@@ -45,7 +45,6 @@ PathLike = Union[str, Path]           # For user input (can be str or Path)
 DEFAULT_MAX_TOKENS: Final[int] = 500
 DEFAULT_FOLDER: Final[Path] = Path.home() / "Pictures" / "Processed" # More robust default
 DEFAULT_HTML_OUTPUT: Final[Path] = Path("results.html")
-HUGGINGFACE_CLI: Final[Path] = Path("/opt/homebrew/Caskroom/miniconda/base/envs/mlx/bin/huggingface-cli")
 
 # Constants - EXIF
 IMPORTANT_EXIF_TAGS: Final[frozenset[str]] = frozenset({
@@ -632,9 +631,9 @@ def print_model_stats(results: List[ModelResult]) -> None:
         avg_time: float = sum(r.stats.time for r in results) / len(results)
 
         # Format summary strings
-        avg_active_str: str = f"{avg_active:.1f} MB"
-        avg_cache_str: str = f"{avg_cache:.1f} MB"
-        max_peak_str: str = f"{max_peak:.1f} MB"
+        avg_active_str: str = f"{avg_active:,.1f} MB"
+        avg_cache_str: str = f"{avg_cache:,.1f} MB"
+        max_peak_str: str = f"{max_peak:,.1f} MB"
         avg_time_str: str = f"{avg_time:.2f} s"
 
         # Print separator and summary row
