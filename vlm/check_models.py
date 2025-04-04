@@ -6,41 +6,32 @@ import argparse
 import logging
 import sys
 import time
+import traceback
 from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
-from typing import (Any, Callable, Dict, Final, List, Optional, NamedTuple,
-                    Tuple, Union, IO) # Added IO, Text
+from typing import (
+    Any, Callable, Dict, Final, IO, List, NamedTuple, 
+    Optional, Tuple, Union
+)
 
 # Third-party imports
-try:
-    import mlx.core as mx
-    from PIL import Image, UnidentifiedImageError
-    # Import specific EXIF related types if available/needed, otherwise use Any
-    from PIL.ExifTags import GPSTAGS, TAGS # Keep these
-    from mlx_vlm import (load, generate, __version__ as vlm_version)
-    from mlx_vlm.prompt_utils import apply_chat_template
-    from mlx_vlm.utils import load_config
-    # Import huggingface_hub library
-    from huggingface_hub import scan_cache_dir
-    # Import specific types if needed, e.g., CacheInfo, CachedRepoInfo
-    from huggingface_hub import HFCacheInfo
-    from huggingface_hub.errors import HFValidationError # For error handling
-except ImportError as e:
-    print(f"Error importing required libraries: {e}", file=sys.stderr)
-    print("Please ensure you have installed mlx, mlx-lm, Pillow, huggingface_hub, and mlx-vlm.", file=sys.stderr)
-    sys.exit(1)
-
+import mlx.core as mx
+from PIL import Image, UnidentifiedImageError
+from PIL.ExifTags import GPSTAGS, TAGS
+from mlx_vlm import (load, generate, __version__ as vlm_version)
+from mlx_vlm.prompt_utils import apply_chat_template
+from mlx_vlm.utils import load_config
+from huggingface_hub import scan_cache_dir, HFCacheInfo
+from huggingface_hub.errors import HFValidationError
 
 # Configure logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(sys.stderr)
-    ]
+    handlers=[logging.StreamHandler(sys.stderr)]
 )
 
 # Type aliases and definitions
@@ -54,6 +45,7 @@ PathLike = Union[str, Path]           # For user input (can be str or Path)
 DEFAULT_MAX_TOKENS: Final[int] = 500
 DEFAULT_FOLDER: Final[Path] = Path.home() / "Pictures" / "Processed" # More robust default
 DEFAULT_HTML_OUTPUT: Final[Path] = Path("results.html")
+HUGGINGFACE_CLI: Final[Path] = Path("/opt/homebrew/Caskroom/miniconda/base/envs/mlx/bin/huggingface-cli")
 
 # Constants - EXIF
 IMPORTANT_EXIF_TAGS: Final[frozenset[str]] = frozenset({
@@ -124,74 +116,34 @@ class ModelResult:
 # --- Memory Management ---
 
 def track_memory_and_time(func: Callable[[], Any]) -> Tuple[Any, MemoryStats]:
-    """
-    Tracks MLX memory usage and timing for a given function execution.
-
-    Args:
-        func: The function to execute and measure. It should take no arguments.
-
-    Returns:
-        A tuple containing the result of the function and a MemoryStats object.
-        Returns (None, MemoryStats.zero()) if the function raises an exception.
-    """
-    # Clear cache and reset peak memory *before* the operation
+    """Track memory usage and timing for a function execution."""
     mx.clear_cache()
     mx.reset_peak_memory()
-    # Get initial memory state
-    initial_stats: MemoryStats = MemoryStats.from_current()
-    start_time: float = time.perf_counter()
-
-    result: Any = None
-    stats: MemoryStats = MemoryStats.zero()
-
+    
+    initial_stats = MemoryStats.from_current()
+    start_time = time.perf_counter()
+    
     try:
-        result = func() # Execute the code block
-
-        # Ensure all computations are done for accurate memory measurement if result involves mx arrays
-        # This part is heuristic; checks common MLX object patterns
-        items_to_eval: List[Any] = []
-        if isinstance(result, tuple):
-            items_to_eval.extend(list(result))
-        else:
-            items_to_eval.append(result)
-
-        for item in items_to_eval:
-            if hasattr(item, 'parameters') and callable(getattr(item, 'parameters')):
-                 # Assuming parameters() returns something mx.eval can handle (like dict/list of arrays)
-                 mx.eval(item.parameters())
-            elif isinstance(item, (list, dict)): # Eval if result is a collection of arrays
-                 mx.eval(item)
-            elif hasattr(item, 'tolist'): # Simple check for mx.array like objects
-                 mx.eval(item)
-
-    except Exception as e:
-        log.error(f"Exception during tracked execution: {e}", exc_info=log.level <= logging.DEBUG)
-        # Return None result and zero stats on error
-        return None, MemoryStats.zero()
-    finally:
-        # Calculate deltas and final stats *after* the operation
-        end_time: float = time.perf_counter()
-        elapsed_time: float = end_time - start_time
-        final_stats: MemoryStats = MemoryStats.from_current().with_time(elapsed_time)
-
-        stats = MemoryStats(
+        result = func()
+        # Check if result contains a model attribute with parameters
+        if hasattr(result, 'model') and hasattr(result.model, 'parameters'):
+            mx.eval(result.model.parameters())
+        final_stats = MemoryStats.from_current()
+        
+        return result, MemoryStats(
             active=final_stats.active - initial_stats.active,
             cached=final_stats.cached - initial_stats.cached,
             peak=final_stats.peak,
-            time=final_stats.time
+            time=time.perf_counter() - start_time
         )
-
-        log.debug(
-            f"Memory Tracking: Active Δ: {stats.active:.1f} MB, "
-            f"Cache Δ: {stats.cached:.1f} MB, "
-            f"Peak: {stats.peak:.1f} MB, "
-            f"Time: {stats.time:.2f}s"
-        )
-        # Clean up *after* measurements are taken
+    except Exception as e:
+        logger.error(f"Error during tracked execution: {e}")
+        if logger.level <= logging.DEBUG:
+            traceback.print_exc()
+        return None, MemoryStats.zero()
+    finally:
         mx.clear_cache()
-        # Peak memory is reset at the start, no need to reset here
-
-    return result, stats
+        mx.reset_peak_memory()
 
 
 # --- File Handling ---
@@ -199,7 +151,7 @@ def track_memory_and_time(func: Callable[[], Any]) -> Tuple[Any, MemoryStats]:
 def find_most_recent_file(folder: Path) -> Optional[Path]:
     """Return the Path of the most recently modified file in the folder."""
     if not folder.is_dir():
-        log.error(f"Provided path is not a directory: {folder}")
+        logger.error(f"Provided path is not a directory: {folder}")
         return None
     try:
         # Filter for files, excluding hidden ones
@@ -208,18 +160,18 @@ def find_most_recent_file(folder: Path) -> Optional[Path]:
             if f.is_file() and not f.name.startswith(".")
         ]
         if not files:
-            log.warning(f"No non-hidden files found in: {folder}")
+            logger.warning(f"No non-hidden files found in: {folder}")
             return None
         # Sort by modification time, newest first
         files.sort(key=lambda f: f.stat().st_mtime, reverse=True)
         most_recent: Path = files[0]
-        log.debug(f"Most recent file found: {most_recent}")
+        logger.debug(f"Most recent file found: {most_recent}")
         return most_recent
     except PermissionError:
-        log.error(f"Permission denied accessing folder: {folder}")
+        logger.error(f"Permission denied accessing folder: {folder}")
         return None
     except OSError as e:
-        log.error(f"OS error scanning folder {folder}: {e}")
+        logger.error(f"OS error scanning folder {folder}: {e}")
         return None
 
 def print_image_dimensions(image_path: Path) -> None:
@@ -232,11 +184,11 @@ def print_image_dimensions(image_path: Path) -> None:
             mpx: float = (width * height) / 1_000_000
             print(f"Image dimensions: {width}x{height} ({mpx:.1f} MPixels)")
     except FileNotFoundError:
-        log.error(f"Image file not found: {image_path}")
+        logger.error(f"Image file not found: {image_path}")
     except UnidentifiedImageError:
-        log.error(f"Cannot identify image file (may be corrupt or wrong format): {image_path}")
+        logger.error(f"Cannot identify image file (may be corrupt or wrong format): {image_path}")
     except Exception as e:
-        log.error(f"Error reading image dimensions for {image_path}: {e}")
+        logger.error(f"Error reading image dimensions for {image_path}: {e}")
 
 # --- EXIF & Metadata Handling ---
 
@@ -251,7 +203,7 @@ def get_exif_data(image_path: Path) -> Optional[ExifDict]:
             # The return type of getexif() is complex, often Image.Exif
             exif_raw: Any = img.getexif() # Use Any or a more specific type if PIL provides one easily
             if not exif_raw:
-                log.debug(f"No EXIF data found in {image_path}")
+                logger.debug(f"No EXIF data found in {image_path}")
                 return None
 
             # Decode tags using PIL.ExifTags.TAGS
@@ -279,26 +231,26 @@ def get_exif_data(image_path: Path) -> Optional[ExifDict]:
                     # Store decoded GPS info under a consistent string key "GPSInfo"
                     exif_decoded["GPSInfo"] = gps_decoded
             except KeyError: # Handle case where GPS IFD doesn't exist
-                 log.debug(f"GPSInfo IFD (key {Image.Exif.IFD.GPSInfo}) not found in {image_path}")
+                 logger.debug(f"GPSInfo IFD (key {Image.Exif.IFD.GPSInfo}) not found in {image_path}")
             except Exception as e_gps: # Catch other potential errors reading GPS IFD
-                 log.warning(f"Could not read GPS IFD for {image_path}: {type(e_gps).__name__} {e_gps}")
+                 logger.warning(f"Could not read GPS IFD for {image_path}: {type(e_gps).__name__} {e_gps}")
 
 
-            log.debug(f"Successfully extracted EXIF for {image_path}")
+            logger.debug(f"Successfully extracted EXIF for {image_path}")
             return exif_decoded
 
     except FileNotFoundError:
-        log.error(f"Image file not found for EXIF extraction: {image_path}")
+        logger.error(f"Image file not found for EXIF extraction: {image_path}")
         return None
     except UnidentifiedImageError:
-        log.error(f"Cannot identify image file for EXIF: {image_path}")
+        logger.error(f"Cannot identify image file for EXIF: {image_path}")
         return None
     except AttributeError as e:
         # Can happen if PIL version is very old or image format lacks EXIF support
-        log.warning(f"PIL lacks getexif/get_ifd method or image has no EXIF support ({e}): {image_path}")
+        logger.warning(f"PIL lacks getexif/get_ifd method or image has no EXIF support ({e}): {image_path}")
         return None
     except Exception as e:
-        log.error(f"Unexpected error reading EXIF from {image_path}: {e}", exc_info=log.level <= logging.DEBUG)
+        logger.error(f"Unexpected error reading EXIF from {image_path}: {e}", exc_info=logger.level <= logging.DEBUG)
         return None
 
 def _format_exif_date(date_str_input: Any) -> Optional[str]:
@@ -307,7 +259,7 @@ def _format_exif_date(date_str_input: Any) -> Optional[str]:
         try:
             date_str: str = str(date_str_input)
         except Exception:
-             log.debug(f"Could not convert potential date value '{date_str_input}' to string.")
+             logger.debug(f"Could not convert potential date value '{date_str_input}' to string.")
              return None
     else:
         date_str = date_str_input
@@ -319,7 +271,7 @@ def _format_exif_date(date_str_input: Any) -> Optional[str]:
             return dt_obj.strftime("%Y-%m-%d %H:%M:%S")
         except (ValueError, TypeError): # Catch errors during parsing
             continue # Try next format
-    log.debug(f"Could not parse date string '{date_str}' with known formats.")
+    logger.debug(f"Could not parse date string '{date_str}' with known formats.")
     return None
 
 # Helper type for GPS coordinate tuple elements (can be complex, e.g., Ratio)
@@ -333,7 +285,7 @@ def _convert_gps_coordinate(
     """Convert EXIF GPS coordinate tuple (Degrees, Minutes, Seconds) to decimal degrees."""
     # Basic validation
     if ref is None or coord_tuple is None or len(coord_tuple) != 3:
-        log.debug(f"Invalid input for GPS conversion: ref={ref}, coord_tuple={coord_tuple}")
+        logger.debug(f"Invalid input for GPS conversion: ref={ref}, coord_tuple={coord_tuple}")
         return None
 
     try:
@@ -344,11 +296,11 @@ def _convert_gps_coordinate(
         elif isinstance(ref, str):
             ref_str = ref
         else:
-            log.warning(f"Unexpected type for GPS reference: {type(ref)}")
+            logger.warning(f"Unexpected type for GPS reference: {type(ref)}")
             return None
         ref_upper: str = ref_str.upper()
         if ref_upper not in ['N', 'S', 'E', 'W']:
-             log.warning(f"Invalid GPS reference value: {ref_str}")
+             logger.warning(f"Invalid GPS reference value: {ref_str}")
              return None
 
         # Helper to extract float value from Ratio or numeric types
@@ -359,7 +311,7 @@ def _convert_gps_coordinate(
                  num = item.numerator
                  den = item.denominator
                  if den == 0:
-                      log.warning("GPS coordinate component has zero denominator.")
+                      logger.warning("GPS coordinate component has zero denominator.")
                       # Fallback or raise? Let's try returning numerator as float
                       return float(num)
                  return float(num) / float(den)
@@ -371,7 +323,7 @@ def _convert_gps_coordinate(
                   try:
                        return float(item)
                   except (TypeError, ValueError) as e_conv:
-                       log.warning(f"Could not convert GPS component '{item}' to float: {e_conv}")
+                       logger.warning(f"Could not convert GPS component '{item}' to float: {e_conv}")
                        raise ValueError("Invalid GPS component type") from e_conv
 
 
@@ -391,7 +343,7 @@ def _convert_gps_coordinate(
 
     except (AttributeError, IndexError, TypeError, ValueError, ZeroDivisionError, UnicodeDecodeError) as e:
         # Catch errors during conversion or calculation
-        log.warning(f"Error converting GPS coordinate component: {e} (Ref: {ref}, Coords: {coord_tuple})")
+        logger.warning(f"Error converting GPS coordinate component: {e} (Ref: {ref}, Coords: {coord_tuple})")
         return None
 
 def extract_image_metadata(image_path: Path) -> MetadataDict:
@@ -405,7 +357,7 @@ def extract_image_metadata(image_path: Path) -> MetadataDict:
     # Get EXIF data using the cached function
     exif: Optional[ExifDict] = get_exif_data(image_path)
     if not exif:
-        log.debug(f"No EXIF data found for {image_path}, returning default metadata.")
+        logger.debug(f"No EXIF data found for {image_path}, returning default metadata.")
         return metadata # Return defaults if no EXIF
 
     # 1. Extract Date
@@ -417,13 +369,13 @@ def extract_image_metadata(image_path: Path) -> MetadataDict:
             formatted_date: Optional[str] = _format_exif_date(date_val) # Pass the raw value
             if formatted_date:
                 metadata["date"] = formatted_date
-                log.debug(f"Found and formatted date from tag '{tag}': {formatted_date}")
+                logger.debug(f"Found and formatted date from tag '{tag}': {formatted_date}")
                 found_date = True
                 break # Stop after finding the first valid date
             else:
-                 log.debug(f"Date tag '{tag}' ('{date_val}') found but could not be formatted.")
+                 logger.debug(f"Date tag '{tag}' ('{date_val}') found but could not be formatted.")
     if not found_date:
-         log.debug(f"Could not find or format a suitable date tag in {EXIF_DATE_TAGS}")
+         logger.debug(f"Could not find or format a suitable date tag in {EXIF_DATE_TAGS}")
 
     # 2. Extract Description
     desc_val: ExifValue = exif.get("ImageDescription")
@@ -437,15 +389,15 @@ def extract_image_metadata(image_path: Path) -> MetadataDict:
             else:
                  desc_str = str(desc_val) # Convert other types to string
             metadata["description"] = desc_str.strip()
-            log.debug(f"Found description: '{metadata['description']}'")
+            logger.debug(f"Found description: '{metadata['description']}'")
         except Exception as e:
-            log.warning(f"Could not convert description value '{desc_val}' to string: {e}")
+            logger.warning(f"Could not convert description value '{desc_val}' to string: {e}")
 
     # 3. Extract GPS
     # GPSInfo should have been decoded into a dict by get_exif_data
     gps_info_val: ExifValue = exif.get("GPSInfo")
     if isinstance(gps_info_val, dict): # Check if it's the decoded dictionary
-        log.debug(f"Raw GPS Info dictionary: {gps_info_val}")
+        logger.debug(f"Raw GPS Info dictionary: {gps_info_val}")
         # Explicitly type hint the retrieved values
         lat_ref: Optional[Union[str, bytes]] = gps_info_val.get("GPSLatitudeRef")
         # Assume GPSLatitude/Longitude are tuples if they exist
@@ -464,18 +416,18 @@ def extract_image_metadata(image_path: Path) -> MetadataDict:
         if lat is not None and lon is not None:
             # Format to standard GPS string (latitude, longitude)
             metadata["gps"] = f"{lat:+.6f}, {lon:+.6f}"
-            log.debug(f"Calculated GPS Coordinates: {metadata['gps']}")
+            logger.debug(f"Calculated GPS Coordinates: {metadata['gps']}")
         else:
-            log.debug("Could not calculate valid GPS coordinates from available tags.")
+            logger.debug("Could not calculate valid GPS coordinates from available tags.")
             if lat_coord is None or lon_coord is None:
-                 log.debug(f"GPS coordinate tuples were invalid or missing. Lat raw: {lat_coord_raw}, Lon raw: {lon_coord_raw}")
+                 logger.debug(f"GPS coordinate tuples were invalid or missing. Lat raw: {lat_coord_raw}, Lon raw: {lon_coord_raw}")
 
     elif gps_info_val is not None:
         # Log if GPSInfo exists but isn't the expected dictionary
-         log.warning(f"GPSInfo tag found but was not a dictionary (type: {type(gps_info_val)}). Value: {gps_info_val}")
+         logger.warning(f"GPSInfo tag found but was not a dictionary (type: {type(gps_info_val)}). Value: {gps_info_val}")
     else:
          # Log if GPSInfo tag is completely missing
-         log.debug("No GPSInfo tag found in EXIF data.")
+         logger.debug("No GPSInfo tag found in EXIF data.")
 
     return metadata
 
@@ -498,7 +450,7 @@ def pretty_print_exif(exif: ExifDict, verbose: bool = False) -> None:
         if tag_str == "GPSInfo" and isinstance(value, dict): # Skip the decoded GPS dict
              continue
         if isinstance(value, dict): # Skip other unexpected dictionaries
-             log.debug(f"Skipping dictionary value for EXIF tag '{tag_str}' in pretty print.")
+             logger.debug(f"Skipping dictionary value for EXIF tag '{tag_str}' in pretty print.")
              continue
 
         # Format the value nicely for printing
@@ -601,18 +553,18 @@ def get_cached_model_ids() -> List[str]:
         cache_info: HFCacheInfo = scan_cache_dir()
         # CacheInfo.repos is a list of RepoInfo objects
         model_ids: List[str] = sorted(repo.repo_id for repo in cache_info.repos)
-        log.debug(f"Found {len(model_ids)} potential models in cache: {model_ids}")
+        logger.debug(f"Found {len(model_ids)} potential models in cache: {model_ids}")
         # Optional: Add filtering here based on repo properties if needed
         # e.g., filter by repo_type if available and relevant
         return model_ids
     except HFValidationError:
-         log.error("Hugging Face cache directory seems invalid or inaccessible.")
+         logger.error("Hugging Face cache directory seems invalid or inaccessible.")
          return []
     except FileNotFoundError:
-        log.error("Hugging Face cache directory not found. Is huggingface_hub configured?")
+        logger.error("Hugging Face cache directory not found. Is huggingface_hub configured?")
         return []
     except Exception as e:
-        log.error(f"Unexpected error scanning Hugging Face cache: {type(e).__name__}: {e}", exc_info=log.level <= logging.DEBUG)
+        logger.error(f"Unexpected error scanning Hugging Face cache: {type(e).__name__}: {e}", exc_info=logger.level <= logging.DEBUG)
         return []
 
 
@@ -705,7 +657,7 @@ def print_model_stats(results: List[ModelResult]) -> None:
 def generate_html_report(results: List[ModelResult], filename: Path) -> None:
     """Generates an HTML file with a table of model performance statistics."""
     if not results:
-        log.warning("No results to generate HTML report.")
+        logger.warning("No results to generate HTML report.")
         return
 
     # Sort by processing time (fastest first) for consistency with console
@@ -795,12 +747,12 @@ def generate_html_report(results: List[ModelResult], filename: Path) -> None:
         f: IO[str]
         with open(filename, "w", encoding="utf-8") as f:
             f.write(html_content)
-        log.info(f"HTML report saved to: {filename.resolve()}")
+        logger.info(f"HTML report saved to: {filename.resolve()}")
     except IOError as e:
-        log.error(f"Failed to write HTML report to {filename}: {e}")
+        logger.error(f"Failed to write HTML report to {filename}: {e}")
     except Exception as e:
          # Catch any other unexpected errors during file writing
-         log.error(f"An unexpected error occurred while writing HTML report: {type(e).__name__}: {e}", exc_info=log.level <= logging.DEBUG)
+         logger.error(f"An unexpected error occurred while writing HTML report: {type(e).__name__}: {e}", exc_info=logger.level <= logging.DEBUG)
 
 
 # --- Model Processing Core ---
@@ -810,95 +762,65 @@ def process_image_with_model(
     image_path: Path,
     prompt: str,
     max_tokens: int,
-    vlm_verbose: bool, # Verbosity for VLM generate function
+    vlm_verbose: bool,
 ) -> Optional[ModelResult]:
-    """Loads a VLM, generates text for an image, and tracks resources."""
-    log.info(f"Processing '{image_path.name}' with model: {model_identifier}")
-
-    # Use Any for model, tokenizer, config as specific types might be internal/complex
-    model_obj: Any = None
-    tokenizer_obj: Any = None
-    config_obj: Any = None
-
-    # Define the core processing logic as a function to pass to the tracker
-    # This function should return the generated output string or raise an exception
-    def core_processing_logic() -> str: # Return type is string on success
-        nonlocal model_obj, tokenizer_obj, config_obj # Allow modification
-
-        # --- Load Model ---
-        load_start_time: float = time.perf_counter()
-        try:
-            # Use trust_remote_code=True cautiously, often needed for VLMs from HF Hub
-            # load() typically returns (model, tokenizer)
-            model_obj, tokenizer_obj = load(model_identifier, trust_remote_code=True)
-            # load_config() returns the model config dictionary
-            config_obj = load_config(model_identifier, trust_remote_code=True)
-            log.debug(f"Model '{model_identifier}' loaded in {time.perf_counter() - load_start_time:.2f}s")
-        except Exception as load_err:
-             # Log the specific error during loading
-             log.error(f"Failed to load model/tokenizer/config for {model_identifier}: {type(load_err).__name__}: {load_err}", exc_info=log.level <= logging.DEBUG)
-             raise RuntimeError(f"Model loading failed for {model_identifier}") from load_err # Re-raise standardized error
-
-        # --- Prepare Prompt ---
-        try:
-            # apply_chat_template expects tokenizer, config, prompt, num_images
-            # It returns the formatted prompt string
-            chat_prompt: str = apply_chat_template(tokenizer_obj, config_obj, prompt, num_images=1)
-            log.debug(f"Applied chat template for {model_identifier}: {chat_prompt[:100]}...") # Log snippet
-        except Exception as prompt_err:
-            log.error(f"Failed to apply chat template for {model_identifier}: {type(prompt_err).__name__}: {prompt_err}", exc_info=log.level <= logging.DEBUG)
-            raise RuntimeError(f"Prompt templating failed for {model_identifier}") from prompt_err # Re-raise
-
-        # --- Generate Text ---
-        gen_start_time: float = time.perf_counter()
-        try:
-            # generate() returns the generated text as a string
-            generated_output: str = generate(
-                model=model_obj,
-                processor=tokenizer_obj, # 'processor' is the term used in mlx-vlm for tokenizer/processor
-                prompt=chat_prompt,
-                image_paths=[str(image_path)], # generate expects list of strings
-                max_tokens=max_tokens,
-                verbose=vlm_verbose, # Pass verbose flag to generate
-                temp=0.0 # Deterministic output
-            )
-            log.debug(f"Generation completed in {time.perf_counter() - gen_start_time:.2f}s for {model_identifier}")
-            # Ensure the output is a string, handle potential non-string returns defensively
-            return str(generated_output) if generated_output is not None else ""
-        except Exception as gen_err:
-            log.error(f"Generation failed for {model_identifier}: {type(gen_err).__name__}: {gen_err}", exc_info=log.level <= logging.DEBUG)
-            raise RuntimeError(f"Text generation failed for {model_identifier}") from gen_err # Re-raise
-
-    # --- Execute and Track ---
-    # track_memory_and_time returns Tuple[Any, MemoryStats]
-    # We expect the 'Any' part to be 'str' if core_processing_logic succeeds, None otherwise
-    tracked_result: Optional[str] # Explicitly type the expected result
-    stats: MemoryStats
-    tracked_result, stats = track_memory_and_time(core_processing_logic)
-
-    # Cleanup loaded objects explicitly after tracking (helps free memory sooner, maybe)
-    # Use del statement
+    """Process an image with a Vision Language Model."""
+    logger.info(f"Processing '{image_path.name}' with model: {model_identifier}")
+    
+    model = tokenizer = None
     try:
-         if model_obj is not None:
-           del model_obj
-         if tokenizer_obj is not None:
-           del tokenizer_obj
-         if config_obj is not None:
-           del config_obj
-    except NameError:
-         pass # Should not happen if logic flows correctly, but safe to ignore
+        # Reset memory state
+        mx.clear_cache()
+        mx.reset_peak_memory()
+        
+        # Capture initial memory state
+        initial_stats = MemoryStats.from_current()
+        start_time = time.perf_counter()
 
-    # Check if the tracking or the core logic failed
-    # tracked_result will be None if core_processing_logic raised an exception caught by track_memory_and_time
-    if tracked_result is None:
-         # Error messages should have been logged within core_processing_logic or track_memory_and_time
-         log.error(f"Processing failed for model {model_identifier} (check previous logs for details).")
-         return None # Indicate failure
+        # Load and run model
+        model, tokenizer = load(model_identifier, trust_remote_code=True)
+        config = load_config(model_identifier, trust_remote_code=True)
+        
+        formatted_prompt = apply_chat_template(tokenizer, config, prompt, num_images=1)
+        output = generate(
+            model=model,
+            processor=tokenizer,
+            prompt=formatted_prompt,
+            image_paths=[str(image_path)],
+            max_tokens=max_tokens,
+            verbose=vlm_verbose,
+            temp=0.0
+        )
 
-    # If core_processing_logic succeeded, tracked_result contains the generated text
-    log.info(f"Finished processing '{model_identifier}' in {stats.time:.1f}s. Peak Mem: {stats.peak:.1f}MB")
-    # Create and return the ModelResult object
-    return ModelResult(model_name=model_identifier, output=tracked_result, stats=stats)
+        # Force sync and measure final state
+        mx.eval(model.parameters())
+        
+        end_stats = MemoryStats.from_current()
+        
+        final_stats = MemoryStats(
+            active=end_stats.active - initial_stats.active,
+            cached=end_stats.cached - initial_stats.cached,
+            peak=end_stats.peak,
+            time=time.perf_counter() - start_time
+        )
+
+        return ModelResult(
+            model_name=model_identifier,
+            output=str(output) if output is not None else "",
+            stats=final_stats
+        )
+
+    except Exception as e:
+        logger.error(f"Failed to process {model_identifier}: {e}")
+        if logger.isEnabledFor(logging.DEBUG):
+            traceback.print_exc()
+        return None
+    finally:
+        # Ensure cleanup
+        del model
+        del tokenizer
+        mx.clear_cache()
+        mx.reset_peak_memory()
 
 # --- Main Execution ---
 
@@ -906,27 +828,27 @@ def main(args: argparse.Namespace) -> None:
     """Main function to orchestrate image analysis."""
     # Setup logging level based on args
     if args.debug:
-        log.setLevel(logging.DEBUG)
-        log.debug("Debug mode enabled.")
+        logger.setLevel(logging.DEBUG)
+        logger.debug("Debug mode enabled.")
     elif args.verbose: # If only verbose is set, ensure INFO level
-        log.setLevel(logging.INFO)
-        log.info("Verbose mode enabled.")
+        logger.setLevel(logging.INFO)
+        logger.info("Verbose mode enabled.")
     else:
-        log.setLevel(logging.INFO) # Default level
+        logger.setLevel(logging.INFO) # Default level
 
     # Print library versions if possible
     try:
          # Use f-string for cleaner output
          print(f"MLX version: {mx.__version__}")
          print(f"MLX-VLM version: {vlm_version}\n")
-         log.debug(f"Default MLX device: {mx.default_device()}")
+         logger.debug(f"Default MLX device: {mx.default_device()}")
          # Optionally, add huggingface_hub version
          # import huggingface_hub
          # print(f"Hugging Face Hub version: {huggingface_hub.__version__}")
     except NameError: # mx or vlm_version might not be defined if import failed
-         log.warning("Could not retrieve MLX/VLM version info (NameError).")
+         logger.warning("Could not retrieve MLX/VLM version info (NameError).")
     except AttributeError: # mx might not have __version__ in older versions
-         log.warning("Could not retrieve MLX version info (AttributeError).")
+         logger.warning("Could not retrieve MLX version info (AttributeError).")
 
     # Record overall start time
     overall_start_time: float = time.perf_counter()
@@ -934,7 +856,7 @@ def main(args: argparse.Namespace) -> None:
     # --- 1. Validate folder and find the image ---
     # args.folder should be Path type from argparse setup
     folder_path: Path = args.folder.resolve() # Use absolute path
-    log.info(f"Scanning folder: {folder_path}")
+    logger.info(f"Scanning folder: {folder_path}")
 
     # Ensure default folder exists if it's the one being used
     if args.folder == DEFAULT_FOLDER and not DEFAULT_FOLDER.is_dir():
@@ -973,9 +895,9 @@ def main(args: argparse.Namespace) -> None:
     prompt: str
     if args.prompt:
         prompt = args.prompt
-        log.info("Using user-provided prompt.")
+        logger.info("Using user-provided prompt.")
     else:
-        log.info("Generating default prompt based on image metadata.")
+        logger.info("Generating default prompt based on image metadata.")
         # Construct default prompt using extracted metadata, filter empty parts
         prompt_parts: List[str] = [
             "Provide a factual caption, a brief description, and relevant comma-separated keywords/tags for this image.",
@@ -988,7 +910,7 @@ def main(args: argparse.Namespace) -> None:
         ]
         # Join non-empty parts with a space, remove leading/trailing whitespace
         prompt = " ".join(filter(None, prompt_parts)).strip()
-        log.debug("Using generated prompt based on metadata.")
+        logger.debug("Using generated prompt based on metadata.")
 
     print(f"\nUsing Prompt:\n{prompt}\n{'-'*40}")
 
@@ -1038,7 +960,7 @@ def main(args: argparse.Namespace) -> None:
     if results:
         generate_html_report(results, html_output_path)
     else:
-        log.info(f"Skipping HTML report generation to {html_output_path} as no models were successfully processed.")
+        logger.info(f"Skipping HTML report generation to {html_output_path} as no models were successfully processed.")
 
     # --- Calculate and Print Total Execution Time ---
     overall_time: float = time.perf_counter() - overall_start_time
@@ -1097,6 +1019,6 @@ if __name__ == "__main__":
         main(parsed_args)
     except Exception as main_err:
          # Catch unexpected errors in main execution flow
-         log.exception(f"An unexpected error occurred during main execution: {main_err}")
+         logger.exception(f"An unexpected error occurred during main execution: {main_err}")
          sys.exit(1) # Exit with error status
 
