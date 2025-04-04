@@ -1,0 +1,216 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Performance Results</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f8f9fa; color: #212529; }
+        h1 { text-align: center; color: #343a40; border-bottom: 2px solid #dee2e6; padding-bottom: 10px; margin-bottom: 30px; }
+        table { border-collapse: collapse; width: 95%; margin: 30px auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); background-color: #ffffff; }
+        th, td { border: 1px solid #dee2e6; padding: 12px 15px; text-align: left; }
+        th { background-color: #e9ecef; font-weight: 600; color: #495057; }
+        tr:nth-child(even) { background-color: #f8f9fa; }
+        tr:hover { background-color: #e2e6ea; }
+        td.numeric, th.numeric { text-align: right; font-variant-numeric: tabular-nums; }
+        .summary td { font-weight: bold; background-color: #d1ecf1; color: #0c5460; border-color: #bee5eb; }
+        caption { caption-side: bottom; padding: 15px; font-style: italic; color: #6c757d; text-align: center; }
+        .model-name { font-family: 'Courier New', Courier, monospace; } /* Monospace for model IDs */
+    </style>
+</head>
+<body>
+    <h1>Model Performance Summary</h1>
+    <table>
+        <caption>Performance metrics for Vision Language Model processing. Generated on 2025-04-04 22:03:35. Active/Cache Δ = Change in MB. Peak Mem = Peak usage in MB. Time in seconds.</caption>
+        <thead>
+            <tr>
+                <th>Model</th>
+                <th class="numeric">Active Δ (MB)</th>
+                <th class="numeric">Cache Δ (MB)</th>
+                <th class="numeric">Peak Mem (MB)</th>
+                <th class="numeric">Time (s)</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            <tr>
+                <td class="model-name">mlx-community/SmolVLM2-2.2B-Instruct-mlx</td>
+                <td class="numeric">4,532.7</td>
+                <td class="numeric">333.5</td>
+                <td class="numeric">4,829.7</td>
+                <td class="numeric">2.23</td>
+            </tr>
+
+            <tr>
+                <td class="model-name">mlx-community/paligemma2-3b-pt-896-4bit</td>
+                <td class="numeric">1,751.6</td>
+                <td class="numeric">749.6</td>
+                <td class="numeric">2,426.1</td>
+                <td class="numeric">2.25</td>
+            </tr>
+
+            <tr>
+                <td class="model-name">mlx-community/Florence-2-large-ft-bf16</td>
+                <td class="numeric">1,646.4</td>
+                <td class="numeric">1,607.3</td>
+                <td class="numeric">1,780.0</td>
+                <td class="numeric">2.29</td>
+            </tr>
+
+            <tr>
+                <td class="model-name">mlx-community/Molmo-7B-D-0924-8bit</td>
+                <td class="numeric">9,048.7</td>
+                <td class="numeric">1,848.5</td>
+                <td class="numeric">10,798.1</td>
+                <td class="numeric">2.58</td>
+            </tr>
+
+            <tr>
+                <td class="model-name">HuggingFaceTB/SmolVLM-Instruct</td>
+                <td class="numeric">4,537.9</td>
+                <td class="numeric">497.1</td>
+                <td class="numeric">4,828.6</td>
+                <td class="numeric">2.62</td>
+            </tr>
+
+            <tr>
+                <td class="model-name">mlx-community/paligemma2-3b-ft-docci-448-bf16</td>
+                <td class="numeric">6,083.3</td>
+                <td class="numeric">420.7</td>
+                <td class="numeric">6,489.0</td>
+                <td class="numeric">2.75</td>
+            </tr>
+
+            <tr>
+                <td class="model-name">mlx-community/SmolVLM-Instruct-bf16</td>
+                <td class="numeric">4,537.9</td>
+                <td class="numeric">497.1</td>
+                <td class="numeric">4,828.6</td>
+                <td class="numeric">3.09</td>
+            </tr>
+
+            <tr>
+                <td class="model-name">mlx-community/paligemma2-10b-ft-docci-448-6bit</td>
+                <td class="numeric">7,912.6</td>
+                <td class="numeric">814.5</td>
+                <td class="numeric">8,648.8</td>
+                <td class="numeric">3.27</td>
+            </tr>
+
+            <tr>
+                <td class="model-name">mlx-community/Molmo-7B-D-0924-bf16</td>
+                <td class="numeric">16,047.4</td>
+                <td class="numeric">1,551.9</td>
+                <td class="numeric">17,526.8</td>
+                <td class="numeric">3.62</td>
+            </tr>
+
+            <tr>
+                <td class="model-name">mlx-community/paligemma2-10b-ft-docci-448-bf16</td>
+                <td class="numeric">19,345.9</td>
+                <td class="numeric">518.7</td>
+                <td class="numeric">19,829.0</td>
+                <td class="numeric">5.05</td>
+            </tr>
+
+            <tr>
+                <td class="model-name">mlx-community/deepseek-vl2-8bit</td>
+                <td class="numeric">29,370.0</td>
+                <td class="numeric">638.6</td>
+                <td class="numeric">29,911.4</td>
+                <td class="numeric">6.48</td>
+            </tr>
+
+            <tr>
+                <td class="model-name">mlx-community/Llama-3.2-11B-Vision-Instruct-8bit</td>
+                <td class="numeric">11,370.1</td>
+                <td class="numeric">636.7</td>
+                <td class="numeric">11,827.8</td>
+                <td class="numeric">8.14</td>
+            </tr>
+
+            <tr>
+                <td class="model-name">mlx-community/llava-v1.6-mistral-7b-8bit</td>
+                <td class="numeric">8,070.3</td>
+                <td class="numeric">570.4</td>
+                <td class="numeric">8,480.9</td>
+                <td class="numeric">8.18</td>
+            </tr>
+
+            <tr>
+                <td class="model-name">mlx-community/Idefics3-8B-Llama3-bf16</td>
+                <td class="numeric">16,934.9</td>
+                <td class="numeric">380.1</td>
+                <td class="numeric">17,180.9</td>
+                <td class="numeric">9.28</td>
+            </tr>
+
+            <tr>
+                <td class="model-name">meta-llama/Llama-3.2-11B-Vision-Instruct</td>
+                <td class="numeric">21,347.5</td>
+                <td class="numeric">424.0</td>
+                <td class="numeric">21,628.3</td>
+                <td class="numeric">13.60</td>
+            </tr>
+
+            <tr>
+                <td class="model-name">mlx-community/pixtral-12b-8bit</td>
+                <td class="numeric">13,499.7</td>
+                <td class="numeric">563.4</td>
+                <td class="numeric">13,882.3</td>
+                <td class="numeric">13.69</td>
+            </tr>
+
+            <tr>
+                <td class="model-name">microsoft/Phi-3.5-vision-instruct</td>
+                <td class="numeric">10,104.0</td>
+                <td class="numeric">2,725.9</td>
+                <td class="numeric">10,975.2</td>
+                <td class="numeric">18.84</td>
+            </tr>
+
+            <tr>
+                <td class="model-name">mlx-community/Phi-3.5-vision-instruct-bf16</td>
+                <td class="numeric">10,104.0</td>
+                <td class="numeric">2,725.9</td>
+                <td class="numeric">10,975.2</td>
+                <td class="numeric">18.89</td>
+            </tr>
+
+            <tr>
+                <td class="model-name">mlx-community/pixtral-12b-bf16</td>
+                <td class="numeric">25,372.3</td>
+                <td class="numeric">446.5</td>
+                <td class="numeric">25,660.3</td>
+                <td class="numeric">22.83</td>
+            </tr>
+
+            <tr>
+                <td class="model-name">mlx-community/llava-v1.6-34b-8bit</td>
+                <td class="numeric">36,939.4</td>
+                <td class="numeric">624.7</td>
+                <td class="numeric">37,314.1</td>
+                <td class="numeric">34.73</td>
+            </tr>
+
+            <tr>
+                <td class="model-name">mlx-community/Llama-3.2-90B-Vision-Instruct-4bit</td>
+                <td class="numeric">49,856.4</td>
+                <td class="numeric">1,250.8</td>
+                <td class="numeric">50,455.0</td>
+                <td class="numeric">67.96</td>
+            </tr>
+
+            <tr class="summary">
+                <td>AVERAGE / MAX PEAK</td>
+                <td class="numeric">14686.3</td>
+                <td class="numeric">944.1</td>
+                <td class="numeric">50455.0</td>
+                <td class="numeric">12.02</td>
+            </tr>
+
+        </tbody>
+    </table>
+</body>
+</html>
