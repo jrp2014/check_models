@@ -83,15 +83,34 @@ GPS_LON_TAG: Final[int] = 4
 
 class MemoryStats(NamedTuple):
     """Memory statistics container."""
-    active_delta: float  # Change in active memory (MB)
-    cache_delta: float   # Change in cache memory (MB)
-    peak: float          # Peak memory usage (MB) during the operation
-    time: float          # Processing time (seconds)
+    active: float    # Current active memory in MB
+    cached: float    # Current cached memory in MB
+    peak: float      # Peak memory usage in MB
+    time: float      # Processing time in seconds
 
     @staticmethod
     def zero() -> 'MemoryStats':
         """Create a zero-initialized MemoryStats object."""
-        return MemoryStats(active_delta=0.0, cache_delta=0.0, peak=0.0, time=0.0)
+        return MemoryStats(active=0.0, cached=0.0, peak=0.0, time=0.0)
+
+    @staticmethod
+    def from_current() -> 'MemoryStats':
+        """Create MemoryStats from current MLX memory state."""
+        return MemoryStats(
+            active=mx.get_active_memory() / 1024 / 1024,
+            cached=mx.get_cache_memory() / 1024 / 1024,
+            peak=mx.get_peak_memory() / 1024 / 1024,
+            time=0.0
+        )
+
+    def with_time(self, elapsed: float) -> 'MemoryStats':
+        """Return new MemoryStats with updated time."""
+        return MemoryStats(
+            active=self.active,
+            cached=self.cached,
+            peak=self.peak,
+            time=elapsed
+        )
 
 @dataclass(frozen=True)
 class ModelResult:
@@ -117,8 +136,7 @@ def track_memory_and_time(func: Callable[[], Any]) -> Tuple[Any, MemoryStats]:
     mx.clear_cache()
     mx.reset_peak_memory()
     # Get initial memory state
-    initial_active: int = mx.get_active_memory()
-    initial_cache: int = mx.get_cache_memory()
+    initial_stats: MemoryStats = MemoryStats.from_current()
     start_time: float = time.perf_counter()
 
     result: Any = None
@@ -150,25 +168,20 @@ def track_memory_and_time(func: Callable[[], Any]) -> Tuple[Any, MemoryStats]:
         return None, MemoryStats.zero()
     finally:
         # Calculate deltas and final stats *after* the operation
-        peak_mem: int = mx.get_peak_memory()
         end_time: float = time.perf_counter()
-        final_active: int = mx.get_active_memory()
-        final_cache: int = mx.get_cache_memory()
-
-        active_delta: int = final_active - initial_active
-        cache_delta: int = final_cache - initial_cache
         elapsed_time: float = end_time - start_time
+        final_stats: MemoryStats = MemoryStats.from_current().with_time(elapsed_time)
 
         stats = MemoryStats(
-            active_delta=float(active_delta / 1e6), # Convert to MB
-            cache_delta=float(cache_delta / 1e6), # Convert to MB
-            peak=float(peak_mem / 1e6),            # Convert to MB
-            time=elapsed_time
+            active=final_stats.active - initial_stats.active,
+            cached=final_stats.cached - initial_stats.cached,
+            peak=final_stats.peak,
+            time=final_stats.time
         )
 
         log.debug(
-            f"Memory Tracking: Active Δ: {stats.active_delta:.1f} MB, "
-            f"Cache Δ: {stats.cache_delta:.1f} MB, "
+            f"Memory Tracking: Active Δ: {stats.active:.1f} MB, "
+            f"Cache Δ: {stats.cached:.1f} MB, "
             f"Peak: {stats.peak:.1f} MB, "
             f"Time: {stats.time:.2f}s"
         )
@@ -642,8 +655,8 @@ def print_model_stats(results: List[ModelResult]) -> None:
             model_disp_name = model_disp_name[:max_name_len-3] + "..."
 
         # Format statistics strings
-        active_str: str = f"{result.stats.active_delta:,.1f} MB"
-        cache_str: str = f"{result.stats.cache_delta:,.1f} MB"
+        active_str: str = f"{result.stats.active:,.1f} MB"
+        cache_str: str = f"{result.stats.cached:,.1f} MB"
         peak_str: str = f"{result.stats.peak:,.1f} MB"
         time_str: str = f"{result.stats.time:.2f} s"
 
@@ -659,8 +672,8 @@ def print_model_stats(results: List[ModelResult]) -> None:
     # --- Print average/summary row if multiple results ---
     if len(results) > 1:
         # Calculate averages and maximum peak
-        avg_active: float = sum(r.stats.active_delta for r in results) / len(results)
-        avg_cache: float = sum(r.stats.cache_delta for r in results) / len(results)
+        avg_active: float = sum(r.stats.active for r in results) / len(results)
+        avg_cache: float = sum(r.stats.cached for r in results) / len(results)
         max_peak: float = max(r.stats.peak for r in results) # Peak is max across runs
         avg_time: float = sum(r.stats.time for r in results) / len(results)
 
@@ -742,8 +755,8 @@ def generate_html_report(results: List[ModelResult], filename: Path) -> None:
         html_rows += f"""
             <tr>
                 <td class="model-name">{model_disp_name}</td>
-                <td class="numeric">{result.stats.active_delta:,.1f}</td>
-                <td class="numeric">{result.stats.cache_delta:,.1f}</td>
+                <td class="numeric">{result.stats.active:,.1f}</td>
+                <td class="numeric">{result.stats.cached:,.1f}</td>
                 <td class="numeric">{result.stats.peak:,.1f}</td>
                 <td class="numeric">{result.stats.time:.2f}</td>
             </tr>
@@ -751,8 +764,8 @@ def generate_html_report(results: List[ModelResult], filename: Path) -> None:
     html_summary_row: str = ""
     # Add summary row if multiple results
     if len(results) > 1:
-        avg_active: float = sum(r.stats.active_delta for r in results) / len(results)
-        avg_cache: float = sum(r.stats.cache_delta for r in results) / len(results)
+        avg_active: float = sum(r.stats.active for r in results) / len(results)
+        avg_cache: float = sum(r.stats.cached for r in results) / len(results)
         max_peak: float = max(r.stats.peak for r in results)
         avg_time: float = sum(r.stats.time for r in results) / len(results)
         html_summary_row = f"""
