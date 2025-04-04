@@ -33,13 +33,15 @@ except ImportError as e:
     sys.exit(1)
 
 
-# Logging Configuration
+# Configure logging
+logger = logging.getLogger(__name__)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[logging.StreamHandler(sys.stderr)] # Log errors/debug to stderr
+    handlers=[
+        logging.StreamHandler(sys.stderr)
+    ]
 )
-log: logging.Logger = logging.getLogger(__name__)
 
 # Type aliases and definitions
 # EXIF keys can be int (from raw exif) or str (after decoding)
