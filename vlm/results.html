@@ -9,179 +9,193 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f8f9fa; color: #212529; line-height: 1.6; }
         h1 { text-align: center; color: #343a40; border-bottom: 2px solid #dee2e6; padding-bottom: 10px; margin-bottom: 30px; }
         table { border-collapse: collapse; width: 95%; margin: 30px auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); background-color: #ffffff; }
-        th, td { border: 1px solid #dee2e6; padding: 12px 15px; text-align: left; vertical-align: top; } /* Align top for output cell */
-        th { background-color: #e9ecef; font-weight: 600; color: #495057; position: sticky; top: 0; z-index: 1; } /* Sticky header */
-        tr:nth-child(even) { background-color: #f8f9fa; }
-        tr:hover { background-color: #e2e6ea; }
+        th, td { border: 1px solid #dee2e6; padding: 12px 15px; text-align: left; vertical-align: top; }
+        th { background-color: #e9ecef; font-weight: 600; color: #495057; position: sticky; top: 0; z-index: 1; }
+        tr:nth-child(even):not(.failed-row) { background-color: #f8f9fa; }
+        tr:not(.failed-row):hover { background-color: #e2e6ea; }
         td.numeric, th.numeric { text-align: right; font-variant-numeric: tabular-nums; }
         .summary td { font-weight: bold; background-color: #d1ecf1; color: #0c5460; border-color: #bee5eb; }
         caption { caption-side: bottom; padding: 15px; font-style: italic; color: #6c757d; text-align: center; }
         .model-name { font-family: 'Courier New', Courier, monospace; font-weight: 500; }
-        .model-output { white-space: pre-wrap; word-wrap: break-word; max-width: 600px; font-size: 0.9em; } /* Wrap output, limit width, slightly smaller font */
+        .model-output, .captured-output pre { white-space: pre-wrap; word-wrap: break-word; max-width: 600px; font-size: 0.9em; }
+        .captured-output { background-color: #fff3cd; border-left: 3px solid #ffeeba; padding: 8px; margin-top: 10px; color: #856404; }
+        .captured-output strong { color: #856404; }
+        .captured-output pre { margin: 0; padding: 5px; background-color: transparent; border: none; color: #856404; }
+        tr.failed-row { background-color: #f8d7da !important; color: #721c24; }
+        tr.failed-row:hover { background-color: #f5c6cb !important; }
+        tr.failed-row .model-output { font-style: italic; color: #721c24; }
+        tr.failed-row td.numeric { color: #721c24; font-style: italic; }
+        .error-message { font-weight: bold; display: block; color: #721c24; }
     </style>
 </head>
 <body>
     <h1>Model Performance Summary</h1>
     <table>
-        <caption>Performance metrics and output for Vision Language Model processing. Generated on 2025-04-04 23:55:52. Active/Cache Δ = Change in MB. Peak Mem = Peak usage in MB. Time in seconds.</caption>
-        <!-- Table Header -->
+        <caption>Performance metrics and output/errors for Vision Language Model processing. Generated on 2025-04-05 00:55:58. Failures shown but excluded from averages.</caption>
         <thead>
             <tr>
                 <th>Model</th>
-                <th class="numeric">Active Δ (MB)</th>
-                <th class="numeric">Cache Δ (MB)</th>
-                <th class="numeric">Peak Mem (MB)</th>
-                <th class="numeric">Time (s)</th>
-                <th>Generated Output</th> <!-- Column for model output -->
+                <th class="numeric">Active Δ (MB)</th> <th class="numeric">Cache Δ (MB)</th>
+                <th class="numeric">Peak Mem (MB)</th> <th class="numeric">Time (s)</th>
+                <th>Result / Error / Captured Output</th>
             </tr>
         </thead>
-        <!-- Table Body: Data rows will be inserted here -->
         <tbody>
 
-            <!-- Data row for model: mlx-community/Florence-2-large-ft-bf16 -->
+            <!-- Data row for model: HuggingFaceTB/SmolVLM-Instruct -->
             <tr>
-                <td class="model-name">mlx-community/Florence-2-large-ft-bf16</td>
-                <td class="numeric">1,646.4</td>
-                <td class="numeric">1,606.1</td>
-                <td class="numeric">1,780.0</td>
-                <td class="numeric">2.05</td>
-                <td class="model-output">&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;</td> <!-- Escaped model output -->
-            </tr>
-
-            <!-- Data row for model: mlx-community/SmolVLM2-2.2B-Instruct-mlx -->
-            <tr>
-                <td class="model-name">mlx-community/SmolVLM2-2.2B-Instruct-mlx</td>
-                <td class="numeric">4,528.4</td>
-                <td class="numeric">337.8</td>
-                <td class="numeric">4,829.7</td>
-                <td class="numeric">2.20</td>
-                <td class="model-output"> **Image Caption:**
-
-A serene beach scene unfolds at Shoreham-by-Sea, England, with Worthing visible in the distance. A dog walker enjoys the expansive shoreline as kite surfers take advantage of the coastal winds.
-
-**Keywords/Tags:**
-
-- beach
-- Worthing
-- Shoreham-by-Sea
-- England
-- United Kingdom
-- UK
-- kite surfing
-- dog walker
-- coastal atmosphere
-- serene
-- expansive shoreline
-- kite surfers
-- coastal winds</td> <!-- Escaped model output -->
-            </tr>
-
-            <!-- Data row for model: mlx-community/paligemma2-3b-pt-896-4bit -->
-            <tr>
-                <td class="model-name">mlx-community/paligemma2-3b-pt-896-4bit</td>
-                <td class="numeric">1,717.2</td>
-                <td class="numeric">784.0</td>
-                <td class="numeric">2,426.1</td>
-                <td class="numeric">2.27</td>
-                <td class="model-output"> A dog walker enjoys the beach at Shoreham-by-Sea, England, this image showcases the beauty of the Sussex coastline. Worthing&#x27;s silhouette is visible on the horizon, while closer to shore, a person and their dog stroll along the wet sand.</td> <!-- Escaped model output -->
-            </tr>
-
-            <!-- Data row for model: mlx-community/paligemma2-3b-ft-docci-448-bf16 -->
-            <tr>
-                <td class="model-name">mlx-community/paligemma2-3b-ft-docci-448-bf16</td>
-                <td class="numeric">6,067.6</td>
-                <td class="numeric">436.4</td>
-                <td class="numeric">6,489.0</td>
-                <td class="numeric">2.59</td>
-                <td class="model-output"></td> <!-- Escaped model output -->
-            </tr>
-
-            <!-- Data row for model: mlx-community/Molmo-7B-D-0924-8bit -->
-            <tr>
-                <td class="model-name">mlx-community/Molmo-7B-D-0924-8bit</td>
-                <td class="numeric">9,047.4</td>
-                <td class="numeric">1,849.8</td>
-                <td class="numeric">10,798.1</td>
-                <td class="numeric">2.75</td>
-                <td class="model-output"></td> <!-- Escaped model output -->
+                <td class="model-name">HuggingFaceTB/SmolVLM-Instruct</td>
+                
+                <td class="numeric">4,527.4</td>
+                <td class="numeric">312.5</td>
+                <td class="numeric">4,806.7</td>
+                <td class="numeric">1.30</td>
+            
+                <td><div class="model-output"> Option 3: Kite surfers and dog walkers share the beach at Shoreham-by-Sea, England, in this view towards Worthing. The wide expanse of sand and sea provides ample space for both recreational activities, creating a vibrant coastal atmosphere.</div></td>
             </tr>
 
             <!-- Data row for model: mlx-community/SmolVLM-Instruct-bf16 -->
             <tr>
                 <td class="model-name">mlx-community/SmolVLM-Instruct-bf16</td>
-                <td class="numeric">4,525.2</td>
-                <td class="numeric">509.8</td>
-                <td class="numeric">4,828.6</td>
-                <td class="numeric">3.10</td>
-                <td class="model-output"> Option 1: A tranquil scene unfolds on Shoreham beach in Shoreham-by-Sea, England, with Worthing visible in the distance. A dog walker enjoys the expansive shoreline as kite surfers take advantage of the coastal winds.
-
-Option 2: Captured from Shoreham beach (GPS: 50Â°49&#x27;38.76&quot; N 0Â°16&#x27;21.48&quot; W) in Shoreham-by-Sea, England, this image showcases the beauty of the Sussex coastline. Worthing&#x27;s silhouette is visible on the horizon, while closer to shore, a person and their dog stroll along the wet sand. Kite surfers add a splash of color to the seascape, harnessing the power of the wind.
-
-Option 3: Kite surfers and dog walkers share the beach at Shoreham-by-Sea, England, in this view towards Worthing. The wide expanse of sand and sea provides ample space for bothRecreational activities, creating a vibrant coastal atmosphere.</td> <!-- Escaped model output -->
+                
+                <td class="numeric">4,523.1</td>
+                <td class="numeric">316.8</td>
+                <td class="numeric">4,806.7</td>
+                <td class="numeric">1.65</td>
+            
+                <td><div class="model-output"> Option 3: Kite surfers and dog walkers share the beach at Shoreham-by-Sea, England, in this view towards Worthing. The wide expanse of sand and sea provides ample space for both recreational activities, creating a vibrant coastal atmosphere.</div></td>
             </tr>
 
-            <!-- Data row for model: HuggingFaceTB/SmolVLM-Instruct -->
+            <!-- Data row for model: mlx-community/paligemma2-3b-pt-896-4bit -->
             <tr>
-                <td class="model-name">HuggingFaceTB/SmolVLM-Instruct</td>
-                <td class="numeric">4,525.2</td>
-                <td class="numeric">509.8</td>
-                <td class="numeric">4,828.6</td>
-                <td class="numeric">3.13</td>
-                <td class="model-output"> Option 1: A tranquil scene unfolds on Shoreham beach in Shoreham-by-Sea, England, with Worthing visible in the distance. A dog walker enjoys the expansive shoreline as kite surfers take advantage of the coastal winds.
-
-Option 2: Captured from Shoreham beach (GPS: 50Â°49&#x27;38.76&quot; N 0Â°16&#x27;21.48&quot; W) in Shoreham-by-Sea, England, this image showcases the beauty of the Sussex coastline. Worthing&#x27;s silhouette is visible on the horizon, while closer to shore, a person and their dog stroll along the wet sand. Kite surfers add a splash of color to the seascape, harnessing the power of the wind.
-
-Option 3: Kite surfers and dog walkers share the beach at Shoreham-by-Sea, England, in this view towards Worthing. The wide expanse of sand and sea provides ample space for bothRecreational activities, creating a vibrant coastal atmosphere.</td> <!-- Escaped model output -->
+                <td class="model-name">mlx-community/paligemma2-3b-pt-896-4bit</td>
+                
+                <td class="numeric">1,717.2</td>
+                <td class="numeric">701.6</td>
+                <td class="numeric">2,357.1</td>
+                <td class="numeric">2.13</td>
+            
+                <td><div class="model-output"></div></td>
             </tr>
 
-            <!-- Data row for model: mlx-community/Molmo-7B-D-0924-bf16 -->
+            <!-- Data row for model: mlx-community/Florence-2-large-ft-bf16 -->
             <tr>
-                <td class="model-name">mlx-community/Molmo-7B-D-0924-bf16</td>
-                <td class="numeric">16,047.3</td>
-                <td class="numeric">1,552.1</td>
-                <td class="numeric">17,526.8</td>
-                <td class="numeric">3.84</td>
-                <td class="model-output"></td> <!-- Escaped model output -->
+                <td class="model-name">mlx-community/Florence-2-large-ft-bf16</td>
+                
+                <td class="numeric">1,646.4</td>
+                <td class="numeric">1,613.0</td>
+                <td class="numeric">1,766.9</td>
+                <td class="numeric">2.20</td>
+            
+                <td><div class="model-output">&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;</div></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/Molmo-7B-D-0924-8bit -->
+            <tr>
+                <td class="model-name">mlx-community/Molmo-7B-D-0924-8bit</td>
+                
+                <td class="numeric">9,047.4</td>
+                <td class="numeric">1,778.1</td>
+                <td class="numeric">10,736.1</td>
+                <td class="numeric">2.50</td>
+            
+                <td><div class="model-output"></div></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/paligemma2-3b-ft-docci-448-bf16 -->
+            <tr>
+                <td class="model-name">mlx-community/paligemma2-3b-ft-docci-448-bf16</td>
+                
+                <td class="numeric">6,067.6</td>
+                <td class="numeric">458.1</td>
+                <td class="numeric">6,512.3</td>
+                <td class="numeric">2.72</td>
+            
+                <td><div class="model-output"></div></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/SmolVLM2-2.2B-Instruct-mlx -->
+            <tr>
+                <td class="model-name">mlx-community/SmolVLM2-2.2B-Instruct-mlx</td>
+                
+                <td class="numeric">4,528.4</td>
+                <td class="numeric">312.6</td>
+                <td class="numeric">4,807.8</td>
+                <td class="numeric">2.82</td>
+            
+                <td><div class="model-output"> **Option 1 (Concise):**
+
+Worthing from Shoreham beach, Shoreham-by-Sea, England, United Kingdom, UK
+
+**Option 2 (More descriptive):**
+
+Shoreham beach, England, UK
+
+**Option 3 (Focus on activity):**
+
+Kite surfers and dog walkers share the beach at Shoreham-by-Sea, England, in this view towards Worthing. The wide expanse of sand and sea provides ample space for both recreational activities, creating a vibrant coastal atmosphere.
+
+Keywords/tags:
+- Worthing
+- Shoreham beach
+- Shoreham-by-Sea
+- England
+- United Kingdom
+- UK
+- Kite surfers
+- Dog walkers
+- Recreational activities
+- Coastal atmosphere
+- Wide expanse of sand and sea
+- Vibrant coastal atmosphere</div></td>
             </tr>
 
             <!-- Data row for model: mlx-community/paligemma2-10b-ft-docci-448-6bit -->
             <tr>
                 <td class="model-name">mlx-community/paligemma2-10b-ft-docci-448-6bit</td>
-                <td class="numeric">7,859.4</td>
-                <td class="numeric">867.1</td>
-                <td class="numeric">8,648.8</td>
-                <td class="numeric">4.44</td>
-                <td class="model-output"></td> <!-- Escaped model output -->
+                
+                <td class="numeric">7,520.9</td>
+                <td class="numeric">1,130.7</td>
+                <td class="numeric">8,584.8</td>
+                <td class="numeric">3.19</td>
+            
+                <td><div class="model-output"></div></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/Molmo-7B-D-0924-bf16 -->
+            <tr>
+                <td class="model-name">mlx-community/Molmo-7B-D-0924-bf16</td>
+                
+                <td class="numeric">16,047.3</td>
+                <td class="numeric">1,509.5</td>
+                <td class="numeric">17,491.6</td>
+                <td class="numeric">3.54</td>
+            
+                <td><div class="model-output"></div></td>
             </tr>
 
             <!-- Data row for model: mlx-community/paligemma2-10b-ft-docci-448-bf16 -->
             <tr>
                 <td class="model-name">mlx-community/paligemma2-10b-ft-docci-448-bf16</td>
-                <td class="numeric">19,327.7</td>
-                <td class="numeric">536.9</td>
-                <td class="numeric">19,829.0</td>
-                <td class="numeric">4.97</td>
-                <td class="model-output"></td> <!-- Escaped model output -->
-            </tr>
-
-            <!-- Data row for model: mlx-community/deepseek-vl2-8bit -->
-            <tr>
-                <td class="model-name">mlx-community/deepseek-vl2-8bit</td>
-                <td class="numeric">29,348.2</td>
-                <td class="numeric">660.3</td>
-                <td class="numeric">29,911.4</td>
-                <td class="numeric">6.48</td>
-                <td class="model-output">I&#x27;m sorry I can&#x27;t provide a description of the image you&#x27;ve provided.</td> <!-- Escaped model output -->
+                
+                <td class="numeric">19,328.3</td>
+                <td class="numeric">499.1</td>
+                <td class="numeric">19,795.6</td>
+                <td class="numeric">4.96</td>
+            
+                <td><div class="model-output"></div></td>
             </tr>
 
             <!-- Data row for model: mlx-community/llava-v1.6-mistral-7b-8bit -->
             <tr>
                 <td class="model-name">mlx-community/llava-v1.6-mistral-7b-8bit</td>
-                <td class="numeric">8,057.3</td>
-                <td class="numeric">583.5</td>
-                <td class="numeric">8,480.9</td>
-                <td class="numeric">8.09</td>
-                <td class="model-output">**Option 1 (Concise):**
+                
+                <td class="numeric">8,063.8</td>
+                <td class="numeric">535.9</td>
+                <td class="numeric">8,469.9</td>
+                <td class="numeric">6.87</td>
+            
+                <td><div class="model-output">**Option 1 (Concise):**
 
 A tranquil scene unfolds on Shoreham beach in Shoreham-by-Sea, England, with Worthing visible in the distance. A dog walker enjoys the expansive shoreline as kite surfers take advantage of the coastal winds.
 
@@ -191,40 +205,45 @@ Captured from Shoreham beach (GPS: 50Â°49&#x27;38.76&quot; N 0Â°16&#x27;21.4
 
 **Option 3 (Focus on activity):**
 
-Kite surfers and dog walkers share the beach at Shoreham-by-Sea, England, in this view towards Worthing. The wide expanse of sand and sea provides ample space for both recreational activities, creating a vibrant coastal atmosphere.
-**Keywords/Tags:** Shoreham-by-Sea, England, beach, dog walker, kite surfers, Worthing, Sussex coastline, recreational activities, coastal winds, wet sand, seascape, power of the wind, tranquil scene, expansive shoreline, recreational activities, vibrant coastal atmosphere. </td> <!-- Escaped model output -->
+Kite surfers and dog walkers share the beach at Shoreham-by-Sea, England, in this view towards Worthing. The wide expanse of sand and sea provides ample space for both recreational activities, creating a vibrant coastal atmosphere. </div></td>
             </tr>
 
             <!-- Data row for model: mlx-community/Llama-3.2-11B-Vision-Instruct-8bit -->
             <tr>
                 <td class="model-name">mlx-community/Llama-3.2-11B-Vision-Instruct-8bit</td>
+                
                 <td class="numeric">11,363.5</td>
-                <td class="numeric">643.3</td>
-                <td class="numeric">11,827.8</td>
-                <td class="numeric">8.17</td>
-                <td class="model-output">The image depicts a serene coastal scene, with a prominent view of Worthing in the distance. The composition of the image can be broken down into three main elements:
+                <td class="numeric">593.9</td>
+                <td class="numeric">11,828.6</td>
+                <td class="numeric">8.83</td>
+            
+                <td><div class="model-output">The image depicts a serene coastal scene, with a dog walker and kite surfers enjoying the expansive shoreline.
 
-*   **Worthing in the Distance**
-    *   The silhouette of Worthing is visible on the horizon, creating a sense of depth and context for the scene.
-    *   The image provides a glimpse into the coastal landscape beyond the immediate scene.
-*   **Dog Walker and Kite Surfer**
-    *   A person and their dog are strolling along the wet sand, adding a sense of movement and life to the scene.
-    *   Kite surfers are also present, taking advantage of the coastal winds and creating a dynamic visual element.
-*   **Shoreham Beach**
-    *   The beach itself is the main subject of the image, with its wet sand and expansive shoreline creating a sense of tranquility.
-    *   The beach serves as the backdrop for the various activities and elements in the scene.
+* A dog walker is walking on the beach:
+	+ The dog walker is positioned in the center of the image.
+	+ They are holding a leash attached to a dog that is not visible in the frame.
+	+ The dog walker appears to be walking towards the right side of the image.
+* There are kite surfers in the water:
+	+ Two kite surfers are visible in the water, both wearing wetsuits.
+	+ They are standing on their boards, with their arms outstretched and holding onto the kite strings.
+	+ The kites are white and have a distinctive shape, with a curved top and a flat bottom.
+* The background is a body of water:
+	+ The water is calm and peaceful, with small waves gently lapping at the shore.
+	+ The sky is not visible in the image, but the overall atmosphere suggests a sunny day.
 
-Overall, the image captures a peaceful and active coastal scene, with a focus on the natural beauty of the beach and the activities that take place there.</td> <!-- Escaped model output -->
+The image captures a moment of tranquility and recreation, with the dog walker and kite surfers enjoying the beautiful coastal scenery. The presence of the kites adds a sense of excitement and adventure to the scene, while the calm water and clear sky create a sense of serenity.</div></td>
             </tr>
 
             <!-- Data row for model: mlx-community/Idefics3-8B-Llama3-bf16 -->
             <tr>
                 <td class="model-name">mlx-community/Idefics3-8B-Llama3-bf16</td>
+                
                 <td class="numeric">16,931.7</td>
-                <td class="numeric">383.3</td>
-                <td class="numeric">17,180.9</td>
-                <td class="numeric">11.03</td>
-                <td class="model-output"> **Option 1 (Concise):**
+                <td class="numeric">361.9</td>
+                <td class="numeric">17,162.3</td>
+                <td class="numeric">11.20</td>
+            
+                <td><div class="model-output"> **Option 1 (Concise):**
 
 A tranquil scene unfolds on Shoreham beach in Shoreham-by-Sea, England, with Worthing visible in the distance. A dog walker enjoys the expansive shoreline as kite surfers take advantage of the coastal winds.
 
@@ -234,149 +253,230 @@ Captured from Shoreham beach (GPS: 50Â°49&#x27;38.76&quot; N 0Â°16&#x27;21.4
 
 **Option 3 (Focus on activity):**
 
-Kite surfers and dog walkers share the beach at Shoreham-by-Sea, England, in this view towards Worthing. The wide expanse of sand and sea provides ample space for both recreational activities, creating a vibrant coastal atmosphere.&lt;end_of_utterance&gt;</td> <!-- Escaped model output -->
-            </tr>
-
-            <!-- Data row for model: mlx-community/pixtral-12b-8bit -->
-            <tr>
-                <td class="model-name">mlx-community/pixtral-12b-8bit</td>
-                <td class="numeric">13,480.2</td>
-                <td class="numeric">582.9</td>
-                <td class="numeric">13,882.3</td>
-                <td class="numeric">12.92</td>
-                <td class="model-output">**Option 1 (Concise):**
-
-Caption: A tranquil scene unfolds on Shoreham beach in Shoreham-by-Sea, England, with Worthing visible in the distance. A dog walker enjoys the expansive shoreline as kite surfers take advantage of the coastal winds.
-
-Description: A serene coastal scene featuring Shoreham beach with Worthing in the background, dog walkers, and kite surfers.
-
-Keywords/tags: Shoreham beach, Shoreham-by-Sea, Worthing, England, UK, dog walking, kite surfing, coastal scene, beach, shoreline
-
-**Option 2 (More descriptive):**
-
-Caption: The Sussex coastline from Shoreham beach in Shoreham-by-Sea, England, showcasing Worthing on the horizon and kite surfers enjoying the wind.
-
-Description: A picturesque view of the Sussex coastline from Shoreham beach, featuring Worthing in the distance and kite surfers harnessing the wind.
-
-Keywords/tags: Sussex coastline, Shoreham beach, Shoreham-by-Sea, Worthing, England, UK, kite surfing, coastal scene, beach, seascape
-
-**Option 3 (Focus on activity):**
-
-Caption: Kite surfers and dog walkers share Shoreham beach in Shoreham-by-Sea, England, with Worthing visible in the distance.
-
-Description: A lively coastal scene at Shoreham beach where kite surfers and dog walkers enjoy the expansive shoreline, with Worthing visible on the horizon.
-
-Keywords/tags: Shoreham beach, Shoreham-by-Sea, Worthing, England, UK, kite surfing, dog walking, coastal scene, beach, shoreline, recreational activities</td> <!-- Escaped model output -->
+Kite surfers and dog walkers share the beach at Shoreham-by-Sea, England, in this view towards Worthing. The wide expanse of sand and sea provides ample space for both recreational activities, creating a vibrant coastal atmosphere.&lt;end_of_utterance&gt;</div></td>
             </tr>
 
             <!-- Data row for model: meta-llama/Llama-3.2-11B-Vision-Instruct -->
             <tr>
                 <td class="model-name">meta-llama/Llama-3.2-11B-Vision-Instruct</td>
+                
                 <td class="numeric">21,344.3</td>
-                <td class="numeric">427.2</td>
-                <td class="numeric">21,628.3</td>
-                <td class="numeric">14.22</td>
-                <td class="model-output">The image depicts a serene coastal scene, with a prominent view of Worthing in the distance. The scene is set against the backdrop of Shoreham beach, with a person and their dog strolling along the wet sand, while kite surfers take advantage of the coastal winds.
+                <td class="numeric">402.0</td>
+                <td class="numeric">21,604.3</td>
+                <td class="numeric">12.87</td>
+            
+                <td><div class="model-output">The image depicts a serene coastal scene, with a dog walker and kite surfers enjoying the expansive shoreline. The composition of the image is as follows:
 
-**Key Features:**
+*   **Foreground:**
+    *   A person and their dog are walking along the wet sand, creating a sense of movement and activity.
+    *   The dog walker is positioned in the bottom-left corner of the image, with the dog facing to the right.
+    *   The person is wearing a light-colored shirt and dark pants, while the dog is white with a darker-colored face.
+*   **Middle Ground:**
+    *   The kite surfers are scattered across the image, with some standing on the shore and others in the water.
+    *   They are all holding kites and wearing casual clothing, adding to the relaxed atmosphere of the scene.
+*   **Background:**
+    *   The horizon line is visible in the distance, with the silhouette of Worthing&#x27;s buildings and trees visible.
+    *   The sky is not visible, but the overall mood of the image is one of tranquility and relaxation.
 
-* **Worthing:** Visible in the distance, with a silhouette that adds depth to the image.
-* **Person and Dog:** Strolling along the wet sand, creating a sense of movement and life in the scene.
-* **Kite Surfers:** Harnessing the power of the wind, adding a splash of color and energy to the image.
-* **Shoreham Beach:** The focal point of the image, with its expansive shoreline and tranquil atmosphere.
-* **Coastal Winds:** The gentle breeze that fills the scene, creating a sense of calmness and serenity.
+The image captures a peaceful moment on the beach, with the dog walker and kite surfers enjoying the sunny day. The composition of the image creates a sense of depth and atmosphere, drawing the viewer&#x27;s attention to the serene coastal scene.</div></td>
+            </tr>
 
-**Overall Impression:**
+            <!-- Data row for model: mlx-community/deepseek-vl2-8bit -->
+            <tr>
+                <td class="model-name">mlx-community/deepseek-vl2-8bit</td>
+                
+                <td class="numeric">29,337.2</td>
+                <td class="numeric">1,590.7</td>
+                <td class="numeric">30,106.4</td>
+                <td class="numeric">13.78</td>
+            
+                <td><div class="model-output">&quot;Shoreham-by-Sear, 1870&quot; (vulghe 2 3 4 5  大革命 大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的iflanken fil fil fil洋洋常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常刚刚一下刚刚刚刚安装完的，安装好的，安装好的，安装好的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，</div></td>
+            </tr>
 
-The image exudes a sense of peace and tranquility, with the harmonious blend of natural elements and human activity creating a captivating visual experience. The coastal winds and gentle waves add to the soothing ambiance, making the scene feel like a perfect spot for relaxation and recreation.</td> <!-- Escaped model output -->
+            <!-- Data row for model: mlx-community/pixtral-12b-8bit -->
+            <tr>
+                <td class="model-name">mlx-community/pixtral-12b-8bit</td>
+                
+                <td class="numeric">13,502.8</td>
+                <td class="numeric">690.0</td>
+                <td class="numeric">13,869.5</td>
+                <td class="numeric">17.59</td>
+            
+                <td><div class="model-output">Certainly! Here are the factual captions, descriptions, and keywords/tags for each option:
+
+### Option 1 (Concise)
+
+**Caption:**
+Tranquil scene on Shoreham beach, Shoreham-by-Sea, England, with Worthing visible in the distance. A dog walker enjoys the expansive shoreline as kite surfers take advantage of the coastal winds.
+
+**Description:**
+A serene coastal scene from Shoreham beach in Shoreham-by-Sea, England, showcasing the distant silhouette of Worthing. A dog walker strolls along the shore while kite surfers enjoy the windy conditions.
+
+**Keywords/Tags:**
+Shoreham beach, Shoreham-by-Sea, Worthing, England, UK, coastal scene, dog walking, kite surfing, shoreline, Sussex, windy day
+
+### Option 2 (More descriptive)
+
+**Caption:**
+View from Shoreham beach, Shoreham-by-Sea, England, showcasing Worthing on the horizon. A person and their dog stroll along the wet sand, while kite surfers add color to the seascape.
+
+**Description:**
+Captured from Shoreham beach in Shoreham-by-Sea, England, this image highlights the scenic Sussex coastline. Worthing&#x27;s silhouette is visible on the horizon, with a person and their dog walking along the wet sand. Kite surfers add vibrant color to the seascape, utilizing the coastal winds.
+
+**Keywords/Tags:**
+Shoreham beach, Shoreham-by-Sea, Worthing, England, UK, Sussex coastline, dog walking, kite surfing, seascape, coastal winds, GPS coordinates, 50°49&#x27;38.76&quot;N 0°16&#x27;21.48&quot;W
+
+### Option 3 (Focus on activity)
+
+**Caption:**
+Kite surfers and dog walkers share Shoreham beach, Shoreham-by-Sea, England, with Worthing visible in the distance. The wide expanse of sand and sea supports both activities, creating a vibrant coastal atmosphere.
+
+**Description:**
+Kite surfers and dog walkers enjoy Shoreham beach in Shoreham-by-Sea, England, with Worthing visible on the horizon. The expansive shoreline provides ample space for both recreational activities, contributing to a lively coastal scene.
+
+**Keywords/Tags:**
+Shoreham beach, Shoreham-by-Sea, Worthing, England,</div></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/Llama-3.2-90B-Vision-Instruct-4bit -->
+            <tr>
+                <td class="model-name">mlx-community/Llama-3.2-90B-Vision-Instruct-4bit</td>
+                
+                <td class="numeric">49,852.2</td>
+                <td class="numeric">613.9</td>
+                <td class="numeric">50,412.0</td>
+                <td class="numeric">29.51</td>
+            
+                <td><div class="model-output">**Option 2 (More descriptive):**
+
+Captured from Shoreham beach (GPS: 50Â°49&#x27;38.76&quot; N 0Â°16&#x27;21.48&quot; W) in Shoreham-by-Sea, England, this image showcases the beauty of the Sussex coastline. Worthing&#x27;s silhouette is visible on the horizon, while closer to shore, a person and their dog stroll along the wet sand. Kite surfers add a splash of color to the seascape, harnessing the power of the wind.
+
+**Keywords:** Shoreham-by-Sea, England, Sussex, coastline, beach, kite surfing, dog walking, Worthing, seascape, wet sand, silhouette, horizon, recreational activities, coastal atmosphere.</div></td>
             </tr>
 
             <!-- Data row for model: microsoft/Phi-3.5-vision-instruct -->
             <tr>
                 <td class="model-name">microsoft/Phi-3.5-vision-instruct</td>
+                
                 <td class="numeric">9,159.7</td>
-                <td class="numeric">3,670.3</td>
-                <td class="numeric">10,975.2</td>
-                <td class="numeric">19.67</td>
-                <td class="model-output">**Option 1 (Concise):**
+                <td class="numeric">4,183.6</td>
+                <td class="numeric">10,972.9</td>
+                <td class="numeric">29.80</td>
+            
+                <td><div class="model-output">**Option 1 (Concise):**
 
 A serene beach scene in Shoreham-by-Sea, England, with Worthing in the background.
 
-**Option 2 (More descriptive):**
+**Keywords/Tags:** Shoreham beach, Worthing, England, United Kingdom, coastal landscape, dog walking, kite surfing.
 
-A picturesque view of Shoreham beach in Shoreham-by-Sea, England, with Worthing in the distance. The image captures the essence of a peaceful day at the seaside, with a dog walker enjoying the scenic walk and kite surfers riding the waves.
-
-**Option 3 (Focus on activity):**
-
-Kite surfers and dog walkers at Shoreham-by-Sea, England, with Worthing visible in the distance. The image highlights the recreational activities available on this beautiful coastal location.&lt;|end|&gt;</td> <!-- Escaped model output -->
-            </tr>
-
-            <!-- Data row for model: mlx-community/Phi-3.5-vision-instruct-bf16 -->
-            <tr>
-                <td class="model-name">mlx-community/Phi-3.5-vision-instruct-bf16</td>
-                <td class="numeric">9,159.7</td>
-                <td class="numeric">3,670.3</td>
-                <td class="numeric">10,975.2</td>
-                <td class="numeric">19.74</td>
-                <td class="model-output">**Option 1 (Concise):**
-
-A serene beach scene in Shoreham-by-Sea, England, with Worthing in the background.
 
 **Option 2 (More descriptive):**
 
-A picturesque view of Shoreham beach in Shoreham-by-Sea, England, with Worthing in the distance. The image captures the essence of a peaceful day at the seaside, with a dog walker enjoying the scenic walk and kite surfers riding the waves.
+A picturesque view of Shoreham beach in Shoreham-by-Sea, England, with Worthing in the distance. The image captures the essence of the Sussex coastline, with a dog walker enjoying the scenic wet sand and kite surfers riding the waves.
+
+**Keywords/Tags:** Shoreham beach, Worthing, Sussex coastline, dog walking, kite surfing, coastal England, United Kingdom.
+
 
 **Option 3 (Focus on activity):**
 
-Kite surfers and dog walkers at Shoreham-by-Sea, England, with Worthing visible in the distance. The image highlights the recreational activities available on this beautiful coastal location.&lt;|end|&gt;</td> <!-- Escaped model output -->
+Kite surfers and dog walkers at Shoreham-by-Sea, England, with Worthing in the backdrop. The image highlights the recreational use of the beach, showcasing the diverse activities available in this coastal area.
+
+**Keywords/Tags:** Shoreham beach, Worthing, kite surfing, dog walking, coastal activities, United Kingdom.&lt;|end|&gt;</div></td>
             </tr>
 
             <!-- Data row for model: mlx-community/pixtral-12b-bf16 -->
             <tr>
                 <td class="model-name">mlx-community/pixtral-12b-bf16</td>
-                <td class="numeric">25,369.1</td>
-                <td class="numeric">449.7</td>
-                <td class="numeric">25,660.3</td>
-                <td class="numeric">22.75</td>
-                <td class="model-output">**Option 1 (Concise):**
+                
+                <td class="numeric">25,370.2</td>
+                <td class="numeric">593.5</td>
+                <td class="numeric">25,640.2</td>
+                <td class="numeric">30.29</td>
+            
+                <td><div class="model-output">Certainly! Here are the factual captions, descriptions, and keywords/tags for each option:
 
-Caption: A tranquil scene unfolds on Shoreham beach in Shoreham-by-Sea, England, with Worthing visible in the distance. A dog walker enjoys the expansive shoreline as kite surfers take advantage of the coastal winds.
+### Option 1 (Concise)
 
-Description: A serene coastal scene featuring Shoreham beach with Worthing in the background, dog walkers, and kite surfers.
+**Caption:**
+Tranquil scene on Shoreham beach, Shoreham-by-Sea, England, with Worthing visible in the distance. A dog walker enjoys the expansive shoreline as kite surfers take advantage of the coastal winds.
 
-Keywords/tags: Shoreham beach, Shoreham-by-Sea, Worthing, England, UK, dog walking, kite surfing, coastal scene, beach, shoreline
+**Description:**
+A serene coastal scene from Shoreham beach in Shoreham-by-Sea, England, showcasing the distant silhouette of Worthing. A dog walker strolls along the shore while kite surfers add dynamic elements to the seascape.
+
+**Keywords/Tags:**
+Shoreham beach, Shoreham-by-Sea, Worthing, England, UK, coastal scene, dog walking, kite surfing, shoreline, Sussex, beach activity
+
+### Option 2 (More descriptive)
+
+**Caption:**
+View from Shoreham beach, Shoreham-by-Sea, England, showcasing Worthing on the horizon. A person and their dog stroll along the wet sand, while kite surfers add color to the seascape.
+
+**Description:**
+Captured from Shoreham beach in Shoreham-by-Sea, England, this image highlights the scenic Sussex coastline with Worthing&#x27;s silhouette on the horizon. A person and their dog enjoy a leisurely walk along the wet sand, while kite surfers harness the wind, adding vibrant splashes of color to the seascape.
+
+**Keywords/Tags:**
+Shoreham beach, Shoreham-by-Sea, Worthing, England, UK, Sussex coastline, dog walking, kite surfing, seascape, coastal winds, GPS coordinates, beach activity
+
+### Option 3 (Focus on activity)
+
+**Caption:**
+Kite surfers and dog walkers share Shoreham beach, Shoreham-by-Sea, England, with Worthing visible in the distance. The wide expanse of sand and sea supports both activities.
+
+**Description:**
+Kite surfers and dog walkers enjoy Shoreham beach in Shoreham-by-Sea, England, with Worthing visible on the horizon. The expansive shoreline provides ample space for both recreational activities, creating a vibrant coastal atmosphere.
+
+**Keywords/Tags:**
+Shoreham beach, Shoreham-by-Sea, Worthing, England, UK, kite surfing, dog walking, beach activity, coastal scene, Sussex, recreational activities, shoreline
+
+These capt</div></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/Phi-3.5-vision-instruct-bf16 -->
+            <tr>
+                <td class="model-name">mlx-community/Phi-3.5-vision-instruct-bf16</td>
+                
+                <td class="numeric">10,104.0</td>
+                <td class="numeric">3,239.3</td>
+                <td class="numeric">10,972.9</td>
+                <td class="numeric">30.83</td>
+            
+                <td><div class="model-output">**Option 1 (Concise):**
+
+A serene beach scene in Shoreham-by-Sea, England, with Worthing in the background.
+
+**Keywords/Tags:** Shoreham beach, Worthing, England, United Kingdom, coastal landscape, dog walking, kite surfing.
+
 
 **Option 2 (More descriptive):**
 
-Caption: The Sussex coastline from Shoreham beach in Shoreham-by-Sea, England, showcasing Worthing on the horizon and kite surfers enjoying the wind.
+A picturesque view of Shoreham beach in Shoreham-by-Sea, England, with Worthing in the distance. The image captures the essence of the Sussex coastline, with a dog walker enjoying the scenic wet sand and kite surfers riding the waves.
 
-Description: A picturesque view of the Sussex coastline from Shoreham beach, featuring Worthing in the distance and kite surfers harnessing the wind.
+**Keywords/Tags:** Shoreham beach, Worthing, Sussex coastline, dog walking, kite surfing, coastal England, United Kingdom.
 
-Keywords/tags: Sussex coastline, Shoreham beach, Shoreham-by-Sea, Worthing, England, UK, kite surfing, coastal scene, beach, seascape
 
 **Option 3 (Focus on activity):**
 
-Caption: Kite surfers and dog walkers share Shoreham beach in Shoreham-by-Sea, England, with Worthing visible in the distance.
+Kite surfers and dog walkers at Shoreham-by-Sea, England, with Worthing in the backdrop. The image highlights the recreational use of the beach, showcasing the diverse activities available in this coastal area.
 
-Description: A lively coastal scene at Shoreham beach, where kite surfers and dog walkers enjoy the expansive shoreline with Worthing in the background.
-
-Keywords/tags: Shoreham beach, Shoreham-by-Sea, Worthing, England, UK, kite surfing, dog walking, coastal scene, beach, shoreline, recreational activities</td> <!-- Escaped model output -->
+**Keywords/Tags:** Shoreham beach, Worthing, kite surfing, dog walking, coastal activities, United Kingdom.&lt;|end|&gt;</div></td>
             </tr>
 
             <!-- Data row for model: mlx-community/llava-v1.6-34b-8bit -->
             <tr>
                 <td class="model-name">mlx-community/llava-v1.6-34b-8bit</td>
+                
                 <td class="numeric">36,936.1</td>
-                <td class="numeric">628.0</td>
-                <td class="numeric">37,314.1</td>
-                <td class="numeric">34.03</td>
-                <td class="model-output">Option 1:
+                <td class="numeric">599.1</td>
+                <td class="numeric">37,290.2</td>
+                <td class="numeric">34.91</td>
+            
+                <td><div class="model-output">Option 1:
 
 Caption: A tranquil scene unfolds on Shoreham beach in Shoreham-by-Sea, England, with Worthing visible in the distance.
 
 Description: A dog walker enjoys the expansive shoreline as kite surfers take advantage of the coastal winds.
 
-Keywords: Shoreham beach, Shoreham-by-Sea, England, Worthing, dog walker, kite surfers, coastal winds.
+Keywords/Tags: Shoreham beach, Shoreham-by-Sea, England, Worthing, dog walker, kite surfers, coastal winds, tranquil scene.
 
 Option 2:
 
@@ -384,7 +484,7 @@ Caption: Captured from Shoreham beach in Shoreham-by-Sea, England, this image sh
 
 Description: Worthing&#x27;s silhouette is visible on the horizon, while closer to shore, a person and their dog stroll along the wet sand. Kite surfers add a splash of color to the seascape, harnessing the power of the wind.
 
-Keywords: Shoreham beach, Shoreham-by-Sea, England, Sussex coastline, Worthing, silhouette, dog walker, wet sand, kite surfers, wind.
+Keywords/Tags: Shoreham beach, Shoreham-by-Sea, England, Sussex coastline, Worthing, silhouette, wet sand, kite surfers, wind.
 
 Option 3:
 
@@ -392,31 +492,74 @@ Caption: Kite surfers and dog walkers share the beach at Shoreham-by-Sea, Englan
 
 Description: The wide expanse of sand and sea provides ample space for both recreational activities, creating a vibrant coastal atmosphere.
 
-Keywords: Shoreham beach, Shoreham-by-Sea, England, kite surfers, dog walkers, recreational activities, coastal atmosphere.</td> <!-- Escaped model output -->
+Keywords/Tags: Shoreham beach, Shoreham-by-Sea, England, kite surfers, dog walkers, recreational activities, coastal atmosphere, sand, sea.</div></td>
             </tr>
 
-            <!-- Data row for model: mlx-community/Llama-3.2-90B-Vision-Instruct-4bit -->
-            <tr>
-                <td class="model-name">mlx-community/Llama-3.2-90B-Vision-Instruct-4bit</td>
-                <td class="numeric">49,851.8</td>
-                <td class="numeric">1,255.4</td>
-                <td class="numeric">50,455.0</td>
-                <td class="numeric">68.27</td>
-                <td class="model-output">**Option 2 (More descriptive):**
+            <!-- Data row for model: microsoft/Florence-2-large-ft -->
+            <tr class="failed-row">
+                <td class="model-name">microsoft/Florence-2-large-ft</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'load': FileNotFoundError: 
+No safetensors found in /Users/jrp/.cache/huggingface/hub/models--microsoft--Florence-2-large-ft/snapshots/bb44b80c15e943b1bf7cec6e076359cec6e40178
+Create safetensors using the following code:
+```
+from transformers import AutoModelForCausalLM, AutoProcessor
 
-Captured from Shoreham beach in Shoreham-by-Sea, England, this image showcases the beauty of the Sussex coastline. A person and their dog stroll along the wet sand, while kite surfers add a splash of color to the seascape, harnessing the power of the wind.
+model_id= &quot;&lt;huggingface_model_id&gt;&quot;
+model = AutoModelForCausalLM.from_pretrained(model_id)
+processor = AutoProcessor.from_pretrained(model_id)
 
-**Keywords:** Shoreham-by-Sea, England, Sussex, coastline, beach, kite surfing, dog walking, scenic view, Worthing, coastal activity, recreational, outdoor, nature, landscape, seascape, water, sand, wind, sport, leisure, travel, tourism, UK, United Kingdom, British, English, seaside, ocean, sea, waves, tide, shore, horizon, sky, sun, weather, climate, geography, topography, map, location, place, destination, vacation, holiday, getaway, adventure, experience, memory, moment, snapshot, photo, picture, image, visual, photography, photographer, camera, shot, capture, frame, composition, art, creative, aesthetic, beautiful, lovely, nice, pleasant, enjoyable, fun, exciting, thrilling, adventurous, daring, bold, fearless, confident, happy, joyful, cheerful, smiling, laughing, relaxed, calm, peaceful, serene, tranquil, quiet, still, motionless, stationary, static, unmoving, unchanging, constant, steady, stable, consistent, uniform, even, flat, level, horizontal, vertical, diagonal, angular, curved, circular, round, oval, rectangular, square, triangular, polygonal, geometric, symmetrical, asymmetrical, balanced, unbalanced, centered, off-center, left, right, up, down, front, back, side, top, bottom, middle, center, edge, corner, border, frame, margin, border, outline, silhouette, shadow, light, dark, bright, dim, blurry, clear, sharp, focused, unfocused, abstract, realistic, detailed, intricate, simple, minimal, clean, neat, tidy, organized, messy, cluttered, disorganized, chaotic, busy, crowded, empty, vacant, bare, plain, simple, monochromatic, colorful, vibrant, dull, muted, soft, hard, rough, smooth, textured, patterned, striped, spotted, dotted, lined, checked, plaid, floral, geometric, abstract, artistic, creative, unique, one-of-a-kind, special, exclusive, rare, limited,</td> <!-- Escaped model output -->
+model.save_pretrained(&quot;&lt;local_dir&gt;&quot;)
+processor.save_pretrained(&quot;&lt;local_dir&gt;&quot;)
+```
+Then use the &lt;local_dir&gt; as the --hf-path in the convert script.
+```
+python -m mlx_vlm.convert --hf-path &lt;local_dir&gt; --mlx-path &lt;mlx_dir&gt;
+```
+        </span></td>
             </tr>
 
-            <!-- Summary Row -->
+            <!-- Data row for model: mlx-community/QwQ-32B-4bit -->
+            <tr class="failed-row">
+                <td class="model-name">mlx-community/QwQ-32B-4bit</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'load': ValueError: Model type qwen2 not supported.</span></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/QwQ-32B-8bit -->
+            <tr class="failed-row">
+                <td class="model-name">mlx-community/QwQ-32B-8bit</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'load': ValueError: Model type qwen2 not supported.</span></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/gemma-3-12b-pt-8bit -->
+            <tr class="failed-row">
+                <td class="model-name">mlx-community/gemma-3-12b-pt-8bit</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'prompt': ValueError: No chat template is set for this processor. Please either set the `chat_template` attribute, or provide a chat template as an argument. See https://huggingface.co/docs/transformers/main/en/chat_templating for more information.</span></td>
+            </tr>
+
+            <!-- Summary Row (Based on Successful Runs) -->
             <tr class="summary">
-                <td>AVERAGE / MAX PEAK</td>
-                <td class="numeric">14585.4</td>
-                <td class="numeric">1044.9</td>
-                <td class="numeric">50455.0</td>
-                <td class="numeric">12.23</td>
-                <td></td> <!-- Empty cell for output column in summary -->
+                <td>AVG/PEAK (21 Success)</td>
+                <td class="numeric">14615.2</td>
+                <td class="numeric">1049.3</td>
+                <td class="numeric">50412.0</td>
+                <td class="numeric">12.07</td>
+                <td></td>
             </tr>
 
         </tbody>

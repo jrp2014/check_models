@@ -7,6 +7,7 @@ import contextlib
 import html
 import io
 import logging
+import re  # Added for ANSI code stripping
 import sys
 import time
 import traceback
@@ -14,9 +15,9 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
-from typing import (
+from typing import ( # Removed IO
     Any, Dict, Final, List, NamedTuple,
-    Optional, Tuple, Union
+    Optional, TextIO, Tuple, Union
 )
 
 # Third-party imports
@@ -51,6 +52,8 @@ class Colors:
     GRAY = "\033[90m"
 
     _enabled = sys.stderr.isatty()
+    # Regex to remove ANSI escape codes
+    _ansi_escape_re = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 
     @staticmethod
     def colored(text: str, color: str) -> str:
@@ -58,6 +61,13 @@ class Colors:
         if not Colors._enabled:
             return text
         return f"{color}{text}{Colors.RESET}"
+
+    @staticmethod
+    def visual_len(text: str) -> int:
+        """Calculate the visual length of a string (stripping ANSI codes)."""
+        if not isinstance(text, str): # Handle non-string inputs gracefully
+             text = str(text)
+        return len(Colors._ansi_escape_re.sub('', text))
 
 
 # Type aliases and definitions
@@ -408,37 +418,41 @@ def pretty_print_exif(exif: ExifDict, verbose: bool = False) -> None:
         return
 
     tags_to_print.sort(key=lambda x: x[0])
-    # Determine column widths dynamically
-    max_tag_len = max(len(t[0]) for t in tags_to_print) if tags_to_print else 20
-    max_val_len = max(len(t[1]) for t in tags_to_print) if tags_to_print else 40
+    # Determine column widths dynamically based on visual length
+    max_tag_len = max(Colors.visual_len(t[0]) for t in tags_to_print) if tags_to_print else 20
+    max_val_len = max(Colors.visual_len(t[1]) for t in tags_to_print) if tags_to_print else 40
     min_width = 10
     max_tag_len = max(max_tag_len, min_width)
     max_val_len = max(max_val_len, min_width + 5)
-    # Length adjustment needed for bolded text ANSI codes
-    bold_len = len(Colors.BOLD) + len(Colors.RESET)
+
     # Define colors
     header_color = Colors.BLUE
     border_color = Colors.BLUE
     important_color = Colors.YELLOW
 
+    # Helper for padding colored strings correctly
+    def pad(text: str, width: int, is_left_justified: bool = True) -> str:
+        vlen = Colors.visual_len(text)
+        padding = ' ' * max(0, width - vlen)
+        if is_left_justified:
+            return text + padding
+        else:
+            return padding + text
+
     # Print table header
     print(Colors.colored(f"╔{'═' * (max_tag_len + 2)}╤{'═' * (max_val_len + 2)}╗", border_color))
-    print(f"{Colors.colored('║', border_color)} {Colors.colored('Tag'.ljust(max_tag_len), header_color)} {Colors.colored('│', border_color)} {Colors.colored('Value'.ljust(max_val_len), header_color)} {Colors.colored('║', border_color)}")
+    print(f"{Colors.colored('║', border_color)} {pad(Colors.colored('Tag', header_color), max_tag_len)} {Colors.colored('│', border_color)} {pad(Colors.colored('Value', header_color), max_val_len)} {Colors.colored('║', border_color)}")
     print(Colors.colored(f"╠{'═' * (max_tag_len + 2)}╪{'═' * (max_val_len + 2)}╣", border_color))
     # Print table rows
     for tag_name, value_display, is_important_tag in tags_to_print:
         tag_display: str
-        tag_padding: int
         if is_important_tag:
             # Apply bold formatting
             tag_display = Colors.colored(tag_name, Colors.BOLD + important_color)
-            # Adjust ljust width by the length of the ANSI codes
-            tag_padding = max_tag_len + bold_len
         else:
             tag_display = tag_name
-            tag_padding = max_tag_len
-        # Print the formatted row
-        print(f"{Colors.colored('║', border_color)} {tag_display.ljust(tag_padding)} {Colors.colored('│', border_color)} {value_display.ljust(max_val_len)} {Colors.colored('║', border_color)}")
+        # Print the formatted row using the padding helper
+        print(f"{Colors.colored('║', border_color)} {pad(tag_display, max_tag_len)} {Colors.colored('│', border_color)} {pad(value_display, max_val_len)} {Colors.colored('║', border_color)}")
     # Print table footer
     print(Colors.colored(f"╚{'═' * (max_tag_len + 2)}╧{'═' * (max_val_len + 2)}╝", border_color))
 
@@ -473,49 +487,70 @@ def print_model_stats(results: List[ModelResult]) -> None:
     results.sort(key=lambda x: (not x.success, x.stats.time if x.success else 0))
     # Get base display names
     display_names = [(r.model_name.split('/')[-1]) for r in results]
-    # Base max length calculation
-    base_max_name = max(len(name) for name in display_names) if display_names else 20
-    max_name_len_base = min(base_max_name, 44) # Cap base length reasonably
 
-    col_width = 11
+    # *** Fix: Initialize max_name_len_base before use ***
+    max_name_len_base = max(len(name) for name in display_names) if display_names else 20
+    max_name_len_cap = 44 # Cap base length reasonably
+    max_name_len_base = min(max_name_len_base, max_name_len_cap) # Apply cap
+
+    col_width = 12 # Increased slightly for comma formatting
+    # Define colors
     header_color = Colors.BLUE
     border_color = Colors.BLUE
     summary_color = Colors.YELLOW
     failure_color = Colors.RED
     failure_text_color = Colors.GRAY
-    captured_marker = Colors.colored("(+cap)", Colors.GRAY) # Marker for captured output
+    captured_marker_plain = "(+cap)"
+    captured_marker_colored = Colors.colored(captured_marker_plain, Colors.GRAY) # Marker for captured output
 
     # Adjust max_name_len dynamically based on actual content including failure text
     max_len_needed = 0
+    temp_display_names = [] # Store potentially modified names for width calculation
     for i, r in enumerate(results):
         name = display_names[i]
         # Apply base truncation before calculating potential length
-        if len(name) > max_name_len_base:
-            name = name[:max_name_len_base-3] + "..."
+        current_max_name = max_name_len_base # Use initialized value
+        if len(name) > current_max_name:
+            name = name[:current_max_name - 3] + "..."
 
-        current_len = len(name) # Length of potentially truncated name
+        display_str = name # Start with (potentially truncated) name
         if not r.success:
             # Calculate length of appended failure info text (without ANSI codes)
             fail_info_text = f" (Failed: {r.error_stage or '?'})"
             if r.captured_output_on_fail:
-                fail_info_text += " (+cap)" # Add length of visible marker text
-            current_len += len(fail_info_text)
-        max_len_needed = max(max_len_needed, current_len)
+                fail_info_text += f" {captured_marker_plain}" # Use plain marker for length calc
+            display_str += fail_info_text
+        temp_display_names.append(display_str)
+        max_len_needed = max(max_len_needed, len(display_str))
 
     # Final column width for name, capped reasonably
     max_name_len = min(max(max_name_len_base, max_len_needed), 55)
 
+    # Helper for padding colored strings correctly using visual length
+    def pad(text: str, width: int, is_left_justified: bool = True) -> str:
+        vlen = Colors.visual_len(text)
+        padding = ' ' * max(0, width - vlen)
+        if is_left_justified:
+            return text + padding
+        else:
+            return padding + text
+
     print(f"\n--- {Colors.colored('Model Performance Summary (Console)', Colors.CYAN)} ---")
-    print(Colors.colored(f"╔{'═' * max_name_len}═╦{'═' * col_width}═╦{'═' * col_width}═╦{'═' * col_width}═╦{'═' * col_width}═╗", border_color))
-    title_line = (f"║ {Colors.colored('Model'.ljust(max_name_len), header_color)} │ "
-                  f"{Colors.colored('Active Δ'.rjust(col_width), header_color)} │ {Colors.colored('Cache Δ'.rjust(col_width), header_color)} │ "
-                  f"{Colors.colored('Peak Mem'.rjust(col_width), header_color)} │ {Colors.colored('Time'.rjust(col_width), header_color)} ║")
-    # Print title row carefully removing outer color codes before adding border colors
-    print(f"{Colors.colored('║', border_color)}{title_line[len(Colors.RESET)+1:-len(Colors.RESET)-1]}{Colors.colored('║', border_color)}")
-    print(Colors.colored(f"╠{'═' * max_name_len}═╬{'═' * col_width}═╬{'═' * col_width}═╬{'═' * col_width}═╬{'═' * col_width}═╣", border_color))
+    # Adjust table width based on final max_name_len
+    print(Colors.colored(f"╔{'═' * (max_name_len + 2)}╤{'═' * (col_width + 2)}╤{'═' * (col_width + 2)}╤{'═' * (col_width + 2)}╤{'═' * (col_width + 2)}╗", border_color))
+
+    # Print Header Row using padding helper
+    header_model = pad(Colors.colored('Model', header_color), max_name_len)
+    header_active = pad(Colors.colored('Active Δ', header_color), col_width, False)
+    header_cache = pad(Colors.colored('Cache Δ', header_color), col_width, False)
+    header_peak = pad(Colors.colored('Peak Mem', header_color), col_width, False)
+    header_time = pad(Colors.colored('Time', header_color), col_width, False)
+    print(f"{Colors.colored('║', border_color)} {header_model} {Colors.colored('│', border_color)} {header_active} {Colors.colored('│', border_color)} {header_cache} {Colors.colored('│', border_color)} {header_peak} {Colors.colored('│', border_color)} {header_time} {Colors.colored('║', border_color)}")
+    print(Colors.colored(f"╠{'═' * (max_name_len + 2)}╪{'═' * (col_width + 2)}╪{'═' * (col_width + 2)}╪{'═' * (col_width + 2)}╪{'═' * (col_width + 2)}╣", border_color))
 
     successful_results = [r for r in results if r.success]
 
+    # Print Data Rows
     for i, result in enumerate(results):
         model_disp_name_raw = display_names[i] # Base short name
         model_display_text: str
@@ -525,7 +560,6 @@ def print_model_stats(results: List[ModelResult]) -> None:
         time_str: str
 
         # Apply base truncation based on adjusted max_name_len allowance
-        # Leave ~15 chars visible space for potential failure info
         allowance = 15 if not result.success else 0
         if len(model_disp_name_raw) > max_name_len - allowance:
              # Ensure truncate_at is non-negative
@@ -534,48 +568,33 @@ def print_model_stats(results: List[ModelResult]) -> None:
 
         if result.success:
             model_display_text = model_disp_name_raw
-            active_str = f"{result.stats.active:,.1f} MB"
-            cache_str = f"{result.stats.cached:,.1f} MB"
-            peak_str = f"{result.stats.peak:,.1f} MB"
+            # Format stats as comma-separated integers
+            active_str = f"{result.stats.active:,.0f} MB"
+            cache_str = f"{result.stats.cached:,.0f} MB"
+            peak_str = f"{result.stats.peak:,.0f} MB"
             time_str = f"{result.stats.time:.2f} s"
-            name_ansi_len = 0
-            stat_ansi_len = 0
         else:
             fail_info = f" (Failed: {result.error_stage or '?'})"
             if result.captured_output_on_fail:
-                # Display colored marker, but calculate length based on non-colored version
-                fail_info += f" {captured_marker}"
-            # Color the base name and non-ANSI fail info parts separately for length calculation
-            model_display_text_base = model_disp_name_raw + fail_info.replace(captured_marker, "(+cap)")
-            model_display_text = Colors.colored(model_display_text_base, failure_color)
-            # Re-insert colored marker if needed
-            if result.captured_output_on_fail:
-                 model_display_text = model_display_text.replace("(+cap)", captured_marker)
+                fail_info += f" {captured_marker_colored}" # Use colored marker here
+            # Color the fail info part
+            model_display_text = model_disp_name_raw + Colors.colored(fail_info.replace(captured_marker_colored, "(+cap)"), failure_color)
+            if result.captured_output_on_fail: # Add back colored marker
+                 model_display_text = model_display_text.replace("(+cap)", captured_marker_colored)
 
-
+            # Use dimmed placeholder for stats
             active_str = Colors.colored("-".rjust(col_width - 1), failure_text_color)
             cache_str = Colors.colored("-".rjust(col_width - 1), failure_text_color)
             peak_str = Colors.colored("-".rjust(col_width - 1), failure_text_color)
             time_str = Colors.colored("-".rjust(col_width - 1), failure_text_color)
-            # Estimate ANSI length added to the display string
-            name_ansi_len = len(Colors.RED) + len(Colors.RESET)
-            if result.captured_output_on_fail:
-                 # Add length of marker's codes, subtract length of plain marker text
-                 name_ansi_len += len(captured_marker) - len("(+cap)")
-            stat_ansi_len = len(Colors.GRAY) + len(Colors.RESET)
 
-        # Padding needs to account for added ANSI codes for correct alignment
-        name_padding = max_name_len + name_ansi_len
-        stat_padding = col_width + stat_ansi_len
-
-        # Print row using calculated padding
-        # Use ljust on the final colored string, padding adjusted for ANSI codes
+        # Print row using padding helper for alignment
         print(
-             f"{Colors.colored('║', border_color)} {model_display_text.ljust(name_padding)} │ "
-             f"{active_str.rjust(stat_padding)} │ "
-             f"{cache_str.rjust(stat_padding)} │ "
-             f"{peak_str.rjust(stat_padding)} │ "
-             f"{time_str.rjust(stat_padding)} {Colors.colored('║', border_color)}"
+             f"{Colors.colored('║', border_color)} {pad(model_display_text, max_name_len)} {Colors.colored('│', border_color)} "
+             f"{pad(active_str, col_width, False)} {Colors.colored('│', border_color)} "
+             f"{pad(cache_str, col_width, False)} {Colors.colored('│', border_color)} "
+             f"{pad(peak_str, col_width, False)} {Colors.colored('│', border_color)} "
+             f"{pad(time_str, col_width, False)} {Colors.colored('║', border_color)}"
         )
 
     # Print average/summary row only if there were successful runs to average
@@ -584,20 +603,25 @@ def print_model_stats(results: List[ModelResult]) -> None:
         avg_cache = sum(r.stats.cached for r in successful_results) / len(successful_results)
         max_peak = max(r.stats.peak for r in successful_results)
         avg_time = sum(r.stats.time for r in successful_results) / len(successful_results)
-        avg_active_str = f"{avg_active:.1f} MB"
-        avg_cache_str = f"{avg_cache:.1f} MB"
-        max_peak_str = f"{max_peak:.1f} MB"
+        # Format averages as comma-separated integers
+        avg_active_str = f"{avg_active:,.0f} MB"
+        avg_cache_str = f"{avg_cache:,.0f} MB"
+        max_peak_str = f"{max_peak:,.0f} MB"
         avg_time_str = f"{avg_time:.2f} s"
 
-        print(Colors.colored(f"╠{'═' * max_name_len}═╬{'═' * col_width}═╬{'═' * col_width}═╬{'═' * col_width}═╬{'═' * col_width}═╣", border_color))
+        print(Colors.colored(f"╠{'═' * (max_name_len + 2)}╪{'═' * (col_width + 2)}╪{'═' * (col_width + 2)}╪{'═' * (col_width + 2)}╪{'═' * (col_width + 2)}╣", border_color))
         summary_title = f"AVG/PEAK ({len(successful_results)} Success)"
-        summary_line_content = (f"║ {Colors.colored(summary_title.ljust(max_name_len), summary_color)} │ "
-                                f"{Colors.colored(avg_active_str.rjust(col_width), summary_color)} │ {Colors.colored(avg_cache_str.rjust(col_width), summary_color)} │ "
-                                f"{Colors.colored(max_peak_str.rjust(col_width), summary_color)} │ {Colors.colored(avg_time_str.rjust(col_width), summary_color)} ║")
-        # Adjust print for inner colors
-        print(f"{Colors.colored('║', border_color)}{summary_line_content[len(Colors.RESET)+1:-len(Colors.RESET)-1]}{Colors.colored('║', border_color)}")
+        # Color each part of the summary row individually
+        summary_model = pad(Colors.colored(summary_title, summary_color), max_name_len)
+        summary_active = pad(Colors.colored(avg_active_str, summary_color), col_width, False)
+        summary_cache = pad(Colors.colored(avg_cache_str, summary_color), col_width, False)
+        summary_peak = pad(Colors.colored(max_peak_str, summary_color), col_width, False)
+        summary_time = pad(Colors.colored(avg_time_str, summary_color), col_width, False)
 
-    print(Colors.colored(f"╚{'═' * max_name_len}═╩{'═' * col_width}═╩{'═' * col_width}═╩{'═' * col_width}═╩{'═' * col_width}═╝", border_color))
+        print(f"{Colors.colored('║', border_color)} {summary_model} {Colors.colored('│', border_color)} {summary_active} {Colors.colored('│', border_color)} {summary_cache} {Colors.colored('│', border_color)} {summary_peak} {Colors.colored('│', border_color)} {summary_time} {Colors.colored('║', border_color)}")
+
+    # Print Footer
+    print(Colors.colored(f"╚{'═' * (max_name_len + 2)}╧{'═' * (col_width + 2)}╧{'═' * (col_width + 2)}╧{'═' * (col_width + 2)}╧{'═' * (col_width + 2)}╝", border_color))
 
 
 # --- HTML Report Generation ---
@@ -665,10 +689,11 @@ def generate_html_report(results: List[ModelResult], filename: Path) -> None:
         if result.success:
             escaped_output = html.escape(result.output or "")
             result_content = f'<div class="model-output">{escaped_output}</div>'
+            # Format stats as comma-separated integers for HTML
             stats_cells = f"""
-                <td class="numeric">{result.stats.active:,.1f}</td>
-                <td class="numeric">{result.stats.cached:,.1f}</td>
-                <td class="numeric">{result.stats.peak:,.1f}</td>
+                <td class="numeric">{result.stats.active:,.0f}</td>
+                <td class="numeric">{result.stats.cached:,.0f}</td>
+                <td class="numeric">{result.stats.peak:,.0f}</td>
                 <td class="numeric">{result.stats.time:.2f}</td>
             """
         else:
@@ -681,8 +706,10 @@ def generate_html_report(results: List[ModelResult], filename: Path) -> None:
 
             if result.captured_output_on_fail:
                 escaped_capture = html.escape(result.captured_output_on_fail)
+                # Wrap captured output in a distinct div/pre block
                 result_content += f'<div class="captured-output"><strong>Captured Output (during generate):</strong><pre>{escaped_capture}</pre></div>'
 
+            # Use hyphen placeholder for failed stats in HTML
             stats_cells = """
                 <td class="numeric">-</td> <td class="numeric">-</td>
                 <td class="numeric">-</td> <td class="numeric">-</td>
@@ -705,13 +732,14 @@ def generate_html_report(results: List[ModelResult], filename: Path) -> None:
         max_peak = max(r.stats.peak for r in successful_results)
         avg_time = sum(r.stats.time for r in successful_results) / len(successful_results)
         summary_title = f"AVG/PEAK ({len(successful_results)} Success)"
+        # Format summary stats as comma-separated integers
         html_summary_row = f"""
             <!-- Summary Row (Based on Successful Runs) -->
             <tr class="summary">
                 <td>{summary_title}</td>
-                <td class="numeric">{avg_active:.1f}</td>
-                <td class="numeric">{avg_cache:.1f}</td>
-                <td class="numeric">{max_peak:.1f}</td>
+                <td class="numeric">{avg_active:,.0f}</td>
+                <td class="numeric">{avg_cache:,.0f}</td>
+                <td class="numeric">{max_peak:,.0f}</td>
                 <td class="numeric">{avg_time:.2f}</td>
                 <td></td>
             </tr>
@@ -727,6 +755,7 @@ def generate_html_report(results: List[ModelResult], filename: Path) -> None:
     html_content = html_start + html_rows + html_summary_row + html_end
 
     try:
+        f: TextIO[str] 
         with open(filename, "w", encoding="utf-8") as f:
             f.write(html_content)
         logger.info(f"HTML report saved to: {Colors.colored(str(filename.resolve()), Colors.GREEN)}")
@@ -799,7 +828,7 @@ def process_image_with_model(
         error_stage = 'measure'
         # Ensure model parameters are evaluated if model loaded successfully
         if model is not None and hasattr(model, 'parameters'):
-             mx.eval(model.parameters())
+             mx.eval(model.parameters()) # Ensure calculations finish
         end_time = time.perf_counter()
         final_active_mb = mx.get_active_memory() / 1e6
         final_cache_mb = mx.get_cache_memory() / 1e6
@@ -811,7 +840,8 @@ def process_image_with_model(
         final_stats = MemoryStats(active=active_delta_mb, cached=cache_delta_mb, peak=peak_mb, time=elapsed_time)
         error_stage = None # Success
 
-        logger.info(f"Finished processing {Colors.colored(model_short_name, Colors.MAGENTA)} in {Colors.colored(f'{elapsed_time:.1f}s', Colors.GREEN)}. Peak Mem: {Colors.colored(f'{peak_mb:.1f}MB', Colors.CYAN)}")
+        # Format peak mem in log message
+        logger.info(f"Finished processing {Colors.colored(model_short_name, Colors.MAGENTA)} in {Colors.colored(f'{elapsed_time:.1f}s', Colors.GREEN)}. Peak Mem: {Colors.colored(f'{peak_mb:,.0f}MB', Colors.CYAN)}")
         return ModelResult(model_name=model_identifier, success=True, output=str(output or ""), stats=final_stats)
 
     except Exception as e:
@@ -840,6 +870,7 @@ def process_image_with_model(
             model_name=model_identifier, success=False,
             error_stage=error_stage, error_message=error_message_str,
             captured_output_on_fail=captured_output_str
+            # Stats default to zero via dataclass field factory
         )
     finally:
         # Ensure cleanup even if errors occur
@@ -974,15 +1005,15 @@ def main(args: argparse.Namespace) -> None:
 
     # --- 5. Print Summary Statistics ---
     if results:
-        print(Colors.colored(f"\n{'=' * 80}\n", Colors.BLUE))
-        print_model_stats(results)
+        print(Colors.colored(f"\n{'=' * 80}\n", Colors.BLUE)) # Separator
+        print_model_stats(results) # Function call
     else:
         print(Colors.colored("\nNo models processed. No performance summary generated.", Colors.YELLOW))
 
     # --- 6. Generate HTML Report ---
     html_output_path = args.output_html.resolve()
     if results:
-        generate_html_report(results, html_output_path)
+        generate_html_report(results, html_output_path) # Function call
     else:
         logger.info(f"Skipping HTML report generation to {html_output_path} as no models were processed.")
 
