@@ -26,12 +26,18 @@
         tr.failed-row .model-output { font-style: italic; color: #721c24; }
         tr.failed-row td.numeric { color: #721c24; font-style: italic; }
         .error-message { font-weight: bold; display: block; color: #721c24; }
+        footer { margin-top: 30px; text-align: center; font-size: 0.85em; color: #6c757d; }
+        footer h2 { font-size: 1.1em; color: #495057; margin-bottom: 10px;}
+        footer ul { list-style: none; padding: 0; margin: 0 0 10px 0; }
+        footer li { display: inline-block; margin: 0 10px; }
+        footer code { background-color: #e9ecef; padding: 2px 4px; border-radius: 3px; }
+        footer p { margin-top: 5px; }
     </style>
 </head>
 <body>
     <h1>Model Performance Summary</h1>
     <table>
-        <caption>Performance metrics and output/errors for Vision Language Model processing. Generated on 2025-04-05 00:55:58. Failures shown but excluded from averages.</caption>
+        <caption>Performance metrics and output/errors for Vision Language Model processing. Generated on 2025-04-06 22:03:56. Failures shown but excluded from averages.</caption>
         <thead>
             <tr>
                 <th>Model</th>
@@ -43,456 +49,23 @@
         <tbody>
 
             <!-- Data row for model: HuggingFaceTB/SmolVLM-Instruct -->
-            <tr>
+            <tr class="failed-row">
                 <td class="model-name">HuggingFaceTB/SmolVLM-Instruct</td>
                 
-                <td class="numeric">4,527.4</td>
-                <td class="numeric">312.5</td>
-                <td class="numeric">4,806.7</td>
-                <td class="numeric">1.30</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
             
-                <td><div class="model-output"> Option 3: Kite surfers and dog walkers share the beach at Shoreham-by-Sea, England, in this view towards Worthing. The wide expanse of sand and sea provides ample space for both recreational activities, creating a vibrant coastal atmosphere.</div></td>
-            </tr>
-
-            <!-- Data row for model: mlx-community/SmolVLM-Instruct-bf16 -->
-            <tr>
-                <td class="model-name">mlx-community/SmolVLM-Instruct-bf16</td>
-                
-                <td class="numeric">4,523.1</td>
-                <td class="numeric">316.8</td>
-                <td class="numeric">4,806.7</td>
-                <td class="numeric">1.65</td>
-            
-                <td><div class="model-output"> Option 3: Kite surfers and dog walkers share the beach at Shoreham-by-Sea, England, in this view towards Worthing. The wide expanse of sand and sea provides ample space for both recreational activities, creating a vibrant coastal atmosphere.</div></td>
-            </tr>
-
-            <!-- Data row for model: mlx-community/paligemma2-3b-pt-896-4bit -->
-            <tr>
-                <td class="model-name">mlx-community/paligemma2-3b-pt-896-4bit</td>
-                
-                <td class="numeric">1,717.2</td>
-                <td class="numeric">701.6</td>
-                <td class="numeric">2,357.1</td>
-                <td class="numeric">2.13</td>
-            
-                <td><div class="model-output"></div></td>
-            </tr>
-
-            <!-- Data row for model: mlx-community/Florence-2-large-ft-bf16 -->
-            <tr>
-                <td class="model-name">mlx-community/Florence-2-large-ft-bf16</td>
-                
-                <td class="numeric">1,646.4</td>
-                <td class="numeric">1,613.0</td>
-                <td class="numeric">1,766.9</td>
-                <td class="numeric">2.20</td>
-            
-                <td><div class="model-output">&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;&lt;s&gt;</div></td>
-            </tr>
-
-            <!-- Data row for model: mlx-community/Molmo-7B-D-0924-8bit -->
-            <tr>
-                <td class="model-name">mlx-community/Molmo-7B-D-0924-8bit</td>
-                
-                <td class="numeric">9,047.4</td>
-                <td class="numeric">1,778.1</td>
-                <td class="numeric">10,736.1</td>
-                <td class="numeric">2.50</td>
-            
-                <td><div class="model-output"></div></td>
-            </tr>
-
-            <!-- Data row for model: mlx-community/paligemma2-3b-ft-docci-448-bf16 -->
-            <tr>
-                <td class="model-name">mlx-community/paligemma2-3b-ft-docci-448-bf16</td>
-                
-                <td class="numeric">6,067.6</td>
-                <td class="numeric">458.1</td>
-                <td class="numeric">6,512.3</td>
-                <td class="numeric">2.72</td>
-            
-                <td><div class="model-output"></div></td>
-            </tr>
-
-            <!-- Data row for model: mlx-community/SmolVLM2-2.2B-Instruct-mlx -->
-            <tr>
-                <td class="model-name">mlx-community/SmolVLM2-2.2B-Instruct-mlx</td>
-                
-                <td class="numeric">4,528.4</td>
-                <td class="numeric">312.6</td>
-                <td class="numeric">4,807.8</td>
-                <td class="numeric">2.82</td>
-            
-                <td><div class="model-output"> **Option 1 (Concise):**
-
-Worthing from Shoreham beach, Shoreham-by-Sea, England, United Kingdom, UK
-
-**Option 2 (More descriptive):**
-
-Shoreham beach, England, UK
-
-**Option 3 (Focus on activity):**
-
-Kite surfers and dog walkers share the beach at Shoreham-by-Sea, England, in this view towards Worthing. The wide expanse of sand and sea provides ample space for both recreational activities, creating a vibrant coastal atmosphere.
-
-Keywords/tags:
-- Worthing
-- Shoreham beach
-- Shoreham-by-Sea
-- England
-- United Kingdom
-- UK
-- Kite surfers
-- Dog walkers
-- Recreational activities
-- Coastal atmosphere
-- Wide expanse of sand and sea
-- Vibrant coastal atmosphere</div></td>
-            </tr>
-
-            <!-- Data row for model: mlx-community/paligemma2-10b-ft-docci-448-6bit -->
-            <tr>
-                <td class="model-name">mlx-community/paligemma2-10b-ft-docci-448-6bit</td>
-                
-                <td class="numeric">7,520.9</td>
-                <td class="numeric">1,130.7</td>
-                <td class="numeric">8,584.8</td>
-                <td class="numeric">3.19</td>
-            
-                <td><div class="model-output"></div></td>
-            </tr>
-
-            <!-- Data row for model: mlx-community/Molmo-7B-D-0924-bf16 -->
-            <tr>
-                <td class="model-name">mlx-community/Molmo-7B-D-0924-bf16</td>
-                
-                <td class="numeric">16,047.3</td>
-                <td class="numeric">1,509.5</td>
-                <td class="numeric">17,491.6</td>
-                <td class="numeric">3.54</td>
-            
-                <td><div class="model-output"></div></td>
-            </tr>
-
-            <!-- Data row for model: mlx-community/paligemma2-10b-ft-docci-448-bf16 -->
-            <tr>
-                <td class="model-name">mlx-community/paligemma2-10b-ft-docci-448-bf16</td>
-                
-                <td class="numeric">19,328.3</td>
-                <td class="numeric">499.1</td>
-                <td class="numeric">19,795.6</td>
-                <td class="numeric">4.96</td>
-            
-                <td><div class="model-output"></div></td>
-            </tr>
-
-            <!-- Data row for model: mlx-community/llava-v1.6-mistral-7b-8bit -->
-            <tr>
-                <td class="model-name">mlx-community/llava-v1.6-mistral-7b-8bit</td>
-                
-                <td class="numeric">8,063.8</td>
-                <td class="numeric">535.9</td>
-                <td class="numeric">8,469.9</td>
-                <td class="numeric">6.87</td>
-            
-                <td><div class="model-output">**Option 1 (Concise):**
-
-A tranquil scene unfolds on Shoreham beach in Shoreham-by-Sea, England, with Worthing visible in the distance. A dog walker enjoys the expansive shoreline as kite surfers take advantage of the coastal winds.
-
-**Option 2 (More descriptive):**
-
-Captured from Shoreham beach (GPS: 50Â°49&#x27;38.76&quot; N 0Â°16&#x27;21.48&quot; W) in Shoreham-by-Sea, England, this image showcases the beauty of the Sussex coastline. Worthing&#x27;s silhouette is visible on the horizon, while closer to shore, a person and their dog stroll along the wet sand. Kite surfers add a splash of color to the seascape, harnessing the power of the wind.
-
-**Option 3 (Focus on activity):**
-
-Kite surfers and dog walkers share the beach at Shoreham-by-Sea, England, in this view towards Worthing. The wide expanse of sand and sea provides ample space for both recreational activities, creating a vibrant coastal atmosphere. </div></td>
-            </tr>
-
-            <!-- Data row for model: mlx-community/Llama-3.2-11B-Vision-Instruct-8bit -->
-            <tr>
-                <td class="model-name">mlx-community/Llama-3.2-11B-Vision-Instruct-8bit</td>
-                
-                <td class="numeric">11,363.5</td>
-                <td class="numeric">593.9</td>
-                <td class="numeric">11,828.6</td>
-                <td class="numeric">8.83</td>
-            
-                <td><div class="model-output">The image depicts a serene coastal scene, with a dog walker and kite surfers enjoying the expansive shoreline.
-
-* A dog walker is walking on the beach:
-	+ The dog walker is positioned in the center of the image.
-	+ They are holding a leash attached to a dog that is not visible in the frame.
-	+ The dog walker appears to be walking towards the right side of the image.
-* There are kite surfers in the water:
-	+ Two kite surfers are visible in the water, both wearing wetsuits.
-	+ They are standing on their boards, with their arms outstretched and holding onto the kite strings.
-	+ The kites are white and have a distinctive shape, with a curved top and a flat bottom.
-* The background is a body of water:
-	+ The water is calm and peaceful, with small waves gently lapping at the shore.
-	+ The sky is not visible in the image, but the overall atmosphere suggests a sunny day.
-
-The image captures a moment of tranquility and recreation, with the dog walker and kite surfers enjoying the beautiful coastal scenery. The presence of the kites adds a sense of excitement and adventure to the scene, while the calm water and clear sky create a sense of serenity.</div></td>
-            </tr>
-
-            <!-- Data row for model: mlx-community/Idefics3-8B-Llama3-bf16 -->
-            <tr>
-                <td class="model-name">mlx-community/Idefics3-8B-Llama3-bf16</td>
-                
-                <td class="numeric">16,931.7</td>
-                <td class="numeric">361.9</td>
-                <td class="numeric">17,162.3</td>
-                <td class="numeric">11.20</td>
-            
-                <td><div class="model-output"> **Option 1 (Concise):**
-
-A tranquil scene unfolds on Shoreham beach in Shoreham-by-Sea, England, with Worthing visible in the distance. A dog walker enjoys the expansive shoreline as kite surfers take advantage of the coastal winds.
-
-**Option 2 (More descriptive):**
-
-Captured from Shoreham beach (GPS: 50Â°49&#x27;38.76&quot; N 0Â°16&#x27;21.48&quot; W) in Shoreham-by-Sea, England, this image showcases the beauty of the Sussex coastline. Worthing&#x27;s silhouette is visible on the horizon, while closer to shore, a person and their dog stroll along the wet sand. Kite surfers add a splash of color to the seascape, harnessing the power of the wind.
-
-**Option 3 (Focus on activity):**
-
-Kite surfers and dog walkers share the beach at Shoreham-by-Sea, England, in this view towards Worthing. The wide expanse of sand and sea provides ample space for both recreational activities, creating a vibrant coastal atmosphere.&lt;end_of_utterance&gt;</div></td>
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: HuggingFaceTB/SmolVLM-Instruct</span></td>
             </tr>
 
             <!-- Data row for model: meta-llama/Llama-3.2-11B-Vision-Instruct -->
-            <tr>
+            <tr class="failed-row">
                 <td class="model-name">meta-llama/Llama-3.2-11B-Vision-Instruct</td>
                 
-                <td class="numeric">21,344.3</td>
-                <td class="numeric">402.0</td>
-                <td class="numeric">21,604.3</td>
-                <td class="numeric">12.87</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
             
-                <td><div class="model-output">The image depicts a serene coastal scene, with a dog walker and kite surfers enjoying the expansive shoreline. The composition of the image is as follows:
-
-*   **Foreground:**
-    *   A person and their dog are walking along the wet sand, creating a sense of movement and activity.
-    *   The dog walker is positioned in the bottom-left corner of the image, with the dog facing to the right.
-    *   The person is wearing a light-colored shirt and dark pants, while the dog is white with a darker-colored face.
-*   **Middle Ground:**
-    *   The kite surfers are scattered across the image, with some standing on the shore and others in the water.
-    *   They are all holding kites and wearing casual clothing, adding to the relaxed atmosphere of the scene.
-*   **Background:**
-    *   The horizon line is visible in the distance, with the silhouette of Worthing&#x27;s buildings and trees visible.
-    *   The sky is not visible, but the overall mood of the image is one of tranquility and relaxation.
-
-The image captures a peaceful moment on the beach, with the dog walker and kite surfers enjoying the sunny day. The composition of the image creates a sense of depth and atmosphere, drawing the viewer&#x27;s attention to the serene coastal scene.</div></td>
-            </tr>
-
-            <!-- Data row for model: mlx-community/deepseek-vl2-8bit -->
-            <tr>
-                <td class="model-name">mlx-community/deepseek-vl2-8bit</td>
-                
-                <td class="numeric">29,337.2</td>
-                <td class="numeric">1,590.7</td>
-                <td class="numeric">30,106.4</td>
-                <td class="numeric">13.78</td>
-            
-                <td><div class="model-output">&quot;Shoreham-by-Sear, 1870&quot; (vulghe 2 3 4 5  大革命 大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命大革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的革命的iflanken fil fil fil洋洋常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常常刚刚一下刚刚刚刚安装完的，安装好的，安装好的，安装好的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，安装的，</div></td>
-            </tr>
-
-            <!-- Data row for model: mlx-community/pixtral-12b-8bit -->
-            <tr>
-                <td class="model-name">mlx-community/pixtral-12b-8bit</td>
-                
-                <td class="numeric">13,502.8</td>
-                <td class="numeric">690.0</td>
-                <td class="numeric">13,869.5</td>
-                <td class="numeric">17.59</td>
-            
-                <td><div class="model-output">Certainly! Here are the factual captions, descriptions, and keywords/tags for each option:
-
-### Option 1 (Concise)
-
-**Caption:**
-Tranquil scene on Shoreham beach, Shoreham-by-Sea, England, with Worthing visible in the distance. A dog walker enjoys the expansive shoreline as kite surfers take advantage of the coastal winds.
-
-**Description:**
-A serene coastal scene from Shoreham beach in Shoreham-by-Sea, England, showcasing the distant silhouette of Worthing. A dog walker strolls along the shore while kite surfers enjoy the windy conditions.
-
-**Keywords/Tags:**
-Shoreham beach, Shoreham-by-Sea, Worthing, England, UK, coastal scene, dog walking, kite surfing, shoreline, Sussex, windy day
-
-### Option 2 (More descriptive)
-
-**Caption:**
-View from Shoreham beach, Shoreham-by-Sea, England, showcasing Worthing on the horizon. A person and their dog stroll along the wet sand, while kite surfers add color to the seascape.
-
-**Description:**
-Captured from Shoreham beach in Shoreham-by-Sea, England, this image highlights the scenic Sussex coastline. Worthing&#x27;s silhouette is visible on the horizon, with a person and their dog walking along the wet sand. Kite surfers add vibrant color to the seascape, utilizing the coastal winds.
-
-**Keywords/Tags:**
-Shoreham beach, Shoreham-by-Sea, Worthing, England, UK, Sussex coastline, dog walking, kite surfing, seascape, coastal winds, GPS coordinates, 50°49&#x27;38.76&quot;N 0°16&#x27;21.48&quot;W
-
-### Option 3 (Focus on activity)
-
-**Caption:**
-Kite surfers and dog walkers share Shoreham beach, Shoreham-by-Sea, England, with Worthing visible in the distance. The wide expanse of sand and sea supports both activities, creating a vibrant coastal atmosphere.
-
-**Description:**
-Kite surfers and dog walkers enjoy Shoreham beach in Shoreham-by-Sea, England, with Worthing visible on the horizon. The expansive shoreline provides ample space for both recreational activities, contributing to a lively coastal scene.
-
-**Keywords/Tags:**
-Shoreham beach, Shoreham-by-Sea, Worthing, England,</div></td>
-            </tr>
-
-            <!-- Data row for model: mlx-community/Llama-3.2-90B-Vision-Instruct-4bit -->
-            <tr>
-                <td class="model-name">mlx-community/Llama-3.2-90B-Vision-Instruct-4bit</td>
-                
-                <td class="numeric">49,852.2</td>
-                <td class="numeric">613.9</td>
-                <td class="numeric">50,412.0</td>
-                <td class="numeric">29.51</td>
-            
-                <td><div class="model-output">**Option 2 (More descriptive):**
-
-Captured from Shoreham beach (GPS: 50Â°49&#x27;38.76&quot; N 0Â°16&#x27;21.48&quot; W) in Shoreham-by-Sea, England, this image showcases the beauty of the Sussex coastline. Worthing&#x27;s silhouette is visible on the horizon, while closer to shore, a person and their dog stroll along the wet sand. Kite surfers add a splash of color to the seascape, harnessing the power of the wind.
-
-**Keywords:** Shoreham-by-Sea, England, Sussex, coastline, beach, kite surfing, dog walking, Worthing, seascape, wet sand, silhouette, horizon, recreational activities, coastal atmosphere.</div></td>
-            </tr>
-
-            <!-- Data row for model: microsoft/Phi-3.5-vision-instruct -->
-            <tr>
-                <td class="model-name">microsoft/Phi-3.5-vision-instruct</td>
-                
-                <td class="numeric">9,159.7</td>
-                <td class="numeric">4,183.6</td>
-                <td class="numeric">10,972.9</td>
-                <td class="numeric">29.80</td>
-            
-                <td><div class="model-output">**Option 1 (Concise):**
-
-A serene beach scene in Shoreham-by-Sea, England, with Worthing in the background.
-
-**Keywords/Tags:** Shoreham beach, Worthing, England, United Kingdom, coastal landscape, dog walking, kite surfing.
-
-
-**Option 2 (More descriptive):**
-
-A picturesque view of Shoreham beach in Shoreham-by-Sea, England, with Worthing in the distance. The image captures the essence of the Sussex coastline, with a dog walker enjoying the scenic wet sand and kite surfers riding the waves.
-
-**Keywords/Tags:** Shoreham beach, Worthing, Sussex coastline, dog walking, kite surfing, coastal England, United Kingdom.
-
-
-**Option 3 (Focus on activity):**
-
-Kite surfers and dog walkers at Shoreham-by-Sea, England, with Worthing in the backdrop. The image highlights the recreational use of the beach, showcasing the diverse activities available in this coastal area.
-
-**Keywords/Tags:** Shoreham beach, Worthing, kite surfing, dog walking, coastal activities, United Kingdom.&lt;|end|&gt;</div></td>
-            </tr>
-
-            <!-- Data row for model: mlx-community/pixtral-12b-bf16 -->
-            <tr>
-                <td class="model-name">mlx-community/pixtral-12b-bf16</td>
-                
-                <td class="numeric">25,370.2</td>
-                <td class="numeric">593.5</td>
-                <td class="numeric">25,640.2</td>
-                <td class="numeric">30.29</td>
-            
-                <td><div class="model-output">Certainly! Here are the factual captions, descriptions, and keywords/tags for each option:
-
-### Option 1 (Concise)
-
-**Caption:**
-Tranquil scene on Shoreham beach, Shoreham-by-Sea, England, with Worthing visible in the distance. A dog walker enjoys the expansive shoreline as kite surfers take advantage of the coastal winds.
-
-**Description:**
-A serene coastal scene from Shoreham beach in Shoreham-by-Sea, England, showcasing the distant silhouette of Worthing. A dog walker strolls along the shore while kite surfers add dynamic elements to the seascape.
-
-**Keywords/Tags:**
-Shoreham beach, Shoreham-by-Sea, Worthing, England, UK, coastal scene, dog walking, kite surfing, shoreline, Sussex, beach activity
-
-### Option 2 (More descriptive)
-
-**Caption:**
-View from Shoreham beach, Shoreham-by-Sea, England, showcasing Worthing on the horizon. A person and their dog stroll along the wet sand, while kite surfers add color to the seascape.
-
-**Description:**
-Captured from Shoreham beach in Shoreham-by-Sea, England, this image highlights the scenic Sussex coastline with Worthing&#x27;s silhouette on the horizon. A person and their dog enjoy a leisurely walk along the wet sand, while kite surfers harness the wind, adding vibrant splashes of color to the seascape.
-
-**Keywords/Tags:**
-Shoreham beach, Shoreham-by-Sea, Worthing, England, UK, Sussex coastline, dog walking, kite surfing, seascape, coastal winds, GPS coordinates, beach activity
-
-### Option 3 (Focus on activity)
-
-**Caption:**
-Kite surfers and dog walkers share Shoreham beach, Shoreham-by-Sea, England, with Worthing visible in the distance. The wide expanse of sand and sea supports both activities.
-
-**Description:**
-Kite surfers and dog walkers enjoy Shoreham beach in Shoreham-by-Sea, England, with Worthing visible on the horizon. The expansive shoreline provides ample space for both recreational activities, creating a vibrant coastal atmosphere.
-
-**Keywords/Tags:**
-Shoreham beach, Shoreham-by-Sea, Worthing, England, UK, kite surfing, dog walking, beach activity, coastal scene, Sussex, recreational activities, shoreline
-
-These capt</div></td>
-            </tr>
-
-            <!-- Data row for model: mlx-community/Phi-3.5-vision-instruct-bf16 -->
-            <tr>
-                <td class="model-name">mlx-community/Phi-3.5-vision-instruct-bf16</td>
-                
-                <td class="numeric">10,104.0</td>
-                <td class="numeric">3,239.3</td>
-                <td class="numeric">10,972.9</td>
-                <td class="numeric">30.83</td>
-            
-                <td><div class="model-output">**Option 1 (Concise):**
-
-A serene beach scene in Shoreham-by-Sea, England, with Worthing in the background.
-
-**Keywords/Tags:** Shoreham beach, Worthing, England, United Kingdom, coastal landscape, dog walking, kite surfing.
-
-
-**Option 2 (More descriptive):**
-
-A picturesque view of Shoreham beach in Shoreham-by-Sea, England, with Worthing in the distance. The image captures the essence of the Sussex coastline, with a dog walker enjoying the scenic wet sand and kite surfers riding the waves.
-
-**Keywords/Tags:** Shoreham beach, Worthing, Sussex coastline, dog walking, kite surfing, coastal England, United Kingdom.
-
-
-**Option 3 (Focus on activity):**
-
-Kite surfers and dog walkers at Shoreham-by-Sea, England, with Worthing in the backdrop. The image highlights the recreational use of the beach, showcasing the diverse activities available in this coastal area.
-
-**Keywords/Tags:** Shoreham beach, Worthing, kite surfing, dog walking, coastal activities, United Kingdom.&lt;|end|&gt;</div></td>
-            </tr>
-
-            <!-- Data row for model: mlx-community/llava-v1.6-34b-8bit -->
-            <tr>
-                <td class="model-name">mlx-community/llava-v1.6-34b-8bit</td>
-                
-                <td class="numeric">36,936.1</td>
-                <td class="numeric">599.1</td>
-                <td class="numeric">37,290.2</td>
-                <td class="numeric">34.91</td>
-            
-                <td><div class="model-output">Option 1:
-
-Caption: A tranquil scene unfolds on Shoreham beach in Shoreham-by-Sea, England, with Worthing visible in the distance.
-
-Description: A dog walker enjoys the expansive shoreline as kite surfers take advantage of the coastal winds.
-
-Keywords/Tags: Shoreham beach, Shoreham-by-Sea, England, Worthing, dog walker, kite surfers, coastal winds, tranquil scene.
-
-Option 2:
-
-Caption: Captured from Shoreham beach in Shoreham-by-Sea, England, this image showcases the beauty of the Sussex coastline.
-
-Description: Worthing&#x27;s silhouette is visible on the horizon, while closer to shore, a person and their dog stroll along the wet sand. Kite surfers add a splash of color to the seascape, harnessing the power of the wind.
-
-Keywords/Tags: Shoreham beach, Shoreham-by-Sea, England, Sussex coastline, Worthing, silhouette, wet sand, kite surfers, wind.
-
-Option 3:
-
-Caption: Kite surfers and dog walkers share the beach at Shoreham-by-Sea, England, in this view towards Worthing.
-
-Description: The wide expanse of sand and sea provides ample space for both recreational activities, creating a vibrant coastal atmosphere.
-
-Keywords/Tags: Shoreham beach, Shoreham-by-Sea, England, kite surfers, dog walkers, recreational activities, coastal atmosphere, sand, sea.</div></td>
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: meta-llama/Llama-3.2-11B-Vision-Instruct</span></td>
             </tr>
 
             <!-- Data row for model: microsoft/Florence-2-large-ft -->
@@ -502,24 +75,87 @@ Keywords/Tags: Shoreham beach, Shoreham-by-Sea, England, kite surfers, dog walke
                 <td class="numeric">-</td> <td class="numeric">-</td>
                 <td class="numeric">-</td> <td class="numeric">-</td>
             
-                <td><span class='error-message'>Failed during 'load': FileNotFoundError: 
-No safetensors found in /Users/jrp/.cache/huggingface/hub/models--microsoft--Florence-2-large-ft/snapshots/bb44b80c15e943b1bf7cec6e076359cec6e40178
-Create safetensors using the following code:
-```
-from transformers import AutoModelForCausalLM, AutoProcessor
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: microsoft/Florence-2-large-ft</span></td>
+            </tr>
 
-model_id= &quot;&lt;huggingface_model_id&gt;&quot;
-model = AutoModelForCausalLM.from_pretrained(model_id)
-processor = AutoProcessor.from_pretrained(model_id)
+            <!-- Data row for model: microsoft/Phi-3.5-vision-instruct -->
+            <tr class="failed-row">
+                <td class="model-name">microsoft/Phi-3.5-vision-instruct</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: microsoft/Phi-3.5-vision-instruct</span></td>
+            </tr>
 
-model.save_pretrained(&quot;&lt;local_dir&gt;&quot;)
-processor.save_pretrained(&quot;&lt;local_dir&gt;&quot;)
-```
-Then use the &lt;local_dir&gt; as the --hf-path in the convert script.
-```
-python -m mlx_vlm.convert --hf-path &lt;local_dir&gt; --mlx-path &lt;mlx_dir&gt;
-```
-        </span></td>
+            <!-- Data row for model: mlx-community/Florence-2-large-ft-bf16 -->
+            <tr class="failed-row">
+                <td class="model-name">mlx-community/Florence-2-large-ft-bf16</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: mlx-community/Florence-2-large-ft-bf16</span></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/Idefics3-8B-Llama3-bf16 -->
+            <tr class="failed-row">
+                <td class="model-name">mlx-community/Idefics3-8B-Llama3-bf16</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: mlx-community/Idefics3-8B-Llama3-bf16</span></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/Llama-3.2-11B-Vision-Instruct-8bit -->
+            <tr class="failed-row">
+                <td class="model-name">mlx-community/Llama-3.2-11B-Vision-Instruct-8bit</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: mlx-community/Llama-3.2-11B-Vision-Instruct-8bit</span></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/Llama-3.2-90B-Vision-Instruct-4bit -->
+            <tr class="failed-row">
+                <td class="model-name">mlx-community/Llama-3.2-90B-Vision-Instruct-4bit</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: mlx-community/Llama-3.2-90B-Vision-Instruct-4bit</span></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/Molmo-7B-D-0924-8bit -->
+            <tr class="failed-row">
+                <td class="model-name">mlx-community/Molmo-7B-D-0924-8bit</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: mlx-community/Molmo-7B-D-0924-8bit</span></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/Molmo-7B-D-0924-bf16 -->
+            <tr class="failed-row">
+                <td class="model-name">mlx-community/Molmo-7B-D-0924-bf16</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: mlx-community/Molmo-7B-D-0924-bf16</span></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/Phi-3.5-vision-instruct-bf16 -->
+            <tr class="failed-row">
+                <td class="model-name">mlx-community/Phi-3.5-vision-instruct-bf16</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: mlx-community/Phi-3.5-vision-instruct-bf16</span></td>
             </tr>
 
             <!-- Data row for model: mlx-community/QwQ-32B-4bit -->
@@ -529,7 +165,7 @@ python -m mlx_vlm.convert --hf-path &lt;local_dir&gt; --mlx-path &lt;mlx_dir&gt;
                 <td class="numeric">-</td> <td class="numeric">-</td>
                 <td class="numeric">-</td> <td class="numeric">-</td>
             
-                <td><span class='error-message'>Failed during 'load': ValueError: Model type qwen2 not supported.</span></td>
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: mlx-community/QwQ-32B-4bit</span></td>
             </tr>
 
             <!-- Data row for model: mlx-community/QwQ-32B-8bit -->
@@ -539,7 +175,37 @@ python -m mlx_vlm.convert --hf-path &lt;local_dir&gt; --mlx-path &lt;mlx_dir&gt;
                 <td class="numeric">-</td> <td class="numeric">-</td>
                 <td class="numeric">-</td> <td class="numeric">-</td>
             
-                <td><span class='error-message'>Failed during 'load': ValueError: Model type qwen2 not supported.</span></td>
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: mlx-community/QwQ-32B-8bit</span></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/SmolVLM-Instruct-bf16 -->
+            <tr class="failed-row">
+                <td class="model-name">mlx-community/SmolVLM-Instruct-bf16</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: mlx-community/SmolVLM-Instruct-bf16</span></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/SmolVLM2-2.2B-Instruct-mlx -->
+            <tr class="failed-row">
+                <td class="model-name">mlx-community/SmolVLM2-2.2B-Instruct-mlx</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: mlx-community/SmolVLM2-2.2B-Instruct-mlx</span></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/deepseek-vl2-8bit -->
+            <tr class="failed-row">
+                <td class="model-name">mlx-community/deepseek-vl2-8bit</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: mlx-community/deepseek-vl2-8bit</span></td>
             </tr>
 
             <!-- Data row for model: mlx-community/gemma-3-12b-pt-8bit -->
@@ -549,21 +215,103 @@ python -m mlx_vlm.convert --hf-path &lt;local_dir&gt; --mlx-path &lt;mlx_dir&gt;
                 <td class="numeric">-</td> <td class="numeric">-</td>
                 <td class="numeric">-</td> <td class="numeric">-</td>
             
-                <td><span class='error-message'>Failed during 'prompt': ValueError: No chat template is set for this processor. Please either set the `chat_template` attribute, or provide a chat template as an argument. See https://huggingface.co/docs/transformers/main/en/chat_templating for more information.</span></td>
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: mlx-community/gemma-3-12b-pt-8bit</span></td>
             </tr>
 
-            <!-- Summary Row (Based on Successful Runs) -->
-            <tr class="summary">
-                <td>AVG/PEAK (21 Success)</td>
-                <td class="numeric">14615.2</td>
-                <td class="numeric">1049.3</td>
-                <td class="numeric">50412.0</td>
-                <td class="numeric">12.07</td>
-                <td></td>
+            <!-- Data row for model: mlx-community/llava-v1.6-34b-8bit -->
+            <tr class="failed-row">
+                <td class="model-name">mlx-community/llava-v1.6-34b-8bit</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: mlx-community/llava-v1.6-34b-8bit</span></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/llava-v1.6-mistral-7b-8bit -->
+            <tr class="failed-row">
+                <td class="model-name">mlx-community/llava-v1.6-mistral-7b-8bit</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: mlx-community/llava-v1.6-mistral-7b-8bit</span></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/paligemma2-10b-ft-docci-448-6bit -->
+            <tr class="failed-row">
+                <td class="model-name">mlx-community/paligemma2-10b-ft-docci-448-6bit</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: mlx-community/paligemma2-10b-ft-docci-448-6bit</span></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/paligemma2-10b-ft-docci-448-bf16 -->
+            <tr class="failed-row">
+                <td class="model-name">mlx-community/paligemma2-10b-ft-docci-448-bf16</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: mlx-community/paligemma2-10b-ft-docci-448-bf16</span></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/paligemma2-3b-ft-docci-448-bf16 -->
+            <tr class="failed-row">
+                <td class="model-name">mlx-community/paligemma2-3b-ft-docci-448-bf16</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: mlx-community/paligemma2-3b-ft-docci-448-bf16</span></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/paligemma2-3b-pt-896-4bit -->
+            <tr class="failed-row">
+                <td class="model-name">mlx-community/paligemma2-3b-pt-896-4bit</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: mlx-community/paligemma2-3b-pt-896-4bit</span></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/pixtral-12b-8bit -->
+            <tr class="failed-row">
+                <td class="model-name">mlx-community/pixtral-12b-8bit</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: mlx-community/pixtral-12b-8bit</span></td>
+            </tr>
+
+            <!-- Data row for model: mlx-community/pixtral-12b-bf16 -->
+            <tr class="failed-row">
+                <td class="model-name">mlx-community/pixtral-12b-bf16</td>
+                
+                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td> <td class="numeric">-</td>
+            
+                <td><span class='error-message'>Failed during 'Unknown': FileNotFoundError: Model not found: mlx-community/pixtral-12b-bf16</span></td>
             </tr>
 
         </tbody>
     </table>
     <!-- End of Table -->
+    <footer>
+<h2>Library Versions</h2>
+<ul>
+<li>mlx: <code style="color: green;">0.24.2.dev20250406+ba09f01c</code></li>
+<li>mlx-vlm: <code style="color: green;">0.1.21</code></li>
+<li>mlx-lm: <code style="color: green;">0.22.3</code></li>
+<li>huggingface-hub: <code style="color: green;">0.30.1</code></li>
+<li>transformers: <code style="color: green;">4.50.3</code></li>
+<li>Pillow: <code style="color: green;">11.1.0</code></li>
+</ul>
+<p>Report generated on: 2025-04-06</p>
+</footer>
 </body>
 </html>
