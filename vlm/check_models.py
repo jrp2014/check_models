@@ -18,8 +18,9 @@ from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
 from typing import (
-    Any, Dict, Final, List, NamedTuple,
-    Optional, TextIO, Tuple, Union
+    Any, Dict, Final, List, NamedTuple, NoReturn,
+    Optional, TextIO, Tuple, Union, Callable,
+    TypeVar
 )
 
 from huggingface_hub import HFCacheInfo, scan_cache_dir
@@ -64,23 +65,26 @@ except ImportError:
 
 # Custom timeout context manager (for Python < 3.11)
 class timeout(contextlib.ContextDecorator):
-    def __init__(self, seconds: float):
-        self.seconds = seconds
-        self.timer = None
+    def __init__(self, seconds: float) -> None:
+        self.seconds: float = seconds
+        self.timer: Optional[Callable[[int, Optional[type[BaseException]]], Any]] = None
 
-    def _timeout_handler(self, signum, frame):
+    def _timeout_handler(self, signum: int, frame: Optional[Any]) -> NoReturn:
         raise TimeoutError(f"Operation timed out after {self.seconds} seconds")
 
-    def __enter__(self):
+    def __enter__(self) -> 'timeout':
         if self.seconds > 0:
             self.timer = signal.signal(signal.SIGALRM, self._timeout_handler)
             signal.alarm(int(self.seconds))
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type: Optional[type[BaseException]], 
+                 exc_val: Optional[BaseException], 
+                 exc_tb: Optional[Any]) -> None:
         if self.seconds > 0:
             signal.alarm(0)
-            signal.signal(signal.SIGALRM, self.timer)
+            if self.timer is not None:
+                signal.signal(signal.SIGALRM, self.timer)
 
 
 # Configure logging
@@ -115,18 +119,18 @@ def print_version_info(versions: Dict[str, str]) -> None:
 # --- ANSI Color Codes for Console Output ---
 class Colors:
     """ANSI color codes for terminal output"""
-    RESET = "\033[0m"
-    BOLD = "\033[1m"
-    RED = "\033[91m"
-    GREEN = "\033[92m"
-    YELLOW = "\033[93m"
-    BLUE = "\033[94m"
-    MAGENTA = "\033[95m"
-    CYAN = "\033[96m"
-    WHITE = "\033[97m"
-    GRAY = "\033[90m"
-    _enabled = sys.stderr.isatty()
-    _ansi_escape_re = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+    RESET: Final[str] = "\033[0m"
+    BOLD: Final[str] = "\033[1m"
+    RED: Final[str] = "\033[91m"
+    GREEN: Final[str] = "\033[92m"
+    YELLOW: Final[str] = "\033[93m"
+    BLUE: Final[str] = "\033[94m"
+    MAGENTA: Final[str] = "\033[95m"
+    CYAN: Final[str] = "\033[96m"
+    WHITE: Final[str] = "\033[97m"
+    GRAY: Final[str] = "\033[90m"
+    _enabled: bool = sys.stderr.isatty()
+    _ansi_escape_re: re.Pattern[str] = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 
     @staticmethod
     def colored(text: str, color: str) -> str:
@@ -135,17 +139,20 @@ class Colors:
         return f"{color}{text}{Colors.RESET}"
 
     @staticmethod
-    def visual_len(text: str) -> int:
+    def visual_len(text: Union[str, Any]) -> int:
         if not isinstance(text, str):
              text = str(text)
         return len(Colors._ansi_escape_re.sub('', text))
 
 
 # Type aliases and definitions
+T = TypeVar('T')
 ExifValue = Any
 ExifDict = Dict[Union[str, int], ExifValue]
 MetadataDict = Dict[str, str]
 PathLike = Union[str, Path]
+GPSTupleElement = Union[int, float]
+GPSTuple = Tuple[GPSTupleElement, GPSTupleElement, GPSTupleElement]
 
 # Constants - Defaults
 DEFAULT_MAX_TOKENS: Final[int] = 500
@@ -291,10 +298,6 @@ def _format_exif_date(date_str_input: Any) -> Optional[str]:
 
     logger.debug(f"Could not parse date string '{date_str}' with known formats.")
     return None
-
-
-GPSTupleElement = Any
-GPSTuple = Tuple[GPSTupleElement, GPSTupleElement, GPSTupleElement]
 
 
 def _convert_gps_coordinate(ref: Optional[Union[str, bytes]], coord: Any) -> Optional[float]:
@@ -1014,7 +1017,7 @@ def main(args: argparse.Namespace) -> None:
 
 if __name__ == "__main__":
     # Setup Argument Parser
-    parser = argparse.ArgumentParser(
+    parser: argparse.ArgumentParser = argparse.ArgumentParser(
         description="Analyze image with MLX VLMs.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
@@ -1030,7 +1033,7 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--debug", action="store_true", help="Enable debug logging (DEBUG level).")
 
     # Parse arguments
-    parsed_args = parser.parse_args()
+    parsed_args: argparse.Namespace = parser.parse_args()
 
     # --- Main Execution ---
     try:
