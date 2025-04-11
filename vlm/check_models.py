@@ -6,7 +6,10 @@ import argparse
 import contextlib
 import html
 import logging
+import platform
 import re  # For ANSI code stripping
+import signal
+import subprocess
 import sys
 import time
 import traceback
@@ -19,17 +22,16 @@ from typing import (
     Optional, TextIO, Tuple, Union
 )
 
+from huggingface_hub import HFCacheInfo, scan_cache_dir
+from huggingface_hub import __version__ as hf_version
+from huggingface_hub.errors import HFValidationError
+
 # Third-party imports
 try:
     import mlx.core as mx
 except ImportError:
     print("Core dependency missing: mlx. Please install it.", file=sys.stderr)
     sys.exit(1)
-
-
-from huggingface_hub import HFCacheInfo, scan_cache_dir
-from huggingface_hub import __version__ as hf_version
-from huggingface_hub.errors import HFValidationError
 
 try:
     from PIL import Image, UnidentifiedImageError
@@ -59,6 +61,26 @@ try:
     transformers_version = transformers.__version__
 except ImportError:
     transformers_version = "N/A"
+
+# Custom timeout context manager (for Python < 3.11)
+class timeout(contextlib.ContextDecorator):
+    def __init__(self, seconds: float):
+        self.seconds = seconds
+        self.timer = None
+
+    def _timeout_handler(self, signum, frame):
+        raise TimeoutError(f"Operation timed out after {self.seconds} seconds")
+
+    def __enter__(self):
+        if self.seconds > 0:
+            self.timer = signal.signal(signal.SIGALRM, self._timeout_handler)
+            signal.alarm(int(self.seconds))
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if self.seconds > 0:
+            signal.alarm(0)
+            signal.signal(signal.SIGALRM, self.timer)
 
 
 # Configure logging
@@ -93,9 +115,16 @@ def print_version_info(versions: Dict[str, str]) -> None:
 # --- ANSI Color Codes for Console Output ---
 class Colors:
     """ANSI color codes for terminal output"""
-    RESET = "\033[0m"; BOLD = "\033[1m"; RED = "\033[91m"; GREEN = "\033[92m"
-    YELLOW = "\033[93m"; BLUE = "\033[94m"; MAGENTA = "\033[95m"; CYAN = "\033[96m"
-    WHITE = "\033[97m"; GRAY = "\033[90m"
+    RESET = "\033[0m"
+    BOLD = "\033[1m"
+    RED = "\033[91m"
+    GREEN = "\033[92m"
+    YELLOW = "\033[93m"
+    BLUE = "\033[94m"
+    MAGENTA = "\033[95m"
+    CYAN = "\033[96m"
+    WHITE = "\033[97m"
+    GRAY = "\033[90m"
     _enabled = sys.stderr.isatty()
     _ansi_escape_re = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 
@@ -132,21 +161,27 @@ IMPORTANT_EXIF_TAGS: Final[frozenset[str]] = frozenset({
 })
 DATE_FORMATS: Final[Tuple[str, ...]] = ("%Y:%m:%d %H:%M:%S", "%Y-%m-%d %H:%M:%S", "%Y%m%d")
 EXIF_DATE_TAGS: Final[Tuple[str, ...]] = ("DateTimeOriginal", "CreateDate", "DateTime")
-GPS_LAT_REF_TAG: Final[int] = 1; GPS_LAT_TAG: Final[int] = 2
-GPS_LON_REF_TAG: Final[int] = 3; GPS_LON_TAG: Final[int] = 4
+GPS_LAT_REF_TAG: Final[int] = 1
+GPS_LAT_TAG: Final[int] = 2
+GPS_LON_REF_TAG: Final[int] = 3
+GPS_LON_TAG: Final[int] = 4
 
 
 # Type definitions
 class MemoryStats(NamedTuple):
     """Memory statistics container (values represent deltas or peak)."""
-    active: float; cached: float; peak: float; time: float
+    active: float
+    cached: float
+    peak: float
+    time: float
     @staticmethod
     def zero() -> 'MemoryStats': return MemoryStats(0.0, 0.0, 0.0, 0.0)
 
 @dataclass(frozen=True)
 class ModelResult:
     """Container for model processing results, including failures."""
-    model_name: str; success: bool
+    model_name: str
+    success: bool
     output: Optional[str] = None
     stats: MemoryStats = field(default_factory=MemoryStats.zero)
     error_stage: Optional[str] = None
@@ -351,7 +386,8 @@ def pretty_print_exif(exif: ExifDict, verbose: bool = False) -> None:
     tags_to_print: List[Tuple[str, str, bool]] = []
     for tag, value in exif.items():
         tag_str = str(tag)
-        if tag_str == "GPSInfo" and isinstance(value, dict): continue
+        if tag_str == "GPSInfo" and isinstance(value, dict):
+            continue
         if isinstance(value, dict):
             logger.debug(f"Skipping dictionary value for EXIF tag '{tag_str}' in pretty print.")
             continue
@@ -360,25 +396,37 @@ def pretty_print_exif(exif: ExifDict, verbose: bool = False) -> None:
              try:
                  decoded_str = value.decode('utf-8', errors='replace')
                  value_str = decoded_str[:57] + "..." if len(decoded_str) > 60 else decoded_str
-             except Exception: value_str = f"<bytes len={len(value)}>"
-        elif isinstance(value, tuple) and len(value) > 10: value_str = f"<tuple len={len(value)}>"
+             except Exception:
+                 value_str = f"<bytes len={len(value)}>"
+        elif isinstance(value, tuple) and len(value) > 10:
+            value_str = f"<tuple len={len(value)}>"
         else:
              try:
                   value_str = str(value)
-                  if len(value_str) > 60: value_str = value_str[:57] + "..."
-             except Exception: value_str = f"<unrepresentable type: {type(value).__name__}>"
+                  if len(value_str) > 60:
+                      value_str = value_str[:57] + "..."
+             except Exception:
+                 value_str = f"<unrepresentable type: {type(value).__name__}>"
 
         is_important = tag_str in IMPORTANT_EXIF_TAGS
-        if verbose or is_important: tags_to_print.append((tag_str, value_str, is_important))
+        if verbose or is_important:
+            tags_to_print.append((tag_str, value_str, is_important))
 
-    if not tags_to_print: print("No relevant EXIF tags found to display."); return
+    if not tags_to_print:
+        print("No relevant EXIF tags found to display.")
+        return
     tags_to_print.sort(key=lambda x: x[0])
     max_tag_len = max(Colors.visual_len(t[0]) for t in tags_to_print) if tags_to_print else 20
     max_val_len = max(Colors.visual_len(t[1]) for t in tags_to_print) if tags_to_print else 40
-    min_width = 10; max_tag_len = max(max_tag_len, min_width); max_val_len = max(max_val_len, min_width + 5)
-    header_color = Colors.BLUE; border_color = Colors.BLUE; important_color = Colors.YELLOW
+    min_width = 10
+    max_tag_len = max(max_tag_len, min_width)
+    max_val_len = max(max_val_len, min_width + 5)
+    header_color = Colors.BLUE
+    border_color = Colors.BLUE
+    important_color = Colors.YELLOW
     def pad(text: str, width: int, left: bool = True) -> str:
-        pad_len = max(0, width - Colors.visual_len(text)); return f"{text}{' '*pad_len}" if left else f"{' '*pad_len}{text}"
+        pad_len = max(0, width - Colors.visual_len(text))
+        return f"{text}{' '*pad_len}" if left else f"{' '*pad_len}{text}"
     print(Colors.colored(f"╔{'═' * (max_tag_len + 2)}╤{'═' * (max_val_len + 2)}╗", border_color))
     print(f"{Colors.colored('║', border_color)} {pad(Colors.colored('Tag', header_color), max_tag_len)} {Colors.colored('│', border_color)} {pad(Colors.colored('Value', header_color), max_val_len)} {Colors.colored('║', border_color)}")
     print(Colors.colored(f"╠{'═' * (max_tag_len + 2)}╪{'═' * (max_val_len + 2)}╣", border_color))
@@ -414,28 +462,42 @@ def get_cached_model_ids() -> List[str]:
 def print_model_stats(results: List[ModelResult]) -> None:
     """Print a table summarizing model performance statistics to the console, including failures."""
     # (Implementation remains the same as previous correct version)
-    if not results: print("No model results to display."); return
+    if not results:
+         print("No model results to display.")
+         return
     results.sort(key=lambda x: (not x.success, x.stats.time if x.success else 0))
     display_names = [(r.model_name.split('/')[-1]) for r in results]
     max_name_len_base = max(len(name) for name in display_names) if display_names else 20
-    max_name_len_cap = 44; max_name_len_base = min(max_name_len_base, max_name_len_cap)
+    max_name_len_cap = 44
+    max_name_len_base = min(max_name_len_base, max_name_len_cap)
     col_width = 12
-    header_color = Colors.BLUE; border_color = Colors.BLUE; summary_color = Colors.YELLOW
-    failure_color = Colors.RED; failure_text_color = Colors.GRAY
-    captured_marker_plain = "(+cap)"; captured_marker_colored = Colors.colored(captured_marker_plain, Colors.GRAY)
-    max_len_needed = 0; temp_display_names = []
+    header_color = Colors.BLUE
+    border_color = Colors.BLUE
+    summary_color = Colors.YELLOW
+    failure_color = Colors.RED
+    failure_text_color = Colors.GRAY
+    captured_marker_plain = "(+cap)"
+    captured_marker_colored = Colors.colored(captured_marker_plain, Colors.GRAY)
+    max_len_needed = 0
+    temp_display_names = []
     for i, r in enumerate(results):
-        name = display_names[i]; current_max_name = max_name_len_base
-        if len(name) > current_max_name: name = name[:current_max_name - 3] + "..."
+        name = display_names[i]
+        current_max_name = max_name_len_base
+        if len(name) > current_max_name:
+            name = name[:current_max_name - 3] + "..."
         display_str = name
         if not r.success:
             fail_info_text = f" (Failed: {r.error_stage or '?'})"
-            if r.captured_output_on_fail: fail_info_text += f" {captured_marker_plain}"
+            if r.captured_output_on_fail: 
+                fail_info_text += f" {captured_marker_plain}"
             display_str += fail_info_text
-        temp_display_names.append(display_str); max_len_needed = max(max_len_needed, len(display_str))
+        temp_display_names.append(display_str)
+        max_len_needed = max(max_len_needed, len(display_str))
     max_name_len = min(max(max_name_len_base, max_len_needed), 55)
     def pad(text: str, width: int, left: bool = True) -> str:
-        vlen = Colors.visual_len(text); padding = ' ' * max(0, width - vlen); return f"{text}{padding}" if left else f"{padding}{text}"
+        vlen = Colors.visual_len(text)
+        padding = ' ' * max(0, width - vlen)
+        return f"{text}{padding}" if left else f"{padding}{text}"
     print(f"\n--- {Colors.colored('Model Performance Summary (Console)', Colors.CYAN)} ---")
     print(Colors.colored(f"╔{'═' * (max_name_len + 2)}╤{'═' * (col_width + 2)}╤{'═' * (col_width + 2)}╤{'═' * (col_width + 2)}╤{'═' * (col_width + 2)}╗", border_color))
     header_model = pad(Colors.colored('Model', header_color), max_name_len)
@@ -447,28 +509,50 @@ def print_model_stats(results: List[ModelResult]) -> None:
     print(Colors.colored(f"╠{'═' * (max_name_len + 2)}╪{'═' * (col_width + 2)}╪{'═' * (col_width + 2)}╪{'═' * (col_width + 2)}╪{'═' * (col_width + 2)}╣", border_color))
     successful_results = [r for r in results if r.success]
     for i, result in enumerate(results):
-        model_disp_name_raw = display_names[i]; model_display_text: str
-        active_str: str; cache_str: str; peak_str: str; time_str: str
+        model_disp_name_raw = display_names[i]
+        model_display_text: str
+        active_str: str
+        cache_str: str
+        peak_str: str
+        time_str: str
         allowance = 15 if not result.success else 0
         if len(model_disp_name_raw) > max_name_len - allowance:
-             truncate_at = max(0, max_name_len - allowance - 3); model_disp_name_raw = model_disp_name_raw[:truncate_at] + "..."
+             truncate_at = max(0, max_name_len - allowance - 3)
+             model_disp_name_raw = model_disp_name_raw[:truncate_at] + "..."
         if result.success:
-            model_display_text = model_disp_name_raw; active_str = f"{result.stats.active:,.0f} MB"; cache_str = f"{result.stats.cached:,.0f} MB"; peak_str = f"{result.stats.peak:,.0f} MB"; time_str = f"{result.stats.time:.2f} s"
+            model_display_text = model_disp_name_raw
+            active_str = f"{result.stats.active:,.0f} MB"
+            cache_str = f"{result.stats.cached:,.0f} MB" 
+            peak_str = f"{result.stats.peak:,.0f} MB"
+            time_str = f"{result.stats.time:.2f} s"
         else:
             fail_info = f" (Failed: {result.error_stage or '?'})"
-            if result.captured_output_on_fail: fail_info += f" {captured_marker_colored}"
-            model_display_text_base = model_disp_name_raw + fail_info.replace(captured_marker_colored, "(+cap)"); model_display_text = Colors.colored(model_display_text_base, failure_color)
-            if result.captured_output_on_fail: model_display_text = model_display_text.replace("(+cap)", captured_marker_colored)
-            active_str = Colors.colored("-".rjust(col_width - 4), failure_text_color); cache_str = Colors.colored("-".rjust(col_width - 4), failure_text_color); peak_str = Colors.colored("-".rjust(col_width - 4), failure_text_color); time_str = Colors.colored("-".rjust(col_width - 2), failure_text_color)
+            if result.captured_output_on_fail: 
+                fail_info += f" {captured_marker_colored}"
+            model_display_text_base = model_disp_name_raw + fail_info.replace(captured_marker_colored, "(+cap)")
+            model_display_text = Colors.colored(model_display_text_base, failure_color)
+            if result.captured_output_on_fail:
+                model_display_text = model_display_text.replace("(+cap)", captured_marker_colored)
+            active_str = Colors.colored("-".rjust(col_width - 4), failure_text_color)
+            cache_str = Colors.colored("-".rjust(col_width - 4), failure_text_color) 
+            peak_str = Colors.colored("-".rjust(col_width - 4), failure_text_color) 
+            time_str = Colors.colored("-".rjust(col_width - 2), failure_text_color)
         print(f"{Colors.colored('║', border_color)} {pad(model_display_text, max_name_len)} {Colors.colored('│', border_color)} {pad(active_str, col_width, False)} {Colors.colored('│', border_color)} {pad(cache_str, col_width, False)} {Colors.colored('│', border_color)} {pad(peak_str, col_width, False)} {Colors.colored('│', border_color)} {pad(time_str, col_width, False)} {Colors.colored('║', border_color)}")
     if successful_results:
-        avg_active = sum(r.stats.active for r in successful_results) / len(successful_results); avg_cache = sum(r.stats.cached for r in successful_results) / len(successful_results)
-        max_peak = max(r.stats.peak for r in successful_results); avg_time = sum(r.stats.time for r in successful_results) / len(successful_results)
-        avg_active_str = f"{avg_active:,.0f} MB"; avg_cache_str = f"{avg_cache:,.0f} MB"; max_peak_str = f"{max_peak:,.0f} MB"; avg_time_str = f"{avg_time:.2f} s"
+        avg_active = sum(r.stats.active for r in successful_results) / len(successful_results)
+        avg_cache = sum(r.stats.cached for r in successful_results) / len(successful_results)
+        max_peak = max(r.stats.peak for r in successful_results)
+        avg_time = sum(r.stats.time for r in successful_results) / len(successful_results)
+        avg_active_str = f"{avg_active:,.0f} MB"
+        avg_cache_str = f"{avg_cache:,.0f} MB"
+        max_peak_str = f"{max_peak:,.0f} MB"
+        avg_time_str = f"{avg_time:.2f} s"
         print(Colors.colored(f"╠{'═' * (max_name_len + 2)}╪{'═' * (col_width + 2)}╪{'═' * (col_width + 2)}╪{'═' * (col_width + 2)}╪{'═' * (col_width + 2)}╣", border_color))
         summary_title = f"AVG/PEAK ({len(successful_results)} Success)"
-        summary_model = pad(Colors.colored(summary_title, summary_color), max_name_len); summary_active = pad(Colors.colored(avg_active_str, summary_color), col_width, False)
-        summary_cache = pad(Colors.colored(avg_cache_str, summary_color), col_width, False); summary_peak = pad(Colors.colored(max_peak_str, summary_color), col_width, False)
+        summary_model = pad(Colors.colored(summary_title, summary_color), max_name_len)
+        summary_active = pad(Colors.colored(avg_active_str, summary_color), col_width, False)
+        summary_cache = pad(Colors.colored(avg_cache_str, summary_color), col_width, False)
+        summary_peak = pad(Colors.colored(max_peak_str, summary_color), col_width, False)
         summary_time = pad(Colors.colored(avg_time_str, summary_color), col_width, False)
         print(f"{Colors.colored('║', border_color)} {summary_model} {Colors.colored('│', border_color)} {summary_active} {Colors.colored('│', border_color)} {summary_cache} {Colors.colored('│', border_color)} {summary_peak} {Colors.colored('│', border_color)} {summary_time} {Colors.colored('║', border_color)}")
     print(Colors.colored(f"╚{'═' * (max_name_len + 2)}╧{'═' * (col_width + 2)}╧{'═' * (col_width + 2)}╧{'═' * (col_width + 2)}╧{'═' * (col_width + 2)}╝", border_color))
@@ -634,6 +718,25 @@ def generate_html_report(results: List[ModelResult], filename: Path, versions: D
          logger.error(Colors.colored(f"An unexpected error occurred while writing HTML report: {type(e).__name__}: {e}", Colors.RED), exc_info=logger.level <= logging.DEBUG)
 
 
+def get_system_info() -> Tuple[str, str]:
+    """Get system architecture and GPU information."""
+    arch = platform.machine()
+    gpu_info = "Unknown"
+    try:
+        # Try to get GPU info on macOS
+        if platform.system() == "Darwin":
+            result = subprocess.run(['system_profiler', 'SPDisplaysDataType'], 
+                                 capture_output=True, text=True, timeout=2)
+            if result.returncode == 0:
+                # Extract GPU info from system_profiler output
+                gpu_lines = [line for line in result.stdout.split('\n') 
+                           if "Chipset Model:" in line]
+                if gpu_lines:
+                    gpu_info = gpu_lines[0].split("Chipset Model:")[-1].strip()
+    except (subprocess.SubprocessError, TimeoutError):
+        pass
+    return arch, gpu_info
+
 # --- Model Processing Core ---
 def validate_inputs(image_path: PathLike, model_path: str, temperature: float = 0.0) -> None:
     """Validate input paths and parameters."""
@@ -645,8 +748,7 @@ def validate_inputs(image_path: PathLike, model_path: str, temperature: float = 
     if img_path.suffix.lower() not in {'.jpg', '.jpeg', '.png', '.webp'}:
         raise ValueError(f"Unsupported image format: {img_path.suffix}")
     
-    if not (0.0 <= temperature <= 1.0):
-        raise ValueError(f"Temperature must be between 0 and 1, got {temperature}")
+    validate_temperature(temperature)
 
 def validate_temperature(temp: float) -> None:
     """Validate temperature parameter is within acceptable range."""
@@ -654,6 +756,19 @@ def validate_temperature(temp: float) -> None:
         raise ValueError(f"Temperature must be a number, got {type(temp)}")
     if not 0.0 <= temp <= 1.0:
         raise ValueError(f"Temperature must be between 0 and 1, got {temp}")
+
+def validate_image_accessible(image_path: Path) -> None:
+    """Validate image file is accessible and supported."""
+    try:
+        with timeout(5):  # 5 second timeout for read test
+            with Image.open(image_path) as img:
+                img.verify()
+    except TimeoutError:
+        raise IOError(f"Timeout while reading image: {image_path}")
+    except UnidentifiedImageError:
+        raise ValueError(f"File is not a recognized image format: {image_path}")
+    except Exception as e:
+        raise IOError(f"Error accessing image {image_path}: {e}")
 
 def process_image_with_model(
     model_identifier: str,
@@ -667,15 +782,18 @@ def process_image_with_model(
     """Process an image with a Vision Language Model."""
     logger.info(f"Processing '{image_path.name}' with model: {model_identifier}")
     
-    model = None
-    tokenizer = None
+    model = tokenizer = None
+    arch, gpu_info = get_system_info()
     
     try:
         validate_temperature(temperature)
-        validate_inputs(image_path, model_identifier)
+        validate_image_accessible(image_path)
         
-        # Add timeout for image loading
-        with contextlib.timeout(30):  # 30 second timeout
+        # Log system info in debug mode
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"System: {arch}, GPU: {gpu_info}")
+        
+        with timeout(30):  # 30 second timeout
             mx.clear_cache()
             mx.reset_peak_memory()
             
