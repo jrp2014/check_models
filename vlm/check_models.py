@@ -13,6 +13,7 @@ import subprocess
 import sys
 import time
 import traceback
+import types # Added for TracebackType
 from dataclasses import dataclass, field
 from datetime import datetime
 from functools import lru_cache
@@ -20,8 +21,9 @@ from pathlib import Path
 from typing import (
     Any, Dict, Final, List, NamedTuple, NoReturn,
     Optional, TextIO, Tuple, Union, Callable,
-    TypeVar
+    TypeVar, cast
 )
+import os # Needed for os.path.getmtime
 
 from huggingface_hub import HFCacheInfo, scan_cache_dir
 from huggingface_hub import __version__ as hf_version
@@ -64,27 +66,39 @@ except ImportError:
     transformers_version = "N/A"
 
 # Custom timeout context manager (for Python < 3.11)
+# Note: This implementation relies on signal.SIGALRM and will not work on Windows.
 class timeout(contextlib.ContextDecorator):
     def __init__(self, seconds: float) -> None:
         self.seconds: float = seconds
-        self.timer: Optional[Callable[[int, Optional[type[BaseException]]], Any]] = None
+        self.timer: Optional[Callable[[int, Optional[types.FrameType]], Any]] = None # Use FrameType
 
-    def _timeout_handler(self, signum: int, frame: Optional[Any]) -> NoReturn:
+    def _timeout_handler(self, signum: int, frame: Optional[types.FrameType]) -> NoReturn: # Use FrameType
         raise TimeoutError(f"Operation timed out after {self.seconds} seconds")
 
     def __enter__(self) -> 'timeout':
-        if self.seconds > 0:
-            self.timer = signal.signal(signal.SIGALRM, self._timeout_handler)
-            signal.alarm(int(self.seconds))
+        # Check if SIGALRM is available (won't be on Windows)
+        if hasattr(signal, 'SIGALRM'):
+            if self.seconds > 0:
+                try:
+                    self.timer = signal.signal(signal.SIGALRM, self._timeout_handler)
+                    signal.alarm(int(self.seconds))
+                except ValueError as e:
+                    # Running in a thread or environment where signals are restricted
+                    logger.warning(f"Could not set SIGALRM for timeout: {e}. Timeout disabled.")
+                    self.seconds = 0 # Disable timeout functionality
+        else:
+            if self.seconds > 0:
+                logger.warning("Timeout functionality requires signal.SIGALRM, not available on this platform (e.g., Windows). Timeout disabled.")
+                self.seconds = 0 # Disable timeout functionality
         return self
 
-    def __exit__(self, exc_type: Optional[type[BaseException]], 
-                 exc_val: Optional[BaseException], 
-                 exc_tb: Optional[Any]) -> None:
-        if self.seconds > 0:
+    def __exit__(self, exc_type: Optional[type[BaseException]],
+                 exc_val: Optional[BaseException],
+                 exc_tb: Optional[types.TracebackType]) -> None: # Use TracebackType
+        # Only try to reset the alarm if it was successfully set
+        if hasattr(signal, 'SIGALRM') and self.seconds > 0 and self.timer is not None:
             signal.alarm(0)
-            if self.timer is not None:
-                signal.signal(signal.SIGALRM, self.timer)
+            signal.signal(signal.SIGALRM, self.timer)
 
 
 # Configure logging
@@ -158,7 +172,7 @@ GPSTuple = Tuple[GPSTupleElement, GPSTupleElement, GPSTupleElement]
 DEFAULT_MAX_TOKENS: Final[int] = 500
 DEFAULT_FOLDER: Final[Path] = Path.home() / "Pictures" / "Processed"
 DEFAULT_HTML_OUTPUT: Final[Path] = Path("results.html")
-DEFAULT_TEMPERATURE: Final[float] = 0.0
+DEFAULT_TEMPERATURE: Final[float] = 0.5
 
 # Constants - EXIF
 IMPORTANT_EXIF_TAGS: Final[frozenset[str]] = frozenset({
@@ -167,12 +181,12 @@ IMPORTANT_EXIF_TAGS: Final[frozenset[str]] = frozenset({
     "FocalLength", "ExposureProgram",
 })
 DATE_FORMATS: Final[Tuple[str, ...]] = ("%Y:%m:%d %H:%M:%S", "%Y-%m-%d %H:%M:%S", "%Y%m%d")
-EXIF_DATE_TAGS: Final[Tuple[str, ...]] = ("DateTimeOriginal", "CreateDate", "DateTime")
+EXIF_DATE_TAGS: Final[Tuple[str, ...]] = ("DateTimeOriginal", "CreateDate",  "DateTime")
 GPS_LAT_REF_TAG: Final[int] = 1
 GPS_LAT_TAG: Final[int] = 2
 GPS_LON_REF_TAG: Final[int] = 3
 GPS_LON_TAG: Final[int] = 4
-
+GPS_INFO_TAG_ID: Final[int] = 34853  # Standard EXIF tag ID for GPS IFD
 
 # Type definitions
 class MemoryStats(NamedTuple):
@@ -239,7 +253,7 @@ def print_image_dimensions(image_path: Path) -> None:
 @lru_cache(maxsize=128)
 def get_exif_data(image_path: Path) -> Optional[ExifDict]:
     """Extract EXIF data from an image file, including decoding GPS IFD."""
-    GPS_INFO_TAG_ID: Final[int] = 34853  # Standard EXIF tag ID
+    # GPS_INFO_TAG_ID moved to global constants
 
     try:
         with Image.open(image_path) as img:
@@ -250,11 +264,22 @@ def get_exif_data(image_path: Path) -> Optional[ExifDict]:
 
             # First pass: decode main EXIF tags
             exif_decoded: ExifDict = {}
+            
+            # Try to get DateTimeOriginal directly from IFD using tag ID
+            dt_original_tag_id = 36867  # Standard EXIF tag ID for DateTimeOriginal
+            if dt_original_tag_id in exif_raw:
+                exif_decoded["DateTimeOriginal"] = exif_raw[dt_original_tag_id]
+
+            # Decode remaining EXIF tags
             for tag_id, value in exif_raw.items():
                 if tag_id == GPS_INFO_TAG_ID:
                     continue
+                if tag_id == dt_original_tag_id:
+                    continue
                 tag_name = TAGS.get(tag_id, str(tag_id))
                 exif_decoded[tag_name] = value
+
+            logger.debug(f"EXIF data decoded for {image_path}: {exif_decoded}")
 
             # Second pass: handle GPS IFD specifically
             if GPS_INFO_TAG_ID in exif_raw:
@@ -267,7 +292,8 @@ def get_exif_data(image_path: Path) -> Optional[ExifDict]:
                             gps_decoded[gps_tag_name] = gps_value
                         exif_decoded["GPSInfo"] = gps_decoded
                 except Exception as e:
-                    logger.warning(f"Failed to decode GPS data: {e}")
+                    # Add image path to the warning log
+                    logger.warning(f"Failed to decode GPS data for {image_path}: {e}")
 
             return exif_decoded
 
@@ -346,37 +372,112 @@ def _convert_gps_coordinate(ref: Optional[Union[str, bytes]], coord: Any) -> Opt
 
 
 def extract_image_metadata(image_path: Path) -> MetadataDict:
-    """Extract key metadata (Date, Description, GPS) from image EXIF."""
-    metadata = {"date": "Unknown date", "description": "No description", "gps": "Unknown location"}
-    
-    exif = get_exif_data(image_path)
-    if not exif:
-        logger.debug(f"No EXIF data found for {image_path}")
-        return metadata
+    """Extract key metadata: date, GPS, and selected EXIF tags.
 
-    # Extract description and date
-    if desc := exif.get("ImageDescription"):
-        metadata["description"] = str(desc).strip()
+    Prioritizes DateTimeOriginal from raw IFD, then falls back to other date sources.
+    """
+    metadata: MetadataDict = {}
+    exif_data: Optional[ExifDict] = get_exif_data(image_path)
 
-    for tag in EXIF_DATE_TAGS:
-        if date_str := exif.get(tag):
-            if formatted_date := _format_exif_date(date_str):
-                metadata["date"] = formatted_date
-                break
+    # 1. Try to get date from EXIF, prioritizing DateTimeOriginal from raw IFD
+    if exif_data:
+        dt_original = exif_data.get("DateTimeOriginal")
+        if dt_original:
+            formatted_date = _format_exif_date(dt_original)
+            if formatted_date:
+                metadata['date'] = formatted_date
+                metadata['date_source'] = "DateTimeOriginal (IFD)"
+                metadata['date_tag'] = "DateTimeOriginal"
+                logger.debug(f"Using DateTimeOriginal from IFD: {formatted_date}")
+                
+        # Only try other date tags if DateTimeOriginal wasn't found
+        if 'date' not in metadata:
+            for tag in EXIF_DATE_TAGS:
+                if tag in exif_data:
+                    date_str = str(exif_data[tag])
+                    formatted_date = _format_exif_date(date_str)
+                    if formatted_date:
+                        metadata['date'] = formatted_date
+                        metadata['date_source'] = f"EXIF ({tag})"
+                        metadata['date_tag'] = tag
+                        logger.debug(f"Using date from {tag}: {formatted_date}")
+                        break
 
-    # Extract GPS
-    if isinstance(gps_info := exif.get("GPSInfo"), dict):
+    # 2. Fallback to file modification time if no EXIF date found
+    if 'date' not in metadata:
+        try:
+            mtime = os.path.getmtime(image_path)
+            metadata['date'] = datetime.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M:%S")
+            metadata['date_source'] = "File Modification Time"
+            metadata['date_tag'] = "mtime"
+            logger.debug(f"Using file modification time: {metadata['date']}")
+        except OSError as e:
+            logger.warning(f"Could not get modification time: {e}")
+            metadata['date'] = "Unknown"
+            metadata['date_source'] = "Unavailable"
+            metadata['date_tag'] = None
+            
+    # 3. Extract GPS coordinates if available
+    if exif_data and "GPSInfo" in exif_data and isinstance(exif_data["GPSInfo"], dict):
+        gps_info = exif_data["GPSInfo"]
+        lat = gps_info.get("GPSLatitude")
         lat_ref = gps_info.get("GPSLatitudeRef")
-        lat_coord = gps_info.get("GPSLatitude")
+        lon = gps_info.get("GPSLongitude")
         lon_ref = gps_info.get("GPSLongitudeRef")
-        lon_coord = gps_info.get("GPSLongitude")
 
-        if lat := _convert_gps_coordinate(lat_ref, lat_coord):
-            if lon := _convert_gps_coordinate(lon_ref, lon_coord):
-                metadata["gps"] = f"{lat:+.6f}°, {lon:+.6f}°"
+        if lat and lat_ref and lon and lon_ref:
+            try:
+                # Ensure values are tuples of numbers before conversion
+                if (
+                    isinstance(lat, tuple) and len(lat) == 3 and all(isinstance(x, (int, float)) for x in lat) and
+                    isinstance(lon, tuple) and len(lon) == 3 and all(isinstance(x, (int, float)) for x in lon) and
+                    isinstance(lat_ref, str) and isinstance(lon_ref, str)
+                ):
+                    # Cast to expected tuple types for _convert_gps
+                    lat_tuple = cast(GPSTuple, lat)
+                    lon_tuple = cast(GPSTuple, lon)
+
+                    latitude = _convert_gps(lat_tuple, lat_ref)
+                    longitude = _convert_gps(lon_tuple, lon_ref)
+                    metadata['gps'] = f"{latitude:.6f}, {longitude:.6f}"
+                    logger.debug(f"Extracted GPS {metadata['gps']} for {image_path.name}")
+                else:
+                     logger.warning(f"Unexpected GPS data format in {image_path.name}: lat={lat}, lon={lon}")
+            except (ValueError, TypeError, ZeroDivisionError) as e:
+                logger.warning(f"Could not decode GPS coordinates for {image_path.name}: {e}")
+        else:
+            logger.debug(f"Incomplete GPS tags found for {image_path.name}")
+    else:
+        logger.debug(f"No GPSInfo found in EXIF for {image_path.name}")
+
+    # 4. Add other important EXIF tags
+    if exif_data:
+        for tag in IMPORTANT_EXIF_TAGS:
+            # Avoid overwriting the date we just determined
+            if tag not in EXIF_DATE_TAGS and tag in exif_data:
+                value = exif_data[tag]
+                # Simple conversion for common types, avoid complex objects
+                if isinstance(value, (str, int, float)):
+                     metadata[tag] = str(value).strip()
+                elif isinstance(value, bytes):
+                     # Attempt to decode bytes, fallback to repr
+                     try:
+                         metadata[tag] = value.decode('utf-8', errors='replace').strip()
+                     except UnicodeDecodeError:
+                         metadata[tag] = repr(value)
+                elif isinstance(value, tuple):
+                     metadata[tag] = ", ".join(map(str, value))
+                # Add other simple types if needed, but avoid deep structures
 
     return metadata
 
+def _convert_gps(coord: GPSTuple, ref: str) -> float:
+    """Convert EXIF GPS coordinate (degrees, minutes, seconds) to decimal degrees."""
+    degrees, minutes, seconds = coord
+    decimal_degrees = degrees + (minutes / 60.0) + (seconds / 3600.0)
+    if ref in ['S', 'W']:
+        decimal_degrees = -decimal_degrees
+    return decimal_degrees
 
 def pretty_print_exif(exif: ExifDict, verbose: bool = False) -> None:
     """Pretty print key EXIF data in a formatted table, using colors."""
@@ -408,7 +509,9 @@ def pretty_print_exif(exif: ExifDict, verbose: bool = False) -> None:
                   value_str = str(value)
                   if len(value_str) > 60:
                       value_str = value_str[:57] + "..."
-             except Exception:
+             except Exception as str_err:
+                 # Log the specific error during string conversion
+                 logger.debug(f"Could not convert EXIF value for tag '{tag_str}' to string: {str_err}")
                  value_str = f"<unrepresentable type: {type(value).__name__}>"
 
         is_important = tag_str in IMPORTANT_EXIF_TAGS
@@ -443,22 +546,23 @@ def pretty_print_exif(exif: ExifDict, verbose: bool = False) -> None:
 def get_cached_model_ids() -> List[str]:
     """Get list of model repo IDs from the huggingface cache."""
     if scan_cache_dir is None:
-        logger.error(Colors.colored("huggingface_hub library not found. Cannot scan cache.", Colors.RED))
+        logger.error(Colors.colored("huggingface_hub library not found. Cannot scan Hugging Face cache.", Colors.RED))
         return []
     try:
         # Use CacheInfo (public class)
+        logger.debug("Scanning Hugging Face cache directory...")
         cache_info: HFCacheInfo = scan_cache_dir()
         model_ids = sorted([repo.repo_id for repo in cache_info.repos])
-        logger.debug(f"Found {len(model_ids)} potential models in cache: {model_ids}")
+        logger.debug(f"Found {len(model_ids)} potential models in Hugging Face cache: {model_ids}")
         return model_ids
     except HFValidationError:
-        logger.error(Colors.colored("HF cache directory invalid.", Colors.RED))
+        logger.error(Colors.colored("Hugging Face cache directory invalid.", Colors.RED))
         return []
     except FileNotFoundError:
-        logger.error(Colors.colored("HF cache directory not found.", Colors.RED))
+        logger.error(Colors.colored("Hugging Face cache directory not found.", Colors.RED))
         return []
     except Exception as e:
-        logger.error(Colors.colored(f"Unexpected error scanning HF cache: {type(e).__name__}: {e}", Colors.RED), exc_info=logger.level <= logging.DEBUG)
+        logger.error(Colors.colored(f"Unexpected error scanning Hugging Face cache: {type(e).__name__}: {e}", Colors.RED), exc_info=logger.level <= logging.DEBUG)
         return []
 
 
@@ -728,11 +832,11 @@ def get_system_info() -> Tuple[str, str]:
     try:
         # Try to get GPU info on macOS
         if platform.system() == "Darwin":
-            result = subprocess.run(['system_profiler', 'SPDisplaysDataType'], 
+            result = subprocess.run(['system_profiler', 'SPDisplaysDataType'],
                                  capture_output=True, text=True, timeout=2)
             if result.returncode == 0:
                 # Extract GPU info from system_profiler output
-                gpu_lines = [line for line in result.stdout.split('\n') 
+                gpu_lines = [line for line in result.stdout.split('\n')
                            if "Chipset Model:" in line]
                 if gpu_lines:
                     gpu_info = gpu_lines[0].split("Chipset Model:")[-1].strip()
@@ -750,7 +854,7 @@ def validate_inputs(image_path: PathLike, model_path: str, temperature: float = 
         raise ValueError(f"Not a file: {img_path}")
     if img_path.suffix.lower() not in {'.jpg', '.jpeg', '.png', '.webp'}:
         raise ValueError(f"Unsupported image format: {img_path.suffix}")
-    
+
     validate_temperature(temperature)
 
 def validate_temperature(temp: float) -> None:
@@ -784,29 +888,29 @@ def process_image_with_model(
 ) -> ModelResult:
     """Process an image with a Vision Language Model."""
     logger.info(f"Processing '{image_path.name}' with model: {model_identifier}")
-    
+
     model = tokenizer = None
     arch, gpu_info = get_system_info()
-    
+
     try:
         validate_temperature(temperature)
         validate_image_accessible(image_path)
-        
+
         # Log system info in debug mode
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"System: {arch}, GPU: {gpu_info}")
-        
+
         with timeout(30):  # 30 second timeout
             mx.clear_cache()
             mx.reset_peak_memory()
-            
+
             initial_mem = mx.get_active_memory() / 1024 / 1024
             initial_cache = mx.get_cache_memory() / 1024 / 1024
             start_time = time.perf_counter()
 
             model, tokenizer = load(model_identifier, trust_remote_code=trust_remote_code)
             config = load_config(model_identifier, trust_remote_code=trust_remote_code)
-            
+
             formatted_prompt = apply_chat_template(tokenizer, config, prompt, num_images=1)
             output = generate(
                 model=model,
@@ -819,7 +923,7 @@ def process_image_with_model(
             )
 
             mx.eval(model.parameters())
-            
+
             final_stats = MemoryStats(
                 active=mx.get_active_memory() / 1024 / 1024 - initial_mem,
                 cached=mx.get_cache_memory() / 1024 / 1024 - initial_cache,
