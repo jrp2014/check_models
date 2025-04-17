@@ -327,47 +327,62 @@ def _format_exif_date(date_str_input: Any) -> Optional[str]:
 
 
 def _convert_gps_coordinate(ref: Optional[Union[str, bytes]], coord: Any) -> Optional[float]:
-    """Convert various GPS coordinate formats to decimal degrees."""
+    """Convert various GPS coordinate formats to decimal degrees, robustly handling Ratio types and malformed data."""
     if not ref or not coord:
+        logger.debug("Missing GPS reference or coordinate.")
         return None
-
     try:
         # Handle reference direction
         ref_str = ref.decode('ascii') if isinstance(ref, bytes) else str(ref)
         ref_upper = ref_str.upper()
         if ref_upper not in ['N', 'S', 'E', 'W']:
+            logger.warning(f"Unexpected GPS reference: {ref_str}")
             return None
-
-        # Handle different coordinate formats
-        if isinstance(coord, tuple) and len(coord) == 3:
-            # Standard DMS format
-            degrees, minutes, seconds = [
-                float(v.numerator)/float(v.denominator) 
-                if hasattr(v, 'numerator') else float(v) 
-                for v in coord
-            ]
-        elif isinstance(coord, (list, tuple)) and len(coord) == 2:
-            # Decimal degrees and minutes format
-            degrees, minutes = coord
-            degrees = float(degrees.numerator)/float(degrees.denominator) if hasattr(degrees, 'numerator') else float(degrees)
-            minutes = float(minutes.numerator)/float(minutes.denominator) if hasattr(minutes, 'numerator') else float(minutes)
-            seconds = 0.0
-        else:
-            # Try direct decimal degrees
-            try:
-                return -float(coord) if ref_upper in ['S', 'W'] else float(coord)
-            except (TypeError, ValueError):
+        # Handle DMS tuple (degrees, minutes, seconds)
+        if isinstance(coord, (tuple, list)) and len(coord) == 3:
+            def to_float(val):
+                if hasattr(val, 'numerator') and hasattr(val, 'denominator'):
+                    try:
+                        return float(val.numerator) / float(val.denominator)
+                    except Exception as e:
+                        logger.warning(f"Malformed Ratio in GPS: {val} ({e})")
+                        return None
+                try:
+                    return float(val)
+                except Exception as e:
+                    logger.warning(f"Malformed GPS value: {val} ({e})")
+                    return None
+            degrees = to_float(coord[0])
+            minutes = to_float(coord[1])
+            seconds = to_float(coord[2])
+            if None in (degrees, minutes, seconds):
+                logger.warning(f"Malformed GPS DMS tuple: {coord}")
                 return None
-
+        # Handle decimal degrees and minutes
+        elif isinstance(coord, (tuple, list)) and len(coord) == 2:
+            degrees = to_float(coord[0])
+            minutes = to_float(coord[1])
+            seconds = 0.0
+            if None in (degrees, minutes):
+                logger.warning(f"Malformed GPS DM tuple: {coord}")
+                return None
+        # Handle direct decimal degrees
+        else:
+            try:
+                val = coord[0] if isinstance(coord, (tuple, list)) and len(coord) == 1 else coord
+                decimal = float(val)
+                return -decimal if ref_upper in ['S', 'W'] else decimal
+            except Exception as e:
+                logger.warning(f"Malformed direct GPS value: {coord} ({e})")
+                return None
         # Validate ranges
         if not (0 <= degrees <= 180 and 0 <= minutes < 60 and 0 <= seconds < 60):
+            logger.warning(f"GPS values out of range: {degrees}, {minutes}, {seconds}")
             return None
-
         decimal = degrees + (minutes / 60.0) + (seconds / 3600.0)
         return -decimal if ref_upper in ['S', 'W'] else decimal
-
-    except (ValueError, TypeError, ZeroDivisionError) as e:
-        logger.debug(f"GPS conversion error: {type(e).__name__}: {e}")
+    except Exception as e:
+        logger.warning(f"GPS conversion error: {type(e).__name__}: {e}")
         return None
 
 
@@ -981,13 +996,8 @@ def main(args: argparse.Namespace) -> None:
     library_versions = get_library_versions()
 
     # Print library versions initially (now using the collected dict)
-    try:
-        # Use .get with default 'N/A' for safety
-        print(f"MLX version: {Colors.colored(library_versions.get('mlx', 'N/A'), Colors.GREEN)}")
-        print(f"MLX-VLM version: {Colors.colored(library_versions.get('mlx-vlm', 'N/A'), Colors.GREEN)}\n")
-        # logger.debug(f"Default MLX device: {mx.default_device()}") # Optional: Keep only in debug
-    except Exception as version_err:
-        logger.warning(Colors.colored(f"Could not retrieve some library version info: {version_err}", Colors.YELLOW))
+    if args.debug:
+        print_version_info(library_versions)
 
     # Warn about trusting remote code
     if args.trust_remote_code:
@@ -1120,6 +1130,7 @@ def main(args: argparse.Namespace) -> None:
 
 
 if __name__ == "__main__":
+    
     # Setup Argument Parser
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
         description="Analyze image with MLX VLMs.",
