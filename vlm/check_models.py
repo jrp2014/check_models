@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import (
     Any, Dict, Final, List, NamedTuple, NoReturn,
     Optional, TextIO, Tuple, Union, Callable,
-    TypeVar, cast
+    TypeVar
 )
 import os # Needed for os.path.getmtime
 
@@ -67,7 +67,7 @@ except ImportError:
 
 # Custom timeout context manager (for Python < 3.11)
 # Note: This implementation relies on signal.SIGALRM and will not work on Windows.
-class timeout(contextlib.ContextDecorator):
+class timeout_manager(contextlib.ContextDecorator):
     def __init__(self, seconds: float) -> None:
         self.seconds: float = seconds
         self.timer: Optional[Callable[[int, Optional[types.FrameType]], Any]] = None # Use FrameType
@@ -75,7 +75,7 @@ class timeout(contextlib.ContextDecorator):
     def _timeout_handler(self, signum: int, frame: Optional[types.FrameType]) -> NoReturn: # Use FrameType
         raise TimeoutError(f"Operation timed out after {self.seconds} seconds")
 
-    def __enter__(self) -> 'timeout':
+    def __enter__(self) -> 'timeout_manager':
         # Check if SIGALRM is available (won't be on Windows)
         if hasattr(signal, 'SIGALRM'):
             if self.seconds > 0:
@@ -173,6 +173,7 @@ DEFAULT_MAX_TOKENS: Final[int] = 500
 DEFAULT_FOLDER: Final[Path] = Path.home() / "Pictures" / "Processed"
 DEFAULT_HTML_OUTPUT: Final[Path] = Path("results.html")
 DEFAULT_TEMPERATURE: Final[float] = 0.5
+DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
 
 # Constants - EXIF
 IMPORTANT_EXIF_TAGS: Final[frozenset[str]] = frozenset({
@@ -394,20 +395,24 @@ def extract_image_metadata(image_path: Path) -> MetadataDict:
     metadata: MetadataDict = {}
     exif_data: Optional[ExifDict] = get_exif_data(image_path)
 
-    # 1. Try to get date from EXIF, prioritizing DateTimeOriginal from raw IFD
+    # 1. Try to get date from EXIF, prioritizing DateTimeOriginal
     if exif_data:
+        # Prioritize DateTimeOriginal
         dt_original = exif_data.get("DateTimeOriginal")
         if dt_original:
             formatted_date = _format_exif_date(dt_original)
             if formatted_date:
                 metadata['date'] = formatted_date
-                metadata['date_source'] = "DateTimeOriginal (IFD)"
+                metadata['date_source'] = "EXIF (DateTimeOriginal)"
                 metadata['date_tag'] = "DateTimeOriginal"
-                logger.debug(f"Using DateTimeOriginal from IFD: {formatted_date}")
-                
-        # Only try other date tags if DateTimeOriginal wasn't found
+                logger.debug(f"Using DateTimeOriginal from EXIF: {formatted_date}")
+
+        # Only try other date tags if DateTimeOriginal wasn't found or couldn't be parsed
         if 'date' not in metadata:
             for tag in EXIF_DATE_TAGS:
+                # Skip DateTimeOriginal as it was already checked
+                if tag == "DateTimeOriginal":
+                    continue
                 if tag in exif_data:
                     date_str = str(exif_data[tag])
                     formatted_date = _format_exif_date(date_str)
@@ -416,7 +421,7 @@ def extract_image_metadata(image_path: Path) -> MetadataDict:
                         metadata['date_source'] = f"EXIF ({tag})"
                         metadata['date_tag'] = tag
                         logger.debug(f"Using date from {tag}: {formatted_date}")
-                        break
+                        break # Found a fallback date, stop searching
 
     # 2. Fallback to file modification time if no EXIF date found
     if 'date' not in metadata:
@@ -431,7 +436,7 @@ def extract_image_metadata(image_path: Path) -> MetadataDict:
             metadata['date'] = "Unknown"
             metadata['date_source'] = "Unavailable"
             metadata['date_tag'] = None
-            
+
     # 3. Extract GPS coordinates if available
     if exif_data and "GPSInfo" in exif_data and isinstance(exif_data["GPSInfo"], dict):
         gps_info = exif_data["GPSInfo"]
@@ -442,28 +447,21 @@ def extract_image_metadata(image_path: Path) -> MetadataDict:
 
         if lat and lat_ref and lon and lon_ref:
             try:
-                # Ensure values are tuples of numbers before conversion
-                if (
-                    isinstance(lat, tuple) and len(lat) == 3 and all(isinstance(x, (int, float)) for x in lat) and
-                    isinstance(lon, tuple) and len(lon) == 3 and all(isinstance(x, (int, float)) for x in lon) and
-                    isinstance(lat_ref, str) and isinstance(lon_ref, str)
-                ):
-                    # Cast to expected tuple types for _convert_gps
-                    lat_tuple = cast(GPSTuple, lat)
-                    lon_tuple = cast(GPSTuple, lon)
+                # Use the more robust conversion function directly
+                latitude = _convert_gps_coordinate(lat_ref, lat)
+                longitude = _convert_gps_coordinate(lon_ref, lon)
 
-                    latitude = _convert_gps(lat_tuple, lat_ref)
-                    longitude = _convert_gps(lon_tuple, lon_ref)
+                # Check if conversion was successful
+                if latitude is not None and longitude is not None:
                     metadata['gps'] = f"{latitude:.6f}, {longitude:.6f}"
                     logger.debug(f"Extracted GPS {metadata['gps']} for {image_path.name}")
                 else:
-                     logger.warning(f"Unexpected GPS data format in {image_path.name}: lat={lat}, lon={lon}")
-            except (ValueError, TypeError, ZeroDivisionError) as e:
-                logger.warning(f"Could not decode GPS coordinates for {image_path.name}: {e}")
+                    logger.warning(f"Failed to convert GPS coordinates for {image_path.name}. Lat: {lat}, Lon: {lon}")
+            # Keep specific error handling for conversion issues
+            except Exception as e: # Catch broader exceptions during conversion attempt
+                logger.warning(f"Error processing GPS coordinates for {image_path.name}: {e}")
         else:
             logger.debug(f"Incomplete GPS tags found for {image_path.name}")
-    else:
-        logger.debug(f"No GPSInfo found in EXIF for {image_path.name}")
 
     # 4. Add other important EXIF tags
     if exif_data:
@@ -485,14 +483,6 @@ def extract_image_metadata(image_path: Path) -> MetadataDict:
                 # Add other simple types if needed, but avoid deep structures
 
     return metadata
-
-def _convert_gps(coord: GPSTuple, ref: str) -> float:
-    """Convert EXIF GPS coordinate (degrees, minutes, seconds) to decimal degrees."""
-    degrees, minutes, seconds = coord
-    decimal_degrees = degrees + (minutes / 60.0) + (seconds / 3600.0)
-    if ref in ['S', 'W']:
-        decimal_degrees = -decimal_degrees
-    return decimal_degrees
 
 def pretty_print_exif(exif: ExifDict, verbose: bool = False) -> None:
     """Pretty print key EXIF data in a formatted table, using colors."""
@@ -787,7 +777,6 @@ def generate_html_report(results: List[ModelResult], filename: Path, versions: D
 """
 
     html_summary_row = ""
-    # Only show summary if there was at least one success
     if successful_results:
         avg_active = sum(r.stats.active for r in successful_results) / len(successful_results)
         avg_cache = sum(r.stats.cached for r in successful_results) / len(successful_results)
@@ -882,7 +871,7 @@ def validate_temperature(temp: float) -> None:
 def validate_image_accessible(image_path: Path) -> None:
     """Validate image file is accessible and supported."""
     try:
-        with timeout(5):  # 5 second timeout for read test
+        with timeout_manager(5):  # 5 second timeout for read test
             with Image.open(image_path) as img:
                 img.verify()
     except TimeoutError:
@@ -897,12 +886,13 @@ def process_image_with_model(
     image_path: Path,
     prompt: str,
     max_tokens: int,
-    verbose: bool,
-    trust_remote_code: bool = True,
+    verbose: bool = False,
+    trust_remote_code: bool = False,
     temperature: float = DEFAULT_TEMPERATURE,
+    timeout: float = DEFAULT_TIMEOUT,
 ) -> ModelResult:
     """Process an image with a Vision Language Model."""
-    logger.info(f"Processing '{image_path.name}' with model: {model_identifier}")
+    logger.info(f"Processing '{image_path}' with model: {model_identifier}")
 
     model = tokenizer = None
     arch, gpu_info = get_system_info()
@@ -915,7 +905,7 @@ def process_image_with_model(
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"System: {arch}, GPU: {gpu_info}")
 
-        with timeout(30):  # 30 second timeout
+        with timeout_manager(timeout):  # Use provided timeout value
             mx.clear_cache()
             mx.reset_peak_memory()
 
@@ -931,7 +921,7 @@ def process_image_with_model(
                 model=model,
                 processor=tokenizer,
                 prompt=formatted_prompt,
-                image_paths=[str(image_path)],
+                image=image_path.as_posix(),
                 max_tokens=max_tokens,
                 verbose=verbose,
                 temp=temperature
@@ -1087,7 +1077,8 @@ def main(args: argparse.Namespace) -> None:
                 model_identifier=model_id, image_path=resolved_image_path,
                 prompt=prompt, max_tokens=args.max_tokens,
                 verbose=is_vlm_verbose, trust_remote_code=args.trust_remote_code,
-                temperature=args.temperature
+                temperature=args.temperature,
+                timeout=args.timeout
             )
             results.append(result)
             # Print immediate feedback
@@ -1146,6 +1137,7 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--temperature", type=float, default=DEFAULT_TEMPERATURE, help=f"Sampling temperature (default: {DEFAULT_TEMPERATURE}).")
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output (INFO logging).")
     parser.add_argument("-d", "--debug", action="store_true", help="Enable debug logging (DEBUG level).")
+    parser.add_argument("--timeout", type=float, default=DEFAULT_TIMEOUT, help=f"Timeout in seconds for model operations (default: {DEFAULT_TIMEOUT}).")
 
     # Parse arguments
     parsed_args: argparse.Namespace = parser.parse_args()
