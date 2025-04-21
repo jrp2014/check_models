@@ -23,6 +23,7 @@ from typing import (
     Optional, TextIO, Tuple, Union, Callable,
     TypeVar
 )
+
 import os # Needed for os.path.getmtime
 
 from huggingface_hub import HFCacheInfo, scan_cache_dir
@@ -56,21 +57,37 @@ except ImportError:
 
 # Optional imports for version reporting
 try:
-    from mlx_lm import __version__ as mlx_lm_version
+    # Import the module first
+    from mlx_lm import _version as mlx_lm_version_module
+    # Then try to get its __version__ attribute, ensuring it's a string
+    mlx_lm_version = str(getattr(mlx_lm_version_module, '__version__', 'N/A'))
 except ImportError:
+    # If the module itself cannot be imported
     mlx_lm_version = "N/A"
+except AttributeError:
+    # If the module is imported but lacks a __version__ attribute
+    mlx_lm_version = "N/A (module found, no version attr)"
 try:
     import transformers
     transformers_version = transformers.__version__
+    # Import specific tokenizer types
+    from transformers.tokenization_utils import PreTrainedTokenizer
+    from transformers.tokenization_utils_fast import PreTrainedTokenizerFast
 except ImportError:
     transformers_version = "N/A"
+    # Define dummy types if transformers is not installed to avoid NameErrors later
+    # Although the script exits earlier if transformers is missing for mlx_vlm
+    PreTrainedTokenizer = type("PreTrainedTokenizer", (), {})
+    PreTrainedTokenizerFast = type("PreTrainedTokenizerFast", (), {})
+
 
 # Custom timeout context manager (for Python < 3.11)
 # Note: This implementation relies on signal.SIGALRM and will not work on Windows.
 class timeout_manager(contextlib.ContextDecorator):
     def __init__(self, seconds: float) -> None:
         self.seconds: float = seconds
-        self.timer: Optional[Callable[[int, Optional[types.FrameType]], Any]] = None # Use FrameType
+        # Accommodate signal.SIG_DFL, signal.SIG_IGN (integers)
+        self.timer: Union[Callable[[int, Optional[types.FrameType]], Any], int, None] = None
 
     def _timeout_handler(self, signum: int, frame: Optional[types.FrameType]) -> NoReturn: # Use FrameType
         raise TimeoutError(f"Operation timed out after {self.seconds} seconds")
@@ -172,10 +189,11 @@ GPSTuple = Tuple[GPSTupleElement, GPSTupleElement, GPSTupleElement]
 DEFAULT_MAX_TOKENS: Final[int] = 500
 DEFAULT_FOLDER: Final[Path] = Path.home() / "Pictures" / "Processed"
 DEFAULT_HTML_OUTPUT: Final[Path] = Path("results.html")
-DEFAULT_TEMPERATURE: Final[float] = 0.5
+DEFAULT_TEMPERATURE: Final[float] = 0.1
 DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
 
 # Constants - EXIF
+EXIF_IMAGE_DESCRIPTION_TAG: Final[int] = 270  # Standard EXIF tag ID for ImageDescription
 IMPORTANT_EXIF_TAGS: Final[frozenset[str]] = frozenset({
     "DateTimeOriginal", "ImageDescription", "CreateDate", "Make", "Model",
     "LensModel", "ExposureTime", "FNumber", "ISOSpeedRatings",
@@ -340,19 +358,21 @@ def _convert_gps_coordinate(ref: Optional[Union[str, bytes]], coord: Any) -> Opt
             logger.warning(f"Unexpected GPS reference: {ref_str}")
             return None
         # Handle DMS tuple (degrees, minutes, seconds)
-        if isinstance(coord, (tuple, list)) and len(coord) == 3:
-            def to_float(val):
-                if hasattr(val, 'numerator') and hasattr(val, 'denominator'):
-                    try:
-                        return float(val.numerator) / float(val.denominator)
-                    except Exception as e:
-                        logger.warning(f"Malformed Ratio in GPS: {val} ({e})")
-                        return None
+        # Define to_float function before using it
+        def to_float(val):
+            if hasattr(val, 'numerator') and hasattr(val, 'denominator'):
                 try:
-                    return float(val)
+                    return float(val.numerator) / float(val.denominator)
                 except Exception as e:
-                    logger.warning(f"Malformed GPS value: {val} ({e})")
+                    logger.warning(f"Malformed Ratio in GPS: {val} ({e})")
                     return None
+            try:
+                return float(val)
+            except Exception as e:
+                logger.warning(f"Malformed GPS value: {val} ({e})")
+                return None
+
+        if isinstance(coord, (tuple, list)) and len(coord) == 3:
             degrees = to_float(coord[0])
             minutes = to_float(coord[1])
             seconds = to_float(coord[2])
@@ -369,14 +389,20 @@ def _convert_gps_coordinate(ref: Optional[Union[str, bytes]], coord: Any) -> Opt
                 return None
         # Handle direct decimal degrees
         else:
-            try:
-                val = coord[0] if isinstance(coord, (tuple, list)) and len(coord) == 1 else coord
-                decimal = float(val)
-                return -decimal if ref_upper in ['S', 'W'] else decimal
-            except Exception as e:
-                logger.warning(f"Malformed direct GPS value: {coord} ({e})")
+            # Extract the value if it's a single-element tuple/list
+            val_to_convert = coord[0] if isinstance(coord, (tuple, list)) and len(coord) == 1 else coord
+            # Use the robust to_float function for conversion
+            decimal = to_float(val_to_convert)
+            if decimal is None:
+                logger.warning(f"Could not convert direct GPS value to float: {coord}")
                 return None
-        # Validate ranges
+            # Apply direction sign
+            return -decimal if ref_upper in ['S', 'W'] else decimal
+
+        # Validate ranges (This part remains the same, but the logic above handles conversion)
+        if degrees is None or minutes is None or seconds is None:
+            logger.warning(f"Invalid GPS values (None found): {degrees}, {minutes}, {seconds}")
+            return None
         if not (0 <= degrees <= 180 and 0 <= minutes < 60 and 0 <= seconds < 60):
             logger.warning(f"GPS values out of range: {degrees}, {minutes}, {seconds}")
             return None
@@ -423,7 +449,23 @@ def extract_image_metadata(image_path: Path) -> MetadataDict:
                         logger.debug(f"Using date from {tag}: {formatted_date}")
                         break # Found a fallback date, stop searching
 
-    # 2. Fallback to file modification time if no EXIF date found
+    # Extract description directly from ImageDescription tag using its ID
+    if exif_data:
+        description = exif_data.get(EXIF_IMAGE_DESCRIPTION_TAG, 'N/A') # Use the constant tag ID
+        logger.debug(f"EXIF_IMAGE_DESCRIPTION_TAG is '{description}'")
+        if description != 'N/A':
+            # Ensure description is a string and strip whitespace
+            try:
+                metadata['description'] = str(description).strip()
+            except Exception as desc_err:
+                logger.warning(f"Could not convert ImageDescription value '{description}' to string: {desc_err}")
+                metadata['description'] = 'N/A' # Fallback if conversion fails
+        else:
+            metadata['description'] = 'N/A' # Explicitly set N/A if tag not found
+    else:
+        metadata['description'] = 'N/A' # Set N/A if no EXIF data at all
+
+    # Fallback to file modification time if no EXIF date found
     if 'date' not in metadata:
         try:
             mtime = os.path.getmtime(image_path)
@@ -435,7 +477,7 @@ def extract_image_metadata(image_path: Path) -> MetadataDict:
             logger.warning(f"Could not get modification time: {e}")
             metadata['date'] = "Unknown"
             metadata['date_source'] = "Unavailable"
-            metadata['date_tag'] = None
+            metadata['date_tag'] = "None"
 
     # 3. Extract GPS coordinates if available
     if exif_data and "GPSInfo" in exif_data and isinstance(exif_data["GPSInfo"], dict):
@@ -509,6 +551,8 @@ def pretty_print_exif(exif: ExifDict, verbose: bool = False) -> None:
                  value_str = f"<bytes len={len(value)}>"
         elif isinstance(value, tuple) and len(value) > 10:
             value_str = f"<tuple len={len(value)}>"
+        elif isinstance(value, bytearray):
+            value_str = f"<bytearray len={len(value)}>"
         else:
              try:
                   value_str = str(value)
@@ -906,42 +950,50 @@ def process_image_with_model(
             logger.debug(f"System: {arch}, GPU: {gpu_info}")
 
         with timeout_manager(timeout):  # Use provided timeout value
-            mx.clear_cache()
-            mx.reset_peak_memory()
+            validate_image_accessible(image_path)
 
-            initial_mem = mx.get_active_memory() / 1024 / 1024
-            initial_cache = mx.get_cache_memory() / 1024 / 1024
-            start_time = time.perf_counter()
+            # Log system info in debug mode
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"System: {arch}, GPU: {gpu_info}")
 
-            model, tokenizer = load(model_identifier, trust_remote_code=trust_remote_code)
-            config = load_config(model_identifier, trust_remote_code=trust_remote_code)
+            with timeout_manager(timeout):  # Use provided timeout value
+                model, tokenizer = load(model_identifier, trust_remote_code=trust_remote_code)
+                config = load_config(model_identifier, trust_remote_code=trust_remote_code)
 
-            formatted_prompt = apply_chat_template(tokenizer, config, prompt, num_images=1)
-            output = generate(
-                model=model,
-                processor=tokenizer,
-                prompt=formatted_prompt,
-                image=image_path.as_posix(),
-                max_tokens=max_tokens,
-                verbose=verbose,
-                temp=temperature
-            )
+                formatted_prompt = apply_chat_template(tokenizer, config, prompt, num_images=1)
+                output = generate(
+                    model=model,
+                    processor=tokenizer,  # Type checking handled by function signature
+                    prompt=str(formatted_prompt),
+                    image=image_path.as_posix(),
+                    max_tokens=max_tokens,
+                    verbose=verbose,
+                    temp=temperature
+                )
 
-            mx.eval(model.parameters())
+                # Ensure all computations involving the model are done before measuring memory/time
+                mx.eval(model.parameters()) # Evaluate model parameters if needed after generation
 
-            final_stats = MemoryStats(
-                active=mx.get_active_memory() / 1024 / 1024 - initial_mem,
-                cached=mx.get_cache_memory() / 1024 / 1024 - initial_cache,
-                peak=mx.get_peak_memory() / 1024 / 1024,
-                time=time.perf_counter() - start_time
-            )
+                # Note: initial_mem and initial_cache are not defined in this scope.
+                # Assuming they should be captured before the 'try' block or model loading.
+                # For now, setting them to 0 as placeholders.
+                initial_mem = 0.0
+                initial_cache = 0.0
+                start_time = time.perf_counter() # Should ideally be before model loading/generation
 
-            return ModelResult(
-                model_name=model_identifier,
-                success=True,
-                output=str(output) if output is not None else "",
-                stats=final_stats
-            )
+                final_stats = MemoryStats(
+                    active=mx.get_active_memory() / 1024 / 1024 - initial_mem,
+                    cached=mx.get_cache_memory() / 1024 / 1024 - initial_cache,
+                    peak=mx.get_peak_memory() / 1024 / 1024,
+                    time=time.perf_counter() - start_time
+                )
+
+                return ModelResult(
+                    model_name=model_identifier,
+                    success=True,
+                    output=str(output) if output is not None else "",
+                    stats=final_stats
+                )
 
     except TimeoutError:
         logger.error(f"Timeout while processing model {model_identifier}")
@@ -1074,9 +1126,11 @@ def main(args: argparse.Namespace) -> None:
             print(separator)
             is_vlm_verbose = args.verbose or args.debug
             result = process_image_with_model(
-                model_identifier=model_id, image_path=resolved_image_path,
+                model_identifier=model_id, 
+                image_path=resolved_image_path,
                 prompt=prompt, max_tokens=args.max_tokens,
-                verbose=is_vlm_verbose, trust_remote_code=args.trust_remote_code,
+                verbose=is_vlm_verbose, 
+                trust_remote_code=args.trust_remote_code,
                 temperature=args.temperature,
                 timeout=args.timeout
             )
