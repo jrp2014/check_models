@@ -122,6 +122,14 @@ class timeout_manager(contextlib.ContextDecorator):
 logger = logging.getLogger(__name__)
 # BasicConfig called in main()
 
+# Constants
+MB_CONVERSION: Final[float] = 1024 * 1024
+
+# --- Utility Functions ---
+def _pad_text(text: str, width: int, left: bool = True) -> str:
+    """Pads text to a specific visual width, accounting for ANSI codes."""
+    pad_len = max(0, width - Colors.visual_len(text))
+    return f"{text}{' ' * pad_len}" if left else f"{' ' * pad_len}{text}"
 
 # --- Version Info ---
 def get_library_versions() -> Dict[str, str]:
@@ -244,7 +252,8 @@ def find_most_recent_file(folder: Path) -> Optional[Path]:
             return None
         files.sort(key=lambda f: f.stat().st_mtime, reverse=True)
         most_recent: Path = files[0]
-        logger.debug(f"Most recent file found: {most_recent}")
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"Most recent file found: {most_recent}")
         return most_recent
     except PermissionError:
         logger.error(Colors.colored(f"Permission denied accessing folder: {folder}", Colors.RED))
@@ -278,7 +287,8 @@ def get_exif_data(image_path: Path) -> Optional[ExifDict]:
         with Image.open(image_path) as img:
             exif_raw: Any = img.getexif()
             if not exif_raw:
-                logger.debug(f"No EXIF data found in {image_path}")
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f"No EXIF data found in {image_path}")
                 return None
 
             # First pass: decode main EXIF tags
@@ -298,7 +308,8 @@ def get_exif_data(image_path: Path) -> Optional[ExifDict]:
                 tag_name = TAGS.get(tag_id, str(tag_id))
                 exif_decoded[tag_name] = value
 
-            logger.debug(f"EXIF data decoded for {image_path}: {exif_decoded}")
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"EXIF data decoded for {image_path}: {exif_decoded}")
 
             # Second pass: handle GPS IFD specifically
             if GPS_INFO_TAG_ID in exif_raw:
@@ -329,7 +340,8 @@ def _format_exif_date(date_str_input: Any) -> Optional[str]:
         try:
             date_str = str(date_str_input)
         except Exception:
-            logger.debug(f"Could not convert potential date value '{date_str_input}' to string.")
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"Could not convert potential date value '{date_str_input}' to string.")
             return None
     else:
         date_str = date_str_input
@@ -341,184 +353,230 @@ def _format_exif_date(date_str_input: Any) -> Optional[str]:
         except (ValueError, TypeError):
             continue  # Try next format
 
-    logger.debug(f"Could not parse date string '{date_str}' with known formats.")
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Could not parse date string '{date_str}' with known formats.")
     return None
 
 
 def _convert_gps_coordinate(ref: Optional[Union[str, bytes]], coord: Any) -> Optional[float]:
     """Convert various GPS coordinate formats to decimal degrees, robustly handling Ratio types and malformed data."""
     if not ref or not coord:
-        logger.debug("Missing GPS reference or coordinate.")
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug("Missing GPS reference or coordinate.")
         return None
+
     try:
-        # Handle reference direction
-        ref_str = ref.decode('ascii') if isinstance(ref, bytes) else str(ref)
-        ref_upper = ref_str.upper()
-        if ref_upper not in ['N', 'S', 'E', 'W']:
-            logger.warning(f"Unexpected GPS reference: {ref_str}")
+        # --- Reference Handling ---
+        ref_str: str
+        if isinstance(ref, bytes):
+            try:
+                ref_str = ref.decode('ascii')
+            except UnicodeDecodeError:
+                logger.warning(f"Invalid GPS reference encoding: {ref!r}")
+                return None
+        elif isinstance(ref, str):
+            ref_str = ref
+        else:
+            logger.warning(f"Unexpected GPS reference type: {type(ref).__name__}")
             return None
-        # Handle DMS tuple (degrees, minutes, seconds)
-        # Define to_float function before using it
-        def to_float(val: Any) -> Optional[float]: # Add type hint to inner function
-            if hasattr(val, 'numerator') and hasattr(val, 'denominator'):
+
+        ref_upper = ref_str.strip().upper()
+        if ref_upper not in ['N', 'S', 'E', 'W']:
+            logger.warning(f"Unexpected GPS reference value: {ref_str}")
+            return None
+
+        # --- Coordinate Value Handling ---
+        degrees: Optional[float] = None
+        minutes: Optional[float] = None
+        seconds: Optional[float] = 0.0 # Default seconds to 0
+
+        def to_float(val: Any) -> Optional[float]:
+            """Safely convert EXIF value (potentially Ratio) to float."""
+            if hasattr(val, 'numerator') and hasattr(val, 'denominator'): # Check for Ratio-like object
                 try:
-                    return float(val.numerator) / float(val.denominator)
-                except Exception as e:
+                    # Ensure numerator/denominator are numeric before division
+                    num = float(val.numerator)
+                    den = float(val.denominator)
+                    if den == 0:
+                        logger.warning(f"Invalid Ratio in GPS (denominator is zero): {val}")
+                        return None
+                    return num / den
+                except (ValueError, TypeError, AttributeError, ZeroDivisionError) as e:
                     logger.warning(f"Malformed Ratio in GPS: {val} ({e})")
                     return None
             try:
+                # Handle direct numeric types or strings representing numbers
                 return float(val)
-            except Exception as e:
-                logger.warning(f"Malformed GPS value: {val} ({e})")
+            except (ValueError, TypeError):
+                logger.warning(f"Could not convert GPS value to float: {val!r} (type: {type(val).__name__})")
                 return None
 
-        if isinstance(coord, (tuple, list)) and len(coord) == 3:
-            degrees = to_float(coord[0])
-            minutes = to_float(coord[1])
-            seconds = to_float(coord[2])
-            if None in (degrees, minutes, seconds):
-                logger.warning(f"Malformed GPS DMS tuple: {coord}")
+        # Check if coord is a sequence (tuple or list)
+        if isinstance(coord, (tuple, list)):
+            if len(coord) == 3: # Assume Degrees, Minutes, Seconds (DMS)
+                degrees = to_float(coord[0])
+                minutes = to_float(coord[1])
+                seconds = to_float(coord[2])
+            elif len(coord) == 2: # Assume Degrees, Decimal Minutes (DM)
+                degrees = to_float(coord[0])
+                minutes = to_float(coord[1])
+            elif len(coord) == 1: # Assume Decimal Degrees in a sequence
+                degrees = to_float(coord[0])
+                minutes = 0.0 # Set minutes explicitly
+            else:
+                logger.warning(f"Unexpected GPS coordinate sequence length: {len(coord)} for {coord}")
                 return None
-        # Handle decimal degrees and minutes
-        elif isinstance(coord, (tuple, list)) and len(coord) == 2:
-            degrees = to_float(coord[0])
-            minutes = to_float(coord[1])
-            seconds = 0.0
-            if None in (degrees, minutes):
-                logger.warning(f"Malformed GPS DM tuple: {coord}")
-                return None
-        # Handle direct decimal degrees
         else:
-            # Extract the value if it's a single-element tuple/list
-            val_to_convert = coord[0] if isinstance(coord, (tuple, list)) and len(coord) == 1 else coord
-            # Use the robust to_float function for conversion
-            decimal = to_float(val_to_convert)
-            if decimal is None:
-                logger.warning(f"Could not convert direct GPS value to float: {coord}")
-                return None
-            # Apply direction sign
-            return -decimal if ref_upper in ['S', 'W'] else decimal
+            # Assume direct Decimal Degrees if not a sequence
+            degrees = to_float(coord)
+            minutes = 0.0 # Set minutes explicitly
 
-        # Validate ranges (This part remains the same, but the logic above handles conversion)
+        # --- Validation and Calculation ---
         if degrees is None or minutes is None or seconds is None:
-            logger.warning(f"Invalid GPS values (None found): {degrees}, {minutes}, {seconds}")
+            logger.warning(f"Failed to extract valid numeric values from GPS coordinate: {coord}")
             return None
-        if not (0 <= degrees <= 180 and 0 <= minutes < 60 and 0 <= seconds < 60):
-            logger.warning(f"GPS values out of range: {degrees}, {minutes}, {seconds}")
+
+        # Validate ranges
+        # Allow slightly wider range for degrees initially, sign applied later
+        if not (0 <= abs(degrees) <= 180 and 0 <= minutes < 60 and 0 <= seconds < 60):
+            logger.warning(f"GPS values out of range: Deg={degrees}, Min={minutes}, Sec={seconds}")
             return None
-        decimal = degrees + (minutes / 60.0) + (seconds / 3600.0)
+
+        # Calculate decimal degrees
+        decimal = abs(degrees) + (minutes / 60.0) + (seconds / 3600.0)
+
+        # Apply sign based on reference
         return -decimal if ref_upper in ['S', 'W'] else decimal
+
     except Exception as e:
-        logger.warning(f"GPS conversion error: {type(e).__name__}: {e}")
+        # Catch-all for unexpected errors during conversion
+        logger.error(f"Unexpected GPS conversion error for coord={coord!r}, ref={ref!r}: {type(e).__name__}: {e}", exc_info=logger.level <= logging.DEBUG)
         return None
 
+def _extract_exif_date(exif_data: Optional[ExifDict]) -> Tuple[Optional[str], Optional[str], Optional[str]]:
+    """Helper to extract the best date from EXIF data."""
+    if not exif_data:
+        return None, None, None
+
+    # Prioritize DateTimeOriginal
+    dt_original = exif_data.get("DateTimeOriginal")
+    if dt_original:
+        formatted_date = _format_exif_date(dt_original)
+        if formatted_date:
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"Using DateTimeOriginal from EXIF: {formatted_date}")
+            return formatted_date, "EXIF (DateTimeOriginal)", "DateTimeOriginal"
+
+    # Fallback to other date tags
+    for tag in EXIF_DATE_TAGS:
+        if tag == "DateTimeOriginal":
+             continue # Already checked
+        if tag in exif_data:
+            date_str = str(exif_data[tag])
+            formatted_date = _format_exif_date(date_str)
+            if formatted_date:
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f"Using date from {tag}: {formatted_date}")
+                return formatted_date, f"EXIF ({tag})", tag
+
+    return None, None, None # No valid EXIF date found
+
+def _extract_exif_description(exif_data: Optional[ExifDict]) -> Optional[str]:
+    """Helper to extract the description from EXIF data."""
+    if not exif_data:
+        return None
+
+    description = exif_data.get('ImageDescription', None)
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Raw EXIF ImageDescription: '{description}'")
+
+    if description is not None:
+        try:
+            desc_str = str(description).strip()
+            return desc_str if desc_str else None # Return None if empty after stripping
+        except Exception as desc_err:
+            logger.warning(f"Could not convert ImageDescription value '{description}' to string: {desc_err}")
+            return None
+    return None
+
+def _extract_gps_coordinates(exif_data: Optional[ExifDict], image_path_name: str) -> Optional[str]:
+    """Helper to extract and format GPS coordinates from EXIF data."""
+    if not exif_data or "GPSInfo" not in exif_data or not isinstance(exif_data["GPSInfo"], dict):
+        return None
+
+    gps_info = exif_data["GPSInfo"]
+    lat = gps_info.get("GPSLatitude")
+    lat_ref = gps_info.get("GPSLatitudeRef")
+    lon = gps_info.get("GPSLongitude")
+    lon_ref = gps_info.get("GPSLongitudeRef")
+
+    if not (lat and lat_ref and lon and lon_ref):
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"Incomplete GPS tags found for {image_path_name}")
+        return None
+
+    try:
+        latitude = _convert_gps_coordinate(lat_ref, lat)
+        longitude = _convert_gps_coordinate(lon_ref, lon)
+
+        if latitude is not None and longitude is not None:
+            gps_str = f"{latitude:.6f}, {longitude:.6f}"
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"Extracted GPS {gps_str} for {image_path_name}")
+            return gps_str
+        else:
+            logger.warning(f"Failed to convert GPS coordinates for {image_path_name}. Lat: {lat}, Lon: {lon}")
+            return None
+    except Exception as e:
+        logger.warning(f"Error processing GPS coordinates for {image_path_name}: {e}")
+        return None
 
 def extract_image_metadata(image_path: Path, debug: bool = False) -> MetadataDict:
-    """Extract key metadata: date, GPS, and selected EXIF tags.
-
-    Prioritizes DateTimeOriginal from raw IFD, then falls back to other date sources.
-
-    Args:
-        image_path: Path to the image file.
-        debug: If True, enable more verbose logging within this function.
-    """
+    """Extract key metadata: date, GPS, and selected EXIF tags."""
     metadata: MetadataDict = {}
     exif_data: Optional[ExifDict] = get_exif_data(image_path)
 
-    # Example of using the debug flag (optional, as logging is already controlled globally)
     if debug:
         logger.debug(f"Debug mode enabled for metadata extraction of {image_path.name}")
-        logger.debug(f"EXIF data: {exif_data}")
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Raw EXIF data for {image_path.name}: {exif_data}")
 
-    # 1. Try to get date from EXIF, prioritizing DateTimeOriginal
-    if exif_data:
-        # Prioritize DateTimeOriginal
-        dt_original = exif_data.get("DateTimeOriginal")
-        if dt_original:
-            formatted_date = _format_exif_date(dt_original)
-            if formatted_date:
-                metadata['date'] = formatted_date
-                metadata['date_source'] = "EXIF (DateTimeOriginal)"
-                metadata['date_tag'] = "DateTimeOriginal"
-                logger.debug(f"Using DateTimeOriginal from EXIF: {formatted_date}")
-
-        # Only try other date tags if DateTimeOriginal wasn't found or couldn't be parsed
-        if 'date' not in metadata:
-            for tag in EXIF_DATE_TAGS:
-                # Skip DateTimeOriginal as it was already checked
-                if tag == "DateTimeOriginal":
-                    continue
-                if tag in exif_data:
-                    date_str = str(exif_data[tag])
-                    formatted_date = _format_exif_date(date_str)
-                    if formatted_date:
-                        metadata['date'] = formatted_date
-                        metadata['date_source'] = f"EXIF ({tag})"
-                        metadata['date_tag'] = tag
-                        logger.debug(f"Using date from {tag}: {formatted_date}")
-                        break # Found a fallback date, stop searching
-
-    # Extract description directly from ImageDescription tag using its ID
-    if exif_data:
-        description = exif_data.get('ImageDescription', 'N/A')
-        logger.debug(f"EXIF_IMAGE_DESCRIPTION_TAG is '{description}'")
-        if description != 'N/A':
-            # Ensure description is a string and strip whitespace
-            try:
-                metadata['description'] = str(description).strip()
-            except Exception as desc_err:
-                logger.warning(f"Could not convert ImageDescription value '{description}' to string: {desc_err}")
-                metadata['description'] = 'N/A' # Fallback if conversion fails
-        else:
-            metadata['description'] = 'N/A' # Explicitly set N/A if tag not found
+    # 1. Extract Date (using helper)
+    exif_date, date_source, date_tag = _extract_exif_date(exif_data)
+    if exif_date:
+        metadata['date'] = exif_date
+        metadata['date_source'] = date_source
+        metadata['date_tag'] = date_tag
     else:
-        metadata['description'] = 'N/A' # Set N/A if no EXIF data at all
-
-    # Fallback to file modification time if no EXIF date found
-    if 'date' not in metadata:
+        # Fallback to file modification time
         try:
             mtime = os.path.getmtime(image_path)
             metadata['date'] = datetime.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M:%S")
             metadata['date_source'] = "File Modification Time"
             metadata['date_tag'] = "mtime"
-            logger.debug(f"Using file modification time: {metadata['date']}")
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"Using file modification time: {metadata['date']}")
         except OSError as e:
-            logger.warning(f"Could not get modification time: {e}")
+            logger.warning(f"Could not get modification time for {image_path.name}: {e}")
             metadata['date'] = "Unknown"
             metadata['date_source'] = "Unavailable"
             metadata['date_tag'] = "None"
 
-    # 3. Extract GPS coordinates if available
-    if exif_data and "GPSInfo" in exif_data and isinstance(exif_data["GPSInfo"], dict):
-        gps_info = exif_data["GPSInfo"]
-        lat = gps_info.get("GPSLatitude")
-        lat_ref = gps_info.get("GPSLatitudeRef")
-        lon = gps_info.get("GPSLongitude")
-        lon_ref = gps_info.get("GPSLongitudeRef")
+    # 2. Extract Description (using helper)
+    description = _extract_exif_description(exif_data)
+    metadata['description'] = description if description is not None else 'N/A'
 
-        if lat and lat_ref and lon and lon_ref:
-            try:
-                # Use the more robust conversion function directly
-                latitude = _convert_gps_coordinate(lat_ref, lat)
-                longitude = _convert_gps_coordinate(lon_ref, lon)
-
-                # Check if conversion was successful
-                if latitude is not None and longitude is not None:
-                    metadata['gps'] = f"{latitude:.6f}, {longitude:.6f}"
-                    logger.debug(f"Extracted GPS {metadata['gps']} for {image_path.name}")
-                else:
-                    logger.warning(f"Failed to convert GPS coordinates for {image_path.name}. Lat: {lat}, Lon: {lon}")
-            # Keep specific error handling for conversion issues
-            except Exception as e: # Catch broader exceptions during conversion attempt
-                logger.warning(f"Error processing GPS coordinates for {image_path.name}: {e}")
-        else:
-            logger.debug(f"Incomplete GPS tags found for {image_path.name}")
+    # 3. Extract GPS (using helper)
+    gps_coords = _extract_gps_coordinates(exif_data, image_path.name)
+    if gps_coords:
+        metadata['gps'] = gps_coords
+    # No need for an else clause, if gps_coords is None, 'gps' key won't be in metadata
 
     # 4. Add other important EXIF tags
     if exif_data:
         for tag in IMPORTANT_EXIF_TAGS:
-            # Avoid overwriting the date we just determined
-            if tag not in EXIF_DATE_TAGS and tag in exif_data:
+            # Avoid overwriting the date/desc we just determined
+            if tag not in EXIF_DATE_TAGS and tag != 'ImageDescription' and tag in exif_data:
                 value = exif_data[tag]
                 # Simple conversion for common types, avoid complex objects
                 if isinstance(value, (str, int, float)):
@@ -549,7 +607,8 @@ def pretty_print_exif(exif: ExifDict, verbose: bool = False) -> None:
         if tag_str == "GPSInfo" and isinstance(value, dict):
             continue
         if isinstance(value, dict):
-            logger.debug(f"Skipping dictionary value for EXIF tag '{tag_str}' in pretty print.")
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"Skipping dictionary value for EXIF tag '{tag_str}' in pretty print.")
             continue
         value_str: str
         if isinstance(value, bytes):
@@ -569,7 +628,8 @@ def pretty_print_exif(exif: ExifDict, verbose: bool = False) -> None:
                       value_str = value_str[:57] + "..."
              except Exception as str_err:
                  # Log the specific error during string conversion
-                 logger.debug(f"Could not convert EXIF value for tag '{tag_str}' to string: {str_err}")
+                 if logger.isEnabledFor(logging.DEBUG):
+                     logger.debug(f"Could not convert EXIF value for tag '{tag_str}' to string: {str_err}")
                  value_str = f"<unrepresentable type: {type(value).__name__}>"
 
         is_important = tag_str in IMPORTANT_EXIF_TAGS
@@ -588,9 +648,8 @@ def pretty_print_exif(exif: ExifDict, verbose: bool = False) -> None:
     header_color = Colors.BLUE
     border_color = Colors.BLUE
     important_color = Colors.YELLOW
-    def pad(text: str, width: int, left: bool = True) -> str: # Add type hint to inner function
-        pad_len = max(0, width - Colors.visual_len(text))
-        return f"{text}{' '*pad_len}" if left else f"{' '*pad_len}{text}"
+    # Use the extracted helper function
+    pad = _pad_text
     print(Colors.colored(f"╔{'═' * (max_tag_len + 2)}╤{'═' * (max_val_len + 2)}╗", border_color))
     print(f"{Colors.colored('║', border_color)} {pad(Colors.colored('Tag', header_color), max_tag_len)} {Colors.colored('│', border_color)} {pad(Colors.colored('Value', header_color), max_val_len)} {Colors.colored('║', border_color)}")
     print(Colors.colored(f"╠{'═' * (max_tag_len + 2)}╪{'═' * (max_val_len + 2)}╣", border_color))
@@ -608,10 +667,12 @@ def get_cached_model_ids() -> List[str]:
         return []
     try:
         # Use CacheInfo (public class)
-        logger.debug("Scanning Hugging Face cache directory...")
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug("Scanning Hugging Face cache directory...")
         cache_info: HFCacheInfo = scan_cache_dir()
         model_ids = sorted([repo.repo_id for repo in cache_info.repos])
-        logger.debug(f"Found {len(model_ids)} potential models in Hugging Face cache: {model_ids}")
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"Found {len(model_ids)} potential models in Hugging Face cache: {model_ids}")
         return model_ids
     except HFValidationError:
         logger.error(Colors.colored("Hugging Face cache directory invalid.", Colors.RED))
@@ -626,101 +687,126 @@ def get_cached_model_ids() -> List[str]:
 
 def print_model_stats(results: List[ModelResult]) -> None:
     """Print a table summarizing model performance statistics to the console, including failures."""
-    # (Implementation remains the same as previous correct version)
     if not results:
-         print("No model results to display.")
-         return
-    results.sort(key=lambda x: (not x.success, x.stats.time if x.success else 0))
-    display_names: List[str] = [(r.model_name.split('/')[-1]) for r in results]
-    max_name_len_base = max(len(name) for name in display_names) if display_names else 20
-    max_name_len_cap = 44
-    max_name_len_base = min(max_name_len_base, max_name_len_cap)
-    col_width = 12
-    header_color = Colors.BLUE
-    border_color = Colors.BLUE
-    summary_color = Colors.YELLOW
-    failure_color = Colors.RED
-    failure_text_color = Colors.GRAY
-    captured_marker_plain = "(+cap)"
-    captured_marker_colored = Colors.colored(captured_marker_plain, Colors.GRAY)
-    max_len_needed = 0
-    temp_display_names: List[str] = []
-    for i, r in enumerate(results):
-        name = display_names[i]
-        current_max_name = max_name_len_base
-        if len(name) > current_max_name:
-            name = name[:current_max_name - 3] + "..."
-        display_str = name
-        if not r.success:
-            fail_info_text = f" (Failed: {r.error_stage or '?'})"
-            if r.captured_output_on_fail: 
-                fail_info_text += f" {captured_marker_plain}"
-            display_str += fail_info_text
-        temp_display_names.append(display_str)
-        max_len_needed = max(max_len_needed, len(display_str))
-    max_name_len = min(max(max_name_len_base, max_len_needed), 55)
-    def pad(text: str, width: int, left: bool = True) -> str:
-        vlen = Colors.visual_len(text)
-        padding = ' ' * max(0, width - vlen)
-        return f"{text}{padding}" if left else f"{padding}{text}"
-    print(f"\n--- {Colors.colored('Model Performance Summary (Console)', Colors.CYAN)} ---")
-    print(Colors.colored(f"╔{'═' * (max_name_len + 2)}╤{'═' * (col_width + 2)}╤{'═' * (col_width + 2)}╤{'═' * (col_width + 2)}╤{'═' * (col_width + 2)}╗", border_color))
-    header_model = pad(Colors.colored('Model', header_color), max_name_len)
-    header_active = pad(Colors.colored('Active Δ', header_color), col_width, False)
-    header_cache = pad(Colors.colored('Cache Δ', header_color), col_width, False)
-    header_peak = pad(Colors.colored('Peak Mem', header_color), col_width, False)
-    header_time = pad(Colors.colored('Time', header_color), col_width, False)
-    print(f"{Colors.colored('║', border_color)} {header_model} {Colors.colored('│', border_color)} {header_active} {Colors.colored('│', border_color)} {header_cache} {Colors.colored('│', border_color)} {header_peak} {Colors.colored('│', border_color)} {header_time} {Colors.colored('║', border_color)}")
-    print(Colors.colored(f"╠{'═' * (max_name_len + 2)}╪{'═' * (col_width + 2)}╪{'═' * (col_width + 2)}╪{'═' * (col_width + 2)}╪{'═' * (col_width + 2)}╣", border_color))
-    successful_results: List[ModelResult] = [r for r in results if r.success]
-    for i, result in enumerate(results):
-        model_disp_name_raw = display_names[i]
-        model_display_text: str
-        active_str: str
-        cache_str: str
-        peak_str: str
-        time_str: str
-        allowance = 15 if not result.success else 0
-        if len(model_disp_name_raw) > max_name_len - allowance:
-             truncate_at = max(0, max_name_len - allowance - 3)
-             model_disp_name_raw = model_disp_name_raw[:truncate_at] + "..."
-        if result.success:
-            model_display_text = model_disp_name_raw
-            active_str = f"{result.stats.active:,.0f} MB"
-            cache_str = f"{result.stats.cached:,.0f} MB" 
-            peak_str = f"{result.stats.peak:,.0f} MB"
-            time_str = f"{result.stats.time:.2f} s"
+        logger.info("No model results to display.")
+        return
+
+    # Sort results: failures last, then by time
+    results.sort(key=lambda x: (not x.success, x.stats.time if x.success else float('inf')))
+
+    # --- Constants and Configuration ---
+    BASE_NAME_MAX_WIDTH = 45
+    COL_WIDTH = 12
+    MIN_NAME_COL_WIDTH = len("Model")
+
+    # --- Colors ---
+    COLORS = types.SimpleNamespace(
+        HEADER=Colors.BLUE,
+        BORDER=Colors.BLUE,
+        SUMMARY=Colors.YELLOW,
+        FAIL=Colors.RED,
+        FAIL_TEXT=Colors.GRAY,
+        SUCCESS=Colors.GREEN
+    )
+
+    # Calculate display lengths and format model names
+    def format_model_name(result: ModelResult) -> Tuple[str, int]:
+        base_name = result.model_name.split('/')[-1]
+        display_name = base_name[:BASE_NAME_MAX_WIDTH] + ("..." if len(base_name) > BASE_NAME_MAX_WIDTH else "")
+        
+        if not result.success:
+            fail_suffix = f" [FAIL: {result.error_stage or '?'}]"
+            display_name = Colors.colored(display_name + fail_suffix, COLORS.FAIL)
         else:
-            fail_info = f" (Failed: {result.error_stage or '?'})"
-            if result.captured_output_on_fail: 
-                fail_info += f" {captured_marker_colored}"
-            model_display_text_base = model_disp_name_raw + fail_info.replace(captured_marker_colored, "(+cap)")
-            model_display_text = Colors.colored(model_display_text_base, failure_color)
-            if result.captured_output_on_fail:
-                model_display_text = model_display_text.replace("(+cap)", captured_marker_colored)
-            active_str = Colors.colored("-".rjust(col_width - 4), failure_text_color)
-            cache_str = Colors.colored("-".rjust(col_width - 4), failure_text_color) 
-            peak_str = Colors.colored("-".rjust(col_width - 4), failure_text_color) 
-            time_str = Colors.colored("-".rjust(col_width - 2), failure_text_color)
-        print(f"{Colors.colored('║', border_color)} {pad(model_display_text, max_name_len)} {Colors.colored('│', border_color)} {pad(active_str, col_width, False)} {Colors.colored('│', border_color)} {pad(cache_str, col_width, False)} {Colors.colored('│', border_color)} {pad(peak_str, col_width, False)} {Colors.colored('│', border_color)} {pad(time_str, col_width, False)} {Colors.colored('║', border_color)}")
+            display_name = Colors.colored(display_name, COLORS.SUCCESS)
+            
+        return display_name, Colors.visual_len(display_name)
+
+    # Calculate maximum display length
+    name_displays = [format_model_name(r) for r in results]
+    max_display_len = max((length for _, length in name_displays), default=MIN_NAME_COL_WIDTH)
+    name_col_width = max(max_display_len, MIN_NAME_COL_WIDTH)
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Column widths - Name: {name_col_width}, Data: {COL_WIDTH}")
+
+    # Helper for horizontal lines
+    def h_line(char: str) -> str:
+        return Colors.colored(
+            f"╔{'═' * (name_col_width + 2)}╤{'═' * (COL_WIDTH + 2)}╤"
+            f"{'═' * (COL_WIDTH + 2)}╤{'═' * (COL_WIDTH + 2)}╤{'═' * (COL_WIDTH + 2)}╗"
+            if char == '═' else
+            f"╚{'═' * (name_col_width + 2)}╧{'═' * (COL_WIDTH + 2)}╧"
+            f"{'═' * (COL_WIDTH + 2)}╧{'═' * (COL_WIDTH + 2)}╧{'═' * (COL_WIDTH + 2)}╝",
+            COLORS.BORDER
+        )
+
+    # Print table header
+    print("\n" + h_line('═'))
+    headers = ["Model", "Active Δ", "Cache Δ", "Peak Mem", "Time"]
+    header_row = Colors.colored(
+        f"║ {_pad_text(Colors.colored(headers[0], COLORS.HEADER), name_col_width)} │ "
+        + " │ ".join(_pad_text(Colors.colored(h, COLORS.HEADER), COL_WIDTH, False) for h in headers[1:])
+        + " ║", COLORS.BORDER
+    )
+    print(header_row)
+    print(Colors.colored(f"╠{'═' * (name_col_width + 2)}╪{'═' * (COL_WIDTH + 2)}╪"
+                        f"{'═' * (COL_WIDTH + 2)}╪{'═' * (COL_WIDTH + 2)}╪{'═' * (COL_WIDTH + 2)}╣",
+                        COLORS.BORDER))
+
+    # Print data rows
+    successful_results = []
+    for result, (display_name, _) in zip(results, name_displays):
+        if result.success:
+            successful_results.append(result)
+            stats = [
+                f"{result.stats.active:,.0f} MB",
+                f"{result.stats.cached:,.0f} MB",
+                f"{result.stats.peak:,.0f} MB",
+                f"{result.stats.time:.2f} s"
+            ]
+        else:
+            stats = [Colors.colored("-", COLORS.FAIL_TEXT)] * 4
+
+        row = Colors.colored(
+            f"║ {_pad_text(display_name, name_col_width)} │ "
+            + " │ ".join(_pad_text(stat, COL_WIDTH, False) for stat in stats)
+            + " ║", COLORS.BORDER
+        )
+        print(row)
+
+    # Print summary if there are successful results
     if successful_results:
-        avg_active = sum(r.stats.active for r in successful_results) / len(successful_results)
-        avg_cache = sum(r.stats.cached for r in successful_results) / len(successful_results)
-        max_peak = max(r.stats.peak for r in successful_results)
-        avg_time = sum(r.stats.time for r in successful_results) / len(successful_results)
-        avg_active_str = f"{avg_active:,.0f} MB"
-        avg_cache_str = f"{avg_cache:,.0f} MB"
-        max_peak_str = f"{max_peak:,.0f} MB"
-        avg_time_str = f"{avg_time:.2f} s"
-        print(Colors.colored(f"╠{'═' * (max_name_len + 2)}╪{'═' * (col_width + 2)}╪{'═' * (col_width + 2)}╪{'═' * (col_width + 2)}╪{'═' * (col_width + 2)}╣", border_color))
-        summary_title = f"AVG/PEAK ({len(successful_results)} Success)"
-        summary_model = pad(Colors.colored(summary_title, summary_color), max_name_len)
-        summary_active = pad(Colors.colored(avg_active_str, summary_color), col_width, False)
-        summary_cache = pad(Colors.colored(avg_cache_str, summary_color), col_width, False)
-        summary_peak = pad(Colors.colored(max_peak_str, summary_color), col_width, False)
-        summary_time = pad(Colors.colored(avg_time_str, summary_color), col_width, False)
-        print(f"{Colors.colored('║', border_color)} {summary_model} {Colors.colored('│', border_color)} {summary_active} {Colors.colored('│', border_color)} {summary_cache} {Colors.colored('│', border_color)} {summary_peak} {Colors.colored('│', border_color)} {summary_time} {Colors.colored('║', border_color)}")
-    print(Colors.colored(f"╚{'═' * (max_name_len + 2)}╧{'═' * (col_width + 2)}╧{'═' * (col_width + 2)}╧{'═' * (col_width + 2)}╧{'═' * (col_width + 2)}╝", border_color))
+        print(Colors.colored(f"╠{'═' * (name_col_width + 2)}╪{'═' * (COL_WIDTH + 2)}╪"
+                           f"{'═' * (COL_WIDTH + 2)}╪{'═' * (COL_WIDTH + 2)}╪{'═' * (COL_WIDTH + 2)}╣",
+                           COLORS.BORDER))
+        
+        avg_stats = [
+            sum(r.stats.active for r in successful_results) / len(successful_results),
+            sum(r.stats.cached for r in successful_results) / len(successful_results),
+            max(r.stats.peak for r in successful_results),
+            sum(r.stats.time for r in successful_results) / len(successful_results)
+        ]
+        
+        summary_stats = [
+            f"{avg_stats[0]:,.0f} MB",
+            f"{avg_stats[1]:,.0f} MB",
+            f"{avg_stats[2]:,.0f} MB",
+            f"{avg_stats[3]:.2f} s"
+        ]
+        
+        summary_title = Colors.colored(f"AVG/PEAK ({len(successful_results)} Success)", COLORS.SUMMARY)
+        summary_row = Colors.colored(
+            f"║ {_pad_text(summary_title, name_col_width)} │ "
+            + " │ ".join(_pad_text(Colors.colored(stat, COLORS.SUMMARY), COL_WIDTH, False) for stat in summary_stats)
+            + " ║", COLORS.BORDER
+        )
+        print(summary_row)
+
+    print(h_line('╝'))
+    
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug(f"Displayed stats for {len(results)} models ({len(successful_results)} successful)")
 
 
 # --- HTML Report Generation ---
@@ -803,21 +889,16 @@ def generate_html_report(results: List[ModelResult], filename: Path, versions: D
             """
         else:
             row_class = ' class="failed-row"'
-            error_info = f"<span class='error-message'>Failed during '{html.escape(result.error_stage or 'Unknown')}'"
-            if result.error_message:
-                error_info += f": {html.escape(result.error_message)}"
-            error_info += "</span>"
-            result_content = error_info
-
+            error_message = html.escape(result.error_message or "Unknown error")
+            result_content = f'<span class="error-message">{error_message}</span>'
             if result.captured_output_on_fail:
-                escaped_capture = html.escape(result.captured_output_on_fail)
-                # Wrap captured output in a distinct div/pre block
-                result_content += f'<div class="captured-output"><strong>Captured Output (during generate):</strong><pre>{escaped_capture}</pre></div>'
-
-            # Use hyphen placeholder for failed stats in HTML
+                captured_output = html.escape(result.captured_output_on_fail)
+                result_content += f'<div class="captured-output"><strong>Captured Output:</strong><pre>{captured_output}</pre></div>'
             stats_cells = """
-                <td class="numeric">-</td> <td class="numeric">-</td>
-                <td class="numeric">-</td> <td class="numeric">-</td>
+                <td class="numeric">-</td>
+                <td class="numeric">-</td>
+                <td class="numeric">-</td>
+                <td class="numeric">-</td>
             """
 
         html_rows += f"""
@@ -934,6 +1015,47 @@ def validate_image_accessible(image_path: Path) -> None:
     except Exception as e:
         raise IOError(f"Error accessing image {image_path}: {e}")
 
+def _run_model_generation(
+    model_identifier: str,
+    image_path: Path,
+    prompt: str,
+    max_tokens: int,
+    verbose: bool,
+    trust_remote_code: bool,
+    temperature: float
+) -> Tuple[str, Any, Any]: # Returns (output, model, tokenizer) - model/tokenizer needed for cleanup
+    """Loads model, formats prompt, and runs generation. Raises exceptions on failure."""
+    model = tokenizer = None # Ensure they are defined in this scope
+    try:
+        # Load model and tokenizer
+        model, tokenizer = load(model_identifier, trust_remote_code=trust_remote_code)
+        config: Dict[str, Any] = load_config(model_identifier, trust_remote_code=trust_remote_code)
+
+        # Prepare prompt
+        formatted_prompt: str = apply_chat_template(tokenizer, config, prompt, num_images=1)
+
+        # Generate output
+        output: Optional[str] = generate(
+            model=model,
+            processor=tokenizer,  # Type checking handled by function signature
+            prompt=str(formatted_prompt),
+            image=image_path.as_posix(),
+            max_tokens=max_tokens,
+            verbose=verbose,
+            temp=temperature
+        )
+
+        # Ensure all computations involving the model are done before measuring memory/time
+        mx.eval(model.parameters()) # Evaluate model parameters if needed after generation
+
+        return str(output) if output is not None else "", model, tokenizer
+
+    except Exception:
+        # If loading failed, model might be None. If generation failed, model is likely loaded.
+        # Re-raise the exception to be caught by the outer function, which handles ModelResult creation.
+        # We pass model/tokenizer back mainly for the finally block in the caller.
+        raise # Re-raise the original exception
+
 def process_image_with_model(
     model_identifier: str,
     image_path: Path,
@@ -944,105 +1066,108 @@ def process_image_with_model(
     temperature: float = DEFAULT_TEMPERATURE,
     timeout: float = DEFAULT_TIMEOUT,
 ) -> ModelResult:
-    """Process an image with a Vision Language Model."""
-    logger.info(f"Processing '{image_path}' with model: {model_identifier}")
+    """Process an image with a Vision Language Model, managing stats and errors."""
+    logger.info(f"Processing '{image_path.name}' with model: {Colors.colored(model_identifier, Colors.MAGENTA)}")
 
-    model: Optional[Any] = None # Use Any for now, or a more specific type if available
-    tokenizer: Optional[Union[PreTrainedTokenizer, PreTrainedTokenizerFast]] = None
-    arch: str
-    gpu_info: str
+    model = tokenizer = None # Initialize here for the finally block
     arch, gpu_info = get_system_info()
-    start_time: float = 0.0 # Initialize start_time
+    start_time: float = 0.0
     initial_mem: float = 0.0
     initial_cache: float = 0.0
+    output: Optional[str] = None
+    error_stage: str = "initialization"
 
     try:
         validate_temperature(temperature)
         validate_image_accessible(image_path)
+        error_stage = "validation"
 
-        # Log system info in debug mode
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"System: {arch}, GPU: {gpu_info}")
 
         # --- Capture initial state BEFORE model operations ---
-        initial_mem = mx.get_active_memory() / 1024 / 1024
-        initial_cache = mx.get_cache_memory() / 1024 / 1024
-        start_time = time.perf_counter() # <<< START TIMER HERE
+        initial_mem = mx.get_active_memory() / MB_CONVERSION
+        initial_cache = mx.get_cache_memory() / MB_CONVERSION
+        start_time = time.perf_counter()
         # -----------------------------------------------------
 
-        with timeout_manager(timeout):  # Use provided timeout value
-            # Load model and tokenizer
-            model, tokenizer = load(model_identifier, trust_remote_code=trust_remote_code)
-            config: Dict[str, Any] = load_config(model_identifier, trust_remote_code=trust_remote_code)
-
-            # Prepare prompt
-            formatted_prompt: str = apply_chat_template(tokenizer, config, prompt, num_images=1)
-
-            # Generate output
-            output: Optional[str] = generate(
-                model=model,
-                processor=tokenizer,  # Type checking handled by function signature
-                prompt=str(formatted_prompt),
-                image=image_path.as_posix(),
+        with timeout_manager(timeout):
+            error_stage = "load/generate" # Stage if timeout occurs here
+            # Call the internal generation function
+            output, model, tokenizer = _run_model_generation(
+                model_identifier=model_identifier,
+                image_path=image_path,
+                prompt=prompt,
                 max_tokens=max_tokens,
                 verbose=verbose,
-                temp=temperature
+                trust_remote_code=trust_remote_code,
+                temperature=temperature
             )
-
-            # Ensure all computations involving the model are done before measuring memory/time
-            mx.eval(model.parameters()) # Evaluate model parameters if needed after generation
+            error_stage = "post-generate" # Stage after successful generation
 
         # --- Capture final state AFTER model operations ---
-        end_time: float = time.perf_counter() # <<< END TIMER HERE
-        final_active_mem: float = mx.get_active_memory() / 1024 / 1024
-        final_cache_mem: float = mx.get_cache_memory() / 1024 / 1024
-        peak_mem: float = mx.get_peak_memory() / 1024 / 1024
+        end_time = time.perf_counter()
+        final_active_mem = mx.get_active_memory() / MB_CONVERSION
+        final_cache_mem = mx.get_cache_memory() / MB_CONVERSION
+        peak_mem = mx.get_peak_memory() / MB_CONVERSION
         # --------------------------------------------------
 
-        final_stats: MemoryStats = MemoryStats(
-            active=final_active_mem - initial_mem, # Calculate delta
-            cached=final_cache_mem - initial_cache, # Calculate delta
-            peak=peak_mem, # Peak is absolute
-            time=end_time - start_time # <<< CALCULATE DURATION
+        final_stats = MemoryStats(
+            active=final_active_mem - initial_mem,
+            cached=final_cache_mem - initial_cache,
+            peak=peak_mem,
+            time=end_time - start_time
         )
 
         return ModelResult(
             model_name=model_identifier,
             success=True,
-            output=str(output) if output is not None else "",
+            output=output, # Use the output from _run_model_generation
             stats=final_stats
         )
 
     except TimeoutError:
-        logger.error(f"Timeout while processing model {model_identifier}")
+        # Timeout specifically handled
+        logger.error(f"Timeout ({timeout}s) during '{error_stage}' for model {model_identifier}")
         return ModelResult(
             model_name=model_identifier,
             success=False,
             error_stage="timeout",
-            error_message="Operation timed out"
+            error_message=f"Operation timed out after {timeout} seconds during {error_stage}"
         )
     except Exception as e:
-        error_stage: str = "model_load" if model is None else "generate"
-        logger.error(f"Failed during {error_stage}: {type(e).__name__}: {e}")
+        # Determine stage more accurately based on where the exception occurred
+        # If model is None here, it likely failed during load within _run_model_generation
+        if model is None and error_stage == "load/generate":
+             error_stage = "model_load"
+
+        logger.error(f"Failed during '{error_stage}' for model {model_identifier}: {type(e).__name__}: {e}")
         if logger.isEnabledFor(logging.DEBUG):
             traceback.print_exc()
+
         return ModelResult(
             model_name=model_identifier,
             success=False,
             error_stage=error_stage,
             error_message=str(e)
+            # captured_output_on_fail might be added here if needed, but requires more complex handling
         )
     finally:
-        del model
-        del tokenizer
+        # Ensure cleanup happens regardless of success/failure
+        if model is not None:
+            del model
+        if tokenizer is not None:
+            del tokenizer
+        # Clear cache and reset peak memory after each model run
         mx.clear_cache()
         mx.reset_peak_memory()
+        if logger.isEnabledFor(logging.DEBUG):
+             logger.debug(f"Cleaned up resources for model {model_identifier}")
 
+# --- Main Execution Helper Functions ---
 
-# --- Main Execution ---
-def main(args: argparse.Namespace) -> None:
-    """Main function to orchestrate image analysis."""
-    # Configure logging level based on args
+def setup_environment(args: argparse.Namespace) -> Dict[str, str]:
+    """Configure logging, collect versions, print warnings."""
     log_level: int = logging.DEBUG if args.debug else (logging.INFO if args.verbose else logging.INFO)
     logging.basicConfig(level=log_level,
                         format='%(asctime)s - %(levelname)s - %(message)s',
@@ -1052,55 +1177,58 @@ def main(args: argparse.Namespace) -> None:
     elif args.verbose:
         logger.info("Verbose mode enabled.")
 
-    # Collect library versions early
     library_versions: Dict[str, str] = get_library_versions()
-
-    # Print library versions initially (now using the collected dict)
-    if args.debug:
+    if args.debug: # Only print versions in debug mode initially
         print_version_info(library_versions)
 
-    # Warn about trusting remote code
     if args.trust_remote_code:
         logger.warning(Colors.colored("--- SECURITY WARNING ---", Colors.YELLOW + Colors.BOLD))
         logger.warning(Colors.colored("`--trust-remote-code` is enabled.", Colors.YELLOW))
         logger.warning(Colors.colored("-----------------------", Colors.YELLOW + Colors.BOLD))
 
-    overall_start_time: float = time.perf_counter()
+    return library_versions
 
-    # --- 1. Find Image ---
+def find_and_validate_image(args: argparse.Namespace) -> Path:
+    """Find the most recent image in the specified folder and validate it."""
     folder_path: Path = args.folder.resolve()
     logger.info(f"Scanning folder: {Colors.colored(str(folder_path), Colors.BLUE)}")
     if args.folder == DEFAULT_FOLDER and not DEFAULT_FOLDER.is_dir():
         print(Colors.colored(f"Warning: Default folder '{DEFAULT_FOLDER}' does not exist.", Colors.YELLOW), file=sys.stderr)
+
     image_path: Optional[Path] = find_most_recent_file(folder_path)
     if not image_path:
-        print(Colors.colored(f"\nError: Could not find a suitable image file in {folder_path}.", Colors.RED), file=sys.stderr)
+        print(Colors.colored(f"\nError: Could not find a suitable image file in {folder_path}. Exiting.", Colors.RED), file=sys.stderr)
         sys.exit(1)
+
     resolved_image_path: Path = image_path.resolve()
     print(f"\nProcessing file: {Colors.colored(resolved_image_path.name, Colors.MAGENTA)} (located at {resolved_image_path})")
-    # Validate image readability early
+
     try:
         with Image.open(resolved_image_path) as img:
             img.verify() # Verify basic structure without loading full data
         print_image_dimensions(resolved_image_path)
+        return resolved_image_path
     except (FileNotFoundError, UnidentifiedImageError, OSError, Exception) as img_err:
-        logger.error(Colors.colored(f"Error opening or verifying image {resolved_image_path}: {img_err}", Colors.RED))
+        logger.critical(Colors.colored(f"Critical Error: Cannot open or verify image {resolved_image_path}: {img_err}. Exiting.", Colors.RED))
         sys.exit(1)
 
-
-    # --- 2. Extract Metadata ---
-    metadata: MetadataDict = extract_image_metadata(resolved_image_path, debug=args.debug)
+def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
+    """Extract, print, and return image metadata."""
+    metadata: MetadataDict = extract_image_metadata(image_path, debug=args.debug)
     print(f"  Date: {Colors.colored(metadata.get('date', 'N/A'), Colors.CYAN)}")
     print(f"  Desc: {Colors.colored(metadata.get('description', 'N/A'), Colors.CYAN)}")
     print(f"  GPS:  {Colors.colored(metadata.get('gps', 'N/A'), Colors.CYAN)}")
+
     if args.verbose or args.debug:
-         exif_data: Optional[ExifDict] = get_exif_data(resolved_image_path)
+         exif_data: Optional[ExifDict] = get_exif_data(image_path)
          if exif_data:
              pretty_print_exif(exif_data, verbose=True)
          else:
              print("\nNo detailed EXIF data could be extracted.")
+    return metadata
 
-    # --- 3. Prepare Prompt ---
+def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
+    """Prepare the prompt for the VLM, using user input or generating from metadata."""
     prompt: str
     if args.prompt:
         prompt = args.prompt
@@ -1118,10 +1246,17 @@ def main(args: argparse.Namespace) -> None:
             "Focus on visual content. Avoid repeating the context unless it is visible."
         ]
         prompt = " ".join(filter(None, prompt_parts)).strip()
-        logger.debug("Using generated prompt based on metadata.")
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug("Using generated prompt based on metadata.")
     print(f"\n{Colors.colored('--- Using Prompt ---', Colors.CYAN)}\n{prompt}\n{Colors.colored('-'*40, Colors.BLUE)}")
+    return prompt
 
-    # --- 4. Find and Process Models ---
+def process_models(
+    args: argparse.Namespace,
+    image_path: Path,
+    prompt: str
+) -> List[ModelResult]:
+    """Identify models to process and run them against the image."""
     model_identifiers: List[str]
     if args.models:
         model_identifiers = args.models
@@ -1139,35 +1274,44 @@ def main(args: argparse.Namespace) -> None:
             print("Ensure models are downloaded and cache is accessible.", file=sys.stderr)
     else:
         print(f"\nProcessing {Colors.colored(str(len(model_identifiers)), Colors.GREEN)} model(s)...")
-        separator: str = Colors.colored(f"\n{'=' * 80}\n", Colors.BLUE)
+        separator: str = Colors.colored(f"\n{'-' * 40}\n", Colors.BLUE)
         for model_id in model_identifiers:
             print(separator)
             is_vlm_verbose: bool = args.verbose or args.debug
             result: ModelResult = process_image_with_model(
-                model_identifier=model_id, 
-                image_path=resolved_image_path,
+                model_identifier=model_id,
+                image_path=image_path,
                 prompt=prompt, max_tokens=args.max_tokens,
-                verbose=is_vlm_verbose, 
+                verbose=is_vlm_verbose,
                 trust_remote_code=args.trust_remote_code,
                 temperature=args.temperature,
                 timeout=args.timeout
             )
             results.append(result)
-            # Print immediate feedback
-            if result.success:
-                print(f"\n--- {Colors.colored(f'Output from {model_id.split('/')[-1]}', Colors.GREEN)} ---")
-                print(result.output)
-            else:
-                print(f"--- {Colors.colored(f'Processing failed for model: {model_id}', Colors.RED)} ---")
-                # Conditionally print captured output if it exists
-                if result.captured_output_on_fail:
-                    print(Colors.colored("Captured output during failure:", Colors.YELLOW))
-                    # Maybe limit how much is printed to console?
-                    capture_snippet: str = result.captured_output_on_fail[:1000]
-                    if len(result.captured_output_on_fail) > 1000:
-                        capture_snippet += '...'
-                    print(capture_snippet)
 
+            # Print immediate model output/status
+            model_short_name = model_id.split('/')[-1]
+            if result.success:
+                logger.info(f"Successfully processed model: {Colors.colored(model_short_name, Colors.GREEN)}")
+                if result.output:
+                    print(f"\n{Colors.colored('Output:', Colors.CYAN)}\n{result.output}")
+                if args.verbose or args.debug:
+                    print(f"Time taken: {result.stats.time:.2f}s")
+            else:
+                logger.error(f"Failed processing model: {Colors.colored(model_short_name, Colors.RED)} (Stage: {result.error_stage})")
+                print(f"  {Colors.colored('ERROR', Colors.RED)}: Model {model_short_name} failed during '{result.error_stage}'.")
+                if args.verbose or args.debug:
+                    print(f"  Reason: {result.error_message}")
+
+    return results
+
+def finalize_execution(
+    args: argparse.Namespace,
+    results: List[ModelResult],
+    library_versions: Dict[str, str],
+    overall_start_time: float
+) -> None:
+    """Print summary stats, generate report, print versions, and total time."""
     # --- 5. Print Summary Statistics ---
     if results:
         print(Colors.colored(f"\n{'=' * 80}\n", Colors.BLUE)) # Separator
@@ -1181,6 +1325,7 @@ def main(args: argparse.Namespace) -> None:
         # Pass collected versions to the report generator
         generate_html_report(results, html_output_path, library_versions)
     else:
+        # Use logger.info for consistency
         logger.info(f"Skipping HTML report generation to {html_output_path} as no models were processed.")
 
     # --- 7. Print Version Info to Console ---
@@ -1191,6 +1336,28 @@ def main(args: argparse.Namespace) -> None:
     overall_time: float = time.perf_counter() - overall_start_time
     print(f"\nTotal execution time: {Colors.colored(f'{overall_time:.2f} seconds', Colors.GREEN)}.")
 
+# --- Main Execution ---
+def main(args: argparse.Namespace) -> None:
+    """Main function to orchestrate image analysis."""
+    overall_start_time: float = time.perf_counter()
+
+    # --- 0. Setup ---
+    library_versions: Dict[str, str] = setup_environment(args)
+
+    # --- 1. Find and Validate Image ---
+    resolved_image_path: Path = find_and_validate_image(args)
+
+    # --- 2. Extract Metadata ---
+    metadata: MetadataDict = handle_metadata(resolved_image_path, args)
+
+    # --- 3. Prepare Prompt ---
+    prompt: str = prepare_prompt(args, metadata)
+
+    # --- 4. Find and Process Models ---
+    results: List[ModelResult] = process_models(args, resolved_image_path, prompt)
+
+    # --- 5. Final Reporting ---
+    finalize_execution(args, results, library_versions, overall_start_time)
 
 if __name__ == "__main__":
     
@@ -1219,5 +1386,6 @@ if __name__ == "__main__":
         main(parsed_args)
     except Exception as main_err:
         # Log final unhandled exceptions with color
-        logger.exception(Colors.colored(f"An unexpected error occurred during main execution: {main_err}", Colors.RED))
+        # Use logger.critical for severe errors causing exit
+        logger.critical(Colors.colored(f"An unexpected error occurred during main execution: {main_err}", Colors.RED), exc_info=True)
         sys.exit(1) # Exit with error status
