@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import (
     Any, Dict, Final, List, NamedTuple, NoReturn,
     Optional, TextIO, Tuple, Union, Callable,
-    TypeVar
+    TypeVar, Pattern # Added Pattern
 )
 
 import os # Needed for os.path.getmtime
@@ -161,16 +161,16 @@ class Colors:
     WHITE: Final[str] = "\033[97m"
     GRAY: Final[str] = "\033[90m"
     _enabled: bool = sys.stderr.isatty()
-    _ansi_escape_re: re.Pattern[str] = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+    _ansi_escape_re: Pattern[str] = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 
     @staticmethod
-    def colored(text: str, color: str) -> str:
+    def colored(text: Any, color: str) -> str: # Use Any for text input
         if not Colors._enabled:
-            return text
-        return f"{color}{text}{Colors.RESET}"
+            return str(text) # Ensure return is string
+        return f"{color}{str(text)}{Colors.RESET}" # Ensure text is string
 
     @staticmethod
-    def visual_len(text: Union[str, Any]) -> int:
+    def visual_len(text: Any) -> int: # Use Any for text input
         if not isinstance(text, str):
              text = str(text)
         return len(Colors._ansi_escape_re.sub('', text))
@@ -359,7 +359,7 @@ def _convert_gps_coordinate(ref: Optional[Union[str, bytes]], coord: Any) -> Opt
             return None
         # Handle DMS tuple (degrees, minutes, seconds)
         # Define to_float function before using it
-        def to_float(val):
+        def to_float(val: Any) -> Optional[float]: # Add type hint to inner function
             if hasattr(val, 'numerator') and hasattr(val, 'denominator'):
                 try:
                     return float(val.numerator) / float(val.denominator)
@@ -413,13 +413,22 @@ def _convert_gps_coordinate(ref: Optional[Union[str, bytes]], coord: Any) -> Opt
         return None
 
 
-def extract_image_metadata(image_path: Path) -> MetadataDict:
+def extract_image_metadata(image_path: Path, debug: bool = False) -> MetadataDict:
     """Extract key metadata: date, GPS, and selected EXIF tags.
 
     Prioritizes DateTimeOriginal from raw IFD, then falls back to other date sources.
+
+    Args:
+        image_path: Path to the image file.
+        debug: If True, enable more verbose logging within this function.
     """
     metadata: MetadataDict = {}
     exif_data: Optional[ExifDict] = get_exif_data(image_path)
+
+    # Example of using the debug flag (optional, as logging is already controlled globally)
+    if debug:
+        logger.debug(f"Debug mode enabled for metadata extraction of {image_path.name}")
+        logger.debug(f"EXIF data: {exif_data}")
 
     # 1. Try to get date from EXIF, prioritizing DateTimeOriginal
     if exif_data:
@@ -451,7 +460,7 @@ def extract_image_metadata(image_path: Path) -> MetadataDict:
 
     # Extract description directly from ImageDescription tag using its ID
     if exif_data:
-        description = exif_data.get(EXIF_IMAGE_DESCRIPTION_TAG, 'N/A') # Use the constant tag ID
+        description = exif_data.get('ImageDescription', 'N/A')
         logger.debug(f"EXIF_IMAGE_DESCRIPTION_TAG is '{description}'")
         if description != 'N/A':
             # Ensure description is a string and strip whitespace
@@ -579,7 +588,7 @@ def pretty_print_exif(exif: ExifDict, verbose: bool = False) -> None:
     header_color = Colors.BLUE
     border_color = Colors.BLUE
     important_color = Colors.YELLOW
-    def pad(text: str, width: int, left: bool = True) -> str:
+    def pad(text: str, width: int, left: bool = True) -> str: # Add type hint to inner function
         pad_len = max(0, width - Colors.visual_len(text))
         return f"{text}{' '*pad_len}" if left else f"{' '*pad_len}{text}"
     print(Colors.colored(f"╔{'═' * (max_tag_len + 2)}╤{'═' * (max_val_len + 2)}╗", border_color))
@@ -622,7 +631,7 @@ def print_model_stats(results: List[ModelResult]) -> None:
          print("No model results to display.")
          return
     results.sort(key=lambda x: (not x.success, x.stats.time if x.success else 0))
-    display_names = [(r.model_name.split('/')[-1]) for r in results]
+    display_names: List[str] = [(r.model_name.split('/')[-1]) for r in results]
     max_name_len_base = max(len(name) for name in display_names) if display_names else 20
     max_name_len_cap = 44
     max_name_len_base = min(max_name_len_base, max_name_len_cap)
@@ -635,7 +644,7 @@ def print_model_stats(results: List[ModelResult]) -> None:
     captured_marker_plain = "(+cap)"
     captured_marker_colored = Colors.colored(captured_marker_plain, Colors.GRAY)
     max_len_needed = 0
-    temp_display_names = []
+    temp_display_names: List[str] = []
     for i, r in enumerate(results):
         name = display_names[i]
         current_max_name = max_name_len_base
@@ -663,7 +672,7 @@ def print_model_stats(results: List[ModelResult]) -> None:
     header_time = pad(Colors.colored('Time', header_color), col_width, False)
     print(f"{Colors.colored('║', border_color)} {header_model} {Colors.colored('│', border_color)} {header_active} {Colors.colored('│', border_color)} {header_cache} {Colors.colored('│', border_color)} {header_peak} {Colors.colored('│', border_color)} {header_time} {Colors.colored('║', border_color)}")
     print(Colors.colored(f"╠{'═' * (max_name_len + 2)}╪{'═' * (col_width + 2)}╪{'═' * (col_width + 2)}╪{'═' * (col_width + 2)}╪{'═' * (col_width + 2)}╣", border_color))
-    successful_results = [r for r in results if r.success]
+    successful_results: List[ModelResult] = [r for r in results if r.success]
     for i, result in enumerate(results):
         model_disp_name_raw = display_names[i]
         model_display_text: str
@@ -773,8 +782,8 @@ def generate_html_report(results: List[ModelResult], filename: Path, versions: D
         </thead>
         <tbody>
 """
-    html_rows = ""
-    successful_results = [r for r in results if r.success]
+    html_rows: str = ""
+    successful_results: List[ModelResult] = [r for r in results if r.success]
 
     for result in results:
         model_disp_name = html.escape(result.model_name)
@@ -820,7 +829,7 @@ def generate_html_report(results: List[ModelResult], filename: Path, versions: D
             </tr>
 """
 
-    html_summary_row = ""
+    html_summary_row: str = ""
     if successful_results:
         avg_active = sum(r.stats.active for r in successful_results) / len(successful_results)
         avg_cache = sum(r.stats.cached for r in successful_results) / len(successful_results)
@@ -841,7 +850,7 @@ def generate_html_report(results: List[ModelResult], filename: Path, versions: D
 """
 
     # --- Add Version Info Footer ---
-    html_footer = "<footer>\n<h2>Library Versions</h2>\n<ul>\n"
+    html_footer: str = "<footer>\n<h2>Library Versions</h2>\n<ul>\n"
     # Use sorted items for consistent order in HTML
     for name, ver in sorted(versions.items()):
         status_style = 'color: green;' if ver != "N/A" else 'color: orange;'
@@ -859,7 +868,7 @@ def generate_html_report(results: List[ModelResult], filename: Path, versions: D
 </body>
 </html>
 """
-    html_content = html_start + html_rows + html_summary_row + html_end
+    html_content: str = html_start + html_rows + html_summary_row + html_end
 
     try:
         # *** Restore TextIO type hint for file handle 'f' ***
@@ -875,16 +884,16 @@ def generate_html_report(results: List[ModelResult], filename: Path, versions: D
 
 def get_system_info() -> Tuple[str, str]:
     """Get system architecture and GPU information."""
-    arch = platform.machine()
-    gpu_info = "Unknown"
+    arch: str = platform.machine()
+    gpu_info: str = "Unknown"
     try:
         # Try to get GPU info on macOS
         if platform.system() == "Darwin":
-            result = subprocess.run(['system_profiler', 'SPDisplaysDataType'],
+            result: subprocess.CompletedProcess[str] = subprocess.run(['system_profiler', 'SPDisplaysDataType'],
                                  capture_output=True, text=True, timeout=2)
             if result.returncode == 0:
                 # Extract GPU info from system_profiler output
-                gpu_lines = [line for line in result.stdout.split('\n')
+                gpu_lines: List[str] = [line for line in result.stdout.split('\n')
                            if "Chipset Model:" in line]
                 if gpu_lines:
                     gpu_info = gpu_lines[0].split("Chipset Model:")[-1].strip()
@@ -895,7 +904,7 @@ def get_system_info() -> Tuple[str, str]:
 # --- Model Processing Core ---
 def validate_inputs(image_path: PathLike, model_path: str, temperature: float = 0.0) -> None:
     """Validate input paths and parameters."""
-    img_path = Path(image_path)
+    img_path: Path = Path(image_path)
     if not img_path.exists():
         raise FileNotFoundError(f"Image not found: {img_path}")
     if not img_path.is_file():
@@ -938,8 +947,14 @@ def process_image_with_model(
     """Process an image with a Vision Language Model."""
     logger.info(f"Processing '{image_path}' with model: {model_identifier}")
 
-    model = tokenizer = None
+    model: Optional[Any] = None # Use Any for now, or a more specific type if available
+    tokenizer: Optional[Union[PreTrainedTokenizer, PreTrainedTokenizerFast]] = None
+    arch: str
+    gpu_info: str
     arch, gpu_info = get_system_info()
+    start_time: float = 0.0 # Initialize start_time
+    initial_mem: float = 0.0
+    initial_cache: float = 0.0
 
     try:
         validate_temperature(temperature)
@@ -949,51 +964,54 @@ def process_image_with_model(
         if logger.isEnabledFor(logging.DEBUG):
             logger.debug(f"System: {arch}, GPU: {gpu_info}")
 
+        # --- Capture initial state BEFORE model operations ---
+        initial_mem = mx.get_active_memory() / 1024 / 1024
+        initial_cache = mx.get_cache_memory() / 1024 / 1024
+        start_time = time.perf_counter() # <<< START TIMER HERE
+        # -----------------------------------------------------
+
         with timeout_manager(timeout):  # Use provided timeout value
-            validate_image_accessible(image_path)
+            # Load model and tokenizer
+            model, tokenizer = load(model_identifier, trust_remote_code=trust_remote_code)
+            config: Dict[str, Any] = load_config(model_identifier, trust_remote_code=trust_remote_code)
 
-            # Log system info in debug mode
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f"System: {arch}, GPU: {gpu_info}")
+            # Prepare prompt
+            formatted_prompt: str = apply_chat_template(tokenizer, config, prompt, num_images=1)
 
-            with timeout_manager(timeout):  # Use provided timeout value
-                model, tokenizer = load(model_identifier, trust_remote_code=trust_remote_code)
-                config = load_config(model_identifier, trust_remote_code=trust_remote_code)
+            # Generate output
+            output: Optional[str] = generate(
+                model=model,
+                processor=tokenizer,  # Type checking handled by function signature
+                prompt=str(formatted_prompt),
+                image=image_path.as_posix(),
+                max_tokens=max_tokens,
+                verbose=verbose,
+                temp=temperature
+            )
 
-                formatted_prompt = apply_chat_template(tokenizer, config, prompt, num_images=1)
-                output = generate(
-                    model=model,
-                    processor=tokenizer,  # Type checking handled by function signature
-                    prompt=str(formatted_prompt),
-                    image=image_path.as_posix(),
-                    max_tokens=max_tokens,
-                    verbose=verbose,
-                    temp=temperature
-                )
+            # Ensure all computations involving the model are done before measuring memory/time
+            mx.eval(model.parameters()) # Evaluate model parameters if needed after generation
 
-                # Ensure all computations involving the model are done before measuring memory/time
-                mx.eval(model.parameters()) # Evaluate model parameters if needed after generation
+        # --- Capture final state AFTER model operations ---
+        end_time: float = time.perf_counter() # <<< END TIMER HERE
+        final_active_mem: float = mx.get_active_memory() / 1024 / 1024
+        final_cache_mem: float = mx.get_cache_memory() / 1024 / 1024
+        peak_mem: float = mx.get_peak_memory() / 1024 / 1024
+        # --------------------------------------------------
 
-                # Note: initial_mem and initial_cache are not defined in this scope.
-                # Assuming they should be captured before the 'try' block or model loading.
-                # For now, setting them to 0 as placeholders.
-                initial_mem = 0.0
-                initial_cache = 0.0
-                start_time = time.perf_counter() # Should ideally be before model loading/generation
+        final_stats: MemoryStats = MemoryStats(
+            active=final_active_mem - initial_mem, # Calculate delta
+            cached=final_cache_mem - initial_cache, # Calculate delta
+            peak=peak_mem, # Peak is absolute
+            time=end_time - start_time # <<< CALCULATE DURATION
+        )
 
-                final_stats = MemoryStats(
-                    active=mx.get_active_memory() / 1024 / 1024 - initial_mem,
-                    cached=mx.get_cache_memory() / 1024 / 1024 - initial_cache,
-                    peak=mx.get_peak_memory() / 1024 / 1024,
-                    time=time.perf_counter() - start_time
-                )
-
-                return ModelResult(
-                    model_name=model_identifier,
-                    success=True,
-                    output=str(output) if output is not None else "",
-                    stats=final_stats
-                )
+        return ModelResult(
+            model_name=model_identifier,
+            success=True,
+            output=str(output) if output is not None else "",
+            stats=final_stats
+        )
 
     except TimeoutError:
         logger.error(f"Timeout while processing model {model_identifier}")
@@ -1004,7 +1022,7 @@ def process_image_with_model(
             error_message="Operation timed out"
         )
     except Exception as e:
-        error_stage = "model_load" if model is None else "generate"
+        error_stage: str = "model_load" if model is None else "generate"
         logger.error(f"Failed during {error_stage}: {type(e).__name__}: {e}")
         if logger.isEnabledFor(logging.DEBUG):
             traceback.print_exc()
@@ -1025,7 +1043,7 @@ def process_image_with_model(
 def main(args: argparse.Namespace) -> None:
     """Main function to orchestrate image analysis."""
     # Configure logging level based on args
-    log_level = logging.DEBUG if args.debug else (logging.INFO if args.verbose else logging.INFO)
+    log_level: int = logging.DEBUG if args.debug else (logging.INFO if args.verbose else logging.INFO)
     logging.basicConfig(level=log_level,
                         format='%(asctime)s - %(levelname)s - %(message)s',
                         handlers=[logging.StreamHandler(sys.stderr)], force=True)
@@ -1035,7 +1053,7 @@ def main(args: argparse.Namespace) -> None:
         logger.info("Verbose mode enabled.")
 
     # Collect library versions early
-    library_versions = get_library_versions()
+    library_versions: Dict[str, str] = get_library_versions()
 
     # Print library versions initially (now using the collected dict)
     if args.debug:
@@ -1047,18 +1065,18 @@ def main(args: argparse.Namespace) -> None:
         logger.warning(Colors.colored("`--trust-remote-code` is enabled.", Colors.YELLOW))
         logger.warning(Colors.colored("-----------------------", Colors.YELLOW + Colors.BOLD))
 
-    overall_start_time = time.perf_counter()
+    overall_start_time: float = time.perf_counter()
 
     # --- 1. Find Image ---
-    folder_path = args.folder.resolve()
+    folder_path: Path = args.folder.resolve()
     logger.info(f"Scanning folder: {Colors.colored(str(folder_path), Colors.BLUE)}")
     if args.folder == DEFAULT_FOLDER and not DEFAULT_FOLDER.is_dir():
         print(Colors.colored(f"Warning: Default folder '{DEFAULT_FOLDER}' does not exist.", Colors.YELLOW), file=sys.stderr)
-    image_path = find_most_recent_file(folder_path)
+    image_path: Optional[Path] = find_most_recent_file(folder_path)
     if not image_path:
         print(Colors.colored(f"\nError: Could not find a suitable image file in {folder_path}.", Colors.RED), file=sys.stderr)
         sys.exit(1)
-    resolved_image_path = image_path.resolve()
+    resolved_image_path: Path = image_path.resolve()
     print(f"\nProcessing file: {Colors.colored(resolved_image_path.name, Colors.MAGENTA)} (located at {resolved_image_path})")
     # Validate image readability early
     try:
@@ -1071,12 +1089,12 @@ def main(args: argparse.Namespace) -> None:
 
 
     # --- 2. Extract Metadata ---
-    metadata = extract_image_metadata(resolved_image_path)
+    metadata: MetadataDict = extract_image_metadata(resolved_image_path, debug=args.debug)
     print(f"  Date: {Colors.colored(metadata.get('date', 'N/A'), Colors.CYAN)}")
     print(f"  Desc: {Colors.colored(metadata.get('description', 'N/A'), Colors.CYAN)}")
     print(f"  GPS:  {Colors.colored(metadata.get('gps', 'N/A'), Colors.CYAN)}")
     if args.verbose or args.debug:
-         exif_data = get_exif_data(resolved_image_path)
+         exif_data: Optional[ExifDict] = get_exif_data(resolved_image_path)
          if exif_data:
              pretty_print_exif(exif_data, verbose=True)
          else:
@@ -1089,15 +1107,15 @@ def main(args: argparse.Namespace) -> None:
         logger.info("Using user-provided prompt.")
     else:
         logger.info("Generating default prompt based on image metadata.")
-        prompt_parts = [
-            "Provide factual caption, description, keywords/tags for cataloguing/searching.",
+        prompt_parts: List[str] = [
+            "Provide factual caption, description, keywords suitable for cataloguing/searching the image.",
             (f"Context: Relates to '{metadata.get('description', '')}'"
-             if metadata.get('description') and metadata['description'] != "No description" else ""),
+             if metadata.get('description') and metadata['description'] != "N/A" else ""),
             (f"taken around {metadata.get('date', '')}"
              if metadata.get('date') and metadata['date'] != "Unknown date" else ""),
             (f"near GPS {metadata.get('gps', '')}."
              if metadata.get('gps') and metadata['gps'] != "Unknown location" else ""),
-            "Focus on visual content. Avoid repeating context unless visible."
+            "Focus on visual content. Avoid repeating the context unless it is visible."
         ]
         prompt = " ".join(filter(None, prompt_parts)).strip()
         logger.debug("Using generated prompt based on metadata.")
@@ -1114,18 +1132,18 @@ def main(args: argparse.Namespace) -> None:
 
     results: List[ModelResult] = []
     if not model_identifiers:
-        msg = ("\nWarning: No models specified and none found in cache." if not args.models
+        msg: str = ("\nWarning: No models specified and none found in cache." if not args.models
                else "\nWarning: No models specified via --models argument.")
         print(Colors.colored(msg, Colors.YELLOW), file=sys.stderr)
         if not args.models:
             print("Ensure models are downloaded and cache is accessible.", file=sys.stderr)
     else:
         print(f"\nProcessing {Colors.colored(str(len(model_identifiers)), Colors.GREEN)} model(s)...")
-        separator = Colors.colored(f"\n{'=' * 80}\n", Colors.BLUE)
+        separator: str = Colors.colored(f"\n{'=' * 80}\n", Colors.BLUE)
         for model_id in model_identifiers:
             print(separator)
-            is_vlm_verbose = args.verbose or args.debug
-            result = process_image_with_model(
+            is_vlm_verbose: bool = args.verbose or args.debug
+            result: ModelResult = process_image_with_model(
                 model_identifier=model_id, 
                 image_path=resolved_image_path,
                 prompt=prompt, max_tokens=args.max_tokens,
@@ -1145,7 +1163,7 @@ def main(args: argparse.Namespace) -> None:
                 if result.captured_output_on_fail:
                     print(Colors.colored("Captured output during failure:", Colors.YELLOW))
                     # Maybe limit how much is printed to console?
-                    capture_snippet = result.captured_output_on_fail[:1000]
+                    capture_snippet: str = result.captured_output_on_fail[:1000]
                     if len(result.captured_output_on_fail) > 1000:
                         capture_snippet += '...'
                     print(capture_snippet)
@@ -1158,7 +1176,7 @@ def main(args: argparse.Namespace) -> None:
         print(Colors.colored("\nNo models processed. No performance summary generated.", Colors.YELLOW))
 
     # --- 6. Generate HTML Report ---
-    html_output_path = args.output_html.resolve()
+    html_output_path: Path = args.output_html.resolve()
     if results:
         # Pass collected versions to the report generator
         generate_html_report(results, html_output_path, library_versions)
@@ -1170,7 +1188,7 @@ def main(args: argparse.Namespace) -> None:
     print_version_info(library_versions)
 
     # --- Calculate and Print Total Time ---
-    overall_time = time.perf_counter() - overall_start_time
+    overall_time: float = time.perf_counter() - overall_start_time
     print(f"\nTotal execution time: {Colors.colored(f'{overall_time:.2f} seconds', Colors.GREEN)}.")
 
 
