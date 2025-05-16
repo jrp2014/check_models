@@ -38,7 +38,7 @@ except ImportError:
     sys.exit(1)
 
 try:
-    from PIL import Image, UnidentifiedImageError
+    from PIL import Image, UnidentifiedImageError, ExifTags
     from PIL.ExifTags import GPSTAGS, TAGS
     pillow_version = Image.__version__ if hasattr(Image, '__version__') else 'N/A'
 except ImportError:
@@ -280,9 +280,7 @@ def print_image_dimensions(image_path: Path) -> None:
 # --- EXIF & Metadata Handling ---
 @lru_cache(maxsize=128)
 def get_exif_data(image_path: Path) -> Optional[ExifDict]:
-    """Extract EXIF data from an image file, including decoding GPS IFD."""
-    # GPS_INFO_TAG_ID moved to global constants
-
+    """Extract EXIF data from an image file, including IFD0, Exif SubIFD, and GPS IFD."""
     try:
         with Image.open(image_path) as img:
             exif_raw: Any = img.getexif()
@@ -291,39 +289,48 @@ def get_exif_data(image_path: Path) -> Optional[ExifDict]:
                     logger.debug(f"No EXIF data found in {image_path}")
                 return None
 
-            # First pass: decode main EXIF tags
+            # Initialize the result dictionary
             exif_decoded: ExifDict = {}
-            
-            # Try to get DateTimeOriginal directly from IFD using tag ID
-            dt_original_tag_id = 36867  # Standard EXIF tag ID for DateTimeOriginal
-            if dt_original_tag_id in exif_raw:
-                exif_decoded["DateTimeOriginal"] = exif_raw[dt_original_tag_id]
 
-            # Decode remaining EXIF tags
+            if logger.isEnabledFor(logging.DEBUG):
+                logger.debug(f"Raw EXIF data for {image_path}: {exif_raw}")
+
+            # First pass: Process IFD0 (main image directory) tags
+            tag_id: int
+            value: Any
             for tag_id, value in exif_raw.items():
-                if tag_id == GPS_INFO_TAG_ID:
+                # Skip SubIFD pointers, we'll handle them separately
+                if tag_id in (ExifTags.Base.ExifOffset, ExifTags.Base.GPSInfo):
                     continue
-                if tag_id == dt_original_tag_id:
-                    continue
-                tag_name = TAGS.get(tag_id, str(tag_id))
+                tag_name: str = TAGS.get(tag_id, str(tag_id))
                 exif_decoded[tag_name] = value
 
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f"EXIF data decoded for {image_path}: {exif_decoded}")
+                logger.debug(f"IFD0 tags decoded for {image_path}: {exif_decoded}")
 
-            # Second pass: handle GPS IFD specifically
-            if GPS_INFO_TAG_ID in exif_raw:
-                try:
-                    gps_ifd = exif_raw.get_ifd(GPS_INFO_TAG_ID)
-                    if isinstance(gps_ifd, dict) and gps_ifd:
-                        gps_decoded = {}
-                        for gps_tag_id, gps_value in gps_ifd.items():
-                            gps_tag_name = GPSTAGS.get(gps_tag_id, str(gps_tag_id))
-                            gps_decoded[gps_tag_name] = gps_value
-                        exif_decoded["GPSInfo"] = gps_decoded
-                except Exception as e:
-                    # Add image path to the warning log
-                    logger.warning(f"Failed to decode GPS data for {image_path}: {e}")
+            # Second pass: Process Exif SubIFD
+            exif_ifd: Any = exif_raw.get_ifd(ExifTags.IFD.Exif)
+            if exif_ifd:
+                for tag_id, value in exif_ifd.items():
+                    tag_name: str = TAGS.get(tag_id, str(tag_id))
+                    exif_decoded[tag_name] = value
+
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f"Exif SubIFD merged for {image_path}: {exif_decoded}")
+
+            # Third pass: Process GPS IFD
+            gps_ifd: Any = exif_raw.get_ifd(ExifTags.IFD.GPSInfo)
+            if isinstance(gps_ifd, dict) and gps_ifd:
+                gps_decoded: Dict[str, Any] = {}
+                gps_tag_id: int
+                gps_value: Any
+                for gps_tag_id, gps_value in gps_ifd.items():
+                    gps_tag_name: str = GPSTAGS.get(gps_tag_id, str(gps_tag_id))
+                    gps_decoded[gps_tag_name] = gps_value
+                exif_decoded["GPSInfo"] = gps_decoded
+
+                if logger.isEnabledFor(logging.DEBUG):
+                    logger.debug(f"GPS IFD merged for {image_path}: {exif_decoded}")
 
             return exif_decoded
 
@@ -334,29 +341,16 @@ def get_exif_data(image_path: Path) -> Optional[ExifDict]:
     return None
 
 def _format_exif_date(date_str_input: Any) -> Optional[str]:
-    """Attempt to parse and format a date string from EXIF."""
-    date_str: str
-    if not isinstance(date_str_input, str):
-        try:
-            date_str = str(date_str_input)
-        except Exception:
-            if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f"Could not convert potential date value '{date_str_input}' to string.")
-            return None
-    else:
-        date_str = date_str_input
-
-    for fmt in DATE_FORMATS:
-        try:
-            dt_obj: datetime = datetime.strptime(date_str, fmt)
-            return dt_obj.strftime("%Y-%m-%d %H:%M:%S")
-        except (ValueError, TypeError):
-            continue  # Try next format
-
-    if logger.isEnabledFor(logging.DEBUG):
-        logger.debug(f"Could not parse date string '{date_str}' with known formats.")
-    return None
-
+    """Return the EXIF date value as a string, without parsing."""
+    if isinstance(date_str_input, str):
+        return date_str_input.strip()
+    try:
+        # Attempt to convert non-string types to string
+        return str(date_str_input).strip()
+    except Exception:
+        if logger.isEnabledFor(logging.DEBUG):
+            logger.debug(f"Could not convert potential date value '{date_str_input}' to string.")
+        return None
 
 def _convert_gps_coordinate(ref: Optional[Union[str, bytes]], coord: Any) -> Optional[float]:
     """Convert various GPS coordinate formats to decimal degrees, robustly handling Ratio types and malformed data."""
@@ -454,30 +448,29 @@ def _convert_gps_coordinate(ref: Optional[Union[str, bytes]], coord: Any) -> Opt
         return None
 
 def _extract_exif_date(exif_data: Optional[ExifDict]) -> Tuple[Optional[str], Optional[str], Optional[str]]:
-    """Helper to extract the best date from EXIF data."""
+    """Helper to extract the best date string from EXIF data."""
     if not exif_data:
         return None, None, None
 
     # Prioritize DateTimeOriginal
     dt_original = exif_data.get("DateTimeOriginal")
     if dt_original:
-        formatted_date = _format_exif_date(dt_original)
-        if formatted_date:
+        raw_date_str = _format_exif_date(dt_original) # Get raw string
+        if raw_date_str:
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f"Using DateTimeOriginal from EXIF: {formatted_date}")
-            return formatted_date, "EXIF (DateTimeOriginal)", "DateTimeOriginal"
+                logger.debug(f"Using raw DateTimeOriginal from EXIF: '{raw_date_str}'")
+            return raw_date_str, "EXIF (DateTimeOriginal)", "DateTimeOriginal"
 
     # Fallback to other date tags
     for tag in EXIF_DATE_TAGS:
         if tag == "DateTimeOriginal":
              continue # Already checked
         if tag in exif_data:
-            date_str = str(exif_data[tag])
-            formatted_date = _format_exif_date(date_str)
-            if formatted_date:
+            raw_date_str = _format_exif_date(exif_data[tag]) # Get raw string
+            if raw_date_str:
                 if logger.isEnabledFor(logging.DEBUG):
-                    logger.debug(f"Using date from {tag}: {formatted_date}")
-                return formatted_date, f"EXIF ({tag})", tag
+                    logger.debug(f"Using raw date from {tag}: '{raw_date_str}'")
+                return raw_date_str, f"EXIF ({tag})", tag
 
     return None, None, None # No valid EXIF date found
 
@@ -520,9 +513,12 @@ def _extract_gps_coordinates(exif_data: Optional[ExifDict], image_path_name: str
         longitude = _convert_gps_coordinate(lon_ref, lon)
 
         if latitude is not None and longitude is not None:
-            gps_str = f"{latitude:.6f}, {longitude:.6f}"
+            # ISO 6709:2022 format: ±DD.DDDDDD±DDD.DDDDDD/
+            lat_str = f"{latitude:+.6f}"
+            lon_str = f"{longitude:+.6f}"
+            gps_str = f"{lat_str}{lon_str}/"
             if logger.isEnabledFor(logging.DEBUG):
-                logger.debug(f"Extracted GPS {gps_str} for {image_path_name}")
+                logger.debug(f"Extracted GPS (ISO 6709): {gps_str} for {image_path_name}")
             return gps_str
         else:
             logger.warning(f"Failed to convert GPS coordinates for {image_path_name}. Lat: {lat}, Lon: {lon}")
@@ -532,7 +528,7 @@ def _extract_gps_coordinates(exif_data: Optional[ExifDict], image_path_name: str
         return None
 
 def extract_image_metadata(image_path: Path, debug: bool = False) -> MetadataDict:
-    """Extract key metadata: date, GPS, and selected EXIF tags."""
+    """Extract key metadata: date string, GPS, and selected EXIF tags."""
     metadata: MetadataDict = {}
     exif_data: Optional[ExifDict] = get_exif_data(image_path)
 
@@ -541,16 +537,17 @@ def extract_image_metadata(image_path: Path, debug: bool = False) -> MetadataDic
     if logger.isEnabledFor(logging.DEBUG):
         logger.debug(f"Raw EXIF data for {image_path.name}: {exif_data}")
 
-    # 1. Extract Date (using helper)
-    exif_date, date_source, date_tag = _extract_exif_date(exif_data)
-    if exif_date:
-        metadata['date'] = exif_date
+    # 1. Extract Date String (using helper)
+    raw_exif_date, date_source, date_tag = _extract_exif_date(exif_data)
+    if raw_exif_date:
+        metadata['date'] = raw_exif_date # Store the raw string
         metadata['date_source'] = date_source
         metadata['date_tag'] = date_tag
     else:
-        # Fallback to file modification time
+        # Fallback to file modification time (formatted as ISO 8601 string)
         try:
             mtime = os.path.getmtime(image_path)
+            # Format as YYYY-MM-DD HH:MM:SS for consistency
             metadata['date'] = datetime.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M:%S")
             metadata['date_source'] = "File Modification Time"
             metadata['date_tag'] = "mtime"
@@ -879,8 +876,8 @@ def generate_html_report(results: List[ModelResult], filename: Path, versions: D
 
         if result.success:
             escaped_output = html.escape(result.output or "")
-            result_content = f'<div class="model-output">{escaped_output}</div>'
-            # Format stats as comma-separated integers for HTML
+            # Highlight model output in HTML
+            result_content = f'<div class="model-output"><strong>{escaped_output}</strong></div>'
             stats_cells = f"""
                 <td class="numeric">{result.stats.active:,.0f}</td>
                 <td class="numeric">{result.stats.cached:,.0f}</td>
@@ -1035,20 +1032,22 @@ def _run_model_generation(
         formatted_prompt: str = apply_chat_template(tokenizer, config, prompt, num_images=1)
 
         # Generate output
-        output: Optional[str] = generate(
+        # output: Optional[str] = generate(
+        output = generate(    
             model=model,
             processor=tokenizer,  # Type checking handled by function signature
-            prompt=str(formatted_prompt),
+            prompt=formatted_prompt,
             image=image_path.as_posix(),
             max_tokens=max_tokens,
             verbose=verbose,
             temp=temperature
         )
 
+
         # Ensure all computations involving the model are done before measuring memory/time
         mx.eval(model.parameters()) # Evaluate model parameters if needed after generation
 
-        return str(output) if output is not None else "", model, tokenizer
+        return output if output is not None else "[No model output]", model, tokenizer
 
     except Exception:
         # If loading failed, model might be None. If generation failed, model is likely loaded.
@@ -1166,6 +1165,17 @@ def process_image_with_model(
 
 # --- Main Execution Helper Functions ---
 
+def print_cli_header(title: str) -> None:
+    print(Colors.colored(f"\n{'=' * 80}", Colors.BLUE))
+    print(Colors.colored(f"{title.center(80)}", Colors.CYAN + Colors.BOLD))
+    print(Colors.colored(f"{'=' * 80}\n", Colors.BLUE))
+
+def print_cli_section(title: str) -> None:
+    print(Colors.colored(f"\n--- {title} ---", Colors.MAGENTA))
+
+def print_cli_error(msg: str) -> None:
+    print(Colors.colored(f"Error: {msg}", Colors.RED), file=sys.stderr)
+
 def setup_environment(args: argparse.Namespace) -> Dict[str, str]:
     """Configure logging, collect versions, print warnings."""
     log_level: int = logging.DEBUG if args.debug else (logging.INFO if args.verbose else logging.INFO)
@@ -1189,27 +1199,24 @@ def setup_environment(args: argparse.Namespace) -> Dict[str, str]:
     return library_versions
 
 def find_and_validate_image(args: argparse.Namespace) -> Path:
-    """Find the most recent image in the specified folder and validate it."""
     folder_path: Path = args.folder.resolve()
-    logger.info(f"Scanning folder: {Colors.colored(str(folder_path), Colors.BLUE)}")
+    print_cli_section(f"Scanning folder: {folder_path}")
     if args.folder == DEFAULT_FOLDER and not DEFAULT_FOLDER.is_dir():
-        print(Colors.colored(f"Warning: Default folder '{DEFAULT_FOLDER}' does not exist.", Colors.YELLOW), file=sys.stderr)
-
+        print_cli_error(f"Default folder '{DEFAULT_FOLDER}' does not exist.")
     image_path: Optional[Path] = find_most_recent_file(folder_path)
     if not image_path:
-        print(Colors.colored(f"\nError: Could not find a suitable image file in {folder_path}. Exiting.", Colors.RED), file=sys.stderr)
+        print_cli_error(f"Could not find a suitable image file in {folder_path}. Exiting.")
         sys.exit(1)
-
     resolved_image_path: Path = image_path.resolve()
-    print(f"\nProcessing file: {Colors.colored(resolved_image_path.name, Colors.MAGENTA)} (located at {resolved_image_path})")
-
+    print_cli_section(f"Processing file: {resolved_image_path.name}")
+    print(f"Located at: {Colors.colored(resolved_image_path, Colors.BLUE)}")
     try:
         with Image.open(resolved_image_path) as img:
-            img.verify() # Verify basic structure without loading full data
+            img.verify()
         print_image_dimensions(resolved_image_path)
         return resolved_image_path
     except (FileNotFoundError, UnidentifiedImageError, OSError, Exception) as img_err:
-        logger.critical(Colors.colored(f"Critical Error: Cannot open or verify image {resolved_image_path}: {img_err}. Exiting.", Colors.RED))
+        print_cli_error(f"Cannot open or verify image {resolved_image_path}: {img_err}. Exiting.")
         sys.exit(1)
 
 def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
@@ -1236,7 +1243,7 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
     else:
         logger.info("Generating default prompt based on image metadata.")
         prompt_parts: List[str] = [
-            "Provide factual caption, description, keywords suitable for cataloguing/searching the image.",
+            "Provide a factual caption, description, and keywords suitable for cataloguing, or searching for, the image.",
             (f"Context: Relates to '{metadata.get('description', '')}'"
              if metadata.get('description') and metadata['description'] != "N/A" else ""),
             (f"taken around {metadata.get('date', '')}"
@@ -1256,24 +1263,20 @@ def process_models(
     image_path: Path,
     prompt: str
 ) -> List[ModelResult]:
-    """Identify models to process and run them against the image."""
     model_identifiers: List[str]
     if args.models:
         model_identifiers = args.models
-        logger.info(f"Processing explicitly specified models: {Colors.colored(str(model_identifiers), Colors.GREEN)}")
+        print_cli_section(f"Processing specified models: {', '.join(model_identifiers)}")
     else:
-        logger.info("Scanning cache for models to process...")
+        print_cli_section("Scanning cache for models to process...")
         model_identifiers = get_cached_model_ids()
-
     results: List[ModelResult] = []
     if not model_identifiers:
-        msg: str = ("\nWarning: No models specified and none found in cache." if not args.models
-               else "\nWarning: No models specified via --models argument.")
-        print(Colors.colored(msg, Colors.YELLOW), file=sys.stderr)
+        print_cli_error("No models specified or found in cache.")
         if not args.models:
             print("Ensure models are downloaded and cache is accessible.", file=sys.stderr)
     else:
-        print(f"\nProcessing {Colors.colored(str(len(model_identifiers)), Colors.GREEN)} model(s)...")
+        print_cli_section(f"Processing {len(model_identifiers)} model(s)...")
         separator: str = Colors.colored(f"\n{'-' * 40}\n", Colors.BLUE)
         for model_id in model_identifiers:
             print(separator)
@@ -1288,21 +1291,19 @@ def process_models(
                 timeout=args.timeout
             )
             results.append(result)
-
-            # Print immediate model output/status
-            model_short_name = model_id.split('/')[-1]
+            model_short_name: str = model_id.split('/')[-1]
             if result.success:
-                logger.info(f"Successfully processed model: {Colors.colored(model_short_name, Colors.GREEN)}")
+                print(Colors.colored(f"[SUCCESS] {model_short_name}", Colors.GREEN))
                 if result.output:
-                    print(f"\n{Colors.colored('Output:', Colors.CYAN)}\n{result.output}")
+                    # Highlight model output
+                    print(f"\n{Colors.colored('Output:', Colors.CYAN)}\n{Colors.colored(result.output, Colors.CYAN + Colors.BOLD)}")
                 if args.verbose or args.debug:
                     print(f"Time taken: {result.stats.time:.2f}s")
             else:
-                logger.error(f"Failed processing model: {Colors.colored(model_short_name, Colors.RED)} (Stage: {result.error_stage})")
+                print(Colors.colored(f"[FAIL] {model_short_name} (Stage: {result.error_stage})", Colors.RED))
                 print(f"  {Colors.colored('ERROR', Colors.RED)}: Model {model_short_name} failed during '{result.error_stage}'.")
                 if args.verbose or args.debug:
                     print(f"  Reason: {result.error_message}")
-
     return results
 
 def finalize_execution(
@@ -1340,23 +1341,12 @@ def finalize_execution(
 def main(args: argparse.Namespace) -> None:
     """Main function to orchestrate image analysis."""
     overall_start_time: float = time.perf_counter()
-
-    # --- 0. Setup ---
+    print_cli_header("MLX Vision Language Model Image Analysis")
     library_versions: Dict[str, str] = setup_environment(args)
-
-    # --- 1. Find and Validate Image ---
     resolved_image_path: Path = find_and_validate_image(args)
-
-    # --- 2. Extract Metadata ---
     metadata: MetadataDict = handle_metadata(resolved_image_path, args)
-
-    # --- 3. Prepare Prompt ---
     prompt: str = prepare_prompt(args, metadata)
-
-    # --- 4. Find and Process Models ---
     results: List[ModelResult] = process_models(args, resolved_image_path, prompt)
-
-    # --- 5. Final Reporting ---
     finalize_execution(args, results, library_versions, overall_start_time)
 
 if __name__ == "__main__":
@@ -1371,11 +1361,11 @@ if __name__ == "__main__":
     parser.add_argument("--output-html", type=Path, default=DEFAULT_HTML_OUTPUT, help="Output HTML report file.")
     parser.add_argument("--models", nargs='+', type=str, default=None, help="Specify models by ID/path. Overrides cache scan.")
     parser.add_argument("--trust-remote-code", action=argparse.BooleanOptionalAction, default=True, help="Allow custom code from Hub models (SECURITY RISK).")
-    parser.add_argument("-p", "--prompt", type=str, default=None, help="Custom VLM prompt.")
+    parser.add_argument("-p", "--prompt", type=str, default=None, help="Custom prompt.")
     parser.add_argument("-m", "--max-tokens", type=int, default=DEFAULT_MAX_TOKENS, help="Max new tokens to generate.")
     parser.add_argument("-t", "--temperature", type=float, default=DEFAULT_TEMPERATURE, help=f"Sampling temperature (default: {DEFAULT_TEMPERATURE}).")
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output (INFO logging).")
-    parser.add_argument("-d", "--debug", action="store_true", help="Enable debug logging (DEBUG level).")
+    parser.add_argument("-d", "--debug", action="store_true", help="Enable debug logging (DEBUG logging).")
     parser.add_argument("--timeout", type=float, default=DEFAULT_TIMEOUT, help=f"Timeout in seconds for model operations (default: {DEFAULT_TIMEOUT}).")
 
     # Parse arguments
