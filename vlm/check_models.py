@@ -960,6 +960,73 @@ def generate_html_report(results: List[ModelResult], filename: Path, versions: D
          logger.error(Colors.colored(f"An unexpected error occurred while writing HTML report: {type(e).__name__}: {e}", Colors.RED), exc_info=logger.level <= logging.DEBUG)
 
 
+def generate_markdown_report(results: List[ModelResult], filename: Path, versions: Dict[str, str]) -> None:
+    """Generates a Markdown file with model stats, output/errors, failures, and versions."""
+    if not results:
+        logger.warning("No results to generate Markdown report.")
+        return
+
+    results.sort(key=lambda x: (not x.success, x.stats.time if x.success else 0))
+    successful_results: List[ModelResult] = [r for r in results if r.success]
+
+    # Table header
+    md = []
+    md.append("# Model Performance Results\n")
+    md.append(f"_Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}_\n")
+    md.append("")
+    md.append("| Model | Active Δ (MB) | Cache Δ (MB) | Peak Mem (MB) | Time (s) | Output / Error / Diagnostics |")
+    md.append("|-------|:-------------:|:------------:|:-------------:|:--------:|------------------------------|")
+
+    for result in results:
+        model_disp_name = f"`{result.model_name}`"
+        if result.success:
+            stats = [
+                f"{result.stats.active:,.0f}",
+                f"{result.stats.cached:,.0f}",
+                f"{result.stats.peak:,.0f}",
+                f"{result.stats.time:.2f}"
+            ]
+            output_md = f"```\n{result.output or ''}\n```"
+        else:
+            stats = ["-", "-", "-", "-"]
+            error_msg = result.error_message or "Unknown error"
+            output_md = f"**ERROR:** {error_msg}"
+            if result.captured_output_on_fail:
+                output_md += f"\n<details><summary>Captured Output</summary>\n\n```\n{result.captured_output_on_fail}\n```\n</details>"
+        md.append(f"| {model_disp_name} | {stats[0]} | {stats[1]} | {stats[2]} | {stats[3]} | {output_md} |")
+
+    # Summary row
+    if successful_results:
+        avg_active = sum(r.stats.active for r in successful_results) / len(successful_results)
+        avg_cache = sum(r.stats.cached for r in successful_results) / len(successful_results)
+        max_peak = max(r.stats.peak for r in successful_results)
+        avg_time = sum(r.stats.time for r in successful_results) / len(successful_results)
+        summary_title = f"**AVG/PEAK ({len(successful_results)} Success)**"
+        summary_stats = [
+            f"{avg_active:,.0f}",
+            f"{avg_cache:,.0f}",
+            f"{max_peak:,.0f}",
+            f"{avg_time:.2f}"
+        ]
+        md.append(f"| {summary_title} | {summary_stats[0]} | {summary_stats[1]} | {summary_stats[2]} | {summary_stats[3]} |  |")
+
+    # Version info
+    md.append("\n---\n")
+    md.append("**Library Versions:**\n")
+    for name, ver in sorted(versions.items()):
+        md.append(f"- `{name}`: `{ver}`")
+    md.append(f"\n_Report generated on: {datetime.now().strftime('%Y-%m-%d')}_\n")
+
+    try:
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write("\n".join(md))
+        logger.info(f"Markdown report saved to: {Colors.colored(str(filename.resolve()), Colors.GREEN)}")
+    except IOError as e:
+        logger.error(Colors.colored(f"Failed to write Markdown report to {filename}: {e}", Colors.RED))
+    except Exception as e:
+        logger.error(Colors.colored(f"An unexpected error occurred while writing Markdown report: {type(e).__name__}: {e}", Colors.RED), exc_info=logger.level <= logging.DEBUG)
+
+
 def get_system_info() -> Tuple[str, str]:
     """Get system architecture and GPU information."""
     arch: str = platform.machine()
@@ -1033,7 +1100,7 @@ def _run_model_generation(
 
         # Generate output
         # output: Optional[str] = generate(
-        output = generate(    
+        output, _stats = generate(    
             model=model,
             processor=tokenizer,  # Type checking handled by function signature
             prompt=formatted_prompt,
@@ -1315,19 +1382,31 @@ def finalize_execution(
     """Print summary stats, generate report, print versions, and total time."""
     # --- 5. Print Summary Statistics ---
     if results:
-        print(Colors.colored(f"\n{'=' * 80}\n", Colors.BLUE)) # Separator
-        print_model_stats(results) # Function call
+        print(Colors.colored(f"\n{'=' * 80}\n", Colors.BLUE))
+        print_model_stats(results)
+        
+        # --- 6. Generate HTML and Markdown Reports ---
+        try:
+            html_output_path: Path = args.output_html.resolve()
+            md_output_path: Path = args.output_markdown.resolve()
+            
+            # Create parent directories if they don't exist
+            html_output_path.parent.mkdir(parents=True, exist_ok=True)
+            md_output_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            # Generate reports
+            generate_html_report(results, html_output_path, library_versions)
+            generate_markdown_report(results, md_output_path, library_versions)
+            
+            # Print paths to generated files
+            print("\nReports generated:")
+            print(f"HTML:     {Colors.colored(str(html_output_path), Colors.GREEN)}")
+            print(f"Markdown: {Colors.colored(str(md_output_path), Colors.GREEN)}")
+        except Exception as e:
+            logger.error(Colors.colored(f"Failed to generate reports: {e}", Colors.RED))
     else:
         print(Colors.colored("\nNo models processed. No performance summary generated.", Colors.YELLOW))
-
-    # --- 6. Generate HTML Report ---
-    html_output_path: Path = args.output_html.resolve()
-    if results:
-        # Pass collected versions to the report generator
-        generate_html_report(results, html_output_path, library_versions)
-    else:
-        # Use logger.info for consistency
-        logger.info(f"Skipping HTML report generation to {html_output_path} as no models were processed.")
+        logger.info("Skipping HTML/Markdown report generation as no models were processed.")
 
     # --- 7. Print Version Info to Console ---
     # Print versions after all processing and reporting is done
@@ -1358,7 +1437,8 @@ if __name__ == "__main__":
     )
     # Add arguments (separated for clarity)
     parser.add_argument("-f", "--folder", type=Path, default=DEFAULT_FOLDER, help="Folder to scan.")
-    parser.add_argument("--output-html", type=Path, default=DEFAULT_HTML_OUTPUT, help="Output HTML report file.")
+    parser.add_argument("--output-html", type=Path, default=Path("results.html"), help="Output HTML report file.")
+    parser.add_argument("--output-markdown", type=Path, default=Path("results.md"), help="Output Github Markdown report file.")
     parser.add_argument("--models", nargs='+', type=str, default=None, help="Specify models by ID/path. Overrides cache scan.")
     parser.add_argument("--trust-remote-code", action=argparse.BooleanOptionalAction, default=True, help="Allow custom code from Hub models (SECURITY RISK).")
     parser.add_argument("-p", "--prompt", type=str, default=None, help="Custom prompt.")
