@@ -1017,7 +1017,7 @@ def generate_markdown_report(results: List[ModelResult], filename: Path, version
     md.append("**Library Versions:**\n")
     for name, ver in sorted(versions.items()):
         md.append(f"- `{name}`: `{ver}`")
-    md.append(f"\n_Report generated on: {datetime.now().strftime('%Y-%m-%d')}_\n")
+    md.append(f"\n_Report generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}_\n")
 
     try:
         with open(filename, "w", encoding="utf-8") as f:
