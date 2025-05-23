@@ -127,9 +127,9 @@ MB_CONVERSION: Final[float] = 1024 * 1024
 
 # --- Utility Functions ---
 def _pad_text(text: str, width: int, left: bool = True) -> str:
-    """Pads text to a specific visual width, accounting for ANSI codes."""
+    """Pads text to a specific visual width, accounting for ANSI codes. Always pads on the right for left/top alignment."""
     pad_len = max(0, width - Colors.visual_len(text))
-    return f"{text}{' ' * pad_len}" if left else f"{' ' * pad_len}{text}"
+    return f"{text}{' ' * pad_len}"
 
 # --- Version Info ---
 def get_library_versions() -> Dict[str, str]:
@@ -605,7 +605,7 @@ def extract_image_metadata(image_path: Path, debug: bool = False) -> MetadataDic
     return metadata
 
 def pretty_print_exif(exif: ExifDict, verbose: bool = False) -> None:
-    """Pretty print key EXIF data in a formatted table, using colors."""
+    """Pretty print key EXIF data in a formatted table, using colors. All cells are top, left aligned."""
     # (Implementation remains the same as previous correct version)
     if not exif:
         print("No EXIF data available.")
@@ -697,7 +697,7 @@ def get_cached_model_ids() -> List[str]:
 
 
 def print_model_stats(results: List[ModelResult]) -> None:
-    """Print a table summarizing model performance statistics to the console, including failures."""
+    """Print a table summarizing model performance statistics to the console, including failures. All cells are top, left aligned."""
     if not results:
         logger.info(Colors.colored("No model results to display.", Colors.BLUE))
         return
@@ -743,7 +743,7 @@ def print_model_stats(results: List[ModelResult]) -> None:
     headers = ["Model", "Active Δ", "Cache Δ", "Peak Mem", "Time"]
     header_row = Colors.colored(
         f"║ {_pad_text(Colors.colored(headers[0], COLORS.HEADER, Colors.BOLD), name_col_width)} │ "
-        + " │ ".join(_pad_text(Colors.colored(h, COLORS.HEADER, Colors.BOLD), COL_WIDTH, False) for h in headers[1:])
+        + " │ ".join(_pad_text(Colors.colored(h, COLORS.HEADER, Colors.BOLD), COL_WIDTH) for h in headers[1:])
         + " ║", COLORS.BORDER
     )
     print(header_row)
@@ -764,7 +764,7 @@ def print_model_stats(results: List[ModelResult]) -> None:
             stats = [Colors.colored("-", COLORS.FAIL_TEXT)] * 4
         row = Colors.colored(
             f"║ {_pad_text(display_name, name_col_width)} │ "
-            + " │ ".join(_pad_text(stat, COL_WIDTH, False) for stat in stats)
+            + " │ ".join(_pad_text(stat, COL_WIDTH) for stat in stats)
             + " ║", COLORS.BORDER
         )
         print(row)
@@ -787,7 +787,7 @@ def print_model_stats(results: List[ModelResult]) -> None:
         summary_title = Colors.colored(f"AVG/PEAK ({len(successful_results)} Success)", COLORS.SUMMARY, Colors.BOLD)
         summary_row = Colors.colored(
             f"║ {_pad_text(summary_title, name_col_width)} │ "
-            + " │ ".join(_pad_text(Colors.colored(stat, COLORS.SUMMARY, Colors.BOLD), COL_WIDTH, False) for stat in summary_stats)
+            + " │ ".join(_pad_text(Colors.colored(stat, COLORS.SUMMARY, Colors.BOLD), COL_WIDTH) for stat in summary_stats)
             + " ║", COLORS.BORDER
         )
         print(summary_row)
@@ -951,7 +951,7 @@ def generate_html_report(results: List[ModelResult], filename: Path, versions: D
 
 
 def generate_markdown_report(results: List[ModelResult], filename: Path, versions: Dict[str, str]) -> None:
-    """Generates a Markdown file with model stats, output/errors, failures, and versions."""
+    """Generates a Markdown file with model stats, output/errors, failures, and versions. All table cells are left- and top-aligned."""
     if not results:
         logger.warning("No results to generate Markdown report.")
         return
@@ -961,11 +961,14 @@ def generate_markdown_report(results: List[ModelResult], filename: Path, version
 
     # Table header
     md: List[str] = []
+    # Add a style block to force top alignment for all table cells (works in GitHub and VS Code preview)
+    md.append('<style>table td, table th { vertical-align: top !important; text-align: left !important; }</style>')
     md.append("# Model Performance Results\n")
     md.append(f"_Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}_\n")
     md.append("")
     md.append("| Model | Active Δ (MB) | Cache Δ (MB) | Peak Mem (MB) | Time (s) | Output / Error / Diagnostics |")
-    md.append("|-------|:-------------:|:------------:|:-------------:|:--------:|------------------------------|")
+    # All columns left-aligned:
+    md.append("|:------|:--------------|:-------------|:--------------|:---------|:-----------------------------|")
 
     for result in results:
         model_disp_name: str = f"`{result.model_name}`"
