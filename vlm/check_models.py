@@ -157,7 +157,7 @@ def print_version_info(versions: Dict[str, str]) -> None:
 
 # --- ANSI Color Codes for Console Output ---
 class Colors:
-    """ANSI color codes for terminal output"""
+    """ANSI color codes for terminal output, with a Cartesian color scheme."""
     RESET: Final[str] = "\033[0m"
     BOLD: Final[str] = "\033[1m"
     RED: Final[str] = "\033[91m"
@@ -172,17 +172,31 @@ class Colors:
     _ansi_escape_re: Pattern[str] = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
 
     @staticmethod
-    def colored(text: Any, color: str) -> str: # Use Any for text input
-        if not Colors._enabled:
-            return str(text) # Ensure return is string
-        return f"{color}{str(text)}{Colors.RESET}" # Ensure text is string
+    def colored(text: str, *colors: str) -> str:
+        if not Colors._enabled or not colors:
+            return text
+        color_seq = ''.join(colors)
+        return f"{color_seq}{text}{Colors.RESET}"
 
     @staticmethod
-    def visual_len(text: Any) -> int: # Use Any for text input
-        if not isinstance(text, str):
-             text = str(text)
+    def visual_len(text: str) -> int:
+        # Remove ANSI codes for accurate width
         return len(Colors._ansi_escape_re.sub('', text))
 
+# --- Status Tag Helper ---
+def status_tag(status: str) -> str:
+    """Return a colored status tag for SUCCESS, FAIL, WARNING, INFO, or other."""
+    s = status.upper()
+    if s == "SUCCESS":
+        return Colors.colored("SUCCESS", Colors.BOLD, Colors.GREEN)
+    elif s == "FAIL":
+        return Colors.colored("FAIL", Colors.BOLD, Colors.RED)
+    elif s == "WARNING":
+        return Colors.colored("WARNING", Colors.BOLD, Colors.YELLOW)
+    elif s == "INFO":
+        return Colors.colored("INFO", Colors.BOLD, Colors.BLUE)
+    else:
+        return Colors.colored(s, Colors.BOLD, Colors.MAGENTA)
 
 # Type aliases and definitions
 T = TypeVar('T')
@@ -685,49 +699,37 @@ def get_cached_model_ids() -> List[str]:
 def print_model_stats(results: List[ModelResult]) -> None:
     """Print a table summarizing model performance statistics to the console, including failures."""
     if not results:
-        logger.info("No model results to display.")
+        logger.info(Colors.colored("No model results to display.", Colors.BLUE))
         return
 
-    # Sort results: failures last, then by time
     results.sort(key=lambda x: (not x.success, x.stats.time if x.success else float('inf')))
-
-    # --- Constants and Configuration ---
     BASE_NAME_MAX_WIDTH = 45
     COL_WIDTH = 12
     MIN_NAME_COL_WIDTH = len("Model")
-
-    # --- Colors ---
+    # Color mapping
     COLORS = types.SimpleNamespace(
         HEADER=Colors.BLUE,
         BORDER=Colors.BLUE,
         SUMMARY=Colors.YELLOW,
         FAIL=Colors.RED,
         FAIL_TEXT=Colors.GRAY,
-        SUCCESS=Colors.GREEN
+        SUCCESS=Colors.GREEN,
+        MODEL=Colors.CYAN,
+        VARIABLE=Colors.WHITE,
+        DIAG=Colors.MAGENTA
     )
-
-    # Calculate display lengths and format model names
     def format_model_name(result: ModelResult) -> Tuple[str, int]:
         base_name = result.model_name.split('/')[-1]
         display_name = base_name[:BASE_NAME_MAX_WIDTH] + ("..." if len(base_name) > BASE_NAME_MAX_WIDTH else "")
-        
         if not result.success:
             fail_suffix = f" [FAIL: {result.error_stage or '?'}]"
-            display_name = Colors.colored(display_name + fail_suffix, COLORS.FAIL)
+            display_name = Colors.colored(display_name, COLORS.MODEL) + Colors.colored(fail_suffix, Colors.BOLD, COLORS.FAIL)
         else:
-            display_name = Colors.colored(display_name, COLORS.SUCCESS)
-            
+            display_name = Colors.colored(display_name, COLORS.MODEL)
         return display_name, Colors.visual_len(display_name)
-
-    # Calculate maximum display length
     name_displays = [format_model_name(r) for r in results]
     max_display_len = max((length for _, length in name_displays), default=MIN_NAME_COL_WIDTH)
     name_col_width = max(max_display_len, MIN_NAME_COL_WIDTH)
-
-    if logger.isEnabledFor(logging.DEBUG):
-        logger.debug(f"Column widths - Name: {name_col_width}, Data: {COL_WIDTH}")
-
-    # Helper for horizontal lines
     def h_line(char: str) -> str:
         return Colors.colored(
             f"╔{'═' * (name_col_width + 2)}╤{'═' * (COL_WIDTH + 2)}╤"
@@ -737,73 +739,61 @@ def print_model_stats(results: List[ModelResult]) -> None:
             f"{'═' * (COL_WIDTH + 2)}╧{'═' * (COL_WIDTH + 2)}╧{'═' * (COL_WIDTH + 2)}╝",
             COLORS.BORDER
         )
-
-    # Print table header
     print("\n" + h_line('═'))
     headers = ["Model", "Active Δ", "Cache Δ", "Peak Mem", "Time"]
     header_row = Colors.colored(
-        f"║ {_pad_text(Colors.colored(headers[0], COLORS.HEADER), name_col_width)} │ "
-        + " │ ".join(_pad_text(Colors.colored(h, COLORS.HEADER), COL_WIDTH, False) for h in headers[1:])
+        f"║ {_pad_text(Colors.colored(headers[0], COLORS.HEADER, Colors.BOLD), name_col_width)} │ "
+        + " │ ".join(_pad_text(Colors.colored(h, COLORS.HEADER, Colors.BOLD), COL_WIDTH, False) for h in headers[1:])
         + " ║", COLORS.BORDER
     )
     print(header_row)
     print(Colors.colored(f"╠{'═' * (name_col_width + 2)}╪{'═' * (COL_WIDTH + 2)}╪"
                         f"{'═' * (COL_WIDTH + 2)}╪{'═' * (COL_WIDTH + 2)}╪{'═' * (COL_WIDTH + 2)}╣",
                         COLORS.BORDER))
-
-    # Print data rows
     successful_results = []
     for result, (display_name, _) in zip(results, name_displays):
         if result.success:
             successful_results.append(result)
             stats = [
-                f"{result.stats.active:,.0f} MB",
-                f"{result.stats.cached:,.0f} MB",
-                f"{result.stats.peak:,.0f} MB",
-                f"{result.stats.time:.2f} s"
+                Colors.colored(f"{result.stats.active:,.0f} MB", COLORS.VARIABLE),
+                Colors.colored(f"{result.stats.cached:,.0f} MB", COLORS.VARIABLE),
+                Colors.colored(f"{result.stats.peak:,.0f} MB", COLORS.VARIABLE),
+                Colors.colored(f"{result.stats.time:.2f} s", COLORS.VARIABLE)
             ]
         else:
             stats = [Colors.colored("-", COLORS.FAIL_TEXT)] * 4
-
         row = Colors.colored(
             f"║ {_pad_text(display_name, name_col_width)} │ "
             + " │ ".join(_pad_text(stat, COL_WIDTH, False) for stat in stats)
             + " ║", COLORS.BORDER
         )
         print(row)
-
-    # Print summary if there are successful results
     if successful_results:
         print(Colors.colored(f"╠{'═' * (name_col_width + 2)}╪{'═' * (COL_WIDTH + 2)}╪"
                            f"{'═' * (COL_WIDTH + 2)}╪{'═' * (COL_WIDTH + 2)}╪{'═' * (COL_WIDTH + 2)}╣",
                            COLORS.BORDER))
-        
         avg_stats = [
             sum(r.stats.active for r in successful_results) / len(successful_results),
             sum(r.stats.cached for r in successful_results) / len(successful_results),
             max(r.stats.peak for r in successful_results),
             sum(r.stats.time for r in successful_results) / len(successful_results)
         ]
-        
         summary_stats = [
             f"{avg_stats[0]:,.0f} MB",
             f"{avg_stats[1]:,.0f} MB",
             f"{avg_stats[2]:,.0f} MB",
             f"{avg_stats[3]:.2f} s"
         ]
-        
-        summary_title = Colors.colored(f"AVG/PEAK ({len(successful_results)} Success)", COLORS.SUMMARY)
+        summary_title = Colors.colored(f"AVG/PEAK ({len(successful_results)} Success)", COLORS.SUMMARY, Colors.BOLD)
         summary_row = Colors.colored(
             f"║ {_pad_text(summary_title, name_col_width)} │ "
-            + " │ ".join(_pad_text(Colors.colored(stat, COLORS.SUMMARY), COL_WIDTH, False) for stat in summary_stats)
+            + " │ ".join(_pad_text(Colors.colored(stat, COLORS.SUMMARY, Colors.BOLD), COL_WIDTH, False) for stat in summary_stats)
             + " ║", COLORS.BORDER
         )
         print(summary_row)
-
     print(h_line('╝'))
-    
     if logger.isEnabledFor(logging.DEBUG):
-        logger.debug(f"Displayed stats for {len(results)} models ({len(successful_results)} successful)")
+        logger.debug(Colors.colored(f"Displayed stats for {len(results)} models ({len(successful_results)} successful)", COLORS.DIAG))
 
 
 # --- HTML Report Generation ---
@@ -970,7 +960,7 @@ def generate_markdown_report(results: List[ModelResult], filename: Path, version
     successful_results: List[ModelResult] = [r for r in results if r.success]
 
     # Table header
-    md = []
+    md: List[str] = []
     md.append("# Model Performance Results\n")
     md.append(f"_Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}_\n")
     md.append("")
@@ -978,7 +968,7 @@ def generate_markdown_report(results: List[ModelResult], filename: Path, version
     md.append("|-------|:-------------:|:------------:|:-------------:|:--------:|------------------------------|")
 
     for result in results:
-        model_disp_name = f"`{result.model_name}`"
+        model_disp_name: str = f"`{result.model_name}`"
         if result.success:
             stats = [
                 f"{result.stats.active:,.0f}",
@@ -986,16 +976,25 @@ def generate_markdown_report(results: List[ModelResult], filename: Path, version
                 f"{result.stats.peak:,.0f}",
                 f"{result.stats.time:.2f}"
             ]
-            output_md = f"```\n{result.output or ''}\n```"
+            # Replace newlines with <br> in output
+            output_text: str = (result.output or "").replace("\n", "<br>")
+            output_md: str = output_text
         else:
             stats = ["-", "-", "-", "-"]
-            error_msg = result.error_message or "Unknown error"
-            output_md = f"**ERROR:** {error_msg}"
+            error_msg: str = result.error_message or "Unknown error"
+            # Replace newlines in error message with <br>
+            error_text: str = error_msg.replace("\n", "<br>")
+            output_md: str = f"**ERROR:** {error_text}"
             if result.captured_output_on_fail:
-                output_md += f"\n<details><summary>Captured Output</summary>\n\n```\n{result.captured_output_on_fail}\n```\n</details>"
+                # Replace newlines in captured output with <br>
+                captured: str = result.captured_output_on_fail.replace("\n", "<br>")
+                output_md += f"<br>**Captured Output:** {captured}"
+
+        # Escape any pipe characters in the output to preserve table formatting
+        output_md = output_md.replace("|", "\\|")
         md.append(f"| {model_disp_name} | {stats[0]} | {stats[1]} | {stats[2]} | {stats[3]} | {output_md} |")
 
-    # Summary row
+    # Summary row (no changes needed here, as it doesn't contain multiline content)
     if successful_results:
         avg_active = sum(r.stats.active for r in successful_results) / len(successful_results)
         avg_cache = sum(r.stats.cached for r in successful_results) / len(successful_results)
@@ -1024,7 +1023,7 @@ def generate_markdown_report(results: List[ModelResult], filename: Path, version
     except IOError as e:
         logger.error(Colors.colored(f"Failed to write Markdown report to {filename}: {e}", Colors.RED))
     except Exception as e:
-        logger.error(Colors.colored(f"An unexpected error occurred while writing Markdown report: {type(e).__name__}: {e}", Colors.RED), exc_info=logger.level <= logging.DEBUG)
+        logger.error(Colors.colored(f"An unexpected error occurred while writing Markdown report: {type(e).__name__}: {e}", Colors.RED))
 
 
 def get_system_info() -> Tuple[str, str]:
@@ -1234,14 +1233,14 @@ def process_image_with_model(
 
 def print_cli_header(title: str) -> None:
     print(Colors.colored(f"\n{'=' * 80}", Colors.BLUE))
-    print(Colors.colored(f"{title.center(80)}", Colors.CYAN + Colors.BOLD))
+    print(Colors.colored(f"{title.center(80)}", Colors.CYAN, Colors.BOLD))
     print(Colors.colored(f"{'=' * 80}\n", Colors.BLUE))
 
 def print_cli_section(title: str) -> None:
-    print(Colors.colored(f"\n--- {title} ---", Colors.MAGENTA))
+    print(Colors.colored(f"\n--- {title} ---", Colors.MAGENTA, Colors.BOLD))
 
 def print_cli_error(msg: str) -> None:
-    print(Colors.colored(f"Error: {msg}", Colors.RED), file=sys.stderr)
+    print(Colors.colored(f"Error: {msg}", Colors.RED, Colors.BOLD), file=sys.stderr)
 
 def setup_environment(args: argparse.Namespace) -> Dict[str, str]:
     """Configure logging, collect versions, print warnings."""
