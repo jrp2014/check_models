@@ -24,6 +24,7 @@ from re import Pattern
 from typing import (
     Any,
     Callable,
+    ClassVar,
     Final,
     NamedTuple,
     NoReturn,
@@ -102,6 +103,11 @@ class TimeoutManager(contextlib.ContextDecorator):
     """Manage a timeout context for code execution (UNIX only)."""
 
     def __init__(self, seconds: float) -> None:
+        """Initialize a timeout manager with a timeout duration.
+
+        Args:
+            seconds: The timeout duration in seconds.
+        """
         self.seconds: float = seconds
         # Accommodate signal.SIG_DFL, signal.SIG_IGN (integers)
         self.timer: Callable[[int, types.FrameType | None], Any] | int | None = None
@@ -158,8 +164,84 @@ class TimeoutManager(contextlib.ContextDecorator):
 logger = logging.getLogger(__name__)
 # BasicConfig called in main()
 
+
+# --- ANSI Color Codes for Console Output ---
+class Colors:
+    """ANSI color codes for terminal output."""
+
+    RESET: Final[str] = "\033[0m"
+    BOLD: Final[str] = "\033[1m"
+    RED: Final[str] = "\033[91m"
+    GREEN: Final[str] = "\033[92m"
+    YELLOW: Final[str] = "\033[93m"
+    BLUE: Final[str] = "\033[94m"
+    MAGENTA: Final[str] = "\033[95m"
+    CYAN: Final[str] = "\033[96m"
+    WHITE: Final[str] = "\033[97m"
+    GRAY: Final[str] = "\033[90m"
+    _enabled: ClassVar[bool] = sys.stderr.isatty()
+    _ansi_escape_re: ClassVar[Pattern[str]] = re.compile(
+        r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])",
+    )
+
+    @staticmethod
+    def colored(text: str, *colors: str) -> str:
+        """Return text wrapped in ANSI color codes if enabled."""
+        if not Colors._enabled or not colors:
+            return text
+        color_seq = "".join(colors)
+        return f"{color_seq}{text}{Colors.RESET}"
+
+    @staticmethod
+    def visual_len(text: str) -> int:
+        """Return the visual length of text, ignoring ANSI codes."""
+        # Remove ANSI codes for accurate width
+        return len(Colors._ansi_escape_re.sub("", text))
+
+
+# --- Colored Logging Formatter ---
+class ColoredFormatter(logging.Formatter):
+    """A logging formatter that applies color to log messages based on their level."""
+
+    LEVEL_COLORS: ClassVar[dict[int, str]] = {
+        logging.DEBUG: Colors.CYAN,
+        logging.INFO: Colors.GREEN,
+        logging.WARNING: Colors.YELLOW,
+        logging.ERROR: Colors.RED,
+        logging.CRITICAL: Colors.RED + Colors.BOLD,
+    }
+
+    def format(self, record: logging.LogRecord) -> str:
+        """Format the log record with color based on its level."""
+        color = self.LEVEL_COLORS.get(record.levelno, "")
+        msg = super().format(record)
+        if color:
+            msg = Colors.colored(msg, color)
+        return msg
+
+
+# Configure logging to use ColoredFormatter
+handler = logging.StreamHandler(sys.stderr)
+formatter = ColoredFormatter("%(asctime)s - %(levelname)s - %(message)s")
+handler.setFormatter(formatter)
+logger.handlers.clear()
+logger.addHandler(handler)
+
 # Constants
 MB_CONVERSION: Final[float] = 1024 * 1024
+
+# Magic value constants
+DMS_LEN: Final[int] = 3  # Degrees, Minutes, Seconds
+DM_LEN: Final[int] = 2  # Degrees, Decimal Minutes
+MAX_DEGREES: Final[int] = 180
+MAX_MINUTES: Final[int] = 60
+MAX_SECONDS: Final[int] = 60
+MAX_TUPLE_LEN: Final[int] = 10
+MAX_STR_LEN: Final[int] = 60
+STR_TRUNCATE_LEN: Final[int] = 57
+BASE_NAME_MAX_WIDTH: Final[int] = 45
+COL_WIDTH: Final[int] = 12
+MIN_NAME_COL_WIDTH: Final[int] = len("Model")
 
 
 # --- Utility Functions ---
@@ -192,40 +274,6 @@ def print_version_info(versions: dict[str, str]) -> None:
         name_padded = name.ljust(max_len)
         logger.info("%s: %s", name_padded, Colors.colored(ver, status_color))
     logger.info("Generated: %s", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-
-
-# --- ANSI Color Codes for Console Output ---
-class Colors:
-    """ANSI color codes for terminal output."""
-
-    RESET: Final[str] = "\033[0m"
-    BOLD: Final[str] = "\033[1m"
-    RED: Final[str] = "\033[91m"
-    GREEN: Final[str] = "\033[92m"
-    YELLOW: Final[str] = "\033[93m"
-    BLUE: Final[str] = "\033[94m"
-    MAGENTA: Final[str] = "\033[95m"
-    CYAN: Final[str] = "\033[96m"
-    WHITE: Final[str] = "\033[97m"
-    GRAY: Final[str] = "\033[90m"
-    _enabled: bool = sys.stderr.isatty()
-    _ansi_escape_re: Pattern[str] = re.compile(
-        r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])",
-    )
-
-    @staticmethod
-    def colored(text: str, *colors: str) -> str:
-        """Return text wrapped in ANSI color codes if enabled."""
-        if not Colors._enabled or not colors:
-            return text
-        color_seq = "".join(colors)
-        return f"{color_seq}{text}{Colors.RESET}"
-
-    @staticmethod
-    def visual_len(text: str) -> int:
-        """Return the visual length of text, ignoring ANSI codes."""
-        # Remove ANSI codes for accurate width
-        return len(Colors._ansi_escape_re.sub("", text))
 
 
 # --- Status Tag Helper ---
@@ -331,10 +379,7 @@ def find_most_recent_file(folder: Path) -> Path | None:
     """Return the most recently modified file in a folder, or None."""
     if not folder.is_dir():
         logger.error(
-            Colors.colored(
-                "Provided path is not a directory: %s",
-                Colors.RED,
-            ),
+            "Provided path is not a directory: %s",
             folder,
         )
         return None
@@ -350,15 +395,12 @@ def find_most_recent_file(folder: Path) -> Path | None:
             return most_recent
     except PermissionError:
         logger.exception(
-            Colors.colored(
-                "Permission denied accessing folder: %s",
-                Colors.RED,
-            ),
+            "Permission denied accessing folder: %s",
             folder,
         )
     except OSError:
         logger.exception(
-            Colors.colored("OS error scanning folder %s", Colors.RED),
+            "OS error scanning folder %s",
             folder,
         )
     return None
@@ -378,15 +420,12 @@ def print_image_dimensions(image_path: Path) -> None:
             )
     except (FileNotFoundError, UnidentifiedImageError):
         logger.exception(
-            Colors.colored("Error with image file %s", Colors.RED),
+            "Error with image file %s",
             image_path,
         )
     except Exception:
         logger.exception(
-            Colors.colored(
-                "Unexpected error reading image dimensions for %s",
-                Colors.RED,
-            ),
+            "Unexpected error reading image dimensions for %s",
             image_path,
         )
 
@@ -558,11 +597,11 @@ def _convert_gps_coordinate(
 
         # Check if coord is a sequence (tuple or list)
         if isinstance(coord, (tuple, list)):
-            if len(coord) == 3:  # Assume Degrees, Minutes, Seconds (DMS)
+            if len(coord) == DMS_LEN:  # Assume Degrees, Minutes, Seconds (DMS)
                 degrees = to_float(coord[0])
                 minutes = to_float(coord[1])
                 seconds = to_float(coord[2])
-            elif len(coord) == 2:  # Assume Degrees, Decimal Minutes (DM)
+            elif len(coord) == DM_LEN:  # Assume Degrees, Decimal Minutes (DM)
                 degrees = to_float(coord[0])
                 minutes = to_float(coord[1])
             elif len(coord) == 1:  # Assume Decimal Degrees in a sequence
@@ -590,7 +629,11 @@ def _convert_gps_coordinate(
 
         # Validate ranges
         # Allow slightly wider range for degrees initially, sign applied later
-        if not (0 <= abs(degrees) <= 180 and 0 <= minutes < 60 and 0 <= seconds < 60):
+        if not (
+            0 <= abs(degrees) <= MAX_DEGREES
+            and 0 <= minutes < MAX_MINUTES
+            and 0 <= seconds < MAX_SECONDS
+        ):
             logger.warning(
                 "GPS values out of range: Deg=%s, Min=%s, Sec=%s",
                 degrees,
@@ -715,13 +758,14 @@ def _extract_gps_coordinates(
                     image_path_name,
                 )
             return gps_str
-        logger.warning(
-            "Failed to convert GPS coordinates for %s. Lat: %s, Lon: %s",
-            image_path_name,
-            lat,
-            lon,
-        )
-        return None
+        else:
+            logger.warning(
+                "Failed to convert GPS coordinates for %s. Lat: %s, Lon: %s",
+                image_path_name,
+                lat,
+                lon,
+            )
+            return None
     except Exception as e:
         logger.warning(
             "Error processing GPS coordinates for %s: %s",
@@ -841,19 +885,21 @@ def pretty_print_exif(exif: ExifDict, verbose: bool = False) -> None:
             try:
                 decoded_str = value.decode("utf-8", errors="replace")
                 value_str = (
-                    decoded_str[:57] + "..." if len(decoded_str) > 60 else decoded_str
+                    decoded_str[:STR_TRUNCATE_LEN] + "..."
+                    if len(decoded_str) > MAX_STR_LEN
+                    else decoded_str
                 )
             except Exception:
                 value_str = f"<bytes len={len(value)}>"
-        elif isinstance(value, tuple) and len(value) > 10:
+        elif isinstance(value, tuple) and len(value) > MAX_TUPLE_LEN:
             value_str = f"<tuple len={len(value)}>"
         elif isinstance(value, bytearray):
             value_str = f"<bytearray len={len(value)}>"
         else:
             try:
                 value_str = str(value)
-                if len(value_str) > 60:
-                    value_str = value_str[:57] + "..."
+                if len(value_str) > MAX_STR_LEN:
+                    value_str = value_str[:STR_TRUNCATE_LEN] + "..."
             except Exception as str_err:
                 # Log the specific error during string conversion
                 if logger.isEnabledFor(logging.DEBUG):
@@ -923,10 +969,7 @@ def get_cached_model_ids() -> list[str]:
     """Return a list of model repo IDs from the Hugging Face cache."""
     if scan_cache_dir is None:
         logger.error(
-            Colors.colored(
-                "huggingface_hub library not found. Cannot scan Hugging Face cache.",
-                Colors.RED,
-            ),
+            "huggingface_hub library not found. Cannot scan Hugging Face cache."
         )
         return []
     try:
@@ -944,24 +987,14 @@ def get_cached_model_ids() -> list[str]:
         else:
             return model_ids
     except HFValidationError:
-        logger.exception(
-            Colors.colored("Hugging Face cache directory invalid.", Colors.RED),
-        )
+        logger.exception("Hugging Face cache directory invalid.")
         return []
     except FileNotFoundError:
-        logger.exception(
-            Colors.colored(
-                "Hugging Face cache directory not found.",
-                Colors.RED,
-            ),
-        )
+        logger.exception("Hugging Face cache directory not found.")
         return []
     except Exception:
         logger.exception(
-            Colors.colored(
-                "Unexpected error scanning Hugging Face cache.",
-                Colors.RED,
-            ),
+            "Unexpected error scanning Hugging Face cache.",
             exc_info=logger.level <= logging.DEBUG,
         )
         return []
@@ -970,7 +1003,7 @@ def get_cached_model_ids() -> list[str]:
 def print_model_stats(results: list[ModelResult]) -> None:
     """Print a table summarizing model performance statistics."""
     if not results:
-        logger.info(Colors.colored("No model results to display.", Colors.BLUE))
+        logger.info("No model results to display.")
         return
 
     results.sort(
@@ -979,20 +1012,21 @@ def print_model_stats(results: list[ModelResult]) -> None:
             x.stats.time if x.success else float("inf"),
         ),
     )
-    BASE_NAME_MAX_WIDTH = 45
-    COL_WIDTH = 12
-    MIN_NAME_COL_WIDTH = len("Model")
+    BASE_NAME_MAX_WIDTH: Final[int] = 45
+    COL_WIDTH: Final[int] = 12
+    MIN_NAME_COL_WIDTH: Final[int] = len("Model")
     # Color mapping
-    COLORS = types.SimpleNamespace(
-        HEADER=Colors.BLUE,
-        BORDER=Colors.BLUE,
-        SUMMARY=Colors.YELLOW,
-        FAIL=Colors.RED,
-        FAIL_TEXT=Colors.GRAY,
-        SUCCESS=Colors.GREEN,
-        MODEL=Colors.CYAN,
-        VARIABLE=Colors.WHITE,
-        DIAG=Colors.MAGENTA,
+    # Each color maps to a logging level or UI element color
+    COLORS: Final[types.SimpleNamespace] = types.SimpleNamespace(
+        HEADER=Colors.CYAN,  # Match logger headers
+        BORDER=Colors.BLUE,  # Keep borders blue for contrast
+        SUMMARY=Colors.GREEN,  # Match SUCCESS logger color
+        FAIL=Colors.RED,  # Match ERROR logger color
+        FAIL_TEXT=Colors.RED,  # Match ERROR text color
+        SUCCESS=Colors.GREEN,  # Match SUCCESS logger color
+        MODEL=Colors.MAGENTA,  # Match model identifier color in logs
+        VARIABLE=Colors.CYAN,  # Match variable/value colors in logs
+        DIAG=Colors.YELLOW,  # Match WARNING diagnostic colors
     )
 
     def format_model_name(result: ModelResult) -> tuple[str, int]:
@@ -1130,6 +1164,7 @@ def generate_html_report(
     results: list[ModelResult],
     filename: Path,
     versions: dict[str, str],
+    prompt: str,
 ) -> None:
     """Generate an HTML file with model stats, outputs, errors, and versions."""
     if not results:
@@ -1151,6 +1186,7 @@ def generate_html_report(
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f8f9fa; color: #212529; line-height: 1.6; }
         h1 { text-align: center; color: #343a40; border-bottom: 2px solid #dee2e6; padding-bottom: 10px; margin-bottom: 30px; }
+        .prompt-block { background: #e9ecef; border-left: 4px solid #007bff; padding: 12px 18px; margin: 20px auto 30px auto; max-width: 900px; font-size: 1.05em; font-family: 'Fira Mono', 'Consolas', monospace; color: #343a40; }
         table { border-collapse: collapse; width: 95%; margin: 30px auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); background-color: #ffffff; }
         th, td { border: 1px solid #dee2e6; padding: 12px 15px; text-align: left; vertical-align: top; }
         th { background-color: #e9ecef; font-weight: 600; color: #495057; position: sticky; top: 0; z-index: 1; }
@@ -1179,17 +1215,9 @@ def generate_html_report(
 </head>
 <body>
     <h1>Model Performance Summary</h1>
-    <table>
-        <caption>Performance metrics and output/errors for Vision Language Model processing. Generated on """
-        + datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        + """. Failures shown but excluded from averages.</caption>
-        <thead>
-            <tr>
-                <th>Model</th>
-                <th class="numeric">Active Δ (MB)</th> <th class="numeric">Cache Δ (MB)</th>
-</head>
-<body>
-    <h1>Model Performance Summary</h1>
+    <div class="prompt-block"><strong>Prompt used:</strong><br>"""
+        + html.escape(prompt).replace("\n", "<br>")
+        + """</div>
     <table>
         <caption>Performance metrics and output/errors for Vision Language Model processing. Generated on """
         + datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -1309,17 +1337,11 @@ def generate_html_report(
         )
     except OSError:
         logger.exception(
-            Colors.colored(
-                "Failed to write HTML report to file.",
-                Colors.RED,
-            ),
+            "Failed to write HTML report to file.",
         )
     except Exception:
         logger.exception(
-            Colors.colored(
-                "An unexpected error occurred while writing HTML report.",
-                Colors.RED,
-            ),
+            "An unexpected error occurred while writing HTML report.",
             exc_info=logger.level <= logging.DEBUG,
         )
 
@@ -1328,6 +1350,7 @@ def generate_markdown_report(
     results: list[ModelResult],
     filename: Path,
     versions: dict[str, str],
+    prompt: str,
 ) -> None:
     """Generate a Markdown file with model stats, output/errors, failures, and versions. All table cells are left- and top-aligned."""
     if not results:
@@ -1348,6 +1371,10 @@ def generate_markdown_report(
     md.append("# Model Performance Results\n")
     md.append(
         f"_Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}_\n",
+    )
+    md.append("")
+    md.append(
+        "> **Prompt used:**\n>\n> " + prompt.replace("\n", "\n> ") + "\n",
     )
     md.append("")
     md.append(
@@ -1431,17 +1458,11 @@ def generate_markdown_report(
         )
     except OSError:
         logger.exception(
-            Colors.colored(
-                "Failed to write Markdown report to file.",
-                Colors.RED,
-            ),
+            "Failed to write Markdown report to file.",
         )
     except Exception:
         logger.exception(
-            Colors.colored(
-                "An unexpected error occurred while writing Markdown report.",
-                Colors.RED,
-            ),
+            "An unexpected error occurred while writing Markdown report.",
         )
 
 
@@ -1535,7 +1556,9 @@ def _run_model_generation(
     Any,
     Any,
 ]:  # Returns (output, model, tokenizer) - model/tokenizer needed for cleanup
-    """Loads model, formats prompt, and runs generation. Raises exceptions on failure."""
+    """Load model, format prompt and run generation.
+    Raise exceptions on failure.
+    """
     model = tokenizer = None  # Ensure they are defined in this scope
     try:
         # Load model and tokenizer
@@ -1591,10 +1614,10 @@ def process_image_with_model(
     image_path: Path,
     prompt: str,
     max_tokens: int,
-    verbose: bool = False,
-    trust_remote_code: bool = False,
     temperature: float = DEFAULT_TEMPERATURE,
     timeout: float = DEFAULT_TIMEOUT,
+    verbose: bool = False,
+    trust_remote_code: bool = False,
 ) -> ModelResult:
     """Process an image with a Vision Language Model, managing stats and errors."""
     logger.info(
@@ -1617,7 +1640,7 @@ def process_image_with_model(
         error_stage = "validation"
 
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug("System: %s, GPU: %s", arch, gpu_info)
+            logger.debug(f"System: {arch}, GPU: {gpu_info}")
 
         # --- Capture initial state BEFORE model operations ---
         initial_mem = mx.get_active_memory() / MB_CONVERSION
@@ -1707,7 +1730,7 @@ def process_image_with_model(
         mx.clear_cache()
         mx.reset_peak_memory()
         if logger.isEnabledFor(logging.DEBUG):
-            logger.debug("Cleaned up resources for model %s", model_identifier)
+            logger.debug(f"Cleaned up resources for model {model_identifier}")
 
 
 # --- Main Execution Helper Functions ---
@@ -1715,19 +1738,19 @@ def process_image_with_model(
 
 def print_cli_header(title: str) -> None:
     """Print a formatted CLI header with the given title."""
-    logger.info(Colors.colored(f"\n{'=' * 80}", Colors.BLUE))
-    logger.info(Colors.colored("%s", Colors.CYAN, Colors.BOLD), title.center(80))
-    logger.info(Colors.colored(f"{'=' * 80}\n", Colors.BLUE))
+    logger.info(f"\n{'=' * 80}")
+    logger.info(f"{title.center(80)}")
+    logger.info(f"{'=' * 80}\n")
 
 
 def print_cli_section(title: str) -> None:
     """Print a formatted CLI section header."""
-    logging.info(Colors.colored("\n--- %s ---", Colors.MAGENTA, Colors.BOLD), title)
+    logging.info(f"\n--- {title} ---")
 
 
 def print_cli_error(msg: str) -> None:
     """Print a formatted CLI error message."""
-    logger.error(Colors.colored("Error: %s", Colors.RED, Colors.BOLD), msg)
+    logger.error(f"Error: {msg}")
 
 
 def setup_environment(args: argparse.Namespace) -> dict[str, str]:
@@ -1754,19 +1777,13 @@ def setup_environment(args: argparse.Namespace) -> dict[str, str]:
 
     if args.trust_remote_code:
         logger.warning(
-            Colors.colored(
-                "--- SECURITY WARNING ---",
-                Colors.YELLOW + Colors.BOLD,
-            ),
+            "--- SECURITY WARNING ---"
         )
         logger.warning(
-            Colors.colored("`--trust-remote-code` is enabled.", Colors.YELLOW),
+            "`--trust-remote-code` is enabled."
         )
         logger.warning(
-            Colors.colored(
-                "-----------------------",
-                Colors.YELLOW + Colors.BOLD,
-            ),
+            "-----------------------"
         )
 
     return library_versions
@@ -1775,17 +1792,15 @@ def setup_environment(args: argparse.Namespace) -> dict[str, str]:
 def find_and_validate_image(args: argparse.Namespace) -> Path:
     """Find and validate the image file to process from arguments."""
     folder_path: Path = args.folder.resolve()
-    print_cli_section("Scanning folder: %s" % folder_path)
+    print_cli_section(f"Scanning folder: {folder_path}")
     if args.folder == DEFAULT_FOLDER and not DEFAULT_FOLDER.is_dir():
-        print_cli_error("Default folder '%s' does not exist." % DEFAULT_FOLDER)
+        print_cli_error(f"Default folder '{DEFAULT_FOLDER}' does not exist.")
     image_path: Path | None = find_most_recent_file(folder_path)
     if not image_path:
-        print_cli_error(
-            "Could not find a suitable image file in %s. Exiting." % folder_path,
-        )
+        print_cli_error(f"Could not find a suitable image file in {folder_path}. Exiting.")
         sys.exit(1)
     resolved_image_path: Path = image_path.resolve()
-    print_cli_section("Processing file: %s" % resolved_image_path.name)
+    print_cli_section(f"Processing file: {resolved_image_path.name}")
     logger.info("Located at: %s", Colors.colored(resolved_image_path, Colors.BLUE))
     try:
         with Image.open(resolved_image_path) as img:
@@ -1798,10 +1813,7 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
         OSError,
         Exception,
     ) as img_err:
-        print_cli_error(
-            "Cannot open or verify image %s: %s. Exiting."
-            % (resolved_image_path, img_err),
-        )
+        print_cli_error(f"Cannot open or verify image {resolved_image_path}: {img_err}. Exiting.")
         sys.exit(1)
 
 
@@ -1838,17 +1850,17 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
         prompt_parts: list[str] = [
             "Provide a factual caption, description, and keywords suitable for cataloguing, or searching for, the image.",
             (
-                "Context: Relates to '%s'" % metadata.get("description", "")
+                f"Context: Relates to '{metadata.get('description', '')}'"
                 if metadata.get("description") and metadata["description"] != "N/A"
                 else ""
             ),
             (
-                "taken around %s" % metadata.get("date", "")
+                f"taken around {metadata.get('date', '')}"
                 if metadata.get("date") and metadata["date"] != "Unknown date"
                 else ""
             ),
             (
-                "near GPS %s" % metadata.get("gps", "")
+                f"near GPS {metadata.get('gps', '')}"
                 if metadata.get("gps") and metadata["gps"] != "Unknown location"
                 else ""
             ),
@@ -1908,14 +1920,7 @@ def process_models(
             model_short_name: str = model_id.split("/")[-1]
 
             if result.success:
-                success_msg = (
-                    Colors.colored(
-                        "[SUCCESS] %s",
-                        Colors.GREEN,
-                    )
-                    % model_short_name
-                )
-                logger.info(success_msg)
+                logger.info(f"[SUCCESS] {model_short_name}")
 
                 if result.output:
                     # Log output with proper formatting
@@ -1928,17 +1933,14 @@ def process_models(
                     logger.info("Time taken: %.2f s", result.stats.time)
             else:
                 # Format error messages
-                fail_msg = Colors.colored(
-                    "[FAIL] %s (Stage: %s)",
-                    Colors.RED,
-                ) % (model_short_name, result.error_stage)
-                error_detail = "%s: Model %s failed during '%s'." % (
-                    Colors.colored("ERROR", Colors.RED),
+                logger.error(
+                    "[FAIL] %s (Stage: %s)", model_short_name, result.error_stage
+                )
+                logger.error(
+                    "Model %s failed during '%s'.",
                     model_short_name,
                     result.error_stage,
                 )
-                logger.error(fail_msg)
-                logger.error(error_detail)
                 if args.verbose or args.debug:
                     logger.error("Reason: %s", result.error_message)
     return results
@@ -1949,6 +1951,7 @@ def finalize_execution(
     results: list[ModelResult],
     library_versions: dict[str, str],
     overall_start_time: float,
+    prompt: str,
 ) -> None:
     """Output summary statistics, generate reports, and display timing information."""
     if results:
@@ -1966,8 +1969,8 @@ def finalize_execution(
             md_output_path.parent.mkdir(parents=True, exist_ok=True)
 
             # Generate reports
-            generate_html_report(results, html_output_path, library_versions)
-            generate_markdown_report(results, md_output_path, library_versions)
+            generate_html_report(results, html_output_path, library_versions, prompt)
+            generate_markdown_report(results, md_output_path, library_versions, prompt)
 
             # Log paths to generated files
             logger.info("Reports generated:")
@@ -1983,10 +1986,7 @@ def finalize_execution(
             logger.exception("Failed to generate reports")
     else:
         logger.warning(
-            Colors.colored(
-                "\nNo models processed. No performance summary generated.",
-                Colors.YELLOW,
-            ),
+            "\nNo models processed. No performance summary generated."
         )
         logger.info("Skipping report generation as no models were processed.")
 
@@ -2013,7 +2013,7 @@ def main(args: argparse.Namespace) -> None:
         resolved_image_path,
         prompt,
     )
-    finalize_execution(args, results, library_versions, overall_start_time)
+    finalize_execution(args, results, library_versions, overall_start_time, prompt)
 
 
 if __name__ == "__main__":
@@ -2074,7 +2074,7 @@ if __name__ == "__main__":
         "--temperature",
         type=float,
         default=DEFAULT_TEMPERATURE,
-        help=f"Sampling temperature (default: {DEFAULT_TEMPERATURE}).",
+        help=f"Sampling temperature.",
     )
     parser.add_argument(
         "-v",
@@ -2092,7 +2092,7 @@ if __name__ == "__main__":
         "--timeout",
         type=float,
         default=DEFAULT_TIMEOUT,
-        help=f"Timeout in seconds for model operations (default: {DEFAULT_TIMEOUT}).",
+        help=f"Timeout in seconds for model operations.",
     )
 
     # Parse arguments
