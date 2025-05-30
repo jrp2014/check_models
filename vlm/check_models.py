@@ -23,7 +23,6 @@ from pathlib import Path
 from re import Pattern
 from typing import (
     Any,
-    Callable,
     ClassVar,
     Final,
     NamedTuple,
@@ -31,6 +30,8 @@ from typing import (
     TextIO,
     TypeVar,
 )
+
+from collections.abc import Callable
 
 from huggingface_hub import HFCacheInfo, scan_cache_dir
 from huggingface_hub import __version__ as hf_version
@@ -1755,17 +1756,21 @@ def print_cli_error(msg: str) -> None:
 
 def setup_environment(args: argparse.Namespace) -> dict[str, str]:
     """Configure logging, collect versions, print warnings."""
+    # Always set at least INFO level
     log_level: int = (
         logging.DEBUG
         if args.debug
         else (logging.VERBOSE if args.verbose else logging.INFO)
     )
-    logging.basicConfig(
-        level=log_level,
-        format="%(asctime)s - %(levelname)s - %(message)s",
-        handlers=[logging.StreamHandler(sys.stderr)],
-        force=True,
-    )
+    # Remove all handlers and add only one
+    logger.handlers.clear()
+    handler = logging.StreamHandler(sys.stderr)
+    formatter = ColoredFormatter("%(asctime)s - %(levelname)s - %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(log_level)
+    logger.propagate = False  # Prevent double logging
+
     if args.debug:
         logger.debug("Debug mode enabled.")
     elif args.verbose:
@@ -1777,13 +1782,13 @@ def setup_environment(args: argparse.Namespace) -> dict[str, str]:
 
     if args.trust_remote_code:
         logger.warning(
-            "--- SECURITY WARNING ---"
+            "--- SECURITY WARNING ---",
         )
         logger.warning(
-            "`--trust-remote-code` is enabled."
+            "`--trust-remote-code` is enabled.",
         )
         logger.warning(
-            "-----------------------"
+            "------------------------",
         )
 
     return library_versions
@@ -1797,7 +1802,9 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
         print_cli_error(f"Default folder '{DEFAULT_FOLDER}' does not exist.")
     image_path: Path | None = find_most_recent_file(folder_path)
     if not image_path:
-        print_cli_error(f"Could not find a suitable image file in {folder_path}. Exiting.")
+        print_cli_error(
+            f"Could not find a suitable image file in {folder_path}. Exiting."
+        )
         sys.exit(1)
     resolved_image_path: Path = image_path.resolve()
     print_cli_section(f"Processing file: {resolved_image_path.name}")
@@ -1813,7 +1820,9 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
         OSError,
         Exception,
     ) as img_err:
-        print_cli_error(f"Cannot open or verify image {resolved_image_path}: {img_err}. Exiting.")
+        print_cli_error(
+            f"Cannot open or verify image {resolved_image_path}: {img_err}. Exiting."
+        )
         sys.exit(1)
 
 
@@ -1985,9 +1994,7 @@ def finalize_execution(
         except Exception:
             logger.exception("Failed to generate reports")
     else:
-        logger.warning(
-            "\nNo models processed. No performance summary generated."
-        )
+        logger.warning("\nNo models processed. No performance summary generated.")
         logger.info("Skipping report generation as no models were processed.")
 
     # Print version information
@@ -2074,7 +2081,7 @@ if __name__ == "__main__":
         "--temperature",
         type=float,
         default=DEFAULT_TEMPERATURE,
-        help=f"Sampling temperature.",
+        help="Sampling temperature.",
     )
     parser.add_argument(
         "-v",
@@ -2092,7 +2099,7 @@ if __name__ == "__main__":
         "--timeout",
         type=float,
         default=DEFAULT_TIMEOUT,
-        help=f"Timeout in seconds for model operations.",
+        help="Timeout in seconds for model operations.",
     )
 
     # Parse arguments
