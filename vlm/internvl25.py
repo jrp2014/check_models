@@ -21,13 +21,13 @@ IMAGENET_STD: Tuple[float, float, float] = (0.229, 0.224, 0.225)
 def build_transform(input_size: int) -> T.Compose:
     MEAN, STD = IMAGENET_MEAN, IMAGENET_STD
     return T.Compose([
-        T.Lambda(lambda img: img.convert('RGB') if img.mode != 'RGB' else img),
+        T.Lambda(lambda img: img.convert("RGB") if img.mode != "RGB" else img),
         T.Resize((input_size, input_size), interpolation=InterpolationMode.BICUBIC),
         T.ToTensor(),
         T.Normalize(mean=MEAN, std=STD)
     ])
 
-def find_closest_aspect_ratio(aspect_ratio: float, target_ratios: List[Tuple[int, int]], width: int, height: int, image_size: int) -> Tuple[int, int]:
+def find_closest_aspect_ratio(aspect_ratio: float, target_ratios: list[tuple[int, int]], width: int, height: int, image_size: int) -> Tuple[int, int]:
     best_ratio_diff = float('inf')
     best_ratio = (1, 1)
     area = width * height
@@ -82,7 +82,7 @@ def dynamic_preprocess(image: Image.Image, min_num: int = 1, max_num: int = 12, 
     return processed_images
 
 def load_image(image_file: str, input_size: int = 448, max_num: int = 12) -> torch.Tensor:
-    image: Image.Image = Image.open(image_file).convert('RGB')
+    image: Image.Image = Image.open(image_file).convert("RGB")
     transform: T.Compose = build_transform(input_size=input_size)
     images: List[Image.Image] = dynamic_preprocess(image, image_size=input_size, use_thumbnail=True, max_num=max_num)
     pixel_values: List[torch.Tensor] = [transform(image) for image in images]
@@ -95,7 +95,7 @@ model: AutoModel = AutoModel.from_pretrained(
     torch_dtype=torch.bfloat16,
     low_cpu_mem_usage=True,
     use_flash_attn=False,
-    trust_remote_code=True).eval().to('mps')
+    trust_remote_code=True).eval().to("mps")
 tokenizer: AutoTokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True, use_fast=False)
 
 # set the max number of tiles in `max_num`
