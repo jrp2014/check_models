@@ -16,6 +16,7 @@ import sys
 import time
 import traceback
 import types  # Added for TracebackType
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from functools import lru_cache
@@ -30,8 +31,6 @@ from typing import (
     TextIO,
     TypeVar,
 )
-
-from collections.abc import Callable
 
 from huggingface_hub import HFCacheInfo, scan_cache_dir
 from huggingface_hub import __version__ as hf_version
@@ -108,6 +107,7 @@ class TimeoutManager(contextlib.ContextDecorator):
 
         Args:
             seconds: The timeout duration in seconds.
+
         """
         self.seconds: float = seconds
         # Accommodate signal.SIG_DFL, signal.SIG_IGN (integers)
@@ -186,7 +186,7 @@ class Colors:
     )
 
     @staticmethod
-    def colored(text: str, *colors: str) -> str:
+    def colored(text: PathLike, *colors: str) -> PathLike:
         """Return text wrapped in ANSI color codes if enabled."""
         if not Colors._enabled or not colors:
             return text
@@ -759,14 +759,13 @@ def _extract_gps_coordinates(
                     image_path_name,
                 )
             return gps_str
-        else:
-            logger.warning(
-                "Failed to convert GPS coordinates for %s. Lat: %s, Lon: %s",
-                image_path_name,
-                lat,
-                lon,
-            )
-            return None
+        logger.warning(
+            "Failed to convert GPS coordinates for %s. Lat: %s, Lon: %s",
+            image_path_name,
+            lat,
+            lon,
+        )
+        return None
     except Exception as e:
         logger.warning(
             "Error processing GPS coordinates for %s: %s",
@@ -970,7 +969,7 @@ def get_cached_model_ids() -> list[str]:
     """Return a list of model repo IDs from the Hugging Face cache."""
     if scan_cache_dir is None:
         logger.error(
-            "huggingface_hub library not found. Cannot scan Hugging Face cache."
+            "huggingface_hub library not found. Cannot scan Hugging Face cache.",
         )
         return []
     try:
@@ -1803,12 +1802,12 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
     image_path: Path | None = find_most_recent_file(folder_path)
     if not image_path:
         print_cli_error(
-            f"Could not find a suitable image file in {folder_path}. Exiting."
+            f"Could not find a suitable image file in {folder_path}. Exiting.",
         )
         sys.exit(1)
     resolved_image_path: Path = image_path.resolve()
     print_cli_section(f"Processing file: {resolved_image_path.name}")
-    logger.info("Located at: %s", Colors.colored(resolved_image_path, Colors.BLUE))
+    logger.info("Image: %s", Colors.colored(resolved_image_path, Colors.BLUE))
     try:
         with Image.open(resolved_image_path) as img:
             img.verify()
@@ -1821,7 +1820,7 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
         Exception,
     ) as img_err:
         print_cli_error(
-            f"Cannot open or verify image {resolved_image_path}: {img_err}. Exiting."
+            f"Cannot open or verify image {resolved_image_path}: {img_err}. Exiting.",
         )
         sys.exit(1)
 
@@ -1873,7 +1872,7 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
                 if metadata.get("gps") and metadata["gps"] != "Unknown location"
                 else ""
             ),
-            "Focus on visual content. Avoid repeating the context unless it is visible.",
+            "Focus on visual content. Avoid repeating the context unless it is visible.  Do not speculate.",
         ]
         prompt = " ".join(filter(None, prompt_parts)).strip()
         if logger.isEnabledFor(logging.DEBUG):
@@ -1882,7 +1881,7 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
         "\n%s\n%s\n%s",
         Colors.colored("--- Using Prompt ---", Colors.CYAN),
         prompt,
-        Colors.colored("-" * 40, Colors.BLUE),
+        Colors.colored("-" * 40, Colors.CYAN),
     )
     return prompt
 
@@ -1943,7 +1942,9 @@ def process_models(
             else:
                 # Format error messages
                 logger.error(
-                    "[FAIL] %s (Stage: %s)", model_short_name, result.error_stage
+                    "[FAIL] %s (Stage: %s)",
+                    model_short_name,
+                    result.error_stage,
                 )
                 logger.error(
                     "Model %s failed during '%s'.",
