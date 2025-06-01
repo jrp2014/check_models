@@ -244,7 +244,7 @@ MIN_NAME_COL_WIDTH: Final[int] = len("Model")
 
 
 # --- Utility Functions ---
-def _pad_text(text: str, width: int, right_align: bool = False) -> str:
+def _pad_text(text: str, width: int, *, right_align: bool = False) -> str:
     """Pad text to a specific visual width, accounting for ANSI codes."""
     pad_len = max(0, width - Colors.visual_len(text))
     padding = " " * pad_len
@@ -564,7 +564,8 @@ def _convert_gps_coordinate(
     ref: str | bytes | None,
     coord: float | tuple[float | str, ...] | list[float | str] | object,
 ) -> float | None:
-    """Convert GPS coordinate and reference to decimal degrees, or None.
+    """
+    Convert GPS coordinate and reference to decimal degrees, or None.
 
     Args:
         ref: The GPS reference (N/S/E/W) as string or bytes.
@@ -576,83 +577,69 @@ def _convert_gps_coordinate(
     """
     dms_len = 3
     dm_len = 2
-    error = False
-    degrees: float | None = None
-    minutes: float | None = None
-    seconds: float | None = None
-    error_msg = ""
+    max_degrees = 180
+    max_minutes = 60
+    max_seconds = 60
 
-    if not ref or coord is None:
-        error = True
-        error_msg = "Missing GPS reference or coordinate."
-    else:
-        ref_str = ref.decode(errors="replace") if isinstance(ref, bytes) else str(ref)
-        ref_upper = ref_str.strip().upper()
-        if ref_upper not in ("N", "S", "E", "W"):
-            error = True
-            error_msg = f"Unexpected GPS reference value: {ref_str}"
-        elif isinstance(coord, (tuple, list)):
-            clen = len(coord)
-
-            # Only process if all elements are float/int/str or ratio-like
-            def is_valid_elem(x: object) -> bool:
-                return isinstance(x, (float, int, str)) or (
-                    hasattr(x, "numerator") and hasattr(x, "denominator")
-                )
-
-            if all(is_valid_elem(x) for x in coord):
-                if clen == dms_len:
-                    deg_val, min_val, sec_val = coord[0], coord[1], coord[2]
-                    degrees = to_float(deg_val)
-                    minutes = to_float(min_val)
-                    seconds = to_float(sec_val)
-                elif clen == dm_len:
-                    deg_val, min_val = coord[0], coord[1]
-                    degrees = to_float(deg_val)
-                    minutes = to_float(min_val)
-                    seconds = 0.0
-                elif clen == 1:
-                    deg_val = coord[0]
-                    degrees = to_float(deg_val)
-                    minutes = 0.0
-                    seconds = 0.0
-                else:
-                    error = True
-                    error_msg = f"Unexpected GPS coordinate sequence length: {clen} for {coord!s}"
-            else:
-                error = True
-                error_msg = f"Invalid element types in GPS coordinate: {coord!s}"
-        elif isinstance(coord, (float, int, str)) or (
-            hasattr(coord, "numerator") and hasattr(coord, "denominator")
-        ):
-            degrees = to_float(coord)
-            minutes = 0.0
-            seconds = 0.0
-        else:
-            error = True
-            error_msg = f"Unsupported GPS coordinate type: {type(coord).__name__}"
-
-    if not error and None in (degrees, minutes, seconds):
-        error = True
-        error_msg = f"One or more GPS values are None in coordinate: {coord!s}"
-
-    if not error and not (
-        degrees is not None
-        and minutes is not None
-        and seconds is not None
-        and 0 <= abs(degrees) <= MAX_DEGREES
-        and 0 <= minutes < MAX_MINUTES
-        and 0 <= seconds < MAX_SECONDS
-    ):
-        error = True
-        error_msg = (
-            f"GPS values out of range: Deg={degrees}, Min={minutes}, Sec={seconds}"
+    def is_valid_elem(x: object) -> bool:
+        return isinstance(x, (float, int, str)) or (
+            hasattr(x, "numerator") and hasattr(x, "denominator")
         )
 
-    if error:
-        logger.warning("%s", error_msg)
-        return None
+    def get_ref_upper(ref: str | bytes | None) -> str | None:
+        if ref is None:
+            return None
+        if isinstance(ref, bytes):
+            return ref.decode(errors="replace").strip().upper()
+        return str(ref).strip().upper()
 
+    def get_dms_from_coord(
+        coord: float | tuple[float | str, ...] | list[float | str] | object,
+    ) -> tuple[float | None, float | None, float | None]:
+        if isinstance(coord, (tuple, list)):
+            clen = len(coord)
+            if not all(is_valid_elem(x) for x in coord):
+                return (None, None, None)
+            if clen == dms_len:
+                return (
+                    to_float(coord[0]),
+                    to_float(coord[1]),
+                    to_float(coord[2]),
+                )
+            if clen == dm_len:
+                return (to_float(coord[0]), to_float(coord[1]), 0.0)
+            if clen == 1:
+                return (to_float(coord[0]), 0.0, 0.0)
+            return (None, None, None)
+        if isinstance(coord, (float, int, str)) or (
+            hasattr(coord, "numerator") and hasattr(coord, "denominator")
+        ):
+            return (to_float(coord), 0.0, 0.0)
+        return (None, None, None)
+
+    ref_upper = get_ref_upper(ref)
+    if not ref_upper or coord is None:
+        logger.warning("Missing GPS reference or coordinate.")
+        return None
+    if ref_upper not in ("N", "S", "E", "W"):
+        logger.warning("Unexpected GPS reference value: %s", ref_upper)
+        return None
+    degrees, minutes, seconds = get_dms_from_coord(coord)
+    if None in (degrees, minutes, seconds):
+        logger.warning("One or more GPS values are None in coordinate: %r", coord)
+        return None
+    if not (
+        isinstance(degrees, float)
+        and isinstance(minutes, float)
+        and isinstance(seconds, float)
+        and 0 <= abs(degrees) <= max_degrees
+        and 0 <= minutes < max_minutes
+        and 0 <= seconds < max_seconds
+    ):
+        logger.warning(
+            "GPS values out of range: Deg=%r, Min=%r, Sec=%r", degrees, minutes, seconds,
+        )
+        return None
     decimal = abs(degrees) + (minutes / 60.0) + (seconds / 3600.0)
     if ref_upper in ("S", "W"):
         decimal = -decimal
@@ -889,7 +876,7 @@ def print_model_stats(results: list[ModelResult]) -> None:
             _pad_text(
                 Colors.colored(h, COLORS.HEADER, Colors.BOLD),
                 COL_WIDTH,
-                right_align=True,
+                align="right",
             )
             for h in headers[1:]
         )
@@ -927,7 +914,7 @@ def print_model_stats(results: list[ModelResult]) -> None:
             stats = [Colors.colored("-", COLORS.FAIL_TEXT)] * 4
         row = Colors.colored(
             f"║ {_pad_text(display_name, name_col_width)} │ "
-            + " │ ".join(_pad_text(stat, COL_WIDTH, right_align=True) for stat in stats)
+            + " │ ".join(_pad_text(stat, COL_WIDTH, align="right") for stat in stats)
             + " ║",
             COLORS.BORDER,
         )
@@ -964,7 +951,7 @@ def print_model_stats(results: list[ModelResult]) -> None:
                 _pad_text(
                     Colors.colored(stat, COLORS.SUMMARY, Colors.BOLD),
                     COL_WIDTH,
-                    right_align=True,
+                    align="right",
                 )
                 for stat in summary_stats
             )
@@ -1128,16 +1115,6 @@ def generate_html_report(
     html_footer: str = "<footer>\n<h2>Library Versions</h2>\n<ul>\n"
     # Use sorted items for consistent order in HTML
     for name, ver in sorted(versions.items()):
-        status_style = "color: green;" if ver != "N/A" else "color: orange;"
-        html_footer += f'<li>{html.escape(name)}: <code style="{status_style}">{html.escape(ver)}</code></li>\n'
-    html_footer += "</ul>\n"
-    # Add date to footer
-    html_footer += (
-        f"<p>Report generated on: {datetime.now().strftime('%Y-%m-%d')}</p>\n</footer>"
-    )
-    # -----------------------------
-
-    html_end = f"""
         </tbody>
     </table>
     <!-- End of Table -->
@@ -1148,20 +1125,18 @@ def generate_html_report(
     html_content: str = html_start + html_rows + html_summary_row + html_end
 
     try:
-        # *** Restore TextIO type hint for file handle 'f' ***
-        f: TextIO
-        with Path.open(str(filename), "w", encoding="utf-8") as f:
+        with open(str(filename), "w", encoding="utf-8") as f:
             f.write(html_content)
         logger.info(
             "HTML report saved to: %s",
             Colors.colored(str(filename.resolve()), Colors.GREEN),
         )
-    except OSError:
+    except OSError as e:
         logger.exception(
             "Failed to write HTML report to file %s.",
             str(filename),
         )
-    except Exception:
+    except Exception as e:
         logger.exception(
             "An unexpected error occurred while writing HTML report %s.",
             str(filename),
@@ -1272,18 +1247,18 @@ def generate_markdown_report(
     )
 
     try:
-        with Path.open(str(filename), "w", encoding="utf-8") as f:
+        with open(str(filename), "w", encoding="utf-8") as f:
             f.write("\n".join(md))
         logger.info(
             "Markdown report saved to: %s",
             Colors.colored(str(filename.resolve()), Colors.GREEN),
         )
-    except OSError:
+    except OSError as e:
         logger.exception(
             "Failed to write Markdown report to file %s.",
             str(filename),
         )
-    except Exception:
+    except Exception as e:
         logger.exception(
             "An unexpected error occurred while writing Markdown report %s.",
             str(filename),
@@ -1441,6 +1416,7 @@ def process_image_with_model(
     image_path: PathLike,
     prompt: str,
     max_tokens: int,
+    *,
     temperature: float = DEFAULT_TEMPERATURE,
     timeout: float = DEFAULT_TIMEOUT,
     verbose: bool = False,
@@ -1509,41 +1485,29 @@ def process_image_with_model(
             stats=final_stats,
         )
 
-    except TimeoutError:
-        # Timeout specifically handled
-        logger.exception(
-            "Timeout (%ss) during '%s' for model %s",
-            timeout,
-            error_stage,
-            model_identifier,
-        )
+    except TimeoutError as e:
+        logger.error("Timeout during model processing: %s", e)
         return ModelResult(
             model_name=model_identifier,
             success=False,
             error_stage="timeout",
-            error_message=f"Operation timed out after {timeout} seconds during {error_stage}",
+            error_message=str(e),
         )
-    except Exception as e:
-        # Determine stage more accurately based on where the exception occurred
-        # If model is None here, it likely failed during load within _run_model_generation
-        if model is None and error_stage == "load/generate":
-            error_stage = "model_load"
-
-        logger.exception(
-            "Failed during '%s' for model %s: %s: %s",
-            error_stage,
-            model_identifier,
-            type(e).__name__,
-            e,
-        )
-        traceback.print_exc()
-
+    except (OSError, ValueError) as e:
+        logger.error("Model processing error: %s", e)
         return ModelResult(
             model_name=model_identifier,
             success=False,
-            error_stage=error_stage,
+            error_stage="processing",
             error_message=str(e),
-            # captured_output_on_fail might be added here if needed, but requires more complex handling
+        )
+    except Exception as e:
+        logger.exception("Unexpected error in model processing: %s", e)
+        return ModelResult(
+            model_name=model_identifier,
+            success=False,
+            error_stage="unexpected",
+            error_message=str(e),
         )
     finally:
         # Ensure cleanup happens regardless of success/failure
