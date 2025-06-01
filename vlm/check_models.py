@@ -823,8 +823,7 @@ def print_model_stats(results: list[ModelResult]) -> None:
             x.stats.time if x.success else float("inf"),
         ),
     )
-    # Use module-level constants for widths/colors
-    COLORS: Final[types.SimpleNamespace] = types.SimpleNamespace(
+    colors: Final[types.SimpleNamespace] = types.SimpleNamespace(
         HEADER=Colors.CYAN,
         BORDER=Colors.BLUE,
         SUMMARY=Colors.GREEN,
@@ -845,10 +844,10 @@ def print_model_stats(results: list[ModelResult]) -> None:
             fail_suffix = f" [FAIL: {result.error_stage or '?'}]"
             display_name = Colors.colored(
                 display_name,
-                COLORS.MODEL,
-            ) + Colors.colored(fail_suffix, Colors.BOLD, COLORS.FAIL)
+                colors.MODEL,
+            ) + Colors.colored(fail_suffix, Colors.BOLD, colors.FAIL)
         else:
-            display_name = Colors.colored(display_name, COLORS.MODEL)
+            display_name = Colors.colored(display_name, colors.MODEL)
         return display_name, Colors.visual_len(display_name)
 
     name_displays = [format_model_name(r) for r in results]
@@ -865,23 +864,23 @@ def print_model_stats(results: list[ModelResult]) -> None:
             if char == "═"
             else f"╚{'═' * (name_col_width + 2)}╧{'═' * (COL_WIDTH + 2)}╧"
             f"{'═' * (COL_WIDTH + 2)}╧{'═' * (COL_WIDTH + 2)}╧{'═' * (COL_WIDTH + 2)}╝",
-            COLORS.BORDER,
+            colors.BORDER,
         )
 
     logger.info("\n%s", h_line("═"))
     headers = ["Model", "Active Δ", "Cache Δ", "Peak Mem", "Time"]
     header_row = Colors.colored(
-        f"║ {_pad_text(Colors.colored(headers[0], COLORS.HEADER, Colors.BOLD), name_col_width)} │ "
+        f"║ {_pad_text(Colors.colored(headers[0], colors.HEADER, Colors.BOLD), name_col_width)} │ "
         + " │ ".join(
             _pad_text(
-                Colors.colored(h, COLORS.HEADER, Colors.BOLD),
+                Colors.colored(h, colors.HEADER, Colors.BOLD),
                 COL_WIDTH,
-                align="right",
+                right_align=True,
             )
             for h in headers[1:]
         )
         + " ║",
-        COLORS.BORDER,
+        colors.BORDER,
     )
     logger.info("%s", header_row)
     logger.info(
@@ -889,34 +888,34 @@ def print_model_stats(results: list[ModelResult]) -> None:
         Colors.colored(
             f"╠{'═' * (name_col_width + 2)}╪{'═' * (COL_WIDTH + 2)}╪"
             f"{'═' * (COL_WIDTH + 2)}╪{'═' * (COL_WIDTH + 2)}╪{'═' * (COL_WIDTH + 2)}╣",
-            COLORS.BORDER,
+            colors.BORDER,
         ),
     )
-    successful_results = []
+    successful_results: list[ModelResult] = []
     for result, (display_name, _) in zip(results, name_displays):
         if result.success:
             successful_results.append(result)
             stats = [
                 Colors.colored(
                     "%s MB",
-                    COLORS.VARIABLE,
+                    colors.VARIABLE,
                 )
                 % f"{result.stats.active:,.0f}",
                 Colors.colored(
                     "%s MB",
-                    COLORS.VARIABLE,
+                    colors.VARIABLE,
                 )
                 % f"{result.stats.cached:,.0f}",
-                Colors.colored("%s MB", COLORS.VARIABLE) % f"{result.stats.peak:,.0f}",
-                Colors.colored("%s s", COLORS.VARIABLE) % f"{result.stats.time:.2f}",
+                Colors.colored("%s MB", colors.VARIABLE) % f"{result.stats.peak:,.0f}",
+                Colors.colored("%s s", colors.VARIABLE) % f"{result.stats.time:.2f}",
             ]
         else:
-            stats = [Colors.colored("-", COLORS.FAIL_TEXT)] * 4
+            stats = [Colors.colored("-", colors.FAIL_TEXT)] * 4
         row = Colors.colored(
             f"║ {_pad_text(display_name, name_col_width)} │ "
-            + " │ ".join(_pad_text(stat, COL_WIDTH, align="right") for stat in stats)
+            + " │ ".join(_pad_text(stat, COL_WIDTH, right_align=True) for stat in stats)
             + " ║",
-            COLORS.BORDER,
+            colors.BORDER,
         )
         logger.info("%s", row)
     if successful_results:
@@ -925,7 +924,7 @@ def print_model_stats(results: list[ModelResult]) -> None:
             Colors.colored(
                 f"╠{'═' * (name_col_width + 2)}╪{'═' * (COL_WIDTH + 2)}╪"
                 f"{'═' * (COL_WIDTH + 2)}╪{'═' * (COL_WIDTH + 2)}╪{'═' * (COL_WIDTH + 2)}╣",
-                COLORS.BORDER,
+                colors.BORDER,
             ),
         )
         avg_stats = [
@@ -942,21 +941,21 @@ def print_model_stats(results: list[ModelResult]) -> None:
         ]
         summary_title = Colors.colored(
             f"AVG/PEAK ({len(successful_results)} Success)",
-            COLORS.SUMMARY,
+            colors.SUMMARY,
             Colors.BOLD,
         )
         summary_row = Colors.colored(
             f"║ {_pad_text(summary_title, name_col_width)} │ "
             + " │ ".join(
                 _pad_text(
-                    Colors.colored(stat, COLORS.SUMMARY, Colors.BOLD),
+                    Colors.colored(stat, colors.SUMMARY, Colors.BOLD),
                     COL_WIDTH,
-                    align="right",
+                    right_align=True,
                 )
                 for stat in summary_stats
             )
             + " ║",
-            COLORS.BORDER,
+            colors.BORDER,
         )
         logger.info("%s", summary_row)
     logger.info("%s", h_line("╝"))
@@ -1115,6 +1114,12 @@ def generate_html_report(
     html_footer: str = "<footer>\n<h2>Library Versions</h2>\n<ul>\n"
     # Use sorted items for consistent order in HTML
     for name, ver in sorted(versions.items()):
+        html_footer += f"<li><code>{html.escape(name)}</code>: <code>{html.escape(ver)}</code></li>\n"
+    html_footer += "</ul>\n<p>Report generated on: " + datetime.now().strftime(
+        "%Y-%m-%d %H:%M:%S",
+    ) + "</p>\n</footer>"
+
+    html_end = """
         </tbody>
     </table>
     <!-- End of Table -->
@@ -1125,7 +1130,7 @@ def generate_html_report(
     html_content: str = html_start + html_rows + html_summary_row + html_end
 
     try:
-        with open(str(filename), "w", encoding="utf-8") as f:
+        with filename.open("w", encoding="utf-8") as f:
             f.write(html_content)
         logger.info(
             "HTML report saved to: %s",
@@ -1247,7 +1252,7 @@ def generate_markdown_report(
     )
 
     try:
-        with open(str(filename), "w", encoding="utf-8") as f:
+        with filename.open("w", encoding="utf-8") as f:
             f.write("\n".join(md))
         logger.info(
             "Markdown report saved to: %s",
@@ -1348,6 +1353,7 @@ def _run_model_generation(
     image_path: PathLike,
     prompt: str,
     max_tokens: int,
+    *,
     verbose: bool,
     trust_remote_code: bool,
     temperature: float,
@@ -1622,7 +1628,7 @@ def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
     if args.verbose:
         exif_data: ExifDict | None = get_exif_data(image_path)
         if exif_data:
-            pretty_print_exif(exif_data, verbose=True)
+            pretty_print_exif(exif_data, show_all=True)
         else:
             logger.warning("\nNo detailed EXIF data could be extracted.")
     return metadata
