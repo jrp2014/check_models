@@ -270,7 +270,8 @@ def print_version_info(versions: dict[str, str]) -> None:
         name_padded = name.ljust(max_len)
         logger.info("%s: %s", name_padded, Colors.colored(ver, status_color))
     logger.info(
-        "Generated: %s", datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
+        "Generated: %s",
+        datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
     )
 
 
@@ -555,9 +556,7 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
                 {TAGS.get(tag, tag): exif.get(tag) for tag in exif} if exif else {}
             )
             # Filter to ensure all keys are str
-            exif_data: dict[str, Any] = {
-                str(k): v for k, v in exif_data_raw.items()
-            }
+            exif_data: dict[str, Any] = {str(k): v for k, v in exif_data_raw.items()}
     except (FileNotFoundError, UnidentifiedImageError) as e:
         logger.warning("Could not extract EXIF from %s: %s", img_path_str, e)
         exif_data = {}
@@ -717,9 +716,11 @@ def pretty_print_exif(exif: ExifDict, *, show_all: bool = False) -> None:
 
 
 def print_model_stats(results: list[ModelResult]) -> None:
-    """Print a table summarizing model performance statistics."""
+    """Print a table summarizing model performance statistics with visually distinct output."""
     if not results:
-        logger.info("No model results to display.")
+        logger.info(
+            Colors.colored("No model results to display.", Colors.BOLD, Colors.YELLOW)
+        )
         return
 
     results.sort(
@@ -738,6 +739,8 @@ def print_model_stats(results: list[ModelResult]) -> None:
         MODEL=Colors.MAGENTA,
         VARIABLE=Colors.CYAN,
         DIAG=Colors.YELLOW,
+        OUTPUT=Colors.BOLD + Colors.GREEN,
+        ERROR=Colors.BOLD + Colors.RED,
     )
 
     def format_model_name(result: ModelResult) -> tuple[str, int]:
@@ -750,9 +753,9 @@ def print_model_stats(results: list[ModelResult]) -> None:
             display_name = Colors.colored(
                 display_name,
                 colors.MODEL,
-            ) + Colors.colored(fail_suffix, Colors.BOLD, colors.FAIL)
+            ) + Colors.colored(fail_suffix, colors.FAIL)
         else:
-            display_name = Colors.colored(display_name, colors.MODEL)
+            display_name = Colors.colored(display_name, colors.MODEL, Colors.BOLD)
         return display_name, Colors.visual_len(display_name)
 
     name_displays = [format_model_name(r) for r in results]
@@ -814,13 +817,15 @@ def print_model_stats(results: list[ModelResult]) -> None:
                 Colors.colored("%s MB", colors.VARIABLE) % f"{result.stats.peak:,.0f}",
                 Colors.colored("%s s", colors.VARIABLE) % f"{result.stats.time:.2f}",
             ]
+            row_color = colors.OUTPUT
         else:
-            stats = [Colors.colored("-", colors.FAIL_TEXT)] * 4
+            stats = [Colors.colored("-", colors.FAIL_TEXT, Colors.BOLD)] * 4
+            row_color = colors.FAIL
         row = Colors.colored(
             f"║ {_pad_text(display_name, name_col_width)} │ "
             + " │ ".join(_pad_text(stat, COL_WIDTH, right_align=True) for stat in stats)
             + " ║",
-            colors.BORDER,
+            row_color,
         )
         logger.info("%s", row)
     if successful_results:
@@ -860,7 +865,7 @@ def print_model_stats(results: list[ModelResult]) -> None:
                 for stat in summary_stats
             )
             + " ║",
-            colors.BORDER,
+            colors.OUTPUT,
         )
         logger.info("%s", summary_row)
     logger.info("%s", h_line("╝"))
@@ -1306,7 +1311,7 @@ def _run_model_generation(
         image=str(image_path),
         verbose=verbose,
     )
-    mx.eval(model.parameters())  # type: ignore
+    mx.eval(model.parameters())  # type: ignore[attr-defined]
     return (
         output if output else "[No model output]",
         model,
@@ -1359,8 +1364,8 @@ def process_image_with_model(params: ProcessImageParams) -> ModelResult:
         validate_temperature(temp=params.temperature)
         validate_image_accessible(image_path=params.image_path)
         logger.debug("System: %s, GPU: %s", arch, gpu_info)
-        initial_mem = mx.get_active_memory() / MB_CONVERSION  # type: ignore
-        initial_cache = mx.get_cache_memory() / MB_CONVERSION  # type: ignore
+        initial_mem = mx.get_active_memory() / MB_CONVERSION  # type: ignore[attr-defined]
+        initial_cache = mx.get_cache_memory() / MB_CONVERSION  # type: ignore[attr-defined]
         start_time = time.perf_counter()
         with TimeoutManager(params.timeout):
             gen_params: ModelGenParams = ModelGenParams(
@@ -1378,9 +1383,9 @@ def process_image_with_model(params: ProcessImageParams) -> ModelResult:
                 verbose=params.verbose,
             )
         end_time: float = time.perf_counter()
-        final_active_mem: float = mx.get_active_memory() / MB_CONVERSION  # type: ignore
-        final_cache_mem: float = mx.get_cache_memory() / MB_CONVERSION  # type: ignore
-        peak_mem: float = mx.get_peak_memory() / MB_CONVERSION  # type: ignore
+        final_active_mem: float = mx.get_active_memory() / MB_CONVERSION  # type: ignore[attr-defined]
+        final_cache_mem: float = mx.get_cache_memory() / MB_CONVERSION  # type: ignore[attr-defined]
+        peak_mem: float = mx.get_peak_memory() / MB_CONVERSION  # type: ignore[attr-defined]
         final_stats: MemoryStats = MemoryStats(
             active=final_active_mem - initial_mem,
             cached=final_cache_mem - initial_cache,
@@ -1414,8 +1419,8 @@ def process_image_with_model(params: ProcessImageParams) -> ModelResult:
             del model
         if tokenizer is not None:
             del tokenizer
-        mx.clear_cache()  # type: ignore
-        mx.reset_peak_memory()  # type: ignore
+        mx.clear_cache()  # type: ignore[attr-defined]
+        mx.reset_peak_memory()  # type: ignore[attr-defined]
         logger.debug("Cleaned up resources for model %s", params.model_identifier)
 
 
@@ -1424,7 +1429,7 @@ def process_image_with_model(params: ProcessImageParams) -> ModelResult:
 
 def print_cli_header(title: str) -> None:
     """Print a formatted CLI header with the given title."""
-    logger.info("\n%s", "=" * 80)
+    logger.info("%s", "=" * 80)
     logger.info("%s", title.center(80))
     logger.info("%s\n", "=" * 80)
 
@@ -1562,7 +1567,7 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
         prompt = " ".join(filter(None, prompt_parts)).strip()
         logger.debug("Using generated prompt based on metadata.")
     logger.info(
-        "\n%s\n%s\n%s",
+        "%s\n%s\n%s",
         "--- Using Prompt ---",
         prompt,
         "-" * 40,
@@ -1629,16 +1634,39 @@ def process_models(
             results.append(result)
             model_short_name: str = model_id.split("/")[-1]
             if result.success:
-                logger.info("[SUCCESS] %s", model_short_name)
+                logger.info(
+                    Colors.colored(
+                        f"[SUCCESS] {model_short_name}",
+                        Colors.BOLD,
+                        Colors.GREEN,
+                    ),
+                )
                 if result.output:
-                    logger.info("Output:\n%s", result.output)
+                    logger.info(
+                        Colors.colored("Output:\n%s", Colors.BOLD, Colors.GREEN),
+                        result.output,
+                    )
                 if args.verbose:
-                    logger.info("Time taken: %.2f s", result.stats.time)
+                    logger.info(
+                        Colors.colored(
+                            "Time taken: %.2f s",
+                            Colors.BOLD,
+                            Colors.CYAN,
+                        ),
+                        result.stats.time,
+                    )
             else:
                 logger.error(
-                    "[FAIL] %s (Stage: %s)", model_short_name, result.error_stage,
+                    Colors.colored(
+                        f"[FAIL] {model_short_name} (Stage: {result.error_stage})",
+                        Colors.BOLD,
+                        Colors.RED,
+                    ),
                 )
-                logger.error("Reason: %s", result.error_message)
+                logger.error(
+                    Colors.colored("Reason: %s", Colors.BOLD, Colors.RED),
+                    result.error_message,
+                )
     return results
 
 
