@@ -9,35 +9,35 @@ import contextlib
 import html
 import logging
 import platform
-import re  # For ANSI code stripping
+import re
 import signal
 import subprocess
 import sys
 import time
-import traceback
-import types  # Added for TracebackType
+import types  # For TracebackType
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from functools import lru_cache
 from pathlib import Path
 from re import Pattern
 from typing import (
-    TYPE_CHECKING,
     Any,
     ClassVar,
     Final,
     NamedTuple,
     NoReturn,
-    TextIO,
     TypeVar,
 )
 
-if TYPE_CHECKING:
-    from collections.abc import Callable
-
+# Third-party imports
 from huggingface_hub import HFCacheInfo, scan_cache_dir
 from huggingface_hub import __version__ as hf_version
 from huggingface_hub.errors import HFValidationError
+from typing_extensions import Self
 
 # Third-party imports
 try:
@@ -54,7 +54,9 @@ try:
     pillow_version = Image.__version__ if hasattr(Image, "__version__") else "N/A"
 except ImportError:
     logger = logging.getLogger("mlx-vlm-check")
-    logger.error("Error: Pillow not found. Please install it (`pip install Pillow`).")
+    logger.critical(
+        "Error: Pillow not found. Please install it (`pip install Pillow`).",
+    )
     pillow_version = "N/A"
     sys.exit(1)
 
@@ -65,7 +67,9 @@ try:
     from mlx_vlm.version import __version__ as vlm_version
 except ImportError:
     logger = logging.getLogger("mlx-vlm-check")
-    logger.error("Error: mlx-vlm not found. Please install it (`pip install mlx-vlm`).")
+    logger.critical(
+        "Error: mlx-vlm not found. Please install it (`pip install mlx-vlm`).",
+    )
     sys.exit(1)
 
 # Optional imports for version reporting
@@ -81,15 +85,8 @@ try:
     import transformers
 
     transformers_version = transformers.__version__
-    # Import specific tokenizer types
-    from transformers.tokenization_utils import PreTrainedTokenizer
-    from transformers.tokenization_utils_fast import PreTrainedTokenizerFast
 except ImportError:
     transformers_version = "N/A"
-    # Define dummy types if transformers is not installed to avoid NameErrors later
-    # Although the script exits earlier if transformers is missing for mlx_vlm
-    PreTrainedTokenizer = type("PreTrainedTokenizer", (), {})
-    PreTrainedTokenizerFast = type("PreTrainedTokenizerFast", (), {})
 
 
 # Custom timeout context manager (for Python < 3.11)
@@ -116,7 +113,7 @@ class TimeoutManager(contextlib.ContextDecorator):
         msg = f"Operation timed out after {self.seconds} seconds"
         raise TimeoutError(msg)
 
-    def __enter__(self) -> TimeoutManager:
+    def __enter__(self) -> Self:
         """Enter the timeout context manager."""
         # Check if SIGALRM is available (won't be on Windows)
         if hasattr(signal, "SIGALRM"):
@@ -272,7 +269,9 @@ def print_version_info(versions: dict[str, str]) -> None:
         status_color = Colors.GREEN if ver != "N/A" else Colors.YELLOW
         name_padded = name.ljust(max_len)
         logger.info("%s: %s", name_padded, Colors.colored(ver, status_color))
-    logger.info("Generated: %s", datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    logger.info(
+        "Generated: %s", datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
+    )
 
 
 # --- Status Tag Helper ---
@@ -422,15 +421,15 @@ def print_image_dimensions(image_path: Path | str) -> None:
             mpx: float = (width * height) / 1_000_000
             logger.info(
                 "Image dimensions: %s (%s MPixels)",
-                Colors.colored(f"{width}x{height}", Colors.CYAN),
-                Colors.colored(f"{mpx:.1f}", Colors.CYAN),
+                f"{width}x{height}",
+                f"{mpx:.1f}",
             )
     except (FileNotFoundError, UnidentifiedImageError):
         logger.exception(
             "Error with image file %s",
             img_path_str,
         )
-    except Exception:
+    except OSError:
         logger.exception(
             "Unexpected error reading image dimensions for %s",
             img_path_str,
@@ -449,7 +448,7 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
                 logger.debug("No EXIF data found in %s", img_path_str)
                 return None
             exif_decoded: ExifDict = {}
-            logger.debug("Raw EXIF data for %s: %s", img_path_str, exif_raw)
+            # logger.debug("Raw EXIF data for %s: %s", img_path_str, exif_raw)
             # First pass: Process IFD0 (main image directory) tags
             for tag_id, value in exif_raw.items():
                 # Skip SubIFD pointers, we'll handle them separately
@@ -477,173 +476,72 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
                         img_path_str,
                         exif_decoded,
                     )
-            except Exception:
+            except (KeyError, AttributeError, TypeError):
                 logger.exception("Could not extract Exif SubIFD")
             # Third pass: Process GPS IFD (if available)
             try:
                 gps_ifd: Any = exif_raw.get_ifd(ExifTags.IFD.GPSInfo)
                 if isinstance(gps_ifd, dict) and gps_ifd:
-                    gps_decoded: dict[str, Any] = {
-                        GPSTAGS.get(gps_tag_id, str(gps_tag_id)): gps_value
-                        for gps_tag_id, gps_value in gps_ifd.items()
-                    }
+                    gps_decoded: dict[str, Any] = {}
+                    for gps_tag_id, gps_value in gps_ifd.items():
+                        try:
+                            gps_key = GPSTAGS.get(int(gps_tag_id), str(gps_tag_id))
+                        except Exception:
+                            gps_key = str(gps_tag_id)
+                        gps_decoded[str(gps_key)] = gps_value
                     exif_decoded["GPSInfo"] = gps_decoded
                     logger.debug(
                         "GPS IFD merged for %s: %s",
                         img_path_str,
                         exif_decoded,
                     )
-            except Exception as e:
-                logger.warning("Could not extract GPS IFD: %s", e)
+            except (KeyError, AttributeError, TypeError) as gps_err:
+                logger.warning("Could not extract GPS IFD: %s", gps_err)
             return exif_decoded
     except (FileNotFoundError, UnidentifiedImageError):
         logger.exception("Error reading image file: %s", img_path_str)
-    except Exception:
+    except (OSError, ValueError, TypeError):
         logger.exception("Unexpected error reading EXIF from: %s", img_path_str)
     return None
 
 
-def _format_exif_date(date_str_input: str | bytes | float | None) -> str | None:
-    """Return the EXIF date value as a string, or None if not available."""
-    if date_str_input is None:
-        return None
-    if isinstance(date_str_input, str):
-        return date_str_input.strip()
+def to_float(val: float | str) -> float | None:
+    """Convert a value to float if possible, else return None."""
     try:
-        # Attempt to convert non-string types to string
-        return str(date_str_input).strip()
-    except Exception:
-        logger.debug(
-            "Could not convert potential date value '%s' to string.",
-            date_str_input,
-        )
+        temp = float(val)
+    except (TypeError, ValueError):
         return None
+    else:
+        return temp
 
 
-def to_float(val: float | str | object) -> float | None:
-    """Convert a value to float if possible, handling ratio-like objects and strings."""
-    if isinstance(val, (float, int)):
-        return float(val)
-    if isinstance(val, str):
-        try:
-            return float(val)
-        except ValueError:
-            logger.warning(
-                "Could not convert GPS value to float: %r (type: %s)",
-                val,
-                type(val).__name__,
-            )
-            return None
-    # Handle ratio-like objects (e.g., PIL's IFDRational)
-    if hasattr(val, "numerator") and hasattr(val, "denominator"):
-        try:
-            num = float(getattr(val, "numerator", 0))
-            den = float(getattr(val, "denominator", 1))
-            if den == 0:
-                logger.warning(
-                    "Invalid Ratio in GPS (denominator is zero): %s",
-                    val,
-                )
-                return None
-            return num / den
-        except (ValueError, TypeError, AttributeError, ZeroDivisionError):
-            logger.warning(
-                "Malformed Ratio in GPS: %s",
-                val,
-            )
-            return None
-    logger.warning(
-        "Could not convert GPS value to float: %r (type: %s)",
-        val,
-        type(val).__name__,
-    )
-    return None
+MAX_GPS_COORD_LEN = 3
+MED_GPS_COORD_LEN = 2
+MIN_GPS_COORD_LEN = 1
 
 
+# Reduce return count and use named constants
 def _convert_gps_coordinate(
-    ref: str | bytes | None,
-    coord: float | tuple[float | str, ...] | list[float | str] | object,
-) -> float | None:
-    """
-    Convert GPS coordinate and reference to decimal degrees, or None.
-
-    Args:
-        ref: The GPS reference (N/S/E/W) as string or bytes.
-        coord: The coordinate value(s) as float, tuple, or list.
-
-    Returns:
-        Decimal degrees as float, or None if invalid.
-
-    """
-    dms_len = 3
-    dm_len = 2
-    max_degrees = 180
-    max_minutes = 60
-    max_seconds = 60
-
-    def is_valid_elem(x: object) -> bool:
-        return isinstance(x, (float, int, str)) or (
-            hasattr(x, "numerator") and hasattr(x, "denominator")
-        )
-
-    def get_ref_upper(ref: str | bytes | None) -> str | None:
-        if ref is None:
-            return None
-        if isinstance(ref, bytes):
-            return ref.decode(errors="replace").strip().upper()
-        return str(ref).strip().upper()
-
-    def get_dms_from_coord(
-        coord: float | tuple[float | str, ...] | list[float | str] | object,
-    ) -> tuple[float | None, float | None, float | None]:
-        if isinstance(coord, (tuple, list)):
-            clen = len(coord)
-            if not all(is_valid_elem(x) for x in coord):
-                return (None, None, None)
-            if clen == dms_len:
-                return (
-                    to_float(coord[0]),
-                    to_float(coord[1]),
-                    to_float(coord[2]),
-                )
-            if clen == dm_len:
-                return (to_float(coord[0]), to_float(coord[1]), 0.0)
-            if clen == 1:
-                return (to_float(coord[0]), 0.0, 0.0)
-            return (None, None, None)
-        if isinstance(coord, (float, int, str)) or (
-            hasattr(coord, "numerator") and hasattr(coord, "denominator")
-        ):
-            return (to_float(coord), 0.0, 0.0)
-        return (None, None, None)
-
-    ref_upper = get_ref_upper(ref)
-    if not ref_upper or coord is None:
-        logger.warning("Missing GPS reference or coordinate.")
-        return None
-    if ref_upper not in ("N", "S", "E", "W"):
-        logger.warning("Unexpected GPS reference value: %s", ref_upper)
-        return None
-    degrees, minutes, seconds = get_dms_from_coord(coord)
-    if None in (degrees, minutes, seconds):
-        logger.warning("One or more GPS values are None in coordinate: %r", coord)
-        return None
-    if not (
-        isinstance(degrees, float)
-        and isinstance(minutes, float)
-        and isinstance(seconds, float)
-        and 0 <= abs(degrees) <= max_degrees
-        and 0 <= minutes < max_minutes
-        and 0 <= seconds < max_seconds
-    ):
-        logger.warning(
-            "GPS values out of range: Deg=%r, Min=%r, Sec=%r", degrees, minutes, seconds,
-        )
-        return None
-    decimal = abs(degrees) + (minutes / 60.0) + (seconds / 3600.0)
-    if ref_upper in ("S", "W"):
-        decimal = -decimal
-    return decimal
+    coord: tuple[float | str, ...] | list[float | str],
+) -> tuple[float, float, float] | None:
+    """Convert GPS EXIF coordinate to (degrees, minutes, seconds) tuple."""
+    clen: int = len(coord)
+    if clen == MAX_GPS_COORD_LEN:
+        deg = to_float(val=coord[0])
+        min_ = to_float(val=coord[1])
+        sec = to_float(val=coord[2])
+        if deg is not None and min_ is not None and sec is not None:
+            return (deg, min_, sec)
+    elif clen == MED_GPS_COORD_LEN:
+        deg = to_float(val=coord[0])
+        min_ = to_float(val=coord[1])
+        if deg is not None and min_ is not None:
+            return (deg, min_, 0.0)
+    elif clen == MIN_GPS_COORD_LEN:
+        deg = to_float(val=coord[0])
+        if deg is not None:
+            return (deg, 0.0, 0.0)
+    return None
 
 
 def extract_image_metadata(image_path: Path | str) -> MetadataDict:
@@ -653,9 +551,13 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
     try:
         with Image.open(img_path_str) as img:
             exif = img.getexif()
-            exif_data = (
+            exif_data_raw = (
                 {TAGS.get(tag, tag): exif.get(tag) for tag in exif} if exif else {}
             )
+            # Filter to ensure all keys are str
+            exif_data: dict[str, Any] = {
+                str(k): v for k, v in exif_data_raw.items()
+            }
     except (FileNotFoundError, UnidentifiedImageError) as e:
         logger.warning("Could not extract EXIF from %s: %s", img_path_str, e)
         exif_data = {}
@@ -669,7 +571,7 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
         try:
             mtime = Path(img_path_str).stat().st_mtime
             date = datetime.fromtimestamp(mtime, tz=timezone.utc).strftime(
-                "%Y-%m-%d %H:%M:%S"
+                "%Y-%m-%d %H:%M:%S",
             )
         except OSError:
             date = "Unknown"
@@ -681,8 +583,8 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
         lat_ref = gps_info.get("GPSLatitudeRef")
         lon = gps_info.get("GPSLongitude")
         lon_ref = gps_info.get("GPSLongitudeRef")
-        latitude = _convert_gps_coordinate(lat_ref, lat) if lat and lat_ref else None
-        longitude = _convert_gps_coordinate(lon_ref, lon) if lon and lon_ref else None
+        latitude = _convert_gps_coordinate(lat) if lat and lat_ref else None
+        longitude = _convert_gps_coordinate(lon) if lon and lon_ref else None
         if latitude is not None and longitude is not None:
             metadata["gps"] = f"{latitude:.6f}, {longitude:.6f}"
         else:
@@ -690,7 +592,7 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
     else:
         metadata["gps"] = "N/A"
     # Add all EXIF tags (flattened)
-    metadata["exif"] = exif_data
+    metadata["exif"] = str(exif_data)
     return metadata
 
 
@@ -712,20 +614,23 @@ def exif_value_to_str(tag_str: str, value: object) -> str:
         return f"<bytearray len={len(value)}>"
     try:
         value_str = str(value)
-        if len(value_str) > MAX_STR_LEN:
-            value_str = value_str[:STR_TRUNCATE_LEN] + "..."
-        return value_str
-    except Exception as str_err:
+    except (TypeError, ValueError) as str_err:
         logger.debug(
             "Could not convert EXIF value for tag '%s' to string: %s",
             tag_str,
             str_err,
         )
         return f"<unrepresentable type: {type(value).__name__}>"
+    else:
+        if len(value_str) > MAX_STR_LEN:
+            value_str = value_str[:STR_TRUNCATE_LEN] + "..."
+        return value_str
 
 
 def filter_and_format_tags(
-    exif: ExifDict, *, show_all: bool = False
+    exif: ExifDict,
+    *,
+    show_all: bool = False,
 ) -> list[tuple[str, str, bool]]:
     """Filter and format EXIF tags for pretty printing."""
     tags = []
@@ -773,7 +678,7 @@ def pretty_print_exif(exif: ExifDict, *, show_all: bool = False) -> None:
         Colors.colored(
             "╔{}╤{}╗".format("═" * (max_tag_len + 2), "═" * (max_val_len + 2)),
             border_color,
-        )
+        ),
     )
     logger.info(
         "%s %s %s %s %s",
@@ -787,7 +692,7 @@ def pretty_print_exif(exif: ExifDict, *, show_all: bool = False) -> None:
         Colors.colored(
             "╠{}╪{}╣".format("═" * (max_tag_len + 2), "═" * (max_val_len + 2)),
             border_color,
-        )
+        ),
     )
     for tag_name, value_display, is_important_tag in tags_to_print:
         tag_display = (
@@ -807,7 +712,7 @@ def pretty_print_exif(exif: ExifDict, *, show_all: bool = False) -> None:
         Colors.colored(
             "╚{}╧{}╝".format("═" * (max_tag_len + 2), "═" * (max_val_len + 2)),
             border_color,
-        )
+        ),
     )
 
 
@@ -1115,9 +1020,13 @@ def generate_html_report(
     # Use sorted items for consistent order in HTML
     for name, ver in sorted(versions.items()):
         html_footer += f"<li><code>{html.escape(name)}</code>: <code>{html.escape(ver)}</code></li>\n"
-    html_footer += "</ul>\n<p>Report generated on: " + datetime.now().strftime(
-        "%Y-%m-%d %H:%M:%S",
-    ) + "</p>\n</footer>"
+    html_footer += (
+        "</ul>\n<p>Report generated on: "
+        + datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S",
+        )
+        + "</p>\n</footer>"
+    )
 
     html_end = """
         </tbody>
@@ -1136,14 +1045,14 @@ def generate_html_report(
             "HTML report saved to: %s",
             Colors.colored(str(filename.resolve()), Colors.GREEN),
         )
-    except OSError as e:
+    except OSError:
         logger.exception(
             "Failed to write HTML report to file %s.",
             str(filename),
         )
-    except Exception as e:
+    except Exception:
         logger.exception(
-            "An unexpected error occurred while writing HTML report %s.",
+            "An unexpected error occurred while writing HTML report %s",
             str(filename),
         )
 
@@ -1258,14 +1167,14 @@ def generate_markdown_report(
             "Markdown report saved to: %s",
             Colors.colored(str(filename.resolve()), Colors.GREEN),
         )
-    except OSError as e:
+    except OSError:
         logger.exception(
             "Failed to write Markdown report to file %s.",
             str(filename),
         )
-    except Exception as e:
+    except Exception:
         logger.exception(
-            "An unexpected error occurred while writing Markdown report %s.",
+            "An unexpected error occurred while writing Markdown report %s",
             str(filename),
         )
 
@@ -1306,225 +1215,208 @@ def validate_inputs(
     """Validate input paths and parameters."""
     img_path: Path = Path(str(image_path))
     if not img_path.exists():
-        msg = f"Image not found: {img_path}"
+        msg: str = f"Image not found: {img_path}"
         raise FileNotFoundError(msg)
     if not img_path.is_file():
-        msg = f"Not a file: {img_path}"
+        msg: str = f"Not a file: {img_path}"
         raise ValueError(msg)
     if img_path.suffix.lower() not in {".jpg", ".jpeg", ".png", ".webp"}:
-        msg = f"Unsupported image format: {img_path.suffix}"
+        msg: str = f"Unsupported image format: {img_path.suffix}"
         raise ValueError(msg)
-
-    validate_temperature(temperature)
+    validate_temperature(temp=temperature)
 
 
 def validate_temperature(temp: float) -> None:
     """Validate temperature parameter is within acceptable range."""
     if not isinstance(temp, (int, float)):
-        msg = f"Temperature must be a number, got {type(temp)}"
+        msg: str = f"Temperature must be a number, got {type(temp)}"
         raise TypeError(msg)
     if not 0.0 <= temp <= 1.0:
-        msg = f"Temperature must be between 0 and 1, got {temp}"
+        msg: str = f"Temperature must be between 0 and 1, got {temp}"
         raise ValueError(msg)
 
 
 def validate_image_accessible(image_path: PathLike) -> None:
     """Validate image file is accessible and supported."""
-    img_path_str = str(image_path)
+    img_path_str: str = str(image_path)
     try:
         with (
-            TimeoutManager(5),
+            TimeoutManager(seconds=5),
             Image.open(img_path_str) as img,
-        ):  # 5 second timeout for read test
+        ):
             img.verify()
     except TimeoutError:
-        msg = f"Timeout while reading image: {img_path_str}"
+        msg: str = f"Timeout while reading image: {img_path_str}"
         raise OSError(msg)
     except UnidentifiedImageError:
-        msg = f"File is not a recognized image format: {img_path_str}"
+        msg: str = f"File is not a recognized image format: {img_path_str}"
         raise ValueError(msg)
-    except Exception as e:
-        msg = f"Error accessing image {img_path_str}: {e}"
+    except (OSError, ValueError) as e:
+        msg: str = f"Error accessing image {img_path_str}: {e}"
         raise OSError(msg)
+    else:
+        return
+
+
+class ModelGenParams(NamedTuple):
+    """Parameters for model generation."""
+
+    model_path: str
+    tokenizer: object
+    prompt: str
+    config: object
+    max_tokens: int
+    temperature: float
+    trust_remote_code: bool
 
 
 def _run_model_generation(
-    model_identifier: str,
-    image_path: PathLike,
-    prompt: str,
-    max_tokens: int,
+    params: ModelGenParams,
+    image_path: Path,
     *,
     verbose: bool,
-    trust_remote_code: bool,
-    temperature: float,
-) -> tuple[
-    str,
-    Any,
-    Any,
-]:  # Returns (output, model, tokenizer) - model/tokenizer needed for cleanup
+) -> tuple[str, object, object]:
     """Load model, format prompt and run generation.
+
     Raise exceptions on failure.
     """
-    model = tokenizer = None  # Ensure they are defined in this scope
-    try:
-        # Load model and tokenizer
-        model, tokenizer = load(
-            model_identifier,
-            trust_remote_code=trust_remote_code,
-        )
-        config = load_config(
-            model_identifier,
-        )
+    model: object
+    tokenizer: object
+    # Pass trust_remote_code as dict for compatibility with type stubs
+    model, tokenizer = load(
+        path_or_hf_repo=params.model_path,
+        trust_remote_code={"trust_remote_code": params.trust_remote_code},
+    )
+    config: object = load_config(model_path=params.model_path)
 
-        # Prepare prompt
-        formatted_prompt: str = apply_chat_template(
-            tokenizer,
-            config,
-            prompt,
-            num_images=1,
-        )
-        if isinstance(formatted_prompt, list):
-            # If return_messages=True or unexpected, convert to string (fallback)
-            formatted_prompt = str(formatted_prompt)
+    formatted_prompt = apply_chat_template(
+        processor=tokenizer,
+        config=config,
+        prompt=params.prompt,
+        num_images=1,
+    )
+    # Handle list return from apply_chat_template
+    if isinstance(formatted_prompt, list):
+        formatted_prompt = "\n".join(str(m) for m in formatted_prompt)
 
-        # Generate output
-        # output: Optional[str] = generate(
-        output, _stats = generate(
-            model=model,
-            processor=tokenizer,  # Type checking handled by function signature
-            prompt=formatted_prompt,
-            image=str(image_path),
-            max_tokens=max_tokens,
-            verbose=verbose,
-            temp=temperature,
-        )
-
-        # Ensure all computations involving the model are done before measuring memory/time
-        mx.eval(
-            model.parameters(),
-        )  # Evaluate model parameters if needed after generation
-
-        return (
-            output if output is not None else "[No model output]",
-            model,
-            tokenizer,
-        )
-
-    except Exception:
-        # If loading failed, model might be None. If generation failed, model is likely loaded.
-        # Re-raise the exception to be caught by the outer function, which handles ModelResult creation.
-        # We pass model/tokenizer back mainly for the finally block in the caller.
-        raise  # Re-raise the original exception
+    output: str = generate(
+        model=model,
+        processor=tokenizer,  # type: ignore[arg-type]
+        prompt=formatted_prompt,
+        image=str(image_path),
+        verbose=verbose,
+    )
+    mx.eval(model.parameters())  # type: ignore
+    return (
+        output if output else "[No model output]",
+        model,
+        tokenizer,
+    )
 
 
-def process_image_with_model(
-    model_identifier: str,
-    image_path: PathLike,
-    prompt: str,
-    max_tokens: int,
-    *,
-    temperature: float = DEFAULT_TEMPERATURE,
-    timeout: float = DEFAULT_TIMEOUT,
-    verbose: bool = False,
-    trust_remote_code: bool = False,
-) -> ModelResult:
+class ProcessImageParams(NamedTuple):
+    """Parameters for processing an image with a VLM.
+
+    Attributes:
+        model_identifier: Model path or identifier.
+        image_path: Path to the image file.
+        prompt: Prompt string for the model.
+        max_tokens: Maximum tokens to generate.
+        temperature: Sampling temperature.
+        timeout: Timeout in seconds.
+        verbose: Verbose/debug flag.
+        trust_remote_code: Allow remote code execution.
+
+    """
+
+    model_identifier: str
+    image_path: Path
+    prompt: str
+    max_tokens: int
+    temperature: float
+    timeout: float
+    verbose: bool
+    trust_remote_code: bool
+
+
+def process_image_with_model(params: ProcessImageParams) -> ModelResult:
     """Process an image with a Vision Language Model, managing stats and errors."""
     logger.info(
         "Processing '%s' with model: %s",
-        str(getattr(image_path, "name", image_path)),
-        Colors.colored(model_identifier, Colors.MAGENTA),
+        str(getattr(params.image_path, "name", params.image_path)),
+        params.model_identifier,
     )
-
-    model = tokenizer = None  # Initialize here for the finally block
+    model: object | None = None
+    tokenizer: object | None = None
+    arch: str
+    gpu_info: str
     arch, gpu_info = get_system_info()
     start_time: float = 0.0
     initial_mem: float = 0.0
     initial_cache: float = 0.0
     output: str | None = None
-    error_stage: str = "initialization"
-
     try:
-        validate_temperature(temperature)
-        validate_image_accessible(image_path)
-        error_stage = "validation"
-
+        validate_temperature(temp=params.temperature)
+        validate_image_accessible(image_path=params.image_path)
         logger.debug("System: %s, GPU: %s", arch, gpu_info)
-
-        # --- Capture initial state BEFORE model operations ---
-        initial_mem = mx.get_active_memory() / MB_CONVERSION
-        initial_cache = mx.get_cache_memory() / MB_CONVERSION
+        initial_mem = mx.get_active_memory() / MB_CONVERSION  # type: ignore
+        initial_cache = mx.get_cache_memory() / MB_CONVERSION  # type: ignore
         start_time = time.perf_counter()
-        # -----------------------------------------------------
-
-        with TimeoutManager(timeout):
-            error_stage = "load/generate"  # Stage if timeout occurs here
-            # Call the internal generation function
-            output, model, tokenizer = _run_model_generation(
-                model_identifier=model_identifier,
-                image_path=image_path,
-                prompt=prompt,
-                max_tokens=max_tokens,
-                verbose=verbose,
-                trust_remote_code=trust_remote_code,
-                temperature=temperature,
+        with TimeoutManager(params.timeout):
+            gen_params: ModelGenParams = ModelGenParams(
+                model_path=params.model_identifier,
+                tokenizer=None,
+                prompt=params.prompt,
+                config=None,
+                max_tokens=params.max_tokens,
+                temperature=params.temperature,
+                trust_remote_code=params.trust_remote_code,
             )
-            error_stage = "post-generate"  # Stage after successful generation
-
-        # --- Capture final state AFTER model operations ---
-        end_time = time.perf_counter()
-        final_active_mem = mx.get_active_memory() / MB_CONVERSION
-        final_cache_mem = mx.get_cache_memory() / MB_CONVERSION
-        peak_mem = mx.get_peak_memory() / MB_CONVERSION
-        # --------------------------------------------------
-
-        final_stats = MemoryStats(
+            output, model, tokenizer = _run_model_generation(
+                params=gen_params,
+                image_path=params.image_path,
+                verbose=params.verbose,
+            )
+        end_time: float = time.perf_counter()
+        final_active_mem: float = mx.get_active_memory() / MB_CONVERSION  # type: ignore
+        final_cache_mem: float = mx.get_cache_memory() / MB_CONVERSION  # type: ignore
+        peak_mem: float = mx.get_peak_memory() / MB_CONVERSION  # type: ignore
+        final_stats: MemoryStats = MemoryStats(
             active=final_active_mem - initial_mem,
             cached=final_cache_mem - initial_cache,
             peak=peak_mem,
             time=end_time - start_time,
         )
-
         return ModelResult(
-            model_name=model_identifier,
+            model_name=params.model_identifier,
             success=True,
-            output=output,  # Use the output from _run_model_generation
+            output=output,
             stats=final_stats,
         )
-
     except TimeoutError as e:
-        logger.error("Timeout during model processing: %s", e)
+        logger.exception("Timeout during model processing")
         return ModelResult(
-            model_name=model_identifier,
+            model_name=params.model_identifier,
             success=False,
             error_stage="timeout",
             error_message=str(e),
         )
     except (OSError, ValueError) as e:
-        logger.error("Model processing error: %s", e)
+        logger.exception("Model processing error")
         return ModelResult(
-            model_name=model_identifier,
+            model_name=params.model_identifier,
             success=False,
             error_stage="processing",
             error_message=str(e),
         )
-    except Exception as e:
-        logger.exception("Unexpected error in model processing: %s", e)
-        return ModelResult(
-            model_name=model_identifier,
-            success=False,
-            error_stage="unexpected",
-            error_message=str(e),
-        )
     finally:
-        # Ensure cleanup happens regardless of success/failure
         if model is not None:
             del model
         if tokenizer is not None:
             del tokenizer
-        # Clear cache and reset peak memory after each model run
-        mx.clear_cache()
-        mx.reset_peak_memory()
-        logger.debug("Cleaned up resources for model %s", model_identifier)
+        mx.clear_cache()  # type: ignore
+        mx.reset_peak_memory()  # type: ignore
+        logger.debug("Cleaned up resources for model %s", params.model_identifier)
 
 
 # --- Main Execution Helper Functions ---
@@ -1595,22 +1487,22 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
         sys.exit(1)
     resolved_image_path: Path = image_path.resolve()
     print_cli_section(f"Processing file: {resolved_image_path.name}")
-    logger.info("Image: %s", Colors.colored(resolved_image_path, Colors.BLUE))
+    logger.info("Image: %s", str(resolved_image_path))
     try:
         with Image.open(resolved_image_path) as img:
             img.verify()
         print_image_dimensions(resolved_image_path)
-        return resolved_image_path
     except (
         FileNotFoundError,
         UnidentifiedImageError,
         OSError,
-        Exception,
     ) as img_err:
         print_cli_error(
             f"Cannot open or verify image {resolved_image_path}: {img_err}. Exiting.",
         )
         sys.exit(1)
+    else:
+        return resolved_image_path
 
 
 def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
@@ -1643,7 +1535,10 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
     else:
         logger.info("Generating default prompt based on image metadata.")
         prompt_parts: list[str] = [
-            "Provide a factual caption, description, and keywords suitable for cataloguing, or searching for, the image.",
+            (
+                "Provide a factual caption, description, and keywords suitable for "
+                "cataloguing, or searching for, the image."
+            ),
             (
                 f"Context: Relates to '{metadata.get('description', '')}'"
                 if metadata.get("description") and metadata["description"] != "N/A"
@@ -1659,15 +1554,18 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
                 if metadata.get("gps") and metadata["gps"] != "Unknown location"
                 else ""
             ),
-            "Focus on visual content. Avoid repeating the context unless it is visible.  Do not speculate.",
+            (
+                "Focus on visual content. Avoid repeating the context unless it is "
+                "visible. Do not speculate."
+            ),
         ]
         prompt = " ".join(filter(None, prompt_parts)).strip()
         logger.debug("Using generated prompt based on metadata.")
     logger.info(
         "\n%s\n%s\n%s",
-        Colors.colored("--- Using Prompt ---", Colors.CYAN),
+        "--- Using Prompt ---",
         prompt,
-        Colors.colored("-" * 40, Colors.CYAN),
+        "-" * 40,
     )
     return prompt
 
@@ -1676,16 +1574,17 @@ def get_cached_model_ids() -> list[str]:
     """Return a list of model IDs found in the Hugging Face cache."""
     try:
         cache_info: HFCacheInfo = scan_cache_dir()
-        return sorted([repo.repo_id for repo in cache_info.repos])
     except HFValidationError:
         logger.warning("Hugging Face cache directory invalid.")
         return []
     except FileNotFoundError:
         logger.warning("Hugging Face cache directory not found.")
         return []
-    except Exception as e:
+    except (OSError, ValueError) as e:
         logger.warning("Unexpected error scanning Hugging Face cache: %s", e)
         return []
+    else:
+        return sorted([repo.repo_id for repo in cache_info.repos])
 
 
 def process_models(
@@ -1712,43 +1611,33 @@ def process_models(
             logger.error("Ensure models are downloaded and cache is accessible.")
     else:
         logger.info("Processing %d model(s)...", len(model_identifiers))
-        separator = Colors.colored(f"\n{'-' * 40}\n", Colors.BLUE)
+        separator = "\n" + ("-" * 40) + "\n"
         for model_id in model_identifiers:
             logger.info(separator)
             is_vlm_verbose: bool = args.verbose
-            result: ModelResult = process_image_with_model(
+            params = ProcessImageParams(
                 model_identifier=model_id,
                 image_path=image_path,
                 prompt=prompt,
                 max_tokens=args.max_tokens,
-                verbose=is_vlm_verbose,
-                trust_remote_code=args.trust_remote_code,
                 temperature=args.temperature,
                 timeout=args.timeout,
+                verbose=is_vlm_verbose,
+                trust_remote_code=args.trust_remote_code,
             )
+            result: ModelResult = process_image_with_model(params)
             results.append(result)
             model_short_name: str = model_id.split("/")[-1]
-
             if result.success:
                 logger.info("[SUCCESS] %s", model_short_name)
-
                 if result.output:
-                    # Log output with proper formatting
-                    logger.info(
-                        "%s\n%s",
-                        Colors.colored("Output:", Colors.CYAN),
-                        Colors.colored(result.output, Colors.CYAN + Colors.BOLD),
-                    )
+                    logger.info("Output:\n%s", result.output)
                 if args.verbose:
                     logger.info("Time taken: %.2f s", result.stats.time)
             else:
-                # Format error messages
                 logger.error(
-                    "[FAIL] %s (Stage: %s)",
-                    model_short_name,
-                    result.error_stage,
+                    "[FAIL] %s (Stage: %s)", model_short_name, result.error_stage,
                 )
-
                 logger.error("Reason: %s", result.error_message)
     return results
 
@@ -1762,71 +1651,66 @@ def finalize_execution(
 ) -> None:
     """Output summary statistics, generate reports, and display timing information."""
     if results:
-        # Print summary statistics
-        separator = Colors.colored("=" * 80, Colors.BLUE)
-        logger.info("\n%s\n", separator)
+        logger.info("\n%s\n", "=" * 80)
         print_model_stats(results)
-
         try:
             html_output_path: Path = args.output_html.resolve()
             md_output_path: Path = args.output_markdown.resolve()
-
-            # Create parent directories if they don't exist
             html_output_path.parent.mkdir(parents=True, exist_ok=True)
             md_output_path.parent.mkdir(parents=True, exist_ok=True)
-
-            # Generate reports
-            generate_html_report(results, html_output_path, library_versions, prompt)
-            generate_markdown_report(results, md_output_path, library_versions, prompt)
-
-            # Log paths to generated files
+            generate_html_report(
+                results=results,
+                filename=html_output_path,
+                versions=library_versions,
+                prompt=prompt,
+            )
+            generate_markdown_report(
+                results=results,
+                filename=md_output_path,
+                versions=library_versions,
+                prompt=prompt,
+            )
             logger.info("Reports generated:")
-            logger.info(
-                "HTML:     %s",
-                Colors.colored(str(html_output_path), Colors.GREEN),
-            )
-            logger.info(
-                "Markdown: %s",
-                Colors.colored(str(md_output_path), Colors.GREEN),
-            )
-        except Exception:
-            logger.exception("Failed to generate reports")
+            logger.info("HTML:     %s", str(html_output_path))
+            logger.info("Markdown: %s", str(md_output_path))
+        except (OSError, ValueError):
+            logger.exception("Failed to generate reports.")
     else:
         logger.warning("\nNo models processed. No performance summary generated.")
         logger.info("Skipping report generation as no models were processed.")
-
-    # Print version information
     print_version_info(library_versions)
-
-    # Calculate and log total time
     overall_time: float = time.perf_counter() - overall_start_time
-    time_msg = Colors.colored("%s seconds", Colors.GREEN) % f"{overall_time:.2f}"
+    time_msg = "{} seconds".format(f"{overall_time:.2f}")
     logger.info("\nTotal execution time: %s", time_msg)
 
 
-# --- Main Execution ---
 def main(args: argparse.Namespace) -> None:
-    """Main function to orchestrate image analysis."""
-    overall_start_time: float = time.perf_counter()
-    print_cli_header("MLX Vision Language Model Image Analysis")
-    library_versions: dict[str, str] = setup_environment(args)
-    resolved_image_path: Path = find_and_validate_image(args)
-    metadata: MetadataDict = handle_metadata(resolved_image_path, args)
-    prompt: str = prepare_prompt(args, metadata)
-    results: list[ModelResult] = process_models(
-        args,
-        resolved_image_path,
-        prompt,
-    )
-    finalize_execution(args, results, library_versions, overall_start_time, prompt)
+    """Run CLI execution for MLX VLM model check."""
+    overall_start_time = time.perf_counter()
+    try:
+        library_versions = setup_environment(args)
+        print_cli_header("MLX Vision Language Model Check")
+        image_path = find_and_validate_image(args)
+        metadata = handle_metadata(image_path, args)
+        prompt = prepare_prompt(args, metadata)
+        results = process_models(args, image_path, prompt)
+        finalize_execution(
+            args=args,
+            results=results,
+            library_versions=library_versions,
+            overall_start_time=overall_start_time,
+            prompt=prompt,
+        )
+    except (KeyboardInterrupt, SystemExit):
+        logger.exception("Execution interrupted by user.")
+        sys.exit(1)
+    except Exception as main_err:
+        logger.critical("Fatal error in main execution: %s", main_err)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
-    # Setup Argument Parser
-    parser: argparse.ArgumentParser = argparse.ArgumentParser(
-        description="Analyze image with MLX VLMs.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-    )
+    parser = argparse.ArgumentParser(description="MLX VLM Model Checker")
     # Add arguments (separated for clarity)
     parser.add_argument(
         "-f",
@@ -1848,6 +1732,7 @@ if __name__ == "__main__":
         help="Output Github Markdown report file.",
     )
     parser.add_argument(
+        "-m",
         "--models",
         nargs="+",
         type=str,
@@ -1868,7 +1753,7 @@ if __name__ == "__main__":
         help="Custom prompt.",
     )
     parser.add_argument(
-        "-m",
+        "-x",
         "--max-tokens",
         type=int,
         default=DEFAULT_MAX_TOKENS,
@@ -1895,20 +1780,5 @@ if __name__ == "__main__":
     )
 
     # Parse arguments
-    parsed_args: argparse.Namespace = parser.parse_args()
-
-    # --- Main Execution ---
-    try:
-        main(parsed_args)
-    except Exception as main_err:
-        # Log final unhandled exceptions with color
-        # Use logger.critical for severe errors causing exit
-        logger.critical(
-            Colors.colored(
-                "An unexpected error occurred during main execution: %s",
-                Colors.RED,
-            ),
-            main_err,
-            exc_info=True,
-        )
-        sys.exit(1)  # Exit with error status
+    args = parser.parse_args()
+    main(args)
