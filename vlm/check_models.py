@@ -719,7 +719,7 @@ def print_model_stats(results: list[ModelResult]) -> None:
     """Print a table summarizing model performance statistics with visually distinct output."""
     if not results:
         logger.info(
-            Colors.colored("No model results to display.", Colors.BOLD, Colors.YELLOW)
+            Colors.colored("No model results to display.", Colors.BOLD, Colors.YELLOW),
         )
         return
 
@@ -1310,6 +1310,9 @@ def _run_model_generation(
         prompt=formatted_prompt,
         image=str(image_path),
         verbose=verbose,
+        temperature=params.temperature,
+        trust_remote_code=params.trust_remote_code,
+        max_tokens=params.max_tokens,
     )
     mx.eval(model.parameters())  # type: ignore[attr-defined]
     return (
@@ -1769,7 +1772,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--trust-remote-code",
-        action=argparse.BooleanOptionalAction,
+        action="store_true",
         default=True,
         help="Allow custom code from Hub models (SECURITY RISK).",
     )
@@ -1778,7 +1781,7 @@ if __name__ == "__main__":
         "--prompt",
         type=str,
         default=None,
-        help="Custom prompt.",
+        help="Prompt.",
     )
     parser.add_argument(
         "-x",

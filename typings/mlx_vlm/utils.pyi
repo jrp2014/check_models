@@ -9,7 +9,8 @@ from typing import Any, Callable
 import mlx.core as mx
 from mlx import nn
 from PIL.Image import Image
-from transformers import PreTrainedTokenizer, PreTrainedTokenizerFast
+from transformers.tokenization_utils import PreTrainedTokenizer
+from transformers.tokenization_utils_fast import PreTrainedTokenizerFast
 
 from .models.base import BaseImageProcessor
 
@@ -194,12 +195,12 @@ class TokenIdHandler:
         eos_token_ids: list[int],
         tokenizer: PreTrainedTokenizer = ...,
     ) -> None: ...
-    
+
     def add_eos_token_ids(
         self,
         new_eos_token_ids: int | list[int] = ...,
     ) -> None: ...
-    
+
     def reset(
         self,
         eos_token_ids: list[int] = ...,
