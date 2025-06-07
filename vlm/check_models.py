@@ -394,7 +394,7 @@ def find_most_recent_file(folder: Path | str) -> Path | None:
             key=lambda f: f.stat().st_mtime,
             default=None,
         )
-        if (most_recent):
+        if most_recent:
             logger.debug("Most recent file found: %s", str(most_recent))
             return most_recent
         logger.debug("No files found in directory: %s", folder_str)
@@ -568,7 +568,8 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
     if not date:
         try:
             date = datetime.fromtimestamp(
-                Path(img_path_str).stat().st_mtime, tz=timezone.utc,
+                Path(img_path_str).stat().st_mtime,
+                tz=timezone.utc,
             ).strftime("%Y-%m-%d %H:%M:%S")
         except OSError:
             date = "Unknown date"
