@@ -588,16 +588,17 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
     metadata["description"] = desc_str
     gps_info = exif_data.get("GPSInfo")
     if isinstance(gps_info, dict):
-        lat = gps_info.get("GPSLatitude")  # type: ignore
-        lat_ref = gps_info.get("GPSLatitudeRef")  # type: ignore
-        lon = gps_info.get("GPSLongitude")  # type: ignore
-        lon_ref = gps_info.get("GPSLongitudeRef")  # type: ignore
-        latitude = _convert_gps_coordinate(lat) if lat and lat_ref else None  # type: ignore
-        longitude = _convert_gps_coordinate(lon) if lon and lon_ref else None  # type: ignore
+        # The type: ignore[call-arg] is required for mypy/pyright compatibility
+        lat = gps_info.get("GPSLatitude")  # type: ignore[call-arg]
+        lat_ref = gps_info.get("GPSLatitudeRef")  # type: ignore[call-arg]
+        lon = gps_info.get("GPSLongitude")  # type: ignore[call-arg]
+        lon_ref = gps_info.get("GPSLongitudeRef")  # type: ignore[call-arg]
+        latitude = _convert_gps_coordinate(lat) if lat and lat_ref else None  # type: ignore[call-arg]
+        longitude = _convert_gps_coordinate(lon) if lon and lon_ref else None  # type: ignore[call-arg]
         if latitude is not None and longitude is not None:
             metadata["gps"] = (
                 f"{latitude[0]:.6f},{latitude[1]:.6f},{latitude[2]:.6f} {lat_ref}, "
-                f"{longitude[0]::.6f},{longitude[1]::.6f},{longitude[2]::.6f} {lon_ref}"
+                f"{longitude[0]:.6f},{longitude[1]:.6f},{longitude[2]:.6f} {lon_ref}"
             )
         else:
             metadata["gps"] = "Unknown location"
