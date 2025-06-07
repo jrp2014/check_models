@@ -394,7 +394,7 @@ def find_most_recent_file(folder: Path | str) -> Path | None:
             key=lambda f: f.stat().st_mtime,
             default=None,
         )
-        if most_recent:
+        if (most_recent):
             logger.debug("Most recent file found: %s", str(most_recent))
             return most_recent
         logger.debug("No files found in directory: %s", folder_str)
@@ -457,11 +457,11 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
                     continue
                 tag_name: str = TAGS.get(tag_id, str(tag_id))
                 exif_decoded[tag_name] = value
-            logger.debug(
-                "IFD0 tags decoded for %s: %s",
-                img_path_str,
-                exif_decoded,
-            )
+            # logger.debug(
+            #     "IFD0 tags decoded for %s: %s",
+            #     img_path_str,
+            #     exif_decoded,
+            # )
             # Second pass: Process Exif SubIFD (if available)
             try:
                 exif_ifd: Any = exif_raw.get_ifd(ExifTags.IFD.Exif)
@@ -472,11 +472,11 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
                             for tag_id, value in exif_ifd.items()
                         },
                     )
-                    logger.debug(
-                        "Exif SubIFD merged for %s: %s",
-                        img_path_str,
-                        exif_decoded,
-                    )
+                    # logger.debug(
+                    #     "Exif SubIFD merged for %s: %s",
+                    #     img_path_str,
+                    #     exif_decoded,
+                    # )
             except (KeyError, AttributeError, TypeError):
                 logger.exception("Could not extract Exif SubIFD")
             # Third pass: Process GPS IFD (if available)
@@ -487,7 +487,7 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
                     for gps_tag_id, gps_value in gps_ifd.items():
                         try:
                             gps_key = GPSTAGS.get(int(gps_tag_id), str(gps_tag_id))
-                        except Exception:
+                        except (KeyError, ValueError, TypeError):
                             gps_key = str(gps_tag_id)
                         gps_decoded[str(gps_key)] = gps_value
                     exif_decoded["GPSInfo"] = gps_decoded
@@ -546,21 +546,20 @@ def _convert_gps_coordinate(
 
 
 def extract_image_metadata(image_path: Path | str) -> MetadataDict:
-    """Extract key metadata (date, GPS, EXIF tags) from an image file using Pillow's built-in EXIF support."""
+    """Extract key metadata (date, GPS, EXIF tags) from an image file."""
     metadata: MetadataDict = {}
     img_path_str = str(image_path)
+    exif_data: dict[str, str] = {}
     try:
         with Image.open(img_path_str) as img:
-            exif = img.getexif()
-            exif_data_raw = (
-                {TAGS.get(tag, tag): exif.get(tag) for tag in exif} if exif else {}
-            )
-            # Filter to ensure all keys are str
-            exif_data: dict[str, Any] = {str(k): v for k, v in exif_data_raw.items()}
+            exif_raw = img.getexif()
+            if exif_raw:
+                exif_data = {
+                    str(ExifTags.TAGS.get(k, k)): v for k, v in exif_raw.items()
+                }
     except (FileNotFoundError, UnidentifiedImageError) as e:
         logger.warning("Could not extract EXIF from %s: %s", img_path_str, e)
         exif_data = {}
-    # Date extraction (prefer DateTimeOriginal, fallback to CreateDate, DateTime, or file mtime)
     date = (
         exif_data.get("DateTimeOriginal")
         or exif_data.get("CreateDate")
@@ -568,29 +567,42 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
     )
     if not date:
         try:
-            mtime = Path(img_path_str).stat().st_mtime
-            date = datetime.fromtimestamp(mtime, tz=timezone.utc).strftime(
-                "%Y-%m-%d %H:%M:%S",
-            )
+            date = datetime.fromtimestamp(
+                Path(img_path_str).stat().st_mtime, tz=timezone.utc,
+            ).strftime("%Y-%m-%d %H:%M:%S")
         except OSError:
-            date = "Unknown"
-    metadata["date"] = date
-    # GPS extraction
-    gps_info = exif_data.get("GPSInfo", {})
-    if gps_info:
-        lat = gps_info.get("GPSLatitude")
-        lat_ref = gps_info.get("GPSLatitudeRef")
-        lon = gps_info.get("GPSLongitude")
-        lon_ref = gps_info.get("GPSLongitudeRef")
-        latitude = _convert_gps_coordinate(lat) if lat and lat_ref else None
-        longitude = _convert_gps_coordinate(lon) if lon and lon_ref else None
-        if latitude is not None and longitude is not None:
-            metadata["gps"] = f"{latitude:.6f}, {longitude:.6f}"
+            date = "Unknown date"
+    metadata["date"] = str(date)
+    description = exif_data.get("ImageDescription")
+    desc_str = "N/A"
+    if description is not None:
+        if isinstance(description, bytes):
+            try:
+                desc_str = description.decode("utf-8", errors="replace").strip()
+            except UnicodeDecodeError:
+                desc_str = str(description)
         else:
-            metadata["gps"] = "N/A"
+            desc_str = str(description).strip()
+        if not desc_str:
+            desc_str = "N/A"
+    metadata["description"] = desc_str
+    gps_info = exif_data.get("GPSInfo")
+    if isinstance(gps_info, dict):
+        lat = gps_info.get("GPSLatitude")  # type: ignore
+        lat_ref = gps_info.get("GPSLatitudeRef")  # type: ignore
+        lon = gps_info.get("GPSLongitude")  # type: ignore
+        lon_ref = gps_info.get("GPSLongitudeRef")  # type: ignore
+        latitude = _convert_gps_coordinate(lat) if lat and lat_ref else None  # type: ignore
+        longitude = _convert_gps_coordinate(lon) if lon and lon_ref else None  # type: ignore
+        if latitude is not None and longitude is not None:
+            metadata["gps"] = (
+                f"{latitude[0]:.6f},{latitude[1]:.6f},{latitude[2]:.6f} {lat_ref}, "
+                f"{longitude[0]::.6f},{longitude[1]::.6f},{longitude[2]::.6f} {lon_ref}"
+            )
+        else:
+            metadata["gps"] = "Unknown location"
     else:
         metadata["gps"] = "N/A"
-    # Add all EXIF tags (flattened)
     metadata["exif"] = str(exif_data)
     return metadata
 
@@ -1395,15 +1407,9 @@ def process_image_with_model(params: ProcessImageParams) -> ModelResult:
             peak=peak_mem,
             time=end_time - start_time,
         )
-        return ModelResult(
-            model_name=params.model_identifier,
-            success=True,
-            output=output,
-            stats=final_stats,
-        )
     except TimeoutError as e:
         logger.exception("Timeout during model processing")
-        return ModelResult(
+        result = ModelResult(
             model_name=params.model_identifier,
             success=False,
             error_stage="timeout",
@@ -1411,11 +1417,18 @@ def process_image_with_model(params: ProcessImageParams) -> ModelResult:
         )
     except (OSError, ValueError) as e:
         logger.exception("Model processing error")
-        return ModelResult(
+        result = ModelResult(
             model_name=params.model_identifier,
             success=False,
             error_stage="processing",
             error_message=str(e),
+        )
+    else:
+        result = ModelResult(
+            model_name=params.model_identifier,
+            success=True,
+            output=output,
+            stats=final_stats,
         )
     finally:
         if model is not None:
@@ -1425,6 +1438,7 @@ def process_image_with_model(params: ProcessImageParams) -> ModelResult:
         mx.clear_cache()  # type: ignore[attr-defined]
         mx.reset_peak_memory()  # type: ignore[attr-defined]
         logger.debug("Cleaned up resources for model %s", params.model_identifier)
+    return result
 
 
 # --- Main Execution Helper Functions ---
@@ -1735,7 +1749,7 @@ def main(args: argparse.Namespace) -> None:
     except (KeyboardInterrupt, SystemExit):
         logger.exception("Execution interrupted by user.")
         sys.exit(1)
-    except Exception as main_err:
+    except (OSError, ValueError) as main_err:
         logger.critical("Fatal error in main execution: %s", main_err)
         sys.exit(1)
 
