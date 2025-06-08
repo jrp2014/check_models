@@ -549,17 +549,7 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
     """Extract key metadata (date, GPS, EXIF tags) from an image file."""
     metadata: MetadataDict = {}
     img_path_str = str(image_path)
-    exif_data: dict[str, str] = {}
-    try:
-        with Image.open(img_path_str) as img:
-            exif_raw = img.getexif()
-            if exif_raw:
-                exif_data = {
-                    str(ExifTags.TAGS.get(k, k)): v for k, v in exif_raw.items()
-                }
-    except (FileNotFoundError, UnidentifiedImageError) as e:
-        logger.warning("Could not extract EXIF from %s: %s", img_path_str, e)
-        exif_data = {}
+    exif_data = get_exif_data(img_path_str) or {}
     date = (
         exif_data.get("DateTimeOriginal")
         or exif_data.get("CreateDate")
@@ -587,24 +577,63 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
         if not desc_str:
             desc_str = "N/A"
     metadata["description"] = desc_str
-    gps_info = exif_data.get("GPSInfo")
-    if isinstance(gps_info, dict):
-        # The type: ignore[call-arg] is required for mypy/pyright compatibility
-        lat = gps_info.get("GPSLatitude")  # type: ignore[call-arg]
-        lat_ref = gps_info.get("GPSLatitudeRef")  # type: ignore[call-arg]
-        lon = gps_info.get("GPSLongitude")  # type: ignore[call-arg]
-        lon_ref = gps_info.get("GPSLongitudeRef")  # type: ignore[call-arg]
-        latitude = _convert_gps_coordinate(lat) if lat and lat_ref else None  # type: ignore[call-arg]
-        longitude = _convert_gps_coordinate(lon) if lon and lon_ref else None  # type: ignore[call-arg]
-        if latitude is not None and longitude is not None:
-            metadata["gps"] = (
-                f"{latitude[0]:.6f},{latitude[1]:.6f},{latitude[2]:.6f} {lat_ref}, "
-                f"{longitude[0]:.6f},{longitude[1]:.6f},{longitude[2]:.6f} {lon_ref}"
+
+    # --- Robust GPS extraction ---
+    gps_info_raw = exif_data.get("GPSInfo")
+    gps_str = "N/A"
+    if isinstance(gps_info_raw, dict):
+        gps_info: dict[str, Any] = {}
+        for k, v in gps_info_raw.items():
+            tag_name = (
+                GPSTAGS.get(int(k), str(k)) if isinstance(k, int) else str(k)  # type: ignore[arg-type]
             )
+            gps_info[tag_name] = v
+        lat = gps_info.get("GPSLatitude")
+        lat_ref = gps_info.get("GPSLatitudeRef")
+        lon = gps_info.get("GPSLongitude")
+        lon_ref = gps_info.get("GPSLongitudeRef")
+        logger.debug(
+            "Extracted GPS fields: lat=%r, lat_ref=%r, lon=%r, lon_ref=%r",
+            lat, lat_ref, lon, lon_ref
+        )
+        latitude = _convert_gps_coordinate(lat) if lat and lat_ref else None
+        longitude = _convert_gps_coordinate(lon) if lon and lon_ref else None
+        logger.debug(
+            "Converted GPS: latitude=%r, longitude=%r", latitude, longitude
+        )
+        if latitude is not None and longitude is not None:
+            # Convert to signed decimal degrees
+            def dms_to_dd(dms: tuple[float, float, float], ref: str) -> tuple[float, str]:
+                dd = dms[0] + dms[1] / 60.0 + dms[2] / 3600.0
+                ref_upper = ref.upper()
+                if ref_upper in ("S", "W"):
+                    dd = abs(dd)
+                    sign = -1
+                else:
+                    sign = 1
+                return (dd * sign, ref_upper)
+            try:
+                lat_ref_str = lat_ref.decode() if isinstance(lat_ref, bytes) else str(lat_ref)
+                lon_ref_str = lon_ref.decode() if isinstance(lon_ref, bytes) else str(lon_ref)
+                lat_dd, lat_card = dms_to_dd(latitude, lat_ref_str)
+                lon_dd, lon_card = dms_to_dd(longitude, lon_ref_str)
+                # Ensure correct sign for S/W
+                if lat_card == "S":
+                    lat_dd = -abs(lat_dd)
+                else:
+                    lat_dd = abs(lat_dd)
+                if lon_card == "W":
+                    lon_dd = -abs(lon_dd)
+                else:
+                    lon_dd = abs(lon_dd)
+                gps_str = f"{abs(lat_dd):.6f} {lat_card}, {abs(lon_dd):.6f} {lon_card}"
+            except (ValueError, AttributeError, TypeError) as e:
+                logger.debug("Failed to convert GPS DMS to decimal: %s", e)
+                gps_str = "Unknown location"
         else:
-            metadata["gps"] = "Unknown location"
-    else:
-        metadata["gps"] = "N/A"
+            logger.debug("GPS conversion failed: latitude or longitude is None.")
+            gps_str = "Unknown location"
+    metadata["gps"] = gps_str
     metadata["exif"] = str(exif_data)
     return metadata
 
