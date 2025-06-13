@@ -491,11 +491,11 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
                             gps_key = str(gps_tag_id)
                         gps_decoded[str(gps_key)] = gps_value
                     exif_decoded["GPSInfo"] = gps_decoded
-                    logger.debug(
-                        "GPS IFD merged for %s: %s",
-                        img_path_str,
-                        exif_decoded,
-                    )
+                    # logger.debug(
+                    #     "GPS IFD merged for %s: %s",
+                    #     img_path_str,
+                    #     exif_decoded,
+                    # )
             except (KeyError, AttributeError, TypeError) as gps_err:
                 logger.warning("Could not extract GPS IFD: %s", gps_err)
             return exif_decoded
@@ -550,6 +550,8 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
     metadata: MetadataDict = {}
     img_path_str = str(image_path)
     exif_data = get_exif_data(img_path_str) or {}
+
+    # --- Date extraction ---
     date = (
         exif_data.get("DateTimeOriginal")
         or exif_data.get("CreateDate")
@@ -561,32 +563,34 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
                 Path(img_path_str).stat().st_mtime,
                 tz=timezone.utc,
             ).strftime("%Y-%m-%d %H:%M:%S")
-        except OSError:
+        except OSError as err:
             date = "Unknown date"
+            logger.debug("Could not get file mtime: %s", err)
     metadata["date"] = str(date)
+
+    # --- Description extraction ---
     description = exif_data.get("ImageDescription")
     desc_str = "N/A"
     if description is not None:
         if isinstance(description, bytes):
             try:
                 desc_str = description.decode("utf-8", errors="replace").strip()
-            except UnicodeDecodeError:
+            except UnicodeDecodeError as err:
                 desc_str = str(description)
+                logger.debug("Failed to decode description: %s", err)
         else:
             desc_str = str(description).strip()
         if not desc_str:
             desc_str = "N/A"
     metadata["description"] = desc_str
 
-    # --- Robust GPS extraction ---
-    gps_info_raw = exif_data.get("GPSInfo")
-    gps_str = "N/A"
-    if isinstance(gps_info_raw, dict):
+    # --- GPS extraction helper ---
+    def _extract_gps_str(gps_info_raw: object) -> str:
+        if not isinstance(gps_info_raw, dict):
+            return "N/A"
         gps_info: dict[str, Any] = {}
         for k, v in gps_info_raw.items():
-            tag_name = (
-                GPSTAGS.get(int(k), str(k)) if isinstance(k, int) else str(k)  # type: ignore[arg-type]
-            )
+            tag_name = GPSTAGS.get(int(k), str(k)) if isinstance(k, int) else str(k)
             gps_info[tag_name] = v
         lat = gps_info.get("GPSLatitude")
         lat_ref = gps_info.get("GPSLatitudeRef")
@@ -594,46 +598,47 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
         lon_ref = gps_info.get("GPSLongitudeRef")
         logger.debug(
             "Extracted GPS fields: lat=%r, lat_ref=%r, lon=%r, lon_ref=%r",
-            lat, lat_ref, lon, lon_ref
+            lat,
+            lat_ref,
+            lon,
+            lon_ref,
         )
         latitude = _convert_gps_coordinate(lat) if lat and lat_ref else None
         longitude = _convert_gps_coordinate(lon) if lon and lon_ref else None
         logger.debug(
-            "Converted GPS: latitude=%r, longitude=%r", latitude, longitude
+            "Converted GPS: latitude=%r, longitude=%r",
+            latitude,
+            longitude,
         )
-        if latitude is not None and longitude is not None:
-            # Convert to signed decimal degrees
-            def dms_to_dd(dms: tuple[float, float, float], ref: str) -> tuple[float, str]:
-                dd = dms[0] + dms[1] / 60.0 + dms[2] / 3600.0
-                ref_upper = ref.upper()
-                if ref_upper in ("S", "W"):
-                    dd = abs(dd)
-                    sign = -1
-                else:
-                    sign = 1
-                return (dd * sign, ref_upper)
-            try:
-                lat_ref_str = lat_ref.decode() if isinstance(lat_ref, bytes) else str(lat_ref)
-                lon_ref_str = lon_ref.decode() if isinstance(lon_ref, bytes) else str(lon_ref)
-                lat_dd, lat_card = dms_to_dd(latitude, lat_ref_str)
-                lon_dd, lon_card = dms_to_dd(longitude, lon_ref_str)
-                # Ensure correct sign for S/W
-                if lat_card == "S":
-                    lat_dd = -abs(lat_dd)
-                else:
-                    lat_dd = abs(lat_dd)
-                if lon_card == "W":
-                    lon_dd = -abs(lon_dd)
-                else:
-                    lon_dd = abs(lon_dd)
-                gps_str = f"{abs(lat_dd):.6f} {lat_card}, {abs(lon_dd):.6f} {lon_card}"
-            except (ValueError, AttributeError, TypeError) as e:
-                logger.debug("Failed to convert GPS DMS to decimal: %s", e)
-                gps_str = "Unknown location"
-        else:
+        if latitude is None or longitude is None:
             logger.debug("GPS conversion failed: latitude or longitude is None.")
-            gps_str = "Unknown location"
-    metadata["gps"] = gps_str
+            return "Unknown location"
+
+        def dms_to_dd(dms: tuple[float, float, float], ref: str) -> tuple[float, str]:
+            dd = dms[0] + dms[1] / 60.0 + dms[2] / 3600.0
+            ref_upper = ref.upper()
+            sign = -1 if ref_upper in ("S", "W") else 1
+            return (dd * sign, ref_upper)
+
+        try:
+            lat_ref_str = (
+                lat_ref.decode() if isinstance(lat_ref, bytes) else str(lat_ref)
+            )
+            lon_ref_str = (
+                lon_ref.decode() if isinstance(lon_ref, bytes) else str(lon_ref)
+            )
+            lat_dd, lat_card = dms_to_dd(latitude, lat_ref_str)
+            lon_dd, lon_card = dms_to_dd(longitude, lon_ref_str)
+            lat_dd = -abs(lat_dd) if lat_card == "S" else abs(lat_dd)
+            lon_dd = -abs(lon_dd) if lon_card == "W" else abs(lon_dd)
+            return f"{abs(lat_dd):.6f} {lat_card}, {abs(lon_dd):.6f} {lon_card}"
+        except (ValueError, AttributeError, TypeError) as err:
+            logger.debug("Failed to convert GPS DMS to decimal: %s", err)
+            return "Unknown location"
+
+    # --- End GPS extraction helper ---
+
+    metadata["gps"] = _extract_gps_str(exif_data.get("GPSInfo"))
     metadata["exif"] = str(exif_data)
     return metadata
 
@@ -693,8 +698,13 @@ def filter_and_format_tags(
     return tags
 
 
-def pretty_print_exif(exif: ExifDict, *, show_all: bool = False) -> None:
-    """Print key EXIF data in a formatted table with colors."""
+def pretty_print_exif(
+    exif: ExifDict,
+    *,
+    show_all: bool = True,  # Default to True to print all EXIF tags
+    title: str = "EXIF Metadata Summary",
+) -> None:
+    """Print key EXIF data in a formatted table with colors and a title."""
     if not exif:
         logger.info("No EXIF data available.")
         return
@@ -716,6 +726,33 @@ def pretty_print_exif(exif: ExifDict, *, show_all: bool = False) -> None:
     border_color = Colors.BLUE
     important_color = Colors.YELLOW
     pad = _pad_text
+
+    # Print title above the table, visually separated (no leading newline)
+    logger.info(
+        Colors.colored(
+            "=" * (max_tag_len + max_val_len + 9),
+            Colors.BOLD,
+            Colors.BLUE,
+        ),
+    )
+    # Print the title in a more visually distinct color and with extra spacing
+    logger.info(
+        Colors.colored(
+            f"{title.center(max_tag_len + max_val_len + 9)}",
+            Colors.BOLD,
+            Colors.MAGENTA,
+        ),
+    )
+    # Add a blank line for separation
+    logger.info("")
+    logger.info(
+        Colors.colored(
+            "=" * (max_tag_len + max_val_len + 9),
+            Colors.BOLD,
+            Colors.BLUE,
+        ),
+    )
+
     logger.info(
         Colors.colored(
             "╔{}╤{}╗".format("═" * (max_tag_len + 2), "═" * (max_val_len + 2)),
@@ -723,7 +760,7 @@ def pretty_print_exif(exif: ExifDict, *, show_all: bool = False) -> None:
         ),
     )
     logger.info(
-        "%s %s %s %s %s",
+        "%s%s%s%s%s",
         Colors.colored("║", border_color),
         pad(Colors.colored("Tag", header_color), max_tag_len),
         Colors.colored("│", border_color),
@@ -743,7 +780,7 @@ def pretty_print_exif(exif: ExifDict, *, show_all: bool = False) -> None:
             else tag_name
         )
         logger.info(
-            "%s %s %s %s %s",
+            "%s%s%s%s%s",
             Colors.colored("║", border_color),
             pad(tag_display, max_tag_len),
             Colors.colored("│", border_color),
@@ -754,6 +791,13 @@ def pretty_print_exif(exif: ExifDict, *, show_all: bool = False) -> None:
         Colors.colored(
             "╚{}╧{}╝".format("═" * (max_tag_len + 2), "═" * (max_val_len + 2)),
             border_color,
+        ),
+    )
+    logger.info(
+        Colors.colored(
+            "=" * (max_tag_len + max_val_len + 9) + "\n",
+            Colors.BOLD,
+            Colors.BLUE,
         ),
     )
 
@@ -1290,18 +1334,18 @@ def validate_image_accessible(image_path: PathLike) -> None:
     try:
         with (
             TimeoutManager(seconds=5),
-            Image.open(img_path_str) as img,
+            Image.open(img_path_str),
         ):
-            img.verify()
-    except TimeoutError:
+            pass
+    except TimeoutError as err:
         msg: str = f"Timeout while reading image: {img_path_str}"
-        raise OSError(msg)
-    except UnidentifiedImageError:
+        raise OSError(msg) from err
+    except UnidentifiedImageError as err:
         msg: str = f"File is not a recognized image format: {img_path_str}"
-        raise ValueError(msg)
-    except (OSError, ValueError) as e:
-        msg: str = f"Error accessing image {img_path_str}: {e}"
-        raise OSError(msg)
+        raise ValueError(msg) from err
+    except (OSError, ValueError) as err:
+        msg: str = f"Error accessing image {img_path_str}: {err}"
+        raise OSError(msg) from err
     else:
         return
 
@@ -1347,15 +1391,15 @@ def _run_model_generation(
     if isinstance(formatted_prompt, list):
         formatted_prompt = "\n".join(str(m) for m in formatted_prompt)
 
-    output: str = generate(
+    output, _stats = generate(
         model=model,
         processor=tokenizer,  # type: ignore[arg-type]
         prompt=formatted_prompt,
         image=str(image_path),
         verbose=verbose,
-        temperature=params.temperature,
-        trust_remote_code=params.trust_remote_code,
-        max_tokens=params.max_tokens,
+        temperature = params.temperature,
+        trust_remote_code = params.trust_remote_code,
+        max_tokens = params.max_tokens,
     )
     mx.eval(model.parameters())  # type: ignore[attr-defined]
     return (
@@ -1477,19 +1521,19 @@ def process_image_with_model(params: ProcessImageParams) -> ModelResult:
 
 def print_cli_header(title: str) -> None:
     """Print a formatted CLI header with the given title."""
-    logger.info("%s", "=" * 80)
-    logger.info("%s", title.center(80))
-    logger.info("%s\n", "=" * 80)
+    logger.info("%s", Colors.colored("=" * 80, Colors.BOLD, Colors.BLUE))
+    logger.info("%s", Colors.colored(title.center(80), Colors.BOLD, Colors.MAGENTA))
+    logger.info("%s\n", Colors.colored("=" * 80, Colors.BOLD, Colors.BLUE))
 
 
 def print_cli_section(title: str) -> None:
     """Print a formatted CLI section header."""
-    logger.info("\n--- %s ---", title)
+    logger.info(Colors.colored("--- %s ---", Colors.BOLD, Colors.MAGENTA), title)
 
 
 def print_cli_error(msg: str) -> None:
     """Print a formatted CLI error message."""
-    logger.error("Error: %s", msg)
+    logger.error(Colors.colored("Error: %s", Colors.BOLD, Colors.CYAN), msg)
 
 
 def setup_environment(args: argparse.Namespace) -> dict[str, str]:
