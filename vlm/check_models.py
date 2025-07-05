@@ -1393,7 +1393,7 @@ def _run_model_generation(
 
     output, _stats = generate(
         model=model,
-        processor=tokenizer,  # type: ignore[arg-type]
+        processor=tokenizer,
         prompt=formatted_prompt,
         image=str(image_path),
         verbose=verbose,
@@ -1401,7 +1401,7 @@ def _run_model_generation(
         trust_remote_code = params.trust_remote_code,
         max_tokens = params.max_tokens,
     )
-    mx.eval(model.parameters())  # type: ignore[attr-defined]
+    mx.eval(model.parameters()) 
     return (
         output if output else "[No model output]",
         model,
