@@ -62,8 +62,9 @@ except ImportError:
 
 # Local application/library specific imports
 try:
+    from mlx_vlm.generate import GenerationResult, generate
     from mlx_vlm.prompt_utils import apply_chat_template
-    from mlx_vlm.utils import generate, load, load_config
+    from mlx_vlm.utils import load
     from mlx_vlm.version import __version__ as vlm_version
 except ImportError:
     logger = logging.getLogger("mlx-vlm-check")
@@ -365,7 +366,7 @@ class ModelResult:
 
     model_name: str
     success: bool
-    output: str | None = None
+    output: GenerationResult | None = None
     stats: MemoryStats = field(default_factory=MemoryStats.zero)
     error_stage: str | None = None
     error_message: str | None = None
@@ -1047,7 +1048,7 @@ def generate_html_report(
         stats_cells = ""
 
         if result.success:
-            escaped_output = html.escape(result.output or "")
+            escaped_output = html.escape(result.output.text or "")
             # Highlight model output in HTML
             result_content = (
                 f'<div class="model-output"><strong>{escaped_output}</strong></div>'
@@ -1374,12 +1375,12 @@ def _run_model_generation(
     """
     model: object
     tokenizer: object
-    # Pass trust_remote_code as dict for compatibility with type stubs
+
     model, tokenizer = load(
         path_or_hf_repo=params.model_path,
-        trust_remote_code={"trust_remote_code": params.trust_remote_code},
+        trust_remote_code=params.trust_remote_code,
     )
-    config: object = load_config(model_path=params.model_path)
+    config = model.config
 
     formatted_prompt = apply_chat_template(
         processor=tokenizer,
@@ -1391,7 +1392,7 @@ def _run_model_generation(
     if isinstance(formatted_prompt, list):
         formatted_prompt = "\n".join(str(m) for m in formatted_prompt)
 
-    output, _stats = generate(
+    output = generate(
         model=model,
         processor=tokenizer,
         prompt=formatted_prompt,
@@ -1401,7 +1402,7 @@ def _run_model_generation(
         trust_remote_code = params.trust_remote_code,
         max_tokens = params.max_tokens,
     )
-    mx.eval(model.parameters()) 
+    mx.eval(model.parameters())
     return (
         output if output else "[No model output]",
         model,
@@ -1736,16 +1737,22 @@ def process_models(
                 if result.output:
                     logger.info(
                         Colors.colored("Output:\n%s", Colors.BOLD, Colors.GREEN),
-                        result.output,
+                        result.output.text,
                     )
                 if args.verbose:
                     logger.info(
                         Colors.colored(
-                            "Time taken: %.2f s",
+                            "Statistics:\nTime taken: %.2fs\nToken: %i\nPrompt tokens: %i\nGeneration tokens: %i\nPrompt tps: %.1f\nGeneration tps: %.1f\nPeak Memory: %.1fGb\n",
                             Colors.BOLD,
                             Colors.CYAN,
                         ),
                         result.stats.time,
+                        result.output.token,
+                        result.output.prompt_tokens,
+                        result.output.generation_tokens,
+                        result.output.prompt_tps,
+                        result.output.generation_tps,
+                        result.output.peak_memory,
                     )
             else:
                 logger.error(
