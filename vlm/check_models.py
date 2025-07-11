@@ -98,8 +98,7 @@ class TimeoutManager(contextlib.ContextDecorator):
     """Manage a timeout context for code execution (UNIX only)."""
 
     def __init__(self, seconds: float) -> None:
-        """
-        Initialize a timeout manager with a timeout duration.
+        """Initialize a timeout manager with a timeout duration.
 
         Args:
             seconds: The timeout duration in seconds.
@@ -515,7 +514,6 @@ MED_GPS_COORD_LEN = 2
 MIN_GPS_COORD_LEN = 1
 
 
-# Reduce return count and use named constants
 def _convert_gps_coordinate(
     coord: tuple[float | str, ...] | list[float | str],
 ) -> tuple[float, float, float] | None:
@@ -1215,7 +1213,7 @@ def generate_markdown_report(
             ]
             # Replace newlines with <br> in output
             output_text: str = (result.generationresult.text or "").replace(
-                "\n", "<br>"
+                "\n", "<br>",
             )
             output_md: str = output_text
         else:
@@ -1248,7 +1246,7 @@ def generate_markdown_report(
         )
         max_peak = max(r.stats.peak for r in successful_results)
         avg_time = sum(r.stats.time for r in successful_results) / len(
-            successful_results
+            successful_results,
         )
         summary_title = f"**AVG/PEAK ({len(successful_results)} Success)**"
         summary_stats = [
@@ -1390,8 +1388,7 @@ def _run_model_generation(
     *,
     verbose: bool,
 ) -> GenerationResult:
-    """
-    Load model, format prompt and run generation.
+    """Load model, format prompt and run generation.
 
     Raise exceptions on failure.
     """
@@ -1429,8 +1426,7 @@ def _run_model_generation(
 
 
 class ProcessImageParams(NamedTuple):
-    """
-    Parameters for processing an image with a VLM.
+    """Parameters for processing an image with a VLM.
 
     Attributes:
         model_identifier: Model path or identifier.
@@ -1710,8 +1706,7 @@ def process_models(
     image_path: Path,
     prompt: str,
 ) -> list[ModelResult]:
-    """
-    Process images with the specified models or scan cache for available models.
+    """Process images with the specified models or scan cache for available models.
 
     Returns a list of model results with outputs and performance metrics.
     """
