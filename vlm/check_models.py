@@ -97,7 +97,8 @@ class TimeoutManager(contextlib.ContextDecorator):
     """Manage a timeout context for code execution (UNIX only)."""
 
     def __init__(self, seconds: float) -> None:
-        """Initialize a timeout manager with a timeout duration.
+        """
+        Initialize a timeout manager with a timeout duration.
 
         Args:
             seconds: The timeout duration in seconds.
@@ -1387,7 +1388,8 @@ def _run_model_generation(
     *,
     verbose: bool,
 ) -> GenerationResult:
-    """Load model, format prompt and run generation.
+    """
+    Load model, format prompt and run generation.
 
     Raise exceptions on failure.
     """
@@ -1425,7 +1427,8 @@ def _run_model_generation(
 
 
 class ProcessImageParams(NamedTuple):
-    """Parameters for processing an image with a VLM.
+    """
+    Parameters for processing an image with a VLM.
 
     Attributes:
         model_identifier: Model path or identifier.
@@ -1705,7 +1708,8 @@ def process_models(
     image_path: Path,
     prompt: str,
 ) -> list[ModelResult]:
-    """Process images with the specified models or scan cache for available models.
+    """
+    Process images with the specified models or scan cache for available models.
 
     Returns a list of model results with outputs and performance metrics.
     """
