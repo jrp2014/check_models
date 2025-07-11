@@ -1064,7 +1064,11 @@ def generate_html_report(
         stats_cells = ""
 
         if result.success:
-            escaped_output = html.escape(result.generationresult.text or "")
+            escaped_output = (
+                "No output generated"
+                if result.generationresult is None
+                else html.escape(result.generationresult.text or "")
+            )
             # Highlight model output in HTML
             result_content = (
                 f'<div class="model-output"><strong>{escaped_output}</strong></div>'
@@ -1212,8 +1216,13 @@ def generate_markdown_report(
                 f"{result.stats.time:.2f}",
             ]
             # Replace newlines with <br> in output
-            output_text: str = (result.generationresult.text or "").replace(
-                "\n", "<br>",
+            output_text: str = (
+                "No generated output"
+                if result.generationresult is None
+                else (result.generationresult.text or "").replace(
+                    "\n",
+                    "<br>",
+                )
             )
             output_md: str = output_text
         else:
@@ -1388,7 +1397,8 @@ def _run_model_generation(
     *,
     verbose: bool,
 ) -> GenerationResult:
-    """Load model, format prompt and run generation.
+    """
+    Load model, format prompt and run generation.
 
     Raise exceptions on failure.
     """
@@ -1426,7 +1436,8 @@ def _run_model_generation(
 
 
 class ProcessImageParams(NamedTuple):
-    """Parameters for processing an image with a VLM.
+    """
+    Parameters for processing an image with a VLM.
 
     Attributes:
         model_identifier: Model path or identifier.
@@ -1706,7 +1717,8 @@ def process_models(
     image_path: Path,
     prompt: str,
 ) -> list[ModelResult]:
-    """Process images with the specified models or scan cache for available models.
+    """
+    Process images with the specified models or scan cache for available models.
 
     Returns a list of model results with outputs and performance metrics.
     """
@@ -1763,12 +1775,24 @@ def process_models(
                             Colors.CYAN,
                         ),
                         result.stats.time,
-                        result.generationresult.token,
-                        result.generationresult.prompt_tokens,
-                        result.generationresult.generation_tokens,
-                        result.generationresult.prompt_tps,
-                        result.generationresult.generation_tps,
-                        result.generationresult.peak_memory,
+                        0
+                        if results.generationresult is None
+                        else result.generationresult.token,
+                        0
+                        if results.generationresult is None
+                        else result.generationresult.prompt_tokens,
+                        0
+                        if results.generationresult is None
+                        else result.generationresult.generation_tokens,
+                        0
+                        if results.generationresult is None
+                        else result.generationresult.prompt_tps,
+                        0
+                        if results.generationresult is None
+                        else result.generationresult.generation_tps,
+                        0
+                        if results.generationresult is None
+                        else result.generationresult.peak_memory,
                     )
             else:
                 logger.error(
