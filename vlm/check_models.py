@@ -37,7 +37,7 @@ from typing import (
 from huggingface_hub import HFCacheInfo, scan_cache_dir
 from huggingface_hub import __version__ as hf_version
 from huggingface_hub.errors import HFValidationError
-from typing_extensions import Self
+from tzlocal import get_localzone
 
 # Third-party imports
 try:
@@ -114,7 +114,7 @@ class TimeoutManager(contextlib.ContextDecorator):
         msg = f"Operation timed out after {self.seconds} seconds"
         raise TimeoutError(msg)
 
-    def __enter__(self) -> "TimeoutManager":
+    def __enter__(self) -> TimeoutManager:
         """Enter the timeout context manager."""
         # Check if SIGALRM is available (won't be on Windows)
         if hasattr(signal, "SIGALRM"):
@@ -245,14 +245,6 @@ MIN_NAME_COL_WIDTH: Final[int] = len("Model")
 
 
 # --- Utility Functions ---
-def _pad_text(text: str, width: int, *, right_align: bool = False) -> str:
-    """Pad text to a specific visual width, accounting for ANSI codes."""
-    pad_len = max(0, width - Colors.visual_len(text))
-    padding = " " * pad_len
-    return f"{padding}{text}" if right_align else f"{text}{padding}"
-
-
-# --- Version Info ---
 def get_library_versions() -> dict[str, str]:
     """Return versions of key libraries as a dictionary."""
     return {
@@ -275,7 +267,7 @@ def print_version_info(versions: dict[str, str]) -> None:
         logger.info("%s: %s", name_padded, Colors.colored(ver, status_color))
     logger.info(
         "Generated: %s",
-        datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
+        datetime.now(get_localzone()).strftime("%Y-%m-%d %H:%M:%S %Z"),
     )
 
 
@@ -358,7 +350,7 @@ class MemoryStats(NamedTuple):
     time: float
 
     @staticmethod
-    def zero() -> "MemoryStats":
+    def zero() -> MemoryStats:
         """Return a MemoryStats instance with all values zeroed."""
         return MemoryStats(0.0, 0.0, 0.0, 0.0)
 
@@ -563,13 +555,32 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
     )
     if not date:
         try:
+            local_tz = get_localzone()
             date = datetime.fromtimestamp(
                 Path(img_path_str).stat().st_mtime,
-                tz=timezone.utc,
-            ).strftime("%Y-%m-%d %H:%M:%S")
+                tz=local_tz,
+            ).strftime("%Y-%m-%d %H:%M:%S %Z")
         except OSError as err:
             date = "Unknown date"
             logger.debug("Could not get file mtime: %s", err)
+    else:
+        # If EXIF date is present, try to parse and localize it
+        try:
+            for fmt in DATE_FORMATS:
+                try:
+                    dt = datetime.strptime(str(date), fmt)
+                    local_tz = get_localzone()
+                    date = (
+                        dt.replace(tzinfo=timezone.utc)
+                        .astimezone(local_tz)
+                        .strftime("%Y-%m-%d %H:%M:%S %Z")
+                    )
+                    break
+                except ValueError:
+                    continue
+        except Exception as err:
+            logger.debug("Could not localize EXIF date: %s", err)
+            date = str(date)
     metadata["date"] = str(date)
 
     # --- Description extraction ---
@@ -619,10 +630,13 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
             return "Unknown location"
 
         def dms_to_dd(dms: tuple[float, float, float], ref: str) -> tuple[float, str]:
-            dd: float
-            ref_upper: str
-            sign: int
-            # ...existing code...
+            # Ensure all elements are valid floats
+            deg, min_, sec = dms
+            if deg is None or min_ is None or sec is None:
+                raise ValueError("Invalid DMS tuple: contains None")
+            dd = deg + min_ / 60.0 + sec / 3600.0
+            ref_upper = ref.upper()
+            sign = -1 if ref_upper in ("S", "W") else 1
             return (dd * sign, ref_upper)
 
         try:
@@ -714,7 +728,9 @@ def pretty_print_exif(
         logger.info("No EXIF data available.")
         return
 
-    tags_to_print: list[tuple[str, str, bool]] = filter_and_format_tags(exif, show_all=show_all)
+    tags_to_print: list[tuple[str, str, bool]] = filter_and_format_tags(
+        exif, show_all=show_all,
+    )
     if not tags_to_print:
         logger.warning("No relevant EXIF tags found to display.")
         return
@@ -730,6 +746,13 @@ def pretty_print_exif(
     header_color = Colors.BLUE
     border_color = Colors.BLUE
     important_color = Colors.YELLOW
+    def _pad_text(text: str, width: int, right_align: bool = False) -> str:
+        """Pad text to a given width, optionally right-aligning."""
+        pad_len = width - Colors.visual_len(text)
+        pad_len = max(pad_len, 0)
+        pad_str = " " * pad_len
+        return (pad_str + text) if right_align else (text + pad_str)
+
     pad: Callable[[str, int, bool], str] = _pad_text
 
     # Print title above the table, visually separated (no leading newline)
@@ -984,6 +1007,7 @@ def generate_html_report(
         key=lambda x: (not x.success, x.stats.time if x.success else 0),
     )
 
+    local_tz = get_localzone()
     html_start = (
         """
 <!DOCTYPE html>
@@ -1029,7 +1053,7 @@ def generate_html_report(
         + """</div>
     <table>
         <caption>Performance metrics and output/errors for Vision Language Model processing. Generated on """
-        + datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        + datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")
         + """. Failures shown but excluded from averages.</caption>
         <thead>
             <tr>
@@ -1119,8 +1143,8 @@ def generate_html_report(
         html_footer += f"<li><code>{html.escape(name)}</code>: <code>{html.escape(ver)}</code></li>\n"
     html_footer += (
         "</ul>\n<p>Report generated on: "
-        + datetime.now().strftime(
-            "%Y-%m-%d %H:%M:%S",
+        + datetime.now(local_tz).strftime(
+            "%Y-%m-%d %H:%M:%S %Z",
         )
         + "</p>\n</footer>"
     )
@@ -1178,7 +1202,7 @@ def generate_markdown_report(
     )
     md.append("# Model Performance Results\n")
     md.append(
-        f"_Generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}_\n",
+        f"_Generated on {datetime.now(get_localzone()).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n",
     )
     md.append("")
     md.append(
@@ -1253,8 +1277,12 @@ def generate_markdown_report(
     md.append("**Library Versions:**\n")
     for name, ver in sorted(versions.items()):
         md.append(f"- `{name}`: `{ver}`")
+    local_tz = get_localzone()
     md.append(
-        f"\n_Report generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}_\n",
+        (
+            "\n_Report generated on: "
+            f"{datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n"
+        ),
     )
 
     try:
@@ -1372,7 +1400,7 @@ def _run_model_generation(
     image_path: Path,
     *,
     verbose: bool,
-) -> tuple[str, object, object]:
+) -> tuple[GenerationResult | str, object, object]:
     """Load model, format prompt and run generation.
 
     Raise exceptions on failure.
@@ -1452,8 +1480,7 @@ def process_image_with_model(params: ProcessImageParams) -> ModelResult:
     )
     model: object | None = None
     tokenizer: object | None = None
-    arch: str
-    gpu_info: str
+    arch, gpu_info = get_system_info()  # <-- Fix: initialize before use
     start_time: float = 0.0
     initial_mem: float = 0.0
     initial_cache: float = 0.0
