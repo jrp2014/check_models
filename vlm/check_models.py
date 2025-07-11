@@ -110,11 +110,11 @@ class TimeoutManager(contextlib.ContextDecorator):
         self,
         _signum: int,
         _frame: types.FrameType | None,
-    ) -> NoReturn:  # Use FrameType
+    ) -> NoReturn:
         msg = f"Operation timed out after {self.seconds} seconds"
         raise TimeoutError(msg)
 
-    def __enter__(self) -> Self:
+    def __enter__(self) -> "TimeoutManager":
         """Enter the timeout context manager."""
         # Check if SIGALRM is available (won't be on Windows)
         if hasattr(signal, "SIGALRM"):
@@ -181,12 +181,15 @@ class Colors:
     )
 
     @staticmethod
-    def colored(text: PathLike, *colors: str) -> str:
+    def colored(
+        text: str,
+        *color_codes: str,
+    ) -> str:
         """Return text wrapped in ANSI color codes if enabled."""
         text_str = str(text)  # Ensure always a string
-        if not Colors._enabled or not colors:
+        if not Colors._enabled or not color_codes:
             return text_str
-        color_seq = "".join(colors)
+        color_seq = "".join(color_codes)
         return f"{color_seq}{text_str}{Colors.RESET}"
 
     @staticmethod
@@ -355,7 +358,7 @@ class MemoryStats(NamedTuple):
     time: float
 
     @staticmethod
-    def zero() -> MemoryStats:
+    def zero() -> "MemoryStats":
         """Return a MemoryStats instance with all values zeroed."""
         return MemoryStats(0.0, 0.0, 0.0, 0.0)
 
@@ -386,7 +389,7 @@ def find_most_recent_file(folder: Path | str) -> Path | None:
         )
         return None
     try:
-        most_recent = max(
+        most_recent: Path | None = max(
             (
                 f
                 for f in folder_path.iterdir()
@@ -416,7 +419,7 @@ def find_most_recent_file(folder: Path | str) -> Path | None:
 # Improved error handling in `print_image_dimensions`.
 def print_image_dimensions(image_path: Path | str) -> None:
     """Print the dimensions and megapixel count of an image file."""
-    img_path_str = str(image_path)
+    img_path_str: str = str(image_path)
     try:
         with Image.open(img_path_str) as img:
             width, height = img.size
@@ -442,7 +445,7 @@ def print_image_dimensions(image_path: Path | str) -> None:
 @lru_cache(maxsize=128)
 def get_exif_data(image_path: PathLike) -> ExifDict | None:
     """Extract EXIF data from an image file and return as a dictionary."""
-    img_path_str = str(image_path)
+    img_path_str: str = str(image_path)
     try:
         with Image.open(img_path_str) as img:
             exif_raw: Any = img.getexif()
@@ -549,7 +552,7 @@ def _convert_gps_coordinate(
 def extract_image_metadata(image_path: Path | str) -> MetadataDict:
     """Extract key metadata (date, GPS, EXIF tags) from an image file."""
     metadata: MetadataDict = {}
-    img_path_str = str(image_path)
+    img_path_str: str = str(image_path)
     exif_data = get_exif_data(img_path_str) or {}
 
     # --- Date extraction ---
@@ -616,9 +619,10 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
             return "Unknown location"
 
         def dms_to_dd(dms: tuple[float, float, float], ref: str) -> tuple[float, str]:
-            dd = dms[0] + dms[1] / 60.0 + dms[2] / 3600.0
-            ref_upper = ref.upper()
-            sign = -1 if ref_upper in ("S", "W") else 1
+            dd: float
+            ref_upper: str
+            sign: int
+            # ...existing code...
             return (dd * sign, ref_upper)
 
         try:
@@ -681,7 +685,7 @@ def filter_and_format_tags(
     show_all: bool = False,
 ) -> list[tuple[str, str, bool]]:
     """Filter and format EXIF tags for pretty printing."""
-    tags = []
+    tags: list[tuple[str, str, bool]] = []
     for tag, value in exif.items():
         tag_str = str(tag)
         if tag_str == "GPSInfo" and isinstance(value, dict):
@@ -702,7 +706,7 @@ def filter_and_format_tags(
 def pretty_print_exif(
     exif: ExifDict,
     *,
-    show_all: bool = True,  # Default to True to print all EXIF tags
+    show_all: bool = True,
     title: str = "EXIF Metadata Summary",
 ) -> None:
     """Print key EXIF data in a formatted table with colors and a title."""
@@ -710,7 +714,7 @@ def pretty_print_exif(
         logger.info("No EXIF data available.")
         return
 
-    tags_to_print = filter_and_format_tags(exif, show_all=show_all)
+    tags_to_print: list[tuple[str, str, bool]] = filter_and_format_tags(exif, show_all=show_all)
     if not tags_to_print:
         logger.warning("No relevant EXIF tags found to display.")
         return
@@ -726,7 +730,7 @@ def pretty_print_exif(
     header_color = Colors.BLUE
     border_color = Colors.BLUE
     important_color = Colors.YELLOW
-    pad = _pad_text
+    pad: Callable[[str, int, bool], str] = _pad_text
 
     # Print title above the table, visually separated (no leading newline)
     logger.info(
@@ -817,7 +821,7 @@ def print_model_stats(results: list[ModelResult]) -> None:
             x.stats.time if x.success else float("inf"),
         ),
     )
-    colors: Final[types.SimpleNamespace] = types.SimpleNamespace(
+    colors: types.SimpleNamespace = types.SimpleNamespace(
         HEADER=Colors.CYAN,
         BORDER=Colors.BLUE,
         SUMMARY=Colors.GREEN,
@@ -832,8 +836,8 @@ def print_model_stats(results: list[ModelResult]) -> None:
     )
 
     def format_model_name(result: ModelResult) -> tuple[str, int]:
-        base_name = str(result.model_name).split("/")[-1]
-        display_name = base_name[:BASE_NAME_MAX_WIDTH] + (
+        base_name: str = str(result.model_name).split("/")[-1]
+        display_name: str = base_name[:BASE_NAME_MAX_WIDTH] + (
             "..." if len(base_name) > BASE_NAME_MAX_WIDTH else ""
         )
         if not result.success:
@@ -1392,15 +1396,15 @@ def _run_model_generation(
     if isinstance(formatted_prompt, list):
         formatted_prompt = "\n".join(str(m) for m in formatted_prompt)
 
-    output = generate(
+    output: GenerationResult | str = generate(
         model=model,
         processor=tokenizer,
         prompt=formatted_prompt,
         image=str(image_path),
         verbose=verbose,
-        temperature = params.temperature,
-        trust_remote_code = params.trust_remote_code,
-        max_tokens = params.max_tokens,
+        temperature=params.temperature,
+        trust_remote_code=params.trust_remote_code,
+        max_tokens=params.max_tokens,
     )
     mx.eval(model.parameters())
     return (
@@ -1440,7 +1444,8 @@ def process_image_with_model(params: ProcessImageParams) -> ModelResult:
     logger.info(
         Colors.colored(
             "Processing '%s' with model: %s",
-            Colors.BOLD, Colors.MAGENTA,
+            Colors.BOLD,
+            Colors.MAGENTA,
         ),
         str(getattr(params.image_path, "name", params.image_path)),
         params.model_identifier,
@@ -1449,7 +1454,6 @@ def process_image_with_model(params: ProcessImageParams) -> ModelResult:
     tokenizer: object | None = None
     arch: str
     gpu_info: str
-    arch, gpu_info = get_system_info()
     start_time: float = 0.0
     initial_mem: float = 0.0
     initial_cache: float = 0.0
@@ -1816,7 +1820,7 @@ def finalize_execution(
 
 def main(args: argparse.Namespace) -> None:
     """Run CLI execution for MLX VLM model check."""
-    overall_start_time = time.perf_counter()
+    overall_start_time: float = time.perf_counter()
     try:
         library_versions = setup_environment(args)
         print_cli_header("MLX Vision Language Model Check")
