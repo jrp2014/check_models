@@ -373,7 +373,7 @@ class ModelResult:
 
     model_name: str
     success: bool
-    output: GenerationResult | None = None
+    generationresult: GenerationResult | None = None
     stats: MemoryStats = field(default_factory=MemoryStats.zero)
     error_stage: str | None = None
     error_message: str | None = None
@@ -457,7 +457,6 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
                 logger.debug("No EXIF data found in %s", img_path_str)
                 return None
             exif_decoded: ExifDict = {}
-            # logger.debug("Raw EXIF data for %s: %s", img_path_str, exif_raw)
             # First pass: Process IFD0 (main image directory) tags
             for tag_id, value in exif_raw.items():
                 # Skip SubIFD pointers, we'll handle them separately
@@ -465,11 +464,6 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
                     continue
                 tag_name: str = TAGS.get(tag_id, str(tag_id))
                 exif_decoded[tag_name] = value
-            # logger.debug(
-            #     "IFD0 tags decoded for %s: %s",
-            #     img_path_str,
-            #     exif_decoded,
-            # )
             # Second pass: Process Exif SubIFD (if available)
             try:
                 exif_ifd: Any = exif_raw.get_ifd(ExifTags.IFD.Exif)
@@ -480,11 +474,6 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
                             for tag_id, value in exif_ifd.items()
                         },
                     )
-                    # logger.debug(
-                    #     "Exif SubIFD merged for %s: %s",
-                    #     img_path_str,
-                    #     exif_decoded,
-                    # )
             except (KeyError, AttributeError, TypeError):
                 logger.exception("Could not extract Exif SubIFD")
             # Third pass: Process GPS IFD (if available)
@@ -499,11 +488,6 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
                             gps_key = str(gps_tag_id)
                         gps_decoded[str(gps_key)] = gps_value
                     exif_decoded["GPSInfo"] = gps_decoded
-                    # logger.debug(
-                    #     "GPS IFD merged for %s: %s",
-                    #     img_path_str,
-                    #     exif_decoded,
-                    # )
             except (KeyError, AttributeError, TypeError) as gps_err:
                 logger.warning("Could not extract GPS IFD: %s", gps_err)
             return exif_decoded
@@ -1080,7 +1064,7 @@ def generate_html_report(
         stats_cells = ""
 
         if result.success:
-            escaped_output = html.escape(result.output.text or "")
+            escaped_output = html.escape(result.generationresult.text or "")
             # Highlight model output in HTML
             result_content = (
                 f'<div class="model-output"><strong>{escaped_output}</strong></div>'
@@ -1231,7 +1215,7 @@ def generate_markdown_report(
                 f"{result.stats.time:.2f}",
             ]
             # Replace newlines with <br> in output
-            output_text: str = (result.output.text or "").replace("\n", "<br>")
+            output_text: str = (result.generationresult.text or "").replace("\n", "<br>")
             output_md: str = output_text
         else:
             stats = ["-", "-", "-", "-"]
@@ -1262,9 +1246,7 @@ def generate_markdown_report(
             successful_results,
         )
         max_peak = max(r.stats.peak for r in successful_results)
-        avg_time = sum(r.stats.time for r in successful_results) / len(
-            successful_results,
-        )
+        avg_time = sum(r.stats.time for r in successful_results) / len(successful_results)
         summary_title = f"**AVG/PEAK ({len(successful_results)} Success)**"
         summary_stats = [
             f"{avg_active:,.0f}",
@@ -1407,7 +1389,7 @@ def _run_model_generation(
     image_path: Path,
     *,
     verbose: bool,
-) -> tuple[GenerationResult | str, object, object]:
+) -> GenerationResult:
     """Load model, format prompt and run generation.
 
     Raise exceptions on failure.
@@ -1431,7 +1413,7 @@ def _run_model_generation(
     if isinstance(formatted_prompt, list):
         formatted_prompt = "\n".join(str(m) for m in formatted_prompt)
 
-    output: GenerationResult | str = generate(
+    output: GenerationResult = generate(
         model=model,
         processor=tokenizer,
         prompt=formatted_prompt,
@@ -1442,11 +1424,7 @@ def _run_model_generation(
         max_tokens=params.max_tokens,
     )
     mx.eval(model.parameters())
-    return (
-        output if output else "[No model output]",
-        model,
-        tokenizer,
-    )
+    return output
 
 
 class ProcessImageParams(NamedTuple):
@@ -1509,7 +1487,7 @@ def process_image_with_model(params: ProcessImageParams) -> ModelResult:
                 temperature=params.temperature,
                 trust_remote_code=params.trust_remote_code,
             )
-            output, model, tokenizer = _run_model_generation(
+            output : GenerationResult= _run_model_generation(
                 params=gen_params,
                 image_path=params.image_path,
                 verbose=params.verbose,
@@ -1544,7 +1522,7 @@ def process_image_with_model(params: ProcessImageParams) -> ModelResult:
         result = ModelResult(
             model_name=params.model_identifier,
             success=True,
-            output=output,
+            generationresult=output,
             stats=final_stats,
         )
     finally:
@@ -1775,10 +1753,10 @@ def process_models(
                         Colors.GREEN,
                     ),
                 )
-                if result.output:
+                if result.generationresult:
                     logger.info(
                         Colors.colored("Output:\n%s", Colors.BOLD, Colors.GREEN),
-                        result.output.text,
+                        result.generationresult.text,
                     )
                 if args.verbose:
                     logger.info(
@@ -1788,12 +1766,12 @@ def process_models(
                             Colors.CYAN,
                         ),
                         result.stats.time,
-                        result.output.token,
-                        result.output.prompt_tokens,
-                        result.output.generation_tokens,
-                        result.output.prompt_tps,
-                        result.output.generation_tps,
-                        result.output.peak_memory,
+                        result.generationresult.token,
+                        result.generationresult.prompt_tokens,
+                        result.generationresult.generation_tokens,
+                        result.generationresult.prompt_tps,
+                        result.generationresult.generation_tps,
+                        result.generationresult.peak_memory,
                     )
             else:
                 logger.error(
