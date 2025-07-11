@@ -16,20 +16,22 @@ import sys
 import time
 import types  # For TracebackType
 from typing import TYPE_CHECKING
+from zoneinfo import ZoneInfo
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from re import Pattern
+import functools  # For lru_cache
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from functools import lru_cache
 from pathlib import Path
-from re import Pattern
 from typing import (
     Any,
     ClassVar,
     Final,
     NamedTuple,
     NoReturn,
+    Self,
     TypeVar,
 )
 
@@ -39,7 +41,6 @@ from huggingface_hub import __version__ as hf_version
 from huggingface_hub.errors import HFValidationError
 from tzlocal import get_localzone
 
-# Third-party imports
 try:
     import mlx.core as mx
 except ImportError:
@@ -114,7 +115,7 @@ class TimeoutManager(contextlib.ContextDecorator):
         msg = f"Operation timed out after {self.seconds} seconds"
         raise TimeoutError(msg)
 
-    def __enter__(self) -> TimeoutManager:
+    def __enter__(self) -> Self:
         """Enter the timeout context manager."""
         # Check if SIGALRM is available (won't be on Windows)
         if hasattr(signal, "SIGALRM"):
@@ -245,6 +246,17 @@ MIN_NAME_COL_WIDTH: Final[int] = len("Model")
 
 
 # --- Utility Functions ---
+# Ensure _pad_text is defined only once at module level and used everywhere
+
+
+def _pad_text(text: str, width: int, right_align: bool = False) -> str:
+    """Pad text to a given width, optionally right-aligning."""
+    pad_len = width - Colors.visual_len(text)
+    pad_len = max(pad_len, 0)
+    pad_str = " " * pad_len
+    return (pad_str + text) if right_align else (text + pad_str)
+
+
 def get_library_versions() -> dict[str, str]:
     """Return versions of key libraries as a dictionary."""
     return {
@@ -434,7 +446,7 @@ def print_image_dimensions(image_path: Path | str) -> None:
 
 
 # --- EXIF & Metadata Handling ---
-@lru_cache(maxsize=128)
+@functools.lru_cache(maxsize=128)
 def get_exif_data(image_path: PathLike) -> ExifDict | None:
     """Extract EXIF data from an image file and return as a dictionary."""
     img_path_str: str = str(image_path)
@@ -548,7 +560,7 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
     exif_data = get_exif_data(img_path_str) or {}
 
     # --- Date extraction ---
-    date = (
+    date : str = (
         exif_data.get("DateTimeOriginal")
         or exif_data.get("CreateDate")
         or exif_data.get("DateTime")
@@ -568,13 +580,11 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
         try:
             for fmt in DATE_FORMATS:
                 try:
-                    dt = datetime.strptime(str(date), fmt)
-                    local_tz = get_localzone()
-                    date = (
-                        dt.replace(tzinfo=timezone.utc)
-                        .astimezone(local_tz)
-                        .strftime("%Y-%m-%d %H:%M:%S %Z")
+                    dt: datetime = datetime.strptime(str(date), fmt).replace(
+                        tzinfo=timezone.utc,
                     )
+                    local_tz: ZoneInfo = get_localzone()
+                    date: str = dt.astimezone(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")
                     break
                 except ValueError:
                     continue
@@ -633,7 +643,8 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
             # Ensure all elements are valid floats
             deg, min_, sec = dms
             if deg is None or min_ is None or sec is None:
-                raise ValueError("Invalid DMS tuple: contains None")
+                msg = "Invalid DMS tuple: contains None"
+                raise ValueError(msg)
             dd = deg + min_ / 60.0 + sec / 3600.0
             ref_upper = ref.upper()
             sign = -1 if ref_upper in ("S", "W") else 1
@@ -729,7 +740,8 @@ def pretty_print_exif(
         return
 
     tags_to_print: list[tuple[str, str, bool]] = filter_and_format_tags(
-        exif, show_all=show_all,
+        exif,
+        show_all=show_all,
     )
     if not tags_to_print:
         logger.warning("No relevant EXIF tags found to display.")
@@ -746,14 +758,6 @@ def pretty_print_exif(
     header_color = Colors.BLUE
     border_color = Colors.BLUE
     important_color = Colors.YELLOW
-    def _pad_text(text: str, width: int, right_align: bool = False) -> str:
-        """Pad text to a given width, optionally right-aligning."""
-        pad_len = width - Colors.visual_len(text)
-        pad_len = max(pad_len, 0)
-        pad_str = " " * pad_len
-        return (pad_str + text) if right_align else (text + pad_str)
-
-    pad: Callable[[str, int, bool], str] = _pad_text
 
     # Print title above the table, visually separated (no leading newline)
     logger.info(
@@ -790,9 +794,9 @@ def pretty_print_exif(
     logger.info(
         "%s%s%s%s%s",
         Colors.colored("║", border_color),
-        pad(Colors.colored("Tag", header_color), max_tag_len),
+        _pad_text(Colors.colored("Tag", header_color), max_tag_len),
         Colors.colored("│", border_color),
-        pad(Colors.colored("Value", header_color), max_val_len),
+        _pad_text(Colors.colored("Value", header_color), max_val_len),
         Colors.colored("║", border_color),
     )
     logger.info(
@@ -810,9 +814,9 @@ def pretty_print_exif(
         logger.info(
             "%s%s%s%s%s",
             Colors.colored("║", border_color),
-            pad(tag_display, max_tag_len),
+            _pad_text(tag_display, max_tag_len),
             Colors.colored("│", border_color),
-            pad(value_display, max_val_len),
+            _pad_text(value_display, max_val_len),
             Colors.colored("║", border_color),
         )
     logger.info(
@@ -1272,6 +1276,9 @@ def generate_markdown_report(
             f"| {summary_title} | {summary_stats[0]} | {summary_stats[1]} | {summary_stats[2]} | {summary_stats[3]} |  |",
         )
 
+    # Version info
+    md.append("\n---\n")
+    md.append("**Library Versions:**\n")
     # Version info
     md.append("\n---\n")
     md.append("**Library Versions:**\n")
