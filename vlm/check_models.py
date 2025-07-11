@@ -16,11 +16,12 @@ import sys
 import time
 import types  # For TracebackType
 from typing import TYPE_CHECKING
-from zoneinfo import ZoneInfo
 
 if TYPE_CHECKING:
     from collections.abc import Callable
     from re import Pattern
+    from zoneinfo import ZoneInfo
+
 import functools  # For lru_cache
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -97,7 +98,8 @@ class TimeoutManager(contextlib.ContextDecorator):
     """Manage a timeout context for code execution (UNIX only)."""
 
     def __init__(self, seconds: float) -> None:
-        """Initialize a timeout manager with a timeout duration.
+        """
+        Initialize a timeout manager with a timeout duration.
 
         Args:
             seconds: The timeout duration in seconds.
@@ -544,7 +546,7 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
     exif_data = get_exif_data(img_path_str) or {}
 
     # --- Date extraction ---
-    date : str = (
+    date: str = (
         exif_data.get("DateTimeOriginal")
         or exif_data.get("CreateDate")
         or exif_data.get("DateTime")
@@ -878,7 +880,7 @@ def print_model_stats(results: list[ModelResult]) -> None:
             colors.BORDER,
         )
 
-    logger.info("\n%s", h_line("═"))
+    logger.info("%s", h_line("═"))
     headers = ["Model", "Active Δ", "Cache Δ", "Peak Mem", "Time"]
     header_row = Colors.colored(
         f"║ {_pad_text(Colors.colored(headers[0], colors.HEADER, Colors.BOLD), name_col_width)} │ "
@@ -1184,10 +1186,7 @@ def generate_markdown_report(
 
     # Table header
     md: list[str] = []
-    # Add a style block to force top alignment for all table cells (works in GitHub and VS Code preview)
-    md.append(
-        "<style>table td, table th { vertical-align: top !important; text-align: left !important; }</style>",
-    )
+
     md.append("# Model Performance Results\n")
     md.append(
         f"_Generated on {datetime.now(get_localzone()).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n",
@@ -1200,9 +1199,9 @@ def generate_markdown_report(
     md.append(
         "| Model | Active Δ (MB) | Cache Δ (MB) | Peak Mem (MB) | Time (s) | Output / Error / Diagnostics |",
     )
-    # All columns left-aligned:
+    # All columns: Model and Output left-aligned, numeric columns right-aligned, top-aligned
     md.append(
-        "|:------|:--------------|:-------------|:--------------|:---------|:-----------------------------|",
+        "|:------|--:|--:|--:|--:|:-----------------------------|",
     )
 
     for result in results:
@@ -1215,7 +1214,9 @@ def generate_markdown_report(
                 f"{result.stats.time:.2f}",
             ]
             # Replace newlines with <br> in output
-            output_text: str = (result.generationresult.text or "").replace("\n", "<br>")
+            output_text: str = (result.generationresult.text or "").replace(
+                "\n", "<br>"
+            )
             output_md: str = output_text
         else:
             stats = ["-", "-", "-", "-"]
@@ -1246,7 +1247,9 @@ def generate_markdown_report(
             successful_results,
         )
         max_peak = max(r.stats.peak for r in successful_results)
-        avg_time = sum(r.stats.time for r in successful_results) / len(successful_results)
+        avg_time = sum(r.stats.time for r in successful_results) / len(
+            successful_results
+        )
         summary_title = f"**AVG/PEAK ({len(successful_results)} Success)**"
         summary_stats = [
             f"{avg_active:,.0f}",
@@ -1258,9 +1261,6 @@ def generate_markdown_report(
             f"| {summary_title} | {summary_stats[0]} | {summary_stats[1]} | {summary_stats[2]} | {summary_stats[3]} |  |",
         )
 
-    # Version info
-    md.append("\n---\n")
-    md.append("**Library Versions:**\n")
     # Version info
     md.append("\n---\n")
     md.append("**Library Versions:**\n")
@@ -1390,7 +1390,8 @@ def _run_model_generation(
     *,
     verbose: bool,
 ) -> GenerationResult:
-    """Load model, format prompt and run generation.
+    """
+    Load model, format prompt and run generation.
 
     Raise exceptions on failure.
     """
@@ -1428,7 +1429,8 @@ def _run_model_generation(
 
 
 class ProcessImageParams(NamedTuple):
-    """Parameters for processing an image with a VLM.
+    """
+    Parameters for processing an image with a VLM.
 
     Attributes:
         model_identifier: Model path or identifier.
@@ -1469,7 +1471,6 @@ def process_image_with_model(params: ProcessImageParams) -> ModelResult:
     start_time: float = 0.0
     initial_mem: float = 0.0
     initial_cache: float = 0.0
-    output: str | None = None
     try:
         validate_temperature(temp=params.temperature)
         validate_image_accessible(image_path=params.image_path)
@@ -1487,7 +1488,7 @@ def process_image_with_model(params: ProcessImageParams) -> ModelResult:
                 temperature=params.temperature,
                 trust_remote_code=params.trust_remote_code,
             )
-            output : GenerationResult= _run_model_generation(
+            output: GenerationResult = _run_model_generation(
                 params=gen_params,
                 image_path=params.image_path,
                 verbose=params.verbose,
@@ -1709,7 +1710,8 @@ def process_models(
     image_path: Path,
     prompt: str,
 ) -> list[ModelResult]:
-    """Process images with the specified models or scan cache for available models.
+    """
+    Process images with the specified models or scan cache for available models.
 
     Returns a list of model results with outputs and performance metrics.
     """
