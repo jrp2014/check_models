@@ -1199,7 +1199,7 @@ def generate_markdown_report(
                 f"{result.stats.time:.2f}",
             ]
             # Replace newlines with <br> in output
-            output_text: str = (result.output or "").replace("\n", "<br>")
+            output_text: str = (result.output.text or "").replace("\n", "<br>")
             output_md: str = output_text
         else:
             stats = ["-", "-", "-", "-"]
@@ -1438,7 +1438,10 @@ class ProcessImageParams(NamedTuple):
 def process_image_with_model(params: ProcessImageParams) -> ModelResult:
     """Process an image with a Vision Language Model, managing stats and errors."""
     logger.info(
-        "Processing '%s' with model: %s",
+        Colors.colored(
+            "Processing '%s' with model: %s",
+            Colors.BOLD, Colors.MAGENTA,
+        ),
         str(getattr(params.image_path, "name", params.image_path)),
         params.model_identifier,
     )
@@ -1742,7 +1745,7 @@ def process_models(
                 if args.verbose:
                     logger.info(
                         Colors.colored(
-                            "Statistics:\nTime taken: %.2fs\nToken: %i\nPrompt tokens: %i\nGeneration tokens: %i\nPrompt tps: %.1f\nGeneration tps: %.1f\nPeak Memory: %.1fGb\n",
+                            "Statistics:\nTime taken: %.2fs\nInput tokens: %i\nPrompt tokens: %i\nGeneration tokens: %i\nPrompt tps: %.1f\nGeneration tps: %.1f\nPeak Memory: %.1fGb\n",
                             Colors.BOLD,
                             Colors.CYAN,
                         ),
