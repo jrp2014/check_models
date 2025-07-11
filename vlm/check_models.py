@@ -16,12 +16,11 @@ import sys
 import time
 import types  # For TracebackType
 from typing import TYPE_CHECKING
+from zoneinfo import ZoneInfo
 
 if TYPE_CHECKING:
     from collections.abc import Callable
     from re import Pattern
-    from zoneinfo import ZoneInfo
-
 import functools  # For lru_cache
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -514,6 +513,7 @@ MED_GPS_COORD_LEN = 2
 MIN_GPS_COORD_LEN = 1
 
 
+# Reduce return count and use named constants
 def _convert_gps_coordinate(
     coord: tuple[float | str, ...] | list[float | str],
 ) -> tuple[float, float, float] | None:
@@ -544,7 +544,7 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
     exif_data = get_exif_data(img_path_str) or {}
 
     # --- Date extraction ---
-    date: str = (
+    date : str = (
         exif_data.get("DateTimeOriginal")
         or exif_data.get("CreateDate")
         or exif_data.get("DateTime")
@@ -1064,11 +1064,7 @@ def generate_html_report(
         stats_cells = ""
 
         if result.success:
-            escaped_output = (
-                "No output generated"
-                if result.generationresult is None
-                else html.escape(result.generationresult.text or "")
-            )
+            escaped_output = html.escape(result.generationresult.text or "")
             # Highlight model output in HTML
             result_content = (
                 f'<div class="model-output"><strong>{escaped_output}</strong></div>'
@@ -1216,14 +1212,7 @@ def generate_markdown_report(
                 f"{result.stats.time:.2f}",
             ]
             # Replace newlines with <br> in output
-            output_text: str = (
-                "No generated output"
-                if result.generationresult is None
-                else (result.generationresult.text or "").replace(
-                    "\n",
-                    "<br>",
-                )
-            )
+            output_text: str = (result.generationresult.text or "").replace("\n", "<br>")
             output_md: str = output_text
         else:
             stats = ["-", "-", "-", "-"]
@@ -1254,9 +1243,7 @@ def generate_markdown_report(
             successful_results,
         )
         max_peak = max(r.stats.peak for r in successful_results)
-        avg_time = sum(r.stats.time for r in successful_results) / len(
-            successful_results,
-        )
+        avg_time = sum(r.stats.time for r in successful_results) / len(successful_results)
         summary_title = f"**AVG/PEAK ({len(successful_results)} Success)**"
         summary_stats = [
             f"{avg_active:,.0f}",
@@ -1268,6 +1255,9 @@ def generate_markdown_report(
             f"| {summary_title} | {summary_stats[0]} | {summary_stats[1]} | {summary_stats[2]} | {summary_stats[3]} |  |",
         )
 
+    # Version info
+    md.append("\n---\n")
+    md.append("**Library Versions:**\n")
     # Version info
     md.append("\n---\n")
     md.append("**Library Versions:**\n")
@@ -1397,8 +1387,7 @@ def _run_model_generation(
     *,
     verbose: bool,
 ) -> GenerationResult:
-    """
-    Load model, format prompt and run generation.
+    """Load model, format prompt and run generation.
 
     Raise exceptions on failure.
     """
@@ -1436,8 +1425,7 @@ def _run_model_generation(
 
 
 class ProcessImageParams(NamedTuple):
-    """
-    Parameters for processing an image with a VLM.
+    """Parameters for processing an image with a VLM.
 
     Attributes:
         model_identifier: Model path or identifier.
@@ -1495,7 +1483,7 @@ def process_image_with_model(params: ProcessImageParams) -> ModelResult:
                 temperature=params.temperature,
                 trust_remote_code=params.trust_remote_code,
             )
-            output: GenerationResult = _run_model_generation(
+            output : GenerationResult= _run_model_generation(
                 params=gen_params,
                 image_path=params.image_path,
                 verbose=params.verbose,
@@ -1717,8 +1705,7 @@ def process_models(
     image_path: Path,
     prompt: str,
 ) -> list[ModelResult]:
-    """
-    Process images with the specified models or scan cache for available models.
+    """Process images with the specified models or scan cache for available models.
 
     Returns a list of model results with outputs and performance metrics.
     """
@@ -1775,24 +1762,12 @@ def process_models(
                             Colors.CYAN,
                         ),
                         result.stats.time,
-                        0
-                        if results.generationresult is None
-                        else result.generationresult.token,
-                        0
-                        if results.generationresult is None
-                        else result.generationresult.prompt_tokens,
-                        0
-                        if results.generationresult is None
-                        else result.generationresult.generation_tokens,
-                        0
-                        if results.generationresult is None
-                        else result.generationresult.prompt_tps,
-                        0
-                        if results.generationresult is None
-                        else result.generationresult.generation_tps,
-                        0
-                        if results.generationresult is None
-                        else result.generationresult.peak_memory,
+                        result.generationresult.token,
+                        result.generationresult.prompt_tokens,
+                        result.generationresult.generation_tokens,
+                        result.generationresult.prompt_tps,
+                        result.generationresult.generation_tps,
+                        result.generationresult.peak_memory,
                     )
             else:
                 logger.error(
@@ -1948,4 +1923,10 @@ if __name__ == "__main__":
 
     # Parse arguments
     args = parser.parse_args()
+    # Print all command-line arguments if verbose is set
+    if getattr(args, "verbose", False):
+        logger.info(Colors.colored("--- Command Line Parameters ---", Colors.BOLD, Colors.BLUE))
+        for arg_name, arg_value in sorted(vars(args).items()):
+            logger.info("%s: %s", Colors.colored(arg_name, Colors.BOLD, Colors.CYAN), Colors.colored(str(arg_value), Colors.GREEN))
+        logger.info(Colors.colored("--- End Parameters ---", Colors.BOLD, Colors.BLUE))
     main(args)
