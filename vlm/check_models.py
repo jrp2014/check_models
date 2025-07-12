@@ -16,11 +16,12 @@ import sys
 import time
 import types  # For TracebackType
 from typing import TYPE_CHECKING
-from zoneinfo import ZoneInfo
 
 if TYPE_CHECKING:
     from collections.abc import Callable
     from re import Pattern
+    from zoneinfo import ZoneInfo
+
 import functools  # For lru_cache
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -549,6 +550,7 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
         exif_data.get("DateTimeOriginal")
         or exif_data.get("CreateDate")
         or exif_data.get("DateTime")
+        or "No date recorded"
     )
     if not date:
         try:
