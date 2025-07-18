@@ -104,10 +104,12 @@ class TimeoutManager(contextlib.ContextDecorator):
 
         """
         self.seconds: float = seconds
-        self.timer: types.FrameType | None = None
+        self.timer: Any = None
 
     def _timeout_handler(
-        self, _signum: int, _frame: types.FrameType | None
+        self,
+        _signum: int,
+        _frame: types.FrameType | None,
     ) -> NoReturn:
         msg: str = f"Operation timed out after {self.seconds} seconds"
         raise TimeoutError(msg)
@@ -175,7 +177,7 @@ class Colors:
     GRAY: Final[str] = "\033[90m"
     _enabled: ClassVar[bool] = sys.stderr.isatty()
     _ansi_escape_re: ClassVar[re.Pattern[str]] = re.compile(
-        r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])"
+        r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])",
     )
 
     @staticmethod
@@ -404,12 +406,13 @@ def find_most_recent_file(folder: Path | str) -> Path | None:
     except PermissionError:
         logger.exception(
             Colors.colored(
-                f"Permission denied accessing folder: {folder_str}", Colors.YELLOW
-            )
+                f"Permission denied accessing folder: {folder_str}",
+                Colors.YELLOW,
+            ),
         )
     except OSError:
         logger.exception(
-            Colors.colored(f"OS error scanning folder {folder_str}", Colors.YELLOW)
+            Colors.colored(f"OS error scanning folder {folder_str}", Colors.YELLOW),
         )
     return None
 
@@ -429,14 +432,14 @@ def print_image_dimensions(image_path: Path | str) -> None:
             )
     except (FileNotFoundError, UnidentifiedImageError):
         logger.exception(
-            Colors.colored(f"Error with image file {img_path_str}", Colors.YELLOW)
+            Colors.colored(f"Error with image file {img_path_str}", Colors.YELLOW),
         )
     except OSError:
         logger.exception(
             Colors.colored(
                 f"Unexpected error reading image dimensions for {img_path_str}",
                 Colors.YELLOW,
-            )
+            ),
         )
 
 
@@ -486,19 +489,21 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
             except (KeyError, AttributeError, TypeError) as gps_err:
                 logger.warning(
                     Colors.colored(
-                        f"Could not extract GPS IFD: {gps_err}", Colors.YELLOW
-                    )
+                        f"Could not extract GPS IFD: {gps_err}",
+                        Colors.YELLOW,
+                    ),
                 )
             return exif_decoded
     except (FileNotFoundError, UnidentifiedImageError):
         logger.exception(
-            Colors.colored(f"Error reading image file: {img_path_str}", Colors.YELLOW)
+            Colors.colored(f"Error reading image file: {img_path_str}", Colors.YELLOW),
         )
     except (OSError, ValueError, TypeError):
         logger.exception(
             Colors.colored(
-                f"Unexpected error reading EXIF from: {img_path_str}", Colors.YELLOW
-            )
+                f"Unexpected error reading EXIF from: {img_path_str}",
+                Colors.YELLOW,
+            ),
         )
     return None
 
@@ -580,7 +585,7 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
                     continue
         except (ValueError, TypeError, UnicodeDecodeError) as err:
             logger.warning(
-                Colors.colored(f"Could not localize EXIF date: {err}", Colors.YELLOW)
+                Colors.colored(f"Could not localize EXIF date: {err}", Colors.YELLOW),
             )
             date = str(date)
     metadata["date"] = str(date)
@@ -596,8 +601,9 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
                 desc_str = str(description)
                 logger.debug(
                     Colors.colored(
-                        f"Failed to decode description: {err}", Colors.YELLOW
-                    )
+                        f"Failed to decode description: {err}",
+                        Colors.YELLOW,
+                    ),
                 )
         else:
             desc_str = str(description).strip()
@@ -636,7 +642,7 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
                 Colors.colored(
                     "GPS conversion failed: latitude or longitude is None.",
                     Colors.YELLOW,
-                )
+                ),
             )
             return "Unknown location"
 
@@ -666,8 +672,9 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
         except (ValueError, AttributeError, TypeError) as err:
             logger.debug(
                 Colors.colored(
-                    f"Failed to convert GPS DMS to decimal: {err}", Colors.YELLOW
-                )
+                    f"Failed to convert GPS DMS to decimal: {err}",
+                    Colors.YELLOW,
+                ),
             )
             return "Unknown location"
 
@@ -701,7 +708,7 @@ def exif_value_to_str(tag_str: str, value: object) -> str:
             Colors.colored(
                 f"Could not convert EXIF value for tag '{tag_str}' to string: {str_err}",
                 Colors.YELLOW,
-            )
+            ),
         )
         return f"<unrepresentable type: {type(value).__name__}>"
     else:
@@ -751,7 +758,7 @@ def pretty_print_exif(
     )
     if not tags_to_print:
         logger.warning(
-            Colors.colored("No relevant EXIF tags found to display.", Colors.YELLOW)
+            Colors.colored("No relevant EXIF tags found to display.", Colors.YELLOW),
         )
         return
     max_tag_len = (
@@ -874,7 +881,7 @@ def print_model_stats(results: list[ModelResult]) -> None:
                 getattr(result.model_name, "split", None)
                 and result.model_name.split("/")[-1]
             )
-            or result.model_name
+            or result.model_name,
         )
         display_name: str = base_name[:BASE_NAME_MAX_WIDTH] + (
             "..." if len(base_name) > BASE_NAME_MAX_WIDTH else ""
@@ -1017,7 +1024,7 @@ def generate_html_report(
     """Generate an HTML file with model stats, outputs, errors, and versions."""
     if not results:
         logger.warning(
-            Colors.colored("No results to generate HTML report.", Colors.YELLOW)
+            Colors.colored("No results to generate HTML report.", Colors.YELLOW),
         )
         return
 
@@ -1094,7 +1101,12 @@ def generate_html_report(
         stats_cells = ""
 
         if result.success:
-            escaped_output = html.escape(result.generationresult.text or "")
+            output_text = (
+                result.generationresult.text
+                if result.generationresult and hasattr(result.generationresult, "text")
+                else ""
+            )
+            escaped_output = html.escape(output_text or "")
             # Highlight model output in HTML
             result_content = (
                 f'<div class="model-output"><strong>{escaped_output}</strong></div>'
@@ -1205,7 +1217,7 @@ def generate_markdown_report(
     """Generate a Markdown file with model stats, output/errors, failures, and versions. All table cells are left- and top-aligned."""
     if not results:
         logger.warning(
-            Colors.colored("No results to generate Markdown report.", Colors.YELLOW)
+            Colors.colored("No results to generate Markdown report.", Colors.YELLOW),
         )
         return
 
@@ -1273,7 +1285,7 @@ def generate_markdown_report(
         )
         max_peak = max(r.stats.peak for r in successful_results)
         avg_time = sum(r.stats.time for r in successful_results) / len(
-            successful_results
+            successful_results,
         )
         summary_title = f"**AVG/PEAK ({len(successful_results)} Success)**"
         summary_stats = [
@@ -1796,12 +1808,12 @@ def process_models(
                             Colors.CYAN,
                         ),
                         result.stats.time,
-                        result.generationresult.token,
-                        result.generationresult.prompt_tokens,
-                        result.generationresult.generation_tokens,
-                        result.generationresult.prompt_tps,
-                        result.generationresult.generation_tps,
-                        result.generationresult.peak_memory,
+                        getattr(result.generationresult, "token", 0),
+                        getattr(result.generationresult, "prompt_tokens", 0),
+                        getattr(result.generationresult, "generation_tokens", 0),
+                        getattr(result.generationresult, "prompt_tps", 0.0),
+                        getattr(result.generationresult, "generation_tps", 0.0),
+                        getattr(result.generationresult, "peak_memory", 0.0),
                     )
             else:
                 logger.error(
@@ -1960,7 +1972,7 @@ if __name__ == "__main__":
     # Print all command-line arguments if verbose is set
     if getattr(args, "verbose", False):
         logger.info(
-            Colors.colored("--- Command Line Parameters ---", Colors.BOLD, Colors.BLUE)
+            Colors.colored("--- Command Line Parameters ---", Colors.BOLD, Colors.BLUE),
         )
         for arg_name, arg_value in sorted(vars(args).items()):
             logger.info(
