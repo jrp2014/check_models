@@ -1,0 +1,46 @@
+[project]
+name = "mlx-vlm-check"
+description = "Image analysis and caption generation using MLX Vision Language Models."
+version = "0.1.0"
+authors = [
+    { name = "Your Name", email = "your@email.com" },
+]
+requires-python = ">=3.9"
+readme = "README.md"
+license = { text = "MIT" }
+
+[project.urls]
+Homepage = "https://github.com/ml-explore/mlx-examples"
+
+[tool.uv]
+dev-dependencies = []
+
+[tool.setuptools]
+packages = ["."]
+
+[project.dependencies]
+mlx = "*"
+mlx-vlm = "*"
+Pillow = "*"
+huggingface_hub = "*"
+tzlocal = "*"
+
+[tool.ruff]
+line-length = 100
+exclude = [".venv", "__pycache__", "build", "dist"]
+indent-width = 4
+
+[tool.ruff.format]
+quote-style = "double"
+skip-magic-trailing-comma = false
+
+[tool.ruff.lint]
+# D203 and D213 are explicitly excluded to avoid incompatibility warnings with D211 and D212.
+select = [
+    "E", "F", "W", "C90", "I", "N", "D", "UP", "YTT", "ANN", "S", "BLE", "B", "A", "COM", "C4", "DTZ", "EM", "EXE", "FBT", "ICN", "INP", "ISC", "PIE", "PT", "Q", "RET", "SIM", "T20", "TID", "TCH", "ARG", "PTH", "ERA", "PD", "PGH", "PL", "TRY", "RUF"
+]
+ignore = ["COM812", "D203", "D213"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

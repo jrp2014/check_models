@@ -96,8 +96,7 @@ class TimeoutManager(contextlib.ContextDecorator):
     """Manage a timeout context for code execution (UNIX only)."""
 
     def __init__(self, seconds: float) -> None:
-        """
-        Initialize a timeout manager with a timeout duration.
+        """Initialize a timeout manager with a timeout duration.
 
         Args:
             seconds: The timeout duration in seconds.
@@ -312,9 +311,7 @@ DEFAULT_TEMPERATURE: Final[float] = 0.1
 DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
 
 # Constants - EXIF
-EXIF_IMAGE_DESCRIPTION_TAG: Final[int] = (
-    270  # Standard EXIF tag ID for ImageDescription
-)
+EXIF_IMAGE_DESCRIPTION_TAG: Final[int] = 270  # Standard EXIF tag ID for ImageDescription
 IMPORTANT_EXIF_TAGS: Final[frozenset[str]] = frozenset(
     {
         "DateTimeOriginal",
@@ -389,11 +386,7 @@ def find_most_recent_file(folder: Path | str) -> Path | None:
         return None
     try:
         most_recent: Path | None = max(
-            (
-                f
-                for f in folder_path.iterdir()
-                if f.is_file() and not f.name.startswith(".")
-            ),
+            (f for f in folder_path.iterdir() if f.is_file() and not f.name.startswith(".")),
             key=lambda f: f.stat().st_mtime,
             default=None,
         )
@@ -657,12 +650,8 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
             return (dd * sign, ref_upper)
 
         try:
-            lat_ref_str = (
-                lat_ref.decode() if isinstance(lat_ref, bytes) else str(lat_ref)
-            )
-            lon_ref_str = (
-                lon_ref.decode() if isinstance(lon_ref, bytes) else str(lon_ref)
-            )
+            lat_ref_str = lat_ref.decode() if isinstance(lat_ref, bytes) else str(lat_ref)
+            lon_ref_str = lon_ref.decode() if isinstance(lon_ref, bytes) else str(lon_ref)
             lat_dd, lat_card = dms_to_dd(latitude, lat_ref_str)
             lon_dd, lon_card = dms_to_dd(longitude, lon_ref_str)
             lat_dd = -abs(lat_dd) if lat_card == "S" else abs(lat_dd)
@@ -760,12 +749,8 @@ def pretty_print_exif(
             Colors.colored("No relevant EXIF tags found to display.", Colors.YELLOW),
         )
         return
-    max_tag_len = (
-        max(Colors.visual_len(t[0]) for t in tags_to_print) if tags_to_print else 20
-    )
-    max_val_len = (
-        max(Colors.visual_len(t[1]) for t in tags_to_print) if tags_to_print else 40
-    )
+    max_tag_len = max(Colors.visual_len(t[0]) for t in tags_to_print) if tags_to_print else 20
+    max_val_len = max(Colors.visual_len(t[1]) for t in tags_to_print) if tags_to_print else 40
     min_width = 10
     max_tag_len = max(max_tag_len, min_width)
     max_val_len = max(max_val_len, min_width + 5)
@@ -876,10 +861,7 @@ def print_model_stats(results: list[ModelResult]) -> None:
 
     def format_model_name(result: ModelResult) -> tuple[str, int]:
         base_name: str = str(
-            (
-                getattr(result.model_name, "split", None)
-                and result.model_name.split("/")[-1]
-            )
+            (getattr(result.model_name, "split", None) and result.model_name.split("/")[-1])
             or result.model_name,
         )
         display_name: str = base_name[:BASE_NAME_MAX_WIDTH] + (
@@ -944,7 +926,7 @@ def print_model_stats(results: list[ModelResult]) -> None:
                 f"--- Model Run {idx + 1}: {getattr(result, 'model_name', 'N/A')} ---",
                 Colors.BOLD,
                 Colors.MAGENTA,
-            )
+            ),
         )
         if result.success:
             successful_results.append(result)
@@ -967,44 +949,39 @@ def print_model_stats(results: list[ModelResult]) -> None:
             stats = [Colors.colored("-", colors.FAIL_TEXT, Colors.BOLD)] * 4
             row_color = colors.FAIL
         # Model output: plain, no color
-        output_text = (
-            getattr(getattr(result, "generationresult", None), "text", "") or ""
-        )
+        output_text = getattr(getattr(result, "generationresult", None), "text", "") or ""
         if result.success:
             row = (
                 f"║ {_pad_text(display_name, name_col_width)} │ "
-                + " │ ".join(
-                    _pad_text(stat, COL_WIDTH, right_align=True) for stat in stats
-                )
+                + " │ ".join(_pad_text(stat, COL_WIDTH, right_align=True) for stat in stats)
                 + f" ║\n    Output: {output_text}"
             )
         else:
             if row_color is not None:
                 row = Colors.colored(
                     f"║ {_pad_text(display_name, name_col_width)} │ "
-                    + " │ ".join(
-                        _pad_text(stat, COL_WIDTH, right_align=True) for stat in stats
-                    )
+                    + " │ ".join(_pad_text(stat, COL_WIDTH, right_align=True) for stat in stats)
                     + " ║",
                     row_color,
                 )
             else:
                 row = (
                     f"║ {_pad_text(display_name, name_col_width)} │ "
-                    + " │ ".join(
-                        _pad_text(stat, COL_WIDTH, right_align=True) for stat in stats
-                    )
+                    + " │ ".join(_pad_text(stat, COL_WIDTH, right_align=True) for stat in stats)
                     + " ║"
                 )
             # Error message, colored
             error_msg = getattr(result, "error_message", None) or "Unknown error"
             row += "\n    " + Colors.colored(
-                f"ERROR: {error_msg}", Colors.BOLD, Colors.RED
+                f"ERROR: {error_msg}",
+                Colors.BOLD,
+                Colors.RED,
             )
             if getattr(result, "captured_output_on_fail", None):
                 captured = getattr(result, "captured_output_on_fail", "")
                 row += "\n    " + Colors.colored(
-                    f"Captured Output: {captured}", Colors.YELLOW
+                    f"Captured Output: {captured}",
+                    Colors.YELLOW,
                 )
         logger.info("%s", row)
     if successful_results:
@@ -1149,9 +1126,7 @@ def generate_html_report(
             )
             escaped_output = html.escape(output_text or "")
             # Highlight model output in HTML
-            result_content = (
-                f'<div class="model-output"><strong>{escaped_output}</strong></div>'
-            )
+            result_content = f'<div class="model-output"><strong>{escaped_output}</strong></div>'
             stats_cells = f"""
                 <td class="numeric">{result.stats.active:,.0f}</td>
                 <td class="numeric">{result.stats.cached:,.0f}</td>
@@ -1211,7 +1186,9 @@ def generate_html_report(
     html_footer: str = "<footer>\n<h2>Library Versions</h2>\n<ul>\n"
     # Use sorted items for consistent order in HTML
     for name, ver in sorted(versions.items()):
-        html_footer += f"<li><code>{html.escape(name)}</code>: <code>{html.escape(ver)}</code></li>\n"
+        html_footer += (
+            f"<li><code>{html.escape(name)}</code>: <code>{html.escape(ver)}</code></li>\n"
+        )
     html_footer += (
         "</ul>\n<p>Report generated on: "
         + datetime.now(local_tz).strftime(
@@ -1349,10 +1326,7 @@ def generate_markdown_report(
         md.append(f"- `{name}`: `{ver}`")
     local_tz = get_localzone()
     md.append(
-        (
-            "\n_Report generated on: "
-            f"{datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n"
-        ),
+        (f"\n_Report generated on: {datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n"),
     )
 
     try:
@@ -1391,9 +1365,7 @@ def get_system_info() -> tuple[str, str]:
             if result.returncode == 0:
                 # Extract GPU info from system_profiler output
                 gpu_lines: list[str] = [
-                    line
-                    for line in result.stdout.split("\n")
-                    if "Chipset Model:" in line
+                    line for line in result.stdout.split("\n") if "Chipset Model:" in line
                 ]
                 if gpu_lines:
                     gpu_info = gpu_lines[0].split("Chipset Model:")[-1].strip()
@@ -1471,8 +1443,7 @@ def _run_model_generation(
     *,
     verbose: bool,
 ) -> GenerationResult:
-    """
-    Load model, format prompt and run generation.
+    """Load model, format prompt and run generation.
 
     Raise exceptions on failure.
     """
@@ -1510,8 +1481,7 @@ def _run_model_generation(
 
 
 class ProcessImageParams(NamedTuple):
-    """
-    Parameters for processing an image with a VLM.
+    """Parameters for processing an image with a VLM.
 
     Attributes:
         model_identifier: Model path or identifier.
@@ -1791,8 +1761,7 @@ def process_models(
     image_path: Path,
     prompt: str,
 ) -> list[ModelResult]:
-    """
-    Process images with the specified models or scan cache for available models.
+    """Process images with the specified models or scan cache for available models.
 
     Returns a list of model results with outputs and performance metrics.
     """
