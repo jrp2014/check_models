@@ -5,7 +5,7 @@ version = "0.1.0"
 authors = [
     { name = "Your Name", email = "your@email.com" },
 ]
-requires-python = ">=3.9"
+requires-python = ">=3.12"
 readme = "README.md"
 license = { text = "MIT" }
 
@@ -36,10 +36,34 @@ skip-magic-trailing-comma = false
 
 [tool.ruff.lint]
 # D203 and D213 are explicitly excluded to avoid incompatibility warnings with D211 and D212.
-select = [
-    "E", "F", "W", "C90", "I", "N", "D", "UP", "YTT", "ANN", "S", "BLE", "B", "A", "COM", "C4", "DTZ", "EM", "EXE", "FBT", "ICN", "INP", "ISC", "PIE", "PT", "Q", "RET", "SIM", "T20", "TID", "TCH", "ARG", "PTH", "ERA", "PD", "PGH", "PL", "TRY", "RUF"
+# Select all rules and then ignore the ones that are incompatible or too noisy.
+select = ["ALL"]
+ignore = [
+    "COM812",  # Conflicts with formatter
+    "D203",    # Conflicts with D211
+    "D213",    # Conflicts with D212
+    "D100", "D101", "D102", "D103", "D104", "D105", "D106", "D107", # Missing docstrings
+    "S101", # Use of assert
 ]
-ignore = ["COM812", "D203", "D213"]
+
+[tool.pylance]
+# Pyright/Pylance configuration
+# See: https://github.com/microsoft/pyright/blob/main/docs/configuration.md
+pythonVersion = "3.12"
+typeCheckingMode = "basic" # Can be "off", "basic", or "strict"
+reportMissingImports = true
+reportUnusedImport = "warning"
+
+[tool.mypy]
+# MyPy configuration
+# See: https://mypy.readthedocs.io/en/stable/config_file.html
+python_version = "3.12"
+ignore_missing_imports = true
+# For stricter checking, you can enable the following:
+# disallow_untyped_defs = true
+# warn_return_any = true
+warn_unused_configs = true
+
 
 [build-system]
 requires = ["setuptools>=61.0"]

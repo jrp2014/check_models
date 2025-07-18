@@ -31,7 +31,7 @@ if TYPE_CHECKING:
 
 import functools  # For lru_cache
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 # Third-party imports
@@ -568,7 +568,7 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
             for fmt in DATE_FORMATS:
                 try:
                     dt: datetime = datetime.strptime(str(date), fmt).replace(
-                        tzinfo=timezone.utc,
+                        tzinfo=UTC,
                     )
                     local_tz: ZoneInfo = get_localzone()
                     date: str = dt.astimezone(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")
@@ -919,7 +919,7 @@ def print_model_stats(results: list[ModelResult]) -> None:
         ),
     )
     successful_results: list[ModelResult] = []
-    for idx, (result, (display_name, _)) in enumerate(zip(results, name_displays)):
+    for idx, (result, (display_name, _)) in enumerate(zip(results, name_displays, strict=False)):
         # Section header for each model run
         logger.info(
             Colors.colored(
