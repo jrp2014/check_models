@@ -871,7 +871,7 @@ def print_model_stats(results: list[ModelResult]) -> None:
         MODEL=Colors.MAGENTA,
         VARIABLE=Colors.CYAN,
         DIAG=Colors.YELLOW,
-        OUTPUT=Colors.BOLD + Colors.GREEN,
+        OUTPUT=None,  # No color for model output
         ERROR=Colors.BOLD + Colors.RED,
     )
 
@@ -938,7 +938,9 @@ def print_model_stats(results: list[ModelResult]) -> None:
         ),
     )
     successful_results: list[ModelResult] = []
-    for result, (display_name, _) in zip(results, name_displays):
+    for idx, (result, (display_name, _)) in enumerate(zip(results, name_displays)):
+        # Section header for each model run
+        logger.info(Colors.colored(f"--- Model Run {idx+1}: {getattr(result, 'model_name', 'N/A')} ---", Colors.BOLD, Colors.MAGENTA))
         if result.success:
             successful_results.append(result)
             stats = [
@@ -955,16 +957,38 @@ def print_model_stats(results: list[ModelResult]) -> None:
                 Colors.colored("%s MB", colors.VARIABLE) % f"{result.stats.peak:,.0f}",
                 Colors.colored("%s s", colors.VARIABLE) % f"{result.stats.time:.2f}",
             ]
-            row_color = colors.OUTPUT
+            row_color = None  # No color for model output row
         else:
             stats = [Colors.colored("-", colors.FAIL_TEXT, Colors.BOLD)] * 4
             row_color = colors.FAIL
-        row = Colors.colored(
-            f"║ {_pad_text(display_name, name_col_width)} │ "
-            + " │ ".join(_pad_text(stat, COL_WIDTH, right_align=True) for stat in stats)
-            + " ║",
-            row_color,
-        )
+        # Model output: plain, no color
+        output_text = getattr(getattr(result, "generationresult", None), "text", "") or ""
+        if result.success:
+            row = (
+                f"║ {_pad_text(display_name, name_col_width)} │ "
+                + " │ ".join(_pad_text(stat, COL_WIDTH, right_align=True) for stat in stats)
+                + f" ║\n    Output: {output_text}"
+            )
+        else:
+            if row_color is not None:
+                row = Colors.colored(
+                    f"║ {_pad_text(display_name, name_col_width)} │ "
+                    + " │ ".join(_pad_text(stat, COL_WIDTH, right_align=True) for stat in stats)
+                    + " ║",
+                    row_color,
+                )
+            else:
+                row = (
+                    f"║ {_pad_text(display_name, name_col_width)} │ "
+                    + " │ ".join(_pad_text(stat, COL_WIDTH, right_align=True) for stat in stats)
+                    + " ║"
+                )
+            # Error message, colored
+            error_msg = getattr(result, "error_message", None) or "Unknown error"
+            row += "\n    " + Colors.colored(f"ERROR: {error_msg}", Colors.BOLD, Colors.RED)
+            if getattr(result, "captured_output_on_fail", None):
+                captured = getattr(result, "captured_output_on_fail", "")
+                row += "\n    " + Colors.colored(f"Captured Output: {captured}", Colors.YELLOW)
         logger.info("%s", row)
     if successful_results:
         logger.info(
@@ -1430,8 +1454,7 @@ def _run_model_generation(
     *,
     verbose: bool,
 ) -> GenerationResult:
-    """
-    Load model, format prompt and run generation.
+    """Load model, format prompt and run generation.
 
     Raise exceptions on failure.
     """
@@ -1469,8 +1492,7 @@ def _run_model_generation(
 
 
 class ProcessImageParams(NamedTuple):
-    """
-    Parameters for processing an image with a VLM.
+    """Parameters for processing an image with a VLM.
 
     Attributes:
         model_identifier: Model path or identifier.
@@ -1750,8 +1772,7 @@ def process_models(
     image_path: Path,
     prompt: str,
 ) -> list[ModelResult]:
-    """
-    Process images with the specified models or scan cache for available models.
+    """Process images with the specified models or scan cache for available models.
 
     Returns a list of model results with outputs and performance metrics.
     """
