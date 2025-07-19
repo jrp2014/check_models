@@ -184,7 +184,7 @@ class Colors:
         """Return text wrapped in ANSI color codes if enabled."""
         text_str: str = str(text)
         # Filter out None values from color_codes
-        filtered_codes = [c for c in color_codes if isinstance(c, str)]
+        filtered_codes: list[str] = [c for c in color_codes if isinstance(c, str)]
         if not Colors._enabled or not filtered_codes:
             return text_str
         color_seq: str = "".join(filtered_codes)
@@ -1232,8 +1232,7 @@ def _format_markdown_table_row(
     output_md: str,
 ) -> str:
     return (
-        f"| {model_disp_name} | {stats[0]} | {stats[1]} | {stats[2]} | {stats[3]} | "
-        f"{output_md} |"
+        f"| {model_disp_name} | {stats[0]} | {stats[1]} | {stats[2]} | {stats[3]} | {output_md} |"
     )
 
 
@@ -1330,9 +1329,7 @@ def generate_markdown_report(
         md.append(f"- `{name}`: `{ver}`")
     local_tz = get_localzone()
     md.append(
-        (
-            f"\n_Report generated on: {datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n"
-        ),
+        (f"\n_Report generated on: {datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n"),
     )
 
     try:

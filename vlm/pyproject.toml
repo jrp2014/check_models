@@ -44,6 +44,7 @@ ignore = [
     "D213",    # Conflicts with D212
     "D100", "D101", "D102", "D103", "D104", "D105", "D106", "D107", # Missing docstrings
     "S101", # Use of assert
+    "E501", # Line too long
 ]
 
 [tool.pylance]
