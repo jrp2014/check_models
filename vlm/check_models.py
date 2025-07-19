@@ -395,8 +395,10 @@ def find_most_recent_file(folder: Path | str) -> Path | None:
         if most_recent:
             logger.debug("Most recent file found: %s", str(most_recent))
             return most_recent
-        logger.debug("No files found in directory: %s", folder_str)
-        return None
+    except FileNotFoundError:
+        logger.exception(
+            Colors.colored(f"Directory not found: {folder_str}", Colors.YELLOW),
+        )
     except PermissionError:
         logger.exception(
             Colors.colored(
@@ -408,6 +410,7 @@ def find_most_recent_file(folder: Path | str) -> Path | None:
         logger.exception(
             Colors.colored(f"OS error scanning folder {folder_str}", Colors.YELLOW),
         )
+    logger.debug("No files found in directory: %s", folder_str)
     return None
 
 
