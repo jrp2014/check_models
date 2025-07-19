@@ -244,7 +244,7 @@ MIN_NAME_COL_WIDTH: Final[int] = len("Model")
 # Ensure _pad_text is defined only once at module level and used everywhere
 
 
-def _pad_text(text: str, width: int, right_align: bool = False) -> str:
+def _pad_text(text: str, width: int, *, right_align: bool = False) -> str:
     """Pad text to a given width, optionally right-aligning."""
     pad_len: int = width - Colors.visual_len(text)
     pad_len = max(pad_len, 0)
@@ -1010,7 +1010,7 @@ def print_model_stats(results: list[ModelResult]) -> None:
             colors.SUMMARY,
             Colors.BOLD,
         )
-        summary_row = Colors.colored(
+        summary_row = (
             f"║ {_pad_text(summary_title, name_col_width)} │ "
             + " │ ".join(
                 _pad_text(
@@ -1020,8 +1020,7 @@ def print_model_stats(results: list[ModelResult]) -> None:
                 )
                 for stat in summary_stats
             )
-            + " ║",
-            colors.OUTPUT,
+            + " ║"
         )
         logger.info("%s", summary_row)
     logger.info("%s", h_line("╝"))
@@ -1191,9 +1190,7 @@ def generate_html_report(
         )
     html_footer += (
         "</ul>\n<p>Report generated on: "
-        + datetime.now(local_tz).strftime(
-            "%Y-%m-%d %H:%M:%S %Z",
-        )
+        + datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")
         + "</p>\n</footer>"
     )
 
@@ -1226,13 +1223,27 @@ def generate_html_report(
         )
 
 
+def _format_markdown_table_row(
+    model_disp_name: str,
+    stats: list[str],
+    output_md: str,
+) -> str:
+    return (
+        f"| {model_disp_name} | {stats[0]} | {stats[1]} | {stats[2]} | {stats[3]} | "
+        f"{output_md} |"
+    )
+
+
 def generate_markdown_report(
     results: list[ModelResult],
     filename: Path,
     versions: dict[str, str],
     prompt: str,
 ) -> None:
-    """Generate a Markdown file with model stats, output/errors, failures, and versions. All table cells are left- and top-aligned."""
+    """Generate a Markdown file with model stats, output/errors, failures, and versions.
+
+    All table cells are left- and top-aligned.
+    """
     if not results:
         logger.warning(
             Colors.colored("No results to generate Markdown report.", Colors.YELLOW),
@@ -1257,7 +1268,8 @@ def generate_markdown_report(
     )
     md.append("")
     md.append(
-        "| Model | Active Δ (MB) | Cache Δ (MB) | Peak Mem (MB) | Time (s) | Output / Error / Diagnostics |",
+        "| Model | Active Δ (MB) | Cache Δ (MB) | Peak Mem (MB) | Time (s) | "
+        "Output / Error / Diagnostics |",
     )
     # All columns: Model and Output left-aligned, numeric columns right-aligned, top-aligned
     md.append(
@@ -1289,22 +1301,14 @@ def generate_markdown_report(
                 )
                 output_md += f"<br>**Captured Output:** {captured}"
         output_md = output_md.replace("|", "\\|")
-        md.append(
-            f"| {model_disp_name} | {stats[0]} | {stats[1]} | {stats[2]} | {stats[3]} | {output_md} |",
-        )
+        md.append(_format_markdown_table_row(model_disp_name, stats, output_md))
 
     # Summary row (no changes needed here, as it doesn't contain multiline content)
     if successful_results:
-        avg_active = sum(r.stats.active for r in successful_results) / len(
-            successful_results,
-        )
-        avg_cache = sum(r.stats.cached for r in successful_results) / len(
-            successful_results,
-        )
+        avg_active = sum(r.stats.active for r in successful_results) / len(successful_results)
+        avg_cache = sum(r.stats.cached for r in successful_results) / len(successful_results)
         max_peak = max(r.stats.peak for r in successful_results)
-        avg_time = sum(r.stats.time for r in successful_results) / len(
-            successful_results,
-        )
+        avg_time = sum(r.stats.time for r in successful_results) / len(successful_results)
         summary_title = f"**AVG/PEAK ({len(successful_results)} Success)**"
         summary_stats = [
             f"{avg_active:,.0f}",
@@ -1313,12 +1317,9 @@ def generate_markdown_report(
             f"{avg_time:.2f}",
         ]
         md.append(
-            f"| {summary_title} | {summary_stats[0]} | {summary_stats[1]} | {summary_stats[2]} | {summary_stats[3]} |  |",
+            _format_markdown_table_row(summary_title, summary_stats, ""),
         )
 
-    # Version info
-    md.append("\n---\n")
-    md.append("**Library Versions:**\n")
     # Version info
     md.append("\n---\n")
     md.append("**Library Versions:**\n")
@@ -1326,7 +1327,9 @@ def generate_markdown_report(
         md.append(f"- `{name}`: `{ver}`")
     local_tz = get_localzone()
     md.append(
-        (f"\n_Report generated on: {datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n"),
+        (
+            f"\n_Report generated on: {datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n"
+        ),
     )
 
     try:
@@ -1813,7 +1816,14 @@ def process_models(
                 if args.verbose:
                     logger.info(
                         Colors.colored(
-                            "Statistics:\nTime taken: %.2fs\nInput tokens: %i\nPrompt tokens: %i\nGeneration tokens: %i\nPrompt tps: %.1f\nGeneration tps: %.1f\nPeak Memory: %.1fGb\n",
+                            "Statistics:\n"
+                            "Time taken: %.2fs\n"
+                            "Input tokens: %i\n"
+                            "Prompt tokens: %i\n"
+                            "Generation tokens: %i\n"
+                            "Prompt tps: %.1f\n"
+                            "Generation tps: %.1f\n"
+                            "Peak Memory: %.1fGb\n",
                             Colors.BOLD,
                             Colors.CYAN,
                         ),
@@ -1982,7 +1992,11 @@ if __name__ == "__main__":
     # Print all command-line arguments if verbose is set
     if getattr(args, "verbose", False):
         logger.info(
-            Colors.colored("--- Command Line Parameters ---", Colors.BOLD, Colors.BLUE),
+            Colors.colored(
+                "--- Command Line Parameters ---",
+                Colors.BOLD,
+                Colors.BLUE,
+            ),
         )
         for arg_name, arg_value in sorted(vars(args).items()):
             logger.info(
@@ -1990,5 +2004,7 @@ if __name__ == "__main__":
                 Colors.colored(arg_name, Colors.BOLD, Colors.CYAN),
                 Colors.colored(str(arg_value), Colors.GREEN),
             )
-        logger.info(Colors.colored("--- End Parameters ---", Colors.BOLD, Colors.BLUE))
+        logger.info(
+            Colors.colored("--- End Parameters ---", Colors.BOLD, Colors.BLUE),
+        )
     main(args)
