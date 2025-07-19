@@ -183,9 +183,11 @@ class Colors:
     def colored(text: str, *color_codes: str) -> str:
         """Return text wrapped in ANSI color codes if enabled."""
         text_str: str = str(text)
-        if not Colors._enabled or not color_codes:
+        # Filter out None values from color_codes
+        filtered_codes = [c for c in color_codes if isinstance(c, str)]
+        if not Colors._enabled or not filtered_codes:
             return text_str
-        color_seq: str = "".join(color_codes)
+        color_seq: str = "".join(filtered_codes)
         return f"{color_seq}{text_str}{Colors.RESET}"
 
     @staticmethod
@@ -1010,7 +1012,7 @@ def print_model_stats(results: list[ModelResult]) -> None:
             colors.SUMMARY,
             Colors.BOLD,
         )
-        summary_row = (
+        summary_row = Colors.colored(
             f"║ {_pad_text(summary_title, name_col_width)} │ "
             + " │ ".join(
                 _pad_text(
@@ -1020,7 +1022,8 @@ def print_model_stats(results: list[ModelResult]) -> None:
                 )
                 for stat in summary_stats
             )
-            + " ║"
+            + " ║",
+            colors.OUTPUT,
         )
         logger.info("%s", summary_row)
     logger.info("%s", h_line("╝"))
