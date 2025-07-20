@@ -679,35 +679,41 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
 
 
 def exif_value_to_str(tag_str: str, value: object) -> str:
-    """Convert an EXIF value to a string for display, handling bytes, tuples, and truncation."""
+    """Convert an EXIF value to a string for display, sanitizing and truncating it."""
+
+    def _sanitize(s: str) -> str:
+        """Replace control characters with spaces to prevent breaking table alignment."""
+        # This regex targets ASCII control characters, including tabs and newlines.
+        return re.sub(r"[\x00-\x1F\x7F-\x9F]", " ", s).strip()
+
+    processed_str: str
     if isinstance(value, bytes):
+        # Use latin-1 as a robust decoder. It can decode any byte, preventing errors,
+        # though it may not render all international characters correctly.
+        # This prioritizes stability and alignment over perfect character representation.
         try:
-            decoded_str = value.decode("utf-8", errors="replace")
-            return (
-                decoded_str[:STR_TRUNCATE_LEN] + "..."
-                if len(decoded_str) > MAX_STR_LEN
-                else decoded_str
-            )
-        except UnicodeDecodeError:
-            return f"<bytes len={len(value)}>"
-    if isinstance(value, tuple) and len(value) > MAX_TUPLE_LEN:
+            processed_str = _sanitize(value.decode("latin-1", errors="replace"))
+        except (UnicodeDecodeError, AttributeError):
+            return f"<bytes len={len(value)} un-decodable>"
+    elif isinstance(value, (tuple, list)) and len(value) > MAX_TUPLE_LEN:
         return f"<tuple len={len(value)}>"
-    if isinstance(value, bytearray):
+    elif isinstance(value, bytearray):
         return f"<bytearray len={len(value)}>"
-    try:
-        value_str = str(value)
-    except (TypeError, ValueError) as str_err:
-        logger.debug(
-            Colors.colored(
-                f"Could not convert EXIF value for tag '{tag_str}' to string: {str_err}",
-                Colors.YELLOW,
-            ),
-        )
-        return f"<unrepresentable type: {type(value).__name__}>"
     else:
-        if len(value_str) > MAX_STR_LEN:
-            value_str = value_str[:STR_TRUNCATE_LEN] + "..."
-        return value_str
+        try:
+            processed_str = _sanitize(str(value))
+        except (TypeError, ValueError) as str_err:
+            logger.debug(
+                "Could not convert EXIF value for tag '%s' to string: %s",
+                tag_str,
+                str_err,
+            )
+            return f"<unrepresentable type: {type(value).__name__}>"
+
+    # Truncate the final sanitized string if it's too long
+    if len(processed_str) > MAX_STR_LEN:
+        return processed_str[:STR_TRUNCATE_LEN] + "..."
+    return processed_str
 
 
 def filter_and_format_tags(
@@ -763,30 +769,20 @@ def pretty_print_exif(
     border_color = Colors.BLUE
     important_color = Colors.YELLOW
 
+    table_width = max_tag_len + max_val_len + 7
+
     # Print title above the table, visually separated (no leading newline)
     logger.info(
-        Colors.colored(
-            "=" * (max_tag_len + max_val_len + 9),
-            Colors.BOLD,
-            Colors.BLUE,
-        ),
+        Colors.colored("=" * table_width, Colors.BOLD, Colors.BLUE),
     )
     # Print the title in a more visually distinct color and with extra spacing
     logger.info(
-        Colors.colored(
-            f"{title.center(max_tag_len + max_val_len + 9)}",
-            Colors.BOLD,
-            Colors.MAGENTA,
-        ),
+        Colors.colored(f"{title.center(table_width)}", Colors.BOLD, Colors.MAGENTA),
     )
     # Add a blank line for separation
     logger.info("")
     logger.info(
-        Colors.colored(
-            "=" * (max_tag_len + max_val_len + 9),
-            Colors.BOLD,
-            Colors.BLUE,
-        ),
+        Colors.colored("=" * table_width, Colors.BOLD, Colors.BLUE),
     )
 
     logger.info(
@@ -795,12 +791,14 @@ def pretty_print_exif(
             border_color,
         ),
     )
+    tag_header = _pad_text(Colors.colored("Tag", header_color), max_tag_len)
+    value_header = _pad_text(Colors.colored("Value", header_color), max_val_len)
     logger.info(
-        "%s%s%s%s%s",
+        "%s %s %s %s %s",
         Colors.colored("║", border_color),
-        _pad_text(Colors.colored("Tag", header_color), max_tag_len),
+        tag_header,
         Colors.colored("│", border_color),
-        _pad_text(Colors.colored("Value", header_color), max_val_len),
+        value_header,
         Colors.colored("║", border_color),
     )
     logger.info(
@@ -815,13 +813,10 @@ def pretty_print_exif(
             if is_important_tag
             else tag_name
         )
+        padded_tag = _pad_text(tag_display, max_tag_len)
+        padded_value = _pad_text(value_display, max_val_len)
         logger.info(
-            "%s%s%s%s%s",
-            Colors.colored("║", border_color),
-            _pad_text(tag_display, max_tag_len),
-            Colors.colored("│", border_color),
-            _pad_text(value_display, max_val_len),
-            Colors.colored("║", border_color),
+            f"{Colors.colored('║', border_color)} {padded_tag} {Colors.colored('│', border_color)} {padded_value} {Colors.colored('║', border_color)}",
         )
     logger.info(
         Colors.colored(
@@ -830,11 +825,7 @@ def pretty_print_exif(
         ),
     )
     logger.info(
-        Colors.colored(
-            "=" * (max_tag_len + max_val_len + 9) + "\n",
-            Colors.BOLD,
-            Colors.BLUE,
-        ),
+        Colors.colored("=" * table_width + "\n", Colors.BOLD, Colors.BLUE),
     )
 
 
@@ -1222,9 +1213,9 @@ def generate_html_report(
             "Failed to write HTML report to file %s.",
             str(filename),
         )
-    except Exception:
+    except ValueError:
         logger.exception(
-            "An unexpected error occurred while writing HTML report %s",
+            "A value error occurred while writing HTML report %s",
             str(filename),
         )
 
@@ -1347,9 +1338,9 @@ def generate_markdown_report(
             "Failed to write Markdown report to file %s.",
             str(filename),
         )
-    except Exception:
+    except ValueError:
         logger.exception(
-            "An unexpected error occurred while writing Markdown report %s",
+            "A value error occurred while writing Markdown report %s",
             str(filename),
         )
 
