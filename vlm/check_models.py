@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     from zoneinfo import ZoneInfo
 
 import functools  # For lru_cache
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -362,16 +362,19 @@ class MemoryStats(NamedTuple):
 
 
 @dataclass(frozen=True)
-class ModelResult:
-    """Represent the result of processing a model, including failures."""
+class PerformanceResult:
+    """Encapsulates a GenerationResult, timing, and performance metrics for a model run."""
 
     model_name: str
+    generation: GenerationResult | None
     success: bool
-    generationresult: GenerationResult | None = None
-    stats: MemoryStats = field(default_factory=MemoryStats.zero)
     error_stage: str | None = None
     error_message: str | None = None
     captured_output_on_fail: str | None = None
+    active_mb: float = 0.0
+    cached_mb: float = 0.0
+    peak_mb: float = 0.0
+    time_s: float = 0.0
 
 
 # --- File Handling ---
@@ -834,8 +837,8 @@ def pretty_print_exif(
     )
 
 
-def print_model_stats(results: list[ModelResult]) -> None:
-    """Print a table summarizing model performance statistics with visually distinct output."""
+def print_model_stats(results: list[PerformanceResult]) -> None:
+    """Print a table summarizing model performance statistics and GenerationResult fields."""
     if not results:
         logger.info(Colors.colored("No model results to display.", Colors.YELLOW))
         return
@@ -843,7 +846,7 @@ def print_model_stats(results: list[ModelResult]) -> None:
     results.sort(
         key=lambda x: (
             not x.success,
-            x.stats.time if x.success else float("inf"),
+            x.time_s if x.success else float("inf"),
         ),
     )
     colors: types.SimpleNamespace = types.SimpleNamespace(
@@ -860,7 +863,7 @@ def print_model_stats(results: list[ModelResult]) -> None:
         ERROR=Colors.BOLD + Colors.RED,
     )
 
-    def format_model_name(result: ModelResult) -> tuple[str, int]:
+    def format_model_name(result: PerformanceResult) -> tuple[str, int]:
         base_name: str = str(
             (getattr(result.model_name, "split", None) and result.model_name.split("/")[-1])
             or result.model_name,
@@ -919,9 +922,8 @@ def print_model_stats(results: list[ModelResult]) -> None:
             colors.BORDER,
         ),
     )
-    successful_results: list[ModelResult] = []
+    successful_results: list[PerformanceResult] = []
     for idx, (result, (display_name, _)) in enumerate(zip(results, name_displays, strict=False)):
-        # Section header for each model run
         logger.info(
             Colors.colored(
                 f"--- Model Run {idx + 1}: {getattr(result, 'model_name', 'N/A')} ---",
@@ -936,26 +938,30 @@ def print_model_stats(results: list[ModelResult]) -> None:
                     "%s MB",
                     colors.VARIABLE,
                 )
-                % f"{result.stats.active:,.0f}",
+                % f"{result.active_mb:,.0f}",
                 Colors.colored(
                     "%s MB",
                     colors.VARIABLE,
                 )
-                % f"{result.stats.cached:,.0f}",
-                Colors.colored("%s MB", colors.VARIABLE) % f"{result.stats.peak:,.0f}",
-                Colors.colored("%s s", colors.VARIABLE) % f"{result.stats.time:.2f}",
+                % f"{result.cached_mb:,.0f}",
+                Colors.colored("%s MB", colors.VARIABLE) % f"{result.peak_mb:,.0f}",
+                Colors.colored("%s s", colors.VARIABLE) % f"{result.time_s:.2f}",
             ]
-            row_color = None  # No color for model output row
+            row_color = None
         else:
             stats = [Colors.colored("-", colors.FAIL_TEXT, Colors.BOLD)] * 4
             row_color = colors.FAIL
-        # Model output: plain, no color
-        output_text = getattr(getattr(result, "generationresult", None), "text", "") or ""
+        # Output all GenerationResult fields
+        if result.success and result.generation:
+            output_lines = [f"    {k}: {v}" for k, v in asdict(result.generation).items()]
+            output_text = "\n".join(output_lines)
+        else:
+            output_text = ""
         if result.success:
             row = (
                 f"║ {_pad_text(display_name, name_col_width)} │ "
                 + " │ ".join(_pad_text(stat, COL_WIDTH, right_align=True) for stat in stats)
-                + f" ║\n    Output: {output_text}"
+                + f" ║\n{output_text}"
             )
         else:
             if row_color is not None:
@@ -971,7 +977,6 @@ def print_model_stats(results: list[ModelResult]) -> None:
                     + " │ ".join(_pad_text(stat, COL_WIDTH, right_align=True) for stat in stats)
                     + " ║"
                 )
-            # Error message, colored
             error_msg = getattr(result, "error_message", None) or "Unknown error"
             row += "\n    " + Colors.colored(
                 f"ERROR: {error_msg}",
@@ -995,10 +1000,10 @@ def print_model_stats(results: list[ModelResult]) -> None:
             ),
         )
         avg_stats = [
-            sum(r.stats.active for r in successful_results) / len(successful_results),
-            sum(r.stats.cached for r in successful_results) / len(successful_results),
-            max(r.stats.peak for r in successful_results),
-            sum(r.stats.time for r in successful_results) / len(successful_results),
+            sum(r.active_mb for r in successful_results) / len(successful_results),
+            sum(r.cached_mb for r in successful_results) / len(successful_results),
+            max(r.peak_mb for r in successful_results),
+            sum(r.time_s for r in successful_results) / len(successful_results),
         ]
         summary_stats = [
             f"{avg_stats[0]:,.0f} MB",
@@ -1035,12 +1040,12 @@ def print_model_stats(results: list[ModelResult]) -> None:
 
 # --- HTML Report Generation ---
 def generate_html_report(
-    results: list[ModelResult],
+    results: list[PerformanceResult],
     filename: Path,
     versions: dict[str, str],
     prompt: str,
 ) -> None:
-    """Generate an HTML file with model stats, outputs, errors, and versions."""
+    """Generate an HTML file with all GenerationResult fields, errors, and metrics."""
     if not results:
         logger.warning(
             Colors.colored("No results to generate HTML report.", Colors.YELLOW),
@@ -1048,17 +1053,17 @@ def generate_html_report(
         return
 
     results.sort(
-        key=lambda x: (not x.success, x.stats.time if x.success else 0),
+        key=lambda x: (not x.success, x.time_s if x.success else 0),
     )
 
     local_tz = get_localzone()
     html_start = (
         """
 <!DOCTYPE html>
-<html lang="en">
+<html lang=\"en\">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset=\"UTF-8\">
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
     <title>Model Performance Results</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f8f9fa; color: #212529; line-height: 1.6; }
@@ -1092,7 +1097,7 @@ def generate_html_report(
 </head>
 <body>
     <h1>Model Performance Summary</h1>
-    <div class="prompt-block"><strong>Prompt used:</strong><br>"""
+    <div class=\"prompt-block\"><strong>Prompt used:</strong><br>"""
         + html.escape(prompt).replace("\n", "<br>")
         + """</div>
     <table>
@@ -1102,16 +1107,16 @@ def generate_html_report(
         <thead>
             <tr>
                 <th>Model</th>
-                <th class="numeric">Active Δ (MB)</th> <th class="numeric">Cache Δ (MB)</th>
-                <th class="numeric">Peak Mem (MB)</th> <th class="numeric">Time (s)</th>
-                <th>Result / Error / Captured Output</th>
+                <th class=\"numeric\">Active Δ (MB)</th> <th class=\"numeric\">Cache Δ (MB)</th>
+                <th class=\"numeric\">Peak Mem (MB)</th> <th class=\"numeric\">Time (s)</th>
+                <th>GenerationResult Fields / Error / Captured Output</th>
             </tr>
         </thead>
         <tbody>
 """
     )
     html_rows: str = ""
-    successful_results: list[ModelResult] = [r for r in results if r.success]
+    successful_results: list[PerformanceResult] = [r for r in results if r.success]
 
     for result in results:
         model_disp_name = html.escape(result.model_name)
@@ -1119,20 +1124,17 @@ def generate_html_report(
         result_content = ""
         stats_cells = ""
 
-        if result.success:
-            output_text = (
-                result.generationresult.text
-                if result.generationresult and hasattr(result.generationresult, "text")
-                else ""
+        if result.success and result.generation:
+            output_fields = "<br>".join(
+                f"<strong>{html.escape(str(k))}</strong>: {html.escape(str(v))}"
+                for k, v in asdict(result.generation).items()
             )
-            escaped_output = html.escape(output_text or "")
-            # Highlight model output in HTML
-            result_content = f'<div class="model-output"><strong>{escaped_output}</strong></div>'
+            result_content = f'<div class="model-output">{output_fields}</div>'
             stats_cells = f"""
-                <td class="numeric">{result.stats.active:,.0f}</td>
-                <td class="numeric">{result.stats.cached:,.0f}</td>
-                <td class="numeric">{result.stats.peak:,.0f}</td>
-                <td class="numeric">{result.stats.time:.2f}</td>
+                <td class=\"numeric\">{result.active_mb:,.0f}</td>
+                <td class=\"numeric\">{result.cached_mb:,.0f}</td>
+                <td class=\"numeric\">{result.peak_mb:,.0f}</td>
+                <td class=\"numeric\">{result.time_s:.2f}</td>
             """
         else:
             row_class = ' class="failed-row"'
@@ -1142,10 +1144,10 @@ def generate_html_report(
                 captured_output = html.escape(result.captured_output_on_fail)
                 result_content += f'<div class="captured-output"><strong>Captured Output:</strong><pre>{captured_output}</pre></div>'
             stats_cells = """
-                <td class="numeric">-</td>
-                <td class="numeric">-</td>
-                <td class="numeric">-</td>
-                <td class="numeric">-</td>
+                <td class=\"numeric\">-</td>
+                <td class=\"numeric\">-</td>
+                <td class=\"numeric\">-</td>
+                <td class=\"numeric\">-</td>
             """
 
         html_rows += f"""
@@ -1159,18 +1161,11 @@ def generate_html_report(
 
     html_summary_row: str = ""
     if successful_results:
-        avg_active = sum(r.stats.active for r in successful_results) / len(
-            successful_results,
-        )
-        avg_cache = sum(r.stats.cached for r in successful_results) / len(
-            successful_results,
-        )
-        max_peak = max(r.stats.peak for r in successful_results)
-        avg_time = sum(r.stats.time for r in successful_results) / len(
-            successful_results,
-        )
+        avg_active = sum(r.active_mb for r in successful_results) / len(successful_results)
+        avg_cache = sum(r.cached_mb for r in successful_results) / len(successful_results)
+        max_peak = max(r.peak_mb for r in successful_results)
+        avg_time = sum(r.time_s for r in successful_results) / len(successful_results)
         summary_title = f"AVG/PEAK ({len(successful_results)} Success)"
-        # Format summary stats as comma-separated integers
         html_summary_row = f"""
             <!-- Summary Row (Based on Successful Runs) -->
             <tr class="summary">
@@ -1183,9 +1178,7 @@ def generate_html_report(
             </tr>
 """
 
-    # --- Add Version Info Footer ---
     html_footer: str = "<footer>\n<h2>Library Versions</h2>\n<ul>\n"
-    # Use sorted items for consistent order in HTML
     for name, ver in sorted(versions.items()):
         html_footer += (
             f"<li><code>{html.escape(name)}</code>: <code>{html.escape(ver)}</code></li>\n"
@@ -1196,7 +1189,7 @@ def generate_html_report(
         + "</p>\n</footer>"
     )
 
-    html_end = """
+    html_end = f"""
         </tbody>
     </table>
     <!-- End of Table -->
@@ -1236,15 +1229,12 @@ def _format_markdown_table_row(
 
 
 def generate_markdown_report(
-    results: list[ModelResult],
+    results: list[PerformanceResult],
     filename: Path,
     versions: dict[str, str],
     prompt: str,
 ) -> None:
-    """Generate a Markdown file with model stats, output/errors, failures, and versions.
-
-    All table cells are left- and top-aligned.
-    """
+    """Generate a Markdown file with all GenerationResult fields, errors, and metrics."""
     if not results:
         logger.warning(
             Colors.colored("No results to generate Markdown report.", Colors.YELLOW),
@@ -1252,11 +1242,10 @@ def generate_markdown_report(
         return
 
     results.sort(
-        key=lambda x: (not x.success, x.stats.time if x.success else 0),
+        key=lambda x: (not x.success, x.time_s if x.success else 0),
     )
-    successful_results: list[ModelResult] = [r for r in results if r.success]
+    successful_results: list[PerformanceResult] = [r for r in results if r.success]
 
-    # Table header
     md: list[str] = []
 
     md.append("# Model Performance Results\n")
@@ -1269,27 +1258,24 @@ def generate_markdown_report(
     )
     md.append("")
     md.append(
-        "| Model | Active Δ (MB) | Cache Δ (MB) | Peak Mem (MB) | Time (s) | "
-        "Output / Error / Diagnostics |",
+        "| Model | Active Δ (MB) | Cache Δ (MB) | Peak Mem (MB) | Time (s) | GenerationResult Fields / Error / Diagnostics |",
     )
-    # All columns: Model and Output left-aligned, numeric columns right-aligned, top-aligned
     md.append(
         "|:------|--:|--:|--:|--:|:-----------------------------|",
     )
 
     for result in results:
         model_disp_name: str = f"`{getattr(result, 'model_name', 'N/A')}`"
-        if result.success:
+        if result.success and result.generation:
             stats = [
-                f"{getattr(result.stats, 'active', 0):,.0f}",
-                f"{getattr(result.stats, 'cached', 0):,.0f}",
-                f"{getattr(result.stats, 'peak', 0):,.0f}",
-                f"{getattr(result.stats, 'time', 0):.2f}",
+                f"{result.active_mb:,.0f}",
+                f"{result.cached_mb:,.0f}",
+                f"{result.peak_mb:,.0f}",
+                f"{result.time_s:.2f}",
             ]
-            output_text: str = (
-                getattr(getattr(result, "generationresult", None), "text", "") or ""
-            ).replace("\n", "<br>")
-            output_md: str = output_text
+            output_md: str = "<br>".join(
+                f"**{k}**: {v}" for k, v in asdict(result.generation).items()
+            )
         else:
             stats = ["-", "-", "-", "-"]
             error_msg: str = getattr(result, "error_message", None) or "Unknown error"
@@ -1302,14 +1288,15 @@ def generate_markdown_report(
                 )
                 output_md += f"<br>**Captured Output:** {captured}"
         output_md = output_md.replace("|", "\\|")
-        md.append(_format_markdown_table_row(model_disp_name, stats, output_md))
+        md.append(
+            f"| {model_disp_name} | {stats[0]} | {stats[1]} | {stats[2]} | {stats[3]} | {output_md} |",
+        )
 
-    # Summary row (no changes needed here, as it doesn't contain multiline content)
     if successful_results:
-        avg_active = sum(r.stats.active for r in successful_results) / len(successful_results)
-        avg_cache = sum(r.stats.cached for r in successful_results) / len(successful_results)
-        max_peak = max(r.stats.peak for r in successful_results)
-        avg_time = sum(r.stats.time for r in successful_results) / len(successful_results)
+        avg_active = sum(r.active_mb for r in successful_results) / len(successful_results)
+        avg_cache = sum(r.cached_mb for r in successful_results) / len(successful_results)
+        max_peak = max(r.peak_mb for r in successful_results)
+        avg_time = sum(r.time_s for r in successful_results) / len(successful_results)
         summary_title = f"**AVG/PEAK ({len(successful_results)} Success)**"
         summary_stats = [
             f"{avg_active:,.0f}",
@@ -1318,10 +1305,9 @@ def generate_markdown_report(
             f"{avg_time:.2f}",
         ]
         md.append(
-            _format_markdown_table_row(summary_title, summary_stats, ""),
+            f"| {summary_title} | {summary_stats[0]} | {summary_stats[1]} | {summary_stats[2]} | {summary_stats[3]} |  |",
         )
 
-    # Version info
     md.append("\n---\n")
     md.append("**Library Versions:**\n")
     for name, ver in sorted(versions.items()):
@@ -1507,7 +1493,7 @@ class ProcessImageParams(NamedTuple):
     trust_remote_code: bool
 
 
-def process_image_with_model(params: ProcessImageParams) -> ModelResult:
+def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     """Process an image with a Vision Language Model, managing stats and errors."""
     logger.info(
         Colors.colored(
@@ -1520,7 +1506,7 @@ def process_image_with_model(params: ProcessImageParams) -> ModelResult:
     )
     model: object | None = None
     tokenizer: object | None = None
-    arch, gpu_info = get_system_info()  # <-- Fix: initialize before use
+    arch, gpu_info = get_system_info()
     start_time: float = 0.0
     initial_mem: float = 0.0
     initial_cache: float = 0.0
@@ -1550,34 +1536,32 @@ def process_image_with_model(params: ProcessImageParams) -> ModelResult:
         final_active_mem: float = mx.get_active_memory() / MB_CONVERSION  # type: ignore[attr-defined]
         final_cache_mem: float = mx.get_cache_memory() / MB_CONVERSION  # type: ignore[attr-defined]
         peak_mem: float = mx.get_peak_memory() / MB_CONVERSION  # type: ignore[attr-defined]
-        final_stats: MemoryStats = MemoryStats(
-            active=final_active_mem - initial_mem,
-            cached=final_cache_mem - initial_cache,
-            peak=peak_mem,
-            time=end_time - start_time,
+        return PerformanceResult(
+            model_name=params.model_identifier,
+            generation=output,
+            success=True,
+            active_mb=final_active_mem - initial_mem,
+            cached_mb=final_cache_mem - initial_cache,
+            peak_mb=peak_mem,
+            time_s=end_time - start_time,
         )
     except TimeoutError as e:
         logger.exception("Timeout during model processing")
-        result = ModelResult(
+        return PerformanceResult(
             model_name=params.model_identifier,
+            generation=None,
             success=False,
             error_stage="timeout",
             error_message=str(e),
         )
     except (OSError, ValueError) as e:
         logger.exception("Model processing error")
-        result = ModelResult(
+        return PerformanceResult(
             model_name=params.model_identifier,
+            generation=None,
             success=False,
             error_stage="processing",
             error_message=str(e),
-        )
-    else:
-        result = ModelResult(
-            model_name=params.model_identifier,
-            success=True,
-            generationresult=output,
-            stats=final_stats,
         )
     finally:
         if model is not None:
@@ -1587,7 +1571,6 @@ def process_image_with_model(params: ProcessImageParams) -> ModelResult:
         mx.clear_cache()  # type: ignore[attr-defined]
         mx.reset_peak_memory()  # type: ignore[attr-defined]
         logger.debug("Cleaned up resources for model %s", params.model_identifier)
-    return result
 
 
 # --- Main Execution Helper Functions ---
@@ -1762,10 +1745,10 @@ def process_models(
     args: argparse.Namespace,
     image_path: Path,
     prompt: str,
-) -> list[ModelResult]:
+) -> list[PerformanceResult]:
     """Process images with the specified models or scan cache for available models.
 
-    Returns a list of model results with outputs and performance metrics.
+    Returns a list of performance results with outputs and performance metrics.
     """
     model_identifiers: list[str]
     if args.models:
@@ -1775,7 +1758,7 @@ def process_models(
         logger.info("Scanning cache for models to process...")
         model_identifiers = get_cached_model_ids()
 
-    results: list[ModelResult] = []
+    results: list[PerformanceResult] = []
     if not model_identifiers:
         logger.error("No models specified or found in cache.")
         if not args.models:
@@ -1796,7 +1779,7 @@ def process_models(
                 verbose=is_vlm_verbose,
                 trust_remote_code=args.trust_remote_code,
             )
-            result: ModelResult = process_image_with_model(params)
+            result: PerformanceResult = process_image_with_model(params)
             results.append(result)
             model_short_name: str = model_id.split("/")[-1]
             if result.success:
@@ -1807,32 +1790,23 @@ def process_models(
                         Colors.GREEN,
                     ),
                 )
-                if result.generationresult:
+                if result.generation:
                     logger.info(
-                        Colors.colored("Output:\n%s", Colors.BOLD, Colors.GREEN),
-                        result.generationresult.text,
+                        Colors.colored("Output fields:", Colors.BOLD, Colors.GREEN),
                     )
+                    for k, v in asdict(result.generation).items():
+                        logger.info("  %s: %s", k, v)
                 if args.verbose:
                     logger.info(
                         Colors.colored(
-                            "Statistics:\n"
-                            "Time taken: %.2fs\n"
-                            "Input tokens: %i\n"
-                            "Prompt tokens: %i\n"
-                            "Generation tokens: %i\n"
-                            "Prompt tps: %.1f\n"
-                            "Generation tps: %.1f\n"
-                            "Peak Memory: %.1fGb\n",
+                            "Statistics:\nTime taken: %.2fs\nActive Δ: %.1f MB\nCache Δ: %.1f MB\nPeak Mem: %.1f MB\n",
                             Colors.BOLD,
                             Colors.CYAN,
                         ),
-                        result.stats.time,
-                        getattr(result.generationresult, "token", 0),
-                        getattr(result.generationresult, "prompt_tokens", 0),
-                        getattr(result.generationresult, "generation_tokens", 0),
-                        getattr(result.generationresult, "prompt_tps", 0.0),
-                        getattr(result.generationresult, "generation_tps", 0.0),
-                        getattr(result.generationresult, "peak_memory", 0.0),
+                        result.time_s,
+                        result.active_mb,
+                        result.cached_mb,
+                        result.peak_mb,
                     )
             else:
                 logger.error(
@@ -1851,7 +1825,7 @@ def process_models(
 
 def finalize_execution(
     args: argparse.Namespace,
-    results: list[ModelResult],
+    results: list[PerformanceResult],
     library_versions: dict[str, str],
     overall_start_time: float,
     prompt: str,
