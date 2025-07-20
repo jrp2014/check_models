@@ -816,7 +816,12 @@ def pretty_print_exif(
         padded_tag = _pad_text(tag_display, max_tag_len)
         padded_value = _pad_text(value_display, max_val_len)
         logger.info(
-            f"{Colors.colored('║', border_color)} {padded_tag} {Colors.colored('│', border_color)} {padded_value} {Colors.colored('║', border_color)}",
+            "%s %s %s %s %s",
+            Colors.colored("║", border_color),
+            padded_tag,
+            Colors.colored("│", border_color),
+            padded_value,
+            Colors.colored("║", border_color),
         )
     logger.info(
         Colors.colored(
