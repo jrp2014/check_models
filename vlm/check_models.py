@@ -296,6 +296,16 @@ def fmt_num(val: float | str) -> str:
         return str(val)
 
 
+def format_field_label(field_name: str) -> str:
+    """Convert field_name to a formatted display label."""
+    return field_name.replace("_", " ").title()
+
+
+def is_numeric_string(val: str | float) -> bool:
+    """Check if a value is a string representing a numeric value."""
+    return isinstance(val, str) and val.replace(".", "", 1).isdigit()
+
+
 def is_numeric_field(field_name: str) -> bool:
     """Check if a field should be treated as numeric (right-aligned)."""
     field_lower = field_name.lower()
@@ -452,13 +462,9 @@ class PerformanceResult:
 # Simplified the `find_most_recent_file` function by using `max` with a generator.
 def find_most_recent_file(folder: Path | str) -> Path | None:
     """Return the most recently modified file in a folder, or None."""
-    folder_str = str(folder)
-    folder_path = Path(folder_str)
+    folder_path = Path(folder)  # Path() handles both str and Path objects
     if not folder_path.is_dir():
-        logger.error(
-            "Provided path is not a directory: %s",
-            folder_str,
-        )
+        logger.error("Provided path is not a directory: %s", folder_path)
         return None
     try:
         most_recent: Path | None = max(
@@ -471,20 +477,20 @@ def find_most_recent_file(folder: Path | str) -> Path | None:
             return most_recent
     except FileNotFoundError:
         logger.exception(
-            Colors.colored(f"Directory not found: {folder_str}", Colors.YELLOW),
+            Colors.colored(f"Directory not found: {folder_path}", Colors.YELLOW),
         )
     except PermissionError:
         logger.exception(
             Colors.colored(
-                f"Permission denied accessing folder: {folder_str}",
+                f"Permission denied accessing folder: {folder_path}",
                 Colors.YELLOW,
             ),
         )
     except OSError:
         logger.exception(
-            Colors.colored(f"OS error scanning folder {folder_str}", Colors.YELLOW),
+            Colors.colored(f"OS error scanning folder {folder_path}", Colors.YELLOW),
         )
-    logger.debug("No files found in directory: %s", folder_str)
+    logger.debug("No files found in directory: %s", folder_path)
     return None
 
 
@@ -932,7 +938,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     header_line1 = ["Model"]
     header_line2 = [""]
     for h in gen_fields:
-        abbr, unit = field_abbr.get(h, (h.replace("_", " ").title(), ""))
+        abbr, unit = field_abbr.get(h, (format_field_label(h), ""))
         header_line1.append(abbr)
         header_line2.append(unit)
     # Use a short header for output column
@@ -959,9 +965,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
         col_widths[0] = max(col_widths[0], min(25, len(str(r.model_name))))
         for i, f in enumerate(gen_fields):
             val = getattr(r.generation, f, "-") if r.generation else "-"
-            if isinstance(val, (int, float)) or (
-                isinstance(val, str) and val.replace(".", "", 1).isdigit()
-            ):
+            if isinstance(val, (int, float)) or is_numeric_string(val):
                 val = fmt_num(val)
             col_widths[i + 1] = max(col_widths[i + 1], min(12, len(str(val))))
     # Calculate total width and shrink if needed
@@ -1017,9 +1021,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
         row = [str(r.model_name)[: col_widths[0]].ljust(col_widths[0])]
         for i, f in enumerate(gen_fields):
             val = getattr(r.generation, f, "-") if r.generation else "-"
-            is_numeric = isinstance(val, (int, float)) or (
-                isinstance(val, str) and val.replace(".", "", 1).isdigit()
-            )
+            is_numeric = isinstance(val, (int, float)) or is_numeric_string(val)
             if is_numeric:
                 val = fmt_num(val)
             sval = str(val)[: col_widths[i + 1]]
@@ -1032,7 +1034,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
             out_val = str(getattr(r.generation, "text", ""))
         else:
             out_val = r.error_message or r.captured_output_on_fail or "-"
-        out_val = out_val.replace("\n", " ").replace("\r", " ")
+        out_val = re.sub(r"[\n\r]", " ", out_val)
         if len(out_val) > col_widths[-1]:
             out_val = out_val[: col_widths[-1] - 3] + "..."
         row.append(out_val.ljust(col_widths[-1]))
@@ -1101,33 +1103,11 @@ def generate_html_report(
 """
     )
     for f in gen_fields:
-        label = f.replace("_", " ").title()
+        label = format_field_label(f)
         if f in FIELD_UNITS:
             label += f" {FIELD_UNITS[f]}"
-        # Determine alignment class based on field type
-        # Include patterns for token counts, rates, memory, and timing fields
-        alignment_class = (
-            "numeric"
-            if (
-                f
-                in (
-                    "tokens",
-                    "prompt_tokens",
-                    "generation_tokens",
-                    "prompt_tps",
-                    "generation_tps",
-                    "peak_memory",
-                    "time",
-                    "duration",
-                )
-                or "token" in f.lower()
-                or "tps" in f.lower()
-                or "memory" in f.lower()
-                or "time" in f.lower()
-                or f.lower().endswith("_tokens")
-            )
-            else "text"
-        )
+        # Use the shared is_numeric_field function for consistency
+        alignment_class = "numeric" if is_numeric_field(f) else "text"
         html_start += f'<th class="{alignment_class}">{html.escape(label)}</th>\n'
     html_start += '<th class="text">Output / Diagnostics</th>\n</tr>\n</thead>\n<tbody>\n'
 
@@ -1137,9 +1117,7 @@ def generate_html_report(
         html_rows += f'<tr{row_class}><td class="model-name">{html.escape(str(r.model_name))}</td>'
         for f in gen_fields:
             val = getattr(r.generation, f, "-") if r.generation else "-"
-            is_numeric = isinstance(val, (int, float)) or (
-                isinstance(val, str) and val.replace(".", "", 1).isdigit()
-            )
+            is_numeric = isinstance(val, (int, float)) or is_numeric_string(val)
             if is_numeric:
                 val = fmt_num(val)
             # Use the shared is_numeric_field function for consistency
@@ -1234,7 +1212,7 @@ def generate_markdown_report(
     header_row = ["Model"]
     alignment_row = [":-"]  # Model column is left-aligned
     for h in gen_fields:
-        label = h.replace("_", " ").title()
+        label = format_field_label(h)
         if h in FIELD_UNITS:
             label += f" {FIELD_UNITS[h]}"
         header_row.append(label)
@@ -1254,9 +1232,7 @@ def generate_markdown_report(
         for f in gen_fields:
             val = getattr(r.generation, f, "-") if r.generation else "-"
             # Format numbers
-            if isinstance(val, (int, float)) or (
-                isinstance(val, str) and val.replace(".", "", 1).isdigit()
-            ):
+            if isinstance(val, (int, float)) or is_numeric_string(val):
                 val = fmt_num(val)
             row.append(str(val))
         if r.success and r.generation:
@@ -1326,7 +1302,7 @@ def validate_inputs(
     temperature: float = 0.0,
 ) -> None:
     """Validate input paths and parameters."""
-    img_path: Path = Path(str(image_path))
+    img_path: Path = Path(image_path)  # Path() can handle str or Path objects directly
     if not img_path.exists():
         msg: str = f"Image not found: {img_path}"
         raise FileNotFoundError(msg)
@@ -1367,8 +1343,6 @@ def validate_image_accessible(image_path: PathLike) -> None:
     except (OSError, ValueError) as err:
         msg: str = f"Error accessing image {img_path_str}: {err}"
         raise OSError(msg) from err
-    else:
-        return
 
 
 class ModelGenParams(NamedTuple):
