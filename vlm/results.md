@@ -1,6 +1,6 @@
 # Model Performance Results
 
-_Generated on 2025-07-25 23:36:23 BST_
+_Generated on 2025-07-25 23:57:43 BST_
 
 
 > **Prompt used:**
@@ -10,8 +10,8 @@ _Generated on 2025-07-25 23:36:23 BST_
 
 
 | Model | Token | Logprobs | Prompt Tokens (count) | Generation Tokens (count) | Total Tokens | Prompt Tps (t/s) | Generation Tps (t/s) | Peak Memory (MB) | Output / Diagnostics |
-|:-|-|-|-|-|-|-|-|-|:-|
-| `HuggingFaceTB/SmolVLM-Instruct` | 49,154 | array([-17.875, -17.625, -12.25, ..., -16.75, -22.75, -0.4375], dtype=bfloat16) | 1,392 | 16 | 1,408 | 1,224 | 123 | 5.55 |  A row of well-preserved medieval and later period buildings line the road. |
+|:-|-:|:-|-:|-:|-:|-:|-:|-:|:-|
+| `HuggingFaceTB/SmolVLM-Instruct` | 49,154 | array([-18.25, -18.875, -13.375, ..., -17, -23.25, -0.5], dtype=bfloat16) | 1,392 | 12 | 1,404 | 1,225 | 126 | 5.55 |  A row of old buildings line a street in England. |
 
 ---
 
@@ -24,4 +24,4 @@ _Generated on 2025-07-25 23:36:23 BST_
 - `mlx-vlm`: `0.3.1`
 - `transformers`: `4.54.0`
 
-_Report generated on: 2025-07-25 23:36:23 BST_
+_Report generated on: 2025-07-25 23:57:43 BST_

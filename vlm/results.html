@@ -8,35 +8,37 @@
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f8f9fa; color: #212529; line-height: 1.6; }
         table { border-collapse: collapse; width: 95%; margin: 30px auto; background-color: #fff; }
-        th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; vertical-align: top; }
+        th, td { border: 1px solid #dee2e6; padding: 8px 12px; vertical-align: top; }
         th { background-color: #e9ecef; font-weight: 600; color: #495057; }
         tr:nth-child(even):not(.failed-row) { background-color: #f8f9fa; }
         tr.failed-row { background-color: #f8d7da !important; color: #721c24; }
-        .model-name { font-family: 'Courier New', Courier, monospace; font-weight: 500; }
+        .model-name { font-family: 'Courier New', Courier, monospace; font-weight: 500; text-align: left; }
         .error-message { font-weight: bold; color: #721c24; }
+        .numeric { text-align: right; }
+        .text { text-align: left; }
     </style>
 </head>
 <body>
     <h1>Model Performance Summary</h1>
     <div class="prompt-block"><strong>Prompt used:</strong><br>Provide a factual caption, description, and keywords suitable for cataloguing, or searching for, the image. Context: Relates to &#x27;, High Street, East Grinstead, England, United Kingdom, UK<br>On a summer afternoon, the historic High Street in East Grinstead, England, presents a scene where centuries of architecture meet modern life. A row of well-preserved medieval and later period buildings, featuring distinctive half-timbered Tudor-style facades alongside brick structures, lines the road. Modern cars are parked along the kerb, creating a contrast between past and present. Above, a dynamic sky with billowing clouds casts a diffused light over the townscape.&#x27; taken around 2025-07-19 16:49:26 BST near GPS 51.123983 N, 0.004783 W Focus on visual content. Avoid repeating the context unless it is visible. Do not speculate.</div>
     <table>
-        <caption>Performance metrics and output/errors for Vision Language Model processing. Generated on 2025-07-25 23:36:23 BST. Failures shown but excluded from averages.</caption>
+        <caption>Performance metrics and output/errors for Vision Language Model processing. Generated on 2025-07-25 23:57:43 BST. Failures shown but excluded from averages.</caption>
         <thead>
             <tr>
-                <th>Model</th>
-<th>Token</th>
-<th>Logprobs</th>
-<th>Prompt Tokens (count)</th>
-<th>Generation Tokens (count)</th>
-<th>Total Tokens</th>
-<th>Prompt Tps (t/s)</th>
-<th>Generation Tps (t/s)</th>
-<th>Peak Memory (MB)</th>
-<th>Output / Diagnostics</th>
+                <th class="text">Model</th>
+<th class="numeric">Token</th>
+<th class="text">Logprobs</th>
+<th class="numeric">Prompt Tokens (count)</th>
+<th class="numeric">Generation Tokens (count)</th>
+<th class="numeric">Total Tokens</th>
+<th class="numeric">Prompt Tps (t/s)</th>
+<th class="numeric">Generation Tps (t/s)</th>
+<th class="numeric">Peak Memory (MB)</th>
+<th class="text">Output / Diagnostics</th>
 </tr>
 </thead>
 <tbody>
-<tr><td class="model-name">HuggingFaceTB/SmolVLM-Instruct</td><td>49,154</td><td>array([-17.875, -17.625, -12.25, ..., -16.75, -22.75, -0.4375], dtype=bfloat16)</td><td>1,392</td><td>16</td><td>1,408</td><td>1,224</td><td>123</td><td>5.55</td><td> A row of well-preserved medieval and later period buildings line the road.</td></tr>
+<tr><td class="model-name">HuggingFaceTB/SmolVLM-Instruct</td><td class="numeric">49,154</td><td class="text">array([-18.25, -18.875, -13.375, ..., -17, -23.25, -0.5], dtype=bfloat16)</td><td class="numeric">1,392</td><td class="numeric">12</td><td class="numeric">1,404</td><td class="numeric">1,225</td><td class="numeric">126</td><td class="numeric">5.55</td><td class="text"> A row of old buildings line a street in England.</td></tr>
 
         </tbody>
     </table>
@@ -51,7 +53,7 @@
 <li><code>mlx-vlm</code>: <code>0.3.1</code></li>
 <li><code>transformers</code>: <code>4.54.0</code></li>
 </ul>
-<p>Report generated on: 2025-07-25 23:36:23 BST</p>
+<p>Report generated on: 2025-07-25 23:57:43 BST</p>
 </footer>
 </body>
 </html>

@@ -934,22 +934,50 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     if total < max_width:
         col_widths[-1] += max_width - total
 
-    # Print header (no extra blank lines)
+    # Determine column alignment: numeric fields right-aligned, text fields left-aligned
+    col_alignments = ["left"]  # Model name is always left-aligned
+    for f in gen_fields:
+        # Numeric fields should be right-aligned
+        # Include patterns for token counts, rates, memory, and timing fields
+        if f in ("tokens", "prompt_tokens", "generation_tokens", "prompt_tps", "generation_tps", "peak_memory", "time", "duration") or \
+           "token" in f.lower() or "tps" in f.lower() or "memory" in f.lower() or "time" in f.lower() or \
+           f.lower().endswith("_tokens"):
+            col_alignments.append("right")
+        else:
+            col_alignments.append("left")
+    col_alignments.append("left")  # Output column is left-aligned
+
+    # Print header (no extra blank lines) - use logger.info() for consistency
     logger.info("=" * max_width)
-    logger.info(" | ".join(header_line1[i].ljust(col_widths[i]) for i in range(ncols)))
-    logger.info(" | ".join(header_line2[i].ljust(col_widths[i]) for i in range(ncols)))
+    # Align headers according to column type
+    header_row1 = []
+    header_row2 = []
+    for i in range(ncols):
+        if col_alignments[i] == "right":
+            header_row1.append(header_line1[i].rjust(col_widths[i]))
+            header_row2.append(header_line2[i].rjust(col_widths[i]))
+        else:
+            header_row1.append(header_line1[i].ljust(col_widths[i]))
+            header_row2.append(header_line2[i].ljust(col_widths[i]))
+    logger.info(" | ".join(header_row1))
+    logger.info(" | ".join(header_row2))
     logger.info("-+-".join("-" * w for w in col_widths))
     # Print rows
     for r in results:
         row = [str(r.model_name)[:col_widths[0]].ljust(col_widths[0])]
         for i, f in enumerate(gen_fields):
             val = getattr(r.generation, f, "-") if r.generation else "-"
-            if isinstance(val, (int, float)) or (
+            is_numeric = isinstance(val, (int, float)) or (
                 isinstance(val, str) and val.replace(".", "", 1).isdigit()
-            ):
+            )
+            if is_numeric:
                 val = fmt_num(val)
             sval = str(val)[:col_widths[i + 1]]
-            row.append(sval.ljust(col_widths[i + 1]))
+            # Align based on column type
+            if col_alignments[i + 1] == "right":
+                row.append(sval.rjust(col_widths[i + 1]))
+            else:
+                row.append(sval.ljust(col_widths[i + 1]))
         if r.success and r.generation:
             out_val = str(getattr(r.generation, "text", ""))
         else:
@@ -1021,12 +1049,14 @@ def generate_html_report(
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f8f9fa; color: #212529; line-height: 1.6; }
         table { border-collapse: collapse; width: 95%; margin: 30px auto; background-color: #fff; }
-        th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; vertical-align: top; }
+        th, td { border: 1px solid #dee2e6; padding: 8px 12px; vertical-align: top; }
         th { background-color: #e9ecef; font-weight: 600; color: #495057; }
         tr:nth-child(even):not(.failed-row) { background-color: #f8f9fa; }
         tr.failed-row { background-color: #f8d7da !important; color: #721c24; }
-        .model-name { font-family: 'Courier New', Courier, monospace; font-weight: 500; }
+        .model-name { font-family: 'Courier New', Courier, monospace; font-weight: 500; text-align: left; }
         .error-message { font-weight: bold; color: #721c24; }
+        .numeric { text-align: right; }
+        .text { text-align: left; }
     </style>
 </head>
 <body>
@@ -1040,15 +1070,20 @@ def generate_html_report(
         + """. Failures shown but excluded from averages.</caption>
         <thead>
             <tr>
-                <th>Model</th>
+                <th class="text">Model</th>
 """
     )
     for f in gen_fields:
         label = f.replace("_", " ").title()
         if f in field_units:
             label += f" {field_units[f]}"
-        html_start += f"<th>{html.escape(label)}</th>\n"
-    html_start += "<th>Output / Diagnostics</th>\n</tr>\n</thead>\n<tbody>\n"
+        # Determine alignment class based on field type
+        # Include patterns for token counts, rates, memory, and timing fields
+        alignment_class = "numeric" if (f in ("tokens", "prompt_tokens", "generation_tokens", "prompt_tps", "generation_tps", "peak_memory", "time", "duration") or \
+                                      "token" in f.lower() or "tps" in f.lower() or "memory" in f.lower() or "time" in f.lower() or \
+                                      f.lower().endswith("_tokens")) else "text"
+        html_start += f'<th class="{alignment_class}">{html.escape(label)}</th>\n'
+    html_start += '<th class="text">Output / Diagnostics</th>\n</tr>\n</thead>\n<tbody>\n'
 
     html_rows: str = ""
     for r in results:
@@ -1056,16 +1091,22 @@ def generate_html_report(
         html_rows += f'<tr{row_class}><td class="model-name">{html.escape(str(r.model_name))}</td>'
         for f in gen_fields:
             val = getattr(r.generation, f, "-") if r.generation else "-"
-            if isinstance(val, (int, float)) or (
+            is_numeric = isinstance(val, (int, float)) or (
                 isinstance(val, str) and val.replace(".", "", 1).isdigit()
-            ):
+            )
+            if is_numeric:
                 val = fmt_num(val)
-            html_rows += f"<td>{html.escape(str(val))}</td>"
+            # Determine alignment class based on field type
+            # Include patterns for token counts, rates, memory, and timing fields
+            alignment_class = "numeric" if (f in ("tokens", "prompt_tokens", "generation_tokens", "prompt_tps", "generation_tps", "peak_memory", "time", "duration") or \
+                                          "token" in f.lower() or "tps" in f.lower() or "memory" in f.lower() or "time" in f.lower() or \
+                                          f.lower().endswith("_tokens")) else "text"
+            html_rows += f'<td class="{alignment_class}">{html.escape(str(val))}</td>'
         if r.success and r.generation:
             out_val = str(getattr(r.generation, "text", ""))
         else:
             out_val = r.error_message or r.captured_output_on_fail or "-"
-        html_rows += f"<td>{html.escape(out_val)}</td></tr>\n"
+        html_rows += f'<td class="text">{html.escape(out_val)}</td></tr>\n'
 
     html_footer: str = "<footer>\n<h2>Library Versions</h2>\n<ul>\n"
     for name, ver in sorted(versions.items()):
@@ -1173,20 +1214,25 @@ def generate_markdown_report(
     md.append("")
     # Build header row with units
     header_row = ["Model"]
+    alignment_row = [":-"]  # Model column is left-aligned
     for h in gen_fields:
         label = h.replace("_", " ").title()
         if h in field_units:
             label += f" {field_units[h]}"
         header_row.append(label)
+        # Determine alignment based on field type
+        # Include patterns for token counts, rates, memory, and timing fields
+        if (h in ("tokens", "prompt_tokens", "generation_tokens", "prompt_tps", "generation_tps", "peak_memory", "time", "duration") or \
+            "token" in h.lower() or "tps" in h.lower() or "memory" in h.lower() or "time" in h.lower() or \
+            h.lower().endswith("_tokens")):
+            alignment_row.append("-:")  # Right-aligned for numeric fields
+        else:
+            alignment_row.append(":-")  # Left-aligned for text fields
     header_row.append("Output / Diagnostics")
+    alignment_row.append(":-")  # Output column is left-aligned
+    
     md.append("| " + " | ".join(header_row) + " |")
-    md.append(
-        "|"
-        + "|".join(
-            [":-" if i == 0 or i == len(header_row) - 1 else "-" for i in range(len(header_row))]
-        )
-        + "|"
-    )
+    md.append("|" + "|".join(alignment_row) + "|")
 
     for r in results:
         row = [f"`{r.model_name}`"]
@@ -1475,9 +1521,9 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
 
 def print_cli_header(title: str) -> None:
     """Print a formatted CLI header with the given title."""
-    logger.info("%s", Colors.colored("=" * 80, Colors.BOLD, Colors.BLUE))
-    logger.info("%s", Colors.colored(title.center(80), Colors.BOLD, Colors.MAGENTA))
-    logger.info("%s\n", Colors.colored("=" * 80, Colors.BOLD, Colors.BLUE))
+    logger.info(Colors.colored("=" * 100, Colors.BOLD, Colors.BLUE))
+    logger.info(Colors.colored(title.center(100), Colors.BOLD, Colors.MAGENTA))
+    logger.info(Colors.colored("=" * 100, Colors.BOLD, Colors.BLUE))
 
 
 def print_cli_section(title: str) -> None:
@@ -1729,7 +1775,7 @@ def finalize_execution(
 ) -> None:
     """Output summary statistics, generate reports, and display timing information."""
     if results:
-        logger.info("\n%s\n", "=" * 80)
+        logger.info("=" * 100)
         print_model_stats(results)
         try:
             html_output_path: Path = args.output_html.resolve()
@@ -1754,12 +1800,12 @@ def finalize_execution(
         except (OSError, ValueError):
             logger.exception("Failed to generate reports.")
     else:
-        logger.warning("\nNo models processed. No performance summary generated.")
+        logger.warning("No models processed. No performance summary generated.")
         logger.info("Skipping report generation as no models were processed.")
     print_version_info(library_versions)
     overall_time: float = time.perf_counter() - overall_start_time
     time_msg = "{} seconds".format(f"{overall_time:.2f}")
-    logger.info("\nTotal execution time: %s", time_msg)
+    logger.info("Total execution time: %s", time_msg)
 
 
 def main(args: argparse.Namespace) -> None:
