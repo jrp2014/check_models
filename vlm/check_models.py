@@ -6,6 +6,7 @@ from __future__ import annotations
 # Standard library imports
 import argparse
 import contextlib
+import functools
 import html
 import logging
 import platform
@@ -15,6 +16,9 @@ import subprocess
 import sys
 import time
 import types
+from dataclasses import asdict, dataclass, fields
+from datetime import UTC, datetime
+from pathlib import Path
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -27,13 +31,7 @@ from typing import (
 )
 
 if TYPE_CHECKING:
-    import types
     from zoneinfo import ZoneInfo
-
-import functools  # For lru_cache
-from dataclasses import asdict, dataclass, fields
-from datetime import UTC, datetime
-from pathlib import Path
 
 # Third-party imports
 from huggingface_hub import HFCacheInfo, scan_cache_dir
@@ -154,11 +152,8 @@ class TimeoutManager(contextlib.ContextDecorator):
             signal.signal(signal.SIGALRM, self.timer)
 
 
-# Configure logging
-logger: logging.Logger = logging.getLogger(__name__)
-# Setup logger at module level
-logger = logging.getLogger("mlx-vlm-check")
-# BasicConfig called in main()
+# Configure logging - Single logger instance
+logger: logging.Logger = logging.getLogger("mlx-vlm-check")
 
 
 # --- ANSI Color Codes for Console Output ---
@@ -228,6 +223,7 @@ logger.addHandler(handler)
 
 # Constants
 MB_CONVERSION: Final[float] = 1024 * 1024
+LARGE_NUMBER_THRESHOLD: Final[float] = 1000.0
 
 # Magic value constants
 DMS_LEN: Final[int] = 3  # Degrees, Minutes, Seconds
@@ -241,6 +237,79 @@ STR_TRUNCATE_LEN: Final[int] = 57
 BASE_NAME_MAX_WIDTH: Final[int] = 45
 COL_WIDTH: Final[int] = 12
 MIN_NAME_COL_WIDTH: Final[int] = len("Model")
+
+# Shared field metadata for reports
+FIELD_UNITS: Final[dict[str, str]] = {
+    "tokens": "(count)",
+    "prompt_tokens": "(count)",
+    "generation_tokens": "(count)",
+    "prompt_tps": "(t/s)",
+    "generation_tps": "(t/s)",
+    "peak_memory": "(MB)",
+    "time": "(s)",
+    "duration": "(s)",
+}
+
+FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
+    "tokens": ("Token", "(ct)"),
+    "prompt_tokens": ("Prompt", "(ct)"),
+    "generation_tokens": ("Gen", "(ct)"),
+    "total_tokens": ("Total", "Tokens"),
+    "prompt_tps": ("Prompt", "(t/s)"),
+    "generation_tps": ("Gen", "(t/s)"),
+    "peak_memory": ("Peak", "(MB)"),
+    "time": ("Time", "(s)"),
+    "duration": ("Dur", "(s)"),
+}
+
+# Fields that should be right-aligned (numeric fields)
+NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
+    {
+        "tokens",
+        "prompt_tokens",
+        "generation_tokens",
+        "prompt_tps",
+        "generation_tps",
+        "peak_memory",
+        "time",
+        "duration",
+    }
+)
+
+
+# --- Shared Utility Functions ---
+def fmt_num(val: float | str) -> str:
+    """Format numbers consistently across all output formats."""
+    try:
+        fval = float(val)
+        if abs(fval) >= LARGE_NUMBER_THRESHOLD:
+            return f"{fval:,.0f}"
+        if abs(fval) >= 1:
+            return f"{fval:.3g}"
+        if abs(fval) > 0:
+            return f"{fval:.3g}"
+        return str(val)
+    except (ValueError, TypeError, OverflowError):
+        return str(val)
+
+
+def is_numeric_field(field_name: str) -> bool:
+    """Check if a field should be treated as numeric (right-aligned)."""
+    return (
+        field_name in NUMERIC_FIELD_PATTERNS
+        or "token" in field_name.lower()
+        or "tps" in field_name.lower()
+        or "memory" in field_name.lower()
+        or "time" in field_name.lower()
+        or field_name.lower().endswith("_tokens")
+    )
+
+
+def is_numeric_value(val: float | str | object) -> bool:
+    """Check if a value should be formatted as numeric."""
+    return isinstance(val, (int, float)) or (
+        isinstance(val, str) and val.replace(".", "", 1).isdigit()
+    )
 
 
 # --- Utility Functions ---
@@ -848,36 +917,15 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     gen_fields = []
     for r in results:
         if r.generation is not None:
-            gen_fields = [f.name for f in fields(r.generation) if f.name not in ("text", "logprobs")]
+            gen_fields = [
+                f.name for f in fields(r.generation) if f.name not in ("text", "logprobs")
+            ]
             break
     if not gen_fields:
         gen_fields = []
 
     # Abbreviated headers and units for CLI
-    field_abbr = {
-        "tokens": ("Token", "(ct)"),
-        "prompt_tokens": ("Prompt", "(ct)"),
-        "generation_tokens": ("Gen", "(ct)"),
-        "total_tokens": ("Total", "Tokens"),
-        "prompt_tps": ("Prompt", "(t/s)"),
-        "generation_tps": ("Gen", "(t/s)"),
-        "peak_memory": ("Peak", "(MB)"),
-        "time": ("Time", "(s)"),
-        "duration": ("Dur", "(s)"),
-    }
-
-    def fmt_num(val: float | str) -> str:
-        try:
-            fval = float(val)
-            if abs(fval) >= 1000:
-                return f"{fval:,.0f}"
-            if abs(fval) >= 1:
-                return f"{fval:.3g}"
-            if abs(fval) > 0:
-                return f"{fval:.3g}"
-            return str(val)
-        except Exception:
-            return str(val)
+    field_abbr = FIELD_ABBREVIATIONS
 
     # Build headers (2 lines: label and unit)
     header_line1 = ["Model"]
@@ -940,9 +988,24 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     for f in gen_fields:
         # Numeric fields should be right-aligned
         # Include patterns for token counts, rates, memory, and timing fields
-        if f in ("tokens", "prompt_tokens", "generation_tokens", "prompt_tps", "generation_tps", "peak_memory", "time", "duration") or \
-           "token" in f.lower() or "tps" in f.lower() or "memory" in f.lower() or "time" in f.lower() or \
-           f.lower().endswith("_tokens"):
+        if (
+            f
+            in (
+                "tokens",
+                "prompt_tokens",
+                "generation_tokens",
+                "prompt_tps",
+                "generation_tps",
+                "peak_memory",
+                "time",
+                "duration",
+            )
+            or "token" in f.lower()
+            or "tps" in f.lower()
+            or "memory" in f.lower()
+            or "time" in f.lower()
+            or f.lower().endswith("_tokens")
+        ):
             col_alignments.append("right")
         else:
             col_alignments.append("left")
@@ -965,7 +1028,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     logger.info("-+-".join("-" * w for w in col_widths))
     # Print rows
     for r in results:
-        row = [str(r.model_name)[:col_widths[0]].ljust(col_widths[0])]
+        row = [str(r.model_name)[: col_widths[0]].ljust(col_widths[0])]
         for i, f in enumerate(gen_fields):
             val = getattr(r.generation, f, "-") if r.generation else "-"
             is_numeric = isinstance(val, (int, float)) or (
@@ -973,7 +1036,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
             )
             if is_numeric:
                 val = fmt_num(val)
-            sval = str(val)[:col_widths[i + 1]]
+            sval = str(val)[: col_widths[i + 1]]
             # Align based on column type
             if col_alignments[i + 1] == "right":
                 row.append(sval.rjust(col_widths[i + 1]))
@@ -1080,9 +1143,28 @@ def generate_html_report(
             label += f" {field_units[f]}"
         # Determine alignment class based on field type
         # Include patterns for token counts, rates, memory, and timing fields
-        alignment_class = "numeric" if (f in ("tokens", "prompt_tokens", "generation_tokens", "prompt_tps", "generation_tps", "peak_memory", "time", "duration") or \
-                                      "token" in f.lower() or "tps" in f.lower() or "memory" in f.lower() or "time" in f.lower() or \
-                                      f.lower().endswith("_tokens")) else "text"
+        alignment_class = (
+            "numeric"
+            if (
+                f
+                in (
+                    "tokens",
+                    "prompt_tokens",
+                    "generation_tokens",
+                    "prompt_tps",
+                    "generation_tps",
+                    "peak_memory",
+                    "time",
+                    "duration",
+                )
+                or "token" in f.lower()
+                or "tps" in f.lower()
+                or "memory" in f.lower()
+                or "time" in f.lower()
+                or f.lower().endswith("_tokens")
+            )
+            else "text"
+        )
         html_start += f'<th class="{alignment_class}">{html.escape(label)}</th>\n'
     html_start += '<th class="text">Output / Diagnostics</th>\n</tr>\n</thead>\n<tbody>\n'
 
@@ -1099,9 +1181,28 @@ def generate_html_report(
                 val = fmt_num(val)
             # Determine alignment class based on field type
             # Include patterns for token counts, rates, memory, and timing fields
-            alignment_class = "numeric" if (f in ("tokens", "prompt_tokens", "generation_tokens", "prompt_tps", "generation_tps", "peak_memory", "time", "duration") or \
-                                          "token" in f.lower() or "tps" in f.lower() or "memory" in f.lower() or "time" in f.lower() or \
-                                          f.lower().endswith("_tokens")) else "text"
+            alignment_class = (
+                "numeric"
+                if (
+                    f
+                    in (
+                        "tokens",
+                        "prompt_tokens",
+                        "generation_tokens",
+                        "prompt_tps",
+                        "generation_tps",
+                        "peak_memory",
+                        "time",
+                        "duration",
+                    )
+                    or "token" in f.lower()
+                    or "tps" in f.lower()
+                    or "memory" in f.lower()
+                    or "time" in f.lower()
+                    or f.lower().endswith("_tokens")
+                )
+                else "text"
+            )
             html_rows += f'<td class="{alignment_class}">{html.escape(str(val))}</td>'
         if r.success and r.generation:
             out_val = str(getattr(r.generation, "text", ""))
@@ -1223,9 +1324,24 @@ def generate_markdown_report(
         header_row.append(label)
         # Determine alignment based on field type
         # Include patterns for token counts, rates, memory, and timing fields
-        if (h in ("tokens", "prompt_tokens", "generation_tokens", "prompt_tps", "generation_tps", "peak_memory", "time", "duration") or \
-            "token" in h.lower() or "tps" in h.lower() or "memory" in h.lower() or "time" in h.lower() or \
-            h.lower().endswith("_tokens")):
+        if (
+            h
+            in (
+                "tokens",
+                "prompt_tokens",
+                "generation_tokens",
+                "prompt_tps",
+                "generation_tps",
+                "peak_memory",
+                "time",
+                "duration",
+            )
+            or "token" in h.lower()
+            or "tps" in h.lower()
+            or "memory" in h.lower()
+            or "time" in h.lower()
+            or h.lower().endswith("_tokens")
+        ):
             alignment_row.append("-:")  # Right-aligned for numeric fields
         else:
             alignment_row.append(":-")  # Left-aligned for text fields
@@ -1361,9 +1477,7 @@ class ModelGenParams(NamedTuple):
     """Parameters for model generation."""
 
     model_path: str
-    tokenizer: object
     prompt: str
-    config: object
     max_tokens: int
     temperature: float
     trust_remote_code: bool
@@ -1464,9 +1578,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         with TimeoutManager(params.timeout):
             gen_params: ModelGenParams = ModelGenParams(
                 model_path=params.model_identifier,
-                tokenizer=None,
                 prompt=params.prompt,
-                config=None,
                 max_tokens=params.max_tokens,
                 temperature=params.temperature,
                 trust_remote_code=params.trust_remote_code,

@@ -1,6 +1,6 @@
 # Model Performance Results
 
-_Generated on 2025-07-26 00:03:22 BST_
+_Generated on 2025-07-26 00:35:43 BST_
 
 
 > **Prompt used:**
@@ -11,7 +11,7 @@ _Generated on 2025-07-26 00:03:22 BST_
 
 | Model | Token | Logprobs | Prompt Tokens (count) | Generation Tokens (count) | Total Tokens | Prompt Tps (t/s) | Generation Tps (t/s) | Peak Memory (MB) | Output / Diagnostics |
 |:-|-:|:-|-:|-:|-:|-:|-:|-:|:-|
-| `HuggingFaceTB/SmolVLM-Instruct` | 49,154 | array([-18.25, -18.75, -13.1875, ..., -17, -23.125, -0.375], dtype=bfloat16) | 1,393 | 12 | 1,405 | 1,224 | 126 | 5.55 |  A row of old buildings line a street in England. |
+| `HuggingFaceTB/SmolVLM-Instruct` | 49,154 | array([-18.25, -18.75, -13.1875, ..., -17, -23.125, -0.375], dtype=bfloat16) | 1,393 | 12 | 1,405 | 1,221 | 126 | 5.55 |  A row of old buildings line a street in England. |
 
 ---
 
@@ -24,4 +24,4 @@ _Generated on 2025-07-26 00:03:22 BST_
 - `mlx-vlm`: `0.3.1`
 - `transformers`: `4.54.0`
 
-_Report generated on: 2025-07-26 00:03:22 BST_
+_Report generated on: 2025-07-26 00:35:43 BST_
