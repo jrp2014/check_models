@@ -42,8 +42,9 @@ from tzlocal import get_localzone
 try:
     import mlx.core as mx
 except ImportError:
-    logger = logging.getLogger("mlx-vlm-check")
-    logger.exception("Core dependency missing: mlx. Please install it.")
+    # Create a temporary logger since the main one isn't configured yet
+    _temp_logger = logging.getLogger("mlx-vlm-check")
+    _temp_logger.exception("Core dependency missing: mlx. Please install it.")
     sys.exit(1)
 
 try:
@@ -52,8 +53,9 @@ try:
 
     pillow_version: str = Image.__version__ if hasattr(Image, "__version__") else "N/A"
 except ImportError:
-    logger = logging.getLogger("mlx-vlm-check")
-    logger.critical(
+    # Create a temporary logger since the main one isn't configured yet
+    _temp_logger = logging.getLogger("mlx-vlm-check")
+    _temp_logger.critical(
         "Error: Pillow not found. Please install it (`pip install Pillow`).",
     )
     pillow_version = "N/A"
@@ -66,8 +68,9 @@ try:
     from mlx_vlm.utils import load
     from mlx_vlm.version import __version__ as vlm_version
 except ImportError:
-    logger = logging.getLogger("mlx-vlm-check")
-    logger.critical(
+    # Create a temporary logger since the main one isn't configured yet
+    _temp_logger = logging.getLogger("mlx-vlm-check")
+    _temp_logger.critical(
         "Error: mlx-vlm not found. Please install it (`pip install mlx-vlm`).",
     )
     sys.exit(1)
@@ -273,7 +276,7 @@ NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
         "peak_memory",
         "time",
         "duration",
-    }
+    },
 )
 
 
@@ -295,13 +298,11 @@ def fmt_num(val: float | str) -> str:
 
 def is_numeric_field(field_name: str) -> bool:
     """Check if a field should be treated as numeric (right-aligned)."""
+    field_lower = field_name.lower()
     return (
         field_name in NUMERIC_FIELD_PATTERNS
-        or "token" in field_name.lower()
-        or "tps" in field_name.lower()
-        or "memory" in field_name.lower()
-        or "time" in field_name.lower()
-        or field_name.lower().endswith("_tokens")
+        or any(keyword in field_lower for keyword in ("token", "tps", "memory", "time"))
+        or field_lower.endswith("_tokens")
     )
 
 
@@ -353,15 +354,15 @@ def print_version_info(versions: dict[str, str]) -> None:
 def status_tag(status: str) -> str:
     """Return a colored status tag for a given status string."""
     s: str = status.upper()
-    if s == "SUCCESS":
-        return Colors.colored("SUCCESS", Colors.BOLD, Colors.GREEN)
-    if s == "FAIL":
-        return Colors.colored("FAIL", Colors.BOLD, Colors.RED)
-    if s == "WARNING":
-        return Colors.colored("WARNING", Colors.BOLD, Colors.YELLOW)
-    if s == "INFO":
-        return Colors.colored("INFO", Colors.BOLD, Colors.BLUE)
-    return Colors.colored(s, Colors.BOLD, Colors.MAGENTA)
+    # Use dictionary lookup for better performance and reduced branching
+    status_colors = {
+        "SUCCESS": (Colors.BOLD, Colors.GREEN),
+        "FAIL": (Colors.BOLD, Colors.RED),
+        "WARNING": (Colors.BOLD, Colors.YELLOW),
+        "INFO": (Colors.BOLD, Colors.BLUE),
+    }
+    colors = status_colors.get(s, (Colors.BOLD, Colors.MAGENTA))
+    return Colors.colored(s, *colors)
 
 
 # Type aliases and definitions
@@ -946,8 +947,11 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     min_col = 6
     max_output_col = max(len(output_header), 18)  # At least as wide as header
     col_widths = [max(min_col, len(header_line1[0]), len(header_line2[0]))]
-    for i in range(1, ncols - 1):
-        col_widths.append(max(min_col, len(header_line1[i]), len(header_line2[i])))
+    # Use list comprehension for better performance
+    col_widths.extend([
+        max(min_col, len(header_line1[i]), len(header_line2[i]))
+        for i in range(1, ncols - 1)
+    ])
     col_widths.append(max_output_col)
 
     # Update col_widths based on data (but never exceed max_output_col for output)
@@ -986,26 +990,8 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     # Determine column alignment: numeric fields right-aligned, text fields left-aligned
     col_alignments = ["left"]  # Model name is always left-aligned
     for f in gen_fields:
-        # Numeric fields should be right-aligned
-        # Include patterns for token counts, rates, memory, and timing fields
-        if (
-            f
-            in (
-                "tokens",
-                "prompt_tokens",
-                "generation_tokens",
-                "prompt_tps",
-                "generation_tps",
-                "peak_memory",
-                "time",
-                "duration",
-            )
-            or "token" in f.lower()
-            or "tps" in f.lower()
-            or "memory" in f.lower()
-            or "time" in f.lower()
-            or f.lower().endswith("_tokens")
-        ):
+        # Use the shared is_numeric_field function for consistency
+        if is_numeric_field(f):
             col_alignments.append("right")
         else:
             col_alignments.append("left")
@@ -1077,30 +1063,7 @@ def generate_html_report(
     if not gen_fields:
         gen_fields = []
 
-    field_units = {
-        "tokens": "(count)",
-        "prompt_tokens": "(count)",
-        "generation_tokens": "(count)",
-        "prompt_tps": "(t/s)",
-        "generation_tps": "(t/s)",
-        "peak_memory": "(MB)",
-        "time": "(s)",
-        "duration": "(s)",
-    }
-
-    def fmt_num(val: float | str) -> str:
-        try:
-            fval = float(val)
-            if abs(fval) >= 1000:
-                return f"{fval:,.0f}"
-            if abs(fval) >= 1:
-                return f"{fval:,.3g}"
-            if abs(fval) > 0:
-                return f"{fval:.3g}"
-            return str(val)
-        except Exception:
-            return str(val)
-
+    # Use the shared FIELD_UNITS constant
     local_tz = get_localzone()
     html_start = (
         """
@@ -1139,8 +1102,8 @@ def generate_html_report(
     )
     for f in gen_fields:
         label = f.replace("_", " ").title()
-        if f in field_units:
-            label += f" {field_units[f]}"
+        if f in FIELD_UNITS:
+            label += f" {FIELD_UNITS[f]}"
         # Determine alignment class based on field type
         # Include patterns for token counts, rates, memory, and timing fields
         alignment_class = (
@@ -1179,30 +1142,8 @@ def generate_html_report(
             )
             if is_numeric:
                 val = fmt_num(val)
-            # Determine alignment class based on field type
-            # Include patterns for token counts, rates, memory, and timing fields
-            alignment_class = (
-                "numeric"
-                if (
-                    f
-                    in (
-                        "tokens",
-                        "prompt_tokens",
-                        "generation_tokens",
-                        "prompt_tps",
-                        "generation_tps",
-                        "peak_memory",
-                        "time",
-                        "duration",
-                    )
-                    or "token" in f.lower()
-                    or "tps" in f.lower()
-                    or "memory" in f.lower()
-                    or "time" in f.lower()
-                    or f.lower().endswith("_tokens")
-                )
-                else "text"
-            )
+            # Use the shared is_numeric_field function for consistency
+            alignment_class = "numeric" if is_numeric_field(f) else "text"
             html_rows += f'<td class="{alignment_class}">{html.escape(str(val))}</td>'
         if r.success and r.generation:
             out_val = str(getattr(r.generation, "text", ""))
@@ -1282,32 +1223,7 @@ def generate_markdown_report(
     if not gen_fields:
         gen_fields = []
 
-    # Optionally, define units for known fields
-    field_units = {
-        "tokens": "(count)",
-        "prompt_tokens": "(count)",
-        "generation_tokens": "(count)",
-        "prompt_tps": "(t/s)",
-        "generation_tps": "(t/s)",
-        "peak_memory": "(MB)",
-        "time": "(s)",
-        "duration": "(s)",
-    }
-
-    # Helper to format numbers
-    def fmt_num(val: float | str) -> str:
-        try:
-            fval = float(val)
-            if abs(fval) >= 1000:
-                return f"{fval:,.0f}"
-            if abs(fval) >= 1:
-                return f"{fval:,.3g}"
-            if abs(fval) > 0:
-                return f"{fval:.3g}"
-            return str(val)
-        except Exception:
-            return str(val)
-
+    # Use the shared FIELD_UNITS constant
     md: list[str] = []
     md.append("# Model Performance Results\n")
     md.append(f"_Generated on {datetime.now(get_localzone()).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n")
@@ -1319,29 +1235,11 @@ def generate_markdown_report(
     alignment_row = [":-"]  # Model column is left-aligned
     for h in gen_fields:
         label = h.replace("_", " ").title()
-        if h in field_units:
-            label += f" {field_units[h]}"
+        if h in FIELD_UNITS:
+            label += f" {FIELD_UNITS[h]}"
         header_row.append(label)
-        # Determine alignment based on field type
-        # Include patterns for token counts, rates, memory, and timing fields
-        if (
-            h
-            in (
-                "tokens",
-                "prompt_tokens",
-                "generation_tokens",
-                "prompt_tps",
-                "generation_tps",
-                "peak_memory",
-                "time",
-                "duration",
-            )
-            or "token" in h.lower()
-            or "tps" in h.lower()
-            or "memory" in h.lower()
-            or "time" in h.lower()
-            or h.lower().endswith("_tokens")
-        ):
+        # Use the shared is_numeric_field function for consistency
+        if is_numeric_field(h):
             alignment_row.append("-:")  # Right-aligned for numeric fields
         else:
             alignment_row.append(":-")  # Left-aligned for text fields
