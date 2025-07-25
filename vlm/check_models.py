@@ -52,7 +52,7 @@ try:
     from PIL import ExifTags, Image, UnidentifiedImageError
     from PIL.ExifTags import GPSTAGS, TAGS
 
-    pillow_version = Image.__version__ if hasattr(Image, "__version__") else "N/A"
+    pillow_version: str = Image.__version__ if hasattr(Image, "__version__") else "N/A"
 except ImportError:
     logger = logging.getLogger("mlx-vlm-check")
     logger.critical(
@@ -78,7 +78,7 @@ except ImportError:
 try:
     import mlx_lm
 
-    mlx_lm_version = str(getattr(mlx_lm, "__version__", "N/A"))
+    mlx_lm_version: str = str(getattr(mlx_lm, "__version__", "N/A"))
 except ImportError:
     mlx_lm_version = "N/A"
 except AttributeError:
@@ -86,7 +86,7 @@ except AttributeError:
 try:
     import transformers
 
-    transformers_version = transformers.__version__
+    transformers_version: str = transformers.__version__
 except ImportError:
     transformers_version = "N/A"
 
@@ -155,7 +155,7 @@ class TimeoutManager(contextlib.ContextDecorator):
 
 
 # Configure logging
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
 # Setup logger at module level
 logger = logging.getLogger("mlx-vlm-check")
 # BasicConfig called in main()
@@ -220,8 +220,8 @@ class ColoredFormatter(logging.Formatter):
 
 
 # Configure logging to use ColoredFormatter
-handler = logging.StreamHandler(sys.stderr)
-formatter = ColoredFormatter("%(asctime)s - %(levelname)s - %(message)s")
+handler: logging.StreamHandler[Any] = logging.StreamHandler(sys.stderr)
+formatter: ColoredFormatter = ColoredFormatter("%(asctime)s - %(levelname)s - %(message)s")
 handler.setFormatter(formatter)
 logger.handlers.clear()
 logger.addHandler(handler)
@@ -519,9 +519,9 @@ def to_float(val: float | str) -> float | None:
         return temp
 
 
-MAX_GPS_COORD_LEN = 3
-MED_GPS_COORD_LEN = 2
-MIN_GPS_COORD_LEN = 1
+MAX_GPS_COORD_LEN: Final[int] = 3
+MED_GPS_COORD_LEN: Final[int] = 2
+MIN_GPS_COORD_LEN: Final[int] = 1
 
 
 # Reduce return count and use named constants
@@ -866,7 +866,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
         "duration": ("Dur", "(s)"),
     }
 
-    def fmt_num(val):
+    def fmt_num(val: float | str) -> str:
         try:
             fval = float(val)
             if abs(fval) >= 1000:
@@ -1025,7 +1025,7 @@ def generate_html_report(
         "duration": "(s)",
     }
 
-    def fmt_num(val):
+    def fmt_num(val: float | str) -> str:
         try:
             fval = float(val)
             if abs(fval) >= 1000:
@@ -1194,7 +1194,7 @@ def generate_markdown_report(
     }
 
     # Helper to format numbers
-    def fmt_num(val):
+    def fmt_num(val: float | str) -> str:
         try:
             fval = float(val)
             if abs(fval) >= 1000:
@@ -1231,7 +1231,7 @@ def generate_markdown_report(
             alignment_row.append(":-")  # Left-aligned for text fields
     header_row.append("Output / Diagnostics")
     alignment_row.append(":-")  # Output column is left-aligned
-    
+
     md.append("| " + " | ".join(header_row) + " |")
     md.append("|" + "|".join(alignment_row) + "|")
 
@@ -1258,7 +1258,7 @@ def generate_markdown_report(
         md.append(f"- `{name}`: `{ver}`")
     local_tz = get_localzone()
     md.append(
-        f"\n_Report generated on: {datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n"
+        f"\n_Report generated on: {datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n",
     )
 
     try:
@@ -1835,7 +1835,7 @@ def main(args: argparse.Namespace) -> None:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="MLX VLM Model Checker")
+    parser: argparse.ArgumentParser = argparse.ArgumentParser(description="MLX VLM Model Checker")
     # Add arguments (separated for clarity)
     parser.add_argument(
         "-f",
@@ -1905,7 +1905,7 @@ if __name__ == "__main__":
     )
 
     # Parse arguments
-    args = parser.parse_args()
+    args: argparse.Namespace = parser.parse_args()
     # Print all command-line arguments if verbose is set
     if getattr(args, "verbose", False):
         logger.info(
