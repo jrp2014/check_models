@@ -27,10 +27,11 @@ from typing import (
 )
 
 if TYPE_CHECKING:
+    import types
     from zoneinfo import ZoneInfo
 
 import functools  # For lru_cache
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, fields
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -838,204 +839,127 @@ def pretty_print_exif(
 
 
 def print_model_stats(results: list[PerformanceResult]) -> None:
-    """Print a table summarizing model performance statistics and GenerationResult fields."""
+    """Print a visually compact, perfectly aligned table summarizing model GenerationResult fields and text output/diagnostics, with units and formatted numbers, fitting within 100 characters."""
     if not results:
         logger.info(Colors.colored("No model results to display.", Colors.YELLOW))
         return
 
-    results.sort(
-        key=lambda x: (
-            not x.success,
-            x.time_s if x.success else float("inf"),
-        ),
-    )
-    colors: types.SimpleNamespace = types.SimpleNamespace(
-        HEADER=Colors.CYAN,
-        BORDER=Colors.BLUE,
-        SUMMARY=Colors.GREEN,
-        FAIL=Colors.RED,
-        FAIL_TEXT=Colors.RED,
-        SUCCESS=Colors.GREEN,
-        MODEL=Colors.MAGENTA,
-        VARIABLE=Colors.CYAN,
-        DIAG=Colors.YELLOW,
-        OUTPUT=None,  # No color for model output
-        ERROR=Colors.BOLD + Colors.RED,
-    )
+    # Determine GenerationResult fields (excluding 'text' and 'logprobs')
+    gen_fields = []
+    for r in results:
+        if r.generation is not None:
+            gen_fields = [f.name for f in fields(r.generation) if f.name not in ("text", "logprobs")]
+            break
+    if not gen_fields:
+        gen_fields = []
 
-    def format_model_name(result: PerformanceResult) -> tuple[str, int]:
-        base_name: str = str(
-            (getattr(result.model_name, "split", None) and result.model_name.split("/")[-1])
-            or result.model_name,
-        )
-        display_name: str = base_name[:BASE_NAME_MAX_WIDTH] + (
-            "..." if len(base_name) > BASE_NAME_MAX_WIDTH else ""
-        )
-        if not result.success:
-            fail_suffix = f" [FAIL: {getattr(result, 'error_stage', None) or '?'}]"
-            display_name = Colors.colored(
-                display_name,
-                colors.MODEL,
-            ) + Colors.colored(fail_suffix, colors.FAIL)
-        else:
-            display_name = Colors.colored(display_name, colors.MODEL, Colors.BOLD)
-        return display_name, Colors.visual_len(display_name)
+    # Abbreviated headers and units for CLI
+    field_abbr = {
+        "tokens": ("Tokens", "(ct)"),
+        "prompt_tokens": ("Prompt", "(ct)"),
+        "generation_tokens": ("Gen", "(ct)"),
+        "prompt_tps": ("Prompt", "(t/s)"),
+        "generation_tps": ("Gen", "(t/s)"),
+        "peak_memory": ("Peak", "(MB)"),
+        "time": ("Time", "(s)"),
+        "duration": ("Dur", "(s)"),
+    }
 
-    name_displays = [format_model_name(r) for r in results]
-    max_display_len = max(
-        (length for _, length in name_displays),
-        default=MIN_NAME_COL_WIDTH,
-    )
-    name_col_width = max(max_display_len, MIN_NAME_COL_WIDTH)
+    def fmt_num(val):
+        try:
+            fval = float(val)
+            if abs(fval) >= 1000:
+                return f"{fval:,.0f}"
+            if abs(fval) >= 1:
+                return f"{fval:.3g}"
+            if abs(fval) > 0:
+                return f"{fval:.3g}"
+            return str(val)
+        except Exception:
+            return str(val)
 
-    def h_line(char: str) -> str:
-        return Colors.colored(
-            f"╔{'═' * (name_col_width + 2)}╤{'═' * (COL_WIDTH + 2)}╤"
-            f"{'═' * (COL_WIDTH + 2)}╤{'═' * (COL_WIDTH + 2)}╤{'═' * (COL_WIDTH + 2)}╗"
-            if char == "═"
-            else f"╚{'═' * (name_col_width + 2)}╧{'═' * (COL_WIDTH + 2)}╧"
-            f"{'═' * (COL_WIDTH + 2)}╧{'═' * (COL_WIDTH + 2)}╧{'═' * (COL_WIDTH + 2)}╝",
-            colors.BORDER,
-        )
+    # Build headers (2 lines: label and unit)
+    header_line1 = ["Model"]
+    header_line2 = [""]
+    for h in gen_fields:
+        abbr, unit = field_abbr.get(h, (h.replace("_", " ").title(), ""))
+        header_line1.append(abbr)
+        header_line2.append(unit)
+    # Use a short header for output column
+    output_header = "Output"
+    header_line1.append(output_header)
+    header_line2.append("")
+    ncols = len(header_line1)
+    while len(header_line2) < ncols:
+        header_line2.append("")
 
-    logger.info("%s", h_line("═"))
-    headers = ["Model", "Active Δ", "Cache Δ", "Peak Mem", "Time"]
-    header_row = Colors.colored(
-        f"║ {_pad_text(Colors.colored(headers[0], colors.HEADER, Colors.BOLD), name_col_width)} │ "
-        + " │ ".join(
-            _pad_text(
-                Colors.colored(h, colors.HEADER, Colors.BOLD),
-                COL_WIDTH,
-                right_align=True,
-            )
-            for h in headers[1:]
-        )
-        + " ║",
-        colors.BORDER,
-    )
-    logger.info("%s", header_row)
-    logger.info(
-        "%s",
-        Colors.colored(
-            f"╠{'═' * (name_col_width + 2)}╪{'═' * (COL_WIDTH + 2)}╪"
-            f"{'═' * (COL_WIDTH + 2)}╪{'═' * (COL_WIDTH + 2)}╪{'═' * (COL_WIDTH + 2)}╣",
-            colors.BORDER,
-        ),
-    )
-    successful_results: list[PerformanceResult] = []
-    for idx, (result, (display_name, _)) in enumerate(zip(results, name_displays, strict=False)):
-        logger.info(
-            Colors.colored(
-                f"--- Model Run {idx + 1}: {getattr(result, 'model_name', 'N/A')} ---",
-                Colors.BOLD,
-                Colors.MAGENTA,
-            ),
-        )
-        if result.success:
-            successful_results.append(result)
-            stats = [
-                Colors.colored(
-                    "%s MB",
-                    colors.VARIABLE,
-                )
-                % f"{result.active_mb:,.0f}",
-                Colors.colored(
-                    "%s MB",
-                    colors.VARIABLE,
-                )
-                % f"{result.cached_mb:,.0f}",
-                Colors.colored("%s MB", colors.VARIABLE) % f"{result.peak_mb:,.0f}",
-                Colors.colored("%s s", colors.VARIABLE) % f"{result.time_s:.2f}",
-            ]
-            row_color = None
+    # Set minimal and maximal column widths
+    min_col = 6
+    max_output_col = max(len(output_header), 18)  # At least as wide as header
+    col_widths = [max(min_col, len(header_line1[0]), len(header_line2[0]))]
+    for i in range(1, ncols - 1):
+        col_widths.append(max(min_col, len(header_line1[i]), len(header_line2[i])))
+    col_widths.append(max_output_col)
+
+    # Update col_widths based on data (but never exceed max_output_col for output)
+    for r in results:
+        col_widths[0] = max(col_widths[0], min(18, len(str(r.model_name))))
+        for i, f in enumerate(gen_fields):
+            val = getattr(r.generation, f, "-") if r.generation else "-"
+            if isinstance(val, (int, float)) or (
+                isinstance(val, str) and val.replace(".", "", 1).isdigit()
+            ):
+                val = fmt_num(val)
+            col_widths[i + 1] = max(col_widths[i + 1], min(12, len(str(val))))
+    # Calculate total width and shrink if needed
+    max_width = 100
+    total = sum(col_widths) + 3 * (ncols - 1)
+    # Shrink output col first
+    if total > max_width:
+        excess = total - max_width
+        if col_widths[-1] > len(output_header):
+            shrink = min(excess, col_widths[-1] - len(output_header))
+            col_widths[-1] -= shrink
+            total -= shrink
+    # Shrink other cols if still too wide
+    for i in range(1, ncols - 1):
+        if total <= max_width:
+            break
+        if col_widths[i] > min_col:
+            shrink = min(total - max_width, col_widths[i] - min_col)
+            col_widths[i] -= shrink
+            total -= shrink
+    # Final adjustment: pad columns to fill exactly max_width
+    total = sum(col_widths) + 3 * (ncols - 1)
+    if total < max_width:
+        col_widths[-1] += max_width - total
+
+    # Print header (no extra blank lines)
+    logger.info("=" * max_width)
+    logger.info(" | ".join(header_line1[i].ljust(col_widths[i]) for i in range(ncols)))
+    logger.info(" | ".join(header_line2[i].ljust(col_widths[i]) for i in range(ncols)))
+    logger.info("-+-".join("-" * w for w in col_widths))
+    # Print rows
+    for r in results:
+        row = [str(r.model_name)[:col_widths[0]].ljust(col_widths[0])]
+        for i, f in enumerate(gen_fields):
+            val = getattr(r.generation, f, "-") if r.generation else "-"
+            if isinstance(val, (int, float)) or (
+                isinstance(val, str) and val.replace(".", "", 1).isdigit()
+            ):
+                val = fmt_num(val)
+            sval = str(val)[:col_widths[i + 1]]
+            row.append(sval.ljust(col_widths[i + 1]))
+        if r.success and r.generation:
+            out_val = str(getattr(r.generation, "text", ""))
         else:
-            stats = [Colors.colored("-", colors.FAIL_TEXT, Colors.BOLD)] * 4
-            row_color = colors.FAIL
-        # Output all GenerationResult fields
-        if result.success and result.generation:
-            output_lines = [f"    {k}: {v}" for k, v in asdict(result.generation).items()]
-            output_text = "\n".join(output_lines)
-        else:
-            output_text = ""
-        if result.success:
-            row = (
-                f"║ {_pad_text(display_name, name_col_width)} │ "
-                + " │ ".join(_pad_text(stat, COL_WIDTH, right_align=True) for stat in stats)
-                + f" ║\n{output_text}"
-            )
-        else:
-            if row_color is not None:
-                row = Colors.colored(
-                    f"║ {_pad_text(display_name, name_col_width)} │ "
-                    + " │ ".join(_pad_text(stat, COL_WIDTH, right_align=True) for stat in stats)
-                    + " ║",
-                    row_color,
-                )
-            else:
-                row = (
-                    f"║ {_pad_text(display_name, name_col_width)} │ "
-                    + " │ ".join(_pad_text(stat, COL_WIDTH, right_align=True) for stat in stats)
-                    + " ║"
-                )
-            error_msg = getattr(result, "error_message", None) or "Unknown error"
-            row += "\n    " + Colors.colored(
-                f"ERROR: {error_msg}",
-                Colors.BOLD,
-                Colors.RED,
-            )
-            if getattr(result, "captured_output_on_fail", None):
-                captured = getattr(result, "captured_output_on_fail", "")
-                row += "\n    " + Colors.colored(
-                    f"Captured Output: {captured}",
-                    Colors.YELLOW,
-                )
-        logger.info("%s", row)
-    if successful_results:
-        logger.info(
-            "%s",
-            Colors.colored(
-                f"╠{'═' * (name_col_width + 2)}╪{'═' * (COL_WIDTH + 2)}╪"
-                f"{'═' * (COL_WIDTH + 2)}╪{'═' * (COL_WIDTH + 2)}╪{'═' * (COL_WIDTH + 2)}╣",
-                colors.BORDER,
-            ),
-        )
-        avg_stats = [
-            sum(r.active_mb for r in successful_results) / len(successful_results),
-            sum(r.cached_mb for r in successful_results) / len(successful_results),
-            max(r.peak_mb for r in successful_results),
-            sum(r.time_s for r in successful_results) / len(successful_results),
-        ]
-        summary_stats = [
-            f"{avg_stats[0]:,.0f} MB",
-            f"{avg_stats[1]:,.0f} MB",
-            f"{avg_stats[2]:,.0f} MB",
-            f"{avg_stats[3]:.2f} s",
-        ]
-        summary_title = Colors.colored(
-            f"AVG/PEAK ({len(successful_results)} Success)",
-            colors.SUMMARY,
-            Colors.BOLD,
-        )
-        summary_row = Colors.colored(
-            f"║ {_pad_text(summary_title, name_col_width)} │ "
-            + " │ ".join(
-                _pad_text(
-                    Colors.colored(stat, colors.SUMMARY, Colors.BOLD),
-                    COL_WIDTH,
-                    right_align=True,
-                )
-                for stat in summary_stats
-            )
-            + " ║",
-            colors.OUTPUT,
-        )
-        logger.info("%s", summary_row)
-    logger.info("%s", h_line("╝"))
-    logger.debug(
-        "Displayed stats for %d models (%d successful)",
-        len(results),
-        len(successful_results),
-    )
+            out_val = r.error_message or r.captured_output_on_fail or "-"
+        out_val = out_val.replace("\n", " ").replace("\r", " ")
+        if len(out_val) > col_widths[-1]:
+            out_val = out_val[: col_widths[-1] - 3] + "..."
+        row.append(out_val.ljust(col_widths[-1]))
+        logger.info(" | ".join(row))
+    logger.info("=" * max_width)
 
 
 # --- HTML Report Generation ---
@@ -1045,16 +969,45 @@ def generate_html_report(
     versions: dict[str, str],
     prompt: str,
 ) -> None:
-    """Generate an HTML file with all GenerationResult fields, errors, and metrics."""
+    """Generate an HTML file with GenerationResult fields as columns and text/diagnostics as last column, with units and formatted numbers."""
     if not results:
         logger.warning(
             Colors.colored("No results to generate HTML report.", Colors.YELLOW),
         )
         return
 
-    results.sort(
-        key=lambda x: (not x.success, x.time_s if x.success else 0),
-    )
+    # Determine GenerationResult fields (excluding 'text')
+    gen_fields = []
+    for r in results:
+        if r.generation is not None:
+            gen_fields = [f.name for f in fields(r.generation) if f.name != "text"]
+            break
+    if not gen_fields:
+        gen_fields = []
+
+    field_units = {
+        "tokens": "(count)",
+        "prompt_tokens": "(count)",
+        "generation_tokens": "(count)",
+        "prompt_tps": "(t/s)",
+        "generation_tps": "(t/s)",
+        "peak_memory": "(MB)",
+        "time": "(s)",
+        "duration": "(s)",
+    }
+
+    def fmt_num(val):
+        try:
+            fval = float(val)
+            if abs(fval) >= 1000:
+                return f"{fval:,.0f}"
+            if abs(fval) >= 1:
+                return f"{fval:,.3g}"
+            if abs(fval) > 0:
+                return f"{fval:.3g}"
+            return str(val)
+        except Exception:
+            return str(val)
 
     local_tz = get_localzone()
     html_start = (
@@ -1067,32 +1020,13 @@ def generate_html_report(
     <title>Model Performance Results</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f8f9fa; color: #212529; line-height: 1.6; }
-        h1 { text-align: center; color: #343a40; border-bottom: 2px solid #dee2e6; padding-bottom: 10px; margin-bottom: 30px; }
-        .prompt-block { background: #e9ecef; border-left: 4px solid #007bff; padding: 12px 18px; margin: 20px auto 30px auto; max-width: 900px; font-size: 1.05em; font-family: 'Fira Mono', 'Consolas', monospace; color: #343a40; }
-        table { border-collapse: collapse; width: 95%; margin: 30px auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); background-color: #ffffff; }
-        th, td { border: 1px solid #dee2e6; padding: 12px 15px; text-align: left; vertical-align: top; }
-        th { background-color: #e9ecef; font-weight: 600; color: #495057; position: sticky; top: 0; z-index: 1; }
+        table { border-collapse: collapse; width: 95%; margin: 30px auto; background-color: #fff; }
+        th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; vertical-align: top; }
+        th { background-color: #e9ecef; font-weight: 600; color: #495057; }
         tr:nth-child(even):not(.failed-row) { background-color: #f8f9fa; }
-        tr:not(.failed-row):hover { background-color: #e2e6ea; }
-        td.numeric, th.numeric { text-align: right; font-variant-numeric: tabular-nums; }
-        .summary td { font-weight: bold; background-color: #d1ecf1; color: #0c5460; border-color: #bee5eb; }
-        caption { caption-side: bottom; padding: 15px; font-style: italic; color: #6c757d; text-align: center; }
-        .model-name { font-family: 'Courier New', Courier, monospace; font-weight: 500; }
-        .model-output, .captured-output pre { white-space: pre-wrap; word-wrap: break-word; max-width: 600px; font-size: 0.9em; }
-        .captured-output { background-color: #fff3cd; border-left: 3px solid #ffeeba; padding: 8px; margin-top: 10px; color: #856404; }
-        .captured-output strong { color: #856404; }
-        .captured-output pre { margin: 0; padding: 5px; background-color: transparent; border: none; color: #856404; }
         tr.failed-row { background-color: #f8d7da !important; color: #721c24; }
-        tr.failed-row:hover { background-color: #f5c6cb !important; }
-        tr.failed-row .model-output { font-style: italic; color: #721c24; }
-        tr.failed-row td.numeric { color: #721c24; font-style: italic; }
-        .error-message { font-weight: bold; display: block; color: #721c24; }
-        footer { margin-top: 30px; text-align: center; font-size: 0.85em; color: #6c757d; }
-        footer h2 { font-size: 1.1em; color: #495057; margin-bottom: 10px;}
-        footer ul { list-style: none; padding: 0; margin: 0 0 10px 0; }
-        footer li { display: inline-block; margin: 0 10px; }
-        footer code { background-color: #e9ecef; padding: 2px 4px; border-radius: 3px; }
-        footer p { margin-top: 5px; }
+        .model-name { font-family: 'Courier New', Courier, monospace; font-weight: 500; }
+        .error-message { font-weight: bold; color: #721c24; }
     </style>
 </head>
 <body>
@@ -1107,76 +1041,31 @@ def generate_html_report(
         <thead>
             <tr>
                 <th>Model</th>
-                <th class=\"numeric\">Active Δ (MB)</th> <th class=\"numeric\">Cache Δ (MB)</th>
-                <th class=\"numeric\">Peak Mem (MB)</th> <th class=\"numeric\">Time (s)</th>
-                <th>GenerationResult Fields / Error / Captured Output</th>
-            </tr>
-        </thead>
-        <tbody>
 """
     )
+    for f in gen_fields:
+        label = f.replace("_", " ").title()
+        if f in field_units:
+            label += f" {field_units[f]}"
+        html_start += f"<th>{html.escape(label)}</th>\n"
+    html_start += "<th>Output / Diagnostics</th>\n</tr>\n</thead>\n<tbody>\n"
+
     html_rows: str = ""
-    successful_results: list[PerformanceResult] = [r for r in results if r.success]
-
-    for result in results:
-        model_disp_name = html.escape(result.model_name)
-        row_class = ""
-        result_content = ""
-        stats_cells = ""
-
-        if result.success and result.generation:
-            output_fields = "<br>".join(
-                f"<strong>{html.escape(str(k))}</strong>: {html.escape(str(v))}"
-                for k, v in asdict(result.generation).items()
-            )
-            result_content = f'<div class="model-output">{output_fields}</div>'
-            stats_cells = f"""
-                <td class=\"numeric\">{result.active_mb:,.0f}</td>
-                <td class=\"numeric\">{result.cached_mb:,.0f}</td>
-                <td class=\"numeric\">{result.peak_mb:,.0f}</td>
-                <td class=\"numeric\">{result.time_s:.2f}</td>
-            """
+    for r in results:
+        row_class = ' class="failed-row"' if not r.success else ""
+        html_rows += f'<tr{row_class}><td class="model-name">{html.escape(str(r.model_name))}</td>'
+        for f in gen_fields:
+            val = getattr(r.generation, f, "-") if r.generation else "-"
+            if isinstance(val, (int, float)) or (
+                isinstance(val, str) and val.replace(".", "", 1).isdigit()
+            ):
+                val = fmt_num(val)
+            html_rows += f"<td>{html.escape(str(val))}</td>"
+        if r.success and r.generation:
+            out_val = str(getattr(r.generation, "text", ""))
         else:
-            row_class = ' class="failed-row"'
-            error_message = html.escape(result.error_message or "Unknown error")
-            result_content = f'<span class="error-message">{error_message}</span>'
-            if result.captured_output_on_fail:
-                captured_output = html.escape(result.captured_output_on_fail)
-                result_content += f'<div class="captured-output"><strong>Captured Output:</strong><pre>{captured_output}</pre></div>'
-            stats_cells = """
-                <td class=\"numeric\">-</td>
-                <td class=\"numeric\">-</td>
-                <td class=\"numeric\">-</td>
-                <td class=\"numeric\">-</td>
-            """
-
-        html_rows += f"""
-            <!-- Data row for model: {model_disp_name} -->
-            <tr{row_class}>
-                <td class="model-name">{model_disp_name}</td>
-                {stats_cells}
-                <td>{result_content}</td>
-            </tr>
-"""
-
-    html_summary_row: str = ""
-    if successful_results:
-        avg_active = sum(r.active_mb for r in successful_results) / len(successful_results)
-        avg_cache = sum(r.cached_mb for r in successful_results) / len(successful_results)
-        max_peak = max(r.peak_mb for r in successful_results)
-        avg_time = sum(r.time_s for r in successful_results) / len(successful_results)
-        summary_title = f"AVG/PEAK ({len(successful_results)} Success)"
-        html_summary_row = f"""
-            <!-- Summary Row (Based on Successful Runs) -->
-            <tr class="summary">
-                <td>{summary_title}</td>
-                <td class="numeric">{avg_active:,.0f}</td>
-                <td class="numeric">{avg_cache:,.0f}</td>
-                <td class="numeric">{max_peak:,.0f}</td>
-                <td class="numeric">{avg_time:.2f}</td>
-                <td></td>
-            </tr>
-"""
+            out_val = r.error_message or r.captured_output_on_fail or "-"
+        html_rows += f"<td>{html.escape(out_val)}</td></tr>\n"
 
     html_footer: str = "<footer>\n<h2>Library Versions</h2>\n<ul>\n"
     for name, ver in sorted(versions.items()):
@@ -1197,7 +1086,7 @@ def generate_html_report(
 </body>
 </html>
 """
-    html_content: str = html_start + html_rows + html_summary_row + html_end
+    html_content: str = html_start + html_rows + html_end
 
     try:
         with filename.open("w", encoding="utf-8") as f:
@@ -1234,79 +1123,87 @@ def generate_markdown_report(
     versions: dict[str, str],
     prompt: str,
 ) -> None:
-    """Generate a Markdown file with all GenerationResult fields, errors, and metrics."""
+    """Generate a Markdown file with GenerationResult fields as columns and text/diagnostics as last column, with units and formatted numbers."""
     if not results:
         logger.warning(
             Colors.colored("No results to generate Markdown report.", Colors.YELLOW),
         )
         return
 
-    results.sort(
-        key=lambda x: (not x.success, x.time_s if x.success else 0),
-    )
-    successful_results: list[PerformanceResult] = [r for r in results if r.success]
+    # Determine GenerationResult fields (excluding 'text')
+    gen_fields = []
+    for r in results:
+        if r.generation is not None:
+            gen_fields = [f.name for f in fields(r.generation) if f.name != "text"]
+            break
+    if not gen_fields:
+        gen_fields = []
+
+    # Optionally, define units for known fields
+    field_units = {
+        "tokens": "(count)",
+        "prompt_tokens": "(count)",
+        "generation_tokens": "(count)",
+        "prompt_tps": "(t/s)",
+        "generation_tps": "(t/s)",
+        "peak_memory": "(MB)",
+        "time": "(s)",
+        "duration": "(s)",
+    }
+
+    # Helper to format numbers
+    def fmt_num(val):
+        try:
+            fval = float(val)
+            if abs(fval) >= 1000:
+                return f"{fval:,.0f}"
+            if abs(fval) >= 1:
+                return f"{fval:,.3g}"
+            if abs(fval) > 0:
+                return f"{fval:.3g}"
+            return str(val)
+        except Exception:
+            return str(val)
 
     md: list[str] = []
-
     md.append("# Model Performance Results\n")
-    md.append(
-        f"_Generated on {datetime.now(get_localzone()).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n",
-    )
+    md.append(f"_Generated on {datetime.now(get_localzone()).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n")
     md.append("")
-    md.append(
-        "> **Prompt used:**\n>\n> " + prompt.replace("\n", "\n> ") + "\n",
-    )
+    md.append("> **Prompt used:**\n>\n> " + prompt.replace("\n", "\n> ") + "\n")
     md.append("")
+    # Build header row with units
+    header_row = ["Model"]
+    for h in gen_fields:
+        label = h.replace("_", " ").title()
+        if h in field_units:
+            label += f" {field_units[h]}"
+        header_row.append(label)
+    header_row.append("Output / Diagnostics")
+    md.append("| " + " | ".join(header_row) + " |")
     md.append(
-        "| Model | Active Δ (MB) | Cache Δ (MB) | Peak Mem (MB) | Time (s) | GenerationResult Fields / Error / Diagnostics |",
-    )
-    md.append(
-        "|:------|--:|--:|--:|--:|:-----------------------------|",
+        "|"
+        + "|".join(
+            [":-" if i == 0 or i == len(header_row) - 1 else "-" for i in range(len(header_row))]
+        )
+        + "|"
     )
 
-    for result in results:
-        model_disp_name: str = f"`{getattr(result, 'model_name', 'N/A')}`"
-        if result.success and result.generation:
-            stats = [
-                f"{result.active_mb:,.0f}",
-                f"{result.cached_mb:,.0f}",
-                f"{result.peak_mb:,.0f}",
-                f"{result.time_s:.2f}",
-            ]
-            output_md: str = "<br>".join(
-                f"**{k}**: {v}" for k, v in asdict(result.generation).items()
-            )
+    for r in results:
+        row = [f"`{r.model_name}`"]
+        for f in gen_fields:
+            val = getattr(r.generation, f, "-") if r.generation else "-"
+            # Format numbers
+            if isinstance(val, (int, float)) or (
+                isinstance(val, str) and val.replace(".", "", 1).isdigit()
+            ):
+                val = fmt_num(val)
+            row.append(str(val))
+        if r.success and r.generation:
+            out_val = str(getattr(r.generation, "text", ""))
         else:
-            stats = ["-", "-", "-", "-"]
-            error_msg: str = getattr(result, "error_message", None) or "Unknown error"
-            error_text: str = error_msg.replace("\n", "<br>")
-            output_md: str = f"**ERROR:** {error_text}"
-            if getattr(result, "captured_output_on_fail", None):
-                captured: str = getattr(result, "captured_output_on_fail", "").replace(
-                    "\n",
-                    "<br>",
-                )
-                output_md += f"<br>**Captured Output:** {captured}"
-        output_md = output_md.replace("|", "\\|")
-        md.append(
-            f"| {model_disp_name} | {stats[0]} | {stats[1]} | {stats[2]} | {stats[3]} | {output_md} |",
-        )
-
-    if successful_results:
-        avg_active = sum(r.active_mb for r in successful_results) / len(successful_results)
-        avg_cache = sum(r.cached_mb for r in successful_results) / len(successful_results)
-        max_peak = max(r.peak_mb for r in successful_results)
-        avg_time = sum(r.time_s for r in successful_results) / len(successful_results)
-        summary_title = f"**AVG/PEAK ({len(successful_results)} Success)**"
-        summary_stats = [
-            f"{avg_active:,.0f}",
-            f"{avg_cache:,.0f}",
-            f"{max_peak:,.0f}",
-            f"{avg_time:.2f}",
-        ]
-        md.append(
-            f"| {summary_title} | {summary_stats[0]} | {summary_stats[1]} | {summary_stats[2]} | {summary_stats[3]} |  |",
-        )
+            out_val = r.error_message or r.captured_output_on_fail or "-"
+        row.append(out_val)
+        md.append("| " + " | ".join(row) + " |")
 
     md.append("\n---\n")
     md.append("**Library Versions:**\n")
@@ -1314,7 +1211,7 @@ def generate_markdown_report(
         md.append(f"- `{name}`: `{ver}`")
     local_tz = get_localzone()
     md.append(
-        (f"\n_Report generated on: {datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n"),
+        f"\n_Report generated on: {datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n"
     )
 
     try:

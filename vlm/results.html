@@ -7,87 +7,36 @@
     <title>Model Performance Results</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f8f9fa; color: #212529; line-height: 1.6; }
-        h1 { text-align: center; color: #343a40; border-bottom: 2px solid #dee2e6; padding-bottom: 10px; margin-bottom: 30px; }
-        .prompt-block { background: #e9ecef; border-left: 4px solid #007bff; padding: 12px 18px; margin: 20px auto 30px auto; max-width: 900px; font-size: 1.05em; font-family: 'Fira Mono', 'Consolas', monospace; color: #343a40; }
-        table { border-collapse: collapse; width: 95%; margin: 30px auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); background-color: #ffffff; }
-        th, td { border: 1px solid #dee2e6; padding: 12px 15px; text-align: left; vertical-align: top; }
-        th { background-color: #e9ecef; font-weight: 600; color: #495057; position: sticky; top: 0; z-index: 1; }
+        table { border-collapse: collapse; width: 95%; margin: 30px auto; background-color: #fff; }
+        th, td { border: 1px solid #dee2e6; padding: 8px 12px; text-align: left; vertical-align: top; }
+        th { background-color: #e9ecef; font-weight: 600; color: #495057; }
         tr:nth-child(even):not(.failed-row) { background-color: #f8f9fa; }
-        tr:not(.failed-row):hover { background-color: #e2e6ea; }
-        td.numeric, th.numeric { text-align: right; font-variant-numeric: tabular-nums; }
-        .summary td { font-weight: bold; background-color: #d1ecf1; color: #0c5460; border-color: #bee5eb; }
-        caption { caption-side: bottom; padding: 15px; font-style: italic; color: #6c757d; text-align: center; }
-        .model-name { font-family: 'Courier New', Courier, monospace; font-weight: 500; }
-        .model-output, .captured-output pre { white-space: pre-wrap; word-wrap: break-word; max-width: 600px; font-size: 0.9em; }
-        .captured-output { background-color: #fff3cd; border-left: 3px solid #ffeeba; padding: 8px; margin-top: 10px; color: #856404; }
-        .captured-output strong { color: #856404; }
-        .captured-output pre { margin: 0; padding: 5px; background-color: transparent; border: none; color: #856404; }
         tr.failed-row { background-color: #f8d7da !important; color: #721c24; }
-        tr.failed-row:hover { background-color: #f5c6cb !important; }
-        tr.failed-row .model-output { font-style: italic; color: #721c24; }
-        tr.failed-row td.numeric { color: #721c24; font-style: italic; }
-        .error-message { font-weight: bold; display: block; color: #721c24; }
-        footer { margin-top: 30px; text-align: center; font-size: 0.85em; color: #6c757d; }
-        footer h2 { font-size: 1.1em; color: #495057; margin-bottom: 10px;}
-        footer ul { list-style: none; padding: 0; margin: 0 0 10px 0; }
-        footer li { display: inline-block; margin: 0 10px; }
-        footer code { background-color: #e9ecef; padding: 2px 4px; border-radius: 3px; }
-        footer p { margin-top: 5px; }
+        .model-name { font-family: 'Courier New', Courier, monospace; font-weight: 500; }
+        .error-message { font-weight: bold; color: #721c24; }
     </style>
 </head>
 <body>
     <h1>Model Performance Summary</h1>
-    <div class="prompt-block"><strong>Prompt used:</strong><br>Provide a factual caption, description, and keywords suitable for cataloguing, or searching for, the image. Context: Relates to &#x27;, High Street, East Grinstead, England, United Kingdom, UK<br>On a summer afternoon in July, modern cars are parked along the historic High Street in East Grinstead, England. The scene captures daily life unfolding alongside the town&#x27;s well-preserved architecture, featuring timber-framed and brick buildings set against a backdrop of a partly cloudy sky.&#x27; taken around 2025-07-19 16:49:18 BST near GPS 51.123933 N, 0.005083 W Focus on visual content. Avoid repeating the context unless it is visible. Do not speculate.</div>
+    <div class="prompt-block"><strong>Prompt used:</strong><br>Provide a factual caption, description, and keywords suitable for cataloguing, or searching for, the image. Context: Relates to &#x27;, High Street, East Grinstead, England, United Kingdom, UK<br>On a summer afternoon, the historic High Street in East Grinstead, England, presents a scene where centuries of architecture meet modern life. A row of well-preserved medieval and later period buildings, featuring distinctive half-timbered Tudor-style facades alongside brick structures, lines the road. Modern cars are parked along the kerb, creating a contrast between past and present. Above, a dynamic sky with billowing clouds casts a diffused light over the townscape.&#x27; taken around 2025-07-19 16:49:26 BST near GPS 51.123983 N, 0.004783 W Focus on visual content. Avoid repeating the context unless it is visible. Do not speculate.</div>
     <table>
-        <caption>Performance metrics and output/errors for Vision Language Model processing. Generated on 2025-07-20 22:09:13 BST. Failures shown but excluded from averages.</caption>
+        <caption>Performance metrics and output/errors for Vision Language Model processing. Generated on 2025-07-25 23:36:23 BST. Failures shown but excluded from averages.</caption>
         <thead>
             <tr>
                 <th>Model</th>
-                <th class="numeric">Active Δ (MB)</th> <th class="numeric">Cache Δ (MB)</th>
-                <th class="numeric">Peak Mem (MB)</th> <th class="numeric">Time (s)</th>
-                <th>GenerationResult Fields / Error / Captured Output</th>
-            </tr>
-        </thead>
-        <tbody>
-
-            <!-- Data row for model: HuggingFaceTB/SmolVLM-Instruct -->
-            <tr>
-                <td class="model-name">HuggingFaceTB/SmolVLM-Instruct</td>
-                
-                <td class="numeric">0</td>
-                <td class="numeric">4,435</td>
-                <td class="numeric">5,289</td>
-                <td class="numeric">6.75</td>
-            
-                <td><div class="model-output"><strong>text</strong>:  The image depicts a quaint, narrow street in a small town, likely in England, given the architectural style and the presence of traditional buildings. The street is lined with a variety of buildings, including shops, cafes, and residential properties. The buildings are predominantly made of brick and timber, with some having wooden beams and exposed brickwork. The street is relatively narrow, with only a few cars parked along it. The sky above is partly cloudy, with a mix of blue and grey clouds. The overall atmosphere of the image is calm and pleasant, suggesting a pleasant day.
-
-### Detailed Description:
-
-**Foreground:**
-- **Buildings:** The buildings in the foreground are primarily made of brick and timber. The buildings have a mix of architectural styles, including timber-framed and brick buildings. The buildings are mostly two or three stories high, with some having small windows and others having larger windows.
-- **Windows:** The windows are mostly rectangular, with some having small panes and others having larger panes. The windows are set in a variety of styles, including casement windows, sash windows, and bay windows.
-- **Furniture:** There are a few pieces of furniture visible, including a table and chairs in front of one of the buildings.
-- **Vehicles:** There are several cars parked along the street, including a red car, a blue car, and a black car.
-
-**Middle:**
-- **Buildings:** The buildings in the middle are also primarily made of brick and timber. The buildings have a mix of architectural styles, including timber-framed and brick buildings. The buildings are mostly two or three stories high, with some having small windows and others having larger windows.
-- **Windows:** The windows are mostly rectangular, with some having small panes and others having larger panes. The windows are set in a variety of styles, including casement windows, sash windows, and bay windows.
-- **Furniture:** There are a few pieces of furniture visible, including a table and chairs in front of one of the buildings.
-- **Vehicles:** There are several cars parked along the street, including a red car, a blue car, and a black car.
-
-**Background:**
-- **Buildings:** The buildings in the background are primarily made of brick and timber. The buildings have a mix of architectural styles, including timber-framed<br><strong>token</strong>: 277<br><strong>logprobs</strong>: array([-22.25, -36, -36, ..., -29.125, -34.75, -32.75], dtype=bfloat16)<br><strong>prompt_tokens</strong>: 1355<br><strong>generation_tokens</strong>: 500<br><strong>total_tokens</strong>: 1855<br><strong>prompt_tps</strong>: 1192.4697081591887<br><strong>generation_tps</strong>: 113.54527258670353<br><strong>peak_memory</strong>: 5.546142044</div></td>
-            </tr>
-
-            <!-- Summary Row (Based on Successful Runs) -->
-            <tr class="summary">
-                <td>AVG/PEAK (1 Success)</td>
-                <td class="numeric">0</td>
-                <td class="numeric">4,435</td>
-                <td class="numeric">5,289</td>
-                <td class="numeric">6.75</td>
-                <td></td>
-            </tr>
+<th>Token</th>
+<th>Logprobs</th>
+<th>Prompt Tokens (count)</th>
+<th>Generation Tokens (count)</th>
+<th>Total Tokens</th>
+<th>Prompt Tps (t/s)</th>
+<th>Generation Tps (t/s)</th>
+<th>Peak Memory (MB)</th>
+<th>Output / Diagnostics</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="model-name">HuggingFaceTB/SmolVLM-Instruct</td><td>49,154</td><td>array([-17.875, -17.625, -12.25, ..., -16.75, -22.75, -0.4375], dtype=bfloat16)</td><td>1,392</td><td>16</td><td>1,408</td><td>1,224</td><td>123</td><td>5.55</td><td> A row of well-preserved medieval and later period buildings line the road.</td></tr>
 
         </tbody>
     </table>
@@ -96,13 +45,13 @@
 <h2>Library Versions</h2>
 <ul>
 <li><code>Pillow</code>: <code>11.3.0</code></li>
-<li><code>huggingface-hub</code>: <code>0.33.4</code></li>
-<li><code>mlx</code>: <code>0.26.5.dev20250718+84b4d96ef</code></li>
+<li><code>huggingface-hub</code>: <code>0.34.1</code></li>
+<li><code>mlx</code>: <code>0.27.0.dev20250725+d1165b215</code></li>
 <li><code>mlx-lm</code>: <code>0.26.0</code></li>
 <li><code>mlx-vlm</code>: <code>0.3.1</code></li>
-<li><code>transformers</code>: <code>4.53.2</code></li>
+<li><code>transformers</code>: <code>4.54.0</code></li>
 </ul>
-<p>Report generated on: 2025-07-20 22:09:13 BST</p>
+<p>Report generated on: 2025-07-25 23:36:23 BST</p>
 </footer>
 </body>
 </html>
