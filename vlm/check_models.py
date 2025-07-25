@@ -15,7 +15,6 @@ import signal
 import subprocess
 import sys
 import time
-import types
 from dataclasses import asdict, dataclass, fields
 from datetime import UTC, datetime
 from pathlib import Path
@@ -31,6 +30,7 @@ from typing import (
 )
 
 if TYPE_CHECKING:
+    import types
     from zoneinfo import ZoneInfo
 
 # Third-party imports
