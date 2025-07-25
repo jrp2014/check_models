@@ -855,9 +855,10 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
 
     # Abbreviated headers and units for CLI
     field_abbr = {
-        "tokens": ("Tokens", "(ct)"),
+        "tokens": ("Token", "(ct)"),
         "prompt_tokens": ("Prompt", "(ct)"),
         "generation_tokens": ("Gen", "(ct)"),
+        "total_tokens": ("Total", "Tokens"),
         "prompt_tps": ("Prompt", "(t/s)"),
         "generation_tps": ("Gen", "(t/s)"),
         "peak_memory": ("Peak", "(MB)"),
@@ -903,7 +904,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
 
     # Update col_widths based on data (but never exceed max_output_col for output)
     for r in results:
-        col_widths[0] = max(col_widths[0], min(18, len(str(r.model_name))))
+        col_widths[0] = max(col_widths[0], min(25, len(str(r.model_name))))
         for i, f in enumerate(gen_fields):
             val = getattr(r.generation, f, "-") if r.generation else "-"
             if isinstance(val, (int, float)) or (
@@ -1652,7 +1653,7 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
                 else ""
             ),
             (
-                "Focus on visual content. Avoid repeating the context unless it is "
+                ". Focus on visual content. Avoid repeating the context unless it is "
                 "visible. Do not speculate."
             ),
         ]
