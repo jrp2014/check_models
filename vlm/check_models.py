@@ -29,36 +29,46 @@ from typing import (
     TypeVar,
 )
 
-if TYPE_CHECKING:
-    import types
-    from zoneinfo import ZoneInfo
-
 # Third-party imports
 from huggingface_hub import HFCacheInfo, scan_cache_dir
 from huggingface_hub import __version__ as hf_version
 from huggingface_hub.errors import HFValidationError
 from tzlocal import get_localzone
 
+if TYPE_CHECKING:
+    import types
+    from zoneinfo import ZoneInfo
+
+# Constants for logger
+LOGGER_NAME: Final[str] = "mlx-vlm-check"
+NOT_AVAILABLE: Final[str] = "N/A"
+
+# Error message constants
+ERROR_MLX_MISSING: Final[str] = "Core dependency missing: mlx. Please install it."
+ERROR_PILLOW_MISSING: Final[str] = (
+    "Error: Pillow not found. Please install it (`pip install Pillow`)."
+)
+ERROR_MLX_VLM_MISSING: Final[str] = (
+    "Error: mlx-vlm not found. Please install it (`pip install mlx-vlm`)."
+)
+
+# Create a single temp logger for dependency errors
+_temp_logger = logging.getLogger(LOGGER_NAME)
+
 try:
     import mlx.core as mx
 except ImportError:
-    # Create a temporary logger since the main one isn't configured yet
-    _temp_logger = logging.getLogger("mlx-vlm-check")
-    _temp_logger.exception("Core dependency missing: mlx. Please install it.")
+    _temp_logger.exception(ERROR_MLX_MISSING)
     sys.exit(1)
 
 try:
     from PIL import ExifTags, Image, UnidentifiedImageError
     from PIL.ExifTags import GPSTAGS, TAGS
 
-    pillow_version: str = Image.__version__ if hasattr(Image, "__version__") else "N/A"
+    pillow_version: str = Image.__version__ if hasattr(Image, "__version__") else NOT_AVAILABLE
 except ImportError:
-    # Create a temporary logger since the main one isn't configured yet
-    _temp_logger = logging.getLogger("mlx-vlm-check")
-    _temp_logger.critical(
-        "Error: Pillow not found. Please install it (`pip install Pillow`).",
-    )
-    pillow_version = "N/A"
+    _temp_logger.critical(ERROR_PILLOW_MISSING)
+    pillow_version = NOT_AVAILABLE
     sys.exit(1)
 
 # Local application/library specific imports
@@ -68,20 +78,16 @@ try:
     from mlx_vlm.utils import load
     from mlx_vlm.version import __version__ as vlm_version
 except ImportError:
-    # Create a temporary logger since the main one isn't configured yet
-    _temp_logger = logging.getLogger("mlx-vlm-check")
-    _temp_logger.critical(
-        "Error: mlx-vlm not found. Please install it (`pip install mlx-vlm`).",
-    )
+    _temp_logger.critical(ERROR_MLX_VLM_MISSING)
     sys.exit(1)
 
 # Optional imports for version reporting
 try:
     import mlx_lm
 
-    mlx_lm_version: str = str(getattr(mlx_lm, "__version__", "N/A"))
+    mlx_lm_version: str = getattr(mlx_lm, "__version__", NOT_AVAILABLE)
 except ImportError:
-    mlx_lm_version = "N/A"
+    mlx_lm_version = NOT_AVAILABLE
 except AttributeError:
     mlx_lm_version = "N/A (module found, no version attr)"
 try:
@@ -89,7 +95,7 @@ try:
 
     transformers_version: str = transformers.__version__
 except ImportError:
-    transformers_version = "N/A"
+    transformers_version = NOT_AVAILABLE
 
 
 # Custom timeout context manager (for Python < 3.11)
@@ -156,7 +162,7 @@ class TimeoutManager(contextlib.ContextDecorator):
 
 
 # Configure logging - Single logger instance
-logger: logging.Logger = logging.getLogger("mlx-vlm-check")
+logger: logging.Logger = logging.getLogger(LOGGER_NAME)
 
 
 # --- ANSI Color Codes for Console Output ---
