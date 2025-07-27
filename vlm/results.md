@@ -1,6 +1,6 @@
 # Model Performance Results
 
-_Generated on 2025-07-27 22:13:36 BST_
+_Generated on 2025-07-27 22:19:59 BST_
 
 
 > **Prompt used:**
@@ -12,7 +12,7 @@ _Generated on 2025-07-27 22:13:36 BST_
 
 | Model | Token | Logprobs | Prompt Tokens (count) | Generation Tokens (count) | Total Tokens | Prompt Tps (t/s) | Generation Tps (t/s) | Peak Memory (MB) | Output / Diagnostics |
 |:-|-:|:-|-:|-:|-:|-:|-:|-:|:-|
-| `HuggingFaceTB/SmolVLM-Instruct` | 49,154 | array([-19.375, -18, -11.75, ..., -16.75, -22.625, -0.1875], dtype=bfloat16) | 1,391 | 15 | 1,406 | 1,222 | 124 | 5,289 |  A large, historic cathedral with a large lawn in front of it. |
+| `HuggingFaceTB/SmolVLM-Instruct` | 49,154 | array([-19.375, -18, -11.75, ..., -16.75, -22.625, -0.1875], dtype=bfloat16) | 1,391 | 15 | 1,406 | 1,221 | 124 | 5,289 |  A large, historic cathedral with a large lawn in front of it. |
 
 ---
 
@@ -25,4 +25,4 @@ _Generated on 2025-07-27 22:13:36 BST_
 - `mlx-vlm`: `0.3.2`
 - `transformers`: `4.54.0`
 
-_Report generated on: 2025-07-27 22:13:36 BST_
+_Report generated on: 2025-07-27 22:19:59 BST_
