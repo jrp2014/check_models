@@ -1512,7 +1512,13 @@ def print_model_result(result: PerformanceResult, *, verbose: bool = False) -> N
         if result.generation:
             # Generation results with clear labeling
             logger.info("  Generated Text: %s", getattr(result.generation, "text", "N/A"))
-            logger.info("  Tokens: %d", getattr(result.generation, "tokens", 0))
+
+            # Calculate total tokens from prompt + generation tokens
+            prompt_tokens = getattr(result.generation, "prompt_tokens", 0)
+            generation_tokens = getattr(result.generation, "generation_tokens", 0)
+            total_tokens = prompt_tokens + generation_tokens
+
+            logger.info("  Tokens: %d", total_tokens)
             logger.info("  Generation TPS: %.2f", getattr(result.generation, "generation_tps", 0.0))
 
         if verbose and result.generation:
