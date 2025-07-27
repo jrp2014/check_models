@@ -315,8 +315,17 @@ def format_field_label(field_name: str) -> str:
 def format_field_value(field_name: str, value: object) -> object:
     """Format a field value for display, applying unit conversions as needed."""
     if field_name == "peak_memory" and isinstance(value, (int, float)):
-        # Convert bytes to MB for memory fields, return as whole MB with comma separators
-        mb_value = value / MB_CONVERSION
+        # MLX VLM returns memory in GB, convert to MB for display consistency
+        # If value is very small (< 1), assume it's already in MB; if large (> 100), assume bytes
+        if value < 1.0:
+            # Assume already in MB
+            return f"{value:,.0f}"
+        if value > 100.0:
+            # Assume in bytes, convert to MB
+            mb_value = value / MB_CONVERSION
+            return f"{mb_value:,.0f}"
+        # Assume in GB, convert to MB
+        mb_value = value * 1024
         return f"{mb_value:,.0f}"
     if field_name.endswith("_tps") and isinstance(value, (int, float)):
         # Format TPS values to 1 decimal place or 3 significant figures with comma separators
@@ -469,7 +478,7 @@ class MemoryStats(NamedTuple):
 
 @dataclass(frozen=True)
 class PerformanceResult:
-    """Encapsulates a GenerationResult, timing, and performance metrics for a model run."""
+    """Encapsulates a GenerationResult and execution metadata for a model run."""
 
     model_name: str
     generation: GenerationResult | None
@@ -477,10 +486,6 @@ class PerformanceResult:
     error_stage: str | None = None
     error_message: str | None = None
     captured_output_on_fail: str | None = None
-    active_bytes: float = 0.0
-    cached_bytes: float = 0.0
-    peak_bytes: float = 0.0
-    time_s: float = 0.0
 
 
 # --- File Handling ---
@@ -922,10 +927,6 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     if not gen_fields:
         gen_fields = []
 
-    # Add peak_memory field manually since it comes from PerformanceResult.peak_bytes
-    if "peak_memory" not in gen_fields:
-        gen_fields.append("peak_memory")
-
     # Abbreviated headers and units for CLI
     field_abbr = FIELD_ABBREVIATIONS
 
@@ -1014,11 +1015,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     for r in results:
         row = [str(r.model_name)[: col_widths[0]].ljust(col_widths[0])]
         for i, f in enumerate(gen_fields):
-            # Handle peak_memory specially - it's stored as peak_bytes in PerformanceResult
-            if f == "peak_memory":
-                val = r.peak_bytes
-            else:
-                val = getattr(r.generation, f, "-") if r.generation else "-"
+            val = getattr(r.generation, f, "-") if r.generation else "-"
             val = format_field_value(f, val)
             is_numeric = isinstance(val, (int, float)) or is_numeric_string(val)
             if is_numeric and isinstance(val, (int, float, str)):
@@ -1063,10 +1060,6 @@ def generate_html_report(
             break
     if not gen_fields:
         gen_fields = []
-
-    # Add peak_memory field manually since it comes from PerformanceResult.peak_bytes
-    if "peak_memory" not in gen_fields:
-        gen_fields.append("peak_memory")
 
     # Use the shared FIELD_UNITS constant
     local_tz = get_localzone()
@@ -1119,11 +1112,7 @@ def generate_html_report(
         row_class = ' class="failed-row"' if not r.success else ""
         html_rows += f'<tr{row_class}><td class="model-name">{html.escape(str(r.model_name))}</td>'
         for f in gen_fields:
-            # Handle peak_memory specially - it's stored as peak_bytes in PerformanceResult
-            if f == "peak_memory":
-                val = r.peak_bytes
-            else:
-                val = getattr(r.generation, f, "-") if r.generation else "-"
+            val = getattr(r.generation, f, "-") if r.generation else "-"
             val = format_field_value(f, val)
             is_numeric = isinstance(val, (int, float)) or is_numeric_string(val)
             if is_numeric and isinstance(val, (int, float, str)):
@@ -1242,11 +1231,7 @@ def generate_markdown_report(
     for r in results:
         row = [f"`{r.model_name}`"]
         for f in gen_fields:
-            # Handle peak_memory specially - it's stored as peak_bytes in PerformanceResult
-            if f == "peak_memory":
-                val = r.peak_bytes
-            else:
-                val = getattr(r.generation, f, "-") if r.generation else "-"
+            val = getattr(r.generation, f, "-") if r.generation else "-"
             val = format_field_value(f, val)
             # Format numbers
             is_numeric = isinstance(val, (int, float)) or is_numeric_string(val)
@@ -1457,16 +1442,10 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     model: object | None = None
     tokenizer: object | None = None
     arch, gpu_info = get_system_info()
-    start_time: float = 0.0
-    initial_mem: float = 0.0
-    initial_cache: float = 0.0
     try:
         validate_temperature(temp=params.temperature)
         validate_image_accessible(image_path=params.image_path)
         logger.debug("System: %s, GPU: %s", arch, gpu_info)
-        initial_mem = mx.get_active_memory()
-        initial_cache = mx.get_cache_memory()
-        start_time = time.perf_counter()
         with TimeoutManager(params.timeout):
             gen_params: ModelGenParams = ModelGenParams(
                 model_path=params.model_identifier,
@@ -1480,18 +1459,10 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
                 image_path=params.image_path,
                 verbose=params.verbose,
             )
-        end_time: float = time.perf_counter()
-        final_active_mem: float = mx.get_active_memory()
-        final_cache_mem: float = mx.get_cache_memory()
-        peak_mem: float = mx.get_peak_memory()
         return PerformanceResult(
             model_name=params.model_identifier,
             generation=output,
             success=True,
-            active_bytes=final_active_mem - initial_mem,
-            cached_bytes=final_cache_mem - initial_cache,
-            peak_bytes=peak_mem,
-            time_s=end_time - start_time,
         )
     except TimeoutError as e:
         logger.exception("Timeout during model processing")
@@ -1562,24 +1533,50 @@ def print_model_result(result: PerformanceResult, *, verbose: bool = False) -> N
             generation_tokens = getattr(result.generation, "generation_tokens", 0)
             total_tokens = prompt_tokens + generation_tokens
 
-            logger.info("  Tokens: %,d", total_tokens)
+            logger.info("  Tokens: %s", fmt_num(total_tokens))
             generation_tps = getattr(result.generation, "generation_tps", 0.0)
-            logger.info("  Generation TPS: %,.1f", generation_tps)
+            logger.info("  Generation TPS: %s", fmt_num(generation_tps))
 
         if verbose and result.generation:
             # Detailed statistics in verbose mode
             logger.info("  Performance Metrics:")
-            logger.info("    Time: %.2fs", result.time_s)
-            logger.info("    Memory (Active Δ): %,.0f MB", result.active_bytes / MB_CONVERSION)
-            logger.info("    Memory (Cache Δ): %,.0f MB", result.cached_bytes / MB_CONVERSION)
-            logger.info("    Memory (Peak): %,.0f MB", result.peak_bytes / MB_CONVERSION)
-            logger.info("    Prompt Tokens: %,d", getattr(result.generation, "prompt_tokens", 0))
-            logger.info(
-                "    Generation Tokens: %,d",
-                getattr(result.generation, "generation_tokens", 0),
-            )
+            # Debug: show all available fields in GenerationResult
+            available_fields = [f.name for f in fields(result.generation)]
+            logger.debug("  Available GenerationResult fields: %s", available_fields)
+            # Get time from GenerationResult if available
+            time_val = getattr(result.generation, "time", 0.0)
+            logger.info("    Time: %.2fs", time_val)
+
+            # Get memory fields from GenerationResult if available
+            active_mem = getattr(result.generation, "active_memory", 0.0)
+            cached_mem = getattr(result.generation, "cached_memory", 0.0)
+            peak_mem = getattr(result.generation, "peak_memory", 0.0)
+
+            if active_mem > 0:
+                formatted_active = format_field_value("active_memory", active_mem)
+                if isinstance(formatted_active, str):
+                    logger.info("    Memory (Active Δ): %s MB", formatted_active)
+                else:
+                    logger.info("    Memory (Active Δ): %s MB", fmt_num(active_mem / MB_CONVERSION))
+            if cached_mem > 0:
+                formatted_cached = format_field_value("cached_memory", cached_mem)
+                if isinstance(formatted_cached, str):
+                    logger.info("    Memory (Cache Δ): %s MB", formatted_cached)
+                else:
+                    logger.info("    Memory (Cache Δ): %s MB", fmt_num(cached_mem / MB_CONVERSION))
+            if peak_mem > 0:
+                formatted_peak = format_field_value("peak_memory", peak_mem)
+                if isinstance(formatted_peak, str):
+                    logger.info("    Memory (Peak): %s MB", formatted_peak)
+                else:
+                    logger.info("    Memory (Peak): %s MB", fmt_num(peak_mem / MB_CONVERSION))
+
+            prompt_tokens_val = getattr(result.generation, "prompt_tokens", 0)
+            logger.info("    Prompt Tokens: %s", fmt_num(prompt_tokens_val))
+            generation_tokens_val = getattr(result.generation, "generation_tokens", 0)
+            logger.info("    Generation Tokens: %s", fmt_num(generation_tokens_val))
             prompt_tps = getattr(result.generation, "prompt_tps", 0.0)
-            logger.info("    Prompt TPS: %,.1f", prompt_tps)
+            logger.info("    Prompt TPS: %s", fmt_num(prompt_tps))
     else:
         # Failure header
         logger.error("✗ FAILED: %s", model_short_name)
