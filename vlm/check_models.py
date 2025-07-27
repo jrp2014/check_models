@@ -315,8 +315,15 @@ def format_field_label(field_name: str) -> str:
 def format_field_value(field_name: str, value: object) -> object:
     """Format a field value for display, applying unit conversions as needed."""
     if field_name == "peak_memory" and isinstance(value, (int, float)):
-        # Convert bytes to MB for memory fields
-        return value / MB_CONVERSION
+        # Convert bytes to MB for memory fields, return as whole MB
+        return f"{value / MB_CONVERSION:.0f}"
+    if field_name.endswith("_tps") and isinstance(value, (int, float)):
+        # Format TPS values to 1 decimal place or 3 significant figures
+        if abs(value) >= 100:
+            return f"{value:.0f}"  # No decimal for large values (≥100)
+        if abs(value) >= 10:
+            return f"{value:.1f}"  # 1 decimal place for medium values (10-99.9)
+        return f"{value:.2g}"  # Up to 2 significant figures for small values (<10)
     return value
 
 
@@ -1555,21 +1562,21 @@ def print_model_result(result: PerformanceResult, *, verbose: bool = False) -> N
             total_tokens = prompt_tokens + generation_tokens
 
             logger.info("  Tokens: %d", total_tokens)
-            logger.info("  Generation TPS: %.2f", getattr(result.generation, "generation_tps", 0.0))
+            logger.info("  Generation TPS: %.1f", getattr(result.generation, "generation_tps", 0.0))
 
         if verbose and result.generation:
             # Detailed statistics in verbose mode
             logger.info("  Performance Metrics:")
             logger.info("    Time: %.2fs", result.time_s)
-            logger.info("    Memory (Active Δ): %.1f MB", result.active_bytes / MB_CONVERSION)
-            logger.info("    Memory (Cache Δ): %.1f MB", result.cached_bytes / MB_CONVERSION)
-            logger.info("    Memory (Peak): %.1f MB", result.peak_bytes / MB_CONVERSION)
+            logger.info("    Memory (Active Δ): %.0f MB", result.active_bytes / MB_CONVERSION)
+            logger.info("    Memory (Cache Δ): %.0f MB", result.cached_bytes / MB_CONVERSION)
+            logger.info("    Memory (Peak): %.0f MB", result.peak_bytes / MB_CONVERSION)
             logger.info("    Prompt Tokens: %d", getattr(result.generation, "prompt_tokens", 0))
             logger.info(
                 "    Generation Tokens: %d",
                 getattr(result.generation, "generation_tokens", 0),
             )
-            logger.info("    Prompt TPS: %.2f", getattr(result.generation, "prompt_tps", 0.0))
+            logger.info("    Prompt TPS: %.1f", getattr(result.generation, "prompt_tps", 0.0))
     else:
         # Failure header
         logger.error("✗ FAILED: %s", model_short_name)
