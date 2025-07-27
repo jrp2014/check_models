@@ -15,7 +15,7 @@ import signal
 import subprocess
 import sys
 import time
-from dataclasses import asdict, dataclass, fields
+from dataclasses import dataclass, fields
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import (
@@ -1408,11 +1408,7 @@ class ProcessImageParams(NamedTuple):
 def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     """Process an image with a Vision Language Model, managing stats and errors."""
     logger.info(
-        Colors.colored(
-            "Processing '%s' with model: %s",
-            Colors.BOLD,
-            Colors.MAGENTA,
-        ),
+        "Processing '%s' with model: %s",
         str(getattr(params.image_path, "name", params.image_path)),
         params.model_identifier,
     )
@@ -1488,19 +1484,66 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
 
 def print_cli_header(title: str) -> None:
     """Print a formatted CLI header with the given title."""
-    logger.info("=" * 100)
-    logger.info(title.center(100))
-    logger.info("=" * 100)
+    separator_line = "=" * 80
+    logger.info(separator_line)
+    logger.info("%s", title.center(80))
+    logger.info(separator_line)
 
 
 def print_cli_section(title: str) -> None:
     """Print a formatted CLI section header."""
-    logger.info("--- %s ---", title)
+    separator_line = "-" * 60
+    logger.info(separator_line)
+    logger.info("[ %s ]", title.upper())
+    logger.info(separator_line)
 
 
 def print_cli_error(msg: str) -> None:
     """Print a formatted CLI error message."""
-    logger.error("Error: %s", msg)
+    logger.error("ERROR: %s", msg)
+
+
+def print_model_result(result: PerformanceResult, *, verbose: bool = False) -> None:
+    """Print model processing result in a structured, easy-to-parse format."""
+    model_short_name = result.model_name.split("/")[-1]
+
+    if result.success:
+        # Success header
+        logger.info("✓ SUCCESS: %s", model_short_name)
+
+        if result.generation:
+            # Generation results with clear labeling
+            logger.info("  Generated Text: %s", getattr(result.generation, "text", "N/A"))
+            logger.info("  Tokens: %d", getattr(result.generation, "tokens", 0))
+            logger.info("  Generation TPS: %.2f", getattr(result.generation, "generation_tps", 0.0))
+
+        if verbose and result.generation:
+            # Detailed statistics in verbose mode
+            logger.info("  Performance Metrics:")
+            logger.info("    Time: %.2fs", result.time_s)
+            logger.info("    Memory (Active Δ): %.1f MB", result.active_mb)
+            logger.info("    Memory (Cache Δ): %.1f MB", result.cached_mb)
+            logger.info("    Memory (Peak): %.1f MB", result.peak_mb)
+            logger.info("    Prompt Tokens: %d", getattr(result.generation, "prompt_tokens", 0))
+            logger.info(
+                "    Generation Tokens: %d",
+                getattr(result.generation, "generation_tokens", 0),
+            )
+            logger.info("    Prompt TPS: %.2f", getattr(result.generation, "prompt_tps", 0.0))
+    else:
+        # Failure header
+        logger.error("✗ FAILED: %s", model_short_name)
+        if result.error_stage:
+            logger.error("  Stage: %s", result.error_stage)
+        if result.error_message:
+            logger.error("  Error: %s", result.error_message)
+        if result.captured_output_on_fail:
+            logger.error("  Output: %s", result.captured_output_on_fail)
+
+
+def print_cli_separator() -> None:
+    """Print a simple separator line."""
+    logger.info("")
 
 
 def setup_environment(args: argparse.Namespace) -> dict[str, str]:
@@ -1524,15 +1567,9 @@ def setup_environment(args: argparse.Namespace) -> dict[str, str]:
         print_version_info(library_versions)
 
     if args.trust_remote_code:
-        logger.warning(
-            "--- SECURITY WARNING ---",
-        )
-        logger.warning(
-            "`--trust-remote-code` is enabled.",
-        )
-        logger.warning(
-            "------------------------",
-        )
+        print_cli_separator()
+        logger.warning("SECURITY WARNING: --trust-remote-code is enabled.")
+        logger.warning("This allows execution of remote code and may pose security risks.")
 
     return library_versions
 
@@ -1541,17 +1578,21 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
     """Find and validate the image file to process from arguments."""
     folder_path: Path = args.folder.resolve()
     print_cli_section(f"Scanning folder: {folder_path}")
+    
     if args.folder == DEFAULT_FOLDER and not DEFAULT_FOLDER.is_dir():
         print_cli_error(f"Default folder '{DEFAULT_FOLDER}' does not exist.")
+        
     image_path: Path | None = find_most_recent_file(folder_path)
     if image_path is None:
         print_cli_error(
             f"Could not find the most recent image file in {folder_path}. Exiting.",
         )
         sys.exit(1)
+        
     resolved_image_path: Path = image_path.resolve()
-    print_cli_section(f"Processing file: {resolved_image_path.name}")
-    logger.info("Image: %s", str(resolved_image_path))
+    print_cli_section(f"Image File: {resolved_image_path.name}")
+    logger.info("Full path: %s", str(resolved_image_path))
+    
     try:
         with Image.open(resolved_image_path) as img:
             img.verify()
@@ -1571,27 +1612,29 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
 
 def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
     """Extract, print, and return image metadata."""
-    metadata: MetadataDict = extract_image_metadata(
-        image_path,
-    )
-    logger.info("  Date: %s", metadata.get("date", "N/A"))
-    logger.info(
-        "  Desc: %s",
-        Colors.colored(metadata.get("description", "N/A"), Colors.CYAN),
-    )
-    logger.info("  GPS:  %s", metadata.get("gps", "N/A"))
+    print_cli_section("Image Metadata")
+    
+    metadata: MetadataDict = extract_image_metadata(image_path)
+    
+    # Display key metadata in a clean format
+    logger.info("Date: %s", metadata.get("date", "N/A"))
+    logger.info("Description: %s", metadata.get("description", "N/A"))
+    logger.info("GPS Location: %s", metadata.get("gps", "N/A"))
 
     if args.verbose:
+        print_cli_separator()
         exif_data: ExifDict | None = get_exif_data(image_path)
         if exif_data:
             pretty_print_exif(exif_data, show_all=True)
         else:
-            logger.warning("\nNo detailed EXIF data could be extracted.")
+            logger.warning("No detailed EXIF data could be extracted.")
     return metadata
 
 
 def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
     """Prepare the prompt for the VLM, using user input or generating from metadata."""
+    print_cli_section("Prompt Configuration")
+    
     prompt: str
     if args.prompt:
         prompt = args.prompt
@@ -1625,12 +1668,8 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
         ]
         prompt = " ".join(filter(None, prompt_parts)).strip()
         logger.debug("Using generated prompt based on metadata.")
-    logger.info(
-        "%s\n%s\n%s",
-        "--- Using Prompt ---",
-        prompt,
-        "-" * 40,
-    )
+        
+    logger.info("Final prompt: %s", prompt)
     return prompt
 
 
@@ -1675,9 +1714,10 @@ def process_models(
             logger.error("Ensure models are downloaded and cache is accessible.")
     else:
         logger.info("Processing %d model(s)...", len(model_identifiers))
-        separator = "\n" + ("-" * 40) + "\n"
         for model_id in model_identifiers:
-            logger.info(separator)
+            print_cli_separator()
+            print_cli_section(f"Processing Model: {model_id.split('/')[-1]}")
+            
             is_vlm_verbose: bool = args.verbose
             params = ProcessImageParams(
                 model_identifier=model_id,
@@ -1691,45 +1731,9 @@ def process_models(
             )
             result: PerformanceResult = process_image_with_model(params)
             results.append(result)
-            model_short_name: str = model_id.split("/")[-1]
-            if result.success:
-                logger.info(
-                    Colors.colored(
-                        f"[SUCCESS] {model_short_name}",
-                        Colors.BOLD,
-                        Colors.GREEN,
-                    ),
-                )
-                if result.generation:
-                    logger.info(
-                        Colors.colored("Output fields:", Colors.BOLD, Colors.GREEN),
-                    )
-                    for k, v in asdict(result.generation).items():
-                        logger.info("  %s: %s", k, v)
-                if args.verbose:
-                    logger.info(
-                        Colors.colored(
-                            "Statistics:\nTime taken: %.2fs\nActive Δ: %.1f MB\nCache Δ: %.1f MB\nPeak Mem: %.1f MB\n",
-                            Colors.BOLD,
-                            Colors.CYAN,
-                        ),
-                        result.time_s,
-                        result.active_mb,
-                        result.cached_mb,
-                        result.peak_mb,
-                    )
-            else:
-                logger.error(
-                    Colors.colored(
-                        f"[FAIL] {model_short_name} (Stage: {result.error_stage})",
-                        Colors.BOLD,
-                        Colors.RED,
-                    ),
-                )
-                logger.error(
-                    Colors.colored("Reason: %s", Colors.BOLD, Colors.RED),
-                    result.error_message,
-                )
+            
+            # Use the new structured output function
+            print_model_result(result, verbose=args.verbose)
     return results
 
 
@@ -1742,13 +1746,16 @@ def finalize_execution(
 ) -> None:
     """Output summary statistics, generate reports, and display timing information."""
     if results:
-        logger.info("=" * 100)
+        print_cli_section("Performance Summary")
         print_model_stats(results)
+        
+        print_cli_section("Report Generation")
         try:
             html_output_path: Path = args.output_html.resolve()
             md_output_path: Path = args.output_markdown.resolve()
             html_output_path.parent.mkdir(parents=True, exist_ok=True)
             md_output_path.parent.mkdir(parents=True, exist_ok=True)
+            
             generate_html_report(
                 results=results,
                 filename=html_output_path,
@@ -1761,18 +1768,20 @@ def finalize_execution(
                 versions=library_versions,
                 prompt=prompt,
             )
-            logger.info("Reports generated:")
-            logger.info("HTML:     %s", str(html_output_path))
-            logger.info("Markdown: %s", str(md_output_path))
+            
+            logger.info("Reports successfully generated:")
+            logger.info("  HTML: %s", str(html_output_path))
+            logger.info("  Markdown: %s", str(md_output_path))
         except (OSError, ValueError):
             logger.exception("Failed to generate reports.")
     else:
         logger.warning("No models processed. No performance summary generated.")
         logger.info("Skipping report generation as no models were processed.")
+    
+    print_cli_section("Execution Summary")
     print_version_info(library_versions)
     overall_time: float = time.perf_counter() - overall_start_time
-    time_msg = "{} seconds".format(f"{overall_time:.2f}")
-    logger.info("Total execution time: %s", time_msg)
+    logger.info("Total execution time: %.2f seconds", overall_time)
 
 
 def main(args: argparse.Namespace) -> None:
@@ -1874,20 +1883,7 @@ if __name__ == "__main__":
     args: argparse.Namespace = parser.parse_args()
     # Print all command-line arguments if verbose is set
     if getattr(args, "verbose", False):
-        logger.info(
-            Colors.colored(
-                "--- Command Line Parameters ---",
-                Colors.BOLD,
-                Colors.BLUE,
-            ),
-        )
+        print_cli_section("Command Line Parameters")
         for arg_name, arg_value in sorted(vars(args).items()):
-            logger.info(
-                "%s: %s",
-                Colors.colored(arg_name, Colors.BOLD, Colors.CYAN),
-                Colors.colored(str(arg_value), Colors.GREEN),
-            )
-        logger.info(
-            Colors.colored("--- End Parameters ---", Colors.BOLD, Colors.BLUE),
-        )
+            logger.info("  %s: %s", arg_name, arg_value)
     main(args)
