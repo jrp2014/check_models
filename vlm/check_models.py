@@ -358,9 +358,8 @@ def print_version_info(versions: dict[str, str]) -> None:
     logger.info("--- Library Versions ---")
     max_len: int = max(len(k) for k in versions) + 1 if versions else 10
     for name, ver in sorted(versions.items()):
-        status_color: str = Colors.GREEN if ver != "N/A" else Colors.YELLOW
         name_padded: str = name.ljust(max_len)
-        logger.info("%s: %s", name_padded, Colors.colored(ver, status_color))
+        logger.info("%s: %s", name_padded, ver)
     logger.info(
         "Generated: %s",
         datetime.now(get_localzone()).strftime("%Y-%m-%d %H:%M:%S %Z"),
@@ -570,12 +569,7 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
                         gps_decoded[str(gps_key)] = gps_value
                     exif_decoded["GPSInfo"] = gps_decoded
             except (KeyError, AttributeError, TypeError) as gps_err:
-                logger.warning(
-                    Colors.colored(
-                        f"Could not extract GPS IFD: {gps_err}",
-                        Colors.YELLOW,
-                    ),
-                )
+                logger.warning("Could not extract GPS IFD: %s", gps_err)
             return exif_decoded
     except (FileNotFoundError, UnidentifiedImageError):
         logger.exception(
@@ -667,9 +661,7 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
                 except ValueError:
                     continue
         except (ValueError, TypeError, UnicodeDecodeError) as err:
-            logger.warning(
-                Colors.colored(f"Could not localize EXIF date: {err}", Colors.YELLOW),
-            )
+            logger.warning("Could not localize EXIF date: %s", err)
             date = str(date)
     metadata["date"] = str(date)
 
@@ -682,12 +674,7 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
                 desc_str = description.decode("utf-8", errors="replace").strip()
             except UnicodeDecodeError as err:
                 desc_str = str(description)
-                logger.debug(
-                    Colors.colored(
-                        f"Failed to decode description: {err}",
-                        Colors.YELLOW,
-                    ),
-                )
+                logger.debug("Failed to decode description: %s", err)
         else:
             desc_str = str(description).strip()
         if not desc_str:
@@ -721,12 +708,7 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
             longitude,
         )
         if latitude is None or longitude is None:
-            logger.debug(
-                Colors.colored(
-                    "GPS conversion failed: latitude or longitude is None.",
-                    Colors.YELLOW,
-                ),
-            )
+            logger.debug("GPS conversion failed: latitude or longitude is None.")
             return "Unknown location"
 
         def dms_to_dd(dms: tuple[float, float, float], ref: str) -> tuple[float, str]:
@@ -749,12 +731,7 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
             lon_dd = -abs(lon_dd) if lon_card == "W" else abs(lon_dd)
             return f"{abs(lat_dd):.6f} {lat_card}, {abs(lon_dd):.6f} {lon_card}"
         except (ValueError, AttributeError, TypeError) as err:
-            logger.debug(
-                Colors.colored(
-                    f"Failed to convert GPS DMS to decimal: {err}",
-                    Colors.YELLOW,
-                ),
-            )
+            logger.debug("Failed to convert GPS DMS to decimal: %s", err)
             return "Unknown location"
 
     # --- End GPS extraction helper ---
@@ -834,7 +811,7 @@ def pretty_print_exif(
 ) -> None:
     """Print key EXIF data in a formatted table with colors and a title."""
     if not exif:
-        logger.info(Colors.colored("No EXIF data available.", Colors.YELLOW))
+        logger.info("No EXIF data available.")
         return
 
     tags_to_print: list[tuple[str, str, bool]] = filter_and_format_tags(
@@ -923,7 +900,7 @@ def pretty_print_exif(
 def print_model_stats(results: list[PerformanceResult]) -> None:
     """Print a visually compact, perfectly aligned table summarizing model GenerationResult fields and text output/diagnostics, with units and formatted numbers, fitting within 100 characters."""
     if not results:
-        logger.info(Colors.colored("No model results to display.", Colors.YELLOW))
+        logger.info("No model results to display.")
         return
 
     # Determine GenerationResult fields (excluding 'text' and 'logprobs')
@@ -960,10 +937,9 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     max_output_col = max(len(output_header), 18)  # At least as wide as header
     col_widths = [max(min_col, len(header_line1[0]), len(header_line2[0]))]
     # Use list comprehension for better performance
-    col_widths.extend([
-        max(min_col, len(header_line1[i]), len(header_line2[i]))
-        for i in range(1, ncols - 1)
-    ])
+    col_widths.extend(
+        [max(min_col, len(header_line1[i]), len(header_line2[i])) for i in range(1, ncols - 1)]
+    )
     col_widths.append(max_output_col)
 
     # Update col_widths based on data (but never exceed max_output_col for output)
@@ -1512,19 +1488,19 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
 
 def print_cli_header(title: str) -> None:
     """Print a formatted CLI header with the given title."""
-    logger.info(Colors.colored("=" * 100, Colors.BOLD, Colors.BLUE))
-    logger.info(Colors.colored(title.center(100), Colors.BOLD, Colors.MAGENTA))
-    logger.info(Colors.colored("=" * 100, Colors.BOLD, Colors.BLUE))
+    logger.info("=" * 100)
+    logger.info(title.center(100))
+    logger.info("=" * 100)
 
 
 def print_cli_section(title: str) -> None:
     """Print a formatted CLI section header."""
-    logger.info(Colors.colored("--- %s ---", Colors.BOLD, Colors.MAGENTA), title)
+    logger.info("--- %s ---", title)
 
 
 def print_cli_error(msg: str) -> None:
     """Print a formatted CLI error message."""
-    logger.error(Colors.colored("Error: %s", Colors.BOLD, Colors.CYAN), msg)
+    logger.error("Error: %s", msg)
 
 
 def setup_environment(args: argparse.Namespace) -> dict[str, str]:
@@ -1598,12 +1574,12 @@ def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
     metadata: MetadataDict = extract_image_metadata(
         image_path,
     )
-    logger.info("  Date: %s", Colors.colored(metadata.get("date", "N/A"), Colors.CYAN))
+    logger.info("  Date: %s", metadata.get("date", "N/A"))
     logger.info(
         "  Desc: %s",
         Colors.colored(metadata.get("description", "N/A"), Colors.CYAN),
     )
-    logger.info("  GPS:  %s", Colors.colored(metadata.get("gps", "N/A"), Colors.CYAN))
+    logger.info("  GPS:  %s", metadata.get("gps", "N/A"))
 
     if args.verbose:
         exif_data: ExifDict | None = get_exif_data(image_path)

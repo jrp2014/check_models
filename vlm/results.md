@@ -1,17 +1,18 @@
 # Model Performance Results
 
-_Generated on 2025-07-26 22:50:34 BST_
+_Generated on 2025-07-27 00:25:52 BST_
 
 
 > **Prompt used:**
 >
-> Provide a factual caption, description, and keywords suitable for cataloguing, or searching for, the image. Context: Relates to ', High Street, Botley, England, United Kingdom, UK
-> On a summer afternoon in July, the historic parish church on High Street in Botley, England, stands under an overcast sky. A paved path follows the weathered stone walls of the building, leading past arched windows and through the churchyard. The dry grass surrounding the aged headstones points to the warm season, contributing to the quiet and timeless atmosphere of the scene.' taken around 2025-07-26 16:15:22 BST near GPS N/A . Focus on visual content. Avoid repeating the context unless it is visible. Do not speculate.
+> Provide a factual caption, description, and keywords suitable for cataloguing, or searching for, the image. Context: Relates to ', Cathedral, Winchester, England, United Kingdom, UK
+> On a warm, late summer afternoon, visitors and locals relax on the grassy grounds of Winchester Cathedral in Winchester, England. The magnificent Gothic facade of the historic cathedral, framed by trees, provides a tranquil backdrop as people enjoy the public space in the gentle afternoon light.
+> On a late summer afternoon in July, visitors and locals relax on the green in front of the grand Gothic facade of Winchester Cathedral in England. People are enjoying the pleasant weather, sitting on the lawn in small groups, with the historic cathedral providing a timeless and imposing backdrop to the peaceful, contemporary scene.' taken around 2025-07-26 18:16:10 BST near GPS N/A . Focus on visual content. Avoid repeating the context unless it is visible. Do not speculate.
 
 
 | Model | Token | Logprobs | Prompt Tokens (count) | Generation Tokens (count) | Total Tokens | Prompt Tps (t/s) | Generation Tps (t/s) | Peak Memory (MB) | Output / Diagnostics |
 |:-|-:|:-|-:|-:|-:|-:|-:|-:|:-|
-| `HuggingFaceTB/SmolVLM-Instruct` | 49,154 | array([-19, -17.375, -11.5625, ..., -15.3125, -22.25, -0.0625], dtype=bfloat16) | 1,355 | 15 | 1,370 | 1,189 | 125 | 5.55 |  Old stone church with a tall steeple and a cross on top. |
+| `HuggingFaceTB/SmolVLM-Instruct` | 49,154 | array([-20.375, -18.875, -12, ..., -18, -24.25, 0], dtype=bfloat16) | 1,391 | 23 | 1,414 | 1,176 | 121 | 5.55 |  A large cathedral with tall spires and stained glass windows sits in a park with people sitting on the grass. |
 
 ---
 
@@ -24,4 +25,4 @@ _Generated on 2025-07-26 22:50:34 BST_
 - `mlx-vlm`: `0.3.2`
 - `transformers`: `4.54.0`
 
-_Report generated on: 2025-07-26 22:50:34 BST_
+_Report generated on: 2025-07-27 00:25:52 BST_
