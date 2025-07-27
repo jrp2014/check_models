@@ -312,6 +312,14 @@ def format_field_label(field_name: str) -> str:
     return field_name.replace("_", " ").title()
 
 
+def format_field_value(field_name: str, value: object) -> object:
+    """Format a field value for display, applying unit conversions as needed."""
+    if field_name == "peak_memory" and isinstance(value, (int, float)):
+        # Convert bytes to MB for memory fields
+        return value / MB_CONVERSION
+    return value
+
+
 def is_numeric_value(val: float | str | object) -> bool:
     """Check if a value is numeric or a string representing a numeric value."""
     return isinstance(val, (int, float)) or (
@@ -501,11 +509,11 @@ def print_image_dimensions(image_path: Path | str) -> None:
     try:
         with Image.open(img_path_str) as img:
             width, height = img.size
-            mpx: float = (width * height) / 1_000_000
+            total_pixels = width * height
             logger.info(
-                "Image dimensions: %s (%s MPixels)",
+                "Image dimensions: %s (%.1f MPixels)",
                 f"{width}x{height}",
-                f"{mpx:.1f}",
+                total_pixels / 1_000_000,
             )
     except (FileNotFoundError, UnidentifiedImageError):
         logger.exception("Error with image file %s", img_path_str)
@@ -995,8 +1003,9 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
         row = [str(r.model_name)[: col_widths[0]].ljust(col_widths[0])]
         for i, f in enumerate(gen_fields):
             val = getattr(r.generation, f, "-") if r.generation else "-"
+            val = format_field_value(f, val)
             is_numeric = isinstance(val, (int, float)) or is_numeric_string(val)
-            if is_numeric:
+            if is_numeric and isinstance(val, (int, float, str)):
                 val = fmt_num(val)
             sval = str(val)[: col_widths[i + 1]]
             # Align based on column type
@@ -1091,8 +1100,9 @@ def generate_html_report(
         html_rows += f'<tr{row_class}><td class="model-name">{html.escape(str(r.model_name))}</td>'
         for f in gen_fields:
             val = getattr(r.generation, f, "-") if r.generation else "-"
+            val = format_field_value(f, val)
             is_numeric = isinstance(val, (int, float)) or is_numeric_string(val)
-            if is_numeric:
+            if is_numeric and isinstance(val, (int, float, str)):
                 val = fmt_num(val)
             # Use the shared is_numeric_field function for consistency
             alignment_class = "numeric" if is_numeric_field(f) else "text"
@@ -1205,8 +1215,10 @@ def generate_markdown_report(
         row = [f"`{r.model_name}`"]
         for f in gen_fields:
             val = getattr(r.generation, f, "-") if r.generation else "-"
+            val = format_field_value(f, val)
             # Format numbers
-            if isinstance(val, (int, float)) or is_numeric_string(val):
+            is_numeric = isinstance(val, (int, float)) or is_numeric_string(val)
+            if is_numeric and isinstance(val, (int, float, str)):
                 val = fmt_num(val)
             row.append(str(val))
         if r.success and r.generation:
