@@ -43,7 +43,7 @@ if TYPE_CHECKING:
 LOGGER_NAME: Final[str] = "mlx-vlm-check"
 NOT_AVAILABLE: Final[str] = "N/A"
 
-# Error message constants
+# Error message constants - centralized for consistency
 ERROR_MLX_MISSING: Final[str] = "Core dependency missing: mlx. Please install it."
 ERROR_PILLOW_MISSING: Final[str] = (
     "Error: Pillow not found. Please install it (`pip install Pillow`)."
@@ -51,6 +51,11 @@ ERROR_PILLOW_MISSING: Final[str] = (
 ERROR_MLX_VLM_MISSING: Final[str] = (
     "Error: mlx-vlm not found. Please install it (`pip install mlx-vlm`)."
 )
+
+# Timeout constants for robustness
+DEFAULT_TIMEOUT_SHORT: Final[float] = 2.0  # Quick operations
+DEFAULT_TIMEOUT_MEDIUM: Final[float] = 5.0  # File operations
+DEFAULT_TIMEOUT_LONG: Final[float] = 300.0  # Model operations
 
 # Create a single temp logger for dependency errors
 _temp_logger = logging.getLogger(LOGGER_NAME)
@@ -234,18 +239,18 @@ logger.addHandler(handler)
 MB_CONVERSION: Final[float] = 1024 * 1024
 LARGE_NUMBER_THRESHOLD: Final[float] = 1000.0
 
-# Magic value constants
+# Magic value constants for EXIF processing and table formatting
 DMS_LEN: Final[int] = 3  # Degrees, Minutes, Seconds
 DM_LEN: Final[int] = 2  # Degrees, Decimal Minutes
 MAX_DEGREES: Final[int] = 180
 MAX_MINUTES: Final[int] = 60
 MAX_SECONDS: Final[int] = 60
-MAX_TUPLE_LEN: Final[int] = 10
-MAX_STR_LEN: Final[int] = 60
-STR_TRUNCATE_LEN: Final[int] = 57
-BASE_NAME_MAX_WIDTH: Final[int] = 45
-COL_WIDTH: Final[int] = 12
-MIN_NAME_COL_WIDTH: Final[int] = len("Model")
+MAX_TUPLE_LEN: Final[int] = 10  # Max EXIF tuple length before truncation
+MAX_STR_LEN: Final[int] = 60  # Max string length before truncation
+STR_TRUNCATE_LEN: Final[int] = 57  # Characters to keep when truncating
+BASE_NAME_MAX_WIDTH: Final[int] = 45  # Max model name width in tables
+COL_WIDTH: Final[int] = 12  # Default column width for tables
+MIN_NAME_COL_WIDTH: Final[int] = len("Model")  # Minimum model column width
 
 # Shared field metadata for reports
 FIELD_UNITS: Final[dict[str, str]] = {
@@ -307,9 +312,11 @@ def format_field_label(field_name: str) -> str:
     return field_name.replace("_", " ").title()
 
 
-def is_numeric_string(val: str | float) -> bool:
-    """Check if a value is a string representing a numeric value."""
-    return isinstance(val, str) and val.replace(".", "", 1).isdigit()
+def is_numeric_value(val: float | str | object) -> bool:
+    """Check if a value is numeric or a string representing a numeric value."""
+    return isinstance(val, (int, float)) or (
+        isinstance(val, str) and val.replace(".", "", 1).isdigit()
+    )
 
 
 def is_numeric_field(field_name: str) -> bool:
@@ -322,11 +329,8 @@ def is_numeric_field(field_name: str) -> bool:
     )
 
 
-def is_numeric_value(val: float | str | object) -> bool:
-    """Check if a value should be formatted as numeric."""
-    return isinstance(val, (int, float)) or (
-        isinstance(val, str) and val.replace(".", "", 1).isdigit()
-    )
+# Alias for backward compatibility
+is_numeric_string = is_numeric_value
 
 
 # --- Utility Functions ---
@@ -481,20 +485,11 @@ def find_most_recent_file(folder: Path | str) -> Path | None:
             logger.debug("Most recent file found: %s", str(most_recent))
             return most_recent
     except FileNotFoundError:
-        logger.exception(
-            Colors.colored(f"Directory not found: {folder_path}", Colors.YELLOW),
-        )
+        logger.exception("Directory not found: %s", folder_path)
     except PermissionError:
-        logger.exception(
-            Colors.colored(
-                f"Permission denied accessing folder: {folder_path}",
-                Colors.YELLOW,
-            ),
-        )
+        logger.exception("Permission denied accessing folder: %s", folder_path)
     except OSError:
-        logger.exception(
-            Colors.colored(f"OS error scanning folder {folder_path}", Colors.YELLOW),
-        )
+        logger.exception("OS error scanning folder %s", folder_path)
     logger.debug("No files found in directory: %s", folder_path)
     return None
 
@@ -513,16 +508,9 @@ def print_image_dimensions(image_path: Path | str) -> None:
                 f"{mpx:.1f}",
             )
     except (FileNotFoundError, UnidentifiedImageError):
-        logger.exception(
-            Colors.colored(f"Error with image file {img_path_str}", Colors.YELLOW),
-        )
+        logger.exception("Error with image file %s", img_path_str)
     except OSError:
-        logger.exception(
-            Colors.colored(
-                f"Unexpected error reading image dimensions for {img_path_str}",
-                Colors.YELLOW,
-            ),
-        )
+        logger.exception("Unexpected error reading image dimensions for %s", img_path_str)
 
 
 # --- EXIF & Metadata Handling ---
@@ -898,7 +886,11 @@ def pretty_print_exif(
 
 
 def print_model_stats(results: list[PerformanceResult]) -> None:
-    """Print a visually compact, perfectly aligned table summarizing model GenerationResult fields and text output/diagnostics, with units and formatted numbers, fitting within 100 characters."""
+    """Print a compact, aligned table of model performance metrics.
+
+    Displays GenerationResult fields with units and formatted numbers,
+    designed to fit within 100 characters width.
+    """
     if not results:
         logger.info("No model results to display.")
         return
@@ -938,7 +930,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     col_widths = [max(min_col, len(header_line1[0]), len(header_line2[0]))]
     # Use list comprehension for better performance
     col_widths.extend(
-        [max(min_col, len(header_line1[i]), len(header_line2[i])) for i in range(1, ncols - 1)]
+        [max(min_col, len(header_line1[i]), len(header_line2[i])) for i in range(1, ncols - 1)],
     )
     col_widths.append(max_output_col)
 
@@ -1031,7 +1023,7 @@ def generate_html_report(
     versions: dict[str, str],
     prompt: str,
 ) -> None:
-    """Generate an HTML file with GenerationResult fields as columns and text/diagnostics as last column, with units and formatted numbers."""
+    """Generate an HTML report with performance metrics and output."""
     if not results:
         logger.warning(
             Colors.colored("No results to generate HTML report.", Colors.YELLOW),
@@ -1167,7 +1159,7 @@ def generate_markdown_report(
     versions: dict[str, str],
     prompt: str,
 ) -> None:
-    """Generate a Markdown file with GenerationResult fields as columns and text/diagnostics as last column, with units and formatted numbers."""
+    """Generate a Markdown report with performance metrics and output."""
     if not results:
         logger.warning(
             Colors.colored("No results to generate Markdown report.", Colors.YELLOW),
@@ -1257,13 +1249,13 @@ def get_system_info() -> tuple[str, str]:
     arch: str = platform.machine()
     gpu_info: str = "Unknown"
     try:
-        # Try to get GPU info on macOS
+        # Try to get GPU info on macOS using full path for security
         if platform.system() == "Darwin":
             result: subprocess.CompletedProcess[str] = subprocess.run(
-                ["system_profiler", "SPDisplaysDataType"],
+                ["/usr/sbin/system_profiler", "SPDisplaysDataType"],
                 capture_output=True,
                 text=True,
-                timeout=2,
+                timeout=5,  # Increased timeout for robustness
                 check=False,
             )
             if result.returncode == 0:
@@ -1273,8 +1265,8 @@ def get_system_info() -> tuple[str, str]:
                 ]
                 if gpu_lines:
                     gpu_info = gpu_lines[0].split("Chipset Model:")[-1].strip()
-    except (subprocess.SubprocessError, TimeoutError):
-        pass
+    except (subprocess.SubprocessError, TimeoutError) as e:
+        logger.debug("Could not get GPU info: %s", e)
     return arch, gpu_info
 
 
@@ -1283,17 +1275,23 @@ def validate_inputs(
     image_path: PathLike,
     temperature: float = 0.0,
 ) -> None:
-    """Validate input paths and parameters."""
-    img_path: Path = Path(image_path)  # Path() can handle str or Path objects directly
+    """Validate input paths and parameters with comprehensive checks."""
+    img_path: Path = Path(image_path)
+
+    # Early validation for performance
     if not img_path.exists():
-        msg: str = f"Image not found: {img_path}"
+        msg = f"Image not found: {img_path}"
         raise FileNotFoundError(msg)
     if not img_path.is_file():
-        msg: str = f"Not a file: {img_path}"
+        msg = f"Not a file: {img_path}"
         raise ValueError(msg)
-    if img_path.suffix.lower() not in {".jpg", ".jpeg", ".png", ".webp"}:
-        msg: str = f"Unsupported image format: {img_path.suffix}"
+
+    # Check file extension (case-insensitive for robustness)
+    supported_extensions = {".jpg", ".jpeg", ".png", ".webp"}
+    if img_path.suffix.lower() not in supported_extensions:
+        msg = f"Unsupported image format: {img_path.suffix}"
         raise ValueError(msg)
+
     validate_temperature(temp=temperature)
 
 
@@ -1368,7 +1366,7 @@ def _run_model_generation(
 
     output: GenerationResult = generate(
         model=model,
-        processor=tokenizer,
+        processor=tokenizer,  # type: ignore[arg-type] # MLX VLM accepts both tokenizer types
         prompt=formatted_prompt,
         image=str(image_path),
         verbose=verbose,
