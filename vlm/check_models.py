@@ -1578,21 +1578,21 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
     """Find and validate the image file to process from arguments."""
     folder_path: Path = args.folder.resolve()
     print_cli_section(f"Scanning folder: {folder_path}")
-    
+
     if args.folder == DEFAULT_FOLDER and not DEFAULT_FOLDER.is_dir():
         print_cli_error(f"Default folder '{DEFAULT_FOLDER}' does not exist.")
-        
+
     image_path: Path | None = find_most_recent_file(folder_path)
     if image_path is None:
         print_cli_error(
             f"Could not find the most recent image file in {folder_path}. Exiting.",
         )
         sys.exit(1)
-        
+
     resolved_image_path: Path = image_path.resolve()
     print_cli_section(f"Image File: {resolved_image_path.name}")
     logger.info("Full path: %s", str(resolved_image_path))
-    
+
     try:
         with Image.open(resolved_image_path) as img:
             img.verify()
@@ -1613,9 +1613,9 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
 def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
     """Extract, print, and return image metadata."""
     print_cli_section("Image Metadata")
-    
+
     metadata: MetadataDict = extract_image_metadata(image_path)
-    
+
     # Display key metadata in a clean format
     logger.info("Date: %s", metadata.get("date", "N/A"))
     logger.info("Description: %s", metadata.get("description", "N/A"))
@@ -1634,7 +1634,7 @@ def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
 def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
     """Prepare the prompt for the VLM, using user input or generating from metadata."""
     print_cli_section("Prompt Configuration")
-    
+
     prompt: str
     if args.prompt:
         prompt = args.prompt
@@ -1668,7 +1668,7 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
         ]
         prompt = " ".join(filter(None, prompt_parts)).strip()
         logger.debug("Using generated prompt based on metadata.")
-        
+
     logger.info("Final prompt: %s", prompt)
     return prompt
 
@@ -1717,7 +1717,7 @@ def process_models(
         for model_id in model_identifiers:
             print_cli_separator()
             print_cli_section(f"Processing Model: {model_id.split('/')[-1]}")
-            
+
             is_vlm_verbose: bool = args.verbose
             params = ProcessImageParams(
                 model_identifier=model_id,
@@ -1731,7 +1731,7 @@ def process_models(
             )
             result: PerformanceResult = process_image_with_model(params)
             results.append(result)
-            
+
             # Use the new structured output function
             print_model_result(result, verbose=args.verbose)
     return results
@@ -1748,14 +1748,14 @@ def finalize_execution(
     if results:
         print_cli_section("Performance Summary")
         print_model_stats(results)
-        
+
         print_cli_section("Report Generation")
         try:
             html_output_path: Path = args.output_html.resolve()
             md_output_path: Path = args.output_markdown.resolve()
             html_output_path.parent.mkdir(parents=True, exist_ok=True)
             md_output_path.parent.mkdir(parents=True, exist_ok=True)
-            
+
             generate_html_report(
                 results=results,
                 filename=html_output_path,
@@ -1768,7 +1768,7 @@ def finalize_execution(
                 versions=library_versions,
                 prompt=prompt,
             )
-            
+
             logger.info("Reports successfully generated:")
             logger.info("  HTML: %s", str(html_output_path))
             logger.info("  Markdown: %s", str(md_output_path))
@@ -1777,7 +1777,7 @@ def finalize_execution(
     else:
         logger.warning("No models processed. No performance summary generated.")
         logger.info("Skipping report generation as no models were processed.")
-    
+
     print_cli_section("Execution Summary")
     print_version_info(library_versions)
     overall_time: float = time.perf_counter() - overall_start_time
