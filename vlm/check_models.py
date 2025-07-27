@@ -461,9 +461,9 @@ class PerformanceResult:
     error_stage: str | None = None
     error_message: str | None = None
     captured_output_on_fail: str | None = None
-    active_mb: float = 0.0
-    cached_mb: float = 0.0
-    peak_mb: float = 0.0
+    active_bytes: float = 0.0
+    cached_bytes: float = 0.0
+    peak_bytes: float = 0.0
     time_s: float = 0.0
 
 
@@ -1420,8 +1420,8 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         validate_temperature(temp=params.temperature)
         validate_image_accessible(image_path=params.image_path)
         logger.debug("System: %s, GPU: %s", arch, gpu_info)
-        initial_mem = mx.get_active_memory() / MB_CONVERSION  # type: ignore[attr-defined]
-        initial_cache = mx.get_cache_memory() / MB_CONVERSION  # type: ignore[attr-defined]
+        initial_mem = mx.get_active_memory()
+        initial_cache = mx.get_cache_memory()
         start_time = time.perf_counter()
         with TimeoutManager(params.timeout):
             gen_params: ModelGenParams = ModelGenParams(
@@ -1437,16 +1437,16 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
                 verbose=params.verbose,
             )
         end_time: float = time.perf_counter()
-        final_active_mem: float = mx.get_active_memory() / MB_CONVERSION  # type: ignore[attr-defined]
-        final_cache_mem: float = mx.get_cache_memory() / MB_CONVERSION  # type: ignore[attr-defined]
-        peak_mem: float = mx.get_peak_memory() / MB_CONVERSION  # type: ignore[attr-defined]
+        final_active_mem: float = mx.get_active_memory()
+        final_cache_mem: float = mx.get_cache_memory()
+        peak_mem: float = mx.get_peak_memory()
         return PerformanceResult(
             model_name=params.model_identifier,
             generation=output,
             success=True,
-            active_mb=final_active_mem - initial_mem,
-            cached_mb=final_cache_mem - initial_cache,
-            peak_mb=peak_mem,
+            active_bytes=final_active_mem - initial_mem,
+            cached_bytes=final_cache_mem - initial_cache,
+            peak_bytes=peak_mem,
             time_s=end_time - start_time,
         )
     except TimeoutError as e:
@@ -1472,8 +1472,8 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             del model
         if tokenizer is not None:
             del tokenizer
-        mx.clear_cache()  # type: ignore[attr-defined]
-        mx.reset_peak_memory()  # type: ignore[attr-defined]
+        mx.clear_cache()
+        mx.reset_peak_memory()
         logger.debug("Cleaned up resources for model %s", params.model_identifier)
 
 
@@ -1525,9 +1525,9 @@ def print_model_result(result: PerformanceResult, *, verbose: bool = False) -> N
             # Detailed statistics in verbose mode
             logger.info("  Performance Metrics:")
             logger.info("    Time: %.2fs", result.time_s)
-            logger.info("    Memory (Active Δ): %.1f MB", result.active_mb)
-            logger.info("    Memory (Cache Δ): %.1f MB", result.cached_mb)
-            logger.info("    Memory (Peak): %.1f MB", result.peak_mb)
+            logger.info("    Memory (Active Δ): %.1f MB", result.active_bytes / MB_CONVERSION)
+            logger.info("    Memory (Cache Δ): %.1f MB", result.cached_bytes / MB_CONVERSION)
+            logger.info("    Memory (Peak): %.1f MB", result.peak_bytes / MB_CONVERSION)
             logger.info("    Prompt Tokens: %d", getattr(result.generation, "prompt_tokens", 0))
             logger.info(
                 "    Generation Tokens: %d",
