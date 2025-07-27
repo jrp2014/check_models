@@ -1,6 +1,6 @@
 # Model Performance Results
 
-_Generated on 2025-07-27 21:36:41 BST_
+_Generated on 2025-07-27 21:42:12 BST_
 
 
 > **Prompt used:**
@@ -12,7 +12,7 @@ _Generated on 2025-07-27 21:36:41 BST_
 
 | Model | Token | Logprobs | Prompt Tokens (count) | Generation Tokens (count) | Total Tokens | Prompt Tps (t/s) | Generation Tps (t/s) | Peak Memory (MB) | Output / Diagnostics |
 |:-|-:|:-|-:|-:|-:|-:|-:|-:|:-|
-| `HuggingFaceTB/SmolVLM-Instruct` | 49,154 | array([-20.5, -19.125, -12.4375, ..., -18.375, -24.25, 0], dtype=bfloat16) | 1,391 | 29 | 1,420 | 1,220 | 120 | 5.55 |  A large, historic cathedral with tall spires and stained glass windows sits in a park with people sitting on the grass in front of it. |
+| `HuggingFaceTB/SmolVLM-Instruct` | 49,154 | array([-20.375, -18.875, -12, ..., -18, -24.25, 0], dtype=bfloat16) | 1,391 | 23 | 1,414 | 1,223 | 122 | 5.55 |  A large cathedral with tall spires and stained glass windows sits in a park with people sitting on the grass. |
 
 ---
 
@@ -25,4 +25,4 @@ _Generated on 2025-07-27 21:36:41 BST_
 - `mlx-vlm`: `0.3.2`
 - `transformers`: `4.54.0`
 
-_Report generated on: 2025-07-27 21:36:41 BST_
+_Report generated on: 2025-07-27 21:42:12 BST_
