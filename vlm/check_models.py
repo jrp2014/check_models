@@ -914,6 +914,10 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     if not gen_fields:
         gen_fields = []
 
+    # Add peak_memory field manually since it comes from PerformanceResult.peak_bytes
+    if "peak_memory" not in gen_fields:
+        gen_fields.append("peak_memory")
+
     # Abbreviated headers and units for CLI
     field_abbr = FIELD_ABBREVIATIONS
 
@@ -1002,7 +1006,11 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     for r in results:
         row = [str(r.model_name)[: col_widths[0]].ljust(col_widths[0])]
         for i, f in enumerate(gen_fields):
-            val = getattr(r.generation, f, "-") if r.generation else "-"
+            # Handle peak_memory specially - it's stored as peak_bytes in PerformanceResult
+            if f == "peak_memory":
+                val = r.peak_bytes
+            else:
+                val = getattr(r.generation, f, "-") if r.generation else "-"
             val = format_field_value(f, val)
             is_numeric = isinstance(val, (int, float)) or is_numeric_string(val)
             if is_numeric and isinstance(val, (int, float, str)):
@@ -1047,6 +1055,10 @@ def generate_html_report(
             break
     if not gen_fields:
         gen_fields = []
+
+    # Add peak_memory field manually since it comes from PerformanceResult.peak_bytes
+    if "peak_memory" not in gen_fields:
+        gen_fields.append("peak_memory")
 
     # Use the shared FIELD_UNITS constant
     local_tz = get_localzone()
@@ -1099,7 +1111,11 @@ def generate_html_report(
         row_class = ' class="failed-row"' if not r.success else ""
         html_rows += f'<tr{row_class}><td class="model-name">{html.escape(str(r.model_name))}</td>'
         for f in gen_fields:
-            val = getattr(r.generation, f, "-") if r.generation else "-"
+            # Handle peak_memory specially - it's stored as peak_bytes in PerformanceResult
+            if f == "peak_memory":
+                val = r.peak_bytes
+            else:
+                val = getattr(r.generation, f, "-") if r.generation else "-"
             val = format_field_value(f, val)
             is_numeric = isinstance(val, (int, float)) or is_numeric_string(val)
             if is_numeric and isinstance(val, (int, float, str)):
@@ -1185,6 +1201,10 @@ def generate_markdown_report(
     if not gen_fields:
         gen_fields = []
 
+    # Add peak_memory field manually since it comes from PerformanceResult.peak_bytes
+    if "peak_memory" not in gen_fields:
+        gen_fields.append("peak_memory")
+
     # Use the shared FIELD_UNITS constant
     md: list[str] = []
     md.append("# Model Performance Results\n")
@@ -1214,7 +1234,11 @@ def generate_markdown_report(
     for r in results:
         row = [f"`{r.model_name}`"]
         for f in gen_fields:
-            val = getattr(r.generation, f, "-") if r.generation else "-"
+            # Handle peak_memory specially - it's stored as peak_bytes in PerformanceResult
+            if f == "peak_memory":
+                val = r.peak_bytes
+            else:
+                val = getattr(r.generation, f, "-") if r.generation else "-"
             val = format_field_value(f, val)
             # Format numbers
             is_numeric = isinstance(val, (int, float)) or is_numeric_string(val)
