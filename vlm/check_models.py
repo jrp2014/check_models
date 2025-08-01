@@ -1843,6 +1843,37 @@ def get_cached_model_ids() -> list[str]:
         return sorted([repo.repo_id for repo in cache_info.repos])
 
 
+def validate_model_selection(args: argparse.Namespace) -> None:
+    """Validate that no models are both explicitly included and excluded.
+
+    Args:
+        args: Parsed command line arguments
+
+    Raises:
+        ValueError: If a model appears in both --models and --exclude lists
+
+    """
+    if not args.models or not args.exclude:
+        return  # No conflict possible
+
+    # Convert to sets for efficient intersection checking
+    included_models = set(args.models)
+    excluded_models = set(args.exclude)
+
+    # Check for exact matches
+    conflicts = included_models.intersection(excluded_models)
+
+    if conflicts:
+        conflict_list = sorted(conflicts)
+        error_msg = (
+            f"Model conflict: The following models are both explicitly included (--models) "
+            f"and excluded (--exclude): {', '.join(conflict_list)}. "
+            f"Please remove them from one of the lists."
+        )
+        logger.error(error_msg)
+        raise ValueError(error_msg)
+
+
 def process_models(
     args: argparse.Namespace,
     image_path: Path,
@@ -1852,6 +1883,9 @@ def process_models(
 
     Returns a list of performance results with outputs and performance metrics.
     """
+    # Validate model selection for conflicts
+    validate_model_selection(args)
+
     model_identifiers: list[str]
     if args.models:
         model_identifiers = args.models
@@ -1859,6 +1893,29 @@ def process_models(
     else:
         logger.info("Scanning cache for models to process...")
         model_identifiers = get_cached_model_ids()
+
+        # Apply exclusions if specified and not using explicit model list
+        if args.exclude and model_identifiers:
+            excluded_set = set(args.exclude)
+            original_count = len(model_identifiers)
+
+            # Filter out excluded models (exact match)
+            model_identifiers = [model for model in model_identifiers if model not in excluded_set]
+
+            excluded_count = original_count - len(model_identifiers)
+            if excluded_count > 0:
+                logger.info(
+                    "Excluded %d model(s) from processing. Remaining: %d model(s)",
+                    excluded_count,
+                    len(model_identifiers),
+                )
+                if args.verbose:
+                    excluded_found = excluded_set.intersection(set(get_cached_model_ids()))
+                    if excluded_found:
+                        logger.info(
+                            "Excluded models found in cache: %s",
+                            ", ".join(sorted(excluded_found)),
+                        )
 
     results: list[PerformanceResult] = []
     if not model_identifiers:
@@ -1994,6 +2051,14 @@ def main_cli() -> None:
         type=str,
         default=None,
         help="Specify models by ID/path. Overrides cache scan.",
+    )
+    parser.add_argument(
+        "-e",
+        "--exclude",
+        nargs="+",
+        type=str,
+        default=None,
+        help="Exclude models by ID/path from cache scan. Ignored if --models is specified.",
     )
     parser.add_argument(
         "--trust-remote-code",
