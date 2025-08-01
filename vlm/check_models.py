@@ -1043,10 +1043,11 @@ def _prepare_table_data(
     results: list[PerformanceResult],
 ) -> tuple[list[str], list[list[str]]]:
     """Prepare table data for both HTML and Markdown reports using tabulate.
-    
+
     Returns:
         Tuple of (headers, rows) where headers is a list of column names
         and rows is a list of row data lists.
+
     """
     if not results:
         return [], []
@@ -1056,8 +1057,7 @@ def _prepare_table_data(
     for r in results:
         if r.generation is not None:
             gen_fields = [
-                f.name for f in fields(r.generation) 
-                if f.name not in ("text", "logprobs")
+                f.name for f in fields(r.generation) if f.name not in ("text", "logprobs")
             ]
             break
     if not gen_fields:
@@ -1076,7 +1076,7 @@ def _prepare_table_data(
     rows = []
     for r in results:
         row = [str(r.model_name)]
-        
+
         # Add generation fields
         for f in gen_fields:
             val = getattr(r.generation, f, "-") if r.generation else "-"
@@ -1086,14 +1086,14 @@ def _prepare_table_data(
             if is_numeric and isinstance(val, (int, float, str)):
                 val = fmt_num(val)
             row.append(str(val))
-        
+
         # Add output/diagnostic column
         if r.success and r.generation:
             out_val = str(getattr(r.generation, "text", ""))
         else:
             out_val = r.error_message or r.captured_output_on_fail or "-"
         row.append(out_val)
-        
+
         rows.append(row)
 
     return headers, rows
@@ -1125,13 +1125,13 @@ def generate_html_report(
         rows,
         headers=headers,
         tablefmt="unsafehtml",
-        colalign=["left"] + ["right" if is_numeric_field(h.split()[0]) else "left"
-                            for h in headers[1:]],
+        colalign=["left"]
+        + ["right" if is_numeric_field(h.split()[0]) else "left" for h in headers[1:]],
     )
 
     # Use the shared FIELD_UNITS constant
     local_tz = get_localzone()
-    
+
     # Build complete HTML document
     html_content = f"""<!DOCTYPE html>
 <html lang="en">
@@ -1140,46 +1140,46 @@ def generate_html_report(
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Model Performance Results</title>
     <style>
-        body {{ 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            margin: 20px; 
-            background-color: #f8f9fa; 
-            color: #212529; 
-            line-height: 1.6; 
+        body {{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+            color: #212529;
+            line-height: 1.6;
         }}
-        table {{ 
-            border-collapse: collapse; 
-            width: 95%; 
-            margin: 30px auto; 
-            background-color: #fff; 
+        table {{
+            border-collapse: collapse;
+            width: 95%;
+            margin: 30px auto;
+            background-color: #fff;
         }}
-        th, td {{ 
-            border: 1px solid #dee2e6; 
-            padding: 8px 12px; 
-            vertical-align: top; 
+        th, td {{
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            vertical-align: top;
         }}
-        th {{ 
-            background-color: #e9ecef; 
-            font-weight: 600; 
-            color: #495057; 
+        th {{
+            background-color: #e9ecef;
+            font-weight: 600;
+            color: #495057;
         }}
-        tr:nth-child(even) {{ 
-            background-color: #f8f9fa; 
+        tr:nth-child(even) {{
+            background-color: #f8f9fa;
         }}
-        .model-name {{ 
-            font-family: 'Courier New', Courier, monospace; 
-            font-weight: 500; 
-            text-align: left; 
+        .model-name {{
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 500;
+            text-align: left;
         }}
-        .error-message {{ 
-            font-weight: bold; 
-            color: #721c24; 
+        .error-message {{
+            font-weight: bold;
+            color: #721c24;
         }}
-        .numeric {{ 
-            text-align: right; 
+        .numeric {{
+            text-align: right;
         }}
-        .text {{ 
-            text-align: left; 
+        .text {{
+            text-align: left;
         }}
     </style>
 </head>
@@ -1187,15 +1187,15 @@ def generate_html_report(
     <h1>Model Performance Summary</h1>
     <div class="prompt-block">
         <strong>Prompt used:</strong><br>
-        {html.escape(prompt).replace('\n', '<br>')}
+        {html.escape(prompt).replace("\n", "<br>")}
     </div>
-    
+
     <p><strong>Performance metrics and output/errors for Vision Language Model processing.</strong></p>
-    <p><em>Generated on {datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S %Z')}. 
+    <p><em>Generated on {datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")}.
     Failures shown but excluded from averages.</em></p>
-    
+
     {html_table}
-    
+
     <footer>
         <h2>Library Versions</h2>
         <ul>
@@ -1206,7 +1206,7 @@ def generate_html_report(
         html_content += f"            <li><code>{html.escape(name)}</code>: <code>{html.escape(ver)}</code></li>\n"
 
     html_content += f"""        </ul>
-        <p>Report generated on: {datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S %Z')}</p>
+        <p>Report generated on: {datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")}</p>
     </footer>
 </body>
 </html>"""
@@ -1255,8 +1255,8 @@ def generate_markdown_report(
         rows,
         headers=headers,
         tablefmt="github",
-        colalign=["left"] + ["right" if is_numeric_field(h.split()[0]) else "left"
-                            for h in headers[1:]],
+        colalign=["left"]
+        + ["right" if is_numeric_field(h.split()[0]) else "left" for h in headers[1:]],
     )
 
     # Build the complete markdown content
