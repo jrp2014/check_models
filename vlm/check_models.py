@@ -33,6 +33,7 @@ from typing import (
 from huggingface_hub import HFCacheInfo, scan_cache_dir
 from huggingface_hub import __version__ as hf_version
 from huggingface_hub.errors import HFValidationError
+from tabulate import tabulate
 from tzlocal import get_localzone
 
 if TYPE_CHECKING:
@@ -289,6 +290,10 @@ NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
         "duration",
     },
 )
+
+# Console table formatting constants
+MAX_MODEL_NAME_LENGTH = 14
+MAX_OUTPUT_LENGTH = 28
 
 
 # --- Shared Utility Functions ---
@@ -907,10 +912,9 @@ def pretty_print_exif(
 
 
 def print_model_stats(results: list[PerformanceResult]) -> None:
-    """Print a compact, aligned table of model performance metrics.
+    """Print a compact, aligned table of model performance metrics using tabulate.
 
-    Displays GenerationResult fields with units and formatted numbers,
-    designed to fit within 100 characters width.
+    Displays GenerationResult fields with units and formatted numbers.
     """
     if not results:
         logger.info("No model results to display.")
@@ -927,114 +931,93 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     if not gen_fields:
         gen_fields = []
 
-    # Abbreviated headers and units for CLI
-    field_abbr = FIELD_ABBREVIATIONS
+    # Build compact headers with multi-line format
+    headers = ["Model"]
+    field_names = ["model"]  # Track original field names for alignment
 
-    # Build headers (2 lines: label and unit)
-    header_line1 = ["Model"]
-    header_line2 = [""]
-    for h in gen_fields:
-        abbr, unit = field_abbr.get(h, (format_field_label(h), ""))
-        header_line1.append(abbr)
-        header_line2.append(unit)
-    # Use a short header for output column
-    output_header = "Output"
-    header_line1.append(output_header)
-    header_line2.append("")
-    ncols = len(header_line1)
-    while len(header_line2) < ncols:
-        header_line2.append("")
-
-    # Set minimal and maximal column widths
-    min_col = 6
-    max_output_col = max(len(output_header), 18)  # At least as wide as header
-    col_widths = [max(min_col, len(header_line1[0]), len(header_line2[0]))]
-    # Use list comprehension for better performance
-    col_widths.extend(
-        [max(min_col, len(header_line1[i]), len(header_line2[i])) for i in range(1, ncols - 1)],
-    )
-    col_widths.append(max_output_col)
-
-    # Update col_widths based on data (but never exceed max_output_col for output)
-    for r in results:
-        col_widths[0] = max(col_widths[0], min(25, len(str(r.model_name))))
-        for i, f in enumerate(gen_fields):
-            val = getattr(r.generation, f, "-") if r.generation else "-"
-            if isinstance(val, (int, float)) or is_numeric_string(val):
-                val = fmt_num(val)
-            col_widths[i + 1] = max(col_widths[i + 1], min(12, len(str(val))))
-    # Calculate total width and shrink if needed
-    max_width = 100
-    total = sum(col_widths) + 3 * (ncols - 1)
-    # Shrink output col first
-    if total > max_width:
-        excess = total - max_width
-        if col_widths[-1] > len(output_header):
-            shrink = min(excess, col_widths[-1] - len(output_header))
-            col_widths[-1] -= shrink
-            total -= shrink
-    # Shrink other cols if still too wide
-    for i in range(1, ncols - 1):
-        if total <= max_width:
-            break
-        if col_widths[i] > min_col:
-            shrink = min(total - max_width, col_widths[i] - min_col)
-            col_widths[i] -= shrink
-            total -= shrink
-    # Final adjustment: pad columns to fill exactly max_width
-    total = sum(col_widths) + 3 * (ncols - 1)
-    if total < max_width:
-        col_widths[-1] += max_width - total
-
-    # Determine column alignment: numeric fields right-aligned, text fields left-aligned
-    col_alignments = ["left"]  # Model name is always left-aligned
     for f in gen_fields:
-        # Use the shared is_numeric_field function for consistency
-        if is_numeric_field(f):
-            col_alignments.append("right")
+        # Use multi-line headers to save space
+        if f in FIELD_ABBREVIATIONS:
+            line1, line2 = FIELD_ABBREVIATIONS[f]
+            label = f"{line1}\n{line2}"
         else:
-            col_alignments.append("left")
-    col_alignments.append("left")  # Output column is left-aligned
+            # For fields not in abbreviations, create compact multi-line format
+            base_label = format_field_label(f)
+            if f in FIELD_UNITS:
+                unit = FIELD_UNITS[f]
+                label = f"{base_label}\n{unit}"
+            else:
+                label = base_label
+        headers.append(label)
+        field_names.append(f)
 
-    # Print header (no extra blank lines) - use logger.info() for consistency
-    logger.info("=" * max_width)
-    # Align headers according to column type
-    header_row1 = []
-    header_row2 = []
-    for i in range(ncols):
-        if col_alignments[i] == "right":
-            header_row1.append(header_line1[i].rjust(col_widths[i]))
-            header_row2.append(header_line2[i].rjust(col_widths[i]))
-        else:
-            header_row1.append(header_line1[i].ljust(col_widths[i]))
-            header_row2.append(header_line2[i].ljust(col_widths[i]))
-    logger.info(" | ".join(header_row1))
-    logger.info(" | ".join(header_row2))
-    logger.info("-+-".join("-" * w for w in col_widths))
-    # Print rows
+    headers.append("Output")
+    field_names.append("output")
+
+    # Build table rows
+    rows = []
     for r in results:
-        row = [str(r.model_name)[: col_widths[0]].ljust(col_widths[0])]
-        for i, f in enumerate(gen_fields):
+        # Truncate model name to keep table compact
+        model_name = str(r.model_name).split("/")[-1]  # Use just the model name part
+        if len(model_name) > MAX_MODEL_NAME_LENGTH:
+            model_name = model_name[: MAX_MODEL_NAME_LENGTH - 3] + "..."
+        row = [model_name]
+
+        # Add generation fields
+        for f in gen_fields:
             val = getattr(r.generation, f, "-") if r.generation else "-"
             val = format_field_value(f, val)
+            # Format numbers with commas for console display
             is_numeric = isinstance(val, (int, float)) or is_numeric_string(val)
             if is_numeric and isinstance(val, (int, float, str)):
-                val = fmt_num(val)
-            sval = str(val)[: col_widths[i + 1]]
-            # Align based on column type
-            if col_alignments[i + 1] == "right":
-                row.append(sval.rjust(col_widths[i + 1]))
-            else:
-                row.append(sval.ljust(col_widths[i + 1]))
+                # Use comma formatting for readability
+                try:
+                    num_val = float(val)
+                    if abs(num_val) >= 1000:
+                        val = f"{num_val:,.0f}"  # With commas, whole numbers for large values
+                    elif abs(num_val) >= 1:
+                        val = f"{num_val:.3g}"
+                    else:
+                        val = f"{num_val:.2g}"
+                except (ValueError, TypeError):
+                    val = str(val)
+            row.append(str(val))
+
+        # Add output/diagnostic column (truncated for console display)
         if r.success and r.generation:
             out_val = str(getattr(r.generation, "text", ""))
         else:
             out_val = r.error_message or r.captured_output_on_fail or "-"
+
+        # Clean and truncate output for console display
         out_val = re.sub(r"[\n\r]", " ", out_val)
-        if len(out_val) > col_widths[-1]:
-            out_val = out_val[: col_widths[-1] - 3] + "..."
-        row.append(out_val.ljust(col_widths[-1]))
-        logger.info(" | ".join(row))
+        if len(out_val) > MAX_OUTPUT_LENGTH:
+            out_val = out_val[: MAX_OUTPUT_LENGTH - 3] + "..."
+        row.append(out_val)
+        rows.append(row)
+
+    # Determine column alignment using original field names
+    colalign = ["left"] + [
+        "right" if is_numeric_field(field_name) else "left" for field_name in field_names[1:]
+    ]
+
+    # Generate compact table using plain format with multi-line headers
+    # Use 2-space column separation and optimize widths for 100-char total
+    table = tabulate(
+        rows,
+        headers=headers,
+        tablefmt="plain",
+        colalign=colalign,
+        maxcolwidths=[14, 6, 6, 6, 6, 7, 7, 6, 28],  # Optimized for ~100 char width
+    )
+
+    # Print the table with surrounding decorations
+    table_lines = table.split("\n")
+    max_width = max(len(line) for line in table_lines) if table_lines else 80
+
+    logger.info("=" * max_width)
+    for line in table_lines:
+        logger.info(line)
     logger.info("=" * max_width)
 
 
