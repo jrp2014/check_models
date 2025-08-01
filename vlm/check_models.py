@@ -277,6 +277,9 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
     "duration": ("Dur", "(s)"),
 }
 
+# Threshold for splitting long header text into multiple lines
+HEADER_SPLIT_LENGTH = 10
+
 # Fields that should be right-aligned (numeric fields)
 NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
     {
@@ -999,6 +1002,95 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     logger.info("=" * max_width)
 
 
+def _prepare_table_data(
+    results: list[PerformanceResult],
+) -> tuple[list[str], list[list[str]], list[str]]:
+    """Prepare table data for both HTML and Markdown reports using tabulate.
+
+    Returns:
+        Tuple of (headers, rows, field_names) where headers is a list of column names,
+        rows is a list of row data lists, and field_names tracks the original field names
+        for alignment purposes.
+
+    """
+    if not results:
+        return [], [], []
+
+    # Determine GenerationResult fields (excluding 'text' and 'logprobs')
+    gen_fields = []
+    for r in results:
+        if r.generation is not None:
+            gen_fields = [
+                f.name for f in fields(r.generation) if f.name not in ("text", "logprobs")
+            ]
+            break
+    if not gen_fields:
+        gen_fields = []
+
+    # Build compact headers with multi-line support
+    headers = ["Model"]
+    field_names = ["model"]  # Track original field names for alignment
+
+    # Create more compact, multi-line friendly headers
+    compact_headers = {
+        "tokens": "Total<br>Tokens",
+        "prompt_tokens": "Prompt<br>Tokens",
+        "generation_tokens": "Gen<br>Tokens",
+        "prompt_tps": "Prompt<br>TPS",
+        "generation_tps": "Gen<br>TPS",
+        "peak_memory": "Peak<br>Memory<br>(MB)",
+        "active_memory": "Active<br>Memory<br>(MB)",
+        "cached_memory": "Cache<br>Memory<br>(MB)",
+        "time": "Time<br>(s)",
+        "duration": "Duration<br>(s)",
+    }
+
+    for f in gen_fields:
+        if f in compact_headers:
+            headers.append(compact_headers[f])
+        else:
+            # Fallback to formatted label with units
+            label = format_field_label(f)
+            if f in FIELD_UNITS:
+                # Split long headers into multiple lines
+                parts = label.split()
+                if len(parts) > 1 and len(label) > HEADER_SPLIT_LENGTH:
+                    label = "<br>".join(parts) + f"<br>{FIELD_UNITS[f]}"
+                else:
+                    label += f" {FIELD_UNITS[f]}"
+            headers.append(label)
+        field_names.append(f)
+
+    headers.append("Output /<br>Diagnostics")
+    field_names.append("output")
+
+    # Build table rows
+    rows = []
+    for r in results:
+        row = [str(r.model_name)]
+
+        # Add generation fields
+        for f in gen_fields:
+            val = getattr(r.generation, f, "-") if r.generation else "-"
+            val = format_field_value(f, val)
+            # Format numbers
+            is_numeric = isinstance(val, (int, float)) or is_numeric_string(val)
+            if is_numeric and isinstance(val, (int, float, str)):
+                val = fmt_num(val)
+            row.append(str(val))
+
+        # Add output/diagnostic column
+        if r.success and r.generation:
+            out_val = str(getattr(r.generation, "text", ""))
+        else:
+            out_val = r.error_message or r.captured_output_on_fail or "-"
+        row.append(out_val)
+
+        rows.append(row)
+
+    return headers, rows, field_names
+
+
 # --- HTML Report Generation ---
 def generate_html_report(
     results: list[PerformanceResult],
@@ -1006,33 +1098,45 @@ def generate_html_report(
     versions: dict[str, str],
     prompt: str,
 ) -> None:
-    """Generate an HTML report with performance metrics and output."""
+    """Generate an HTML report with performance metrics and output using tabulate."""
     if not results:
         logger.warning(
             Colors.colored("No results to generate HTML report.", Colors.YELLOW),
         )
         return
 
-    # Determine GenerationResult fields (excluding 'text')
-    gen_fields = []
-    for r in results:
-        if r.generation is not None:
-            gen_fields = [f.name for f in fields(r.generation) if f.name != "text"]
-            break
-    if not gen_fields:
-        gen_fields = []
+    # Get table data using our helper function
+    headers, rows, field_names = _prepare_table_data(results)
+
+    if not headers or not rows:
+        logger.warning("No table data to generate HTML report.")
+        return
+
+    # Determine column alignment using original field names
+    colalign = ["left"] + [
+        "right" if is_numeric_field(field_name) else "left" for field_name in field_names[1:]
+    ]
+
+    # Generate HTML table using tabulate
+    html_table = tabulate(
+        rows,
+        headers=headers,
+        tablefmt="unsafehtml",
+        colalign=colalign,
+    )
 
     # Use the shared FIELD_UNITS constant
     local_tz = get_localzone()
-    html_start = (
-        """
-<!DOCTYPE html>
-<html lang=\"en\">
+
+    # Build complete HTML document
+    html_content = f"""<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset=\"UTF-8\">
-    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Model Performance Results</title>
     <style>
+<<<<<<< HEAD
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f8f9fa; color: #212529; line-height: 1.6; }
         h1 { color: #495057; text-align: center; margin-bottom: 10px; border-bottom: 3px solid #007bff; padding-bottom: 10px; }
         .prompt-block { background-color: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; margin: 20px 0; border-radius: 4px; }
@@ -1069,56 +1173,82 @@ def generate_html_report(
         <thead>
             <tr>
                 <th class="text">Model</th>
+=======
+        body {{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+            color: #212529;
+            line-height: 1.6;
+        }}
+        table {{
+            border-collapse: collapse;
+            width: 95%;
+            margin: 30px auto;
+            background-color: #fff;
+        }}
+        th, td {{
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            vertical-align: top;
+        }}
+        th {{
+            background-color: #e9ecef;
+            font-weight: 600;
+            color: #495057;
+        }}
+        tr:nth-child(even) {{
+            background-color: #f8f9fa;
+        }}
+        .model-name {{
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 500;
+            text-align: left;
+        }}
+        .error-message {{
+            font-weight: bold;
+            color: #721c24;
+        }}
+        .numeric {{
+            text-align: right;
+        }}
+        .text {{
+            text-align: left;
+        }}
+    </style>
+</head>
+<body>
+    <h1>Model Performance Summary</h1>
+    <div class="prompt-block">
+        <strong>Prompt used:</strong><br>
+        {html.escape(prompt).replace("\n", "<br>")}
+    </div>
+
+    <p><strong>Performance metrics and output/errors for Vision Language Model
+    processing.</strong></p>
+    <p><em>Generated on {datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")}.
+    Failures shown but excluded from averages.</em></p>
+
+    {html_table}
+
+    <footer>
+        <h2>Library Versions</h2>
+        <ul>
+>>>>>>> refs/remotes/origin/main
 """
-    )
-    for f in gen_fields:
-        label = format_field_label(f)
-        if f in FIELD_UNITS:
-            label += f" {FIELD_UNITS[f]}"
-        # Use the shared is_numeric_field function for consistency
-        alignment_class = "numeric" if is_numeric_field(f) else "text"
-        html_start += f'<th class="{alignment_class}">{html.escape(label)}</th>\n'
-    html_start += '<th class="text">Output / Diagnostics</th>\n</tr>\n</thead>\n<tbody>\n'
 
-    html_rows: str = ""
-    for r in results:
-        row_class = ' class="failed-row"' if not r.success else ""
-        html_rows += f'<tr{row_class}><td class="model-name">{html.escape(str(r.model_name))}</td>'
-        for f in gen_fields:
-            val = getattr(r.generation, f, "-") if r.generation else "-"
-            val = format_field_value(f, val)
-            is_numeric = isinstance(val, (int, float)) or is_numeric_string(val)
-            if is_numeric and isinstance(val, (int, float, str)):
-                val = fmt_num(val)
-            # Use the shared is_numeric_field function for consistency
-            alignment_class = "numeric" if is_numeric_field(f) else "text"
-            html_rows += f'<td class="{alignment_class}">{html.escape(str(val))}</td>'
-        if r.success and r.generation:
-            out_val = str(getattr(r.generation, "text", ""))
-        else:
-            out_val = r.error_message or r.captured_output_on_fail or "-"
-        html_rows += f'<td class="text">{html.escape(out_val)}</td></tr>\n'
-
-    html_footer: str = "<footer>\n<h2>Library Versions</h2>\n<ul>\n"
+    # Add library versions
     for name, ver in sorted(versions.items()):
-        html_footer += (
-            f"<li><code>{html.escape(name)}</code>: <code>{html.escape(ver)}</code></li>\n"
+        html_content += (
+            f"            <li><code>{html.escape(name)}</code>: "
+            f"<code>{html.escape(ver)}</code></li>\n"
         )
-    html_footer += (
-        "</ul>\n<p>Report generated on: "
-        + datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")
-        + "</p>\n</footer>"
-    )
 
-    html_end = f"""
-        </tbody>
-    </table>
-    <!-- End of Table -->
-    {html_footer}
+    html_content += f"""        </ul>
+        <p>Report generated on: {datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")}</p>
+    </footer>
 </body>
-</html>
-"""
-    html_content: str = html_start + html_rows + html_end
+</html>"""
 
     try:
         with filename.open("w", encoding="utf-8") as f:
@@ -1139,85 +1269,54 @@ def generate_html_report(
         )
 
 
-def _format_markdown_table_row(
-    model_disp_name: str,
-    stats: list[str],
-    output_md: str,
-) -> str:
-    return (
-        f"| {model_disp_name} | {stats[0]} | {stats[1]} | {stats[2]} | {stats[3]} | {output_md} |"
-    )
-
-
 def generate_markdown_report(
     results: list[PerformanceResult],
     filename: Path,
     versions: dict[str, str],
     prompt: str,
 ) -> None:
-    """Generate a Markdown report with performance metrics and output."""
+    """Generate a Markdown report with performance metrics and output using tabulate."""
     if not results:
         logger.warning(
             Colors.colored("No results to generate Markdown report.", Colors.YELLOW),
         )
         return
 
-    # Determine GenerationResult fields (excluding 'text')
-    gen_fields = []
-    for r in results:
-        if r.generation is not None:
-            gen_fields = [f.name for f in fields(r.generation) if f.name != "text"]
-            break
-    if not gen_fields:
-        gen_fields = []
+    # Get table data using our helper function
+    headers, rows, field_names = _prepare_table_data(results)
 
-    # Add peak_memory field manually since it comes from PerformanceResult.peak_bytes
-    if "peak_memory" not in gen_fields:
-        gen_fields.append("peak_memory")
+    if not headers or not rows:
+        logger.warning("No table data to generate Markdown report.")
+        return
 
-    # Use the shared FIELD_UNITS constant
+    # For Markdown, we need to process headers to remove HTML breaks and use simpler formatting
+    markdown_headers = []
+    for header in headers:
+        # Replace <br> with space for Markdown compatibility
+        clean_header = header.replace("<br>", " ")
+        markdown_headers.append(clean_header)
+
+    # Determine column alignment using original field names
+    colalign = ["left"] + [
+        "right" if is_numeric_field(field_name) else "left" for field_name in field_names[1:]
+    ]
+
+    # Generate Markdown table using tabulate
+    markdown_table = tabulate(
+        rows,
+        headers=markdown_headers,
+        tablefmt="github",
+        colalign=colalign,
+    )
+
+    # Build the complete markdown content
     md: list[str] = []
     md.append("# Model Performance Results\n")
     md.append(f"_Generated on {datetime.now(get_localzone()).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n")
     md.append("")
     md.append("> **Prompt used:**\n>\n> " + prompt.replace("\n", "\n> ") + "\n")
     md.append("")
-    # Build header row with units
-    header_row = ["Model"]
-    alignment_row = [":-"]  # Model column is left-aligned
-    for h in gen_fields:
-        label = format_field_label(h)
-        if h in FIELD_UNITS:
-            label += f" {FIELD_UNITS[h]}"
-        header_row.append(label)
-        # Use the shared is_numeric_field function for consistency
-        if is_numeric_field(h):
-            alignment_row.append("-:")  # Right-aligned for numeric fields
-        else:
-            alignment_row.append(":-")  # Left-aligned for text fields
-    header_row.append("Output / Diagnostics")
-    alignment_row.append(":-")  # Output column is left-aligned
-
-    md.append("| " + " | ".join(header_row) + " |")
-    md.append("|" + "|".join(alignment_row) + "|")
-
-    for r in results:
-        row = [f"`{r.model_name}`"]
-        for f in gen_fields:
-            val = getattr(r.generation, f, "-") if r.generation else "-"
-            val = format_field_value(f, val)
-            # Format numbers
-            is_numeric = isinstance(val, (int, float)) or is_numeric_string(val)
-            if is_numeric and isinstance(val, (int, float, str)):
-                val = fmt_num(val)
-            row.append(str(val))
-        if r.success and r.generation:
-            out_val = str(getattr(r.generation, "text", ""))
-        else:
-            out_val = r.error_message or r.captured_output_on_fail or "-"
-        row.append(out_val)
-        md.append("| " + " | ".join(row) + " |")
-
+    md.append(markdown_table)
     md.append("\n---\n")
     md.append("**Library Versions:**\n")
     for name, ver in sorted(versions.items()):
@@ -1667,12 +1766,12 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
                 "cataloguing, or searching for, the image."
             ),
             (
-                f"Context: Relates to '{metadata.get('description', '')}'"
+                f"\n\nContext: The image relates to '{metadata.get('description', '')}'"
                 if metadata.get("description") and metadata["description"] != "N/A"
                 else ""
             ),
             (
-                f"taken around {metadata.get('date', '')}"
+                f"\n\nThe photo was taken around {metadata.get('date', '')}"
                 if metadata.get("date") and metadata["date"] != "Unknown date"
                 else ""
             ),
@@ -1682,8 +1781,8 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
                 else ""
             ),
             (
-                ". Focus on visual content. Avoid repeating the context unless it is "
-                "visible. Do not speculate."
+                ". Focus on visual content, drawing on any available "
+                "contextual information for specificity. Do not speculate."
             ),
         ]
         prompt = " ".join(filter(None, prompt_parts)).strip()
@@ -1829,8 +1928,11 @@ def main(args: argparse.Namespace) -> None:
         sys.exit(1)
 
 
-if __name__ == "__main__":
-    parser: argparse.ArgumentParser = argparse.ArgumentParser(description="MLX VLM Model Checker")
+def main_cli() -> None:
+    """CLI entry point for the MLX VLM checker script."""
+    parser: argparse.ArgumentParser = argparse.ArgumentParser(
+        description="MLX VLM Model Checker",
+    )
     # Add arguments (separated for clarity)
     parser.add_argument(
         "-f",
@@ -1907,3 +2009,7 @@ if __name__ == "__main__":
         for arg_name, arg_value in sorted(vars(args).items()):
             logger.info("  %s: %s", arg_name, arg_value)
     main(args)
+
+
+if __name__ == "__main__":
+    main_cli()
