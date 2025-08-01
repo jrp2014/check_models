@@ -53,10 +53,15 @@ ERROR_MLX_VLM_MISSING: Final[str] = (
     "Error: mlx-vlm not found. Please install it (`pip install mlx-vlm`)."
 )
 
-# Timeout constants for robustness
-DEFAULT_TIMEOUT_SHORT: Final[float] = 2.0  # Quick operations
-DEFAULT_TIMEOUT_MEDIUM: Final[float] = 5.0  # File operations
-DEFAULT_TIMEOUT_LONG: Final[float] = 300.0  # Model operations
+# Timeout constants - only the one actually used
+DEFAULT_TIMEOUT_LONG: Final[float] = 300.0  # Model operations timeout
+
+# Text formatting constants
+MIN_SEPARATOR_CHARS: Final[int] = 50  # Minimum chars for separator detection
+DEFAULT_DECIMAL_PLACES: Final[int] = 2  # Default decimal formatting
+LARGE_NUMBER_THRESHOLD: Final[float] = 100.0  # Threshold for large number formatting
+MEDIUM_NUMBER_THRESHOLD: Final[int] = 10  # Threshold for medium number formatting
+THOUSAND_THRESHOLD: Final[int] = 1000  # Threshold for thousands formatting
 
 # Create a single temp logger for dependency errors
 _temp_logger = logging.getLogger(LOGGER_NAME)
@@ -241,47 +246,55 @@ class ColoredFormatter(logging.Formatter):
         """Apply context-aware formatting to INFO messages for better visual hierarchy."""
         stripped = msg.strip()
 
-        # Check for various separator patterns first (highest priority)
-        if (
-            stripped.startswith(("===", "---"))
-            or (len(stripped) > 50 and stripped.count("=") > 50)
-            or (len(stripped) > 50 and stripped.count("-") > 50)
-        ):
-            return Colors.colored(msg, Colors.BOLD, Colors.BLUE)
+        # Define format patterns with their corresponding colors (priority ordered)
+        format_patterns = [
+            # Section separators (highest priority)
+            (
+                lambda s, m: (
+                    s.startswith(("===", "---"))
+                    or (len(s) > MIN_SEPARATOR_CHARS and s.count("=") > MIN_SEPARATOR_CHARS)
+                    or (len(s) > MIN_SEPARATOR_CHARS and s.count("-") > MIN_SEPARATOR_CHARS)
+                ),
+                (Colors.BOLD, Colors.BLUE),
+            ),
+            # Section headers in brackets
+            (lambda s, _: s.startswith("[ ") and s.endswith(" ]"), (Colors.BOLD, Colors.MAGENTA)),
+            # Success indicators
+            (lambda s, m: "SUCCESS:" in m or s.startswith("✓"), (Colors.BOLD, Colors.GREEN)),
+            # Failure indicators
+            (
+                lambda s, m: any(x in m for x in ["FAILED:", "ERROR:"]) or s.startswith("✗"),
+                (Colors.BOLD, Colors.RED),
+            ),
+            # Generated text highlighting
+            (lambda _, m: "Generated Text:" in m, (Colors.CYAN,)),
+            # Performance metrics
+            (
+                lambda _, m: any(metric in m for metric in ["Tokens:", "TPS:", "Time:", "Memory:"]),
+                (Colors.WHITE,),
+            ),
+            # File operations
+            (
+                lambda _, m: any(x in m for x in ["HTML report saved", "Markdown report saved"]),
+                (Colors.BOLD, Colors.GREEN),
+            ),
+            # Processing status
+            (lambda s, _: s.startswith("Processing"), (Colors.YELLOW,)),
+            # Library versions section
+            (
+                lambda _, m: "Library Versions" in m
+                or (
+                    m.count(":") == 1
+                    and any(lib in m.lower() for lib in ["mlx", "pillow", "transformers"])
+                ),
+                (Colors.CYAN,),
+            ),
+        ]
 
-        # Section headers in brackets
-        if stripped.startswith("[ ") and stripped.endswith(" ]"):
-            return Colors.colored(msg, Colors.BOLD, Colors.MAGENTA)
-
-        # Success/failure indicators
-        if "SUCCESS:" in msg or stripped.startswith("✓"):
-            return Colors.colored(msg, Colors.BOLD, Colors.GREEN)
-
-        if any(x in msg for x in ["FAILED:", "ERROR:"]) or stripped.startswith("✗"):
-            return Colors.colored(msg, Colors.BOLD, Colors.RED)
-
-        # Generated text highlighting
-        if "Generated Text:" in msg:
-            return Colors.colored(msg, Colors.CYAN)
-
-        # Performance metrics
-        if any(metric in msg for metric in ["Tokens:", "TPS:", "Time:", "Memory:"]):
-            return Colors.colored(msg, Colors.WHITE)
-
-        # File operations
-        if any(x in msg for x in ["HTML report saved", "Markdown report saved"]):
-            return Colors.colored(msg, Colors.BOLD, Colors.GREEN)
-
-        # Processing status
-        if stripped.startswith("Processing"):
-            return Colors.colored(msg, Colors.YELLOW)
-
-        # Library versions section
-        if "Library Versions" in msg or (
-            msg.count(":") == 1
-            and any(lib in msg.lower() for lib in ["mlx", "pillow", "transformers"])
-        ):
-            return Colors.colored(msg, Colors.CYAN)
+        # Apply first matching pattern
+        for pattern_check, colors in format_patterns:
+            if pattern_check(stripped, msg):
+                return Colors.colored(msg, *colors)
 
         # Default INFO messages without color to reduce noise
         return msg
@@ -386,7 +399,7 @@ def format_field_value(field_name: str, value: object) -> object:
         if value < 1.0:
             # Assume already in MB
             return f"{value:,.0f}"
-        if value > 100.0:
+        if value > LARGE_NUMBER_THRESHOLD:
             # Assume in bytes, convert to MB
             mb_value = value / MB_CONVERSION
             return f"{mb_value:,.0f}"
@@ -395,9 +408,9 @@ def format_field_value(field_name: str, value: object) -> object:
         return f"{mb_value:,.0f}"
     if field_name.endswith("_tps") and isinstance(value, (int, float)):
         # Format TPS values to 1 decimal place or 3 significant figures with comma separators
-        if abs(value) >= 100:
+        if abs(value) >= LARGE_NUMBER_THRESHOLD:
             return f"{value:,.0f}"  # No decimal for large values (≥100)
-        if abs(value) >= 10:
+        if abs(value) >= MEDIUM_NUMBER_THRESHOLD:
             return f"{value:,.1f}"  # 1 decimal place for medium values (10-99.9)
         return f"{value:.2g}"  # Up to 2 significant figures for small values (<10)
     return value
@@ -461,20 +474,6 @@ def print_version_info(versions: dict[str, str]) -> None:
     )
 
 
-def status_tag(status: str) -> str:
-    """Return a colored status tag for a given status string."""
-    s: str = status.upper()
-    # Use dictionary lookup for better performance and reduced branching
-    status_colors = {
-        "SUCCESS": (Colors.BOLD, Colors.GREEN),
-        "FAIL": (Colors.BOLD, Colors.RED),
-        "WARNING": (Colors.BOLD, Colors.YELLOW),
-        "INFO": (Colors.BOLD, Colors.BLUE),
-    }
-    colors = status_colors.get(s, (Colors.BOLD, Colors.MAGENTA))
-    return Colors.colored(s, *colors)
-
-
 # Type aliases and definitions
 T = TypeVar("T")
 ExifValue = Any
@@ -528,18 +527,6 @@ GPS_INFO_TAG_ID: Final[int] = 34853  # Standard EXIF tag ID for GPS IFD
 
 
 # Type definitions
-class MemoryStats(NamedTuple):
-    """Represent memory statistics (deltas or peak values)."""
-
-    active: float
-    cached: float
-    peak: float
-    time: float
-
-    @staticmethod
-    def zero() -> MemoryStats:
-        """Return a MemoryStats instance with all values zeroed."""
-        return MemoryStats(0.0, 0.0, 0.0, 0.0)
 
 
 @dataclass(frozen=True)
@@ -603,7 +590,19 @@ def print_image_dimensions(image_path: Path | str) -> None:
 # --- EXIF & Metadata Handling ---
 @functools.lru_cache(maxsize=128)
 def get_exif_data(image_path: PathLike) -> ExifDict | None:
-    """Extract EXIF data from an image file and return as a dictionary."""
+    """Extract EXIF data from an image file.
+
+    This function processes both IFD0 (main image directory) and Exif SubIFD
+    to extract comprehensive metadata including camera settings, GPS info, etc.
+    Results are cached to avoid re-processing the same image files.
+
+    Args:
+        image_path: Path to the image file to process
+
+    Returns:
+        Dictionary of EXIF tags and values, or None if no EXIF data found
+
+    """
     img_path_str: str = str(image_path)
     try:
         with Image.open(img_path_str) as img:
@@ -1012,7 +1011,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
                 # Use comma formatting for readability
                 try:
                     num_val = float(val)
-                    if abs(num_val) >= 1000:
+                    if abs(num_val) >= THOUSAND_THRESHOLD:
                         val = f"{num_val:,.0f}"  # With commas, whole numbers for large values
                     elif abs(num_val) >= 1:
                         val = f"{num_val:.3g}"
