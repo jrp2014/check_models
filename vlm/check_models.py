@@ -1070,7 +1070,7 @@ def _prepare_table_data(
     # Build compact headers with multi-line support
     headers = ["Model"]
     field_names = ["model"]  # Track original field names for alignment
-    
+
     # Create more compact, multi-line friendly headers
     compact_headers = {
         "tokens": "Total<br>Tokens",
@@ -1084,7 +1084,7 @@ def _prepare_table_data(
         "time": "Time<br>(s)",
         "duration": "Duration<br>(s)",
     }
-    
+
     for f in gen_fields:
         if f in compact_headers:
             headers.append(compact_headers[f])
@@ -1100,7 +1100,7 @@ def _prepare_table_data(
                     label += f" {FIELD_UNITS[f]}"
             headers.append(label)
         field_names.append(f)
-    
+
     headers.append("Output /<br>Diagnostics")
     field_names.append("output")
 
@@ -1154,8 +1154,7 @@ def generate_html_report(
 
     # Determine column alignment using original field names
     colalign = ["left"] + [
-        "right" if is_numeric_field(field_name) else "left"
-        for field_name in field_names[1:]
+        "right" if is_numeric_field(field_name) else "left" for field_name in field_names[1:]
     ]
 
     # Generate HTML table using tabulate
@@ -1300,8 +1299,7 @@ def generate_markdown_report(
 
     # Determine column alignment using original field names
     colalign = ["left"] + [
-        "right" if is_numeric_field(field_name) else "left"
-        for field_name in field_names[1:]
+        "right" if is_numeric_field(field_name) else "left" for field_name in field_names[1:]
     ]
 
     # Generate Markdown table using tabulate
@@ -1931,8 +1929,11 @@ def main(args: argparse.Namespace) -> None:
         sys.exit(1)
 
 
-if __name__ == "__main__":
-    parser: argparse.ArgumentParser = argparse.ArgumentParser(description="MLX VLM Model Checker")
+def main_cli() -> None:
+    """CLI entry point for the MLX VLM checker script."""
+    parser: argparse.ArgumentParser = argparse.ArgumentParser(
+        description="MLX VLM Model Checker",
+    )
     # Add arguments (separated for clarity)
     parser.add_argument(
         "-f",
@@ -2009,3 +2010,7 @@ if __name__ == "__main__":
         for arg_name, arg_value in sorted(vars(args).items()):
             logger.info("  %s: %s", arg_name, arg_value)
     main(args)
+
+
+if __name__ == "__main__":
+    main_cli()
