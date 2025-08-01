@@ -1136,105 +1136,45 @@ def generate_html_report(
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Model Performance Results</title>
     <style>
-<<<<<<< HEAD
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f8f9fa; color: #212529; line-height: 1.6; }
-        h1 { color: #495057; text-align: center; margin-bottom: 10px; border-bottom: 3px solid #007bff; padding-bottom: 10px; }
-        .prompt-block { background-color: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; margin: 20px 0; border-radius: 4px; }
-        .prompt-block strong { color: #1976d2; }
-        table { border-collapse: collapse; width: 95%; margin: 30px auto; background-color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
-        th, td { border: 1px solid #dee2e6; padding: 8px 12px; vertical-align: top; }
-        th { background: linear-gradient(135deg, #e9ecef 0%, #f8f9fa 100%); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 600; color: #495057; text-shadow: 0 1px 0 white; font-size: 16px; }
-        th.numeric { text-align: right; }
-        th.text { text-align: left; }
-        tr:nth-child(even):not(.failed-row) { background-color: #f8f9fa; }
-        tr:hover:not(.failed-row) { background-color: #e3f2fd; transition: background-color 0.2s; }
-        tr.failed-row { background-color: #f8d7da !important; color: #721c24; }
-        tr.failed-row:hover { background-color: #f5c6cb !important; }
-        .model-name { font-family: 'Courier New', Courier, monospace; font-weight: 500; text-align: left; color: #0d6efd; }
-        .error-message { font-weight: bold; color: #721c24; }
-        td.numeric { text-align: right; font-family: 'Courier New', monospace; }
-        td.text { text-align: left; }
-        caption { font-style: italic; color: #6c757d; margin-bottom: 10px; }
-        footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #dee2e6; }
-        footer h2 { color: #495057; }
-        footer ul { background-color: #f8f9fa; padding: 15px; border-radius: 5px; }
-        footer code { background-color: #e9ecef; padding: 2px 4px; border-radius: 3px; color: #d63384; }
+        body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f8f9fa; color: #212529; line-height: 1.6; }}
+        h1 {{ color: #495057; text-align: center; margin-bottom: 10px; border-bottom: 3px solid #007bff; padding-bottom: 10px; }}
+        .prompt-block {{ background-color: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; margin: 20px 0; border-radius: 4px; }}
+        .prompt-block strong {{ color: #1976d2; }}
+        table {{ border-collapse: collapse; width: 95%; margin: 30px auto; background-color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }}
+        th, td {{ border: 1px solid #dee2e6; padding: 8px 12px; vertical-align: top; }}
+        th {{ background: linear-gradient(135deg, #e9ecef 0%, #f8f9fa 100%); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 600; color: #495057; text-shadow: 0 1px 0 white; font-size: 16px; }}
+        th.numeric {{ text-align: right; }}
+        th.text {{ text-align: left; }}
+        tr:nth-child(even):not(.failed-row) {{ background-color: #f8f9fa; }}
+        tr:hover:not(.failed-row) {{ background-color: #e3f2fd; transition: background-color 0.2s; }}
+        tr.failed-row {{ background-color: #f8d7da !important; color: #721c24; }}
+        tr.failed-row:hover {{ background-color: #f5c6cb !important; }}
+        .model-name {{ font-family: 'Courier New', Courier, monospace; font-weight: 500; text-align: left; color: #0d6efd; }}
+        .error-message {{ font-weight: bold; color: #721c24; }}
+        td.numeric {{ text-align: right; font-family: 'Courier New', monospace; }}
+        td.text {{ text-align: left; }}
+        caption {{ font-style: italic; color: #6c757d; margin-bottom: 10px; }}
+        footer {{ margin-top: 40px; padding-top: 20px; border-top: 2px solid #dee2e6; }}
+        footer h2 {{ color: #495057; }}
+        footer ul {{ background-color: #f8f9fa; padding: 15px; border-radius: 5px; }}
+        footer code {{ background-color: #e9ecef; padding: 2px 4px; border-radius: 3px; color: #d63384; }}
     </style>
 </head>
 <body>
     <h1>🚀 Model Performance Summary</h1>
-    <div class=\"prompt-block\"><strong>📝 Prompt used:</strong><br>"""
-        + html.escape(prompt).replace("\n", "<br>")
-        + """</div>
-    <table>
-        <caption>Performance metrics and output/errors for Vision Language Model processing. Generated on """
-        + datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")
-        + """. Failures shown but excluded from averages.</caption>
-        <thead>
-            <tr>
-                <th class="text">Model</th>
-=======
-        body {{
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 20px;
-            background-color: #f8f9fa;
-            color: #212529;
-            line-height: 1.6;
-        }}
-        table {{
-            border-collapse: collapse;
-            width: 95%;
-            margin: 30px auto;
-            background-color: #fff;
-        }}
-        th, td {{
-            border: 1px solid #dee2e6;
-            padding: 8px 12px;
-            vertical-align: top;
-        }}
-        th {{
-            background-color: #e9ecef;
-            font-weight: 600;
-            color: #495057;
-        }}
-        tr:nth-child(even) {{
-            background-color: #f8f9fa;
-        }}
-        .model-name {{
-            font-family: 'Courier New', Courier, monospace;
-            font-weight: 500;
-            text-align: left;
-        }}
-        .error-message {{
-            font-weight: bold;
-            color: #721c24;
-        }}
-        .numeric {{
-            text-align: right;
-        }}
-        .text {{
-            text-align: left;
-        }}
-    </style>
-</head>
-<body>
-    <h1>Model Performance Summary</h1>
     <div class="prompt-block">
-        <strong>Prompt used:</strong><br>
+        <strong>📝 Prompt used:</strong><br>
         {html.escape(prompt).replace("\n", "<br>")}
     </div>
 
-    <p><strong>Performance metrics and output/errors for Vision Language Model
-    processing.</strong></p>
-    <p><em>Generated on {datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")}.
-    Failures shown but excluded from averages.</em></p>
+    <p><strong>Performance metrics and output/errors for Vision Language Model processing.</strong></p>
+    <p><em>Generated on {datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")}. Failures shown but excluded from averages.</em></p>
 
     {html_table}
 
     <footer>
         <h2>Library Versions</h2>
         <ul>
->>>>>>> refs/remotes/origin/main
 """
 
     # Add library versions
