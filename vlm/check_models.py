@@ -243,8 +243,7 @@ class ColoredFormatter(logging.Formatter):
 
         # Check for various separator patterns first (highest priority)
         if (
-            stripped.startswith("===")
-            or stripped.startswith("---")
+            stripped.startswith(("===", "---"))
             or (len(stripped) > 50 and stripped.count("=") > 50)
             or (len(stripped) > 50 and stripped.count("-") > 50)
         ):
