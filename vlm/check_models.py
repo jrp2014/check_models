@@ -309,7 +309,6 @@ logger.addHandler(handler)
 
 # Constants
 MB_CONVERSION: Final[float] = 1024 * 1024
-LARGE_NUMBER_THRESHOLD: Final[float] = 1000.0
 
 # Magic value constants for EXIF processing and table formatting
 DMS_LEN: Final[int] = 3  # Degrees, Minutes, Seconds
@@ -1088,17 +1087,17 @@ def _prepare_table_data(
     headers = ["Model"]
     field_names = ["model"]  # Track original field names for alignment
 
-    # Create more compact, multi-line friendly headers
+    # Create more compact, multi-line friendly headers with consistent formatting
     compact_headers = {
         "tokens": "Total<br>Tokens",
         "prompt_tokens": "Prompt<br>Tokens",
-        "generation_tokens": "Gen<br>Tokens",
-        "prompt_tps": "Prompt<br>TPS",
-        "generation_tps": "Gen<br>TPS",
+        "generation_tokens": "Generated<br>Tokens",
+        "prompt_tps": "Prompt<br>Speed<br>(t/s)",
+        "generation_tps": "Generation<br>Speed<br>(t/s)",
         "peak_memory": "Peak<br>Memory<br>(MB)",
         "active_memory": "Active<br>Memory<br>(MB)",
-        "cached_memory": "Cache<br>Memory<br>(MB)",
-        "time": "Time<br>(s)",
+        "cached_memory": "Cached<br>Memory<br>(MB)",
+        "time": "Total<br>Time<br>(s)",
         "duration": "Duration<br>(s)",
     }
 
@@ -1191,15 +1190,17 @@ def generate_html_report(
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Model Performance Results</title>
+    <title>MLX VLM Performance Report</title>
     <style>
         body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f8f9fa; color: #212529; line-height: 1.6; }}
-        h1 {{ color: #495057; text-align: center; margin-bottom: 10px; border-bottom: 3px solid #007bff; padding-bottom: 10px; }}
-        .prompt-block {{ background-color: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; margin: 20px 0; border-radius: 4px; }}
-        .prompt-block strong {{ color: #1976d2; }}
+        h1 {{ color: #495057; text-align: center; margin-bottom: 15px; border-bottom: 3px solid #007bff; padding-bottom: 15px; font-size: 2.2em; }}
+        h2 {{ color: #495057; margin-top: 30px; margin-bottom: 15px; border-bottom: 2px solid #6c757d; padding-bottom: 8px; font-size: 1.4em; }}
+        .prompt-section {{ background-color: #e3f2fd; border-left: 4px solid #2196f3; padding: 20px; margin: 25px 0; border-radius: 6px; }}
+        .prompt-section h3 {{ color: #1976d2; margin-top: 0; margin-bottom: 10px; font-size: 1.1em; }}
+        .meta-info {{ color: #6c757d; font-style: italic; margin: 15px 0; text-align: center; }}
         table {{ border-collapse: collapse; width: 95%; margin: 30px auto; background-color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }}
         th, td {{ border: 1px solid #dee2e6; padding: 8px 12px; vertical-align: top; }}
-        th {{ background: linear-gradient(135deg, #e9ecef 0%, #f8f9fa 100%); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 600; color: #495057; text-shadow: 0 1px 0 white; font-size: 16px; }}
+        th {{ background: linear-gradient(135deg, #e9ecef 0%, #f8f9fa 100%); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 600; color: #495057; text-shadow: 0 1px 0 white; font-size: 14px; text-align: center; }}
         th.numeric {{ text-align: right; }}
         th.text {{ text-align: left; }}
         tr:nth-child(even):not(.failed-row) {{ background-color: #f8f9fa; }}
@@ -1218,19 +1219,23 @@ def generate_html_report(
     </style>
 </head>
 <body>
-    <h1>🚀 Model Performance Summary</h1>
-    <div class="prompt-block">
-        <strong>📝 Prompt used:</strong><br>
-        {html.escape(prompt).replace("\n", "<br>")}
+    <h1>MLX Vision Language Model Performance Report</h1>
+    
+    <div class="prompt-section">
+        <h3>📝 Test Prompt</h3>
+        <div>{html.escape(prompt).replace("\n", "<br>")}</div>
     </div>
 
-    <p><strong>Performance metrics and output/errors for Vision Language Model processing.</strong></p>
-    <p><em>Generated on {datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")}. Failures shown but excluded from averages.</em></p>
+    <h2>📊 Performance Results</h2>
+    <div class="meta-info">
+        Performance metrics and output for Vision Language Model processing<br>
+        Generated on {datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")} • Failures shown but excluded from averages
+    </div>
 
     {html_table}
 
     <footer>
-        <h2>Library Versions</h2>
+        <h2>🔧 System Information</h2>
         <ul>
 """
 
@@ -1242,7 +1247,7 @@ def generate_html_report(
         )
 
     html_content += f"""        </ul>
-        <p>Report generated on: {datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")}</p>
+        <p><em>Report generated: {datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")}</em></p>
     </footer>
 </body>
 </html>"""
