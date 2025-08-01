@@ -823,7 +823,7 @@ def pretty_print_exif(
     show_all: bool = True,
     title: str = "EXIF Metadata Summary",
 ) -> None:
-    """Print key EXIF data in a formatted table with colors and a title."""
+    """Print key EXIF data in a formatted table with colors and a title using tabulate."""
     if not exif:
         logger.info("No EXIF data available.")
         return
@@ -837,75 +837,53 @@ def pretty_print_exif(
             Colors.colored("No relevant EXIF tags found to display.", Colors.YELLOW),
         )
         return
-    max_tag_len = max(Colors.visual_len(t[0]) for t in tags_to_print) if tags_to_print else 20
-    max_val_len = max(Colors.visual_len(t[1]) for t in tags_to_print) if tags_to_print else 40
-    min_width = 10
-    max_tag_len = max(max_tag_len, min_width)
-    max_val_len = max(max_val_len, min_width + 5)
+
+    # Prepare data for tabulate with colors
     header_color = Colors.BLUE
-    border_color = Colors.BLUE
     important_color = Colors.YELLOW
 
-    table_width = max_tag_len + max_val_len + 7
+    # Create colored headers
+    headers = [
+        Colors.colored("Tag", Colors.BOLD, header_color),
+        Colors.colored("Value", Colors.BOLD, header_color),
+    ]
 
-    # Print title above the table, visually separated (no leading newline)
+    # Create table rows with appropriate coloring
+    rows = []
+    for tag_name, value_display, is_important_tag in tags_to_print:
+        tag_display = (
+            Colors.colored(tag_name, Colors.BOLD, important_color) if is_important_tag else tag_name
+        )
+        rows.append([tag_display, value_display])
+
+    # Generate table using tabulate with outline format for clean borders without row separators
+    table = tabulate(
+        rows,
+        headers=headers,
+        tablefmt="outline",
+        colalign=["left", "left"],
+    )
+
+    # Print title and table with decorative separators
+    table_lines = table.split("\n")
+    table_width = max(Colors.visual_len(line) for line in table_lines) if table_lines else 80
+
+    # Print title above the table, visually separated
     logger.info(
         Colors.colored("=" * table_width, Colors.BOLD, Colors.BLUE),
     )
-    # Print the title in a more visually distinct color and with extra spacing
     logger.info(
         Colors.colored(f"{title.center(table_width)}", Colors.BOLD, Colors.MAGENTA),
     )
-    # Add a blank line for separation
     logger.info("")
     logger.info(
         Colors.colored("=" * table_width, Colors.BOLD, Colors.BLUE),
     )
 
-    logger.info(
-        Colors.colored(
-            "╔{}╤{}╗".format("═" * (max_tag_len + 2), "═" * (max_val_len + 2)),
-            border_color,
-        ),
-    )
-    tag_header = _pad_text(Colors.colored("Tag", header_color), max_tag_len)
-    value_header = _pad_text(Colors.colored("Value", header_color), max_val_len)
-    logger.info(
-        "%s %s %s %s %s",
-        Colors.colored("║", border_color),
-        tag_header,
-        Colors.colored("│", border_color),
-        value_header,
-        Colors.colored("║", border_color),
-    )
-    logger.info(
-        Colors.colored(
-            "╠{}╪{}╣".format("═" * (max_tag_len + 2), "═" * (max_val_len + 2)),
-            border_color,
-        ),
-    )
-    for tag_name, value_display, is_important_tag in tags_to_print:
-        tag_display = (
-            Colors.colored(tag_name, Colors.BOLD + important_color)
-            if is_important_tag
-            else tag_name
-        )
-        padded_tag = _pad_text(tag_display, max_tag_len)
-        padded_value = _pad_text(value_display, max_val_len)
-        logger.info(
-            "%s %s %s %s %s",
-            Colors.colored("║", border_color),
-            padded_tag,
-            Colors.colored("│", border_color),
-            padded_value,
-            Colors.colored("║", border_color),
-        )
-    logger.info(
-        Colors.colored(
-            "╚{}╧{}╝".format("═" * (max_tag_len + 2), "═" * (max_val_len + 2)),
-            border_color,
-        ),
-    )
+    # Print the tabulated table
+    for line in table_lines:
+        logger.info(line)
+
     logger.info(
         Colors.colored("=" * table_width + "\n", Colors.BOLD, Colors.BLUE),
     )
@@ -1056,20 +1034,32 @@ def generate_html_report(
     <title>Model Performance Results</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f8f9fa; color: #212529; line-height: 1.6; }
-        table { border-collapse: collapse; width: 95%; margin: 30px auto; background-color: #fff; }
+        h1 { color: #495057; text-align: center; margin-bottom: 10px; border-bottom: 3px solid #007bff; padding-bottom: 10px; }
+        .prompt-block { background-color: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; margin: 20px 0; border-radius: 4px; }
+        .prompt-block strong { color: #1976d2; }
+        table { border-collapse: collapse; width: 95%; margin: 30px auto; background-color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
         th, td { border: 1px solid #dee2e6; padding: 8px 12px; vertical-align: top; }
-        th { background-color: #e9ecef; font-weight: 600; color: #495057; }
+        th { background: linear-gradient(135deg, #e9ecef 0%, #f8f9fa 100%); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 600; color: #495057; text-shadow: 0 1px 0 white; font-size: 16px; }
+        th.numeric { text-align: right; }
+        th.text { text-align: left; }
         tr:nth-child(even):not(.failed-row) { background-color: #f8f9fa; }
+        tr:hover:not(.failed-row) { background-color: #e3f2fd; transition: background-color 0.2s; }
         tr.failed-row { background-color: #f8d7da !important; color: #721c24; }
-        .model-name { font-family: 'Courier New', Courier, monospace; font-weight: 500; text-align: left; }
+        tr.failed-row:hover { background-color: #f5c6cb !important; }
+        .model-name { font-family: 'Courier New', Courier, monospace; font-weight: 500; text-align: left; color: #0d6efd; }
         .error-message { font-weight: bold; color: #721c24; }
-        .numeric { text-align: right; }
-        .text { text-align: left; }
+        td.numeric { text-align: right; font-family: 'Courier New', monospace; }
+        td.text { text-align: left; }
+        caption { font-style: italic; color: #6c757d; margin-bottom: 10px; }
+        footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #dee2e6; }
+        footer h2 { color: #495057; }
+        footer ul { background-color: #f8f9fa; padding: 15px; border-radius: 5px; }
+        footer code { background-color: #e9ecef; padding: 2px 4px; border-radius: 3px; color: #d63384; }
     </style>
 </head>
 <body>
-    <h1>Model Performance Summary</h1>
-    <div class=\"prompt-block\"><strong>Prompt used:</strong><br>"""
+    <h1>🚀 Model Performance Summary</h1>
+    <div class=\"prompt-block\"><strong>📝 Prompt used:</strong><br>"""
         + html.escape(prompt).replace("\n", "<br>")
         + """</div>
     <table>

@@ -7,22 +7,34 @@
     <title>Model Performance Results</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f8f9fa; color: #212529; line-height: 1.6; }
-        table { border-collapse: collapse; width: 95%; margin: 30px auto; background-color: #fff; }
+        h1 { color: #495057; text-align: center; margin-bottom: 10px; border-bottom: 3px solid #007bff; padding-bottom: 10px; }
+        .prompt-block { background-color: #e3f2fd; border-left: 4px solid #2196f3; padding: 15px; margin: 20px 0; border-radius: 4px; }
+        .prompt-block strong { color: #1976d2; }
+        table { border-collapse: collapse; width: 95%; margin: 30px auto; background-color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
         th, td { border: 1px solid #dee2e6; padding: 8px 12px; vertical-align: top; }
-        th { background-color: #e9ecef; font-weight: 600; color: #495057; }
+        th { background: linear-gradient(135deg, #e9ecef 0%, #f8f9fa 100%); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 600; color: #495057; text-shadow: 0 1px 0 white; font-size: 16px; }
+        th.numeric { text-align: right; }
+        th.text { text-align: left; }
         tr:nth-child(even):not(.failed-row) { background-color: #f8f9fa; }
+        tr:hover:not(.failed-row) { background-color: #e3f2fd; transition: background-color 0.2s; }
         tr.failed-row { background-color: #f8d7da !important; color: #721c24; }
-        .model-name { font-family: 'Courier New', Courier, monospace; font-weight: 500; text-align: left; }
+        tr.failed-row:hover { background-color: #f5c6cb !important; }
+        .model-name { font-family: 'Courier New', Courier, monospace; font-weight: 500; text-align: left; color: #0d6efd; }
         .error-message { font-weight: bold; color: #721c24; }
-        .numeric { text-align: right; }
-        .text { text-align: left; }
+        td.numeric { text-align: right; font-family: 'Courier New', monospace; }
+        td.text { text-align: left; }
+        caption { font-style: italic; color: #6c757d; margin-bottom: 10px; }
+        footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #dee2e6; }
+        footer h2 { color: #495057; }
+        footer ul { background-color: #f8f9fa; padding: 15px; border-radius: 5px; }
+        footer code { background-color: #e9ecef; padding: 2px 4px; border-radius: 3px; color: #d63384; }
     </style>
 </head>
 <body>
-    <h1>Model Performance Summary</h1>
-    <div class="prompt-block"><strong>Prompt used:</strong><br>Provide a factual caption, description, and keywords suitable for cataloguing, or searching for, the image. Context: Relates to &#x27;, Cathedral, Winchester, England, United Kingdom, UK<br>On a warm, late summer afternoon, visitors and locals relax on the grassy grounds of Winchester Cathedral in Winchester, England. The magnificent Gothic facade of the historic cathedral, framed by trees, provides a tranquil backdrop as people enjoy the public space in the gentle afternoon light.<br>On a late summer afternoon in July, visitors and locals relax on the green in front of the grand Gothic facade of Winchester Cathedral in England. People are enjoying the pleasant weather, sitting on the lawn in small groups, with the historic cathedral providing a timeless and imposing backdrop to the peaceful, contemporary scene.&#x27; taken around 2025-07-26 18:16:10 BST near GPS N/A . Focus on visual content. Avoid repeating the context unless it is visible. Do not speculate.</div>
+    <h1>🚀 Model Performance Summary</h1>
+    <div class="prompt-block"><strong>📝 Prompt used:</strong><br>Provide a factual caption, description, and keywords suitable for cataloguing, or searching for, the image. Context: Relates to &#x27;, Cathedral, Winchester, England, United Kingdom, UK<br>On a warm, late summer afternoon, visitors and locals relax on the grassy grounds of Winchester Cathedral in Winchester, England. The magnificent Gothic facade of the historic cathedral, framed by trees, provides a tranquil backdrop as people enjoy the public space in the gentle afternoon light.<br>On a late summer afternoon in July, visitors and locals relax on the green in front of the grand Gothic facade of Winchester Cathedral in England. People are enjoying the pleasant weather, sitting on the lawn in small groups, with the historic cathedral providing a timeless and imposing backdrop to the peaceful, contemporary scene.&#x27; taken around 2025-07-26 18:16:10 BST near GPS N/A . Focus on visual content. Avoid repeating the context unless it is visible. Do not speculate.</div>
     <table>
-        <caption>Performance metrics and output/errors for Vision Language Model processing. Generated on 2025-08-01 22:40:01 BST. Failures shown but excluded from averages.</caption>
+        <caption>Performance metrics and output/errors for Vision Language Model processing. Generated on 2025-08-01 23:20:42 BST. Failures shown but excluded from averages.</caption>
         <thead>
             <tr>
                 <th class="text">Model</th>
@@ -38,7 +50,7 @@
 </tr>
 </thead>
 <tbody>
-<tr><td class="model-name">HuggingFaceTB/SmolVLM-Instruct</td><td class="numeric">49,154</td><td class="text">array([-20.5, -19.25, -12.375, ..., -18.5, -24.5, 0], dtype=bfloat16)</td><td class="numeric">1,391</td><td class="numeric">27</td><td class="numeric">1,418</td><td class="numeric">1,229</td><td class="numeric">122</td><td class="numeric">5,679</td><td class="text"> A large cathedral with tall spires and stained glass windows sits in a park with people sitting on the grass in front of it.</td></tr>
+<tr><td class="model-name">HuggingFaceTB/SmolVLM-Instruct</td><td class="numeric">49,154</td><td class="text">array([-19.375, -18, -11.75, ..., -16.75, -22.625, -0.1875], dtype=bfloat16)</td><td class="numeric">1,391</td><td class="numeric">15</td><td class="numeric">1,406</td><td class="numeric">1,229</td><td class="numeric">126</td><td class="numeric">5,679</td><td class="text"> A large, historic cathedral with a large lawn in front of it.</td></tr>
 
         </tbody>
     </table>
@@ -53,7 +65,7 @@
 <li><code>mlx-vlm</code>: <code>0.3.2</code></li>
 <li><code>transformers</code>: <code>4.54.1</code></li>
 </ul>
-<p>Report generated on: 2025-08-01 22:40:01 BST</p>
+<p>Report generated on: 2025-08-01 23:20:42 BST</p>
 </footer>
 </body>
 </html>
