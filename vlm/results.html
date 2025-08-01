@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,54 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Model Performance Results</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f8f9fa; color: #212529; line-height: 1.6; }
-        table { border-collapse: collapse; width: 95%; margin: 30px auto; background-color: #fff; }
-        th, td { border: 1px solid #dee2e6; padding: 8px 12px; vertical-align: top; }
-        th { background-color: #e9ecef; font-weight: 600; color: #495057; }
-        tr:nth-child(even):not(.failed-row) { background-color: #f8f9fa; }
-        tr.failed-row { background-color: #f8d7da !important; color: #721c24; }
-        .model-name { font-family: 'Courier New', Courier, monospace; font-weight: 500; text-align: left; }
-        .error-message { font-weight: bold; color: #721c24; }
-        .numeric { text-align: right; }
-        .text { text-align: left; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+            color: #212529;
+            line-height: 1.6;
+        }
+        table {
+            border-collapse: collapse;
+            width: 95%;
+            margin: 30px auto;
+            background-color: #fff;
+        }
+        th, td {
+            border: 1px solid #dee2e6;
+            padding: 8px 12px;
+            vertical-align: top;
+        }
+        th {
+            background-color: #e9ecef;
+            font-weight: 600;
+            color: #495057;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .model-name {
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 500;
+            text-align: left;
+        }
+        .error-message {
+            font-weight: bold;
+            color: #721c24;
+        }
+        .numeric {
+            text-align: right;
+        }
+        .text {
+            text-align: left;
+        }
     </style>
 </head>
 <body>
     <h1>Model Performance Summary</h1>
-    <div class="prompt-block"><strong>Prompt used:</strong><br>Provide a factual caption, description, and keywords suitable for cataloguing, or searching for, the image. Context: Relates to &#x27;, Cathedral, Winchester, England, United Kingdom, UK<br>On a warm, late summer afternoon, visitors and locals relax on the grassy grounds of Winchester Cathedral in Winchester, England. The magnificent Gothic facade of the historic cathedral, framed by trees, provides a tranquil backdrop as people enjoy the public space in the gentle afternoon light.<br>On a late summer afternoon in July, visitors and locals relax on the green in front of the grand Gothic facade of Winchester Cathedral in England. People are enjoying the pleasant weather, sitting on the lawn in small groups, with the historic cathedral providing a timeless and imposing backdrop to the peaceful, contemporary scene.&#x27; taken around 2025-07-26 18:16:10 BST near GPS N/A . Focus on visual content. Avoid repeating the context unless it is visible. Do not speculate.</div>
+    <div class="prompt-block">
+        <strong>Prompt used:</strong><br>
+        Provide a factual caption, description, and keywords suitable for cataloguing, or searching for, the image. <br><br>Context: The image relates to &#x27;, Cathedral, Winchester, England, United Kingdom, UK<br>On a warm, late summer afternoon, visitors and locals relax on the grassy grounds of Winchester Cathedral in Winchester, England. The magnificent Gothic facade of the historic cathedral, framed by trees, provides a tranquil backdrop as people enjoy the public space in the gentle afternoon light.<br>On a late summer afternoon in July, visitors and locals relax on the green in front of the grand Gothic facade of Winchester Cathedral in England. People are enjoying the pleasant weather, sitting on the lawn in small groups, with the historic cathedral providing a timeless and imposing backdrop to the peaceful, contemporary scene.&#x27; <br><br>The photo was taken around 2025-07-26 18:16:10 BST near GPS N/A . Focus on visual content, drawing on any available contextual information for specificity. Do not speculate.
+    </div>
+
+    <p><strong>Performance metrics and output/errors for Vision Language Model processing.</strong></p>
+    <p><em>Generated on 2025-08-01 21:57:53 BST.
+    Failures shown but excluded from averages.</em></p>
+
     <table>
-        <caption>Performance metrics and output/errors for Vision Language Model processing. Generated on 2025-07-27 22:56:58 BST. Failures shown but excluded from averages.</caption>
-        <thead>
-            <tr>
-                <th class="text">Model</th>
-<th class="numeric">Token</th>
-<th class="text">Logprobs</th>
-<th class="numeric">Prompt Tokens (count)</th>
-<th class="numeric">Generation Tokens (count)</th>
-<th class="numeric">Total Tokens</th>
-<th class="numeric">Prompt Tps (t/s)</th>
-<th class="numeric">Generation Tps (t/s)</th>
-<th class="numeric">Peak Memory (MB)</th>
-<th class="text">Output / Diagnostics</th>
-</tr>
+<thead>
+<tr><th>Model                         </th><th style="text-align: right;">  Token</th><th>Prompt Tokens (count)  </th><th>Generation Tokens (count)  </th><th>Total Tokens  </th><th>Prompt Tps (t/s)  </th><th>Generation Tps (t/s)  </th><th>Peak Memory (MB)  </th><th>Output / Diagnostics  </th></tr>
 </thead>
 <tbody>
-<tr><td class="model-name">HuggingFaceTB/SmolVLM-Instruct</td><td class="numeric">49,154</td><td class="text">array([-20.5, -19.125, -12, ..., -18.625, -24.5, 0], dtype=bfloat16)</td><td class="numeric">1,391</td><td class="numeric">23</td><td class="numeric">1,414</td><td class="numeric">1,221</td><td class="numeric">120</td><td class="numeric">5,679</td><td class="text"> A large cathedral with tall spires and stained glass windows is surrounded by trees and people relaxing in a park.</td></tr>
+<tr><td>HuggingFaceTB/SmolVLM-Instruct</td><td style="text-align: right;"> 49,154</td><td>1,399                  </td><td>319                        </td><td>1,718         </td><td>1,239             </td><td>116                   </td><td>5,679             </td><td>The image depicts a serene and picturesque scene of a cathedral in England. The cathedral is a prominent architectural structure with a Gothic facade that is characterized by its pointed arches, intricate stonework, and tall spires. The facade is adorned with stained glass windows, which contribute to the cathedral's rich and vibrant appearance. The cathedral's interior is visible through the large arched windows, showcasing the grandeur and architectural splendor of the Gothic style.
 
-        </tbody>
-    </table>
-    <!-- End of Table -->
+The surrounding area is lush and green, with a well-maintained lawn and a few trees. The trees are tall and leafy, providing shade and a natural canopy over the cathedral grounds. The sky is clear and blue, with a few scattered clouds, indicating a pleasant and sunny day.
+
+In the foreground, there are several people relaxing on the grass. Some are sitting on the lawn, while others are leaning against the stone wall or standing near the entrance of the cathedral. The people are dressed in casual attire, suggesting a relaxed and informal atmosphere.
+
+The cathedral's entrance is prominently visible, with a large red door flanked by two smaller doors. The doors are made of wood and have intricate carvings and designs. The cathedral's interior is visible through the large arched windows, showcasing the grandeur and architectural splendor of the Gothic style.
+
+The image captures the essence of a peaceful and serene cathedral setting, where visitors and locals can enjoy the natural beauty of the surroundings while appreciating the architectural marvels of the Gothic style. The cathedral's historical and cultural significance is evident in its architectural design and the presence of people enjoying the space.                       </td></tr>
+</tbody>
+</table>
+
     <footer>
-<h2>Library Versions</h2>
-<ul>
-<li><code>Pillow</code>: <code>11.3.0</code></li>
-<li><code>huggingface-hub</code>: <code>0.34.1</code></li>
-<li><code>mlx</code>: <code>0.27.1.dev20250727+b9e88fb97</code></li>
-<li><code>mlx-lm</code>: <code>0.26.1</code></li>
-<li><code>mlx-vlm</code>: <code>0.3.2</code></li>
-<li><code>transformers</code>: <code>4.54.0</code></li>
-</ul>
-<p>Report generated on: 2025-07-27 22:56:58 BST</p>
-</footer>
+        <h2>Library Versions</h2>
+        <ul>
+            <li><code>Pillow</code>: <code>11.3.0</code></li>
+            <li><code>huggingface-hub</code>: <code>0.34.1</code></li>
+            <li><code>mlx</code>: <code>0.27.1.dev20250801+86258f29</code></li>
+            <li><code>mlx-lm</code>: <code>0.26.2</code></li>
+            <li><code>mlx-vlm</code>: <code>0.3.2</code></li>
+            <li><code>transformers</code>: <code>4.54.1</code></li>
+        </ul>
+        <p>Report generated on: 2025-08-01 21:57:53 BST</p>
+    </footer>
 </body>
 </html>

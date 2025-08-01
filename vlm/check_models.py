@@ -277,6 +277,9 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
     "duration": ("Dur", "(s)"),
 }
 
+# Threshold for splitting long header text into multiple lines
+HEADER_SPLIT_LENGTH = 10
+
 # Fields that should be right-aligned (numeric fields)
 NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
     {
@@ -1041,16 +1044,17 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
 
 def _prepare_table_data(
     results: list[PerformanceResult],
-) -> tuple[list[str], list[list[str]]]:
+) -> tuple[list[str], list[list[str]], list[str]]:
     """Prepare table data for both HTML and Markdown reports using tabulate.
 
     Returns:
-        Tuple of (headers, rows) where headers is a list of column names
-        and rows is a list of row data lists.
+        Tuple of (headers, rows, field_names) where headers is a list of column names,
+        rows is a list of row data lists, and field_names tracks the original field names
+        for alignment purposes.
 
     """
     if not results:
-        return [], []
+        return [], [], []
 
     # Determine GenerationResult fields (excluding 'text' and 'logprobs')
     gen_fields = []
@@ -1063,14 +1067,42 @@ def _prepare_table_data(
     if not gen_fields:
         gen_fields = []
 
-    # Build headers with units
+    # Build compact headers with multi-line support
     headers = ["Model"]
+    field_names = ["model"]  # Track original field names for alignment
+    
+    # Create more compact, multi-line friendly headers
+    compact_headers = {
+        "tokens": "Total<br>Tokens",
+        "prompt_tokens": "Prompt<br>Tokens",
+        "generation_tokens": "Gen<br>Tokens",
+        "prompt_tps": "Prompt<br>TPS",
+        "generation_tps": "Gen<br>TPS",
+        "peak_memory": "Peak<br>Memory<br>(MB)",
+        "active_memory": "Active<br>Memory<br>(MB)",
+        "cached_memory": "Cache<br>Memory<br>(MB)",
+        "time": "Time<br>(s)",
+        "duration": "Duration<br>(s)",
+    }
+    
     for f in gen_fields:
-        label = format_field_label(f)
-        if f in FIELD_UNITS:
-            label += f" {FIELD_UNITS[f]}"
-        headers.append(label)
-    headers.append("Output / Diagnostics")
+        if f in compact_headers:
+            headers.append(compact_headers[f])
+        else:
+            # Fallback to formatted label with units
+            label = format_field_label(f)
+            if f in FIELD_UNITS:
+                # Split long headers into multiple lines
+                parts = label.split()
+                if len(parts) > 1 and len(label) > HEADER_SPLIT_LENGTH:
+                    label = "<br>".join(parts) + f"<br>{FIELD_UNITS[f]}"
+                else:
+                    label += f" {FIELD_UNITS[f]}"
+            headers.append(label)
+        field_names.append(f)
+    
+    headers.append("Output /<br>Diagnostics")
+    field_names.append("output")
 
     # Build table rows
     rows = []
@@ -1096,7 +1128,7 @@ def _prepare_table_data(
 
         rows.append(row)
 
-    return headers, rows
+    return headers, rows, field_names
 
 
 # --- HTML Report Generation ---
@@ -1114,19 +1146,24 @@ def generate_html_report(
         return
 
     # Get table data using our helper function
-    headers, rows = _prepare_table_data(results)
+    headers, rows, field_names = _prepare_table_data(results)
 
     if not headers or not rows:
         logger.warning("No table data to generate HTML report.")
         return
+
+    # Determine column alignment using original field names
+    colalign = ["left"] + [
+        "right" if is_numeric_field(field_name) else "left"
+        for field_name in field_names[1:]
+    ]
 
     # Generate HTML table using tabulate
     html_table = tabulate(
         rows,
         headers=headers,
         tablefmt="unsafehtml",
-        colalign=["left"]
-        + ["right" if is_numeric_field(h.split()[0]) else "left" for h in headers[1:]],
+        colalign=colalign,
     )
 
     # Use the shared FIELD_UNITS constant
@@ -1190,7 +1227,8 @@ def generate_html_report(
         {html.escape(prompt).replace("\n", "<br>")}
     </div>
 
-    <p><strong>Performance metrics and output/errors for Vision Language Model processing.</strong></p>
+    <p><strong>Performance metrics and output/errors for Vision Language Model
+    processing.</strong></p>
     <p><em>Generated on {datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")}.
     Failures shown but excluded from averages.</em></p>
 
@@ -1203,7 +1241,10 @@ def generate_html_report(
 
     # Add library versions
     for name, ver in sorted(versions.items()):
-        html_content += f"            <li><code>{html.escape(name)}</code>: <code>{html.escape(ver)}</code></li>\n"
+        html_content += (
+            f"            <li><code>{html.escape(name)}</code>: "
+            f"<code>{html.escape(ver)}</code></li>\n"
+        )
 
     html_content += f"""        </ul>
         <p>Report generated on: {datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")}</p>
@@ -1244,19 +1285,31 @@ def generate_markdown_report(
         return
 
     # Get table data using our helper function
-    headers, rows = _prepare_table_data(results)
+    headers, rows, field_names = _prepare_table_data(results)
 
     if not headers or not rows:
         logger.warning("No table data to generate Markdown report.")
         return
 
+    # For Markdown, we need to process headers to remove HTML breaks and use simpler formatting
+    markdown_headers = []
+    for header in headers:
+        # Replace <br> with space for Markdown compatibility
+        clean_header = header.replace("<br>", " ")
+        markdown_headers.append(clean_header)
+
+    # Determine column alignment using original field names
+    colalign = ["left"] + [
+        "right" if is_numeric_field(field_name) else "left"
+        for field_name in field_names[1:]
+    ]
+
     # Generate Markdown table using tabulate
     markdown_table = tabulate(
         rows,
-        headers=headers,
+        headers=markdown_headers,
         tablefmt="github",
-        colalign=["left"]
-        + ["right" if is_numeric_field(h.split()[0]) else "left" for h in headers[1:]],
+        colalign=colalign,
     )
 
     # Build the complete markdown content
@@ -1716,12 +1769,12 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
                 "cataloguing, or searching for, the image."
             ),
             (
-                f"Context: Relates to '{metadata.get('description', '')}'"
+                f"\n\nContext: The image relates to '{metadata.get('description', '')}'"
                 if metadata.get("description") and metadata["description"] != "N/A"
                 else ""
             ),
             (
-                f"taken around {metadata.get('date', '')}"
+                f"\n\nThe photo was taken around {metadata.get('date', '')}"
                 if metadata.get("date") and metadata["date"] != "Unknown date"
                 else ""
             ),
@@ -1731,8 +1784,8 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
                 else ""
             ),
             (
-                ". Focus on visual content. Avoid repeating the context unless it is "
-                "visible. Do not speculate."
+                ". Focus on visual content, drawing on any available "
+                "contextual information for specificity. Do not speculate."
             ),
         ]
         prompt = " ".join(filter(None, prompt_parts)).strip()
