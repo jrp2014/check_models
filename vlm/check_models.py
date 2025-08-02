@@ -38,6 +38,7 @@ from tzlocal import get_localzone
 
 if TYPE_CHECKING:
     import types
+    from collections.abc import Callable
     from zoneinfo import ZoneInfo
 
 # Constants for logger
@@ -244,10 +245,10 @@ class ColoredFormatter(logging.Formatter):
 
     def _format_info_message(self, msg: str) -> str:
         """Apply context-aware formatting to INFO messages for better visual hierarchy."""
-        stripped = msg.strip()
+        stripped: str = msg.strip()
 
         # Define format patterns with their corresponding colors (priority ordered)
-        format_patterns = [
+        format_patterns: list[tuple[Callable[[str, str], bool], tuple[str, ...]]] = [
             # Section separators (highest priority)
             (
                 lambda s, _: (
@@ -704,7 +705,7 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
     exif_data = get_exif_data(img_path_str) or {}
 
     # --- Date extraction ---
-    date: str = (
+    date = (
         exif_data.get("DateTimeOriginal")
         or exif_data.get("CreateDate")
         or exif_data.get("DateTime")
@@ -760,7 +761,7 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
             return "N/A"
         gps_info: dict[str, Any] = {}
         for k, v in gps_info_raw.items():
-            tag_name = GPSTAGS.get(int(k), str(k)) if isinstance(k, int) else str(k)
+            tag_name: str = GPSTAGS.get(int(k), str(k)) if isinstance(k, int) else str(k)
             gps_info[tag_name] = v
         lat = gps_info.get("GPSLatitude")
         lat_ref = gps_info.get("GPSLatitudeRef")
@@ -796,8 +797,8 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
             return (dd * sign, ref_upper)
 
         try:
-            lat_ref_str = lat_ref.decode() if isinstance(lat_ref, bytes) else str(lat_ref)
-            lon_ref_str = lon_ref.decode() if isinstance(lon_ref, bytes) else str(lon_ref)
+            lat_ref_str: str = lat_ref.decode() if isinstance(lat_ref, bytes) else str(lat_ref)
+            lon_ref_str: str = lon_ref.decode() if isinstance(lon_ref, bytes) else str(lon_ref)
             lat_dd, lat_card = dms_to_dd(latitude, lat_ref_str)
             lon_dd, lon_card = dms_to_dd(longitude, lon_ref_str)
             lat_dd = -abs(lat_dd) if lat_card == "S" else abs(lat_dd)
@@ -860,7 +861,7 @@ def filter_and_format_tags(
     """Filter and format EXIF tags for pretty printing."""
     tags: list[tuple[str, str, bool]] = []
     for tag, value in exif.items():
-        tag_str = str(tag)
+        tag_str: str = str(tag)
         if tag_str == "GPSInfo" and isinstance(value, dict):
             continue
         if isinstance(value, dict):
@@ -869,8 +870,8 @@ def filter_and_format_tags(
                 tag_str,
             )
             continue
-        value_str = exif_value_to_str(tag_str, value)
-        is_important = tag_str in IMPORTANT_EXIF_TAGS
+        value_str: str = exif_value_to_str(tag_str, value)
+        is_important: bool = tag_str in IMPORTANT_EXIF_TAGS
         if show_all or is_important:
             tags.append((tag_str, value_str, is_important))
     return tags
@@ -898,25 +899,25 @@ def pretty_print_exif(
         return
 
     # Prepare data for tabulate with colors
-    header_color = Colors.BLUE
-    important_color = Colors.YELLOW
+    header_color: str = Colors.BLUE
+    important_color: str = Colors.YELLOW
 
     # Create colored headers
-    headers = [
+    headers: list[str] = [
         Colors.colored("Tag", Colors.BOLD, header_color),
         Colors.colored("Value", Colors.BOLD, header_color),
     ]
 
     # Create table rows with appropriate coloring
-    rows = []
+    rows: list[list[str]] = []
     for tag_name, value_display, is_important_tag in tags_to_print:
-        tag_display = (
+        tag_display: str = (
             Colors.colored(tag_name, Colors.BOLD, important_color) if is_important_tag else tag_name
         )
         rows.append([tag_display, value_display])
 
     # Generate table using tabulate with outline format for clean borders without row separators
-    table = tabulate(
+    table: str = tabulate(
         rows,
         headers=headers,
         tablefmt="outline",
@@ -924,8 +925,8 @@ def pretty_print_exif(
     )
 
     # Print title and table with decorative separators
-    table_lines = table.split("\n")
-    table_width = max(Colors.visual_len(line) for line in table_lines) if table_lines else 80
+    table_lines: list[str] = table.split("\n")
+    table_width: int = max(Colors.visual_len(line) for line in table_lines) if table_lines else 80
 
     # Print title above the table, visually separated
     logger.info(
@@ -958,7 +959,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
         return
 
     # Determine GenerationResult fields (excluding 'text' and 'logprobs')
-    gen_fields = []
+    gen_fields: list[str] = []
     for r in results:
         if r.generation is not None:
             gen_fields = [
@@ -969,8 +970,8 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
         gen_fields = []
 
     # Build compact headers with multi-line format
-    headers = ["Model"]
-    field_names = ["model"]  # Track original field names for alignment
+    headers: list[str] = ["Model"]
+    field_names: list[str] = ["model"]  # Track original field names for alignment
 
     for f in gen_fields:
         # Use multi-line headers to save space
@@ -992,13 +993,13 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     field_names.append("output")
 
     # Build table rows
-    rows = []
+    rows: list[list[str]] = []
     for r in results:
         # Truncate model name to keep table compact
-        model_name = str(r.model_name).split("/")[-1]  # Use just the model name part
+        model_name: str = str(r.model_name).split("/")[-1]  # Use just the model name part
         if len(model_name) > MAX_MODEL_NAME_LENGTH:
             model_name = model_name[: MAX_MODEL_NAME_LENGTH - 3] + "..."
-        row = [model_name]
+        row: list[str] = [model_name]
 
         # Add generation fields
         for f in gen_fields:
@@ -1022,7 +1023,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
 
         # Add output/diagnostic column (truncated for console display)
         if r.success and r.generation:
-            out_val = str(getattr(r.generation, "text", ""))
+            out_val: str = str(getattr(r.generation, "text", ""))
         else:
             out_val = r.error_message or r.captured_output_on_fail or "-"
 
@@ -1034,7 +1035,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
         rows.append(row)
 
     # Determine column alignment using original field names
-    colalign = ["left"] + [
+    colalign: list[str] = ["left"] + [
         "right" if is_numeric_field(field_name) else "left" for field_name in field_names[1:]
     ]
 
@@ -1362,7 +1363,7 @@ def get_system_info() -> tuple[str, str]:
                 check=False,
             )
             if result.returncode == 0:
-                # Extract GPU info from system_profiler output
+                # --- Extract GPS info from system_profiler output
                 gpu_lines: list[str] = [
                     line for line in result.stdout.split("\n") if "Chipset Model:" in line
                 ]
@@ -1571,7 +1572,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
 
 def print_cli_header(title: str) -> None:
     """Print a formatted CLI header with the given title."""
-    separator_line = "=" * 80
+    separator_line: str = "=" * 80
     logger.info(separator_line)
     logger.info("%s", title.center(80))
     logger.info(separator_line)
@@ -1579,7 +1580,7 @@ def print_cli_header(title: str) -> None:
 
 def print_cli_section(title: str) -> None:
     """Print a formatted CLI section header."""
-    separator_line = "-" * 60
+    separator_line: str = "-" * 60
     logger.info(separator_line)
     logger.info("[ %s ]", title.upper())
     logger.info(separator_line)
@@ -1592,29 +1593,31 @@ def print_cli_error(msg: str) -> None:
 
 def print_model_result(result: PerformanceResult, *, verbose: bool = False) -> None:
     """Print model processing result with enhanced visual formatting and contextual colors."""
-    model_short_name = result.model_name.split("/")[-1]
+    model_short_name: str = result.model_name.split("/")[-1]
 
     if result.success:
         # Success header with green coloring
-        success_msg = f"✓ SUCCESS: {model_short_name}"
+        success_msg: str = f"✓ SUCCESS: {model_short_name}"
         sys.stderr.write(Colors.colored(success_msg, Colors.BOLD, Colors.GREEN) + "\n")
 
         if result.generation:
             # Generated text with cyan highlighting for visibility
-            gen_text = getattr(result.generation, "text", "N/A")
-            gen_msg = f"  Generated Text: {Colors.colored(gen_text, Colors.CYAN)}"
+            gen_text: str = getattr(result.generation, "text", "N/A")
+            gen_msg: str = f"  Generated Text: {Colors.colored(gen_text, Colors.CYAN)}"
             sys.stderr.write(gen_msg + "\n")
 
             # Performance metrics with white color for better visibility
-            prompt_tokens = getattr(result.generation, "prompt_tokens", 0)
-            generation_tokens = getattr(result.generation, "generation_tokens", 0)
-            total_tokens = prompt_tokens + generation_tokens
+            prompt_tokens: int = getattr(result.generation, "prompt_tokens", 0)
+            generation_tokens: int = getattr(result.generation, "generation_tokens", 0)
+            total_tokens: int = prompt_tokens + generation_tokens
 
-            tokens_msg = f"  Tokens: {Colors.colored(fmt_num(total_tokens), Colors.WHITE)}"
+            tokens_msg: str = f"  Tokens: {Colors.colored(fmt_num(total_tokens), Colors.WHITE)}"
             sys.stderr.write(tokens_msg + "\n")
 
-            generation_tps = getattr(result.generation, "generation_tps", 0.0)
-            tps_msg = f"  Generation TPS: {Colors.colored(fmt_num(generation_tps), Colors.WHITE)}"
+            generation_tps: float = getattr(result.generation, "generation_tps", 0.0)
+            tps_msg: str = (
+                f"  Generation TPS: {Colors.colored(fmt_num(generation_tps), Colors.WHITE)}"
+            )
             sys.stderr.write(tps_msg + "\n")
 
         if verbose and result.generation:
@@ -1705,8 +1708,8 @@ def setup_environment(args: argparse.Namespace) -> dict[str, str]:
     log_level: int = logging.DEBUG if args.verbose else logging.INFO
     # Remove all handlers and add only one
     logger.handlers.clear()
-    handler = logging.StreamHandler(sys.stderr)
-    formatter = ColoredFormatter("%(asctime)s - %(levelname)s - %(message)s")
+    handler: logging.StreamHandler[Any] = logging.StreamHandler(sys.stderr)
+    formatter: ColoredFormatter = ColoredFormatter("%(asctime)s - %(levelname)s - %(message)s")
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     logger.setLevel(log_level)
@@ -1854,19 +1857,19 @@ def validate_and_warn_model_selection(args: argparse.Namespace) -> None:
         return  # No exclusions to validate
 
     # Get available models for validation
-    available_models = set()
+    available_models: set[str] = set()
     if args.models:
         # When explicit models are specified, available = explicit models
         available_models = set(args.models)
-        context_msg = "explicitly specified models"
+        context_msg: str = "explicitly specified models"
     else:
         # When no models specified, available = cached models
         available_models = set(get_cached_model_ids())
         context_msg = "locally cached models"
 
     # Check for ineffective exclusions (models to exclude that aren't available)
-    excluded_models = set(args.exclude)
-    ineffective_exclusions = excluded_models - available_models
+    excluded_models: set[str] = set(args.exclude)
+    ineffective_exclusions: set[str] = excluded_models - available_models
 
     if ineffective_exclusions:
         ineffective_list = sorted(ineffective_exclusions)
