@@ -1,12 +1,11 @@
 model_path = "mlx-community/deepseek-vl2-8bit"
 
-from mlx_vlm import load, generate
+import time
+
+import psutil
+from mlx_vlm import generate, load
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load_config
-import subprocess
-import time
-import psutil
-
 
 print("\033[1mRunning", model_path, "\033[0m")
 
@@ -25,9 +24,7 @@ image = ["http://images.cocodataset.org/val2017/000000039769.jpg"]
 prompt = "Describe this image."
 
 # Apply chat template
-formatted_prompt = apply_chat_template(
-    tokenizer, config, prompt, num_images=len(image)
-)
+formatted_prompt = apply_chat_template(tokenizer, config, prompt, num_images=len(image))
 
 # Generate output
 try:

@@ -8,7 +8,7 @@ data = mx.array(
         0.0,
         459367.0,
     ],
-    dtype=mx.float32
+    dtype=mx.float32,
 )
 
 print(f"mx.argim on cpu {mx.argmin(data, stream=mx.cpu)}")
@@ -21,7 +21,7 @@ data = mx.array(
         -1.401298464324817e-45,
         0.0,
     ],
-    dtype=mx.float32
+    dtype=mx.float32,
 )
 
 print(f"mx.argmax on cpu {mx.argmax(data, stream=mx.cpu)}")

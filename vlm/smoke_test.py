@@ -5,22 +5,22 @@ import subprocess
 import sys
 import textwrap
 import traceback
-from typing import Any, Dict, Tuple, Optional, List
+from typing import Any
 
 import mlx.core as mx
 import psutil
+from mlx_vlm import generate, load
+from mlx_vlm.prompt_utils import apply_chat_template
+from mlx_vlm.utils import load_config
+from mlx_vlm.version import __version__
 from rich.console import Console
 from rich.panel import Panel
 from tqdm import tqdm
 from transformers import __version__ as transformers_version
 
-from mlx_vlm import generate, load
-from mlx_vlm.prompt_utils import apply_chat_template
-from mlx_vlm.utils import load_config
-from mlx_vlm.version import __version__
-
 # Initialize console
 console = Console()
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Test MLX-VLM models")
@@ -45,15 +45,12 @@ def parse_args() -> argparse.Namespace:
         default="Hi, how are you?",
         help="Language-only prompt to test",
     )
-    parser.add_argument(
-        "--temperature", type=float, default=0.7, help="Sampling temperature"
-    )
-    parser.add_argument(
-        "--max-tokens", type=int, default=100, help="Maximum tokens to generate"
-    )
+    parser.add_argument("--temperature", type=float, default=0.7, help="Sampling temperature")
+    parser.add_argument("--max-tokens", type=int, default=100, help="Maximum tokens to generate")
     return parser.parse_args()
 
-def get_device_info() -> Optional[Dict[str, Any]]:
+
+def get_device_info() -> dict[str, Any] | None:
     # Disable tokenizers parallelism to avoid deadlocks after forking
     import os
 
@@ -68,7 +65,10 @@ def get_device_info() -> Optional[Dict[str, Any]]:
         print(f"Could not retrieve GPU information: {e}")
         return None
 
-def test_model_loading(model_path: str) -> Tuple[Optional[Any], Optional[Any], Optional[Dict[str, Any]], bool]:
+
+def test_model_loading(
+    model_path: str,
+) -> tuple[Any | None, Any | None, dict[str, Any] | None, bool]:
     try:
         console.print("[bold green]Loading model...")
         model, processor = load(model_path, trust_remote_code=True)
@@ -76,26 +76,26 @@ def test_model_loading(model_path: str) -> Tuple[Optional[Any], Optional[Any], O
         console.print("[bold green]✓[/] Model loaded successfully")
         return model, processor, config, False
     except Exception as e:
-        console.print(f"[bold red]✗[/] Failed to load model: {str(e)}")
+        console.print(f"[bold red]✗[/] Failed to load model: {e!s}")
         return None, None, None, True
 
+
 def test_generation(
-    model: Any, processor: Any, config: Dict[str, Any], model_path: str, test_inputs: Dict[str, Any], vision_language: bool = True
+    model: Any,
+    processor: Any,
+    config: dict[str, Any],
+    model_path: str,
+    test_inputs: dict[str, Any],
+    vision_language: bool = True,
 ) -> bool:
     try:
         test_type = "vision-language" if vision_language else "language-only"
         console.print(f"[bold yellow]Testing {test_type} generation...")
 
-        prompt = (
-            test_inputs["prompt"]
-            if vision_language
-            else test_inputs["language_only_prompt"]
-        )
+        prompt = test_inputs["prompt"] if vision_language else test_inputs["language_only_prompt"]
         num_images = len(test_inputs["image"]) if vision_language else 0
 
-        formatted_prompt = apply_chat_template(
-            processor, config, prompt, num_images=num_images
-        )
+        formatted_prompt = apply_chat_template(processor, config, prompt, num_images=num_images)
 
         generate_args = {
             "model": model,
@@ -120,19 +120,20 @@ def test_generation(
         console.print(f"[bold green]✓[/] {test_type} generation successful")
         return False
     except Exception as e:
-        console.print(f"[bold red]✗[/] {test_type} generation failed: {str(e)}")
+        console.print(f"[bold red]✗[/] {test_type} generation failed: {e!s}")
         print(traceback.format_exc())
         return True
+
 
 def main() -> None:
     args = parse_args()
 
     # Load models list
-    with open(args.models_file, "r", encoding="utf-8") as f:
-        models = [line.strip() for line in f.readlines()]
+    with open(args.models_file, encoding="utf-8") as f:
+        models = [line.strip() for line in f]
 
     # Test inputs dictionary
-    test_inputs: Dict[str, Any] = {
+    test_inputs: dict[str, Any] = {
         "image": args.image,
         "prompt": args.prompt,
         "language_only_prompt": args.language_only_prompt,
@@ -142,7 +143,7 @@ def main() -> None:
         },
     }
 
-    results: List[str] = []
+    results: list[str] = []
 
     for model_path in tqdm(models):
         console.print(Panel(f"Testing {model_path}", style="bold blue"))
@@ -192,7 +193,10 @@ def main() -> None:
         Panel(
             title="System Information",
             renderable=textwrap.dedent(
-                f"""{platform.machine() == 'arm64' and f'''
+                f"""{
+                    (
+                        platform.machine() == "arm64"
+                        and f'''
             MAC OS:       v{platform.mac_ver()[0]}
             Python:       v{sys.version.split()[0]}
             MLX:          v{mx.__version__}
@@ -200,15 +204,19 @@ def main() -> None:
             Transformers: v{transformers_version}
 
             Hardware:
-            • Chip:       {device_info['SPDisplaysDataType'][0]['_name']}
-            • RAM:        {psutil.virtual_memory().total / (1024 ** 3):.1f} GB
+            • Chip:       {device_info["SPDisplaysDataType"][0]["_name"]}
+            • RAM:        {psutil.virtual_memory().total / (1024**3):.1f} GB
             • CPU Cores:  {psutil.cpu_count(logical=False)}
-            • GPU Cores:  {device_info['SPDisplaysDataType'][0]['sppci_cores']}
-            ''' or 'Not running on Apple Silicon'}"""
+            • GPU Cores:  {device_info["SPDisplaysDataType"][0]["sppci_cores"]}
+            '''
+                    )
+                    or "Not running on Apple Silicon"
+                }"""
             ),
             style="bold blue",
         )
     )
+
 
 if __name__ == "__main__":
     main()

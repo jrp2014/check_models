@@ -1,10 +1,9 @@
-from PIL import Image
-from transformers import Qwen2VLForConditionalGeneration, AutoProcessor
-from transformers import BitsAndBytesConfig
-import torch
-
 import os
 from pathlib import Path
+
+import torch
+from PIL import Image
+from transformers import AutoProcessor, Qwen2VLForConditionalGeneration
 
 model_id = "Ertugrul/Qwen2-VL-7B-Captioner-Relaxed"
 
@@ -37,22 +36,21 @@ image = Image.open(pic)
 
 text_prompt = processor.apply_chat_template(conversation, add_generation_prompt=True)
 
-inputs = processor(
-    text=[text_prompt], images=[image], padding=True, return_tensors="pt"
-)
+inputs = processor(text=[text_prompt], images=[image], padding=True, return_tensors="pt")
 inputs = inputs.to("mps")
 
-#with torch.no_grad():
+# with torch.no_grad():
 #    with torch.autocast(device_type="mps", dtype=torch.bfloat16):
-output_ids  = model.generate(**inputs, max_new_tokens=384, do_sample=True, temperature=0.7, use_cache=True, top_k=50)
+output_ids = model.generate(
+    **inputs, max_new_tokens=384, do_sample=True, temperature=0.7, use_cache=True, top_k=50
+)
 
 
 generated_ids = [
     output_ids[len(input_ids) :]
-    for input_ids, output_ids in zip(inputs.input_ids, output_ids)
+    for input_ids, output_ids in zip(inputs.input_ids, output_ids, strict=False)
 ]
 output_text = processor.batch_decode(
     generated_ids, skip_special_tokens=True, clean_up_tokenization_spaces=True
 )[0]
 print(output_text)
-

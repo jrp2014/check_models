@@ -1,12 +1,9 @@
-import mlx.core as mx # unused ...
-from mlx_vlm import load, generate
-from mlx_vlm.prompt_utils import apply_chat_template
-from mlx_vlm.utils import load_config, load_image_processor # unused?
-
-from PIL import Image # Unused
-
 import os
 from pathlib import Path
+
+from mlx_vlm import generate, load
+from mlx_vlm.prompt_utils import apply_chat_template
+from mlx_vlm.utils import load_config  # unused?
 
 # https://huggingface.co/HuggingFaceM4/Idefics3-8B-Llama3   # Very concise, no keywords
 # model_path = "HuggingFaceTB/SmolVLM-Instruct" # Fast, but too concise (eg, no keywords)
@@ -17,7 +14,7 @@ from pathlib import Path
 # model_path = "mistral-community/pixtral-12b"
 # model_path = "mlx-community/Phi-3.5-vision-instruct-bf16" # OK, but doesn't provide keywords
 # model_path = "mlx-community/llava-1.5-7b-4bit"
-model_path = "mlx-community/llava-v1.6-34b-8bit" # Slower but more precise
+model_path = "mlx-community/llava-v1.6-34b-8bit"  # Slower but more precise
 # model_path = "mlx-community/llava-v1.6-mistral-7b-8bit"
 # model_path = "mlx-community/pixtral-12b-8bit" # To the point
 # model_path ="mlx-community/Qwen2-VL-72B-Instruct-8bit" # libc++abi: terminating due to uncaught exception of type std::runtime_error: Attempting to allocate 135383101952 bytes which is greater than the maximum allowed buffer size of 77309411328 bytes.
