@@ -27,6 +27,7 @@ from typing import (
     Self,
     TypeVar,
 )
+
 from huggingface_hub import HFCacheInfo, scan_cache_dir
 from huggingface_hub import __version__ as hf_version
 from huggingface_hub.errors import HFValidationError
@@ -297,7 +298,7 @@ MB_CONVERSION: Final[float] = 1024 * 1024
 
 # EXIF/GPS coordinate standards: camera hardware stores GPS as degrees-minutes-seconds tuples
 DMS_LEN: Final[int] = 3  # Full DMS: (degrees, minutes, seconds)
-DM_LEN: Final[int] = 2   # Decimal minutes: (degrees, decimal_minutes)
+DM_LEN: Final[int] = 2  # Decimal minutes: (degrees, decimal_minutes)
 MAX_DEGREES: Final[int] = 180
 MAX_MINUTES: Final[int] = 60
 MAX_SECONDS: Final[int] = 60
@@ -579,7 +580,7 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
     - IFD0: Main image metadata (camera, dimensions, etc.)
     - Exif SubIFD: Camera settings (exposure, ISO, etc.)
     - GPS SubIFD: Location data stored as degrees/minutes/seconds tuples
-    
+
     The PIL library provides access to raw numeric tag IDs which we convert to
     human-readable names using TAGS/GPSTAGS lookup tables.
 
