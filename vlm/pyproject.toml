@@ -82,6 +82,7 @@ skip-magic-trailing-comma = false
 [tool.ruff.lint]
 # D203 and D213 are explicitly excluded to avoid incompatibility warnings with D211 and D212.
 # Select all rules and then ignore the ones that are incompatible or too noisy.
+extend-select = ["B"]
 select = ["ALL"]
 ignore = [
     "COM812",  # Conflicts with formatter

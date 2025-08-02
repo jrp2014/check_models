@@ -250,7 +250,7 @@ class ColoredFormatter(logging.Formatter):
         format_patterns = [
             # Section separators (highest priority)
             (
-                lambda s, m: (
+                lambda s, _: (
                     s.startswith(("===", "---"))
                     or (len(s) > MIN_SEPARATOR_CHARS and s.count("=") > MIN_SEPARATOR_CHARS)
                     or (len(s) > MIN_SEPARATOR_CHARS and s.count("-") > MIN_SEPARATOR_CHARS)
@@ -1220,7 +1220,7 @@ def generate_html_report(
 </head>
 <body>
     <h1>MLX Vision Language Model Performance Report</h1>
-    
+
     <div class="prompt-section">
         <h3>📝 Test Prompt</h3>
         <div>{html.escape(prompt).replace("\n", "<br>")}</div>
