@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-# Standard library imports
 import argparse
 import contextlib
 import functools
@@ -28,8 +27,6 @@ from typing import (
     Self,
     TypeVar,
 )
-
-# Third-party imports
 from huggingface_hub import HFCacheInfo, scan_cache_dir
 from huggingface_hub import __version__ as hf_version
 from huggingface_hub.errors import HFValidationError
@@ -41,11 +38,9 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from zoneinfo import ZoneInfo
 
-# Constants for logger
 LOGGER_NAME: Final[str] = "mlx-vlm-check"
 NOT_AVAILABLE: Final[str] = "N/A"
 
-# Error message constants - centralized for consistency
 ERROR_MLX_MISSING: Final[str] = "Core dependency missing: mlx. Please install it."
 ERROR_PILLOW_MISSING: Final[str] = (
     "Error: Pillow not found. Please install it (`pip install Pillow`)."
@@ -54,17 +49,14 @@ ERROR_MLX_VLM_MISSING: Final[str] = (
     "Error: mlx-vlm not found. Please install it (`pip install mlx-vlm`)."
 )
 
-# Timeout constants - only the one actually used
-DEFAULT_TIMEOUT_LONG: Final[float] = 300.0  # Model operations timeout
+DEFAULT_TIMEOUT_LONG: Final[float] = 300.0
 
-# Text formatting constants
-MIN_SEPARATOR_CHARS: Final[int] = 50  # Minimum chars for separator detection
-DEFAULT_DECIMAL_PLACES: Final[int] = 2  # Default decimal formatting
-LARGE_NUMBER_THRESHOLD: Final[float] = 100.0  # Threshold for large number formatting
-MEDIUM_NUMBER_THRESHOLD: Final[int] = 10  # Threshold for medium number formatting
-THOUSAND_THRESHOLD: Final[int] = 1000  # Threshold for thousands formatting
+MIN_SEPARATOR_CHARS: Final[int] = 50
+DEFAULT_DECIMAL_PLACES: Final[int] = 2
+LARGE_NUMBER_THRESHOLD: Final[float] = 100.0
+MEDIUM_NUMBER_THRESHOLD: Final[int] = 10
+THOUSAND_THRESHOLD: Final[int] = 1000
 
-# Create a single temp logger for dependency errors
 _temp_logger = logging.getLogger(LOGGER_NAME)
 
 try:
@@ -83,7 +75,6 @@ except ImportError:
     pillow_version = NOT_AVAILABLE
     sys.exit(1)
 
-# Local application/library specific imports
 try:
     from mlx_vlm.generate import GenerationResult, generate
     from mlx_vlm.prompt_utils import apply_chat_template
@@ -92,8 +83,6 @@ try:
 except ImportError:
     _temp_logger.critical(ERROR_MLX_VLM_MISSING)
     sys.exit(1)
-
-# Optional imports for version reporting
 try:
     import mlx_lm
 
@@ -110,8 +99,9 @@ except ImportError:
     transformers_version = NOT_AVAILABLE
 
 
-# Custom timeout context manager (for Python < 3.11)
-# Note: This implementation relies on signal.SIGALRM and will not work on Windows.
+# Custom timeout context manager
+# Python 3.11+ has asyncio.timeout, but signal-based timeout works across sync code
+# Uses SIGALRM which is Unix-only - Windows doesn't support this signal mechanism
 class TimeoutManager(contextlib.ContextDecorator):
     """Manage a timeout context for code execution (UNIX only)."""
 
@@ -135,7 +125,6 @@ class TimeoutManager(contextlib.ContextDecorator):
 
     def __enter__(self) -> Self:
         """Enter the timeout context manager."""
-        # Check if SIGALRM is available (won't be on Windows)
         if hasattr(signal, "SIGALRM"):
             if self.seconds > 0:
                 try:
@@ -145,19 +134,19 @@ class TimeoutManager(contextlib.ContextDecorator):
                     )
                     signal.alarm(int(self.seconds))
                 except ValueError as e:
-                    # Running in a thread or environment where signals are restricted
+                    # Signal handling restricted (threading/subprocess environment)
                     logger.warning(
                         "Could not set SIGALRM for timeout: %s. Timeout disabled.",
                         e,
                     )
-                    self.seconds = 0  # Disable timeout functionality
+                    self.seconds = 0
         elif self.seconds > 0:
             logger.warning(
                 "Timeout functionality requires signal.SIGALRM, "
                 "not available on this platform (e.g., Windows). "
                 "Timeout disabled.",
             )
-            self.seconds = 0  # Disable timeout functionality
+            self.seconds = 0
         return self
 
     def __exit__(
@@ -167,7 +156,7 @@ class TimeoutManager(contextlib.ContextDecorator):
         exc_tb: types.TracebackType | None,
     ) -> None:
         """Exit the timeout context manager and clear the alarm."""
-        # Only try to reset the alarm if it was successfully set
+        # Reset signal handler only if we successfully set it up
         if hasattr(signal, "SIGALRM") and self.seconds > 0 and self.timer is not None:
             signal.alarm(0)
             signal.signal(signal.SIGALRM, self.timer)
@@ -177,7 +166,6 @@ class TimeoutManager(contextlib.ContextDecorator):
 logger: logging.Logger = logging.getLogger(LOGGER_NAME)
 
 
-# --- ANSI Color Codes for Console Output ---
 class Colors:
     """ANSI color codes for terminal output."""
 
@@ -214,13 +202,12 @@ class Colors:
         return len(Colors._ansi_escape_re.sub("", text))
 
 
-# --- Colored Logging Formatter ---
 class ColoredFormatter(logging.Formatter):
     """A logging formatter that applies color to log messages based on their level and content."""
 
     LEVEL_COLORS: ClassVar[dict[int, str]] = {
         logging.DEBUG: Colors.GRAY,
-        logging.INFO: "",  # No color for INFO to reduce green noise
+        logging.INFO: "",
         logging.WARNING: Colors.YELLOW,
         logging.ERROR: Colors.RED,
         logging.CRITICAL: Colors.RED + Colors.BOLD,
@@ -233,11 +220,9 @@ class ColoredFormatter(logging.Formatter):
         # Apply level-based coloring first
         level_color: str = self.LEVEL_COLORS.get(record.levelno, "")
 
-        # Context-aware coloring for INFO messages
         if record.levelno == logging.INFO:
             return self._format_info_message(msg)
 
-        # Apply level color for non-INFO messages
         if level_color:
             return Colors.colored(msg, level_color)
 
@@ -308,21 +293,20 @@ handler.setFormatter(formatter)
 logger.handlers.clear()
 logger.addHandler(handler)
 
-# Constants
 MB_CONVERSION: Final[float] = 1024 * 1024
 
-# Magic value constants for EXIF processing and table formatting
-DMS_LEN: Final[int] = 3  # Degrees, Minutes, Seconds
-DM_LEN: Final[int] = 2  # Degrees, Decimal Minutes
+# EXIF/GPS coordinate standards: camera hardware stores GPS as degrees-minutes-seconds tuples
+DMS_LEN: Final[int] = 3  # Full DMS: (degrees, minutes, seconds)
+DM_LEN: Final[int] = 2   # Decimal minutes: (degrees, decimal_minutes)
 MAX_DEGREES: Final[int] = 180
 MAX_MINUTES: Final[int] = 60
 MAX_SECONDS: Final[int] = 60
-MAX_TUPLE_LEN: Final[int] = 10  # Max EXIF tuple length before truncation
-MAX_STR_LEN: Final[int] = 60  # Max string length before truncation
-STR_TRUNCATE_LEN: Final[int] = 57  # Characters to keep when truncating
-BASE_NAME_MAX_WIDTH: Final[int] = 45  # Max model name width in tables
-COL_WIDTH: Final[int] = 12  # Default column width for tables
-MIN_NAME_COL_WIDTH: Final[int] = len("Model")  # Minimum model column width
+MAX_TUPLE_LEN: Final[int] = 10
+MAX_STR_LEN: Final[int] = 60
+STR_TRUNCATE_LEN: Final[int] = 57
+BASE_NAME_MAX_WIDTH: Final[int] = 45
+COL_WIDTH: Final[int] = 12
+MIN_NAME_COL_WIDTH: Final[int] = len("Model")
 
 # Shared field metadata for reports
 FIELD_UNITS: Final[dict[str, str]] = {
@@ -370,7 +354,6 @@ MAX_MODEL_NAME_LENGTH = 14
 MAX_OUTPUT_LENGTH = 28
 
 
-# --- Shared Utility Functions ---
 def fmt_num(val: float | str) -> str:
     """Format numbers consistently across all output formats."""
     try:
@@ -592,9 +575,13 @@ def print_image_dimensions(image_path: Path | str) -> None:
 def get_exif_data(image_path: PathLike) -> ExifDict | None:
     """Extract EXIF data from an image file.
 
-    This function processes both IFD0 (main image directory) and Exif SubIFD
-    to extract comprehensive metadata including camera settings, GPS info, etc.
-    Results are cached to avoid re-processing the same image files.
+    EXIF data is stored in Image File Directories (IFDs) with a hierarchical structure:
+    - IFD0: Main image metadata (camera, dimensions, etc.)
+    - Exif SubIFD: Camera settings (exposure, ISO, etc.)
+    - GPS SubIFD: Location data stored as degrees/minutes/seconds tuples
+    
+    The PIL library provides access to raw numeric tag IDs which we convert to
+    human-readable names using TAGS/GPSTAGS lookup tables.
 
     Args:
         image_path: Path to the image file to process
@@ -704,7 +691,6 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
     img_path_str: str = str(image_path)
     exif_data = get_exif_data(img_path_str) or {}
 
-    # --- Date extraction ---
     date = (
         exif_data.get("DateTimeOriginal")
         or exif_data.get("CreateDate")
@@ -1445,19 +1431,30 @@ def _run_model_generation(
     *,
     verbose: bool,
 ) -> GenerationResult:
-    """Load model, format prompt and run generation.
+    """Load HuggingFace model, format prompt and run MLX VLM generation.
+
+    This function interfaces between HuggingFace's model repository system and
+    MLX's optimized inference engine. The model loading process:
+    1. Downloads model weights/config from HuggingFace Hub if not cached locally
+    2. Loads the model into MLX's memory-efficient format
+    3. Applies the model's specific chat template format to the user prompt
+    4. Runs inference using MLX's Metal Performance Shaders acceleration
 
     Raise exceptions on failure.
     """
     model: object
     tokenizer: object
 
+    # Load model from HuggingFace Hub - this handles automatic download/caching
+    # and converts weights to MLX format for Apple Silicon optimization
     model, tokenizer = load(
         path_or_hf_repo=params.model_path,
         trust_remote_code=params.trust_remote_code,
     )
     config = model.config
 
+    # Apply model-specific chat template - each model has its own conversation format
+    # (e.g., Llama uses <|begin_of_text|>, Phi-3 uses <|user|>, etc.)
     formatted_prompt = apply_chat_template(
         processor=tokenizer,
         config=config,
