@@ -953,6 +953,11 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
             gen_fields = [
                 f.name for f in fields(r.generation) if f.name not in ("text", "logprobs")
             ]
+            # Add timing field if it exists as a dynamic attribute
+            if hasattr(r.generation, "time") and "time" not in gen_fields:
+                gen_fields.append("time")
+            if hasattr(r.generation, "duration") and "duration" not in gen_fields:
+                gen_fields.append("duration")
             break
     if not gen_fields:
         gen_fields = []
@@ -1068,6 +1073,11 @@ def _prepare_table_data(
             gen_fields = [
                 f.name for f in fields(r.generation) if f.name not in ("text", "logprobs")
             ]
+            # Add timing field if it exists as a dynamic attribute
+            if hasattr(r.generation, "time") and "time" not in gen_fields:
+                gen_fields.append("time")
+            if hasattr(r.generation, "duration") and "duration" not in gen_fields:
+                gen_fields.append("duration")
             break
     if not gen_fields:
         gen_fields = []
@@ -1458,8 +1468,7 @@ def _run_model_generation(
     except Exception as load_err:
         # Capture any model loading errors (config issues, missing files, etc.)
         error_details = (
-            f"Model loading failed: {load_err}\n\n"
-            f"Full traceback:\n{traceback.format_exc()}"
+            f"Model loading failed: {load_err}\n\nFull traceback:\n{traceback.format_exc()}"
         )
         logger.exception("Failed to load model %s", params.model_path)
         raise ValueError(error_details) from load_err
@@ -1493,7 +1502,7 @@ def _run_model_generation(
     # Add timing to the GenerationResult object
     # Since we can't modify the dataclass, we'll add it as an attribute
     output.time = end_time - start_time  # type: ignore[attr-defined]
-    
+
     mx.eval(model.parameters())
     return output
 
