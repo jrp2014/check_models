@@ -937,14 +937,98 @@ def pretty_print_exif(
     )
 
 
+# Helper function to sort results by elapsed time (lowest to highest)
+def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceResult]:
+    """Sort results by elapsed time (lowest to highest).
+    
+    Failed results (no timing data) are placed at the end.
+    """
+    def get_time_value(result: PerformanceResult) -> float:
+        """Extract time value for sorting, with fallback for failed results."""
+        if not result.success or not result.generation:
+            return float('inf')  # Failed results go to the end
+        
+        # Check for time or duration attributes
+        if hasattr(result.generation, 'time'):
+            time_val = getattr(result.generation, 'time')
+            if isinstance(time_val, (int, float)):
+                return float(time_val)
+        
+        if hasattr(result.generation, 'duration'):
+            duration_val = getattr(result.generation, 'duration')
+            if isinstance(duration_val, (int, float)):
+                return float(duration_val)
+        
+        return float('inf')  # No timing data available
+    
+    return sorted(results, key=get_time_value)
+
+
+# Additional constants for multi-line formatting
+MAX_SHORT_NAME_LENGTH: int = 12
+MAX_LONG_NAME_LENGTH: int = 24
+MAX_SIMPLE_NAME_LENGTH: int = 20
+MAX_OUTPUT_LINE_LENGTH: int = 35
+MAX_OUTPUT_TOTAL_LENGTH: int = 70
+
+
+def _format_model_name_multiline(model_name: str) -> str:
+    """Format model name for multi-line display in console table."""
+    if "/" in model_name:
+        parts = model_name.split("/")
+        if len(parts[-1]) > MAX_SHORT_NAME_LENGTH:  # If final part is long, break it
+            final_part = parts[-1]
+            if len(final_part) > MAX_LONG_NAME_LENGTH:  # Very long, truncate
+                return f"{'/'.join(parts[:-1])}/\n{final_part[:21]}..."
+            # Moderate length, wrap
+            mid_point = len(final_part) // 2
+            return (f"{'/'.join(parts[:-1])}/\n"
+                   f"{final_part[:mid_point]}-\n{final_part[mid_point:]}")
+        return model_name
+    elif len(model_name) > MAX_SIMPLE_NAME_LENGTH:
+        # No slash, just split if too long
+        mid_point = len(model_name) // 2
+        return f"{model_name[:mid_point]}\n{model_name[mid_point:]}"
+    return model_name
+
+
+def _format_output_multiline(output_text: str) -> str:
+    """Format output text for multi-line display in console table."""
+    # Clean newlines
+    output_text = re.sub(r"[\n\r]", " ", output_text)
+    
+    if len(output_text) <= MAX_OUTPUT_LINE_LENGTH:
+        return output_text
+        
+    # Find a good break point around the middle
+    mid_point = min(MAX_OUTPUT_LINE_LENGTH, len(output_text) // 2)
+    # Try to break at word boundary near mid point
+    space_pos = output_text.find(" ", mid_point)
+    if space_pos != -1 and space_pos < len(output_text) * 0.7:  # Break at space if reasonable
+        line1 = output_text[:space_pos]
+        line2 = output_text[space_pos + 1:]
+        if len(line2) > MAX_OUTPUT_LINE_LENGTH:  # Second line still too long
+            line2 = line2[:32] + "..."
+        return f"{line1}\n{line2}"
+    # No good break point, just split at reasonable length
+    truncated = ("..." if len(output_text) > MAX_OUTPUT_TOTAL_LENGTH else "")
+    return (f"{output_text[:MAX_OUTPUT_LINE_LENGTH]}\n"
+           f"{output_text[MAX_OUTPUT_LINE_LENGTH:MAX_OUTPUT_TOTAL_LENGTH]}"
+           f"{truncated}")
+
+
 def print_model_stats(results: list[PerformanceResult]) -> None:
     """Print a compact, aligned table of model performance metrics using tabulate.
 
     Displays GenerationResult fields with units and formatted numbers.
+    Results are sorted by elapsed time (lowest to highest).
     """
     if not results:
         logger.info("No model results to display.")
         return
+
+    # Sort results by elapsed time (lowest to highest)
+    results = _sort_results_by_time(results)
 
     # Determine GenerationResult fields (excluding 'text' and 'logprobs')
     gen_fields: list[str] = []
@@ -985,16 +1069,14 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     headers.append("Output")
     field_names.append("output")
 
-    # Build table rows
+    # Build table rows with multi-line formatting for better space utilization
     rows: list[list[str]] = []
     for r in results:
-        # Truncate model name to keep table compact
-        model_name: str = str(r.model_name).split("/")[-1]  # Use just the model name part
-        if len(model_name) > MAX_MODEL_NAME_LENGTH:
-            model_name = model_name[: MAX_MODEL_NAME_LENGTH - 3] + "..."
-        row: list[str] = [model_name]
+        # Format model name with multi-line support
+        model_display = _format_model_name_multiline(str(r.model_name))
+        row: list[str] = [model_display]
 
-        # Add generation fields
+        # Add generation fields with same processing
         for f in gen_fields:
             val = getattr(r.generation, f, "-") if r.generation else "-"
             val = format_field_value(f, val)
@@ -1014,16 +1096,14 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
                     val = str(val)
             row.append(str(val))
 
-        # Add output/diagnostic column (truncated for console display)
+        # Add output/diagnostic column with multi-line support
         if r.success and r.generation:
             out_val: str = str(getattr(r.generation, "text", ""))
         else:
             out_val = r.error_message or r.captured_output_on_fail or "-"
 
-        # Clean and truncate output for console display
-        out_val = re.sub(r"[\n\r]", " ", out_val)
-        if len(out_val) > MAX_OUTPUT_LENGTH:
-            out_val = out_val[: MAX_OUTPUT_LENGTH - 3] + "..."
+        # Format output for multi-line display
+        out_val = _format_output_multiline(out_val)
         row.append(out_val)
         rows.append(row)
 
@@ -1033,13 +1113,13 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     ]
 
     # Generate compact table using plain format with multi-line headers
-    # Use 2-space column separation and optimize widths for 100-char total
+    # Use optimized widths for better vertical space utilization
     table = tabulate(
         rows,
         headers=headers,
         tablefmt="plain",
         colalign=colalign,
-        maxcolwidths=[14, 6, 6, 6, 6, 7, 7, 6, 28],  # Optimized for ~100 char width
+        maxcolwidths=[20, 6, 6, 6, 6, 7, 7, 6, 45],  # Allow longer model names and output
     )
 
     # Print the table with surrounding decorations
@@ -1050,12 +1130,15 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     for line in table_lines:
         logger.info(line)
     logger.info("=" * max_width)
+    logger.info("Results sorted by elapsed time (fastest to slowest).")
 
 
 def _prepare_table_data(
     results: list[PerformanceResult],
 ) -> tuple[list[str], list[list[str]], list[str]]:
     """Prepare table data for both HTML and Markdown reports using tabulate.
+
+    Results are sorted by elapsed time (lowest to highest).
 
     Returns:
         Tuple of (headers, rows, field_names) where headers is a list of column names,
@@ -1065,6 +1148,9 @@ def _prepare_table_data(
     """
     if not results:
         return [], [], []
+
+    # Sort results by elapsed time (lowest to highest)
+    results = _sort_results_by_time(results)
 
     # Determine GenerationResult fields (excluding 'text' and 'logprobs')
     gen_fields = []
@@ -1228,7 +1314,7 @@ def generate_html_report(
     <h2>📊 Performance Results</h2>
     <div class="meta-info">
         Performance metrics and output for Vision Language Model processing<br>
-        Generated on {datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")} • Failures shown but excluded from averages
+        Results sorted by elapsed time (fastest to slowest) • Generated on {datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")} • Failures shown but excluded from averages
     </div>
 
     {html_table}
@@ -1316,6 +1402,8 @@ def generate_markdown_report(
     md.append(f"_Generated on {datetime.now(get_localzone()).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n")
     md.append("")
     md.append("> **Prompt used:**\n>\n> " + prompt.replace("\n", "\n> ") + "\n")
+    md.append("")
+    md.append("**Note:** Results are sorted by elapsed time (fastest to slowest).\n")
     md.append("")
     md.append(markdown_table)
     md.append("\n---\n")
