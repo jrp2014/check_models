@@ -14,6 +14,7 @@ import signal
 import subprocess
 import sys
 import time
+import traceback
 from dataclasses import dataclass, fields
 from datetime import UTC, datetime
 from pathlib import Path
@@ -1448,11 +1449,20 @@ def _run_model_generation(
 
     # Load model from HuggingFace Hub - this handles automatic download/caching
     # and converts weights to MLX format for Apple Silicon optimization
-    model, tokenizer = load(
-        path_or_hf_repo=params.model_path,
-        trust_remote_code=params.trust_remote_code,
-    )
-    config = model.config
+    try:
+        model, tokenizer = load(
+            path_or_hf_repo=params.model_path,
+            trust_remote_code=params.trust_remote_code,
+        )
+        config = model.config
+    except Exception as load_err:
+        # Capture any model loading errors (config issues, missing files, etc.)
+        error_details = (
+            f"Model loading failed: {load_err}\n\n"
+            f"Full traceback:\n{traceback.format_exc()}"
+        )
+        logger.exception("Failed to load model %s", params.model_path)
+        raise ValueError(error_details) from load_err
 
     # Apply model-specific chat template - each model has its own conversation format
     # (e.g., Llama uses <|begin_of_text|>, Phi-3 uses <|user|>, etc.)
