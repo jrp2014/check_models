@@ -1466,6 +1466,8 @@ def _run_model_generation(
     if isinstance(formatted_prompt, list):
         formatted_prompt = "\n".join(str(m) for m in formatted_prompt)
 
+    # Time the generation process manually since MLX VLM doesn't include timing
+    start_time = time.perf_counter()
     output: GenerationResult = generate(
         model=model,
         processor=tokenizer,  # type: ignore[arg-type] # MLX VLM accepts both tokenizer types
@@ -1476,6 +1478,12 @@ def _run_model_generation(
         trust_remote_code=params.trust_remote_code,
         max_tokens=params.max_tokens,
     )
+    end_time = time.perf_counter()
+
+    # Add timing to the GenerationResult object
+    # Since we can't modify the dataclass, we'll add it as an attribute
+    output.time = end_time - start_time  # type: ignore[attr-defined]
+    
     mx.eval(model.parameters())
     return output
 
@@ -1627,8 +1635,10 @@ def print_model_result(result: PerformanceResult, *, verbose: bool = False) -> N
             available_fields = [f.name for f in fields(result.generation)]
             logger.debug("  Available GenerationResult fields: %s", available_fields)
 
-            # Time metric in white
-            time_val = getattr(result.generation, "time", 0.0)
+            # Time metric in white - try both 'time' and 'duration' fields
+            time_val = getattr(result.generation, "time", None)
+            if time_val is None:
+                time_val = getattr(result.generation, "duration", 0.0)
             time_msg = f"    Time: {Colors.colored(f'{time_val:.2f}s', Colors.WHITE)}"
             sys.stderr.write(time_msg + "\n")
 
