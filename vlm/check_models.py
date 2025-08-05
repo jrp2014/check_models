@@ -332,6 +332,9 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
     "peak_memory": ("Peak", "(MB)"),
     "time": ("Time", "(s)"),
     "duration": ("Dur", "(s)"),
+    "elapsed_time": ("Elapsed", "(s)"),
+    "model_load_time": ("Load", "(s)"),
+    "total_time": ("Total", "(s)"),
 }
 
 # Threshold for splitting long header text into multiple lines
@@ -348,6 +351,9 @@ NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
         "peak_memory",
         "time",
         "duration",
+        "elapsed_time",
+        "model_load_time",
+        "total_time",
     },
 )
 
@@ -524,6 +530,9 @@ class PerformanceResult:
     error_stage: str | None = None
     error_message: str | None = None
     captured_output_on_fail: str | None = None
+    elapsed_time: float | None = None  # Time taken for generation in seconds
+    model_load_time: float | None = None  # Time taken to load the model in seconds
+    total_time: float | None = None  # Total time including model loading
 
 
 # --- File Handling ---
@@ -946,19 +955,22 @@ def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceR
 
     def get_time_value(result: PerformanceResult) -> float:
         """Extract time value for sorting, with fallback for failed results."""
-        if not result.success or not result.generation:
+        if not result.success:
             return float("inf")  # Failed results go to the end
 
-        # Check for time or duration attributes
-        if hasattr(result.generation, "time"):
-            time_val = result.generation.time
-            if isinstance(time_val, (int, float)):
-                return float(time_val)
+        # Use the elapsed_time field from PerformanceResult
+        if result.elapsed_time is not None:
+            return float(result.elapsed_time)
 
-        if hasattr(result.generation, "duration"):
-            duration_val = result.generation.duration
-            if isinstance(duration_val, (int, float)):
-                return float(duration_val)
+        # Fallback: calculate time from GenerationResult tokens-per-second if available
+        if (
+            result.generation
+            and hasattr(result.generation, "generation_tokens")
+            and hasattr(result.generation, "generation_tps")
+            and result.generation.generation_tps > 0
+        ):
+            estimated_time = result.generation.generation_tokens / result.generation.generation_tps
+            return float(estimated_time)
 
         return float("inf")  # No timing data available
 
@@ -1034,25 +1046,26 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
 
     # Determine GenerationResult fields (excluding 'text' and 'logprobs')
     gen_fields: list[str] = []
+
     for r in results:
         if r.generation is not None:
             gen_fields = [
                 f.name for f in fields(r.generation) if f.name not in ("text", "logprobs")
             ]
-            # Add timing field if it exists as a dynamic attribute
-            if hasattr(r.generation, "time") and "time" not in gen_fields:
-                gen_fields.append("time")
-            if hasattr(r.generation, "duration") and "duration" not in gen_fields:
-                gen_fields.append("duration")
             break
-    if not gen_fields:
-        gen_fields = []
+
+    # Add PerformanceResult timing fields
+    performance_timing_fields = ["elapsed_time", "model_load_time", "total_time"]
+    all_fields = gen_fields + performance_timing_fields
+
+    if not all_fields:
+        all_fields = []
 
     # Build compact headers with multi-line format
     headers: list[str] = ["Model"]
     field_names: list[str] = ["model"]  # Track original field names for alignment
 
-    for f in gen_fields:
+    for f in all_fields:
         # Use multi-line headers to save space
         if f in FIELD_ABBREVIATIONS:
             line1, line2 = FIELD_ABBREVIATIONS[f]
@@ -1078,9 +1091,15 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
         model_display = _format_model_name_multiline(str(r.model_name))
         row: list[str] = [model_display]
 
-        # Add generation fields with same processing
-        for f in gen_fields:
-            val = getattr(r.generation, f, "-") if r.generation else "-"
+        # Add generation fields and performance timing fields
+        for f in all_fields:
+            if f in ["elapsed_time", "model_load_time", "total_time"]:
+                # Get from PerformanceResult
+                val = getattr(r, f, "-")
+            else:
+                # Get from GenerationResult
+                val = getattr(r.generation, f, "-") if r.generation else "-"
+
             val = format_field_value(f, val)
             # Format numbers with commas for console display
             is_numeric = isinstance(val, (int, float)) or is_numeric_string(val)
@@ -1161,14 +1180,14 @@ def _prepare_table_data(
             gen_fields = [
                 f.name for f in fields(r.generation) if f.name not in ("text", "logprobs")
             ]
-            # Add timing field if it exists as a dynamic attribute
-            if hasattr(r.generation, "time") and "time" not in gen_fields:
-                gen_fields.append("time")
-            if hasattr(r.generation, "duration") and "duration" not in gen_fields:
-                gen_fields.append("duration")
             break
-    if not gen_fields:
-        gen_fields = []
+
+    # Add PerformanceResult timing fields
+    performance_timing_fields = ["elapsed_time", "model_load_time", "total_time"]
+    all_fields = gen_fields + performance_timing_fields
+
+    if not all_fields:
+        all_fields = []
 
     # Build compact headers with multi-line support
     headers = ["Model"]
@@ -1186,9 +1205,12 @@ def _prepare_table_data(
         "cached_memory": "Cached<br>Memory<br>(MB)",
         "time": "Total<br>Time<br>(s)",
         "duration": "Duration<br>(s)",
+        "elapsed_time": "Elapsed<br>Time<br>(s)",
+        "model_load_time": "Model<br>Load<br>(s)",
+        "total_time": "Total<br>Time<br>(s)",
     }
 
-    for f in gen_fields:
+    for f in all_fields:
         if f in compact_headers:
             headers.append(compact_headers[f])
         else:
@@ -1212,9 +1234,15 @@ def _prepare_table_data(
     for r in results:
         row = [str(r.model_name)]
 
-        # Add generation fields
-        for f in gen_fields:
-            val = getattr(r.generation, f, "-") if r.generation else "-"
+        # Add generation fields and performance timing fields
+        for f in all_fields:
+            if f in ["elapsed_time", "model_load_time", "total_time"]:
+                # Get from PerformanceResult
+                val = getattr(r, f, "-")
+            else:
+                # Get from GenerationResult
+                val = getattr(r.generation, f, "-") if r.generation else "-"
+
             val = format_field_value(f, val)
             # Format numbers
             is_numeric = isinstance(val, (int, float)) or is_numeric_string(val)
