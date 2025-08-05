@@ -361,6 +361,9 @@ NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
 MAX_MODEL_NAME_LENGTH = 14
 MAX_OUTPUT_LENGTH = 28
 
+# PerformanceResult timing fields - centralized definition
+PERFORMANCE_TIMING_FIELDS: Final[list[str]] = ["elapsed_time", "model_load_time", "total_time"]
+
 
 def fmt_num(val: float | str) -> str:
     """Format numbers consistently across all output formats."""
@@ -946,6 +949,38 @@ def pretty_print_exif(
     )
 
 
+def _get_available_fields(results: list[PerformanceResult]) -> list[str]:
+    """Extract available GenerationResult fields and add PerformanceResult timing fields.
+
+    Returns combined list of fields excluding 'text' and 'logprobs'.
+    """
+    # Determine GenerationResult fields (excluding 'text' and 'logprobs')
+    gen_fields: list[str] = []
+    for r in results:
+        if r.generation is not None:
+            gen_fields = [
+                f.name for f in fields(r.generation) if f.name not in ("text", "logprobs")
+            ]
+            break
+
+    # Combine with PerformanceResult timing fields
+    return gen_fields + PERFORMANCE_TIMING_FIELDS
+
+
+def _is_performance_timing_field(field_name: str) -> bool:
+    """Check if a field is a PerformanceResult timing field."""
+    return field_name in PERFORMANCE_TIMING_FIELDS
+
+
+def _get_field_value(result: PerformanceResult, field_name: str) -> object:
+    """Get field value from either GenerationResult or PerformanceResult."""
+    if _is_performance_timing_field(field_name):
+        # Get from PerformanceResult
+        return getattr(result, field_name, "-")
+    # Get from GenerationResult
+    return getattr(result.generation, field_name, "-") if result.generation else "-"
+
+
 # Helper function to sort results by elapsed time (lowest to highest)
 def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceResult]:
     """Sort results by elapsed time (lowest to highest).
@@ -1044,19 +1079,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     # Sort results by elapsed time (lowest to highest)
     results = _sort_results_by_time(results)
 
-    # Determine GenerationResult fields (excluding 'text' and 'logprobs')
-    gen_fields: list[str] = []
-
-    for r in results:
-        if r.generation is not None:
-            gen_fields = [
-                f.name for f in fields(r.generation) if f.name not in ("text", "logprobs")
-            ]
-            break
-
-    # Add PerformanceResult timing fields
-    performance_timing_fields = ["elapsed_time", "model_load_time", "total_time"]
-    all_fields = gen_fields + performance_timing_fields
+    all_fields = _get_available_fields(results)
 
     if not all_fields:
         all_fields = []
@@ -1093,13 +1116,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
 
         # Add generation fields and performance timing fields
         for f in all_fields:
-            if f in ["elapsed_time", "model_load_time", "total_time"]:
-                # Get from PerformanceResult
-                val = getattr(r, f, "-")
-            else:
-                # Get from GenerationResult
-                val = getattr(r.generation, f, "-") if r.generation else "-"
-
+            val = _get_field_value(r, f)
             val = format_field_value(f, val)
             # Format numbers with commas for console display
             is_numeric = isinstance(val, (int, float)) or is_numeric_string(val)
@@ -1173,23 +1190,8 @@ def _prepare_table_data(
     # Sort results by elapsed time (lowest to highest)
     results = _sort_results_by_time(results)
 
-    # Determine GenerationResult fields (excluding 'text' and 'logprobs')
-    gen_fields = []
-    for r in results:
-        if r.generation is not None:
-            gen_fields = [
-                f.name for f in fields(r.generation) if f.name not in ("text", "logprobs")
-            ]
-            break
+    all_fields = _get_available_fields(results)
 
-    # Add PerformanceResult timing fields
-    performance_timing_fields = ["elapsed_time", "model_load_time", "total_time"]
-    all_fields = gen_fields + performance_timing_fields
-
-    if not all_fields:
-        all_fields = []
-
-    # Build compact headers with multi-line support
     headers = ["Model"]
     field_names = ["model"]  # Track original field names for alignment
 
@@ -1236,13 +1238,7 @@ def _prepare_table_data(
 
         # Add generation fields and performance timing fields
         for f in all_fields:
-            if f in ["elapsed_time", "model_load_time", "total_time"]:
-                # Get from PerformanceResult
-                val = getattr(r, f, "-")
-            else:
-                # Get from GenerationResult
-                val = getattr(r.generation, f, "-") if r.generation else "-"
-
+            val = _get_field_value(r, f)
             val = format_field_value(f, val)
             # Format numbers
             is_numeric = isinstance(val, (int, float)) or is_numeric_string(val)
