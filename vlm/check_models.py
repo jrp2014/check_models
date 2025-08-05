@@ -1279,6 +1279,12 @@ def generate_html_report(
         logger.warning("No table data to generate HTML report.")
         return
 
+    # Escape HTML characters in output text for HTML safety
+    for i in range(len(rows)):
+        for j in range(len(rows[i])):
+            if j == len(rows[i]) - 1:  # Only escape in the last column (output column)
+                rows[i][j] = html.escape(str(rows[i][j]))
+
     # Determine column alignment using original field names
     colalign = ["left"] + [
         "right" if is_numeric_field(field_name) else "left" for field_name in field_names[1:]
@@ -1409,6 +1415,12 @@ def generate_markdown_report(
         clean_header = header.replace("<br>", " ")
         markdown_headers.append(clean_header)
 
+    # Escape markdown characters in output text for Markdown safety
+    for i in range(len(rows)):
+        for j in range(len(rows[i])):
+            if j == len(rows[i]) - 1:  # Only escape in the last column (output column)
+                rows[i][j] = _escape_markdown_in_text(rows[i][j])
+
     # Determine column alignment using original field names
     colalign = ["left"] + [
         "right" if is_numeric_field(field_name) else "left" for field_name in field_names[1:]
@@ -1458,6 +1470,31 @@ def generate_markdown_report(
             "A value error occurred while writing Markdown report %s",
             str(filename),
         )
+
+
+def _escape_markdown_in_text(text: str) -> str:
+    """Escape markdown characters in text to prevent formatting issues in markdown tables."""
+    if not isinstance(text, str):
+        return str(text)
+
+    # Escape common markdown characters that could break table formatting
+    # Order matters - escape backslashes first
+    escape_chars = [
+        ("\\", "\\\\"),  # Backslash
+        ("`", "\\`"),  # Backticks
+        ("*", "\\*"),  # Asterisks
+        ("_", "\\_"),  # Underscores
+        ("#", "\\#"),  # Headers
+        ("|", "\\|"),  # Pipe (table separator)
+        ("[", "\\["),  # Square brackets
+        ("]", "\\]"),  # Square brackets
+    ]
+
+    result = text
+    for char, escaped in escape_chars:
+        result = result.replace(char, escaped)
+
+    return result
 
 
 def get_system_info() -> tuple[str, str]:
