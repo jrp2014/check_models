@@ -940,27 +940,28 @@ def pretty_print_exif(
 # Helper function to sort results by elapsed time (lowest to highest)
 def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceResult]:
     """Sort results by elapsed time (lowest to highest).
-    
+
     Failed results (no timing data) are placed at the end.
     """
+
     def get_time_value(result: PerformanceResult) -> float:
         """Extract time value for sorting, with fallback for failed results."""
         if not result.success or not result.generation:
-            return float('inf')  # Failed results go to the end
-        
+            return float("inf")  # Failed results go to the end
+
         # Check for time or duration attributes
-        if hasattr(result.generation, 'time'):
-            time_val = getattr(result.generation, 'time')
+        if hasattr(result.generation, "time"):
+            time_val = result.generation.time
             if isinstance(time_val, (int, float)):
                 return float(time_val)
-        
-        if hasattr(result.generation, 'duration'):
-            duration_val = getattr(result.generation, 'duration')
+
+        if hasattr(result.generation, "duration"):
+            duration_val = result.generation.duration
             if isinstance(duration_val, (int, float)):
                 return float(duration_val)
-        
-        return float('inf')  # No timing data available
-    
+
+        return float("inf")  # No timing data available
+
     return sorted(results, key=get_time_value)
 
 
@@ -982,10 +983,9 @@ def _format_model_name_multiline(model_name: str) -> str:
                 return f"{'/'.join(parts[:-1])}/\n{final_part[:21]}..."
             # Moderate length, wrap
             mid_point = len(final_part) // 2
-            return (f"{'/'.join(parts[:-1])}/\n"
-                   f"{final_part[:mid_point]}-\n{final_part[mid_point:]}")
+            return f"{'/'.join(parts[:-1])}/\n{final_part[:mid_point]}-\n{final_part[mid_point:]}"
         return model_name
-    elif len(model_name) > MAX_SIMPLE_NAME_LENGTH:
+    if len(model_name) > MAX_SIMPLE_NAME_LENGTH:
         # No slash, just split if too long
         mid_point = len(model_name) // 2
         return f"{model_name[:mid_point]}\n{model_name[mid_point:]}"
@@ -996,25 +996,27 @@ def _format_output_multiline(output_text: str) -> str:
     """Format output text for multi-line display in console table."""
     # Clean newlines
     output_text = re.sub(r"[\n\r]", " ", output_text)
-    
+
     if len(output_text) <= MAX_OUTPUT_LINE_LENGTH:
         return output_text
-        
+
     # Find a good break point around the middle
     mid_point = min(MAX_OUTPUT_LINE_LENGTH, len(output_text) // 2)
     # Try to break at word boundary near mid point
     space_pos = output_text.find(" ", mid_point)
     if space_pos != -1 and space_pos < len(output_text) * 0.7:  # Break at space if reasonable
         line1 = output_text[:space_pos]
-        line2 = output_text[space_pos + 1:]
+        line2 = output_text[space_pos + 1 :]
         if len(line2) > MAX_OUTPUT_LINE_LENGTH:  # Second line still too long
             line2 = line2[:32] + "..."
         return f"{line1}\n{line2}"
     # No good break point, just split at reasonable length
-    truncated = ("..." if len(output_text) > MAX_OUTPUT_TOTAL_LENGTH else "")
-    return (f"{output_text[:MAX_OUTPUT_LINE_LENGTH]}\n"
-           f"{output_text[MAX_OUTPUT_LINE_LENGTH:MAX_OUTPUT_TOTAL_LENGTH]}"
-           f"{truncated}")
+    truncated = "..." if len(output_text) > MAX_OUTPUT_TOTAL_LENGTH else ""
+    return (
+        f"{output_text[:MAX_OUTPUT_LINE_LENGTH]}\n"
+        f"{output_text[MAX_OUTPUT_LINE_LENGTH:MAX_OUTPUT_TOTAL_LENGTH]}"
+        f"{truncated}"
+    )
 
 
 def print_model_stats(results: list[PerformanceResult]) -> None:
