@@ -1693,10 +1693,17 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     model: object | None = None
     tokenizer: object | None = None
     arch, gpu_info = get_system_info()
+
+    # Track overall timing
+    total_start_time = time.perf_counter()
+    model_load_time: float | None = None
+    generation_time: float | None = None
+
     try:
         validate_temperature(temp=params.temperature)
         validate_image_accessible(image_path=params.image_path)
         logger.debug("System: %s, GPU: %s", arch, gpu_info)
+
         with TimeoutManager(params.timeout):
             gen_params: ModelGenParams = ModelGenParams(
                 model_path=params.model_identifier,
@@ -1710,10 +1717,23 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
                 image_path=params.image_path,
                 verbose=params.verbose,
             )
+
+        # Extract timing from GenerationResult if available
+        generation_time = getattr(output, "time", None)
+        total_end_time = time.perf_counter()
+        total_time = total_end_time - total_start_time
+
+        # Estimate model load time (total - generation time)
+        if generation_time is not None:
+            model_load_time = max(0.0, total_time - generation_time)
+
         return PerformanceResult(
             model_name=params.model_identifier,
             generation=output,
             success=True,
+            elapsed_time=generation_time,
+            model_load_time=model_load_time,
+            total_time=total_time,
         )
     except TimeoutError as e:
         logger.exception("Timeout during model processing")
@@ -1723,6 +1743,9 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             success=False,
             error_stage="timeout",
             error_message=str(e),
+            elapsed_time=None,
+            model_load_time=None,
+            total_time=None,
         )
     except (OSError, ValueError) as e:
         logger.exception("Model processing error")
@@ -1732,6 +1755,9 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             success=False,
             error_stage="processing",
             error_message=str(e),
+            elapsed_time=None,
+            model_load_time=None,
+            total_time=None,
         )
     finally:
         if model is not None:
