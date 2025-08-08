@@ -1396,13 +1396,59 @@ def generate_html_report(
         )
 
 
+def _generate_github_markdown_table(
+    headers: list[str],
+    rows: list[list[str]],
+    colalign: list[str],
+) -> str:
+    """Generate a properly formatted GitHub markdown table with alignment syntax.
+
+    GitHub requires specific alignment syntax in the separator row:
+    - Left: :---
+    - Right: ---:
+    - Center: :---:
+    """
+    if not headers or not rows:
+        return ""
+
+    # Build header row
+    header_row = "| " + " | ".join(headers) + " |"
+
+    # Build alignment row with proper GitHub syntax
+    alignment_parts = []
+    for align in colalign:
+        if align == "left":
+            alignment_parts.append(":---")
+        elif align == "right":
+            alignment_parts.append("---:")
+        elif align == "center":
+            alignment_parts.append(":---:")
+        else:
+            # Default to left alignment
+            alignment_parts.append(":---")
+
+    alignment_row = "| " + " | ".join(alignment_parts) + " |"
+
+    # Build data rows
+    data_rows = []
+    for row in rows:
+        # Ensure all cells are strings and escape any remaining pipes
+        safe_row = [str(cell) for cell in row]
+        data_row = "| " + " | ".join(safe_row) + " |"
+        data_rows.append(data_row)
+
+    # Combine all parts
+    table_lines = [header_row, alignment_row, *data_rows]
+    return "\n".join(table_lines)
+
+
 def generate_markdown_report(
     results: list[PerformanceResult],
     filename: Path,
     versions: dict[str, str],
     prompt: str,
 ) -> None:
-    """Generate a Markdown report with performance metrics and output using tabulate."""
+    """Generate a Markdown report with performance metrics using proper GitHub table format."""
     if not results:
         logger.warning(
             Colors.colored("No results to generate Markdown report.", Colors.YELLOW),
@@ -1434,13 +1480,8 @@ def generate_markdown_report(
         "right" if is_numeric_field(field_name) else "left" for field_name in field_names[1:]
     ]
 
-    # Generate Markdown table using tabulate
-    markdown_table = tabulate(
-        rows,
-        headers=markdown_headers,
-        tablefmt="github",
-        colalign=colalign,
-    )
+    # Generate proper GitHub markdown table with correct alignment syntax
+    markdown_table = _generate_github_markdown_table(markdown_headers, rows, colalign)
 
     # Build the complete markdown content
     md: list[str] = []
