@@ -332,7 +332,7 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
     "peak_memory": ("Peak", "(MB)"),
     "time": ("Time", "(s)"),
     "duration": ("Dur", "(s)"),
-    "elapsed_time": ("Elapsed", "(s)"),
+    "generation_time": ("Generation", "(s)"),
     "model_load_time": ("Load", "(s)"),
     "total_time": ("Total", "(s)"),
 }
@@ -351,7 +351,7 @@ NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
         "peak_memory",
         "time",
         "duration",
-        "elapsed_time",
+        "generation_time",
         "model_load_time",
         "total_time",
     },
@@ -362,7 +362,7 @@ MAX_MODEL_NAME_LENGTH = 14
 MAX_OUTPUT_LENGTH = 28
 
 # PerformanceResult timing fields - centralized definition
-PERFORMANCE_TIMING_FIELDS: Final[list[str]] = ["elapsed_time", "model_load_time", "total_time"]
+PERFORMANCE_TIMING_FIELDS: Final[list[str]] = ["generation_time", "model_load_time", "total_time"]
 
 
 def fmt_num(val: float | str) -> str:
@@ -533,7 +533,7 @@ class PerformanceResult:
     error_stage: str | None = None
     error_message: str | None = None
     captured_output_on_fail: str | None = None
-    elapsed_time: float | None = None  # Time taken for generation in seconds
+    generation_time: float | None = None  # Time taken for generation in seconds
     model_load_time: float | None = None  # Time taken to load the model in seconds
     total_time: float | None = None  # Total time including model loading
 
@@ -993,9 +993,9 @@ def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceR
         if not result.success:
             return float("inf")  # Failed results go to the end
 
-        # Use the elapsed_time field from PerformanceResult
-        if result.elapsed_time is not None:
-            return float(result.elapsed_time)
+        # Use the generation_time field from PerformanceResult
+        if result.generation_time is not None:
+            return float(result.generation_time)
 
         # Fallback: calculate time from GenerationResult tokens-per-second if available
         if (
@@ -1207,7 +1207,7 @@ def _prepare_table_data(
         "cached_memory": "Cached<br>Memory<br>(MB)",
         "time": "Total<br>Time<br>(s)",
         "duration": "Duration<br>(s)",
-        "elapsed_time": "Elapsed<br>Time<br>(s)",
+        "generation_time": "Generation<br>Time<br>(s)",
         "model_load_time": "Model<br>Load<br>(s)",
         "total_time": "Total<br>Time<br>(s)",
     }
@@ -1731,7 +1731,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             model_name=params.model_identifier,
             generation=output,
             success=True,
-            elapsed_time=generation_time,
+            generation_time=generation_time,
             model_load_time=model_load_time,
             total_time=total_time,
         )
@@ -1743,7 +1743,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             success=False,
             error_stage="timeout",
             error_message=str(e),
-            elapsed_time=None,
+            generation_time=None,
             model_load_time=None,
             total_time=None,
         )
@@ -1755,7 +1755,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             success=False,
             error_stage="processing",
             error_message=str(e),
-            elapsed_time=None,
+            generation_time=None,
             model_load_time=None,
             total_time=None,
         )
@@ -1821,6 +1821,51 @@ def print_model_result(result: PerformanceResult, *, verbose: bool = False) -> N
                 f"  Generation TPS: {Colors.colored(fmt_num(generation_tps), Colors.WHITE)}"
             )
             logger.info(tps_msg)
+
+            # Always show total time
+            total_time = getattr(result, "total_time", None)
+            if total_time is not None and total_time > 0:
+                formatted_total_time = format_field_value("total_time", total_time)
+                if isinstance(formatted_total_time, str):
+                    total_time_msg = (
+                        f"  Total Time: {Colors.colored(formatted_total_time, Colors.WHITE)}"
+                    )
+                else:
+                    total_time_msg = (
+                        f"  Total Time: {Colors.colored(f'{total_time:.3f}s', Colors.WHITE)}"
+                    )
+                logger.info(total_time_msg)
+
+            # Show additional timing metrics if verbose
+            if verbose:
+                generation_time = getattr(result, "generation_time", None)
+                if generation_time is not None and generation_time > 0:
+                    formatted_generation = format_field_value("generation_time", generation_time)
+                    if isinstance(formatted_generation, str):
+                        generation_msg = (
+                            f"  Generation Time: "
+                            f"{Colors.colored(formatted_generation, Colors.WHITE)}"
+                        )
+                    else:
+                        generation_msg = (
+                            f"  Generation Time: "
+                            f"{Colors.colored(f'{generation_time:.3f}s', Colors.WHITE)}"
+                        )
+                    logger.info(generation_msg)
+
+                model_load_time = getattr(result, "model_load_time", None)
+                if model_load_time is not None and model_load_time > 0:
+                    formatted_load = format_field_value("model_load_time", model_load_time)
+                    if isinstance(formatted_load, str):
+                        load_msg = (
+                            f"  Model Load Time: {Colors.colored(formatted_load, Colors.WHITE)}"
+                        )
+                    else:
+                        load_msg = (
+                            f"  Model Load Time: "
+                            f"{Colors.colored(f'{model_load_time:.3f}s', Colors.WHITE)}"
+                        )
+                    logger.info(load_msg)
 
         if verbose and result.generation:
             # Section header in magenta
