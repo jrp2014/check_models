@@ -1497,17 +1497,11 @@ def _escape_markdown_in_text(text: str) -> str:
     result = re.sub(r"(<br>\s*){2,}", "<br><br>", result)  # Max 2 consecutive line breaks
     result = re.sub(r"\s+", " ", result).strip()  # Normalize other whitespace
 
-    # Escape common markdown characters that could break table formatting
-    # Order matters - escape backslashes first
+    # Escape only the critical markdown characters that break table formatting
+    # Based on analysis: most formatting characters are safe within table cells
     escape_chars = [
-        ("\\", "\\\\"),  # Backslash
-        ("`", "\\`"),  # Backticks
-        ("*", "\\*"),  # Asterisks
-        ("_", "\\_"),  # Underscores
-        ("#", "\\#"),  # Headers
-        ("|", "\\|"),  # Pipe (table separator)
-        ("[", "\\["),  # Square brackets
-        ("]", "\\]"),  # Square brackets
+        ("\\", "\\\\"),  # Backslash - escape character, can affect others
+        ("|", "\\|"),    # Pipe - CRITICAL: breaks table column structure
     ]
 
     for char, escaped in escape_chars:
