@@ -989,9 +989,9 @@ def _get_field_value(result: PerformanceResult, field_name: str) -> object:
     return getattr(result.generation, field_name, "-") if result.generation else "-"
 
 
-# Helper function to sort results by elapsed time (lowest to highest)
+# Helper function to sort results by generation time (lowest to highest)
 def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceResult]:
-    """Sort results by elapsed time (lowest to highest).
+    """Sort results by generation time (lowest to highest).
 
     Failed results (no timing data) are placed at the end.
     """
@@ -1078,13 +1078,13 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     """Print a compact, aligned table of model performance metrics using tabulate.
 
     Displays GenerationResult fields with units and formatted numbers.
-    Results are sorted by elapsed time (lowest to highest).
+    Results are sorted by generation time (lowest to highest).
     """
     if not results:
         logger.info("No model results to display.")
         return
 
-    # Sort results by elapsed time (lowest to highest)
+    # Sort results by generation time (lowest to highest)
     results = _sort_results_by_time(results)
 
     all_fields = _get_available_fields(results)
@@ -1176,7 +1176,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     for line in table_lines:
         logger.info(line)
     logger.info("=" * max_width)
-    logger.info("Results sorted by elapsed time (fastest to slowest).")
+    logger.info("Results sorted by generation time (fastest to slowest).")
 
 
 def _prepare_table_data(
@@ -1184,7 +1184,7 @@ def _prepare_table_data(
 ) -> tuple[list[str], list[list[str]], list[str]]:
     """Prepare table data for both HTML and Markdown reports using tabulate.
 
-    Results are sorted by elapsed time (lowest to highest).
+    Results are sorted by generation time (lowest to highest).
 
     Returns:
         Tuple of (headers, rows, field_names) where headers is a list of column names,
@@ -1195,7 +1195,7 @@ def _prepare_table_data(
     if not results:
         return [], [], []
 
-    # Sort results by elapsed time (lowest to highest)
+    # Sort results by generation time (lowest to highest)
     results = _sort_results_by_time(results)
 
     all_fields = _get_available_fields(results)
@@ -1354,7 +1354,7 @@ def generate_html_report(
     <h2>📊 Performance Results</h2>
     <div class="meta-info">
         Performance metrics and output for Vision Language Model processing<br>
-        Results sorted by elapsed time (fastest to slowest) • Generated on {datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")} • Failures shown but excluded from averages
+        Results sorted by generation time (fastest to slowest) • Generated on {datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")} • Failures shown but excluded from averages
     </div>
 
     {html_table}
@@ -1449,7 +1449,7 @@ def generate_markdown_report(
     md.append("")
     md.append("> **Prompt used:**\n>\n> " + prompt.replace("\n", "\n> ") + "\n")
     md.append("")
-    md.append("**Note:** Results are sorted by elapsed time (fastest to slowest).\n")
+    md.append("**Note:** Results are sorted by generation time (fastest to slowest).\n")
     md.append("")
     md.append(markdown_table)
     md.append("\n---\n")
