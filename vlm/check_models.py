@@ -100,6 +100,13 @@ try:
 except ImportError:
     transformers_version = NOT_AVAILABLE
 
+try:
+    import tokenizers
+
+    tokenizers_version: str = tokenizers.__version__
+except ImportError:
+    tokenizers_version = NOT_AVAILABLE
+
 
 # Custom timeout context manager
 # Python 3.11+ has asyncio.timeout, but signal-based timeout works across sync code
@@ -451,6 +458,7 @@ def get_library_versions() -> dict[str, str]:
         "mlx-lm": mlx_lm_version,
         "huggingface-hub": hf_version,
         "transformers": transformers_version,
+        "tokenizers": tokenizers_version,
         "Pillow": pillow_version,
     }
 
@@ -1473,9 +1481,21 @@ def generate_markdown_report(
 
 
 def _escape_markdown_in_text(text: str) -> str:
-    """Escape markdown characters in text to prevent formatting issues in markdown tables."""
+    """Escape markdown characters in text to prevent formatting issues in markdown tables.
+    
+    Preserves line breaks using HTML <br> tags to maintain text structure
+    while ensuring table formatting remains intact.
+    """
     if not isinstance(text, str):
         return str(text)
+
+    # First, convert newlines to HTML <br> tags to preserve line structure
+    # Handle different newline formats consistently
+    result = text.replace("\r\n", "<br>").replace("\r", "<br>").replace("\n", "<br>")
+    
+    # Clean up multiple consecutive <br> tags and normalize spacing
+    result = re.sub(r"(<br>\s*){2,}", "<br><br>", result)  # Max 2 consecutive line breaks
+    result = re.sub(r"\s+", " ", result).strip()  # Normalize other whitespace
 
     # Escape common markdown characters that could break table formatting
     # Order matters - escape backslashes first
@@ -1490,7 +1510,6 @@ def _escape_markdown_in_text(text: str) -> str:
         ("]", "\\]"),  # Square brackets
     ]
 
-    result = text
     for char, escaped in escape_chars:
         result = result.replace(char, escaped)
 
