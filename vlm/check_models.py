@@ -1800,13 +1800,13 @@ def print_model_result(result: PerformanceResult, *, verbose: bool = False) -> N
     if result.success:
         # Success header with green coloring
         success_msg: str = f"✓ SUCCESS: {model_short_name}"
-        sys.stderr.write(Colors.colored(success_msg, Colors.BOLD, Colors.GREEN) + "\n")
+        logger.info(Colors.colored(success_msg, Colors.BOLD, Colors.GREEN))
 
         if result.generation:
             # Generated text with cyan highlighting for visibility
             gen_text: str = getattr(result.generation, "text", "N/A")
             gen_msg: str = f"  Generated Text: {Colors.colored(gen_text, Colors.CYAN)}"
-            sys.stderr.write(gen_msg + "\n")
+            logger.info(gen_msg)
 
             # Performance metrics with white color for better visibility
             prompt_tokens: int = getattr(result.generation, "prompt_tokens", 0)
@@ -1814,18 +1814,18 @@ def print_model_result(result: PerformanceResult, *, verbose: bool = False) -> N
             total_tokens: int = prompt_tokens + generation_tokens
 
             tokens_msg: str = f"  Tokens: {Colors.colored(fmt_num(total_tokens), Colors.WHITE)}"
-            sys.stderr.write(tokens_msg + "\n")
+            logger.info(tokens_msg)
 
             generation_tps: float = getattr(result.generation, "generation_tps", 0.0)
             tps_msg: str = (
                 f"  Generation TPS: {Colors.colored(fmt_num(generation_tps), Colors.WHITE)}"
             )
-            sys.stderr.write(tps_msg + "\n")
+            logger.info(tps_msg)
 
         if verbose and result.generation:
             # Section header in magenta
             header_msg = Colors.colored("  Performance Metrics:", Colors.BOLD, Colors.MAGENTA)
-            sys.stderr.write(header_msg + "\n")
+            logger.info(header_msg)
 
             # Debug: show all available fields in GenerationResult
             available_fields = [f.name for f in fields(result.generation)]
@@ -1836,7 +1836,7 @@ def print_model_result(result: PerformanceResult, *, verbose: bool = False) -> N
             if time_val is None:
                 time_val = getattr(result.generation, "duration", 0.0)
             time_msg = f"    Time: {Colors.colored(f'{time_val:.2f}s', Colors.WHITE)}"
-            sys.stderr.write(time_msg + "\n")
+            logger.info(time_msg)
 
             # Memory fields with white coloring for visibility
             active_mem = getattr(result.generation, "active_memory", 0.0)
@@ -1849,7 +1849,7 @@ def print_model_result(result: PerformanceResult, *, verbose: bool = False) -> N
                     active_msg = f"    Memory (Active Δ): {Colors.colored(f'{formatted_active} MB', Colors.WHITE)}"
                 else:
                     active_msg = f"    Memory (Active Δ): {Colors.colored(f'{fmt_num(active_mem / MB_CONVERSION)} MB', Colors.WHITE)}"
-                sys.stderr.write(active_msg + "\n")
+                logger.info(active_msg)
 
             if cached_mem > 0:
                 formatted_cached = format_field_value("cached_memory", cached_mem)
@@ -1857,7 +1857,7 @@ def print_model_result(result: PerformanceResult, *, verbose: bool = False) -> N
                     cached_msg = f"    Memory (Cache Δ): {Colors.colored(f'{formatted_cached} MB', Colors.WHITE)}"
                 else:
                     cached_msg = f"    Memory (Cache Δ): {Colors.colored(f'{fmt_num(cached_mem / MB_CONVERSION)} MB', Colors.WHITE)}"
-                sys.stderr.write(cached_msg + "\n")
+                logger.info(cached_msg)
 
             if peak_mem > 0:
                 formatted_peak = format_field_value("peak_memory", peak_mem)
@@ -1867,38 +1867,38 @@ def print_model_result(result: PerformanceResult, *, verbose: bool = False) -> N
                     )
                 else:
                     peak_msg = f"    Memory (Peak): {Colors.colored(f'{fmt_num(peak_mem / MB_CONVERSION)} MB', Colors.WHITE)}"
-                sys.stderr.write(peak_msg + "\n")
+                logger.info(peak_msg)
 
             # Token details in white
             prompt_tokens_val = getattr(result.generation, "prompt_tokens", 0)
             prompt_msg = (
                 f"    Prompt Tokens: {Colors.colored(fmt_num(prompt_tokens_val), Colors.WHITE)}"
             )
-            sys.stderr.write(prompt_msg + "\n")
+            logger.info(prompt_msg)
 
             generation_tokens_val = getattr(result.generation, "generation_tokens", 0)
             gen_tokens_msg = f"    Generation Tokens: {Colors.colored(fmt_num(generation_tokens_val), Colors.WHITE)}"
-            sys.stderr.write(gen_tokens_msg + "\n")
+            logger.info(gen_tokens_msg)
 
             prompt_tps = getattr(result.generation, "prompt_tps", 0.0)
             prompt_tps_msg = f"    Prompt TPS: {Colors.colored(fmt_num(prompt_tps), Colors.WHITE)}"
-            sys.stderr.write(prompt_tps_msg + "\n")
+            logger.info(prompt_tps_msg)
     else:
         # Failure header with red coloring
         failure_msg = f"✗ FAILED: {model_short_name}"
-        sys.stderr.write(Colors.colored(failure_msg, Colors.BOLD, Colors.RED) + "\n")
+        logger.error(Colors.colored(failure_msg, Colors.BOLD, Colors.RED))
 
         if result.error_stage:
             stage_msg = f"  Stage: {Colors.colored(result.error_stage, Colors.RED)}"
-            sys.stderr.write(stage_msg + "\n")
+            logger.error(stage_msg)
 
         if result.error_message:
             error_msg = f"  Error: {Colors.colored(result.error_message, Colors.RED)}"
-            sys.stderr.write(error_msg + "\n")
+            logger.error(error_msg)
 
         if result.captured_output_on_fail:
             output_msg = f"  Output: {Colors.colored(result.captured_output_on_fail, Colors.RED)}"
-            sys.stderr.write(output_msg + "\n")
+            logger.error(output_msg)
 
 
 def print_cli_separator() -> None:
