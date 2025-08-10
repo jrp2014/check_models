@@ -1904,9 +1904,7 @@ def print_model_result(
         if result.error_message:
             logger.error("  Error: %s", Colors.colored(result.error_message, Colors.RED))
         if result.captured_output_on_fail:
-            logger.error(
-                "  Output: %s", Colors.colored(result.captured_output_on_fail, Colors.RED)
-            )
+            logger.error("  Output: %s", Colors.colored(result.captured_output_on_fail, Colors.RED))
         return
 
     # From here: success & (verbose True)
@@ -1951,9 +1949,7 @@ def print_model_result(
         if model_load_time is not None and model_load_time > 0:
             formatted_load = format_field_value("model_load_time", model_load_time)
             ml_disp = (
-                formatted_load
-                if isinstance(formatted_load, str)
-                else f"{model_load_time:.3f}s"
+                formatted_load if isinstance(formatted_load, str) else f"{model_load_time:.3f}s"
             )
             logger.info("  Model Load Time: %s", Colors.colored(ml_disp, Colors.WHITE))
 
@@ -2256,30 +2252,30 @@ def process_models(
     else:
         logger.info("Processing %d model(s)...", len(model_identifiers))
     for idx, model_id in enumerate(model_identifiers, start=1):
-            print_cli_separator()
-            print_cli_section(f"Processing Model: {model_id.split('/')[-1]}")
+        print_cli_separator()
+        print_cli_section(f"Processing Model: {model_id.split('/')[-1]}")
 
-            is_vlm_verbose: bool = args.verbose
-            params = ProcessImageParams(
-                model_identifier=model_id,
-                image_path=image_path,
-                prompt=prompt,
-                max_tokens=args.max_tokens,
-                temperature=args.temperature,
-                timeout=args.timeout,
-                verbose=is_vlm_verbose,
-                trust_remote_code=args.trust_remote_code,
-            )
-            result: PerformanceResult = process_image_with_model(params)
-            results.append(result)
+        is_vlm_verbose: bool = args.verbose
+        params = ProcessImageParams(
+            model_identifier=model_id,
+            image_path=image_path,
+            prompt=prompt,
+            max_tokens=args.max_tokens,
+            temperature=args.temperature,
+            timeout=args.timeout,
+            verbose=is_vlm_verbose,
+            trust_remote_code=args.trust_remote_code,
+        )
+        result: PerformanceResult = process_image_with_model(params)
+        results.append(result)
 
-            # Use the new structured output function
-            print_model_result(
-                result,
-                verbose=args.verbose,
-                run_index=idx,
-                total_runs=len(model_identifiers),
-            )
+        # Use the new structured output function
+        print_model_result(
+            result,
+            verbose=args.verbose,
+            run_index=idx,
+            total_runs=len(model_identifiers),
+        )
     return results
 
 
