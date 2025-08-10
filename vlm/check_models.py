@@ -1868,9 +1868,10 @@ def print_model_result(
                 parts.append(f"peak_mem={peak_str}")
         if total_time:
             tt = format_field_value("total_time", total_time)
-            parts.append(
-                f"total_time={tt}" if isinstance(tt, str) else f"total_time={total_time:.3f}s"
-            )
+            if isinstance(tt, str):
+                parts.append(f"total_time={tt}")
+            else:
+                parts.append(f"total_time={total_time:.3f}s")
     if result.error_stage:
         parts.append(f"stage={result.error_stage}")
     if result.error_message:
