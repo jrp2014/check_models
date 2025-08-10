@@ -1159,13 +1159,13 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     ]
 
     # Generate compact table using plain format with multi-line headers
-    # Use optimized widths for better vertical space utilization
+    # Plain format handles multi-line headers properly for logger output
     table = tabulate(
         rows,
         headers=headers,
         tablefmt="plain",
         colalign=colalign,
-        maxcolwidths=[20, 6, 6, 6, 6, 7, 7, 6, 45],  # Allow longer model names and output
+        maxcolwidths=[18, 6, 5, 5, 5, 6, 6, 5, 40],  # Tighter widths for more compact output
     )
 
     # Print the table with surrounding decorations
