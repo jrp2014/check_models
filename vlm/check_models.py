@@ -7,14 +7,21 @@ import argparse
 import contextlib
 import functools
 import html
+import json
 import logging
 import platform
 import re
 import signal
 import subprocess
 import sys
+import textwrap
 import time
 import traceback
+
+try:  # Optional hardware metrics
+    import psutil
+except ImportError:  # pragma: no cover - optional dependency
+    psutil = None
 from dataclasses import dataclass, fields
 from datetime import UTC, datetime
 from pathlib import Path
@@ -356,6 +363,7 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
 # Threshold for splitting long header text into multiple lines
 HEADER_SPLIT_LENGTH = 10
 ERROR_MESSAGE_PREVIEW_LEN: Final[int] = 40  # Max chars to show from error in summary line
+DISPLAY_WRAP_WIDTH: Final[int] = 80  # Column width for wrapping generated text preview
 
 # Fields that should be right-aligned (numeric fields)
 NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
@@ -420,7 +428,7 @@ def format_field_value(field_name: str, value: object) -> object:
         5. else (<= threshold but >= 1.0) -> also treat as GB (historical path)
 
     This keeps the UI consistent while avoiding per-source conditionals. The
-    trade‑off: extremely edge case sizes near thresholds could misclassify;
+    trade-off: extremely edge case sizes near thresholds could misclassify;
     acceptable for human-facing summary. If stricter accuracy is needed, a
     future refactor could pass explicit units alongside values.
     """
@@ -496,17 +504,85 @@ def get_library_versions() -> dict[str, str]:
     }
 
 
+def get_device_info() -> dict[str, Any] | None:
+    """Return system_profiler display (GPU) info as dict or None on failure.
+
+    Only invoked on macOS to enrich hardware section. Failures are swallowed
+    (we log at debug) so version printing never hard-fails.
+    """
+    if platform.system() != "Darwin":  # system_profiler is macOS specific
+        return None
+    try:
+        data = subprocess.check_output(
+            ["system_profiler", "SPDisplaysDataType", "-json"],
+            text=True,
+            timeout=5,
+        )
+        return json.loads(data)
+    except Exception as err:  # noqa: BLE001 broad OK here
+        logger.debug("Could not retrieve GPU information: %s", err)
+        return None
+
+
 def print_version_info(versions: dict[str, str]) -> None:
-    """Print library versions and generation date to the console."""
+    """Print library versions and optionally system / hardware info.
+
+    If running on Apple Silicon (arm64 macOS) we append a concise hardware
+    block (GPU name, RAM, physical CPU cores, GPU cores). Otherwise we note
+    that the extended block is skipped. Errors are swallowed so version
+    printing never fails.
+    """
     logger.info("--- Library Versions ---")
     max_len: int = max(len(k) for k in versions) + 1 if versions else 10
     for name, ver in sorted(versions.items()):
         name_padded: str = name.ljust(max_len)
         logger.info("%s: %s", name_padded, ver)
+
     logger.info(
         "Generated: %s",
         datetime.now(get_localzone()).strftime("%Y-%m-%d %H:%M:%S %Z"),
     )
+
+    # --- Optional system / hardware block (Apple Silicon focus) ---
+    try:
+        is_arm64: bool = platform.machine() == "arm64"
+        if not is_arm64:
+            logger.info("Not running on Apple Silicon (system info block skipped).")
+            return
+
+        device_info = get_device_info() or {}
+        displays = device_info.get("SPDisplaysDataType") or []
+        gpu_name: str | None = None
+        gpu_cores: str | int | None = None
+        if displays and isinstance(displays, list):
+            first = displays[0]
+            if isinstance(first, dict):
+                gpu_name = first.get("_name")
+                gpu_cores = first.get("sppci_cores")
+
+        if psutil is None:  # safety if optional import failed
+            logger.debug("psutil not available; skipping extended system info block.")
+            return
+
+        ram_gb = psutil.virtual_memory().total / (1024**3)
+        physical_cores = psutil.cpu_count(logical=False) or 0
+
+        sys_lines = [
+            "",  # spacer
+            "--- System Information ---",
+            f"macOS:        v{platform.mac_ver()[0]}",
+            f"Python:       v{sys.version.split()[0]}",
+            "",
+            "Hardware:",
+            f"• Chip:        {gpu_name or 'Unknown'}",
+            f"• RAM:         {ram_gb:.1f} GB",
+            f"• CPU Cores:   {physical_cores}",
+            f"• GPU Cores:   {gpu_cores if gpu_cores is not None else 'Unknown'}",
+        ]
+        for line in sys_lines:
+            logger.info(line)
+    except Exception as err:  # noqa: BLE001 broad by design
+        logger.debug("Skipping system info block: %s", err)
 
 
 # Type aliases and definitions
@@ -1024,7 +1100,12 @@ def _get_available_fields(results: list[PerformanceResult]) -> list[str]:
 
 
 def _is_performance_timing_field(field_name: str) -> bool:  # kept for clarity
-    """Return True if ``field_name`` belongs to PerformanceResult timing set."""
+    """Return True if ``field_name`` is one of the timing fields we expose.
+
+    Separated into a helper for readability and potential future extension
+    (e.g. alias mapping or dynamic timing metrics).
+    """
+    return field_name in PERFORMANCE_TIMING_FIELDS
 
 
 def _get_field_value(result: PerformanceResult, field_name: str) -> object:
@@ -1123,7 +1204,7 @@ def _format_output_multiline(output_text: str) -> str:
 
 
 def print_model_stats(results: list[PerformanceResult]) -> None:
-    """Emit a compact multi-line header table of per-model metrics.
+    r"""Emit a compact multi-line header table of per-model metrics.
 
     Space optimization strategies:
         * Multi-line headers (e.g., "Gen\n(ct)") reduce horizontal width.
@@ -1917,8 +1998,32 @@ def print_model_result(
     else:
         logger.error(Colors.colored(summary_raw, Colors.RED))
 
-    # Fast exit if not verbose and success (we already emitted summary + table later)
+    # Fast exit if not verbose and success, but still show generated text (preview)
     if result.success and not verbose:
+        if result.generation:
+            raw_text = getattr(result.generation, "text", "")
+            text_str = str(raw_text)
+            # Start on a fresh line in the log output
+            logger.info("")
+            if not text_str:
+                logger.info("%s", Colors.colored("<empty>", Colors.CYAN))
+            else:
+                for original_line in text_str.splitlines():
+                    if original_line == "":
+                        logger.info("")
+                        continue
+                    # Use drop_whitespace to avoid leading spaces on wrapped continuation lines.
+                    wrapped = textwrap.wrap(
+                        original_line,
+                        width=DISPLAY_WRAP_WIDTH,
+                        replace_whitespace=False,
+                        drop_whitespace=True,
+                        break_long_words=False,
+                        break_on_hyphens=False,
+                    ) or [""]
+                    for wline in wrapped:
+                        # Left align: drop incidental leading space from wrapping.
+                        logger.info("%s", Colors.colored(wline.lstrip(), Colors.CYAN))
         return
 
     # --- Detailed block (verbose success OR any failure) ---
