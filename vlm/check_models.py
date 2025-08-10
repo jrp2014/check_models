@@ -403,13 +403,27 @@ def format_field_label(field_name: str) -> str:
 
 
 def format_field_value(field_name: str, value: object) -> object:
-    """Format a field value for display, applying unit conversions as needed."""
-    # Unified handling for memory-related fields (peak_memory, active_memory, cached_memory, etc.)
-    # Heuristic assumptions:
-    #   < 1.0                 : already in MB
-    #   > LARGE_NUMBER_THRESHOLD * MB_CONVERSION : bytes -> convert to MB
-    #   LARGE_NUMBER_THRESHOLD .. 10*LARGE_NUMBER_THRESHOLD : treat as MB (already reasonable size)
-    #   else                 : treat as GB and convert to MB
+    """Return a display-friendly value with lightweight normalization.
+
+    Memory fields (*_memory): incoming values may be reported by different
+    internal sources in (a) MB already, (b) raw bytes, or (c) GB. We apply a
+    pragmatic heuristic rather than require every caller to normalize:
+
+    Heuristic tiers (fval == numeric value provided):
+        1. fval < 1.0               -> assume already MB (tiny fractional usage)
+        2. fval > LARGE_NUMBER_THRESHOLD * MB_CONVERSION
+                                                             -> treat as raw bytes, divide by MB
+        3. LARGE_NUMBER_THRESHOLD < fval < 10 * LARGE_NUMBER_THRESHOLD
+                                                             -> treat as already MB (reasonable magnitude)
+        4. fval > LARGE_NUMBER_THRESHOLD (and not caught by #2/3)
+                                                             -> treat as GB, convert to MB ( * 1024 )
+        5. else (<= threshold but >= 1.0) -> also treat as GB (historical path)
+
+    This keeps the UI consistent while avoiding per-source conditionals. The
+    trade‑off: extremely edge case sizes near thresholds could misclassify;
+    acceptable for human-facing summary. If stricter accuracy is needed, a
+    future refactor could pass explicit units alongside values.
+    """
     if field_name.endswith("_memory") and isinstance(value, (int, float)):
         try:
             fval = float(value)
@@ -614,22 +628,20 @@ def print_image_dimensions(image_path: Path | str) -> None:
 # --- EXIF & Metadata Handling ---
 @functools.lru_cache(maxsize=128)
 def get_exif_data(image_path: PathLike) -> ExifDict | None:
-    """Extract EXIF data from an image file.
+    """Return decoded EXIF structure or ``None`` if absent.
 
-    EXIF data is stored in Image File Directories (IFDs) with a hierarchical structure:
-    - IFD0: Main image metadata (camera, dimensions, etc.)
-    - Exif SubIFD: Camera settings (exposure, ISO, etc.)
-    - GPS SubIFD: Location data stored as degrees/minutes/seconds tuples
+    Multi-pass extraction strategy (kept explicit for robustness / debugging):
+        1. IFD0 pass: baseline tags (camera vendor, dimensions, etc.). We *skip*
+            pointers to sub directories (Exif / GPS) so we can handle them with
+            targeted try/except blocks and continue even if one sub-IFD is corrupt.
+        2. Exif SubIFD pass: exposure details, lens, ISO. Failure here should not
+            abort the whole extraction—exceptions are logged and ignored.
+        3. GPS IFD pass: converted into a nested mapping so later code can decide
+            whether/how to stringify. We do not attempt immediate DMS conversion
+            here (that happens downstream) to keep responsibilities separate.
 
-    The PIL library provides access to raw numeric tag IDs which we convert to
-    human-readable names using TAGS/GPSTAGS lookup tables.
-
-    Args:
-        image_path: Path to the image file to process
-
-    Returns:
-        Dictionary of EXIF tags and values, or None if no EXIF data found
-
+    Rationale: real-world photographs often contain partially corrupt EXIF
+    segments; failing soft ensures we still display whatever remains.
     """
     img_path_str: str = str(image_path)
     try:
@@ -727,7 +739,18 @@ def _convert_gps_coordinate(
 
 
 def extract_image_metadata(image_path: Path | str) -> MetadataDict:
-    """Extract key metadata (date, GPS, EXIF tags) from an image file."""
+    """Derive high-level metadata (date, description, GPS string, raw EXIF).
+
+        Responsibilities:
+            * Choose a representative date: prefer EXIF original timestamp, then
+                creation fallback, then filesystem mtime, else label unknown.
+            * Decode and sanitize description (graceful bytes → str handling).
+            * Provide a simplified human readable GPS string or fallback phrase.
+            * Preserve the raw EXIF dict (stringified) separately for debugging.
+
+    The function intentionally keeps parsing + fallback logic localized so the
+        rest of the pipeline can treat metadata as plain strings.
+    """
     metadata: MetadataDict = {}
     img_path_str: str = str(image_path)
     exif_data = get_exif_data(img_path_str) or {}
@@ -910,7 +933,11 @@ def pretty_print_exif(
     show_all: bool = True,
     title: str = "EXIF Metadata Summary",
 ) -> None:
-    """Print key EXIF data in a formatted table with colors and a title using tabulate."""
+    """Render selected EXIF tags in a colored table.
+
+    Only simple presentation logic lives here; extraction, filtering and
+    sanitizing occur earlier (see ``get_exif_data`` / ``filter_and_format_tags``).
+    """
     if not exif:
         logger.info("No EXIF data available.")
         return
@@ -977,9 +1004,11 @@ def pretty_print_exif(
 
 
 def _get_available_fields(results: list[PerformanceResult]) -> list[str]:
-    """Extract available GenerationResult fields and add PerformanceResult timing fields.
+    """Return ordered list of metric field names present across results.
 
-    Returns combined list of fields excluding 'text' and 'logprobs'.
+    We skip heavy / long fields (``text``, ``logprobs``) to keep summary tables
+    concise. Timing fields from ``PerformanceResult`` are appended explicitly so
+    they appear in a predictable order if present.
     """
     # Determine GenerationResult fields (excluding 'text' and 'logprobs')
     gen_fields: list[str] = []
@@ -994,9 +1023,8 @@ def _get_available_fields(results: list[PerformanceResult]) -> list[str]:
     return gen_fields + PERFORMANCE_TIMING_FIELDS
 
 
-def _is_performance_timing_field(field_name: str) -> bool:
-    """Check if a field is a PerformanceResult timing field."""
-    return field_name in PERFORMANCE_TIMING_FIELDS
+def _is_performance_timing_field(field_name: str) -> bool:  # kept for clarity
+    """Return True if ``field_name`` belongs to PerformanceResult timing set."""
 
 
 def _get_field_value(result: PerformanceResult, field_name: str) -> object:
@@ -1010,9 +1038,10 @@ def _get_field_value(result: PerformanceResult, field_name: str) -> object:
 
 # Helper function to sort results by generation time (lowest to highest)
 def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceResult]:
-    """Sort results by generation time (lowest to highest).
+    """Return results ordered by effective generation time.
 
-    Failed results (no timing data) are placed at the end.
+    Failed / missing timing entries are pushed to the end by assigning ``inf``.
+    This keeps the fastest successful models visually prioritized.
     """
 
     def get_time_value(result: PerformanceResult) -> float:
@@ -1094,10 +1123,12 @@ def _format_output_multiline(output_text: str) -> str:
 
 
 def print_model_stats(results: list[PerformanceResult]) -> None:
-    """Print a compact, aligned table of model performance metrics using tabulate.
+    """Emit a compact multi-line header table of per-model metrics.
 
-    Displays GenerationResult fields with units and formatted numbers.
-    Results are sorted by generation time (lowest to highest).
+    Space optimization strategies:
+        * Multi-line headers (e.g., "Gen\n(ct)") reduce horizontal width.
+        * Numeric heuristic decides right alignment (tokens, memory, time, etc.).
+        * Long model names and outputs are vertically wrapped for readability.
     """
     if not results:
         logger.info("No model results to display.")
@@ -1201,15 +1232,11 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
 def _prepare_table_data(
     results: list[PerformanceResult],
 ) -> tuple[list[str], list[list[str]], list[str]]:
-    """Prepare table data for both HTML and Markdown reports using tabulate.
+    """Normalize model results into (headers, rows, field_names) for reports.
 
-    Results are sorted by generation time (lowest to highest).
-
-    Returns:
-        Tuple of (headers, rows, field_names) where headers is a list of column names,
-        rows is a list of row data lists, and field_names tracks the original field names
-        for alignment purposes.
-
+    Separation of concerns: this function handles data shaping only; rendering
+    (HTML / Markdown / console) is delegated so that alternate output formats
+    can reuse the same pre-processed structure.
     """
     if not results:
         return [], [], []
@@ -1292,7 +1319,13 @@ def generate_html_report(
     versions: dict[str, str],
     prompt: str,
 ) -> None:
-    """Generate an HTML report with performance metrics and output using tabulate."""
+    """Write an HTML report (standalone) including metrics table and context.
+
+    Inline CSS is used deliberately to keep the artifact portable (single file
+    shareable via email / chat) without additional assets. If styling grows
+    further, moving to a template system + external stylesheet would be the
+    next step.
+    """
     if not results:
         logger.warning(
             Colors.colored("No results to generate HTML report.", Colors.YELLOW),
@@ -1421,7 +1454,7 @@ def generate_markdown_report(
     versions: dict[str, str],
     prompt: str,
 ) -> None:
-    """Generate a Markdown report with performance metrics using proper GitHub table format."""
+    """Write a GitHub-friendly Markdown summary with aligned pipe table."""
     if not results:
         logger.warning(
             Colors.colored("No results to generate Markdown report.", Colors.YELLOW),
@@ -1500,10 +1533,11 @@ def generate_markdown_report(
 
 
 def _escape_markdown_in_text(text: str) -> str:
-    """Escape markdown characters in text to prevent formatting issues in markdown tables.
+    """Escape only structural Markdown chars (currently pipe + backslash).
 
-    Preserves line breaks using HTML <br> tags to maintain text structure
-    while ensuring table formatting remains intact.
+    Minimal escaping avoids noisy backslashes while preserving readability.
+    Newlines are replaced with ``<br>`` so multi-line outputs don't break the
+    pipe table layout.
     """
     if not isinstance(text, str):
         return str(text)
@@ -1626,16 +1660,12 @@ def _run_model_generation(
     *,
     verbose: bool,
 ) -> GenerationResult:
-    """Load HuggingFace model, format prompt and run MLX VLM generation.
+    """Load model + processor, apply chat template, run generation, time it.
 
-    This function interfaces between HuggingFace's model repository system and
-    MLX's optimized inference engine. The model loading process:
-    1. Downloads model weights/config from HuggingFace Hub if not cached locally
-    2. Loads the model into MLX's memory-efficient format
-    3. Applies the model's specific chat template format to the user prompt
-    4. Runs inference using MLX's Metal Performance Shaders acceleration
-
-    Raise exceptions on failure.
+    We keep all loading + formatting + generation steps together because they
+    form a tightly coupled sequence (tokenizer/model/config interplay varies by
+    repo). Errors are wrapped with traceback context so upstream summaries can
+    show concise messages while verbose logs retain full detail.
     """
     model: object
     tokenizer: object
@@ -2196,9 +2226,13 @@ def process_models(
     image_path: Path,
     prompt: str,
 ) -> list[PerformanceResult]:
-    """Process images with the specified models or scan cache for available models.
+    """Resolve the definitive model list and execute each model run.
 
-    Returns a list of performance results with outputs and performance metrics.
+    Selection logic:
+        * If --models provided: start with that list; optionally filter via --exclude.
+        * Else: enumerate cached model repo IDs and apply --exclude.
+    Each resolved identifier is processed sequentially (future work: parallel
+    scheduling once thread/process safety of underlying libs confirmed).
     """
     # Validate model selection and warn about ineffective exclusions
     validate_and_warn_model_selection(args)
@@ -2270,7 +2304,7 @@ def process_models(
         result: PerformanceResult = process_image_with_model(params)
         results.append(result)
 
-        # Use the new structured output function
+        # Structured output for this run
         print_model_result(
             result,
             verbose=args.verbose,
@@ -2281,6 +2315,7 @@ def process_models(
 
 
 def finalize_execution(
+    *,
     args: argparse.Namespace,
     results: list[PerformanceResult],
     library_versions: dict[str, str],
