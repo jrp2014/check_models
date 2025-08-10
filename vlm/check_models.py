@@ -265,7 +265,16 @@ class ColoredFormatter(logging.Formatter):
             (lambda _, m: "Generated Text:" in m, (Colors.CYAN,)),
             # Performance metrics
             (
-                lambda _, m: any(metric in m for metric in ["Tokens:", "TPS:", "Time:", "Memory:"]),
+                lambda _, m: any(
+                    metric in m
+                    for metric in [
+                        "Tokens:",
+                        "TPS:",
+                        "Time:",
+                        "Memory (",  # matches verbose memory lines
+                        "Memory:",
+                    ]
+                ),
                 (Colors.WHITE,),
             ),
             # File operations
@@ -394,18 +403,27 @@ def format_field_label(field_name: str) -> str:
 
 def format_field_value(field_name: str, value: object) -> object:
     """Format a field value for display, applying unit conversions as needed."""
-    if field_name == "peak_memory" and isinstance(value, (int, float)):
-        # MLX VLM returns memory in GB, convert to MB for display consistency
-        # If value is very small (< 1), assume it's already in MB; if large (> 100), assume bytes
-        if value < 1.0:
-            # Assume already in MB
-            return f"{value:,.0f}"
-        if value > LARGE_NUMBER_THRESHOLD:
-            # Assume in bytes, convert to MB
-            mb_value = value / MB_CONVERSION
-            return f"{mb_value:,.0f}"
-        # Assume in GB, convert to MB
-        mb_value = value * 1024
+    # Unified handling for memory-related fields (peak_memory, active_memory, cached_memory, etc.)
+    # Heuristic assumptions:
+    #   < 1.0                 : already in MB
+    #   > LARGE_NUMBER_THRESHOLD * MB_CONVERSION : bytes -> convert to MB
+    #   LARGE_NUMBER_THRESHOLD .. 10*LARGE_NUMBER_THRESHOLD : treat as MB (already reasonable size)
+    #   else                 : treat as GB and convert to MB
+    if field_name.endswith("_memory") and isinstance(value, (int, float)):
+        try:
+            fval = float(value)
+        except (TypeError, ValueError):  # Defensive: return original on failure
+            return value
+        if fval < 1.0:
+            mb_value = fval
+        elif fval > (LARGE_NUMBER_THRESHOLD * MB_CONVERSION):
+            mb_value = fval / MB_CONVERSION
+        elif fval > LARGE_NUMBER_THRESHOLD and fval < (10 * LARGE_NUMBER_THRESHOLD):
+            mb_value = fval  # assume already MB
+        elif fval > LARGE_NUMBER_THRESHOLD:
+            mb_value = fval * 1024  # treat as GB
+        else:
+            mb_value = fval * 1024  # treat as GB (standard case)
         return f"{mb_value:,.0f}"
     if field_name.endswith("_tps") and isinstance(value, (int, float)):
         # Format TPS values to 1 decimal place or 3 significant figures with comma separators
@@ -1901,31 +1919,21 @@ def print_model_result(result: PerformanceResult, *, verbose: bool = False) -> N
             cached_mem = getattr(result.generation, "cached_memory", 0.0)
             peak_mem = getattr(result.generation, "peak_memory", 0.0)
 
-            if active_mem > 0:
-                formatted_active = format_field_value("active_memory", active_mem)
-                if isinstance(formatted_active, str):
-                    active_msg = f"    Memory (Active Δ): {Colors.colored(f'{formatted_active} MB', Colors.WHITE)}"
-                else:
-                    active_msg = f"    Memory (Active Δ): {Colors.colored(f'{fmt_num(active_mem / MB_CONVERSION)} MB', Colors.WHITE)}"
-                logger.info(active_msg)
+            def _log_mem(label: str, field: str, raw_val: float) -> None:
+                if raw_val <= 0:
+                    return
+                formatted = format_field_value(field, raw_val)
+                # formatted already returns MB as string; append unit explicitly once
+                text = f"{formatted} MB" if not str(formatted).endswith("MB") else str(formatted)
+                logger.info(
+                    "    Memory (%s): %s",
+                    label,
+                    Colors.colored(text, Colors.WHITE),
+                )
 
-            if cached_mem > 0:
-                formatted_cached = format_field_value("cached_memory", cached_mem)
-                if isinstance(formatted_cached, str):
-                    cached_msg = f"    Memory (Cache Δ): {Colors.colored(f'{formatted_cached} MB', Colors.WHITE)}"
-                else:
-                    cached_msg = f"    Memory (Cache Δ): {Colors.colored(f'{fmt_num(cached_mem / MB_CONVERSION)} MB', Colors.WHITE)}"
-                logger.info(cached_msg)
-
-            if peak_mem > 0:
-                formatted_peak = format_field_value("peak_memory", peak_mem)
-                if isinstance(formatted_peak, str):
-                    peak_msg = (
-                        f"    Memory (Peak): {Colors.colored(f'{formatted_peak} MB', Colors.WHITE)}"
-                    )
-                else:
-                    peak_msg = f"    Memory (Peak): {Colors.colored(f'{fmt_num(peak_mem / MB_CONVERSION)} MB', Colors.WHITE)}"
-                logger.info(peak_msg)
+            _log_mem("Active Δ", "active_memory", active_mem)
+            _log_mem("Cache Δ", "cached_memory", cached_mem)
+            _log_mem("Peak", "peak_memory", peak_mem)
 
             # Token details in white
             prompt_tokens_val = getattr(result.generation, "prompt_tokens", 0)
@@ -1935,7 +1943,10 @@ def print_model_result(result: PerformanceResult, *, verbose: bool = False) -> N
             logger.info(prompt_msg)
 
             generation_tokens_val = getattr(result.generation, "generation_tokens", 0)
-            gen_tokens_msg = f"    Generation Tokens: {Colors.colored(fmt_num(generation_tokens_val), Colors.WHITE)}"
+            gen_tokens_msg = (
+                f"    Generation Tokens: "
+                f"{Colors.colored(fmt_num(generation_tokens_val), Colors.WHITE)}"
+            )
             logger.info(gen_tokens_msg)
 
             prompt_tps = getattr(result.generation, "prompt_tps", 0.0)
