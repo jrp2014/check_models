@@ -1,40 +1,32 @@
-# MLX Vision Language Model Checker
+# MLX Vision Language Model Checker (`check_models.py`)
 
-A comprehensive tool for testing and benchmarking Vision Language Models (VLMs) using Apple's MLX framework. This script processes images with multiple VLMs, extracts metadata, generates captions, and provides detailed performance analysis with professional reports.
+`check_models.py` is a focused benchmarking and inspection tool for MLX-compatible Vision Language Models (VLMs) on Apple Silicon. It loads one or more local / cached models, optionally derives a prompt from image metadata (EXIF + GPS), runs generation, and reports performance (tokens, speed, timings, memory) plus outputs in colorized CLI, HTML, and Markdown formats.
 
-## What This Script Does
+## Capabilities
 
-The MLX VLM Checker is designed to:
+* Auto‑discovers locally cached MLX VLMs (Hugging Face cache) or runs an explicit list.
+* Captures structured performance: generation time, model load time, total time, token counts, tokens/sec, peak memory.
+* Extracts EXIF + GPS metadata (robust to partial corruption) for context.
+* Provides compact console table + per‑model SUMMARY lines (machine parsable: `SUMMARY key=value ...`).
+* Generates standalone HTML and GitHub‑friendly Markdown reports.
+* Gracefully handles timeouts, load errors, and partial failures.
 
-- **Test Vision Language Models**: Automatically discover and test all locally cached VLMs or run specific models
-- **Performance Benchmarking**: Measure and report token generation speeds, memory usage, and processing times
-- **Image Analysis**: Extract EXIF metadata, GPS information, and generate contextual prompts
-- **Professional Reporting**: Create detailed HTML and Markdown reports with performance metrics and model outputs
-- **Flexible Model Selection**: Include specific models, exclude problematic ones, or test all available models
-- **Error Handling**: Gracefully handle model failures, timeouts, and provide diagnostic information
+## Feature Highlights
 
-## Features
-
-- **Comprehensive Model Testing**: Process images with one or more MLX Vision Language Models
-- **Smart Model Discovery**: Automatically scans local Hugging Face cache for available VLMs
-- **Flexible Model Selection**:
-  - Run all cached models
-  - Specify explicit model lists
-  - Exclude specific models from testing
-  - Filter explicit model lists with exclusions
-- **Rich Metadata Extraction**: Extracts EXIF data, GPS coordinates, and image information
-- **Intelligent Prompting**: Generates context-aware prompts based on image metadata
-- **Performance Metrics**: Tracks tokens/second, memory usage, processing time, and error rates
-- **Multiple Output Formats**:
-  - Colorized CLI output with real-time progress
-  - Professional HTML reports with interactive tables
-  - GitHub-compatible Markdown reports
-- **Robust Error Handling**: Timeout management, graceful failure handling, and diagnostic output
-- **Verbose Debugging**: Detailed logging and performance analysis in verbose mode
+| Area | Notes |
+|------|-------|
+| Model discovery | Scans Hugging Face cache; explicit `--models` overrides. |
+| Selection control | `--exclude` works with cache scan or explicit list. |
+| Prompting | `--prompt` overrides; otherwise metadata‑informed (image description, GPS, date). |
+| Performance | generation_time, model_load_time, total_time, token counts, TPS, peak memory. |
+| Reporting | CLI (color), HTML (standalone), Markdown (GitHub). |
+| Robustness | Per‑model isolation; failures logged; SUMMARY lines for automation. |
+| Timeout | Signal‑based (UNIX) manager; configurable per run. |
+| Output preview | Non‑verbose mode still shows wrapped generated text (80 cols). |
 
 ## Installation and Environment Setup
 
-### Using pyproject.toml (Recommended)
+### Using `pyproject.toml` (recommended)
 
 This project includes a `pyproject.toml` file that defines all dependencies and can be used with modern Python package managers.
 
@@ -90,68 +82,33 @@ pip install mlx>=0.10.0 mlx-vlm>=0.0.9 Pillow>=10.0.0 huggingface-hub>=0.20.0 ta
 
 ## Requirements
 
-- **Python**: 3.12+ (3.9+ may work but 3.12+ recommended)
-- **Operating System**: macOS with Apple Silicon (required for MLX)
-- **Dependencies**: Automatically handled by pyproject.toml
-- **Models**: MLX-compatible Vision Language Models (downloaded automatically from Hugging Face)
+* **Python**: 3.12+ (3.9+ may work but 3.12+ recommended)
+* **Operating System**: macOS with Apple Silicon (required for MLX)
+* **Dependencies**: Automatically handled by pyproject.toml
+* **Models**: MLX-compatible Vision Language Models (downloaded automatically from Hugging Face)
 
 ## Usage
 
-### Basic Usage
+### Quick Start
 
 ```bash
-Test all models with custom prompt:
-
-```bash
+# Run across all cached models with a custom prompt
 python check_models.py -p "What is the main object in this image?"
-```
 
-Test specific models only:
-
-```bash
+# Explicit model list (skips cache discovery)
 python check_models.py -m mlx-community/nanoLLaVA mlx-community/llava-1.5-7b-hf
-```
 
-Exclude problematic models:
+# Exclude specific models from the automatic cache scan
+python check_models.py -e mlx-community/problematic-model other/model
 
-```bash
-python check_models.py -e mlx-community/problematic-model
-```
-
-Test specific models but exclude some:
-
-```bash
+# Combine explicit list with exclusions
 python check_models.py -m model1 model2 model3 -e model2
-# Only tests model1 and model3
-```
 
-### Verbose Output
-
-Enable detailed logging for debugging:
-
-- Detailed model loading information
-- Token-by-token generation details
-- Memory usage tracking
-- Detailed error stack traces
-
-```bash
+# Verbose (debug) mode for detailed logs
 python check_models.py -v
 ```
 
-### Advanced Model Selection
-
-```bash
-# Test explicit models but exclude one from the list
-python check_models.py --models model1 model2 model3 --exclude model2
-
-# Exclude multiple models from cache scan
-python check_models.py --exclude model1 model2 --verbose
-
-# Use custom output locations
-python check_models.py --output-html ~/reports/results.html --output-markdown ~/reports/results.md
-```
-
-### Complete Example
+### Advanced Example
 
 ```bash
 python check_models.py \
@@ -162,44 +119,34 @@ python check_models.py \
   --temperature 0.1 \
   --timeout 600 \
   --output-html ~/reports/vlm_benchmark.html \
+  --output-markdown ~/reports/vlm_benchmark.md \
   --verbose
 ```
 
-## Command Line Arguments
+## Command Line Reference
 
-### Core Options
+| Flag | Type | Default | Description |
+|------|------|---------|-------------|
+| `-f`, `--folder` | Path | `~/Pictures/Processed` | Folder of images to process (non‑recursive). |
+| `--output-html` | Path | `results.html` | HTML report output file. |
+| `--output-markdown` | Path | `results.md` | Markdown report output file. |
+| `-m`, `--models` | list[str] | (none) | Explicit model IDs/paths; disables cache discovery. |
+| `-e`, `--exclude` | list[str] | (none) | Models to exclude (applies to cache scan or explicit list). |
+| `--trust-remote-code` | flag | `True` | Allow custom code from Hub models (SECURITY RISK). |
+| `-p`, `--prompt` | str | (auto) | Custom prompt; if omitted a metadata‑aware prompt may be used. |
+| `-x`, `--max-tokens` | int | 500 | Max new tokens to generate. |
+| `-t`, `--temperature` | float | 0.1 | Sampling temperature. |
+| `--timeout` | float | 300 | Operation timeout (seconds) for model execution. |
+| `-v`, `--verbose` | flag | `False` | Enable verbose + debug logging. |
 
-- `-f, --folder`: Image folder to scan (default: `~/Pictures/Processed`)
-- `-m, --models`: Specify explicit models by ID/path (overrides cache scan)
-- `-e, --exclude`: Exclude models from processing (works with both explicit models and cache scan)
-- `-p, --prompt`: Custom prompt for the models (auto-generated from metadata if not provided)
+### Selection Logic
 
-### Model Selection Logic
+1. No selection flags: run all cached VLMs.
+2. `--models` only: run exactly that list.
+3. `--exclude` only: run cached minus excluded.
+4. `--models` + `--exclude`: intersect explicit list then subtract exclusions.
 
-The script supports four model selection scenarios:
-
-1. **No options**: Tests all locally cached VLMs
-2. **--models only**: Tests only the specified models
-3. **--exclude only**: Tests all cached models except excluded ones
-4. **--models + --exclude**: Tests specified models minus excluded ones
-
-**Warning System**: The script warns when excluded models aren't in the available set, helping you understand which exclusions are effective.
-
-### Performance Options
-
-- `-x, --max-tokens`: Maximum tokens to generate (default: 500)
-- `-t, --temperature`: Sampling temperature 0.0-1.0 (default: 0.1)
-- `--timeout`: Timeout in seconds for model operations (default: 300)
-
-### Output Options
-
-- `--output-html`: HTML report filename (default: `results.html`)
-- `--output-markdown`: Markdown report filename (default: `results.md`)
-- `-v, --verbose`: Enable detailed logging and debug output
-
-### Security Options
-
-- `--trust-remote-code`: Allow custom code from Hub models ⚠️ **SECURITY RISK**
+The script warns about exclusions that don't match any candidate model.
 
 ## Output Formats
 
@@ -207,32 +154,32 @@ The script supports four model selection scenarios:
 
 Real-time colorized output showing:
 
-- Model processing progress with success/failure indicators
-- Performance metrics (tokens/second, memory usage, timing)
-- Generated text preview
-- Error diagnostics for failed models
-- Final performance summary table
+* Model processing progress with success/failure indicators
+* Performance metrics (tokens/second, memory usage, timing)
+* Generated text preview
+* Error diagnostics for failed models
+* Final performance summary table
 
-### HTML Report (`results.html`)
+### HTML Report
 
 Professional report featuring:
 
-- Executive summary with test parameters
-- Interactive performance table with sortable columns
-- Model outputs and diagnostics
-- System information and library versions
-- Responsive design for mobile viewing
+* Executive summary with test parameters
+* Interactive performance table with sortable columns
+* Model outputs and diagnostics
+* System information and library versions
+* Responsive design for mobile viewing
 
-### Markdown Report (`results.md`)
+### Markdown Report
 
 GitHub-compatible format with:
 
-- Performance metrics in table format
-- Model outputs
-- System and library version information
-- Easy integration into documentation
+* Performance metrics in table format
+* Model outputs
+* System and library version information
+* Easy integration into documentation
 
-## Model Selection Examples
+## Additional Examples
 
 ```bash
 # Test all available models
@@ -253,16 +200,16 @@ python check_models.py \
   --exclude "model3"
 ```
 
-## Performance Metrics
+## Metrics Tracked
 
 The script tracks and reports:
 
-- **Token Metrics**: Prompt tokens, generation tokens, total processing
-- **Speed Metrics**: Tokens per second for prompt processing and generation
-- **Memory Usage**: Peak memory consumption during processing
-- **Timing**: Total processing time per model
-- **Success Rate**: Model success/failure statistics
-- **Error Analysis**: Detailed error reporting and diagnostics
+* **Token Metrics**: Prompt tokens, generation tokens, total processing
+* **Speed Metrics**: Tokens per second for prompt processing and generation
+* **Memory Usage**: Peak memory consumption during processing
+* **Timing**: Total processing time per model
+* **Success Rate**: Model success/failure statistics
+* **Error Analysis**: Detailed error reporting and diagnostics
 
 ## Troubleshooting
 
@@ -303,19 +250,19 @@ python check_models.py --verbose
 
 This provides:
 
-- Detailed model loading information
-- EXIF metadata extraction details
-- Performance metric breakdowns
-- Error stack traces
-- Library version information
+* Detailed model loading information
+* EXIF metadata extraction details
+* Performance metric breakdowns
+* Error stack traces
+* Library version information
 
 ## Notes
 
-- **Platform**: Requires macOS with Apple Silicon for MLX support
-- **Colors**: Uses ANSI color codes for CLI output (may not display correctly in all terminals)
-- **Timeout**: Unix-only functionality (not available on Windows)
-- **Security**: The `--trust-remote-code` flag allows arbitrary code execution from models
-- **Performance**: First run may be slower due to model compilation and caching
+* **Platform**: Requires macOS with Apple Silicon for MLX support
+* **Colors**: Uses ANSI color codes for CLI output (may not display correctly in all terminals)
+* **Timeout**: Unix-only functionality (not available on Windows)
+* **Security**: The `--trust-remote-code` flag allows arbitrary code execution from models
+* **Performance**: First run may be slower due to model compilation and caching
 
 ## Project Structure
 
@@ -337,8 +284,8 @@ mlx-vlm-check/
 
 ## Important Notes
 
-- Timeout functionality requires UNIX (not available on Windows).
-- For best results, ensure all dependencies are installed and models are downloaded/cached.
+* Timeout functionality requires UNIX (not available on Windows).
+* For best results, ensure all dependencies are installed and models are downloaded/cached.
 
 ## License
 
