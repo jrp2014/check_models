@@ -82,10 +82,65 @@ pip install mlx>=0.10.0 mlx-vlm>=0.0.9 Pillow>=10.0.0 huggingface-hub>=0.20.0 ta
 
 ## Requirements
 
-* **Python**: 3.12+ (3.9+ may work but 3.12+ recommended)
-* **Operating System**: macOS with Apple Silicon (required for MLX)
-* **Dependencies**: Automatically handled by pyproject.toml
-* **Models**: MLX-compatible Vision Language Models (downloaded automatically from Hugging Face)
+* **Python**: 3.12+ (3.12 is the tested baseline)
+* **Operating System**: macOS with Apple Silicon (MLX is Apple‑Silicon specific)
+* **Models**: MLX-compatible Vision Language Models (fetched via Hugging Face)
+
+## Dependencies
+
+Runtime (installed automatically via `pip install -e .`):
+
+| Purpose | Package | Minimum |
+|---------|---------|---------|
+| Core tensor/runtime | `mlx` | `>=0.10.0` |
+| Vision‑language utilities | `mlx-vlm` | `>=0.0.9` |
+| Image EXIF & loading | `Pillow` | `>=10.0.0` |
+| Model cache / discovery | `huggingface-hub` | `>=0.20.0` |
+| Tabular console & report formatting | `tabulate` | `>=0.9.0` |
+| Local timezone conversion | `tzlocal` | `>=5.0` |
+
+Optional (enable additional features if present):
+
+| Feature | Package | Notes |
+|---------|---------|-------|
+| Additional model families / loaders | `transformers` | Pulled in via `extras` group |
+| Alternative MLX language utilities | `mlx-lm` | Pulled in via `extras` group |
+| Fast tokenizer backends | `tokenizers` | Installed with `transformers` typically |
+| Extended system metrics (RAM/CPU) | `psutil` | If missing, hardware block is reduced |
+
+Development / QA:
+
+| Purpose | Package |
+|---------|---------|
+| Linting & formatting checks | `ruff` |
+| Static type checking | `mypy` |
+| Testing | `pytest`, `pytest-cov` |
+
+### Minimal Install (runtime only)
+
+```bash
+pip install mlx>=0.10.0 mlx-vlm>=0.0.9 Pillow>=10.0.0 huggingface-hub>=0.20.0 tabulate>=0.9.0 tzlocal>=5.0
+```
+
+### With Optional Extras
+
+The `extras` group in `pyproject.toml` pulls in `transformers` and `mlx-lm`:
+
+```bash
+pip install -e ".[extras]"
+```
+
+### Full Development Environment
+
+```bash
+pip install -e ".[dev,extras]"
+```
+
+Notes:
+ 
+* `psutil` is optional; if not installed the extended Apple Silicon hardware section omits RAM/cores.
+* `system_profiler` is a macOS built-in (no install needed) used for GPU name / core info.
+* Long embedded CSS / HTML lines are intentional (readability > artificial wrapping).
 
 ## Usage
 
