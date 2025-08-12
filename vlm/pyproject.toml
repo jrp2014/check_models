@@ -27,15 +27,15 @@ Issues = "https://github.com/ml-explore/mlx-examples/issues"
 mlx-vlm-check = "check_models:main_cli"
 
 [project.dependencies]
-# Core MLX dependencies  
-mlx = ">=0.10.0"
+# Core MLX dependencies (raised minimums to align with currently tested APIs)
+mlx = ">=0.14.0"
 mlx-vlm = ">=0.0.9"
 
 # Image processing
 Pillow = ">=10.0.0"
 
 # Model and caching utilities
-huggingface-hub = ">=0.20.0"
+huggingface-hub = ">=0.23.0"
 
 # Report generation 
 tabulate = ">=0.9.0"
@@ -46,8 +46,11 @@ tzlocal = ">=5.0"
 [project.optional-dependencies]
 # Optional dependencies for enhanced functionality
 extras = [
-    "transformers>=4.30.0",
+    # Newer transformers provides improved multimodal templates & bug fixes
+    "transformers>=4.41.0,<5",
     "mlx-lm>=0.10.0",
+    # Hardware metrics (optional system block)
+    "psutil>=5.9.0",
 ]
 
 # Development dependencies

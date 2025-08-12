@@ -92,10 +92,10 @@ Runtime (installed automatically via `pip install -e .`):
 
 | Purpose | Package | Minimum |
 |---------|---------|---------|
-| Core tensor/runtime | `mlx` | `>=0.10.0` |
+| Core tensor/runtime | `mlx` | `>=0.14.0` |
 | Vision‑language utilities | `mlx-vlm` | `>=0.0.9` |
 | Image EXIF & loading | `Pillow` | `>=10.0.0` |
-| Model cache / discovery | `huggingface-hub` | `>=0.20.0` |
+| Model cache / discovery | `huggingface-hub` | `>=0.23.0` |
 | Tabular console & report formatting | `tabulate` | `>=0.9.0` |
 | Local timezone conversion | `tzlocal` | `>=5.0` |
 
@@ -103,10 +103,10 @@ Optional (enable additional features if present):
 
 | Feature | Package | Notes |
 |---------|---------|-------|
-| Additional model families / loaders | `transformers` | Pulled in via `extras` group |
-| Alternative MLX language utilities | `mlx-lm` | Pulled in via `extras` group |
-| Fast tokenizer backends | `tokenizers` | Installed with `transformers` typically |
-| Extended system metrics (RAM/CPU) | `psutil` | If missing, hardware block is reduced |
+| Additional model families / loaders | `transformers` | Via `extras`; use up-to-date (>=4.41.0) for latest multimodal fixes |
+| Alternative MLX language utilities | `mlx-lm` | Via `extras` group |
+| Fast tokenizer backends | `tokenizers` | Installed automatically with `transformers` (no manual install) |
+| Extended system metrics (RAM/CPU) | `psutil` | Included in `extras`; optional for hardware block |
 
 Development / QA:
 
@@ -119,12 +119,12 @@ Development / QA:
 ### Minimal Install (runtime only)
 
 ```bash
-pip install mlx>=0.10.0 mlx-vlm>=0.0.9 Pillow>=10.0.0 huggingface-hub>=0.20.0 tabulate>=0.9.0 tzlocal>=5.0
+pip install mlx>=0.14.0 mlx-vlm>=0.0.9 Pillow>=10.0.0 huggingface-hub>=0.23.0 tabulate>=0.9.0 tzlocal>=5.0
 ```
 
 ### With Optional Extras
 
-The `extras` group in `pyproject.toml` pulls in `transformers` and `mlx-lm`:
+The `extras` group in `pyproject.toml` pulls in `transformers`, `mlx-lm`, and `psutil`:
 
 ```bash
 pip install -e ".[extras]"
@@ -138,7 +138,12 @@ pip install -e ".[dev,extras]"
 
 Notes:
  
-* `psutil` is optional; if not installed the extended Apple Silicon hardware section omits RAM/cores.
+* `psutil` is optional (installed with `extras`); if absent the extended Apple Silicon hardware section omits RAM/cores.
+* `tokenizers` is a transitive dependency of `transformers`; you don't need to list or install it separately.
+* `transformers` moves quickly for multimodal / vision improvements. Keeping it updated (within the declared range `>=4.41.0,<5`) is recommended:
+  * Upgrade: `pip install -U transformers`
+  * If a 5.x release appears, test locally before relaxing the `<5` upper bound.
+  * Newer releases often fix chat template, processor, and safety issues relevant to VLMs.
 * `system_profiler` is a macOS built-in (no install needed) used for GPU name / core info.
 * Long embedded CSS / HTML lines are intentional (readability > artificial wrapping).
 
