@@ -1,0 +1,2 @@
+mlx-community/llava-v1.6-34b-8bit
+mlx-community/llava-v1.6-mistral-7b-8bit

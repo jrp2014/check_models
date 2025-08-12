@@ -519,7 +519,7 @@ def get_device_info() -> dict[str, Any] | None:
             timeout=5,
         )
         return json.loads(data)
-    except Exception as err:  # noqa: BLE001 broad OK here
+    except Exception as err:
         logger.debug("Could not retrieve GPU information: %s", err)
         return None
 
