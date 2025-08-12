@@ -40,6 +40,8 @@ Current config (see `pyproject.toml`):
   - Add a top‑of‑function comment summarizing the flow; OR
   - If truly egregious and conceptually separable, refactor.
   - Suppression (`# noqa: C901`) is allowed with an explanatory comment above it.
+- Use `ruff format` for layout formatting
+- Use `ruff check --fix` to 
 
 ## Function Size & Complexity
 
