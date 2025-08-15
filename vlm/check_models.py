@@ -3,6 +3,13 @@
 
 from __future__ import annotations
 
+import os
+# Prevent Transformers from importing heavy backends that can hang on macOS/ARM
+# when they are present in the environment but not needed for MLX workflows.
+os.environ.setdefault("TRANSFORMERS_NO_TF", "1")
+os.environ.setdefault("TRANSFORMERS_NO_FLAX", "1")
+os.environ.setdefault("TRANSFORMERS_NO_JAX", "1")
+
 import argparse
 import contextlib
 import functools

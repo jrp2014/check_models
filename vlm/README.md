@@ -316,6 +316,26 @@ This provides:
 * Error stack traces
 * Library version information
 
+### TensorFlow-related hangs on macOS/Apple Silicon
+
+If the process appears to stall during imports with TensorFlow/Abseil mutex lines (e.g., from a `sample` stack trace), Transformers may be auto-importing TensorFlow even though MLX doesn’t need it. You can prevent this in two ways:
+
+1. Set environment flags (recommended):
+
+```bash
+export TRANSFORMERS_NO_TF=1
+export TRANSFORMERS_NO_FLAX=1
+export TRANSFORMERS_NO_JAX=1
+```
+
+1. Uninstall TensorFlow from the environment to avoid accidental imports:
+
+```bash
+pip uninstall -y tensorflow tensorflow-macos tensorflow-metal
+```
+
+Note: `check_models.py` also sets these environment flags automatically to avoid heavy backend imports.
+
 ## Notes
 
 * **Platform**: Requires macOS with Apple Silicon for MLX support
