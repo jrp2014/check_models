@@ -414,65 +414,73 @@ def fmt_num(val: float | str) -> str:
     except (ValueError, TypeError, OverflowError):
         return str(val)
 
-
 def format_field_label(field_name: str) -> str:
-    """Convert field_name to a formatted display label."""
+    """Return a human-friendly label for a metric field name."""
     return field_name.replace("_", " ").title()
 
 
-def format_field_value(field_name: str, value: object) -> object:
-    """Return a display-friendly value with lightweight normalization.
+def format_field_value(field_name: str, value: object) -> str:
+    """Normalize and format field values for display.
 
-    Memory fields (*_memory): incoming values may be reported by different
-    internal sources in (a) MB already, (b) raw bytes, or (c) GB. We apply a
-    pragmatic heuristic rather than require every caller to normalize:
-
-    Heuristic tiers (fval == numeric value provided):
-        1. fval < 1.0               -> assume already MB (tiny fractional usage)
-        2. fval > LARGE_NUMBER_THRESHOLD * MB_CONVERSION
-                                                             -> treat as raw bytes, divide by MB
-        3. LARGE_NUMBER_THRESHOLD < fval < 10 * LARGE_NUMBER_THRESHOLD
-                                                             -> treat as already MB (reasonable magnitude)
-        4. fval > LARGE_NUMBER_THRESHOLD (and not caught by #2/3)
-                                                             -> treat as GB, convert to MB ( * 1024 )
-        5. else (<= threshold but >= 1.0) -> also treat as GB (historical path)
-
-    This keeps the UI consistent while avoiding per-source conditionals. The
-    trade-off: extremely edge case sizes near thresholds could misclassify;
-    acceptable for human-facing summary. If stricter accuracy is needed, a
-    future refactor could pass explicit units alongside values.
+        - Memory fields ("*_memory"): try to display in MB with commas.
+            Heuristic:
+        * > 10*MB_CONVERSION -> treat as bytes, convert to MB
+        * between 1 and 10*MB_CONVERSION -> assume MB already
+        * < 1.0 -> small fractional MB, keep as-is
+    * large but not bytes -> treat as GB and convert to MB (x1024)
+    - Time fields: format as seconds with 3 decimals + trailing 's'.
+    - TPS fields: compact with either 0, 1, or 3 sig figs depending on size.
+    - Other numerics: use fmt_num; non-numerics: str(value) or '-'.
     """
-    if field_name.endswith("_memory") and isinstance(value, (int, float)):
+    if value is None:
+        return "-"
+    # Numeric handling
+    if isinstance(value, (int, float)):
+        num = float(value)
+        if field_name.endswith("_memory"):
+            if num > 10 * MB_CONVERSION:
+                mb = num / MB_CONVERSION
+            elif num < 1.0:
+                mb = num
+            elif num > LARGE_NUMBER_THRESHOLD and num < (10 * LARGE_NUMBER_THRESHOLD):
+                mb = num  # plausibly MB already
+            elif num > LARGE_NUMBER_THRESHOLD:
+                mb = num * 1024  # treat as GB
+            else:
+                mb = num  # default to MB
+            return f"{mb:,.0f}"
+        if field_name.endswith("_tps"):
+            if abs(num) >= LARGE_NUMBER_THRESHOLD:
+                return f"{num:,.0f}"
+            if abs(num) >= MEDIUM_NUMBER_THRESHOLD:
+                return f"{num:.1f}"
+            return f"{num:.3g}"
+        if field_name in {"time", "duration", "total_time", "generation_time", "model_load_time"}:
+            return f"{num:.3f}s"
+        return fmt_num(num)
+    # String numerics (e.g., from JSON/tabulate paths)
+    if isinstance(value, str) and value:
+        s = value.strip().replace(",", "")
         try:
-            fval = float(value)
-        except (TypeError, ValueError):  # Defensive: return original on failure
+            f = float(s)
+        except ValueError:
             return value
-        if fval < 1.0:
-            mb_value = fval
-        elif fval > (LARGE_NUMBER_THRESHOLD * MB_CONVERSION):
-            mb_value = fval / MB_CONVERSION
-        elif fval > LARGE_NUMBER_THRESHOLD and fval < (10 * LARGE_NUMBER_THRESHOLD):
-            mb_value = fval  # assume already MB
-        elif fval > LARGE_NUMBER_THRESHOLD:
-            mb_value = fval * 1024  # treat as GB
-        else:
-            mb_value = fval * 1024  # treat as GB (standard case)
-        return f"{mb_value:,.0f}"
-    if field_name.endswith("_tps") and isinstance(value, (int, float)):
-        # Format TPS values to 1 decimal place or 3 significant figures with comma separators
-        if abs(value) >= LARGE_NUMBER_THRESHOLD:
-            return f"{value:,.0f}"  # No decimal for large values (≥100)
-        if abs(value) >= MEDIUM_NUMBER_THRESHOLD:
-            return f"{value:,.1f}"  # 1 decimal place for medium values (10-99.9)
-        return f"{value:.2g}"  # Up to 2 significant figures for small values (<10)
-    return value
+        return format_field_value(field_name, f)
+    return str(value)
 
 
 def is_numeric_value(val: float | str | object) -> bool:
-    """Check if a value is numeric or a string representing a numeric value."""
-    return isinstance(val, (int, float)) or (
-        isinstance(val, str) and val.replace(".", "", 1).isdigit()
-    )
+    """Return True if val can be interpreted as a number."""
+    if isinstance(val, (int, float)):
+        return True
+    if isinstance(val, str):
+        s = val.strip().replace(",", "")
+        try:
+            float(s)
+            return True
+        except ValueError:
+            return False
+    return False
 
 
 def is_numeric_field(field_name: str) -> bool:
@@ -524,12 +532,17 @@ def get_device_info() -> dict[str, Any] | None:
         return None
     try:
         data = subprocess.check_output(
-            ["system_profiler", "SPDisplaysDataType", "-json"],
+            ["/usr/sbin/system_profiler", "SPDisplaysDataType", "-json"],
             text=True,
             timeout=5,
         )
         return json.loads(data)
-    except Exception as err:
+    except (
+        subprocess.SubprocessError,
+        json.JSONDecodeError,
+        FileNotFoundError,
+        PermissionError,
+    ) as err:
         logger.debug("Could not retrieve GPU information: %s", err)
         return None
 
@@ -755,7 +768,7 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
                         },
                     )
             except (KeyError, AttributeError, TypeError):
-                logger.exception("Could not extract Exif SubIFD")
+                logger.warning("Could not extract Exif SubIFD")
             # Third pass: Process GPS IFD (if available)
             try:
                 gps_ifd: Any = exif_raw.get_ifd(ExifTags.IFD.GPSInfo)
@@ -775,7 +788,6 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
         logger.exception(
             Colors.colored(f"Error reading image file: {img_path_str}", Colors.YELLOW),
         )
-    except (OSError, ValueError, TypeError):
         logger.exception(
             Colors.colored(
                 f"Unexpected error reading EXIF from: {img_path_str}",
@@ -1862,8 +1874,8 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     """Process an image with a Vision Language Model, managing stats and errors."""
     logger.info(
         "Processing '%s' with model: %s",
-        str(getattr(params.image_path, "name", params.image_path)),
-        params.model_identifier,
+        Colors.colored(str(getattr(params.image_path, "name", params.image_path)), Colors.MAGENTA),
+        Colors.colored(params.model_identifier, Colors.MAGENTA),
     )
     model: object | None = None
     tokenizer: object | None = None
@@ -1959,7 +1971,9 @@ def print_cli_section(title: str) -> None:
     """Print a formatted CLI section header."""
     separator_line: str = "-" * 60
     logger.info(separator_line)
-    logger.info("[ %s ]", title.upper())
+    # Avoid uppercasing when ANSI escape codes are present (would corrupt codes)
+    safe_title = title if "\x1b[" in title else title.upper()
+    logger.info("[ %s ]", safe_title)
     logger.info(separator_line)
 
 
@@ -2035,15 +2049,12 @@ def print_model_result(
         if result.generation:
             raw_text = getattr(result.generation, "text", "")
             text_str = str(raw_text)
-            # Start on a fresh line in the log output
-            logger.info("")
             if not text_str:
                 logger.info("%s", Colors.colored("<empty>", Colors.CYAN))
             else:
                 for original_line in text_str.splitlines():
                     if original_line == "":
-                        logger.info("")
-                        continue
+                        continue  # avoid random blank lines
                     # Use drop_whitespace to avoid leading spaces on wrapped continuation lines.
                     wrapped = textwrap.wrap(
                         original_line,
