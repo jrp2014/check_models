@@ -3,13 +3,15 @@
 
 from __future__ import annotations
 
+import importlib.util as importlib_util
 import os
 
 # Prevent Transformers from importing heavy backends that can hang on macOS/ARM
 # when they are present in the environment but not needed for MLX workflows.
-os.environ.setdefault("TRANSFORMERS_NO_TF", "1")
-os.environ.setdefault("TRANSFORMERS_NO_FLAX", "1")
-os.environ.setdefault("TRANSFORMERS_NO_JAX", "1")
+if os.getenv("MLX_VLM_ALLOW_TF", "0") != "1":
+    os.environ.setdefault("TRANSFORMERS_NO_TF", "1")
+    os.environ.setdefault("TRANSFORMERS_NO_FLAX", "1")
+    os.environ.setdefault("TRANSFORMERS_NO_JAX", "1")
 
 import argparse
 import contextlib
@@ -28,7 +30,7 @@ import traceback
 
 try:  # Optional hardware metrics
     import psutil
-except ImportError:  # pragma: no cover - optional dependency
+except ImportError:
     psutil = None
 from dataclasses import dataclass, fields
 from datetime import UTC, datetime
@@ -118,7 +120,7 @@ except ImportError:
 try:
     import tokenizers
 
-    tokenizers_version: str = tokenizers.__version__
+    tokenizers_version: str = getattr(tokenizers, "__version__", NOT_AVAILABLE)
 except ImportError:
     tokenizers_version = NOT_AVAILABLE
 
@@ -2164,6 +2166,20 @@ def setup_environment(args: argparse.Namespace) -> dict[str, str]:
 
     if args.verbose:
         logger.debug("Verbose/debug mode enabled.")
+
+    # Warn if TensorFlow or sentence-transformers are present
+    tf_present = bool(importlib_util.find_spec("tensorflow"))
+    st_present = bool(importlib_util.find_spec("sentence_transformers"))
+    guard_on = os.getenv("MLX_VLM_ALLOW_TF", "0") != "1"
+    if guard_on and tf_present:
+        logger.info(
+            "TensorFlow detected but disabled (set MLX_VLM_ALLOW_TF=1 to opt in)",
+        )
+    if st_present:
+        logger.info(
+            "Detected 'sentence-transformers'. It's not used here by default and may "
+            "import heavy backends.",
+        )
 
     library_versions: dict[str, str] = get_library_versions()
     if args.verbose:
