@@ -414,6 +414,7 @@ def fmt_num(val: float | str) -> str:
     except (ValueError, TypeError, OverflowError):
         return str(val)
 
+
 def format_field_label(field_name: str) -> str:
     """Return a human-friendly label for a metric field name."""
     return field_name.replace("_", " ").title()
