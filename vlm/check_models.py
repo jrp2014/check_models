@@ -1347,7 +1347,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
         headers=headers,
         tablefmt="plain",
         colalign=colalign,
-    maxcolwidths=widths,
+        maxcolwidths=widths,
     )
 
     # Print the table with surrounding decorations
