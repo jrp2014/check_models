@@ -457,7 +457,7 @@ def format_field_value(field_name: str, value: object) -> str:
                 return f"{num:.1f}"
             return f"{num:.3g}"
         if field_name in {"time", "duration", "total_time", "generation_time", "model_load_time"}:
-            return f"{num:.3f}s"
+            return f"{num:.2f}s"
         return fmt_num(num)
     # String numerics (e.g., from JSON/tabulate paths)
     if isinstance(value, str) and value:
@@ -1329,14 +1329,10 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
             widths.append(72)
         elif name == "peak_memory":
             widths.append(7)  # slightly wider to fit commas comfortably
-        elif name in {
-            "tokens",
-            "prompt_tokens",
-            "generation_tokens",
-            "prompt_tps",
-            "generation_tps",
-        }:
-            widths.append(5)
+        elif name in {"tokens", "prompt_tokens", "generation_tokens", "total_tokens"}:
+            widths.append(9)  # allow up to 9,999,999 comfortably with commas
+        elif name in {"prompt_tps", "generation_tps"}:
+            widths.append(6)
         elif name in {"time", "duration", "generation_time", "model_load_time", "total_time"}:
             widths.append(6)
         else:
@@ -2052,7 +2048,7 @@ def print_model_result(
             if isinstance(tt, str):
                 parts.append(f"total_time={tt}")
             else:
-                parts.append(f"total_time={total_time:.3f}s")
+                parts.append(f"total_time={total_time:.2f}s")
     if result.error_stage:
         parts.append(f"stage={result.error_stage}")
     if result.error_message:
@@ -2133,7 +2129,7 @@ def print_model_result(
             tt_disp = (
                 formatted_total_time
                 if isinstance(formatted_total_time, str)
-                else f"{total_time:.3f}s"
+                else f"{total_time:.2f}s"
             )
             logger.info("  Total Time: %s", Colors.colored(tt_disp, Colors.WHITE))
 
@@ -2144,7 +2140,7 @@ def print_model_result(
             gt_disp = (
                 formatted_generation
                 if isinstance(formatted_generation, str)
-                else f"{generation_time:.3f}s"
+                else f"{generation_time:.2f}s"
             )
             logger.info("  Generation Time: %s", Colors.colored(gt_disp, Colors.WHITE))
 
@@ -2152,7 +2148,7 @@ def print_model_result(
         if model_load_time is not None and model_load_time > 0:
             formatted_load = format_field_value("model_load_time", model_load_time)
             ml_disp = (
-                formatted_load if isinstance(formatted_load, str) else f"{model_load_time:.3f}s"
+                formatted_load if isinstance(formatted_load, str) else f"{model_load_time:.2f}s"
             )
             logger.info("  Model Load Time: %s", Colors.colored(ml_disp, Colors.WHITE))
 
