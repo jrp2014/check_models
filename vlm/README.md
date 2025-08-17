@@ -145,6 +145,8 @@ Notes:
   * If a 5.x release appears, test locally before relaxing the `<5` upper bound.
   * Newer releases often fix chat template, processor, and safety issues relevant to VLMs.
 * `system_profiler` is a macOS built-in (no install needed) used for GPU name / core info.
+* Torch is supported and can be installed when you need it for specific models; the script does not block Torch.
+* Installing `sentence-transformers` isn’t necessary for this tool and may pull heavy backends into import paths; a heads‑up is logged if detected.
 * Long embedded CSS / HTML lines are intentional (readability > artificial wrapping).
 
 ## Usage
@@ -220,6 +222,11 @@ Real-time colorized output showing:
 * Error diagnostics for failed models
 * Final performance summary table
 
+Color conventions:
+
+* Identifiers (file/folder paths and model names) are shown in magenta for quick scanning.
+* Failures are shown in red; the compact CLI table also highlights failed model names in red.
+
 ### HTML Report
 
 Professional report featuring:
@@ -228,6 +235,7 @@ Professional report featuring:
 * Interactive performance table with sortable columns
 * Model outputs and diagnostics
 * System information and library versions
+* Failed rows are highlighted in red for quick identification
 * Responsive design for mobile viewing
 
 ### Markdown Report
@@ -328,13 +336,18 @@ export TRANSFORMERS_NO_FLAX=1
 export TRANSFORMERS_NO_JAX=1
 ```
 
-1. Uninstall TensorFlow from the environment to avoid accidental imports:
+1. Uninstall TensorFlow from the environment to avoid accidental imports (recommended for MLX-only envs):
 
 ```bash
 pip uninstall -y tensorflow tensorflow-macos tensorflow-metal
 ```
 
-Note: `check_models.py` also sets these environment flags automatically to avoid heavy backend imports.
+Script behavior:
+
+* On startup, the script sets `TRANSFORMERS_NO_TF=1`, `TRANSFORMERS_NO_FLAX=1`, `TRANSFORMERS_NO_JAX=1` unless you explicitly opt in with `MLX_VLM_ALLOW_TF=1`.
+* Torch is allowed by default (some models require it).
+* A startup log warns if TensorFlow is installed but disabled; a heads‑up is also logged if `sentence-transformers` is present.
+* Warning: Installing TensorFlow on macOS/Apple Silicon can trigger hangs during import (Abseil mutex). Prefer not installing it in MLX‑only environments.
 
 ## Notes
 

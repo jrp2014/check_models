@@ -1259,9 +1259,14 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     # Build table rows with multi-line formatting for better space utilization
     rows: list[list[str]] = []
     for r in results:
-        # Format model name with multi-line support
+        # Format model name with multi-line support and color
         model_display = _format_model_name_multiline(str(r.model_name))
-        row: list[str] = [model_display]
+        model_colored = (
+            Colors.colored(model_display, Colors.RED)
+            if not r.success
+            else Colors.colored(model_display, Colors.MAGENTA)
+        )
+        row: list[str] = [model_colored]
 
         # Add generation fields and performance timing fields
         for f in all_fields:
@@ -1448,6 +1453,23 @@ def generate_html_report(
         tablefmt="unsafehtml",
         colalign=colalign,
     )
+
+    # Mark failed rows in the HTML table by adding a CSS class on <tr>
+    failed_set = {idx for idx, r in enumerate(results) if not r.success}
+    if failed_set and "<tbody>" in html_table:
+        tbody_start = html_table.find("<tbody>")
+        tbody_end = html_table.find("</tbody>", tbody_start)
+        if tbody_start != -1 and tbody_end != -1:
+            body_html = html_table[tbody_start:tbody_end]
+            row_index = -1
+
+            def _row_replacer(match: re.Match[str]) -> str:
+                nonlocal row_index
+                row_index += 1
+                return '<tr class="failed-row">' if row_index in failed_set else match.group(0)
+
+            body_html = re.sub(r"<tr>", _row_replacer, body_html)
+            html_table = html_table[:tbody_start] + body_html + html_table[tbody_end:]
 
     # Use the shared FIELD_UNITS constant
     local_tz = get_localzone()
@@ -2038,10 +2060,10 @@ def print_model_result(
 
     # --- Detailed block (verbose success OR any failure) ---
     if result.success:
-        header = f"✓ SUCCESS: {model_short_name}"
+        header = f"✓ SUCCESS: {Colors.colored(model_short_name, Colors.MAGENTA)}"
         logger.info(Colors.colored(header, Colors.BOLD, Colors.GREEN))
     else:
-        header = f"✗ FAILED: {model_short_name}"
+        header = f"✗ FAILED: {Colors.colored(model_short_name, Colors.RED)}"
         logger.error(Colors.colored(header, Colors.BOLD, Colors.RED))
 
     if not result.success:
@@ -2176,7 +2198,7 @@ def setup_environment(args: argparse.Namespace) -> dict[str, str]:
             "TensorFlow detected but disabled (set MLX_VLM_ALLOW_TF=1 to opt in)",
         )
     if st_present:
-        logger.info(
+        logger.warning(
             "Detected 'sentence-transformers'. It's not used here by default and may "
             "import heavy backends.",
         )
@@ -2196,7 +2218,9 @@ def setup_environment(args: argparse.Namespace) -> dict[str, str]:
 def find_and_validate_image(args: argparse.Namespace) -> Path:
     """Find and validate the image file to process from arguments."""
     folder_path: Path = args.folder.resolve()
-    print_cli_section(f"Scanning folder: {folder_path}")
+    print_cli_section(
+        f"Scanning folder: {Colors.colored(str(folder_path), Colors.MAGENTA)}",
+    )
 
     if args.folder == DEFAULT_FOLDER and not DEFAULT_FOLDER.is_dir():
         print_cli_error(f"Default folder '{DEFAULT_FOLDER}' does not exist.")
@@ -2209,8 +2233,10 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
         sys.exit(1)
 
     resolved_image_path: Path = image_path.resolve()
-    print_cli_section(f"Image File: {resolved_image_path.name}")
-    logger.info("Full path: %s", str(resolved_image_path))
+    print_cli_section(
+        f"Image File: {Colors.colored(resolved_image_path.name, Colors.MAGENTA)}",
+    )
+    logger.info("Full path: %s", Colors.colored(str(resolved_image_path), Colors.MAGENTA))
 
     try:
         with Image.open(resolved_image_path) as img:
@@ -2417,7 +2443,10 @@ def process_models(
         logger.info("Processing %d model(s)...", len(model_identifiers))
     for idx, model_id in enumerate(model_identifiers, start=1):
         print_cli_separator()
-        print_cli_section(f"Processing Model: {model_id.split('/')[-1]}")
+        model_label = model_id.split("/")[-1]
+        print_cli_section(
+            f"Processing Model: {Colors.colored(model_label, Colors.MAGENTA)}",
+        )
 
         is_vlm_verbose: bool = args.verbose
         params = ProcessImageParams(

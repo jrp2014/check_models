@@ -19,9 +19,9 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/ml-explore/mlx-examples"
-Repository = "https://github.com/ml-explore/mlx-examples"
-Issues = "https://github.com/ml-explore/mlx-examples/issues"
+Homepage = "https://github.com/jrp2014/scripts"
+Repository = "https://github.com/jrp2014/scripts"
+Issues = "https://github.com/jrp2014/scripts/issues"
 
 [project.scripts]
 mlx-vlm-check = "check_models:main_cli"
@@ -52,6 +52,14 @@ extras = [
     # Hardware metrics (optional system block)
     "psutil>=5.9.0",
 ]
+
+# Guidance: Torch is supported but not required globally; install only when needed for specific models.
+# Example (uncomment to use a curated torch extra):
+# torch = [
+#     "torch>=2.2.0; platform_system == 'Darwin'",
+#     "torchvision>=0.17.0; platform_system == 'Darwin'",
+#     "torchaudio>=2.2.0; platform_system == 'Darwin'",
+# ]
 
 # Development dependencies
 dev = [

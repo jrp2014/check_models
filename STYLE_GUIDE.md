@@ -41,7 +41,7 @@ Current config (see `pyproject.toml`):
   - If truly egregious and conceptually separable, refactor.
   - Suppression (`# noqa: C901`) is allowed with an explanatory comment above it.
 - Use `ruff format` for layout formatting
-- Use `ruff check --fix` to 
+- Use `ruff check --fix` to
 
 ## Function Size & Complexity
 
@@ -74,6 +74,21 @@ Before refactoring for size:
 - Use the central logger; avoid stray `print` except for deliberate user‑facing terminal blocks (currently generation output preview).
 - SUMMARY log lines must remain machine‑parsable (`SUMMARY key=value ...`).
 - Generated model output (non‑verbose mode) respects 80‑column wrapping while preserving logical newlines.
+
+### Color conventions (CLI and reports)
+
+- Identifiers (file/folder paths and model names): magenta in CLI for quick visual scanning.
+- Failures: red in CLI; in HTML tables failed rows are styled with a red background/text using the `failed-row` class.
+- Markdown: no colors (GitHub Markdown doesn’t support ANSI); consider adding a textual marker like "FAILED" when needed.
+
+### Backend import guard policy
+
+- Default: block heavy backends that are not needed for MLX workflows to avoid macOS/Apple Silicon hangs:
+  - Set `TRANSFORMERS_NO_TF=1`, `TRANSFORMERS_NO_FLAX=1`, `TRANSFORMERS_NO_JAX=1` at process start.
+  - Torch is allowed by default (some models require it).
+- Opt‑in to TensorFlow/Flax/JAX by setting `MLX_VLM_ALLOW_TF=1` before running.
+- Warning: Installing TensorFlow on macOS/ARM may trigger an Abseil mutex stall during import in unrelated code paths. Prefer not installing it in MLX‑only environments or keep it disabled via the guard.
+- Note: Installing `sentence-transformers` isn’t required here and may import heavy backends; the script logs a heads‑up if it’s detected.
 
 ## Constants & Naming
 
