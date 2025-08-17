@@ -1319,12 +1319,35 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
 
     # Generate compact table using plain format with multi-line headers
     # Plain format handles multi-line headers properly for logger output
+    # Column widths: allocate more to first (Model) and last (Output) columns,
+    # and tighten numeric columns to reduce visible padding.
+    widths: list[int] = []
+    for i, name in enumerate(field_names):
+        if i == 0:  # Model column
+            widths.append(26)
+        elif name == "output":
+            widths.append(72)
+        elif name == "peak_memory":
+            widths.append(7)  # slightly wider to fit commas comfortably
+        elif name in {
+            "tokens",
+            "prompt_tokens",
+            "generation_tokens",
+            "prompt_tps",
+            "generation_tps",
+        }:
+            widths.append(5)
+        elif name in {"time", "duration", "generation_time", "model_load_time", "total_time"}:
+            widths.append(6)
+        else:
+            widths.append(4)
+
     table = tabulate(
         rows,
         headers=headers,
         tablefmt="plain",
         colalign=colalign,
-        maxcolwidths=[18, 6, 5, 5, 5, 6, 6, 5, 40],  # Tighter widths for more compact output
+    maxcolwidths=widths,
     )
 
     # Print the table with surrounding decorations
