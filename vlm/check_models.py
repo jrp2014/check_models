@@ -470,9 +470,10 @@ def is_numeric_value(val: float | str | object) -> bool:
         s = val.strip().replace(",", "")
         try:
             float(s)
-            return True
         except ValueError:
             return False
+        else:
+            return True
     return False
 
 
