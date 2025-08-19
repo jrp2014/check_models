@@ -498,6 +498,30 @@ def is_numeric_field(field_name: str) -> bool:
 is_numeric_string = is_numeric_value
 
 
+# --- Console UI helpers (rules/separators) ---
+def log_rule(
+    width: int = 80,
+    *,
+    char: str = "-",
+    color: str | None = None,
+    bold: bool = False,
+) -> None:
+    """Log a horizontal rule line with optional color and bold.
+
+    Keeps a single place for styling separators to ensure consistency.
+    """
+    line = char * max(1, width)
+    if color or bold:
+        styles: list[str] = []
+        if bold:
+            styles.append(Colors.BOLD)
+        if color:
+            styles.append(color)
+        logger.info(Colors.colored(line, *styles))
+    else:
+        logger.info(line)
+
+
 # --- Utility Functions ---
 # Ensure _pad_text is defined only once at module level and used everywhere
 
@@ -1081,25 +1105,17 @@ def pretty_print_exif(
     table_lines: list[str] = table.split("\n")
     table_width: int = max(Colors.visual_len(line) for line in table_lines) if table_lines else 80
 
-    # Print title above the table, visually separated
-    logger.info(
-        Colors.colored("=" * table_width, Colors.BOLD, Colors.BLUE),
-    )
-    logger.info(
-        Colors.colored(f"{title.center(table_width)}", Colors.BOLD, Colors.MAGENTA),
-    )
-    logger.info("")
-    logger.info(
-        Colors.colored("=" * table_width, Colors.BOLD, Colors.BLUE),
-    )
+    # Print title above the table, visually separated (consistent rule styling)
+    log_rule(table_width, char="=", color=Colors.BLUE, bold=True)
+    logger.info(Colors.colored(f"{title.center(table_width)}", Colors.BOLD, Colors.MAGENTA))
+    log_rule(table_width, char="=", color=Colors.BLUE, bold=True)
 
     # Print the tabulated table
     for line in table_lines:
         logger.info(line)
 
-    logger.info(
-        Colors.colored("=" * table_width + "\n", Colors.BOLD, Colors.BLUE),
-    )
+    log_rule(table_width, char="=", color=Colors.BLUE, bold=True)
+    logger.info("")
 
 
 def _get_available_fields(results: list[PerformanceResult]) -> list[str]:
@@ -1331,9 +1347,13 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
             widths.append(7)  # slightly wider to fit commas comfortably
         elif name in {"tokens", "prompt_tokens", "generation_tokens", "total_tokens"}:
             widths.append(9)  # allow up to 9,999,999 comfortably with commas
-        elif name in {"prompt_tps", "generation_tps"}:
-            widths.append(6)
-        elif name in {"time", "duration", "generation_time", "model_load_time", "total_time"}:
+        elif name in {"prompt_tps", "generation_tps"} or name in {
+            "time",
+            "duration",
+            "generation_time",
+            "model_load_time",
+            "total_time",
+        }:
             widths.append(6)
         else:
             widths.append(4)
@@ -1350,10 +1370,10 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     table_lines = table.split("\n")
     max_width = max(len(line) for line in table_lines) if table_lines else 80
 
-    logger.info("=" * max_width)
+    log_rule(max_width, char="=", color=Colors.BLUE, bold=True)
     for line in table_lines:
         logger.info(line)
-    logger.info("=" * max_width)
+    log_rule(max_width, char="=", color=Colors.BLUE, bold=True)
     logger.info("Results sorted by generation time (fastest to slowest).")
 
 
@@ -1981,20 +2001,18 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
 
 def print_cli_header(title: str) -> None:
     """Print a formatted CLI header with the given title."""
-    separator_line: str = "=" * 80
-    logger.info(separator_line)
-    logger.info("%s", title.center(80))
-    logger.info(separator_line)
+    log_rule(80, char="=", color=Colors.BLUE, bold=True)
+    logger.info("%s", Colors.colored(title.center(80), Colors.BOLD, Colors.MAGENTA))
+    log_rule(80, char="=", color=Colors.BLUE, bold=True)
 
 
 def print_cli_section(title: str) -> None:
     """Print a formatted CLI section header."""
-    separator_line: str = "-" * 60
-    logger.info(separator_line)
+    log_rule(60, char="-", color=Colors.BLUE, bold=False)
     # Avoid uppercasing when ANSI escape codes are present (would corrupt codes)
     safe_title = title if "\x1b[" in title else title.upper()
-    logger.info("[ %s ]", safe_title)
-    logger.info(separator_line)
+    logger.info("[ %s ]", Colors.colored(safe_title, Colors.BOLD, Colors.MAGENTA))
+    log_rule(60, char="-", color=Colors.BLUE, bold=False)
 
 
 def print_cli_error(msg: str) -> None:
@@ -2016,48 +2034,155 @@ def print_model_result(
     - Keeps human-readable colored block below when verbose or on failure.
     - Consistent indentation and grouping for easier visual scanning.
     """
+
+    def _build_summary_parts(res: PerformanceResult, model_short: str) -> list[str]:
+        status_local = "OK" if res.success else "FAIL"
+        parts_local: list[str] = [f"model={model_short}", f"status={status_local}"]
+        if res.generation:
+            p_tokens = getattr(res.generation, "prompt_tokens", 0) or 0
+            g_tokens = getattr(res.generation, "generation_tokens", 0) or 0
+            tot_tokens = p_tokens + g_tokens
+            gen_tps = getattr(res.generation, "generation_tps", 0.0) or 0.0
+            peak_mem_val = getattr(res.generation, "peak_memory", 0.0) or 0.0
+            total_time_val = getattr(res, "total_time", None)
+            if tot_tokens:
+                parts_local.append(f"tokens={tot_tokens}")
+            if p_tokens:
+                parts_local.append(f"prompt={p_tokens}")
+            if g_tokens:
+                parts_local.append(f"gen={g_tokens}")
+            if gen_tps:
+                parts_local.append(f"gen_tps={fmt_num(gen_tps)}")
+            if peak_mem_val:
+                peak_str_local = format_field_value("peak_memory", peak_mem_val)
+                if not str(peak_str_local).endswith("MB"):
+                    parts_local.append(f"peak_mem={peak_str_local}MB")
+                else:
+                    parts_local.append(f"peak_mem={peak_str_local}")
+            if total_time_val:
+                tt_val = format_field_value("total_time", total_time_val)
+                if isinstance(tt_val, str):
+                    parts_local.append(f"total_time={tt_val}")
+                else:
+                    parts_local.append(f"total_time={total_time_val:.2f}s")
+        if res.error_stage:
+            parts_local.append(f"stage={res.error_stage}")
+        if res.error_message:
+            clean_err_local = re.sub(r"\s+", " ", str(res.error_message))
+            preview_local = clean_err_local[:ERROR_MESSAGE_PREVIEW_LEN].rstrip()
+            if len(clean_err_local) > ERROR_MESSAGE_PREVIEW_LEN:
+                preview_local += "…"
+            parts_local.append(f"error={preview_local}")
+        return parts_local
+
+    def _print_preview_text(gen_obj: GenerationResult | None) -> None:
+        if not gen_obj:
+            return
+        raw_text_local = getattr(gen_obj, "text", "")
+        text_str_local = str(raw_text_local)
+        if not text_str_local:
+            logger.info("%s", Colors.colored("<empty>", Colors.CYAN))
+            return
+        for original_line in text_str_local.splitlines():
+            if original_line == "":
+                continue
+            wrapped = textwrap.wrap(
+                original_line,
+                width=DISPLAY_WRAP_WIDTH,
+                replace_whitespace=False,
+                drop_whitespace=True,
+                break_long_words=False,
+                break_on_hyphens=False,
+            ) or [""]
+            for wline in wrapped:
+                logger.info("%s", Colors.colored(wline.lstrip(), Colors.CYAN))
+
+    def _log_verbose_success_details(res: PerformanceResult) -> None:
+        if not res.generation:
+            return
+        gen_text_local = getattr(res.generation, "text", "N/A")
+        logger.info("  Generated Text: %s", Colors.colored(gen_text_local, Colors.CYAN))
+
+        p_tokens_local = getattr(res.generation, "prompt_tokens", 0)
+        g_tokens_local = getattr(res.generation, "generation_tokens", 0)
+        tot_tokens_local = p_tokens_local + g_tokens_local
+        gen_tps_local = getattr(res.generation, "generation_tps", 0.0)
+        logger.info(
+            "  Tokens: total=%s prompt=%s gen=%s",
+            fmt_num(tot_tokens_local),
+            fmt_num(p_tokens_local),
+            fmt_num(g_tokens_local),
+        )
+        logger.info("  Generation TPS: %s", Colors.colored(fmt_num(gen_tps_local), Colors.WHITE))
+
+        total_time_local = getattr(res, "total_time", None)
+        if total_time_local is not None and total_time_local > 0:
+            formatted_total_time = format_field_value("total_time", total_time_local)
+            tt_disp_local = (
+                formatted_total_time
+                if isinstance(formatted_total_time, str)
+                else f"{total_time_local:.2f}s"
+            )
+            logger.info("  Total Time: %s", Colors.colored(tt_disp_local, Colors.WHITE))
+
+        generation_time_local = getattr(res, "generation_time", None)
+        if generation_time_local is not None and generation_time_local > 0:
+            formatted_generation = format_field_value("generation_time", generation_time_local)
+            gt_disp_local = (
+                formatted_generation
+                if isinstance(formatted_generation, str)
+                else f"{generation_time_local:.2f}s"
+            )
+            logger.info("  Generation Time: %s", Colors.colored(gt_disp_local, Colors.WHITE))
+
+        model_load_time_local = getattr(res, "model_load_time", None)
+        if model_load_time_local is not None and model_load_time_local > 0:
+            formatted_load = format_field_value("model_load_time", model_load_time_local)
+            ml_disp_local = (
+                formatted_load
+                if isinstance(formatted_load, str)
+                else f"{model_load_time_local:.2f}s"
+            )
+            logger.info("  Model Load Time: %s", Colors.colored(ml_disp_local, Colors.WHITE))
+
+        logger.info(Colors.colored("  Performance Metrics:", Colors.BOLD, Colors.MAGENTA))
+        if hasattr(res.generation, "time"):
+            time_val_local = getattr(res.generation, "time", 0.0) or 0.0
+            logger.info("    Time: %s", Colors.colored(f"{time_val_local:.2f}s", Colors.WHITE))
+
+        def _log_mem(label: str, field: str, raw_val: float) -> None:
+            if raw_val <= 0:
+                return
+            formatted = format_field_value(field, raw_val)
+            text = f"{formatted} MB" if not str(formatted).endswith("MB") else str(formatted)
+            logger.info("    Memory (%s): %s", label, Colors.colored(text, Colors.WHITE))
+
+        active_mem_local = getattr(res.generation, "active_memory", 0.0) or 0.0
+        cached_mem_local = getattr(res.generation, "cached_memory", 0.0) or 0.0
+        peak_mem_local = getattr(res.generation, "peak_memory", 0.0) or 0.0
+        _log_mem("Active Δ", "active_memory", active_mem_local)
+        _log_mem("Cache Δ", "cached_memory", cached_mem_local)
+        _log_mem("Peak", "peak_memory", peak_mem_local)
+
+        prompt_tps_local = getattr(res.generation, "prompt_tps", 0.0) or 0.0
+        logger.info(
+            "    Prompt Tokens: %s",
+            Colors.colored(fmt_num(p_tokens_local), Colors.WHITE),
+        )
+        logger.info(
+            "    Generation Tokens: %s",
+            Colors.colored(fmt_num(g_tokens_local), Colors.WHITE),
+        )
+        logger.info(
+            "    Prompt TPS: %s",
+            Colors.colored(fmt_num(prompt_tps_local), Colors.WHITE),
+        )
+
     model_short_name: str = result.model_name.split("/")[-1]
     run_prefix = "" if run_index is None else f"[RUN {run_index}/{total_runs}] "
 
     # --- Build summary line (machine/grep friendly) ---
-    status = "OK" if result.success else "FAIL"
-    parts: list[str] = [f"model={model_short_name}", f"status={status}"]
-    if result.generation:
-        prompt_tokens = getattr(result.generation, "prompt_tokens", 0) or 0
-        generation_tokens = getattr(result.generation, "generation_tokens", 0) or 0
-        total_tokens = prompt_tokens + generation_tokens
-        generation_tps = getattr(result.generation, "generation_tps", 0.0) or 0.0
-        peak_mem = getattr(result.generation, "peak_memory", 0.0) or 0.0
-        total_time = getattr(result, "total_time", None)
-        if total_tokens:
-            parts.append(f"tokens={total_tokens}")
-        if prompt_tokens:
-            parts.append(f"prompt={prompt_tokens}")
-        if generation_tokens:
-            parts.append(f"gen={generation_tokens}")
-        if generation_tps:
-            parts.append(f"gen_tps={fmt_num(generation_tps)}")
-        if peak_mem:
-            peak_str = format_field_value("peak_memory", peak_mem)
-            if not str(peak_str).endswith("MB"):
-                parts.append(f"peak_mem={peak_str}MB")
-            else:
-                parts.append(f"peak_mem={peak_str}")
-        if total_time:
-            tt = format_field_value("total_time", total_time)
-            if isinstance(tt, str):
-                parts.append(f"total_time={tt}")
-            else:
-                parts.append(f"total_time={total_time:.2f}s")
-    if result.error_stage:
-        parts.append(f"stage={result.error_stage}")
-    if result.error_message:
-        # Keep short (first 40 chars)
-        clean_err = re.sub(r"\s+", " ", str(result.error_message))
-        preview = clean_err[:ERROR_MESSAGE_PREVIEW_LEN].rstrip()
-        if len(clean_err) > ERROR_MESSAGE_PREVIEW_LEN:
-            preview += "…"
-        parts.append(f"error={preview}")
+    parts = _build_summary_parts(result, model_short_name)
     summary_raw = run_prefix + "SUMMARY " + " ".join(parts)
     if result.success:
         logger.info(Colors.colored(summary_raw, Colors.GREEN))
@@ -2066,27 +2191,7 @@ def print_model_result(
 
     # Fast exit if not verbose and success, but still show generated text (preview)
     if result.success and not verbose:
-        if result.generation:
-            raw_text = getattr(result.generation, "text", "")
-            text_str = str(raw_text)
-            if not text_str:
-                logger.info("%s", Colors.colored("<empty>", Colors.CYAN))
-            else:
-                for original_line in text_str.splitlines():
-                    if original_line == "":
-                        continue  # avoid random blank lines
-                    # Use drop_whitespace to avoid leading spaces on wrapped continuation lines.
-                    wrapped = textwrap.wrap(
-                        original_line,
-                        width=DISPLAY_WRAP_WIDTH,
-                        replace_whitespace=False,
-                        drop_whitespace=True,
-                        break_long_words=False,
-                        break_on_hyphens=False,
-                    ) or [""]
-                    for wline in wrapped:
-                        # Left align: drop incidental leading space from wrapping.
-                        logger.info("%s", Colors.colored(wline.lstrip(), Colors.CYAN))
+        _print_preview_text(result.generation)
         return
 
     # --- Detailed block (verbose success OR any failure) ---
@@ -2108,100 +2213,13 @@ def print_model_result(
 
     # From here: success & (verbose True)
     if result.generation:
-        gen_text = getattr(result.generation, "text", "N/A")
-        logger.info("  Generated Text: %s", Colors.colored(gen_text, Colors.CYAN))
-
-        prompt_tokens = getattr(result.generation, "prompt_tokens", 0)
-        generation_tokens = getattr(result.generation, "generation_tokens", 0)
-        total_tokens = prompt_tokens + generation_tokens
-        generation_tps = getattr(result.generation, "generation_tps", 0.0)
-        logger.info(
-            "  Tokens: total=%s prompt=%s gen=%s",
-            fmt_num(total_tokens),
-            fmt_num(prompt_tokens),
-            fmt_num(generation_tokens),
-        )
-        logger.info("  Generation TPS: %s", Colors.colored(fmt_num(generation_tps), Colors.WHITE))
-
-        total_time = getattr(result, "total_time", None)
-        if total_time is not None and total_time > 0:
-            formatted_total_time = format_field_value("total_time", total_time)
-            tt_disp = (
-                formatted_total_time
-                if isinstance(formatted_total_time, str)
-                else f"{total_time:.2f}s"
-            )
-            logger.info("  Total Time: %s", Colors.colored(tt_disp, Colors.WHITE))
-
-        # Show additional timing metrics if verbose (already inside verbose)
-        generation_time = getattr(result, "generation_time", None)
-        if generation_time is not None and generation_time > 0:
-            formatted_generation = format_field_value("generation_time", generation_time)
-            gt_disp = (
-                formatted_generation
-                if isinstance(formatted_generation, str)
-                else f"{generation_time:.2f}s"
-            )
-            logger.info("  Generation Time: %s", Colors.colored(gt_disp, Colors.WHITE))
-
-        model_load_time = getattr(result, "model_load_time", None)
-        if model_load_time is not None and model_load_time > 0:
-            formatted_load = format_field_value("model_load_time", model_load_time)
-            ml_disp = (
-                formatted_load if isinstance(formatted_load, str) else f"{model_load_time:.2f}s"
-            )
-            logger.info("  Model Load Time: %s", Colors.colored(ml_disp, Colors.WHITE))
-
-        # Detailed metrics header
-        logger.info(Colors.colored("  Performance Metrics:", Colors.BOLD, Colors.MAGENTA))
-        # Time field in GenerationResult (if present)
-        if hasattr(result.generation, "time"):
-            time_val = getattr(result.generation, "time", 0.0) or 0.0
-            logger.info(
-                "    Time: %s",
-                Colors.colored(f"{time_val:.2f}s", Colors.WHITE),
-            )
-
-        # Memory block
-        active_mem = getattr(result.generation, "active_memory", 0.0) or 0.0
-        cached_mem = getattr(result.generation, "cached_memory", 0.0) or 0.0
-        peak_mem = getattr(result.generation, "peak_memory", 0.0) or 0.0
-
-        def _log_mem(label: str, field: str, raw_val: float) -> None:
-            if raw_val <= 0:
-                return
-            formatted = format_field_value(field, raw_val)
-            text = f"{formatted} MB" if not str(formatted).endswith("MB") else str(formatted)
-            logger.info(
-                "    Memory (%s): %s",
-                label,
-                Colors.colored(text, Colors.WHITE),
-            )
-
-        _log_mem("Active Δ", "active_memory", active_mem)
-        _log_mem("Cache Δ", "cached_memory", cached_mem)
-        _log_mem("Peak", "peak_memory", peak_mem)
-
-        # Token + TPS details
-        prompt_tps = getattr(result.generation, "prompt_tps", 0.0) or 0.0
-        logger.info(
-            "    Prompt Tokens: %s",
-            Colors.colored(fmt_num(prompt_tokens), Colors.WHITE),
-        )
-        logger.info(
-            "    Generation Tokens: %s",
-            Colors.colored(fmt_num(generation_tokens), Colors.WHITE),
-        )
-        logger.info(
-            "    Prompt TPS: %s",
-            Colors.colored(fmt_num(prompt_tps), Colors.WHITE),
-        )
+        _log_verbose_success_details(result)
     # End detailed block
 
 
 def print_cli_separator() -> None:
     """Print a simple separator line."""
-    logger.info("")
+    log_rule(60, char="-", color=Colors.GRAY, bold=False)
 
 
 def setup_environment(args: argparse.Namespace) -> dict[str, str]:
@@ -2557,10 +2575,22 @@ def main(args: argparse.Namespace) -> None:
     try:
         library_versions = setup_environment(args)
         print_cli_header("MLX Vision Language Model Check")
+
+        # Thin separator between major phases for scan-friendly logs
+        print_cli_separator()
+
         image_path = find_and_validate_image(args)
+        print_cli_separator()
+
         metadata = handle_metadata(image_path, args)
+        print_cli_separator()
+
         prompt = prepare_prompt(args, metadata)
+        print_cli_separator()
+
         results = process_models(args, image_path, prompt)
+        print_cli_separator()
+
         finalize_execution(
             args=args,
             results=results,
