@@ -51,6 +51,8 @@ extras = [
     "mlx-lm>=0.10.0",
     # Hardware metrics (optional system block)
     "psutil>=5.9.0",
+    # Tokenization utilities (optional; used for versions/introspection only)
+    "tokenizers>=0.15.0",
 ]
 
 # Guidance: Torch is supported but not required globally; install only when needed for specific models.

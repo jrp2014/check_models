@@ -81,6 +81,20 @@ Before refactoring for size:
 - Failures: red in CLI; in HTML tables failed rows are styled with a red background/text using the `failed-row` class.
 - Markdown: no colors (GitHub Markdown doesn’t support ANSI); consider adding a textual marker like "FAILED" when needed.
 
+### Markdown tables and alignment
+
+- Markdown doesn’t support vertical alignment controls; most renderers (e.g., GitHub) top-align cells by default.
+- Enforce vertical top alignment only in the HTML report via inline CSS; keep Markdown simple for portability.
+
+### Timezones
+
+- Prefer `datetime.UTC` for aware datetimes; localize with `tzlocal.get_localzone()` when formatting local times.
+
+### Optional imports
+
+- For optional deps (e.g., `psutil`), import in a `try/except ImportError` and fall back to `None`.
+- If needed for typing, use a specific ignore like `# type: ignore[assignment]` (avoid bare `# type: ignore`).
+
 ### Backend import guard policy
 
 - Default: block heavy backends that are not needed for MLX workflows to avoid macOS/Apple Silicon hangs:
