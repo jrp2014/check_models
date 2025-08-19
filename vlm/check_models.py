@@ -27,24 +27,16 @@ import sys
 import textwrap
 import time
 import traceback
-
-try:  # Optional hardware metrics
-    import psutil
-except ImportError:
-    psutil = None
 from dataclasses import dataclass, fields
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    ClassVar,
-    Final,
-    NamedTuple,
-    NoReturn,
-    Self,
-    TypeVar,
-)
+from typing import TYPE_CHECKING, Any, ClassVar, Final, NamedTuple, NoReturn, Self, TypeVar
+
+# Optional dependency: psutil for system info; degrade gracefully if missing
+try:
+    import psutil
+except ImportError:  # pragma: no cover - optional
+    psutil = None  # type: ignore[assignment]
 
 from huggingface_hub import HFCacheInfo, scan_cache_dir
 from huggingface_hub import __version__ as hf_version
@@ -1541,7 +1533,8 @@ def generate_html_report(
         .prompt-section h3 {{ color: #1976d2; margin-top: 0; margin-bottom: 10px; font-size: 1.1em; }}
         .meta-info {{ color: #6c757d; font-style: italic; margin: 15px 0; text-align: center; }}
         table {{ border-collapse: collapse; width: 95%; margin: 30px auto; background-color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }}
-        th, td {{ border: 1px solid #dee2e6; padding: 8px 12px; vertical-align: top; }}
+    th, td {{ border: 1px solid #dee2e6; padding: 8px 12px; vertical-align: top; }}
+    thead th, tbody td {{ vertical-align: top; }}
         th {{ background: linear-gradient(135deg, #e9ecef 0%, #f8f9fa 100%); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 600; color: #495057; text-shadow: 0 1px 0 white; font-size: 14px; text-align: center; }}
         th.numeric {{ text-align: right; }}
         th.text {{ text-align: left; }}
