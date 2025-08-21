@@ -74,10 +74,10 @@ pip install -e .
 
 ### Manual Installation
 
-If you prefer to install dependencies manually:
+If you prefer to install dependencies manually (ensure these match `pyproject.toml`):
 
 ```bash
-pip install mlx>=0.10.0 mlx-vlm>=0.0.9 Pillow>=10.0.0 huggingface-hub>=0.20.0 tabulate>=0.9.0 tzlocal>=5.0
+pip install "mlx>=0.14.0" "mlx-vlm>=0.0.9" "Pillow>=10.0.0" "huggingface-hub>=0.23.0" "tabulate>=0.9.0" "tzlocal>=5.0"
 ```
 
 ## Requirements
@@ -119,7 +119,7 @@ Development / QA:
 ### Minimal Install (runtime only)
 
 ```bash
-pip install mlx>=0.14.0 mlx-vlm>=0.0.9 Pillow>=10.0.0 huggingface-hub>=0.23.0 tabulate>=0.9.0 tzlocal>=5.0
+pip install "mlx>=0.14.0" "mlx-vlm>=0.0.9" "Pillow>=10.0.0" "huggingface-hub>=0.23.0" "tabulate>=0.9.0" "tzlocal>=5.0"
 ```
 
 ### With Optional Extras
@@ -148,6 +148,7 @@ Notes:
 * Torch is supported and can be installed when you need it for specific models; the script does not block Torch.
 * Installing `sentence-transformers` isn’t necessary for this tool and may pull heavy backends into import paths; a heads‑up is logged if detected.
 * Long embedded CSS / HTML lines are intentional (readability > artificial wrapping).
+* Dependency versions in this README are automatically kept in sync with `pyproject.toml`; update the TOML first and reflect changes here.
 
 ## Usage
 
