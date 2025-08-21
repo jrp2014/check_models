@@ -134,6 +134,29 @@ Before refactoring for size:
 - Justify each new dependency in a brief comment or commit message.
 - Prefer standard library or existing dependencies first.
 
+### Dependency Version Synchronization
+
+Runtime dependency versions MUST stay consistent between `pyproject.toml` and the install snippets in `vlm/README.md`.
+
+Mechanism:
+
+1. Edit versions only in `pyproject.toml` (authoritative source).
+2. Run the sync helper: `python -m vlm.tools.update_readme_deps` (or via a future pre-commit/CI hook) to regenerate the blocks between:
+
+- `<!-- BEGIN MANUAL_INSTALL -->` / `<!-- END MANUAL_INSTALL -->`
+- `<!-- BEGIN MINIMAL_INSTALL -->` / `<!-- END MINIMAL_INSTALL -->`
+
+1. Commit both changed files together.
+
+Guidelines:
+
+- Do NOT hand-edit inside the marked blocks; the script will overwrite them.
+- If adding a new runtime dependency, ensure it is placed in `[project.dependencies]` (not only an optional group) or it will not appear in the synced snippets.
+- When removing a dependency, delete it from `pyproject.toml`, run the sync script, and verify it disappears from both blocks.
+- Optional / extras groups are intentionally excluded from automatic blocks; document their usage separately.
+
+Rationale: Single source of truth avoids configuration drift and stale README instructions.
+
 ## Tests (If/When Added)
 
 - Minimal, focused tests for parsing/formatting helpers.
