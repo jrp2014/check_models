@@ -630,7 +630,7 @@ def print_version_info(versions: dict[str, str]) -> None:
 T = TypeVar("T")
 ExifValue = Any
 ExifDict = dict[str | int, ExifValue]
-MetadataDict = dict[str, str]
+MetadataDict = dict[str, str | None]
 PathLike = str | Path
 GPSTupleElement = int | float
 GPSTuple = tuple[GPSTupleElement, GPSTupleElement, GPSTupleElement]
@@ -857,57 +857,51 @@ def _convert_gps_coordinate(
 def extract_image_metadata(image_path: Path | str) -> MetadataDict:
     """Derive high-level metadata (date, description, GPS string, raw EXIF).
 
-        Responsibilities:
-            * Choose a representative date: prefer EXIF original timestamp, then
-                creation fallback, then filesystem mtime, else label unknown.
-            * Decode and sanitize description (graceful bytes → str handling).
-            * Provide a simplified human readable GPS string or fallback phrase.
-            * Preserve the raw EXIF dict (stringified) separately for debugging.
-
-    The function intentionally keeps parsing + fallback logic localized so the
-        rest of the pipeline can treat metadata as plain strings.
+    Returns None for unavailable date/description/gps instead of sentinel strings.
     """
     metadata: MetadataDict = {}
-    img_path_str: str = str(image_path)
+    img_path_str = str(image_path)
     exif_data = get_exif_data(img_path_str) or {}
 
-    date = (
+    # --- Date extraction & localization ---
+    exif_date = (
         exif_data.get("DateTimeOriginal")
         or exif_data.get("CreateDate")
         or exif_data.get("DateTime")
-        or "No date recorded"
+        or None
     )
-    if not date:
-        try:
-            local_tz = get_localzone()
-            date = datetime.fromtimestamp(
-                Path(img_path_str).stat().st_mtime,
-                tz=local_tz,
-            ).strftime("%Y-%m-%d %H:%M:%S %Z")
-        except OSError as err:
-            date = "Unknown date"
-            logger.debug("Could not get file mtime: %s", err)
-    else:
-        # If EXIF date is present, try to parse and localize it
+    date_str: str | None = None
+    if exif_date:
+        # Try to parse and localize
+        parsed: str | None = None
         try:
             for fmt in DATE_FORMATS:
                 try:
-                    dt: datetime = datetime.strptime(str(date), fmt).replace(
-                        tzinfo=UTC,
-                    )
+                    dt: datetime = datetime.strptime(str(exif_date), fmt).replace(tzinfo=UTC)
                     local_tz: ZoneInfo = get_localzone()
-                    date: str = dt.astimezone(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")
+                    parsed = dt.astimezone(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")
                     break
                 except ValueError:
                     continue
         except (ValueError, TypeError, UnicodeDecodeError) as err:
             logger.warning("Could not localize EXIF date: %s", err)
-            date = str(date)
-    metadata["date"] = str(date)
+        date_str = parsed or str(exif_date)
+    else:
+        # Fallback to filesystem mtime
+        try:
+            local_tz = get_localzone()
+            date_str = datetime.fromtimestamp(
+                Path(img_path_str).stat().st_mtime,
+                tz=local_tz,
+            ).strftime("%Y-%m-%d %H:%M:%S %Z")
+        except OSError as err:
+            logger.debug("Could not get file mtime: %s", err)
+            date_str = None
+    metadata["date"] = date_str
 
     # --- Description extraction ---
     description = exif_data.get("ImageDescription")
-    desc_str = "N/A"
+    desc_str: str | None = None
     if description is not None:
         if isinstance(description, bytes):
             try:
@@ -917,14 +911,14 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
                 logger.debug("Failed to decode description: %s", err)
         else:
             desc_str = str(description).strip()
-        if not desc_str:
-            desc_str = "N/A"
+        if desc_str == "":
+            desc_str = None
     metadata["description"] = desc_str
 
     # --- GPS extraction helper ---
-    def _extract_gps_str(gps_info_raw: object) -> str:
+    def _extract_gps_str(gps_info_raw: object) -> str | None:
         if not isinstance(gps_info_raw, dict):
-            return "N/A"
+            return None
         gps_info: dict[str, Any] = {}
         for k, v in gps_info_raw.items():
             tag_name: str = GPSTAGS.get(int(k), str(k)) if isinstance(k, int) else str(k)
@@ -942,21 +936,13 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
         )
         latitude = _convert_gps_coordinate(lat) if lat and lat_ref else None
         longitude = _convert_gps_coordinate(lon) if lon and lon_ref else None
-        logger.debug(
-            "Converted GPS: latitude=%r, longitude=%r",
-            latitude,
-            longitude,
-        )
+        logger.debug("Converted GPS: latitude=%r, longitude=%r", latitude, longitude)
         if latitude is None or longitude is None:
             logger.debug("GPS conversion failed: latitude or longitude is None.")
-            return "Unknown location"
+            return None
 
         def dms_to_dd(dms: tuple[float, float, float], ref: str) -> tuple[float, str]:
-            # Ensure all elements are valid floats
             deg, min_, sec = dms
-            if deg is None or min_ is None or sec is None:
-                msg = "Invalid DMS tuple: contains None"
-                raise ValueError(msg)
             dd = deg + min_ / 60.0 + sec / 3600.0
             ref_upper = ref.upper()
             sign = -1 if ref_upper in ("S", "W") else 1
@@ -972,9 +958,7 @@ def extract_image_metadata(image_path: Path | str) -> MetadataDict:
             return f"{abs(lat_dd):.6f} {lat_card}, {abs(lon_dd):.6f} {lon_card}"
         except (ValueError, AttributeError, TypeError) as err:
             logger.debug("Failed to convert GPS DMS to decimal: %s", err)
-            return "Unknown location"
-
-    # --- End GPS extraction helper ---
+            return None
 
     metadata["gps"] = _extract_gps_str(exif_data.get("GPSInfo"))
     metadata["exif"] = str(exif_data)
@@ -2304,10 +2288,10 @@ def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
 
     metadata: MetadataDict = extract_image_metadata(image_path)
 
-    # Display key metadata in a clean format
-    logger.info("Date: %s", metadata.get("date", "N/A"))
-    logger.info("Description: %s", metadata.get("description", "N/A"))
-    logger.info("GPS Location: %s", metadata.get("gps", "N/A"))
+    # Display key metadata (fallback to N/A only at presentation time)
+    logger.info("Date: %s", metadata.get("date") or "N/A")
+    logger.info("Description: %s", metadata.get("description") or "N/A")
+    logger.info("GPS Location: %s", metadata.get("gps") or "N/A")
 
     if args.verbose:
         print_cli_separator()
@@ -2329,26 +2313,17 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
         logger.info("Using user-provided prompt.")
     else:
         logger.info("Generating default prompt based on image metadata.")
+        desc = metadata.get("description")
+        date_val = metadata.get("date")
+        gps_val = metadata.get("gps")
         prompt_parts: list[str] = [
             (
                 "Provide a factual caption, description, and keywords suitable for "
                 "cataloguing, or searching for, the image."
             ),
-            (
-                f"\n\nContext: The image relates to '{metadata.get('description', '')}'"
-                if metadata.get("description") and metadata["description"] != "N/A"
-                else ""
-            ),
-            (
-                f"\n\nThe photo was taken around {metadata.get('date', '')}"
-                if metadata.get("date") and metadata["date"] != "Unknown date"
-                else ""
-            ),
-            (
-                f"near GPS {metadata.get('gps', '')}"
-                if metadata.get("gps") and metadata["gps"] != "Unknown location"
-                else ""
-            ),
+            (f"\n\nContext: The image relates to '{desc}'" if desc else ""),
+            (f"\n\nThe photo was taken around {date_val}" if date_val else ""),
+            (f"near GPS {gps_val}" if gps_val else ""),
             (
                 ". Focus on visual content, drawing on any available "
                 "contextual information for specificity. Do not speculate."
