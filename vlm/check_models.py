@@ -1483,8 +1483,10 @@ def generate_html_report(
         colalign=colalign,
     )
 
-    # Mark failed rows in the HTML table by adding a CSS class on <tr>
-    failed_set = {idx for idx, r in enumerate(results) if not r.success}
+    # Mark failed rows: must mirror the same sorted order used in _prepare_table_data
+    # _prepare_table_data sorts internally, so we re-sort here for index alignment.
+    sorted_results_for_flags = _sort_results_by_time(results)
+    failed_set = {idx for idx, r in enumerate(sorted_results_for_flags) if not r.success}
     if failed_set and "<tbody>" in html_table:
         tbody_start = html_table.find("<tbody>")
         tbody_end = html_table.find("</tbody>", tbody_start)
