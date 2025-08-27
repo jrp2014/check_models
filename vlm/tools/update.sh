@@ -29,6 +29,7 @@ EXTRAS_PACKAGES=(
 	"transformers>=4.41.0,<5"
 	"mlx-lm>=0.10.0"
 	"psutil>=5.9.0"
+	"tokenizers>=0.15.0" # explicit (also pulled transitively by transformers)
 )
 
 DEV_PACKAGES=(
@@ -48,21 +49,37 @@ if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
 fi
 
 echo "[update.sh] Updating core runtime dependencies..."
-pip install -U "${EXTRA_ARGS[@]}" "${RUNTIME_PACKAGES[@]}"
+if ((${#EXTRA_ARGS[@]})); then
+	pip install -U "${EXTRA_ARGS[@]}" "${RUNTIME_PACKAGES[@]}"
+else
+	pip install -U "${RUNTIME_PACKAGES[@]}"
+fi
 
 if [[ "${INSTALL_EXTRAS:-0}" == "1" ]]; then
 	echo "[update.sh] Installing extras group..."
-	pip install -U "${EXTRA_ARGS[@]}" "${EXTRAS_PACKAGES[@]}" safetensors accelerate tqdm
+	if ((${#EXTRA_ARGS[@]})); then
+		pip install -U "${EXTRA_ARGS[@]}" "${EXTRAS_PACKAGES[@]}" safetensors accelerate tqdm
+	else
+		pip install -U "${EXTRAS_PACKAGES[@]}" safetensors accelerate tqdm
+	fi
 fi
 
 if [[ "${INSTALL_TORCH:-0}" == "1" ]]; then
 	echo "[update.sh] Installing PyTorch stack (optional)..."
-	pip install -U "${EXTRA_ARGS[@]}" "${TORCH_PACKAGES[@]}"
+	if ((${#EXTRA_ARGS[@]})); then
+		pip install -U "${EXTRA_ARGS[@]}" "${TORCH_PACKAGES[@]}"
+	else
+		pip install -U "${TORCH_PACKAGES[@]}"
+	fi
 fi
 
 if [[ "${INSTALL_DEV:-0}" == "1" ]]; then
 	echo "[update.sh] Installing dev tools..."
-	pip install -U "${EXTRA_ARGS[@]}" "${DEV_PACKAGES[@]}"
+	if ((${#EXTRA_ARGS[@]})); then
+		pip install -U "${EXTRA_ARGS[@]}" "${DEV_PACKAGES[@]}"
+	else
+		pip install -U "${DEV_PACKAGES[@]}"
+	fi
 fi
 
 echo "[update.sh] Done."
