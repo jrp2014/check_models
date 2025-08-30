@@ -14,7 +14,8 @@
 
 set -euo pipefail
 
-pip install -U pip setuptools wheel
+brew upgrade
+pip install -U pip setuptools wheel cmake typing_extensions
 
 RUNTIME_PACKAGES=(
 	"mlx>=0.14.0"
@@ -23,13 +24,14 @@ RUNTIME_PACKAGES=(
 	"huggingface-hub>=0.23.0"
 	"tabulate>=0.9.0"
 	"tzlocal>=5.0"
+    "numpy"
+    "nanobind==2.4.0"
 )
 
 EXTRAS_PACKAGES=(
-	"transformers>=4.41.0,<5"
+	"transformers>=4.41.0"
 	"mlx-lm>=0.10.0"
 	"psutil>=5.9.0"
-	"tokenizers>=0.15.0" # explicit (also pulled transitively by transformers)
 )
 
 DEV_PACKAGES=(
