@@ -24,24 +24,28 @@ Repository = "https://github.com/jrp2014/scripts"
 Issues = "https://github.com/jrp2014/scripts/issues"
 
 [project.scripts]
-mlx-vlm-check = "check_models:main_cli"
+# Use fully-qualified module path for the CLI entry point (module inside vlm package)
+mlx-vlm-check = "vlm.check_models:main_cli"
 
-[project.dependencies]
-# Core MLX dependencies (raised minimums to align with currently tested APIs)
-mlx = ">=0.14.0"
-mlx-vlm = ">=0.0.9"
+# PEP 621: declare runtime dependencies as an inline array instead of a key/value table.
+# This keeps ordering deterministic and simplifies automated parsing.
+dependencies = [
+    # Core MLX dependencies (raised minimums to align with currently tested APIs)
+    "mlx>=0.14.0",
+    "mlx-vlm>=0.0.9",
+    # Image processing
+    "Pillow>=10.0.0",
+    # Model and caching utilities
+    "huggingface-hub>=0.23.0",
+    # Report generation
+    "tabulate>=0.9.0",
+    # System utilities
+    "tzlocal>=5.0",
+]
 
-# Image processing
-Pillow = ">=10.0.0"
-
-# Model and caching utilities
-huggingface-hub = ">=0.23.0"
-
-# Report generation 
-tabulate = ">=0.9.0"
-
-# System utilities
-tzlocal = ">=5.0"
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["vlm*"]
 
 [project.optional-dependencies]
 # Optional dependencies for enhanced functionality

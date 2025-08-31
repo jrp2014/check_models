@@ -157,6 +157,59 @@ Guidelines:
 
 Rationale: Single source of truth avoids configuration drift and stale README instructions.
 
+### pyproject.toml Conventions (PEP 621 Compliance)
+
+The `pyproject.toml` MUST conform to the official packaging guide: <https://packaging.python.org/en/latest/guides/writing-pyproject-toml>
+
+Required conventions for this project:
+
+1. Use PEP 621 metadata under the single `[project]` table (name, version, description, authors, readme, license, keywords, classifiers, urls).
+2. Runtime dependencies belong in the `dependencies = [ ... ]` array (NOT a legacy `[project.dependencies]` table). Each entry is a single quoted spec, optionally with an inline comment.
+3. Optional/development groups live under `[project.optional-dependencies]` using standard PEP 621 extras (`dev`, `extras`, etc.).
+4. The CLI entry point MUST use a fully-qualified module path in `[project.scripts]` (e.g., `vlm.check_models:main_cli`).
+5. Build backend stays explicit in `[build-system]` (setuptools minimal requirement pinned to a modern version).
+6. Tool configs (`[tool.ruff]`, `[tool.mypy]`, `[tool.pylance]`, etc.) must NOT shadow standard PEP 621 fields (avoid redefining metadata there).
+7. Keep ordering logically grouped: `[project]` → `[project.urls]` → `[project.scripts]` → dependencies array → extras → build-system → tool configs.
+8. Do NOT introduce dynamic version computation; version is a literal string (`version = "x.y.z"`).
+9. When adding a new tool section, prefer concise comments referencing its upstream documentation.
+10. Any change to runtime dependencies MUST be followed by running the README sync script (`python -m vlm.tools.update_readme_deps`).
+
+Validation checklist before committing pyproject changes:
+
+- [ ] PEP 621 core fields present (name/version/description/authors/readme/license/classifiers)
+- [ ] `dependencies` array present and sorted conceptually (grouped by comment blocks)
+- [ ] No stale legacy `[project.dependencies]` table remains
+- [ ] Extras defined only if referenced in docs / README
+- [ ] CLI script path correct & importable
+- [ ] README dependency blocks regenerated
+- [ ] Tool sections still parse (run a local `pip install -e .` or `uv pip install -e .`)
+
+Automation:
+
+- A GitHub Actions workflow (`.github/workflows/dependency-sync.yml`) enforces that README dependency blocks match `pyproject.toml`. If the workflow fails, run:
+
+```bash
+python -m vlm.tools.update_readme_deps
+git add vlm/README.md
+git commit -m "Sync README dependency blocks"
+```
+
+- (Optional) Add a local pre-commit hook to auto-run the sync when `pyproject.toml` changes:
+
+```bash
+cat > .git/hooks/pre-commit <<'HOOK'
+#!/usr/bin/env bash
+if git diff --cached --name-only | grep -q '^vlm/pyproject.toml$'; then
+  echo '[pre-commit] Syncing README dependency blocks'
+  python -m vlm.tools.update_readme_deps || exit 1
+  git add vlm/README.md
+fi
+HOOK
+chmod +x .git/hooks/pre-commit
+```
+
+Rationale: Following the packaging guide ensures forward compatibility with modern build backends, simplifies automated parsing (agents & scripts), and avoids ambiguous duplication of dependency sources.
+
 ## Tests (If/When Added)
 
 - Minimal, focused tests for parsing/formatting helpers.

@@ -31,15 +31,46 @@ logger = logging.getLogger(__name__)
 
 
 def parse_pyproject(path: Path) -> dict[str, str]:
-    """Return mapping of dependency name to spec from [project.dependencies]."""
+    """Return mapping of dependency name->spec from PEP 621 dependencies array.
+
+    Supports both legacy table form (key = "spec") and current array form:
+
+    dependencies = [
+        "pkg>=1.0",
+        "other==2.0",  # comment
+    ]
+    """
     content = path.read_text(encoding="utf-8")
-    pattern = r"^\[project\.dependencies\](.*?)(^\[|\Z)"
-    match = re.search(pattern, content, flags=re.MULTILINE | re.DOTALL)
-    if not match:
-        msg = "Could not locate [project.dependencies] section"
-        raise RuntimeError(msg)
-    block = match.group(1)
+
+    # First try to find the PEP 621 dependencies = [ ... ] block
+    array_pattern = r"^dependencies\s*=\s*\[(.*?)\]"  # within [project]
+    match = re.search(array_pattern, content, flags=re.MULTILINE | re.DOTALL)
     deps: dict[str, str] = {}
+    if match:
+        block = match.group(1)
+        for raw in block.splitlines():
+            line = raw.strip().rstrip(",")
+            if not line or line.startswith("#"):
+                continue
+            # Strip inline comments
+            if "#" in line:
+                line = line.split("#", 1)[0].strip()
+            line = line.strip('"').strip("'")
+            if not line:
+                continue
+            # Split name from spec heuristically: first occurrence of >,=,!,<,~
+            name_part = re.split(r"[<>=!~]", line, maxsplit=1)[0].strip()
+            spec = line[len(name_part):].strip()
+            deps[name_part] = spec
+        return deps
+
+    # Fallback: legacy table style [project.dependencies]
+    table_pattern = r"^\[project\.dependencies\](.*?)(^\[|\Z)"
+    t_match = re.search(table_pattern, content, flags=re.MULTILINE | re.DOTALL)
+    if not t_match:
+        msg = "Could not locate dependencies array or [project.dependencies] section"
+        raise RuntimeError(msg)
+    block = t_match.group(1)
     for raw in block.splitlines():
         line = raw.strip()
         if not line or line.startswith("#") or "=" not in line:
@@ -91,7 +122,7 @@ def main() -> int:
         deps = parse_pyproject(pyproject_path)
         runtime_deps = {k: v for k, v in deps.items() if k not in set()}
         install_cmd = build_install_command(runtime_deps)
-        snippet = install_cmd[len("pip install ") :]
+        snippet = install_cmd  # keep full command for clarity
         readme_text = readme_path.read_text(encoding="utf-8")
         for key in MARKERS:
             readme_text = replace_between_markers(readme_text, key, snippet)
