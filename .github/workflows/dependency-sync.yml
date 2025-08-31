@@ -29,11 +29,7 @@ jobs:
 
       - name: Run dependency sync script
         run: |
-          python - <<'PY'
-import subprocess, sys, pathlib
-# Ensure package path resolution
-subprocess.run([sys.executable, '-m', 'vlm.tools.update_readme_deps'], check=True)
-PY
+          python -m vlm.tools.update_readme_deps
 
       - name: Detect uncommitted changes after sync
         run: |
