@@ -1695,15 +1695,93 @@ def _escape_markdown_in_text(text: str) -> str:
     result = re.sub(r"(<br>\s*){2,}", "<br><br>", result)  # Max 2 consecutive line breaks
     result = re.sub(r"\s+", " ", result).strip()  # Normalize other whitespace
 
-    # Escape only the critical markdown characters that break table formatting
-    # Based on analysis: most formatting characters are safe within table cells
-    escape_chars = [
+    # Escape only the critical markdown characters that break table formatting, PLUS
+    # neutralize raw HTML tag markers (<tag>) which GitHub may treat as HTML (e.g. <s> strike-through).
+    escape_pairs = [
         ("\\", "\\\\"),  # Backslash - escape character, can affect others
         ("|", "\\|"),  # Pipe - CRITICAL: breaks table column structure
     ]
-
-    for char, escaped in escape_chars:
+    for char, escaped in escape_pairs:
         result = result.replace(char, escaped)
+
+    # HTML-like angle bracket handling: escape < and > only when they appear to form a tag
+    # Simple heuristic: `<` followed by optional / then alphanum and `>` within short span.
+    # We replace such patterns with escaped entities so they render literally.
+    # Preserve common GitHub-flavored Markdown HTML tags; escape others so
+    # model tokens like <foo> show literally. GitHub will still sanitize
+    # unsafe attributes, so we only need to avoid over-escaping legit tags.
+    # (Subset chosen for formatting/readability; extend if needed.)
+    allowed_inline_tags: set[str] = {
+        # Basic inline
+        "br",
+        "b",
+        "strong",
+        "i",
+        "em",
+        "code",
+        "kbd",
+        "s",
+        "del",
+        "strike",
+        "sup",
+        "sub",
+        "span",
+        "u",
+        "var",
+        "mark",
+        "small",
+        # Block / structural
+        "pre",
+        "p",
+        "div",
+        "blockquote",
+        "hr",
+        # Lists
+        "ul",
+        "ol",
+        "li",
+        # Tables
+        "table",
+        "thead",
+        "tbody",
+        "tr",
+        "th",
+        "td",
+        # Details/summary disclosure
+        "details",
+        "summary",
+        # Definition lists (less common but supported)
+        "dl",
+        "dt",
+        "dd",
+        # Ruby annotations (rare but supported)
+        "ruby",
+        "rt",
+        "rp",
+        "rb",
+        "rtc",
+        # Links & media (GitHub sanitizes attributes)
+        "a",
+        "img",
+    }
+
+    tag_pattern = re.compile(r"</?[A-Za-z][A-Za-z0-9:-]*(?:\s+[^<>]*?)?>")
+
+    def _escape_html_like(m: re.Match[str]) -> str:
+        token = m.group(0)
+        # Derive tag name (strip leading </, split on whitespace or '>', trim trailing '/').
+        inner = token[1:-1].strip()
+        if not inner:
+            return token.replace("<", "&lt;").replace(">", "&gt;")
+        core = inner.lstrip("/").split(None, 1)[0].rstrip("/").lower()
+        if core in allowed_inline_tags:
+            return token  # keep recognized safe tag
+        return token.replace("<", "&lt;").replace(">", "&gt;")
+
+    result = tag_pattern.sub(_escape_html_like, result)
+
+    # Escape bare ampersands that could start entities; avoid double-escaping existing ones.
+    result = re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
 
     return result
 
