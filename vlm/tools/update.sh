@@ -50,20 +50,12 @@ if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
 	EXTRA_ARGS+=("--force-reinstall")
 fi
 
-echo "[update.sh] Updating core runtime dependencies..."
+echo "[update.sh] Updating core runtime + extras dependencies..."
+ALL_PRIMARY=("${RUNTIME_PACKAGES[@]}" "${EXTRAS_PACKAGES[@]}" safetensors accelerate tqdm)
 if ((${#EXTRA_ARGS[@]})); then
-	pip install -U "${EXTRA_ARGS[@]}" "${RUNTIME_PACKAGES[@]}"
+	pip install -U "${EXTRA_ARGS[@]}" "${ALL_PRIMARY[@]}"
 else
-	pip install -U "${RUNTIME_PACKAGES[@]}"
-fi
-
-if [[ "${INSTALL_EXTRAS:-0}" == "1" ]]; then
-	echo "[update.sh] Installing extras group..."
-	if ((${#EXTRA_ARGS[@]})); then
-		pip install -U "${EXTRA_ARGS[@]}" "${EXTRAS_PACKAGES[@]}" safetensors accelerate tqdm
-	else
-		pip install -U "${EXTRAS_PACKAGES[@]}" safetensors accelerate tqdm
-	fi
+	pip install -U "${ALL_PRIMARY[@]}"
 fi
 
 if [[ "${INSTALL_TORCH:-0}" == "1" ]]; then
