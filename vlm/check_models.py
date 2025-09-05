@@ -144,7 +144,7 @@ class TimeoutManager(contextlib.ContextDecorator):
 
         """
         self.seconds: float = seconds
-        self.timer: Any = None
+        self.timer: signal._HANDLER | None = None
 
     def _timeout_handler(
         self,
@@ -542,7 +542,7 @@ def _pad_text(text: str, width: int, *, right_align: bool = False) -> str:
     return (pad_str + text) if right_align else (text + pad_str)
 
 
-def get_library_versions() -> dict[str, str]:
+def get_library_versions() -> LibraryVersionDict:
     """Return versions of key libraries as a dictionary."""
     return {
         "mlx": getattr(mx, "__version__", "N/A"),
@@ -555,7 +555,7 @@ def get_library_versions() -> dict[str, str]:
     }
 
 
-def get_device_info() -> dict[str, Any] | None:
+def get_device_info() -> SystemProfilerDict | None:
     """Return system_profiler display (GPU) info as dict or None on failure.
 
     Only invoked on macOS to enrich hardware section. Failures are swallowed
@@ -580,7 +580,7 @@ def get_device_info() -> dict[str, Any] | None:
         return None
 
 
-def print_version_info(versions: dict[str, str]) -> None:
+def print_version_info(versions: LibraryVersionDict) -> None:
     """Print library versions and optionally system / hardware info.
 
     If running on Apple Silicon (arm64 macOS) we append a concise hardware
@@ -649,6 +649,9 @@ MetadataDict = dict[str, str | None]
 PathLike = str | Path
 GPSTupleElement = int | float
 GPSTuple = tuple[GPSTupleElement, GPSTupleElement, GPSTupleElement]
+GPSDict = dict[str, ExifValue]  # GPS EXIF data structure
+SystemProfilerDict = dict[str, list[dict[str, Any]]]  # macOS system_profiler JSON structure
+LibraryVersionDict = dict[str, str]  # Library name to version mapping
 MetricValue = int | float | str | bool | None  # Common scalar metric variants for metrics
 
 
@@ -748,7 +751,8 @@ def find_most_recent_file(folder: PathLike) -> Path | None:
         )
         if most_recent:
             logger.debug("Most recent file found: %s", str(most_recent))
-        return most_recent
+        else:
+            return most_recent
     except FileNotFoundError:
         logger.exception("Directory not found: %s", folder_path)
     except PermissionError:
@@ -827,7 +831,7 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:  # noqa: C901
             try:
                 gps_ifd: Any = exif_raw.get_ifd(ExifTags.IFD.GPSInfo)
                 if isinstance(gps_ifd, dict) and gps_ifd:
-                    gps_decoded: dict[str, Any] = {}
+                    gps_decoded: GPSDict = {}
                     for gps_tag_id, gps_value in gps_ifd.items():
                         try:
                             gps_key = GPSTAGS.get(int(gps_tag_id), str(gps_tag_id))
@@ -952,10 +956,10 @@ def extract_image_metadata(image_path: PathLike) -> MetadataDict:  # noqa: C901,
     metadata["description"] = desc_str
 
     # --- GPS extraction helper ---
-    def _extract_gps_str(gps_info_raw: object) -> str | None:
+    def _extract_gps_str(gps_info_raw: dict[str, Any] | None) -> str | None:
         if not isinstance(gps_info_raw, dict):
             return None
-        gps_info: dict[str, Any] = {}
+        gps_info: GPSDict = {}
         for k, v in gps_info_raw.items():
             tag_name: str = GPSTAGS.get(int(k), str(k)) if isinstance(k, int) else str(k)
             gps_info[tag_name] = v
@@ -1471,7 +1475,7 @@ def _prepare_table_data(
 def generate_html_report(
     results: list[PerformanceResult],
     filename: Path,
-    versions: dict[str, str],
+    versions: LibraryVersionDict,
     prompt: str,
 ) -> None:
     """Write an HTML report (standalone) including metrics table and context.
@@ -1645,7 +1649,7 @@ def generate_html_report(
 def generate_markdown_report(
     results: list[PerformanceResult],
     filename: Path,
-    versions: dict[str, str],
+    versions: LibraryVersionDict,
     prompt: str,
 ) -> None:
     """Write a GitHub-friendly Markdown summary with aligned pipe table."""
@@ -2239,7 +2243,7 @@ def print_cli_separator() -> None:
     log_rule(60, char="-", color=Colors.GRAY, bold=False)
 
 
-def setup_environment(args: argparse.Namespace) -> dict[str, str]:
+def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     """Configure logging, collect versions, print warnings."""
     # Set DEBUG if verbose, else WARNING
     log_level: int = logging.DEBUG if args.verbose else logging.INFO
@@ -2269,7 +2273,7 @@ def setup_environment(args: argparse.Namespace) -> dict[str, str]:
             "import heavy backends.",
         )
 
-    library_versions: dict[str, str] = get_library_versions()
+    library_versions: LibraryVersionDict = get_library_versions()
     if args.verbose:
         print_version_info(library_versions)
 
@@ -2533,7 +2537,7 @@ def finalize_execution(
     *,
     args: argparse.Namespace,
     results: list[PerformanceResult],
-    library_versions: dict[str, str],
+    library_versions: LibraryVersionDict,
     overall_start_time: float,
     prompt: str,
 ) -> None:
