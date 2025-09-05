@@ -348,7 +348,7 @@ FIELD_UNITS: Final[dict[str, str]] = {
 }
 
 FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
-    "tokens": ("Token", "(ct)"),
+    "tokens": ("Tokens", "(ct)"),
     "prompt_tokens": ("Prompt", "(ct)"),
     "generation_tokens": ("Gen", "(ct)"),
     "total_tokens": ("Total", "Tokens"),
