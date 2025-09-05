@@ -1720,7 +1720,6 @@ def _escape_markdown_in_text(text: str) -> str:
         "em",
         "code",
         "kbd",
-        "s",
         "del",
         "strike",
         "sup",
