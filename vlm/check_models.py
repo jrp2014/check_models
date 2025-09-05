@@ -321,6 +321,9 @@ logger.handlers.clear()
 logger.addHandler(handler)
 
 MB_CONVERSION: Final[float] = 1024 * 1024
+GB_CONVERSION: Final[float] = 1024 * 1024 * 1024
+DECIMAL_GB: Final[float] = 1_000_000_000.0  # Decimal GB (mlx-vlm already divides by 1e9)
+MEM_BYTES_TO_GB_THRESHOLD: Final[float] = 1_000_000.0  # > ~1MB treat as raw bytes from mlx
 
 # EXIF/GPS coordinate standards: camera hardware stores GPS as degrees-minutes-seconds tuples
 DMS_LEN: Final[int] = 3  # Full DMS: (degrees, minutes, seconds)
@@ -342,7 +345,7 @@ FIELD_UNITS: Final[dict[str, str]] = {
     "generation_tokens": "(count)",
     "prompt_tps": "(t/s)",
     "generation_tps": "(t/s)",
-    "peak_memory": "(MB)",
+    "peak_memory": "(GB)",
     "time": "(s)",
     "duration": "(s)",
 }
@@ -354,7 +357,7 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
     "total_tokens": ("Total", "Tokens"),
     "prompt_tps": ("Prompt", "(t/s)"),
     "generation_tps": ("Gen", "(t/s)"),
-    "peak_memory": ("Peak", "(MB)"),
+    "peak_memory": ("Peak", "(GB)"),
     "time": ("Time", "(s)"),
     "duration": ("Dur", "(s)"),
     "generation_time": ("Generation", "(s)"),
@@ -415,15 +418,16 @@ def format_field_label(field_name: str) -> str:
 def format_field_value(field_name: str, value: object) -> str:
     """Normalize and format field values for display.
 
-        - Memory fields ("*_memory"): try to display in MB with commas.
-            Heuristic:
-        * > 10*MB_CONVERSION -> treat as bytes, convert to MB
-        * between 1 and 10*MB_CONVERSION -> assume MB already
-        * < 1.0 -> small fractional MB, keep as-is
-    * large but not bytes -> treat as GB and convert to MB (x1024)
-    - Time fields: format as seconds with 3 decimals + trailing 's'.
-    - TPS fields: compact with either 0, 1, or 3 sig figs depending on size.
-    - Other numerics: use fmt_num; non-numerics: str(value) or '-'.
+    Rules:
+        - Memory fields ("*_memory"): mixed sources (mlx returns bytes; mlx-vlm returns
+            decimal GB). Heuristic: if raw value > MEM_BYTES_TO_GB_THRESHOLD treat as bytes,
+            else assume already GB. Formatting thresholds:
+                >= 10 GB : integer with commas
+                >= 1 GB  : one decimal place
+                < 1 GB   : two decimals
+    - Time fields: seconds with 2 decimals + trailing 's'.
+    - TPS fields: adaptive precision (integer / 1 decimal / 3 sig figs).
+    - Other numerics: general fmt_num; non-numerics: str(value) or '-'.
     """
     if value is None:
         return "-"
@@ -431,17 +435,14 @@ def format_field_value(field_name: str, value: object) -> str:
     if isinstance(value, (int, float)):
         num = float(value)
         if field_name.endswith("_memory"):
-            if num > 10 * MB_CONVERSION:
-                mb = num / MB_CONVERSION
-            elif num < 1.0:
-                mb = num
-            elif num > LARGE_NUMBER_THRESHOLD and num < (10 * LARGE_NUMBER_THRESHOLD):
-                mb = num  # plausibly MB already
-            elif num > LARGE_NUMBER_THRESHOLD:
-                mb = num * 1024  # treat as GB
-            else:
-                mb = num  # default to MB
-            return f"{mb:,.0f}"
+            if num <= 0:
+                return "0"
+            gb = (num / DECIMAL_GB) if num > MEM_BYTES_TO_GB_THRESHOLD else num
+            if gb >= 10:
+                return f"{gb:,.0f}"
+            if gb >= 1:
+                return f"{gb:,.1f}"
+            return f"{gb:.2f}"
         if field_name.endswith("_tps"):
             if abs(num) >= LARGE_NUMBER_THRESHOLD:
                 return f"{num:,.0f}"
@@ -1381,9 +1382,9 @@ def _prepare_table_data(
         "generation_tokens": "Generated<br>Tokens",
         "prompt_tps": "Prompt<br>Speed<br>(t/s)",
         "generation_tps": "Generation<br>Speed<br>(t/s)",
-        "peak_memory": "Peak<br>Memory<br>(MB)",
-        "active_memory": "Active<br>Memory<br>(MB)",
-        "cached_memory": "Cached<br>Memory<br>(MB)",
+        "peak_memory": "Peak<br>Memory<br>(GB)",
+        "active_memory": "Active<br>Memory<br>(GB)",
+        "cached_memory": "Cached<br>Memory<br>(GB)",
         "time": "Total<br>Time<br>(s)",
         "duration": "Duration<br>(s)",
         "generation_time": "Generation<br>Time<br>(s)",
