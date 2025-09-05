@@ -3,10 +3,8 @@
 # Keeps runtime, optional extras, and dev tooling aligned with pyproject.toml.
 #
 # Usage examples:
-#   ./update.sh                # Update core runtime only
-#   INSTALL_EXTRAS=1 ./update.sh      # Include extras group (transformers, mlx-lm, psutil)
-#   INSTALL_DEV=1 ./update.sh         # Include dev tools (ruff, mypy, pytest, pytest-cov)
-#   INSTALL_TORCH=1 ./update.sh       # Add PyTorch packages (optional / only if you need torch models)
+#   ./update.sh                       # Update runtime + extras + dev (default behavior)
+#   INSTALL_TORCH=1 ./update.sh       # Additionally install torch/torchvision/torchaudio
 #   FORCE_REINSTALL=1 ./update.sh     # Force reinstall with --force-reinstall
 #
 # Environment flags controlling heavy backend suppression are set in Python at runtime;
@@ -50,8 +48,8 @@ if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
 	EXTRA_ARGS+=("--force-reinstall")
 fi
 
-echo "[update.sh] Updating core runtime + extras dependencies..."
-ALL_PRIMARY=("${RUNTIME_PACKAGES[@]}" "${EXTRAS_PACKAGES[@]}" safetensors accelerate tqdm)
+echo "[update.sh] Updating runtime + extras + dev dependencies..."
+ALL_PRIMARY=("${RUNTIME_PACKAGES[@]}" "${EXTRAS_PACKAGES[@]}" "${DEV_PACKAGES[@]}" safetensors accelerate tqdm)
 if ((${#EXTRA_ARGS[@]})); then
 	pip install -U "${EXTRA_ARGS[@]}" "${ALL_PRIMARY[@]}"
 else
@@ -64,15 +62,6 @@ if [[ "${INSTALL_TORCH:-0}" == "1" ]]; then
 		pip install -U "${EXTRA_ARGS[@]}" "${TORCH_PACKAGES[@]}"
 	else
 		pip install -U "${TORCH_PACKAGES[@]}"
-	fi
-fi
-
-if [[ "${INSTALL_DEV:-0}" == "1" ]]; then
-	echo "[update.sh] Installing dev tools..."
-	if ((${#EXTRA_ARGS[@]})); then
-		pip install -U "${EXTRA_ARGS[@]}" "${DEV_PACKAGES[@]}"
-	else
-		pip install -U "${DEV_PACKAGES[@]}"
 	fi
 fi
 
