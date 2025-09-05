@@ -30,7 +30,18 @@ import traceback
 from dataclasses import dataclass, fields
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar, Final, NamedTuple, NoReturn, Self, TypeVar
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    ClassVar,
+    Final,
+    NamedTuple,
+    NoReturn,
+    Protocol,
+    Self,
+    TypeVar,
+    runtime_checkable,
+)
 
 # Optional dependency: psutil for system info; degrade gracefully if missing
 try:
@@ -67,6 +78,7 @@ DEFAULT_DECIMAL_PLACES: Final[int] = 2
 LARGE_NUMBER_THRESHOLD: Final[float] = 100.0
 MEDIUM_NUMBER_THRESHOLD: Final[int] = 10
 THOUSAND_THRESHOLD: Final[int] = 1000
+MEMORY_GB_INTEGER_THRESHOLD: Final[float] = 10.0  # >= this many GB show as integer (no decimals)
 
 _temp_logger = logging.getLogger(LOGGER_NAME)
 
@@ -415,7 +427,10 @@ def format_field_label(field_name: str) -> str:
     return field_name.replace("_", " ").title()
 
 
-def format_field_value(field_name: str, value: object) -> str:
+allowed_inline_tags = {"b", "strong", "i", "em", "code"}
+
+
+def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: C901, PLR0911
     """Normalize and format field values for display.
 
     Rules:
@@ -431,14 +446,13 @@ def format_field_value(field_name: str, value: object) -> str:
     """
     if value is None:
         return "-"
-    # Numeric handling
     if isinstance(value, (int, float)):
         num = float(value)
         if field_name.endswith("_memory"):
             if num <= 0:
                 return "0"
             gb = (num / DECIMAL_GB) if num > MEM_BYTES_TO_GB_THRESHOLD else num
-            if gb >= 10:
+            if gb >= MEMORY_GB_INTEGER_THRESHOLD:
                 return f"{gb:,.0f}"
             if gb >= 1:
                 return f"{gb:,.1f}"
@@ -452,7 +466,6 @@ def format_field_value(field_name: str, value: object) -> str:
         if field_name in {"time", "duration", "total_time", "generation_time", "model_load_time"}:
             return f"{num:.2f}s"
         return fmt_num(num)
-    # String numerics (e.g., from JSON/tabulate paths)
     if isinstance(value, str) and value:
         s = value.strip().replace(",", "")
         try:
@@ -463,7 +476,7 @@ def format_field_value(field_name: str, value: object) -> str:
     return str(value)
 
 
-def is_numeric_value(val: float | str | object) -> bool:
+def is_numeric_value(val: object) -> bool:
     """Return True if val can be interpreted as a number."""
     if isinstance(val, (int, float)):
         return True
@@ -629,12 +642,33 @@ def print_version_info(versions: dict[str, str]) -> None:
 
 # Type aliases and definitions
 T = TypeVar("T")
-ExifValue = Any
+ExifValue = Any  # Pillow yields varied scalar / tuple EXIF types; keep permissive
 ExifDict = dict[str | int, ExifValue]
 MetadataDict = dict[str, str | None]
 PathLike = str | Path
 GPSTupleElement = int | float
 GPSTuple = tuple[GPSTupleElement, GPSTupleElement, GPSTupleElement]
+MetricValue = int | float | str | bool | None  # Common scalar metric variants for metrics
+
+
+@runtime_checkable
+class SupportsGenerationResult(Protocol):  # Minimal attributes we read from GenerationResult
+    """Structural subset of GenerationResult accessed by this script.
+
+    Using a Protocol keeps typing resilient to upstream changes in the
+    concrete GenerationResult while still giving linters strong guarantees
+    about the attributes actually consumed here.
+    """
+
+    text: str | None
+    prompt_tokens: int | None
+    generation_tokens: int | None
+    generation_tps: float | None
+    peak_memory: float | None
+    active_memory: float | None
+    cached_memory: float | None
+    time: float | None
+
 
 # Constants - Defaults
 # These constants define default values for various parameters used in the script.
@@ -687,7 +721,7 @@ class PerformanceResult:
     """Encapsulates a GenerationResult and execution metadata for a model run."""
 
     model_name: str
-    generation: GenerationResult | None
+    generation: GenerationResult | SupportsGenerationResult | None
     success: bool
     error_stage: str | None = None
     error_message: str | None = None
@@ -699,9 +733,9 @@ class PerformanceResult:
 
 # --- File Handling ---
 # Simplified the `find_most_recent_file` function by using `max` with a generator.
-def find_most_recent_file(folder: Path | str) -> Path | None:
+def find_most_recent_file(folder: PathLike) -> Path | None:
     """Return the most recently modified file in a folder, or None."""
-    folder_path = Path(folder)  # Path() handles both str and Path objects
+    folder_path = Path(folder)
     if not folder_path.is_dir():
         logger.error("Provided path is not a directory: %s", folder_path)
         return None
@@ -713,7 +747,7 @@ def find_most_recent_file(folder: Path | str) -> Path | None:
         )
         if most_recent:
             logger.debug("Most recent file found: %s", str(most_recent))
-            return most_recent
+        return most_recent
     except FileNotFoundError:
         logger.exception("Directory not found: %s", folder_path)
     except PermissionError:
@@ -725,7 +759,7 @@ def find_most_recent_file(folder: Path | str) -> Path | None:
 
 
 # Improved error handling in `print_image_dimensions`.
-def print_image_dimensions(image_path: Path | str) -> None:
+def print_image_dimensions(image_path: PathLike) -> None:
     """Print the dimensions and megapixel count of an image file."""
     img_path_str: str = str(image_path)
     try:
@@ -745,7 +779,7 @@ def print_image_dimensions(image_path: Path | str) -> None:
 
 # --- EXIF & Metadata Handling ---
 @functools.lru_cache(maxsize=128)
-def get_exif_data(image_path: PathLike) -> ExifDict | None:
+def get_exif_data(image_path: PathLike) -> ExifDict | None:  # noqa: C901
     """Return decoded EXIF structure or ``None`` if absent.
 
     Multi-pass extraction strategy (kept explicit for robustness / debugging):
@@ -855,7 +889,7 @@ def _convert_gps_coordinate(
     return None
 
 
-def extract_image_metadata(image_path: Path | str) -> MetadataDict:
+def extract_image_metadata(image_path: PathLike) -> MetadataDict:  # noqa: C901, PLR0915
     """Derive high-level metadata (date, description, GPS string, raw EXIF).
 
     Returns None for unavailable date/description/gps instead of sentinel strings.
@@ -1125,13 +1159,11 @@ def _is_performance_timing_field(field_name: str) -> bool:  # kept for clarity
     return field_name in PERFORMANCE_TIMING_FIELDS
 
 
-def _get_field_value(result: PerformanceResult, field_name: str) -> object:
+def _get_field_value(result: PerformanceResult, field_name: str) -> MetricValue:
     """Get field value from either GenerationResult or PerformanceResult."""
     if _is_performance_timing_field(field_name):
-        # Get from PerformanceResult
-        return getattr(result, field_name, "-")
-    # Get from GenerationResult
-    return getattr(result.generation, field_name, "-") if result.generation else "-"
+        return getattr(result, field_name, None)
+    return getattr(result.generation, field_name, None) if result.generation else None
 
 
 # Helper function to sort results by generation time (lowest to highest)
@@ -1220,7 +1252,7 @@ def _format_output_multiline(output_text: str) -> str:
     )
 
 
-def print_model_stats(results: list[PerformanceResult]) -> None:
+def print_model_stats(results: list[PerformanceResult]) -> None:  # noqa: C901, PLR0915, PLR0912
     r"""Emit a compact multi-line header table of per-model metrics.
 
     Space optimization strategies:
@@ -1698,6 +1730,7 @@ def _escape_markdown_in_text(text: str) -> str:
 
     # Escape only the critical markdown characters that break table formatting, PLUS
     # neutralize raw HTML tag markers (<tag>) which GitHub may treat as HTML (e.g. <s> strike-through).
+    # (Subset chosen for formatting/readability; extend if needed.)
     escape_pairs = [
         ("\\", "\\\\"),  # Backslash - escape character, can affect others
         ("|", "\\|"),  # Pipe - CRITICAL: breaks table column structure
@@ -1706,65 +1739,6 @@ def _escape_markdown_in_text(text: str) -> str:
         result = result.replace(char, escaped)
 
     # HTML-like angle bracket handling: escape < and > only when they appear to form a tag
-    # Simple heuristic: `<` followed by optional / then alphanum and `>` within short span.
-    # We replace such patterns with escaped entities so they render literally.
-    # Preserve common GitHub-flavored Markdown HTML tags; escape others so
-    # model tokens like <foo> show literally. GitHub will still sanitize
-    # unsafe attributes, so we only need to avoid over-escaping legit tags.
-    # (Subset chosen for formatting/readability; extend if needed.)
-    allowed_inline_tags: set[str] = {
-        # Basic inline
-        "br",
-        "b",
-        "strong",
-        "i",
-        "em",
-        "code",
-        "kbd",
-        "del",
-        "strike",
-        "sup",
-        "sub",
-        "span",
-        "u",
-        "var",
-        "mark",
-        "small",
-        # Block / structural
-        "pre",
-        "p",
-        "div",
-        "blockquote",
-        "hr",
-        # Lists
-        "ul",
-        "ol",
-        "li",
-        # Tables
-        "table",
-        "thead",
-        "tbody",
-        "tr",
-        "th",
-        "td",
-        # Details/summary disclosure
-        "details",
-        "summary",
-        # Definition lists (less common but supported)
-        "dl",
-        "dt",
-        "dd",
-        # Ruby annotations (rare but supported)
-        "ruby",
-        "rt",
-        "rp",
-        "rb",
-        "rtc",
-        # Links & media (GitHub sanitizes attributes)
-        "a",
-        "img",
-    }
-
     tag_pattern = re.compile(r"</?[A-Za-z][A-Za-z0-9:-]*(?:\s+[^<>]*?)?>")
 
     def _escape_html_like(m: re.Match[str]) -> str:
@@ -1781,9 +1755,7 @@ def _escape_markdown_in_text(text: str) -> str:
     result = tag_pattern.sub(_escape_html_like, result)
 
     # Escape bare ampersands that could start entities; avoid double-escaping existing ones.
-    result = re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
-
-    return result
+    return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
 
 
 def get_system_info() -> tuple[str, str]:
@@ -2093,7 +2065,7 @@ def print_model_result(
     - Consistent indentation and grouping for easier visual scanning.
     """
 
-    def _build_summary_parts(res: PerformanceResult, model_short: str) -> list[str]:
+    def _build_summary_parts(res: PerformanceResult, model_short: str) -> list[str]:  # noqa: C901
         status_local = "OK" if res.success else "FAIL"
         parts_local: list[str] = [f"model={model_short}", f"status={status_local}"]
         if res.generation:
@@ -2113,10 +2085,7 @@ def print_model_result(
                 parts_local.append(f"gen_tps={fmt_num(gen_tps)}")
             if peak_mem_val:
                 peak_str_local = format_field_value("peak_memory", peak_mem_val)
-                if not str(peak_str_local).endswith("MB"):
-                    parts_local.append(f"peak_mem={peak_str_local}MB")
-                else:
-                    parts_local.append(f"peak_mem={peak_str_local}")
+                parts_local.append(f"peak_mem={peak_str_local}GB")
             if total_time_val:
                 tt_val = format_field_value("total_time", total_time_val)
                 if isinstance(tt_val, str):
@@ -2133,7 +2102,7 @@ def print_model_result(
             parts_local.append(f"error={preview_local}")
         return parts_local
 
-    def _print_preview_text(gen_obj: GenerationResult | None) -> None:
+    def _print_preview_text(gen_obj: GenerationResult | SupportsGenerationResult | None) -> None:
         if not gen_obj:
             return
         raw_text_local = getattr(gen_obj, "text", "")
@@ -2212,7 +2181,8 @@ def print_model_result(
             if raw_val <= 0:
                 return
             formatted = format_field_value(field, raw_val)
-            text = f"{formatted} MB" if not str(formatted).endswith("MB") else str(formatted)
+            unit = "GB"
+            text = str(formatted) if str(formatted).endswith(unit) else f"{formatted}{unit}"
             logger.info("    Memory (%s): %s", label, Colors.colored(text, Colors.WHITE))
 
         active_mem_local = getattr(res.generation, "active_memory", 0.0) or 0.0
