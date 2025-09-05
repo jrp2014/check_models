@@ -337,6 +337,7 @@ MB_CONVERSION: Final[float] = 1024 * 1024
 GB_CONVERSION: Final[float] = 1024 * 1024 * 1024
 DECIMAL_GB: Final[float] = 1_000_000_000.0  # Decimal GB (mlx-vlm already divides by 1e9)
 MEM_BYTES_TO_GB_THRESHOLD: Final[float] = 1_000_000.0  # > ~1MB treat as raw bytes from mlx
+MEGAPIXEL_CONVERSION: Final[float] = 1_000_000.0  # Convert pixels to megapixels
 
 # EXIF/GPS coordinate standards: camera hardware stores GPS as degrees-minutes-seconds tuples
 DMS_LEN: Final[int] = 3  # Full DMS: (degrees, minutes, seconds)
@@ -414,8 +415,6 @@ def fmt_num(val: float | str) -> str:
         fval = float(val)
         if abs(fval) >= LARGE_NUMBER_THRESHOLD:
             return f"{fval:,.0f}"
-        if abs(fval) >= 1:
-            return f"{fval:.3g}"
         if abs(fval) > 0:
             return f"{fval:.3g}"
         return str(val)
@@ -500,10 +499,6 @@ def is_numeric_field(field_name: str) -> bool:
         or any(keyword in field_lower for keyword in ("token", "tps", "memory", "time"))
         or field_lower.endswith("_tokens")
     )
-
-
-# Alias for backward compatibility
-is_numeric_string = is_numeric_value
 
 
 # --- Console UI helpers (rules/separators) ---
@@ -774,7 +769,7 @@ def print_image_dimensions(image_path: PathLike) -> None:
             logger.info(
                 "Image dimensions: %s (%.1f MPixels)",
                 f"{width}x{height}",
-                total_pixels / 1_000_000,
+                total_pixels / MEGAPIXEL_CONVERSION,
             )
     except (FileNotFoundError, UnidentifiedImageError):
         logger.exception("Error with image file %s", img_path_str)
@@ -845,12 +840,6 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:  # noqa: C901
     except (FileNotFoundError, UnidentifiedImageError):
         logger.exception(
             Colors.colored(f"Error reading image file: {img_path_str}", Colors.YELLOW),
-        )
-        logger.exception(
-            Colors.colored(
-                f"Unexpected error reading EXIF from: {img_path_str}",
-                Colors.YELLOW,
-            ),
         )
     return None
 
@@ -1454,7 +1443,7 @@ def _prepare_table_data(
             val = _get_field_value(r, f)
             val = format_field_value(f, val)
             # Format numbers
-            is_numeric = isinstance(val, (int, float)) or is_numeric_string(val)
+            is_numeric = isinstance(val, (int, float)) or is_numeric_value(val)
             if is_numeric and isinstance(val, (int, float, str)):
                 val = fmt_num(val)
             row.append(str(val))
