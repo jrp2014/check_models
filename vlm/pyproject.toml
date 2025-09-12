@@ -3,7 +3,7 @@ name = "mlx-vlm-check"
 description = "Image analysis and caption generation using MLX Vision Language Models."
 version = "0.1.0"
 authors = [
-    { name = "Your Name", email = "your@email.com" },
+    { name = "jrp2014", email = "jrp2014@users.noreply.github.com" },
 ]
 requires-python = ">=3.12"
 readme = "README.md"
@@ -11,22 +11,17 @@ license = { text = "MIT" }
 keywords = ["mlx", "vision", "language-model", "ai", "image-analysis"]
 classifiers = [
     "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers", 
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research", 
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3 :: Only",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Operating System :: MacOS",
+    "Environment :: Console",
 ]
-
-[project.urls]
-Homepage = "https://github.com/jrp2014/scripts"
-Repository = "https://github.com/jrp2014/scripts"
-Issues = "https://github.com/jrp2014/scripts/issues"
-
-[project.scripts]
-# Use fully-qualified module path for the CLI entry point (module inside vlm package)
-mlx-vlm-check = "vlm.check_models:main_cli"
-
 # PEP 621: declare runtime dependencies as an inline array instead of a key/value table.
 # This keeps ordering deterministic and simplifies automated parsing.
 dependencies = [
@@ -42,6 +37,15 @@ dependencies = [
     # System utilities
     "tzlocal>=5.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/jrp2014/scripts"
+Repository = "https://github.com/jrp2014/scripts"
+Issues = "https://github.com/jrp2014/scripts/issues"
+
+[project.scripts]
+# Use fully-qualified module path for the CLI entry point (module inside vlm package)
+mlx-vlm-check = "vlm.check_models:main_cli"
 
 [tool.setuptools.packages.find]
 where = ["."]
@@ -75,14 +79,6 @@ dev = [
     "pytest-cov>=4.0.0",
 ]
 
-[tool.uv]
-dev-dependencies = [
-    "ruff>=0.1.0",
-    "mypy>=1.8.0", 
-    "pytest>=8.0.0",
-    "pytest-cov>=4.0.0",
-]
-
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
@@ -103,11 +99,16 @@ extend-select = ["B"]
 select = ["ALL"]
 ignore = [
     "COM812",  # Conflicts with formatter
+    "ISC001",  # Conflicts with formatter
     "D203",    # Conflicts with D211
     "D213",    # Conflicts with D212
     "D100", "D101", "D102", "D103", "D104", "D105", "D106", "D107", # Missing docstrings
-    "S101", # Use of assert
-    "E501", # Line too long
+    "S101",    # Use of assert
+    "E501",    # Line too long
+    "PLR0913", # Too many arguments
+    "PLR0915", # Too many statements
+    "C901",    # Complex structure (handled by style guide)
+    "PLR0912", # Too many branches
 ]
 
 [tool.pylance]
@@ -127,6 +128,6 @@ ignore_missing_imports = true
 # disallow_untyped_defs = true
 warn_return_any = true
 warn_unused_configs = true
-line-length = 100
-exclude = [".venv", "__pycache__", "build", "dist"]
-indent-width = 4
+warn_redundant_casts = true
+warn_unreachable = true
+strict_optional = true
