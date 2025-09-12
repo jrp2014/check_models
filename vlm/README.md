@@ -72,13 +72,40 @@ conda activate mlx-vlm
 pip install -e .
 ```
 
+#### Automated Setup (Recommended)
+
+For the easiest setup, use the provided shell script that automates the entire conda environment creation:
+
+```bash
+# Make script executable (if needed)
+chmod +x setup_conda_env.sh
+
+# Create environment with default name 'mlx-vlm'
+./setup_conda_env.sh
+
+# Or create with custom name
+./setup_conda_env.sh my-custom-env-name
+
+# View help
+./setup_conda_env.sh --help
+```
+
+The script will:
+
+* Check for macOS and Apple Silicon compatibility
+* Create a conda environment with Python 3.12
+* Install all required and optional dependencies
+* Install the package in development mode
+* Verify the installation
+* Provide usage instructions
+
 ### Manual Installation
 
 If you prefer to install dependencies manually (ensure these match `pyproject.toml`):
 
 <!-- BEGIN MANUAL_INSTALL -->
 ```bash
-pip install "huggingface-hub>=0.23.0" "mlx>=0.14.0" "mlx-vlm>=0.0.9" "Pillow>=10.0.0" "tabulate>=0.9.0" "tzlocal>=5.0"
+pip install "datasets>=2.19.1" "fastapi>=0.95.1" "huggingface-hub>=0.23.0" "jinja2" "mlx>=0.29.1" "mlx-lm>=0.23.0" "mlx-vlm>=0.0.9" "numpy" "opencv-python>=4.12.0.88" "Pillow>=10.3.0" "protobuf" "pyyaml" "requests>=2.31.0" "soundfile>=0.13.1" "tabulate>=0.9.0" "tqdm>=4.66.2" "transformers>=4.53.0" "tzlocal>=5.0" "uvicorn"
 ```
 <!-- END MANUAL_INSTALL -->
 
@@ -94,21 +121,28 @@ Runtime (installed automatically via `pip install -e .`):
 
 | Purpose | Package | Minimum |
 |---------|---------|---------|
-| Core tensor/runtime | `mlx` | `>=0.14.0` |
+| Core tensor/runtime | `mlx` | `>=0.29.1` |
 | Vision‑language utilities | `mlx-vlm` | `>=0.0.9` |
-| Image EXIF & loading | `Pillow` | `>=10.0.0` |
+| Language model utilities | `mlx-lm` | `>=0.23.0` |
+| Core Python data libraries | `numpy` | (latest) |
+| Image processing & loading | `Pillow` | `>=10.3.0` |
+| Computer vision | `opencv-python` | `>=4.12.0.88` |
+| ML/AI frameworks | `transformers` | `>=4.53.0` |
+| Dataset handling | `datasets` | `>=2.19.1` |
 | Model cache / discovery | `huggingface-hub` | `>=0.23.0` |
-| Tabular console & report formatting | `tabulate` | `>=0.9.0` |
+| Serialization & config | `protobuf`, `pyyaml`, `jinja2` | (latest) |
+| Network & API | `requests` | `>=2.31.0` |
+| Web framework | `fastapi`, `uvicorn` | `>=0.95.1`, (latest) |
+| Audio processing | `soundfile` | `>=0.13.1` |
+| Console formatting & progress | `tabulate`, `tqdm` | `>=0.9.0`, `>=4.66.2` |
 | Local timezone conversion | `tzlocal` | `>=5.0` |
 
 Optional (enable additional features if present):
 
 | Feature | Package | Notes |
 |---------|---------|-------|
-| Additional model families / loaders | `transformers` | Via `extras`; use up-to-date (>=4.41.0) for latest multimodal fixes |
-| Alternative MLX language utilities | `mlx-lm` | Via `extras` group |
-| Fast tokenizer backends | `tokenizers` | Installed automatically with `transformers` (no manual install) |
 | Extended system metrics (RAM/CPU) | `psutil` | Included in `extras`; optional for hardware block |
+| Fast tokenizer backends | `tokenizers` | Via `extras`; enhanced tokenization utilities |
 
 Development / QA:
 
@@ -122,7 +156,7 @@ Development / QA:
 
 <!-- BEGIN MINIMAL_INSTALL -->
 ```bash
-pip install "huggingface-hub>=0.23.0" "mlx>=0.14.0" "mlx-vlm>=0.0.9" "Pillow>=10.0.0" "tabulate>=0.9.0" "tzlocal>=5.0"
+pip install "datasets>=2.19.1" "fastapi>=0.95.1" "huggingface-hub>=0.23.0" "jinja2" "mlx>=0.29.1" "mlx-lm>=0.23.0" "mlx-vlm>=0.0.9" "numpy" "opencv-python>=4.12.0.88" "Pillow>=10.3.0" "protobuf" "pyyaml" "requests>=2.31.0" "soundfile>=0.13.1" "tabulate>=0.9.0" "tqdm>=4.66.2" "transformers>=4.53.0" "tzlocal>=5.0" "uvicorn"
 ```
 <!-- END MINIMAL_INSTALL -->
 

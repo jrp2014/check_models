@@ -26,14 +26,32 @@ classifiers = [
 # This keeps ordering deterministic and simplifies automated parsing.
 dependencies = [
     # Core MLX dependencies (raised minimums to align with currently tested APIs)
-    "mlx>=0.14.0",
+    "mlx>=0.29.1",
     "mlx-vlm>=0.0.9",
+    "mlx-lm>=0.23.0",
+    # Core Python data libraries
+    "numpy",
     # Image processing
-    "Pillow>=10.0.0",
+    "Pillow>=10.3.0",
+    "opencv-python>=4.12.0.88",
+    # ML/AI frameworks
+    "transformers>=4.53.0",
+    "datasets>=2.19.1",
     # Model and caching utilities
     "huggingface-hub>=0.23.0",
-    # Report generation
+    # Serialization and configuration
+    "protobuf",
+    "pyyaml",
+    "jinja2",
+    # Network and API
+    "requests>=2.31.0",
+    "fastapi>=0.95.1",
+    "uvicorn",
+    # Audio processing
+    "soundfile>=0.13.1",
+    # Report generation and utilities
     "tabulate>=0.9.0",
+    "tqdm>=4.66.2",
     # System utilities
     "tzlocal>=5.0",
 ]
@@ -54,9 +72,6 @@ include = ["vlm*"]
 [project.optional-dependencies]
 # Optional dependencies for enhanced functionality
 extras = [
-    # Newer transformers provides improved multimodal templates & bug fixes
-    "transformers>=4.41.0,<5",
-    "mlx-lm>=0.10.0",
     # Hardware metrics (optional system block)
     "psutil>=5.9.0",
     # Tokenization utilities (optional; used for versions/introspection only)
