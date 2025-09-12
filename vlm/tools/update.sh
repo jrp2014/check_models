@@ -39,7 +39,7 @@ DEV_PACKAGES=(
 )
 
 TORCH_PACKAGES=(
-	"torch" "torchvision" "torchaudio"
+	"torch>=2.2.0" "torchvision>=0.17.0" "torchaudio>=2.2.0"
 )
 
 EXTRA_ARGS=()

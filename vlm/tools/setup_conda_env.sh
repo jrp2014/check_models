@@ -211,6 +211,19 @@ install_dependencies() {
             "pytest>=8.0.0" \
             "pytest-cov>=4.0.0"
     fi
+
+    # Optional: PyTorch stack (torch, torchvision, torchaudio)
+    read -p "Install PyTorch stack (torch, torchvision, torchaudio)? (y/N): " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        log_info "Installing PyTorch packages..."
+        # On Apple Silicon, standard PyPI wheels provide MPS acceleration.
+        pip install \
+            "torch>=2.2.0" \
+            "torchvision>=0.17.0" \
+            "torchaudio>=2.2.0"
+        log_success "Installed PyTorch packages"
+    fi
     
     # Install this package in development mode
     if [[ -f "pyproject.toml" ]]; then
@@ -241,6 +254,11 @@ from PIL import Image
 import huggingface_hub
 import tabulate
 import tzlocal
+try:
+    import torch, torchvision, torchaudio
+    print(f'✓ PyTorch version: {torch.__version__}')
+except Exception:
+    pass
 print('✓ All core packages imported successfully')
 print(f'✓ MLX version: {mx.__version__}')
 "
@@ -275,6 +293,10 @@ To use the MLX VLM environment:
 4. Example usage:
    ${BLUE}mlx-vlm-check --image /path/to/image.jpg${NC}
    ${BLUE}mlx-vlm-check --models "microsoft/Florence-2-large"${NC}
+
+Optional installs:
+    - To include PyTorch stack during setup, answer 'y' when prompted, or later run:
+      ${BLUE}pip install "scripts[torch]"${NC}
 
 5. Deactivate when done:
    ${BLUE}conda deactivate${NC}

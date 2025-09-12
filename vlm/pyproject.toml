@@ -79,12 +79,14 @@ extras = [
 ]
 
 # Guidance: Torch is supported but not required globally; install only when needed for specific models.
-# Example (uncomment to use a curated torch extra):
-# torch = [
-#     "torch>=2.2.0; platform_system == 'Darwin'",
-#     "torchvision>=0.17.0; platform_system == 'Darwin'",
-#     "torchaudio>=2.2.0; platform_system == 'Darwin'",
-# ]
+# Provide a dedicated extra to make it simple to opt in.
+torch = [
+    # Recent PyTorch wheels for macOS include MPS acceleration out of the box.
+    # Version pins chosen to align with stable 2.2+ API and matching torchvision/torchaudio.
+    "torch>=2.2.0",
+    "torchvision>=0.17.0",
+    "torchaudio>=2.2.0",
+]
 
 # Development dependencies
 dev = [
