@@ -432,7 +432,7 @@ def format_field_label(field_name: str) -> str:
 allowed_inline_tags = {"b", "strong", "i", "em", "code"}
 
 
-def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: C901, PLR0911
+def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: PLR0911
     """Normalize and format field values for display.
 
     Rules:
@@ -781,7 +781,7 @@ def print_image_dimensions(image_path: PathLike) -> None:
 
 # --- EXIF & Metadata Handling ---
 @functools.lru_cache(maxsize=128)
-def get_exif_data(image_path: PathLike) -> ExifDict | None:  # noqa: C901
+def get_exif_data(image_path: PathLike) -> ExifDict | None:
     """Return decoded EXIF structure or ``None`` if absent.
 
     Multi-pass extraction strategy (kept explicit for robustness / debugging):
@@ -885,7 +885,7 @@ def _convert_gps_coordinate(
     return None
 
 
-def extract_image_metadata(image_path: PathLike) -> MetadataDict:  # noqa: C901, PLR0915
+def extract_image_metadata(image_path: PathLike) -> MetadataDict:
     """Derive high-level metadata (date, description, GPS string, raw EXIF).
 
     Returns None for unavailable date/description/gps instead of sentinel strings.
