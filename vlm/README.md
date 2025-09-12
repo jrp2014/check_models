@@ -175,7 +175,7 @@ pip install -e ".[dev,extras]"
 ```
 
 Notes:
- 
+
 * `psutil` is optional (installed with `extras`); if absent the extended Apple Silicon hardware section omits RAM/cores.
 * `tokenizers` is a transitive dependency of `transformers`; you don't need to list or install it separately.
 * `transformers` moves quickly for multimodal / vision improvements. Keeping it updated (within the declared range `>=4.41.0,<5`) is recommended:
