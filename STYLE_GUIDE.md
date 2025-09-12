@@ -36,12 +36,13 @@ Current config (see `pyproject.toml`):
 - `select = ["ALL"]` + targeted `ignore` list.
 - Long line rule `E501` ignored intentionally: long literals (HTML/CSS, structured log templates) are acceptable if breaking harms readability.
 - Docstring rules (D100–D107) ignored: we require docstrings only for non‑obvious or externally consumed functions.
-- Complexity warnings (e.g., C901) may appear; do not refactor purely to silence them if it reduces clarity. Instead:
+- Formatter conflicts (`COM812`, `ISC001`) ignored: ruff format handles these.
+- Complexity warnings (e.g., `C901`, `PLR0913`, `PLR0915`, `PLR0912`) may appear; do not refactor purely to silence them if it reduces clarity. Instead:
   - Add a top‑of‑function comment summarizing the flow; OR
   - If truly egregious and conceptually separable, refactor.
   - Suppression (`# noqa: C901`) is allowed with an explanatory comment above it.
-- Use `ruff format` for layout formatting
-- Use `ruff check --fix` to
+- Use `ruff format` for layout formatting.
+- Use `ruff check --fix` to apply automated fixes for style violations.
 
 ## Function Size & Complexity
 
@@ -124,6 +125,8 @@ Before refactoring for size:
 ## Memory / Performance Reporting
 
 - Keep formatting logic centralized (e.g., `format_field_value`). If a new metric aligns with existing heuristics, extend the existing function rather than branching inline.
+- Memory values: Mixed sources require heuristic unit detection. MLX returns bytes; mlx-vlm returns decimal GB (bytes/1e9). The `format_field_value` function handles this automatically via threshold detection.
+- Memory display: All memory values formatted as GB with adaptive decimal places (0, 1, or 2 decimals based on magnitude).
 
 ## HTML / CSS Blocks
 
@@ -172,15 +175,19 @@ Required conventions for this project:
 7. Keep ordering logically grouped: `[project]` → `[project.urls]` → `[project.scripts]` → dependencies array → extras → build-system → tool configs.
 8. Do NOT introduce dynamic version computation; version is a literal string (`version = "x.y.z"`).
 9. When adding a new tool section, prefer concise comments referencing its upstream documentation.
-10. Any change to runtime dependencies MUST be followed by running the README sync script (`python -m vlm.tools.update_readme_deps`).
+10. Any change to runtime dependencies MUST be followed by running the README sync script (`cd vlm && python tools/update_readme_deps.py`).
 
 Validation checklist before committing pyproject changes:
 
 - [ ] PEP 621 core fields present (name/version/description/authors/readme/license/classifiers)
-- [ ] `dependencies` array present and sorted conceptually (grouped by comment blocks)
+- [ ] `dependencies` array present within `[project]` section and sorted conceptually (grouped by comment blocks)
 - [ ] No stale legacy `[project.dependencies]` table remains
 - [ ] Extras defined only if referenced in docs / README
 - [ ] CLI script path correct & importable
+- [ ] Author information updated (no placeholder "Your Name")
+- [ ] Appropriate classifiers added (including "Python :: 3 :: Only", OS-specific, etc.)
+- [ ] No duplicate dependency sections (e.g., redundant `[tool.uv]` when `[project.optional-dependencies]` exists)
+- [ ] Tool configs valid (mypy settings don't include formatter-specific fields)
 - [ ] README dependency blocks regenerated
 - [ ] Tool sections still parse (run a local `pip install -e .` or `uv pip install -e .`)
 
@@ -189,7 +196,7 @@ Automation:
 - A GitHub Actions workflow (`.github/workflows/dependency-sync.yml`) enforces that README dependency blocks match `pyproject.toml`. If the workflow fails, run:
 
 ```bash
-python -m vlm.tools.update_readme_deps
+cd vlm && python tools/update_readme_deps.py
 git add vlm/README.md
 git commit -m "Sync README dependency blocks"
 ```
@@ -201,7 +208,7 @@ cat > .git/hooks/pre-commit <<'HOOK'
 #!/usr/bin/env bash
 if git diff --cached --name-only | grep -q '^vlm/pyproject.toml$'; then
   echo '[pre-commit] Syncing README dependency blocks'
-  python -m vlm.tools.update_readme_deps || exit 1
+  cd vlm && python tools/update_readme_deps.py || exit 1
   git add vlm/README.md
 fi
 HOOK
