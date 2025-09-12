@@ -296,7 +296,7 @@ To use the MLX VLM environment:
 
 Optional installs:
     - To include PyTorch stack during setup, answer 'y' when prompted, or later run:
-      ${BLUE}pip install "scripts[torch]"${NC}
+    ${BLUE}pip install -e ".[torch]"${NC}
 
 5. Deactivate when done:
    ${BLUE}conda deactivate${NC}

@@ -99,6 +99,12 @@ The script will:
 * Verify the installation
 * Provide usage instructions
 
+Torch support:
+
+* During setup, you'll be prompted to install the optional PyTorch stack (torch, torchvision, torchaudio). Choose 'y' if you plan to use models that rely on Torch.
+* You can also install later via the project extra: `pip install -e ".[torch]"`.
+* The update helper script supports installing Torch too: run with `INSTALL_TORCH=1` to include it.
+
 ## Notes on Metrics and Output Formatting
 
 * Memory units: All memory metrics are displayed in GB. Sources differ: MLX reports bytes; mlx‑vlm reports decimal GB (bytes/1e9). The tool detects and normalizes both to GB for consistent display.
@@ -152,6 +158,7 @@ Optional (enable additional features if present):
 |---------|---------|-------|
 | Extended system metrics (RAM/CPU) | `psutil` | Included in `extras`; optional for hardware block |
 | Fast tokenizer backends | `tokenizers` | Via `extras`; enhanced tokenization utilities |
+| PyTorch stack | `torch`, `torchvision`, `torchaudio` | Optional extra `.[torch]`; installed on demand |
 
 Development / QA:
 
@@ -177,6 +184,12 @@ The `extras` group in `pyproject.toml` pulls in `transformers`, `mlx-lm`, and `p
 pip install -e ".[extras]"
 ```
 
+To include the optional PyTorch stack when needed:
+
+```bash
+pip install -e ".[torch]"
+```
+
 ### Full Development Environment
 
 ```bash
@@ -186,13 +199,14 @@ pip install -e ".[dev,extras]"
 Notes:
 
 * `psutil` is optional (installed with `extras`); if absent the extended Apple Silicon hardware section omits RAM/cores.
-* `tokenizers` is a transitive dependency of `transformers`; you don't need to list or install it separately.
-* `transformers` moves quickly for multimodal / vision improvements. Keeping it updated (within the declared range `>=4.41.0,<5`) is recommended:
+* `tokenizers` is a transitive dependency of `transformers`; you usually don't need to list or install it separately.
+* `transformers` moves quickly for multimodal / vision improvements. Keeping it updated (within the declared range `>=4.53.0,<5`) is recommended:
   * Upgrade: `pip install -U transformers`
   * If a 5.x release appears, test locally before relaxing the `<5` upper bound.
   * Newer releases often fix chat template, processor, and safety issues relevant to VLMs.
 * `system_profiler` is a macOS built-in (no install needed) used for GPU name / core info.
 * Torch is supported and can be installed when you need it for specific models; the script does not block Torch.
+* The `tools/update.sh` helper supports adding Torch via an environment flag: `INSTALL_TORCH=1 ./tools/update.sh`.
 * Installing `sentence-transformers` isn’t necessary for this tool and may pull heavy backends into import paths; a heads‑up is logged if detected.
 * Long embedded CSS / HTML lines are intentional (readability > artificial wrapping).
 * Dependency versions in this README are automatically kept in sync with `pyproject.toml`; update the TOML first and reflect changes here.
