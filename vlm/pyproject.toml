@@ -125,7 +125,7 @@ python_version = "3.12"
 ignore_missing_imports = true
 # For stricter checking, you can enable the following:
 # disallow_untyped_defs = true
-# warn_return_any = true
+warn_return_any = true
 warn_unused_configs = true
 line-length = 100
 exclude = [".venv", "__pycache__", "build", "dist"]

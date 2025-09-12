@@ -37,6 +37,7 @@ DEV_PACKAGES=(
 	"mypy>=1.8.0"
 	"pytest>=8.0.0"
 	"pytest-cov>=4.0.0"
+    "ty"
 )
 
 TORCH_PACKAGES=(

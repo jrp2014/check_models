@@ -61,6 +61,8 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from zoneinfo import ZoneInfo
 
+    from mlx.nn import Module
+
 LOGGER_NAME: Final[str] = "mlx-vlm-check"
 NOT_AVAILABLE: Final[str] = "N/A"
 
@@ -1871,7 +1873,7 @@ def _run_model_generation(
     repo). Errors are wrapped with traceback context so upstream summaries can
     show concise messages while verbose logs retain full detail.
     """
-    model: object
+    model: Module
     tokenizer: object
 
     # Load model from HuggingFace Hub - this handles automatic download/caching
