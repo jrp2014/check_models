@@ -429,7 +429,10 @@ def format_field_label(field_name: str) -> str:
     return field_name.replace("_", " ").title()
 
 
-allowed_inline_tags = {"b", "strong", "i", "em", "code"}
+# Allowlist of inline HTML tags we preserve in Markdown output
+# Keep <br> for line breaks; do NOT include 's' to avoid interpreting <s> tokens
+# from model output as strikethrough.
+allowed_inline_tags = {"br", "b", "strong", "i", "em", "code"}
 
 
 def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: PLR0911
@@ -2186,7 +2189,7 @@ def _log_verbose_success_details(res: PerformanceResult) -> None:
             return
         formatted = format_field_value(field, raw_val)
         unit = "GB"
-        text = str(formatted) if str(formatted).endswith(unit) else f"{formatted}{unit}"
+        text = str(formatted) if str(formatted).endswith(unit) else f"{formatted} {unit}"
         logger.info("    Memory (%s): %s", label, Colors.colored(text, Colors.WHITE))
 
     active_mem = getattr(res.generation, "active_memory", 0.0) or 0.0
