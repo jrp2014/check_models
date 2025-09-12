@@ -16,19 +16,18 @@ brew upgrade
 pip install -U pip setuptools wheel cmake typing_extensions
 
 RUNTIME_PACKAGES=(
-	"mlx>=0.14.0"
+	"mlx>=0.29.1"
 	"mlx-vlm>=0.0.9"
-	"Pillow>=10.0.0"
+	"Pillow>=10.3.0"
 	"huggingface-hub>=0.23.0"
 	"tabulate>=0.9.0"
 	"tzlocal>=5.0"
     "numpy"
-    "nanobind==2.4.0"
 )
 
 EXTRAS_PACKAGES=(
-	"transformers>=4.41.0"
-	"mlx-lm>=0.10.0"
+	"transformers>=4.53.0"
+	"mlx-lm>=0.23.0"
 	"psutil>=5.9.0"
 )
 
@@ -37,7 +36,6 @@ DEV_PACKAGES=(
 	"mypy>=1.8.0"
 	"pytest>=8.0.0"
 	"pytest-cov>=4.0.0"
-    "ty"
 )
 
 TORCH_PACKAGES=(
