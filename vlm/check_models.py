@@ -735,17 +735,29 @@ class PerformanceResult:
 # --- File Handling ---
 # Simplified the `find_most_recent_file` function by using `max` with a generator.
 def find_most_recent_file(folder: PathLike) -> Path | None:
-    """Return the most recently modified file in a folder, or None."""
+    """Return the most recently modified file in a folder, or None.
+
+    Scans for regular files (excluding hidden files starting with '.') and
+    returns the one with the most recent modification time.
+    """
     folder_path = Path(folder)
     if not folder_path.is_dir():
         logger.error("Provided path is not a directory: %s", folder_path)
         return None
+
     try:
+        # Find all regular files, excluding hidden files (starting with '.')
+        regular_files = [
+            f for f in folder_path.iterdir() if f.is_file() and not f.name.startswith(".")
+        ]
+
+        # Return the most recently modified file, or None if no files found
         most_recent: Path | None = max(
-            (f for f in folder_path.iterdir() if f.is_file() and not f.name.startswith(".")),
+            regular_files,
             key=lambda f: f.stat().st_mtime,
             default=None,
         )
+
     except FileNotFoundError:
         logger.exception("Directory not found: %s", folder_path)
         return None
@@ -755,12 +767,14 @@ def find_most_recent_file(folder: PathLike) -> Path | None:
     except OSError:
         logger.exception("OS error scanning folder %s", folder_path)
         return None
-    else:
-        if most_recent:
-            logger.debug("Most recent file found: %s", str(most_recent))
-            return most_recent
-        logger.debug("No files found in directory: %s", folder_path)
-        return None
+
+    # Log result and return
+    if most_recent:
+        logger.debug("Most recent file found: %s", str(most_recent))
+        return most_recent
+
+    logger.debug("No files found in directory: %s", folder_path)
+    return None
 
 
 # Improved error handling in `print_image_dimensions`.
