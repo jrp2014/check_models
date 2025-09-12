@@ -748,15 +748,15 @@ def find_most_recent_file(folder: PathLike) -> Path | None:
         )
         if most_recent:
             logger.debug("Most recent file found: %s", str(most_recent))
-        else:
             return most_recent
+        logger.debug("No files found in directory: %s", folder_path)
+        return None
     except FileNotFoundError:
         logger.exception("Directory not found: %s", folder_path)
     except PermissionError:
         logger.exception("Permission denied accessing folder: %s", folder_path)
     except OSError:
         logger.exception("OS error scanning folder %s", folder_path)
-    logger.debug("No files found in directory: %s", folder_path)
     return None
 
 
