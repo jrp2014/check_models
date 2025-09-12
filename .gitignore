@@ -1,0 +1,43 @@
+# Global ignores for this repository (root-level)
+
+# macOS
+.DS_Store
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv/
+venv/
+env/
+ENV/
+.env
+.env.*
+*.env
+
+# Test/coverage caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.hypothesis/
+.tox/
+.nox/
+.pyre/
+.pytype/
+.coverage*
+coverage.xml
+
+# Packaging / build artifacts
+build/
+dist/
+*.egg
+*.egg-info/
+*.whl
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
+*.log

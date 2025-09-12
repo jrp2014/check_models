@@ -217,6 +217,18 @@ chmod +x .git/hooks/pre-commit
 
 Rationale: Following the packaging guide ensures forward compatibility with modern build backends, simplifies automated parsing (agents & scripts), and avoids ambiguous duplication of dependency sources.
 
+## Git Hygiene and Caches
+
+- Do not commit ephemeral caches or local environment files. This repository includes a root `.gitignore` and `vlm/.gitignore` that exclude common caches and artifacts:
+  - Python: `__pycache__/`, `*.py[cod]`
+  - Tools: `.pytest_cache/`, `.ruff_cache/`, `.mypy_cache/`, `.hypothesis/`, `.tox/`, `.nox/`
+  - Editors/IDE: `.vscode/`, `.idea/`
+  - Packaging: `build/`, `dist/`, `*.egg-info/`, `*.whl`
+  - Environments: `.venv/`, `venv/`, `env/`, `.env*`, `*.env`
+  - macOS: `.DS_Store`
+- If new tooling introduces a cache directory, add it to the appropriate `.gitignore`.
+- Generated artifacts like `results.html` and `results.md` are acceptable to commit for sharing, but large binary caches from Hugging Face or MLX should remain local.
+
 ## Tests (If/When Added)
 
 - Minimal, focused tests for parsing/formatting helpers.

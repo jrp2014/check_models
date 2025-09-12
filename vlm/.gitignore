@@ -41,6 +41,11 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *.coveragerc
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+.vscode/
+.idea/
 
 # Translations
 *.mo

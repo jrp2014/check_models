@@ -5,7 +5,7 @@
 ## Capabilities
 
 * Auto‑discovers locally cached MLX VLMs (Hugging Face cache) or runs an explicit list.
-* Captures structured performance: generation time, model load time, total time, token counts, tokens/sec, peak memory.
+* Captures structured performance: generation time, model load time, total time, token counts, tokens/sec, peak memory (GB).
 * Extracts EXIF + GPS metadata (robust to partial corruption) for context.
 * Provides compact console table + per‑model SUMMARY lines (machine parsable: `SUMMARY key=value ...`).
 * Generates standalone HTML and GitHub‑friendly Markdown reports.
@@ -98,6 +98,15 @@ The script will:
 * Install the package in development mode
 * Verify the installation
 * Provide usage instructions
+
+## Notes on Metrics and Output Formatting
+
+* Memory units: All memory metrics are displayed in GB. Sources differ: MLX reports bytes; mlx‑vlm reports decimal GB (bytes/1e9). The tool detects and normalizes both to GB for consistent display.
+* Markdown escaping: The final output column preserves common GitHub‑supported tags (e.g., `<br>`) and escapes others so special tokens like `<s>` render literally.
+
+## Git Hygiene and Caches
+
+This repo excludes ephemeral caches and local environments via `.gitignore`. Common exclusions include `__pycache__/`, `.pytest_cache/`, `.ruff_cache/`, `.mypy_cache/`, `.venv/`, and editor folders like `.vscode/`. Do not commit large model caches (e.g., Hugging Face) to the repository.
 
 ### Manual Installation
 
