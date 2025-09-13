@@ -29,6 +29,31 @@ Do NOT introduce a new function solely to silence a complexity / length warning 
 - Runtime casts: use `typing.cast` sparingly; prefer narrowing via `if` guards.
 - Replace blanket `# type: ignore` with specific codes (e.g., `# type: ignore[attr-defined]`).
 
+## Missing Values and Sentinels
+
+- Return `None` for missing/unavailable values instead of sentinel strings like "N/A" or "Unknown".
+- Functions that may not be able to compute a value should reflect this in the return type with `| None`.
+- Callers must handle `None` explicitly (e.g., via branching or a user-facing fallback), rather than baking sentinels into the data layer.
+- Logging/printing: prefer empty string or a localized message at the presentation layer, e.g.,
+  - `logger.info("Date: %s", date or "")` if the field is optional.
+  - For summaries intended for machines, omit missing key/value pairs entirely rather than outputting placeholder text.
+
+Rationale: `None` preserves semantic meaning for "not present" and avoids accidental comparisons against magic strings. It also simplifies downstream formatting logic and enables proper type checking.
+
+### Library Versions (Optional values)
+
+- Library version values are `str | None` (optional). When a version is unknown or a library isn't installed, return `None` and let presentation layers render an empty value.
+- CLI/Markdown/HTML should not insert placeholders like "N/A" or "-" for versions. Prefer blank values for a clean, non‑misleading display.
+
+### Centralized Display Normalization
+
+- Use `format_field_value(field_name, value)` for all metric formatting. It is responsible for:
+  - Converting `None` → `""` for display.
+  - Normalizing memory values to GB with adaptive precision.
+  - Formatting time (seconds) and TPS consistently.
+  - Applying numeric formatting consistently.
+- Callers should avoid duplicating formatting logic (e.g., do not re‑format numeric strings or add ad‑hoc fallbacks). If a new metric is introduced, extend the central formatter instead of branching inline.
+
 ## Ruff / Linting
 
 Current config (see `pyproject.toml`):
@@ -87,6 +112,15 @@ Before refactoring for size:
 - Markdown doesn’t support vertical alignment controls; most renderers (e.g., GitHub) top-align cells by default.
 - Enforce vertical top alignment only in the HTML report via inline CSS; keep Markdown simple for portability.
 
+### Markdown/HTML escaping policy
+
+- Preserve a small allowlist of inline HTML tags that GitHub renders safely: `br`, `b`, `strong`, `i`, `em`, `code`.
+- Escape all other HTML‑like tags by replacing `<` and `>` with `&lt;` and `&gt;` (prevents accidental interpretation, e.g., `<s>`).
+- For Markdown output specifically:
+  - Escape only the pipe character `|` (critical for table layout). Do not escape backslashes to avoid double‑escaping user content.
+  - Convert newlines to `<br>` to maintain row structure in pipe tables.
+  - Keep other characters as‑is to minimize visual noise.
+
 ### Timezones
 
 - Prefer `datetime.UTC` for aware datetimes; localize with `tzlocal.get_localzone()` when formatting local times.
@@ -124,9 +158,9 @@ Before refactoring for size:
 
 ## Memory / Performance Reporting
 
-- Keep formatting logic centralized (e.g., `format_field_value`). If a new metric aligns with existing heuristics, extend the existing function rather than branching inline.
-- Memory values: Mixed sources require heuristic unit detection. MLX returns bytes; mlx-vlm returns decimal GB (bytes/1e9). The `format_field_value` function handles this automatically via threshold detection.
-- Memory display: All memory values formatted as GB with adaptive decimal places (0, 1, or 2 decimals based on magnitude).
+- Keep formatting logic centralized (e.g., `format_field_value`). If a new metric aligns with existing heuristics, extend the existing function rather than branching inline. Do not perform extra per‑cell formatting in table builders.
+- Memory values: Mixed sources require heuristic unit detection. MLX returns bytes; mlx-vlm returns decimal GB (bytes/1e9). The central formatter handles this automatically via threshold detection.
+- Memory display: Always show GB (decimal GB). Use adaptive precision: integers for large values, one decimal for mid‑range, two decimals for fractions.
 
 ## HTML / CSS Blocks
 
@@ -279,6 +313,57 @@ def process_image_pipeline(...) -> Result:  # noqa: C901 (Reason: cohesive multi
   ...
   # --- Aggregate & return ---
   return result
+```
+
+## Conventions in Practice
+
+A few short examples to make common conventions concrete:
+
+### Metric formatting via the central formatter
+
+```python
+from vlm.check_models import format_field_value
+
+# Memory (mlx bytes -> decimal GB normalization)
+format_field_value("peak_memory", 8_589_934_592)  # "8.6"
+format_field_value("peak_memory", 0.25)          # "0.25"
+
+# Time (seconds)
+format_field_value("generation_time", 1.2345)    # "1.23s"
+
+# TPS (adaptive precision)
+format_field_value("generation_tps", 1234.56)    # "1,235"
+
+# Missing values → empty string
+format_field_value("peak_memory", None)           # ""
+```
+
+### Rendering library versions (optional values)
+
+```python
+versions = {"mlx": "0.19.0", "mlx-vlm": None, "Pillow": "10.4.0"}
+
+# CLI (example):
+# mlx:       0.19.0
+# mlx-vlm:
+# Pillow:    10.4.0
+
+# Markdown:
+# - `mlx`: `0.19.0`
+# - `mlx-vlm`: ``
+# - `Pillow`: `10.4.0`
+```
+
+### Markdown escaping policy (tables)
+
+```text
+Input:  a|b\\c <unk>\nNext line
+Output: a\|b\\c &lt;unk&gt;<br>Next line
+
+- Only the pipe `|` is escaped (to preserve table columns).
+- Backslashes are preserved (no extra escaping added).
+- Unknown HTML-like tags (e.g., <unk>) are neutralized.
+- Newlines become <br> to keep single-row structure.
 ```
 
 ## When in Doubt

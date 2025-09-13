@@ -3,23 +3,14 @@
 
 from __future__ import annotations
 
-import importlib.util as importlib_util
-import os
-
-# Prevent Transformers from importing heavy backends that can hang on macOS/ARM
-# when they are present in the environment but not needed for MLX workflows.
-if os.getenv("MLX_VLM_ALLOW_TF", "0") != "1":
-    os.environ.setdefault("TRANSFORMERS_NO_TF", "1")
-    os.environ.setdefault("TRANSFORMERS_NO_FLAX", "1")
-    os.environ.setdefault("TRANSFORMERS_NO_JAX", "1")
-
 import argparse
 import contextlib
 import dataclasses
-import functools
 import html
+import importlib.util as importlib_util
 import json
 import logging
+import os
 import platform
 import re
 import signal
@@ -41,6 +32,7 @@ from typing import (
     Protocol,
     Self,
     TypeVar,
+    cast,
     runtime_checkable,
 )
 
@@ -121,6 +113,14 @@ try:
     import transformers
 
     transformers_version: str = transformers.__version__
+
+    # Prevent Transformers from importing heavy backends that can hang on macOS/ARM
+    # when they are present in the environment but not needed for MLX workflows.
+    if os.getenv("MLX_VLM_ALLOW_TF", "0") != "1":
+        os.environ.setdefault("TRANSFORMERS_NO_TF", "1")
+        os.environ.setdefault("TRANSFORMERS_NO_FLAX", "1")
+        os.environ.setdefault("TRANSFORMERS_NO_JAX", "1")
+
 except ImportError:
     transformers_version = NOT_AVAILABLE
 
@@ -476,10 +476,10 @@ def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: PLR
                 < 1 GB   : two decimals
     - Time fields: seconds with 2 decimals + trailing 's'.
     - TPS fields: adaptive precision (integer / 1 decimal / 3 sig figs).
-    - Other numerics: general fmt_num; non-numerics: str(value) or '-'.
+    - Other numerics: general fmt_num; non-numerics: str(value) or ''.
     """
     if value is None:
-        return "-"
+        return ""
     if isinstance(value, (int, float)):
         num = float(value)
         if field_name.endswith("_memory"):
@@ -561,15 +561,25 @@ def _pad_text(text: str, width: int, *, right_align: bool = False) -> str:
 
 
 def get_library_versions() -> LibraryVersionDict:
-    """Return versions of key libraries as a dictionary."""
+    """Return versions of key libraries as a dictionary, using None for missing."""
+
+    def _none_if_na(v: object) -> str | None:
+        s = str(v) if v is not None else ""
+        s_norm = s.strip()
+        if not s_norm:
+            return None
+        if s_norm == NOT_AVAILABLE or s_norm.startswith("N/A"):
+            return None
+        return s_norm
+
     return {
-        "mlx": getattr(mx, "__version__", "N/A"),
-        "mlx-vlm": vlm_version if "vlm_version" in globals() else "N/A",
-        "mlx-lm": mlx_lm_version,
-        "huggingface-hub": hf_version,
-        "transformers": transformers_version,
-        "tokenizers": tokenizers_version,
-        "Pillow": pillow_version,
+        "mlx": _none_if_na(getattr(mx, "__version__", None)),
+        "mlx-vlm": _none_if_na(vlm_version) if "vlm_version" in globals() else None,
+        "mlx-lm": _none_if_na(mlx_lm_version),
+        "huggingface-hub": _none_if_na(hf_version),
+        "transformers": _none_if_na(transformers_version),
+        "tokenizers": _none_if_na(tokenizers_version),
+        "Pillow": _none_if_na(pillow_version),
     }
 
 
@@ -587,7 +597,7 @@ def get_device_info() -> SystemProfilerDict | None:
             text=True,
             timeout=5,
         )
-        return json.loads(data)
+        return cast("SystemProfilerDict", json.loads(data))
     except (
         subprocess.SubprocessError,
         json.JSONDecodeError,
@@ -610,7 +620,7 @@ def print_version_info(versions: LibraryVersionDict) -> None:
     max_len: int = max(len(k) for k in versions) + 1 if versions else 10
     for name, ver in sorted(versions.items()):
         name_padded: str = name.ljust(max_len)
-        logger.info("%s: %s", name_padded, ver)
+        logger.info("%s: %s", name_padded, ver or "")
 
     logger.info(
         "Generated: %s",
@@ -669,7 +679,7 @@ GPSTupleElement = int | float
 GPSTuple = tuple[GPSTupleElement, GPSTupleElement, GPSTupleElement]
 GPSDict = dict[str, ExifValue]  # GPS EXIF data structure
 SystemProfilerDict = dict[str, list[dict[str, Any]]]  # macOS system_profiler JSON structure
-LibraryVersionDict = dict[str, str]  # Library name to version mapping
+LibraryVersionDict = dict[str, str | None]  # Library name to version mapping (optional values)
 MetricValue = int | float | str | bool | None  # Common scalar metric variants for metrics
 
 
@@ -818,7 +828,45 @@ def print_image_dimensions(image_path: PathLike) -> None:
 
 
 # --- EXIF & Metadata Handling ---
-@functools.lru_cache(maxsize=128)
+def _process_ifd0(exif_raw: Image.Exif) -> ExifDict:
+    exif_decoded: ExifDict = {}
+    for tag_id, value in exif_raw.items():
+        # Skip SubIFD pointers, we'll handle them separately
+        if tag_id in (ExifTags.Base.ExifOffset, ExifTags.Base.GPSInfo):
+            continue
+        tag_name: str = TAGS.get(tag_id, str(tag_id))
+        exif_decoded[tag_name] = value
+    return exif_decoded
+
+
+def _process_exif_subifd(exif_raw: Image.Exif) -> ExifDict:
+    out: ExifDict = {}
+    try:
+        exif_ifd: Any = exif_raw.get_ifd(ExifTags.IFD.Exif)
+        if exif_ifd:
+            out.update({TAGS.get(tag_id, str(tag_id)): value for tag_id, value in exif_ifd.items()})
+    except (KeyError, AttributeError, TypeError):
+        logger.warning("Could not extract Exif SubIFD")
+    return out
+
+
+def _process_gps_ifd(exif_raw: Image.Exif) -> GPSDict | None:
+    try:
+        gps_ifd: Any = exif_raw.get_ifd(ExifTags.IFD.GPSInfo)
+        if isinstance(gps_ifd, dict) and gps_ifd:
+            gps_decoded: GPSDict = {}
+            for gps_tag_id, gps_value in gps_ifd.items():
+                try:
+                    gps_key = GPSTAGS.get(int(gps_tag_id), str(gps_tag_id))
+                except (KeyError, ValueError, TypeError):
+                    gps_key = str(gps_tag_id)
+                gps_decoded[str(gps_key)] = gps_value
+            return gps_decoded
+    except (KeyError, AttributeError, TypeError) as gps_err:
+        logger.warning("Could not extract GPS IFD: %s", gps_err)
+    return None
+
+
 def get_exif_data(image_path: PathLike) -> ExifDict | None:
     """Return decoded EXIF structure or ``None`` if absent.
 
@@ -842,40 +890,11 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
             if not exif_raw:
                 logger.debug("No EXIF data found in %s", img_path_str)
                 return None
-            exif_decoded: ExifDict = {}
-            # First pass: Process IFD0 (main image directory) tags
-            for tag_id, value in exif_raw.items():
-                # Skip SubIFD pointers, we'll handle them separately
-                if tag_id in (ExifTags.Base.ExifOffset, ExifTags.Base.GPSInfo):
-                    continue
-                tag_name: str = TAGS.get(tag_id, str(tag_id))
-                exif_decoded[tag_name] = value
-            # Second pass: Process Exif SubIFD (if available)
-            try:
-                exif_ifd: Any = exif_raw.get_ifd(ExifTags.IFD.Exif)
-                if exif_ifd:
-                    exif_decoded.update(
-                        {
-                            TAGS.get(tag_id, str(tag_id)): value
-                            for tag_id, value in exif_ifd.items()
-                        },
-                    )
-            except (KeyError, AttributeError, TypeError):
-                logger.warning("Could not extract Exif SubIFD")
-            # Third pass: Process GPS IFD (if available)
-            try:
-                gps_ifd: Any = exif_raw.get_ifd(ExifTags.IFD.GPSInfo)
-                if isinstance(gps_ifd, dict) and gps_ifd:
-                    gps_decoded: GPSDict = {}
-                    for gps_tag_id, gps_value in gps_ifd.items():
-                        try:
-                            gps_key = GPSTAGS.get(int(gps_tag_id), str(gps_tag_id))
-                        except (KeyError, ValueError, TypeError):
-                            gps_key = str(gps_tag_id)
-                        gps_decoded[str(gps_key)] = gps_value
-                    exif_decoded["GPSInfo"] = gps_decoded
-            except (KeyError, AttributeError, TypeError) as gps_err:
-                logger.warning("Could not extract GPS IFD: %s", gps_err)
+            exif_decoded: ExifDict = _process_ifd0(exif_raw)
+            exif_decoded.update(_process_exif_subifd(exif_raw))
+            gps_decoded = _process_gps_ifd(exif_raw)
+            if gps_decoded:
+                exif_decoded["GPSInfo"] = gps_decoded
             return exif_decoded
     except (FileNotFoundError, UnidentifiedImageError):
         logger.exception(
@@ -923,25 +942,14 @@ def _convert_gps_coordinate(
     return None
 
 
-def extract_image_metadata(image_path: PathLike) -> MetadataDict:
-    """Derive high-level metadata (date, description, GPS string, raw EXIF).
-
-    Returns None for unavailable date/description/gps instead of sentinel strings.
-    """
-    metadata: MetadataDict = {}
-    img_path_str = str(image_path)
-    exif_data = get_exif_data(img_path_str) or {}
-
-    # --- Date extraction & localization ---
+def _extract_exif_date(img_path_str: str, exif_data: ExifDict) -> str | None:
     exif_date = (
         exif_data.get("DateTimeOriginal")
         or exif_data.get("CreateDate")
         or exif_data.get("DateTime")
         or None
     )
-    date_str: str | None = None
     if exif_date:
-        # Try to parse and localize
         parsed: str | None = None
         try:
             for fmt in DATE_FORMATS:
@@ -954,82 +962,97 @@ def extract_image_metadata(image_path: PathLike) -> MetadataDict:
                     continue
         except (ValueError, TypeError, UnicodeDecodeError) as err:
             logger.warning("Could not localize EXIF date: %s", err)
-        date_str = parsed or str(exif_date)
-    else:
-        # Fallback to filesystem mtime
-        try:
-            local_tz = get_localzone()
-            date_str = datetime.fromtimestamp(
-                Path(img_path_str).stat().st_mtime,
-                tz=local_tz,
-            ).strftime("%Y-%m-%d %H:%M:%S %Z")
-        except OSError as err:
-            logger.debug("Could not get file mtime: %s", err)
-            date_str = None
-    metadata["date"] = date_str
+        return parsed or str(exif_date)
+    # Fallback to filesystem mtime
+    try:
+        local_tz = get_localzone()
+        return datetime.fromtimestamp(
+            Path(img_path_str).stat().st_mtime,
+            tz=local_tz,
+        ).strftime("%Y-%m-%d %H:%M:%S %Z")
+    except OSError as err:
+        logger.debug("Could not get file mtime: %s", err)
+        return None
 
-    # --- Description extraction ---
+
+def _extract_description(exif_data: ExifDict) -> str | None:
     description = exif_data.get("ImageDescription")
-    desc_str: str | None = None
-    if description is not None:
-        if isinstance(description, bytes):
-            try:
-                desc_str = description.decode("utf-8", errors="replace").strip()
-            except UnicodeDecodeError as err:
-                desc_str = str(description)
-                logger.debug("Failed to decode description: %s", err)
-        else:
-            desc_str = str(description).strip()
-        if desc_str == "":
-            desc_str = None
-    metadata["description"] = desc_str
-
-    # --- GPS extraction helper ---
-    def _extract_gps_str(gps_info_raw: dict[str, Any] | None) -> str | None:
-        if not isinstance(gps_info_raw, dict):
-            return None
-        gps_info: GPSDict = {}
-        for k, v in gps_info_raw.items():
-            tag_name: str = GPSTAGS.get(int(k), str(k)) if isinstance(k, int) else str(k)
-            gps_info[tag_name] = v
-        lat = gps_info.get("GPSLatitude")
-        lat_ref = gps_info.get("GPSLatitudeRef")
-        lon = gps_info.get("GPSLongitude")
-        lon_ref = gps_info.get("GPSLongitudeRef")
-        logger.debug(
-            "Extracted GPS fields: lat=%r, lat_ref=%r, lon=%r, lon_ref=%r",
-            lat,
-            lat_ref,
-            lon,
-            lon_ref,
-        )
-        latitude = _convert_gps_coordinate(lat) if lat and lat_ref else None
-        longitude = _convert_gps_coordinate(lon) if lon and lon_ref else None
-        logger.debug("Converted GPS: latitude=%r, longitude=%r", latitude, longitude)
-        if latitude is None or longitude is None:
-            logger.debug("GPS conversion failed: latitude or longitude is None.")
-            return None
-
-        def dms_to_dd(dms: tuple[float, float, float], ref: str) -> tuple[float, str]:
-            deg, min_, sec = dms
-            dd = deg + min_ / 60.0 + sec / 3600.0
-            ref_upper = ref.upper()
-            sign = -1 if ref_upper in ("S", "W") else 1
-            return (dd * sign, ref_upper)
-
+    if description is None:
+        return None
+    if isinstance(description, bytes):
         try:
-            lat_ref_str: str = lat_ref.decode() if isinstance(lat_ref, bytes) else str(lat_ref)
-            lon_ref_str: str = lon_ref.decode() if isinstance(lon_ref, bytes) else str(lon_ref)
-            lat_dd, lat_card = dms_to_dd(latitude, lat_ref_str)
-            lon_dd, lon_card = dms_to_dd(longitude, lon_ref_str)
-            lat_dd = -abs(lat_dd) if lat_card == "S" else abs(lat_dd)
-            lon_dd = -abs(lon_dd) if lon_card == "W" else abs(lon_dd)
-            return f"{abs(lat_dd):.6f} {lat_card}, {abs(lon_dd):.6f} {lon_card}"
-        except (ValueError, AttributeError, TypeError) as err:
-            logger.debug("Failed to convert GPS DMS to decimal: %s", err)
-            return None
+            desc = description.decode("utf-8", errors="replace").strip()
+        except UnicodeDecodeError as err:
+            desc = str(description)
+            logger.debug("Failed to decode description: %s", err)
+    else:
+        desc = str(description).strip()
+    return desc or None
 
+
+def _extract_gps_str(gps_info_raw: dict[str | int, Any] | None) -> str | None:
+    if not isinstance(gps_info_raw, dict):
+        return None
+    gps_info: GPSDict = {}
+    for k, v in gps_info_raw.items():
+        if isinstance(k, int):
+            tag_name: str = GPSTAGS.get(k, str(k))
+        else:
+            tag_name = str(k)
+        gps_info[tag_name] = v
+    lat = gps_info.get("GPSLatitude")
+    lat_ref = gps_info.get("GPSLatitudeRef")
+    lon = gps_info.get("GPSLongitude")
+    lon_ref = gps_info.get("GPSLongitudeRef")
+    logger.debug(
+        "Extracted GPS fields: lat=%r, lat_ref=%r, lon=%r, lon_ref=%r",
+        lat,
+        lat_ref,
+        lon,
+        lon_ref,
+    )
+    latitude = _convert_gps_coordinate(lat) if lat and lat_ref else None
+    longitude = _convert_gps_coordinate(lon) if lon and lon_ref else None
+    logger.debug("Converted GPS: latitude=%r, longitude=%r", latitude, longitude)
+    if latitude is None or longitude is None:
+        logger.debug("GPS conversion failed: latitude or longitude is None.")
+        return None
+
+    def dms_to_dd(dms: tuple[float, float, float], ref: str) -> tuple[float, str]:
+        deg, min_, sec = dms
+        dd = deg + min_ / 60.0 + sec / 3600.0
+        ref_upper = ref.upper()
+        sign = -1 if ref_upper in ("S", "W") else 1
+        return (dd * sign, ref_upper)
+
+    try:
+        lat_ref_str: str = lat_ref.decode() if isinstance(lat_ref, bytes) else str(lat_ref)
+        lon_ref_str: str = lon_ref.decode() if isinstance(lon_ref, bytes) else str(lon_ref)
+        lat_dd, lat_card = dms_to_dd(latitude, lat_ref_str)
+        lon_dd, lon_card = dms_to_dd(longitude, lon_ref_str)
+        lat_dd = -abs(lat_dd) if lat_card == "S" else abs(lat_dd)
+        lon_dd = -abs(lon_dd) if lon_card == "W" else abs(lon_dd)
+        return f"{abs(lat_dd):.6f} {lat_card}, {abs(lon_dd):.6f} {lon_card}"
+    except (ValueError, AttributeError, TypeError) as err:
+        logger.debug("Failed to convert GPS DMS to decimal: %s", err)
+        return None
+
+
+def extract_image_metadata(image_path: PathLike) -> MetadataDict:
+    """Derive high-level metadata (date, description, GPS string, raw EXIF).
+
+    Returns None for unavailable date/description/gps instead of sentinel strings.
+    """
+    metadata: MetadataDict = {}
+    img_path_str = str(image_path)
+    exif_data = get_exif_data(img_path_str) or {}
+
+    # Date, Description, GPS
+    metadata["date"] = _extract_exif_date(img_path_str, exif_data)
+    metadata["description"] = _extract_description(exif_data)
     metadata["gps"] = _extract_gps_str(exif_data.get("GPSInfo"))
+
+    # Raw EXIF for reference
     metadata["exif"] = str(exif_data)
     return metadata
 
@@ -1482,17 +1505,13 @@ def _prepare_table_data(
         for f in all_fields:
             val = _get_field_value(r, f)
             val = format_field_value(f, val)
-            # Format numbers
-            is_numeric = isinstance(val, (int, float)) or is_numeric_value(val)
-            if is_numeric and isinstance(val, (int, float, str)):
-                val = fmt_num(val)
             row.append(str(val))
 
-        # Add output/diagnostic column
+        # Add output/diagnostic column (empty string as unified fallback)
         if r.success and r.generation:
             out_val = str(getattr(r.generation, "text", ""))
         else:
-            out_val = r.error_message or r.captured_output_on_fail or "-"
+            out_val = r.error_message or r.captured_output_on_fail or ""
         row.append(out_val)
 
         rows.append(row)
@@ -1501,6 +1520,136 @@ def _prepare_table_data(
 
 
 # --- HTML Report Generation ---
+def _mark_failed_rows_in_html(html_table: str, results: list[PerformanceResult]) -> str:
+    """Add class="failed-row" to <tr> elements whose corresponding result failed."""
+    sorted_results_for_flags = _sort_results_by_time(results)
+    failed_set = {idx for idx, r in enumerate(sorted_results_for_flags) if not r.success}
+    if not failed_set or "<tbody>" not in html_table:
+        return html_table
+    tbody_start = html_table.find("<tbody>")
+    tbody_end = html_table.find("</tbody>", tbody_start)
+    if tbody_start == -1 or tbody_end == -1:
+        return html_table
+    body_html = html_table[tbody_start:tbody_end]
+    row_index = -1
+
+    def _row_replacer(match: re.Match[str]) -> str:
+        nonlocal row_index
+        row_index += 1
+        return '<tr class="failed-row">' if row_index in failed_set else match.group(0)
+
+    body_html = re.sub(r"<tr>", _row_replacer, body_html)
+    return html_table[:tbody_start] + body_html + html_table[tbody_end:]
+
+
+def _build_full_html_document(
+    *,
+    html_table: str,
+    versions: LibraryVersionDict,
+    prompt: str,
+) -> str:
+    local_tz = get_localzone()
+    # Build complete HTML document
+    html_content = f"""<!DOCTYPE html>
+<html lang=\"en\">
+<head>
+    <meta charset=\"UTF-8\">
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+    <title>MLX VLM Performance Report</title>
+    <style>
+        body {{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px; background-color: #f8f9fa; color: #212529; line-height: 1.6;
+        }}
+        h1 {{
+            color: #495057; text-align: center; margin-bottom: 15px;
+            border-bottom: 3px solid #007bff; padding-bottom: 15px; font-size: 2.2em;
+        }}
+        h2 {{
+            color: #495057; margin-top: 30px; margin-bottom: 15px;
+            border-bottom: 2px solid #6c757d; padding-bottom: 8px; font-size: 1.4em;
+        }}
+        .prompt-section {{
+            background-color: #e3f2fd; border-left: 4px solid #2196f3; padding: 20px;
+            margin: 25px 0; border-radius: 6px;
+        }}
+        .prompt-section h3 {{
+            color: #1976d2; margin-top: 0; margin-bottom: 10px;
+            font-size: 1.1em;
+        }}
+        .meta-info {{ color: #6c757d; font-style: italic; margin: 15px 0; text-align: center; }}
+        table {{
+            border-collapse: collapse; width: 95%; margin: 30px auto; background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden;
+        }}
+        th, td {{ border: 1px solid #dee2e6; padding: 8px 12px; vertical-align: top; }}
+        thead th, tbody td {{ vertical-align: top; }}
+        th {{
+            background: linear-gradient(135deg, #e9ecef 0%, #f8f9fa 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 600;
+            color: #495057; text-shadow: 0 1px 0 white; font-size: 14px; text-align: center;
+        }}
+        th.numeric {{ text-align: right; }}
+        th.text {{ text-align: left; }}
+        tr:nth-child(even):not(.failed-row) {{ background-color: #f8f9fa; }}
+        tr:hover:not(.failed-row) {{
+            background-color: #e3f2fd; transition: background-color 0.2s;
+        }}
+        tr.failed-row {{ background-color: #f8d7da !important; color: #721c24; }}
+        tr.failed-row:hover {{ background-color: #f5c6cb !important; }}
+        .model-name {{
+            font-family: 'Courier New', Courier, monospace; font-weight: 500;
+            text-align: left; color: #0d6efd;
+        }}
+        .error-message {{ font-weight: bold; color: #721c24; }}
+        td.numeric {{ text-align: right; font-family: 'Courier New', monospace; }}
+        td.text {{ text-align: left; }}
+        caption {{ font-style: italic; color: #6c757d; margin-bottom: 10px; }}
+        footer {{ margin-top: 40px; padding-top: 20px; border-top: 2px solid #dee2e6; }}
+        footer h2 {{ color: #495057; }}
+        footer ul {{ background-color: #f8f9fa; padding: 15px; border-radius: 5px; }}
+        footer code {{
+            background-color: #e9ecef; padding: 2px 4px; border-radius: 3px;
+            color: #d63384;
+        }}
+    </style>
+</head>
+<body>
+    <h1>MLX Vision Language Model Performance Report</h1>
+    <div class=\"prompt-section\">
+        <h3>📝 Test Prompt</h3>
+        <div>{html.escape(prompt).replace("\n", "<br>")}</div>
+    </div>
+    <h2>📊 Performance Results</h2>
+    <div class=\"meta-info\">
+        Performance metrics and output for Vision Language Model processing<br>
+        Results sorted by generation time (fastest to slowest) • Generated on
+        {datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")} • Failures shown but
+        excluded from averages
+    </div>
+    {html_table}
+    <footer>
+        <h2>🔧 System Information</h2>
+        <ul>\n"""
+
+    for name, ver in sorted(versions.items()):
+        ver_str = "" if ver is None else ver
+        html_content += (
+            f"            <li><code>{html.escape(name)}</code>: "
+            f"<code>{html.escape(ver_str)}</code></li>\n"
+        )
+
+    generated_ts = datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")
+    html_content += (
+        "        </ul>\n"
+        f"        <p><em>Report generated: {generated_ts}</em></p>\n"
+        "    </footer>\n"
+        "</body>\n"
+        "</html>"
+    )
+    return html_content
+
+
 def generate_html_report(
     results: list[PerformanceResult],
     filename: Path,
@@ -1545,115 +1694,12 @@ def generate_html_report(
         tablefmt="unsafehtml",
         colalign=colalign,
     )
-
-    # Mark failed rows: must mirror the same sorted order used in _prepare_table_data
-    # _prepare_table_data sorts internally, so we re-sort here for index alignment.
-    sorted_results_for_flags = _sort_results_by_time(results)
-    failed_set = {idx for idx, r in enumerate(sorted_results_for_flags) if not r.success}
-    if failed_set and "<tbody>" in html_table:
-        tbody_start = html_table.find("<tbody>")
-        tbody_end = html_table.find("</tbody>", tbody_start)
-        if tbody_start != -1 and tbody_end != -1:
-            body_html = html_table[tbody_start:tbody_end]
-            row_index = -1
-
-            def _row_replacer(match: re.Match[str]) -> str:
-                nonlocal row_index
-                row_index += 1
-                return '<tr class="failed-row">' if row_index in failed_set else match.group(0)
-
-            body_html = re.sub(r"<tr>", _row_replacer, body_html)
-            html_table = html_table[:tbody_start] + body_html + html_table[tbody_end:]
-
-    # Use the shared FIELD_UNITS constant
-    local_tz = get_localzone()
-
-    # Build complete HTML document
-    html_content = f"""<!DOCTYPE html>
-<html lang=\"en\">
-<head>
-    <meta charset=\"UTF-8\">
-    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-    <title>MLX VLM Performance Report</title>
-    <style>
-        body {{
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 20px; background-color: #f8f9fa; color: #212529; line-height: 1.6;
-        }}
-        h1 {{
-            color: #495057; text-align: center; margin-bottom: 15px;
-            border-bottom: 3px solid #007bff; padding-bottom: 15px; font-size: 2.2em;
-        }}
-        h2 {{
-            color: #495057; margin-top: 30px; margin-bottom: 15px;
-            border-bottom: 2px solid #6c757d; padding-bottom: 8px; font-size: 1.4em;
-        }}
-        .prompt-section {{
-            background-color: #e3f2fd; border-left: 4px solid #2196f3; padding: 20px;
-            margin: 25px 0; border-radius: 6px;
-        }}
-        .prompt-section h3 {{ color: #1976d2; margin-top: 0; margin-bottom: 10px; font-size: 1.1em; }}
-        .meta-info {{ color: #6c757d; font-style: italic; margin: 15px 0; text-align: center; }}
-        table {{
-            border-collapse: collapse; width: 95%; margin: 30px auto; background-color: #fff;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden;
-        }}
-        th, td {{ border: 1px solid #dee2e6; padding: 8px 12px; vertical-align: top; }}
-        thead th, tbody td {{ vertical-align: top; }}
-        th {{
-            background: linear-gradient(135deg, #e9ecef 0%, #f8f9fa 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 600;
-            color: #495057; text-shadow: 0 1px 0 white; font-size: 14px; text-align: center;
-        }}
-        th.numeric {{ text-align: right; }}
-        th.text {{ text-align: left; }}
-        tr:nth-child(even):not(.failed-row) {{ background-color: #f8f9fa; }}
-        tr:hover:not(.failed-row) {{ background-color: #e3f2fd; transition: background-color 0.2s; }}
-        tr.failed-row {{ background-color: #f8d7da !important; color: #721c24; }}
-        tr.failed-row:hover {{ background-color: #f5c6cb !important; }}
-        .model-name {{ font-family: 'Courier New', Courier, monospace; font-weight: 500; text-align: left; color: #0d6efd; }}
-        .error-message {{ font-weight: bold; color: #721c24; }}
-        td.numeric {{ text-align: right; font-family: 'Courier New', monospace; }}
-        td.text {{ text-align: left; }}
-        caption {{ font-style: italic; color: #6c757d; margin-bottom: 10px; }}
-        footer {{ margin-top: 40px; padding-top: 20px; border-top: 2px solid #dee2e6; }}
-        footer h2 {{ color: #495057; }}
-        footer ul {{ background-color: #f8f9fa; padding: 15px; border-radius: 5px; }}
-        footer code {{ background-color: #e9ecef; padding: 2px 4px; border-radius: 3px; color: #d63384; }}
-    </style>
-</head>
-<body>
-    <h1>MLX Vision Language Model Performance Report</h1>
-    <div class=\"prompt-section\">
-        <h3>📝 Test Prompt</h3>
-        <div>{html.escape(prompt).replace("\n", "<br>")}</div>
-    </div>
-    <h2>📊 Performance Results</h2>
-    <div class=\"meta-info\">
-        Performance metrics and output for Vision Language Model processing<br>
-        Results sorted by generation time (fastest to slowest) • Generated on
-        {datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")} • Failures shown but
-        excluded from averages
-    </div>
-    {html_table}
-    <footer>
-        <h2>🔧 System Information</h2>
-        <ul>\n"""
-
-    # Add library versions
-    for name, ver in sorted(versions.items()):
-        html_content += (
-            f"            <li><code>{html.escape(name)}</code>: "
-            f"<code>{html.escape(ver)}</code></li>\n"
-        )
-
-    generated_ts = datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")
-    html_content += (
-        "        </ul>\n"
-        f"        <p><em>Report generated: {generated_ts}</em></p>\n"
-        "    </footer>\n"
-        "</body>\n"
-        "</html>"
+    # Mark failed rows and build the final document
+    html_table = _mark_failed_rows_in_html(html_table, results)
+    html_content = _build_full_html_document(
+        html_table=html_table,
+        versions=versions,
+        prompt=prompt,
     )
 
     try:
@@ -1734,7 +1780,8 @@ def generate_markdown_report(
     md.append("\n---\n")
     md.append("**Library Versions:**\n")
     for name, ver in sorted(versions.items()):
-        md.append(f"- `{name}`: `{ver}`")
+        ver_str = "" if ver is None else ver
+        md.append(f"- `{name}`: `{ver_str}`")
     local_tz = get_localzone()
     md.append(
         f"\n_Report generated on: {datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n",
@@ -1766,9 +1813,6 @@ def _escape_markdown_in_text(text: str) -> str:
     Newlines are replaced with ``<br>`` so multi-line outputs don't break the
     pipe table layout.
     """
-    if not isinstance(text, str):
-        return str(text)
-
     # First, convert newlines to HTML <br> tags to preserve line structure
     # Handle different newline formats consistently
     result = text.replace("\r\n", "<br>").replace("\r", "<br>").replace("\n", "<br>")
@@ -1782,7 +1826,6 @@ def _escape_markdown_in_text(text: str) -> str:
     # (e.g. <s> strike-through).
     # (Subset chosen for formatting/readability; extend if needed.)
     escape_pairs = [
-        ("\\", "\\\\"),  # Backslash - escape character, can affect others
         ("|", "\\|"),  # Pipe - CRITICAL: breaks table column structure
     ]
     for char, escaped in escape_pairs:
@@ -1808,10 +1851,10 @@ def _escape_markdown_in_text(text: str) -> str:
     return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
 
 
-def get_system_info() -> tuple[str, str]:
+def get_system_info() -> tuple[str, str | None]:
     """Get system architecture and GPU information."""
     arch: str = platform.machine()
-    gpu_info: str = "Unknown"
+    gpu_info: str | None = None
     try:
         # Try to get GPU info on macOS using full path for security
         if platform.system() == "Darwin":
@@ -1861,9 +1904,6 @@ def validate_inputs(
 
 def validate_temperature(temp: float) -> None:
     """Validate temperature parameter is within acceptable range."""
-    if not isinstance(temp, (int, float)):
-        msg: str = f"Temperature must be a number, got {type(temp)}"
-        raise TypeError(msg)
     if not 0.0 <= temp <= 1.0:
         msg: str = f"Temperature must be between 0 and 1, got {temp}"
         raise ValueError(msg)
@@ -1913,7 +1953,7 @@ def _run_model_generation(
     show concise messages while verbose logs retain full detail.
     """
     model: Module
-    tokenizer: object
+    tokenizer: Any  # transformers-compatible tokenizer
 
     # Load model from HuggingFace Hub - this handles automatic download/caching
     # and converts weights to MLX format for Apple Silicon optimization
@@ -1922,7 +1962,7 @@ def _run_model_generation(
             path_or_hf_repo=params.model_path,
             trust_remote_code=params.trust_remote_code,
         )
-        config = model.config
+        config: dict[str, Any] = model.config
     except Exception as load_err:
         # Capture any model loading errors (config issues, missing files, etc.)
         error_details = (
@@ -2009,7 +2049,11 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     try:
         validate_temperature(temp=params.temperature)
         validate_image_accessible(image_path=params.image_path)
-        logger.debug("System: %s, GPU: %s", arch, gpu_info)
+        logger.debug(
+            "System: %s, GPU: %s",
+            arch,
+            gpu_info if gpu_info is not None else "",
+        )
 
         with TimeoutManager(params.timeout):
             gen_params: ModelGenParams = ModelGenParams(
@@ -2170,7 +2214,7 @@ def _preview_generation(gen: GenerationResult | SupportsGenerationResult | None)
 def _log_verbose_success_details(res: PerformanceResult) -> None:
     if not res.generation:
         return
-    gen_text = getattr(res.generation, "text", "N/A")
+    gen_text = getattr(res.generation, "text", None) or ""
     logger.info("  Generated Text: %s", Colors.colored(gen_text, Colors.CYAN))
     p_tokens = getattr(res.generation, "prompt_tokens", 0)
     g_tokens = getattr(res.generation, "generation_tokens", 0)
@@ -2362,9 +2406,15 @@ def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
     metadata: MetadataDict = extract_image_metadata(image_path)
 
     # Display key metadata (fallback to N/A only at presentation time)
-    logger.info("Date: %s", metadata.get("date") or "N/A")
-    logger.info("Description: %s", metadata.get("description") or "N/A")
-    logger.info("GPS Location: %s", metadata.get("gps") or "N/A")
+    logger.info("Date: %s", metadata.get("date") if metadata.get("date") is not None else "")
+    logger.info(
+        "Description: %s",
+        metadata.get("description") if metadata.get("description") is not None else "",
+    )
+    logger.info(
+        "GPS Location: %s",
+        metadata.get("gps") if metadata.get("gps") is not None else "",
+    )
 
     if args.verbose:
         print_cli_separator()
