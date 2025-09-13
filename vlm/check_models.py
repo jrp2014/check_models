@@ -37,17 +37,24 @@ from typing import (
     runtime_checkable,
 )
 
-# Optional dependency: psutil for system info; degrade gracefully if missing
-try:
-    import psutil
-except ImportError:  # pragma: no cover - optional
-    psutil = None  # type: ignore[assignment]
-
 from huggingface_hub import HFCacheInfo, scan_cache_dir
 from huggingface_hub import __version__ as hf_version
 from huggingface_hub.errors import HFValidationError
 from tabulate import tabulate
 from tzlocal import get_localzone
+
+# Optional dependency: psutil for system info; degrade gracefully if missing.
+# Use an intermediate variable with an explicit Optional type so mypy
+# doesn't complain about assigning None to a module symbol on the except path.
+psutil_mod: Any | None
+try:
+    import psutil as _psutil_runtime  # type: ignore[import-not-found]
+
+    psutil_mod = _psutil_runtime
+except ImportError:  # pragma: no cover - optional
+    psutil_mod = None
+
+psutil: Any | None = psutil_mod
 
 if TYPE_CHECKING:
     import types
