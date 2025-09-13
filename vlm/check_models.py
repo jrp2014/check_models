@@ -199,6 +199,10 @@ class TimeoutManager(contextlib.ContextDecorator):
 # Configure logging - Single logger instance
 logger: logging.Logger = logging.getLogger(LOGGER_NAME)
 
+# Disable Hugging Face tokenizers parallelism to avoid fork-related warnings/deadlocks.
+# This must be set before tokenizers are created/used.
+#os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+
 
 class Colors:
     """ANSI color codes for terminal output."""
