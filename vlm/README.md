@@ -262,6 +262,9 @@ python check_models.py \
 | `-t`, `--temperature` | float | 0.1 | Sampling temperature. |
 | `--timeout` | float | 300 | Operation timeout (seconds) for model execution. |
 | `-v`, `--verbose` | flag | `False` | Enable verbose + debug logging. |
+| `--no-color` | flag | `False` | Disable ANSI colors in the CLI output. |
+| `--force-color` | flag | `False` | Force-enable ANSI colors even if stderr is not a TTY. |
+| `--width` | int | (auto) | Force a fixed output width (columns) for separators and wrapping. |
 
 ### Selection Logic
 
@@ -288,6 +291,16 @@ Color conventions:
 
 * Identifiers (file/folder paths and model names) are shown in magenta for quick scanning.
 * Failures are shown in red; the compact CLI table also highlights failed model names in red.
+
+Width and color controls:
+
+* Colors are enabled by default on TTYs. You can override with flags or environment variables:
+  * Disable colors: `--no-color` or set `NO_COLOR=1`
+  * Force-enable colors (even when not a TTY): `--force-color` or set `FORCE_COLOR=1`
+* Output width is auto-detected and clamped for readability. You can force a specific width:
+  * Use `--width 100` to render at 100 columns
+  * Or set `MLX_VLM_WIDTH=100`
+  These affect separator lengths and line wrapping for previews and summaries.
 
 ### HTML Report
 

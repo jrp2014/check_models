@@ -204,6 +204,11 @@ logger: logging.Logger = logging.getLogger(LOGGER_NAME)
 # This must be set before tokenizers are created/used.
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
+# Global rendering width override (set via --width); when set, all width
+# calculations should honor this value instead of auto-detected terminal width.
+WIDTH_OVERRIDE: int | None = None
+
+
 class Colors:
     """ANSI color codes for terminal output."""
 
@@ -541,6 +546,7 @@ def is_numeric_field(field_name: str) -> bool:
 
 # --- Console UI helpers (rules/separators) ---
 
+
 def get_terminal_width(min_width: int = 60, max_width: int = 120) -> int:
     """Return a clamped terminal width for formatting.
 
@@ -548,6 +554,17 @@ def get_terminal_width(min_width: int = 60, max_width: int = 120) -> int:
     value to avoid excessive lines on very wide terminals and poor display
     on very narrow ones.
     """
+    # If an explicit override is set (via --width), prefer it and do not apply
+    # per-call max_width limits; still enforce a minimal practical width.
+    if WIDTH_OVERRIDE is not None and WIDTH_OVERRIDE > 0:
+        return max(min_width, int(WIDTH_OVERRIDE))
+    # Support environment-based override as well (useful in CI): MLX_VLM_WIDTH
+    env_width = os.getenv("MLX_VLM_WIDTH")
+    if env_width:
+        try:
+            return max(min_width, int(env_width))
+        except ValueError:
+            pass
     try:
         width = shutil.get_terminal_size(fallback=(80, 24)).columns
     except OSError:
@@ -600,6 +617,35 @@ def _log_wrapped_error(label: str, value: str) -> None:
             logger.error("%s %s", prefix, Colors.colored(part, Colors.RED))
         else:
             logger.error("%s %s", " " * (len(prefix)), Colors.colored(part, Colors.RED))
+
+
+def _apply_cli_output_preferences(args: argparse.Namespace) -> None:
+    """Apply color and width preferences based on CLI flags.
+
+    - Honors --no-color / --force-color to toggle ANSI colors
+    - Applies --width via MLX_VLM_WIDTH env var for child processes too
+    """
+    # Color controls
+    if getattr(args, "no_color", False):
+        Colors.set_enabled(enabled=False)
+    elif getattr(args, "force_color", False):
+        Colors.set_enabled(enabled=True)
+
+    # Width override: prefer CLI value; store in env so subprocesses inherit it
+    if getattr(args, "width", None) is not None:
+        try:
+            os.environ["MLX_VLM_WIDTH"] = str(int(args.width))
+        except (TypeError, ValueError):
+            # Invalid width -> remove override and fall back to detection
+            os.environ.pop("MLX_VLM_WIDTH", None)
+        else:
+            if getattr(args, "verbose", False):
+                logger.debug(
+                    "Width override set to %s columns",
+                    os.environ.get("MLX_VLM_WIDTH"),
+                )
+
+
 def log_rule(
     width: int = 80,
     *,
@@ -1248,7 +1294,9 @@ def pretty_print_exif(
     # Print title and table with decorative separators
     table_lines: list[str] = table.split("\n")
     # Use a consistent terminal-based width for header rules to avoid ragged lines
-    header_width: int = max(40, min(get_terminal_width(), 100))
+    # Use a clamped terminal width by default; if --width is set, get_terminal_width
+    # will return the explicit override and ignore the max clamp.
+    header_width: int = max(40, get_terminal_width(max_width=100))
 
     # Print the title with consistent rule width
     log_rule(header_width, char="=", color=Colors.BLUE, bold=True)
@@ -2067,7 +2115,7 @@ def _run_model_generation(
             path_or_hf_repo=params.model_path,
             trust_remote_code=params.trust_remote_code,
         )
-        config: dict[str, Any] = model.config
+        config: Any = getattr(model, "config", None)
     except Exception as load_err:
         # Capture any model loading errors (config issues, missing files, etc.)
         error_details = (
@@ -2456,11 +2504,8 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     if args.verbose:
         logger.debug("Verbose/debug mode enabled.")
 
-    # Control color output via CLI flags if provided
-    if getattr(args, "no_color", False):
-        Colors.set_enabled(enabled=False)
-    elif getattr(args, "force_color", False):
-        Colors.set_enabled(enabled=True)
+    # Apply CLI output preferences (color + width)
+    _apply_cli_output_preferences(args)
 
     # Warn if TensorFlow or sentence-transformers are present
     tf_present = bool(importlib_util.find_spec("tensorflow"))
@@ -2910,6 +2955,15 @@ def main_cli() -> None:
         "--force-color",
         action="store_true",
         help="Force enable ANSI colors even if not a TTY.",
+    )
+    parser.add_argument(
+        "--width",
+        type=int,
+        default=None,
+        help=(
+            "Force a specific CLI output width (columns) for separators and text wrapping. "
+            "Overrides terminal detection. Also supported via MLX_VLM_WIDTH env var."
+        ),
     )
 
     # Parse arguments
