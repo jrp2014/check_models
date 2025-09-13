@@ -1,0 +1,17 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "VLM: Quality checks (ruff format + fix + mypy)",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"vlm/tools/check_quality.py"
+			],
+			"problemMatcher": [
+				"$eslint-stylish"
+			],
+			"group": "build"
+		}
+	]
+}

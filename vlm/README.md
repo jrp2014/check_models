@@ -458,3 +458,32 @@ mlx-vlm-check/
 ## License
 
 MIT License - see LICENSE file for details.
+
+## Quality checks and formatting
+
+A small helper script runs formatting and static checks for this project.
+
+- Location: `vlm/tools/check_quality.py`
+- Defaults:
+  * Targets only `vlm/check_models.py` unless paths are provided
+  * Runs `ruff format` by default (skip with `--no-format`)
+  * Runs `ruff check --fix` by default (skip fixing with `--no-fix`)
+  * Runs `mypy` for type checking
+
+Examples:
+
+```bash
+# Default: format + fixable lint + mypy on check_models.py
+python vlm/tools/check_quality.py
+
+# Skip auto-fix
+python vlm/tools/check_quality.py --no-fix
+
+# Skip formatting
+python vlm/tools/check_quality.py --no-format
+
+# Check multiple paths
+python vlm/tools/check_quality.py vlm tools
+```
+
+Requirements: `ruff` and `mypy` (install with `pip install -e ".[dev]"`).

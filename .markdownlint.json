@@ -1,0 +1,14 @@
+{
+  "default": true,
+  "MD013": false,
+  "MD033": {
+    "allowed_elements": [
+      "br",
+      "b",
+      "strong",
+      "i",
+      "em",
+      "code"
+    ]
+  }
+}

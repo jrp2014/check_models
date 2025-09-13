@@ -26,15 +26,14 @@ if missing_packages:
     sys.exit(1)
 
 import psutil
-from rich.console import Console
-from rich.panel import Panel
-from tqdm import tqdm
-from transformers import __version__ as transformers_version
-
 from mlx_vlm import generate, load
 from mlx_vlm.prompt_utils import apply_chat_template
 from mlx_vlm.utils import load_config
 from mlx_vlm.version import __version__
+from rich.console import Console
+from rich.panel import Panel
+from tqdm import tqdm
+from transformers import __version__ as transformers_version
 
 # Initialize console
 console = Console()
@@ -102,7 +101,7 @@ def test_model_loading(model_path):
         )
         return model, processor, config, False
     except Exception as e:
-        console.print(f"[bold red]✗[/] Failed to load model: {str(e)}")
+        console.print(f"[bold red]✗[/] Failed to load model: {e!s}")
         # traceback.print_exc() #Uncomment this to see the full traceback
         return None, None, None, True
 
@@ -147,8 +146,8 @@ def test_generation(
         # Paligemma outputs are empty on language-only generation
         # So we skip the assertion for these models
         if (
-            not any(x in model_path for x in ["deepseek-vl2-tiny", "ShowUI"])
-            and vision_language
+            (not any(x in model_path for x in ["deepseek-vl2-tiny", "ShowUI"])
+            and vision_language)
             or ("paligemma" not in model_path and not vision_language)
         ):
             assert isinstance(output, str) and len(output) > 0
@@ -156,7 +155,7 @@ def test_generation(
         console.print(f"[bold green]✓[/] {test_type} generation successful")
         return False
     except Exception as e:
-        console.print(f"[bold red]✗[/] {test_type} generation failed: {str(e)}")
+        console.print(f"[bold red]✗[/] {test_type} generation failed: {e!s}")
         traceback.print_exc()
         return True
 
@@ -165,8 +164,8 @@ def main():
     args = parse_args()
 
     # Load models list
-    with open(args.models_file, "r", encoding="utf-8") as f:
-        models = [line.strip() for line in f.readlines()]
+    with open(args.models_file, encoding="utf-8") as f:
+        models = [line.strip() for line in f]
 
     # Test inputs dictionary
     test_inputs = {
@@ -232,7 +231,7 @@ def main():
         Panel(
             title="System Information",
             renderable=textwrap.dedent(
-                f"""{platform.machine() == 'arm64' and f'''
+                f"""{(platform.machine() == 'arm64' and f'''
             MAC OS:       v{platform.mac_ver()[0]}
             Python:       v{sys.version.split()[0]}
             MLX:          v{mx.__version__}
@@ -244,7 +243,7 @@ def main():
             • RAM:        {psutil.virtual_memory().total / (1024 ** 3):.1f} GB
             • CPU Cores:  {psutil.cpu_count(logical=False)}
             • GPU Cores:  {device_info['SPDisplaysDataType'][0]['sppci_cores']}
-            ''' or 'Not running on Apple Silicon'}"""
+            ''') or 'Not running on Apple Silicon'}"""
             ),
             style="bold blue",
         )
