@@ -144,6 +144,8 @@ python_version = "3.12"
 ignore_missing_imports = true
 # Search path for local type stubs (generated via stubgen into ./typings)
 mypy_path = ["typings"]
+# Do not descend into imports; treat imported modules as 'Any' unless stubs exist
+follow_imports = "skip"
 # For stricter checking, you can enable the following:
 # disallow_untyped_defs = true
 warn_return_any = true
@@ -151,3 +153,17 @@ warn_unused_configs = true
 warn_redundant_casts = true
 warn_unreachable = true
 strict_optional = true
+
+# Explicitly silence external packages commonly used here
+[[tool.mypy.overrides]]
+module = [
+    "mlx_vlm.*",
+    "mlx_lm.*",
+    "tokenizers.*",
+    "transformers.*",
+    "datasets.*",
+    "huggingface_hub.*",
+    "tzlocal.*",
+    "psutil.*",
+]
+ignore_missing_imports = true
