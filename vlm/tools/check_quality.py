@@ -16,18 +16,13 @@ reported as warnings and skipped (use --require to fail if missing).
 from __future__ import annotations
 
 import argparse
+import importlib
 import logging
 import shutil
 import subprocess
 import sys
 from pathlib import Path
 from typing import Final
-
-# Optional: local stub generation utility
-try:
-    from vlm.tools.generate_stubs import run_stubgen as _run_stubgen  # type: ignore[import-not-found]
-except Exception:  # noqa: BLE001 - best-effort import; we fallback gracefully
-    _run_stubgen = None  # type: ignore[assignment]
 
 DEFAULT_PATHS: Final[list[str]] = ["vlm/check_models.py"]
 ALLOWED_TOOLS: Final[set[str]] = {"ruff", "mypy"}
@@ -111,6 +106,13 @@ def _ensure_stubs(repo_root: Path, *, refresh: bool, require: bool) -> int:
     )
     if not need_stubs:
         return 0
+    # Import locally to avoid global import-sort issues and keep this optional.
+    try:
+        mod = importlib.import_module("vlm.tools.generate_stubs")
+        _run_stubgen = getattr(mod, "run_stubgen", None)
+    except Exception:  # noqa: BLE001 - best-effort import; we fallback gracefully
+        _run_stubgen = None  # type: ignore[assignment]
+
     if _run_stubgen is None:
         # Tool not importable; skip unless required
         if require:
@@ -118,6 +120,12 @@ def _ensure_stubs(repo_root: Path, *, refresh: bool, require: bool) -> int:
             return 1
         logger.warning("[quality] Stub generator not available; skipping stub generation")
         return 0
+    if refresh:
+        # Best-effort clear of existing per-package stub dirs
+        for pkg in ("mlx_vlm", "tokenizers"):
+            target = typings / pkg
+            if target.exists():
+                shutil.rmtree(target, ignore_errors=True)
     logger.info("[quality] Generating local type stubs (mlx_vlm, tokenizers) ...")
     rc = int(_run_stubgen(["mlx_vlm", "tokenizers"]))
     if rc != 0 and require:
