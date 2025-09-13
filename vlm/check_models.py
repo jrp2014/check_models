@@ -435,6 +435,35 @@ def format_field_label(field_name: str) -> str:
 allowed_inline_tags = {"br", "b", "strong", "i", "em", "code"}
 
 
+def _format_memory_value_gb(num: float) -> str:
+    """Format mixed-source memory value as GB string.
+
+    Accepts raw bytes (mlx) or decimal GB (mlx-vlm). Returns a string without unit.
+    """
+    if num <= 0:
+        return "0"
+    gb: float = (num / DECIMAL_GB) if num > MEM_BYTES_TO_GB_THRESHOLD else num
+    if gb >= MEMORY_GB_INTEGER_THRESHOLD:
+        return f"{gb:,.0f}"
+    if gb >= 1:
+        return f"{gb:,.1f}"
+    return f"{gb:.2f}"
+
+
+def _format_time_seconds(num: float) -> str:
+    """Format seconds with two decimals and trailing 's'."""
+    return f"{num:.2f}s"
+
+
+def _format_tps(num: float) -> str:
+    """Format tokens-per-second with adaptive precision."""
+    if abs(num) >= LARGE_NUMBER_THRESHOLD:
+        return f"{num:,.0f}"
+    if abs(num) >= MEDIUM_NUMBER_THRESHOLD:
+        return f"{num:.1f}"
+    return f"{num:.3g}"
+
+
 def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: PLR0911
     """Normalize and format field values for display.
 
@@ -454,22 +483,11 @@ def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: PLR
     if isinstance(value, (int, float)):
         num = float(value)
         if field_name.endswith("_memory"):
-            if num <= 0:
-                return "0"
-            gb = (num / DECIMAL_GB) if num > MEM_BYTES_TO_GB_THRESHOLD else num
-            if gb >= MEMORY_GB_INTEGER_THRESHOLD:
-                return f"{gb:,.0f}"
-            if gb >= 1:
-                return f"{gb:,.1f}"
-            return f"{gb:.2f}"
+            return _format_memory_value_gb(num)
         if field_name.endswith("_tps"):
-            if abs(num) >= LARGE_NUMBER_THRESHOLD:
-                return f"{num:,.0f}"
-            if abs(num) >= MEDIUM_NUMBER_THRESHOLD:
-                return f"{num:.1f}"
-            return f"{num:.3g}"
+            return _format_tps(num)
         if field_name in {"time", "duration", "total_time", "generation_time", "model_load_time"}:
-            return f"{num:.2f}s"
+            return _format_time_seconds(num)
         return fmt_num(num)
     if isinstance(value, str) and value:
         s = value.strip().replace(",", "")
@@ -1760,7 +1778,8 @@ def _escape_markdown_in_text(text: str) -> str:
     result = re.sub(r"\s+", " ", result).strip()  # Normalize other whitespace
 
     # Escape only the critical markdown characters that break table formatting, PLUS
-    # neutralize raw HTML tag markers (<tag>) which GitHub may treat as HTML (e.g. <s> strike-through).
+    # neutralize raw HTML tag markers (<tag>) which GitHub may treat as HTML
+    # (e.g. <s> strike-through).
     # (Subset chosen for formatting/readability; extend if needed.)
     escape_pairs = [
         ("\\", "\\\\"),  # Backslash - escape character, can affect others
