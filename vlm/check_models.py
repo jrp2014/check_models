@@ -2079,14 +2079,11 @@ def validate_image_accessible(image_path: PathLike) -> None:
         ):
             pass
     except TimeoutError as err:
-        msg: str = f"Timeout while reading image: {img_path_str}"
-        raise OSError(msg) from err
+        raise OSError(f"Timeout while reading image: {img_path_str}") from err
     except UnidentifiedImageError as err:
-        msg: str = f"File is not a recognized image format: {img_path_str}"
-        raise ValueError(msg) from err
+        raise ValueError(f"File is not a recognized image format: {img_path_str}") from err
     except (OSError, ValueError) as err:
-        msg: str = f"Error accessing image {img_path_str}: {err}"
-        raise OSError(msg) from err
+        raise OSError(f"Error accessing image {img_path_str}: {err}") from err
 
 
 class ModelGenParams(NamedTuple):

@@ -25,7 +25,7 @@ from pathlib import Path
 from typing import Final
 
 DEFAULT_PATHS: Final[list[str]] = ["vlm/check_models.py"]
-ALLOWED_TOOLS: Final[set[str]] = {"ruff", "mypy"}
+ALLOWED_TOOLS: Final[set[str]] = {"ruff", "mypy", "stubgen"}
 logger = logging.getLogger("quality")
 
 
@@ -100,12 +100,13 @@ def _ensure_stubs(repo_root: Path, *, refresh: bool, require: bool) -> int:
       generation was attempted and required.
     """
     typings = repo_root / "typings"
-    need_stubs = refresh or not (
-        (typings / "mlx_vlm" / "__init__.pyi").exists()
-        and (typings / "tokenizers" / "__init__.pyi").exists()
-    )
+    # Only require mlx_vlm stubs; tokenizers stubs are optional and often noisy.
+    need_stubs = refresh or not (typings / "mlx_vlm" / "__init__.pyi").exists()
     if not need_stubs:
         return 0
+    # Ensure repo root is on sys.path so 'vlm' is importable when run as a script
+    if str(repo_root) not in sys.path:
+        sys.path.insert(0, str(repo_root))
     # Import locally to avoid global import-sort issues and keep this optional.
     try:
         mod = importlib.import_module("vlm.tools.generate_stubs")
@@ -114,20 +115,25 @@ def _ensure_stubs(repo_root: Path, *, refresh: bool, require: bool) -> int:
         _run_stubgen = None  # type: ignore[assignment]
 
     if _run_stubgen is None:
-        # Tool not importable; skip unless required
-        if require:
-            logger.error("[quality] Stub generator not available; cannot generate stubs")
-            return 1
-        logger.warning("[quality] Stub generator not available; skipping stub generation")
-        return 0
+        # Fallback: try calling 'stubgen' directly for mlx_vlm
+        logger.warning("[quality] Stub generator not importable; trying 'stubgen' CLI ...")
+        try:
+            rc = _run(["stubgen", "-p", "mlx_vlm", "-o", str(typings)], cwd=repo_root)
+        except Exception:
+            if require:
+                logger.error("[quality] Stub generator not available; cannot generate stubs")
+                return 1
+            logger.warning("[quality] Stub generation skipped (no stubgen)")
+            return 0
+        else:
+            return int(rc)
     if refresh:
         # Best-effort clear of existing per-package stub dirs
-        for pkg in ("mlx_vlm", "tokenizers"):
-            target = typings / pkg
-            if target.exists():
-                shutil.rmtree(target, ignore_errors=True)
-    logger.info("[quality] Generating local type stubs (mlx_vlm, tokenizers) ...")
-    rc = int(_run_stubgen(["mlx_vlm", "tokenizers"]))
+        target = typings / "mlx_vlm"
+        if target.exists():
+            shutil.rmtree(target, ignore_errors=True)
+    logger.info("[quality] Generating local type stubs (mlx_vlm) ...")
+    rc = int(_run_stubgen(["mlx_vlm"]))
     if rc != 0 and require:
         logger.error("[quality] Stub generation failed (exit %s)", rc)
         return rc
@@ -184,6 +190,8 @@ def main(argv: list[str] | None = None) -> int:  # noqa: PLR0912 - cohesive CLI 
                 "mypy",
                 "--config-file",
                 str(repo_root / "vlm/pyproject.toml"),
+                "--exclude",
+                r"typings/tokenizers/.*",
                 *paths,
             ],
             cwd=repo_root,

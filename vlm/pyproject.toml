@@ -157,7 +157,6 @@ strict_optional = true
 # Explicitly silence external packages commonly used here
 [[tool.mypy.overrides]]
 module = [
-    "mlx_vlm.*",
     "mlx_lm.*",
     "tokenizers.*",
     "transformers.*",
@@ -167,3 +166,4 @@ module = [
     "psutil.*",
 ]
 ignore_missing_imports = true
+ignore_errors = true
