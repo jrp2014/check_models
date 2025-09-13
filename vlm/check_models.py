@@ -13,6 +13,7 @@ import logging
 import os
 import platform
 import re
+import shutil
 import signal
 import subprocess
 import sys
@@ -216,7 +217,12 @@ class Colors:
     CYAN: Final[str] = "\033[96m"
     WHITE: Final[str] = "\033[97m"
     GRAY: Final[str] = "\033[90m"
-    _enabled: ClassVar[bool] = sys.stderr.isatty()
+    # Honor NO_COLOR / FORCE_COLOR conventions while defaulting to TTY detection
+    _enabled: ClassVar[bool] = (
+        True
+        if os.getenv("FORCE_COLOR", "").lower() in {"1", "true", "yes"}
+        else (sys.stderr.isatty() and os.getenv("NO_COLOR") is None)
+    )
     _ansi_escape_re: ClassVar[re.Pattern[str]] = re.compile(
         r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])",
     )
@@ -231,6 +237,11 @@ class Colors:
             return text_str
         color_seq: str = "".join(filtered_codes)
         return f"{color_seq}{text_str}{Colors.RESET}"
+
+    @staticmethod
+    def set_enabled(*, enabled: bool) -> None:
+        """Globally enable/disable ANSI colors for this process."""
+        Colors._enabled = bool(enabled)
 
     @staticmethod
     def visual_len(text: str) -> int:
@@ -388,7 +399,7 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
 # Threshold for splitting long header text into multiple lines
 HEADER_SPLIT_LENGTH = 10
 ERROR_MESSAGE_PREVIEW_LEN: Final[int] = 40  # Max chars to show from error in summary line
-DISPLAY_WRAP_WIDTH: Final[int] = 80  # Column width for wrapping generated text preview
+DISPLAY_WRAP_WIDTH: Final[int] = 80  # Base/fallback column width for wrapping previews
 
 # Fields that should be right-aligned (numeric fields)
 NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
@@ -529,6 +540,66 @@ def is_numeric_field(field_name: str) -> bool:
 
 
 # --- Console UI helpers (rules/separators) ---
+
+def get_terminal_width(min_width: int = 60, max_width: int = 120) -> int:
+    """Return a clamped terminal width for formatting.
+
+    Uses shutil.get_terminal_size with a sensible fallback; clamps the
+    value to avoid excessive lines on very wide terminals and poor display
+    on very narrow ones.
+    """
+    try:
+        width = shutil.get_terminal_size(fallback=(80, 24)).columns
+    except OSError:
+        width = 80
+    return max(min_width, min(width, max_width))
+
+
+def _log_wrapped_label_value(
+    label: str,
+    value: str,
+    *,
+    color: str = "",
+    indent: int = 2,
+) -> None:
+    """Log a potentially long label/value pair wrapped to terminal width.
+
+    The first line includes the label; subsequent lines are aligned under the value.
+    """
+    width = get_terminal_width(max_width=100)
+    prefix = (" " * indent) + label
+    avail = max(20, width - Colors.visual_len(prefix) - 1)
+    parts = textwrap.wrap(
+        value,
+        width=avail,
+        break_long_words=False,
+        break_on_hyphens=False,
+        replace_whitespace=False,
+    ) or [""]
+    for idx, part in enumerate(parts):
+        if idx == 0:
+            logger.info("%s %s", prefix, Colors.colored(part, color))
+        else:
+            logger.info("%s %s", " " * (len(prefix)), Colors.colored(part, color))
+
+
+def _log_wrapped_error(label: str, value: str) -> None:
+    """Log long error/captured output text with wrapping and red color."""
+    width = get_terminal_width(max_width=100)
+    prefix = "  " + label
+    avail = max(20, width - Colors.visual_len(prefix) - 1)
+    parts = textwrap.wrap(
+        value,
+        width=avail,
+        break_long_words=False,
+        break_on_hyphens=False,
+        replace_whitespace=False,
+    ) or [""]
+    for idx, part in enumerate(parts):
+        if idx == 0:
+            logger.error("%s %s", prefix, Colors.colored(part, Colors.RED))
+        else:
+            logger.error("%s %s", " " * (len(prefix)), Colors.colored(part, Colors.RED))
 def log_rule(
     width: int = 80,
     *,
@@ -1170,25 +1241,24 @@ def pretty_print_exif(
     table: str = tabulate(
         rows,
         headers=headers,
-        tablefmt="outline",
+        tablefmt="fancy_grid",
         colalign=["left", "left"],
     )
 
     # Print title and table with decorative separators
     table_lines: list[str] = table.split("\n")
-    table_width: int = max(Colors.visual_len(line) for line in table_lines) if table_lines else 80
+    # Use a consistent terminal-based width for header rules to avoid ragged lines
+    header_width: int = max(40, min(get_terminal_width(), 100))
 
-    # Print title above the table, visually separated (consistent rule styling)
-    log_rule(table_width, char="=", color=Colors.BLUE, bold=True)
-    logger.info(Colors.colored(f"{title.center(table_width)}", Colors.BOLD, Colors.MAGENTA))
-    log_rule(table_width, char="=", color=Colors.BLUE, bold=True)
+    # Print the title with consistent rule width
+    log_rule(header_width, char="=", color=Colors.BLUE, bold=True)
+    logger.info(Colors.colored(f"{title.center(header_width)}", Colors.BOLD, Colors.MAGENTA))
+    log_rule(header_width, char="=", color=Colors.BLUE, bold=True)
 
     # Print the tabulated table
     for line in table_lines:
         logger.info(line)
-
-    log_rule(table_width, char="=", color=Colors.BLUE, bold=True)
-    logger.info("")
+    log_rule(header_width, char="=", color=Colors.BLUE, bold=True)
 
 
 def _get_available_fields(results: list[PerformanceResult]) -> list[str]:
@@ -1385,11 +1455,14 @@ def _build_stat_row(result: PerformanceResult, all_fields: list[str]) -> list[st
 def _compute_column_widths(field_names: list[str]) -> list[int]:
     """Compute per-column width hints based on field naming heuristics."""
     widths: list[int] = []
+    term_w = get_terminal_width()
+    # Allocate a generous portion to output column but cap to ~45-70 depending on terminal
+    out_w = max(40, min(70, int(term_w * 0.6)))
     for idx, name in enumerate(field_names):
         if idx == 0:  # Model column
             widths.append(26)
         elif name == "output":
-            widths.append(72)
+            widths.append(out_w)
         elif name == "peak_memory":
             widths.append(7)
         elif name in {"tokens", "prompt_tokens", "generation_tokens", "total_tokens"}:
@@ -1436,7 +1509,8 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
         maxcolwidths=widths,
     )
     lines = table.split("\n")
-    max_width = max((len(line) for line in lines), default=80)
+    # Use terminal width for framing rules to keep things neat
+    max_width = get_terminal_width(max_width=100)
     log_rule(max_width, char="=", color=Colors.BLUE, bold=True)
     for line in lines:
         logger.info(line)
@@ -2156,18 +2230,19 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
 
 def print_cli_header(title: str) -> None:
     """Print a formatted CLI header with the given title."""
-    log_rule(80, char="=", color=Colors.BLUE, bold=True)
-    logger.info("%s", Colors.colored(title.center(80), Colors.BOLD, Colors.MAGENTA))
-    log_rule(80, char="=", color=Colors.BLUE, bold=True)
+    width = get_terminal_width(max_width=100)
+    log_rule(width, char="=", color=Colors.BLUE, bold=True)
+    logger.info("%s", Colors.colored(title.center(width), Colors.BOLD, Colors.MAGENTA))
+    log_rule(width, char="=", color=Colors.BLUE, bold=True)
 
 
 def print_cli_section(title: str) -> None:
     """Print a formatted CLI section header."""
-    log_rule(60, char="-", color=Colors.BLUE, bold=False)
+    width = get_terminal_width(max_width=100)
     # Avoid uppercasing when ANSI escape codes are present (would corrupt codes)
     safe_title = title if "\x1b[" in title else title.upper()
     logger.info("[ %s ]", Colors.colored(safe_title, Colors.BOLD, Colors.MAGENTA))
-    log_rule(60, char="-", color=Colors.BLUE, bold=False)
+    log_rule(width, char="-", color=Colors.BLUE, bold=False)
 
 
 def print_cli_error(msg: str) -> None:
@@ -2227,12 +2302,13 @@ def _preview_generation(gen: GenerationResult | SupportsGenerationResult | None)
     if not text_val:
         logger.info("%s", Colors.colored("<empty>", Colors.CYAN))
         return
+    width = get_terminal_width(max_width=100)
     for original_line in text_val.splitlines():
         if not original_line:
             continue
         wrapped = textwrap.wrap(
             original_line,
-            width=DISPLAY_WRAP_WIDTH,
+            width=width,
             replace_whitespace=False,
             drop_whitespace=True,
             break_long_words=False,
@@ -2246,11 +2322,20 @@ def _log_verbose_success_details(res: PerformanceResult) -> None:
     if not res.generation:
         return
     gen_text = getattr(res.generation, "text", None) or ""
-    logger.info("  Generated Text: %s", Colors.colored(gen_text, Colors.CYAN))
+    _log_wrapped_label_value("Generated Text:", gen_text, color=Colors.CYAN)
+
+    _log_token_summary(res)
+    _log_detailed_timings(res)
+    logger.info(Colors.colored("  Performance Metrics:", Colors.BOLD, Colors.MAGENTA))
+    _log_perf_block(res)
+
+
+def _log_token_summary(res: PerformanceResult) -> None:
+    """Log tokens and generation TPS in a compact form."""
     p_tokens = getattr(res.generation, "prompt_tokens", 0)
     g_tokens = getattr(res.generation, "generation_tokens", 0)
-    tot_tokens = p_tokens + g_tokens
-    gen_tps = getattr(res.generation, "generation_tps", 0.0)
+    tot_tokens = (p_tokens or 0) + (g_tokens or 0)
+    gen_tps = getattr(res.generation, "generation_tps", 0.0) or 0.0
     logger.info(
         "  Tokens: total=%s prompt=%s gen=%s",
         fmt_num(tot_tokens),
@@ -2258,22 +2343,31 @@ def _log_verbose_success_details(res: PerformanceResult) -> None:
         fmt_num(g_tokens),
     )
     logger.info("  Generation TPS: %s", Colors.colored(fmt_num(gen_tps), Colors.WHITE))
+
+
+def _log_detailed_timings(res: PerformanceResult) -> None:
+    """Log total, generation, and model load times if available."""
     total_time_val = getattr(res, "total_time", None)
     if total_time_val and total_time_val > 0:
         tt_val = format_field_value("total_time", total_time_val)
         tt_disp = tt_val if isinstance(tt_val, str) else f"{total_time_val:.2f}s"
         logger.info("  Total Time: %s", Colors.colored(tt_disp, Colors.WHITE))
+
     generation_time_val = getattr(res, "generation_time", None)
     if generation_time_val and generation_time_val > 0:
         gt_val = format_field_value("generation_time", generation_time_val)
         gt_disp = gt_val if isinstance(gt_val, str) else f"{generation_time_val:.2f}s"
         logger.info("  Generation Time: %s", Colors.colored(gt_disp, Colors.WHITE))
+
     model_load_time_val = getattr(res, "model_load_time", None)
     if model_load_time_val and model_load_time_val > 0:
         ml_val = format_field_value("model_load_time", model_load_time_val)
         ml_disp = ml_val if isinstance(ml_val, str) else f"{model_load_time_val:.2f}s"
         logger.info("  Model Load Time: %s", Colors.colored(ml_disp, Colors.WHITE))
-    logger.info(Colors.colored("  Performance Metrics:", Colors.BOLD, Colors.MAGENTA))
+
+
+def _log_perf_block(res: PerformanceResult) -> None:
+    """Log inner performance metrics (time within generation, memory, prompt stats)."""
     if hasattr(res.generation, "time"):
         time_val = getattr(res.generation, "time", 0.0) or 0.0
         logger.info("    Time: %s", Colors.colored(f"{time_val:.2f}s", Colors.WHITE))
@@ -2292,15 +2386,12 @@ def _log_verbose_success_details(res: PerformanceResult) -> None:
     _log_mem("Active Δ", "active_memory", active_mem)
     _log_mem("Cache Δ", "cached_memory", cached_mem)
     _log_mem("Peak", "peak_memory", peak_mem)
+
+    p_tokens = getattr(res.generation, "prompt_tokens", 0)
+    g_tokens = getattr(res.generation, "generation_tokens", 0)
     prompt_tps = getattr(res.generation, "prompt_tps", 0.0) or 0.0
-    logger.info(
-        "    Prompt Tokens: %s",
-        Colors.colored(fmt_num(p_tokens), Colors.WHITE),
-    )
-    logger.info(
-        "    Generation Tokens: %s",
-        Colors.colored(fmt_num(g_tokens), Colors.WHITE),
-    )
+    logger.info("    Prompt Tokens: %s", Colors.colored(fmt_num(p_tokens), Colors.WHITE))
+    logger.info("    Generation Tokens: %s", Colors.colored(fmt_num(g_tokens), Colors.WHITE))
     logger.info("    Prompt TPS: %s", Colors.colored(fmt_num(prompt_tps), Colors.WHITE))
 
 
@@ -2317,7 +2408,10 @@ def print_model_result(
     summary = run_prefix + "SUMMARY " + " ".join(_summary_parts(result, model_short))
     log_fn = logger.info if result.success else logger.error
     color = Colors.GREEN if result.success else Colors.RED
-    log_fn(Colors.colored(summary, color))
+    # Wrap summary to terminal width for readability
+    width = get_terminal_width(max_width=100)
+    for line in textwrap.wrap(summary, width=width, break_long_words=False, break_on_hyphens=False):
+        log_fn(Colors.colored(line, color))
     if result.success and not verbose:  # quick exit with preview only
         _preview_generation(result.generation)
         return
@@ -2330,14 +2424,11 @@ def print_model_result(
     log_fn(Colors.colored(header, Colors.BOLD, header_color))
     if not result.success:
         if result.error_stage:
-            logger.error("  Stage: %s", Colors.colored(result.error_stage, Colors.RED))
+            _log_wrapped_error("Stage:", str(result.error_stage))
         if result.error_message:
-            logger.error("  Error: %s", Colors.colored(result.error_message, Colors.RED))
+            _log_wrapped_error("Error:", str(result.error_message))
         if result.captured_output_on_fail:
-            logger.error(
-                "  Output: %s",
-                Colors.colored(result.captured_output_on_fail, Colors.RED),
-            )
+            _log_wrapped_error("Output:", str(result.captured_output_on_fail))
         return
     if result.generation and verbose:
         _log_verbose_success_details(result)
@@ -2345,7 +2436,8 @@ def print_model_result(
 
 def print_cli_separator() -> None:
     """Print a simple separator line."""
-    log_rule(60, char="-", color=Colors.GRAY, bold=False)
+    width = get_terminal_width(max_width=100)
+    log_rule(width, char="-", color=Colors.BLUE, bold=False)
 
 
 def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
@@ -2363,6 +2455,12 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
 
     if args.verbose:
         logger.debug("Verbose/debug mode enabled.")
+
+    # Control color output via CLI flags if provided
+    if getattr(args, "no_color", False):
+        Colors.set_enabled(enabled=False)
+    elif getattr(args, "force_color", False):
+        Colors.set_enabled(enabled=True)
 
     # Warn if TensorFlow or sentence-transformers are present
     tf_present = bool(importlib_util.find_spec("tensorflow"))
@@ -2699,20 +2797,13 @@ def main(args: argparse.Namespace) -> None:
         library_versions = setup_environment(args)
         print_cli_header("MLX Vision Language Model Check")
 
-        # Thin separator between major phases for scan-friendly logs
-        print_cli_separator()
-
         image_path = find_and_validate_image(args)
-        print_cli_separator()
 
         metadata = handle_metadata(image_path, args)
-        print_cli_separator()
 
         prompt = prepare_prompt(args, metadata)
-        print_cli_separator()
 
         results = process_models(args, image_path, prompt)
-        print_cli_separator()
 
         finalize_execution(
             args=args,
@@ -2809,6 +2900,16 @@ def main_cli() -> None:
         type=float,
         default=DEFAULT_TIMEOUT,
         help="Timeout in seconds for model operations.",
+    )
+    parser.add_argument(
+        "--no-color",
+        action="store_true",
+        help="Disable ANSI colors in output.",
+    )
+    parser.add_argument(
+        "--force-color",
+        action="store_true",
+        help="Force enable ANSI colors even if not a TTY.",
     )
 
     # Parse arguments
