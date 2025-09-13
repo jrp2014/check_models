@@ -137,6 +137,14 @@ def _ensure_stubs(repo_root: Path, *, refresh: bool, require: bool) -> int:
     if rc != 0 and require:
         logger.error("[quality] Stub generation failed (exit %s)", rc)
         return rc
+    # Apply post-processing patch to fix Optional annotations, if available
+    try:
+        _patch = getattr(mod, "_patch_mlx_vlm_stubs", None)
+        if _patch is not None:
+            _patch(typings)
+    except Exception:
+        # Non-fatal: continue; mypy may still pass if stubs happen to be fine
+        logger.debug("[quality] Stub patch step skipped due to exception", exc_info=True)
     return 0
 
 
