@@ -29,6 +29,13 @@ Do NOT introduce a new function solely to silence a complexity / length warning 
 - Runtime casts: use `typing.cast` sparingly; prefer narrowing via `if` guards.
 - Replace blanket `# type: ignore` with specific codes (e.g., `# type: ignore[attr-defined]`).
 
+### Paths & Files
+
+- Prefer `pathlib.Path` for internal path handling and operations (`open`, `resolve`, `suffix`, joins).
+- Public functions that accept a path-like input should use a `PathLike` alias (`str | Path`). Convert to `Path` at the top of the function for uniform handling.
+- Only convert to `str` at library boundaries that explicitly require string paths (e.g., third-party APIs or JSON serialization of paths). Keep this conversion local to the call site.
+- Do not accept raw `str` for paths unless necessary for interop; use `Path`/`PathLike` and document the expectation in docstrings.
+
 ## Missing Values and Sentinels
 
 - Return `None` for missing/unavailable values instead of sentinel strings like "N/A" or "Unknown".

@@ -74,6 +74,7 @@ LARGE_NUMBER_THRESHOLD: Final[float] = 100.0
 MEDIUM_NUMBER_THRESHOLD: Final[int] = 10
 THOUSAND_THRESHOLD: Final[int] = 1000
 MEMORY_GB_INTEGER_THRESHOLD: Final[float] = 10.0  # >= this many GB show as integer (no decimals)
+MARKDOWN_HARD_BREAK_SPACES: Final[int] = 2  # Preserve exactly two trailing spaces for hard breaks
 
 _temp_logger = logging.getLogger(LOGGER_NAME)
 
@@ -1767,6 +1768,9 @@ def generate_markdown_report(
         colalign=colalign,
     )
 
+    # Normalize trailing spaces per line using shared helper
+    markdown_table = normalize_markdown_trailing_spaces(markdown_table)
+
     # Build the complete markdown content
     md: list[str] = []
     md.append("# Model Performance Results\n")
@@ -1787,9 +1791,12 @@ def generate_markdown_report(
         f"\n_Report generated on: {datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n",
     )
 
+    # Join and normalize trailing spaces across the entire Markdown document
+    markdown_content = normalize_markdown_trailing_spaces("\n".join(md))
+
     try:
         with filename.open("w", encoding="utf-8") as f:
-            f.write("\n".join(md))
+            f.write(markdown_content)
         logger.info(
             "Markdown report saved to: %s",
             Colors.colored(str(filename.resolve()), Colors.GREEN),
@@ -1807,7 +1814,7 @@ def generate_markdown_report(
 
 
 def _escape_markdown_in_text(text: str) -> str:
-    """Escape only structural Markdown chars (currently pipe + backslash).
+    """Escape only structural Markdown chars (currently pipe only).
 
     Minimal escaping avoids noisy backslashes while preserving readability.
     Newlines are replaced with ``<br>`` so multi-line outputs don't break the
@@ -1849,6 +1856,27 @@ def _escape_markdown_in_text(text: str) -> str:
 
     # Escape bare ampersands that could start entities; avoid double-escaping existing ones.
     return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
+
+
+def normalize_markdown_trailing_spaces(md_text: str) -> str:
+    """Normalize trailing spaces on each line in Markdown text.
+
+    Rules:
+    - Keep exactly MARKDOWN_HARD_BREAK_SPACES trailing spaces (Markdown hard line break).
+    - Strip any other count of trailing spaces to avoid accidental single-space endings.
+    """
+    out_lines: list[str] = []
+    for ln in md_text.splitlines():
+        m = re.search(r"( +)$", ln)
+        if not m:
+            out_lines.append(ln)
+            continue
+        spaces = len(m.group(1))
+        if spaces == MARKDOWN_HARD_BREAK_SPACES:
+            out_lines.append(ln)
+        else:
+            out_lines.append(ln[:-spaces])
+    return "\n".join(out_lines)
 
 
 def get_system_info() -> tuple[str, str | None]:
