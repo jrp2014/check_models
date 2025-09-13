@@ -1,0 +1,3 @@
+from .config import TextConfig as TextConfig
+
+class LanguageModel: ...

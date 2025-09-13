@@ -142,6 +142,8 @@ reportUnusedImport = "warning"
 # See: https://mypy.readthedocs.io/en/stable/config_file.html
 python_version = "3.12"
 ignore_missing_imports = true
+# Search path for local type stubs (generated via stubgen into ./typings)
+mypy_path = ["typings"]
 # For stricter checking, you can enable the following:
 # disallow_untyped_defs = true
 warn_return_any = true

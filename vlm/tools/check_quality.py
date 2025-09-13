@@ -120,7 +120,16 @@ def main(argv: list[str] | None = None) -> int:  # noqa: PLR0912 - cohesive CLI 
     # mypy
     if _have("mypy"):
         logger.info("[quality] mypy type check ...")
-        rc = _run(["mypy", *paths], cwd=repo_root)
+        # Explicitly point to the project config to honor mypy_path=typings
+        rc = _run(
+            [
+                "mypy",
+                "--config-file",
+                str(repo_root / "vlm/pyproject.toml"),
+                *paths,
+            ],
+            cwd=repo_root,
+        )
         overall_rc = overall_rc or rc
     else:
         msg = "[quality] mypy not found; skipping type check"

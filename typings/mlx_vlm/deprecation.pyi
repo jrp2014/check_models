@@ -1,0 +1,3 @@
+from typing import Callable
+
+def deprecate(remove_version: str, message: str, instead: str | None = None, since: str | None = None) -> Callable: ...
