@@ -2145,16 +2145,35 @@ def _run_model_generation(
 
     # Time the generation process manually since MLX VLM doesn't include timing
     start_time = time.perf_counter()
-    output: GenerationResult = generate(
-        model=model,
-        processor=tokenizer,  # type: ignore[arg-type] # MLX VLM accepts both tokenizer types
-        prompt=formatted_prompt,
-        image=str(image_path),
-        verbose=verbose,
-        temperature=params.temperature,
-        trust_remote_code=params.trust_remote_code,
-        max_tokens=params.max_tokens,
-    )
+    try:
+        output: GenerationResult = generate(
+            model=model,
+            processor=tokenizer,  # type: ignore[arg-type] # MLX VLM accepts both tokenizer types
+            prompt=formatted_prompt,
+            image=str(image_path),
+            verbose=verbose,
+            temperature=params.temperature,
+            trust_remote_code=params.trust_remote_code,
+            max_tokens=params.max_tokens,
+        )
+    except TimeoutError as gen_to_err:
+        msg = f"Generation timed out for model {params.model_path}: {gen_to_err}"
+        # Re-raise to be handled by outer TimeoutError branch
+        raise TimeoutError(msg) from gen_to_err
+    except (OSError, ValueError) as gen_known_err:
+        # Known I/O or validation-style issues
+        msg = (
+            f"Model generation failed for {params.model_path}: {gen_known_err}\n\n"
+            f"Full traceback:\n{traceback.format_exc()}"
+        )
+        raise ValueError(msg) from gen_known_err
+    except Exception as gen_err:
+        # Catch unexpected exceptions from third-party generate/stream internals
+        msg = (
+            f"Unexpected error during generation for {params.model_path}: {gen_err}\n\n"
+            f"Full traceback:\n{traceback.format_exc()}"
+        )
+        raise ValueError(msg) from gen_err
     end_time = time.perf_counter()
 
     # Add timing to the GenerationResult object

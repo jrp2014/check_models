@@ -23,6 +23,8 @@ RUNTIME_PACKAGES=(
 	"tabulate>=0.9.0"
 	"tzlocal>=5.0"
     "numpy"
+    "einops"
+    "num2words"
 )
 
 EXTRAS_PACKAGES=(
