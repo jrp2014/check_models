@@ -89,6 +89,19 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         action="store_true",
         help="Force re-generate local stubs (clears and rebuilds).",
     )
+    parser.add_argument(
+        "--check-stubs",
+        action="store_true",
+        help=(
+            "Also run mypy against the generated stubs (typings/mlx_vlm). "
+            "Useful to audit stub quality; off by default to avoid noise."
+        ),
+    )
+    parser.add_argument(
+        "--stubs-path",
+        default="typings/mlx_vlm",
+        help="Path to the stubs package to type-check when using --check-stubs.",
+    )
     return parser.parse_args(argv)
 
 
@@ -205,6 +218,19 @@ def main(argv: list[str] | None = None) -> int:  # noqa: PLR0912 - cohesive CLI 
             cwd=repo_root,
         )
         overall_rc = overall_rc or rc
+        # Optionally, also check the stubs package itself
+        if args.check_stubs:
+            logger.info("[quality] mypy type check (stubs: %s) ...", args.stubs_path)
+            rc2 = _run(
+                [
+                    "mypy",
+                    "--config-file",
+                    str(repo_root / "vlm/pyproject.toml"),
+                    str(repo_root / args.stubs_path),
+                ],
+                cwd=repo_root,
+            )
+            overall_rc = overall_rc or rc2
     else:
         msg = "[quality] mypy not found; skipping type check"
         logger.warning(msg)
