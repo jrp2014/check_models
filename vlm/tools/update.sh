@@ -13,7 +13,7 @@
 set -euo pipefail
 
 brew upgrade
-pip install -U pip setuptools wheel cmake typing_extensions
+pip install -U pip wheel typing_extensions
 
 RUNTIME_PACKAGES=(
 	"mlx>=0.29.1"
@@ -32,11 +32,14 @@ EXTRAS_PACKAGES=(
 )
 
 DEV_PACKAGES=(
+    "cmake>=3.25,<4.1"
 	"ruff>=0.1.0"
 	"mypy>=1.8.0"
 	"pytest>=8.0.0"
 	"pytest-cov>=4.0.0"
+    "setuptools>=80"
     "types-tabulate"
+    "nanobind==2.4.0"
 )
 
 TORCH_PACKAGES=(
