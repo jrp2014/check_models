@@ -54,6 +54,9 @@ dependencies = [
     "tqdm>=4.66.2",
     # System utilities
     "tzlocal>=5.0",
+    # Some models seem to need these
+    "einops",
+    "num2words",
 ]
 
 [project.urls]

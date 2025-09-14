@@ -1,0 +1,16 @@
+import mlx.core as mx
+import mlx.nn as nn
+from ..base import LanguageModelOutput as LanguageModelOutput
+from .config import TextConfig as TextConfig
+from _typeshed import Incomplete
+
+class LanguageModel(nn.Module):
+    config: Incomplete
+    model_type: Incomplete
+    model: Incomplete
+    def __init__(self, config: TextConfig) -> None: ...
+    def __call__(self, inputs: mx.array, mask: mx.array = None, cache=None, inputs_embeds: mx.array | None = None): ...
+    def sanitize(self, weights): ...
+    @property
+    def layers(self): ...
+    def make_cache(self): ...

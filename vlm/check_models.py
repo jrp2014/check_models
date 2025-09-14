@@ -592,38 +592,48 @@ def _log_wrapped_label_value(
     """
     width = get_terminal_width(max_width=100)
     prefix = (" " * indent) + label
-    avail = max(20, width - Colors.visual_len(prefix) - 1)
-    parts = textwrap.wrap(
-        value,
-        width=avail,
-        break_long_words=False,
-        break_on_hyphens=False,
-        replace_whitespace=False,
-    ) or [""]
-    for idx, part in enumerate(parts):
-        if idx == 0:
-            logger.info("%s %s", prefix, Colors.colored(part, color))
-        else:
-            logger.info("%s %s", " " * (len(prefix)), Colors.colored(part, color))
+    first_avail = max(20, width - Colors.visual_len(prefix) - 1)
+    cont_indent = " " * (indent + 2)
+    cont_avail = max(20, width - len(cont_indent) - 1)
+
+    # Preserve user newlines: wrap each input line independently
+    lines = value.splitlines() or [""]
+    for li, original_line in enumerate(lines):
+        wrapped = textwrap.wrap(
+            original_line,
+            width=first_avail if li == 0 else cont_avail,
+            break_long_words=False,
+            break_on_hyphens=False,
+            replace_whitespace=False,
+        ) or [""]
+        for wi, wline in enumerate(wrapped):
+            if li == 0 and wi == 0:
+                logger.info("%s %s", prefix, Colors.colored(wline, color))
+            else:
+                logger.info("%s%s", cont_indent, Colors.colored(wline, color))
 
 
 def _log_wrapped_error(label: str, value: str) -> None:
     """Log long error/captured output text with wrapping and red color."""
     width = get_terminal_width(max_width=100)
     prefix = "  " + label
-    avail = max(20, width - Colors.visual_len(prefix) - 1)
-    parts = textwrap.wrap(
-        value,
-        width=avail,
-        break_long_words=False,
-        break_on_hyphens=False,
-        replace_whitespace=False,
-    ) or [""]
-    for idx, part in enumerate(parts):
-        if idx == 0:
-            logger.error("%s %s", prefix, Colors.colored(part, Colors.RED))
-        else:
-            logger.error("%s %s", " " * (len(prefix)), Colors.colored(part, Colors.RED))
+    first_avail = max(20, width - Colors.visual_len(prefix) - 1)
+    cont_indent = " " * 4
+    cont_avail = max(20, width - len(cont_indent) - 1)
+    lines = value.splitlines() or [""]
+    for li, original_line in enumerate(lines):
+        wrapped = textwrap.wrap(
+            original_line,
+            width=first_avail if li == 0 else cont_avail,
+            break_long_words=False,
+            break_on_hyphens=False,
+            replace_whitespace=False,
+        ) or [""]
+        for wi, wline in enumerate(wrapped):
+            if li == 0 and wi == 0:
+                logger.error("%s %s", prefix, Colors.colored(wline, Colors.RED))
+            else:
+                logger.error("%s%s", cont_indent, Colors.colored(wline, Colors.RED))
 
 
 def _apply_cli_output_preferences(args: argparse.Namespace) -> None:
@@ -1881,11 +1891,22 @@ def generate_markdown_report(
         clean_header = header.replace("<br>", " ")
         markdown_headers.append(clean_header)
 
-    # Escape markdown characters in output text for Markdown safety
+    # Escape Markdown only for diagnostics (failed rows). Keep successful model output
+    # unchanged. This preserves model formatting (including *, _, `, etc.) while
+    # avoiding table breakage from diagnostics.
+    sorted_results_for_flags = _sort_results_by_time(results)
     for i in range(len(rows)):
-        for j in range(len(rows[i])):
-            if j == len(rows[i]) - 1:  # Only escape in the last column (output column)
-                rows[i][j] = _escape_markdown_in_text(rows[i][j])
+        last_col_idx = len(rows[i]) - 1
+        if last_col_idx < 0:
+            continue
+        # If corresponding result failed, treat as diagnostics and escape more aggressively
+        is_failure = i < len(sorted_results_for_flags) and not sorted_results_for_flags[i].success
+        if is_failure:
+            rows[i][last_col_idx] = _escape_markdown_diagnostics(rows[i][last_col_idx])
+        else:
+            # Minimal structural escaping only (protect pipes/HTML-like tags, preserve output
+            # as-is otherwise)
+            rows[i][last_col_idx] = _escape_markdown_in_text(rows[i][last_col_idx])
 
     # Determine column alignment using original field names
     colalign = ["left"] + [
@@ -1912,9 +1933,13 @@ def generate_markdown_report(
     md.append("")
     md.append("**Note:** Results are sorted by generation time (fastest to slowest).\n")
     md.append("")
+    # Surround the table with markdownlint rule guards; the table can be wide and may
+    # contain HTML breaks
+    md.append("<!-- markdownlint-disable MD013 MD033 MD037 -->")
     md.append(markdown_table)
+    md.append("<!-- markdownlint-enable MD013 MD033 MD037 -->")
     md.append("\n---\n")
-    md.append("**Library Versions:**\n")
+    md.append("## Library Versions\n")
     for name, ver in sorted(versions.items()):
         ver_str = "" if ver is None else ver
         md.append(f"- `{name}`: `{ver_str}`")
@@ -1987,6 +2012,51 @@ def _escape_markdown_in_text(text: str) -> str:
     result = tag_pattern.sub(_escape_html_like, result)
 
     # Escape bare ampersands that could start entities; avoid double-escaping existing ones.
+    return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
+
+
+def _escape_markdown_diagnostics(text: str) -> str:
+    """Escape diagnostics text for Markdown tables more defensively.
+
+    Behavior:
+    - Convert newlines to <br> to keep table rows intact.
+    - Escape characters that commonly trigger Markdown formatting in diagnostics: *, _, `, ~, and |.
+    - Neutralize HTML-like tags except for a safe inline subset defined in allowed_inline_tags.
+    - Do NOT collapse general whitespace, to avoid losing error message detail.
+    """
+    # Convert newlines to <br> but otherwise keep spacing as-is
+    result = text.replace("\r\n", "<br>").replace("\r", "<br>").replace("\n", "<br>")
+
+    # Limit excessive consecutive <br> while preserving intentional blank lines
+    result = re.sub(r"(<br>\s*){3,}", "<br><br>", result)
+
+    # Escape characters with special meaning in Markdown and table structure
+    escape_map = {
+        "|": "\\|",
+        "*": "\\*",
+        "_": "\\_",
+        "`": "\\`",
+        "~": "\\~",
+    }
+    for ch, repl in escape_map.items():
+        result = result.replace(ch, repl)
+
+    # Neutralize HTML-like tags except a safe allowlist
+    tag_pattern = re.compile(r"</?[A-Za-z][A-Za-z0-9:-]*(?:\s+[^<>]*?)?>")
+
+    def _escape_html_like(m: re.Match[str]) -> str:
+        token = m.group(0)
+        inner = token[1:-1].strip()
+        if not inner:
+            return token.replace("<", "&lt;").replace(">", "&gt;")
+        core = inner.lstrip("/").split(None, 1)[0].rstrip("/").lower()
+        if core in allowed_inline_tags:
+            return token
+        return token.replace("<", "&lt;").replace(">", "&gt;")
+
+    result = tag_pattern.sub(_escape_html_like, result)
+
+    # Escape bare ampersands (avoid starting entities)
     return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
 
 
@@ -2451,7 +2521,7 @@ def _log_perf_block(res: PerformanceResult) -> None:
             return
         formatted = format_field_value(field, raw_val)
         unit = "GB"
-        text = str(formatted) if str(formatted).endswith(unit) else f"{formatted} {unit}"
+        text = str(formatted) if str(formatted).endswith(unit) else f"{formatted}{unit}"
         logger.info("    Memory (%s): %s", label, Colors.colored(text, Colors.WHITE))
 
     active_mem = getattr(res.generation, "active_memory", 0.0) or 0.0
