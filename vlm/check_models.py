@@ -23,6 +23,7 @@ import traceback
 from dataclasses import dataclass, fields
 from datetime import UTC, datetime
 from pathlib import Path
+from collections.abc import Iterator
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -58,7 +59,7 @@ psutil: Any | None = psutil_mod
 
 if TYPE_CHECKING:
     import types
-    from collections.abc import Callable
+    from collections.abc import Callable, Iterator
     from zoneinfo import ZoneInfo
 
     from mlx.nn import Module
@@ -389,8 +390,6 @@ FIELD_UNITS: Final[dict[str, str]] = {
     "prompt_tps": "(t/s)",
     "generation_tps": "(t/s)",
     "peak_memory": "(GB)",
-    "time": "(s)",
-    "duration": "(s)",
 }
 
 FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
@@ -401,8 +400,6 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
     "prompt_tps": ("Prompt", "(t/s)"),
     "generation_tps": ("Gen", "(t/s)"),
     "peak_memory": ("Peak", "(GB)"),
-    "time": ("Time", "(s)"),
-    "duration": ("Dur", "(s)"),
     "generation_time": ("Generation", "(s)"),
     "model_load_time": ("Load", "(s)"),
     "total_time": ("Total", "(s)"),
@@ -421,8 +418,6 @@ NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
         "prompt_tps",
         "generation_tps",
         "peak_memory",
-        "time",
-        "duration",
         "generation_time",
         "model_load_time",
         "total_time",
@@ -513,6 +508,16 @@ def format_overall_runtime(total_seconds: float) -> str:
     return f"{total_seconds:.2f}s"
 
 
+def local_now_str(fmt: str = "%Y-%m-%d %H:%M:%S %Z") -> str:
+    """Return localized current time as a formatted string.
+
+    Centralizes timestamp formatting so report generators and version info
+    stay consistent and makes future changes (e.g. adding UTC or ISO8601
+    variants) trivial.
+    """
+    return datetime.now(get_localzone()).strftime(fmt)
+
+
 def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: PLR0911
     # Justification (PLR0911): Multiple early returns keep the formatting
     # branches (memory/time/tps/numeric/string) linear and readable without
@@ -539,7 +544,7 @@ def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: PLR
             return _format_memory_value_gb(num)
         if field_name.endswith("_tps"):
             return _format_tps(num)
-        if field_name in {"time", "duration", "total_time", "generation_time", "model_load_time"}:
+        if field_name in {"total_time", "generation_time", "model_load_time"}:
             return _format_time_seconds(num)
         return fmt_num(num)
     if isinstance(value, str) and value:
@@ -788,7 +793,7 @@ def print_version_info(versions: LibraryVersionDict) -> None:
 
     logger.info(
         "Generated: %s",
-        datetime.now(get_localzone()).strftime("%Y-%m-%d %H:%M:%S %Z"),
+        local_now_str(),
     )
 
     # --- Optional system / hardware block (Apple Silicon focus) ---
@@ -925,6 +930,53 @@ class PerformanceResult:
     generation_time: float | None = None  # Time taken for generation in seconds
     model_load_time: float | None = None  # Time taken to load the model in seconds
     total_time: float | None = None  # Total time including model loading
+
+
+class ResultSet:
+    """Cache-friendly wrapper around a collection of PerformanceResult.
+
+    Provides:
+        - Single-pass sorting by generation time (fastest first)
+        - Lazy discovery/caching of available metric fields (generation + timing)
+        - Simple iteration / length protocol support
+
+    Rationale: Multiple rendering paths previously repeated the same sort
+    and field extraction logic. Centralizing reduces duplication and
+    guarantees consistent ordering across console, HTML, and Markdown
+    outputs.
+    """
+
+    __slots__ = ("_fields", "_results")  # Sorted for lint consistency
+
+    def __init__(self, results: list[PerformanceResult]) -> None:
+        """Initialize and sort results.
+
+        A shallow copy of ``results`` is taken to guard against external
+        mutation after construction.
+        """
+        self._results = _sort_results_by_time(list(results))
+        self._fields: list[str] | None = None
+
+    # Public API -----------------------------------------------------
+    @property
+    def results(self) -> list[PerformanceResult]:  # Sorted
+        """Return results sorted by generation time (fastest first)."""
+        return self._results
+
+    def fields(self) -> list[str]:
+        """Return cached list of metric field names (generation + timing)."""
+        if self._fields is None:
+            self._fields = _get_available_fields(self._results)
+        return self._fields
+
+    # Dunder conveniences --------------------------------------------
+    def __len__(self) -> int:  # pragma: no cover - trivial
+        """Return number of results."""
+        return len(self._results)
+
+    def __iter__(self) -> Iterator[PerformanceResult]:  # pragma: no cover - trivial
+        """Iterate over sorted results."""
+        return iter(self._results)
 
 
 # --- File Handling ---
@@ -1561,8 +1613,6 @@ def _compute_column_widths(field_names: list[str]) -> list[int]:
         elif name in {
             "prompt_tps",
             "generation_tps",
-            "time",
-            "duration",
             "generation_time",
             "model_load_time",
             "total_time",
@@ -1583,11 +1633,10 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     if not results:
         logger.info("No model results to display.")
         return
-    # Ordering
-    ordered_results = _sort_results_by_time(results)
-    all_fields = _get_available_fields(ordered_results) or []
+    rs = ResultSet(results)
+    all_fields = rs.fields() or []
     headers, field_names = _build_stat_headers(all_fields)
-    rows = [_build_stat_row(r, all_fields) for r in ordered_results]
+    rows = [_build_stat_row(r, all_fields) for r in rs.results]
     colalign: list[str] = ["left"] + [
         "right" if is_numeric_field(fname) else "left" for fname in field_names[1:]
     ]
@@ -1621,10 +1670,9 @@ def _prepare_table_data(
     if not results:
         return [], [], []
 
-    # Sort results by generation time (lowest to highest)
-    results = _sort_results_by_time(results)
-
-    all_fields = _get_available_fields(results)
+    rs = ResultSet(results)
+    results = rs.results
+    all_fields = rs.fields()
 
     headers = ["Model"]
     field_names = ["model"]  # Track original field names for alignment
@@ -1639,8 +1687,6 @@ def _prepare_table_data(
         "peak_memory": "Peak<br>Memory<br>(GB)",
         "active_memory": "Active<br>Memory<br>(GB)",
         "cached_memory": "Cached<br>Memory<br>(GB)",
-        "time": "Total<br>Time<br>(s)",
-        "duration": "Duration<br>(s)",
         "generation_time": "Generation<br>Time<br>(s)",
         "model_load_time": "Model<br>Load<br>(s)",
         "total_time": "Total<br>Time<br>(s)",
@@ -1958,7 +2004,7 @@ def generate_markdown_report(
     # Build the complete markdown content
     md: list[str] = []
     md.append("# Model Performance Results\n")
-    md.append(f"_Generated on {datetime.now(get_localzone()).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n")
+    md.append(f"_Generated on {local_now_str()}_\n")
     md.append("")
     md.append("> **Prompt used:**\n>\n> " + prompt.replace("\n", "\n> ") + "\n")
     md.append("")
@@ -1975,10 +2021,7 @@ def generate_markdown_report(
     for name, ver in sorted(versions.items()):
         ver_str = "" if ver is None else ver
         md.append(f"- `{name}`: `{ver_str}`")
-    local_tz = get_localzone()
-    md.append(
-        f"\n_Report generated on: {datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S %Z')}_\n",
-    )
+    md.append(f"\n_Report generated on: {local_now_str()}_\n")
 
     # Join and normalize trailing spaces across the entire Markdown document
     markdown_content = normalize_markdown_trailing_spaces("\n".join(md))
