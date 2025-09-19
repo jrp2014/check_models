@@ -85,9 +85,6 @@ MEMORY_GB_INTEGER_THRESHOLD: Final[float] = 10.0  # >= this many GB show as inte
 MARKDOWN_HARD_BREAK_SPACES: Final[int] = 2  # Preserve exactly two trailing spaces for hard breaks
 HOUR_THRESHOLD_SECONDS: Final[int] = 3600  # Threshold for displaying HH:MM:SS runtime
 
-# Sentinel to track one-time legend emission for compact metrics
-_COMPACT_TOKENS_LEGEND_EMITTED = False
-
 _temp_logger = logging.getLogger(LOGGER_NAME)
 
 try:
@@ -2646,7 +2643,7 @@ def _log_compact_metrics(res: PerformanceResult) -> None:
             Colors.MAGENTA,
         ),
     )
-    _emit_tokens_legend_once()
+    # Legend emitted once at start of processing; no per-model legend here.
 
 
 def _build_compact_metric_parts(
@@ -2712,18 +2709,22 @@ def _align_metric_parts(parts: list[str]) -> list[str]:
     return aligned
 
 
-def _emit_tokens_legend_once() -> None:
-    """Emit legend for tokens triple exactly once per process."""
-    global _COMPACT_TOKENS_LEGEND_EMITTED  # noqa: PLW0603 (simple sentinel write)
-    if _COMPACT_TOKENS_LEGEND_EMITTED:
-        return
-    logger.info(
-        Colors.colored(
-            "    Legend: tokens(total/prompt/gen)=total/prompt/generated tokens",
-            Colors.GRAY,
-        ),
-    )
-    _COMPACT_TOKENS_LEGEND_EMITTED = True
+def log_metrics_legend(*, detailed: bool) -> None:
+    """Emit a one-time legend at the beginning of processing for clarity."""
+    if detailed:
+        logger.info(
+            Colors.colored(
+                "Legend (detailed): shows separate lines for timing, memory, tokens, TPS.",
+                Colors.GRAY,
+            ),
+        )
+    else:
+        logger.info(
+            Colors.colored(
+                "Legend: tokens(total/prompt/gen)=total/prompt/generated • keys aligned for readability",
+                Colors.GRAY,
+            ),
+        )
 
 
 def print_model_result(
@@ -3040,6 +3041,10 @@ def process_models(
             logger.error("Ensure models are downloaded and cache is accessible.")
     else:
         logger.info("Processing %d model(s)...", len(model_identifiers))
+    # Emit legend once if verbose
+    if args.verbose:
+        log_metrics_legend(detailed=args.detailed_metrics)
+
     for idx, model_id in enumerate(model_identifiers, start=1):
         print_cli_separator()
         model_label = model_id.split("/")[-1]
@@ -3211,13 +3216,22 @@ def main_cli() -> None:
         default=None,
         help="Prompt.",
     )
-    parser.add_argument(
+    metrics_group = parser.add_mutually_exclusive_group()
+    metrics_group.add_argument(
         "--detailed-metrics",
         action="store_true",
         default=False,
         help=(
             "Use expanded multi-line metrics block instead of compact aligned single-line metrics. "
             "Only applies when --verbose is set."
+        ),
+    )
+    metrics_group.add_argument(
+        "--compact-metrics",
+        action="store_true",
+        default=False,
+        help=(
+            "Force compact metrics (explicit; default behavior). Useful if environment sets a different default."
         ),
     )
     parser.add_argument(
@@ -3273,6 +3287,9 @@ def main_cli() -> None:
         print_cli_section("Command Line Parameters")
         for arg_name, arg_value in sorted(vars(args).items()):
             logger.info("  %s: %s", arg_name, arg_value)
+    # Normalize: if neither flag set, compact is default; if both prevented by group.
+    if getattr(args, "compact_metrics", False):
+        args.detailed_metrics = False
     main(args)
 
 
