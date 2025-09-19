@@ -111,6 +111,9 @@ Torch support:
 * Markdown escaping: The final output column preserves common GitHub‑supported tags (e.g., `<br>`) and escapes others so special tokens like `<s>` render literally.
 
 ## Git Hygiene and Caches
+
+This repo excludes ephemeral caches and local environments via `.gitignore`. Common exclusions include `__pycache__/`, `.pytest_cache/`, `.ruff_cache/`, `.mypy_cache/`, `.venv/`, and editor folders like `.vscode/`. Do not commit large model caches (e.g., Hugging Face) to the repository.
+
 ## Pre-commit (Optional)
 
 To enforce formatting, lint, type, and dependency sync locally:
@@ -126,8 +129,7 @@ Hooks run automatically on commit. Run against all files manually:
 pre-commit run --all-files
 ```
 
-
-This repo excludes ephemeral caches and local environments via `.gitignore`. Common exclusions include `__pycache__/`, `.pytest_cache/`, `.ruff_cache/`, `.mypy_cache/`, `.venv/`, and editor folders like `.vscode/`. Do not commit large model caches (e.g., Hugging Face) to the repository.
+<!-- (Moved Git Hygiene descriptive paragraph above for correct heading spacing) -->
 
 ### Manual Installation
 
@@ -468,8 +470,8 @@ MIT License - see LICENSE file for details.
 
 A small helper script runs formatting and static checks for this project.
 
-- Location: `vlm/tools/check_quality.py`
-- Defaults:
+* Location: `vlm/tools/check_quality.py`
+* Defaults:
   * Targets only `vlm/check_models.py` unless paths are provided
   * Runs `ruff format` by default (skip with `--no-format`)
   * Runs `ruff check --fix` by default (skip fixing with `--no-fix`)
