@@ -143,3 +143,11 @@ module = [
 ]
 ignore_missing_imports = true
 ignore_errors = true
+
+[tool.pytest.ini_options]
+# Limit test discovery to the dedicated tests package inside the project
+# (avoids collecting helper scripts or example snippets).
+testpaths = ["vlm/tests"]
+# Keep output concise; individual developers can override locally if needed.
+addopts = "-q"
+

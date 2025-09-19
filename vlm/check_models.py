@@ -83,6 +83,7 @@ MEDIUM_NUMBER_THRESHOLD: Final[int] = 10
 THOUSAND_THRESHOLD: Final[int] = 1000
 MEMORY_GB_INTEGER_THRESHOLD: Final[float] = 10.0  # >= this many GB show as integer (no decimals)
 MARKDOWN_HARD_BREAK_SPACES: Final[int] = 2  # Preserve exactly two trailing spaces for hard breaks
+HOUR_THRESHOLD_SECONDS: Final[int] = 3600  # Threshold for displaying HH:MM:SS runtime
 
 _temp_logger = logging.getLogger(LOGGER_NAME)
 
@@ -489,6 +490,29 @@ def _format_tps(num: float) -> str:
     if abs(num) >= MEDIUM_NUMBER_THRESHOLD:
         return f"{num:.1f}"
     return f"{num:.3g}"
+
+
+def _format_hms(total_seconds: float) -> str:
+    """Return HH:MM:SS string for durations >= 1 hour.
+
+    Seconds are floored for the human-friendly component; fractional part is
+    still preserved in the separate seconds display when shown.
+    """
+    hours = int(total_seconds // 3600)
+    minutes = int((total_seconds % 3600) // 60)
+    seconds = int(total_seconds % 60)
+    return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+
+
+def format_overall_runtime(total_seconds: float) -> str:
+    """Format overall runtime.
+
+    For durations < 3600s return ``"{seconds:.2f}s"``.
+    For durations >= 3600s return ``"HH:MM:SS ({seconds:.2f}s)"``.
+    """
+    if total_seconds >= HOUR_THRESHOLD_SECONDS:
+        return f"{_format_hms(total_seconds)} ({total_seconds:.2f}s)"
+    return f"{total_seconds:.2f}s"
 
 
 def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: PLR0911
@@ -1690,6 +1714,7 @@ def _build_full_html_document(
     html_table: str,
     versions: LibraryVersionDict,
     prompt: str,
+    total_runtime_seconds: float,
 ) -> str:
     local_tz = get_localzone()
     # Build complete HTML document
@@ -1768,7 +1793,8 @@ def _build_full_html_document(
         Performance metrics and output for Vision Language Model processing<br>
         Results sorted by generation time (fastest to slowest) • Generated on
         {datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")} • Failures shown but
-        excluded from averages
+        excluded from averages<br>
+        Overall runtime: {format_overall_runtime(total_runtime_seconds)}
     </div>
     {html_table}
     <footer>
@@ -1798,6 +1824,7 @@ def generate_html_report(
     filename: Path,
     versions: LibraryVersionDict,
     prompt: str,
+    total_runtime_seconds: float,
 ) -> None:
     """Write an HTML report (standalone) including metrics table and context.
 
@@ -1843,6 +1870,7 @@ def generate_html_report(
         html_table=html_table,
         versions=versions,
         prompt=prompt,
+        total_runtime_seconds=total_runtime_seconds,
     )
 
     try:
@@ -1869,6 +1897,7 @@ def generate_markdown_report(
     filename: Path,
     versions: LibraryVersionDict,
     prompt: str,
+    total_runtime_seconds: float,
 ) -> None:
     """Write a GitHub-friendly Markdown summary with aligned pipe table."""
     if not results:
@@ -1932,6 +1961,7 @@ def generate_markdown_report(
     md.append("> **Prompt used:**\n>\n> " + prompt.replace("\n", "\n> ") + "\n")
     md.append("")
     md.append("**Note:** Results are sorted by generation time (fastest to slowest).\n")
+    md.append(f"**Overall runtime:** {format_overall_runtime(total_runtime_seconds)}\n")
     md.append("")
     # Surround the table with markdownlint rule guards; the table can be wide and may
     # contain HTML breaks
@@ -2892,6 +2922,7 @@ def finalize_execution(
     prompt: str,
 ) -> None:
     """Output summary statistics, generate reports, and display timing information."""
+    overall_time: float = time.perf_counter() - overall_start_time
     if results:
         print_cli_section("Performance Summary")
         print_model_stats(results)
@@ -2908,12 +2939,14 @@ def finalize_execution(
                 filename=html_output_path,
                 versions=library_versions,
                 prompt=prompt,
+                total_runtime_seconds=overall_time,
             )
             generate_markdown_report(
                 results=results,
                 filename=md_output_path,
                 versions=library_versions,
                 prompt=prompt,
+                total_runtime_seconds=overall_time,
             )
 
             logger.info("Reports successfully generated:")
@@ -2926,8 +2959,11 @@ def finalize_execution(
         logger.info("Skipping report generation as no models were processed.")
 
     print_cli_section("Execution Summary")
+    logger.info(
+        "Overall runtime (start to finish): %s",
+        format_overall_runtime(overall_time),
+    )
     print_version_info(library_versions)
-    overall_time: float = time.perf_counter() - overall_start_time
     logger.info("Total execution time: %.2f seconds", overall_time)
 
 
