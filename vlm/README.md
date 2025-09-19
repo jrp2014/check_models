@@ -454,10 +454,73 @@ mlx-vlm-check/
 
 ## Contributing
 
-1. Install development dependencies: `pip install -e ".[dev]"`
-2. Run linting: `ruff check .`
-3. Run type checking: `mypy check_models.py`
-4. Test your changes thoroughly
+### Developer Workflow (Makefile)
+
+A `Makefile` at the repository root streamlines common tasks. It auto‑detects whether the target conda environment (`mlx-vlm` by default) is already active; if not, it transparently prefixes commands with `conda run -n mlx-vlm` so you don't have to manually activate it.
+
+Key targets:
+
+| Target | Purpose | Notes |
+|--------|---------|-------|
+| `make help` | Show all targets | Displays active vs target env. |
+| `make install-dev` | Editable install with dev extras | Equivalent to `pip install -e .[dev]`. |
+| `make install` | Runtime‑only editable install | No dev/test tooling. |
+| `make format` | Run `ruff format` | Applies canonical formatting. |
+| `make lint` | Run `ruff check` (no fixes) | Fails on style violations. |
+| `make lint-fix` | Run `ruff check --fix` | Auto‑fixes where safe. |
+| `make typecheck` | Run `mypy` | Uses `vlm/pyproject.toml` config. |
+| `make test` | Run pytest suite | Uses settings in `pyproject.toml`. |
+| `make test-cov` | Pytest with coverage | Generates terminal + XML report. |
+| `make quality` | Invoke integrated quality script | Wraps format + lint + mypy. |
+| `make quality-strict` | Quality script (require tools, no stubs) | Adds `--require --no-stubs`. |
+| `make run ARGS="..."` | Run the CLI script | Pass CLI args via `ARGS`. |
+| `make smoke` | Fast help invocation | Sanity check only. |
+| `make check` | format + lint + typecheck + test | Quick pre‑commit aggregate. |
+| `make clean` | Remove caches / pyc | Safe cleanup. |
+
+Examples:
+
+```bash
+# Install with dev dependencies (ruff, mypy, pytest, etc.)
+make install-dev
+
+# Format, then lint and auto-fix issues
+make format
+make lint-fix
+
+# Type check and run tests
+make typecheck
+make test
+
+# All core checks (use before committing)
+make check
+
+# Run CLI with arguments (quote ARGS value if it has spaces)
+make run ARGS="--verbose --detailed-metrics --image sample.jpg --models microsoft/Florence-2-large"
+```
+
+Override variables on the fly:
+
+```bash
+make test CONDA_ENV=custom-mlx-env
+make run CONDA_ENV=mlx-vlm ARGS="--verbose"
+```
+
+If you prefer manual commands, the traditional workflow still works:
+
+1. `pip install -e ".[dev]"`
+2. `ruff format vlm/check_models.py vlm/tests`
+3. `ruff check --fix vlm/check_models.py vlm/tests`
+4. `mypy --config-file vlm/pyproject.toml vlm/check_models.py`
+5. `pytest -q`
+
+### Contribution Guidelines
+
+* Keep patches focused; separate mechanical formatting changes from functional changes.
+* Run `make check` (or at minimum `make test` and `make typecheck`) before opening a PR.
+* Add or update tests when changing output formatting or public CLI flags.
+* Prefer small helper functions over adding more branching to large blocks in `check_models.py`.
+* Document new flags or output changes in this README (search for an existing section to extend rather than creating duplicates).
 
 ## Important Notes
 
