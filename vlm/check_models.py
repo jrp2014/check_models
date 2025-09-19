@@ -20,10 +20,10 @@ import sys
 import textwrap
 import time
 import traceback
+from collections.abc import Iterator
 from dataclasses import dataclass, fields
 from datetime import UTC, datetime
 from pathlib import Path
-from collections.abc import Iterator
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -84,6 +84,9 @@ THOUSAND_THRESHOLD: Final[int] = 1000
 MEMORY_GB_INTEGER_THRESHOLD: Final[float] = 10.0  # >= this many GB show as integer (no decimals)
 MARKDOWN_HARD_BREAK_SPACES: Final[int] = 2  # Preserve exactly two trailing spaces for hard breaks
 HOUR_THRESHOLD_SECONDS: Final[int] = 3600  # Threshold for displaying HH:MM:SS runtime
+
+# Sentinel to track one-time legend emission for compact metrics
+_COMPACT_TOKENS_LEGEND_EMITTED = False
 
 _temp_logger = logging.getLogger(LOGGER_NAME)
 
@@ -2538,15 +2541,24 @@ def _preview_generation(gen: GenerationResult | SupportsGenerationResult | None)
 
 
 def _log_verbose_success_details(res: PerformanceResult) -> None:
+    # Placeholder retained for backward compatibility; actual implementation
+    # now parameterized via updated function below.
+    _log_verbose_success_details_mode(res, detailed=False)
+
+
+def _log_verbose_success_details_mode(res: PerformanceResult, *, detailed: bool) -> None:
+    """Emit verbose block using either compact or detailed metrics style."""
     if not res.generation:
         return
     gen_text = getattr(res.generation, "text", None) or ""
     _log_wrapped_label_value("Generated Text:", gen_text, color=Colors.CYAN)
-
-    _log_token_summary(res)
-    _log_detailed_timings(res)
-    logger.info(Colors.colored("  Performance Metrics:", Colors.BOLD, Colors.MAGENTA))
-    _log_perf_block(res)
+    if detailed:
+        _log_token_summary(res)
+        _log_detailed_timings(res)
+        logger.info(Colors.colored("  Performance Metrics:", Colors.BOLD, Colors.MAGENTA))
+        _log_perf_block(res)
+    else:
+        _log_compact_metrics(res)
 
 
 def _log_token_summary(res: PerformanceResult) -> None:
@@ -2614,10 +2626,111 @@ def _log_perf_block(res: PerformanceResult) -> None:
     logger.info("    Prompt TPS: %s", Colors.colored(fmt_num(prompt_tps), Colors.WHITE))
 
 
+def _log_compact_metrics(res: PerformanceResult) -> None:
+    """Emit a single consolidated metrics line for a successful run.
+
+    Example output (wrapped):
+        Metrics: total=4.13s gen=3.03s load=1.09s peak_mem=5.5GB
+        tokens(total/prompt/gen)=1637/1488/149 gen_tps=114
+    """
+    if not res.generation:
+        return
+    parts = _build_compact_metric_parts(res, res.generation)
+    if not parts:
+        return
+    parts = _align_metric_parts(parts)
+    logger.info(
+        Colors.colored(
+            "  Metrics: " + "  ".join(parts),
+            Colors.BOLD,
+            Colors.MAGENTA,
+        ),
+    )
+    _emit_tokens_legend_once()
+
+
+def _build_compact_metric_parts(
+    res: PerformanceResult, gen: GenerationResult | SupportsGenerationResult
+) -> list[str]:
+    """Return list of metric segments for compact metrics line."""
+    total_time_val = getattr(res, "total_time", None)
+    generation_time_val = getattr(res, "generation_time", None)
+    load_time_val = getattr(res, "model_load_time", None)
+    peak_mem = getattr(gen, "peak_memory", None) or 0.0
+    prompt_tokens = getattr(gen, "prompt_tokens", 0) or 0
+    gen_tokens = getattr(gen, "generation_tokens", 0) or 0
+    all_tokens = prompt_tokens + gen_tokens
+    gen_tps = getattr(gen, "generation_tps", 0.0) or 0.0
+    prompt_tps = getattr(gen, "prompt_tps", 0.0) or 0.0
+
+    parts: list[str] = []
+    if total_time_val is not None:
+        parts.append(f"total={total_time_val:.2f}s")
+    if generation_time_val is not None:
+        parts.append(f"gen={generation_time_val:.2f}s")
+    if load_time_val is not None:
+        parts.append(f"load={load_time_val:.2f}s")
+    if peak_mem > 0:
+        mem_fmt = format_field_value("peak_memory", peak_mem)
+        mem_str = f"{mem_fmt}GB" if not str(mem_fmt).endswith("GB") else str(mem_fmt)
+        parts.append(f"peak_mem={mem_str}")
+    if all_tokens:
+        parts.append(
+            "tokens(total/prompt/gen)="
+            f"{fmt_num(all_tokens)}/{fmt_num(prompt_tokens)}/{fmt_num(gen_tokens)}"
+        )
+    if gen_tps:
+        parts.append(f"gen_tps={fmt_num(gen_tps)}")
+    if prompt_tps:
+        parts.append(f"prompt_tps={fmt_num(prompt_tps)}")
+    return parts
+
+
+def _align_metric_parts(parts: list[str]) -> list[str]:
+    """Return parts with keys padded to align '=' vertically.
+
+    Keeps output more scannable while preserving simple key=value tokenization
+    (spaces appear only before keys, not around '='). Long keys are left as-is.
+    """
+    split_parts: list[tuple[str, str]] = []
+    for p in parts:
+        if "=" in p:
+            k, v = p.split("=", 1)
+            split_parts.append((k, v))
+        else:
+            split_parts.append((p, ""))
+    max_key = max((len(k) for k, _ in split_parts), default=0)
+    cap = 22  # avoid overly wide padding if tokens key is very long
+    width = min(max_key, cap)
+    aligned: list[str] = []
+    for k, v in split_parts:
+        if not v:
+            aligned.append(k)
+        else:
+            pad_k = f"{k:<{width}}" if len(k) < width else k
+            aligned.append(f"{pad_k}={v}")
+    return aligned
+
+
+def _emit_tokens_legend_once() -> None:
+    """Emit legend for tokens triple exactly once per process."""
+    global _COMPACT_TOKENS_LEGEND_EMITTED  # noqa: PLW0603 (simple sentinel write)
+    if _COMPACT_TOKENS_LEGEND_EMITTED:
+        return
+    logger.info(
+        Colors.colored(
+            "    Legend: tokens(total/prompt/gen)=total/prompt/generated tokens",
+            Colors.GRAY,
+        ),
+    )
+    _COMPACT_TOKENS_LEGEND_EMITTED = True
+
+
 def print_model_result(
     result: PerformanceResult,
     *,
     verbose: bool = False,
+    detailed_metrics: bool = False,
     run_index: int | None = None,
     total_runs: int | None = None,
 ) -> None:
@@ -2650,7 +2763,7 @@ def print_model_result(
             _log_wrapped_error("Output:", str(result.captured_output_on_fail))
         return
     if result.generation and verbose:
-        _log_verbose_success_details(result)
+        _log_verbose_success_details_mode(result, detailed=detailed_metrics)
 
 
 def print_cli_separator() -> None:
@@ -2952,6 +3065,7 @@ def process_models(
         print_model_result(
             result,
             verbose=args.verbose,
+            detailed_metrics=getattr(args, "detailed_metrics", False),
             run_index=idx,
             total_runs=len(model_identifiers),
         )
@@ -3096,6 +3210,15 @@ def main_cli() -> None:
         type=str,
         default=None,
         help="Prompt.",
+    )
+    parser.add_argument(
+        "--detailed-metrics",
+        action="store_true",
+        default=False,
+        help=(
+            "Use expanded multi-line metrics block instead of compact aligned single-line metrics. "
+            "Only applies when --verbose is set."
+        ),
     )
     parser.add_argument(
         "-x",

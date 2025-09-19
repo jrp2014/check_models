@@ -23,6 +23,7 @@
 | Robustness | Per‑model isolation; failures logged; SUMMARY lines for automation. |
 | Timeout | Signal‑based (UNIX) manager; configurable per run. |
 | Output preview | Non‑verbose mode still shows wrapped generated text (80 cols). |
+| Metrics modes | Compact (default) or expanded with `--detailed-metrics`. |
 
 ## Installation and Environment Setup
 
@@ -109,6 +110,8 @@ Torch support:
 
 * Memory units: All memory metrics are displayed in GB. Sources differ: MLX reports bytes; mlx‑vlm reports decimal GB (bytes/1e9). The tool detects and normalizes both to GB for consistent display.
 * Markdown escaping: The final output column preserves common GitHub‑supported tags (e.g., `<br>`) and escapes others so special tokens like `<s>` render literally.
+* Compact vs detailed metrics (verbose mode): By default, verbose output shows a single aligned line beginning with `Metrics:`. Enable classic multi‑line breakdown with `--detailed-metrics`.
+* Token triple legend: `tokens(total/prompt/gen)=T/P/G` corresponds to total tokens = prompt tokens + generated tokens.
 
 ## Git Hygiene and Caches
 

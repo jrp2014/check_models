@@ -1,5 +1,15 @@
 {
-    "python.analysis.diagnosticSeverityOverrides": {
-        "reportUnknownVariableType": "none"
+  "terminal.integrated.profiles.osx": {
+    "zsh-conda-mlx-vlm": {
+      "path": "zsh",
+      "args": [
+        "-c",
+        "source $(conda info --base)/etc/profile.d/conda.sh && conda activate mlx-vlm && exec zsh"
+      ]
     }
+  },
+  "terminal.integrated.defaultProfile.osx": "zsh-conda-mlx-vlm",
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportUnknownVariableType": "none"
+  }
 }
