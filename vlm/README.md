@@ -111,6 +111,21 @@ Torch support:
 * Markdown escaping: The final output column preserves common GitHub‑supported tags (e.g., `<br>`) and escapes others so special tokens like `<s>` render literally.
 
 ## Git Hygiene and Caches
+## Pre-commit (Optional)
+
+To enforce formatting, lint, type, and dependency sync locally:
+
+```bash
+pip install pre-commit
+pre-commit install
+```
+
+Hooks run automatically on commit. Run against all files manually:
+
+```bash
+pre-commit run --all-files
+```
+
 
 This repo excludes ephemeral caches and local environments via `.gitignore`. Common exclusions include `__pycache__/`, `.pytest_cache/`, `.ruff_cache/`, `.mypy_cache/`, `.venv/`, and editor folders like `.vscode/`. Do not commit large model caches (e.g., Hugging Face) to the repository.
 
@@ -120,7 +135,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- BEGIN MANUAL_INSTALL -->
 ```bash
-pip install "datasets>=2.19.1" "fastapi>=0.95.1" "huggingface-hub>=0.23.0" "jinja2" "mlx>=0.29.1" "mlx-lm>=0.23.0" "mlx-vlm>=0.0.9" "numpy" "opencv-python>=4.12.0.88" "Pillow>=10.3.0" "protobuf" "pyyaml" "requests>=2.31.0" "soundfile>=0.13.1" "tabulate>=0.9.0" "tqdm>=4.66.2" "transformers>=4.53.0" "tzlocal>=5.0" "uvicorn"
+pip install "mlx>=0.29.1" "mlx-vlm>=0.0.9" "Pillow>=10.3.0" "huggingface-hub>=0.23.0" "tabulate>=0.9.0" "tzlocal>=5.0"
 ```
 <!-- END MANUAL_INSTALL -->
 
@@ -138,27 +153,20 @@ Runtime (installed automatically via `pip install -e .`):
 |---------|---------|---------|
 | Core tensor/runtime | `mlx` | `>=0.29.1` |
 | Vision‑language utilities | `mlx-vlm` | `>=0.0.9` |
-| Language model utilities | `mlx-lm` | `>=0.23.0` |
-| Core Python data libraries | `numpy` | (latest) |
 | Image processing & loading | `Pillow` | `>=10.3.0` |
-| Computer vision | `opencv-python` | `>=4.12.0.88` |
-| ML/AI frameworks | `transformers` | `>=4.53.0` |
-| Dataset handling | `datasets` | `>=2.19.1` |
 | Model cache / discovery | `huggingface-hub` | `>=0.23.0` |
-| Serialization & config | `protobuf`, `pyyaml`, `jinja2` | (latest) |
-| Network & API | `requests` | `>=2.31.0` |
-| Web framework | `fastapi`, `uvicorn` | `>=0.95.1`, (latest) |
-| Audio processing | `soundfile` | `>=0.13.1` |
-| Console formatting & progress | `tabulate`, `tqdm` | `>=0.9.0`, `>=4.66.2` |
+| Reporting / tables | `tabulate` | `>=0.9.0` |
 | Local timezone conversion | `tzlocal` | `>=5.0` |
 
-Optional (enable additional features if present):
+Optional (enable additional features):
 
-| Feature | Package | Notes |
-|---------|---------|-------|
-| Extended system metrics (RAM/CPU) | `psutil` | Included in `extras`; optional for hardware block |
-| Fast tokenizer backends | `tokenizers` | Via `extras`; enhanced tokenization utilities |
-| PyTorch stack | `torch`, `torchvision`, `torchaudio` | Optional extra `.[torch]`; installed on demand |
+| Feature | Package | Source |
+|---------|---------|--------|
+| Extended system metrics (RAM/CPU) | `psutil` | `extras` |
+| Fast tokenizer backends | `tokenizers` | `extras` |
+| Language model utilities | `mlx-lm` | `extras` |
+| Transformer model support | `transformers` | `extras` |
+| PyTorch stack | `torch`, `torchvision`, `torchaudio` | `torch` extra |
 
 Development / QA:
 
@@ -172,16 +180,16 @@ Development / QA:
 
 <!-- BEGIN MINIMAL_INSTALL -->
 ```bash
-pip install "datasets>=2.19.1" "fastapi>=0.95.1" "huggingface-hub>=0.23.0" "jinja2" "mlx>=0.29.1" "mlx-lm>=0.23.0" "mlx-vlm>=0.0.9" "numpy" "opencv-python>=4.12.0.88" "Pillow>=10.3.0" "protobuf" "pyyaml" "requests>=2.31.0" "soundfile>=0.13.1" "tabulate>=0.9.0" "tqdm>=4.66.2" "transformers>=4.53.0" "tzlocal>=5.0" "uvicorn"
+pip install "mlx>=0.29.1" "mlx-vlm>=0.0.9" "Pillow>=10.3.0" "huggingface-hub>=0.23.0" "tabulate>=0.9.0" "tzlocal>=5.0"
 ```
 <!-- END MINIMAL_INSTALL -->
 
 ### With Optional Extras
 
-The `extras` group in `pyproject.toml` pulls in `psutil` (hardware metrics) and `tokenizers`:
+The `extras` group in `pyproject.toml` pulls in `psutil`, `tokenizers`, `mlx-lm`, and `transformers`:
 
 ```bash
-pip install -e ".[extras]"
+pip install -e ".[extras]"  # adds psutil, tokenizers
 ```
 
 To include the optional PyTorch stack when needed (macOS wheels include MPS acceleration):
@@ -193,17 +201,14 @@ pip install -e ".[torch]"
 ### Full Development Environment
 
 ```bash
-pip install -e ".[dev,extras]"
+pip install -e ".[dev,extras]"  # dev tools + optional metrics/tokenizers
 ```
 
 Notes:
 
 * `psutil` is optional (installed with `extras`); if absent the extended Apple Silicon hardware section omits RAM/cores.
-* `tokenizers` is a transitive dependency of `transformers`; you usually don't need to list or install it separately (it's also available via the `extras` group).
-* `transformers` moves quickly for multimodal / vision improvements. Keeping it updated (at least `>=4.53.0`) is recommended:
-  * Upgrade: `pip install -U transformers`
-  * If a 5.x release appears, test locally before adopting it broadly.
-  * Newer releases often fix chat template, processor, and safety issues relevant to VLMs.
+* `extras` group bundles: psutil, tokenizers, mlx-lm, transformers. Install only if you need extended metrics or LM/transformer features.
+* Keep `transformers` updated if using it: `pip install -U transformers`.
 * `system_profiler` is a macOS built-in (no install needed) used for GPU name / core info.
 * Torch is supported and can be installed when you need it for specific models; the script does not block Torch.
 * The `tools/update.sh` helper supports adding Torch via an environment flag: `INSTALL_TORCH=1 ./tools/update.sh`.

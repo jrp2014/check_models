@@ -182,6 +182,14 @@ Before refactoring for size:
 
 Runtime dependency versions MUST stay consistent between `pyproject.toml` and the install snippets in `vlm/README.md`.
 
+Current slim runtime set (authoritative in `pyproject.toml`):
+`mlx`, `mlx-vlm`, `Pillow`, `huggingface-hub`, `tabulate`, `tzlocal`.
+
+Optional groups:
+
+- `extras`: `psutil`, `tokenizers`, `mlx-lm`, `transformers`
+- `torch`: `torch`, `torchvision`, `torchaudio`
+
 Mechanism:
 
 1. Edit versions only in `pyproject.toml` (authoritative source).
@@ -234,7 +242,7 @@ Validation checklist before committing pyproject changes:
 
 Automation:
 
-- A GitHub Actions workflow (`.github/workflows/dependency-sync.yml`) enforces that README dependency blocks match `pyproject.toml`. If the workflow fails, run:
+- A GitHub Actions workflow (`.github/workflows/dependency-sync.yml`) enforces that README dependency blocks match `pyproject.toml`. If it fails, run:
 
 ```bash
 cd vlm && python tools/update_readme_deps.py

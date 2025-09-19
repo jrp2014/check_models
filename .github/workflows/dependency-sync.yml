@@ -31,6 +31,10 @@ jobs:
         run: |
           python -m vlm.tools.update_readme_deps
 
+      - name: Run dependency sync verification
+        run: |
+          python -m vlm.tools.check_dependency_sync
+
       - name: Detect uncommitted changes after sync
         run: |
           if ! git diff --exit-code --quiet; then
@@ -40,6 +44,6 @@ jobs:
             exit 1
           fi
 
-      - name: Ruff lint (fail fast on syntax issues)
+      - name: Ruff lint (sync utilities)
         run: |
-          ruff check vlm/tools/update_readme_deps.py
+          ruff check vlm/tools/update_readme_deps.py vlm/tools/check_dependency_sync.py

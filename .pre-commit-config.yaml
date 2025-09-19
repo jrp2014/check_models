@@ -1,0 +1,22 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.3
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+      - id: ruff-format
+  - repo: local
+    hooks:
+      - id: dependency-sync-check
+        name: dependency-sync-check
+        entry: python -m vlm.tools.check_dependency_sync
+        language: system
+        pass_filenames: false
+        files: ^vlm/(pyproject\.toml|README\.md)$
+      - id: mypy
+        name: mypy
+        entry: mypy
+        language: system
+        types: [python]
+        pass_filenames: true
+        additional_dependencies: []

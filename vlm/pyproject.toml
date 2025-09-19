@@ -24,39 +24,16 @@ classifiers = [
 ]
 # PEP 621: declare runtime dependencies as an inline array instead of a key/value table.
 # This keeps ordering deterministic and simplifies automated parsing.
+# Runtime intentionally slim: only what `vlm/check_models.py` imports directly.
+# Everything else lives in extras to reduce cold install surface & build time.
 dependencies = [
-    # Core MLX dependencies (raised minimums to align with currently tested APIs)
+    # Minimal runtime set actually imported by check_models.py
     "mlx>=0.29.1",
     "mlx-vlm>=0.0.9",
-    "mlx-lm>=0.23.0",
-    # Core Python data libraries
-    "numpy",
-    # Image processing
     "Pillow>=10.3.0",
-    "opencv-python>=4.12.0.88",
-    # ML/AI frameworks
-    "transformers>=4.53.0",
-    "datasets>=2.19.1",
-    # Model and caching utilities
     "huggingface-hub>=0.23.0",
-    # Serialization and configuration
-    "protobuf",
-    "pyyaml",
-    "jinja2",
-    # Network and API
-    "requests>=2.31.0",
-    "fastapi>=0.95.1",
-    "uvicorn",
-    # Audio processing
-    "soundfile>=0.13.1",
-    # Report generation and utilities
     "tabulate>=0.9.0",
-    "tqdm>=4.66.2",
-    # System utilities
     "tzlocal>=5.0",
-    # Some models seem to need these
-    "einops",
-    "num2words",
 ]
 
 [project.urls]
@@ -73,28 +50,24 @@ where = ["."]
 include = ["vlm*"]
 
 [project.optional-dependencies]
-# Optional dependencies for enhanced functionality
+# Optional dependencies grouped by use case.
 extras = [
     # Hardware metrics (optional system block)
     "psutil>=5.9.0",
-    # Tokenization utilities (optional; used for versions/introspection only)
+    # Fast tokenizer backends
     "tokenizers>=0.15.0",
+    # Language-model utilities & transformer inference (not required for base benchmarking)
+    "mlx-lm>=0.23.0",
+    "transformers>=4.53.0",
 ]
-
-# Guidance: Torch is supported but not required globally; install only when needed for specific models.
-# Provide a dedicated extra to make it simple to opt in.
 torch = [
-    # Recent PyTorch wheels for macOS include MPS acceleration out of the box.
-    # Version pins chosen to align with stable 2.2+ API and matching torchvision/torchaudio.
     "torch>=2.2.0",
     "torchvision>=0.17.0",
     "torchaudio>=2.2.0",
 ]
-
-# Development dependencies
 dev = [
     "ruff>=0.1.0",
-    "mypy>=1.8.0", 
+    "mypy>=1.8.0",
     "pytest>=8.0.0",
     "pytest-cov>=4.0.0",
     "types-tqdm",
