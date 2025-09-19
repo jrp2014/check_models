@@ -74,7 +74,6 @@ ERROR_MLX_VLM_MISSING: Final[str] = (
     "Error: mlx-vlm not found. Please install it (`pip install mlx-vlm`)."
 )
 
-DEFAULT_TIMEOUT_LONG: Final[float] = 300.0
 
 MIN_SEPARATOR_CHARS: Final[int] = 50
 DEFAULT_DECIMAL_PLACES: Final[int] = 2
@@ -363,8 +362,8 @@ handler.setFormatter(formatter)
 logger.handlers.clear()
 logger.addHandler(handler)
 
-MB_CONVERSION: Final[float] = 1024 * 1024
-GB_CONVERSION: Final[float] = 1024 * 1024 * 1024
+# Removed unused constants (DEFAULT_TIMEOUT_LONG, MB_CONVERSION, GB_CONVERSION, DISPLAY_WRAP_WIDTH)
+# to reduce surface area; they had no runtime references.
 DECIMAL_GB: Final[float] = 1_000_000_000.0  # Decimal GB (mlx-vlm already divides by 1e9)
 MEM_BYTES_TO_GB_THRESHOLD: Final[float] = 1_000_000.0  # > ~1MB treat as raw bytes from mlx
 MEGAPIXEL_CONVERSION: Final[float] = 1_000_000.0  # Convert pixels to megapixels
@@ -412,7 +411,6 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
 # Threshold for splitting long header text into multiple lines
 HEADER_SPLIT_LENGTH = 10
 ERROR_MESSAGE_PREVIEW_LEN: Final[int] = 40  # Max chars to show from error in summary line
-DISPLAY_WRAP_WIDTH: Final[int] = 80  # Base/fallback column width for wrapping previews
 
 # Fields that should be right-aligned (numeric fields)
 NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
@@ -516,6 +514,10 @@ def format_overall_runtime(total_seconds: float) -> str:
 
 
 def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: PLR0911
+    # Justification (PLR0911): Multiple early returns keep the formatting
+    # branches (memory/time/tps/numeric/string) linear and readable without
+    # nested condition accumulation; refactoring into a single exit would
+    # add temporary variables and reduce clarity.
     """Normalize and format field values for display.
 
     Rules:
@@ -541,7 +543,7 @@ def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: PLR
             return _format_time_seconds(num)
         return fmt_num(num)
     if isinstance(value, str) and value:
-        s = value.strip().replace(",", "")
+        s: str = value.strip().replace(",", "")
         try:
             f = float(s)
         except ValueError:
