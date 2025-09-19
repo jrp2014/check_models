@@ -1,0 +1,17 @@
+{
+  // Markdownlint configuration tuned for this project
+  // Reference: https://github.com/DavidAnson/markdownlint
+  "default": true,
+  // Allow long lines (intentional for code blocks, tables, HTML/CSS)
+  "MD013": false,
+  // Allow multiple consecutive blank lines where we intentionally separate sections
+  "MD012": false,
+  // We manually manage heading style consistency; allow mixed ATX where needed
+  "MD003": { "style": "consistent" },
+  // Disable duplicate heading check across entire doc (some sections intentionally repeated)
+  "MD024": false,
+  // Don't require top-level heading in some auxiliary docs if added later
+  "MD041": false,
+  // Permit inline HTML for GitHub-supported tags (validation done in code)
+  "MD033": false
+}

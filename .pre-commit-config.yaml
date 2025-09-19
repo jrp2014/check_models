@@ -5,6 +5,13 @@ repos:
       - id: ruff
         args: ["--fix"]
       - id: ruff-format
+  - repo: https://github.com/DavidAnson/markdownlint-cli2
+    rev: v0.15.0
+    hooks:
+      - id: markdownlint-cli2
+        name: markdownlint
+        files: \.(md|markdown)$
+        additional_dependencies: []
   - repo: local
     hooks:
       - id: dependency-sync-check

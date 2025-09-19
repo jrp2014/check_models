@@ -76,6 +76,18 @@ Current config (see `pyproject.toml`):
 - Use `ruff format` for layout formatting.
 - Use `ruff check --fix` to apply automated fixes for style violations.
 
+### Markdown Linting
+
+Markdown consistency is enforced (optionally) via `markdownlint-cli2` using the configuration in `.markdownlint.jsonc`:
+
+- Long lines (MD013) are disabled to allow readable HTML/CSS blocks and wide tables.
+- Inline HTML is allowed (MD033) because the codebase already sanitizes/escapes disallowed tags during report generation.
+- Duplicate headings (MD024) are permitted; some conceptual repeats are intentional (e.g., Notes vs Important Notes).
+- If you introduce new documentation, follow existing heading spacing (blank line before/after) and prefer asterisk `*` for unordered lists (already standard in `README.md`).
+- Run locally with: `npx markdownlint-cli2 "**/*.md"` (or rely on the pre-commit hook if installed).
+
+Rationale: Lightweight rules catch accidental spacing/list inconsistencies without blocking intentional formatting choices used for clarity.
+
 ## Function Size & Complexity
 
 Acceptable to exceed default complexity / statement counts when:

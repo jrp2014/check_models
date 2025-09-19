@@ -129,7 +129,6 @@ Hooks run automatically on commit. Run against all files manually:
 pre-commit run --all-files
 ```
 
-<!-- (Moved Git Hygiene descriptive paragraph above for correct heading spacing) -->
 
 ### Manual Installation
 
