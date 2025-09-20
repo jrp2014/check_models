@@ -113,6 +113,15 @@ smoke: ## Very small smoke test (override ARGS for custom) - placeholder
 check: format lint typecheck test ## Run format, lint, typecheck, tests (fast aggregate)
 	@echo "All core checks completed"
 
+# ---- Dependency snippet sync ----
+.PHONY: deps-sync
+deps-sync: ## Update README dependency blocks from pyproject
+	$(RUN_PY) vlm/tools/update_readme_deps.py
+
+.PHONY: deps-check
+deps-check: ## Verify README dependency blocks (fails on drift)
+	$(RUN_PY) -m vlm.tools.check_dependency_sync
+
 # ---- Cleanup helpers ----
 .PHONY: clean-pyc
 clean-pyc: ## Remove Python cache artifacts

@@ -4,6 +4,7 @@ These tests intentionally avoid asserting on presence of MLX; if MLX is not
 installed the import of `vlm.check_models` will log an error but still expose
 the formatting utilities.
 """
+
 from __future__ import annotations
 
 import importlib

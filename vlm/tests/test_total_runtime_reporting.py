@@ -4,6 +4,7 @@ This focuses on ensuring that the recently added overall runtime metric
 appears in CLI-related report outputs (Markdown & HTML builders) without
 executing full model runs.
 """
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
