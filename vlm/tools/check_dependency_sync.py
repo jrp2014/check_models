@@ -42,7 +42,15 @@ def main() -> int:
     readme = repo_root / "README.md"
     deps = parse_pyproject(pyproject)
     # deps already a mapping name -> spec
-    expected_tail = build_install_command(deps).split(" ", 1)[1].strip()
+    # build_install_command returns 'pip install "pkg>=ver" ...'
+    # We want only the quoted package specs list for comparison.
+    expected_full = build_install_command(deps)
+    if expected_full.startswith("pip install "):
+        expected_tail = expected_full[len("pip install "):].strip()
+    else:  # Fallback: previous splitting logic (should not normally happen)
+        split_threshold = 2  # minimal pieces: 'pip' 'install' rest
+        parts = expected_full.split(" ", split_threshold)
+        expected_tail = parts[-1].strip() if len(parts) > split_threshold else expected_full
     readme_text = readme.read_text(encoding="utf-8")
     mismatches: list[str] = []
     for key in MARKERS:
