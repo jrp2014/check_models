@@ -15,6 +15,7 @@ Notes
 - Requires mypy to be installed (provides ``stubgen``).
 - Generated stubs are shallow by default; refine by hand for critical APIs.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -126,6 +127,7 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
             ),
         ],
     )
+
 
 logger = logging.getLogger("generate_stubs")
 

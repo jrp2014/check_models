@@ -62,7 +62,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         "paths",
         nargs="*",
         default=DEFAULT_PATHS,
-    help="Paths to check (default: vlm/check_models.py)",
+        help="Paths to check (default: vlm/check_models.py)",
     )
     parser.add_argument(
         "--no-format",

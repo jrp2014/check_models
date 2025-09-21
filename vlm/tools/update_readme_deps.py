@@ -60,7 +60,7 @@ def parse_pyproject(path: Path) -> dict[str, str]:
                 continue
             # Split name from spec heuristically: first occurrence of >,=,!,<,~
             name_part = re.split(r"[<>=!~]", line, maxsplit=1)[0].strip()
-            spec = line[len(name_part):].strip()
+            spec = line[len(name_part) :].strip()
             deps[name_part] = spec
         return deps
 
@@ -135,13 +135,7 @@ def extract_optional_groups(pyproject_text: str) -> dict[str, list[str]]:
             groups[current] = []
             continue
         if current and stripped.startswith('"'):
-            pkg = (
-                stripped.strip(",")
-                .strip()
-                .strip('"')
-                .split(">=")[0]
-                .split("==")[0]
-            )
+            pkg = stripped.strip(",").strip().strip('"').split(">=")[0].split("==")[0]
             if pkg:
                 groups[current].append(pkg)
     return groups

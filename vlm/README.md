@@ -41,7 +41,7 @@ pip install uv
 uv venv
 source .venv/bin/activate  # On macOS/Linux
 # .venv\Scripts\activate     # On Windows
-uv pip install -e .
+uv pip install -e .  # run inside the vlm/ directory (root-level Makefile is a shim)
 
 # For development with additional tools
 uv pip install -e ".[dev]"
@@ -56,7 +56,7 @@ source .venv/bin/activate  # On macOS/Linux
 # .venv\Scripts\activate     # On Windows
 
 # Install the package
-pip install -e .
+pip install -e .  # run inside vlm/
 
 # For development
 pip install -e ".[dev]"
@@ -70,7 +70,7 @@ conda create -n mlx-vlm python=3.12
 conda activate mlx-vlm
 
 # Install dependencies
-pip install -e .
+pip install -e .  # run inside vlm/
 ```
 
 #### Automated Setup (Recommended)
@@ -165,7 +165,7 @@ If you add a new top‑level import in `check_models.py`, promote its package
 from an optional group (or add it fresh) into the runtime `dependencies` array
 and re-run the sync helper.
 
-Runtime (installed automatically via `pip install -e .`):
+Runtime (installed automatically via `pip install -e .` when executed inside `vlm/`, or via `make install` from repo root):
 
 | Purpose | Package | Minimum |
 |---------|---------|---------|
@@ -477,7 +477,7 @@ Key targets:
 | Target | Purpose | Notes |
 |--------|---------|-------|
 | `make help` | Show all targets | Displays active vs target env. |
-| `make install-dev` | Editable install with dev extras | Equivalent to `pip install -e .[dev]`. |
+| `make install-dev` | Editable install with dev extras | Equivalent to changing into `vlm/` then `pip install -e .[dev]`. |
 | `make install` | Runtime‑only editable install | No dev/test tooling. |
 | `make format` | Run `ruff format` | Applies canonical formatting. |
 | `make lint` | Run `ruff check` (no fixes) | Fails on style violations. |

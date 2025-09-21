@@ -4,10 +4,15 @@
 		{
 			"label": "VLM: Quality checks (ruff format + fix + mypy)",
 			"type": "shell",
-			"command": "python",
+			"command": "bash",
 			"args": [
-				"vlm/tools/check_quality.py"
+				"vlm/tools/run_quality.sh"
 			],
+			"options": {
+				"env": {
+					"ZSH_DISABLE_COMPFIX": "true"
+				}
+			},
 			"problemMatcher": [
 				"$eslint-stylish"
 			],

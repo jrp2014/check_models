@@ -3,14 +3,32 @@
 This enforces local parity in addition to CI. The test focuses only on runtime deps
 (not optional extras groups) and uses the same parsing heuristics as the sync script.
 """
+
 from __future__ import annotations
 
 import re
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-PYPROJECT = REPO_ROOT / "pyproject.toml"
-README = REPO_ROOT / "README.md"
+_TEST_FILE = Path(__file__).resolve()
+# tests/ parent, then package root (vlm)
+PKG_ROOT = _TEST_FILE.parents[1]
+REPO_ROOT = PKG_ROOT.parent
+
+
+def _first_existing(paths: list[Path]) -> Path:
+    for p in paths:
+        if p.exists():
+            return p
+    msg = f"None of the candidate paths exist: {paths}"
+    raise FileNotFoundError(msg)
+
+
+PYPROJECT = _first_existing(
+    [PKG_ROOT / "pyproject.toml", REPO_ROOT / "pyproject.toml"],
+)  # prefer in-package
+README = _first_existing(
+    [PKG_ROOT / "README.md", REPO_ROOT / "README.md"],
+)  # prefer in-package
 
 MANUAL_MARKERS = ("<!-- BEGIN MANUAL_INSTALL -->", "<!-- END MANUAL_INSTALL -->")
 
@@ -33,7 +51,7 @@ def _parse_runtime_deps(text: str) -> dict[str, str]:
         if not line:
             continue
         name = re.split(r"[<>=!~]", line, maxsplit=1)[0].strip()
-        spec = line[len(name):].strip()
+        spec = line[len(name) :].strip()
         deps[name] = spec
     return deps
 
@@ -63,7 +81,7 @@ def test_readme_runtime_block_matches_pyproject() -> None:  # noqa: D103
     seen: dict[str, str] = {}
     for q in quoted:
         name = re.split(r"[<>=!~]", q, maxsplit=1)[0]
-        spec = q[len(name):]
+        spec = q[len(name) :]
         seen[name] = spec
 
     # All runtime deps must exist

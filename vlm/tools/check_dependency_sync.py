@@ -7,6 +7,7 @@ Exit codes:
     0: OK
     1: Drift detected
 """
+
 from __future__ import annotations
 
 import logging
@@ -46,7 +47,7 @@ def main() -> int:
     # We want only the quoted package specs list for comparison.
     expected_full = build_install_command(deps)
     if expected_full.startswith("pip install "):
-        expected_tail = expected_full[len("pip install "):].strip()
+        expected_tail = expected_full[len("pip install ") :].strip()
     else:  # Fallback: previous splitting logic (should not normally happen)
         split_threshold = 2  # minimal pieces: 'pip' 'install' rest
         parts = expected_full.split(" ", split_threshold)

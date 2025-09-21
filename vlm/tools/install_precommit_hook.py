@@ -17,6 +17,7 @@ Usage:
 Re-running this script overwrites the existing `.git/hooks/pre-commit` (after backing it up
 as `.git/hooks/pre-commit.bak`).
 """
+
 from __future__ import annotations
 
 import logging

@@ -9,6 +9,7 @@ from typing import Any
 
 try:  # Soft import: allow environments lacking native MLX lib to still run tests
     import mlx.core as mx  # type: ignore
+
     _MLX_AVAILABLE = True
 except Exception:  # pragma: no cover - fallback path
     mx = None  # type: ignore
