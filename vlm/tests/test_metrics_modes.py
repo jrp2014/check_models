@@ -6,8 +6,8 @@ import logging
 from typing import TYPE_CHECKING
 
 from vlm.check_models import (  # type: ignore[attr-defined]
-    _align_metric_parts,
     PerformanceResult,
+    _align_metric_parts,
     print_model_result,
 )
 
@@ -59,7 +59,7 @@ def test_align_metric_parts_alignment() -> None:
     ]
     aligned = _align_metric_parts(parts)
     eq_positions = [p.index("=") for p in aligned[:3]]
-    assert len(set(eq_positions)) == 1, aligned  # noqa: S101
+    assert len(set(eq_positions)) == 1, aligned
 
 
 def test_metrics_mode_compact_smoke(caplog: pytest.LogCaptureFixture) -> None:  # type: ignore[name-defined]
@@ -68,7 +68,7 @@ def test_metrics_mode_compact_smoke(caplog: pytest.LogCaptureFixture) -> None:  
     res = _build_perf()
     print_model_result(res, verbose=True, detailed_metrics=False)
     metrics_lines = [r.message for r in caplog.records if "Metrics:" in r.message]
-    assert metrics_lines, "Expected compact Metrics line in logs"  # noqa: S101
+    assert metrics_lines, "Expected compact Metrics line in logs"
 
 
 def test_metrics_mode_detailed_smoke(caplog: pytest.LogCaptureFixture) -> None:  # type: ignore[name-defined]
@@ -78,5 +78,5 @@ def test_metrics_mode_detailed_smoke(caplog: pytest.LogCaptureFixture) -> None: 
     print_model_result(res, verbose=True, detailed_metrics=True)
     metrics_lines = [r.message for r in caplog.records if "Metrics:" in r.message]
     token_lines = [r.message for r in caplog.records if "Tokens:" in r.message]
-    assert token_lines, "Expected token summary lines in detailed mode"  # noqa: S101
-    assert metrics_lines, "Expected Metrics header in detailed mode"  # noqa: S101
+    assert token_lines, "Expected token summary lines in detailed mode"
+    assert metrics_lines, "Expected Metrics header in detailed mode"
