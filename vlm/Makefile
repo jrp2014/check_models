@@ -58,6 +58,12 @@ typecheck: ## mypy type checking
 # Tests
 .PHONY: test
 test: ## Run pytest
+	@echo "[test] collecting tests"; \
+	$(RUN_TOOL_PREFIX) pytest --collect-only -q > .test_collect.txt || exit 1; \
+	COUNT=$$(awk '/::/ {c++} END {print c+0}' .test_collect.txt); \
+	if [ "$$COUNT" -lt 1 ]; then \
+	  if [ "$$ALLOW_EMPTY_TESTS" = "1" ]; then echo "[test] WARNING: 0 tests collected (override ALLOW_EMPTY_TESTS=1)"; else echo "[test] ERROR: 0 tests collected (set ALLOW_EMPTY_TESTS=1 to override)"; exit 1; fi; \
+	else echo "[test] collected $$COUNT tests"; fi; \
 	$(RUN_TOOL_PREFIX) pytest -q
 
 .PHONY: test-cov
@@ -77,6 +83,7 @@ check: format lint typecheck test ## Core quality pipeline
 .PHONY: quality
 quality: ## Run consolidated quality script (ruff format+lint+stubgen+mypy on core file)
 	$(RUN_PY) tools/check_quality.py
+	@echo "[quality] NOTE: unit tests not executed by this target; use 'make check' or 'make ci' for full validation"
 
 # CI pipeline
 .PHONY: ci
