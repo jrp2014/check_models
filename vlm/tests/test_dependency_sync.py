@@ -1,0 +1,88 @@
+"""Test that runtime dependency block in README matches pyproject runtime deps.
+
+This enforces local parity in addition to CI. The test focuses only on runtime deps
+(not optional extras groups) and uses the same parsing heuristics as the sync script.
+"""
+from __future__ import annotations
+
+import re
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+PYPROJECT = REPO_ROOT / "pyproject.toml"
+README = REPO_ROOT / "README.md"
+
+MANUAL_MARKERS = ("<!-- BEGIN MANUAL_INSTALL -->", "<!-- END MANUAL_INSTALL -->")
+
+
+def _parse_runtime_deps(text: str) -> dict[str, str]:
+    pattern = r"^dependencies\s*=\s*\[(.*?)\]"  # inside [project]
+    m = re.search(pattern, text, flags=re.MULTILINE | re.DOTALL)
+    if not m:
+        msg = "dependencies array not found in pyproject.toml"
+        raise RuntimeError(msg)
+    block = m.group(1)
+    deps: dict[str, str] = {}
+    for raw in block.splitlines():
+        line = raw.strip().rstrip(",")
+        if not line or line.startswith("#"):
+            continue
+        if "#" in line:
+            line = line.split("#", 1)[0].strip()
+        line = line.strip('"').strip("'")
+        if not line:
+            continue
+        name = re.split(r"[<>=!~]", line, maxsplit=1)[0].strip()
+        spec = line[len(name):].strip()
+        deps[name] = spec
+    return deps
+
+
+def _extract_manual_block(readme: str) -> str:
+    start, end = MANUAL_MARKERS
+    pattern = re.compile(rf"{re.escape(start)}(.*?){re.escape(end)}", re.DOTALL)
+    m = pattern.search(readme)
+    if not m:
+        msg = "Manual install markers not found in README.md"
+        raise RuntimeError(msg)
+    return m.group(1)
+
+
+def test_readme_runtime_block_matches_pyproject() -> None:  # noqa: D103
+    py_text = PYPROJECT.read_text(encoding="utf-8")
+    rd_text = README.read_text(encoding="utf-8")
+    runtime_deps = _parse_runtime_deps(py_text)
+
+    manual_block = _extract_manual_block(rd_text)
+    # Pull quoted specs from pip install line
+    quoted = re.findall(r'"([^"]+)"', manual_block)
+    if not quoted:
+        msg = "No quoted packages found in manual install block"
+        raise RuntimeError(msg)
+
+    seen: dict[str, str] = {}
+    for q in quoted:
+        name = re.split(r"[<>=!~]", q, maxsplit=1)[0]
+        spec = q[len(name):]
+        seen[name] = spec
+
+    # All runtime deps must exist
+    missing = [k for k in runtime_deps if k not in seen]
+    if missing:
+        msg = f"Runtime deps missing from README: {missing}"
+        raise RuntimeError(msg)
+
+    # No extras should leak (heuristic: check optional groups defined later if needed)
+    forbidden = {
+        "psutil",
+        "tokenizers",
+        "mlx-lm",
+        "transformers",
+        "torch",
+        "torchvision",
+        "torchaudio",
+    }
+    leaked = sorted(forbidden & set(seen))
+    if leaked:
+        msg = f"Optional deps leaked into runtime block: {leaked}"
+        raise RuntimeError(msg)

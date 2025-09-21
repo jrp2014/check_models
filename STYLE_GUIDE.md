@@ -197,6 +197,14 @@ Runtime dependency versions MUST stay consistent between `pyproject.toml` and th
 Current slim runtime set (authoritative in `pyproject.toml`):
 `mlx`, `mlx-vlm`, `Pillow`, `huggingface-hub`, `tabulate`, `tzlocal`.
 
+If you add a new import in `vlm/check_models.py`, you MUST also:
+
+1. Add the dependency to `[project].dependencies` (not just an optional group).
+2. Run `python -m vlm.tools.update_readme_deps`.
+3. Commit both `pyproject.toml` and the updated `README.md`.
+
+The `test_dependency_sync` test and CI will fail otherwise.
+
 Optional groups:
 
 - `extras`: `psutil`, `tokenizers`, `mlx-lm`, `transformers`

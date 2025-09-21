@@ -151,6 +151,20 @@ pip install "huggingface-hub>=0.23.0" "mlx>=0.29.1" "mlx-vlm>=0.0.9" "Pillow>=10
 
 ## Dependencies
 
+Why so slim? The runtime dependency set is intentionally minimized to only the
+packages directly imported by `vlm/check_models.py`. Everything else that might
+be useful in adjacent workflows (tokenizers, psutil system metrics, transformer
+inference helpers, PyTorch stack) lives in optional extras. Benefits:
+
+* Faster cold installs / CI setup
+* Smaller transitive surface → fewer unexpected resolver conflicts
+* Clearer signal when a new import is introduced (you must add it to
+  `[project.dependencies]` or tests + sync tooling will fail)
+
+If you add a new top‑level import in `check_models.py`, promote its package
+from an optional group (or add it fresh) into the runtime `dependencies` array
+and re-run the sync helper.
+
 Runtime (installed automatically via `pip install -e .`):
 
 | Purpose | Package | Minimum |

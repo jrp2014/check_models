@@ -54,12 +54,18 @@ help: ## Show this help message
 
 # ---- Installation ----
 .PHONY: install-dev
-install-dev: ## Install package in editable mode with dev extras
-	$(RUN_PY) -m pip install -e .[dev]
+install-dev: ## Install package in editable mode with dev extras (pyproject in ./vlm)
+	$(RUN_PY) -m pip install -e "vlm[dev]"
+
+.PHONY: bootstrap-dev
+bootstrap-dev: ## Pip bootstrap runtime + dev + extras (pyproject located in ./vlm)
+	$(RUN_PY) -m pip install --upgrade pip
+	$(RUN_PY) -m pip install -e "vlm[dev,extras]"
+	@echo "Bootstrap complete: runtime + dev + extras installed via pip (vlm directory)"
 
 .PHONY: install
 install: ## Install runtime package only (no dev extras)
-	$(RUN_PY) -m pip install -e .
+	$(RUN_PY) -m pip install -e vlm
 
 # ---- Formatting & Lint ----
 .PHONY: format

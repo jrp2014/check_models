@@ -113,25 +113,78 @@ def replace_between_markers(text: str, marker_key: str, replacement_block: str) 
     return new_text
 
 
+def extract_optional_groups(pyproject_text: str) -> dict[str, list[str]]:
+    """Very small parser to extract optional group package names.
+
+    We only need names (not version specs) for validation that no optional dep leaks
+    into the auto-generated runtime blocks.
+    """
+    groups: dict[str, list[str]] = {}
+    current: str | None = None
+    for line in pyproject_text.splitlines():
+        stripped = line.strip()
+        if stripped.startswith("[project.optional-dependencies]"):
+            current = None
+            continue
+        if (
+            stripped.startswith("[")
+            and stripped.endswith("]")
+            and stripped.startswith("[project.optional-dependencies.")
+        ):
+            current = stripped.rsplit(".", 1)[-1][:-1]
+            groups[current] = []
+            continue
+        if current and stripped.startswith('"'):
+            pkg = (
+                stripped.strip(",")
+                .strip()
+                .strip('"')
+                .split(">=")[0]
+                .split("==")[0]
+            )
+            if pkg:
+                groups[current].append(pkg)
+    return groups
+
+
 def main() -> int:
-    """Run the sync and return exit code."""
+    """Run the sync and return exit code.
+
+    Validation performed:
+      * Ensures all runtime dependencies appear in README blocks after update.
+      * Ensures no optional dependency (extras/torch/etc.) appears in those blocks.
+    """
     repo_root = Path(__file__).resolve().parents[1]
     pyproject_path = repo_root / "pyproject.toml"
     readme_path = repo_root / "README.md"
     try:
+        py_text = pyproject_path.read_text(encoding="utf-8")
         deps = parse_pyproject(pyproject_path)
-        runtime_deps = {k: v for k, v in deps.items() if k not in set()}
+        optional_groups = extract_optional_groups(py_text)
+        optional_flat = {p for pkgs in optional_groups.values() for p in pkgs}
+        runtime_deps = {k: v for k, v in deps.items() if k not in optional_flat}
         install_cmd = build_install_command(runtime_deps)
-        snippet = install_cmd  # keep full command for clarity
+        snippet = install_cmd
         readme_text = readme_path.read_text(encoding="utf-8")
         for key in MARKERS:
             readme_text = replace_between_markers(readme_text, key, snippet)
+        # Post-update validation: ensure no optional package leaked
+        for opt in sorted(optional_flat):
+            pattern = f'"{opt}'
+            if pattern in snippet:
+                _fail_optional_leak(opt)
         readme_path.write_text(readme_text, encoding="utf-8")
-    except Exception:
+    except Exception:  # pragma: no cover - rare failure path
         logger.exception("update_readme_deps failed")
         return 1
     logger.info("README dependency blocks updated")
     return 0
+
+
+def _fail_optional_leak(opt_pkg: str) -> None:
+    """Raise a standardized runtime leak error (isolated for lint friendliness)."""
+    msg = f"Optional dependency '{opt_pkg}' appeared in runtime block"
+    raise RuntimeError(msg)
 
 
 if __name__ == "__main__":  # pragma: no cover

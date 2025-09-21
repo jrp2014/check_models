@@ -7,7 +7,12 @@ import textwrap
 import traceback
 from typing import Any
 
-import mlx.core as mx
+try:  # Soft import: allow environments lacking native MLX lib to still run tests
+    import mlx.core as mx  # type: ignore
+    _MLX_AVAILABLE = True
+except Exception:  # pragma: no cover - fallback path
+    mx = None  # type: ignore
+    _MLX_AVAILABLE = False
 import psutil
 from mlx_vlm import generate, load
 from mlx_vlm.prompt_utils import apply_chat_template
@@ -127,6 +132,11 @@ def test_generation(
 
 def main() -> None:
     args = parse_args()
+    if not _MLX_AVAILABLE:
+        console.print(
+            "[bold yellow]Skipping smoke test: MLX core library not available in this env.[/]"
+        )
+        return
 
     # Load models list
     with open(args.models_file, encoding="utf-8") as f:
