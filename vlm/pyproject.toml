@@ -98,12 +98,17 @@ ignore = [
     "D213",    # Conflicts with D212
     "D100", "D101", "D102", "D103", "D104", "D105", "D106", "D107", # Missing docstrings
     "S101",    # Use of assert
-    "E501",    # Line too long
-    "PLR0913", # Too many arguments
-    "PLR0915", # Too many statements
-    "C901",    # Complex structure (handled by style guide)
-    "PLR0912", # Too many branches
+    "E501",    # Line too long (allow longer lines for now)
+    "PLR0913", # Too many arguments (temporarily tolerated)
+    # NOTE: Previously ignored complexity/branch rules (C901, PLR0912, PLR0915) reinstated.
 ]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 15
+
+[tool.ruff.lint.per-file-ignores]
+# Allow higher complexity in the central orchestrator script for now; revisit later.
+"vlm/check_models.py" = ["C901"]
 
 [tool.pylance]
 # Pyright/Pylance configuration
@@ -118,6 +123,9 @@ reportUnusedImport = "warning"
 # See: https://mypy.readthedocs.io/en/stable/config_file.html
 python_version = "3.12"
 ignore_missing_imports = true
+# Additional strictness flags (incremental tightening)
+warn_unused_ignores = true
+no_implicit_optional = true
 # Search path for local type stubs (generated via stubgen into ./typings)
 mypy_path = ["typings"]
 # Do not descend into imports; treat imported modules as 'Any' unless stubs exist
@@ -142,7 +150,6 @@ module = [
     "psutil.*",
 ]
 ignore_missing_imports = true
-ignore_errors = true
 
 [tool.pytest.ini_options]
 # Limit test discovery to the dedicated tests package inside the project
