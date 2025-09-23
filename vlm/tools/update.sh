@@ -42,6 +42,7 @@ DEV_PACKAGES=(
     "setuptools>=80"
     "types-tabulate"
     "nanobind==2.4.0"
+	"gh"
 )
 
 TORCH_PACKAGES=(
