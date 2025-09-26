@@ -14,6 +14,7 @@ Notes
 -----
 - Requires mypy to be installed (provides ``stubgen``).
 - Generated stubs are shallow by default; refine by hand for critical APIs.
+
 """
 
 from __future__ import annotations

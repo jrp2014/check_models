@@ -47,6 +47,17 @@ stubs: ## Generate/update local type stubs into ../typings/
 stubs-clear: ## Remove all generated stubs
 	rm -rf ../typings
 
+# ------------------------
+# Run script
+# ------------------------
+.PHONY: check_models
+check_models: ## Run the VLM checker (pass args via ARGS='--model <id> --image <path> ...')
+	$(RUN_PY) -m vlm.check_models $(ARGS)
+
+.PHONY: check_models-demo
+check_models-demo: ## Demo run with minimal flags (override via ARGS to customize)
+	$(RUN_PY) -m vlm.check_models $(ARGS)
+
 # Quality
 .PHONY: format
 format: ## Ruff format

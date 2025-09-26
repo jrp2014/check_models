@@ -74,6 +74,10 @@ ci: ## Full CI pipeline (format check, quality, deps sync, tests)
 # ------------------------
 # Typings
 # ------------------------
+.PHONY: check_models
+check_models: ## Run the VLM checker (pass args via ARGS='--model <id> --image <path> ...')
+	@$(FWD) check_models
+
 .PHONY: stubs
 stubs: ## Generate/update local type stubs into ./typings/
 	@$(FWD) stubs

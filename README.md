@@ -32,6 +32,12 @@ make quality
 make test
 ```
 
+- Run the VLM checker (pass flags via ARGS):
+
+```bash
+make check_models ARGS="--model mlx-community/Florence-2-large --image /path/to/image.jpg --max-tokens 256"
+```
+
 - Generate local type stubs (to improve mypy signal):
 
 ```bash
