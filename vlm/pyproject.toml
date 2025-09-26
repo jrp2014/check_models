@@ -141,7 +141,7 @@ warn_redundant_casts = true
 warn_unreachable = true
 strict_optional = true
 
-// Explicitly silence external packages commonly used here
+# Explicitly silence external packages commonly used here
 [[tool.mypy.overrides]]
 module = [
     "mlx_lm.*",
@@ -157,6 +157,13 @@ module = [
     "tabulate.*",
 ]
 ignore_missing_imports = true
+
+# Local stub package for mlx_vlm is intentionally partial; ignore errors within it
+[[tool.mypy.overrides]]
+module = [
+    "mlx_vlm.*",
+]
+ignore_errors = true
 
 # If needed, relax typing requirements for the monolithic script temporarily.
 [[tool.mypy.overrides]]
