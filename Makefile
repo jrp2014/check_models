@@ -1,17 +1,98 @@
-# Root shim Makefile: forwards targets to package-local Makefile in ./vlm
+## Root Makefile: friendly aliases that proxy to the package Makefile in ./vlm
+
+.DEFAULT_GOAL := help
+
+VLM := vlm
+FWD := $(MAKE) -C $(VLM)
 
 .PHONY: help
-help:
-	@$(MAKE) -C vlm help
+help: ## Show this help with aligned target descriptions
+	@echo "Available targets:\n"
+	@grep -E '^[a-zA-Z0-9_-]+:.*##' $(MAKEFILE_LIST) \
+		| sed 's/:.*##/: /' \
+		| awk 'BEGIN {FS=": "; C=28} {printf "  \033[36m%-*s\033[0m %s\n", C, $$1, $$2}'
+	@echo "\n(These commands proxy to ./vlm/Makefile so you don\'t need \"-C vlm\".)"
+
+# ------------------------
+# Install / bootstrap
+# ------------------------
+.PHONY: install
+install: ## Editable install (runtime only)
+	@$(FWD) install
+
+.PHONY: install-dev
+install-dev: ## Editable install with dev extras
+	@$(FWD) install-dev
+
+.PHONY: bootstrap-dev
+bootstrap-dev: ## Pip bootstrap runtime + dev + extras
+	@$(FWD) bootstrap-dev
+
+# ------------------------
+# Quality & tests
+# ------------------------
+.PHONY: format
+format: ## Ruff format
+	@$(FWD) format
+
+.PHONY: lint
+lint: ## Ruff lint
+	@$(FWD) lint
+
+.PHONY: lint-fix
+lint-fix: ## Ruff lint with --fix
+	@$(FWD) lint-fix
+
+.PHONY: typecheck
+typecheck: ## Mypy type checking
+	@$(FWD) typecheck
+
+.PHONY: test
+test: ## Run pytest
+	@$(FWD) test
+
+.PHONY: test-cov
+test-cov: ## Run pytest with coverage
+	@$(FWD) test-cov
+
+.PHONY: deps-sync
+deps-sync: ## Sync README dependency blocks from pyproject
+	@$(FWD) deps-sync
+
+.PHONY: check
+check: ## Format + lint + typecheck + tests
+	@$(FWD) check
 
 .PHONY: quality
-quality: ## Run consolidated quality checks (alias to vlm/quality)
-	@$(MAKE) -C vlm quality
+quality: ## Consolidated quality script (ruff format+lint+mypy on core file)
+	@$(FWD) quality
 
 .PHONY: ci
-ci: ## Full CI pipeline (alias to vlm/ci)
-	@$(MAKE) -C vlm ci
+ci: ## Full CI pipeline (format check, quality, deps sync, tests)
+	@$(FWD) ci
 
-# Forward any target to ./vlm/Makefile
+# ------------------------
+# Typings
+# ------------------------
+.PHONY: stubs
+stubs: ## Generate/update local type stubs into ./typings/
+	@$(FWD) stubs
+
+.PHONY: stubs-clear
+stubs-clear: ## Remove all generated stubs
+	@$(FWD) stubs-clear
+
+# ------------------------
+# Cleanup
+# ------------------------
+.PHONY: clean-pyc
+clean-pyc: ## Remove Python caches
+	@$(FWD) clean-pyc
+
+.PHONY: clean
+clean: ## Remove caches and temporary files
+	@$(FWD) clean
+
+# Fallback: forward any unknown target directly to ./vlm
 %:
-	@$(MAKE) -C vlm $@
+	@$(FWD) $@
