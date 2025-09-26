@@ -1,3 +1,0 @@
-import mlx.core as mx
-
-def top_p_sampling(logits: mx.array, top_p: float, temperature: float) -> mx.array: ...
