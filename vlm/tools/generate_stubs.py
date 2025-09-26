@@ -24,8 +24,11 @@ import logging
 import re
 import shutil
 import subprocess
-from collections.abc import Iterable
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:  # TC003: typing-only import
+    from collections.abc import Iterable
 
 
 def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
@@ -35,17 +38,21 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
     defaults, which violates mypy's no_implicit_optional. Here we apply minimal,
     targeted edits to generated stubs so that they type-check cleanly:
 
-    - models/base.pyi: BaseImageProcessor.__init__(..., crop_size: dict[str, int] | None = None, ...)
+    - models/base.pyi:
+        BaseImageProcessor.__init__(..., crop_size: dict[str, int] | None = None, ...)
     - utils.pyi:
         * load_processor(..., eos_token_ids: int | list[int] | None = None, ...)
         * StoppingCriteria.add_eos_token_ids(self, new_eos_token_ids: int | list[int] | None = None)
         * StoppingCriteria.reset(self, eos_token_ids: list[int] | None = None)
     - convert.pyi: convert(..., upload_repo: str | None = None, ...)
-    - generate.pyi: stream_generate/generate(..., image: str | list[str] | None = None, audio: str | list[str] | None = None, ...)
+    - generate.pyi:
+        stream_generate/generate(
+            ..., image: str | list[str] | None = None,
+            audio: str | list[str] | None = None, ...
+        )
 
     This function is idempotent and safe to run repeatedly.
     """
-    import re
 
     def _patch_file(path: Path, patches: list[tuple[re.Pattern[str], str]]) -> None:
         if not path.exists():
@@ -78,7 +85,8 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
     _patch_file(
         mlx_root / "utils.pyi",
         patches=[
-            # load_processor(..., eos_token_ids=None, ...) -> eos_token_ids: int | list[int] | None = None
+            # load_processor(..., eos_token_ids=None, ...)
+            #   -> eos_token_ids: int | list[int] | None = None
             (
                 re.compile(
                     r"(def\s+load_processor\([^\)]*?eos_token_ids)\s*=\s*None",

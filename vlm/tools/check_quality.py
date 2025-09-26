@@ -22,7 +22,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import Final
+from typing import Any, Final
 
 DEFAULT_PATHS: Final[list[str]] = ["vlm/check_models.py"]
 ALLOWED_TOOLS: Final[set[str]] = {"ruff", "mypy", "stubgen"}
@@ -121,20 +121,24 @@ def _ensure_stubs(repo_root: Path, *, refresh: bool, require: bool) -> int:
     if str(repo_root) not in sys.path:
         sys.path.insert(0, str(repo_root))
     # Import locally to avoid global import-sort issues and keep this optional.
+    mod: Any | None = None
     try:
         mod = importlib.import_module("vlm.tools.generate_stubs")
         _run_stubgen = getattr(mod, "run_stubgen", None)
-    except Exception:  # noqa: BLE001 - best-effort import; we fallback gracefully
-        _run_stubgen = None  # type: ignore[assignment]
+    except ImportError:
+        # Best-effort import; fall back to invoking stubgen via CLI
+        _run_stubgen = None
 
     if _run_stubgen is None:
         # Fallback: try calling 'stubgen' directly for mlx_vlm
         logger.warning("[quality] Stub generator not importable; trying 'stubgen' CLI ...")
         try:
             rc = _run(["stubgen", "-p", "mlx_vlm", "-o", str(typings)], cwd=repo_root)
-        except Exception:
+        except (FileNotFoundError, OSError, subprocess.SubprocessError, ValueError):
             if require:
-                logger.error("[quality] Stub generator not available; cannot generate stubs")
+                logger.exception(
+                    "[quality] Stub generator not available; cannot generate stubs",
+                )
                 return 1
             logger.warning("[quality] Stub generation skipped (no stubgen)")
             return 0
@@ -152,10 +156,10 @@ def _ensure_stubs(repo_root: Path, *, refresh: bool, require: bool) -> int:
         return rc
     # Apply post-processing patch to fix Optional annotations, if available
     try:
-        _patch = getattr(mod, "_patch_mlx_vlm_stubs", None)
+        _patch = getattr(mod, "_patch_mlx_vlm_stubs", None) if mod is not None else None
         if _patch is not None:
             _patch(typings)
-    except Exception:
+    except (OSError, ValueError, TypeError, AttributeError, RuntimeError):
         # Non-fatal: continue; mypy may still pass if stubs happen to be fine
         logger.debug("[quality] Stub patch step skipped due to exception", exc_info=True)
     return 0
