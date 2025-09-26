@@ -10,6 +10,13 @@ This guide defines coding conventions for this repository so automated agents (a
 4. Readability & comprehensibility over mechanical micro‑refactors.
 5. Maintain strong, meaningful comments instead of over‑factoring into tiny single‑use helpers.
 
+## Documentation Linting
+
+- We use `markdownlint-cli2` to keep Markdown consistent.
+- Run it locally with `make lint-md` (uses `npx` if available, otherwise a global install).
+- The canonical config is `.markdownlint.json` at the repo root.
+
+
 ## Philosophy
 
 "Readable first." A single medium‑sized, well‑commented function is often clearer than a web of one‑line helpers. Only extract a helper when it:
@@ -105,7 +112,7 @@ Current config (see `pyproject.toml`):
 
 ### Markdown Linting
 
-Markdown consistency is enforced (optionally) via `markdownlint-cli2` using the configuration in `.markdownlint.jsonc`:
+Markdown consistency is enforced (optionally) via `markdownlint-cli2` using the configuration in `.markdownlint.json`:
 
 - Long lines (MD013) are disabled to allow readable HTML/CSS blocks and wide tables.
 - Inline HTML is allowed (MD033) because the codebase already sanitizes/escapes disallowed tags during report generation.
