@@ -20,6 +20,33 @@ This guide defines coding conventions for this repository so automated agents (a
 
 Do NOT introduce a new function solely to silence a complexity / length warning if it harms cohesion. Prefer an inline code comment or a local inner helper (with a brief comment) instead of a file‑level public function.
 
+## Repository structure conventions
+
+- Single focused package `vlm/` contains all Python code and its `pyproject.toml`.
+- Root `Makefile` is a shim that forwards targets to `vlm/Makefile`.
+- Generated artifacts (e.g., `typings/`) are not committed — regenerate via `make -C vlm stubs`.
+- README at repo root documents high‑level layout and quickstart; package‑specific README lives in `vlm/`.
+
+## Typings policy
+
+- Third‑party stubs are generated locally into `typings/` using `vlm/tools/generate_stubs.py`.
+- `typings/` is git‑ignored; do not commit generated stubs.
+- `mypy_path = ["typings"]` is configured in `vlm/pyproject.toml` so mypy picks them up.
+- Make targets:
+  - `make -C vlm stubs` — generate/update stubs
+  - `make -C vlm stubs-clear` — clear generated stubs
+
+## Dependency source of truth
+
+- `vlm/pyproject.toml` is authoritative for dependencies.
+- Use `tools/update_readme_deps.py` to sync README install blocks.
+- Keep runtime set slim — only libraries imported by `check_models.py` — and move optional tooling to extras.
+
+## Quality gates
+
+- Run `make quality` locally (ruff format+lint, mypy on `check_models.py`).
+- CI should verify formatting, dependency sync, and run tests.
+
 ## Type Annotations
 
 - All new functions must be fully typed (parameters + return type).

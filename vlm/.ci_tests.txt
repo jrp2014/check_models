@@ -11,4 +11,4 @@ tests/test_format_field_value.py .....                                   [ 46%]
 tests/test_metrics_modes.py ...                                          [ 69%]
 tests/test_total_runtime_reporting.py ....                               [100%]
 
-============================== 13 passed in 1.49s ==============================
+============================== 13 passed in 1.46s ==============================

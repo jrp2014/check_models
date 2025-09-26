@@ -49,7 +49,7 @@ from tzlocal import get_localzone
 # doesn't complain about assigning None to a module symbol on the except path.
 psutil_mod: Any | None
 try:
-    import psutil as _psutil_runtime  # type: ignore[import-not-found]
+    import psutil as _psutil_runtime
 
     psutil_mod = _psutil_runtime
 except ImportError:  # pragma: no cover - optional
@@ -1414,11 +1414,9 @@ def _get_available_fields(results: list[PerformanceResult]) -> list[str]:
     # Determine GenerationResult fields (excluding 'text' and 'logprobs')
     gen_fields: list[str] = []
     for r in results:
-        if r.generation is not None and dataclasses.is_dataclass(r.generation):  # type: ignore[arg-type]
+        if r.generation is not None and dataclasses.is_dataclass(r.generation):
             gen_fields = [
-                f.name
-                for f in fields(r.generation)  # type: ignore[arg-type]
-                if f.name not in ("text", "logprobs")
+                f.name for f in fields(r.generation) if f.name not in ("text", "logprobs")
             ]
             break
 
@@ -2293,7 +2291,7 @@ def _run_model_generation(
     try:
         output: GenerationResult = generate(
             model=model,
-            processor=tokenizer,  # type: ignore[arg-type] # MLX VLM accepts both tokenizer types
+            processor=tokenizer,  # MLX VLM accepts both tokenizer types
             prompt=formatted_prompt,
             image=str(image_path),
             verbose=verbose,
@@ -2321,9 +2319,9 @@ def _run_model_generation(
         raise ValueError(msg) from gen_err
     end_time = time.perf_counter()
 
-    # Add timing to the GenerationResult object
-    # Since we can't modify the dataclass, we'll add it as an attribute
-    output.time = end_time - start_time  # type: ignore[attr-defined]
+    # Add timing to the GenerationResult object dynamically without tripping linters
+    # Cast to Any so mypy doesn't complain about unknown attribute on upstream type
+    cast("Any", output).time = end_time - start_time
 
     mx.eval(model.parameters())
     return output
@@ -2647,7 +2645,8 @@ def _log_compact_metrics(res: PerformanceResult) -> None:
 
 
 def _build_compact_metric_parts(
-    res: PerformanceResult, gen: GenerationResult | SupportsGenerationResult
+    res: PerformanceResult,
+    gen: GenerationResult | SupportsGenerationResult,
 ) -> list[str]:
     """Return list of metric segments for compact metrics line."""
     total_time_val = getattr(res, "total_time", None)
@@ -2674,7 +2673,7 @@ def _build_compact_metric_parts(
     if all_tokens:
         parts.append(
             "tokens(total/prompt/gen)="
-            f"{fmt_num(all_tokens)}/{fmt_num(prompt_tokens)}/{fmt_num(gen_tokens)}"
+            f"{fmt_num(all_tokens)}/{fmt_num(prompt_tokens)}/{fmt_num(gen_tokens)}",
         )
     if gen_tps:
         parts.append(f"gen_tps={fmt_num(gen_tps)}")
@@ -2721,7 +2720,10 @@ def log_metrics_legend(*, detailed: bool) -> None:
     else:
         logger.info(
             Colors.colored(
-                "Legend: tokens(total/prompt/gen)=total/prompt/generated • keys aligned for readability",
+                (
+                    "Legend: tokens(total/prompt/gen)="
+                    "total/prompt/generated • keys aligned for readability"
+                ),
                 Colors.GRAY,
             ),
         )
@@ -3231,7 +3233,8 @@ def main_cli() -> None:
         action="store_true",
         default=False,
         help=(
-            "Force compact metrics (explicit; default behavior). Useful if environment sets a different default."
+            "Force compact metrics (explicit; default behavior). "
+            "Useful if environment sets a different default."
         ),
     )
     parser.add_argument(

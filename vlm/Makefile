@@ -38,6 +38,15 @@ bootstrap-dev: ## pip bootstrap runtime + dev + extras
 	$(RUN_PY) -m pip install -e .[dev,extras]
 	@echo "Bootstrap complete (local pyproject)"
 
+# Stubs
+.PHONY: stubs
+stubs: ## Generate/update local type stubs into ../typings/
+	$(RUN_PY) tools/generate_stubs.py
+
+.PHONY: stubs-clear
+stubs-clear: ## Remove all generated stubs
+	rm -rf ../typings
+
 # Quality
 .PHONY: format
 format: ## Ruff format

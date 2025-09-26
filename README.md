@@ -1,0 +1,57 @@
+# MLX VLM Check Scripts
+
+This repository hosts a small, focused project centered on `vlm/check_models.py`, a script for running MLX Vision-Language Models (VLMs) on images, collecting performance metrics, and generating HTML/Markdown reports.
+
+## Layout
+
+- `vlm/` — Python package with the main script, tests, and tools
+  - `check_models.py` — the primary CLI and implementation
+  - `tools/` — helper scripts (quality, stub generation, dependency sync)
+  - `tests/` — unit tests for formatting and reporting
+  - `pyproject.toml` — project metadata and tooling config for this package
+- `typings/` — generated `.pyi` stubs for third‑party packages (not committed)
+- `Makefile` — root shim forwarding to `vlm/Makefile`
+
+## Quickstart
+
+- Install with dev tools and extras:
+
+```bash
+make -C vlm bootstrap-dev
+```
+
+- Run quality checks (ruff + mypy):
+
+```bash
+make quality
+```
+
+- Run tests:
+
+```bash
+make test
+```
+
+- Generate local type stubs (to improve mypy signal):
+
+```bash
+make -C vlm stubs
+```
+
+## Typings
+
+Local type stubs live under `typings/` and are generated via:
+
+```bash
+python -m vlm.tools.generate_stubs mlx_vlm tokenizers
+```
+
+The directory is ignored by git. If stubs get stale or noisy:
+
+```bash
+make -C vlm stubs-clear && make -C vlm stubs
+```
+
+## Conventions
+
+See `STYLE_GUIDE.md` for coding conventions, including dependency sync, pyproject shape, and quality gates. The `vlm/pyproject.toml` is the source of truth for dependency lists; the README blocks are kept in sync by the `tools/update_readme_deps.py` script.

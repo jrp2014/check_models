@@ -36,6 +36,9 @@ dist/
 *.egg-info/
 *.whl
 
+# Generated type stubs (do not commit; regenerate via `make stubs`)
+typings/
+
 # Jupyter
 .ipynb_checkpoints/
 
