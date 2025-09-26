@@ -42,6 +42,7 @@ Key defaults and parameters:
 
 - Models: discovered from Hugging Face cache. Use `--models` for explicit IDs, `--exclude` to filter.
 - Images: `-f/--folder` points to your images; default is `~/Pictures/Processed`.
+- Folder behavior: when you pass a folder, the script automatically selects the most recently modified image file in that folder (hidden files are ignored).
 - Reports: `results.html` and `results.md` are created in the current directory; override via `--output-html` and `--output-markdown`.
 - Prompting: If `--prompt` isn’t provided, the tool can compose a metadata‑aware prompt from EXIF data when available (camera, time, GPS).
 - Runtime: `--timeout 300`, `--max-tokens 500`, `--temperature 0.1` by default.
@@ -577,6 +578,7 @@ If you prefer manual commands, the traditional workflow still works:
 - Add or update tests when changing output formatting or public CLI flags.
 - Prefer small helper functions over adding more branching to large blocks in `check_models.py`.
 - Document new flags or output changes in this README (search for an existing section to extend rather than creating duplicates).
+- For full conventions (naming, imports, dependency policy, quality gates), see `STYLE_GUIDE.md` in the repository root.
 
 ## Important Notes
 
