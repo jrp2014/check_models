@@ -2,6 +2,8 @@
 
 This repository hosts a small, focused project centered on `vlm/check_models.py`, a script for running MLX Vision-Language Models (VLMs) on images, collecting performance metrics, and generating HTML/Markdown reports.
 
+If you just want to run the script on your images, see the “TL;DR for Users” section in `vlm/README.md`. If you want to contribute to the script or tooling, see the Contributors section in the same file.
+
 ## Layout
 
 - `vlm/` — Python package with the main script, tests, and tools

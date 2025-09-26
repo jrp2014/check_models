@@ -2,14 +2,59 @@
 
 `check_models.py` is a focused benchmarking and inspection tool for MLX-compatible Vision Language Models (VLMs) on Apple Silicon. It loads one or more local / cached models, optionally derives a prompt from image metadata (EXIF + GPS), runs generation, and reports performance (tokens, speed, timings, memory) plus outputs in colorized CLI, HTML, and Markdown formats.
 
+## Who is this for?
+
+- Users (including MLX/MLX‑VLM/MLX‑LM developers) who want to run models on their own images and quickly see outputs and metrics: see the TL;DR below.
+- Contributors who want to work on `check_models.py` itself and keep quality gates green: see the Contributors section near the end.
+
+## TL;DR for Users
+
+Defaults assume you have Hugging Face models in your local cache. The tool will discover cached VLMs automatically (unless you pass `--models`), carefully read EXIF metadata (including GPS/time when present) to enrich prompts, and write reports to `results.html` and `results.md` in the current directory.
+
+Quickest start on Apple Silicon (Python 3.12):
+
+```bash
+cd vlm
+python -m venv .venv && source .venv/bin/activate
+pip install -e .
+
+# Optional extras for system metrics & tokenizers
+pip install -e ".[extras]"
+
+# Run against a folder of images (change the path to your images)
+python check_models.py -f ~/Pictures/Processed -p "Describe this image."
+
+# Try specific models
+python check_models.py -f ~/Pictures/Processed -m mlx-community/nanoLLaVA mlx-community/llava-1.5-7b-hf
+
+# Exclude a model from auto-discovered cache
+python check_models.py -f ~/Pictures/Processed -e "microsoft/Phi-3-vision-128k-instruct"
+```
+
+Prefer Make?
+
+```bash
+make -C vlm bootstrap-dev
+make check_models ARGS="-f ~/Pictures/Processed -p 'Describe this image.'"
+```
+
+Key defaults and parameters:
+
+- Models: discovered from Hugging Face cache. Use `--models` for explicit IDs, `--exclude` to filter.
+- Images: `-f/--folder` points to your images; default is `~/Pictures/Processed`.
+- Reports: `results.html` and `results.md` are created in the current directory; override via `--output-html` and `--output-markdown`.
+- Prompting: If `--prompt` isn’t provided, the tool can compose a metadata‑aware prompt from EXIF data when available (camera, time, GPS).
+- Runtime: `--timeout 300`, `--max-tokens 500`, `--temperature 0.1` by default.
+- Security: `--trust-remote-code=True` by default for Hub models; only use with trusted sources.
+
 ## Capabilities
 
-* Auto‑discovers locally cached MLX VLMs (Hugging Face cache) or runs an explicit list.
-* Captures structured performance: generation time, model load time, total time, token counts, tokens/sec, peak memory (GB).
-* Extracts EXIF + GPS metadata (robust to partial corruption) for context.
-* Provides compact console table + per‑model SUMMARY lines (machine parsable: `SUMMARY key=value ...`).
-* Generates standalone HTML and GitHub‑friendly Markdown reports.
-* Gracefully handles timeouts, load errors, and partial failures.
+- Auto‑discovers locally cached MLX VLMs (Hugging Face cache) or runs an explicit list.
+- Captures structured performance: generation time, model load time, total time, token counts, tokens/sec, peak memory (GB).
+- Extracts EXIF + GPS metadata (robust to partial corruption) for context.
+- Provides compact console table + per‑model SUMMARY lines (machine parsable: `SUMMARY key=value ...`).
+- Generates standalone HTML and GitHub‑friendly Markdown reports.
+- Gracefully handles timeouts, load errors, and partial failures.
 
 ## Feature Highlights
 
@@ -93,25 +138,25 @@ chmod +x setup_conda_env.sh
 
 The script will:
 
-* Check for macOS and Apple Silicon compatibility
-* Create a conda environment with Python 3.12
-* Install all required and optional dependencies
-* Install the package in development mode
-* Verify the installation
-* Provide usage instructions
+- Check for macOS and Apple Silicon compatibility
+- Create a conda environment with Python 3.12
+- Install all required and optional dependencies
+- Install the package in development mode
+- Verify the installation
+- Provide usage instructions
 
 Torch support:
 
-* During setup, you'll be prompted to install the optional PyTorch stack (torch, torchvision, torchaudio). Choose 'y' if you plan to use models that rely on Torch.
-* You can also install later via the project extra: `pip install -e ".[torch]"`.
-* The update helper script supports installing Torch too: run with `INSTALL_TORCH=1` to include it.
+- During setup, you'll be prompted to install the optional PyTorch stack (torch, torchvision, torchaudio). Choose 'y' if you plan to use models that rely on Torch.
+- You can also install later via the project extra: `pip install -e ".[torch]"`.
+- The update helper script supports installing Torch too: run with `INSTALL_TORCH=1` to include it.
 
 ## Notes on Metrics and Output Formatting
 
-* Memory units: All memory metrics are displayed in GB. Sources differ: MLX reports bytes; mlx‑vlm reports decimal GB (bytes/1e9). The tool detects and normalizes both to GB for consistent display.
-* Markdown escaping: The final output column preserves common GitHub‑supported tags (e.g., `<br>`) and escapes others so special tokens like `<s>` render literally.
-* Compact vs detailed metrics (verbose mode): By default, verbose output shows a single aligned line beginning with `Metrics:`. Enable classic multi‑line breakdown with `--detailed-metrics`.
-* Token triple legend: `tokens(total/prompt/gen)=T/P/G` corresponds to total tokens = prompt tokens + generated tokens.
+- Memory units: All memory metrics are displayed in GB. Sources differ: MLX reports bytes; mlx‑vlm reports decimal GB (bytes/1e9). The tool detects and normalizes both to GB for consistent display.
+- Markdown escaping: The final output column preserves common GitHub‑supported tags (e.g., `<br>`) and escapes others so special tokens like `<s>` render literally.
+- Compact vs detailed metrics (verbose mode): By default, verbose output shows a single aligned line beginning with `Metrics:`. Enable classic multi‑line breakdown with `--detailed-metrics`.
+- Token triple legend: `tokens(total/prompt/gen)=T/P/G` corresponds to total tokens = prompt tokens + generated tokens.
 
 ## Git Hygiene and Caches
 
@@ -145,22 +190,19 @@ pip install "huggingface-hub>=0.23.0" "mlx>=0.29.1" "mlx-vlm>=0.0.9" "Pillow>=10
 
 ## Requirements
 
-* **Python**: 3.12+ (3.12 is the tested baseline)
-* **Operating System**: macOS with Apple Silicon (MLX is Apple‑Silicon specific)
-* **Models**: MLX-compatible Vision Language Models (fetched via Hugging Face)
+- **Python**: 3.12+ (3.12 is the tested baseline)
+- **Operating System**: macOS with Apple Silicon (MLX is Apple‑Silicon specific)
 
 ## Dependencies
 
 Why so slim? The runtime dependency set is intentionally minimized to only the
 packages directly imported by `vlm/check_models.py`. Everything else that might
-be useful in adjacent workflows (tokenizers, psutil system metrics, transformer
 inference helpers, PyTorch stack) lives in optional extras. Benefits:
 
-* Faster cold installs / CI setup
-* Smaller transitive surface → fewer unexpected resolver conflicts
-* Clearer signal when a new import is introduced (you must add it to
+- Faster cold installs / CI setup
+- Smaller transitive surface → fewer unexpected resolver conflicts
+- Clearer signal when a new import is introduced (you must add it to
   `[project.dependencies]` or tests + sync tooling will fail)
-
 If you add a new top‑level import in `check_models.py`, promote its package
 from an optional group (or add it fresh) into the runtime `dependencies` array
 and re-run the sync helper.
@@ -224,15 +266,15 @@ pip install -e ".[dev,extras]"  # dev tools + optional metrics/tokenizers
 
 Notes:
 
-* `psutil` is optional (installed with `extras`); if absent the extended Apple Silicon hardware section omits RAM/cores.
-* `extras` group bundles: psutil, tokenizers, mlx-lm, transformers. Install only if you need extended metrics or LM/transformer features.
-* Keep `transformers` updated if using it: `pip install -U transformers`.
-* `system_profiler` is a macOS built-in (no install needed) used for GPU name / core info.
-* Torch is supported and can be installed when you need it for specific models; the script does not block Torch.
-* The `tools/update.sh` helper supports adding Torch via an environment flag: `INSTALL_TORCH=1 ./tools/update.sh`.
-* Installing `sentence-transformers` isn’t necessary for this tool and may pull heavy backends into import paths; a heads‑up is logged if detected.
-* Long embedded CSS / HTML lines are intentional (readability > artificial wrapping).
-* Dependency versions in this README are automatically kept in sync with `pyproject.toml`; update the TOML first and reflect changes here.
+- `psutil` is optional (installed with `extras`); if absent the extended Apple Silicon hardware section omits RAM/cores.
+- `extras` group bundles: psutil, tokenizers, mlx-lm, transformers. Install only if you need extended metrics or LM/transformer features.
+- Keep `transformers` updated if using it: `pip install -U transformers`.
+- `system_profiler` is a macOS built-in (no install needed) used for GPU name / core info.
+- Torch is supported and can be installed when you need it for specific models; the script does not block Torch.
+- The `tools/update.sh` helper supports adding Torch via an environment flag: `INSTALL_TORCH=1 ./tools/update.sh`.
+- Installing `sentence-transformers` isn’t necessary for this tool and may pull heavy backends into import paths; a heads‑up is logged if detected.
+- Long embedded CSS / HTML lines are intentional (readability > artificial wrapping).
+- Dependency versions in this README are automatically kept in sync with `pyproject.toml`; update the TOML first and reflect changes here.
 
 ## Usage
 
@@ -240,19 +282,19 @@ Notes:
 
 ```bash
 # Run across all cached models with a custom prompt
-python check_models.py -p "What is the main object in this image?"
+python check_models.py -f ~/Pictures/Processed -p "What is the main object in this image?"
 
 # Explicit model list (skips cache discovery)
-python check_models.py -m mlx-community/nanoLLaVA mlx-community/llava-1.5-7b-hf
+python check_models.py -f ~/Pictures/Processed -m mlx-community/nanoLLaVA mlx-community/llava-1.5-7b-hf
 
 # Exclude specific models from the automatic cache scan
-python check_models.py -e mlx-community/problematic-model other/model
+python check_models.py -f ~/Pictures/Processed -e mlx-community/problematic-model other/model
 
 # Combine explicit list with exclusions
-python check_models.py -m model1 model2 model3 -e model2
+python check_models.py -f ~/Pictures/Processed -m model1 model2 model3 -e model2
 
 # Verbose (debug) mode for detailed logs
-python check_models.py -v
+python check_models.py -f ~/Pictures/Processed -v
 ```
 
 ### Advanced Example
@@ -304,46 +346,46 @@ The script warns about exclusions that don't match any candidate model.
 
 Real-time colorized output showing:
 
-* Model processing progress with success/failure indicators
-* Performance metrics (tokens/second, memory usage, timing)
-* Generated text preview
-* Error diagnostics for failed models
-* Final performance summary table
+- Model processing progress with success/failure indicators
+- Performance metrics (tokens/second, memory usage, timing)
+- Generated text preview
+- Error diagnostics for failed models
+- Final performance summary table
 
 Color conventions:
 
-* Identifiers (file/folder paths and model names) are shown in magenta for quick scanning.
-* Failures are shown in red; the compact CLI table also highlights failed model names in red.
+- Identifiers (file/folder paths and model names) are shown in magenta for quick scanning.
+- Failures are shown in red; the compact CLI table also highlights failed model names in red.
 
 Width and color controls:
 
-* Colors are enabled by default on TTYs. You can override with flags or environment variables:
-  * Disable colors: `--no-color` or set `NO_COLOR=1`
-  * Force-enable colors (even when not a TTY): `--force-color` or set `FORCE_COLOR=1`
-* Output width is auto-detected and clamped for readability. You can force a specific width:
-  * Use `--width 100` to render at 100 columns
-  * Or set `MLX_VLM_WIDTH=100`
+- Colors are enabled by default on TTYs. You can override with flags or environment variables:
+  - Disable colors: `--no-color` or set `NO_COLOR=1`
+  - Force-enable colors (even when not a TTY): `--force-color` or set `FORCE_COLOR=1`
+- Output width is auto-detected and clamped for readability. You can force a specific width:
+  - Use `--width 100` to render at 100 columns
+  - Or set `MLX_VLM_WIDTH=100`
   These affect separator lengths and line wrapping for previews and summaries.
 
 ### HTML Report
 
 Professional report featuring:
 
-* Executive summary with test parameters
-* Interactive performance table with sortable columns
-* Model outputs and diagnostics
-* System information and library versions
-* Failed rows are highlighted in red for quick identification
-* Responsive design for mobile viewing
+- Executive summary with test parameters
+- Interactive performance table with sortable columns
+- Model outputs and diagnostics
+- System information and library versions
+- Failed rows are highlighted in red for quick identification
+- Responsive design for mobile viewing
 
 ### Markdown Report
 
 GitHub-compatible format with:
 
-* Performance metrics in table format
-* Model outputs
-* System and library version information
-* Easy integration into documentation
+- Performance metrics in table format
+- Model outputs
+- System and library version information
+- Easy integration into documentation
 
 ## Additional Examples
 
@@ -370,12 +412,12 @@ python check_models.py \
 
 The script tracks and reports:
 
-* **Token Metrics**: Prompt tokens, generation tokens, total processing
-* **Speed Metrics**: Tokens per second for prompt processing and generation
-* **Memory Usage**: Peak memory consumption during processing
-* **Timing**: Total processing time per model
-* **Success Rate**: Model success/failure statistics
-* **Error Analysis**: Detailed error reporting and diagnostics
+- **Token Metrics**: Prompt tokens, generation tokens, total processing
+- **Speed Metrics**: Tokens per second for prompt processing and generation
+- **Memory Usage**: Peak memory consumption during processing
+- **Timing**: Total processing time per model
+- **Success Rate**: Model success/failure statistics
+- **Error Analysis**: Detailed error reporting and diagnostics
 
 ## Troubleshooting
 
@@ -416,11 +458,11 @@ python check_models.py --verbose
 
 This provides:
 
-* Detailed model loading information
-* EXIF metadata extraction details
-* Performance metric breakdowns
-* Error stack traces
-* Library version information
+- Detailed model loading information
+- EXIF metadata extraction details
+- Performance metric breakdowns
+- Error stack traces
+- Library version information
 
 ### TensorFlow-related hangs on macOS/Apple Silicon
 
@@ -442,18 +484,18 @@ pip uninstall -y tensorflow tensorflow-macos tensorflow-metal
 
 Script behavior:
 
-* On startup, the script sets `TRANSFORMERS_NO_TF=1`, `TRANSFORMERS_NO_FLAX=1`, `TRANSFORMERS_NO_JAX=1` unless you explicitly opt in with `MLX_VLM_ALLOW_TF=1`.
-* Torch is allowed by default (some models require it).
-* A startup log warns if TensorFlow is installed but disabled; a heads‑up is also logged if `sentence-transformers` is present.
-* Warning: Installing TensorFlow on macOS/Apple Silicon can trigger hangs during import (Abseil mutex). Prefer not installing it in MLX‑only environments.
+- On startup, the script sets `TRANSFORMERS_NO_TF=1`, `TRANSFORMERS_NO_FLAX=1`, `TRANSFORMERS_NO_JAX=1` unless you explicitly opt in with `MLX_VLM_ALLOW_TF=1`.
+- Torch is allowed by default (some models require it).
+- A startup log warns if TensorFlow is installed but disabled; a heads‑up is also logged if `sentence-transformers` is present.
+- Warning: Installing TensorFlow on macOS/Apple Silicon can trigger hangs during import (Abseil mutex). Prefer not installing it in MLX‑only environments.
 
 ## Notes
 
-* **Platform**: Requires macOS with Apple Silicon for MLX support
-* **Colors**: Uses ANSI color codes for CLI output (may not display correctly in all terminals)
-* **Timeout**: Unix-only functionality (not available on Windows)
-* **Security**: The `--trust-remote-code` flag allows arbitrary code execution from models
-* **Performance**: First run may be slower due to model compilation and caching
+- **Platform**: Requires macOS with Apple Silicon for MLX support
+- **Colors**: Uses ANSI color codes for CLI output (may not display correctly in all terminals)
+- **Timeout**: Unix-only functionality (not available on Windows)
+- **Security**: The `--trust-remote-code` flag allows arbitrary code execution from models
+- **Performance**: First run may be slower due to model compilation and caching
 
 ## Project Structure
 
@@ -530,16 +572,16 @@ If you prefer manual commands, the traditional workflow still works:
 
 ### Contribution Guidelines
 
-* Keep patches focused; separate mechanical formatting changes from functional changes.
-* Run `make check` (or at minimum `make test` and `make typecheck`) before opening a PR.
-* Add or update tests when changing output formatting or public CLI flags.
-* Prefer small helper functions over adding more branching to large blocks in `check_models.py`.
-* Document new flags or output changes in this README (search for an existing section to extend rather than creating duplicates).
+- Keep patches focused; separate mechanical formatting changes from functional changes.
+- Run `make check` (or at minimum `make test` and `make typecheck`) before opening a PR.
+- Add or update tests when changing output formatting or public CLI flags.
+- Prefer small helper functions over adding more branching to large blocks in `check_models.py`.
+- Document new flags or output changes in this README (search for an existing section to extend rather than creating duplicates).
 
 ## Important Notes
 
-* Timeout functionality requires UNIX (not available on Windows).
-* For best results, ensure all dependencies are installed and models are downloaded/cached.
+- Timeout functionality requires UNIX (not available on Windows).
+- For best results, ensure all dependencies are installed and models are downloaded/cached.
 
 ## License
 
@@ -549,12 +591,12 @@ MIT License - see LICENSE file for details.
 
 A small helper script runs formatting and static checks for this project.
 
-* Location: `vlm/tools/check_quality.py`
-* Defaults:
-  * Targets only `vlm/check_models.py` unless paths are provided
-  * Runs `ruff format` by default (skip with `--no-format`)
-  * Runs `ruff check --fix` by default (skip fixing with `--no-fix`)
-  * Runs `mypy` for type checking
+- Location: `vlm/tools/check_quality.py`
+- Defaults:
+  - Targets only `vlm/check_models.py` unless paths are provided
+  - Runs `ruff format` by default (skip with `--no-format`)
+  - Runs `ruff check --fix` by default (skip fixing with `--no-fix`)
+  - Runs `mypy` for type checking
 
 Examples:
 
