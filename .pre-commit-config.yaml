@@ -22,7 +22,7 @@ repos:
         files: ^vlm/(pyproject\.toml|README\.md)$
       - id: mypy
         name: mypy
-        entry: mypy
+        entry: mypy --config-file vlm/pyproject.toml
         language: system
         types: [python]
         pass_filenames: true
