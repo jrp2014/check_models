@@ -38,14 +38,14 @@ Do NOT introduce a new function solely to silence a complexity / length warning 
 
 - Third‑party stubs are generated locally into `typings/` using `vlm/tools/generate_stubs.py`.
 - `typings/` is git‑ignored; do not commit generated stubs.
-- `mypy_path = ["typings"]` is configured in `vlm/pyproject.toml` so mypy picks them up.
+- `mypy_path = ["typings"]` is configured in `pyproject.toml` so mypy picks them up.
 - Make targets:
   - `make -C vlm stubs` — generate/update stubs
   - `make -C vlm stubs-clear` — clear generated stubs
 
 ## Dependency source of truth
 
-- `vlm/pyproject.toml` is authoritative for dependencies.
+- `pyproject.toml` at the repo root is authoritative for dependencies.
 - Use `tools/update_readme_deps.py` to sync README install blocks.
 - Keep runtime set slim — only libraries imported by `check_models.py` — and move optional tooling to extras.
 
@@ -309,7 +309,7 @@ git commit -m "Sync README dependency blocks"
 ```bash
 cat > .git/hooks/pre-commit <<'HOOK'
 #!/usr/bin/env bash
-if git diff --cached --name-only | grep -q '^vlm/pyproject.toml$'; then
+if git diff --cached --name-only | grep -q '^pyproject.toml$'; then
   echo '[pre-commit] Syncing README dependency blocks'
   cd vlm && python tools/update_readme_deps.py || exit 1
   git add vlm/README.md

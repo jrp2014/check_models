@@ -67,7 +67,7 @@ make -C vlm stubs-clear && make -C vlm stubs
 
 ## Conventions
 
-See `STYLE_GUIDE.md` for coding conventions, including dependency sync, pyproject shape, and quality gates. The `vlm/pyproject.toml` is the source of truth for dependency lists; the README blocks are kept in sync by the `tools/update_readme_deps.py` script.
+See `STYLE_GUIDE.md` for coding conventions, including dependency sync, pyproject shape, and quality gates. The root `pyproject.toml` is the source of truth for dependency lists; the README blocks are kept in sync by the `vlm/tools/update_readme_deps.py` script.
 
 ## Contributing
 

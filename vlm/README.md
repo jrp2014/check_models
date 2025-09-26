@@ -525,7 +525,7 @@ Key targets:
 | `make format` | Run `ruff format` | Applies canonical formatting. |
 | `make lint` | Run `ruff check` (no fixes) | Fails on style violations. |
 | `make lint-fix` | Run `ruff check --fix` | Auto‑fixes where safe. |
-| `make typecheck` | Run `mypy` | Uses `vlm/pyproject.toml` config. |
+| `make typecheck` | Run `mypy` | Uses root `pyproject.toml` config. |
 | `make test` | Run pytest suite | Uses settings in `pyproject.toml`. |
 | `make test-cov` | Pytest with coverage | Generates terminal + XML report. |
 | `make quality` | Invoke integrated quality script | Wraps format + lint + mypy. |
@@ -568,7 +568,7 @@ If you prefer manual commands, the traditional workflow still works:
 1. `pip install -e ".[dev]"`
 2. `ruff format vlm/check_models.py vlm/tests`
 3. `ruff check --fix vlm/check_models.py vlm/tests`
-4. `mypy --config-file vlm/pyproject.toml vlm/check_models.py`
+4. `mypy --config-file pyproject.toml vlm/check_models.py`
 5. `pytest -q`
 
 ### Contribution Guidelines

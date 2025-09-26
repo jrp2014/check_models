@@ -19,13 +19,13 @@ jobs:
       - name: Install project (dev + extras)
         run: |
           python -m pip install --upgrade pip
-          pip install -e vlm[dev,extras]
+          pip install -e .[dev,extras]
       - name: Ruff lint
         run: ruff check .
       - name: Ruff format check
         run: ruff format --check .
       - name: Mypy
-        run: mypy --config-file vlm/pyproject.toml vlm/tools/check_dependency_sync.py
+        run: mypy --config-file pyproject.toml vlm/tools/check_dependency_sync.py
       - name: Dependency sync check
         run: python -m vlm.tools.check_dependency_sync
       - name: Pytest (format tests only)

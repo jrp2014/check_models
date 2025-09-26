@@ -239,7 +239,7 @@ def main(argv: list[str] | None = None) -> int:
         "mypy",
         [
             "--config-file",
-            str(repo_root / "vlm/pyproject.toml"),
+            str(repo_root / "pyproject.toml"),
             "--exclude",
             r"typings/tokenizers/.*",
             *paths,
@@ -256,7 +256,7 @@ def main(argv: list[str] | None = None) -> int:
             "mypy",
             [
                 "--config-file",
-                str(repo_root / "vlm/pyproject.toml"),
+                str(repo_root / "pyproject.toml"),
                 str(repo_root / args.stubs_path),
             ],
             cwd=repo_root,

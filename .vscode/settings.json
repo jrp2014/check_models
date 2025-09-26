@@ -13,8 +13,8 @@
     "reportUnknownVariableType": "none"
   },
   // Ensure tooling extensions load the correct project configuration
-  "ruff.configuration": "${workspaceFolder}/vlm/pyproject.toml",
-  "mypy.configFile": "${workspaceFolder}/vlm/pyproject.toml",
+  "ruff.configuration": "${workspaceFolder}/pyproject.toml",
+  "mypy.configFile": "${workspaceFolder}/pyproject.toml",
   "markdownlint.configPath": "${workspaceFolder}/.markdownlint.json",
   // Keep pytest discovery scoped to the package tests
   "python.testing.pytestArgs": ["vlm/tests"],
