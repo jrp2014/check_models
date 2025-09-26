@@ -18,6 +18,7 @@ from __future__ import annotations
 import argparse
 import importlib
 import logging
+import os
 import shutil
 import subprocess
 import sys
@@ -48,6 +49,35 @@ def _run(cmd: list[str], *, cwd: Path | None = None) -> int:
         check=False,
     )
     return int(proc.returncode or 0)
+
+
+def _run_tool_or_module(
+    tool: str,
+    module: str,
+    args: list[str],
+    *,
+    cwd: Path | None = None,
+) -> int:
+    """Run a CLI tool if on PATH, else try `python -m <module>`.
+
+    Safety: Only allows known tool/module pairs. Uses direct subprocess.run for
+    the module fallback without shell.
+    """
+    if tool not in {"ruff", "mypy"} or module not in {"ruff", "mypy"}:
+        msg = f"Disallowed tool/module: {tool} / {module}"
+        raise ValueError(msg)
+    if _have(tool):
+        return _run([tool, *args], cwd=cwd)
+    # Fallback: python -m <module>
+    try:
+        proc = subprocess.run(  # noqa: S603
+            [sys.executable, "-m", module, *args],
+            cwd=str(cwd) if cwd else None,
+            check=False,
+        )
+        return int(proc.returncode or 0)
+    except (OSError, subprocess.SubprocessError):
+        return 1
 
 
 def _have(tool: str) -> bool:
@@ -165,7 +195,7 @@ def _ensure_stubs(repo_root: Path, *, refresh: bool, require: bool) -> int:
     return 0
 
 
-def main(argv: list[str] | None = None) -> int:  # noqa: PLR0912 - cohesive CLI flow
+def main(argv: list[str] | None = None) -> int:
     """Run selected quality checks and return combined exit status."""
     # Basic logging setup
     logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -175,6 +205,10 @@ def main(argv: list[str] | None = None) -> int:  # noqa: PLR0912 - cohesive CLI 
 
     overall_rc = 0
 
+    # Basic diagnostics to help when VS Code terminals miss PATH entries
+    logger.info("[quality] Python: %s", sys.executable)
+    logger.info("[quality] PATH: %s", os.environ.get("PATH", ""))
+
     # Optionally (re)generate stubs prior to mypy
     if not args.no_stubs:
         rc = _ensure_stubs(repo_root, refresh=args.refresh_stubs, require=args.require)
@@ -182,64 +216,53 @@ def main(argv: list[str] | None = None) -> int:  # noqa: PLR0912 - cohesive CLI 
 
     # Formatter step (default on; disable with --no-format)
     if not args.no_format:
-        if _have("ruff"):
-            logger.info("[quality] ruff format ...")
-            rc = _run(["ruff", "format", *paths], cwd=repo_root)
-            overall_rc = overall_rc or rc
-        else:
-            msg = "[quality] ruff not found; skipping format"
-            logger.warning(msg)
+        logger.info("[quality] ruff format ...")
+        rc = _run_tool_or_module("ruff", "ruff", ["format", *paths], cwd=repo_root)
+        if rc != 0:
+            logger.warning("[quality] ruff format failed or missing")
             if args.require:
-                overall_rc = 1
+                overall_rc = overall_rc or rc
 
     # Ruff check
-    if _have("ruff"):
-        logger.info("[quality] ruff check ...")
-        cmd = ["ruff", "check", *paths]
-        if not args.no_fix:
-            cmd.append("--fix")
-        rc = _run(cmd, cwd=repo_root)
+    logger.info("[quality] ruff check ...")
+    check_args = ["check", *paths]
+    if not args.no_fix:
+        check_args.append("--fix")
+    rc = _run_tool_or_module("ruff", "ruff", check_args, cwd=repo_root)
+    if rc != 0 and args.require:
         overall_rc = overall_rc or rc
-    else:
-        msg = "[quality] ruff not found; skipping lint"
-        logger.warning(msg)
-        if args.require:
-            overall_rc = 1
 
     # mypy
-    if _have("mypy"):
-        logger.info("[quality] mypy type check ...")
-        # Explicitly point to the project config to honor mypy_path=typings
-        rc = _run(
+    logger.info("[quality] mypy type check ...")
+    rc = _run_tool_or_module(
+        "mypy",
+        "mypy",
+        [
+            "--config-file",
+            str(repo_root / "vlm/pyproject.toml"),
+            "--exclude",
+            r"typings/tokenizers/.*",
+            *paths,
+        ],
+        cwd=repo_root,
+    )
+    if rc != 0 and args.require:
+        overall_rc = overall_rc or rc
+    # Optionally, also check the stubs package itself
+    if args.check_stubs:
+        logger.info("[quality] mypy type check (stubs: %s) ...", args.stubs_path)
+        rc2 = _run_tool_or_module(
+            "mypy",
+            "mypy",
             [
-                "mypy",
                 "--config-file",
                 str(repo_root / "vlm/pyproject.toml"),
-                "--exclude",
-                r"typings/tokenizers/.*",
-                *paths,
+                str(repo_root / args.stubs_path),
             ],
             cwd=repo_root,
         )
-        overall_rc = overall_rc or rc
-        # Optionally, also check the stubs package itself
-        if args.check_stubs:
-            logger.info("[quality] mypy type check (stubs: %s) ...", args.stubs_path)
-            rc2 = _run(
-                [
-                    "mypy",
-                    "--config-file",
-                    str(repo_root / "vlm/pyproject.toml"),
-                    str(repo_root / args.stubs_path),
-                ],
-                cwd=repo_root,
-            )
+        if rc2 != 0 and args.require:
             overall_rc = overall_rc or rc2
-    else:
-        msg = "[quality] mypy not found; skipping type check"
-        logger.warning(msg)
-        if args.require:
-            overall_rc = 1
 
     if overall_rc == 0:
         logger.info("[quality] All selected checks passed")
