@@ -299,7 +299,7 @@ Automation:
 - A GitHub Actions workflow (`.github/workflows/dependency-sync.yml`) enforces that README dependency blocks match `pyproject.toml`. If it fails, run:
 
 ```bash
-cd vlm && python tools/update_readme_deps.py
+python -m vlm.tools.update_readme_deps
 git add vlm/README.md
 git commit -m "Sync README dependency blocks"
 ```
@@ -311,7 +311,7 @@ cat > .git/hooks/pre-commit <<'HOOK'
 #!/usr/bin/env bash
 if git diff --cached --name-only | grep -q '^pyproject.toml$'; then
   echo '[pre-commit] Syncing README dependency blocks'
-  cd vlm && python tools/update_readme_deps.py || exit 1
+  python -m vlm.tools.update_readme_deps || exit 1
   git add vlm/README.md
 fi
 HOOK

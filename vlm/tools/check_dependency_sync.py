@@ -40,7 +40,7 @@ def main() -> int:
     """
     repo_root = Path(__file__).resolve().parents[1]
     pyproject = repo_root / "pyproject.toml"
-    readme = repo_root / "README.md"
+    readme = repo_root / "vlm" / "README.md"
     deps = parse_pyproject(pyproject)
     # deps already a mapping name -> spec
     # build_install_command returns 'pip install "pkg>=ver" ...'

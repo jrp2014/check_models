@@ -150,7 +150,7 @@ def main() -> int:
     """
     repo_root = Path(__file__).resolve().parents[1]
     pyproject_path = repo_root / "pyproject.toml"
-    readme_path = repo_root / "README.md"
+    readme_path = repo_root / "vlm" / "README.md"
     try:
         py_text = pyproject_path.read_text(encoding="utf-8")
         deps = parse_pyproject(pyproject_path)

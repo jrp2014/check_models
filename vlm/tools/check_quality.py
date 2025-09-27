@@ -241,7 +241,7 @@ def main(argv: list[str] | None = None) -> int:
             "--config-file",
             str(repo_root / "pyproject.toml"),
             "--exclude",
-            r"typings/tokenizers/.*",
+            r"(typings/tokenizers/.*)|(typings/tokenizers)",
             *paths,
         ],
         cwd=repo_root,

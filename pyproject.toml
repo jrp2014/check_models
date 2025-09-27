@@ -173,6 +173,14 @@ module = [
 ]
 disallow_untyped_defs = false
 
+# Third-party stub package `tokenizers` in typings can be noisy; ignore errors inside it.
+[[tool.mypy.overrides]]
+module = [
+    "tokenizers",
+    "tokenizers.*",
+]
+ignore_errors = true
+
 [tool.pytest.ini_options]
 # Limit test discovery to the dedicated tests package inside the project
 # (avoids collecting helper scripts or example snippets).

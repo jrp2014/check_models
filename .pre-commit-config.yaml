@@ -43,7 +43,7 @@ repos:
         entry: python -m vlm.tools.check_dependency_sync
         language: system
         pass_filenames: false
-        files: ^(pyproject\.toml|README\.md)$
+        files: ^(pyproject\.toml|vlm/README\.md)$
       - id: mypy
         name: mypy
         entry: mypy --config-file pyproject.toml

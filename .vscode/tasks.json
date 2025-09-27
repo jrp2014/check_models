@@ -1,22 +1,46 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "Quality: ruff + mypy",
-      "type": "shell",
-      "command": "bash",
-      "args": ["vlm/tools/run_quality.sh", "--require"],
-      "options": {
-        "env": { "ZSH_DISABLE_COMPFIX": "true" }
-      },
-      "isBackground": false,
-      "problemMatcher": [],
-  "group": { "kind": "test", "isDefault": true },
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated",
-        "clear": true
-      }
-    }
-  ]
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Quality: ruff + mypy",
+			"type": "shell",
+			"command": "bash",
+			"args": [
+				"vlm/tools/run_quality.sh",
+				"--require"
+			],
+			"options": {
+				"env": {
+					"ZSH_DISABLE_COMPFIX": "true"
+				}
+			},
+			"isBackground": false,
+			"problemMatcher": [],
+			"group": {
+				"kind": "test",
+				"isDefault": true
+			},
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"clear": true
+			}
+		},
+		{
+			"label": "Quality: ruff + mypy",
+			"type": "shell",
+			"command": "bash",
+			"args": [
+				"vlm/tools/run_quality.sh",
+				"--require"
+			],
+			"isBackground": false,
+			"problemMatcher": [
+				"$flake8",
+				"$tsc",
+				"$eslint - stylish"
+			],
+			"group": "test"
+		}
+	]
 }

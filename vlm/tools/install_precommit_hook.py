@@ -37,7 +37,7 @@ cd "$REPO_ROOT"
 if git diff --cached --name-only | grep -q '^pyproject.toml$'; then
   echo '[pre-commit] Syncing README dependency blocks'
   python -m vlm.tools.update_readme_deps || exit 1
-  git add README.md
+  git add vlm/README.md
 fi
 
 # 2) Ensure local type stubs for mypy (mlx_vlm, tokenizers)
