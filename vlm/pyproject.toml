@@ -127,7 +127,10 @@ ignore_missing_imports = true
 warn_unused_ignores = true
 no_implicit_optional = true
 # Search path for local type stubs (generated via stubgen into ./typings)
-mypy_path = ["typings"]
+# Only use our curated stubs for mlx_vlm; avoid scanning tokenizers stubs which are noisy
+mypy_path = ["typings/mlx_vlm"]
+# Exclude third-party stub trees that may contain incomplete or conflicting definitions
+exclude = ["^typings/tokenizers/.*"]
 # Do not descend into imports; treat imported modules as 'Any' unless stubs exist
 follow_imports = "skip"
 # For stricter checking, you can enable the following:

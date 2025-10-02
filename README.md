@@ -5,6 +5,8 @@ This repository hosts a small, focused project centered on `vlm/check_models.py`
 
 If you just want to run the script on your images, see the “TL;DR for Users” section in `vlm/README.md`. If you want to contribute to the script or tooling, see the Contributors section in the same file.
 
+Note on folder input: when you pass a folder path, the tool will automatically select the most recently modified, non-hidden image file in that folder. Override this by passing a direct file path (CLI in `vlm/README.md`).
+
 ## Layout
 
 - `vlm/` — Python package with the main script, tests, and tools
@@ -63,4 +65,4 @@ make -C vlm stubs-clear && make -C vlm stubs
 
 ## Conventions
 
-See `STYLE_GUIDE.md` for coding conventions, including dependency sync, pyproject shape, and quality gates. The `vlm/pyproject.toml` is the source of truth for dependency lists; the README blocks are kept in sync by the `tools/update_readme_deps.py` script.
+See `STYLE_GUIDE.md` for coding conventions (contributing guide), including dependency sync, pyproject shape, folder structure conventions, and quality gates. The `vlm/pyproject.toml` is the source of truth for dependency lists; the README blocks are kept in sync by the `tools/update_readme_deps.py` script.

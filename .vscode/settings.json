@@ -9,6 +9,13 @@
     }
   },
   "terminal.integrated.defaultProfile.osx": "zsh-conda-mlx-vlm",
+  "python.defaultInterpreterPath": "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/bin/python",
+  "python.terminal.activateEnvironment": true,
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": [
+    "vlm/tests"
+  ],
+  "mypy.configFile": "vlm/pyproject.toml",
   "python.analysis.diagnosticSeverityOverrides": {
     "reportUnknownVariableType": "none"
   }
