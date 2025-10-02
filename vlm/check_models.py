@@ -61,11 +61,11 @@ if TYPE_CHECKING:
     import types
     from collections.abc import Callable, Iterator
     from zoneinfo import ZoneInfo
-    # Avoid importing GenerationResult for type checking in environments without mlx-vlm
+
+    from mlx.nn import Module
 
 LOGGER_NAME: Final[str] = "mlx-vlm-check"
 NOT_AVAILABLE: Final[str] = "N/A"
-_SOFT_IMPORT: Final[bool] = os.getenv("MLX_VLM_SOFT_IMPORT", "0") == "1"
 
 ERROR_MLX_MISSING: Final[str] = "Core dependency missing: mlx. Please install it."
 ERROR_PILLOW_MISSING: Final[str] = (
@@ -87,120 +87,30 @@ HOUR_THRESHOLD_SECONDS: Final[int] = 3600  # Threshold for displaying HH:MM:SS r
 
 _temp_logger = logging.getLogger(LOGGER_NAME)
 
-# Optional mlx import: keep symbol bound even in soft-import mode
-mx: Any | None
 try:
     import mlx.core as mx
 except ImportError:
     _temp_logger.exception(ERROR_MLX_MISSING)
-    if _SOFT_IMPORT:
-        mx = None
-    else:
-        sys.exit(1)
-
-TAGS: dict[int, str] = {}
-GPSTAGS: dict[int, str] = {}
+    sys.exit(1)
 
 try:
-    import PIL.ExifTags as _PIL_ExifTags
-    from PIL import Image as _PIL_Image
-    from PIL import UnidentifiedImageError as _PIL_UnidentifiedImageError
+    from PIL import ExifTags, Image, UnidentifiedImageError
+    from PIL.ExifTags import GPSTAGS, TAGS
 
-    pillow_version: str = getattr(_PIL_Image, "__version__", NOT_AVAILABLE)
-    # Bind public names once to avoid cross-branch redefinition noise in type checkers
-    ExifTags = _PIL_ExifTags
-    Image = _PIL_Image
-    UnidentifiedImageError = _PIL_UnidentifiedImageError
-    TAGS = _PIL_ExifTags.TAGS
-    GPSTAGS = _PIL_ExifTags.GPSTAGS
+    pillow_version: str = Image.__version__ if hasattr(Image, "__version__") else NOT_AVAILABLE
 except ImportError:
     _temp_logger.critical(ERROR_PILLOW_MISSING)
     pillow_version = NOT_AVAILABLE
+    sys.exit(1)
 
-    # Ensure names are bound in soft-import mode to avoid NameError downstream
-    class _ImageOpenStub:
-        size: tuple[int, int] = (0, 0)
-
-        def __enter__(self) -> Self:  # pragma: no cover - error path
-            # Simulate runtime failure when Pillow is unavailable
-            raise OSError(ERROR_PILLOW_MISSING)
-
-        def __exit__(
-            self,
-            _exc_type: type[BaseException] | None,
-            _exc: BaseException | None,
-            _tb: types.TracebackType | None,
-        ) -> None:  # pragma: no cover - error path
-            return None
-
-        def verify(self) -> None:  # pragma: no cover - error path
-            return None
-
-        def getexif(self) -> dict[str, object]:  # pragma: no cover - error path
-            return {}
-
-    class _ImageStub:
-        __version__ = "N/A"
-
-        @staticmethod
-        def open(_path: str | Path) -> _ImageOpenStub:  # pragma: no cover - error path
-            return _ImageOpenStub()
-
-    Image = _ImageStub
-    ExifTags = None
-    # Note: TAGS/GPSTAGS remain empty dicts in soft-import mode
-
-    class _DummyUnidentifiedImageError(Exception):
-        pass
-
-    UnidentifiedImageError = _DummyUnidentifiedImageError
-    if not _SOFT_IMPORT:
-        sys.exit(1)
-
-_mlg: Any | None = None
-_mpu: Any | None = None
-_mu: Any | None = None
 try:
-    import mlx_vlm.generate as _mlg
-    import mlx_vlm.prompt_utils as _mpu
-    import mlx_vlm.utils as _mu
+    from mlx_vlm.generate import GenerationResult, generate
+    from mlx_vlm.prompt_utils import apply_chat_template
+    from mlx_vlm.utils import load
     from mlx_vlm.version import __version__ as vlm_version
-
-    # Avoid binding GenerationResult for static typing to keep soft-import light
 except ImportError:
     _temp_logger.critical(ERROR_MLX_VLM_MISSING)
-    if _SOFT_IMPORT:
-        vlm_version = NOT_AVAILABLE
-        # Note: in soft-import mode, generate/load/apply_chat_template proxies will raise if used
-    else:
-        sys.exit(1)
-
-
-def generate(*args: object, **kwargs: object) -> object:
-    """Proxy to mlx_vlm.generate.generate with import guard."""
-    if _mlg is None:
-        del args, kwargs
-        raise RuntimeError(ERROR_MLX_VLM_MISSING)
-    return _mlg.generate(*args, **kwargs)
-
-
-def apply_chat_template(*args: object, **kwargs: object) -> object:
-    """Proxy to mlx_vlm.prompt_utils.apply_chat_template with import guard."""
-    if _mpu is None:
-        del args, kwargs
-        raise RuntimeError(ERROR_MLX_VLM_MISSING)
-    return _mpu.apply_chat_template(*args, **kwargs)
-
-
-def load(*args: object, **kwargs: object) -> tuple[object, object]:
-    """Proxy to mlx_vlm.utils.load with import guard (returns model, tokenizer)."""
-    if _mu is None:
-        del args, kwargs
-        raise RuntimeError(ERROR_MLX_VLM_MISSING)
-    ret = _mu.load(*args, **kwargs)
-    return cast("tuple[object, object]", ret)
-
-
+    sys.exit(1)
 try:
     import mlx_lm
 
@@ -943,19 +853,6 @@ MetricValue = int | float | str | bool | None  # Common scalar metric variants f
 
 
 @runtime_checkable
-class SupportsExifRaw(Protocol):
-    """Minimal EXIF mapping/proxy we rely on from Pillow's Exif object."""
-
-    def items(self) -> Iterator[tuple[int, ExifValue]]:  # pragma: no cover - typing aid
-        """Iterate over (tag_id, value) pairs like a mapping."""
-        ...
-
-    def get_ifd(self, ifd: object) -> object:  # pragma: no cover - typing aid
-        """Return a sub-IFD object for the given identifier."""
-        ...
-
-
-@runtime_checkable
 class SupportsGenerationResult(Protocol):  # Minimal attributes we read from GenerationResult
     """Structural subset of GenerationResult accessed by this script.
 
@@ -1022,40 +919,64 @@ GPS_INFO_TAG_ID: Final[int] = 34853  # Standard EXIF tag ID for GPS IFD
 
 @dataclass(frozen=True)
 class PerformanceResult:
-    """Per-model generation output and timing/error metadata."""
+    """Encapsulates a GenerationResult and execution metadata for a model run."""
 
     model_name: str
-    generation: SupportsGenerationResult | None
+    generation: GenerationResult | SupportsGenerationResult | None
     success: bool
-
-    # Optional diagnostics/timing populated by pipeline
-    generation_time: float | None = None
-    model_load_time: float | None = None
-    total_time: float | None = None
-
-    # Failure context (only set when success == False)
     error_stage: str | None = None
     error_message: str | None = None
     captured_output_on_fail: str | None = None
+    generation_time: float | None = None  # Time taken for generation in seconds
+    model_load_time: float | None = None  # Time taken to load the model in seconds
+    total_time: float | None = None  # Total time including model loading
 
 
-@dataclass
 class ResultSet:
-    """Utility to sort results and compute available metric fields."""
+    """Cache-friendly wrapper around a collection of PerformanceResult.
 
-    _results: list[PerformanceResult]
-    _fields: list[str] | None = None
+    Provides:
+        - Single-pass sorting by generation time (fastest first)
+        - Lazy discovery/caching of available metric fields (generation + timing)
+        - Simple iteration / length protocol support
 
+    Rationale: Multiple rendering paths previously repeated the same sort
+    and field extraction logic. Centralizing reduces duplication and
+    guarantees consistent ordering across console, HTML, and Markdown
+    outputs.
+    """
+
+    __slots__ = ("_fields", "_results")  # Sorted for lint consistency
+
+    def __init__(self, results: list[PerformanceResult]) -> None:
+        """Initialize and sort results.
+
+        A shallow copy of ``results`` is taken to guard against external
+        mutation after construction.
+        """
+        self._results = _sort_results_by_time(list(results))
+        self._fields: list[str] | None = None
+
+    # Public API -----------------------------------------------------
     @property
-    def results(self) -> list[PerformanceResult]:
-        """Results sorted by total time, falling back to model name."""
-        return _sort_results_by_time(self._results)
+    def results(self) -> list[PerformanceResult]:  # Sorted
+        """Return results sorted by generation time (fastest first)."""
+        return self._results
 
     def fields(self) -> list[str]:
-        """List of available metric fields inferred from successful results."""
+        """Return cached list of metric field names (generation + timing)."""
         if self._fields is None:
-            self._fields = _get_available_fields(self.results)
+            self._fields = _get_available_fields(self._results)
         return self._fields
+
+    # Dunder conveniences --------------------------------------------
+    def __len__(self) -> int:  # pragma: no cover - trivial
+        """Return number of results."""
+        return len(self._results)
+
+    def __iter__(self) -> Iterator[PerformanceResult]:  # pragma: no cover - trivial
+        """Iterate over sorted results."""
+        return iter(self._results)
 
 
 # --- File Handling ---
@@ -1123,37 +1044,31 @@ def print_image_dimensions(image_path: PathLike) -> None:
 
 
 # --- EXIF & Metadata Handling ---
-def _process_ifd0(exif_raw: SupportsExifRaw | dict[int, ExifValue]) -> ExifDict:
+def _process_ifd0(exif_raw: Image.Exif) -> ExifDict:
     exif_decoded: ExifDict = {}
     for tag_id, value in exif_raw.items():
         # Skip SubIFD pointers, we'll handle them separately
-        if ExifTags is not None and tag_id in (ExifTags.Base.ExifOffset, ExifTags.Base.GPSInfo):
+        if tag_id in (ExifTags.Base.ExifOffset, ExifTags.Base.GPSInfo):
             continue
         tag_name: str = TAGS.get(tag_id, str(tag_id))
         exif_decoded[tag_name] = value
     return exif_decoded
 
 
-def _process_exif_subifd(exif_raw: SupportsExifRaw) -> ExifDict:
+def _process_exif_subifd(exif_raw: Image.Exif) -> ExifDict:
     out: ExifDict = {}
     try:
-        if ExifTags is None:
-            return out
-        exif_ifd: object = exif_raw.get_ifd(ExifTags.IFD.Exif)
-        if isinstance(exif_ifd, dict) and exif_ifd:
-            out.update(
-                {TAGS.get(tag_id, str(tag_id)): value for tag_id, value in exif_ifd.items()},
-            )
+        exif_ifd: Any = exif_raw.get_ifd(ExifTags.IFD.Exif)
+        if exif_ifd:
+            out.update({TAGS.get(tag_id, str(tag_id)): value for tag_id, value in exif_ifd.items()})
     except (KeyError, AttributeError, TypeError):
         logger.warning("Could not extract Exif SubIFD")
     return out
 
 
-def _process_gps_ifd(exif_raw: SupportsExifRaw) -> GPSDict | None:
+def _process_gps_ifd(exif_raw: Image.Exif) -> GPSDict | None:
     try:
-        if ExifTags is None:
-            return None
-        gps_ifd: object = exif_raw.get_ifd(ExifTags.IFD.GPSInfo)
+        gps_ifd: Any = exif_raw.get_ifd(ExifTags.IFD.GPSInfo)
         if isinstance(gps_ifd, dict) and gps_ifd:
             gps_decoded: GPSDict = {}
             for gps_tag_id, gps_value in gps_ifd.items():
@@ -1498,18 +1413,12 @@ def _get_available_fields(results: list[PerformanceResult]) -> list[str]:
     """
     # Determine GenerationResult fields (excluding 'text' and 'logprobs')
     gen_fields: list[str] = []
-    first_gen = next(
-        (
-            r.generation
-            for r in results
-            if r.generation is not None and dataclasses.is_dataclass(r.generation)
-        ),
-        None,
-    )
-    if first_gen is not None:
-        gen_fields = [
-            f.name for f in fields(cast("Any", first_gen)) if f.name not in ("text", "logprobs")
-        ]
+    for r in results:
+        if r.generation is not None and dataclasses.is_dataclass(r.generation):
+            gen_fields = [
+                f.name for f in fields(r.generation) if f.name not in ("text", "logprobs")
+            ]
+            break
 
     # Combine with PerformanceResult timing fields
     return gen_fields + PERFORMANCE_TIMING_FIELDS
@@ -1548,7 +1457,7 @@ def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceR
         if result.generation_time is not None:
             return float(result.generation_time)
 
-        # Fallback: calculate time from generation tokens-per-second if available
+        # Fallback: calculate time from GenerationResult tokens-per-second if available
         if (
             result.generation
             and hasattr(result.generation, "generation_tokens")
@@ -2307,9 +2216,11 @@ def validate_image_accessible(image_path: PathLike) -> None:
     """Validate image file is accessible and supported."""
     img_path_str: str = str(image_path)
     try:
-        with TimeoutManager(seconds=5):
-            _img = Image.open(img_path_str)
-            del _img
+        with (
+            TimeoutManager(seconds=5),
+            Image.open(img_path_str),
+        ):
+            pass
     except TimeoutError as err:
         msg = f"Timeout while reading image: {img_path_str}"
         raise OSError(msg) from err
@@ -2336,7 +2247,7 @@ def _run_model_generation(
     image_path: Path,
     *,
     verbose: bool,
-) -> SupportsGenerationResult:
+) -> GenerationResult:
     """Load model + processor, apply chat template, run generation, time it.
 
     We keep all loading + formatting + generation steps together because they
@@ -2344,7 +2255,7 @@ def _run_model_generation(
     repo). Errors are wrapped with traceback context so upstream summaries can
     show concise messages while verbose logs retain full detail.
     """
-    model: object  # use object to avoid strict typing in soft-import mode
+    model: Module
     tokenizer: Any  # transformers-compatible tokenizer
 
     # Load model from HuggingFace Hub - this handles automatic download/caching
@@ -2378,7 +2289,7 @@ def _run_model_generation(
     # Time the generation process manually since MLX VLM doesn't include timing
     start_time = time.perf_counter()
     try:
-        output = generate(
+        output: GenerationResult = generate(
             model=model,
             processor=tokenizer,  # MLX VLM accepts both tokenizer types
             prompt=formatted_prompt,
@@ -2410,18 +2321,10 @@ def _run_model_generation(
 
     # Add timing to the GenerationResult object dynamically without tripping linters
     # Cast to Any so mypy doesn't complain about unknown attribute on upstream type
-    output_typed: SupportsGenerationResult = cast("SupportsGenerationResult", output)
-    cast("Any", output_typed).time = end_time - start_time
+    cast("Any", output).time = end_time - start_time
 
-    if mx is not None:
-        params_attr = getattr(model, "parameters", None)
-        if params_attr is not None:
-            with contextlib.suppress(Exception):
-                if callable(params_attr):
-                    cast("Any", mx).eval(params_attr())
-                else:
-                    cast("Any", mx).eval(params_attr)
-    return output_typed
+    mx.eval(model.parameters())
+    return output
 
 
 class ProcessImageParams(NamedTuple):
@@ -2482,7 +2385,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
                 temperature=params.temperature,
                 trust_remote_code=params.trust_remote_code,
             )
-            output = _run_model_generation(
+            output: GenerationResult = _run_model_generation(
                 params=gen_params,
                 image_path=params.image_path,
                 verbose=params.verbose,
@@ -2534,9 +2437,8 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             del model
         if tokenizer is not None:
             del tokenizer
-        if mx is not None:
-            mx.clear_cache()
-            mx.reset_peak_memory()
+        mx.clear_cache()
+        mx.reset_peak_memory()
         logger.debug("Cleaned up resources for model %s", params.model_identifier)
 
 
@@ -2610,7 +2512,7 @@ def _summary_parts(res: PerformanceResult, model_short: str) -> list[str]:
     return parts
 
 
-def _preview_generation(gen: SupportsGenerationResult | None) -> None:
+def _preview_generation(gen: GenerationResult | SupportsGenerationResult | None) -> None:
     if not gen:
         return
     text_val = str(getattr(gen, "text", ""))
@@ -2744,7 +2646,7 @@ def _log_compact_metrics(res: PerformanceResult) -> None:
 
 def _build_compact_metric_parts(
     res: PerformanceResult,
-    gen: SupportsGenerationResult,
+    gen: GenerationResult | SupportsGenerationResult,
 ) -> list[str]:
     """Return list of metric segments for compact metrics line."""
     total_time_val = getattr(res, "total_time", None)

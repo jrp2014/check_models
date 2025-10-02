@@ -64,40 +64,8 @@ check: ## Format + lint + typecheck + tests
 	@$(FWD) check
 
 .PHONY: quality
-.PHONY: lint-sh
-lint-sh: ## Lint shell scripts with shellcheck
-	@if command -v shellcheck >/dev/null 2>&1; then \
-	  shellcheck vlm/tools/*.sh; \
-	else \
-	  echo "shellcheck not found. Install with: brew install shellcheck"; exit 1; \
-	fi
-
-.PHONY: fmt-sh
-fmt-sh: ## Format shell scripts with shfmt
-	@if command -v shfmt >/dev/null 2>&1; then \
-	  shfmt -w -i 2 -bn -ci vlm/tools/*.sh; \
-	else \
-	  echo "shfmt not found. Install with: brew install shfmt"; exit 1; \
-	fi
-
-.PHONY: spell
-spell: ## Spell-check with codespell
-	@if command -v codespell >/dev/null 2>&1; then \
-	  codespell -q 3 --skip "*.lock,*.min.js,*.map,*.svg,*.png,*.jpg,*.ico,.git,dist,build,.venv"; \
-	else \
-	  echo "codespell not found. Install with: pip install codespell"; exit 1; \
-	fi
 quality: ## Consolidated quality script (ruff format+lint+mypy on core file)
 	@$(FWD) quality
-.PHONY: lint-md
-lint-md: ## Lint Markdown files with markdownlint-cli2 (via npx if available)
-	@if command -v npx >/dev/null 2>&1; then \
-	  npx --yes markdownlint-cli2 "**/*.md" "#node_modules"; \
-	elif command -v markdownlint-cli2 >/dev/null 2>&1; then \
-	  markdownlint-cli2 "**/*.md" "#node_modules"; \
-	else \
-	  echo "markdownlint not found. Install with: npm i -g markdownlint-cli2"; exit 1; \
-	fi
 
 .PHONY: ci
 ci: ## Full CI pipeline (format check, quality, deps sync, tests)

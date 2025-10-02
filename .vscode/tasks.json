@@ -2,45 +2,34 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "Quality: ruff + mypy",
+			"label": "VLM: Quality checks (ruff format + fix + mypy)",
 			"type": "shell",
 			"command": "bash",
 			"args": [
-				"vlm/tools/run_quality.sh",
-				"--require"
+				"vlm/tools/run_quality.sh"
 			],
 			"options": {
 				"env": {
 					"ZSH_DISABLE_COMPFIX": "true"
 				}
 			},
-			"isBackground": false,
-			"problemMatcher": [],
-			"group": {
-				"kind": "test",
-				"isDefault": true
-			},
-			"presentation": {
-				"reveal": "always",
-				"panel": "dedicated",
-				"clear": true
-			}
+			"problemMatcher": [
+				"$eslint-stylish"
+			],
+			"group": "build"
 		},
 		{
-			"label": "Quality: ruff + mypy",
+			"label": "VLM: Quality checks (ruff format + fix + mypy)",
 			"type": "shell",
 			"command": "bash",
 			"args": [
-				"vlm/tools/run_quality.sh",
-				"--require"
+				"vlm/tools/run_quality.sh"
 			],
 			"isBackground": false,
 			"problemMatcher": [
-				"$flake8",
-				"$tsc",
-				"$eslint - stylish"
+				"$eslint-stylish"
 			],
-			"group": "test"
+			"group": "build"
 		}
 	]
 }

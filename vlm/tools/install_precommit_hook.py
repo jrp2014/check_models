@@ -2,9 +2,9 @@
 
 The hook automates two maintenance steps:
 
-1) Sync README dependency blocks when `pyproject.toml` changes
-  - Runs: `python -m vlm.tools.update_readme_deps`
-  - Adds changes to `README.md` back to the commit
+1) Sync README dependency blocks when `vlm/pyproject.toml` changes
+   - Runs: `cd vlm && python tools/update_readme_deps.py`
+   - Adds changes to `vlm/README.md` back to the commit
 
 2) Ensure local type stubs exist for third-party packages used by mypy
    - If `typings/mlx_vlm/__init__.pyi` or `typings/tokenizers/__init__.pyi` is missing,
@@ -34,9 +34,9 @@ REPO_ROOT=$(git rev-parse --show-toplevel)
 cd "$REPO_ROOT"
 
 # 1) Sync README dependency blocks when pyproject changes
-if git diff --cached --name-only | grep -q '^pyproject.toml$'; then
+if git diff --cached --name-only | grep -q '^vlm/pyproject.toml$'; then
   echo '[pre-commit] Syncing README dependency blocks'
-  python -m vlm.tools.update_readme_deps || exit 1
+  (cd vlm && python tools/update_readme_deps.py) || exit 1
   git add vlm/README.md
 fi
 

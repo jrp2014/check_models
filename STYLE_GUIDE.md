@@ -10,13 +10,6 @@ This guide defines coding conventions for this repository so automated agents (a
 4. Readability & comprehensibility over mechanical micro‑refactors.
 5. Maintain strong, meaningful comments instead of over‑factoring into tiny single‑use helpers.
 
-## Documentation Linting
-
-- We use `markdownlint-cli2` to keep Markdown consistent.
-- Run it locally with `make lint-md` (uses `npx` if available, otherwise a global install).
-- The canonical config is `.markdownlint.json` at the repo root.
-
-
 ## Philosophy
 
 "Readable first." A single medium‑sized, well‑commented function is often clearer than a web of one‑line helpers. Only extract a helper when it:
@@ -38,14 +31,14 @@ Do NOT introduce a new function solely to silence a complexity / length warning 
 
 - Third‑party stubs are generated locally into `typings/` using `vlm/tools/generate_stubs.py`.
 - `typings/` is git‑ignored; do not commit generated stubs.
-- `mypy_path = ["typings"]` is configured in `pyproject.toml` so mypy picks them up.
+- `mypy_path = ["typings"]` is configured in `vlm/pyproject.toml` so mypy picks them up.
 - Make targets:
   - `make -C vlm stubs` — generate/update stubs
   - `make -C vlm stubs-clear` — clear generated stubs
 
 ## Dependency source of truth
 
-- `pyproject.toml` at the repo root is authoritative for dependencies.
+- `vlm/pyproject.toml` is authoritative for dependencies.
 - Use `tools/update_readme_deps.py` to sync README install blocks.
 - Keep runtime set slim — only libraries imported by `check_models.py` — and move optional tooling to extras.
 
@@ -112,7 +105,7 @@ Current config (see `pyproject.toml`):
 
 ### Markdown Linting
 
-Markdown consistency is enforced (optionally) via `markdownlint-cli2` using the configuration in `.markdownlint.json`:
+Markdown consistency is enforced (optionally) via `markdownlint-cli2` using the configuration in `.markdownlint.jsonc`:
 
 - Long lines (MD013) are disabled to allow readable HTML/CSS blocks and wide tables.
 - Inline HTML is allowed (MD033) because the codebase already sanitizes/escapes disallowed tags during report generation.
@@ -299,7 +292,7 @@ Automation:
 - A GitHub Actions workflow (`.github/workflows/dependency-sync.yml`) enforces that README dependency blocks match `pyproject.toml`. If it fails, run:
 
 ```bash
-python -m vlm.tools.update_readme_deps
+cd vlm && python tools/update_readme_deps.py
 git add vlm/README.md
 git commit -m "Sync README dependency blocks"
 ```
@@ -309,9 +302,9 @@ git commit -m "Sync README dependency blocks"
 ```bash
 cat > .git/hooks/pre-commit <<'HOOK'
 #!/usr/bin/env bash
-if git diff --cached --name-only | grep -q '^pyproject.toml$'; then
+if git diff --cached --name-only | grep -q '^vlm/pyproject.toml$'; then
   echo '[pre-commit] Syncing README dependency blocks'
-  python -m vlm.tools.update_readme_deps || exit 1
+  cd vlm && python tools/update_readme_deps.py || exit 1
   git add vlm/README.md
 fi
 HOOK

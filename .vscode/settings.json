@@ -11,12 +11,5 @@
   "terminal.integrated.defaultProfile.osx": "zsh-conda-mlx-vlm",
   "python.analysis.diagnosticSeverityOverrides": {
     "reportUnknownVariableType": "none"
-  },
-  // Ensure tooling extensions load the correct project configuration
-  "ruff.configuration": "${workspaceFolder}/pyproject.toml",
-  "mypy.configFile": "${workspaceFolder}/pyproject.toml",
-  "markdownlint.configPath": "${workspaceFolder}/.markdownlint.json",
-  // Keep pytest discovery scoped to the package tests
-  "python.testing.pytestArgs": ["vlm/tests"],
-  "python.testing.pytestEnabled": true
+  }
 }
