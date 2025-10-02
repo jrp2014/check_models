@@ -1,6 +1,14 @@
 # Contributing to MLX VLM Check
 
-Thank you for your interest in contributing to MLX VLM Check! This document provides guidelines and instructions for contributing to the project.
+Thank you for your interest in contributing to MLX VLM Check! This document guides you through the practical workflow of contributing: getting set up, making changes, and submitting them.
+
+**Target audience**: New contributors, anyone submitting a pull request.
+
+**Related documents**:
+
+- [README.md](README.md) - What this project does and how to use it
+- [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) - Detailed coding standards and technical conventions
+- [vlm/README.md](vlm/README.md) - Package-specific usage and CLI documentation
 
 ## Table of Contents
 
@@ -8,8 +16,9 @@ Thank you for your interest in contributing to MLX VLM Check! This document prov
 - [Making Changes](#making-changes)
 - [Quality Checks](#quality-checks)
 - [Testing](#testing)
+- [Dependency Management](#dependency-management)
 - [Submitting Changes](#submitting-changes)
-- [Release Process](#release-process)
+- [Getting Help](#getting-help)
 
 ## Development Setup
 
@@ -72,7 +81,7 @@ python -m vlm.tools.validate_env --fix
    ```
 
 2. **Make your changes**:
-   - Follow the [STYLE_GUIDE.md](STYLE_GUIDE.md) conventions
+   - Follow the [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) conventions
    - Add tests for new functionality
    - Update documentation as needed
 
@@ -93,7 +102,7 @@ python -m vlm.tools.validate_env --fix
 - **Type annotations**: Required for all new code
 - **Docstrings**: Required for non-obvious functions
 
-See [STYLE_GUIDE.md](STYLE_GUIDE.md) for detailed conventions.
+See [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) for detailed conventions.
 
 ## Quality Checks
 
@@ -184,8 +193,8 @@ cd vlm && pytest -v
    ```
 
 2. **Update documentation**:
-   - Update README.md if adding features
-   - Update STYLE_GUIDE.md if changing conventions
+   - Update README.md if adding user-facing features
+   - Update IMPLEMENTATION_GUIDE.md if changing technical conventions
    - Add docstrings to new functions
 
 3. **Commit your changes**:
@@ -256,7 +265,7 @@ make -C vlm audit
 
 ## Getting Help
 
-- Check [STYLE_GUIDE.md](STYLE_GUIDE.md) for coding conventions
+- Check [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) for coding conventions
 - Review existing issues on GitHub
 - Ask questions in issue comments
 - Run `make -C vlm help` to see available commands

@@ -17,7 +17,7 @@ pytest>=8.0.0
 pytest-cov>=4.0.0
 
 # Type stubs
-types-tqdm
+types-tqdm>=0.1.0
 
 # Dependency management
 pip-tools>=7.0.0

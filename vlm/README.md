@@ -578,7 +578,7 @@ If you prefer manual commands, the traditional workflow still works:
 - Add or update tests when changing output formatting or public CLI flags.
 - Prefer small helper functions over adding more branching to large blocks in `check_models.py`.
 - Document new flags or output changes in this README (search for an existing section to extend rather than creating duplicates).
-- For full conventions (naming, imports, dependency policy, quality gates), see `STYLE_GUIDE.md` in the repository root.
+- For full conventions (naming, imports, dependency policy, quality gates), see `IMPLEMENTATION_GUIDE.md` in the repository root.
 
 ## Important Notes
 
