@@ -1,6 +1,6 @@
 ## Root Makefile: friendly aliases that proxy to the package Makefile in ./vlm
 
-.DEFAULT_GOAL := help
+.DEFAULT_GOAL := check_models
 
 VLM := vlm
 FWD := $(MAKE) -C $(VLM)

@@ -24,7 +24,7 @@ ifneq ($(CONDA_ACTIVE),$(CONDA_ENV))
     endif
 endif
 
-.DEFAULT_GOAL := help
+.DEFAULT_GOAL := check_models
 
 .PHONY: help
 help:
