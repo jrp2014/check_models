@@ -109,6 +109,9 @@ max-complexity = 15
 [tool.ruff.lint.per-file-ignores]
 # Allow higher complexity in the central orchestrator script for now; revisit later.
 "vlm/check_models.py" = ["C901"]
+# CLI tools: allow print statements for user output
+"vlm/tools/check_outdated.py" = ["T201"]
+"vlm/tools/validate_env.py" = ["T201"]
 
 [tool.pylance]
 # Pyright/Pylance configuration
