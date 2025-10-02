@@ -197,6 +197,45 @@ Before refactoring for size:
 - Wrap external calls (filesystem, subprocess, model load) with concise try/except that annotates context.
 - Preserve original exception context with `raise ... from e` when enriching messages.
 
+### Exception Handling Policy
+
+- **Catch specific exceptions** rather than broad `Exception` or bare `except`. Use the most specific exception type that correctly handles the error condition:
+  - File operations: `OSError`, `FileNotFoundError`, `PermissionError`
+  - Type errors: `TypeError`, `AttributeError`
+  - Value errors: `ValueError`, `KeyError`
+  - External library failures: Library-specific exceptions (e.g., `HFValidationError`, `UnidentifiedImageError`)
+- Only catch `Exception` when you truly need to handle any error (e.g., at a top-level error boundary for user-facing error messages).
+- When catching multiple related exceptions, use tuple syntax: `except (TypeError, ValueError, AttributeError):`
+- Document unexpected exceptions in comments if the cause isn't obvious from context.
+- Avoid silent failures: Always log errors or re-raise with context. Use `logger.exception()` to include traceback automatically.
+
+### Constants & Magic Numbers
+
+- **Extract magic numbers** into named `Final` constants at the module or block level when:
+  - The value is used in multiple places (DRY principle)
+  - The semantic meaning isn't immediately obvious from context (e.g., `5.0` → `IMAGE_OPEN_TIMEOUT`)
+  - The value represents a domain concept (e.g., `80` → `GENERATION_WRAP_WIDTH`)
+- Group related constants together with brief comments explaining their purpose.
+- Use type annotations with `Final` to prevent reassignment: `TIMEOUT: Final[float] = 5.0`
+- Constants should be UPPER_SNAKE_CASE and placed near the top of the file after imports.
+- Don't extract constants for:
+  - Single-use values where the semantic meaning is clear from immediate context
+  - Values that are part of an algorithm's definition (e.g., mathematical constants like `0.5` in a midpoint calculation)
+  - Trivial offsets like `0` or `1` when used in obvious contexts (e.g., `list[0]`)
+
+### HTML Output Security
+
+- **Always escape user-controlled content** before inserting into HTML:
+  - Model names, file paths, generated text, error messages
+  - Any data that originates from external sources (user input, file metadata, model outputs)
+- Use `html.escape(text, quote=True)` for all user-controlled strings before HTML insertion.
+- Apply escaping at the point of HTML generation, not earlier (to preserve original data for other uses).
+- Allowlist approach: Only specific, known-safe HTML tags should be permitted in Markdown rendering (e.g., `<br>`, `<code>`).
+- For user-generated content displayed in HTML tables, escape both:
+  - Row headers (model identifiers, paths)
+  - Cell contents (output text, error messages)
+- Rationale: Prevents HTML injection and ensures generated reports render correctly even if model outputs contain HTML-like syntax.
+
 ## External Processes & Paths
 
 - Prefer explicit executable paths if security warnings arise (e.g., `/usr/sbin/system_profiler`).

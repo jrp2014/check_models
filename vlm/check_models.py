@@ -84,6 +84,8 @@ THOUSAND_THRESHOLD: Final[int] = 1000
 MEMORY_GB_INTEGER_THRESHOLD: Final[float] = 10.0  # >= this many GB show as integer (no decimals)
 MARKDOWN_HARD_BREAK_SPACES: Final[int] = 2  # Preserve exactly two trailing spaces for hard breaks
 HOUR_THRESHOLD_SECONDS: Final[int] = 3600  # Threshold for displaying HH:MM:SS runtime
+IMAGE_OPEN_TIMEOUT: Final[float] = 5.0  # Timeout for opening/verifying image files
+GENERATION_WRAP_WIDTH: Final[int] = 80  # Console output wrapping width for generated text
 
 _temp_logger = logging.getLogger(LOGGER_NAME)
 
@@ -179,7 +181,8 @@ class TimeoutManager(contextlib.ContextDecorator):
                 except ValueError as e:
                     # Signal handling restricted (threading/subprocess environment)
                     logger.warning(
-                        "Could not set SIGALRM for timeout: %s. Timeout disabled.",
+                        "Could not set SIGALRM for timeout: %s. "
+                        "Timeout disabled - operations may hang indefinitely.",
                         e,
                     )
                     self.seconds = 0
@@ -370,6 +373,9 @@ MEM_BYTES_TO_GB_THRESHOLD: Final[float] = 1_000_000.0  # > ~1MB treat as raw byt
 MEGAPIXEL_CONVERSION: Final[float] = 1_000_000.0  # Convert pixels to megapixels
 
 # EXIF/GPS coordinate standards: camera hardware stores GPS as degrees-minutes-seconds tuples
+MAX_GPS_COORD_LEN: Final[int] = 3  # Full GPS coordinate tuple (degrees, minutes, seconds)
+MED_GPS_COORD_LEN: Final[int] = 2  # GPS coordinate with 2 elements (degrees, minutes)
+MIN_GPS_COORD_LEN: Final[int] = 1  # GPS coordinate with 1 element (degrees only)
 DMS_LEN: Final[int] = 3  # Full DMS: (degrees, minutes, seconds)
 DM_LEN: Final[int] = 2  # Decimal minutes: (degrees, decimal_minutes)
 MAX_DEGREES: Final[int] = 180
@@ -604,9 +610,9 @@ def get_terminal_width(min_width: int = 60, max_width: int = 120) -> int:
         except ValueError:
             pass
     try:
-        width = shutil.get_terminal_size(fallback=(80, 24)).columns
+        width = shutil.get_terminal_size(fallback=(GENERATION_WRAP_WIDTH, 24)).columns
     except OSError:
-        width = 80
+        width = GENERATION_WRAP_WIDTH
     return max(min_width, min(width, max_width))
 
 
@@ -695,7 +701,7 @@ def _apply_cli_output_preferences(args: argparse.Namespace) -> None:
 
 
 def log_rule(
-    width: int = 80,
+    width: int = GENERATION_WRAP_WIDTH,
     *,
     char: str = "-",
     color: str | None = None,
@@ -1027,9 +1033,9 @@ def find_most_recent_file(folder: PathLike) -> Path | None:
 # Improved error handling in `print_image_dimensions`.
 def print_image_dimensions(image_path: PathLike) -> None:
     """Print the dimensions and megapixel count of an image file."""
-    img_path_str: str = str(image_path)
+    img_path = Path(image_path)
     try:
-        with Image.open(img_path_str) as img:
+        with Image.open(img_path) as img:
             width, height = img.size
             total_pixels = width * height
             logger.info(
@@ -1038,9 +1044,9 @@ def print_image_dimensions(image_path: PathLike) -> None:
                 total_pixels / MEGAPIXEL_CONVERSION,
             )
     except (FileNotFoundError, UnidentifiedImageError):
-        logger.exception("Error with image file %s", img_path_str)
+        logger.exception("Error with image file %s", img_path)
     except OSError:
-        logger.exception("Unexpected error reading image dimensions for %s", img_path_str)
+        logger.exception("Unexpected error reading image dimensions for %s", img_path)
 
 
 # --- EXIF & Metadata Handling ---
@@ -1099,12 +1105,12 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
     Rationale: real-world photographs often contain partially corrupt EXIF
     segments; failing soft ensures we still display whatever remains.
     """
-    img_path_str: str = str(image_path)
+    img_path = Path(image_path)
     try:
-        with Image.open(img_path_str) as img:
+        with Image.open(img_path) as img:
             exif_raw: Any = img.getexif()
             if not exif_raw:
-                logger.debug("No EXIF data found in %s", img_path_str)
+                logger.debug("No EXIF data found in %s", img_path)
                 return None
             exif_decoded: ExifDict = _process_ifd0(exif_raw)
             exif_decoded.update(_process_exif_subifd(exif_raw))
@@ -1114,7 +1120,7 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
             return exif_decoded
     except (FileNotFoundError, UnidentifiedImageError):
         logger.exception(
-            Colors.colored(f"Error reading image file: {img_path_str}", Colors.YELLOW),
+            Colors.colored(f"Error reading image file: {img_path}", Colors.YELLOW),
         )
     return None
 
@@ -1127,11 +1133,6 @@ def to_float(val: float | str) -> float | None:
         return None
     else:
         return temp
-
-
-MAX_GPS_COORD_LEN: Final[int] = 3
-MED_GPS_COORD_LEN: Final[int] = 2
-MIN_GPS_COORD_LEN: Final[int] = 1
 
 
 # Reduce return count and use named constants
@@ -1158,7 +1159,7 @@ def _convert_gps_coordinate(
     return None
 
 
-def _extract_exif_date(img_path_str: str, exif_data: ExifDict) -> str | None:
+def _extract_exif_date(img_path: PathLike, exif_data: ExifDict) -> str | None:
     exif_date = (
         exif_data.get("DateTimeOriginal")
         or exif_data.get("CreateDate")
@@ -1183,7 +1184,7 @@ def _extract_exif_date(img_path_str: str, exif_data: ExifDict) -> str | None:
     try:
         local_tz = get_localzone()
         return datetime.fromtimestamp(
-            Path(img_path_str).stat().st_mtime,
+            Path(img_path).stat().st_mtime,
             tz=local_tz,
         ).strftime("%Y-%m-%d %H:%M:%S %Z")
     except OSError as err:
@@ -1260,11 +1261,11 @@ def extract_image_metadata(image_path: PathLike) -> MetadataDict:
     Returns None for unavailable date/description/gps instead of sentinel strings.
     """
     metadata: MetadataDict = {}
-    img_path_str = str(image_path)
-    exif_data = get_exif_data(img_path_str) or {}
+    img_path = Path(image_path)
+    exif_data = get_exif_data(img_path) or {}
 
     # Date, Description, GPS
-    metadata["date"] = _extract_exif_date(img_path_str, exif_data)
+    metadata["date"] = _extract_exif_date(img_path, exif_data)
     metadata["description"] = _extract_description(exif_data)
     metadata["gps"] = _extract_gps_str(exif_data.get("GPSInfo"))
 
@@ -1892,10 +1893,11 @@ def generate_html_report(
         logger.warning("No table data to generate HTML report.")
         return
 
-    # Escape HTML characters in output text for HTML safety
+    # Escape HTML characters for safety (all user-controlled content: model names, output)
     for i in range(len(rows)):
         for j in range(len(rows[i])):
-            if j == len(rows[i]) - 1:  # Only escape in the last column (output column)
+            # Escape first column (model name) and last column (output text)
+            if j == 0 or j == len(rows[i]) - 1:
                 rows[i][j] = html.escape(str(rows[i][j]))
 
     # Determine column alignment using original field names
@@ -2214,21 +2216,21 @@ def validate_temperature(temp: float) -> None:
 
 def validate_image_accessible(image_path: PathLike) -> None:
     """Validate image file is accessible and supported."""
-    img_path_str: str = str(image_path)
+    img_path = Path(image_path)
     try:
         with (
-            TimeoutManager(seconds=5),
-            Image.open(img_path_str),
+            TimeoutManager(seconds=IMAGE_OPEN_TIMEOUT),
+            Image.open(img_path),
         ):
             pass
     except TimeoutError as err:
-        msg = f"Timeout while reading image: {img_path_str}"
+        msg = f"Timeout while reading image: {img_path}"
         raise OSError(msg) from err
     except UnidentifiedImageError as err:
-        msg = f"File is not a recognized image format: {img_path_str}"
+        msg = f"File is not a recognized image format: {img_path}"
         raise ValueError(msg) from err
     except (OSError, ValueError) as err:
-        msg = f"Error accessing image {img_path_str}: {err}"
+        msg = f"Error accessing image {img_path}: {err}"
         raise OSError(msg) from err
 
 
@@ -2310,10 +2312,10 @@ def _run_model_generation(
             f"Full traceback:\n{traceback.format_exc()}"
         )
         raise ValueError(msg) from gen_known_err
-    except Exception as gen_err:
-        # Catch unexpected exceptions from third-party generate/stream internals
+    except (RuntimeError, TypeError, AttributeError, KeyError) as gen_err:
+        # Model-specific runtime errors (weights, config, tensor ops, missing attributes)
         msg = (
-            f"Unexpected error during generation for {params.model_path}: {gen_err}\n\n"
+            f"Model runtime error during generation for {params.model_path}: {gen_err}\n\n"
             f"Full traceback:\n{traceback.format_exc()}"
         )
         raise ValueError(msg) from gen_err
@@ -2937,6 +2939,37 @@ def get_cached_model_ids() -> list[str]:
         return sorted([repo.repo_id for repo in cache_info.repos])
 
 
+def validate_model_identifier(model_id: str) -> None:
+    """Validate model ID is well-formed (org/name format or existing local path).
+
+    Args:
+        model_id: Model identifier to validate
+
+    Raises:
+        ValueError: If model_id is empty, malformed, or local path doesn't exist
+
+    """
+    if not model_id or not model_id.strip():
+        msg = "Model identifier cannot be empty"
+        raise ValueError(msg)
+
+    # Check if it's a local path (starts with / or ./ or ../)
+    if model_id.startswith(("/", "./", "../")):
+        model_path = Path(model_id)
+        if not model_path.exists():
+            msg = f"Local model path does not exist: {model_id}"
+            raise ValueError(msg)
+        if not model_path.is_dir():
+            msg = f"Local model path is not a directory: {model_id}"
+            raise ValueError(msg)
+    elif " " in model_id:
+        # Hub identifier: basic sanity checks
+        msg = f"Model identifier contains spaces: '{model_id}'"
+        raise ValueError(msg)
+        # Optionally check for org/name format (though single names are valid too)
+        # For now, just ensure it's not obviously malformed
+
+
 def validate_and_warn_model_selection(args: argparse.Namespace) -> None:
     """Validate model selection and warn about ineffective exclusions.
 
@@ -2978,6 +3011,41 @@ def validate_and_warn_model_selection(args: argparse.Namespace) -> None:
                 )
 
 
+def _apply_exclusions(
+    model_list: list[str],
+    exclude_list: list[str],
+    context: str,
+) -> list[str]:
+    """Apply exclusion list to models and log results.
+
+    Args:
+        model_list: List of model identifiers to filter
+        exclude_list: List of models to exclude
+        context: Description for logging (e.g., "explicit list", "cached models")
+
+    Returns:
+        Filtered list with excluded models removed
+
+    """
+    if not exclude_list:
+        return model_list
+
+    excluded_set = set(exclude_list)
+    original_count = len(model_list)
+    filtered = [model for model in model_list if model not in excluded_set]
+    excluded_count = original_count - len(filtered)
+
+    if excluded_count > 0:
+        logger.info(
+            "Excluded %d model(s) from %s. Remaining: %d model(s)",
+            excluded_count,
+            context,
+            len(filtered),
+        )
+
+    return filtered
+
+
 def process_models(
     args: argparse.Namespace,
     image_path: Path,
@@ -2999,42 +3067,20 @@ def process_models(
         # Case 1: Explicit models specified - apply exclusions to this list
         model_identifiers = args.models
         logger.info("Processing specified models: %s", ", ".join(model_identifiers))
-
-        # Apply exclusions to explicit model list if specified
-        if args.exclude:
-            excluded_set = set(args.exclude)
-            original_count = len(model_identifiers)
-
-            # Filter out excluded models from explicit list
-            model_identifiers = [model for model in model_identifiers if model not in excluded_set]
-
-            excluded_count = original_count - len(model_identifiers)
-            if excluded_count > 0:
-                logger.info(
-                    "Excluded %d model(s) from explicit list. Remaining: %d model(s)",
-                    excluded_count,
-                    len(model_identifiers),
-                )
+        model_identifiers = _apply_exclusions(
+            model_identifiers,
+            args.exclude or [],
+            "explicit list",
+        )
     else:
         # Case 2: No explicit models - scan cache and apply exclusions
         logger.info("Scanning cache for models to process...")
         model_identifiers = get_cached_model_ids()
-
-        # Apply exclusions if specified and not using explicit model list
-        if args.exclude and model_identifiers:
-            excluded_set = set(args.exclude)
-            original_count = len(model_identifiers)
-
-            # Filter out excluded models (exact match)
-            model_identifiers = [model for model in model_identifiers if model not in excluded_set]
-
-            excluded_count = original_count - len(model_identifiers)
-            if excluded_count > 0:
-                logger.info(
-                    "Excluded %d model(s) from cached models. Remaining: %d model(s)",
-                    excluded_count,
-                    len(model_identifiers),
-                )
+        model_identifiers = _apply_exclusions(
+            model_identifiers,
+            args.exclude or [],
+            "cached models",
+        )
 
     results: list[PerformanceResult] = []
     if not model_identifiers:
@@ -3043,6 +3089,15 @@ def process_models(
             logger.error("Ensure models are downloaded and cache is accessible.")
     else:
         logger.info("Processing %d model(s)...", len(model_identifiers))
+
+        # Validate all model identifiers before processing
+        for model_id in model_identifiers:
+            try:
+                validate_model_identifier(model_id)
+            except ValueError:
+                logger.exception("Invalid model identifier '%s'", model_id)
+                raise
+
     # Emit legend once if verbose
     if args.verbose:
         log_metrics_legend(detailed=args.detailed_metrics)
