@@ -1,17 +1,23 @@
 ## Root Makefile: friendly aliases that proxy to the package Makefile in ./vlm
 
-.DEFAULT_GOAL := check_models
+.DEFAULT_GOAL := help
 
 VLM := vlm
 FWD := $(MAKE) -C $(VLM)
 
 .PHONY: help
 help: ## Show this help with aligned target descriptions
-	@echo "Available targets:\n"
-	@grep -E '^[a-zA-Z0-9_-]+:.*##' $(MAKEFILE_LIST) \
+	@echo "\033[1;35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+	@echo "\033[1;35m  MLX VLM Check - Vision-Language Model Benchmarking Tool\033[0m"
+	@echo "\033[1;35m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m\n"
+	@echo "\033[1;33m🚀 PRIMARY TARGET:\033[0m\n"
+	@echo "  \033[1;36mmake check_models ARGS='--model <id> --image <path>'\033[0m"
+	@echo "    Run the VLM checker (the main purpose of this project)\n"
+	@echo "\033[1mDevelopment targets:\033[0m\n"
+	@grep -E '^[a-zA-Z0-9_-]+:.*##' $(MAKEFILE_LIST) | grep -v "check_models:" \
 		| sed 's/:.*##/: /' \
 		| awk 'BEGIN {FS=": "; C=28} {printf "  \033[36m%-*s\033[0m %s\n", C, $$1, $$2}'
-	@echo "\n(These commands proxy to ./vlm/Makefile so you don\'t need \"-C vlm\".)"
+	@echo "\n\033[2m(These commands proxy to ./vlm/Makefile so you don't need \"-C vlm\".)\033[0m"
 
 # ------------------------
 # Install / bootstrap
