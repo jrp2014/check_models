@@ -51,11 +51,11 @@ conda activate mlx-vlm
 conda install python=3.13 -y
 
 # 3. Reinstall dependencies (in case of binary compatibility issues)
-pip install --force-reinstall -e "vlm/[dev,extras]"
+pip install --force-reinstall -e "src/[dev,extras]"
 
 # 4. Verify installation
 python --version
-python -m vlm.tools.validate_env
+python -m tools.validate_env
 ```
 
 ### Option 3: Automated Setup Script
@@ -63,7 +63,7 @@ python -m vlm.tools.validate_env
 Use the provided setup script:
 
 ```bash
-cd /path/to/scripts/vlm/tools
+cd /path/to/scripts/src/tools
 ./setup_conda_env.sh
 
 # Follow the prompts - the script will:
