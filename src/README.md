@@ -93,7 +93,7 @@ pip install uv
 uv venv
 source .venv/bin/activate  # On macOS/Linux
 # .venv\Scripts\activate     # On Windows
-uv pip install -e .  # run inside the vlm/ directory (root-level Makefile is a shim)
+uv pip install -e .  # run inside the src/ directory (root-level Makefile is a shim)
 
 # For development with additional tools
 uv pip install -e ".[dev]"
@@ -108,7 +108,7 @@ source .venv/bin/activate  # On macOS/Linux
 # .venv\Scripts\activate     # On Windows
 
 # Install the package
-pip install -e .  # run inside vlm/
+pip install -e .  # run inside src/
 
 # For development
 pip install -e ".[dev]"
@@ -122,7 +122,7 @@ conda create -n mlx-vlm python=3.13
 conda activate mlx-vlm
 
 # Install dependencies
-pip install -e .  # run inside vlm/
+pip install -e .  # run inside src/
 
 # Optional: Install PyTorch and other extras
 pip install -e ".[torch,extras]"
