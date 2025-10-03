@@ -45,7 +45,7 @@ This guide defines technical conventions and implementation details for develope
 
 ## Philosophy
 
-**"Readable first."**
+### Core Principle: Readable First
 
 A single medium-sized, well-commented function is often clearer than a web of one-line helpers.
 
@@ -542,9 +542,9 @@ Potential future enhancements (not required now):
 
 ---
 
-# Dependency Management Strategy
+## Dependency Management Strategy
 
-## Philosophy: Easy Updates + Reproducible Builds
+### Philosophy: Easy Updates + Reproducible Builds
 
 This project uses **pip-tools** to balance two goals:
 
