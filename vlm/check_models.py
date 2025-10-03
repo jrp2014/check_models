@@ -2659,7 +2659,8 @@ def _log_detailed_timings(res: PerformanceResult) -> None:
         gt_disp = gt_val if isinstance(gt_val, str) else f"{generation_time_val:.2f}s"
         pct = (generation_time_val / total_time_val * 100) if total_time_val > 0 else 0
         logger.info(
-            "     ├─ Generation: %s", Colors.colored(f"{gt_disp:>8} ({pct:>3.0f}%)", Colors.WHITE)
+            "     ├─ Generation: %s",
+            Colors.colored(f"{gt_disp:>8} ({pct:>3.0f}%)", Colors.WHITE),
         )
 
     if model_load_time_val and model_load_time_val > 0:
@@ -2667,7 +2668,8 @@ def _log_detailed_timings(res: PerformanceResult) -> None:
         ml_disp = ml_val if isinstance(ml_val, str) else f"{model_load_time_val:.2f}s"
         pct = (model_load_time_val / total_time_val * 100) if total_time_val > 0 else 0
         logger.info(
-            "     └─ Load:       %s", Colors.colored(f"{ml_disp:>8} ({pct:>3.0f}%)", Colors.WHITE)
+            "     └─ Load:       %s",
+            Colors.colored(f"{ml_disp:>8} ({pct:>3.0f}%)", Colors.WHITE),
         )
 
 
@@ -2690,7 +2692,10 @@ def _log_perf_block(res: PerformanceResult) -> None:
         unit = "GB"
         text = str(formatted) if str(formatted).endswith(unit) else f"{formatted} GB"
         logger.info(
-            "     %s %s %s", prefix, label.ljust(11), Colors.colored(f"{text:>8}", Colors.WHITE)
+            "     %s %s %s",
+            prefix,
+            label.ljust(11),
+            Colors.colored(f"{text:>8}", Colors.WHITE),
         )
 
     _log_mem("├─", "Active Δ:", "active_memory", active_mem)
@@ -2743,7 +2748,10 @@ def _log_compact_metrics(res: PerformanceResult) -> None:
 
     if all_tokens:
         token_parts = [
-            f"{fmt_num(all_tokens)} (prompt:{fmt_num(prompt_tokens)}  generated:{fmt_num(gen_tokens)})"
+            (
+                f"{fmt_num(all_tokens)} "
+                f"(prompt:{fmt_num(prompt_tokens)}  generated:{fmt_num(gen_tokens)})"
+            ),
         ]
         tps_parts = []
         if gen_tps:
