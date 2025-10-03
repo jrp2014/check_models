@@ -66,7 +66,7 @@ def _extract_manual_block(readme: str) -> str:
     return m.group(1)
 
 
-def test_readme_runtime_block_matches_pyproject() -> None:  # noqa: D103
+def test_readme_runtime_block_matches_pyproject() -> None:
     py_text = PYPROJECT.read_text(encoding="utf-8")
     rd_text = README.read_text(encoding="utf-8")
     runtime_deps = _parse_runtime_deps(py_text)
