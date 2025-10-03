@@ -234,6 +234,7 @@ Optional (enable additional features):
 |---------|---------|--------|-----------------|
 | Extended system metrics (RAM/CPU) | `psutil` | `extras` | `pip install -e ".[extras]"` or `make install` |
 | Fast tokenizer backends | `tokenizers` | `extras` | `pip install -e ".[extras]"` or `make install` |
+| Tensor operations (for some models) | `einops` | `extras` | `pip install -e ".[extras]"` or `make install` |
 | Language model utilities | `mlx-lm` | `extras` | `pip install -e ".[extras]"` or `make install` |
 | Transformer model support | `transformers` | `extras` | `pip install -e ".[extras]"` or `make install` |
 | PyTorch stack (needed for some models) | `torch`, `torchvision`, `torchaudio` | `torch` | `pip install -e ".[torch]"` or `make install-torch` |

@@ -56,6 +56,8 @@ extras = [
     "psutil>=5.9.0",
     # Fast tokenizer backends
     "tokenizers>=0.15.0",
+    # Tensor operations (required by some model architectures)
+    "einops>=0.6.0",
     # Language-model utilities & transformer inference (not required for base benchmarking)
     "mlx-lm>=0.23.0",
     "transformers>=4.53.0",
