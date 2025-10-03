@@ -25,7 +25,7 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
 ### Prerequisites
 
 - macOS (preferably with Apple Silicon)
-- Python 3.12+
+- Python 3.13+
 - conda or miniconda
 - Git
 
@@ -39,7 +39,7 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
 
 2. **Create and activate conda environment**:
    ```bash
-   conda create -n mlx-vlm python=3.12
+   conda create -n mlx-vlm python=3.13
    conda activate mlx-vlm
    ```
 

@@ -5,7 +5,7 @@ version = "0.1.0"
 authors = [
     { name = "jrp2014", email = "jrp2014@users.noreply.github.com" },
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.13"
 readme = "README.md"
 license = { text = "MIT" }
 keywords = ["mlx", "vision", "language-model", "ai", "image-analysis"]
@@ -15,7 +15,7 @@ classifiers = [
     "Intended Audience :: Science/Research", 
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3 :: Only",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Software Development :: Libraries :: Python Modules",
@@ -116,7 +116,7 @@ max-complexity = 15
 [tool.pylance]
 # Pyright/Pylance configuration
 # See: https://github.com/microsoft/pyright/blob/main/docs/configuration.md
-pythonVersion = "3.12"
+pythonVersion = "3.13"
 typeCheckingMode = "basic" # Can be "off", "basic", or "strict"
 reportMissingImports = true
 reportUnusedImport = "warning"
@@ -124,7 +124,7 @@ reportUnusedImport = "warning"
 [tool.mypy]
 # MyPy configuration
 # See: https://mypy.readthedocs.io/en/stable/config_file.html
-python_version = "3.12"
+python_version = "3.13"
 ignore_missing_imports = true
 # Additional strictness flags (incremental tightening)
 warn_unused_ignores = true

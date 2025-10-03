@@ -91,7 +91,7 @@ A single medium-sized, well-commented function is often clearer than a web of on
 **Requirements**:
 
 - All new functions must be fully typed (parameters + return type)
-- Use `| None` over `Optional[T]` (Python 3.12 style)
+- Use `| None` over `Optional[T]` (Python 3.13 style)
 - Prefer concrete container types (e.g., `list[str]`, `dict[str, Any]`)
 - Use `Protocol` or `TypedDict` only when it materially clarifies usage or makes the code more robust
 
@@ -769,7 +769,7 @@ make -C vlm sync-deps
 # Or nuclear option: recreate environment
 conda deactivate
 conda remove -n mlx-vlm --all
-conda create -n mlx-vlm python=3.12
+conda create -n mlx-vlm python=3.13
 conda activate mlx-vlm
 make -C vlm bootstrap-dev
 ```

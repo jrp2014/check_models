@@ -27,7 +27,7 @@ from typing import Final
 
 logger = logging.getLogger("validate-env")
 
-REQUIRED_PYTHON_VERSION: Final[tuple[int, int]] = (3, 12)
+REQUIRED_PYTHON_VERSION: Final[tuple[int, int]] = (3, 13)
 EXPECTED_CONDA_ENV: Final[str] = "mlx-vlm"
 
 # Core runtime dependencies (subset for quick validation)

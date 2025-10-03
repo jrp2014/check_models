@@ -11,7 +11,7 @@
 
 Defaults assume you have Hugging Face models in your local cache. The tool will discover cached VLMs automatically (unless you pass `--models`), carefully read EXIF metadata (including GPS/time when present) to enrich prompts, and write reports to `results.html` and `results.md` in the current directory.
 
-Quickest start on Apple Silicon (Python 3.12):
+Quickest start on Apple Silicon (Python 3.13):
 
 ```bash
 cd vlm
@@ -140,7 +140,7 @@ chmod +x setup_conda_env.sh
 The script will:
 
 - Check for macOS and Apple Silicon compatibility
-- Create a conda environment with Python 3.12
+- Create a conda environment with Python 3.13
 - Install all required and optional dependencies
 - Install the package in development mode
 - Verify the installation

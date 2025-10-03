@@ -8,7 +8,7 @@
 #
 # Key Features:
 # - Validates macOS/Apple Silicon compatibility
-# - Creates conda environment with Python 3.12
+# - Creates conda environment with Python 3.13
 # - Installs all runtime and optional dependencies  
 # - Optionally installs development tools
 # - Verifies installation and provides usage instructions
@@ -132,9 +132,9 @@ create_environment() {
         fi
     fi
     
-    # Create new environment with Python 3.12
-    log_info "Creating new environment with Python 3.12..."
-    conda create -n "$ENV_NAME" python=3.12 -y
+    # Create new environment with Python 3.13
+    log_info "Creating new environment with Python 3.13..."
+    conda create -n "$ENV_NAME" python=3.13 -y
     
     log_success "Environment '$ENV_NAME' created successfully"
 }
