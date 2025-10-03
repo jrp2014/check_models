@@ -221,7 +221,8 @@ Then report the issue on GitHub.
 
 **Migration Status**: ✅ Complete - All files updated, tests passing
 
-**Tested On**: 
+**Tested On**:
+
 - macOS with Apple Silicon (M1/M2/M3)
 - Python 3.13.0
 

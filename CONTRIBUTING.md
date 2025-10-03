@@ -32,18 +32,21 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
 ### Initial Setup
 
 1. **Clone the repository**:
+
    ```bash
    git clone https://github.com/jrp2014/scripts.git
    cd scripts
    ```
 
 2. **Create and activate conda environment**:
+
    ```bash
    conda create -n mlx-vlm python=3.13
    conda activate mlx-vlm
    ```
 
 3. **Bootstrap development environment**:
+
    ```bash
    make -C vlm bootstrap-dev
    ```
@@ -55,10 +58,12 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
    - Validate the environment
 
    **Optional dependencies**:
+
    - **PyTorch** (needed for some models): `make install-torch`
    - **Everything** (extras + torch + dev): `make install-all`
 
 4. **Verify installation**:
+
    ```bash
    python -m vlm.tools.validate_env
    ```
@@ -80,21 +85,25 @@ python -m vlm.tools.validate_env --fix
 ### Workflow
 
 1. **Create a feature branch**:
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
 
 2. **Make your changes**:
+
    - Follow the [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) conventions
    - Add tests for new functionality
    - Update documentation as needed
 
 3. **Run quality checks locally**:
+
    ```bash
    make -C vlm quality
    ```
 
 4. **Run tests**:
+
    ```bash
    make -C vlm test
    ```
@@ -115,6 +124,7 @@ See [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) for detailed conventions.
 The project uses several automated quality checks:
 
 1. **Ruff** (formatting and linting):
+
    ```bash
    make -C vlm format    # Format code
    make -C vlm lint      # Check linting
@@ -122,17 +132,20 @@ The project uses several automated quality checks:
    ```
 
 2. **Mypy** (type checking):
+
    ```bash
    make -C vlm typecheck
    ```
 
 3. **Tests**:
+
    ```bash
    make -C vlm test
    make -C vlm test-cov  # With coverage
    ```
 
 4. **Combined quality check**:
+
    ```bash
    make -C vlm quality   # Runs format + lint + typecheck
    make -C vlm check     # Runs quality + tests
@@ -147,6 +160,7 @@ The project uses git hooks to enforce quality:
 - **Pre-push**: Runs full quality checks before pushing
 
 To bypass hooks (not recommended):
+
 ```bash
 git commit --no-verify
 git push --no-verify
@@ -155,6 +169,7 @@ git push --no-verify
 ### Continuous Integration
 
 All pull requests must pass:
+
 - Ruff format check (no unformatted code)
 - Ruff lint check (all rules)
 - Mypy type checking (strict mode)
@@ -192,16 +207,19 @@ cd vlm && pytest -v
 ### Pull Request Process
 
 1. **Ensure all checks pass**:
+
    ```bash
    make -C vlm ci
    ```
 
 2. **Update documentation**:
+
    - Update README.md if adding user-facing features
    - Update IMPLEMENTATION_GUIDE.md if changing technical conventions
    - Add docstrings to new functions
 
 3. **Commit your changes**:
+
    ```bash
    git add .
    git commit -m "feat: add amazing feature"
@@ -216,6 +234,7 @@ cd vlm && pytest -v
    - `chore:` for maintenance tasks
 
 4. **Push and create PR**:
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -225,6 +244,7 @@ cd vlm && pytest -v
 ### PR Requirements
 
 Your PR must:
+
 - Pass all CI checks
 - Include tests for new functionality
 - Update relevant documentation
