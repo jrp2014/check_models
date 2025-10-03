@@ -513,7 +513,7 @@ Script behavior:
 - On startup, the script sets `TRANSFORMERS_NO_TF=1`, `TRANSFORMERS_NO_FLAX=1`, `TRANSFORMERS_NO_JAX=1` unless you explicitly opt in with `MLX_VLM_ALLOW_TF=1`.
 - Torch is allowed by default (some models require it).
 - A startup log warns if TensorFlow is installed but disabled; a heads‑up is also logged if `sentence-transformers` is present.
-- Warning: Installing TensorFlow on macOS/Apple Silicon can trigger hangs during import (Abseil mutex). Prefer not installing it in MLX‑only environments.
+- **⚠️ Warning**: Installing TensorFlow on macOS/Apple Silicon can cause the script to crash with `libc++abi: terminating due to uncaught exception of type std::__1::system_error: mutex lock failed: Invalid argument`. This is due to conflicts with the Abseil mutex implementation. **Strongly recommend uninstalling TensorFlow** in MLX-only environments: `pip uninstall tensorflow tensorboard keras` and their transitive dependencies.
 
 ## Notes
 
