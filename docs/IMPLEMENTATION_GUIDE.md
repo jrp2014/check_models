@@ -4,10 +4,13 @@ This guide defines technical conventions and implementation details for develope
 
 **Target audience**: Developers actively modifying code, automated agents making changes, code reviewers.
 
+> **Note**: This project was restructured in October 2025 to follow Python best practices. The old `vlm/` directory is now `src/`. See [notes/RESTRUCTURE_COMPLETED.md](notes/RESTRUCTURE_COMPLETED.md) for details.
+
 **Related documents**:
 
 - [CONTRIBUTING.md](CONTRIBUTING.md) - How to contribute (setup, workflow, PR process)
-- [README.md](README.md) - What this project does and how to use it
+- [README.md](../README.md) - Project overview and quick start
+- [notes/](notes/) - Design notes and project evolution
 - [DEPENDENCY_STRATEGY.md](DEPENDENCY_STRATEGY.md) - Dependency management workflows (embedded below)
 
 ## Table of Contents
@@ -61,11 +64,14 @@ A single medium-sized, well-commented function is often clearer than a web of on
 
 ### Directory Layout
 
-- **`vlm/`** - Single focused package contains all Python code and its `pyproject.toml`
-- **Root `Makefile`** - Shim that forwards targets to `vlm/Makefile`
-- **`typings/`** - Generated `.pyi` stubs (not committed, regenerate via `make -C vlm stubs`)
-- **`README.md`** - High-level layout and quickstart (repo root)
-- **`vlm/README.md`** - Package-specific documentation
+- **`src/`** - Main Python package containing all code and its `pyproject.toml`
+- **`docs/`** - All documentation (CONTRIBUTING.md, IMPLEMENTATION_GUIDE.md, etc.)
+- **`docs/notes/`** - Design notes, reviews, and project evolution documentation
+- **`output/`** - Generated reports (HTML/Markdown, git-ignored)
+- **`typings/`** - Generated `.pyi` stubs (not committed, regenerate via stubs tools)
+- **Root `Makefile`** - User-friendly commands that orchestrate `src/` operations
+- **`README.md`** - Project overview and quick start guide (repo root)
+- **`src/README.md`** - Detailed package usage and CLI documentation
 
 ### Generated Artifacts
 
@@ -75,14 +81,21 @@ A single medium-sized, well-commented function is often clearer than a web of on
 
 ### Typings Policy
 
-- Third-party stubs are generated locally into `typings/` using `vlm/tools/generate_stubs.py`
+- Third-party stubs are generated locally into `typings/` using `src/tools/generate_stubs.py`
 - `typings/` is git-ignored; do not commit generated stubs
-- `mypy_path = ["typings"]` is configured in `vlm/pyproject.toml` so mypy picks them up
+- `mypy_path = ["typings"]` is configured in `src/pyproject.toml` so mypy picks them up
 
-**Make targets**:
+**Generating stubs**:
 
-- `make -C vlm stubs` - Generate/update stubs
-- `make -C vlm stubs-clear` - Clear generated stubs
+```bash
+python -m tools.generate_stubs mlx_vlm tokenizers
+```
+
+Or use the quality check with stub generation:
+
+```bash
+make quality  # Automatically generates stubs if missing
+```
 
 ## Code Standards
 
@@ -423,16 +436,16 @@ Output: a\|b\\c &lt;unk&gt;<br>Next line
 
 ### Dependency Version Synchronization
 
-**Runtime dependency versions MUST stay consistent** between `pyproject.toml` and the install snippets in `vlm/README.md`.
+**Runtime dependency versions MUST stay consistent** between `pyproject.toml` and the install snippets in `src/README.md`.
 
-**Current slim runtime set** (authoritative in `pyproject.toml`):
+**Current slim runtime set** (authoritative in `src/pyproject.toml`):
 `mlx`, `mlx-vlm`, `Pillow`, `huggingface-hub`, `tabulate`, `tzlocal`
 
-**If you add a new import in `vlm/check_models.py`, you MUST also**:
+**If you add a new import in `src/check_models.py`, you MUST also**:
 
-1. Add the dependency to `[project].dependencies` (not just an optional group)
-2. Run `python -m vlm.tools.update_readme_deps`
-3. Commit both `pyproject.toml` and the updated `README.md`
+1. Add the dependency to `[project].dependencies` in `src/pyproject.toml` (not just an optional group)
+2. Run `python -m tools.update_readme_deps` from the src directory
+3. Commit both `src/pyproject.toml` and the updated `src/README.md`
 
 The `test_dependency_sync` test and CI will fail otherwise.
 
@@ -492,7 +505,7 @@ The `pyproject.toml` MUST conform to the official packaging guide: <https://pack
 **Automation**:
 
 - A GitHub Actions workflow (`.github/workflows/dependency-sync.yml`) enforces that README dependency blocks match `pyproject.toml`
-- If it fails, run: `cd vlm && python tools/update_readme_deps.py`
+- If it fails, run: `cd src && python tools/update_readme_deps.py`
 
 **Rationale**: Following the packaging guide ensures forward compatibility with modern build backends, simplifies automated parsing, and avoids ambiguous duplication of dependency sources.
 
@@ -504,9 +517,16 @@ The `pyproject.toml` MUST conform to the official packaging guide: <https://pack
 - Avoid over-mocking
 - Integration smoke tests acceptable for model pipeline (skipped if environment unavailable)
 
+### Running Tests
+
+```bash
+make test           # Run all tests
+pytest src/tests/   # Direct pytest invocation
+```
+
 ### Git Hygiene and Caches
 
-Do not commit ephemeral caches or local environment files. This repository includes a root `.gitignore` and `vlm/.gitignore` that exclude common caches and artifacts:
+Do not commit ephemeral caches or local environment files. This repository includes a root `.gitignore` and `src/.gitignore` that exclude common caches and artifacts:
 
 - Python: `__pycache__/`, `*.py[cod]`
 - Tools: `.pytest_cache/`, `.ruff_cache/`, `.mypy_cache/`, `.hypothesis/`, `.tox/`, `.nox/`
@@ -599,17 +619,17 @@ Update all dependencies to latest compatible versions:
 
 ```bash
 # 1. Upgrade lock files
-make -C vlm upgrade-deps
+make -C src upgrade-deps
 
 # 2. Sync your environment
-make -C vlm sync-deps
+make -C src sync-deps
 
 # 3. Test thoroughly
-make -C vlm check
-make -C vlm test
+make quality
+make test
 
 # 4. Commit if tests pass
-git add vlm/requirements*.txt
+git add src/requirements*.txt
 git commit -m "chore(deps): upgrade dependencies"
 ```
 
@@ -617,17 +637,17 @@ git commit -m "chore(deps): upgrade dependencies"
 
 ```bash
 # 1. Edit requirements.in or requirements-dev.in
-echo "new-package>=1.0.0" >> vlm/requirements.in
+echo "new-package>=1.0.0" >> src/requirements.in
 
 # 2. Regenerate lock files
-make -C vlm lock-deps
+make -C src lock-deps
 
 # 3. Sync and test
-make -C vlm sync-deps
-make -C vlm test
+make -C src sync-deps
+make test
 
 # 4. Commit both .in and .txt files
-git add vlm/requirements*.in vlm/requirements*.txt
+git add src/requirements*.in src/requirements*.txt
 git commit -m "feat(deps): add new-package for X functionality"
 ```
 
@@ -718,7 +738,7 @@ CI uses lock files for reproducibility:
 ```yaml
 # .github/workflows/quality.yml
 - name: Install dependencies
-  run: pip install -r vlm/requirements-dev.txt
+  run: pip install -e src/.[dev]
 ```
 
 ### Dependency Sync Check
@@ -749,15 +769,15 @@ Pre-commit hook ensures `pyproject.toml` and `requirements.in` stay synchronized
 
 ```bash
 # Try with backtracking resolver (default)
-make -C vlm upgrade-deps
+make -C src upgrade-deps
 
 # If still fails, check which package is causing conflict
 pip install pip-tools
-pip-compile vlm/requirements.in --output-file=- 2>&1 | grep -i conflict
+pip-compile src/requirements.in --output-file=- 2>&1 | grep -i conflict
 
 # Temporarily pin the problematic package in .in file
-echo "problematic-package<2.0.0" >> vlm/requirements.in
-make -C vlm lock-deps
+echo "problematic-package<2.0.0" >> src/requirements.in
+make -C src lock-deps
 ```
 
 ### "Environment out of sync"
