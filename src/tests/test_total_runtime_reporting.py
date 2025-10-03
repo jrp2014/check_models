@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from vlm.check_models import PerformanceResult, generate_html_report, generate_markdown_report
+from check_models import PerformanceResult, generate_html_report, generate_markdown_report
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from pathlib import Path

@@ -1,7 +1,7 @@
 """Unit tests for memory formatting heuristics in format_field_value.
 
 These tests intentionally avoid asserting on presence of MLX; if MLX is not
-installed the import of `vlm.check_models` will log an error but still expose
+installed the import of `check_models` will log an error but still expose
 the formatting utilities.
 """
 
@@ -19,7 +19,7 @@ import pytest
 @pytest.fixture(scope="module")
 def mod() -> types.ModuleType:  # type: ignore[override]
     """Import and return the target module once for all tests."""
-    return importlib.import_module("vlm.check_models")
+    return importlib.import_module("check_models")
 
 
 def test_memory_bytes_mid_range(mod: types.ModuleType) -> None:

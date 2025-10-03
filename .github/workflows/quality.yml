@@ -28,7 +28,7 @@ jobs:
       - name: Install core dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e vlm/.[dev]
+          pip install -e src/.[dev]
 
       - name: Verify environment
         run: |
@@ -37,31 +37,31 @@ jobs:
 
       - name: Run ruff format check (no modifications)
         run: |
-          cd vlm
+          cd src
           ruff format --check check_models.py tests tools
         
       - name: Run ruff lint
         run: |
-          cd vlm
+          cd src
           ruff check check_models.py tests tools
 
       - name: Generate type stubs
         run: |
-          cd vlm
+          cd src
           python tools/generate_stubs.py
 
       - name: Run mypy type checking
         run: |
-          cd vlm
+          cd src
           mypy --config-file pyproject.toml check_models.py tests
 
       - name: Run dependency sync check
         run: |
-          python -m vlm.tools.check_dependency_sync
+          python -m tools.check_dependency_sync
 
       - name: Collect and verify tests
         run: |
-          cd vlm
+          cd src
           pytest --collect-only -q > /tmp/test_collect.txt
           COUNT=$(awk '/::/ {c++} END {print c+0}' /tmp/test_collect.txt)
           echo "Collected $COUNT tests"
@@ -72,14 +72,14 @@ jobs:
 
       - name: Run pytest
         run: |
-          cd vlm
+          cd src
           pytest -v --tb=short
 
       - name: Upload coverage (if available)
         if: always()
         continue-on-error: true
         run: |
-          cd vlm
+          cd src
           pytest --cov=. --cov-report=xml --cov-report=term || true
 
   markdown-lint:

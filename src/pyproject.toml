@@ -42,12 +42,11 @@ Repository = "https://github.com/jrp2014/scripts"
 Issues = "https://github.com/jrp2014/scripts/issues"
 
 [project.scripts]
-# Use fully-qualified module path for the CLI entry point (module inside vlm package)
-mlx-vlm-check = "vlm.check_models:main_cli"
+# Use fully-qualified module path for the CLI entry point
+mlx-vlm-check = "check_models:main_cli"
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["vlm*"]
+[tool.setuptools]
+py-modules = ["check_models"]
 
 [project.optional-dependencies]
 # Optional dependencies grouped by use case.

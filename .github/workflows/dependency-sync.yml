@@ -29,16 +29,16 @@ jobs:
 
       - name: Run dependency sync script
         run: |
-          python -m vlm.tools.update_readme_deps
+          python -m tools.update_readme_deps
 
       - name: Run dependency sync verification
         run: |
-          python -m vlm.tools.check_dependency_sync
+          python -m tools.check_dependency_sync
 
       - name: Detect uncommitted changes after sync
         run: |
           if ! git diff --exit-code --quiet; then
-            echo '::error ::README dependency blocks are out of sync with pyproject.toml. Run python -m vlm.tools.update_readme_deps and commit the result.'
+            echo '::error ::README dependency blocks are out of sync with pyproject.toml. Run python -m tools.update_readme_deps and commit the result.'
             echo 'Modified files:'
             git diff --name-only
             exit 1
@@ -46,4 +46,4 @@ jobs:
 
       - name: Ruff lint (sync utilities)
         run: |
-          ruff check vlm/tools/update_readme_deps.py vlm/tools/check_dependency_sync.py
+          ruff check src/tools/update_readme_deps.py src/tools/check_dependency_sync.py

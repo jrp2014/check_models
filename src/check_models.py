@@ -897,8 +897,8 @@ class SupportsGenerationResult(Protocol):  # Minimal attributes we read from Gen
 # These constants define default values for various parameters used in the script.
 DEFAULT_MAX_TOKENS: Final[int] = 500
 DEFAULT_FOLDER: Final[Path] = Path.home() / "Pictures" / "Processed"
-DEFAULT_HTML_OUTPUT: Final[Path] = Path("results.html")
-DEFAULT_MD_OUTPUT: Final[Path] = Path("results.md")
+DEFAULT_HTML_OUTPUT: Final[Path] = Path("output/results.html")
+DEFAULT_MD_OUTPUT: Final[Path] = Path("output/results.md")
 DEFAULT_TEMPERATURE: Final[float] = 0.1
 DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
 

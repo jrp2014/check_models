@@ -6,7 +6,7 @@
 			"type": "shell",
 			"command": "bash",
 			"args": [
-				"vlm/tools/run_quality.sh"
+				"src/tools/run_quality.sh"
 			],
 			"options": {
 				"env": {
@@ -23,7 +23,7 @@
 			"type": "shell",
 			"command": "bash",
 			"args": [
-				"vlm/tools/run_quality.sh"
+				"src/tools/run_quality.sh"
 			],
 			"isBackground": false,
 			"problemMatcher": [

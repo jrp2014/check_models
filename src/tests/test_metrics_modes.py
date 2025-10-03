@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
-from vlm.check_models import (  # type: ignore[attr-defined]
+from check_models import (  # type: ignore[attr-defined]
     PerformanceResult,
     _align_metric_parts,
     print_model_result,
