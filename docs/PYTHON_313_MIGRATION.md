@@ -152,11 +152,11 @@ pip install --no-cache-dir mlx mlx-vlm Pillow
 
 ```bash
 # Clear Python caches
-find vlm -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
-find vlm -type f -name "*.pyc" -delete
+find src -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+find src -type f -name "*.pyc" -delete
 
 # Reinstall in development mode
-pip install -e "vlm/[dev,extras]"
+pip install -e "src/[dev,extras]"
 ```
 
 ### Issue: "torch/torchvision/torchaudio import errors"
@@ -168,12 +168,12 @@ pip install -e "vlm/[dev,extras]"
 make install-torch
 
 # Or directly
-cd vlm
+cd src
 pip install -e ".[torch]"
 
 # Or install everything
 make install-all  # from root
-pip install -e ".[extras,torch,dev]"  # from vlm/
+pip install -e ".[extras,torch,dev]"  # from src/
 ```
 
 ### Issue: "Pre-commit hooks failing"
