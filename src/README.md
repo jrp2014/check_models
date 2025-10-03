@@ -206,7 +206,7 @@ pip install "huggingface-hub>=0.23.0" "mlx>=0.29.1" "mlx-vlm>=0.0.9" "Pillow>=10
 ## Dependencies
 
 Why so slim? The runtime dependency set is intentionally minimized to only the
-packages directly imported by `vlm/check_models.py`. Everything else that might
+packages directly imported by `check_models.py`. Everything else that might
 inference helpers, PyTorch stack) lives in optional extras. Benefits:
 
 - Faster cold installs / CI setup
@@ -217,7 +217,7 @@ If you add a new top‑level import in `check_models.py`, promote its package
 from an optional group (or add it fresh) into the runtime `dependencies` array
 and re-run the sync helper.
 
-Runtime (installed automatically via `pip install -e .` when executed inside `vlm/`, or via `make install` from repo root):
+Runtime (installed automatically via `pip install -e .` when executed inside `src/`, or via `make install` from repo root):
 
 | Purpose | Package | Minimum |
 |---------|---------|---------|
@@ -246,12 +246,12 @@ Optional (enable additional features):
 # From root directory:
 make install-torch
 
-# Or from vlm/ directory:
+# Or from src/ directory:
 pip install -e ".[torch]"
 
 # Install everything (extras + torch + dev):
 make install-all  # from root
-pip install -e ".[extras,torch,dev]"  # from vlm/
+pip install -e ".[extras,torch,dev]"  # from src/
 ```
 
 Development / QA:
