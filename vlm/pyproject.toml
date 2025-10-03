@@ -58,6 +58,8 @@ extras = [
     "tokenizers>=0.15.0",
     # Tensor operations (required by some model architectures)
     "einops>=0.6.0",
+    # Number-to-words conversion (required by some model processors)
+    "num2words>=0.5.0",
     # Language-model utilities & transformer inference (not required for base benchmarking)
     "mlx-lm>=0.23.0",
     "transformers>=4.53.0",
