@@ -21,6 +21,12 @@ pip install -e .
 # Optional extras for system metrics & tokenizers
 pip install -e ".[extras]"
 
+# Optional: Install PyTorch (needed for some models like Phi-3-vision)
+pip install -e ".[torch]"
+
+# Or install everything at once:
+# pip install -e ".[extras,torch]"
+
 # Run against a folder of images (change the path to your images)
 python check_models.py -f ~/Pictures/Processed -p "Describe this image."
 
@@ -112,11 +118,14 @@ pip install -e ".[dev]"
 
 ```bash
 # Create conda environment
-conda create -n mlx-vlm python=3.12
+conda create -n mlx-vlm python=3.13
 conda activate mlx-vlm
 
 # Install dependencies
 pip install -e .  # run inside vlm/
+
+# Optional: Install PyTorch and other extras
+pip install -e ".[torch,extras]"
 ```
 
 #### Automated Setup (Recommended)
@@ -221,13 +230,27 @@ Runtime (installed automatically via `pip install -e .` when executed inside `vl
 
 Optional (enable additional features):
 
-| Feature | Package | Source |
-|---------|---------|--------|
-| Extended system metrics (RAM/CPU) | `psutil` | `extras` |
-| Fast tokenizer backends | `tokenizers` | `extras` |
-| Language model utilities | `mlx-lm` | `extras` |
-| Transformer model support | `transformers` | `extras` |
-| PyTorch stack | `torch`, `torchvision`, `torchaudio` | `torch` extra |
+| Feature | Package | Source | Install Command |
+|---------|---------|--------|-----------------|
+| Extended system metrics (RAM/CPU) | `psutil` | `extras` | `pip install -e ".[extras]"` or `make install` |
+| Fast tokenizer backends | `tokenizers` | `extras` | `pip install -e ".[extras]"` or `make install` |
+| Language model utilities | `mlx-lm` | `extras` | `pip install -e ".[extras]"` or `make install` |
+| Transformer model support | `transformers` | `extras` | `pip install -e ".[extras]"` or `make install` |
+| PyTorch stack (needed for some models) | `torch`, `torchvision`, `torchaudio` | `torch` | `pip install -e ".[torch]"` or `make install-torch` |
+
+**Note**: Some models (e.g., Phi-3-vision, certain Florence2 variants) require PyTorch. If you encounter import errors for `torch`, `torchvision`, or `torchaudio`, install with:
+
+```bash
+# From root directory:
+make install-torch
+
+# Or from vlm/ directory:
+pip install -e ".[torch]"
+
+# Install everything (extras + torch + dev):
+make install-all  # from root
+pip install -e ".[extras,torch,dev]"  # from vlm/
+```
 
 Development / QA:
 

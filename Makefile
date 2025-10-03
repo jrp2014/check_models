@@ -30,6 +30,14 @@ install: ## Editable install (runtime only)
 install-dev: ## Editable install with dev extras
 	@$(FWD) install-dev
 
+.PHONY: install-torch
+install-torch: ## Install PyTorch dependencies (for some models)
+	@$(FWD) install-torch
+
+.PHONY: install-all
+install-all: ## Install all optional dependencies
+	@$(FWD) install-all
+
 .PHONY: bootstrap-dev
 bootstrap-dev: ## Pip bootstrap runtime + dev + extras
 	@$(FWD) bootstrap-dev

@@ -159,6 +159,23 @@ find vlm -type f -name "*.pyc" -delete
 pip install -e "vlm/[dev,extras]"
 ```
 
+### Issue: "torch/torchvision/torchaudio import errors"
+
+**Solution**: Some models require PyTorch. Install the torch extras:
+
+```bash
+# From root directory
+make install-torch
+
+# Or directly
+cd vlm
+pip install -e ".[torch]"
+
+# Or install everything
+make install-all  # from root
+pip install -e ".[extras,torch,dev]"  # from vlm/
+```
+
 ### Issue: "Pre-commit hooks failing"
 
 **Solution**: Reinstall pre-commit hooks:

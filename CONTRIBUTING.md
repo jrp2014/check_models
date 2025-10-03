@@ -54,6 +54,10 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
    - Install pre-commit framework hooks (if available)
    - Validate the environment
 
+   **Optional dependencies**:
+   - **PyTorch** (needed for some models): `make install-torch`
+   - **Everything** (extras + torch + dev): `make install-all`
+
 4. **Verify installation**:
    ```bash
    python -m vlm.tools.validate_env
@@ -228,6 +232,33 @@ Your PR must:
 - Reference any related issues
 
 ## Dependency Management
+
+### Dependency Structure
+
+The project organizes dependencies into groups:
+
+- **Runtime**: Core dependencies needed to run `check_models.py` (mlx, mlx-vlm, Pillow, etc.)
+- **Extras**: Optional enhancements (psutil, tokenizers, mlx-lm, transformers)
+- **Torch**: PyTorch stack for models that require it (torch, torchvision, torchaudio)
+- **Dev**: Development tools (ruff, mypy, pytest)
+
+Install specific groups as needed:
+
+```bash
+# Runtime only (default)
+pip install -e .
+
+# With extras
+pip install -e ".[extras]"
+
+# With PyTorch (needed for some models)
+pip install -e ".[torch]"
+make install-torch  # from root
+
+# Everything
+pip install -e ".[extras,torch,dev]"
+make install-all  # from root
+```
 
 ### Using pip-tools
 

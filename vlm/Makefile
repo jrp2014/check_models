@@ -47,6 +47,14 @@ install: ## Editable install (runtime only)
 install-dev: ## Editable install with dev extras
 	$(RUN_PY) -m pip install -e .[dev]
 
+.PHONY: install-torch
+install-torch: ## Install PyTorch dependencies (needed for some models)
+	$(RUN_PY) -m pip install -e .[torch]
+
+.PHONY: install-all
+install-all: ## Install all optional dependencies (dev + extras + torch)
+	$(RUN_PY) -m pip install -e .[dev,extras,torch]
+
 .PHONY: bootstrap-dev
 bootstrap-dev: ## pip bootstrap runtime + dev + extras + hooks + validation
 	$(RUN_PY) -m pip install --upgrade pip
