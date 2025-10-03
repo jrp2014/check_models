@@ -3,6 +3,10 @@
 # 
 # Update: edit this file, then run: make lock-deps
 # Install: pip install -r requirements.txt
+#
+# Note: Optional extras (psutil, tokenizers, einops, num2words, mlx-lm, transformers)
+# are defined in pyproject.toml [project.optional-dependencies.extras]
+# Install with: pip install -e ".[extras]"
 
 # Core MLX dependencies
 mlx>=0.29.1

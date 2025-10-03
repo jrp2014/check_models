@@ -40,6 +40,16 @@ CORE_PACKAGES: Final[dict[str, str]] = {
     "tzlocal": ">=5.0",
 }
 
+# Optional extras (checked if installed)
+EXTRAS_PACKAGES: Final[dict[str, str]] = {
+    "psutil": ">=5.9.0",
+    "tokenizers": ">=0.15.0",
+    "einops": ">=0.6.0",
+    "num2words": ">=0.5.0",
+    "mlx-lm": ">=0.23.0",
+    "transformers": ">=4.53.0",
+}
+
 # Dev tools
 DEV_TOOLS: Final[dict[str, str]] = {
     "ruff": ">=0.1.0",
@@ -202,6 +212,10 @@ def main() -> int:
         logger.info("\nChecking core packages...")
         if not check_packages(CORE_PACKAGES):
             issues.append("Core packages missing or outdated")
+
+        # Optional extras (informational only - don't fail if missing)
+        logger.info("\nChecking optional extras packages...")
+        check_packages(EXTRAS_PACKAGES)
 
         # Dev tools
         logger.info("\nChecking development tools...")

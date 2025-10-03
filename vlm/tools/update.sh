@@ -22,15 +22,15 @@ RUNTIME_PACKAGES=(
 	"huggingface-hub>=0.23.0"
 	"tabulate>=0.9.0"
 	"tzlocal>=5.0"
-    "numpy"
-    "einops"
-    "num2words"
 )
 
 EXTRAS_PACKAGES=(
-	"transformers>=4.53.0"
-	"mlx-lm>=0.23.0"
 	"psutil>=5.9.0"
+	"tokenizers>=0.15.0"
+	"einops>=0.6.0"
+	"num2words>=0.5.0"
+	"mlx-lm>=0.23.0"
+	"transformers>=4.53.0"
 )
 
 DEV_PACKAGES=(
