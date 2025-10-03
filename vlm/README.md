@@ -474,6 +474,12 @@ python check_models.py --timeout 600  # 10 minutes
 python check_models.py --exclude "meta-llama/Llama-3.2-90B-Vision-Instruct"
 ```
 
+**Script crashes with mutex error**: If you see `libc++abi: terminating due to uncaught exception of type std::__1::system_error: mutex lock failed: Invalid argument`, TensorFlow is likely installed and conflicting with MLX. Uninstall it:
+
+```bash
+pip uninstall -y tensorflow tensorboard keras absl-py astunparse flatbuffers gast google_pasta grpcio h5py libclang ml_dtypes opt_einsum termcolor wrapt tensorboard-data-server
+```
+
 ### Debug Mode
 
 Use `--verbose` for detailed diagnostics:
