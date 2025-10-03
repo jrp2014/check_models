@@ -474,11 +474,24 @@ python check_models.py --timeout 600  # 10 minutes
 python check_models.py --exclude "meta-llama/Llama-3.2-90B-Vision-Instruct"
 ```
 
-**Script crashes with mutex error**: If you see `libc++abi: terminating due to uncaught exception of type std::__1::system_error: mutex lock failed: Invalid argument`, TensorFlow is likely installed and conflicting with MLX. Uninstall it:
+**Script crashes with mutex error**: If you see `libc++abi: terminating due to uncaught exception of type std::__1::system_error: mutex lock failed: Invalid argument`, TensorFlow is installed and conflicting with MLX.
+
+The script automatically prevents TensorFlow from loading by setting `TRANSFORMERS_NO_TF=1` (unless you override with `MLX_VLM_ALLOW_TF=1`), so if TensorFlow gets imported anyway:
+
+Option 1 - Keep TensorFlow but ensure it's blocked (safest, script does this automatically):
+
+```bash
+export TRANSFORMERS_NO_TF=1
+python check_models.py  # Run normally - the script sets this env var automatically
+```
+
+Option 2 - Uninstall TensorFlow completely (recommended for MLX-only environments):
 
 ```bash
 pip uninstall -y tensorflow tensorboard keras absl-py astunparse flatbuffers gast google_pasta grpcio h5py libclang ml_dtypes opt_einsum termcolor wrapt tensorboard-data-server
 ```
+
+**Note**: Most MLX VLMs don't need TensorFlow. If a model actually requires it, you can allow TensorFlow with `MLX_VLM_ALLOW_TF=1`, but this may cause mutex crashes on Apple Silicon.
 
 ### Debug Mode
 
@@ -496,30 +509,35 @@ This provides:
 - Error stack traces
 - Library version information
 
-### TensorFlow-related hangs on macOS/Apple Silicon
+### Framework Detection and Automatic Blocking
 
-If the process appears to stall during imports with TensorFlow/Abseil mutex lines (e.g., from a `sample` stack trace), Transformers may be auto-importing TensorFlow even though MLX doesn’t need it. You can prevent this in two ways:
+The script **automatically** prevents TensorFlow, JAX, and Flax from loading to avoid conflicts with MLX on Apple Silicon:
 
-1. Set environment flags (recommended):
+- On startup, sets `TRANSFORMERS_NO_TF=1`, `TRANSFORMERS_NO_FLAX=1`, `TRANSFORMERS_NO_JAX=1` (unless you override with `MLX_VLM_ALLOW_TF=1`)
+- PyTorch is allowed by default (some models require it, e.g., Phi-3-vision)
+- Logs a warning if TensorFlow is detected but successfully blocked
+- Also logs if `sentence-transformers` is present
 
-```bash
-export TRANSFORMERS_NO_TF=1
-export TRANSFORMERS_NO_FLAX=1
-export TRANSFORMERS_NO_JAX=1
-```
+**⚠️ About TensorFlow on Apple Silicon:**
 
-1. Uninstall TensorFlow from the environment to avoid accidental imports (recommended for MLX-only envs):
+If TensorFlow is installed, the script's automatic blocking (`TRANSFORMERS_NO_TF=1`) should prevent it from loading, avoiding mutex crashes. However, if you encounter the error `libc++abi: terminating due to uncaught exception of type std::__1::system_error: mutex lock failed: Invalid argument`:
 
-```bash
-pip uninstall -y tensorflow tensorflow-macos tensorflow-metal
-```
+1. **First try**: Verify the environment variable is set (the script does this automatically):
 
-Script behavior:
+   ```bash
+   export TRANSFORMERS_NO_TF=1
+   python check_models.py
+   ```
 
-- On startup, the script sets `TRANSFORMERS_NO_TF=1`, `TRANSFORMERS_NO_FLAX=1`, `TRANSFORMERS_NO_JAX=1` unless you explicitly opt in with `MLX_VLM_ALLOW_TF=1`.
-- Torch is allowed by default (some models require it).
-- A startup log warns if TensorFlow is installed but disabled; a heads‑up is also logged if `sentence-transformers` is present.
-- **⚠️ Warning**: Installing TensorFlow on macOS/Apple Silicon can cause the script to crash with `libc++abi: terminating due to uncaught exception of type std::__1::system_error: mutex lock failed: Invalid argument`. This is due to conflicts with the Abseil mutex implementation. **Strongly recommend uninstalling TensorFlow** in MLX-only environments: `pip uninstall tensorflow tensorboard keras` and their transitive dependencies.
+2. **If that fails**: Uninstall TensorFlow completely (recommended for MLX-only environments):
+
+   ```bash
+   pip uninstall -y tensorflow tensorboard keras
+   ```
+
+3. **If a model needs TensorFlow**: Set `MLX_VLM_ALLOW_TF=1` to allow it, but be aware this may cause crashes on Apple Silicon
+
+**Why this matters**: TensorFlow's Abseil mutex implementation conflicts with MLX on macOS/ARM, causing crashes. Most MLX VLMs don't need TensorFlow.
 
 ## Notes
 
