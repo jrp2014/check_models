@@ -7,7 +7,7 @@ Runs code formatting and static analysis tools with sensible defaults:
 - ruff check (auto-fix enabled by default; use --no-fix to disable)
 - mypy type checking
 
-You can target specific paths; by default it runs only on `vlm/check_models.py`.
+You can target specific paths; by default it runs only on `check_models.py`.
 
 Exit status is non-zero if any executed check fails. Missing tools are
 reported as warnings and skipped (use --require to fail if missing).
@@ -24,7 +24,7 @@ import sys
 from pathlib import Path
 from typing import Any, Final
 
-DEFAULT_PATHS: Final[list[str]] = ["vlm/check_models.py"]
+DEFAULT_PATHS: Final[list[str]] = ["check_models.py"]
 ALLOWED_TOOLS: Final[set[str]] = {"ruff", "mypy", "stubgen"}
 logger = logging.getLogger("quality")
 
@@ -62,7 +62,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         "paths",
         nargs="*",
         default=DEFAULT_PATHS,
-        help="Paths to check (default: vlm/check_models.py)",
+        help="Paths to check (default: check_models.py)",
     )
     parser.add_argument(
         "--no-format",
@@ -117,13 +117,14 @@ def _ensure_stubs(repo_root: Path, *, refresh: bool, require: bool) -> int:
     need_stubs = refresh or not (typings / "mlx_vlm" / "__init__.pyi").exists()
     if not need_stubs:
         return 0
-    # Ensure repo root is on sys.path so 'vlm' is importable when run as a script
-    if str(repo_root) not in sys.path:
-        sys.path.insert(0, str(repo_root))
+    # Ensure src is on sys.path so 'tools' is importable when run as a script
+    src_path = str(repo_root / "src")
+    if src_path not in sys.path:
+        sys.path.insert(0, src_path)
     # Import locally to avoid global import-sort issues and keep this optional.
     mod: Any | None = None
     try:
-        mod = importlib.import_module("vlm.tools.generate_stubs")
+        mod = importlib.import_module("tools.generate_stubs")
         _run_stubgen = getattr(mod, "run_stubgen", None)
     except ImportError:
         # Best-effort import; fall back to invoking stubgen via CLI
@@ -171,7 +172,9 @@ def main(argv: list[str] | None = None) -> int:  # noqa: PLR0912 - cohesive CLI 
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     args = parse_args(argv or sys.argv[1:])
     repo_root = Path(__file__).resolve().parents[2]  # .../scripts
-    paths = [str((repo_root / p).resolve()) for p in args.paths]
+    src_dir = repo_root / "src"
+    # Resolve paths relative to src/ directory
+    paths = [str((src_dir / p).resolve()) for p in args.paths]
 
     overall_rc = 0
 
@@ -214,7 +217,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: PLR0912 - cohesive CLI 
             [
                 "mypy",
                 "--config-file",
-                str(repo_root / "vlm/pyproject.toml"),
+                str(repo_root / "src/pyproject.toml"),
                 "--exclude",
                 r"typings/tokenizers/.*",
                 *paths,
@@ -229,7 +232,7 @@ def main(argv: list[str] | None = None) -> int:  # noqa: PLR0912 - cohesive CLI 
                 [
                     "mypy",
                     "--config-file",
-                    str(repo_root / "vlm/pyproject.toml"),
+                    str(repo_root / "src/pyproject.toml"),
                     str(repo_root / args.stubs_path),
                 ],
                 cwd=repo_root,
