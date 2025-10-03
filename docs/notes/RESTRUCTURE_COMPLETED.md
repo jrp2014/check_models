@@ -30,8 +30,9 @@ Successfully completed Option A from RESTRUCTURE_PLAN.md - a full reorganization
 - `output/.gitignore` - Ignores *.html, *.md except README.md
 - `Makefile` - Simplified root-level command interface
 - `README.md` - Completely rewritten with quick start guide
-- `RESTRUCTURE_PLAN.md` - Original restructure plan
-- `RESTRUCTURE_COMPLETED.md` - This file
+- `docs/notes/RESTRUCTURE_PLAN.md` - Original restructure plan
+- `docs/notes/RESTRUCTURE_COMPLETED.md` - This file
+- `docs/notes/GIT_HOOKS_FIXED.md` - Git hooks fix documentation
 
 ### 4. Files Removed
 
