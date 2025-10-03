@@ -4,11 +4,14 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
 
 **Target audience**: New contributors, anyone submitting a pull request.
 
+> **Note**: This project was restructured in October 2025. The old `vlm/` directory is now `src/`. Most commands now use the root `Makefile` instead of `make -C src`.
+
 **Related documents**:
 
-- [README.md](README.md) - What this project does and how to use it
+- [README.md](../README.md) - Project overview and quick start
 - [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) - Detailed coding standards and technical conventions
-- [vlm/README.md](vlm/README.md) - Package-specific usage and CLI documentation
+- [src/README.md](../src/README.md) - Detailed package usage and CLI documentation
+- [notes/](notes/) - Design notes and project evolution
 
 ## Table of Contents
 
@@ -45,17 +48,16 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
    conda activate mlx-vlm
    ```
 
-3. **Bootstrap development environment**:
+3. **Install development dependencies**:
 
    ```bash
-   make -C vlm bootstrap-dev
+   make dev
    ```
 
    This will:
    - Install all dependencies (runtime + dev + extras)
-   - Install git pre-commit hooks
-   - Install pre-commit framework hooks (if available)
-   - Validate the environment
+   - Install the package in editable mode
+   - Set up git hooks automatically via pre-commit (if configured)
 
    **Optional dependencies**:
 
@@ -99,13 +101,13 @@ python -m vlm.tools.validate_env --fix
 3. **Run quality checks locally**:
 
    ```bash
-   make -C vlm quality
+   make quality
    ```
 
 4. **Run tests**:
 
    ```bash
-   make -C vlm test
+   make test
    ```
 
 ### Code Style
@@ -126,30 +128,26 @@ The project uses several automated quality checks:
 1. **Ruff** (formatting and linting):
 
    ```bash
-   make -C vlm format    # Format code
-   make -C vlm lint      # Check linting
-   make -C vlm lint-fix  # Auto-fix issues
+   make format      # Format code
+   make lint        # Check linting (alias for quality)
    ```
 
 2. **Mypy** (type checking):
 
    ```bash
-   make -C vlm typecheck
+   make typecheck   # Type check with mypy
    ```
 
 3. **Tests**:
 
    ```bash
-   make -C vlm test
-   make -C vlm test-cov  # With coverage
+   make test        # Run all tests
    ```
 
 4. **Combined quality check**:
 
    ```bash
-   make -C vlm quality   # Runs format + lint + typecheck
-   make -C vlm check     # Runs quality + tests
-   make -C vlm ci        # Full CI pipeline
+   make quality     # Runs format + lint + typecheck
    ```
 
 ### Git Hooks
