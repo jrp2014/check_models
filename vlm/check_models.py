@@ -439,11 +439,14 @@ PERFORMANCE_TIMING_FIELDS: Final[list[str]] = ["generation_time", "model_load_ti
 
 
 def fmt_num(val: float | str) -> str:
-    """Format numbers consistently across all output formats."""
+    """Format numbers consistently with thousands separators across all output formats."""
     try:
         fval = float(val)
         if abs(fval) >= LARGE_NUMBER_THRESHOLD:
             return f"{fval:,.0f}"
+        # For integers or whole numbers, use comma separator if >= THOUSAND_THRESHOLD
+        if fval == int(fval) and abs(fval) >= THOUSAND_THRESHOLD:
+            return f"{int(fval):,}"
         if abs(fval) > 0:
             return f"{fval:.3g}"
         return str(val)
@@ -651,26 +654,38 @@ def _log_wrapped_label_value(
 
 
 def _log_wrapped_error(label: str, value: str) -> None:
-    """Log long error/captured output text with wrapping and red color."""
+    """Log error with box border for better visibility."""
     width = get_terminal_width(max_width=100)
-    prefix = "  " + label
-    first_avail = max(20, width - Colors.visual_len(prefix) - 1)
-    cont_indent = " " * 4
-    cont_avail = max(20, width - len(cont_indent) - 1)
+
+    # Top border
+    logger.error(Colors.colored("╔" + "═" * (width - 2) + "╗", Colors.RED, Colors.BOLD))
+
+    # Label
+    logger.error(Colors.colored(f"║ {label}", Colors.RED, Colors.BOLD))
+    logger.error(Colors.colored("╠" + "═" * (width - 2) + "╣", Colors.RED))
+
+    # Content with wrapping
+    cont_indent = "║ "
+    cont_avail = max(20, width - len(cont_indent) - 3)  # Account for right border
     lines = value.splitlines() or [""]
-    for li, original_line in enumerate(lines):
+    for original_line in lines:
+        if not original_line.strip():
+            logger.error(Colors.colored("║", Colors.RED))
+            continue
         wrapped = textwrap.wrap(
             original_line,
-            width=first_avail if li == 0 else cont_avail,
+            width=cont_avail,
             break_long_words=False,
             break_on_hyphens=False,
             replace_whitespace=False,
         ) or [""]
-        for wi, wline in enumerate(wrapped):
-            if li == 0 and wi == 0:
-                logger.error("%s %s", prefix, Colors.colored(wline, Colors.RED))
-            else:
-                logger.error("%s%s", cont_indent, Colors.colored(wline, Colors.RED))
+        for wline in wrapped:
+            # Pad to width for clean box
+            padded = wline.ljust(cont_avail)
+            logger.error(Colors.colored(f"║ {padded} ║", Colors.RED))
+
+    # Bottom border
+    logger.error(Colors.colored("╚" + "═" * (width - 2) + "╝", Colors.RED, Colors.BOLD))
 
 
 def _apply_cli_output_preferences(args: argparse.Namespace) -> None:
@@ -703,12 +718,13 @@ def _apply_cli_output_preferences(args: argparse.Namespace) -> None:
 def log_rule(
     width: int = GENERATION_WRAP_WIDTH,
     *,
-    char: str = "-",
+    char: str = "─",  # Unicode box-drawing character (was "-")
     color: str | None = None,
     bold: bool = False,
 ) -> None:
     """Log a horizontal rule line with optional color and bold.
 
+    Uses unicode box-drawing characters for better visual separation.
     Keeps a single place for styling separators to ensure consistency.
     """
     line = char * max(1, width)
@@ -1623,19 +1639,33 @@ def _compute_column_widths(field_names: list[str]) -> list[int]:
 
 
 def print_model_stats(results: list[PerformanceResult]) -> None:
-    """Emit a compact multi-line header table of per-model metrics.
+    """Emit an enhanced table of per-model metrics with visual indicators and summary.
 
     (Refactored) The original monolithic implementation has been decomposed
     into small helpers: header building, row construction, column width
-    calculation. Behavior and visual output are preserved.
+    calculation. Now enhanced with unicode borders, success/fail indicators,
+    and summary statistics.
     """
     if not results:
         logger.info("No model results to display.")
         return
+
     rs = ResultSet(results)
     all_fields = rs.fields() or []
     headers, field_names = _build_stat_headers(all_fields)
-    rows = [_build_stat_row(r, all_fields) for r in rs.results]
+
+    # Add visual indicators to rows
+    success_count = sum(1 for r in rs.results if r.success)
+    fail_count = len(rs.results) - success_count
+
+    rows = []
+    for r in rs.results:
+        row_data = _build_stat_row(r, all_fields)
+        # Prepend success/fail indicator to model name
+        indicator = "✓" if r.success else "✗"
+        row_data[0] = f"{indicator} {row_data[0]}"
+        rows.append(row_data)
+
     colalign: list[str] = ["left"] + [
         "right" if is_numeric_field(fname) else "left" for fname in field_names[1:]
     ]
@@ -1648,12 +1678,31 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
         maxcolwidths=widths,
     )
     lines = table.split("\n")
-    # Use terminal width for framing rules to keep things neat
+
+    # Use terminal width for framing rules
     max_width = get_terminal_width(max_width=100)
-    log_rule(max_width, char="=", color=Colors.BLUE, bold=True)
+
+    # Top border with title
+    logger.info("")
+    log_rule(max_width, char="═", color=Colors.BLUE, bold=True)
+    title = "PERFORMANCE SUMMARY"
+    padding = (max_width - len(title)) // 2
+    logger.info(Colors.colored(" " * padding + title, Colors.BOLD, Colors.CYAN))
+    log_rule(max_width, char="═", color=Colors.BLUE, bold=True)
+
+    # Table content
     for line in lines:
         logger.info(line)
-    log_rule(max_width, char="=", color=Colors.BLUE, bold=True)
+
+    # Bottom border with summary
+    log_rule(max_width, char="─", color=Colors.BLUE, bold=False)
+    summary = f"Total Models: {len(rs.results)}  │  "
+    summary += Colors.colored(f"✓ Pass: {success_count}", Colors.GREEN) + "  "
+    if fail_count > 0:
+        summary += Colors.colored(f"✗ Fail: {fail_count}", Colors.RED)
+    logger.info(summary)
+    log_rule(max_width, char="═", color=Colors.BLUE, bold=True)
+
     logger.info("Results sorted by generation time (fastest to slowest).")
 
 
@@ -2457,12 +2506,13 @@ def print_cli_header(title: str) -> None:
 
 
 def print_cli_section(title: str) -> None:
-    """Print a formatted CLI section header."""
+    """Print a formatted CLI section header with visual prefix."""
     width = get_terminal_width(max_width=100)
     # Avoid uppercasing when ANSI escape codes are present (would corrupt codes)
     safe_title = title if "\x1b[" in title else title.upper()
-    logger.info("[ %s ]", Colors.colored(safe_title, Colors.BOLD, Colors.MAGENTA))
-    log_rule(width, char="-", color=Colors.BLUE, bold=False)
+    # Add ▶ prefix to make check_models output visually distinct from MLX-VLM output
+    logger.info("▶ [ %s ]", Colors.colored(safe_title, Colors.BOLD, Colors.MAGENTA))
+    log_rule(width, char="─", color=Colors.BLUE, bold=False)
 
 
 def print_cli_error(msg: str) -> None:
@@ -2545,106 +2595,164 @@ def _log_verbose_success_details(res: PerformanceResult) -> None:
 
 
 def _log_verbose_success_details_mode(res: PerformanceResult, *, detailed: bool) -> None:
-    """Emit verbose block using either compact or detailed metrics style."""
+    """Emit verbose block using either compact or detailed metrics style with visual hierarchy."""
     if not res.generation:
         return
+
+    # Add breathing room
+    logger.info("")
+
+    # Generated text with emoji prefix for easy scanning
     gen_text = getattr(res.generation, "text", None) or ""
-    _log_wrapped_label_value("Generated Text:", gen_text, color=Colors.CYAN)
+    logger.info("📝 %s", Colors.colored("Generated Text:", Colors.BOLD, Colors.CYAN))
+    _log_wrapped_label_value("   ", gen_text, color=Colors.CYAN)
+
+    logger.info("")  # Breathing room
+
     if detailed:
+        logger.info("📊 %s", Colors.colored("Performance Metrics:", Colors.BOLD, Colors.WHITE))
         _log_token_summary(res)
         _log_detailed_timings(res)
-        logger.info(Colors.colored("  Performance Metrics:", Colors.BOLD, Colors.MAGENTA))
+        logger.info("")
         _log_perf_block(res)
     else:
         _log_compact_metrics(res)
 
 
 def _log_token_summary(res: PerformanceResult) -> None:
-    """Log tokens and generation TPS in a compact form."""
+    """Log tokens and generation TPS with tree structure for visual hierarchy."""
     p_tokens = getattr(res.generation, "prompt_tokens", 0)
     g_tokens = getattr(res.generation, "generation_tokens", 0)
     tot_tokens = (p_tokens or 0) + (g_tokens or 0)
     gen_tps = getattr(res.generation, "generation_tps", 0.0) or 0.0
+    prompt_tps = getattr(res.generation, "prompt_tps", 0.0) or 0.0
+
+    logger.info("  🔢 %s", Colors.colored("Tokens:", Colors.BOLD, Colors.WHITE))
     logger.info(
-        "  Tokens: total=%s prompt=%s gen=%s",
-        fmt_num(tot_tokens),
-        fmt_num(p_tokens),
-        fmt_num(g_tokens),
+        "     ├─ Prompt:     %s",
+        Colors.colored(f"{fmt_num(p_tokens):>8} @ {fmt_num(prompt_tps)} tok/s", Colors.WHITE),
     )
-    logger.info("  Generation TPS: %s", Colors.colored(fmt_num(gen_tps), Colors.WHITE))
+    logger.info(
+        "     ├─ Generated:  %s",
+        Colors.colored(f"{fmt_num(g_tokens):>8} @ {fmt_num(gen_tps)} tok/s", Colors.WHITE),
+    )
+    logger.info("     └─ Total:      %s", Colors.colored(f"{fmt_num(tot_tokens):>8}", Colors.WHITE))
 
 
 def _log_detailed_timings(res: PerformanceResult) -> None:
-    """Log total, generation, and model load times if available."""
+    """Log total, generation, and model load times with tree structure."""
     total_time_val = getattr(res, "total_time", None)
-    if total_time_val and total_time_val > 0:
-        tt_val = format_field_value("total_time", total_time_val)
-        tt_disp = tt_val if isinstance(tt_val, str) else f"{total_time_val:.2f}s"
-        logger.info("  Total Time: %s", Colors.colored(tt_disp, Colors.WHITE))
-
     generation_time_val = getattr(res, "generation_time", None)
+    model_load_time_val = getattr(res, "model_load_time", None)
+
+    if not total_time_val or total_time_val <= 0:
+        return
+
+    logger.info("  ⏱  %s", Colors.colored("Timing:", Colors.BOLD, Colors.WHITE))
+
+    tt_val = format_field_value("total_time", total_time_val)
+    tt_disp = tt_val if isinstance(tt_val, str) else f"{total_time_val:.2f}s"
+    logger.info("     ├─ Total:      %s", Colors.colored(f"{tt_disp:>8}", Colors.WHITE))
+
     if generation_time_val and generation_time_val > 0:
         gt_val = format_field_value("generation_time", generation_time_val)
         gt_disp = gt_val if isinstance(gt_val, str) else f"{generation_time_val:.2f}s"
-        logger.info("  Generation Time: %s", Colors.colored(gt_disp, Colors.WHITE))
+        pct = (generation_time_val / total_time_val * 100) if total_time_val > 0 else 0
+        logger.info(
+            "     ├─ Generation: %s", Colors.colored(f"{gt_disp:>8} ({pct:>3.0f}%)", Colors.WHITE)
+        )
 
-    model_load_time_val = getattr(res, "model_load_time", None)
     if model_load_time_val and model_load_time_val > 0:
         ml_val = format_field_value("model_load_time", model_load_time_val)
         ml_disp = ml_val if isinstance(ml_val, str) else f"{model_load_time_val:.2f}s"
-        logger.info("  Model Load Time: %s", Colors.colored(ml_disp, Colors.WHITE))
+        pct = (model_load_time_val / total_time_val * 100) if total_time_val > 0 else 0
+        logger.info(
+            "     └─ Load:       %s", Colors.colored(f"{ml_disp:>8} ({pct:>3.0f}%)", Colors.WHITE)
+        )
 
 
 def _log_perf_block(res: PerformanceResult) -> None:
-    """Log inner performance metrics (time within generation, memory, prompt stats)."""
-    if hasattr(res.generation, "time"):
-        time_val = getattr(res.generation, "time", 0.0) or 0.0
-        logger.info("    Time: %s", Colors.colored(f"{time_val:.2f}s", Colors.WHITE))
+    """Log inner performance metrics (memory) with tree structure and emoji."""
+    active_mem = getattr(res.generation, "active_memory", 0.0) or 0.0
+    cached_mem = getattr(res.generation, "cached_memory", 0.0) or 0.0
+    peak_mem = getattr(res.generation, "peak_memory", 0.0) or 0.0
 
-    def _log_mem(label: str, field: str, raw_val: float) -> None:
+    # Only show memory section if at least one value is present
+    if active_mem <= 0 and cached_mem <= 0 and peak_mem <= 0:
+        return
+
+    logger.info("  💾 %s", Colors.colored("Memory:", Colors.BOLD, Colors.WHITE))
+
+    def _log_mem(prefix: str, label: str, field: str, raw_val: float) -> None:
         if raw_val <= 0:
             return
         formatted = format_field_value(field, raw_val)
         unit = "GB"
-        text = str(formatted) if str(formatted).endswith(unit) else f"{formatted}{unit}"
-        logger.info("    Memory (%s): %s", label, Colors.colored(text, Colors.WHITE))
+        text = str(formatted) if str(formatted).endswith(unit) else f"{formatted} GB"
+        logger.info(
+            "     %s %s %s", prefix, label.ljust(11), Colors.colored(f"{text:>8}", Colors.WHITE)
+        )
 
-    active_mem = getattr(res.generation, "active_memory", 0.0) or 0.0
-    cached_mem = getattr(res.generation, "cached_memory", 0.0) or 0.0
-    peak_mem = getattr(res.generation, "peak_memory", 0.0) or 0.0
-    _log_mem("Active Δ", "active_memory", active_mem)
-    _log_mem("Cache Δ", "cached_memory", cached_mem)
-    _log_mem("Peak", "peak_memory", peak_mem)
-
-    p_tokens = getattr(res.generation, "prompt_tokens", 0)
-    g_tokens = getattr(res.generation, "generation_tokens", 0)
-    prompt_tps = getattr(res.generation, "prompt_tps", 0.0) or 0.0
-    logger.info("    Prompt Tokens: %s", Colors.colored(fmt_num(p_tokens), Colors.WHITE))
-    logger.info("    Generation Tokens: %s", Colors.colored(fmt_num(g_tokens), Colors.WHITE))
-    logger.info("    Prompt TPS: %s", Colors.colored(fmt_num(prompt_tps), Colors.WHITE))
+    _log_mem("├─", "Active Δ:", "active_memory", active_mem)
+    _log_mem("├─", "Cache Δ:", "cached_memory", cached_mem)
+    _log_mem("└─", "Peak:", "peak_memory", peak_mem)
 
 
 def _log_compact_metrics(res: PerformanceResult) -> None:
-    """Emit a single consolidated metrics line for a successful run.
+    """Emit grouped metrics lines for better readability while maintaining parsability.
 
-    Example output (wrapped):
-        Metrics: total=4.13s gen=3.03s load=1.09s peak_mem=5.5GB
-        tokens(total/prompt/gen)=1637/1488/149 gen_tps=114
+    Example output:
+        ⏱  Time: total=4.13s  gen=3.03s (73%)  load=1.09s (27%)
+        💾  Memory: peak=5.5 GB
+        🔢  Tokens: 1,637 (prompt:1,488  generated:149)  TPS: gen=114  prompt=421
     """
     if not res.generation:
         return
-    parts = _build_compact_metric_parts(res, res.generation)
-    if not parts:
-        return
-    parts = _align_metric_parts(parts)
-    logger.info(
-        Colors.colored(
-            "  Metrics: " + "  ".join(parts),
-            Colors.BOLD,
-            Colors.MAGENTA,
-        ),
-    )
-    # Legend emitted once at start of processing; no per-model legend here.
+
+    gen = res.generation
+    logger.info("")  # Breathing room
+
+    # Timing group
+    total_time_val = getattr(res, "total_time", None)
+    generation_time_val = getattr(res, "generation_time", None)
+    load_time_val = getattr(res, "model_load_time", None)
+
+    if total_time_val:
+        time_parts = [f"total={total_time_val:.2f}s"]
+        if generation_time_val:
+            pct = (generation_time_val / total_time_val * 100) if total_time_val > 0 else 0
+            time_parts.append(f"gen={generation_time_val:.2f}s ({pct:.0f}%)")
+        if load_time_val:
+            pct = (load_time_val / total_time_val * 100) if total_time_val > 0 else 0
+            time_parts.append(f"load={load_time_val:.2f}s ({pct:.0f}%)")
+        logger.info("  ⏱  Time: %s", Colors.colored("  ".join(time_parts), Colors.WHITE))
+
+    # Memory group
+    peak_mem = getattr(gen, "peak_memory", None) or 0.0
+    if peak_mem > 0:
+        mem_fmt = format_field_value("peak_memory", peak_mem)
+        mem_str = f"{mem_fmt} GB" if not str(mem_fmt).endswith("GB") else str(mem_fmt)
+        logger.info("  💾  Memory: %s", Colors.colored(f"peak={mem_str}", Colors.WHITE))
+
+    # Token group
+    prompt_tokens = getattr(gen, "prompt_tokens", 0) or 0
+    gen_tokens = getattr(gen, "generation_tokens", 0) or 0
+    all_tokens = prompt_tokens + gen_tokens
+    gen_tps = getattr(gen, "generation_tps", 0.0) or 0.0
+    prompt_tps = getattr(gen, "prompt_tps", 0.0) or 0.0
+
+    if all_tokens:
+        token_parts = [
+            f"{fmt_num(all_tokens)} (prompt:{fmt_num(prompt_tokens)}  generated:{fmt_num(gen_tokens)})"
+        ]
+        tps_parts = []
+        if gen_tps:
+            tps_parts.append(f"gen={fmt_num(gen_tps)}")
+        if prompt_tps:
+            tps_parts.append(f"prompt={fmt_num(prompt_tps)}")
+        if tps_parts:
+            token_parts.append(f"TPS: {' '.join(tps_parts)}")
+        logger.info("  🔢  Tokens: %s", Colors.colored("  ".join(token_parts), Colors.WHITE))
 
 
 def _build_compact_metric_parts(
@@ -2773,9 +2881,9 @@ def print_model_result(
 
 
 def print_cli_separator() -> None:
-    """Print a simple separator line."""
+    """Print a visually distinct separator line using unicode box-drawing characters."""
     width = get_terminal_width(max_width=100)
-    log_rule(width, char="-", color=Colors.BLUE, bold=False)
+    log_rule(width, char="─", color=Colors.BLUE, bold=False)
 
 
 def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
@@ -3171,9 +3279,13 @@ def finalize_execution(
                 total_runtime_seconds=overall_time,
             )
 
-            logger.info("Reports successfully generated:")
-            logger.info("  HTML: %s", str(html_output_path))
-            logger.info("  Markdown: %s", str(md_output_path))
+            logger.info("")
+            logger.info(
+                "📊 %s",
+                Colors.colored("Reports successfully generated:", Colors.BOLD, Colors.GREEN),
+            )
+            logger.info("   HTML:     %s", Colors.colored(str(html_output_path), Colors.CYAN))
+            logger.info("   Markdown: %s", Colors.colored(str(md_output_path), Colors.CYAN))
         except (OSError, ValueError):
             logger.exception("Failed to generate reports.")
     else:
@@ -3181,9 +3293,10 @@ def finalize_execution(
         logger.info("Skipping report generation as no models were processed.")
 
     print_cli_section("Execution Summary")
+    logger.info("")
     logger.info(
-        "Overall runtime (start to finish): %s",
-        format_overall_runtime(overall_time),
+        "⏱  Overall runtime (start to finish): %s",
+        Colors.colored(format_overall_runtime(overall_time), Colors.BOLD, Colors.WHITE),
     )
     print_version_info(library_versions)
     logger.info("Total execution time: %.2f seconds", overall_time)
