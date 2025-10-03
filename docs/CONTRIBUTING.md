@@ -181,21 +181,18 @@ All pull requests must pass:
 
 ```bash
 # Run all tests
-make -C vlm test
-
-# Run with coverage
-make -C vlm test-cov
+make test
 
 # Run specific test file
-cd vlm && pytest tests/test_specific.py
+pytest src/tests/test_specific.py
 
 # Run with verbose output
-cd vlm && pytest -v
+pytest src/tests/ -v
 ```
 
 ### Writing Tests
 
-- Place tests in `vlm/tests/`
+- Place tests in `src/tests/`
 - Use descriptive test names: `test_<function>_<scenario>_<expected_result>`
 - Include both positive and negative test cases
 - Aim for high coverage of critical paths
@@ -284,27 +281,27 @@ The project uses pip-tools for reproducible builds:
 
 ```bash
 # Add a new dependency
-# 1. Edit vlm/requirements.in or vlm/requirements-dev.in
+# 1. Edit src/requirements.in or src/requirements-dev.in
 # 2. Regenerate lock files:
-make -C vlm lock-deps
+make lock-deps
 
 # Upgrade all dependencies to latest:
-make -C vlm upgrade-deps
+make upgrade-deps
 
 # Sync your environment with lock files:
-make -C vlm sync-deps
+make sync-deps
 
 # Check for outdated packages:
-make -C vlm check-outdated
+make check-outdated
 
 # Security audit:
-make -C vlm audit
+make audit
 ```
 
 ### Updating Dependencies
 
-1. Edit `vlm/requirements.in` or `vlm/requirements-dev.in`
-2. Run `make -C vlm lock-deps`
+1. Edit `src/requirements.in` or `src/requirements-dev.in`
+2. Run `make lock-deps`
 3. Test thoroughly
 4. Commit both `.in` and `.txt` files
 
@@ -317,7 +314,7 @@ make -C vlm audit
 - Check [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) for coding conventions
 - Review existing issues on GitHub
 - Ask questions in issue comments
-- Run `make -C vlm help` to see available commands
+- Run `make help` to see available commands
 
 ## Code of Conduct
 
