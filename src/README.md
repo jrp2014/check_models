@@ -569,12 +569,12 @@ Key targets:
 | Target | Purpose | Notes |
 |--------|---------|-------|
 | `make help` | Show all targets | Displays active vs target env. |
-| `make install-dev` | Editable install with dev extras | Equivalent to changing into `vlm/` then `pip install -e .[dev]`. |
+| `make install-dev` | Editable install with dev extras | Equivalent to changing into `src/` then `pip install -e .[dev]`. |
 | `make install` | Runtime‑only editable install | No dev/test tooling. |
 | `make format` | Run `ruff format` | Applies canonical formatting. |
 | `make lint` | Run `ruff check` (no fixes) | Fails on style violations. |
 | `make lint-fix` | Run `ruff check --fix` | Auto‑fixes where safe. |
-| `make typecheck` | Run `mypy` | Uses `vlm/pyproject.toml` config. |
+| `make typecheck` | Run `mypy` | Uses `src/pyproject.toml` config. |
 | `make test` | Run pytest suite | Uses settings in `pyproject.toml`. |
 | `make test-cov` | Pytest with coverage | Generates terminal + XML report. |
 | `make quality` | Invoke integrated quality script | Wraps format + lint + mypy. |
@@ -615,9 +615,9 @@ make run CONDA_ENV=mlx-vlm ARGS="--verbose"
 If you prefer manual commands, the traditional workflow still works:
 
 1. `pip install -e ".[dev]"`
-2. `ruff format vlm/check_models.py vlm/tests`
-3. `ruff check --fix vlm/check_models.py vlm/tests`
-4. `mypy --config-file vlm/pyproject.toml vlm/check_models.py`
+2. `ruff format check_models.py tests`
+3. `ruff check --fix check_models.py tests`
+4. `mypy --config-file pyproject.toml check_models.py`
 5. `pytest -q`
 
 ### Contribution Guidelines
@@ -642,9 +642,9 @@ MIT License - see LICENSE file for details.
 
 A small helper script runs formatting and static checks for this project.
 
-- Location: `vlm/tools/check_quality.py`
+- Location: `src/tools/check_quality.py`
 - Defaults:
-  - Targets only `vlm/check_models.py` unless paths are provided
+  - Targets only `check_models.py` unless paths are provided
   - Runs `ruff format` by default (skip with `--no-format`)
   - Runs `ruff check --fix` by default (skip fixing with `--no-fix`)
   - Runs `mypy` for type checking
@@ -653,16 +653,16 @@ Examples:
 
 ```bash
 # Default: format + fixable lint + mypy on check_models.py
-python vlm/tools/check_quality.py
+python tools/check_quality.py
 
 # Skip auto-fix
-python vlm/tools/check_quality.py --no-fix
+python tools/check_quality.py --no-fix
 
 # Skip formatting
-python vlm/tools/check_quality.py --no-format
+python tools/check_quality.py --no-format
 
-# Check multiple paths
-python vlm/tools/check_quality.py vlm tools
+# Check multiple paths (from src/ directory)
+python tools/check_quality.py . tools
 ```
 
 Requirements: `ruff` and `mypy` (install with `pip install -e ".[dev]"`).
