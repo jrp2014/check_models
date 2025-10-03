@@ -2021,10 +2021,11 @@ def generate_markdown_report(
     for name, ver in sorted(versions.items()):
         ver_str = "" if ver is None else ver
         md.append(f"- `{name}`: `{ver_str}`")
-    md.append(f"\n_Report generated on: {local_now_str()}_\n")
+    md.append(f"\n_Report generated on: {local_now_str()}_")
 
     # Join and normalize trailing spaces across the entire Markdown document
-    markdown_content = normalize_markdown_trailing_spaces("\n".join(md))
+    # Ensure file ends with single newline (MD047 requirement)
+    markdown_content = normalize_markdown_trailing_spaces("\n".join(md)) + "\n"
 
     try:
         with filename.open("w", encoding="utf-8") as f:
