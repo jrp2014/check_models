@@ -17,7 +17,7 @@ import pytest
 
 
 @pytest.fixture(scope="module")
-def mod() -> types.ModuleType:  # type: ignore[override]
+def mod() -> types.ModuleType:
     """Import and return the target module once for all tests."""
     return importlib.import_module("check_models")
 

@@ -55,7 +55,7 @@ def _build_single_result() -> PerformanceResult:
     )
 
 
-def test_markdown_report_includes_runtime(tmp_path: Path) -> None:  # type: ignore[name-defined]
+def test_markdown_report_includes_runtime(tmp_path: Path) -> None:
     """Markdown report should contain an overall runtime line with seconds."""
     results = [_build_single_result()]
     md_file = tmp_path / "report.md"
@@ -76,7 +76,7 @@ def test_markdown_report_includes_runtime(tmp_path: Path) -> None:  # type: igno
         raise AssertionError(msg)
 
 
-def test_html_report_includes_runtime(tmp_path: Path) -> None:  # type: ignore[name-defined]
+def test_html_report_includes_runtime(tmp_path: Path) -> None:
     """HTML report should include the formatted overall runtime string with 's' suffix."""
     results = [_build_single_result()]
     html_file = tmp_path / "report.html"
@@ -97,7 +97,7 @@ def test_html_report_includes_runtime(tmp_path: Path) -> None:  # type: ignore[n
         raise AssertionError(msg)
 
 
-def test_markdown_long_runtime_hms(tmp_path: Path) -> None:  # type: ignore[name-defined]
+def test_markdown_long_runtime_hms(tmp_path: Path) -> None:
     """Markdown should show HH:MM:SS plus seconds for long runtimes (>= 1 hour)."""
     results = [_build_single_result()]
     md_file = tmp_path / "long.md"
@@ -118,7 +118,7 @@ def test_markdown_long_runtime_hms(tmp_path: Path) -> None:  # type: ignore[name
         raise AssertionError(msg)
 
 
-def test_html_long_runtime_hms(tmp_path: Path) -> None:  # type: ignore[name-defined]
+def test_html_long_runtime_hms(tmp_path: Path) -> None:
     """HTML should show HH:MM:SS plus seconds for long runtimes (>= 1 hour)."""
     results = [_build_single_result()]
     html_file = tmp_path / "long.html"

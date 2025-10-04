@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
-from check_models import (  # type: ignore[attr-defined]
+from check_models import (
     PerformanceResult,
     _align_metric_parts,
     print_model_result,
@@ -62,7 +62,7 @@ def test_align_metric_parts_alignment() -> None:
     assert len(set(eq_positions)) == 1, aligned
 
 
-def test_metrics_mode_compact_smoke(caplog: pytest.LogCaptureFixture) -> None:  # type: ignore[name-defined]
+def test_metrics_mode_compact_smoke(caplog: pytest.LogCaptureFixture) -> None:
     """Compact mode should emit a single 'Metrics:' line."""
     caplog.set_level(logging.INFO)
     res = _build_perf()
@@ -71,7 +71,7 @@ def test_metrics_mode_compact_smoke(caplog: pytest.LogCaptureFixture) -> None:  
     assert metrics_lines, "Expected compact Metrics line in logs"
 
 
-def test_metrics_mode_detailed_smoke(caplog: pytest.LogCaptureFixture) -> None:  # type: ignore[name-defined]
+def test_metrics_mode_detailed_smoke(caplog: pytest.LogCaptureFixture) -> None:
     """Detailed mode should emit token lines plus Metrics header."""
     caplog.set_level(logging.INFO)
     res = _build_perf()
