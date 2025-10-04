@@ -8,5 +8,5 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 cd "${REPO_ROOT}"
 
 # Use package-local Makefile which proxies tools through 'conda run -n mlx-vlm'
-exec make -C vlm quality
+exec make -C src quality
 

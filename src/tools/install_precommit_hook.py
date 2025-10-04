@@ -2,21 +2,21 @@
 
 Pre-commit hook automates two maintenance steps:
 
-1) Sync README dependency blocks when `vlm/pyproject.toml` changes
-   - Runs: `cd vlm && python tools/update_readme_deps.py`
-   - Adds changes to `vlm/README.md` back to the commit
+1) Sync README dependency blocks when `src/pyproject.toml` changes
+   - Runs: `cd src && python tools/update_readme_deps.py`
+   - Adds changes to `src/README.md` back to the commit
 
 2) Ensure local type stubs exist for third-party packages used by mypy
    - If `typings/mlx_vlm/__init__.pyi` or `typings/tokenizers/__init__.pyi` is missing,
-     it runs: `python -m vlm.tools.generate_stubs mlx_vlm tokenizers`
+     it runs: `python -m tools.generate_stubs mlx_vlm tokenizers`
    - Adds `typings/` changes back to the commit
 
 Pre-push hook runs quality checks:
-   - Runs: `make -C vlm quality`
+   - Runs: `make -C src quality`
    - Prevents pushing if quality checks fail
 
 Usage:
-  python -m vlm.tools.install_precommit_hook
+  python -m tools.install_precommit_hook
 
 Re-running this script overwrites existing hooks (after backing them up as `.bak`).
 """
@@ -37,16 +37,16 @@ REPO_ROOT=$(git rev-parse --show-toplevel)
 cd "$REPO_ROOT"
 
 # 1) Sync README dependency blocks when pyproject changes
-if git diff --cached --name-only | grep -q '^vlm/pyproject.toml$'; then
+if git diff --cached --name-only | grep -q '^src/pyproject.toml$'; then
   echo '[pre-commit] Syncing README dependency blocks'
-  (cd vlm && python tools/update_readme_deps.py) || exit 1
-  git add vlm/README.md
+  (cd src && python tools/update_readme_deps.py) || exit 1
+  git add src/README.md
 fi
 
 # 2) Ensure local type stubs for mypy (mlx_vlm, tokenizers)
 if [ ! -f typings/mlx_vlm/__init__.pyi ] || [ ! -f typings/tokenizers/__init__.pyi ]; then
   echo '[pre-commit] Generating local type stubs (mlx_vlm, tokenizers)'
-  python -m vlm.tools.generate_stubs mlx_vlm tokenizers || exit 1
+  python -m tools.generate_stubs mlx_vlm tokenizers || exit 1
   git add typings
 fi
 

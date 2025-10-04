@@ -24,7 +24,7 @@ classifiers = [
 ]
 # PEP 621: declare runtime dependencies as an inline array instead of a key/value table.
 # This keeps ordering deterministic and simplifies automated parsing.
-# Runtime intentionally slim: only what `vlm/check_models.py` imports directly.
+# Runtime intentionally slim: only what `check_models.py` imports directly.
 # Everything else lives in extras to reduce cold install surface & build time.
 dependencies = [
     # Minimal runtime set actually imported by check_models.py
@@ -111,10 +111,10 @@ max-complexity = 15
 
 [tool.ruff.lint.per-file-ignores]
 # Allow higher complexity in the central orchestrator script for now; revisit later.
-"vlm/check_models.py" = ["C901"]
+"check_models.py" = ["C901"]
 # CLI tools: allow print statements for user output
-"vlm/tools/check_outdated.py" = ["T201"]
-"vlm/tools/validate_env.py" = ["T201"]
+"tools/check_outdated.py" = ["T201"]
+"tools/validate_env.py" = ["T201"]
 
 [tool.pylance]
 # Pyright/Pylance configuration
@@ -163,7 +163,7 @@ ignore_missing_imports = true
 [tool.pytest.ini_options]
 # Limit test discovery to the dedicated tests package inside the project
 # (avoids collecting helper scripts or example snippets).
-testpaths = ["vlm/tests"]
+testpaths = ["tests"]
 # Keep output concise; individual developers can override locally if needed.
 addopts = "-q"
 

@@ -16,10 +16,10 @@ repos:
     hooks:
       - id: dependency-sync-check
         name: dependency-sync-check
-        entry: python -m vlm.tools.check_dependency_sync
+        entry: python -m tools.check_dependency_sync
         language: system
         pass_filenames: false
-        files: ^vlm/(pyproject\.toml|README\.md)$
+        files: ^src/(pyproject\.toml|README\.md)$
       - id: mypy
         name: mypy
         entry: mypy

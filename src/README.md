@@ -560,6 +560,8 @@ mlx-vlm-check/
 
 ## Contributing
 
+**For detailed contribution guidelines, coding standards, and project conventions, see [docs/CONTRIBUTING.md](../docs/CONTRIBUTING.md).**
+
 ### Developer Workflow (Makefile)
 
 A `Makefile` at the repository root streamlines common tasks. It auto‑detects whether the target conda environment (`mlx-vlm` by default) is already active; if not, it transparently prefixes commands with `conda run -n mlx-vlm` so you don't have to manually activate it.
