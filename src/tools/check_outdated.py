@@ -29,7 +29,9 @@ def main() -> int:
     if "Package" in output:
         # Has header and packages
         lines = output.split("\n")
-        if len(lines) > 2:  # Header + separator + at least one package
+        # Header + separator + at least one package = 3 lines minimum
+        min_lines_with_packages = 3
+        if len(lines) > min_lines_with_packages - 1:
             print("⚠️  Outdated packages found:\n")
             print(output)
             print("\n💡 Run 'make upgrade-deps' to upgrade all dependencies")
