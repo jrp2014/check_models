@@ -1,7 +1,7 @@
 # CLI Output Formatting Review & Improvement Suggestions
 
-**Date**: 2025-10-03  
-**File**: `vlm/check_models.py`  
+**Date**: 2025-10-03
+**File**: `src/check_models.py`
 **Purpose**: Review current formatting and colorization, suggest improvements for clarity and visual scanning
 
 ---
@@ -27,12 +27,14 @@ The script uses a well-defined color palette:
 ### Current Output Structure
 
 #### Standard Mode (Non-Verbose)
+
 1. **Section Headers**: Bold magenta with blue separator lines
 2. **Processing Status**: Model name in magenta
 3. **Summary Line**: Green/red based on success, with key metrics
 4. **Generated Text Preview**: Cyan color
 
 #### Verbose Mode
+
 1. All of standard mode, plus:
 2. **Detailed Metrics**: White text for numbers
 3. **Token Summary**: Separate lines for tokens and TPS
@@ -48,6 +50,7 @@ The script uses a well-defined color palette:
 **Problem**: When `verbose=True` is passed to `mlx_vlm.generate()`, the library outputs its own progress information (token-by-token generation, timing info) directly to stdout/stderr. This output is **not** styled or prefixed by check_models.py, making it hard to distinguish script output from library output.
 
 **Example of Confusion**:
+
 ```
 [ PROCESSING MODEL: PHI-3-VISION ]
 Processing 'test.jpg' with model: microsoft/Phi-3-vision-128k-instruct
@@ -60,6 +63,7 @@ Generation: 78 tokens, 23.456 tok/s    ← MLX-VLM output (not styled)
 **Suggested Solutions**:
 
 **Option A: Visual Prefix/Indent** (Easiest, Non-Intrusive)
+
 - Add a visual indicator to check_models output to make it stand out
 - Prefix check_models messages with `📊` or `▶` symbols
 - Keep MLX-VLM output unmodified but clearly separated
@@ -75,6 +79,7 @@ def print_cli_section(title: str) -> None:
 ```
 
 **Option B: Bracketed Context** (More Invasive)
+
 - Wrap each model processing in clear "begin/end" markers
 - Makes it obvious what's MLX-VLM vs what's check_models
 
@@ -94,6 +99,7 @@ def print_cli_section(title: str) -> None:
 ```
 
 **Option C: Capture and Reformat** (Most Control, Most Complex)
+
 - Capture MLX-VLM's stdout/stderr in verbose mode
 - Parse and reformat with consistent styling
 - Requires stdout/stderr redirection during `generate()` call
@@ -107,11 +113,11 @@ def _run_model_generation_with_captured_output(...):
         # Capture MLX-VLM's output
         captured_stdout = io.StringIO()
         captured_stderr = io.StringIO()
-        
+
         with contextlib.redirect_stdout(captured_stdout), \
              contextlib.redirect_stderr(captured_stderr):
             output = generate(...)
-        
+
         # Re-emit with styling
         for line in captured_stdout.getvalue().splitlines():
             logger.info("  %s", Colors.colored(f"[mlx-vlm] {line}", Colors.GRAY))
@@ -126,6 +132,7 @@ def _run_model_generation_with_captured_output(...):
 ### 2. **Inconsistent Metric Formatting**
 
 **Problem**: Metrics use different formats in different contexts:
+
 - Summary line: `tokens=1637 gen_tps=114`
 - Verbose detailed: `Prompt Tokens: 1,488` (with thousands separator)
 - Compact metrics: `tokens(total/prompt/gen)=1637/1488/149`
@@ -151,6 +158,7 @@ def _run_model_generation_with_captured_output(...):
 **Problem**: Detailed metrics use inconsistent indentation and headers aren't visually distinct enough.
 
 **Current**:
+
 ```
 ✓ SUCCESS: Phi-3-vision-128k-instruct
 Generated Text: This is a test image...
@@ -170,6 +178,7 @@ Generated Text: This is a test image...
 ```
 
 **Suggested Improvement**:
+
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✓ SUCCESS: Phi-3-vision-128k-instruct
@@ -196,26 +205,27 @@ Generated Text: This is a test image...
 ```
 
 Implementation:
+
 ```python
 def _log_verbose_success_details_mode(res: PerformanceResult, *, detailed: bool) -> None:
     """Emit verbose block with improved hierarchy."""
     if not res.generation:
         return
-    
+
     # Success separator
     width = get_terminal_width(max_width=100)
     log_rule(width, char="━", color=Colors.GREEN, bold=True)
-    
+
     # Generated text with emoji prefix
     gen_text = getattr(res.generation, "text", None) or ""
     logger.info("")  # Blank line for breathing room
     logger.info("📝 %s", Colors.colored("Generated Text:", Colors.BOLD, Colors.CYAN))
     _log_wrapped_label_value("   ", gen_text, color=Colors.CYAN)
-    
+
     logger.info("")
     logger.info("📊 %s", Colors.colored("Performance Summary:", Colors.BOLD, Colors.WHITE))
     _log_tree_metrics(res)
-    
+
     # ... rest of metrics with tree structure
 ```
 
@@ -224,16 +234,19 @@ def _log_verbose_success_details_mode(res: PerformanceResult, *, detailed: bool)
 ### 4. **Compact Metrics Readability**
 
 **Problem**: The single-line compact metrics can be hard to scan:
+
 ```
 Metrics: total=4.13s gen=3.03s load=1.09s peak_mem=5.5GB tokens(total/prompt/gen)=1637/1488/149 gen_tps=114
 ```
 
 **Suggestion**: Use clearer grouping and alignment:
+
 ```
 Metrics: ⏱ total=4.13s gen=3.03s load=1.09s  💾 peak=5.5GB  🔢 tok=1,637 (p:1,488 g:149)  ⚡ tps=114
 ```
 
 Or split into logical groups:
+
 ```
 ⏱  Time: total=4.13s  gen=3.03s  load=1.09s
 💾  Memory: peak=5.5GB
@@ -245,6 +258,7 @@ Or split into logical groups:
 ### 5. **Error Messages**
 
 **Current**: Error wrapping is good, but could be more visually distinct:
+
 ```
 ✗ FAILED: microsoft/Phi-3-vision-128k-instruct
 Stage: processing
@@ -252,13 +266,14 @@ Error: Model loading failed: [Errno 2] No such file or directory: ...
 ```
 
 **Suggestion**: Add error context boxes:
+
 ```
 ╔════════════════════════════════════════════════════════════════════
 ║ ✗ FAILED: microsoft/Phi-3-vision-128k-instruct
 ╠════════════════════════════════════════════════════════════════════
 ║ Stage:  processing
 ║ Error:  Model loading failed: [Errno 2] No such file or directory
-║         
+║
 ║         Full traceback available with --verbose
 ╚════════════════════════════════════════════════════════════════════
 ```
@@ -268,18 +283,20 @@ Error: Model loading failed: [Errno 2] No such file or directory: ...
 ### 6. **Section Separators**
 
 **Current**: Uses simple dashes, which can get lost in output:
+
 ```
 -------------------------------------------------
 ```
 
 **Suggestion**: Use unicode box-drawing characters for better visibility:
+
 ```python
 def print_cli_separator() -> None:
     """Print a visually distinct separator line."""
     width = get_terminal_width(max_width=100)
     # Use unicode box-drawing for better visual separation
     log_rule(width, char="─", color=Colors.BLUE, bold=False)
-    
+
 def log_rule(width: int, char: str = "─", color: str = "", bold: bool = False) -> None:
     """Log a horizontal rule with optional color."""
     colors = [c for c in [Colors.BOLD if bold else "", color] if c]
@@ -293,6 +310,7 @@ def log_rule(width: int, char: str = "─", color: str = "", bold: bool = False)
 **Current**: The final summary table is good but could be enhanced:
 
 **Suggestion**: Add visual indicators and color coding:
+
 ```
 ═══════════════════════════════════════════════════════════════════════
                      PERFORMANCE SUMMARY
@@ -317,18 +335,21 @@ def log_rule(width: int, char: str = "─", color: str = "", bold: bool = False)
 ## Implementation Priority
 
 ### Phase 1: Quick Wins (Low Risk, High Impact)
+
 1. ✅ Add visual prefixes (▶, 📊, 📝, etc.) to check_models output
 2. ✅ Improve separator lines with unicode box-drawing characters
 3. ✅ Standardize number formatting with thousands separators
 4. ✅ Add blank lines for breathing room between sections
 
 ### Phase 2: Moderate Changes (Medium Risk, High Impact)
+
 5. 🔄 Restructure verbose output with tree-style hierarchy
 6. 🔄 Add emoji icons to section headers for quick scanning
 7. 🔄 Improve error message boxes with border characters
 8. 🔄 Enhanced summary table with visual indicators
 
 ### Phase 3: Advanced Features (Higher Risk, High Impact)
+
 9. 🔮 Capture and reformat MLX-VLM output for consistent styling
 10. 🔮 Add progress indicators for multi-model runs
 11. 🔮 Support for alternate output formats (JSON, CSV) alongside pretty printing
@@ -377,15 +398,15 @@ def _log_verbose_success_details_mode(res: PerformanceResult, *, detailed: bool)
     """Emit verbose block with improved spacing."""
     if not res.generation:
         return
-    
+
     # Add blank lines for visual breathing room
     logger.info("")
-    
+
     gen_text = getattr(res.generation, "text", None) or ""
     _log_wrapped_label_value("📝 Generated Text:", gen_text, color=Colors.CYAN)
-    
+
     logger.info("")  # Breathing room
-    
+
     if detailed:
         logger.info("📊 %s", Colors.colored("Performance Metrics:", Colors.BOLD, Colors.MAGENTA))
         _log_token_summary(res)
@@ -411,6 +432,7 @@ def _log_verbose_success_details_mode(res: PerformanceResult, *, detailed: bool)
 ## Backward Compatibility
 
 All suggested changes maintain backward compatibility:
+
 - Color codes only appear if terminal supports them (TTY detection + NO_COLOR)
 - Unicode characters degrade gracefully in terminals that don't support them
 - Log messages remain parseable for automated tools

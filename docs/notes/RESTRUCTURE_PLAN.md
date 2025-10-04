@@ -3,17 +3,20 @@
 ## Current Issues
 
 1. **Duplicate/confusing file locations**:
+
    - `pyproject.toml` at root AND in vlm/ (vlm/ is the real one)
    - `pytest.ini` at root AND in vlm/
    - `results.html/md` generated in both root AND vlm/
    - Two READMEs with overlapping content
 
 2. **Unclear entry point**:
+
    - Not obvious that `vlm/` is the main package
    - Root Makefile is just a proxy
    - Need to know to go to `vlm/` subdirectory
 
 3. **Scattered documentation**:
+
    - Main README at root
    - Detailed README in vlm/
    - CONTRIBUTING.md at root
@@ -57,6 +60,7 @@ mlx-vlm-check/
 ### 1. Simplify Root README.md
 
 Make it the single source of truth with:
+
 - What this project does (1-2 paragraphs)
 - Quick start (copy-paste to get running in 30 seconds)
 - Common commands (table format)
@@ -65,6 +69,7 @@ Make it the single source of truth with:
 ### 2. Consolidate Documentation
 
 Move all docs to `docs/` folder:
+
 ```bash
 mkdir docs
 mv CONTRIBUTING.md docs/
@@ -76,11 +81,13 @@ mv vlm/notes/OUTPUT_FORMATTING_REVIEW.md docs/notes/
 ### 3. Rename vlm/ to src/
 
 More standard Python package structure:
+
 ```bash
 mv vlm src
 ```
 
 Update:
+
 - Makefile paths
 - GitHub workflows
 - Import paths in tests
@@ -89,6 +96,7 @@ Update:
 ### 4. Create output/ Directory
 
 Stop polluting root/vlm with generated files:
+
 ```bash
 mkdir -p output
 echo "# Generated Reports\n\nThis directory contains generated HTML and Markdown reports.\n" > output/README.md
@@ -156,14 +164,19 @@ Benchmark and test Vision-Language Models on Apple Silicon using MLX.
 ## Quick Start
 
 ```bash
+
 # 1. Install
+
 pip install -e .
 
 # 2. Run on an image
+
 python -m check_models --model mlx-community/Florence-2-large --image ~/Pictures/test.jpg
 
 # 3. View results
+
 open output/results.html
+
 ```
 
 ## What This Does

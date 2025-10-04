@@ -9,16 +9,19 @@ Successfully completed Option A from RESTRUCTURE_PLAN.md - a full reorganization
 ### 1. Directory Structure
 
 **Created:**
+
 - `docs/` - All documentation moved here
 - `docs/notes/` - Design notes and reviews
 - `output/` - Generated reports (HTML/Markdown)
 
 **Renamed:**
+
 - `vlm/` → `src/` - Standard Python package layout
 
 ### 2. Files Moved
 
 **Documentation (to docs/):**
+
 - `CONTRIBUTING.md` → `docs/CONTRIBUTING.md`
 - `IMPLEMENTATION_GUIDE.md` → `docs/IMPLEMENTATION_GUIDE.md`
 - `PYTHON_313_MIGRATION.md` → `docs/PYTHON_313_MIGRATION.md`
@@ -37,6 +40,7 @@ Successfully completed Option A from RESTRUCTURE_PLAN.md - a full reorganization
 ### 4. Files Removed
 
 Duplicate configuration files (src/ versions are canonical):
+
 - Root `pyproject.toml`
 - Root `pytest.ini`
 - Root `results.html`
@@ -45,26 +49,32 @@ Duplicate configuration files (src/ versions are canonical):
 ### 5. Configuration Updates
 
 **src/pyproject.toml:**
+
 - Line 43: Changed entry point from `vlm.check_models:main_cli` to `check_models:main_cli`
 - Lines 46-47: Changed to `py-modules = ["check_models"]` (from packages.find)
 
 **src/check_models.py:**
+
 - Lines 900-901: Updated default output paths to `output/results.{html,md}`
 
 **src/__init__.py:**
+
 - Updated docstring
 - Added `__version__ = "0.1.0"`
 
 **Test files:**
+
 - `src/tests/test_metrics_modes.py`: Changed import from `vlm.check_models` to `check_models`
 - `src/tests/test_total_runtime_reporting.py`: Changed import from `vlm.check_models` to `check_models`
 - `src/tests/test_format_field_value.py`: Changed import module from `vlm.check_models` to `check_models`
 
 **GitHub Workflows:**
+
 - `.github/workflows/dependency-sync.yml`: Changed `vlm/` to `src/` in all paths
 - `.github/workflows/quality.yml`: Changed `vlm/` to `src/` in all paths
 
 **VS Code Settings:**
+
 - `.vscode/settings.json`: Changed test path from `vlm/tests` to `src/tests`, config from `vlm/pyproject.toml` to `src/pyproject.toml`
 - `.vscode/tasks.json`: Changed script path from `vlm/tools/run_quality.sh` to `src/tools/run_quality.sh`
 
@@ -137,6 +147,7 @@ Run `make` or `make help` to see:
 ## Migration Notes for Users
 
 ### Old Commands (no longer work):
+
 ```bash
 pip install -e vlm/
 python -m vlm.check_models --help
@@ -144,6 +155,7 @@ cd vlm && pytest
 ```
 
 ### New Commands (current):
+
 ```bash
 make install  # or: pip install -e src/
 make run      # or: python -m check_models --help
@@ -151,6 +163,7 @@ make test     # or: pytest src/tests/
 ```
 
 ### Import Changes (for contributors):
+
 ```python
 # Old
 from vlm.check_models import PerformanceResult
