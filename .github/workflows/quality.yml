@@ -57,6 +57,7 @@ jobs:
 
       - name: Run dependency sync check
         run: |
+          cd src
           python -m tools.check_dependency_sync
 
       - name: Collect and verify tests
