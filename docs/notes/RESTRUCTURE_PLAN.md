@@ -24,7 +24,7 @@
 
 ## Proposed Structure
 
-```
+```text
 mlx-vlm-check/
 ├── README.md                          # 🎯 MAIN ENTRY POINT - Quick start
 ├── Makefile                           # Simple top-level targets
@@ -41,7 +41,7 @@ mlx-vlm-check/
 │
 ├── src/                               # 🐍 Python package (renamed from vlm/)
 │   ├── check_models.py               # Main script
-│   ├── __init__.py
+│   ├── **init**.py
 │   ├── pyproject.toml                # Package config
 │   ├── requirements.txt              # Locked dependencies
 │   ├── requirements-dev.txt
@@ -53,8 +53,7 @@ mlx-vlm-check/
 └── output/                            # 📊 Generated reports go here
     ├── .gitignore                    # Ignore *.html, *.md
     └── README.md                     # Explains this is for outputs
-```
-
+```text
 ## Proposed Changes
 
 ### 1. Simplify Root README.md
@@ -76,16 +75,14 @@ mv CONTRIBUTING.md docs/
 mv IMPLEMENTATION_GUIDE.md docs/
 mv PYTHON_313_MIGRATION.md docs/
 mv vlm/notes/OUTPUT_FORMATTING_REVIEW.md docs/notes/
-```
-
+```text
 ### 3. Rename vlm/ to src/
 
 More standard Python package structure:
 
 ```bash
 mv vlm src
-```
-
+```text
 Update:
 
 - Makefile paths
@@ -101,8 +98,7 @@ Stop polluting root/vlm with generated files:
 mkdir -p output
 echo "# Generated Reports\n\nThis directory contains generated HTML and Markdown reports.\n" > output/README.md
 echo "*.html\n*.md\n!README.md" > output/.gitignore
-```
-
+```text
 Update check_models.py default output paths to `output/results.{html,md}`
 
 ### 5. Remove Duplicates
@@ -110,50 +106,48 @@ Update check_models.py default output paths to `output/results.{html,md}`
 ```bash
 # Remove root duplicates (vlm/ versions are canonical)
 rm pyproject.toml pytest.ini results.html results.md
-```
-
+```text
 ### 6. Simplify Root Makefile
 
 ```makefile
 .DEFAULT_GOAL := help
 
 help:
-	@echo "MLX VLM Check - Quick Commands"
-	@echo ""
-	@echo "Getting Started:"
-	@echo "  make install          Install the package"
-	@echo "  make run              Run on default image"
-	@echo ""
-	@echo "Development:"
-	@echo "  make dev              Setup dev environment"
-	@echo "  make test             Run tests"
-	@echo "  make quality          Run quality checks"
-	@echo ""
-	@echo "See README.md for detailed usage"
+    @echo "MLX VLM Check - Quick Commands"
+    @echo ""
+    @echo "Getting Started:"
+    @echo "  make install          Install the package"
+    @echo "  make run              Run on default image"
+    @echo ""
+    @echo "Development:"
+    @echo "  make dev              Setup dev environment"
+    @echo "  make test             Run tests"
+    @echo "  make quality          Run quality checks"
+    @echo ""
+    @echo "See README.md for detailed usage"
 
 install:
-	pip install -e src/
+    pip install -e src/
 
 dev:
-	pip install -e "src/[dev,extras]"
+    pip install -e "src/[dev,extras]"
 
 run:
-	python -m src.check_models --help
+    python -m src.check_models --help
 
 test:
-	pytest src/tests/
+    pytest src/tests/
 
 quality:
-	ruff format src/
-	ruff check src/
-	mypy src/
+    ruff format src/
+    ruff check src/
+    mypy src/
 
 clean:
-	rm -rf output/*.html output/*.md
-	find . -type d -name __pycache__ -exec rm -rf {} +
-	find . -type d -name .pytest_cache -exec rm -rf {} +
-```
-
+    rm -rf output/*.html output/*.md
+    find . -type d -name **pycache**-exec rm -rf {} +
+    find . -type d -name .pytest_cache -exec rm -rf {} +
+```text
 ### 7. Update Root README.md
 
 ```markdown
@@ -177,8 +171,7 @@ python -m check_models --model mlx-community/Florence-2-large --image ~/Pictures
 
 open output/results.html
 
-```
-
+```text
 ## What This Does
 
 - Runs MLX Vision-Language Models on images
@@ -211,11 +204,10 @@ open output/results.html
 ## License
 
 [Add license]
-```
-
+```text
 ## Benefits
 
-1. **Clear entry point**: README.md is the first thing users see
+1.**Clear entry point**: README.md is the first thing users see
 2. **Standard structure**: `src/` is a common Python pattern
 3. **Clean root**: No generated files or test artifacts
 4. **Organized docs**: Everything in `docs/`

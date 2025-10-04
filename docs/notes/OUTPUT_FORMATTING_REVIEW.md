@@ -22,8 +22,7 @@ The script uses a well-defined color palette:
 - WHITE (97)   : Metrics, performance data
 - GRAY (90)    : Debug messages
 - BOLD         : Emphasis on headers and critical info
-```
-
+```text
 ### Current Output Structure
 
 #### Standard Mode (Non-Verbose)
@@ -45,24 +44,18 @@ The script uses a well-defined color palette:
 
 ## Issues & Opportunities for Improvement
 
-### 1. **MLX-VLM Output Interleaving** ⚠️ HIGH PRIORITY
-
-**Problem**: When `verbose=True` is passed to `mlx_vlm.generate()`, the library outputs its own progress information (token-by-token generation, timing info) directly to stdout/stderr. This output is **not** styled or prefixed by check_models.py, making it hard to distinguish script output from library output.
-
-**Example of Confusion**:
-
-```
+### 1. **MLX-VLM Output Interleaving**⚠️ HIGH PRIORITY**Problem**: When `verbose=True` is passed to `mlx_vlm.generate()`, the library outputs its own progress information (token-by-token generation, timing info) directly to stdout/stderr. This output is **not**styled or prefixed by check_models.py, making it hard to distinguish script output from library output.**Example of Confusion**
+```text
 [ PROCESSING MODEL: PHI-3-VISION ]
 Processing 'test.jpg' with model: microsoft/Phi-3-vision-128k-instruct
 Fetching 6 files: 100%|█████████████| 6/6 [00:00<00:00, 42.12it/s]
 Prompt: 125 tokens, 1.234 tok/s
 Generation: 78 tokens, 23.456 tok/s    ← MLX-VLM output (not styled)
 ✓ SUCCESS: Phi-3-vision-128k-instruct  ← check_models output (styled)
-```
-
+```text
 **Suggested Solutions**:
 
-**Option A: Visual Prefix/Indent** (Easiest, Non-Intrusive)
+**Option A: Visual Prefix/Indent**(Easiest, Non-Intrusive)
 
 - Add a visual indicator to check_models output to make it stand out
 - Prefix check_models messages with `📊` or `▶` symbols
@@ -76,14 +69,12 @@ def print_cli_section(title: str) -> None:
     # Add visual prefix to make check_models output distinct
     logger.info("▶ [ %s ]", Colors.colored(safe_title, Colors.BOLD, Colors.MAGENTA))
     log_rule(width, char="━", color=Colors.BLUE, bold=False)
-```
-
-**Option B: Bracketed Context** (More Invasive)
+```text**Option B: Bracketed Context**(More Invasive)
 
 - Wrap each model processing in clear "begin/end" markers
 - Makes it obvious what's MLX-VLM vs what's check_models
 
-```
+```text
 ┌─────────────────────────────────────────────────────
 │ MODEL: microsoft/Phi-3-vision-128k-instruct
 └─────────────────────────────────────────────────────
@@ -96,9 +87,7 @@ def print_cli_section(title: str) -> None:
 │ ✓ check_models RESULT: SUCCESS
 │   Metrics: total=4.13s gen=3.03s load=1.09s
 └─────────────────────────────────────────────────────
-```
-
-**Option C: Capture and Reformat** (Most Control, Most Complex)
+```text**Option C: Capture and Reformat**(Most Control, Most Complex)
 
 - Capture MLX-VLM's stdout/stderr in verbose mode
 - Parse and reformat with consistent styling
@@ -123,13 +112,11 @@ def _run_model_generation_with_captured_output(...):
             logger.info("  %s", Colors.colored(f"[mlx-vlm] {line}", Colors.GRAY))
     else:
         output = generate(...)
-```
-
-**Recommendation**: Start with **Option A** (visual prefixes) for immediate improvement, consider Option C for future enhancement.
+```text**Recommendation**: Start with **Option A**(visual prefixes) for immediate improvement, consider Option C for future enhancement.
 
 ---
 
-### 2. **Inconsistent Metric Formatting**
+### 2.**Inconsistent Metric Formatting**
 
 **Problem**: Metrics use different formats in different contexts:
 
@@ -149,8 +136,7 @@ def _run_model_generation_with_captured_output(...):
 "tokens=1,637"                   # Always use separator for > 999
 "Prompt Tokens: 1,488"          # Keep separator
 "tokens(total/prompt/gen)=1,637/1,488/149"  # Compact with separators
-```
-
+```text
 ---
 
 ### 3. **Visual Hierarchy in Verbose Mode**
@@ -159,7 +145,7 @@ def _run_model_generation_with_captured_output(...):
 
 **Current**:
 
-```
+```text
 ✓ SUCCESS: Phi-3-vision-128k-instruct
 Generated Text: This is a test image...
   Tokens: total=1,637 prompt=1,488 gen=149
@@ -175,11 +161,10 @@ Generated Text: This is a test image...
     Prompt Tokens: 1,488
     Generation Tokens: 149
     Prompt TPS: 421
-```
-
+```text
 **Suggested Improvement**:
 
-```
+```text
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✓ SUCCESS: Phi-3-vision-128k-instruct
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -202,8 +187,7 @@ Generated Text: This is a test image...
    ├─ Active Delta:    0.5 GB
    ├─ Cache Delta:     4.8 GB
    └─ Peak:            5.5 GB
-```
-
+```text
 Implementation:
 
 ```python
@@ -227,47 +211,42 @@ def _log_verbose_success_details_mode(res: PerformanceResult, *, detailed: bool)
     _log_tree_metrics(res)
 
     # ... rest of metrics with tree structure
-```
-
+```text
 ---
 
 ### 4. **Compact Metrics Readability**
 
 **Problem**: The single-line compact metrics can be hard to scan:
 
-```
+```text
 Metrics: total=4.13s gen=3.03s load=1.09s peak_mem=5.5GB tokens(total/prompt/gen)=1637/1488/149 gen_tps=114
-```
-
+```text
 **Suggestion**: Use clearer grouping and alignment:
 
-```
+```text
 Metrics: ⏱ total=4.13s gen=3.03s load=1.09s  💾 peak=5.5GB  🔢 tok=1,637 (p:1,488 g:149)  ⚡ tps=114
-```
-
+```text
 Or split into logical groups:
 
-```
+```text
 ⏱  Time: total=4.13s  gen=3.03s  load=1.09s
 💾  Memory: peak=5.5GB
 🔢  Tokens: 1,637 (prompt:1,488  generated:149)  TPS: 114
-```
-
+```text
 ---
 
 ### 5. **Error Messages**
 
 **Current**: Error wrapping is good, but could be more visually distinct:
 
-```
+```text
 ✗ FAILED: microsoft/Phi-3-vision-128k-instruct
 Stage: processing
 Error: Model loading failed: [Errno 2] No such file or directory: ...
-```
-
+```text
 **Suggestion**: Add error context boxes:
 
-```
+```text
 ╔════════════════════════════════════════════════════════════════════
 ║ ✗ FAILED: microsoft/Phi-3-vision-128k-instruct
 ╠════════════════════════════════════════════════════════════════════
@@ -276,18 +255,16 @@ Error: Model loading failed: [Errno 2] No such file or directory: ...
 ║
 ║         Full traceback available with --verbose
 ╚════════════════════════════════════════════════════════════════════
-```
-
+```text
 ---
 
 ### 6. **Section Separators**
 
 **Current**: Uses simple dashes, which can get lost in output:
 
-```
+```text
 -------------------------------------------------
-```
-
+```text
 **Suggestion**: Use unicode box-drawing characters for better visibility:
 
 ```python
@@ -300,9 +277,8 @@ def print_cli_separator() -> None:
 def log_rule(width: int, char: str = "─", color: str = "", bold: bool = False) -> None:
     """Log a horizontal rule with optional color."""
     colors = [c for c in [Colors.BOLD if bold else "", color] if c]
-    logger.info(Colors.colored(char * width, *colors))
-```
-
+    logger.info(Colors.colored(char *width,*colors))
+```text
 ---
 
 ### 7. **Summary Table at End**
@@ -311,7 +287,7 @@ def log_rule(width: int, char: str = "─", color: str = "", bold: bool = False)
 
 **Suggestion**: Add visual indicators and color coding:
 
-```
+```text
 ═══════════════════════════════════════════════════════════════════════
                      PERFORMANCE SUMMARY
 ═══════════════════════════════════════════════════════════════════════
@@ -328,8 +304,7 @@ def log_rule(width: int, char: str = "─", color: str = "", bold: bool = False)
 ⏱  Total Runtime: 12.45s
 📊 HTML Report: /path/to/results.html
 📝 Markdown Report: /path/to/results.md
-```
-
+```text
 ---
 
 ## Implementation Priority
@@ -343,16 +318,16 @@ def log_rule(width: int, char: str = "─", color: str = "", bold: bool = False)
 
 ### Phase 2: Moderate Changes (Medium Risk, High Impact)
 
-5. 🔄 Restructure verbose output with tree-style hierarchy
-6. 🔄 Add emoji icons to section headers for quick scanning
-7. 🔄 Improve error message boxes with border characters
-8. 🔄 Enhanced summary table with visual indicators
+1. 🔄 Restructure verbose output with tree-style hierarchy
+2. 🔄 Add emoji icons to section headers for quick scanning
+3. 🔄 Improve error message boxes with border characters
+4. 🔄 Enhanced summary table with visual indicators
 
 ### Phase 3: Advanced Features (Higher Risk, High Impact)
 
-9. 🔮 Capture and reformat MLX-VLM output for consistent styling
-10. 🔮 Add progress indicators for multi-model runs
-11. 🔮 Support for alternate output formats (JSON, CSV) alongside pretty printing
+1. 🔮 Capture and reformat MLX-VLM output for consistent styling
+2. 🔮 Add progress indicators for multi-model runs
+3. 🔮 Support for alternate output formats (JSON, CSV) alongside pretty printing
 
 ---
 
@@ -374,7 +349,7 @@ def print_cli_section(title: str) -> None:
 def log_rule(width: int, char: str = "─", color: str = "", bold: bool = False) -> None:
     """Log a horizontal rule with optional color."""
     colors = [c for c in [Colors.BOLD if bold else "", color] if c]
-    logger.info(Colors.colored(char * width, *colors))
+    logger.info(Colors.colored(char *width,*colors))
 
 # 3. Update print_cli_separator
 def print_cli_separator() -> None:
@@ -415,8 +390,7 @@ def _log_verbose_success_details_mode(res: PerformanceResult, *, detailed: bool)
         _log_perf_block(res)
     else:
         _log_compact_metrics(res)
-```
-
+```text
 ---
 
 ## Testing Recommendations

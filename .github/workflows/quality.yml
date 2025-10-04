@@ -45,10 +45,11 @@ jobs:
           cd src
           ruff check check_models.py tests tools
 
-      - name: Generate type stubs
+      - name: Generate type stubs (optional, MLX requires macOS)
+        continue-on-error: true
         run: |
           cd src
-          python tools/generate_stubs.py
+          python tools/generate_stubs.py || echo "⚠️ Stub generation skipped (MLX not available on Linux)"
 
       - name: Run mypy type checking
         run: |

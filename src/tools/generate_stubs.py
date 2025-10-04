@@ -213,11 +213,15 @@ def main() -> int:
             if not pkg_dir.exists():
                 missing.append(pkg)
         if missing:
-            logger.error(
+            logger.warning(
                 "[stubs] Some packages did not produce stubs (possibly not importable): %s",
                 ", ".join(missing),
             )
-            return 2
+            logger.warning(
+                "[stubs] This is expected on non-macOS platforms (MLX requires Apple Silicon)",
+            )
+            # Don't fail - mypy has ignore_missing_imports=true and will work without stubs
+            return 0
         # Apply post-processing patches for mlx_vlm stubs
         if any(pkg.split(".")[0] == "mlx_vlm" for pkg in ns.packages):
             _patch_mlx_vlm_stubs(TYPINGS_DIR)

@@ -13,13 +13,12 @@ make install
 # 2. Run on an image
 make check_models ARGS="--model mlx-community/Florence-2-large --image /path/to/image.jpg"
 
-# Or use the CLI directly:
+# Or use the CLI directly
 python -m check_models --model mlx-community/Florence-2-large --image /path/to/image.jpg
 
 # 3. Generate HTML report
 python -m check_models --model mlx-community/Florence-2-large --image /path/to/image.jpg --html
-```
-
+```text
 **📝 Note**: When you pass a folder path, the tool automatically selects the most recently modified, non-hidden image file in that folder. Pass a direct file path to override this behavior.
 
 ## What This Does
@@ -36,7 +35,7 @@ Reports are saved to the `output/` directory by default.
 
 ## Repository Structure
 
-```
+```text
 .
 ├── src/                       # Main Python package
 │   ├── check_models.py        # Primary CLI and implementation
@@ -52,8 +51,7 @@ Reports are saved to the `output/` directory by default.
 ├── typings/                   # Type stubs (git-ignored)
 ├── Makefile                   # Development commands
 └── README.md                  # This file
-```
-
+```text
 ## Available Commands
 
 Run `make` or `make help` to see all available commands:
@@ -94,41 +92,37 @@ make test
 
 # Format code
 make format
-```
-
+```text
 ### Type Stubs
 
 Local type stubs live under `typings/` and are generated via:
 
 ```bash
 python -m tools.generate_stubs mlx_vlm tokenizers
-```
-
+```text
 The directory is ignored by git. If stubs get stale:
 
 ```bash
 make clean && python -m tools.generate_stubs mlx_vlm tokenizers
-```
-
+```text
 ### Dependencies
 
 The `src/pyproject.toml` is the source of truth for dependency lists. To check for outdated packages:
 
 ```bash
 python -m tools.check_outdated
-```
-
+```text
 ## Documentation
 
-- **[src/README.md](src/README.md)** - Detailed usage, CLI options, and examples
-- **[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)** - How to contribute to this project
-- **[docs/IMPLEMENTATION_GUIDE.md](docs/IMPLEMENTATION_GUIDE.md)** - Technical standards for developers
-- **[docs/PYTHON_313_MIGRATION.md](docs/PYTHON_313_MIGRATION.md)** - Python 3.13 migration notes
-- **[docs/notes/](docs/notes/)** - Design notes and formatting reviews
+- **[src/README.md](src/README.md)**- Detailed usage, CLI options, and examples
+-**[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)**- How to contribute to this project
+-**[docs/IMPLEMENTATION_GUIDE.md](docs/IMPLEMENTATION_GUIDE.md)**- Technical standards for developers
+-**[docs/PYTHON_313_MIGRATION.md](docs/PYTHON_313_MIGRATION.md)**- Python 3.13 migration notes
+-**[docs/notes/](docs/notes/)**- Design notes and formatting reviews
 
 ## Requirements
 
-- **Python**: 3.13+
+-**Python**: 3.13+
 - **Platform**: macOS with Apple Silicon (M1/M2/M3)
 - **Framework**: MLX (Apple's machine learning framework)
 
