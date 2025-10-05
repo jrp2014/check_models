@@ -6,6 +6,10 @@
 #   ./update.sh                       # Update runtime + extras + dev (default behavior)
 #   INSTALL_TORCH=1 ./update.sh       # Additionally install torch/torchvision/torchaudio
 #   FORCE_REINSTALL=1 ./update.sh     # Force reinstall with --force-reinstall
+#   SKIP_MLX=1 ./update.sh            # Force skip mlx/mlx-vlm updates (override detection)
+#
+# Note: Script automatically detects and preserves local MLX dev builds (versions
+# containing .dev or +commit). Stable releases are updated normally.
 #
 # Environment flags controlling heavy backend suppression are set in Python at runtime;
 # here we just upgrade packages.
@@ -15,9 +19,23 @@ set -euo pipefail
 brew upgrade
 pip install -U pip wheel typing_extensions
 
-RUNTIME_PACKAGES=(
-	"mlx>=0.29.1"
-	"mlx-vlm>=0.0.9"
+# Check if MLX is a local dev build (contains .dev or +commit in version)
+MLX_VERSION=$(pip show mlx 2>/dev/null | grep '^Version:' | awk '{print $2}' || echo "")
+MLX_IS_LOCAL=0
+if [[ "$MLX_VERSION" == *".dev"* ]] || [[ "$MLX_VERSION" == *"+"* ]]; then
+	MLX_IS_LOCAL=1
+	echo "[update.sh] Detected local MLX build: $MLX_VERSION — preserving..."
+fi
+
+RUNTIME_PACKAGES=()
+# Only update MLX if not a local dev build (or if SKIP_MLX=1 is explicitly set)
+if [[ "${SKIP_MLX:-0}" != "1" ]] && [[ "$MLX_IS_LOCAL" != "1" ]]; then
+	RUNTIME_PACKAGES+=("mlx>=0.29.1" "mlx-vlm>=0.0.9")
+elif [[ "${SKIP_MLX:-0}" == "1" ]]; then
+	echo "[update.sh] Skipping mlx/mlx-vlm updates (SKIP_MLX=1)..."
+fi
+
+RUNTIME_PACKAGES+=(
 	"Pillow>=10.3.0"
 	"huggingface-hub>=0.23.0"
 	"tabulate>=0.9.0"
