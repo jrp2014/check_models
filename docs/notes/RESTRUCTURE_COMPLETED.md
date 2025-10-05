@@ -147,18 +147,23 @@ Run `make` or `make help` to see:
 ## Migration Notes for Users
 
 ### Old Commands (no longer work)
+
 ```bash
 pip install -e vlm/
 python -m vlm.check_models --help
 cd vlm && pytest
 ```
+
 ### New Commands (current)
+
 ```bash
 make install  # or: pip install -e src/
 make run      # or: python -m check_models --help
 make test     # or: pytest src/tests/
 ```
+
 ### Import Changes (for contributors)
+
 ```python
 # Old
 from vlm.check_models import PerformanceResult
@@ -166,6 +171,7 @@ from vlm.check_models import PerformanceResult
 # New
 from check_models import PerformanceResult
 ```
+
 ## Next Steps
 
 1. ✅ Restructure completed
@@ -175,6 +181,7 @@ from check_models import PerformanceResult
 5. 🔄 Ready to commit
 
 ### Suggested Commit Message
+
 ```text
 feat: restructure project to follow Python best practices
 
@@ -191,6 +198,7 @@ Tests: 12/13 passing (1 pre-existing failure)
 Structure: Now follows standard Python package layout
 Entry point: Clear quick start in root README
 ```
+
 ## Files Changed Summary
 
 - Created: 5 files (Makefile, README.md, `output/README.md`, `output/.gitignore`, docs/ structure)
