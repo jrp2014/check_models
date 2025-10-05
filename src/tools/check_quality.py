@@ -25,7 +25,14 @@ from pathlib import Path
 from typing import Any, Final
 
 DEFAULT_PATHS: Final[list[str]] = ["check_models.py"]
-ALLOWED_TOOLS: Final[set[str]] = {"ruff", "mypy", "stubgen"}
+ALLOWED_TOOLS: Final[set[str]] = {
+    "ruff",
+    "mypy",
+    "stubgen",
+    "markdownlint-cli2",
+    "npx",
+    "markdownlint",
+}
 logger = logging.getLogger("quality")
 
 
@@ -78,6 +85,11 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         "--require",
         action="store_true",
         help="Fail if a required tool is missing (otherwise tools are skipped).",
+    )
+    parser.add_argument(
+        "--no-md",
+        action="store_true",
+        help="Do not run markdownlint-cli2 on Markdown files (runs by default if available).",
     )
     parser.add_argument(
         "--no-stubs",
@@ -166,7 +178,101 @@ def _ensure_stubs(repo_root: Path, *, refresh: bool, require: bool) -> int:
     return 0
 
 
-def main(argv: list[str] | None = None) -> int:  # noqa: PLR0912 - cohesive CLI flow
+def _run_ruff(
+    repo_root: Path,
+    *,
+    paths: list[str],
+    do_format: bool,
+    do_fix: bool,
+    require: bool,
+) -> int:
+    overall = 0
+    if do_format:
+        if _have("ruff"):
+            logger.info("[quality] ruff format ...")
+            overall = overall or _run(["ruff", "format", *paths], cwd=repo_root)
+        else:
+            logger.warning("[quality] ruff not found; skipping format")
+            if require:
+                overall = 1
+    if _have("ruff"):
+        logger.info("[quality] ruff check ...")
+        cmd = ["ruff", "check", *paths]
+        if do_fix:
+            cmd.append("--fix")
+        overall = overall or _run(cmd, cwd=repo_root)
+    else:
+        logger.warning("[quality] ruff not found; skipping lint")
+        if require:
+            overall = 1
+    return overall
+
+
+def _run_mypy(
+    repo_root: Path,
+    *,
+    paths: list[str],
+    require: bool,
+    check_stubs: bool,
+    stubs_path: str,
+) -> int:
+    overall = 0
+    if _have("mypy"):
+        logger.info("[quality] mypy type check ...")
+        overall = overall or _run(
+            [
+                "mypy",
+                "--config-file",
+                str(repo_root / "src/pyproject.toml"),
+                "--exclude",
+                r"typings/tokenizers/.*",
+                *paths,
+            ],
+            cwd=repo_root,
+        )
+        if check_stubs:
+            logger.info("[quality] mypy type check (stubs: %s) ...", stubs_path)
+            overall = overall or _run(
+                [
+                    "mypy",
+                    "--config-file",
+                    str(repo_root / "src/pyproject.toml"),
+                    str(repo_root / stubs_path),
+                ],
+                cwd=repo_root,
+            )
+    else:
+        logger.warning("[quality] mypy not found; skipping type check")
+        if require:
+            overall = 1
+    return overall
+
+
+def _run_markdownlint(repo_root: Path, *, require: bool) -> int:
+    """Run markdownlint on all Markdown files if available.
+
+    Tries markdownlint-cli2 directly, then via npx. Returns exit code.
+    """
+    md_patterns = ["**/*.md"]
+    if _have("markdownlint-cli2"):
+        logger.info("[quality] markdownlint-cli2 ...")
+        try:
+            return _run(["markdownlint-cli2", *md_patterns], cwd=repo_root)
+        except Exception:
+            logger.exception("[quality] markdownlint-cli2 execution failed")
+            return 1
+    if _have("npx"):
+        logger.info("[quality] npx markdownlint-cli2 ...")
+        try:
+            return _run(["npx", "--yes", "markdownlint-cli2", *md_patterns], cwd=repo_root)
+        except Exception:
+            logger.exception("[quality] npx markdownlint-cli2 execution failed")
+            return 1
+    logger.warning("[quality] markdownlint not found (install markdownlint-cli2 or npx)")
+    return 1 if require else 0
+
+
+def main(argv: list[str] | None = None) -> int:  # noqa: PLR0912, PLR0915
     """Run selected quality checks and return combined exit status."""
     # Basic logging setup
     logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -208,6 +314,11 @@ def main(argv: list[str] | None = None) -> int:  # noqa: PLR0912 - cohesive CLI 
         logger.warning(msg)
         if args.require:
             overall_rc = 1
+
+    # markdownlint (via markdownlint-cli2)
+    if not args.no_md:
+        rc_md = _run_markdownlint(repo_root, require=args.require)
+        overall_rc = overall_rc or rc_md
 
     # mypy
     if _have("mypy"):

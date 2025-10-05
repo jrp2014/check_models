@@ -63,6 +63,7 @@ if TYPE_CHECKING:
     from zoneinfo import ZoneInfo
 
     from mlx.nn import Module
+    from mlx_vlm.generate import GenerationResult
 
 LOGGER_NAME: Final[str] = "mlx-vlm-check"
 NOT_AVAILABLE: Final[str] = "N/A"
@@ -106,7 +107,7 @@ except ImportError:
     sys.exit(1)
 
 try:
-    from mlx_vlm.generate import GenerationResult, generate
+    from mlx_vlm.generate import generate
     from mlx_vlm.prompt_utils import apply_chat_template
     from mlx_vlm.utils import load
     from mlx_vlm.version import __version__ as vlm_version
