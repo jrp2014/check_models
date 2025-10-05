@@ -1,6 +1,7 @@
 # Why GPS Data Isn't Stored as Strings in EXIF
 
 ## Question
+
 If GPS coordinates are ultimately displayed as strings like `"37.422000°N, 122.084000°W"`, why doesn't Pillow just return them as strings? Why do we have to decode `IFDRational` fractions and convert bytes references?
 
 ## Answer: The EXIF/TIFF Specification
@@ -11,7 +12,7 @@ GPS coordinates in EXIF are **not stored as strings** in the image file. They're
 
 #### Example: What's Actually in the File
 
-```
+```text
 GPSLatitude:
   - Tag ID: 2 (in GPSInfo IFD)
   - Type: RATIONAL (5)
@@ -36,6 +37,7 @@ Seconds: 15177/500 = 30.354 exactly
 If stored as decimal string `"30.354"`, you lose information about the original fraction. If stored as `"30.35"`, you lose precision entirely.
 
 **Flexibility**: Applications can choose their own precision when converting:
+
 - Navigation app: 8 decimal places → `30.35400000°`
 - Photo viewer: 2 decimal places → `30.35°`
 - Surveying tool: Full rational → `15177/500`
@@ -52,9 +54,9 @@ from PIL.TiffImagePlugin import IFDRational
 exif_data['GPSInfo'] = {
     1: b'N',                                    # GPSLatitudeRef (bytes, not string!)
     2: (IFDRational(37, 1),                     # GPSLatitude (rationals, not floats!)
-        IFDRational(25, 1), 
+        IFDRational(25, 1),
         IFDRational(15177, 500)),
-    3: b'W',                                    # GPSLongitudeRef  
+    3: b'W',                                    # GPSLongitudeRef
     4: (IFDRational(122, 1),                    # GPSLongitude
         IFDRational(5, 1),
         IFDRational(24, 10))
@@ -62,6 +64,7 @@ exif_data['GPSInfo'] = {
 ```
 
 **IFDRational** is a `numbers.Rational` subclass that:
+
 - Preserves exact numerator/denominator from file
 - Converts to float when needed: `float(IFDRational(15177, 500))` → `30.354`
 - Converts to string: `str(IFDRational(15177, 500))` → `"30.354"`
@@ -82,7 +85,7 @@ Our code must:
 ```python
 # What's in the file (binary EXIF):
 GPSLatitude = [0x00000025, 0x00000001,    # 37/1
-               0x00000019, 0x00000001,    # 25/1  
+               0x00000019, 0x00000001,    # 25/1
                0x00003B49, 0x000001F4]    # 15177/500
 
 # What Pillow returns:
@@ -98,7 +101,7 @@ def dms_to_dd(dms, ref):
     deg, min_, sec = dms
     dd = deg + min_/60.0 + sec/3600.0
     # Returns: (37.422567, 'N')
-    
+
 # Final display:
 "37.422567°N, 122.084000°W"
 ```
@@ -120,7 +123,7 @@ But this would:
    - Some want 6 decimals, some want 8
 
 2. **Lose precision**: Once converted to string, you can't get back the exact rational
-   
+
 3. **Hide data quality**: Raw rationals let you see if seconds = `0/1` (no GPS second data) vs `30354/1000` (precise measurement)
 
 4. **Break TIFF philosophy**: Pillow is a low-level library that provides faithful access to the binary structure
@@ -147,7 +150,7 @@ GPS data **is not** stored as strings in EXIF files—it's stored as binary rati
 
 ## Visual Data Flow
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │ CAMERA: Takes photo with GPS receiver active                       │
 │ GPS reading: 37° 25' 30.354" N, 122° 5' 2.4" W                     │
@@ -212,7 +215,7 @@ GPS data **is not** stored as strings in EXIF files—it's stored as binary rati
 3. **Applications** (like ours) choose precision and format for their specific needs
 
 This separation of concerns is good design:
+
 - File format (TIFF): Optimized for precision and storage
 - Library (Pillow): Faithful low-level access
 - Application (our code): Domain-specific formatting
-
