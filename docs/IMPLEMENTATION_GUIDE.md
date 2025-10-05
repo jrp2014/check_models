@@ -221,6 +221,12 @@ format_field_value("peak_memory", None)           # ""
 - Private helpers: prefix with `_` if not part of the public surface
 - Avoid adding a constant for a value used only once unless it improves semantics
 
+**Display/Formatting Constants**:
+
+- `MAX_MODEL_NAME_LENGTH = 20`: Increased from 14 to accommodate longer model names like "microsoft/phi-3-vision" without truncation (2025-10-05)
+- Balance readability with typical model naming patterns from HuggingFace
+- If common models require even longer names, increase further with inline comment
+
 ## Quality & Linting
 
 ### Ruff Configuration
@@ -396,6 +402,199 @@ Output: a\|b\\c &lt;unk&gt;<br>Next line
 - Opt-in to TensorFlow/Flax/JAX by setting `MLX_VLM_ALLOW_TF=1` before running
 - Warning: Installing TensorFlow on macOS/ARM may trigger an Abseil mutex stall during import
 - Note: Installing `sentence-transformers` isn't required here and may import heavy backends
+
+## EXIF & GPS Handling
+
+### Multi-Pass Extraction Strategy
+
+EXIF data extraction uses a **fail-soft multi-pass** approach to handle partially corrupted metadata:
+
+1. **IFD0 pass**: Extract baseline tags (camera make/model, dimensions)
+   - Skip sub-IFD pointers (ExifOffset, GPSInfo) to handle them separately
+2. **Exif SubIFD pass**: Extract exposure details (ISO, aperture, shutter speed)
+   - Isolated try/except so corruption here doesn't abort entire extraction
+3. **GPS IFD pass**: Extract location data
+   - Isolated try/except with separate logging
+   - Returns `None` if GPS data missing or corrupt
+
+**Rationale**: Real-world images often have partially corrupt EXIF segments. Failing soft ensures we still extract whatever remains intact.
+
+### GPS Coordinate Handling
+
+**Display Convention**: Use unsigned decimal degrees with cardinal direction suffix (e.g., `37.422000°N, 122.084000°W`)
+
+**Implementation**:
+
+```python
+def dms_to_dd(dms: tuple[float, float, float], ref: str) -> tuple[float, str]:
+    """Convert DMS (degrees, minutes, seconds) to unsigned decimal degrees.
+    
+    Returns unsigned decimal and normalized cardinal direction (N/S/E/W).
+    Display convention: show absolute value with cardinal direction suffix.
+    """
+    deg, min_, sec = dms
+    dd = deg + min_ / 60.0 + sec / 3600.0
+    return (dd, ref.upper())
+```
+
+**Important Design Decisions**:
+
+1. **Return unsigned values**: Avoids confusion about sign application
+2. **Cardinal direction in output**: More user-friendly than signed decimals
+3. **Single sign application**: Only in display formatting, not in conversion
+4. **Degree symbol (°)**: Added for clarity in final output
+
+**Format Examples**:
+
+- Northern latitude: `37.422000°N`
+- Southern latitude: `33.856000°S`
+- Eastern longitude: `151.215000°E`
+- Western longitude: `122.084000°W`
+
+**Handling Different Coordinate Formats**:
+
+GPS EXIF data may contain 3 formats:
+
+- **Full DMS**: `(degrees, minutes, seconds)` → `(37, 25, 19.2)`
+- **DM only**: `(degrees, minutes)` → `(37, 25)` with implicit `0` seconds
+- **D only**: `(degrees,)` → `(37,)` with implicit `0` minutes and seconds
+
+All formats convert to decimal degrees via `_convert_gps_coordinate()`.
+
+**Byte Decoding**:
+
+GPS reference values (`GPSLatitudeRef`, `GPSLongitudeRef`) may be bytes or strings. Decode with explicit ASCII encoding:
+
+```python
+lat_ref_str: str = (
+    lat_ref.decode("ascii", errors="replace")
+    if isinstance(lat_ref, bytes)
+    else str(lat_ref)
+)
+```
+
+**Why ASCII**: GPS refs are always single-letter ASCII ("N"/"S"/"E"/"W"), but defensive decoding prevents crashes on malformed data.
+
+### Type Safety
+
+Use explicit type narrowing with type guards:
+
+```python
+if isinstance(gps_ifd, dict) and gps_ifd:
+    # Process GPS data - mypy knows gps_ifd is dict here
+```
+
+Avoid broad exception handlers; catch specific types:
+
+```python
+except (KeyError, AttributeError, TypeError) as gps_err:
+    logger.warning("Could not extract GPS IFD: %s", gps_err)
+```
+
+## Code Duplication
+
+### When to Refactor
+
+Extract shared logic when:
+
+1. **Identical code** appears in 2+ functions
+2. **Logic is non-trivial** (>3-4 lines)
+3. **Extraction improves clarity** by naming a concept
+
+**Do NOT extract** just to reduce line count if it:
+
+- Scatters related logic across multiple files
+- Requires passing many parameters
+- Makes the calling code harder to understand
+
+### Example: HTML Tag Escaping
+
+**Before** (duplicated):
+
+```python
+def _escape_markdown_in_text(text: str) -> str:
+    # ... setup code ...
+    def _escape_html_like(m: re.Match[str]) -> str:
+        # 15 lines of tag escaping logic
+        ...
+    result = tag_pattern.sub(_escape_html_like, result)
+    # ... cleanup code ...
+
+def _escape_markdown_diagnostics(text: str) -> str:
+    # ... setup code ...
+    def _escape_html_like(m: re.Match[str]) -> str:
+        # 15 lines of IDENTICAL tag escaping logic
+        ...
+    result = tag_pattern.sub(_escape_html_like, result)
+    # ... cleanup code ...
+```
+
+**After** (refactored):
+
+```python
+def _escape_html_tags_selective(text: str) -> str:
+    """Escape HTML-like tags except GitHub-allowed safe tags.
+    
+    Helper for markdown escaping functions. Neutralizes potentially unsafe HTML
+    while preserving common formatting tags that GitHub recognizes.
+    """
+    tag_pattern = re.compile(r"</?[A-Za-z][A-Za-z0-9:-]*(?:\s+[^<>]*?)?>")
+
+    def _escape_html_like(m: re.Match[str]) -> str:
+        token = m.group(0)
+        inner = token[1:-1].strip()
+        if not inner:
+            return token.replace("<", "&lt;").replace(">", "&gt;")
+        core = inner.lstrip("/").split(None, 1)[0].rstrip("/").lower()
+        if core in allowed_inline_tags:
+            return token  # Keep recognized safe tag
+        return token.replace("<", "&lt;").replace(">", "&gt;")
+
+    return tag_pattern.sub(_escape_html_like, text)
+
+
+def _escape_markdown_in_text(text: str) -> str:
+    # ... setup code ...
+    result = _escape_html_tags_selective(result)
+    # ... cleanup code ...
+
+def _escape_markdown_diagnostics(text: str) -> str:
+    # ... setup code ...
+    result = _escape_html_tags_selective(result)
+    # ... cleanup code ...
+```
+
+**Benefits**:
+
+- Single source of truth (fix bugs once)
+- Clearer intent (function name documents purpose)
+- Easier to test (can test helper independently)
+- Reduced maintenance burden
+
+### Removing Legacy Code
+
+**When to remove**:
+
+- Wrapper functions with no callers ("backward compatibility" stubs)
+- Unused constants (defined but never referenced)
+- Dead code paths (unreachable branches)
+
+**How to verify**:
+
+```bash
+# Search for function calls
+rg "_old_function_name\(" src/
+
+# Check constant usage
+rg "UNUSED_CONSTANT" src/
+```
+
+**Document removal**:
+
+```python
+# Removed: _log_verbose_success_details() - unused wrapper (2025-10-05)
+# Callers migrated to _log_verbose_success_details_mode()
+```
 
 ## External Processes
 

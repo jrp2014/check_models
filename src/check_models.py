@@ -377,11 +377,6 @@ MEGAPIXEL_CONVERSION: Final[float] = 1_000_000.0  # Convert pixels to megapixels
 MAX_GPS_COORD_LEN: Final[int] = 3  # Full GPS coordinate tuple (degrees, minutes, seconds)
 MED_GPS_COORD_LEN: Final[int] = 2  # GPS coordinate with 2 elements (degrees, minutes)
 MIN_GPS_COORD_LEN: Final[int] = 1  # GPS coordinate with 1 element (degrees only)
-DMS_LEN: Final[int] = 3  # Full DMS: (degrees, minutes, seconds)
-DM_LEN: Final[int] = 2  # Decimal minutes: (degrees, decimal_minutes)
-MAX_DEGREES: Final[int] = 180
-MAX_MINUTES: Final[int] = 60
-MAX_SECONDS: Final[int] = 60
 MAX_TUPLE_LEN: Final[int] = 10
 MAX_STR_LEN: Final[int] = 60
 STR_TRUNCATE_LEN: Final[int] = 57
@@ -432,7 +427,7 @@ NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
 )
 
 # Console table formatting constants
-MAX_MODEL_NAME_LENGTH = 14
+MAX_MODEL_NAME_LENGTH = 20  # Allows "microsoft/phi-3-vision" without truncation
 MAX_OUTPUT_LENGTH = 28
 
 # PerformanceResult timing fields - centralized definition
@@ -464,6 +459,27 @@ def format_field_label(field_name: str) -> str:
 # Keep <br> for line breaks; do NOT include 's' to avoid interpreting <s> tokens
 # from model output as strikethrough.
 allowed_inline_tags = {"br", "b", "strong", "i", "em", "code"}
+
+
+def _escape_html_tags_selective(text: str) -> str:
+    """Escape HTML-like tags except GitHub-allowed safe tags.
+
+    Helper for markdown escaping functions. Neutralizes potentially unsafe HTML
+    while preserving common formatting tags that GitHub recognizes.
+    """
+    tag_pattern = re.compile(r"</?[A-Za-z][A-Za-z0-9:-]*(?:\s+[^<>]*?)?>")
+
+    def _escape_html_like(m: re.Match[str]) -> str:
+        token = m.group(0)
+        inner = token[1:-1].strip()
+        if not inner:
+            return token.replace("<", "&lt;").replace(">", "&gt;")
+        core = inner.lstrip("/").split(None, 1)[0].rstrip("/").lower()
+        if core in allowed_inline_tags:
+            return token  # Keep recognized safe tag
+        return token.replace("<", "&lt;").replace(">", "&gt;")
+
+    return tag_pattern.sub(_escape_html_like, text)
 
 
 def _format_memory_value_gb(num: float) -> str:
@@ -930,11 +946,6 @@ EXIF_DATE_TAGS: Final[tuple[str, ...]] = (
     "CreateDate",
     "DateTime",
 )
-GPS_LAT_REF_TAG: Final[int] = 1
-GPS_LAT_TAG: Final[int] = 2
-GPS_LON_REF_TAG: Final[int] = 3
-GPS_LON_TAG: Final[int] = 4
-GPS_INFO_TAG_ID: Final[int] = 34853  # Standard EXIF tag ID for GPS IFD
 
 
 # Type definitions
@@ -1253,23 +1264,35 @@ def _extract_gps_str(gps_info_raw: dict[str | int, Any] | None) -> str | None:
         return None
 
     def dms_to_dd(dms: tuple[float, float, float], ref: str) -> tuple[float, str]:
+        """Convert DMS (degrees, minutes, seconds) to unsigned decimal degrees.
+
+        Returns unsigned decimal and normalized cardinal direction (N/S/E/W).
+        Display convention: show absolute value with cardinal direction suffix.
+        """
         deg, min_, sec = dms
         dd = deg + min_ / 60.0 + sec / 3600.0
         ref_upper = ref.upper()
-        sign = -1 if ref_upper in ("S", "W") else 1
-        return (dd * sign, ref_upper)
+        return (dd, ref_upper)
 
     try:
-        lat_ref_str: str = lat_ref.decode() if isinstance(lat_ref, bytes) else str(lat_ref)
-        lon_ref_str: str = lon_ref.decode() if isinstance(lon_ref, bytes) else str(lon_ref)
+        lat_ref_str: str = (
+            lat_ref.decode("ascii", errors="replace")
+            if isinstance(lat_ref, bytes)
+            else str(lat_ref)
+        )
+        lon_ref_str: str = (
+            lon_ref.decode("ascii", errors="replace")
+            if isinstance(lon_ref, bytes)
+            else str(lon_ref)
+        )
         lat_dd, lat_card = dms_to_dd(latitude, lat_ref_str)
         lon_dd, lon_card = dms_to_dd(longitude, lon_ref_str)
-        lat_dd = -abs(lat_dd) if lat_card == "S" else abs(lat_dd)
-        lon_dd = -abs(lon_dd) if lon_card == "W" else abs(lon_dd)
-        return f"{abs(lat_dd):.6f} {lat_card}, {abs(lon_dd):.6f} {lon_card}"
     except (ValueError, AttributeError, TypeError) as err:
         logger.debug("Failed to convert GPS DMS to decimal: %s", err)
         return None
+    else:
+        # Format with degree symbol and cardinal direction (standard GPS display)
+        return f"{lat_dd:.6f}°{lat_card}, {lon_dd:.6f}°{lon_card}"
 
 
 def extract_image_metadata(image_path: PathLike) -> MetadataDict:
@@ -2122,20 +2145,7 @@ def _escape_markdown_in_text(text: str) -> str:
         result = result.replace(char, escaped)
 
     # HTML-like angle bracket handling: escape < and > only when they appear to form a tag
-    tag_pattern = re.compile(r"</?[A-Za-z][A-Za-z0-9:-]*(?:\s+[^<>]*?)?>")
-
-    def _escape_html_like(m: re.Match[str]) -> str:
-        token = m.group(0)
-        # Derive tag name (strip leading </, split on whitespace or '>', trim trailing '/').
-        inner = token[1:-1].strip()
-        if not inner:
-            return token.replace("<", "&lt;").replace(">", "&gt;")
-        core = inner.lstrip("/").split(None, 1)[0].rstrip("/").lower()
-        if core in allowed_inline_tags:
-            return token  # keep recognized safe tag
-        return token.replace("<", "&lt;").replace(">", "&gt;")
-
-    result = tag_pattern.sub(_escape_html_like, result)
+    result = _escape_html_tags_selective(result)
 
     # Escape bare ampersands that could start entities; avoid double-escaping existing ones.
     return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
@@ -2168,19 +2178,7 @@ def _escape_markdown_diagnostics(text: str) -> str:
         result = result.replace(ch, repl)
 
     # Neutralize HTML-like tags except a safe allowlist
-    tag_pattern = re.compile(r"</?[A-Za-z][A-Za-z0-9:-]*(?:\s+[^<>]*?)?>")
-
-    def _escape_html_like(m: re.Match[str]) -> str:
-        token = m.group(0)
-        inner = token[1:-1].strip()
-        if not inner:
-            return token.replace("<", "&lt;").replace(">", "&gt;")
-        core = inner.lstrip("/").split(None, 1)[0].rstrip("/").lower()
-        if core in allowed_inline_tags:
-            return token
-        return token.replace("<", "&lt;").replace(">", "&gt;")
-
-    result = tag_pattern.sub(_escape_html_like, result)
+    result = _escape_html_tags_selective(result)
 
     # Escape bare ampersands (avoid starting entities)
     return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
@@ -2590,12 +2588,6 @@ def _preview_generation(gen: GenerationResult | SupportsGenerationResult | None)
         ) or [""]
         for wline in wrapped:
             logger.info("%s", Colors.colored(wline.lstrip(), Colors.CYAN))
-
-
-def _log_verbose_success_details(res: PerformanceResult) -> None:
-    # Placeholder retained for backward compatibility; actual implementation
-    # now parameterized via updated function below.
-    _log_verbose_success_details_mode(res, detailed=False)
 
 
 def _log_verbose_success_details_mode(res: PerformanceResult, *, detailed: bool) -> None:
