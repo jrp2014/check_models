@@ -5,7 +5,7 @@ particularly the fix for the GPS sign bug (2025-10-05) where signs were
 being applied multiple times incorrectly.
 """
 
-# ruff: noqa: S101, PLR2004  # assert and magic numbers are fine in tests
+# ruff: noqa: PLR2004  # assert and magic numbers are fine in tests
 # mypy: disable-error-code="arg-type"  # Test dicts intentionally use specific key types
 
 from __future__ import annotations
