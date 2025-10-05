@@ -2710,61 +2710,23 @@ def _log_perf_block(res: PerformanceResult) -> None:
 def _log_compact_metrics(res: PerformanceResult) -> None:
     """Emit grouped metrics lines for better readability while maintaining parsability.
 
-    Example output:
-        ⏱  Time: total=4.13s  gen=3.03s (73%)  load=1.09s (27%)
-        💾  Memory: peak=5.5 GB
-        🔢  Tokens: 1,637 (prompt:1,488  generated:149)  TPS: gen=114  prompt=421
+    Example output (single aligned line):
+        📊 Metrics: total=4.13s  gen=3.03s  load=1.09s  peak_mem=5.5GB
+                    tokens(total/prompt/gen)=1,637/1,488/149  gen_tps=114  prompt_tps=421
     """
     if not res.generation:
         return
 
-    gen = res.generation
     logger.info("")  # Breathing room
-
-    # Timing group
-    total_time_val = getattr(res, "total_time", None)
-    generation_time_val = getattr(res, "generation_time", None)
-    load_time_val = getattr(res, "model_load_time", None)
-
-    if total_time_val:
-        time_parts = [f"total={total_time_val:.2f}s"]
-        if generation_time_val:
-            pct = (generation_time_val / total_time_val * 100) if total_time_val > 0 else 0
-            time_parts.append(f"gen={generation_time_val:.2f}s ({pct:.0f}%)")
-        if load_time_val:
-            pct = (load_time_val / total_time_val * 100) if total_time_val > 0 else 0
-            time_parts.append(f"load={load_time_val:.2f}s ({pct:.0f}%)")
-        logger.info("  ⏱  Time: %s", Colors.colored("  ".join(time_parts), Colors.WHITE))
-
-    # Memory group
-    peak_mem = getattr(gen, "peak_memory", None) or 0.0
-    if peak_mem > 0:
-        mem_fmt = format_field_value("peak_memory", peak_mem)
-        mem_str = f"{mem_fmt} GB" if not str(mem_fmt).endswith("GB") else str(mem_fmt)
-        logger.info("  💾  Memory: %s", Colors.colored(f"peak={mem_str}", Colors.WHITE))
-
-    # Token group
-    prompt_tokens = getattr(gen, "prompt_tokens", 0) or 0
-    gen_tokens = getattr(gen, "generation_tokens", 0) or 0
-    all_tokens = prompt_tokens + gen_tokens
-    gen_tps = getattr(gen, "generation_tps", 0.0) or 0.0
-    prompt_tps = getattr(gen, "prompt_tps", 0.0) or 0.0
-
-    if all_tokens:
-        token_parts = [
-            (
-                f"{fmt_num(all_tokens)} "
-                f"(prompt:{fmt_num(prompt_tokens)}  generated:{fmt_num(gen_tokens)})"
-            ),
-        ]
-        tps_parts = []
-        if gen_tps:
-            tps_parts.append(f"gen={fmt_num(gen_tps)}")
-        if prompt_tps:
-            tps_parts.append(f"prompt={fmt_num(prompt_tps)}")
-        if tps_parts:
-            token_parts.append(f"TPS: {' '.join(tps_parts)}")
-        logger.info("  🔢  Tokens: %s", Colors.colored("  ".join(token_parts), Colors.WHITE))
+    parts = _build_compact_metric_parts(res, res.generation)
+    if not parts:
+        return
+    aligned = _align_metric_parts(parts)
+    logger.info(
+        "📊 %s %s",
+        Colors.colored("Metrics:", Colors.BOLD, Colors.WHITE),
+        Colors.colored("  ".join(aligned), Colors.WHITE),
+    )
 
 
 def _build_compact_metric_parts(
