@@ -25,7 +25,7 @@ class TestGPSCoordinateConversion:
             "GPSLongitude": (122, 5, 2.4),
             "GPSLongitudeRef": "E",
         }
-        result = _extract_gps_str(gps_info)
+        result = _extract_gps_str(gps_info)  # type: ignore[arg-type]
         assert result is not None
         # Check format: decimal°CARD, decimal°CARD
         assert "°N" in result
