@@ -6,7 +6,6 @@ being applied multiple times incorrectly.
 """
 
 # ruff: noqa: PLR2004  # assert and magic numbers are fine in tests
-# mypy: disable-error-code="arg-type"  # Test dicts intentionally use specific key types
 
 from __future__ import annotations
 
@@ -154,7 +153,7 @@ class TestGPSCoordinateConversion:
 
     def test_non_dict_input(self) -> None:
         """Non-dict input should return None."""
-        result = _extract_gps_str("not a dict")  # type: ignore[arg-type]
+        result = _extract_gps_str("not a dict")  # Intentionally test with invalid type
         assert result is None
 
     def test_precision_six_decimals(self) -> None:
