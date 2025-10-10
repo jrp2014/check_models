@@ -100,11 +100,12 @@ except ImportError:
     mx = cast("Any", None)
     MISSING_DEPENDENCIES["mlx"] = ERROR_MLX_MISSING
 
-try:
-    from PIL import ExifTags, Image, UnidentifiedImageError
-    from PIL.ExifTags import GPSTAGS, TAGS
+ExifTags: Any
+GPSTAGS: Mapping[Any, Any]
+TAGS: Mapping[Any, Any]
 
-    pillow_version: str = Image.__version__ if hasattr(Image, "__version__") else NOT_AVAILABLE
+try:
+    from PIL import Image, UnidentifiedImageError
 except ImportError:
     pillow_version = NOT_AVAILABLE
 
@@ -127,9 +128,18 @@ except ImportError:
     ExifTags = _ExifTagsUnavailable()
     Image = cast("Any", _ImageUnavailable())
     UnidentifiedImageError = _PILUnavailableError
-    GPSTAGS: dict[Any, Any] = {}
-    TAGS: dict[Any, Any] = {}
+    GPSTAGS = {}
+    TAGS = {}
     MISSING_DEPENDENCIES["Pillow"] = ERROR_PILLOW_MISSING
+else:
+    from PIL import ExifTags as PIL_ExifTags
+    from PIL.ExifTags import GPSTAGS as PIL_GPSTAGS
+    from PIL.ExifTags import TAGS as PIL_TAGS
+
+    pillow_version = Image.__version__ if hasattr(Image, "__version__") else NOT_AVAILABLE
+    ExifTags = PIL_ExifTags
+    GPSTAGS = PIL_GPSTAGS
+    TAGS = PIL_TAGS
 
 try:
     from mlx_vlm.generate import generate
