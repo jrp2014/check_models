@@ -10,6 +10,7 @@ import html
 import importlib.util as importlib_util
 import json
 import logging
+import math
 import os
 import platform
 import re
@@ -20,7 +21,7 @@ import sys
 import textwrap
 import time
 import traceback
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator, Mapping
 from dataclasses import dataclass, fields
 from datetime import UTC, datetime
 from pathlib import Path
@@ -59,7 +60,7 @@ psutil: Any | None = psutil_mod
 
 if TYPE_CHECKING:
     import types
-    from collections.abc import Callable, Iterator, Mapping
+    from collections.abc import Iterator
     from zoneinfo import ZoneInfo
 
     from mlx.nn import Module
@@ -67,6 +68,8 @@ if TYPE_CHECKING:
 
 LOGGER_NAME: Final[str] = "mlx-vlm-check"
 NOT_AVAILABLE: Final[str] = "N/A"
+
+MISSING_DEPENDENCIES: dict[str, str] = {}
 
 ERROR_MLX_MISSING: Final[str] = "Core dependency missing: mlx. Please install it."
 ERROR_PILLOW_MISSING: Final[str] = (
@@ -90,11 +93,12 @@ GENERATION_WRAP_WIDTH: Final[int] = 80  # Console output wrapping width for gene
 
 _temp_logger = logging.getLogger(LOGGER_NAME)
 
+mx: Any
 try:
     import mlx.core as mx
 except ImportError:
-    _temp_logger.exception(ERROR_MLX_MISSING)
-    sys.exit(1)
+    mx = cast("Any", None)
+    MISSING_DEPENDENCIES["mlx"] = ERROR_MLX_MISSING
 
 try:
     from PIL import ExifTags, Image, UnidentifiedImageError
@@ -102,18 +106,56 @@ try:
 
     pillow_version: str = Image.__version__ if hasattr(Image, "__version__") else NOT_AVAILABLE
 except ImportError:
-    _temp_logger.critical(ERROR_PILLOW_MISSING)
     pillow_version = NOT_AVAILABLE
-    sys.exit(1)
+
+    class _PILUnavailableError(RuntimeError):
+        """Raised when Pillow functionality is requested but unavailable."""
+
+    class _ImageUnavailable:
+        """Stub for PIL.Image that raises informative errors when used."""
+
+        @staticmethod
+        def open(*_args: object, **_kwargs: object) -> NoReturn:
+            raise _PILUnavailableError(ERROR_PILLOW_MISSING)
+
+    class _ExifTagsUnavailable:
+        """Stub that surfaces a clear error if EXIF helpers are accessed."""
+
+        def __getattr__(self, _name: str) -> NoReturn:
+            raise _PILUnavailableError(ERROR_PILLOW_MISSING)
+
+    ExifTags = _ExifTagsUnavailable()
+    Image = cast("Any", _ImageUnavailable())
+    UnidentifiedImageError = _PILUnavailableError
+    GPSTAGS: dict[Any, Any] = {}
+    TAGS: dict[Any, Any] = {}
+    MISSING_DEPENDENCIES["Pillow"] = ERROR_PILLOW_MISSING
 
 try:
-    from mlx_vlm.generate import GenerationResult, generate
+    from mlx_vlm.generate import generate
     from mlx_vlm.prompt_utils import apply_chat_template
     from mlx_vlm.utils import load
     from mlx_vlm.version import __version__ as vlm_version
 except ImportError:
-    _temp_logger.critical(ERROR_MLX_VLM_MISSING)
-    sys.exit(1)
+    vlm_version = NOT_AVAILABLE
+
+    @dataclass
+    class _GenerationResultFallback:
+        """Fallback structure used when mlx-vlm is unavailable."""
+
+        text: str | None = None
+        prompt_tokens: int | None = None
+        generation_tokens: int | None = None
+
+    def _raise_mlx_vlm_missing(*_args: object, **_kwargs: object) -> NoReturn:
+        """Raise a consistent runtime error when mlx-vlm is unavailable."""
+        raise RuntimeError(ERROR_MLX_VLM_MISSING)
+
+    generate = cast("Callable[..., SupportsGenerationResult]", _raise_mlx_vlm_missing)
+    apply_chat_template = cast("Callable[..., Any]", _raise_mlx_vlm_missing)
+    load = cast("Callable[..., tuple[Any, Any]]", _raise_mlx_vlm_missing)
+
+    MISSING_DEPENDENCIES["mlx-vlm"] = ERROR_MLX_VLM_MISSING
 try:
     import mlx_lm
 
@@ -122,17 +164,18 @@ except ImportError:
     mlx_lm_version = NOT_AVAILABLE
 except AttributeError:
     mlx_lm_version = "N/A (module found, no version attr)"
+_transformers_guard_enabled: bool = os.getenv("MLX_VLM_ALLOW_TF", "0") != "1"
+if _transformers_guard_enabled:
+    # Prevent Transformers from importing heavy backends that can hang on macOS/ARM
+    # when they are present in the environment but not needed for MLX workflows.
+    os.environ.setdefault("TRANSFORMERS_NO_TF", "1")
+    os.environ.setdefault("TRANSFORMERS_NO_FLAX", "1")
+    os.environ.setdefault("TRANSFORMERS_NO_JAX", "1")
+
 try:
     import transformers
 
     transformers_version: str = transformers.__version__
-
-    # Prevent Transformers from importing heavy backends that can hang on macOS/ARM
-    # when they are present in the environment but not needed for MLX workflows.
-    if os.getenv("MLX_VLM_ALLOW_TF", "0") != "1":
-        os.environ.setdefault("TRANSFORMERS_NO_TF", "1")
-        os.environ.setdefault("TRANSFORMERS_NO_FLAX", "1")
-        os.environ.setdefault("TRANSFORMERS_NO_JAX", "1")
 
 except ImportError:
     transformers_version = NOT_AVAILABLE
@@ -178,7 +221,7 @@ class TimeoutManager(contextlib.ContextDecorator):
                         signal.SIGALRM,
                         self._timeout_handler,
                     )
-                    signal.alarm(int(self.seconds))
+                    signal.alarm(math.ceil(self.seconds))
                 except ValueError as e:
                     # Signal handling restricted (threading/subprocess environment)
                     logger.warning(
@@ -902,6 +945,14 @@ class SupportsGenerationResult(Protocol):  # Minimal attributes we read from Gen
     text: str | None
     prompt_tokens: int | None
     generation_tokens: int | None
+
+
+class SupportsExifIfd(Protocol):
+    """Minimal interface for EXIF objects providing nested IFD access."""
+
+    def get_ifd(self, tag: object) -> Mapping[object, Mapping[object, object]] | None:
+        """Retrieve a nested IFD mapping by tag identifier."""
+
     generation_tps: float | None
     peak_memory: float | None
     active_memory: float | None
@@ -1077,7 +1128,7 @@ def print_image_dimensions(image_path: PathLike) -> None:
 
 
 # --- EXIF & Metadata Handling ---
-def _process_ifd0(exif_raw: Image.Exif) -> ExifDict:
+def _process_ifd0(exif_raw: Mapping[object, object]) -> ExifDict:
     exif_decoded: ExifDict = {}
     for tag_id, value in exif_raw.items():
         # Skip SubIFD pointers, we'll handle them separately
@@ -1088,7 +1139,7 @@ def _process_ifd0(exif_raw: Image.Exif) -> ExifDict:
     return exif_decoded
 
 
-def _process_exif_subifd(exif_raw: Image.Exif) -> ExifDict:
+def _process_exif_subifd(exif_raw: SupportsExifIfd) -> ExifDict:
     out: ExifDict = {}
     try:
         exif_ifd: Any = exif_raw.get_ifd(ExifTags.IFD.Exif)
@@ -1099,7 +1150,7 @@ def _process_exif_subifd(exif_raw: Image.Exif) -> ExifDict:
     return out
 
 
-def _process_gps_ifd(exif_raw: Image.Exif) -> GPSDict | None:
+def _process_gps_ifd(exif_raw: SupportsExifIfd) -> GPSDict | None:
     try:
         gps_ifd: Any = exif_raw.get_ifd(ExifTags.IFD.GPSInfo)
         if isinstance(gps_ifd, dict) and gps_ifd:
@@ -1235,7 +1286,7 @@ def _extract_description(exif_data: ExifDict) -> str | None:
 
 
 def _extract_gps_str(gps_info_raw: Mapping[object, Any] | None) -> str | None:
-    if not isinstance(gps_info_raw, dict):
+    if not isinstance(gps_info_raw, Mapping):
         return None
     gps_info: GPSDict = {}
     for k, v in gps_info_raw.items():
@@ -2299,7 +2350,7 @@ def _run_model_generation(
     image_path: Path,
     *,
     verbose: bool,
-) -> GenerationResult:
+) -> GenerationResult | SupportsGenerationResult:
     """Load model + processor, apply chat template, run generation, time it.
 
     We keep all loading + formatting + generation steps together because they
@@ -2344,7 +2395,7 @@ def _run_model_generation(
     # Time the generation process manually since MLX VLM doesn't include timing
     start_time = time.perf_counter()
     try:
-        output: GenerationResult = generate(
+        output: GenerationResult | SupportsGenerationResult = generate(
             model=model,
             processor=tokenizer,  # MLX VLM accepts both tokenizer types
             prompt=formatted_prompt,
@@ -2440,7 +2491,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
                 temperature=params.temperature,
                 trust_remote_code=params.trust_remote_code,
             )
-            output: GenerationResult = _run_model_generation(
+            output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                 params=gen_params,
                 image_path=params.image_path,
                 verbose=params.verbose,
@@ -2838,6 +2889,16 @@ def print_cli_separator() -> None:
 
 def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     """Configure logging, collect versions, print warnings."""
+    if MISSING_DEPENDENCIES:
+        for message in MISSING_DEPENDENCIES.values():
+            logger.critical("%s", message)
+        missing_list = ", ".join(sorted(MISSING_DEPENDENCIES))
+        error_message = (
+            f"Missing required runtime dependencies: {missing_list}. "
+            "Install the missing packages or adjust optional features."
+        )
+        raise RuntimeError(error_message)
+
     # Set DEBUG if verbose, else WARNING
     log_level: int = logging.DEBUG if args.verbose else logging.INFO
     # Remove all handlers and add only one
