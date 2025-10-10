@@ -3301,6 +3301,7 @@ def main_cli() -> None:
     """CLI entry point for the MLX VLM checker script."""
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
         description="MLX VLM Model Checker",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     # Add arguments (separated for clarity)
     parser.add_argument(
