@@ -92,19 +92,21 @@ make test
 
 # Format code
 make format
-```text
+```
+
 ### Type Stubs
 
 Local type stubs live under `typings/` and are generated via:
 
 ```bash
 python -m tools.generate_stubs mlx_vlm tokenizers
-```text
+```
+
 The directory is ignored by git. If stubs get stale:
 
 ```bash
 make clean && python -m tools.generate_stubs mlx_vlm tokenizers
-```text
+```bash
 ### Dependencies
 
 The `src/pyproject.toml` is the source of truth for dependency lists. To check for outdated packages:
