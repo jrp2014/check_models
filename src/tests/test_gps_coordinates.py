@@ -7,6 +7,7 @@ being applied multiple times incorrectly.
 
 # Magic numbers and assert statements are fine in tests
 # Type: ignore comments used for test dict invariance issues
+# pyright: reportArgumentType=false
 
 from __future__ import annotations
 

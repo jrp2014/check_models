@@ -59,7 +59,7 @@ psutil: Any | None = psutil_mod
 
 if TYPE_CHECKING:
     import types
-    from collections.abc import Callable, Iterator
+    from collections.abc import Callable, Iterator, Mapping
     from zoneinfo import ZoneInfo
 
     from mlx.nn import Module
@@ -1234,7 +1234,7 @@ def _extract_description(exif_data: ExifDict) -> str | None:
     return desc or None
 
 
-def _extract_gps_str(gps_info_raw: dict[str | int, Any] | None) -> str | None:
+def _extract_gps_str(gps_info_raw: Mapping[object, Any] | None) -> str | None:
     if not isinstance(gps_info_raw, dict):
         return None
     gps_info: GPSDict = {}
