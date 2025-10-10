@@ -51,18 +51,20 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
 3. **Install development dependencies**:
 
    ```bash
-   make dev
+   make bootstrap-dev
    ```
 
    This will:
-   - Install all dependencies (runtime + dev + extras)
+   - Install all Python dependencies (runtime + dev + extras)
    - Install the package in editable mode
-   - Set up git hooks automatically via pre-commit (if configured)
+   - Install markdownlint-cli2 (if Node.js/npm is available)
+   - Set up git hooks automatically via pre-commit
 
    **Optional dependencies**:
 
    - **PyTorch** (needed for some models): `make install-torch`
    - **Everything** (extras + torch + dev): `make install-all`
+   - **Markdown linting only**: `make install-markdownlint` (requires Node.js/npm)
 
 4. **Verify installation**:
 
@@ -147,8 +149,22 @@ The project uses several automated quality checks:
 4. **Combined quality check**:
 
    ```bash
-   make quality     # Runs format + lint + typecheck
+   make quality     # Runs format + lint + typecheck + markdownlint (if available)
    ```
+
+5. **Markdown linting** (optional):
+
+   Automatically included in `make quality` if `markdownlint-cli2` is installed.
+
+   ```bash
+   # Install markdown linting (requires Node.js/npm)
+   make install-markdownlint
+
+   # Or run via npx (on-demand download)
+   npx markdownlint-cli2 '**/*.md'
+   ```
+
+   If neither npm nor npx is available, markdown linting is gracefully skipped with a warning.
 
 ### Git Hooks
 

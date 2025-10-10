@@ -564,7 +564,17 @@ mlx-vlm-check/
 
 ### Developer Workflow (Makefile)
 
-A `Makefile` at the repository root streamlines common tasks. It auto‑detects whether the target conda environment (`mlx-vlm` by default) is already active; if not, it transparently prefixes commands with `conda run -n mlx-vlm` so you don't have to manually activate it.
+A `Makefile` at the repository root streamlines common tasks. It **auto-detects your active Python environment** and works with:
+
+- **Virtual environments** (`venv`, `virtualenv`, `uv`, `poetry`, `pipenv`, etc.) - uses the active environment directly
+- **Conda environments** - adapts based on active vs target environment:
+  - **If target env is active**: runs commands directly
+  - **If different conda env is active**: uses `conda run -n <target-env>`
+  - **If no env is active**: uses `conda run -n <target-env>` (or system Python if conda unavailable)
+
+The default conda target is `mlx-vlm`, but you can override it with `CONDA_ENV=your-env-name` for any make target.
+
+**Recommendation**: Activate your environment first (e.g., `source .venv/bin/activate` or `conda activate mlx-vlm`) for best performance.
 
 Key targets:
 
@@ -572,18 +582,21 @@ Key targets:
 |--------|---------|-------|
 | `make help` | Show all targets | Displays active vs target env. |
 | `make install-dev` | Editable install with dev extras | Equivalent to changing into `src/` then `pip install -e .[dev]`. |
+| `make install-markdownlint` | Install markdownlint-cli2 | Requires Node.js/npm. Optional for markdown linting. |
 | `make install` | Runtime‑only editable install | No dev/test tooling. |
+| `make bootstrap-dev` | Full dev setup | Installs Python deps + markdownlint + git hooks. |
 | `make format` | Run `ruff format` | Applies canonical formatting. |
 | `make lint` | Run `ruff check` (no fixes) | Fails on style violations. |
 | `make lint-fix` | Run `ruff check --fix` | Auto‑fixes where safe. |
 | `make typecheck` | Run `mypy` | Uses `src/pyproject.toml` config. |
 | `make test` | Run pytest suite | Uses settings in `pyproject.toml`. |
 | `make test-cov` | Pytest with coverage | Generates terminal + XML report. |
-| `make quality` | Invoke integrated quality script | Wraps format + lint + mypy. |
+| `make quality` | Invoke integrated quality script | Wraps format + lint + mypy + markdownlint. |
 | `make quality-strict` | Quality script (require tools, no stubs) | Adds `--require --no-stubs`. |
 | `make run ARGS="..."` | Run the CLI script | Pass CLI args via `ARGS`. |
 | `make smoke` | Fast help invocation | Sanity check only. |
 | `make check` | format + lint + typecheck + test | Quick pre‑commit aggregate. |
+| `make validate-env` | Check environment setup | Validates Python packages installed. |
 | `make clean` | Remove caches / pyc | Safe cleanup. |
 
 Examples:
@@ -621,6 +634,34 @@ If you prefer manual commands, the traditional workflow still works:
 3. `ruff check --fix check_models.py tests`
 4. `mypy --config-file pyproject.toml check_models.py`
 5. `pytest -q`
+
+#### Markdown Linting (Optional)
+
+The project uses `markdownlint-cli2` to ensure consistent markdown formatting. This is **optional** but recommended for contributors editing documentation:
+
+**Installation:**
+
+```bash
+# If you have Node.js/npm installed:
+make install-markdownlint
+
+# Or install manually:
+npm install
+
+# Or rely on npx (downloads on-demand):
+# No installation needed - quality checks will use npx automatically
+```
+
+**Usage:**
+
+- `make quality` - Automatically runs markdownlint if available (or via npx)
+- Quality checks gracefully skip markdown linting if neither npm nor npx is available
+
+**Requirements:**
+
+- Node.js/npm (optional) - Install via `brew install node` on macOS or download from [nodejs.org](https://nodejs.org/)
+- If npm is unavailable, the quality script will attempt to use `npx` as a fallback
+- If neither is available, markdown linting is skipped with a warning
 
 ### Contribution Guidelines
 

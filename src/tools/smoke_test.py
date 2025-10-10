@@ -17,7 +17,10 @@ import sys
 import textwrap
 import traceback
 from pathlib import Path
-from typing import Any, NamedTuple, cast
+from typing import TYPE_CHECKING, Any, NamedTuple, cast
+
+if TYPE_CHECKING:
+    from rich.panel import Panel as RichPanel
 
 import psutil
 from mlx_vlm import generate, load
@@ -36,26 +39,31 @@ try:  # Soft import: allow environments lacking native MLX lib to still run test
 except ImportError:  # pragma: no cover - fallback path
     mx = None
     _MLX_AVAILABLE = False
+
+
+# Rich console and panel - with fallback shims for environments without rich
+class _ConsoleShim:
+    """Minimal Console shim when 'rich' is unavailable."""
+
+    def print(self, *args: object, **kwargs: object) -> None:
+        """Shim for Console.print that does nothing."""
+        del args, kwargs
+
+
+class _PanelShim:
+    """Minimal Panel shim when 'rich' is unavailable."""
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        """Initialize shim; accepts and ignores all arguments."""
+        del args, kwargs
+
+
 try:
     from rich.console import Console
     from rich.panel import Panel
-except ImportError:  # pragma: no cover - allow running without rich for type-checkers
-
-    class Console:  # type: ignore[no-redef]
-        """Minimal Console shim when 'rich' is unavailable."""
-
-        def print(self, *args: object, **kwargs: object) -> None:
-            """Shim for Console.print that does nothing."""
-            del args, kwargs
-
-    class Panel:  # type: ignore[no-redef]
-        """Minimal Panel shim when 'rich' is unavailable."""
-
-        def __init__(self, *args: object, **kwargs: object) -> None:
-            """Initialize shim; accepts and ignores all arguments."""
-            del args, kwargs
-
-    # Provide basic types so annotations referring to Panel are still valid
+except ImportError:  # pragma: no cover - allow running without rich
+    Console = _ConsoleShim  # type: ignore[assignment,misc]
+    Panel = _PanelShim  # type: ignore[assignment,misc]
 
 # Initialize console
 console = Console()
@@ -137,7 +145,7 @@ def load_model(
         console.print("[bold green]Loading model...")
         model, processor = load(model_path, trust_remote_code=True)
         config = load_config(model_path, trust_remote_code=True)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         console.print(f"[bold red]✗[/] Failed to load model: {e!s}")
         return None, None, None, True
     else:
@@ -201,7 +209,7 @@ def run_generation(
                 f"[bold red]✗[/] {test_type} generation produced empty output",
             )
             return True
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         console.print(f"[bold red]✗[/] {test_type} generation failed: {e!s}")
         console.print(f"[dim]{traceback.format_exc()}[/]")
         return True
@@ -295,7 +303,7 @@ def _render_summary(results: list[str]) -> None:
     )
 
 
-def _make_system_panel() -> Panel:
+def _make_system_panel() -> RichPanel:
     """Create a panel with system information suitable for display."""
     device_info = get_device_info()
     chip_name: str = "Unknown"
@@ -307,7 +315,7 @@ def _make_system_panel() -> Panel:
                 first = disp_list[0]
                 chip_name = first.get("_name", chip_name)
                 gpu_cores = first.get("sppci_cores", gpu_cores)
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             console.print(f"[dim]Failed to parse GPU info: {exc!s}[/]")
 
     mlx_version = getattr(mx, "__version__", "unavailable") if _MLX_AVAILABLE else "unavailable"
@@ -332,7 +340,7 @@ def _make_system_panel() -> Panel:
         ).strip()
     else:
         system_info_str = "Not running on Apple Silicon"
-    return Panel(title="System Information", renderable=system_info_str, style="bold blue")
+    return Panel(title="System Information", renderable=system_info_str, style="bold blue")  # type: ignore[return-value]
 
 
 if __name__ == "__main__":

@@ -1,0 +1,12 @@
+{
+  "name": "mlx-vlm-check-dev-tools",
+  "version": "0.1.0",
+  "description": "Development tooling for MLX VLM Check (Markdown linting)",
+  "private": true,
+  "devDependencies": {
+    "markdownlint-cli2": "^0.15.0"
+  },
+  "scripts": {
+    "lint:md": "markdownlint-cli2 '**/*.md' '#node_modules'"
+  }
+}

@@ -116,6 +116,8 @@ max-complexity = 15
 # CLI tools: allow print statements for user output
 "tools/check_outdated.py" = ["T201"]
 "tools/validate_env.py" = ["T201"]
+# Test files: allow assert statements and magic numbers
+"tests/**" = ["S101", "PLR2004"]
 
 [tool.pylance]
 # Pyright/Pylance configuration

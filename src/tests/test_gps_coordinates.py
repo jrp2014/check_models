@@ -6,6 +6,7 @@ being applied multiple times incorrectly.
 """
 
 # Magic numbers and assert statements are fine in tests
+# Type: ignore comments used for test dict invariance issues
 
 from __future__ import annotations
 
@@ -170,7 +171,10 @@ class TestGPSCoordinateConversion:
         # Pattern: number with exactly 6 decimal places
         pattern = r"\d+\.\d{6}°[NSEW]"
         matches = re.findall(pattern, result)
-        assert len(matches) == 2, f"Expected 2 coordinates with 6 decimals, got: {result}"
+        expected_coords = 2  # Latitude and longitude
+        assert len(matches) == expected_coords, (
+            f"Expected {expected_coords} coordinates with 6 decimals, got: {result}"
+        )
 
     def test_zero_coordinates(self) -> None:
         """Zero coordinates (null island) should format correctly."""

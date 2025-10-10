@@ -1,28 +1,58 @@
 # Package-local Makefile for mlx-vlm-check (lives alongside pyproject.toml)
 
 PYTHON ?= python
+# CONDA_ENV can be overridden: make test CONDA_ENV=my-custom-env
 CONDA_ENV ?= mlx-vlm
+VIRTUAL_ENV := $(shell echo $$VIRTUAL_ENV)
 CONDA_ACTIVE := $(shell echo $$CONDA_DEFAULT_ENV)
 
-ifeq ($(CONDA_ACTIVE),$(CONDA_ENV))
-	RUN_PY := $(PYTHON)
-	RUN_TOOL_PREFIX :=
+# Detect and use active Python environment (supports venv, virtualenv, uv, conda, etc.)
+ifdef VIRTUAL_ENV
+    # Virtual environment is active (venv/virtualenv/uv/poetry/pipenv/etc.)
+    RUN_PY := $(PYTHON)
+    RUN_TOOL_PREFIX :=
+    ENV_TYPE := venv
+    ENV_NAME := $(notdir $(VIRTUAL_ENV))
+else ifdef CONDA_DEFAULT_ENV
+    # In a conda environment - decide if we need conda run
+    ifeq ($(CONDA_ACTIVE),$(CONDA_ENV))
+        # Correct conda environment is active
+        RUN_PY := $(PYTHON)
+        RUN_TOOL_PREFIX :=
+        ENV_TYPE := conda
+        ENV_NAME := $(CONDA_ENV)
+    else
+        # Different conda environment is active, use conda run
+        RUN_PY := conda run -n $(CONDA_ENV) $(PYTHON)
+        RUN_TOOL_PREFIX := conda run -n $(CONDA_ENV)
+        ENV_TYPE := conda
+        ENV_NAME := $(CONDA_ENV)
+        $(warning ⚠️  Conda env '$(CONDA_ACTIVE)' is active, but targeting '$(CONDA_ENV)')
+        $(warning ⚠️  Commands will use: conda run -n $(CONDA_ENV))
+        $(warning ⚠️  To avoid this, either activate the target env or set CONDA_ENV=$(CONDA_ACTIVE))
+    endif
 else
-	RUN_PY := conda run -n $(CONDA_ENV) $(PYTHON)
-	RUN_TOOL_PREFIX := conda run -n $(CONDA_ENV)
+    # No environment active - check if conda is available for fallback
+    ifneq ($(shell command -v conda 2>/dev/null),)
+        # Conda available but no env active, use conda run
+        RUN_PY := conda run -n $(CONDA_ENV) $(PYTHON)
+        RUN_TOOL_PREFIX := conda run -n $(CONDA_ENV)
+        ENV_TYPE := conda
+        ENV_NAME := $(CONDA_ENV)
+        $(info ℹ️  No environment active; commands will use: conda run -n $(CONDA_ENV))
+    else
+        # No environment manager detected, use system Python
+        RUN_PY := $(PYTHON)
+        RUN_TOOL_PREFIX :=
+        ENV_TYPE := system
+        ENV_NAME := system
+        $(warning ⚠️  No virtual environment detected; using system Python)
+        $(warning ℹ️  Consider activating venv/conda first: source .venv/bin/activate or conda activate $(CONDA_ENV))
+    endif
 endif
 
 MYPY_CONFIG := pyproject.toml
 FMT_PATHS := check_models.py tests tools
-
-# Warn if wrong conda environment is active
-ifneq ($(CONDA_ACTIVE),$(CONDA_ENV))
-    ifneq ($(CONDA_ACTIVE),)
-        $(warning ⚠️  Expected conda env '$(CONDA_ENV)' but '$(CONDA_ACTIVE)' is active)
-        $(warning ⚠️  Activate with: conda activate $(CONDA_ENV))
-        $(warning ⚠️  Commands will use: conda run -n $(CONDA_ENV))
-    endif
-endif
 
 .DEFAULT_GOAL := help
 
@@ -59,6 +89,14 @@ install-all: ## Install all optional dependencies (dev + extras + torch)
 bootstrap-dev: ## pip bootstrap runtime + dev + extras + hooks + validation
 	$(RUN_PY) -m pip install --upgrade pip
 	$(RUN_PY) -m pip install -e .[dev,extras]
+	@echo "[bootstrap] Installing markdownlint-cli2 (for markdown linting)..."
+	@if command -v npm >/dev/null 2>&1; then \
+		echo "[bootstrap] npm found, installing markdownlint-cli2..."; \
+		npm install --silent 2>/dev/null || echo "⚠️  npm install failed (markdownlint will use npx fallback)"; \
+	else \
+		echo "[bootstrap] npm not found - markdownlint-cli2 will use npx on-demand"; \
+		echo "  To install npm: https://nodejs.org/ or 'brew install node'"; \
+	fi
 	@echo "[bootstrap] Installing pre-commit hooks..."
 	@$(RUN_PY) -m vlm.tools.install_precommit_hook || echo "⚠️  Could not install custom git hook"
 	@if command -v pre-commit >/dev/null 2>&1; then \
@@ -69,8 +107,34 @@ bootstrap-dev: ## pip bootstrap runtime + dev + extras + hooks + validation
 		echo "  Install with: pip install pre-commit && pre-commit install"; \
 	fi
 	@echo "[bootstrap] Running environment validation..."
-	@$(RUN_PY) -m vlm.tools.validate_env || echo "⚠️  Validation found issues (run 'python -m vlm.tools.validate_env' for details)"
+	@$(RUN_PY) -m vlx.tools.validate_env || echo "⚠️  Validation found issues (run 'python -m vlx.tools.validate_env' for details)"
 	@echo "✓ Bootstrap complete"
+
+# Markdown linting setup
+.PHONY: install-markdownlint
+install-markdownlint: ## Install markdownlint-cli2 via npm (requires Node.js/npm)
+	@if command -v npm >/dev/null 2>&1; then \
+		echo "Installing markdownlint-cli2 via npm..."; \
+		npm install; \
+		echo "✓ markdownlint-cli2 installed to node_modules/.bin/"; \
+		echo "  Add node_modules/.bin to PATH or quality checks will use npx fallback"; \
+	else \
+		echo "❌ npm not found - install Node.js first"; \
+		echo "  macOS: brew install node"; \
+		echo "  Or download from: https://nodejs.org/"; \
+		exit 1; \
+	fi
+
+# Environment validation
+.PHONY: validate-env
+validate-env: ## Validate that required packages are installed in the environment
+	@echo "🔍 Validating environment: $(ENV_NAME) ($(ENV_TYPE))"
+	@$(RUN_PY) -c "import sys; print(f'Python: {sys.version.split()[0]}')"
+	@$(RUN_PY) -c "import mlx; print('MLX: ✓')" || (echo "❌ mlx not found - run 'make install'" && exit 1)
+	@$(RUN_PY) -c "import mlx_vlm; v=getattr(mlx_vlm,'__version__','installed'); print(f'MLX-VLM: {v}')" || (echo "❌ mlx-vlm not found - run 'make install'" && exit 1)
+	@$(RUN_PY) -c "import PIL; print(f'Pillow: {PIL.__version__}')" || (echo "❌ Pillow not found - run 'make install'" && exit 1)
+	@echo "✓ Core runtime dependencies present"
+	@$(RUN_PY) -m tools.validate_env 2>/dev/null || echo "ℹ️  Run 'python -m tools.validate_env' for detailed validation"
 
 # Stubs
 .PHONY: stubs

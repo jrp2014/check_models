@@ -19,7 +19,9 @@ help: ## Show this help message
 	@echo "🛠️  Development:"
 	@echo "  make dev              Setup dev environment"
 	@echo "  make test             Run tests"
+	@echo "  make check            Run format, lint, typecheck, and tests"
 	@echo "  make quality          Run linting and type checks"
+	@echo "  make ci               Run full CI pipeline (strict)"
 	@echo "  make format           Format code with ruff"
 	@echo ""
 	@echo "📚 Documentation: See docs/CONTRIBUTING.md for details"
@@ -44,9 +46,17 @@ demo:
 test:
 	pytest $(SRC)/tests/ -v
 
+.PHONY: check
+check:
+	@$(MAKE) -C $(SRC) check
+
 .PHONY: quality
 quality:
 	@$(MAKE) -C $(SRC) quality
+
+.PHONY: ci
+ci:
+	@$(MAKE) -C $(SRC) ci
 
 .PHONY: format
 format:

@@ -49,7 +49,7 @@ def _run(cmd: list[str], *, cwd: Path | None = None) -> int:
         msg = f"Disallowed tool: {tool}"
         raise ValueError(msg)
     # Use check=False and aggregate exit codes ourselves
-    proc = subprocess.run(
+    proc = subprocess.run(  # noqa: S603
         cmd,
         cwd=str(cwd) if cwd else None,
         check=False,
@@ -272,7 +272,7 @@ def _run_markdownlint(repo_root: Path, *, require: bool) -> int:
     return 1 if require else 0
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv: list[str] | None = None) -> int:  # noqa: PLR0912, PLR0915
     """Run selected quality checks and return combined exit status."""
     # Basic logging setup
     logging.basicConfig(level=logging.INFO, format="%(message)s")

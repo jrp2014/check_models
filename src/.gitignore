@@ -106,3 +106,7 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# Node.js (for markdownlint-cli2)
+node_modules/
+package-lock.json
