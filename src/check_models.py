@@ -1484,14 +1484,14 @@ def _get_field_value(result: PerformanceResult, field_name: str) -> MetricValue:
 def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceResult]:
     """Return results ordered by effective generation time.
 
-    Failed / missing timing entries are pushed to the end by assigning ``inf``.
-    This keeps the fastest successful models visually prioritized.
+    Failed results are placed first (negative inf) to highlight errors,
+    followed by successful results sorted by generation time (fastest first).
     """
 
     def get_time_value(result: PerformanceResult) -> float:
         """Extract time value for sorting, with fallback for failed results."""
         if not result.success:
-            return float("inf")  # Failed results go to the end
+            return float("-inf")  # Failed results go to the beginning
 
         # Use the generation_time field from PerformanceResult
         if result.generation_time is not None:
@@ -1727,7 +1727,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     logger.info(summary)
     log_rule(max_width, char="═", color=Colors.BLUE, bold=True)
 
-    logger.info("Results sorted by generation time (fastest to slowest).")
+    logger.info("Results sorted: errors first, then by generation time (fastest to slowest).")
 
 
 def _prepare_table_data(
@@ -1911,7 +1911,7 @@ def _build_full_html_document(
     <h2>📊 Performance Results</h2>
     <div class=\"meta-info\">
         Performance metrics and output for Vision Language Model processing<br>
-        Results sorted by generation time (fastest to slowest) • Generated on
+        Results sorted: errors first, then by generation time (fastest to slowest) • Generated on
         {datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")} • Failures shown but
         excluded from averages<br>
         Overall runtime: {format_overall_runtime(total_runtime_seconds)}
@@ -2081,7 +2081,8 @@ def generate_markdown_report(
     md.append("")
     md.append("> **Prompt used:**\n>\n> " + prompt.replace("\n", "\n> ") + "\n")
     md.append("")
-    md.append("**Note:** Results are sorted by generation time (fastest to slowest).\n")
+    note = "**Note:** Results sorted: errors first, then by generation time (fastest to slowest).\n"
+    md.append(note)
     md.append(f"**Overall runtime:** {format_overall_runtime(total_runtime_seconds)}\n")
     md.append("")
     # Surround the table with markdownlint rule guards; the table can be wide and may
