@@ -13,18 +13,6 @@
 					"ZSH_DISABLE_COMPFIX": "true"
 				}
 			},
-			"problemMatcher": [
-				"$eslint-stylish"
-			],
-			"group": "build"
-		},
-		{
-			"label": "VLM: Quality checks (ruff format + fix + mypy)",
-			"type": "shell",
-			"command": "bash",
-			"args": [
-				"src/tools/run_quality.sh"
-			],
 			"isBackground": false,
 			"problemMatcher": [
 				"$eslint-stylish"
