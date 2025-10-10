@@ -544,11 +544,9 @@ def local_now_str(fmt: str = "%Y-%m-%d %H:%M:%S %Z") -> str:
     return datetime.now(get_localzone()).strftime(fmt)
 
 
-def format_field_value(field_name: str, value: MetricValue) -> str:
-    # Justification (PLR0911): Multiple early returns keep the formatting
-    # branches (memory/time/tps/numeric/string) linear and readable without
-    # nested condition accumulation; refactoring into a single exit would
-    # add temporary variables and reduce clarity.
+def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: PLR0911
+    # Multiple early returns keep formatting branches (memory/time/tps/numeric/string)
+    # linear and readable without nested condition accumulation.
     """Normalize and format field values for display.
 
     Rules:
@@ -873,7 +871,8 @@ def print_version_info(versions: LibraryVersionDict) -> None:
         ]
         for line in sys_lines:
             logger.info(line)
-    except Exception as err:
+    except Exception as err:  # noqa: BLE001
+        # Broad catch intentional: system info is non-critical, many failure modes
         logger.debug("Skipping system info block: %s", err)
 
 
