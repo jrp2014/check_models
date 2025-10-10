@@ -2759,29 +2759,12 @@ def _build_compact_metric_parts(
 
 
 def _align_metric_parts(parts: list[str]) -> list[str]:
-    """Return parts with keys padded to align '=' vertically.
+    """Return parts with compact key=value formatting.
 
-    Keeps output more scannable while preserving simple key=value tokenization
-    (spaces appear only before keys, not around '='). Long keys are left as-is.
+    No padding/alignment to keep output compact and readable.
     """
-    split_parts: list[tuple[str, str]] = []
-    for p in parts:
-        if "=" in p:
-            k, v = p.split("=", 1)
-            split_parts.append((k, v))
-        else:
-            split_parts.append((p, ""))
-    max_key = max((len(k) for k, _ in split_parts), default=0)
-    cap = 22  # avoid overly wide padding if tokens key is very long
-    width = min(max_key, cap)
-    aligned: list[str] = []
-    for k, v in split_parts:
-        if not v:
-            aligned.append(k)
-        else:
-            pad_k = f"{k:<{width}}" if len(k) < width else k
-            aligned.append(f"{pad_k}={v}")
-    return aligned
+    # Simply return parts as-is since they're already in key=value format
+    return parts
 
 
 def log_metrics_legend(*, detailed: bool) -> None:
@@ -2858,7 +2841,10 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     # Remove all handlers and add only one
     logger.handlers.clear()
     handler: logging.StreamHandler[Any] = logging.StreamHandler(sys.stderr)
-    formatter: ColoredFormatter = ColoredFormatter("%(asctime)s - %(levelname)s - %(message)s")
+    # Use clean format for CLI: just the message without timestamps/levels
+    # In verbose mode, include level for debugging
+    fmt = "%(levelname)s: %(message)s" if args.verbose else "%(message)s"
+    formatter: ColoredFormatter = ColoredFormatter(fmt)
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     logger.setLevel(log_level)

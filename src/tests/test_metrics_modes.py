@@ -50,7 +50,7 @@ def _build_perf() -> PerformanceResult:
 
 
 def test_align_metric_parts_alignment() -> None:
-    """The '=' characters for first metrics should be column-aligned."""
+    """The metric parts should remain in compact key=value format."""
     parts = [
         "total=1.23s",
         "gen=1.00s",
@@ -58,8 +58,11 @@ def test_align_metric_parts_alignment() -> None:
         "tokens(total/prompt/gen)=15/10/5",
     ]
     aligned = _align_metric_parts(parts)
-    eq_positions = [p.index("=") for p in aligned[:3]]
-    assert len(set(eq_positions)) == 1, aligned
+    # Should return parts unchanged (no padding)
+    assert aligned == parts, f"Expected {parts}, got {aligned}"
+    # Verify all parts are in key=value format
+    for part in aligned:
+        assert "=" in part, f"Part {part!r} should contain '='"
 
 
 def test_metrics_mode_compact_smoke(caplog: pytest.LogCaptureFixture) -> None:

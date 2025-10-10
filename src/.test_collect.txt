@@ -28,4 +28,4 @@ tests/test_total_runtime_reporting.py::test_html_report_includes_runtime
 tests/test_total_runtime_reporting.py::test_markdown_long_runtime_hms
 tests/test_total_runtime_reporting.py::test_html_long_runtime_hms
 
-29 tests collected in 1.40s
+29 tests collected in 1.70s
