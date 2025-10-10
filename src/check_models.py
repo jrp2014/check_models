@@ -1514,11 +1514,11 @@ def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceR
 
 
 # Additional constants for multi-line formatting
-MAX_SHORT_NAME_LENGTH: int = 12
-MAX_LONG_NAME_LENGTH: int = 24
-MAX_SIMPLE_NAME_LENGTH: int = 20
-MAX_OUTPUT_LINE_LENGTH: int = 35
-MAX_OUTPUT_TOTAL_LENGTH: int = 70
+MAX_SHORT_NAME_LENGTH: int = 16  # Increased from 12 to show more of model names
+MAX_LONG_NAME_LENGTH: int = 32  # Increased from 24 for longer model names
+MAX_SIMPLE_NAME_LENGTH: int = 24  # Increased from 20
+MAX_OUTPUT_LINE_LENGTH: int = 60  # Increased from 35 to show more error details
+MAX_OUTPUT_TOTAL_LENGTH: int = 120  # Increased from 70 for complete error messages
 
 
 def _format_model_name_multiline(model_name: str) -> str:
@@ -1527,8 +1527,9 @@ def _format_model_name_multiline(model_name: str) -> str:
         parts = model_name.split("/")
         if len(parts[-1]) > MAX_SHORT_NAME_LENGTH:  # If final part is long, break it
             final_part = parts[-1]
-            if len(final_part) > MAX_LONG_NAME_LENGTH:  # Very long, truncate
-                return f"{'/'.join(parts[:-1])}/\n{final_part[:21]}..."
+            if len(final_part) > MAX_LONG_NAME_LENGTH:  # Very long, truncate with ellipsis
+                # Use MAX_LONG_NAME_LENGTH - 3 for the ellipsis
+                return f"{'/'.join(parts[:-1])}/\n{final_part[: MAX_LONG_NAME_LENGTH - 3]}..."
             # Moderate length, wrap
             mid_point = len(final_part) // 2
             return f"{'/'.join(parts[:-1])}/\n{final_part[:mid_point]}-\n{final_part[mid_point:]}"
@@ -1555,8 +1556,8 @@ def _format_output_multiline(output_text: str) -> str:
     if space_pos != -1 and space_pos < len(output_text) * 0.7:  # Break at space if reasonable
         line1 = output_text[:space_pos]
         line2 = output_text[space_pos + 1 :]
-        if len(line2) > MAX_OUTPUT_LINE_LENGTH:  # Second line still too long
-            line2 = line2[:32] + "..."
+        if len(line2) > MAX_OUTPUT_LINE_LENGTH:  # Second line too long
+            line2 = line2[: MAX_OUTPUT_LINE_LENGTH - 3] + "..."
         return f"{line1}\n{line2}"
     # No good break point, just split at reasonable length
     truncated = "..." if len(output_text) > MAX_OUTPUT_TOTAL_LENGTH else ""
@@ -1637,11 +1638,11 @@ def _compute_column_widths(field_names: list[str]) -> list[int]:
     """Compute per-column width hints based on field naming heuristics."""
     widths: list[int] = []
     term_w = get_terminal_width()
-    # Allocate a generous portion to output column but cap to ~45-70 depending on terminal
-    out_w = max(40, min(70, int(term_w * 0.6)))
+    # Allocate generous space for output/error messages - prioritize readability
+    out_w = max(60, min(120, int(term_w * 0.6)))
     for idx, name in enumerate(field_names):
-        if idx == 0:  # Model column
-            widths.append(26)
+        if idx == 0:  # Model column - increased for longer model names
+            widths.append(35)
         elif name == "output":
             widths.append(out_w)
         elif name == "peak_memory":
