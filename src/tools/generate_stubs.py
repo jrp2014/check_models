@@ -171,7 +171,7 @@ def run_stubgen(packages: Iterable[str]) -> int:
     args.extend(["-o", str(TYPINGS_DIR)])
     try:
         # No shell=True; rely on PATH to find 'stubgen' from mypy installation
-        completed = subprocess.run(args, check=False)  # noqa: S603
+        completed = subprocess.run(args, check=False)
     except FileNotFoundError:
         logger.exception(
             "[stubs] 'stubgen' (from mypy) not found. Install mypy: pip install -e '.[dev]'",

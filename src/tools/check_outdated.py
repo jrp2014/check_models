@@ -9,7 +9,7 @@ import sys
 
 def main() -> int:
     """Check for outdated packages using pip list --outdated."""
-    result = subprocess.run(  # noqa: S603 - sys.executable is trusted
+    result = subprocess.run(
         [sys.executable, "-m", "pip", "list", "--outdated"],
         capture_output=True,
         text=True,

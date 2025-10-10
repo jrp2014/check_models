@@ -5,7 +5,7 @@ particularly the fix for the GPS sign bug (2025-10-05) where signs were
 being applied multiple times incorrectly.
 """
 
-# ruff: noqa: PLR2004, S101  # Magic numbers and assert statements are fine in tests
+# Magic numbers and assert statements are fine in tests
 
 from __future__ import annotations
 

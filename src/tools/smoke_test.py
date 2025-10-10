@@ -137,7 +137,7 @@ def load_model(
         console.print("[bold green]Loading model...")
         model, processor = load(model_path, trust_remote_code=True)
         config = load_config(model_path, trust_remote_code=True)
-    except Exception as e:  # noqa: BLE001 - upstream may raise varied errors
+    except Exception as e:
         console.print(f"[bold red]✗[/] Failed to load model: {e!s}")
         return None, None, None, True
     else:
@@ -201,7 +201,7 @@ def run_generation(
                 f"[bold red]✗[/] {test_type} generation produced empty output",
             )
             return True
-    except Exception as e:  # noqa: BLE001 - upstream may raise varied errors
+    except Exception as e:
         console.print(f"[bold red]✗[/] {test_type} generation failed: {e!s}")
         console.print(f"[dim]{traceback.format_exc()}[/]")
         return True
@@ -307,7 +307,7 @@ def _make_system_panel() -> Panel:
                 first = disp_list[0]
                 chip_name = first.get("_name", chip_name)
                 gpu_cores = first.get("sppci_cores", gpu_cores)
-        except Exception as exc:  # noqa: BLE001 - best-effort system info
+        except Exception as exc:
             console.print(f"[dim]Failed to parse GPU info: {exc!s}[/]")
 
     mlx_version = getattr(mx, "__version__", "unavailable") if _MLX_AVAILABLE else "unavailable"

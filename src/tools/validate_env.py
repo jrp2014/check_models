@@ -139,7 +139,7 @@ def check_precommit_framework() -> bool:
         return False
 
     # Check if hooks are installed
-    result = subprocess.run(  # noqa: S603 - pre-commit path validated above
+    result = subprocess.run(
         [precommit_path, "run", "--all-files", "--dry-run"],
         capture_output=True,
         text=True,
@@ -160,7 +160,7 @@ def fix_issues() -> None:
 
     # Install missing packages
     logger.info("Installing missing packages...")
-    subprocess.run(  # noqa: S603 - sys.executable is trusted
+    subprocess.run(
         [sys.executable, "-m", "pip", "install", "-e", ".[dev]"],
         check=True,
         cwd=Path(__file__).resolve().parents[1],
@@ -168,7 +168,7 @@ def fix_issues() -> None:
 
     # Install git hooks
     logger.info("Installing git pre-commit hook...")
-    subprocess.run(  # noqa: S603 - sys.executable is trusted
+    subprocess.run(
         [sys.executable, "-m", "vlm.tools.install_precommit_hook"],
         check=True,
     )
@@ -177,7 +177,7 @@ def fix_issues() -> None:
     precommit_path = shutil.which("pre-commit")
     if precommit_path:
         logger.info("Installing pre-commit framework hooks...")
-        subprocess.run([precommit_path, "install"], check=True)  # noqa: S603 - path validated
+        subprocess.run([precommit_path, "install"], check=True)
 
 
 def main() -> int:
