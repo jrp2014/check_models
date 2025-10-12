@@ -77,11 +77,7 @@ update_local_mlx_repos() {
 				continue
 			fi
 			
-			# Special handling for mlx-vlm: install opencv-python first
-			if [[ "$repo" == "mlx-vlm" ]]; then
-				echo "[update.sh] Installing opencv-python for mlx-vlm..."
-				pip install -U opencv-python
-			fi
+
 			
 			# Install requirements.txt if it exists
 			if [[ -f "requirements.txt" ]]; then
@@ -89,6 +85,12 @@ update_local_mlx_repos() {
 				pip install -U -r requirements.txt
 			else
 				echo "[update.sh] No requirements.txt found"
+			fi
+
+			# Special handling for mlx-vlm: install opencv-python (which has particular numpy dependency reqruirements)
+			if [[ "$repo" == "mlx-vlm" ]]; then
+				echo "[update.sh] Installing opencv-python for mlx-vlm..."
+				pip install -U opencv-python
 			fi
 			
 			# Install the package in editable mode
