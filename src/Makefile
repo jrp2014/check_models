@@ -223,6 +223,18 @@ upgrade-deps: ## Upgrade all dependencies to latest compatible versions
 	$(RUN_TOOL_PREFIX) pip-compile requirements-dev.in --output-file=requirements-dev.txt --upgrade --resolver=backtracking
 	@echo "✓ Dependencies upgraded. Review changes and commit lock files."
 
+.PHONY: update
+update: ## Update conda environment and reinstall project with all dependencies
+	@echo "[update] Updating pip in environment: $(ENV_NAME) ($(ENV_TYPE))"
+	@$(RUN_PY) -m pip install --upgrade pip
+	@echo "[update] Reinstalling project with all dependencies (dev+extras+torch)..."
+	@$(RUN_PY) -m pip install -e .[dev,extras,torch] --upgrade
+	@echo "✓ Environment updated and project reinstalled"
+	@echo "  To also upgrade lock files, run: make upgrade-deps"
+
+.PHONY: update-env
+update-env: update ## Alias for 'update' target
+
 # Aggregates
 .PHONY: check
 check: format lint typecheck test ## Core quality pipeline

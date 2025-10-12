@@ -18,6 +18,7 @@ help: ## Show this help message
 	@echo ""
 	@echo "🛠️  Development:"
 	@echo "  make dev              Setup dev environment"
+	@echo "  make update           Update conda environment and project dependencies"
 	@echo "  make test             Run tests"
 	@echo "  make check            Run format, lint, typecheck, and tests"
 	@echo "  make quality          Run linting and type checks"
@@ -77,5 +78,12 @@ clean:
 	find . -type d -name .pytest_cache -exec rm -rf {} + 2>/dev/null || true
 
 .PHONY: check_models
-check_models:
-	python -m check_models $(ARGS)
+check_models: ## Run VLM checker (pass args: make check_models ARGS='--model X --image Y')
+	$(MAKE) -C $(SRC) check_models ARGS='$(ARGS)'
+
+.PHONY: update
+update: ## Update conda environment and reinstall project dependencies
+	$(MAKE) -C $(SRC) update
+
+.PHONY: update-env
+update-env: update ## Alias for 'update' target
