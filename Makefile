@@ -87,3 +87,15 @@ update: ## Update conda environment and reinstall project dependencies
 
 .PHONY: update-env
 update-env: update ## Alias for 'update' target
+
+.PHONY: upgrade-deps
+upgrade-deps: ## Upgrade all dependencies to latest compatible versions
+	$(MAKE) -C $(SRC) upgrade-deps
+
+.PHONY: lock-deps
+lock-deps: ## Generate requirements.txt from requirements.in using pip-tools
+	$(MAKE) -C $(SRC) lock-deps
+
+.PHONY: sync-deps
+sync-deps: ## Sync installed packages with requirements.txt using pip-sync
+	$(MAKE) -C $(SRC) sync-deps
