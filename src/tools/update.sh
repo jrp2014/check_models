@@ -14,7 +14,9 @@
 #   1. Run git pull in each repository
 #   2. Install requirements.txt (if present)
 #   3. Install packages in order: mlx → mlx-lm → mlx-vlm
-#   4. Skip PyPI updates for these packages
+#   4. Generate type stubs (mlx: python setup.py generate_stubs)
+#   5. Generate stubs for this project (mlx_vlm, tokenizers)
+#   6. Skip PyPI updates for these packages
 #
 # Note: Script automatically detects and preserves local MLX dev builds (versions
 # containing .dev or +commit). Stable releases are updated normally.
@@ -101,6 +103,16 @@ update_local_mlx_repos() {
 				echo "⚠️  Failed to install $repo"
 			fi
 			
+			# Generate stubs for mlx (only mlx has stub generation in setup.py)
+			if [[ "$repo" == "mlx" ]]; then
+				echo "[update.sh] Generating type stubs for mlx..."
+				if python setup.py generate_stubs; then
+					echo "✓ MLX stubs generated successfully"
+				else
+					echo "⚠️  Failed to generate MLX stubs (non-fatal)"
+				fi
+			fi
+			
 			echo ""
 		fi
 	done
@@ -110,6 +122,18 @@ update_local_mlx_repos() {
 		echo "✓ Local MLX repositories updated"
 		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 		echo ""
+		
+		# Generate stubs for this project (mlx-vlm-check) if we're in scripts
+		if [[ -f "$SCRIPT_DIR/generate_stubs.py" ]]; then
+			echo "[update.sh] Generating type stubs for mlx_vlm and tokenizers..."
+			cd "$SCRIPT_DIR"
+			if python generate_stubs.py mlx_vlm tokenizers; then
+				echo "✓ Project stubs generated successfully"
+			else
+				echo "⚠️  Failed to generate project stubs (non-fatal)"
+			fi
+		fi
+		
 		# Return to the scripts directory
 		cd "$SCRIPT_DIR"
 		return 0

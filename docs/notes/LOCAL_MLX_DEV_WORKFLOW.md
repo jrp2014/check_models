@@ -37,9 +37,17 @@ When `update.sh` runs, it:
 For each detected repository:
 
 1. **Git pull** - Updates the repository from its remote
-2. **Special handling for mlx-vlm** - Installs `opencv-python` first (required dependency)
-3. **Install requirements.txt** - If present, runs `pip install -U -r requirements.txt`
+2. **Install requirements.txt** - If present, runs `pip install -U -r requirements.txt`
+3. **Special handling for mlx-vlm** - Installs `opencv-python` (required dependency)
 4. **Install package** - Runs `pip install -e .` (editable/development mode)
+5. **Generate stubs** - For MLX core, runs `python setup.py generate_stubs`
+
+### Post-Update Actions
+
+After all repositories are updated:
+
+1. **Generate project stubs** - Runs `python generate_stubs.py mlx_vlm tokenizers` for this project
+2. **Sets `MLX_IS_LOCAL=1` flag** - Marks that local builds are in use
 
 ### Integration with Package Management
 
@@ -176,6 +184,41 @@ fi
 ```
 
 MLX-VLM requires OpenCV but doesn't always declare it properly in requirements.txt, so we install it explicitly.
+
+### Stub Generation
+
+#### MLX Core Stubs
+
+```bash
+if [[ "$repo" == "mlx" ]]; then
+    echo "[update.sh] Generating type stubs for mlx..."
+    python setup.py generate_stubs
+fi
+```
+
+MLX core has a custom stub generator in its `setup.py` that uses nanobind.stubgen to create `.pyi` type stub files. These stubs are essential for:
+
+- Type checking with mypy
+- IDE autocompletion
+- Static analysis tools
+
+#### Project Stubs
+
+After all repositories are updated:
+
+```bash
+if [[ -f "$SCRIPT_DIR/generate_stubs.py" ]]; then
+    echo "[update.sh] Generating type stubs for mlx_vlm and tokenizers..."
+    python generate_stubs.py mlx_vlm tokenizers
+fi
+```
+
+This generates stubs for:
+
+- `mlx_vlm` - Vision-Language Models package
+- `tokenizers` - HuggingFace tokenizers library
+
+These stubs are written to the local `typings/` directory and are automatically discovered by mypy via the `mypy_path` configuration in `pyproject.toml`.
 
 ## Integration with Existing Features
 
