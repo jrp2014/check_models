@@ -18,7 +18,8 @@ python -m check_models --model mlx-community/Florence-2-large --image /path/to/i
 
 # 3. Generate HTML report
 python -m check_models --model mlx-community/Florence-2-large --image /path/to/image.jpg --html
-```text
+```
+
 **📝 Note**: When you pass a folder path, the tool automatically selects the most recently modified, non-hidden image file in that folder. Pass a direct file path to override this behavior.
 
 ## What This Does
@@ -51,7 +52,8 @@ Reports are saved to the `output/` directory by default.
 ├── typings/                   # Type stubs (git-ignored)
 ├── Makefile                   # Development commands
 └── README.md                  # This file
-```text
+```
+
 ## Available Commands
 
 Run `make` or `make help` to see all available commands:
