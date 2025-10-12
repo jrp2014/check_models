@@ -28,51 +28,51 @@ help: ## Show this help message
 	@echo "📚 Documentation: See docs/CONTRIBUTING.md for details"
 
 .PHONY: install
-install:
+install: ## Install the package in editable mode
 	pip install -e $(SRC)/
 
 .PHONY: dev
-dev:
+dev: ## Setup dev environment with all dependencies
 	pip install -e "$(SRC)/[dev,extras,torch]"
 
 .PHONY: run
-run:
+run: ## Show usage help
 	python -m check_models --help
 
 .PHONY: demo
-demo:
+demo: ## Run demo with verbose output
 	python -m check_models --verbose
 
 .PHONY: test
-test:
+test: ## Run tests with pytest
 	pytest $(SRC)/tests/ -v
 
 .PHONY: check
-check:
+check: ## Run core quality pipeline (format, lint, typecheck, test)
 	@$(MAKE) -C $(SRC) check
 
 .PHONY: quality
-quality:
+quality: ## Run linting and type checks
 	@$(MAKE) -C $(SRC) quality
 
 .PHONY: ci
-ci:
+ci: ## Run full CI pipeline (strict mode)
 	@$(MAKE) -C $(SRC) ci
 
 .PHONY: format
-format:
+format: ## Format code with ruff
 	ruff format $(SRC)/
 
 .PHONY: lint
-lint:
+lint: ## Lint code with ruff
 	ruff check $(SRC)/
 
 .PHONY: typecheck
-typecheck:
+typecheck: ## Run mypy type checking
 	mypy $(SRC)/check_models.py
 
 .PHONY: clean
-clean:
+clean: ## Remove generated files and caches
 	rm -rf output/*.html output/*.md
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name .pytest_cache -exec rm -rf {} + 2>/dev/null || true

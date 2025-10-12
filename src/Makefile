@@ -284,10 +284,10 @@ audit: ## Run security audit on dependencies
 
 # Cleanup
 .PHONY: clean-pyc
-clean-pyc:
+clean-pyc: ## Remove Python cache files and bytecode
 	find . -name '__pycache__' -prune -exec rm -rf {} +
 	find . -name '*.pyc' -delete -o -name '*.pyo' -delete -o -name '*~' -delete
 
 .PHONY: clean
-clean: clean-pyc
+clean: clean-pyc ## Clean up Python cache files
 	@echo "Cleanup complete"

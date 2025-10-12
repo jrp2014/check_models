@@ -63,9 +63,14 @@ Run `make` or `make help` to see all available commands:
 | `make demo` | Run example (if you have images) |
 | `make clean` | Remove generated files |
 | `make dev` | Setup development environment |
+| `make update` | Update conda environment and project dependencies |
 | `make test` | Run tests |
+| `make check` | Run core quality pipeline (format, lint, typecheck, test) |
 | `make quality` | Run linting and type checks |
+| `make ci` | Run full CI pipeline (strict mode) |
 | `make format` | Format code with ruff |
+| `make lint` | Lint code with ruff |
+| `make typecheck` | Run mypy type checking |
 
 ## Development
 

@@ -301,6 +301,9 @@ The project uses pip-tools for reproducible builds:
 # 2. Regenerate lock files:
 make lock-deps
 
+# Update environment and reinstall project (recommended after pulling changes):
+make update
+
 # Upgrade all dependencies to latest:
 make upgrade-deps
 
@@ -320,6 +323,22 @@ make audit
 2. Run `make lock-deps`
 3. Test thoroughly
 4. Commit both `.in` and `.txt` files
+
+### Keeping Your Environment Up-to-Date
+
+After pulling changes from the repository, update your environment with:
+
+```bash
+make update
+```
+
+This command will:
+
+- Update pip in your conda/venv environment
+- Reinstall the project with all dependencies (dev, extras, torch)
+- Ensure you have the latest versions compatible with lock files
+
+**Note**: This does NOT update the lock files themselves. To upgrade dependencies to newer versions, use `make upgrade-deps` instead.
 
 ## Release Process
 
