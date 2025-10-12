@@ -263,6 +263,10 @@ print('✓ All core packages imported successfully')
 print(f'✓ MLX version: {mx.__version__}')
 "
     
+    # Install huggingface_hub CLI tools
+    log_info "Installing huggingface_hub CLI tools..."
+    pip install "huggingface_hub[cli]"
+    
     # Check if CLI is available
     if command -v mlx-vlm-check &> /dev/null; then
         log_success "CLI command 'mlx-vlm-check' is available"

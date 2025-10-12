@@ -89,6 +89,7 @@ install-all: ## Install all optional dependencies (dev + extras + torch)
 bootstrap-dev: ## pip bootstrap runtime + dev + extras + hooks + validation
 	$(RUN_PY) -m pip install --upgrade pip
 	$(RUN_PY) -m pip install -e .[dev,extras]
+	$(RUN_PY) -m pip install "huggingface_hub[cli]"
 	@echo "[bootstrap] Installing markdownlint-cli2 (for markdown linting)..."
 	@if command -v npm >/dev/null 2>&1; then \
 		echo "[bootstrap] npm found, installing markdownlint-cli2..."; \

@@ -38,6 +38,7 @@ fi
 RUNTIME_PACKAGES+=(
 	"Pillow>=10.3.0"
 	"huggingface-hub>=0.23.0"
+	"huggingface-hub[cli]"
 	"tabulate>=0.9.0"
 	"tzlocal>=5.0"
 )

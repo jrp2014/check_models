@@ -57,6 +57,7 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
    This will:
    - Install all Python dependencies (runtime + dev + extras)
    - Install the package in editable mode
+   - Install huggingface_hub CLI tools (`huggingface-cli`)
    - Install markdownlint-cli2 (if Node.js/npm is available)
    - Set up git hooks automatically via pre-commit
 
