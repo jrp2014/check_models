@@ -25,12 +25,14 @@ This document summarizes the documentation updates made to align with the Makefi
 **Updated**: Dependency Management section
 
 **Changes**:
+
 - Added `make update` to the dependency management command list
 - Added new subsection: "Keeping Your Environment Up-to-Date"
 - Documented when to use `make update` vs `make upgrade-deps`
 - Clarified that `make update` is recommended after pulling changes
 
-**Key Points**:
+Example usage:
+
 ```bash
 # After pulling changes from the repository:
 make update
