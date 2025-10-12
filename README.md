@@ -1,81 +1,86 @@
 # MLX VLM Check
 
-A benchmarking and testing tool for MLX Vision-Language Models (VLMs) on Apple Silicon. Run VLMs on images, collect performance metrics, and generate detailed HTML/Markdown reports.
-
-**🎯 Target Audience**: Users who want to test and benchmark Vision-Language Models on macOS/Apple Silicon using MLX.
+Run and benchmark Vision-Language Models on Apple Silicon with MLX. Get performance metrics and detailed reports in seconds.
 
 ## Quick Start
 
+**Requirements**: macOS with Apple Silicon (M1/M2/M3/M4), Python 3.13+
+
 ```bash
-# 1. Install the package
+# 1. Install
 make install
 
 # 2. Run on an image
-make check_models ARGS="--model mlx-community/Florence-2-large --image /path/to/image.jpg"
-
-# Or use the CLI directly
 python -m check_models --model mlx-community/Florence-2-large --image /path/to/image.jpg
 
-# 3. Generate HTML report
+# 3. Get HTML report
 python -m check_models --model mlx-community/Florence-2-large --image /path/to/image.jpg --html
 ```
 
-**📝 Note**: When you pass a folder path, the tool automatically selects the most recently modified, non-hidden image file in that folder. Pass a direct file path to override this behavior.
+That's it! See [detailed usage](#detailed-usage) below for more options.
 
-## What This Does
+## What You Get
 
-`check_models.py` runs MLX-based Vision-Language Models on images and generates detailed performance reports including:
+- ✅ **Instant results**: Run any MLX-compatible VLM on your images
+- 📊 **Performance metrics**: Tokens/sec, memory usage, generation time
+- 📝 **Multiple formats**: Beautiful HTML reports + GitHub-compatible Markdown
+- 🖼️ **Smart image handling**: Folders automatically use the latest image
+- 📍 **Metadata extraction**: EXIF data, GPS coordinates when available
 
-- **Model outputs**: Generated text from VLM inference
-- **Performance metrics**: Generation time, tokens per second, memory usage
-- **Image metadata**: EXIF data, GPS coordinates (when available)
-- **System information**: Device specs, library versions
-- **Multiple output formats**: HTML (styled) and Markdown (GitHub-compatible)
+## Detailed Usage
 
-Reports are saved to the `output/` directory by default.
+### Common Commands
 
-## Repository Structure
+```bash
+# Run on a specific image
+python -m check_models --image /path/to/photo.jpg
 
-```text
-.
-├── src/                       # Main Python package
-│   ├── check_models.py        # Primary CLI and implementation
-│   ├── tools/                 # Helper scripts (quality checks, stubs, etc.)
-│   ├── tests/                 # Unit tests
-│   └── pyproject.toml         # Package metadata and dependencies
-├── docs/                      # Documentation
-│   ├── CONTRIBUTING.md        # How to contribute
-│   ├── IMPLEMENTATION_GUIDE.md    # Technical standards
-│   ├── PYTHON_313_MIGRATION.md   # Python 3.13 migration notes
-│   └── notes/                 # Design notes and reviews
-├── output/                    # Generated reports (git-ignored)
-├── typings/                   # Type stubs (git-ignored)
-├── Makefile                   # Development commands
-└── README.md                  # This file
+# Run on a folder (uses most recent image)
+python -m check_models --folder ~/Pictures
+
+# Specify a model
+python -m check_models --model mlx-community/Qwen2-VL-2B-Instruct-4bit --image photo.jpg
+
+# Generate HTML report
+python -m check_models --image photo.jpg --html
+
+# Use a custom prompt
+python -m check_models --image photo.jpg --prompt "Describe this in detail"
 ```
 
-## Available Commands
+**💡 Tip**: Pass a folder path to automatically select the most recently modified image (hidden files are ignored).
 
-Run `make` or `make help` to see all available commands:
+### Using Make Commands
 
-| Command | Description |
-|:--------|:------------|
-| `make install` | Install the package |
-| `make run` | Show usage help |
-| `make demo` | Run example (if you have images) |
-| `make clean` | Remove generated files |
-| `make dev` | Setup development environment |
-| `make update` | Update conda environment and project dependencies |
-| `make upgrade-deps` | Upgrade all dependencies to latest compatible versions |
-| `make lock-deps` | Generate requirements.txt from requirements.in |
-| `make sync-deps` | Sync installed packages with requirements.txt |
-| `make test` | Run tests |
-| `make check` | Run core quality pipeline (format, lint, typecheck, test) |
-| `make quality` | Run linting and type checks |
-| `make ci` | Run full CI pipeline (strict mode) |
-| `make format` | Format code with ruff |
-| `make lint` | Lint code with ruff |
-| `make typecheck` | Run mypy type checking |
+For convenience, many operations have `make` targets:
+
+```bash
+make install      # Install the package
+make test         # Run tests
+make quality      # Run code quality checks
+make clean        # Remove generated files
+```
+
+See `make help` for all available commands.
+
+## For Developers
+
+### Quick Setup
+
+```bash
+# Clone and setup
+git clone https://github.com/jrp2014/scripts.git
+cd scripts
+make dev          # Install dev dependencies + setup hooks
+
+# Run quality checks
+make quality
+
+# Run tests
+make test
+```
+
+See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for the complete development guide.
 
 ## Development
 
@@ -116,26 +121,75 @@ The directory is ignored by git. If stubs get stale:
 
 ```bash
 make clean && python -m tools.generate_stubs mlx_vlm tokenizers
-```bash
+```
+
 ### Dependencies
 
 The `src/pyproject.toml` is the source of truth for dependency lists. To check for outdated packages:
 
 ```bash
 python -m tools.check_outdated
-```text
-## Documentation
+```
 
-- **[src/README.md](src/README.md)**- Detailed usage, CLI options, and examples
--**[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)**- How to contribute to this project
--**[docs/IMPLEMENTATION_GUIDE.md](docs/IMPLEMENTATION_GUIDE.md)**- Technical standards for developers
--**[docs/PYTHON_313_MIGRATION.md](docs/PYTHON_313_MIGRATION.md)**- Python 3.13 migration notes
--**[docs/notes/](docs/notes/)**- Design notes and formatting reviews
+## Advanced Topics
+
+### All Available Make Commands
+
+Run `make help` to see all targets. Key commands:
+
+| Command | Description |
+|:--------|:------------|
+| `make install` | Install the package |
+| `make dev` | Setup development environment |
+| `make update` | Update conda environment and dependencies |
+| `make upgrade-deps` | Upgrade all dependencies to latest versions |
+| `make test` | Run tests |
+| `make quality` | Run linting and type checks |
+| `make check` | Run full quality pipeline (format, lint, typecheck, test) |
+| `make clean` | Remove generated files |
+
+### Dependency Management
+
+```bash
+make upgrade-deps # Upgrade all dependencies to latest compatible versions
+make lock-deps    # Generate requirements.txt from requirements.in
+make sync-deps    # Sync installed packages with requirements.txt
+```
+
+### Checking for Outdated Packages
+
+```bash
+python -m tools.check_outdated
+```
+
+## Repository Structure
+
+```text
+.
+├── src/                       # Main Python package
+│   ├── check_models.py        # Primary CLI and implementation
+│   ├── tools/                 # Helper scripts (quality checks, stubs, etc.)
+│   ├── tests/                 # Unit tests
+│   └── pyproject.toml         # Package metadata and dependencies
+├── docs/                      # Documentation
+│   ├── CONTRIBUTING.md        # How to contribute
+│   ├── IMPLEMENTATION_GUIDE.md    # Technical standards
+│   └── notes/                 # Design notes and reviews
+├── Makefile                   # Development commands
+└── README.md                  # This file
+```
+
+## More Documentation
+
+- **[src/README.md](src/README.md)** - Complete CLI reference and usage examples
+- **[docs/CONTRIBUTING.md](docs/CONTRIBUTING.md)** - Development workflow and guidelines
+- **[docs/IMPLEMENTATION_GUIDE.md](docs/IMPLEMENTATION_GUIDE.md)** - Technical standards and conventions
+- **[docs/notes/](docs/notes/)** - Design decisions and technical notes
 
 ## Requirements
 
--**Python**: 3.13+
-- **Platform**: macOS with Apple Silicon (M1/M2/M3)
+- **Python**: 3.13+
+- **Platform**: macOS with Apple Silicon (M1/M2/M3/M4)
 - **Framework**: MLX (Apple's machine learning framework)
 
 ## License
