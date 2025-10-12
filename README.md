@@ -64,6 +64,9 @@ Run `make` or `make help` to see all available commands:
 | `make clean` | Remove generated files |
 | `make dev` | Setup development environment |
 | `make update` | Update conda environment and project dependencies |
+| `make upgrade-deps` | Upgrade all dependencies to latest compatible versions |
+| `make lock-deps` | Generate requirements.txt from requirements.in |
+| `make sync-deps` | Sync installed packages with requirements.txt |
 | `make test` | Run tests |
 | `make check` | Run core quality pipeline (format, lint, typecheck, test) |
 | `make quality` | Run linting and type checks |
