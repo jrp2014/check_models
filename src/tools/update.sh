@@ -16,6 +16,27 @@
 
 set -euo pipefail
 
+# Check if we're in a virtual environment (uv, conda, venv, virtualenv)
+if [[ -z "${VIRTUAL_ENV:-}" ]] && [[ -z "${CONDA_DEFAULT_ENV:-}" ]] && [[ -z "${UV_ACTIVE:-}" ]]; then
+	echo "⚠️  WARNING: You don't appear to be in a virtual environment!"
+	echo "   (No VIRTUAL_ENV, CONDA_DEFAULT_ENV, or UV_ACTIVE detected)"
+	echo ""
+	echo "   This script will update packages globally on your system."
+	echo "   It's strongly recommended to activate a virtual environment first:"
+	echo ""
+	echo "   • conda: conda activate <env-name>"
+	echo "   • venv/virtualenv: source /path/to/venv/bin/activate"
+	echo "   • uv: uv venv && source .venv/bin/activate"
+	echo ""
+	read -p "   Continue anyway? [y/N] " -n 1 -r
+	echo
+	if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+		echo "[update.sh] Aborted by user."
+		exit 1
+	fi
+	echo "[update.sh] Proceeding with global installation (user confirmed)..."
+fi
+
 brew upgrade
 pip install -U pip wheel typing_extensions
 
