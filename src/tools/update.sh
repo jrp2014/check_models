@@ -8,6 +8,14 @@
 #   FORCE_REINSTALL=1 ./update.sh     # Force reinstall with --force-reinstall
 #   SKIP_MLX=1 ./update.sh            # Force skip mlx/mlx-vlm updates (override detection)
 #
+# Local MLX Development:
+#   If mlx, mlx-lm, and mlx-vlm directories exist at ../../ (sibling to scripts/),
+#   the script will automatically:
+#   1. Run git pull in each repository
+#   2. Install requirements.txt (if present)
+#   3. Install packages in order: mlx → mlx-lm → mlx-vlm
+#   4. Skip PyPI updates for these packages
+#
 # Note: Script automatically detects and preserves local MLX dev builds (versions
 # containing .dev or +commit). Stable releases are updated normally.
 #
@@ -37,6 +45,86 @@ if [[ -z "${VIRTUAL_ENV:-}" ]] && [[ -z "${CONDA_DEFAULT_ENV:-}" ]] && [[ -z "${
 	echo "[update.sh] Proceeding with global installation (user confirmed)..."
 fi
 
+# Function to update local MLX development repositories
+update_local_mlx_repos() {
+	# Determine the parent directory (assuming scripts/src/tools/update.sh)
+	local SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+	local PARENT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+	
+	echo "[update.sh] Checking for local MLX development repositories..."
+	
+	# Define the repositories in install order
+	local MLX_REPOS=("mlx" "mlx-lm" "mlx-vlm")
+	local FOUND_LOCAL=0
+	
+	for repo in "${MLX_REPOS[@]}"; do
+		local REPO_PATH="$PARENT_DIR/$repo"
+		if [[ -d "$REPO_PATH/.git" ]]; then
+			FOUND_LOCAL=1
+			echo ""
+			echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+			echo "📦 Updating local repository: $repo"
+			echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+			
+			cd "$REPO_PATH"
+			
+			# Git pull
+			echo "[update.sh] Running git pull in $repo..."
+			if git pull; then
+				echo "✓ Git pull successful"
+			else
+				echo "⚠️  Git pull failed or had conflicts - skipping install for $repo"
+				continue
+			fi
+			
+			# Special handling for mlx-vlm: install opencv-python first
+			if [[ "$repo" == "mlx-vlm" ]]; then
+				echo "[update.sh] Installing opencv-python for mlx-vlm..."
+				pip install -U opencv-python
+			fi
+			
+			# Install requirements.txt if it exists
+			if [[ -f "requirements.txt" ]]; then
+				echo "[update.sh] Installing requirements from requirements.txt..."
+				pip install -U -r requirements.txt
+			else
+				echo "[update.sh] No requirements.txt found"
+			fi
+			
+			# Install the package in editable mode
+			echo "[update.sh] Installing $repo package..."
+			if pip install -e .; then
+				echo "✓ $repo installed successfully"
+			else
+				echo "⚠️  Failed to install $repo"
+			fi
+			
+			echo ""
+		fi
+	done
+	
+	if [[ $FOUND_LOCAL -eq 1 ]]; then
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+		echo "✓ Local MLX repositories updated"
+		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+		echo ""
+		# Return to the scripts directory
+		cd "$SCRIPT_DIR"
+		return 0
+	else
+		echo "[update.sh] No local MLX development repositories found"
+		echo "[update.sh] (Looked for mlx, mlx-lm, mlx-vlm directories with .git at $PARENT_DIR)"
+		return 1
+	fi
+}
+
+# Update local MLX repos if they exist
+LOCAL_MLX_UPDATED=0
+if update_local_mlx_repos; then
+	LOCAL_MLX_UPDATED=1
+	echo "[update.sh] Local MLX builds updated - will skip PyPI MLX packages"
+fi
+
 brew upgrade
 pip install -U pip wheel typing_extensions
 
@@ -46,6 +134,11 @@ MLX_IS_LOCAL=0
 if [[ "$MLX_VERSION" == *".dev"* ]] || [[ "$MLX_VERSION" == *"+"* ]]; then
 	MLX_IS_LOCAL=1
 	echo "[update.sh] Detected local MLX build: $MLX_VERSION — preserving..."
+fi
+
+# If we just updated local repos, treat as local build
+if [[ $LOCAL_MLX_UPDATED -eq 1 ]]; then
+	MLX_IS_LOCAL=1
 fi
 
 RUNTIME_PACKAGES=()
