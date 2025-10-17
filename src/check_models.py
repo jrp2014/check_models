@@ -2650,7 +2650,7 @@ def _summary_parts(res: PerformanceResult, model_short: str) -> list[str]:
             time_str = (
                 f"total_time={tt_val}"
                 if isinstance(tt_val, str)
-                else f"total_time={total_time_val:.2f}s"
+                else f"total_time={_format_time_seconds(total_time_val)}"
             )
             parts.append(time_str)
     if res.error_stage:
@@ -2744,12 +2744,12 @@ def _log_detailed_timings(res: PerformanceResult) -> None:
     logger.info("  ⏱  %s", Colors.colored("Timing:", Colors.BOLD, Colors.WHITE))
 
     tt_val = format_field_value("total_time", total_time_val)
-    tt_disp = tt_val if isinstance(tt_val, str) else f"{total_time_val:.2f}s"
+    tt_disp = tt_val if isinstance(tt_val, str) else _format_time_seconds(total_time_val)
     logger.info("     ├─ Total:      %s", Colors.colored(f"{tt_disp:>8}", Colors.WHITE))
 
     if generation_time_val and generation_time_val > 0:
         gt_val = format_field_value("generation_time", generation_time_val)
-        gt_disp = gt_val if isinstance(gt_val, str) else f"{generation_time_val:.2f}s"
+        gt_disp = gt_val if isinstance(gt_val, str) else _format_time_seconds(generation_time_val)
         pct = (generation_time_val / total_time_val * 100) if total_time_val > 0 else 0
         logger.info(
             "     ├─ Generation: %s",
@@ -2758,7 +2758,7 @@ def _log_detailed_timings(res: PerformanceResult) -> None:
 
     if model_load_time_val and model_load_time_val > 0:
         ml_val = format_field_value("model_load_time", model_load_time_val)
-        ml_disp = ml_val if isinstance(ml_val, str) else f"{model_load_time_val:.2f}s"
+        ml_disp = ml_val if isinstance(ml_val, str) else _format_time_seconds(model_load_time_val)
         pct = (model_load_time_val / total_time_val * 100) if total_time_val > 0 else 0
         logger.info(
             "     └─ Load:       %s",
@@ -2835,11 +2835,11 @@ def _build_compact_metric_parts(
 
     parts: list[str] = []
     if total_time_val is not None:
-        parts.append(f"total={total_time_val:.2f}s")
+        parts.append(f"total={_format_time_seconds(total_time_val)}")
     if generation_time_val is not None:
-        parts.append(f"gen={generation_time_val:.2f}s")
+        parts.append(f"gen={_format_time_seconds(generation_time_val)}")
     if load_time_val is not None:
-        parts.append(f"load={load_time_val:.2f}s")
+        parts.append(f"load={_format_time_seconds(load_time_val)}")
     if peak_mem > 0:
         mem_fmt = format_field_value("peak_memory", peak_mem)
         mem_str = f"{mem_fmt}GB" if not str(mem_fmt).endswith("GB") else str(mem_fmt)
