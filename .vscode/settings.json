@@ -20,7 +20,14 @@
   "python.analysis.extraPaths": [
     "typings"
   ],
+  "python.analysis.exclude": [
+    "**/typings/**"
+  ],
+  "python.analysis.useLibraryCodeForTypes": true,
+  "python.analysis.typeCheckingMode": "basic",
   "python.analysis.diagnosticSeverityOverrides": {
-    "reportUnknownVariableType": "none"
+    "reportUnknownVariableType": "none",
+    "reportMissingImports": "none",
+    "reportMissingModuleSource": "none"
   }
 }
