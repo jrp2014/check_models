@@ -47,101 +47,146 @@ if [[ -z "${VIRTUAL_ENV:-}" ]] && [[ -z "${CONDA_DEFAULT_ENV:-}" ]] && [[ -z "${
 	echo "[update.sh] Proceeding with global installation (user confirmed)..."
 fi
 
+# Homebrew updates first (if available)
+if command -v brew >/dev/null 2>&1; then
+	echo "[update.sh] Updating Homebrew..."
+	brew update
+	brew upgrade
+else
+	echo "[update.sh] Homebrew not found; skipping brew update/upgrade"
+fi
+
+# Ensure global Python packaging tools are current
+echo "[update.sh] Updating core Python packaging tools (pip, wheel, typing_extensions)..."
+pip install -U pip wheel typing_extensions
+
 # Function to update local MLX development repositories
 update_local_mlx_repos() {
 	# Determine the parent directory (assuming scripts/src/tools/update.sh)
 	local SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 	local PARENT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+	local ORIGINAL_DIR="$(pwd)"
 	
 	echo "[update.sh] Checking for local MLX development repositories..."
 	
-	# Define the repositories in install order
+	# Define repositories in the desired order
 	local MLX_REPOS=("mlx-lm" "mlx-vlm" "mlx")
-	local FOUND_LOCAL=0
+	local -a REPO_NAMES=()
+	local -a REPO_PATHS=()
+	local -a REPO_SKIP=()
 	
 	for repo in "${MLX_REPOS[@]}"; do
 		local REPO_PATH="$PARENT_DIR/$repo"
 		if [[ -d "$REPO_PATH/.git" ]]; then
-			FOUND_LOCAL=1
-			echo ""
-			echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-			echo "📦 Updating local repository: $repo"
-			echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-			
-			cd "$REPO_PATH"
-			
-			# Git pull
-			echo "[update.sh] Running git pull in $repo..."
-			if git pull; then
-				echo "✓ Git pull successful"
-			else
-				echo "⚠️  Git pull failed or had conflicts - skipping install for $repo"
-				continue
-			fi
-			
-
-			
-			# Install requirements.txt if it exists
-			if [[ -f "requirements.txt" ]]; then
-				echo "[update.sh] Installing requirements from requirements.txt..."
-				pip install -U -r requirements.txt
-			else
-				echo "[update.sh] No requirements.txt found"
-			fi
-
-			# Special handling for mlx-vlm: install opencv-python (which has particular numpy dependency requirements)
-			if [[ "$repo" == "mlx-vlm" ]]; then
-				echo "[update.sh] Installing opencv-python for mlx-vlm..."
-				pip install -U opencv-python
-			fi
-			
-			# Install the package in editable mode
-			echo "[update.sh] Installing $repo package..."
-			if pip install -e .; then
-				echo "✓ $repo installed successfully"
-			else
-				echo "⚠️  Failed to install $repo"
-			fi
-			
-			# Generate stubs for mlx (only mlx has stub generation in setup.py)
-			if [[ "$repo" == "mlx" ]]; then
-				echo "[update.sh] Generating type stubs for mlx..."
-				if python setup.py generate_stubs; then
-					echo "✓ MLX stubs generated successfully"
-				else
-					echo "⚠️  Failed to generate MLX stubs (non-fatal)"
-				fi
-			fi
-			
-			echo ""
+			REPO_NAMES+=("$repo")
+			REPO_PATHS+=("$REPO_PATH")
+			REPO_SKIP+=(0)
 		fi
 	done
 	
-	if [[ $FOUND_LOCAL -eq 1 ]]; then
-		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-		echo "✓ Local MLX repositories updated"
-		echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-		echo ""
-		
-		# Generate stubs for this project (mlx-vlm-check) if we're in scripts
-		if [[ -f "$SCRIPT_DIR/generate_stubs.py" ]]; then
-			echo "[update.sh] Generating type stubs for mlx_vlm and tokenizers..."
-			cd "$SCRIPT_DIR"
-			if python generate_stubs.py mlx_vlm tokenizers; then
-				echo "✓ Project stubs generated successfully"
-			else
-				echo "⚠️  Failed to generate project stubs (non-fatal)"
-			fi
-		fi
-		
-		# Return to the scripts directory
-		cd "$SCRIPT_DIR"
-		return 0
-	else
+	if [[ ${#REPO_NAMES[@]} -eq 0 ]]; then
 		echo "[update.sh] No local MLX development repositories found"
-		echo "[update.sh] (Looked for mlx, mlx-lm, mlx-vlm directories with .git at $PARENT_DIR)"
+		echo "[update.sh] (Looked for mlx-lm, mlx-vlm, mlx directories with .git at $PARENT_DIR)"
+		cd "$ORIGINAL_DIR"
 		return 1
 	fi
+	
+	echo ""
+	echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	echo "📦 Updating local MLX repositories: ${REPO_NAMES[*]}"
+	echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+	# Stage 1: Sync repositories
+	for idx in "${!REPO_NAMES[@]}"; do
+		cd "${REPO_PATHS[idx]}"
+		echo "[update.sh] ($((idx + 1))/${#REPO_NAMES[@]}) git pull -> ${REPO_NAMES[idx]}"
+		if git pull; then
+			echo "✓ Git pull successful for ${REPO_NAMES[idx]}"
+		else
+			echo "⚠️  Git pull failed for ${REPO_NAMES[idx]} — skipping build"
+			REPO_SKIP[idx]=1
+		fi
+		echo ""
+	done
+	cd "$ORIGINAL_DIR"
+
+	# Stage 2: Install Python library dependencies (requirements)
+	for idx in "${!REPO_NAMES[@]}"; do
+		if [[ ${REPO_SKIP[idx]} -eq 1 ]]; then
+			continue
+		fi
+		cd "${REPO_PATHS[idx]}"
+		if [[ -f "requirements.txt" ]]; then
+			echo "[update.sh] Installing requirements for ${REPO_NAMES[idx]}..."
+			if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
+				pip install -U --force-reinstall -r requirements.txt
+			else
+				pip install -U -r requirements.txt
+			fi
+		else
+			echo "[update.sh] No requirements.txt for ${REPO_NAMES[idx]}"
+		fi
+		if [[ "${REPO_NAMES[idx]}" == "mlx-vlm" ]]; then
+			echo "[update.sh] Installing opencv-python for mlx-vlm..."
+			if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
+				pip install -U --force-reinstall opencv-python
+			else
+				pip install -U opencv-python
+			fi
+		fi
+		echo ""
+	done
+	cd "$ORIGINAL_DIR"
+
+	# Stage 3: Build/install packages
+	for idx in "${!REPO_NAMES[@]}"; do
+		if [[ ${REPO_SKIP[idx]} -eq 1 ]]; then
+			continue
+		fi
+		cd "${REPO_PATHS[idx]}"
+		echo "[update.sh] Installing ${REPO_NAMES[idx]} package..."
+		local INSTALL_STATUS=0
+		if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
+			pip install --force-reinstall -e . || INSTALL_STATUS=$?
+		else
+			pip install -e . || INSTALL_STATUS=$?
+		fi
+		if [[ $INSTALL_STATUS -eq 0 ]]; then
+			echo "✓ ${REPO_NAMES[idx]} installed successfully"
+		else
+			echo "⚠️  Failed to install ${REPO_NAMES[idx]}"
+			REPO_SKIP[idx]=1
+		fi
+	
+		if [[ "${REPO_NAMES[idx]}" == "mlx" ]] && [[ ${REPO_SKIP[idx]} -eq 0 ]]; then
+			echo "[update.sh] Generating type stubs for mlx..."
+			if python setup.py generate_stubs; then
+				echo "✓ MLX stubs generated successfully"
+			else
+				echo "⚠️  Failed to generate MLX stubs (non-fatal)"
+			fi
+		fi
+		echo ""
+	done
+	cd "$ORIGINAL_DIR"
+
+	# Stage 4: Generate project stubs if applicable
+	cd "$SCRIPT_DIR"
+	if [[ -f "$SCRIPT_DIR/generate_stubs.py" ]]; then
+		echo "[update.sh] Generating type stubs for mlx_vlm and tokenizers..."
+		if python generate_stubs.py mlx_vlm tokenizers; then
+			echo "✓ Project stubs generated successfully"
+		else
+			echo "⚠️  Failed to generate project stubs (non-fatal)"
+		fi
+	fi
+
+	cd "$ORIGINAL_DIR"
+	echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	echo "✓ Local MLX repositories updated"
+	echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	echo ""
+	return 0
 }
 
 # Update local MLX repos if they exist
@@ -150,9 +195,6 @@ if update_local_mlx_repos; then
 	LOCAL_MLX_UPDATED=1
 	echo "[update.sh] Local MLX builds updated - will skip PyPI MLX packages"
 fi
-
-brew upgrade
-pip install -U pip wheel typing_extensions
 
 # Check if MLX is a local dev build (contains .dev or +commit in version)
 MLX_VERSION=$(pip show mlx 2>/dev/null | grep '^Version:' | awk '{print $2}' || echo "")
