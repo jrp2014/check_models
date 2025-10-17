@@ -16,6 +16,10 @@
     "src/tests"
   ],
   "mypy.configFile": "src/pyproject.toml",
+  "python.analysis.stubPath": "typings",
+  "python.analysis.extraPaths": [
+    "typings"
+  ],
   "python.analysis.diagnosticSeverityOverrides": {
     "reportUnknownVariableType": "none"
   }
