@@ -3042,7 +3042,7 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
             ),
             (f"\n\nContext: The image relates to '{desc}'" if desc else ""),
             (f"\n\nThe photo was taken around {date_val}" if date_val else ""),
-            (f"near GPS {gps_val}" if gps_val else ""),
+            (f"from GPS {gps_val}" if gps_val else ""),
             (
                 ". Focus on visual content, drawing on any available "
                 "contextual information for specificity. Do not speculate."
