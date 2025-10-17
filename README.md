@@ -48,7 +48,7 @@ python -m check_models --image photo.jpg --html
 python -m check_models --image photo.jpg --prompt "Describe this in detail"
 ```
 
-**💡 Tip**: Pass a folder path to automatically select the most recently modified image (hidden files are ignored).
+**💡 Tip**: Pass a folder path with `--folder` to automatically select the **most recently modified image** in that directory (hidden files are ignored).
 
 ### Using Make Commands
 
@@ -63,7 +63,9 @@ make clean        # Remove generated files
 
 See `make help` for all available commands.
 
-## For Developers
+## For Contributors
+
+Want to contribute? Great! See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for the complete setup and workflow guide, and [IMPLEMENTATION_GUIDE.md](docs/IMPLEMENTATION_GUIDE.md) for coding standards.
 
 ### Quick Setup
 
@@ -79,6 +81,8 @@ make quality
 # Run tests
 make test
 ```
+
+**Note**: Output files are written to `output/` by default (git-ignored). See [src/README.md](src/README.md) for detailed CLI options.
 
 See [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md) for the complete development guide.
 

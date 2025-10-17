@@ -9,12 +9,28 @@
 
 ## TL;DR for Users
 
-Defaults assume you have Hugging Face models in your local cache. The tool will discover cached VLMs automatically (unless you pass `--models`), carefully read EXIF metadata (including GPS/time when present) to enrich prompts, and write reports to `results.html` and `results.md` in the current directory.
+Defaults assume you have Hugging Face models in your local cache. The tool will discover cached VLMs automatically (unless you pass `--models`), carefully read EXIF metadata (including GPS/time when present) to enrich prompts, and write reports to `output/results.html` and `output/results.md` by default.
 
 Quickest start on Apple Silicon (Python 3.13):
 
 ```bash
-cd vlm
+# From repository root
+make install
+
+# Run against a folder of images (change the path to your images)
+python -m check_models --folder ~/Pictures/Processed --prompt "Describe this image."
+
+# Try specific models
+python -m check_models --folder ~/Pictures/Processed --models mlx-community/nanoLLaVA mlx-community/llava-1.5-7b-hf
+
+# Exclude a model from auto-discovered cache
+python -m check_models --folder ~/Pictures/Processed --exclude "microsoft/Phi-3-vision-128k-instruct"
+```
+
+Prefer working directly in `src/`?
+
+```bash
+cd src
 python -m venv .venv && source .venv/bin/activate
 pip install -e .
 
@@ -24,32 +40,16 @@ pip install -e ".[extras]"
 # Optional: Install PyTorch (needed for some models like Phi-3-vision)
 pip install -e ".[torch]"
 
-# Or install everything at once:
-# pip install -e ".[extras,torch]"
-
-# Run against a folder of images (change the path to your images)
+# Run directly
 python check_models.py -f ~/Pictures/Processed -p "Describe this image."
-
-# Try specific models
-python check_models.py -f ~/Pictures/Processed -m mlx-community/nanoLLaVA mlx-community/llava-1.5-7b-hf
-
-# Exclude a model from auto-discovered cache
-python check_models.py -f ~/Pictures/Processed -e "microsoft/Phi-3-vision-128k-instruct"
-```
-
-Prefer Make?
-
-```bash
-make -C vlm bootstrap-dev
-make check_models ARGS="-f ~/Pictures/Processed -p 'Describe this image.'"
 ```
 
 Key defaults and parameters:
 
 - Models: discovered from Hugging Face cache. Use `--models` for explicit IDs, `--exclude` to filter.
 - Images: `-f/--folder` points to your images; default is `~/Pictures/Processed`.
-- Folder behavior: when you pass a folder, the script automatically selects the most recently modified image file in that folder (hidden files are ignored).
-- Reports: `results.html` and `results.md` are created in the current directory; override via `--output-html` and `--output-markdown`.
+- **Folder behavior**: When you pass a folder path, the script automatically selects the **most recently modified image file** in that folder (hidden files are ignored).
+- Reports: By default, `output/results.html` and `output/results.md` are created; override via `--output-html` and `--output-markdown`.
 - Prompting: If `--prompt` isn’t provided, the tool can compose a metadata‑aware prompt from EXIF data when available (camera, time, GPS).
 - Runtime: `--timeout 300`, `--max-tokens 500`, `--temperature 0.1` by default.
 - Security: `--trust-remote-code=True` by default for Hub models; only use with trusted sources.
@@ -343,7 +343,7 @@ python check_models.py \
 | Flag | Type | Default | Description |
 |------|------|---------|-------------|
 | `-f`, `--folder` | Path | `~/Pictures/Processed` | Folder of images to process (non‑recursive). |
-| `--output-html` | Path | `results.html` | HTML report output file. |
+| `--output-html` | Path | `output/results.html` | HTML report output file. |
 | `--output-markdown` | Path | `results.md` | Markdown report output file. |
 | `-m`, `--models` | list[str] | (none) | Explicit model IDs/paths; disables cache discovery. |
 | `-e`, `--exclude` | list[str] | (none) | Models to exclude (applies to cache scan or explicit list). |
@@ -551,16 +551,27 @@ If TensorFlow is installed, the script's automatic blocking (`TRANSFORMERS_NO_TF
 
 ```text
 mlx-vlm-check/
-├── check_models.py      # Main script
-├── pyproject.toml       # Project configuration and dependencies  
-├── README.md           # This file
-└── results.html        # Generated HTML report (after running)
-└── results.md          # Generated Markdown report (after running)
+├── src/
+│   ├── check_models.py      # Main script
+│   ├── pyproject.toml       # Project configuration and dependencies  
+│   ├── tools/               # Helper scripts
+│   └── tests/               # Test suite
+├── output/
+│   ├── results.html        # Generated HTML report (default location)
+│   └── results.md          # Generated Markdown report (default location)
+├── docs/                   # Documentation
+├── typings/                # Generated type stubs (git-ignored)
+└── Makefile               # Root orchestration
 ```
+
+**Output behavior**: By default, reports are written to `output/` (git-ignored). Override with `--output-html` / `--output-markdown`.
 
 ## Contributing
 
-**For detailed contribution guidelines, coding standards, and project conventions, see [docs/CONTRIBUTING.md](../docs/CONTRIBUTING.md).**
+**For detailed contribution guidelines, coding standards, and project conventions, see:**
+
+- [docs/CONTRIBUTING.md](../docs/CONTRIBUTING.md) - Setup, workflow, and PR process
+- [docs/IMPLEMENTATION_GUIDE.md](../docs/IMPLEMENTATION_GUIDE.md) - Coding standards and architecture
 
 ### Developer Workflow (Makefile)
 

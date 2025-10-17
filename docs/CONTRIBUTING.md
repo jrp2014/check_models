@@ -4,7 +4,7 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
 
 **Target audience**: New contributors, anyone submitting a pull request.
 
-> **Note**: This project was restructured in October 2025. The old `vlm/` directory is now `src/`. Most commands now use the root `Makefile` instead of `make -C src`.
+> **Note**: This project was restructured in October 2025. The old `vlm/` directory is now `src/`. All `make` commands now use the root `Makefile` instead of `make -C src` or `make -C vlm`.
 
 **Related documents**:
 
@@ -221,7 +221,7 @@ pytest src/tests/ -v
 1. **Ensure all checks pass**:
 
    ```bash
-   make -C vlm ci
+   make ci
    ```
 
 2. **Update documentation**:

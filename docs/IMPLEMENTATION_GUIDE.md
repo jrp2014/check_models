@@ -76,7 +76,7 @@ A single medium-sized, well-commented function is often clearer than a web of on
 ### Generated Artifacts
 
 - Generated artifacts (e.g., `typings/`) are **not committed**
-- Regenerate via `make -C vlm stubs`
+- Regenerate via `make stubs` (from repo root) or `python -m tools.generate_stubs mlx_vlm tokenizers` (from `src/`)
 - See `.gitignore` for complete list of excluded files
 
 ### Typings Policy
@@ -88,6 +88,10 @@ A single medium-sized, well-commented function is often clearer than a web of on
 **Generating stubs**:
 
 ```bash
+# From repo root
+make stubs
+
+# Or from src/ directory
 python -m tools.generate_stubs mlx_vlm tokenizers
 ```
 
@@ -854,7 +858,7 @@ git commit -m "feat(deps): add new-package for X functionality"
 
 ```bash
 # Quick check
-make -C vlm check-outdated
+make check-outdated
 
 # Detailed info
 pip list --outdated
@@ -883,7 +887,7 @@ make -C vlm audit
 1. Review changes in PR
 2. CI automatically tests
 3. Merge if green
-4. Pull and sync: `git pull && make -C vlm sync-deps`
+4. Pull and sync: `git pull && make sync-deps`
 
 ## Version Constraints Guide
 
@@ -983,14 +987,14 @@ make -C src lock-deps
 
 ```bash
 # Force sync to lock file state
-make -C vlm sync-deps
+make sync-deps
 
 # Or nuclear option: recreate environment
 conda deactivate
 conda remove -n mlx-vlm --all
 conda create -n mlx-vlm python=3.13
 conda activate mlx-vlm
-make -C vlm bootstrap-dev
+make bootstrap-dev
 ```
 
 ### "Dependabot PR causes test failures"
@@ -999,8 +1003,8 @@ make -C vlm bootstrap-dev
 # Locally reproduce the issue
 git checkout -b test-dependabot-update
 git pull origin <dependabot-branch>
-make -C vlm sync-deps
-make -C vlm ci
+make sync-deps
+make ci
 
 # If tests fail, investigate and either:
 # a) Fix code to work with new version
