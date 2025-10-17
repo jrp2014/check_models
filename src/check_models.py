@@ -274,6 +274,11 @@ os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 WIDTH_OVERRIDE: int | None = None
 
 
+# =============================================================================
+# UTILITY CLASSES (Colors, Logging, Timeout Management)
+# =============================================================================
+
+
 class Colors:
     """ANSI color codes for terminal output."""
 
@@ -485,6 +490,11 @@ MAX_OUTPUT_LENGTH = 28
 
 # PerformanceResult timing fields - centralized definition
 PERFORMANCE_TIMING_FIELDS: Final[list[str]] = ["generation_time", "model_load_time", "total_time"]
+
+
+# =============================================================================
+# FORMATTING UTILITIES (Numbers, Memory, Time, Tokens/sec, Field Values)
+# =============================================================================
 
 
 def fmt_num(val: float | str) -> str:
@@ -842,6 +852,11 @@ def get_library_versions() -> LibraryVersionDict:
     }
 
 
+# =============================================================================
+# SYSTEM INFO & VERSION DETECTION (Hardware, OS, Dependencies)
+# =============================================================================
+
+
 def get_device_info() -> SystemProfilerDict | None:
     """Return system_profiler display (GPU) info as dict or None on failure.
 
@@ -1071,6 +1086,11 @@ class ResultSet:
     def __iter__(self) -> Iterator[PerformanceResult]:  # pragma: no cover - trivial
         """Iterate over sorted results."""
         return iter(self._results)
+
+
+# =============================================================================
+# IMAGE & EXIF METADATA PROCESSING (File handling, GPS, EXIF extraction)
+# =============================================================================
 
 
 # --- File Handling ---
@@ -1503,6 +1523,11 @@ def pretty_print_exif(
     for line in table_lines:
         logger.info(line)
     log_rule(header_width, char="=", color=Colors.BLUE, bold=True)
+
+
+# =============================================================================
+# TABLE & REPORT GENERATION (CLI Tables, Field Formatting, Aggregation)
+# =============================================================================
 
 
 def _get_available_fields(results: list[PerformanceResult]) -> list[str]:
@@ -2000,6 +2025,11 @@ def _build_full_html_document(
     return html_content
 
 
+# =============================================================================
+# HTML REPORT GENERATION (HTML formatting, styling, templates)
+# =============================================================================
+
+
 def generate_html_report(
     results: list[PerformanceResult],
     filename: Path,
@@ -2072,6 +2102,11 @@ def generate_html_report(
             "A value error occurred while writing HTML report %s",
             str(filename),
         )
+
+
+# =============================================================================
+# MARKDOWN REPORT GENERATION (Markdown tables, formatting)
+# =============================================================================
 
 
 def generate_markdown_report(
@@ -3324,6 +3359,11 @@ def finalize_execution(
     )
     print_version_info(library_versions)
     logger.info("Total execution time: %.2f seconds", overall_time)
+
+
+# =============================================================================
+# MAIN ORCHESTRATION & CLI (Argument parsing, execution flow)
+# =============================================================================
 
 
 def main(args: argparse.Namespace) -> None:
