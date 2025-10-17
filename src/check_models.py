@@ -587,10 +587,34 @@ def _format_hms(total_seconds: float) -> str:
 
 
 def format_overall_runtime(total_seconds: float) -> str:
-    """Format overall runtime.
+    """Format overall runtime with adaptive precision based on duration.
 
     For durations < 3600s return ``"{seconds:.2f}s"``.
     For durations >= 3600s return ``"HH:MM:SS ({seconds:.2f}s)"``.
+
+    Args:
+        total_seconds: Total elapsed time in seconds
+
+    Returns:
+        Formatted runtime string with seconds or HH:MM:SS format
+
+    Examples:
+        >>> # Short durations show seconds only
+        >>> format_overall_runtime(42.5)
+        '42.50s'
+
+        >>> # Medium durations still use seconds
+        >>> format_overall_runtime(1234.56)
+        '1234.56s'
+
+        >>> # Long durations show HH:MM:SS plus seconds
+        >>> format_overall_runtime(7384.25)
+        '02:03:04 (7384.25s)'
+
+        >>> # Very long durations
+        >>> format_overall_runtime(36125.78)
+        '10:02:05 (36125.78s)'
+
     """
     if total_seconds >= HOUR_THRESHOLD_SECONDS:
         return f"{_format_hms(total_seconds)} ({total_seconds:.2f}s)"
@@ -622,6 +646,35 @@ def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: PLR
     - Time fields: seconds with 2 decimals + trailing 's'.
     - TPS fields: adaptive precision (integer / 1 decimal / 3 sig figs).
     - Other numerics: general fmt_num; non-numerics: str(value) or ''.
+
+    Args:
+        field_name: Name of the metric field (used for format detection)
+        value: Numeric or string value to format
+
+    Returns:
+        Formatted string representation of the value
+
+    Examples:
+        >>> # Memory formatting (bytes to GB conversion)
+        >>> format_field_value("peak_memory", 15_728_640_000.0)
+        '15 GB'
+
+        >>> # Time formatting (seconds with 2 decimals)
+        >>> format_field_value("generation_time", 3.14159)
+        '3.14s'
+
+        >>> # TPS formatting (adaptive precision)
+        >>> format_field_value("generation_tps", 42.567)
+        '42.6'
+
+        >>> # Non-numeric values returned as strings
+        >>> format_field_value("model_name", "qwen2-vl-2b-instruct-4bit")
+        'qwen2-vl-2b-instruct-4bit'
+
+        >>> # None values return empty string
+        >>> format_field_value("any_field", None)
+        ''
+
     """
     if value is None:
         return ""
@@ -1247,7 +1300,31 @@ def to_float(val: float | str) -> float | None:
 def _convert_gps_coordinate(
     coord: tuple[float | str, ...] | list[float | str],
 ) -> tuple[float, float, float] | None:
-    """Convert GPS EXIF coordinate to (degrees, minutes, seconds) tuple."""
+    """Convert GPS EXIF coordinate to (degrees, minutes, seconds) tuple.
+
+    GPS coordinates in EXIF are stored as tuples of (degrees, minutes, seconds)
+    or (degrees, decimal_minutes). This function normalizes both formats.
+
+    Args:
+        coord: Tuple or list of 2 or 3 numeric values representing GPS coordinate
+
+    Returns:
+        Tuple of (degrees, minutes, seconds) as floats, or None if conversion fails
+
+    Examples:
+        >>> # Standard DMS format (degrees, minutes, seconds)
+        >>> _convert_gps_coordinate((37.0, 46.0, 30.5))
+        (37.0, 46.0, 30.5)
+
+        >>> # Decimal minutes format (degrees, decimal_minutes)
+        >>> _convert_gps_coordinate((37.0, 46.508333))
+        (37.0, 46.508333, 0.0)
+
+        >>> # Invalid format returns None
+        >>> _convert_gps_coordinate((37.0,))
+        None
+
+    """
     clen: int = len(coord)
     if clen == MAX_GPS_COORD_LEN:
         deg = to_float(val=coord[0])
@@ -1316,6 +1393,37 @@ def _extract_description(exif_data: ExifDict) -> str | None:
 
 
 def _extract_gps_str(gps_info_raw: Mapping[object, Any] | None) -> str | None:
+    """Extract formatted GPS string from EXIF GPS info dictionary.
+
+    Converts raw EXIF GPS data (DMS format) into human-readable decimal degrees
+    with cardinal directions. Handles byte decoding and various EXIF tag formats.
+
+    Args:
+        gps_info_raw: Raw GPS info dict from EXIF with numeric or string keys
+
+    Returns:
+        Formatted GPS string like "37.775139°N, 122.418336°W" or None if invalid
+
+    Examples:
+        >>> # Standard GPS EXIF data with DMS coordinates
+        >>> gps_data = {
+        ...     1: b'N',  # GPSLatitudeRef
+        ...     2: (37.0, 46.0, 30.5),  # GPSLatitude
+        ...     3: b'W',  # GPSLongitudeRef
+        ...     4: (122.0, 25.0, 6.0)  # GPSLongitude
+        ... }
+        >>> _extract_gps_str(gps_data)
+        '37.775139°N, 122.418336°W'
+
+        >>> # Missing required fields returns None
+        >>> _extract_gps_str({1: b'N', 2: (37.0, 46.0, 30.5)})
+        None
+
+        >>> # Invalid input returns None
+        >>> _extract_gps_str(None)
+        None
+
+    """
     if not isinstance(gps_info_raw, Mapping):
         return None
     gps_info: GPSDict = {}
