@@ -322,12 +322,12 @@ If we see bugs in HTML manipulation:
 
 ### Library Documentation
 
-- **tabulate:** https://github.com/astanin/python-tabulate
+- **tabulate:** <https://github.com/astanin/python-tabulate>
   - Version used: 0.9.0
   - Last updated: 2022 (stable, mature)
   - License: MIT
 
-- **BeautifulSoup4:** https://www.crummy.com/software/BeautifulSoup/
+- **BeautifulSoup4:** <https://www.crummy.com/software/BeautifulSoup/>
   - Version evaluated: 4.12.x
   - Last updated: 2024 (actively maintained)
   - License: MIT
