@@ -28,7 +28,7 @@ make dev          # Install for development
 make run          # Run the check (uses default model)
 ```
 
-Added clear next step: "That's it! See [detailed usage](#detailed-usage) below for more options."
+Added clear next step with link to detailed usage section.
 
 ### 3. Benefit-Focused "What You Get"
 
@@ -70,6 +70,7 @@ No content was removed - everything was reorganized:
 ### Progressive Disclosure
 
 Present information in layers:
+
 1. **Essential** - What you need to get started (Quick Start)
 2. **Benefit** - Why you should care (What You Get)
 3. **Common** - Most frequent use cases (Detailed Usage)
@@ -90,16 +91,7 @@ Present information in layers:
 
 ## Link Fragment Fix
 
-Fixed markdown linting error MD051 by changing:
-```markdown
-[Detailed Usage](#detailed-usage)
-```
-to:
-```markdown
-[detailed usage](#detailed-usage)
-```
-
-The lowercase link text is more natural in the sentence context.
+Fixed markdown linting error MD051 by changing the link text to lowercase, which is more natural in the sentence context while maintaining the correct anchor reference.
 
 ## Validation
 
@@ -112,15 +104,17 @@ The lowercase link text is more natural in the sentence context.
 ## Next Steps
 
 Consider applying the same progressive disclosure pattern to:
+
 - `docs/CONTRIBUTING.md` - Developer onboarding
 - `src/README.md` - CLI reference
 
 The goal is consistent UX across all documentation where users can:
+
 1. Get started quickly
 2. Find common patterns easily
 3. Access complete details when needed
 
 ## References
 
-- Progressive Disclosure: https://www.nngroup.com/articles/progressive-disclosure/
-- Documentation Best Practices: https://documentation.divio.com/
+- Progressive Disclosure: <https://www.nngroup.com/articles/progressive-disclosure/>
+- Documentation Best Practices: <https://documentation.divio.com/>
