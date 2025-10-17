@@ -154,11 +154,13 @@ Run `make help` to see all targets. Key commands:
 
 ### Dependency Management
 
+Dependencies are defined in `src/pyproject.toml` and mirrored in simple `requirements.txt` files.
+
 ```bash
-make upgrade-deps # Upgrade all dependencies to latest compatible versions
-make lock-deps    # Generate requirements.txt from requirements.in
-make sync-deps    # Sync installed packages with requirements.txt
+make deps-sync    # Sync README dependency blocks with pyproject.toml
 ```
+
+To add a new dependency, edit `src/pyproject.toml` and `src/requirements.txt` (or `requirements-dev.txt`).
 
 ### Checking for Outdated Packages
 

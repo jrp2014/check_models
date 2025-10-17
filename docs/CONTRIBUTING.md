@@ -292,38 +292,31 @@ pip install -e ".[extras,torch,dev]"
 make install-all  # from root
 ```
 
-### Using pip-tools
+### Managing Dependencies
 
-The project uses pip-tools for reproducible builds:
+Dependencies are defined in `src/pyproject.toml` and mirrored in simple `requirements.txt` files.
 
 ```bash
-# Add a new dependency
-# 1. Edit src/requirements.in or src/requirements-dev.in
-# 2. Regenerate lock files:
-make lock-deps
-
 # Update environment and reinstall project (recommended after pulling changes):
 make update
-
-# Upgrade all dependencies to latest:
-make upgrade-deps
-
-# Sync your environment with lock files:
-make sync-deps
 
 # Check for outdated packages:
 make check-outdated
 
 # Security audit:
 make audit
+
+# Sync README dependency blocks:
+make deps-sync
 ```
 
 ### Updating Dependencies
 
-1. Edit `src/requirements.in` or `src/requirements-dev.in`
-2. Run `make lock-deps`
-3. Test thoroughly
-4. Commit both `.in` and `.txt` files
+1. Edit `src/pyproject.toml` to update the dependency specification
+2. Edit `src/requirements.txt` or `src/requirements-dev.txt` to match
+3. Run `make deps-sync` to update README blocks
+4. Test thoroughly
+5. Commit both files
 
 ### Keeping Your Environment Up-to-Date
 

@@ -201,29 +201,6 @@ test-cov: ## Run pytest with coverage
 deps-sync: ## Sync README dependency blocks
 	$(RUN_PY) tools/update_readme_deps.py
 
-.PHONY: lock-deps
-lock-deps: ## Generate requirements.txt from requirements.in using pip-tools
-	@echo "[lock-deps] Installing pip-tools if needed..."
-	@$(RUN_PY) -m pip install pip-tools --quiet || echo "pip-tools already installed"
-	@echo "[lock-deps] Compiling requirements.txt from requirements.in..."
-	$(RUN_TOOL_PREFIX) pip-compile requirements.in --output-file=requirements.txt --resolver=backtracking
-	@echo "[lock-deps] Compiling requirements-dev.txt from requirements-dev.in..."
-	$(RUN_TOOL_PREFIX) pip-compile requirements-dev.in --output-file=requirements-dev.txt --resolver=backtracking
-	@echo "✓ Lock files generated"
-
-.PHONY: sync-deps
-sync-deps: ## Sync installed packages with requirements.txt (using pip-sync)
-	@$(RUN_PY) -m pip install pip-tools --quiet || echo "pip-tools already installed"
-	$(RUN_TOOL_PREFIX) pip-sync requirements-dev.txt
-	@echo "✓ Dependencies synced"
-
-.PHONY: upgrade-deps
-upgrade-deps: ## Upgrade all dependencies to latest compatible versions
-	@$(RUN_PY) -m pip install pip-tools --quiet || echo "pip-tools already installed"
-	$(RUN_TOOL_PREFIX) pip-compile requirements.in --output-file=requirements.txt --upgrade --resolver=backtracking
-	$(RUN_TOOL_PREFIX) pip-compile requirements-dev.in --output-file=requirements-dev.txt --upgrade --resolver=backtracking
-	@echo "✓ Dependencies upgraded. Review changes and commit lock files."
-
 .PHONY: update
 update: ## Update conda environment and reinstall project with all dependencies
 	@echo "[update] Updating pip in environment: $(ENV_NAME) ($(ENV_TYPE))"
