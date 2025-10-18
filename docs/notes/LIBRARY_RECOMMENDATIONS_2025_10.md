@@ -1,6 +1,6 @@
 # Python Libraries & Tools for Improved Maintainability
 
-<!-- markdownlint-disable MD032 MD009 -->
+<!-- markdownlint-disable MD032 MD009 MD026 -->
 
 **Date:** October 18, 2025  
 **Scope:** Recommendations for leveraging additional Python libraries and tools  

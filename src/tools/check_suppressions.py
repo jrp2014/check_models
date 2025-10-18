@@ -126,5 +126,7 @@ def main() -> int:
             print(f"    Line {line_num}: {codes} - {reason}")  # noqa: T201
 
     return 0
+
+
 if __name__ == "__main__":
     sys.exit(main())
