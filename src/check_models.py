@@ -161,9 +161,10 @@ except ImportError:
         """Raise a consistent runtime error when mlx-vlm is unavailable."""
         raise RuntimeError(ERROR_MLX_VLM_MISSING)
 
-    generate = cast("Callable[..., SupportsGenerationResult]", _raise_mlx_vlm_missing)
-    apply_chat_template = cast("Callable[..., Any]", _raise_mlx_vlm_missing)
-    load = cast("Callable[..., tuple[Any, Any]]", _raise_mlx_vlm_missing)
+    # Use Any for fallback functions to avoid type conflicts with stub signatures
+    generate = cast("Any", _raise_mlx_vlm_missing)
+    apply_chat_template = cast("Any", _raise_mlx_vlm_missing)
+    load = cast("Any", _raise_mlx_vlm_missing)
 
     MISSING_DEPENDENCIES["mlx-vlm"] = ERROR_MLX_VLM_MISSING
 try:
