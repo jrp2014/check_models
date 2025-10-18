@@ -63,7 +63,7 @@ jobs:
       - name: Collect and verify tests
         run: |
           cd src
-          pytest --collect-only -q > /tmp/test_collect.txt
+          pytest --collect-only > /tmp/test_collect.txt
           COUNT=$(awk '/::/ {c++} END {print c+0}' /tmp/test_collect.txt)
           echo "Collected $COUNT tests"
           if [ "$COUNT" -lt 1 ]; then
