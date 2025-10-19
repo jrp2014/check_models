@@ -1048,6 +1048,7 @@ DEFAULT_HTML_OUTPUT: Final[Path] = Path("output/results.html")
 DEFAULT_MD_OUTPUT: Final[Path] = Path("output/results.md")
 DEFAULT_TEMPERATURE: Final[float] = 0.1
 DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
+MAX_REASONABLE_TEMPERATURE: Final[float] = 2.0  # Warn if temperature exceeds this
 
 # Constants - EXIF
 EXIF_IMAGE_DESCRIPTION_TAG: Final[int] = 270  # Standard EXIF tag ID for ImageDescription
@@ -2465,8 +2466,42 @@ def validate_inputs(
 
 def validate_temperature(temp: float) -> None:
     """Validate temperature parameter is within acceptable range."""
-    if not 0.0 <= temp <= 1.0:
-        msg: str = f"Temperature must be between 0 and 1, got {temp}"
+    if temp < 0.0:
+        msg: str = f"Temperature must be non-negative, got {temp}"
+        raise ValueError(msg)
+    if temp > MAX_REASONABLE_TEMPERATURE:
+        logger.warning(
+            "Temperature %.2f is unusually high (>%.1f). Output may be very random.",
+            temp,
+            MAX_REASONABLE_TEMPERATURE,
+        )
+
+
+def validate_sampling_params(
+    top_p: float,
+    repetition_penalty: float | None,
+) -> None:
+    """Validate sampling parameters are within acceptable ranges."""
+    if not 0.0 <= top_p <= 1.0:
+        msg = f"top_p must be between 0.0 and 1.0, got {top_p}"
+        raise ValueError(msg)
+
+    if repetition_penalty is not None and repetition_penalty < 1.0:
+        msg = f"repetition_penalty must be >= 1.0 if specified, got {repetition_penalty}"
+        raise ValueError(msg)
+
+
+def validate_kv_params(
+    max_kv_size: int | None,
+    kv_bits: int | None,
+) -> None:
+    """Validate KV cache parameters are within acceptable ranges."""
+    if max_kv_size is not None and max_kv_size <= 0:
+        msg = f"max_kv_size must be > 0 if specified, got {max_kv_size}"
+        raise ValueError(msg)
+
+    if kv_bits is not None and kv_bits not in (4, 8):
+        msg = f"kv_bits must be 4 or 8 if specified, got {kv_bits}"
         raise ValueError(msg)
 
 
@@ -3407,6 +3442,16 @@ def process_models(
             logger.error("Ensure models are downloaded and cache is accessible.")
     else:
         logger.info("Processing %d model(s)...", len(model_identifiers))
+
+        # Validate parameters before processing any models
+        validate_sampling_params(
+            top_p=args.top_p,
+            repetition_penalty=args.repetition_penalty,
+        )
+        validate_kv_params(
+            max_kv_size=args.max_kv_size,
+            kv_bits=args.kv_bits,
+        )
 
         # Validate all model identifiers before processing
         for model_id in model_identifiers:
