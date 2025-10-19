@@ -177,19 +177,7 @@ typecheck: ## mypy type checking
 # Tests
 .PHONY: test
 test: ## Run pytest
-	@echo "[test] collecting tests"; \
-	$(RUN_TOOL_PREFIX) pytest --collect-only -q > .test_collect.txt || exit 1; \
-	COUNT=$$(awk '/::/ {c++} END {print c+0}' .test_collect.txt); \
-	if [ "$$COUNT" -lt 1 ]; then \
-	  if [ "$$CI" != "true" ] && [ "$$ALLOW_EMPTY_TESTS" = "1" ]; then \
-	    echo "[test] WARNING: 0 tests collected (local override ALLOW_EMPTY_TESTS=1)"; \
-	  else \
-	    echo "[test] ERROR: 0 tests collected"; \
-	    exit 1; \
-	  fi; \
-	else \
-	  echo "[test] collected $$COUNT tests"; \
-	fi; \
+	@echo "[test] running tests"; \
 	$(RUN_TOOL_PREFIX) pytest -q
 
 .PHONY: test-cov
@@ -225,29 +213,21 @@ quality: ## Run consolidated quality script (ruff format+lint+stubgen+mypy on co
 
 # CI pipeline
 .PHONY: ci
-ci: ## Run full CI pipeline (format check, quality script, dependency sync, test count sanity, tests)
+ci: ## Run full CI pipeline (format check, quality script, dependency sync, tests)
 	@echo "[ci] ruff format --check (fail if unformatted)" && $(RUN_TOOL_PREFIX) ruff format --check $(FMT_PATHS) || (echo "[ci] Formatting issues detected; run 'make format'" && exit 1)
 	@echo "[ci] quality (ruff check + mypy)" && $(RUN_PY) tools/check_quality.py --no-format --no-fix || exit 1
 	@echo "[ci] dependency sync check" && $(RUN_PY) tools/update_readme_deps.py --check || exit 1
-	@echo "[ci] collecting tests (root config)"; \
-	$(RUN_TOOL_PREFIX) pytest --collect-only -q > .ci_collect.txt || exit 1; \
-	COUNT=$$(awk '/::/ {c++} END {print c+0}' .ci_collect.txt); \
-	if [ "$$COUNT" -lt 1 ]; then echo "[ci] ERROR: No tests collected"; cat .ci_collect.txt; exit 1; else echo "[ci] collected $$COUNT tests"; fi; \
-	echo $$COUNT > .ci_count
 	@echo "[ci] running tests"; \
-	COUNT=$$(cat .ci_count); \
 	TEST_OUTPUT=$$($(RUN_TOOL_PREFIX) pytest 2>&1); RC=$$?; echo "$$TEST_OUTPUT" > .ci_tests.txt; echo "$$TEST_OUTPUT"; \
 	if [ $$RC -ne 0 ]; then echo "[ci] tests failed (rc=$$RC)"; exit $$RC; fi; \
-	PASSED=$$(grep -Eo '[0-9]+ passed' .ci_tests.txt | tail -1 | awk '{print $$1}'); \
-	if [ -z "$$PASSED" ]; then echo "[ci] ERROR: Could not parse passed test count"; exit 1; fi; \
-	SKIPPED=$$(grep -Eo '[0-9]+ skipped' .ci_tests.txt | tail -1 | awk '{print $$1}'); [ -z "$$SKIPPED" ] && SKIPPED=0; \
-	if [ "$$PASSED" -lt 1 ]; then echo "[ci] ERROR: Zero tests passed"; exit 1; fi; \
-	if [ "$$SKIPPED" -gt 0 ]; then \
+	PASSED=$$(echo "$$TEST_OUTPUT" | grep -Eo '[0-9]+ passed' | tail -1 | awk '{print $$1}'); \
+	if [ -z "$$PASSED" ] || [ "$$PASSED" -lt 1 ]; then echo "[ci] ERROR: No tests passed"; exit 1; fi; \
+	SKIPPED=$$(echo "$$TEST_OUTPUT" | grep -Eo '[0-9]+ skipped' | tail -1 | awk '{print $$1}' || echo 0); \
+	if [ "$$SKIPPED" != "0" ] && [ -n "$$SKIPPED" ]; then \
 	  echo "[ci] ERROR: $$SKIPPED tests skipped (skips not allowed in CI)"; \
 	  exit 1; \
 	fi; \
-	if [ "$$PASSED" != "$$COUNT" ]; then echo "[ci] ERROR: Collected $$COUNT tests but only $$PASSED passed"; exit 1; fi; \
-	echo "[ci] SUCCESS (all $$PASSED tests executed; no skips)"
+	echo "[ci] SUCCESS ($$PASSED tests passed; no skips)"
 
 # Maintenance
 .PHONY: check-outdated

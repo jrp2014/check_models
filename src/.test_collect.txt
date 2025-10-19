@@ -1,31 +1,8 @@
-tests/test_dependency_sync.py::test_readme_runtime_block_matches_pyproject
-tests/test_format_field_value.py::test_memory_bytes_mid_range
-tests/test_format_field_value.py::test_memory_bytes_large_integer
-tests/test_format_field_value.py::test_memory_fractional_bytes
-tests/test_format_field_value.py::test_memory_already_decimal_gb_small
-tests/test_format_field_value.py::test_memory_zero_and_negative
-tests/test_gps_coordinates.py::TestGPSCoordinateConversion::test_northern_eastern_coordinates
-tests/test_gps_coordinates.py::TestGPSCoordinateConversion::test_southern_western_coordinates
-tests/test_gps_coordinates.py::TestGPSCoordinateConversion::test_bytes_reference_values
-tests/test_gps_coordinates.py::TestGPSCoordinateConversion::test_two_element_coordinates
-tests/test_gps_coordinates.py::TestGPSCoordinateConversion::test_single_element_coordinates
-tests/test_gps_coordinates.py::TestGPSCoordinateConversion::test_missing_latitude
-tests/test_gps_coordinates.py::TestGPSCoordinateConversion::test_missing_longitude
-tests/test_gps_coordinates.py::TestGPSCoordinateConversion::test_missing_latitude_ref
-tests/test_gps_coordinates.py::TestGPSCoordinateConversion::test_invalid_coordinate_tuple
-tests/test_gps_coordinates.py::TestGPSCoordinateConversion::test_non_numeric_coordinates
-tests/test_gps_coordinates.py::TestGPSCoordinateConversion::test_null_input
-tests/test_gps_coordinates.py::TestGPSCoordinateConversion::test_empty_dict
-tests/test_gps_coordinates.py::TestGPSCoordinateConversion::test_non_dict_input
-tests/test_gps_coordinates.py::TestGPSCoordinateConversion::test_precision_six_decimals
-tests/test_gps_coordinates.py::TestGPSCoordinateConversion::test_zero_coordinates
-tests/test_gps_coordinates.py::TestGPSCoordinateConversion::test_integer_tag_keys
-tests/test_metrics_modes.py::test_align_metric_parts_alignment
-tests/test_metrics_modes.py::test_metrics_mode_compact_smoke
-tests/test_metrics_modes.py::test_metrics_mode_detailed_smoke
-tests/test_total_runtime_reporting.py::test_markdown_report_includes_runtime
-tests/test_total_runtime_reporting.py::test_html_report_includes_runtime
-tests/test_total_runtime_reporting.py::test_markdown_long_runtime_hms
-tests/test_total_runtime_reporting.py::test_html_long_runtime_hms
+tests/test_dependency_sync.py: 1
+tests/test_format_field_value.py: 5
+tests/test_gps_coordinates.py: 16
+tests/test_metrics_modes.py: 3
+tests/test_parameter_validation.py: 13
+tests/test_total_runtime_reporting.py: 4
 
-29 tests collected in 5.47s
+

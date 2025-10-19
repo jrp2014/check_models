@@ -8,8 +8,8 @@ Pre-commit hook automates two maintenance steps:
 
 2) Ensure local type stubs exist for third-party packages used by mypy
    - If `typings/mlx_vlm/__init__.pyi` or `typings/tokenizers/__init__.pyi` is missing,
-     it runs: `python -m tools.generate_stubs mlx_vlm tokenizers`
-   - Adds `typings/` changes back to the commit
+     it runs: `cd src && python tools/generate_stubs.py mlx_vlm tokenizers`
+   - Note: typings/ is gitignored and not committed
 
 Pre-push hook runs quality checks:
    - Runs: `make -C src quality`
@@ -46,8 +46,8 @@ fi
 # 2) Ensure local type stubs for mypy (mlx_vlm, tokenizers)
 if [ ! -f typings/mlx_vlm/__init__.pyi ] || [ ! -f typings/tokenizers/__init__.pyi ]; then
   echo '[pre-commit] Generating local type stubs (mlx_vlm, tokenizers)'
-  python -m tools.generate_stubs mlx_vlm tokenizers || exit 1
-  git add typings
+  (cd src && python tools/generate_stubs.py mlx_vlm tokenizers) || exit 1
+  # Note: typings/ is in .gitignore and should not be committed
 fi
 
 exit 0
@@ -64,13 +64,13 @@ REPO_ROOT=$(git rev-parse --show-toplevel)
 cd "$REPO_ROOT"
 
 # Run full quality check
-if make -C vlm quality; then
+if make -C src quality; then
     echo "✓ Pre-push quality checks passed"
     exit 0
 else
     echo ""
     echo "❌ Quality checks failed. Fix issues before pushing."
-    echo "💡 Run 'make -C vlm quality' to see details"
+    echo "💡 Run 'make -C src quality' to see details"
     echo ""
     echo "To skip this check (not recommended), use:"
     echo "  git push --no-verify"
