@@ -77,7 +77,7 @@
 # Manual copying in process_image_with_model (lines 2675-2688)
 ```
 
-**Impact**: 
+**Impact**:
 
 - Maintenance burden (update in two places)
 - Risk of inconsistency
