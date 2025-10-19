@@ -2525,32 +2525,8 @@ def validate_image_accessible(image_path: PathLike) -> None:
         raise OSError(msg) from err
 
 
-class ModelGenParams(NamedTuple):
-    """Parameters for model generation."""
-
-    model_path: str
-    prompt: str
-    max_tokens: int
-    temperature: float
-    trust_remote_code: bool
-    # Advanced generation parameters
-    top_p: float
-    repetition_penalty: float | None
-    repetition_context_size: int
-    # Model loading parameters
-    lazy: bool
-    # KV cache parameters
-    max_kv_size: int | None
-    kv_bits: int | None
-    kv_group_size: int
-    quantized_kv_start: int
-
-
 def _run_model_generation(
-    params: ModelGenParams,
-    image_path: Path,
-    *,
-    verbose: bool,
+    params: ProcessImageParams,
 ) -> GenerationResult | SupportsGenerationResult:
     """Load model + processor, apply chat template, run generation, time it.
 
@@ -2566,7 +2542,7 @@ def _run_model_generation(
     # and converts weights to MLX format for Apple Silicon optimization
     try:
         model, tokenizer = load(
-            path_or_hf_repo=params.model_path,
+            path_or_hf_repo=params.model_identifier,
             lazy=params.lazy,
             trust_remote_code=params.trust_remote_code,
         )
@@ -2576,7 +2552,7 @@ def _run_model_generation(
         error_details = (
             f"Model loading failed: {load_err}\n\nFull traceback:\n{traceback.format_exc()}"
         )
-        logger.exception("Failed to load model %s", params.model_path)
+        logger.exception("Failed to load model %s", params.model_identifier)
         raise ValueError(error_details) from load_err
 
     # Apply model-specific chat template - each model has its own conversation format
@@ -2598,8 +2574,8 @@ def _run_model_generation(
             model=model,
             processor=tokenizer,  # MLX VLM accepts both tokenizer types
             prompt=formatted_prompt,
-            image=str(image_path),
-            verbose=verbose,
+            image=str(params.image_path),
+            verbose=params.verbose,
             temperature=params.temperature,
             top_p=params.top_p,
             repetition_penalty=params.repetition_penalty,
@@ -2612,20 +2588,20 @@ def _run_model_generation(
             max_tokens=params.max_tokens,
         )
     except TimeoutError as gen_to_err:
-        msg = f"Generation timed out for model {params.model_path}: {gen_to_err}"
+        msg = f"Generation timed out for model {params.model_identifier}: {gen_to_err}"
         # Re-raise to be handled by outer TimeoutError branch
         raise TimeoutError(msg) from gen_to_err
     except (OSError, ValueError) as gen_known_err:
         # Known I/O or validation-style issues
         msg = (
-            f"Model generation failed for {params.model_path}: {gen_known_err}\n\n"
+            f"Model generation failed for {params.model_identifier}: {gen_known_err}\n\n"
             f"Full traceback:\n{traceback.format_exc()}"
         )
         raise ValueError(msg) from gen_known_err
     except (RuntimeError, TypeError, AttributeError, KeyError) as gen_err:
         # Model-specific runtime errors (weights, config, tensor ops, missing attributes)
         msg = (
-            f"Model runtime error during generation for {params.model_path}: {gen_err}\n\n"
+            f"Model runtime error during generation for {params.model_identifier}: {gen_err}\n\n"
             f"Full traceback:\n{traceback.format_exc()}"
         )
         raise ValueError(msg) from gen_err
@@ -2706,25 +2682,8 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         )
 
         with TimeoutManager(params.timeout):
-            gen_params: ModelGenParams = ModelGenParams(
-                model_path=params.model_identifier,
-                prompt=params.prompt,
-                max_tokens=params.max_tokens,
-                temperature=params.temperature,
-                trust_remote_code=params.trust_remote_code,
-                top_p=params.top_p,
-                repetition_penalty=params.repetition_penalty,
-                repetition_context_size=params.repetition_context_size,
-                lazy=params.lazy,
-                max_kv_size=params.max_kv_size,
-                kv_bits=params.kv_bits,
-                kv_group_size=params.kv_group_size,
-                quantized_kv_start=params.quantized_kv_start,
-            )
             output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                params=gen_params,
-                image_path=params.image_path,
-                verbose=params.verbose,
+                params=params,
             )
 
         # Extract timing from GenerationResult if available
