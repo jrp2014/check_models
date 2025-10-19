@@ -540,22 +540,238 @@ def print_multi_image_dimensions(image_paths: list[Path]) -> None:
 
 #### 2.4 Model Capability Detection
 
-```python
-# Document which models support multi-image
-MULTI_IMAGE_MODELS = {
-    "qnguyen3/nanoLLaVA",  # Example - verify actual support
-    # ... others ...
-}
+**Challenge**: Determining programmatically which models support multiple images.
 
-def validate_multi_image_support(model_id: str, num_images: int) -> None:
-    """Warn if model might not support multiple images."""
-    if num_images > 1 and model_id not in MULTI_IMAGE_MODELS:
+##### Detection Strategies
+
+###### Strategy 1: Heuristic-Based Detection (Recommended for Phase 2)
+
+Use model architecture patterns to infer multi-image support:
+
+```python
+def detect_multi_image_support(model: nn.Module, config: Any) -> bool:
+    """Detect if a model likely supports multiple images.
+    
+    Detection heuristics:
+        1. Check model_type in config for known multi-image architectures
+        2. Check for vision-related config attributes
+        3. Look for specific model families known to support it
+    
+    Returns:
+        True if model likely supports multiple images, False otherwise
+    
+    Note:
+        This is heuristic-based and may have false positives/negatives.
+        Always verify with specific model documentation.
+    """
+    # Known multi-image model types/architectures
+    MULTI_IMAGE_ARCHITECTURES = {
+        "idefics",      # Idefics/Idefics2 support multi-image
+        "idefics2",
+        "idefics3",
+        "qwen2_vl",     # Qwen2-VL supports multi-image
+        "qwen3_vl",     # Qwen3-VL supports multi-image
+        "internvl",     # InternVL supports multi-image
+        "llama4",       # Llama 4 Vision supports multi-image
+        "mllama",       # Multi-modal Llama
+        "florence2",    # Florence-2 multi-image
+    }
+    
+    # Single-image only architectures
+    SINGLE_IMAGE_ONLY = {
+        "llava",        # LLaVA typically single image
+        "paligemma",    # PaliGemma single image
+        "phi3_v",       # Phi-3 Vision single image
+        "smolvlm",      # SmolVLM single image
+    }
+    
+    # Get model type from config
+    model_type = getattr(config, "model_type", "").lower()
+    
+    # Check explicit single-image architectures first
+    for arch in SINGLE_IMAGE_ONLY:
+        if arch in model_type:
+            logger.debug("Model %s is single-image only architecture", model_type)
+            return False
+    
+    # Check known multi-image architectures
+    for arch in MULTI_IMAGE_ARCHITECTURES:
+        if arch in model_type:
+            logger.debug("Model %s supports multi-image", model_type)
+            return True
+    
+    # Check for multi-image indicators in config
+    # Some models have explicit max_num_images or similar
+    if hasattr(config, "max_num_images"):
+        max_images = getattr(config, "max_num_images", 1)
+        return max_images > 1
+    
+    # Default to False (conservative - assume single image)
+    logger.debug("Model %s: multi-image support unknown, assuming single-image", model_type)
+    return False
+
+
+def warn_multi_image_usage(
+    model_id: str,
+    model: nn.Module,
+    config: Any,
+    num_images: int
+) -> None:
+    """Warn if attempting multi-image with potentially incompatible model.
+    
+    Args:
+        model_id: Model identifier (for logging)
+        model: Loaded model instance
+        config: Model configuration
+        num_images: Number of images being processed
+    """
+    if num_images <= 1:
+        return  # Single image, no warning needed
+    
+    supports_multi = detect_multi_image_support(model, config)
+    
+    if not supports_multi:
         logger.warning(
-            "Model %s may not support multiple images. "
-            "It might ignore extra images or fail.",
-            model_id
+            "Model %s may not support multiple images (%d provided). "
+            "The model might ignore extra images, use only the first, or fail. "
+            "Check model documentation for multi-image capabilities.",
+            model_id,
+            num_images,
+        )
+    else:
+        logger.info(
+            "Model %s appears to support multiple images (%d provided)",
+            model_id,
+            num_images,
         )
 ```
+
+**Usage in code**:
+
+```python
+def _generate_vlm_output(...) -> GenerationResult | SupportsGenerationResult:
+    """Execute VLM generation with multi-image warning."""
+    # After loading model and config
+    model, tokenizer = load(...)
+    config = getattr(model, "config", None)
+    
+    # Warn about multi-image usage
+    warn_multi_image_usage(
+        model_id=params.model_identifier,
+        model=model,
+        config=config,
+        num_images=len(params.image_paths),
+    )
+    
+    # ... continue with generation ...
+```
+
+###### Strategy 2: Runtime Detection (Advanced)
+
+Try multi-image and catch failures:
+
+```python
+def supports_multi_image_runtime(
+    model: nn.Module,
+    processor: Any,
+    test_images: list[str]
+) -> bool:
+    """Test if model accepts multiple images at runtime.
+    
+    Warning: This approach requires test images and may be slow.
+    """
+    try:
+        # Try generating with multiple test images
+        generate(
+            model=model,
+            processor=processor,
+            prompt="Test",
+            image=test_images[:2],  # Try 2 images
+            max_tokens=1,  # Minimal generation
+        )
+        return True
+    except (ValueError, TypeError, RuntimeError):
+        return False
+```
+
+❌ **Not recommended**: Too slow, requires test images, may have side effects.
+
+###### Strategy 3: Manual Allowlist (Simple, Phase 1)
+
+Maintain known-good models:
+
+```python
+# Curated list of models verified to support multiple images
+VERIFIED_MULTI_IMAGE_MODELS = {
+    # Idefics family
+    "HuggingFaceM4/idefics2-8b": True,
+    "HuggingFaceM4/idefics3-8b-llama": True,
+    
+    # Qwen family
+    "Qwen/Qwen2-VL-2B-Instruct": True,
+    "Qwen/Qwen2-VL-7B-Instruct": True,
+    
+    # InternVL family  
+    "OpenGVLab/InternVL2-8B": True,
+    
+    # Florence family
+    "microsoft/Florence-2-large": True,
+    
+    # Known single-image only
+    "llava-hf/llava-1.5-7b-hf": False,
+    "microsoft/Phi-3-vision-128k-instruct": False,
+}
+
+def check_multi_image_support(model_id: str) -> bool | None:
+    """Check if model is known to support multiple images.
+    
+    Returns:
+        True: Verified multi-image support
+        False: Verified single-image only
+        None: Unknown/unverified
+    """
+    # Check exact match first
+    if model_id in VERIFIED_MULTI_IMAGE_MODELS:
+        return VERIFIED_MULTI_IMAGE_MODELS[model_id]
+    
+    # Check partial matches (e.g., "Qwen/Qwen2-VL-*")
+    for known_model, supports_multi in VERIFIED_MULTI_IMAGE_MODELS.items():
+        if known_model.split("/")[0] in model_id:  # Same org
+            # Return if same model family
+            if known_model.split("/")[1].split("-")[0] in model_id:
+                return supports_multi
+    
+    return None  # Unknown
+```
+
+##### Recommended Approach
+
+**Phase 1**: Manual allowlist (simple, accurate for known models)
+
+- Maintain `VERIFIED_MULTI_IMAGE_MODELS` dict
+- Warn on unknown models when `num_images > 1`
+- Update list based on user feedback/testing
+
+**Phase 2**: Heuristic detection (automatic, good coverage)
+
+- Use `detect_multi_image_support()` based on model architecture
+- Fall back to conservative behavior (assume single-image)
+- Log warnings for unknown architectures
+
+**Phase 3**: Documentation integration (best UX)
+
+- Scrape model cards from HuggingFace Hub
+- Parse README/config.json for multi-image capabilities
+- Cache results locally
+
+##### Implementation Notes
+
+1. **Config inspection**: After `load()`, inspect `model.config.model_type`
+2. **Conservative defaults**: When uncertain, warn but allow (don't block)
+3. **User override**: Consider `--force-multi-image` flag to suppress warnings
+4. **Documentation**: Clearly document which models are verified to work
+
+
 
 ## Testing Strategy
 
@@ -768,6 +984,38 @@ The argparse help will automatically show:
 - Only warn if `--folder` differs from default
 
 **Rationale**: Standard CLI practice (git, docker, npm use "last wins" / explicit override)
+
+### Multi-Image Detection Strategy
+
+**Challenge**: Not all VLMs support multiple images.
+
+**Recommended Approach** (Progressive Enhancement):
+
+1. **Phase 1 - Manual Allowlist**:
+   - Maintain `VERIFIED_MULTI_IMAGE_MODELS` dictionary
+   - Known-good: Qwen2-VL, Idefics2/3, InternVL, Florence-2
+   - Known single-only: LLaVA, Phi-3-Vision, SmolVLM
+   - Warn when using multi-image with unknown models
+
+2. **Phase 2 - Heuristic Detection**:
+   - Inspect `model.config.model_type` after loading
+   - Match against known architecture patterns
+   - Check for `max_num_images` in config
+   - Conservative: assume single-image when uncertain
+
+3. **Phase 3 - Documentation Parsing** (future):
+   - Scrape HuggingFace model cards
+   - Parse capabilities from README/config
+   - Cache results locally
+
+**Key Implementation Points**:
+
+- Detection happens *after* model load (config available)
+- Non-blocking warnings (warn but allow)
+- Optional `--force-multi-image` flag to suppress warnings
+- Clear logging about model capabilities
+
+See **Section 2.4** for detailed implementation code.
 
 ### Alternative Approaches (Not Recommended)
 
