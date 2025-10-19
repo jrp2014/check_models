@@ -50,8 +50,10 @@ Key defaults and parameters:
 - Images: `-f/--folder` points to your images; default is `~/Pictures/Processed`.
 - **Folder behavior**: When you pass a folder path, the script automatically selects the **most recently modified image file** in that folder (hidden files are ignored).
 - Reports: By default, `output/results.html` and `output/results.md` are created; override via `--output-html` and `--output-markdown`.
-- Prompting: If `--prompt` isn’t provided, the tool can compose a metadata‑aware prompt from EXIF data when available (camera, time, GPS).
+- Prompting: If `--prompt` isn't provided, the tool can compose a metadata‑aware prompt from EXIF data when available (camera, time, GPS).
 - Runtime: `--timeout 300`, `--max-tokens 500`, `--temperature 0.1` by default.
+- Sampling: `--top-p 1.0` (nucleus sampling), `--repetition-penalty` (disabled by default).
+- Memory: `--lazy-load` (off by default), `--kv-bits` and `--max-kv-size` for KV cache optimization.
 - Security: `--trust-remote-code=True` by default for Hub models; only use with trusted sources.
 
 ## Capabilities
@@ -338,6 +340,52 @@ python check_models.py \
   --verbose
 ```
 
+### Advanced Parameters Example
+
+Control sampling behavior and memory optimization:
+
+```bash
+# Nucleus sampling with repetition penalty
+python check_models.py \
+  --folder ~/Pictures \
+  --top-p 0.9 \
+  --repetition-penalty 1.2 \
+  --repetition-context-size 50
+
+# Memory optimization for large models
+python check_models.py \
+  --folder ~/Pictures \
+  --lazy-load \
+  --max-kv-size 4096 \
+  --kv-bits 4
+
+# Combine sampling and memory optimization
+python check_models.py \
+  --folder ~/Pictures \
+  --models mlx-community/Qwen2-VL-7B-Instruct \
+  --top-p 0.95 \
+  --repetition-penalty 1.1 \
+  --lazy-load \
+  --kv-bits 8 \
+  --max-kv-size 8192
+```
+
+#### Sampling Parameters
+
+- **`--top-p`**: Nucleus sampling controls output diversity. Lower values (e.g., 0.9) produce more focused text; 1.0 disables it.
+- **`--repetition-penalty`**: Values > 1.0 discourage the model from repeating phrases. Useful for VLMs that tend to loop.
+- **`--repetition-context-size`**: How many recent tokens to consider when applying repetition penalty (default: 20).
+
+#### Memory Optimization
+
+- **`--lazy-load`**: Loads model weights on-demand rather than all at once. Reduces peak memory usage, recommended for models larger than half your RAM.
+- **`--max-kv-size`**: Limits the KV cache size to prevent memory overflow on long sequences.
+- **`--kv-bits`**: Quantizes the KV cache to 4 or 8 bits, significantly reducing memory with minimal quality loss.
+- **`--kv-group-size`**: Group size for KV quantization (advanced tuning).
+- **`--quantized-kv-start`**: Token position to start quantization (advanced tuning).
+
+**Tip**: For 16GB systems running large models, try `--lazy-load --kv-bits 4 --max-kv-size 4096`.
+
 ## Command Line Reference
 
 | Flag | Type | Default | Description |
@@ -351,6 +399,14 @@ python check_models.py \
 | `-p`, `--prompt` | str | (auto) | Custom prompt; if omitted a metadata‑aware prompt may be used. |
 | `-x`, `--max-tokens` | int | 500 | Max new tokens to generate. |
 | `-t`, `--temperature` | float | 0.1 | Sampling temperature. |
+| `--top-p` | float | 1.0 | Nucleus sampling parameter (0.0-1.0); lower = more focused. |
+| `--repetition-penalty` | float | (none) | Penalize repeated tokens (>1.0 discourages repetition). |
+| `--repetition-context-size` | int | 20 | Context window size for repetition penalty. |
+| `--lazy-load` | flag | `False` | Use lazy loading (loads weights on-demand, reduces memory). |
+| `--max-kv-size` | int | (none) | Maximum KV cache size (limits memory for long sequences). |
+| `--kv-bits` | int | (none) | Quantize KV cache to N bits (4 or 8); saves memory. |
+| `--kv-group-size` | int | 64 | Quantization group size for KV cache. |
+| `--quantized-kv-start` | int | 0 | Start position for KV cache quantization. |
 | `--timeout` | float | 300 | Operation timeout (seconds) for model execution. |
 | `-v`, `--verbose` | flag | `False` | Enable verbose + debug logging. |
 | `--no-color` | flag | `False` | Disable ANSI colors in the CLI output. |

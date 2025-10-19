@@ -2498,6 +2498,17 @@ class ModelGenParams(NamedTuple):
     max_tokens: int
     temperature: float
     trust_remote_code: bool
+    # Advanced generation parameters
+    top_p: float
+    repetition_penalty: float | None
+    repetition_context_size: int
+    # Model loading parameters
+    lazy: bool
+    # KV cache parameters
+    max_kv_size: int | None
+    kv_bits: int | None
+    kv_group_size: int
+    quantized_kv_start: int
 
 
 def _run_model_generation(
@@ -2518,12 +2529,10 @@ def _run_model_generation(
 
     # Load model from HuggingFace Hub - this handles automatic download/caching
     # and converts weights to MLX format for Apple Silicon optimization
-
-    # Load model from HuggingFace Hub - this handles automatic download/caching
-    # and converts weights to MLX format for Apple Silicon optimization
     try:
         model, tokenizer = load(
             path_or_hf_repo=params.model_path,
+            lazy=params.lazy,
             trust_remote_code=params.trust_remote_code,
         )
         config: Any | None = getattr(model, "config", None)
@@ -2557,6 +2566,13 @@ def _run_model_generation(
             image=str(image_path),
             verbose=verbose,
             temperature=params.temperature,
+            top_p=params.top_p,
+            repetition_penalty=params.repetition_penalty,
+            repetition_context_size=params.repetition_context_size,
+            max_kv_size=params.max_kv_size,
+            kv_bits=params.kv_bits,
+            kv_group_size=params.kv_group_size,
+            quantized_kv_start=params.quantized_kv_start,
             trust_remote_code=params.trust_remote_code,
             max_tokens=params.max_tokens,
         )
@@ -2600,6 +2616,14 @@ class ProcessImageParams(NamedTuple):
         timeout: Timeout in seconds.
         verbose: Verbose/debug flag.
         trust_remote_code: Allow remote code execution.
+        top_p: Nucleus sampling parameter.
+        repetition_penalty: Repetition penalty (None to disable).
+        repetition_context_size: Context window for repetition penalty.
+        lazy: Use lazy loading for models.
+        max_kv_size: Maximum KV cache size.
+        kv_bits: KV cache quantization bits.
+        kv_group_size: KV cache quantization group size.
+        quantized_kv_start: Start position for KV quantization.
 
     """
 
@@ -2611,6 +2635,14 @@ class ProcessImageParams(NamedTuple):
     timeout: float
     verbose: bool
     trust_remote_code: bool
+    top_p: float
+    repetition_penalty: float | None
+    repetition_context_size: int
+    lazy: bool
+    max_kv_size: int | None
+    kv_bits: int | None
+    kv_group_size: int
+    quantized_kv_start: int
 
 
 def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
@@ -2645,6 +2677,14 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
                 max_tokens=params.max_tokens,
                 temperature=params.temperature,
                 trust_remote_code=params.trust_remote_code,
+                top_p=params.top_p,
+                repetition_penalty=params.repetition_penalty,
+                repetition_context_size=params.repetition_context_size,
+                lazy=params.lazy,
+                max_kv_size=params.max_kv_size,
+                kv_bits=params.kv_bits,
+                kv_group_size=params.kv_group_size,
+                quantized_kv_start=params.quantized_kv_start,
             )
             output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                 params=gen_params,
@@ -3397,6 +3437,14 @@ def process_models(
             timeout=args.timeout,
             verbose=is_vlm_verbose,
             trust_remote_code=args.trust_remote_code,
+            top_p=args.top_p,
+            repetition_penalty=args.repetition_penalty,
+            repetition_context_size=args.repetition_context_size,
+            lazy=args.lazy_load,
+            max_kv_size=args.max_kv_size,
+            kv_bits=args.kv_bits,
+            kv_group_size=args.kv_group_size,
+            quantized_kv_start=args.quantized_kv_start,
         )
         result: PerformanceResult = process_image_with_model(params)
         results.append(result)
@@ -3594,6 +3642,55 @@ def main_cli() -> None:
         type=float,
         default=DEFAULT_TEMPERATURE,
         help="Sampling temperature.",
+    )
+    parser.add_argument(
+        "--top-p",
+        type=float,
+        default=1.0,
+        help="Nucleus sampling parameter (0.0-1.0). Lower values = more focused output.",
+    )
+    parser.add_argument(
+        "--repetition-penalty",
+        type=float,
+        default=None,
+        help="Penalize repeated tokens (>1.0 discourages repetition). Default: None (disabled).",
+    )
+    parser.add_argument(
+        "--repetition-context-size",
+        type=int,
+        default=20,
+        help="Context window size for repetition penalty. Default: 20 tokens.",
+    )
+    parser.add_argument(
+        "--lazy-load",
+        action="store_true",
+        default=False,
+        help="Use lazy loading for models (loads weights on-demand, reduces peak memory).",
+    )
+    parser.add_argument(
+        "--max-kv-size",
+        type=int,
+        default=None,
+        help="Maximum KV cache size (limits memory for long sequences). Default: None (unlimited).",
+    )
+    parser.add_argument(
+        "--kv-bits",
+        type=int,
+        default=None,
+        choices=[4, 8],
+        help="Quantize KV cache to N bits (4 or 8). Saves memory with small quality trade-off.",
+    )
+    parser.add_argument(
+        "--kv-group-size",
+        type=int,
+        default=64,
+        help="Quantization group size for KV cache. Default: 64.",
+    )
+    parser.add_argument(
+        "--quantized-kv-start",
+        type=int,
+        default=0,
+        help="Start position for KV cache quantization. Default: 0 (from beginning).",
     )
     parser.add_argument(
         "-v",
