@@ -65,6 +65,7 @@ if TYPE_CHECKING:
 
     from mlx.nn import Module
     from mlx_vlm.generate import GenerationResult
+    from transformers import PreTrainedTokenizer, PreTrainedTokenizerFast
 
 LOGGER_NAME: Final[str] = "mlx-vlm-check"
 NOT_AVAILABLE: Final[str] = "N/A"
@@ -2513,7 +2514,7 @@ def _run_model_generation(
     show concise messages while verbose logs retain full detail.
     """
     model: Module
-    tokenizer: Any  # transformers-compatible tokenizer
+    tokenizer: PreTrainedTokenizer | PreTrainedTokenizerFast
 
     # Load model from HuggingFace Hub - this handles automatic download/caching
     # and converts weights to MLX format for Apple Silicon optimization
@@ -2525,7 +2526,7 @@ def _run_model_generation(
             path_or_hf_repo=params.model_path,
             trust_remote_code=params.trust_remote_code,
         )
-        config: Any = getattr(model, "config", None)
+        config: Any | None = getattr(model, "config", None)
     except Exception as load_err:
         # Capture any model loading errors (config issues, missing files, etc.)
         error_details = (
@@ -2536,7 +2537,7 @@ def _run_model_generation(
 
     # Apply model-specific chat template - each model has its own conversation format
     # (e.g., Llama uses <|begin_of_text|>, Phi-3 uses <|user|>, etc.)
-    formatted_prompt = apply_chat_template(
+    formatted_prompt: str | list[Any] = apply_chat_template(
         processor=tokenizer,
         config=config,
         prompt=params.prompt,
@@ -2619,8 +2620,8 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         Colors.colored(str(getattr(params.image_path, "name", params.image_path)), Colors.MAGENTA),
         Colors.colored(params.model_identifier, Colors.MAGENTA),
     )
-    model: object | None = None
-    tokenizer: object | None = None
+    model: Module | None = None
+    tokenizer: PreTrainedTokenizer | PreTrainedTokenizerFast | None = None
     arch, gpu_info = get_system_info()
 
     # Track overall timing
