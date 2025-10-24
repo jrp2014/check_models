@@ -105,17 +105,17 @@ fi
 echo "[update.sh] Updating runtime + extras + dev dependencies (needed for MLX builds)..."
 ALL_PRIMARY=("${RUNTIME_PACKAGES[@]}" "${EXTRAS_PACKAGES[@]}" "${DEV_PACKAGES[@]}" safetensors accelerate tqdm)
 if ((${#EXTRA_ARGS[@]})); then
-	pip install -U "${EXTRA_ARGS[@]}" "${ALL_PRIMARY[@]}"
+	pip install -U --upgrade-strategy eager "${EXTRA_ARGS[@]}" "${ALL_PRIMARY[@]}"
 else
-	pip install -U "${ALL_PRIMARY[@]}"
+	pip install -U --upgrade-strategy eager "${ALL_PRIMARY[@]}"
 fi
 
 if [[ "${INSTALL_TORCH:-0}" == "1" ]]; then
 	echo "[update.sh] Installing PyTorch stack (optional)..."
 	if ((${#EXTRA_ARGS[@]})); then
-		pip install -U "${EXTRA_ARGS[@]}" "${TORCH_PACKAGES[@]}"
+		pip install -U --upgrade-strategy eager "${EXTRA_ARGS[@]}" "${TORCH_PACKAGES[@]}"
 	else
-		pip install -U "${TORCH_PACKAGES[@]}"
+		pip install -U --upgrade-strategy eager "${TORCH_PACKAGES[@]}"
 	fi
 fi
 
@@ -279,9 +279,9 @@ if [[ "${SKIP_MLX:-0}" != "1" ]] && [[ "$MLX_IS_LOCAL" != "1" ]]; then
 	echo "[update.sh] Updating MLX packages from PyPI..."
 	MLX_PYPI_PACKAGES=("mlx>=0.29.1" "mlx-vlm>=0.0.9" "mlx-lm>=0.23.0")
 	if ((${#EXTRA_ARGS[@]})); then
-		pip install -U "${EXTRA_ARGS[@]}" "${MLX_PYPI_PACKAGES[@]}"
+		pip install -U --upgrade-strategy eager "${EXTRA_ARGS[@]}" "${MLX_PYPI_PACKAGES[@]}"
 	else
-		pip install -U "${MLX_PYPI_PACKAGES[@]}"
+		pip install -U --upgrade-strategy eager "${MLX_PYPI_PACKAGES[@]}"
 	fi
 elif [[ "${SKIP_MLX:-0}" == "1" ]]; then
 	echo "[update.sh] Skipping mlx/mlx-vlm/mlx-lm updates (SKIP_MLX=1)..."
