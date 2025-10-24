@@ -3092,9 +3092,11 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     # Remove all handlers and add only one
     logger.handlers.clear()
     handler: logging.StreamHandler[Any] = logging.StreamHandler(sys.stderr)
-    # Use clean format for CLI: just the message without timestamps/levels
-    # In verbose mode, include level for debugging
-    fmt = "%(levelname)s: %(message)s" if args.verbose else "%(message)s"
+    # Include timestamp for better traceability, level in verbose mode
+    if args.verbose:
+        fmt = "%(asctime)s - %(levelname)s - %(message)s"
+    else:
+        fmt = "%(asctime)s - %(message)s"
     formatter: ColoredFormatter = ColoredFormatter(fmt)
     handler.setFormatter(formatter)
     logger.addHandler(handler)
