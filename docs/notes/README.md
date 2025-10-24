@@ -10,6 +10,11 @@ This directory contains design documents, implementation notes, and project evol
 - **[RESTRUCTURE_COMPLETED.md](RESTRUCTURE_COMPLETED.md)** - Summary of completed restructure with all changes, testing results, and migration notes
 - **[GIT_HOOKS_FIXED.md](GIT_HOOKS_FIXED.md)** - Documentation of git hook updates required after restructure
 
+### Code Quality
+
+- **[CODE_REVIEW_2025_01_19.md](CODE_REVIEW_2025_01_19.md)** - Type narrowing improvements and comprehensive quality audit
+- **[REDUNDANCY_ELIMINATION_2025_10.md](REDUNDANCY_ELIMINATION_2025_10.md)** - Final cleanup pass removing duplicate patterns and aligning documentation with current implementation
+
 ### CLI and Output
 
 - **[OUTPUT_FORMATTING_REVIEW.md](OUTPUT_FORMATTING_REVIEW.md)** - Comprehensive analysis of CLI output formatting with unicode characters, emoji, and color improvements

@@ -63,12 +63,13 @@ else:  # pragma: no branch - runtime import with fallback
         from rich.console import Console as ConsoleType
         from rich.panel import Panel as PanelType
     except ImportError:  # pragma: no cover - allow running without rich
+
         class ConsoleType(_ConsoleShim):
             """Fallback Console when 'rich' is unavailable."""
 
-
         class PanelType(_PanelShim):
             """Fallback Panel when 'rich' is unavailable."""
+
 
 # Initialize console
 console = ConsoleType()

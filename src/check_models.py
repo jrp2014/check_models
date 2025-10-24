@@ -3626,11 +3626,10 @@ def finalize_execution(
     print_cli_section("Execution Summary")
     logger.info("")
     logger.info(
-        "⏱  Overall runtime (start to finish): %s",
+        "⏱  Overall runtime: %s",
         Colors.colored(format_overall_runtime(overall_time), Colors.BOLD, Colors.WHITE),
     )
     print_version_info(library_versions)
-    logger.info("Total execution time: %.2f seconds", overall_time)
 
 
 # =============================================================================

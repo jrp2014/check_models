@@ -58,12 +58,23 @@ Key defaults and parameters:
 
 ## Capabilities
 
-- Auto‑discovers locally cached MLX VLMs (Hugging Face cache) or runs an explicit list.
-- Captures structured performance: generation time, model load time, total time, token counts, tokens/sec, peak memory (GB).
-- Extracts EXIF + GPS metadata (robust to partial corruption) for context.
-- Provides compact console table + per‑model SUMMARY lines (machine parsable: `SUMMARY key=value ...`).
-- Generates standalone HTML and GitHub‑friendly Markdown reports.
-- Gracefully handles timeouts, load errors, and partial failures.
+- **Model Discovery**: Auto-discovers locally cached MLX VLMs from Hugging Face cache or processes explicit model list with `--models`
+- **Selection Control**: Use `--exclude` to filter models from cache scan or explicit list
+- **Folder Mode**: Automatically selects most recently modified image from specified folder
+- **Metadata Extraction**: Robust EXIF + GPS parsing with fail-soft multi-pass strategy for partially corrupted metadata
+- **Smart Prompting**: Generates metadata-aware prompts (image description, GPS, date) when `--prompt` not provided
+- **Performance Metrics**:
+  - Timing: generation_time, model_load_time, total_time
+  - Tokens: total, prompt, generated with tokens/sec
+  - Memory: peak, active delta, cached delta (GB)
+- **Structured Logging**: Formatter-driven styling with LogStyles for consistent CLI output
+- **Multiple Output Formats**:
+  - **CLI**: Colorized with compact or detailed metrics modes
+  - **HTML**: Standalone report with inline CSS, failed row highlighting
+  - **Markdown**: GitHub-compatible with pipe tables
+- **Error Handling**: Per-model isolation with detailed diagnostics; graceful timeout/failure handling
+- **Machine Parsable**: SUMMARY lines with `key=value` format for automation
+- **Visual Hierarchy**: Emoji prefixes, tree-structured metrics, wrapped text output
 
 ## Feature Highlights
 

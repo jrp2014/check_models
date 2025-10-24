@@ -201,7 +201,72 @@ format_field_value("peak_memory", None)           # ""
 - Avoid silent failures: Always log errors or re-raise with context
 - Use `logger.exception()` to include traceback automatically
 
-### Constants & Naming
+### Error Handling
+
+### Exception Types
+
+- **Known issues**: `OSError`, `ValueError`, `FileNotFoundError`, etc. for validation/I/O errors
+- **Runtime issues**: `RuntimeError`, `TypeError`, `AttributeError` for model/library errors
+- **User errors**: CLI parameter validation with clear messages
+
+### Termination Pattern
+
+Use `raise SystemExit(exit_code)` instead of `sys.exit()` for better static analysis:
+
+```python
+# Good - type checkers understand control flow ends
+if not image_path:
+    raise SystemExit(1)
+# Code here is unreachable, mypy knows image_path is not None
+
+# Avoid - requires cast() or manual type narrowing
+if not image_path:
+    sys.exit(1)
+```
+
+### Error Helper Function
+
+Use `exit_with_cli_error()` for consistent error reporting with termination:
+
+```python
+def exit_with_cli_error(
+    msg: str,
+    *,
+    exit_code: int = 1,
+    suppress_cause: bool = False,
+    cause: BaseException | None = None,
+) -> NoReturn:
+    """Log a CLI-friendly error message and terminate the program."""
+```
+
+**Usage patterns**:
+
+```python
+# Simple error exit
+if not valid:
+    exit_with_cli_error("Invalid configuration. Exiting.")
+
+# Suppress exception chain (clean user output)
+try:
+    risky_operation()
+except ValueError as e:
+    exit_with_cli_error(f"Operation failed: {e}", suppress_cause=True)
+
+# Preserve exception chain (for debugging)
+try:
+    critical_operation()
+except RuntimeError as e:
+    exit_with_cli_error(f"Critical error: {e}", cause=e)
+```
+
+**Benefits**:
+
+- Consistent error formatting (uses `print_cli_error` internally)
+- No duplicate print+exit code
+- Type checker knows function never returns (NoReturn annotation)
+- Optional exception chain control for clean vs detailed output
+
+## Constants & Naming
 
 **Constants**:
 
@@ -340,10 +405,61 @@ def process_image_pipeline(...) -> Result:  # noqa: C901 (Reason: cohesive multi
 
 ### Logging Policy
 
-- Use the central logger
-- Avoid stray `print` except for deliberate user-facing terminal blocks (currently generation output preview)
+- Use the central logger with structured logging for consistent formatting
+- Avoid stray `print` except for deliberate user-facing terminal blocks
 - SUMMARY log lines must remain machine-parsable (`SUMMARY key=value ...`)
 - Generated model output (non-verbose mode) respects 80-column wrapping while preserving logical newlines
+
+### Structured Logging System
+
+The codebase uses a **structured logging** approach with `LogStyles` and a custom `ColoredFormatter` that applies styling based on `extra` dict parameters rather than manual color application at call sites.
+
+**LogStyles constants** (defined in `check_models.py`):
+
+- `HEADER`: Centered, bold magenta text for major section headers
+- `SECTION`: Bold magenta with prefix for subsection headers  
+- `RULE`: Horizontal separator lines with configurable color/boldness
+- `ERROR`: Red bold prefix for error messages
+- `SUCCESS`: Green bold for success messages
+- `WARNING`: Yellow bold for warnings
+- `DETAIL`: Configurable color/bold for detail lines
+
+**Usage pattern**:
+
+```python
+# Instead of manual Colors.colored() calls:
+logger.info("Error message", extra={"style_hint": LogStyles.ERROR})
+
+# Section headers with automatic styling:
+logger.info(
+    "Processing Image",
+    extra={"style_hint": LogStyles.SECTION, "style_uppercase": True}
+)
+
+# Rules with color customization:
+logger.info(
+    "─" * width,
+    extra={
+        "style_hint": LogStyles.RULE,
+        "style_color": Colors.BLUE,
+        "style_bold": False
+    }
+)
+```
+
+**Benefits**:
+
+- Call sites are simpler (no manual color concatenation)
+- Styling logic centralized in formatter
+- Easier to adjust output formats consistently
+- Better separation of concerns (content vs presentation)
+
+**Helper functions** wrap common patterns:
+
+- `print_cli_header(title)`: Prints centered header with rules
+- `print_cli_section(title)`: Prints section header with visual prefix
+- `print_cli_error(msg)`: Prints error with red styling
+- `exit_with_cli_error(msg)`: Prints error and raises SystemExit
 
 ### Color Conventions
 
