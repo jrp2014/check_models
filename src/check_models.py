@@ -3265,10 +3265,7 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
         )
 
     resolved_image_path: Path = image_path.resolve()
-    print_cli_section(
-        f"Image File: {Colors.colored(resolved_image_path.name, Colors.MAGENTA)}",
-    )
-    logger.info("Full path: %s", Colors.colored(str(resolved_image_path), Colors.MAGENTA))
+    print_cli_section(f"Image File: {Colors.colored(str(resolved_image_path), Colors.MAGENTA)}")
 
     try:
         with Image.open(resolved_image_path) as img:
