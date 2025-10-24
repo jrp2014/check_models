@@ -2,6 +2,12 @@
 # Unified dependency updater for mlx-vlm-check project.
 # Keeps runtime, optional extras, and dev tooling aligned with pyproject.toml.
 #
+# Execution Order:
+#   1. Update Homebrew (if available)
+#   2. Update pip/wheel/typing_extensions
+#   3. Install ALL library dependencies (runtime + extras + dev) FIRST
+#   4. Then update local MLX repos (if present) OR install from PyPI
+#
 # Usage examples:
 #   ./update.sh                       # Update runtime + extras + dev (default behavior)
 #   INSTALL_TORCH=1 ./update.sh       # Additionally install torch/torchvision/torchaudio
@@ -10,19 +16,16 @@
 #
 # Local MLX Development:
 #   If mlx, mlx-lm, and mlx-vlm directories exist at ../../ (sibling to scripts/),
-#   the script will automatically:
+#   the script will automatically (AFTER installing all library dependencies):
 #   1. Run git pull in each repository
-#   2. Install requirements.txt (if present)
-#   3. Install packages in order: mlx → mlx-lm → mlx-vlm
+#   2. Install requirements.txt (if present) for additional dependencies
+#   3. Install packages in dependency order: mlx → mlx-lm → mlx-vlm
 #   4. Generate type stubs (mlx: python setup.py generate_stubs)
 #   5. Generate stubs for this project (mlx_vlm, tokenizers)
 #   6. Skip PyPI updates for these packages
 #
 # Note: Script automatically detects and preserves local MLX dev builds (versions
 # containing .dev or +commit). Stable releases are updated normally.
-#
-# Environment flags controlling heavy backend suppression are set in Python at runtime;
-# here we just upgrade packages.
 
 set -euo pipefail
 
@@ -60,6 +63,62 @@ fi
 echo "[update.sh] Updating core Python packaging tools (pip, wheel, typing_extensions)..."
 pip install -U pip wheel typing_extensions
 
+# Define all package arrays early so we can install dependencies before building local MLX
+RUNTIME_PACKAGES=(
+	"Pillow>=10.3.0"
+	"huggingface-hub>=0.23.0"
+	"huggingface-hub[cli]"
+	"tabulate>=0.9.0"
+	"tzlocal>=5.0"
+)
+
+EXTRAS_PACKAGES=(
+	"psutil>=5.9.0"
+	"tokenizers>=0.15.0"
+	"einops>=0.6.0"
+	"num2words>=0.5.0"
+	"transformers>=4.53.0"
+)
+
+DEV_PACKAGES=(
+    "cmake>=3.25,<4.1"
+	"ruff>=0.1.0"
+	"mypy>=1.8.0"
+	"pytest>=8.0.0"
+	"pytest-cov>=4.0.0"
+    "setuptools>=80"
+    "types-tabulate"
+    "nanobind==2.4.0"
+	"gh"
+)
+
+TORCH_PACKAGES=(
+	"torch>=2.2.0" "torchvision>=0.17.0" "torchaudio>=2.2.0"
+)
+
+EXTRA_ARGS=()
+if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
+	EXTRA_ARGS+=("--force-reinstall")
+fi
+
+# Install all library dependencies BEFORE building local MLX packages
+echo "[update.sh] Updating runtime + extras + dev dependencies (needed for MLX builds)..."
+ALL_PRIMARY=("${RUNTIME_PACKAGES[@]}" "${EXTRAS_PACKAGES[@]}" "${DEV_PACKAGES[@]}" safetensors accelerate tqdm)
+if ((${#EXTRA_ARGS[@]})); then
+	pip install -U "${EXTRA_ARGS[@]}" "${ALL_PRIMARY[@]}"
+else
+	pip install -U "${ALL_PRIMARY[@]}"
+fi
+
+if [[ "${INSTALL_TORCH:-0}" == "1" ]]; then
+	echo "[update.sh] Installing PyTorch stack (optional)..."
+	if ((${#EXTRA_ARGS[@]})); then
+		pip install -U "${EXTRA_ARGS[@]}" "${TORCH_PACKAGES[@]}"
+	else
+		pip install -U "${TORCH_PACKAGES[@]}"
+	fi
+fi
+
 # Function to update local MLX development repositories
 update_local_mlx_repos() {
 	# Determine the parent directory (assuming scripts/src/tools/update.sh)
@@ -69,8 +128,8 @@ update_local_mlx_repos() {
 	
 	echo "[update.sh] Checking for local MLX development repositories..."
 	
-	# Define repositories in the desired order
-	local MLX_REPOS=("mlx-lm" "mlx-vlm" "mlx")
+	# Define repositories in dependency order: mlx first (base), then mlx-lm, then mlx-vlm
+	local MLX_REPOS=("mlx" "mlx-lm" "mlx-vlm")
 	local -a REPO_NAMES=()
 	local -a REPO_PATHS=()
 	local -a REPO_SKIP=()
@@ -96,7 +155,9 @@ update_local_mlx_repos() {
 	echo "📦 Updating local MLX repositories: ${REPO_NAMES[*]}"
 	echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-	# Stage 1: Sync repositories
+	# Stage 1: Sync all repositories first
+	echo ""
+	echo "Stage 1: Syncing repositories with git pull..."
 	for idx in "${!REPO_NAMES[@]}"; do
 		cd "${REPO_PATHS[idx]}"
 		echo "[update.sh] ($((idx + 1))/${#REPO_NAMES[@]}) git pull -> ${REPO_NAMES[idx]}"
@@ -110,7 +171,9 @@ update_local_mlx_repos() {
 	done
 	cd "$ORIGINAL_DIR"
 
-	# Stage 2: Install Python library dependencies (requirements)
+	# Stage 2: Install all Python library dependencies from requirements.txt
+	echo ""
+	echo "Stage 2: Installing library dependencies (requirements.txt files)..."
 	for idx in "${!REPO_NAMES[@]}"; do
 		if [[ ${REPO_SKIP[idx]} -eq 1 ]]; then
 			continue
@@ -138,7 +201,9 @@ update_local_mlx_repos() {
 	done
 	cd "$ORIGINAL_DIR"
 
-	# Stage 3: Build/install packages
+	# Stage 3: Build and install packages in dependency order (mlx → mlx-lm → mlx-vlm)
+	echo ""
+	echo "Stage 3: Building and installing MLX packages in dependency order..."
 	for idx in "${!REPO_NAMES[@]}"; do
 		if [[ ${REPO_SKIP[idx]} -eq 1 ]]; then
 			continue
@@ -209,67 +274,17 @@ if [[ $LOCAL_MLX_UPDATED -eq 1 ]]; then
 	MLX_IS_LOCAL=1
 fi
 
-RUNTIME_PACKAGES=()
-# Only update MLX if not a local dev build (or if SKIP_MLX=1 is explicitly set)
+# Only update MLX from PyPI if not using local builds
 if [[ "${SKIP_MLX:-0}" != "1" ]] && [[ "$MLX_IS_LOCAL" != "1" ]]; then
-	RUNTIME_PACKAGES+=("mlx>=0.29.1" "mlx-vlm>=0.0.9")
-elif [[ "${SKIP_MLX:-0}" == "1" ]]; then
-	echo "[update.sh] Skipping mlx/mlx-vlm updates (SKIP_MLX=1)..."
-fi
-
-RUNTIME_PACKAGES+=(
-	"Pillow>=10.3.0"
-	"huggingface-hub>=0.23.0"
-	"huggingface-hub[cli]"
-	"tabulate>=0.9.0"
-	"tzlocal>=5.0"
-)
-
-EXTRAS_PACKAGES=(
-	"psutil>=5.9.0"
-	"tokenizers>=0.15.0"
-	"einops>=0.6.0"
-	"num2words>=0.5.0"
-	"mlx-lm>=0.23.0"
-	"transformers>=4.53.0"
-)
-
-DEV_PACKAGES=(
-    "cmake>=3.25,<4.1"
-	"ruff>=0.1.0"
-	"mypy>=1.8.0"
-	"pytest>=8.0.0"
-	"pytest-cov>=4.0.0"
-    "setuptools>=80"
-    "types-tabulate"
-    "nanobind==2.4.0"
-	"gh"
-)
-
-TORCH_PACKAGES=(
-	"torch>=2.2.0" "torchvision>=0.17.0" "torchaudio>=2.2.0"
-)
-
-EXTRA_ARGS=()
-if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
-	EXTRA_ARGS+=("--force-reinstall")
-fi
-
-echo "[update.sh] Updating runtime + extras + dev dependencies..."
-ALL_PRIMARY=("${RUNTIME_PACKAGES[@]}" "${EXTRAS_PACKAGES[@]}" "${DEV_PACKAGES[@]}" safetensors accelerate tqdm)
-if ((${#EXTRA_ARGS[@]})); then
-	pip install -U "${EXTRA_ARGS[@]}" "${ALL_PRIMARY[@]}"
-else
-	pip install -U "${ALL_PRIMARY[@]}"
-fi
-
-if [[ "${INSTALL_TORCH:-0}" == "1" ]]; then
-	echo "[update.sh] Installing PyTorch stack (optional)..."
+	echo "[update.sh] Updating MLX packages from PyPI..."
+	MLX_PYPI_PACKAGES=("mlx>=0.29.1" "mlx-vlm>=0.0.9" "mlx-lm>=0.23.0")
 	if ((${#EXTRA_ARGS[@]})); then
-		pip install -U "${EXTRA_ARGS[@]}" "${TORCH_PACKAGES[@]}"
+		pip install -U "${EXTRA_ARGS[@]}" "${MLX_PYPI_PACKAGES[@]}"
 	else
-		pip install -U "${TORCH_PACKAGES[@]}"
+		pip install -U "${MLX_PYPI_PACKAGES[@]}"
 	fi
+elif [[ "${SKIP_MLX:-0}" == "1" ]]; then
+	echo "[update.sh] Skipping mlx/mlx-vlm/mlx-lm updates (SKIP_MLX=1)..."
 fi
 
 echo "[update.sh] Done."
