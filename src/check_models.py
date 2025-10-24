@@ -94,7 +94,6 @@ GENERATION_WRAP_WIDTH: Final[int] = 80  # Console output wrapping width for gene
 
 _temp_logger = logging.getLogger(LOGGER_NAME)
 
-mx: Any
 try:
     import mlx.core as mx
 except ImportError:
