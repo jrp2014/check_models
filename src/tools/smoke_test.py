@@ -19,9 +19,6 @@ import traceback
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, NamedTuple, cast
 
-if TYPE_CHECKING:
-    from rich.panel import Panel as RichPanel
-
 import psutil
 from mlx_vlm import generate, load
 from mlx_vlm.prompt_utils import apply_chat_template
@@ -58,15 +55,23 @@ class _PanelShim:
         del args, kwargs
 
 
-try:
-    from rich.console import Console
-    from rich.panel import Panel
-except ImportError:  # pragma: no cover - allow running without rich
-    Console = _ConsoleShim  # type: ignore[assignment,misc]
-    Panel = _PanelShim  # type: ignore[assignment,misc]
+if TYPE_CHECKING:
+    from rich.console import Console as ConsoleType
+    from rich.panel import Panel as PanelType
+else:  # pragma: no branch - runtime import with fallback
+    try:
+        from rich.console import Console as ConsoleType
+        from rich.panel import Panel as PanelType
+    except ImportError:  # pragma: no cover - allow running without rich
+        class ConsoleType(_ConsoleShim):
+            """Fallback Console when 'rich' is unavailable."""
+
+
+        class PanelType(_PanelShim):
+            """Fallback Panel when 'rich' is unavailable."""
 
 # Initialize console
-console = Console()
+console = ConsoleType()
 
 
 def parse_args() -> argparse.Namespace:
@@ -257,7 +262,7 @@ def _build_test_inputs(args: argparse.Namespace) -> dict[str, Any]:
 
 def _test_one_model(model_path: str, test_inputs: dict[str, Any]) -> tuple[bool, str]:
     """Load and run both generation modes for a single model path."""
-    console.print(Panel(f"Testing {model_path}", style="bold blue"))
+    console.print(PanelType(f"Testing {model_path}", style="bold blue"))
     model, processor, config, error = load_model(model_path)
 
     if not error and model:
@@ -293,7 +298,7 @@ def _render_summary(results: list[str]) -> None:
     """Render results list and overall summary to the console."""
     success = all(result.startswith("[bold green]") for result in results)
     panel_style = "bold green" if success else "bold red"
-    console.print(Panel("\n".join(results), title="Results", style=panel_style))
+    console.print(PanelType("\n".join(results), title="Results", style=panel_style))
     console.print(
         (
             f"[bold {'green' if success else 'red'}]"
@@ -303,7 +308,7 @@ def _render_summary(results: list[str]) -> None:
     )
 
 
-def _make_system_panel() -> RichPanel:
+def _make_system_panel() -> PanelType:
     """Create a panel with system information suitable for display."""
     device_info = get_device_info()
     chip_name: str = "Unknown"
@@ -340,7 +345,7 @@ def _make_system_panel() -> RichPanel:
         ).strip()
     else:
         system_info_str = "Not running on Apple Silicon"
-    return Panel(title="System Information", renderable=system_info_str, style="bold blue")  # type: ignore[return-value]
+    return PanelType(title="System Information", renderable=system_info_str, style="bold blue")
 
 
 if __name__ == "__main__":
