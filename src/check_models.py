@@ -2859,6 +2859,22 @@ def print_cli_error(msg: str) -> None:
     logger.error(msg, extra={"style_hint": LogStyles.ERROR})
 
 
+def exit_with_cli_error(
+    msg: str,
+    *,
+    exit_code: int = 1,
+    suppress_cause: bool = False,
+    cause: BaseException | None = None,
+) -> NoReturn:
+    """Log a CLI-friendly error message and terminate the program."""
+    print_cli_error(msg)
+    if suppress_cause:
+        raise SystemExit(exit_code) from None
+    if cause is not None:
+        raise SystemExit(exit_code) from cause
+    raise SystemExit(exit_code)
+
+
 def _summary_parts(res: PerformanceResult, model_short: str) -> list[str]:
     """Assemble key=value summary segments (reduced branching)."""
     gen = res.generation
@@ -3244,10 +3260,9 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
 
     image_path: Path | None = find_most_recent_file(folder_path)
     if image_path is None:
-        print_cli_error(
+        exit_with_cli_error(
             f"Could not find the most recent image file in {folder_path}. Exiting.",
         )
-        raise SystemExit(1)
 
     resolved_image_path: Path = image_path.resolve()
     print_cli_section(
@@ -3264,10 +3279,10 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
         UnidentifiedImageError,
         OSError,
     ) as img_err:
-        print_cli_error(
+        exit_with_cli_error(
             f"Cannot open or verify image {resolved_image_path}: {img_err}. Exiting.",
+            suppress_cause=True,
         )
-        raise SystemExit(1) from None
     else:
         return resolved_image_path
 
