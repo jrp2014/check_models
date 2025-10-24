@@ -2571,7 +2571,7 @@ def _run_model_generation(
     try:
         output: GenerationResult | SupportsGenerationResult = generate(
             model=model,
-            processor=tokenizer,  # MLX VLM accepts both tokenizer types
+            processor=cast("PreTrainedTokenizer", tokenizer),  # Cast to expected type
             prompt=formatted_prompt,
             image=str(params.image_path),
             verbose=params.verbose,
