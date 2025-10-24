@@ -64,36 +64,37 @@ echo "[update.sh] Updating core Python packaging tools (pip, wheel, typing_exten
 pip install -U pip wheel typing_extensions
 
 # Define all package arrays early so we can install dependencies before building local MLX
+# No version constraints - always install latest versions
 RUNTIME_PACKAGES=(
-	"Pillow>=10.3.0"
-	"huggingface-hub>=0.23.0"
+	"Pillow"
+	"huggingface-hub"
 	"huggingface-hub[cli]"
-	"tabulate>=0.9.0"
-	"tzlocal>=5.0"
+	"tabulate"
+	"tzlocal"
 )
 
 EXTRAS_PACKAGES=(
-	"psutil>=5.9.0"
-	"tokenizers>=0.15.0"
-	"einops>=0.6.0"
-	"num2words>=0.5.0"
-	"transformers>=4.53.0"
+	"psutil"
+	"tokenizers"
+	"einops"
+	"num2words"
+	"transformers"
 )
 
 DEV_PACKAGES=(
-    "cmake>=3.25,<4.1"
-	"ruff>=0.1.0"
-	"mypy>=1.8.0"
-	"pytest>=8.0.0"
-	"pytest-cov>=4.0.0"
-    "setuptools>=80"
+    "cmake"
+	"ruff"
+	"mypy"
+	"pytest"
+	"pytest-cov"
+    "setuptools"
     "types-tabulate"
-    "nanobind==2.4.0"
+    "nanobind"
 	"gh"
 )
 
 TORCH_PACKAGES=(
-	"torch>=2.2.0" "torchvision>=0.17.0" "torchaudio>=2.2.0"
+	"torch" "torchvision" "torchaudio"
 )
 
 EXTRA_ARGS=()
@@ -277,7 +278,7 @@ fi
 # Only update MLX from PyPI if not using local builds
 if [[ "${SKIP_MLX:-0}" != "1" ]] && [[ "$MLX_IS_LOCAL" != "1" ]]; then
 	echo "[update.sh] Updating MLX packages from PyPI..."
-	MLX_PYPI_PACKAGES=("mlx>=0.29.1" "mlx-vlm>=0.0.9" "mlx-lm>=0.23.0")
+	MLX_PYPI_PACKAGES=("mlx" "mlx-vlm" "mlx-lm")
 	if ((${#EXTRA_ARGS[@]})); then
 		pip install -U --upgrade-strategy eager "${EXTRA_ARGS[@]}" "${MLX_PYPI_PACKAGES[@]}"
 	else
