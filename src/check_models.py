@@ -326,6 +326,18 @@ class Colors:
         return len(Colors._ansi_escape_re.sub("", text))
 
 
+class LogStyles:
+    """String constants describing structured log presentation styles."""
+
+    HEADER: ClassVar[str] = "header"
+    SECTION: ClassVar[str] = "section"
+    RULE: ClassVar[str] = "rule"
+    ERROR: ClassVar[str] = "error"
+    SUCCESS: ClassVar[str] = "success"
+    WARNING: ClassVar[str] = "warning"
+    DETAIL: ClassVar[str] = "detail"
+
+
 class ColoredFormatter(logging.Formatter):
     """A logging formatter that applies color to log messages based on their level and content."""
 
@@ -339,9 +351,25 @@ class ColoredFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         """Format the log record with context-aware colors."""
-        msg: str = super().format(record)
+        style_hint: str | None = getattr(record, "style_hint", None)
+        original_msg: object = record.msg
+        original_args: tuple[object, ...] | Mapping[str, object] | None = record.args
 
-        # Apply level-based coloring first
+        if style_hint:
+            raw_message: str = record.getMessage()
+            structured: str = self._format_structured_message(style_hint, raw_message, record)
+            record.msg = structured
+            record.args = ()
+
+        try:
+            msg: str = super().format(record)
+        finally:
+            record.msg = original_msg
+            record.args = original_args
+
+        if style_hint:
+            return msg
+
         level_color: str = self.LEVEL_COLORS.get(record.levelno, "")
 
         if record.levelno == logging.INFO:
@@ -351,6 +379,72 @@ class ColoredFormatter(logging.Formatter):
             return Colors.colored(msg, level_color)
 
         return msg
+
+    def _format_structured_message(
+        self,
+        style_hint: str,
+        raw_message: str,
+        record: logging.LogRecord,
+    ) -> str:
+        """Return a message string styled according to the provided hint."""
+        handlers: dict[str, Callable[[str, logging.LogRecord], str]] = {
+            LogStyles.RULE: self._style_rule,
+            LogStyles.HEADER: self._style_header,
+            LogStyles.SECTION: self._style_section,
+            LogStyles.ERROR: self._style_error,
+            LogStyles.SUCCESS: self._style_success,
+            LogStyles.WARNING: self._style_warning,
+            LogStyles.DETAIL: self._style_detail,
+        }
+
+        handler = handlers.get(style_hint)
+        if handler is None:
+            return raw_message
+
+        return handler(raw_message, record)
+
+    def _style_rule(self, raw_message: str, record: logging.LogRecord) -> str:
+        styles: list[str] = []
+        if bool(getattr(record, "style_bold", False)):
+            styles.append(Colors.BOLD)
+        rule_color = getattr(record, "style_color", None)
+        if isinstance(rule_color, str) and rule_color:
+            styles.append(rule_color)
+        return Colors.colored(raw_message, *styles) if styles else raw_message
+
+    def _style_header(self, raw_message: str, record: logging.LogRecord) -> str:
+        width = int(getattr(record, "style_width", max(len(raw_message), 1)))
+        centered = raw_message.center(width)
+        return Colors.colored(centered, Colors.BOLD, Colors.MAGENTA)
+
+    def _style_section(self, raw_message: str, record: logging.LogRecord) -> str:
+        uppercase_enabled = bool(getattr(record, "style_uppercase", True))
+        has_ansi = "\x1b[" in raw_message
+        uppercase = uppercase_enabled and not has_ansi
+        safe_title = raw_message.upper() if uppercase else raw_message
+        title_colored = Colors.colored(safe_title, Colors.BOLD, Colors.MAGENTA)
+        prefix = getattr(record, "style_prefix", "▶")
+        return f"{prefix} [ {title_colored} ]"
+
+    def _style_error(self, raw_message: str, record: logging.LogRecord) -> str:
+        prefix = getattr(record, "style_prefix", "ERROR")
+        styled_prefix = Colors.colored(f"{prefix}:", Colors.BOLD, Colors.RED)
+        return f"{styled_prefix} {raw_message}"
+
+    def _style_success(self, raw_message: str, _record: logging.LogRecord) -> str:
+        return Colors.colored(raw_message, Colors.BOLD, Colors.GREEN)
+
+    def _style_warning(self, raw_message: str, _record: logging.LogRecord) -> str:
+        return Colors.colored(raw_message, Colors.BOLD, Colors.YELLOW)
+
+    def _style_detail(self, raw_message: str, record: logging.LogRecord) -> str:
+        detail_styles: list[str] = []
+        if bool(getattr(record, "style_bold", False)):
+            detail_styles.append(Colors.BOLD)
+        detail_color = getattr(record, "style_color", Colors.CYAN)
+        if isinstance(detail_color, str) and detail_color:
+            detail_styles.append(detail_color)
+        return Colors.colored(raw_message, *detail_styles) if detail_styles else raw_message
 
     def _format_info_message(self, msg: str) -> str:
         """Apply context-aware formatting to INFO messages for better visual hierarchy."""
@@ -860,15 +954,12 @@ def log_rule(
     Keeps a single place for styling separators to ensure consistency.
     """
     line = char * max(1, width)
-    if color or bold:
-        styles: list[str] = []
-        if bold:
-            styles.append(Colors.BOLD)
-        if color:
-            styles.append(color)
-        logger.info(Colors.colored(line, *styles))
-    else:
-        logger.info(line)
+    extra: dict[str, object] = {"style_hint": LogStyles.RULE}
+    if color:
+        extra["style_color"] = color
+    if bold:
+        extra["style_bold"] = True
+    logger.info(line, extra=extra)
 
 
 # --- Utility Functions ---
@@ -2743,23 +2834,29 @@ def print_cli_header(title: str) -> None:
     """Print a formatted CLI header with the given title."""
     width = get_terminal_width(max_width=100)
     log_rule(width, char="=", color=Colors.BLUE, bold=True)
-    logger.info("%s", Colors.colored(title.center(width), Colors.BOLD, Colors.MAGENTA))
+    logger.info(
+        title,
+        extra={"style_hint": LogStyles.HEADER, "style_width": width},
+    )
     log_rule(width, char="=", color=Colors.BLUE, bold=True)
 
 
 def print_cli_section(title: str) -> None:
     """Print a formatted CLI section header with visual prefix."""
     width = get_terminal_width(max_width=100)
-    # Avoid uppercasing when ANSI escape codes are present (would corrupt codes)
-    safe_title = title if "\x1b[" in title else title.upper()
-    # Add ▶ prefix to make check_models output visually distinct from MLX-VLM output
-    logger.info("▶ [ %s ]", Colors.colored(safe_title, Colors.BOLD, Colors.MAGENTA))
+    logger.info(
+        title,
+        extra={
+            "style_hint": LogStyles.SECTION,
+            "style_uppercase": "\x1b[" not in title,
+        },
+    )
     log_rule(width, char="─", color=Colors.BLUE, bold=False)
 
 
 def print_cli_error(msg: str) -> None:
     """Print a formatted CLI error message."""
-    logger.error("ERROR: %s", msg)
+    logger.error(msg, extra={"style_hint": LogStyles.ERROR})
 
 
 def _summary_parts(res: PerformanceResult, model_short: str) -> list[str]:
