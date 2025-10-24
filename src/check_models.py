@@ -3247,7 +3247,7 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
         print_cli_error(
             f"Could not find the most recent image file in {folder_path}. Exiting.",
         )
-        sys.exit(1)
+        raise SystemExit(1)
 
     resolved_image_path: Path = image_path.resolve()
     print_cli_section(
@@ -3267,7 +3267,7 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
         print_cli_error(
             f"Cannot open or verify image {resolved_image_path}: {img_err}. Exiting.",
         )
-        sys.exit(1)
+        raise SystemExit(1) from None
     else:
         return resolved_image_path
 
