@@ -24,6 +24,7 @@ import logging
 import re
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -165,16 +166,43 @@ def run_stubgen(packages: Iterable[str]) -> int:
     """Invoke stubgen for the provided packages and return its exit code."""
     TYPINGS_DIR.mkdir(parents=True, exist_ok=True)
     pkg_list = _validate_packages(packages)
-    args = ["stubgen"]
+
+    # Find the stubgen executable - prefer the one in the same environment as Python
+    stubgen_path = shutil.which("stubgen")
+    if not stubgen_path:
+        logger.error("[stubs] 'stubgen' command not found. Install mypy: pip install mypy")
+        return 1
+
+    # Verify it's mypy's stubgen by checking if it accepts -p flag
+    # (mlx-vlm might have its own stubgen that uses --model)
+    try:
+        test_result = subprocess.run(  # noqa: S603
+            [stubgen_path, "--help"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if "-p" not in test_result.stdout and "-p" not in test_result.stderr:
+            # This might be the wrong stubgen, try to find mypy's version
+            python_bin_dir = Path(sys.executable).parent
+            alt_stubgen = python_bin_dir / "stubgen"
+            if alt_stubgen.exists():
+                stubgen_path = str(alt_stubgen)
+                logger.info("[stubs] Using stubgen from Python environment: %s", stubgen_path)
+    except (OSError, subprocess.SubprocessError) as e:
+        logger.warning("[stubs] Could not verify stubgen: %s", e)
+
+    args = [stubgen_path]
     for pkg in pkg_list:
         args.extend(["-p", pkg])
     args.extend(["-o", str(TYPINGS_DIR)])
     try:
-        # No shell=True; rely on PATH to find 'stubgen' from mypy installation
-        completed = subprocess.run(args, check=False)  # noqa: S603
+        # Suppress stderr to avoid confusing error messages from wrong stubgen commands
+        # that might be in PATH before mypy's stubgen
+        completed = subprocess.run(args, check=False, stderr=subprocess.DEVNULL)  # noqa: S603
     except FileNotFoundError:
         logger.exception(
-            "[stubs] 'stubgen' (from mypy) not found. Install mypy: pip install -e '.[dev]'",
+            "[stubs] 'stubgen' (from mypy) not found. Install mypy: pip install mypy",
         )
         return 1
     else:
