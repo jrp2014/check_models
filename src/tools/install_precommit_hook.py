@@ -7,8 +7,8 @@ Pre-commit hook automates two maintenance steps:
    - Adds changes to `src/README.md` back to the commit
 
 2) Ensure local type stubs exist for third-party packages used by mypy
-   - If `typings/mlx_vlm/__init__.pyi` or `typings/tokenizers/__init__.pyi` is missing,
-     it runs: `cd src && python tools/generate_stubs.py mlx_vlm tokenizers`
+   - If `typings/mlx_vlm/__init__.pyi` is missing,
+     it runs: `cd src && python tools/generate_stubs.py mlx_vlm`
    - Note: typings/ is gitignored and not committed
 
 Pre-push hook runs quality checks:
@@ -43,10 +43,10 @@ if git diff --cached --name-only | grep -q '^src/pyproject.toml$'; then
   git add src/README.md
 fi
 
-# 2) Ensure local type stubs for mypy (mlx_vlm, tokenizers)
-if [ ! -f typings/mlx_vlm/__init__.pyi ] || [ ! -f typings/tokenizers/__init__.pyi ]; then
-  echo '[pre-commit] Generating local type stubs (mlx_vlm, tokenizers)'
-  (cd src && python tools/generate_stubs.py mlx_vlm tokenizers) || exit 1
+# 2) Ensure local type stubs for mypy (mlx_vlm only)
+if [ ! -f typings/mlx_vlm/__init__.pyi ]; then
+  echo '[pre-commit] Generating local type stubs (mlx_vlm)'
+  (cd src && python tools/generate_stubs.py mlx_vlm) || exit 1
   # Note: typings/ is in .gitignore and should not be committed
 fi
 
