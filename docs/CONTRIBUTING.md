@@ -70,7 +70,8 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
 4. **Verify installation**:
 
    ```bash
-   python -m vlm.tools.validate_env
+   cd src
+   python -m tools.validate_env
    ```
 
 ### Manual Environment Validation
@@ -78,11 +79,12 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
 If bootstrap didn't work or you want to check your environment:
 
 ```bash
-# Check environment health
-python -m vlm.tools.validate_env
+# Check environment health (run from src/ directory)
+cd src
+python -m tools.validate_env
 
 # Auto-fix common issues
-python -m vlm.tools.validate_env --fix
+python -m tools.validate_env --fix
 ```
 
 ## Making Changes

@@ -14,4 +14,5 @@ pytest>=8.0.0
 pytest-cov>=4.0.0
 
 # Type stubs
+types-tabulate
 types-tqdm>=0.1.0

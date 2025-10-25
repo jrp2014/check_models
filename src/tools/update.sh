@@ -89,6 +89,7 @@ DEV_PACKAGES=(
 	"pytest-cov"
     "setuptools"
     "types-tabulate"
+    "types-tqdm"
     "nanobind"
 	"gh"
 )

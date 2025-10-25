@@ -2,15 +2,15 @@
 """Validate the development environment is properly configured.
 
 This script checks:
-- Python version (>= 3.12)
+- Python version (>= 3.13)
 - Conda environment (if CONDA_ENV is set)
 - Required packages are installed with correct versions
 - Tools (ruff, mypy, pytest) are available
 - Git hooks are installed
 
 Usage:
-    python -m vlm.tools.validate_env
-    python -m vlm.tools.validate_env --fix  # Auto-fix issues
+    python -m tools.validate_env
+    python -m tools.validate_env --fix  # Auto-fix issues
 """
 
 from __future__ import annotations
