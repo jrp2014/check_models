@@ -24,6 +24,7 @@ help: ## Show this help message
 	@echo "  make quality          Run linting and type checks"
 	@echo "  make ci               Run full CI pipeline (strict)"
 	@echo "  make format           Format code with ruff"
+	@echo "  make stubs            Generate type stubs for mlx-vlm"
 	@echo ""
 	@echo "📚 Documentation: See docs/CONTRIBUTING.md for details"
 
@@ -92,4 +93,12 @@ update-env: update ## Alias for 'update' target
 .PHONY: deps-sync
 deps-sync: ## Sync README dependency blocks with pyproject.toml
 	$(MAKE) -C $(SRC) deps-sync
+
+.PHONY: stubs
+stubs: ## Generate type stubs for mlx-vlm
+	$(MAKE) -C $(SRC) stubs
+
+.PHONY: stubs-clear
+stubs-clear: ## Remove generated type stubs
+	$(MAKE) -C $(SRC) stubs-clear
 

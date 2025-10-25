@@ -99,7 +99,7 @@ bootstrap-dev: ## pip bootstrap runtime + dev + extras + hooks + validation
 		echo "  To install npm: https://nodejs.org/ or 'brew install node'"; \
 	fi
 	@echo "[bootstrap] Installing pre-commit hooks..."
-	@$(RUN_PY) -m vlm.tools.install_precommit_hook || echo "⚠️  Could not install custom git hook"
+	@$(RUN_PY) -m tools.install_precommit_hook || echo "⚠️  Could not install custom git hook"
 	@if command -v pre-commit >/dev/null 2>&1; then \
 		echo "[bootstrap] Installing pre-commit framework hooks..."; \
 		$(RUN_TOOL_PREFIX) pre-commit install || echo "⚠️  pre-commit install failed"; \
@@ -108,7 +108,7 @@ bootstrap-dev: ## pip bootstrap runtime + dev + extras + hooks + validation
 		echo "  Install with: pip install pre-commit && pre-commit install"; \
 	fi
 	@echo "[bootstrap] Running environment validation..."
-	@$(RUN_PY) -m vlx.tools.validate_env || echo "⚠️  Validation found issues (run 'python -m vlx.tools.validate_env' for details)"
+	@$(RUN_PY) -m tools.validate_env || echo "⚠️  Validation found issues (run 'python -m tools.validate_env' for details)"
 	@echo "✓ Bootstrap complete"
 
 # Markdown linting setup
@@ -151,11 +151,11 @@ stubs-clear: ## Remove all generated stubs
 # ------------------------
 .PHONY: check_models
 check_models: ## Run the VLM checker (pass args via ARGS='--model <id> --image <path> ...')
-	$(RUN_PY) -m vlm.check_models $(ARGS)
+	$(RUN_PY) -m check_models $(ARGS)
 
 .PHONY: check_models-demo
 check_models-demo: ## Demo run with minimal flags (override via ARGS to customize)
-	$(RUN_PY) -m vlm.check_models $(ARGS)
+	$(RUN_PY) -m check_models $(ARGS)
 
 # Quality
 .PHONY: format
@@ -204,7 +204,7 @@ update-env: update ## Alias for 'update' target
 # Aggregates
 .PHONY: check
 check: format lint typecheck test ## Core quality pipeline
-	@echo "All core checks completed"
+	@echo "✓ All core checks completed"
 
 .PHONY: quality
 quality: ## Run consolidated quality script (ruff format+lint+stubgen+mypy on core file)
