@@ -3,8 +3,9 @@
     "zsh-conda-mlx-vlm": {
       "path": "zsh",
       "args": [
+        "-l",
         "-c",
-        "source $(conda info --base)/etc/profile.d/conda.sh && conda activate mlx-vlm && exec zsh"
+        "source /opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh && conda activate mlx-vlm && exec zsh"
       ]
     }
   },
