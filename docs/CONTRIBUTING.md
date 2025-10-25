@@ -312,6 +312,36 @@ make audit
 make deps-sync
 ```
 
+#### Advanced: Using update.sh for MLX Development
+
+If you're actively developing MLX libraries locally, use `src/tools/update.sh` for more granular control:
+
+```bash
+cd src
+bash tools/update.sh
+```
+
+**When to use `update.sh`**:
+
+- You have local development builds of MLX, MLX-LM, or MLX-VLM
+- You need to update specific dependency groups independently
+- You want to skip certain groups (e.g., skip torch on Apple Silicon)
+- You need environment diagnostics and validation
+
+**When to use `make update`**:
+
+- Standard workflow (using released packages from PyPI)
+- Quick updates after pulling repository changes
+- You don't need special handling for local MLX builds
+
+**Features of update.sh**:
+
+- Automatically detects and uses local MLX development builds
+- Validates Python version (>= 3.13 required)
+- Checks for virtual environment activation
+- Offers per-group installation (runtime, extras, torch, dev)
+- Verifies dependency sync across pyproject.toml, requirements*.txt, and update.sh itself
+
 ### Updating Dependencies
 
 1. Edit `src/pyproject.toml` to update the dependency specification

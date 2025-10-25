@@ -185,6 +185,20 @@ python -m tools.check_outdated
 └── README.md                  # This file
 ```
 
+## Common Issues
+
+### TensorFlow Conflicts
+
+If you encounter import errors related to TensorFlow (e.g., `"mlx_vlm: Failed to import"`), you can safely remove it:
+
+```bash
+pip uninstall -y tensorflow
+```
+
+**Why this works**: MLX-VLM doesn't require TensorFlow. It may be pulled in as an indirect dependency by some packages (like `transformers`), but it's not needed for MLX workflows. TensorFlow 2.20 has known issues on Python 3.13.
+
+For more troubleshooting help, see the [detailed troubleshooting guide](src/README.md#troubleshooting) in `src/README.md`.
+
 ## More Documentation
 
 - **[src/README.md](src/README.md)** - Complete CLI reference and usage examples
