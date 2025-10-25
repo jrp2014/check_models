@@ -17,12 +17,14 @@ This audit reviewed the MLX VLM Check project for consistency across documentati
 **Location**: `docs/CONTRIBUTING.md` lines 73, 82, 85
 
 **Current (Incorrect)**:
+
 ```bash
 python -m vlm.tools.validate_env
 python -m vlm.tools.validate_env --fix
 ```
 
 **Should be**:
+
 ```bash
 python -m tools.validate_env
 python -m tools.validate_env --fix
@@ -39,11 +41,13 @@ python -m tools.validate_env --fix
 **Issue**: Type stub for `tqdm` is specified in `pyproject.toml` and `requirements-dev.txt` but missing from `update.sh`.
 
 **Locations**:
+
 - ✅ `src/pyproject.toml` line 77: `"types-tqdm"`
 - ✅ `src/requirements-dev.txt` line 17: `types-tqdm>=0.1.0`
 - ❌ `src/tools/update.sh` line 91: Missing from `DEV_PACKAGES`
 
 **Current update.sh**:
+
 ```bash
 DEV_PACKAGES=(
     "cmake"
@@ -59,6 +63,7 @@ DEV_PACKAGES=(
 ```
 
 **Should include**:
+
 ```bash
 DEV_PACKAGES=(
     "cmake"
@@ -85,11 +90,13 @@ DEV_PACKAGES=(
 **Issue**: Mixed messaging about minimum Python version requirements.
 
 **Findings**:
+
 - ✅ `pyproject.toml` line 8: `requires-python = ">=3.13"` (correct)
 - ✅ `README.md` line 7: `Python 3.13+` (correct)
 - ⚠️ `validate_env.py` line 30: Checks for `>= 3.13` but comment says `>= 3.12`
 
 **validate_env.py** (line 11-12):
+
 ```python
 """Validate the development environment is properly configured.
 
@@ -98,6 +105,7 @@ This script checks:
 ```
 
 vs line 30:
+
 ```python
 REQUIRED_PYTHON_VERSION: Final[tuple[int, int]] = (3, 13)  # ← CODE IS CORRECT
 ```
@@ -115,6 +123,7 @@ REQUIRED_PYTHON_VERSION: Final[tuple[int, int]] = (3, 13)  # ← CODE IS CORRECT
 **Issue**: Root `README.md` doesn't mention TensorFlow conflicts, but `src/README.md` has extensive documentation.
 
 **Current State**:
+
 - ❌ Root `README.md`: No mention of TensorFlow issues
 - ✅ `src/README.md`: Comprehensive TensorFlow troubleshooting (lines 544-607)
 - ✅ Code: Automatic TensorFlow blocking implemented
@@ -130,6 +139,7 @@ REQUIRED_PYTHON_VERSION: Final[tuple[int, int]] = (3, 13)  # ← CODE IS CORRECT
 **Issue**: `src/tools/update.sh` is a critical development tool but not mentioned in documentation.
 
 **Current State**:
+
 - ✅ Script exists and is functional
 - ✅ Has comprehensive header comments
 - ❌ Not mentioned in CONTRIBUTING.md
@@ -210,6 +220,7 @@ The project has **comprehensive** environment checks:
 The project has robust TensorFlow conflict prevention:
 
 1. **Automatic blocking** in `check_models.py`:
+
    ```python
    os.environ.setdefault("TRANSFORMERS_NO_TF", "1")
    os.environ.setdefault("TRANSFORMERS_NO_JAX", "1")
@@ -229,11 +240,13 @@ The project has robust TensorFlow conflict prevention:
 **Issue**: Code assumes macOS/Apple Silicon but doesn't enforce this.
 
 **Current State**:
+
 - Documentation states "macOS with Apple Silicon" requirement
 - No runtime platform check in code
 - Could fail silently on Linux/Windows/Intel Macs
 
 **Recommendation**: Add platform detection in `check_models.py` startup:
+
 ```python
 import platform
 
@@ -278,13 +291,15 @@ if platform.processor() != "arm":
 ### 12. ⚠️ **Gap: Test Coverage Could Be Expanded**
 
 **Current State**:
+
 - ✅ Tests exist in `src/tests/`
 - ✅ Basic functionality covered
 - ⚠️ No explicit coverage targets
 - ⚠️ No integration tests documented
 
 **Test Files Present**:
-```
+
+```text
 tests/
   test_dependency_sync.py
   test_format_field_value.py
@@ -294,7 +309,8 @@ tests/
   test_total_runtime_reporting.py
 ```
 
-**Recommendation**: 
+**Recommendation**:
+
 - Set coverage target (e.g., 80%)
 - Add coverage reporting to `make test`
 - Document test strategy in CONTRIBUTING.md
@@ -307,15 +323,15 @@ tests/
 
 ### 13. ✅ **Excellent: Well-Organized Documentation**
 
-```
+```text
 docs/
   CONTRIBUTING.md          ✅ Comprehensive contributor guide
   IMPLEMENTATION_GUIDE.md  ✅ Coding standards
   notes/                   ✅ Design decisions and evolution
-    (30+ documentation files covering project history)
 ```
 
 **Strengths**:
+
 - Clear separation of concerns
 - Historical context preserved
 - Progressive disclosure (README → CONTRIBUTING → IMPLEMENTATION_GUIDE)
@@ -338,29 +354,29 @@ docs/
 
 ### Short Term (This Month)
 
-4. **Document update.sh in CONTRIBUTING.md**
+1. **Document update.sh in CONTRIBUTING.md**
    - Add section under "Dependency Management"
    - Explain when to use `update.sh` vs `make dev`
 
-5. **Add Common Issues section to root README**
+2. **Add Common Issues section to root README**
    - Brief TensorFlow conflict mention
    - Link to detailed troubleshooting in src/README.md
 
-6. **Add types-tabulate to requirements-dev.txt**
+3. **Add types-tabulate to requirements-dev.txt**
    - Currently only in pyproject.toml and update.sh
 
 ### Medium Term (Next Quarter)
 
-7. **Add platform detection warnings**
+1. **Add platform detection warnings**
    - Helpful UX improvement
    - Low priority since docs are clear
 
-8. **Expand test coverage**
+2. **Expand test coverage**
    - Set coverage targets
    - Add integration tests
    - Document test strategy
 
-9. **Consider pre-commit hook for dependency sync**
+3. **Consider pre-commit hook for dependency sync**
    - Prevent future drift between pyproject.toml, requirements*.txt, and update.sh
 
 ---
@@ -395,6 +411,7 @@ All should pass ✅
 **Overall Assessment**: ✅ **High Quality Project**
 
 **Strengths**:
+
 - Comprehensive environment validation
 - Multi-layer quality checks
 - Excellent documentation structure
@@ -403,6 +420,7 @@ All should pass ✅
 - Well-organized dependency management
 
 **Areas for Improvement**:
+
 - Fix outdated module references (critical for new contributors)
 - Minor dependency inconsistencies
 - Could expand test coverage and documentation
