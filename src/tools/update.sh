@@ -209,28 +209,57 @@ update_local_mlx_repos() {
 		echo "[update.sh] Installing ${REPO_NAMES[idx]} package..."
 		local INSTALL_STATUS=0
 		
-		# Set Metal JIT environment variable for mlx builds
-		# MLX_METAL_JIT=OFF (default): Pre-built kernels, larger binary, faster cold start
-		# MLX_METAL_JIT=ON: Runtime compilation, smaller binary, slower cold start (cached after first use)
+		# MLX requires CMake configuration before pip install (generates version.h, etc.)
 		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
+			echo "[update.sh] Configuring MLX build with CMake..."
+			
+			# Clean build directory if CLEAN_BUILD is set
+			if [[ "${CLEAN_BUILD:-0}" == "1" ]] && [[ -d "build" ]]; then
+				echo "[update.sh] Cleaning previous build directory..."
+				rm -rf build
+			fi
+			
+			# Set Metal JIT environment variable for mlx builds
+			# MLX_METAL_JIT=OFF (default): Pre-built kernels, larger binary, faster cold start
+			# MLX_METAL_JIT=ON: Runtime compilation, smaller binary, slower cold start (cached after first use)
 			local JIT_SETTING="${MLX_METAL_JIT:-OFF}"
+			local CMAKE_STATUS=0
+			
+			# Run CMake configuration
 			if [[ "$JIT_SETTING" == "ON" ]]; then
 				echo "[update.sh] Building mlx with MLX_METAL_JIT=ON (smaller binary, runtime compilation)"
-				if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
-					env MLX_METAL_JIT=ON pip install --force-reinstall -e . || INSTALL_STATUS=$?
-				else
-					env MLX_METAL_JIT=ON pip install -e . || INSTALL_STATUS=$?
-				fi
+				env MLX_METAL_JIT=ON cmake -S . -B build || CMAKE_STATUS=$?
 			else
 				echo "[update.sh] Building mlx with MLX_METAL_JIT=OFF (pre-built kernels, larger binary)"
-				if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
-					pip install --force-reinstall -e . || INSTALL_STATUS=$?
-				else
-					pip install -e . || INSTALL_STATUS=$?
-				fi
+				cmake -S . -B build || CMAKE_STATUS=$?
+			fi
+			
+			if [[ $CMAKE_STATUS -ne 0 ]]; then
+				echo "⚠️  CMake configuration failed for mlx"
+				REPO_SKIP[idx]=1
+				echo ""
+				continue
+			fi
+			
+			echo "[update.sh] Building MLX with CMake..."
+			cmake --build build || INSTALL_STATUS=$?
+			
+			if [[ $INSTALL_STATUS -ne 0 ]]; then
+				echo "⚠️  CMake build failed for mlx"
+				REPO_SKIP[idx]=1
+				echo ""
+				continue
+			fi
+			
+			# Now install Python bindings
+			echo "[update.sh] Installing MLX Python bindings..."
+			if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
+				pip install --force-reinstall -e . || INSTALL_STATUS=$?
+			else
+				pip install -e . || INSTALL_STATUS=$?
 			fi
 		else
-			# Non-mlx packages: normal install without environment modifications
+			# Non-mlx packages: normal install without CMake
 			if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
 				pip install --force-reinstall -e . || INSTALL_STATUS=$?
 			else
