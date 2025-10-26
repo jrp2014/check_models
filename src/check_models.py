@@ -67,6 +67,43 @@ if TYPE_CHECKING:
     from mlx_vlm.generate import GenerationResult
     from transformers import PreTrainedTokenizer, PreTrainedTokenizerFast
 
+# Public API (PEP 8 / PEP 561 best practice)
+__all__ = [
+    "PerformanceResult",
+    "ProcessImageParams",
+    "ResultSet",
+    "exit_with_cli_error",
+    "extract_image_metadata",
+    "find_most_recent_file",
+    "format_field_label",
+    "format_field_value",
+    "format_overall_runtime",
+    "generate_html_report",
+    "generate_markdown_report",
+    "get_device_info",
+    "get_exif_data",
+    "get_library_versions",
+    "get_system_info",
+    "get_terminal_width",
+    "is_numeric_field",
+    "is_numeric_value",
+    "main",
+    "main_cli",
+    "pretty_print_exif",
+    "print_cli_error",
+    "print_cli_header",
+    "print_cli_section",
+    "print_model_result",
+    "print_model_stats",
+    "print_version_info",
+    "process_image_with_model",
+    "validate_image_accessible",
+    "validate_inputs",
+    "validate_kv_params",
+    "validate_sampling_params",
+    "validate_temperature",
+]
+
 LOGGER_NAME: Final[str] = "mlx-vlm-check"
 NOT_AVAILABLE: Final[str] = "N/A"
 
