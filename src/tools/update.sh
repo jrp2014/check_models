@@ -9,11 +9,11 @@
 #   4. Then update local MLX repos (if present) OR update from PyPI
 #
 # Usage examples:
-#   ./update.sh                       # Install project + dev + extras
+#   ./update.sh                       # Install project + dev + extras (MLX_METAL_JIT=ON by default)
 #   INSTALL_TORCH=1 ./update.sh       # Additionally install torch group
 #   FORCE_REINSTALL=1 ./update.sh     # Force reinstall with --force-reinstall
 #   SKIP_MLX=1 ./update.sh            # Force skip mlx/mlx-vlm updates (override detection)
-#   MLX_METAL_JIT=ON ./update.sh      # Enable Metal JIT when building local MLX (dev only)
+#   MLX_METAL_JIT=OFF ./update.sh     # Disable Metal JIT when building local MLX (defaults to ON)
 #
 # Local MLX Development:
 #   If mlx, mlx-lm, and mlx-vlm directories exist at ../../ (sibling to scripts/),
@@ -181,11 +181,16 @@ update_local_mlx_repos() {
 		echo "[update.sh] Installing ${REPO_NAMES[idx]} package..."
 		local INSTALL_STATUS=0
 		
-		# Set Metal JIT environment variable for mlx builds if requested
+		# Set Metal JIT environment variable for mlx builds (default: ON for better performance)
 		local MLX_BUILD_ENV=()
-		if [[ "${REPO_NAMES[idx]}" == "mlx" ]] && [[ "${MLX_METAL_JIT:-}" == "ON" ]]; then
-			echo "[update.sh] Building mlx with MLX_METAL_JIT=ON (Metal shader JIT enabled)"
-			MLX_BUILD_ENV=(env MLX_METAL_JIT=ON)
+		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
+			local JIT_SETTING="${MLX_METAL_JIT:-ON}"
+			if [[ "$JIT_SETTING" == "ON" ]]; then
+				echo "[update.sh] Building mlx with MLX_METAL_JIT=ON (Metal shader JIT enabled)"
+				MLX_BUILD_ENV=(env MLX_METAL_JIT=ON)
+			else
+				echo "[update.sh] Building mlx with MLX_METAL_JIT=OFF (JIT disabled)"
+			fi
 		fi
 		
 		if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
