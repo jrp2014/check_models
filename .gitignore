@@ -3,6 +3,9 @@
 # macOS
 .DS_Store
 
+# VS Code personal settings
+.vscode/settings.local.json
+
 # Python caches
 __pycache__/
 *.py[cod]

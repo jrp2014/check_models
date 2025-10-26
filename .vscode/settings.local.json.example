@@ -1,0 +1,17 @@
+{
+  // Copy this file to settings.local.json and customize for your machine
+  // settings.local.json is gitignored and won't be committed
+  
+  "terminal.integrated.profiles.osx": {
+    "zsh-conda-mlx-vlm": {
+      "path": "zsh",
+      "args": [
+        "-l",
+        "-c",
+        "source /opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh && conda activate mlx-vlm && exec zsh"
+      ]
+    }
+  },
+  "terminal.integrated.defaultProfile.osx": "zsh-conda-mlx-vlm",
+  "python.defaultInterpreterPath": "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/bin/python"
+}
