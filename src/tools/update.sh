@@ -9,11 +9,11 @@
 #   4. Then update local MLX repos (if present) OR update from PyPI
 #
 # Usage examples:
-#   ./update.sh                       # Install project + dev + extras (MLX_METAL_JIT=ON by default)
+#   ./update.sh                       # Install project + dev + extras (MLX_METAL_JIT=OFF by default)
 #   INSTALL_TORCH=1 ./update.sh       # Additionally install torch group
 #   FORCE_REINSTALL=1 ./update.sh     # Force reinstall with --force-reinstall
 #   SKIP_MLX=1 ./update.sh            # Force skip mlx/mlx-vlm updates (override detection)
-#   MLX_METAL_JIT=OFF ./update.sh     # Disable Metal JIT when building local MLX (defaults to ON)
+#   MLX_METAL_JIT=ON ./update.sh      # Enable Metal JIT for smaller binaries (defaults to OFF)
 #   CLEAN_BUILD=1 ./update.sh         # Clean build artifacts before building local MLX repos
 #
 # Local MLX Development:
@@ -209,15 +209,17 @@ update_local_mlx_repos() {
 		echo "[update.sh] Installing ${REPO_NAMES[idx]} package..."
 		local INSTALL_STATUS=0
 		
-		# Set Metal JIT environment variable for mlx builds (default: ON for better performance)
+		# Set Metal JIT environment variable for mlx builds
+		# MLX_METAL_JIT=OFF (default): Pre-built kernels, larger binary, faster cold start
+		# MLX_METAL_JIT=ON: Runtime compilation, smaller binary, slower cold start (cached after first use)
 		local MLX_BUILD_ENV=()
 		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
-			local JIT_SETTING="${MLX_METAL_JIT:-ON}"
+			local JIT_SETTING="${MLX_METAL_JIT:-OFF}"
 			if [[ "$JIT_SETTING" == "ON" ]]; then
-				echo "[update.sh] Building mlx with MLX_METAL_JIT=ON (Metal shader JIT enabled)"
+				echo "[update.sh] Building mlx with MLX_METAL_JIT=ON (smaller binary, runtime compilation)"
 				MLX_BUILD_ENV=(env MLX_METAL_JIT=ON)
 			else
-				echo "[update.sh] Building mlx with MLX_METAL_JIT=OFF (JIT disabled)"
+				echo "[update.sh] Building mlx with MLX_METAL_JIT=OFF (pre-built kernels, larger binary)"
 			fi
 		fi
 		

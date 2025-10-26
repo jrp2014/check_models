@@ -345,13 +345,21 @@ bash tools/update.sh
 **Environment Variables**:
 
 - `INSTALL_TORCH=1`: Install PyTorch (if needed for specific models)
-- `MLX_METAL_JIT=OFF`: Disable Metal shader JIT compilation (default: `ON` for local MLX builds for better performance)
+- `MLX_METAL_JIT=ON`: Enable Metal shader runtime compilation for smaller binaries (default: `OFF` for pre-built kernels)
+
+**MLX_METAL_JIT Trade-offs**:
+
+- `OFF` (default): Pre-built GPU kernels, larger binary (~100MB+ metallib), instant execution
+- `ON`: Runtime compilation, smaller binary, cold-start delay (few hundred ms to few seconds on first use per kernel, then cached permanently)
 
 **Example usage**:
 
 ```bash
-# Install with JIT disabled for debugging
-MLX_METAL_JIT=OFF bash tools/update.sh
+# Standard build with pre-built kernels (default)
+bash tools/update.sh
+
+# Smaller binary with runtime compilation (cold start penalty)
+MLX_METAL_JIT=ON bash tools/update.sh
 
 # Install with PyTorch support
 INSTALL_TORCH=1 bash tools/update.sh
@@ -409,6 +417,8 @@ bash src/tools/clean_builds.sh --dry-run  # See what would be cleaned
 - Type stubs: `typings/` (only with `clean-all`)
 
 **Note on Metal kernel caches:** Compiled Metal shaders are cached by macOS in system temp directories and persist across builds. These are automatically managed by the Metal framework and cleared on reboot. To manually clear (use with caution): `sudo rm -rf /tmp/com.apple.metal/*`
+
+According to the [official MLX documentation](https://ml-explore.github.io/mlx/build/html/install.html#binary-size-minimization), the Metal kernel cache persists across reboots and is system-managed for performance.
 
 **When to clean:**
 
