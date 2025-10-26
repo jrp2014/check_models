@@ -14,6 +14,7 @@
 #   FORCE_REINSTALL=1 ./update.sh     # Force reinstall with --force-reinstall
 #   SKIP_MLX=1 ./update.sh            # Force skip mlx/mlx-vlm updates (override detection)
 #   MLX_METAL_JIT=OFF ./update.sh     # Disable Metal JIT when building local MLX (defaults to ON)
+#   CLEAN_BUILD=1 ./update.sh         # Clean build artifacts before building local MLX repos
 #
 # Local MLX Development:
 #   If mlx, mlx-lm, and mlx-vlm directories exist at ../../ (sibling to scripts/),
@@ -87,6 +88,33 @@ if ((${#EXTRA_ARGS[@]})); then
 else
 	pip install -U --upgrade-strategy eager -e "$PROJECT_ROOT/$INSTALL_GROUPS"
 fi
+
+# Function to clean build artifacts from local MLX repositories
+clean_local_mlx_builds() {
+	local SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+	local PARENT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+	local MLX_REPOS=("mlx" "mlx-lm" "mlx-vlm" "mlx-data")
+	
+	echo "[update.sh] Cleaning build artifacts from local MLX repositories..."
+	
+	for repo in "${MLX_REPOS[@]}"; do
+		local REPO_PATH="$PARENT_DIR/$repo"
+		if [[ -d "$REPO_PATH/.git" ]]; then
+			echo "[update.sh] Cleaning $repo build artifacts..."
+			cd "$REPO_PATH"
+			# Remove Python build artifacts
+			rm -rf build/ dist/ *.egg-info/ .eggs/
+			find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true
+			find . -type d -name '.pytest_cache' -exec rm -rf {} + 2>/dev/null || true
+			find . -type d -name '*.egg-info' -exec rm -rf {} + 2>/dev/null || true
+			find . -name '*.pyc' -delete -o -name '*.pyo' -delete 2>/dev/null || true
+			echo "  ✓ Cleaned $repo"
+		fi
+	done
+	
+	echo "[update.sh] Build artifact cleanup complete"
+	echo ""
+}
 
 # Function to update local MLX development repositories
 update_local_mlx_repos() {
@@ -235,6 +263,11 @@ update_local_mlx_repos() {
 	echo ""
 	return 0
 }
+
+# Clean build artifacts if requested
+if [[ "${CLEAN_BUILD:-0}" == "1" ]]; then
+	clean_local_mlx_builds
+fi
 
 # Update local MLX repos if they exist
 LOCAL_MLX_UPDATED=0

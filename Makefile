@@ -77,6 +77,11 @@ clean: ## Remove generated files and caches
 	rm -rf output/*.html output/*.md
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name .pytest_cache -exec rm -rf {} + 2>/dev/null || true
+	find . -type d -name '*.egg-info' -exec rm -rf {} + 2>/dev/null || true
+
+.PHONY: clean-all
+clean-all: clean ## Deep clean including build artifacts and stubs
+	@$(MAKE) -C $(SRC) clean-all
 
 .PHONY: check_models
 check_models: ## Run VLM checker (pass args: make check_models ARGS='--model X --image Y')

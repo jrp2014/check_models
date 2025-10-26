@@ -379,6 +379,44 @@ This command will:
 - Reinstall the project with all dependencies (dev, extras, torch)
 - Ensure you have the latest versions compatible with lock files
 
+### Cleaning Build Artifacts
+
+Build artifacts can accumulate during development, especially when working with local MLX builds:
+
+```bash
+# Clean project artifacts (recommended for regular cleanup)
+make clean              # Remove __pycache__, build/, dist/, test caches
+
+# Deep clean including type stubs
+make clean-all          # Also removes typings/
+
+# Clean local MLX development repositories
+make clean-mlx          # Remove build artifacts from mlx, mlx-lm, mlx-vlm, mlx-data
+
+# Preview what would be cleaned (dry run)
+make clean-mlx-dry-run
+
+# Or use the script directly
+bash src/tools/clean_builds.sh
+bash src/tools/clean_builds.sh --dry-run  # See what would be cleaned
+```
+
+**What gets cleaned:**
+
+- Python build artifacts: `build/`, `dist/`, `*.egg-info/`, `.eggs/`
+- Bytecode caches: `__pycache__/`, `*.pyc`, `*.pyo`
+- Test caches: `.pytest_cache/`, `.mypy_cache/`
+- Type stubs: `typings/` (only with `clean-all`)
+
+**Note on Metal kernel caches:** Compiled Metal shaders are cached by macOS in system temp directories and persist across builds. These are automatically managed by the Metal framework and cleared on reboot. To manually clear (use with caution): `sudo rm -rf /tmp/com.apple.metal/*`
+
+**When to clean:**
+
+- Before rebuilding MLX with different compiler flags (e.g., changing `MLX_METAL_JIT`)
+- When experiencing odd build or runtime errors
+- To free up disk space
+- After switching between different MLX versions or branches
+
 **Note**: This does NOT update the lock files themselves. To upgrade dependencies to newer versions, use `make upgrade-deps` instead.
 
 ## Release Process

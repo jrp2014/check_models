@@ -246,6 +246,31 @@ clean-pyc: ## Remove Python cache files and bytecode
 	find . -name '__pycache__' -prune -exec rm -rf {} +
 	find . -name '*.pyc' -delete -o -name '*.pyo' -delete -o -name '*~' -delete
 
+.PHONY: clean-build
+clean-build: ## Remove build artifacts (build/, dist/, *.egg-info/)
+	rm -rf build/ dist/ *.egg-info/
+	find . -type d -name '*.egg-info' -exec rm -rf {} + 2>/dev/null || true
+
+.PHONY: clean-test
+clean-test: ## Remove test and coverage artifacts
+	rm -rf .pytest_cache/ .coverage htmlcov/ .mypy_cache/
+
+.PHONY: clean-stubs
+clean-stubs: ## Remove generated type stubs
+	rm -rf ../typings/
+
+.PHONY: clean-mlx
+clean-mlx: ## Clean build artifacts from local MLX development repos
+	@bash tools/clean_builds.sh
+
+.PHONY: clean-mlx-dry-run
+clean-mlx-dry-run: ## Show what would be cleaned (dry run)
+	@bash tools/clean_builds.sh --dry-run
+
 .PHONY: clean
-clean: clean-pyc ## Clean up Python cache files
-	@echo "Cleanup complete"
+clean: clean-pyc clean-build clean-test ## Clean all generated files (pyc, build, test artifacts)
+	@echo "✓ Cleanup complete"
+
+.PHONY: clean-all
+clean-all: clean clean-stubs ## Clean everything including type stubs
+	@echo "✓ Deep cleanup complete (use 'make clean-mlx' to clean local MLX repos)"
