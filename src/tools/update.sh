@@ -212,21 +212,30 @@ update_local_mlx_repos() {
 		# Set Metal JIT environment variable for mlx builds
 		# MLX_METAL_JIT=OFF (default): Pre-built kernels, larger binary, faster cold start
 		# MLX_METAL_JIT=ON: Runtime compilation, smaller binary, slower cold start (cached after first use)
-		local MLX_BUILD_ENV=()
 		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
 			local JIT_SETTING="${MLX_METAL_JIT:-OFF}"
 			if [[ "$JIT_SETTING" == "ON" ]]; then
 				echo "[update.sh] Building mlx with MLX_METAL_JIT=ON (smaller binary, runtime compilation)"
-				MLX_BUILD_ENV=(env MLX_METAL_JIT=ON)
+				if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
+					env MLX_METAL_JIT=ON pip install --force-reinstall -e . || INSTALL_STATUS=$?
+				else
+					env MLX_METAL_JIT=ON pip install -e . || INSTALL_STATUS=$?
+				fi
 			else
 				echo "[update.sh] Building mlx with MLX_METAL_JIT=OFF (pre-built kernels, larger binary)"
+				if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
+					pip install --force-reinstall -e . || INSTALL_STATUS=$?
+				else
+					pip install -e . || INSTALL_STATUS=$?
+				fi
 			fi
-		fi
-		
-		if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
-			"${MLX_BUILD_ENV[@]}" pip install --force-reinstall -e . || INSTALL_STATUS=$?
 		else
-			"${MLX_BUILD_ENV[@]}" pip install -e . || INSTALL_STATUS=$?
+			# Non-mlx packages: normal install without environment modifications
+			if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
+				pip install --force-reinstall -e . || INSTALL_STATUS=$?
+			else
+				pip install -e . || INSTALL_STATUS=$?
+			fi
 		fi
 		if [[ $INSTALL_STATUS -eq 0 ]]; then
 			echo "✓ ${REPO_NAMES[idx]} installed successfully"
