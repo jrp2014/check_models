@@ -211,6 +211,17 @@ update_local_mlx_repos() {
 		
 		# MLX requires CMake configuration before pip install (generates version.h, etc.)
 		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
+			# Ensure mlx/version.h exists (required by CMakeLists.txt and setup.py)
+			if [[ ! -f "mlx/version.h" ]]; then
+				echo "[update.sh] Restoring mlx/version.h from git..."
+				git restore mlx/version.h || {
+					echo "⚠️  Failed to restore mlx/version.h"
+					REPO_SKIP[idx]=1
+					echo ""
+					continue
+				}
+			fi
+			
 			echo "[update.sh] Configuring MLX build with CMake..."
 			
 			# Clean build directory if CLEAN_BUILD is set
