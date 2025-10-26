@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 # Unified dependency updater for mlx-vlm-check project.
-# Keeps runtime, optional extras, and dev tooling aligned with pyproject.toml.
+# Installs/updates the project and all dependencies from pyproject.toml.
 #
 # Execution Order:
 #   1. Update Homebrew (if available)
-#   2. Update pip/wheel/typing_extensions
-#   3. Install ALL library dependencies (runtime + extras + dev) FIRST
-#   4. Then update local MLX repos (if present) OR install from PyPI
+#   2. Update pip/wheel/setuptools
+#   3. Install project in editable mode with all dependencies (dev + extras)
+#   4. Then update local MLX repos (if present) OR update from PyPI
 #
 # Usage examples:
-#   ./update.sh                       # Update runtime + extras + dev (default behavior)
-#   INSTALL_TORCH=1 ./update.sh       # Additionally install torch/torchvision/torchaudio
+#   ./update.sh                       # Install project + dev + extras
+#   INSTALL_TORCH=1 ./update.sh       # Additionally install torch group
 #   FORCE_REINSTALL=1 ./update.sh     # Force reinstall with --force-reinstall
 #   SKIP_MLX=1 ./update.sh            # Force skip mlx/mlx-vlm updates (override detection)
 #
@@ -60,65 +60,31 @@ else
 fi
 
 # Ensure global Python packaging tools are current
-echo "[update.sh] Updating core Python packaging tools (pip, wheel, typing_extensions)..."
-pip install -U pip wheel typing_extensions
+echo "[update.sh] Updating core Python packaging tools (pip, wheel, setuptools)..."
+pip install -U pip wheel setuptools
 
-# Define all package arrays early so we can install dependencies before building local MLX
-# No version constraints - always install latest versions
-RUNTIME_PACKAGES=(
-	"Pillow"
-	"huggingface-hub"
-	"huggingface-hub[cli]"
-	"tabulate"
-	"tzlocal"
-)
-
-EXTRAS_PACKAGES=(
-	"psutil"
-	"tokenizers"
-	"einops"
-	"num2words"
-	"transformers"
-)
-
-DEV_PACKAGES=(
-    "cmake"
-	"ruff"
-	"mypy"
-	"pytest"
-	"pytest-cov"
-    "setuptools"
-    "types-tabulate"
-    "types-tqdm"
-    "nanobind"
-	"gh"
-)
-
-TORCH_PACKAGES=(
-	"torch" "torchvision" "torchaudio"
-)
+# Determine project root (assuming scripts/src/tools/update.sh)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 EXTRA_ARGS=()
 if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
 	EXTRA_ARGS+=("--force-reinstall")
 fi
 
-# Install all library dependencies BEFORE building local MLX packages
-echo "[update.sh] Updating runtime + extras + dev dependencies (needed for MLX builds)..."
-ALL_PRIMARY=("${RUNTIME_PACKAGES[@]}" "${EXTRAS_PACKAGES[@]}" "${DEV_PACKAGES[@]}" safetensors accelerate tqdm)
-if ((${#EXTRA_ARGS[@]})); then
-	pip install -U --upgrade-strategy eager "${EXTRA_ARGS[@]}" "${ALL_PRIMARY[@]}"
-else
-	pip install -U --upgrade-strategy eager "${ALL_PRIMARY[@]}"
+# Install project with all dependencies from pyproject.toml
+# This installs: runtime + extras + dev in editable mode
+echo "[update.sh] Installing project with all dependencies from pyproject.toml..."
+INSTALL_GROUPS=".[dev,extras]"
+if [[ "${INSTALL_TORCH:-0}" == "1" ]]; then
+	INSTALL_GROUPS=".[dev,extras,torch]"
+	echo "[update.sh] Including torch group (INSTALL_TORCH=1)"
 fi
 
-if [[ "${INSTALL_TORCH:-0}" == "1" ]]; then
-	echo "[update.sh] Installing PyTorch stack (optional)..."
-	if ((${#EXTRA_ARGS[@]})); then
-		pip install -U --upgrade-strategy eager "${EXTRA_ARGS[@]}" "${TORCH_PACKAGES[@]}"
-	else
-		pip install -U --upgrade-strategy eager "${TORCH_PACKAGES[@]}"
-	fi
+if ((${#EXTRA_ARGS[@]})); then
+	pip install -U --upgrade-strategy eager "${EXTRA_ARGS[@]}" -e "$PROJECT_ROOT/$INSTALL_GROUPS"
+else
+	pip install -U --upgrade-strategy eager -e "$PROJECT_ROOT/$INSTALL_GROUPS"
 fi
 
 # Function to update local MLX development repositories
