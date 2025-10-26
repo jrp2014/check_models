@@ -310,8 +310,8 @@ Notes:
 - Keep `transformers` updated if using it: `pip install -U transformers`.
 - `system_profiler` is a macOS built-in (no install needed) used for GPU name / core info.
 - Torch is supported and can be installed when you need it for specific models; the script does not block Torch.
-- The `tools/update.sh` helper supports adding Torch via an environment flag: `INSTALL_TORCH=1 ./tools/update.sh`.
-- Installing `sentence-transformers` isn’t necessary for this tool and may pull heavy backends into import paths; a heads‑up is logged if detected.
+- The `tools/update.sh` helper supports environment flags: `INSTALL_TORCH=1` for PyTorch, `MLX_METAL_JIT=OFF` to disable JIT compilation (default: `ON` for local MLX builds).
+- Installing `sentence-transformers` isn't necessary for this tool and may pull heavy backends into import paths; a heads‑up is logged if detected.
 - Long embedded CSS / HTML lines are intentional (readability > artificial wrapping).
 - Dependency versions in this README are automatically kept in sync with `pyproject.toml`; update the TOML first and reflect changes here.
 

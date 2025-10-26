@@ -342,6 +342,21 @@ bash tools/update.sh
 - Offers per-group installation (runtime, extras, torch, dev)
 - Verifies dependency sync across pyproject.toml, requirements*.txt, and update.sh itself
 
+**Environment Variables**:
+
+- `INSTALL_TORCH=1`: Install PyTorch (if needed for specific models)
+- `MLX_METAL_JIT=OFF`: Disable Metal shader JIT compilation (default: `ON` for local MLX builds for better performance)
+
+**Example usage**:
+
+```bash
+# Install with JIT disabled for debugging
+MLX_METAL_JIT=OFF bash tools/update.sh
+
+# Install with PyTorch support
+INSTALL_TORCH=1 bash tools/update.sh
+```
+
 ### Updating Dependencies
 
 1. Edit `src/pyproject.toml` to update the dependency specification
