@@ -13,6 +13,7 @@
 #   INSTALL_TORCH=1 ./update.sh       # Additionally install torch group
 #   FORCE_REINSTALL=1 ./update.sh     # Force reinstall with --force-reinstall
 #   SKIP_MLX=1 ./update.sh            # Force skip mlx/mlx-vlm updates (override detection)
+#   MLX_METAL_JIT=ON ./update.sh      # Enable Metal JIT when building local MLX (dev only)
 #
 # Local MLX Development:
 #   If mlx, mlx-lm, and mlx-vlm directories exist at ../../ (sibling to scripts/),
@@ -179,10 +180,18 @@ update_local_mlx_repos() {
 		cd "${REPO_PATHS[idx]}"
 		echo "[update.sh] Installing ${REPO_NAMES[idx]} package..."
 		local INSTALL_STATUS=0
+		
+		# Set Metal JIT environment variable for mlx builds if requested
+		local MLX_BUILD_ENV=()
+		if [[ "${REPO_NAMES[idx]}" == "mlx" ]] && [[ "${MLX_METAL_JIT:-}" == "ON" ]]; then
+			echo "[update.sh] Building mlx with MLX_METAL_JIT=ON (Metal shader JIT enabled)"
+			MLX_BUILD_ENV=(env MLX_METAL_JIT=ON)
+		fi
+		
 		if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
-			pip install --force-reinstall -e . || INSTALL_STATUS=$?
+			"${MLX_BUILD_ENV[@]}" pip install --force-reinstall -e . || INSTALL_STATUS=$?
 		else
-			pip install -e . || INSTALL_STATUS=$?
+			"${MLX_BUILD_ENV[@]}" pip install -e . || INSTALL_STATUS=$?
 		fi
 		if [[ $INSTALL_STATUS -eq 0 ]]; then
 			echo "✓ ${REPO_NAMES[idx]} installed successfully"
