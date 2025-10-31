@@ -211,15 +211,19 @@ update_local_mlx_repos() {
 		
 		# MLX requires CMake configuration before pip install (generates version.h, etc.)
 		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
-			# Ensure mlx/version.h exists (required by CMakeLists.txt and setup.py)
-			if [[ ! -f "mlx/version.h" ]]; then
-				echo "[update.sh] Restoring mlx/version.h from git..."
-				git restore mlx/version.h || {
-					echo "⚠️  Failed to restore mlx/version.h"
+			# Check for any missing git-tracked files and restore them
+			# This handles cases where files were accidentally deleted (e.g., mlx/version.h, mlx/CMakeLists.txt)
+			local MISSING_FILES
+			MISSING_FILES=$(git ls-files --deleted)
+			if [[ -n "$MISSING_FILES" ]]; then
+				echo "[update.sh] Restoring missing git-tracked files..."
+				git restore . || {
+					echo "⚠️  Failed to restore missing files"
 					REPO_SKIP[idx]=1
 					echo ""
 					continue
 				}
+				echo "✓ Restored: $(echo "$MISSING_FILES" | wc -l | tr -d ' ') file(s)"
 			fi
 			
 			echo "[update.sh] Configuring MLX build with CMake..."
