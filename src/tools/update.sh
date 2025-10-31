@@ -198,9 +198,46 @@ update_local_mlx_repos() {
 	done
 	cd "$ORIGINAL_DIR"
 
-	# Stage 3: Build and install packages in dependency order (mlx → mlx-lm → mlx-vlm)
+	# Stage 3: Verify repository integrity before building
 	echo ""
-	echo "Stage 3: Building and installing MLX packages in dependency order..."
+	echo "Stage 3: Verifying repository integrity..."
+	for idx in "${!REPO_NAMES[@]}"; do
+		if [[ ${REPO_SKIP[idx]} -eq 1 ]]; then
+			continue
+		fi
+		cd "${REPO_PATHS[idx]}"
+		
+		# Check for missing git-tracked files (indicates corruption or incomplete checkout)
+		local MISSING_FILES
+		MISSING_FILES=$(git ls-files --deleted 2>/dev/null)
+		if [[ -n "$MISSING_FILES" ]]; then
+			echo "❌ ERROR: Repository ${REPO_NAMES[idx]} is corrupt - missing tracked files:"
+			echo "$MISSING_FILES" | head -5
+			local FILE_COUNT
+			FILE_COUNT=$(echo "$MISSING_FILES" | wc -l | tr -d ' ')
+			if [[ "$FILE_COUNT" -gt 5 ]]; then
+				echo "... and $((FILE_COUNT - 5)) more file(s)"
+			fi
+			echo ""
+			echo "To fix this, run one of the following:"
+			echo "  cd ${REPO_PATHS[idx]} && git restore ."
+			echo "  cd ${REPO_PATHS[idx]} && git reset --hard HEAD"
+			echo "  cd ${REPO_PATHS[idx]} && git clean -fdx && git restore ."
+			echo ""
+			exit 1
+		fi
+		
+		# Check for uncommitted changes that might interfere with build
+		if ! git diff --quiet HEAD 2>/dev/null; then
+			echo "⚠️  Warning: Repository ${REPO_NAMES[idx]} has uncommitted changes"
+		fi
+	done
+	echo "✓ All repositories verified"
+	cd "$ORIGINAL_DIR"
+
+	# Stage 4: Build and install packages in dependency order (mlx → mlx-lm → mlx-vlm)
+	echo ""
+	echo "Stage 4: Building and installing MLX packages in dependency order..."
 	for idx in "${!REPO_NAMES[@]}"; do
 		if [[ ${REPO_SKIP[idx]} -eq 1 ]]; then
 			continue
@@ -209,23 +246,8 @@ update_local_mlx_repos() {
 		echo "[update.sh] Installing ${REPO_NAMES[idx]} package..."
 		local INSTALL_STATUS=0
 		
-		# MLX requires CMake configuration before pip install (generates version.h, etc.)
+		# MLX requires CMake configuration before pip install
 		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
-			# Check for any missing git-tracked files and restore them
-			# This handles cases where files were accidentally deleted (e.g., mlx/version.h, mlx/CMakeLists.txt)
-			local MISSING_FILES
-			MISSING_FILES=$(git ls-files --deleted)
-			if [[ -n "$MISSING_FILES" ]]; then
-				echo "[update.sh] Restoring missing git-tracked files..."
-				git restore . || {
-					echo "⚠️  Failed to restore missing files"
-					REPO_SKIP[idx]=1
-					echo ""
-					continue
-				}
-				echo "✓ Restored: $(echo "$MISSING_FILES" | wc -l | tr -d ' ') file(s)"
-			fi
-			
 			echo "[update.sh] Configuring MLX build with CMake..."
 			
 			# Clean build directory if CLEAN_BUILD is set
@@ -300,7 +322,7 @@ update_local_mlx_repos() {
 	done
 	cd "$ORIGINAL_DIR"
 
-	# Stage 4: Generate project stubs if applicable
+	# Stage 5: Generate project stubs if applicable
 	cd "$SCRIPT_DIR"
 	if [[ -f "$SCRIPT_DIR/generate_stubs.py" ]]; then
 		echo "[update.sh] Generating type stubs for mlx_vlm and tokenizers..."
