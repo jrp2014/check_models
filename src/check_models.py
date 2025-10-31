@@ -60,7 +60,6 @@ psutil: Any | None = psutil_mod
 if TYPE_CHECKING:
     import types
     from collections.abc import Iterator
-    from zoneinfo import ZoneInfo
 
     from mlx.nn import Module
     from mlx_vlm.generate import GenerationResult
@@ -1507,46 +1506,45 @@ def _convert_gps_coordinate(
         None
 
     """
-    clen: int = len(coord)
-    if clen == MAX_GPS_COORD_LEN:
-        deg = to_float(val=coord[0])
-        min_ = to_float(val=coord[1])
-        sec = to_float(val=coord[2])
-        if deg is not None and min_ is not None and sec is not None:
-            return (deg, min_, sec)
-    elif clen == MED_GPS_COORD_LEN:
-        deg = to_float(val=coord[0])
-        min_ = to_float(val=coord[1])
-        if deg is not None and min_ is not None:
-            return (deg, min_, 0.0)
-    elif clen == MIN_GPS_COORD_LEN:
-        deg = to_float(val=coord[0])
-        if deg is not None:
-            return (deg, 0.0, 0.0)
-    return None
+    clen = len(coord)
+    if clen not in (MIN_GPS_COORD_LEN, MED_GPS_COORD_LEN, MAX_GPS_COORD_LEN):
+        return None
+
+    # Convert available components to float, padding with 0.0 for missing values
+    components = [to_float(coord[i]) if i < clen else 0.0 for i in range(3)]
+
+    # Return None if any required component failed to convert
+    if any(c is None for c in components[:clen]):
+        return None
+
+    # All conversions succeeded, return tuple with defaults for missing values
+    return (components[0] or 0.0, components[1] or 0.0, components[2] or 0.0)
 
 
 def _extract_exif_date(img_path: PathLike, exif_data: ExifDict) -> str | None:
-    exif_date = (
-        exif_data.get("DateTimeOriginal")
-        or exif_data.get("CreateDate")
-        or exif_data.get("DateTime")
-        or None
-    )
+    # Try EXIF date tags in priority order (using tuple unpacking for cleaner code)
+    for tag in EXIF_DATE_TAGS:
+        if exif_date := exif_data.get(tag):
+            break
+    else:
+        exif_date = None
+
     if exif_date:
-        parsed: str | None = None
+        # Try to parse with known formats
         try:
+            local_tz = get_localzone()
             for fmt in DATE_FORMATS:
                 try:
-                    dt: datetime = datetime.strptime(str(exif_date), fmt).replace(tzinfo=UTC)
-                    local_tz: ZoneInfo = get_localzone()
-                    parsed = dt.astimezone(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")
-                    break
+                    dt = datetime.strptime(str(exif_date), fmt).replace(tzinfo=UTC)
+                    return dt.astimezone(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")
                 except ValueError:
                     continue
-        except (ValueError, TypeError, UnicodeDecodeError) as err:
+            # If no format matched, return raw date string
+            return str(exif_date)
+        except (TypeError, UnicodeDecodeError) as err:
             logger.warning("Could not localize EXIF date: %s", err)
-        return parsed or str(exif_date)
+            return str(exif_date)
+
     # Fallback to filesystem mtime
     try:
         local_tz = get_localzone()
@@ -1973,16 +1971,9 @@ def _format_numeric_display(val: Numberish) -> str:
     """Format numeric-ish values with commas / precision heuristics.
 
     Non-numeric inputs should be pre-converted to str before calling.
+    This is a thin wrapper around fmt_num for consistency.
     """
-    try:
-        num_val = float(val)
-    except (ValueError, TypeError):
-        return str(val)
-    if abs(num_val) >= THOUSAND_THRESHOLD:
-        return f"{num_val:,.0f}"
-    if abs(num_val) >= 1:
-        return f"{num_val:.3g}"
-    return f"{num_val:.2g}"
+    return fmt_num(val)
 
 
 def _build_stat_row(result: PerformanceResult, all_fields: list[str]) -> list[str]:
