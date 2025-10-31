@@ -288,7 +288,7 @@ update_local_mlx_repos() {
 				continue
 			fi
 			
-			# Now install Python bindings
+			# Install Python bindings (pip install uses the already-built CMake artifacts)
 			echo "[update.sh] Installing MLX Python bindings..."
 			if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
 				pip install --force-reinstall -e . || INSTALL_STATUS=$?
@@ -312,6 +312,17 @@ update_local_mlx_repos() {
 	
 		if [[ "${REPO_NAMES[idx]}" == "mlx" ]] && [[ ${REPO_SKIP[idx]} -eq 0 ]]; then
 			echo "[update.sh] Generating type stubs for mlx..."
+			
+			# Ensure setuptools is available (required by setup.py)
+			if ! python -c "import setuptools" 2>/dev/null; then
+				echo "[update.sh] Installing setuptools for stub generation..."
+				pip install setuptools || {
+					echo "⚠️  Failed to install setuptools - skipping stub generation"
+					echo ""
+					continue
+				}
+			fi
+			
 			if python setup.py generate_stubs; then
 				echo "✓ MLX stubs generated successfully"
 			else
