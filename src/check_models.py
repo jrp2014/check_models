@@ -1131,18 +1131,18 @@ def print_version_info(versions: LibraryVersionDict) -> None:
         logger.debug("Skipping system info block: %s", err)
 
 
-# Type aliases and definitions
+# Type aliases and definitions (Python 3.12+ type statement for better scoping)
 T = TypeVar("T")
-ExifValue = Any  # Pillow yields varied scalar / tuple EXIF types; keep permissive
-ExifDict = dict[str | int, ExifValue]
-MetadataDict = dict[str, str | None]
-PathLike = str | Path
-GPSTupleElement = int | float
-GPSTuple = tuple[GPSTupleElement, GPSTupleElement, GPSTupleElement]
-GPSDict = dict[str, ExifValue]  # GPS EXIF data structure
-SystemProfilerDict = dict[str, list[dict[str, Any]]]  # macOS system_profiler JSON structure
-LibraryVersionDict = dict[str, str | None]  # Library name to version mapping (optional values)
-MetricValue = int | float | str | bool | None  # Common scalar metric variants for metrics
+type ExifValue = Any  # Pillow yields varied scalar / tuple EXIF types; keep permissive
+type ExifDict = dict[str | int, ExifValue]
+type MetadataDict = dict[str, str | None]
+type PathLike = str | Path
+type GPSTupleElement = int | float
+type GPSTuple = tuple[GPSTupleElement, GPSTupleElement, GPSTupleElement]
+type GPSDict = dict[str, ExifValue]  # GPS EXIF data structure
+type SystemProfilerDict = dict[str, list[dict[str, Any]]]  # macOS system_profiler JSON structure
+type LibraryVersionDict = dict[str, str | None]  # Library name to version mapping (optional values)
+type MetricValue = int | float | str | bool | None  # Common scalar metric variants for metrics
 
 
 @runtime_checkable
@@ -1152,11 +1152,14 @@ class SupportsGenerationResult(Protocol):  # Minimal attributes we read from Gen
     Using a Protocol keeps typing resilient to upstream changes in the
     concrete GenerationResult while still giving linters strong guarantees
     about the attributes actually consumed here.
+
+    Note: `time` attribute is added dynamically by our code after generation.
     """
 
     text: str | None
     prompt_tokens: int | None
     generation_tokens: int | None
+    time: float | None  # Dynamically added timing attribute
 
 
 class SupportsExifIfd(Protocol):
@@ -1164,12 +1167,6 @@ class SupportsExifIfd(Protocol):
 
     def get_ifd(self, tag: object) -> Mapping[object, Mapping[object, object]] | None:
         """Retrieve a nested IFD mapping by tag identifier."""
-
-    generation_tps: float | None
-    peak_memory: float | None
-    active_memory: float | None
-    cached_memory: float | None
-    time: float | None
 
 
 # Constants - Defaults
@@ -2622,7 +2619,7 @@ def validate_inputs(
     validate_temperature(temp=temperature)
 
 
-def validate_temperature(temp: float) -> None:
+def validate_temperature(*, temp: float) -> None:
     """Validate temperature parameter is within acceptable range."""
     if temp < 0.0:
         msg: str = f"Temperature must be non-negative, got {temp}"
@@ -2636,6 +2633,7 @@ def validate_temperature(temp: float) -> None:
 
 
 def validate_sampling_params(
+    *,  # Force all parameters to be keyword-only for clarity
     top_p: float,
     repetition_penalty: float | None,
 ) -> None:
@@ -2650,6 +2648,7 @@ def validate_sampling_params(
 
 
 def validate_kv_params(
+    *,  # Force all parameters to be keyword-only for clarity
     max_kv_size: int | None,
     kv_bits: int | None,
 ) -> None:
@@ -2663,7 +2662,7 @@ def validate_kv_params(
         raise ValueError(msg)
 
 
-def validate_image_accessible(image_path: PathLike) -> None:
+def validate_image_accessible(*, image_path: PathLike) -> None:
     """Validate image file is accessible and supported."""
     img_path = Path(image_path)
     try:
@@ -2765,9 +2764,9 @@ def _run_model_generation(
         raise ValueError(msg) from gen_err
     end_time = time.perf_counter()
 
-    # Add timing to the GenerationResult object dynamically without tripping linters
-    # Cast to Any so mypy doesn't complain about unknown attribute on upstream type
-    cast("Any", output).time = end_time - start_time
+    # Add timing to the GenerationResult object dynamically
+    # Cast to our Protocol which includes the time attribute we're adding
+    cast("SupportsGenerationResult", output).time = end_time - start_time
 
     mx.eval(model.parameters())
     return output
@@ -3554,6 +3553,7 @@ def _apply_exclusions(
 def process_models(
     args: argparse.Namespace,
     image_path: Path,
+    *,  # Force prompt to be keyword-only for clarity
     prompt: str,
 ) -> list[PerformanceResult]:
     """Resolve the definitive model list and execute each model run.
@@ -3735,7 +3735,7 @@ def main(args: argparse.Namespace) -> None:
 
         prompt = prepare_prompt(args, metadata)
 
-        results = process_models(args, image_path, prompt)
+        results = process_models(args, image_path, prompt=prompt)
 
         finalize_execution(
             args=args,
