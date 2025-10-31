@@ -34,7 +34,6 @@ from typing import (
     NoReturn,
     Protocol,
     Self,
-    TypeVar,
     cast,
     runtime_checkable,
 )
@@ -103,6 +102,10 @@ __all__ = [
     "validate_sampling_params",
     "validate_temperature",
 ]
+
+# =============================================================================
+# MODULE CONSTANTS
+# =============================================================================
 
 LOGGER_NAME: Final[str] = "mlx-vlm-check"
 NOT_AVAILABLE: Final[str] = "N/A"
@@ -242,6 +245,195 @@ try:
     tokenizers_version: str = getattr(tokenizers, "__version__", NOT_AVAILABLE)
 except ImportError:
     tokenizers_version = NOT_AVAILABLE
+
+
+# =============================================================================
+# TYPE ALIASES & PROTOCOLS
+# =============================================================================
+
+type ExifValue = Any  # Pillow yields varied scalar / tuple EXIF types; keep permissive
+type ExifDict = dict[str | int, ExifValue]
+type MetadataDict = dict[str, str | None]
+type PathLike = str | Path
+type GPSTupleElement = int | float
+type GPSTuple = tuple[GPSTupleElement, GPSTupleElement, GPSTupleElement]
+type GPSDict = dict[str, ExifValue]  # GPS EXIF data structure
+type SystemProfilerDict = dict[str, list[dict[str, Any]]]  # macOS system_profiler JSON structure
+type LibraryVersionDict = dict[str, str | None]  # Library name to version mapping (optional values)
+type MetricValue = int | float | str | bool | None  # Common scalar metric variants for metrics
+
+
+@runtime_checkable
+class SupportsGenerationResult(Protocol):  # Minimal attributes we read from GenerationResult
+    """Structural subset of GenerationResult accessed by this script.
+
+    Using a Protocol keeps typing resilient to upstream changes in the
+    concrete GenerationResult while still giving linters strong guarantees
+    about the attributes actually consumed here.
+
+    Note: `time` attribute is added dynamically by our code after generation.
+    """
+
+    text: str | None
+    prompt_tokens: int | None
+    generation_tokens: int | None
+    time: float | None  # Dynamically added timing attribute
+
+
+class SupportsExifIfd(Protocol):
+    """Minimal interface for EXIF objects providing nested IFD access."""
+
+    def get_ifd(self, tag: object) -> Mapping[object, Mapping[object, object]] | None:
+        """Retrieve a nested IFD mapping by tag identifier."""
+
+
+# =============================================================================
+# APPLICATION CONSTANTS & DEFAULTS
+# =============================================================================
+
+# These constants define default values for various parameters used in the script.
+DEFAULT_MAX_TOKENS: Final[int] = 500
+DEFAULT_FOLDER: Final[Path] = Path.home() / "Pictures" / "Processed"
+# Output paths relative to script's directory (not CWD) for consistency
+_SCRIPT_DIR = Path(__file__).parent
+DEFAULT_HTML_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.html"
+DEFAULT_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.md"
+DEFAULT_LOG_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "check_models.log"
+DEFAULT_TEMPERATURE: Final[float] = 0.1
+DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
+MAX_REASONABLE_TEMPERATURE: Final[float] = 2.0  # Warn if temperature exceeds this
+
+# Constants - EXIF
+EXIF_IMAGE_DESCRIPTION_TAG: Final[int] = 270  # Standard EXIF tag ID for ImageDescription
+IMPORTANT_EXIF_TAGS: Final[frozenset[str]] = frozenset(
+    {
+        "DateTimeOriginal",
+        "ImageDescription",
+        "CreateDate",
+        "Make",
+        "Model",
+        "LensModel",
+        "ExposureTime",
+        "FNumber",
+        "ISOSpeedRatings",
+        "FocalLength",
+        "ExposureProgram",
+    },
+)
+DATE_FORMATS: Final[tuple[str, ...]] = (
+    "%Y:%m:%d %H:%M:%S",
+    "%Y-%m-%d %H:%M:%S",
+    "%Y%m%d",
+)
+EXIF_DATE_TAGS: Final[tuple[str, ...]] = (
+    "DateTimeOriginal",
+    "CreateDate",
+    "DateTime",
+)
+
+
+# =============================================================================
+# DATA CLASSES
+# =============================================================================
+
+
+@dataclass(frozen=True)
+class PerformanceResult:
+    """Encapsulates a GenerationResult and execution metadata for a model run."""
+
+    model_name: str
+    generation: GenerationResult | SupportsGenerationResult | None
+    success: bool
+    error_stage: str | None = None
+    error_message: str | None = None
+    captured_output_on_fail: str | None = None
+    generation_time: float | None = None  # Time taken for generation in seconds
+    model_load_time: float | None = None  # Time taken to load the model in seconds
+    total_time: float | None = None  # Total time including model loading
+
+
+class ResultSet:
+    """Cache-friendly wrapper around a collection of PerformanceResult.
+
+    Provides:
+        - Single-pass sorting by generation time (fastest first)
+        - Lazy discovery/caching of available metric fields (generation + timing)
+        - Simple iteration / length protocol support
+
+    Rationale: Multiple rendering paths previously repeated the same sort
+    and field extraction logic. Centralizing reduces duplication and
+    guarantees consistent ordering across console, HTML, and Markdown
+    outputs.
+    """
+
+    __slots__ = ("_fields", "_results")  # Sorted for lint consistency
+
+    def __init__(self, results: list[PerformanceResult]) -> None:
+        """Initialize and sort results.
+
+        A shallow copy of ``results`` is taken to guard against external
+        mutation after construction.
+        """
+        self._results = _sort_results_by_time(list(results))
+        self._fields: list[str] | None = None
+
+    # Public API -----------------------------------------------------
+    @property
+    def results(self) -> list[PerformanceResult]:  # Sorted
+        """Return results sorted by generation time (fastest first)."""
+        return self._results
+
+    def fields(self) -> list[str]:
+        """Return cached list of metric field names (generation + timing)."""
+        if self._fields is None:
+            self._fields = _get_available_fields(self._results)
+        return self._fields
+
+    # Dunder conveniences --------------------------------------------
+    def __len__(self) -> int:  # pragma: no cover - trivial
+        """Return number of results."""
+        return len(self._results)
+
+    def __iter__(self) -> Iterator[PerformanceResult]:  # pragma: no cover - trivial
+        """Iterate over sorted results."""
+        return iter(self._results)
+
+
+class ProcessImageParams(NamedTuple):
+    """Parameters for processing an image with a model.
+
+    Centralizes all parameters needed for model inference into a single
+    immutable structure. This approach:
+        - Reduces function signature complexity (single param vs many)
+        - Makes parameter passing explicit and type-safe
+        - Simplifies testing (one object to mock/construct)
+        - Documents expected inputs clearly
+
+    Note: Using NamedTuple instead of dataclass for lightweight immutability
+    and automatic tuple unpacking support if needed.
+    """
+
+    model_identifier: str
+    image_path: Path
+    prompt: str
+    max_tokens: int
+    temperature: float
+    timeout: float
+    verbose: bool
+    trust_remote_code: bool
+    top_p: float
+    repetition_penalty: float | None
+    repetition_context_size: int
+    lazy: bool
+    max_kv_size: int | None
+    kv_bits: int | None
+    kv_group_size: int
+    quantized_kv_start: int
+
+
+# =============================================================================
+# INFRASTRUCTURE: Timeouts, Colors, Logging
+# =============================================================================
 
 
 # Custom timeout context manager
@@ -1129,151 +1321,6 @@ def print_version_info(versions: LibraryVersionDict) -> None:
             logger.info(line)
     except Exception as err:  # noqa: BLE001 - system info is non-critical, intentionally catch all failure modes
         logger.debug("Skipping system info block: %s", err)
-
-
-# Type aliases and definitions (Python 3.12+ type statement for better scoping)
-T = TypeVar("T")
-type ExifValue = Any  # Pillow yields varied scalar / tuple EXIF types; keep permissive
-type ExifDict = dict[str | int, ExifValue]
-type MetadataDict = dict[str, str | None]
-type PathLike = str | Path
-type GPSTupleElement = int | float
-type GPSTuple = tuple[GPSTupleElement, GPSTupleElement, GPSTupleElement]
-type GPSDict = dict[str, ExifValue]  # GPS EXIF data structure
-type SystemProfilerDict = dict[str, list[dict[str, Any]]]  # macOS system_profiler JSON structure
-type LibraryVersionDict = dict[str, str | None]  # Library name to version mapping (optional values)
-type MetricValue = int | float | str | bool | None  # Common scalar metric variants for metrics
-
-
-@runtime_checkable
-class SupportsGenerationResult(Protocol):  # Minimal attributes we read from GenerationResult
-    """Structural subset of GenerationResult accessed by this script.
-
-    Using a Protocol keeps typing resilient to upstream changes in the
-    concrete GenerationResult while still giving linters strong guarantees
-    about the attributes actually consumed here.
-
-    Note: `time` attribute is added dynamically by our code after generation.
-    """
-
-    text: str | None
-    prompt_tokens: int | None
-    generation_tokens: int | None
-    time: float | None  # Dynamically added timing attribute
-
-
-class SupportsExifIfd(Protocol):
-    """Minimal interface for EXIF objects providing nested IFD access."""
-
-    def get_ifd(self, tag: object) -> Mapping[object, Mapping[object, object]] | None:
-        """Retrieve a nested IFD mapping by tag identifier."""
-
-
-# Constants - Defaults
-# These constants define default values for various parameters used in the script.
-DEFAULT_MAX_TOKENS: Final[int] = 500
-DEFAULT_FOLDER: Final[Path] = Path.home() / "Pictures" / "Processed"
-# Output paths relative to script's directory (not CWD) for consistency
-_SCRIPT_DIR = Path(__file__).parent
-DEFAULT_HTML_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.html"
-DEFAULT_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.md"
-DEFAULT_LOG_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "check_models.log"
-DEFAULT_TEMPERATURE: Final[float] = 0.1
-DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
-MAX_REASONABLE_TEMPERATURE: Final[float] = 2.0  # Warn if temperature exceeds this
-
-# Constants - EXIF
-EXIF_IMAGE_DESCRIPTION_TAG: Final[int] = 270  # Standard EXIF tag ID for ImageDescription
-IMPORTANT_EXIF_TAGS: Final[frozenset[str]] = frozenset(
-    {
-        "DateTimeOriginal",
-        "ImageDescription",
-        "CreateDate",
-        "Make",
-        "Model",
-        "LensModel",
-        "ExposureTime",
-        "FNumber",
-        "ISOSpeedRatings",
-        "FocalLength",
-        "ExposureProgram",
-    },
-)
-DATE_FORMATS: Final[tuple[str, ...]] = (
-    "%Y:%m:%d %H:%M:%S",
-    "%Y-%m-%d %H:%M:%S",
-    "%Y%m%d",
-)
-EXIF_DATE_TAGS: Final[tuple[str, ...]] = (
-    "DateTimeOriginal",
-    "CreateDate",
-    "DateTime",
-)
-
-
-# Type definitions
-
-
-@dataclass(frozen=True)
-class PerformanceResult:
-    """Encapsulates a GenerationResult and execution metadata for a model run."""
-
-    model_name: str
-    generation: GenerationResult | SupportsGenerationResult | None
-    success: bool
-    error_stage: str | None = None
-    error_message: str | None = None
-    captured_output_on_fail: str | None = None
-    generation_time: float | None = None  # Time taken for generation in seconds
-    model_load_time: float | None = None  # Time taken to load the model in seconds
-    total_time: float | None = None  # Total time including model loading
-
-
-class ResultSet:
-    """Cache-friendly wrapper around a collection of PerformanceResult.
-
-    Provides:
-        - Single-pass sorting by generation time (fastest first)
-        - Lazy discovery/caching of available metric fields (generation + timing)
-        - Simple iteration / length protocol support
-
-    Rationale: Multiple rendering paths previously repeated the same sort
-    and field extraction logic. Centralizing reduces duplication and
-    guarantees consistent ordering across console, HTML, and Markdown
-    outputs.
-    """
-
-    __slots__ = ("_fields", "_results")  # Sorted for lint consistency
-
-    def __init__(self, results: list[PerformanceResult]) -> None:
-        """Initialize and sort results.
-
-        A shallow copy of ``results`` is taken to guard against external
-        mutation after construction.
-        """
-        self._results = _sort_results_by_time(list(results))
-        self._fields: list[str] | None = None
-
-    # Public API -----------------------------------------------------
-    @property
-    def results(self) -> list[PerformanceResult]:  # Sorted
-        """Return results sorted by generation time (fastest first)."""
-        return self._results
-
-    def fields(self) -> list[str]:
-        """Return cached list of metric field names (generation + timing)."""
-        if self._fields is None:
-            self._fields = _get_available_fields(self._results)
-        return self._fields
-
-    # Dunder conveniences --------------------------------------------
-    def __len__(self) -> int:  # pragma: no cover - trivial
-        """Return number of results."""
-        return len(self._results)
-
-    def __iter__(self) -> Iterator[PerformanceResult]:  # pragma: no cover - trivial
-        """Iterate over sorted results."""
-        return iter(self._results)
 
 
 # =============================================================================
@@ -2770,47 +2817,6 @@ def _run_model_generation(
 
     mx.eval(model.parameters())
     return output
-
-
-class ProcessImageParams(NamedTuple):
-    """Parameters for processing an image with a VLM.
-
-    Attributes:
-        model_identifier: Model path or identifier.
-        image_path: Path to the image file.
-        prompt: Prompt string for the model.
-        max_tokens: Maximum tokens to generate.
-        temperature: Sampling temperature.
-        timeout: Timeout in seconds.
-        verbose: Verbose/debug flag.
-        trust_remote_code: Allow remote code execution.
-        top_p: Nucleus sampling parameter.
-        repetition_penalty: Repetition penalty (None to disable).
-        repetition_context_size: Context window for repetition penalty.
-        lazy: Use lazy loading for models.
-        max_kv_size: Maximum KV cache size.
-        kv_bits: KV cache quantization bits.
-        kv_group_size: KV cache quantization group size.
-        quantized_kv_start: Start position for KV quantization.
-
-    """
-
-    model_identifier: str
-    image_path: Path
-    prompt: str
-    max_tokens: int
-    temperature: float
-    timeout: float
-    verbose: bool
-    trust_remote_code: bool
-    top_p: float
-    repetition_penalty: float | None
-    repetition_context_size: int
-    lazy: bool
-    max_kv_size: int | None
-    kv_bits: int | None
-    kv_group_size: int
-    quantized_kv_start: int
 
 
 def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
