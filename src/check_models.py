@@ -1173,6 +1173,7 @@ DEFAULT_MAX_TOKENS: Final[int] = 500
 DEFAULT_FOLDER: Final[Path] = Path.home() / "Pictures" / "Processed"
 DEFAULT_HTML_OUTPUT: Final[Path] = Path("output/results.html")
 DEFAULT_MD_OUTPUT: Final[Path] = Path("output/results.md")
+DEFAULT_LOG_OUTPUT: Final[Path] = Path("output/check_models.log")
 DEFAULT_TEMPERATURE: Final[float] = 0.1
 DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
 MAX_REASONABLE_TEMPERATURE: Final[float] = 2.0  # Warn if temperature exceeds this
@@ -3239,17 +3240,31 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
 
     # Set DEBUG if verbose, else WARNING
     log_level: int = logging.DEBUG if args.verbose else logging.INFO
-    # Remove all handlers and add only one
+    # Remove all handlers and add console + file handlers
     logger.handlers.clear()
-    handler: logging.StreamHandler[Any] = logging.StreamHandler(sys.stderr)
+
+    # Console handler with colored output
+    console_handler: logging.StreamHandler[Any] = logging.StreamHandler(sys.stderr)
     # Include timestamp for better traceability, level in verbose mode
     if args.verbose:
         fmt = "%(asctime)s - %(levelname)s - %(message)s"
     else:
         fmt = "%(asctime)s - %(message)s"
-    formatter: ColoredFormatter = ColoredFormatter(fmt)
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
+    console_formatter: ColoredFormatter = ColoredFormatter(fmt)
+    console_handler.setFormatter(console_formatter)
+    logger.addHandler(console_handler)
+
+    # File handler - write to specified log file (overwrite each run)
+    log_file: Path = args.output_log.resolve()
+    log_file.parent.mkdir(parents=True, exist_ok=True)
+    file_handler: logging.FileHandler = logging.FileHandler(log_file, mode="w", encoding="utf-8")
+    # File gets full timestamp + level always (no colors in file)
+    file_formatter: logging.Formatter = logging.Formatter(
+        "%(asctime)s - %(levelname)s - %(message)s",
+    )
+    file_handler.setFormatter(file_formatter)
+    logger.addHandler(file_handler)
+
     logger.setLevel(log_level)
     logger.propagate = False  # Prevent double logging
 
@@ -3654,6 +3669,8 @@ def finalize_execution(
             )
             logger.info("   HTML:     %s", Colors.colored(str(html_output_path), Colors.CYAN))
             logger.info("   Markdown: %s", Colors.colored(str(md_output_path), Colors.CYAN))
+            log_output = args.output_log.resolve()
+            logger.info("   Log:      %s", Colors.colored(str(log_output), Colors.CYAN))
         except (OSError, ValueError):
             logger.exception("Failed to generate reports.")
     else:
@@ -3729,6 +3746,12 @@ def main_cli() -> None:
         type=Path,
         default=DEFAULT_MD_OUTPUT,
         help="Output Github Markdown report file.",
+    )
+    parser.add_argument(
+        "--output-log",
+        type=Path,
+        default=DEFAULT_LOG_OUTPUT,
+        help="Output log file (overwritten each run).",
     )
     parser.add_argument(
         "-m",
