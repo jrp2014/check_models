@@ -140,9 +140,13 @@ except ImportError:
 ExifTags: Any
 GPSTAGS: Mapping[Any, Any]
 TAGS: Mapping[Any, Any]
+UnidentifiedImageError: type[Exception]
 
 try:
-    from PIL import Image, UnidentifiedImageError
+    from PIL import Image
+    from PIL import UnidentifiedImageError as _PILUnidentifiedImageError
+
+    UnidentifiedImageError = _PILUnidentifiedImageError
 except ImportError:
     pillow_version = NOT_AVAILABLE
 
@@ -178,11 +182,15 @@ else:
     GPSTAGS = PIL_GPSTAGS
     TAGS = PIL_TAGS
 
+vlm_version: str
+
 try:
     from mlx_vlm.generate import generate
     from mlx_vlm.prompt_utils import apply_chat_template
     from mlx_vlm.utils import load
-    from mlx_vlm.version import __version__ as vlm_version
+    from mlx_vlm.version import __version__ as _mlx_vlm_version
+
+    vlm_version = _mlx_vlm_version
 except ImportError:
     vlm_version = NOT_AVAILABLE
 
@@ -3341,6 +3349,7 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
             f"Could not find the most recent image file in {folder_path}. Exiting.",
         )
 
+    # At this point image_path is guaranteed to be Path (not None) due to exit above
     resolved_image_path: Path = image_path.resolve()
     print_cli_section(f"Image File: {Colors.colored(str(resolved_image_path), Colors.MAGENTA)}")
 
