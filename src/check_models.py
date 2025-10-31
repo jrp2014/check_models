@@ -143,6 +143,7 @@ ExifTags: Any
 GPSTAGS: Mapping[Any, Any]
 TAGS: Mapping[Any, Any]
 UnidentifiedImageError: type[Exception]
+GPS: Any  # Type annotation for GPS enum (defined below based on Pillow availability)
 
 try:
     from PIL import Image
@@ -171,16 +172,19 @@ except ImportError:
     ExifTags = _ExifTagsUnavailable()
     Image = cast("Any", _ImageUnavailable())
     UnidentifiedImageError = _PILUnavailableError
+    GPS = cast("Any", None)  # GPS enum unavailable when Pillow missing
     GPSTAGS = {}
     TAGS = {}
     MISSING_DEPENDENCIES["Pillow"] = ERROR_PILLOW_MISSING
 else:
     from PIL import ExifTags as PIL_ExifTags
+    from PIL.ExifTags import GPS as PIL_GPS
     from PIL.ExifTags import GPSTAGS as PIL_GPSTAGS
     from PIL.ExifTags import TAGS as PIL_TAGS
 
     pillow_version = Image.__version__ if hasattr(Image, "__version__") else NOT_AVAILABLE
     ExifTags = PIL_ExifTags
+    GPS = PIL_GPS
     GPSTAGS = PIL_GPSTAGS
     TAGS = PIL_TAGS
 
@@ -303,7 +307,7 @@ DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
 MAX_REASONABLE_TEMPERATURE: Final[float] = 2.0  # Warn if temperature exceeds this
 
 # Constants - EXIF
-EXIF_IMAGE_DESCRIPTION_TAG: Final[int] = 270  # Standard EXIF tag ID for ImageDescription
+# Use Pillow's modern ExifTags enums (Pillow 10.0+) for type safety
 IMPORTANT_EXIF_TAGS: Final[frozenset[str]] = frozenset(
     {
         "DateTimeOriginal",
@@ -1420,10 +1424,12 @@ def _process_gps_ifd(exif_raw: SupportsExifIfd) -> GPSDict | None:
         if isinstance(gps_ifd, dict) and gps_ifd:
             gps_decoded: GPSDict = {}
             for gps_tag_id, gps_value in gps_ifd.items():
+                # Use modern Pillow GPS enum (10.0+) for type-safe tag name resolution
                 try:
+                    gps_key = GPS(int(gps_tag_id)).name
+                except (ValueError, TypeError):
+                    # Fallback to dict lookup for unknown tags
                     gps_key = GPSTAGS.get(int(gps_tag_id), str(gps_tag_id))
-                except (KeyError, ValueError, TypeError):
-                    gps_key = str(gps_tag_id)
                 gps_decoded[str(gps_key)] = gps_value
             return gps_decoded
     except (KeyError, AttributeError, TypeError) as gps_err:
@@ -2001,31 +2007,24 @@ def _build_stat_row(result: PerformanceResult, all_fields: list[str]) -> list[st
     return row
 
 
-def _compute_column_widths(field_names: list[str]) -> list[int]:
-    """Compute per-column width hints based on field naming heuristics."""
-    widths: list[int] = []
+def _compute_column_widths(field_names: list[str]) -> list[int | None]:
+    """Compute per-column width hints based on field naming heuristics.
+
+    Returns a list with explicit widths for critical columns (model, output)
+    and None for numeric columns to enable tabulate's intelligent auto-sizing.
+    """
+    widths: list[int | None] = []
     term_w = get_terminal_width()
     # Allocate generous space for output/error messages - prioritize readability
     out_w = max(60, min(120, int(term_w * 0.6)))
     for idx, name in enumerate(field_names):
-        if idx == 0:  # Model column - increased for longer model names
+        if idx == 0:  # Model column - keep explicit width for consistency
             widths.append(35)
         elif name == "output":
             widths.append(out_w)
-        elif name == "peak_memory":
-            widths.append(7)
-        elif name in {"tokens", "prompt_tokens", "generation_tokens", "total_tokens"}:
-            widths.append(9)
-        elif name in {
-            "prompt_tps",
-            "generation_tps",
-            "generation_time",
-            "model_load_time",
-            "total_time",
-        }:
-            widths.append(6)
         else:
-            widths.append(4)
+            # Let tabulate auto-size numeric and other columns intelligently
+            widths.append(None)
     return widths
 
 
