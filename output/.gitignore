@@ -1,6 +1,0 @@
-# Ignore all generated reports
-*.html
-*.md
-
-# Keep the README
-!README.md
