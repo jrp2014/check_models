@@ -2421,10 +2421,10 @@ def generate_markdown_report(
     md.append(f"**Overall runtime:** {format_overall_runtime(total_runtime_seconds)}\n")
     md.append("")
     # Surround the table with markdownlint rule guards; the table can be wide and may
-    # contain HTML breaks
-    md.append("<!-- markdownlint-disable MD013 MD033 MD037 -->")
+    # contain HTML breaks and model-generated emphasis styles
+    md.append("<!-- markdownlint-disable MD013 MD033 MD034 MD037 MD049 -->")
     md.append(markdown_table)
-    md.append("<!-- markdownlint-enable MD013 MD033 MD037 -->")
+    md.append("<!-- markdownlint-enable MD013 MD033 MD034 MD037 MD049 -->")
     md.append("\n---\n")
     md.append("## Library Versions\n")
     for name, ver in sorted(versions.items()):
@@ -2460,7 +2460,7 @@ def _escape_markdown_in_text(text: str) -> str:
 
     Minimal escaping avoids noisy backslashes while preserving readability.
     Newlines are replaced with ``<br>`` so multi-line outputs don't break the
-    pipe table layout.
+    pipe table layout. Bare URLs are wrapped in angle brackets for MD034 compliance.
     """
     # First, convert newlines to HTML <br> tags to preserve line structure
     # Handle different newline formats consistently
@@ -2469,6 +2469,9 @@ def _escape_markdown_in_text(text: str) -> str:
     # Clean up multiple consecutive <br> tags and normalize spacing
     result = re.sub(r"(<br>\s*){2,}", "<br><br>", result)  # Max 2 consecutive line breaks
     result = re.sub(r"\s+", " ", result).strip()  # Normalize other whitespace
+
+    # Wrap bare URLs in angle brackets (MD034 compliance)
+    result = _wrap_bare_urls(result)
 
     # Escape only the critical markdown characters that break table formatting, PLUS
     # neutralize raw HTML tag markers (<tag>) which GitHub may treat as HTML
@@ -2492,6 +2495,7 @@ def _escape_markdown_diagnostics(text: str) -> str:
 
     Behavior:
     - Convert newlines to <br> to keep table rows intact.
+    - Wrap bare URLs in angle brackets to satisfy markdownlint MD034.
     - Escape characters that commonly trigger Markdown formatting in diagnostics: *, _, `, ~, and |.
     - Neutralize HTML-like tags except for a safe inline subset defined in allowed_inline_tags.
     - Do NOT collapse general whitespace, to avoid losing error message detail.
@@ -2501,6 +2505,9 @@ def _escape_markdown_diagnostics(text: str) -> str:
 
     # Limit excessive consecutive <br> while preserving intentional blank lines
     result = re.sub(r"(<br>\s*){3,}", "<br><br>", result)
+
+    # Wrap bare URLs in angle brackets (MD034 compliance)
+    result = _wrap_bare_urls(result)
 
     # Escape characters with special meaning in Markdown and table structure
     escape_map = {
@@ -2518,6 +2525,22 @@ def _escape_markdown_diagnostics(text: str) -> str:
 
     # Escape bare ampersands (avoid starting entities)
     return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
+
+
+def _wrap_bare_urls(text: str) -> str:
+    """Wrap bare URLs in angle brackets to satisfy markdownlint MD034.
+
+    URLs are wrapped as <URL> which tells markdown processors they are autolinks.
+    This prevents MD034 "Bare URL used" warnings.
+    """
+    # Match http:// or https:// URLs that aren't already in angle brackets or markdown links
+    # Pattern: not preceded by [ or <, then URL, not followed by ] or >
+    url_pattern = re.compile(
+        r"(?<![\[<])"  # Negative lookbehind: not [ or <
+        r"(https?://[^\s\)>\]]+)"  # URL (not followed by space, ), >, or ])
+        r"(?![\]>])",  # Negative lookahead: not ] or >
+    )
+    return url_pattern.sub(r"<\1>", text)
 
 
 def normalize_markdown_trailing_spaces(md_text: str) -> str:
