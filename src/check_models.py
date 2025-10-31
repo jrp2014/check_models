@@ -1171,9 +1171,11 @@ class SupportsExifIfd(Protocol):
 # These constants define default values for various parameters used in the script.
 DEFAULT_MAX_TOKENS: Final[int] = 500
 DEFAULT_FOLDER: Final[Path] = Path.home() / "Pictures" / "Processed"
-DEFAULT_HTML_OUTPUT: Final[Path] = Path("output/results.html")
-DEFAULT_MD_OUTPUT: Final[Path] = Path("output/results.md")
-DEFAULT_LOG_OUTPUT: Final[Path] = Path("output/check_models.log")
+# Output paths relative to script's parent directory (not CWD) for consistency
+_SCRIPT_PARENT = Path(__file__).parent.parent
+DEFAULT_HTML_OUTPUT: Final[Path] = _SCRIPT_PARENT / "output" / "results.html"
+DEFAULT_MD_OUTPUT: Final[Path] = _SCRIPT_PARENT / "output" / "results.md"
+DEFAULT_LOG_OUTPUT: Final[Path] = _SCRIPT_PARENT / "output" / "check_models.log"
 DEFAULT_TEMPERATURE: Final[float] = 0.1
 DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
 MAX_REASONABLE_TEMPERATURE: Final[float] = 2.0  # Warn if temperature exceeds this
