@@ -771,9 +771,7 @@ def local_now_str(fmt: str = "%Y-%m-%d %H:%M:%S %Z") -> str:
     return datetime.now(get_localzone()).strftime(fmt)
 
 
-def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: PLR0911
-    # Multiple early returns keep formatting branches (memory/time/tps/numeric/string)
-    # linear and readable without nested condition accumulation.
+def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: PLR0911 - dispatcher with 8 return branches (memory/time/tps/numeric/string)
     """Normalize and format field values for display.
 
     Rules:
@@ -1129,8 +1127,7 @@ def print_version_info(versions: LibraryVersionDict) -> None:
         ]
         for line in sys_lines:
             logger.info(line)
-    except Exception as err:  # noqa: BLE001
-        # Broad catch intentional: system info is non-critical, many failure modes
+    except Exception as err:  # noqa: BLE001 - system info is non-critical, intentionally catch all failure modes
         logger.debug("Skipping system info block: %s", err)
 
 
