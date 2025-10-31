@@ -18,7 +18,7 @@ When you run `check_models.py`, the script provides rich terminal output with co
 
 ### Startup Phase
 
-```
+```console
 ╔══════════════════════════════════════════╗
 ║ MLX Vision Language Model Check          ║
 ╚══════════════════════════════════════════╝
@@ -45,7 +45,7 @@ Hardware:
 
 If the image contains EXIF data:
 
-```
+```console
 📷 Image Metadata (photo.jpg)
 ────────────────────────────────────
 Make:           Apple
@@ -59,7 +59,7 @@ GPS Longitude:  122.4194° W
 
 For each model tested:
 
-```
+```console
 ✓ qwen2-vl-7b-instruct               [Success]
   Tokens: 150 | Gen: 42 | TPS: 85.3 | Time: 2.5s
   Output: "A beautiful sunset over..."
@@ -69,6 +69,7 @@ For each model tested:
 ```
 
 **Visual Indicators:**
+
 - `✓` (green) - Successful inference
 - `✗` (red) - Failed inference
 - Color-coded output:
@@ -81,7 +82,7 @@ For each model tested:
 
 After all models complete, a formatted table displays results:
 
-```
+```console
 ╔════════════════════════════════════════════════════════════════╗
 ║                      Model Performance Summary                  ║
 ╚════════════════════════════════════════════════════════════════╝
@@ -98,6 +99,7 @@ Success rate: 2/3 (66.7%)
 ```
 
 **Column Descriptions:**
+
 - **Model** - Model identifier with success/fail indicator
 - **Tokens** - Total prompt tokens processed
 - **Gen** - Generation tokens produced
@@ -107,7 +109,7 @@ Success rate: 2/3 (66.7%)
 
 ### Finalization Phase
 
-```
+```console
 💾 Reports generated:
    • HTML: src/output/results.html
    • Markdown: src/output/results.md
@@ -126,6 +128,7 @@ The script supports different verbosity levels via `--log-level`:
 - `CRITICAL` - Fatal errors that stop execution
 
 Example:
+
 ```bash
 python src/check_models.py --log-level DEBUG
 ```
@@ -139,6 +142,7 @@ python src/check_models.py --output-log src/output/results.log
 ```
 
 The log file contains the same information as terminal output but in plain text format, suitable for:
+
 - Post-execution analysis
 - CI/CD pipeline integration
 - Archiving run history
