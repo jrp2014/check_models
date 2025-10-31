@@ -96,7 +96,7 @@ skip-magic-trailing-comma = false
 
 [tool.ruff.lint]
 # D203 and D213 are explicitly excluded to avoid incompatibility warnings with D211 and D212.
-# Select all rules and then ignore the ones that are incompatible or too noisy.
+# Select ALL rules for maximum rigor, then ignore only the truly necessary exceptions.
 extend-select = ["B"]
 select = ["ALL"]
 ignore = [
@@ -104,22 +104,32 @@ ignore = [
     "ISC001",  # Conflicts with formatter
     "D203",    # Conflicts with D211
     "D213",    # Conflicts with D212
-    "D100", "D101", "D102", "D103", "D104", "D105", "D106", "D107", # Missing docstrings
-    "S101",    # Use of assert
-    "E501",    # Line too long (allow longer lines for now)
-    "PLR0913", # Too many arguments (temporarily tolerated)
-    # NOTE: Previously ignored complexity/branch rules (C901, PLR0912, PLR0915) reinstated.
+    "D100", "D101", "D102", "D103", "D104", "D105", "D106", "D107", # Missing docstrings (too noisy for scripts)
+    "S101",    # Use of assert (needed for tests)
+    "E501",    # Line too long (formatter handles this)
+    # NOTE: Complexity rules (C901, PLR0912, PLR0915, PLR0913) are ENFORCED with per-file exceptions only
 ]
 
 [tool.ruff.lint.mccabe]
 max-complexity = 15
 
 [tool.ruff.lint.per-file-ignores]
-# Allow higher complexity in the central orchestrator script for now; revisit later.
-"check_models.py" = ["C901"]
+# check_models.py: Allow complexity only where truly needed (main orchestration)
+# Individual functions should still respect complexity limits
+"check_models.py" = [
+    "C901",     # Function complexity (main processing loops)
+    "PLR0913",  # Too many arguments (ProcessImageParams has many fields)
+]
+# check_quality.py: Quality checker orchestration
+"tools/check_quality.py" = [
+    "C901",     # Function complexity (main check orchestration)
+    "PLR0912",  # Too many branches (check orchestration)
+    "PLR0915",  # Too many statements (check orchestration)
+]
 # CLI tools: allow print statements for user output
 "tools/check_outdated.py" = ["T201"]
 "tools/validate_env.py" = ["T201"]
+"tools/smoke_test.py" = ["T201"]
 # Test files: allow assert statements and magic numbers
 "tests/**" = ["S101", "PLR2004"]
 
@@ -132,28 +142,35 @@ reportMissingImports = true
 reportUnusedImport = "warning"
 
 [tool.mypy]
-# MyPy configuration
+# MyPy configuration - STRICT mode for high-quality type checking
 # See: https://mypy.readthedocs.io/en/stable/config_file.html
 python_version = "3.13"
 ignore_missing_imports = true
-# Additional strictness flags (incremental tightening)
-warn_unused_ignores = true
-no_implicit_optional = true
+
+# Strictness flags - comprehensive type safety
+warn_unused_ignores = true              # Catch unnecessary # type: ignore comments
+no_implicit_optional = true             # Require explicit Optional[T] for None defaults
+warn_return_any = true                  # Flag functions returning Any
+warn_unused_configs = true              # Catch typos in mypy config
+warn_redundant_casts = true             # Catch unnecessary cast() calls
+warn_unreachable = true                 # Catch dead code paths
+strict_optional = true                  # Strict None checking
+check_untyped_defs = true               # Check function bodies even without annotations
+disallow_any_generics = true            # Require type parameters for generics (e.g., list[int] not list)
+disallow_incomplete_defs = true         # All functions must have complete type annotations
+disallow_subclassing_any = true         # Prevent subclassing Any (catches errors)
+warn_no_return = true                   # Warn if function has return statement but no return type
+
 # Search path for local type stubs (generated via stubgen into ../typings)
 # Points to project root typings/ directory relative to src/
 mypy_path = ["../typings"]
+
 # Exclude third-party stub trees that may contain incomplete or conflicting definitions
 # Use absolute path pattern to exclude tokenizers stubs
 exclude = ["typings"]
+
 # Do not descend into imports; treat imported modules as 'Any' unless stubs exist
 follow_imports = "skip"
-# For stricter checking, you can enable the following:
-# disallow_untyped_defs = true
-warn_return_any = true
-warn_unused_configs = true
-warn_redundant_casts = true
-warn_unreachable = true
-strict_optional = true
 
 # Explicitly silence external packages commonly used here
 [[tool.mypy.overrides]]

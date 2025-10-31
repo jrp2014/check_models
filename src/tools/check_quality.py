@@ -1,16 +1,44 @@
 #!/usr/bin/env python3
-"""Quality checks runner for this repository.
+"""Quality checks runner for this repository - STRICT MODE.
 
-Runs code formatting and static analysis tools with sensible defaults:
+Runs comprehensive code quality checks with rigorous standards:
 
-- ruff format (default; use --no-format to skip)
-- ruff check (auto-fix enabled by default; use --no-fix to disable)
-- mypy type checking
+1. Type Stub Generation (mlx_vlm)
+   - Ensures type hints available for third-party libraries
+
+2. ruff format (CHECK mode)
+   - Fails if code needs formatting (no auto-fix)
+   - Enforces consistent code style
+
+3. ruff check (ALL rules enabled)
+   - Comprehensive linting with full rule set
+   - Auto-fix available with --fix (default: check-only)
+   - Complexity limits: max-complexity=15, enforced per-function
+
+4. markdownlint-cli2
+   - Documentation quality and consistency
+   - Ensures proper markdown formatting
+
+5. mypy (STRICT mode)
+   - check_untyped_defs: Check all function bodies
+   - disallow_any_generics: Require type parameters (e.g., list[int])
+   - disallow_incomplete_defs: All functions must have complete annotations
+   - warn_return_any: Flag functions returning Any
+   - warn_redundant_casts: Catch unnecessary cast() calls
+   - warn_unreachable: Catch dead code paths
 
 You can target specific paths; by default it runs only on `check_models.py`.
 
-Exit status is non-zero if any executed check fails. Missing tools are
-reported as warnings and skipped (use --require to fail if missing).
+Exit status is non-zero if ANY check fails. Missing tools are reported as
+warnings and skipped (use --require to fail if missing).
+
+Options:
+  --no-format       Skip ruff format check
+  --no-fix          Disable auto-fix (strict check-only mode)
+  --no-md           Skip markdownlint
+  --no-stubs        Skip stub generation
+  --require         Fail if required tools are missing
+  --check-stubs     Also type-check the generated stubs
 """
 
 from __future__ import annotations
@@ -272,8 +300,18 @@ def _run_markdownlint(repo_root: Path, *, require: bool) -> int:
     return 1 if require else 0
 
 
-def main(argv: list[str] | None = None) -> int:  # noqa: PLR0912, PLR0915
-    """Run selected quality checks and return combined exit status."""
+def main(argv: list[str] | None = None) -> int:
+    """Run selected quality checks and return combined exit status.
+
+    Quality checks run in order:
+    1. Stub generation (ensures type hints available)
+    2. ruff format (code formatting - CHECK mode, fails if unformatted)
+    3. ruff check (linting with ALL rules enabled)
+    4. markdownlint (documentation quality)
+    5. mypy (strict type checking)
+
+    All checks must pass for overall success.
+    """
     # Basic logging setup
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     args = parse_args(argv or sys.argv[1:])
@@ -283,46 +321,73 @@ def main(argv: list[str] | None = None) -> int:  # noqa: PLR0912, PLR0915
     paths = [str((src_dir / p).resolve()) for p in args.paths]
 
     overall_rc = 0
+    checks_run = 0
+    checks_passed = 0
 
     # Optionally (re)generate stubs prior to mypy
     if not args.no_stubs:
+        checks_run += 1
+        logger.info("[quality] [1/%d] Generating type stubs ...", 5)
         rc = _ensure_stubs(repo_root, refresh=args.refresh_stubs, require=args.require)
         overall_rc = overall_rc or rc
+        if rc == 0:
+            checks_passed += 1
 
-    # Formatter step (default on; disable with --no-format)
+    # Formatter step - CHECK mode (default on; disable with --no-format)
     if not args.no_format:
+        checks_run += 1
         if _have("ruff"):
-            logger.info("[quality] ruff format ...")
-            rc = _run(["ruff", "format", *paths], cwd=repo_root)
+            logger.info("[quality] [2/%d] ruff format (check mode) ...", 5)
+            # Use --check to fail if formatting needed (stricter than auto-format)
+            rc = _run(["ruff", "format", "--check", *paths], cwd=repo_root)
             overall_rc = overall_rc or rc
+            if rc == 0:
+                checks_passed += 1
+            elif rc != 0:
+                logger.warning(
+                    "[quality] ⚠️  Code formatting issues detected. Run 'ruff format %s' to fix.",
+                    " ".join(args.paths),
+                )
         else:
             msg = "[quality] ruff not found; skipping format"
             logger.warning(msg)
             if args.require:
                 overall_rc = 1
 
-    # Ruff check
+    # Ruff check - comprehensive linting with ALL rules
     if _have("ruff"):
-        logger.info("[quality] ruff check ...")
+        checks_run += 1
+        logger.info("[quality] [3/%d] ruff check (all rules) ...", 5)
         cmd = ["ruff", "check", *paths]
+        # Only auto-fix if explicitly allowed (stricter: default is check-only)
         if not args.no_fix:
+            logger.info("[quality]   Auto-fix enabled (--fix)")
             cmd.append("--fix")
+        else:
+            logger.info("[quality]   Check-only mode (no auto-fix)")
         rc = _run(cmd, cwd=repo_root)
         overall_rc = overall_rc or rc
+        if rc == 0:
+            checks_passed += 1
     else:
         msg = "[quality] ruff not found; skipping lint"
         logger.warning(msg)
         if args.require:
             overall_rc = 1
 
-    # markdownlint (via markdownlint-cli2)
+    # markdownlint (via markdownlint-cli2) - documentation quality
     if not args.no_md:
+        checks_run += 1
+        logger.info("[quality] [4/%d] markdownlint (documentation) ...", 5)
         rc_md = _run_markdownlint(repo_root, require=args.require)
         overall_rc = overall_rc or rc_md
+        if rc_md == 0:
+            checks_passed += 1
 
-    # mypy
+    # mypy - strict type checking
     if _have("mypy"):
-        logger.info("[quality] mypy type check ...")
+        checks_run += 1
+        logger.info("[quality] [5/%d] mypy (strict type checking) ...", 5)
         # Explicitly point to the project config to honor mypy_path=typings
         rc = _run(
             [
@@ -331,11 +396,18 @@ def main(argv: list[str] | None = None) -> int:  # noqa: PLR0912, PLR0915
                 str(repo_root / "src/pyproject.toml"),
                 "--exclude",
                 r"typings/tokenizers/.*",
+                "--strict-optional",  # Enforce strict optional handling
+                "--warn-redundant-casts",  # Catch unnecessary casts
+                "--warn-unused-ignores",  # Catch unnecessary suppressions
+                "--warn-return-any",  # Catch functions returning Any
+                "--warn-unreachable",  # Catch unreachable code
                 *paths,
             ],
             cwd=repo_root,
         )
         overall_rc = overall_rc or rc
+        if rc == 0:
+            checks_passed += 1
         # Optionally, also check the stubs package itself
         if args.check_stubs:
             logger.info("[quality] mypy type check (stubs: %s) ...", args.stubs_path)
@@ -355,10 +427,16 @@ def main(argv: list[str] | None = None) -> int:  # noqa: PLR0912, PLR0915
         if args.require:
             overall_rc = 1
 
+    # Summary
+    logger.info("")
+    logger.info("[quality] ═══════════════════════════════════════════")
     if overall_rc == 0:
-        logger.info("[quality] All selected checks passed")
+        logger.info("[quality] ✅ All %d quality checks passed", checks_passed)
+        logger.info("[quality] ═══════════════════════════════════════════")
     else:
-        logger.error("[quality] Checks failed")
+        logger.error("[quality] ❌ %d/%d checks failed", checks_run - checks_passed, checks_run)
+        logger.error("[quality] ═══════════════════════════════════════════")
+        logger.error("[quality] Fix issues above and re-run checks")
     return overall_rc
 
 
