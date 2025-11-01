@@ -156,7 +156,32 @@ The simplified setup is a solid foundation that can be incrementally enhanced if
 | Quality Orchestrator | 444 lines | 20 lines | 95% |
 | Stub Generator | 261 lines | 0 lines | 100% |
 | MyPy Config | 60 lines | 15 lines | 75% |
-| Ruff Config | 40 lines | 15 lines | 62% |
+| Ruff Config | 40 lines | 4 lines | 90% |
 | **Total Infrastructure** | **1,091 lines** | **150 lines** | **85%** |
 
 For a 3,941 line script, quality infrastructure dropped from 28% overhead to 4% overhead.
+
+## Additional Cleanup (2025-11-01)
+
+### Removed Redundant Configuration Files
+
+- **Removed**: `src/__init__.py` - Version never imported, module not a package
+- **Removed**: `src/py.typed` - Only applies to package directories, not single modules
+- **Removed**: `src/requirements.txt` - Redundant with pyproject.toml
+- **Removed**: `src/requirements-dev.txt` - Redundant with pyproject.toml
+- **Updated**: Removed `setuptools.package-data` config from pyproject.toml
+
+**Rationale**: Single source of truth in `pyproject.toml` (PEP 621), no need for dual-file maintenance.
+
+### Expanded Ruff Rule Coverage
+
+- **Changed**: From curated list to `select = ["ALL"]`
+- **Result**: 934 rules across 59 linter categories
+- **Benefits**: Simpler, more maintainable, automatically includes new rules
+- **Exclusions**: Only formatter conflicts and intentional patterns (24 rules)
+
+### Minimized Test Exclusions
+
+- **Before**: Excluded ANN, D, S, PLR2004 for all tests
+- **After**: Only exclude S101 (assert) and D103 (docstrings) for tests
+- **Result**: Tests now checked with 99%+ of rules
