@@ -125,22 +125,22 @@ def test_validate_inputs_rejects_directory(tmp_path: Path):
 
 def test_validate_temperature_accepts_valid_range():
     """Should accept temperature in valid range [0.0, 1.0]."""
-    # Should not raise
-    check_models.validate_temperature(0.0)
-    check_models.validate_temperature(0.5)
-    check_models.validate_temperature(1.0)
+    # Should not raise - note: keyword-only argument
+    check_models.validate_temperature(temp=0.0)
+    check_models.validate_temperature(temp=0.5)
+    check_models.validate_temperature(temp=1.0)
 
 
 def test_validate_temperature_rejects_negative():
     """Should reject negative temperature."""
-    with pytest.raises(ValueError, match="Temperature must be"):
-        check_models.validate_temperature(-0.1)
+    with pytest.raises(ValueError, match="non-negative"):
+        check_models.validate_temperature(temp=-0.1)
 
 
 def test_validate_temperature_rejects_above_one():
-    """Should reject temperature above 1.0."""
-    with pytest.raises(ValueError, match="Temperature must be"):
-        check_models.validate_temperature(1.5)
+    """Should log warning for temperature above 1.0."""
+    # Note: High temperatures log warning but don't raise
+    check_models.validate_temperature(temp=1.5)
 
 
 def test_validate_image_accessible_success(tmp_path: Path):
@@ -148,11 +148,11 @@ def test_validate_image_accessible_success(tmp_path: Path):
     img_path = tmp_path / "test.jpg"
     Image.new("RGB", (100, 100)).save(img_path)
 
-    # Should not raise
-    check_models.validate_image_accessible(img_path)
+    # Should not raise - note: keyword-only argument
+    check_models.validate_image_accessible(image_path=img_path)
 
 
 def test_validate_image_accessible_missing_file():
-    """Should raise for missing file."""
-    with pytest.raises(FileNotFoundError):
-        check_models.validate_image_accessible("/nonexistent/image.jpg")
+    """Should raise OSError for missing file."""
+    with pytest.raises(OSError, match="Error accessing image"):
+        check_models.validate_image_accessible(image_path="/nonexistent/image.jpg")

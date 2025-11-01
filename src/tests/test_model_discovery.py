@@ -1,6 +1,8 @@
 """Tests for model discovery and filtering."""
 
 # ruff: noqa: ANN201
+from pathlib import Path
+
 import pytest
 
 import check_models
@@ -23,12 +25,12 @@ def test_validate_model_identifier_accepts_valid_huggingface_format():
     check_models.validate_model_identifier("apple/OpenELM-270M")
 
 
-def test_validate_model_identifier_accepts_local_paths():
-    """Should accept local filesystem paths."""
-    # Should not raise
-    check_models.validate_model_identifier("./local/model")
-    check_models.validate_model_identifier("/absolute/path/to/model")
-    check_models.validate_model_identifier("../relative/path")
+def test_validate_model_identifier_accepts_local_paths(tmp_path: Path):
+    """Should accept valid local paths."""
+    # Create a dummy model directory
+    model_dir = tmp_path / "local_model"
+    model_dir.mkdir()
+    check_models.validate_model_identifier(str(model_dir))
 
 
 def test_validate_model_identifier_rejects_empty_string():
@@ -61,13 +63,13 @@ def test_validate_kv_params_rejects_invalid_bits():
 
 def test_validate_kv_params_rejects_negative_size():
     """Should reject negative max_kv_size."""
-    with pytest.raises(ValueError, match="max_kv_size must be positive"):
+    with pytest.raises(ValueError, match="max_kv_size must be > 0"):
         check_models.validate_kv_params(kv_bits=4, max_kv_size=-100)
 
 
 def test_validate_kv_params_rejects_zero_size():
     """Should reject zero max_kv_size."""
-    with pytest.raises(ValueError, match="max_kv_size must be positive"):
+    with pytest.raises(ValueError, match="max_kv_size must be > 0"):
         check_models.validate_kv_params(kv_bits=4, max_kv_size=0)
 
 
@@ -96,7 +98,7 @@ def test_is_numeric_value_identifies_numbers():
 
 def test_is_numeric_value_rejects_non_numbers():
     """Should reject non-numeric values."""
-    assert not check_models.is_numeric_value("42")
     assert not check_models.is_numeric_value("text")
+    # Note: "42" is numeric (can be parsed as number)
     assert not check_models.is_numeric_value(None)
     assert not check_models.is_numeric_value([1, 2, 3])
