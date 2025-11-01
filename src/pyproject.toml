@@ -132,13 +132,10 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
-# Tests: allow assert, magic numbers, missing docstrings, and security issues
+# Tests: minimal necessary exclusions
 "tests/**" = [
-    "S101",     # Use of assert
-    "PLR2004",  # Magic values
-    "ANN",      # Type annotations not required in tests
-    "D",        # Docstrings not required in tests
-    "S",        # Security checks not needed in tests
+    "S101",     # Use of assert - required for pytest
+    "D103",     # Missing docstring in public function - test names are self-documenting
 ]
 # Tools: allow print statements, missing docstrings
 "tools/**" = [
