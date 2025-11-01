@@ -48,10 +48,6 @@ mlx-vlm-check = "check_models:main_cli"
 [tool.setuptools]
 py-modules = ["check_models"]
 
-[tool.setuptools.package-data]
-# PEP 561: Include py.typed marker for type checkers
-"*" = ["py.typed"]
-
 [project.optional-dependencies]
 # Optional dependencies grouped by use case.
 extras = [
