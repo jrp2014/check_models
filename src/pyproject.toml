@@ -147,6 +147,10 @@ reportUnusedImport = "warning"
 python_version = "3.13"
 ignore_missing_imports = true
 
+# Avoid "Source file found twice" errors when running from src/ directory
+namespace_packages = true
+explicit_package_bases = true
+
 # Strictness flags - comprehensive type safety
 warn_unused_ignores = true              # Catch unnecessary # type: ignore comments
 no_implicit_optional = true             # Require explicit Optional[T] for None defaults
@@ -165,17 +169,27 @@ warn_no_return = true                   # Warn if function has return statement 
 # Points to project root typings/ directory relative to src/
 mypy_path = ["../typings"]
 
-# Exclude third-party stub trees that may contain incomplete or conflicting definitions
-# Use absolute path pattern to exclude tokenizers stubs
-exclude = ["typings"]
+# Use stubs for type info but don't check them for completeness
+# "silent" means: use the stubs for type checking our code, but don't
+# report errors in the stub files themselves
+follow_imports = "silent"
 
-# Do not descend into imports; treat imported modules as 'Any' unless stubs exist
-follow_imports = "skip"
+# Exclude patterns - prevent mypy from directly analyzing stub files
+exclude = '''
+    (?x)(
+        ^\.\.\/typings\/
+        | ^typings\/
+        | __pycache__
+        | build
+        | dist
+    )
+'''
 
 # Explicitly silence external packages commonly used here
 [[tool.mypy.overrides]]
 module = [
     "mlx_lm.*",
+    "mlx_vlm.*",
     "tokenizers.*",
     "transformers.*",
     "datasets.*",
@@ -184,6 +198,12 @@ module = [
     "psutil.*",
 ]
 ignore_missing_imports = true
+ignore_errors = true
+
+# Test files: relax type checking since tests intentionally test edge cases
+[[tool.mypy.overrides]]
+module = "tests.*"
+disable_error_code = ["arg-type", "misc"]
 
 [tool.pytest.ini_options]
 # Limit test discovery to the dedicated tests package inside the project
