@@ -44,6 +44,7 @@ def test_cli_help_displays():
     """Should display help message with --help."""
     result = subprocess.run(
         [sys.executable, "check_models.py", "--help"],
+        check=False,
         capture_output=True,
         text=True,
         timeout=10,
@@ -58,6 +59,7 @@ def test_cli_help_structure():
     """Should display help text that includes usage information."""
     result = subprocess.run(
         [sys.executable, "check_models.py", "--help"],
+        check=False,
         capture_output=True,
         text=True,
         timeout=10,
@@ -72,6 +74,7 @@ def test_cli_exits_on_nonexistent_folder():
     """Should exit with error when folder does not exist."""
     result = subprocess.run(
         [sys.executable, "check_models.py", "--folder", "/nonexistent/folder/path"],
+        check=False,
         capture_output=True,
         text=True,
         timeout=5,
@@ -81,9 +84,7 @@ def test_cli_exits_on_nonexistent_folder():
     output = result.stdout + result.stderr
     # Check for error message about missing folder
     assert (
-        "folder" in output.lower()
-        or "directory" in output.lower()
-        or "not found" in output.lower()
+        "folder" in output.lower() or "directory" in output.lower() or "not found" in output.lower()
     )
 
 
@@ -94,6 +95,7 @@ def test_cli_exits_on_empty_folder(tmp_path: Path):
 
     result = subprocess.run(
         [sys.executable, "check_models.py", "--folder", str(empty_folder)],
+        check=False,
         capture_output=True,
         text=True,
         timeout=10,
@@ -114,6 +116,7 @@ def test_cli_invalid_temperature_value():
             "--folder",
             ".",
         ],
+        check=False,
         capture_output=True,
         text=True,
         timeout=10,
@@ -133,6 +136,7 @@ def test_cli_invalid_max_tokens():
             "--folder",
             ".",
         ],
+        check=False,
         capture_output=True,
         text=True,
         timeout=10,
@@ -145,6 +149,7 @@ def test_cli_accepts_valid_parameters():
     # Just test that the script accepts parameters correctly without actually running models
     result = subprocess.run(
         [sys.executable, "check_models.py", "--help"],
+        check=False,
         capture_output=True,
         text=True,
         timeout=5,
@@ -153,6 +158,3 @@ def test_cli_accepts_valid_parameters():
     output = result.stdout + result.stderr
     # Check that help shows our expected parameters
     assert "--folder" in output or "--temperature" in output or "usage:" in output.lower()
-
-
-
