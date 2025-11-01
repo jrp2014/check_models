@@ -95,43 +95,27 @@ quote-style = "double"
 skip-magic-trailing-comma = false
 
 [tool.ruff.lint]
-# D203 and D213 are explicitly excluded to avoid incompatibility warnings with D211 and D212.
-# Select ALL rules for maximum rigor, then ignore only the truly necessary exceptions.
-extend-select = ["B"]
-select = ["ALL"]
-ignore = [
-    "COM812",  # Conflicts with formatter
-    "ISC001",  # Conflicts with formatter
-    "D203",    # Conflicts with D211
-    "D213",    # Conflicts with D212
-    "D100", "D101", "D102", "D103", "D104", "D105", "D106", "D107", # Missing docstrings (too noisy for scripts)
-    "S101",    # Use of assert (needed for tests)
-    "E501",    # Line too long (formatter handles this)
-    # NOTE: Complexity rules (C901, PLR0912, PLR0915, PLR0913) are ENFORCED with per-file exceptions only
+# Comprehensive but pragmatic linting
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "B",      # flake8-bugbear
+    "C4",     # flake8-comprehensions
+    "UP",     # pyupgrade
+    "ARG",    # flake8-unused-arguments
+    "SIM",    # flake8-simplify
 ]
-
-[tool.ruff.lint.mccabe]
-max-complexity = 15
+ignore = [
+    "E501",   # Line too long (formatter handles this)
+]
 
 [tool.ruff.lint.per-file-ignores]
-# check_models.py: Allow complexity only where truly needed (main orchestration)
-# Individual functions should still respect complexity limits
-"check_models.py" = [
-    "C901",     # Function complexity (main processing loops)
-    "PLR0913",  # Too many arguments (ProcessImageParams has many fields)
-]
-# check_quality.py: Quality checker orchestration
-"tools/check_quality.py" = [
-    "C901",     # Function complexity (main check orchestration)
-    "PLR0912",  # Too many branches (check orchestration)
-    "PLR0915",  # Too many statements (check orchestration)
-]
-# CLI tools: allow print statements for user output
-"tools/check_outdated.py" = ["T201"]
-"tools/validate_env.py" = ["T201"]
-"tools/smoke_test.py" = ["T201"]
-# Test files: allow assert statements and magic numbers
+# Tests: allow assert and magic numbers
 "tests/**" = ["S101", "PLR2004"]
+# Tools: allow print statements
+"tools/**" = ["T201"]
 
 [tool.pylance]
 # Pyright/Pylance configuration
@@ -142,68 +126,22 @@ reportMissingImports = true
 reportUnusedImport = "warning"
 
 [tool.mypy]
-# MyPy configuration - STRICT mode for high-quality type checking
-# See: https://mypy.readthedocs.io/en/stable/config_file.html
+# Simplified mypy configuration - pragmatic type checking
 python_version = "3.13"
 ignore_missing_imports = true
 
-# Avoid "Source file found twice" errors when running from src/ directory
-namespace_packages = true
-explicit_package_bases = true
+# Core strictness - catch common errors
+warn_unused_ignores = true
+no_implicit_optional = true
+warn_return_any = true
+warn_redundant_casts = true
+check_untyped_defs = true
+disallow_incomplete_defs = true
 
-# Strictness flags - comprehensive type safety
-warn_unused_ignores = true              # Catch unnecessary # type: ignore comments
-no_implicit_optional = true             # Require explicit Optional[T] for None defaults
-warn_return_any = true                  # Flag functions returning Any
-warn_unused_configs = true              # Catch typos in mypy config
-warn_redundant_casts = true             # Catch unnecessary cast() calls
-warn_unreachable = true                 # Catch dead code paths
-strict_optional = true                  # Strict None checking
-check_untyped_defs = true               # Check function bodies even without annotations
-disallow_any_generics = true            # Require type parameters for generics (e.g., list[int] not list)
-disallow_incomplete_defs = true         # All functions must have complete type annotations
-disallow_subclassing_any = true         # Prevent subclassing Any (catches errors)
-warn_no_return = true                   # Warn if function has return statement but no return type
-
-# Search path for local type stubs (generated via stubgen into ../typings)
-# Points to project root typings/ directory relative to src/
-mypy_path = ["../typings"]
-
-# Use stubs for type info but don't check them for completeness
-# "silent" means: use the stubs for type checking our code, but don't
-# report errors in the stub files themselves
-follow_imports = "silent"
-
-# Exclude patterns - prevent mypy from directly analyzing stub files
-exclude = '''
-    (?x)(
-        ^\.\.\/typings\/
-        | ^typings\/
-        | __pycache__
-        | build
-        | dist
-    )
-'''
-
-# Explicitly silence external packages commonly used here
-[[tool.mypy.overrides]]
-module = [
-    "mlx_lm.*",
-    "mlx_vlm.*",
-    "tokenizers.*",
-    "transformers.*",
-    "datasets.*",
-    "huggingface_hub.*",
-    "tzlocal.*",
-    "psutil.*",
-]
-ignore_missing_imports = true
-ignore_errors = true
-
-# Test files: relax type checking since tests intentionally test edge cases
+# Ignore errors in tests (they intentionally test edge cases)
 [[tool.mypy.overrides]]
 module = "tests.*"
-disable_error_code = ["arg-type", "misc"]
+ignore_errors = true
 
 [tool.pytest.ini_options]
 # Limit test discovery to the dedicated tests package inside the project

@@ -14,23 +14,23 @@ class TestTemperatureValidation:
 
     def test_valid_temperatures(self) -> None:
         """Test that valid temperatures pass validation."""
-        validate_temperature(0.0)  # Minimum valid
-        validate_temperature(0.1)  # Default
-        validate_temperature(0.5)  # Mid-range
-        validate_temperature(1.0)  # Common value
-        validate_temperature(1.5)  # Higher but reasonable
+        validate_temperature(temp=0.0)  # Minimum valid
+        validate_temperature(temp=0.1)  # Default
+        validate_temperature(temp=0.5)  # Mid-range
+        validate_temperature(temp=1.0)  # Common value
+        validate_temperature(temp=1.5)  # Higher but reasonable
 
     def test_negative_temperature_raises_error(self) -> None:
         """Test that negative temperature raises ValueError."""
         with pytest.raises(ValueError, match="Temperature must be non-negative"):
-            validate_temperature(-0.1)
+            validate_temperature(temp=-0.1)
 
         with pytest.raises(ValueError, match="Temperature must be non-negative"):
-            validate_temperature(-1.0)
+            validate_temperature(temp=-1.0)
 
     def test_high_temperature_warns(self, caplog: pytest.LogCaptureFixture) -> None:
         """Test that very high temperature triggers warning."""
-        validate_temperature(2.5)  # Should warn but not raise
+        validate_temperature(temp=2.5)  # Should warn but not raise
         assert "unusually high" in caplog.text.lower()
 
 
