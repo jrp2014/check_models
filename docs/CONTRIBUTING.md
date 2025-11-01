@@ -296,7 +296,7 @@ make install-all  # from root
 
 ### Managing Dependencies
 
-Dependencies are defined in `src/pyproject.toml` and mirrored in simple `requirements.txt` files.
+Dependencies are defined in `src/pyproject.toml` as the single source of truth.
 
 ```bash
 # Update environment and reinstall project (recommended after pulling changes):
@@ -367,11 +367,13 @@ INSTALL_TORCH=1 bash tools/update.sh
 
 ### Updating Dependencies
 
-1. Edit `src/pyproject.toml` to update the dependency specification
-2. Edit `src/requirements.txt` or `src/requirements-dev.txt` to match
-3. Run `make deps-sync` to update README blocks
-4. Test thoroughly
-5. Commit both files
+1. Edit `src/pyproject.toml` to update the dependency specification:
+   - Runtime dependencies: `[project.dependencies]`
+   - Dev dependencies: `[project.optional-dependencies.dev]`
+   - Optional extras: `[project.optional-dependencies.extras]`
+2. Run `make deps-sync` to update README blocks
+3. Test thoroughly with `make test`
+4. Commit the changes
 
 ### Keeping Your Environment Up-to-Date
 

@@ -913,16 +913,23 @@ dev = [
 ]
 ```
 
-### Requirements Files (For pip install)
+### Dependency Management
 
-**`requirements.txt`** and **`requirements-dev.txt`** mirror pyproject.toml for pip compatibility:
+All dependencies are defined in `src/pyproject.toml` as the single source of truth:
 
-```txt
+```toml
+[project.dependencies]
 # Core runtime dependencies
-# Matches pyproject.toml [project.dependencies]
 mlx>=0.29.1
 mlx-vlm>=0.0.9
 Pillow>=10.3.0
+# ...
+
+[project.optional-dependencies.dev]
+# Development dependencies
+ruff>=0.1.0
+mypy>=1.8.0
+pytest>=8.0.0
 # ...
 ```
 
@@ -931,6 +938,14 @@ Pillow>=10.3.0
 - Allows automatic security patches
 - Compatible with Dependabot updates
 - Pip resolves latest compatible versions
+
+**Installation:**
+
+```bash
+pip install -e .              # Runtime only
+pip install -e ".[dev]"       # With dev tools
+pip install -e ".[extras]"    # With optional features
+```
 
 ## Update Workflows
 
@@ -942,13 +957,13 @@ Check and update dependencies manually:
 # 1. Check for outdated packages
 make check-outdated
 
-# 2. Update pyproject.toml and requirements.txt as needed
+# 2. Update pyproject.toml as needed
 # 3. Test thoroughly
 make quality
 make test
 
 # 4. Commit if tests pass
-git add src/pyproject.toml src/requirements*.txt
+git add src/pyproject.toml
 git commit -m "chore(deps): upgrade dependencies"
 ```
 
@@ -956,20 +971,20 @@ git commit -m "chore(deps): upgrade dependencies"
 
 ```bash
 # 1. Add to pyproject.toml
-# Edit src/pyproject.toml to add new-package>=1.0.0
+# Edit src/pyproject.toml to add new-package>=1.0.0 in the appropriate section:
+#   - [project.dependencies] for runtime
+#   - [project.optional-dependencies.dev] for development
+#   - [project.optional-dependencies.extras] for optional features
 
-# 2. Add to requirements.txt (or requirements-dev.txt)
-echo "new-package>=1.0.0" >> src/requirements.txt
-
-# 3. Sync README blocks
+# 2. Sync README blocks
 make deps-sync
 
-# 4. Install and test
+# 3. Install and test
 make update
 make test
 
-# 5. Commit all changes
-git add src/pyproject.toml src/requirements*.txt README.md src/README.md
+# 4. Commit all changes
+git add src/pyproject.toml README.md src/README.md
 git commit -m "feat(deps): add new-package for X functionality"
 ```
 
@@ -1063,14 +1078,14 @@ CI uses lock files for reproducibility:
 
 ### Dependency Sync Check
 
-Pre-commit hook ensures `pyproject.toml` and `requirements.txt` stay synchronized for README documentation purposes (via `tools/update_readme_deps.py` and `tools/check_dependency_sync.py`).
+Pre-commit hook automatically updates README dependency blocks when `pyproject.toml` changes (via `tools/update_readme_deps.py`).
 
 ## Best Practices
 
 ### ✅ Do
 
 - Use `>=` for minimum versions with flexibility
-- Keep pyproject.toml and requirements.txt in sync
+- Define all dependencies in pyproject.toml
 - Run `make check-outdated` regularly
 - Test thoroughly after dependency updates
 - Review Dependabot PRs within a week
@@ -1078,7 +1093,7 @@ Pre-commit hook ensures `pyproject.toml` and `requirements.txt` stay synchronize
 ### ❌ Don't
 
 - Pin versions without good reason
-- Update one file without updating the other
+- Create separate requirements.txt files (use pyproject.toml)
 - Skip testing after dependency updates
 - Ignore security audit warnings
 - Let Dependabot PRs pile up
@@ -1117,22 +1132,22 @@ make bootstrap-dev
 # Locally reproduce the issue
 git checkout -b test-dependabot-update
 git pull origin <dependabot-branch>
-make sync-deps
+make update
 make ci
 
 # If tests fail, investigate and either:
 # a) Fix code to work with new version
-# b) Add version constraint to .in file to exclude problematic version
+# b) Add version constraint to pyproject.toml to exclude problematic version
 ```
 
 ## Summary
 
 ✅ **Current State**: All dependencies use `>=` for flexibility  
-✅ **Single Source**: pyproject.toml is the source of truth  
-✅ **Pip Compatibility**: requirements.txt files mirror pyproject.toml  
+✅ **Single Source**: pyproject.toml is the sole source of truth  
+✅ **Modern Standard**: PEP 621 compliant dependency specification  
 ✅ **Automation**: Dependabot handles routine updates  
-✅ **CI Checks**: Automated sync verification prevents drift  
-✅ **Simplicity**: No lock files or pip-compile complexity
+✅ **CI Checks**: Automated README sync verification  
+✅ **Simplicity**: No lock files, no requirements.txt duplication
 
 **Simple, flexible, and maintainable!** 🎉
 
