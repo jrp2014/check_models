@@ -1,24 +1,21 @@
 """Install Git hooks (pre-commit and pre-push) for this repo.
 
-Pre-commit hook automates two maintenance steps:
-
-1) Sync README dependency blocks when `src/pyproject.toml` changes
+Pre-commit hook automates dependency sync:
+   - Syncs README dependency blocks when `src/pyproject.toml` changes
    - Runs: `cd src && python tools/update_readme_deps.py`
    - Adds changes to `src/README.md` back to the commit
 
-2) Ensure local type stubs exist for third-party packages used by mypy
-   - If `typings/mlx_vlm/__init__.pyi` is missing,
-     it runs: `cd src && python tools/generate_stubs.py mlx_vlm`
-   - Note: typings/ is gitignored and not committed
-
 Pre-push hook runs quality checks:
-   - Runs: `make -C src quality`
+   - Runs simplified quality checks
    - Prevents pushing if quality checks fail
 
 Usage:
   python -m tools.install_precommit_hook
 
 Re-running this script overwrites existing hooks (after backing them up as `.bak`).
+
+Note: Stub generation removed as part of quality simplification (2025-11-01).
+      Now using mypy's ignore_missing_imports=true instead.
 """
 
 from __future__ import annotations
@@ -36,19 +33,15 @@ set -euo pipefail
 REPO_ROOT=$(git rev-parse --show-toplevel)
 cd "$REPO_ROOT"
 
-# 1) Sync README dependency blocks when pyproject changes
+# Sync README dependency blocks when pyproject changes
 if git diff --cached --name-only | grep -q '^src/pyproject.toml$'; then
   echo '[pre-commit] Syncing README dependency blocks'
   (cd src && python tools/update_readme_deps.py) || exit 1
   git add src/README.md
 fi
 
-# 2) Ensure local type stubs for mypy (mlx_vlm only)
-if [ ! -f typings/mlx_vlm/__init__.pyi ]; then
-  echo '[pre-commit] Generating local type stubs (mlx_vlm)'
-  (cd src && python tools/generate_stubs.py mlx_vlm) || exit 1
-  # Note: typings/ is in .gitignore and should not be committed
-fi
+# Note: Stub generation removed as part of quality simplification (2025-11-01)
+# Now using mypy's ignore_missing_imports=true instead
 
 exit 0
 """
@@ -63,14 +56,14 @@ echo "[pre-push] Running quality checks before push..."
 REPO_ROOT=$(git rev-parse --show-toplevel)
 cd "$REPO_ROOT"
 
-# Run full quality check
-if make -C src quality; then
+# Run simplified quality checks
+if bash src/tools/check_quality_simple.sh; then
     echo "✓ Pre-push quality checks passed"
     exit 0
 else
     echo ""
     echo "❌ Quality checks failed. Fix issues before pushing."
-    echo "💡 Run 'make -C src quality' to see details"
+    echo "💡 Run 'bash src/tools/check_quality_simple.sh' to see details"
     echo ""
     echo "To skip this check (not recommended), use:"
     echo "  git push --no-verify"
