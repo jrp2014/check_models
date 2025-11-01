@@ -111,6 +111,10 @@ ignore = [
     "Q002",     # Quotes (formatter handles this)
     "Q003",     # Quotes (formatter handles this)
     
+    # Docstring style conflicts (mutually exclusive pairs)
+    "D203",     # one-blank-line-before-class (conflicts with D211)
+    "D213",     # multi-line-summary-second-line (conflicts with D212)
+    
     # Stylistic choices
     "ANN401",   # Dynamically typed Any - we use this intentionally
     "FBT001",   # Boolean positional arg - common pattern
@@ -132,6 +136,7 @@ ignore = [
 "tests/**" = [
     "S101",     # Use of assert - required for pytest
     "D103",     # Missing docstring in public function - test names are self-documenting
+    "PLR2004",  # Magic values in test assertions - values match test parameters
 ]
 # Tools: allow print statements, missing docstrings
 "tools/**" = [
@@ -141,6 +146,10 @@ ignore = [
 ]
 # Archived files: ignore all rules (these are not maintained)
 "tools/.archived/**" = ["ALL"]
+
+[tool.ruff.lint.pydocstyle]
+# Use Google docstring convention (resolves D203/D211 and D212/D213 conflicts)
+convention = "google"
 
 [tool.ruff.lint.mccabe]
 # Maximum cyclomatic complexity - balance between strictness and practicality
