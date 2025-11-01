@@ -5,16 +5,16 @@ set -e
 cd "$(dirname "$0")/.."
 
 echo "=== Ruff Format Check ==="
-ruff format --check .
+python -m ruff format --check .
 
 echo "=== Ruff Lint ==="
-ruff check .
+python -m ruff check .
 
 echo "=== MyPy Type Check ==="
-mypy check_models.py
+python -m mypy check_models.py
 
 echo "=== Pytest ==="
-pytest -v
+python -m pytest -v
 
 echo ""
 echo "✅ All quality checks passed!"

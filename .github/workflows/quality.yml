@@ -29,16 +29,16 @@ jobs:
           pip install -e src/.[dev]
 
       - name: Run ruff format check
-        run: cd src && ruff format --check .
+        run: cd src && python -m ruff format --check .
         
       - name: Run ruff lint
-        run: cd src && ruff check .
+        run: cd src && python -m ruff check .
 
       - name: Run mypy type checking
-        run: cd src && mypy check_models.py
+        run: cd src && python -m mypy check_models.py
 
       - name: Run tests
-        run: cd src && pytest -v
+        run: cd src && python -m pytest -v
 
       - name: Run markdown lint
         run: |
