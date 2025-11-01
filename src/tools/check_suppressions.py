@@ -85,45 +85,45 @@ def main() -> int:
     check_models = src_dir / "check_models.py"
 
     if not check_models.exists():
-        print(f"Error: {check_models} not found", file=sys.stderr)  # noqa: T201
+        print(f"Error: {check_models} not found", file=sys.stderr)
         return 1
 
-    print(f"Auditing suppressions in: {check_models}\n")  # noqa: T201
-    print("=" * 80)  # noqa: T201
+    print(f"Auditing suppressions in: {check_models}\n")
+    print("=" * 80)
 
     suppressions = find_suppressions(check_models)
 
     if not suppressions:
-        print("No suppressions found!")  # noqa: T201
+        print("No suppressions found!")
         return 0
 
-    print(f"Found {len(suppressions)} suppression(s)\n")  # noqa: T201
+    print(f"Found {len(suppressions)} suppression(s)\n")
 
     unnecessary = []
     necessary = []
 
     for line_num, codes, line_text in suppressions:
-        print(f"\nLine {line_num}: {codes}")  # noqa: T201
-        print(f"  {line_text[:100]}...")  # noqa: T201
+        print(f"\nLine {line_num}: {codes}")
+        print(f"  {line_text[:100]}...")
 
         needed, reason = check_if_needed(check_models, line_num, codes)
 
         if needed:
-            print(f"  ✓ NEEDED: {reason}")  # noqa: T201
+            print(f"  ✓ NEEDED: {reason}")
             necessary.append((line_num, codes, reason))
         else:
-            print(f"  ✗ UNNECESSARY: {reason}")  # noqa: T201
+            print(f"  ✗ UNNECESSARY: {reason}")
             unnecessary.append((line_num, codes, reason))
 
-    print("\n" + "=" * 80)  # noqa: T201
-    print("\nSummary:")  # noqa: T201
-    print(f"  Necessary:   {len(necessary)}")  # noqa: T201
-    print(f"  Unnecessary: {len(unnecessary)}")  # noqa: T201
+    print("\n" + "=" * 80)
+    print("\nSummary:")
+    print(f"  Necessary:   {len(necessary)}")
+    print(f"  Unnecessary: {len(unnecessary)}")
 
     if unnecessary:
-        print("\n  Lines with potentially unnecessary suppressions:")  # noqa: T201
+        print("\n  Lines with potentially unnecessary suppressions:")
         for line_num, codes, reason in unnecessary:
-            print(f"    Line {line_num}: {codes} - {reason}")  # noqa: T201
+            print(f"    Line {line_num}: {codes} - {reason}")
 
     return 0
 
