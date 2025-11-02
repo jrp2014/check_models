@@ -98,7 +98,7 @@ clean_local_mlx_builds() {
 	SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 	local PARENT_DIR
 	PARENT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
-	local MLX_REPOS=("mlx" "mlx-lm" "mlx-vlm" "mlx-data")
+	local MLX_REPOS=("mlx" "mlx-lm" "mlx-vlm")
 	
 	echo "[update.sh] Cleaning build artifacts from local MLX repositories..."
 	
