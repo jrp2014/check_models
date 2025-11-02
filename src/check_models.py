@@ -2138,6 +2138,215 @@ def _compute_column_widths(field_names: list[str]) -> list[int | None]:
     return widths
 
 
+@dataclass
+class ModelIssuesSummary:
+    """Summary of model performance issues categorized by type."""
+
+    crashed: list[str]  # Models that failed with errors/OOM
+    repetitive: list[str]  # Models with highly repetitive output
+    succinct: list[str]  # Models with very short output relative to prompt
+    hallucinated: list[str]  # Models with detected hallucination patterns
+    successful: list[str]  # Models that completed successfully without issues
+
+
+def analyze_model_issues(results: list[PerformanceResult]) -> ModelIssuesSummary:
+    """Analyze results and categorize models by performance issues.
+
+    Args:
+        results: List of model performance results
+
+    Returns:
+        ModelIssuesSummary with categorized model lists
+    """
+    crashed: list[str] = []
+    repetitive: list[str] = []
+    succinct: list[str] = []
+    hallucinated: list[str] = []
+    successful: list[str] = []
+
+    succinct_threshold = 0.3  # Output < 30% of prompt length
+
+    for result in results:
+        model_name = result.model_name.split("/")[-1]
+
+        # Check for crashes/failures
+        if not result.success:
+            crashed.append(model_name)
+            continue
+
+        # Analyze successful models
+        gen_text = str(getattr(result.generation, "text", "")) if result.generation else ""
+
+        # Check for repetitive output
+        is_repetitive, repeated_token = _detect_repetitive_output(gen_text)
+        if is_repetitive:
+            repetitive.append(f"{model_name} ({repeated_token})")
+            continue
+
+        # Check for hallucinations
+        hallucination_issues = _detect_hallucination_patterns(gen_text)
+        if hallucination_issues:
+            issue_desc = ", ".join(hallucination_issues[:2])  # First 2 issues
+            hallucinated.append(f"{model_name} ({issue_desc})")
+            continue
+
+        # Check for overly succinct output
+        prompt_tokens = getattr(result.generation, "prompt_tokens", 0) if result.generation else 0
+        gen_tokens = (
+            getattr(result.generation, "generation_tokens", 0) if result.generation else 0
+        )
+
+        if prompt_tokens > 0 and gen_tokens < (prompt_tokens * succinct_threshold):
+            succinct.append(f"{model_name} ({gen_tokens} tokens)")
+            continue
+
+        # If none of the above, it's successful
+        successful.append(model_name)
+
+    return ModelIssuesSummary(
+        crashed=crashed,
+        repetitive=repetitive,
+        succinct=succinct,
+        hallucinated=hallucinated,
+        successful=successful,
+    )
+
+
+def format_issues_summary_text(summary: ModelIssuesSummary) -> str:
+    """Format issues summary as plain text for CLI and Markdown.
+
+    Args:
+        summary: Analyzed model issues summary
+
+    Returns:
+        Formatted text summary
+    """
+    max_shown = 5
+    lines: list[str] = []
+    total = (
+        len(summary.crashed)
+        + len(summary.repetitive)
+        + len(summary.succinct)
+        + len(summary.hallucinated)
+        + len(summary.successful)
+    )
+
+    lines.append(f"**Total Models Evaluated:** {total}")
+    lines.append("")
+
+    if summary.successful:
+        lines.append(f"✅ **Successful ({len(summary.successful)}):**")
+        lines.append("   Clean output, no issues detected")
+        lines.extend([f"  • {model}" for model in summary.successful[:max_shown]])
+        if len(summary.successful) > max_shown:
+            lines.append(f"  • ...and {len(summary.successful) - max_shown} more")
+        lines.append("")
+
+    if summary.crashed:
+        lines.append(f"❌ **Crashed/Failed ({len(summary.crashed)}):**")
+        lines.append("   Errors, OOM, or other failures")
+        lines.extend([f"  • {model}" for model in summary.crashed])
+        lines.append("")
+
+    if summary.repetitive:
+        lines.append(f"🔁 **Repetitive Output ({len(summary.repetitive)}):**")
+        lines.append("   Generated highly repetitive or garbage tokens")
+        lines.extend([f"  • {model}" for model in summary.repetitive])
+        lines.append("")
+
+    if summary.hallucinated:
+        lines.append(f"🤔 **Possible Hallucinations ({len(summary.hallucinated)}):**")
+        lines.append("   Detected unexpected content patterns")
+        lines.extend([f"  • {model}" for model in summary.hallucinated])
+        lines.append("")
+
+    if summary.succinct:
+        lines.append(f"📝 **Very Succinct ({len(summary.succinct)}):**")
+        lines.append("   Generated output much shorter than prompt")
+        lines.extend([f"  • {model}" for model in summary.succinct])
+        lines.append("")
+
+    return "\n".join(lines)
+
+
+def format_issues_summary_html(summary: ModelIssuesSummary) -> str:
+    """Format issues summary as HTML for reports.
+
+    Args:
+        summary: Analyzed model issues summary
+
+    Returns:
+        Formatted HTML summary
+    """
+    max_shown = 5
+    lines: list[str] = []
+    total = (
+        len(summary.crashed)
+        + len(summary.repetitive)
+        + len(summary.succinct)
+        + len(summary.hallucinated)
+        + len(summary.successful)
+    )
+
+    lines.append("<div class='issues-summary'>")
+    lines.append("<h3>Model Performance Summary</h3>")
+    lines.append(f"<p><strong>Total Models Evaluated:</strong> {total}</p>")
+
+    if summary.successful:
+        lines.append(f"<h4>✅ Successful ({len(summary.successful)})</h4>")
+        lines.append("<p>Clean output, no issues detected</p>")
+        lines.append("<ul>")
+        lines.extend([f"<li>{html.escape(m)}</li>" for m in summary.successful[:max_shown]])
+        if len(summary.successful) > max_shown:
+            remaining = len(summary.successful) - max_shown
+            lines.append(f"<li><em>...and {remaining} more</em></li>")
+        lines.append("</ul>")
+
+    if summary.crashed:
+        lines.append(
+            f"<h4 style='color: #d32f2f;'>❌ Crashed/Failed ({len(summary.crashed)})</h4>",
+        )
+        lines.append("<p>Errors, OOM, or other failures</p>")
+        lines.append("<ul>")
+        lines.extend([f"<li>{html.escape(m)}</li>" for m in summary.crashed])
+        lines.append("</ul>")
+
+    if summary.repetitive:
+        lines.append(
+            f"<h4 style='color: #ff9800;'>🔁 Repetitive Output "
+            f"({len(summary.repetitive)})</h4>",
+        )
+        lines.append("<p>Generated highly repetitive or garbage tokens</p>")
+        lines.append("<ul>")
+        lines.extend([f"<li>{html.escape(m)}</li>" for m in summary.repetitive])
+        lines.append("</ul>")
+
+    if summary.hallucinated:
+        lines.append(
+            f"<h4 style='color: #ff9800;'>🤔 Possible Hallucinations "
+            f"({len(summary.hallucinated)})</h4>",
+        )
+        lines.append("<p>Detected unexpected content patterns</p>")
+        lines.append("<ul>")
+        lines.extend([f"<li>{html.escape(m)}</li>" for m in summary.hallucinated])
+        lines.append("</ul>")
+
+    if summary.succinct:
+        lines.append(
+            f"<h4 style='color: #2196f3;'>📝 Very Succinct "
+            f"({len(summary.succinct)})</h4>",
+        )
+        lines.append("<p>Generated output much shorter than prompt</p>")
+        lines.append("<ul>")
+        lines.extend([f"<li>{html.escape(m)}</li>" for m in summary.succinct])
+        lines.append("</ul>")
+
+    lines.append("</div>")
+    lines.append("<hr>")
+
+    return "\n".join(lines)
+
+
 def print_model_stats(results: list[PerformanceResult]) -> None:
     """Emit an enhanced table of per-model metrics with visual indicators and summary.
 
@@ -2311,6 +2520,7 @@ def _build_full_html_document(
     versions: LibraryVersionDict,
     prompt: str,
     total_runtime_seconds: float,
+    issues_summary_html: str = "",
 ) -> str:
     local_tz = get_localzone()
     # Build complete HTML document
@@ -2380,6 +2590,7 @@ def _build_full_html_document(
 </head>
 <body>
     <h1>MLX Vision Language Model Performance Report</h1>
+    {issues_summary_html}
     <div class=\"prompt-section\">
         <h3>📝 Test Prompt</h3>
         <div>{html.escape(prompt).replace("\n", "<br>")}</div>
@@ -2466,6 +2677,10 @@ def generate_html_report(
         tablefmt="unsafehtml",
         colalign=colalign,
     )
+    # Analyze model issues and generate summary
+    summary = analyze_model_issues(results)
+    issues_html = format_issues_summary_html(summary)
+
     # Mark failed rows and build the final document
     html_table = _mark_failed_rows_in_html(html_table, results)
     html_content = _build_full_html_document(
@@ -2473,6 +2688,7 @@ def generate_html_report(
         versions=versions,
         prompt=prompt,
         total_runtime_seconds=total_runtime_seconds,
+        issues_summary_html=issues_html,
     )
 
     try:
@@ -2560,11 +2776,19 @@ def generate_markdown_report(
     # Normalize trailing spaces per line using shared helper
     markdown_table = normalize_markdown_trailing_spaces(markdown_table)
 
+    # Analyze model issues and generate summary
+    summary = analyze_model_issues(results)
+    issues_text = format_issues_summary_text(summary)
+
     # Build the complete markdown content
     md: list[str] = []
     md.append("# Model Performance Results\n")
     md.append(f"_Generated on {local_now_str()}_\n")
     md.append("")
+    # Add issues summary before prompt
+    if issues_text:
+        md.append(issues_text)
+        md.append("")
     md.append("> **Prompt used:**\n>\n> " + prompt.replace("\n", "\n> ") + "\n")
     md.append("")
     note = "**Note:** Results sorted: errors first, then by generation time (fastest to slowest).\n"
@@ -3819,6 +4043,14 @@ def finalize_execution(
     if results:
         print_cli_section("Performance Summary")
         print_model_stats(results)
+
+        # Add model issues summary
+        summary = analyze_model_issues(results)
+        issues_text = format_issues_summary_text(summary)
+        if issues_text:
+            logger.info("")
+            logger.info(issues_text)
+            logger.info("")
 
         print_cli_section("Report Generation")
         try:
