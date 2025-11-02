@@ -172,9 +172,12 @@ reportUnusedImport = "warning"
 [tool.mypy]
 # Simplified mypy configuration - pragmatic type checking
 python_version = "3.13"
+# Treat imports as third-party - don't follow them for type checking
+# This prevents mypy from parsing external library stubs (like MLX) that may have errors
+follow_imports = "skip"
 ignore_missing_imports = true
 
-# Core strictness - catch common errors
+# Core strictness - catch common errors in our own code
 warn_unused_ignores = true
 no_implicit_optional = true
 warn_return_any = true
