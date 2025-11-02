@@ -1093,6 +1093,7 @@ def _log_wrapped_label_value(
     """Log a potentially long label/value pair wrapped to terminal width.
 
     The first line includes the label; subsequent lines are aligned under the value.
+    Groups output into paragraphs to reduce log line count.
     """
     width = get_terminal_width(max_width=100)
     prefix = (" " * indent) + label
@@ -1101,7 +1102,10 @@ def _log_wrapped_label_value(
     cont_avail = max(20, width - len(cont_indent) - 1)
 
     # Preserve user newlines: wrap each input line independently
+    # Group into paragraphs separated by blank lines
     lines = value.splitlines() or [""]
+    output_lines: list[str] = []
+
     for li, original_line in enumerate(lines):
         wrapped = textwrap.wrap(
             original_line,
@@ -1112,29 +1116,28 @@ def _log_wrapped_label_value(
         ) or [""]
         for wi, wline in enumerate(wrapped):
             if li == 0 and wi == 0:
-                logger.info("%s %s", prefix, Colors.colored(wline, color))
+                output_lines.append(f"{prefix} {Colors.colored(wline, color)}")
             else:
-                logger.info("%s%s", cont_indent, Colors.colored(wline, color))
+                output_lines.append(f"{cont_indent}{Colors.colored(wline, color)}")
+
+    # Output as single multi-line log statement
+    if output_lines:
+        logger.info("\n".join(output_lines))
 
 
 def _log_wrapped_error(label: str, value: str) -> None:
-    """Log error with box border for better visibility."""
+    """Log error with simple formatting for readability."""
     width = get_terminal_width(max_width=100)
 
-    # Top border
-    logger.error(Colors.colored("╔" + "═" * (width - 2) + "╗", Colors.RED, Colors.BOLD))
-
     # Label
-    logger.error(Colors.colored(f"║ {label}", Colors.RED, Colors.BOLD))
-    logger.error(Colors.colored("╠" + "═" * (width - 2) + "╣", Colors.RED))
+    logger.error(Colors.colored(f"{label}", Colors.RED, Colors.BOLD))
 
-    # Content with wrapping
-    cont_indent = "║ "
-    cont_avail = max(20, width - len(cont_indent) - 3)  # Account for right border
+    # Content with wrapping and indentation
+    cont_indent = "  "
+    cont_avail = max(20, width - len(cont_indent))
     lines = value.splitlines() or [""]
     for original_line in lines:
         if not original_line.strip():
-            logger.error(Colors.colored("║", Colors.RED))
             continue
         wrapped = textwrap.wrap(
             original_line,
@@ -1144,12 +1147,7 @@ def _log_wrapped_error(label: str, value: str) -> None:
             replace_whitespace=False,
         ) or [""]
         for wline in wrapped:
-            # Pad to width for clean box
-            padded = wline.ljust(cont_avail)
-            logger.error(Colors.colored(f"║ {padded} ║", Colors.RED))
-
-    # Bottom border
-    logger.error(Colors.colored("╚" + "═" * (width - 2) + "╝", Colors.RED, Colors.BOLD))
+            logger.error(Colors.colored(f"{cont_indent}{wline}", Colors.RED))
 
 
 def _apply_cli_output_preferences(args: argparse.Namespace) -> None:
@@ -2743,9 +2741,7 @@ def _run_model_generation(
         config: Any | None = getattr(model, "config", None)
     except Exception as load_err:
         # Capture any model loading errors (config issues, missing files, etc.)
-        error_details = (
-            f"Model loading failed: {load_err}\n\nFull traceback:\n{traceback.format_exc()}"
-        )
+        error_details = f"Model loading failed: {load_err}\n{traceback.format_exc()}"
         logger.exception("Failed to load model %s", params.model_identifier)
         raise ValueError(error_details) from load_err
 
@@ -2788,15 +2784,15 @@ def _run_model_generation(
     except (OSError, ValueError) as gen_known_err:
         # Known I/O or validation-style issues
         msg = (
-            f"Model generation failed for {params.model_identifier}: {gen_known_err}\n\n"
-            f"Full traceback:\n{traceback.format_exc()}"
+            f"Model generation failed for {params.model_identifier}: {gen_known_err}\n"
+            f"{traceback.format_exc()}"
         )
         raise ValueError(msg) from gen_known_err
     except (RuntimeError, TypeError, AttributeError, KeyError) as gen_err:
         # Model-specific runtime errors (weights, config, tensor ops, missing attributes)
         msg = (
-            f"Model runtime error during generation for {params.model_identifier}: {gen_err}\n\n"
-            f"Full traceback:\n{traceback.format_exc()}"
+            f"Model runtime error during generation for {params.model_identifier}: {gen_err}\n"
+            f"{traceback.format_exc()}"
         )
         raise ValueError(msg) from gen_err
     end_time = time.perf_counter()
@@ -3418,7 +3414,13 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
         prompt = " ".join(filter(None, prompt_parts)).strip()
         logger.debug("Using generated prompt based on metadata.")
 
-    logger.info("Final prompt: %s", prompt)
+    # Truncate long prompts for display
+    max_display_len = 200
+    if len(prompt) > max_display_len:
+        prompt_display = prompt[:max_display_len] + "..."
+        logger.info("Final prompt: %s", prompt_display)
+    else:
+        logger.info("Final prompt: %s", prompt)
     return prompt
 
 
@@ -3616,8 +3618,9 @@ def process_models(
     for idx, model_id in enumerate(model_identifiers, start=1):
         print_cli_separator()
         model_label = model_id.split("/")[-1]
+        progress = f"[{idx}/{len(model_identifiers)}]"
         print_cli_section(
-            f"Processing Model: {Colors.colored(model_label, Colors.MAGENTA)}",
+            f"Processing Model {progress}: {Colors.colored(model_label, Colors.MAGENTA)}",
         )
 
         is_vlm_verbose: bool = args.verbose
