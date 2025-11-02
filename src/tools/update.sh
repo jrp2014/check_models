@@ -69,25 +69,22 @@ pip install -U pip wheel setuptools
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-EXTRA_ARGS=()
-if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
-	EXTRA_ARGS+=("--force-reinstall")
-fi
+# Helper function: pip install with optional force reinstall
+pip_install() {
+	local args=("-U" "--upgrade-strategy" "eager")
+	[[ "${FORCE_REINSTALL:-0}" == "1" ]] && args+=("--force-reinstall")
+	pip install "${args[@]}" "$@"
+}
 
 # Install project with all dependencies from pyproject.toml
-# This installs: runtime + extras + dev in editable mode
-echo "[update.sh] Installing project with all dependencies from pyproject.toml..."
 INSTALL_GROUPS=".[dev,extras]"
 if [[ "${INSTALL_TORCH:-0}" == "1" ]]; then
 	INSTALL_GROUPS=".[dev,extras,torch]"
 	echo "[update.sh] Including torch group (INSTALL_TORCH=1)"
 fi
 
-if ((${#EXTRA_ARGS[@]})); then
-	pip install -U --upgrade-strategy eager "${EXTRA_ARGS[@]}" -e "$PROJECT_ROOT/$INSTALL_GROUPS"
-else
-	pip install -U --upgrade-strategy eager -e "$PROJECT_ROOT/$INSTALL_GROUPS"
-fi
+echo "[update.sh] Installing project with all dependencies from pyproject.toml..."
+pip_install -e "$PROJECT_ROOT/$INSTALL_GROUPS"
 
 # Function to clean build artifacts from local MLX repositories
 clean_local_mlx_builds() {
@@ -172,27 +169,15 @@ update_local_mlx_repos() {
 	echo ""
 	echo "Stage 2: Installing library dependencies (requirements.txt files)..."
 	for idx in "${!REPO_NAMES[@]}"; do
-		if [[ ${REPO_SKIP[idx]} -eq 1 ]]; then
-			continue
-		fi
+		[[ ${REPO_SKIP[idx]} -eq 1 ]] && continue
 		cd "${REPO_PATHS[idx]}"
 		if [[ -f "requirements.txt" ]]; then
 			echo "[update.sh] Installing requirements for ${REPO_NAMES[idx]}..."
-			if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
-				pip install -U --force-reinstall -r requirements.txt
-			else
-				pip install -U -r requirements.txt
-			fi
-		else
-			echo "[update.sh] No requirements.txt for ${REPO_NAMES[idx]}"
+			pip_install -r requirements.txt
 		fi
 		if [[ "${REPO_NAMES[idx]}" == "mlx-vlm" ]]; then
 			echo "[update.sh] Installing opencv-python for mlx-vlm..."
-			if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
-				pip install -U --force-reinstall opencv-python
-			else
-				pip install -U opencv-python
-			fi
+			pip_install opencv-python
 		fi
 		echo ""
 	done
@@ -202,35 +187,22 @@ update_local_mlx_repos() {
 	echo ""
 	echo "Stage 3: Verifying repository integrity..."
 	for idx in "${!REPO_NAMES[@]}"; do
-		if [[ ${REPO_SKIP[idx]} -eq 1 ]]; then
-			continue
-		fi
+		[[ ${REPO_SKIP[idx]} -eq 1 ]] && continue
 		cd "${REPO_PATHS[idx]}"
 		
-		# Check for missing git-tracked files (indicates corruption or incomplete checkout)
-		local MISSING_FILES
-		MISSING_FILES=$(git ls-files --deleted 2>/dev/null)
+		# Check for missing git-tracked files
+		local MISSING_FILES=$(git ls-files --deleted 2>/dev/null)
 		if [[ -n "$MISSING_FILES" ]]; then
-			echo "❌ ERROR: Repository ${REPO_NAMES[idx]} is corrupt - missing tracked files:"
-			echo "$MISSING_FILES" | head -5
-			local FILE_COUNT
-			FILE_COUNT=$(echo "$MISSING_FILES" | wc -l | tr -d ' ')
-			if [[ "$FILE_COUNT" -gt 5 ]]; then
-				echo "... and $((FILE_COUNT - 5)) more file(s)"
-			fi
+			local FILE_COUNT=$(echo "$MISSING_FILES" | wc -l | tr -d ' ')
+			echo "❌ ERROR: Repository ${REPO_NAMES[idx]} is corrupt - $FILE_COUNT missing tracked file(s)"
+			echo "$MISSING_FILES" | head -3
 			echo ""
-			echo "To fix this, run one of the following:"
-			echo "  cd ${REPO_PATHS[idx]} && git restore ."
-			echo "  cd ${REPO_PATHS[idx]} && git reset --hard HEAD"
-			echo "  cd ${REPO_PATHS[idx]} && git clean -fdx && git restore ."
-			echo ""
+			echo "Fix with: cd ${REPO_PATHS[idx]} && git restore ."
 			exit 1
 		fi
 		
-		# Check for uncommitted changes that might interfere with build
-		if ! git diff --quiet HEAD 2>/dev/null; then
-			echo "⚠️  Warning: Repository ${REPO_NAMES[idx]} has uncommitted changes"
-		fi
+		# Warn about uncommitted changes
+		git diff --quiet HEAD 2>/dev/null || echo "⚠️  Warning: ${REPO_NAMES[idx]} has uncommitted changes"
 	done
 	echo "✓ All repositories verified"
 	cd "$ORIGINAL_DIR"
@@ -239,95 +211,41 @@ update_local_mlx_repos() {
 	echo ""
 	echo "Stage 4: Building and installing MLX packages in dependency order..."
 	for idx in "${!REPO_NAMES[@]}"; do
-		if [[ ${REPO_SKIP[idx]} -eq 1 ]]; then
-			continue
-		fi
+		[[ ${REPO_SKIP[idx]} -eq 1 ]] && continue
 		cd "${REPO_PATHS[idx]}"
 		echo "[update.sh] Installing ${REPO_NAMES[idx]} package..."
-		local INSTALL_STATUS=0
 		
 		# MLX requires CMake configuration before pip install
 		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
-			echo "[update.sh] Configuring MLX build with CMake..."
+			[[ "${CLEAN_BUILD:-0}" == "1" ]] && rm -rf build
 			
-			# Clean build directory if CLEAN_BUILD is set
-			if [[ "${CLEAN_BUILD:-0}" == "1" ]] && [[ -d "build" ]]; then
-				echo "[update.sh] Cleaning previous build directory..."
-				rm -rf build
-			fi
-			
-			# Set Metal JIT environment variable for mlx builds
-			# MLX_METAL_JIT=OFF (default): Pre-built kernels, larger binary, faster cold start
-			# MLX_METAL_JIT=ON: Runtime compilation, smaller binary, slower cold start (cached after first use)
 			local JIT_SETTING="${MLX_METAL_JIT:-OFF}"
-			local CMAKE_STATUS=0
+			echo "[update.sh] Building mlx with MLX_METAL_JIT=$JIT_SETTING"
 			
-			# Run CMake configuration
 			if [[ "$JIT_SETTING" == "ON" ]]; then
-				echo "[update.sh] Building mlx with MLX_METAL_JIT=ON (smaller binary, runtime compilation)"
-				env MLX_METAL_JIT=ON cmake -S . -B build || CMAKE_STATUS=$?
+				env MLX_METAL_JIT=ON cmake -S . -B build || { REPO_SKIP[idx]=1; continue; }
 			else
-				echo "[update.sh] Building mlx with MLX_METAL_JIT=OFF (pre-built kernels, larger binary)"
-				cmake -S . -B build || CMAKE_STATUS=$?
+				cmake -S . -B build || { REPO_SKIP[idx]=1; continue; }
 			fi
 			
-			if [[ $CMAKE_STATUS -ne 0 ]]; then
-				echo "⚠️  CMake configuration failed for mlx"
-				REPO_SKIP[idx]=1
-				echo ""
-				continue
-			fi
-			
-			echo "[update.sh] Building MLX with CMake..."
-			cmake --build build || INSTALL_STATUS=$?
-			
-			if [[ $INSTALL_STATUS -ne 0 ]]; then
-				echo "⚠️  CMake build failed for mlx"
-				REPO_SKIP[idx]=1
-				echo ""
-				continue
-			fi
-			
-			# Install Python bindings (pip install uses the already-built CMake artifacts)
+			cmake --build build || { REPO_SKIP[idx]=1; continue; }
 			echo "[update.sh] Installing MLX Python bindings..."
-			if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
-				pip install --force-reinstall -e . || INSTALL_STATUS=$?
-			else
-				pip install -e . || INSTALL_STATUS=$?
-			fi
-		else
-			# Non-mlx packages: normal install without CMake
-			if [[ "${FORCE_REINSTALL:-0}" == "1" ]]; then
-				pip install --force-reinstall -e . || INSTALL_STATUS=$?
-			else
-				pip install -e . || INSTALL_STATUS=$?
-			fi
 		fi
-		if [[ $INSTALL_STATUS -eq 0 ]]; then
+		
+		# Install package (works for both mlx and others)
+		if pip_install -e .; then
 			echo "✓ ${REPO_NAMES[idx]} installed successfully"
 		else
 			echo "⚠️  Failed to install ${REPO_NAMES[idx]}"
 			REPO_SKIP[idx]=1
+			continue
 		fi
 	
-		if [[ "${REPO_NAMES[idx]}" == "mlx" ]] && [[ ${REPO_SKIP[idx]} -eq 0 ]]; then
+		# Generate stubs for mlx
+		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
 			echo "[update.sh] Generating type stubs for mlx..."
-			
-			# Ensure setuptools is available (required by setup.py)
-			if ! python -c "import setuptools" 2>/dev/null; then
-				echo "[update.sh] Installing setuptools for stub generation..."
-				pip install setuptools || {
-					echo "⚠️  Failed to install setuptools - skipping stub generation"
-					echo ""
-					continue
-				}
-			fi
-			
-			if python setup.py generate_stubs; then
-				echo "✓ MLX stubs generated successfully"
-			else
-				echo "⚠️  Failed to generate MLX stubs (non-fatal)"
-			fi
+			python -c "import setuptools" 2>/dev/null || pip install setuptools
+			python setup.py generate_stubs && echo "✓ MLX stubs generated" || echo "⚠️  Stub generation failed (non-fatal)"
 		fi
 		echo ""
 	done
@@ -357,37 +275,28 @@ if [[ "${CLEAN_BUILD:-0}" == "1" ]]; then
 	clean_local_mlx_builds
 fi
 
-# Update local MLX repos if they exist
-LOCAL_MLX_UPDATED=0
+# Determine if we should skip PyPI MLX updates
+SKIP_MLX_PYPI=0
+
+# Check for local MLX repos
 if update_local_mlx_repos; then
-	LOCAL_MLX_UPDATED=1
-	echo "[update.sh] Local MLX builds updated - will skip PyPI MLX packages"
-fi
-
-# Check if MLX is a local dev build (contains .dev or +commit in version)
-MLX_VERSION=$(pip show mlx 2>/dev/null | grep '^Version:' | awk '{print $2}' || echo "")
-MLX_IS_LOCAL=0
-if [[ "$MLX_VERSION" == *".dev"* ]] || [[ "$MLX_VERSION" == *"+"* ]]; then
-	MLX_IS_LOCAL=1
-	echo "[update.sh] Detected local MLX build: $MLX_VERSION — preserving..."
-fi
-
-# If we just updated local repos, treat as local build
-if [[ $LOCAL_MLX_UPDATED -eq 1 ]]; then
-	MLX_IS_LOCAL=1
-fi
-
-# Only update MLX from PyPI if not using local builds
-if [[ "${SKIP_MLX:-0}" != "1" ]] && [[ "$MLX_IS_LOCAL" != "1" ]]; then
-	echo "[update.sh] Updating MLX packages from PyPI..."
-	MLX_PYPI_PACKAGES=("mlx" "mlx-vlm" "mlx-lm")
-	if ((${#EXTRA_ARGS[@]})); then
-		pip install -U --upgrade-strategy eager "${EXTRA_ARGS[@]}" "${MLX_PYPI_PACKAGES[@]}"
-	else
-		pip install -U --upgrade-strategy eager "${MLX_PYPI_PACKAGES[@]}"
+	SKIP_MLX_PYPI=1
+	echo "[update.sh] Local MLX builds updated - skipping PyPI updates"
+else
+	# Check if MLX is a dev build (contains .dev or +commit)
+	MLX_VERSION=$(pip show mlx 2>/dev/null | grep '^Version:' | awk '{print $2}' || echo "")
+	if [[ "$MLX_VERSION" == *".dev"* ]] || [[ "$MLX_VERSION" == *"+"* ]]; then
+		SKIP_MLX_PYPI=1
+		echo "[update.sh] Detected local MLX build: $MLX_VERSION — preserving..."
 	fi
-elif [[ "${SKIP_MLX:-0}" == "1" ]]; then
-	echo "[update.sh] Skipping mlx/mlx-vlm/mlx-lm updates (SKIP_MLX=1)..."
+fi
+
+# Update MLX from PyPI if not skipped
+if [[ "${SKIP_MLX:-0}" == "1" ]] || [[ $SKIP_MLX_PYPI -eq 1 ]]; then
+	[[ "${SKIP_MLX:-0}" == "1" ]] && echo "[update.sh] Skipping MLX updates (SKIP_MLX=1)"
+else
+	echo "[update.sh] Updating MLX packages from PyPI..."
+	pip_install mlx mlx-vlm mlx-lm
 fi
 
 echo "[update.sh] Done."
