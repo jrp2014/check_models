@@ -43,4 +43,4 @@ jobs:
       - name: Run markdown lint
         run: |
           npm install -g markdownlint-cli2
-          markdownlint-cli2 "**/*.md"
+          markdownlint-cli2 --config .markdownlint.jsonc "**/*.md"

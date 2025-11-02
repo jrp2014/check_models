@@ -9,7 +9,9 @@ Successfully added comprehensive integration tests to verify end-to-end function
 ### Integration Test Files Created (3 files, 37 tests)
 
 #### 1. **test_cli_integration.py** (7 tests)
+
 End-to-end CLI interaction tests:
+
 - `test_cli_help_displays` - Verifies --help output
 - `test_cli_help_structure` - Checks help text structure
 - `test_cli_exits_on_nonexistent_folder` - Error handling for missing folders
@@ -19,13 +21,16 @@ End-to-end CLI interaction tests:
 - `test_cli_accepts_valid_parameters` - Parameter acceptance
 
 **Testing Approach**: Uses `subprocess.run()` to invoke the script as a user would from command line, verifying:
+
 - Argument parsing
 - Error messages
 - Exit codes
 - Help text generation
 
 #### 2. **test_image_workflow.py** (17 tests)
+
 Image discovery and validation workflows:
+
 - `test_find_most_recent_file_in_directory` - File timestamp sorting
 - `test_find_most_recent_file_ignores_hidden_files` - Hidden file filtering
 - `test_find_most_recent_file_returns_none_for_empty_folder` - Empty folder handling
@@ -40,12 +45,15 @@ Image discovery and validation workflows:
 - `test_validate_image_accessible_missing_file` - Missing file error handling
 
 **Testing Approach**: Tests core file discovery and validation logic using:
+
 - Temporary directories with pytest fixtures
 - PIL Image generation for test images
 - Time-based file creation for mtime testing
 
 #### 3. **test_model_discovery.py** (13 tests)
+
 Model discovery and parameter validation:
+
 - `test_get_cached_model_ids_returns_list` - Model cache scanning
 - `test_validate_model_identifier_accepts_valid_huggingface_format` - HF format validation
 - `test_validate_model_identifier_accepts_local_paths` - Local path support
@@ -61,6 +69,7 @@ Model discovery and parameter validation:
 - `test_is_numeric_value_accepts_numbers` - Numeric value validation
 
 **Testing Approach**: Validates model identifier parsing and KV cache parameters:
+
 - HuggingFace format validation (org/name)
 - Local path existence checking
 - Parameter boundary testing
@@ -68,6 +77,7 @@ Model discovery and parameter validation:
 ## Existing Test Coverage (104 tests)
 
 ### Unit Test Files (13 files, 104 tests)
+
 - **test_dependency_sync.py** (1 test) - Package dependency consistency
 - **test_exif_extraction.py** (10 tests) - EXIF metadata extraction
 - **test_format_field_value.py** (5 tests) - Field value formatting
@@ -85,22 +95,27 @@ Model discovery and parameter validation:
 ## Key Design Decisions
 
 ### 1. **Lightweight Integration Tests**
+
 - Avoided tests that load actual ML models (would timeout in 60s)
 - Focused on argument parsing, validation, and error handling
 - Used test fixtures to create synthetic test images and folders
 
 ### 2. **API-Compliant Testing**
+
 - Adjusted tests to match actual function signatures (keyword-only args)
 - Used correct exception types (OSError vs FileNotFoundError)
 - Validated against actual error messages from the script
 
 ### 3. **Test Isolation**
+
 - Each test creates its own temporary directory
 - No dependencies between tests
 - Clean setup/teardown with pytest fixtures
 
 ### 4. **Subprocess Testing Pattern**
+
 For CLI tests, used:
+
 ```python
 result = subprocess.run(
     [sys.executable, "check_models.py", "--help"],
@@ -112,7 +127,9 @@ assert result.returncode == 0
 ```
 
 ### 5. **Suppressions**
+
 Added necessary lint suppressions:
+
 - `# ruff: noqa: S603, ANN201` in test_cli_integration.py
   - S603: subprocess security warnings (expected for CLI testing)
   - ANN201: return type annotations (test functions don't need them)
@@ -138,6 +155,7 @@ These could be added in the future if corresponding helper functions are impleme
 ## Quality Checks
 
 All tests pass quality checks:
+
 - ✅ Ruff formatting
 - ✅ Ruff linting (934 rules)
 - ✅ MyPy type checking
@@ -180,6 +198,7 @@ bash src/tools/run_quality.sh
 ## Conclusion
 
 The integration test suite successfully validates that `check_models.py`:
+
 - Parses CLI arguments correctly
 - Validates parameters appropriately
 - Discovers and validates image files
