@@ -21,6 +21,7 @@ import sys
 import textwrap
 import time
 import traceback
+from collections import Counter
 from collections.abc import Callable, Iterator, Mapping
 from dataclasses import dataclass, fields
 from datetime import UTC, datetime
@@ -956,6 +957,113 @@ def format_overall_runtime(total_seconds: float) -> str:
     return f"{total_seconds:.2f}s"
 
 
+def _detect_repetitive_output(text: str, threshold: float = 0.8) -> tuple[bool, str | None]:
+    """Detect if generated text is highly repetitive (like '<s>' repeated 500 times).
+
+    Args:
+        text: Generated text to check
+        threshold: Fraction of text that must be repetitive to flag (default 0.8)
+
+    Returns:
+        Tuple of (is_repetitive, repeated_pattern)
+        - is_repetitive: True if text exceeds repetition threshold
+        - repeated_pattern: The repeated token/pattern if detected, None otherwise
+
+    Examples:
+        >>> _detect_repetitive_output("<s>" * 400)
+        (True, '<s>')
+
+        >>> _detect_repetitive_output("This is normal varied text")
+        (False, None)
+    """
+    min_text_len = 10
+    min_tokens = 5
+
+    if not text or len(text) < min_text_len:
+        return False, None
+
+    # Split into tokens (words/symbols)
+    tokens = text.split()
+    if len(tokens) < min_tokens:
+        return False, None
+
+    # Count token frequency
+    token_counts = Counter(tokens)
+
+    # Find most common token
+    if not token_counts:
+        return False, None
+
+    most_common_token, count = token_counts.most_common(1)[0]
+    repetition_ratio = count / len(tokens)
+
+    if repetition_ratio >= threshold:
+        return True, most_common_token
+
+    return False, None
+
+
+def _detect_hallucination_patterns(text: str) -> list[str]:
+    r"""Detect patterns that suggest model hallucination or non-stopping behavior.
+
+    Looks for:
+    - Markdown tables in non-table contexts (like captions)
+    - Questions appearing in generated descriptions
+    - Multiple choice answer patterns (A), B), C), D))
+    - Unrelated mathematical or quiz content
+
+    Args:
+        text: Generated text to check
+
+    Returns:
+        List of detected issue descriptions (empty if clean)
+
+    Examples:
+        >>> _detect_hallucination_patterns("Caption: Nice photo\n\n| Grade | Count |")
+        ['Contains unexpected table']
+
+        >>> _detect_hallucination_patterns("A) 42\nB) 43\nC) 44")
+        ['Contains multiple choice pattern']
+    """
+    min_pipes_for_table = 4
+    min_table_rows = 2
+    min_mc_answers = 3
+    substantial_text_len = 200
+
+    issues: list[str] = []
+
+    if not text:
+        return issues
+
+    text_lower = text.lower()
+
+    # Check for markdown tables (pipe-delimited)
+    if "|" in text and text.count("|") >= min_pipes_for_table:
+        # Likely a table if we see multiple pipes
+        lines_with_pipes = [line for line in text.split("\n") if "|" in line]
+        if len(lines_with_pipes) >= min_table_rows:
+            issues.append("Contains unexpected table")
+
+    # Check for multiple choice patterns
+    mc_pattern = re.compile(r"^[A-D]\)", re.MULTILINE)
+    mc_matches = mc_pattern.findall(text)
+    if len(mc_matches) >= min_mc_answers:
+        issues.append("Contains multiple choice pattern")
+
+    # Check for quiz/test questions
+    question_indicators = ["what is", "how many", "based on the chart", "calculate"]
+    has_question = any(indicator in text_lower for indicator in question_indicators)
+    if has_question and len(text) > substantial_text_len:
+        issues.append("Contains question/quiz content")
+
+    # Check for unrelated educational content keywords
+    edu_keywords = ["grade level", "students with adhd", "test scores", "homework"]
+    if any(keyword in text_lower for keyword in edu_keywords):
+        issues.append("Contains unrelated educational content")
+
+    return issues
+
+
 def local_now_str(fmt: str = "%Y-%m-%d %H:%M:%S %Z") -> str:
     """Return localized current time as a formatted string.
 
@@ -1107,6 +1215,10 @@ def _log_wrapped_label_value(
     output_lines: list[str] = []
 
     for li, original_line in enumerate(lines):
+        # Skip empty lines to reduce noise
+        if not original_line.strip():
+            continue
+
         wrapped = textwrap.wrap(
             original_line,
             width=first_avail if li == 0 else cont_avail,
@@ -2986,9 +3098,19 @@ def _preview_generation(gen: GenerationResult | SupportsGenerationResult | None)
     if not text_val:
         logger.info("%s", Colors.colored("<empty>", Colors.CYAN))
         return
+
+    # Check for quality issues (non-verbose mode gets brief inline warnings)
+    is_repetitive, repeated_token = _detect_repetitive_output(text_val)
+    hallucination_issues = _detect_hallucination_patterns(text_val)
+
+    if is_repetitive and repeated_token:
+        logger.warning(Colors.colored(f"⚠️  Repetitive: '{repeated_token}'", Colors.YELLOW))
+    if hallucination_issues:
+        logger.warning(Colors.colored(f"⚠️  {', '.join(hallucination_issues)}", Colors.YELLOW))
+
     width = get_terminal_width(max_width=100)
     for original_line in text_val.splitlines():
-        if not original_line:
+        if not original_line.strip():
             continue
         wrapped = textwrap.wrap(
             original_line,
@@ -3012,7 +3134,23 @@ def _log_verbose_success_details_mode(res: PerformanceResult, *, detailed: bool)
 
     # Generated text with emoji prefix for easy scanning
     gen_text = getattr(res.generation, "text", None) or ""
+
+    # Check for quality issues in generated text
+    is_repetitive, repeated_token = _detect_repetitive_output(gen_text)
+    hallucination_issues = _detect_hallucination_patterns(gen_text)
+
     logger.info("📝 %s", Colors.colored("Generated Text:", Colors.BOLD, Colors.CYAN))
+
+    # Warn about repetitive output
+    if is_repetitive and repeated_token:
+        warning_msg = f"⚠️  WARNING: Output appears to be garbage (repetitive: '{repeated_token}')"
+        logger.warning(Colors.colored(warning_msg, Colors.YELLOW, Colors.BOLD))
+
+    # Warn about hallucination patterns
+    if hallucination_issues:
+        for issue in hallucination_issues:
+            logger.warning(Colors.colored(f"⚠️  Note: {issue}", Colors.YELLOW))
+
     _log_wrapped_label_value("   ", gen_text, color=Colors.CYAN)
 
     logger.info("")  # Breathing room
@@ -3182,23 +3320,35 @@ def _align_metric_parts(parts: list[str]) -> list[str]:
 
 def log_metrics_legend(*, detailed: bool) -> None:
     """Emit a one-time legend at the beginning of processing for clarity."""
+    logger.info("")
+    logger.info(Colors.colored("📖 Metrics Format:", Colors.BOLD, Colors.CYAN))
     if detailed:
         logger.info(
             Colors.colored(
-                "Legend (detailed): shows separate lines for timing, memory, tokens, TPS.",
+                "  • Detailed mode: separate lines for timing, memory, tokens, TPS",
                 Colors.GRAY,
             ),
         )
     else:
         logger.info(
             Colors.colored(
-                (
-                    "Legend: tokens(total/prompt/gen)="
-                    "total/prompt/generated • keys aligned for readability"
-                ),
+                "  • Compact mode: tokens(total/prompt/gen) format with aligned keys",
                 Colors.GRAY,
             ),
         )
+    logger.info(
+        Colors.colored(
+            "  • ⚠️  warnings shown for repetitive or hallucinated output",
+            Colors.GRAY,
+        ),
+    )
+    logger.info(
+        Colors.colored(
+            "  • Note: Streaming early-stop for repetitive output is not yet implemented",
+            Colors.GRAY,
+        ),
+    )
+    logger.info("")
 
 
 def print_model_result(
