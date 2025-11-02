@@ -4,13 +4,17 @@
 from pathlib import Path
 
 import pytest
+from huggingface_hub.errors import CacheNotFound
 
 import check_models
 
 
 def test_get_cached_model_ids_returns_list():
     """Should return a list of model IDs from cache."""
-    model_ids = check_models.get_cached_model_ids()
+    try:
+        model_ids = check_models.get_cached_model_ids()
+    except CacheNotFound:
+        pytest.skip("HuggingFace cache directory not found (expected in CI)")
     assert isinstance(model_ids, list)
     # May be empty if no models cached
     for model_id in model_ids:
