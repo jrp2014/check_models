@@ -21,10 +21,16 @@
 #   the script will automatically (AFTER installing all library dependencies):
 #   1. Run git pull in each repository
 #   2. Install requirements.txt (if present) for additional dependencies
+#      (Note: mlx requires nanobind==2.4.0 and setuptools>=80 for dev builds)
 #   3. Install packages in dependency order: mlx → mlx-lm → mlx-vlm
 #   4. Generate type stubs (mlx: python setup.py generate_stubs)
 #   5. Generate stubs for this project (mlx_vlm, tokenizers)
 #   6. Skip PyPI updates for these packages
+#
+# Requirements for local MLX builds:
+#   - CMake >= 3.27
+#   - Xcode >= 15.0 (macOS)
+#   - macOS >= 13.5 (for Metal backend)
 #
 # Note: Script automatically detects and preserves local MLX dev builds (versions
 # containing .dev or +commit). Stable releases are updated normally.
@@ -113,6 +119,45 @@ clean_local_mlx_builds() {
 	echo ""
 }
 
+# Function to check system requirements for MLX builds
+check_mlx_build_requirements() {
+	local has_errors=0
+	
+	# Check for CMake and version
+	if ! command -v cmake >/dev/null 2>&1; then
+		echo "❌ ERROR: CMake not found. MLX requires CMake >= 3.27"
+		echo "   Install with: brew install cmake"
+		has_errors=1
+	else
+		local CMAKE_VERSION=$(cmake --version | head -n1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+		local CMAKE_MAJOR=$(echo "$CMAKE_VERSION" | cut -d. -f1)
+		local CMAKE_MINOR=$(echo "$CMAKE_VERSION" | cut -d. -f2)
+		
+		if [[ $CMAKE_MAJOR -lt 3 ]] || [[ $CMAKE_MAJOR -eq 3 && $CMAKE_MINOR -lt 27 ]]; then
+			echo "❌ ERROR: CMake $CMAKE_VERSION found, but MLX requires >= 3.27"
+			echo "   Update with: brew upgrade cmake"
+			has_errors=1
+		else
+			echo "✓ CMake $CMAKE_VERSION (>= 3.27 required)"
+		fi
+	fi
+	
+	# Check for macOS version (Metal backend requirement)
+	if [[ "$OSTYPE" == "darwin"* ]]; then
+		local MACOS_VERSION=$(sw_vers -productVersion)
+		local MACOS_MAJOR=$(echo "$MACOS_VERSION" | cut -d. -f1)
+		local MACOS_MINOR=$(echo "$MACOS_VERSION" | cut -d. -f2)
+		
+		if [[ $MACOS_MAJOR -lt 13 ]] || [[ $MACOS_MAJOR -eq 13 && $MACOS_MINOR -lt 5 ]]; then
+			echo "⚠️  WARNING: macOS $MACOS_VERSION detected. MLX recommends >= 13.5 for Metal backend"
+		else
+			echo "✓ macOS $MACOS_VERSION (>= 13.5 required for Metal)"
+		fi
+	fi
+	
+	return $has_errors
+}
+
 # Function to update local MLX development repositories
 update_local_mlx_repos() {
 	# Determine the parent directory (assuming scripts/src/tools/update.sh)
@@ -148,6 +193,22 @@ update_local_mlx_repos() {
 	echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	echo "📦 Updating local MLX repositories: ${REPO_NAMES[*]}"
 	echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	
+	# Check build requirements if mlx is present
+	for repo in "${REPO_NAMES[@]}"; do
+		if [[ "$repo" == "mlx" ]]; then
+			echo ""
+			echo "Verifying build requirements for MLX..."
+			if ! check_mlx_build_requirements; then
+				echo ""
+				echo "❌ Build requirements not met. Cannot build MLX."
+				cd "$ORIGINAL_DIR"
+				return 1
+			fi
+			echo ""
+			break
+		fi
+	done
 
 	# Stage 1: Sync all repositories first
 	echo ""
@@ -244,8 +305,18 @@ update_local_mlx_repos() {
 		# Generate stubs for mlx
 		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
 			echo "[update.sh] Generating type stubs for mlx..."
-			python -c "import setuptools" 2>/dev/null || pip install setuptools
-			python setup.py generate_stubs && echo "✓ MLX stubs generated" || echo "⚠️  Stub generation failed (non-fatal)"
+			
+			# Verify setuptools is installed (required for stub generation)
+			if ! python -c "import setuptools; exit(0 if tuple(map(int, setuptools.__version__.split('.'))) >= (80, 0, 0) else 1)" 2>/dev/null; then
+				echo "[update.sh] Installing setuptools>=80 (required for stub generation)..."
+				pip_install "setuptools>=80"
+			fi
+			
+			if python setup.py generate_stubs; then
+				echo "✓ MLX stubs generated"
+			else
+				echo "⚠️  Stub generation failed (non-fatal)"
+			fi
 		fi
 		echo ""
 	done
