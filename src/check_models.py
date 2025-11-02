@@ -1064,6 +1064,94 @@ def _detect_hallucination_patterns(text: str) -> list[str]:
     return issues
 
 
+def _detect_excessive_verbosity(text: str, generated_tokens: int) -> bool:
+    """Detect if model output is excessively verbose.
+
+    Considers output verbose if:
+    - Generated tokens > 300 (substantial length)
+    - Contains meta-commentary about the image/analysis
+    - Has multiple sections (###, ##) suggesting over-structure
+
+    Args:
+        text: Generated text to check
+        generated_tokens: Number of tokens generated
+
+    Returns:
+        True if output appears excessively verbose
+    """
+    verbose_threshold = 300
+    min_meta_count = 2
+    min_section_headers = 3
+
+    if generated_tokens < verbose_threshold:
+        return False
+
+    text_lower = text.lower()
+
+    # Check for meta-commentary patterns
+    meta_patterns = [
+        "the image depicts",
+        "the image shows",
+        "the photograph captures",
+        "this image features",
+        "in conclusion",
+        "### analysis",
+        "### conclusion",
+        "based on the image",
+    ]
+
+    meta_count = sum(1 for pattern in meta_patterns if pattern in text_lower)
+
+    # Check for excessive sectioning
+    section_headers = text.count("###") + text.count("## ")
+
+    # Verbose if has meta-commentary + sections or just too many sections
+    return meta_count >= min_meta_count or section_headers >= min_section_headers
+
+
+def _detect_formatting_violations(text: str) -> list[str]:
+    """Detect formatting issues in generated output.
+
+    Looks for:
+    - HTML tags when not expected
+    - Excessive markdown headers/structure
+    - Bullet lists when simple text requested
+
+    Args:
+        text: Generated text to check
+
+    Returns:
+        List of detected formatting issues
+    """
+    max_headers = 5
+    max_bullets = 15
+
+    issues: list[str] = []
+
+    if not text:
+        return issues
+
+    # Check for HTML tags (beyond simple breaks)
+    html_tags = re.findall(r"<(?!br>|/br>)[a-z]+[^>]*>", text, re.IGNORECASE)
+    if html_tags:
+        issues.append(f"Contains HTML tags: {', '.join(set(html_tags[:3]))}")
+
+    # Check for excessive markdown structure
+    header_count = text.count("\n##") + text.count("\n###")
+    if header_count > max_headers:
+        issues.append(f"Excessive markdown headers ({header_count})")
+
+    # Check for bullet lists when might not be appropriate
+    bullet_prefixes = ("- ", "* ", "• ")
+    bullet_lines = [
+        line for line in text.split("\n") if line.strip().startswith(bullet_prefixes)
+    ]
+    if len(bullet_lines) > max_bullets:
+        issues.append(f"Excessive bullet points ({len(bullet_lines)})")
+
+    return issues
+
+
 def local_now_str(fmt: str = "%Y-%m-%d %H:%M:%S %Z") -> str:
     """Return localized current time as a formatted string.
 
@@ -2146,6 +2234,8 @@ class ModelIssuesSummary:
     repetitive: list[str]  # Models with highly repetitive output
     succinct: list[str]  # Models with very short output relative to prompt
     hallucinated: list[str]  # Models with detected hallucination patterns
+    verbose: list[str]  # Models with excessively verbose/over-structured output
+    formatting_issues: list[str]  # Models with HTML/markdown formatting violations
     successful: list[str]  # Models that completed successfully without issues
 
 
@@ -2162,6 +2252,8 @@ def analyze_model_issues(results: list[PerformanceResult]) -> ModelIssuesSummary
     repetitive: list[str] = []
     succinct: list[str] = []
     hallucinated: list[str] = []
+    verbose: list[str] = []
+    formatting_issues: list[str] = []
     successful: list[str] = []
 
     succinct_threshold = 0.3  # Output < 30% of prompt length
@@ -2176,6 +2268,9 @@ def analyze_model_issues(results: list[PerformanceResult]) -> ModelIssuesSummary
 
         # Analyze successful models
         gen_text = str(getattr(result.generation, "text", "")) if result.generation else ""
+        gen_tokens = (
+            getattr(result.generation, "generation_tokens", 0) if result.generation else 0
+        )
 
         # Check for repetitive output
         is_repetitive, repeated_token = _detect_repetitive_output(gen_text)
@@ -2190,11 +2285,20 @@ def analyze_model_issues(results: list[PerformanceResult]) -> ModelIssuesSummary
             hallucinated.append(f"{model_name} ({issue_desc})")
             continue
 
+        # Check for excessive verbosity
+        if _detect_excessive_verbosity(gen_text, gen_tokens):
+            verbose.append(f"{model_name} ({gen_tokens} tokens)")
+            continue
+
+        # Check for formatting violations
+        format_issues = _detect_formatting_violations(gen_text)
+        if format_issues:
+            issue_desc = format_issues[0]  # First issue
+            formatting_issues.append(f"{model_name} ({issue_desc})")
+            continue
+
         # Check for overly succinct output
         prompt_tokens = getattr(result.generation, "prompt_tokens", 0) if result.generation else 0
-        gen_tokens = (
-            getattr(result.generation, "generation_tokens", 0) if result.generation else 0
-        )
 
         if prompt_tokens > 0 and gen_tokens < (prompt_tokens * succinct_threshold):
             succinct.append(f"{model_name} ({gen_tokens} tokens)")
@@ -2208,6 +2312,8 @@ def analyze_model_issues(results: list[PerformanceResult]) -> ModelIssuesSummary
         repetitive=repetitive,
         succinct=succinct,
         hallucinated=hallucinated,
+        verbose=verbose,
+        formatting_issues=formatting_issues,
         successful=successful,
     )
 
@@ -2228,9 +2334,13 @@ def format_issues_summary_text(summary: ModelIssuesSummary) -> str:
         + len(summary.repetitive)
         + len(summary.succinct)
         + len(summary.hallucinated)
+        + len(summary.verbose)
+        + len(summary.formatting_issues)
         + len(summary.successful)
     )
 
+    lines.append("## 📊 Model Performance Summary")
+    lines.append("")
     lines.append(f"**Total Models Evaluated:** {total}")
     lines.append("")
 
@@ -2260,6 +2370,18 @@ def format_issues_summary_text(summary: ModelIssuesSummary) -> str:
         lines.extend([f"  • {model}" for model in summary.hallucinated])
         lines.append("")
 
+    if summary.verbose:
+        lines.append(f"📚 **Excessively Verbose ({len(summary.verbose)}):**")
+        lines.append("   Over-structured output with meta-commentary")
+        lines.extend([f"  • {model}" for model in summary.verbose])
+        lines.append("")
+
+    if summary.formatting_issues:
+        lines.append(f"🎨 **Formatting Issues ({len(summary.formatting_issues)}):**")
+        lines.append("   Unexpected HTML/markdown structure")
+        lines.extend([f"  • {model}" for model in summary.formatting_issues])
+        lines.append("")
+
     if summary.succinct:
         lines.append(f"📝 **Very Succinct ({len(summary.succinct)}):**")
         lines.append("   Generated output much shorter than prompt")
@@ -2285,11 +2407,13 @@ def format_issues_summary_html(summary: ModelIssuesSummary) -> str:
         + len(summary.repetitive)
         + len(summary.succinct)
         + len(summary.hallucinated)
+        + len(summary.verbose)
+        + len(summary.formatting_issues)
         + len(summary.successful)
     )
 
     lines.append("<div class='issues-summary'>")
-    lines.append("<h3>Model Performance Summary</h3>")
+    lines.append("<h3>📊 Model Performance Summary</h3>")
     lines.append(f"<p><strong>Total Models Evaluated:</strong> {total}</p>")
 
     if summary.successful:
@@ -2329,6 +2453,26 @@ def format_issues_summary_html(summary: ModelIssuesSummary) -> str:
         lines.append("<p>Detected unexpected content patterns</p>")
         lines.append("<ul>")
         lines.extend([f"<li>{html.escape(m)}</li>" for m in summary.hallucinated])
+        lines.append("</ul>")
+
+    if summary.verbose:
+        lines.append(
+            f"<h4 style='color: #9c27b0;'>📚 Excessively Verbose "
+            f"({len(summary.verbose)})</h4>",
+        )
+        lines.append("<p>Over-structured output with meta-commentary</p>")
+        lines.append("<ul>")
+        lines.extend([f"<li>{html.escape(m)}</li>" for m in summary.verbose])
+        lines.append("</ul>")
+
+    if summary.formatting_issues:
+        lines.append(
+            f"<h4 style='color: #795548;'>🎨 Formatting Issues "
+            f"({len(summary.formatting_issues)})</h4>",
+        )
+        lines.append("<p>Unexpected HTML/markdown structure</p>")
+        lines.append("<ul>")
+        lines.extend([f"<li>{html.escape(m)}</li>" for m in summary.formatting_issues])
         lines.append("</ul>")
 
     if summary.succinct:
@@ -3326,11 +3470,18 @@ def _preview_generation(gen: GenerationResult | SupportsGenerationResult | None)
     # Check for quality issues (non-verbose mode gets brief inline warnings)
     is_repetitive, repeated_token = _detect_repetitive_output(text_val)
     hallucination_issues = _detect_hallucination_patterns(text_val)
+    gen_tokens = getattr(gen, "generation_tokens", 0)
+    is_verbose = _detect_excessive_verbosity(text_val, gen_tokens)
+    format_issues = _detect_formatting_violations(text_val)
 
     if is_repetitive and repeated_token:
         logger.warning(Colors.colored(f"⚠️  Repetitive: '{repeated_token}'", Colors.YELLOW))
     if hallucination_issues:
-        logger.warning(Colors.colored(f"⚠️  {', '.join(hallucination_issues)}", Colors.YELLOW))
+        logger.warning(Colors.colored(f"⚠️  {', '.join(hallucination_issues[:2])}", Colors.YELLOW))
+    if is_verbose:
+        logger.warning(Colors.colored(f"⚠️  Verbose ({gen_tokens} tokens)", Colors.YELLOW))
+    if format_issues:
+        logger.warning(Colors.colored(f"⚠️  {format_issues[0]}", Colors.YELLOW))
 
     width = get_terminal_width(max_width=100)
     for original_line in text_val.splitlines():
@@ -3362,6 +3513,9 @@ def _log_verbose_success_details_mode(res: PerformanceResult, *, detailed: bool)
     # Check for quality issues in generated text
     is_repetitive, repeated_token = _detect_repetitive_output(gen_text)
     hallucination_issues = _detect_hallucination_patterns(gen_text)
+    gen_tokens = getattr(res.generation, "generation_tokens", 0)
+    is_verbose = _detect_excessive_verbosity(gen_text, gen_tokens)
+    format_issues = _detect_formatting_violations(gen_text)
 
     logger.info("📝 %s", Colors.colored("Generated Text:", Colors.BOLD, Colors.CYAN))
 
@@ -3373,6 +3527,20 @@ def _log_verbose_success_details_mode(res: PerformanceResult, *, detailed: bool)
     # Warn about hallucination patterns
     if hallucination_issues:
         for issue in hallucination_issues:
+            logger.warning(Colors.colored(f"⚠️  Note: {issue}", Colors.YELLOW))
+
+    # Warn about excessive verbosity
+    if is_verbose:
+        logger.warning(
+            Colors.colored(
+                f"⚠️  Note: Output is excessively verbose ({gen_tokens} tokens)",
+                Colors.YELLOW,
+            ),
+        )
+
+    # Warn about formatting issues
+    if format_issues:
+        for issue in format_issues[:2]:  # Show first 2 issues
             logger.warning(Colors.colored(f"⚠️  Note: {issue}", Colors.YELLOW))
 
     _log_wrapped_label_value("   ", gen_text, color=Colors.CYAN)
