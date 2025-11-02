@@ -47,6 +47,8 @@ typings/
 
 # Logs
 *.log
+# But keep the default output log for reference
+!src/output/check_models.log
 
 # Backup files
 *.bak
