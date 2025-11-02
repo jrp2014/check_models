@@ -94,8 +94,10 @@ pip_install -e "$PROJECT_ROOT/$INSTALL_GROUPS"
 
 # Function to clean build artifacts from local MLX repositories
 clean_local_mlx_builds() {
-	local SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-	local PARENT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+	local SCRIPT_DIR
+	SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+	local PARENT_DIR
+	PARENT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 	local MLX_REPOS=("mlx" "mlx-lm" "mlx-vlm" "mlx-data")
 	
 	echo "[update.sh] Cleaning build artifacts from local MLX repositories..."
@@ -106,7 +108,7 @@ clean_local_mlx_builds() {
 			echo "[update.sh] Cleaning $repo build artifacts..."
 			cd "$REPO_PATH"
 			# Remove Python build artifacts
-			rm -rf build/ dist/ *.egg-info/ .eggs/
+			rm -rf build/ dist/ ./*.egg-info/ .eggs/
 			find . -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true
 			find . -type d -name '.pytest_cache' -exec rm -rf {} + 2>/dev/null || true
 			find . -type d -name '*.egg-info' -exec rm -rf {} + 2>/dev/null || true
@@ -129,9 +131,12 @@ check_mlx_build_requirements() {
 		echo "   Install with: brew install cmake"
 		has_errors=1
 	else
-		local CMAKE_VERSION=$(cmake --version | head -n1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
-		local CMAKE_MAJOR=$(echo "$CMAKE_VERSION" | cut -d. -f1)
-		local CMAKE_MINOR=$(echo "$CMAKE_VERSION" | cut -d. -f2)
+		local CMAKE_VERSION
+		CMAKE_VERSION=$(cmake --version | head -n1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+		local CMAKE_MAJOR
+		CMAKE_MAJOR=$(echo "$CMAKE_VERSION" | cut -d. -f1)
+		local CMAKE_MINOR
+		CMAKE_MINOR=$(echo "$CMAKE_VERSION" | cut -d. -f2)
 		
 		if [[ $CMAKE_MAJOR -lt 3 ]] || [[ $CMAKE_MAJOR -eq 3 && $CMAKE_MINOR -lt 27 ]]; then
 			echo "❌ ERROR: CMake $CMAKE_VERSION found, but MLX requires >= 3.27"
@@ -144,9 +149,12 @@ check_mlx_build_requirements() {
 	
 	# Check for macOS version (Metal backend requirement)
 	if [[ "$OSTYPE" == "darwin"* ]]; then
-		local MACOS_VERSION=$(sw_vers -productVersion)
-		local MACOS_MAJOR=$(echo "$MACOS_VERSION" | cut -d. -f1)
-		local MACOS_MINOR=$(echo "$MACOS_VERSION" | cut -d. -f2)
+		local MACOS_VERSION
+		MACOS_VERSION=$(sw_vers -productVersion)
+		local MACOS_MAJOR
+		MACOS_MAJOR=$(echo "$MACOS_VERSION" | cut -d. -f1)
+		local MACOS_MINOR
+		MACOS_MINOR=$(echo "$MACOS_VERSION" | cut -d. -f2)
 		
 		if [[ $MACOS_MAJOR -lt 13 ]] || [[ $MACOS_MAJOR -eq 13 && $MACOS_MINOR -lt 5 ]]; then
 			echo "⚠️  WARNING: macOS $MACOS_VERSION detected. MLX recommends >= 13.5 for Metal backend"
@@ -161,9 +169,12 @@ check_mlx_build_requirements() {
 # Function to update local MLX development repositories
 update_local_mlx_repos() {
 	# Determine the parent directory (assuming scripts/src/tools/update.sh)
-	local SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-	local PARENT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
-	local ORIGINAL_DIR="$(pwd)"
+	local SCRIPT_DIR
+	SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+	local PARENT_DIR
+	PARENT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+	local ORIGINAL_DIR
+	ORIGINAL_DIR="$(pwd)"
 	
 	echo "[update.sh] Checking for local MLX development repositories..."
 	
@@ -252,9 +263,11 @@ update_local_mlx_repos() {
 		cd "${REPO_PATHS[idx]}"
 		
 		# Check for missing git-tracked files
-		local MISSING_FILES=$(git ls-files --deleted 2>/dev/null)
+		local MISSING_FILES
+		MISSING_FILES=$(git ls-files --deleted 2>/dev/null)
 		if [[ -n "$MISSING_FILES" ]]; then
-			local FILE_COUNT=$(echo "$MISSING_FILES" | wc -l | tr -d ' ')
+			local FILE_COUNT
+			FILE_COUNT=$(echo "$MISSING_FILES" | wc -l | tr -d ' ')
 			echo "❌ ERROR: Repository ${REPO_NAMES[idx]} is corrupt - $FILE_COUNT missing tracked file(s)"
 			echo "$MISSING_FILES" | head -3
 			echo ""
