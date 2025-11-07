@@ -82,6 +82,7 @@ __all__ = [
     "get_device_info",
     "get_exif_data",
     "get_library_versions",
+    "get_system_characteristics",
     "get_system_info",
     "get_terminal_width",
     "is_numeric_field",
@@ -1466,11 +1467,10 @@ def get_device_info() -> SystemProfilerDict | None:
 
 
 def print_version_info(versions: LibraryVersionDict) -> None:
-    """Print library versions and optionally system / hardware info.
+    """Print library versions and system / hardware info.
 
-    If running on Apple Silicon (arm64 macOS) we append a concise hardware
-    block (GPU name, RAM, physical CPU cores, GPU cores). Otherwise we note
-    that the extended block is skipped. Errors are swallowed so version
+    Uses get_system_characteristics() to provide consistent output across
+    CLI, HTML, and Markdown reports. Errors are swallowed so version
     printing never fails.
     """
     logger.info("--- Library Versions ---")
@@ -1484,44 +1484,19 @@ def print_version_info(versions: LibraryVersionDict) -> None:
         local_now_str(),
     )
 
-    # --- Optional system / hardware block (Apple Silicon focus) ---
+    # --- System / hardware information block ---
     try:
-        is_arm64: bool = platform.machine() == "arm64"
-        if not is_arm64:
-            logger.info("Not running on Apple Silicon (system info block skipped).")
-            return
-
-        device_info = get_device_info() or {}
-        displays = device_info.get("SPDisplaysDataType") or []
-        gpu_name: str | None = None
-        gpu_cores: str | int | None = None
-        if displays and isinstance(displays, list):
-            first = displays[0]
-            if isinstance(first, dict):
-                gpu_name = first.get("_name")
-                gpu_cores = first.get("sppci_cores")
-
-        if psutil is None:  # safety if optional import failed
-            logger.debug("psutil not available; skipping extended system info block.")
-            return
-
-        ram_gb = psutil.virtual_memory().total / (1024**3)
-        physical_cores = psutil.cpu_count(logical=False) or 0
-
-        sys_lines = [
-            "",  # spacer
-            "--- System Information ---",
-            f"macOS:        v{platform.mac_ver()[0]}",
-            f"Python:       v{sys.version.split()[0]}",
-            "",
-            "Hardware:",
-            f"• Chip:        {gpu_name or 'Unknown'}",
-            f"• RAM:         {ram_gb:.1f} GB",
-            f"• CPU Cores:   {physical_cores}",
-            f"• GPU Cores:   {gpu_cores if gpu_cores is not None else 'Unknown'}",
-        ]
-        for line in sys_lines:
-            logger.info(line)
+        system_info = get_system_characteristics()
+        if system_info:
+            logger.info("")  # spacer
+            logger.info("--- System Information ---")
+            # Calculate max key length for alignment
+            max_key_len = max(len(k) for k in system_info) if system_info else 10
+            for key, value in system_info.items():
+                key_padded = key.ljust(max_key_len)
+                logger.info("%s: %s", key_padded, value)
+        else:
+            logger.debug("No system information available.")
     except Exception as err:  # noqa: BLE001 - system info is non-critical, intentionally catch all failure modes
         logger.debug("Skipping system info block: %s", err)
 
@@ -2667,6 +2642,7 @@ def _build_full_html_document(
     prompt: str,
     total_runtime_seconds: float,
     issues_summary_html: str = "",
+    system_info: dict[str, str] | None = None,
 ) -> str:
     local_tz = get_localzone()
     # Build complete HTML document
@@ -2750,9 +2726,18 @@ def _build_full_html_document(
         Overall runtime: {format_overall_runtime(total_runtime_seconds)}
     </div>
     {html_table}
-    <footer>
-        <h2>🔧 System Information</h2>
-        <ul>\n"""
+    <footer>"""
+
+    # Add system/hardware information if available
+    if system_info:
+        html_content += "\n        <h2>� System/Hardware Information</h2>\n        <ul>\n"
+        for name, value in system_info.items():
+            html_content += (
+                f"            <li><strong>{html.escape(name)}</strong>: {html.escape(value)}</li>\n"
+            )
+        html_content += "        </ul>\n"
+
+    html_content += "        <h2>🔧 Library Versions</h2>\n        <ul>\n"
 
     for name, ver in sorted(versions.items()):
         ver_str = "" if ver is None else ver
@@ -2827,6 +2812,9 @@ def generate_html_report(
     summary = analyze_model_issues(results)
     issues_html = format_issues_summary_html(summary)
 
+    # Gather system characteristics for the report
+    system_info = get_system_characteristics()
+
     # Mark failed rows and build the final document
     html_table = _mark_failed_rows_in_html(html_table, results)
     html_content = _build_full_html_document(
@@ -2835,6 +2823,7 @@ def generate_html_report(
         prompt=prompt,
         total_runtime_seconds=total_runtime_seconds,
         issues_summary_html=issues_html,
+        system_info=system_info if system_info else None,
     )
 
     try:
@@ -2926,6 +2915,9 @@ def generate_markdown_report(
     summary = analyze_model_issues(results)
     issues_text = format_issues_summary_text(summary)
 
+    # Gather system characteristics for the report
+    system_info = get_system_characteristics()
+
     # Build the complete markdown content
     md: list[str] = []
     md.append("# Model Performance Results\n")
@@ -2947,6 +2939,14 @@ def generate_markdown_report(
     md.append(markdown_table)
     md.append("<!-- markdownlint-enable MD013 MD033 MD034 MD037 MD049 -->")
     md.append("\n---\n")
+
+    # Add system/hardware information if available
+    if system_info:
+        md.append("## System/Hardware Information\n")
+        for name, value in system_info.items():
+            md.append(f"- **{name}**: {value}")
+        md.append("")
+
     md.append("## Library Versions\n")
     for name, ver in sorted(versions.items()):
         ver_str = "" if ver is None else ver
@@ -3109,6 +3109,57 @@ def get_system_info() -> tuple[str, str | None]:
     except (subprocess.SubprocessError, TimeoutError) as e:
         logger.debug("Could not get GPU info: %s", e)
     return arch, gpu_info
+
+
+def get_system_characteristics() -> dict[str, str]:
+    """Gather system/hardware characteristics for inclusion in reports.
+
+    Returns a dict with human-readable hardware info (OS, chip, RAM, cores, etc).
+    Safe to call even if psutil or system_profiler unavailable.
+    """
+    info: dict[str, str] = {}
+
+    try:
+        # Basic platform info
+        info["OS"] = f"{platform.system()} {platform.release()}"
+        if platform.system() == "Darwin":
+            info["macOS Version"] = platform.mac_ver()[0]
+        info["Python Version"] = sys.version.split()[0]
+        info["Architecture"] = platform.machine()
+
+        # Get GPU info
+        _, gpu_name = get_system_info()
+        if gpu_name:
+            info["GPU/Chip"] = gpu_name
+
+        # Get detailed device info if on Apple Silicon
+        if platform.machine() == "arm64":
+            device_info = get_device_info() or {}
+            displays = device_info.get("SPDisplaysDataType") or []
+            if displays and isinstance(displays, list):
+                first = displays[0]
+                if isinstance(first, dict):
+                    gpu_cores = first.get("sppci_cores")
+                    if gpu_cores is not None:
+                        info["GPU Cores"] = str(gpu_cores)
+
+        # Get memory and CPU info if psutil available
+        if psutil is not None:
+            ram_gb = psutil.virtual_memory().total / (1024**3)
+            info["RAM"] = f"{ram_gb:.1f} GB"
+
+            physical_cores = psutil.cpu_count(logical=False)
+            if physical_cores:
+                info["CPU Cores (Physical)"] = str(physical_cores)
+
+            logical_cores = psutil.cpu_count(logical=True)
+            if logical_cores:
+                info["CPU Cores (Logical)"] = str(logical_cores)
+
+    except Exception as err:  # noqa: BLE001 - system characteristics are supplementary
+        logger.debug("Error gathering system characteristics: %s", err)
+
+    return info
 
 
 # --- Model Processing Core ---
