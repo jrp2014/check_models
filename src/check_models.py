@@ -1116,18 +1116,19 @@ def _detect_formatting_violations(text: str) -> list[str]:
     """Detect formatting issues in generated output.
 
     Looks for:
-    - HTML tags when not expected
+    - Unknown/unexpected HTML tags (not simple <br>)
     - Excessive markdown headers/structure
-    - Bullet lists when simple text requested
+
+    Note: Bullet lists are checked separately by _detect_excessive_bullets()
+    since they may be appropriate depending on the prompt.
 
     Args:
         text: Generated text to check
 
     Returns:
-        List of detected formatting issues
+        List of detected formatting issues (excluding bullets)
     """
     max_headers = 5
-    max_bullets = 15
 
     issues: list[str] = []
 
@@ -1139,20 +1140,39 @@ def _detect_formatting_violations(text: str) -> list[str]:
     if html_tags:
         # Escape the HTML tags in the diagnostic message itself
         escaped_tags = [tag.replace("<", "&lt;").replace(">", "&gt;") for tag in set(html_tags[:3])]
-        issues.append(f"Contains HTML tags: {', '.join(escaped_tags)}")
+        issues.append(f"Unknown HTML tags: {', '.join(escaped_tags)}")
 
     # Check for excessive markdown structure
     header_count = text.count("\n##") + text.count("\n###")
     if header_count > max_headers:
         issues.append(f"Excessive markdown headers ({header_count})")
 
-    # Check for bullet lists when might not be appropriate
+    return issues
+
+
+def _detect_excessive_bullets(text: str) -> tuple[bool, int]:
+    """Detect if output contains excessive bullet points.
+
+    Bullet lists may be appropriate depending on the prompt (e.g., if the
+    prompt asks "list the items in this image"), so this is separated from
+    other formatting violations.
+
+    Args:
+        text: Generated text to check
+
+    Returns:
+        Tuple of (has_excessive_bullets, bullet_count)
+    """
+    max_bullets = 15
+
+    if not text:
+        return False, 0
+
     bullet_prefixes = ("- ", "* ", "• ")
     bullet_lines = [line for line in text.split("\n") if line.strip().startswith(bullet_prefixes)]
-    if len(bullet_lines) > max_bullets:
-        issues.append(f"Excessive bullet points ({len(bullet_lines)})")
+    bullet_count = len(bullet_lines)
 
-    return issues
+    return bullet_count > max_bullets, bullet_count
 
 
 def local_now_str(fmt: str = "%Y-%m-%d %H:%M:%S %Z") -> str:
@@ -2217,7 +2237,8 @@ class ModelIssuesSummary:
     succinct: list[str]  # Models with very short output relative to prompt
     hallucinated: list[str]  # Models with detected hallucination patterns
     verbose: list[str]  # Models with excessively verbose/over-structured output
-    formatting_issues: list[str]  # Models with HTML/markdown formatting violations
+    formatting_issues: list[str]  # Models with HTML/markdown formatting violations (excl. bullets)
+    excessive_bullets: list[str]  # Models with excessive bullet points (may be prompt-appropriate)
     successful: list[str]  # Models that completed successfully without issues
 
 
@@ -2236,6 +2257,7 @@ def analyze_model_issues(results: list[PerformanceResult]) -> ModelIssuesSummary
     hallucinated: list[str] = []
     verbose: list[str] = []
     formatting_issues: list[str] = []
+    excessive_bullets: list[str] = []
     successful: list[str] = []
 
     succinct_threshold = 0.3  # Output < 30% of prompt length
@@ -2270,12 +2292,18 @@ def analyze_model_issues(results: list[PerformanceResult]) -> ModelIssuesSummary
             verbose.append(f"{model_name} ({gen_tokens} tokens)")
             continue
 
-        # Check for formatting violations
+        # Check for formatting violations (HTML tags, headers, etc. - excluding bullets)
         format_issues = _detect_formatting_violations(gen_text)
         if format_issues:
             issue_desc = format_issues[0]  # First issue
             formatting_issues.append(f"{model_name} ({issue_desc})")
             continue
+
+        # Check for excessive bullets separately (may be prompt-appropriate)
+        has_excess_bullets, bullet_count = _detect_excessive_bullets(gen_text)
+        if has_excess_bullets:
+            excessive_bullets.append(f"{model_name} ({bullet_count} bullets)")
+            # Note: We continue here but mark as a separate category, not a hard failure
 
         # Check for overly succinct output
         prompt_tokens = getattr(result.generation, "prompt_tokens", 0) if result.generation else 0
@@ -2284,8 +2312,10 @@ def analyze_model_issues(results: list[PerformanceResult]) -> ModelIssuesSummary
             succinct.append(f"{model_name} ({gen_tokens} tokens)")
             continue
 
-        # If none of the above, it's successful
-        successful.append(model_name)
+        # If none of the critical issues above, it's successful
+        # (may still have excessive bullets, but that's noted separately)
+        if not has_excess_bullets:
+            successful.append(model_name)
 
     return ModelIssuesSummary(
         crashed=crashed,
@@ -2294,6 +2324,7 @@ def analyze_model_issues(results: list[PerformanceResult]) -> ModelIssuesSummary
         hallucinated=hallucinated,
         verbose=verbose,
         formatting_issues=formatting_issues,
+        excessive_bullets=excessive_bullets,
         successful=successful,
     )
 
@@ -2316,6 +2347,7 @@ def format_issues_summary_text(summary: ModelIssuesSummary) -> str:
         + len(summary.hallucinated)
         + len(summary.verbose)
         + len(summary.formatting_issues)
+        + len(summary.excessive_bullets)
         + len(summary.successful)
     )
 
@@ -2358,8 +2390,14 @@ def format_issues_summary_text(summary: ModelIssuesSummary) -> str:
 
     if summary.formatting_issues:
         lines.append(f"🎨 **Formatting Issues ({len(summary.formatting_issues)}):**")
-        lines.append("   Unexpected HTML/markdown structure")
+        lines.append("   Unexpected HTML tags or markdown structure")
         lines.extend([f"  • {model}" for model in summary.formatting_issues])
+        lines.append("")
+
+    if summary.excessive_bullets:
+        lines.append(f"📋 **Excessive Bullet Points ({len(summary.excessive_bullets)}):**")
+        lines.append("   Many bullet points (may be appropriate depending on prompt)")
+        lines.extend([f"  • {model}" for model in summary.excessive_bullets])
         lines.append("")
 
     if summary.succinct:
@@ -2389,6 +2427,7 @@ def format_issues_summary_html(summary: ModelIssuesSummary) -> str:
         + len(summary.hallucinated)
         + len(summary.verbose)
         + len(summary.formatting_issues)
+        + len(summary.excessive_bullets)
         + len(summary.successful)
     )
 
@@ -2448,9 +2487,19 @@ def format_issues_summary_html(summary: ModelIssuesSummary) -> str:
             f"<h4 style='color: #795548;'>🎨 Formatting Issues "
             f"({len(summary.formatting_issues)})</h4>",
         )
-        lines.append("<p>Unexpected HTML/markdown structure</p>")
+        lines.append("<p>Unexpected HTML tags or markdown structure</p>")
         lines.append("<ul>")
         lines.extend([f"<li>{html.escape(m)}</li>" for m in summary.formatting_issues])
+        lines.append("</ul>")
+
+    if summary.excessive_bullets:
+        lines.append(
+            f"<h4 style='color: #607d8b;'>📋 Excessive Bullet Points "
+            f"({len(summary.excessive_bullets)})</h4>",
+        )
+        lines.append("<p>Many bullet points (may be appropriate depending on prompt)</p>")
+        lines.append("<ul>")
+        lines.extend([f"<li>{html.escape(m)}</li>" for m in summary.excessive_bullets])
         lines.append("</ul>")
 
     if summary.succinct:
