@@ -47,8 +47,17 @@ typings/
 
 # Logs
 *.log
-# But keep the default output log for reference
-!src/output/check_models.log
+
+# Output files (regenerated on each run; don't commit)
+src/output/check_models.log
+src/output/results.html
+src/output/results.md
+# Test output files
+src/output/test_*.log
+src/output/test_*.html
+src/output/test_*.md
+# Keep the README explaining the output directory
+!src/output/README.md
 
 # Backup files
 *.bak

@@ -6,11 +6,21 @@ The script's default output location is now this directory, keeping the project 
 
 ## Files
 
+### Production Output (not committed to git)
+
 - `results.html` - Styled HTML report (viewable in browser)
 - `results.md` - GitHub-friendly Markdown report
-- `results.log` - Detailed execution log (optional, via `--output-log`)
+- `check_models.log` - Detailed execution log (optional, via `--output-log`)
 
-These files are regenerated each time you run the tool.
+### Test Output (not committed to git)
+
+When running tests or CI, the script uses separate output files to avoid conflicts:
+
+- `test_results.html` - Test run HTML report
+- `test_results.md` - Test run Markdown report
+- `test_check_models.log` - Test run log
+
+These files are regenerated each time you run the tool and are excluded from git tracking.
 
 ## CLI Logging Output
 
