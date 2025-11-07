@@ -29,7 +29,13 @@ python check_models.py \
 
 Files matching `test_*.{html,md,log}` are automatically excluded from git tracking via `.gitignore`.
 
-**Separation strategy**: Production runs use the default `check_models.log` (tracked in git for benchmark visibility). Integration scripts and tests should specify alternative log files (e.g., `test_check_models.log`, `debug.log`) which are excluded from version control.
+**Separation strategy**: 
+- **Production runs**: Use default outputs (`check_models.log`, `results.html`, `results.md`) → committed to git
+- **Integration tests**: Use `test_cli_integration.{log,html,md}` → gitignored (handled automatically by test suite)
+- **Manual test/debug runs**: Pass custom paths with `test_` prefix or any other name except the production defaults → gitignored
+- **Pre-push git hook**: Runs pytest which uses test-specific output files → doesn't overwrite production log
+
+This ensures your production benchmark results in git remain clean and only reflect intentional benchmark runs, not test/debug executions.
 
 ## CLI Logging Output
 

@@ -17,6 +17,24 @@ from PIL import Image
 _TEST_DIR = Path(__file__).parent
 _SRC_DIR = _TEST_DIR.parent
 _CHECK_MODELS_SCRIPT = _SRC_DIR / "check_models.py"
+_OUTPUT_DIR = _SRC_DIR / "output"
+
+# Test-specific output files (excluded from git via .gitignore)
+_TEST_LOG = _OUTPUT_DIR / "test_cli_integration.log"
+_TEST_HTML = _OUTPUT_DIR / "test_cli_integration.html"
+_TEST_MD = _OUTPUT_DIR / "test_cli_integration.md"
+
+
+def _get_test_output_args() -> list[str]:
+    """Return CLI arguments for test-specific output files."""
+    return [
+        "--output-log",
+        str(_TEST_LOG),
+        "--output-html",
+        str(_TEST_HTML),
+        "--output-markdown",
+        str(_TEST_MD),
+    ]
 
 
 @pytest.fixture
@@ -78,7 +96,13 @@ def test_cli_help_structure():
 def test_cli_exits_on_nonexistent_folder():
     """Should exit with error when folder does not exist."""
     result = subprocess.run(
-        [sys.executable, str(_CHECK_MODELS_SCRIPT), "--folder", "/nonexistent/folder/path"],
+        [
+            sys.executable,
+            str(_CHECK_MODELS_SCRIPT),
+            *_get_test_output_args(),
+            "--folder",
+            "/nonexistent/folder/path",
+        ],
         check=False,
         capture_output=True,
         text=True,
@@ -99,7 +123,13 @@ def test_cli_exits_on_empty_folder(tmp_path: Path):
     empty_folder.mkdir()
 
     result = subprocess.run(
-        [sys.executable, str(_CHECK_MODELS_SCRIPT), "--folder", str(empty_folder)],
+        [
+            sys.executable,
+            str(_CHECK_MODELS_SCRIPT),
+            *_get_test_output_args(),
+            "--folder",
+            str(empty_folder),
+        ],
         check=False,
         capture_output=True,
         text=True,
@@ -116,6 +146,7 @@ def test_cli_invalid_temperature_value():
         [
             sys.executable,
             str(_CHECK_MODELS_SCRIPT),
+            *_get_test_output_args(),
             "--temperature",
             "2.5",
             "--folder",
@@ -136,6 +167,7 @@ def test_cli_invalid_max_tokens():
         [
             sys.executable,
             str(_CHECK_MODELS_SCRIPT),
+            *_get_test_output_args(),
             "--max-tokens",
             "-10",
             "--folder",

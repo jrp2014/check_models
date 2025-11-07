@@ -1134,7 +1134,9 @@ def _detect_formatting_violations(text: str) -> list[str]:
     # Check for HTML tags (beyond simple breaks)
     html_tags = re.findall(r"<(?!br>|/br>)[a-z]+[^>]*>", text, re.IGNORECASE)
     if html_tags:
-        issues.append(f"Contains HTML tags: {', '.join(set(html_tags[:3]))}")
+        # Escape the HTML tags in the diagnostic message itself
+        escaped_tags = [tag.replace("<", "&lt;").replace(">", "&gt;") for tag in set(html_tags[:3])]
+        issues.append(f"Contains HTML tags: {', '.join(escaped_tags)}")
 
     # Check for excessive markdown structure
     header_count = text.count("\n##") + text.count("\n###")

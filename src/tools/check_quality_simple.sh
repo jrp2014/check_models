@@ -4,6 +4,19 @@ set -e
 
 cd "$(dirname "$0")/.."
 
+# Ensure we're using the mlx-vlm conda environment
+# First, initialize conda for bash (required for conda activate to work)
+if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
+    source "$HOME/miniconda3/etc/profile.d/conda.sh"
+elif [ -f "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
+    source "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
+fi
+
+# Activate the mlx-vlm environment
+if command -v conda &> /dev/null; then
+    conda activate mlx-vlm 2>/dev/null || true
+fi
+
 # Use the Python from the current conda environment
 # CONDA_PREFIX points to the active environment's directory
 if [ -n "$CONDA_PREFIX" ]; then
