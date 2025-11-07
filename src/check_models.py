@@ -3813,7 +3813,11 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     # File handler - write to specified log file (overwrite each run)
     log_file: Path = args.output_log.resolve()
     log_file.parent.mkdir(parents=True, exist_ok=True)
-    file_handler: logging.FileHandler = logging.FileHandler(log_file, mode="w", encoding="utf-8")
+    file_handler: logging.FileHandler = logging.FileHandler(
+        log_file,
+        mode="w",
+        encoding="utf-8",
+    )
     # File gets full timestamp + level always (no colors in file)
     file_formatter: logging.Formatter = logging.Formatter(
         "%(asctime)s - %(levelname)s - %(message)s",
@@ -4324,7 +4328,7 @@ def main_cli() -> None:
         "--output-log",
         type=Path,
         default=DEFAULT_LOG_OUTPUT,
-        help="Output log file (overwritten each run).",
+        help="Output log file (overwritten each run). Use different path for tests/debug runs.",
     )
     parser.add_argument(
         "-m",

@@ -10,15 +10,16 @@ The script's default output location is now this directory, keeping the project 
 
 - `results.html` - Styled HTML report (viewable in browser)
 - `results.md` - GitHub-friendly Markdown report  
-- `check_models.log` - Detailed execution log
+- `check_models.log` - Detailed execution log from production benchmark runs
 
 These files are regenerated each time you run the tool and **committed to version control** so results are visible in GitHub.
 
-### Test Output (excluded from git)
+### Test/Debug Output (excluded from git)
 
-When running tests or CI, pass custom output paths via CLI flags to avoid polluting production results:
+When running tests, integration checks, or debug runs, pass custom output paths via CLI flags to avoid polluting production results:
 
 ```bash
+# Example: Running tests with debug-specific output
 python check_models.py \
   --output-html output/test_results.html \
   --output-markdown output/test_results.md \
@@ -27,6 +28,8 @@ python check_models.py \
 ```
 
 Files matching `test_*.{html,md,log}` are automatically excluded from git tracking via `.gitignore`.
+
+**Separation strategy**: Production runs use the default `check_models.log` (tracked in git for benchmark visibility). Integration scripts and tests should specify alternative log files (e.g., `test_check_models.log`, `debug.log`) which are excluded from version control.
 
 ## CLI Logging Output
 
