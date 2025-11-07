@@ -48,16 +48,12 @@ typings/
 # Logs
 *.log
 
-# Output files (regenerated on each run; don't commit)
-src/output/check_models.log
-src/output/results.html
-src/output/results.md
-# Test output files
+# Test output files (don't commit test runs)
 src/output/test_*.log
 src/output/test_*.html
 src/output/test_*.md
-# Keep the README explaining the output directory
-!src/output/README.md
+# But allow the production output files to be committed
+!src/output/check_models.log
 
 # Backup files
 *.bak
