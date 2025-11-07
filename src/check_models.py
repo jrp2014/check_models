@@ -3234,7 +3234,7 @@ def get_system_characteristics() -> dict[str, str]:
             # Get SDK version (useful for Metal/framework compatibility)
             try:
                 sdk_result = subprocess.run(
-                    ["xcrun", "--show-sdk-version"],
+                    ["/usr/bin/xcrun", "--show-sdk-version"],
                     capture_output=True,
                     text=True,
                     timeout=2,
@@ -3243,9 +3243,7 @@ def get_system_characteristics() -> dict[str, str]:
                 if sdk_result.returncode == 0 and sdk_result.stdout.strip():
                     info["SDK Version"] = sdk_result.stdout.strip()
             except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
-                pass  # SDK version is nice-to-have, not critical
-
-        info["Python Version"] = sys.version.split()[0]
+                pass  # SDK version is nice-to-have, not critical        info["Python Version"] = sys.version.split()[0]
         info["Architecture"] = platform.machine()
 
         # Get GPU info
