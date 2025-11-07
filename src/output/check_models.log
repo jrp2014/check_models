@@ -1,27 +1,1773 @@
-2025-11-07 22:19:27,951 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2025-11-07 22:19:27,951 - WARNING - SECURITY WARNING: --trust-remote-code is enabled.
-2025-11-07 22:19:27,951 - WARNING - This allows execution of remote code and may pose security risks.
-2025-11-07 22:19:27,951 - INFO - ====================================================================================================
-2025-11-07 22:19:27,951 - INFO - MLX Vision Language Model Check
-2025-11-07 22:19:27,951 - INFO - ====================================================================================================
-2025-11-07 22:19:27,951 - INFO - Scanning folder: /Users/jrp/Documents/AI/mlx/scripts/src
-2025-11-07 22:19:27,951 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2025-11-07 22:19:27,951 - INFO - Image File: /Users/jrp/Documents/AI/mlx/scripts/src/check_models.py
-2025-11-07 22:19:27,951 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2025-11-07 22:19:27,970 - ERROR - Cannot open or verify image /Users/jrp/Documents/AI/mlx/scripts/src/check_models.py: cannot identify image file '/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py'. Exiting.
-2025-11-07 22:19:27,970 - ERROR - Execution interrupted by user.
+2025-11-07 23:11:48,128 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:11:48,128 - WARNING - SECURITY WARNING: --trust-remote-code is enabled.
+2025-11-07 23:11:48,128 - WARNING - This allows execution of remote code and may pose security risks.
+2025-11-07 23:11:48,128 - INFO - ====================================================================================================
+2025-11-07 23:11:48,128 - INFO - MLX Vision Language Model Check
+2025-11-07 23:11:48,128 - INFO - ====================================================================================================
+2025-11-07 23:11:48,128 - INFO - Scanning folder: [95m/Users/jrp/Pictures/Processed[0m
+2025-11-07 23:11:48,128 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:11:48,155 - INFO - Image File: [95m/Users/jrp/Pictures/Processed/20251101-162710_DSC07298_DxO.jpg[0m
+2025-11-07 23:11:48,155 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:11:48,159 - INFO - Image dimensions: 8514x4791 (40.8 MPixels)
+2025-11-07 23:11:48,159 - INFO - Image Metadata
+2025-11-07 23:11:48,159 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:11:48,161 - INFO - Date: 2025-11-01 16:27:10 GMT
+2025-11-07 23:11:48,161 - INFO - Description: , Southampton Water, Netley, England, United Kingdom, UK
+On a late November afternoon, the industrial expanse of the Port of Southampton is captured from across the water at Netley, England. The scene is dominated by the 'Pleiades Leader', a large vehicle carrier ship from Tokyo, docked at one of the UK's busiest automotive ports.
+
+To the right of the ship, multi-level storage structures are filled with new cars awaiting export or distribution, a testament to the port's role as a major hub for global vehicle trade. In the background, the towering gantry cranes of the container terminal stand silhouetted against the overcast sky. This modern tableau of international commerce takes place in a port with a deep maritime history, famously known as the departure point for the RMS Titanic in 1912.
+2025-11-07 23:11:48,161 - INFO - GPS Location: 
+2025-11-07 23:11:48,161 - INFO - Prompt Configuration
+2025-11-07 23:11:48,161 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:11:48,161 - INFO - Generating default prompt based on image metadata.
+2025-11-07 23:11:48,161 - INFO - Final prompt: Provide a factual caption, description, and keywords suitable for cataloguing, or searching for, the image. 
+
+Context: The image relates to ', Southampton Water, Netley, England, United Kingdom, UK
+On...
+2025-11-07 23:11:48,161 - INFO - Scanning cache for models to process...
+2025-11-07 23:11:48,176 - INFO - Processing 29 model(s)...
+2025-11-07 23:11:48,176 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:11:48,176 - INFO - Processing Model [1/29]: [95mSmolVLM-Instruct[0m
+2025-11-07 23:11:48,176 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:11:48,176 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mHuggingFaceTB/SmolVLM-Instruct[0m
+2025-11-07 23:11:52,838 - INFO - [92m[RUN 1/29] SUMMARY model=SmolVLM-Instruct status=OK tokens=1707 prompt=1439 gen=268 gen_tps=116[0m
+2025-11-07 23:11:52,839 - INFO - [92mpeak_mem=5.5GB total_time=4.51s[0m
+2025-11-07 23:11:52,839 - INFO - [96mThe image depicts the Port of Southampton, a major international shipping hub located in[0m
+2025-11-07 23:11:52,839 - INFO - [96mSouthampton Water, England. The port is situated in the United Kingdom and is known for its[0m
+2025-11-07 23:11:52,839 - INFO - [96mextensive activities in the automotive industry, particularly in the export and distribution of new[0m
+2025-11-07 23:11:52,839 - INFO - [96mcars.[0m
+2025-11-07 23:11:52,839 - INFO - [96mThe central focus of the image is the 'Pleiades Leader', a large vehicle carrier ship from Tokyo.[0m
+2025-11-07 23:11:52,839 - INFO - [96mThe ship is docked at the port, and its name is prominently displayed on the side of the vessel. The[0m
+2025-11-07 23:11:52,839 - INFO - [96mship is a large, multi-level structure designed to carry a significant number of vehicles.[0m
+2025-11-07 23:11:52,839 - INFO - [96mTo the right of the ship, the container terminal is visible. This area is filled with gantry cranes,[0m
+2025-11-07 23:11:52,839 - INFO - [96mwhich are used to load and unload cargo from ships. The cranes are tall and slender, with their long[0m
+2025-11-07 23:11:52,839 - INFO - [96marms extending over the ship to secure and transport containers.[0m
+2025-11-07 23:11:52,839 - INFO - [96mIn the background, the sky is overcast, with a few clouds visible. The weather conditions appear to[0m
+2025-11-07 23:11:52,839 - INFO - [96mbe calm, as there are no visible waves or disturbances in the water.[0m
+2025-11-07 23:11:52,839 - INFO - [96mThe image provides a clear view of the port's infrastructure and the activities taking place within[0m
+2025-11-07 23:11:52,839 - INFO - [96mit. The port is a significant part of the UK's maritime economy, handling a large volume of cargo,[0m
+2025-11-07 23:11:52,839 - INFO - [96mincluding vehicles, and is a key contributor to the nation's global trade.[0m
+2025-11-07 23:11:52,839 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:11:52,839 - INFO - Processing Model [2/29]: [95mLlama-3.2-11B-Vision-Instruct[0m
+2025-11-07 23:11:52,839 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:11:52,839 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmeta-llama/Llama-3.2-11B-Vision-Instruct[0m
+2025-11-07 23:14:09,104 - INFO - [92m[RUN 2/29] SUMMARY model=Llama-3.2-11B-Vision-Instruct status=OK tokens=746 prompt=246 gen=500[0m
+2025-11-07 23:14:09,105 - INFO - [92mgen_tps=3.81 peak_mem=25GB total_time=136.05s[0m
+2025-11-07 23:14:09,105 - INFO - [96m**Image Details**[0m
+2025-11-07 23:14:09,105 - INFO - [96m* **Location**: The image was taken in Southampton, England, UK.[0m
+2025-11-07 23:14:09,105 - INFO - [96m* **Subject**: The image features the Port of Southampton, a major port in the UK.[0m
+2025-11-07 23:14:09,105 - INFO - [96m* **Time**: The photo was taken on a cloudy day in November.[0m
+2025-11-07 23:14:09,105 - INFO - [96m* **Content**: The image shows the port's industrial area, with a large ship and cranes in the[0m
+2025-11-07 23:14:09,105 - INFO - [96mbackground.[0m
+2025-11-07 23:14:09,105 - INFO - [96m**Keywords**[0m
+2025-11-07 23:14:09,105 - INFO - [96m* Port of Southampton[0m
+2025-11-07 23:14:09,105 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,105 - INFO - [96m* Large ship[0m
+2025-11-07 23:14:09,105 - INFO - [96m* Cranes[0m
+2025-11-07 23:14:09,105 - INFO - [96m* Cloudy day[0m
+2025-11-07 23:14:09,105 - INFO - [96m* November[0m
+2025-11-07 23:14:09,105 - INFO - [96m* Industrial[0m
+2025-11-07 23:14:09,105 - INFO - [96m* Shipping[0m
+2025-11-07 23:14:09,105 - INFO - [96m* Port[0m
+2025-11-07 23:14:09,105 - INFO - [96m* Waterfront[0m
+2025-11-07 23:14:09,105 - INFO - [96m* Industrial complex[0m
+2025-11-07 23:14:09,105 - INFO - [96m* Cranes[0m
+2025-11-07 23:14:09,105 - INFO - [96m* Industrial equipment[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial zone[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,106 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial area[0m
+2025-11-07 23:14:09,107 - INFO - [96m* Industrial[0m
+2025-11-07 23:14:09,107 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:14:09,107 - INFO - Processing Model [3/29]: [95mFlorence-2-large-ft[0m
+2025-11-07 23:14:09,107 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:14:09,107 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmicrosoft/Florence-2-large-ft[0m
+2025-11-07 23:14:09,528 - ERROR - Failed to load model microsoft/Florence-2-large-ft
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 4280, in main
-    image_path = find_and_validate_image(args)
-  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3894, in find_and_validate_image
-    exit_with_cli_error(
-    ~~~~~~~~~~~~~~~~~~~^
-        f"Cannot open or verify image {resolved_image_path}: {img_err}. Exiting.",
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        suppress_cause=True,
-        ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3344, in _run_model_generation
+    model, tokenizer = load(
+                       ~~~~^
+        path_or_hf_repo=params.model_identifier,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        lazy=params.lazy,
+        ^^^^^^^^^^^^^^^^^
+        trust_remote_code=params.trust_remote_code,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3406, in exit_with_cli_error
-    raise SystemExit(exit_code) from None
-SystemExit: 1
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 295, in load
+    model = load_model(model_path, lazy, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 224, in load_model
+    model.load_weights(list(weights.items()))
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx/nn/layers/base.py", line 191, in load_weights
+    raise ValueError(f"Missing {num_missing} parameters: \n{missing}.")
+ValueError: Missing 1 parameters: 
+language_model.lm_head.weight.
+2025-11-07 23:14:09,528 - ERROR - Model processing error
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3344, in _run_model_generation
+    model, tokenizer = load(
+                       ~~~~^
+        path_or_hf_repo=params.model_identifier,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        lazy=params.lazy,
+        ^^^^^^^^^^^^^^^^^
+        trust_remote_code=params.trust_remote_code,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 295, in load
+    model = load_model(model_path, lazy, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 224, in load_model
+    model.load_weights(list(weights.items()))
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx/nn/layers/base.py", line 191, in load_weights
+    raise ValueError(f"Missing {num_missing} parameters: \n{missing}.")
+ValueError: Missing 1 parameters: 
+language_model.lm_head.weight.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3442, in process_image_with_model
+    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
+                                                          ~~~~~~~~~~~~~~~~~~~~~^
+        params=params,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3354, in _run_model_generation
+    raise ValueError(error_details) from load_err
+ValueError: Model loading failed: Missing 1 parameters: 
+language_model.lm_head.weight.
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3344, in _run_model_generation
+    model, tokenizer = load(
+                       ~~~~^
+        path_or_hf_repo=params.model_identifier,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        lazy=params.lazy,
+        ^^^^^^^^^^^^^^^^^
+        trust_remote_code=params.trust_remote_code,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 295, in load
+    model = load_model(model_path, lazy, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 224, in load_model
+    model.load_weights(list(weights.items()))
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx/nn/layers/base.py", line 191, in load_weights
+    raise ValueError(f"Missing {num_missing} parameters: \n{missing}.")
+ValueError: Missing 1 parameters: 
+language_model.lm_head.weight.
+
+2025-11-07 23:14:09,535 - ERROR - [91m[RUN 3/29] SUMMARY model=Florence-2-large-ft status=FAIL stage=processing error=Model loading[0m
+2025-11-07 23:14:09,535 - ERROR - [91mfailed: Missing 1 paramete…[0m
+2025-11-07 23:14:09,535 - ERROR - [1m[91m✗ FAILED: [91mFlorence-2-large-ft[0m[0m
+2025-11-07 23:14:09,535 - ERROR - [91m[1mStage:[0m
+2025-11-07 23:14:09,535 - ERROR - [91m  processing[0m
+2025-11-07 23:14:09,535 - ERROR - [91m[1mError:[0m
+2025-11-07 23:14:09,535 - ERROR - [91m  Model loading failed: Missing 1 parameters:[0m
+2025-11-07 23:14:09,535 - ERROR - [91m  language_model.lm_head.weight.[0m
+2025-11-07 23:14:09,535 - ERROR - [91m  Traceback (most recent call last):[0m
+2025-11-07 23:14:09,535 - ERROR - [91m    File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3344, in[0m
+2025-11-07 23:14:09,535 - ERROR - [91m  _run_model_generation[0m
+2025-11-07 23:14:09,535 - ERROR - [91m      model, tokenizer = load([0m
+2025-11-07 23:14:09,535 - ERROR - [91m                         ~~~~^[0m
+2025-11-07 23:14:09,535 - ERROR - [91m          path_or_hf_repo=params.model_identifier,[0m
+2025-11-07 23:14:09,535 - ERROR - [91m          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2025-11-07 23:14:09,535 - ERROR - [91m          lazy=params.lazy,[0m
+2025-11-07 23:14:09,535 - ERROR - [91m          ^^^^^^^^^^^^^^^^^[0m
+2025-11-07 23:14:09,535 - ERROR - [91m          trust_remote_code=params.trust_remote_code,[0m
+2025-11-07 23:14:09,535 - ERROR - [91m          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2025-11-07 23:14:09,535 - ERROR - [91m      )[0m
+2025-11-07 23:14:09,535 - ERROR - [91m      ^[0m
+2025-11-07 23:14:09,535 - ERROR - [91m    File[0m
+2025-11-07 23:14:09,535 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py",[0m
+2025-11-07 23:14:09,535 - ERROR - [91m  line 295, in load[0m
+2025-11-07 23:14:09,535 - ERROR - [91m      model = load_model(model_path, lazy, **kwargs)[0m
+2025-11-07 23:14:09,535 - ERROR - [91m    File[0m
+2025-11-07 23:14:09,535 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py",[0m
+2025-11-07 23:14:09,536 - ERROR - [91m  line 224, in load_model[0m
+2025-11-07 23:14:09,536 - ERROR - [91m      model.load_weights(list(weights.items()))[0m
+2025-11-07 23:14:09,536 - ERROR - [91m      ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^[0m
+2025-11-07 23:14:09,536 - ERROR - [91m    File[0m
+2025-11-07 23:14:09,536 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx/nn/layers/base.py",[0m
+2025-11-07 23:14:09,536 - ERROR - [91m  line 191, in load_weights[0m
+2025-11-07 23:14:09,536 - ERROR - [91m      raise ValueError(f"Missing {num_missing} parameters: \n{missing}.")[0m
+2025-11-07 23:14:09,536 - ERROR - [91m  ValueError: Missing 1 parameters:[0m
+2025-11-07 23:14:09,536 - ERROR - [91m  language_model.lm_head.weight.[0m
+2025-11-07 23:14:09,536 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:14:09,536 - INFO - Processing Model [4/29]: [95mPhi-3.5-vision-instruct[0m
+2025-11-07 23:14:09,536 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:14:09,536 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmicrosoft/Phi-3.5-vision-instruct[0m
+2025-11-07 23:14:57,806 - INFO - [92m[RUN 4/29] SUMMARY model=Phi-3.5-vision-instruct status=OK tokens=1547 prompt=1047 gen=500[0m
+2025-11-07 23:14:57,806 - INFO - [92mgen_tps=11.1 peak_mem=12GB total_time=48.09s[0m
+2025-11-07 23:14:57,806 - WARNING - [93m⚠️  Contains unexpected table, Contains multiple choice pattern[0m
+2025-11-07 23:14:57,806 - INFO - [96mCaption: A view of the Port of Southampton from Netley, England, featuring the 'Pleiades Leader'[0m
+2025-11-07 23:14:57,806 - INFO - [96mcarrier ship and the container terminal with storage structures for vehicles. The scene is set[0m
+2025-11-07 23:14:57,806 - INFO - [96magainst an overcast sky, highlighting the port's role in global vehicle trade.[0m
+2025-11-07 23:14:57,806 - INFO - [96mDescription: The image captures the Port of Southampton, a significant automotive trade hub, with[0m
+2025-11-07 23:14:57,807 - INFO - [96mthe 'Pleiades Leader' carrier ship docked at the port. The storage structures are filled with new[0m
+2025-11-07 23:14:57,807 - INFO - [96mcars, indicating the port's active role in vehicle distribution. The container terminal is visible[0m
+2025-11-07 23:14:57,807 - INFO - [96min the background, with gantry cranes ready for loading and unloading.[0m
+2025-11-07 23:14:57,807 - INFO - [96mKeywords: Port of Southampton, Pleiades Leader, automotive trade, vehicle storage, container[0m
+2025-11-07 23:14:57,807 - INFO - [96mterminal, gantry cranes, Netley, England, UK.<|end|><|endoftext|>[0m
+2025-11-07 23:14:57,807 - INFO - [96mHere is a chart that shows the number of books read by students in different grades.[0m
+2025-11-07 23:14:57,807 - INFO - [96m| Grade | Number of Books Read |[0m
+2025-11-07 23:14:57,807 - INFO - [96m|-------|----------------------|[0m
+2025-11-07 23:14:57,807 - INFO - [96m| 6     | 10                   |[0m
+2025-11-07 23:14:57,807 - INFO - [96m| 7     | 15                   |[0m
+2025-11-07 23:14:57,807 - INFO - [96m| 8     | 20                   |[0m
+2025-11-07 23:14:57,807 - INFO - [96m| 9     | 25                   |[0m
+2025-11-07 23:14:57,807 - INFO - [96m| 10     | 30                   |[0m
+2025-11-07 23:14:57,807 - INFO - [96mBased on the chart, which grade level has the highest number of books read?[0m
+2025-11-07 23:14:57,807 - INFO - [96mA) 6th grade[0m
+2025-11-07 23:14:57,807 - INFO - [96mB) 10th grade[0m
+2025-11-07 23:14:57,807 - INFO - [96mB) 10th grade<|end|><|endoftext|>[0m
+2025-11-07 23:14:57,807 - INFO - [96mArticle:[0m
+2025-11-07 23:14:57,807 - INFO - [96mThe Importance of Sleep for Teenagers[0m
+2025-11-07 23:14:57,807 - INFO - [96mSleep is essential for the overall health and well-being of teenagers. During adolescence, the body[0m
+2025-11-07 23:14:57,807 - INFO - [96mundergoes significant changes, and sleep plays a crucial role in supporting these developmental[0m
+2025-11-07 23:14:57,807 - INFO - [96mprocesses. In this article, we will explore the importance of sleep for teenagers and how it can[0m
+2025-11-07 23:14:57,807 - INFO - [96mpositively impact their lives.[0m
+2025-11-07 23:14:57,807 - INFO - [96mThe Benefits of Adequate Sleep[0m
+2025-11-07 23:14:57,807 - INFO - [96m1. Improved Academic Performance:[0m
+2025-11-07 23:14:57,807 - INFO - [96mAdequate sleep is essential for maintaining focus, concentration, and memory. Teenagers who get[0m
+2025-11-07 23:14:57,807 - INFO - [96menough sleep are more likely to perform better in school and have higher grades.[0m
+2025-11-07 23:14:57,807 - INFO - [96m2. Physical Health:[0m
+2025-11-07 23:14:57,807 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:14:57,807 - INFO - Processing Model [5/29]: [95mApriel-1.5-15b-Thinker-6bit-MLX[0m
+2025-11-07 23:14:57,807 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:14:57,807 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/Apriel-1.5-15b-Thinker-6bit-MLX[0m
+2025-11-07 23:15:21,883 - INFO - [92m[RUN 5/29] SUMMARY model=Apriel-1.5-15b-Thinker-6bit-MLX status=OK tokens=3182 prompt=2682 gen=500[0m
+2025-11-07 23:15:21,884 - INFO - [92mgen_tps=36 peak_mem=15GB total_time=23.82s[0m
+2025-11-07 23:15:21,884 - INFO - [96mHere are my reasoning steps:[0m
+2025-11-07 23:15:21,884 - INFO - [96mThe user asks: "Provide a factual caption, description, and keywords suitable for cataloguing, or[0m
+2025-11-07 23:15:21,884 - INFO - [96msearching for, the image."[0m
+2025-11-07 23:15:21,884 - INFO - [96mWe have a context: The image relates to 'Southampton Water, Netley, England, United Kingdom, UK. On[0m
+2025-11-07 23:15:21,884 - INFO - [96ma late November afternoon, the industrial expanse of the Port of Southampton is captured from across[0m
+2025-11-07 23:15:21,884 - INFO - [96mthe water at Netley, England. The scene is dominated by the 'Pleiades Leader', a large vehicle[0m
+2025-11-07 23:15:21,884 - INFO - [96mcarrier ship from Tokyo, docked at one of the UK's busiest automotive ports.[0m
+2025-11-07 23:15:21,884 - INFO - [96mTo the right of the ship, multi-level storage structures are filled with new cars awaiting export or[0m
+2025-11-07 23:15:21,884 - INFO - [96mdistribution, a testament to the port's role as a major hub for global vehicle trade. In the[0m
+2025-11-07 23:15:21,884 - INFO - [96mbackground, the towering gantry cranes of the container terminal stand silhouetted against the[0m
+2025-11-07 23:15:21,884 - INFO - [96movercast sky. This modern tableau of international commerce takes place in a port with a deep[0m
+2025-11-07 23:15:21,884 - INFO - [96mmaritime history, famously known as the departure point for the RMS Titanic in 1912.[0m
+2025-11-07 23:15:21,884 - INFO - [96mThe photo was taken around 2025-11-01 16:27:10 GMT . Focus on visual content, drawing on any[0m
+2025-11-07 23:15:21,884 - INFO - [96mavailable contextual information for specificity. Do not speculate."[0m
+2025-11-07 23:15:21,884 - INFO - [96mThus we need to produce a factual caption, description, and keywords. The caption should be concise,[0m
+2025-11-07 23:15:21,884 - INFO - [96mdescribing the main elements: the port, the ship Pleiades Leader, the car storage, the gantry[0m
+2025-11-07 23:15:21,884 - INFO - [96mcranes, the water, the location (Southampton Water, Netley, UK), the date/time (late November 2025).[0m
+2025-11-07 23:15:21,884 - INFO - [96mThe description should be more detailed, describing the visual content: the ship, its size, the[0m
+2025-11-07 23:15:21,884 - INFO - [96mcargo, the storage structures, the cranes, the sky, the water, the perspective (view from across[0m
+2025-11-07 23:15:21,884 - INFO - [96mwater), the industrial setting, the overcast sky, the green buoy, etc. The keywords should be[0m
+2025-11-07 23:15:21,884 - INFO - [96mrelevant for cataloguing/search: "Port of Southampton", "Southampton Water", "Netley", "vehicle[0m
+2025-11-07 23:15:21,884 - INFO - [96mcarrier", "Pleiades Leader", "automotive shipping", "car storage", "gantry cranes", "container[0m
+2025-11-07 23:15:21,884 - INFO - [96mterminal", "UK", "England", "late November", "overcast sky", "maritime industry", "Titanic departure[0m
+2025-11-07 23:15:21,885 - INFO - [96mpoint", "2025", "photography", "industrial landscape", "waterfront", "ship docked", "vehicle carrier[0m
+2025-11-07 23:15:21,885 - INFO - [96mfrom Tokyo",[0m
+2025-11-07 23:15:21,885 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:15:21,885 - INFO - Processing Model [6/29]: [95mFlorence-2-large-ft-8bit[0m
+2025-11-07 23:15:21,885 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:15:21,885 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/Florence-2-large-ft-8bit[0m
+2025-11-07 23:15:25,586 - INFO - [92m[RUN 6/29] SUMMARY model=Florence-2-large-ft-8bit status=OK tokens=741 prompt=241 gen=500[0m
+2025-11-07 23:15:25,586 - INFO - [92mgen_tps=299 peak_mem=2.8GB total_time=3.48s[0m
+2025-11-07 23:15:25,586 - WARNING - [93m⚠️  Unknown HTML tags: &lt;s&gt;[0m
+2025-11-07 23:15:25,586 - INFO - [96m<s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s>[0m
+2025-11-07 23:15:25,586 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:15:25,586 - INFO - Processing Model [7/29]: [95mIdefics3-8B-Llama3-bf16[0m
+2025-11-07 23:15:25,586 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:15:25,586 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/Idefics3-8B-Llama3-bf16[0m
+2025-11-07 23:15:47,479 - INFO - [92m[RUN 7/29] SUMMARY model=Idefics3-8B-Llama3-bf16 status=OK tokens=2929 prompt=2556 gen=373[0m
+2025-11-07 23:15:47,480 - INFO - [92mgen_tps=26.6 peak_mem=19GB total_time=21.69s[0m
+2025-11-07 23:15:47,480 - WARNING - [93m⚠️  Unknown HTML tags: &lt;end_of_utterance&gt;[0m
+2025-11-07 23:15:47,481 - INFO - [96mThe image depicts a wide, expansive view of the Port of Southampton, situated in Netley, England,[0m
+2025-11-07 23:15:47,481 - INFO - [96mUK. The focal point of the image is the 'Pleiades Leader', a large vehicle carrier ship from Tokyo,[0m
+2025-11-07 23:15:47,481 - INFO - [96mdocked at one of the UK's busiest automotive ports. The ship is positioned centrally in the image,[0m
+2025-11-07 23:15:47,481 - INFO - [96mwith its bow facing towards the left side of the frame. The ship's massive size is emphasized by the[0m
+2025-11-07 23:15:47,481 - INFO - [96msurrounding structures and the scale of the port facilities.[0m
+2025-11-07 23:15:47,481 - INFO - [96mTo the right of the ship, there are multi-level storage structures filled with new cars, indicating[0m
+2025-11-07 23:15:47,481 - INFO - [96mthe port's role in the global vehicle trade. These structures are elevated, allowing for efficient[0m
+2025-11-07 23:15:47,481 - INFO - [96mstorage and organization of the vehicles. The cars are neatly arranged in rows, showcasing the[0m
+2025-11-07 23:15:47,481 - INFO - [96mport's capacity to handle large quantities of vehicles.[0m
+2025-11-07 23:15:47,481 - INFO - [96mIn the background, the towering gantry cranes of the container terminal are visible, silhouetted[0m
+2025-11-07 23:15:47,481 - INFO - [96magainst the overcast sky. These cranes are essential for the loading and unloading of containers,[0m
+2025-11-07 23:15:47,481 - INFO - [96mhighlighting the port's role in international trade and logistics. The cranes are positioned in a[0m
+2025-11-07 23:15:47,481 - INFO - [96mline, stretching across the horizon, emphasizing the port's extensive infrastructure.[0m
+2025-11-07 23:15:47,481 - INFO - [96mThe sky above is overcast, with clouds covering the entire sky, casting a muted light over the[0m
+2025-11-07 23:15:47,481 - INFO - [96mscene. The lighting conditions suggest it is either late afternoon or early morning, as the shadows[0m
+2025-11-07 23:15:47,481 - INFO - [96mare relatively long and the light is diffused.[0m
+2025-11-07 23:15:47,481 - INFO - [96mThe image captures the essence of the Port of Southampton as a major hub for international trade and[0m
+2025-11-07 23:15:47,481 - INFO - [96mcommerce, with a significant focus on the automotive industry. The presence of the 'Pleiades Leader'[0m
+2025-11-07 23:15:47,481 - INFO - [96mand the multi-level car storage structures emphasize the port's importance in the global vehicle[0m
+2025-11-07 23:15:47,481 - INFO - [96mtrade. The towering gantry cranes in the background underscore the port's role in handling[0m
+2025-11-07 23:15:47,481 - INFO - [96mcontainerized cargo, making it a vital part of the global supply chain network.<end_of_utterance>[0m
+2025-11-07 23:15:47,481 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:15:47,481 - INFO - Processing Model [8/29]: [95mInternVL3-14B-8bit[0m
+2025-11-07 23:15:47,481 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:15:47,481 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/InternVL3-14B-8bit[0m
+2025-11-07 23:16:06,467 - INFO - [92m[RUN 8/29] SUMMARY model=InternVL3-14B-8bit status=OK tokens=2776 prompt=2555 gen=221 gen_tps=27.2[0m
+2025-11-07 23:16:06,467 - INFO - [92mpeak_mem=18GB total_time=18.74s[0m
+2025-11-07 23:16:06,468 - INFO - [96m**Caption:**[0m
+2025-11-07 23:16:06,468 - INFO - [96mA view of the Port of Southampton from Netley, England, featuring the 'Pleiades Leader' vehicle[0m
+2025-11-07 23:16:06,468 - INFO - [96mcarrier ship docked at the port. The scene includes multi-level car storage structures and towering[0m
+2025-11-07 23:16:06,468 - INFO - [96mgantry cranes against an overcast sky.[0m
+2025-11-07 23:16:06,468 - INFO - [96m**Description:**[0m
+2025-11-07 23:16:06,468 - INFO - [96mThe image captures the industrial landscape of the Port of Southampton, with the 'Pleiades Leader'[0m
+2025-11-07 23:16:06,468 - INFO - [96mprominently docked. The ship is a large vehicle carrier, and adjacent to it are multi-level storage[0m
+2025-11-07 23:16:06,468 - INFO - [96mfacilities filled with cars. In the background, several large gantry cranes are visible, silhouetted[0m
+2025-11-07 23:16:06,468 - INFO - [96magainst a cloudy sky. The water in the foreground reflects the industrial setting, and a[0m
+2025-11-07 23:16:06,468 - INFO - [96mnavigational buoy is seen near the bottom right.[0m
+2025-11-07 23:16:06,468 - INFO - [96m**Keywords:**[0m
+2025-11-07 23:16:06,468 - INFO - [96mPort of Southampton, Netley, England, United Kingdom, UK, Pleiades Leader, vehicle carrier,[0m
+2025-11-07 23:16:06,468 - INFO - [96mindustrial port, gantry cranes, car storage, maritime, Southampton Water, automotive port,[0m
+2025-11-07 23:16:06,468 - INFO - [96minternational trade, navigational buoy, cloudy sky, 2025-11-01, late November, industrial landscape.[0m
+2025-11-07 23:16:06,468 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:16:06,468 - INFO - Processing Model [9/29]: [95mKimi-VL-A3B-Thinking-2506-bf16[0m
+2025-11-07 23:16:06,468 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:16:06,468 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/Kimi-VL-A3B-Thinking-2506-bf16[0m
+2025-11-07 23:16:11,953 - ERROR - Failed to load model mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3344, in _run_model_generation
+    model, tokenizer = load(
+                       ~~~~^
+        path_or_hf_repo=params.model_identifier,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        lazy=params.lazy,
+        ^^^^^^^^^^^^^^^^^
+        trust_remote_code=params.trust_remote_code,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 305, in load
+    processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 366, in load_processor
+    processor = AutoProcessor.from_pretrained(model_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py", line 387, in from_pretrained
+    processor_class = get_class_from_dynamic_module(
+        processor_auto_map, pretrained_model_name_or_path, **kwargs
+    )
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 616, in get_class_from_dynamic_module
+    return get_class_in_module(class_name, final_module, force_reload=force_download)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 311, in get_class_in_module
+    module_spec.loader.exec_module(module)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/Users/jrp/.cache/huggingface/modules/transformers_modules/a04b2b044b1795d3e56eeee0d4946ca0c3a9d0fc/processing_kimi_vl.py", line 25, in <module>
+    from transformers.processing_utils import ProcessingKwargs, ProcessorMixin, Unpack, _validate_images_text_input_order
+ImportError: cannot import name '_validate_images_text_input_order' from 'transformers.processing_utils' (/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py)
+2025-11-07 23:16:12,014 - ERROR - Model processing error
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3344, in _run_model_generation
+    model, tokenizer = load(
+                       ~~~~^
+        path_or_hf_repo=params.model_identifier,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        lazy=params.lazy,
+        ^^^^^^^^^^^^^^^^^
+        trust_remote_code=params.trust_remote_code,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 305, in load
+    processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 366, in load_processor
+    processor = AutoProcessor.from_pretrained(model_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py", line 387, in from_pretrained
+    processor_class = get_class_from_dynamic_module(
+        processor_auto_map, pretrained_model_name_or_path, **kwargs
+    )
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 616, in get_class_from_dynamic_module
+    return get_class_in_module(class_name, final_module, force_reload=force_download)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 311, in get_class_in_module
+    module_spec.loader.exec_module(module)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/Users/jrp/.cache/huggingface/modules/transformers_modules/a04b2b044b1795d3e56eeee0d4946ca0c3a9d0fc/processing_kimi_vl.py", line 25, in <module>
+    from transformers.processing_utils import ProcessingKwargs, ProcessorMixin, Unpack, _validate_images_text_input_order
+ImportError: cannot import name '_validate_images_text_input_order' from 'transformers.processing_utils' (/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3442, in process_image_with_model
+    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
+                                                          ~~~~~~~~~~~~~~~~~~~~~^
+        params=params,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3354, in _run_model_generation
+    raise ValueError(error_details) from load_err
+ValueError: Model loading failed: cannot import name '_validate_images_text_input_order' from 'transformers.processing_utils' (/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py)
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3344, in _run_model_generation
+    model, tokenizer = load(
+                       ~~~~^
+        path_or_hf_repo=params.model_identifier,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        lazy=params.lazy,
+        ^^^^^^^^^^^^^^^^^
+        trust_remote_code=params.trust_remote_code,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 305, in load
+    processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 366, in load_processor
+    processor = AutoProcessor.from_pretrained(model_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py", line 387, in from_pretrained
+    processor_class = get_class_from_dynamic_module(
+        processor_auto_map, pretrained_model_name_or_path, **kwargs
+    )
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 616, in get_class_from_dynamic_module
+    return get_class_in_module(class_name, final_module, force_reload=force_download)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 311, in get_class_in_module
+    module_spec.loader.exec_module(module)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/Users/jrp/.cache/huggingface/modules/transformers_modules/a04b2b044b1795d3e56eeee0d4946ca0c3a9d0fc/processing_kimi_vl.py", line 25, in <module>
+    from transformers.processing_utils import ProcessingKwargs, ProcessorMixin, Unpack, _validate_images_text_input_order
+ImportError: cannot import name '_validate_images_text_input_order' from 'transformers.processing_utils' (/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py)
+
+2025-11-07 23:16:12,331 - ERROR - [91m[RUN 9/29] SUMMARY model=Kimi-VL-A3B-Thinking-2506-bf16 status=FAIL stage=processing error=Model[0m
+2025-11-07 23:16:12,331 - ERROR - [91mloading failed: cannot import name…[0m
+2025-11-07 23:16:12,331 - ERROR - [1m[91m✗ FAILED: [91mKimi-VL-A3B-Thinking-2506-bf16[0m[0m
+2025-11-07 23:16:12,331 - ERROR - [91m[1mStage:[0m
+2025-11-07 23:16:12,331 - ERROR - [91m  processing[0m
+2025-11-07 23:16:12,331 - ERROR - [91m[1mError:[0m
+2025-11-07 23:16:12,331 - ERROR - [91m  Model loading failed: cannot import name '_validate_images_text_input_order' from[0m
+2025-11-07 23:16:12,331 - ERROR - [91m  'transformers.processing_utils'[0m
+2025-11-07 23:16:12,331 - ERROR - [91m  (/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py)[0m
+2025-11-07 23:16:12,331 - ERROR - [91m  Traceback (most recent call last):[0m
+2025-11-07 23:16:12,331 - ERROR - [91m    File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3344, in[0m
+2025-11-07 23:16:12,331 - ERROR - [91m  _run_model_generation[0m
+2025-11-07 23:16:12,331 - ERROR - [91m      model, tokenizer = load([0m
+2025-11-07 23:16:12,331 - ERROR - [91m                         ~~~~^[0m
+2025-11-07 23:16:12,331 - ERROR - [91m          path_or_hf_repo=params.model_identifier,[0m
+2025-11-07 23:16:12,331 - ERROR - [91m          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2025-11-07 23:16:12,331 - ERROR - [91m          lazy=params.lazy,[0m
+2025-11-07 23:16:12,331 - ERROR - [91m          ^^^^^^^^^^^^^^^^^[0m
+2025-11-07 23:16:12,331 - ERROR - [91m          trust_remote_code=params.trust_remote_code,[0m
+2025-11-07 23:16:12,331 - ERROR - [91m          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2025-11-07 23:16:12,331 - ERROR - [91m      )[0m
+2025-11-07 23:16:12,331 - ERROR - [91m      ^[0m
+2025-11-07 23:16:12,331 - ERROR - [91m    File[0m
+2025-11-07 23:16:12,331 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py",[0m
+2025-11-07 23:16:12,331 - ERROR - [91m  line 305, in load[0m
+2025-11-07 23:16:12,331 - ERROR - [91m      processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)[0m
+2025-11-07 23:16:12,331 - ERROR - [91m    File[0m
+2025-11-07 23:16:12,331 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py",[0m
+2025-11-07 23:16:12,331 - ERROR - [91m  line 366, in load_processor[0m
+2025-11-07 23:16:12,331 - ERROR - [91m      processor = AutoProcessor.from_pretrained(model_path, **kwargs)[0m
+2025-11-07 23:16:12,331 - ERROR - [91m    File[0m
+2025-11-07 23:16:12,331 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py",[0m
+2025-11-07 23:16:12,331 - ERROR - [91m  line 387, in from_pretrained[0m
+2025-11-07 23:16:12,331 - ERROR - [91m      processor_class = get_class_from_dynamic_module([0m
+2025-11-07 23:16:12,331 - ERROR - [91m          processor_auto_map, pretrained_model_name_or_path, **kwargs[0m
+2025-11-07 23:16:12,331 - ERROR - [91m      )[0m
+2025-11-07 23:16:12,331 - ERROR - [91m    File[0m
+2025-11-07 23:16:12,331 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py",[0m
+2025-11-07 23:16:12,331 - ERROR - [91m  line 616, in get_class_from_dynamic_module[0m
+2025-11-07 23:16:12,332 - ERROR - [91m      return get_class_in_module(class_name, final_module, force_reload=force_download)[0m
+2025-11-07 23:16:12,332 - ERROR - [91m    File[0m
+2025-11-07 23:16:12,332 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py",[0m
+2025-11-07 23:16:12,332 - ERROR - [91m  line 311, in get_class_in_module[0m
+2025-11-07 23:16:12,332 - ERROR - [91m      module_spec.loader.exec_module(module)[0m
+2025-11-07 23:16:12,332 - ERROR - [91m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^[0m
+2025-11-07 23:16:12,332 - ERROR - [91m    File "<frozen importlib._bootstrap_external>", line 1026, in exec_module[0m
+2025-11-07 23:16:12,332 - ERROR - [91m    File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed[0m
+2025-11-07 23:16:12,332 - ERROR - [91m    File[0m
+2025-11-07 23:16:12,332 - ERROR - [91m  "/Users/jrp/.cache/huggingface/modules/transformers_modules/a04b2b044b1795d3e56eeee0d4946ca0c3a9d0fc/processing_kimi_vl.py",[0m
+2025-11-07 23:16:12,332 - ERROR - [91m  line 25, in <module>[0m
+2025-11-07 23:16:12,332 - ERROR - [91m      from transformers.processing_utils import ProcessingKwargs, ProcessorMixin, Unpack,[0m
+2025-11-07 23:16:12,332 - ERROR - [91m  _validate_images_text_input_order[0m
+2025-11-07 23:16:12,332 - ERROR - [91m  ImportError: cannot import name '_validate_images_text_input_order' from[0m
+2025-11-07 23:16:12,332 - ERROR - [91m  'transformers.processing_utils'[0m
+2025-11-07 23:16:12,332 - ERROR - [91m  (/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py)[0m
+2025-11-07 23:16:12,332 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:16:12,332 - INFO - Processing Model [10/29]: [95mKimi-VL-A3B-Thinking-8bit[0m
+2025-11-07 23:16:12,332 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:16:12,332 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/Kimi-VL-A3B-Thinking-8bit[0m
+2025-11-07 23:16:15,508 - ERROR - Failed to load model mlx-community/Kimi-VL-A3B-Thinking-8bit
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3344, in _run_model_generation
+    model, tokenizer = load(
+                       ~~~~^
+        path_or_hf_repo=params.model_identifier,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        lazy=params.lazy,
+        ^^^^^^^^^^^^^^^^^
+        trust_remote_code=params.trust_remote_code,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 305, in load
+    processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 366, in load_processor
+    processor = AutoProcessor.from_pretrained(model_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py", line 387, in from_pretrained
+    processor_class = get_class_from_dynamic_module(
+        processor_auto_map, pretrained_model_name_or_path, **kwargs
+    )
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 616, in get_class_from_dynamic_module
+    return get_class_in_module(class_name, final_module, force_reload=force_download)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 311, in get_class_in_module
+    module_spec.loader.exec_module(module)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/Users/jrp/.cache/huggingface/modules/transformers_modules/b5f89e575e95a48394b3d708beff29b842a4e14c/processing_kimi_vl.py", line 25, in <module>
+    from transformers.processing_utils import ProcessingKwargs, ProcessorMixin, Unpack, _validate_images_text_input_order
+ImportError: cannot import name '_validate_images_text_input_order' from 'transformers.processing_utils' (/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py)
+2025-11-07 23:16:15,568 - ERROR - Model processing error
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3344, in _run_model_generation
+    model, tokenizer = load(
+                       ~~~~^
+        path_or_hf_repo=params.model_identifier,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        lazy=params.lazy,
+        ^^^^^^^^^^^^^^^^^
+        trust_remote_code=params.trust_remote_code,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 305, in load
+    processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 366, in load_processor
+    processor = AutoProcessor.from_pretrained(model_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py", line 387, in from_pretrained
+    processor_class = get_class_from_dynamic_module(
+        processor_auto_map, pretrained_model_name_or_path, **kwargs
+    )
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 616, in get_class_from_dynamic_module
+    return get_class_in_module(class_name, final_module, force_reload=force_download)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 311, in get_class_in_module
+    module_spec.loader.exec_module(module)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/Users/jrp/.cache/huggingface/modules/transformers_modules/b5f89e575e95a48394b3d708beff29b842a4e14c/processing_kimi_vl.py", line 25, in <module>
+    from transformers.processing_utils import ProcessingKwargs, ProcessorMixin, Unpack, _validate_images_text_input_order
+ImportError: cannot import name '_validate_images_text_input_order' from 'transformers.processing_utils' (/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3442, in process_image_with_model
+    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
+                                                          ~~~~~~~~~~~~~~~~~~~~~^
+        params=params,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3354, in _run_model_generation
+    raise ValueError(error_details) from load_err
+ValueError: Model loading failed: cannot import name '_validate_images_text_input_order' from 'transformers.processing_utils' (/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py)
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3344, in _run_model_generation
+    model, tokenizer = load(
+                       ~~~~^
+        path_or_hf_repo=params.model_identifier,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        lazy=params.lazy,
+        ^^^^^^^^^^^^^^^^^
+        trust_remote_code=params.trust_remote_code,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 305, in load
+    processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 366, in load_processor
+    processor = AutoProcessor.from_pretrained(model_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py", line 387, in from_pretrained
+    processor_class = get_class_from_dynamic_module(
+        processor_auto_map, pretrained_model_name_or_path, **kwargs
+    )
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 616, in get_class_from_dynamic_module
+    return get_class_in_module(class_name, final_module, force_reload=force_download)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 311, in get_class_in_module
+    module_spec.loader.exec_module(module)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/Users/jrp/.cache/huggingface/modules/transformers_modules/b5f89e575e95a48394b3d708beff29b842a4e14c/processing_kimi_vl.py", line 25, in <module>
+    from transformers.processing_utils import ProcessingKwargs, ProcessorMixin, Unpack, _validate_images_text_input_order
+ImportError: cannot import name '_validate_images_text_input_order' from 'transformers.processing_utils' (/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py)
+
+2025-11-07 23:16:15,758 - ERROR - [91m[RUN 10/29] SUMMARY model=Kimi-VL-A3B-Thinking-8bit status=FAIL stage=processing error=Model loading[0m
+2025-11-07 23:16:15,758 - ERROR - [91mfailed: cannot import name…[0m
+2025-11-07 23:16:15,758 - ERROR - [1m[91m✗ FAILED: [91mKimi-VL-A3B-Thinking-8bit[0m[0m
+2025-11-07 23:16:15,758 - ERROR - [91m[1mStage:[0m
+2025-11-07 23:16:15,758 - ERROR - [91m  processing[0m
+2025-11-07 23:16:15,758 - ERROR - [91m[1mError:[0m
+2025-11-07 23:16:15,758 - ERROR - [91m  Model loading failed: cannot import name '_validate_images_text_input_order' from[0m
+2025-11-07 23:16:15,758 - ERROR - [91m  'transformers.processing_utils'[0m
+2025-11-07 23:16:15,758 - ERROR - [91m  (/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py)[0m
+2025-11-07 23:16:15,758 - ERROR - [91m  Traceback (most recent call last):[0m
+2025-11-07 23:16:15,758 - ERROR - [91m    File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3344, in[0m
+2025-11-07 23:16:15,758 - ERROR - [91m  _run_model_generation[0m
+2025-11-07 23:16:15,758 - ERROR - [91m      model, tokenizer = load([0m
+2025-11-07 23:16:15,758 - ERROR - [91m                         ~~~~^[0m
+2025-11-07 23:16:15,758 - ERROR - [91m          path_or_hf_repo=params.model_identifier,[0m
+2025-11-07 23:16:15,758 - ERROR - [91m          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2025-11-07 23:16:15,758 - ERROR - [91m          lazy=params.lazy,[0m
+2025-11-07 23:16:15,758 - ERROR - [91m          ^^^^^^^^^^^^^^^^^[0m
+2025-11-07 23:16:15,758 - ERROR - [91m          trust_remote_code=params.trust_remote_code,[0m
+2025-11-07 23:16:15,758 - ERROR - [91m          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2025-11-07 23:16:15,758 - ERROR - [91m      )[0m
+2025-11-07 23:16:15,758 - ERROR - [91m      ^[0m
+2025-11-07 23:16:15,758 - ERROR - [91m    File[0m
+2025-11-07 23:16:15,758 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py",[0m
+2025-11-07 23:16:15,758 - ERROR - [91m  line 305, in load[0m
+2025-11-07 23:16:15,758 - ERROR - [91m      processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)[0m
+2025-11-07 23:16:15,758 - ERROR - [91m    File[0m
+2025-11-07 23:16:15,758 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py",[0m
+2025-11-07 23:16:15,758 - ERROR - [91m  line 366, in load_processor[0m
+2025-11-07 23:16:15,758 - ERROR - [91m      processor = AutoProcessor.from_pretrained(model_path, **kwargs)[0m
+2025-11-07 23:16:15,758 - ERROR - [91m    File[0m
+2025-11-07 23:16:15,759 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py",[0m
+2025-11-07 23:16:15,759 - ERROR - [91m  line 387, in from_pretrained[0m
+2025-11-07 23:16:15,759 - ERROR - [91m      processor_class = get_class_from_dynamic_module([0m
+2025-11-07 23:16:15,759 - ERROR - [91m          processor_auto_map, pretrained_model_name_or_path, **kwargs[0m
+2025-11-07 23:16:15,759 - ERROR - [91m      )[0m
+2025-11-07 23:16:15,759 - ERROR - [91m    File[0m
+2025-11-07 23:16:15,759 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py",[0m
+2025-11-07 23:16:15,759 - ERROR - [91m  line 616, in get_class_from_dynamic_module[0m
+2025-11-07 23:16:15,759 - ERROR - [91m      return get_class_in_module(class_name, final_module, force_reload=force_download)[0m
+2025-11-07 23:16:15,759 - ERROR - [91m    File[0m
+2025-11-07 23:16:15,759 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py",[0m
+2025-11-07 23:16:15,759 - ERROR - [91m  line 311, in get_class_in_module[0m
+2025-11-07 23:16:15,759 - ERROR - [91m      module_spec.loader.exec_module(module)[0m
+2025-11-07 23:16:15,759 - ERROR - [91m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^[0m
+2025-11-07 23:16:15,759 - ERROR - [91m    File "<frozen importlib._bootstrap_external>", line 1026, in exec_module[0m
+2025-11-07 23:16:15,759 - ERROR - [91m    File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed[0m
+2025-11-07 23:16:15,759 - ERROR - [91m    File[0m
+2025-11-07 23:16:15,759 - ERROR - [91m  "/Users/jrp/.cache/huggingface/modules/transformers_modules/b5f89e575e95a48394b3d708beff29b842a4e14c/processing_kimi_vl.py",[0m
+2025-11-07 23:16:15,759 - ERROR - [91m  line 25, in <module>[0m
+2025-11-07 23:16:15,759 - ERROR - [91m      from transformers.processing_utils import ProcessingKwargs, ProcessorMixin, Unpack,[0m
+2025-11-07 23:16:15,759 - ERROR - [91m  _validate_images_text_input_order[0m
+2025-11-07 23:16:15,759 - ERROR - [91m  ImportError: cannot import name '_validate_images_text_input_order' from[0m
+2025-11-07 23:16:15,759 - ERROR - [91m  'transformers.processing_utils'[0m
+2025-11-07 23:16:15,759 - ERROR - [91m  (/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py)[0m
+2025-11-07 23:16:15,759 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:16:15,759 - INFO - Processing Model [11/29]: [95mLFM2-VL-1.6B-8bit[0m
+2025-11-07 23:16:15,759 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:16:15,759 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/LFM2-VL-1.6B-8bit[0m
+2025-11-07 23:16:18,789 - INFO - [92m[RUN 11/29] SUMMARY model=LFM2-VL-1.6B-8bit status=OK tokens=2592 prompt=2564 gen=28 gen_tps=240[0m
+2025-11-07 23:16:18,789 - INFO - [92mpeak_mem=3.3GB total_time=2.85s[0m
+2025-11-07 23:16:18,789 - INFO - [96mA large ship is docked at the Port of Southampton, with multi-level storage structures and gantry[0m
+2025-11-07 23:16:18,789 - INFO - [96mcranes in the background.[0m
+2025-11-07 23:16:18,789 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:16:18,790 - INFO - Processing Model [12/29]: [95mLlama-3.2-11B-Vision-Instruct-8bit[0m
+2025-11-07 23:16:18,790 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:16:18,790 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/Llama-3.2-11B-Vision-Instruct-8bit[0m
+2025-11-07 23:16:47,787 - INFO - [92m[RUN 12/29] SUMMARY model=Llama-3.2-11B-Vision-Instruct-8bit status=OK tokens=430 prompt=245 gen=185[0m
+2025-11-07 23:16:47,788 - INFO - [92mgen_tps=8.03 peak_mem=15GB total_time=28.79s[0m
+2025-11-07 23:16:47,788 - INFO - [96mI'm happy to help you with your question. However, I must point out that the image you provided is[0m
+2025-11-07 23:16:47,788 - INFO - [96mnot a real-world image, but rather a fictional representation of a harbor. Therefore, I will not be[0m
+2025-11-07 23:16:47,788 - INFO - [96mable to provide a detailed description of the image as it is not a real-world image.[0m
+2025-11-07 23:16:47,788 - INFO - [96mIf you could provide a real-world image of a harbor, I would be happy to help you with your[0m
+2025-11-07 23:16:47,788 - INFO - [96mquestion. I can provide a general description of what a harbor is and what you might see in a[0m
+2025-11-07 23:16:47,788 - INFO - [96mharbor, but I would not be able to provide a specific description of the image you provided.[0m
+2025-11-07 23:16:47,788 - INFO - [96mPlease note that I'm a large language model, I don't have the capability to access or view images,[0m
+2025-11-07 23:16:47,788 - INFO - [96mso I can only provide a general description of what a harbor is and what you might see in a harbor.[0m
+2025-11-07 23:16:47,788 - INFO - [96mIf you have any further questions or need help with anything else, please feel free to ask.[0m
+2025-11-07 23:16:47,788 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:16:47,789 - INFO - Processing Model [13/29]: [95mMolmo-7B-D-0924-8bit[0m
+2025-11-07 23:16:47,789 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:16:47,789 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/Molmo-7B-D-0924-8bit[0m
+2025-11-07 23:16:49,520 - ERROR - Failed to load model mlx-community/Molmo-7B-D-0924-8bit
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3344, in _run_model_generation
+    model, tokenizer = load(
+                       ~~~~^
+        path_or_hf_repo=params.model_identifier,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        lazy=params.lazy,
+        ^^^^^^^^^^^^^^^^^
+        trust_remote_code=params.trust_remote_code,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 305, in load
+    processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 366, in load_processor
+    processor = AutoProcessor.from_pretrained(model_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py", line 392, in from_pretrained
+    return processor_class.from_pretrained(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path, trust_remote_code=trust_remote_code, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1394, in from_pretrained
+    args = cls._get_arguments_from_pretrained(pretrained_model_name_or_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1453, in _get_arguments_from_pretrained
+    args.append(attribute_class.from_pretrained(pretrained_model_name_or_path, **kwargs))
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/image_processing_auto.py", line 598, in from_pretrained
+    image_processor_class = get_class_from_dynamic_module(class_ref, pretrained_model_name_or_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 604, in get_class_from_dynamic_module
+    final_module = get_cached_module_file(
+        repo_id,
+    ...<8 lines>...
+        repo_type=repo_type,
+    )
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 427, in get_cached_module_file
+    modules_needed = check_imports(resolved_module_file)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 260, in check_imports
+    raise ImportError(
+    ...<2 lines>...
+    )
+ImportError: This modeling file requires the following packages that were not found in your environment: tensorflow. Run `pip install tensorflow`
+2025-11-07 23:16:49,522 - ERROR - Model processing error
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3344, in _run_model_generation
+    model, tokenizer = load(
+                       ~~~~^
+        path_or_hf_repo=params.model_identifier,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        lazy=params.lazy,
+        ^^^^^^^^^^^^^^^^^
+        trust_remote_code=params.trust_remote_code,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 305, in load
+    processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 366, in load_processor
+    processor = AutoProcessor.from_pretrained(model_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py", line 392, in from_pretrained
+    return processor_class.from_pretrained(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path, trust_remote_code=trust_remote_code, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1394, in from_pretrained
+    args = cls._get_arguments_from_pretrained(pretrained_model_name_or_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1453, in _get_arguments_from_pretrained
+    args.append(attribute_class.from_pretrained(pretrained_model_name_or_path, **kwargs))
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/image_processing_auto.py", line 598, in from_pretrained
+    image_processor_class = get_class_from_dynamic_module(class_ref, pretrained_model_name_or_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 604, in get_class_from_dynamic_module
+    final_module = get_cached_module_file(
+        repo_id,
+    ...<8 lines>...
+        repo_type=repo_type,
+    )
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 427, in get_cached_module_file
+    modules_needed = check_imports(resolved_module_file)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 260, in check_imports
+    raise ImportError(
+    ...<2 lines>...
+    )
+ImportError: This modeling file requires the following packages that were not found in your environment: tensorflow. Run `pip install tensorflow`
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3442, in process_image_with_model
+    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
+                                                          ~~~~~~~~~~~~~~~~~~~~~^
+        params=params,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3354, in _run_model_generation
+    raise ValueError(error_details) from load_err
+ValueError: Model loading failed: This modeling file requires the following packages that were not found in your environment: tensorflow. Run `pip install tensorflow`
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3344, in _run_model_generation
+    model, tokenizer = load(
+                       ~~~~^
+        path_or_hf_repo=params.model_identifier,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        lazy=params.lazy,
+        ^^^^^^^^^^^^^^^^^
+        trust_remote_code=params.trust_remote_code,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 305, in load
+    processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 366, in load_processor
+    processor = AutoProcessor.from_pretrained(model_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py", line 392, in from_pretrained
+    return processor_class.from_pretrained(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path, trust_remote_code=trust_remote_code, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1394, in from_pretrained
+    args = cls._get_arguments_from_pretrained(pretrained_model_name_or_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1453, in _get_arguments_from_pretrained
+    args.append(attribute_class.from_pretrained(pretrained_model_name_or_path, **kwargs))
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/image_processing_auto.py", line 598, in from_pretrained
+    image_processor_class = get_class_from_dynamic_module(class_ref, pretrained_model_name_or_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 604, in get_class_from_dynamic_module
+    final_module = get_cached_module_file(
+        repo_id,
+    ...<8 lines>...
+        repo_type=repo_type,
+    )
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 427, in get_cached_module_file
+    modules_needed = check_imports(resolved_module_file)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 260, in check_imports
+    raise ImportError(
+    ...<2 lines>...
+    )
+ImportError: This modeling file requires the following packages that were not found in your environment: tensorflow. Run `pip install tensorflow`
+
+2025-11-07 23:16:49,604 - ERROR - [91m[RUN 13/29] SUMMARY model=Molmo-7B-D-0924-8bit status=FAIL stage=processing error=Model loading[0m
+2025-11-07 23:16:49,604 - ERROR - [91mfailed: This modeling file…[0m
+2025-11-07 23:16:49,604 - ERROR - [1m[91m✗ FAILED: [91mMolmo-7B-D-0924-8bit[0m[0m
+2025-11-07 23:16:49,604 - ERROR - [91m[1mStage:[0m
+2025-11-07 23:16:49,604 - ERROR - [91m  processing[0m
+2025-11-07 23:16:49,605 - ERROR - [91m[1mError:[0m
+2025-11-07 23:16:49,605 - ERROR - [91m  Model loading failed: This modeling file requires the following packages that were not found in[0m
+2025-11-07 23:16:49,605 - ERROR - [91m  your environment: tensorflow. Run `pip install tensorflow`[0m
+2025-11-07 23:16:49,605 - ERROR - [91m  Traceback (most recent call last):[0m
+2025-11-07 23:16:49,605 - ERROR - [91m    File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3344, in[0m
+2025-11-07 23:16:49,605 - ERROR - [91m  _run_model_generation[0m
+2025-11-07 23:16:49,605 - ERROR - [91m      model, tokenizer = load([0m
+2025-11-07 23:16:49,605 - ERROR - [91m                         ~~~~^[0m
+2025-11-07 23:16:49,605 - ERROR - [91m          path_or_hf_repo=params.model_identifier,[0m
+2025-11-07 23:16:49,605 - ERROR - [91m          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2025-11-07 23:16:49,605 - ERROR - [91m          lazy=params.lazy,[0m
+2025-11-07 23:16:49,605 - ERROR - [91m          ^^^^^^^^^^^^^^^^^[0m
+2025-11-07 23:16:49,605 - ERROR - [91m          trust_remote_code=params.trust_remote_code,[0m
+2025-11-07 23:16:49,605 - ERROR - [91m          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2025-11-07 23:16:49,606 - ERROR - [91m      )[0m
+2025-11-07 23:16:49,606 - ERROR - [91m      ^[0m
+2025-11-07 23:16:49,606 - ERROR - [91m    File[0m
+2025-11-07 23:16:49,606 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py",[0m
+2025-11-07 23:16:49,606 - ERROR - [91m  line 305, in load[0m
+2025-11-07 23:16:49,606 - ERROR - [91m      processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)[0m
+2025-11-07 23:16:49,606 - ERROR - [91m    File[0m
+2025-11-07 23:16:49,606 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py",[0m
+2025-11-07 23:16:49,606 - ERROR - [91m  line 366, in load_processor[0m
+2025-11-07 23:16:49,606 - ERROR - [91m      processor = AutoProcessor.from_pretrained(model_path, **kwargs)[0m
+2025-11-07 23:16:49,606 - ERROR - [91m    File[0m
+2025-11-07 23:16:49,606 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py",[0m
+2025-11-07 23:16:49,606 - ERROR - [91m  line 392, in from_pretrained[0m
+2025-11-07 23:16:49,606 - ERROR - [91m      return processor_class.from_pretrained([0m
+2025-11-07 23:16:49,606 - ERROR - [91m             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^[0m
+2025-11-07 23:16:49,606 - ERROR - [91m          pretrained_model_name_or_path, trust_remote_code=trust_remote_code, **kwargs[0m
+2025-11-07 23:16:49,606 - ERROR - [91m          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2025-11-07 23:16:49,606 - ERROR - [91m      )[0m
+2025-11-07 23:16:49,606 - ERROR - [91m      ^[0m
+2025-11-07 23:16:49,606 - ERROR - [91m    File[0m
+2025-11-07 23:16:49,606 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py",[0m
+2025-11-07 23:16:49,606 - ERROR - [91m  line 1394, in from_pretrained[0m
+2025-11-07 23:16:49,606 - ERROR - [91m      args = cls._get_arguments_from_pretrained(pretrained_model_name_or_path, **kwargs)[0m
+2025-11-07 23:16:49,606 - ERROR - [91m    File[0m
+2025-11-07 23:16:49,606 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py",[0m
+2025-11-07 23:16:49,606 - ERROR - [91m  line 1453, in _get_arguments_from_pretrained[0m
+2025-11-07 23:16:49,606 - ERROR - [91m      args.append(attribute_class.from_pretrained(pretrained_model_name_or_path, **kwargs))[0m
+2025-11-07 23:16:49,606 - ERROR - [91m                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2025-11-07 23:16:49,606 - ERROR - [91m    File[0m
+2025-11-07 23:16:49,606 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/image_processing_auto.py",[0m
+2025-11-07 23:16:49,606 - ERROR - [91m  line 598, in from_pretrained[0m
+2025-11-07 23:16:49,606 - ERROR - [91m      image_processor_class = get_class_from_dynamic_module(class_ref,[0m
+2025-11-07 23:16:49,606 - ERROR - [91m  pretrained_model_name_or_path, **kwargs)[0m
+2025-11-07 23:16:49,606 - ERROR - [91m    File[0m
+2025-11-07 23:16:49,606 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py",[0m
+2025-11-07 23:16:49,606 - ERROR - [91m  line 604, in get_class_from_dynamic_module[0m
+2025-11-07 23:16:49,606 - ERROR - [91m      final_module = get_cached_module_file([0m
+2025-11-07 23:16:49,606 - ERROR - [91m          repo_id,[0m
+2025-11-07 23:16:49,606 - ERROR - [91m      ...<8 lines>...[0m
+2025-11-07 23:16:49,606 - ERROR - [91m          repo_type=repo_type,[0m
+2025-11-07 23:16:49,606 - ERROR - [91m      )[0m
+2025-11-07 23:16:49,606 - ERROR - [91m    File[0m
+2025-11-07 23:16:49,606 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py",[0m
+2025-11-07 23:16:49,606 - ERROR - [91m  line 427, in get_cached_module_file[0m
+2025-11-07 23:16:49,606 - ERROR - [91m      modules_needed = check_imports(resolved_module_file)[0m
+2025-11-07 23:16:49,606 - ERROR - [91m    File[0m
+2025-11-07 23:16:49,606 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py",[0m
+2025-11-07 23:16:49,606 - ERROR - [91m  line 260, in check_imports[0m
+2025-11-07 23:16:49,606 - ERROR - [91m      raise ImportError([0m
+2025-11-07 23:16:49,606 - ERROR - [91m      ...<2 lines>...[0m
+2025-11-07 23:16:49,606 - ERROR - [91m      )[0m
+2025-11-07 23:16:49,606 - ERROR - [91m  ImportError: This modeling file requires the following packages that were not found in your[0m
+2025-11-07 23:16:49,606 - ERROR - [91m  environment: tensorflow. Run `pip install tensorflow`[0m
+2025-11-07 23:16:49,606 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:16:49,607 - INFO - Processing Model [14/29]: [95mMolmo-7B-D-0924-bf16[0m
+2025-11-07 23:16:49,607 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:16:49,607 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/Molmo-7B-D-0924-bf16[0m
+2025-11-07 23:16:52,469 - ERROR - Failed to load model mlx-community/Molmo-7B-D-0924-bf16
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3344, in _run_model_generation
+    model, tokenizer = load(
+                       ~~~~^
+        path_or_hf_repo=params.model_identifier,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        lazy=params.lazy,
+        ^^^^^^^^^^^^^^^^^
+        trust_remote_code=params.trust_remote_code,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 305, in load
+    processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 366, in load_processor
+    processor = AutoProcessor.from_pretrained(model_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py", line 392, in from_pretrained
+    return processor_class.from_pretrained(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path, trust_remote_code=trust_remote_code, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1394, in from_pretrained
+    args = cls._get_arguments_from_pretrained(pretrained_model_name_or_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1453, in _get_arguments_from_pretrained
+    args.append(attribute_class.from_pretrained(pretrained_model_name_or_path, **kwargs))
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/image_processing_auto.py", line 598, in from_pretrained
+    image_processor_class = get_class_from_dynamic_module(class_ref, pretrained_model_name_or_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 604, in get_class_from_dynamic_module
+    final_module = get_cached_module_file(
+        repo_id,
+    ...<8 lines>...
+        repo_type=repo_type,
+    )
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 427, in get_cached_module_file
+    modules_needed = check_imports(resolved_module_file)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 260, in check_imports
+    raise ImportError(
+    ...<2 lines>...
+    )
+ImportError: This modeling file requires the following packages that were not found in your environment: tensorflow. Run `pip install tensorflow`
+2025-11-07 23:16:52,470 - ERROR - Model processing error
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3344, in _run_model_generation
+    model, tokenizer = load(
+                       ~~~~^
+        path_or_hf_repo=params.model_identifier,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        lazy=params.lazy,
+        ^^^^^^^^^^^^^^^^^
+        trust_remote_code=params.trust_remote_code,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 305, in load
+    processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 366, in load_processor
+    processor = AutoProcessor.from_pretrained(model_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py", line 392, in from_pretrained
+    return processor_class.from_pretrained(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path, trust_remote_code=trust_remote_code, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1394, in from_pretrained
+    args = cls._get_arguments_from_pretrained(pretrained_model_name_or_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1453, in _get_arguments_from_pretrained
+    args.append(attribute_class.from_pretrained(pretrained_model_name_or_path, **kwargs))
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/image_processing_auto.py", line 598, in from_pretrained
+    image_processor_class = get_class_from_dynamic_module(class_ref, pretrained_model_name_or_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 604, in get_class_from_dynamic_module
+    final_module = get_cached_module_file(
+        repo_id,
+    ...<8 lines>...
+        repo_type=repo_type,
+    )
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 427, in get_cached_module_file
+    modules_needed = check_imports(resolved_module_file)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 260, in check_imports
+    raise ImportError(
+    ...<2 lines>...
+    )
+ImportError: This modeling file requires the following packages that were not found in your environment: tensorflow. Run `pip install tensorflow`
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3442, in process_image_with_model
+    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
+                                                          ~~~~~~~~~~~~~~~~~~~~~^
+        params=params,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3354, in _run_model_generation
+    raise ValueError(error_details) from load_err
+ValueError: Model loading failed: This modeling file requires the following packages that were not found in your environment: tensorflow. Run `pip install tensorflow`
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3344, in _run_model_generation
+    model, tokenizer = load(
+                       ~~~~^
+        path_or_hf_repo=params.model_identifier,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        lazy=params.lazy,
+        ^^^^^^^^^^^^^^^^^
+        trust_remote_code=params.trust_remote_code,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 305, in load
+    processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py", line 366, in load_processor
+    processor = AutoProcessor.from_pretrained(model_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py", line 392, in from_pretrained
+    return processor_class.from_pretrained(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path, trust_remote_code=trust_remote_code, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1394, in from_pretrained
+    args = cls._get_arguments_from_pretrained(pretrained_model_name_or_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1453, in _get_arguments_from_pretrained
+    args.append(attribute_class.from_pretrained(pretrained_model_name_or_path, **kwargs))
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/image_processing_auto.py", line 598, in from_pretrained
+    image_processor_class = get_class_from_dynamic_module(class_ref, pretrained_model_name_or_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 604, in get_class_from_dynamic_module
+    final_module = get_cached_module_file(
+        repo_id,
+    ...<8 lines>...
+        repo_type=repo_type,
+    )
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 427, in get_cached_module_file
+    modules_needed = check_imports(resolved_module_file)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 260, in check_imports
+    raise ImportError(
+    ...<2 lines>...
+    )
+ImportError: This modeling file requires the following packages that were not found in your environment: tensorflow. Run `pip install tensorflow`
+
+2025-11-07 23:16:52,592 - ERROR - [91m[RUN 14/29] SUMMARY model=Molmo-7B-D-0924-bf16 status=FAIL stage=processing error=Model loading[0m
+2025-11-07 23:16:52,592 - ERROR - [91mfailed: This modeling file…[0m
+2025-11-07 23:16:52,592 - ERROR - [1m[91m✗ FAILED: [91mMolmo-7B-D-0924-bf16[0m[0m
+2025-11-07 23:16:52,592 - ERROR - [91m[1mStage:[0m
+2025-11-07 23:16:52,592 - ERROR - [91m  processing[0m
+2025-11-07 23:16:52,592 - ERROR - [91m[1mError:[0m
+2025-11-07 23:16:52,592 - ERROR - [91m  Model loading failed: This modeling file requires the following packages that were not found in[0m
+2025-11-07 23:16:52,592 - ERROR - [91m  your environment: tensorflow. Run `pip install tensorflow`[0m
+2025-11-07 23:16:52,592 - ERROR - [91m  Traceback (most recent call last):[0m
+2025-11-07 23:16:52,592 - ERROR - [91m    File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 3344, in[0m
+2025-11-07 23:16:52,592 - ERROR - [91m  _run_model_generation[0m
+2025-11-07 23:16:52,592 - ERROR - [91m      model, tokenizer = load([0m
+2025-11-07 23:16:52,592 - ERROR - [91m                         ~~~~^[0m
+2025-11-07 23:16:52,592 - ERROR - [91m          path_or_hf_repo=params.model_identifier,[0m
+2025-11-07 23:16:52,592 - ERROR - [91m          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2025-11-07 23:16:52,592 - ERROR - [91m          lazy=params.lazy,[0m
+2025-11-07 23:16:52,592 - ERROR - [91m          ^^^^^^^^^^^^^^^^^[0m
+2025-11-07 23:16:52,592 - ERROR - [91m          trust_remote_code=params.trust_remote_code,[0m
+2025-11-07 23:16:52,592 - ERROR - [91m          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2025-11-07 23:16:52,592 - ERROR - [91m      )[0m
+2025-11-07 23:16:52,592 - ERROR - [91m      ^[0m
+2025-11-07 23:16:52,592 - ERROR - [91m    File[0m
+2025-11-07 23:16:52,592 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py",[0m
+2025-11-07 23:16:52,592 - ERROR - [91m  line 305, in load[0m
+2025-11-07 23:16:52,593 - ERROR - [91m      processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)[0m
+2025-11-07 23:16:52,593 - ERROR - [91m    File[0m
+2025-11-07 23:16:52,593 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/mlx_vlm/utils.py",[0m
+2025-11-07 23:16:52,593 - ERROR - [91m  line 366, in load_processor[0m
+2025-11-07 23:16:52,593 - ERROR - [91m      processor = AutoProcessor.from_pretrained(model_path, **kwargs)[0m
+2025-11-07 23:16:52,593 - ERROR - [91m    File[0m
+2025-11-07 23:16:52,593 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py",[0m
+2025-11-07 23:16:52,593 - ERROR - [91m  line 392, in from_pretrained[0m
+2025-11-07 23:16:52,593 - ERROR - [91m      return processor_class.from_pretrained([0m
+2025-11-07 23:16:52,593 - ERROR - [91m             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^[0m
+2025-11-07 23:16:52,593 - ERROR - [91m          pretrained_model_name_or_path, trust_remote_code=trust_remote_code, **kwargs[0m
+2025-11-07 23:16:52,593 - ERROR - [91m          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2025-11-07 23:16:52,593 - ERROR - [91m      )[0m
+2025-11-07 23:16:52,593 - ERROR - [91m      ^[0m
+2025-11-07 23:16:52,593 - ERROR - [91m    File[0m
+2025-11-07 23:16:52,593 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py",[0m
+2025-11-07 23:16:52,593 - ERROR - [91m  line 1394, in from_pretrained[0m
+2025-11-07 23:16:52,593 - ERROR - [91m      args = cls._get_arguments_from_pretrained(pretrained_model_name_or_path, **kwargs)[0m
+2025-11-07 23:16:52,593 - ERROR - [91m    File[0m
+2025-11-07 23:16:52,593 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py",[0m
+2025-11-07 23:16:52,593 - ERROR - [91m  line 1453, in _get_arguments_from_pretrained[0m
+2025-11-07 23:16:52,593 - ERROR - [91m      args.append(attribute_class.from_pretrained(pretrained_model_name_or_path, **kwargs))[0m
+2025-11-07 23:16:52,593 - ERROR - [91m                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+2025-11-07 23:16:52,593 - ERROR - [91m    File[0m
+2025-11-07 23:16:52,593 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/image_processing_auto.py",[0m
+2025-11-07 23:16:52,593 - ERROR - [91m  line 598, in from_pretrained[0m
+2025-11-07 23:16:52,593 - ERROR - [91m      image_processor_class = get_class_from_dynamic_module(class_ref,[0m
+2025-11-07 23:16:52,593 - ERROR - [91m  pretrained_model_name_or_path, **kwargs)[0m
+2025-11-07 23:16:52,593 - ERROR - [91m    File[0m
+2025-11-07 23:16:52,593 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py",[0m
+2025-11-07 23:16:52,593 - ERROR - [91m  line 604, in get_class_from_dynamic_module[0m
+2025-11-07 23:16:52,593 - ERROR - [91m      final_module = get_cached_module_file([0m
+2025-11-07 23:16:52,593 - ERROR - [91m          repo_id,[0m
+2025-11-07 23:16:52,593 - ERROR - [91m      ...<8 lines>...[0m
+2025-11-07 23:16:52,593 - ERROR - [91m          repo_type=repo_type,[0m
+2025-11-07 23:16:52,593 - ERROR - [91m      )[0m
+2025-11-07 23:16:52,593 - ERROR - [91m    File[0m
+2025-11-07 23:16:52,593 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py",[0m
+2025-11-07 23:16:52,593 - ERROR - [91m  line 427, in get_cached_module_file[0m
+2025-11-07 23:16:52,593 - ERROR - [91m      modules_needed = check_imports(resolved_module_file)[0m
+2025-11-07 23:16:52,593 - ERROR - [91m    File[0m
+2025-11-07 23:16:52,593 - ERROR - [91m  "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py",[0m
+2025-11-07 23:16:52,593 - ERROR - [91m  line 260, in check_imports[0m
+2025-11-07 23:16:52,593 - ERROR - [91m      raise ImportError([0m
+2025-11-07 23:16:52,593 - ERROR - [91m      ...<2 lines>...[0m
+2025-11-07 23:16:52,593 - ERROR - [91m      )[0m
+2025-11-07 23:16:52,593 - ERROR - [91m  ImportError: This modeling file requires the following packages that were not found in your[0m
+2025-11-07 23:16:52,593 - ERROR - [91m  environment: tensorflow. Run `pip install tensorflow`[0m
+2025-11-07 23:16:52,593 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:16:52,593 - INFO - Processing Model [15/29]: [95mPhi-3.5-vision-instruct-bf16[0m
+2025-11-07 23:16:52,593 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:16:52,593 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/Phi-3.5-vision-instruct-bf16[0m
+2025-11-07 23:17:10,645 - INFO - [92m[RUN 15/29] SUMMARY model=Phi-3.5-vision-instruct-bf16 status=OK tokens=1206 prompt=1047 gen=159[0m
+2025-11-07 23:17:10,645 - INFO - [92mgen_tps=10.8 peak_mem=11GB total_time=17.86s[0m
+2025-11-07 23:17:10,645 - INFO - [96mCaption: A view of the Port of Southampton from Netley, England, featuring the 'Pleiades Leader'[0m
+2025-11-07 23:17:10,645 - INFO - [96mship and storage structures for vehicles.[0m
+2025-11-07 23:17:10,645 - INFO - [96mDescription: The image captures the Port of Southampton, a significant automotive trade hub, with[0m
+2025-11-07 23:17:10,645 - INFO - [96mthe 'Pleiades Leader' ship docked at the port. The port is equipped with storage facilities for[0m
+2025-11-07 23:17:10,645 - INFO - [96mvehicles and is surrounded by the iconic gantry cranes of the container terminal. The scene is set[0m
+2025-11-07 23:17:10,645 - INFO - [96magainst an overcast sky, emphasizing the industrial atmosphere of the port.[0m
+2025-11-07 23:17:10,645 - INFO - [96mKeywords: Port of Southampton, Pleiades Leader, automotive trade, vehicle storage, gantry cranes,[0m
+2025-11-07 23:17:10,645 - INFO - [96mNetley, England, United Kingdom.[0m
+2025-11-07 23:17:10,645 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:17:10,645 - INFO - Processing Model [16/29]: [95mSmolVLM-Instruct-bf16[0m
+2025-11-07 23:17:10,645 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:17:10,645 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/SmolVLM-Instruct-bf16[0m
+2025-11-07 23:17:17,387 - INFO - [92m[RUN 16/29] SUMMARY model=SmolVLM-Instruct-bf16 status=OK tokens=1844 prompt=1439 gen=405[0m
+2025-11-07 23:17:17,387 - INFO - [92mgen_tps=112 peak_mem=5.6GB total_time=6.50s[0m
+2025-11-07 23:17:17,387 - WARNING - [93m⚠️  Verbose (405 tokens)[0m
+2025-11-07 23:17:17,387 - INFO - [96mThe image depicts the Port of Southampton, a major international shipping hub located in[0m
+2025-11-07 23:17:17,388 - INFO - [96mSouthampton Water, England. The port is known for its significant role in global trade, particularly[0m
+2025-11-07 23:17:17,388 - INFO - [96min the automotive industry. The image captures the port's infrastructure, including the 'Pleiades[0m
+2025-11-07 23:17:17,388 - INFO - [96mLeader', a large vehicle carrier ship from Tokyo, docked at the port. The ship is part of the[0m
+2025-11-07 23:17:17,388 - INFO - [96mcontainer terminal, which is a key component of the port's operations.[0m
+2025-11-07 23:17:17,388 - INFO - [96mThe ship is positioned in the center of the image, with its side facing the camera. The ship is[0m
+2025-11-07 23:17:17,388 - INFO - [96mlarge, with a long, flat deck and a tall superstructure. The deck is filled with various equipment[0m
+2025-11-07 23:17:17,388 - INFO - [96mand cargo containers, indicating that the ship is either in transit or preparing to load or unload[0m
+2025-11-07 23:17:17,388 - INFO - [96mcargo. The ship's name, "Pleiades Leader," is visible on the side of the ship, indicating its[0m
+2025-11-07 23:17:17,388 - INFO - [96midentity.[0m
+2025-11-07 23:17:17,388 - INFO - [96mThe port is a complex structure, with multiple levels and a large number of cranes. The cranes are[0m
+2025-11-07 23:17:17,388 - INFO - [96mused for loading and unloading cargo from ships, and they are visible in the background of the[0m
+2025-11-07 23:17:17,388 - INFO - [96mimage. The cranes are tall and slender, with a distinctive design that allows them to reach high[0m
+2025-11-07 23:17:17,388 - INFO - [96mabove the water.[0m
+2025-11-07 23:17:17,388 - INFO - [96mThe background of the image shows a portion of the port's infrastructure, including other ships[0m
+2025-11-07 23:17:17,388 - INFO - [96mdocked at the port, as well as the container terminal. The container terminal is a key part of the[0m
+2025-11-07 23:17:17,388 - INFO - [96mport's operations, handling the movement of cargo containers, which are used to transport goods[0m
+2025-11-07 23:17:17,388 - INFO - [96mglobally.[0m
+2025-11-07 23:17:17,388 - INFO - [96mThe sky in the image is overcast, with a mix of clouds and a hint of sunlight peeking through. The[0m
+2025-11-07 23:17:17,388 - INFO - [96mweather conditions suggest that the image was taken during a typical day at the port, likely during[0m
+2025-11-07 23:17:17,388 - INFO - [96mthe late afternoon or early evening.[0m
+2025-11-07 23:17:17,388 - INFO - [96mThe image provides a comprehensive view of the port's infrastructure and operations, highlighting[0m
+2025-11-07 23:17:17,388 - INFO - [96mthe key elements of the port's role in global trade. The image captures the industrial and[0m
+2025-11-07 23:17:17,388 - INFO - [96mlogistical aspects of the port, showcasing its importance in the global shipping industry.[0m
+2025-11-07 23:17:17,388 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:17:17,388 - INFO - Processing Model [17/29]: [95mSmolVLM2-2.2B-Instruct-mlx[0m
+2025-11-07 23:17:17,388 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:17:17,388 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/SmolVLM2-2.2B-Instruct-mlx[0m
+2025-11-07 23:17:20,512 - INFO - [92m[RUN 17/29] SUMMARY model=SmolVLM2-2.2B-Instruct-mlx status=OK tokens=1353 prompt=1339 gen=14[0m
+2025-11-07 23:17:20,513 - INFO - [92mgen_tps=126 peak_mem=5.6GB total_time=2.88s[0m
+2025-11-07 23:17:20,513 - INFO - [96mPleiades Leader ship docked at Port of Southampton, UK[0m
+2025-11-07 23:17:20,513 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:17:20,513 - INFO - Processing Model [18/29]: [95mdeepseek-vl2-8bit[0m
+2025-11-07 23:17:20,513 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:17:20,513 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/deepseek-vl2-8bit[0m
+2025-11-07 23:17:36,815 - INFO - [92m[RUN 18/29] SUMMARY model=deepseek-vl2-8bit status=OK tokens=2546 prompt=2046 gen=500 gen_tps=58.6[0m
+2025-11-07 23:17:36,816 - INFO - [92mpeak_mem=32GB total_time=16.02s[0m
+2025-11-07 23:17:36,816 - INFO - [96mA large, the image is a large, and the image is a large, and the image is a large, and the image is[0m
+2025-11-07 23:17:36,816 - INFO - [96ma large, and the image is a large, and the image is a large, and the image is a large, and the image[0m
+2025-11-07 23:17:36,817 - INFO - [96mis a large, and the image is a large, and the image is a large, and the image is a large, and the[0m
+2025-11-07 23:17:36,817 - INFO - [96mimage is a large, and the image is a large, and the image is a large, and the image is a large, and[0m
+2025-11-07 23:17:36,817 - INFO - [96mthe image is a large, and ther, the image is a large, and the image is a large, and the image is a[0m
+2025-11-07 23:17:36,817 - INFO - [96mlarge, and the image is a large, and the image is a large, and the image is a large, and the image[0m
+2025-11-07 23:17:36,817 - INFO - [96mis a large, and the image is a large, and the image is a large, and the image is a large, and the[0m
+2025-11-07 23:17:36,817 - INFO - [96mimage is a large, and the image is a large, and the image is a large, and the image is a large, and[0m
+2025-11-07 23:17:36,817 - INFO - [96mthe image is a large, and the image is a large, and the image is a large, and the image is a large,[0m
+2025-11-07 23:17:36,817 - INFO - [96mand the image is a large, and the image is a large, and the image is a large, and the image is a[0m
+2025-11-07 23:17:36,817 - INFO - [96mlarge, and the image is a large, and the image is a large, and the image is a large, and the image[0m
+2025-11-07 23:17:36,817 - INFO - [96mis a large, and the image is a large, and the image is a large, and the image is a large, and the[0m
+2025-11-07 23:17:36,817 - INFO - [96mimage is a large, and the image is a large, and the image is a large, and the image is a large, and[0m
+2025-11-07 23:17:36,817 - INFO - [96mthe image is a large, and the image is a large, and the image is a large, and the image is a large,[0m
+2025-11-07 23:17:36,817 - INFO - [96mand the image is a large, and the image is a large, and the image is a large, and the image is a[0m
+2025-11-07 23:17:36,817 - INFO - [96mlarge, and the image is a large, and the image is a large, and the image is a large, and the image[0m
+2025-11-07 23:17:36,817 - INFO - [96mis a large, and the image is a large, and the image is a large, and the image is a large, and the[0m
+2025-11-07 23:17:36,817 - INFO - [96mimage is a large, and the image is a large, and the image is a large, and the image is a large, and[0m
+2025-11-07 23:17:36,817 - INFO - [96mthe image is a large, and the image is a large, and the image is a[0m
+2025-11-07 23:17:36,817 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:17:36,817 - INFO - Processing Model [19/29]: [95mgemma-3-27b-it-qat-4bit[0m
+2025-11-07 23:17:36,817 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:17:36,817 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/gemma-3-27b-it-qat-4bit[0m
+2025-11-07 23:17:56,660 - INFO - [92m[RUN 19/29] SUMMARY model=gemma-3-27b-it-qat-4bit status=OK tokens=847 prompt=514 gen=333[0m
+2025-11-07 23:17:56,661 - INFO - [92mgen_tps=27.3 peak_mem=18GB total_time=19.55s[0m
+2025-11-07 23:17:56,661 - INFO - [96mHere's a factual caption, description, and keyword list for cataloguing the image, based on your[0m
+2025-11-07 23:17:56,661 - INFO - [96mprovided context:[0m
+2025-11-07 23:17:56,661 - INFO - [96m**Caption:**[0m
+2025-11-07 23:17:56,661 - INFO - [96mVehicle carrier *Pleiades Leader* docked at the Port of Southampton, viewed from Netley, England,[0m
+2025-11-07 23:17:56,661 - INFO - [96mNovember 2025.[0m
+2025-11-07 23:17:56,662 - INFO - [96m**Description:**[0m
+2025-11-07 23:17:56,662 - INFO - [96mA wide, horizontal photograph showing the Port of Southampton from across Southampton Water, taken[0m
+2025-11-07 23:17:56,662 - INFO - [96mnear Netley, England on or around November 1st, 2025 at 16:27:10 GMT. The image is dominated by the[0m
+2025-11-07 23:17:56,662 - INFO - [96mlarge vehicle carrier ship, *Pleiades Leader*, identifiable by its red and white hull and[0m
+2025-11-07 23:17:56,662 - INFO - [96msuperstructure. The ship is docked alongside a multi-level storage area filled with rows of new[0m
+2025-11-07 23:17:56,662 - INFO - [96mvehicles. To the right of the ship, gantry cranes are visible in the background, silhouetted against[0m
+2025-11-07 23:17:56,662 - INFO - [96man overcast sky. The foreground consists of the water surface with a navigational buoy visible. The[0m
+2025-11-07 23:17:56,662 - INFO - [96mscene depicts a busy automotive port facility.[0m
+2025-11-07 23:17:56,662 - INFO - [96m**Keywords:**[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   Port of Southampton[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   Southampton Water[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   Netley[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   England[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   United Kingdom[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   UK[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   Vehicle Carrier[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   Ship[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   *Pleiades Leader*[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   Automotive Port[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   Car Transport[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   Gantry Crane[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   Container Terminal[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   Maritime Industry[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   Commerce[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   Transport[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   November 2025[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   Overcast Sky[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   Waterfront[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   Buoy[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   Industrial Landscape[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   Logistics[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   Shipping[0m
+2025-11-07 23:17:56,662 - INFO - [96m*   International Trade[0m
+2025-11-07 23:17:56,662 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:17:56,662 - INFO - Processing Model [20/29]: [95mgemma-3-27b-it-qat-8bit[0m
+2025-11-07 23:17:56,662 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:17:56,662 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/gemma-3-27b-it-qat-8bit[0m
+2025-11-07 23:18:31,285 - INFO - [92m[RUN 20/29] SUMMARY model=gemma-3-27b-it-qat-8bit status=OK tokens=863 prompt=514 gen=349[0m
+2025-11-07 23:18:31,285 - INFO - [92mgen_tps=14.4 peak_mem=32GB total_time=34.26s[0m
+2025-11-07 23:18:31,286 - INFO - [96mHere's a factual caption, description, and keyword list for the image, based on the provided context[0m
+2025-11-07 23:18:31,286 - INFO - [96mand visual content:[0m
+2025-11-07 23:18:31,286 - INFO - [96m**Caption:**[0m
+2025-11-07 23:18:31,286 - INFO - [96mThe vehicle carrier *Pleiades Leader* docked at the Port of Southampton, viewed from Netley,[0m
+2025-11-07 23:18:31,286 - INFO - [96mEngland, November 1, 2025.[0m
+2025-11-07 23:18:31,286 - INFO - [96m**Description:**[0m
+2025-11-07 23:18:31,286 - INFO - [96mA wide, horizontal photograph shows the Port of Southampton from across Southampton Water, taken[0m
+2025-11-07 23:18:31,286 - INFO - [96mfrom Netley, England, on November 1, 2025, at approximately 16:27 GMT. The *Pleiades Leader*, a[0m
+2025-11-07 23:18:31,286 - INFO - [96mlarge vehicle carrier ship originating from Tokyo, is the dominant feature, docked alongside a[0m
+2025-11-07 23:18:31,286 - INFO - [96mmulti-level storage area filled with rows of new vehicles. To the right of the ship, the port’s[0m
+2025-11-07 23:18:31,286 - INFO - [96mcontainer terminal is visible, with several large gantry cranes silhouetted against an overcast sky.[0m
+2025-11-07 23:18:31,286 - INFO - [96mThe water in the foreground is choppy. A navigational buoy is visible in the lower right corner.[0m
+2025-11-07 23:18:31,286 - INFO - [96m**Keywords:**[0m
+2025-11-07 23:18:31,286 - INFO - [96m*   Southampton[0m
+2025-11-07 23:18:31,286 - INFO - [96m*   Southampton Water[0m
+2025-11-07 23:18:31,286 - INFO - [96m*   Netley[0m
+2025-11-07 23:18:31,286 - INFO - [96m*   England[0m
+2025-11-07 23:18:31,286 - INFO - [96m*   United Kingdom[0m
+2025-11-07 23:18:31,286 - INFO - [96m*   UK[0m
+2025-11-07 23:18:31,286 - INFO - [96m*   Port of Southampton[0m
+2025-11-07 23:18:31,286 - INFO - [96m*   Vehicle Carrier[0m
+2025-11-07 23:18:31,286 - INFO - [96m*   Ship[0m
+2025-11-07 23:18:31,286 - INFO - [96m*   *Pleiades Leader*[0m
+2025-11-07 23:18:31,286 - INFO - [96m*   Automotive Port[0m
+2025-11-07 23:18:31,286 - INFO - [96m*   Container Terminal[0m
+2025-11-07 23:18:31,286 - INFO - [96m*   Gantry Cranes[0m
+2025-11-07 23:18:31,286 - INFO - [96m*   Maritime Trade[0m
+2025-11-07 23:18:31,286 - INFO - [96m*   International Commerce[0m
+2025-11-07 23:18:31,286 - INFO - [96m*   November 2025[0m
+2025-11-07 23:18:31,286 - INFO - [96m*   Transport[0m
+2025-11-07 23:18:31,287 - INFO - [96m*   Shipping[0m
+2025-11-07 23:18:31,287 - INFO - [96m*   Logistics[0m
+2025-11-07 23:18:31,287 - INFO - [96m*   Waterfront[0m
+2025-11-07 23:18:31,287 - INFO - [96m*   Buoy[0m
+2025-11-07 23:18:31,287 - INFO - [96m*   Overcast Sky[0m
+2025-11-07 23:18:31,287 - INFO - [96m*   Industrial Landscape[0m
+2025-11-07 23:18:31,287 - INFO - [96m*   RMS Titanic (historical context - optional, but relevant)[0m
+2025-11-07 23:18:31,287 - INFO - [96m*   Tokyo (origin of ship)[0m
+2025-11-07 23:18:31,287 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:18:31,287 - INFO - Processing Model [21/29]: [95mgemma-3n-E4B-it-bf16[0m
+2025-11-07 23:18:31,287 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:18:31,287 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/gemma-3n-E4B-it-bf16[0m
+2025-11-07 23:18:49,194 - INFO - [92m[RUN 21/29] SUMMARY model=gemma-3n-E4B-it-bf16 status=OK tokens=978 prompt=514 gen=464 gen_tps=37.5[0m
+2025-11-07 23:18:49,195 - INFO - [92mpeak_mem=18GB total_time=17.58s[0m
+2025-11-07 23:18:49,196 - WARNING - [93m⚠️  Verbose (464 tokens)[0m
+2025-11-07 23:18:49,196 - INFO - [96m## Caption:[0m
+2025-11-07 23:18:49,196 - INFO - [96mA wide shot captures the industrial landscape of the Port of Southampton on a late November[0m
+2025-11-07 23:18:49,196 - INFO - [96mafternoon, viewed from across the water at Netley, England, UK. The prominent "Pleiades Leader," a[0m
+2025-11-07 23:18:49,196 - INFO - [96mlarge vehicle carrier ship from Tokyo, is docked at one of the UK's busiest ports. To the right,[0m
+2025-11-07 23:18:49,196 - INFO - [96mmulti-level storage structures are filled with new cars awaiting export or distribution,[0m
+2025-11-07 23:18:49,196 - INFO - [96mhighlighting the port's role as a major hub for global vehicle trade. In the background, the[0m
+2025-11-07 23:18:49,196 - INFO - [96mtowering gantry cranes of the container terminal stand silhouetted against the overcast sky. This[0m
+2025-11-07 23:18:49,196 - INFO - [96mscene depicts a bustling port with a rich maritime history, famously known as the departure point[0m
+2025-11-07 23:18:49,196 - INFO - [96mfor the RMS Titanic in 1912.[0m
+2025-11-07 23:18:49,197 - INFO - [96m## Description:[0m
+2025-11-07 23:18:49,197 - INFO - [96mThe photograph presents a panoramic view of the Port of Southampton from the opposite shore at[0m
+2025-11-07 23:18:49,197 - INFO - [96mNetley, England. The water in the foreground is choppy, reflecting the muted tones of the overcast[0m
+2025-11-07 23:18:49,197 - INFO - [96msky. Dominating the left side of the frame is the "Pleiades Leader," a substantial cargo ship,[0m
+2025-11-07 23:18:49,197 - INFO - [96midentifiable by its size and the visible lettering on its hull. The ship is docked alongside a[0m
+2025-11-07 23:18:49,197 - INFO - [96mcomplex network of industrial infrastructure. To the right of the ship, a vast area is dedicated to[0m
+2025-11-07 23:18:49,197 - INFO - [96mmulti-level storage facilities, densely packed with rows upon rows of new vehicles. These vehicles[0m
+2025-11-07 23:18:49,197 - INFO - [96mare arranged in an orderly fashion, suggesting preparation for export.[0m
+2025-11-07 23:18:49,197 - INFO - [96mThe background is dominated by the impressive array of container terminal equipment. Numerous[0m
+2025-11-07 23:18:49,197 - INFO - [96mtowering gantry cranes, painted in a light color, stand in a row, their skeletal structures reaching[0m
+2025-11-07 23:18:49,197 - INFO - [96mtowards the sky. Some cranes are emitting plumes of white smoke, indicating ongoing activity. The[0m
+2025-11-07 23:18:49,197 - INFO - [96moverall atmosphere is industrial and functional, emphasizing the port's role in global logistics and[0m
+2025-11-07 23:18:49,197 - INFO - [96mtrade. The overcast sky casts a soft, diffused light over the scene, enhancing the muted color[0m
+2025-11-07 23:18:49,197 - INFO - [96mpalette of the photograph. A green and white navigational marker is visible in the foreground on the[0m
+2025-11-07 23:18:49,197 - INFO - [96mright, anchored in the water.[0m
+2025-11-07 23:18:49,197 - INFO - [96m## Keywords:[0m
+2025-11-07 23:18:49,197 - INFO - [96mSouthampton, Water, Netley, England, UK, Port, Pleiades Leader, Cargo Ship, Vehicle Carrier, Cars,[0m
+2025-11-07 23:18:49,197 - INFO - [96mStorage, Container Terminal, Gantry Cranes, Industrial, Maritime, Shipping, Logistics, Trade,[0m
+2025-11-07 23:18:49,197 - INFO - [96mOvercast, November, 2025-11-01.[0m
+2025-11-07 23:18:49,198 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:18:49,198 - INFO - Processing Model [22/29]: [95mllava-v1.6-mistral-7b-8bit[0m
+2025-11-07 23:18:49,198 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:18:49,198 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/llava-v1.6-mistral-7b-8bit[0m
+2025-11-07 23:19:03,871 - INFO - [92m[RUN 22/29] SUMMARY model=llava-v1.6-mistral-7b-8bit status=OK tokens=2241 prompt=2233 gen=8[0m
+2025-11-07 23:19:03,872 - INFO - [92mgen_tps=48.3 peak_mem=12GB total_time=14.32s[0m
+2025-11-07 23:19:03,872 - INFO - [96mThe image is a photograph.[0m
+2025-11-07 23:19:03,872 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:19:03,872 - INFO - Processing Model [23/29]: [95mpaligemma2-10b-ft-docci-448-6bit[0m
+2025-11-07 23:19:03,872 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:19:03,872 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/paligemma2-10b-ft-docci-448-6bit[0m
+2025-11-07 23:19:12,099 - INFO - [92m[RUN 23/29] SUMMARY model=paligemma2-10b-ft-docci-448-6bit status=OK tokens=1374 prompt=1270 gen=104[0m
+2025-11-07 23:19:12,100 - INFO - [92mgen_tps=41.8 peak_mem=11GB total_time=8.02s[0m
+2025-11-07 23:19:12,100 - INFO - [96mA long shot view of the Southampton docks from across the water. The docks are dominated by a large[0m
+2025-11-07 23:19:12,100 - INFO - [96mwhite ship with a blue stripe down the side of it. The ship is facing the left side of the image.[0m
+2025-11-07 23:19:12,100 - INFO - [96mThere are cranes on the left side of the ship and a large structure with cars parked on it to the[0m
+2025-11-07 23:19:12,100 - INFO - [96mright of the ship. There is a green and black pole sticking out of the water in the bottom left[0m
+2025-11-07 23:19:12,100 - INFO - [96mcorner of the image. The water is choppy and the sky is gray and cloudy.[0m
+2025-11-07 23:19:12,100 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:19:12,100 - INFO - Processing Model [24/29]: [95mpaligemma2-10b-ft-docci-448-bf16[0m
+2025-11-07 23:19:12,100 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:19:12,100 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/paligemma2-10b-ft-docci-448-bf16[0m
+2025-11-07 23:21:04,114 - INFO - [92m[RUN 24/29] SUMMARY model=paligemma2-10b-ft-docci-448-bf16 status=OK tokens=1770 prompt=1270 gen=500[0m
+2025-11-07 23:21:04,115 - INFO - [92mgen_tps=4.81 peak_mem=27GB total_time=111.78s[0m
+2025-11-07 23:21:04,115 - INFO - [96mA long shot view of the Southampton docks from across the water. The docks are dominated by a large[0m
+2025-11-07 23:21:04,115 - INFO - [96mwhite ship with a red crane on the left side of the ship. The ship is facing to the left. The ship[0m
+2025-11-07 23:21:04,115 - INFO - [96mis casting a shadow on the water in front of it. The water is choppy and has a brown color. A green[0m
+2025-11-07 23:21:04,115 - INFO - [96mand black buoy is in the bottom left corner of the image. A green and black buoy is in the bottom[0m
+2025-11-07 23:21:04,115 - INFO - [96mleft corner of the image. A white building is on the right side of the ship. A metal structure is in[0m
+2025-11-07 23:21:04,115 - INFO - [96mfront of the building. A metal structure is in front of the building. A metal structure is in front[0m
+2025-11-07 23:21:04,115 - INFO - [96mof the building. A metal structure is in front of the building. A metal structure is in front of the[0m
+2025-11-07 23:21:04,115 - INFO - [96mbuilding. A metal structure is in front of the building. A metal structure is in front of the[0m
+2025-11-07 23:21:04,115 - INFO - [96mbuilding. A metal structure is in front of the building. A metal structure is in front of the[0m
+2025-11-07 23:21:04,115 - INFO - [96mbuilding. A metal structure is in front of the building. A metal structure is in front of the[0m
+2025-11-07 23:21:04,115 - INFO - [96mbuilding. A metal structure is in front of the building. A metal structure is in front of the[0m
+2025-11-07 23:21:04,115 - INFO - [96mbuilding. A metal structure is in front of the building. A metal structure is in front of the[0m
+2025-11-07 23:21:04,115 - INFO - [96mbuilding. A metal structure is in front of the building. A metal structure is in front of the[0m
+2025-11-07 23:21:04,115 - INFO - [96mbuilding. A metal structure is in front of the building. A metal structure is in front of the[0m
+2025-11-07 23:21:04,115 - INFO - [96mbuilding. A metal structure is in front of the building. A metal structure is in front of the[0m
+2025-11-07 23:21:04,115 - INFO - [96mbuilding. A metal structure is in front of the building. A metal structure is in front of the[0m
+2025-11-07 23:21:04,115 - INFO - [96mbuilding. A metal structure is in front of the building. A metal structure is in front of the[0m
+2025-11-07 23:21:04,115 - INFO - [96mbuilding. A metal structure is in front of the building. A metal structure is in front of the[0m
+2025-11-07 23:21:04,115 - INFO - [96mbuilding. A metal structure is in front of the building. A metal structure is in front of the[0m
+2025-11-07 23:21:04,116 - INFO - [96mbuilding. A metal structure is in front of the building. A metal structure is in front of the[0m
+2025-11-07 23:21:04,116 - INFO - [96mbuilding. A metal structure is in front of the building. A metal structure is in front of the[0m
+2025-11-07 23:21:04,116 - INFO - [96mbuilding. A metal structure is in front of the building. A metal structure is in front of the[0m
+2025-11-07 23:21:04,116 - INFO - [96mbuilding. A metal structure is in front of the building. A metal structure is in front of the[0m
+2025-11-07 23:21:04,116 - INFO - [96mbuilding. A metal structure is in front of the building. A metal structure is in front of the[0m
+2025-11-07 23:21:04,116 - INFO - [96mbuilding. A[0m
+2025-11-07 23:21:04,116 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:21:04,116 - INFO - Processing Model [25/29]: [95mpaligemma2-3b-ft-docci-448-bf16[0m
+2025-11-07 23:21:04,116 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:21:04,116 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/paligemma2-3b-ft-docci-448-bf16[0m
+2025-11-07 23:21:12,995 - INFO - [92m[RUN 25/29] SUMMARY model=paligemma2-3b-ft-docci-448-bf16 status=OK tokens=1343 prompt=1270 gen=73[0m
+2025-11-07 23:21:12,995 - INFO - [92mgen_tps=17.5 peak_mem=11GB total_time=8.50s[0m
+2025-11-07 23:21:12,996 - INFO - [96mA single green and black navigational buoy is visible in the foreground, with a small black pole and[0m
+2025-11-07 23:21:12,996 - INFO - [96ma green pyramid-shaped top. The water in the foreground is a light brown, with a rough, rippled[0m
+2025-11-07 23:21:12,996 - INFO - [96msurface. The horizon is a dark gray. The sky is a light gray, with a single plume of white smoke[0m
+2025-11-07 23:21:12,996 - INFO - [96mcoming from the top right corner.[0m
+2025-11-07 23:21:12,997 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:21:12,997 - INFO - Processing Model [26/29]: [95mpaligemma2-3b-pt-896-4bit[0m
+2025-11-07 23:21:12,997 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:21:12,997 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/paligemma2-3b-pt-896-4bit[0m
+2025-11-07 23:21:24,534 - INFO - [92m[RUN 26/29] SUMMARY model=paligemma2-3b-pt-896-4bit status=OK tokens=4842 prompt=4342 gen=500[0m
+2025-11-07 23:21:24,534 - INFO - [92mgen_tps=109 peak_mem=8.8GB total_time=10.98s[0m
+2025-11-07 23:21:24,534 - INFO - [96mThe image is a photograph of a large ship with a large nameplate on the side of a large building.[0m
+2025-11-07 23:21:24,534 - INFO - [96mThe name of the ship is unknown. The ship is a large ship with a large nameplate on the side of a[0m
+2025-11-07 23:21:24,534 - INFO - [96mlarge building. The name of the building is unknown. The building is a large building with a large[0m
+2025-11-07 23:21:24,534 - INFO - [96mnameplate on the side of a large building. The name of the building is unknown. The building is a[0m
+2025-11-07 23:21:24,534 - INFO - [96mlarge building with a large nameplate on the side of a large building. The name of the building is[0m
+2025-11-07 23:21:24,534 - INFO - [96munknown. The building is a large building with a large nameplate on the side of a large building.[0m
+2025-11-07 23:21:24,534 - INFO - [96mThe name of the building is unknown. The building is a large building with a large nameplate on the[0m
+2025-11-07 23:21:24,534 - INFO - [96mside of a large building. The name of the building is unknown. The building is a large building with[0m
+2025-11-07 23:21:24,534 - INFO - [96ma large nameplate on the side of a large building. The name of the building is unknown. The building[0m
+2025-11-07 23:21:24,534 - INFO - [96mis a large building with a large nameplate on the side of a large building. The name of the building[0m
+2025-11-07 23:21:24,534 - INFO - [96mis unknown. The building is a large building with a large nameplate on the side of a large building.[0m
+2025-11-07 23:21:24,534 - INFO - [96mThe name of the building is unknown. The building is a large building with a large nameplate on the[0m
+2025-11-07 23:21:24,534 - INFO - [96mside of a large building. The name of the building is unknown. The building is a large building with[0m
+2025-11-07 23:21:24,534 - INFO - [96ma large nameplate on the side of a large building. The name of the building is unknown. The building[0m
+2025-11-07 23:21:24,534 - INFO - [96mis a large building with a large nameplate on the side of a large building. The name of the building[0m
+2025-11-07 23:21:24,534 - INFO - [96mis unknown. The building is a large building with a large nameplate on the side of a large building.[0m
+2025-11-07 23:21:24,534 - INFO - [96mThe name of the building is unknown. The building is a large building with a large nameplate on the[0m
+2025-11-07 23:21:24,534 - INFO - [96mside of a large building. The name of the building is unknown. The building is a large building with[0m
+2025-11-07 23:21:24,534 - INFO - [96ma large nameplate on the side of a large building. The name of the building is unknown. The building[0m
+2025-11-07 23:21:24,534 - INFO - [96mis a large building with a large nameplate on the side of a large building. The name of the building[0m
+2025-11-07 23:21:24,534 - INFO - [96mis unknown. The building is a large building with a large nameplate on the side of a large building.[0m
+2025-11-07 23:21:24,534 - INFO - [96mThe name of the building is unknown. The building is a large building with a large nameplate on the[0m
+2025-11-07 23:21:24,534 - INFO - [96mside of a large building. The name of the building is unknown. The building is a large building with[0m
+2025-11-07 23:21:24,534 - INFO - [96ma large nameplate[0m
+2025-11-07 23:21:24,534 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:21:24,534 - INFO - Processing Model [27/29]: [95mpixtral-12b-8bit[0m
+2025-11-07 23:21:24,534 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:21:24,535 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/pixtral-12b-8bit[0m
+2025-11-07 23:21:40,740 - INFO - [92m[RUN 27/29] SUMMARY model=pixtral-12b-8bit status=OK tokens=2849 prompt=2591 gen=258 gen_tps=34.6[0m
+2025-11-07 23:21:40,740 - INFO - [92mpeak_mem=15GB total_time=15.96s[0m
+2025-11-07 23:21:40,741 - INFO - [96m### Caption[0m
+2025-11-07 23:21:40,741 - INFO - [96mIndustrial expanse of the Port of Southampton, featuring the vehicle carrier ship 'Pleiades Leader'[0m
+2025-11-07 23:21:40,741 - INFO - [96mdocked at one of the UK's busiest automotive ports, with multi-level storage structures and towering[0m
+2025-11-07 23:21:40,741 - INFO - [96mcranes in the background.[0m
+2025-11-07 23:21:40,741 - INFO - [96m### Description[0m
+2025-11-07 23:21:40,741 - INFO - [96mThe image captures the bustling Port of Southampton from across the water at Netley, England. The[0m
+2025-11-07 23:21:40,741 - INFO - [96mscene is dominated by the large vehicle carrier ship 'Pleiades Leader' from Tokyo, docked at the[0m
+2025-11-07 23:21:40,741 - INFO - [96mport. To the right of the ship, multi-level storage structures are filled with new cars awaiting[0m
+2025-11-07 23:21:40,741 - INFO - [96mexport or distribution, highlighting the port's role as a major hub for global vehicle trade. In the[0m
+2025-11-07 23:21:40,741 - INFO - [96mbackground, the towering gantry cranes of the container terminal stand silhouetted against the[0m
+2025-11-07 23:21:40,741 - INFO - [96movercast sky, emphasizing the port's modern infrastructure and its significance in international[0m
+2025-11-07 23:21:40,741 - INFO - [96mcommerce.[0m
+2025-11-07 23:21:40,741 - INFO - [96m### Keywords[0m
+2025-11-07 23:21:40,741 - INFO - [96m- Port of Southampton[0m
+2025-11-07 23:21:40,741 - INFO - [96m- Pleiades Leader[0m
+2025-11-07 23:21:40,741 - INFO - [96m- Vehicle carrier ship[0m
+2025-11-07 23:21:40,741 - INFO - [96m- Southampton Water[0m
+2025-11-07 23:21:40,741 - INFO - [96m- Netley, England[0m
+2025-11-07 23:21:40,741 - INFO - [96m- UK[0m
+2025-11-07 23:21:40,741 - INFO - [96m- Automotive port[0m
+2025-11-07 23:21:40,741 - INFO - [96m- Multi-level storage structures[0m
+2025-11-07 23:21:40,741 - INFO - [96m- New cars[0m
+2025-11-07 23:21:40,741 - INFO - [96m- Gantry cranes[0m
+2025-11-07 23:21:40,741 - INFO - [96m- Container terminal[0m
+2025-11-07 23:21:40,741 - INFO - [96m- International commerce[0m
+2025-11-07 23:21:40,741 - INFO - [96m- Maritime history[0m
+2025-11-07 23:21:40,741 - INFO - [96m- RMS Titanic[0m
+2025-11-07 23:21:40,741 - INFO - [96m- Overcast sky[0m
+2025-11-07 23:21:40,741 - INFO - [96m- Industrial expanse[0m
+2025-11-07 23:21:40,741 - INFO - [96m- Global vehicle trade[0m
+2025-11-07 23:21:40,741 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:21:40,741 - INFO - Processing Model [28/29]: [95mpixtral-12b-bf16[0m
+2025-11-07 23:21:40,741 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:21:40,741 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mmlx-community/pixtral-12b-bf16[0m
+2025-11-07 23:22:04,416 - INFO - [92m[RUN 28/29] SUMMARY model=pixtral-12b-bf16 status=OK tokens=2858 prompt=2591 gen=267 gen_tps=19.6[0m
+2025-11-07 23:22:04,416 - INFO - [92mpeak_mem=27GB total_time=23.45s[0m
+2025-11-07 23:22:04,417 - INFO - [96m### Caption[0m
+2025-11-07 23:22:04,417 - INFO - [96mIndustrial expanse of the Port of Southampton, featuring the vehicle carrier ship 'Pleiades Leader'[0m
+2025-11-07 23:22:04,417 - INFO - [96mdocked at one of the UK's busiest automotive ports, with multi-level storage structures filled with[0m
+2025-11-07 23:22:04,417 - INFO - [96mnew cars and towering gantry cranes in the background.[0m
+2025-11-07 23:22:04,417 - INFO - [96m### Description[0m
+2025-11-07 23:22:04,417 - INFO - [96mThe image captures the Port of Southampton from across the water at Netley, England, on a late[0m
+2025-11-07 23:22:04,417 - INFO - [96mNovember afternoon. The 'Pleiades Leader', a large vehicle carrier ship from Tokyo, is prominently[0m
+2025-11-07 23:22:04,417 - INFO - [96mdocked at the port. To the right of the ship, multi-level storage structures are filled with new[0m
+2025-11-07 23:22:04,417 - INFO - [96mcars awaiting export or distribution, highlighting the port's role as a major hub for global vehicle[0m
+2025-11-07 23:22:04,417 - INFO - [96mtrade. In the background, the towering gantry cranes of the container terminal stand silhouetted[0m
+2025-11-07 23:22:04,417 - INFO - [96magainst the overcast sky, emphasizing the port's modern infrastructure and its significance in[0m
+2025-11-07 23:22:04,417 - INFO - [96minternational commerce.[0m
+2025-11-07 23:22:04,417 - INFO - [96m### Keywords[0m
+2025-11-07 23:22:04,417 - INFO - [96m- Port of Southampton[0m
+2025-11-07 23:22:04,417 - INFO - [96m- Pleiades Leader[0m
+2025-11-07 23:22:04,417 - INFO - [96m- Vehicle carrier ship[0m
+2025-11-07 23:22:04,417 - INFO - [96m- Tokyo[0m
+2025-11-07 23:22:04,417 - INFO - [96m- Southampton Water[0m
+2025-11-07 23:22:04,417 - INFO - [96m- Netley, England[0m
+2025-11-07 23:22:04,417 - INFO - [96m- UK[0m
+2025-11-07 23:22:04,417 - INFO - [96m- Automotive port[0m
+2025-11-07 23:22:04,417 - INFO - [96m- New cars[0m
+2025-11-07 23:22:04,417 - INFO - [96m- Storage structures[0m
+2025-11-07 23:22:04,417 - INFO - [96m- Gantry cranes[0m
+2025-11-07 23:22:04,417 - INFO - [96m- Container terminal[0m
+2025-11-07 23:22:04,417 - INFO - [96m- International commerce[0m
+2025-11-07 23:22:04,417 - INFO - [96m- Maritime history[0m
+2025-11-07 23:22:04,417 - INFO - [96m- RMS Titanic[0m
+2025-11-07 23:22:04,417 - INFO - [96m- Overcast sky[0m
+2025-11-07 23:22:04,417 - INFO - [96m- Industrial expanse[0m
+2025-11-07 23:22:04,417 - INFO - [96m- Global vehicle trade[0m
+2025-11-07 23:22:04,417 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:22:04,417 - INFO - Processing Model [29/29]: [95mnanoLLaVA[0m
+2025-11-07 23:22:04,417 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:22:04,417 - INFO - Processing '[95m20251101-162710_DSC07298_DxO.jpg[0m' with model: [95mqnguyen3/nanoLLaVA[0m
+2025-11-07 23:22:06,855 - INFO - [92m[RUN 29/29] SUMMARY model=nanoLLaVA status=OK tokens=341 prompt=260 gen=81 gen_tps=105[0m
+2025-11-07 23:22:06,855 - INFO - [92mpeak_mem=4.5GB total_time=2.17s[0m
+2025-11-07 23:22:06,856 - INFO - [96mThe image captures a scene at the Port of Southampton, England, during the late November afternoon.[0m
+2025-11-07 23:22:06,856 - INFO - [96mThe dominant feature is the large 'Pleiades Leader', a container ship from Tokyo, docked at the[0m
+2025-11-07 23:22:06,856 - INFO - [96mport. The image also includes other ships and containers, as well as a variety of other elements[0m
+2025-11-07 23:22:06,856 - INFO - [96msuch as the overcast sky, the water, and the various structures and features of the port.[0m
+2025-11-07 23:22:06,856 - INFO - Performance Summary
+2025-11-07 23:22:06,856 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:22:06,864 - INFO - 
+2025-11-07 23:22:06,864 - INFO - ════════════════════════════════════════════════════════════════════════════════════════════════════
+2025-11-07 23:22:06,864 - INFO - [1m[96m                                        PERFORMANCE SUMMARY[0m
+2025-11-07 23:22:06,864 - INFO - ════════════════════════════════════════════════════════════════════════════════════════════════════
+2025-11-07 23:22:06,864 - INFO - Model                                  Token    Prompt     Gen     Total    Prompt      Gen    Peak    Generation    Load    Total  Output
+2025-11-07 23:22:06,864 - INFO -                                                   (ct)    (ct)    Tokens     (t/s)    (t/s)    (GB)           (s)     (s)      (s)
+2025-11-07 23:22:06,864 - INFO - ✗ [91mmicrosoft/ Florence-- 2-large-ft[0m                                                                                                  Model loading failed: Missing 1 parameters:
+2025-11-07 23:22:06,864 - INFO -                                                                                                                                     language_model.lm_head.weight. Traceback (most recent call
+2025-11-07 23:22:06,864 - INFO -                                                                                                                                     last):   File "/Users/jrp/Doc...
+2025-11-07 23:22:06,864 - INFO - ✗ [91mmlx-community/ Kimi-VL-A3B-Thi-[0m                                                                                                   Model loading failed: cannot import name
+2025-11-07 23:22:06,864 - INFO - [91mnking-2506-bf16[0m                                                                                                                     '_validate_images_text_input_order' from
+2025-11-07 23:22:06,864 - INFO -                                                                                                                                     'transformers.processing_utils' (/opt/homebrew/Caskr...
+2025-11-07 23:22:06,864 - INFO - ✗ [91mmlx-community/ Kimi-VL-A3B--[0m                                                                                                      Model loading failed: cannot import name
+2025-11-07 23:22:06,865 - INFO - [91mThinking-8bit[0m                                                                                                                       '_validate_images_text_input_order' from
+2025-11-07 23:22:06,865 - INFO -                                                                                                                                     'transformers.processing_utils' (/opt/homebrew/Caskr...
+2025-11-07 23:22:06,865 - INFO - ✗ [91mmlx-community/ Molmo-7B-D-[0m                                                                                                        Model loading failed: This modeling file requires the
+2025-11-07 23:22:06,865 - INFO - [91m-0924-8bit[0m                                                                                                                          following packages that were not found in your environment:
+2025-11-07 23:22:06,865 - INFO -                                                                                                                                     tensorf...
+2025-11-07 23:22:06,865 - INFO - ✗ [91mmlx-community/ Molmo-7B-D-[0m                                                                                                        Model loading failed: This modeling file requires the
+2025-11-07 23:22:06,865 - INFO - [91m-0924-bf16[0m                                                                                                                          following packages that were not found in your environment:
+2025-11-07 23:22:06,865 - INFO -                                                                                                                                     tensorf...
+2025-11-07 23:22:06,865 - INFO - ✓ [95mqnguyen3/nanoLLaVA[0m                 151,645       260      81       341     1,203      105     4.5         1.47s   0.70s    2.17s  The image captures a scene at the Port of Southampton,
+2025-11-07 23:22:06,865 - INFO -                                                                                                                                     England, during the late November afternoon. The dominant
+2025-11-07 23:22:06,865 - INFO -                                                                                                                                     feature ...
+2025-11-07 23:22:06,865 - INFO - ✓ [95mmlx-community/ SmolVLM2-2.2B-[0m       49,279     1,339      14     1,353     1,174      126     5.6         1.88s   1.00s    2.88s  Pleiades Leader ship docked at Port of Southampton, UK
+2025-11-07 23:22:06,865 - INFO - [95m-Instruct-mlx[0m
+2025-11-07 23:22:06,865 - INFO - ✓ [95mmlx-community/ LFM2-VL--[0m                 7     2,564      28     2,592     1,837      240     3.3         2.17s   0.68s    2.85s  A large ship is docked at the Port of Southampton, with
+2025-11-07 23:22:06,865 - INFO - [95m1.6B-8bit[0m                                                                                                                           multi-level storage structures and gantry cranes in the
+2025-11-07 23:22:06,865 - INFO -                                                                                                                                     background.
+2025-11-07 23:22:06,865 - INFO - ✓ [95mmlx-community/ Florence-2-l-[0m           0.0       241     500       741     1,010      299     2.8         2.56s   0.93s    3.48s  <s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s>
+2025-11-07 23:22:06,865 - INFO - [95marge-ft-8bit[0m                                                                                                                        <s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s>
+2025-11-07 23:22:06,865 - INFO -                                                                                                                                     ...
+2025-11-07 23:22:06,865 - INFO - ✓ [95mHuggingFaceTB/SmolVLM-Instruct[0m      49,154     1,439     268     1,707     1,231      116     5.5         4.01s   0.50s    4.51s  The image depicts the Port of Southampton, a major
+2025-11-07 23:22:06,865 - INFO -                                                                                                                                     international shipping hub located in Southampton Water,
+2025-11-07 23:22:06,865 - INFO -                                                                                                                                     England. The p...
+2025-11-07 23:22:06,865 - INFO - ✓ [95mmlx-community/ SmolVLM-In-[0m          49,154     1,439     405     1,844     1,214      112     5.6         5.47s   1.03s    6.50s  The image depicts the Port of Southampton, a major
+2025-11-07 23:22:06,865 - INFO - [95mstruct-bf16[0m                                                                                                                         international shipping hub located in Southampton Water,
+2025-11-07 23:22:06,865 - INFO -                                                                                                                                     England. The p...
+2025-11-07 23:22:06,865 - INFO - ✓ [95mmlx-community/ paligemma2-10b-f-[0m         1     1,270     104     1,374       501     41.8      11         5.51s   2.51s    8.02s  A long shot view of the Southampton docks from across the
+2025-11-07 23:22:06,865 - INFO - [95mt-docci-448-6bit[0m                                                                                                                    water. The docks are dominated by a large white ship with a
+2025-11-07 23:22:06,865 - INFO -                                                                                                                                     blue...
+2025-11-07 23:22:06,865 - INFO - ✓ [95mmlx-community/ paligemma2-3b-f-[0m          1     1,270      73     1,343     1,462     17.5      11         5.62s   2.89s    8.50s  A single green and black navigational buoy is visible in the
+2025-11-07 23:22:06,865 - INFO - [95mt-docci-448-bf16[0m                                                                                                                    foreground, with a small black pole and a green pyramid-s...
+2025-11-07 23:22:06,865 - INFO - ✓ [95mmlx-community/ paligemma2-3-[0m         3,714     4,342     500     4,842     1,127      109     8.8         8.97s   2.02s   10.98s  The image is a photograph of a large ship with a large
+2025-11-07 23:22:06,865 - INFO - [95mb-pt-896-4bit[0m                                                                                                                       nameplate on the side of a large building. The name of the
+2025-11-07 23:22:06,865 - INFO -                                                                                                                                     ship is ...
+2025-11-07 23:22:06,865 - INFO - ✓ [95mmlx-community/ deepseek-[0m               260     2,046     500     2,546     1,002     58.6      32        11.08s   4.94s   16.02s  A large, the image is a large, and the image is a large,
+2025-11-07 23:22:06,865 - INFO - [95m-vl2-8bit[0m                                                                                                                           and the image is a large, and the image is a large, and the
+2025-11-07 23:22:06,865 - INFO -                                                                                                                                     i...
+2025-11-07 23:22:06,865 - INFO - ✓ [95mmlx-community/ llava-v1.6-mi-[0m            2     2,233       8     2,241       186     48.3      12        12.77s   1.55s   14.32s  The image is a photograph.
+2025-11-07 23:22:06,865 - INFO - [95mstral-7b-8bit[0m
+2025-11-07 23:22:06,865 - INFO - ✓ [95mmlx-community/pixtral-12b-8bit[0m           2     2,591     258     2,849       494     34.6      15        13.19s   2.77s   15.96s  ### Caption Industrial expanse of the Port of Southampton,
+2025-11-07 23:22:06,865 - INFO -                                                                                                                                     featuring the vehicle carrier ship 'Pleiades Leader' docked
+2025-11-07 23:22:06,865 - INFO -                                                                                                                                     at one ...
+2025-11-07 23:22:06,865 - INFO - ✓ [95mmlx-community/ gemma-3n-E- 4B-it-[0m      106       514     464       978       677     37.5      18        13.55s   4.03s   17.58s  ## Caption:  A wide shot captures the industrial landscape
+2025-11-07 23:22:06,865 - INFO - [95mbf16[0m                                                                                                                                of the Port of Southampton on a late November afternoon,
+2025-11-07 23:22:06,865 - INFO -                                                                                                                                     vie...
+2025-11-07 23:22:06,865 - INFO - ✓ [95mmlx-community/ gemma-3-27b- -it-[0m       106       514     333       847       171     27.3      18        15.66s   3.89s   19.55s  Here's a factual caption, description, and keyword list for
+2025-11-07 23:22:06,865 - INFO - [95mqat-4bit[0m                                                                                                                            cataloguing the image, based on your provided context:
+2025-11-07 23:22:06,865 - INFO -                                                                                                                                     **Caption:** ...
+2025-11-07 23:22:06,865 - INFO - ✓ [95mmlx-community/ InternVL3-[0m          151,645     2,555     221     2,776       362     27.2      18        15.76s   2.97s   18.74s  **Caption:**   A view of the Port of Southampton from
+2025-11-07 23:22:06,865 - INFO - [95m-14B-8bit[0m                                                                                                                           Netley, England, featuring the 'Pleiades Leader' vehicle
+2025-11-07 23:22:06,866 - INFO -                                                                                                                                     carrier ...
+2025-11-07 23:22:06,866 - INFO - ✓ [95mmlx-community/ Phi-3.5-vision-[0m      32,007     1,047     159     1,206       919     10.8      11        16.19s   1.67s   17.86s  Caption: A view of the Port of Southampton from Netley,
+2025-11-07 23:22:06,866 - INFO - [95m-instruct-bf16[0m                                                                                                                      England, featuring the 'Pleiades Leader' ship and storage
+2025-11-07 23:22:06,866 - INFO -                                                                                                                                     structur...
+2025-11-07 23:22:06,866 - INFO - ✓ [95mmlx-community/ Idefics3-8B-[0m        128,001     2,556     373     2,929       671     26.6      19        18.46s   3.22s   21.69s  The image depicts a wide, expansive view of the Port of
+2025-11-07 23:22:06,866 - INFO - [95m-Llama3-bf16[0m                                                                                                                        Southampton, situated in Netley, England, UK. The focal
+2025-11-07 23:22:06,866 - INFO -                                                                                                                                     point of the i...
+2025-11-07 23:22:06,866 - INFO - ✓ [95mmlx-community/pixtral-12b-bf16[0m           2     2,591     267     2,858       534     19.6      27        19.00s   4.44s   23.45s  ### Caption Industrial expanse of the Port of Southampton,
+2025-11-07 23:22:06,866 - INFO -                                                                                                                                     featuring the vehicle carrier ship 'Pleiades Leader' docked
+2025-11-07 23:22:06,866 - INFO -                                                                                                                                     at one ...
+2025-11-07 23:22:06,866 - INFO - ✓ [95mmlx-community/ Apriel-1.5-15b--[0m      1,897     2,682     500     3,182       392       36      15        21.22s   2.60s   23.82s  Here are my reasoning steps: The user asks: "Provide a
+2025-11-07 23:22:06,866 - INFO - [95mThinker-6bit-MLX[0m                                                                                                                    factual caption, description, and keywords suitable for
+2025-11-07 23:22:06,866 - INFO -                                                                                                                                     catalogui...
+2025-11-07 23:22:06,866 - INFO - ✓ [95mmlx-community/[0m                     128,009       245     185       430      85.5     8.03      15        26.36s   2.42s   28.79s  I'm happy to help you with your question. However, I must
+2025-11-07 23:22:06,866 - INFO - [95mLlama-3.2-11B-Vision-Instruct...[0m                                                                                                    point out that the image you provided is not a real-world
+2025-11-07 23:22:06,866 - INFO -                                                                                                                                     image...
+2025-11-07 23:22:06,866 - INFO - ✓ [95mmlx-community/ gemma-3-27b- -it-[0m       106       514     349       863       161     14.4      32        27.93s   6.33s   34.26s  Here's a factual caption, description, and keyword list for
+2025-11-07 23:22:06,866 - INFO - [95mqat-8bit[0m                                                                                                                            the image, based on the provided context and visual content:
+2025-11-07 23:22:06,866 - INFO -                                                                                                                                     ...
+2025-11-07 23:22:06,866 - INFO - ✓ [95mmicrosoft/ Phi-3.5-vis- ion-[0m            13     1,047     500     1,547       925     11.1      12        46.42s   1.67s   48.09s  Caption: A view of the Port of Southampton from Netley,
+2025-11-07 23:22:06,866 - INFO - [95minstruct[0m                                                                                                                            England, featuring the 'Pleiades Leader' carrier ship and
+2025-11-07 23:22:06,866 - INFO -                                                                                                                                     the cont...
+2025-11-07 23:22:06,866 - INFO - ✓ [95mmlx-community/ paligemma2-10b-f-[0m       586     1,270     500     1,770       455     4.81      27       107.31s   4.47s  111.78s  A long shot view of the Southampton docks from across the
+2025-11-07 23:22:06,866 - INFO - [95mt-docci-448-bf16[0m                                                                                                                    water. The docks are dominated by a large white ship with a
+2025-11-07 23:22:06,866 - INFO -                                                                                                                                     red ...
+2025-11-07 23:22:06,866 - INFO - ✓ [95mmeta-llama/ Llama-3.2-11B--[0m         25,563       246     500       746      79.5     3.81      25       134.89s   1.16s  136.05s  **Image Details**  * **Location**: The image was taken in
+2025-11-07 23:22:06,866 - INFO - [95mVision-Instruct[0m                                                                                                                     Southampton, England, UK. * **Subject**: The image features
+2025-11-07 23:22:06,866 - INFO -                                                                                                                                     the Port o...
+2025-11-07 23:22:06,866 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:22:06,866 - INFO - Total Models: 29  │  [92m✓ Pass: 24[0m  [91m✗ Fail: 5[0m
+2025-11-07 23:22:06,866 - INFO - ════════════════════════════════════════════════════════════════════════════════════════════════════
+2025-11-07 23:22:06,866 - INFO - Results sorted: errors first, then by generation time (fastest to slowest).
+2025-11-07 23:22:06,867 - INFO - 
+2025-11-07 23:22:06,868 - INFO - ## 📊 Model Performance Summary
+
+**Total Models Evaluated:** 31
+
+✅ **Successful (3):**
+   Clean output, no issues detected
+  • Llama-3.2-11B-Vision-Instruct-8bit
+  • paligemma2-10b-ft-docci-448-bf16
+  • nanoLLaVA
+
+❌ **Crashed/Failed (5):**
+   Errors, OOM, or other failures
+  • Florence-2-large-ft
+  • Kimi-VL-A3B-Thinking-2506-bf16
+  • Kimi-VL-A3B-Thinking-8bit
+  • Molmo-7B-D-0924-8bit
+  • Molmo-7B-D-0924-bf16
+
+🤔 **Possible Hallucinations (1):**
+   Detected unexpected content patterns
+  • Phi-3.5-vision-instruct (Contains unexpected table, Contains multiple choice pattern)
+
+📚 **Excessively Verbose (2):**
+   Over-structured output with meta-commentary
+  • SmolVLM-Instruct-bf16 (405 tokens)
+  • gemma-3n-E4B-it-bf16 (464 tokens)
+
+🎨 **Formatting Issues (2):**
+   Unexpected HTML tags or markdown structure
+  • Florence-2-large-ft-8bit (Unknown HTML tags: &lt;s&gt;)
+  • Idefics3-8B-Llama3-bf16 (Unknown HTML tags: &lt;end_of_utterance&gt;)
+
+📋 **Excessive Bullet Points (5):**
+   Many bullet points (may be appropriate depending on prompt)
+  • Llama-3.2-11B-Vision-Instruct (110 bullets)
+  • gemma-3-27b-it-qat-4bit (24 bullets)
+  • gemma-3-27b-it-qat-8bit (25 bullets)
+  • pixtral-12b-8bit (17 bullets)
+  • pixtral-12b-bf16 (18 bullets)
+
+📝 **Very Succinct (13):**
+   Generated output much shorter than prompt
+  • SmolVLM-Instruct (268 tokens)
+  • Apriel-1.5-15b-Thinker-6bit-MLX (500 tokens)
+  • InternVL3-14B-8bit (221 tokens)
+  • LFM2-VL-1.6B-8bit (28 tokens)
+  • Phi-3.5-vision-instruct-bf16 (159 tokens)
+  • SmolVLM2-2.2B-Instruct-mlx (14 tokens)
+  • deepseek-vl2-8bit (500 tokens)
+  • llava-v1.6-mistral-7b-8bit (8 tokens)
+  • paligemma2-10b-ft-docci-448-6bit (104 tokens)
+  • paligemma2-3b-ft-docci-448-bf16 (73 tokens)
+  • paligemma2-3b-pt-896-4bit (500 tokens)
+  • pixtral-12b-8bit (258 tokens)
+  • pixtral-12b-bf16 (267 tokens)
+
+2025-11-07 23:22:06,868 - INFO - 
+2025-11-07 23:22:06,868 - INFO - Report Generation
+2025-11-07 23:22:06,868 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:22:07,201 - INFO - HTML report saved to: [92m/Users/jrp/Documents/AI/mlx/scripts/src/output/results.html[0m
+2025-11-07 23:22:08,716 - INFO - Markdown report saved to: [92m/Users/jrp/Documents/AI/mlx/scripts/src/output/results.md[0m
+2025-11-07 23:22:08,717 - INFO - 
+2025-11-07 23:22:08,717 - INFO - 📊 [1m[92mReports successfully generated:[0m
+2025-11-07 23:22:08,717 - INFO -    HTML:     [96m/Users/jrp/Documents/AI/mlx/scripts/src/output/results.html[0m
+2025-11-07 23:22:08,717 - INFO -    Markdown: [96m/Users/jrp/Documents/AI/mlx/scripts/src/output/results.md[0m
+2025-11-07 23:22:08,717 - INFO -    Log:      [96m/Users/jrp/Documents/AI/mlx/scripts/src/output/check_models.log[0m
+2025-11-07 23:22:08,717 - INFO - Execution Summary
+2025-11-07 23:22:08,717 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 23:22:08,717 - INFO - 
+2025-11-07 23:22:08,717 - INFO - ⏱  Overall runtime: [1m[97m618.73s[0m
+2025-11-07 23:22:08,717 - INFO - --- Library Versions ---
+2025-11-07 23:22:08,717 - INFO - Pillow          : 12.0.0
+2025-11-07 23:22:08,717 - INFO - huggingface-hub : 0.36.0
+2025-11-07 23:22:08,717 - INFO - mlx             : 0.29.4.dev20251107+be9e2aeb
+2025-11-07 23:22:08,717 - INFO - mlx-lm          : 0.28.4
+2025-11-07 23:22:08,717 - INFO - mlx-vlm         : 0.3.5
+2025-11-07 23:22:08,718 - INFO - tokenizers      : 0.22.1
+2025-11-07 23:22:08,718 - INFO - transformers    : 4.57.1
+2025-11-07 23:22:08,718 - INFO - Generated: 2025-11-07 23:22:08 GMT
+2025-11-07 23:22:09,122 - INFO - 
+2025-11-07 23:22:09,122 - INFO - --- System Information ---
+2025-11-07 23:22:09,122 - INFO - OS                  : Darwin 25.1.0
+2025-11-07 23:22:09,122 - INFO - macOS Version       : 26.1
+2025-11-07 23:22:09,122 - INFO - Python Version      : 3.13.7
+2025-11-07 23:22:09,122 - INFO - Architecture        : arm64
+2025-11-07 23:22:09,122 - INFO - GPU/Chip            : Apple M4 Max
+2025-11-07 23:22:09,122 - INFO - GPU Cores           : 40
+2025-11-07 23:22:09,122 - INFO - RAM                 : 128.0 GB
+2025-11-07 23:22:09,122 - INFO - CPU Cores (Physical): 16
+2025-11-07 23:22:09,122 - INFO - CPU Cores (Logical) : 16

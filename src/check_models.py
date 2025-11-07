@@ -1175,6 +1175,41 @@ def _detect_excessive_bullets(text: str) -> tuple[bool, int]:
     return bullet_count > max_bullets, bullet_count
 
 
+def _detect_markdown_formatting(text: str) -> bool:
+    """Detect if output contains markdown formatting elements.
+
+    Args:
+        text: Generated text to check
+
+    Returns:
+        True if markdown formatting is detected
+    """
+    if not text:
+        return False
+
+    # Common markdown patterns
+    markdown_indicators = [
+        r"^#{1,6}\s",  # Headers (# Header, ## Header, etc.)
+        r"\*\*[^*]+\*\*",  # Bold (**text**)
+        r"\*[^*]+\*",  # Italic (*text*)
+        r"__[^_]+__",  # Bold (__text__)
+        r"_[^_]+_",  # Italic (_text_)
+        r"`[^`]+`",  # Inline code (`code`)
+        r"```",  # Code blocks
+        r"^\s*[-*+]\s",  # Unordered lists
+        r"^\s*\d+\.\s",  # Ordered lists
+        r"\[([^\]]+)\]\(([^)]+)\)",  # Links [text](url)
+    ]
+
+    import re
+
+    for pattern in markdown_indicators:
+        if re.search(pattern, text, re.MULTILINE):
+            return True
+
+    return False
+
+
 def local_now_str(fmt: str = "%Y-%m-%d %H:%M:%S %Z") -> str:
     """Return localized current time as a formatted string.
 
@@ -2239,6 +2274,7 @@ class ModelIssuesSummary:
     verbose: list[str]  # Models with excessively verbose/over-structured output
     formatting_issues: list[str]  # Models with HTML/markdown formatting violations (excl. bullets)
     excessive_bullets: list[str]  # Models with excessive bullet points (may be prompt-appropriate)
+    markdown_output: list[str]  # Models that generate markdown-formatted output (informational)
     successful: list[str]  # Models that completed successfully without issues
 
 
@@ -2258,6 +2294,7 @@ def analyze_model_issues(results: list[PerformanceResult]) -> ModelIssuesSummary
     verbose: list[str] = []
     formatting_issues: list[str] = []
     excessive_bullets: list[str] = []
+    markdown_output: list[str] = []
     successful: list[str] = []
 
     succinct_threshold = 0.3  # Output < 30% of prompt length
@@ -2273,6 +2310,10 @@ def analyze_model_issues(results: list[PerformanceResult]) -> ModelIssuesSummary
         # Analyze successful models
         gen_text = str(getattr(result.generation, "text", "")) if result.generation else ""
         gen_tokens = getattr(result.generation, "generation_tokens", 0) if result.generation else 0
+
+        # Check for markdown formatting (informational, not a quality issue)
+        if _detect_markdown_formatting(gen_text):
+            markdown_output.append(model_name)
 
         # Check for repetitive output
         is_repetitive, repeated_token = _detect_repetitive_output(gen_text)
@@ -2325,6 +2366,7 @@ def analyze_model_issues(results: list[PerformanceResult]) -> ModelIssuesSummary
         verbose=verbose,
         formatting_issues=formatting_issues,
         excessive_bullets=excessive_bullets,
+        markdown_output=markdown_output,
         successful=successful,
     )
 
@@ -2404,6 +2446,14 @@ def format_issues_summary_text(summary: ModelIssuesSummary) -> str:
         lines.append(f"📝 **Very Succinct ({len(summary.succinct)}):**")
         lines.append("   Generated output much shorter than prompt")
         lines.extend([f"  • {model}" for model in summary.succinct])
+        lines.append("")
+
+    if summary.markdown_output:
+        lines.append(f"📄 **Markdown Formatting ({len(summary.markdown_output)}):**")
+        lines.append("   Models that generate markdown-formatted output")
+        lines.extend([f"  • {model}" for model in summary.markdown_output[:max_shown]])
+        if len(summary.markdown_output) > max_shown:
+            lines.append(f"  • ...and {len(summary.markdown_output) - max_shown} more")
         lines.append("")
 
     return "\n".join(lines)
@@ -2509,6 +2559,19 @@ def format_issues_summary_html(summary: ModelIssuesSummary) -> str:
         lines.append("<p>Generated output much shorter than prompt</p>")
         lines.append("<ul>")
         lines.extend([f"<li>{html.escape(m)}</li>" for m in summary.succinct])
+        lines.append("</ul>")
+
+    if summary.markdown_output:
+        lines.append(
+            f"<h4 style='color: #4caf50;'>📄 Markdown Formatting "
+            f"({len(summary.markdown_output)})</h4>",
+        )
+        lines.append("<p>Models that generate markdown-formatted output</p>")
+        lines.append("<ul>")
+        lines.extend([f"<li>{html.escape(m)}</li>" for m in summary.markdown_output[:max_shown]])
+        if len(summary.markdown_output) > max_shown:
+            remaining = len(summary.markdown_output) - max_shown
+            lines.append(f"<li><em>...and {remaining} more</em></li>")
         lines.append("</ul>")
 
     lines.append("</div>")
