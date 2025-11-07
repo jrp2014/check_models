@@ -1143,9 +1143,7 @@ def _detect_formatting_violations(text: str) -> list[str]:
 
     # Check for bullet lists when might not be appropriate
     bullet_prefixes = ("- ", "* ", "• ")
-    bullet_lines = [
-        line for line in text.split("\n") if line.strip().startswith(bullet_prefixes)
-    ]
+    bullet_lines = [line for line in text.split("\n") if line.strip().startswith(bullet_prefixes)]
     if len(bullet_lines) > max_bullets:
         issues.append(f"Excessive bullet points ({len(bullet_lines)})")
 
@@ -2268,9 +2266,7 @@ def analyze_model_issues(results: list[PerformanceResult]) -> ModelIssuesSummary
 
         # Analyze successful models
         gen_text = str(getattr(result.generation, "text", "")) if result.generation else ""
-        gen_tokens = (
-            getattr(result.generation, "generation_tokens", 0) if result.generation else 0
-        )
+        gen_tokens = getattr(result.generation, "generation_tokens", 0) if result.generation else 0
 
         # Check for repetitive output
         is_repetitive, repeated_token = _detect_repetitive_output(gen_text)
@@ -2437,8 +2433,7 @@ def format_issues_summary_html(summary: ModelIssuesSummary) -> str:
 
     if summary.repetitive:
         lines.append(
-            f"<h4 style='color: #ff9800;'>🔁 Repetitive Output "
-            f"({len(summary.repetitive)})</h4>",
+            f"<h4 style='color: #ff9800;'>🔁 Repetitive Output ({len(summary.repetitive)})</h4>",
         )
         lines.append("<p>Generated highly repetitive or garbage tokens</p>")
         lines.append("<ul>")
@@ -2457,8 +2452,7 @@ def format_issues_summary_html(summary: ModelIssuesSummary) -> str:
 
     if summary.verbose:
         lines.append(
-            f"<h4 style='color: #9c27b0;'>📚 Excessively Verbose "
-            f"({len(summary.verbose)})</h4>",
+            f"<h4 style='color: #9c27b0;'>📚 Excessively Verbose ({len(summary.verbose)})</h4>",
         )
         lines.append("<p>Over-structured output with meta-commentary</p>")
         lines.append("<ul>")
@@ -2477,8 +2471,7 @@ def format_issues_summary_html(summary: ModelIssuesSummary) -> str:
 
     if summary.succinct:
         lines.append(
-            f"<h4 style='color: #2196f3;'>📝 Very Succinct "
-            f"({len(summary.succinct)})</h4>",
+            f"<h4 style='color: #2196f3;'>📝 Very Succinct ({len(summary.succinct)})</h4>",
         )
         lines.append("<p>Generated output much shorter than prompt</p>")
         lines.append("<ul>")
