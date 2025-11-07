@@ -3230,6 +3230,21 @@ def get_system_characteristics() -> dict[str, str]:
         info["OS"] = f"{platform.system()} {platform.release()}"
         if platform.system() == "Darwin":
             info["macOS Version"] = platform.mac_ver()[0]
+
+            # Get SDK version (useful for Metal/framework compatibility)
+            try:
+                sdk_result = subprocess.run(
+                    ["xcrun", "--show-sdk-version"],
+                    capture_output=True,
+                    text=True,
+                    timeout=2,
+                    check=False,
+                )
+                if sdk_result.returncode == 0 and sdk_result.stdout.strip():
+                    info["SDK Version"] = sdk_result.stdout.strip()
+            except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+                pass  # SDK version is nice-to-have, not critical
+
         info["Python Version"] = sys.version.split()[0]
         info["Architecture"] = platform.machine()
 
@@ -3248,6 +3263,13 @@ def get_system_characteristics() -> dict[str, str]:
                     gpu_cores = first.get("sppci_cores")
                     if gpu_cores is not None:
                         info["GPU Cores"] = str(gpu_cores)
+
+                    # Get Metal family version if available
+                    metal_family = first.get("spdisplays_mtlgpufamilysupport")
+                    if metal_family:
+                        # Convert "spdisplays_metal4" to "Metal 4"
+                        metal_ver = metal_family.replace("spdisplays_metal", "Metal ")
+                        info["Metal Support"] = metal_ver
 
         # Get memory and CPU info if psutil available
         if psutil is not None:
