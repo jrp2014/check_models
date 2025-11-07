@@ -1155,7 +1155,7 @@ def _detect_excessive_bullets(text: str) -> tuple[bool, int]:
 
     Bullet lists may be appropriate depending on the prompt (e.g., if the
     prompt asks "list the items in this image"), so this is separated from
-    other formatting violations.
+    other formatting issues.
 
     Args:
         text: Generated text to check
@@ -2327,7 +2327,7 @@ def analyze_model_issues(results: list[PerformanceResult]) -> ModelIssuesSummary
             verbose.append(f"{model_name} ({gen_tokens} tokens)")
             continue
 
-        # Check for formatting violations (HTML tags, headers, etc. - excluding bullets)
+        # Check for formatting issues (HTML tags, headers, etc. - excluding bullets)
         format_issues = _detect_formatting_violations(gen_text)
         if format_issues:
             issue_desc = format_issues[0]  # First issue
