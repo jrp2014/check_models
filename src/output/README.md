@@ -16,15 +16,17 @@ These files are regenerated each time you run the tool and **committed to versio
 
 ### Test Output (excluded from git)
 
-When running tests or CI, use separate output paths to avoid polluting production results:
+When running tests or CI, pass custom output paths via CLI flags to avoid polluting production results:
 
-- `test_results.html` - Test run HTML report
-- `test_results.md` - Test run Markdown report
-- `test_check_models.log` - Test run log
+```bash
+python check_models.py \
+  --output-html output/test_results.html \
+  --output-markdown output/test_results.md \
+  --output-log output/test_check_models.log \
+  [other options...]
+```
 
-These test files are automatically excluded from git tracking via `.gitignore`.
-
-**For test scripts:** Pass `--output-html`, `--output-markdown`, `--output-log` flags or use the `TEST_*_OUTPUT` constants from `check_models.py`.
+Files matching `test_*.{html,md,log}` are automatically excluded from git tracking via `.gitignore`.
 
 ## CLI Logging Output
 

@@ -303,10 +303,6 @@ _SCRIPT_DIR = Path(__file__).parent
 DEFAULT_HTML_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.html"
 DEFAULT_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.md"
 DEFAULT_LOG_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "check_models.log"
-# Test/CI output paths (separate from defaults; excluded from git to avoid churn)
-TEST_HTML_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "test_results.html"
-TEST_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "test_results.md"
-TEST_LOG_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "test_check_models.log"
 DEFAULT_TEMPERATURE: Final[float] = 0.1
 DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
 MAX_REASONABLE_TEMPERATURE: Final[float] = 2.0  # Warn if temperature exceeds this
