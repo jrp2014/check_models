@@ -140,7 +140,7 @@ def test_cli_exits_on_empty_folder(tmp_path: Path):
     assert "could not find" in output.lower() or "no image" in output.lower()
 
 
-def test_cli_invalid_temperature_value():
+def test_cli_invalid_temperature_value(test_folder_with_images: Path):
     """Should reject temperature outside valid range."""
     result = subprocess.run(
         [
@@ -148,9 +148,9 @@ def test_cli_invalid_temperature_value():
             str(_CHECK_MODELS_SCRIPT),
             *_get_test_output_args(),
             "--temperature",
-            "2.5",
+            "-0.5",  # Negative temperature should be rejected
             "--folder",
-            ".",
+            str(test_folder_with_images),
         ],
         check=False,
         capture_output=True,
@@ -159,9 +159,11 @@ def test_cli_invalid_temperature_value():
     )
     # Should fail validation
     assert result.returncode != 0
+    output = result.stdout + result.stderr
+    assert "temperature" in output.lower()
 
 
-def test_cli_invalid_max_tokens():
+def test_cli_invalid_max_tokens(test_folder_with_images: Path):
     """Should reject negative max_tokens."""
     result = subprocess.run(
         [
@@ -171,7 +173,7 @@ def test_cli_invalid_max_tokens():
             "--max-tokens",
             "-10",
             "--folder",
-            ".",
+            str(test_folder_with_images),
         ],
         check=False,
         capture_output=True,
@@ -179,6 +181,8 @@ def test_cli_invalid_max_tokens():
         timeout=10,
     )
     assert result.returncode != 0
+    output = result.stdout + result.stderr
+    assert "max" in output.lower() or "token" in output.lower()
 
 
 def test_cli_accepts_valid_parameters():

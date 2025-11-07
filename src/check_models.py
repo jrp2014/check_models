@@ -96,6 +96,7 @@ __all__ = [
     "print_model_stats",
     "print_version_info",
     "process_image_with_model",
+    "validate_cli_arguments",
     "validate_image_accessible",
     "validate_inputs",
     "validate_kv_params",
@@ -131,6 +132,7 @@ MARKDOWN_HARD_BREAK_SPACES: Final[int] = 2  # Preserve exactly two trailing spac
 HOUR_THRESHOLD_SECONDS: Final[int] = 3600  # Threshold for displaying HH:MM:SS runtime
 IMAGE_OPEN_TIMEOUT: Final[float] = 5.0  # Timeout for opening/verifying image files
 GENERATION_WRAP_WIDTH: Final[int] = 80  # Console output wrapping width for generated text
+SUPPORTED_IMAGE_EXTENSIONS: Final[frozenset[str]] = frozenset({".jpg", ".jpeg", ".png", ".webp"})
 
 _temp_logger = logging.getLogger(LOGGER_NAME)
 
@@ -1532,10 +1534,11 @@ def print_version_info(versions: LibraryVersionDict) -> None:
 # --- File Handling ---
 # Simplified the `find_most_recent_file` function by using `max` with a generator.
 def find_most_recent_file(folder: PathLike) -> Path | None:
-    """Return the most recently modified file in a folder, or None.
+    """Return the most recently modified image file in a folder, or None.
 
-    Scans for regular files (excluding hidden files starting with '.') and
-    returns the one with the most recent modification time.
+    Scans for regular image files (with supported extensions: .jpg, .jpeg, .png, .webp)
+    excluding hidden files starting with '.', and returns the one with the most recent
+    modification time.
     """
     folder_path = Path(folder)
     if not folder_path.is_dir():
@@ -1543,9 +1546,13 @@ def find_most_recent_file(folder: PathLike) -> Path | None:
         return None
 
     try:
-        # Find all regular files, excluding hidden files (starting with '.')
+        # Find all regular image files, excluding hidden files (starting with '.')
         regular_files = [
-            f for f in folder_path.iterdir() if f.is_file() and not f.name.startswith(".")
+            f
+            for f in folder_path.iterdir()
+            if f.is_file()
+            and not f.name.startswith(".")
+            and f.suffix.lower() in SUPPORTED_IMAGE_EXTENSIONS
         ]
 
         # Return the most recently modified file, or None if no files found
@@ -1567,10 +1574,10 @@ def find_most_recent_file(folder: PathLike) -> Path | None:
 
     # Log result and return
     if most_recent:
-        logger.debug("Most recent file found: %s", str(most_recent))
+        logger.debug("Most recent image file found: %s", str(most_recent))
         return most_recent
 
-    logger.debug("No files found in directory: %s", folder_path)
+    logger.debug("No image files found in directory: %s", folder_path)
     return None
 
 
@@ -3121,8 +3128,7 @@ def validate_inputs(
         raise ValueError(msg)
 
     # Check file extension (case-insensitive for robustness)
-    supported_extensions = {".jpg", ".jpeg", ".png", ".webp"}
-    if img_path.suffix.lower() not in supported_extensions:
+    if img_path.suffix.lower() not in SUPPORTED_IMAGE_EXTENSIONS:
         msg = f"Unsupported image format: {img_path.suffix}"
         raise ValueError(msg)
 
@@ -3170,6 +3176,33 @@ def validate_kv_params(
     if kv_bits is not None and kv_bits not in (4, 8):
         msg = f"kv_bits must be 4 or 8 if specified, got {kv_bits}"
         raise ValueError(msg)
+
+
+def validate_cli_arguments(args: argparse.Namespace) -> None:
+    """Validate all CLI arguments before processing begins.
+
+    This performs early validation to fail fast on invalid inputs
+    before any expensive operations (model loading, image processing, etc.).
+    """
+    # Validate temperature
+    validate_temperature(temp=args.temperature)
+
+    # Validate max_tokens
+    if args.max_tokens <= 0:
+        msg = f"max_tokens must be > 0, got {args.max_tokens}"
+        raise ValueError(msg)
+
+    # Validate sampling parameters
+    validate_sampling_params(
+        top_p=args.top_p,
+        repetition_penalty=args.repetition_penalty,
+    )
+
+    # Validate KV cache parameters
+    validate_kv_params(
+        max_kv_size=args.max_kv_size,
+        kv_bits=args.kv_bits,
+    )
 
 
 def validate_image_accessible(*, image_path: PathLike) -> None:
@@ -4274,6 +4307,9 @@ def main(args: argparse.Namespace) -> None:
     """Run CLI execution for MLX VLM model check."""
     overall_start_time: float = time.perf_counter()
     try:
+        # Validate all CLI arguments early to fail fast
+        validate_cli_arguments(args)
+
         library_versions = setup_environment(args)
         print_cli_header("MLX Vision Language Model Check")
 
