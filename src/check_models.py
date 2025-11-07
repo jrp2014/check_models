@@ -4010,8 +4010,9 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
         exit_with_cli_error(
             f"Could not find the most recent image file in {folder_path}. Exiting.",
         )
-
-    # At this point image_path is guaranteed to be Path (not None) due to exit above
+    
+    # Type narrowing: image_path is guaranteed to be Path (not None) due to exit above
+    assert image_path is not None
     resolved_image_path: Path = image_path.resolve()
     print_cli_section(f"Image File: {Colors.colored(str(resolved_image_path), Colors.MAGENTA)}")
 
