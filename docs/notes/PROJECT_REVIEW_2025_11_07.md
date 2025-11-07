@@ -13,6 +13,7 @@ Conducted comprehensive review of the project looking for inconsistencies betwee
 **Issue**: `docs/CONTRIBUTING.md` line 176 incorrectly stated that pre-commit hook runs "ruff format/lint, mypy, and dependency sync checks"
 
 **Reality**: Pre-commit hook actually:
+
 - Auto-formats Python files with ruff
 - Syncs README dependencies when `pyproject.toml` changes
 - Does NOT run lint or mypy (those run in pre-push)
@@ -22,6 +23,7 @@ Conducted comprehensive review of the project looking for inconsistencies betwee
 ### 2. Terminology Inconsistency ✅ FIXED
 
 **Issue**: Mixed use of "formatting violations" vs "formatting issues"
+
 - Function name: `_detect_formatting_violations()`
 - Dataclass field: `formatting_issues`
 - User-facing text: "Formatting Issues"
@@ -33,11 +35,13 @@ Conducted comprehensive review of the project looking for inconsistencies betwee
 ### Code Quality
 
 ✅ **Linting Suppressions** - All 4 `noqa` suppressions reviewed and justified:
+
 - `PLR0911` on `format_field_value()` - Legitimate dispatcher with 8 return branches for different field types
 - `PLR0915` on `format_issues_summary_html()` - Function naturally has 9 conditional blocks for different issue categories
 - 2x `BLE001` - Broad exception catches for non-critical system info gathering (graceful degradation)
 
 ✅ **Code Duplication** - Quality detection code appears in two places but intentionally:
+
 - `_preview_generation()` - Brief inline warnings for non-verbose mode  
 - `_log_verbose_success_details_mode()` - Detailed warnings for verbose mode
 - Different presentation contexts justify the duplication
@@ -46,6 +50,7 @@ Conducted comprehensive review of the project looking for inconsistencies betwee
 ### Documentation Accuracy
 
 ✅ **README Claims** - Verified all feature claims in `src/README.md` match current implementation:
+
 - Model discovery ✓
 - Folder mode (most recent file selection) ✓
 - Metadata extraction (EXIF + GPS) ✓
@@ -55,18 +60,21 @@ Conducted comprehensive review of the project looking for inconsistencies betwee
 - Error handling ✓
 
 ✅ **Git Hooks Documentation** - Now accurately describes:
+
 - Pre-commit: Auto-format + README sync
 - Pre-push: Full quality checks (format check, lint, type check, tests)
 
 ### Terminology Consistency
 
 ✅ **Formatting terminology**:
+
 - Function: `_detect_formatting_violations()` (internal only)
 - Field: `formatting_issues` ✓
 - User-facing: "Formatting Issues" ✓
 - Comments: Now use "formatting issues" ✓
 
 ✅ **Markdown terminology**:
+
 - Function: `_detect_markdown_formatting()` ✓
 - Field: `markdown_output` ✓
 - User-facing: "Markdown Formatting" ✓
@@ -75,6 +83,7 @@ Conducted comprehensive review of the project looking for inconsistencies betwee
 ### Known Documentation Artifacts
 
 ⚠️ **Historical References** - Several docs in `docs/notes/` reference `check_dependency_sync.py`:
+
 - `REDUNDANCY_AUDIT_2025_10.md`
 - `CONSISTENCY_AUDIT_2025_10_26.md`
 - `CONSISTENCY_FIXES_2025_10_26.md`
@@ -144,6 +153,7 @@ Project is in excellent health. Recent feature additions (bullet detection, mark
 **No critical issues found** - only minor documentation inconsistencies that have been corrected.
 
 **Code quality is high**:
+
 - Consistent style (enforced by ruff)
 - Type-safe (mypy clean)
 - Well-tested (141 tests)
@@ -153,7 +163,8 @@ Project is in excellent health. Recent feature additions (bullet detection, mark
 ---
 
 **Review conducted**: November 7, 2025  
-**Files examined**: 
+**Files examined**:
+
 - `src/check_models.py` (main code)
 - `docs/CONTRIBUTING.md`
 - `docs/IMPLEMENTATION_GUIDE.md`
