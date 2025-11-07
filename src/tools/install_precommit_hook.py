@@ -1,12 +1,13 @@
 """Install Git hooks (pre-commit and pre-push) for this repo.
 
-Pre-commit hook automates dependency sync:
+Pre-commit hook automates:
+   - Auto-formats Python files with ruff before committing
    - Syncs README dependency blocks when `src/pyproject.toml` changes
    - Runs: `cd src && python tools/update_readme_deps.py`
-   - Adds changes to `src/README.md` back to the commit
+   - Adds changes back to the commit
 
 Pre-push hook runs quality checks:
-   - Runs simplified quality checks
+   - Runs simplified quality checks (format check, lint, tests)
    - Prevents pushing if quality checks fail
 
 Usage:
@@ -26,12 +27,29 @@ from pathlib import Path
 
 logger = logging.getLogger("precommit")
 
-PRECOMMIT_HOOK_CONTENT = """#!/usr/bin/env bash
+PRECOMMIT_HOOK_CONTENT = r"""#!/usr/bin/env bash
 set -euo pipefail
 
 # Run from repo root
 REPO_ROOT=$(git rev-parse --show-toplevel)
 cd "$REPO_ROOT"
+
+# Activate conda environment if conda is available
+if command -v conda &> /dev/null; then
+    eval "$(conda shell.bash hook)"
+    conda activate mlx-vlm 2>/dev/null || true
+fi
+
+# Auto-format Python files with ruff before committing
+PYTHON_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.py$' || true)
+if [ -n "$PYTHON_FILES" ]; then
+    echo '[pre-commit] Auto-formatting Python files with ruff...'
+    # shellcheck disable=SC2086
+    python -m ruff format $PYTHON_FILES || exit 1
+    # Re-stage the formatted files
+    # shellcheck disable=SC2086
+    git add $PYTHON_FILES
+fi
 
 # Sync README dependency blocks when pyproject changes
 if git diff --cached --name-only | grep -q '^src/pyproject.toml$'; then
@@ -46,7 +64,7 @@ fi
 exit 0
 """
 
-PREPUSH_HOOK_CONTENT = """#!/usr/bin/env bash
+PREPUSH_HOOK_CONTENT = r"""#!/usr/bin/env bash
 # Pre-push hook: Run quality checks before pushing
 set -euo pipefail
 
@@ -55,6 +73,14 @@ echo "[pre-push] Running quality checks before push..."
 # Run from repo root
 REPO_ROOT=$(git rev-parse --show-toplevel)
 cd "$REPO_ROOT"
+
+# Activate conda environment if conda is available
+if command -v conda &> /dev/null; then
+    # Initialize conda for the current shell
+    eval "$(conda shell.bash hook)"
+    # Activate the mlx-vlm environment
+    conda activate mlx-vlm 2>/dev/null || true
+fi
 
 # Run simplified quality checks
 if bash src/tools/check_quality_simple.sh; then
