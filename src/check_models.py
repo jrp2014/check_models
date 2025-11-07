@@ -1201,13 +1201,7 @@ def _detect_markdown_formatting(text: str) -> bool:
         r"\[([^\]]+)\]\(([^)]+)\)",  # Links [text](url)
     ]
 
-    import re
-
-    for pattern in markdown_indicators:
-        if re.search(pattern, text, re.MULTILINE):
-            return True
-
-    return False
+    return any(re.search(pattern, text, re.MULTILINE) for pattern in markdown_indicators)
 
 
 def local_now_str(fmt: str = "%Y-%m-%d %H:%M:%S %Z") -> str:
@@ -2459,7 +2453,7 @@ def format_issues_summary_text(summary: ModelIssuesSummary) -> str:
     return "\n".join(lines)
 
 
-def format_issues_summary_html(summary: ModelIssuesSummary) -> str:
+def format_issues_summary_html(summary: ModelIssuesSummary) -> str:  # noqa: PLR0915
     """Format issues summary as HTML for reports.
 
     Args:
