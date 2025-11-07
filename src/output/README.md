@@ -4,23 +4,19 @@ This directory contains generated HTML and Markdown reports from running `check_
 
 The script's default output location is now this directory, keeping the project root clean.
 
-## Files
-
-### Production Output (not committed to git)
+## Files (not committed to git)
 
 - `results.html` - Styled HTML report (viewable in browser)
 - `results.md` - GitHub-friendly Markdown report
 - `check_models.log` - Detailed execution log (optional, via `--output-log`)
 
-### Test Output (not committed to git)
+These files are regenerated each time you run the tool and are excluded from version control.
 
-When running tests or CI, the script uses separate output files to avoid conflicts:
+If you need different output paths (e.g., for testing), use the CLI flags:
 
-- `test_results.html` - Test run HTML report
-- `test_results.md` - Test run Markdown report
-- `test_check_models.log` - Test run log
-
-These files are regenerated each time you run the tool and are excluded from git tracking.
+- `--output-html <path>`
+- `--output-markdown <path>`
+- `--output-log <path>`
 
 ## CLI Logging Output
 
