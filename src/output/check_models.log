@@ -1,15 +1,15 @@
-2025-11-07 21:47:40,243 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2025-11-07 21:47:40,243 - WARNING - SECURITY WARNING: --trust-remote-code is enabled.
-2025-11-07 21:47:40,243 - WARNING - This allows execution of remote code and may pose security risks.
-2025-11-07 21:47:40,243 - INFO - ====================================================================================================
-2025-11-07 21:47:40,243 - INFO - MLX Vision Language Model Check
-2025-11-07 21:47:40,243 - INFO - ====================================================================================================
-2025-11-07 21:47:40,243 - INFO - Scanning folder: /Users/jrp/Documents/AI/mlx/scripts/src
-2025-11-07 21:47:40,243 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2025-11-07 21:47:40,243 - INFO - Image File: /Users/jrp/Documents/AI/mlx/scripts/src/check_models.py
-2025-11-07 21:47:40,243 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2025-11-07 21:47:40,258 - ERROR - Cannot open or verify image /Users/jrp/Documents/AI/mlx/scripts/src/check_models.py: cannot identify image file '/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py'. Exiting.
-2025-11-07 21:47:40,258 - ERROR - Execution interrupted by user.
+2025-11-07 21:52:36,213 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 21:52:36,213 - WARNING - SECURITY WARNING: --trust-remote-code is enabled.
+2025-11-07 21:52:36,213 - WARNING - This allows execution of remote code and may pose security risks.
+2025-11-07 21:52:36,213 - INFO - ====================================================================================================
+2025-11-07 21:52:36,213 - INFO - MLX Vision Language Model Check
+2025-11-07 21:52:36,213 - INFO - ====================================================================================================
+2025-11-07 21:52:36,213 - INFO - Scanning folder: /Users/jrp/Documents/AI/mlx/scripts/src
+2025-11-07 21:52:36,213 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 21:52:36,214 - INFO - Image File: /Users/jrp/Documents/AI/mlx/scripts/src/check_models.py
+2025-11-07 21:52:36,214 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-07 21:52:36,229 - ERROR - Cannot open or verify image /Users/jrp/Documents/AI/mlx/scripts/src/check_models.py: cannot identify image file '/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py'. Exiting.
+2025-11-07 21:52:36,229 - ERROR - Execution interrupted by user.
 Traceback (most recent call last):
   File "/Users/jrp/Documents/AI/mlx/scripts/src/check_models.py", line 4274, in main
     image_path = find_and_validate_image(args)

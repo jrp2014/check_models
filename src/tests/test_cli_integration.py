@@ -13,6 +13,11 @@ from pathlib import Path
 import pytest
 from PIL import Image
 
+# Path to check_models.py relative to test file location
+_TEST_DIR = Path(__file__).parent
+_SRC_DIR = _TEST_DIR.parent
+_CHECK_MODELS_SCRIPT = _SRC_DIR / "check_models.py"
+
 
 @pytest.fixture
 def test_image(tmp_path: Path) -> Path:
@@ -43,7 +48,7 @@ def test_folder_with_images(tmp_path: Path) -> Path:
 def test_cli_help_displays():
     """Should display help message with --help."""
     result = subprocess.run(
-        [sys.executable, "check_models.py", "--help"],
+        [sys.executable, str(_CHECK_MODELS_SCRIPT), "--help"],
         check=False,
         capture_output=True,
         text=True,
@@ -58,7 +63,7 @@ def test_cli_help_displays():
 def test_cli_help_structure():
     """Should display help text that includes usage information."""
     result = subprocess.run(
-        [sys.executable, "check_models.py", "--help"],
+        [sys.executable, str(_CHECK_MODELS_SCRIPT), "--help"],
         check=False,
         capture_output=True,
         text=True,
@@ -73,7 +78,7 @@ def test_cli_help_structure():
 def test_cli_exits_on_nonexistent_folder():
     """Should exit with error when folder does not exist."""
     result = subprocess.run(
-        [sys.executable, "check_models.py", "--folder", "/nonexistent/folder/path"],
+        [sys.executable, str(_CHECK_MODELS_SCRIPT), "--folder", "/nonexistent/folder/path"],
         check=False,
         capture_output=True,
         text=True,
@@ -94,7 +99,7 @@ def test_cli_exits_on_empty_folder(tmp_path: Path):
     empty_folder.mkdir()
 
     result = subprocess.run(
-        [sys.executable, "check_models.py", "--folder", str(empty_folder)],
+        [sys.executable, str(_CHECK_MODELS_SCRIPT), "--folder", str(empty_folder)],
         check=False,
         capture_output=True,
         text=True,
@@ -110,7 +115,7 @@ def test_cli_invalid_temperature_value():
     result = subprocess.run(
         [
             sys.executable,
-            "check_models.py",
+            str(_CHECK_MODELS_SCRIPT),
             "--temperature",
             "2.5",
             "--folder",
@@ -130,7 +135,7 @@ def test_cli_invalid_max_tokens():
     result = subprocess.run(
         [
             sys.executable,
-            "check_models.py",
+            str(_CHECK_MODELS_SCRIPT),
             "--max-tokens",
             "-10",
             "--folder",
@@ -148,7 +153,7 @@ def test_cli_accepts_valid_parameters():
     """Should accept valid command-line parameters without error."""
     # Just test that the script accepts parameters correctly without actually running models
     result = subprocess.run(
-        [sys.executable, "check_models.py", "--help"],
+        [sys.executable, str(_CHECK_MODELS_SCRIPT), "--help"],
         check=False,
         capture_output=True,
         text=True,
