@@ -2271,8 +2271,64 @@ class ModelIssuesSummary:
     markdown_output: list[str]  # Models that generate markdown-formatted output (informational)
     successful: list[str]  # Models that completed successfully without issues
 
+    # Performance tiers (based on speed and memory efficiency)
+    high_performance: list[str]  # >50 t/s generation, <10GB memory
+    medium_performance: list[str]  # 20-50 t/s generation, 10-20GB memory
+    low_performance: list[str]  # <20 t/s generation or >20GB memory
 
-def analyze_model_issues(results: list[PerformanceResult]) -> ModelIssuesSummary:
+    # Speed categories
+    very_fast: list[str]  # >100 t/s generation (real-time capable)
+    fast: list[str]  # 50-100 t/s (interactive)
+    moderate: list[str]  # 20-50 t/s (acceptable)
+    slow: list[str]  # <20 t/s (batch only)
+
+    # Memory categories
+    low_memory: list[str]  # <5GB (laptop-friendly)
+    medium_memory: list[str]  # 5-15GB (desktop-friendly)
+    high_memory: list[str]  # >15GB (workstation only)
+
+    # Quality categories (based on output analysis)
+    high_quality: list[str]  # Successful + no major issues + reasonable length
+    medium_quality: list[str]  # Successful but with minor issues
+    low_quality: list[str]  # Repetitive/hallucinated/very short
+
+    # Recommendations (composite metrics)
+    recommended: list[str]  # High quality + good performance + reasonable memory
+    budget_friendly: list[str]  # Good quality + low memory (<10GB)
+    speed_kings: list[str]  # Fastest models with acceptable quality
+
+
+@dataclass
+class PerformanceStatistics:
+    """Aggregate statistics across all successful models (only shown for multi-model runs)."""
+
+    total_models: int  # Total number of models tested
+    successful_models: int  # Number that completed successfully
+
+    # Speed statistics
+    avg_generation_tps: float | None
+    median_generation_tps: float | None
+    fastest_model: str | None
+    fastest_tps: float | None
+
+    # Memory statistics
+    avg_memory_gb: float | None
+    median_memory_gb: float | None
+    lowest_memory_model: str | None
+    lowest_memory_gb: float | None
+
+    # Efficiency statistics
+    avg_tokens_per_gb: float | None
+    most_efficient_model: str | None  # best tokens_per_gb
+    best_efficiency_score: float | None
+
+    # Quality statistics
+    high_quality_count: int
+    medium_quality_count: int
+    low_quality_count: int
+
+
+def analyze_model_issues(results: list[PerformanceResult]) -> ModelIssuesSummary:  # noqa: C901, PLR0912, PLR0915
     """Analyze results and categorize models by performance issues.
 
     Args:
@@ -2291,6 +2347,32 @@ def analyze_model_issues(results: list[PerformanceResult]) -> ModelIssuesSummary
     markdown_output: list[str] = []
     successful: list[str] = []
 
+    # Performance categories
+    high_performance: list[str] = []
+    medium_performance: list[str] = []
+    low_performance: list[str] = []
+
+    # Speed categories
+    very_fast: list[str] = []
+    fast: list[str] = []
+    moderate: list[str] = []
+    slow: list[str] = []
+
+    # Memory categories
+    low_memory: list[str] = []
+    medium_memory: list[str] = []
+    high_memory: list[str] = []
+
+    # Quality categories
+    high_quality: list[str] = []
+    medium_quality: list[str] = []
+    low_quality: list[str] = []
+
+    # Recommendations
+    recommended: list[str] = []
+    budget_friendly: list[str] = []
+    speed_kings: list[str] = []
+
     succinct_threshold = 0.3  # Output < 30% of prompt length
 
     for result in results:
@@ -2305,52 +2387,111 @@ def analyze_model_issues(results: list[PerformanceResult]) -> ModelIssuesSummary
         gen_text = str(getattr(result.generation, "text", "")) if result.generation else ""
         gen_tokens = getattr(result.generation, "generation_tokens", 0) if result.generation else 0
 
+        # Extract performance metrics
+        gen_tps = getattr(result.generation, "generation_tps", None) if result.generation else None
+        peak_mem = getattr(result.generation, "peak_memory", None) if result.generation else None
+
         # Check for markdown formatting (informational, not a quality issue)
         if _detect_markdown_formatting(gen_text):
             markdown_output.append(model_name)
 
-        # Check for repetitive output
+        # Determine quality tier
         is_repetitive, repeated_token = _detect_repetitive_output(gen_text)
+        hallucination_issues = _detect_hallucination_patterns(gen_text)
+        is_verbose = _detect_excessive_verbosity(gen_text, gen_tokens)
+        format_issues = _detect_formatting_violations(gen_text)
+        has_excess_bullets, bullet_count = _detect_excessive_bullets(gen_text)
+        prompt_tokens = getattr(result.generation, "prompt_tokens", 0) if result.generation else 0
+        is_succinct = prompt_tokens > 0 and gen_tokens < (prompt_tokens * succinct_threshold)
+
+        # Categorize by quality issues (for backward compatibility)
         if is_repetitive:
             repetitive.append(f"{model_name} ({repeated_token})")
+            low_quality.append(model_name)
             continue
 
-        # Check for hallucinations
-        hallucination_issues = _detect_hallucination_patterns(gen_text)
         if hallucination_issues:
-            issue_desc = ", ".join(hallucination_issues[:2])  # First 2 issues
+            issue_desc = ", ".join(hallucination_issues[:2])
             hallucinated.append(f"{model_name} ({issue_desc})")
+            low_quality.append(model_name)
             continue
 
-        # Check for excessive verbosity
-        if _detect_excessive_verbosity(gen_text, gen_tokens):
+        if is_verbose:
             verbose.append(f"{model_name} ({gen_tokens} tokens)")
-            continue
+            medium_quality.append(model_name)
+            # Don't continue - verbose models can still be categorized by performance
 
-        # Check for formatting issues (HTML tags, headers, etc. - excluding bullets)
-        format_issues = _detect_formatting_violations(gen_text)
         if format_issues:
-            issue_desc = format_issues[0]  # First issue
+            issue_desc = format_issues[0]
             formatting_issues.append(f"{model_name} ({issue_desc})")
-            continue
+            medium_quality.append(model_name)
+            # Don't continue - formatting issues don't prevent performance categorization
 
-        # Check for excessive bullets separately (may be prompt-appropriate)
-        has_excess_bullets, bullet_count = _detect_excessive_bullets(gen_text)
         if has_excess_bullets:
             excessive_bullets.append(f"{model_name} ({bullet_count} bullets)")
-            # Note: We continue here but mark as a separate category, not a hard failure
+            # Don't mark as quality issue - may be prompt-appropriate
 
-        # Check for overly succinct output
-        prompt_tokens = getattr(result.generation, "prompt_tokens", 0) if result.generation else 0
-
-        if prompt_tokens > 0 and gen_tokens < (prompt_tokens * succinct_threshold):
+        if is_succinct:
             succinct.append(f"{model_name} ({gen_tokens} tokens)")
+            low_quality.append(model_name)
             continue
 
-        # If none of the critical issues above, it's successful
-        # (may still have excessive bullets, but that's noted separately)
-        if not has_excess_bullets:
-            successful.append(model_name)
+        # Determine quality tier if not already categorized
+        if model_name not in low_quality and model_name not in medium_quality:
+            if has_excess_bullets or format_issues or is_verbose:
+                medium_quality.append(model_name)
+            else:
+                high_quality.append(model_name)
+                successful.append(model_name)
+
+        # Performance tiers (speed + memory combined)
+        if gen_tps is not None and peak_mem is not None:
+            if gen_tps > 50 and peak_mem < 10:
+                high_performance.append(model_name)
+            elif gen_tps >= 20 and peak_mem <= 20:
+                medium_performance.append(model_name)
+            else:
+                low_performance.append(model_name)
+
+        # Speed categories
+        if gen_tps is not None:
+            if gen_tps > 100:
+                very_fast.append(model_name)
+            elif gen_tps >= 50:
+                fast.append(model_name)
+            elif gen_tps >= 20:
+                moderate.append(model_name)
+            else:
+                slow.append(model_name)
+
+        # Memory categories
+        if peak_mem is not None:
+            if peak_mem < 5:
+                low_memory.append(model_name)
+            elif peak_mem <= 15:
+                medium_memory.append(model_name)
+            else:
+                high_memory.append(model_name)
+
+        # Recommendations (composite metrics)
+        if model_name in high_quality and gen_tps is not None and peak_mem is not None:
+            # Recommended: high quality + good performance + reasonable memory
+            if gen_tps >= 30 and peak_mem <= 15:
+                recommended.append(model_name)
+
+            # Budget friendly: good quality + low memory
+            if peak_mem < 10:
+                budget_friendly.append(model_name)
+
+            # Speed kings: fastest with acceptable quality (high or medium)
+            if gen_tps >= 80:
+                speed_kings.append(model_name)
+        elif model_name in medium_quality and gen_tps is not None and peak_mem is not None:
+            # Medium quality can still be budget friendly or fast
+            if peak_mem < 8 and gen_tps >= 25:
+                budget_friendly.append(model_name)
+            if gen_tps >= 100:
+                speed_kings.append(model_name)
 
     return ModelIssuesSummary(
         crashed=crashed,
@@ -2362,14 +2503,134 @@ def analyze_model_issues(results: list[PerformanceResult]) -> ModelIssuesSummary
         excessive_bullets=excessive_bullets,
         markdown_output=markdown_output,
         successful=successful,
+        high_performance=high_performance,
+        medium_performance=medium_performance,
+        low_performance=low_performance,
+        very_fast=very_fast,
+        fast=fast,
+        moderate=moderate,
+        slow=slow,
+        low_memory=low_memory,
+        medium_memory=medium_memory,
+        high_memory=high_memory,
+        high_quality=high_quality,
+        medium_quality=medium_quality,
+        low_quality=low_quality,
+        recommended=recommended,
+        budget_friendly=budget_friendly,
+        speed_kings=speed_kings,
     )
 
 
-def format_issues_summary_text(summary: ModelIssuesSummary) -> str:
+def compute_performance_statistics(
+    results: list[PerformanceResult],
+) -> PerformanceStatistics | None:
+    """Compute aggregate performance statistics across models.
+
+    Only returns statistics when there are multiple successful models to compare.
+
+    Args:
+        results: List of model performance results
+
+    Returns:
+        PerformanceStatistics if multiple models, None otherwise
+    """
+    # Extract successful models with metrics
+    successful_results = [r for r in results if r.success and r.generation]
+
+    if len(successful_results) < 2:
+        # Don't show comparative statistics for single model
+        return None
+
+    # Extract metrics
+    tps_values: list[float] = []
+    memory_values: list[float] = []
+    efficiency_scores: list[tuple[str, float]] = []
+
+    for result in successful_results:
+        gen = result.generation
+        if not gen:
+            continue
+
+        gen_tps = getattr(gen, "generation_tps", None)
+        peak_mem = getattr(gen, "peak_memory", None)
+        gen_tokens = getattr(gen, "generation_tokens", 0)
+
+        if gen_tps is not None:
+            tps_values.append(gen_tps)
+
+        if peak_mem is not None:
+            memory_values.append(peak_mem)
+
+        # Calculate efficiency (tokens per GB)
+        if gen_tokens > 0 and peak_mem and peak_mem > 0:
+            efficiency = gen_tokens / peak_mem
+            model_name = result.model_name.split("/")[-1]
+            efficiency_scores.append((model_name, efficiency))
+
+    # Calculate statistics
+    avg_tps = sum(tps_values) / len(tps_values) if tps_values else 0.0
+    median_tps = sorted(tps_values)[len(tps_values) // 2] if tps_values else 0.0
+
+    fastest_model = ""
+    fastest_tps = 0.0
+    if tps_values:
+        max_tps_idx = tps_values.index(max(tps_values))
+        fastest_model = successful_results[max_tps_idx].model_name.split("/")[-1]
+        fastest_tps = tps_values[max_tps_idx]
+
+    avg_memory = sum(memory_values) / len(memory_values) if memory_values else 0.0
+    median_memory = sorted(memory_values)[len(memory_values) // 2] if memory_values else 0.0
+
+    lowest_memory_model = ""
+    lowest_memory_gb = 0.0
+    if memory_values:
+        min_mem_idx = memory_values.index(min(memory_values))
+        lowest_memory_model = successful_results[min_mem_idx].model_name.split("/")[-1]
+        lowest_memory_gb = memory_values[min_mem_idx]
+
+    avg_efficiency = (
+        sum(e for _, e in efficiency_scores) / len(efficiency_scores) if efficiency_scores else 0.0
+    )
+    most_efficient_model = ""
+    best_efficiency = 0.0
+    if efficiency_scores:
+        most_efficient_model, best_efficiency = max(efficiency_scores, key=lambda x: x[1])
+
+    # Count quality tiers
+    summary = analyze_model_issues(results)
+    high_quality_count = len(summary.high_quality)
+    medium_quality_count = len(summary.medium_quality)
+    low_quality_count = len(summary.low_quality)
+
+    return PerformanceStatistics(
+        total_models=len(results),
+        successful_models=len(successful_results),
+        avg_generation_tps=avg_tps,
+        median_generation_tps=median_tps,
+        fastest_model=fastest_model,
+        fastest_tps=fastest_tps,
+        avg_memory_gb=avg_memory,
+        median_memory_gb=median_memory,
+        lowest_memory_model=lowest_memory_model,
+        lowest_memory_gb=lowest_memory_gb,
+        avg_tokens_per_gb=avg_efficiency,
+        most_efficient_model=most_efficient_model,
+        best_efficiency_score=best_efficiency,
+        high_quality_count=high_quality_count,
+        medium_quality_count=medium_quality_count,
+        low_quality_count=low_quality_count,
+    )
+
+
+def format_issues_summary_text(  # noqa: C901, PLR0912, PLR0915
+    summary: ModelIssuesSummary, stats: PerformanceStatistics | None = None
+) -> str:
     """Format issues summary as plain text for CLI and Markdown.
 
     Args:
         summary: Analyzed model issues summary
+        stats: Optional performance statistics (only shown for multiple models)
 
     Returns:
         Formatted text summary
@@ -2392,6 +2653,40 @@ def format_issues_summary_text(summary: ModelIssuesSummary) -> str:
     lines.append(f"**Total Models Evaluated:** {total}")
     lines.append("")
 
+    # Performance Highlights (new categories)
+    has_performance_highlights = (
+        summary.recommended or summary.budget_friendly or summary.speed_kings
+    )
+
+    if has_performance_highlights:
+        lines.append("### 🏆 Performance Highlights")
+        lines.append("")
+
+        if summary.recommended:
+            lines.append(f"**Recommended ({len(summary.recommended)}):**")
+            lines.append("   Best balance of quality, speed, and memory")
+            lines.extend([f"  • {model}" for model in summary.recommended[:max_shown]])
+            if len(summary.recommended) > max_shown:
+                lines.append(f"  • ...and {len(summary.recommended) - max_shown} more")
+            lines.append("")
+
+        if summary.budget_friendly:
+            lines.append(f"💰 **Budget Friendly ({len(summary.budget_friendly)}):**")
+            lines.append("   Low memory usage with good quality")
+            lines.extend([f"  • {model}" for model in summary.budget_friendly[:max_shown]])
+            if len(summary.budget_friendly) > max_shown:
+                lines.append(f"  • ...and {len(summary.budget_friendly) - max_shown} more")
+            lines.append("")
+
+        if summary.speed_kings:
+            lines.append(f"⚡ **Speed Kings ({len(summary.speed_kings)}):**")
+            lines.append("   Fastest generation with acceptable quality")
+            lines.extend([f"  • {model}" for model in summary.speed_kings[:max_shown]])
+            if len(summary.speed_kings) > max_shown:
+                lines.append(f"  • ...and {len(summary.speed_kings) - max_shown} more")
+            lines.append("")
+
+    # Quality Categories
     if summary.successful:
         lines.append(f"✅ **Successful ({len(summary.successful)}):**")
         lines.append("   Clean output, no issues detected")
@@ -2448,6 +2743,45 @@ def format_issues_summary_text(summary: ModelIssuesSummary) -> str:
         lines.extend([f"  • {model}" for model in summary.markdown_output[:max_shown]])
         if len(summary.markdown_output) > max_shown:
             lines.append(f"  • ...and {len(summary.markdown_output) - max_shown} more")
+        lines.append("")
+
+    # Add performance statistics (only for multiple models)
+    if stats:
+        lines.append("### 📊 Performance Statistics")
+        lines.append("")
+        lines.append(
+            f"**Models Tested:** {stats.total_models} total, {stats.successful_models} successful"
+        )
+        lines.append("")
+
+        if stats.fastest_model:
+            lines.append("**Speed:**")
+            lines.append(f"  • Average: {stats.avg_generation_tps:.1f} t/s")
+            lines.append(f"  • Median: {stats.median_generation_tps:.1f} t/s")
+            lines.append(f"  • Fastest: {stats.fastest_model} ({stats.fastest_tps:.1f} t/s)")
+            lines.append("")
+
+        if stats.lowest_memory_model:
+            lines.append("**Memory:**")
+            lines.append(f"  • Average: {stats.avg_memory_gb:.2f} GB")
+            lines.append(f"  • Median: {stats.median_memory_gb:.2f} GB")
+            lines.append(
+                f"  • Lowest: {stats.lowest_memory_model} ({stats.lowest_memory_gb:.2f} GB)"
+            )
+            lines.append("")
+
+        if stats.most_efficient_model:
+            lines.append("**Efficiency:**")
+            lines.append(f"  • Average: {stats.avg_tokens_per_gb:.1f} tokens/GB")
+            lines.append(
+                f"  • Best: {stats.most_efficient_model} ({stats.best_efficiency_score:.1f} tokens/GB)"
+            )
+            lines.append("")
+
+        lines.append("**Quality Distribution:**")
+        lines.append(f"  • High Quality: {stats.high_quality_count}")
+        lines.append(f"  • Medium Quality: {stats.medium_quality_count}")
+        lines.append(f"  • Low Quality: {stats.low_quality_count}")
         lines.append("")
 
     return "\n".join(lines)
@@ -3019,7 +3353,8 @@ def generate_markdown_report(
 
     # Analyze model issues and generate summary
     summary = analyze_model_issues(results)
-    issues_text = format_issues_summary_text(summary)
+    stats = compute_performance_statistics(results)
+    issues_text = format_issues_summary_text(summary, stats)
 
     # Gather system characteristics for the report
     system_info = get_system_characteristics()
@@ -4424,7 +4759,8 @@ def finalize_execution(
 
         # Add model issues summary
         summary = analyze_model_issues(results)
-        issues_text = format_issues_summary_text(summary)
+        stats = compute_performance_statistics(results)
+        issues_text = format_issues_summary_text(summary, stats)
         if issues_text:
             logger.info("")
             logger.info(issues_text)

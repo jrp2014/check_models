@@ -29,7 +29,8 @@ python check_models.py \
 
 Files matching `test_*.{html,md,log}` are automatically excluded from git tracking via `.gitignore`.
 
-**Separation strategy**: 
+**Separation strategy**:
+
 - **Production runs**: Use default outputs (`check_models.log`, `results.html`, `results.md`) → committed to git
 - **Integration tests**: Use `test_cli_integration.{log,html,md}` → gitignored (handled automatically by test suite)
 - **Manual test/debug runs**: Pass custom paths with `test_` prefix or any other name except the production defaults → gitignored

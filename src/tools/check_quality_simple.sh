@@ -40,5 +40,14 @@ echo "⚠️  Skipped (external MLX stub syntax error - not fixable from this pr
 echo "=== Pytest ==="
 $PYTHON -m pytest -v
 
+echo "=== Markdown Lint ==="
+if command -v npx &> /dev/null; then
+    cd "$(dirname "$0")/../.."  # Go to repo root for markdown linting
+    npx markdownlint-cli2 --config .markdownlint.jsonc "**/*.md"
+    cd -  # Return to previous directory
+else
+    echo "⚠️  Skipped (npx not found - install Node.js to enable)"
+fi
+
 echo ""
 echo "✅ All quality checks passed!"
