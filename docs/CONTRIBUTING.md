@@ -173,7 +173,11 @@ The project uses several automated quality checks:
 
 The project uses git hooks to enforce quality:
 
-- **Pre-commit**: Automatically formats Python files with ruff and syncs README dependencies when pyproject.toml changes
+- **Pre-commit**:
+  - Automatically formats Python files with ruff
+  - Auto-fixes Markdown files with markdownlint (via npx)
+  - Syncs README dependencies when pyproject.toml changes
+  - Re-stages all fixed files automatically
 - **Pre-push**: Runs full quality checks (format check, lint, type check, tests) before pushing
 
 To bypass hooks (not recommended):
