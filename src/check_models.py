@@ -2259,43 +2259,16 @@ def _compute_column_widths(field_names: list[str]) -> list[int | None]:
 
 @dataclass
 class ModelIssuesSummary:
-    """Summary of model performance issues categorized by type."""
+    """Simplified summary of model performance issues."""
 
-    crashed: list[str]  # Models that failed with errors/OOM
-    repetitive: list[str]  # Models with highly repetitive output
-    succinct: list[str]  # Models with very short output relative to prompt
-    hallucinated: list[str]  # Models with detected hallucination patterns
-    verbose: list[str]  # Models with excessively verbose/over-structured output
-    formatting_issues: list[str]  # Models with HTML/markdown formatting violations (excl. bullets)
-    excessive_bullets: list[str]  # Models with excessive bullet points (may be prompt-appropriate)
-    markdown_output: list[str]  # Models that generate markdown-formatted output (informational)
-    successful: list[str]  # Models that completed successfully without issues
+    crashed: list[str]
+    has_issues: list[str]
+    successful: list[str]
 
-    # Performance tiers (based on speed and memory efficiency)
-    high_performance: list[str]  # >50 t/s generation, <10GB memory
-    medium_performance: list[str]  # 20-50 t/s generation, 10-20GB memory
-    low_performance: list[str]  # <20 t/s generation or >20GB memory
-
-    # Speed categories
-    very_fast: list[str]  # >100 t/s generation (real-time capable)
-    fast: list[str]  # 50-100 t/s (interactive)
-    moderate: list[str]  # 20-50 t/s (acceptable)
-    slow: list[str]  # <20 t/s (batch only)
-
-    # Memory categories
-    low_memory: list[str]  # <5GB (laptop-friendly)
-    medium_memory: list[str]  # 5-15GB (desktop-friendly)
-    high_memory: list[str]  # >15GB (workstation only)
-
-    # Quality categories (based on output analysis)
-    high_quality: list[str]  # Successful + no major issues + reasonable length
-    medium_quality: list[str]  # Successful but with minor issues
-    low_quality: list[str]  # Repetitive/hallucinated/very short
-
-    # Recommendations (composite metrics)
-    recommended: list[str]  # High quality + good performance + reasonable memory
-    budget_friendly: list[str]  # Good quality + low memory (<10GB)
-    speed_kings: list[str]  # Fastest models with acceptable quality
+    # Recommendations
+    recommended: list[str]
+    budget_friendly: list[str]
+    speed_kings: list[str]
 
 
 @dataclass
