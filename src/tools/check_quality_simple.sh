@@ -42,9 +42,11 @@ $PYTHON -m pytest -v
 
 echo "=== Markdown Lint ==="
 if command -v npx &> /dev/null; then
-    cd "$(dirname "$0")/../.."  # Go to repo root for markdown linting
+    # Find repo root (works whether we're in src/ or repo root)
+    REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$(dirname "$0")/../..")
+    pushd "$REPO_ROOT" > /dev/null
     npx markdownlint-cli2 --config .markdownlint.jsonc "**/*.md"
-    cd -  # Return to previous directory
+    popd > /dev/null
 else
     echo "⚠️  Skipped (npx not found - install Node.js to enable)"
 fi
