@@ -27,21 +27,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e src/.[dev]
-
-      - name: Run ruff format check
-        run: cd src && python -m ruff format --check .
-        
-      - name: Run ruff lint
-        run: cd src && python -m ruff check .
-
-      # Temporarily disabled: external MLX stubs have syntax errors (mlx/core/__init__.pyi:3124)
-      # - name: Run mypy type checking
-      #   run: cd src && python -m mypy check_models.py
-
-      - name: Run tests
-        run: cd src && python -m pytest -v
-
-      - name: Run markdown lint
-        run: |
           npm install -g markdownlint-cli2
-          markdownlint-cli2 --config .markdownlint.jsonc "**/*.md"
+
+      - name: Run quality checks
+        run: bash src/tools/run_quality_checks.sh
