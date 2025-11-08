@@ -2,6 +2,7 @@
 
 Pre-commit hook automates:
    - Auto-formats Python files with ruff before committing
+   - Auto-fixes Markdown files with markdownlint (via npx) before committing
    - Syncs README dependency blocks when `src/pyproject.toml` changes
    - Runs: `cd src && python tools/update_readme_deps.py`
    - Adds changes back to the commit
@@ -49,6 +50,21 @@ if [ -n "$PYTHON_FILES" ]; then
     # Re-stage the formatted files
     # shellcheck disable=SC2086
     git add $PYTHON_FILES
+fi
+
+# Auto-fix Markdown files with markdownlint before committing
+MD_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.md$' || true)
+if [ -n "$MD_FILES" ]; then
+    echo '[pre-commit] Auto-fixing Markdown files with markdownlint...'
+    if command -v npx &> /dev/null; then
+        # shellcheck disable=SC2086
+        npx --yes markdownlint-cli2 --fix $MD_FILES || echo "⚠️  Some markdown issues could not be auto-fixed"
+        # Re-stage the fixed files
+        # shellcheck disable=SC2086
+        git add $MD_FILES
+    else
+        echo "⚠️  npx not found - skipping markdown auto-fix (install Node.js for markdown linting)"
+    fi
 fi
 
 # Sync README dependency blocks when pyproject changes
