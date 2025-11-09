@@ -23,7 +23,7 @@ import time
 import traceback
 from collections import Counter
 from collections.abc import Callable, Iterator, Mapping
-from dataclasses import dataclass, fields
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import (
@@ -94,7 +94,6 @@ __all__ = [
     "print_cli_header",
     "print_cli_section",
     "print_model_result",
-    "print_model_stats",
     "print_version_info",
     "process_image_with_model",
     "validate_cli_arguments",
@@ -390,7 +389,7 @@ class ResultSet:
         """Return results sorted by generation time (fastest first)."""
         return self._results
 
-    def fields(self) -> list[str]:
+    def get_fields(self) -> list[str]:
         """Return cached list of metric field names (generation + timing)."""
         if self._fields is None:
             self._fields = _get_available_fields(self._results)
@@ -771,7 +770,7 @@ MEM_BYTES_TO_GB_THRESHOLD: Final[float] = 1_000_000.0  # > ~1MB treat as raw byt
 MEGAPIXEL_CONVERSION: Final[float] = 1_000_000.0  # Convert pixels to megapixels
 
 # EXIF/GPS coordinate standards: camera hardware stores GPS as degrees-minutes-seconds tuples
-MAX_GPS_COORD_LEN: Final[int] = 3  # Full GPS coordinate tuple (degrees, minutes, seconds)
+MAX_GPS_COORD_LEN: Final[int] = 3  # Full GPS coordinate (degrees, minutes, seconds)
 MED_GPS_COORD_LEN: Final[int] = 2  # GPS coordinate with 2 elements (degrees, minutes)
 MIN_GPS_COORD_LEN: Final[int] = 1  # GPS coordinate with 1 element (degrees only)
 MAX_TUPLE_LEN: Final[int] = 10
@@ -1485,6 +1484,77 @@ def get_library_versions() -> LibraryVersionDict:
     }
 
 
+def _get_available_fields(results: list[PerformanceResult]) -> list[str]:
+    """Return ordered list of metric field names present across results.
+
+    We skip heavy / long fields (``text``, ``logprobs``) to keep summary tables
+    concise. Timing fields from ``PerformanceResult`` are appended explicitly so
+    they appear in a predictable order if present.
+    """
+    # Determine GenerationResult fields (excluding 'text' and 'logprobs')
+    gen_fields: list[str] = []
+    for r in results:
+        if r.generation is not None and dataclasses.is_dataclass(r.generation):
+            gen_fields = [
+                f.name
+                for f in dataclasses.fields(r.generation)
+                if f.name not in ("text", "logprobs")
+            ]
+            break
+
+    # Combine with PerformanceResult timing fields
+    return gen_fields + PERFORMANCE_TIMING_FIELDS
+
+
+def _is_performance_timing_field(field_name: str) -> bool:  # kept for clarity
+    """Return True if ``field_name`` is one of the timing fields we expose.
+
+    Separated into a helper for readability and potential future extension
+    (e.g. alias mapping or dynamic timing metrics).
+    """
+    return field_name in PERFORMANCE_TIMING_FIELDS
+
+
+def _get_field_value(result: PerformanceResult, field_name: str) -> MetricValue:
+    """Get field value from either GenerationResult or PerformanceResult."""
+    if _is_performance_timing_field(field_name):
+        return getattr(result, field_name, None)
+    return getattr(result.generation, field_name, None) if result.generation else None
+
+
+# Helper function to sort results by generation time (lowest to highest)
+def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceResult]:
+    """Return results ordered by effective generation time.
+
+    Failed results are placed first (negative inf) to highlight errors,
+    followed by successful results sorted by generation time (fastest first).
+    """
+
+    def get_time_value(result: PerformanceResult) -> float:
+        """Extract time value for sorting, with fallback for failed results."""
+        if not result.success:
+            return float("-inf")  # Failed results go to the beginning
+
+        # Use the generation_time field from PerformanceResult
+        if result.generation_time is not None:
+            return float(result.generation_time)
+
+        # Fallback: calculate time from GenerationResult tokens-per-second if available
+        if (
+            result.generation
+            and hasattr(result.generation, "generation_tokens")
+            and hasattr(result.generation, "generation_tps")
+        ):
+            g_tokens = getattr(result.generation, "generation_tokens", 0) or 0
+            g_tps = getattr(result.generation, "generation_tps", 0.0) or 0.0
+            if g_tps > 0 and g_tokens:
+                return float(g_tokens / g_tps)
+
+        return float("inf")  # No timing data available
+
+    return sorted(results, key=get_time_value)
+
+
 # =============================================================================
 # SYSTEM INFO & VERSION DETECTION (Hardware, OS, Dependencies)
 # =============================================================================
@@ -2048,1004 +2118,192 @@ def pretty_print_exif(
     log_rule(header_width, char="=", color=Colors.BLUE, bold=True)
 
 
-# =============================================================================
-# TABLE & REPORT GENERATION (CLI Tables, Field Formatting, Aggregation)
-# =============================================================================
-
-
-def _get_available_fields(results: list[PerformanceResult]) -> list[str]:
-    """Return ordered list of metric field names present across results.
-
-    We skip heavy / long fields (``text``, ``logprobs``) to keep summary tables
-    concise. Timing fields from ``PerformanceResult`` are appended explicitly so
-    they appear in a predictable order if present.
-    """
-    # Determine GenerationResult fields (excluding 'text' and 'logprobs')
-    gen_fields: list[str] = []
-    for r in results:
-        if r.generation is not None and dataclasses.is_dataclass(r.generation):
-            gen_fields = [
-                f.name for f in fields(r.generation) if f.name not in ("text", "logprobs")
-            ]
-            break
-
-    # Combine with PerformanceResult timing fields
-    return gen_fields + PERFORMANCE_TIMING_FIELDS
-
-
-def _is_performance_timing_field(field_name: str) -> bool:  # kept for clarity
-    """Return True if ``field_name`` is one of the timing fields we expose.
-
-    Separated into a helper for readability and potential future extension
-    (e.g. alias mapping or dynamic timing metrics).
-    """
-    return field_name in PERFORMANCE_TIMING_FIELDS
-
-
-def _get_field_value(result: PerformanceResult, field_name: str) -> MetricValue:
-    """Get field value from either GenerationResult or PerformanceResult."""
-    if _is_performance_timing_field(field_name):
-        return getattr(result, field_name, None)
-    return getattr(result.generation, field_name, None) if result.generation else None
-
-
-# Helper function to sort results by generation time (lowest to highest)
-def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceResult]:
-    """Return results ordered by effective generation time.
-
-    Failed results are placed first (negative inf) to highlight errors,
-    followed by successful results sorted by generation time (fastest first).
-    """
-
-    def get_time_value(result: PerformanceResult) -> float:
-        """Extract time value for sorting, with fallback for failed results."""
-        if not result.success:
-            return float("-inf")  # Failed results go to the beginning
-
-        # Use the generation_time field from PerformanceResult
-        if result.generation_time is not None:
-            return float(result.generation_time)
-
-        # Fallback: calculate time from GenerationResult tokens-per-second if available
-        if (
-            result.generation
-            and hasattr(result.generation, "generation_tokens")
-            and hasattr(result.generation, "generation_tps")
-        ):
-            g_tokens = getattr(result.generation, "generation_tokens", 0) or 0
-            g_tps = getattr(result.generation, "generation_tps", 0.0) or 0.0
-            if g_tps > 0 and g_tokens:
-                return float(g_tokens / g_tps)
-
-        return float("inf")  # No timing data available
-
-    return sorted(results, key=get_time_value)
-
-
-# Additional constants for multi-line formatting
-MAX_SHORT_NAME_LENGTH: int = 16  # Increased from 12 to show more of model names
-MAX_LONG_NAME_LENGTH: int = 32  # Increased from 24 for longer model names
-MAX_SIMPLE_NAME_LENGTH: int = 24  # Increased from 20
-MAX_OUTPUT_LINE_LENGTH: int = 60  # Increased from 35 to show more error details
-MAX_OUTPUT_TOTAL_LENGTH: int = 120  # Increased from 70 for complete error messages
-
-
-def _format_model_name_multiline(model_name: str) -> str:
-    """Format model name for multi-line display in console table."""
-    if "/" in model_name:
-        parts = model_name.split("/")
-        if len(parts[-1]) > MAX_SHORT_NAME_LENGTH:  # If final part is long, break it
-            final_part = parts[-1]
-            if len(final_part) > MAX_LONG_NAME_LENGTH:  # Very long, truncate with ellipsis
-                # Use MAX_LONG_NAME_LENGTH - 3 for the ellipsis
-                return f"{'/'.join(parts[:-1])}/\n{final_part[: MAX_LONG_NAME_LENGTH - 3]}..."
-            # Moderate length, wrap
-            mid_point = len(final_part) // 2
-            return f"{'/'.join(parts[:-1])}/\n{final_part[:mid_point]}-\n{final_part[mid_point:]}"
-        return model_name
-    if len(model_name) > MAX_SIMPLE_NAME_LENGTH:
-        # No slash, just split if too long
-        mid_point = len(model_name) // 2
-        return f"{model_name[:mid_point]}\n{model_name[mid_point:]}"
-    return model_name
-
-
-def _format_output_multiline(output_text: str) -> str:
-    """Format output text for multi-line display in console table."""
-    # Clean newlines
-    output_text = re.sub(r"[\n\r]", " ", output_text)
-
-    if len(output_text) <= MAX_OUTPUT_LINE_LENGTH:
-        return output_text
-
-    # Find a good break point around the middle
-    mid_point = min(MAX_OUTPUT_LINE_LENGTH, len(output_text) // 2)
-    # Try to break at word boundary near mid point
-    space_pos = output_text.find(" ", mid_point)
-    if space_pos != -1 and space_pos < len(output_text) * 0.7:  # Break at space if reasonable
-        line1 = output_text[:space_pos]
-        line2 = output_text[space_pos + 1 :]
-        if len(line2) > MAX_OUTPUT_LINE_LENGTH:  # Second line too long
-            line2 = line2[: MAX_OUTPUT_LINE_LENGTH - 3] + "..."
-        return f"{line1}\n{line2}"
-    # No good break point, just split at reasonable length
-    truncated = "..." if len(output_text) > MAX_OUTPUT_TOTAL_LENGTH else ""
-    return (
-        f"{output_text[:MAX_OUTPUT_LINE_LENGTH]}\n"
-        f"{output_text[MAX_OUTPUT_LINE_LENGTH:MAX_OUTPUT_TOTAL_LENGTH]}"
-        f"{truncated}"
-    )
-
-
-def _build_stat_headers(all_fields: list[str]) -> tuple[list[str], list[str]]:
-    """Return (headers, field_names) for the stats table.
-
-    headers contain multi-line abbreviated labels. field_names maintains the
-    underlying attribute order for alignment & width rules.
-    """
-    headers: list[str] = ["Model"]
-    field_names: list[str] = ["model"]
-    for field in all_fields:
-        if field in FIELD_ABBREVIATIONS:
-            line1, line2 = FIELD_ABBREVIATIONS[field]
-            label = f"{line1}\n{line2}"
-        else:
-            base_label = format_field_label(field)
-            label = f"{base_label}\n{FIELD_UNITS[field]}" if field in FIELD_UNITS else base_label
-        headers.append(label)
-        field_names.append(field)
-    headers.append("Output")
-    field_names.append("output")
-    return headers, field_names
-
-
-Numberish = int | float | str
-
-
-def _format_numeric_display(val: Numberish) -> str:
-    """Format numeric-ish values with commas / precision heuristics.
-
-    Non-numeric inputs should be pre-converted to str before calling.
-    This is a thin wrapper around fmt_num for consistency.
-    """
-    return fmt_num(val)
-
-
-def _build_stat_row(result: PerformanceResult, all_fields: list[str]) -> list[str]:
-    """Build a single table row for the stats table."""
-    model_display = _format_model_name_multiline(str(result.model_name))
-    model_colored = (
-        Colors.colored(model_display, Colors.RED)
-        if not result.success
-        else Colors.colored(model_display, Colors.MAGENTA)
-    )
-    row: list[str] = [model_colored]
-    for field in all_fields:
-        raw_val = _get_field_value(result, field)
-        formatted = format_field_value(field, raw_val)
-        # Ensure we only pass supported types
-        fmt_input: Numberish = (
-            formatted if isinstance(formatted, (int, float, str)) else str(formatted)
-        )
-        row.append(_format_numeric_display(fmt_input))
-    if result.success and result.generation:
-        output_text = str(getattr(result.generation, "text", ""))
-    else:
-        output_text = result.error_message or result.captured_output_on_fail or "-"
-    row.append(_format_output_multiline(output_text))
-    return row
-
-
-def _compute_column_widths(field_names: list[str]) -> list[int | None]:
-    """Compute per-column width hints based on field naming heuristics.
-
-    Returns a list with explicit widths for critical columns (model, output)
-    and None for numeric columns to enable tabulate's intelligent auto-sizing.
-    """
-    widths: list[int | None] = []
-    term_w = get_terminal_width()
-    # Allocate generous space for output/error messages - prioritize readability
-    out_w = max(60, min(120, int(term_w * 0.6)))
-    for idx, name in enumerate(field_names):
-        if idx == 0:  # Model column - keep explicit width for consistency
-            widths.append(35)
-        elif name == "output":
-            widths.append(out_w)
-        else:
-            # Let tabulate auto-size numeric and other columns intelligently
-            widths.append(None)
-    return widths
-
-
-@dataclass
-class ModelIssuesSummary:
-    """Simplified summary of model performance issues."""
-
-    crashed: list[str]
-    has_issues: list[str]
-    successful: list[str]
-
-    # Recommendations
-    recommended: list[str]
-    budget_friendly: list[str]
-    speed_kings: list[str]
-
-
-@dataclass
-class PerformanceStatistics:
-    """Aggregate statistics across all successful models (only shown for multi-model runs)."""
-
-    total_models: int  # Total number of models tested
-    successful_models: int  # Number that completed successfully
-
-    # Speed statistics
-    avg_generation_tps: float | None
-    median_generation_tps: float | None
-    fastest_model: str | None
-    fastest_tps: float | None
-
-    # Memory statistics
-    avg_memory_gb: float | None
-    median_memory_gb: float | None
-    lowest_memory_model: str | None
-    lowest_memory_gb: float | None
-
-    # Efficiency statistics
-    avg_tokens_per_gb: float | None
-    most_efficient_model: str | None  # best tokens_per_gb
-    best_efficiency_score: float | None
-
-    # Quality statistics
-    high_quality_count: int
-    medium_quality_count: int
-    low_quality_count: int
-
-
-def analyze_model_issues(results: list[PerformanceResult]) -> ModelIssuesSummary:  # noqa: C901, PLR0912, PLR0915
-    """Analyze results and categorize models by performance issues.
-
-    Args:
-        results: List of model performance results
-
-    Returns:
-        ModelIssuesSummary with categorized model lists
-    """
-    crashed: list[str] = []
-    repetitive: list[str] = []
-    succinct: list[str] = []
-    hallucinated: list[str] = []
-    verbose: list[str] = []
-    formatting_issues: list[str] = []
-    excessive_bullets: list[str] = []
-    markdown_output: list[str] = []
-    successful: list[str] = []
-
-    # Performance categories
-    high_performance: list[str] = []
-    medium_performance: list[str] = []
-    low_performance: list[str] = []
-
-    # Speed categories
-    very_fast: list[str] = []
-    fast: list[str] = []
-    moderate: list[str] = []
-    slow: list[str] = []
-
-    # Memory categories
-    low_memory: list[str] = []
-    medium_memory: list[str] = []
-    high_memory: list[str] = []
-
-    # Quality categories
-    high_quality: list[str] = []
-    medium_quality: list[str] = []
-    low_quality: list[str] = []
-
-    # Recommendations
-    recommended: list[str] = []
-    budget_friendly: list[str] = []
-    speed_kings: list[str] = []
-
-    succinct_threshold = 0.3  # Output < 30% of prompt length
-
-    for result in results:
-        model_name = result.model_name.split("/")[-1]
-
-        # Check for crashes/failures
-        if not result.success:
-            crashed.append(model_name)
-            continue
-
-        # Analyze successful models
-        gen_text = str(getattr(result.generation, "text", "")) if result.generation else ""
-        gen_tokens = getattr(result.generation, "generation_tokens", 0) if result.generation else 0
-
-        # Extract performance metrics
-        gen_tps = getattr(result.generation, "generation_tps", None) if result.generation else None
-        peak_mem = getattr(result.generation, "peak_memory", None) if result.generation else None
-
-        # Check for markdown formatting (informational, not a quality issue)
-        if _detect_markdown_formatting(gen_text):
-            markdown_output.append(model_name)
-
-        # Determine quality tier
-        is_repetitive, repeated_token = _detect_repetitive_output(gen_text)
-        hallucination_issues = _detect_hallucination_patterns(gen_text)
-        is_verbose = _detect_excessive_verbosity(gen_text, gen_tokens)
-        format_issues = _detect_formatting_violations(gen_text)
-        has_excess_bullets, bullet_count = _detect_excessive_bullets(gen_text)
-        prompt_tokens = getattr(result.generation, "prompt_tokens", 0) if result.generation else 0
-        is_succinct = prompt_tokens > 0 and gen_tokens < (prompt_tokens * succinct_threshold)
-
-        # Categorize by quality issues (for backward compatibility)
-        if is_repetitive:
-            repetitive.append(f"{model_name} ({repeated_token})")
-            low_quality.append(model_name)
-            continue
-
-        if hallucination_issues:
-            issue_desc = ", ".join(hallucination_issues[:2])
-            hallucinated.append(f"{model_name} ({issue_desc})")
-            low_quality.append(model_name)
-            continue
-
-        if is_verbose:
-            verbose.append(f"{model_name} ({gen_tokens} tokens)")
-            medium_quality.append(model_name)
-            # Don't continue - verbose models can still be categorized by performance
-
-        if format_issues:
-            issue_desc = format_issues[0]
-            formatting_issues.append(f"{model_name} ({issue_desc})")
-            medium_quality.append(model_name)
-            # Don't continue - formatting issues don't prevent performance categorization
-
-        if has_excess_bullets:
-            excessive_bullets.append(f"{model_name} ({bullet_count} bullets)")
-            # Don't mark as quality issue - may be prompt-appropriate
-
-        if is_succinct:
-            succinct.append(f"{model_name} ({gen_tokens} tokens)")
-            low_quality.append(model_name)
-            continue
-
-        # Determine quality tier if not already categorized
-        if model_name not in low_quality and model_name not in medium_quality:
-            if has_excess_bullets or format_issues or is_verbose:
-                medium_quality.append(model_name)
-            else:
-                high_quality.append(model_name)
-                successful.append(model_name)
-
-        # Performance tiers (speed + memory combined)
-        if gen_tps is not None and peak_mem is not None:
-            if gen_tps > 50 and peak_mem < 10:
-                high_performance.append(model_name)
-            elif gen_tps >= 20 and peak_mem <= 20:
-                medium_performance.append(model_name)
-            else:
-                low_performance.append(model_name)
-
-        # Speed categories
-        if gen_tps is not None:
-            if gen_tps > 100:
-                very_fast.append(model_name)
-            elif gen_tps >= 50:
-                fast.append(model_name)
-            elif gen_tps >= 20:
-                moderate.append(model_name)
-            else:
-                slow.append(model_name)
-
-        # Memory categories
-        if peak_mem is not None:
-            if peak_mem < 5:
-                low_memory.append(model_name)
-            elif peak_mem <= 15:
-                medium_memory.append(model_name)
-            else:
-                high_memory.append(model_name)
-
-        # Recommendations (composite metrics)
-        if model_name in high_quality and gen_tps is not None and peak_mem is not None:
-            # Recommended: high quality + good performance + reasonable memory
-            if gen_tps >= 30 and peak_mem <= 15:
-                recommended.append(model_name)
-
-            # Budget friendly: good quality + low memory
-            if peak_mem < 10:
-                budget_friendly.append(model_name)
-
-            # Speed kings: fastest with acceptable quality (high or medium)
-            if gen_tps >= 80:
-                speed_kings.append(model_name)
-        elif model_name in medium_quality and gen_tps is not None and peak_mem is not None:
-            # Medium quality can still be budget friendly or fast
-            if peak_mem < 8 and gen_tps >= 25:
-                budget_friendly.append(model_name)
-            if gen_tps >= 100:
-                speed_kings.append(model_name)
-
-    return ModelIssuesSummary(
-        crashed=crashed,
-        repetitive=repetitive,
-        succinct=succinct,
-        hallucinated=hallucinated,
-        verbose=verbose,
-        formatting_issues=formatting_issues,
-        excessive_bullets=excessive_bullets,
-        markdown_output=markdown_output,
-        successful=successful,
-        high_performance=high_performance,
-        medium_performance=medium_performance,
-        low_performance=low_performance,
-        very_fast=very_fast,
-        fast=fast,
-        moderate=moderate,
-        slow=slow,
-        low_memory=low_memory,
-        medium_memory=medium_memory,
-        high_memory=high_memory,
-        high_quality=high_quality,
-        medium_quality=medium_quality,
-        low_quality=low_quality,
-        recommended=recommended,
-        budget_friendly=budget_friendly,
-        speed_kings=speed_kings,
-    )
-
-
-def compute_performance_statistics(
-    results: list[PerformanceResult],
-) -> PerformanceStatistics | None:
-    """Compute aggregate performance statistics across models.
-
-    Only returns statistics when there are multiple successful models to compare.
-
-    Args:
-        results: List of model performance results
-
-    Returns:
-        PerformanceStatistics if multiple models, None otherwise
-    """
-    # Extract successful models with metrics
-    successful_results = [r for r in results if r.success and r.generation]
-
-    if len(successful_results) < 2:
-        # Don't show comparative statistics for single model
-        return None
-
-    # Extract metrics
-    tps_values: list[float] = []
-    memory_values: list[float] = []
-    efficiency_scores: list[tuple[str, float]] = []
-
-    for result in successful_results:
-        gen = result.generation
-        if not gen:
-            continue
-
-        gen_tps = getattr(gen, "generation_tps", None)
-        peak_mem = getattr(gen, "peak_memory", None)
-        gen_tokens = getattr(gen, "generation_tokens", 0)
-
-        if gen_tps is not None:
-            tps_values.append(gen_tps)
-
-        if peak_mem is not None:
-            memory_values.append(peak_mem)
-
-        # Calculate efficiency (tokens per GB)
-        if gen_tokens > 0 and peak_mem and peak_mem > 0:
-            efficiency = gen_tokens / peak_mem
-            model_name = result.model_name.split("/")[-1]
-            efficiency_scores.append((model_name, efficiency))
-
-    # Calculate statistics
-    avg_tps = sum(tps_values) / len(tps_values) if tps_values else 0.0
-    median_tps = sorted(tps_values)[len(tps_values) // 2] if tps_values else 0.0
-
-    fastest_model = ""
-    fastest_tps = 0.0
-    if tps_values:
-        max_tps_idx = tps_values.index(max(tps_values))
-        fastest_model = successful_results[max_tps_idx].model_name.split("/")[-1]
-        fastest_tps = tps_values[max_tps_idx]
-
-    avg_memory = sum(memory_values) / len(memory_values) if memory_values else 0.0
-    median_memory = sorted(memory_values)[len(memory_values) // 2] if memory_values else 0.0
-
-    lowest_memory_model = ""
-    lowest_memory_gb = 0.0
-    if memory_values:
-        min_mem_idx = memory_values.index(min(memory_values))
-        lowest_memory_model = successful_results[min_mem_idx].model_name.split("/")[-1]
-        lowest_memory_gb = memory_values[min_mem_idx]
-
-    avg_efficiency = (
-        sum(e for _, e in efficiency_scores) / len(efficiency_scores) if efficiency_scores else 0.0
-    )
-    most_efficient_model = ""
-    best_efficiency = 0.0
-    if efficiency_scores:
-        most_efficient_model, best_efficiency = max(efficiency_scores, key=lambda x: x[1])
-
-    # Count quality tiers
-    summary = analyze_model_issues(results)
-    high_quality_count = len(summary.high_quality)
-    medium_quality_count = len(summary.medium_quality)
-    low_quality_count = len(summary.low_quality)
-
-    return PerformanceStatistics(
-        total_models=len(results),
-        successful_models=len(successful_results),
-        avg_generation_tps=avg_tps,
-        median_generation_tps=median_tps,
-        fastest_model=fastest_model,
-        fastest_tps=fastest_tps,
-        avg_memory_gb=avg_memory,
-        median_memory_gb=median_memory,
-        lowest_memory_model=lowest_memory_model,
-        lowest_memory_gb=lowest_memory_gb,
-        avg_tokens_per_gb=avg_efficiency,
-        most_efficient_model=most_efficient_model,
-        best_efficiency_score=best_efficiency,
-        high_quality_count=high_quality_count,
-        medium_quality_count=medium_quality_count,
-        low_quality_count=low_quality_count,
-    )
-
-
-def format_issues_summary_text(  # noqa: C901, PLR0912, PLR0915
-    summary: ModelIssuesSummary, stats: PerformanceStatistics | None = None
-) -> str:
-    """Format issues summary as plain text for CLI and Markdown.
-
-    Args:
-        summary: Analyzed model issues summary
-        stats: Optional performance statistics (only shown for multiple models)
-
-    Returns:
-        Formatted text summary
-    """
-    max_shown = 5
-    lines: list[str] = []
-    total = (
-        len(summary.crashed)
-        + len(summary.repetitive)
-        + len(summary.succinct)
-        + len(summary.hallucinated)
-        + len(summary.verbose)
-        + len(summary.formatting_issues)
-        + len(summary.excessive_bullets)
-        + len(summary.successful)
-    )
-
-    lines.append("## 📊 Model Performance Summary")
-    lines.append("")
-    lines.append(f"**Total Models Evaluated:** {total}")
-    lines.append("")
-
-    # Performance Highlights (new categories)
-    has_performance_highlights = (
-        summary.recommended or summary.budget_friendly or summary.speed_kings
-    )
-
-    if has_performance_highlights:
-        lines.append("### 🏆 Performance Highlights")
-        lines.append("")
-
-        if summary.recommended:
-            lines.append(f"**Recommended ({len(summary.recommended)}):**")
-            lines.append("   Best balance of quality, speed, and memory")
-            lines.extend([f"  • {model}" for model in summary.recommended[:max_shown]])
-            if len(summary.recommended) > max_shown:
-                lines.append(f"  • ...and {len(summary.recommended) - max_shown} more")
-            lines.append("")
-
-        if summary.budget_friendly:
-            lines.append(f"💰 **Budget Friendly ({len(summary.budget_friendly)}):**")
-            lines.append("   Low memory usage with good quality")
-            lines.extend([f"  • {model}" for model in summary.budget_friendly[:max_shown]])
-            if len(summary.budget_friendly) > max_shown:
-                lines.append(f"  • ...and {len(summary.budget_friendly) - max_shown} more")
-            lines.append("")
-
-        if summary.speed_kings:
-            lines.append(f"⚡ **Speed Kings ({len(summary.speed_kings)}):**")
-            lines.append("   Fastest generation with acceptable quality")
-            lines.extend([f"  • {model}" for model in summary.speed_kings[:max_shown]])
-            if len(summary.speed_kings) > max_shown:
-                lines.append(f"  • ...and {len(summary.speed_kings) - max_shown} more")
-            lines.append("")
-
-    # Quality Categories
-    if summary.successful:
-        lines.append(f"✅ **Successful ({len(summary.successful)}):**")
-        lines.append("   Clean output, no issues detected")
-        lines.extend([f"  • {model}" for model in summary.successful[:max_shown]])
-        if len(summary.successful) > max_shown:
-            lines.append(f"  • ...and {len(summary.successful) - max_shown} more")
-        lines.append("")
-
-    if summary.crashed:
-        lines.append(f"❌ **Crashed/Failed ({len(summary.crashed)}):**")
-        lines.append("   Errors, OOM, or other failures")
-        lines.extend([f"  • {model}" for model in summary.crashed])
-        lines.append("")
-
-    if summary.repetitive:
-        lines.append(f"🔁 **Repetitive Output ({len(summary.repetitive)}):**")
-        lines.append("   Generated highly repetitive or garbage tokens")
-        lines.extend([f"  • {model}" for model in summary.repetitive])
-        lines.append("")
-
-    if summary.hallucinated:
-        lines.append(f"🤔 **Possible Hallucinations ({len(summary.hallucinated)}):**")
-        lines.append("   Detected unexpected content patterns")
-        lines.extend([f"  • {model}" for model in summary.hallucinated])
-        lines.append("")
-
-    if summary.verbose:
-        lines.append(f"📚 **Excessively Verbose ({len(summary.verbose)}):**")
-        lines.append("   Over-structured output with meta-commentary")
-        lines.extend([f"  • {model}" for model in summary.verbose])
-        lines.append("")
-
-    if summary.formatting_issues:
-        lines.append(f"🎨 **Formatting Issues ({len(summary.formatting_issues)}):**")
-        lines.append("   Unexpected HTML tags or markdown structure")
-        lines.extend([f"  • {model}" for model in summary.formatting_issues])
-        lines.append("")
-
-    if summary.excessive_bullets:
-        lines.append(f"📋 **Excessive Bullet Points ({len(summary.excessive_bullets)}):**")
-        lines.append("   Many bullet points (may be appropriate depending on prompt)")
-        lines.extend([f"  • {model}" for model in summary.excessive_bullets])
-        lines.append("")
-
-    if summary.succinct:
-        lines.append(f"📝 **Very Succinct ({len(summary.succinct)}):**")
-        lines.append("   Generated output much shorter than prompt")
-        lines.extend([f"  • {model}" for model in summary.succinct])
-        lines.append("")
-
-    if summary.markdown_output:
-        lines.append(f"📄 **Markdown Formatting ({len(summary.markdown_output)}):**")
-        lines.append("   Models that generate markdown-formatted output")
-        lines.extend([f"  • {model}" for model in summary.markdown_output[:max_shown]])
-        if len(summary.markdown_output) > max_shown:
-            lines.append(f"  • ...and {len(summary.markdown_output) - max_shown} more")
-        lines.append("")
-
-    # Add performance statistics (only for multiple models)
-    if stats:
-        lines.append("### 📊 Performance Statistics")
-        lines.append("")
-        lines.append(
-            f"**Models Tested:** {stats.total_models} total, {stats.successful_models} successful"
-        )
-        lines.append("")
-
-        if stats.fastest_model:
-            lines.append("**Speed:**")
-            lines.append(f"  • Average: {stats.avg_generation_tps:.1f} t/s")
-            lines.append(f"  • Median: {stats.median_generation_tps:.1f} t/s")
-            lines.append(f"  • Fastest: {stats.fastest_model} ({stats.fastest_tps:.1f} t/s)")
-            lines.append("")
-
-        if stats.lowest_memory_model:
-            lines.append("**Memory:**")
-            lines.append(f"  • Average: {stats.avg_memory_gb:.2f} GB")
-            lines.append(f"  • Median: {stats.median_memory_gb:.2f} GB")
-            lines.append(
-                f"  • Lowest: {stats.lowest_memory_model} ({stats.lowest_memory_gb:.2f} GB)"
-            )
-            lines.append("")
-
-        if stats.most_efficient_model:
-            lines.append("**Efficiency:**")
-            lines.append(f"  • Average: {stats.avg_tokens_per_gb:.1f} tokens/GB")
-            lines.append(
-                f"  • Best: {stats.most_efficient_model} ({stats.best_efficiency_score:.1f} tokens/GB)"
-            )
-            lines.append("")
-
-        lines.append("**Quality Distribution:**")
-        lines.append(f"  • High Quality: {stats.high_quality_count}")
-        lines.append(f"  • Medium Quality: {stats.medium_quality_count}")
-        lines.append(f"  • Low Quality: {stats.low_quality_count}")
-        lines.append("")
-
-    return "\n".join(lines)
-
-
-def format_issues_summary_html(summary: ModelIssuesSummary) -> str:  # noqa: PLR0915
-    """Format issues summary as HTML for reports.
-
-    Args:
-        summary: Analyzed model issues summary
-
-    Returns:
-        Formatted HTML summary
-    """
-    max_shown = 5
-    lines: list[str] = []
-    total = (
-        len(summary.crashed)
-        + len(summary.repetitive)
-        + len(summary.succinct)
-        + len(summary.hallucinated)
-        + len(summary.verbose)
-        + len(summary.formatting_issues)
-        + len(summary.excessive_bullets)
-        + len(summary.successful)
-    )
-
-    lines.append("<div class='issues-summary'>")
-    lines.append("<h3>📊 Model Performance Summary</h3>")
-    lines.append(f"<p><strong>Total Models Evaluated:</strong> {total}</p>")
-
-    if summary.successful:
-        lines.append(f"<h4>✅ Successful ({len(summary.successful)})</h4>")
-        lines.append("<p>Clean output, no issues detected</p>")
-        lines.append("<ul>")
-        lines.extend([f"<li>{html.escape(m)}</li>" for m in summary.successful[:max_shown]])
-        if len(summary.successful) > max_shown:
-            remaining = len(summary.successful) - max_shown
-            lines.append(f"<li><em>...and {remaining} more</em></li>")
-        lines.append("</ul>")
-
-    if summary.crashed:
-        lines.append(
-            f"<h4 style='color: #d32f2f;'>❌ Crashed/Failed ({len(summary.crashed)})</h4>",
-        )
-        lines.append("<p>Errors, OOM, or other failures</p>")
-        lines.append("<ul>")
-        lines.extend([f"<li>{html.escape(m)}</li>" for m in summary.crashed])
-        lines.append("</ul>")
-
-    if summary.repetitive:
-        lines.append(
-            f"<h4 style='color: #ff9800;'>🔁 Repetitive Output ({len(summary.repetitive)})</h4>",
-        )
-        lines.append("<p>Generated highly repetitive or garbage tokens</p>")
-        lines.append("<ul>")
-        lines.extend([f"<li>{html.escape(m)}</li>" for m in summary.repetitive])
-        lines.append("</ul>")
-
-    if summary.hallucinated:
-        lines.append(
-            f"<h4 style='color: #ff9800;'>🤔 Possible Hallucinations "
-            f"({len(summary.hallucinated)})</h4>",
-        )
-        lines.append("<p>Detected unexpected content patterns</p>")
-        lines.append("<ul>")
-        lines.extend([f"<li>{html.escape(m)}</li>" for m in summary.hallucinated])
-        lines.append("</ul>")
-
-    if summary.verbose:
-        lines.append(
-            f"<h4 style='color: #9c27b0;'>📚 Excessively Verbose ({len(summary.verbose)})</h4>",
-        )
-        lines.append("<p>Over-structured output with meta-commentary</p>")
-        lines.append("<ul>")
-        lines.extend([f"<li>{html.escape(m)}</li>" for m in summary.verbose])
-        lines.append("</ul>")
-
-    if summary.formatting_issues:
-        lines.append(
-            f"<h4 style='color: #795548;'>🎨 Formatting Issues "
-            f"({len(summary.formatting_issues)})</h4>",
-        )
-        lines.append("<p>Unexpected HTML tags or markdown structure</p>")
-        lines.append("<ul>")
-        lines.extend([f"<li>{html.escape(m)}</li>" for m in summary.formatting_issues])
-        lines.append("</ul>")
-
-    if summary.excessive_bullets:
-        lines.append(
-            f"<h4 style='color: #607d8b;'>📋 Excessive Bullet Points "
-            f"({len(summary.excessive_bullets)})</h4>",
-        )
-        lines.append("<p>Many bullet points (may be appropriate depending on prompt)</p>")
-        lines.append("<ul>")
-        lines.extend([f"<li>{html.escape(m)}</li>" for m in summary.excessive_bullets])
-        lines.append("</ul>")
-
-    if summary.succinct:
-        lines.append(
-            f"<h4 style='color: #2196f3;'>📝 Very Succinct ({len(summary.succinct)})</h4>",
-        )
-        lines.append("<p>Generated output much shorter than prompt</p>")
-        lines.append("<ul>")
-        lines.extend([f"<li>{html.escape(m)}</li>" for m in summary.succinct])
-        lines.append("</ul>")
-
-    if summary.markdown_output:
-        lines.append(
-            f"<h4 style='color: #4caf50;'>📄 Markdown Formatting "
-            f"({len(summary.markdown_output)})</h4>",
-        )
-        lines.append("<p>Models that generate markdown-formatted output</p>")
-        lines.append("<ul>")
-        lines.extend([f"<li>{html.escape(m)}</li>" for m in summary.markdown_output[:max_shown]])
-        if len(summary.markdown_output) > max_shown:
-            remaining = len(summary.markdown_output) - max_shown
-            lines.append(f"<li><em>...and {remaining} more</em></li>")
-        lines.append("</ul>")
-
-    lines.append("</div>")
-    lines.append("<hr>")
-
-    return "\n".join(lines)
-
-
-def print_model_stats(results: list[PerformanceResult]) -> None:
-    """Emit an enhanced table of per-model metrics with visual indicators and summary.
-
-    (Refactored) The original monolithic implementation has been decomposed
-    into small helpers: header building, row construction, column width
-    calculation. Now enhanced with unicode borders, success/fail indicators,
-    and summary statistics.
-    """
-    if not results:
-        logger.info("No model results to display.")
-        return
-
-    rs = ResultSet(results)
-    all_fields = rs.fields() or []
-    headers, field_names = _build_stat_headers(all_fields)
-
-    # Add visual indicators to rows
-    success_count = sum(1 for r in rs.results if r.success)
-    fail_count = len(rs.results) - success_count
-
-    rows = []
-    for r in rs.results:
-        row_data = _build_stat_row(r, all_fields)
-        # Prepend success/fail indicator to model name
-        indicator = "✓" if r.success else "✗"
-        row_data[0] = f"{indicator} {row_data[0]}"
-        rows.append(row_data)
-
-    colalign: list[str] = ["left"] + [
-        "right" if is_numeric_field(fname) else "left" for fname in field_names[1:]
-    ]
-    widths = _compute_column_widths(field_names)
-    table = tabulate(
-        rows,
-        headers=headers,
-        tablefmt="plain",
-        colalign=colalign,
-        maxcolwidths=widths,
-    )
-    lines = table.split("\n")
-
-    # Use terminal width for framing rules
-    max_width = get_terminal_width(max_width=100)
-
-    # Top border with title
-    logger.info("")
-    log_rule(max_width, char="═", color=Colors.BLUE, bold=True)
-    title = "PERFORMANCE SUMMARY"
-    padding = (max_width - len(title)) // 2
-    logger.info(Colors.colored(" " * padding + title, Colors.BOLD, Colors.CYAN))
-    log_rule(max_width, char="═", color=Colors.BLUE, bold=True)
-
-    # Table content
-    for line in lines:
-        logger.info(line)
-
-    # Bottom border with summary
-    log_rule(max_width, char="─", color=Colors.BLUE, bold=False)
-    summary = f"Total Models: {len(rs.results)}  │  "
-    summary += Colors.colored(f"✓ Pass: {success_count}", Colors.GREEN) + "  "
-    if fail_count > 0:
-        summary += Colors.colored(f"✗ Fail: {fail_count}", Colors.RED)
-    logger.info(summary)
-    log_rule(max_width, char="═", color=Colors.BLUE, bold=True)
-
-    logger.info("Results sorted: errors first, then by generation time (fastest to slowest).")
-
-
 def _prepare_table_data(
     results: list[PerformanceResult],
 ) -> tuple[list[str], list[list[str]], list[str]]:
-    """Normalize model results into (headers, rows, field_names) for reports.
+    """Prepare headers, rows, and field names for reports.
 
-    Separation of concerns: this function handles data shaping only; rendering
-    (HTML / Markdown / console) is delegated so that alternate output formats
-    can reuse the same pre-processed structure.
+    Args:
+        results: List of PerformanceResult objects.
+
+    Returns:
+        A tuple containing:
+        - list[str]: Headers for the table.
+        - list[list[str]]: Rows of data for the table.
+        - list[str]: The names of the fields.
     """
     if not results:
         return [], [], []
 
-    rs = ResultSet(results)
-    results = rs.results
-    all_fields = rs.fields()
+    result_set = ResultSet(results)
+    field_names = ["model_name", *result_set.get_fields(), "output"]
+    sorted_results = result_set.results
 
-    headers = ["Model"]
-    field_names = ["model"]  # Track original field names for alignment
-
-    # Create more compact, multi-line friendly headers with consistent formatting
-    compact_headers = {
-        "tokens": "Total<br>Tokens",
-        "prompt_tokens": "Prompt<br>Tokens",
-        "generation_tokens": "Generated<br>Tokens",
-        "prompt_tps": "Prompt<br>Speed<br>(t/s)",
-        "generation_tps": "Generation<br>Speed<br>(t/s)",
-        "peak_memory": "Peak<br>Memory<br>(GB)",
-        "active_memory": "Active<br>Memory<br>(GB)",
-        "cached_memory": "Cached<br>Memory<br>(GB)",
-        "generation_time": "Generation<br>Time<br>(s)",
-        "model_load_time": "Model<br>Load<br>(s)",
-        "total_time": "Total<br>Time<br>(s)",
-    }
-
-    for f in all_fields:
-        if f in compact_headers:
-            headers.append(compact_headers[f])
+    # Create headers
+    headers = []
+    for field_name in field_names:
+        if field_name in FIELD_ABBREVIATIONS:
+            line1, line2 = FIELD_ABBREVIATIONS[field_name]
+            # Split long headers for better readability in reports
+            if len(line1) > HEADER_SPLIT_LENGTH or len(line2) > HEADER_SPLIT_LENGTH:
+                headers.append(f"{line1}<br>{line2}")
+            else:
+                headers.append(f"{line1} {line2}")
         else:
-            # Fallback to formatted label with units
-            label = format_field_label(f)
-            if f in FIELD_UNITS:
-                # Split long headers into multiple lines
-                parts = label.split()
-                if len(parts) > 1 and len(label) > HEADER_SPLIT_LENGTH:
-                    label = "<br>".join(parts) + f"<br>{FIELD_UNITS[f]}"
+            headers.append(format_field_label(field_name))
+
+    # Create rows
+    rows: list[list[str]] = []
+    for res in sorted_results:
+        row: list[str] = []
+        for field_name in field_names:
+            if field_name == "model_name":
+                row.append(res.model_name.split("/")[-1])
+            elif field_name == "output":
+                if res.success and res.generation:
+                    row.append(str(getattr(res.generation, "text", "")))
                 else:
-                    label += f" {FIELD_UNITS[f]}"
-            headers.append(label)
-        field_names.append(f)
-
-    headers.append("Output /<br>Diagnostics")
-    field_names.append("output")
-
-    # Build table rows
-    rows = []
-    for r in results:
-        row = [str(r.model_name)]
-
-        # Add generation fields and performance timing fields
-        for f in all_fields:
-            val = _get_field_value(r, f)
-            val = format_field_value(f, val)
-            row.append(str(val))
-
-        # Add output/diagnostic column (empty string as unified fallback)
-        if r.success and r.generation:
-            out_val = str(getattr(r.generation, "text", ""))
-        else:
-            out_val = r.error_message or r.captured_output_on_fail or ""
-        row.append(out_val)
-
+                    row.append(
+                        f"Error: {res.error_stage} - {res.error_message}"
+                        if res.error_message
+                        else "Unknown error",
+                    )
+            else:
+                value = _get_field_value(res, field_name)
+                row.append(format_field_value(field_name, value))
         rows.append(row)
 
     return headers, rows, field_names
 
 
-# --- HTML Report Generation ---
 def _mark_failed_rows_in_html(html_table: str, results: list[PerformanceResult]) -> str:
-    """Add class="failed-row" to <tr> elements whose corresponding result failed."""
-    sorted_results_for_flags = _sort_results_by_time(results)
-    failed_set = {idx for idx, r in enumerate(sorted_results_for_flags) if not r.success}
-    if not failed_set or "<tbody>" not in html_table:
-        return html_table
-    tbody_start = html_table.find("<tbody>")
-    tbody_end = html_table.find("</tbody>", tbody_start)
-    if tbody_start == -1 or tbody_end == -1:
-        return html_table
-    body_html = html_table[tbody_start:tbody_end]
-    row_index = -1
+    """Add a 'failed' class to rows for failed models in the HTML table."""
+    sorted_results = _sort_results_by_time(results)
+    table_rows = html_table.split("<tr>")
+    new_table_rows = [table_rows[0]]  # Keep the header row
 
-    def _row_replacer(match: re.Match[str]) -> str:
-        nonlocal row_index
-        row_index += 1
-        return '<tr class="failed-row">' if row_index in failed_set else match.group(0)
+    for i, res in enumerate(sorted_results):
+        if i + 1 < len(table_rows):
+            row_html = table_rows[i + 1]
+            if not res.success:
+                new_table_rows.append(row_html.replace("<td>", '<td class="failed">', 1))
+            else:
+                new_table_rows.append(row_html)
 
-    body_html = re.sub(r"<tr>", _row_replacer, body_html)
-    return html_table[:tbody_start] + body_html + html_table[tbody_end:]
+    return "<tr>".join(new_table_rows)
+
+
+def analyze_model_issues(results: list[PerformanceResult]) -> dict[str, Any]:
+    """Analyze results to identify common model issues."""
+    summary: dict[str, Any] = {
+        "total_models": len(results),
+        "failed_models": [],
+        "repetitive_models": [],
+        "hallucination_models": [],
+        "verbose_models": [],
+        "formatting_issues": [],
+        "excessive_bullets": [],
+    }
+
+    for res in results:
+        if not res.success:
+            summary["failed_models"].append(
+                (res.model_name, res.error_stage, res.error_message),
+            )
+            continue
+
+        if res.generation and hasattr(res.generation, "text"):
+            text = getattr(res.generation, "text", "") or ""
+            is_repetitive, token = _detect_repetitive_output(text)
+            if is_repetitive:
+                summary["repetitive_models"].append((res.model_name, token))
+
+            hallucinations = _detect_hallucination_patterns(text)
+            if hallucinations:
+                summary["hallucination_models"].append((res.model_name, hallucinations))
+
+            gen_tokens = getattr(res.generation, "generation_tokens", 0)
+            if _detect_excessive_verbosity(text, gen_tokens):
+                summary["verbose_models"].append((res.model_name, gen_tokens))
+
+            formatting_issues = _detect_formatting_violations(text)
+            if formatting_issues:
+                summary["formatting_issues"].append((res.model_name, formatting_issues))
+
+            has_bullets, count = _detect_excessive_bullets(text)
+            if has_bullets:
+                summary["excessive_bullets"].append((res.model_name, count))
+
+    return summary
+
+
+def compute_performance_statistics(results: list[PerformanceResult]) -> dict[str, Any]:
+    """Compute performance statistics (min, max, avg) for successful runs."""
+    stats: dict[str, Any] = {}
+    successful_results = [r for r in results if r.success and r.generation]
+    if not successful_results:
+        return stats
+
+    fields_to_stat = [
+        "generation_tps",
+        "peak_memory",
+        "total_time",
+        "generation_time",
+        "model_load_time",
+    ]
+    for field in fields_to_stat:
+        values = [
+            _get_field_value(res, field)
+            for res in successful_results
+            if _get_field_value(res, field) is not None
+        ]
+        if values:
+            numeric_values = [v for v in values if is_numeric_value(v)]
+            if numeric_values:
+                float_values = [float(v) for v in numeric_values if v is not None]
+                if not float_values:
+                    continue
+                stats[field] = {
+                    "min": min(float_values),
+                    "max": max(float_values),
+                    "avg": sum(float_values) / len(float_values),
+                }
+    return stats
+
+
+def format_issues_summary_html(summary: dict[str, Any], stats: dict[str, Any]) -> str:
+    """Format the issues and statistics summary as an HTML string."""
+    # This is a simplified placeholder. A complete implementation would build a
+    # more detailed HTML structure.
+    parts = []
+    if summary.get("failed_models"):
+        parts.append(f"<li><b>Failed models:</b> {len(summary['failed_models'])}</li>")
+    if summary.get("repetitive_models"):
+        parts.append(f"<li><b>Repetitive models:</b> {len(summary['repetitive_models'])}</li>")
+    if stats:
+        parts.append("<li><b>Performance Stats (avg):</b></li>")
+        for field, data in stats.items():
+            parts.append(
+                f"<ul><li><i>{format_field_label(field)}:</i> "
+                f"{format_field_value(field, data['avg'])}</li></ul>",
+            )
+    return "<ul>" + "".join(parts) + "</ul>" if parts else ""
+
+
+def format_issues_summary_text(summary: dict[str, Any], stats: dict[str, Any]) -> str:
+    """Format the issues and statistics summary as a Markdown string."""
+    parts = []
+    if summary.get("failed_models"):
+        parts.append(f"- **Failed models:** {len(summary['failed_models'])}")
+    if summary.get("repetitive_models"):
+        parts.append(f"- **Repetitive models:** {len(summary['repetitive_models'])}")
+    if stats:
+        parts.append("- **Performance Stats (avg):**")
+        for field, data in stats.items():
+            parts.append(
+                f"  - *{format_field_label(field)}:* {format_field_value(field, data['avg'])}",
+            )
+    return "\n".join(parts)
 
 
 def _build_full_html_document(
@@ -3054,124 +2312,109 @@ def _build_full_html_document(
     versions: LibraryVersionDict,
     prompt: str,
     total_runtime_seconds: float,
-    issues_summary_html: str = "",
-    system_info: dict[str, str] | None = None,
+    issues_summary_html: str,
+    system_info: dict[str, str],
 ) -> str:
-    local_tz = get_localzone()
-    # Build complete HTML document
-    html_content = f"""<!DOCTYPE html>
-<html lang=\"en\">
-<head>
-    <meta charset=\"UTF-8\">
-    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-    <title>MLX VLM Performance Report</title>
+    """Build the full self-contained HTML document from components."""
+    css = """
     <style>
-        body {{
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 20px; background-color: #f8f9fa; color: #212529; line-height: 1.6;
-        }}
-        h1 {{
-            color: #495057; text-align: center; margin-bottom: 15px;
-            border-bottom: 3px solid #007bff; padding-bottom: 15px; font-size: 2.2em;
-        }}
-        h2 {{
-            color: #495057; margin-top: 30px; margin-bottom: 15px;
-            border-bottom: 2px solid #6c757d; padding-bottom: 8px; font-size: 1.4em;
-        }}
-        .prompt-section {{
-            background-color: #e3f2fd; border-left: 4px solid #2196f3; padding: 20px;
-            margin: 25px 0; border-radius: 6px;
-        }}
-        .prompt-section h3 {{
-            color: #1976d2; margin-top: 0; margin-bottom: 10px;
-            font-size: 1.1em;
-        }}
-        .meta-info {{ color: #6c757d; font-style: italic; margin: 15px 0; text-align: center; }}
-        table {{
-            border-collapse: collapse; width: 95%; margin: 30px auto; background-color: #fff;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden;
-        }}
-        th, td {{ border: 1px solid #dee2e6; padding: 8px 12px; vertical-align: top; }}
-        thead th, tbody td {{ vertical-align: top; }}
-        th {{
-            background: linear-gradient(135deg, #e9ecef 0%, #f8f9fa 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 600;
-            color: #495057; text-shadow: 0 1px 0 white; font-size: 14px; text-align: center;
-        }}
-        th.numeric {{ text-align: right; }}
-        th.text {{ text-align: left; }}
-        tr:nth-child(even):not(.failed-row) {{ background-color: #f8f9fa; }}
-        tr:hover:not(.failed-row) {{
-            background-color: #e3f2fd; transition: background-color 0.2s;
-        }}
-        tr.failed-row {{ background-color: #f8d7da !important; color: #721c24; }}
-        tr.failed-row:hover {{ background-color: #f5c6cb !important; }}
-        .model-name {{
-            font-family: 'Courier New', Courier, monospace; font-weight: 500;
-            text-align: left; color: #0d6efd;
-        }}
-        .error-message {{ font-weight: bold; color: #721c24; }}
-        td.numeric {{ text-align: right; font-family: 'Courier New', monospace; }}
-        td.text {{ text-align: left; }}
-        caption {{ font-style: italic; color: #6c757d; margin-bottom: 10px; }}
-        footer {{ margin-top: 40px; padding-top: 20px; border-top: 2px solid #dee2e6; }}
-        footer h2 {{ color: #495057; }}
-        footer ul {{ background-color: #f8f9fa; padding: 15px; border-radius: 5px; }}
-        footer code {{
-            background-color: #e9ecef; padding: 2px 4px; border-radius: 3px;
-            color: #d63384;
-        }}
+        body { font-family: sans-serif; margin: 2em; }
+        table { border-collapse: collapse; margin-top: 1em; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .numeric { text-align: right; }
+        .failed { background-color: #ffdddd; }
+        .summary { margin-top: 2em; padding: 1em; border: 1px solid #eee; }
     </style>
-</head>
-<body>
-    <h1>MLX Vision Language Model Performance Report</h1>
-    {issues_summary_html}
-    <div class=\"prompt-section\">
-        <h3>📝 Test Prompt</h3>
-        <div>{html.escape(prompt).replace("\n", "<br>")}</div>
-    </div>
-    <h2>📊 Performance Results</h2>
-    <div class=\"meta-info\">
-        Performance metrics and output for Vision Language Model processing<br>
-        Results sorted: errors first, then by generation time (fastest to slowest) • Generated on
-        {datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")} • Failures shown but
-        excluded from averages<br>
-        Overall runtime: {format_overall_runtime(total_runtime_seconds)}
-    </div>
-    {html_table}
-    <footer>"""
+    """
+    sys_info_html = "<ul>"
+    for k, v in system_info.items():
+        sys_info_html += f"<li><b>{html.escape(k)}:</b> {html.escape(v)}</li>"
+    sys_info_html += "</ul>"
 
-    # Add system/hardware information if available
-    if system_info:
-        html_content += "\n        <h2>� System/Hardware Information</h2>\n        <ul>\n"
-        for name, value in system_info.items():
-            html_content += (
-                f"            <li><strong>{html.escape(name)}</strong>: {html.escape(value)}</li>\n"
-            )
-        html_content += "        </ul>\n"
-
-    html_content += "        <h2>🔧 Library Versions</h2>\n        <ul>\n"
-
+    versions_html = "<ul>"
     for name, ver in sorted(versions.items()):
         ver_str = "" if ver is None else ver
-        html_content += (
-            f"            <li><code>{html.escape(name)}</code>: "
-            f"<code>{html.escape(ver_str)}</code></li>\n"
+        versions_html += (
+            f"<li><code>{html.escape(name)}</code>: <code>{html.escape(ver_str)}</code></li>"
         )
+    versions_html += "</ul>"
 
-    generated_ts = datetime.now(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")
-    html_content += (
-        "        </ul>\n"
-        f"        <p><em>Report generated: {generated_ts}</em></p>\n"
-        "    </footer>\n"
-        "</body>\n"
-        "</html>"
-    )
-    return html_content
+    return f"""
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Model Performance Report</title>
+        {css}
+    </head>
+    <body>
+        <h1>Model Performance Report</h1>
+        <p><em>Generated on {local_now_str()}</em></p>
+        <div class="summary">
+            <h2>Summary</h2>
+            {issues_summary_html}
+        </div>
+        <h2>Prompt</h2>
+        <pre>{html.escape(prompt)}</pre>
+        <h2>Results</h2>
+        <p><strong>Overall runtime:</strong> {format_overall_runtime(total_runtime_seconds)}</p>
+        {html_table}
+        <h2>System Information</h2>
+        {sys_info_html}
+        <h2>Library Versions</h2>
+        {versions_html}
+    </body>
+    </html>
+    """
+
+
+def print_model_stats(results: list[PerformanceResult]) -> None:
+    """Print model performance statistics in a formatted table."""
+    if not results:
+        logger.info("No results to display.")
+        return
+
+    headers, rows, field_names = _prepare_table_data(results)
+    if not headers or not rows:
+        logger.info("No data to display in stats table.")
+        return
+
+    # Create a text-based table
+    # We need to manually align because tabulate's alignment is based on visible chars
+    # and doesn't account for our ANSI color codes.
+    col_widths = [Colors.visual_len(h) for h in headers]
+    for row in rows:
+        for i, cell in enumerate(row):
+            col_widths[i] = max(col_widths[i], Colors.visual_len(cell))
+
+    # Header
+    header_line = " | ".join(_pad_text(h, col_widths[i]) for i, h in enumerate(headers))
+    logger.info(Colors.colored(header_line, Colors.BLUE, Colors.BOLD))
+
+    # Separator
+    separator_line = " | ".join("-" * w for w in col_widths)
+    logger.info(Colors.colored(separator_line, Colors.BLUE))
+
+    # Rows
+    sorted_results = _sort_results_by_time(results)
+    for i, row_data in enumerate(rows):
+        is_fail = not sorted_results[i].success
+        row_color = Colors.RED if is_fail else ""
+        colored_row: list[str] = []
+        for j, cell_data in enumerate(row_data):
+            is_numeric = is_numeric_field(field_names[j])
+            padded_cell = _pad_text(cell_data, col_widths[j], right_align=is_numeric)
+            # Color the whole row on failure, but don't color the output column on success
+            if (j < len(row_data) - 1) or (j == len(row_data) - 1 and is_fail):
+                colored_row.append(Colors.colored(padded_cell, row_color))
+            else:
+                colored_row.append(padded_cell)
+        logger.info(" | ".join(colored_row))
 
 
 # =============================================================================
-# HTML REPORT GENERATION (HTML formatting, styling, templates)
+# REPORT GENERATION (HTML, Markdown)
 # =============================================================================
 
 
@@ -3182,61 +2425,65 @@ def generate_html_report(
     prompt: str,
     total_runtime_seconds: float,
 ) -> None:
-    """Write an HTML report (standalone) including metrics table and context.
-
-    Inline CSS is used deliberately to keep the artifact portable (single file
-    shareable via email / chat) without additional assets. If styling grows
-    further, moving to a template system + external stylesheet would be the
-    next step.
-    """
+    """Write a self-contained HTML summary with aligned table."""
     if not results:
         logger.warning(
             Colors.colored("No results to generate HTML report.", Colors.YELLOW),
         )
         return
 
-    # Get table data using our helper function
     headers, rows, field_names = _prepare_table_data(results)
 
     if not headers or not rows:
         logger.warning("No table data to generate HTML report.")
         return
 
-    # Escape HTML characters for safety (all user-controlled content: model names, output)
-    for i in range(len(rows)):
-        for j in range(len(rows[i])):
-            # Escape first column (model name) and last column (output text)
-            if j == 0 or j == len(rows[i]) - 1:
-                rows[i][j] = html.escape(str(rows[i][j]))
-
-    # Determine column alignment using original field names
-    colalign = ["left"] + [
-        "right" if is_numeric_field(field_name) else "left" for field_name in field_names[1:]
-    ]
-
     # Generate HTML table using tabulate
     html_table = tabulate(
         rows,
         headers=headers,
-        tablefmt="unsafehtml",
-        colalign=colalign,
+        tablefmt="html",
+        colalign=["left"] + ["right" if is_numeric_field(f) else "left" for f in field_names[1:]],
     )
+
+    # Add CSS classes for alignment and styling
+    html_table = html_table.replace("<td>", '<td class="text">').replace(
+        "<th>",
+        '<th class="text">',
+    )
+    for f in field_names:
+        if is_numeric_field(f):
+            idx = field_names.index(f)
+            html_table = html_table.replace(
+                f"<td>{rows[0][idx]}",
+                f'<td class="numeric">{rows[0][idx]}',
+                1,
+            )
+            html_table = html_table.replace(
+                f"<th>{headers[idx]}",
+                f'<th class="numeric">{headers[idx]}',
+                1,
+            )
+
+    # Mark failed rows
+    html_table = _mark_failed_rows_in_html(html_table, results)
+
     # Analyze model issues and generate summary
     summary = analyze_model_issues(results)
-    issues_html = format_issues_summary_html(summary)
+    stats = compute_performance_statistics(results)
+    issues_summary_html = format_issues_summary_html(summary, stats)
 
     # Gather system characteristics for the report
     system_info = get_system_characteristics()
 
-    # Mark failed rows and build the final document
-    html_table = _mark_failed_rows_in_html(html_table, results)
+    # Build the full HTML document
     html_content = _build_full_html_document(
         html_table=html_table,
         versions=versions,
         prompt=prompt,
         total_runtime_seconds=total_runtime_seconds,
-        issues_summary_html=issues_html,
-        system_info=system_info if system_info else None,
+        issues_summary_html=issues_summary_html,
+        system_info=system_info,
     )
 
     try:
@@ -3247,15 +2494,7 @@ def generate_html_report(
             Colors.colored(str(filename.resolve()), Colors.GREEN),
         )
     except OSError:
-        logger.exception(
-            "Failed to write HTML report to file %s.",
-            str(filename),
-        )
-    except ValueError:
-        logger.exception(
-            "A value error occurred while writing HTML report %s",
-            str(filename),
-        )
+        logger.exception("Failed to write HTML report to %s", filename)
 
 
 # =============================================================================
@@ -3441,7 +2680,7 @@ def _escape_markdown_diagnostics(text: str) -> str:
     # Limit excessive consecutive <br> while preserving intentional blank lines
     result = re.sub(r"(<br>\s*){3,}", "<br><br>", result)
 
-    # Wrap bare URLs in angle brackets (MD034 compliance)
+    # Wrap bare URLs in angle brackets to satisfy markdownlint MD034
     result = _wrap_bare_urls(result)
 
     # Escape characters with special meaning in Markdown and table structure
@@ -3551,7 +2790,8 @@ def get_system_characteristics() -> dict[str, str]:
                 if sdk_result.returncode == 0 and sdk_result.stdout.strip():
                     info["SDK Version"] = sdk_result.stdout.strip()
             except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
-                pass  # SDK version is nice-to-have, not critical        info["Python Version"] = sys.version.split()[0]
+                pass  # SDK version is nice-to-have, not critical
+        info["Python Version"] = sys.version.split()[0]
         info["Architecture"] = platform.machine()
 
         # Get GPU info
@@ -4330,7 +3570,7 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     console_handler.setFormatter(console_formatter)
     logger.addHandler(console_handler)
 
-    # File handler - write to specified log file (overwrite each run)
+    # File handler - write to specified log file (overwritten each run)
     log_file: Path = args.output_log.resolve()
     log_file.parent.mkdir(parents=True, exist_ok=True)
     file_handler: logging.FileHandler = logging.FileHandler(
