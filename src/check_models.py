@@ -411,6 +411,8 @@ class PerformanceResult:
     generation_time: float | None = None  # Time taken for generation in seconds
     model_load_time: float | None = None  # Time taken to load the model in seconds
     total_time: float | None = None  # Total time including model loading
+    # MOD: Added error_type to preserve original exception type for better error bucketing
+    error_type: str | None = None  # Original exception type name (e.g., "TypeError", "ImportError")
 
 
 class ResultSet:
@@ -1323,6 +1325,104 @@ def _detect_markdown_formatting(text: str) -> bool:
     return any(re.search(pattern, text, re.MULTILINE) for pattern in markdown_indicators)
 
 
+# MOD: Added context ignorance detection
+def _detect_context_ignorance(text: str, prompt: str) -> tuple[bool, list[str]]:
+    """Detect if the generated text ignores key context from the prompt.
+
+    Extracts proper nouns and key contextual terms from the prompt (e.g., from
+    "Context:" sections) and checks if they appear in the generated text.
+
+    Args:
+        text: Generated text to check
+        prompt: Original prompt text containing context
+
+    Returns:
+        Tuple of (is_context_ignored, missing_context_terms)
+    """
+    if not text or not prompt:
+        return False, []
+
+    # Extract context section if present
+    context_match = re.search(r"Context:\s*(.+?)(?:\n\n|\Z)", prompt, re.DOTALL | re.IGNORECASE)
+    if not context_match:
+        # No explicit context section, so can't check
+        return False, []
+
+    context_text = context_match.group(1)
+
+    # Extract potential proper nouns and key terms from context
+    # Look for capitalized words that aren't common words
+    common_words = {
+        "the",
+        "a",
+        "an",
+        "and",
+        "or",
+        "but",
+        "in",
+        "on",
+        "at",
+        "to",
+        "for",
+        "of",
+        "with",
+        "by",
+        "from",
+        "about",
+        "as",
+        "this",
+        "that",
+        "these",
+        "those",
+        "is",
+        "are",
+        "was",
+        "were",
+        "be",
+        "been",
+        "being",
+        "have",
+        "has",
+        "had",
+        "do",
+        "does",
+        "did",
+        "will",
+        "would",
+        "should",
+        "could",
+        "may",
+        "might",
+        "must",
+        "can",
+        "context",
+        "image",
+        "photo",
+        "picture",
+    }
+
+    min_term_length = 2  # Minimum length for a term to be considered
+
+    # Find capitalized words (potential proper nouns)
+    potential_terms = re.findall(r"\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b", context_text)
+
+    # Filter out common words and keep unique terms
+    key_terms = [
+        term
+        for term in set(potential_terms)
+        if term.lower() not in common_words and len(term) > min_term_length
+    ]
+
+    # Check if these terms appear in the generated text (case-insensitive)
+    missing_terms = [term for term in key_terms if term.lower() not in text.lower()]
+
+    # Only flag as "ignored" if we found key terms and most are missing
+    min_missing_ratio = 0.5  # At least 50% of key terms must be missing
+    is_ignored = len(missing_terms) > 0 and len(missing_terms) >= len(key_terms) * min_missing_ratio
+
+    return is_ignored, missing_terms
+
+
 @dataclass(frozen=True)
 class GenerationQualityAnalysis:
     """Analysis results for generated text quality.
@@ -1338,6 +1438,9 @@ class GenerationQualityAnalysis:
     formatting_issues: list[str]
     has_excessive_bullets: bool
     bullet_count: int
+    # MOD: Added context ignorance detection
+    is_context_ignored: bool
+    missing_context_terms: list[str]
 
     def has_any_issues(self) -> bool:
         """Return True if any quality issues were detected."""
@@ -1347,10 +1450,15 @@ class GenerationQualityAnalysis:
             or self.is_verbose
             or bool(self.formatting_issues)
             or self.has_excessive_bullets
+            or self.is_context_ignored
         )
 
 
-def analyze_generation_text(text: str, generated_tokens: int) -> GenerationQualityAnalysis:
+def analyze_generation_text(
+    text: str,
+    generated_tokens: int,
+    prompt: str | None = None,
+) -> GenerationQualityAnalysis:
     """Analyze generated text for quality issues.
 
     Consolidates all quality detection logic into a single function to avoid
@@ -1359,6 +1467,7 @@ def analyze_generation_text(text: str, generated_tokens: int) -> GenerationQuali
     Args:
         text: Generated text to analyze
         generated_tokens: Number of tokens generated
+        prompt: Optional prompt text for context ignorance detection
 
     Returns:
         GenerationQualityAnalysis with all detected issues
@@ -1369,6 +1478,12 @@ def analyze_generation_text(text: str, generated_tokens: int) -> GenerationQuali
     formatting_issues = _detect_formatting_violations(text)
     has_excessive_bullets, bullet_count = _detect_excessive_bullets(text)
 
+    # MOD: Added context ignorance detection
+    is_context_ignored = False
+    missing_context_terms: list[str] = []
+    if prompt:
+        is_context_ignored, missing_context_terms = _detect_context_ignorance(text, prompt)
+
     return GenerationQualityAnalysis(
         is_repetitive=is_repetitive,
         repeated_token=repeated_token,
@@ -1377,6 +1492,8 @@ def analyze_generation_text(text: str, generated_tokens: int) -> GenerationQuali
         formatting_issues=formatting_issues,
         has_excessive_bullets=has_excessive_bullets,
         bullet_count=bullet_count,
+        is_context_ignored=is_context_ignored,
+        missing_context_terms=missing_context_terms,
     )
 
 
@@ -3155,6 +3272,56 @@ def validate_image_accessible(*, image_path: PathLike) -> None:
         raise OSError(msg) from err
 
 
+# MOD: Added HF cache integrity diagnostic helper
+def _check_hf_cache_integrity(model_identifier: str) -> None:
+    """Check HuggingFace cache integrity for a model and log diagnostics.
+
+    When a model fails to load, this helps distinguish between:
+    - Code bugs (wrong parameters, incompatible model)
+    - Environment bugs (corrupted cache, incomplete download)
+
+    Args:
+        model_identifier: HuggingFace model identifier
+            (e.g., "mlx-community/Qwen2-VL-2B-Instruct-4bit")
+    """
+    min_cache_size_mb = 1  # Less than 1MB is suspicious for any model
+    try:
+        cache_info: HFCacheInfo = scan_cache_dir()
+        # Find the specific repo in cache
+        repo_found = False
+        for repo in cache_info.repos:
+            if model_identifier in repo.repo_id:
+                repo_found = True
+                logger.debug(
+                    "HF Cache Info for %s: size=%s MB, files=%d",
+                    repo.repo_id,
+                    f"{repo.size_on_disk / (1024**2):.1f}",
+                    repo.nb_files,
+                )
+                # Check for missing or corrupt files
+                if repo.nb_files == 0:
+                    logger.warning(
+                        "⚠️  Cache Warning: Model %s has 0 files "
+                        "(incomplete download or corruption)",
+                        model_identifier,
+                    )
+                elif repo.size_on_disk < min_cache_size_mb * (1024**2):
+                    logger.warning(
+                        "⚠️  Cache Warning: Model %s cache is suspiciously small (%s MB)",
+                        model_identifier,
+                        f"{repo.size_on_disk / (1024**2):.1f}",
+                    )
+                break
+
+        if not repo_found:
+            logger.debug(
+                "Model %s not found in HF cache (may need to download)",
+                model_identifier,
+            )
+    except (OSError, HFValidationError) as cache_err:
+        logger.debug("Could not check HF cache integrity: %s", cache_err)
+
+
 def _run_model_generation(
     params: ProcessImageParams,
 ) -> GenerationResult | SupportsGenerationResult:
@@ -3179,8 +3346,13 @@ def _run_model_generation(
         config: Any | None = getattr(model, "config", None)
     except Exception as load_err:
         # Capture any model loading errors (config issues, missing files, etc.)
+        # MOD: Enhanced error handling with cache integrity check
         error_details = f"Model loading failed: {load_err}\n{traceback.format_exc()}"
         logger.exception("Failed to load model %s", params.model_identifier)
+
+        # MOD: HF cache integrity check on load failure
+        _check_hf_cache_integrity(params.model_identifier)
+
         raise ValueError(error_details) from load_err
 
     # Apply model-specific chat template - each model has its own conversation format
@@ -3292,24 +3464,28 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         )
     except TimeoutError as e:
         logger.exception("Timeout during model processing")
+        # MOD: Capture original exception type for error bucketing
         return PerformanceResult(
             model_name=params.model_identifier,
             generation=None,
             success=False,
             error_stage="timeout",
             error_message=str(e),
+            error_type=type(e).__name__,
             generation_time=None,
             model_load_time=None,
             total_time=None,
         )
     except (OSError, ValueError) as e:
         logger.exception("Model processing error")
+        # MOD: Capture original exception type for error bucketing
         return PerformanceResult(
             model_name=params.model_identifier,
             generation=None,
             success=False,
             error_stage="processing",
             error_message=str(e),
+            error_type=type(e).__name__,
             generation_time=None,
             model_load_time=None,
             total_time=None,
@@ -3417,7 +3593,11 @@ def _summary_parts(res: PerformanceResult, model_short: str) -> list[str]:
     return parts
 
 
-def _preview_generation(gen: GenerationResult | SupportsGenerationResult | None) -> None:
+def _preview_generation(
+    gen: GenerationResult | SupportsGenerationResult | None,
+    *,
+    prompt: str | None = None,
+) -> None:
     if not gen:
         return
     text_val = str(getattr(gen, "text", ""))
@@ -3425,9 +3605,9 @@ def _preview_generation(gen: GenerationResult | SupportsGenerationResult | None)
         logger.info("%s", Colors.colored("<empty>", Colors.CYAN))
         return
 
-    # Analyze quality using consolidated utility
+    # MOD: Analyze quality using consolidated utility with optional prompt
     gen_tokens = getattr(gen, "generation_tokens", 0)
-    analysis = analyze_generation_text(text_val, gen_tokens)
+    analysis = analyze_generation_text(text_val, gen_tokens, prompt=prompt)
 
     # Show brief inline warnings for quality issues
     if analysis.is_repetitive and analysis.repeated_token:
@@ -3441,6 +3621,12 @@ def _preview_generation(gen: GenerationResult | SupportsGenerationResult | None)
         logger.warning(Colors.colored(f"⚠️  Verbose ({gen_tokens} tokens)", Colors.YELLOW))
     if analysis.formatting_issues:
         logger.warning(Colors.colored(f"⚠️  {analysis.formatting_issues[0]}", Colors.YELLOW))
+    # MOD: Added context ignorance warning
+    if analysis.is_context_ignored and analysis.missing_context_terms:
+        missing = ", ".join(analysis.missing_context_terms[:3])
+        logger.warning(
+            Colors.colored(f"⚠️  Context ignored (missing: {missing})", Colors.YELLOW),
+        )
 
     width = get_terminal_width(max_width=100)
     for original_line in text_val.splitlines():
@@ -3458,7 +3644,12 @@ def _preview_generation(gen: GenerationResult | SupportsGenerationResult | None)
             logger.info("%s", Colors.colored(wline.lstrip(), Colors.CYAN))
 
 
-def _log_verbose_success_details_mode(res: PerformanceResult, *, detailed: bool) -> None:
+def _log_verbose_success_details_mode(
+    res: PerformanceResult,
+    *,
+    detailed: bool,
+    prompt: str | None = None,
+) -> None:
     """Emit verbose block using either compact or detailed metrics style with visual hierarchy."""
     if not res.generation:
         return
@@ -3469,9 +3660,9 @@ def _log_verbose_success_details_mode(res: PerformanceResult, *, detailed: bool)
     # Generated text with emoji prefix for easy scanning
     gen_text = getattr(res.generation, "text", None) or ""
 
-    # Analyze quality using consolidated utility
+    # MOD: Analyze quality using consolidated utility with optional prompt
     gen_tokens = getattr(res.generation, "generation_tokens", 0)
-    analysis = analyze_generation_text(gen_text, gen_tokens)
+    analysis = analyze_generation_text(gen_text, gen_tokens, prompt=prompt)
 
     logger.info("📝 %s", Colors.colored("Generated Text:", Colors.BOLD, Colors.CYAN))
 
@@ -3497,6 +3688,16 @@ def _log_verbose_success_details_mode(res: PerformanceResult, *, detailed: bool)
     if analysis.formatting_issues:
         for issue in analysis.formatting_issues[:2]:  # Show first 2 issues
             logger.warning(Colors.colored(f"⚠️  Note: {issue}", Colors.YELLOW))
+
+    # MOD: Added context ignorance warning
+    if analysis.is_context_ignored and analysis.missing_context_terms:
+        missing = ", ".join(analysis.missing_context_terms)
+        logger.warning(
+            Colors.colored(
+                f"⚠️  Note: Output ignored key context (missing: {missing})",
+                Colors.YELLOW,
+            ),
+        )
 
     _log_wrapped_label_value("   ", gen_text, color=Colors.CYAN)
 
@@ -3705,6 +3906,7 @@ def print_model_result(
     detailed_metrics: bool = False,
     run_index: int | None = None,
     total_runs: int | None = None,
+    prompt: str | None = None,  # MOD: Added for context ignorance detection
 ) -> None:
     """Print a concise summary + optional verbose block for a model result."""
     model_short = result.model_name.split("/")[-1]
@@ -3717,7 +3919,7 @@ def print_model_result(
     for line in textwrap.wrap(summary, width=width, break_long_words=False, break_on_hyphens=False):
         log_fn(Colors.colored(line, color))
     if result.success and not verbose:  # quick exit with preview only
-        _preview_generation(result.generation)
+        _preview_generation(result.generation, prompt=prompt)
         return
     header_label = "✓ SUCCESS" if result.success else "✗ FAILED"
     header_color = Colors.GREEN if result.success else Colors.RED
@@ -3735,13 +3937,85 @@ def print_model_result(
             _log_wrapped_error("Output:", str(result.captured_output_on_fail))
         return
     if result.generation and verbose:
-        _log_verbose_success_details_mode(result, detailed=detailed_metrics)
+        _log_verbose_success_details_mode(result, detailed=detailed_metrics, prompt=prompt)
 
 
 def print_cli_separator() -> None:
     """Print a visually distinct separator line using unicode box-drawing characters."""
     width = get_terminal_width(max_width=100)
     log_rule(width, char="─", color=Colors.BLUE, bold=False)
+
+
+# MOD: Added full environment dump to log file for reproducibility
+def _dump_environment_to_log(log_file_path: Path) -> None:
+    """Dump complete Python environment to log file for debugging/reproducibility.
+
+    Captures output from pip freeze (and conda list if in conda environment)
+    to provide complete package manifest for issue reproduction.
+
+    Args:
+        log_file_path: Path to the log file where environment info will be appended
+    """
+    try:
+        # Detect if we're in a conda environment
+        conda_env = os.environ.get("CONDA_DEFAULT_ENV")
+        is_conda = conda_env is not None
+
+        with log_file_path.open("a", encoding="utf-8") as log_f:
+            log_f.write("\n" + "=" * 80 + "\n")
+            log_f.write("FULL ENVIRONMENT DUMP (for reproducibility)\n")
+            log_f.write("=" * 80 + "\n\n")
+
+            # Try pip freeze first (works in both conda and venv)
+            try:
+                # Use sys.executable to ensure we're using the same Python interpreter
+                pip_result = subprocess.run(  # noqa: S603 - trusted command with controlled args
+                    [sys.executable, "-m", "pip", "freeze"],
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
+                    check=False,
+                )
+                if pip_result.returncode == 0:
+                    log_f.write("--- pip freeze ---\n")
+                    log_f.write(pip_result.stdout)
+                    log_f.write("\n")
+                else:
+                    log_f.write(f"pip freeze failed: {pip_result.stderr}\n\n")
+            except (subprocess.SubprocessError, FileNotFoundError) as pip_err:
+                log_f.write(f"Could not run pip freeze: {pip_err}\n\n")
+
+            # If in conda, also capture conda list
+            if is_conda:
+                try:
+                    # Use shutil.which to find conda executable safely
+                    conda_path = shutil.which("conda")
+                    if conda_path:
+                        conda_result = subprocess.run(  # noqa: S603 - trusted command
+                            [conda_path, "list"],
+                            capture_output=True,
+                            text=True,
+                            timeout=30,
+                            check=False,
+                        )
+                        if conda_result.returncode == 0:
+                            log_f.write(f"--- conda list (env: {conda_env}) ---\n")
+                            log_f.write(conda_result.stdout)
+                            log_f.write("\n")
+                        else:
+                            log_f.write(f"conda list failed: {conda_result.stderr}\n\n")
+                    else:
+                        log_f.write("conda command not found in PATH\n\n")
+                except (subprocess.SubprocessError, FileNotFoundError) as conda_err:
+                    log_f.write(f"Could not run conda list: {conda_err}\n\n")
+
+            log_f.write("=" * 80 + "\n")
+            log_f.write(f"Environment dump completed at {local_now_str()}\n")
+            log_f.write("=" * 80 + "\n\n")
+
+        logger.debug("Full environment dump written to log file")
+    except (OSError, ValueError) as dump_err:
+        logger.debug("Could not write environment dump: %s", dump_err)
 
 
 def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
@@ -3813,6 +4087,9 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     library_versions: LibraryVersionDict = get_library_versions()
     if args.verbose:
         print_version_info(library_versions)
+
+    # MOD: Dump full environment to log file for reproducibility
+    _dump_environment_to_log(log_file)
 
     if args.trust_remote_code:
         print_cli_separator()
@@ -4147,15 +4424,127 @@ def process_models(
         result: PerformanceResult = process_image_with_model(params)
         results.append(result)
 
-        # Structured output for this run
+        # MOD: Structured output for this run with prompt for context detection
         print_model_result(
             result,
             verbose=args.verbose,
             detailed_metrics=getattr(args, "detailed_metrics", False),
             run_index=idx,
             total_runs=len(model_identifiers),
+            prompt=prompt,
         )
     return results
+
+
+# MOD: Added error bucketing diagnostic helper
+def _bucket_failures_by_error(
+    results: list[PerformanceResult],
+) -> dict[str, list[str]]:
+    """Group failed models by their root cause exception type and message pattern.
+
+    This transforms a flat list of failures into categorized buckets, making it
+    easier to identify systematic issues (e.g., all models failing with the same
+    missing parameter error).
+
+    Args:
+        results: List of all PerformanceResult objects
+
+    Returns:
+        Dictionary mapping error signature to list of failed model names.
+        Format: {"TypeError: unexpected keyword 'temperature'": ["model1", "model2"], ...}
+    """
+    buckets: dict[str, list[str]] = {}
+    failed_results = [r for r in results if not r.success]
+
+    min_wrapped_parts = 3  # Minimum parts to identify wrapped exception
+    max_error_msg_len = 120  # Truncate long error messages for readability
+
+    for res in failed_results:
+        # Build error signature from error_type and core message
+        error_type = res.error_type or "UnknownError"
+        error_msg = res.error_message or "No error message"
+
+        # Extract the core exception message (first line, truncated)
+        # Skip traceback noise and focus on the actual error
+        core_msg = error_msg.split("\n")[0].strip()
+
+        # Try to extract the root cause from wrapped exceptions
+        # Look for patterns like "ValueError: Model loading failed: ImportError: ..."
+        if ": " in core_msg:
+            parts = core_msg.split(": ")
+            # If this looks like a wrapped exception, extract the inner one
+            if len(parts) >= min_wrapped_parts and parts[1].startswith("Model"):
+                # Example pattern: ValueError, Model loading failed, ImportError, cannot import
+                # We want to extract: ImportError: cannot import
+                inner_parts = parts[2:]
+                core_msg = ": ".join(inner_parts)
+                # Update error_type to the actual root cause
+                if inner_parts and inner_parts[0] in {
+                    "TypeError",
+                    "ImportError",
+                    "ValueError",
+                    "AttributeError",
+                    "KeyError",
+                    "OSError",
+                    "RuntimeError",
+                }:
+                    error_type = inner_parts[0]
+
+        # Truncate very long messages but keep key info
+        if len(core_msg) > max_error_msg_len:
+            core_msg = core_msg[: max_error_msg_len - 3] + "..."
+
+        # Create signature
+        signature = f"{error_type}: {core_msg}"
+
+        # Add model to this bucket
+        if signature not in buckets:
+            buckets[signature] = []
+        buckets[signature].append(res.model_name)
+
+    return buckets
+
+
+def _format_failure_summary(buckets: dict[str, list[str]]) -> str:
+    """Format error buckets into a human-readable failure summary.
+
+    Args:
+        buckets: Dictionary from _bucket_failures_by_error
+
+    Returns:
+        Formatted multi-line string for logging/reporting
+    """
+    if not buckets:
+        return ""
+
+    lines = [
+        "",
+        "=" * 80,
+        "FAILURE SUMMARY - Models Grouped by Root Cause",
+        "=" * 80,
+        "",
+    ]
+
+    # Sort buckets by number of affected models (most common errors first)
+    sorted_buckets = sorted(
+        buckets.items(),
+        key=lambda item: len(item[1]),
+        reverse=True,
+    )
+
+    for signature, models in sorted_buckets:
+        lines.append(f"{signature}")
+        lines.append(f"  Affected models ({len(models)}):")
+        for model in models:
+            # Shorten model names for readability
+            short_name = model.split("/")[-1] if "/" in model else model
+            lines.append(f"    • {short_name}")
+        lines.append("")  # Blank line between buckets
+
+    lines.append("=" * 80)
+    lines.append("")
+
+    return "\n".join(lines)
 
 
 def finalize_execution(
@@ -4171,6 +4560,15 @@ def finalize_execution(
     if results:
         print_cli_section("Performance Summary")
         print_model_stats(results)
+
+        # MOD: Added failure bucketing summary for better diagnostics
+        # Group failures by root cause before showing detailed issues
+        failed_count = sum(1 for r in results if not r.success)
+        if failed_count > 0:
+            buckets = _bucket_failures_by_error(results)
+            failure_summary = _format_failure_summary(buckets)
+            if failure_summary:
+                logger.info(failure_summary)
 
         # Add model issues summary
         summary = analyze_model_issues(results)

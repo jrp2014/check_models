@@ -27,11 +27,21 @@ fi
 # All paths are relative to the `src` directory
 cd ..
 
-echo "=== Ruff Format Check ==="
-$PYTHON -m ruff format --check .
+echo "=== Ruff Format ==="
+# In CI mode, only check; in local mode, fix automatically
+if [[ "${CI:-false}" == "true" ]]; then
+    $PYTHON -m ruff format --check .
+else
+    $PYTHON -m ruff format .
+fi
 
 echo "=== Ruff Lint ==="
-$PYTHON -m ruff check .
+# In CI mode, only check; in local mode, fix automatically
+if [[ "${CI:-false}" == "true" ]]; then
+    $PYTHON -m ruff check .
+else
+    $PYTHON -m ruff check --fix .
+fi
 
 echo "=== MyPy Type Check ==="
 echo "⚠️  Skipped (external MLX stub syntax error - not fixable from this project)"
