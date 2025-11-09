@@ -181,6 +181,33 @@ Torch support:
 - Compact vs detailed metrics (verbose mode): By default, verbose output shows a single aligned line beginning with `Metrics:`. Enable classic multi‑line breakdown with `--detailed-metrics`.
 - Token triple legend: `tokens(total/prompt/gen)=T/P/G` corresponds to total tokens = prompt tokens + generated tokens.
 
+## Environment Variable Overrides
+
+Several behaviors can be customized via environment variables (useful for CI/automation):
+
+| Variable | Purpose | Default | Example |
+|----------|---------|---------|---------|
+| `MLX_VLM_WIDTH` | Force CLI output width (columns) | Auto-detect terminal | `MLX_VLM_WIDTH=120` |
+| `NO_COLOR` | Disable ANSI colors in output | Not set (colors enabled) | `NO_COLOR=1` |
+| `FORCE_COLOR` | Force ANSI colors even in non-TTY | Not set | `FORCE_COLOR=1` |
+| `TRANSFORMERS_NO_TF` | Block TensorFlow loading | `1` (blocked) | `TRANSFORMERS_NO_TF=0` to allow |
+| `MLX_VLM_ALLOW_TF` | Override TensorFlow blocking | Not set (blocked) | `MLX_VLM_ALLOW_TF=1` to allow |
+| `TOKENIZERS_PARALLELISM` | Disable tokenizer parallelism warnings | `false` | `TOKENIZERS_PARALLELISM=true` |
+| `MLX_METAL_JIT` | Metal kernel compilation mode | `OFF` (pre-built) | `MLX_METAL_JIT=ON` for runtime JIT |
+
+**Examples**:
+
+```bash
+# Force wider output for CI logs
+MLX_VLM_WIDTH=120 python check_models.py --folder ~/Pictures
+
+# Disable colors for log file capture
+NO_COLOR=1 python check_models.py > output.log 2>&1
+
+# Allow TensorFlow for specific model (may crash on Apple Silicon)
+MLX_VLM_ALLOW_TF=1 python check_models.py --models model-needing-tf
+```
+
 ## Git Hygiene and Caches
 
 This repo excludes ephemeral caches and local environments via `.gitignore`. Common exclusions include `__pycache__/`, `.pytest_cache/`, `.ruff_cache/`, `.mypy_cache/`, `.venv/`, and editor folders like `.vscode/`. Do not commit large model caches (e.g., Hugging Face) to the repository.

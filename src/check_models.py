@@ -68,9 +68,11 @@ if TYPE_CHECKING:
 
 # Public API (PEP 8 / PEP 561 best practice)
 __all__ = [
+    "GenerationQualityAnalysis",
     "PerformanceResult",
     "ProcessImageParams",
     "ResultSet",
+    "analyze_generation_text",
     "exit_with_cli_error",
     "extract_image_metadata",
     "find_most_recent_file",
@@ -1203,6 +1205,63 @@ def _detect_markdown_formatting(text: str) -> bool:
     return any(re.search(pattern, text, re.MULTILINE) for pattern in markdown_indicators)
 
 
+@dataclass(frozen=True)
+class GenerationQualityAnalysis:
+    """Analysis results for generated text quality.
+
+    Consolidates all quality checks (repetition, hallucination, verbosity,
+    formatting) into a single structured result to avoid duplicate analysis.
+    """
+
+    is_repetitive: bool
+    repeated_token: str | None
+    hallucination_issues: list[str]
+    is_verbose: bool
+    formatting_issues: list[str]
+    has_excessive_bullets: bool
+    bullet_count: int
+
+    def has_any_issues(self) -> bool:
+        """Return True if any quality issues were detected."""
+        return (
+            self.is_repetitive
+            or bool(self.hallucination_issues)
+            or self.is_verbose
+            or bool(self.formatting_issues)
+            or self.has_excessive_bullets
+        )
+
+
+def analyze_generation_text(text: str, generated_tokens: int) -> GenerationQualityAnalysis:
+    """Analyze generated text for quality issues.
+
+    Consolidates all quality detection logic into a single function to avoid
+    duplication between preview and verbose output modes.
+
+    Args:
+        text: Generated text to analyze
+        generated_tokens: Number of tokens generated
+
+    Returns:
+        GenerationQualityAnalysis with all detected issues
+    """
+    is_repetitive, repeated_token = _detect_repetitive_output(text)
+    hallucination_issues = _detect_hallucination_patterns(text)
+    is_verbose = _detect_excessive_verbosity(text, generated_tokens)
+    formatting_issues = _detect_formatting_violations(text)
+    has_excessive_bullets, bullet_count = _detect_excessive_bullets(text)
+
+    return GenerationQualityAnalysis(
+        is_repetitive=is_repetitive,
+        repeated_token=repeated_token,
+        hallucination_issues=hallucination_issues,
+        is_verbose=is_verbose,
+        formatting_issues=formatting_issues,
+        has_excessive_bullets=has_excessive_bullets,
+        bullet_count=bullet_count,
+    )
+
+
 def local_now_str(fmt: str = "%Y-%m-%d %H:%M:%S %Z") -> str:
     """Return localized current time as a formatted string.
 
@@ -2238,7 +2297,11 @@ def analyze_model_issues(results: list[PerformanceResult]) -> dict[str, Any]:
 
 
 def compute_performance_statistics(results: list[PerformanceResult]) -> dict[str, Any]:
-    """Compute performance statistics (min, max, avg) for successful runs."""
+    """Compute performance statistics (min, max, avg) for successful runs.
+
+    Uses single-pass aggregation to build stats for all fields at once,
+    reducing overhead from repeated filtering and type conversions.
+    """
     stats: dict[str, Any] = {}
     successful_results = [r for r in results if r.success and r.generation]
     if not successful_results:
@@ -2251,23 +2314,29 @@ def compute_performance_statistics(results: list[PerformanceResult]) -> dict[str
         "generation_time",
         "model_load_time",
     ]
-    for field in fields_to_stat:
-        values = [
-            _get_field_value(res, field)
-            for res in successful_results
-            if _get_field_value(res, field) is not None
-        ]
-        if values:
-            numeric_values = [v for v in values if is_numeric_value(v)]
-            if numeric_values:
-                float_values = [float(v) for v in numeric_values if v is not None]
-                if not float_values:
+
+    # Single-pass aggregation: build value lists for all fields at once
+    field_values: dict[str, list[float]] = {field: [] for field in fields_to_stat}
+
+    for res in successful_results:
+        for field in fields_to_stat:
+            value = _get_field_value(res, field)
+            if value is not None and is_numeric_value(value):
+                # Convert to float once
+                try:
+                    field_values[field].append(float(value))
+                except (ValueError, TypeError):
                     continue
-                stats[field] = {
-                    "min": min(float_values),
-                    "max": max(float_values),
-                    "avg": sum(float_values) / len(float_values),
-                }
+
+    # Compute min/max/avg for fields with data
+    for field, values in field_values.items():
+        if values:
+            stats[field] = {
+                "min": min(values),
+                "max": max(values),
+                "avg": sum(values) / len(values),
+            }
+
     return stats
 
 
@@ -3220,21 +3289,22 @@ def _preview_generation(gen: GenerationResult | SupportsGenerationResult | None)
         logger.info("%s", Colors.colored("<empty>", Colors.CYAN))
         return
 
-    # Check for quality issues (non-verbose mode gets brief inline warnings)
-    is_repetitive, repeated_token = _detect_repetitive_output(text_val)
-    hallucination_issues = _detect_hallucination_patterns(text_val)
+    # Analyze quality using consolidated utility
     gen_tokens = getattr(gen, "generation_tokens", 0)
-    is_verbose = _detect_excessive_verbosity(text_val, gen_tokens)
-    format_issues = _detect_formatting_violations(text_val)
+    analysis = analyze_generation_text(text_val, gen_tokens)
 
-    if is_repetitive and repeated_token:
-        logger.warning(Colors.colored(f"⚠️  Repetitive: '{repeated_token}'", Colors.YELLOW))
-    if hallucination_issues:
-        logger.warning(Colors.colored(f"⚠️  {', '.join(hallucination_issues[:2])}", Colors.YELLOW))
-    if is_verbose:
+    # Show brief inline warnings for quality issues
+    if analysis.is_repetitive and analysis.repeated_token:
+        logger.warning(
+            Colors.colored(f"⚠️  Repetitive: '{analysis.repeated_token}'", Colors.YELLOW),
+        )
+    if analysis.hallucination_issues:
+        issues_preview = ", ".join(analysis.hallucination_issues[:2])
+        logger.warning(Colors.colored(f"⚠️  {issues_preview}", Colors.YELLOW))
+    if analysis.is_verbose:
         logger.warning(Colors.colored(f"⚠️  Verbose ({gen_tokens} tokens)", Colors.YELLOW))
-    if format_issues:
-        logger.warning(Colors.colored(f"⚠️  {format_issues[0]}", Colors.YELLOW))
+    if analysis.formatting_issues:
+        logger.warning(Colors.colored(f"⚠️  {analysis.formatting_issues[0]}", Colors.YELLOW))
 
     width = get_terminal_width(max_width=100)
     for original_line in text_val.splitlines():
@@ -3263,27 +3333,24 @@ def _log_verbose_success_details_mode(res: PerformanceResult, *, detailed: bool)
     # Generated text with emoji prefix for easy scanning
     gen_text = getattr(res.generation, "text", None) or ""
 
-    # Check for quality issues in generated text
-    is_repetitive, repeated_token = _detect_repetitive_output(gen_text)
-    hallucination_issues = _detect_hallucination_patterns(gen_text)
+    # Analyze quality using consolidated utility
     gen_tokens = getattr(res.generation, "generation_tokens", 0)
-    is_verbose = _detect_excessive_verbosity(gen_text, gen_tokens)
-    format_issues = _detect_formatting_violations(gen_text)
+    analysis = analyze_generation_text(gen_text, gen_tokens)
 
     logger.info("📝 %s", Colors.colored("Generated Text:", Colors.BOLD, Colors.CYAN))
 
-    # Warn about repetitive output
-    if is_repetitive and repeated_token:
-        warning_msg = f"⚠️  WARNING: Output appears to be garbage (repetitive: '{repeated_token}')"
+    # Warn about quality issues
+    if analysis.is_repetitive and analysis.repeated_token:
+        warning_msg = (
+            f"⚠️  WARNING: Output appears to be garbage (repetitive: '{analysis.repeated_token}')"
+        )
         logger.warning(Colors.colored(warning_msg, Colors.YELLOW, Colors.BOLD))
 
-    # Warn about hallucination patterns
-    if hallucination_issues:
-        for issue in hallucination_issues:
+    if analysis.hallucination_issues:
+        for issue in analysis.hallucination_issues:
             logger.warning(Colors.colored(f"⚠️  Note: {issue}", Colors.YELLOW))
 
-    # Warn about excessive verbosity
-    if is_verbose:
+    if analysis.is_verbose:
         logger.warning(
             Colors.colored(
                 f"⚠️  Note: Output is excessively verbose ({gen_tokens} tokens)",
@@ -3291,9 +3358,8 @@ def _log_verbose_success_details_mode(res: PerformanceResult, *, detailed: bool)
             ),
         )
 
-    # Warn about formatting issues
-    if format_issues:
-        for issue in format_issues[:2]:  # Show first 2 issues
+    if analysis.formatting_issues:
+        for issue in analysis.formatting_issues[:2]:  # Show first 2 issues
             logger.warning(Colors.colored(f"⚠️  Note: {issue}", Colors.YELLOW))
 
     _log_wrapped_label_value("   ", gen_text, color=Colors.CYAN)
