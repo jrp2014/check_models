@@ -2273,25 +2273,25 @@ def analyze_model_issues(results: list[PerformanceResult]) -> dict[str, Any]:
 
         if res.generation and hasattr(res.generation, "text"):
             text = getattr(res.generation, "text", "") or ""
-            is_repetitive, token = _detect_repetitive_output(text)
-            if is_repetitive:
-                summary["repetitive_models"].append((res.model_name, token))
-
-            hallucinations = _detect_hallucination_patterns(text)
-            if hallucinations:
-                summary["hallucination_models"].append((res.model_name, hallucinations))
-
             gen_tokens = getattr(res.generation, "generation_tokens", 0)
-            if _detect_excessive_verbosity(text, gen_tokens):
+
+            # Use consolidated quality analysis utility
+            analysis = analyze_generation_text(text, gen_tokens)
+
+            if analysis.is_repetitive:
+                summary["repetitive_models"].append((res.model_name, analysis.repeated_token))
+            if analysis.hallucination_issues:
+                summary["hallucination_models"].append(
+                    (res.model_name, analysis.hallucination_issues),
+                )
+            if analysis.is_verbose:
                 summary["verbose_models"].append((res.model_name, gen_tokens))
-
-            formatting_issues = _detect_formatting_violations(text)
-            if formatting_issues:
-                summary["formatting_issues"].append((res.model_name, formatting_issues))
-
-            has_bullets, count = _detect_excessive_bullets(text)
-            if has_bullets:
-                summary["excessive_bullets"].append((res.model_name, count))
+            if analysis.formatting_issues:
+                summary["formatting_issues"].append(
+                    (res.model_name, analysis.formatting_issues),
+                )
+            if analysis.has_excessive_bullets:
+                summary["excessive_bullets"].append((res.model_name, analysis.bullet_count))
 
     return summary
 

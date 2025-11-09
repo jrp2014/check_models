@@ -6,7 +6,7 @@
 			"type": "shell",
 			"command": "bash",
 			"args": [
-				"src/tools/run_quality.sh"
+				"src/tools/run_quality_checks.sh"
 			],
 			"options": {
 				"env": {
