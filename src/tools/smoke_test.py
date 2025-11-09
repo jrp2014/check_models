@@ -197,14 +197,18 @@ def run_generation(
             cast("list[str]", ctx.test_inputs["image"]) if vision_language else None
         )
 
-        output = generate(
-            model=ctx.model,
-            processor=ctx.processor,
-            prompt=cast("Any", formatted_prompt),
-            image=image_arg,
-            verbose=True,
+        # Build kwargs conditionally to avoid passing None for image parameter
+        generate_kwargs: dict[str, Any] = {
+            "model": ctx.model,
+            "processor": ctx.processor,
+            "prompt": cast("Any", formatted_prompt),
+            "verbose": True,
             **ctx.test_inputs["kwargs"],
-        )
+        }
+        if image_arg is not None:
+            generate_kwargs["image"] = image_arg
+
+        output = generate(**generate_kwargs)
 
         # Skip emptiness checks for models known to emit empty outputs for a mode
         skip_check = (vision_language and "deepseek-vl2-tiny" in ctx.model_path) or (
