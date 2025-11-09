@@ -16,7 +16,7 @@
     "**/typings/**"
   ],
   "python.analysis.useLibraryCodeForTypes": true,
-  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.typeCheckingMode": "standard",
   "python.analysis.diagnosticSeverityOverrides": {
     "reportUnknownVariableType": "none",
     "reportMissingImports": "none",

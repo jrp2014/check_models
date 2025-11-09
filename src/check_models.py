@@ -125,14 +125,66 @@ ERROR_MLX_VLM_MISSING: Final[str] = (
 )
 
 
+# =============================================================================
+# CONFIGURATION DATACLASSES - Centralized thresholds and constants
+# =============================================================================
+
+
+@dataclass(frozen=True)
+class FormattingThresholds:
+    """Centralized thresholds for number/memory/token formatting.
+
+    Consolidates magic numbers used throughout formatting functions to
+    improve maintainability and make threshold tuning easier.
+    """
+
+    # Number formatting thresholds
+    large_number: float = 100.0  # Format as integer with commas
+    medium_number: float = 10.0  # One decimal place for TPS
+    thousand_separator: int = 1_000  # Add comma separators
+
+    # Memory formatting thresholds
+    memory_gb_integer: float = 10.0  # Show GB as integer (no decimals)
+
+    # Time formatting thresholds
+    hour_threshold_seconds: float = 3600.0  # Show HH:MM:SS format
+
+
+@dataclass(frozen=True)
+class QualityThresholds:
+    """Centralized thresholds for quality analysis detection.
+
+    Consolidates detection thresholds to make quality check tuning
+    more transparent and maintainable.
+    """
+
+    # Repetition detection
+    repetition_ratio: float = 0.8  # 80% of tokens must be same to flag
+    min_text_length: int = 10  # Minimum text length to check
+    min_token_count: int = 5  # Minimum tokens to analyze
+
+    # Verbosity detection
+    max_verbosity_tokens: int = 300  # Substantial length threshold
+    min_meta_patterns: int = 2  # Minimum meta-commentary patterns
+    min_section_headers: int = 3  # Minimum section headers
+
+    # Bullet point detection
+    max_bullets: int = 15  # Maximum allowed bullet points
+
+
+# Instantiate singletons for runtime use
+FORMATTING = FormattingThresholds()
+QUALITY = QualityThresholds()
+
+
 MIN_SEPARATOR_CHARS: Final[int] = 50
 DEFAULT_DECIMAL_PLACES: Final[int] = 2
-LARGE_NUMBER_THRESHOLD: Final[float] = 100.0
-MEDIUM_NUMBER_THRESHOLD: Final[int] = 10
-THOUSAND_THRESHOLD: Final[int] = 1000
-MEMORY_GB_INTEGER_THRESHOLD: Final[float] = 10.0  # >= this many GB show as integer (no decimals)
+# DEPRECATED - Use FORMATTING constants instead (kept for backward compatibility)
+LARGE_NUMBER_THRESHOLD: Final[float] = FORMATTING.large_number
+MEDIUM_NUMBER_THRESHOLD: Final[float] = FORMATTING.medium_number
+THOUSAND_THRESHOLD: Final[int] = FORMATTING.thousand_separator
+MEMORY_GB_INTEGER_THRESHOLD: Final[float] = FORMATTING.memory_gb_integer
 MARKDOWN_HARD_BREAK_SPACES: Final[int] = 2  # Preserve exactly two trailing spaces for hard breaks
-HOUR_THRESHOLD_SECONDS: Final[int] = 3600  # Threshold for displaying HH:MM:SS runtime
 IMAGE_OPEN_TIMEOUT: Final[float] = 5.0  # Timeout for opening/verifying image files
 GENERATION_WRAP_WIDTH: Final[int] = 80  # Console output wrapping width for generated text
 SUPPORTED_IMAGE_EXTENSIONS: Final[frozenset[str]] = frozenset({".jpg", ".jpeg", ".png", ".webp"})
@@ -859,10 +911,90 @@ def format_field_label(field_name: str) -> str:
     return field_name.replace("_", " ").title()
 
 
+# =============================================================================
+# TEXT ESCAPING - Unified strategy for HTML/Markdown escaping
+# =============================================================================
+
+
+@runtime_checkable
+class EscapeStrategy(Protocol):
+    """Protocol for text escaping strategies.
+
+    Enables unified handling of different output format escaping needs
+    (HTML, Markdown) with consistent interface.
+    """
+
+    def escape(self, text: str) -> str:
+        """Escape text according to strategy rules."""
+        ...
+
+
+class HTMLSelectiveEscaper:
+    """Selective HTML escaping preserving GitHub-safe tags.
+
+    Escapes potentially unsafe HTML while preserving common formatting
+    tags that GitHub Markdown recognizes (br, b, strong, i, em, code).
+    Does NOT preserve 's' tag to avoid interpreting <s> tokens from
+    model output as strikethrough.
+    """
+
+    allowed_tags: frozenset[str] = frozenset({"br", "b", "strong", "i", "em", "code"})
+    tag_pattern: re.Pattern[str] = re.compile(r"</?[A-Za-z][A-Za-z0-9:-]*(?:\s+[^<>]*?)?>")
+
+    def escape(self, text: str) -> str:
+        """Escape HTML tags except allowed safe tags."""
+
+        def _escape_html_like(m: re.Match[str]) -> str:
+            token = m.group(0)
+            inner = token[1:-1].strip()
+            if not inner:
+                return token.replace("<", "&lt;").replace(">", "&gt;")
+            core = inner.lstrip("/").split(None, 1)[0].rstrip("/").lower()
+            if core in self.allowed_tags:
+                return token  # Keep recognized safe tag
+            return token.replace("<", "&lt;").replace(">", "&gt;")
+
+        return self.tag_pattern.sub(_escape_html_like, text)
+
+
+class MarkdownPipeEscaper:
+    """Markdown escaping for table pipe characters and formatting.
+
+    Handles pipe character escaping and converts newlines to <br> tags
+    to prevent breaking Markdown table formatting.
+    """
+
+    def escape(self, text: str) -> str:
+        """Escape text for safe inclusion in Markdown tables.
+
+        Converts newlines to <br> tags and wraps bare URLs while
+        escaping pipe characters to prevent table formatting issues.
+        """
+        # First, convert newlines to HTML <br> tags to preserve line structure
+        # Handle different newline formats consistently
+        result = text.replace("\r\n", "<br>").replace("\r", "<br>").replace("\n", "<br>")
+
+        # Clean up multiple consecutive <br> tags and normalize spacing
+        result = re.sub(r"(<br>\s*){2,}", "<br><br>", result)  # Max 2 consecutive breaks
+        result = re.sub(r"\s+", " ", result).strip()  # Normalize other whitespace
+
+        # Wrap bare URLs in angle brackets (MD034 compliance)
+        result = _wrap_bare_urls(result)
+
+        # Finally, escape pipe characters for table safety
+        return result.replace("|", "\\|")
+
+
+# Instantiate default escapers for runtime use
+HTML_ESCAPER = HTMLSelectiveEscaper()
+MARKDOWN_ESCAPER = MarkdownPipeEscaper()
+
+
 # Allowlist of inline HTML tags we preserve in Markdown output
 # Keep <br> for line breaks; do NOT include 's' to avoid interpreting <s> tokens
 # from model output as strikethrough.
-allowed_inline_tags = {"br", "b", "strong", "i", "em", "code"}
+# DEPRECATED: Use HTML_ESCAPER.allowed_tags instead
+allowed_inline_tags = HTML_ESCAPER.allowed_tags
 
 
 def _escape_html_tags_selective(text: str) -> str:
@@ -870,20 +1002,10 @@ def _escape_html_tags_selective(text: str) -> str:
 
     Helper for markdown escaping functions. Neutralizes potentially unsafe HTML
     while preserving common formatting tags that GitHub recognizes.
+
+    DEPRECATED: Use HTML_ESCAPER.escape() instead for new code.
     """
-    tag_pattern = re.compile(r"</?[A-Za-z][A-Za-z0-9:-]*(?:\s+[^<>]*?)?>")
-
-    def _escape_html_like(m: re.Match[str]) -> str:
-        token = m.group(0)
-        inner = token[1:-1].strip()
-        if not inner:
-            return token.replace("<", "&lt;").replace(">", "&gt;")
-        core = inner.lstrip("/").split(None, 1)[0].rstrip("/").lower()
-        if core in allowed_inline_tags:
-            return token  # Keep recognized safe tag
-        return token.replace("<", "&lt;").replace(">", "&gt;")
-
-    return tag_pattern.sub(_escape_html_like, text)
+    return HTML_ESCAPER.escape(text)
 
 
 def _format_memory_value_gb(num: float) -> str:
@@ -957,17 +1079,18 @@ def format_overall_runtime(total_seconds: float) -> str:
         '10:02:05 (36125.78s)'
 
     """
-    if total_seconds >= HOUR_THRESHOLD_SECONDS:
+    if total_seconds >= FORMATTING.hour_threshold_seconds:
         return f"{_format_hms(total_seconds)} ({total_seconds:.2f}s)"
     return f"{total_seconds:.2f}s"
 
 
-def _detect_repetitive_output(text: str, threshold: float = 0.8) -> tuple[bool, str | None]:
+def _detect_repetitive_output(text: str, threshold: float | None = None) -> tuple[bool, str | None]:
     """Detect if generated text is highly repetitive (like '<s>' repeated 500 times).
 
     Args:
         text: Generated text to check
-        threshold: Fraction of text that must be repetitive to flag (default 0.8)
+        threshold: Fraction of text that must be repetitive to flag
+            (default from QUALITY.repetition_ratio)
 
     Returns:
         Tuple of (is_repetitive, repeated_pattern)
@@ -981,15 +1104,15 @@ def _detect_repetitive_output(text: str, threshold: float = 0.8) -> tuple[bool, 
         >>> _detect_repetitive_output("This is normal varied text")
         (False, None)
     """
-    min_text_len = 10
-    min_tokens = 5
+    if threshold is None:
+        threshold = QUALITY.repetition_ratio
 
-    if not text or len(text) < min_text_len:
+    if not text or len(text) < QUALITY.min_text_length:
         return False, None
 
     # Split into tokens (words/symbols)
     tokens = text.split()
-    if len(tokens) < min_tokens:
+    if len(tokens) < QUALITY.min_token_count:
         return False, None
 
     # Count token frequency
@@ -1084,11 +1207,7 @@ def _detect_excessive_verbosity(text: str, generated_tokens: int) -> bool:
     Returns:
         True if output appears excessively verbose
     """
-    verbose_threshold = 300
-    min_meta_count = 2
-    min_section_headers = 3
-
-    if generated_tokens < verbose_threshold:
+    if generated_tokens < QUALITY.max_verbosity_tokens:
         return False
 
     text_lower = text.lower()
@@ -1111,7 +1230,7 @@ def _detect_excessive_verbosity(text: str, generated_tokens: int) -> bool:
     section_headers = text.count("###") + text.count("## ")
 
     # Verbose if has meta-commentary + sections or just too many sections
-    return meta_count >= min_meta_count or section_headers >= min_section_headers
+    return meta_count >= QUALITY.min_meta_patterns or section_headers >= QUALITY.min_section_headers
 
 
 def _detect_formatting_violations(text: str) -> list[str]:
@@ -1165,8 +1284,6 @@ def _detect_excessive_bullets(text: str) -> tuple[bool, int]:
     Returns:
         Tuple of (has_excessive_bullets, bullet_count)
     """
-    max_bullets = 15
-
     if not text:
         return False, 0
 
@@ -1174,7 +1291,7 @@ def _detect_excessive_bullets(text: str) -> tuple[bool, int]:
     bullet_lines = [line for line in text.split("\n") if line.strip().startswith(bullet_prefixes)]
     bullet_count = len(bullet_lines)
 
-    return bullet_count > max_bullets, bullet_count
+    return bullet_count > QUALITY.max_bullets, bullet_count
 
 
 def _detect_markdown_formatting(text: str) -> bool:
@@ -2819,8 +2936,15 @@ def normalize_markdown_trailing_spaces(md_text: str) -> str:
     return "\n".join(out_lines)
 
 
+@lru_cache(maxsize=1)
 def get_system_info() -> tuple[str, str | None]:
-    """Get system architecture and GPU information."""
+    """Get system architecture and GPU information.
+
+    Cached since system info doesn't change during execution.
+
+    Returns:
+        Tuple of (architecture_string, optional_gpu_info)
+    """
     arch: str = platform.machine()
     gpu_info: str | None = None
     try:
