@@ -360,6 +360,7 @@ _SCRIPT_DIR = Path(__file__).parent
 DEFAULT_HTML_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.html"
 DEFAULT_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.md"
 DEFAULT_LOG_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "check_models.log"
+DEFAULT_BASELINE_FILE: Final[Path] = _SCRIPT_DIR / "output" / "baseline.txt"
 DEFAULT_TEMPERATURE: Final[float] = 0.1
 DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
 MAX_REASONABLE_TEMPERATURE: Final[float] = 2.0  # Warn if temperature exceeds this
@@ -413,6 +414,8 @@ class PerformanceResult:
     total_time: float | None = None  # Total time including model loading
     # MOD: Added error_type to preserve original exception type for better error bucketing
     error_type: str | None = None  # Original exception type name (e.g., "TypeError", "ImportError")
+    # MOD: Added quality_score for baseline evaluation
+    quality_score: float | None = None  # Keyword overlap score vs baseline (0-100%)
 
 
 class ResultSet:
@@ -858,6 +861,7 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
     "generation_time": ("Generation", "(s)"),
     "model_load_time": ("Load", "(s)"),
     "total_time": ("Total", "(s)"),
+    "quality_score": ("Score", "(%)"),  # MOD: Added baseline evaluation score
 }
 
 # Threshold for splitting long header text into multiple lines
@@ -876,6 +880,7 @@ NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
         "generation_time",
         "model_load_time",
         "total_time",
+        "quality_score",  # MOD: Added baseline evaluation score
     },
 )
 
@@ -884,7 +889,12 @@ MAX_MODEL_NAME_LENGTH = 20  # Allows "microsoft/phi-3-vision" without truncation
 MAX_OUTPUT_LENGTH = 28
 
 # PerformanceResult timing fields - centralized definition
-PERFORMANCE_TIMING_FIELDS: Final[list[str]] = ["generation_time", "model_load_time", "total_time"]
+PERFORMANCE_TIMING_FIELDS: Final[list[str]] = [
+    "generation_time",
+    "model_load_time",
+    "total_time",
+    "quality_score",  # MOD: Added baseline evaluation score
+]
 
 
 # =============================================================================
@@ -1423,6 +1433,111 @@ def _detect_context_ignorance(text: str, prompt: str) -> tuple[bool, list[str]]:
     return is_ignored, missing_terms
 
 
+# MOD: Added baseline evaluation scoring
+def _calculate_keyword_overlap_score(generated_text: str, baseline_text: str) -> float:
+    """Calculate keyword overlap score between generated and baseline text.
+
+    Extracts significant keywords from both texts and computes the percentage
+    of baseline keywords that appear in the generated text.
+
+    Args:
+        generated_text: Model-generated text to evaluate
+        baseline_text: Golden/ideal reference text
+
+    Returns:
+        Percentage (0-100) of baseline keywords found in generated text
+    """
+    # Common English stop words to filter out
+    stop_words = {
+        "a",
+        "an",
+        "and",
+        "are",
+        "as",
+        "at",
+        "be",
+        "been",
+        "by",
+        "for",
+        "from",
+        "has",
+        "have",
+        "he",
+        "in",
+        "is",
+        "it",
+        "its",
+        "of",
+        "on",
+        "that",
+        "the",
+        "to",
+        "was",
+        "were",
+        "will",
+        "with",
+        "this",
+        "but",
+        "they",
+        "or",
+        "not",
+        "which",
+        "their",
+        "what",
+        "when",
+        "where",
+        "who",
+        "if",
+        "can",
+        "could",
+        "would",
+        "should",
+        "may",
+        "might",
+        "there",
+        "here",
+        "all",
+        "also",
+        "any",
+        "both",
+        "each",
+        "few",
+        "more",
+        "most",
+        "other",
+        "some",
+        "such",
+        "than",
+        "then",
+        "these",
+        "those",
+        "through",
+        "very",
+        "we",
+        "you",
+        "your",
+    }
+
+    def extract_keywords(text: str) -> set[str]:
+        """Extract significant keywords from text."""
+        # Convert to lowercase and extract words (alphanumeric sequences)
+        words = re.findall(r"\b[a-z0-9]+\b", text.lower())
+        # Filter out stop words and very short words
+        min_keyword_length = 3
+        return {w for w in words if w not in stop_words and len(w) >= min_keyword_length}
+
+    baseline_keywords = extract_keywords(baseline_text)
+    generated_keywords = extract_keywords(generated_text)
+
+    if not baseline_keywords:
+        # No baseline keywords to compare against
+        return 0.0
+
+    # Calculate overlap: what percentage of baseline keywords appear in generated text
+    overlap_count = len(baseline_keywords & generated_keywords)
+    return (overlap_count / len(baseline_keywords)) * 100.0
+
+
 @dataclass(frozen=True)
 class GenerationQualityAnalysis:
     """Analysis results for generated text quality.
@@ -1441,6 +1556,8 @@ class GenerationQualityAnalysis:
     # MOD: Added context ignorance detection
     is_context_ignored: bool
     missing_context_terms: list[str]
+    # MOD: Added baseline evaluation scoring
+    keyword_overlap_score: float | None = None
 
     def has_any_issues(self) -> bool:
         """Return True if any quality issues were detected."""
@@ -1458,6 +1575,7 @@ def analyze_generation_text(
     text: str,
     generated_tokens: int,
     prompt: str | None = None,
+    baseline_text: str | None = None,  # MOD: Added baseline for scoring
 ) -> GenerationQualityAnalysis:
     """Analyze generated text for quality issues.
 
@@ -1468,9 +1586,10 @@ def analyze_generation_text(
         text: Generated text to analyze
         generated_tokens: Number of tokens generated
         prompt: Optional prompt text for context ignorance detection
+        baseline_text: Optional golden/ideal text for baseline scoring
 
     Returns:
-        GenerationQualityAnalysis with all detected issues
+        GenerationQualityAnalysis with all detected issues and optional score
     """
     is_repetitive, repeated_token = _detect_repetitive_output(text)
     hallucination_issues = _detect_hallucination_patterns(text)
@@ -1484,6 +1603,11 @@ def analyze_generation_text(
     if prompt:
         is_context_ignored, missing_context_terms = _detect_context_ignorance(text, prompt)
 
+    # MOD: Added baseline scoring
+    keyword_overlap_score: float | None = None
+    if baseline_text:
+        keyword_overlap_score = _calculate_keyword_overlap_score(text, baseline_text)
+
     return GenerationQualityAnalysis(
         is_repetitive=is_repetitive,
         repeated_token=repeated_token,
@@ -1494,6 +1618,7 @@ def analyze_generation_text(
         bullet_count=bullet_count,
         is_context_ignored=is_context_ignored,
         missing_context_terms=missing_context_terms,
+        keyword_overlap_score=keyword_overlap_score,
     )
 
 
@@ -1560,6 +1685,9 @@ def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: PLR
             return _format_tps(num)
         if field_name in {"total_time", "generation_time", "model_load_time"}:
             return _format_time_seconds(num)
+        # MOD: Format quality_score as percentage with 1 decimal
+        if field_name == "quality_score":
+            return f"{num:.1f}"
         return fmt_num(num)
     if isinstance(value, str) and value:
         s: str = value.strip().replace(",", "")
@@ -3597,6 +3725,7 @@ def _preview_generation(
     gen: GenerationResult | SupportsGenerationResult | None,
     *,
     prompt: str | None = None,
+    baseline_text: str | None = None,
 ) -> None:
     if not gen:
         return
@@ -3605,9 +3734,14 @@ def _preview_generation(
         logger.info("%s", Colors.colored("<empty>", Colors.CYAN))
         return
 
-    # MOD: Analyze quality using consolidated utility with optional prompt
+    # MOD: Analyze quality using consolidated utility with optional prompt and baseline
     gen_tokens = getattr(gen, "generation_tokens", 0)
-    analysis = analyze_generation_text(text_val, gen_tokens, prompt=prompt)
+    analysis = analyze_generation_text(
+        text_val,
+        gen_tokens,
+        prompt=prompt,
+        baseline_text=baseline_text,
+    )
 
     # Show brief inline warnings for quality issues
     if analysis.is_repetitive and analysis.repeated_token:
@@ -3649,6 +3783,7 @@ def _log_verbose_success_details_mode(
     *,
     detailed: bool,
     prompt: str | None = None,
+    baseline_text: str | None = None,
 ) -> None:
     """Emit verbose block using either compact or detailed metrics style with visual hierarchy."""
     if not res.generation:
@@ -3660,9 +3795,14 @@ def _log_verbose_success_details_mode(
     # Generated text with emoji prefix for easy scanning
     gen_text = getattr(res.generation, "text", None) or ""
 
-    # MOD: Analyze quality using consolidated utility with optional prompt
+    # MOD: Analyze quality using consolidated utility with optional prompt and baseline
     gen_tokens = getattr(res.generation, "generation_tokens", 0)
-    analysis = analyze_generation_text(gen_text, gen_tokens, prompt=prompt)
+    analysis = analyze_generation_text(
+        gen_text,
+        gen_tokens,
+        prompt=prompt,
+        baseline_text=baseline_text,
+    )
 
     logger.info("📝 %s", Colors.colored("Generated Text:", Colors.BOLD, Colors.CYAN))
 
@@ -3907,6 +4047,7 @@ def print_model_result(
     run_index: int | None = None,
     total_runs: int | None = None,
     prompt: str | None = None,  # MOD: Added for context ignorance detection
+    baseline_text: str | None = None,  # MOD: Added for baseline scoring
 ) -> None:
     """Print a concise summary + optional verbose block for a model result."""
     model_short = result.model_name.split("/")[-1]
@@ -3919,7 +4060,7 @@ def print_model_result(
     for line in textwrap.wrap(summary, width=width, break_long_words=False, break_on_hyphens=False):
         log_fn(Colors.colored(line, color))
     if result.success and not verbose:  # quick exit with preview only
-        _preview_generation(result.generation, prompt=prompt)
+        _preview_generation(result.generation, prompt=prompt, baseline_text=baseline_text)
         return
     header_label = "✓ SUCCESS" if result.success else "✗ FAILED"
     header_color = Colors.GREEN if result.success else Colors.RED
@@ -3937,7 +4078,12 @@ def print_model_result(
             _log_wrapped_error("Output:", str(result.captured_output_on_fail))
         return
     if result.generation and verbose:
-        _log_verbose_success_details_mode(result, detailed=detailed_metrics, prompt=prompt)
+        _log_verbose_success_details_mode(
+            result,
+            detailed=detailed_metrics,
+            prompt=prompt,
+            baseline_text=baseline_text,
+        )
 
 
 def print_cli_separator() -> None:
@@ -4330,8 +4476,9 @@ def _apply_exclusions(
 def process_models(
     args: argparse.Namespace,
     image_path: Path,
-    *,  # Force prompt to be keyword-only for clarity
+    *,  # Force keyword-only arguments for clarity
     prompt: str,
+    baseline_text: str | None = None,  # MOD: Added baseline for evaluation
 ) -> list[PerformanceResult]:
     """Resolve the definitive model list and execute each model run.
 
@@ -4422,9 +4569,17 @@ def process_models(
             quantized_kv_start=args.quantized_kv_start,
         )
         result: PerformanceResult = process_image_with_model(params)
+
+        # MOD: Calculate quality score if baseline provided
+        if baseline_text and result.success and result.generation:
+            gen_text = str(getattr(result.generation, "text", ""))
+            if gen_text:
+                score = _calculate_keyword_overlap_score(gen_text, baseline_text)
+                result = dataclasses.replace(result, quality_score=score)
+
         results.append(result)
 
-        # MOD: Structured output for this run with prompt for context detection
+        # MOD: Structured output for this run with prompt and baseline for evaluation
         print_model_result(
             result,
             verbose=args.verbose,
@@ -4432,6 +4587,7 @@ def process_models(
             run_index=idx,
             total_runs=len(model_identifiers),
             prompt=prompt,
+            baseline_text=baseline_text,
         )
     return results
 
@@ -4646,7 +4802,23 @@ def main(args: argparse.Namespace) -> None:
 
         prompt = prepare_prompt(args, metadata)
 
-        results = process_models(args, image_path, prompt=prompt)
+        # MOD: Load baseline text for evaluation scoring
+        baseline_text: str | None = None
+        if args.baseline_file:
+            baseline_path = Path(args.baseline_file).resolve()
+            if not baseline_path.exists():
+                logger.warning("Baseline file not found: %s", baseline_path)
+            elif not baseline_path.is_file():
+                logger.warning("Baseline path is not a file: %s", baseline_path)
+            else:
+                try:
+                    baseline_text = baseline_path.read_text(encoding="utf-8").strip()
+                    logger.info("Loaded baseline text from: %s", baseline_path)
+                    logger.debug("Baseline text length: %d characters", len(baseline_text))
+                except (OSError, UnicodeDecodeError) as read_err:
+                    logger.warning("Could not read baseline file %s: %s", baseline_path, read_err)
+
+        results = process_models(args, image_path, prompt=prompt, baseline_text=baseline_text)
 
         finalize_execution(
             args=args,
@@ -4724,6 +4896,16 @@ def main_cli() -> None:
         type=str,
         default=None,
         help="Prompt.",
+    )
+    # MOD: Added baseline evaluation argument
+    parser.add_argument(
+        "--baseline-file",
+        type=Path,
+        default=DEFAULT_BASELINE_FILE,
+        help="Path to baseline/golden text file for keyword overlap scoring. "
+        "When provided, the script will calculate a keyword overlap score "
+        "comparing model output to this reference text. "
+        f"(default: {DEFAULT_BASELINE_FILE})",
     )
     metrics_group = parser.add_mutually_exclusive_group()
     metrics_group.add_argument(

@@ -466,6 +466,41 @@ python check_models.py \
 
 **Tip**: For 16GB systems running large models, try `--lazy-load --kv-bits 4 --max-kv-size 4096`.
 
+### Baseline Evaluation
+
+Compare model outputs against a "golden" reference text using keyword overlap scoring:
+
+```bash
+# Create or edit the baseline text file (default: output/baseline.txt)
+echo "Your ideal/reference output text here" > output/baseline.txt
+
+# Run evaluation with baseline scoring (uses output/baseline.txt by default)
+python check_models.py \
+  --folder ~/Pictures \
+  --models mlx-community/nanoLLaVA mlx-community/Qwen2-VL-2B-Instruct-4bit
+
+# Or specify a custom baseline file
+python check_models.py \
+  --folder ~/Pictures \
+  --baseline-file /path/to/custom_baseline.txt
+
+# Score appears as "Score (%)" column in all reports
+```
+
+**How it works:**
+
+- Extracts significant keywords from both baseline and generated text
+- Filters out common stop words (the, a, an, is, etc.)
+- Calculates percentage of baseline keywords found in generated output
+- Score (0-100%) appears in console, HTML, and Markdown reports
+- If baseline file doesn't exist, scoring is skipped (no errors)
+
+**Use cases:**
+
+- Benchmarking models against known-good outputs
+- Regression testing to ensure quality doesn't degrade
+- Objective comparison when evaluating model updates
+
 ## Command Line Reference
 
 | Flag | Type | Default | Description |
@@ -473,6 +508,7 @@ python check_models.py \
 | `-f`, `--folder` | Path | `~/Pictures/Processed` | Folder of images to process (non‑recursive). |
 | `--output-html` | Path | `output/results.html` | HTML report output file. |
 | `--output-markdown` | Path | `results.md` | Markdown report output file. |
+| `--baseline-file` | Path | `output/baseline.txt` | Path to baseline/golden text file for evaluation scoring. |
 | `-m`, `--models` | list[str] | (none) | Explicit model IDs/paths; disables cache discovery. |
 | `-e`, `--exclude` | list[str] | (none) | Models to exclude (applies to cache scan or explicit list). |
 | `--trust-remote-code` | flag | `True` | Allow custom code from Hub models (SECURITY RISK). |
