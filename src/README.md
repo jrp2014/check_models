@@ -42,7 +42,7 @@ pip install -e ".[torch]"
 
 # Run directly
 python check_models.py -f ~/Pictures/Processed -p "Describe this image."
-```
+**Python**: 3.13+ (project is configured and tested on Python 3.13)
 
 Key defaults and parameters:
 
@@ -96,7 +96,7 @@ Key defaults and parameters:
 
 This project includes a `pyproject.toml` file that defines all dependencies and can be used with modern Python package managers.
 
-#### With uv (fastest)
+### With uv (fastest)
 
 ```bash
 # Install uv if you haven't already
@@ -112,7 +112,7 @@ uv pip install -e .  # run inside the src/ directory (root-level Makefile is a s
 uv pip install -e ".[dev]"
 ```
 
-#### With pip
+### With pip
 
 ```bash
 # Create virtual environment
@@ -127,7 +127,7 @@ pip install -e .  # run inside src/
 pip install -e ".[dev]"
 ```
 
-#### With conda
+### With conda
 
 ```bash
 # Create conda environment
@@ -141,7 +141,7 @@ pip install -e .  # run inside src/
 pip install -e ".[torch,extras]"
 ```
 
-#### Automated Setup (Recommended)
+### Automated Setup (Recommended)
 
 For the easiest setup, use the provided shell script that automates the entire conda environment creation:
 

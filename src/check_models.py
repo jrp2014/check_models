@@ -2753,7 +2753,7 @@ def get_system_info() -> tuple[str, str | None]:
                 check=False,
             )
             if result.returncode == 0:
-                # --- Extract GPS info from system_profiler output
+                # --- Extract GPU info from system_profiler output
                 gpu_lines: list[str] = [
                     line for line in result.stdout.split("\n") if "Chipset Model:" in line
                 ]
