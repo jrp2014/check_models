@@ -58,7 +58,8 @@ if [ -n "$MD_FILES" ]; then
     echo '[pre-commit] Auto-fixing Markdown files with markdownlint...'
     if command -v npx &> /dev/null; then
         # shellcheck disable=SC2086
-        npx --yes markdownlint-cli2 --fix $MD_FILES || echo "⚠️  Some markdown issues could not be auto-fixed"
+        npx --yes markdownlint-cli2 --fix $MD_FILES ||
+            echo "⚠️  Some markdown issues could not be auto-fixed"
         # Re-stage the fixed files
         # shellcheck disable=SC2086
         git add $MD_FILES
