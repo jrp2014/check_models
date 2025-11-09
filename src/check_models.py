@@ -25,6 +25,7 @@ from collections import Counter
 from collections.abc import Callable, Iterator, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from functools import lru_cache
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
@@ -1351,8 +1352,19 @@ def is_numeric_value(val: object) -> bool:
     return False
 
 
+@lru_cache(maxsize=128)
 def is_numeric_field(field_name: str) -> bool:
-    """Check if a field should be treated as numeric (right-aligned)."""
+    """Check if a field should be treated as numeric (right-aligned).
+
+    Uses caching to avoid repeated string operations for frequently
+    accessed field names during formatting operations.
+
+    Args:
+        field_name: Name of the metric field to check
+
+    Returns:
+        True if field contains numeric data
+    """
     field_lower = field_name.lower()
     return (
         field_name in NUMERIC_FIELD_PATTERNS

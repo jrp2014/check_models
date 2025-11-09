@@ -343,6 +343,47 @@ Notes:
 - Dependency versions in this README are automatically kept in sync with `pyproject.toml`; update the TOML first and reflect changes here.
 - To clean build artifacts: `make clean` (project), `make clean-mlx` (local MLX repos), or `bash tools/clean_builds.sh`.
 
+## Python API
+
+The package exports a clean public API for programmatic use:
+
+### Quality Analysis
+
+```python
+from check_models import analyze_generation_text, GenerationQualityAnalysis
+
+# Analyze generated text for quality issues
+text = "Model output goes here..."
+analysis = analyze_generation_text(text, generated_tokens=50)
+
+# Access analysis results
+if analysis.is_repetitive:
+    print(f"Repetitive token: {analysis.repeated_token}")
+if analysis.hallucination_issues:
+    print(f"Hallucinations detected: {analysis.hallucination_issues}")
+if analysis.is_verbose:
+    print("Output is excessively verbose")
+if analysis.formatting_issues:
+    print(f"Formatting problems: {analysis.formatting_issues}")
+if analysis.has_excessive_bullets:
+    print(f"Too many bullets: {analysis.bullet_count}")
+```
+
+### Core Functions
+
+```python
+from check_models import (
+    process_image_with_model,    # Process single image with a model
+    generate_markdown_report,     # Create Markdown report
+    generate_html_report,         # Create HTML report
+    get_system_info,              # Get system information dict
+    format_field_value,           # Format metric values consistently
+    format_overall_runtime,       # Format duration strings
+)
+```
+
+See module docstrings and `__all__` exports for complete API reference.
+
 ## Usage
 
 ### Quick Start
