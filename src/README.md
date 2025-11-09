@@ -240,7 +240,7 @@ pip install "huggingface-hub>=0.23.0" "mlx>=0.29.1" "mlx-vlm>=0.0.9" "Pillow>=10
 
 ## Requirements
 
-- **Python**: 3.12+ (3.12 is the tested baseline)
+- **Python**: 3.13+ (3.13 is the tested baseline)
 - **Operating System**: macOS with Apple Silicon (MLX is Apple‑Silicon specific)
 
 ## Dependencies
