@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import contextlib
 import dataclasses
 import html
@@ -2626,6 +2627,71 @@ def _mark_failed_rows_in_html(html_table: str, results: list[PerformanceResult])
     return "<tr>".join(new_table_rows)
 
 
+def _wrap_output_column_in_details(html_table: str, output_col_idx: int) -> str:
+    """Wrap the output column content in <details>/<summary> for expandability.
+
+    Args:
+        html_table: The HTML table string
+        output_col_idx: The index of the output column (0-based)
+
+    Returns:
+        Modified HTML table with output column wrapped in details/summary tags
+    """
+    preview_length = 100
+
+    # Pattern to match table cells in data rows (not header)
+    # We'll process each row and wrap the last td content
+    lines = html_table.split("\n")
+    result_lines = []
+
+    for original_line in lines:
+        # Check if this is a data row (contains <td> tags)
+        if "<td" in original_line and "</td>" in original_line:
+            # Find all <td>...</td> cells in this row
+            cells = re.findall(r"<td[^>]*>.*?</td>", original_line)
+            if len(cells) > output_col_idx:
+                # Get the last cell (output column)
+                output_cell = cells[output_col_idx]
+
+                # Extract the content between <td...> and </td>
+                match = re.match(r"(<td[^>]*>)(.*?)(</td>)", output_cell, re.DOTALL)
+                if match:
+                    opening_tag, content, closing_tag = match.groups()
+
+                    # Create preview (first N chars)
+                    text_content = re.sub(r"<[^>]+>", "", content)  # Strip HTML tags
+                    preview = text_content[:preview_length]
+                    if len(text_content) > preview_length:
+                        preview += "..."
+
+                    # Wrap in details/summary
+                    wrapped_content = (
+                        f"<details><summary>{html.escape(preview)}</summary>"
+                        f"<div style='margin-top: 0.5em;'>{content}</div></details>"
+                    )
+                    new_cell = opening_tag + wrapped_content + closing_tag
+
+                    # Replace the old cell with the new one
+                    cells[output_col_idx] = new_cell
+
+                    # Reconstruct the line with updated cells
+                    cell_iter = iter(cells)
+                    updated_line = re.sub(
+                        r"<td[^>]*>.*?</td>",
+                        lambda _, ci=cell_iter: next(ci),
+                        original_line,
+                    )
+                    result_lines.append(updated_line)
+                else:
+                    result_lines.append(original_line)
+            else:
+                result_lines.append(original_line)
+        else:
+            result_lines.append(original_line)
+
+    return "\n".join(result_lines)
+
+
 def analyze_model_issues(results: list[PerformanceResult]) -> dict[str, Any]:
     """Analyze results to identify common model issues."""
     summary: dict[str, Any] = {
@@ -2757,17 +2823,36 @@ def _build_full_html_document(
     total_runtime_seconds: float,
     issues_summary_html: str,
     system_info: dict[str, str],
+    image_path: Path | None = None,
 ) -> str:
-    """Build the full self-contained HTML document from components."""
+    """Build the full self-contained HTML document from components with optional embedded image."""
     css = """
     <style>
         body { font-family: sans-serif; margin: 2em; }
-        table { border-collapse: collapse; margin-top: 1em; }
+        table { border-collapse: collapse; margin-top: 1em; width: 100%; }
         th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
+        th { background-color: #f2f2f2; font-weight: bold; }
         .numeric { text-align: right; }
         .failed { background-color: #ffdddd; }
-        .summary { margin-top: 2em; padding: 1em; border: 1px solid #eee; }
+        .summary { margin-top: 2em; padding: 1em; border: 1px solid #eee; background-color: #f9f9f9; }
+        .embedded-image { max-width: 600px; margin: 1em 0; border: 1px solid #ccc; border-radius: 4px; }
+        details { cursor: pointer; max-width: 800px; }
+        details summary {
+            font-weight: normal;
+            color: #0066cc;
+            padding: 0.25em;
+            user-select: none;
+        }
+        details summary:hover { background-color: #f0f0f0; }
+        details[open] summary { color: #004499; font-weight: bold; }
+        details > div {
+            margin-top: 0.5em;
+            padding: 0.5em;
+            border-left: 3px solid #0066cc;
+            background-color: #f8f8f8;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
     </style>
     """
     sys_info_html = "<ul>"
@@ -2783,6 +2868,30 @@ def _build_full_html_document(
         )
     versions_html += "</ul>"
 
+    # Embed image if provided
+    image_html = ""
+    if image_path and image_path.exists():
+        try:
+            with image_path.open("rb") as img_file:
+                img_data = base64.b64encode(img_file.read()).decode("utf-8")
+                # Determine MIME type from extension
+                ext = image_path.suffix.lower()
+                mime_type = {
+                    ".jpg": "image/jpeg",
+                    ".jpeg": "image/jpeg",
+                    ".png": "image/png",
+                    ".gif": "image/gif",
+                    ".webp": "image/webp",
+                }.get(ext, "image/jpeg")
+                image_html = (
+                    f"<h2>Test Image</h2>"
+                    f'<img src="data:{mime_type};base64,{img_data}" '
+                    f'class="embedded-image" '
+                    f'alt="Test image used for model evaluation" />'
+                )
+        except (OSError, ValueError):
+            logger.warning("Failed to embed image: %s", image_path)
+
     return f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -2794,6 +2903,7 @@ def _build_full_html_document(
     <body>
         <h1>Model Performance Report</h1>
         <p><em>Generated on {local_now_str()}</em></p>
+        {image_html}
         <div class="summary">
             <h2>Summary</h2>
             {issues_summary_html}
@@ -2867,8 +2977,9 @@ def generate_html_report(
     versions: LibraryVersionDict,
     prompt: str,
     total_runtime_seconds: float,
+    image_path: Path | None = None,
 ) -> None:
-    """Write a self-contained HTML summary with aligned table."""
+    """Write a self-contained HTML summary with aligned table and embedded image."""
     if not results:
         logger.warning(
             Colors.colored("No results to generate HTML report.", Colors.YELLOW),
@@ -2911,6 +3022,10 @@ def generate_html_report(
     # Mark failed rows
     html_table = _mark_failed_rows_in_html(html_table, results)
 
+    # Wrap output column (last column) in <details> for expandability
+    output_col_idx = len(field_names) - 1  # output is last column
+    html_table = _wrap_output_column_in_details(html_table, output_col_idx)
+
     # Analyze model issues and generate summary
     summary = analyze_model_issues(results)
     stats = compute_performance_statistics(results)
@@ -2927,6 +3042,7 @@ def generate_html_report(
         total_runtime_seconds=total_runtime_seconds,
         issues_summary_html=issues_summary_html,
         system_info=system_info,
+        image_path=image_path,
     )
 
     try:
@@ -4710,6 +4826,7 @@ def finalize_execution(
     library_versions: LibraryVersionDict,
     overall_start_time: float,
     prompt: str,
+    image_path: Path | None = None,
 ) -> None:
     """Output summary statistics, generate reports, and display timing information."""
     overall_time: float = time.perf_counter() - overall_start_time
@@ -4748,6 +4865,7 @@ def finalize_execution(
                 versions=library_versions,
                 prompt=prompt,
                 total_runtime_seconds=overall_time,
+                image_path=image_path,
             )
             generate_markdown_report(
                 results=results,
@@ -4826,6 +4944,7 @@ def main(args: argparse.Namespace) -> None:
             library_versions=library_versions,
             overall_start_time=overall_start_time,
             prompt=prompt,
+            image_path=image_path,
         )
     except (KeyboardInterrupt, SystemExit):
         logger.exception("Execution interrupted by user.")

@@ -141,8 +141,7 @@ python -m tools.check_outdated
 
 Run `make help` to see all targets. Key commands:
 
-| Command | Description |
-|:--------|:------------|
+| Command | Description |\n| :------ | :---------- |
 | `make install` | Install the package |
 | `make dev` | Setup development environment |
 | `make update` | Update conda environment and dependencies |

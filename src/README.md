@@ -186,7 +186,8 @@ Torch support:
 Several behaviors can be customized via environment variables (useful for CI/automation):
 
 | Variable | Purpose | Default | Example |
-|----------|---------|---------|---------|
+| -------- | ------- | ------- | ------- |
+| -------- | ------- | ------- | ------- |
 | `MLX_VLM_WIDTH` | Force CLI output width (columns) | Auto-detect terminal | `MLX_VLM_WIDTH=120` |
 | `NO_COLOR` | Disable ANSI colors in output | Not set (colors enabled) | `NO_COLOR=1` |
 | `FORCE_COLOR` | Force ANSI colors even in non-TTY | Not set | `FORCE_COLOR=1` |
@@ -259,9 +260,7 @@ and re-run the sync helper.
 
 Runtime (installed automatically via `pip install -e .` when executed inside `src/`, or via `make install` from repo root):
 
-| Purpose | Package | Minimum |
-|---------|---------|---------|
-| Core tensor/runtime | `mlx` | `>=0.29.1` |
+| Purpose | Package | Minimum |\n| ------- | ------- | ------- |\n| Core tensor/runtime | `mlx` | `>=0.29.1` |
 | Vision‑language utilities | `mlx-vlm` | `>=0.0.9` |
 | Image processing & loading | `Pillow` | `>=10.3.0` |
 | Model cache / discovery | `huggingface-hub` | `>=0.23.0` |
@@ -271,7 +270,8 @@ Runtime (installed automatically via `pip install -e .` when executed inside `sr
 Optional (enable additional features):
 
 | Feature | Package | Source | Install Command |
-|---------|---------|--------|-----------------|
+| ------- | ------- | ------ | --------------- |
+| ------- | ------- | ------ | --------------- |
 | Extended system metrics (RAM/CPU) | `psutil` | `extras` | `pip install -e ".[extras]"` or `make install` |
 | Fast tokenizer backends | `tokenizers` | `extras` | `pip install -e ".[extras]"` or `make install` |
 | Tensor operations (for some models) | `einops` | `extras` | `pip install -e ".[extras]"` or `make install` |
@@ -297,7 +297,7 @@ pip install -e ".[extras,torch,dev]"  # from src/
 Development / QA:
 
 | Purpose | Package |
-|---------|---------|
+| ------- | ------- |
 | Linting & formatting checks | `ruff` |
 | Static type checking | `mypy` |
 | Testing | `pytest`, `pytest-cov` |
@@ -504,7 +504,7 @@ python check_models.py \
 ## Command Line Reference
 
 | Flag | Type | Default | Description |
-|------|------|---------|-------------|
+| ---- | ---- | ------- | ----------- |
 | `-f`, `--folder` | Path | `~/Pictures/Processed` | Folder of images to process (non‑recursive). |
 | `--output-html` | Path | `output/results.html` | HTML report output file. |
 | `--output-markdown` | Path | `results.md` | Markdown report output file. |
@@ -762,7 +762,7 @@ The default conda target is `mlx-vlm`, but you can override it with `CONDA_ENV=y
 Key targets:
 
 | Target | Purpose | Notes |
-|--------|---------|-------|
+| ------ | ------- | ----- |
 | `make help` | Show all targets | Displays active vs target env. |
 | `make install-dev` | Editable install with dev extras | Equivalent to changing into `src/` then `pip install -e .[dev]`. |
 | `make install-markdownlint` | Install markdownlint-cli2 | Requires Node.js/npm. Optional for markdown linting. |
