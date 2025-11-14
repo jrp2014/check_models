@@ -1,8 +1,8 @@
 version: 2
 updates:
-  # Python dependencies in vlm package
+  # Python dependencies in src package
   - package-ecosystem: "pip"
-    directory: "/vlm"
+    directory: "/src"
     schedule:
       interval: "weekly"
       day: "monday"
