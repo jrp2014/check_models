@@ -632,7 +632,7 @@ parser.add_argument(
 ### Implementation Status
 
 | Feature | Priority | Impact | Effort | Status |
-|---------|----------|--------|--------|--------|
+| ------- | -------- | ------ | ------ | ------ |
 | `top_p` | HIGH | Quality | LOW | ✅ **IMPLEMENTED** |
 | `repetition_penalty` | HIGH | Quality | LOW | ✅ **IMPLEMENTED** |
 | `lazy` loading | HIGH | Memory | LOW | ✅ **IMPLEMENTED** |

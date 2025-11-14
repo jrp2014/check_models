@@ -60,7 +60,7 @@ python -m tools.validate_env
 ### Dependency Alignment Matrix
 
 | Package | pyproject.toml | requirements*.txt | update.sh | Status |
-|---------|----------------|-------------------|-----------|--------|
+| ------- | -------------- | ----------------- | --------- | ------ |
 | types-tabulate | ✅ | ✅ (NEW) | ✅ | ✅ Fixed |
 | types-tqdm | ✅ | ✅ | ✅ (NEW) | ✅ Fixed |
 | All core packages | ✅ | ✅ | ✅ | ✅ Aligned |
@@ -69,7 +69,7 @@ python -m tools.validate_env
 ### Documentation Accuracy
 
 | File | Issue | Status |
-|------|-------|--------|
+| ---- | ----- | ------ |
 | CONTRIBUTING.md | Module paths | ✅ Fixed |
 | CONTRIBUTING.md | Working directory | ✅ Clarified |
 | validate_env.py | Python version docstring | ✅ Fixed |

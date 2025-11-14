@@ -1059,7 +1059,7 @@ mlx>=0.29.1,<0.30.0
 ## Makefile Targets Reference
 
 | Command | Purpose | When to Use |
-|---------|---------|-------------|
+| ------- | ------- | ----------- |
 | `make deps-sync` | Sync README with pyproject.toml | After editing dependencies |
 | `make check-outdated` | List outdated packages | Before deciding to upgrade |
 | `make audit` | Security vulnerability scan | Before releases |

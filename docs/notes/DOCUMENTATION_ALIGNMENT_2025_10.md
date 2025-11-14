@@ -53,7 +53,7 @@ Comprehensive alignment of all documentation (READMEs, CONTRIBUTING.md, IMPLEMEN
 All `make -C vlm` and `make -C src` commands updated to root `Makefile` equivalents:
 
 | Old Command | New Command |
-|-------------|-------------|
+| ----------- | ----------- |
 | `make -C vlm quality` | `make quality` |
 | `make -C vlm bootstrap-dev` | `make bootstrap-dev` |
 | `make -C vlm sync-deps` | `make sync-deps` |

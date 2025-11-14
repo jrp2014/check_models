@@ -201,7 +201,7 @@ parser.add_argument(
 ### README.md vs Code
 
 | Parameter | Code Default | Docs Default | Status |
-|-----------|--------------|--------------|--------|
+| --------- | ------------ | ------------ | ------ |
 | `--max-tokens` | 500 | 500 | ✅ |
 | `--temperature` | 0.1 | 0.1 | ✅ |
 | `--timeout` | 300 | 300 | ✅ |

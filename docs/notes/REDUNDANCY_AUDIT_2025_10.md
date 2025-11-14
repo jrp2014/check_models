@@ -329,7 +329,7 @@ print_cli("error", "Error")
 ## Summary Statistics
 
 | Category | Files Checked | Redundancies Found | Status |
-|----------|---------------|-------------------|---------|
+| -------- | ------------- | ------------------ | ------- |
 | File Structure | 36 files | 0 | ✅ Clean |
 | Makefiles | 2 files | 0 (intentional) | ✅ Good |
 | READMEs | 4 files | 0 (distinct) | ✅ Good |

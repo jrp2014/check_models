@@ -151,7 +151,7 @@ The simplified setup is a solid foundation that can be incrementally enhanced if
 ## File Size Comparison
 
 | Component | Before | After | Reduction |
-|-----------|--------|-------|-----------|
+| --------- | ------ | ----- | --------- |
 | GitHub Actions | 103 lines | 45 lines | 56% |
 | Quality Orchestrator | 444 lines | 20 lines | 95% |
 | Stub Generator | 261 lines | 0 lines | 100% |

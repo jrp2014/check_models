@@ -78,7 +78,7 @@ markdown_table = tabulate(rows, headers=markdown_headers, tablefmt="pipe", colal
 ### What We Use tabulate For
 
 | Feature | Usage | Location |
-|---------|-------|----------|
+| ------- | ----- | -------- |
 | `tablefmt="fancy_grid"` | EXIF metadata display with Unicode borders | `print_exif_summary()` |
 | `tablefmt="plain"` | CLI performance summary (no borders) | `print_model_stats()` |
 | `tablefmt="unsafehtml"` | HTML report generation | `generate_html_report()` |

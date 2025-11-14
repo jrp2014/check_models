@@ -158,7 +158,7 @@ REQUIRED_PYTHON_VERSION: Final[tuple[int, int]] = (3, 13)  # ← CODE IS CORRECT
 **Verified Alignment** (with exception of types-tqdm above):
 
 | Package | pyproject.toml | requirements*.txt | update.sh |
-|---------|----------------|-------------------|-----------|
+| ------- | -------------- | ----------------- | --------- |
 | mlx | ✅ >=0.29.1 | ✅ >=0.29.1 | ✅ (no constraint) |
 | mlx-vlm | ✅ >=0.0.9 | ✅ >=0.0.9 | ✅ (no constraint) |
 | Pillow | ✅ >=10.3.0 | ✅ >=10.3.0 | ✅ (no constraint) |

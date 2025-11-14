@@ -113,7 +113,7 @@ VS Code Settings:
 Run `make` or `make help` to see:
 
 | Command | Description |
-|:--------|:------------|
+| :------ | :---------- |
 | `make install` | Install the package |
 | `make run` | Show usage help |
 | `make demo` | Run example |

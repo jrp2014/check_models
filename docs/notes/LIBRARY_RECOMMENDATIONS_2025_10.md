@@ -629,7 +629,7 @@ dev = [
 ## Risk Assessment
 
 | Library | Risk | Benefit | Recommendation |
-|---------|------|---------|----------------|
+| ------- | ---- | ------- | -------------- |
 | rich | LOW | HIGH | ✅ Add as optional |
 | pydantic | MEDIUM | HIGH | ✅ Add gradually |
 | tqdm | LOW | MEDIUM | ✅ Add |
