@@ -254,10 +254,6 @@ update_local_mlx_repos() {
 			echo "[update.sh] Installing requirements for ${REPO_NAMES[idx]}..."
 			pip_install -r requirements.txt
 		fi
-		if [[ "${REPO_NAMES[idx]}" == "mlx-vlm" ]]; then
-			echo "[update.sh] Installing opencv-python for mlx-vlm..."
-			pip_install opencv-python
-		fi
 		echo ""
 	done
 	cd "$ORIGINAL_DIR"
@@ -384,7 +380,11 @@ fi
 
 # Update MLX from PyPI if not skipped
 if [[ "${SKIP_MLX:-0}" == "1" ]] || [[ $SKIP_MLX_PYPI -eq 1 ]]; then
-	[[ "${SKIP_MLX:-0}" == "1" ]] && echo "[update.sh] Skipping MLX updates (SKIP_MLX=1)"
+	if [[ "${SKIP_MLX:-0}" == "1" ]]; then
+		echo "[update.sh] Skipping PyPI MLX updates (SKIP_MLX=1 environment variable set)"
+	elif [[ $SKIP_MLX_PYPI -eq 1 ]]; then
+		echo "[update.sh] Skipping PyPI MLX updates (using local development builds)"
+	fi
 else
 	echo "[update.sh] Updating MLX packages from PyPI..."
 	pip_install mlx mlx-vlm mlx-lm
