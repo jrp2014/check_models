@@ -9,6 +9,7 @@ cd "$(dirname "$0")"
 # Activate conda environment if available and not in CI
 if [[ "${CI:-false}" == "false" ]] && command -v conda &> /dev/null; then
     # Initialize conda for bash
+    # shellcheck disable=SC1091
     if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
         source "$HOME/miniconda3/etc/profile.d/conda.sh"
     elif [ -f "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
@@ -49,6 +50,16 @@ echo "⚠️  Skipped (external MLX stub syntax error - not fixable from this pr
 
 echo "=== Pytest ==="
 $PYTHON -m pytest -v
+
+echo "=== ShellCheck ==="
+if command -v shellcheck &> /dev/null; then
+    # Find all shell scripts and check them
+    # shellcheck disable=SC2046
+    shellcheck $(find tools -name "*.sh" -type f)
+else
+    echo "⚠️  Skipped (shellcheck not found)"
+    echo "   Install with: brew install shellcheck"
+fi
 
 # Markdown linting runs from the repo root
 cd ..

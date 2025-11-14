@@ -144,7 +144,10 @@ install_dependencies() {
     log_info "Installing dependencies in environment: $ENV_NAME"
     
     # Activate environment
-    source "$(conda info --base)/etc/profile.d/conda.sh"
+    # Initialize conda for this shell session
+echo "Initializing conda for bash..."
+# shellcheck disable=SC1091
+source "$(conda info --base)/etc/profile.d/conda.sh"
     conda activate "$ENV_NAME"
     
     # Core runtime dependencies (from pyproject.toml)

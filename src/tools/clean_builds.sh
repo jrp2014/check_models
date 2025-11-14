@@ -77,7 +77,7 @@ clean_directory() {
 			if [[ $DRY_RUN -eq 1 ]]; then
 				echo "  [DRY RUN] Would remove: $pattern/"
 			else
-				rm -rf "$dir/$pattern"
+				rm -rf "${dir:?}/$pattern"
 				echo "  ✓ Removed: $pattern/"
 			fi
 			((cleaned++))

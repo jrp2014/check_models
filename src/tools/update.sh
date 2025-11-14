@@ -162,8 +162,6 @@ check_mlx_build_requirements() {
 		MACOS_VERSION=$(sw_vers -productVersion)
 		local MACOS_MAJOR
 		MACOS_MAJOR=$(echo "$MACOS_VERSION" | cut -d. -f1)
-		local MACOS_MINOR
-		MACOS_MINOR=$(echo "$MACOS_VERSION" | cut -d. -f2)
 		
 		if [[ $MACOS_MAJOR -lt 14 ]]; then
 			echo "⚠️  WARNING: macOS $MACOS_VERSION detected. MLX requires >= 14.0 (Sonoma)"
