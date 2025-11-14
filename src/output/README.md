@@ -1,6 +1,6 @@
 # Generated Reports
 
-This directory contains generated HTML and Markdown reports from running `check_models.py`.
+This directory contains generated HTML, Markdown, and TSV reports from running `check_models.py`.
 
 The script's default output location is now this directory, keeping the project root clean.
 
@@ -9,7 +9,8 @@ The script's default output location is now this directory, keeping the project 
 ### Production Output (committed to git)
 
 - `results.html` - Styled HTML report (viewable in browser)
-- `results.md` - GitHub-friendly Markdown report  
+- `results.md` - GitHub-friendly Markdown report
+- `results.tsv` - Tab-separated values table (for spreadsheets/data analysis)
 - `check_models.log` - Detailed execution log from production benchmark runs
 
 These files are regenerated each time you run the tool and **committed to version control** so results are visible in GitHub.
@@ -23,16 +24,17 @@ When running tests, integration checks, or debug runs, pass custom output paths 
 python check_models.py \
   --output-html output/test_results.html \
   --output-markdown output/test_results.md \
+  --output-tsv output/test_results.tsv \
   --output-log output/test_check_models.log \
   [other options...]
 ```
 
-Files matching `test_*.{html,md,log}` are automatically excluded from git tracking via `.gitignore`.
+Files matching `test_*.{html,md,tsv,log}` are automatically excluded from git tracking via `.gitignore`.
 
 **Separation strategy**:
 
-- **Production runs**: Use default outputs (`check_models.log`, `results.html`, `results.md`) → committed to git
-- **Integration tests**: Use `test_cli_integration.{log,html,md}` → gitignored (handled automatically by test suite)
+- **Production runs**: Use default outputs (`check_models.log`, `results.html`, `results.md`, `results.tsv`) → committed to git
+- **Integration tests**: Use `test_cli_integration.{log,html,md,tsv}` → gitignored (handled automatically by test suite)
 - **Manual test/debug runs**: Pass custom paths with `test_` prefix or any other name except the production defaults → gitignored
 - **Pre-push git hook**: Runs pytest which uses test-specific output files → doesn't overwrite production log
 

@@ -1,6 +1,6 @@
 # MLX Vision Language Model Checker (`check_models.py`)
 
-`check_models.py` is a focused benchmarking and inspection tool for MLX-compatible Vision Language Models (VLMs) on Apple Silicon. It loads one or more local / cached models, optionally derives a prompt from image metadata (EXIF + GPS), runs generation, and reports performance (tokens, speed, timings, memory) plus outputs in colorized CLI, HTML, and Markdown formats.
+`check_models.py` is a focused benchmarking and inspection tool for MLX-compatible Vision Language Models (VLMs) on Apple Silicon. It loads one or more local / cached models, optionally derives a prompt from image metadata (EXIF + GPS), runs generation, and reports performance (tokens, speed, timings, memory) plus outputs in colorized CLI, HTML, Markdown, and TSV formats.
 
 ## Who is this for?
 
@@ -9,7 +9,7 @@
 
 ## TL;DR for Users
 
-Defaults assume you have Hugging Face models in your local cache. The tool will discover cached VLMs automatically (unless you pass `--models`), carefully read EXIF metadata (including GPS/time when present) to enrich prompts, and write reports to `output/results.html` and `output/results.md` by default.
+Defaults assume you have Hugging Face models in your local cache. The tool will discover cached VLMs automatically (unless you pass `--models`), carefully read EXIF metadata (including GPS/time when present) to enrich prompts, and write reports to `output/results.html`, `output/results.md`, and `output/results.tsv` by default.
 
 Quickest start on Apple Silicon (Python 3.13):
 
@@ -49,7 +49,7 @@ Key defaults and parameters:
 - Models: discovered from Hugging Face cache. Use `--models` for explicit IDs, `--exclude` to filter.
 - Images: `-f/--folder` points to your images; default is `~/Pictures/Processed`.
 - **Folder behavior**: When you pass a folder path, the script automatically selects the **most recently modified image file** in that folder (hidden files are ignored).
-- Reports: By default, `output/results.html` and `output/results.md` are created; override via `--output-html` and `--output-markdown`.
+- Reports: By default, `output/results.html`, `output/results.md`, and `output/results.tsv` are created; override via `--output-html`, `--output-markdown`, and `--output-tsv`.
 - Prompting: If `--prompt` isn't provided, the tool can compose a metadata‑aware prompt from EXIF data when available (camera, time, GPS).
 - Runtime: `--timeout 300`, `--max-tokens 500`, `--temperature 0.1` by default.
 - Sampling: `--top-p 1.0` (nucleus sampling), `--repetition-penalty` (disabled by default).
@@ -508,6 +508,7 @@ python check_models.py \
 | `-f`, `--folder` | Path | `~/Pictures/Processed` | Folder of images to process (non‑recursive). |
 | `--output-html` | Path | `output/results.html` | HTML report output file. |
 | `--output-markdown` | Path | `results.md` | Markdown report output file. |
+| `--output-tsv` | Path | `output/results.tsv` | TSV (tab-separated values) report output file. |
 | `--baseline-file` | Path | `output/baseline.txt` | Path to baseline/golden text file for evaluation scoring. |
 | `-m`, `--models` | list[str] | (none) | Explicit model IDs/paths; disables cache discovery. |
 | `-e`, `--exclude` | list[str] | (none) | Models to exclude (applies to cache scan or explicit list). |
@@ -736,7 +737,7 @@ mlx-vlm-check/
 └── Makefile               # Root orchestration
 ```
 
-**Output behavior**: By default, reports are written to `output/` (git-ignored). Override with `--output-html` / `--output-markdown`.
+**Output behavior**: By default, reports are written to `output/` (git-ignored). Override with `--output-html`, `--output-markdown`, and `--output-tsv`.
 
 ## Contributing
 

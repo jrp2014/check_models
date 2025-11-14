@@ -361,6 +361,7 @@ DEFAULT_FOLDER: Final[Path] = Path.home() / "Pictures" / "Processed"
 _SCRIPT_DIR = Path(__file__).parent
 DEFAULT_HTML_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.html"
 DEFAULT_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.md"
+DEFAULT_TSV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.tsv"
 DEFAULT_LOG_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "check_models.log"
 DEFAULT_BASELINE_FILE: Final[Path] = _SCRIPT_DIR / "output" / "baseline.txt"
 DEFAULT_TEMPERATURE: Final[float] = 0.1
@@ -3221,6 +3222,79 @@ def generate_markdown_report(
         )
 
 
+def generate_tsv_report(
+    results: list[PerformanceResult],
+    filename: Path,
+) -> None:
+    """Write a TSV (tab-separated values) file of the core results table.
+
+    This outputs only the data table without metadata, properly escaping tabs and newlines
+    in field values to maintain TSV format integrity.
+
+    Args:
+        results: List of PerformanceResult objects.
+        filename: Path where the TSV file will be written.
+    """
+    if not results:
+        logger.warning(
+            Colors.colored("No results to generate TSV report.", Colors.YELLOW),
+        )
+        return
+
+    headers, rows, _ = _prepare_table_data(results)
+
+    if not headers or not rows:
+        logger.warning("No table data to generate TSV report.")
+        return
+
+    def escape_tsv_value(value: str) -> str:
+        r"""Escape a value for TSV format.
+
+        Replaces tabs with spaces and newlines with literal \n to preserve
+        the tabular structure. This ensures each record stays on one line.
+        """
+        # Replace actual tabs with spaces
+        value = value.replace("\t", "    ")
+        # Replace newlines with escaped newline sequence
+        value = value.replace("\n", "\\n")
+        # Remove carriage returns
+        return value.replace("\r", "")
+
+    # Clean headers: remove HTML tags and escape for TSV
+    clean_headers = []
+    for header in headers:
+        # Remove <br> tags and other HTML
+        clean_header = header.replace("<br>", " ").strip()
+        clean_header = re.sub(r"<[^>]+>", "", clean_header)
+        clean_headers.append(escape_tsv_value(clean_header))
+
+    # Clean and escape row data
+    clean_rows = []
+    for row in rows:
+        clean_row = [escape_tsv_value(str(cell)) for cell in row]
+        clean_rows.append(clean_row)
+
+    # Generate TSV using tabulate with tsv format
+    tsv_content = tabulate(
+        clean_rows,
+        headers=clean_headers,
+        tablefmt="tsv",
+    )
+
+    try:
+        with filename.open("w", encoding="utf-8") as f:
+            f.write(tsv_content)
+            # Ensure file ends with newline
+            if not tsv_content.endswith("\n"):
+                f.write("\n")
+        logger.info(
+            "TSV report saved to: %s",
+            Colors.colored(str(filename.resolve()), Colors.GREEN),
+        )
+    except OSError:
+        logger.exception("Failed to write TSV report to %s", filename)
+
+
 def _escape_markdown_in_text(text: str) -> str:
     """Escape only structural Markdown chars (currently pipe only).
 
@@ -4889,8 +4963,10 @@ def finalize_execution(
         try:
             html_output_path: Path = args.output_html.resolve()
             md_output_path: Path = args.output_markdown.resolve()
+            tsv_output_path: Path = args.output_tsv.resolve()
             html_output_path.parent.mkdir(parents=True, exist_ok=True)
             md_output_path.parent.mkdir(parents=True, exist_ok=True)
+            tsv_output_path.parent.mkdir(parents=True, exist_ok=True)
 
             generate_html_report(
                 results=results,
@@ -4907,6 +4983,10 @@ def finalize_execution(
                 prompt=prompt,
                 total_runtime_seconds=overall_time,
             )
+            generate_tsv_report(
+                results=results,
+                filename=tsv_output_path,
+            )
 
             logger.info("")
             logger.info(
@@ -4915,6 +4995,7 @@ def finalize_execution(
             )
             logger.info("   HTML:     %s", Colors.colored(str(html_output_path), Colors.CYAN))
             logger.info("   Markdown: %s", Colors.colored(str(md_output_path), Colors.CYAN))
+            logger.info("   TSV:      %s", Colors.colored(str(tsv_output_path), Colors.CYAN))
             log_output = args.output_log.resolve()
             logger.info("   Log:      %s", Colors.colored(str(log_output), Colors.CYAN))
         except (OSError, ValueError):
@@ -5012,6 +5093,12 @@ def main_cli() -> None:
         type=Path,
         default=DEFAULT_MD_OUTPUT,
         help="Output Github Markdown report file.",
+    )
+    parser.add_argument(
+        "--output-tsv",
+        type=Path,
+        default=DEFAULT_TSV_OUTPUT,
+        help="Output TSV (tab-separated values) report file.",
     )
     parser.add_argument(
         "--output-log",
