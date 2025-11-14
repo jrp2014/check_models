@@ -3,10 +3,11 @@
 # Installs/updates the project and all dependencies from pyproject.toml.
 #
 # Execution Order:
-#   1. Update Homebrew (if available)
-#   2. Update pip/wheel/setuptools
-#   3. Install project in editable mode with all dependencies (dev + extras)
-#   4. Then update local MLX repos (if present) OR update from PyPI
+#   1. Update conda (if in conda environment)
+#   2. Update Homebrew (if available)
+#   3. Update pip/wheel/setuptools
+#   4. Install project in editable mode with all dependencies (dev + extras)
+#   5. Then update local MLX repos (if present) OR update from PyPI
 #
 # Usage examples:
 #   ./update.sh                       # Install project + dev + extras (MLX_METAL_JIT=OFF by default)
@@ -28,9 +29,9 @@
 #   6. Skip PyPI updates for these packages
 #
 # Requirements for local MLX builds:
-#   - CMake >= 3.27
+#   - CMake >= 3.25 (MLX minimum requirement)
 #   - Xcode >= 15.0 (macOS)
-#   - macOS >= 13.5 (for Metal backend)
+#   - macOS >= 14.0 (MLX PyPI requirement)
 #
 # Note: Script automatically detects and preserves local MLX dev builds (versions
 # containing .dev or +commit). Stable releases are updated normally.
@@ -56,6 +57,14 @@ if [[ -z "${VIRTUAL_ENV:-}" ]] && [[ -z "${CONDA_DEFAULT_ENV:-}" ]] && [[ -z "${
 		exit 1
 	fi
 	echo "[update.sh] Proceeding with global installation (user confirmed)..."
+fi
+
+# Update conda itself if in a conda environment
+if [[ -n "${CONDA_DEFAULT_ENV:-}" ]]; then
+	echo "[update.sh] Updating conda and all packages in current environment..."
+	conda update --all -y
+else
+	echo "[update.sh] Not in conda environment; skipping conda update"
 fi
 
 # Homebrew updates first (if available)
@@ -127,7 +136,7 @@ check_mlx_build_requirements() {
 	
 	# Check for CMake and version
 	if ! command -v cmake >/dev/null 2>&1; then
-		echo "❌ ERROR: CMake not found. MLX requires CMake >= 3.27"
+		echo "❌ ERROR: CMake not found. MLX requires CMake >= 3.25"
 		echo "   Install with: brew install cmake"
 		has_errors=1
 	else
@@ -138,16 +147,16 @@ check_mlx_build_requirements() {
 		local CMAKE_MINOR
 		CMAKE_MINOR=$(echo "$CMAKE_VERSION" | cut -d. -f2)
 		
-		if [[ $CMAKE_MAJOR -lt 3 ]] || [[ $CMAKE_MAJOR -eq 3 && $CMAKE_MINOR -lt 27 ]]; then
-			echo "❌ ERROR: CMake $CMAKE_VERSION found, but MLX requires >= 3.27"
+		if [[ $CMAKE_MAJOR -lt 3 ]] || [[ $CMAKE_MAJOR -eq 3 && $CMAKE_MINOR -lt 25 ]]; then
+			echo "❌ ERROR: CMake $CMAKE_VERSION found, but MLX requires >= 3.25"
 			echo "   Update with: brew upgrade cmake"
 			has_errors=1
 		else
-			echo "✓ CMake $CMAKE_VERSION (>= 3.27 required)"
+			echo "✓ CMake $CMAKE_VERSION (>= 3.25 required)"
 		fi
 	fi
 	
-	# Check for macOS version (Metal backend requirement)
+	# Check for macOS version (MLX PyPI requirement is >= 14.0)
 	if [[ "$OSTYPE" == "darwin"* ]]; then
 		local MACOS_VERSION
 		MACOS_VERSION=$(sw_vers -productVersion)
@@ -156,10 +165,10 @@ check_mlx_build_requirements() {
 		local MACOS_MINOR
 		MACOS_MINOR=$(echo "$MACOS_VERSION" | cut -d. -f2)
 		
-		if [[ $MACOS_MAJOR -lt 13 ]] || [[ $MACOS_MAJOR -eq 13 && $MACOS_MINOR -lt 5 ]]; then
-			echo "⚠️  WARNING: macOS $MACOS_VERSION detected. MLX recommends >= 13.5 for Metal backend"
+		if [[ $MACOS_MAJOR -lt 14 ]]; then
+			echo "⚠️  WARNING: macOS $MACOS_VERSION detected. MLX requires >= 14.0 (Sonoma)"
 		else
-			echo "✓ macOS $MACOS_VERSION (>= 13.5 required for Metal)"
+			echo "✓ macOS $MACOS_VERSION (>= 14.0 required for MLX)"
 		fi
 	fi
 	
