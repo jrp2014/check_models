@@ -9,6 +9,7 @@ import contextlib
 import dataclasses
 import html
 import importlib.util as importlib_util
+import io
 import json
 import logging
 import math
@@ -2834,8 +2835,14 @@ def _build_full_html_document(
         th { background-color: #f2f2f2; font-weight: bold; }
         .numeric { text-align: right; }
         .failed { background-color: #ffdddd; }
-        .summary { margin-top: 2em; padding: 1em; border: 1px solid #eee; background-color: #f9f9f9; }
-        .embedded-image { max-width: 600px; margin: 1em 0; border: 1px solid #ccc; border-radius: 4px; }
+        .summary {
+            margin-top: 2em; padding: 1em; border: 1px solid #eee;
+            background-color: #f9f9f9;
+        }
+        .embedded-image {
+            max-width: 600px; margin: 1em 0; border: 1px solid #ccc;
+            border-radius: 4px;
+        }
         details { cursor: pointer; max-width: 800px; }
         details summary {
             font-weight: normal;
@@ -2872,10 +2879,36 @@ def _build_full_html_document(
     image_html = ""
     if image_path and image_path.exists():
         try:
-            with image_path.open("rb") as img_file:
-                img_data = base64.b64encode(img_file.read()).decode("utf-8")
-                # Determine MIME type from extension
+            # Open and resize image if needed
+            with Image.open(image_path) as img_original:
+                # Resize if larger than 1024px in either dimension
+                max_size = 1024
+                img_to_save = img_original
+                if img_original.width > max_size or img_original.height > max_size:
+                    # Calculate new dimensions maintaining aspect ratio
+                    ratio = min(max_size / img_original.width, max_size / img_original.height)
+                    new_width = int(img_original.width * ratio)
+                    new_height = int(img_original.height * ratio)
+                    img_to_save = img_original.resize(
+                        (new_width, new_height),
+                        Image.Resampling.LANCZOS,
+                    )
+
+                # Convert to bytes
+                img_buffer = io.BytesIO()
+                # Determine format from extension
                 ext = image_path.suffix.lower()
+                img_format = {
+                    ".jpg": "JPEG",
+                    ".jpeg": "JPEG",
+                    ".png": "PNG",
+                    ".gif": "GIF",
+                    ".webp": "WEBP",
+                }.get(ext, "JPEG")
+                img_to_save.save(img_buffer, format=img_format)
+                img_data = base64.b64encode(img_buffer.getvalue()).decode("utf-8")
+
+                # Determine MIME type
                 mime_type = {
                     ".jpg": "image/jpeg",
                     ".jpeg": "image/jpeg",
