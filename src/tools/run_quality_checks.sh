@@ -45,8 +45,7 @@ else
 fi
 
 echo "=== MyPy Type Check ==="
-echo "⚠️  Skipped (external MLX stub syntax error - not fixable from this project)"
-# $PYTHON -m mypy check_models.py
+$PYTHON -m mypy check_models.py
 
 echo "=== Pytest ==="
 $PYTHON -m pytest -v

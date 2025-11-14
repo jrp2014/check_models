@@ -2700,7 +2700,7 @@ def _wrap_output_column_in_details(html_table: str, output_col_idx: int) -> str:
                     cell_iter = iter(cells)
                     updated_line = re.sub(
                         r"<td[^>]*>.*?</td>",
-                        lambda _, ci=cell_iter: next(ci),
+                        lambda _, ci=cell_iter: next(ci),  # type: ignore[misc]
                         original_line,
                     )
                     result_lines.append(updated_line)
@@ -3146,7 +3146,10 @@ def generate_html_report(
         rows,
         headers=headers,
         tablefmt="html",
-        colalign=["left"] + ["right" if is_numeric_field(f) else "left" for f in field_names[1:]],
+        colalign=[
+            "left",
+            *["right" if is_numeric_field(field) else "left" for field in field_names[1:]],
+        ],
     )
 
     # Add CSS classes for alignment and styling
@@ -3154,9 +3157,9 @@ def generate_html_report(
         "<th>",
         '<th class="text">',
     )
-    for f in field_names:
-        if is_numeric_field(f):
-            idx = field_names.index(f)
+    for field in field_names:
+        if is_numeric_field(field):
+            idx = field_names.index(field)
             html_table = html_table.replace(
                 f"<td>{rows[0][idx]}",
                 f'<td class="numeric">{rows[0][idx]}',

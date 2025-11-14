@@ -75,6 +75,7 @@ dev = [
     "pytest-cov>=4.0.0",
     "types-tabulate",
     "types-tqdm",
+    "types-psutil",
 ]
 
 [build-system]
@@ -170,12 +171,14 @@ reportMissingImports = true
 reportUnusedImport = "warning"
 
 [tool.mypy]
-# Simplified mypy configuration - pragmatic type checking
+# Pragmatic type checking with MLX library support
 python_version = "3.13"
-# Treat imports as third-party - don't follow them for type checking
-# This prevents mypy from parsing external library stubs (like MLX) that may have errors
-follow_imports = "skip"
-ignore_missing_imports = true
+# Follow imports to enable type checking for typed libraries like MLX
+follow_imports = "normal"
+# Check types from libraries that provide type information (MLX has py.typed marker)
+ignore_missing_imports = false
+# Include local type stubs if generated (update.sh can generate stubs for local MLX builds)
+mypy_path = "typings"
 
 # Core strictness - catch common errors in our own code
 warn_unused_ignores = true
@@ -189,6 +192,18 @@ disallow_incomplete_defs = true
 [[tool.mypy.overrides]]
 module = "tests.*"
 ignore_errors = true
+
+# Override for libraries that genuinely lack type information
+[[tool.mypy.overrides]]
+module = [
+    "cv2.*",
+    "PIL.*",
+    "mlx.core",      # MLX core - C extension without complete stubs
+    "mlx_lm.*",      # MLX Language Models - no py.typed marker
+    "mlx_vlm.*",     # MLX Vision-Language Models - no py.typed marker  
+    "tokenizers.*",  # HuggingFace tokenizers - no py.typed marker
+]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 # Limit test discovery to the dedicated tests package inside the project
