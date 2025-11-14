@@ -2613,7 +2613,7 @@ def _prepare_table_data(
 
 
 def _mark_failed_rows_in_html(html_table: str, results: list[PerformanceResult]) -> str:
-    """Add a 'failed' class to rows for failed models in the HTML table."""
+    """Add data attributes and classes to rows for filtering in the HTML table."""
     sorted_results = _sort_results_by_time(results)
     table_rows = html_table.split("<tr>")
     new_table_rows = [table_rows[0]]  # Keep the header row
@@ -2621,10 +2621,30 @@ def _mark_failed_rows_in_html(html_table: str, results: list[PerformanceResult])
     for i, res in enumerate(sorted_results):
         if i + 1 < len(table_rows):
             row_html = table_rows[i + 1]
+
+            # Add data attributes for filtering
             if not res.success:
-                new_table_rows.append(row_html.replace("<td>", '<td class="failed">', 1))
+                # Determine error category
+                error_stage = res.error_stage or "unknown"
+                error_type = res.error_type or "error"
+
+                # Add both class and data attributes for flexible filtering
+                row_html = row_html.replace(
+                    "<tr>",
+                    f'<tr class="failed" data-status="failed" '
+                    f'data-error-stage="{error_stage}" data-error-type="{error_type}">',
+                    1,
+                )
+                # Also mark first td with failed class for background color
+                row_html = row_html.replace("<td", '<td class="failed"', 1)
             else:
-                new_table_rows.append(row_html)
+                row_html = row_html.replace(
+                    "<tr>",
+                    '<tr class="success" data-status="success">',
+                    1,
+                )
+
+            new_table_rows.append(row_html)
 
     return "<tr>".join(new_table_rows)
 
@@ -2836,6 +2856,7 @@ def _build_full_html_document(
         th { background-color: #f2f2f2; font-weight: bold; }
         .numeric { text-align: right; }
         .failed { background-color: #ffdddd; }
+        tr.hidden { display: none; }
         .summary {
             margin-top: 2em; padding: 1em; border: 1px solid #eee;
             background-color: #f9f9f9;
@@ -2861,12 +2882,105 @@ def _build_full_html_document(
             white-space: pre-wrap;
             word-wrap: break-word;
         }
+        .filter-controls {
+            margin: 1em 0;
+            padding: 1em;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .filter-btn {
+            padding: 0.5em 1em;
+            margin: 0.25em;
+            border: 1px solid #999;
+            background-color: #fff;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        .filter-btn:hover {
+            background-color: #e8e8e8;
+        }
+        .filter-btn.active {
+            background-color: #0066cc;
+            color: white;
+            border-color: #0055aa;
+        }
+        .filter-info {
+            margin-top: 0.5em;
+            font-size: 0.9em;
+            color: #666;
+        }
     </style>
     """
     sys_info_html = "<ul>"
     for k, v in system_info.items():
         sys_info_html += f"<li><b>{html.escape(k)}:</b> {html.escape(v)}</li>"
     sys_info_html += "</ul>"
+
+    # Build filter controls with JavaScript
+    filter_controls = """
+    <div class="filter-controls">
+        <div>
+            <strong>Filter Results:</strong>
+            <button class="filter-btn active" onclick="filterTable('all')">All</button>
+            <button class="filter-btn" onclick="filterTable('success')">Success Only</button>
+            <button class="filter-btn" onclick="filterTable('failed')">Failed Only</button>
+            <button class="filter-btn" onclick="filterTable('load')">Load Errors</button>
+            <button class="filter-btn" onclick="filterTable('generation')">
+                Generation Errors
+            </button>
+            <button class="filter-btn" onclick="filterTable('timeout')">Timeouts</button>
+        </div>
+        <div class="filter-info" id="filter-info">Showing all rows</div>
+    </div>
+
+    <script>
+    function filterTable(filterType) {
+        const table = document.querySelector('table');
+        const rows = table.querySelectorAll('tr[data-status]');
+        let visibleCount = 0;
+
+        // Update button states
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+
+        // Apply filter
+        rows.forEach(row => {
+            let show = false;
+
+            if (filterType === 'all') {
+                show = true;
+            } else if (filterType === 'success') {
+                show = row.dataset.status === 'success';
+            } else if (filterType === 'failed') {
+                show = row.dataset.status === 'failed';
+            } else {
+                // Filter by error stage
+                show = row.dataset.errorStage === filterType;
+            }
+
+            if (show) {
+                row.classList.remove('hidden');
+                visibleCount++;
+            } else {
+                row.classList.add('hidden');
+            }
+        });
+
+        // Update info text
+        const totalRows = rows.length;
+        const filterInfo = document.getElementById('filter-info');
+        if (filterType === 'all') {
+            filterInfo.textContent = `Showing all ${totalRows} rows`;
+        } else {
+            filterInfo.textContent = `Showing ${visibleCount} of ${totalRows} rows`;
+        }
+    }
+    </script>
+    """
 
     versions_html = "<ul>"
     for name, ver in sorted(versions.items()):
@@ -2946,6 +3060,7 @@ def _build_full_html_document(
         <pre>{html.escape(prompt)}</pre>
         <h2>Results</h2>
         <p><strong>Overall runtime:</strong> {format_overall_runtime(total_runtime_seconds)}</p>
+        {filter_controls}
         {html_table}
         <h2>System Information</h2>
         {sys_info_html}
