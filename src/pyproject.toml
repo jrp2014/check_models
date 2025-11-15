@@ -180,6 +180,8 @@ follow_imports = "skip"
 ignore_missing_imports = true
 # Include local type stubs if generated (update.sh can generate stubs for local MLX builds)
 mypy_path = "typings"
+# Silence errors from site-packages stubs (e.g., MLX stub syntax errors)
+no_silence_site_packages = false
 
 # Core strictness - catch common errors in our own code
 warn_unused_ignores = true
