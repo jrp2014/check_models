@@ -5120,37 +5120,8 @@ def process_models(
                     gen_tokens,
                     prompt=prompt,
                 )
-                # Build consolidated quality issues string
-                issues = []
-                # Put critical issues first
-                if analysis.is_refusal:
-                    refusal_label = (
-                        f"refusal({analysis.refusal_type})" if analysis.refusal_type else "refusal"
-                    )
-                    issues.append(refusal_label)
-                if analysis.is_repetitive:
-                    rep_label = (
-                        f"repetitive({analysis.repeated_token})"
-                        if analysis.repeated_token
-                        else "repetitive"
-                    )
-                    issues.append(rep_label)
-                if analysis.has_language_mixing:
-                    issues.append("lang_mixing")
-                if analysis.hallucination_issues:
-                    issues.append("hallucination")
-                if analysis.is_generic:
-                    issues.append(f"generic({analysis.specificity_score:.0f})")
-                if analysis.is_verbose:
-                    issues.append("verbose")
-                if analysis.formatting_issues:
-                    issues.append("formatting")
-                if analysis.has_excessive_bullets:
-                    issues.append(f"bullets({analysis.bullet_count})")
-                if analysis.is_context_ignored:
-                    issues.append("context-ignored")
-
-                quality_issues_str = ", ".join(issues) if issues else None
+                # Build consolidated quality issues string using helper
+                quality_issues_str = _build_quality_issues_string(analysis)
 
                 # Update result with quality metrics
                 result = dataclasses.replace(
@@ -5170,6 +5141,63 @@ def process_models(
             prompt=prompt,
         )
     return results
+
+
+def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | None:
+    """Build consolidated quality issues string from analysis results.
+
+    Prioritizes critical issues first (refusal → repetitive → lang_mixing →
+    hallucination → generic → verbose → formatting → bullets → context-ignored).
+
+    Args:
+        analysis: GenerationQualityAnalysis with detected issues
+
+    Returns:
+        Comma-separated issues string or None if no issues detected
+
+    Examples:
+        >>> analysis = GenerationQualityAnalysis(
+        ...     is_repetitive=True, repeated_token="<s>",
+        ...     is_verbose=True, ...
+        ... )
+        >>> _build_quality_issues_string(analysis)
+        'repetitive(<s>), verbose'
+    """
+    issues = []
+
+    # Critical issues first
+    if analysis.is_refusal:
+        refusal_label = f"refusal({analysis.refusal_type})" if analysis.refusal_type else "refusal"
+        issues.append(refusal_label)
+
+    if analysis.is_repetitive:
+        rep_label = (
+            f"repetitive({analysis.repeated_token})" if analysis.repeated_token else "repetitive"
+        )
+        issues.append(rep_label)
+
+    if analysis.has_language_mixing:
+        issues.append("lang_mixing")
+
+    if analysis.hallucination_issues:
+        issues.append("hallucination")
+
+    if analysis.is_generic:
+        issues.append(f"generic({analysis.specificity_score:.0f})")
+
+    if analysis.is_verbose:
+        issues.append("verbose")
+
+    if analysis.formatting_issues:
+        issues.append("formatting")
+
+    if analysis.has_excessive_bullets:
+        issues.append(f"bullets({analysis.bullet_count})")
+
+    if analysis.is_context_ignored:
+        issues.append("context-ignored")
+
+    return ", ".join(issues) if issues else None
 
 
 # MOD: Added error bucketing diagnostic helper
