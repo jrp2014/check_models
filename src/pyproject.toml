@@ -162,13 +162,17 @@ max-args = 10
 max-branches = 15
 max-statements = 60
 
-[tool.pylance]
+[tool.pyright]
 # Pyright/Pylance configuration
 # See: https://github.com/microsoft/pyright/blob/main/docs/configuration.md
 pythonVersion = "3.13"
 typeCheckingMode = "basic" # Can be "off", "basic", or "strict"
-reportMissingImports = true
+# Allow imports from libraries without type stubs (mlx, mlx-vlm, etc.)
+reportMissingImports = false
+reportMissingTypeStubs = false
 reportUnusedImport = "warning"
+# Ignore type errors in third-party libraries without stubs
+reportAttributeAccessIssue = "none"
 
 [tool.mypy]
 # Pragmatic type checking with MLX library support
