@@ -62,6 +62,7 @@ extras = [
     # Language-model utilities & transformer inference (not required for base benchmarking)
     "mlx-lm>=0.23.0",
     "transformers>=4.53.0",
+    "sentencepiece",
 ]
 torch = [
     "torch>=2.2.0",
