@@ -200,6 +200,12 @@ disallow_incomplete_defs = true
 module = "tests.*"
 ignore_errors = true
 
+[tool.ty]
+# ty (Astral's type checker) configuration
+# Disable unresolved-import rule - mlx ecosystem packages work at runtime
+# but are installed as editable/local packages without proper type stubs
+rules = { unresolved-import = "ignore" }
+
 [tool.pytest.ini_options]
 # Limit test discovery to the dedicated tests package inside the project
 # (avoids collecting helper scripts or example snippets).
