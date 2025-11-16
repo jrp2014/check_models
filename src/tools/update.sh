@@ -22,16 +22,18 @@
 #   the script will automatically (AFTER installing all library dependencies):
 #   1. Run git pull in each repository
 #   2. Install requirements.txt (if present) for additional dependencies
-#      (Note: mlx requires nanobind==2.4.0 and setuptools>=80 for dev builds)
+#      (Note: mlx REQUIRES nanobind==2.4.0 exactly and setuptools>=80 for builds)
 #   3. Install packages in dependency order: mlx → mlx-lm → mlx-vlm
-#   4. Generate type stubs (mlx: python setup.py generate_stubs)
+#   4. Generate type stubs (mlx: python setup.py generate_stubs, requires typing_extensions)
 #   5. Generate stubs for this project (mlx_vlm, tokenizers)
 #   6. Skip PyPI updates for these packages
 #
 # Requirements for local MLX builds:
-#   - CMake >= 3.25 (MLX minimum requirement)
-#   - Xcode >= 15.0 (macOS)
+#   - CMake >= 3.25 (MLX minimum requirement as of 2025)
+#   - Xcode >= 15.0 (macOS, for Metal support)
 #   - macOS >= 14.0 (MLX PyPI requirement)
+#   - nanobind==2.4.0 (exact version, required by MLX)
+#   - setuptools>=80 (required for stub generation)
 #
 # Note: Script automatically detects and preserves local MLX dev builds (versions
 # containing .dev or +commit). Stable releases are updated normally.
@@ -294,6 +296,11 @@ update_local_mlx_repos() {
 		
 		# MLX requires CMake configuration before pip install
 		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
+			# Install MLX build dependencies (matching GitHub Actions)
+			echo "[update.sh] Installing MLX build dependencies..."
+			pip_install "cmake setuptools"
+			pip install nanobind==2.4.0  # Pinned version, no -U
+			
 			[[ "${CLEAN_BUILD:-0}" == "1" ]] && rm -rf build
 			
 			local JIT_SETTING="${MLX_METAL_JIT:-OFF}"
@@ -322,10 +329,15 @@ update_local_mlx_repos() {
 		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
 			echo "[update.sh] Generating type stubs for mlx..."
 			
-			# Verify setuptools is installed (required for stub generation)
+			# Verify setuptools and typing_extensions are installed (both required for stub generation)
 			if ! python -c "import setuptools; exit(0 if tuple(map(int, setuptools.__version__.split('.'))) >= (80, 0, 0) else 1)" 2>/dev/null; then
 				echo "[update.sh] Installing setuptools>=80 (required for stub generation)..."
 				pip_install "setuptools>=80"
+			fi
+			
+			if ! python -c "import typing_extensions" 2>/dev/null; then
+				echo "[update.sh] Installing typing_extensions (required for stub generation)..."
+				pip_install "typing_extensions"
 			fi
 			
 			if python setup.py generate_stubs; then
