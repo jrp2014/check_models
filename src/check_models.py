@@ -417,16 +417,8 @@ class PerformanceResult:
     total_time: float | None = None  # Total time including model loading
     # MOD: Added error_type to preserve original exception type for better error bucketing
     error_type: str | None = None  # Original exception type name (e.g., "TypeError", "ImportError")
-    # MOD: Added quality_score for baseline evaluation
-    quality_score: float | None = None  # Keyword overlap score vs baseline (0-100%)
-    # MOD: Added detailed quality analysis fields
-    is_repetitive: bool | None = None  # Whether repetitive patterns detected
-    repeated_token: str | None = None  # The repeated token/phrase if any
-    is_verbose: bool | None = None  # Excessive verbosity flag
-    has_formatting_issues: bool | None = None  # Whether formatting problems detected
-    has_hallucination_issues: bool | None = None  # Whether potential hallucinations detected
-    has_excessive_bullets: bool | None = None  # Too many bullet points
-    is_context_ignored: bool | None = None  # Context ignorance detected
+    # MOD: Consolidated quality analysis into single field
+    quality_issues: str | None = None  # Detected issues (e.g., "repetitive, verbose")
 
 
 class ResultSet:
@@ -872,13 +864,7 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
     "generation_time": ("Generation", "(s)"),
     "model_load_time": ("Load", "(s)"),
     "total_time": ("Total", "(s)"),
-    "quality_score": ("Score", "(%)"),  # MOD: Added baseline evaluation score
-    "is_repetitive": ("Repetitive", ""),
-    "is_verbose": ("Verbose", ""),
-    "has_formatting_issues": ("Format Issues", ""),
-    "has_hallucination_issues": ("Hallucination", ""),
-    "has_excessive_bullets": ("Excess Bullets", ""),
-    "is_context_ignored": ("Ignored Context", ""),
+    "quality_issues": ("Quality Issues", ""),  # MOD: Consolidated quality analysis
 }
 
 # Threshold for splitting long header text into multiple lines
@@ -897,7 +883,6 @@ NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
         "generation_time",
         "model_load_time",
         "total_time",
-        "quality_score",  # MOD: Added baseline evaluation score
     },
 )
 
@@ -910,13 +895,7 @@ PERFORMANCE_TIMING_FIELDS: Final[list[str]] = [
     "generation_time",
     "model_load_time",
     "total_time",
-    "quality_score",  # MOD: Added baseline evaluation score
-    "is_repetitive",
-    "is_verbose",
-    "has_formatting_issues",
-    "has_hallucination_issues",
-    "has_excessive_bullets",
-    "is_context_ignored",
+    "quality_issues",  # MOD: Consolidated quality analysis
 ]
 
 
@@ -1456,6 +1435,185 @@ def _detect_context_ignorance(text: str, prompt: str) -> tuple[bool, list[str]]:
     return is_ignored, missing_terms
 
 
+def _detect_refusal_patterns(text: str) -> tuple[bool, str | None]:
+    """Detect if model refused or expressed high uncertainty.
+
+    Catches cases where the model can't or won't process the image.
+
+    Args:
+        text: Generated text to check
+
+    Returns:
+        Tuple of (is_refusal, refusal_type)
+    """
+    if not text:
+        return False, None
+
+    text_lower = text.lower()
+
+    # Refusal patterns
+    refusal_patterns = [
+        (
+            "explicit_refusal",
+            [
+                "i cannot",
+                "i can't",
+                "i'm unable to",
+                "i am unable to",
+                "sorry, i can't",
+                "sorry, i cannot",
+            ],
+        ),
+        (
+            "uncertainty",
+            [
+                "it's unclear",
+                "it's difficult to say",
+                "i'm not sure",
+                "i cannot determine",
+                "unable to determine",
+                "difficult to tell",
+            ],
+        ),
+        (
+            "insufficient_info",
+            [
+                "not enough information",
+                "insufficient detail",
+                "cannot see clearly",
+                "too blurry",
+                "image quality",
+            ],
+        ),
+    ]
+
+    for refusal_type, patterns in refusal_patterns:
+        if any(pattern in text_lower for pattern in patterns):
+            return True, refusal_type
+
+    return False, None
+
+
+def _detect_generic_output(text: str) -> tuple[bool, float]:
+    """Detect overly generic or uninformative descriptions.
+
+    Identifies low-quality captions that lack specific details.
+
+    Args:
+        text: Generated text to check
+
+    Returns:
+        Tuple of (is_generic, specificity_score where lower = more generic)
+    """
+    if not text or len(text) < 20:  # Too short to analyze
+        return False, 0.0
+
+    text_lower = text.lower()
+    word_count = len(text.split())
+
+    if word_count == 0:
+        return False, 0.0
+
+    # Count filler/hedge words
+    filler_words = [
+        "appears to",
+        "seems to",
+        "looks like",
+        "might be",
+        "could be",
+        "some",
+        "several",
+        "various",
+        "many",
+        "few",
+        "very",
+        "quite",
+        "rather",
+        "somewhat",
+        "fairly",
+        "thing",
+        "stuff",
+        "item",
+        "object",
+    ]
+    filler_count = sum(text_lower.count(filler) for filler in filler_words)
+
+    # Calculate filler ratio
+    filler_ratio = filler_count / word_count
+
+    # Check for specific details (numbers, measurements, colors, names)
+    has_numbers = bool(re.search(r"\d+", text))
+    has_specific_colors = bool(
+        re.search(
+            r"\b(red|blue|green|yellow|orange|purple|pink|brown|black|white|gray|grey)\b",
+            text_lower,
+        )
+    )
+    has_proper_nouns = bool(re.search(r"\b[A-Z][a-z]+", text))
+
+    specificity_indicators = sum([has_numbers, has_specific_colors, has_proper_nouns])
+
+    # Generic if high filler ratio and low specificity
+    is_generic = filler_ratio > 0.15 and specificity_indicators < 2
+
+    # Specificity score: higher = more specific (0-100)
+    specificity_score = max(0, 100 - (filler_ratio * 200) + (specificity_indicators * 20))
+
+    return is_generic, round(specificity_score, 1)
+
+
+def _detect_language_mixing(text: str) -> tuple[bool, list[str]]:
+    """Detect unexpected language switches or code/tokenizer artifacts.
+
+    Catches technical artifacts that shouldn't appear in natural language output.
+
+    Args:
+        text: Generated text to check
+
+    Returns:
+        Tuple of (has_mixing, list of detected issues)
+    """
+    if not text:
+        return False, []
+
+    issues = []
+
+    # Check for common tokenizer artifacts
+    tokenizer_artifacts = [
+        r"<\|endoftext\|>",
+        r"<\|end\|>",
+        r"<s>",
+        r"</s>",
+        r"\[SEP\]",
+        r"\[CLS\]",
+        r"\[PAD\]",
+        r"\[UNK\]",
+        r"\[MASK\]",
+        r"<pad>",
+        r"<unk>",
+        r"<mask>",
+    ]
+
+    for artifact in tokenizer_artifacts:
+        if re.search(artifact, text, re.IGNORECASE):
+            issues.append("tokenizer_artifact")
+            break
+
+    # Check for code snippets (function calls, variable assignments)
+    code_patterns = [
+        r"\bdef\s+\w+\(",  # Python function def
+        r"\bfunction\s+\w+\(",  # JavaScript function
+        r'\w+\s*=\s*["\']',  # Variable assignment
+    ]
+
+    for pattern in code_patterns:
+        if re.search(pattern, text):
+            issues.append("code_snippet")
+            break
+
+    return bool(issues), issues
+
+
 # MOD: Added baseline evaluation scoring
 def _calculate_keyword_overlap_score(generated_text: str, baseline_text: str) -> float:
     """Calculate keyword overlap score between generated and baseline text.
@@ -1579,8 +1737,15 @@ class GenerationQualityAnalysis:
     # MOD: Added context ignorance detection
     is_context_ignored: bool
     missing_context_terms: list[str]
-    # MOD: Added baseline evaluation scoring
-    keyword_overlap_score: float | None = None
+    # MOD: Added refusal/uncertainty detection
+    is_refusal: bool
+    refusal_type: str | None
+    # MOD: Added generic output detection
+    is_generic: bool
+    specificity_score: float
+    # MOD: Added language/code mixing detection
+    has_language_mixing: bool
+    language_mixing_issues: list[str]
 
     def has_any_issues(self) -> bool:
         """Return True if any quality issues were detected."""
@@ -1591,6 +1756,9 @@ class GenerationQualityAnalysis:
             or bool(self.formatting_issues)
             or self.has_excessive_bullets
             or self.is_context_ignored
+            or self.is_refusal
+            or self.is_generic
+            or self.has_language_mixing
         )
 
 
@@ -1598,7 +1766,6 @@ def analyze_generation_text(
     text: str,
     generated_tokens: int,
     prompt: str | None = None,
-    baseline_text: str | None = None,  # MOD: Added baseline for scoring
 ) -> GenerationQualityAnalysis:
     """Analyze generated text for quality issues.
 
@@ -1609,10 +1776,9 @@ def analyze_generation_text(
         text: Generated text to analyze
         generated_tokens: Number of tokens generated
         prompt: Optional prompt text for context ignorance detection
-        baseline_text: Optional golden/ideal text for baseline scoring
 
     Returns:
-        GenerationQualityAnalysis with all detected issues and optional score
+        GenerationQualityAnalysis with all detected issues
     """
     is_repetitive, repeated_token = _detect_repetitive_output(text)
     hallucination_issues = _detect_hallucination_patterns(text)
@@ -1626,10 +1792,14 @@ def analyze_generation_text(
     if prompt:
         is_context_ignored, missing_context_terms = _detect_context_ignorance(text, prompt)
 
-    # MOD: Added baseline scoring
-    keyword_overlap_score: float | None = None
-    if baseline_text:
-        keyword_overlap_score = _calculate_keyword_overlap_score(text, baseline_text)
+    # MOD: Added refusal/uncertainty detection
+    is_refusal, refusal_type = _detect_refusal_patterns(text)
+
+    # MOD: Added generic output detection
+    is_generic, specificity_score = _detect_generic_output(text)
+
+    # MOD: Added language/code mixing detection
+    has_language_mixing, language_mixing_issues = _detect_language_mixing(text)
 
     return GenerationQualityAnalysis(
         is_repetitive=is_repetitive,
@@ -1641,7 +1811,12 @@ def analyze_generation_text(
         bullet_count=bullet_count,
         is_context_ignored=is_context_ignored,
         missing_context_terms=missing_context_terms,
-        keyword_overlap_score=keyword_overlap_score,
+        is_refusal=is_refusal,
+        refusal_type=refusal_type,
+        is_generic=is_generic,
+        specificity_score=specificity_score,
+        has_language_mixing=has_language_mixing,
+        language_mixing_issues=language_mixing_issues,
     )
 
 
@@ -4097,7 +4272,6 @@ def _preview_generation(
     gen: GenerationResult | SupportsGenerationResult | None,
     *,
     prompt: str | None = None,
-    baseline_text: str | None = None,
 ) -> None:
     if not gen:
         return
@@ -4106,15 +4280,13 @@ def _preview_generation(
         logger.info("%s", Colors.colored("<empty>", Colors.CYAN))
         return
 
-    # MOD: Analyze quality using consolidated utility with optional prompt and baseline
+    # MOD: Analyze quality using consolidated utility with optional prompt
     gen_tokens = getattr(gen, "generation_tokens", 0)
     analysis = analyze_generation_text(
         text_val,
         gen_tokens,
         prompt=prompt,
-        baseline_text=baseline_text,
     )
-
     # Show brief inline warnings for quality issues
     if analysis.is_repetitive and analysis.repeated_token:
         logger.warning(
@@ -4155,7 +4327,6 @@ def _log_verbose_success_details_mode(
     *,
     detailed: bool,
     prompt: str | None = None,
-    baseline_text: str | None = None,
 ) -> None:
     """Emit verbose block using either compact or detailed metrics style with visual hierarchy."""
     if not res.generation:
@@ -4167,13 +4338,12 @@ def _log_verbose_success_details_mode(
     # Generated text with emoji prefix for easy scanning
     gen_text = getattr(res.generation, "text", None) or ""
 
-    # MOD: Analyze quality using consolidated utility with optional prompt and baseline
+    # MOD: Analyze quality using consolidated utility with optional prompt
     gen_tokens = getattr(res.generation, "generation_tokens", 0)
     analysis = analyze_generation_text(
         gen_text,
         gen_tokens,
         prompt=prompt,
-        baseline_text=baseline_text,
     )
 
     logger.info("📝 %s", Colors.colored("Generated Text:", Colors.BOLD, Colors.CYAN))
@@ -4419,7 +4589,6 @@ def print_model_result(
     run_index: int | None = None,
     total_runs: int | None = None,
     prompt: str | None = None,  # MOD: Added for context ignorance detection
-    baseline_text: str | None = None,  # MOD: Added for baseline scoring
 ) -> None:
     """Print a concise summary + optional verbose block for a model result."""
     model_short = result.model_name.split("/")[-1]
@@ -4432,7 +4601,7 @@ def print_model_result(
     for line in textwrap.wrap(summary, width=width, break_long_words=False, break_on_hyphens=False):
         log_fn(Colors.colored(line, color))
     if result.success and not verbose:  # quick exit with preview only
-        _preview_generation(result.generation, prompt=prompt, baseline_text=baseline_text)
+        _preview_generation(result.generation, prompt=prompt)
         return
     header_label = "✓ SUCCESS" if result.success else "✗ FAILED"
     header_color = Colors.GREEN if result.success else Colors.RED
@@ -4454,7 +4623,6 @@ def print_model_result(
             result,
             detailed=detailed_metrics,
             prompt=prompt,
-            baseline_text=baseline_text,
         )
 
 
@@ -4850,7 +5018,6 @@ def process_models(
     image_path: Path,
     *,  # Force keyword-only arguments for clarity
     prompt: str,
-    baseline_text: str | None = None,  # MOD: Added baseline for evaluation
 ) -> list[PerformanceResult]:
     """Resolve the definitive model list and execute each model run.
 
@@ -4952,24 +5119,48 @@ def process_models(
                     gen_text,
                     gen_tokens,
                     prompt=prompt,
-                    baseline_text=baseline_text,
                 )
+                # Build consolidated quality issues string
+                issues = []
+                # Put critical issues first
+                if analysis.is_refusal:
+                    refusal_label = (
+                        f"refusal({analysis.refusal_type})" if analysis.refusal_type else "refusal"
+                    )
+                    issues.append(refusal_label)
+                if analysis.is_repetitive:
+                    rep_label = (
+                        f"repetitive({analysis.repeated_token})"
+                        if analysis.repeated_token
+                        else "repetitive"
+                    )
+                    issues.append(rep_label)
+                if analysis.has_language_mixing:
+                    issues.append("lang_mixing")
+                if analysis.hallucination_issues:
+                    issues.append("hallucination")
+                if analysis.is_generic:
+                    issues.append(f"generic({analysis.specificity_score:.0f})")
+                if analysis.is_verbose:
+                    issues.append("verbose")
+                if analysis.formatting_issues:
+                    issues.append("formatting")
+                if analysis.has_excessive_bullets:
+                    issues.append(f"bullets({analysis.bullet_count})")
+                if analysis.is_context_ignored:
+                    issues.append("context-ignored")
+
+                quality_issues_str = ", ".join(issues) if issues else None
+
                 # Update result with quality metrics
                 result = dataclasses.replace(
                     result,
-                    quality_score=analysis.keyword_overlap_score,
-                    is_repetitive=analysis.is_repetitive,
-                    repeated_token=analysis.repeated_token,
-                    is_verbose=analysis.is_verbose,
-                    has_formatting_issues=bool(analysis.formatting_issues),
-                    has_hallucination_issues=bool(analysis.hallucination_issues),
-                    has_excessive_bullets=analysis.has_excessive_bullets,
-                    is_context_ignored=analysis.is_context_ignored,
+                    quality_issues=quality_issues_str,
                 )
 
         results.append(result)
 
-        # MOD: Structured output for this run with prompt and baseline for evaluation
+        # MOD: Structured output for this run with prompt for evaluation
         print_model_result(
             result,
             verbose=args.verbose,
@@ -4977,7 +5168,6 @@ def process_models(
             run_index=idx,
             total_runs=len(model_identifiers),
             prompt=prompt,
-            baseline_text=baseline_text,
         )
     return results
 
@@ -5201,23 +5391,7 @@ def main(args: argparse.Namespace) -> None:
 
         prompt = prepare_prompt(args, metadata)
 
-        # MOD: Load baseline text for evaluation scoring
-        baseline_text: str | None = None
-        if args.baseline_file:
-            baseline_path = Path(args.baseline_file).resolve()
-            if not baseline_path.exists():
-                logger.warning("Baseline file not found: %s", baseline_path)
-            elif not baseline_path.is_file():
-                logger.warning("Baseline path is not a file: %s", baseline_path)
-            else:
-                try:
-                    baseline_text = baseline_path.read_text(encoding="utf-8").strip()
-                    logger.info("Loaded baseline text from: %s", baseline_path)
-                    logger.debug("Baseline text length: %d characters", len(baseline_text))
-                except (OSError, UnicodeDecodeError) as read_err:
-                    logger.warning("Could not read baseline file %s: %s", baseline_path, read_err)
-
-        results = process_models(args, image_path, prompt=prompt, baseline_text=baseline_text)
+        results = process_models(args, image_path, prompt=prompt)
 
         finalize_execution(
             args=args,
