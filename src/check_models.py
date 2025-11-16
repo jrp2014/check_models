@@ -419,6 +419,14 @@ class PerformanceResult:
     error_type: str | None = None  # Original exception type name (e.g., "TypeError", "ImportError")
     # MOD: Added quality_score for baseline evaluation
     quality_score: float | None = None  # Keyword overlap score vs baseline (0-100%)
+    # MOD: Added detailed quality analysis fields
+    is_repetitive: bool | None = None  # Whether repetitive patterns detected
+    repeated_token: str | None = None  # The repeated token/phrase if any
+    is_verbose: bool | None = None  # Excessive verbosity flag
+    has_formatting_issues: bool | None = None  # Whether formatting problems detected
+    has_hallucination_issues: bool | None = None  # Whether potential hallucinations detected
+    has_excessive_bullets: bool | None = None  # Too many bullet points
+    is_context_ignored: bool | None = None  # Context ignorance detected
 
 
 class ResultSet:
@@ -865,6 +873,12 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
     "model_load_time": ("Load", "(s)"),
     "total_time": ("Total", "(s)"),
     "quality_score": ("Score", "(%)"),  # MOD: Added baseline evaluation score
+    "is_repetitive": ("Repetitive", ""),
+    "is_verbose": ("Verbose", ""),
+    "has_formatting_issues": ("Format Issues", ""),
+    "has_hallucination_issues": ("Hallucination", ""),
+    "has_excessive_bullets": ("Excess Bullets", ""),
+    "is_context_ignored": ("Ignored Context", ""),
 }
 
 # Threshold for splitting long header text into multiple lines
@@ -897,6 +911,12 @@ PERFORMANCE_TIMING_FIELDS: Final[list[str]] = [
     "model_load_time",
     "total_time",
     "quality_score",  # MOD: Added baseline evaluation score
+    "is_repetitive",
+    "is_verbose",
+    "has_formatting_issues",
+    "has_hallucination_issues",
+    "has_excessive_bullets",
+    "is_context_ignored",
 ]
 
 
@@ -1691,6 +1711,17 @@ def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: PLR
         # MOD: Format quality_score as percentage with 1 decimal
         if field_name == "quality_score":
             return f"{num:.1f}"
+        # MOD: Format boolean quality flags as ✓/✗ or Yes/No
+        if field_name in {
+            "is_repetitive",
+            "is_verbose",
+            "has_formatting_issues",
+            "has_hallucination_issues",
+            "has_excessive_bullets",
+            "is_context_ignored",
+        }:
+            # For boolean-like numeric (0/1) or actual boolean
+            return "✓" if num else "-"
         return fmt_num(num)
     if isinstance(value, str) and value:
         s: str = value.strip().replace(",", "")
@@ -4911,12 +4942,30 @@ def process_models(
         )
         result: PerformanceResult = process_image_with_model(params)
 
-        # MOD: Calculate quality score if baseline provided
-        if baseline_text and result.success and result.generation:
+        # MOD: Calculate quality score and analysis if baseline provided or generation successful
+        if result.success and result.generation:
             gen_text = str(getattr(result.generation, "text", ""))
+            gen_tokens = getattr(result.generation, "generation_tokens", 0)
             if gen_text:
-                score = _calculate_keyword_overlap_score(gen_text, baseline_text)
-                result = dataclasses.replace(result, quality_score=score)
+                # Perform quality analysis
+                analysis = analyze_generation_text(
+                    gen_text,
+                    gen_tokens,
+                    prompt=prompt,
+                    baseline_text=baseline_text,
+                )
+                # Update result with quality metrics
+                result = dataclasses.replace(
+                    result,
+                    quality_score=analysis.keyword_overlap_score,
+                    is_repetitive=analysis.is_repetitive,
+                    repeated_token=analysis.repeated_token,
+                    is_verbose=analysis.is_verbose,
+                    has_formatting_issues=bool(analysis.formatting_issues),
+                    has_hallucination_issues=bool(analysis.hallucination_issues),
+                    has_excessive_bullets=analysis.has_excessive_bullets,
+                    is_context_ignored=analysis.is_context_ignored,
+                )
 
         results.append(result)
 

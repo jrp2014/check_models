@@ -184,8 +184,6 @@ follow_imports = "skip"
 ignore_missing_imports = true
 # Include local type stubs if generated (update.sh can generate stubs for local MLX builds)
 mypy_path = "typings"
-# Silence errors from site-packages stubs (e.g., MLX stub syntax errors)
-no_silence_site_packages = false
 
 # Core strictness - catch common errors in our own code
 warn_unused_ignores = true
@@ -198,6 +196,19 @@ disallow_incomplete_defs = true
 # Ignore errors in tests (they intentionally test edge cases)
 [[tool.mypy.overrides]]
 module = "tests.*"
+ignore_errors = true
+
+# Ignore errors in MLX library stubs (they have syntax errors we can't fix)
+[[tool.mypy.overrides]]
+module = "mlx.*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "mlx_vlm.*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "mlx_lm.*"
 ignore_errors = true
 
 [tool.ty]
