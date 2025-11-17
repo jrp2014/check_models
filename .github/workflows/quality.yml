@@ -28,6 +28,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e src/.[dev]
           npm install -g markdownlint-cli2
+          
+      - name: Generate MLX stubs for mypy
+        run: |
+          # Clone MLX and generate stubs to fix PyPI stub syntax errors
+          git clone --depth 1 https://github.com/ml-explore/mlx.git /tmp/mlx
+          cd /tmp/mlx
+          python setup.py generate_stubs
+          # Copy generated stubs to site-packages
+          SITE_PACKAGES=$(python -c "import site; print(site.getsitepackages()[0])")
+          cp -r python/mlx/*.pyi "$SITE_PACKAGES/mlx/" || true
 
       - name: Run quality checks
         env:
