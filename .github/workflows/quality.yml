@@ -31,18 +31,14 @@ jobs:
           
       - name: Generate MLX stubs for mypy
         run: |
-          # Clone MLX and generate stubs to fix PyPI stub syntax errors
-          git clone --depth 1 https://github.com/ml-explore/mlx.git /tmp/mlx
-          cd /tmp/mlx
-          # Install build dependencies needed for stub generation
-          pip install build setuptools wheel pybind11 nanobind
-          python setup.py generate_stubs
-          # Copy generated stubs to site-packages
+          # Install nanobind for stub generation (MLX's approach)
+          pip install nanobind
+          # Generate stubs using nanobind.stubgen (matching MLX's setup.py)
+          python -m nanobind.stubgen -m mlx.core -r -O ~/.mlx_stubs
+          # Copy generated stubs to site-packages to override broken PyPI stubs
           SITE_PACKAGES=$(python -c "import site; print(site.getsitepackages()[0])")
-          cp -r python/mlx/*.pyi "$SITE_PACKAGES/mlx/" || true
-          # Clean up
-          cd /
-          rm -rf /tmp/mlx
+          cp -r ~/.mlx_stubs/mlx/core/*.pyi "$SITE_PACKAGES/mlx/core/" 2>/dev/null || true
+          rm -rf ~/.mlx_stubs
 
       - name: Run quality checks
         env:
