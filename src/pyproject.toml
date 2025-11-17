@@ -199,13 +199,6 @@ disallow_incomplete_defs = true
 module = "tests.*"
 ignore_errors = true
 
-# Skip type checking for all MLX ecosystem libraries (syntax errors in Python 3.13 stubs)
-# Using follow_imports = "skip" prevents mypy from parsing stub files entirely
-[[tool.mypy.overrides]]
-module = ["mlx.*", "mlx_vlm.*", "mlx_lm.*"]
-ignore_errors = true
-follow_imports = "skip"
-
 [tool.ty]
 # ty (Astral's type checker) configuration
 # Disable unresolved-import rule - mlx ecosystem packages work at runtime
