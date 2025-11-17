@@ -35,11 +35,14 @@ jobs:
           git clone --depth 1 https://github.com/ml-explore/mlx.git /tmp/mlx
           cd /tmp/mlx
           # Install build dependencies needed for stub generation
-          pip install setuptools wheel pybind11
+          pip install build setuptools wheel pybind11
           python setup.py generate_stubs
           # Copy generated stubs to site-packages
           SITE_PACKAGES=$(python -c "import site; print(site.getsitepackages()[0])")
           cp -r python/mlx/*.pyi "$SITE_PACKAGES/mlx/" || true
+          # Clean up
+          cd /
+          rm -rf /tmp/mlx
 
       - name: Run quality checks
         env:
