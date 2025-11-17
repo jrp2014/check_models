@@ -19,9 +19,14 @@ if [[ "${CI:-false}" == "false" ]] && command -v conda &> /dev/null; then
 fi
 
 # Determine Python executable
-PYTHON="python"
-if [[ "${CI:-false}" == "false" ]] && [ -n "$CONDA_PREFIX" ]; then
+# In CI, use the python from PATH (set up by GitHub Actions)
+# Locally, prefer conda environment python if available
+if [[ "${CI:-false}" == "true" ]]; then
+    PYTHON="python3"
+elif [ -n "${CONDA_PREFIX:-}" ]; then
     PYTHON="$CONDA_PREFIX/bin/python"
+else
+    PYTHON="python3"
 fi
 
 # --- Quality Checks ---
