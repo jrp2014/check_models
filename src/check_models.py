@@ -173,6 +173,11 @@ class QualityThresholds:
     # Bullet point detection
     max_bullets: int = 15  # Maximum allowed bullet points
 
+    # Generic output detection
+    min_text_length_for_generic: int = 20  # Minimum text length to analyze for genericity
+    generic_filler_threshold: float = 0.15  # Filler ratio threshold (15%)
+    min_specificity_indicators: int = 2  # Minimum indicators for non-generic content
+
 
 # Instantiate singletons for runtime use
 FORMATTING = FormattingThresholds()
@@ -1505,7 +1510,7 @@ def _detect_generic_output(text: str) -> tuple[bool, float]:
     Returns:
         Tuple of (is_generic, specificity_score where lower = more generic)
     """
-    if not text or len(text) < 20:  # Too short to analyze
+    if not text or len(text) < QUALITY.min_text_length_for_generic:
         return False, 0.0
 
     text_lower = text.lower()
@@ -1547,14 +1552,17 @@ def _detect_generic_output(text: str) -> tuple[bool, float]:
         re.search(
             r"\b(red|blue|green|yellow|orange|purple|pink|brown|black|white|gray|grey)\b",
             text_lower,
-        )
+        ),
     )
     has_proper_nouns = bool(re.search(r"\b[A-Z][a-z]+", text))
 
     specificity_indicators = sum([has_numbers, has_specific_colors, has_proper_nouns])
 
     # Generic if high filler ratio and low specificity
-    is_generic = filler_ratio > 0.15 and specificity_indicators < 2
+    is_generic = (
+        filler_ratio > QUALITY.generic_filler_threshold
+        and specificity_indicators < QUALITY.min_specificity_indicators
+    )
 
     # Specificity score: higher = more specific (0-100)
     specificity_score = max(0, 100 - (filler_ratio * 200) + (specificity_indicators * 20))
@@ -5120,8 +5128,20 @@ def process_models(
                     gen_tokens,
                     prompt=prompt,
                 )
+                # Log quality analysis results
+                logger.info(
+                    "Quality analysis for %s: %s",
+                    result.model_name,
+                    _format_quality_analysis_for_log(analysis),
+                )
                 # Build consolidated quality issues string using helper
                 quality_issues_str = _build_quality_issues_string(analysis)
+                if quality_issues_str:
+                    logger.info(
+                        "Quality issues detected for %s: %s",
+                        result.model_name,
+                        quality_issues_str,
+                    )
 
                 # Update result with quality metrics
                 result = dataclasses.replace(
@@ -5141,6 +5161,48 @@ def process_models(
             prompt=prompt,
         )
     return results
+
+
+def _format_quality_analysis_for_log(analysis: GenerationQualityAnalysis) -> str:
+    """Format quality analysis for structured logging.
+
+    Args:
+        analysis: GenerationQualityAnalysis with detected metrics
+
+    Returns:
+        Formatted string with all quality metrics for logging
+
+    Examples:
+        >>> analysis = GenerationQualityAnalysis(
+        ...     is_repetitive=True, repeated_token="<s>",
+        ...     is_verbose=True, ...
+        ... )
+        >>> _format_quality_analysis_for_log(analysis)
+        'repetitive=True(token=<s>), verbose=True, generic=False, ...'
+    """
+    parts = []
+    if analysis.is_repetitive:
+        token_info = f" (token={analysis.repeated_token})" if analysis.repeated_token else ""
+        parts.append(f"repetitive=True{token_info}")
+    if analysis.is_refusal:
+        refusal_info = f" (type={analysis.refusal_type})" if analysis.refusal_type else ""
+        parts.append(f"refusal=True{refusal_info}")
+    if analysis.has_language_mixing:
+        parts.append("language_mixing=True")
+    if analysis.hallucination_issues:
+        parts.append("hallucination=True")
+    if analysis.is_generic:
+        parts.append(f"generic=True (score={analysis.specificity_score:.1f})")
+    if analysis.is_verbose:
+        parts.append("verbose=True")
+    if analysis.formatting_issues:
+        parts.append("formatting_issues=True")
+    if analysis.has_excessive_bullets:
+        parts.append(f"excessive_bullets=True (count={analysis.bullet_count})")
+    if analysis.is_context_ignored:
+        parts.append("context_ignored=True")
+
+    return ", ".join(parts) if parts else "no issues detected"
 
 
 def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | None:
