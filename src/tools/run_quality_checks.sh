@@ -50,7 +50,14 @@ else
 fi
 
 echo "=== MyPy Type Check ==="
-$PYTHON -m mypy check_models.py
+# Ensure mypy uses the correct Python environment by setting MYPYPATH
+# In CI, explicitly use the python from PATH to avoid system Python
+if [[ "${CI:-false}" == "true" ]]; then
+    # Use 'python' instead of 'python3' to match setup-python action
+    python -m mypy check_models.py
+else
+    $PYTHON -m mypy check_models.py
+fi
 
 echo "=== Pytest ==="
 $PYTHON -m pytest -v
