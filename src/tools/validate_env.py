@@ -51,39 +51,39 @@ def load_pyproject_deps() -> tuple[dict[str, str], dict[str, str], dict[str, str
     try:
         with pyproject_path.open("rb") as f:
             data = tomllib.load(f)
-
-        project = data.get("project", {})
-        dependencies = project.get("dependencies", [])
-        optional_dependencies = project.get("optional-dependencies", {})
-
-        core_deps = {}
-        for dep in dependencies:
-            parts = dep.split(">=", 1)
-            if len(parts) == 2:
-                core_deps[parts[0].strip()] = ">=" + parts[1].strip()
-            else:
-                parts = dep.split("==", 1)
-                if len(parts) == 2:
-                    core_deps[parts[0].strip()] = "==" + parts[1].strip()
-                else:
-                    core_deps[dep.strip()] = ""
-
-        dev_deps = {}
-        extras_deps = {}
-
-        for group, deps in optional_dependencies.items():
-            target_dict = dev_deps if group == "dev" else extras_deps
-            for dep in deps:
-                parts = dep.split(">=", 1)
-                if len(parts) == 2:
-                    target_dict[parts[0].strip()] = ">=" + parts[1].strip()
-                else:
-                    target_dict[dep.strip()] = ""
-
-        return core_deps, extras_deps, dev_deps
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         logger.warning("Failed to parse pyproject.toml: %s", e)
         return {}, {}, {}
+
+    project = data.get("project", {})
+    dependencies = project.get("dependencies", [])
+    optional_dependencies = project.get("optional-dependencies", {})
+
+    core_deps = {}
+    for dep in dependencies:
+        parts = dep.split(">=", 1)
+        if len(parts) == 2:
+            core_deps[parts[0].strip()] = ">=" + parts[1].strip()
+        else:
+            parts = dep.split("==", 1)
+            if len(parts) == 2:
+                core_deps[parts[0].strip()] = "==" + parts[1].strip()
+            else:
+                core_deps[dep.strip()] = ""
+
+    dev_deps = {}
+    extras_deps = {}
+
+    for group, deps in optional_dependencies.items():
+        target_dict = dev_deps if group == "dev" else extras_deps
+        for dep in deps:
+            parts = dep.split(">=", 1)
+            if len(parts) == 2:
+                target_dict[parts[0].strip()] = ">=" + parts[1].strip()
+            else:
+                target_dict[dep.strip()] = ""
+
+    return core_deps, extras_deps, dev_deps
 
 
 # Load dependencies dynamically
@@ -116,10 +116,6 @@ if not DEV_TOOLS:
         "mypy": ">=1.8.0",
         "pytest": ">=8.0.0",
     }
-
-
-class ValidationError(Exception):
-    """Raised when environment validation fails."""
 
 
 def check_python_version() -> None:
