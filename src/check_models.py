@@ -5512,7 +5512,7 @@ def main_cli() -> None:
         "--folder",
         type=Path,
         default=DEFAULT_FOLDER,
-        help="Folder to scan.",
+        help="Folder to scan. The most recently modified image file in the folder will be used.",
     )
     parser.add_argument(
         "--output-html",
