@@ -298,7 +298,8 @@ update_local_mlx_repos() {
 		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
 			# Install MLX build dependencies (matching GitHub Actions)
 			echo "[update.sh] Installing MLX build dependencies..."
-			pip_install "cmake setuptools"
+			pip_install cmake
+			pip_install setuptools
 			pip install nanobind==2.4.0  # Pinned version, no -U
 			
 			[[ "${CLEAN_BUILD:-0}" == "1" ]] && rm -rf build
