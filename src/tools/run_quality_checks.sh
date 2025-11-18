@@ -50,6 +50,12 @@ else
 fi
 
 echo "=== MyPy Type Check ==="
+# Debug: Print MLX version in CI to help diagnose stub issues
+if [[ "${CI:-false}" == "true" ]]; then
+    echo "Debug: Checking installed MLX version..."
+    $PYTHON -m pip show mlx || echo "MLX not found via pip"
+fi
+
 # Ensure mypy uses the correct Python environment by setting MYPYPATH
 # In CI, explicitly use the python from PATH to avoid system Python
 if [[ "${CI:-false}" == "true" ]]; then

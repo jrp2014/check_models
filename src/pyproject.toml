@@ -200,6 +200,12 @@ disallow_incomplete_defs = true
 module = "tests.*"
 ignore_errors = true
 
+# Ignore errors in MLX libraries (avoid issues with stubs in older/newer versions)
+[[tool.mypy.overrides]]
+module = ["mlx.*", "mlx_vlm.*", "mlx_lm.*"]
+ignore_errors = true
+follow_imports = "skip"
+
 [tool.ty]
 # ty (Astral's type checker) configuration
 # Disable unresolved-import rule - mlx ecosystem packages work at runtime
