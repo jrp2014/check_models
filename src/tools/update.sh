@@ -331,7 +331,7 @@ update_local_mlx_repos() {
 			echo "[update.sh] Generating type stubs for mlx..."
 			
 			# Verify setuptools and typing_extensions are installed (both required for stub generation)
-			if ! python -c "import setuptools; exit(0 if tuple(map(int, setuptools.__version__.split('.'))) >= (80, 0, 0) else 1)" 2>/dev/null; then
+			if ! python -c 'import setuptools; exit(0 if tuple(map(int, setuptools.__version__.split("."))) >= (80, 0, 0) else 1)' 2>/dev/null; then
 				echo "[update.sh] Installing setuptools>=80 (required for stub generation)..."
 				pip_install "setuptools>=80"
 			fi
