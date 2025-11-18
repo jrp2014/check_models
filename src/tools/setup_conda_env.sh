@@ -145,74 +145,32 @@ install_dependencies() {
     
     # Activate environment
     # Initialize conda for this shell session
-echo "Initializing conda for bash..."
-# shellcheck disable=SC1091
-source "$(conda info --base)/etc/profile.d/conda.sh"
+    echo "Initializing conda for bash..."
+    # shellcheck disable=SC1091
+    source "$(conda info --base)/etc/profile.d/conda.sh"
     conda activate "$ENV_NAME"
     
-    # Core runtime dependencies (from pyproject.toml)
-    log_info "Installing core MLX dependencies..."
-    pip install \
-        "mlx>=0.29.1" \
-        "mlx-vlm>=0.0.9" \
-        "mlx-lm>=0.23.0"
-    
-    log_info "Installing core Python data libraries..."
-    pip install \
-        "numpy"
-    
-    log_info "Installing image processing dependencies..."
-    pip install \
-        "Pillow>=10.3.0" \
-        "opencv-python>=4.12.0.88"
-    
-    log_info "Installing ML/AI frameworks..."
-    pip install \
-        "transformers>=4.53.0" \
-        "datasets>=2.19.1"
-    
-    log_info "Installing model and caching utilities..."
-    pip install \
-        "huggingface-hub>=0.23.0"
-    
-    log_info "Installing serialization and configuration..."
-    pip install \
-        "protobuf" \
-        "pyyaml" \
-        "jinja2"
-    
-    log_info "Installing network and API dependencies..."
-    pip install \
-        "requests>=2.31.0" \
-        "fastapi>=0.95.1" \
-        "uvicorn"
-    
-    log_info "Installing audio processing..."
-    pip install \
-        "soundfile>=0.13.1"
-    
-    log_info "Installing reporting and system utilities..."
-    pip install \
-        "tabulate>=0.9.0" \
-        "tqdm>=4.66.2" \
-        "tzlocal>=5.0"
-    
-    # Optional extras
-    log_info "Installing optional extras for enhanced functionality..."
-    pip install \
-        "psutil>=5.9.0" \
-        "tokenizers>=0.15.0"
-    
+    # Check for pyproject.toml
+    if [[ ! -f "pyproject.toml" ]]; then
+        log_warn "pyproject.toml not found in current directory"
+        log_warn "Please run this script from the src directory"
+        exit 1
+    fi
+
+    log_info "Installing project in editable mode (installs core dependencies)..."
+    pip install -e .
+
     # Development dependencies (optional)
     read -p "Do you want to install development dependencies (ruff, mypy, pytest)? (y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         log_info "Installing development dependencies..."
-        pip install \
-            "ruff>=0.1.0" \
-            "mypy>=1.8.0" \
-            "pytest>=8.0.0" \
-            "pytest-cov>=4.0.0"
+        # Try to install via extras if available, otherwise fallback to manual
+        if grep -q "dev =" pyproject.toml || grep -q "dev =" pyproject.toml; then
+             pip install -e ".[dev]"
+        else
+             pip install "ruff>=0.1.0" "mypy>=1.8.0" "pytest>=8.0.0" "pytest-cov>=4.0.0"
+        fi
     fi
 
     # Optional: PyTorch stack (torch, torchvision, torchaudio)
@@ -226,15 +184,6 @@ source "$(conda info --base)/etc/profile.d/conda.sh"
             "torchvision>=0.17.0" \
             "torchaudio>=2.2.0"
         log_success "Installed PyTorch packages"
-    fi
-    
-    # Install this package in development mode
-    if [[ -f "pyproject.toml" ]]; then
-        log_info "Installing mlx-vlm-check in development mode..."
-        pip install -e .
-    else
-        log_warn "pyproject.toml not found in current directory"
-        log_warn "Run this script from the vlm directory to install the package"
     fi
     
     log_success "All dependencies installed successfully"

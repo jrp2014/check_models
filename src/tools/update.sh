@@ -79,8 +79,8 @@ else
 fi
 
 # Ensure global Python packaging tools are current
-echo "[update.sh] Updating core Python packaging tools (pip, wheel, setuptools)..."
-pip install -U pip wheel setuptools
+echo "[update.sh] Updating core Python packaging tools (pip, wheel, setuptools, ninja)..."
+pip install -U pip wheel setuptools ninja
 
 # Determine project root (assuming scripts/src/tools/update.sh)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -299,6 +299,7 @@ update_local_mlx_repos() {
 			# Install MLX build dependencies (matching GitHub Actions)
 			echo "[update.sh] Installing MLX build dependencies..."
 			pip_install cmake
+			pip_install ninja
 			pip_install setuptools
 			pip install nanobind==2.4.0  # Pinned version, no -U
 			

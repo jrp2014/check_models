@@ -22,40 +22,100 @@ import os
 import shutil
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 from typing import Final
 
 logger = logging.getLogger("validate-env")
 
 REQUIRED_PYTHON_VERSION: Final[tuple[int, int]] = (3, 13)
+# Default env name, but we'll try to detect or be flexible
 EXPECTED_CONDA_ENV: Final[str] = "mlx-vlm"
 
-# Core runtime dependencies (subset for quick validation)
-CORE_PACKAGES: Final[dict[str, str]] = {
-    "mlx": ">=0.29.1",
-    "mlx-vlm": ">=0.0.9",
-    "Pillow": ">=10.3.0",
-    "huggingface-hub": ">=0.23.0",
-    "tabulate": ">=0.9.0",
-    "tzlocal": ">=5.0",
-}
 
-# Optional extras (checked if installed)
-EXTRAS_PACKAGES: Final[dict[str, str]] = {
-    "psutil": ">=5.9.0",
-    "tokenizers": ">=0.15.0",
-    "einops": ">=0.6.0",
-    "num2words": ">=0.5.0",
-    "mlx-lm": ">=0.23.0",
-    "transformers": ">=4.53.0",
-}
+class ValidationError(Exception):
+    """Raised when environment validation fails."""
 
-# Dev tools
-DEV_TOOLS: Final[dict[str, str]] = {
-    "ruff": ">=0.1.0",
-    "mypy": ">=1.8.0",
-    "pytest": ">=8.0.0",
-}
+
+def load_pyproject_deps() -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
+    """Load dependencies from pyproject.toml."""
+    pyproject_path = Path(__file__).parents[2] / "pyproject.toml"
+    if not pyproject_path.exists():
+        # Fallback if running from different location
+        pyproject_path = Path("pyproject.toml").resolve()
+
+    if not pyproject_path.exists():
+        logger.warning("Could not find pyproject.toml at %s", pyproject_path)
+        return {}, {}, {}
+
+    try:
+        with pyproject_path.open("rb") as f:
+            data = tomllib.load(f)
+
+        project = data.get("project", {})
+        dependencies = project.get("dependencies", [])
+        optional_dependencies = project.get("optional-dependencies", {})
+
+        core_deps = {}
+        for dep in dependencies:
+            parts = dep.split(">=", 1)
+            if len(parts) == 2:
+                core_deps[parts[0].strip()] = ">=" + parts[1].strip()
+            else:
+                parts = dep.split("==", 1)
+                if len(parts) == 2:
+                    core_deps[parts[0].strip()] = "==" + parts[1].strip()
+                else:
+                    core_deps[dep.strip()] = ""
+
+        dev_deps = {}
+        extras_deps = {}
+
+        for group, deps in optional_dependencies.items():
+            target_dict = dev_deps if group == "dev" else extras_deps
+            for dep in deps:
+                parts = dep.split(">=", 1)
+                if len(parts) == 2:
+                    target_dict[parts[0].strip()] = ">=" + parts[1].strip()
+                else:
+                    target_dict[dep.strip()] = ""
+
+        return core_deps, extras_deps, dev_deps
+    except Exception as e:
+        logger.warning("Failed to parse pyproject.toml: %s", e)
+        return {}, {}, {}
+
+
+# Load dependencies dynamically
+CORE_PACKAGES, EXTRAS_PACKAGES, DEV_TOOLS = load_pyproject_deps()
+
+# Fallback if parsing failed
+if not CORE_PACKAGES:
+    CORE_PACKAGES = {
+        "mlx": ">=0.29.1",
+        "mlx-vlm": ">=0.0.9",
+        "Pillow": ">=10.3.0",
+        "huggingface-hub": ">=0.23.0",
+        "tabulate": ">=0.9.0",
+        "tzlocal": ">=5.0",
+    }
+
+if not EXTRAS_PACKAGES:
+    EXTRAS_PACKAGES = {
+        "psutil": ">=5.9.0",
+        "tokenizers": ">=0.15.0",
+        "einops": ">=0.6.0",
+        "num2words": ">=0.5.0",
+        "mlx-lm": ">=0.23.0",
+        "transformers": ">=4.53.0",
+    }
+
+if not DEV_TOOLS:
+    DEV_TOOLS = {
+        "ruff": ">=0.1.0",
+        "mypy": ">=1.8.0",
+        "pytest": ">=8.0.0",
+    }
 
 
 class ValidationError(Exception):

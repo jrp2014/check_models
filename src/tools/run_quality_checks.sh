@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Unified quality checker for local and CI environments
 set -euo pipefail
 
