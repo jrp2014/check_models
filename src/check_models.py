@@ -2300,11 +2300,12 @@ def find_most_recent_file(folder: PathLike) -> Path | None:
         ]
 
         # Return the most recently modified file, or None if no files found
-        most_recent: Path | None = max(
-            regular_files,
-            key=lambda f: f.stat().st_mtime,
-            default=None,
-        )
+        most_recent: Path | None = None
+        if regular_files:
+            most_recent = max(
+                regular_files,
+                key=lambda f: f.stat().st_mtime,
+            )
 
     except FileNotFoundError:
         logger.exception("Directory not found: %s", folder_path)

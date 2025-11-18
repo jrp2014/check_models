@@ -74,6 +74,13 @@ else
     $PYTHON -m mypy check_models.py
 fi
 
+echo "=== Ty Type Check ==="
+if ! command -v ty &> /dev/null; then
+    echo "⚠️  'ty' not found. Installing..."
+    $PYTHON -m pip install ty
+fi
+ty check check_models.py
+
 echo "=== Pytest ==="
 $PYTHON -m pytest -v
 

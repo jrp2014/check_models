@@ -7,6 +7,7 @@ This enforces local parity in addition to CI. The test focuses only on runtime d
 from __future__ import annotations
 
 import re
+import tomllib
 from pathlib import Path
 
 _TEST_FILE = Path(__file__).resolve()
@@ -34,22 +35,12 @@ MANUAL_MARKERS = ("<!-- BEGIN MANUAL_INSTALL -->", "<!-- END MANUAL_INSTALL -->"
 
 
 def _parse_runtime_deps(text: str) -> dict[str, str]:
-    pattern = r"^dependencies\s*=\s*\[(.*?)\]"  # inside [project]
-    m = re.search(pattern, text, flags=re.MULTILINE | re.DOTALL)
-    if not m:
-        msg = "dependencies array not found in pyproject.toml"
-        raise RuntimeError(msg)
-    block = m.group(1)
+    data = tomllib.loads(text)
+    # project.dependencies is a list of strings
+    deps_list = data.get("project", {}).get("dependencies", [])
+
     deps: dict[str, str] = {}
-    for raw in block.splitlines():
-        line = raw.strip().rstrip(",")
-        if not line or line.startswith("#"):
-            continue
-        if "#" in line:
-            line = line.split("#", 1)[0].strip()
-        line = line.strip('"').strip("'")
-        if not line:
-            continue
+    for line in deps_list:
         name = re.split(r"[<>=!~]", line, maxsplit=1)[0].strip()
         spec = line[len(name) :].strip()
         deps[name] = spec
