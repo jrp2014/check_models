@@ -5422,17 +5422,8 @@ def process_models(
     else:
         logger.info("Processing %d model(s)...", len(model_identifiers))
 
-        # Validate parameters before processing any models
-        validate_sampling_params(
-            top_p=args.top_p,
-            repetition_penalty=args.repetition_penalty,
-        )
-        validate_kv_params(
-            max_kv_size=args.max_kv_size,
-            kv_bits=args.kv_bits,
-        )
-
         # Validate all model identifiers before processing
+        # (Note: Sampling/KV params already validated in validate_cli_arguments)
         for model_id in model_identifiers:
             try:
                 validate_model_identifier(model_id)
