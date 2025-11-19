@@ -10,8 +10,8 @@
 #   5. Then update local MLX repos (if present) OR update from PyPI
 #
 # Usage examples:
-#   ./update.sh                       # Install project + dev + extras (MLX_METAL_JIT=OFF by default)
-#   INSTALL_TORCH=1 ./update.sh       # Additionally install torch group
+#   ./update.sh                       # Install project + dev + extras + torch (MLX_METAL_JIT=OFF by default)
+#   SKIP_TORCH=1 ./update.sh          # Skip torch group installation
 #   FORCE_REINSTALL=1 ./update.sh     # Force reinstall with --force-reinstall
 #   SKIP_MLX=1 ./update.sh            # Force skip mlx/mlx-vlm updates (override detection)
 #   MLX_METAL_JIT=ON ./update.sh      # Enable Metal JIT for smaller binaries (defaults to OFF)
@@ -94,10 +94,12 @@ pip_install() {
 }
 
 # Install project with all dependencies from pyproject.toml
-INSTALL_GROUPS=".[dev,extras]"
-if [[ "${INSTALL_TORCH:-0}" == "1" ]]; then
-	INSTALL_GROUPS=".[dev,extras,torch]"
-	echo "[update.sh] Including torch group (INSTALL_TORCH=1)"
+INSTALL_GROUPS=".[dev,extras,torch]"
+if [[ "${SKIP_TORCH:-0}" == "1" ]]; then
+	INSTALL_GROUPS=".[dev,extras]"
+	echo "[update.sh] Skipping torch group (SKIP_TORCH=1)"
+else
+	echo "[update.sh] Including torch group (default, set SKIP_TORCH=1 to skip)"
 fi
 
 echo "[update.sh] Installing project with all dependencies from pyproject.toml..."
