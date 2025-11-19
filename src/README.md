@@ -235,7 +235,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- BEGIN MANUAL_INSTALL -->
 ```bash
-pip install "huggingface-hub[cli,mcp,torch,typing]>=0.23.0" "mlx>=0.29.1" "mlx-vlm>=0.0.9" "Pillow>=10.3.0" "tabulate>=0.9.0" "tzlocal>=5.0" "mypy" "ruff" "ty" "PyYAML>=6.0"
+pip install "huggingface-hub[cli,mcp,torch,typing" "mlx>=0.29.1" "mlx-vlm>=0.0.9" "Pillow>=10.3.0"
 ```
 <!-- END MANUAL_INSTALL -->
 
