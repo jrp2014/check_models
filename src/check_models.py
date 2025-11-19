@@ -550,6 +550,7 @@ class ProcessImageParams(NamedTuple):
     kv_bits: int | None
     kv_group_size: int
     quantized_kv_start: int
+    context_marker: str = "Context:"
 
 
 # =============================================================================
@@ -1430,7 +1431,11 @@ def _detect_markdown_formatting(text: str) -> bool:
 
 
 # MOD: Added context ignorance detection
-def _detect_context_ignorance(text: str, prompt: str) -> tuple[bool, list[str]]:
+def _detect_context_ignorance(
+    text: str,
+    prompt: str,
+    context_marker: str = "Context:",
+) -> tuple[bool, list[str]]:
     """Detect if the generated text ignores key context from the prompt.
 
     Extracts proper nouns and key contextual terms from the prompt (e.g., from
@@ -1439,6 +1444,7 @@ def _detect_context_ignorance(text: str, prompt: str) -> tuple[bool, list[str]]:
     Args:
         text: Generated text to check
         prompt: Original prompt text containing context
+        context_marker: The marker used to identify the context section (default: "Context:")
 
     Returns:
         Tuple of (is_context_ignored, missing_context_terms)
@@ -1447,7 +1453,13 @@ def _detect_context_ignorance(text: str, prompt: str) -> tuple[bool, list[str]]:
         return False, []
 
     # Extract context section if present
-    context_match = re.search(r"Context:\s*(.+?)(?:\n\n|\Z)", prompt, re.DOTALL | re.IGNORECASE)
+    # Escape the marker for regex safety
+    marker_pattern = re.escape(context_marker)
+    context_match = re.search(
+        rf"{marker_pattern}\s*(.+?)(?:\n\n|\Z)",
+        prompt,
+        re.DOTALL | re.IGNORECASE,
+    )
     if not context_match:
         # No explicit context section, so can't check
         return False, []
@@ -1553,7 +1565,7 @@ def _detect_refusal_patterns(text: str) -> tuple[bool, str | None]:
             refusal_patterns.append(("uncertainty", QUALITY.patterns["refusal_uncertainty"]))
         if "refusal_insufficient_info" in QUALITY.patterns:
             refusal_patterns.append(
-                ("insufficient_info", QUALITY.patterns["refusal_insufficient_info"])
+                ("insufficient_info", QUALITY.patterns["refusal_insufficient_info"]),
             )
 
     if not refusal_patterns:
@@ -1887,6 +1899,7 @@ def analyze_generation_text(
     text: str,
     generated_tokens: int,
     prompt: str | None = None,
+    context_marker: str = "Context:",
 ) -> GenerationQualityAnalysis:
     """Analyze generated text for quality issues.
 
@@ -1897,6 +1910,7 @@ def analyze_generation_text(
         text: Generated text to analyze
         generated_tokens: Number of tokens generated
         prompt: Optional prompt text for context ignorance detection
+        context_marker: Marker for context section in prompt
 
     Returns:
         GenerationQualityAnalysis with all detected issues
@@ -1911,7 +1925,11 @@ def analyze_generation_text(
     is_context_ignored = False
     missing_context_terms: list[str] = []
     if prompt:
-        is_context_ignored, missing_context_terms = _detect_context_ignorance(text, prompt)
+        is_context_ignored, missing_context_terms = _detect_context_ignorance(
+            text,
+            prompt,
+            context_marker=context_marker,
+        )
 
     # MOD: Added refusal/uncertainty detection
     is_refusal, refusal_type = _detect_refusal_patterns(text)
@@ -4404,6 +4422,7 @@ def _preview_generation(
     gen: GenerationResult | SupportsGenerationResult | None,
     *,
     prompt: str | None = None,
+    context_marker: str = "Context:",
 ) -> None:
     if not gen:
         return
@@ -4418,6 +4437,7 @@ def _preview_generation(
         text_val,
         gen_tokens,
         prompt=prompt,
+        context_marker=context_marker,
     )
     # Show brief inline warnings for quality issues
     if analysis.is_repetitive and analysis.repeated_token:
@@ -4459,6 +4479,7 @@ def _log_verbose_success_details_mode(
     *,
     detailed: bool,
     prompt: str | None = None,
+    context_marker: str = "Context:",
 ) -> None:
     """Emit verbose block using either compact or detailed metrics style with visual hierarchy."""
     if not res.generation:
@@ -4476,6 +4497,7 @@ def _log_verbose_success_details_mode(
         gen_text,
         gen_tokens,
         prompt=prompt,
+        context_marker=context_marker,
     )
 
     logger.info("📝 %s", Colors.colored("Generated Text:", Colors.BOLD, Colors.CYAN))
@@ -4721,6 +4743,7 @@ def print_model_result(
     run_index: int | None = None,
     total_runs: int | None = None,
     prompt: str | None = None,  # MOD: Added for context ignorance detection
+    context_marker: str = "Context:",
 ) -> None:
     """Print a concise summary + optional verbose block for a model result."""
     model_short = result.model_name.split("/")[-1]
@@ -4733,7 +4756,7 @@ def print_model_result(
     for line in textwrap.wrap(summary, width=width, break_long_words=False, break_on_hyphens=False):
         log_fn(Colors.colored(line, color))
     if result.success and not verbose:  # quick exit with preview only
-        _preview_generation(result.generation, prompt=prompt)
+        _preview_generation(result.generation, prompt=prompt, context_marker=context_marker)
         return
     header_label = "✓ SUCCESS" if result.success else "✗ FAILED"
     header_color = Colors.GREEN if result.success else Colors.RED
@@ -4755,6 +4778,7 @@ def print_model_result(
             result,
             detailed=detailed_metrics,
             prompt=prompt,
+            context_marker=context_marker,
         )
 
 
@@ -5238,6 +5262,7 @@ def process_models(
             kv_bits=args.kv_bits,
             kv_group_size=args.kv_group_size,
             quantized_kv_start=args.quantized_kv_start,
+            context_marker=args.context_marker,
         )
         result: PerformanceResult = process_image_with_model(params)
 
@@ -5251,6 +5276,7 @@ def process_models(
                     gen_text,
                     gen_tokens,
                     prompt=prompt,
+                    context_marker=args.context_marker,
                 )
                 # Log quality analysis results
                 logger.info(
@@ -5283,6 +5309,7 @@ def process_models(
             run_index=idx,
             total_runs=len(model_identifiers),
             prompt=prompt,
+            context_marker=args.context_marker,
         )
     return results
 
@@ -5819,6 +5846,12 @@ def main_cli() -> None:
         type=Path,
         default=None,
         help="Path to custom quality configuration YAML file.",
+    )
+    parser.add_argument(
+        "--context-marker",
+        type=str,
+        default="Context:",
+        help="Marker used to identify context section in prompt (default: 'Context:').",
     )
 
     # Parse arguments

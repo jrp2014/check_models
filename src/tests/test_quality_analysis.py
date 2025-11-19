@@ -115,3 +115,29 @@ def test_analyze_generation_text_empty_input() -> None:
     assert not analysis.hallucination_issues
     assert not analysis.is_verbose
     assert analysis.bullet_count == 0
+
+
+def test_analyze_generation_text_context_ignorance_custom_marker() -> None:
+    """Test detection of context ignorance with a custom marker."""
+    prompt = "MyMarker: The secret code is Project Alpha.\n\nDescribe the image."
+    text = "A nice landscape."
+
+    # Should detect missing "Project Alpha" if we use the correct marker
+    analysis = analyze_generation_text(
+        text,
+        10,
+        prompt=prompt,
+        context_marker="MyMarker:",
+    )
+
+    assert analysis.is_context_ignored
+    assert "Project Alpha" in analysis.missing_context_terms
+
+    # Should NOT detect if we use the default marker (since "Context:" is not in prompt)
+    analysis_default = analyze_generation_text(
+        text,
+        10,
+        prompt=prompt,
+    )
+    # If "Context:" is not found, it returns False, []
+    assert not analysis_default.is_context_ignored
