@@ -5248,7 +5248,8 @@ def process_models(
 
     for idx, model_id in enumerate(model_identifiers, start=1):
         print_cli_separator()
-        model_label = model_id.split("/")[-1]
+        # Use full model ID (e.g. "mlx-community/Qwen2-VL-2B-Instruct") instead of just the name
+        model_label = model_id
         progress = f"[{idx}/{len(model_identifiers)}]"
         print_cli_section(
             f"Processing Model {progress}: {Colors.colored(model_label, Colors.MAGENTA)}",

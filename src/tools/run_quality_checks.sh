@@ -99,9 +99,9 @@ cd ..
 
 echo "=== Markdown Lint ==="
 if command -v markdownlint-cli2 &> /dev/null; then
-    markdownlint-cli2 --config .markdownlint.jsonc "**/*.md"
+    markdownlint-cli2 --config .markdownlint.jsonc "**/*.md" "!src/output/**"
 elif command -v npx &> /dev/null; then
-    npx markdownlint-cli2 --config .markdownlint.jsonc "**/*.md"
+    npx markdownlint-cli2 --config .markdownlint.jsonc "**/*.md" "!src/output/**"
 else
     echo "⚠️  Skipped (markdownlint-cli2 or npx not found)"
 fi
