@@ -3390,6 +3390,7 @@ def format_issues_summary_text(summary: dict[str, Any], stats: dict[str, Any]) -
                 f"Min: {format_field_value(field, data['min'])} | "
                 f"Max: {format_field_value(field, data['max'])}",
             )
+        parts.append("")  # Blank line after list (MD032)
 
     return "\n".join(parts)
 
