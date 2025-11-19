@@ -11,6 +11,19 @@ thresholds:
   min_phrase_repetitions: 3      # Minimum phrase repetitions before flagging
   max_phrase_repetitions: 10     # Flag if phrase repeats this many times regardless
   phrase_coverage_threshold: 0.4 # Minimum coverage ratio to flag (40%)
+  min_phrase_length: 4           # Minimum n-gram length to check for repetition
+
+  # Hallucination detection
+  min_pipes_for_table: 4         # Minimum pipe characters to detect table
+  min_table_rows: 2              # Minimum rows to confirm table structure
+  min_mc_answers: 3              # Minimum multiple choice answers to flag pattern
+  substantial_text_length: 200   # Text length threshold for question detection
+
+  # Formatting violations
+  max_markdown_headers: 5        # Maximum markdown headers before flagging
+
+  # Context ignorance detection (additional)
+  min_context_term_length: 2     # Minimum length for context term extraction
 
   # Verbosity detection
   max_verbosity_tokens: 300      # Substantial length threshold

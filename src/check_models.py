@@ -169,6 +169,19 @@ class QualityThresholds:
     min_phrase_repetitions: int = 3
     max_phrase_repetitions: int = 10
     phrase_coverage_threshold: float = 0.4
+    min_phrase_length: int = 4  # Minimum n-gram length to check
+
+    # Hallucination detection
+    min_pipes_for_table: int = 4
+    min_table_rows: int = 2
+    min_mc_answers: int = 3
+    substantial_text_length: int = 200
+
+    # Formatting violations
+    max_markdown_headers: int = 5
+
+    # Context ignorance detection (additional)
+    min_context_term_length: int = 2
 
     # Verbosity detection
     max_verbosity_tokens: int = 300
@@ -1240,8 +1253,8 @@ def _detect_repetitive_output(text: str, threshold: float | None = None) -> tupl
             return True, most_common_token
 
     # 2. Check for phrase repetition (n-grams)
-    # Look for repeated sequences of 4+ tokens
-    min_phrase_len = 4
+    # Look for repeated sequences of configurable length (default 4+ tokens)
+    min_phrase_len = QUALITY.min_phrase_length
     # We only care if the phrase appears multiple times and covers a significant portion of text
 
     # Simple heuristic: Check if any substring of length N repeats significantly
@@ -1297,11 +1310,6 @@ def _detect_hallucination_patterns(text: str) -> list[str]:
         >>> _detect_hallucination_patterns("A) 42\nB) 43\nC) 44")
         ['Contains multiple choice pattern']
     """
-    min_pipes_for_table = 4
-    min_table_rows = 2
-    min_mc_answers = 3
-    substantial_text_len = 200
-
     issues: list[str] = []
 
     if not text:
@@ -1310,16 +1318,16 @@ def _detect_hallucination_patterns(text: str) -> list[str]:
     text_lower = text.lower()
 
     # Check for markdown tables (pipe-delimited)
-    if "|" in text and text.count("|") >= min_pipes_for_table:
+    if "|" in text and text.count("|") >= QUALITY.min_pipes_for_table:
         # Likely a table if we see multiple pipes
         lines_with_pipes = [line for line in text.split("\n") if "|" in line]
-        if len(lines_with_pipes) >= min_table_rows:
+        if len(lines_with_pipes) >= QUALITY.min_table_rows:
             issues.append("Contains unexpected table")
 
     # Check for multiple choice patterns
     mc_pattern = re.compile(r"^[A-D]\)", re.MULTILINE)
     mc_matches = mc_pattern.findall(text)
-    if len(mc_matches) >= min_mc_answers:
+    if len(mc_matches) >= QUALITY.min_mc_answers:
         issues.append("Contains multiple choice pattern")
 
     # Check for quiz/test questions
@@ -1329,7 +1337,7 @@ def _detect_hallucination_patterns(text: str) -> list[str]:
         else ["what is", "how many", "based on the chart", "calculate"]
     )
     has_question = any(indicator in text_lower for indicator in question_indicators)
-    if has_question and len(text) > substantial_text_len:
+    if has_question and len(text) > QUALITY.substantial_text_length:
         issues.append("Contains question/quiz content")
 
     # Check for unrelated educational content keywords
@@ -1405,8 +1413,6 @@ def _detect_formatting_violations(text: str) -> list[str]:
     Returns:
         List of detected formatting issues (excluding bullets)
     """
-    max_headers = 5
-
     issues: list[str] = []
 
     if not text:
@@ -1421,7 +1427,7 @@ def _detect_formatting_violations(text: str) -> list[str]:
 
     # Check for excessive markdown structure
     header_count = text.count("\n##") + text.count("\n###")
-    if header_count > max_headers:
+    if header_count > QUALITY.max_markdown_headers:
         issues.append(f"Excessive markdown headers ({header_count})")
 
     return issues
@@ -1605,8 +1611,6 @@ def _detect_context_ignorance(
         "picture",
     }
 
-    min_term_length = 2  # Minimum length for a term to be considered
-
     # Find capitalized words (potential proper nouns)
     potential_terms = re.findall(r"\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b", context_text)
 
@@ -1614,7 +1618,7 @@ def _detect_context_ignorance(
     key_terms = [
         term
         for term in set(potential_terms)
-        if term.lower() not in common_words and len(term) > min_term_length
+        if term.lower() not in common_words and len(term) > QUALITY.min_context_term_length
     ]
 
     # Check if these terms appear in the generated text (case-insensitive)
