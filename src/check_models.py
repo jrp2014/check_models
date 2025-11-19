@@ -1259,7 +1259,12 @@ def _detect_repetitive_output(text: str, threshold: float | None = None) -> tupl
 
         # If a phrase repeats more than 3 times and covers > 40% of text (approx)
         # Or if it repeats > 10 times regardless of coverage
-        if count > 10 or (count > 3 and (count * n) / n_words > 0.4):
+        min_phrase_repetitions = 3
+        max_phrase_repetitions = 10
+        phrase_coverage_threshold = 0.4
+        if count > max_phrase_repetitions or (
+            count > min_phrase_repetitions and (count * n) / n_words > phrase_coverage_threshold
+        ):
             return True, f'phrase: "{most_common_ngram[:30]}..."'
 
     return False, None
@@ -1973,7 +1978,7 @@ class GenerationQualityAnalysis:
             issues_list.append(f"Excessive bullet points ({self.bullet_count})")
         if self.is_context_ignored:
             issues_list.append(
-                f"Context ignored (missing: {', '.join(self.missing_context_terms)})"
+                f"Context ignored (missing: {', '.join(self.missing_context_terms)})",
             )
         if self.is_refusal:
             issues_list.append(f"Refusal detected ({self.refusal_type})")
@@ -3875,8 +3880,9 @@ def _generate_model_gallery_section(results: list[PerformanceResult]) -> list[st
             gen = res.generation
             if gen:
                 tps = getattr(gen, "generation_tps", 0)
+                tokens = getattr(gen, "generation_tokens", 0)
                 md.append(
-                    f"**Metrics:** {fmt_num(tps)} TPS | {getattr(gen, 'generation_tokens', 0)} tokens"
+                    f"**Metrics:** {fmt_num(tps)} TPS | {tokens} tokens",
                 )
 
             md.append("")
