@@ -2933,7 +2933,7 @@ def _prepare_table_data(
         row: list[str] = []
         for field_name in field_names:
             if field_name == "model_name":
-                row.append(res.model_name.split("/")[-1])
+                row.append(res.model_name)
             elif field_name == "output":
                 if res.success and res.generation:
                     row.append(str(getattr(res.generation, "text", "")))

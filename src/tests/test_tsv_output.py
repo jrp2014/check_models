@@ -186,3 +186,33 @@ def test_tsv_empty_results() -> None:
     finally:
         if output_file.exists():
             output_file.unlink()
+
+
+def test_tsv_full_model_name(tmp_path: Path) -> None:
+    """Should preserve the full model name (including organization) in TSV output."""
+    full_model_name = "organization/specific-model-v1"
+    results = [
+        check_models.PerformanceResult(
+            model_name=full_model_name,
+            success=True,
+            generation=MockGenerationResult(text="Output"),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+        ),
+    ]
+
+    output_file = tmp_path / "test_full_name.tsv"
+    check_models.generate_tsv_report(results, output_file)
+
+    content = output_file.read_text(encoding="utf-8")
+    lines = content.strip().split("\n")
+
+    # Check the data row (index 1)
+    data_row = lines[1]
+    # The model name is typically the first column
+    assert full_model_name in data_row
+    # Ensure it wasn't truncated to just "specific-model-v1"
+    assert f"\t{full_model_name}\t" in f"\t{data_row}\t" or data_row.startswith(
+        f"{full_model_name}\t",
+    )
