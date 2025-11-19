@@ -63,6 +63,20 @@ make clean        # Remove generated files
 
 See `make help` for all available commands.
 
+## Quality Configuration
+
+You can customize the quality detection rules (thresholds and patterns) by providing a YAML configuration file:
+
+```bash
+python -m check_models --quality-config my_quality_config.yaml --folder path/to/images --models mlx-community/Llama-3.2-11B-Vision-Instruct-4bit
+```
+
+A default configuration is provided in `src/quality_config.yaml`. You can copy this file and modify it to:
+
+- Adjust thresholds for repetition, verbosity, etc.
+- Add new hallucination patterns or refusal phrases.
+- Change the list of "filler words" for generic output detection.
+
 ## For Contributors
 
 Want to contribute? Great! See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for the complete setup and workflow guide, and [IMPLEMENTATION_GUIDE.md](docs/IMPLEMENTATION_GUIDE.md) for coding standards.

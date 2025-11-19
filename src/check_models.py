@@ -42,6 +42,7 @@ from typing import (
     runtime_checkable,
 )
 
+import yaml
 from huggingface_hub import HFCacheInfo, scan_cache_dir
 from huggingface_hub import __version__ as hf_version
 from huggingface_hub.errors import HFValidationError
@@ -152,36 +153,82 @@ class FormattingThresholds:
     hour_threshold_seconds: float = 3600.0  # Show HH:MM:SS format
 
 
-@dataclass(frozen=True)
+@dataclass
 class QualityThresholds:
     """Centralized thresholds for quality analysis detection.
 
-    Consolidates detection thresholds to make quality check tuning
-    more transparent and maintainable.
+    Loaded from configuration file or defaults.
     """
 
     # Repetition detection
-    repetition_ratio: float = 0.8  # 80% of tokens must be same to flag
-    min_text_length: int = 10  # Minimum text length to check
-    min_token_count: int = 5  # Minimum tokens to analyze
+    repetition_ratio: float = 0.8
+    min_text_length: int = 10
+    min_token_count: int = 5
 
     # Verbosity detection
-    max_verbosity_tokens: int = 300  # Substantial length threshold
-    min_meta_patterns: int = 2  # Minimum meta-commentary patterns
-    min_section_headers: int = 3  # Minimum section headers
+    max_verbosity_tokens: int = 300
+    min_meta_patterns: int = 2
+    min_section_headers: int = 3
 
     # Bullet point detection
-    max_bullets: int = 15  # Maximum allowed bullet points
+    max_bullets: int = 15
 
     # Generic output detection
-    min_text_length_for_generic: int = 20  # Minimum text length to analyze for genericity
-    generic_filler_threshold: float = 0.15  # Filler ratio threshold (15%)
-    min_specificity_indicators: int = 2  # Minimum indicators for non-generic content
+    min_text_length_for_generic: int = 20
+    generic_filler_threshold: float = 0.15
+    min_specificity_indicators: int = 2
+
+    # Patterns (loaded from config)
+    patterns: dict[str, list[str]] | None = None
+
+    @classmethod
+    def from_config(cls, config: dict[str, Any]) -> QualityThresholds:
+        """Create instance from configuration dictionary."""
+        thresholds = config.get("thresholds", {})
+        patterns = config.get("patterns", {})
+
+        # Filter valid fields for the dataclass
+        valid_fields = {f.name for f in dataclasses.fields(cls) if f.name != "patterns"}
+        filtered_thresholds = {k: v for k, v in thresholds.items() if k in valid_fields}
+
+        return cls(**filtered_thresholds, patterns=patterns)
 
 
 # Instantiate singletons for runtime use
 FORMATTING = FormattingThresholds()
+# Default QUALITY instance (will be updated if config is loaded)
 QUALITY = QualityThresholds()
+
+
+def load_quality_config(config_path: Path | None = None) -> None:
+    """Load quality configuration from file and update global QUALITY instance.
+
+    If no config_path is provided, looks for 'quality_config.yaml' in the
+    same directory as this script.
+    """
+    # Default path relative to script location (robust to CWD changes)
+    if config_path is None:
+        # Use resolve() to handle symlinks and ensure absolute path
+        script_dir = Path(__file__).resolve().parent
+        default_path = script_dir / "quality_config.yaml"
+        if default_path.exists():
+            config_path = default_path
+
+    if config_path and config_path.exists():
+        try:
+            with config_path.open("r") as f:
+                config = yaml.safe_load(f)
+                if config:
+                    new_quality = QualityThresholds.from_config(config)
+                    # Update existing global instance in-place to avoid 'global' keyword
+                    # and ensure all references see the update.
+                    for field in dataclasses.fields(QualityThresholds):
+                        setattr(QUALITY, field.name, getattr(new_quality, field.name))
+                    logger.debug("Loaded quality configuration from %s", config_path)
+        except (OSError, yaml.YAMLError) as e:
+            logger.warning("Failed to load quality config from %s: %s", config_path, e)
+    elif config_path:
+        logger.warning("Quality config file not found: %s", config_path)
 
 
 MIN_SEPARATOR_CHARS: Final[int] = 50
@@ -1198,13 +1245,21 @@ def _detect_hallucination_patterns(text: str) -> list[str]:
         issues.append("Contains multiple choice pattern")
 
     # Check for quiz/test questions
-    question_indicators = ["what is", "how many", "based on the chart", "calculate"]
+    question_indicators = (
+        QUALITY.patterns.get("hallucination_question_indicators", [])
+        if QUALITY.patterns
+        else ["what is", "how many", "based on the chart", "calculate"]
+    )
     has_question = any(indicator in text_lower for indicator in question_indicators)
     if has_question and len(text) > substantial_text_len:
         issues.append("Contains question/quiz content")
 
     # Check for unrelated educational content keywords
-    edu_keywords = ["grade level", "students with adhd", "test scores", "homework"]
+    edu_keywords = (
+        QUALITY.patterns.get("hallucination_edu_keywords", [])
+        if QUALITY.patterns
+        else ["grade level", "students with adhd", "test scores", "homework"]
+    )
     if any(keyword in text_lower for keyword in edu_keywords):
         issues.append("Contains unrelated educational content")
 
@@ -1232,16 +1287,20 @@ def _detect_excessive_verbosity(text: str, generated_tokens: int) -> bool:
     text_lower = text.lower()
 
     # Check for meta-commentary patterns
-    meta_patterns = [
-        "the image depicts",
-        "the image shows",
-        "the photograph captures",
-        "this image features",
-        "in conclusion",
-        "### analysis",
-        "### conclusion",
-        "based on the image",
-    ]
+    meta_patterns = (
+        QUALITY.patterns.get("meta_commentary", [])
+        if QUALITY.patterns
+        else [
+            "the image depicts",
+            "the image shows",
+            "the photograph captures",
+            "this image features",
+            "in conclusion",
+            "### analysis",
+            "### conclusion",
+            "based on the image",
+        ]
+    )
 
     meta_count = sum(1 for pattern in meta_patterns if pattern in text_lower)
 
@@ -1457,40 +1516,54 @@ def _detect_refusal_patterns(text: str) -> tuple[bool, str | None]:
     text_lower = text.lower()
 
     # Refusal patterns
-    refusal_patterns = [
-        (
-            "explicit_refusal",
-            [
-                "i cannot",
-                "i can't",
-                "i'm unable to",
-                "i am unable to",
-                "sorry, i can't",
-                "sorry, i cannot",
-            ],
-        ),
-        (
-            "uncertainty",
-            [
-                "it's unclear",
-                "it's difficult to say",
-                "i'm not sure",
-                "i cannot determine",
-                "unable to determine",
-                "difficult to tell",
-            ],
-        ),
-        (
-            "insufficient_info",
-            [
-                "not enough information",
-                "insufficient detail",
-                "cannot see clearly",
-                "too blurry",
-                "image quality",
-            ],
-        ),
-    ]
+    refusal_patterns = []
+
+    if QUALITY.patterns:
+        if "refusal_explicit" in QUALITY.patterns:
+            refusal_patterns.append(("explicit_refusal", QUALITY.patterns["refusal_explicit"]))
+        if "refusal_uncertainty" in QUALITY.patterns:
+            refusal_patterns.append(("uncertainty", QUALITY.patterns["refusal_uncertainty"]))
+        if "refusal_insufficient_info" in QUALITY.patterns:
+            refusal_patterns.append(
+                ("insufficient_info", QUALITY.patterns["refusal_insufficient_info"])
+            )
+
+    if not refusal_patterns:
+        # Fallback defaults
+        refusal_patterns = [
+            (
+                "explicit_refusal",
+                [
+                    "i cannot",
+                    "i can't",
+                    "i'm unable to",
+                    "i am unable to",
+                    "sorry, i can't",
+                    "sorry, i cannot",
+                ],
+            ),
+            (
+                "uncertainty",
+                [
+                    "it's unclear",
+                    "it's difficult to say",
+                    "i'm not sure",
+                    "i cannot determine",
+                    "unable to determine",
+                    "difficult to tell",
+                ],
+            ),
+            (
+                "insufficient_info",
+                [
+                    "not enough information",
+                    "insufficient detail",
+                    "cannot see clearly",
+                    "too blurry",
+                    "image quality",
+                ],
+            ),
+        ]
 
     for refusal_type, patterns in refusal_patterns:
         if any(pattern in text_lower for pattern in patterns):
@@ -1520,27 +1593,31 @@ def _detect_generic_output(text: str) -> tuple[bool, float]:
         return False, 0.0
 
     # Count filler/hedge words
-    filler_words = [
-        "appears to",
-        "seems to",
-        "looks like",
-        "might be",
-        "could be",
-        "some",
-        "several",
-        "various",
-        "many",
-        "few",
-        "very",
-        "quite",
-        "rather",
-        "somewhat",
-        "fairly",
-        "thing",
-        "stuff",
-        "item",
-        "object",
-    ]
+    filler_words = (
+        QUALITY.patterns.get("filler_words", [])
+        if QUALITY.patterns
+        else [
+            "appears to",
+            "seems to",
+            "looks like",
+            "might be",
+            "could be",
+            "some",
+            "several",
+            "various",
+            "many",
+            "few",
+            "very",
+            "quite",
+            "rather",
+            "somewhat",
+            "fairly",
+            "thing",
+            "stuff",
+            "item",
+            "object",
+        ]
+    )
     filler_count = sum(text_lower.count(filler) for filler in filler_words)
 
     # Calculate filler ratio
@@ -1587,20 +1664,24 @@ def _detect_language_mixing(text: str) -> tuple[bool, list[str]]:
     issues = []
 
     # Check for common tokenizer artifacts
-    tokenizer_artifacts = [
-        r"<\|endoftext\|>",
-        r"<\|end\|>",
-        r"<s>",
-        r"</s>",
-        r"\[SEP\]",
-        r"\[CLS\]",
-        r"\[PAD\]",
-        r"\[UNK\]",
-        r"\[MASK\]",
-        r"<pad>",
-        r"<unk>",
-        r"<mask>",
-    ]
+    tokenizer_artifacts = (
+        QUALITY.patterns.get("tokenizer_artifacts", [])
+        if QUALITY.patterns
+        else [
+            r"<\|endoftext\|>",
+            r"<\|end\|>",
+            r"<s>",
+            r"</s>",
+            r"\[SEP\]",
+            r"\[CLS\]",
+            r"\[PAD\]",
+            r"\[UNK\]",
+            r"\[MASK\]",
+            r"<pad>",
+            r"<unk>",
+            r"<mask>",
+        ]
+    )
 
     for artifact in tokenizer_artifacts:
         if re.search(artifact, text, re.IGNORECASE):
@@ -1608,11 +1689,15 @@ def _detect_language_mixing(text: str) -> tuple[bool, list[str]]:
             break
 
     # Check for code snippets (function calls, variable assignments)
-    code_patterns = [
-        r"\bdef\s+\w+\(",  # Python function def
-        r"\bfunction\s+\w+\(",  # JavaScript function
-        r'\w+\s*=\s*["\']',  # Variable assignment
-    ]
+    code_patterns = (
+        QUALITY.patterns.get("code_patterns", [])
+        if QUALITY.patterns
+        else [
+            r"\bdef\s+\w+\(",  # Python function def
+            r"\bfunction\s+\w+\(",  # JavaScript function
+            r'\w+\s*=\s*["\']',  # Variable assignment
+        ]
+    )
 
     for pattern in code_patterns:
         if re.search(pattern, text):
@@ -5691,6 +5776,12 @@ def main_cli() -> None:
             "Overrides terminal detection. Also supported via MLX_VLM_WIDTH env var."
         ),
     )
+    parser.add_argument(
+        "--quality-config",
+        type=Path,
+        default=None,
+        help="Path to custom quality configuration YAML file.",
+    )
 
     # Parse arguments
     args: argparse.Namespace = parser.parse_args()
@@ -5702,6 +5793,10 @@ def main_cli() -> None:
     # Normalize: if neither flag set, compact is default; if both prevented by group.
     if getattr(args, "compact_metrics", False):
         args.detailed_metrics = False
+
+    # Load quality configuration
+    load_quality_config(getattr(args, "quality_config", None))
+
     main(args)
 
 

@@ -1,0 +1,112 @@
+# Quality Configuration for MLX VLM Check
+# This file defines thresholds and patterns used to detect quality issues in model generation.
+
+thresholds:
+  # Repetition detection
+  repetition_ratio: 0.8          # 80% of tokens must be same to flag
+  min_text_length: 10            # Minimum text length to check
+  min_token_count: 5             # Minimum tokens to analyze
+
+  # Verbosity detection
+  max_verbosity_tokens: 300      # Substantial length threshold
+  min_meta_patterns: 2           # Minimum meta-commentary patterns
+  min_section_headers: 3         # Minimum section headers
+
+  # Bullet point detection
+  max_bullets: 15                # Maximum allowed bullet points
+
+  # Generic output detection
+  min_text_length_for_generic: 20 # Minimum text length to analyze for genericity
+  generic_filler_threshold: 0.15  # Filler ratio threshold (15%)
+  min_specificity_indicators: 2   # Minimum indicators for non-generic content
+
+patterns:
+  # Hallucination detection
+  hallucination_question_indicators:
+    - "what is"
+    - "how many"
+    - "based on the chart"
+    - "calculate"
+  
+  hallucination_edu_keywords:
+    - "grade level"
+    - "students with adhd"
+    - "test scores"
+    - "homework"
+
+  # Verbosity detection
+  meta_commentary:
+    - "the image depicts"
+    - "the image shows"
+    - "the photograph captures"
+    - "this image features"
+    - "in conclusion"
+    - "### analysis"
+    - "### conclusion"
+    - "based on the image"
+
+  # Generic output detection
+  filler_words:
+    - "appears to"
+    - "seems to"
+    - "looks like"
+    - "might be"
+    - "could be"
+    - "some"
+    - "several"
+    - "various"
+    - "many"
+    - "few"
+    - "very"
+    - "quite"
+    - "rather"
+    - "somewhat"
+    - "fairly"
+    - "thing"
+    - "stuff"
+    - "item"
+    - "object"
+
+  # Refusal detection
+  refusal_explicit:
+    - "i cannot"
+    - "i can't"
+    - "i'm unable to"
+    - "i am unable to"
+    - "sorry, i can't"
+    - "sorry, i cannot"
+  
+  refusal_uncertainty:
+    - "it's unclear"
+    - "it's difficult to say"
+    - "i'm not sure"
+    - "i cannot determine"
+    - "unable to determine"
+    - "difficult to tell"
+
+  refusal_insufficient_info:
+    - "not enough information"
+    - "insufficient detail"
+    - "cannot see clearly"
+    - "too blurry"
+    - "image quality"
+
+  # Language mixing / Artifacts (Regex patterns)
+  tokenizer_artifacts:
+    - "<\\|endoftext\\|>"
+    - "<\\|end\\|>"
+    - "<s>"
+    - "</s>"
+    - "\\[SEP\\]"
+    - "\\[CLS\\]"
+    - "\\[PAD\\]"
+    - "\\[UNK\\]"
+    - "\\[MASK\\]"
+    - "<pad>"
+    - "<unk>"
+    - "<mask>"
+
+  code_patterns:
+    - "\\bdef\\s+\\w+\\("
+    - "\\bfunction\\s+\\w+\\("
+    - "\\w+\\s*=\\s*[\"']"

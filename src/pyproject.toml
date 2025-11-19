@@ -38,6 +38,7 @@ dependencies = [
     "mypy",
     "ruff",
     "ty",
+    "PyYAML>=6.0",
 ]
 
 [project.urls]
@@ -223,3 +224,7 @@ testpaths = ["tests"]
 # Keep output concise; individual developers can override locally if needed.
 addopts = "-q"
 
+
+
+[tool.setuptools.package-data]
+"*" = ["*.yaml"]
