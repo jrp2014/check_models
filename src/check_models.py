@@ -1164,7 +1164,11 @@ def format_overall_runtime(total_seconds: float) -> str:
 
 
 def _detect_repetitive_output(text: str, threshold: float | None = None) -> tuple[bool, str | None]:
-    """Detect if generated text is highly repetitive (like '<s>' repeated 500 times).
+    """Detect if generated text is highly repetitive (tokens or phrases).
+
+    Checks for:
+    1. Single token repetition (e.g., "<s> <s> <s>")
+    2. Phrase repetition (e.g., "The scene is very visible. The scene is very visible.")
 
     Args:
         text: Generated text to check
@@ -1173,15 +1177,6 @@ def _detect_repetitive_output(text: str, threshold: float | None = None) -> tupl
 
     Returns:
         Tuple of (is_repetitive, repeated_pattern)
-        - is_repetitive: True if text exceeds repetition threshold
-        - repeated_pattern: The repeated token/pattern if detected, None otherwise
-
-    Examples:
-        >>> _detect_repetitive_output("<s>" * 400)
-        (True, '<s>')
-
-        >>> _detect_repetitive_output("This is normal varied text")
-        (False, None)
     """
     if threshold is None:
         threshold = QUALITY.repetition_ratio
@@ -1189,23 +1184,44 @@ def _detect_repetitive_output(text: str, threshold: float | None = None) -> tupl
     if not text or len(text) < QUALITY.min_text_length:
         return False, None
 
-    # Split into tokens (words/symbols)
+    # 1. Check for single token repetition
     tokens = text.split()
     if len(tokens) < QUALITY.min_token_count:
         return False, None
 
-    # Count token frequency
     token_counts = Counter(tokens)
+    if token_counts:
+        most_common_token, count = token_counts.most_common(1)[0]
+        if count / len(tokens) >= threshold:
+            return True, most_common_token
 
-    # Find most common token
-    if not token_counts:
+    # 2. Check for phrase repetition (n-grams)
+    # Look for repeated sequences of 4+ tokens
+    min_phrase_len = 4
+    # We only care if the phrase appears multiple times and covers a significant portion of text
+
+    # Simple heuristic: Check if any substring of length N repeats significantly
+    # For efficiency, we'll check specific n-gram sizes
+    text_lower = text.lower()
+    words = text_lower.split()
+    n_words = len(words)
+
+    if n_words < min_phrase_len * 2:
         return False, None
 
-    most_common_token, count = token_counts.most_common(1)[0]
-    repetition_ratio = count / len(tokens)
+    # Check n-grams of length 4 to 10
+    for n in range(min_phrase_len, min(11, n_words // 2)):
+        ngrams = [" ".join(words[i : i + n]) for i in range(n_words - n + 1)]
+        if not ngrams:
+            continue
 
-    if repetition_ratio >= threshold:
-        return True, most_common_token
+        ngram_counts = Counter(ngrams)
+        most_common_ngram, count = ngram_counts.most_common(1)[0]
+
+        # If a phrase repeats more than 3 times and covers > 40% of text (approx)
+        # Or if it repeats > 10 times regardless of coverage
+        if count > 10 or (count > 3 and (count * n) / n_words > 0.4):
+            return True, f'phrase: "{most_common_ngram[:30]}..."'
 
     return False, None
 
@@ -4345,6 +4361,24 @@ def _check_hf_cache_integrity(model_identifier: str) -> None:
         logger.debug("Could not check HF cache integrity: %s", cache_err)
 
 
+def _classify_error(error_msg: str) -> str:
+    """Classify error message into a short, readable status code."""
+    msg_lower = error_msg.lower()
+
+    if "metal::malloc" in msg_lower or "maximum allowed buffer size" in msg_lower:
+        return "OOM"
+    if "requires" in msg_lower and "packages" in msg_lower and "pip install" in msg_lower:
+        return "Missing Dep"
+    if "cannot import name" in msg_lower or "importerror" in msg_lower:
+        return "Lib Version"
+    if "missing" in msg_lower and "parameters" in msg_lower:
+        return "Model Error"
+    if "timeout" in msg_lower:
+        return "Timeout"
+
+    return "Error"
+
+
 def _run_model_generation(
     params: ProcessImageParams,
     timer: TimingStrategy | None = None,
@@ -4498,11 +4532,12 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     except TimeoutError as e:
         logger.exception("Timeout during model processing")
         # MOD: Capture original exception type for error bucketing
+        classified_stage = _classify_error(str(e))
         return PerformanceResult(
             model_name=params.model_identifier,
             generation=None,
             success=False,
-            error_stage="timeout",
+            error_stage=classified_stage,  # Use classified error as stage/status
             error_message=str(e),
             error_type=type(e).__name__,
             generation_time=None,
@@ -4512,11 +4547,12 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     except (OSError, ValueError) as e:
         logger.exception("Model processing error")
         # MOD: Capture original exception type for error bucketing
+        classified_stage = _classify_error(str(e))
         return PerformanceResult(
             model_name=params.model_identifier,
             generation=None,
             success=False,
-            error_stage="processing",
+            error_stage=classified_stage,  # Use classified error as stage/status
             error_message=str(e),
             error_type=type(e).__name__,
             generation_time=None,
