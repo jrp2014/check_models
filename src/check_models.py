@@ -2955,11 +2955,13 @@ def _mark_failed_rows_in_html(html_table: str, results: list[PerformanceResult])
     """Add data attributes and classes to rows for filtering in the HTML table."""
     sorted_results = _sort_results_by_time(results)
     table_rows = html_table.split("<tr>")
-    new_table_rows = [table_rows[0]]  # Keep the header row
+    # Keep preamble and header row (index 0 and 1)
+    new_table_rows = [table_rows[0], table_rows[1]]
 
     for i, res in enumerate(sorted_results):
-        if i + 1 < len(table_rows):
-            row_html = table_rows[i + 1]
+        # Data rows start at index 2
+        if i + 2 < len(table_rows):
+            row_html = table_rows[i + 2]
 
             # Add data attributes for filtering
             if not res.success:
