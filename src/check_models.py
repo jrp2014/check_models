@@ -2215,19 +2215,28 @@ def log_rule(
     char: str = "─",  # Unicode box-drawing character (was "-")
     color: str | None = None,
     bold: bool = False,
+    level: int = logging.INFO,
+    pre_newline: bool = False,
+    post_newline: bool = False,
 ) -> None:
     """Log a horizontal rule line with optional color and bold.
 
     Uses unicode box-drawing characters for better visual separation.
     Keeps a single place for styling separators to ensure consistency.
     """
+    if pre_newline:
+        logger.log(level, "")
+
     line = char * max(1, width)
     extra: dict[str, object] = {"style_hint": LogStyles.RULE}
     if color:
         extra["style_color"] = color
     if bold:
         extra["style_bold"] = True
-    logger.info(line, extra=extra)
+    logger.log(level, line, extra=extra)
+
+    if post_newline:
+        logger.log(level, "")
 
 
 # --- Utility Functions ---
@@ -4801,9 +4810,9 @@ def _dump_environment_to_log() -> None:
         is_conda = conda_env is not None
 
         # Use logger instead of writing directly to file
-        logger.info("\n%s", "=" * 80)
-        logger.info("FULL ENVIRONMENT DUMP (for reproducibility)")
-        logger.info("%s\n", "=" * 80)
+        log_rule(80, char="=", level=logging.DEBUG, pre_newline=True)
+        logger.debug("FULL ENVIRONMENT DUMP (for reproducibility)")
+        log_rule(80, char="=", level=logging.DEBUG, post_newline=True)
 
         # Try pip freeze first (works in both conda and venv)
         try:
@@ -4816,10 +4825,10 @@ def _dump_environment_to_log() -> None:
                 check=False,
             )
             if pip_result.returncode == 0:
-                logger.info("--- pip freeze ---")
+                logger.debug("--- pip freeze ---")
                 for line in pip_result.stdout.splitlines():
-                    logger.info(line)
-                logger.info("")
+                    logger.debug(line)
+                logger.debug("")
             else:
                 logger.warning("pip freeze failed: %s", pip_result.stderr)
         except (subprocess.SubprocessError, FileNotFoundError) as pip_err:
@@ -4839,10 +4848,10 @@ def _dump_environment_to_log() -> None:
                         check=False,
                     )
                     if conda_result.returncode == 0:
-                        logger.info("--- conda list (env: %s) ---", conda_env)
+                        logger.debug("--- conda list (env: %s) ---", conda_env)
                         for line in conda_result.stdout.splitlines():
-                            logger.info(line)
-                        logger.info("")
+                            logger.debug(line)
+                        logger.debug("")
                     else:
                         logger.warning("conda list failed: %s", conda_result.stderr)
                 else:
@@ -4850,9 +4859,9 @@ def _dump_environment_to_log() -> None:
             except (subprocess.SubprocessError, FileNotFoundError) as conda_err:
                 logger.warning("Could not run conda list: %s", conda_err)
 
-        logger.info("%s", "=" * 80)
-        logger.info("Environment dump completed at %s", local_now_str())
-        logger.info("%s\n", "=" * 80)
+        log_rule(80, char="=", level=logging.DEBUG)
+        logger.debug("Environment dump completed at %s", local_now_str())
+        log_rule(80, char="=", level=logging.DEBUG, post_newline=True)
 
     except Exception as e:  # noqa: BLE001 - catch-all for logging
         logger.warning("Failed to dump environment info: %s", e)
@@ -4870,13 +4879,14 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
         )
         raise RuntimeError(error_message)
 
-    # Set DEBUG if verbose, else WARNING
-    log_level: int = logging.DEBUG if args.verbose else logging.INFO
+    # Set DEBUG if verbose, else INFO
+    console_log_level: int = logging.DEBUG if args.verbose else logging.INFO
     # Remove all handlers and add console + file handlers
     logger.handlers.clear()
 
     # Console handler with colored output
     console_handler: logging.StreamHandler[Any] = logging.StreamHandler(sys.stderr)
+    console_handler.setLevel(console_log_level)
     # Include timestamp for better traceability, level in verbose mode
     if args.verbose:
         fmt = "%(asctime)s - %(levelname)s - %(message)s"
@@ -4895,13 +4905,15 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
         encoding="utf-8",
     )
     # File gets full timestamp + level always (no colors in file)
+    file_handler.setLevel(logging.DEBUG)
     file_formatter: logging.Formatter = logging.Formatter(
         "%(asctime)s - %(levelname)s - %(message)s",
     )
     file_handler.setFormatter(file_formatter)
     logger.addHandler(file_handler)
 
-    logger.setLevel(log_level)
+    # Logger captures everything so file handler gets debug info
+    logger.setLevel(logging.DEBUG)
     logger.propagate = False  # Prevent double logging
 
     if args.verbose:
@@ -5480,25 +5492,18 @@ def _bucket_failures_by_error(
     return buckets
 
 
-def _format_failure_summary(buckets: dict[str, list[str]]) -> str:
-    """Format error buckets into a human-readable failure summary.
+def log_failure_summary(buckets: dict[str, list[str]]) -> None:
+    """Log error buckets as a human-readable failure summary.
 
     Args:
         buckets: Dictionary from _bucket_failures_by_error
-
-    Returns:
-        Formatted multi-line string for logging/reporting
     """
     if not buckets:
-        return ""
+        return
 
-    lines = [
-        "",
-        "=" * 80,
-        "FAILURE SUMMARY - Models Grouped by Root Cause",
-        "=" * 80,
-        "",
-    ]
+    log_rule(80, char="=", bold=True, pre_newline=True)
+    logger.info("FAILURE SUMMARY - Models Grouped by Root Cause")
+    log_rule(80, char="=", bold=True, post_newline=True)
 
     # Sort buckets by number of affected models (most common errors first)
     sorted_buckets = sorted(
@@ -5508,18 +5513,15 @@ def _format_failure_summary(buckets: dict[str, list[str]]) -> str:
     )
 
     for signature, models in sorted_buckets:
-        lines.append(f"{signature}")
-        lines.append(f"  Affected models ({len(models)}):")
+        logger.info("%s", signature)
+        logger.info("  Affected models (%d):", len(models))
         for model in models:
             # Shorten model names for readability
             short_name = model.split("/")[-1] if "/" in model else model
-            lines.append(f"    • {short_name}")
-        lines.append("")  # Blank line between buckets
+            logger.info("    • %s", short_name)
+        logger.info("")  # Blank line between buckets
 
-    lines.append("=" * 80)
-    lines.append("")
-
-    return "\n".join(lines)
+    log_rule(80, char="=", post_newline=True)
 
 
 def finalize_execution(
@@ -5542,9 +5544,7 @@ def finalize_execution(
         failed_count = sum(1 for r in results if not r.success)
         if failed_count > 0:
             buckets = _bucket_failures_by_error(results)
-            failure_summary = _format_failure_summary(buckets)
-            if failure_summary:
-                logger.info(failure_summary)
+            log_failure_summary(buckets)
 
         # Add model issues summary
         summary = analyze_model_issues(results)
