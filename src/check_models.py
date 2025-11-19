@@ -165,6 +165,11 @@ class QualityThresholds:
     min_text_length: int = 10
     min_token_count: int = 5
 
+    # Phrase repetition detection (n-grams)
+    min_phrase_repetitions: int = 3
+    max_phrase_repetitions: int = 10
+    phrase_coverage_threshold: float = 0.4
+
     # Verbosity detection
     max_verbosity_tokens: int = 300
     min_meta_patterns: int = 2

@@ -7,6 +7,11 @@ thresholds:
   min_text_length: 10            # Minimum text length to check
   min_token_count: 5             # Minimum tokens to analyze
 
+  # Phrase repetition detection (n-grams)
+  min_phrase_repetitions: 3      # Minimum phrase repetitions before flagging
+  max_phrase_repetitions: 10     # Flag if phrase repeats this many times regardless
+  phrase_coverage_threshold: 0.4 # Minimum coverage ratio to flag (40%)
+
   # Verbosity detection
   max_verbosity_tokens: 300      # Substantial length threshold
   min_meta_patterns: 2           # Minimum meta-commentary patterns
