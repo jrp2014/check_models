@@ -25,62 +25,27 @@ from __future__ import annotations
 
 import logging
 import re
+import tomllib
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
 
 def parse_pyproject(path: Path) -> dict[str, str]:
-    """Return mapping of dependency name->spec from PEP 621 dependencies array.
-
-    Supports both legacy table form (key = "spec") and current array form:
-
-    dependencies = [
-        "pkg>=1.0",
-        "other==2.0",  # comment
-    ]
-    """
+    """Return mapping of dependency name->spec from PEP 621 dependencies array."""
     content = path.read_text(encoding="utf-8")
+    data = tomllib.loads(content)
 
-    # First try to find the PEP 621 dependencies = [ ... ] block
-    array_pattern = r"^dependencies\s*=\s*\[(.*?)\]"  # within [project]
-    match = re.search(array_pattern, content, flags=re.MULTILINE | re.DOTALL)
+    # PEP 621: project.dependencies is a list of strings
+    deps_list = data.get("project", {}).get("dependencies", [])
+
     deps: dict[str, str] = {}
-    if match:
-        block = match.group(1)
-        for raw in block.splitlines():
-            line = raw.strip().rstrip(",")
-            if not line or line.startswith("#"):
-                continue
-            # Strip inline comments
-            if "#" in line:
-                line = line.split("#", 1)[0].strip()
-            line = line.strip('"').strip("'")
-            if not line:
-                continue
-            # Split name from spec heuristically: first occurrence of >,=,!,<,~
-            name_part = re.split(r"[<>=!~]", line, maxsplit=1)[0].strip()
-            spec = line[len(name_part) :].strip()
-            deps[name_part] = spec
-        return deps
+    for line in deps_list:
+        # Split name from spec heuristically: first occurrence of >,=,!,<,~
+        name_part = re.split(r"[<>=!~]", line, maxsplit=1)[0].strip()
+        spec = line[len(name_part) :].strip()
+        deps[name_part] = spec
 
-    # Fallback: legacy table style [project.dependencies]
-    table_pattern = r"^\[project\.dependencies\](.*?)(^\[|\Z)"
-    t_match = re.search(table_pattern, content, flags=re.MULTILINE | re.DOTALL)
-    if not t_match:
-        msg = "Could not locate dependencies array or [project.dependencies] section"
-        raise RuntimeError(msg)
-    block = t_match.group(1)
-    for raw in block.splitlines():
-        line = raw.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        name_part, spec_part = line.split("=", 1)
-        name = name_part.strip()
-        spec = spec_part.strip().strip('"')
-        if "#" in spec:
-            spec = spec.split("#", 1)[0].strip()
-        deps[name] = spec
     return deps
 
 
