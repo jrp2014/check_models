@@ -1040,14 +1040,15 @@ class MarkdownPipeEscaper:
     """Markdown escaping for table pipe characters and formatting.
 
     Handles pipe character escaping and converts newlines to <br> tags
-    to prevent breaking Markdown table formatting.
+    to prevent breaking Markdown table formatting. Preserves model-generated
+    markdown like **bold**, *italic*, `code` while preventing table breakage.
     """
 
     def escape(self, text: str) -> str:
         """Escape text for safe inclusion in Markdown tables.
 
-        Converts newlines to <br> tags and wraps bare URLs while
-        escaping pipe characters to prevent table formatting issues.
+        Converts newlines to <br> tags, wraps bare URLs, escapes pipes,
+        and neutralizes HTML-like tags while preserving markdown formatting.
         """
         # First, convert newlines to HTML <br> tags to preserve line structure
         # Handle different newline formats consistently
@@ -1060,13 +1061,51 @@ class MarkdownPipeEscaper:
         # Wrap bare URLs in angle brackets (MD034 compliance)
         result = _wrap_bare_urls(result)
 
-        # Finally, escape pipe characters for table safety
-        return result.replace("|", "\\|")
+        # Escape pipe characters (CRITICAL: breaks table structure)
+        result = result.replace("|", "\\|")
+
+        # Neutralize HTML-like tags using selective escaper
+        result = HTML_ESCAPER.escape(result)
+
+        # Escape bare ampersands that could start entities
+        return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
+
+
+class DiagnosticsEscaper:
+    """Markdown escaping optimized for error/diagnostic messages.
+
+    Similar to MarkdownPipeEscaper but allows more consecutive line breaks
+    to preserve traceback formatting while still preventing table breakage.
+    """
+
+    def escape(self, text: str) -> str:
+        """Escape diagnostics text for Markdown tables.
+
+        More lenient than standard escaping to preserve error message formatting.
+        """
+        # Convert newlines to <br> but preserve more spacing for tracebacks
+        result = text.replace("\r\n", "<br>").replace("\r", "<br>").replace("\n", "<br>")
+
+        # Limit excessive consecutive <br> (allow 3 for traceback readability)
+        result = re.sub(r"(<br>\s*){3,}", "<br><br>", result)
+
+        # Wrap bare URLs in angle brackets
+        result = _wrap_bare_urls(result)
+
+        # Escape pipes (critical for table structure)
+        result = result.replace("|", "\\|")
+
+        # Neutralize HTML-like tags
+        result = HTML_ESCAPER.escape(result)
+
+        # Escape bare ampersands
+        return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
 
 
 # Instantiate default escapers for runtime use
 HTML_ESCAPER = HTMLSelectiveEscaper()
 MARKDOWN_ESCAPER = MarkdownPipeEscaper()
+DIAGNOSTICS_ESCAPER = DiagnosticsEscaper()
 
 
 # Allowlist of inline formatting tags we preserve in Markdown output
@@ -1919,6 +1958,30 @@ class GenerationQualityAnalysis:
             or self.is_generic
             or self.has_language_mixing
         )
+
+    @property
+    def issues(self) -> list[str]:
+        """Return a list of all detected quality issues as human-readable strings."""
+        issues_list = []
+        if self.is_repetitive:
+            issues_list.append(f"Repetitive output ({self.repeated_token})")
+        issues_list.extend(self.hallucination_issues)
+        if self.is_verbose:
+            issues_list.append("Excessive verbosity")
+        issues_list.extend(self.formatting_issues)
+        if self.has_excessive_bullets:
+            issues_list.append(f"Excessive bullet points ({self.bullet_count})")
+        if self.is_context_ignored:
+            issues_list.append(
+                f"Context ignored (missing: {', '.join(self.missing_context_terms)})"
+            )
+        if self.is_refusal:
+            issues_list.append(f"Refusal detected ({self.refusal_type})")
+        if self.is_generic:
+            issues_list.append(f"Generic output (specificity: {self.specificity_score:.2f})")
+        if self.has_language_mixing:
+            issues_list.extend(self.language_mixing_issues)
+        return issues_list
 
 
 def analyze_generation_text(
@@ -3787,29 +3850,77 @@ def _process_markdown_rows(rows: list[list[str]], results: list[PerformanceResul
             rows[i][last_col_idx] = _escape_markdown_in_text(rows[i][last_col_idx])
 
 
-def generate_markdown_report(
-    results: list[PerformanceResult],
-    filename: Path,
-    versions: LibraryVersionDict,
-    prompt: str,
-    total_runtime_seconds: float,
-) -> None:
-    """Write a GitHub-friendly Markdown summary with aligned pipe table."""
-    if not results:
-        logger.warning(
-            Colors.colored("No results to generate Markdown report.", Colors.YELLOW),
-        )
-        return
+def _generate_model_gallery_section(results: list[PerformanceResult]) -> list[str]:
+    """Generate the Model Gallery section for the Markdown report."""
+    md: list[str] = []
+    md.append("## Model Gallery")
+    md.append("")
+    md.append("Full output from each model:")
+    md.append("")
 
-    # Get table data using our helper function
+    sorted_results = _sort_results_by_time(results)
+    for res in sorted_results:
+        # Header with status icon
+        icon = "✅" if res.success else "❌"
+        md.append(f"### {icon} {res.model_name}")
+        md.append("")
+
+        if not res.success:
+            md.append(f"**Status:** Failed ({res.error_stage})")
+            md.append(f"**Error:** `{res.error_message}`")
+            if res.error_type:
+                md.append(f"**Type:** `{res.error_type}`")
+        else:
+            # Show metrics summary line
+            gen = res.generation
+            if gen:
+                tps = getattr(gen, "generation_tps", 0)
+                md.append(
+                    f"**Metrics:** {fmt_num(tps)} TPS | {getattr(gen, 'generation_tokens', 0)} tokens"
+                )
+
+            md.append("")
+            md.append("```text")
+            text = str(getattr(res.generation, "text", "")) if res.generation else ""
+            md.append(text)
+            md.append("```")
+
+            # Show quality warnings if any
+            if res.generation:
+                analysis = getattr(res.generation, "quality_analysis", None)
+                if analysis and analysis.issues:
+                    md.append("")
+                    md.append("⚠️ **Quality Warnings:**")
+                    md.extend(f"- {issue}" for issue in analysis.issues)
+
+        md.append("")
+        md.append("---")
+        md.append("")
+
+    return md
+
+
+def _generate_markdown_table_section(results: list[PerformanceResult]) -> list[str]:
+    """Generate the metrics table section for the Markdown report."""
     headers, rows, field_names = _prepare_table_data(results)
-
-    if not headers or not rows:
-        logger.warning("No table data to generate Markdown report.")
-        return
 
     # For Markdown, we need to process headers to remove HTML breaks and use simpler formatting
     markdown_headers = []
+
+    # Remove "Output" column from table data for Markdown report
+    # We will show it in a separate "Model Gallery" section instead
+    output_col_idx = -1
+    if "output" in field_names:
+        output_col_idx = field_names.index("output")
+        headers.pop(output_col_idx)
+        # We don't pop from field_names yet as we might need it for alignment,
+        # but we must remove it from rows
+        for row in rows:
+            if len(row) > output_col_idx:
+                row.pop(output_col_idx)
+        # Now remove from field_names
+        field_names.pop(output_col_idx)
+
     for header in headers:
         # Replace <br> with space for Markdown compatibility
         clean_header = header.replace("<br>", " ")
@@ -3836,6 +3947,39 @@ def generate_markdown_report(
     # Normalize trailing spaces per line using shared helper
     markdown_table = normalize_markdown_trailing_spaces(markdown_table)
 
+    md: list[str] = []
+    # Surround the table with markdownlint rule guards; the table can be wide and may
+    # contain HTML breaks and model-generated emphasis styles
+    md.append("<!-- markdownlint-disable MD013 MD033 MD034 MD037 MD049 -->")
+    md.append("")
+    md.append(markdown_table)
+    md.append("")
+    md.append("<!-- markdownlint-enable MD013 MD033 MD034 MD037 MD049 -->")
+    md.append("")
+    return md
+
+
+def generate_markdown_report(
+    results: list[PerformanceResult],
+    filename: Path,
+    versions: LibraryVersionDict,
+    prompt: str,
+    total_runtime_seconds: float,
+) -> None:
+    """Write a GitHub-friendly Markdown summary with aligned pipe table."""
+    if not results:
+        logger.warning(
+            Colors.colored("No results to generate Markdown report.", Colors.YELLOW),
+        )
+        return
+
+    # Get table data using our helper function
+    headers, rows, _ = _prepare_table_data(results)
+
+    if not headers or not rows:
+        logger.warning("No table data to generate Markdown report.")
+        return
+
     # Analyze model issues and generate summary
     summary = analyze_model_issues(results)
     stats = compute_performance_statistics(results)
@@ -3861,14 +4005,14 @@ def generate_markdown_report(
     md.append("")
     md.append(f"**Overall runtime:** {format_overall_runtime(total_runtime_seconds)}")
     md.append("")
-    # Surround the table with markdownlint rule guards; the table can be wide and may
-    # contain HTML breaks and model-generated emphasis styles
-    md.append("<!-- markdownlint-disable MD013 MD033 MD034 MD037 MD049 -->")
-    md.append("")
-    md.append(markdown_table)
-    md.append("")
-    md.append("<!-- markdownlint-enable MD013 MD033 MD034 MD037 MD049 -->")
-    md.append("")
+
+    # Generate table section
+    table_md = _generate_markdown_table_section(results)
+    md.extend(table_md)
+
+    # --- Model Gallery Section ---
+    md.extend(_generate_model_gallery_section(results))
+
     md.append("---")
 
     # Add system/hardware information if available
@@ -3997,32 +4141,7 @@ def _escape_markdown_in_text(text: str) -> str:
     This allows models to produce markdown formatting that GitHub interprets correctly,
     while preventing output from breaking the report table structure.
     """
-    # First, convert newlines to HTML <br> tags to preserve line structure
-    # Handle different newline formats consistently
-    result = text.replace("\r\n", "<br>").replace("\r", "<br>").replace("\n", "<br>")
-
-    # Clean up multiple consecutive <br> tags and normalize spacing
-    result = re.sub(r"(<br>\s*){2,}", "<br><br>", result)  # Max 2 consecutive line breaks
-    result = re.sub(r"\s+", " ", result).strip()  # Normalize other whitespace
-
-    # Wrap bare URLs in angle brackets (MD034 compliance)
-    result = _wrap_bare_urls(result)
-
-    # Escape only the critical markdown characters that break table formatting, PLUS
-    # neutralize raw HTML tag markers (<tag>) which GitHub may treat as HTML
-    # (e.g. <s> strike-through).
-    # (Subset chosen for formatting/readability; extend if needed.)
-    escape_pairs = [
-        ("|", "\\|"),  # Pipe - CRITICAL: breaks table column structure
-    ]
-    for char, escaped in escape_pairs:
-        result = result.replace(char, escaped)
-
-    # HTML-like angle bracket handling: escape < and > only when they appear to form a tag
-    result = _escape_html_tags_selective(result)
-
-    # Escape bare ampersands that could start entities; avoid double-escaping existing ones.
-    return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
+    return MARKDOWN_ESCAPER.escape(text)
 
 
 def _escape_markdown_diagnostics(text: str) -> str:
@@ -4036,23 +4155,7 @@ def _escape_markdown_diagnostics(text: str) -> str:
     We do NOT escape *, _, `, ~ as these rarely break tables and
     escaping them makes Python tracebacks harder to read.
     """
-    # Convert newlines to <br> but otherwise keep spacing as-is
-    result = text.replace("\r\n", "<br>").replace("\r", "<br>").replace("\n", "<br>")
-
-    # Limit excessive consecutive <br> while preserving intentional blank lines
-    result = re.sub(r"(<br>\s*){3,}", "<br><br>", result)
-
-    # Wrap bare URLs in angle brackets to satisfy markdownlint MD034
-    result = _wrap_bare_urls(result)
-
-    # Only escape pipe - the critical table-breaking character
-    result = result.replace("|", "\\|")
-
-    # Neutralize HTML-like tags except a safe allowlist
-    result = _escape_html_tags_selective(result)
-
-    # Escape bare ampersands (avoid starting entities)
-    return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
+    return DIAGNOSTICS_ESCAPER.escape(text)
 
 
 def _wrap_bare_urls(text: str) -> str:
