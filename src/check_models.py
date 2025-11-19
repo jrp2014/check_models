@@ -928,16 +928,8 @@ BASE_NAME_MAX_WIDTH: Final[int] = 45
 COL_WIDTH: Final[int] = 12
 MIN_NAME_COL_WIDTH: Final[int] = len("Model")
 
-# Shared field metadata for reports
-FIELD_UNITS: Final[dict[str, str]] = {
-    "tokens": "(count)",
-    "prompt_tokens": "(count)",
-    "generation_tokens": "(count)",
-    "prompt_tps": "(t/s)",
-    "generation_tps": "(t/s)",
-    "peak_memory": "(GB)",
-}
-
+# Field display configuration: maps field names to (label, unit) tuples
+# This centralizes all field metadata in one place for consistency
 FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
     "token": ("Token", "(ct)"),
     "prompt_tokens": ("Prompt", "(ct)"),
@@ -956,20 +948,8 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
 HEADER_SPLIT_LENGTH = 10
 ERROR_MESSAGE_PREVIEW_LEN: Final[int] = 40  # Max chars to show from error in summary line
 
-# Fields that should be right-aligned (numeric fields)
-NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
-    {
-        "tokens",
-        "prompt_tokens",
-        "generation_tokens",
-        "prompt_tps",
-        "generation_tps",
-        "peak_memory",
-        "generation_time",
-        "model_load_time",
-        "total_time",
-    },
-)
+# Numeric fields are automatically derived from FIELD_ABBREVIATIONS for consistency
+NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(FIELD_ABBREVIATIONS.keys())
 
 # Console table formatting constants
 MAX_MODEL_NAME_LENGTH = 20  # Allows "microsoft/phi-3-vision" without truncation
