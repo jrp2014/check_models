@@ -557,6 +557,34 @@ class ProcessImageParams(NamedTuple):
 # =============================================================================
 
 
+class TimingStrategy(Protocol):
+    """Protocol for timing operations."""
+
+    def start(self) -> None:
+        """Start the timer."""
+        ...
+
+    def stop(self) -> float:
+        """Stop the timer and return the elapsed time in seconds."""
+        ...
+
+
+class PerfCounterTimer:
+    """Default timing strategy using time.perf_counter()."""
+
+    def __init__(self) -> None:
+        self._start_time: float | None = None
+
+    def start(self) -> None:
+        self._start_time = time.perf_counter()
+
+    def stop(self) -> float:
+        if self._start_time is None:
+            msg = "Timer was not started"
+            raise RuntimeError(msg)
+        return time.perf_counter() - self._start_time
+
+
 # Custom timeout context manager
 # Python 3.11+ has asyncio.timeout, but signal-based timeout works across sync code
 # Uses SIGALRM which is Unix-only - Windows doesn't support this signal mechanism
@@ -4093,6 +4121,7 @@ def _check_hf_cache_integrity(model_identifier: str) -> None:
 
 def _run_model_generation(
     params: ProcessImageParams,
+    timer: TimingStrategy | None = None,
 ) -> GenerationResult | SupportsGenerationResult:
     """Load model + processor, apply chat template, run generation, time it.
 
@@ -4100,6 +4129,10 @@ def _run_model_generation(
     form a tightly coupled sequence (tokenizer/model/config interplay varies by
     repo). Errors are wrapped with traceback context so upstream summaries can
     show concise messages while verbose logs retain full detail.
+
+    Args:
+        params: The parameters for the image processing.
+        timer: Optional timing strategy. If None, uses PerfCounterTimer.
     """
     model: Module
     tokenizer: PreTrainedTokenizer | PreTrainedTokenizerFast
@@ -4137,7 +4170,11 @@ def _run_model_generation(
         formatted_prompt = "\n".join(str(m) for m in formatted_prompt)
 
     # Time the generation process manually since MLX VLM doesn't include timing
-    start_time = time.perf_counter()
+    # Use injected timer or default to PerfCounterTimer
+    if timer is None:
+        timer = PerfCounterTimer()
+
+    timer.start()
     try:
         output: GenerationResult | SupportsGenerationResult = generate(
             model=model,
@@ -4174,11 +4211,12 @@ def _run_model_generation(
             f"{traceback.format_exc()}"
         )
         raise ValueError(msg) from gen_err
-    end_time = time.perf_counter()
+
+    duration = timer.stop()
 
     # Add timing to the GenerationResult object dynamically
     # Cast to our Protocol which includes the time attribute we're adding
-    cast("SupportsGenerationResult", output).time = end_time - start_time
+    cast("SupportsGenerationResult", output).time = duration
 
     mx.eval(model.parameters())
     return output
