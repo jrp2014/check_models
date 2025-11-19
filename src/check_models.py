@@ -1808,28 +1808,11 @@ def _calculate_keyword_overlap_score(generated_text: str, baseline_text: str) ->
         "should",
         "may",
         "might",
-        "there",
-        "here",
-        "all",
-        "also",
-        "any",
-        "both",
-        "each",
-        "few",
-        "more",
-        "most",
-        "other",
-        "some",
-        "such",
-        "than",
-        "then",
-        "these",
-        "those",
-        "through",
-        "very",
-        "we",
-        "you",
-        "your",
+        "must",
+        "context",
+        "image",
+        "photo",
+        "picture",
     }
 
     def extract_keywords(text: str) -> set[str]:
@@ -2146,6 +2129,7 @@ def _log_wrapped_label_value(
             break_on_hyphens=False,
             replace_whitespace=False,
         ) or [""]
+
         for wi, wline in enumerate(wrapped):
             if li == 0 and wi == 0:
                 output_lines.append(f"{prefix} {Colors.colored(wline, color)}")
@@ -3116,7 +3100,7 @@ def analyze_model_issues(results: list[PerformanceResult]) -> dict[str, Any]:
 def compute_performance_statistics(results: list[PerformanceResult]) -> dict[str, Any]:
     """Compute performance statistics (min, max, avg) for successful runs.
 
-    Uses single-pass aggregation to build stats for all fields at once,
+    Uses single-pass aggregation to build stats for all fields at once
     reducing overhead from repeated filtering and type conversions.
     """
     stats: dict[str, Any] = {}
@@ -3157,38 +3141,202 @@ def compute_performance_statistics(results: list[PerformanceResult]) -> dict[str
     return stats
 
 
+def _format_top_performers_html(summary: dict[str, Any]) -> list[str]:
+    parts = []
+    if summary.get("top_fastest") or summary.get("top_memory"):
+        parts.append("<h3>🏆 Top Performers</h3><ul>")
+        if summary.get("top_fastest"):
+            parts.append("<li><b>Fastest Generation (t/s):</b><ul>")
+            for model, speed in summary["top_fastest"]:
+                parts.append(
+                    f"<li><code>{html.escape(model)}</code>: <b>{speed:.1f} t/s</b></li>",
+                )
+            parts.append("</ul></li>")
+        if summary.get("top_memory"):
+            parts.append("<li><b>Most Memory Efficient (Peak GB):</b><ul>")
+            for model, mem in summary["top_memory"]:
+                parts.append(
+                    f"<li><code>{html.escape(model)}</code>: <b>{mem:.2f} GB</b></li>",
+                )
+            parts.append("</ul></li>")
+        parts.append("</ul>")
+    return parts
+
+
+def _format_quality_issues_html(summary: dict[str, Any]) -> list[str]:
+    quality_parts = []
+
+    if summary.get("failed_models"):
+        quality_parts.append(
+            f"<li><b class='metric-bad'>❌ Failed Models "
+            f"({len(summary['failed_models'])}):</b><ul>",
+        )
+        quality_parts.extend(
+            [
+                f"<li><code>{html.escape(model)}</code> ({html.escape(stage)})</li>"
+                for model, stage, _ in summary["failed_models"]
+            ],
+        )
+        quality_parts.append("</ul></li>")
+
+    if summary.get("context_ignored"):
+        quality_parts.append(
+            f"<li><b class='metric-warn'>⚠️ Context Ignored "
+            f"({len(summary['context_ignored'])}):</b><ul>",
+        )
+        quality_parts.extend(
+            [f"<li><code>{html.escape(model)}</code></li>" for model in summary["context_ignored"]],
+        )
+        quality_parts.append("</ul></li>")
+
+    if summary.get("repetitive_models"):
+        quality_parts.append(
+            f"<li><b class='metric-warn'>🔄 Repetitive Output "
+            f"({len(summary['repetitive_models'])}):</b><ul>",
+        )
+        quality_parts.extend(
+            [
+                f"<li><code>{html.escape(model)}</code> "
+                f"(token: <code>{html.escape(token)}</code>)</li>"
+                for model, token in summary["repetitive_models"]
+            ],
+        )
+        quality_parts.append("</ul></li>")
+
+    if summary.get("hallucination_models"):
+        quality_parts.append(
+            f"<li><b class='metric-warn'>👻 Hallucinations "
+            f"({len(summary['hallucination_models'])}):</b><ul>",
+        )
+        quality_parts.extend(
+            [
+                f"<li><code>{html.escape(model)}</code></li>"
+                for model, _ in summary["hallucination_models"]
+            ],
+        )
+        quality_parts.append("</ul></li>")
+
+    if summary.get("formatting_issues"):
+        quality_parts.append(
+            f"<li><b class='metric-warn'>📝 Formatting Issues "
+            f"({len(summary['formatting_issues'])}):</b><ul>",
+        )
+        quality_parts.extend(
+            [
+                f"<li><code>{html.escape(model)}</code></li>"
+                for model, _ in summary["formatting_issues"]
+            ],
+        )
+        quality_parts.append("</ul></li>")
+
+    parts = []
+    if quality_parts:
+        parts.append("<h3>⚠️ Quality Issues</h3><ul>")
+        parts.extend(quality_parts)
+        parts.append("</ul>")
+
+    return parts
+
+
 def format_issues_summary_html(summary: dict[str, Any], stats: dict[str, Any]) -> str:
     """Format the issues and statistics summary as an HTML string."""
-    # This is a simplified placeholder. A complete implementation would build a
-    # more detailed HTML structure.
     parts = []
-    if summary.get("failed_models"):
-        parts.append(f"<li><b>Failed models:</b> {len(summary['failed_models'])}</li>")
-    if summary.get("repetitive_models"):
-        parts.append(f"<li><b>Repetitive models:</b> {len(summary['repetitive_models'])}</li>")
+    parts.extend(_format_top_performers_html(summary))
+    parts.extend(_format_quality_issues_html(summary))
+
+    # General Stats
     if stats:
-        parts.append("<li><b>Performance Stats (avg):</b></li>")
+        parts.append("<h3>📊 Aggregate Statistics (Successful Runs)</h3><ul>")
         for field, data in stats.items():
             parts.append(
-                f"<ul><li><i>{format_field_label(field)}:</i> "
-                f"{format_field_value(field, data['avg'])}</li></ul>",
+                f"<li><b>{format_field_label(field)}</b>: "
+                f"Avg: {format_field_value(field, data['avg'])} | "
+                f"Min: {format_field_value(field, data['min'])} | "
+                f"Max: {format_field_value(field, data['max'])}</li>",
             )
-    return "<ul>" + "".join(parts) + "</ul>" if parts else ""
+        parts.append("</ul>")
+
+    return "".join(parts)
+
+
+def _format_top_performers_text(summary: dict[str, Any]) -> list[str]:
+    parts = []
+    if summary.get("top_fastest") or summary.get("top_memory"):
+        parts.append("### 🏆 Top Performers")
+        if summary.get("top_fastest"):
+            parts.append("- **Fastest Generation (t/s):**")
+            for model, speed in summary["top_fastest"]:
+                parts.append(f"  - `{model}`: **{speed:.1f} t/s**")
+        if summary.get("top_memory"):
+            parts.append("- **Most Memory Efficient (Peak GB):**")
+            for model, mem in summary["top_memory"]:
+                parts.append(f"  - `{model}`: **{mem:.2f} GB**")
+        parts.append("")
+    return parts
+
+
+def _format_quality_issues_text(summary: dict[str, Any]) -> list[str]:
+    parts = []
+    quality_parts = []
+
+    if summary.get("failed_models"):
+        quality_parts.append(f"- **❌ Failed Models ({len(summary['failed_models'])}):**")
+        for model, stage, _ in summary["failed_models"]:
+            quality_parts.append(f"  - `{model}` (`{stage}`)")
+
+    if summary.get("context_ignored"):
+        quality_parts.append(f"- **⚠️ Context Ignored ({len(summary['context_ignored'])}):**")
+        quality_parts.extend([f"  - `{model}`" for model in summary["context_ignored"]])
+
+    if summary.get("repetitive_models"):
+        quality_parts.append(
+            f"- **🔄 Repetitive Output ({len(summary['repetitive_models'])}):**",
+        )
+        for model, token in summary["repetitive_models"]:
+            quality_parts.append(f"  - `{model}` (token: `{token}`)")
+
+    if summary.get("hallucination_models"):
+        quality_parts.append(
+            f"- **👻 Hallucinations ({len(summary['hallucination_models'])}):**",
+        )
+        quality_parts.extend(
+            [f"  - `{model}`" for model, _ in summary["hallucination_models"]],
+        )
+
+    if summary.get("formatting_issues"):
+        quality_parts.append(
+            f"- **📝 Formatting Issues ({len(summary['formatting_issues'])}):**",
+        )
+        quality_parts.extend(
+            [f"  - `{model}`" for model, _ in summary["formatting_issues"]],
+        )
+
+    if quality_parts:
+        parts.append("### ⚠️ Quality Issues")
+        parts.extend(quality_parts)
+        parts.append("")
+
+    return parts
 
 
 def format_issues_summary_text(summary: dict[str, Any], stats: dict[str, Any]) -> str:
     """Format the issues and statistics summary as a Markdown string."""
     parts = []
-    if summary.get("failed_models"):
-        parts.append(f"- **Failed models:** {len(summary['failed_models'])}")
-    if summary.get("repetitive_models"):
-        parts.append(f"- **Repetitive models:** {len(summary['repetitive_models'])}")
+
+    parts.extend(_format_top_performers_text(summary))
+    parts.extend(_format_quality_issues_text(summary))
+
+    # General Stats
     if stats:
-        parts.append("- **Performance Stats (avg):**")
+        parts.append("### 📊 Aggregate Statistics (Successful Runs)")
         for field, data in stats.items():
             parts.append(
-                f"  - *{format_field_label(field)}:* {format_field_value(field, data['avg'])}",
+                f"- **{format_field_label(field)}**: "
+                f"Avg: {format_field_value(field, data['avg'])} | "
+                f"Min: {format_field_value(field, data['min'])} | "
+                f"Max: {format_field_value(field, data['max'])}",
             )
+
     return "\n".join(parts)
 
 
@@ -3563,9 +3711,25 @@ def generate_html_report(
         logger.exception("Failed to write HTML report to %s", filename)
 
 
-# =============================================================================
-# MARKDOWN REPORT GENERATION (Markdown tables, formatting)
-# =============================================================================
+def _process_markdown_rows(rows: list[list[str]], results: list[PerformanceResult]) -> None:
+    """Process table rows for Markdown: escape content and format model names."""
+    sorted_results_for_flags = _sort_results_by_time(results)
+    for i in range(len(rows)):
+        # Wrap model name in backticks to preserve underscores and special chars
+        if rows[i][0]:
+            rows[i][0] = f"`{rows[i][0]}`"
+
+        last_col_idx = len(rows[i]) - 1
+        if last_col_idx < 0:
+            continue
+        # If corresponding result failed, treat as diagnostics and escape more aggressively
+        is_failure = i < len(sorted_results_for_flags) and not sorted_results_for_flags[i].success
+        if is_failure:
+            rows[i][last_col_idx] = _escape_markdown_diagnostics(rows[i][last_col_idx])
+        else:
+            # Minimal structural escaping only (protect pipes/HTML-like tags, preserve output
+            # as-is otherwise)
+            rows[i][last_col_idx] = _escape_markdown_in_text(rows[i][last_col_idx])
 
 
 def generate_markdown_report(
@@ -3599,19 +3763,7 @@ def generate_markdown_report(
     # Escape Markdown only for diagnostics (failed rows). Keep successful model output
     # unchanged. This preserves model formatting (including *, _, `, etc.) while
     # avoiding table breakage from diagnostics.
-    sorted_results_for_flags = _sort_results_by_time(results)
-    for i in range(len(rows)):
-        last_col_idx = len(rows[i]) - 1
-        if last_col_idx < 0:
-            continue
-        # If corresponding result failed, treat as diagnostics and escape more aggressively
-        is_failure = i < len(sorted_results_for_flags) and not sorted_results_for_flags[i].success
-        if is_failure:
-            rows[i][last_col_idx] = _escape_markdown_diagnostics(rows[i][last_col_idx])
-        else:
-            # Minimal structural escaping only (protect pipes/HTML-like tags, preserve output
-            # as-is otherwise)
-            rows[i][last_col_idx] = _escape_markdown_in_text(rows[i][last_col_idx])
+    _process_markdown_rows(rows, results)
 
     # Determine column alignment using original field names
     colalign = ["left"] + [
@@ -3895,7 +4047,7 @@ def get_system_info() -> tuple[str, str | None]:
                 ["/usr/sbin/system_profiler", "SPDisplaysDataType"],
                 capture_output=True,
                 text=True,
-                timeout=5,  # Increased timeout for robustness
+                timeout=5,
                 check=False,
             )
             if result.returncode == 0:
@@ -3976,7 +4128,7 @@ def get_system_characteristics() -> dict[str, str]:
             if logical_cores:
                 info["CPU Cores (Logical)"] = str(logical_cores)
 
-    except Exception as err:  # noqa: BLE001 - system characteristics are supplementary
+    except Exception as err:  # noqa: BLE001 - catch-all for logging
         logger.debug("Error gathering system characteristics: %s", err)
 
     return info
