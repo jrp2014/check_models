@@ -178,6 +178,10 @@ class QualityThresholds:
     generic_filler_threshold: float = 0.15
     min_specificity_indicators: int = 2
 
+    # Context ignorance detection
+    min_key_terms_threshold: int = 3
+    min_missing_ratio: float = 0.75
+
     # Patterns (loaded from config)
     patterns: dict[str, list[str]] | None = None
 
@@ -935,7 +939,7 @@ FIELD_UNITS: Final[dict[str, str]] = {
 }
 
 FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
-    "tokens": ("Tokens", "(ct)"),
+    "token": ("Token", "(ct)"),
     "prompt_tokens": ("Prompt", "(ct)"),
     "generation_tokens": ("Gen", "(ct)"),
     "total_tokens": ("Total", "Tokens"),
@@ -1572,14 +1576,11 @@ def _detect_context_ignorance(
     missing_terms = [term for term in key_terms if term.lower() not in text.lower()]
 
     # Only flag as "ignored" if we found key terms and most are missing
-    # Require at least MIN_KEY_TERMS to evaluate, and 75% must be missing
-    # This allows concise but accurate outputs to pass
-    min_key_terms_threshold = 3  # Minimum terms needed to evaluate context usage
-    min_missing_ratio = 0.75
+    # Use thresholds from configuration
     is_ignored = (
         len(missing_terms) > 0
-        and len(key_terms) >= min_key_terms_threshold
-        and len(missing_terms) >= len(key_terms) * min_missing_ratio
+        and len(key_terms) >= QUALITY.min_key_terms_threshold
+        and len(missing_terms) >= len(key_terms) * QUALITY.min_missing_ratio
     )
 
     return is_ignored, missing_terms
@@ -2966,10 +2967,13 @@ def _prepare_table_data(
         if field_name in FIELD_ABBREVIATIONS:
             line1, line2 = FIELD_ABBREVIATIONS[field_name]
             # Split long headers for better readability in reports
-            if len(line1) > HEADER_SPLIT_LENGTH or len(line2) > HEADER_SPLIT_LENGTH:
+            # Only add <br> if we actually have two parts to show
+            if line2 and (len(line1) > HEADER_SPLIT_LENGTH or len(line2) > HEADER_SPLIT_LENGTH):
                 headers.append(f"{line1}<br>{line2}")
-            else:
+            elif line2:
                 headers.append(f"{line1} {line2}")
+            else:
+                headers.append(line1)
         else:
             headers.append(format_field_label(field_name))
 

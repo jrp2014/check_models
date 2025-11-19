@@ -20,6 +20,10 @@ thresholds:
   generic_filler_threshold: 0.15  # Filler ratio threshold (15%)
   min_specificity_indicators: 2   # Minimum indicators for non-generic content
 
+  # Context ignorance detection
+  min_key_terms_threshold: 3      # Minimum key terms needed to evaluate context usage
+  min_missing_ratio: 0.75         # Minimum ratio of missing terms (75%)
+
 patterns:
   # Hallucination detection
   hallucination_question_indicators:
