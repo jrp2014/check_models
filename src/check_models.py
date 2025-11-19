@@ -4789,75 +4789,73 @@ def print_cli_separator() -> None:
 
 
 # MOD: Added full environment dump to log file for reproducibility
-def _dump_environment_to_log(log_file_path: Path) -> None:
+def _dump_environment_to_log() -> None:
     """Dump complete Python environment to log file for debugging/reproducibility.
 
     Captures output from pip freeze (and conda list if in conda environment)
     to provide complete package manifest for issue reproduction.
-
-    Args:
-        log_file_path: Path to the log file where environment info will be appended
     """
     try:
         # Detect if we're in a conda environment
         conda_env = os.environ.get("CONDA_DEFAULT_ENV")
         is_conda = conda_env is not None
 
-        with log_file_path.open("a", encoding="utf-8") as log_f:
-            log_f.write("\n" + "=" * 80 + "\n")
-            log_f.write("FULL ENVIRONMENT DUMP (for reproducibility)\n")
-            log_f.write("=" * 80 + "\n\n")
+        # Use logger instead of writing directly to file
+        logger.info("\n%s", "=" * 80)
+        logger.info("FULL ENVIRONMENT DUMP (for reproducibility)")
+        logger.info("%s\n", "=" * 80)
 
-            # Try pip freeze first (works in both conda and venv)
+        # Try pip freeze first (works in both conda and venv)
+        try:
+            # Use sys.executable to ensure we're using the same Python interpreter
+            pip_result = subprocess.run(  # noqa: S603 - trusted command with controlled args
+                [sys.executable, "-m", "pip", "freeze"],
+                capture_output=True,
+                text=True,
+                timeout=30,
+                check=False,
+            )
+            if pip_result.returncode == 0:
+                logger.info("--- pip freeze ---")
+                for line in pip_result.stdout.splitlines():
+                    logger.info(line)
+                logger.info("")
+            else:
+                logger.warning("pip freeze failed: %s", pip_result.stderr)
+        except (subprocess.SubprocessError, FileNotFoundError) as pip_err:
+            logger.warning("Could not run pip freeze: %s", pip_err)
+
+        # If in conda, also capture conda list
+        if is_conda:
             try:
-                # Use sys.executable to ensure we're using the same Python interpreter
-                pip_result = subprocess.run(  # noqa: S603 - trusted command with controlled args
-                    [sys.executable, "-m", "pip", "freeze"],
-                    capture_output=True,
-                    text=True,
-                    timeout=30,
-                    check=False,
-                )
-                if pip_result.returncode == 0:
-                    log_f.write("--- pip freeze ---\n")
-                    log_f.write(pip_result.stdout)
-                    log_f.write("\n")
-                else:
-                    log_f.write(f"pip freeze failed: {pip_result.stderr}\n\n")
-            except (subprocess.SubprocessError, FileNotFoundError) as pip_err:
-                log_f.write(f"Could not run pip freeze: {pip_err}\n\n")
-
-            # If in conda, also capture conda list
-            if is_conda:
-                try:
-                    # Use shutil.which to find conda executable safely
-                    conda_path = shutil.which("conda")
-                    if conda_path:
-                        conda_result = subprocess.run(  # noqa: S603 - trusted command
-                            [conda_path, "list"],
-                            capture_output=True,
-                            text=True,
-                            timeout=30,
-                            check=False,
-                        )
-                        if conda_result.returncode == 0:
-                            log_f.write(f"--- conda list (env: {conda_env}) ---\n")
-                            log_f.write(conda_result.stdout)
-                            log_f.write("\n")
-                        else:
-                            log_f.write(f"conda list failed: {conda_result.stderr}\n\n")
+                # Use shutil.which to find conda executable safely
+                conda_path = shutil.which("conda")
+                if conda_path:
+                    conda_result = subprocess.run(  # noqa: S603 - trusted command
+                        [conda_path, "list"],
+                        capture_output=True,
+                        text=True,
+                        timeout=30,
+                        check=False,
+                    )
+                    if conda_result.returncode == 0:
+                        logger.info("--- conda list (env: %s) ---", conda_env)
+                        for line in conda_result.stdout.splitlines():
+                            logger.info(line)
+                        logger.info("")
                     else:
-                        log_f.write("conda command not found in PATH\n\n")
-                except (subprocess.SubprocessError, FileNotFoundError) as conda_err:
-                    log_f.write(f"Could not run conda list: {conda_err}\n\n")
+                        logger.warning("conda list failed: %s", conda_result.stderr)
+                else:
+                    logger.warning("conda command not found in PATH")
+            except (subprocess.SubprocessError, FileNotFoundError) as conda_err:
+                logger.warning("Could not run conda list: %s", conda_err)
 
-            log_f.write("=" * 80 + "\n")
-            log_f.write(f"Environment dump completed at {local_now_str()}\n")
-            log_f.write("=" * 80 + "\n\n")
+        logger.info("%s", "=" * 80)
+        logger.info("Environment dump completed at %s", local_now_str())
+        logger.info("%s\n", "=" * 80)
 
-        logger.debug("Full environment dump written to log file")
-    except (OSError, ValueError) as dump_err:
-        logger.debug("Could not write environment dump: %s", dump_err)
+    except Exception as e:  # noqa: BLE001 - catch-all for logging
+        logger.warning("Failed to dump environment info: %s", e)
 
 
 def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
@@ -4931,7 +4929,7 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
         print_version_info(library_versions)
 
     # MOD: Dump full environment to log file for reproducibility
-    _dump_environment_to_log(log_file)
+    _dump_environment_to_log()
 
     if args.trust_remote_code:
         print_cli_separator()
