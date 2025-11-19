@@ -57,4 +57,4 @@ The image shows a cat sitting on a mat...
 
 - Repetitive output (cat)
 
-```
+```text
