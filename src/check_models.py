@@ -1037,7 +1037,7 @@ class HTMLSelectiveEscaper:
     tag_pattern: re.Pattern[str] = re.compile(r"</?[A-Za-z][A-Za-z0-9:-]*(?:\s+[^<>]*?)?>")
 
     def escape(self, text: str) -> str:
-        """Escape HTML tags except allowed safe tags."""
+        """Escape tags except allowed safe tags."""
 
         def _escape_html_like(m: re.Match[str]) -> str:
             token = m.group(0)
@@ -1085,18 +1085,18 @@ HTML_ESCAPER = HTMLSelectiveEscaper()
 MARKDOWN_ESCAPER = MarkdownPipeEscaper()
 
 
-# Allowlist of inline HTML tags we preserve in Markdown output
+# Allowlist of inline formatting tags we preserve in Markdown output
 # Keep <br> for line breaks; do NOT include 's' to avoid interpreting <s> tokens
-# from model output as strikethrough.
+# from model output as strikethrough (they may be output markers, not formatting).
 # DEPRECATED: Use HTML_ESCAPER.allowed_tags instead
 allowed_inline_tags = HTML_ESCAPER.allowed_tags
 
 
 def _escape_html_tags_selective(text: str) -> str:
-    """Escape HTML-like tags except GitHub-allowed safe tags.
+    """Escape tag-like sequences except GitHub-recognized formatting tags.
 
-    Helper for markdown escaping functions. Neutralizes potentially unsafe HTML
-    while preserving common formatting tags that GitHub recognizes.
+    Helper for markdown escaping functions. Neutralizes tag sequences that may
+    interfere with rendering while preserving common formatting tags that GitHub recognizes.
 
     DEPRECATED: Use HTML_ESCAPER.escape() instead for new code.
     """
@@ -1344,7 +1344,7 @@ def _detect_formatting_violations(text: str) -> list[str]:
     """Detect formatting issues in generated output.
 
     Looks for:
-    - Unknown/unexpected HTML tags (not simple <br>)
+    - Unknown/unexpected tags (not simple <br>) that may interfere with output rendering
     - Excessive markdown headers/structure
 
     Note: Bullet lists are checked separately by _detect_excessive_bullets()
@@ -1363,12 +1363,12 @@ def _detect_formatting_violations(text: str) -> list[str]:
     if not text:
         return issues
 
-    # Check for HTML tags (beyond simple breaks)
+    # Check for tags (beyond simple breaks) that may interfere with rendering
     html_tags = re.findall(r"<(?!br>|/br>)[a-z]+[^>]*>", text, re.IGNORECASE)
     if html_tags:
-        # Escape the HTML tags in the diagnostic message itself
+        # Escape the tags in the diagnostic message itself
         escaped_tags = [tag.replace("<", "&lt;").replace(">", "&gt;") for tag in set(html_tags[:3])]
-        issues.append(f"Unknown HTML tags: {', '.join(escaped_tags)}")
+        issues.append(f"Unknown tags: {', '.join(escaped_tags)}")
 
     # Check for excessive markdown structure
     header_count = text.count("\n##") + text.count("\n###")
@@ -3923,11 +3923,17 @@ def generate_tsv_report(
 
 
 def _escape_markdown_in_text(text: str) -> str:
-    """Escape only structural Markdown chars (currently pipe only).
+    """Escape structural elements while preserving model-generated markdown.
 
-    Minimal escaping avoids noisy backslashes while preserving readability.
-    Newlines are replaced with ``<br>`` so multi-line outputs don't break the
-    pipe table layout. Bare URLs are wrapped in angle brackets for MD034 compliance.
+    Strategy:
+    - Escape pipes (|) to prevent breaking the outer table structure
+    - Convert newlines to <br> to preserve multi-line output in table cells
+    - Escape tag-like sequences (e.g., <s>, </s>) that aren't recognized GitHub formatting
+    - PRESERVE model-generated markdown: **bold**, *italic*, `code`, etc. (GitHub renders these)
+    - Wrap bare URLs in angle brackets for MD034 compliance
+
+    This allows models to produce markdown formatting that GitHub interprets correctly,
+    while preventing output from breaking the report table structure.
     """
     # First, convert newlines to HTML <br> tags to preserve line structure
     # Handle different newline formats consistently
@@ -4909,9 +4915,8 @@ def print_model_result(
     context_marker: str = "Context:",
 ) -> None:
     """Print a concise summary + optional verbose block for a model result."""
-    model_short = result.model_name.split("/")[-1]
     run_prefix = "" if run_index is None else f"[RUN {run_index}/{total_runs}] "
-    summary = run_prefix + "SUMMARY " + " ".join(_summary_parts(result, model_short))
+    summary = run_prefix + "SUMMARY " + " ".join(_summary_parts(result, result.model_name))
     log_fn = logger.info if result.success else logger.error
     color = Colors.GREEN if result.success else Colors.RED
     # Wrap summary to terminal width for readability
@@ -4925,7 +4930,7 @@ def print_model_result(
     header_color = Colors.GREEN if result.success else Colors.RED
     header = (
         f"{header_label}: "
-        f"{Colors.colored(model_short, Colors.MAGENTA if result.success else Colors.RED)}"
+        f"{Colors.colored(result.model_name, Colors.MAGENTA if result.success else Colors.RED)}"
     )
     log_fn(Colors.colored(header, Colors.BOLD, header_color))
     if not result.success:
@@ -5671,9 +5676,7 @@ def log_failure_summary(buckets: dict[str, list[str]]) -> None:
         logger.info("%s", signature)
         logger.info("  Affected models (%d):", len(models))
         for model in models:
-            # Shorten model names for readability
-            short_name = model.split("/")[-1] if "/" in model else model
-            logger.info("    • %s", short_name)
+            logger.info("    • %s", model)
         logger.info("")  # Blank line between buckets
 
     log_rule(80, char="=", post_newline=True)
