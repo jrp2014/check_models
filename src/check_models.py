@@ -955,12 +955,12 @@ NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(FIELD_ABBREVIATIONS.ke
 MAX_MODEL_NAME_LENGTH = 20  # Allows "microsoft/phi-3-vision" without truncation
 MAX_OUTPUT_LENGTH = 28
 
-# PerformanceResult timing fields - centralized definition
+# Performance timing fields: those from PerformanceResult (not GenerationResult)
+# Automatically derived from FIELD_ABBREVIATIONS for consistency
 PERFORMANCE_TIMING_FIELDS: Final[list[str]] = [
-    "generation_time",
-    "model_load_time",
-    "total_time",
-    "quality_issues",  # MOD: Consolidated quality analysis
+    field
+    for field in FIELD_ABBREVIATIONS
+    if field in {"generation_time", "model_load_time", "total_time", "quality_issues"}
 ]
 
 
@@ -4022,21 +4022,6 @@ def _escape_markdown_diagnostics(text: str) -> str:
     """
     # Convert newlines to <br> but otherwise keep spacing as-is
     result = text.replace("\r\n", "<br>").replace("\r", "<br>").replace("\n", "<br>")
-
-    # Limit excessive consecutive <br> while preserving intentional blank lines
-    result = re.sub(r"(<br>\s*){3,}", "<br><br>", result)
-
-    # Wrap bare URLs in angle brackets to satisfy markdownlint MD034
-    result = _wrap_bare_urls(result)
-
-    # Only escape pipe - the critical table-breaking character
-    result = result.replace("|", "\\|")
-
-    # Neutralize HTML-like tags except a safe allowlist
-    result = _escape_html_tags_selective(result)
-
-    # Escape bare ampersands (avoid starting entities)
-    return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
 
     # Limit excessive consecutive <br> while preserving intentional blank lines
     result = re.sub(r"(<br>\s*){3,}", "<br><br>", result)
