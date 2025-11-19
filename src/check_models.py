@@ -1378,6 +1378,43 @@ def _detect_formatting_violations(text: str) -> list[str]:
     return issues
 
 
+def _truncate_repetitive_output(text: str) -> str:
+    """Truncate outputs with excessive token repetition for display.
+
+    When a model produces many consecutive repetitions of the same token,
+    truncate for readability while indicating the total count.
+
+    Args:
+        text: Generated text
+
+    Returns:
+        Truncated text with repetition summary if applicable
+    """
+    if not text:
+        return text
+
+    # Quick inline check for repetition
+    is_repetitive, repeated_token = _detect_repetitive_output(text)
+    if not is_repetitive or not repeated_token:
+        return text
+
+    # Count consecutive repetitions of the token (with optional whitespace between)
+    pattern = re.escape(repeated_token)
+    match = re.search(rf"({pattern}(?:\s*{pattern}){{10,}})", text)
+
+    if match:
+        # Count total repetitions in the matched section
+        repetitions = match.group(0).count(repeated_token)
+        # Show first few occurrences + count + ellipsis
+        truncated_section = (
+            f"{repeated_token} {repeated_token} {repeated_token} "
+            f"... [{repetitions} total repetitions] ..."
+        )
+        return text.replace(match.group(0), truncated_section)
+
+    return text
+
+
 def _detect_excessive_bullets(text: str) -> tuple[bool, int]:
     """Detect if output contains excessive bullet points.
 
@@ -1398,7 +1435,9 @@ def _detect_excessive_bullets(text: str) -> tuple[bool, int]:
     bullet_lines = [line for line in text.split("\n") if line.strip().startswith(bullet_prefixes)]
     bullet_count = len(bullet_lines)
 
-    return bullet_count > QUALITY.max_bullets, bullet_count
+    # Use config threshold if available, otherwise default to 15 (lowered for cataloging)
+    threshold = QUALITY.max_bullets if QUALITY.max_bullets else 15
+    return bullet_count > threshold, bullet_count
 
 
 def _detect_markdown_formatting(text: str) -> bool:
@@ -1533,8 +1572,15 @@ def _detect_context_ignorance(
     missing_terms = [term for term in key_terms if term.lower() not in text.lower()]
 
     # Only flag as "ignored" if we found key terms and most are missing
-    min_missing_ratio = 0.5  # At least 50% of key terms must be missing
-    is_ignored = len(missing_terms) > 0 and len(missing_terms) >= len(key_terms) * min_missing_ratio
+    # Require at least MIN_KEY_TERMS to evaluate, and 75% must be missing
+    # This allows concise but accurate outputs to pass
+    min_key_terms_threshold = 3  # Minimum terms needed to evaluate context usage
+    min_missing_ratio = 0.75
+    is_ignored = (
+        len(missing_terms) > 0
+        and len(key_terms) >= min_key_terms_threshold
+        and len(missing_terms) >= len(key_terms) * min_missing_ratio
+    )
 
     return is_ignored, missing_terms
 
@@ -2936,7 +2982,10 @@ def _prepare_table_data(
                 row.append(res.model_name)
             elif field_name == "output":
                 if res.success and res.generation:
-                    row.append(str(getattr(res.generation, "text", "")))
+                    text = str(getattr(res.generation, "text", ""))
+                    # Truncate repetitive output for readability
+                    text = _truncate_repetitive_output(text)
+                    row.append(text)
                 else:
                     row.append(
                         f"Error: {res.error_stage} - {res.error_message}"
@@ -3264,7 +3313,8 @@ def format_issues_summary_html(summary: dict[str, Any], stats: dict[str, Any]) -
 def _format_top_performers_text(summary: dict[str, Any]) -> list[str]:
     parts = []
     if summary.get("top_fastest") or summary.get("top_memory"):
-        parts.append("### 🏆 Top Performers")
+        parts.append("## 🏆 Top Performers")
+        parts.append("")  # Blank line after heading (MD022)
         if summary.get("top_fastest"):
             parts.append("- **Fastest Generation (t/s):**")
             for model, speed in summary["top_fastest"]:
@@ -3314,7 +3364,8 @@ def _format_quality_issues_text(summary: dict[str, Any]) -> list[str]:
         )
 
     if quality_parts:
-        parts.append("### ⚠️ Quality Issues")
+        parts.append("## ⚠️ Quality Issues")
+        parts.append("")  # Blank line after heading (MD022)
         parts.extend(quality_parts)
         parts.append("")
 
@@ -3330,7 +3381,8 @@ def format_issues_summary_text(summary: dict[str, Any], stats: dict[str, Any]) -
 
     # General Stats
     if stats:
-        parts.append("### 📊 Aggregate Statistics (Successful Runs)")
+        parts.append("## 📊 Aggregate Statistics (Successful Runs)")
+        parts.append("")  # Blank line after heading (MD022)
         for field, data in stats.items():
             parts.append(
                 f"- **{format_field_label(field)}**: "
@@ -3793,38 +3845,47 @@ def generate_markdown_report(
 
     # Build the complete markdown content
     md: list[str] = []
-    md.append("# Model Performance Results\n")
-    md.append(f"_Generated on {local_now_str()}_\n")
+    md.append("# Model Performance Results")
+    md.append("")
+    md.append(f"_Generated on {local_now_str()}_")
     md.append("")
     # Add issues summary before prompt
     if issues_text:
         md.append(issues_text)
-        md.append("")
-    md.append("> **Prompt used:**\n>\n> " + prompt.replace("\n", "\n> ") + "\n")
+    md.append("> **Prompt used:**\n>\n> " + prompt.replace("\n", "\n> "))
     md.append("")
-    note = "**Note:** Results sorted: errors first, then by generation time (fastest to slowest).\n"
-    md.append(note)
-    md.append(f"**Overall runtime:** {format_overall_runtime(total_runtime_seconds)}\n")
+    md.append(
+        "**Note:** Results sorted: errors first, then by generation time (fastest to slowest).",
+    )
+    md.append("")
+    md.append(f"**Overall runtime:** {format_overall_runtime(total_runtime_seconds)}")
     md.append("")
     # Surround the table with markdownlint rule guards; the table can be wide and may
     # contain HTML breaks and model-generated emphasis styles
     md.append("<!-- markdownlint-disable MD013 MD033 MD034 MD037 MD049 -->")
+    md.append("")
     md.append(markdown_table)
+    md.append("")
     md.append("<!-- markdownlint-enable MD013 MD033 MD034 MD037 MD049 -->")
-    md.append("\n---\n")
+    md.append("")
+    md.append("---")
 
     # Add system/hardware information if available
     if system_info:
-        md.append("## System/Hardware Information\n")
+        md.append("")
+        md.append("## System/Hardware Information")
+        md.append("")
         for name, value in system_info.items():
             md.append(f"- **{name}**: {value}")
         md.append("")
 
-    md.append("## Library Versions\n")
+    md.append("## Library Versions")
+    md.append("")
     for name, ver in sorted(versions.items()):
         ver_str = "" if ver is None else ver
         md.append(f"- `{name}`: `{ver_str}`")
-    md.append(f"\n_Report generated on: {local_now_str()}_")
+    md.append("")
+    md.append(f"_Report generated on: {local_now_str()}_")
 
     # Join and normalize trailing spaces across the entire Markdown document
     # Ensure file ends with single newline (MD047 requirement)
@@ -3964,14 +4025,15 @@ def _escape_markdown_in_text(text: str) -> str:
 
 
 def _escape_markdown_diagnostics(text: str) -> str:
-    """Escape diagnostics text for Markdown tables more defensively.
+    """Escape diagnostics text for Markdown tables - minimal approach.
 
-    Behavior:
-    - Convert newlines to <br> to keep table rows intact.
-    - Wrap bare URLs in angle brackets to satisfy markdownlint MD034.
-    - Escape characters that commonly trigger Markdown formatting in diagnostics: *, _, `, ~, and |.
-    - Neutralize HTML-like tags except for a safe inline subset defined in allowed_inline_tags.
-    - Do NOT collapse general whitespace, to avoid losing error message detail.
+    Error messages are already in table cells, so we only need to:
+    - Escape pipes (|) to prevent breaking table structure
+    - Convert newlines to <br> for multi-line preservation
+    - Escape HTML-like tags that could be misinterpreted
+
+    We do NOT escape *, _, `, ~ as these rarely break tables and
+    escaping them makes Python tracebacks harder to read.
     """
     # Convert newlines to <br> but otherwise keep spacing as-is
     result = text.replace("\r\n", "<br>").replace("\r", "<br>").replace("\n", "<br>")
@@ -3982,16 +4044,23 @@ def _escape_markdown_diagnostics(text: str) -> str:
     # Wrap bare URLs in angle brackets to satisfy markdownlint MD034
     result = _wrap_bare_urls(result)
 
-    # Escape characters with special meaning in Markdown and table structure
-    escape_map = {
-        "|": "\\|",
-        "*": "\\*",
-        "_": "\\_",
-        "`": "\\`",
-        "~": "\\~",
-    }
-    for ch, repl in escape_map.items():
-        result = result.replace(ch, repl)
+    # Only escape pipe - the critical table-breaking character
+    result = result.replace("|", "\\|")
+
+    # Neutralize HTML-like tags except a safe allowlist
+    result = _escape_html_tags_selective(result)
+
+    # Escape bare ampersands (avoid starting entities)
+    return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
+
+    # Limit excessive consecutive <br> while preserving intentional blank lines
+    result = re.sub(r"(<br>\s*){3,}", "<br><br>", result)
+
+    # Wrap bare URLs in angle brackets to satisfy markdownlint MD034
+    result = _wrap_bare_urls(result)
+
+    # Only escape pipe - the critical table-breaking character
+    result = result.replace("|", "\\|")
 
     # Neutralize HTML-like tags except a safe allowlist
     result = _escape_html_tags_selective(result)
