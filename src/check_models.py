@@ -3147,15 +3147,19 @@ def _wrap_output_column_in_details(html_table: str, output_col_idx: int) -> str:
                 if match:
                     opening_tag, content, closing_tag = match.groups()
 
-                    # Create preview (first N chars)
-                    text_content = re.sub(r"<[^>]+>", "", content)  # Strip HTML tags
-                    preview = text_content[:preview_length]
+                    # Create preview (first N chars of actual text)
+                    # Content is already HTML-escaped by tabulate, so unescape to get real text
+                    # for accurate character counting (not entity counting)
+                    text_content = html.unescape(content)
+                    preview_text = text_content[:preview_length]
                     if len(text_content) > preview_length:
-                        preview += "..."
+                        preview_text += "..."
 
                     # Wrap in details/summary
+                    # Escape the preview text for HTML (it was unescaped above for char counting)
+                    # The full content is already escaped by tabulate
                     wrapped_content = (
-                        f"<details><summary>{html.escape(preview)}</summary>"
+                        f"<details><summary>{html.escape(preview_text)}</summary>"
                         f"<div style='margin-top: 0.5em;'>{content}</div></details>"
                     )
                     new_cell = opening_tag + wrapped_content + closing_tag
