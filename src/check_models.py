@@ -2312,7 +2312,7 @@ def _log_wrapped_error(label: str, value: str) -> None:
     width = get_terminal_width(max_width=100)
 
     # Label
-    logger.error(Colors.colored(f"{label}", Colors.RED, Colors.BOLD))
+    logger.error(label, extra={"style_hint": LogStyles.ERROR, "style_prefix": "ERROR"})
 
     # Content with wrapping and indentation
     cont_indent = "  "
@@ -2329,7 +2329,11 @@ def _log_wrapped_error(label: str, value: str) -> None:
             replace_whitespace=False,
         ) or [""]
         for wline in wrapped:
-            logger.error(Colors.colored(f"{cont_indent}{wline}", Colors.RED))
+            formatted_line = f"{cont_indent}{wline}"
+            logger.error(
+                formatted_line,
+                extra={"style_hint": LogStyles.DETAIL, "style_color": Colors.RED},
+            )
 
 
 def _apply_cli_output_preferences(args: argparse.Namespace) -> None:
@@ -3050,7 +3054,10 @@ def pretty_print_exif(
 
     # Print the title with consistent rule width
     log_rule(header_width, char="=", color=Colors.BLUE, bold=True)
-    logger.info(Colors.colored(f"{title.center(header_width)}", Colors.BOLD, Colors.MAGENTA))
+    logger.info(
+        title.center(header_width),
+        extra={"style_hint": LogStyles.HEADER, "style_width": header_width},
+    )
     log_rule(header_width, char="=", color=Colors.BLUE, bold=True)
 
     # Print the tabulated table
@@ -3777,11 +3784,17 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
 
     # Header
     header_line = " | ".join(_pad_text(h, col_widths[i]) for i, h in enumerate(headers))
-    logger.info(Colors.colored(header_line, Colors.BLUE, Colors.BOLD))
+    logger.info(
+        header_line,
+        extra={"style_hint": LogStyles.RULE, "style_color": Colors.BLUE, "style_bold": True},
+    )
 
     # Separator
     separator_line = " | ".join("-" * w for w in col_widths)
-    logger.info(Colors.colored(separator_line, Colors.BLUE))
+    logger.info(
+        separator_line,
+        extra={"style_hint": LogStyles.RULE, "style_color": Colors.BLUE},
+    )
 
     # Rows
     sorted_results = _sort_results_by_time(results)
@@ -4969,7 +4982,10 @@ def _preview_generation(
         return
     text_val = str(getattr(gen, "text", ""))
     if not text_val:
-        logger.info("%s", Colors.colored("<empty>", Colors.CYAN))
+        logger.info(
+            "<empty>",
+            extra={"style_hint": LogStyles.GENERATED_TEXT},
+        )
         return
 
     # MOD: Analyze quality using consolidated utility with optional prompt
@@ -4982,22 +4998,18 @@ def _preview_generation(
     )
     # Show brief inline warnings for quality issues
     if analysis.is_repetitive and analysis.repeated_token:
-        logger.warning(
-            Colors.colored(f"⚠️  Repetitive: '{analysis.repeated_token}'", Colors.YELLOW),
-        )
+        log_warning_note(f"Repetitive: '{analysis.repeated_token}'")
     if analysis.hallucination_issues:
         issues_preview = ", ".join(analysis.hallucination_issues[:2])
-        logger.warning(Colors.colored(f"⚠️  {issues_preview}", Colors.YELLOW))
+        log_warning_note(issues_preview)
     if analysis.is_verbose:
-        logger.warning(Colors.colored(f"⚠️  Verbose ({gen_tokens} tokens)", Colors.YELLOW))
+        log_warning_note(f"Verbose ({gen_tokens} tokens)")
     if analysis.formatting_issues:
-        logger.warning(Colors.colored(f"⚠️  {analysis.formatting_issues[0]}", Colors.YELLOW))
+        log_warning_note(analysis.formatting_issues[0])
     # MOD: Added context ignorance warning
     if analysis.is_context_ignored and analysis.missing_context_terms:
         missing = ", ".join(analysis.missing_context_terms[:3])
-        logger.warning(
-            Colors.colored(f"⚠️  Context ignored (missing: {missing})", Colors.YELLOW),
-        )
+        log_warning_note(f"Context ignored (missing: {missing})")
 
     for original_line in text_val.splitlines():
         if not original_line.strip():
@@ -5052,7 +5064,7 @@ def _log_verbose_success_details_mode(
 
     if analysis.formatting_issues:
         for issue in analysis.formatting_issues[:2]:  # Show first 2 issues
-            logger.warning(Colors.colored(f"⚠️  Note: {issue}", Colors.YELLOW))
+            log_warning_note(issue, prefix="⚠️  Note:")
 
     # MOD: Added context ignorance warning
     if analysis.is_context_ignored and analysis.missing_context_terms:
@@ -5153,7 +5165,7 @@ def _log_perf_block(res: PerformanceResult) -> None:
     if active_mem <= 0 and cached_mem <= 0 and peak_mem <= 0:
         return
 
-    logger.info("  💾 %s", Colors.colored("Memory:", Colors.BOLD, Colors.WHITE))
+    log_metric_label("Memory:", emoji="💾", indent="  ")
 
     def _log_mem(prefix: str, label: str, field: str, raw_val: float) -> None:
         if raw_val <= 0:
@@ -5161,12 +5173,7 @@ def _log_perf_block(res: PerformanceResult) -> None:
         formatted = format_field_value(field, raw_val)
         unit = "GB"
         text = str(formatted) if str(formatted).endswith(unit) else f"{formatted} GB"
-        logger.info(
-            "     %s %s %s",
-            prefix,
-            label.ljust(11),
-            Colors.colored(f"{text:>8}", Colors.WHITE),
-        )
+        log_metric_tree(prefix, label, f"{text:>8}", indent="     ")
 
     _log_mem("├─", "Active Δ:", "active_memory", active_mem)
     _log_mem("├─", "Cache Δ:", "cached_memory", cached_mem)
@@ -5183,15 +5190,17 @@ def _log_compact_metrics(res: PerformanceResult) -> None:
     if not res.generation:
         return
 
-    logger.info("")  # Breathing room
+    log_blank()  # Breathing room
     parts = _build_compact_metric_parts(res, res.generation)
     if not parts:
         return
     aligned = _align_metric_parts(parts)
+    # Use metric_label for the header, then plain info for the values
     logger.info(
         "📊 %s %s",
-        Colors.colored("Metrics:", Colors.BOLD, Colors.WHITE),
-        Colors.colored("  ".join(aligned), Colors.WHITE),
+        "Metrics:",
+        "  ".join(aligned),
+        extra={"style_hint": LogStyles.METRIC_LABEL},
     )
 
 
@@ -5244,35 +5253,27 @@ def _align_metric_parts(parts: list[str]) -> list[str]:
 
 def log_metrics_legend(*, detailed: bool) -> None:
     """Emit a one-time legend at the beginning of processing for clarity."""
-    logger.info("")
-    logger.info(Colors.colored("📖 Metrics Format:", Colors.BOLD, Colors.CYAN))
+    log_blank()
+    log_metric_label("Metrics Format:", emoji="📖")
     if detailed:
         logger.info(
-            Colors.colored(
-                "  • Detailed mode: separate lines for timing, memory, tokens, TPS",
-                Colors.GRAY,
-            ),
+            "  • Detailed mode: separate lines for timing, memory, tokens, TPS",
+            extra={"style_hint": LogStyles.DETAIL, "style_color": Colors.GRAY},
         )
     else:
         logger.info(
-            Colors.colored(
-                "  • Compact mode: tokens(total/prompt/gen) format with aligned keys",
-                Colors.GRAY,
-            ),
+            "  • Compact mode: tokens(total/prompt/gen) format with aligned keys",
+            extra={"style_hint": LogStyles.DETAIL, "style_color": Colors.GRAY},
         )
     logger.info(
-        Colors.colored(
-            "  • ⚠️  warnings shown for repetitive or hallucinated output",
-            Colors.GRAY,
-        ),
+        "  • ⚠️  warnings shown for repetitive or hallucinated output",
+        extra={"style_hint": LogStyles.DETAIL, "style_color": Colors.GRAY},
     )
     logger.info(
-        Colors.colored(
-            "  • Note: Streaming early-stop for repetitive output is not yet implemented",
-            Colors.GRAY,
-        ),
+        "  • Note: Streaming early-stop for repetitive output is not yet implemented",
+        extra={"style_hint": LogStyles.DETAIL, "style_color": Colors.GRAY},
     )
-    logger.info("")
+    log_blank()
 
 
 def print_model_result(
@@ -6039,7 +6040,7 @@ def log_failure_summary(buckets: dict[str, list[str]]) -> None:
         logger.info("  Affected models (%d):", len(models))
         for model in models:
             logger.info("    • %s", model)
-        logger.info("")  # Blank line between buckets
+        log_blank()  # Blank line between buckets
 
     log_rule(80, char="=", post_newline=True)
 
@@ -6071,9 +6072,9 @@ def finalize_execution(
         stats = compute_performance_statistics(results)
         issues_text = format_issues_summary_text(summary, stats)
         if issues_text:
-            logger.info("")
+            log_blank()
             logger.info(issues_text)
-            logger.info("")
+            log_blank()
 
         print_cli_section("Report Generation")
         try:
@@ -6109,11 +6110,11 @@ def finalize_execution(
                 "📊 %s",
                 Colors.colored("Reports successfully generated:", Colors.BOLD, Colors.GREEN),
             )
-            logger.info("   HTML:     %s", Colors.colored(str(html_output_path), Colors.CYAN))
-            logger.info("   Markdown: %s", Colors.colored(str(md_output_path), Colors.CYAN))
-            logger.info("   TSV:      %s", Colors.colored(str(tsv_output_path), Colors.CYAN))
+            log_file_path(html_output_path, label="   HTML:    ")
+            log_file_path(md_output_path, label="   Markdown:")
+            log_file_path(tsv_output_path, label="   TSV:     ")
             log_output = args.output_log.resolve()
-            logger.info("   Log:      %s", Colors.colored(str(log_output), Colors.CYAN))
+            log_file_path(log_output, label="   Log:     ")
         except (OSError, ValueError):
             logger.exception("Failed to generate reports.")
     else:
@@ -6121,10 +6122,11 @@ def finalize_execution(
         logger.info("Skipping report generation as no models were processed.")
 
     print_cli_section("Execution Summary")
-    logger.info("")
+    log_blank()
     logger.info(
         "⏱  Overall runtime: %s",
-        Colors.colored(format_overall_runtime(overall_time), Colors.BOLD, Colors.WHITE),
+        format_overall_runtime(overall_time),
+        extra={"style_hint": LogStyles.METRIC_LABEL},
     )
     print_version_info(library_versions)
 
