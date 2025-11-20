@@ -4686,6 +4686,8 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             del model
         if tokenizer is not None:
             del tokenizer
+        # Clear both Metal and MLX caches for thorough GPU memory cleanup
+        mx.metal.clear_cache()
         mx.clear_cache()
         mx.reset_peak_memory()
         logger.debug("Cleaned up resources for model %s", params.model_identifier)
