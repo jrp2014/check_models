@@ -62,6 +62,9 @@ if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
     exit 0
 fi
 
+# Ensure we are in the project root (src directory)
+cd "$(dirname "$0")/.." || exit 1
+
 ENV_NAME="${1:-$DEFAULT_ENV_NAME}"
 
 # Colors for output
@@ -90,6 +93,20 @@ log_error() {
 
 # Check if conda is available
 check_conda() {
+    # Try to find conda if not in PATH
+    if ! command -v conda &> /dev/null; then
+        if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
+            # shellcheck disable=SC1091
+            source "$HOME/miniconda3/etc/profile.d/conda.sh"
+        elif [ -f "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
+            # shellcheck disable=SC1091
+            source "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
+        elif [ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]; then
+            # shellcheck disable=SC1091
+            source "$HOME/anaconda3/etc/profile.d/conda.sh"
+        fi
+    fi
+
     if ! command -v conda &> /dev/null; then
         log_error "conda is not installed or not in PATH"
         log_info "Please install Miniconda or Anaconda first:"
@@ -166,7 +183,7 @@ install_dependencies() {
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         log_info "Installing development dependencies..."
         # Try to install via extras if available, otherwise fallback to manual
-        if grep -q "dev =" pyproject.toml || grep -q "dev =" pyproject.toml; then
+        if grep -q "dev =" pyproject.toml; then
              pip install -e ".[dev]"
         else
              pip install "ruff>=0.1.0" "mypy>=1.8.0" "pytest>=8.0.0" "pytest-cov>=4.0.0"
@@ -179,10 +196,14 @@ install_dependencies() {
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         log_info "Installing PyTorch packages..."
         # On Apple Silicon, standard PyPI wheels provide MPS acceleration.
-        pip install \
-            "torch>=2.2.0" \
-            "torchvision>=0.17.0" \
-            "torchaudio>=2.2.0"
+        if grep -q "torch =" pyproject.toml; then
+            pip install -e ".[torch]"
+        else
+            pip install \
+                "torch>=2.2.0" \
+                "torchvision>=0.17.0" \
+                "torchaudio>=2.2.0"
+        fi
         log_success "Installed PyTorch packages"
     fi
     
