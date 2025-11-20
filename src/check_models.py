@@ -2260,53 +2260,6 @@ def get_terminal_width(min_width: int = 60, max_width: int = 120) -> int:
     return max(min_width, min(width, max_width))
 
 
-def _log_wrapped_label_value(
-    label: str,
-    value: str,
-    *,
-    color: str = "",
-    indent: int = 2,
-) -> None:
-    """Log a potentially long label/value pair wrapped to terminal width.
-
-    The first line includes the label; subsequent lines are aligned under the value.
-    Groups output into paragraphs to reduce log line count.
-    """
-    width = get_terminal_width(max_width=100)
-    prefix = (" " * indent) + label
-    first_avail = max(20, width - Colors.visual_len(prefix) - 1)
-    cont_indent = " " * (indent + 2)
-    cont_avail = max(20, width - len(cont_indent) - 1)
-
-    # Preserve user newlines: wrap each input line independently
-    # Group into paragraphs separated by blank lines
-    lines = value.splitlines() or [""]
-    output_lines: list[str] = []
-
-    for li, original_line in enumerate(lines):
-        # Skip empty lines to reduce noise
-        if not original_line.strip():
-            continue
-
-        wrapped = textwrap.wrap(
-            original_line,
-            width=first_avail if li == 0 else cont_avail,
-            break_long_words=False,
-            break_on_hyphens=False,
-            replace_whitespace=False,
-        ) or [""]
-
-        for wi, wline in enumerate(wrapped):
-            if li == 0 and wi == 0:
-                output_lines.append(f"{prefix} {Colors.colored(wline, color)}")
-            else:
-                output_lines.append(f"{cont_indent}{Colors.colored(wline, color)}")
-
-    # Output as single multi-line log statement
-    if output_lines:
-        logger.info("\n".join(output_lines))
-
-
 def _log_wrapped_error(label: str, value: str) -> None:
     """Log error with simple formatting for readability."""
     width = get_terminal_width(max_width=100)
@@ -5074,7 +5027,7 @@ def _log_verbose_success_details_mode(
             prefix="⚠️",
         )
 
-    _log_wrapped_label_value("   ", gen_text, color=Colors.CYAN)
+    log_generated_text(gen_text, wrap=True, indent="   ")
 
     log_blank()  # Breathing room
 
