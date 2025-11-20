@@ -327,7 +327,7 @@ vlm_version: str
 try:
     from mlx_vlm.generate import generate
     from mlx_vlm.prompt_utils import apply_chat_template
-    from mlx_vlm.utils import load
+    from mlx_vlm.utils import load, load_image
     from mlx_vlm.version import __version__ as _mlx_vlm_version
 
     vlm_version = _mlx_vlm_version
@@ -350,6 +350,7 @@ except ImportError:
     generate = cast("Any", _raise_mlx_vlm_missing)
     apply_chat_template = cast("Any", _raise_mlx_vlm_missing)
     load = cast("Any", _raise_mlx_vlm_missing)
+    load_image = cast("Any", _raise_mlx_vlm_missing)
 
     MISSING_DEPENDENCIES["mlx-vlm"] = ERROR_MLX_VLM_MISSING
 try:
@@ -557,7 +558,7 @@ class ProcessImageParams(NamedTuple):
     """
 
     model_identifier: str
-    image_path: Path
+    image_path: str | Path  # Support both file paths and URLs
     prompt: str
     max_tokens: int
     temperature: float
@@ -4413,23 +4414,26 @@ def validate_cli_arguments(args: argparse.Namespace) -> None:
     )
 
 
-def validate_image_accessible(*, image_path: PathLike) -> None:
-    """Validate image file is accessible and supported."""
-    img_path = Path(image_path)
+def validate_image_accessible(*, image_path: str | Path) -> None:
+    """Validate image file is accessible and supported.
+
+    Uses mlx_vlm's load_image() which supports both local file paths and URLs.
+    This enables --image https://... usage following mlx-vlm best practices.
+    """
     try:
-        with (
-            TimeoutManager(seconds=IMAGE_OPEN_TIMEOUT),
-            Image.open(img_path),
-        ):
-            pass
+        with TimeoutManager(seconds=IMAGE_OPEN_TIMEOUT):
+            # load_image() from mlx_vlm.utils handles both file paths and URLs
+            # Returns PIL.Image.Image, verifying the image is accessible and valid
+            # Convert Path to str since load_image expects str
+            _ = load_image(str(image_path))
     except TimeoutError as err:
-        msg = f"Timeout while reading image: {img_path}"
+        msg = f"Timeout while reading image: {image_path}"
         raise OSError(msg) from err
     except UnidentifiedImageError as err:
-        msg = f"File is not a recognized image format: {img_path}"
+        msg = f"File is not a recognized image format: {image_path}"
         raise ValueError(msg) from err
     except (OSError, ValueError) as err:
-        msg = f"Error accessing image {img_path}: {err}"
+        msg = f"Error accessing image {image_path}: {err}"
         raise OSError(msg) from err
 
 
