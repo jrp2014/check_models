@@ -93,6 +93,15 @@ __all__ = [
     "get_terminal_width",
     "is_numeric_field",
     "is_numeric_value",
+    "log_blank",
+    "log_failure",
+    "log_file_path",
+    "log_generated_text",
+    "log_metric_label",
+    "log_metric_tree",
+    "log_model_name",
+    "log_success",
+    "log_warning_note",
     "main",
     "main_cli",
     "pretty_print_exif",
@@ -746,6 +755,12 @@ class LogStyles:
     SUCCESS: ClassVar[str] = "success"
     WARNING: ClassVar[str] = "warning"
     DETAIL: ClassVar[str] = "detail"
+    # New styles for consistent output formatting
+    METRIC_LABEL: ClassVar[str] = "metric_label"  # Bold headers for metrics
+    METRIC_VALUE: ClassVar[str] = "metric_value"  # Formatted metric values
+    GENERATED_TEXT: ClassVar[str] = "generated_text"  # Cyan model output
+    FILE_PATH: ClassVar[str] = "file_path"  # Highlighted file paths
+    MODEL_NAME: ClassVar[str] = "model_name"  # Magenta model identifiers
 
 
 class ColoredFormatter(logging.Formatter):
@@ -805,6 +820,11 @@ class ColoredFormatter(logging.Formatter):
             LogStyles.SUCCESS: self._style_success,
             LogStyles.WARNING: self._style_warning,
             LogStyles.DETAIL: self._style_detail,
+            LogStyles.METRIC_LABEL: self._style_metric_label,
+            LogStyles.METRIC_VALUE: self._style_metric_value,
+            LogStyles.GENERATED_TEXT: self._style_generated_text,
+            LogStyles.FILE_PATH: self._style_file_path,
+            LogStyles.MODEL_NAME: self._style_model_name,
         }
 
         handler = handlers.get(style_hint)
@@ -855,6 +875,31 @@ class ColoredFormatter(logging.Formatter):
         if isinstance(detail_color, str) and detail_color:
             detail_styles.append(detail_color)
         return Colors.colored(raw_message, *detail_styles) if detail_styles else raw_message
+
+    def _style_metric_label(self, raw_message: str, record: logging.LogRecord) -> str:
+        """Style metric category labels (e.g., 'Tokens:', 'Memory:')."""
+        emoji = getattr(record, "style_emoji", "")
+        label = f"{emoji} {raw_message}" if emoji else raw_message
+        color = getattr(record, "style_color", Colors.WHITE)
+        return Colors.colored(label, Colors.BOLD, color)
+
+    def _style_metric_value(self, raw_message: str, record: logging.LogRecord) -> str:
+        """Style metric values with optional color."""
+        color = getattr(record, "style_color", Colors.WHITE)
+        return Colors.colored(raw_message, color) if color else raw_message
+
+    def _style_generated_text(self, raw_message: str, _record: logging.LogRecord) -> str:
+        """Style generated model output in cyan."""
+        return Colors.colored(raw_message, Colors.CYAN)
+
+    def _style_file_path(self, raw_message: str, record: logging.LogRecord) -> str:
+        """Style file paths with highlighting."""
+        color = getattr(record, "style_color", Colors.CYAN)
+        return Colors.colored(raw_message, color)
+
+    def _style_model_name(self, raw_message: str, _record: logging.LogRecord) -> str:
+        """Style model identifiers in magenta."""
+        return Colors.colored(raw_message, Colors.MAGENTA)
 
     def _format_info_message(self, msg: str) -> str:
         """Apply context-aware formatting to INFO messages for better visual hierarchy."""
@@ -4745,6 +4790,130 @@ def exit_with_cli_error(
     raise SystemExit(exit_code)
 
 
+# --- New Structured Logging Helpers (Consistent Output Formatting) ---
+
+
+def log_success(msg: str, *, prefix: str = "✓") -> None:
+    """Log a success message with green styling and optional prefix."""
+    formatted_msg = f"{prefix} {msg}" if prefix else msg
+    logger.info(formatted_msg, extra={"style_hint": LogStyles.SUCCESS})
+
+
+def log_warning_note(msg: str, *, prefix: str = "⚠️") -> None:
+    """Log a warning note (non-error condition worth noting)."""
+    formatted_msg = f"{prefix}  {msg}" if prefix else msg
+    logger.warning(formatted_msg, extra={"style_hint": LogStyles.WARNING})
+
+
+def log_failure(msg: str, *, prefix: str = "✗") -> None:
+    """Log a failure message with red styling and optional prefix."""
+    formatted_msg = f"{prefix} {msg}" if prefix else msg
+    logger.error(formatted_msg, extra={"style_hint": LogStyles.ERROR})
+
+
+def log_metric_label(label: str, *, emoji: str = "", indent: str = "") -> None:
+    """Log a metric category label (e.g., '🔢 Tokens:') with consistent styling."""
+    formatted = f"{indent}{label}"
+    logger.info(
+        formatted,
+        extra={"style_hint": LogStyles.METRIC_LABEL, "style_emoji": emoji},
+    )
+
+
+def log_metric_tree(prefix: str, label: str, value: str, *, indent: str = "") -> None:
+    """Log a tree-structured metric line (e.g., '├─ Total: 1,234').
+
+    Args:
+        prefix: Tree prefix characters (├─, └─, etc.)
+        label: Metric label (e.g., 'Total:', 'Prompt:')
+        value: Formatted value to display
+        indent: Additional indentation before the prefix
+    """
+    # Example output: "     ├─ Total:      1,234 tok/s"
+    formatted = f"{indent}{prefix} {label.ljust(11)} {value}"
+    logger.info(formatted, extra={"style_hint": LogStyles.METRIC_VALUE})
+
+
+def log_generated_text(text: str, *, wrap: bool = True, indent: str = "") -> None:
+    """Log generated model output with cyan styling and optional wrapping.
+
+    Args:
+        text: The generated text to display
+        wrap: Whether to wrap text to terminal width
+        indent: Indentation prefix for each line
+    """
+    if wrap:
+        width = get_terminal_width(max_width=100)
+        avail_width = max(20, width - len(indent))
+        wrapped_lines = textwrap.wrap(
+            text,
+            width=avail_width,
+            break_long_words=False,
+            break_on_hyphens=False,
+        ) or [""]
+        for line in wrapped_lines:
+            formatted = f"{indent}{line.lstrip()}"
+            logger.info(formatted, extra={"style_hint": LogStyles.GENERATED_TEXT})
+    else:
+        formatted = f"{indent}{text}"
+        logger.info(formatted, extra={"style_hint": LogStyles.GENERATED_TEXT})
+
+
+def log_model_name(name: str, *, label: str = "") -> None:
+    """Log a model identifier with magenta highlight.
+
+    Args:
+        name: The model identifier/name
+        label: Optional label prefix (e.g., 'Model:')
+    """
+    if label:
+        # Split formatting: plain label + styled name
+        msg = "%s %s"
+        logger.info(
+            msg,
+            label,
+            name,
+            extra={"style_hint": LogStyles.MODEL_NAME},
+        )
+    else:
+        logger.info(name, extra={"style_hint": LogStyles.MODEL_NAME})
+
+
+def log_file_path(path: Path | str, *, label: str = "", color: str = Colors.CYAN) -> None:
+    """Log a file path with highlighting.
+
+    Args:
+        path: The file path to display
+        label: Optional label prefix (e.g., '   HTML:')
+        color: Color to use for the path
+    """
+    path_str = str(path)
+    if label:
+        # Example output: "   HTML:     /path/to/file.html"
+        msg = "%s %s"
+        logger.info(
+            msg,
+            label,
+            path_str,
+            extra={"style_hint": LogStyles.FILE_PATH, "style_color": color},
+        )
+    else:
+        logger.info(
+            path_str,
+            extra={"style_hint": LogStyles.FILE_PATH, "style_color": color},
+        )
+
+
+def log_blank(count: int = 1) -> None:
+    """Log blank lines for spacing (replaces logger.info("")).
+
+    Args:
+        count: Number of blank lines to emit
+    """
+    for _ in range(count):
+        logger.info("")
+
+
 def _summary_parts(res: PerformanceResult, model_short: str) -> list[str]:
     """Assemble key=value summary segments (reduced branching)."""
     gen = res.generation
@@ -4830,20 +4999,10 @@ def _preview_generation(
             Colors.colored(f"⚠️  Context ignored (missing: {missing})", Colors.YELLOW),
         )
 
-    width = get_terminal_width(max_width=100)
     for original_line in text_val.splitlines():
         if not original_line.strip():
             continue
-        wrapped = textwrap.wrap(
-            original_line,
-            width=width,
-            replace_whitespace=False,
-            drop_whitespace=True,
-            break_long_words=False,
-            break_on_hyphens=False,
-        ) or [""]
-        for wline in wrapped:
-            logger.info("%s", Colors.colored(wline.lstrip(), Colors.CYAN))
+        log_generated_text(original_line, wrap=True)
 
 
 def _log_verbose_success_details_mode(
@@ -4858,7 +5017,7 @@ def _log_verbose_success_details_mode(
         return
 
     # Add breathing room
-    logger.info("")
+    log_blank()
 
     # Generated text with emoji prefix for easy scanning
     gen_text = getattr(res.generation, "text", None) or ""
@@ -4872,25 +5031,23 @@ def _log_verbose_success_details_mode(
         context_marker=context_marker,
     )
 
-    logger.info("📝 %s", Colors.colored("Generated Text:", Colors.BOLD, Colors.CYAN))
+    log_metric_label("Generated Text:", emoji="📝")
 
     # Warn about quality issues
     if analysis.is_repetitive and analysis.repeated_token:
         warning_msg = (
-            f"⚠️  WARNING: Output appears to be garbage (repetitive: '{analysis.repeated_token}')"
+            f"WARNING: Output appears to be garbage (repetitive: '{analysis.repeated_token}')"
         )
-        logger.warning(Colors.colored(warning_msg, Colors.YELLOW, Colors.BOLD))
+        log_warning_note(warning_msg)
 
     if analysis.hallucination_issues:
         for issue in analysis.hallucination_issues:
-            logger.warning(Colors.colored(f"⚠️  Note: {issue}", Colors.YELLOW))
+            log_warning_note(issue, prefix="⚠️  Note:")
 
     if analysis.is_verbose:
-        logger.warning(
-            Colors.colored(
-                f"⚠️  Note: Output is excessively verbose ({gen_tokens} tokens)",
-                Colors.YELLOW,
-            ),
+        log_warning_note(
+            f"Note: Output is excessively verbose ({gen_tokens} tokens)",
+            prefix="⚠️",
         )
 
     if analysis.formatting_issues:
@@ -4900,22 +5057,20 @@ def _log_verbose_success_details_mode(
     # MOD: Added context ignorance warning
     if analysis.is_context_ignored and analysis.missing_context_terms:
         missing = ", ".join(analysis.missing_context_terms)
-        logger.warning(
-            Colors.colored(
-                f"⚠️  Note: Output ignored key context (missing: {missing})",
-                Colors.YELLOW,
-            ),
+        log_warning_note(
+            f"Note: Output ignored key context (missing: {missing})",
+            prefix="⚠️",
         )
 
     _log_wrapped_label_value("   ", gen_text, color=Colors.CYAN)
 
-    logger.info("")  # Breathing room
+    log_blank()  # Breathing room
 
     if detailed:
-        logger.info("📊 %s", Colors.colored("Performance Metrics:", Colors.BOLD, Colors.WHITE))
+        log_metric_label("Performance Metrics:", emoji="📊")
         _log_token_summary(res)
         _log_detailed_timings(res)
-        logger.info("")
+        log_blank()
         _log_perf_block(res)
     else:
         _log_compact_metrics(res)
@@ -4929,16 +5084,25 @@ def _log_token_summary(res: PerformanceResult) -> None:
     gen_tps = getattr(res.generation, "generation_tps", 0.0) or 0.0
     prompt_tps = getattr(res.generation, "prompt_tps", 0.0) or 0.0
 
-    logger.info("  🔢 %s", Colors.colored("Tokens:", Colors.BOLD, Colors.WHITE))
-    logger.info(
-        "     ├─ Prompt:     %s",
-        Colors.colored(f"{fmt_num(p_tokens):>8} @ {fmt_num(prompt_tps)} tok/s", Colors.WHITE),
+    log_metric_label("Tokens:", emoji="🔢", indent="  ")
+    log_metric_tree(
+        "├─",
+        "Prompt:",
+        f"{fmt_num(p_tokens):>8} @ {fmt_num(prompt_tps)} tok/s",
+        indent="     ",
     )
-    logger.info(
-        "     ├─ Generated:  %s",
-        Colors.colored(f"{fmt_num(g_tokens):>8} @ {fmt_num(gen_tps)} tok/s", Colors.WHITE),
+    log_metric_tree(
+        "├─",
+        "Generated:",
+        f"{fmt_num(g_tokens):>8} @ {fmt_num(gen_tps)} tok/s",
+        indent="     ",
     )
-    logger.info("     └─ Total:      %s", Colors.colored(f"{fmt_num(tot_tokens):>8}", Colors.WHITE))
+    log_metric_tree(
+        "└─",
+        "Total:",
+        f"{fmt_num(tot_tokens):>8}",
+        indent="     ",
+    )
 
 
 def _log_detailed_timings(res: PerformanceResult) -> None:
@@ -4950,28 +5114,32 @@ def _log_detailed_timings(res: PerformanceResult) -> None:
     if not total_time_val or total_time_val <= 0:
         return
 
-    logger.info("  ⏱  %s", Colors.colored("Timing:", Colors.BOLD, Colors.WHITE))
+    log_metric_label("Timing:", emoji="⏱", indent="  ")
 
     tt_val = format_field_value("total_time", total_time_val)
     tt_disp = tt_val if isinstance(tt_val, str) else _format_time_seconds(total_time_val)
-    logger.info("     ├─ Total:      %s", Colors.colored(f"{tt_disp:>8}", Colors.WHITE))
+    log_metric_tree("├─", "Total:", f"{tt_disp:>8}", indent="     ")
 
     if generation_time_val and generation_time_val > 0:
         gt_val = format_field_value("generation_time", generation_time_val)
         gt_disp = gt_val if isinstance(gt_val, str) else _format_time_seconds(generation_time_val)
         pct = (generation_time_val / total_time_val * 100) if total_time_val > 0 else 0
-        logger.info(
-            "     ├─ Generation: %s",
-            Colors.colored(f"{gt_disp:>8} ({pct:>3.0f}%)", Colors.WHITE),
+        log_metric_tree(
+            "├─",
+            "Generation:",
+            f"{gt_disp:>8} ({pct:>3.0f}%)",
+            indent="     ",
         )
 
     if model_load_time_val and model_load_time_val > 0:
         ml_val = format_field_value("model_load_time", model_load_time_val)
         ml_disp = ml_val if isinstance(ml_val, str) else _format_time_seconds(model_load_time_val)
         pct = (model_load_time_val / total_time_val * 100) if total_time_val > 0 else 0
-        logger.info(
-            "     └─ Load:       %s",
-            Colors.colored(f"{ml_disp:>8} ({pct:>3.0f}%)", Colors.WHITE),
+        log_metric_tree(
+            "└─",
+            "Load:",
+            f"{ml_disp:>8} ({pct:>3.0f}%)",
+            indent="     ",
         )
 
 
