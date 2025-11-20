@@ -18,6 +18,21 @@
 				"$eslint-stylish"
 			],
 			"group": "build"
+		},
+		{
+			"label": "VLM: Run Check Models",
+			"type": "shell",
+			"command": "python",
+			"args": [
+				"src/check_models.py"
+			],
+			"group": "test",
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared"
+			}
 		}
 	]
 }
