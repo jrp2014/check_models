@@ -52,7 +52,7 @@ coverage.xml
 *.pot
 
 # Django stuff:
-*.log
+
 # But keep the production output log for reference
 !output/check_models.log
 local_settings.py
