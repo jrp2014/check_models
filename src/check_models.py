@@ -4803,26 +4803,45 @@ def log_metric_tree(prefix: str, label: str, value: str, *, indent: str = "") ->
 def log_generated_text(text: str, *, wrap: bool = True, indent: str = "") -> None:
     """Log generated model output with cyan styling and optional wrapping.
 
+    Preserves original line breaks in the text. Each line is wrapped independently
+    to terminal width if needed.
+
     Args:
         text: The generated text to display
-        wrap: Whether to wrap text to terminal width
+        wrap: Whether to wrap long lines to terminal width
         indent: Indentation prefix for each line
     """
     if wrap:
         width = get_terminal_width(max_width=100)
         avail_width = max(20, width - len(indent))
-        wrapped_lines = textwrap.wrap(
-            text,
-            width=avail_width,
-            break_long_words=False,
-            break_on_hyphens=False,
-        ) or [""]
-        for line in wrapped_lines:
-            formatted = f"{indent}{line.lstrip()}"
-            logger.info(formatted, extra={"style_hint": LogStyles.GENERATED_TEXT})
+
+        # Process each line independently to preserve line breaks
+        for original_line in text.splitlines():
+            if not original_line:
+                # Preserve blank lines
+                logger.info(indent, extra={"style_hint": LogStyles.GENERATED_TEXT})
+                continue
+
+            # Wrap only if line exceeds available width
+            if len(original_line) <= avail_width:
+                formatted = f"{indent}{original_line}"
+                logger.info(formatted, extra={"style_hint": LogStyles.GENERATED_TEXT})
+            else:
+                # Wrap this line while preserving its content
+                wrapped = textwrap.wrap(
+                    original_line,
+                    width=avail_width,
+                    break_long_words=False,
+                    break_on_hyphens=False,
+                ) or [original_line]
+                for wrapped_line in wrapped:
+                    formatted = f"{indent}{wrapped_line}"
+                    logger.info(formatted, extra={"style_hint": LogStyles.GENERATED_TEXT})
     else:
-        formatted = f"{indent}{text}"
-        logger.info(formatted, extra={"style_hint": LogStyles.GENERATED_TEXT})
+        # No wrapping - output each line as-is
+        for original_line in text.splitlines():
+            formatted = f"{indent}{original_line}"
+            logger.info(formatted, extra={"style_hint": LogStyles.GENERATED_TEXT})
 
 
 def log_model_name(name: str, *, label: str = "") -> None:
@@ -4964,10 +4983,7 @@ def _preview_generation(
         missing = ", ".join(analysis.missing_context_terms[:3])
         log_warning_note(f"Context ignored (missing: {missing})")
 
-    for original_line in text_val.splitlines():
-        if not original_line.strip():
-            continue
-        log_generated_text(original_line, wrap=True)
+    log_generated_text(text_val, wrap=True)
 
 
 def _log_verbose_success_details_mode(
