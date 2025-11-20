@@ -45,15 +45,5 @@ typings/
 # Jupyter
 .ipynb_checkpoints/
 
-# Logs
-*.log
-
-# Test output files (don't commit test runs)
-src/output/test_*.log
-src/output/test_*.html
-src/output/test_*.md
-# But allow the production output files to be committed
-!src/output/check_models.log
-
 # Backup files
 *.bak
