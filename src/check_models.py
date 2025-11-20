@@ -446,6 +446,7 @@ DEFAULT_HTML_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.html"
 DEFAULT_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.md"
 DEFAULT_TSV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.tsv"
 DEFAULT_LOG_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "check_models.log"
+DEFAULT_ENV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "environment.log"
 DEFAULT_BASELINE_FILE: Final[Path] = _SCRIPT_DIR / "output" / "baseline.txt"
 DEFAULT_TEMPERATURE: Final[float] = 0.1
 DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
@@ -3878,6 +3879,9 @@ def _generate_model_gallery_section(results: list[PerformanceResult]) -> list[st
     md.append("")
     md.append("Full output from each model:")
     md.append("")
+    # Disable line-length linting for this section - model outputs can be long
+    md.append("<!-- markdownlint-disable MD013 -->")
+    md.append("")
 
     sorted_results = _sort_results_by_time(results)
     for res in sorted_results:
@@ -3888,7 +3892,23 @@ def _generate_model_gallery_section(results: list[PerformanceResult]) -> list[st
 
         if not res.success:
             md.append(f"**Status:** Failed ({res.error_stage})")
-            md.append(f"**Error:** `{res.error_message}`")
+            # Wrap error messages to avoid excessive line length
+            error_msg = str(res.error_message)
+            max_inline_length = 80
+            if len(error_msg) > max_inline_length:
+                # Escape markdown characters and wrap at word boundaries
+                wrapped_lines = textwrap.wrap(
+                    error_msg,
+                    width=76,  # Leave room for "> " prefix
+                    break_long_words=False,
+                    break_on_hyphens=False,
+                )
+                md.append("**Error:**")
+                md.append("")
+                md.extend(f"> {line}" for line in wrapped_lines)
+            else:
+                # Short errors can stay inline
+                md.append(f"**Error:** {error_msg}")
             if res.error_type:
                 md.append(f"**Type:** `{res.error_type}`")
         else:
@@ -3918,6 +3938,10 @@ def _generate_model_gallery_section(results: list[PerformanceResult]) -> list[st
         md.append("")
         md.append("---")
         md.append("")
+
+    # Re-enable linting after gallery section
+    md.append("<!-- markdownlint-enable MD013 -->")
+    md.append("")
 
     return md
 
@@ -4600,10 +4624,6 @@ def _run_model_generation(
 
 def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     """Process an image with a Vision Language Model, managing stats and errors."""
-    image_name = str(getattr(params.image_path, "name", params.image_path))
-    logger.info("Processing image with model")
-    log_file_path(image_name)
-    log_model_name(params.model_identifier)
     model: Module | None = None
     tokenizer: PreTrainedTokenizer | PreTrainedTokenizerFast | None = None
     arch, gpu_info = get_system_info()
@@ -4645,11 +4665,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             total_time=total_time,
         )
     except TimeoutError as e:
-        logger.exception(
-            "Timeout during model processing for %s",
-            params.model_identifier,
-        )
-        # MOD: Capture original exception type for error bucketing
+        # Full traceback already logged at ERROR level in _run_model_generation
         classified_stage = _classify_error(str(e))
         return PerformanceResult(
             model_name=params.model_identifier,
@@ -4663,8 +4679,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             total_time=None,
         )
     except (OSError, ValueError) as e:
-        logger.exception("Model processing error for %s", params.model_identifier)
-        # MOD: Capture original exception type for error bucketing
+        # Full traceback already logged at ERROR level in _run_model_generation
         classified_stage = _classify_error(str(e))
         return PerformanceResult(
             model_name=params.model_identifier,
@@ -5269,30 +5284,13 @@ def print_model_result(
     if result.success and not verbose:  # quick exit with preview only
         _preview_generation(result.generation, prompt=prompt, context_marker=context_marker)
         return
-    # Use structured logging for success/failure headers
-    if result.success:
-        log_success(f"SUCCESS: {result.model_name}", prefix="✓")
-    else:
-        log_failure(f"FAILED: {result.model_name}", prefix="✗")
+    # For failures, show detailed error info; for success, show generation details
     if not result.success:
         log_blank()
         if result.error_stage:
-            log_metric_label("Stage:", emoji="🔴")
-            logger.error(
-                "  %s",
-                result.error_stage,
-                extra={"style_hint": LogStyles.DETAIL},
-            )
+            logger.info("Stage: %s", result.error_stage)
         if result.error_message:
-            log_metric_label("Error:", emoji="❌")
-            # Show error message (full traceback already logged above with exc_info=True)
-            error_lines = str(result.error_message).splitlines()
-            for line in error_lines:
-                logger.error(
-                    "  %s",
-                    line,
-                    extra={"style_hint": LogStyles.DETAIL},
-                )
+            logger.info("Error: %s", result.error_message)
         if result.captured_output_on_fail:
             _log_wrapped_error("Output:", str(result.captured_output_on_fail))
         return
@@ -5312,21 +5310,23 @@ def print_cli_separator() -> None:
 
 
 # MOD: Write environment dump to separate file to reduce log clutter
-def _dump_environment_to_log() -> None:
+def _dump_environment_to_log(output_path: Path) -> None:
     """Dump complete Python environment to separate file for debugging/reproducibility.
 
     Captures output from pip freeze (and conda list if in conda environment)
     to provide complete package manifest for issue reproduction.
+
+    Args:
+        output_path: Path where the environment log should be written
     """
     try:
         # Detect if we're in a conda environment
         conda_env = os.environ.get("CONDA_DEFAULT_ENV")
         is_conda = conda_env is not None
 
-        # Write to separate environment.log file in output directory
-        output_dir = Path(__file__).parent / "output"
-        output_dir.mkdir(parents=True, exist_ok=True)
-        env_log_path = output_dir / "environment.log"
+        # Ensure output directory exists
+        env_log_path = output_path.resolve()
+        env_log_path.parent.mkdir(parents=True, exist_ok=True)
 
         with env_log_path.open("w", encoding="utf-8") as env_file:
             env_file.write("=" * 80 + "\n")
@@ -5439,6 +5439,9 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     if args.verbose:
         logger.debug("Verbose/debug mode enabled.")
 
+    # Dump full environment to log file for reproducibility (after logging setup)
+    _dump_environment_to_log(args.output_env)
+
     # Apply CLI output preferences (color + width)
     _apply_cli_output_preferences(args)
 
@@ -5459,9 +5462,6 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     library_versions: LibraryVersionDict = get_library_versions()
     if args.verbose:
         print_version_info(library_versions)
-
-    # MOD: Dump full environment to log file for reproducibility
-    _dump_environment_to_log()
 
     if args.trust_remote_code:
         print_cli_separator()
@@ -6095,11 +6095,15 @@ def finalize_execution(
 
             logger.info("")
             log_success("Reports successfully generated:", prefix="📊")
-            log_file_path(html_output_path, label="   HTML:    ")
-            log_file_path(md_output_path, label="   Markdown:")
-            log_file_path(tsv_output_path, label="   TSV:     ")
+            log_file_path(html_output_path, label="   HTML:       ")
+            log_file_path(md_output_path, label="   Markdown:   ")
+            log_file_path(tsv_output_path, label="   TSV:        ")
             log_output = args.output_log.resolve()
-            log_file_path(log_output, label="   Log:     ")
+            log_file_path(log_output, label="   Log:        ")
+            # Include environment.log in the output file listing
+            env_log = args.output_env.resolve()
+            if env_log.exists():
+                log_file_path(env_log, label="   Environment:")
         except (OSError, ValueError):
             logger.exception("Failed to generate reports.")
     else:
@@ -6192,6 +6196,12 @@ def main_cli() -> None:
         type=Path,
         default=DEFAULT_LOG_OUTPUT,
         help="Output log file (overwritten each run). Use different path for tests/debug runs.",
+    )
+    parser.add_argument(
+        "--output-env",
+        type=Path,
+        default=DEFAULT_ENV_OUTPUT,
+        help="Output environment log file (pip freeze, conda list for reproducibility).",
     )
     parser.add_argument(
         "-m",
