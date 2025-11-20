@@ -22,6 +22,8 @@ import subprocess
 import sys
 import textwrap
 import time
+import urllib.error
+import urllib.request
 from collections import Counter
 from collections.abc import Callable, Iterator, Mapping
 from dataclasses import dataclass
@@ -2637,6 +2639,9 @@ def _process_gps_ifd(exif_raw: SupportsExifIfd) -> GPSDict | None:
 def get_exif_data(image_path: PathLike) -> ExifDict | None:
     """Return decoded EXIF structure or ``None`` if absent.
 
+    Supports both local file paths and URLs. For URLs, downloads the image
+    into memory using urllib.request and PIL's file-like object support.
+
     Multi-pass extraction strategy (kept explicit for robustness / debugging):
         1. IFD0 pass: baseline tags (camera vendor, dimensions, etc.). We *skip*
             pointers to sub directories (Exif / GPS) so we can handle them with
@@ -2650,12 +2655,26 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
     Rationale: real-world photographs often contain partially corrupt EXIF
     segments; failing soft ensures we still display whatever remains.
     """
-    img_path = Path(image_path)
+    image_str = str(image_path)
+
+    # Check if input is a URL
+    is_url = image_str.startswith(("http://", "https://"))
+
     try:
-        with Image.open(img_path) as img:
+        if is_url:
+            # Download URL into memory and open with PIL
+            logger.debug("Downloading image from URL for EXIF extraction: %s", image_str)
+            with urllib.request.urlopen(image_str, timeout=30) as response:  # noqa: S310
+                img_data = io.BytesIO(response.read())
+                img = Image.open(img_data)
+        else:
+            # Local file path
+            img = Image.open(Path(image_path))
+
+        with img:
             exif_raw: Any = img.getexif()
             if not exif_raw:
-                logger.debug("No EXIF data found in %s", img_path)
+                logger.debug("No EXIF data found in %s", image_str)
                 return None
             exif_decoded: ExifDict = _process_ifd0(exif_raw)
             exif_decoded.update(_process_exif_subifd(exif_raw))
@@ -2664,7 +2683,9 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
                 exif_decoded["GPSInfo"] = gps_decoded
             return exif_decoded
     except (FileNotFoundError, UnidentifiedImageError):
-        logger.exception("Error reading image file: %s", img_path)
+        logger.exception("Error reading image: %s", image_str)
+    except (OSError, ValueError, urllib.error.URLError) as e:
+        logger.debug("Failed to extract EXIF from %s: %s", image_str, e)
     return None
 
 
