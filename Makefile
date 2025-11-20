@@ -21,10 +21,10 @@ help: ## Show this help message
 	@echo "  make update           Update conda environment and project dependencies"
 	@echo "  make test             Run tests"
 	@echo "  make check            Run format, lint, typecheck, and tests"
-	@echo "  make quality          Run linting and type checks"
+	@echo "  make quality          Run full quality checks (ruff format+lint+mypy+pytest+shellcheck+markdownlint)"
 	@echo "  make ci               Run full CI pipeline (strict)"
 	@echo "  make format           Format code with ruff"
-	@echo "  make stubs            Generate type stubs for mlx-vlm"
+	@echo "  make stubs            Generate type stubs for mlx-vlm (typings/)"
 	@echo ""
 	@echo "📚 Documentation: See docs/CONTRIBUTING.md for details"
 
@@ -53,8 +53,8 @@ check: ## Run core quality pipeline (format, lint, typecheck, test)
 	@$(MAKE) -C $(SRC) check
 
 .PHONY: quality
-quality: ## Run linting and type checks
-	@$(MAKE) -C $(SRC) quality
+quality: ## Run full quality checks (ruff format+lint+mypy+pytest+shellcheck+markdownlint)
+	bash $(SRC)/tools/run_quality_checks.sh
 
 .PHONY: ci
 ci: ## Run full CI pipeline (strict mode)

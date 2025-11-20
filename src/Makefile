@@ -207,9 +207,8 @@ check: format lint typecheck test ## Core quality pipeline
 	@echo "✓ All core checks completed"
 
 .PHONY: quality
-quality: ## Run consolidated quality script (ruff format+lint+stubgen+mypy on core file)
-	$(RUN_PY) tools/check_quality.py
-	@echo "[quality] NOTE: unit tests not executed by this target; use 'make check' or 'make ci' for full validation"
+quality: ## Run full quality checks (ruff format+lint+mypy+pytest+shellcheck+markdownlint)
+	bash tools/run_quality_checks.sh
 
 # CI pipeline
 .PHONY: ci

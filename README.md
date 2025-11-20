@@ -13,8 +13,8 @@ make install
 # 2. Run on an image
 python -m check_models --model mlx-community/Florence-2-large --image /path/to/image.jpg
 
-# 3. Get HTML report
-python -m check_models --model mlx-community/Florence-2-large --image /path/to/image.jpg --html
+# 3. Get HTML report (specify output path)
+python -m check_models --model mlx-community/Florence-2-large --image /path/to/image.jpg --html output/results.html
 ```
 
 That's it! See [detailed usage](#detailed-usage) below for more options.
@@ -41,8 +41,8 @@ python -m check_models --folder ~/Pictures
 # Specify a model
 python -m check_models --model mlx-community/Qwen2-VL-2B-Instruct-4bit --image photo.jpg
 
-# Generate HTML report
-python -m check_models --image photo.jpg --html
+# Generate HTML report (specify output path)
+python -m check_models --image photo.jpg --html output/results.html
 
 # Use a custom prompt
 python -m check_models --image photo.jpg --prompt "Describe this in detail"
@@ -79,7 +79,7 @@ A default configuration is provided in `src/quality_config.yaml`. You can copy t
 
 ## For Contributors
 
-Want to contribute? Great! See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for the complete setup and workflow guide, and [IMPLEMENTATION_GUIDE.md](docs/IMPLEMENTATION_GUIDE.md) for coding standards.
+Want to contribute? Great! See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for the complete setup and workflow guide, [IMPLEMENTATION_GUIDE.md](docs/IMPLEMENTATION_GUIDE.md) for coding standards, and [STYLE_GUIDE.md](docs/STYLE_GUIDE.md) for conventions and best practices.
 
 ### Quick Setup
 
@@ -129,24 +129,20 @@ make format
 
 ### Type Stubs
 
-Local type stubs live under `typings/` and are generated via:
+Local type stubs live under `typings/` and are generated automatically by running:
 
 ```bash
-python -m tools.generate_stubs mlx_vlm tokenizers
+make typings
 ```
 
-The directory is ignored by git. If stubs get stale:
-
-```bash
-make clean && python -m tools.generate_stubs mlx_vlm tokenizers
-```
+The directory is ignored by git. If stubs get stale, just rerun `make typings`.
 
 ### Dependencies
 
 The `src/pyproject.toml` is the source of truth for dependency lists. To check for outdated packages:
 
 ```bash
-python -m tools.check_outdated
+make check-outdated
 ```
 
 ## Advanced Topics
