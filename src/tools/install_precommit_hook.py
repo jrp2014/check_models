@@ -53,7 +53,8 @@ if [ -n "$PYTHON_FILES" ]; then
 fi
 
 # Auto-fix Markdown files with markdownlint before committing
-MD_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.md$' || true)
+# Exclude src/output/ directory (generated reports can have long lines)
+MD_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.md$' | grep -v '^src/output/' || true)
 if [ -n "$MD_FILES" ]; then
     echo '[pre-commit] Auto-fixing Markdown files with markdownlint...'
     if command -v npx &> /dev/null; then
