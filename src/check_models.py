@@ -22,7 +22,6 @@ import subprocess
 import sys
 import textwrap
 import time
-import traceback
 from collections import Counter
 from collections.abc import Callable, Iterator, Mapping
 from dataclasses import dataclass
@@ -2285,7 +2284,7 @@ def _log_wrapped_error(label: str, value: str) -> None:
             formatted_line = f"{cont_indent}{wline}"
             logger.error(
                 formatted_line,
-                extra={"style_hint": LogStyles.DETAIL, "style_color": Colors.RED},
+                extra={"style_hint": LogStyles.DETAIL},
             )
 
 
@@ -2664,9 +2663,7 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
                 exif_decoded["GPSInfo"] = gps_decoded
             return exif_decoded
     except (FileNotFoundError, UnidentifiedImageError):
-        logger.exception(
-            Colors.colored(f"Error reading image file: {img_path}", Colors.YELLOW),
-        )
+        logger.exception("Error reading image file: %s", img_path)
     return None
 
 
@@ -2967,9 +2964,7 @@ def pretty_print_exif(
         show_all=show_all,
     )
     if not tags_to_print:
-        logger.warning(
-            Colors.colored("No relevant EXIF tags found to display.", Colors.YELLOW),
-        )
+        log_warning_note("No relevant EXIF tags found to display.")
         return
 
     # Prepare data for tabulate with colors
@@ -3739,14 +3734,14 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     header_line = " | ".join(_pad_text(h, col_widths[i]) for i, h in enumerate(headers))
     logger.info(
         header_line,
-        extra={"style_hint": LogStyles.RULE, "style_color": Colors.BLUE, "style_bold": True},
+        extra={"style_hint": LogStyles.RULE, "style_bold": True},
     )
 
     # Separator
     separator_line = " | ".join("-" * w for w in col_widths)
     logger.info(
         separator_line,
-        extra={"style_hint": LogStyles.RULE, "style_color": Colors.BLUE},
+        extra={"style_hint": LogStyles.RULE},
     )
 
     # Rows
@@ -3781,15 +3776,13 @@ def generate_html_report(
 ) -> None:
     """Write a self-contained HTML summary with aligned table and embedded image."""
     if not results:
-        logger.warning(
-            Colors.colored("No results to generate HTML report.", Colors.YELLOW),
-        )
+        log_warning_note("No results to generate HTML report.")
         return
 
     headers, rows, field_names = _prepare_table_data(results)
 
     if not headers or not rows:
-        logger.warning("No table data to generate HTML report.")
+        log_warning_note("No table data to generate HTML report.")
         return
 
     # Generate HTML table using tabulate
@@ -3851,10 +3844,8 @@ def generate_html_report(
     try:
         with filename.open("w", encoding="utf-8") as f:
             f.write(html_content)
-        logger.info(
-            "HTML report saved to: %s",
-            Colors.colored(str(filename.resolve()), Colors.GREEN),
-        )
+        log_metric_label("HTML report saved to:", emoji="📝")
+        log_file_path(filename.resolve())
     except OSError:
         logger.exception("Failed to write HTML report to %s", filename)
 
@@ -3999,16 +3990,14 @@ def generate_markdown_report(
 ) -> None:
     """Write a GitHub-friendly Markdown summary with aligned pipe table."""
     if not results:
-        logger.warning(
-            Colors.colored("No results to generate Markdown report.", Colors.YELLOW),
-        )
+        log_warning_note("No results to generate Markdown report.")
         return
 
     # Get table data using our helper function
     headers, rows, _ = _prepare_table_data(results)
 
     if not headers or not rows:
-        logger.warning("No table data to generate Markdown report.")
+        log_warning_note("No table data to generate Markdown report.")
         return
 
     # Analyze model issues and generate summary
@@ -4070,10 +4059,8 @@ def generate_markdown_report(
     try:
         with filename.open("w", encoding="utf-8") as f:
             f.write(markdown_content)
-        logger.info(
-            "Markdown report saved to: %s",
-            Colors.colored(str(filename.resolve()), Colors.GREEN),
-        )
+        log_metric_label("Markdown report saved to:", emoji="📝")
+        log_file_path(filename.resolve())
     except OSError:
         logger.exception(
             "Failed to write Markdown report to file %s.",
@@ -4100,15 +4087,13 @@ def generate_tsv_report(
         filename: Path where the TSV file will be written.
     """
     if not results:
-        logger.warning(
-            Colors.colored("No results to generate TSV report.", Colors.YELLOW),
-        )
+        log_warning_note("No results to generate TSV report.")
         return
 
     headers, rows, _ = _prepare_table_data(results)
 
     if not headers or not rows:
-        logger.warning("No table data to generate TSV report.")
+        log_warning_note("No table data to generate TSV report.")
         return
 
     def escape_tsv_value(value: str) -> str:
@@ -4151,10 +4136,8 @@ def generate_tsv_report(
             # Ensure file ends with newline
             if not tsv_content.endswith("\n"):
                 f.write("\n")
-        logger.info(
-            "TSV report saved to: %s",
-            Colors.colored(str(filename.resolve()), Colors.GREEN),
-        )
+        log_metric_label("TSV report saved to:", emoji="📝")
+        log_file_path(filename.resolve())
     except OSError:
         logger.exception("Failed to write TSV report to %s", filename)
 
@@ -4546,7 +4529,7 @@ def _run_model_generation(
     except Exception as load_err:
         # Capture any model loading errors (config issues, missing files, etc.)
         # MOD: Enhanced error handling with cache integrity check
-        error_details = f"Model loading failed: {load_err}\n{traceback.format_exc()}"
+        error_details = f"Model loading failed: {load_err}"
         logger.exception("Failed to load model %s", params.model_identifier)
 
         # MOD: HF cache integrity check on load failure
@@ -4596,17 +4579,13 @@ def _run_model_generation(
         raise TimeoutError(msg) from gen_to_err
     except (OSError, ValueError) as gen_known_err:
         # Known I/O or validation-style issues
-        msg = (
-            f"Model generation failed for {params.model_identifier}: {gen_known_err}\n"
-            f"{traceback.format_exc()}"
-        )
+        msg = f"Model generation failed for {params.model_identifier}: {gen_known_err}"
+        logger.exception("Generation error for %s", params.model_identifier)
         raise ValueError(msg) from gen_known_err
     except (RuntimeError, TypeError, AttributeError, KeyError) as gen_err:
         # Model-specific runtime errors (weights, config, tensor ops, missing attributes)
-        msg = (
-            f"Model runtime error during generation for {params.model_identifier}: {gen_err}\n"
-            f"{traceback.format_exc()}"
-        )
+        msg = f"Model runtime error during generation for {params.model_identifier}: {gen_err}"
+        logger.exception("Runtime error for %s", params.model_identifier)
         raise ValueError(msg) from gen_err
 
     duration = timer.stop()
@@ -4621,11 +4600,10 @@ def _run_model_generation(
 
 def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     """Process an image with a Vision Language Model, managing stats and errors."""
-    logger.info(
-        "Processing '%s' with model: %s",
-        Colors.colored(str(getattr(params.image_path, "name", params.image_path)), Colors.MAGENTA),
-        Colors.colored(params.model_identifier, Colors.MAGENTA),
-    )
+    image_name = str(getattr(params.image_path, "name", params.image_path))
+    logger.info("Processing image with model")
+    log_file_path(image_name)
+    log_model_name(params.model_identifier)
     model: Module | None = None
     tokenizer: PreTrainedTokenizer | PreTrainedTokenizerFast | None = None
     arch, gpu_info = get_system_info()
@@ -4667,7 +4645,10 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             total_time=total_time,
         )
     except TimeoutError as e:
-        logger.exception("Timeout during model processing")
+        logger.exception(
+            "Timeout during model processing for %s",
+            params.model_identifier,
+        )
         # MOD: Capture original exception type for error bucketing
         classified_stage = _classify_error(str(e))
         return PerformanceResult(
@@ -4682,7 +4663,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             total_time=None,
         )
     except (OSError, ValueError) as e:
-        logger.exception("Model processing error")
+        logger.exception("Model processing error for %s", params.model_identifier)
         # MOD: Capture original exception type for error bucketing
         classified_stage = _classify_error(str(e))
         return PerformanceResult(
@@ -5012,6 +4993,7 @@ def _log_verbose_success_details_mode(
         context_marker=context_marker,
     )
 
+    log_blank()  # Extra spacing before generated text section
     log_metric_label("Generated Text:", emoji="📝")
 
     # Warn about quality issues
@@ -5223,24 +5205,43 @@ def _align_metric_parts(parts: list[str]) -> list[str]:
 def log_metrics_legend(*, detailed: bool) -> None:
     """Emit a one-time legend at the beginning of processing for clarity."""
     log_blank()
-    log_metric_label("Metrics Format:", emoji="📖")
+    width = get_terminal_width(max_width=100)
+    top_line = f"╔{'═' * (width - 2)}╗"
+    header_line = f"║ 📖 METRICS LEGEND{' ' * (width - 20)}║"
+    bottom_line = f"╚{'═' * (width - 2)}╝"
+
+    logger.info(
+        "%s",
+        top_line,
+        extra={"style_hint": LogStyles.RULE},
+    )
+    logger.info(
+        "%s",
+        header_line,
+        extra={"style_hint": LogStyles.HEADER},
+    )
+    logger.info(
+        "%s",
+        bottom_line,
+        extra={"style_hint": LogStyles.RULE},
+    )
     if detailed:
         logger.info(
             "  • Detailed mode: separate lines for timing, memory, tokens, TPS",
-            extra={"style_hint": LogStyles.DETAIL, "style_color": Colors.GRAY},
+            extra={"style_hint": LogStyles.DETAIL},
         )
     else:
         logger.info(
             "  • Compact mode: tokens(total/prompt/gen) format with aligned keys",
-            extra={"style_hint": LogStyles.DETAIL, "style_color": Colors.GRAY},
+            extra={"style_hint": LogStyles.DETAIL},
         )
     logger.info(
         "  • ⚠️  warnings shown for repetitive or hallucinated output",
-        extra={"style_hint": LogStyles.DETAIL, "style_color": Colors.GRAY},
+        extra={"style_hint": LogStyles.DETAIL},
     )
     logger.info(
         "  • Note: Streaming early-stop for repetitive output is not yet implemented",
-        extra={"style_hint": LogStyles.DETAIL, "style_color": Colors.GRAY},
+        extra={"style_hint": LogStyles.DETAIL},
     )
     log_blank()
 
@@ -5258,27 +5259,40 @@ def print_model_result(
     """Print a concise summary + optional verbose block for a model result."""
     run_prefix = "" if run_index is None else f"[RUN {run_index}/{total_runs}] "
     summary = run_prefix + "SUMMARY " + " ".join(_summary_parts(result, result.model_name))
-    log_fn = logger.info if result.success else logger.error
-    color = Colors.GREEN if result.success else Colors.RED
     # Wrap summary to terminal width for readability
     width = get_terminal_width(max_width=100)
     for line in textwrap.wrap(summary, width=width, break_long_words=False, break_on_hyphens=False):
-        log_fn(Colors.colored(line, color))
+        if result.success:
+            log_success(line, prefix="")
+        else:
+            log_failure(line, prefix="")
     if result.success and not verbose:  # quick exit with preview only
         _preview_generation(result.generation, prompt=prompt, context_marker=context_marker)
         return
-    header_label = "✓ SUCCESS" if result.success else "✗ FAILED"
-    header_color = Colors.GREEN if result.success else Colors.RED
-    header = (
-        f"{header_label}: "
-        f"{Colors.colored(result.model_name, Colors.MAGENTA if result.success else Colors.RED)}"
-    )
-    log_fn(Colors.colored(header, Colors.BOLD, header_color))
+    # Use structured logging for success/failure headers
+    if result.success:
+        log_success(f"SUCCESS: {result.model_name}", prefix="✓")
+    else:
+        log_failure(f"FAILED: {result.model_name}", prefix="✗")
     if not result.success:
+        log_blank()
         if result.error_stage:
-            _log_wrapped_error("Stage:", str(result.error_stage))
+            log_metric_label("Stage:", emoji="🔴")
+            logger.error(
+                "  %s",
+                result.error_stage,
+                extra={"style_hint": LogStyles.DETAIL},
+            )
         if result.error_message:
-            _log_wrapped_error("Error:", str(result.error_message))
+            log_metric_label("Error:", emoji="❌")
+            # Show error message (full traceback already logged above with exc_info=True)
+            error_lines = str(result.error_message).splitlines()
+            for line in error_lines:
+                logger.error(
+                    "  %s",
+                    line,
+                    extra={"style_hint": LogStyles.DETAIL},
+                )
         if result.captured_output_on_fail:
             _log_wrapped_error("Output:", str(result.captured_output_on_fail))
         return
@@ -5297,9 +5311,9 @@ def print_cli_separator() -> None:
     log_rule(width, char="─", color=Colors.BLUE, bold=False)
 
 
-# MOD: Added full environment dump to log file for reproducibility
+# MOD: Write environment dump to separate file to reduce log clutter
 def _dump_environment_to_log() -> None:
-    """Dump complete Python environment to log file for debugging/reproducibility.
+    """Dump complete Python environment to separate file for debugging/reproducibility.
 
     Captures output from pip freeze (and conda list if in conda environment)
     to provide complete package manifest for issue reproduction.
@@ -5309,59 +5323,65 @@ def _dump_environment_to_log() -> None:
         conda_env = os.environ.get("CONDA_DEFAULT_ENV")
         is_conda = conda_env is not None
 
-        # Use logger instead of writing directly to file
-        log_rule(80, char="=", level=logging.DEBUG, pre_newline=True)
-        logger.debug("FULL ENVIRONMENT DUMP (for reproducibility)")
-        log_rule(80, char="=", level=logging.DEBUG, post_newline=True)
+        # Write to separate environment.log file in output directory
+        output_dir = Path(__file__).parent / "output"
+        output_dir.mkdir(parents=True, exist_ok=True)
+        env_log_path = output_dir / "environment.log"
 
-        # Try pip freeze first (works in both conda and venv)
-        try:
-            # Use sys.executable to ensure we're using the same Python interpreter
-            pip_result = subprocess.run(  # noqa: S603 - trusted command with controlled args
-                [sys.executable, "-m", "pip", "freeze"],
-                capture_output=True,
-                text=True,
-                timeout=30,
-                check=False,
-            )
-            if pip_result.returncode == 0:
-                logger.debug("--- pip freeze ---")
-                for line in pip_result.stdout.splitlines():
-                    logger.debug(line)
-                logger.debug("")
-            else:
-                logger.warning("pip freeze failed: %s", pip_result.stderr)
-        except (subprocess.SubprocessError, FileNotFoundError) as pip_err:
-            logger.warning("Could not run pip freeze: %s", pip_err)
+        with env_log_path.open("w", encoding="utf-8") as env_file:
+            env_file.write("=" * 80 + "\n")
+            env_file.write(f"FULL ENVIRONMENT DUMP - {local_now_str()}\n")
+            env_file.write("=" * 80 + "\n\n")
 
-        # If in conda, also capture conda list
-        if is_conda:
+            # Try pip freeze first (works in both conda and venv)
             try:
-                # Use shutil.which to find conda executable safely
-                conda_path = shutil.which("conda")
-                if conda_path:
-                    conda_result = subprocess.run(  # noqa: S603 - trusted command
-                        [conda_path, "list"],
-                        capture_output=True,
-                        text=True,
-                        timeout=30,
-                        check=False,
-                    )
-                    if conda_result.returncode == 0:
-                        logger.debug("--- conda list (env: %s) ---", conda_env)
-                        for line in conda_result.stdout.splitlines():
-                            logger.debug(line)
-                        logger.debug("")
-                    else:
-                        logger.warning("conda list failed: %s", conda_result.stderr)
+                pip_result = subprocess.run(  # noqa: S603 - trusted command with controlled args
+                    [sys.executable, "-m", "pip", "freeze"],
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
+                    check=False,
+                )
+                if pip_result.returncode == 0:
+                    env_file.write("--- pip freeze ---\n")
+                    env_file.write(pip_result.stdout)
+                    env_file.write("\n")
                 else:
-                    logger.warning("conda command not found in PATH")
-            except (subprocess.SubprocessError, FileNotFoundError) as conda_err:
-                logger.warning("Could not run conda list: %s", conda_err)
+                    env_file.write(f"pip freeze failed: {pip_result.stderr}\n")
+            except (subprocess.SubprocessError, FileNotFoundError) as pip_err:
+                env_file.write(f"Could not run pip freeze: {pip_err}\n")
 
-        log_rule(80, char="=", level=logging.DEBUG)
-        logger.debug("Environment dump completed at %s", local_now_str())
-        log_rule(80, char="=", level=logging.DEBUG, post_newline=True)
+            # If in conda, also capture conda list
+            if is_conda:
+                try:
+                    conda_path = shutil.which("conda")
+                    if conda_path:
+                        conda_result = subprocess.run(  # noqa: S603 - trusted command
+                            [conda_path, "list"],
+                            capture_output=True,
+                            text=True,
+                            timeout=30,
+                            check=False,
+                        )
+                        if conda_result.returncode == 0:
+                            env_file.write(f"--- conda list (env: {conda_env}) ---\n")
+                            env_file.write(conda_result.stdout)
+                            env_file.write("\n")
+                        else:
+                            env_file.write(f"conda list failed: {conda_result.stderr}\n")
+                    else:
+                        env_file.write("conda command not found in PATH\n")
+                except (subprocess.SubprocessError, FileNotFoundError) as conda_err:
+                    env_file.write(f"Could not run conda list: {conda_err}\n")
+
+            env_file.write("=" * 80 + "\n")
+            env_file.write(f"Environment dump completed at {local_now_str()}\n")
+            env_file.write("=" * 80 + "\n")
+
+        # Log single line pointing to the file
+        log_metric_label("Full environment dump written to:", emoji="📝")
+        log_file_path(str(env_log_path))
+        logger.debug("Environment details saved for reproducibility")
 
     except Exception as e:  # noqa: BLE001 - catch-all for logging
         logger.warning("Failed to dump environment info: %s", e)
@@ -5445,8 +5465,8 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
 
     if args.trust_remote_code:
         print_cli_separator()
-        logger.warning("SECURITY WARNING: --trust-remote-code is enabled.")
-        logger.warning("This allows execution of remote code and may pose security risks.")
+        log_warning_note("SECURITY WARNING: --trust-remote-code is enabled.")
+        log_warning_note("This allows execution of remote code and may pose security risks.")
 
     return library_versions
 
@@ -5454,9 +5474,8 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
 def find_and_validate_image(args: argparse.Namespace) -> Path:
     """Find and validate the image file to process from arguments."""
     folder_path: Path = args.folder.resolve()
-    print_cli_section(
-        f"Scanning folder: {Colors.colored(str(folder_path), Colors.MAGENTA)}",
-    )
+    print_cli_section("Scanning folder:")
+    log_file_path(str(folder_path))
 
     if args.folder == DEFAULT_FOLDER and not DEFAULT_FOLDER.is_dir():
         print_cli_error(f"Default folder '{DEFAULT_FOLDER}' does not exist.")
@@ -5470,7 +5489,8 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
         raise SystemExit  # pragma: no cover
 
     resolved_image_path: Path = image_path.resolve()
-    print_cli_section(f"Image File: {Colors.colored(str(resolved_image_path), Colors.MAGENTA)}")
+    print_cli_section("Image File:")
+    log_file_path(str(resolved_image_path))
 
     try:
         with Image.open(resolved_image_path) as img:
@@ -5718,7 +5738,7 @@ def process_models(
 
     results: list[PerformanceResult] = []
     if not model_identifiers:
-        logger.error("No models specified or found in cache.")
+        log_failure("No models specified or found in cache.", prefix="❌")
         if not args.models:
             logger.error("Ensure models are downloaded and cache is accessible.")
     else:
@@ -5742,9 +5762,8 @@ def process_models(
         # Use full model ID (e.g. "mlx-community/Qwen2-VL-2B-Instruct") instead of just the name
         model_label = model_id
         progress = f"[{idx}/{len(model_identifiers)}]"
-        print_cli_section(
-            f"Processing Model {progress}: {Colors.colored(model_label, Colors.MAGENTA)}",
-        )
+        print_cli_section(f"Processing Model {progress}:")
+        log_model_name(model_label)
 
         is_vlm_verbose: bool = args.verbose
         params = ProcessImageParams(
@@ -5768,20 +5787,20 @@ def process_models(
         )
         result: PerformanceResult = process_image_with_model(params)
 
-        # MOD: Calculate quality score and analysis if baseline provided or generation successful
+        # MOD: Calculate quality score and analysis only for successful generations
         if result.success and result.generation:
             gen_text = str(getattr(result.generation, "text", ""))
             gen_tokens = getattr(result.generation, "generation_tokens", 0)
             if gen_text:
-                # Perform quality analysis
+                # Perform quality analysis (only for successful runs)
                 analysis = analyze_generation_text(
                     gen_text,
                     gen_tokens,
                     prompt=prompt,
                     context_marker=args.context_marker,
                 )
-                # Log quality analysis results
-                logger.info(
+                # Log quality analysis results at DEBUG level
+                logger.debug(
                     "Quality analysis for %s: %s",
                     result.model_name,
                     _format_quality_analysis_for_log(analysis),
@@ -6075,10 +6094,7 @@ def finalize_execution(
             )
 
             logger.info("")
-            logger.info(
-                "📊 %s",
-                Colors.colored("Reports successfully generated:", Colors.BOLD, Colors.GREEN),
-            )
+            log_success("Reports successfully generated:", prefix="📊")
             log_file_path(html_output_path, label="   HTML:    ")
             log_file_path(md_output_path, label="   Markdown:")
             log_file_path(tsv_output_path, label="   TSV:     ")
@@ -6087,7 +6103,7 @@ def finalize_execution(
         except (OSError, ValueError):
             logger.exception("Failed to generate reports.")
     else:
-        logger.warning("No models processed. No performance summary generated.")
+        log_warning_note("No models processed. No performance summary generated.")
         logger.info("Skipping report generation as no models were processed.")
 
     print_cli_section("Execution Summary")
