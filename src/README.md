@@ -235,7 +235,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- BEGIN MANUAL_INSTALL -->
 ```bash
-pip install "huggingface-hub[mcp,torch,typing]>=0.23.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "mypy" "Pillow>=10.3.0" "PyYAML>=6.0" "ruff" "tabulate>=0.9.0" "ty" "tzlocal>=5.0"
+pip install "huggingface-hub[mcp,torch,typing]>=0.23.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "tzlocal>=5.0"
 ```
 <!-- END MANUAL_INSTALL -->
 
@@ -261,7 +261,7 @@ and re-run the sync helper.
 Runtime (installed automatically via `pip install -e .` when executed inside `src/`, or via `make install` from repo root):
 
 | Purpose | Package | Minimum |\n| ------- | ------- | ------- |\n| Core tensor/runtime | `mlx` | `>=0.29.1` |
-| Vision‑language utilities | `mlx-vlm` | `>=0.0.9` |
+| Vision‑language utilities | `mlx-vlm` | `>=0.3.0` |
 | Image processing & loading | `Pillow` | `>=10.3.0` |
 | Model cache / discovery | `huggingface-hub` | `>=0.23.0` |
 | Reporting / tables | `tabulate` | `>=0.9.0` |
@@ -306,7 +306,7 @@ Development / QA:
 
 <!-- BEGIN MINIMAL_INSTALL -->
 ```bash
-pip install "huggingface-hub[mcp,torch,typing]>=0.23.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "mypy" "Pillow>=10.3.0" "PyYAML>=6.0" "ruff" "tabulate>=0.9.0" "ty" "tzlocal>=5.0"
+pip install "huggingface-hub[mcp,torch,typing]>=0.23.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "tzlocal>=5.0"
 ```
 <!-- END MINIMAL_INSTALL -->
 
@@ -529,6 +529,8 @@ python check_models.py \
 | `--no-color` | flag | `False` | Disable ANSI colors in the CLI output. |
 | `--force-color` | flag | `False` | Force-enable ANSI colors even if stderr is not a TTY. |
 | `--width` | int | (auto) | Force a fixed output width (columns) for separators and wrapping. |
+| `--quality-config` | Path | (none) | Path to custom quality configuration YAML file. |
+| `--context-marker` | str | `Context:` | Marker used to identify context section in prompt. |
 
 ### Selection Logic
 

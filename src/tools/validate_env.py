@@ -93,7 +93,7 @@ CORE_PACKAGES, EXTRAS_PACKAGES, DEV_TOOLS = load_pyproject_deps()
 if not CORE_PACKAGES:
     CORE_PACKAGES = {
         "mlx": ">=0.29.1",
-        "mlx-vlm": ">=0.0.9",
+        "mlx-vlm": ">=0.3.0",
         "Pillow": ">=10.3.0",
         "huggingface-hub": ">=0.23.0",
         "tabulate": ">=0.9.0",
@@ -115,6 +115,7 @@ if not DEV_TOOLS:
         "ruff": ">=0.1.0",
         "mypy": ">=1.8.0",
         "pytest": ">=8.0.0",
+        "ty": "",
     }
 
 

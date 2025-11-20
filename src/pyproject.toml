@@ -34,10 +34,6 @@ dependencies = [
     "huggingface-hub[mcp,torch,typing]>=0.23.0",
     "tabulate>=0.9.0",
     "tzlocal>=5.0",
-    # Quality tools (replacing huggingface-hub[quality] to avoid version pinning)
-    "mypy",
-    "ruff",
-    "ty",
     "PyYAML>=6.0",
 ]
 
@@ -77,6 +73,7 @@ torch = [
 dev = [
     "ruff>=0.1.0",
     "mypy>=1.8.0",
+    "ty",
     "pytest>=8.0.0",
     "pytest-cov>=4.0.0",
     "types-tabulate",
