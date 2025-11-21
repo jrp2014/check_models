@@ -71,8 +71,8 @@ def load_pyproject_deps() -> tuple[dict[str, str], dict[str, str], dict[str, str
             else:
                 core_deps[dep.strip()] = ""
 
-    dev_deps = {}
-    extras_deps = {}
+    dev_deps: dict[str, str] = {}
+    extras_deps: dict[str, str] = {}
 
     for group, deps in optional_dependencies.items():
         target_dict = dev_deps if group == "dev" else extras_deps
@@ -226,7 +226,7 @@ def fix_issues() -> None:
     # Install git hooks
     logger.info("Installing git pre-commit hook...")
     subprocess.run(  # noqa: S603
-        [sys.executable, "-m", "vlm.tools.install_precommit_hook"],
+        [sys.executable, "-m", "tools.install_precommit_hook"],
         check=True,
     )
 
