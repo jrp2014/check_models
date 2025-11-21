@@ -2,6 +2,8 @@
 # Unified quality checker for local and CI environments
 set -euo pipefail
 
+CONDA_ENV="mlx-vlm"
+
 # --- Environment Setup ---
 # Navigate to the script's directory to ensure consistent paths
 cd "$(dirname "$0")"
@@ -15,7 +17,7 @@ if [[ "${CI:-false}" == "false" ]] && command -v conda &> /dev/null; then
     elif [ -f "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
         source "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
     fi
-    conda activate mlx-vlm 2>/dev/null || true
+    conda activate $CONDA_ENV 2>/dev/null || true
 fi
 
 # Determine Python executable
@@ -58,11 +60,11 @@ if [[ "${CI:-false}" == "true" ]]; then
     # WORKAROUND: MLX 0.29.4 has a syntax error in __init__.pyi that crashes mypy.
     # We delete the broken stub file in CI so mypy ignores it (we have ignore_missing_imports=True).
     # TODO: Remove this workaround once MLX >= 0.29.6 is available in CI.
-    MLX_LOC=$($PYTHON -m pip show mlx | grep Location | cut -d: -f2 | xargs)
-    if [[ -n "$MLX_LOC" && -f "$MLX_LOC/mlx/core/__init__.pyi" ]]; then
-        echo "⚠️  Workaround: Removing broken mlx/core/__init__.pyi to fix mypy..."
-        rm "$MLX_LOC/mlx/core/__init__.pyi"
-    fi
+    #MLX_LOC=$($PYTHON -m pip show mlx | grep Location | cut -d: -f2 | xargs)
+    #if [[ -n "$MLX_LOC" && -f "$MLX_LOC/mlx/core/__init__.pyi" ]]; then
+    #    echo "⚠️  Workaround: Removing broken mlx/core/__init__.pyi to fix mypy..."
+    #    rm "$MLX_LOC/mlx/core/__init__.pyi"
+    #fi
 fi
 
 # Ensure mypy uses the correct Python environment by setting MYPYPATH

@@ -58,6 +58,7 @@ def _extract_manual_block(readme: str) -> str:
 
 
 def test_readme_runtime_block_matches_pyproject() -> None:
+    """Ensure the runtime dependencies in README match pyproject.toml."""
     py_text = PYPROJECT.read_text(encoding="utf-8")
     rd_text = README.read_text(encoding="utf-8")
     runtime_deps = _parse_runtime_deps(py_text)

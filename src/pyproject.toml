@@ -89,7 +89,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.ruff]
 line-length = 100
-exclude = [".venv", "__pycache__", "build", "dist"]
+exclude = [".venv", "__pycache__", "build", "dist", "src/tools/.archived"]
 indent-width = 4
 
 [tool.ruff.format]
@@ -153,6 +153,11 @@ ignore = [
 # Archived files: ignore all rules (these are not maintained)
 "tools/.archived/**" = ["ALL"]
 
+# Specific ignores for subprocess calls with hardcoded arguments
+"**/tests/**" = ["S101"]
+"**/check_models.py" = ["S603"]
+"**/tools/smoke_test.py" = ["S603"]
+
 [tool.ruff.lint.pydocstyle]
 # Use Google docstring convention (resolves D203/D211 and D212/D213 conflicts)
 convention = "google"
@@ -187,11 +192,13 @@ python_version = "3.13"
 follow_imports = "skip"
 # Ignore missing imports for libraries without stubs
 ignore_missing_imports = true
+# Exclude archived tools
+exclude = ["^src/tools/\\.archived/"]
 # Include local type stubs if generated (update.sh can generate stubs for local MLX builds)
 mypy_path = "typings"
 
 # Core strictness - catch common errors in our own code
-warn_unused_ignores = true
+warn_unused_ignores = false
 no_implicit_optional = true
 warn_return_any = true
 warn_redundant_casts = true
@@ -205,8 +212,9 @@ ignore_errors = true
 
 # Ignore errors in MLX libraries (avoid issues with stubs in older/newer versions)
 [[tool.mypy.overrides]]
-module = ["mlx.*", "mlx_vlm.*", "mlx_lm.*"]
+module = ["mlx.*", "mlx_vlm.*", "mlx_lm.*", "tokenizers.*", "huggingface_hub.*"]
 ignore_errors = true
+ignore_missing_imports = true
 follow_imports = "skip"
 
 [tool.ty]

@@ -1,6 +1,8 @@
 # Model Performance Results
 
-_Generated on 2025-11-20 20:43:02 GMT_
+## Generated on 2025-11-20 20:43:02 GMT
+
+## Report generated on: 2025-11-20 20:43:02 GMT
 
 ## ⚠️ Quality Issues
 
@@ -710,4 +712,4 @@ Now, the caption needs to be factual. Let's check the provided caption: "A damp,
 - `tokenizers`: `0.22.1`
 - `transformers`: `4.57.1`
 
-_Report generated on: 2025-11-20 20:43:02 GMT_
+## Report generated on: 2025-11-20 20:43:02 GMT

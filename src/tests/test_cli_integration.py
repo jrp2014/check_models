@@ -23,6 +23,7 @@ _OUTPUT_DIR = _SRC_DIR / "output"
 _TEST_LOG = _OUTPUT_DIR / "test_cli_integration.log"
 _TEST_HTML = _OUTPUT_DIR / "test_cli_integration.html"
 _TEST_MD = _OUTPUT_DIR / "test_cli_integration.md"
+_TEST_ENV = _OUTPUT_DIR / "test_cli_integration_environment.log"
 
 
 def _get_test_output_args() -> list[str]:
@@ -34,6 +35,8 @@ def _get_test_output_args() -> list[str]:
         str(_TEST_HTML),
         "--output-markdown",
         str(_TEST_MD),
+        "--output-env",
+        str(_TEST_ENV),
     ]
 
 

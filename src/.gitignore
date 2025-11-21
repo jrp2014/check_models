@@ -115,3 +115,6 @@ cython_debug/
 # Node.js (for markdownlint-cli2)
 node_modules/
 package-lock.json
+
+# Test output
+output/test*

@@ -68,7 +68,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
     from mlx.nn import Module
-    from mlx_vlm.generate import GenerationResult
+    from mlx_vlm.generate import GenerationResult  # type: ignore[import]
     from transformers import PreTrainedTokenizer, PreTrainedTokenizerFast
 
 # Public API (PEP 8 / PEP 561 best practice)
@@ -335,10 +335,10 @@ else:
 vlm_version: str
 
 try:
-    from mlx_vlm.generate import generate
-    from mlx_vlm.prompt_utils import apply_chat_template
-    from mlx_vlm.utils import load, load_image
-    from mlx_vlm.version import __version__ as _mlx_vlm_version
+    from mlx_vlm.generate import generate  # type: ignore[import]
+    from mlx_vlm.prompt_utils import apply_chat_template  # type: ignore[import]
+    from mlx_vlm.utils import load, load_image  # type: ignore[import]
+    from mlx_vlm.version import __version__ as _mlx_vlm_version  # type: ignore[import]
 
     vlm_version = _mlx_vlm_version
 except ImportError:
@@ -364,7 +364,7 @@ except ImportError:
 
     MISSING_DEPENDENCIES["mlx-vlm"] = ERROR_MLX_VLM_MISSING
 try:
-    import mlx_lm
+    import mlx_lm  # type: ignore[import]
 
     mlx_lm_version: str = getattr(mlx_lm, "__version__", NOT_AVAILABLE)
 except ImportError:
@@ -388,7 +388,7 @@ except ImportError:
     transformers_version = NOT_AVAILABLE
 
 try:
-    import tokenizers
+    import tokenizers  # type: ignore[import]
 
     tokenizers_version: str = getattr(tokenizers, "__version__", NOT_AVAILABLE)
 except ImportError:
@@ -2165,7 +2165,7 @@ def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: PLR
     """
     if value is None:
         return ""
-    if isinstance(value, (int, float)):
+    if isinstance(value, int | float):
         num = float(value)
         if field_name.endswith("_memory"):
             return _format_memory_value_gb(num)
@@ -2200,7 +2200,7 @@ def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: PLR
 
 def is_numeric_value(val: object) -> bool:
     """Return True if val can be interpreted as a number."""
-    if isinstance(val, (int, float)):
+    if isinstance(val, int | float):
         return True
     if isinstance(val, str):
         s = val.strip().replace(",", "")
@@ -2676,9 +2676,9 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
             if not exif_raw:
                 logger.debug("No EXIF data found in %s", image_str)
                 return None
-            exif_decoded: ExifDict = _process_ifd0(exif_raw)
-            exif_decoded.update(_process_exif_subifd(exif_raw))
-            gps_decoded = _process_gps_ifd(exif_raw)
+            exif_decoded: ExifDict = _process_ifd0(cast("Any", exif_raw))
+            exif_decoded.update(_process_exif_subifd(cast("Any", exif_raw)))
+            gps_decoded = _process_gps_ifd(cast("Any", exif_raw))
             if gps_decoded:
                 exif_decoded["GPSInfo"] = gps_decoded
             return exif_decoded
@@ -2794,7 +2794,7 @@ def _extract_description(exif_data: ExifDict) -> str | None:
     return desc or None
 
 
-def _extract_gps_str(gps_info_raw: Mapping[object, Any] | None) -> str | None:
+def _extract_gps_str(gps_info_raw: Mapping[Any, Any] | None) -> str | None:
     """Extract formatted GPS string from EXIF GPS info dictionary.
 
     Converts raw EXIF GPS data (DMS format) into human-readable decimal degrees
@@ -2921,7 +2921,7 @@ def exif_value_to_str(tag_str: str, value: object) -> str:
             processed_str = _sanitize(value.decode("latin-1", errors="replace"))
         except (UnicodeDecodeError, AttributeError):
             return f"<bytes len={len(value)} un-decodable>"
-    elif isinstance(value, (tuple, list)) and len(value) > MAX_TUPLE_LEN:
+    elif isinstance(value, tuple | list) and len(value) > MAX_TUPLE_LEN:
         return f"<tuple len={len(value)}>"
     elif isinstance(value, bytearray):
         return f"<bytearray len={len(value)}>"
@@ -5356,7 +5356,7 @@ def _dump_environment_to_log(output_path: Path) -> None:
 
             # Try pip freeze first (works in both conda and venv)
             try:
-                pip_result = subprocess.run(  # noqa: S603 - trusted command with controlled args
+                pip_result = subprocess.run(
                     [sys.executable, "-m", "pip", "freeze"],
                     capture_output=True,
                     text=True,
@@ -5377,7 +5377,7 @@ def _dump_environment_to_log(output_path: Path) -> None:
                 try:
                     conda_path = shutil.which("conda")
                     if conda_path:
-                        conda_result = subprocess.run(  # noqa: S603 - trusted command
+                        conda_result = subprocess.run(
                             [conda_path, "list"],
                             capture_output=True,
                             text=True,

@@ -20,10 +20,10 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, NamedTuple, cast
 
 import psutil
-from mlx_vlm import generate, load
-from mlx_vlm.prompt_utils import apply_chat_template
-from mlx_vlm.utils import load_config
-from mlx_vlm.version import __version__
+from mlx_vlm import generate, load  # type: ignore[import]
+from mlx_vlm.prompt_utils import apply_chat_template  # type: ignore[import]
+from mlx_vlm.utils import load_config  # type: ignore[import]
+from mlx_vlm.version import __version__  # type: ignore[import]
 from tqdm import tqdm
 from transformers import __version__ as transformers_version
 

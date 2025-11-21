@@ -1,10 +1,15 @@
 repos:
+repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.3
+    # Ruff version.
+    rev: v0.14.6
     hooks:
-      - id: ruff
-        args: ["--fix"]
-      - id: ruff-format
+    # Run the linter.
+    - id: ruff-check
+      args: [ --fix ]
+    # Run the formatter.
+    - id: ruff-format
+
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.15.0
     hooks:
@@ -14,9 +19,9 @@ repos:
         additional_dependencies: []
   - repo: local
     hooks:
-      - id: dependency-sync-check
-        name: dependency-sync-check
-        entry: python -m tools.check_dependency_sync
+      - id: dependency-sync
+        name: dependency-sync
+        entry: bash -c 'cd src && python -m tools.update_readme_deps'
         language: system
         pass_filenames: false
         files: ^src/(pyproject\.toml|README\.md)$

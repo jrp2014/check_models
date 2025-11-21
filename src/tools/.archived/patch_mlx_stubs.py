@@ -42,8 +42,7 @@ def patch_dequantize_signature(stub_file: Path) -> bool:
     # Pattern: dtype: Optional[Dtype], (without = None)
     # Should be: dtype: Optional[Dtype] = None,
     pattern = re.compile(
-        r"(def dequantize\([^)]+dtype:\s*Optional\[Dtype\])"
-        r"(\s*,\s*\*)",
+        r"(def dequantize\([^)]+dtype:\s*Optional\[Dtype\])" r"(\s*,\s*\*)",
     )
     replacement = r"\1 = None\2"
 

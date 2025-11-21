@@ -155,7 +155,7 @@ class TestGPSCoordinateConversion:
 
     def test_non_dict_input(self) -> None:
         """Non-dict input should return None."""
-        result = _extract_gps_str("not a dict")  # Intentionally test with invalid type
+        result = _extract_gps_str("not a dict")  # type: ignore[arg-type] # Intentionally test with invalid type
         assert result is None
 
     def test_precision_six_decimals(self) -> None:
