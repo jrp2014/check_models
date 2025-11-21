@@ -18,7 +18,7 @@
 #   CLEAN_BUILD=1 ./update.sh         # Clean build artifacts before building local MLX repos
 #
 # Local MLX Development:
-#   If mlx, mlx-lm, and mlx-vlm directories exist at ../../ (sibling to scripts/),
+#   If mlx, mlx-lm, and mlx-vlm directories exist at ../../ (sibling to check_models/),
 #   the script will automatically (AFTER installing all library dependencies):
 #   1. Run git pull in each repository
 #   2. Install requirements.txt (if present) for additional dependencies
@@ -82,7 +82,7 @@ fi
 echo "[update.sh] Updating core Python packaging tools (pip, wheel, setuptools, ninja)..."
 pip install -U pip wheel setuptools ninja
 
-# Determine project root (assuming scripts/src/tools/update.sh)
+# Determine project root (assuming check_models/src/tools/update.sh)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
@@ -179,7 +179,7 @@ check_mlx_build_requirements() {
 
 # Function to update local MLX development repositories
 update_local_mlx_repos() {
-	# Determine the parent directory (assuming scripts/src/tools/update.sh)
+	# Determine the parent directory (assuming check_models/src/tools/update.sh)
 	local SCRIPT_DIR
 	SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 	local PARENT_DIR

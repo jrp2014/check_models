@@ -12,7 +12,7 @@
 # or via system cache cleaning utilities.
 #
 # Usage:
-#   bash tools/clean_builds.sh              # Clean local MLX repos + scripts project
+#   bash tools/clean_builds.sh              # Clean local MLX repos + check_models project
 #   bash tools/clean_builds.sh --dry-run    # Show what would be cleaned
 #   bash tools/clean_builds.sh --help       # Show this help
 
@@ -151,8 +151,8 @@ for repo in "${MLX_REPOS[@]}"; do
 	fi
 done
 
-# Clean scripts project
-clean_directory "$SCRIPTS_DIR/src" "mlx-vlm-check (scripts)"
+# Clean check_models project
+clean_directory "$SCRIPTS_DIR/src" "mlx-vlm-check (check_models)"
 
 # Clean typings
 if [[ -d "$SCRIPTS_DIR/typings" ]]; then

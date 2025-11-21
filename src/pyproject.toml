@@ -38,9 +38,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/jrp2014/scripts"
-Repository = "https://github.com/jrp2014/scripts"
-Issues = "https://github.com/jrp2014/scripts/issues"
+Homepage = "https://github.com/jrp2014/check_models"
+Repository = "https://github.com/jrp2014/check_models"
+Issues = "https://github.com/jrp2014/check_models/issues"
 
 [project.scripts]
 # Use fully-qualified module path for the CLI entry point

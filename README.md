@@ -85,8 +85,8 @@ Want to contribute? Great! See [CONTRIBUTING.md](docs/CONTRIBUTING.md) for the c
 
 ```bash
 # Clone and setup
-git clone https://github.com/jrp2014/scripts.git
-cd scripts
+git clone https://github.com/jrp2014/check_models.git
+cd check_models
 make dev          # Install dev dependencies + setup hooks
 
 # Run quality checks

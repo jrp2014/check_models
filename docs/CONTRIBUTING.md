@@ -37,8 +37,8 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/jrp2014/scripts.git
-   cd scripts
+   git clone https://github.com/jrp2014/check_models.git
+   cd check_models
    ```
 
 2. **Create and activate conda environment**:
