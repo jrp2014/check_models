@@ -5498,8 +5498,9 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
     print_cli_section("Scanning folder:")
     log_file_path(str(folder_path))
 
-    if args.folder == DEFAULT_FOLDER and not DEFAULT_FOLDER.is_dir():
-        print_cli_error(f"Default folder '{DEFAULT_FOLDER}' does not exist.")
+    # Exit immediately if folder does not exist
+    if not folder_path.is_dir():
+        exit_with_cli_error(f"Folder '{folder_path}' does not exist. Exiting.")
 
     image_path: Path | None = find_most_recent_file(folder_path)
     if image_path is None:
