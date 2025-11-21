@@ -35,6 +35,10 @@ fi
 # All paths are relative to the `src` directory
 cd ..
 
+echo "=== Dependency Sync ==="
+$PYTHON -m tools.update_readme_deps
+
+
 echo "=== Ruff Format ==="
 # In CI mode, only check; in local mode, fix automatically
 if [[ "${CI:-false}" == "true" ]]; then

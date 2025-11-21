@@ -1,41 +1,10 @@
 repos:
 repos:
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    # Ruff version.
-    rev: v0.14.6
-    hooks:
-    # Run the linter.
-    - id: ruff-check
-      args: [ --fix ]
-    # Run the formatter.
-    - id: ruff-format
-
-  - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.15.0
-    hooks:
-      - id: markdownlint-cli2
-        name: markdownlint
-        files: \.(md|markdown)$
-        additional_dependencies: []
   - repo: local
     hooks:
-      - id: dependency-sync
-        name: dependency-sync
-        entry: bash -c 'cd src && python -m tools.update_readme_deps'
+      - id: quality-checks
+        name: Quality Checks (Ruff, MyPy, Tests, etc.)
+        entry: src/tools/run_quality_checks.sh
         language: system
         pass_filenames: false
-        files: ^src/(pyproject\.toml|README\.md)$
-      - id: mypy
-        name: mypy
-        entry: mypy
-        language: system
-        types: [python]
-        pass_filenames: true
-        additional_dependencies: []
-      - id: shellcheck
-        name: shellcheck
-        entry: shellcheck
-        language: system
-        types: [shell]
-
-
+        always_run: true
