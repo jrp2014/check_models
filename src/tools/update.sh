@@ -78,9 +78,6 @@ else
 	echo "[update.sh] Homebrew not found; skipping brew update/upgrade"
 fi
 
-# Ensure global Python packaging tools are current
-echo "[update.sh] Updating core Python packaging tools (pip, wheel, setuptools, ninja)..."
-pip install -U pip wheel setuptools ninja
 
 # Determine project root (assuming check_models/src/tools/update.sh)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -92,6 +89,10 @@ pip_install() {
 	[[ "${FORCE_REINSTALL:-0}" == "1" ]] && args+=("--force-reinstall")
 	pip install "${args[@]}" "$@"
 }
+
+# Ensure global Python packaging tools are current
+echo "[update.sh] Updating core Python packaging tools (pip, wheel, setuptools, ninja)..."
+pip_install pip wheel setuptools ninja
 
 # Install project with all dependencies from pyproject.toml
 INSTALL_GROUPS=".[dev,extras,torch]"
