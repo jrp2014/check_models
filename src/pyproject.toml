@@ -1,5 +1,5 @@
 [project]
-name = "mlx-vlm-check"
+name = "check_models"
 description = "Image analysis and caption generation using MLX Vision Language Models."
 version = "0.1.0"
 authors = [
@@ -44,7 +44,7 @@ Issues = "https://github.com/jrp2014/check_models/issues"
 
 [project.scripts]
 # Use fully-qualified module path for the CLI entry point
-mlx-vlm-check = "check_models:main_cli"
+check_models = "check_models:main_cli"
 
 [tool.setuptools]
 py-modules = ["check_models"]
