@@ -450,7 +450,7 @@ DEFAULT_TSV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.tsv"
 DEFAULT_LOG_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "check_models.log"
 DEFAULT_JSONL_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.jsonl"
 DEFAULT_ENV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "environment.log"
-DEFAULT_BASELINE_FILE: Final[Path] = _SCRIPT_DIR / "output" / "baseline.txt"
+
 DEFAULT_TEMPERATURE: Final[float] = 0.1
 DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
 MAX_REASONABLE_TEMPERATURE: Final[float] = 2.0  # Warn if temperature exceeds this
@@ -795,14 +795,17 @@ class ColoredFormatter(logging.Formatter):
             record.msg = original_msg
             record.args = original_args
 
+        # If there's a style_hint, it already applied styling, so return as-is
         if style_hint:
             return msg
 
+        # For messages without style_hint, apply level-based colors
         level_color: str = self.LEVEL_COLORS.get(record.levelno, "")
 
         if record.levelno == logging.INFO:
             return self._format_info_message(msg)
 
+        # Apply level color (ERROR=red, WARNING=yellow, etc.)
         if level_color:
             return Colors.colored(msg, level_color)
 
@@ -859,10 +862,10 @@ class ColoredFormatter(logging.Formatter):
         prefix = getattr(record, "style_prefix", "▶")
         return f"{prefix} [ {title_colored} ]"
 
-    def _style_error(self, raw_message: str, record: logging.LogRecord) -> str:
-        prefix = getattr(record, "style_prefix", "ERROR")
-        styled_prefix = Colors.colored(f"{prefix}:", Colors.BOLD, Colors.RED)
-        return f"{styled_prefix} {raw_message}"
+    def _style_error(self, raw_message: str, _record: logging.LogRecord) -> str:
+        # Don't add "ERROR:" prefix since the log level already shows "ERROR"
+        # Just apply error styling (red, bold) to the message
+        return Colors.colored(raw_message, Colors.BOLD, Colors.RED)
 
     def _style_success(self, raw_message: str, _record: logging.LogRecord) -> str:
         return Colors.colored(raw_message, Colors.BOLD, Colors.GREEN)
@@ -2265,14 +2268,6 @@ def log_rule(
 # Ensure _pad_text is defined only once at module level and used everywhere
 
 
-def _pad_text(text: str, width: int, *, right_align: bool = False) -> str:
-    """Pad text to a given width, optionally right-aligning."""
-    pad_len: int = width - Colors.visual_len(text)
-    pad_len = max(pad_len, 0)
-    pad_str: str = " " * pad_len
-    return (pad_str + text) if right_align else (text + pad_str)
-
-
 def get_library_versions() -> LibraryVersionDict:
     """Return versions of key libraries as a dictionary, using None for missing."""
 
@@ -3122,7 +3117,7 @@ def _wrap_output_column_in_details(html_table: str, output_col_idx: int) -> str:
 
 
 def analyze_model_issues(results: list[PerformanceResult]) -> dict[str, Any]:
-    """Analyze results to identify common model issues."""
+    """Analyze results to identify common model issues and calculate performance highlights."""
     summary: dict[str, Any] = {
         "total_models": len(results),
         "failed_models": [],
@@ -3132,6 +3127,53 @@ def analyze_model_issues(results: list[PerformanceResult]) -> dict[str, Any]:
         "formatting_issues": [],
         "excessive_bullets": [],
     }
+
+    # Separate successful and failed results
+    successful = [r for r in results if r.success]
+
+    # Calculate performance highlights for successful models
+    if successful:
+        # Fastest model (generation TPS)
+        fastest = max(successful, key=lambda r: getattr(r.generation, "generation_tps", 0) or 0)
+        fastest_tps = getattr(fastest.generation, "generation_tps", 0) or 0
+        summary["fastest_model"] = (fastest.model_name, fastest_tps)
+
+        # Most memory efficient (lowest peak memory)
+        most_efficient = min(
+            successful,
+            key=lambda r: getattr(r.generation, "peak_memory", float("inf")) or float("inf"),
+        )
+        efficient_mem = getattr(most_efficient.generation, "peak_memory", 0) or 0
+        summary["most_efficient_model"] = (most_efficient.model_name, efficient_mem)
+
+        # Fastest to load
+        fastest_load = min(
+            successful,
+            key=lambda r: getattr(r, "load_time", float("inf")) or float("inf"),
+        )
+        load_time = getattr(fastest_load, "load_time", 0) or 0
+        summary["fastest_load_model"] = (fastest_load.model_name, load_time)
+
+        # Average TPS
+        total_tps = sum(getattr(r.generation, "generation_tps", 0) or 0 for r in successful)
+        avg_tps = total_tps / len(successful) if successful else 0
+        summary["average_tps"] = avg_tps
+        summary["successful_count"] = len(successful)
+
+        # Resource usage summary
+        total_mem = sum(getattr(r.generation, "peak_memory", 0) or 0 for r in successful)
+        avg_mem = total_mem / len(successful) if successful else 0
+        summary["total_peak_memory"] = total_mem
+        summary["average_peak_memory"] = avg_mem
+
+        # Memory efficiency (tokens per GB)
+        total_tokens = sum(
+            (getattr(r.generation, "prompt_tokens", 0) or 0)
+            + (getattr(r.generation, "generation_tokens", 0) or 0)
+            for r in successful
+        )
+        tokens_per_gb = total_tokens / total_mem if total_mem > 0 else 0
+        summary["memory_efficiency"] = tokens_per_gb
 
     for res in results:
         if not res.success:
@@ -3211,23 +3253,63 @@ def compute_performance_statistics(results: list[PerformanceResult]) -> dict[str
 
 def _format_top_performers_html(summary: dict[str, Any]) -> list[str]:
     parts = []
-    if summary.get("top_fastest") or summary.get("top_memory"):
-        parts.append("<h3>🏆 Top Performers</h3><ul>")
-        if summary.get("top_fastest"):
-            parts.append("<li><b>Fastest Generation (t/s):</b><ul>")
-            for model, speed in summary["top_fastest"]:
-                parts.append(
-                    f"<li><code>{html.escape(model)}</code>: <b>{speed:.1f} t/s</b></li>",
-                )
-            parts.append("</ul></li>")
-        if summary.get("top_memory"):
-            parts.append("<li><b>Most Memory Efficient (Peak GB):</b><ul>")
-            for model, mem in summary["top_memory"]:
-                parts.append(
-                    f"<li><code>{html.escape(model)}</code>: <b>{mem:.2f} GB</b></li>",
-                )
-            parts.append("</ul></li>")
+
+    # Performance Highlights
+    if any(
+        k in summary
+        for k in ["fastest_model", "most_efficient_model", "fastest_load_model", "average_tps"]
+    ):
+        parts.append("<h3>🏆 Performance Highlights</h3><ul>")
+
+        if "fastest_model" in summary:
+            model, tps = summary["fastest_model"]
+            parts.append(
+                f"<li><b>Fastest:</b> <code>{html.escape(model)}</code> ({tps:.1f} tps)</li>",
+            )
+
+        if "most_efficient_model" in summary:
+            model, mem = summary["most_efficient_model"]
+            parts.append(
+                f"<li><b>💾 Most efficient:</b> "
+                f"<code>{html.escape(model)}</code> ({mem:.1f} GB)</li>",
+            )
+
+        if "fastest_load_model" in summary:
+            model, load_time = summary["fastest_load_model"]
+            parts.append(
+                f"<li><b>⚡ Fastest load:</b> "
+                f"<code>{html.escape(model)}</code> ({load_time:.2f}s)</li>",
+            )
+
+        if "average_tps" in summary and "successful_count" in summary:
+            parts.append(
+                f"<li><b>📊 Average TPS:</b> {summary['average_tps']:.1f} "
+                f"across {summary['successful_count']} models</li>",
+            )
+
         parts.append("</ul>")
+
+    # Resource Usage Summary
+    if any(k in summary for k in ["total_peak_memory", "average_peak_memory", "memory_efficiency"]):
+        parts.append("<h3>📈 Resource Usage</h3><ul>")
+
+        if "total_peak_memory" in summary:
+            parts.append(
+                f"<li><b>Total peak memory:</b> {summary['total_peak_memory']:.1f} GB</li>",
+            )
+
+        if "average_peak_memory" in summary:
+            parts.append(
+                f"<li><b>Average peak memory:</b> {summary['average_peak_memory']:.1f} GB</li>",
+            )
+
+        if "memory_efficiency" in summary:
+            parts.append(
+                f"<li><b>Memory efficiency:</b> {summary['memory_efficiency']:.0f} tokens/GB</li>",
+            )
+
+        parts.append("</ul>")
+
     return parts
 
 
@@ -3329,18 +3411,51 @@ def format_issues_summary_html(summary: dict[str, Any], stats: dict[str, Any]) -
 
 def _format_top_performers_text(summary: dict[str, Any]) -> list[str]:
     parts = []
-    if summary.get("top_fastest") or summary.get("top_memory"):
-        parts.append("## 🏆 Top Performers")
+
+    # Performance Highlights
+    if any(
+        k in summary
+        for k in ["fastest_model", "most_efficient_model", "fastest_load_model", "average_tps"]
+    ):
+        parts.append("## 🏆 Performance Highlights")
         parts.append("")  # Blank line after heading (MD022)
-        if summary.get("top_fastest"):
-            parts.append("- **Fastest Generation (t/s):**")
-            for model, speed in summary["top_fastest"]:
-                parts.append(f"  - `{model}`: **{speed:.1f} t/s**")
-        if summary.get("top_memory"):
-            parts.append("- **Most Memory Efficient (Peak GB):**")
-            for model, mem in summary["top_memory"]:
-                parts.append(f"  - `{model}`: **{mem:.2f} GB**")
-        parts.append("")
+
+        if "fastest_model" in summary:
+            model, tps = summary["fastest_model"]
+            parts.append(f"- **Fastest:** `{model}` ({tps:.1f} tps)")
+
+        if "most_efficient_model" in summary:
+            model, mem = summary["most_efficient_model"]
+            parts.append(f"- **💾 Most efficient:** `{model}` ({mem:.1f} GB)")
+
+        if "fastest_load_model" in summary:
+            model, load_time = summary["fastest_load_model"]
+            parts.append(f"- **⚡ Fastest load:** `{model}` ({load_time:.2f}s)")
+
+        if "average_tps" in summary and "successful_count" in summary:
+            parts.append(
+                f"- **📊 Average TPS:** {summary['average_tps']:.1f} "
+                f"across {summary['successful_count']} models",
+            )
+
+        parts.append("")  # Blank line after list (MD032)
+
+    # Resource Usage Summary
+    if any(k in summary for k in ["total_peak_memory", "average_peak_memory", "memory_efficiency"]):
+        parts.append("## 📈 Resource Usage")
+        parts.append("")  # Blank line after heading (MD022)
+
+        if "total_peak_memory" in summary:
+            parts.append(f"- **Total peak memory:** {summary['total_peak_memory']:.1f} GB")
+
+        if "average_peak_memory" in summary:
+            parts.append(f"- **Average peak memory:** {summary['average_peak_memory']:.1f} GB")
+
+        if "memory_efficiency" in summary:
+            parts.append(f"- **Memory efficiency:** {summary['memory_efficiency']:.0f} tokens/GB")
+
+        parts.append("")  # Blank line after list (MD032)
+
     return parts
 
 
@@ -3657,43 +3772,23 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
         logger.info("No data to display in stats table.")
         return
 
-    # Create a text-based table
-    # We need to manually align because tabulate's alignment is based on visible chars
-    # and doesn't account for our ANSI color codes.
-    col_widths = [Colors.visual_len(h) for h in headers]
-    for row in rows:
-        for i, cell in enumerate(row):
-            col_widths[i] = max(col_widths[i], Colors.visual_len(cell))
+    # Use tabulate with 'simple' format for clean plain text output
+    # Determine column alignment (numeric fields right-aligned)
+    colalign = ["right" if is_numeric_field(field) else "left" for field in field_names]
 
-    # Header
-    header_line = " | ".join(_pad_text(h, col_widths[i]) for i, h in enumerate(headers))
-    logger.info(
-        header_line,
-        extra={"style_hint": LogStyles.RULE, "style_bold": True},
+    # Generate table using tabulate
+    table_text = tabulate(
+        rows,
+        headers=headers,
+        tablefmt="simple",
+        colalign=colalign,
     )
 
-    # Separator
-    separator_line = " | ".join("-" * w for w in col_widths)
-    logger.info(
-        separator_line,
-        extra={"style_hint": LogStyles.RULE},
-    )
-
-    # Rows
-    sorted_results = _sort_results_by_time(results)
-    for i, row_data in enumerate(rows):
-        is_fail = not sorted_results[i].success
-        row_color = Colors.RED if is_fail else ""
-        colored_row: list[str] = []
-        for j, cell_data in enumerate(row_data):
-            is_numeric = is_numeric_field(field_names[j])
-            padded_cell = _pad_text(cell_data, col_widths[j], right_align=is_numeric)
-            # Color the whole row on failure, but don't color the output column on success
-            if (j < len(row_data) - 1) or (j == len(row_data) - 1 and is_fail):
-                colored_row.append(Colors.colored(padded_cell, row_color))
-            else:
-                colored_row.append(padded_cell)
-        logger.info(" | ".join(colored_row))
+    # Log the table line by line
+    for line in table_text.split("\n"):
+        if not line.strip():
+            continue
+        logger.info(line)
 
 
 # =============================================================================
@@ -4840,45 +4935,14 @@ def log_blank(count: int = 1) -> None:
 
 
 def _summary_parts(res: PerformanceResult, model_short: str) -> list[str]:
-    """Assemble key=value summary segments (reduced branching)."""
-    gen = res.generation
+    """Assemble key=value summary segments (status only, metrics shown separately)."""
     parts: list[str] = [
         f"model={model_short}",
         f"status={'OK' if res.success else 'FAIL'}",
     ]
-    if gen:
-        p_tokens = getattr(gen, "prompt_tokens", 0) or 0
-        g_tokens = getattr(gen, "generation_tokens", 0) or 0
-        tot_tokens = p_tokens + g_tokens
-        gen_tps = getattr(gen, "generation_tps", 0.0) or 0.0
-        peak_mem = getattr(gen, "peak_memory", 0.0) or 0.0
-        total_time_val = getattr(res, "total_time", None)
-        for present, label in (
-            (tot_tokens, f"tokens={tot_tokens}"),
-            (p_tokens, f"prompt={p_tokens}"),
-            (g_tokens, f"gen={g_tokens}"),
-        ):
-            if present:
-                parts.append(label)
-        if gen_tps:
-            parts.append(f"gen_tps={fmt_num(gen_tps)}")
-        if peak_mem:
-            peak_str = format_field_value("peak_memory", peak_mem)
-            parts.append(f"peak_mem={peak_str}GB")
-        if total_time_val:
-            tt_val = format_field_value("total_time", total_time_val)
-            time_str = (
-                f"total_time={tt_val}"
-                if isinstance(tt_val, str)
-                else f"total_time={_format_time_seconds(total_time_val)}"
-            )
-            parts.append(time_str)
     if res.error_stage:
         parts.append(f"stage={res.error_stage}")
-    if res.error_stage:
-        parts.append(f"stage={res.error_stage}")
-    # Error message removed from summary line to avoid truncation/duplication
-    # It will be logged in full by print_model_result
+    # Metrics are shown in the dedicated metrics section below, not in summary
     return parts
 
 
@@ -5704,6 +5768,7 @@ def process_models(
 
     for idx, model_id in enumerate(model_identifiers, start=1):
         print_cli_separator()
+        log_blank()  # Add visual separation between model runs
         # Use full model ID (e.g. "mlx-community/Qwen2-VL-2B-Instruct") instead of just the name
         model_label = model_id
         progress = f"[{idx}/{len(model_identifiers)}]"
@@ -5985,11 +6050,66 @@ def log_summary(results: list[PerformanceResult]) -> None:
 
     log_blank()
     log_rule(color=Colors.BLUE, bold=True)
-    logger.info("FINAL SUMMARY", extra={"style_hint": LogStyles.HEADER})
+    logger.info("Results Summary", extra={"style_hint": LogStyles.HEADER})
     log_rule(color=Colors.BLUE, bold=True)
 
-    # Failed models
+    # Success stats
+    successful = [r for r in results if r.success]
     failed = [r for r in results if not r.success]
+
+    # Performance Highlights (only if we have successful models)
+    if successful:
+        logger.info("🏆 Performance Highlights:")
+
+        # Fastest model (gen TPS)
+        fastest = max(successful, key=lambda r: getattr(r.generation, "generation_tps", 0) or 0)
+        fastest_tps = getattr(fastest.generation, "generation_tps", 0) or 0
+        logger.info("   Fastest: %s (%.1f tps)", fastest.model_name, fastest_tps)
+
+        # Most memory efficient (lowest peak memory)
+        most_efficient = min(
+            successful,
+            key=lambda r: getattr(r.generation, "peak_memory", float("inf")) or float("inf"),
+        )
+        efficient_mem = getattr(most_efficient.generation, "peak_memory", 0) or 0
+        logger.info("   💾 Most efficient: %s (%.1f GB)", most_efficient.model_name, efficient_mem)
+
+        # Fastest to load
+        fastest_load = min(
+            successful,
+            key=lambda r: getattr(r, "load_time", float("inf")) or float("inf"),
+        )
+        load_time = getattr(fastest_load, "load_time", 0) or 0
+        logger.info("   ⚡ Fastest load: %s (%.2fs)", fastest_load.model_name, load_time)
+
+        # Average TPS
+        total_tps = sum(getattr(r.generation, "generation_tps", 0) or 0 for r in successful)
+        avg_tps = total_tps / len(successful) if successful else 0
+        logger.info("   📊 Average TPS: %.1f across %d models", avg_tps, len(successful))
+
+        log_blank()
+
+        # Resource Usage Summary
+        logger.info("📈 Resource Usage:")
+
+        # Total and average memory
+        total_mem = sum(getattr(r.generation, "peak_memory", 0) or 0 for r in successful)
+        avg_mem = total_mem / len(successful) if successful else 0
+        logger.info("   Total peak memory: %.1f GB", total_mem)
+        logger.info("   Average peak memory: %.1f GB", avg_mem)
+
+        # Memory efficiency (tokens per GB)
+        total_tokens = sum(
+            (getattr(r.generation, "prompt_tokens", 0) or 0)
+            + (getattr(r.generation, "generation_tokens", 0) or 0)
+            for r in successful
+        )
+        tokens_per_gb = total_tokens / total_mem if total_mem > 0 else 0
+        logger.info("   Memory efficiency: %.0f tokens/GB", tokens_per_gb)
+
+        log_blank()
+
+    # Failed models
     if failed:
         logger.info("❌ Failed Models (%d):", len(failed))
         for res in failed:
@@ -6001,8 +6121,7 @@ def log_summary(results: list[PerformanceResult]) -> None:
             )
         log_blank()
 
-    # Success stats
-    successful = [r for r in results if r.success]
+    # Successful models list
     if successful:
         logger.info("✅ Successful Models (%d):", len(successful))
         # Sort by generation tps (descending)
@@ -6122,7 +6241,7 @@ def finalize_execution(
         log_warning_note("No models processed. No performance summary generated.")
         logger.info("Skipping report generation as no models were processed.")
 
-    print_cli_section("Execution Summary")
+    print_cli_section("Final Summary")
     log_blank()
     logger.info(
         "⏱  Overall runtime: %s",
