@@ -701,7 +701,7 @@ Width and color controls:
 
 ### HTML Report
 
-Professional report featuring:
+Report featuring:
 
 - Executive summary with test parameters
 - Interactive performance table with sortable columns
@@ -912,8 +912,9 @@ The default conda target is `mlx-vlm`, but you can override it with `CONDA_ENV=y
 
 ## All Available Make Commands
 
+Run `make help` to see all targets.
 
-Run `make help` to see all targets. **Key commands:**
+**Key commands:**
 
 - `make install` — Install the package
 - `make dev` — Setup development environment
