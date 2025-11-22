@@ -1892,94 +1892,6 @@ def _detect_language_mixing(text: str) -> tuple[bool, list[str]]:
     return bool(issues), issues
 
 
-# MOD: Added baseline evaluation scoring
-def _calculate_keyword_overlap_score(generated_text: str, baseline_text: str) -> float:
-    """Calculate keyword overlap score between generated and baseline text.
-
-    Extracts significant keywords from both texts and computes the percentage
-    of baseline keywords that appear in the generated text.
-
-    Args:
-        generated_text: Model-generated text to evaluate
-        baseline_text: Golden/ideal reference text
-
-    Returns:
-        Percentage (0-100) of baseline keywords found in generated text
-    """
-    # Common English stop words to filter out
-    stop_words = {
-        "a",
-        "an",
-        "and",
-        "are",
-        "as",
-        "at",
-        "be",
-        "been",
-        "by",
-        "for",
-        "from",
-        "has",
-        "have",
-        "he",
-        "in",
-        "is",
-        "it",
-        "its",
-        "of",
-        "on",
-        "that",
-        "the",
-        "to",
-        "was",
-        "were",
-        "will",
-        "with",
-        "this",
-        "but",
-        "they",
-        "or",
-        "not",
-        "which",
-        "their",
-        "what",
-        "when",
-        "where",
-        "who",
-        "if",
-        "can",
-        "could",
-        "would",
-        "should",
-        "may",
-        "might",
-        "must",
-        "context",
-        "image",
-        "photo",
-        "picture",
-    }
-
-    def extract_keywords(text: str) -> set[str]:
-        """Extract significant keywords from text."""
-        # Convert to lowercase and extract words (alphanumeric sequences)
-        words = re.findall(r"\b[a-z0-9]+\b", text.lower())
-        # Filter out stop words and very short words
-        min_keyword_length = 3
-        return {w for w in words if w not in stop_words and len(w) >= min_keyword_length}
-
-    baseline_keywords = extract_keywords(baseline_text)
-    generated_keywords = extract_keywords(generated_text)
-
-    if not baseline_keywords:
-        # No baseline keywords to compare against
-        return 0.0
-
-    # Calculate overlap: what percentage of baseline keywords appear in generated text
-    overlap_count = len(baseline_keywords & generated_keywords)
-    return (overlap_count / len(baseline_keywords)) * 100.0
-
-
 @dataclass(frozen=True)
 class GenerationQualityAnalysis:
     """Analysis results for generated text quality.
@@ -6160,9 +6072,11 @@ def finalize_execution(
             html_output_path: Path = args.output_html.resolve()
             md_output_path: Path = args.output_markdown.resolve()
             tsv_output_path: Path = args.output_tsv.resolve()
+            jsonl_output_path: Path = args.output_jsonl.resolve()
             html_output_path.parent.mkdir(parents=True, exist_ok=True)
             md_output_path.parent.mkdir(parents=True, exist_ok=True)
             tsv_output_path.parent.mkdir(parents=True, exist_ok=True)
+            jsonl_output_path.parent.mkdir(parents=True, exist_ok=True)
 
             generate_html_report(
                 results=results,
@@ -6184,7 +6098,7 @@ def finalize_execution(
                 filename=args.output_tsv,
             )
             # New: Save JSONL report
-            save_jsonl_report(results, DEFAULT_JSONL_OUTPUT)
+            save_jsonl_report(results, args.output_jsonl)
 
             # Log file locations
             logger.info("")
@@ -6195,7 +6109,7 @@ def finalize_execution(
                 label="   Markdown Report:",
             )
             log_file_path(args.output_tsv, label="   TSV Report:   ")
-            log_file_path(DEFAULT_JSONL_OUTPUT, label="   JSONL Report: ")
+            log_file_path(args.output_jsonl, label="   JSONL Report: ")
 
             log_file_path(DEFAULT_LOG_OUTPUT, label="   Log File:")
             # Include environment.log in the output file listing
@@ -6275,31 +6189,37 @@ def main_cli() -> None:
         "--output-html",
         type=Path,
         default=DEFAULT_HTML_OUTPUT,
-        help="Output HTML report file.",
+        help="Output HTML report filename.",
     )
     parser.add_argument(
         "--output-markdown",
         type=Path,
         default=DEFAULT_MD_OUTPUT,
-        help="Output Github Markdown report file.",
+        help="Output Github Markdown report filename.",
     )
     parser.add_argument(
         "--output-tsv",
         type=Path,
         default=DEFAULT_TSV_OUTPUT,
-        help="Output TSV (tab-separated values) report file.",
+        help="Output TSV (tab-separated values) report filename.",
+    )
+    parser.add_argument(
+        "--output-jsonl",
+        type=Path,
+        default=DEFAULT_JSONL_OUTPUT,
+        help="Output JSONL report filename.",
     )
     parser.add_argument(
         "--output-log",
         type=Path,
         default=DEFAULT_LOG_OUTPUT,
-        help="Output log file (overwritten each run). Use different path for tests/debug runs.",
+        help="Command line output log filename (overwritten each run). Use different path for tests/debug runs.",
     )
     parser.add_argument(
         "--output-env",
         type=Path,
         default=DEFAULT_ENV_OUTPUT,
-        help="Output environment log file (pip freeze, conda list for reproducibility).",
+        help="Environment log filename (pip freeze, conda list for reproducibility).",
     )
     parser.add_argument(
         "-m",
@@ -6331,16 +6251,7 @@ def main_cli() -> None:
         default=None,
         help="Prompt.",
     )
-    # MOD: Added baseline evaluation argument
-    parser.add_argument(
-        "--baseline-file",
-        type=Path,
-        default=DEFAULT_BASELINE_FILE,
-        help="Path to baseline/golden text file for keyword overlap scoring. "
-        "When provided, the script will calculate a keyword overlap score "
-        "comparing model output to this reference text. "
-        f"(default: {DEFAULT_BASELINE_FILE})",
-    )
+
     metrics_group = parser.add_mutually_exclusive_group()
     metrics_group.add_argument(
         "--detailed-metrics",
@@ -6384,13 +6295,13 @@ def main_cli() -> None:
         "--repetition-penalty",
         type=float,
         default=None,
-        help="Penalize repeated tokens (>1.0 discourages repetition). Default: None (disabled).",
+        help="Penalize repeated tokens (>1.0 discourages repetition). None = no penalty.",
     )
     parser.add_argument(
         "--repetition-context-size",
         type=int,
         default=20,
-        help="Context window size for repetition penalty. Default: 20 tokens.",
+        help="Context window size for repetition penalty.",
     )
     parser.add_argument(
         "--lazy-load",
@@ -6402,7 +6313,7 @@ def main_cli() -> None:
         "--max-kv-size",
         type=int,
         default=None,
-        help="Maximum KV cache size (limits memory for long sequences). Default: None (unlimited).",
+        help="Maximum KV cache size (limits memory for long sequences). None = no limit.",
     )
     parser.add_argument(
         "--kv-bits",
@@ -6415,13 +6326,13 @@ def main_cli() -> None:
         "--kv-group-size",
         type=int,
         default=64,
-        help="Quantization group size for KV cache. Default: 64.",
+        help="Quantization group size for KV cache.",
     )
     parser.add_argument(
         "--quantized-kv-start",
         type=int,
         default=0,
-        help="Start position for KV cache quantization. Default: 0 (from beginning).",
+        help="Start position for KV cache quantization. 0 = from beginning.",
     )
     parser.add_argument(
         "-v",
@@ -6464,7 +6375,7 @@ def main_cli() -> None:
         "--context-marker",
         type=str,
         default="Context:",
-        help="Marker used to identify context section in prompt (default: 'Context:').",
+        help="Marker used to identify context section in prompt.",
     )
 
     # Parse arguments
