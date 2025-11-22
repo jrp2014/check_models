@@ -18,6 +18,7 @@ This guide defines technical conventions and implementation details for develope
 
 - [Core Priorities](#core-priorities)
 - [Philosophy](#philosophy)
+- [Guidelines for AI Agents](#guidelines-for-ai-agents)
 - [Repository Structure](#repository-structure)
 - [Code Standards](#code-standards)
   - [Type Annotations](#type-annotations)
@@ -61,11 +62,39 @@ A single medium-sized, well-commented function is often clearer than a web of on
 
 **Do NOT** introduce a new function solely to silence a complexity/length warning if it harms cohesion. Prefer an inline code comment or a local inner helper (with a brief comment) instead of a file-level public function.
 
+## Guidelines for AI Agents
+
+**If you are an AI assistant or Agent working on this codebase, follow these rules:**
+
+1. **Context First**: Before making changes, read `src/README.md` for CLI usage and `src/quality_config.yaml` for configuration logic.
+2. **Use Existing Tools**:
+    - Run `python -m tools.validate_env` to diagnose environment issues.
+    - Run `make quality` to verify your changes (formatting, linting, typing).
+    - **Do not** create new "test" scripts; use `python -m mlx_vlm.generate` or the official `test_smoke.py` for verification.
+3. **Configuration over Hardcoding**:
+    - **Never** hardcode magic numbers for thresholds (e.g., repetition limits, formatting precision).
+    - Always use or extend `src/quality_config.yaml` and the `QualityThresholds` class.
+4. **Dependency Management**:
+    - If you add an import, you **must** add it to `pyproject.toml` and run `python -m tools.update_readme_deps`.
+5. **Linting**:
+    - Do not suppress lints (e.g., `# noqa`, `# type: ignore`) without a specific, valid reason documented in a comment.
+    - Fix the underlying issue whenever possible.
+6. **Documentation & Alignment**:
+    - **Update All Docs**: Ensure changes are reflected in `src/README.md`, `docs/CONTRIBUTING.md`, and `docs/IMPLEMENTATION_GUIDE.md`.
+    - **Avoid Fragmentation**: Try to avoid changes that require aligning multiple scripts or documents.
+    - **Validate Alignment**: If multi-file alignment is unavoidable, you **must** execute the necessary updates (e.g., sync scripts) and validate that all files are consistent.
+7. **Validation**:
+    - **Add Tests**: Whenever possible, add an easy test case to validate your change.
+
 ## Repository Structure
 
 ### Directory Layout
 
 - **`src/`** - Main Python package containing all code and its `pyproject.toml`
+  - **`src/tools/`** - Developer utilities:
+    - `validate_env.py`: Diagnostics for dependencies and environment.
+    - `update_readme_deps.py`: Syncs `pyproject.toml` deps to `README.md`.
+    - `install_precommit_hook.py`: Sets up git hooks.
 - **`docs/`** - All documentation (CONTRIBUTING.md, IMPLEMENTATION_GUIDE.md, etc.)
 - **`docs/notes/`** - Design notes, reviews, and project evolution documentation
 - **`output/`** - Generated reports (HTML/Markdown, git-ignored)
@@ -162,7 +191,9 @@ Responsibilities:
 ### Configuration
 
 - **`FormattingThresholds`**: Dataclass defining limits for number formatting (decimals, separators).
-- **`QualityThresholds`**: Dataclass defining thresholds for quality analysis (repetition, hallucination). Loaded from `quality_config.yaml`.
+- **`QualityThresholds`**: Dataclass defining thresholds for quality analysis (repetition, hallucination).
+  - **Source of Truth**: These values are loaded from `src/quality_config.yaml`.
+  - **Modification**: To adjust thresholds, edit the YAML file, not the Python code.
 - **`Module Constants`**: Used for fixed values (timeouts, default paths).
 
 **Do not duplicate formatting logic**. If a new metric is introduced, extend the central formatter instead of branching inline.
