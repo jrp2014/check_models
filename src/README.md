@@ -413,7 +413,9 @@ and re-run the sync helper.
 
 Runtime (installed automatically via `pip install -e .` when executed inside `src/`, or via `make install` from repo root):
 
-| Purpose | Package | Minimum |\n| ------- | ------- | ------- |\n| Core tensor/runtime | `mlx` | `>=0.29.1` |
+| Purpose | Package | Minimum |
+| ------- | ------- | ------- |
+| Core tensor/runtime | `mlx` | `>=0.29.1` |
 | Vision‑language utilities | `mlx-vlm` | `>=0.3.0` |
 | Image processing & loading | `Pillow` | `>=10.3.0` |
 | Model cache / discovery | `huggingface-hub` | `>=0.23.0` |
