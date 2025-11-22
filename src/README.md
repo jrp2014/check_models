@@ -3,6 +3,8 @@
 
 `check_models.py` is a focused benchmarking and inspection tool for MLX-compatible Vision Language Models (VLMs) on Apple Silicon. It loads one or more local / cached models, optionally derives a prompt from image metadata (EXIF + GPS), runs generation, and reports performance (tokens, speed, timings, memory) plus outputs in colorized CLI, HTML, Markdown, and TSV formats.
 
+Note: This tool runs MLX-format Vision-Language Models hosted on the [Hugging Face Hub](https://huggingface.co). By default it will run all the models found in your local Hugging Face Hub cache (use `--models` to specify explicit model IDs).
+
 
 ## Who is this for?
 
@@ -21,17 +23,17 @@ Quickest start on Apple Silicon (Python 3.13):
 # From repository root
 make install
 
-# Run against a folder of images (change the path to your images)
+# Run all your cached models against a folder of images (change the path to your images) using a default prompt
 python -m check_models --folder ~/Pictures/Processed --prompt "Describe this image."
 
-# Run against a specific image
+# Run them against a specific image
 python -m check_models --image ~/Pictures/Processed/sample.jpg --prompt "Describe this image."
-# You can now use `--image` to specify a single image file directly. If neither `--folder` nor `--image` is specified, the script will assume the default folder and log diagnostics explaining the assumption.
+# You can  use `--image` to specify a single image file directly. If neither `--folder` nor `--image` is specified, the script will assume a default folder and log diagnostics explaining the assumption.
 
-# Try specific models
+# Try a specific model (which will be downloaded if it is not cached locally)
 python -m check_models --folder ~/Pictures/Processed --models mlx-community/nanoLLaVA mlx-community/llava-1.5-7b-hf
 
-# Exclude a model from auto-discovered cache
+# Exclude a model from the local auto-discovered cache
 python -m check_models --folder ~/Pictures/Processed --exclude "microsoft/Phi-3-vision-128k-instruct"
 ```
 
@@ -58,7 +60,7 @@ python check_models.py -f ~/Pictures/Processed -p "Describe this image."
 
 Key defaults and parameters:
 
-- Models: discovered from Hugging Face cache. Use `--models` for explicit IDs, `--exclude` to filter.
+- Models: discovered from your local Hugging Face cache. Use `--models` for explicit IDs, `--exclude` to filter.
 - Images: `-f/--folder` points to your images; default is `~/Pictures/Processed`. If neither `--folder` nor `--image` is specified, the script assumes the default folder and logs a diagnostic message.
 - **Folder behavior**: When you pass a folder path, the script automatically selects the **most recently modified image file** in that folder (hidden files are ignored). If no image or folder is specified, the default folder is used and a diagnostic is logged.
 - Reports: By default, `output/results.html`, `output/results.md`, `output/results.tsv`, and `output/results.jsonl` are created; override via `--output-html`, `--output-markdown`, `--output-tsv`, and `--output-jsonl`.
@@ -108,7 +110,7 @@ Key defaults and parameters:
 
 This project includes a `pyproject.toml` file that defines all dependencies and can be used with modern Python package managers.
 
-### With uv (fastest)
+### With uv (untested)
 
 ```bash
 # Install uv if you haven't already

@@ -4,14 +4,16 @@ Lightweight CLI to run and benchmark MLX-compatible Vision-Language Models (VLMs
 
 Quick start (recommended):
 
+Note: This tool runs MLX-format Vision-Language Models hosted on the [Hugging Face Hub](https://huggingface.co). By default it will run all the models found in your local Hugging Face Hub model cache (use `--models` to specify explicit model IDs).
+
 ```bash
 # Install runtime dependencies
 make install
 
-# Run against a folder (auto-selects most recent image)
+# Run all models against a folder (auto-selects most recent image) using the default built in prompt
 python -m check_models --folder ~/Pictures/Processed
 
-# Run a single image
+# Run them on a single image
 python -m check_models --image /path/to/photo.jpg
 ```
 
