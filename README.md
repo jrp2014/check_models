@@ -38,3 +38,19 @@ Notes
 For complete CLI usage, examples, and advanced configuration, see `src/README.md`.
 
 License: See the `LICENSE` file.
+
+Install (auto-generated)
+
+The project exposes two installation snippets; these are kept in sync with `src/pyproject.toml`.
+
+<!-- BEGIN MANUAL_INSTALL -->
+```bash
+# (auto-filled by `src/tools/update_readme_deps.py`)
+```
+<!-- END MANUAL_INSTALL -->
+
+<!-- BEGIN MINIMAL_INSTALL -->
+```bash
+# (auto-filled by `src/tools/update_readme_deps.py`)
+```
+<!-- END MINIMAL_INSTALL -->
