@@ -151,15 +151,14 @@ make check-outdated
 
 Run `make help` to see all targets. Key commands:
 
-| Command | Description |\n| :------ | :---------- |
-| `make install` | Install the package |
-| `make dev` | Setup development environment |
-| `make update` | Update conda environment and dependencies |
-| `make upgrade-deps` | Upgrade all dependencies to latest versions |
-| `make test` | Run tests |
-| `make quality` | Run linting and type checks |
-| `make check` | Run full quality pipeline (format, lint, typecheck, test) |
-| `make clean` | Remove generated files |
+- `make install` — Install the package
+- `make dev` — Setup development environment
+- `make update` — Update conda environment and dependencies
+- `make upgrade-deps` — Upgrade all dependencies to latest versions
+- `make test` — Run tests
+- `make quality` — Run linting and type checks
+- `make check` — Run full quality pipeline (format, lint, typecheck, test)
+- `make clean` — Remove generated files
 
 ### Dependency Management
 
