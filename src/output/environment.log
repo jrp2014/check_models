@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2025-11-22 09:22:39 GMT
+FULL ENVIRONMENT DUMP - 2025-11-22 10:17:26 GMT
 ================================================================================
 
 --- pip freeze ---
@@ -14,7 +14,7 @@ certifi==2025.11.12
 cffi==2.0.0
 cfgv==3.5.0
 charset-normalizer==3.4.4
--e git+https://github.com/jrp2014/check_models.git@de90a16804145796cd96ed17170d89421024618a#egg=check_models&subdirectory=src
+-e git+https://github.com/jrp2014/check_models.git@ccf58b2ff24d1488d430781fdf869465892b8831#egg=check_models&subdirectory=src
 click==8.3.1
 cmake==4.2.0
 coverage==7.12.0
@@ -49,7 +49,7 @@ mdurl==0.1.2
 -e git+https://github.com/ml-explore/mlx-lm.git@743f4f7710e72f94ef68160f2fde9dc50280ec84#egg=mlx_lm
 mlx-metal==0.30.0
 -e git+https://github.com/Blaizzy/mlx-vlm.git@8862ce0e6387d1a68a0e1ce47ad689c9431126d4#egg=mlx_vlm
--e git+https://github.com/jrp2014/check_models.git@de90a16804145796cd96ed17170d89421024618a#egg=mlx_vlm_check&subdirectory=src
+-e git+https://github.com/jrp2014/check_models.git@ccf58b2ff24d1488d430781fdf869465892b8831#egg=mlx_vlm_check&subdirectory=src
 mpmath==1.3.0
 multidict==6.7.0
 multiprocess==0.70.18
@@ -285,5 +285,5 @@ yarl                         1.22.0                       pypi_0              py
 zlib                         1.3.1                        h5f15de7_0
 
 ================================================================================
-Environment dump completed at 2025-11-22 09:22:40 GMT
+Environment dump completed at 2025-11-22 10:17:28 GMT
 ================================================================================

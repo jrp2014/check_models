@@ -448,6 +448,7 @@ DEFAULT_HTML_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.html"
 DEFAULT_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.md"
 DEFAULT_TSV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.tsv"
 DEFAULT_LOG_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "check_models.log"
+DEFAULT_JSONL_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.jsonl"
 DEFAULT_ENV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "environment.log"
 DEFAULT_BASELINE_FILE: Final[Path] = _SCRIPT_DIR / "output" / "baseline.txt"
 DEFAULT_TEMPERATURE: Final[float] = 0.1
@@ -1469,9 +1470,9 @@ def _detect_formatting_violations(text: str) -> list[str]:
     # Check for tags (beyond simple breaks) that may interfere with rendering
     html_tags = re.findall(r"<(?!br>|/br>)[a-z]+[^>]*>", text, re.IGNORECASE)
     if html_tags:
-        # Escape the tags in the diagnostic message itself
-        escaped_tags = [tag.replace("<", "&lt;").replace(">", "&gt;") for tag in set(html_tags[:3])]
-        issues.append(f"Unknown tags: {', '.join(escaped_tags)}")
+        # Report the raw tags (escaping handled by reporters)
+        tags_preview = ", ".join(set(html_tags[:3]))
+        issues.append(f"Unknown tags: {tags_preview}")
 
     # Check for excessive markdown structure
     header_count = text.count("\n##") + text.count("\n###")
@@ -3866,8 +3867,7 @@ def generate_html_report(
     try:
         with filename.open("w", encoding="utf-8") as f:
             f.write(html_content)
-        log_metric_label("HTML report saved to:", emoji="📝")
-        log_file_path(filename.resolve())
+        # Logging handled in finalize_execution
     except OSError:
         logger.exception("Failed to write HTML report to %s", filename)
 
@@ -3954,7 +3954,8 @@ def _generate_model_gallery_section(results: list[PerformanceResult]) -> list[st
                 if analysis and analysis.issues:
                     md.append("")
                     md.append("⚠️ **Quality Warnings:**")
-                    md.extend(f"- {issue}" for issue in analysis.issues)
+                    # Escape issues to prevent tags like <end_of_utterance> from being hidden
+                    md.extend(f"- {html.escape(issue)}" for issue in analysis.issues)
 
         md.append("")
         md.append("---")
@@ -4104,8 +4105,7 @@ def generate_markdown_report(
     try:
         with filename.open("w", encoding="utf-8") as f:
             f.write(markdown_content)
-        log_metric_label("Markdown report saved to:", emoji="📝")
-        log_file_path(filename.resolve())
+        # Logging handled in finalize_execution
     except OSError:
         logger.exception(
             "Failed to write Markdown report to file %s.",
@@ -4181,8 +4181,7 @@ def generate_tsv_report(
             # Ensure file ends with newline
             if not tsv_content.endswith("\n"):
                 f.write("\n")
-        log_metric_label("TSV report saved to:", emoji="📝")
-        log_file_path(filename.resolve())
+        # Logging handled in finalize_execution
     except OSError:
         logger.exception("Failed to write TSV report to %s", filename)
 
@@ -4817,7 +4816,13 @@ def log_metric_tree(prefix: str, label: str, value: str, *, indent: str = "") ->
     logger.info(formatted, extra={"style_hint": LogStyles.METRIC_VALUE})
 
 
-def log_generated_text(text: str, *, wrap: bool = True, indent: str = "") -> None:
+def log_generated_text(
+    text: str,
+    *,
+    wrap: bool = True,
+    indent: str = "",
+    max_lines: int | None = None,
+) -> None:
     """Log generated model output with cyan styling and optional wrapping.
 
     Preserves original line breaks in the text. Each line is wrapped independently
@@ -4827,37 +4832,43 @@ def log_generated_text(text: str, *, wrap: bool = True, indent: str = "") -> Non
         text: The generated text to display
         wrap: Whether to wrap long lines to terminal width
         indent: Indentation prefix for each line
+        max_lines: Maximum number of lines to log (truncates if exceeded)
     """
+    lines = text.splitlines()
+    if max_lines is not None and len(lines) > max_lines:
+        lines = lines[:max_lines]
+        lines.append("... (truncated)")
+
     if wrap:
         width = get_terminal_width(max_width=100)
         avail_width = max(20, width - len(indent))
 
         # Process each line independently to preserve line breaks
-        for original_line in text.splitlines():
-            if not original_line:
+        for line in lines:
+            if not line.strip():
                 # Preserve blank lines
-                logger.info(indent, extra={"style_hint": LogStyles.GENERATED_TEXT})
+                logger.info("", extra={"style_hint": LogStyles.GENERATED_TEXT})
                 continue
 
             # Wrap only if line exceeds available width
-            if len(original_line) <= avail_width:
-                formatted = f"{indent}{original_line}"
+            if len(line) <= avail_width:
+                formatted = f"{indent}{line}"
                 logger.info(formatted, extra={"style_hint": LogStyles.GENERATED_TEXT})
             else:
                 # Wrap this line while preserving its content
                 wrapped = textwrap.wrap(
-                    original_line,
+                    line,
                     width=avail_width,
                     break_long_words=False,
                     break_on_hyphens=False,
-                ) or [original_line]
+                ) or [line]
                 for wrapped_line in wrapped:
                     formatted = f"{indent}{wrapped_line}"
                     logger.info(formatted, extra={"style_hint": LogStyles.GENERATED_TEXT})
     else:
         # No wrapping - output each line as-is
-        for original_line in text.splitlines():
-            formatted = f"{indent}{original_line}"
+        for line in lines:
+            formatted = f"{indent}{line}"
             logger.info(formatted, extra={"style_hint": LogStyles.GENERATED_TEXT})
 
 
@@ -4952,12 +4963,10 @@ def _summary_parts(res: PerformanceResult, model_short: str) -> list[str]:
             parts.append(time_str)
     if res.error_stage:
         parts.append(f"stage={res.error_stage}")
-    if res.error_message:
-        clean_err = re.sub(r"\s+", " ", str(res.error_message))
-        preview = clean_err[:ERROR_MESSAGE_PREVIEW_LEN].rstrip()
-        if len(clean_err) > ERROR_MESSAGE_PREVIEW_LEN:
-            preview += "…"
-        parts.append(f"error={preview}")
+    if res.error_stage:
+        parts.append(f"stage={res.error_stage}")
+    # Error message removed from summary line to avoid truncation/duplication
+    # It will be logged in full by print_model_result
     return parts
 
 
@@ -5000,7 +5009,8 @@ def _preview_generation(
         missing = ", ".join(analysis.missing_context_terms[:3])
         log_warning_note(f"Context ignored (missing: {missing})")
 
-    log_generated_text(text_val, wrap=True)
+    # Truncate log output to 3 lines to keep logs clean (full text in results.md)
+    log_generated_text(text_val, wrap=True, max_lines=3)
 
 
 def _log_verbose_success_details_mode(
@@ -5308,8 +5318,9 @@ def print_model_result(
     # For failures, show detailed error info; for success, show generation details
     if not result.success:
         log_blank()
-        if result.error_stage:
-            logger.info("Stage: %s", result.error_stage)
+    if not result.success:
+        log_blank()
+        # Stage is already in summary, so we only log the full error here
         if result.error_message:
             logger.info("Error: %s", result.error_message)
         if result.captured_output_on_fail:
@@ -5495,8 +5506,8 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
 def find_and_validate_image(args: argparse.Namespace) -> Path:
     """Find and validate the image file to process from arguments."""
     folder_path: Path = args.folder.resolve()
-    print_cli_section("Scanning folder:")
-    log_file_path(str(folder_path))
+    # Compact logging for folder
+    log_file_path(str(folder_path), label="Scanning folder:")
 
     # Exit immediately if folder does not exist
     if not folder_path.is_dir():
@@ -5511,8 +5522,8 @@ def find_and_validate_image(args: argparse.Namespace) -> Path:
         raise SystemExit  # pragma: no cover
 
     resolved_image_path: Path = image_path.resolve()
-    print_cli_section("Image File:")
-    log_file_path(str(resolved_image_path))
+    # Compact logging for image file
+    log_file_path(str(resolved_image_path), label="Image File:     ")
 
     try:
         with Image.open(resolved_image_path) as img:
@@ -5784,8 +5795,8 @@ def process_models(
         # Use full model ID (e.g. "mlx-community/Qwen2-VL-2B-Instruct") instead of just the name
         model_label = model_id
         progress = f"[{idx}/{len(model_identifiers)}]"
-        print_cli_section(f"Processing Model {progress}:")
-        log_model_name(model_label)
+        # Compact logging for model header
+        log_model_name(model_label, label=f"Processing Model {progress}:")
 
         is_vlm_verbose: bool = args.verbose
         params = ProcessImageParams(
@@ -6055,6 +6066,76 @@ def log_failure_summary(buckets: dict[str, list[str]]) -> None:
     log_rule(80, char="=", post_newline=True)
 
 
+def log_summary(results: list[PerformanceResult]) -> None:
+    """Log a text-based summary of the execution results to the log file."""
+    if not results:
+        return
+
+    log_blank()
+    log_rule(color=Colors.BLUE, bold=True)
+    logger.info("FINAL SUMMARY", extra={"style_hint": LogStyles.HEADER})
+    log_rule(color=Colors.BLUE, bold=True)
+
+    # Failed models
+    failed = [r for r in results if not r.success]
+    if failed:
+        logger.info("❌ Failed Models (%d):", len(failed))
+        for res in failed:
+            logger.info(
+                "  - %s (%s)",
+                res.model_name,
+                res.error_stage or "Unknown",
+                extra={"style_hint": LogStyles.ERROR},
+            )
+        log_blank()
+
+    # Success stats
+    successful = [r for r in results if r.success]
+    if successful:
+        logger.info("✅ Successful Models (%d):", len(successful))
+        # Sort by generation tps (descending)
+        sorted_success = sorted(
+            successful,
+            key=lambda r: getattr(r.generation, "generation_tps", 0) or 0,
+            reverse=True,
+        )
+        for res in sorted_success:
+            tps = getattr(res.generation, "generation_tps", 0) or 0
+            logger.info(
+                "  - %s: %.1f tps",
+                res.model_name,
+                tps,
+                extra={"style_hint": LogStyles.SUCCESS},
+            )
+
+
+def save_jsonl_report(results: list[PerformanceResult], filename: Path) -> None:
+    """Save results to a JSONL file for programmatic analysis."""
+    try:
+        with filename.open("w", encoding="utf-8") as f:
+            for res in results:
+                record = {
+                    "model": res.model_name,
+                    "success": res.success,
+                    "error_stage": res.error_stage,
+                    "error_message": res.error_message,
+                    "quality_issues": res.quality_issues,
+                    "metrics": {},
+                }
+                if res.generation:
+                    gen = res.generation
+                    record["metrics"] = {
+                        "prompt_tokens": getattr(gen, "prompt_tokens", 0),
+                        "generation_tokens": getattr(gen, "generation_tokens", 0),
+                        "generation_tps": getattr(gen, "generation_tps", 0.0),
+                        "peak_memory_gb": getattr(gen, "peak_memory", 0.0),
+                    }
+                f.write(json.dumps(record) + "\n")
+        # Logging handled in finalize_execution
+    except OSError:
+        logger.exception("Failed to write JSONL report to %s", filename)
+
+
 def finalize_execution(
     *,
     args: argparse.Namespace,
@@ -6071,22 +6152,10 @@ def finalize_execution(
         print_model_stats(results)
 
         # MOD: Added failure bucketing summary for better diagnostics
-        # Group failures by root cause before showing detailed issues
-        failed_count = sum(1 for r in results if not r.success)
-        if failed_count > 0:
-            buckets = _bucket_failures_by_error(results)
-            log_failure_summary(buckets)
+        # (Already handled by print_model_stats and results.md, but we add log summary now)
+        log_summary(results)
 
-        # Add model issues summary
-        summary = analyze_model_issues(results)
-        stats = compute_performance_statistics(results)
-        issues_text = format_issues_summary_text(summary, stats)
-        if issues_text:
-            log_blank()
-            logger.info(issues_text)
-            log_blank()
-
-        print_cli_section("Report Generation")
+        # Generate reports
         try:
             html_output_path: Path = args.output_html.resolve()
             md_output_path: Path = args.output_markdown.resolve()
@@ -6097,7 +6166,7 @@ def finalize_execution(
 
             generate_html_report(
                 results=results,
-                filename=html_output_path,
+                filename=args.output_html,
                 versions=library_versions,
                 prompt=prompt,
                 total_runtime_seconds=overall_time,
@@ -6105,25 +6174,32 @@ def finalize_execution(
             )
             generate_markdown_report(
                 results=results,
-                filename=md_output_path,
+                filename=args.output_markdown,
                 versions=library_versions,
                 prompt=prompt,
                 total_runtime_seconds=overall_time,
             )
             generate_tsv_report(
                 results=results,
-                filename=tsv_output_path,
+                filename=args.output_tsv,
             )
+            # New: Save JSONL report
+            save_jsonl_report(results, DEFAULT_JSONL_OUTPUT)
 
+            # Log file locations
             logger.info("")
             log_success("Reports successfully generated:", prefix="📊")
-            log_file_path(html_output_path, label="   HTML:       ")
-            log_file_path(md_output_path, label="   Markdown:   ")
-            log_file_path(tsv_output_path, label="   TSV:        ")
-            log_output = args.output_log.resolve()
-            log_file_path(log_output, label="   Log:        ")
+            log_file_path(args.output_html, label="   HTML Report:")
+            log_file_path(
+                args.output_markdown,
+                label="   Markdown Report:",
+            )
+            log_file_path(args.output_tsv, label="   TSV Report:   ")
+            log_file_path(DEFAULT_JSONL_OUTPUT, label="   JSONL Report: ")
+
+            log_file_path(DEFAULT_LOG_OUTPUT, label="   Log File:")
             # Include environment.log in the output file listing
-            env_log = args.output_env.resolve()
+            env_log = DEFAULT_ENV_OUTPUT.resolve()
             if env_log.exists():
                 log_file_path(env_log, label="   Environment:")
         except (OSError, ValueError):
