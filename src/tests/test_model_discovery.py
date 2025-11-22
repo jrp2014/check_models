@@ -13,12 +13,12 @@ def test_get_cached_model_ids_returns_list():
     """Should return a list of model IDs from cache."""
     try:
         model_ids = check_models.get_cached_model_ids()
+        assert isinstance(model_ids, list)
+        # May be empty if no models cached
+        for model_id in model_ids:
+            assert isinstance(model_id, str)
     except CacheNotFound:
         pytest.skip("HuggingFace cache directory not found (expected in CI)")
-    assert isinstance(model_ids, list)
-    # May be empty if no models cached
-    for model_id in model_ids:
-        assert isinstance(model_id, str)
 
 
 def test_validate_model_identifier_accepts_valid_huggingface_format():
