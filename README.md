@@ -17,13 +17,13 @@ python -m check_models --image /path/to/photo.jpg
 
 Where to find detailed docs
 
-- Canonical CLI reference and developer guide: `src/README.md` (full parameter reference, examples, troubleshooting).
-- Developer and contribution guidelines: `docs/CONTRIBUTING.md`.
+- Canonical CLI reference and developer guide: [src/README.md](src/README.md) (full parameter reference, examples, troubleshooting).
+- Developer and contribution guidelines: [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
 
 Common make commands:
 
 ```bash
-make install   # install runtime deps
+make install   # install runtime dependencies
 make dev       # install dev deps and set up hooks
 make test      # run test suite
 make quality   # run formatting, linting, and type checks
@@ -35,22 +35,6 @@ Notes
 - Platform: macOS with Apple Silicon (recommended).
 - Output files are written to `output/` by default and are git-ignored.
 
-For complete CLI usage, examples, and advanced configuration, see `src/README.md`.
+For complete CLI usage, examples, and advanced configuration, see [src/README.md](src/README.md).
 
-License: See the `LICENSE` file.
-
-Install (auto-generated)
-
-The project exposes two installation snippets; these are kept in sync with `src/pyproject.toml`.
-
-<!-- BEGIN MANUAL_INSTALL -->
-```bash
-# (auto-filled by `src/tools/update_readme_deps.py`)
-```
-<!-- END MANUAL_INSTALL -->
-
-<!-- BEGIN MINIMAL_INSTALL -->
-```bash
-# (auto-filled by `src/tools/update_readme_deps.py`)
-```
-<!-- END MINIMAL_INSTALL -->
+License: See the [LICENSE](LICENSE) file.
