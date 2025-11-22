@@ -506,6 +506,9 @@ class PerformanceResult:
     error_type: str | None = None  # Original exception type name (e.g., "TypeError", "ImportError")
     # MOD: Consolidated quality analysis into single field
     quality_issues: str | None = None  # Detected issues (e.g., "repetitive, verbose")
+    # MOD: Added detailed memory profiling
+    active_memory: float | None = None  # Active GPU memory in GB
+    cache_memory: float | None = None  # Cached GPU memory in GB
 
 
 class ResultSet:
@@ -1001,17 +1004,16 @@ MIN_NAME_COL_WIDTH: Final[int] = len("Model")
 # Field display configuration: maps field names to (label, unit) tuples
 # This centralizes all field metadata in one place for consistency
 FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
-    "token": ("Token", "(ct)"),
-    "prompt_tokens": ("Prompt", "(ct)"),
-    "generation_tokens": ("Gen", "(ct)"),
-    "total_tokens": ("Total", "Tokens"),
-    "prompt_tps": ("Prompt", "(t/s)"),
-    "generation_tps": ("Gen", "(t/s)"),
+    "prompt_tokens": ("Prompt", "(tokens)"),
+    "generation_tokens": ("Generation", "(tokens)"),
+    "generation_tps": ("Gen TPS", ""),
     "peak_memory": ("Peak", "(GB)"),
     "generation_time": ("Generation", "(s)"),
     "model_load_time": ("Load", "(s)"),
     "total_time": ("Total", "(s)"),
     "quality_issues": ("Quality Issues", ""),  # MOD: Consolidated quality analysis
+    "active_memory": ("Active Mem", "(GB)"),  # MOD: Active GPU memory
+    "cache_memory": ("Cache Mem", "(GB)"),  # MOD: Cached GPU memory
 }
 
 # Threshold for splitting long header text into multiple lines
@@ -4672,6 +4674,12 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         if generation_time is not None:
             model_load_time = max(0.0, total_time - generation_time)
 
+        # Capture detailed memory metrics before cleanup
+        active_mem_bytes = mx.metal.get_active_memory()
+        cache_mem_bytes = mx.metal.get_cache_memory()
+        active_mem_gb = active_mem_bytes / (1024**3)  # Convert to GB
+        cache_mem_gb = cache_mem_bytes / (1024**3)  # Convert to GB
+
         return PerformanceResult(
             model_name=params.model_identifier,
             generation=output,
@@ -4679,6 +4687,8 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             generation_time=generation_time,
             model_load_time=model_load_time,
             total_time=total_time,
+            active_memory=active_mem_gb,
+            cache_memory=cache_mem_gb,
         )
     except TimeoutError as e:
         # Full traceback already logged at ERROR level in _run_model_generation
@@ -6183,10 +6193,19 @@ def log_summary(results: list[PerformanceResult]) -> None:
         )
         for res in sorted_success:
             tps = getattr(res.generation, "generation_tps", 0) or 0
+            active_mem = res.active_memory if res.active_memory else 0.0
+            cache_mem = res.cache_memory if res.cache_memory else 0.0
+
+            # Format memory info only if we have data
+            mem_info = ""
+            if active_mem > 0 or cache_mem > 0:
+                mem_info = f" (Active: {active_mem:.1f}GB, Cache: {cache_mem:.1f}GB)"
+
             logger.info(
-                "  - %s: %.1f tps",
+                "  - %s: %.1f tps%s",
                 res.model_name,
                 tps,
+                mem_info,
                 extra={"style_hint": LogStyles.SUCCESS},
             )
 
@@ -6211,6 +6230,8 @@ def save_jsonl_report(results: list[PerformanceResult], filename: Path) -> None:
                         "generation_tokens": getattr(gen, "generation_tokens", 0),
                         "generation_tps": getattr(gen, "generation_tps", 0.0),
                         "peak_memory_gb": getattr(gen, "peak_memory", 0.0),
+                        "active_memory_gb": res.active_memory if res.active_memory else 0.0,
+                        "cache_memory_gb": res.cache_memory if res.cache_memory else 0.0,
                     }
                 f.write(json.dumps(record) + "\n")
         # Logging handled in finalize_execution

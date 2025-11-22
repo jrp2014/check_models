@@ -247,7 +247,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- BEGIN MANUAL_INSTALL -->
 ```bash
-pip install "huggingface-hub[mcp,torch,typing]>=0.23.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "tzlocal>=5.0"
+pip install "huggingface-hub[cli,torch,typing]>=0.34.0,<1.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "tzlocal>=5.0"
 ```
 <!-- END MANUAL_INSTALL -->
 
@@ -318,7 +318,7 @@ Development / QA:
 
 <!-- BEGIN MINIMAL_INSTALL -->
 ```bash
-pip install "huggingface-hub[mcp,torch,typing]>=0.23.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "tzlocal>=5.0"
+pip install "huggingface-hub[cli,torch,typing]>=0.34.0,<1.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "tzlocal>=5.0"
 ```
 <!-- END MINIMAL_INSTALL -->
 

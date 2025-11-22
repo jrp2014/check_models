@@ -31,7 +31,7 @@ dependencies = [
     "mlx>=0.29.1",
     "mlx-vlm>=0.3.0",
     "Pillow>=10.3.0",
-    "huggingface-hub[mcp,torch,typing]>=0.23.0",
+    "huggingface-hub[cli,torch,typing]>=0.34.0,<1.0",  # Constrained by transformers 4.57.1
     "tabulate>=0.9.0",
     "tzlocal>=5.0",
     "PyYAML>=6.0",
@@ -89,7 +89,28 @@ build-backend = "setuptools.build_meta"
 
 [tool.ruff]
 line-length = 100
-exclude = [".venv", "__pycache__", "build", "dist", "src/tools/.archived"]
+exclude = [
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".venv*",
+    "__pycache__", 
+    "__pypackages__",
+    "_build",
+    "build",
+    "dist",
+    "src/tools/.archived",
+    "venv",
+]
 indent-width = 4
 
 [tool.ruff.format]
