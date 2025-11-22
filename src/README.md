@@ -912,41 +912,38 @@ The default conda target is `mlx-vlm`, but you can override it with `CONDA_ENV=y
 
 ## All Available Make Commands
 
+
 Run `make help` to see all targets. **Key commands:**
 
-| Command | Description |
-| :------ | :---------- |
-| `make install` | Install the package |
-| `make dev` | Setup development environment |
-| `make update` | Update conda environment and dependencies |
-| `make upgrade-deps` | Upgrade all dependencies to latest versions |
-| `make test` | Run tests |
-| `make quality` | Run linting and type checks |
-| `make check` | Run full quality pipeline (format, lint, typecheck, test) |
-| `make clean` | Remove generated files |
+- `make install` — Install the package
+- `make dev` — Setup development environment
+- `make update` — Update conda environment and dependencies
+- `make upgrade-deps` — Upgrade all dependencies to latest versions
+- `make test` — Run tests
+- `make quality` — Run linting and type checks
+- `make check` — Run full quality pipeline (format, lint, typecheck, test)
+- `make clean` — Remove generated files
 
-Additional make targets are listed later in the README.
+Additional make targets are listed later in the README. Key targets include:
 
-| Target | Purpose | Notes |
-| ------ | ------- | ----- |
-| `make help` | Show all targets | Displays active vs target env. |
-| `make install-dev` | Editable install with dev extras | Equivalent to changing into `src/` then `pip install -e .[dev]`. |
-| `make install-markdownlint` | Install markdownlint-cli2 | Requires Node.js/npm. Optional for markdown linting. |
-| `make install` | Runtime‑only editable install | No dev/test tooling. |
-| `make bootstrap-dev` | Full dev setup | Installs Python deps + markdownlint + git hooks. |
-| `make format` | Run `ruff format` | Applies canonical formatting. |
-| `make lint` | Run `ruff check` (no fixes) | Fails on style violations. |
-| `make lint-fix` | Run `ruff check --fix` | Auto‑fixes where safe. |
-| `make typecheck` | Run `mypy` | Uses `src/pyproject.toml` config. |
-| `make test` | Run pytest suite | Uses settings in `pyproject.toml`. |
-| `make test-cov` | Pytest with coverage | Generates terminal + XML report. |
-| `make quality` | Invoke integrated quality script | Wraps format + lint + mypy + markdownlint. |
-| `make quality-strict` | Quality script (require tools, no stubs) | Adds `--require --no-stubs`. |
-| `make run ARGS="..."` | Run the CLI script | Pass CLI args via `ARGS`. |
-| `make smoke` | Fast help invocation | Sanity check only. |
-| `make check` | format + lint + typecheck + test | Quick pre‑commit aggregate. |
-| `make validate-env` | Check environment setup | Validates Python packages installed. |
-| `make clean` | Remove caches / pyc | Safe cleanup. |
+- `make help` — Show all targets (displays active vs target env)
+- `make install-dev` — Editable install with dev extras (`pip install -e .[dev]`)
+- `make install-markdownlint` — Install `markdownlint-cli2` (requires Node.js/npm)
+- `make install` — Runtime‑only editable install (no dev/test tooling)
+- `make bootstrap-dev` — Full dev setup (installs Python deps + markdownlint + git hooks)
+- `make format` — Run `ruff format`
+- `make lint` — Run `ruff check` (no fixes)
+- `make lint-fix` — Run `ruff check --fix`
+- `make typecheck` — Run `mypy`
+- `make test` — Run pytest suite
+- `make test-cov` — Pytest with coverage (terminal + XML report)
+- `make quality` — Invoke integrated quality script (format + lint + mypy + markdownlint)
+- `make quality-strict` — Quality script (require tools, no stubs)
+- `make run ARGS="..."` — Run the CLI script (pass CLI args via `ARGS`)
+- `make smoke` — Fast help invocation (sanity check)
+- `make check` — Format + lint + typecheck + test (pre‑commit aggregate)
+- `make validate-env` — Check environment setup (validates Python packages)
+- `make clean` — Remove caches / pyc
 
 Examples:
 
