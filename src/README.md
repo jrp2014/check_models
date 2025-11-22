@@ -1,62 +1,7 @@
-
 # MLX Vision Language Model Checker (`check_models.py`)
 
 `check_models.py` is a focused benchmarking and inspection tool for MLX-compatible Vision Language Models (VLMs) on Apple Silicon. It loads one or more local / cached models, optionally derives a prompt from image metadata (EXIF + GPS), runs generation, and reports performance (tokens, speed, timings, memory) plus outputs in colorized CLI, HTML, Markdown, and TSV formats.
 
-
-## Who is this for?
-
-- Users (including MLX/MLX‑VLM/MLX‑LM developers) who want to run models on their own images and quickly see outputs and metrics: see the TL;DR below.
-- Contributors who want to work on `check_models.py` itself and keep quality gates green: see the Contributors section near the end.
-
-
-## TL;DR for Users
-
-Defaults assume you have Hugging Face models in your local cache. The tool will discover cached VLMs automatically (unless you pass `--models`), carefully read EXIF metadata (including GPS/time when present) to enrich prompts, and write reports to `output/results.html`, `output/results.md`, `output/results.tsv`, and `output/results.jsonl` by default.
-
-
-Quickest start on Apple Silicon (Python 3.13):
-
-```bash
-# From repository root
-make install
-
-# Run against a folder of images (change the path to your images)
-python -m check_models --folder ~/Pictures/Processed --prompt "Describe this image."
-
-# Run against a specific image
-python -m check_models --image ~/Pictures/Processed/sample.jpg --prompt "Describe this image."
-# You can now use `--image` to specify a single image file directly. If neither `--folder` nor `--image` is specified, the script will assume the default folder and log diagnostics explaining the assumption.
-
-# Try specific models
-python -m check_models --folder ~/Pictures/Processed --models mlx-community/nanoLLaVA mlx-community/llava-1.5-7b-hf
-
-# Exclude a model from auto-discovered cache
-python -m check_models --folder ~/Pictures/Processed --exclude "microsoft/Phi-3-vision-128k-instruct"
-```
-
-
-Prefer working directly in `src/`?
-
-```bash
-cd src
-python -m venv .venv && source .venv/bin/activate
-pip install -e .
-
-# Optional extras for system metrics & tokenizers
-pip install -e ".[extras]"
-
-# Optional: Install PyTorch (needed for some models like Phi-3-vision)
-pip install -e ".[torch]"
-
-# Run directly
-python check_models.py -f ~/Pictures/Processed -p "Describe this image."
-```
-
-**Python**: 3.13+ (project is configured and tested on Python 3.13)
-
-
-Key defaults and parameters:
 
 - Models: discovered from Hugging Face cache. Use `--models` for explicit IDs, `--exclude` to filter.
 - Images: `-f/--folder` points to your images; default is `~/Pictures/Processed`. If neither `--folder` nor `--image` is specified, the script assumes the default folder and logs a diagnostic message.
@@ -1056,3 +1001,45 @@ python tools/check_quality.py . tools
 ```
 
 Requirements: `ruff` and `mypy` (install with `pip install -e ".[dev]"`).
+
+## Migrated examples (from root README)
+
+The following examples were migrated from the repository root `README.md` to centralize CLI usage examples in this document. They are preserved for convenience and backward-compatibility.
+
+### Quick Examples
+
+```bash
+# Run on a specific image
+python -m check_models --image /path/to/photo.jpg
+
+# Run on a folder (uses most recent image)
+python -m check_models --folder ~/Pictures
+
+# Specify a model
+python -m check_models --model mlx-community/Qwen2-VL-2B-Instruct-4bit --image photo.jpg
+
+# Generate HTML report (specify output path)
+python -m check_models --image photo.jpg --html output/results.html
+
+# Use a custom prompt
+python -m check_models --image photo.jpg --prompt "Describe this in detail"
+```
+
+### Using Make Commands (convenience)
+
+```bash
+make install      # Install the package
+make test         # Run tests
+make quality      # Run code quality checks
+make clean        # Remove generated files
+```
+
+### What You Get (summary)
+
+- Instant results: run MLX-compatible VLMs on images
+- Performance metrics: tokens/sec, memory usage, generation time
+- Multiple formats: HTML reports and GitHub-friendly Markdown
+- Smart image handling: folder mode selects latest image automatically
+- Metadata extraction: EXIF + GPS extraction when available
+
+These examples were taken from the root README to keep `src/README.md` the canonical CLI reference.
