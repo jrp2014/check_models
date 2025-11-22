@@ -877,21 +877,24 @@ If TensorFlow is installed, the script's automatic blocking (`TRANSFORMERS_NO_TF
 ## Project Structure
 
 ```text
-mlx-vlm-check/
+check_models/
 ├── src/
 │   ├── check_models.py      # Main script
+│   ├── Makefile.            # Orchestration (uses, eg, the helper scripts)
 │   ├── pyproject.toml       # Project configuration and dependencies  
 │   ├── tools/               # Helper scripts
-│   └── tests/               # Test suite
-├── output/
-│   ├── results.html        # Generated HTML report (default location)
-│   └── results.md          # Generated Markdown report (default location)
-├── docs/                   # Documentation
-├── typings/                # Generated type stubs (git-ignored)
-└── Makefile               # Root orchestration
+│   └── tests/               # PyTest test suite
+│   └── output/
+│       ├── results.html     # Generated HTML report (default location)
+│       └── results.md       # Generated Markdown report (default location)
+│       └── results.tsv      # Generated a tab-separated values summary of the run (default location)
+│       └── results.json     # Generated JSON Lines summary of the run (default location)
+├── docs/                    # Documentation
+├── typings/                 # Generated type stubs (git-ignored)
+└── Makefile                 # Root orchestration
 ```
 
-**Output behavior**: By default, reports are written to `output/` (git-ignored). Override with `--output-html`, `--output-markdown`, and `--output-tsv`.
+**Output behaviour**: By default, reports are written to `output/` (git-ignored). Override with `--output-html`, `--output-markdown`, and `--output-tsv`.
 
 ## Contributing
 
