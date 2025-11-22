@@ -1017,6 +1017,7 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
 # Threshold for splitting long header text into multiple lines
 HEADER_SPLIT_LENGTH = 10
 ERROR_MESSAGE_PREVIEW_LEN: Final[int] = 40  # Max chars to show from error in summary line
+MAX_QUALITY_ISSUES_LEN: Final[int] = 30  # Max chars for quality issues in Markdown tables
 
 # Numeric fields are automatically derived from FIELD_ABBREVIATIONS for consistency
 NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(FIELD_ABBREVIATIONS.keys())
@@ -2982,6 +2983,12 @@ def _prepare_table_data(
                         if res.error_message
                         else "Unknown error",
                     )
+            elif field_name == "quality_issues":
+                # Truncate quality issues for Markdown table display
+                value = _get_field_value(res, field_name)
+                formatted_value = format_field_value(field_name, value)
+                truncated_value = _truncate_quality_issues(formatted_value)
+                row.append(truncated_value)
             else:
                 value = _get_field_value(res, field_name)
                 row.append(format_field_value(field_name, value))
@@ -5937,6 +5944,57 @@ def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | N
     return ", ".join(issues) if issues else None
 
 
+def _parse_quality_issues_to_list(quality_issues: str | None) -> list[str]:
+    """Parse quality issues string into a list of individual issues.
+
+    Args:
+        quality_issues: Comma-separated quality issues string or None
+
+    Returns:
+        List of individual quality issue strings, or empty list if None
+
+    Examples:
+        >>> _parse_quality_issues_to_list("repetitive(<s>), verbose")
+        ['repetitive(<s>)', 'verbose']
+        >>> _parse_quality_issues_to_list(None)
+        []
+    """
+    if not quality_issues:
+        return []
+    return [issue.strip() for issue in quality_issues.split(",")]
+
+
+def _truncate_quality_issues(
+    quality_issues: str | None,
+    max_len: int = MAX_QUALITY_ISSUES_LEN,
+) -> str:
+    """Truncate quality issues string for display in Markdown tables.
+
+    Args:
+        quality_issues: Comma-separated quality issues string or None
+        max_len: Maximum length for the truncated string
+
+    Returns:
+        Truncated quality issues string with ellipsis if needed, or empty string if None
+
+    Examples:
+        >>> _truncate_quality_issues("repetitive(<s>), verbose, formatting", 20)
+        'repetitive(<s>), ...'
+        >>> _truncate_quality_issues("short", 20)
+        'short'
+    """
+    if not quality_issues:
+        return ""
+    if len(quality_issues) <= max_len:
+        return quality_issues
+    # Try to truncate at a comma boundary
+    truncated = quality_issues[:max_len]
+    last_comma = truncated.rfind(",")
+    if last_comma > 0:
+        return truncated[:last_comma] + ", ..."
+    return truncated.rstrip() + "..."
+
+
 # MOD: Added error bucketing diagnostic helper
 def _bucket_failures_by_error(
     results: list[PerformanceResult],
@@ -6143,7 +6201,7 @@ def save_jsonl_report(results: list[PerformanceResult], filename: Path) -> None:
                     "success": res.success,
                     "error_stage": res.error_stage,
                     "error_message": res.error_message,
-                    "quality_issues": res.quality_issues,
+                    "quality_issues": _parse_quality_issues_to_list(res.quality_issues),
                     "metrics": {},
                 }
                 if res.generation:

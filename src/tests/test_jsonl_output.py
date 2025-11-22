@@ -102,3 +102,54 @@ def test_save_jsonl_report_failed_model(tmp_path: Path) -> None:
     assert data["success"] is False
     assert data["error_message"] == "Something went wrong"
     assert data["error_stage"] == "Model Load"
+
+
+def test_save_jsonl_report_quality_issues_as_list(tmp_path: Path) -> None:
+    """Test that quality_issues is saved as a list of strings in JSONL."""
+    output_file = tmp_path / "results.jsonl"
+
+    gen = MockGeneration()
+    result = PerformanceResult(
+        model_name="test-model",
+        generation=gen,
+        success=True,
+        quality_issues="repetitive(<s>), verbose, formatting",
+        generation_time=1.5,
+        model_load_time=0.5,
+        total_time=2.0,
+    )
+
+    results = [result]
+    save_jsonl_report(results, output_file)
+
+    lines = output_file.read_text().strip().split("\n")
+    data = json.loads(lines[0])
+
+    assert data["model"] == "test-model"
+    assert isinstance(data["quality_issues"], list)
+    assert data["quality_issues"] == ["repetitive(<s>)", "verbose", "formatting"]
+
+
+def test_save_jsonl_report_no_quality_issues(tmp_path: Path) -> None:
+    """Test that quality_issues is an empty list when None."""
+    output_file = tmp_path / "results.jsonl"
+
+    gen = MockGeneration()
+    result = PerformanceResult(
+        model_name="test-model",
+        generation=gen,
+        success=True,
+        quality_issues=None,
+        generation_time=1.5,
+        model_load_time=0.5,
+        total_time=2.0,
+    )
+
+    results = [result]
+    save_jsonl_report(results, output_file)
+
+    lines = output_file.read_text().strip().split("\n")
+    data = json.loads(lines[0])
+
+    assert data["model"] == "test-model"
+    assert data["quality_issues"] == []
