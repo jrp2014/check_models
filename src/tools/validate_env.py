@@ -31,6 +31,7 @@ logger = logging.getLogger("validate-env")
 REQUIRED_PYTHON_VERSION: Final[tuple[int, int]] = (3, 13)
 # Default env name, but we'll try to detect or be flexible
 EXPECTED_CONDA_ENV: Final[str] = "mlx-vlm"
+EXPECTED_SPLIT_PARTS: Final[int] = 2
 
 
 class ValidationError(Exception):
@@ -62,11 +63,11 @@ def load_pyproject_deps() -> tuple[dict[str, str], dict[str, str], dict[str, str
     core_deps = {}
     for dep in dependencies:
         parts = dep.split(">=", 1)
-        if len(parts) == 2:
+        if len(parts) == EXPECTED_SPLIT_PARTS:
             core_deps[parts[0].strip()] = ">=" + parts[1].strip()
         else:
             parts = dep.split("==", 1)
-            if len(parts) == 2:
+            if len(parts) == EXPECTED_SPLIT_PARTS:
                 core_deps[parts[0].strip()] = "==" + parts[1].strip()
             else:
                 core_deps[dep.strip()] = ""
@@ -78,7 +79,7 @@ def load_pyproject_deps() -> tuple[dict[str, str], dict[str, str], dict[str, str
         target_dict = dev_deps if group == "dev" else extras_deps
         for dep in deps:
             parts = dep.split(">=", 1)
-            if len(parts) == 2:
+            if len(parts) == EXPECTED_SPLIT_PARTS:
                 target_dict[parts[0].strip()] = ">=" + parts[1].strip()
             else:
                 target_dict[dep.strip()] = ""
@@ -182,7 +183,7 @@ def check_git_hooks() -> bool:
         return True
 
     logger.warning("⚠ Git pre-commit hook NOT installed")
-    logger.warning("  Install with: python -m vlm.tools.install_precommit_hook")
+    logger.warning("  Install with: python -m tools.install_precommit_hook")
     return False
 
 

@@ -4,7 +4,29 @@ Lightweight CLI to run and benchmark MLX-compatible Vision-Language Models (VLMs
 
 Quick start (recommended):
 
-Note: This tool runs MLX-format Vision-Language Models hosted on the [Hugging Face Hub](https://huggingface.co). By default it will run all the models found in your local Hugging Face Hub model cache (use `--models` to specify explicit model IDs).
+
+> [!NOTE]
+> This tool runs MLX-format Vision-Language Models hosted on the [Hugging Face Hub](https://huggingface.co). By default it will run all the models found in your local Hugging Face Hub model cache (use `--models` to specify explicit model IDs).
+
+## Why use this tool?
+
+While `mlx-vlm` provides excellent raw generation capabilities, `check_models.py` adds a layer of **batch processing, standardized benchmarking, and reporting** essential for model evaluation:
+
+- **Batch Processing**: Run multiple models against multiple images in one go.
+- **Standardized Metrics**: Automatically capture tokens/sec, memory usage, and load times in a consistent format.
+- **Rich Reporting**: Generate HTML, Markdown, and JSONL reports for easy sharing and analysis.
+- **Robustness**: Handles model failures gracefully (timeouts, errors) without crashing the entire batch.
+- **Metadata Awareness**: Uses EXIF and GPS data from images to generate context-aware prompts automatically.
+
+## Ecosystem
+
+This tool is part of the broader MLX ecosystem on Apple Silicon:
+
+- **[MLX](https://github.com/ml-explore/mlx)**: The array framework for machine learning on Apple Silicon.
+- **[MLX VLM](https://github.com/ml-explore/mlx-vlm)**: The underlying library for running Vision-Language Models.
+- **[Hugging Face Hub](https://huggingface.co)**: The source for models (look for `mlx-community` or models with `mlx` tags).
+
+## Quick Start
 
 ```bash
 # Install runtime dependencies
@@ -17,12 +39,12 @@ python -m check_models --folder ~/Pictures/Processed
 python -m check_models --image /path/to/photo.jpg
 ```
 
-Where to find detailed docs
+## Documentation
 
-- Canonical CLI reference and developer guide: [src/README.md](src/README.md) (full parameter reference, examples, troubleshooting).
-- Developer and contribution guidelines: [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).
+- **[User Guide & CLI Reference](src/README.md)**: Full parameter reference, advanced usage, and troubleshooting.
+- **[Contributor Guide](docs/CONTRIBUTING.md)**: Setup, workflow, and quality standards.
 
-Common make commands:
+## Common Make Commands
 
 ```bash
 make install   # install runtime dependencies
@@ -31,12 +53,8 @@ make test      # run test suite
 make quality   # run formatting, linting, and type checks
 ```
 
-Notes
-
-- Default Python: 3.13+ (project is tested on 3.13).
-- Platform: macOS with Apple Silicon (recommended).
-- Output files are written to `output/` by default and are git-ignored.
-
-For complete CLI usage, examples, and advanced configuration, see [src/README.md](src/README.md).
+> [!TIP]
+> **Platform**: macOS with Apple Silicon is required.
+> **Python**: 3.13+ is recommended and tested.
 
 License: See the [LICENSE](LICENSE) file.

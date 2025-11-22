@@ -177,7 +177,7 @@ ignore = [
 # Specific ignores for subprocess calls with hardcoded arguments
 "**/tests/**" = ["S101"]
 "**/check_models.py" = ["S603"]
-"**/tools/smoke_test.py" = ["S603"]
+
 
 [tool.ruff.lint.pydocstyle]
 # Use Google docstring convention (resolves D203/D211 and D212/D213 conflicts)

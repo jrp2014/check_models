@@ -4,7 +4,8 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
 
 **Target audience**: New contributors, anyone submitting a pull request.
 
-> **Note**: This project was restructured in October 2025. The old `vlm/` directory is now `src/`. All `make` commands now use the root `Makefile` instead of `make -C src` or `make -C vlm`.
+> [!NOTE]
+> This project was restructured in October 2025. The old `vlm/` directory is now `src/`. All `make` commands now use the root `Makefile` instead of `make -C src` or `make -C vlm`.
 
 **Related documents**:
 
@@ -67,8 +68,11 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
 4. **Verify installation**:
 
    ```bash
-   cd src
+   # Verify environment
    python -m tools.validate_env
+   
+   # Install git pre-commit hook (important!)
+   python -m tools.install_precommit_hook
    ```
 
 ### Manual Environment Validation
@@ -196,6 +200,18 @@ All pull requests must pass:
 - Markdown linting
 
 ## Testing
+
+### Quick Verification
+
+To verify that your environment and `mlx-vlm` are working correctly before running the full test suite, you can use the CLI:
+
+```bash
+python -m mlx_vlm.generate --model mlx-community/nanoLLaVA --image /path/to/image.jpg
+```
+
+Alternatively, refer to the official smoke test script:
+
+- [test_smoke.py](https://github.com/Blaizzy/mlx-vlm/blob/main/mlx_vlm/tests/test_smoke.py)
 
 ### Running Tests
 

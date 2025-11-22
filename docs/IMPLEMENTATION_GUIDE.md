@@ -4,14 +4,15 @@ This guide defines technical conventions and implementation details for develope
 
 **Target audience**: Developers actively modifying code, automated agents making changes, code reviewers.
 
-> **Note**: This project was restructured in October 2025 to follow Python best practices. The old `vlm/` directory is now `src/`. See [notes/RESTRUCTURE_COMPLETED.md](notes/RESTRUCTURE_COMPLETED.md) for details.
+> [!NOTE]
+> This project was restructured in October 2025 to follow Python best practices. The old `vlm/` directory is now `src/`. See [notes/RESTRUCTURE_COMPLETED.md](notes/RESTRUCTURE_COMPLETED.md) for details.
 
 **Related documents**:
 
 - [CONTRIBUTING.md](CONTRIBUTING.md) - How to contribute (setup, workflow, PR process)
 - [README.md](../README.md) - Project overview and quick start
 - [notes/](notes/) - Design notes and project evolution
-- [DEPENDENCY_STRATEGY.md](DEPENDENCY_STRATEGY.md) - Dependency management workflows (embedded below)
+- [Dependency Management Strategy](#dependency-management-strategy) - Dependency management workflows (embedded below)
 
 ## Table of Contents
 
@@ -157,6 +158,12 @@ Responsibilities:
 - Normalizing memory values to GB with adaptive precision
 - Formatting time (seconds) and TPS consistently
 - Applying numeric formatting consistently
+
+### Configuration
+
+- **`FormattingThresholds`**: Dataclass defining limits for number formatting (decimals, separators).
+- **`QualityThresholds`**: Dataclass defining thresholds for quality analysis (repetition, hallucination). Loaded from `quality_config.yaml`.
+- **`Module Constants`**: Used for fixed values (timeouts, default paths).
 
 **Do not duplicate formatting logic**. If a new metric is introduced, extend the central formatter instead of branching inline.
 
@@ -776,7 +783,7 @@ The `test_dependency_sync` test and CI will fail otherwise.
 **Mechanism**:
 
 1. Edit versions only in `pyproject.toml` (authoritative source)
-2. Run the sync helper: `python -m vlm.tools.update_readme_deps` to regenerate the blocks between:
+2. Run the sync helper: `python -m tools.update_readme_deps` to regenerate the blocks between:
    - `<!-- BEGIN MANUAL_INSTALL -->` / `<!-- END MANUAL_INSTALL -->`
    - `<!-- BEGIN MINIMAL_INSTALL -->` / `<!-- END MINIMAL_INSTALL -->`
 3. Commit both changed files together

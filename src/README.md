@@ -3,7 +3,8 @@
 
 `check_models.py` is a focused benchmarking and inspection tool for MLX-compatible Vision Language Models (VLMs) on Apple Silicon. It loads one or more local / cached models, optionally derives a prompt from image metadata (EXIF + GPS), runs generation, and reports performance (tokens, speed, timings, memory) plus outputs in colorized CLI, HTML, Markdown, and TSV formats.
 
-Note: This tool runs MLX-format Vision-Language Models hosted on the [Hugging Face Hub](https://huggingface.co). By default it will run all the models found in your local Hugging Face Hub cache (use `--models` to specify explicit model IDs).
+> [!NOTE]
+> This tool runs MLX-format Vision-Language Models hosted on the [Hugging Face Hub](https://huggingface.co). By default it will run all the models found in your local Hugging Face Hub cache (use `--models` to specify explicit model IDs).
 
 
 ## Who is this for?
@@ -332,7 +333,8 @@ Some models require custom Python code for their architecture. This flag enables
 python check_models.py --image photo.jpg --models mlx-community/Qwen2-VL-7B-Instruct --trust-remote-code
 ```
 
-⚠️ **Warning**: This executes arbitrary Python from the model repo. Only use with models from trusted sources.
+> [!WARNING]
+> **Security Risk**: This executes arbitrary Python from the model repo. Only use with models from trusted sources.
 
 ### Environment Variables
 
@@ -485,18 +487,67 @@ pip install -e ".[torch]"
 pip install -e ".[dev,extras]"  # dev tools + optional metrics/tokenizers
 ```
 
-Notes:
 
-- `psutil` is optional (installed with `extras`); if absent the extended Apple Silicon hardware section omits RAM/cores.
-- `extras` group bundles: psutil, tokenizers, mlx-lm, transformers. Install only if you need extended metrics or LM/transformer features.
-- Keep `transformers` updated if using it: `pip install -U transformers`.
-- `system_profiler` is a macOS built-in (no install needed) used for GPU name / core info.
-- Torch is supported and can be installed when you need it for specific models; the script does not block Torch.
-- The `tools/update.sh` helper supports environment flags: `INSTALL_TORCH=1` for PyTorch, `MLX_METAL_JIT=ON` for smaller binaries with runtime compilation (default: `OFF` for pre-built kernels), `CLEAN_BUILD=1` to clean build artifacts first.
-- Installing `sentence-transformers` isn't necessary for this tool and may pull heavy backends into import paths; a heads‑up is logged if detected.
-- Long embedded CSS / HTML lines are intentional (readability > artificial wrapping).
-- Dependency versions in this README are automatically kept in sync with `pyproject.toml`; update the TOML first and reflect changes here.
-- To clean build artifacts: `make clean` (project), `make clean-mlx` (local MLX repos), or `bash tools/clean_builds.sh`.
+> [!NOTE]
+> `psutil` is optional (installed with `extras`); if absent the extended Apple Silicon hardware section omits RAM/cores.
+> [!NOTE]
+> `extras` group bundles: psutil, tokenizers, mlx-lm, transformers. Install only if you need extended metrics or LM/transformer features.
+> [!NOTE]
+> Keep `transformers` updated if using it: `pip install -U transformers`.
+> [!NOTE]
+> `system_profiler` is a macOS built-in (no install needed) used for GPU name / core info.
+> [!NOTE]
+> Torch is supported and can be installed when you need it for specific models; the script does not block Torch.
+> [!NOTE]
+> The `tools/update.sh` helper supports environment flags: `INSTALL_TORCH=1` for PyTorch, `MLX_METAL_JIT=ON` for smaller binaries with runtime compilation (default: `OFF` for pre-built kernels), `CLEAN_BUILD=1` to clean build artifacts first.
+> [!NOTE]
+> Installing `sentence-transformers` isn't necessary for this tool and may pull heavy backends into import paths; a heads‑up is logged if detected.
+> [!NOTE]
+> Long embedded CSS / HTML lines are intentional (readability > artificial wrapping).
+> [!NOTE]
+> To update dependency versions in this README:
+>
+> 1. Edit versions only in `pyproject.toml` (authoritative source).
+> 2. Run the sync helper: `python -m tools.update_readme_deps` to regenerate the blocks between:
+>    - `<!-- BEGIN MANUAL_INSTALL -->` / `<!-- END MANUAL_INSTALL -->`
+>    - `<!-- BEGIN MINIMAL_INSTALL -->` / `<!-- END MINIMAL_INSTALL -->`
+> 3. Commit both changed files together.
+> [!NOTE]
+> To clean build artifacts: `make clean` (project), `make clean-mlx` (local MLX repos), or `bash tools/clean_builds.sh`.
+
+### Advanced Configuration
+
+The tool uses a YAML configuration file to define thresholds for quality checks (hallucination, repetition, verbosity).
+
+- **Default Config**: The tool ships with a default `quality_config.yaml` in the `src/` directory.
+- **Custom Config**: You can provide your own config file via `--quality-config path/to/config.yaml`.
+
+**Key Configurable Areas:**
+
+- **Repetition**: Thresholds for token and phrase repetition.
+- **Hallucination**: Keywords and patterns that suggest hallucinated content (e.g., "based on the chart" when no chart exists).
+- **Verbosity**: Limits on output length and meta-commentary patterns.
+- **Formatting**: Rules for markdown headers, bullet points, and table structures.
+
+See `src/quality_config.yaml` for the full schema and default values.
+
+### Development Tools
+
+The `src/tools/` directory contains scripts useful for development and verification:
+
+- **Smoke Testing**: For quick verification, you can use the standard `mlx-vlm` CLI:
+
+  ```bash
+  python -m mlx_vlm.generate --model mlx-community/nanoLLaVA --image test.jpg
+  ```
+
+  Or refer to the official [test_smoke.py](https://github.com/Blaizzy/mlx-vlm/blob/main/mlx_vlm/tests/test_smoke.py) script.
+
+- **`validate_env.py`**: Checks your environment for required dependencies and configuration.
+
+  ```bash
+  python -m tools.validate_env
+  ```
 
 ## Python API
 
@@ -624,7 +675,7 @@ python check_models.py \
 | `-f`, `--folder` | Path | `~/Pictures/Processed` | Folder of images to process (non‑recursive). |
 | `--image` | Path | (none) | Path to a specific image file to process directly. |
 | `--output-html` | Path | `output/results.html` | HTML report output filename. |
-| `--output-markdown` | Path | `results.md` | Markdown report output filename. |
+| `--output-markdown` | Path | `output/results.md` | Markdown report output filename. |
 | `--output-tsv` | Path | `output/results.tsv` | TSV (tab-separated values) report output filename. |
 | `--output-jsonl` | Path | `output/results.jsonl` | JSONL report output filename. |
 | `--output-log` | Path | `output/check_models.log` | Command line output log filename. |
@@ -1024,7 +1075,7 @@ npm install
 - Add or update tests when changing output formatting or public CLI flags.
 - Prefer small helper functions over adding more branching to large blocks in `check_models.py`.
 - Document new flags or output changes in this README (search for an existing section to extend rather than creating duplicates).
-- For full conventions (naming, imports, dependency policy, quality gates), see `IMPLEMENTATION_GUIDE.md` in the repository root.
+- For full conventions (naming, imports, dependency policy, quality gates), see `IMPLEMENTATION_GUIDE.md` in `docs/`.
 
 ## Important Notes
 
@@ -1033,13 +1084,12 @@ npm install
 
 ## License
 
-MIT License - see LICENSE file for details.
+MIT License: See the [LICENSE](../LICENSE) file for details.
 
 ## Quality checks and formatting
 
 A small helper script runs formatting and static checks for this project.
 
-- Location: `src/tools/check_quality.py`
 - Defaults:
   - Targets only `check_models.py` unless paths are provided
   - Runs `ruff format` by default (skip with `--no-format`)
