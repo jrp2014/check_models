@@ -1,15 +1,19 @@
+
 # MLX Vision Language Model Checker (`check_models.py`)
 
 `check_models.py` is a focused benchmarking and inspection tool for MLX-compatible Vision Language Models (VLMs) on Apple Silicon. It loads one or more local / cached models, optionally derives a prompt from image metadata (EXIF + GPS), runs generation, and reports performance (tokens, speed, timings, memory) plus outputs in colorized CLI, HTML, Markdown, and TSV formats.
+
 
 ## Who is this for?
 
 - Users (including MLX/MLX‑VLM/MLX‑LM developers) who want to run models on their own images and quickly see outputs and metrics: see the TL;DR below.
 - Contributors who want to work on `check_models.py` itself and keep quality gates green: see the Contributors section near the end.
 
+
 ## TL;DR for Users
 
 Defaults assume you have Hugging Face models in your local cache. The tool will discover cached VLMs automatically (unless you pass `--models`), carefully read EXIF metadata (including GPS/time when present) to enrich prompts, and write reports to `output/results.html`, `output/results.md`, and `output/results.tsv` by default.
+
 
 Quickest start on Apple Silicon (Python 3.13):
 
@@ -20,12 +24,17 @@ make install
 # Run against a folder of images (change the path to your images)
 python -m check_models --folder ~/Pictures/Processed --prompt "Describe this image."
 
+# Run against a specific image
+python -m check_models --image ~/Pictures/Processed/sample.jpg --prompt "Describe this image."
+# You can now use `--image` to specify a single image file directly. If neither `--folder` nor `--image` is specified, the script will assume the default folder and log diagnostics explaining the assumption.
+
 # Try specific models
 python -m check_models --folder ~/Pictures/Processed --models mlx-community/nanoLLaVA mlx-community/llava-1.5-7b-hf
 
 # Exclude a model from auto-discovered cache
 python -m check_models --folder ~/Pictures/Processed --exclude "microsoft/Phi-3-vision-128k-instruct"
 ```
+
 
 Prefer working directly in `src/`?
 
@@ -42,13 +51,16 @@ pip install -e ".[torch]"
 
 # Run directly
 python check_models.py -f ~/Pictures/Processed -p "Describe this image."
+```
+
 **Python**: 3.13+ (project is configured and tested on Python 3.13)
+
 
 Key defaults and parameters:
 
 - Models: discovered from Hugging Face cache. Use `--models` for explicit IDs, `--exclude` to filter.
-- Images: `-f/--folder` points to your images; default is `~/Pictures/Processed`.
-- **Folder behavior**: When you pass a folder path, the script automatically selects the **most recently modified image file** in that folder (hidden files are ignored).
+- Images: `-f/--folder` points to your images; default is `~/Pictures/Processed`. If neither `--folder` nor `--image` is specified, the script assumes the default folder and logs a diagnostic message.
+- **Folder behavior**: When you pass a folder path, the script automatically selects the **most recently modified image file** in that folder (hidden files are ignored). If no image or folder is specified, the default folder is used and a diagnostic is logged.
 - Reports: By default, `output/results.html`, `output/results.md`, and `output/results.tsv` are created; override via `--output-html`, `--output-markdown`, and `--output-tsv`.
 - Prompting: If `--prompt` isn't provided, the tool can compose a metadata‑aware prompt from EXIF data when available (camera, time, GPS).
 - Runtime: `--timeout 300`, `--max-tokens 500`, `--temperature 0.1` by default.
@@ -79,7 +91,7 @@ Key defaults and parameters:
 ## Feature Highlights
 
 | Area | Notes |
-|------|-------|
+| ---- | ----- |
 | Model discovery | Scans Hugging Face cache; explicit `--models` overrides. |
 | Selection control | `--exclude` works with cache scan or explicit list. |
 | Prompting | `--prompt` overrides; otherwise metadata‑informed (image description, GPS, date). |
@@ -469,6 +481,7 @@ python check_models.py \
 | Flag | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
 | `-f`, `--folder` | Path | `~/Pictures/Processed` | Folder of images to process (non‑recursive). |
+| `--image` | Path | (none) | Path to a specific image file to process directly. |
 | `--output-html` | Path | `output/results.html` | HTML report output filename. |
 | `--output-markdown` | Path | `results.md` | Markdown report output filename. |
 | `--output-tsv` | Path | `output/results.tsv` | TSV (tab-separated values) report output filename. |
@@ -498,14 +511,29 @@ python check_models.py \
 | `--quality-config` | Path | (none) | Path to custom quality configuration YAML file. |
 | `--context-marker` | str | `Context:` | Marker used to identify context section in prompt. |
 
+
+
 ### Selection Logic
 
-1. No selection flags: run all cached VLMs.
+Image selection logic:
+
+1. If neither `--folder` nor `--image` is specified, the script assumes the default folder (`~/Pictures/Processed`) and logs a diagnostic message.
+2. If `--image` is provided, that image is processed directly.
+3. If `--folder` is provided, the most recently modified image in the folder is used.
+
+Model selection logic:
+
+1. No model selection flags: run all cached VLMs.
 2. `--models` only: run exactly that list.
 3. `--exclude` only: run cached minus excluded.
 4. `--models` + `--exclude`: intersect explicit list then subtract exclusions.
 
 The script warns about exclusions that don't match any candidate model.
+
+
+## Diagnostics
+
+If neither `--folder` nor `--image` is specified, the script will log a diagnostic message indicating that the default folder is being used. This ensures clarity and helps users understand the script's assumptions.
 
 ## Output Formats
 
@@ -554,22 +582,39 @@ GitHub-compatible format with:
 - System and library version information
 - Easy integration into documentation
 
+
 ## Additional Examples
 
+Run on a specific image:
+
 ```bash
-# Test all available models
+python check_models.py --image ~/Pictures/Processed/sample.jpg --prompt "Describe this image."
+```
+
+Test all available models:
+
+```bash
 python check_models.py
+```
 
-# Test only fast models, exclude slow ones
+Test only fast models, exclude slow ones:
+
+```bash
 python check_models.py --exclude "meta-llama/Llama-3.2-90B-Vision-Instruct"
+```
 
-# Test specific models for comparison
+Test specific models for comparison:
+
+```bash
 python check_models.py --models \
   "microsoft/Phi-3-vision-128k-instruct" \
   "Qwen/Qwen2-VL-7B-Instruct" \
   "BAAI/Bunny-v1_1-Llama-3-8B-V"
+```
 
-# Test a curated list but exclude one problematic model
+Test a curated list but exclude one problematic model:
+
+```bash
 python check_models.py \
   --models "model1" "model2" "model3" "model4" \
   --exclude "model3"

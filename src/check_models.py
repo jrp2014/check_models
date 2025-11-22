@@ -5481,41 +5481,52 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
 
 def find_and_validate_image(args: argparse.Namespace) -> Path:
     """Find and validate the image file to process from arguments."""
-    folder_path: Path = args.folder.resolve()
-    # Compact logging for folder
-    log_file_path(str(folder_path), label="Scanning folder:")
-
-    # Exit immediately if folder does not exist
-    if not folder_path.is_dir():
-        exit_with_cli_error(f"Folder '{folder_path}' does not exist. Exiting.")
-
-    image_path: Path | None = find_most_recent_file(folder_path)
-    if image_path is None:
-        exit_with_cli_error(
-            f"Could not find the most recent image file in {folder_path}. Exiting.",
-        )
-        # Type checker doesn't know exit_with_cli_error never returns
-        raise SystemExit  # pragma: no cover
-
-    resolved_image_path: Path = image_path.resolve()
-    # Compact logging for image file
-    log_file_path(str(resolved_image_path), label="Image File:     ")
-
-    try:
-        with Image.open(resolved_image_path) as img:
-            img.verify()
-        print_image_dimensions(resolved_image_path)
-    except (
-        FileNotFoundError,
-        UnidentifiedImageError,
-        OSError,
-    ) as img_err:
-        exit_with_cli_error(
-            f"Cannot open or verify image {resolved_image_path}: {img_err}. Exiting.",
-            suppress_cause=True,
-        )
+    if getattr(args, "image", None) is not None:
+        img_path: Path = args.image.resolve()
+        log_file_path(str(img_path), label="Image File:     ")
+        try:
+            with Image.open(img_path) as img:
+                img.verify()
+            print_image_dimensions(img_path)
+        except (
+            FileNotFoundError,
+            UnidentifiedImageError,
+            OSError,
+        ) as img_err:
+            exit_with_cli_error(
+                f"Cannot open or verify image {img_path}: {img_err}. Exiting.",
+                suppress_cause=True,
+            )
+        else:
+            return img_path
     else:
-        return resolved_image_path
+        folder_path: Path = args.folder.resolve()
+        log_file_path(str(folder_path), label="Scanning folder:")
+        if not folder_path.is_dir():
+            exit_with_cli_error(f"Folder '{folder_path}' does not exist. Exiting.")
+        most_recent_path: Path | None = find_most_recent_file(folder_path)
+        if most_recent_path is None:
+            exit_with_cli_error(
+                f"Could not find the most recent image file in {folder_path}. Exiting.",
+            )
+            raise SystemExit  # pragma: no cover
+        resolved_image_path: Path = most_recent_path.resolve()
+        log_file_path(str(resolved_image_path), label="Image File:     ")
+        try:
+            with Image.open(resolved_image_path) as img:
+                img.verify()
+            print_image_dimensions(resolved_image_path)
+        except (
+            FileNotFoundError,
+            UnidentifiedImageError,
+            OSError,
+        ) as img_err:
+            exit_with_cli_error(
+                f"Cannot open or verify image {resolved_image_path}: {img_err}. Exiting.",
+                suppress_cause=True,
+            )
+        else:
+            return resolved_image_path
 
 
 def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
@@ -6282,9 +6293,12 @@ def main(args: argparse.Namespace) -> None:
             prompt=prompt,
             image_path=image_path,
         )
-    except (KeyboardInterrupt, SystemExit):
+    except KeyboardInterrupt:
         logger.exception("Execution interrupted by user.")
         sys.exit(1)
+    except SystemExit:
+        logger.exception("Execution halted due to error.")
+        raise
     except (OSError, ValueError) as main_err:
         logger.critical("Fatal error in main execution: %s", main_err)
         sys.exit(1)
@@ -6297,12 +6311,22 @@ def main_cli() -> None:
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     # Add arguments (separated for clarity)
-    parser.add_argument(
+    group = parser.add_mutually_exclusive_group(required=False)
+    group.add_argument(
         "-f",
         "--folder",
         type=Path,
-        default=DEFAULT_FOLDER,
-        help="Folder to scan. The most recently modified image file in the folder will be used.",
+        default=None,
+        help=(
+            "Folder to scan. The most recently modified image file in the folder will be used. "
+            "If neither --folder nor --image is specified, the default folder will be used."
+        ),
+    )
+    group.add_argument(
+        "--image",
+        type=Path,
+        default=None,
+        help="Path to a specific image file to process directly.",
     )
     parser.add_argument(
         "--output-html",
@@ -6489,6 +6513,20 @@ def main_cli() -> None:
 
     # Parse arguments
     args: argparse.Namespace = parser.parse_args()
+
+    # If neither --folder nor --image is specified, assume default folder
+    if getattr(args, "folder", None) is None and getattr(args, "image", None) is None:
+        args.folder = DEFAULT_FOLDER
+        logger.info(
+            "No --folder or --image specified. Assuming default folder: %s",
+            DEFAULT_FOLDER,
+        )
+        print_cli_section("No image or folder specified")
+        logger.info(
+            "Assuming default folder: %s. To override, specify --folder or --image.",
+            DEFAULT_FOLDER,
+        )
+
     # Print all command-line arguments if verbose is set
     if getattr(args, "verbose", False):
         print_cli_section("Command Line Parameters")
