@@ -419,13 +419,16 @@ class SupportsGenerationResult(Protocol):  # Minimal attributes we read from Gen
     concrete GenerationResult while still giving linters strong guarantees
     about the attributes actually consumed here.
 
-    Note: `time` attribute is added dynamically by our code after generation.
+    Note: `time`, `active_memory`, and `cache_memory` attributes are added
+    dynamically by our code after generation.
     """
 
     text: str | None
     prompt_tokens: int | None
     generation_tokens: int | None
     time: float | None  # Dynamically added timing attribute
+    active_memory: float | None  # Dynamically added active memory (GB)
+    cache_memory: float | None  # Dynamically added cache memory (GB)
 
 
 class SupportsExifIfd(Protocol):
@@ -4632,12 +4635,20 @@ def _run_model_generation(
 
     duration = timer.stop()
 
-    # Add timing to the GenerationResult object dynamically
+    # Capture memory metrics immediately after generation while model is still active
+    # This must happen before mx.eval() which can change memory state
+    active_mem_bytes = mx.metal.get_active_memory()
+    cache_mem_bytes = mx.metal.get_cache_memory()
+
+    # Add timing and memory to the GenerationResult object dynamically
     # Cast to our Protocol which includes the time attribute we're adding
-    cast("SupportsGenerationResult", output).time = duration
+    result = cast("SupportsGenerationResult", output)
+    result.time = duration
+    result.active_memory = active_mem_bytes / (1024**3)  # Convert to GB
+    result.cache_memory = cache_mem_bytes / (1024**3)  # Convert to GB
 
     mx.eval(model.parameters())
-    return output
+    return result
 
 
 def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
@@ -4674,11 +4685,9 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         if generation_time is not None:
             model_load_time = max(0.0, total_time - generation_time)
 
-        # Capture detailed memory metrics before cleanup
-        active_mem_bytes = mx.metal.get_active_memory()
-        cache_mem_bytes = mx.metal.get_cache_memory()
-        active_mem_gb = active_mem_bytes / (1024**3)  # Convert to GB
-        cache_mem_gb = cache_mem_bytes / (1024**3)  # Convert to GB
+        # Read memory metrics from GenerationResult (captured inside _run_model_generation)
+        active_mem_gb = getattr(output, "active_memory", None) or 0.0
+        cache_mem_gb = getattr(output, "cache_memory", None) or 0.0
 
         return PerformanceResult(
             model_name=params.model_identifier,
@@ -4687,8 +4696,8 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             generation_time=generation_time,
             model_load_time=model_load_time,
             total_time=total_time,
-            active_memory=active_mem_gb,
-            cache_memory=cache_mem_gb,
+            active_memory=active_mem_gb if active_mem_gb > 0 else None,
+            cache_memory=cache_mem_gb if cache_mem_gb > 0 else None,
         )
     except TimeoutError as e:
         # Full traceback already logged at ERROR level in _run_model_generation
