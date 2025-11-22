@@ -464,56 +464,22 @@ python check_models.py \
 - **`--kv-group-size`**: Group size for KV quantization (advanced tuning).
 - **`--quantized-kv-start`**: Token position to start quantization (advanced tuning).
 
-**Tip**: For 16GB systems running large models, try `--lazy-load --kv-bits 4 --max-kv-size 4096`.
-
-### Baseline Evaluation
-
-Compare model outputs against a "golden" reference text using keyword overlap scoring:
-
-```bash
-# Create or edit the baseline text file (default: output/baseline.txt)
-echo "Your ideal/reference output text here" > output/baseline.txt
-
-# Run evaluation with baseline scoring (uses output/baseline.txt by default)
-python check_models.py \
-  --folder ~/Pictures \
-  --models mlx-community/nanoLLaVA mlx-community/Qwen2-VL-2B-Instruct-4bit
-
-# Or specify a custom baseline file
-python check_models.py \
-  --folder ~/Pictures \
-  --baseline-file /path/to/custom_baseline.txt
-
-# Score appears as "Score (%)" column in all reports
-```
-
-**How it works:**
-
-- Extracts significant keywords from both baseline and generated text
-- Filters out common stop words (the, a, an, is, etc.)
-- Calculates percentage of baseline keywords found in generated output
-- Score (0-100%) appears in console, HTML, and Markdown reports
-- If baseline file doesn't exist, scoring is skipped (no errors)
-
-**Use cases:**
-
-- Benchmarking models against known-good outputs
-- Regression testing to ensure quality doesn't degrade
-- Objective comparison when evaluating model updates
-
 ## Command Line Reference
 
 | Flag | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
 | `-f`, `--folder` | Path | `~/Pictures/Processed` | Folder of images to process (non‑recursive). |
-| `--output-html` | Path | `output/results.html` | HTML report output file. |
-| `--output-markdown` | Path | `results.md` | Markdown report output file. |
-| `--output-tsv` | Path | `output/results.tsv` | TSV (tab-separated values) report output file. |
-| `--baseline-file` | Path | `output/baseline.txt` | Path to baseline/golden text file for evaluation scoring. |
+| `--output-html` | Path | `output/results.html` | HTML report output filename. |
+| `--output-markdown` | Path | `results.md` | Markdown report output filename. |
+| `--output-tsv` | Path | `output/results.tsv` | TSV (tab-separated values) report output filename. |
+| `--output-jsonl` | Path | `output/results.jsonl` | JSONL report output filename. |
+| `--output-log` | Path | `output/check_models.log` | Command line output log filename. |
+| `--output-env` | Path | `output/environment.log` | Environment log filename (pip freeze, conda list). |
 | `-m`, `--models` | list[str] | (none) | Explicit model IDs/paths; disables cache discovery. |
 | `-e`, `--exclude` | list[str] | (none) | Models to exclude (applies to cache scan or explicit list). |
 | `--trust-remote-code` | flag | `True` | Allow custom code from Hub models (SECURITY RISK). |
 | `-p`, `--prompt` | str | (auto) | Custom prompt; if omitted a metadata‑aware prompt may be used. |
+| `--detailed-metrics` | flag | `False` | Show expanded multi-line metrics block (verbose mode only). |
 | `-x`, `--max-tokens` | int | 500 | Max new tokens to generate. |
 | `-t`, `--temperature` | float | 0.1 | Sampling temperature. |
 | `--top-p` | float | 1.0 | Nucleus sampling parameter (0.0-1.0); lower = more focused. |

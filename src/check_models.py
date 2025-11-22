@@ -6213,7 +6213,10 @@ def main_cli() -> None:
         "--output-log",
         type=Path,
         default=DEFAULT_LOG_OUTPUT,
-        help="Command line output log filename (overwritten each run). Use different path for tests/debug runs.",
+        help=(
+            "Command line output log filename (overwritten each run). "
+            "Use different path for tests/debug runs."
+        ),
     )
     parser.add_argument(
         "--output-env",
@@ -6252,24 +6255,11 @@ def main_cli() -> None:
         help="Prompt.",
     )
 
-    metrics_group = parser.add_mutually_exclusive_group()
-    metrics_group.add_argument(
+    parser.add_argument(
         "--detailed-metrics",
         action="store_true",
         default=False,
-        help=(
-            "Use expanded multi-line metrics block instead of compact aligned single-line metrics. "
-            "Only applies when --verbose is set."
-        ),
-    )
-    metrics_group.add_argument(
-        "--compact-metrics",
-        action="store_true",
-        default=False,
-        help=(
-            "Force compact metrics (explicit; default behavior). "
-            "Useful if environment sets a different default."
-        ),
+        help="Show expanded multi-line metrics block (verbose mode only).",
     )
     parser.add_argument(
         "-x",
@@ -6385,9 +6375,6 @@ def main_cli() -> None:
         print_cli_section("Command Line Parameters")
         for arg_name, arg_value in sorted(vars(args).items()):
             logger.info("  %s: %s", arg_name, arg_value)
-    # Normalize: if neither flag set, compact is default; if both prevented by group.
-    if getattr(args, "compact_metrics", False):
-        args.detailed_metrics = False
 
     # Load quality configuration
     load_quality_config(getattr(args, "quality_config", None))
