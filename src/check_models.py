@@ -5260,10 +5260,6 @@ def log_metrics_legend(*, detailed: bool) -> None:
         "  • ⚠️  warnings shown for repetitive or hallucinated output",
         extra={"style_hint": LogStyles.DETAIL},
     )
-    logger.info(
-        "  • Note: Streaming early-stop for repetitive output is not yet implemented",
-        extra={"style_hint": LogStyles.DETAIL},
-    )
     log_blank()
 
 

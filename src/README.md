@@ -193,6 +193,33 @@ Torch support:
 - Compact vs detailed metrics (verbose mode): By default, verbose output shows a single aligned line beginning with `Metrics:`. Enable classic multi‑line breakdown with `--detailed-metrics`.
 - Token triple legend: `tokens(total/prompt/gen)=T/P/G` corresponds to total tokens = prompt tokens + generated tokens.
 
+## Controlling Repetitive Output
+
+While MLX-VLM doesn't explicitly document these in all examples, the underlying `generate()` function (inherited from MLX-LM) supports **repetition penalty** parameters that can significantly reduce or eliminate repetitive text generation. These parameters work by penalizing tokens that have already appeared in recent context:
+
+- `--repetition-penalty <float>`: Penalty factor for repeating tokens (must be ≥ 1.0). Higher values more strongly discourage repetition. Common range: 1.0-1.2. Default: `None` (no penalty).
+- `--repetition-context-size <int>`: Number of recent tokens to check for repetition. Smaller values (10-20) only penalize immediate loops; larger values (50-100) prevent long-range repetition. Default: 20.
+
+**Example usage**:
+
+```bash
+# Moderate penalty to reduce repetition
+python check_models.py --image photo.jpg --repetition-penalty 1.1
+
+# Strong penalty with larger context window
+python check_models.py --image photo.jpg --repetition-penalty 1.15 --repetition-context-size 50
+```
+
+**How it works** (from MLX source): During generation, the model maintains a sliding window of the last N tokens (`repetition_context_size`). For each new token prediction, logits of tokens that appear in this window are divided by the `repetition_penalty` factor, making them less likely to be selected. This mechanism operates at the token level during sampling, before temperature is applied.
+
+**Trade-offs**:
+
+- ✅ **Benefit**: Dramatically reduces repetitive loops, hallucinated lists, and redundant output
+- ⚠️ **Risk**: Overly aggressive penalties (>1.2) may harm output quality, forcing the model to use awkward synonyms or break natural repetition (e.g., proper nouns, technical terms)
+- 💡 **Tip**: Start with 1.05-1.1 and increase gradually while monitoring quality flags in the output
+
+The `check_models` tool's quality analysis detects repetition post-generation and flags it in reports. Using these parameters proactively can prevent repetitive output before it occurs, saving generation time and improving results.
+
 ## Environment Variable Overrides
 
 Several behaviors can be customized via environment variables (useful for CI/automation):
