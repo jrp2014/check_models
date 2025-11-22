@@ -186,14 +186,24 @@ Torch support:
 - You can also install later via the project extra: `pip install -e ".[torch]"`.
 - The update helper script supports installing Torch too: run with `INSTALL_TORCH=1` to include it.
 
-## Notes on Metrics and Output Formatting
+## Usage
+
+### Basic Examples
+
+See the **TL;DR for Users** section at the top for quick start commands.
+
+For more examples, see the **Additional Examples** section later in this document.
+
+### Notes on Metrics and Output Formatting
 
 - Memory units: All memory metrics are displayed in GB. Sources differ: MLX reports bytes; mlx‑vlm reports decimal GB (bytes/1e9). The tool detects and normalizes both to GB for consistent display.
 - Markdown escaping: The final output column preserves common GitHub‑supported tags (e.g., `<br>`) and escapes others so special tokens like `<s>` render literally.
 - Compact vs detailed metrics (verbose mode): By default, verbose output shows a single aligned line beginning with `Metrics:`. Enable classic multi‑line breakdown with `--detailed-metrics`.
 - Token triple legend: `tokens(total/prompt/gen)=T/P/G` corresponds to total tokens = prompt tokens + generated tokens.
 
-## Controlling Repetitive Output
+### Parameter Reference
+
+#### Controlling Repetitive Output
 
 While MLX-VLM doesn't explicitly document these in all examples, the underlying `generate()` function (inherited from MLX-LM) supports **repetition penalty** parameters that can significantly reduce or eliminate repetitive text generation. These parameters work by penalizing tokens that have already appeared in recent context:
 
@@ -220,7 +230,109 @@ python check_models.py --image photo.jpg --repetition-penalty 1.15 --repetition-
 
 The `check_models` tool's quality analysis detects repetition post-generation and flags it in reports. Using these parameters proactively can prevent repetitive output before it occurs, saving generation time and improving results.
 
-## Environment Variable Overrides
+#### KV Cache Quantization (Memory Optimization)
+
+Vision-language models maintain a **key-value (KV) cache** during text generation to avoid recomputing attention for previous tokens. For long sequences or large models, this cache can consume significant memory. MLX-VLM supports KV cache quantization to reduce memory usage with minimal impact on output quality.
+
+### Parameters
+
+- `--max-kv-size <int>`: Maximum number of tokens to store in KV cache. Limits memory for very long sequences. Default: `None` (unlimited).
+- `--kv-bits <int>`: Quantize KV cache to 4 or 8 bits instead of full precision (typically 16-bit). Default: `None` (no quantization).
+- `--kv-group-size <int>`: Group size for quantization (larger = more compression, less accuracy). Default: `64`.
+- `--quantized-kv-start <int>`: Token position to start quantization. Use `0` to quantize from the beginning, or a larger value to keep early tokens (e.g., system prompts) at full precision. Default: `0`.
+
+### How It Works
+
+From the MLX-VLM source: The KV cache stores attention keys and values for each generated token. Quantization groups cache entries into blocks of `kv_group_size` tokens and represents them with lower precision (`kv_bits`). This reduces memory proportionally (4-bit = 4×, 8-bit = 2× compression) while maintaining most of the model's generation quality.
+
+### Example Usage
+
+```bash
+# Moderate 8-bit quantization for 2× memory savings
+python check_models.py --image photo.jpg --kv-bits 8
+
+# Aggressive 4-bit quantization with larger groups (4× compression)
+python check_models.py --image photo.jpg --kv-bits 4 --kv-group-size 128
+
+# Quantize only after first 512 tokens (preserve system prompt precision)
+python check_models.py --image photo.jpg --kv-bits 8 --quantized-kv-start 512
+
+# Cap cache size for extremely long outputs
+python check_models.py --image photo.jpg --max-kv-size 4096 --kv-bits 8
+```
+
+### When to Use
+
+**Use KV quantization if:**
+
+- ✅ Testing large models (>10B parameters) on limited RAM
+- ✅ Generating long sequences (>1000 tokens)
+- ✅ Running multiple models in parallel
+- ✅ Encountering OOM (out of memory) errors
+
+**Skip quantization if:**
+
+- ❌ Models are small (<7B parameters)
+- ❌ Sequences are short (<500 tokens)
+- ❌ You need maximum quality for critical tasks
+
+### Trade-offs
+
+- **4-bit**: 75% memory reduction, slight quality degradation (noticeable in complex reasoning)
+- **8-bit**: 50% memory reduction, minimal quality impact (recommended starting point)
+- **Group size**: Larger groups save more memory but reduce precision; 64-128 is optimal for most cases
+
+#### Temperature and Sampling
+
+- `--temperature <float>`: Controls randomness in generation. `0.0` = deterministic (argmax), `1.0` = default diversity, `>1.0` = more creative/random. Default: `0.0`.
+- `--top-p <float>`: Nucleus sampling threshold. Only considers tokens whose cumulative probability is ≤ `top_p`. Range: `0.0-1.0`. Default: `1.0` (disabled).
+
+These control the sampling strategy during generation. Higher temperature increases variety but can produce less coherent outputs. Top-p sampling (nucleus sampling) focuses on the most probable tokens.
+
+**Example**:
+
+```bash
+# Deterministic output (default)
+python check_models.py --image photo.jpg --temperature 0.0
+
+# Balanced creativity
+python check_models.py --image photo.jpg --temperature 0.7 --top-p 0.9
+
+# Maximum diversity (risky)
+python check_models.py --image photo.jpg --temperature 1.5 --top-p 0.95
+```
+
+#### Generation Control
+
+- `--max-tokens <int>`: Maximum number of tokens to generate. Prevents runaway generation. Default: `512`.
+- `--timeout <float>`: Timeout in seconds for each model's generation. Useful for identifying slow/hanging models. Default: `600.0` (10 minutes).
+
+**Example**:
+
+```bash
+# Short captions only
+python check_models.py --image photo.jpg --max-tokens 100
+
+# Strict timeout for batch testing
+python check_models.py --folder ~/images --timeout 120
+```
+
+#### Trust Remote Code
+
+- `--trust-remote-code`: Allow execution of custom modeling code from Hugging Face repos. **Security risk** - only use with trusted models.
+
+Some models require custom Python code for their architecture. This flag enables loading that code.
+
+**Example**:
+
+```bash
+# Enable for models like Qwen or custom architectures
+python check_models.py --image photo.jpg --models mlx-community/Qwen2-VL-7B-Instruct --trust-remote-code
+```
+
+⚠️ **Warning**: This executes arbitrary Python from the model repo. Only use with models from trusted sources.
+
+### Environment Variables
 
 Several behaviors can be customized via environment variables (useful for CI/automation):
 
@@ -423,9 +535,7 @@ from check_models import (
 
 See module docstrings and `__all__` exports for complete API reference.
 
-## Usage
-
-### Quick Start
+## Additional Examples
 
 ```bash
 # Run across all cached models with a custom prompt
