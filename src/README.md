@@ -910,7 +910,22 @@ The default conda target is `mlx-vlm`, but you can override it with `CONDA_ENV=y
 
 **Recommendation**: Activate your environment first (e.g., `source .venv/bin/activate` or `conda activate mlx-vlm`) for best performance.
 
-Key targets:
+## All Available Make Commands
+
+Run `make help` to see all targets. **Key commands:**
+
+| Command | Description |
+| :------ | :---------- |
+| `make install` | Install the package |
+| `make dev` | Setup development environment |
+| `make update` | Update conda environment and dependencies |
+| `make upgrade-deps` | Upgrade all dependencies to latest versions |
+| `make test` | Run tests |
+| `make quality` | Run linting and type checks |
+| `make check` | Run full quality pipeline (format, lint, typecheck, test) |
+| `make clean` | Remove generated files |
+
+Additional make targets are listed later in the README.
 
 | Target | Purpose | Notes |
 | ------ | ------- | ----- |
@@ -969,7 +984,7 @@ If you prefer manual commands, the traditional workflow still works:
 4. `mypy --config-file pyproject.toml check_models.py`
 5. `pytest -q`
 
-#### Markdown Linting (Optional)
+### Markdown Linting (Optional)
 
 The project uses `markdownlint-cli2` to ensure consistent markdown formatting. This is **optional** but recommended for contributors editing documentation:
 
