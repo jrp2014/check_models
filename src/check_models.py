@@ -1178,24 +1178,6 @@ MARKDOWN_ESCAPER = MarkdownPipeEscaper()
 DIAGNOSTICS_ESCAPER = DiagnosticsEscaper()
 
 
-# Allowlist of inline formatting tags we preserve in Markdown output
-# Keep <br> for line breaks; do NOT include 's' to avoid interpreting <s> tokens
-# from model output as strikethrough (they may be output markers, not formatting).
-# DEPRECATED: Use HTML_ESCAPER.allowed_tags instead
-allowed_inline_tags = HTML_ESCAPER.allowed_tags
-
-
-def _escape_html_tags_selective(text: str) -> str:
-    """Escape tag-like sequences except GitHub-recognized formatting tags.
-
-    Helper for markdown escaping functions. Neutralizes tag sequences that may
-    interfere with rendering while preserving common formatting tags that GitHub recognizes.
-
-    DEPRECATED: Use HTML_ESCAPER.escape() instead for new code.
-    """
-    return HTML_ESCAPER.escape(text)
-
-
 def _format_memory_value_gb(num: float) -> str:
     """Format mixed-source memory value as GB string.
 

@@ -12,7 +12,7 @@
 
 ## TL;DR for Users
 
-Defaults assume you have Hugging Face models in your local cache. The tool will discover cached VLMs automatically (unless you pass `--models`), carefully read EXIF metadata (including GPS/time when present) to enrich prompts, and write reports to `output/results.html`, `output/results.md`, and `output/results.tsv` by default.
+Defaults assume you have Hugging Face models in your local cache. The tool will discover cached VLMs automatically (unless you pass `--models`), carefully read EXIF metadata (including GPS/time when present) to enrich prompts, and write reports to `output/results.html`, `output/results.md`, `output/results.tsv`, and `output/results.jsonl` by default.
 
 
 Quickest start on Apple Silicon (Python 3.13):
@@ -61,7 +61,7 @@ Key defaults and parameters:
 - Models: discovered from Hugging Face cache. Use `--models` for explicit IDs, `--exclude` to filter.
 - Images: `-f/--folder` points to your images; default is `~/Pictures/Processed`. If neither `--folder` nor `--image` is specified, the script assumes the default folder and logs a diagnostic message.
 - **Folder behavior**: When you pass a folder path, the script automatically selects the **most recently modified image file** in that folder (hidden files are ignored). If no image or folder is specified, the default folder is used and a diagnostic is logged.
-- Reports: By default, `output/results.html`, `output/results.md`, and `output/results.tsv` are created; override via `--output-html`, `--output-markdown`, and `--output-tsv`.
+- Reports: By default, `output/results.html`, `output/results.md`, `output/results.tsv`, and `output/results.jsonl` are created; override via `--output-html`, `--output-markdown`, `--output-tsv`, and `--output-jsonl`.
 - Prompting: If `--prompt` isn't provided, the tool can compose a metadata‑aware prompt from EXIF data when available (camera, time, GPS).
 - Runtime: `--timeout 300`, `--max-tokens 500`, `--temperature 0.1` by default.
 - Sampling: `--top-p 1.0` (nucleus sampling), `--repetition-penalty` (disabled by default).
