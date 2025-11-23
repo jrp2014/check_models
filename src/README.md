@@ -488,22 +488,32 @@ pip install -e ".[dev,extras]"  # dev tools + optional metrics/tokenizers
 ```
 
 
+<!-- markdownlint-disable MD028 -->
+
 > [!NOTE]
 > `psutil` is optional (installed with `extras`); if absent the extended Apple Silicon hardware section omits RAM/cores.
+
 > [!NOTE]
 > `extras` group bundles: psutil, tokenizers, mlx-lm, transformers. Install only if you need extended metrics or LM/transformer features.
+
 > [!NOTE]
 > Keep `transformers` updated if using it: `pip install -U transformers`.
+
 > [!NOTE]
 > `system_profiler` is a macOS built-in (no install needed) used for GPU name / core info.
+
 > [!NOTE]
 > Torch is supported and can be installed when you need it for specific models; the script does not block Torch.
+
 > [!NOTE]
 > The `tools/update.sh` helper supports environment flags: `INSTALL_TORCH=1` for PyTorch, `MLX_METAL_JIT=ON` for smaller binaries with runtime compilation (default: `OFF` for pre-built kernels), `CLEAN_BUILD=1` to clean build artifacts first.
+
 > [!NOTE]
 > Installing `sentence-transformers` isn't necessary for this tool and may pull heavy backends into import paths; a heads‑up is logged if detected.
+
 > [!NOTE]
 > Long embedded CSS / HTML lines are intentional (readability > artificial wrapping).
+
 > [!NOTE]
 > To update dependency versions in this README:
 >
@@ -512,8 +522,11 @@ pip install -e ".[dev,extras]"  # dev tools + optional metrics/tokenizers
 >    - `<!-- BEGIN MANUAL_INSTALL -->` / `<!-- END MANUAL_INSTALL -->`
 >    - `<!-- BEGIN MINIMAL_INSTALL -->` / `<!-- END MINIMAL_INSTALL -->`
 > 3. Commit both changed files together.
+
 > [!NOTE]
 > To clean build artifacts: `make clean` (project), `make clean-mlx` (local MLX repos), or `bash tools/clean_builds.sh`.
+
+<!-- markdownlint-enable MD028 -->
 
 ### Advanced Configuration
 
