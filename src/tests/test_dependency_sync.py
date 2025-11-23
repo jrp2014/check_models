@@ -31,7 +31,7 @@ README = _first_existing(
     [PKG_ROOT / "README.md", REPO_ROOT / "README.md"],
 )  # prefer in-package
 
-MANUAL_MARKERS = ("<!-- BEGIN MANUAL_INSTALL -->", "<!-- END MANUAL_INSTALL -->")
+MANUAL_MARKERS = ("<!-- MANUAL_INSTALL_START -->", "<!-- MANUAL_INSTALL_END -->")
 
 
 def _parse_runtime_deps(text: str) -> dict[str, str]:

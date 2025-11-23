@@ -428,11 +428,11 @@ pre-commit run --all-files
 
 If you prefer to install dependencies manually (ensure these match `pyproject.toml`):
 
-<!-- BEGIN MANUAL_INSTALL -->
+<!-- MANUAL_INSTALL_START -->
 ```bash
 pip install "huggingface-hub[cli,torch,typing]>=0.34.0,<1.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "tzlocal>=5.0"
 ```
-<!-- END MANUAL_INSTALL -->
+<!-- MANUAL_INSTALL_END -->
 
 ## Requirements
 
@@ -544,11 +544,11 @@ Development / QA:
 
 ### Minimal Install (runtime only)
 
-<!-- BEGIN MINIMAL_INSTALL -->
+<!-- MINIMAL_INSTALL_START -->
 ```bash
 pip install "huggingface-hub[cli,torch,typing]>=0.34.0,<1.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "tzlocal>=5.0"
 ```
-<!-- END MINIMAL_INSTALL -->
+<!-- MINIMAL_INSTALL_END -->
 
 ### With Optional Extras
 
@@ -602,8 +602,8 @@ pip install -e ".[dev,extras]"  # dev tools + optional metrics/tokenizers
 >
 > 1. Edit versions only in `pyproject.toml` (authoritative source).
 > 2. Run the sync helper: `python -m tools.update_readme_deps` to regenerate the blocks between:
->    - `<!-- BEGIN MANUAL_INSTALL -->` / `<!-- END MANUAL_INSTALL -->`
->    - `<!-- BEGIN MINIMAL_INSTALL -->` / `<!-- END MINIMAL_INSTALL -->`
+>    - `<!-- MANUAL_INSTALL_START -->` / `<!-- MANUAL_INSTALL_END -->`
+>    - `<!-- MINIMAL_INSTALL_START -->` / `<!-- MINIMAL_INSTALL_END -->`
 > 3. Commit both changed files together.
 
 > [!NOTE]

@@ -58,8 +58,8 @@ def build_install_command(deps: dict[str, str]) -> str:
 
 
 MARKERS = {
-    "MANUAL_INSTALL": ("<!-- BEGIN MANUAL_INSTALL -->", "<!-- END MANUAL_INSTALL -->"),
-    "MINIMAL_INSTALL": ("<!-- BEGIN MINIMAL_INSTALL -->", "<!-- END MINIMAL_INSTALL -->"),
+    "MANUAL_INSTALL": ("<!-- MANUAL_INSTALL_START -->", "<!-- MANUAL_INSTALL_END -->"),
+    "MINIMAL_INSTALL": ("<!-- MINIMAL_INSTALL_START -->", "<!-- MINIMAL_INSTALL_END -->"),
 }
 
 
