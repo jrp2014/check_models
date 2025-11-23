@@ -251,6 +251,19 @@ testpaths = ["tests"]
 # Keep output concise; individual developers can override locally if needed.
 addopts = "-q"
 
+[tool.pyrefly]
+project-excludes = ["**/src/tools/.archived/"]
+search-path = ["typings"]
+python-version = "3.13.0"
+ignore-missing-imports = [
+    "mlx.*",
+    "mlx_vlm.*",
+    "mlx_lm.*",
+    "tokenizers.*",
+    "huggingface_hub.*",
+    "*",
+]
+
 
 
 [tool.setuptools.package-data]

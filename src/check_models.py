@@ -1818,18 +1818,22 @@ def _detect_generic_output(text: str) -> tuple[bool, float]:
     )
 
     # Specificity score: higher = more specific (0-100)
-    specificity_score = max(0, 100 - (filler_ratio * 200) + (specificity_indicators * 20))
+    specificity_score = max(0.0, 100 - (filler_ratio * 200) + (specificity_indicators * 20))
 
     return is_generic, round(specificity_score, 1)
 
 
-def _detect_language_mixing(text: str) -> tuple[bool, list[str]]:
+def _detect_language_mixing(
+    text: str,
+    quality_thresholds: QualityThresholds = QUALITY,
+) -> tuple[bool, list[str]]:
     """Detect unexpected language switches or code/tokenizer artifacts.
 
     Catches technical artifacts that shouldn't appear in natural language output.
 
     Args:
         text: Generated text to check
+        quality_thresholds: Configuration object containing patterns and thresholds
 
     Returns:
         Tuple of (has_mixing, list of detected issues)
@@ -1837,13 +1841,13 @@ def _detect_language_mixing(text: str) -> tuple[bool, list[str]]:
     if not text:
         return False, []
 
-    issues = []
+    issues: list[str] = []
 
     # Check for common tokenizer artifacts
-    tokenizer_artifacts = (
-        QUALITY.patterns.get("tokenizer_artifacts", [])
-        if QUALITY.patterns
-        else [
+    if quality_thresholds.patterns:
+        tokenizer_artifacts = quality_thresholds.patterns.get("tokenizer_artifacts", [])
+    else:
+        tokenizer_artifacts = [
             r"<\|endoftext\|>",
             r"<\|end\|>",
             r"<s>",
@@ -1857,7 +1861,6 @@ def _detect_language_mixing(text: str) -> tuple[bool, list[str]]:
             r"<unk>",
             r"<mask>",
         ]
-    )
 
     for artifact in tokenizer_artifacts:
         if re.search(artifact, text, re.IGNORECASE):
@@ -1865,15 +1868,14 @@ def _detect_language_mixing(text: str) -> tuple[bool, list[str]]:
             break
 
     # Check for code snippets (function calls, variable assignments)
-    code_patterns = (
-        QUALITY.patterns.get("code_patterns", [])
-        if QUALITY.patterns
-        else [
+    if quality_thresholds.patterns:
+        code_patterns = quality_thresholds.patterns.get("code_patterns", [])
+    else:
+        code_patterns = [
             r"\bdef\s+\w+\(",  # Python function def
             r"\bfunction\s+\w+\(",  # JavaScript function
             r'\w+\s*=\s*["\']',  # Variable assignment
         ]
-    )
 
     for pattern in code_patterns:
         if re.search(pattern, text):
@@ -3056,7 +3058,7 @@ def _wrap_output_column_in_details(html_table: str, output_col_idx: int) -> str:
     # Pattern to match table cells in data rows (not header)
     # We'll process each row and wrap the last td content
     lines = html_table.split("\n")
-    result_lines = []
+    result_lines: list[str] = []
 
     for original_line in lines:
         # Check if this is a data row (contains <td> tags)

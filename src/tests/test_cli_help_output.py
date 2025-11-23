@@ -7,7 +7,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-import pytest
+import pytest  # type: ignore[import]
 
 _SRC_DIR = Path(__file__).parent.parent
 _CHECK_MODELS_SCRIPT = _SRC_DIR / "check_models.py"

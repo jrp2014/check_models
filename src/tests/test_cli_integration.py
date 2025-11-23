@@ -4,7 +4,7 @@ These tests verify the full workflow from CLI input to output generation,
 including argument parsing, execution flow, and error handling.
 """
 
-# ruff: noqa: S603, ANN201
+# ruff: noqa: S603
 import subprocess
 import sys
 import time
@@ -69,7 +69,7 @@ def test_folder_with_images(tmp_path: Path) -> Path:
     return folder
 
 
-def test_cli_help_displays():
+def test_cli_help_displays() -> None:
     """Should display help message with --help."""
     result = subprocess.run(
         [sys.executable, str(_CHECK_MODELS_SCRIPT), "--help"],
@@ -84,7 +84,7 @@ def test_cli_help_displays():
     assert "--models" in result.stdout
 
 
-def test_cli_help_structure():
+def test_cli_help_structure() -> None:
     """Should display help text that includes usage information."""
     result = subprocess.run(
         [sys.executable, str(_CHECK_MODELS_SCRIPT), "--help"],
@@ -99,7 +99,7 @@ def test_cli_help_structure():
     assert "usage" in output.lower() or "--folder" in output
 
 
-def test_cli_exits_on_nonexistent_folder():
+def test_cli_exits_on_nonexistent_folder() -> None:
     """Should exit with error when folder does not exist."""
     result = subprocess.run(
         [
@@ -123,7 +123,7 @@ def test_cli_exits_on_nonexistent_folder():
     )
 
 
-def test_cli_exits_on_empty_folder(tmp_path: Path):
+def test_cli_exits_on_empty_folder(tmp_path: Path) -> None:
     """Should exit with error when folder has no images."""
     empty_folder = tmp_path / "empty"
     empty_folder.mkdir()
@@ -151,7 +151,7 @@ def test_cli_exits_on_empty_folder(tmp_path: Path):
     )
 
 
-def test_cli_invalid_temperature_value(test_folder_with_images: Path):
+def test_cli_invalid_temperature_value(test_folder_with_images: Path) -> None:
     """Should reject temperature outside valid range."""
     result = subprocess.run(
         [
@@ -174,7 +174,7 @@ def test_cli_invalid_temperature_value(test_folder_with_images: Path):
     assert "temperature" in output.lower()
 
 
-def test_cli_invalid_max_tokens(test_folder_with_images: Path):
+def test_cli_invalid_max_tokens(test_folder_with_images: Path) -> None:
     """Should reject negative max_tokens."""
     result = subprocess.run(
         [
@@ -196,7 +196,7 @@ def test_cli_invalid_max_tokens(test_folder_with_images: Path):
     assert "max" in output.lower() or "token" in output.lower()
 
 
-def test_cli_accepts_valid_parameters():
+def test_cli_accepts_valid_parameters() -> None:
     """Should accept valid command-line parameters without error."""
     # Just test that the script accepts parameters correctly without actually running models
     result = subprocess.run(
