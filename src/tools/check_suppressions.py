@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Audit all linting suppressions to see if they're still needed."""
 
 import re
@@ -81,7 +80,7 @@ def check_if_needed(file_path: Path, line_num: int, codes: str) -> tuple[bool, s
 
 def main() -> int:
     """Run suppression audit."""
-    src_dir = Path(__file__).parent.parent
+    src_dir = Path(__file__).resolve().parents[1]
     check_models = src_dir / "check_models.py"
 
     if not check_models.exists():
