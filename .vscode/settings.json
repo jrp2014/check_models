@@ -9,9 +9,7 @@
 
   // Enable pytest discovery for the src folder
   "python.testing.pytestEnabled": true,
-  "python.testing.pytestArgs": [
-    "src"
-  ],
+
 
   // Use integrated terminal environment for tasks/debug
   "terminal.integrated.env.osx": {
