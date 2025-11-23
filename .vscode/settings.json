@@ -31,23 +31,24 @@
   "python.linting.ruffEnabled": true,
   "python.linting.ruffPath": "ruff",
 
-  // Optional: tell Python extension which formatter you prefer (ruff handles formatting)
-  "python.formatting.provider": "ruff"
-}
-{
-  // Python configuration (project-specific, no hardcoded paths)
+  // Preferred Python formatter: set default formatter for Python files to Ruff
+  "python.formatting.provider": "ruff",
+  "[python]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit"
+    },
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  },
+
+  // Additional project-level python settings
   "python.terminal.activateEnvironment": true,
-  "python.testing.pytestEnabled": true,
   "python.testing.pytestArgs": [
     "src/tests"
   ],
   "mypy.configFile": "src/pyproject.toml",
-  
-  // Type stub configuration for mlx-vlm
   "python.analysis.stubPath": "src/typings",
-  "python.analysis.extraPaths": [
-    "src"
-  ],
   "python.analysis.exclude": [
     "**/typings/**"
   ],
@@ -58,14 +59,7 @@
     "reportMissingImports": "none",
     "reportMissingModuleSource": "none"
   },
-  "[python]": {
-    "editor.formatOnSave": true,
-    "editor.codeActionsOnSave": {
-      "source.fixAll": "explicit",
-      "source.organizeImports": "explicit"
-    },
-    "editor.defaultFormatter": "charliermarsh.ruff"
-  },
+
   "files.exclude": {
     "**/__pycache__": true,
     "**/.mypy_cache": true,
