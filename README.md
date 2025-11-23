@@ -12,7 +12,7 @@ Quick start (recommended):
 
 While `mlx-vlm` provides excellent raw generation capabilities, `check_models.py` adds a layer of **batch processing, standardized benchmarking, and reporting** essential for model evaluation:
 
-- **Batch Processing**: Run multiple models against multiple images in one go.
+- **Batch Processing**: Run multiple models against an image in one go.
 - **Standardized Metrics**: Automatically capture tokens/sec, memory usage, and load times in a consistent format.
 - **Rich Reporting**: Generate HTML, Markdown, and JSONL reports for easy sharing and analysis.
 - **Robustness**: Handles model failures gracefully (timeouts, errors) without crashing the entire batch.
@@ -20,11 +20,11 @@ While `mlx-vlm` provides excellent raw generation capabilities, `check_models.py
 
 ## Ecosystem
 
-This tool is part of the broader MLX ecosystem on Apple Silicon:
+This tool uses the broader MLX ecosystem on Apple Silicon:
 
 - **[MLX](https://github.com/ml-explore/mlx)**: The array framework for machine learning on Apple Silicon.
 - **[MLX VLM](https://github.com/ml-explore/mlx-vlm)**: The underlying library for running Vision-Language Models.
-- **[Hugging Face Hub](https://huggingface.co)**: The source for models (look for `mlx-community` or models with `mlx` tags).
+- **[Hugging Face Hub](https://huggingface.co)**: The source for models (look for `mlx-community` or models with `mlx` tags).  Image-Text-to-Text (I2T2) models are the category most likely to be supported.
 
 ## Quick Start
 
