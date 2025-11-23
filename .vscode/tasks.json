@@ -9,6 +9,13 @@
       "group": "build",
       "presentation": { "reveal": "always", "panel": "shared" }
     },
+		{
+			"label": "Activate conda: mlx-vlm",
+			"type": "shell",
+			"command": "zsh",
+			"args": ["-lc", "conda activate mlx-vlm && echo 'conda mlx-vlm activated'"] ,
+			"presentation": { "reveal": "always", "panel": "shared" }
+		},
     {
       "label": "Make: test",
       "type": "shell",

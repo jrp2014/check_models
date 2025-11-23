@@ -17,7 +17,22 @@
   "terminal.integrated.env.osx": {
     "CONDA_DEFAULT_ENV": "mlx-vlm",
     "PATH": "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/bin:${env:PATH}"
-  }
+  },
+
+  // Auto-format and code actions on save using ruff (requires ruff extension)
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "always",
+    "source.fixAll.ruff": "always"
+  },
+
+  // Enable ruff linting (for ms-python integration) and prefer ruff formatting
+  "python.linting.enabled": true,
+  "python.linting.ruffEnabled": true,
+  "python.linting.ruffPath": "ruff",
+
+  // Optional: tell Python extension which formatter you prefer (ruff handles formatting)
+  "python.formatting.provider": "ruff"
 }
 {
   // Python configuration (project-specific, no hardcoded paths)
