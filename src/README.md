@@ -735,7 +735,7 @@ python check_models.py \
 | Flag | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
 | `-f`, `--folder` | Path | `~/Pictures/Processed` | Folder of images to process (non‑recursive). |
-| `--image` | Path | (none) | Path to a specific image file to process directly. |
+| `-i`, `--image` | Path | (none) | Path to a specific image file to process directly. |
 | `--output-html` | Path | `output/results.html` | HTML report output filename. |
 | `--output-markdown` | Path | `output/results.md` | Markdown report output filename. |
 | `--output-tsv` | Path | `output/results.tsv` | TSV (tab-separated values) report output filename. |
@@ -746,23 +746,23 @@ python check_models.py \
 | `-e`, `--exclude` | list[str] | (none) | Models to exclude (applies to cache scan or explicit list). |
 | `--trust-remote-code` | flag | `True` | Allow custom code from Hub models (SECURITY RISK). |
 | `-p`, `--prompt` | str | (auto) | Custom prompt; if omitted a metadata‑aware prompt may be used. |
-| `--detailed-metrics` | flag | `False` | Show expanded multi-line metrics block (verbose mode only). |
+| `-d`, `--detailed-metrics` | flag | `False` | Show expanded multi-line metrics block (verbose mode only). |
 | `-x`, `--max-tokens` | int | 500 | Max new tokens to generate. |
 | `-t`, `--temperature` | float | 0.1 | Sampling temperature. |
 | `--top-p` | float | 1.0 | Nucleus sampling parameter (0.0-1.0); lower = more focused. |
-| `--repetition-penalty` | float | (none) | Penalize repeated tokens (>1.0 discourages repetition). |
+| `-r`, `--repetition-penalty` | float | (none) | Penalize repeated tokens (>1.0 discourages repetition). |
 | `--repetition-context-size` | int | 20 | Context window size for repetition penalty. |
-| `--lazy-load` | flag | `False` | Use lazy loading (loads weights on-demand, reduces memory). |
+| `-L`, `--lazy-load` | flag | `False` | Use lazy loading (loads weights on-demand, reduces memory). |
 | `--max-kv-size` | int | (none) | Maximum KV cache size (limits memory for long sequences). |
-| `--kv-bits` | int | (none) | Quantize KV cache to N bits (4 or 8); saves memory. |
-| `--kv-group-size` | int | 64 | Quantization group size for KV cache. |
+| `-b`, `--kv-bits` | int | (none) | Quantize KV cache to N bits (4 or 8); saves memory. |
+| `-g`, `--kv-group-size` | int | 64 | Quantization group size for KV cache. |
 | `--quantized-kv-start` | int | 0 | Start position for KV cache quantization. |
-| `--timeout` | float | 300 | Operation timeout (seconds) for model execution. |
+| `-T`, `--timeout` | float | 300 | Operation timeout (seconds) for model execution. |
 | `-v`, `--verbose` | flag | `False` | Enable verbose + debug logging. |
 | `--no-color` | flag | `False` | Disable ANSI colors in the CLI output. |
 | `--force-color` | flag | `False` | Force-enable ANSI colors even if stderr is not a TTY. |
 | `--width` | int | (auto) | Force a fixed output width (columns) for separators and wrapping. |
-| `--quality-config` | Path | (none) | Path to custom quality configuration YAML file. |
+| `-c`, `--quality-config` | Path | (none) | Path to custom quality configuration YAML file. |
 | `--context-marker` | str | `Context:` | Marker used to identify context section in prompt. |
 
 ### Selection Logic

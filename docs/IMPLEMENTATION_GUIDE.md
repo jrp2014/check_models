@@ -71,19 +71,24 @@ A single medium-sized, well-commented function is often clearer than a web of on
     - Run `python -m tools.validate_env` to diagnose environment issues.
     - Run `make quality` to verify your changes (formatting, linting, typing).
     - **Do not** create new "test" scripts; use `python -m mlx_vlm.generate` or the official `test_smoke.py` for verification.
-3. **Configuration over Hardcoding**:
+3. **Environment Discipline**:
+    - **ALWAYS** run python commands in the `mlx-vlm` conda environment.
+    - Use `conda run -n mlx-vlm python ...` for single commands.
+    - Or prefer `make` targets (e.g., `make run`, `make test`) which handle the environment automatically.
+    - **NEVER** run `python` directly without ensuring the environment is active.
+4. **Configuration over Hardcoding**:
     - **Never** hardcode magic numbers for thresholds (e.g., repetition limits, formatting precision).
     - Always use or extend `src/quality_config.yaml` and the `QualityThresholds` class.
-4. **Dependency Management**:
+5. **Dependency Management**:
     - If you add an import, you **must** add it to `pyproject.toml` and run `python -m tools.update_readme_deps`.
-5. **Linting**:
+6. **Linting**:
     - Do not suppress lints (e.g., `# noqa`, `# type: ignore`) without a specific, valid reason documented in a comment.
     - Fix the underlying issue whenever possible.
-6. **Documentation & Alignment**:
+7. **Documentation & Alignment**:
     - **Update All Docs**: Ensure changes are reflected in `src/README.md`, `docs/CONTRIBUTING.md`, and `docs/IMPLEMENTATION_GUIDE.md`.
     - **Avoid Fragmentation**: Try to avoid changes that require aligning multiple scripts or documents.
     - **Validate Alignment**: If multi-file alignment is unavoidable, you **must** execute the necessary updates (e.g., sync scripts) and validate that all files are consistent.
-7. **Validation**:
+8. **Validation**:
     - **Add Tests**: Whenever possible, add an easy test case to validate your change.
 
 ## Repository Structure

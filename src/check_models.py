@@ -6389,6 +6389,7 @@ def main_cli() -> None:
         ),
     )
     group.add_argument(
+        "-i",
         "--image",
         type=Path,
         default=None,
@@ -6465,6 +6466,7 @@ def main_cli() -> None:
     )
 
     parser.add_argument(
+        "-d",
         "--detailed-metrics",
         action="store_true",
         default=False,
@@ -6491,6 +6493,7 @@ def main_cli() -> None:
         help="Nucleus sampling parameter (0.0-1.0). Lower values = more focused output.",
     )
     parser.add_argument(
+        "-r",
         "--repetition-penalty",
         type=float,
         default=None,
@@ -6503,6 +6506,7 @@ def main_cli() -> None:
         help="Context window size for repetition penalty.",
     )
     parser.add_argument(
+        "-L",
         "--lazy-load",
         action="store_true",
         default=False,
@@ -6515,6 +6519,7 @@ def main_cli() -> None:
         help="Maximum KV cache size (limits memory for long sequences). None = no limit.",
     )
     parser.add_argument(
+        "-b",
         "--kv-bits",
         type=int,
         default=None,
@@ -6522,6 +6527,7 @@ def main_cli() -> None:
         help="Quantize KV cache to N bits (4 or 8). Saves memory with small quality trade-off.",
     )
     parser.add_argument(
+        "-g",
         "--kv-group-size",
         type=int,
         default=64,
@@ -6540,6 +6546,7 @@ def main_cli() -> None:
         help="Enable verbose and debug output (DEBUG logging).",
     )
     parser.add_argument(
+        "-T",
         "--timeout",
         type=float,
         default=DEFAULT_TIMEOUT,
@@ -6565,6 +6572,7 @@ def main_cli() -> None:
         ),
     )
     parser.add_argument(
+        "-c",
         "--quality-config",
         type=Path,
         default=None,
