@@ -72,4 +72,13 @@
   "[jsonc]": {
     "editor.defaultFormatter": "vscode.json-language-features"
   }
+  ,
+  // Prefer the built-in Markdown formatter (prevents Copilot/other extensions taking over)
+  "[markdown]": {
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+  },
+  // Prefer a TOML formatter extension; recommend "bungcip.better-toml" in extensions.json
+  "[toml]": {
+    "editor.defaultFormatter": "tamasfe.even-better-toml"
+  }
 }
