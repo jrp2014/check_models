@@ -64,4 +64,12 @@
     "**/.ruff_cache": true,
     "**/*.egg-info": true
   }
+  ,
+  // Force JSON/JSONC to use the built-in JSON formatter (prevents Copilot being used)
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  }
 }
