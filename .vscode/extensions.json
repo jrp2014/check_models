@@ -2,13 +2,7 @@
   "recommendations": [
     "ms-python.python",
     "ms-python.vscode-pylance",
-    "charliermarsh.ruff"
-  ]
-}
-{
-  "recommendations": [
-    "ms-python.python",
-    "ms-python.vscode-pylance",
+    "ms-toolsai.jupyter",
     "charliermarsh.ruff",
     "davidanson.vscode-markdownlint",
     "tamasfe.even-better-toml",
