@@ -1,75 +1,57 @@
-
 # MLX Vision Language Model Checker (`check_models.py`)
 
-`check_models.py` is a focused benchmarking and inspection tool for MLX-compatible Vision Language Models (VLMs) on Apple Silicon. It loads one or more local / cached models, optionally derives a prompt from image metadata (EXIF + GPS), runs generation, and reports performance (tokens, speed, timings, memory) plus outputs in colorized CLI, HTML, Markdown, and TSV formats.
+`check_models.py` is a comprehensive benchmarking and inspection tool designed for MLX-compatible Vision Language Models (VLMs) on Apple Silicon. It streamlines the process of validating model performance, quality, and resource usage across your local model collection.
 
 > [!NOTE]
-> This tool runs MLX-format Vision-Language Models hosted on the [Hugging Face Hub](https://huggingface.co). By default it will run all the models found in your local Hugging Face Hub cache (use `--models` to specify explicit model IDs).
-
+> This tool runs MLX-format Vision-Language Models hosted on the [Hugging Face Hub](https://huggingface.co). By default, it discovers and runs all models found in your local Hugging Face Hub cache, making it effortless to benchmark your entire library.
 
 ## Who is this for?
 
-- Users (including MLX/MLX‑VLM/MLX‑LM developers) who want to run models on their own images and quickly see outputs and metrics: see the TL;DR below.
-- Contributors who want to work on `check_models.py` itself and keep quality gates green: see the Contributors section near the end.
+- **Users & Researchers**: Quickly benchmark models on your own images, compare performance (TPS, memory), and verify output quality without writing code.
+- **Developers**: Validate model conversions, debug quantization issues, and ensure regression testing for MLX/MLX-VLM improvements.
 
+## Quick Start
 
-## TL;DR for Users
+Get up and running immediately with your cached models.
 
-Defaults assume you have Hugging Face models in your local cache. The tool will discover cached VLMs automatically (unless you pass `--models`), carefully read EXIF metadata (including GPS/time when present) to enrich prompts, and write reports to `output/results.html`, `output/results.md`, `output/results.tsv`, and `output/results.jsonl` by default.
+### 1. Installation
 
-
-Quickest start on Apple Silicon (Python 3.13):
+The fastest way to start is using the automated setup script (requires Conda):
 
 ```bash
-# From repository root
-make install
+# Sets up a 'mlx-vlm' environment with Python 3.13 and all dependencies
+./setup_conda_env.sh
+conda activate mlx-vlm
+```
 
-# Run all your cached models against a folder of images (change the path to your images) using a default prompt
+*(See [Installation Details](#installation-and-environment-setup) for manual pip/uv methods)*
+
+### 2. Run Your First Check
+
+By default, the tool scans your Hugging Face cache for compatible models and runs them against images in `~/Pictures/Processed`.
+
+```bash
+# Run all cached models against the most recent image in your folder
 python -m check_models --folder ~/Pictures/Processed --prompt "Describe this image."
 
-# Run them against a specific image
-python -m check_models --image ~/Pictures/Processed/sample.jpg --prompt "Describe this image."
-# You can  use `--image` to specify a single image file directly. If neither `--folder` nor `--image` is specified, the script will assume a default folder and log diagnostics explaining the assumption.
-
-# Try a specific model (which will be downloaded if it is not cached locally)
-python -m check_models --folder ~/Pictures/Processed --models mlx-community/nanoLLaVA mlx-community/llava-1.5-7b-hf
-
-# Exclude a model from the local auto-discovered cache
-python -m check_models --folder ~/Pictures/Processed --exclude "microsoft/Phi-3-vision-128k-instruct"
+# Run against a specific image file
+python -m check_models --image ~/Pictures/Processed/sample.jpg
 ```
 
-
-Prefer working directly in `src/`?
+### 3. Common Commands
 
 ```bash
-cd src
-python -m venv .venv && source .venv/bin/activate
-pip install -e .
+# Test specific models (downloads them if needed)
+python -m check_models --models mlx-community/nanoLLaVA mlx-community/llava-1.5-7b-hf
 
-# Optional extras for system metrics & tokenizers
-pip install -e ".[extras]"
+# Exclude a problematic model from the batch
+python -m check_models --exclude "microsoft/Phi-3-vision-128k-instruct"
 
-# Optional: Install PyTorch (needed for some models like Phi-3-vision)
-pip install -e ".[torch]"
-
-# Run directly
-python check_models.py -f ~/Pictures/Processed -p "Describe this image."
+# Run with detailed debug logging
+python -m check_models --verbose
 ```
 
-**Python**: 3.13+ (project is configured and tested on Python 3.13)
-
-
-Key defaults and parameters:
-
-- Models: discovered from your local Hugging Face cache. Use `--models` for explicit IDs, `--exclude` to filter.
-- Images: `-f/--folder` points to your images; default is `~/Pictures/Processed`. If neither `--folder` nor `--image` is specified, the script assumes the default folder and logs a diagnostic message.
-- **Folder behavior**: When you pass a folder path, the script automatically selects the **most recently modified image file** in that folder (hidden files are ignored). If no image or folder is specified, the default folder is used and a diagnostic is logged.
-- Reports: By default, `output/results.html`, `output/results.md`, `output/results.tsv`, and `output/results.jsonl` are created; override via `--output-html`, `--output-markdown`, `--output-tsv`, and `--output-jsonl`.
-- Prompting: If `--prompt` isn't provided, the tool can compose a metadata‑aware prompt from EXIF data when available (camera, time, GPS).
-- Runtime: `--timeout 300`, `--max-tokens 500`, `--temperature 0.1` by default.
-- Sampling: `--top-p 1.0` (nucleus sampling), `--repetition-penalty` (disabled by default).
-- Memory: `--lazy-load` (off by default), `--kv-bits` and `--max-kv-size` for KV cache optimization.
-- Security: `--trust-remote-code=True` by default for Hub models; only use with trusted sources.
+**Python Version**: 3.13+ is recommended and tested.
 
 ## Capabilities
 
@@ -107,55 +89,6 @@ Key defaults and parameters:
 
 ## Installation and Environment Setup
 
-### Using `pyproject.toml` (recommended)
-
-This project includes a `pyproject.toml` file that defines all dependencies and can be used with modern Python package managers.
-
-### With uv (untested)
-
-```bash
-# Install uv if you haven't already
-pip install uv
-
-# Create environment and install dependencies
-uv venv
-source .venv/bin/activate  # On macOS/Linux
-# .venv\Scripts\activate     # On Windows
-uv pip install -e .  # run inside the src/ directory (root-level Makefile is a shim)
-
-# For development with additional tools
-uv pip install -e ".[dev]"
-```
-
-### With pip
-
-```bash
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate  # On macOS/Linux
-# .venv\Scripts\activate     # On Windows
-
-# Install the package
-pip install -e .  # run inside src/
-
-# For development
-pip install -e ".[dev]"
-```
-
-### With conda
-
-```bash
-# Create conda environment
-conda create -n mlx-vlm python=3.13
-conda activate mlx-vlm
-
-# Install dependencies
-pip install -e .  # run inside src/
-
-# Optional: Install PyTorch and other extras
-pip install -e ".[torch,extras]"
-```
-
 ### Automated Setup (Recommended)
 
 For the easiest setup, use the provided shell script that automates the entire conda environment creation:
@@ -167,44 +100,151 @@ chmod +x setup_conda_env.sh
 # Create environment with default name 'mlx-vlm'
 ./setup_conda_env.sh
 
-# Or create with custom name
-./setup_conda_env.sh my-custom-env-name
-
-# View help
-./setup_conda_env.sh --help
+# Activate
+conda activate mlx-vlm
 ```
 
-The script will:
+The script handles Python 3.13 setup, dependencies, and optional PyTorch support.
 
-- Check for macOS and Apple Silicon compatibility
-- Create a conda environment with Python 3.13
-- Install all required and optional dependencies
-- Install the package in development mode
-- Verify the installation
-- Provide usage instructions
+### Manual Installation
 
-Torch support:
+If you prefer manual setup, we support `pip`, `uv`, and `conda`.
 
-- During setup, you'll be prompted to install the optional PyTorch stack (torch, torchvision, torchaudio). Choose 'y' if you plan to use models that rely on Torch.
-- You can also install later via the project extra: `pip install -e ".[torch]"`.
-- The update helper script supports installing Torch too: run with `INSTALL_TORCH=1` to include it.
+<details>
+<summary>Click to view manual installation methods</summary>
 
-## Usage
+#### Using `uv` (Fastest)
 
-### Basic Examples
+```bash
+pip install uv
+uv venv
+source .venv/bin/activate
+uv pip install -e .
+```
 
-See the **TL;DR for Users** section at the top for quick start commands.
+#### Using `pip`
 
-For more examples, see the **Additional Examples** section later in this document.
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+```
 
-### Notes on Metrics and Output Formatting
+#### Using `conda`
 
-- Memory units: All memory metrics are displayed in GB. Sources differ: MLX reports bytes; mlx‑vlm reports decimal GB (bytes/1e9). The tool detects and normalizes both to GB for consistent display.
-- Markdown escaping: The final output column preserves common GitHub‑supported tags (e.g., `<br>`) and escapes others so special tokens like `<s>` render literally.
-- Compact vs detailed metrics (verbose mode): By default, verbose output shows a single aligned line beginning with `Metrics:`. Enable classic multi‑line breakdown with `--detailed-metrics`.
-- Token triple legend: `tokens(total/prompt/gen)=T/P/G` corresponds to total tokens = prompt tokens + generated tokens.
+```bash
+conda create -n mlx-vlm python=3.13
+conda activate mlx-vlm
+pip install -e .
+```
 
-### Parameter Reference
+</details>
+
+### Optional Dependencies
+
+Enable additional features by installing "extras":
+
+```bash
+# Install core + extras (psutil, tokenizers, etc.)
+pip install -e ".[extras]"
+
+# Install PyTorch support (needed for Phi-3-vision, Florence-2)
+pip install -e ".[torch]"
+
+# Install everything for development
+pip install -e ".[dev,extras,torch]"
+```
+
+## Usage Guide
+
+### Basic Execution
+
+The tool is flexible: it can scan your cache, run specific models, or process single images.
+
+```bash
+# 1. Run all cached models against a folder
+python -m check_models --folder ~/Pictures/Processed
+
+# 2. Run a specific model against a single image
+python -m check_models --image test.jpg --models mlx-community/nanoLLaVA
+
+# 3. Run with a custom prompt
+python -m check_models --image test.jpg --prompt "Detailed caption."
+```
+
+### Advanced Examples
+
+```bash
+# Run across all cached models with a custom prompt
+python check_models.py -f ~/Pictures/Processed -p "What is the main object in this image?"
+
+# Explicit model list (skips cache discovery)
+python check_models.py -f ~/Pictures/Processed -m mlx-community/nanoLLaVA mlx-community/llava-1.5-7b-hf
+
+# Exclude specific models from the automatic cache scan
+python check_models.py -f ~/Pictures/Processed -e mlx-community/problematic-model other/model
+
+# Combine explicit list with exclusions
+python check_models.py -f ~/Pictures/Processed -m model1 model2 model3 -e model2
+
+# Verbose (debug) mode for detailed logs
+python check_models.py -f ~/Pictures/Processed -v
+```
+
+<details>
+<summary>Click for more complex examples</summary>
+
+```bash
+# Full benchmark run with HTML/Markdown reports
+python check_models.py \
+  --folder ~/Pictures/TestImages \
+  --exclude "microsoft/Phi-3-vision-128k-instruct" \
+  --prompt "Provide a detailed caption for this image" \
+  --max-tokens 200 \
+  --temperature 0.1 \
+  --timeout 600 \
+  --output-html ~/reports/vlm_benchmark.html \
+  --output-markdown ~/reports/vlm_benchmark.md \
+  --verbose
+
+# Memory optimization for large models (4-bit KV cache)
+python check_models.py \
+  --folder ~/Pictures \
+  --lazy-load \
+  --max-kv-size 4096 \
+  --kv-bits 4
+
+# Sampling control (Nucleus sampling + Repetition penalty)
+python check_models.py \
+  --folder ~/Pictures \
+  --top-p 0.9 \
+  --repetition-penalty 1.2 \
+  --repetition-context-size 50
+```
+
+</details>
+
+### Understanding the Output
+
+The tool generates multiple report formats in `output/` by default:
+
+- **CLI**: Real-time colorized progress and metrics.
+- **HTML** (`results.html`): Interactive table with sortable columns and failed row highlighting.
+- **Markdown** (`results.md`): GitHub-compatible summary for documentation.
+- **TSV/JSONL**: Machine-readable formats for analysis.
+
+### Metrics Explained
+
+- **TPS (Tokens/Sec)**: Speed of generation. Higher is better.
+- **Peak Memory**: Maximum RAM used. Critical for hardware sizing.
+- **Load Time**: Time to load weights into memory.
+- **Tokens**: Breakdown of Prompt (input) vs Generated (output) counts.
+
+> [!TIP]
+> **Memory Units**: All memory metrics are normalized to GB (decimal).
+> **Token Counts**: `tokens(total/prompt/gen)` shows the full breakdown.
+
+### Configuration & Parameters
 
 #### Controlling Repetitive Output
 
@@ -399,7 +439,50 @@ pip install "huggingface-hub[cli,torch,typing]>=0.34.0,<1.0" "mlx>=0.29.1" "mlx-
 - **Python**: 3.13+ (3.13 is the tested baseline)
 - **Operating System**: macOS with Apple Silicon (MLX is Apple‑Silicon specific)
 
-## Dependencies
+
+
+### Advanced Configuration
+
+The tool uses a YAML configuration file to define thresholds for quality checks (hallucination, repetition, verbosity).
+
+- **Default Config**: The tool ships with a default `quality_config.yaml` in the `src/` directory.
+- **Custom Config**: You can provide your own config file via `--quality-config path/to/config.yaml`.
+
+**Key Configurable Areas:**
+
+- **Repetition**: Thresholds for token and phrase repetition.
+- **Hallucination**: Keywords and patterns that suggest hallucinated content (e.g., "based on the chart" when no chart exists).
+- **Verbosity**: Limits on output length and meta-commentary patterns.
+- **Formatting**: Rules for markdown headers, bullet points, and table structures.
+
+See `src/quality_config.yaml` for the full schema and default values.
+
+### Development Tools
+
+The `src/tools/` directory contains scripts useful for development and verification:
+
+- **Smoke Testing**: For quick verification, you can use the standard `mlx-vlm` CLI:
+
+  ```bash
+  python -m mlx_vlm.generate --model mlx-community/nanoLLaVA --image test.jpg
+  ```
+
+  Or refer to the official [test_smoke.py](https://github.com/Blaizzy/mlx-vlm/blob/main/mlx_vlm/tests/test_smoke.py) script.
+
+- **`validate_env.py`**: Checks your environment for required dependencies and configuration.
+
+  ```bash
+  python -m tools.validate_env
+  ```
+
+- **`check_quality.py`**: Runs formatting and static checks.
+
+  ```bash
+  # Default: format + fixable lint + mypy on check_models.py
+  python tools/check_quality.py
+  ```
+
+## Appendix: Dependencies
 
 Why so slim? The runtime dependency set is intentionally minimized to only the
 packages directly imported by `check_models.py`. Everything else that might
@@ -527,40 +610,6 @@ pip install -e ".[dev,extras]"  # dev tools + optional metrics/tokenizers
 > To clean build artifacts: `make clean` (project), `make clean-mlx` (local MLX repos), or `bash tools/clean_builds.sh`.
 
 <!-- markdownlint-enable MD028 -->
-
-### Advanced Configuration
-
-The tool uses a YAML configuration file to define thresholds for quality checks (hallucination, repetition, verbosity).
-
-- **Default Config**: The tool ships with a default `quality_config.yaml` in the `src/` directory.
-- **Custom Config**: You can provide your own config file via `--quality-config path/to/config.yaml`.
-
-**Key Configurable Areas:**
-
-- **Repetition**: Thresholds for token and phrase repetition.
-- **Hallucination**: Keywords and patterns that suggest hallucinated content (e.g., "based on the chart" when no chart exists).
-- **Verbosity**: Limits on output length and meta-commentary patterns.
-- **Formatting**: Rules for markdown headers, bullet points, and table structures.
-
-See `src/quality_config.yaml` for the full schema and default values.
-
-### Development Tools
-
-The `src/tools/` directory contains scripts useful for development and verification:
-
-- **Smoke Testing**: For quick verification, you can use the standard `mlx-vlm` CLI:
-
-  ```bash
-  python -m mlx_vlm.generate --model mlx-community/nanoLLaVA --image test.jpg
-  ```
-
-  Or refer to the official [test_smoke.py](https://github.com/Blaizzy/mlx-vlm/blob/main/mlx_vlm/tests/test_smoke.py) script.
-
-- **`validate_env.py`**: Checks your environment for required dependencies and configuration.
-
-  ```bash
-  python -m tools.validate_env
-  ```
 
 ## Python API
 
@@ -716,8 +765,6 @@ python check_models.py \
 | `--quality-config` | Path | (none) | Path to custom quality configuration YAML file. |
 | `--context-marker` | str | `Context:` | Marker used to identify context section in prompt. |
 
-
-
 ### Selection Logic
 
 Image selection logic:
@@ -736,9 +783,11 @@ Model selection logic:
 The script warns about exclusions that don't match any candidate model.
 
 
-## Diagnostics
 
-If neither `--folder` nor `--image` is specified, the script will log a diagnostic message indicating that the default folder is being used. This ensures clarity and helps users understand the script's assumptions.
+
+
+
+
 
 ## Output Formats
 
@@ -788,42 +837,7 @@ GitHub-compatible format with:
 - Easy integration into documentation
 
 
-## Additional Examples
 
-Run on a specific image:
-
-```bash
-python check_models.py --image ~/Pictures/Processed/sample.jpg --prompt "Describe this image."
-```
-
-Test all available models:
-
-```bash
-python check_models.py
-```
-
-Test only fast models, exclude slow ones:
-
-```bash
-python check_models.py --exclude "meta-llama/Llama-3.2-90B-Vision-Instruct"
-```
-
-Test specific models for comparison:
-
-```bash
-python check_models.py --models \
-  "microsoft/Phi-3-vision-128k-instruct" \
-  "Qwen/Qwen2-VL-7B-Instruct" \
-  "BAAI/Bunny-v1_1-Llama-3-8B-V"
-```
-
-Test a curated list but exclude one problematic model:
-
-```bash
-python check_models.py \
-  --models "model1" "model2" "model3" "model4" \
-  --exclude "model3"
-```
 
 ## Metrics Tracked
 
@@ -837,6 +851,10 @@ The script tracks and reports:
 - **Error Analysis**: Detailed error reporting and diagnostics
 
 ## Troubleshooting
+
+### Diagnostics
+
+If neither `--folder` nor `--image` is specified, the script will log a diagnostic message indicating that the default folder is being used. This ensures clarity and helps users understand the script's assumptions.
 
 ### Common Issues
 
@@ -1099,30 +1117,4 @@ npm install
 
 MIT License: See the [LICENSE](../LICENSE) file for details.
 
-## Quality checks and formatting
 
-A small helper script runs formatting and static checks for this project.
-
-- Defaults:
-  - Targets only `check_models.py` unless paths are provided
-  - Runs `ruff format` by default (skip with `--no-format`)
-  - Runs `ruff check --fix` by default (skip fixing with `--no-fix`)
-  - Runs `mypy` for type checking
-
-Examples:
-
-```bash
-# Default: format + fixable lint + mypy on check_models.py
-python tools/check_quality.py
-
-# Skip auto-fix
-python tools/check_quality.py --no-fix
-
-# Skip formatting
-python tools/check_quality.py --no-format
-
-# Check multiple paths (from src/ directory)
-python tools/check_quality.py . tools
-```
-
-Requirements: `ruff` and `mypy` (install with `pip install -e ".[dev]"`).
