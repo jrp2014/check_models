@@ -137,15 +137,40 @@ make quality  # Automatically generates stubs if missing
 
 **Requirements**:
 
-- All new functions must be fully typed (parameters + return type)
-- Use `| None` over `Optional[T]` (Python 3.13 style)
-- Prefer concrete container types (e.g., `list[str]`, `dict[str, Any]`)
-- Use `Protocol` or `TypedDict` only when it materially clarifies usage or makes the code more robust
+- **Future Annotations**: All files must start with `from __future__ import annotations`.
+- **Full Typing**: All new functions must be fully typed (parameters + return type).
+- **Modern Syntax**: Use `| None` over `Optional[T]` and `list[str]` over `List[str]`.
+- **Constants**: Use `Final` for all constants to prevent accidental reassignment.
+- **Protocols**: Use `Protocol` or `TypedDict` only when it materially clarifies usage.
+- **Type Checking Blocks**: Use `if TYPE_CHECKING:` for imports that are only needed for static analysis (avoids circular deps and runtime overhead).
 
 **Type narrowing**:
 
-- Runtime casts: use `typing.cast` sparingly; prefer narrowing via `if` guards
-- Replace blanket `# type: ignore` with specific codes (e.g., `# type: ignore[attr-defined]`)
+- Runtime casts: use `typing.cast` sparingly; prefer narrowing via `if` guards.
+- **Optional Dependencies**: When handling optional imports (e.g., `PIL`, `mlx`), use `cast("Any", None)` or specific stubs to satisfy mypy on the fallback path.
+- Replace blanket `# type: ignore` with specific codes (e.g., `# type: ignore[attr-defined]`).
+
+### Optional Dependencies & Resilience
+
+The codebase uses a **fail-soft** pattern for optional dependencies:
+
+1. **Import Guard**: Wrap imports in `try/except ImportError`.
+2. **Fallback**: Define a placeholder (e.g., `NOT_AVAILABLE` constant or a dummy class) in the `except` block.
+3. **Runtime Check**: Check availability before use (e.g., `if pillow_version != NOT_AVAILABLE:`).
+
+**Example**:
+
+```python
+try:
+    import psutil
+except ImportError:
+    psutil = None  # Handle missing dep gracefully
+
+def get_memory():
+    if psutil is None:
+        return 0  # Fallback behavior
+    return psutil.virtual_memory().total
+```
 
 ### Paths & Files
 
@@ -335,6 +360,56 @@ except RuntimeError as e:
 - If common models require even longer names, increase further with inline comment
 
 ## Quality & Linting
+
+### Python Quality Checks
+
+All Python code is rigorously tested to ensure quality and correctness:
+
+- **Ruff**: Used for both linting and formatting. It enforces style consistency, catches common errors, and sorts imports.
+- **Mypy**: Used for static type checking. We require full type annotations for all new code.
+
+Run these checks locally:
+
+```bash
+make quality
+```
+
+### Markdown Linting
+
+The project uses `markdownlint-cli2` to ensure consistent markdown formatting across documentation files. This is **optional** but recommended for contributors who edit documentation.
+
+**Why Markdown Linting?**
+
+- Ensures consistent formatting across all `.md` files
+- Catches common markdown mistakes
+- Enforces best practices (blank lines, heading structure, etc.)
+- Runs automatically in `make quality` if available
+
+**Installation**:
+
+1. **Option 1: Install Node.js/npm (Recommended)**
+   - Install Node.js (via Homebrew `brew install node` or [nodejs.org](https://nodejs.org/)).
+   - Run `make install-markdownlint` in the `src/` directory.
+2. **Option 2: Use npx (No Installation)**
+   - If you have npm but don't want local packages, use `npx markdownlint-cli2 '**/*.md'`.
+3. **Option 3: Skip**
+   - If Node.js is missing, linting is skipped with a warning. CI will still check it.
+
+**Usage**:
+
+```bash
+make quality          # Includes markdown linting if available
+make quality-strict   # Requires markdown linting (fails if unavailable)
+```
+
+**Configuration**:
+
+Markdown consistency is enforced (optionally) via `markdownlint-cli2` using the configuration in `.markdownlint.jsonc`:
+
+- Long lines (MD013) are disabled to allow readable HTML/CSS blocks and wide tables
+- Inline HTML is allowed (MD033) because the codebase already sanitizes/escapes disallowed tags
+- Duplicate headings (MD024) are permitted; some conceptual repeats are intentional
+- Follow existing heading spacing (blank line before/after) and prefer asterisk `*` for unordered lists
 
 ### Ruff Configuration
 

@@ -33,4 +33,4 @@ For current development practices and guidelines, see:
 
 - [../CONTRIBUTING.md](../CONTRIBUTING.md) - How to contribute
 - [../IMPLEMENTATION_GUIDE.md](../IMPLEMENTATION_GUIDE.md) - Technical standards
-- [../PYTHON_313_MIGRATION.md](../PYTHON_313_MIGRATION.md) - Python 3.13 notes
+- [PYTHON_313_MIGRATION.md](PYTHON_313_MIGRATION.md) - Python 3.13 notes
