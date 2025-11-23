@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Validate the development environment is properly configured.
 
 This script checks:
@@ -40,7 +39,7 @@ class ValidationError(Exception):
 
 def load_pyproject_deps() -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
     """Load dependencies from pyproject.toml."""
-    pyproject_path = Path(__file__).parents[2] / "pyproject.toml"
+    pyproject_path = Path(__file__).resolve().parents[2] / "pyproject.toml"
     if not pyproject_path.exists():
         # Fallback if running from different location
         pyproject_path = Path("pyproject.toml").resolve()
@@ -52,6 +51,10 @@ def load_pyproject_deps() -> tuple[dict[str, str], dict[str, str], dict[str, str
     try:
         with pyproject_path.open("rb") as f:
             data = tomllib.load(f)
+            # logger.info("Loaded pyproject.toml from %s", pyproject_path) # Commented out to avoid noise, or keep it?
+            # The user didn't ask for logging, but it helps debugging.
+            # I'll stick to just the fix first.
+
     except Exception as e:  # noqa: BLE001
         logger.warning("Failed to parse pyproject.toml: %s", e)
         return {}, {}, {}
