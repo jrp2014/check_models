@@ -1,4 +1,25 @@
 {
+  // Point VS Code at the conda environment used for development
+  "python.defaultInterpreterPath": "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/bin/python",
+
+  // Make the `src` package importable for analysis and tests
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/src"
+  ],
+
+  // Enable pytest discovery for the src folder
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": [
+    "src"
+  ],
+
+  // Use integrated terminal environment for tasks/debug
+  "terminal.integrated.env.osx": {
+    "CONDA_DEFAULT_ENV": "mlx-vlm",
+    "PATH": "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/bin:${env:PATH}"
+  }
+}
+{
   // Python configuration (project-specific, no hardcoded paths)
   "python.terminal.activateEnvironment": true,
   "python.testing.pytestEnabled": true,

@@ -1,4 +1,34 @@
 {
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Make: quality",
+      "type": "shell",
+      "command": "make",
+      "args": ["quality"],
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Make: test",
+      "type": "shell",
+      "command": "make",
+      "args": ["test"],
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Run: check_models (help)",
+      "type": "shell",
+      "command": "python",
+      "args": ["-m", "check_models", "--help"],
+      "options": { "cwd": "${workspaceFolder}/src" },
+      "group": "none",
+      "presentation": { "reveal": "always", "panel": "shared" }
+    }
+  ]
+}
+{
 	"version": "2.0.0",
 	"tasks": [
 		{
