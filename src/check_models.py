@@ -272,7 +272,7 @@ THOUSAND_THRESHOLD: Final[int] = FORMATTING.thousand_separator
 MEMORY_GB_INTEGER_THRESHOLD: Final[float] = FORMATTING.memory_gb_integer
 MARKDOWN_HARD_BREAK_SPACES: Final[int] = 2  # Preserve exactly two trailing spaces for hard breaks
 IMAGE_OPEN_TIMEOUT: Final[float] = 5.0  # Timeout for opening/verifying image files
-GENERATION_WRAP_WIDTH: Final[int] = 80  # Console output wrapping width for generated text
+GENERATION_WRAP_WIDTH: Final[int] = 100  # Console output wrapping width for generated text
 SUPPORTED_IMAGE_EXTENSIONS: Final[frozenset[str]] = frozenset({".jpg", ".jpeg", ".png", ".webp"})
 
 _temp_logger = logging.getLogger(LOGGER_NAME)
@@ -1007,16 +1007,19 @@ MIN_NAME_COL_WIDTH: Final[int] = len("Model")
 # Field display configuration: maps field names to (label, unit) tuples
 # This centralizes all field metadata in one place for consistency
 FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
+    "model_name": ("Model", "Name"),
     "prompt_tokens": ("Prompt", "(tokens)"),
     "generation_tokens": ("Generation", "(tokens)"),
-    "generation_tps": ("Gen TPS", ""),
+    "total_tokens": ("Total", "Tokens"),
+    "prompt_tps": ("Prompt", "Tps"),
+    "generation_tps": ("Gen", "TPS"),
     "peak_memory": ("Peak", "(GB)"),
     "generation_time": ("Generation", "(s)"),
     "model_load_time": ("Load", "(s)"),
     "total_time": ("Total", "(s)"),
-    "quality_issues": ("Quality Issues", ""),  # MOD: Consolidated quality analysis
-    "active_memory": ("Active Mem", "(GB)"),  # MOD: Active GPU memory
-    "cache_memory": ("Cache Mem", "(GB)"),  # MOD: Cached GPU memory
+    "quality_issues": ("Quality", "Issues"),  # MOD: Consolidated quality analysis
+    "active_memory": ("Active", "Mem (GB)"),  # MOD: Active GPU memory
+    "cache_memory": ("Cache", "Mem (GB)"),  # MOD: Cached GPU memory
 }
 
 # Threshold for splitting long header text into multiple lines
@@ -1025,7 +1028,10 @@ ERROR_MESSAGE_PREVIEW_LEN: Final[int] = 40  # Max chars to show from error in su
 MAX_QUALITY_ISSUES_LEN: Final[int] = 30  # Max chars for quality issues in Markdown tables
 
 # Numeric fields are automatically derived from FIELD_ABBREVIATIONS for consistency
-NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(FIELD_ABBREVIATIONS.keys())
+# Exclude non-numeric fields explicitly
+NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
+    k for k in FIELD_ABBREVIATIONS if k not in {"model_name", "quality_issues"}
+)
 
 # Console table formatting constants
 MAX_MODEL_NAME_LENGTH = 20  # Allows "microsoft/phi-3-vision" without truncation
@@ -2934,13 +2940,58 @@ def pretty_print_exif(
     log_rule(header_width, char="=", color=Colors.BLUE, bold=True)
 
 
+def _format_table_field_value(
+    field_name: str,
+    res: PerformanceResult,
+) -> str:
+    """Format a single field value for table display.
+
+    Args:
+        field_name: Name of the field to format
+        res: Performance result containing the data
+
+    Returns:
+        Formatted string value for the field
+    """
+    if field_name == "model_name":
+        return res.model_name
+
+    if field_name == "output":
+        if res.success and res.generation:
+            text = str(getattr(res.generation, "text", ""))
+            # Truncate repetitive output for readability
+            text = _truncate_repetitive_output(text)
+            # Truncate to 3 lines for table display (full text shown in main trace)
+            lines = text.splitlines()
+            if len(lines) > 3:
+                text = "\n".join(lines[:3]) + "\n..."
+            return text
+        return (
+            f"Error: {res.error_stage} - {res.error_message}"
+            if res.error_message
+            else "Unknown error"
+        )
+
+    if field_name == "quality_issues":
+        # Truncate quality issues for Markdown table display
+        value = _get_field_value(res, field_name)
+        formatted_value = format_field_value(field_name, value)
+        return _truncate_quality_issues(formatted_value)
+
+    # Default: format the field value normally
+    value = _get_field_value(res, field_name)
+    return format_field_value(field_name, value)
+
+
 def _prepare_table_data(
     results: list[PerformanceResult],
+    header_separator: str = "<br>",
 ) -> tuple[list[str], list[list[str]], list[str]]:
     """Prepare headers, rows, and field names for reports.
 
     Args:
         results: List of PerformanceResult objects.
+        header_separator: String to use for separating header lines (default: "<br>").
 
     Returns:
         A tuple containing:
@@ -2961,9 +3012,15 @@ def _prepare_table_data(
         if field_name in FIELD_ABBREVIATIONS:
             line1, line2 = FIELD_ABBREVIATIONS[field_name]
             # Split long headers for better readability in reports
-            # Only add <br> if we actually have two parts to show
-            if line2 and (len(line1) > HEADER_SPLIT_LENGTH or len(line2) > HEADER_SPLIT_LENGTH):
-                headers.append(f"{line1}<br>{line2}")
+            # Only add separator if we actually have two parts to show
+            # Force split if using newline separator (CLI), otherwise check length threshold
+            should_split = line2 and (
+                header_separator == "\n"
+                or len(line1) > HEADER_SPLIT_LENGTH
+                or len(line2) > HEADER_SPLIT_LENGTH
+            )
+            if should_split:
+                headers.append(f"{line1}{header_separator}{line2}")
             elif line2:
                 headers.append(f"{line1} {line2}")
             else:
@@ -2974,31 +3031,7 @@ def _prepare_table_data(
     # Create rows
     rows: list[list[str]] = []
     for res in sorted_results:
-        row: list[str] = []
-        for field_name in field_names:
-            if field_name == "model_name":
-                row.append(res.model_name)
-            elif field_name == "output":
-                if res.success and res.generation:
-                    text = str(getattr(res.generation, "text", ""))
-                    # Truncate repetitive output for readability
-                    text = _truncate_repetitive_output(text)
-                    row.append(text)
-                else:
-                    row.append(
-                        f"Error: {res.error_stage} - {res.error_message}"
-                        if res.error_message
-                        else "Unknown error",
-                    )
-            elif field_name == "quality_issues":
-                # Truncate quality issues for Markdown table display
-                value = _get_field_value(res, field_name)
-                formatted_value = format_field_value(field_name, value)
-                truncated_value = _truncate_quality_issues(formatted_value)
-                row.append(truncated_value)
-            else:
-                value = _get_field_value(res, field_name)
-                row.append(format_field_value(field_name, value))
+        row = [_format_table_field_value(field_name, res) for field_name in field_names]
         rows.append(row)
 
     return headers, rows, field_names
@@ -3763,7 +3796,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
         logger.info("No results to display.")
         return
 
-    headers, rows, field_names = _prepare_table_data(results)
+    headers, rows, field_names = _prepare_table_data(results, header_separator="\n")
     if not headers or not rows:
         logger.info("No data to display in stats table.")
         return
@@ -3772,12 +3805,24 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     # Determine column alignment (numeric fields right-aligned)
     colalign = ["right" if is_numeric_field(field) else "left" for field in field_names]
 
+    # Set max widths for specific columns to keep table compact
+    # Quality Issues: 20 chars, Output: 50 chars, others: no limit
+    maxcolwidths: list[int | None] = []
+    for field_name in field_names:
+        if field_name == "quality_issues":
+            maxcolwidths.append(20)
+        elif field_name == "output":
+            maxcolwidths.append(50)
+        else:
+            maxcolwidths.append(None)
+
     # Generate table using tabulate
     table_text = tabulate(
         rows,
         headers=headers,
         tablefmt="plain",
         colalign=colalign,
+        maxcolwidths=maxcolwidths,
     )
 
     # Log the table line by line
@@ -4757,6 +4802,8 @@ def print_cli_header(title: str) -> None:
 def print_cli_section(title: str, *, show_rule: bool = True) -> None:
     """Print a formatted CLI section header with visual prefix."""
     width = get_terminal_width(max_width=100)
+    if show_rule:
+        log_rule(width, char="─", color=Colors.BLUE, bold=False)
     logger.info(
         title,
         extra={
@@ -4764,8 +4811,6 @@ def print_cli_section(title: str, *, show_rule: bool = True) -> None:
             "style_uppercase": "\x1b[" not in title,
         },
     )
-    if show_rule:
-        log_rule(width, char="─", color=Colors.BLUE, bold=False)
 
 
 def print_cli_error(msg: str) -> None:
@@ -4995,8 +5040,8 @@ def _preview_generation(
         missing = ", ".join(analysis.missing_context_terms[:3])
         log_warning_note(f"Context ignored (missing: {missing})")
 
-    # Truncate log output to 3 lines to keep logs clean (full text in results.md)
-    log_generated_text(text_val, wrap=True, max_lines=3)
+    # Show full output in trace (truncated in summary table)
+    log_generated_text(text_val, wrap=True)
 
 
 def _log_verbose_success_details_mode(
@@ -6258,7 +6303,7 @@ def finalize_execution(
     """Output summary statistics, generate reports, and display timing information."""
     overall_time: float = time.perf_counter() - overall_start_time
     if results:
-        print_cli_section("Performance Summary", show_rule=False)
+        print_cli_section("Performance Summary")
         print_model_stats(results)
 
         # MOD: Added failure bucketing summary for better diagnostics
