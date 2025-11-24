@@ -68,7 +68,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
 
     from mlx.nn import Module
-    from mlx_vlm.generate import GenerationResult  # type: ignore[import]
+    from mlx_vlm.generate import GenerationResult
     from transformers import PreTrainedTokenizer, PreTrainedTokenizerFast
 
 # Public API (PEP 8 / PEP 561 best practice)
@@ -335,10 +335,10 @@ else:
 vlm_version: str
 
 try:
-    from mlx_vlm.generate import generate  # type: ignore[import]
-    from mlx_vlm.prompt_utils import apply_chat_template  # type: ignore[import]
-    from mlx_vlm.utils import load, load_image  # type: ignore[import]
-    from mlx_vlm.version import __version__ as _mlx_vlm_version  # type: ignore[import]
+    from mlx_vlm.generate import generate
+    from mlx_vlm.prompt_utils import apply_chat_template
+    from mlx_vlm.utils import load, load_image
+    from mlx_vlm.version import __version__ as _mlx_vlm_version
 
     vlm_version = _mlx_vlm_version
 except ImportError:
@@ -364,7 +364,7 @@ except ImportError:
 
     MISSING_DEPENDENCIES["mlx-vlm"] = ERROR_MLX_VLM_MISSING
 try:
-    import mlx_lm  # type: ignore[import]
+    import mlx_lm
 
     mlx_lm_version: str = getattr(mlx_lm, "__version__", NOT_AVAILABLE)
 except ImportError:
@@ -388,7 +388,7 @@ except ImportError:
     transformers_version = NOT_AVAILABLE
 
 try:
-    import tokenizers  # type: ignore[import]
+    import tokenizers
 
     tokenizers_version: str = getattr(tokenizers, "__version__", NOT_AVAILABLE)
 except ImportError:
@@ -3776,7 +3776,7 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     table_text = tabulate(
         rows,
         headers=headers,
-        tablefmt="simple",
+        tablefmt="plain",
         colalign=colalign,
     )
 
@@ -4639,8 +4639,8 @@ def _run_model_generation(
 
     # Capture memory metrics immediately after generation while model is still active
     # This must happen before mx.eval() which can change memory state
-    active_mem_bytes = mx.metal.get_active_memory()
-    cache_mem_bytes = mx.metal.get_cache_memory()
+    active_mem_bytes = mx.get_active_memory()
+    cache_mem_bytes = mx.get_cache_memory()
 
     # Add timing and memory to the GenerationResult object dynamically
     # Cast to our Protocol which includes the time attribute we're adding
@@ -4735,7 +4735,6 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         if tokenizer is not None:
             del tokenizer
         # Clear both Metal and MLX caches for thorough GPU memory cleanup
-        mx.metal.clear_cache()
         mx.clear_cache()
         mx.reset_peak_memory()
         logger.debug("Cleaned up resources for model %s", params.model_identifier)
@@ -4755,7 +4754,7 @@ def print_cli_header(title: str) -> None:
     log_rule(width, char="=", color=Colors.BLUE, bold=True)
 
 
-def print_cli_section(title: str) -> None:
+def print_cli_section(title: str, *, show_rule: bool = True) -> None:
     """Print a formatted CLI section header with visual prefix."""
     width = get_terminal_width(max_width=100)
     logger.info(
@@ -4765,7 +4764,8 @@ def print_cli_section(title: str) -> None:
             "style_uppercase": "\x1b[" not in title,
         },
     )
-    log_rule(width, char="─", color=Colors.BLUE, bold=False)
+    if show_rule:
+        log_rule(width, char="─", color=Colors.BLUE, bold=False)
 
 
 def print_cli_error(msg: str) -> None:
@@ -6258,7 +6258,7 @@ def finalize_execution(
     """Output summary statistics, generate reports, and display timing information."""
     overall_time: float = time.perf_counter() - overall_start_time
     if results:
-        print_cli_section("Performance Summary")
+        print_cli_section("Performance Summary", show_rule=False)
         print_model_stats(results)
 
         # MOD: Added failure bucketing summary for better diagnostics

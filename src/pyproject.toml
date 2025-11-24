@@ -219,7 +219,7 @@ exclude = ["^src/tools/\\.archived/"]
 mypy_path = "typings"
 
 # Core strictness - catch common errors in our own code
-warn_unused_ignores = false
+warn_unused_ignores = true
 no_implicit_optional = true
 warn_return_any = true
 warn_redundant_casts = true
