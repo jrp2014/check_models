@@ -2505,6 +2505,7 @@ def _process_ifd0(exif_raw: Mapping[object, object]) -> ExifDict:
         # Skip SubIFD pointers, we'll handle them separately
         if tag_id in (ExifTags.Base.ExifOffset, ExifTags.Base.GPSInfo):
             continue
+        tag_id = cast("int", tag_id)
         tag_name: str = TAGS.get(tag_id, str(tag_id))
         exif_decoded[tag_name] = value
     return exif_decoded
@@ -2961,9 +2962,9 @@ def _format_table_field_value(
             text = str(getattr(res.generation, "text", ""))
             # Truncate repetitive output for readability
             text = _truncate_repetitive_output(text)
-            # Truncate to 3 lines for table display (full text shown in main trace)
+            # Truncate to [3] lines for table display (full text shown in main trace)
             lines = text.splitlines()
-            if len(lines) > 3:
+            if len(lines) > 3:  # This constant should be part of the quality issues config
                 text = "\n".join(lines[:3]) + "\n..."
             return text
         return (

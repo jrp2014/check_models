@@ -191,7 +191,6 @@ max-statements = 60
 # Pyright/Pylance configuration
 # See: https://github.com/microsoft/pyright/blob/main/docs/configuration.md
 pythonVersion = "3.13"
-conda-environment = "mlx-vlm"
 typeCheckingMode = "basic" # Can be "off", "basic", or "strict"
 # Allow imports from libraries without type stubs (mlx, mlx-vlm, etc.)
 reportMissingImports = false
@@ -249,7 +248,8 @@ addopts = "-q"
 [tool.pyrefly]
 project-excludes = ["**/src/tools/.archived/"]
 search-path = ["typings"]
-python-version = "3.13.0"
+python-version = "3.13"
+#conda-environment = "mlx-vlm"
 ignore-missing-imports = [
     "mlx.*",
     "mlx_vlm.*",
