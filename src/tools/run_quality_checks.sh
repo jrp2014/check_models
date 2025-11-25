@@ -87,6 +87,13 @@ if ! command -v ty &> /dev/null; then
 fi
 ty check check_models.py
 
+echo "=== Pyrefly Type Check ==="
+if ! command -v pyrefly &> /dev/null; then
+    echo "⚠️  'pyrefly' not found. Installing..."
+    $PYTHON -m pip install pyrefly
+fi
+pyrefly check check_models.py
+
 echo "=== Pytest ==="
 $PYTHON -m pytest -v
 

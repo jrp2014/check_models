@@ -26,5 +26,8 @@ $PYTHON -m ruff check .
 echo "=== MyPy Type Check ==="
 $PYTHON -m mypy check_models.py
 
+echo "=== Pyrefly Type Check ==="
+pyrefly check check_models.py
+
 echo ""
 echo "✅ Fast quality checks passed!"

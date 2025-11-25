@@ -91,8 +91,8 @@ pip_install() {
 }
 
 # Ensure global Python packaging tools are current
-echo "[update.sh] Updating core Python packaging tools (pip, wheel, setuptools, ninja)..."
-pip_install pip wheel setuptools ninja
+echo "[update.sh] Updating core Python packaging tools (pip, wheel, setuptools, ninja, pyrefly)..."
+pip_install pip wheel setuptools ninja pyrefly
 
 # Install project with all dependencies from pyproject.toml
 INSTALL_GROUPS=".[dev,extras,torch]"

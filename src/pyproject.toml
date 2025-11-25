@@ -2,9 +2,7 @@
 name = "check_models"
 description = "Image analysis and caption generation using MLX Vision Language Models."
 version = "0.1.0"
-authors = [
-    { name = "jrp2014", email = "jrp2014@users.noreply.github.com" },
-]
+authors = [{ name = "jrp2014", email = "jrp2014@users.noreply.github.com" }]
 requires-python = ">=3.13"
 readme = "README.md"
 license = { text = "MIT" }
@@ -12,7 +10,7 @@ keywords = ["mlx", "vision", "language-model", "ai", "image-analysis"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "Intended Audience :: Science/Research", 
+    "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.13",
@@ -31,7 +29,7 @@ dependencies = [
     "mlx>=0.29.1",
     "mlx-vlm>=0.3.0",
     "Pillow>=10.3.0",
-    "huggingface-hub[cli,torch,typing]>=0.34.0,<1.0",  # Constrained by transformers 4.57.1
+    "huggingface-hub[cli,torch,typing]>=0.34.0,<1.0", # Constrained by transformers 4.57.1
     "tabulate>=0.9.0",
     "tzlocal>=5.0",
     "PyYAML>=6.0",
@@ -65,15 +63,12 @@ extras = [
     "transformers>=4.53.0",
     "sentencepiece",
 ]
-torch = [
-    "torch>=2.2.0",
-    "torchvision>=0.17.0",
-    "torchaudio>=2.2.0",
-]
+torch = ["torch>=2.2.0", "torchvision>=0.17.0", "torchaudio>=2.2.0"]
 dev = [
     "ruff>=0.1.0",
     "mypy>=1.8.0",
     "ty",
+    "pyrefly",
     "pytest>=8.0.0",
     "pytest-cov>=4.0.0",
     "types-tabulate",
@@ -103,7 +98,7 @@ exclude = [
     ".tox",
     ".venv",
     ".venv*",
-    "__pycache__", 
+    "__pycache__",
     "__pypackages__",
     "_build",
     "build",
@@ -124,52 +119,52 @@ select = ["ALL"]
 
 ignore = [
     # Formatter compatibility
-    "E501",     # Line too long (formatter handles this)
-    "W191",     # Tab indentation (formatter handles this)
-    "E111",     # Indentation (formatter handles this)
-    "E114",     # Indentation (formatter handles this)
-    "E117",     # Over-indented (formatter handles this)
-    "COM812",   # Trailing comma (conflicts with formatter)
-    "COM819",   # Trailing comma (conflicts with formatter)
-    "ISC001",   # Single line implicit concatenation (conflicts with formatter)
-    "ISC002",   # Multi line implicit concatenation (conflicts with formatter)
-    "Q000",     # Quotes (formatter handles this)
-    "Q001",     # Quotes (formatter handles this)
-    "Q002",     # Quotes (formatter handles this)
-    "Q003",     # Quotes (formatter handles this)
-    
+    "E501",   # Line too long (formatter handles this)
+    "W191",   # Tab indentation (formatter handles this)
+    "E111",   # Indentation (formatter handles this)
+    "E114",   # Indentation (formatter handles this)
+    "E117",   # Over-indented (formatter handles this)
+    "COM812", # Trailing comma (conflicts with formatter)
+    "COM819", # Trailing comma (conflicts with formatter)
+    "ISC001", # Single line implicit concatenation (conflicts with formatter)
+    "ISC002", # Multi line implicit concatenation (conflicts with formatter)
+    "Q000",   # Quotes (formatter handles this)
+    "Q001",   # Quotes (formatter handles this)
+    "Q002",   # Quotes (formatter handles this)
+    "Q003",   # Quotes (formatter handles this)
+
     # Docstring style conflicts (mutually exclusive pairs)
-    "D203",     # one-blank-line-before-class (conflicts with D211)
-    "D213",     # multi-line-summary-second-line (conflicts with D212)
-    
+    "D203", # one-blank-line-before-class (conflicts with D211)
+    "D213", # multi-line-summary-second-line (conflicts with D212)
+
     # Stylistic choices
-    "ANN401",   # Dynamically typed Any - we use this intentionally
-    "FBT001",   # Boolean positional arg - common pattern
-    "FBT002",   # Boolean default arg - common pattern
-    "TD002",    # Missing TODO author - not critical
-    "TD003",    # Missing TODO link - not critical
-    "FIX002",   # TODO/FIXME comments - we want these
-    
+    "ANN401", # Dynamically typed Any - we use this intentionally
+    "FBT001", # Boolean positional arg - common pattern
+    "FBT002", # Boolean default arg - common pattern
+    "TD002",  # Missing TODO author - not critical
+    "TD003",  # Missing TODO link - not critical
+    "FIX002", # TODO/FIXME comments - we want these
+
     # Too aggressive for existing codebase
-    "ERA001",   # Commented code - sometimes useful for comparison
-    "T201",     # Print statements - needed for CLI output
-    "S311",     # random module - not a security issue in this context
-    "PLR0913",  # Too many arguments - some functions need them
-    "PLR2004",  # Magic values - sometimes clearer than constants
+    "ERA001",  # Commented code - sometimes useful for comparison
+    "T201",    # Print statements - needed for CLI output
+    "S311",    # random module - not a security issue in this context
+    "PLR0913", # Too many arguments - some functions need them
+    "PLR2004", # Magic values - sometimes clearer than constants
 ]
 
 [tool.ruff.lint.per-file-ignores]
 # Tests: minimal necessary exclusions
 "tests/**" = [
-    "S101",     # Use of assert - required for pytest
-    "D103",     # Missing docstring in public function - test names are self-documenting
-    "PLR2004",  # Magic values in test assertions - values match test parameters
+    "S101",    # Use of assert - required for pytest
+    "D103",    # Missing docstring in public function - test names are self-documenting
+    "PLR2004", # Magic values in test assertions - values match test parameters
 ]
 # Tools: allow print statements, missing docstrings
 "tools/**" = [
-    "T201",     # Print statements
-    "D",        # Docstrings not required in tools
-    "ANN",      # Type annotations not required in tools
+    "T201", # Print statements
+    "D",    # Docstrings not required in tools
+    "ANN",  # Type annotations not required in tools
 ]
 # Archived files: ignore all rules (these are not maintained)
 "tools/.archived/**" = ["ALL"]
@@ -263,7 +258,6 @@ ignore-missing-imports = [
     "huggingface_hub.*",
     "*",
 ]
-
 
 
 [tool.setuptools.package-data]
