@@ -1036,6 +1036,7 @@ NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
 # Console table formatting constants
 MAX_MODEL_NAME_LENGTH = 20  # Allows "microsoft/phi-3-vision" without truncation
 MAX_OUTPUT_LENGTH = 28
+MAX_OUTPUT_LINES = 3  # Max lines to show in summary table
 
 # Performance timing fields: those from PerformanceResult (not GenerationResult)
 # Automatically derived from FIELD_ABBREVIATIONS for consistency
@@ -2962,10 +2963,12 @@ def _format_table_field_value(
             text = str(getattr(res.generation, "text", ""))
             # Truncate repetitive output for readability
             text = _truncate_repetitive_output(text)
-            # Truncate to [3] lines for table display (full text shown in main trace)
+            # Truncate to [MAX_OUTPUT_LINES] lines for table display (full text shown in main trace)
             lines = text.splitlines()
-            if len(lines) > 3:  # This constant should be part of the quality issues config
-                text = "\n".join(lines[:3]) + "\n..."
+            if (
+                len(lines) > MAX_OUTPUT_LINES
+            ):  # This constant should be part of the quality issues config
+                text = "\n".join(lines[:MAX_OUTPUT_LINES]) + "\n..."
             return text
         return (
             f"Error: {res.error_stage} - {res.error_message}"
