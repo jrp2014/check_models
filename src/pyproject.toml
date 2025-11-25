@@ -147,7 +147,6 @@ ignore = [
 
     # Too aggressive for existing codebase
     "ERA001",  # Commented code - sometimes useful for comparison
-    "T201",    # Print statements - needed for CLI output
     "S311",    # random module - not a security issue in this context
     "PLR0913", # Too many arguments - some functions need them
     "PLR2004", # Magic values - sometimes clearer than constants
@@ -192,6 +191,7 @@ max-statements = 60
 # Pyright/Pylance configuration
 # See: https://github.com/microsoft/pyright/blob/main/docs/configuration.md
 pythonVersion = "3.13"
+conda-environment = "mlx-vlm"
 typeCheckingMode = "basic" # Can be "off", "basic", or "strict"
 # Allow imports from libraries without type stubs (mlx, mlx-vlm, etc.)
 reportMissingImports = false
