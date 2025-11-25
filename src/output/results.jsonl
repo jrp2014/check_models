@@ -1,1 +1,1 @@
-{"model": "Qwen/Qwen3-VL-2B-Instruct", "success": true, "error_stage": null, "error_message": null, "quality_issues": [], "metrics": {"prompt_tokens": 2117, "generation_tokens": 500, "generation_tps": 103.26278298115294, "peak_memory_gb": 5.843092518, "active_memory_gb": 3.9631351716816425, "cache_memory_gb": 0.1458681607618928}}
+{"model": "Qwen/Qwen3-VL-2B-Instruct", "success": false, "error_stage": "Error", "error_message": "Model loading failed: 'dict' object has no attribute 'model_type'", "quality_issues": [], "metrics": {}}

@@ -1,2 +1,2 @@
-Model Name               	  Token	Prompt (tokens)  	  Generation (tokens)	Total Tokens  	Prompt Tps  	  Gen TPS	  Peak (GB)	Generation (s)  	Load (s)  	Total (s)  	Quality Issues  	Output
-Qwen/Qwen3-VL-2B-Instruct	     11	2,117            	                  500	2,617         	1,348       	      103	        5.8	6.45s           	0.71s     	7.16s      	                	### Factual Caption, Description, and Keywords\n\n**Caption:**  \n...
+Model Name               	Generation (s)  	Load (s)  	Total (s)  	Quality Issues  	Output
+Qwen/Qwen3-VL-2B-Instruct	                	          	           	                	Error: Error - Model loading failed: 'dict' object has no attribute 'model_type'

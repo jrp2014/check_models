@@ -1,119 +1,125 @@
-2025-11-24 23:09:00,690 - INFO - Full environment dump written to:
-2025-11-24 23:09:00,690 - INFO - /Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log
-2025-11-24 23:09:00,690 - DEBUG - Environment details saved for reproducibility
-2025-11-24 23:09:00,690 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2025-11-24 23:09:00,690 - WARNING - ⚠️  SECURITY WARNING: --trust-remote-code is enabled.
-2025-11-24 23:09:00,690 - WARNING - ⚠️  This allows execution of remote code and may pose security risks.
-2025-11-24 23:09:00,690 - INFO - ====================================================================================================
-2025-11-24 23:09:00,690 - INFO - MLX Vision Language Model Check
-2025-11-24 23:09:00,690 - INFO - ====================================================================================================
-2025-11-24 23:09:00,691 - INFO - Image File:      /Users/jrp/Downloads/National_monument_Edinburgh.jpg
-2025-11-24 23:09:00,696 - INFO - Image dimensions: 1080x1920 (2.1 MPixels)
-2025-11-24 23:09:00,696 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2025-11-24 23:09:00,696 - INFO - Image Metadata
-2025-11-24 23:09:00,698 - INFO - Date: 2010-09-30 12:58:31 BST
-2025-11-24 23:09:00,698 - INFO - Description: 
-2025-11-24 23:09:00,698 - INFO - GPS Location: 
-2025-11-24 23:09:00,698 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2025-11-24 23:09:00,698 - INFO - Prompt Configuration
-2025-11-24 23:09:00,698 - INFO - Generating default prompt based on image metadata.
-2025-11-24 23:09:00,698 - DEBUG - Using generated prompt based on metadata.
-2025-11-24 23:09:00,698 - INFO - Final prompt: Provide a factual caption, description, and keywords suitable for cataloguing, or searching for, the image. 
+2025-11-24 23:56:21,649 - INFO - Full environment dump written to:
+2025-11-24 23:56:21,649 - INFO - /Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log
+2025-11-24 23:56:21,649 - DEBUG - Environment details saved for reproducibility
+2025-11-24 23:56:21,649 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-24 23:56:21,649 - WARNING - ⚠️  SECURITY WARNING: --trust-remote-code is enabled.
+2025-11-24 23:56:21,649 - WARNING - ⚠️  This allows execution of remote code and may pose security risks.
+2025-11-24 23:56:21,649 - INFO - ====================================================================================================
+2025-11-24 23:56:21,649 - INFO - MLX Vision Language Model Check
+2025-11-24 23:56:21,649 - INFO - ====================================================================================================
+2025-11-24 23:56:21,649 - INFO - Image File:      /Users/jrp/Downloads/National_monument_Edinburgh.jpg
+2025-11-24 23:56:21,657 - INFO - Image dimensions: 1080x1920 (2.1 MPixels)
+2025-11-24 23:56:21,657 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-24 23:56:21,657 - INFO - Image Metadata
+2025-11-24 23:56:21,659 - INFO - Date: 2010-09-30 12:58:31 BST
+2025-11-24 23:56:21,660 - INFO - Description: 
+2025-11-24 23:56:21,660 - INFO - GPS Location: 
+2025-11-24 23:56:21,660 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-24 23:56:21,660 - INFO - Prompt Configuration
+2025-11-24 23:56:21,660 - INFO - Generating default prompt based on image metadata.
+2025-11-24 23:56:21,660 - DEBUG - Using generated prompt based on metadata.
+2025-11-24 23:56:21,660 - INFO - Final prompt: Provide a factual caption, description, and keywords suitable for cataloguing, or searching for, the image. 
 
 The photo was taken around 2010-09-30 12:58:31 BST . Focus on visual content, drawing on a...
-2025-11-24 23:09:00,698 - INFO - Processing specified models: Qwen/Qwen3-VL-2B-Instruct
-2025-11-24 23:09:00,698 - INFO - Processing 1 model(s)...
-2025-11-24 23:09:00,699 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2025-11-24 23:09:00,699 - INFO - 
-2025-11-24 23:09:00,699 - INFO - Processing Model [1/1]: Qwen/Qwen3-VL-2B-Instruct
-2025-11-24 23:09:00,930 - DEBUG - System: arm64, GPU: Apple M4 Max
-2025-11-24 23:09:08,092 - DEBUG - Cleaned up resources for model Qwen/Qwen3-VL-2B-Instruct
-2025-11-24 23:09:08,093 - DEBUG - Quality analysis for Qwen/Qwen3-VL-2B-Instruct: no issues detected
-2025-11-24 23:09:08,094 - INFO - [RUN 1/1] SUMMARY model=Qwen/Qwen3-VL-2B-Instruct status=OK
-2025-11-24 23:09:08,094 - INFO - ### Factual Caption, Description, and Keywords
-2025-11-24 23:09:08,094 - INFO - 
-2025-11-24 23:09:08,094 - INFO - **Caption:**  
-2025-11-24 23:09:08,094 - INFO - A panoramic view of the Calton Hill Memorial in Edinburgh, Scotland, with the cityscape and
-2025-11-24 23:09:08,094 - INFO - surrounding greenery visible in the background. The image captures the historic stone structure with
-2025-11-24 23:09:08,094 - INFO - its prominent columns and a grassy foreground, taken from an elevated vantage point.
-2025-11-24 23:09:08,094 - INFO - 
-2025-11-24 23:09:08,094 - INFO - **Description:**  
-2025-11-24 23:09:08,094 - INFO - The photograph showcases the Calton Hill Memorial, a prominent monument located on Calton Hill in
-2025-11-24 23:09:08,094 - INFO - Edinburgh. The structure, built in the neoclassical style, features a series of tall, fluted columns
-2025-11-24 23:09:08,094 - INFO - supporting a flat roof. The memorial is set on a raised stone platform, surrounded by lush green
-2025-11-24 23:09:08,094 - INFO - grass and trees with autumnal foliage. In the background, the city of Edinburgh stretches out, with
-2025-11-24 23:09:08,094 - INFO - a mix of residential buildings and modern structures, all under a bright, partly cloudy sky. The
-2025-11-24 23:09:08,094 - INFO - scene is bathed in natural daylight, highlighting the textures of the stone and the vibrant colors
-2025-11-24 23:09:08,095 - INFO - of the landscape.
-2025-11-24 23:09:08,095 - INFO - 
-2025-11-24 23:09:08,095 - INFO - **Keywords:**  
-2025-11-24 23:09:08,095 - INFO - calton hill memorial, edinburgh, scotland, neoclassical architecture, historical monument,
-2025-11-24 23:09:08,095 - INFO - cityscape, greenery, autumn foliage, stone structure, elevated view, public park, urban landscape,
-2025-11-24 23:09:08,095 - INFO - historical site, calton hill, monument, columns, grass, sky, daylight, urban environment, scenic
-2025-11-24 23:09:08,095 - INFO - view, historical architecture, calton hill, edinburgh, scotland, neoclassical, memorial, stone,
-2025-11-24 23:09:08,095 - INFO - platform, green, trees, autumn, sky, daylight, urban, landscape, scenic, view, historical, site,
-2025-11-24 23:09:08,095 - INFO - calton hill, edinburgh, scotland, neoclassical, architecture, monument, stone, platform, green,
-2025-11-24 23:09:08,095 - INFO - trees, autumn, sky, daylight, urban, landscape, scenic, view, historical, site, calton hill,
-2025-11-24 23:09:08,095 - INFO - edinburgh, scotland, neoclassical, architecture, monument, stone, platform, green, trees, autumn,
-2025-11-24 23:09:08,095 - INFO - sky, daylight, urban, landscape, scenic, view, historical, site, calton hill, edinburgh, scotland,
-2025-11-24 23:09:08,095 - INFO - neoclassical, architecture, monument, stone, platform, green, trees, autumn, sky, daylight, urban,
-2025-11-24 23:09:08,095 - INFO - landscape, scenic, view, historical, site, calton hill, edinburgh, scotland, neoclassical,
-2025-11-24 23:09:08,095 - INFO - architecture, monument, stone, platform, green, trees, autumn, sky, daylight, urban, landscape,
-2025-11-24 23:09:08,095 - INFO - scenic, view, historical, site, calton hill, edinburgh, scotland, neoclassical,
-2025-11-24 23:09:08,095 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2025-11-24 23:09:08,095 - INFO - Performance Summary
-2025-11-24 23:09:08,096 - INFO - Model                        Token      Prompt    Generation     Total    Prompt    Gen    Peak    Generation    Load    Total  Quality    Output
-2025-11-24 23:09:08,096 - INFO - Name                                  (tokens)      (tokens)    Tokens       Tps    TPS    (GB)           (s)     (s)      (s)  Issues
-2025-11-24 23:09:08,096 - INFO - Qwen/Qwen3-VL-2B-Instruct       11       2,117           500     2,617     1,348    103     5.8         6.45s   0.71s    7.16s             ### Factual Caption, Description, and Keywords
-2025-11-24 23:09:08,096 - INFO -                                                                                                                                            **Caption:**   ...
-2025-11-24 23:09:08,096 - INFO - 
-2025-11-24 23:09:08,096 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2025-11-24 23:09:08,096 - INFO - Results Summary
-2025-11-24 23:09:08,096 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2025-11-24 23:09:08,096 - INFO - 🏆 Performance Highlights:
-2025-11-24 23:09:08,096 - INFO -    Fastest: Qwen/Qwen3-VL-2B-Instruct (103.3 tps)
-2025-11-24 23:09:08,096 - INFO -    💾 Most efficient: Qwen/Qwen3-VL-2B-Instruct (5.8 GB)
-2025-11-24 23:09:08,096 - INFO -    ⚡ Fastest load: Qwen/Qwen3-VL-2B-Instruct (0.00s)
-2025-11-24 23:09:08,096 - INFO -    📊 Average TPS: 103.3 across 1 models
-2025-11-24 23:09:08,096 - INFO - 
-2025-11-24 23:09:08,097 - INFO - 📈 Resource Usage:
-2025-11-24 23:09:08,097 - INFO -    Total peak memory: 5.8 GB
-2025-11-24 23:09:08,097 - INFO -    Average peak memory: 5.8 GB
-2025-11-24 23:09:08,097 - INFO -    Memory efficiency: 448 tokens/GB
-2025-11-24 23:09:08,097 - INFO - 
-2025-11-24 23:09:08,097 - INFO - ✅ Successful Models (1):
-2025-11-24 23:09:08,097 - INFO -   - Qwen/Qwen3-VL-2B-Instruct: 103.3 tps (Active: 4.0GB, Cache: 0.1GB)
-2025-11-24 23:09:08,369 - INFO - 
-2025-11-24 23:09:08,369 - INFO - 📊 Reports successfully generated:
-2025-11-24 23:09:08,369 - INFO -    HTML Report: /Users/jrp/Documents/AI/mlx/check_models/src/output/results.html
-2025-11-24 23:09:08,369 - INFO -    Markdown Report: /Users/jrp/Documents/AI/mlx/check_models/src/output/results.md
-2025-11-24 23:09:08,369 - INFO -    TSV Report:    /Users/jrp/Documents/AI/mlx/check_models/src/output/results.tsv
-2025-11-24 23:09:08,369 - INFO -    JSONL Report:  /Users/jrp/Documents/AI/mlx/check_models/src/output/results.jsonl
-2025-11-24 23:09:08,369 - INFO -    Log File: /Users/jrp/Documents/AI/mlx/check_models/src/output/check_models.log
-2025-11-24 23:09:08,369 - INFO -    Environment: /Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log
-2025-11-24 23:09:08,369 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
-2025-11-24 23:09:08,369 - INFO - Final Summary
-2025-11-24 23:09:08,369 - INFO - 
-2025-11-24 23:09:08,369 - INFO - ⏱  Overall runtime: 8.48s
-2025-11-24 23:09:08,369 - INFO - --- Library Versions ---
-2025-11-24 23:09:08,370 - INFO - Pillow          : 12.0.0
-2025-11-24 23:09:08,370 - INFO - huggingface-hub : 0.36.0
-2025-11-24 23:09:08,370 - INFO - mlx             : 0.30.1.dev20251123+3e05cea9
-2025-11-24 23:09:08,370 - INFO - mlx-lm          : 0.28.4
-2025-11-24 23:09:08,370 - INFO - mlx-vlm         : 0.3.7
-2025-11-24 23:09:08,370 - INFO - tokenizers      : 0.22.1
-2025-11-24 23:09:08,370 - INFO - transformers    : 4.57.1
-2025-11-24 23:09:08,370 - INFO - Generated: 2025-11-24 23:09:08 GMT
-2025-11-24 23:09:08,567 - INFO - 
-2025-11-24 23:09:08,567 - INFO - --- System Information ---
-2025-11-24 23:09:08,567 - INFO - OS                  : Darwin 25.1.0
-2025-11-24 23:09:08,567 - INFO - macOS Version       : 26.1
-2025-11-24 23:09:08,567 - INFO - SDK Version         : 26.1
-2025-11-24 23:09:08,568 - INFO - Python Version      : 3.13.9
-2025-11-24 23:09:08,568 - INFO - Architecture        : arm64
-2025-11-24 23:09:08,568 - INFO - GPU/Chip            : Apple M4 Max
-2025-11-24 23:09:08,568 - INFO - GPU Cores           : 40
-2025-11-24 23:09:08,568 - INFO - Metal Support       : Metal 4
-2025-11-24 23:09:08,568 - INFO - RAM                 : 128.0 GB
-2025-11-24 23:09:08,568 - INFO - CPU Cores (Physical): 16
-2025-11-24 23:09:08,568 - INFO - CPU Cores (Logical) : 16
+2025-11-24 23:56:21,660 - INFO - Processing specified models: Qwen/Qwen3-VL-2B-Instruct
+2025-11-24 23:56:21,660 - INFO - Processing 1 model(s)...
+2025-11-24 23:56:21,660 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-24 23:56:21,660 - INFO - 
+2025-11-24 23:56:21,660 - INFO - Processing Model [1/1]: Qwen/Qwen3-VL-2B-Instruct
+2025-11-24 23:56:21,824 - DEBUG - System: arm64, GPU: Apple M4 Max
+2025-11-24 23:56:22,867 - ERROR - Failed to load model Qwen/Qwen3-VL-2B-Instruct
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 4615, in _run_model_generation
+    model, tokenizer = load(
+                       ~~~~^
+        path_or_hf_repo=params.model_identifier,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        lazy=params.lazy,
+        ^^^^^^^^^^^^^^^^^
+        trust_remote_code=params.trust_remote_code,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 306, in load
+    processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 364, in load_processor
+    processor = AutoProcessor.from_pretrained(model_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py", line 396, in from_pretrained
+    return processor_class.from_pretrained(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        pretrained_model_name_or_path, trust_remote_code=trust_remote_code, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1394, in from_pretrained
+    args = cls._get_arguments_from_pretrained(pretrained_model_name_or_path, **kwargs)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1453, in _get_arguments_from_pretrained
+    args.append(attribute_class.from_pretrained(pretrained_model_name_or_path, **kwargs))
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/tokenization_utils_base.py", line 2112, in from_pretrained
+    return cls._from_pretrained(
+           ~~~~~~~~~~~~~~~~~~~~^
+        resolved_vocab_files,
+        ^^^^^^^^^^^^^^^^^^^^^
+    ...<9 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/tokenization_utils_base.py", line 2419, in _from_pretrained
+    if _is_local and _config.model_type not in [
+                     ^^^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'model_type'
+2025-11-24 23:56:22,888 - DEBUG - HF Cache Info for Qwen/Qwen3-VL-2B-Instruct: size=4069.0 MB, files=10
+2025-11-24 23:56:22,889 - DEBUG - Cleaned up resources for model Qwen/Qwen3-VL-2B-Instruct
+2025-11-24 23:56:22,889 - ERROR - [RUN 1/1] SUMMARY model=Qwen/Qwen3-VL-2B-Instruct status=FAIL stage=Error
+2025-11-24 23:56:22,889 - INFO - 
+2025-11-24 23:56:22,889 - INFO - 
+2025-11-24 23:56:22,889 - INFO - Error: Model loading failed: 'dict' object has no attribute 'model_type'
+2025-11-24 23:56:22,889 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-24 23:56:22,889 - INFO - Performance Summary
+2025-11-24 23:56:22,890 - INFO - Model                        Generation    Load    Total  Quality    Output
+2025-11-24 23:56:22,890 - INFO - Name                                (s)     (s)      (s)  Issues
+2025-11-24 23:56:22,890 - INFO - Qwen/Qwen3-VL-2B-Instruct                                            Error: Error - Model loading failed: 'dict' object
+2025-11-24 23:56:22,890 - INFO -                                                                      has no attribute 'model_type'
+2025-11-24 23:56:22,890 - INFO - 
+2025-11-24 23:56:22,890 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-24 23:56:22,890 - INFO - Results Summary
+2025-11-24 23:56:22,890 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-24 23:56:22,890 - INFO - ❌ Failed Models (1):
+2025-11-24 23:56:22,890 - INFO -   - Qwen/Qwen3-VL-2B-Instruct (Error)
+2025-11-24 23:56:22,890 - INFO - 
+2025-11-24 23:56:23,251 - INFO - 
+2025-11-24 23:56:23,251 - INFO - 📊 Reports successfully generated:
+2025-11-24 23:56:23,251 - INFO -    HTML Report: /Users/jrp/Documents/AI/mlx/check_models/src/output/results.html
+2025-11-24 23:56:23,251 - INFO -    Markdown Report: /Users/jrp/Documents/AI/mlx/check_models/src/output/results.md
+2025-11-24 23:56:23,251 - INFO -    TSV Report:    /Users/jrp/Documents/AI/mlx/check_models/src/output/results.tsv
+2025-11-24 23:56:23,251 - INFO -    JSONL Report:  /Users/jrp/Documents/AI/mlx/check_models/src/output/results.jsonl
+2025-11-24 23:56:23,251 - INFO -    Log File: /Users/jrp/Documents/AI/mlx/check_models/src/output/check_models.log
+2025-11-24 23:56:23,251 - INFO -    Environment: /Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log
+2025-11-24 23:56:23,251 - INFO - ────────────────────────────────────────────────────────────────────────────────────────────────────
+2025-11-24 23:56:23,251 - INFO - Final Summary
+2025-11-24 23:56:23,251 - INFO - 
+2025-11-24 23:56:23,251 - INFO - ⏱  Overall runtime: 2.51s
+2025-11-24 23:56:23,251 - INFO - --- Library Versions ---
+2025-11-24 23:56:23,251 - INFO - Pillow          : 12.0.0
+2025-11-24 23:56:23,251 - INFO - huggingface-hub : 0.36.0
+2025-11-24 23:56:23,251 - INFO - mlx             : 0.30.1.dev20251124+1d4eacb7
+2025-11-24 23:56:23,251 - INFO - mlx-lm          : 0.28.4
+2025-11-24 23:56:23,251 - INFO - mlx-vlm         : 0.3.7
+2025-11-24 23:56:23,251 - INFO - tokenizers      : 0.22.1
+2025-11-24 23:56:23,251 - INFO - transformers    : 4.57.2
+2025-11-24 23:56:23,251 - INFO - Generated: 2025-11-24 23:56:23 GMT
+2025-11-24 23:56:23,416 - INFO - 
+2025-11-24 23:56:23,416 - INFO - --- System Information ---
+2025-11-24 23:56:23,416 - INFO - OS                  : Darwin 25.1.0
+2025-11-24 23:56:23,416 - INFO - macOS Version       : 26.1
+2025-11-24 23:56:23,416 - INFO - SDK Version         : 26.1
+2025-11-24 23:56:23,416 - INFO - Python Version      : 3.13.9
+2025-11-24 23:56:23,416 - INFO - Architecture        : arm64
+2025-11-24 23:56:23,416 - INFO - GPU/Chip            : Apple M4 Max
+2025-11-24 23:56:23,416 - INFO - GPU Cores           : 40
+2025-11-24 23:56:23,416 - INFO - Metal Support       : Metal 4
+2025-11-24 23:56:23,416 - INFO - RAM                 : 128.0 GB
+2025-11-24 23:56:23,416 - INFO - CPU Cores (Physical): 16
+2025-11-24 23:56:23,417 - INFO - CPU Cores (Logical) : 16
