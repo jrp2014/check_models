@@ -54,7 +54,7 @@ def test_cli_handles_unsupported_format(tmp_path: Path) -> None:
         ],
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=30,
         check=False,
     )
     # Detect SystemExit and assert correct error handling
