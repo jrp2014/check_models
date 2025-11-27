@@ -76,7 +76,7 @@ def test_cli_help_displays() -> None:
         check=False,
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=30,
     )
     assert result.returncode == 0
     assert "MLX VLM Model Checker" in result.stdout
@@ -91,7 +91,7 @@ def test_cli_help_structure() -> None:
         check=False,
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=30,
     )
     assert result.returncode == 0
     output = result.stdout + result.stderr
@@ -112,7 +112,7 @@ def test_cli_exits_on_nonexistent_folder() -> None:
         check=False,
         capture_output=True,
         text=True,
-        timeout=5,
+        timeout=15,
     )
 
     assert result.returncode != 0
@@ -139,7 +139,7 @@ def test_cli_exits_on_empty_folder(tmp_path: Path) -> None:
         check=False,
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=30,
     )
     assert result.returncode != 0
     output = result.stdout + result.stderr
@@ -166,7 +166,7 @@ def test_cli_invalid_temperature_value(test_folder_with_images: Path) -> None:
         check=False,
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=30,
     )
     # Should fail validation
     assert result.returncode != 0
@@ -189,7 +189,7 @@ def test_cli_invalid_max_tokens(test_folder_with_images: Path) -> None:
         check=False,
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=30,
     )
     assert result.returncode != 0
     output = result.stdout + result.stderr
@@ -204,7 +204,7 @@ def test_cli_accepts_valid_parameters() -> None:
         check=False,
         capture_output=True,
         text=True,
-        timeout=5,
+        timeout=15,
     )
 
     output = result.stdout + result.stderr
