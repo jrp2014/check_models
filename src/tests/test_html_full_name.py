@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 import check_models
 
@@ -17,7 +17,7 @@ class MockGenerationResult:
     time: float | None = None
 
 
-def test_html_full_model_name(tmp_path: Path) -> None:
+def test_html_full_model_name(tmp_path: Path, monkeypatch: Any) -> None:
     """Should preserve the full model name (including organization) in HTML output."""
     full_model_name = "organization/specific-model-v1"
     results = [
@@ -39,19 +39,19 @@ def test_html_full_model_name(tmp_path: Path) -> None:
     total_runtime = 10.0
 
     # Mock get_system_characteristics to avoid system calls
-    original_get_sys = check_models.get_system_characteristics
-    check_models.get_system_characteristics = lambda: {"OS": "TestOS"}
+    monkeypatch.setattr(
+        check_models,
+        "get_system_characteristics",
+        lambda: {"OS": "TestOS"},
+    )
 
-    try:
-        check_models.generate_html_report(
-            results,
-            output_file,
-            versions,
-            prompt,
-            total_runtime,
-        )
-    finally:
-        check_models.get_system_characteristics = original_get_sys
+    check_models.generate_html_report(
+        results,
+        output_file,
+        versions,
+        prompt,
+        total_runtime,
+    )
 
     content = output_file.read_text(encoding="utf-8")
 
