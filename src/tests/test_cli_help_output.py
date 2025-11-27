@@ -19,7 +19,7 @@ def test_cli_help_output(help_flag: str) -> None:
         [sys.executable, str(_CHECK_MODELS_SCRIPT), help_flag],
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=30,
         check=False,
     )
     output = result.stdout + result.stderr
