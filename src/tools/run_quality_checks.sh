@@ -98,13 +98,20 @@ echo "=== Pytest ==="
 $PYTHON -m pytest -v
 
 echo "=== ShellCheck ==="
+if ! command -v shellcheck &> /dev/null; then
+    if command -v brew &> /dev/null; then
+        echo "⚠️  'shellcheck' not found. Installing via Homebrew..."
+        brew install shellcheck
+    else
+        echo "⚠️  Skipped (shellcheck not found and brew not available)"
+        echo "   Install with: brew install shellcheck"
+    fi
+fi
+
 if command -v shellcheck &> /dev/null; then
     # Find all shell scripts and check them
     # shellcheck disable=SC2046
     shellcheck $(find tools -name "*.sh" -type f)
-else
-    echo "⚠️  Skipped (shellcheck not found)"
-    echo "   Install with: brew install shellcheck"
 fi
 
 # Markdown linting runs from the repo root
