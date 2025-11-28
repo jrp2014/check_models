@@ -178,7 +178,7 @@ install_dependencies() {
     pip install -e .
 
     # Development dependencies (optional)
-    read -p "Do you want to install development dependencies (ruff, mypy, pytest)? (y/N): " -n 1 -r
+    read -p "Do you want to install development dependencies (ruff, mypy, pytest, pre-commit)? (y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         log_info "Installing development dependencies..."
@@ -186,7 +186,14 @@ install_dependencies() {
         if grep -q "dev =" pyproject.toml; then
              pip install -e ".[dev]"
         else
-             pip install "ruff>=0.1.0" "mypy>=1.8.0" "pytest>=8.0.0" "pytest-cov>=4.0.0"
+             pip install "ruff>=0.1.0" "mypy>=1.8.0" "pytest>=8.0.0" "pytest-cov>=4.0.0" "pre-commit"
+        fi
+        
+        # Set up pre-commit hooks
+        if command -v pre-commit &> /dev/null; then
+            log_info "Installing pre-commit hooks..."
+            pre-commit install
+            log_success "Pre-commit hooks installed"
         fi
     fi
 
