@@ -17,6 +17,8 @@ class MockGenerationResult:
     prompt_tokens: int | None = 100
     generation_tokens: int | None = 50
     time: float | None = None
+    active_memory: float | None = None
+    cache_memory: float | None = None
 
 
 def test_html_full_model_name(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

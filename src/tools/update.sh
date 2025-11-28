@@ -359,10 +359,20 @@ update_local_mlx_repos() {
 	cd "$SCRIPT_DIR"
 	if [[ -f "$SCRIPT_DIR/generate_stubs.py" ]]; then
 		echo "[update.sh] Generating type stubs for mlx_lm, mlx_vlm, and tokenizers..."
-		if python generate_stubs.py mlx_lm mlx_vlm tokenizers; then
-			echo "✓ Project stubs generated successfully"
+		# Use conda run to ensure we're using the mlx-vlm environment
+		if command -v conda &> /dev/null && conda env list | grep -q "^mlx-vlm "; then
+			if conda run -n mlx-vlm python generate_stubs.py mlx_lm mlx_vlm tokenizers; then
+				echo "✓ Project stubs generated successfully"
+			else
+				echo "⚠️  Failed to generate project stubs (non-fatal)"
+			fi
 		else
-			echo "⚠️  Failed to generate project stubs (non-fatal)"
+			# Fallback to current python if conda or mlx-vlm env not available
+			if python generate_stubs.py mlx_lm mlx_vlm tokenizers; then
+				echo "✓ Project stubs generated successfully"
+			else
+				echo "⚠️  Failed to generate project stubs (non-fatal)"
+			fi
 		fi
 	fi
 

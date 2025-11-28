@@ -11,11 +11,14 @@ from check_models import PerformanceResult, save_jsonl_report
 class MockGeneration:
     """Mock generation result for testing."""
 
-    text: str = "generated text"
-    prompt_tokens: int = 10
-    generation_tokens: int = 20
-    generation_tps: float = 5.0
-    peak_memory: float = 1.5
+    text: str | None = "generated text"
+    prompt_tokens: int | None = 10
+    generation_tokens: int | None = 20
+    generation_tps: float | None = 5.0
+    peak_memory: float | None = 1.5
+    time: float | None = None
+    active_memory: float | None = None
+    cache_memory: float | None = None
 
 
 def test_save_jsonl_report_creates_file(tmp_path: Path) -> None:

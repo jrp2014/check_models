@@ -249,7 +249,7 @@ addopts = "-q"
 
 [tool.pyrefly]
 project-excludes = ["**/src/tools/.archived/"]
-search-path = ["typings"]
+search-path = ["../typings"]
 python-version = "3.13"
 #conda-environment = "mlx-vlm"
 ignore-missing-imports = [

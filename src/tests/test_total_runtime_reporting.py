@@ -28,7 +28,7 @@ class _StubGeneration:
     generation_tps: float | None
     peak_memory: float | None
     active_memory: float | None
-    cached_memory: float | None
+    cache_memory: float | None
     time: float | None
     text: str | None
 
@@ -38,7 +38,7 @@ class _StubGeneration:
         self.generation_tps = 20.0
         self.peak_memory = 0.25
         self.active_memory = None
-        self.cached_memory = None
+        self.cache_memory = None
         self.time = 1.23
         self.text = "Sample output"
 

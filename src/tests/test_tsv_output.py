@@ -15,6 +15,8 @@ class MockGenerationResult:
     prompt_tokens: int | None = 100
     generation_tokens: int | None = 50
     time: float | None = None
+    active_memory: float | None = None
+    cache_memory: float | None = None
 
 
 def test_generate_tsv_report_basic(tmp_path: Path) -> None:
