@@ -77,6 +77,7 @@ dev = [
     "types-psutil",
     "types-PyYAML",
     "ninja",
+    "pre-commit",
 ]
 
 [build-system]
