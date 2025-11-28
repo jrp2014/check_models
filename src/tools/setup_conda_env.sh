@@ -9,7 +9,7 @@
 # Key Features:
 # - Validates macOS/Apple Silicon compatibility
 # - Creates conda environment with Python 3.13
-# - Installs all runtime and optional dependencies  
+# - Installs all runtime and optional dependencies
 # - Optionally installs development tools
 # - Verifies installation and provides usage instructions
 #
@@ -123,7 +123,7 @@ check_platform() {
         log_info "This script is designed for macOS only"
         exit 1
     fi
-    
+
     # Check for Apple Silicon
     if [[ "$(uname -m)" != "arm64" ]]; then
         log_warn "MLX is optimized for Apple Silicon (arm64)"
@@ -134,7 +134,7 @@ check_platform() {
 # Create conda environment
 create_environment() {
     log_info "Creating conda environment: $ENV_NAME"
-    
+
     # Check if environment already exists
     if conda env list | grep -q "^$ENV_NAME "; then
         log_warn "Environment '$ENV_NAME' already exists"
@@ -148,25 +148,25 @@ create_environment() {
             return 0
         fi
     fi
-    
+
     # Create new environment with Python 3.13
     log_info "Creating new environment with Python 3.13..."
     conda create -n "$ENV_NAME" python=3.13 -y
-    
+
     log_success "Environment '$ENV_NAME' created successfully"
 }
 
 # Install dependencies
 install_dependencies() {
     log_info "Installing dependencies in environment: $ENV_NAME"
-    
+
     # Activate environment
     # Initialize conda for this shell session
     echo "Initializing conda for bash..."
     # shellcheck disable=SC1091
     source "$(conda info --base)/etc/profile.d/conda.sh"
     conda activate "$ENV_NAME"
-    
+
     # Check for pyproject.toml
     if [[ ! -f "pyproject.toml" ]]; then
         log_warn "pyproject.toml not found in current directory"
@@ -206,18 +206,18 @@ install_dependencies() {
         fi
         log_success "Installed PyTorch packages"
     fi
-    
+
     log_success "All dependencies installed successfully"
 }
 
 # Verify installation
 verify_installation() {
     log_info "Verifying installation..."
-    
+
     # Check Python version
     python_version=$(python --version)
     log_info "Python version: $python_version"
-    
+
     # Check key packages
     log_info "Checking key packages..."
     python -c "
@@ -235,18 +235,18 @@ except Exception:
 print('✓ All core packages imported successfully')
 print(f'✓ MLX version: {mx.__version__}')
 "
-    
+
     # Install huggingface_hub CLI tools
     log_info "Installing huggingface_hub CLI tools..."
     pip install "huggingface_hub[cli]"
-    
+
     # Check if CLI is available
-    if command -v mlx-vlm-check &> /dev/null; then
-        log_success "CLI command 'mlx-vlm-check' is available"
+    if command -v check_models &> /dev/null; then
+        log_success "CLI command 'check_models' is available"
     else
         log_warn "CLI command not found. You may need to reinstall with 'pip install -e .'"
     fi
-    
+
     log_success "Installation verification complete"
 }
 
@@ -265,11 +265,11 @@ To use the MLX VLM environment:
    ${BLUE}python check_models.py --help${NC}
 
 3. Or use the CLI command:
-   ${BLUE}mlx-vlm-check --help${NC}
+   ${BLUE}check_models --help${NC}
 
 4. Example usage:
-   ${BLUE}mlx-vlm-check --image /path/to/image.jpg${NC}
-   ${BLUE}mlx-vlm-check --models "microsoft/Florence-2-large"${NC}
+   ${BLUE}check_models --image /path/to/image.jpg${NC}
+   ${BLUE}check_models --models "microsoft/Florence-2-large"${NC}
 
 Optional installs:
     - To include PyTorch stack during setup, answer 'y' when prompted, or later run:
@@ -287,14 +287,14 @@ EOF
 main() {
     log_info "Setting up MLX VLM conda environment: $ENV_NAME"
     log_info "Script location: $(pwd)"
-    
+
     check_conda
     check_platform
     create_environment
     install_dependencies
     verify_installation
     print_usage
-    
+
     log_success "Setup complete! Environment '$ENV_NAME' is ready to use."
 }
 

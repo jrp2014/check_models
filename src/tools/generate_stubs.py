@@ -6,9 +6,9 @@ Safe to run repeatedly; existing stubs for the target packages are overwritten.
 
 Usage examples
 --------------
-    python -m vlm.tools.generate_stubs mlx_vlm
-    python -m vlm.tools.generate_stubs --clear && \
-        python -m vlm.tools.generate_stubs mlx_vlm
+    python -m tools.generate_stubs mlx_vlm
+    python -m tools.generate_stubs --clear && \
+        python -m tools.generate_stubs mlx_vlm
 
 Notes
 -----

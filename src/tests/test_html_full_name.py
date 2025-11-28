@@ -2,7 +2,9 @@
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
+
+import pytest
 
 import check_models
 
@@ -17,7 +19,7 @@ class MockGenerationResult:
     time: float | None = None
 
 
-def test_html_full_model_name(tmp_path: Path, monkeypatch: Any) -> None:
+def test_html_full_model_name(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Should preserve the full model name (including organization) in HTML output."""
     full_model_name = "organization/specific-model-v1"
     results = [
