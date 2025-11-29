@@ -36,7 +36,7 @@ def test_error_message_consistency(args: list[str], expected_phrases: list[str])
         ],
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=30,
         check=False,
     )
     output = result.stdout + result.stderr

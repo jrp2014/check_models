@@ -5813,9 +5813,10 @@ def process_models(
 
     results: list[PerformanceResult] = []
     if not model_identifiers:
-        log_failure("No models specified or found in cache.", prefix="❌")
+        msg = "No models specified or found in cache."
         if not args.models:
-            logger.error("Ensure models are downloaded and cache is accessible.")
+            msg += " Ensure models are downloaded and cache is accessible."
+        exit_with_cli_error(msg)
     else:
         logger.info("Processing %d model(s)...", len(model_identifiers))
 
@@ -6414,9 +6415,9 @@ def main(args: argparse.Namespace) -> None:
         logger.exception("Execution interrupted by user.")
         sys.exit(1)
     except SystemExit:
-        logger.exception("Execution halted due to error.")
+        logger.exception("Execution halted (SystemExit raised).")
         raise
-    except (OSError, ValueError) as main_err:
+    except (OSError, ValueError, RuntimeError) as main_err:
         logger.critical("Fatal error in main execution: %s", main_err)
         sys.exit(1)
 

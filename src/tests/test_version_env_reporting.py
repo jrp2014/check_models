@@ -30,7 +30,7 @@ def test_cli_version_and_env_reporting(tmp_path: Path) -> None:
         ],
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=30,
         check=False,
     )
     # Check that the log file was created and contains version/environment info

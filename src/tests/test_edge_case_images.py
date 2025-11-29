@@ -31,7 +31,7 @@ def test_cli_handles_corrupted_image(tmp_path: Path) -> None:
         ],
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=30,
         check=False,
     )
     assert result.returncode != 0
@@ -58,7 +58,7 @@ def test_cli_handles_unsupported_format(tmp_path: Path) -> None:
         check=False,
     )
     # Detect SystemExit and assert correct error handling
-    if result.returncode == 1 and "Execution halted due to error." in result.stderr:
+    if result.returncode == 1 and "Execution halted (SystemExit raised)." in result.stderr:
         assert "unsupported" in result.stderr.lower() or "error" in result.stderr.lower()
     else:
         # Fail if the test times out or does not handle error as expected

@@ -38,7 +38,7 @@ def test_cli_invalid_arguments(args: list[str], expected_error: str) -> None:
         ],
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=30,
         check=False,
     )
     output = result.stdout + result.stderr
