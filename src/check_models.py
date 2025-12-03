@@ -3133,9 +3133,13 @@ def _wrap_output_column_in_details(html_table: str, output_col_idx: int) -> str:
 
                     # Reconstruct the line with updated cells
                     cell_iter = iter(cells)
+
+                    def repl(_: re.Match[str], ci: Iterator[str] = cell_iter) -> str:
+                        return next(ci)
+
                     updated_line = re.sub(
                         r"<td[^>]*>.*?</td>",
-                        lambda _, ci=cell_iter: next(ci),  # type: ignore[misc]
+                        repl,
                         original_line,
                     )
                     result_lines.append(updated_line)
