@@ -2823,12 +2823,14 @@ def exif_value_to_str(tag_str: str, value: object) -> str:
 
     processed_str: str
     if isinstance(value, bytes):
-        # Use latin-1 as a robust decoder. It can decode any byte, preventing errors,
-        # though it may not render all international characters correctly.
-        # This prioritizes stability and alignment over perfect character representation.
+        # Try UTF-8 first (handles most modern metadata), fallback to latin-1 for legacy
+        # This fixes garbled copyright symbols (© showing as Â©) and other Unicode chars
         try:
+            processed_str = _sanitize(value.decode("utf-8"))
+        except UnicodeDecodeError:
+            # Fallback to latin-1 which can decode any byte sequence
             processed_str = _sanitize(value.decode("latin-1", errors="replace"))
-        except (UnicodeDecodeError, AttributeError):
+        except AttributeError:
             return f"<bytes len={len(value)} un-decodable>"
     elif isinstance(value, tuple | list) and len(value) > MAX_TUPLE_LEN:
         return f"<tuple len={len(value)}>"
@@ -5220,27 +5222,66 @@ def _log_perf_block(res: PerformanceResult) -> None:
 
 
 def _log_compact_metrics(res: PerformanceResult) -> None:
-    """Emit grouped metrics lines for better readability while maintaining parsability.
+    """Emit two-line metrics for improved scannability.
 
-    Example output (single aligned line):
-        📊 Metrics: total=4.13s  gen=3.03s  load=1.09s  peak_mem=5.5GB
-                    tokens(total/prompt/gen)=1,637/1,488/149  gen_tps=114  prompt_tps=421
+    Example output:
+        📊 Timing: 5.41s total (gen=4.53s, load=0.88s) | Memory: 5.5GB peak
+           Tokens: 1,759 (1,442 prompt + 317 gen) | Speed: 114 gen/s, 1,231 prompt/s
     """
     if not res.generation:
         return
 
     log_blank()  # Breathing room
-    parts = _build_compact_metric_parts(res, res.generation)
-    if not parts:
-        return
-    aligned = _align_metric_parts(parts)
-    # Use metric_label for the header, then plain info for the values
-    logger.info(
-        "📊 %s %s",
-        "Metrics:",
-        "  ".join(aligned),
-        extra={"style_hint": LogStyles.METRIC_LABEL},
-    )
+    gen = res.generation
+
+    # Extract values
+    total_time = getattr(res, "total_time", None)
+    gen_time = getattr(res, "generation_time", None)
+    load_time = getattr(res, "model_load_time", None)
+    peak_mem = getattr(gen, "peak_memory", None) or 0.0
+    prompt_tokens = getattr(gen, "prompt_tokens", 0) or 0
+    gen_tokens = getattr(gen, "generation_tokens", 0) or 0
+    gen_tps = getattr(gen, "generation_tps", 0.0) or 0.0
+    prompt_tps = getattr(gen, "prompt_tps", 0.0) or 0.0
+
+    # Line 1: Timing and Memory
+    timing_parts: list[str] = []
+    if total_time is not None:
+        sub_parts: list[str] = []
+        if gen_time is not None:
+            sub_parts.append(f"gen={_format_time_seconds(gen_time)}")
+        if load_time is not None:
+            sub_parts.append(f"load={_format_time_seconds(load_time)}")
+        breakdown = f" ({', '.join(sub_parts)})" if sub_parts else ""
+        timing_parts.append(f"{_format_time_seconds(total_time)} total{breakdown}")
+
+    mem_part = ""
+    if peak_mem > 0:
+        mem_fmt = format_field_value("peak_memory", peak_mem)
+        mem_str = f"{mem_fmt}GB" if not str(mem_fmt).endswith("GB") else str(mem_fmt)
+        mem_part = f" | Memory: {mem_str} peak"
+
+    line1 = f"📊 Timing: {timing_parts[0] if timing_parts else 'N/A'}{mem_part}"
+    logger.info(line1, extra={"style_hint": LogStyles.METRIC_LABEL})
+
+    # Line 2: Tokens and Speed
+    all_tokens = prompt_tokens + gen_tokens
+    tokens_part = ""
+    if all_tokens:
+        tokens_part = (
+            f"{fmt_num(all_tokens)} ({fmt_num(prompt_tokens)} prompt + {fmt_num(gen_tokens)} gen)"
+        )
+
+    speed_parts: list[str] = []
+    if gen_tps:
+        speed_parts.append(f"{fmt_num(gen_tps)} gen/s")
+    if prompt_tps:
+        speed_parts.append(f"{fmt_num(prompt_tps)} prompt/s")
+    speed_part = f" | Speed: {', '.join(speed_parts)}" if speed_parts else ""
+
+    if tokens_part or speed_part:
+        line2 = f"   Tokens: {tokens_part}{speed_part}"
+        logger.info(line2, extra={"style_hint": LogStyles.METRIC_LABEL})
 
 
 def _build_compact_metric_parts(
@@ -5355,9 +5396,7 @@ def print_model_result(
         return
     # For failures, show detailed error info; for success, show generation details
     if not result.success:
-        log_blank()
-    if not result.success:
-        log_blank()
+        log_blank()  # Single blank before error details
         # Stage is already in summary, so we only log the full error here
         if result.error_message:
             logger.info("Error: %s", result.error_message)
@@ -5609,7 +5648,7 @@ def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
     )
 
     if args.verbose:
-        print_cli_separator()
+        # Note: pretty_print_exif has its own header separators, no need for one here
         exif_data: ExifDict | None = get_exif_data(image_path)
         if exif_data:
             pretty_print_exif(exif_data, show_all=True)

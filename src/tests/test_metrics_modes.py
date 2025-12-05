@@ -66,20 +66,22 @@ def test_align_metric_parts_alignment() -> None:
 
 
 def test_metrics_mode_compact_smoke(caplog: pytest.LogCaptureFixture) -> None:
-    """Compact mode should emit a single 'Metrics:' line."""
+    """Compact mode should emit Timing and Tokens lines."""
     caplog.set_level(logging.INFO)
     res = _build_perf()
     print_model_result(res, verbose=True, detailed_metrics=False)
-    metrics_lines = [r.message for r in caplog.records if "Metrics:" in r.message]
-    assert metrics_lines, "Expected compact Metrics line in logs"
+    # New format uses "Timing:" (line 1) and "Tokens:" (line 2)
+    timing_lines = [r.message for r in caplog.records if "Timing:" in r.message]
+    assert timing_lines, "Expected Timing line in compact mode logs"
 
 
 def test_metrics_mode_detailed_smoke(caplog: pytest.LogCaptureFixture) -> None:
-    """Detailed mode should emit token lines plus Metrics header."""
+    """Detailed mode should emit token lines plus Performance Metrics header."""
     caplog.set_level(logging.INFO)
     res = _build_perf()
     print_model_result(res, verbose=True, detailed_metrics=True)
-    metrics_lines = [r.message for r in caplog.records if "Metrics:" in r.message]
+    # Detailed mode uses "Performance Metrics:" header and separate "Tokens:" section
+    perf_lines = [r.message for r in caplog.records if "Performance Metrics:" in r.message]
     token_lines = [r.message for r in caplog.records if "Tokens:" in r.message]
     assert token_lines, "Expected token summary lines in detailed mode"
-    assert metrics_lines, "Expected Metrics header in detailed mode"
+    assert perf_lines, "Expected Performance Metrics header in detailed mode"
