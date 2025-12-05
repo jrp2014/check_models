@@ -361,7 +361,7 @@ bash tools/update.sh
 
 **Environment Variables**:
 
-- `INSTALL_TORCH=1`: Install PyTorch (if needed for specific models)
+- `SKIP_TORCH=1`: Skip PyTorch installation (torch is included by default)
 - `MLX_METAL_JIT=ON`: Enable Metal shader runtime compilation for smaller binaries (default: `OFF` for pre-built kernels)
 
 **MLX_METAL_JIT Trade-offs**:
@@ -379,7 +379,7 @@ bash tools/update.sh
 MLX_METAL_JIT=ON bash tools/update.sh
 
 # Install with PyTorch support
-INSTALL_TORCH=1 bash tools/update.sh
+SKIP_TORCH=1 bash tools/update.sh
 ```
 
 ### Updating Dependencies

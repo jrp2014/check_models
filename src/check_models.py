@@ -162,6 +162,9 @@ class FormattingThresholds:
     # Time formatting thresholds
     hour_threshold_seconds: float = 3600.0  # Show HH:MM:SS format
 
+    # Dry-run output thresholds
+    max_prompt_preview_lines: int = 10  # Max lines to show in prompt preview
+
 
 @dataclass
 class QualityThresholds:
@@ -6405,6 +6408,11 @@ def main(args: argparse.Namespace) -> None:
 
         prompt = prepare_prompt(args, metadata)
 
+        # Handle dry-run mode: show what would be run and exit
+        if getattr(args, "dry_run", False):
+            _handle_dry_run(args, image_path, prompt, library_versions)
+            return
+
         results = process_models(args, image_path, prompt=prompt)
 
         finalize_execution(
@@ -6424,6 +6432,74 @@ def main(args: argparse.Namespace) -> None:
     except (OSError, ValueError, RuntimeError) as main_err:
         logger.critical("Fatal error in main execution: %s", main_err)
         sys.exit(1)
+
+
+def _handle_dry_run(
+    args: argparse.Namespace,
+    image_path: Path,
+    prompt: str,
+    library_versions: LibraryVersionDict,
+) -> None:
+    """Handle --dry-run mode: display what would be run without invoking models.
+
+    Args:
+        args: Parsed command line arguments
+        image_path: Resolved image path
+        prompt: Generated or user-provided prompt
+        library_versions: Dictionary of library versions
+    """
+    print_cli_section("Dry Run Mode")
+    logger.info("🔍 Validating configuration without running models...")
+    log_blank()
+
+    # Image info
+    logger.info("📷 Image: %s", image_path)
+    if image_path.exists():
+        size_mb = image_path.stat().st_size / (1024 * 1024)
+        logger.info("   Size: %.2f MB", size_mb)
+    log_blank()
+
+    # Prompt info
+    logger.info("💬 Prompt:")
+    # Wrap prompt for readability
+    wrapped = textwrap.wrap(prompt, width=90)
+    max_lines = FORMATTING.max_prompt_preview_lines
+    for line in wrapped[:max_lines]:
+        logger.info("   %s", line)
+    if len(wrapped) > max_lines:
+        logger.info("   ... (%d more lines)", len(wrapped) - max_lines)
+    log_blank()
+
+    # Discover models
+    if args.models:
+        model_identifiers = args.models
+        logger.info("📦 Models specified explicitly:")
+    else:
+        model_identifiers = get_cached_model_ids()
+        logger.info("📦 Models discovered in cache:")
+
+    # Apply exclusions
+    excluded = set(args.exclude or [])
+    if excluded:
+        before_count = len(model_identifiers)
+        model_identifiers = [m for m in model_identifiers if m not in excluded]
+        logger.info("   (Excluded %d models via --exclude)", before_count - len(model_identifiers))
+
+    if not model_identifiers:
+        logger.warning("   ⚠️  No models to process!")
+    else:
+        for idx, model_id in enumerate(model_identifiers, start=1):
+            logger.info("   %2d. %s", idx, model_id)
+
+    log_blank()
+    logger.info("📊 Would process %d model(s)", len(model_identifiers))
+    log_blank()
+
+    # Library versions
+    print_version_info(library_versions)
+
+    log_blank()
+    log_success("Dry run complete. No models were invoked.", prefix="✅")
 
 
 def main_cli() -> None:
@@ -6639,6 +6715,16 @@ def main_cli() -> None:
         type=str,
         default="Context:",
         help="Marker used to identify context section in prompt.",
+    )
+    parser.add_argument(
+        "-n",
+        "--dry-run",
+        action="store_true",
+        default=False,
+        help=(
+            "Validate arguments and show what would be run without invoking any models. "
+            "Lists discovered models, the generated prompt, and image path then exits."
+        ),
     )
 
     # Parse arguments

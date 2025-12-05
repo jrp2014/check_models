@@ -49,6 +49,9 @@ python -m check_models --exclude "microsoft/Phi-3-vision-128k-instruct"
 
 # Run with detailed debug logging
 python -m check_models --verbose
+
+# Dry run: validate setup and show what would run without invoking models
+python -m check_models --dry-run
 ```
 
 **Python Version**: 3.13+ is recommended and tested.
@@ -430,7 +433,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- MANUAL_INSTALL_START -->
 ```bash
-pip install "huggingface-hub[cli,torch,typing]>=0.34.0,<1.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "tensorflow" "tzlocal>=5.0"
+pip install "huggingface-hub[cli,torch,typing]>=0.34.0,<1.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "tzlocal>=5.0"
 ```
 <!-- MANUAL_INSTALL_END -->
 
@@ -546,7 +549,7 @@ Development / QA:
 
 <!-- MINIMAL_INSTALL_START -->
 ```bash
-pip install "huggingface-hub[cli,torch,typing]>=0.34.0,<1.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "tensorflow" "tzlocal>=5.0"
+pip install "huggingface-hub[cli,torch,typing]>=0.34.0,<1.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "tzlocal>=5.0"
 ```
 <!-- MINIMAL_INSTALL_END -->
 
@@ -589,7 +592,7 @@ pip install -e ".[dev,extras]"  # dev tools + optional metrics/tokenizers
 > Torch is supported and can be installed when you need it for specific models; the script does not block Torch.
 
 > [!NOTE]
-> The `tools/update.sh` helper supports environment flags: `INSTALL_TORCH=1` for PyTorch, `MLX_METAL_JIT=ON` for smaller binaries with runtime compilation (default: `OFF` for pre-built kernels), `CLEAN_BUILD=1` to clean build artifacts first.
+> The `tools/update.sh` helper supports environment flags: `SKIP_TORCH=1` to skip PyTorch installation (torch is included by default), `MLX_METAL_JIT=ON` for smaller binaries with runtime compilation (default: `OFF` for pre-built kernels), `CLEAN_BUILD=1` to clean build artifacts first.
 
 > [!NOTE]
 > Installing `sentence-transformers` isn't necessary for this tool and may pull heavy backends into import paths; a heads‑up is logged if detected.
@@ -764,6 +767,7 @@ python check_models.py \
 | `--width` | int | (auto) | Force a fixed output width (columns) for separators and wrapping. |
 | `-c`, `--quality-config` | Path | (none) | Path to custom quality configuration YAML file. |
 | `--context-marker` | str | `Context:` | Marker used to identify context section in prompt. |
+| `-n`, `--dry-run` | flag | `False` | Validate arguments and show what would run without invoking models. |
 
 ### Selection Logic
 

@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2025-12-05 20:55:39 GMT
+FULL ENVIRONMENT DUMP - 2025-12-05 21:56:41 GMT
 ================================================================================
 
 --- pip freeze ---
@@ -16,7 +16,7 @@ certifi==2025.11.12
 cffi==2.0.0
 cfgv==3.5.0
 charset-normalizer==3.4.4
--e git+https://github.com/jrp2014/check_models.git@651865fa4b5b787e9c2cea5ddf493a0a61da8341#egg=check_models&subdirectory=src
+-e git+https://github.com/jrp2014/check_models.git@b9e1ae6ebe0d758bff53b90a06e263b8bafa8330#egg=check_models&subdirectory=src
 click==8.3.1
 cmake==4.2.0
 coverage==7.12.0
@@ -300,5 +300,5 @@ yarl                       1.22.0                       pypi_0              pypi
 zlib                       1.3.1                        h5f15de7_0
 
 ================================================================================
-Environment dump completed at 2025-12-05 20:55:40 GMT
+Environment dump completed at 2025-12-05 21:56:43 GMT
 ================================================================================
