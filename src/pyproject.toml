@@ -247,6 +247,11 @@ rules = { unresolved-import = "ignore" }
 testpaths = ["tests"]
 # Keep output concise; individual developers can override locally if needed.
 addopts = "-q"
+# Register custom markers for selective test execution
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "e2e: marks tests as end-to-end integration tests requiring model inference",
+]
 
 [tool.pyrefly]
 project-excludes = ["**/src/tools/.archived/"]

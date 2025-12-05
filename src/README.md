@@ -472,6 +472,23 @@ The `src/tools/` directory contains scripts useful for development and verificat
 
   Or refer to the official [test_smoke.py](https://github.com/Blaizzy/mlx-vlm/blob/main/mlx_vlm/tests/test_smoke.py) script.
 
+- **E2E Smoke Tests**: The test suite includes end-to-end tests that run actual model inference:
+
+  ```bash
+  # Run E2E tests (requires cached model: qnguyen3/nanoLLaVA)
+  pytest tests/test_e2e_smoke.py -v
+
+  # Skip slow tests for quick iteration
+  pytest -m "not slow"
+
+  # Run all tests including E2E
+  pytest tests/ -v
+  ```
+
+  > [!NOTE]
+  > E2E tests require `qnguyen3/nanoLLaVA` to be cached. Run a quick inference first to download it:
+  > `python -m check_models --models qnguyen3/nanoLLaVA --max-tokens 10`
+
 - **`validate_env.py`**: Checks your environment for required dependencies and configuration.
 
   ```bash
