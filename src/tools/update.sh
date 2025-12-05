@@ -91,8 +91,8 @@ pip_install() {
 }
 
 # Ensure global Python packaging tools are current
-echo "[update.sh] Updating core Python packaging tools (pip, wheel, setuptools, ninja, pyrefly)..."
-pip_install pip wheel setuptools ninja pyrefly
+echo "[update.sh] Updating core Python packaging tools (pip, wheel, setuptools, pyrefly)..."
+pip_install pip wheel setuptools pyrefly
 
 # Install project with all dependencies from pyproject.toml
 INSTALL_GROUPS=".[dev,extras,torch]"
@@ -302,7 +302,6 @@ update_local_mlx_repos() {
 			# Install MLX build dependencies (matching GitHub Actions)
 			echo "[update.sh] Installing MLX build dependencies..."
 			pip_install cmake
-			pip_install ninja
 			pip_install setuptools
 			pip install nanobind==2.4.0  # Pinned version, no -U
 			
