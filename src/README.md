@@ -365,19 +365,23 @@ python check_models.py --folder ~/images --timeout 120
 
 #### Trust Remote Code
 
-- `--trust-remote-code`: Allow execution of custom modeling code from Hugging Face repos. **Security risk** - only use with trusted models.
+- `--trust-remote-code` (default): Allow execution of custom modeling code from Hugging Face repos. **Security risk** - only use with trusted models.
+- `--no-trust-remote-code`: Disable custom code execution for maximum security.
 
 Some models require custom Python code for their architecture. This flag enables loading that code.
 
-**Example**:
+**Examples**:
 
 ```bash
-# Enable for models like Qwen or custom architectures
+# Enable for models like Qwen or custom architectures (default behavior)
 python check_models.py --image photo.jpg --models mlx-community/Qwen2-VL-7B-Instruct --trust-remote-code
+
+# Disable for security (may cause some models to fail)
+python check_models.py --image photo.jpg --no-trust-remote-code
 ```
 
 > [!WARNING]
-> **Security Risk**: This executes arbitrary Python from the model repo. Only use with models from trusted sources.
+> **Security Risk**: `--trust-remote-code` (the default) executes arbitrary Python from the model repo. Use `--no-trust-remote-code` when running untrusted models.
 
 ### Environment Variables
 
@@ -685,7 +689,7 @@ See module docstrings and `__all__` exports for complete API reference.
 | `--output-env` | Path | `output/environment.log` | Environment log filename (pip freeze, conda list). |
 | `-m`, `--models` | list[str] | (none) | Explicit model IDs/paths; disables cache discovery. |
 | `-e`, `--exclude` | list[str] | (none) | Models to exclude (applies to cache scan or explicit list). |
-| `--trust-remote-code` | flag | `True` | Allow custom code from Hub models (SECURITY RISK). |
+| `--trust-remote-code` / `--no-trust-remote-code` | flag | `True` | Allow/disallow custom code from Hub models. Use `--no-trust-remote-code` for security. |
 | `-p`, `--prompt` | str | (auto) | Custom prompt; if omitted a metadata‑aware prompt may be used. |
 | `-d`, `--detailed-metrics` | flag | `False` | Show expanded multi-line metrics block (verbose mode only). |
 | `-x`, `--max-tokens` | int | 500 | Max new tokens to generate. |

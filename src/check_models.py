@@ -6624,9 +6624,12 @@ def main_cli() -> None:
     )
     parser.add_argument(
         "--trust-remote-code",
-        action="store_true",
+        action=argparse.BooleanOptionalAction,
         default=True,
-        help="Allow custom code from Hub models (SECURITY RISK).",
+        help=(
+            "Allow custom code from Hub models (SECURITY RISK). "
+            "Use --no-trust-remote-code to disable."
+        ),
     )
     parser.add_argument(
         "-p",
