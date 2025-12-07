@@ -385,7 +385,6 @@ Several behaviors can be customized via environment variables (useful for CI/aut
 
 | Variable | Purpose | Default | Example |
 | -------- | ------- | ------- | ------- |
-| -------- | ------- | ------- | ------- |
 | `MLX_VLM_WIDTH` | Force CLI output width (columns) | Auto-detect terminal | `MLX_VLM_WIDTH=120` |
 | `NO_COLOR` | Disable ANSI colors in output | Not set (colors enabled) | `NO_COLOR=1` |
 | `FORCE_COLOR` | Force ANSI colors even in non-TTY | Not set | `FORCE_COLOR=1` |
@@ -531,7 +530,6 @@ Optional (enable additional features):
 
 | Feature | Package | Source | Install Command |
 | ------- | ------- | ------ | --------------- |
-| ------- | ------- | ------ | --------------- |
 | Extended system metrics (RAM/CPU) | `psutil` | `extras` | `pip install -e ".[extras]"` or `make install` |
 | Fast tokenizer backends | `tokenizers` | `extras` | `pip install -e ".[extras]"` or `make install` |
 | Tensor operations (for some models) | `einops` | `extras` | `pip install -e ".[extras]"` or `make install` |
@@ -672,83 +670,6 @@ from check_models import (
 
 See module docstrings and `__all__` exports for complete API reference.
 
-## Additional Examples
-
-```bash
-# Run across all cached models with a custom prompt
-python check_models.py -f ~/Pictures/Processed -p "What is the main object in this image?"
-
-# Explicit model list (skips cache discovery)
-python check_models.py -f ~/Pictures/Processed -m mlx-community/nanoLLaVA mlx-community/llava-1.5-7b-hf
-
-# Exclude specific models from the automatic cache scan
-python check_models.py -f ~/Pictures/Processed -e mlx-community/problematic-model other/model
-
-# Combine explicit list with exclusions
-python check_models.py -f ~/Pictures/Processed -m model1 model2 model3 -e model2
-
-# Verbose (debug) mode for detailed logs
-python check_models.py -f ~/Pictures/Processed -v
-```
-
-### Advanced Example
-
-```bash
-python check_models.py \
-  --folder ~/Pictures/TestImages \
-  --exclude "microsoft/Phi-3-vision-128k-instruct" \
-  --prompt "Provide a detailed caption for this image" \
-  --max-tokens 200 \
-  --temperature 0.1 \
-  --timeout 600 \
-  --output-html ~/reports/vlm_benchmark.html \
-  --output-markdown ~/reports/vlm_benchmark.md \
-  --verbose
-```
-
-### Advanced Parameters Example
-
-Control sampling behavior and memory optimization:
-
-```bash
-# Nucleus sampling with repetition penalty
-python check_models.py \
-  --folder ~/Pictures \
-  --top-p 0.9 \
-  --repetition-penalty 1.2 \
-  --repetition-context-size 50
-
-# Memory optimization for large models
-python check_models.py \
-  --folder ~/Pictures \
-  --lazy-load \
-  --max-kv-size 4096 \
-  --kv-bits 4
-
-# Combine sampling and memory optimization
-python check_models.py \
-  --folder ~/Pictures \
-  --models mlx-community/Qwen2-VL-7B-Instruct \
-  --top-p 0.95 \
-  --repetition-penalty 1.1 \
-  --lazy-load \
-  --kv-bits 8 \
-  --max-kv-size 8192
-```
-
-#### Sampling Parameters
-
-- **`--top-p`**: Nucleus sampling controls output diversity. Lower values (e.g., 0.9) produce more focused text; 1.0 disables it.
-- **`--repetition-penalty`**: Values > 1.0 discourage the model from repeating phrases. Useful for VLMs that tend to loop.
-- **`--repetition-context-size`**: How many recent tokens to consider when applying repetition penalty (default: 20).
-
-#### Memory Optimization
-
-- **`--lazy-load`**: Loads model weights on-demand rather than all at once. Reduces peak memory usage, recommended for models larger than half your RAM.
-- **`--max-kv-size`**: Limits the KV cache size to prevent memory overflow on long sequences.
-- **`--kv-bits`**: Quantizes the KV cache to 4 or 8 bits, significantly reducing memory with minimal quality loss.
-- **`--kv-group-size`**: Group size for KV quantization (advanced tuning).
-- **`--quantized-kv-start`**: Token position to start quantization (advanced tuning).
 
 ## Command Line Reference
 
