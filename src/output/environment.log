@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2025-12-12 13:20:42 GMT
+FULL ENVIRONMENT DUMP - 2025-12-14 01:23:53 GMT
 ================================================================================
 
 --- pip freeze ---
@@ -16,7 +16,7 @@ certifi==2025.11.12
 cffi==2.0.0
 cfgv==3.5.0
 charset-normalizer==3.4.4
--e git+https://github.com/jrp2014/check_models.git@83ee33c7c0db37e1102a95315b75a48a0c2d3f84#egg=check_models&subdirectory=src
+-e git+https://github.com/jrp2014/check_models.git@847113c1d3e40a6b445c01d656c194c5d226f08a#egg=check_models&subdirectory=src
 click==8.3.1
 cmake==4.2.0
 coverage==7.13.0
@@ -25,7 +25,7 @@ dill==0.4.0
 distlib==0.4.0
 docopt==0.6.2
 einops==0.8.1
-fastapi==0.124.2
+fastapi==0.124.4
 filelock==3.20.0
 flatbuffers==25.9.23
 frozenlist==1.8.0
@@ -52,7 +52,7 @@ markdown-it-py==4.0.0
 MarkupSafe==3.0.3
 mdurl==0.1.2
 ml_dtypes==0.5.4
--e git+https://github.com/ml-explore/mlx.git@ccaaa7d6df1742111e6784adf7c53220c33706a9#egg=mlx
+-e git+https://github.com/ml-explore/mlx.git@47d2505ea9e3fa067310b59989221b3b50b53ddb#egg=mlx
 -e git+https://github.com/ml-explore/mlx-lm.git@ede65a1484fe10ef96c4ae4dfe6d2c0ef8e7b164#egg=mlx_lm
 mlx-metal==0.30.0
 -e git+https://github.com/Blaizzy/mlx-vlm.git@533e04c461e8bb0e9b5cd86111009def950d4747#egg=mlx_vlm
@@ -117,7 +117,7 @@ torchaudio==2.9.1
 torchvision==0.24.1
 tqdm==4.67.1
 transformers==4.57.3
-ty==0.0.1a33
+ty==0.0.1a34
 types-psutil==7.1.3.20251211
 types-PyYAML==6.0.12.20250915
 types-requests==2.32.4.20250913
@@ -128,7 +128,7 @@ types-tqdm==4.67.0.20250809
 types-urllib3==1.26.25.14
 typing-inspection==0.4.2
 typing_extensions==4.15.0
-tzdata==2025.2
+tzdata==2025.3
 tzlocal==5.3.1
 urllib3==2.6.2
 uvicorn==0.38.0
@@ -169,7 +169,7 @@ distlib                    0.4.0                        pypi_0              pypi
 docopt                     0.6.2                        pypi_0              pypi
 einops                     0.8.1                        pypi_0              pypi
 expat                      2.7.3                        h50f4ffc_4
-fastapi                    0.124.2                      pypi_0              pypi
+fastapi                    0.124.4                      pypi_0              pypi
 filelock                   3.20.0                       pypi_0              pypi
 flatbuffers                25.9.23                      pypi_0              pypi
 frozenlist                 1.8.0                        pypi_0              pypi
@@ -201,7 +201,7 @@ markdown-it-py             4.0.0                        pypi_0              pypi
 markupsafe                 3.0.3                        pypi_0              pypi
 mdurl                      0.1.2                        pypi_0              pypi
 ml-dtypes                  0.5.4                        pypi_0              pypi
-mlx                        0.30.1.dev20251212+ccaaa7d6  pypi_0              pypi
+mlx                        0.30.1.dev20251213+47d2505e  pypi_0              pypi
 mlx-lm                     0.29.0                       pypi_0              pypi
 mlx-metal                  0.30.0                       pypi_0              pypi
 mlx-vlm                    0.3.9                        pypi_0              pypi
@@ -274,7 +274,7 @@ torchaudio                 2.9.1                        pypi_0              pypi
 torchvision                0.24.1                       pypi_0              pypi
 tqdm                       4.67.1                       pypi_0              pypi
 transformers               4.57.3                       pypi_0              pypi
-ty                         0.0.1a33                     pypi_0              pypi
+ty                         0.0.1a34                     pypi_0              pypi
 types-psutil               7.1.3.20251211               pypi_0              pypi
 types-pyyaml               6.0.12.20250915              pypi_0              pypi
 types-requests             2.32.4.20250913              pypi_0              pypi
@@ -285,7 +285,7 @@ types-tqdm                 4.67.0.20250809              pypi_0              pypi
 types-urllib3              1.26.25.14                   pypi_0              pypi
 typing-extensions          4.15.0                       pypi_0              pypi
 typing-inspection          0.4.2                        pypi_0              pypi
-tzdata                     2025.2                       pypi_0              pypi
+tzdata                     2025.3                       pypi_0              pypi
 tzlocal                    5.3.1                        pypi_0              pypi
 urllib3                    2.6.2                        pypi_0              pypi
 uvicorn                    0.38.0                       pypi_0              pypi
@@ -300,5 +300,5 @@ yarl                       1.22.0                       pypi_0              pypi
 zlib                       1.3.1                        h5f15de7_0
 
 ================================================================================
-Environment dump completed at 2025-12-12 13:20:43 GMT
+Environment dump completed at 2025-12-14 01:23:55 GMT
 ================================================================================
