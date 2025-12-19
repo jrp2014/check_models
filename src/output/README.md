@@ -11,7 +11,9 @@ The script's default output location is now this directory, keeping the project 
 - `results.html` - Styled HTML report (viewable in browser)
 - `results.md` - GitHub-friendly Markdown report
 - `results.tsv` - Tab-separated values table (for spreadsheets/data analysis)
+- `results.jsonl` - JSON Lines report (machine-readable results)
 - `check_models.log` - Detailed execution log from production benchmark runs
+- `environment.log` - Complete Python environment dump (for reproducibility)
 
 These files are regenerated each time you run the tool and **committed to version control** so results are visible in GitHub.
 
