@@ -22,9 +22,9 @@
 #   the script will automatically (AFTER installing all library dependencies):
 #   1. Run git pull in each repository
 #   2. Install requirements.txt (if present) for additional dependencies
-#      (Note: mlx REQUIRES nanobind==2.4.0 exactly and setuptools>=80 for builds)
+#      (Note: mlx requires setuptools>=80 and typing_extensions for builds)
 #   3. Install packages in dependency order: mlx → mlx-lm → mlx-vlm
-#   4. Generate type stubs (mlx: python setup.py generate_stubs, requires typing_extensions)
+#   4. (Stubs are now generated automatically by MLX build)
 #   5. Generate stubs for this project (mlx_vlm, tokenizers)
 #   6. Skip PyPI updates for these packages
 #
@@ -32,7 +32,7 @@
 #   - CMake >= 3.25 (MLX minimum requirement as of 2025)
 #   - Xcode >= 15.0 (macOS, for Metal support)
 #   - macOS >= 14.0 (MLX PyPI requirement)
-#   - nanobind==2.4.0 (exact version, required by MLX)
+#   - typing_extensions (required by MLX build)
 #   - setuptools>=80 (required for stub generation)
 #
 # Note: Script automatically detects and preserves local MLX dev builds (versions
@@ -303,7 +303,7 @@ update_local_mlx_repos() {
 			echo "[update.sh] Installing MLX build dependencies..."
 			pip_install cmake
 			pip_install setuptools
-			pip install nanobind==2.4.0  # Pinned version, no -U
+			pip_install typing_extensions
 			
 			[[ "${CLEAN_BUILD:-0}" == "1" ]] && rm -rf build
 			
@@ -329,27 +329,10 @@ update_local_mlx_repos() {
 			continue
 		fi
 	
-		# Generate stubs for mlx
-		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
-			echo "[update.sh] Generating type stubs for mlx..."
-			
-			# Verify setuptools and typing_extensions are installed (both required for stub generation)
-			if ! python -c 'import setuptools; exit(0 if tuple(map(int, setuptools.__version__.split("."))) >= (80, 0, 0) else 1)' 2>/dev/null; then
-				echo "[update.sh] Installing setuptools>=80 (required for stub generation)..."
-				pip_install "setuptools>=80"
-			fi
-			
-			if ! python -c "import typing_extensions" 2>/dev/null; then
-				echo "[update.sh] Installing typing_extensions (required for stub generation)..."
-				pip_install "typing_extensions"
-			fi
-			
-			if python setup.py generate_stubs; then
-				echo "✓ MLX stubs generated"
-			else
-				echo "⚠️  Stub generation failed (non-fatal)"
-			fi
-		fi
+		# Stubs are generated automatically by the build process now
+		# if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
+		# 	echo "[update.sh] (MLX stubs are generated automatically during build)"
+		# fi
 		echo ""
 	done
 	cd "$ORIGINAL_DIR"
