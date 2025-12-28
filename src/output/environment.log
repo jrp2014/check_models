@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2025-12-19 22:31:14 GMT
+FULL ENVIRONMENT DUMP - 2025-12-28 20:39:43 GMT
 ================================================================================
 
 --- pip freeze ---
@@ -16,18 +16,18 @@ certifi==2025.11.12
 cffi==2.0.0
 cfgv==3.5.0
 charset-normalizer==3.4.4
--e git+https://github.com/jrp2014/check_models.git@4320f9d0e41da7afff4694107628a5ea89a7c942#egg=check_models&subdirectory=src
+-e git+https://github.com/jrp2014/check_models.git@34326640f62adb928b0133432441717a63109c91#egg=check_models&subdirectory=src
 click==8.3.1
-cmake==4.2.0
-coverage==7.13.0
+cmake==4.2.1
+coverage==7.13.1
 datasets==4.4.2
 dill==0.4.0
 distlib==0.4.0
 docopt==0.6.2
 einops==0.8.1
-fastapi==0.125.0
+fastapi==0.128.0
 filelock==3.20.1
-flatbuffers==25.9.23
+flatbuffers==25.12.19
 frozenlist==1.8.0
 fsspec==2025.10.0
 gast==0.7.0
@@ -46,16 +46,16 @@ inquirerpy==0.3.4
 Jinja2==3.1.6
 keras==3.13.0
 libclang==18.1.1
-librt==0.7.4
+librt==0.7.5
 Markdown==3.10
 markdown-it-py==4.0.0
 MarkupSafe==3.0.3
 mdurl==0.1.2
 ml_dtypes==0.5.4
--e git+https://github.com/ml-explore/mlx.git@d9f4d8d5083586c5c66e032e41849ae1e122c928#egg=mlx
--e git+https://github.com/ml-explore/mlx-lm.git@1b2d11b5c7ba0ce0122a48edba5f717a41b8da1f#egg=mlx_lm
+-e git+https://github.com/ml-explore/mlx.git@d9b950eb2f1bb695853e93adddbae47bfecc972a#egg=mlx
+-e git+https://github.com/ml-explore/mlx-lm.git@f5ae09a8077ffbe05511877f11b81ae3484535cd#egg=mlx_lm
 mlx-metal==0.30.1
--e git+https://github.com/Blaizzy/mlx-vlm.git@c4ea290e47e2155b67d94c708c662f8ab64e1b37#egg=mlx_vlm
+-e git+https://github.com/Blaizzy/mlx-vlm.git@74fbab92585eb55c6cccb81cd99441265db8aefb#egg=mlx_vlm
 mpmath==1.3.0
 multidict==6.7.0
 multiprocess==0.70.18
@@ -65,7 +65,7 @@ namex==0.1.0
 nanobind==2.4.0
 networkx==3.6.1
 ninja==1.13.0
-nodeenv==1.9.1
+nodeenv==1.10.0
 num2words==0.5.14
 numpy==2.2.6
 opencv-python==4.12.0.88
@@ -82,13 +82,13 @@ pre_commit==4.5.1
 prompt_toolkit==3.0.52
 propcache==0.4.1
 protobuf==6.33.2
-psutil==7.1.3
+psutil==7.2.0
 pyarrow==22.0.0
 pycparser==2.23
 pydantic==2.12.5
 pydantic_core==2.41.5
 Pygments==2.19.2
-pyrefly==0.46.0
+pyrefly==0.46.1
 pytest==9.0.2
 pytest-cov==7.0.0
 python-dateutil==2.9.0.post0
@@ -118,9 +118,9 @@ torchaudio==2.9.1
 torchvision==0.24.1
 tqdm==4.67.1
 transformers==5.0.0rc1
-ty==0.0.4
-typer-slim==0.20.1
-types-psutil==7.1.3.20251211
+ty==0.0.7
+typer-slim==0.21.0
+types-psutil==7.2.0.20251228
 types-PyYAML==6.0.12.20250915
 types-requests==2.32.4.20250913
 types-simplejson==3.20.0.20250822
@@ -133,7 +133,7 @@ typing_extensions==4.15.0
 tzdata==2025.3
 tzlocal==5.3.1
 urllib3==2.6.2
-uvicorn==0.38.0
+uvicorn==0.40.0
 virtualenv==20.35.4
 wcwidth==0.2.14
 Werkzeug==3.1.4
@@ -163,17 +163,17 @@ cfgv                       3.5.0                        pypi_0              pypi
 charset-normalizer         3.4.4                        pypi_0              pypi
 check-models               0.1.0                        pypi_0              pypi
 click                      8.3.1                        pypi_0              pypi
-cmake                      4.2.0                        pypi_0              pypi
-coverage                   7.13.0                       pypi_0              pypi
+cmake                      4.2.1                        pypi_0              pypi
+coverage                   7.13.1                       pypi_0              pypi
 datasets                   4.4.2                        pypi_0              pypi
 dill                       0.4.0                        pypi_0              pypi
 distlib                    0.4.0                        pypi_0              pypi
 docopt                     0.6.2                        pypi_0              pypi
 einops                     0.8.1                        pypi_0              pypi
 expat                      2.7.3                        h50f4ffc_4
-fastapi                    0.125.0                      pypi_0              pypi
+fastapi                    0.128.0                      pypi_0              pypi
 filelock                   3.20.1                       pypi_0              pypi
-flatbuffers                25.9.23                      pypi_0              pypi
+flatbuffers                25.12.19                     pypi_0              pypi
 frozenlist                 1.8.0                        pypi_0              pypi
 fsspec                     2025.10.0                    pypi_0              pypi
 gast                       0.7.0                        pypi_0              pypi
@@ -196,14 +196,14 @@ libcxx                     20.1.8                       hd7fd590_1
 libexpat                   2.7.3                        h50f4ffc_4
 libffi                     3.4.4                        hca03da5_1
 libmpdec                   4.0.0                        h80987f9_0
-librt                      0.7.4                        pypi_0              pypi
+librt                      0.7.5                        pypi_0              pypi
 libzlib                    1.3.1                        h5f15de7_0
 markdown                   3.10                         pypi_0              pypi
 markdown-it-py             4.0.0                        pypi_0              pypi
 markupsafe                 3.0.3                        pypi_0              pypi
 mdurl                      0.1.2                        pypi_0              pypi
 ml-dtypes                  0.5.4                        pypi_0              pypi
-mlx                        0.30.3.dev20251219+d9f4d8d5  pypi_0              pypi
+mlx                        0.30.3.dev20251228+d9b950eb  pypi_0              pypi
 mlx-lm                     0.30.0                       pypi_0              pypi
 mlx-metal                  0.30.1                       pypi_0              pypi
 mlx-vlm                    0.3.10                       pypi_0              pypi
@@ -217,7 +217,7 @@ nanobind                   2.4.0                        pypi_0              pypi
 ncurses                    6.5                          hee39554_0
 networkx                   3.6.1                        pypi_0              pypi
 ninja                      1.13.0                       pypi_0              pypi
-nodeenv                    1.9.1                        pypi_0              pypi
+nodeenv                    1.10.0                       pypi_0              pypi
 num2words                  0.5.14                       pypi_0              pypi
 numpy                      2.2.6                        pypi_0              pypi
 opencv-python              4.12.0.88                    pypi_0              pypi
@@ -236,13 +236,13 @@ pre-commit                 4.5.1                        pypi_0              pypi
 prompt-toolkit             3.0.52                       pypi_0              pypi
 propcache                  0.4.1                        pypi_0              pypi
 protobuf                   6.33.2                       pypi_0              pypi
-psutil                     7.1.3                        pypi_0              pypi
+psutil                     7.2.0                        pypi_0              pypi
 pyarrow                    22.0.0                       pypi_0              pypi
 pycparser                  2.23                         pypi_0              pypi
 pydantic                   2.12.5                       pypi_0              pypi
 pydantic-core              2.41.5                       pypi_0              pypi
 pygments                   2.19.2                       pypi_0              pypi
-pyrefly                    0.46.0                       pypi_0              pypi
+pyrefly                    0.46.1                       pypi_0              pypi
 pytest                     9.0.2                        pypi_0              pypi
 pytest-cov                 7.0.0                        pypi_0              pypi
 python                     3.13.9                       hc7d8306_100_cp313
@@ -277,9 +277,9 @@ torchaudio                 2.9.1                        pypi_0              pypi
 torchvision                0.24.1                       pypi_0              pypi
 tqdm                       4.67.1                       pypi_0              pypi
 transformers               5.0.0rc1                     pypi_0              pypi
-ty                         0.0.4                        pypi_0              pypi
-typer-slim                 0.20.1                       pypi_0              pypi
-types-psutil               7.1.3.20251211               pypi_0              pypi
+ty                         0.0.7                        pypi_0              pypi
+typer-slim                 0.21.0                       pypi_0              pypi
+types-psutil               7.2.0.20251228               pypi_0              pypi
 types-pyyaml               6.0.12.20250915              pypi_0              pypi
 types-requests             2.32.4.20250913              pypi_0              pypi
 types-simplejson           3.20.0.20250822              pypi_0              pypi
@@ -292,7 +292,7 @@ typing-inspection          0.4.2                        pypi_0              pypi
 tzdata                     2025.3                       pypi_0              pypi
 tzlocal                    5.3.1                        pypi_0              pypi
 urllib3                    2.6.2                        pypi_0              pypi
-uvicorn                    0.38.0                       pypi_0              pypi
+uvicorn                    0.40.0                       pypi_0              pypi
 virtualenv                 20.35.4                      pypi_0              pypi
 wcwidth                    0.2.14                       pypi_0              pypi
 werkzeug                   3.1.4                        pypi_0              pypi
@@ -304,5 +304,5 @@ yarl                       1.22.0                       pypi_0              pypi
 zlib                       1.3.1                        h5f15de7_0
 
 ================================================================================
-Environment dump completed at 2025-12-19 22:31:16 GMT
+Environment dump completed at 2025-12-28 20:39:45 GMT
 ================================================================================
