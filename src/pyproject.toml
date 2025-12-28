@@ -170,7 +170,7 @@ ignore = [
 # Archived files: ignore all rules (these are not maintained)
 "tools/.archived/**" = ["ALL"]
 
-# Specific ignores for subprocess calls with hardcoded arguments
+# Asserts are OK in tests
 "**/tests/**" = ["S101"]
 
 
