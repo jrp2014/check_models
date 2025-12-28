@@ -172,7 +172,6 @@ ignore = [
 
 # Specific ignores for subprocess calls with hardcoded arguments
 "**/tests/**" = ["S101"]
-"**/check_models.py" = ["S603"]
 
 
 [tool.ruff.lint.pydocstyle]
@@ -229,7 +228,7 @@ ignore_errors = true
 
 # Ignore errors in MLX libraries (avoid issues with stubs in older/newer versions)
 [[tool.mypy.overrides]]
-module = ["mlx.*", "mlx_vlm.*", "mlx_lm.*", "tokenizers.*", "huggingface_hub.*"]
+module = ["mlx_vlm.*", "mlx_lm.*", "tokenizers.*", "huggingface_hub.*"]
 ignore_errors = true
 ignore_missing_imports = true
 follow_imports = "skip"
@@ -258,7 +257,6 @@ search-path = ["../typings"]
 python-version = "3.13"
 #conda-environment = "mlx-vlm"
 ignore-missing-imports = [
-    "mlx.*",
     "mlx_vlm.*",
     "mlx_lm.*",
     "tokenizers.*",

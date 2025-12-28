@@ -5444,7 +5444,7 @@ def _dump_environment_to_log(output_path: Path) -> None:
 
             # Try pip freeze first (works in both conda and venv)
             try:
-                pip_result = subprocess.run(
+                pip_result = subprocess.run(  # noqa: S603
                     [sys.executable, "-m", "pip", "freeze"],
                     capture_output=True,
                     text=True,
@@ -5465,7 +5465,7 @@ def _dump_environment_to_log(output_path: Path) -> None:
                 try:
                     conda_path = shutil.which("conda")
                     if conda_path:
-                        conda_result = subprocess.run(
+                        conda_result = subprocess.run(  # noqa: S603
                             [conda_path, "list"],
                             capture_output=True,
                             text=True,
