@@ -1,19 +1,19 @@
 # Model Performance Results
 
-_Generated on 2025-12-28 20:50:37 GMT_
+_Generated on 2026-01-03 00:29:57 GMT_
 
 ## 🏆 Performance Highlights
 
-- **Fastest:** `mlx-community/LFM2-VL-1.6B-8bit` (312.1 tps)
+- **Fastest:** `mlx-community/LFM2-VL-1.6B-8bit` (291.0 tps)
 - **💾 Most efficient:** `qnguyen3/nanoLLaVA` (4.5 GB)
 - **⚡ Fastest load:** `HuggingFaceTB/SmolVLM-Instruct` (0.00s)
-- **📊 Average TPS:** 63.3 across 26 models
+- **📊 Average TPS:** 61.8 across 26 models
 
 ## 📈 Resource Usage
 
-- **Total peak memory:** 485.0 GB
+- **Total peak memory:** 485.8 GB
 - **Average peak memory:** 18.7 GB
-- **Memory efficiency:** 174 tokens/GB
+- **Memory efficiency:** 179 tokens/GB
 
 ## ⚠️ Quality Issues
 
@@ -34,26 +34,30 @@ _Generated on 2025-12-28 20:50:37 GMT_
 
 ## 📊 Aggregate Statistics (Successful Runs)
 
-- **Generation Tps**: Avg: 63.3 | Min: 3.8 | Max: 312
+- **Generation Tps**: Avg: 61.8 | Min: 3.81 | Max: 291
 - **Peak Memory**: Avg: 19 | Min: 4.5 | Max: 53
-- **Total Time**: Avg: 23.59s | Min: 2.52s | Max: 60.82s
-- **Generation Time**: Avg: 20.04s | Min: 1.41s | Max: 55.09s
-- **Model Load Time**: Avg: 3.55s | Min: 1.11s | Max: 7.39s
+- **Total Time**: Avg: 24.70s | Min: 2.94s | Max: 83.12s
+- **Generation Time**: Avg: 19.93s | Min: 1.92s | Max: 53.71s
+- **Model Load Time**: Avg: 4.77s | Min: 1.02s | Max: 43.05s
 
 > **Prompt used:**
 >
 > Provide a factual caption, description, and keywords suitable for cataloguing, or searching for, the image.
 >
-> Context: The image relates to ', Beach, Gullane, Scotland, United Kingdom, UK
-> On a quiet December afternoon in Gullane, Scotland, clusters of bright orange sea buckthorn berries provide a vibrant splash of colour against the muted tones of the coastal landscape. From a grassy clifftop, the view extends over the sandy beach where two people are taking a stroll along the shoreline of the Firth of Forth.
+> Context: The image relates to 'Gingerbread House, Morrison's Haven, Prestongrange, Scotland, United Kingdom, UK
+> Here is a caption for the image, written in a neutral and descriptive style suitable for a periodical, blog, or photography website.
 >
-> This area of East Lothian is renowned for its sweeping beaches and world-class golf courses. The coastline also holds historical significance, with many of its beaches, including Gullane, having been fortified with anti-tank defences during World War II, remnants of which can still be seen today.'
+> **Caption:**
 >
-> The photo was taken around 2025-12-28 14:59:01 GMT from GPS 56.038550°N, 2.843717°W . Focus on visual content, drawing on any available contextual information for specificity. Do not speculate.
+> The iconic silhouette of Arthur's Seat is visible across the Firth of Forth during a late winter afternoon in January. This photograph was taken from the rocky shoreline of Morrison's Haven in Prestongrange, East Lothian, Scotland. As the sun dips towards the horizon, its golden light breaks through a band of heavy clouds, illuminating the sky above the distant Edinburgh skyline. In the foreground, the cool, dark stones of the coast contrast with the choppy, blue-grey water as small waves break on the shore.
+>
+> Historically, Morrison's Haven was a significant 16th-century harbour, crucial to the area's once-thriving coal and salt industries. Today, it serves as a quiet location offering expansive views of the capital city and the rugged beauty of the Scottish coastline.'
+>
+> The photo was taken around 2026-01-02 15:56:46 GMT from GPS 55.953633°N, 3.007600°W . Focus on visual content, drawing on any available contextual information for specificity. Do not speculate.
 
 **Note:** Results sorted: errors first, then by generation time (fastest to slowest).
 
-**Overall runtime:** 652.11s
+**Overall runtime:** 679.98s
 
 <!-- markdownlint-disable MD013 MD033 MD034 MD037 MD049 -->
 
@@ -69,32 +73,32 @@ _Generated on 2025-12-28 20:50:37 GMT_
 | `mlx-community/deepseek-vl2-8bit`                       |         |                   |                       |                |              |           |             |                  |            |             |                      |
 | `mlx-community/gemma-3-12b-pt-8bit`                     |         |                   |                       |                |              |           |             |                  |            |             |                      |
 | `prince-canuma/Florence-2-large-ft`                     |         |                   |                       |                |              |           |             |                  |            |             |                      |
-| `qnguyen3/nanoLLaVA`                                    | 151,645 |               260 |                    65 |            325 |        1,118 |       101 |         4.5 |            1.41s |      1.11s |       2.52s |                      |
-| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |  49,279 |             1,337 |                    47 |          1,384 |        1,160 |       118 |         5.5 |            2.01s |      1.42s |       3.43s |                      |
-| `HuggingFaceTB/SmolVLM-Instruct`                        |  49,154 |             1,437 |                    19 |          1,456 |          991 |       118 |         5.5 |            2.25s |      1.48s |       3.73s |                      |
-| `mlx-community/paligemma2-3b-pt-896-4bit`               |       1 |             4,335 |                    22 |          4,357 |        1,294 |       110 |         8.6 |            3.97s |      2.93s |       6.90s | context-ignored      |
-| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |             1,263 |                    87 |          1,350 |          479 |      41.3 |          11 |            5.16s |      3.84s |       8.99s | context-ignored      |
-| `mlx-community/SmolVLM-Instruct-bf16`                   |  49,154 |             1,437 |                   409 |          1,846 |        1,197 |       113 |         5.5 |            5.29s |      1.39s |       6.68s |                      |
-| `mlx-community/LFM2-VL-1.6B-8bit`                       |       7 |             2,036 |                    15 |          2,051 |          434 |       312 |          53 |            5.36s |      1.33s |       6.68s |                      |
-| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |             2,910 |                   305 |          3,215 |          858 |       156 |         7.4 |            5.75s |      2.01s |       7.77s |                      |
-| `mlx-community/gemma-3n-E4B-it-bf16`                    |     106 |               508 |                   230 |            738 |          575 |      41.6 |          17 |            6.85s |      5.28s |      12.14s |                      |
-| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         |       1 |             1,263 |                   128 |          1,391 |        1,457 |      17.6 |          11 |            8.57s |      4.98s |      13.54s | context-ignored      |
-| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |             2,447 |                     8 |          2,455 |          259 |      47.6 |          12 |           10.05s |      1.93s |      11.98s | context-ignored      |
-| `mlx-community/gemma-3-27b-it-qat-4bit`                 |     106 |               508 |                   305 |            813 |          174 |      27.9 |          19 |           14.28s |      5.18s |      19.46s | bullets(21)          |
-| `mlx-community/pixtral-12b-8bit`                        |       2 |             3,071 |                   281 |          3,352 |          495 |      34.3 |          15 |           14.80s |      3.48s |      18.28s | bullets(19)          |
-| `mlx-community/Idefics3-8B-Llama3-bf16`                 | 128,001 |             2,549 |                   364 |          2,913 |          665 |      29.0 |          18 |           16.84s |      3.72s |      20.57s | formatting           |
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |             2,345 |                   194 |          2,539 |          213 |      27.7 |          22 |           18.44s |      4.19s |      22.63s |                      |
-| `mlx-community/pixtral-12b-bf16`                        |       2 |             3,071 |                   277 |          3,348 |          531 |      19.2 |          27 |           20.59s |      5.23s |      25.82s | bullets(20)          |
-| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         |   1,056 |             3,169 |                   500 |          3,669 |          397 |      35.3 |          15 |           22.56s |      3.31s |      25.87s |                      |
-| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               508 |                   360 |            868 |          166 |      15.4 |          34 |           26.88s |      7.39s |      34.26s | bullets(25)          |
-| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      | 128,009 |               237 |                   222 |            459 |         74.9 |      8.61 |          15 |           29.38s |      2.95s |      32.33s | context-ignored      |
-| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |             1,263 |                   128 |          1,391 |          448 |      4.84 |          27 |           29.70s |      7.27s |      36.97s | context-ignored      |
-| `mlx-community/GLM-4.6V-Flash-6bit`                     |  66,452 |             6,382 |                   500 |          6,882 |          304 |      47.3 |          13 |           32.03s |      2.76s |      34.79s | formatting           |
-| `mlx-community/Molmo-7B-D-0924-8bit`                    | 151,643 |             1,452 |                   187 |          1,639 |         43.1 |      44.6 |          41 |           38.47s |      5.96s |      44.43s |                      |
-| `mlx-community/Molmo-7B-D-0924-bf16`                    | 151,643 |             1,452 |                   289 |          1,741 |         43.5 |      27.9 |          47 |           44.25s |      3.71s |      47.97s |                      |
-| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |      11 |            16,479 |                   500 |         16,979 |          386 |      71.8 |          12 |           50.23s |      1.85s |      52.08s |                      |
-| `Qwen/Qwen3-VL-2B-Instruct`                             |  22,012 |            16,477 |                   500 |         16,977 |          382 |      70.3 |          12 |           50.92s |      1.81s |      52.73s | verbose, bullets(54) |
-| `meta-llama/Llama-3.2-11B-Vision-Instruct`              | 128,009 |               238 |                   189 |            427 |         50.7 |       3.8 |          25 |           55.09s |      5.73s |      60.82s |                      |
+| `qnguyen3/nanoLLaVA`                                    | 151,645 |               329 |                   125 |            454 |        1,365 |       101 |         4.5 |            1.92s |      1.02s |       2.94s | context-ignored      |
+| `HuggingFaceTB/SmolVLM-Instruct`                        |  49,154 |             1,514 |                    93 |          1,607 |        1,072 |       114 |         5.5 |            2.63s |      1.37s |       4.00s | context-ignored      |
+| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |  49,279 |             1,414 |                   167 |          1,581 |        1,202 |       115 |         5.5 |            2.98s |      1.31s |       4.29s |                      |
+| `mlx-community/paligemma2-3b-pt-896-4bit`               |       1 |             4,415 |                   121 |          4,536 |        1,258 |       111 |         8.8 |            4.91s |      2.83s |       7.74s |                      |
+| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |             1,343 |                    90 |          1,433 |          477 |      41.2 |          12 |            5.31s |      3.83s |       9.14s | context-ignored      |
+| `mlx-community/LFM2-VL-1.6B-8bit`                       |       7 |             2,111 |                   171 |          2,282 |          462 |       291 |          53 |            5.62s |      1.15s |       6.76s |                      |
+| `mlx-community/SmolVLM-Instruct-bf16`                   |  12,753 |             1,514 |                   500 |          2,014 |        1,236 |       113 |         5.5 |            6.03s |      1.34s |       7.37s | verbose              |
+| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |             2,969 |                   373 |          3,342 |          863 |       156 |         7.4 |            6.14s |      1.91s |       8.05s | verbose              |
+| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         |       1 |             1,343 |                    99 |          1,442 |        1,483 |      17.7 |          11 |            6.83s |      3.51s |      10.34s | context-ignored      |
+| `mlx-community/Idefics3-8B-Llama3-bf16`                 | 128,001 |             2,616 |                   143 |          2,759 |          672 |      29.2 |          19 |            9.17s |      3.58s |      12.75s | formatting           |
+| `mlx-community/gemma-3n-E4B-it-bf16`                    |     106 |               585 |                   474 |          1,059 |          607 |      41.6 |          17 |           12.70s |      5.42s |      18.12s | verbose              |
+| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |             2,517 |                   118 |          2,635 |          239 |      41.0 |          12 |           13.77s |      1.86s |      15.63s |                      |
+| `mlx-community/gemma-3-27b-it-qat-4bit`                 |     106 |               585 |                   373 |            958 |          177 |      27.9 |          19 |           17.01s |      5.10s |      22.11s | bullets(24)          |
+| `mlx-community/pixtral-12b-8bit`                        |       2 |             3,127 |                   364 |          3,491 |          487 |      33.6 |          16 |           17.58s |      3.61s |      21.19s | verbose, bullets(24) |
+| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      | 128,009 |               305 |                   124 |            429 |         94.7 |      8.78 |          15 |           17.70s |      2.86s |      20.56s | context-ignored      |
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |             2,404 |                   255 |          2,659 |          212 |      27.4 |          22 |           20.95s |      4.13s |      25.08s |                      |
+| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         | 115,430 |             3,225 |                   500 |          3,725 |          400 |      35.1 |          15 |           22.63s |      3.23s |      25.85s | verbose              |
+| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |             1,343 |                   102 |          1,445 |          468 |      4.89 |          27 |           24.08s |      5.35s |      29.43s | context-ignored      |
+| `mlx-community/pixtral-12b-bf16`                        |       2 |             3,127 |                   350 |          3,477 |          534 |      18.9 |          27 |           24.70s |      5.13s |      29.83s | verbose, bullets(24) |
+| `mlx-community/GLM-4.6V-Flash-6bit`                     |   3,884 |             6,385 |                   500 |          6,885 |          300 |      47.3 |          13 |           32.25s |      2.66s |      34.91s | formatting           |
+| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               585 |                   407 |            992 |          145 |      14.3 |          34 |           32.93s |      7.23s |      40.16s | bullets(27)          |
+| `mlx-community/Molmo-7B-D-0924-8bit`                    | 151,643 |             1,513 |                   238 |          1,751 |         44.1 |      45.1 |          41 |           40.07s |     43.05s |      83.12s |                      |
+| `mlx-community/Molmo-7B-D-0924-bf16`                    | 151,643 |             1,513 |                   245 |          1,758 |         43.7 |      28.1 |          48 |           43.79s |      3.64s |      47.43s |                      |
+| `meta-llama/Llama-3.2-11B-Vision-Instruct`              | 128,009 |               306 |                   151 |            457 |         65.4 |      3.81 |          25 |           44.78s |      5.51s |      50.29s |                      |
+| `Qwen/Qwen3-VL-2B-Instruct`                             | 151,645 |            16,546 |                   217 |         16,763 |          374 |      68.8 |          12 |           48.04s |      1.69s |      49.73s | bullets(20)          |
+| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |     279 |            16,548 |                   500 |         17,048 |          358 |      71.4 |          12 |           53.71s |      1.77s |      55.48s | verbose              |
 
 <!-- markdownlint-enable MD013 MD033 MD034 MD037 MD049 -->
 
@@ -143,7 +147,7 @@ language_model.lm_head.weight.
 
 > Model loading failed: cannot import name '_validate_images_text_input_order'
 > from 'transformers.processing_utils'
-> (/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py)
+> (/opt/homebrew/Caskroom/miniconda/base/lib/python3.13/site-packages/transformers/processing_utils.py)
 **Type:** `ValueError`
 
 ---
@@ -155,7 +159,7 @@ language_model.lm_head.weight.
 
 > Model loading failed: cannot import name '_validate_images_text_input_order'
 > from 'transformers.processing_utils'
-> (/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py)
+> (/opt/homebrew/Caskroom/miniconda/base/lib/python3.13/site-packages/transformers/processing_utils.py)
 **Type:** `ValueError`
 
 ---
@@ -225,193 +229,224 @@ language_model.lm_head.weight.
 
 ### ✅ qnguyen3/nanoLLaVA
 
-**Metrics:** 101 TPS | 65 tokens
+**Metrics:** 101 TPS | 125 tokens
 
 ```text
-A picturesque coastal scene captures the essence of Gullane, Scotland, with its sandy beach, rocky cliffs, and beachgoers enjoying the day. The image is a blend of natural beauty and human activity, with the bright orange sea buckthorn berries adding a splash of color against the muted tones of the landscape.
-```
-
----
-
-### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
-
-**Metrics:** 118 TPS | 47 tokens
-
-```text
- Beach, Gullane, Scotland, United Kingdom, UK, December, 2025, GPS 56.038550°N, 2.843717°W
+The image captures a picturesque scene of the Firth of Forth during winter, with the iconic Arthur's Seat in the backdrop. The photograph was taken on January 2nd, 2026, at 15:56:46 GMT. The sky is filled with heavy clouds, and the water is choppy, with small waves breaking on the shore. The photograph was taken from a GPS 55.953633°N, 3.007600°W, and was taken at 15:56:46 GMT.
 ```
 
 ---
 
 ### ✅ HuggingFaceTB/SmolVLM-Instruct
 
-**Metrics:** 118 TPS | 19 tokens
+**Metrics:** 114 TPS | 93 tokens
 
 ```text
- Bright orange sea buckthorn berries on a coastal clifftop in Gullane, Scotland.
+ The image captures a serene winter scene in Scotland, showcasing the iconic Arthur's Seat mountain and the Firth of Forth. The sky is painted in hues of orange and yellow, with dark clouds overhead. The water in the foreground is a cool, dark blue, contrasting with the bright, golden light breaking through the clouds. The shoreline is rocky, with small waves breaking on the shore. The image is a beautiful and serene depiction of the Scottish landscape.
+```
+
+---
+
+### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
+
+**Metrics:** 115 TPS | 167 tokens
+
+```text
+ The image captures the stunning view of Arthur's Seat, a prominent mountain in the Firth of Forth, Scotland. The photograph was taken from Morrison's Haven in Prestongrange, East Lothian, during a late winter afternoon in January. The sky is painted with hues of orange and yellow, reflecting the setting sun. The mountain's silhouette stands prominently against the sky, while the water of the Firth of Forth churns with small waves, adding a dynamic element to the scene. The foreground is dominated by dark rocks, providing a stark contrast to the lighter water and sky. The image also provides historical context, noting that Morrison's Haven was a significant 16th-century harbour and today serves as a quiet location offering expansive views of the capital city and the rugged beauty of the Scottish coastline.
 ```
 
 ---
 
 ### ✅ mlx-community/paligemma2-3b-pt-896-4bit
 
-**Metrics:** 110 TPS | 22 tokens
+**Metrics:** 111 TPS | 121 tokens
 
 ```text
-Provide a factual caption, description, and keywords suitable for cataloguing, or searching for, the image.
+**Caption:**Morrison's Haven is a quiet location, with a view of Edinburgh and the rugged beauty of the Scottish coastline. The iconic silhouette of Arthur's Seat is visible across the Firth of Forth during a late winter afternoon in January. This photograph was taken around 2026-01-02 15:56:46 GMT from GPS 55.953633°N, 3.007600°W . Focus on visual content, drawing on any available contextual information for specificity. Do not speculate.
 ```
 
 ---
 
 ### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
 
-**Metrics:** 41.3 TPS | 87 tokens
+**Metrics:** 41.2 TPS | 90 tokens
 
 ```text
-A long-shot view of a beach with two people walking along the shore. The beach is a light brown sand with a dark brown rock formation in the top left corner. The water is a light blue with white foam at the shoreline. The sky is a light blue with no visible cloud coverage. In the foreground is a cluster of sea buckthorn bushes with orange berries. The bushes are growing on a hill with long grass.
-```
-
----
-
-### ✅ mlx-community/SmolVLM-Instruct-bf16
-
-**Metrics:** 113 TPS | 409 tokens
-
-```text
- The image depicts a coastal scene in Gullane, Scotland, captured on December 28, 2025. The focal point of the image is a cluster of bright orange sea buckthorn berries, which are a distinctive and vibrant addition to the otherwise muted coastal landscape. The berries are clustered together on the branches of a shrub or small tree, creating a striking contrast against the muted tones of the surrounding environment.
-
-The sea buckthorn berries are a bright orange color, which stands out against the muted tones of the coastal landscape. The berries are small and round, and they are clustered together in groups. The clusters are dense and appear to be quite large, suggesting that the shrub or tree is quite mature. The berries are also quite small, which helps to create a sense of depth and texture in the image.
-
-The background of the image is dominated by the beach and the Firth of Forth. The beach is sandy and appears to be quite wide, with a few people walking along it. The Firth of Forth is a large body of water that stretches out to the horizon, and it is visible in the distance behind the beach. The water is a light blue color, and it appears to be relatively calm.
-
-The image is taken from a slightly elevated perspective, which gives the viewer a clear view of the beach and the Firth of Forth. The sky is clear, with a few clouds visible in the distance. The overall atmosphere of the image is peaceful and serene, with the bright orange berries providing a focal point that draws the viewer's attention to the scene.
-
-The image is a good example of how natural elements can create a striking and visually appealing scene. The bright orange sea buckthorn berries are a unique and eye-catching feature, and they help to draw the viewer's attention to the natural beauty of the coastal landscape. The image is also a good example of how a single element can create a sense of depth and texture in a scene.
+A long-shot view of a body of water with a rocky shore in the foreground. The water is dark blue and has small waves coming towards the shore. The rocks on the shore are dark and wet, and there are some trees on the other side of the water in the distance. The sky is orange and blue, and there are dark clouds in the sky. There is a mountain in the distance on the other side of the water.
 ```
 
 ---
 
 ### ✅ mlx-community/LFM2-VL-1.6B-8bit
 
-**Metrics:** 312 TPS | 15 tokens
+**Metrics:** 291 TPS | 171 tokens
 
 ```text
-Gullane Beach, Scotland, December 28, 2025
+Caption:
+
+The iconic silhouette of Arthur's Seat is visible across the Firth of Forth during a late winter afternoon in January. This photograph was taken from the rocky shoreline of Morrison's Haven in Prestongrange, East Lothian, Scotland. As the sun dips towards the horizon, its golden light breaks through a band of heavy clouds, illuminating the sky above the distant Edinburgh skyline. In the foreground, the cool, dark stones of the coast contrast with the choppy, blue-grey water as small waves break on the shore. Historically, Morrison's Haven was a significant 16th-century harbour, crucial to the area's once-thriving coal and salt industries. Today, it serves as a quiet location offering expansive views of the capital city and the rugged beauty of the Scottish coastline.
+```
+
+---
+
+### ✅ mlx-community/SmolVLM-Instruct-bf16
+
+**Metrics:** 113 TPS | 500 tokens
+
+```text
+ **Image Description:**
+
+The image depicts a serene coastal scene, featuring a body of water, rocky shorelines, and distant mountainous terrain. The focal point is a large, dark mountain, which appears to be Arthur's Seat, a prominent landmark in Edinburgh, Scotland. The mountain is situated in the background, partially obscured by a layer of clouds that lend a dramatic and ethereal quality to the scene.
+
+The foreground of the image shows a rocky shoreline with small waves breaking on the shore. The water is a deep blue-grey, reflecting the light of the setting sun. The shoreline is composed of a mix of large and small rocks, some of which are covered in moss or other vegetation.
+
+In the background, the sky is a mix of dark and light colors, with the lightest areas being near the horizon and the darkest areas closer to the mountain. The clouds are dense and appear to be moving quickly, suggesting a windy or stormy day. The sky is lit up by the setting sun, casting a golden glow over the landscape.
+
+The mountain is partially obscured by the clouds, but its outline is still visible. The mountain is relatively tall and wide, with a flat top that appears to be covered in vegetation. The mountain is a prominent feature in the landscape, and its silhouette is clearly defined against the sky.
+
+The image captures a moment of tranquility and natural beauty, with the setting sun casting a warm glow on the scene. The water is calm, with small waves breaking on the shore, creating a peaceful and serene atmosphere.
+
+**Contextual Information:**
+
+Arthur's Seat is a significant landmark in Edinburgh, Scotland. It is a popular tourist destination due to its historical and cultural significance. The mountain has been a part of the city's landscape for centuries, and it played a crucial role in the city's salt and coal industries in the 16th century. Today, it is a popular hiking destination and offers stunning views of the city and the surrounding countryside.
+
+The image was taken on January 2, 2026, at approximately 15:56 GMT. The coordinates provided are accurate to within a few meters, indicating the precision of the location. The image was taken from a GPS position, which is a common method for capturing precise geographic data.
+
+**Image Analysis:**
+
+The image is a beautiful and serene landscape photograph that captures the natural beauty of the Scottish
 ```
 
 ---
 
 ### ✅ mlx-community/Ministral-3-3B-Instruct-2512-4bit
 
-**Metrics:** 156 TPS | 305 tokens
+**Metrics:** 156 TPS | 373 tokens
 
 ```text
-**Caption:**
-A serene coastal scene at Gullane Beach, East Lothian, Scotland. Vibrant clusters of orange sea buckthorn berries contrast beautifully with the tranquil shoreline, framing a peaceful walk along the sandy beach by the Firth of Forth.
+Based on the provided context and the visual elements of the image, here is a factual caption and description tailored to the location you mentioned, while ensuring accuracy with available data:
 
----
+**Caption:**
+A serene coastal scene at Morrison’s Haven near Prestongrange, Scotland, captures the interplay of rugged shoreline and the tranquil Firth of Forth. The photograph captures the dramatic contrast between the rocky foreground and the expansive, slightly choppy waters of the estuary. The sky, partially obscured by clouds, is bathed in a soft, golden hue as the sun sets, casting a peaceful ambiance over the scene.
 
 **Description:**
-The image captures a coastal landscape in Gullane, Scotland, featuring a grassy clifftop with dense patches of bright orange sea buckthorn berries. The foreground is dominated by these vivid berries, adding a striking splash of color to the scene. In the background, a sandy beach stretches out toward the water, where two people are leisurely strolling along the shoreline. The coastline is calm, with gentle waves rolling onto the beach. The muted tones of the coastal environment are softened by the natural light, creating a peaceful and picturesque atmosphere.
-
----
+The image depicts a coastal landscape with a rocky shoreline in the foreground. The waves gently lap against the jagged stones, creating a natural breakwater. In the background, the calm waters of the Firth of Forth stretch out, leading to a distant view of hills or low mountains. The lighting suggests late afternoon or early evening, with a mix of cloud cover and a warm, golden glow from the setting sun.
 
 **Keywords:**
-- Gullane Beach, Scotland
-- East Lothian coastline
-- Sea buckthorn berries
-- Sandy beach, Firth of Forth
-- Coastal walk, peaceful scenery
-- Natural landscape, vibrant flora
-- World-class golf courses
-- WWII anti-tank defences
-- December afternoon, coastal view
-- Shoreline, clifftop vegetation
-- Historical coastal fortifications
-- Gullane, United Kingdom, UK
-- Coastal erosion, serene ambiance
-- Wildlife-friendly coastal area
+- Coastal landscape, Scotland, Firth of Forth, rocky shoreline, natural breakwater, late afternoon, golden light, waves, estuary, Prestongrange, East Lothian, UK, serene seascape, coastal erosion, maritime scenery.
 
----
-This cataloguing ensures the image can be accurately referenced for research, tourism, or documentation purposes.
-```
-
----
-
-### ✅ mlx-community/gemma-3n-E4B-it-bf16
-
-**Metrics:** 41.6 TPS | 230 tokens
-
-```text
-## Caption:
-
-A vibrant burst of orange sea buckthorn berries contrasts with the muted tones of the coastal landscape in Gullane, Scotland. Two figures stroll along the sandy beach of the Firth of Forth on a cool December day.
-
-## Description:
-
-This photograph captures a scenic view of Gullane beach in East Lothian, Scotland. The foreground is dominated by low-lying bushes laden with bright orange sea buckthorn berries, adding a striking splash of color to the scene. Beyond the berries, a wide expanse of sandy beach stretches towards the calm, grey-blue waters of the Firth of Forth. Two small figures can be seen walking along the shoreline, enjoying the coastal path. The sky is overcast, contributing to the cool, slightly melancholic atmosphere. The coastline features rocky outcrops and evidence of historical defenses from World War II, highlighting the area's rich history.
-
-## Keywords:
-
-Gullane, Scotland, UK, beach, sea buckthorn, berries, coastline, Firth of Forth, East Lothian, coastal walk, winter, December, landscape, nature, wildlife, historical, cliffs, overcast, tranquil, scenic.
+*Note:* Since the provided context mentions a fictional or hypothetical date (2026-01-02) and the image itself does not align with known locations of Morrison’s Haven, the caption and description are based on the visual elements and the given fictional location description. If this is not the actual image of Morrison’s Haven, the caption should be adjusted to reflect the actual location and date of the photograph. For precise identification, a direct reference to the actual image or verified location would be required.
 ```
 
 ---
 
 ### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
 
-**Metrics:** 17.6 TPS | 128 tokens
+**Metrics:** 17.7 TPS | 99 tokens
 
 ```text
-A long-shot view of a beach with a grassy hill in the foreground. The foreground is filled with a mass of dried, dead grass with orange berries growing on the branches. The background is a view of the beach, with a small group of people walking along the shore in the distance. The beach is a sandy, tan color, with a small area of black rock visible on the left side of the image. The water is a light blue-green color, with a small wave breaking on the shore. The sky is a light blue color, with a slight view of the horizon in the top right corner of the image.
+A large, dark boulder sits on the left edge of the frame, with a small wave breaking on the shore. The water is a deep blue-green, with the sun shining on the left side of the water. The water ripples and creates a white foam on the surface. The horizon is a deep blue, with a band of bright orange and yellow from the setting sun. The distant skyline is a dark silhouette of a mountain range. The sky is filled with thick, dark clouds.
+```
+
+---
+
+### ✅ mlx-community/Idefics3-8B-Llama3-bf16
+
+**Metrics:** 29.2 TPS | 143 tokens
+
+```text
+ The image depicts a serene coastal scene at Morrison's Haven in Prestongrange, Scotland. The photograph captures the tranquil waters of the Firth of Forth, with the silhouette of Arthur's Seat, a prominent hill in Edinburgh, visible in the background. The sky is adorned with a mix of dark clouds and patches of golden sunlight, suggesting a late afternoon or early evening setting. The shoreline is characterized by dark, rugged stones, and the waves gently lapping against the shore create a soothing melody. The photograph was taken on January 2, 2026, at 15:56:46 GMT, with the GPS coordinates 55.953633°N, 3.007600°W.<end_of_utterance>
+```
+
+---
+
+### ✅ mlx-community/gemma-3n-E4B-it-bf16
+
+**Metrics:** 41.6 TPS | 474 tokens
+
+```text
+## Caption:
+
+**Golden Hour at the Shores of Moray Firth**
+
+A dramatic coastal scene unfolds at Moray's Haven in Prestongrange, East Lothian, captured during a late January afternoon. The iconic silhouette of Arthur's Seat rises in the distance across the Firth of Forth, framed by a dynamic sky of heavy clouds and streaks of warm, golden light.
+
+The rugged shoreline, characterized by dark stones and the gentle rhythm of waves, contrasts beautifully with the cool, grey-blue waters of the Firth. This picturesque location, historically a vital hub for the region's fishing and shipbuilding industries, now offers stunning panoramic views of Edinburgh and the scenic Scottish coastline.
+
+**Captured on January 2nd, 2026.**
+
+**Coordinates:** 55.953633°N, 3.007600°W
+
+## Description:
+
+This photograph showcases the captivating beauty of the coastline at Moray's Haven in Prestongrange, East Lothian. The image captures a serene yet dramatic moment during a late January afternoon, with the sun casting a warm glow on the horizon.
+
+The foreground features a rocky shoreline, with dark, weathered stones meeting the gentle waves of the Moray Firth. The water displays a range of cool tones, from deep blue to grey, reflecting the overcast sky.
+
+In the midground, a long, low-lying landmass stretches across the Firth, providing a visual anchor and a sense of depth. Beyond this, the majestic outline of Arthur's Seat dominates the skyline, its familiar form softened by the atmospheric conditions.
+
+The sky is a key element of the composition, with a mix of dark, heavy clouds and patches of warm, golden light breaking through. This interplay of light and shadow creates a visually compelling and evocative scene.
+
+The overall mood of the photograph is one of tranquility and natural beauty, highlighting the rugged charm of the Scottish coastline.
+
+## Keywords:
+
+Moray's Haven, Prestongrange, East Lothian, Scotland, UK, Firth of Forth, Arthur's Seat, coastline, sea, waves, rocks, sky, clouds, golden hour, winter, landscape, scenic, coastal, nature, photography, January, 2026.
 ```
 
 ---
 
 ### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
 
-**Metrics:** 47.6 TPS | 8 tokens
+**Metrics:** 41 TPS | 118 tokens
 
 ```text
-The image is a photograph.
+The image is a photograph of a coastal landscape during the late afternoon. The sky is a mix of blue, grey, and orange hues, with the sun low on the horizon. The silhouette of Arthur's Seat is visible in the distance, with the coastline and water in the foreground. The photograph captures the tranquil beauty of the Scottish coastline, with the city skyline faintly visible in the distance. The image is taken from the rocky shoreline of Morrison's Haven, East Lothian, Scotland.
 ```
 
 ---
 
 ### ✅ mlx-community/gemma-3-27b-it-qat-4bit
 
-**Metrics:** 27.9 TPS | 305 tokens
+**Metrics:** 27.9 TPS | 373 tokens
 
 ```text
-Here's a factual caption, description, and keyword list for the image, based on your provided context:
+## Image Catalogue Information:
 
-**Caption:** Sea buckthorn berries add colour to a December coastal scene at Gullane Beach, Scotland.
+**Caption:**
 
-**Description:** A vertical photograph showing a view of Gullane Beach, East Lothian, Scotland, taken from a grassy clifftop. In the foreground, branches laden with bright orange sea buckthorn berries dominate the lower portion of the frame. Behind the berries, a sandy beach stretches along the shoreline. Two figures are visible walking along the beach. The Firth of Forth is visible in the background under a pale blue sky. Sparse vegetation and dry grasses are visible on the clifftop.
+A late winter view of Arthur's Seat across the Firth of Forth, photographed from the rocky shoreline of Morrison's Haven, Prestongrange, East Lothian, Scotland. The image captures a low sun breaking through cloud cover, illuminating the skyline of Edinburgh in the distance. The foreground features dark, textured rocks and choppy blue-grey water with small waves.
+
+**Description:**
+
+Wide-angle landscape photograph depicting a coastal scene at Morrison's Haven, Prestongrange, Scotland. The composition is divided into three distinct layers: the foreground of dark, angular rocks and breaking waves; the mid-ground of the Firth of Forth with a choppy sea surface; and the background featuring the distant silhouette of Arthur's Seat and the Edinburgh skyline. The sky is dominated by heavy, layered clouds with a band of golden light breaking through near the horizon. The overall tone is cool and atmospheric, with a contrast between the dark foreground and the illuminated background.
 
 **Keywords:**
 
-*   Gullane
-*   Beach
-*   Scotland
+*   Morrison's Haven
+*   Prestongrange
 *   East Lothian
+*   Scotland
+*   Edinburgh
+*   Arthur's Seat
 *   Firth of Forth
-*   Sea Buckthorn
-*   Berries
+*   Scottish Coastline
 *   Coastal Landscape
-*   December
 *   Winter
+*   January
+*   Seascape
+*   Rocks
+*   Waves
+*   Sky
+*   Clouds
+*   Golden Hour
+*   Horizon
+*   Landscape Photography
 *   UK
 *   United Kingdom
-*   Shoreline
-*   People
-*   Clifftop
-*   Vegetation
-*   56.038550°N, 2.843717°W
-*   2025-12-28
-*   Coastal Defence (potential, based on context)
-*   World War II (potential, based on context)
-*   Golf Courses (potential, based on context)
+*   55.953633°N, 3.007600°W
+*   2026-01-02 15:56:46 GMT
+*   Historical Site (Coal/Salt Industry)
 
 
 
@@ -422,196 +457,130 @@ Here's a factual caption, description, and keyword list for the image, based on 
 
 ### ✅ mlx-community/pixtral-12b-8bit
 
-**Metrics:** 34.3 TPS | 281 tokens
+**Metrics:** 33.6 TPS | 364 tokens
 
 ```text
-### Caption
-A serene December afternoon at Gullane Beach, Scotland, showcases vibrant orange sea buckthorn berries against the muted coastal landscape. Two individuals stroll along the sandy shore of the Firth of Forth, with remnants of World War II anti-tank defenses visible in the distance.
-
 ### Description
-The image captures a tranquil scene at Gullane Beach in East Lothian, Scotland. From a grassy clifftop, the viewer's gaze is drawn to the sandy beach below, where two people are walking along the shoreline. The coastline is adorned with clusters of bright orange sea buckthorn berries, providing a striking contrast to the otherwise muted colors of the landscape. The calm waters of the Firth of Forth stretch out to the horizon, and remnants of anti-tank defenses from World War II can be seen along the beach, adding a historical dimension to the scene.
+This image captures the scenic view of Arthur's Seat, a prominent hill in Edinburgh, Scotland, as seen from the rocky shoreline of Morrison's Haven in Prestongrange, East Lothian. The photograph is taken during a late winter afternoon, with the sun casting a golden hue through the clouds, illuminating the sky and creating a dramatic backdrop. The foreground features the rugged, dark stones of the coast contrasting with the choppy, blue-grey waters of the Firth of Forth. Small waves gently break against the shore, adding a sense of movement to the tranquil scene.
 
 ### Keywords
-- Gullane Beach
-- Scotland
-- Firth of Forth
-- Sea Buckthorn
-- Coastal Landscape
-- December
-- Anti-tank Defenses
+- Arthur's Seat
+- Morrison's Haven
+- Prestongrange
 - East Lothian
-- World War II
-- Shoreline
-- Sandy Beach
-- Clifftop
-- Historical Significance
-- Tranquil Scene
-- Muted Colors
-- Orange Berries
-- Walking
-- Remnants
-- Historical Dimension
-```
-
----
-
-### ✅ mlx-community/Idefics3-8B-Llama3-bf16
-
-**Metrics:** 29 TPS | 364 tokens
-
-```text
- The image depicts a serene coastal scene in Gullane, Scotland, captured on December 28, 2025, at 14:59:01 GMT. The photograph was taken from a grassy clifftop, offering a panoramic view of the sandy beach below. The focal point of the image is the vibrant orange sea buckthorn berries that are scattered across the landscape. These berries add a striking contrast to the otherwise muted tones of the coastal environment.
-
-In the foreground, the grassy terrain is interspersed with clusters of these bright orange berries, creating a visually appealing mosaic. The berries are part of the sea buckthorn plant, known scientifically as Hippophae rhamnoides, which is native to the coastal regions of Europe and Asia. The plant is valued for its medicinal properties and is often used in traditional medicine.
-
-The sandy beach below is bordered by the Firth of Forth, a large estuary that flows into the North Sea. The water appears calm, reflecting the clear sky above. The shoreline is dotted with a few people, who are likely enjoying the peaceful atmosphere of the beach. The presence of these individuals adds a sense of scale to the expansive landscape.
-
-In the background, the coastline stretches out, with more sandy beaches and possibly some rocky formations. The historical significance of the area is evident, as remnants of anti-tank defences from World War II can still be seen along the coast. These defences were part of the extensive fortifications built to protect the coastline from potential invasions.
-
-The image captures the essence of a tranquil coastal setting, with the vibrant orange sea buckthorn berries providing a focal point of colour against the natural beauty of the Scottish landscape. The photograph serves as a testament to the region's natural beauty and historical significance.<end_of_utterance>
-```
-
----
-
-### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
-
-**Metrics:** 27.7 TPS | 194 tokens
-
-```text
-Caption: "Vibrant Sea Buckthorn Berries on Gullane Beach, Scotland"
-
-Description: The image captures a serene coastal scene in Gullane, Scotland, on a quiet December afternoon. In the foreground, clusters of bright orange sea buckthorn berries stand out against the muted tones of the grassy clifftop. The view extends over a sandy beach where two people are seen walking along the shoreline of the Firth of Forth. The calm sea and the expansive beach create a peaceful atmosphere, highlighting the natural beauty of this East Lothian coastline.
-
-Keywords: Gullane, Scotland, beach, sea buckthorn berries, coastal landscape, Firth of Forth, East Lothian, sandy beach, shoreline, nature, winter, December, United Kingdom, UK, coastal walk, tranquil, scenic, coastal scenery, sea, grassy clifftop, vibrant colors, natural beauty.
-```
-
----
-
-### ✅ mlx-community/pixtral-12b-bf16
-
-**Metrics:** 19.2 TPS | 277 tokens
-
-```text
-### Caption
-A serene December afternoon in Gullane, Scotland, showcases vibrant orange sea buckthorn berries against the muted coastal landscape. From a grassy clifftop, the view extends over a sandy beach where two people stroll along the shoreline of the Firth of Forth.
-
-### Description
-The image captures a tranquil scene at a beach in Gullane, Scotland. In the foreground, clusters of bright orange sea buckthorn berries stand out vividly against the muted greens and browns of the coastal vegetation. The vantage point is from a grassy clifftop, overlooking a sandy beach where two individuals are seen walking along the shoreline. The expansive view extends to the horizon, where the calm waters of the Firth of Forth meet the sky. The scene is peaceful, highlighting the natural beauty of the area.
-
-### Keywords
-- Gullane, Scotland
-- Beach
-- Sea buckthorn berries
 - Firth of Forth
-- Coastal landscape
-- December
-- Clifftop
-- Sandy beach
-- Shoreline
-- East Lothian
-- Anti-tank defences
-- World War II
-- Golf courses
-- Historical significance
+- Edinburgh skyline
+- Late winter afternoon
+- Rocky shoreline
+- Golden sunset
+- Scottish coastline
+- Historical harbour
+- Coal and salt industries
 - Tranquil scene
-- Natural beauty
-- Walking
-- Horizon
-- Calm waters
-- Sky
-```
+- Waves breaking on the shore
 
----
-
-### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
-
-**Metrics:** 35.3 TPS | 500 tokens
-
-```text
-Here are my reasoning steps:
-We need to produce a factual caption, description, and keywords suitable for cataloguing or searching the image. The user gave context: "Beach, Gullane, Scotland, United Kingdom, UK. On a quiet December afternoon in Gullane, Scotland, clusters of bright orange sea buckthorn berries provide a vibrant splash of colour against the muted tones of the coastal landscape. From a grassy clifftop, the view extends over the sandy beach where two people are taking a stroll along the shoreline of the Firth of Forth. This area of East Lothian is renowned for its sweeping beaches and world-class golf courses. The coastline also holds historical significance, with many of its beaches, including Gullane, having been fortified with anti-tank defences during World War II, remnants of which can still be seen today."
-
-The photo taken around 2025-12-28 14:59:01 GMT from GPS 56.038550°N, 2.843717°W. Focus on visual content, drawing on any available contextual information for specificity. Do not speculate.
-
-Thus we need to produce a factual caption, description, and keywords. The caption should be concise, describing the main visual elements: sea buckthorn berries, orange clusters, grassy clifftop, view over sandy beach, two people walking, Firth of Forth, overcast sky, muted tones, etc. The description should be more detailed, maybe a paragraph. Keywords should be relevant for cataloguing/search: "Gullane Beach", "East Lothian", "Scotland", "United Kingdom", "sea buckthorn", "orange berries", "coastal landscape", "sandy beach", "Firth of Forth", "clifftop", "two people walking", "December", "overcast sky", "anti-tank defences", "World War II remnants", "photography", "nature", "coastline", "grass", "shrubbery", "wildlife", "sea buckthorn (Hippophae rhamnoides)", "Golf courses", "tourist destination", "photographed 2025-12-28", "GPS 56.038550N 2.8
-```
-
----
-
-### ✅ mlx-community/gemma-3-27b-it-qat-8bit
-
-**Metrics:** 15.4 TPS | 360 tokens
-
-```text
-Here's a factual caption, description, and keyword list for the image, based on the provided context and visual content:
-
-**Caption:** Sea buckthorn berries add colour to the Gullane coastline, East Lothian, Scotland, December 2025.
-
-**Description:** A vertical photograph taken on December 28, 2025, at 14:59:01 GMT (56.038550°N, 2.843717°W) shows a view of Gullane beach, Scotland. In the foreground, clusters of bright orange sea buckthorn berries are prominent on branches of shrubs growing on a grassy clifftop. The sandy beach extends into the distance, with two figures walking along the shoreline. The Firth of Forth is visible as the body of water, and the sky is a muted blue. Sparse vegetation and remnants of possible anti-tank defences are visible on the beach.
-
-**Keywords:**
-
-*   Gullane
-*   Scotland
-*   Beach
-*   East Lothian
-*   Firth of Forth
-*   Sea Buckthorn
-*   Berries
-*   Coastline
-*   Winter
-*   December
-*   UK
-*   United Kingdom
-*   Coastal Landscape
-*   Clifftop
-*   Shoreline
-*   People
-*   Anti-tank defences (possible)
-*   Vegetation
-*   2025
-*   56.038550°N, 2.843717°W
-*   Outdoor
-*   Landscape Photography
-*   Natural Environment
-*   Grassy Bank
-*   Coastal Defence (possible)
-
-
-
-
+### Cataloguing Information
+- **Location:** Morrison's Haven, Prestongrange, East Lothian, Scotland, United Kingdom
+- **Date:** 2026-01-02
+- **Time:** 15:56:46 GMT
+- **GPS Coordinates:** 55.953633° N, 3.007600° W
+- **Subject:** Landscape photography of Arthur's Seat and the Firth of Forth
+- **Historical Context:** Former harbour significant for coal and salt industries
+- **Season:** Late winter
+- **Weather:** Cloudy with patches of sunlight
+- **Mood:** Tranquil and serene
+- **Photographer:** [Photographer's Name]
 ```
 
 ---
 
 ### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
-**Metrics:** 8.61 TPS | 222 tokens
+**Metrics:** 8.78 TPS | 124 tokens
 
 ```text
-The image depicts a serene beach scene with a focus on the vibrant orange sea buckthorn bushes in the foreground. The image is set in a natural setting, with the beach and ocean visible in the background.
+I'm happy to help you with your question. However, I must point out that the text you provided is not a question, but rather a passage of text that appears to be a poetic or descriptive piece about a place or a scene. It does not contain a specific question that I can answer.
 
-* The image features a beach with a calm and peaceful atmosphere.
-	+ The beach is sandy and stretches along the coastline.
-	+ The ocean is calm and blue, with gentle waves crashing against the shore.
-* The foreground is dominated by the orange sea buckthorn bushes.
-	+ The bushes are bright orange and have a distinctive shape.
-	+ They are scattered throughout the foreground, adding a pop of color to the image.
-* The background of the image is the ocean and the sky.
-	+ The ocean is calm and peaceful, with a few waves visible.
-	+ The sky is a light blue color, with a few clouds visible.
+If you could provide a specific question related to the text, I would be happy to try and help you. Alternatively, if you would like me to summarize the passage or provide some general information about the place or scene it describes, I can do that as well. Please let me know how I can assist you.
+```
 
-Overall, the image presents a peaceful and serene beach scene, with a focus on the natural beauty of the sea buckthorn bushes. The image does not show any significant changes or comparisons, but rather presents a static view of the scene.
+---
+
+### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+
+**Metrics:** 27.4 TPS | 255 tokens
+
+```text
+**Caption:**
+A serene winter scene at Morrison's Haven, Prestongrange, Scotland, showcasing the rugged coastline and distant view of Arthur's Seat across the Firth of Forth. The late afternoon sun casts a golden glow through the clouds, highlighting the contrast between the dark rocks and the choppy waters.
+
+**Description:**
+The image captures a tranquil moment at Morrison's Haven, a historic harbour in Prestongrange, East Lothian. The foreground features a rocky shoreline with dark, jagged stones, where small waves break gently. Beyond the shore, the Firth of Forth stretches out, its waters a mix of blue and grey under the fading light. In the distance, the silhouette of Arthur's Seat, a prominent hill in Edinburgh, rises against a sky painted with hues of gold and soft clouds. The scene evokes a sense of quiet beauty and historical significance, reflecting the area's past as a key hub for coal and salt industries.
+
+**Keywords:**
+Morrison's Haven, Prestongrange, Scotland, UK, Arthur's Seat, Firth of Forth, winter, coastline, rocky shore, sunset, golden light, historical harbour, East Lothian, Edinburgh skyline, choppy water, natural landscape, photography.
+```
+
+---
+
+### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
+
+**Metrics:** 35.1 TPS | 500 tokens
+
+```text
+Here are my reasoning steps:
+The user wants a factual caption, description, and keywords suitable for cataloguing or searching for the image. The context is "Gingerbread House, Morrison's Haven, Prestongrange, Scotland, United Kingdom, UK". The user gave a caption example that mentions Arthur's Seat, Firth of Forth, etc. However, the user wants a factual caption, description, and keywords. The user says "Provide a factual caption, description, and keywords suitable for cataloguing, or searching for, the image." The user also gave a context: "The image relates to 'Gingerbread House, Morrison's Haven, Prestongrange, Scotland, United Kingdom, UK". The user gave a caption example that mentions Arthur's Seat, etc. The user says "Focus on visual content, drawing on any available contextual information for specificity. Do not speculate."
+
+Thus we need to produce a factual caption, description, and keywords. The image is a seascape at sunset (or sunrise?) with mountains in the distance, a rocky shoreline, waves, clouds, etc. The location is Morrison's Haven, Prestongrange, East Lothian, Scotland. The user gave a caption that mentions Arthur's Seat, but we need to verify if Arthur's Seat is visible. The image shows mountains in the distance across a body of water. The caption says "Arthur's Seat". However, we need to be careful: Arthur's Seat is in Edinburgh, which is about 30 km east of Prestongrange? Actually, Prestongrange is in East Lothian, near the Firth of Forth. Arthur's Seat is a hill in Holyrood Park in Edinburgh, which is across the Firth of Forth. So it's plausible that Arthur's Seat is visible across the water. However, the user says "Do not speculate." So we need to be careful about stating that Arthur's Seat is visible. If we are not certain, we should not claim that. The user gave a caption that includes that, but we need to produce a factual caption based on the image. The user says "Focus on visual content, drawing on any available contextual information for specificity. Do not speculate." So we need to describe what we see: a rocky shoreline, waves, a body of water (likely the Firth of Forth), a distant mountain range (maybe the Lammermuir Hills or the Ochil Hills?),
 ```
 
 ---
 
 ### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
 
-**Metrics:** 4.84 TPS | 128 tokens
+**Metrics:** 4.89 TPS | 102 tokens
 
 ```text
-A long-shot view of a beach with two people walking along the shore. The beach is a light brown sand with a dark brown rock formation on the left side. The water is a light blue with white foam on the shore. The sky is a light blue with no cloud coverage. In the foreground is a large bush with orange berries. The bush is casting a shadow over the beach. The bush is in the foreground, with the beach in the background. The beach is in the middle of the image. The water is in the top right corner of the image. The sky is in the top left corner of the image.
+A long-shot view of a body of water with a rocky shore on the left side of the image. The water is dark blue, and there are small waves coming onto the shore. There are rocks on the shore in the foreground of the image. There is a hill in the distance on the right side of the image. There is a body of land in the distance on the left side of the image. The sky is orange and blue, and there are clouds covering the top of the image.
+```
+
+---
+
+### ✅ mlx-community/pixtral-12b-bf16
+
+**Metrics:** 18.9 TPS | 350 tokens
+
+```text
+### Description
+This image captures a serene coastal scene at Morrison's Haven in Prestongrange, East Lothian, Scotland. The photograph is taken from the rocky shoreline, offering a view across the Firth of Forth towards the iconic silhouette of Arthur's Seat in Edinburgh. The late winter afternoon sky is filled with dramatic clouds, through which the sun casts a golden light, illuminating the horizon. The foreground features dark, rugged stones contrasting with the choppy, blue-grey waters of the Firth of Forth, where small waves gently break on the shore.
+
+### Keywords
+- Morrison's Haven
+- Prestongrange
+- Arthur's Seat
+- Firth of Forth
+- Edinburgh skyline
+- Rocky shoreline
+- Late winter afternoon
+- Golden sunset
+- Scottish coastline
+- Historical harbour
+- Coastal beauty
+- East Lothian
+- Scotland
+- United Kingdom
+- UK
+
+### Cataloguing Information
+- **Location:** Morrison's Haven, Prestongrange, East Lothian, Scotland, United Kingdom
+- **Date:** 2026-01-02
+- **Time:** 15:56:46 GMT
+- **GPS Coordinates:** 55.953633° N, 3.007600° W
+- **Subject:** Coastal landscape, historical harbour, Arthur's Seat silhouette, sunset
+- **Season:** Late winter
+- **Mood:** Serene, dramatic, natural beauty
+- **Historical Context:** Formerly significant 16th-century harbour for coal and salt industries
+- **Photographer:** [Photographer's Name]
 ```
 
 ---
@@ -621,174 +590,189 @@ A long-shot view of a beach with two people walking along the shore. The beach i
 **Metrics:** 47.3 TPS | 500 tokens
 
 ```text
-<think>Got it, let's tackle this. The user wants a factual caption, description, and keywords for cataloguing. First, I need to extract key elements from the context.
+<think>Got it, let's tackle this. The user wants a factual caption, description, and keywords for cataloguing/searching.
 
-First, the location: Beach, Gullane, Scotland, United Kingdom. Then the time: December afternoon, 2025-12-28 14:59:01 GMT. The main visual elements: sea buckthorn berries (bright orange), sandy beach, two people strolling, Firth of Forth, coastal landscape with grassy clifftop, historical context about WWII anti-tank defences (though the image might not show them, but the context mentions they're present).
+First, I need to extract key elements from the provided context. Let's list out the main components:
+
+1. **Subject Matter**: Arthur's Seat silhouette, Firth of Forth, Morrison's Haven shoreline, Edinburgh skyline.
+2. **Time & Season**: Late winter afternoon, January (specifically 2026-01-02 15:56:46 GMT, but maybe just the month/year for cataloguing).
+3. **Location Details**: Morrison's Haven, Prestongrange, East Lothian, Scotland, United Kingdom. GPS coordinates provided.
+4. **Visual Elements**: Rocky shoreline (dark stones), choppy blue-grey water, small waves breaking, golden light breaking through heavy clouds, distant Edinburgh skyline with a tower (maybe the Scott Monument? But the context doesn't specify, so keep it general).
+5. **Historical Context**: 16th-century harbour, coal and salt industries, now quiet location with views.
 
 Now, structure the caption, description, and keywords.
 
-Caption should be concise, include location, date/time, and key visual elements.
+**Caption**: Should be concise but include key identifiers. Maybe: "Silhouette of Arthur's Seat across the Firth of Forth from Morrison's Haven, Prestongrange, Scotland, during a late winter afternoon in January."
 
-Description should elaborate on the scene, elements like sea buckthorn, beach, people, water body (Firth of Forth), coastal vegetation, and any relevant context (though keep factual, no speculation).
+**Description**: More detailed, covering visual elements, time, location, and historical context. Need to be factual, no speculation.
 
-Keywords should be specific terms that would help in searching or cataloguing. Include location terms, subject matter (sea buckthorn, beach, coastal landscape), time (December, afternoon), geographical features (Firth of Forth, sandy beach, grassy clifftop), and any relevant historical or environmental terms.
+**Keywords**: Should be searchable terms. Include location names, landmarks, time of day, weather, water features, historical aspects.
 
-Now, let's draft each part.
+Let me check if all key points are included:
 
-Caption: "Beach scene at Gullane, Scotland, on a December afternoon, featuring bright orange sea buckthorn berries in the foreground, a sandy beach with two people strolling, and the Firth of Forth in the distance."
+- Arthur's Seat silhouette
+- Firth of Forth
+- Morrison's Haven shoreline
+- Prestongrange, East Lothian, Scotland
+- Late winter afternoon, January (specific date/time from GPS, but maybe just month/year for cataloguing)
+- Rocky shoreline (dark stones), choppy blue-grey water, small waves breaking
+- Golden light breaking through heavy clouds
+- Distant Edinburgh skyline
+- 16th-century harbour, coal and salt industries, now quiet location with views
 
-Description: "The image captures a coastal landscape in Gullane, Scotland, during a quiet December afternoon. In the foreground, dense clusters of sea buckthorn (Hippophae rhamnoides) with vibrant orange berries stand out against the muted tones of the coastal vegetation. The middle ground reveals a sandy beach stretching toward the shoreline, where two small figures are visible strolling along the water’s edge. Beyond the beach, the calm waters of the Firth of Forth extend to the horizon under a pale blue sky. The scene is framed by a grassy clifftop in the foreground, with sparse, leafless shrubs interspersed with patches of green grass. The coastal landscape also includes rocky outcrops extending into the water near the beach, adding texture to the shoreline. The overall atmosphere is serene and tranquil
+Now, draft the caption, description, and keywords.
+
+**Caption**: Silhouette of Arthur's Seat across the Firth of Forth from Morrison's Haven, Prestongrange, Scotland, during a late winter afternoon in January.
+
+**Description**: This image captures the iconic silhouette of Arthur's Seat as seen
+```
+
+---
+
+### ✅ mlx-community/gemma-3-27b-it-qat-8bit
+
+**Metrics:** 14.3 TPS | 407 tokens
+
+```text
+## Image Metadata:
+
+**Caption:**
+
+The silhouette of Arthur's Seat is visible across the Firth of Forth during a late winter afternoon in January. This photograph was taken from the rocky shoreline of Morrison's Haven in Prestongrange, East Lothian, Scotland. As the sun dips towards the horizon, its golden light breaks through a band of heavy clouds, illuminating the sky above the distant Edinburgh skyline. In the foreground, the cool, dark stones of the coast contrast with the choppy, blue-grey water as small waves break on the shore. Historically, Morrison's Haven was a significant 16th-century harbour, crucial to the area's once-thriving coal and salt industries.
+
+**Description:**
+
+A landscape photograph capturing a coastal view at Morrison's Haven, Prestongrange, Scotland. The foreground features a rocky shoreline with waves breaking on the beach. The Firth of Forth extends to the horizon, with the Edinburgh skyline and Arthur's Seat visible in the distance, silhouetted against a dramatic sky of golden light breaking through heavy clouds. The water is choppy and blue-grey.
+
+**Keywords:**
+
+*   Morrison's Haven
+*   Prestongrange
+*   East Lothian
+*   Scotland
+*   Edinburgh
+*   Arthur's Seat
+*   Firth of Forth
+*   Coastline
+*   Coastal Landscape
+*   Winter
+*   January
+*   Sunset
+*   Sky
+*   Clouds
+*   Rocks
+*   Waves
+*   Harbour (historical)
+*   Coal Industry (historical)
+*   Salt Industry (historical)
+*   UK
+*   United Kingdom
+*   Landscape Photography
+*   2026-01-02
+*   55.953633°N, 3.007600°W
+*   GMT
+*   Silhouetted skyline
+*   Golden hour
+
+
+
+
 ```
 
 ---
 
 ### ✅ mlx-community/Molmo-7B-D-0924-8bit
 
-**Metrics:** 44.6 TPS | 187 tokens
+**Metrics:** 45.1 TPS | 238 tokens
 
 ```text
- 'Beach, Gullane, Scotland, United Kingdom, UK
-Sea buckthorn berries, December, Coastal landscape, Firth of Forth, Gullane beach, Anti-tank defences, World War II, East Lothian, Golf courses, Historical significance
+ Here is a caption for the image, written in a neutral and descriptive style suitable for a periodical, blog, or photography website:
 
-On a quiet December afternoon in Gullane, Scotland, clusters of bright orange sea buckthorn berries provide a vibrant splash of colour against the muted tones of the coastal landscape. From a grassy clifftop, the view extends over the sandy beach where two people are taking a stroll along the shoreline of the Firth of Forth.
+**Caption:**
 
-This area of East Lothian is renowned for its sweeping beaches and world-class golf courses. The coastline also holds historical significance, with many of its beaches, including Gullane, having been fortified with anti-tank defences during World War II, remnants of which can still be seen today.'
+The iconic silhouette of Arthur's Seat is visible across the Firth of Forth during a late winter afternoon in January. This photograph was taken from the rocky shoreline of Morrison's Haven in Prestongrange, East Lothian, Scotland. As the sun dips towards the horizon, its golden light breaks through a band of heavy clouds, illuminating the sky above the distant Edinburgh skyline. In the foreground, the cool, dark stones of the coast contrast with the choppy, blue-grey water as small waves break on the shore.
+
+Historically, Morrison's Haven was a significant 16th-century harbour, crucial to the area's once-thriving coal and salt trade. Today, it serves as a quiet location offering expansive views of the capital city and the rugged beauty of the Scottish coastline.
+
+Keywords: Arthur's Seat, Firth of Forth, Edinburgh, Scotland, East Lothian, January, sunset, clouds, horizon, rocky shore, waves, historical harbour, coal trade, salt trade, Morrison's Haven
 ```
 
 ---
 
 ### ✅ mlx-community/Molmo-7B-D-0924-bf16
 
-**Metrics:** 27.9 TPS | 289 tokens
+**Metrics:** 28.1 TPS | 245 tokens
 
 ```text
- Here's a factual caption, description, and keywords suitable for cataloguing or searching for the image:
+ Here is a caption for the image, written in a neutral and descriptive style suitable for a periodical, blog, or photography website:
 
-Caption:
-'A serene December scene at Gullane Beach, East Lothian, Scotland. Two figures walk along the shoreline, surrounded by the muted tones of the coastal landscape. Bright orange sea buckthorn berries provide a striking contrast against the grey sky and sandy beach. The image captures the essence of winter along the Firth of Forth, showcasing the rugged beauty of this part of the Scottish coastline.'
+**Caption:**
 
-Description:
-'This photograph, taken on December 28, 2025, at 14:59:01 GMT, from coordinates 56.038550°N, 2.843717°W, depicts a quiet afternoon at Gullane Beach. The scene features two people strolling along the shoreline, with the sea and sky dominating the upper portion of the image. The foreground is dotted with vibrant orange sea buckthorn berries, adding a pop of color to the otherwise muted winter landscape.'
+The iconic silhouette of Arthur's Seat is visible across the Firth of Forth during a late winter afternoon in January. This photograph was taken from the rocky shoreline of Morrison's Haven in Prestongrange, East Lothian, Scotland. As the sun dips towards the horizon, its golden light breaks through a band of heavy clouds, illuminating the sky above the distant Edinburgh skyline. In the foreground, the cool, dark stones of the coast contrast with the choppy, blue-grey water as small waves break on the shore.
 
-Keywords:
-Gullane Beach, Scotland, United Kingdom, UK, December, Sea Buckthorn, Coastal Landscape, Firth of Forth, East Lothian, World War II, Anti-Tank Defences, Beaches, Sandy Beach, Winter Scene, Serene Afternoon, Coastal Photography, Nature Photography, Scottish Coastline
-```
+Historically, Morrison's Haven was a significant 16th-century harbour, crucial to the area's once-thriving coal and salt trade. Today, it serves as a quiet location offering expansive views of the capital city and the rugged beauty of the Scottish coastline.
 
----
-
-### ✅ mlx-community/Qwen3-VL-2B-Thinking-bf16
-
-**Metrics:** 71.8 TPS | 500 tokens
-
-```text
-Got it, let's break this down. First, the task is to provide a factual caption, description, and keywords for the image. The context given is about Gullane, Scotland, a quiet December afternoon, sea buckthorn berries, beach, Firth of Forth, etc.
-
-First, the caption should be factual, based on the context. Let's check the context: "On a quiet December afternoon in Gullane, Scotland, clusters of bright orange sea buckthorn berries provide a vibrant splash of colour against the muted tones of the coastal landscape. From a grassy clifftop, the view extends over the sandy beach where two people are taking a stroll along the shoreline of the Firth of Forth."
-
-So the caption needs to include key elements: location (Gullane, Scotland, UK), time (December afternoon), main subject (sea buckthorn berries, beach, two people walking), and the Firth of Forth.
-
-Then the description: should be a detailed but factual account. Mention the setting: coastal landscape, sandy beach, grassy clifftop, sea buckthorn berries (bright orange), two people walking, Firth of Forth, December afternoon, muted tones of the landscape contrasting with the berries.
-
-Keywords: need to be specific for cataloging/searching. Let's list them: Gullane, Scotland, UK, December, beach, sea buckthorn berries, Firth of Forth, coastal landscape, grassy clifftop, two people walking, sandy beach, winter, coastal defense remnants (but wait, the context says "remnants of which can still be seen today" but the main focus is the berries and the beach. Wait, the context mentions historical significance but the image is about the current scene. So maybe include "coastal defense remnants" as a keyword? Wait, the context says "the coastline also holds historical significance, with many of its beaches, including Gullane, having been fortified with anti-tank defences during World War II, remnants of which can still be seen today." But the image is the main focus, so maybe include that as a keyword? Wait, the task says "suitable for cataloguing, or searching for, the image." So keywords should be relevant to the image content, not just the context. Wait, the context is given as a description, so the keywords should be based on the image's content.
-
-Wait,
-```
-
----
-
-### ✅ Qwen/Qwen3-VL-2B-Instruct
-
-**Metrics:** 70.3 TPS | 500 tokens
-
-```text
-### Factual Caption
-A vibrant cluster of orange sea buckthorn berries in the foreground of a coastal scene at Gullane, Scotland, on a quiet December afternoon. The view extends to a sandy beach where two people are strolling along the shoreline of the Firth of Forth, with the calm sea and distant cliffs under a pale blue sky.
-
-### Description
-The image captures a serene coastal landscape in Gullane, East Lothian, Scotland. In the foreground, dense clusters of bright orange sea buckthorn berries stand out against the muted tones of dry grass and bare branches, creating a striking contrast. The scene is viewed from a grassy clifftop, offering a panoramic view of the sandy beach below. Two people are seen walking along the shoreline, adding a sense of scale and human presence to the tranquil setting. The Firth of Forth stretches out to the horizon, with gentle waves lapping against the shore. The sky is overcast, casting a soft, diffused light over the entire scene, which enhances the natural colors and textures of the landscape. The coastline is marked by rocky outcrops and the remnants of historical anti-tank defenses, adding a layer of historical context to the picturesque view.
-
-### Keywords
-- Gullane
-- Scotland
-- East Lothian
-- Firth of Forth
-- Sea buckthorn berries
-- Coastal landscape
-- Sandy beach
-- People walking
-- Overcast sky
-- Natural scenery
-- Historical defenses
-- December
-- Coastal photography
-- UK
-- Sea
-- Beach
-- Orange berries
-- Clifftop
-- Nature
-- Wildlife
-- Landscape photography
-- Coastal view
-- Sea buckthorn
-- Scotland, UK
-- Gullane, Scotland
-- Firth of Forth
-- Orange berries
-- Coastal scene
-- People
-- Sandy beach
-- Sea buckthorn
-- Natural scenery
-- Overcast sky
-- Coastal photography
-- Sea buckthorn berries
-- Gullane, Scotland
-- East Lothian
-- Firth of Forth
-- Sea
-- Beach
-- People walking
-- Natural scenery
-- Historical defenses
-- December
-- Coastal view
-- Sea buckthorn
-- Scotland, UK
-- Gullane, Scotland
-- Firth of Forth
-- Orange berries
-- Coastal scene
-- People
-- Sandy beach
-- Sea buck
+The photo was taken around 2026-01-02 15:56:46 GMT from GPS 55.953633°N, 3.007600°W.
 ```
 
 ---
 
 ### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
 
-**Metrics:** 3.8 TPS | 189 tokens
+**Metrics:** 3.81 TPS | 151 tokens
 
 ```text
-**Image Details**
+I can provide a factual caption for the image, but I must correct the location information. The image appears to be of Arthur's Seat, a hill in Edinburgh, Scotland, not a location called "Gingerbread House" or "Morrison's Haven." Here is a revised caption:
 
-* Location: Gullane, East Lothian, Scotland, UK
-* Date: December
-* Time: Afternoon
-* Weather: Overcast
-* Scene: Beach
-* Features:
-	+ Orange sea buckthorn bushes
-	+ Sandy beach
-	+ Rocky shoreline
-	+ Two people walking on the beach
-* Atmosphere: Peaceful
-* Mood: Serene
+**Caption:**
 
-**Image Description**
+Arthur's Seat, a prominent hill in Edinburgh, Scotland, is seen at sunset. The image captures the hill's silhouette against the vibrant sky, with the city of Edinburgh visible in the distance. The photo was taken from the shore of the Firth of Forth, showcasing the natural beauty of the area. The image highlights the unique landscape of the area, with the hill's rugged shape and the surrounding water creating a picturesque scene.
+```
 
-The image captures a serene and peaceful scene of a beach in Gullane, East Lothian, Scotland, UK. The overcast sky and calm sea create a soothing atmosphere, while the orange sea buckthorn bushes add a pop of color to the scene. Two people are seen walking on the beach, adding a sense of human presence to the otherwise peaceful scene. The image conveys a sense of tranquility and relaxation, inviting the viewer to step into the serene coastal environment.
+---
+
+### ✅ Qwen/Qwen3-VL-2B-Instruct
+
+**Metrics:** 68.8 TPS | 217 tokens
+
+```text
+**Caption:**
+
+A serene coastal scene at sunset, featuring the iconic Arthur's Seat mountain in the distance across the Firth of Forth. The photograph captures the rugged shoreline of Morrison's Haven in Prestongrange, East Lothian, Scotland, with the dark, textured rocks of the coast in the foreground. The sky is a dramatic canvas of deep blues and oranges, with clouds illuminated by the setting sun, while the distant Edinburgh skyline is visible on the horizon. The water is choppy, with small waves breaking on the shore.
+
+**Keywords:**
+- Arthur's Seat
+- Morrison's Haven
+- Prestongrange
+- East Lothian
+- Scotland
+- Firth of Forth
+- Coastal landscape
+- Sunset
+- Rocky shoreline
+- Edinburgh skyline
+- Arthur's Seat mountain
+- Scottish coastline
+- Winter sunset
+- Photography
+- Natural scenery
+- Coastal view
+- Historical harbour
+- GPS coordinates
+- 2026-01-02
+- 15:56:46 GMT
+```
+
+---
+
+### ✅ mlx-community/Qwen3-VL-2B-Thinking-bf16
+
+**Metrics:** 71.4 TPS | 500 tokens
+
+```text
+Got it, let's tackle this. First, I need to create a factual caption, description, and keywords for the image. The context given is about Gingerbread House, Morrison's Haven, Prestongrange, Scotland, UK. Wait, but the image shows a coastal scene with Arthur's Seat, Firth of Forth, etc. Wait, the caption mentions Arthur's Seat, but the context says Gingerbread House? Wait, no, the user provided a caption that's supposed to be for the image, but the context says "The image relates to 'Gingerbread House, Morrison's Haven, Prestongrange, Scotland, United Kingdom, UK'". Wait, maybe there's a mix-up. Wait, the caption in the problem is the one to use, but the context is about Gingerbread House? Wait, no, the user says: "Context: The image relates to 'Gingerbread House, Morrison's Haven, Prestongrange, Scotland, United Kingdom, UK'." But the image in the problem is a coastal scene with Arthur's Seat. Wait, maybe the caption is supposed to be based on the image, but the context is a bit confusing. Wait, no, the user says: "Here is a caption for the image, written in a neutral and descriptive style suitable for a periodical, blog, or photography website." So the caption is the one provided, but we need to make sure it's factual. Wait, the problem says: "Provide a factual caption, description, and keywords suitable for cataloguing, or searching for, the image." So the caption should be factual, based on the image. Wait, the context says the image relates to Gingerbread House, but the image is of a coastal scene. Wait, maybe the Gingerbread House is a typo or misreference. Wait, no, the user provided a caption that's supposed to be for the image, but the context is about Gingerbread House. Wait, maybe the user made a mistake, but we need to follow the instructions.
+
+Wait, the problem says: "Context: The image relates to 'Gingerbread House, Morrison's Haven, Prestongrange, Scotland, United Kingdom, UK'." But the image in the problem is a coastal scene with Arthur's Seat. Wait, maybe the Gingerbread House is a fictional or mislabeled thing, but the user provided a caption that's supposed to be for the image. Wait, no, the
 ```
 
 ---
@@ -813,12 +797,12 @@ The image captures a serene and peaceful scene of a beach in Gullane, East Lothi
 
 ## Library Versions
 
-- `Pillow`: `12.0.0`
+- `Pillow`: `12.1.0`
 - `huggingface-hub`: `1.2.3`
-- `mlx`: `0.30.3.dev20251228+d9b950eb`
+- `mlx`: `0.30.3.dev20260103+8de9ceb7`
 - `mlx-lm`: `0.30.0`
 - `mlx-vlm`: `0.3.10`
 - `tokenizers`: `0.22.1`
 - `transformers`: `5.0.0rc1`
 
-_Report generated on: 2025-12-28 20:50:37 GMT_
+_Report generated on: 2026-01-03 00:29:57 GMT_
