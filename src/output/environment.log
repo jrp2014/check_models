@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-01-09 12:51:56 GMT
+FULL ENVIRONMENT DUMP - 2026-01-09 21:35:04 GMT
 ================================================================================
 
 --- pip freeze ---
@@ -16,7 +16,7 @@ certifi==2026.1.4
 cffi==2.0.0
 cfgv==3.5.0
 charset-normalizer==3.4.4
--e git+https://github.com/jrp2014/check_models.git@e0dd44dab2b002e6aa828605da3718ee88e92d05#egg=check_models&subdirectory=src
+-e git+https://github.com/jrp2014/check_models.git@b6a3f9172a96d376c0bd6f2e8e4059f4abdb923e#egg=check_models&subdirectory=src
 click==8.3.1
 cmake==4.2.1
 coverage==7.13.1
@@ -26,7 +26,7 @@ distlib==0.4.0
 docopt==0.6.2
 einops==0.8.1
 fastapi==0.128.0
-filelock==3.20.2
+filelock==3.20.3
 flatbuffers==25.12.19
 frozenlist==1.8.0
 fsspec==2025.10.0
@@ -38,7 +38,7 @@ h5py==3.15.1
 hf-xet==1.2.0
 httpcore==1.0.9
 httpx==0.28.1
-huggingface_hub==1.3.0
+huggingface_hub==1.3.1
 identify==2.6.15
 idna==3.11
 iniconfig==2.3.0
@@ -53,7 +53,7 @@ MarkupSafe==3.0.3
 mdurl==0.1.2
 ml_dtypes==0.5.4
 -e git+https://github.com/ml-explore/mlx.git@1596839256eb3cd0bad3c324a1baa9733c950002#egg=mlx
--e git+https://github.com/ml-explore/mlx-lm.git@39a96ab18b77e933d031a8f5777b6e08c19cbe17#egg=mlx_lm
+-e git+https://github.com/ml-explore/mlx-lm.git@7a86c1289ef0ae299414d5e3b886507f4350783f#egg=mlx_lm
 mlx-metal==0.30.1
 -e git+https://github.com/Blaizzy/mlx-vlm.git@fc8c92e31983a52761f37d503f903ec40bebbd62#egg=mlx_vlm
 mpmath==1.3.0
@@ -73,7 +73,7 @@ opt_einsum==3.4.0
 optree==0.18.0
 packaging==25.0
 pandas==2.3.3
-pathspec==1.0.2
+pathspec==1.0.3
 pfzy==0.3.4
 pillow==12.1.0
 platformdirs==4.5.1
@@ -117,8 +117,8 @@ torch==2.9.1
 torchaudio==2.9.1
 torchvision==0.24.1
 tqdm==4.67.1
-transformers==5.0.0rc1
-ty==0.0.10
+transformers==5.0.0rc2
+ty==0.0.11
 typer-slim==0.21.1
 types-psutil==7.2.1.20251231
 types-PyYAML==6.0.12.20250915
@@ -134,7 +134,7 @@ tzdata==2025.3
 tzlocal==5.3.1
 urllib3==2.6.3
 uvicorn==0.40.0
-virtualenv==20.36.0
+virtualenv==20.36.1
 wcwidth==0.2.14
 Werkzeug==3.1.5
 wheel==0.45.1
@@ -172,7 +172,7 @@ docopt                     0.6.2                        pypi_0              pypi
 einops                     0.8.1                        pypi_0              pypi
 expat                      2.7.3                        h50f4ffc_4
 fastapi                    0.128.0                      pypi_0              pypi
-filelock                   3.20.2                       pypi_0              pypi
+filelock                   3.20.3                       pypi_0              pypi
 flatbuffers                25.12.19                     pypi_0              pypi
 frozenlist                 1.8.0                        pypi_0              pypi
 fsspec                     2025.10.0                    pypi_0              pypi
@@ -184,7 +184,7 @@ h5py                       3.15.1                       pypi_0              pypi
 hf-xet                     1.2.0                        pypi_0              pypi
 httpcore                   1.0.9                        pypi_0              pypi
 httpx                      0.28.1                       pypi_0              pypi
-huggingface-hub            1.3.0                        pypi_0              pypi
+huggingface-hub            1.3.1                        pypi_0              pypi
 identify                   2.6.15                       pypi_0              pypi
 idna                       3.11                         pypi_0              pypi
 iniconfig                  2.3.0                        pypi_0              pypi
@@ -226,7 +226,7 @@ opt-einsum                 3.4.0                        pypi_0              pypi
 optree                     0.18.0                       pypi_0              pypi
 packaging                  25.0                         pypi_0              pypi
 pandas                     2.3.3                        pypi_0              pypi
-pathspec                   1.0.2                        pypi_0              pypi
+pathspec                   1.0.3                        pypi_0              pypi
 pfzy                       0.3.4                        pypi_0              pypi
 pillow                     12.1.0                       pypi_0              pypi
 pip                        25.3                         pyhc872135_0
@@ -276,8 +276,8 @@ torch                      2.9.1                        pypi_0              pypi
 torchaudio                 2.9.1                        pypi_0              pypi
 torchvision                0.24.1                       pypi_0              pypi
 tqdm                       4.67.1                       pypi_0              pypi
-transformers               5.0.0rc1                     pypi_0              pypi
-ty                         0.0.10                       pypi_0              pypi
+transformers               5.0.0rc2                     pypi_0              pypi
+ty                         0.0.11                       pypi_0              pypi
 typer-slim                 0.21.1                       pypi_0              pypi
 types-psutil               7.2.1.20251231               pypi_0              pypi
 types-pyyaml               6.0.12.20250915              pypi_0              pypi
@@ -293,7 +293,7 @@ tzdata                     2025.3                       pypi_0              pypi
 tzlocal                    5.3.1                        pypi_0              pypi
 urllib3                    2.6.3                        pypi_0              pypi
 uvicorn                    0.40.0                       pypi_0              pypi
-virtualenv                 20.36.0                      pypi_0              pypi
+virtualenv                 20.36.1                      pypi_0              pypi
 wcwidth                    0.2.14                       pypi_0              pypi
 werkzeug                   3.1.5                        pypi_0              pypi
 wheel                      0.45.1                       py313hca03da5_0
@@ -304,5 +304,5 @@ yarl                       1.22.0                       pypi_0              pypi
 zlib                       1.3.1                        h5f15de7_0
 
 ================================================================================
-Environment dump completed at 2026-01-09 12:51:58 GMT
+Environment dump completed at 2026-01-09 21:35:06 GMT
 ================================================================================

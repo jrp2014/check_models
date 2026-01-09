@@ -330,7 +330,7 @@ python check_models.py --image photo.jpg --max-kv-size 4096 --kv-bits 8
 
 #### Temperature and Sampling
 
-- `--temperature <float>`: Controls randomness in generation. `0.0` = deterministic (argmax), `1.0` = default diversity, `>1.0` = more creative/random. Default: `0.0`.
+- `--temperature <float>`: Controls randomness in generation. `0.0` = deterministic (argmax), `1.0` = default diversity, `>1.0` = more creative/random. Default: `0.1`.
 - `--top-p <float>`: Nucleus sampling threshold. Only considers tokens whose cumulative probability is ≤ `top_p`. Range: `0.0-1.0`. Default: `1.0` (disabled).
 
 These control the sampling strategy during generation. Higher temperature increases variety but can produce less coherent outputs. Top-p sampling (nucleus sampling) focuses on the most probable tokens.
@@ -350,8 +350,8 @@ python check_models.py --image photo.jpg --temperature 1.5 --top-p 0.95
 
 #### Generation Control
 
-- `--max-tokens <int>`: Maximum number of tokens to generate. Prevents runaway generation. Default: `512`.
-- `--timeout <float>`: Timeout in seconds for each model's generation. Useful for identifying slow/hanging models. Default: `600.0` (10 minutes).
+- `--max-tokens <int>`: Maximum number of tokens to generate. Prevents runaway generation. Default: `500`.
+- `--timeout <float>`: Timeout in seconds for each model's generation. Useful for identifying slow/hanging models. Default: `300.0` (5 minutes).
 
 **Example**:
 
