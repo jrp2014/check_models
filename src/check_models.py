@@ -1325,13 +1325,11 @@ def _detect_repetitive_output(text: str, threshold: float | None = None) -> tupl
         ngram_counts = Counter(ngrams)
         most_common_ngram, count = ngram_counts.most_common(1)[0]
 
-        # If a phrase repeats more than 3 times and covers > 40% of text (approx)
-        # Or if it repeats > 10 times regardless of coverage
-        min_phrase_repetitions = 3
-        max_phrase_repetitions = 10
-        phrase_coverage_threshold = 0.4
-        if count > max_phrase_repetitions or (
-            count > min_phrase_repetitions and (count * n) / n_words > phrase_coverage_threshold
+        # If a phrase repeats more than configured threshold and covers significant portion
+        # Or if it repeats excessively regardless of coverage
+        if count > QUALITY.max_phrase_repetitions or (
+            count > QUALITY.min_phrase_repetitions
+            and (count * n) / n_words > QUALITY.phrase_coverage_threshold
         ):
             return True, f'phrase: "{most_common_ngram[:30]}..."'
 
