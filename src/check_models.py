@@ -22,6 +22,7 @@ import subprocess
 import sys
 import textwrap
 import time
+import traceback
 import urllib.error
 import urllib.request
 from collections import Counter
@@ -515,6 +516,8 @@ class PerformanceResult:
     # MOD: Added detailed memory profiling
     active_memory: float | None = None  # Active GPU memory in GB
     cache_memory: float | None = None  # Cached GPU memory in GB
+    # MOD: Added package attribution to identify which package caused the error
+    error_package: str | None = None  # Package that caused error (mlx, mlx-vlm, transformers, etc.)
 
 
 class ResultSet:
@@ -3061,12 +3064,14 @@ def _mark_failed_rows_in_html(html_table: str, results: list[PerformanceResult])
                 # Determine error category
                 error_stage = res.error_stage or "unknown"
                 error_type = res.error_type or "error"
+                error_package = res.error_package or "unknown"
 
                 # Add both class and data attributes for flexible filtering
                 row_html = row_html.replace(
                     "<tr>",
                     f'<tr class="failed" data-status="failed" '
-                    f'data-error-stage="{error_stage}" data-error-type="{error_type}">',
+                    f'data-error-stage="{error_stage}" data-error-type="{error_type}" '
+                    f'data-error-package="{error_package}">',
                     1,
                 )
                 # Also mark first td with failed class for background color
@@ -3991,6 +3996,8 @@ def _generate_model_gallery_section(results: list[PerformanceResult]) -> list[st
                 md.append(f"**Error:** {error_msg}")
             if res.error_type:
                 md.append(f"**Type:** `{res.error_type}`")
+            if res.error_package:
+                md.append(f"**Package:** `{res.error_package}`")
         else:
             # Show metrics summary line
             gen = res.generation
@@ -4585,21 +4592,188 @@ def _check_hf_cache_integrity(model_identifier: str) -> None:
 
 
 def _classify_error(error_msg: str) -> str:
-    """Classify error message into a short, readable status code."""
+    """Classify error message into a short, readable status code.
+
+    Categories (in order of precedence):
+        - OOM: Metal memory allocation failures
+        - Timeout: Operation timed out
+        - Missing Dep: Missing pip packages
+        - Lib Version: Import errors due to version mismatches
+        - API Mismatch: Unexpected keyword arguments (transformers/mlx-vlm API changes)
+        - Config Missing: Model repository missing required config files
+        - No Chat Template: Tokenizer/processor lacks chat template
+        - Weight Mismatch: Model weights don't match expected parameters
+        - Type Cast Error: MLX core type/cast errors (std::bad_cast)
+        - Processor Error: Image processor instantiation failures
+        - Tokenizer Error: Tokenizer class/loading failures
+        - Model Error: Generic model loading/config issues
+        - Error: Unclassified errors
+    """
     msg_lower = error_msg.lower()
 
-    if "metal::malloc" in msg_lower or "maximum allowed buffer size" in msg_lower:
-        return "OOM"
-    if "requires" in msg_lower and "packages" in msg_lower and "pip install" in msg_lower:
-        return "Missing Dep"
-    if "cannot import name" in msg_lower or "importerror" in msg_lower:
-        return "Lib Version"
-    if "missing" in msg_lower and "parameters" in msg_lower:
-        return "Model Error"
-    if "timeout" in msg_lower:
-        return "Timeout"
+    # (Error Type, List of lowercase keywords that trigger this type)
+    # Order matters: first match wins
+    error_definitions = [
+        # Critical infrastructure errors
+        ("OOM", ["metal::malloc", "maximum allowed buffer size"]),
+        ("Timeout", ["timeout"]),
+        # Dependency/version errors
+        (
+            "Missing Dep",
+            ["requires", "packages", "pip install"],
+        ),  # All must be present logic handled below
+        ("Lib Version", ["cannot import name", "importerror"]),
+        # API compatibility errors
+        ("API Mismatch", ["unexpected keyword argument", "got an unexpected keyword"]),
+        # Model configuration/file errors
+        ("Config Missing", ["does not appear to have a file named"]),
+        ("No Chat Template", ["chat_template is not set", "no template argument was passed"]),
+        # Weight/parameter errors
+        ("Weight Mismatch", ["missing", "parameters"]),
+        # MLX core errors
+        ("Type Cast Error", ["std::bad_cast"]),
+        # Processor/tokenizer errors
+        ("Processor Error", ["imageprocessor", "image_processor"]),
+        ("Tokenizer Error", ["tokenizer class", "does not exist"]),
+        # Generic model errors
+        ("Model Error", ["model", "loading", "failed"]),
+    ]
+
+    for error_type, patterns in error_definitions:
+        # Special case for multi-keyword AND logic (Missing Dep, Model Error)
+        if error_type == "Missing Dep":
+            if all(p in msg_lower for p in patterns):
+                return error_type
+            continue
+
+        if error_type == "Model Error":
+            # "model" AND ("loading" OR "failed")
+            if "model" in msg_lower and ("loading" in msg_lower or "failed" in msg_lower):
+                return error_type
+            continue
+
+        if error_type == "Tokenizer Error":
+            # "tokenizer class" AND "does not exist"
+            if all(p in msg_lower for p in patterns):
+                return error_type
+            continue
+
+        if error_type == "Weight Mismatch":
+            # "missing" AND "parameters"
+            if all(p in msg_lower for p in patterns):
+                return error_type
+            continue
+
+        # Default OR logic for other patterns
+        if any(p in msg_lower for p in patterns):
+            return error_type
 
     return "Error"
+
+
+def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None) -> str:
+    """Determine which package most likely caused the error.
+
+    Analyzes the error message and optional traceback to identify the
+    originating package. This helps direct bug reports to the correct
+    repository (mlx, mlx-vlm, mlx-lm, or transformers).
+
+    Args:
+        error_msg: The error message string
+        traceback_str: Optional full traceback string for deeper analysis
+
+    Returns:
+        Package name: 'mlx', 'mlx-vlm', 'mlx-lm', 'transformers', 'huggingface-hub',
+                      'model-config', or 'unknown'
+
+    Examples:
+        >>> _attribute_error_to_package("[metal::malloc] Attempting to allocate...")
+        'mlx'
+
+        >>> _attribute_error_to_package("cannot import name '_validate_images_text_input_order'")
+        'transformers'
+
+        >>> _attribute_error_to_package(
+        ...     "Model loading failed",
+        ...     "File '/path/mlx_vlm/utils.py', line 245..."
+        ... )
+        'mlx-vlm'
+    """
+    msg_lower = error_msg.lower()
+    tb_lower = (traceback_str or "").lower()
+    combined = msg_lower + " " + tb_lower
+
+    # (Package Name, List of unique identification patterns)
+    # Order matters: matches earlier in list take precedence
+    package_definitions = [
+        (
+            "mlx",
+            [
+                "metal::malloc",
+                "maximum allowed buffer size",
+                "std::bad_cast",
+                "mlx/core/",
+                "mlx/nn/",
+                "mlx/python/mlx/",
+            ],
+        ),
+        (
+            "mlx-vlm",
+            [
+                "mlx_vlm/",
+                "mlx-vlm/",
+                "apply_chat_template",
+                "load_image",
+            ],
+        ),
+        (
+            "mlx-lm",
+            [
+                "mlx_lm/",
+                "mlx-lm/",
+            ],
+        ),
+        (
+            "transformers",
+            [
+                "transformers/",
+                "cannot import name",
+                "importerror",
+                "unexpected keyword argument",
+                "tokenizer class",
+                "processing_utils",
+                "tokenization_",
+                "image_processing_",
+                "_batch_encode_plus",
+            ],
+        ),
+        (
+            "huggingface-hub",
+            [
+                "huggingface_hub",
+                "does not appear to have a file",
+                "hfvalidationerror",
+            ],
+        ),
+        (
+            "model-config",
+            [
+                "chat_template is not set",
+                "no template argument",
+                "config.json",
+            ],
+        ),
+    ]
+
+    for package, patterns in package_definitions:
+        if any(pattern in combined for pattern in patterns):
+            return package
+
+    # Special case for compound logic check which didn't fit the loop
+    if "missing" in combined and "parameters" in combined:
+        return "model-config"
+
+    return "unknown"
 
 
 def _run_model_generation(
@@ -4759,28 +4933,36 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         )
     except TimeoutError as e:
         # Full traceback already logged at ERROR level in _run_model_generation
-        classified_stage = _classify_error(str(e))
+        error_msg = str(e)
+        tb_str = traceback.format_exc()
+        classified_stage = _classify_error(error_msg)
+        error_package = _attribute_error_to_package(error_msg, tb_str)
         return PerformanceResult(
             model_name=params.model_identifier,
             generation=None,
             success=False,
             error_stage=classified_stage,  # Use classified error as stage/status
-            error_message=str(e),
+            error_message=error_msg,
             error_type=type(e).__name__,
+            error_package=error_package,
             generation_time=None,
             model_load_time=None,
             total_time=None,
         )
     except (OSError, ValueError) as e:
         # Full traceback already logged at ERROR level in _run_model_generation
-        classified_stage = _classify_error(str(e))
+        error_msg = str(e)
+        tb_str = traceback.format_exc()
+        classified_stage = _classify_error(error_msg)
+        error_package = _attribute_error_to_package(error_msg, tb_str)
         return PerformanceResult(
             model_name=params.model_identifier,
             generation=None,
             success=False,
             error_stage=classified_stage,  # Use classified error as stage/status
-            error_message=str(e),
+            error_message=error_msg,
             error_type=type(e).__name__,
+            error_package=error_package,
             generation_time=None,
             model_load_time=None,
             total_time=None,
@@ -6275,10 +6457,12 @@ def log_summary(results: list[PerformanceResult]) -> None:
     if failed:
         logger.info("❌ Failed Models (%d):", len(failed))
         for res in failed:
+            error_pkg = f" -> {res.error_package}" if res.error_package else ""
             logger.info(
-                "  - %s (%s)",
+                "  - %s (%s%s)",
                 res.model_name,
                 res.error_stage or "Unknown",
+                error_pkg,
                 extra={"style_hint": LogStyles.ERROR},
             )
         log_blank()
