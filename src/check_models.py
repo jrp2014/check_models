@@ -336,6 +336,13 @@ else:
     GPSTAGS = PIL_GPSTAGS
     TAGS = PIL_TAGS
 
+try:
+    import numpy as np
+
+    numpy_version: str = getattr(np, "__version__", NOT_AVAILABLE)
+except ImportError:
+    numpy_version = NOT_AVAILABLE
+
 vlm_version: str
 
 try:
@@ -2282,6 +2289,7 @@ def get_library_versions() -> LibraryVersionDict:
         return s_norm
 
     return {
+        "numpy": _none_if_na(numpy_version),
         "mlx": _none_if_na(getattr(mx, "__version__", None)),
         "mlx-vlm": _none_if_na(vlm_version) if "vlm_version" in globals() else None,
         "mlx-lm": _none_if_na(mlx_lm_version),
