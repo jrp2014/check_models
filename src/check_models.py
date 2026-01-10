@@ -1033,6 +1033,7 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
     "quality_issues": ("Quality", "Issues"),  # MOD: Consolidated quality analysis
     "active_memory": ("Active", "Mem (GB)"),  # MOD: Active GPU memory
     "cache_memory": ("Cache", "Mem (GB)"),  # MOD: Cached GPU memory
+    "error_package": ("Error", "Package"),  # MOD: Package attribution
 }
 
 # Threshold for splitting long header text into multiple lines
@@ -1056,7 +1057,8 @@ MAX_OUTPUT_LINES = 3  # Max lines to show in summary table
 PERFORMANCE_TIMING_FIELDS: Final[list[str]] = [
     field
     for field in FIELD_ABBREVIATIONS
-    if field in {"generation_time", "model_load_time", "total_time", "quality_issues"}
+    if field
+    in {"generation_time", "model_load_time", "total_time", "quality_issues", "error_package"}
 ]
 
 
@@ -6513,6 +6515,7 @@ def save_jsonl_report(results: list[PerformanceResult], filename: Path) -> None:
                     "success": res.success,
                     "error_stage": res.error_stage,
                     "error_message": res.error_message,
+                    "error_package": res.error_package,
                     "quality_issues": _parse_quality_issues_to_list(res.quality_issues),
                     "metrics": {},
                 }
