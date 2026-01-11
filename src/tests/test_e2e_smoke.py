@@ -19,6 +19,7 @@ import contextlib
 import json
 import subprocess
 import sys
+from collections.abc import Generator
 from pathlib import Path
 
 import pytest
@@ -78,6 +79,7 @@ def e2e_test_image(tmp_path: Path) -> Path:
     # Add some basic visual elements by drawing rectangles
     # (Without PIL.ImageDraw, we manually set pixel regions)
     pixels = img.load()
+    assert pixels is not None  # Type guard for PixelAccess
 
     # Draw a "sun" (yellow circle approximation in top-right)
     for x in range(540, 600):
@@ -308,7 +310,7 @@ class TestE2ESmoke:
 
 # Cleanup fixture
 @pytest.fixture(autouse=True)
-def cleanup_e2e_outputs() -> None:
+def cleanup_e2e_outputs() -> Generator[None]:
     """Clean up E2E test output files after each test."""
     yield
     # Cleanup after test
