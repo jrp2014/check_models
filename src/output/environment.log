@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-01-10 22:12:40 GMT
+FULL ENVIRONMENT DUMP - 2026-01-11 00:57:07 GMT
 ================================================================================
 
 --- pip freeze ---
@@ -16,7 +16,7 @@ certifi==2026.1.4
 cffi==2.0.0
 cfgv==3.5.0
 charset-normalizer==3.4.4
--e git+https://github.com/jrp2014/check_models.git@9b500ebd0b46f4743ab639e9f895c393c768cd62#egg=check_models&subdirectory=src
+-e git+https://github.com/jrp2014/check_models.git@8a03a12051ccf0d74afa127a226bcbe83cf4499d#egg=check_models&subdirectory=src
 click==8.3.1
 cmake==4.2.1
 coverage==7.13.1
@@ -52,7 +52,7 @@ markdown-it-py==4.0.0
 MarkupSafe==3.0.3
 mdurl==0.1.2
 ml_dtypes==0.5.4
--e git+https://github.com/ml-explore/mlx.git@1596839256eb3cd0bad3c324a1baa9733c950002#egg=mlx
+-e git+https://github.com/ml-explore/mlx.git@43341e8d533000090a94fdddb7f39c91a1240307#egg=mlx
 -e git+https://github.com/ml-explore/mlx-lm.git@44d12e5d6fbdb717dfa58116af636463e2705fc9#egg=mlx_lm
 mlx-metal==0.30.1
 -e git+https://github.com/Blaizzy/mlx-vlm.git@fc8c92e31983a52761f37d503f903ec40bebbd62#egg=mlx_vlm
@@ -203,7 +203,7 @@ markdown-it-py             4.0.0                        pypi_0              pypi
 markupsafe                 3.0.3                        pypi_0              pypi
 mdurl                      0.1.2                        pypi_0              pypi
 ml-dtypes                  0.5.4                        pypi_0              pypi
-mlx                        0.30.3.dev20260110+15968392  pypi_0              pypi
+mlx                        0.30.3.dev20260111+43341e8d  pypi_0              pypi
 mlx-lm                     0.30.2                       pypi_0              pypi
 mlx-metal                  0.30.1                       pypi_0              pypi
 mlx-vlm                    0.3.10                       pypi_0              pypi
@@ -304,5 +304,5 @@ yarl                       1.22.0                       pypi_0              pypi
 zlib                       1.3.1                        h5f15de7_0
 
 ================================================================================
-Environment dump completed at 2026-01-10 22:12:42 GMT
+Environment dump completed at 2026-01-11 00:57:08 GMT
 ================================================================================
