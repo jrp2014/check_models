@@ -525,6 +525,8 @@ class PerformanceResult:
     cache_memory: float | None = None  # Cached GPU memory in GB
     # MOD: Added package attribution to identify which package caused the error
     error_package: str | None = None  # Package that caused error (mlx, mlx-vlm, transformers, etc.)
+    # MOD: Added full traceback for actionable GitHub issue reports
+    error_traceback: str | None = None  # Full traceback for error diagnosis
 
 
 class ResultSet:
@@ -3974,8 +3976,9 @@ def _generate_model_gallery_section(results: list[PerformanceResult]) -> list[st
     md.append("")
     md.append("Full output from each model:")
     md.append("")
-    # Disable line-length linting for this section - model outputs can be long
-    md.append("<!-- markdownlint-disable MD013 -->")
+    # Disable line-length and inline-html linting - model outputs can be long and
+    # error tracebacks use <details> for collapsible sections
+    md.append("<!-- markdownlint-disable MD013 MD033 -->")
     md.append("")
 
     sorted_results = _sort_results_by_time(results)
@@ -4008,6 +4011,17 @@ def _generate_model_gallery_section(results: list[PerformanceResult]) -> list[st
                 md.append(f"**Type:** `{res.error_type}`")
             if res.error_package:
                 md.append(f"**Package:** `{res.error_package}`")
+            # Include full traceback in collapsible section for GitHub issue reports
+            if res.error_traceback:
+                md.append("")
+                md.append("<details>")
+                md.append("<summary>Full Traceback (click to expand)</summary>")
+                md.append("")
+                md.append("```python")
+                md.append(res.error_traceback.rstrip())
+                md.append("```")
+                md.append("")
+                md.append("</details>")
         else:
             # Show metrics summary line
             gen = res.generation
@@ -4038,7 +4052,7 @@ def _generate_model_gallery_section(results: list[PerformanceResult]) -> list[st
         md.append("")
 
     # Re-enable linting after gallery section
-    md.append("<!-- markdownlint-enable MD013 -->")
+    md.append("<!-- markdownlint-enable MD013 MD033 -->")
     md.append("")
 
     return md
@@ -4955,6 +4969,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             error_message=error_msg,
             error_type=type(e).__name__,
             error_package=error_package,
+            error_traceback=tb_str,
             generation_time=None,
             model_load_time=None,
             total_time=None,
@@ -4973,6 +4988,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             error_message=error_msg,
             error_type=type(e).__name__,
             error_package=error_package,
+            error_traceback=tb_str,
             generation_time=None,
             model_load_time=None,
             total_time=None,
