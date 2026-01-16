@@ -15,11 +15,9 @@ Skip these in CI by default (they require MLX hardware and model downloads).
 
 # ruff: noqa: S603
 
-import contextlib
 import json
 import subprocess
 import sys
-from collections.abc import Generator
 from pathlib import Path
 
 import pytest
@@ -29,15 +27,6 @@ from PIL import Image
 _TEST_DIR = Path(__file__).parent
 _SRC_DIR = _TEST_DIR.parent
 _CHECK_MODELS_SCRIPT = _SRC_DIR / "check_models.py"
-_OUTPUT_DIR = _SRC_DIR / "output"
-
-# Test-specific output files
-_E2E_LOG = _OUTPUT_DIR / "test_e2e_smoke.log"
-_E2E_HTML = _OUTPUT_DIR / "test_e2e_smoke.html"
-_E2E_MD = _OUTPUT_DIR / "test_e2e_smoke.md"
-_E2E_TSV = _OUTPUT_DIR / "test_e2e_smoke.tsv"
-_E2E_JSONL = _OUTPUT_DIR / "test_e2e_smoke.jsonl"
-_E2E_ENV = _OUTPUT_DIR / "test_e2e_smoke_env.log"
 
 # Fixture model - small, fast, reliable
 # nanoLLaVA is ~600MB, fastest load, lowest memory (4.5GB peak)
@@ -47,22 +36,34 @@ FIXTURE_MODEL = "qnguyen3/nanoLLaVA"
 E2E_TIMEOUT = 300  # 5 minutes
 
 
-def _get_e2e_output_args() -> list[str]:
-    """Return CLI arguments for E2E test-specific output files."""
+def _get_e2e_output_args(output_dir: Path) -> list[str]:
+    """Return CLI arguments for E2E test-specific output files.
+
+    Args:
+        output_dir: Directory for output files (should be unique per test)
+    """
     return [
         "--output-log",
-        str(_E2E_LOG),
+        str(output_dir / "e2e.log"),
         "--output-html",
-        str(_E2E_HTML),
+        str(output_dir / "e2e.html"),
         "--output-markdown",
-        str(_E2E_MD),
+        str(output_dir / "e2e.md"),
         "--output-tsv",
-        str(_E2E_TSV),
+        str(output_dir / "e2e.tsv"),
         "--output-jsonl",
-        str(_E2E_JSONL),
+        str(output_dir / "e2e.jsonl"),
         "--output-env",
-        str(_E2E_ENV),
+        str(output_dir / "e2e_env.log"),
     ]
+
+
+@pytest.fixture
+def e2e_output_dir(tmp_path: Path) -> Path:
+    """Create a temporary directory for E2E test outputs."""
+    output_dir = tmp_path / "output"
+    output_dir.mkdir()
+    return output_dir
 
 
 @pytest.fixture
@@ -157,13 +158,13 @@ pytestmark = [
 class TestE2ESmoke:
     """End-to-end smoke tests that run actual model inference."""
 
-    def test_dry_run_with_fixture_model(self, e2e_test_image: Path) -> None:
+    def test_dry_run_with_fixture_model(self, e2e_test_image: Path, e2e_output_dir: Path) -> None:
         """Dry-run should validate setup without invoking the model."""
         result = subprocess.run(
             [
                 sys.executable,
                 str(_CHECK_MODELS_SCRIPT),
-                *_get_e2e_output_args(),
+                *_get_e2e_output_args(e2e_output_dir),
                 "--image",
                 str(e2e_test_image),
                 "--models",
@@ -190,13 +191,15 @@ class TestE2ESmoke:
         not _check_model_cached(FIXTURE_MODEL),
         reason=f"Model {FIXTURE_MODEL} not cached (run manually first)",
     )
-    def test_full_inference_with_fixture_model(self, e2e_test_image: Path) -> None:
+    def test_full_inference_with_fixture_model(
+        self, e2e_test_image: Path, e2e_output_dir: Path
+    ) -> None:
         """Full inference run should complete successfully and produce outputs."""
         result = subprocess.run(
             [
                 sys.executable,
                 str(_CHECK_MODELS_SCRIPT),
-                *_get_e2e_output_args(),
+                *_get_e2e_output_args(e2e_output_dir),
                 "--image",
                 str(e2e_test_image),
                 "--models",
@@ -218,12 +221,15 @@ class TestE2ESmoke:
         assert result.returncode == 0, f"Inference failed: {result.stderr}"
 
         # Verify output files were created
-        assert _E2E_HTML.exists(), "HTML report not created"
-        assert _E2E_MD.exists(), "Markdown report not created"
-        assert _E2E_JSONL.exists(), "JSONL report not created"
+        e2e_html = e2e_output_dir / "e2e.html"
+        e2e_md = e2e_output_dir / "e2e.md"
+        e2e_jsonl = e2e_output_dir / "e2e.jsonl"
+        assert e2e_html.exists(), "HTML report not created"
+        assert e2e_md.exists(), "Markdown report not created"
+        assert e2e_jsonl.exists(), "JSONL report not created"
 
         # Verify JSONL contains valid result
-        with _E2E_JSONL.open() as f:
+        with e2e_jsonl.open() as f:
             records = [json.loads(line) for line in f if line.strip()]
 
         assert len(records) >= 1, "No results in JSONL"
@@ -240,13 +246,15 @@ class TestE2ESmoke:
         not _check_model_cached(FIXTURE_MODEL),
         reason=f"Model {FIXTURE_MODEL} not cached (run manually first)",
     )
-    def test_quality_analysis_produces_output(self, e2e_test_image: Path) -> None:
+    def test_quality_analysis_produces_output(
+        self, e2e_test_image: Path, e2e_output_dir: Path
+    ) -> None:
         """Quality analysis should run and detect potential issues."""
         result = subprocess.run(
             [
                 sys.executable,
                 str(_CHECK_MODELS_SCRIPT),
-                *_get_e2e_output_args(),
+                *_get_e2e_output_args(e2e_output_dir),
                 "--image",
                 str(e2e_test_image),
                 "--models",
@@ -279,13 +287,13 @@ class TestE2ESmoke:
             ]
         ), "Expected quality/metrics output not found"
 
-    def test_invalid_model_produces_error(self, e2e_test_image: Path) -> None:
+    def test_invalid_model_produces_error(self, e2e_test_image: Path, e2e_output_dir: Path) -> None:
         """Non-existent model should produce a clear error."""
         result = subprocess.run(
             [
                 sys.executable,
                 str(_CHECK_MODELS_SCRIPT),
-                *_get_e2e_output_args(),
+                *_get_e2e_output_args(e2e_output_dir),
                 "--image",
                 str(e2e_test_image),
                 "--models",
@@ -308,13 +316,4 @@ class TestE2ESmoke:
         ), f"Expected error message not found in: {output[:500]}"
 
 
-# Cleanup fixture
-@pytest.fixture(autouse=True)
-def cleanup_e2e_outputs() -> Generator[None]:
-    """Clean up E2E test output files after each test."""
-    yield
-    # Cleanup after test
-    for file in [_E2E_LOG, _E2E_HTML, _E2E_MD, _E2E_TSV, _E2E_JSONL, _E2E_ENV]:
-        if file.exists():
-            with contextlib.suppress(OSError):
-                file.unlink()
+# Note: No cleanup fixture needed - tmp_path fixture handles cleanup automatically
