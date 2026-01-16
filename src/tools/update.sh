@@ -78,6 +78,19 @@ else
 	echo "[update.sh] Homebrew not found; skipping brew update/upgrade"
 fi
 
+# npm and markdownlint tools (if npm is available)
+if command -v npm >/dev/null 2>&1; then
+	echo "[update.sh] Updating npm and markdownlint tools..."
+	# Update npm itself
+	npm install -g npm@latest
+	# Update markdownlint CLI tools (used by make quality-strict and pre-commit)
+	npm install -g markdownlint-cli markdownlint-cli2
+	echo "[update.sh] npm and markdownlint tools updated"
+else
+	echo "[update.sh] npm not found; skipping markdownlint tools update"
+	echo "   (Install Node.js/npm for markdown linting: brew install node)"
+fi
+
 
 # Determine project root (assuming check_models/src/tools/update.sh)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
