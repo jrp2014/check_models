@@ -24,7 +24,7 @@ _OUTPUT_DIR = _SRC_DIR / "output"
     ],
 )
 def test_error_message_consistency(args: list[str], expected_phrases: list[str]) -> None:
-    result = subprocess.run(  # noqa: S603
+    result = subprocess.run(
         [
             sys.executable,
             str(_CHECK_MODELS_SCRIPT),

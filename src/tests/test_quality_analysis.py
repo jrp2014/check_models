@@ -27,7 +27,7 @@ def test_analyze_generation_text_repetitive() -> None:
     analysis = check_models.analyze_generation_text(text, 50)
 
     assert analysis.is_repetitive
-    assert analysis.repeated_token == "word"  # noqa: S105 - not a password, it's a token
+    assert analysis.repeated_token == "word"
 
 
 def test_analyze_generation_text_hallucination_table() -> None:

@@ -24,6 +24,7 @@ import textwrap
 import time
 import traceback
 import urllib.error
+import urllib.parse
 import urllib.request
 from collections import Counter
 from collections.abc import Callable, Iterator, Mapping
@@ -2049,7 +2050,46 @@ def local_now_str(fmt: str = "%Y-%m-%d %H:%M:%S %Z") -> str:
     return datetime.now(get_localzone()).strftime(fmt)
 
 
-def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: PLR0911 - dispatcher with 8 return branches (memory/time/tps/numeric/string)
+# Field name patterns for format dispatch
+_TIME_FIELDS: frozenset[str] = frozenset(
+    {"total_time", "generation_time", "model_load_time"},
+)
+_BOOLEAN_FLAG_FIELDS: frozenset[str] = frozenset(
+    {
+        "is_repetitive",
+        "is_verbose",
+        "has_formatting_issues",
+        "has_hallucination_issues",
+        "has_excessive_bullets",
+        "is_context_ignored",
+    },
+)
+
+
+def _format_numeric_by_field(field_name: str, num: float) -> str:
+    """Format a numeric value based on field name conventions.
+
+    Dispatches to appropriate formatter based on field suffix or exact name.
+    """
+    # Check suffix-based patterns first
+    if field_name.endswith("_memory"):
+        return _format_memory_value_gb(num)
+    if field_name.endswith("_tps"):
+        return _format_tps(num)
+
+    # Check exact field name matches via lookup
+    if field_name in _TIME_FIELDS:
+        return _format_time_seconds(num)
+    if field_name == "quality_score":
+        return f"{num:.1f}"
+    if field_name in _BOOLEAN_FLAG_FIELDS:
+        return "✓" if num else "-"
+
+    # Default numeric formatting
+    return fmt_num(num)
+
+
+def format_field_value(field_name: str, value: MetricValue) -> str:
     """Normalize and format field values for display.
 
     Rules:
@@ -2094,36 +2134,20 @@ def format_field_value(field_name: str, value: MetricValue) -> str:  # noqa: PLR
     """
     if value is None:
         return ""
+
+    # Handle numeric types directly
     if isinstance(value, int | float):
-        num = float(value)
-        if field_name.endswith("_memory"):
-            return _format_memory_value_gb(num)
-        if field_name.endswith("_tps"):
-            return _format_tps(num)
-        if field_name in {"total_time", "generation_time", "model_load_time"}:
-            return _format_time_seconds(num)
-        # MOD: Format quality_score as percentage with 1 decimal
-        if field_name == "quality_score":
-            return f"{num:.1f}"
-        # MOD: Format boolean quality flags as ✓/✗ or Yes/No
-        if field_name in {
-            "is_repetitive",
-            "is_verbose",
-            "has_formatting_issues",
-            "has_hallucination_issues",
-            "has_excessive_bullets",
-            "is_context_ignored",
-        }:
-            # For boolean-like numeric (0/1) or actual boolean
-            return "✓" if num else "-"
-        return fmt_num(num)
+        return _format_numeric_by_field(field_name, float(value))
+
+    # Handle string values - try to parse as numeric
     if isinstance(value, str) and value:
         s: str = value.strip().replace(",", "")
         try:
             f = float(s)
         except ValueError:
-            return value
-        return format_field_value(field_name, f)
+            return value  # Return non-numeric strings as-is
+        return _format_numeric_by_field(field_name, f)
+
     return str(value)
 
 
@@ -2437,7 +2461,7 @@ def print_version_info(versions: LibraryVersionDict) -> None:
                 logger.info("%s: %s", key_padded, value)
         else:
             logger.debug("No system information available.")
-    except Exception as err:  # noqa: BLE001 - system info is non-critical, intentionally catch all failure modes
+    except (OSError, RuntimeError, ValueError) as err:
         logger.debug("Skipping system info block: %s", err)
 
 
@@ -2580,13 +2604,22 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
     """
     image_str = str(image_path)
 
-    # Check if input is a URL
-    is_url = image_str.startswith(("http://", "https://"))
+    # Check if input is a URL (http/https only)
+    parsed_url = urllib.parse.urlparse(image_str)
+    if parsed_url.scheme:
+        scheme = parsed_url.scheme.lower()
+        if scheme not in {"http", "https"}:
+            msg = f"Unsupported URL scheme for image: {parsed_url.scheme}"
+            raise ValueError(msg)
+        is_url = True
+    else:
+        is_url = False
 
     try:
         if is_url:
             # Download URL into memory and open with PIL
             logger.debug("Downloading image from URL for EXIF extraction: %s", image_str)
+            # URL scheme validated above (http/https only)
             with urllib.request.urlopen(image_str, timeout=30) as response:  # noqa: S310
                 img_data = io.BytesIO(response.read())
                 img = Image.open(img_data)
@@ -4503,7 +4536,7 @@ def get_system_characteristics() -> dict[str, str]:
             if logical_cores:
                 info["CPU Cores (Logical)"] = str(logical_cores)
 
-    except Exception as err:  # noqa: BLE001 - catch-all for logging
+    except (OSError, RuntimeError, ValueError) as err:
         logger.debug("Error gathering system characteristics: %s", err)
 
     return info
@@ -5685,6 +5718,35 @@ def print_cli_separator() -> None:
     log_rule(width, char="─", color=Colors.BLUE, bold=False)
 
 
+def _resolve_safe_command(command: list[str]) -> list[str] | None:
+    """Validate and resolve a command for subprocess execution.
+
+    Ensures the executable is an absolute, existing file and prevents NUL bytes.
+    Returns the resolved command list or None if validation fails.
+    """
+    if not command or not all(isinstance(arg, str) and arg for arg in command):
+        return None
+    if any("\x00" in arg for arg in command):
+        return None
+
+    exec_path = Path(command[0])
+    if not exec_path.is_absolute():
+        resolved = shutil.which(command[0])
+        if not resolved:
+            return None
+        exec_path = Path(resolved)
+
+    try:
+        exec_path = exec_path.resolve()
+    except OSError:
+        return None
+
+    if not exec_path.is_file():
+        return None
+
+    return [str(exec_path), *command[1:]]
+
+
 # MOD: Write environment dump to separate file to reduce log clutter
 def _dump_environment_to_log(output_path: Path) -> None:
     """Dump complete Python environment to separate file for debugging/reproducibility.
@@ -5711,19 +5773,24 @@ def _dump_environment_to_log(output_path: Path) -> None:
 
             # Try pip freeze first (works in both conda and venv)
             try:
-                pip_result = subprocess.run(  # noqa: S603
-                    [sys.executable, "-m", "pip", "freeze"],
-                    capture_output=True,
-                    text=True,
-                    timeout=30,
-                    check=False,
-                )
-                if pip_result.returncode == 0:
-                    env_file.write("--- pip freeze ---\n")
-                    env_file.write(pip_result.stdout)
-                    env_file.write("\n")
+                pip_cmd = _resolve_safe_command([sys.executable, "-m", "pip", "freeze"])
+                if pip_cmd:
+                    # Command is hardcoded above, validated by _resolve_safe_command
+                    pip_result = subprocess.run(  # noqa: S603
+                        pip_cmd,
+                        capture_output=True,
+                        text=True,
+                        timeout=30,
+                        check=False,
+                    )
+                    if pip_result.returncode == 0:
+                        env_file.write("--- pip freeze ---\n")
+                        env_file.write(pip_result.stdout)
+                        env_file.write("\n")
+                    else:
+                        env_file.write(f"pip freeze failed: {pip_result.stderr}\n")
                 else:
-                    env_file.write(f"pip freeze failed: {pip_result.stderr}\n")
+                    env_file.write("pip freeze skipped: invalid executable\n")
             except (subprocess.SubprocessError, FileNotFoundError) as pip_err:
                 env_file.write(f"Could not run pip freeze: {pip_err}\n")
 
@@ -5732,19 +5799,24 @@ def _dump_environment_to_log(output_path: Path) -> None:
                 try:
                     conda_path = shutil.which("conda")
                     if conda_path:
-                        conda_result = subprocess.run(  # noqa: S603
-                            [conda_path, "list"],
-                            capture_output=True,
-                            text=True,
-                            timeout=30,
-                            check=False,
-                        )
-                        if conda_result.returncode == 0:
-                            env_file.write(f"--- conda list (env: {conda_env}) ---\n")
-                            env_file.write(conda_result.stdout)
-                            env_file.write("\n")
+                        conda_cmd = _resolve_safe_command([conda_path, "list"])
+                        if conda_cmd:
+                            # Command is hardcoded above, validated by _resolve_safe_command
+                            conda_result = subprocess.run(  # noqa: S603
+                                conda_cmd,
+                                capture_output=True,
+                                text=True,
+                                timeout=30,
+                                check=False,
+                            )
+                            if conda_result.returncode == 0:
+                                env_file.write(f"--- conda list (env: {conda_env}) ---\n")
+                                env_file.write(conda_result.stdout)
+                                env_file.write("\n")
+                            else:
+                                env_file.write(f"conda list failed: {conda_result.stderr}\n")
                         else:
-                            env_file.write(f"conda list failed: {conda_result.stderr}\n")
+                            env_file.write("conda list skipped: invalid executable\n")
                     else:
                         env_file.write("conda command not found in PATH\n")
                 except (subprocess.SubprocessError, FileNotFoundError) as conda_err:
@@ -5759,7 +5831,7 @@ def _dump_environment_to_log(output_path: Path) -> None:
         log_file_path(str(env_log_path))
         logger.debug("Environment details saved for reproducibility")
 
-    except Exception as e:  # noqa: BLE001 - catch-all for logging
+    except (OSError, FileNotFoundError, subprocess.SubprocessError) as e:
         logger.warning("Failed to dump environment info: %s", e)
 
 

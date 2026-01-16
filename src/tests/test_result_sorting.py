@@ -1,6 +1,5 @@
 """Tests for result sorting behavior."""
 
-# ruff: noqa: SLF001
 from dataclasses import dataclass
 
 import check_models

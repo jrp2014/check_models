@@ -121,7 +121,7 @@ skip-magic-trailing-comma = false
 select = ["ALL"]
 
 ignore = [
-    # Formatter compatibility
+    # === Formatter compatibility (ruff format handles these) ===
     "E501",   # Line too long (formatter handles this)
     "W191",   # Tab indentation (formatter handles this)
     "E111",   # Indentation (formatter handles this)
@@ -136,42 +136,55 @@ ignore = [
     "Q002",   # Quotes (formatter handles this)
     "Q003",   # Quotes (formatter handles this)
 
-    # Docstring style conflicts (mutually exclusive pairs)
+    # === Docstring style conflicts (mutually exclusive pairs) ===
     "D203", # one-blank-line-before-class (conflicts with D211)
     "D213", # multi-line-summary-second-line (conflicts with D212)
 
-    # Stylistic choices
-    "ANN401", # Dynamically typed Any - we use this intentionally
-    "FBT001", # Boolean positional arg - common pattern
-    "FBT002", # Boolean default arg - common pattern
-    "TD002",  # Missing TODO author - not critical
-    "TD003",  # Missing TODO link - not critical
-    "FIX002", # TODO/FIXME comments - we want these
+    # === Stylistic choices (intentional design decisions) ===
+    "ANN401", # Dynamically typed Any - used for mlx library interop
+    "FBT001", # Boolean positional arg - common pattern in CLI tools
+    "FBT002", # Boolean default arg - common pattern in CLI tools
+    "TD002",  # Missing TODO author - not critical for small team
+    "TD003",  # Missing TODO link - not critical for small team
+    "FIX002", # TODO/FIXME comments - we want these visible
 
-    # Too aggressive for existing codebase
-    "ERA001",  # Commented code - sometimes useful for comparison
-    "S311",    # random module - not a security issue in this context
-    "PLR0913", # Too many arguments - some functions need them
-    "PLR2004", # Magic values - sometimes clearer than constants
+    # === Complexity thresholds (configured separately via pylint section) ===
+    "PLR0913", # Too many arguments - configured via max-args=10
+    "PLR2004", # Magic values - sometimes clearer than constants in tests
+
+    # === Security rules - S311 only (others use targeted noqa with justification) ===
+    # S311: random module used for non-cryptographic purposes (seed generation)
+    # S603/S607/S310/S105: use targeted # noqa comments with justification
+    "S311",   # random module - deterministic seeds, not cryptographic
+    "S105",   # hardcoded password - false positives on token assertions in tests
+
+    # === Code organization ===
+    "ERA001", # Commented code - sometimes useful for debugging/comparison
 ]
 
 [tool.ruff.lint.per-file-ignores]
 # Tests: minimal necessary exclusions
 "tests/**" = [
     "S101",    # Use of assert - required for pytest
+    "S603",    # subprocess calls - test commands are hardcoded, not user input
     "D103",    # Missing docstring in public function - test names are self-documenting
     "PLR2004", # Magic values in test assertions - values match test parameters
+    "SLF001",  # Private member access - tests need to verify internal functions
+    "ARG001",  # Unused argument - pytest fixtures may have unused params
 ]
-# Tools: allow print statements, missing docstrings
+# Tools: allow print statements, missing docstrings (utility scripts)
 "tools/**" = [
-    "T201", # Print statements
-    "D",    # Docstrings not required in tools
-    "ANN",  # Type annotations not required in tools
+    "T201",    # Print statements - tools are CLI utilities
+    "S603",    # subprocess calls - tool commands are hardcoded, not user input
+    "S607",    # partial executable path - tools call known commands in PATH
+    "BLE001",  # blind Exception - tools use broad catches for robustness
+    "D",       # Docstrings not required in tools
+    "ANN",     # Type annotations not required in tools
 ]
 # Archived files: ignore all rules (these are not maintained)
 "tools/.archived/**" = ["ALL"]
 
-# Asserts are OK in tests
+# Asserts are OK in tests (duplicate of tests/** above, kept for clarity)
 "**/tests/**" = ["S101"]
 
 

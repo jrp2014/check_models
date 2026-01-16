@@ -55,7 +55,7 @@ def load_pyproject_deps() -> tuple[dict[str, str], dict[str, str], dict[str, str
             # The user didn't ask for logging, but it helps debugging.
             # I'll stick to just the fix first.
 
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         logger.warning("Failed to parse pyproject.toml: %s", e)
         return {}, {}, {}
 
@@ -200,7 +200,7 @@ def check_precommit_framework() -> bool:
         return False
 
     # Check if hooks are installed
-    result = subprocess.run(  # noqa: S603
+    result = subprocess.run(
         [precommit_path, "run", "--all-files", "--dry-run"],
         capture_output=True,
         text=True,
@@ -221,7 +221,7 @@ def fix_issues() -> None:
 
     # Install missing packages
     logger.info("Installing missing packages...")
-    subprocess.run(  # noqa: S603
+    subprocess.run(
         [sys.executable, "-m", "pip", "install", "-e", ".[dev]"],
         check=True,
         cwd=Path(__file__).resolve().parents[1],
@@ -229,7 +229,7 @@ def fix_issues() -> None:
 
     # Install git hooks
     logger.info("Installing git pre-commit hook...")
-    subprocess.run(  # noqa: S603
+    subprocess.run(
         [sys.executable, "-m", "tools.install_precommit_hook"],
         check=True,
     )
@@ -238,7 +238,7 @@ def fix_issues() -> None:
     precommit_path = shutil.which("pre-commit")
     if precommit_path:
         logger.info("Installing pre-commit framework hooks...")
-        subprocess.run([precommit_path, "install"], check=True)  # noqa: S603
+        subprocess.run([precommit_path, "install"], check=True)
 
 
 def main() -> int:

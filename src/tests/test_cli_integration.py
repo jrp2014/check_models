@@ -4,7 +4,6 @@ These tests verify the full workflow from CLI input to output generation,
 including argument parsing, execution flow, and error handling.
 """
 
-# ruff: noqa: S603
 import subprocess
 import sys
 import time

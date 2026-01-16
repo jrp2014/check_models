@@ -1,6 +1,5 @@
 """Tests for Markdown formatting utilities."""
 
-# ruff: noqa: SLF001
 import check_models
 
 

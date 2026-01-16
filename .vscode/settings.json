@@ -10,6 +10,15 @@
   // Enable pytest discovery for the src folder
   "python.testing.pytestEnabled": true,
 
+  // Ruff extension configuration - use absolute path for reliability
+  "ruff.configuration": "/Users/jrp/Documents/AI/mlx/check_models/src/pyproject.toml",
+  "ruff.cwd": "/Users/jrp/Documents/AI/mlx/check_models/src",
+
+  // Ruff lint ignores - only truly project-wide rules (others use targeted # noqa)
+  "ruff.lint.ignore": [
+    "S311",   // random module - non-cryptographic use throughout project
+    "S105"    // hardcoded password - false positives on token assertions
+  ],
 
   // Use integrated terminal environment for tasks/debug
   "terminal.integrated.env.osx": {

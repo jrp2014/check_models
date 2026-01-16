@@ -18,7 +18,7 @@ _OUTPUT_DIR = _SRC_DIR / "output"
 def test_cli_handles_corrupted_image(tmp_path: Path) -> None:
     img_path = tmp_path / "corrupted.png"
     img_path.write_bytes(b"not an image")
-    result = subprocess.run(  # noqa: S603
+    result = subprocess.run(
         [
             sys.executable,
             str(_CHECK_MODELS_SCRIPT),
@@ -41,7 +41,7 @@ def test_cli_handles_corrupted_image(tmp_path: Path) -> None:
 def test_cli_handles_unsupported_format(tmp_path: Path) -> None:
     txt_path = tmp_path / "not_an_image.txt"
     txt_path.write_text("hello world")
-    result = subprocess.run(  # noqa: S603
+    result = subprocess.run(
         [
             sys.executable,
             str(_CHECK_MODELS_SCRIPT),

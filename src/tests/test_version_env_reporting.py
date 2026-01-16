@@ -17,7 +17,7 @@ _OUTPUT_DIR = _SRC_DIR / "output"
 
 def test_cli_version_and_env_reporting(tmp_path: Path) -> None:
     env_log = tmp_path / "test_env_reporting.log"
-    subprocess.run(  # noqa: S603
+    subprocess.run(
         [
             sys.executable,
             str(_CHECK_MODELS_SCRIPT),

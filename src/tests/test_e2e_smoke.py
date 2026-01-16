@@ -13,8 +13,6 @@ Or run all tests including slow ones:
 Skip these in CI by default (they require MLX hardware and model downloads).
 """
 
-# ruff: noqa: S603
-
 import json
 import subprocess
 import sys

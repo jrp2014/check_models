@@ -57,8 +57,8 @@ def check_if_needed(file_path: Path, line_num: int, codes: str) -> tuple[bool, s
 
     try:
         # Run ruff check on the specific line
-        result = subprocess.run(  # noqa: S603
-            ["ruff", "check", str(temp_path)],  # noqa: S607
+        result = subprocess.run(
+            ["ruff", "check", str(temp_path)],
             capture_output=True,
             text=True,
             check=False,

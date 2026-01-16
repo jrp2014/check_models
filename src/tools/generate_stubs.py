@@ -176,7 +176,7 @@ def run_stubgen(packages: Iterable[str]) -> int:
     # Verify it's mypy's stubgen by checking if it accepts -p flag
     # (mlx-vlm might have its own stubgen that uses --model)
     try:
-        test_result = subprocess.run(  # noqa: S603
+        test_result = subprocess.run(
             [stubgen_path, "--help"],
             capture_output=True,
             text=True,
@@ -199,7 +199,7 @@ def run_stubgen(packages: Iterable[str]) -> int:
     try:
         # Suppress stderr to avoid confusing error messages from wrong stubgen commands
         # that might be in PATH before mypy's stubgen
-        completed = subprocess.run(args, check=False, stderr=subprocess.DEVNULL)  # noqa: S603
+        completed = subprocess.run(args, check=False, stderr=subprocess.DEVNULL)
     except FileNotFoundError:
         logger.exception(
             "[stubs] 'stubgen' (from mypy) not found. Install mypy: pip install mypy",

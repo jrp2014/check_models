@@ -1,6 +1,5 @@
 """Tests for EXIF extraction utilities."""
 
-# ruff: noqa: SLF001
 from pathlib import Path
 from typing import Any
 
