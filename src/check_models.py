@@ -3516,6 +3516,60 @@ def _format_top_performers_text(summary: dict[str, Any]) -> list[str]:
     return parts
 
 
+def _format_failures_by_package_text(results: list[PerformanceResult]) -> list[str]:
+    """Generate a breakdown of failures organized by responsible package for actionable reporting.
+
+    This helps framework maintainers quickly identify which issues belong to them.
+    """
+    parts: list[str] = []
+    failed = [r for r in results if not r.success]
+    if not failed:
+        return parts
+
+    # Group failures by package
+    by_package: dict[str, list[PerformanceResult]] = {}
+    for res in failed:
+        pkg = res.error_package or "unknown"
+        by_package.setdefault(pkg, []).append(res)
+
+    # Sort packages by failure count (descending) for priority
+    sorted_packages = sorted(by_package.items(), key=lambda x: -len(x[1]))
+
+    parts.append("## 🚨 Failures by Package (Actionable)")
+    parts.append("")
+    parts.append("| Package | Failures | Error Types | Affected Models |")
+    parts.append("|---------|----------|-------------|-----------------|")
+
+    for pkg, failures in sorted_packages:
+        error_types = sorted({r.error_stage or "unknown" for r in failures})
+        models = [f"`{r.model_name}`" for r in failures]
+        parts.append(
+            f"| `{pkg}` | {len(failures)} | {', '.join(error_types)} | {', '.join(models)} |"
+        )
+
+    parts.append("")
+
+    # Generate per-package actionable sections
+    parts.append("### Actionable Items by Package")
+    parts.append("")
+
+    for pkg, failures in sorted_packages:
+        parts.append(f"#### {pkg}")
+        parts.append("")
+        for res in failures:
+            parts.append(f"- **{res.model_name}** ({res.error_stage})")
+            # Add truncated error message
+            error_msg = res.error_message or ""
+            if len(error_msg) > 120:
+                error_msg = error_msg[:117] + "..."
+            parts.append(f"  - Error: `{error_msg}`")
+            if res.error_type:
+                parts.append(f"  - Type: `{res.error_type}`")
+        parts.append("")
+
+    return parts
+
+
 def _format_quality_issues_text(summary: dict[str, Any]) -> list[str]:
     parts = []
     quality_parts = []
@@ -4153,6 +4207,12 @@ def generate_markdown_report(
     # Add issues summary before prompt
     if issues_text:
         md.append(issues_text)
+
+    # Add failures-by-package section for actionable reporting
+    failures_by_pkg = _format_failures_by_package_text(results)
+    if failures_by_pkg:
+        md.extend(failures_by_pkg)
+
     md.append("> **Prompt used:**\n>\n> " + prompt.replace("\n", "\n> "))
     md.append("")
     md.append(
@@ -6522,18 +6582,36 @@ def log_summary(results: list[PerformanceResult]) -> None:
 
 
 def save_jsonl_report(results: list[PerformanceResult], filename: Path) -> None:
-    """Save results to a JSONL file for programmatic analysis."""
+    """Save results to a JSONL file for programmatic analysis and AI issue generation.
+
+    The JSONL format includes all diagnostic information needed to generate
+    actionable GitHub issue reports, including:
+    - Full error tracebacks for debugging
+    - Error type classification for bucketing
+    - Package attribution for directing reports
+    - Quality analysis for successful models
+    - Timing metrics for performance analysis
+    """
     try:
         with filename.open("w", encoding="utf-8") as f:
             for res in results:
-                record = {
+                record: dict[str, object] = {
                     "model": res.model_name,
                     "success": res.success,
                     "error_stage": res.error_stage,
                     "error_message": res.error_message,
+                    "error_type": res.error_type,  # Original exception type for bucketing
                     "error_package": res.error_package,
+                    "error_traceback": res.error_traceback,  # Full traceback for diagnostics
                     "quality_issues": _parse_quality_issues_to_list(res.quality_issues),
                     "metrics": {},
+                    "timing": {},
+                }
+                # Add timing metrics (always available, even for failures)
+                record["timing"] = {
+                    "generation_time_s": res.generation_time,
+                    "model_load_time_s": res.model_load_time,
+                    "total_time_s": res.total_time,
                 }
                 if res.generation:
                     gen = res.generation
@@ -6545,6 +6623,21 @@ def save_jsonl_report(results: list[PerformanceResult], filename: Path) -> None:
                         "active_memory_gb": res.active_memory if res.active_memory else 0.0,
                         "cache_memory_gb": res.cache_memory if res.cache_memory else 0.0,
                     }
+                    # Include generated text for quality analysis context
+                    text = getattr(gen, "text", None)
+                    if text:
+                        record["generated_text"] = text
+                    # Include quality analysis details if available
+                    quality_analysis = getattr(gen, "quality_analysis", None)
+                    if quality_analysis:
+                        record["quality_analysis"] = {
+                            "issues": getattr(quality_analysis, "issues", []),
+                            "metrics": {
+                                "word_count": getattr(quality_analysis, "word_count", 0),
+                                "unique_ratio": getattr(quality_analysis, "unique_ratio", 0.0),
+                                "bullet_count": getattr(quality_analysis, "bullet_count", 0),
+                            },
+                        }
                 f.write(json.dumps(record) + "\n")
         # Logging handled in finalize_execution
     except OSError:

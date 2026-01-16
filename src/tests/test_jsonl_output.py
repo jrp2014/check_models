@@ -156,3 +156,82 @@ def test_save_jsonl_report_no_quality_issues(tmp_path: Path) -> None:
 
     assert data["model"] == "test-model"
     assert data["quality_issues"] == []
+
+
+def test_save_jsonl_report_includes_traceback_and_type(tmp_path: Path) -> None:
+    """Test that save_jsonl_report includes error_traceback and error_type for failures."""
+    output_file = tmp_path / "results.jsonl"
+
+    result = PerformanceResult(
+        model_name="failed-model",
+        generation=None,
+        success=False,
+        error_message="ValueError: Missing parameters",
+        error_stage="Weight Mismatch",
+        error_type="ValueError",
+        error_package="mlx",
+        error_traceback="Traceback (most recent call last):\n  File 'test.py', line 1\nValueError: Missing parameters",
+    )
+
+    results = [result]
+    save_jsonl_report(results, output_file)
+
+    lines = output_file.read_text().strip().split("\n")
+    data = json.loads(lines[0])
+
+    assert data["model"] == "failed-model"
+    assert data["success"] is False
+    assert data["error_type"] == "ValueError"
+    assert data["error_package"] == "mlx"
+    assert data["error_traceback"] is not None
+    assert "Traceback" in data["error_traceback"]
+
+
+def test_save_jsonl_report_includes_timing(tmp_path: Path) -> None:
+    """Test that save_jsonl_report includes timing information."""
+    output_file = tmp_path / "results.jsonl"
+
+    gen = MockGeneration()
+    result = PerformanceResult(
+        model_name="test-model",
+        generation=gen,
+        success=True,
+        generation_time=2.5,
+        model_load_time=1.0,
+        total_time=3.5,
+    )
+
+    results = [result]
+    save_jsonl_report(results, output_file)
+
+    lines = output_file.read_text().strip().split("\n")
+    data = json.loads(lines[0])
+
+    assert "timing" in data
+    assert data["timing"]["generation_time_s"] == 2.5
+    assert data["timing"]["model_load_time_s"] == 1.0
+    assert data["timing"]["total_time_s"] == 3.5
+
+
+def test_save_jsonl_report_includes_generated_text(tmp_path: Path) -> None:
+    """Test that save_jsonl_report includes generated_text for successful models."""
+    output_file = tmp_path / "results.jsonl"
+
+    gen = MockGeneration(text="This is the generated output text.")
+    result = PerformanceResult(
+        model_name="test-model",
+        generation=gen,
+        success=True,
+        generation_time=1.5,
+        model_load_time=0.5,
+        total_time=2.0,
+    )
+
+    results = [result]
+    save_jsonl_report(results, output_file)
+
+    lines = output_file.read_text().strip().split("\n")
+    data = json.loads(lines[0])
+
+    assert "generated_text" in data
+    assert data["generated_text"] == "This is the generated output text."
