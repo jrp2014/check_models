@@ -192,7 +192,9 @@ class TestE2ESmoke:
         reason=f"Model {FIXTURE_MODEL} not cached (run manually first)",
     )
     def test_full_inference_with_fixture_model(
-        self, e2e_test_image: Path, e2e_output_dir: Path
+        self,
+        e2e_test_image: Path,
+        e2e_output_dir: Path,
     ) -> None:
         """Full inference run should complete successfully and produce outputs."""
         result = subprocess.run(
@@ -247,7 +249,9 @@ class TestE2ESmoke:
         reason=f"Model {FIXTURE_MODEL} not cached (run manually first)",
     )
     def test_quality_analysis_produces_output(
-        self, e2e_test_image: Path, e2e_output_dir: Path
+        self,
+        e2e_test_image: Path,
+        e2e_output_dir: Path,
     ) -> None:
         """Quality analysis should run and detect potential issues."""
         result = subprocess.run(
