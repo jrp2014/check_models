@@ -32,7 +32,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e src/.[dev]
-          npm install -g markdownlint-cli2
+          npm ci --prefix src
           
       - name: Generate MLX stubs for mypy
         run: |

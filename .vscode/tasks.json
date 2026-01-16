@@ -1,68 +1,57 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-    {
-      "label": "Make: quality",
-      "type": "shell",
-      "command": "make",
-      "args": ["quality"],
-      "group": "build",
-      "presentation": { "reveal": "always", "panel": "shared" }
-    },
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Make: quality",
+			"type": "shell",
+			"command": "make",
+			"args": ["quality"],
+			"group": "build",
+			"presentation": { "reveal": "always", "panel": "shared" }
+		},
 		{
 			"label": "Activate conda: mlx-vlm",
 			"type": "shell",
 			"command": "zsh",
-			"args": ["-lc", "conda activate mlx-vlm && echo 'conda mlx-vlm activated'"] ,
+			"args": ["-lc", "conda activate mlx-vlm && echo 'conda mlx-vlm activated'"],
 			"presentation": { "reveal": "always", "panel": "shared" }
 		},
-    {
-      "label": "Make: test",
-      "type": "shell",
-      "command": "make",
-      "args": ["test"],
-      "group": "test",
-      "presentation": { "reveal": "always", "panel": "shared" }
-    },
-    {
-      "label": "Run: check_models (help)",
-      "type": "shell",
-      "command": "python",
-      "args": ["-m", "check_models", "--help"],
-      "options": { "cwd": "${workspaceFolder}/src" },
-      "group": "none",
-      "presentation": { "reveal": "always", "panel": "shared" }
-    }
-  ]
-}
-{
-	"version": "2.0.0",
-	"tasks": [
+		{
+			"label": "Make: test",
+			"type": "shell",
+			"command": "make",
+			"args": ["test"],
+			"group": "test",
+			"presentation": { "reveal": "always", "panel": "shared" }
+		},
+		{
+			"label": "Run: check_models (help)",
+			"type": "shell",
+			"command": "python",
+			"args": ["-m", "check_models", "--help"],
+			"options": { "cwd": "${workspaceFolder}/src" },
+			"group": "none",
+			"presentation": { "reveal": "always", "panel": "shared" }
+		},
 		{
 			"label": "VLM: Quality checks (ruff format + fix + mypy)",
 			"type": "shell",
 			"command": "bash",
-			"args": [
-				"src/tools/run_quality_checks.sh"
-			],
+			"args": ["src/tools/run_quality_checks.sh"],
 			"options": {
 				"env": {
 					"ZSH_DISABLE_COMPFIX": "true"
 				}
 			},
 			"isBackground": false,
-			"problemMatcher": [
-				"$eslint-stylish"
-			],
+			"problemMatcher": ["$eslint-stylish"],
 			"group": "build"
 		},
 		{
 			"label": "VLM: Run Check Models",
 			"type": "shell",
 			"command": "python",
-			"args": [
-				"src/check_models.py"
-			],
+			"args": ["src/check_models.py"],
 			"group": "test",
 			"presentation": {
 				"echo": true,
