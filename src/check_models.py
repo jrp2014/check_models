@@ -1041,6 +1041,7 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
 # Threshold for splitting long header text into multiple lines
 HEADER_SPLIT_LENGTH = 10
 ERROR_MESSAGE_PREVIEW_LEN: Final[int] = 40  # Max chars to show from error in summary line
+ERROR_MESSAGE_TRUNCATE_LEN: Final[int] = 120  # Max chars for error messages in actionable reports
 MAX_QUALITY_ISSUES_LEN: Final[int] = 30  # Max chars for quality issues in Markdown tables
 
 # Numeric fields are automatically derived from FIELD_ABBREVIATIONS for consistency
@@ -3544,7 +3545,7 @@ def _format_failures_by_package_text(results: list[PerformanceResult]) -> list[s
         error_types = sorted({r.error_stage or "unknown" for r in failures})
         models = [f"`{r.model_name}`" for r in failures]
         parts.append(
-            f"| `{pkg}` | {len(failures)} | {', '.join(error_types)} | {', '.join(models)} |"
+            f"| `{pkg}` | {len(failures)} | {', '.join(error_types)} | {', '.join(models)} |",
         )
 
     parts.append("")
@@ -3560,8 +3561,8 @@ def _format_failures_by_package_text(results: list[PerformanceResult]) -> list[s
             parts.append(f"- **{res.model_name}** ({res.error_stage})")
             # Add truncated error message
             error_msg = res.error_message or ""
-            if len(error_msg) > 120:
-                error_msg = error_msg[:117] + "..."
+            if len(error_msg) > ERROR_MESSAGE_TRUNCATE_LEN:
+                error_msg = error_msg[: ERROR_MESSAGE_TRUNCATE_LEN - 3] + "..."
             parts.append(f"  - Error: `{error_msg}`")
             if res.error_type:
                 parts.append(f"  - Type: `{res.error_type}`")
