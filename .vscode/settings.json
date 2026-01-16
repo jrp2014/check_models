@@ -1,6 +1,4 @@
 {
-  // Prefer workspace virtual environment if present
-  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
   // Make the `src` package importable for analysis and tests
   "python.analysis.extraPaths": [
     "${workspaceFolder}/src"
@@ -10,8 +8,6 @@
   // Ruff extension configuration
   "ruff.configuration": "${workspaceFolder}/src/pyproject.toml",
   "ruff.cwd": "${workspaceFolder}/src",
-  // Use integrated terminal environment for tasks/debug
-  "terminal.integrated.env.osx": {},
   // Auto-format and code actions on save using ruff (requires ruff extension)
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
