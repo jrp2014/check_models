@@ -1,43 +1,35 @@
 {
   // Point VS Code at the conda environment used for development
   "python.defaultInterpreterPath": "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/bin/python",
-
   // Make the `src` package importable for analysis and tests
   "python.analysis.extraPaths": [
     "${workspaceFolder}/src"
   ],
-
   // Enable pytest discovery for the src folder
   "python.testing.pytestEnabled": true,
-
   // Ruff extension configuration - use absolute path for reliability
   "ruff.configuration": "/Users/jrp/Documents/AI/mlx/check_models/src/pyproject.toml",
   "ruff.cwd": "/Users/jrp/Documents/AI/mlx/check_models/src",
-
   // Ruff lint ignores - only truly project-wide rules (others use targeted # noqa)
   "ruff.lint.ignore": [
-    "S311",   // random module - non-cryptographic use throughout project
-    "S105"    // hardcoded password - false positives on token assertions
+    "S311", // random module - non-cryptographic use throughout project
+    "S105" // hardcoded password - false positives on token assertions
   ],
-
   // Use integrated terminal environment for tasks/debug
   "terminal.integrated.env.osx": {
     "CONDA_DEFAULT_ENV": "mlx-vlm",
     "PATH": "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/bin:${env:PATH}"
   },
-
   // Auto-format and code actions on save using ruff (requires ruff extension)
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll": "always",
     "source.fixAll.ruff": "always"
   },
-
   // Enable ruff linting (for ms-python integration) and prefer ruff formatting
   "python.linting.enabled": true,
   "python.linting.ruffEnabled": true,
   "python.linting.ruffPath": "ruff",
-
   // Preferred Python formatter: set default formatter for Python files to Ruff
   "python.formatting.provider": "ruff",
   "[python]": {
@@ -48,7 +40,6 @@
     },
     "editor.defaultFormatter": "charliermarsh.ruff"
   },
-
   // Additional project-level python settings
   "python.terminal.activateEnvironment": true,
   "python.testing.pytestArgs": [
@@ -66,22 +57,19 @@
     "reportMissingImports": "none",
     "reportMissingModuleSource": "none"
   },
-
   "files.exclude": {
     "**/__pycache__": true,
     "**/.mypy_cache": true,
     "**/.ruff_cache": true,
     "**/*.egg-info": true
-  }
-  ,
+  },
   // Force JSON/JSONC to use the built-in JSON formatter (prevents Copilot being used)
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features"
   },
   "[jsonc]": {
     "editor.defaultFormatter": "vscode.json-language-features"
-  }
-  ,
+  },
   // Prefer the built-in Markdown formatter (prevents Copilot/other extensions taking over)
   "[markdown]": {
     "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"

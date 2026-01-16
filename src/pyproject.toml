@@ -155,8 +155,8 @@ ignore = [
     # === Security rules - S311 only (others use targeted noqa with justification) ===
     # S311: random module used for non-cryptographic purposes (seed generation)
     # S603/S607/S310/S105: use targeted # noqa comments with justification
-    "S311",   # random module - deterministic seeds, not cryptographic
-    "S105",   # hardcoded password - false positives on token assertions in tests
+    "S311", # random module - deterministic seeds, not cryptographic
+    "S105", # hardcoded password - false positives on token assertions in tests
 
     # === Code organization ===
     "ERA001", # Commented code - sometimes useful for debugging/comparison
@@ -174,12 +174,12 @@ ignore = [
 ]
 # Tools: allow print statements, missing docstrings (utility scripts)
 "tools/**" = [
-    "T201",    # Print statements - tools are CLI utilities
-    "S603",    # subprocess calls - tool commands are hardcoded, not user input
-    "S607",    # partial executable path - tools call known commands in PATH
-    "BLE001",  # blind Exception - tools use broad catches for robustness
-    "D",       # Docstrings not required in tools
-    "ANN",     # Type annotations not required in tools
+    "T201",   # Print statements - tools are CLI utilities
+    "S603",   # subprocess calls - tool commands are hardcoded, not user input
+    "S607",   # partial executable path - tools call known commands in PATH
+    "BLE001", # blind Exception - tools use broad catches for robustness
+    "D",      # Docstrings not required in tools
+    "ANN",    # Type annotations not required in tools
 ]
 # Archived files: ignore all rules (these are not maintained)
 "tools/.archived/**" = ["ALL"]
