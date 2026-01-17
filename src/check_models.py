@@ -4901,6 +4901,20 @@ def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None
     return "unknown"
 
 
+def _make_snapshot_download_compat(
+    original_fn: Callable[..., object],
+) -> Callable[..., object]:
+    """Create a wrapper for snapshot_download that strips trust_remote_code."""
+
+    def _wrapper(*args: object, **kwargs: object) -> object:
+        # kwargs is captured as a dict, safe to mutate
+        if isinstance(kwargs, dict):
+            kwargs.pop("trust_remote_code", None)
+        return original_fn(*args, **kwargs)
+
+    return _wrapper
+
+
 def _load_model_with_snapshot_compat(
     params: ProcessImageParams,
 ) -> tuple[Module, PreTrainedTokenizer | PreTrainedTokenizerFast, Any | None]:
@@ -4922,15 +4936,9 @@ def _load_model_with_snapshot_compat(
     Related: https://github.com/Blaizzy/mlx-vlm/pull/660 added --trust-remote-code
     CLI flag but did not fix this underlying compatibility issue.
     """
-    original_snapshot_download: Callable[..., object] = cast(
-        "Callable[..., object]",
-        huggingface_hub.snapshot_download,
-    )
-
-    def _snapshot_download_compat(*args: object, **kwargs: object) -> object:
-        if isinstance(kwargs, dict):
-            kwargs.pop("trust_remote_code", None)
-        return original_snapshot_download(*args, **kwargs)
+    # Store original - typed as Any to avoid issues with overloaded signatures
+    original_snapshot_download: Any = huggingface_hub.snapshot_download
+    compat_wrapper = _make_snapshot_download_compat(original_snapshot_download)
 
     original_utils_snapshot: Any | None = None
     utils_mod: Any | None = mlx_vlm_utils
@@ -4938,9 +4946,11 @@ def _load_model_with_snapshot_compat(
         original_utils_snapshot = utils_mod.snapshot_download
 
     try:
-        huggingface_hub.snapshot_download = cast("Any", _snapshot_download_compat)
+        # Use object.__setattr__ to bypass type checker complaints about
+        # assigning a wrapper function to the typed module attribute
+        object.__setattr__(huggingface_hub, "snapshot_download", compat_wrapper)
         if original_utils_snapshot is not None and utils_mod is not None:
-            utils_mod.snapshot_download = cast("Any", _snapshot_download_compat)
+            utils_mod.snapshot_download = compat_wrapper
 
         model, tokenizer = load(
             path_or_hf_repo=params.model_identifier,
@@ -4948,15 +4958,10 @@ def _load_model_with_snapshot_compat(
             trust_remote_code=params.trust_remote_code,
         )
     finally:
-        # Restore original snapshot_download - ignore type checker since we're
-        # restoring the original function (type mismatch is due to our wrapper)
-        huggingface_hub.snapshot_download = original_snapshot_download  # ty: ignore[invalid-assignment]
+        # Restore original snapshot_download
+        object.__setattr__(huggingface_hub, "snapshot_download", original_snapshot_download)
         if original_utils_snapshot is not None and utils_mod is not None:
-            object.__setattr__(
-                utils_mod,
-                "snapshot_download",
-                original_utils_snapshot,
-            )
+            utils_mod.snapshot_download = original_utils_snapshot
 
     return model, tokenizer, getattr(model, "config", None)
 
