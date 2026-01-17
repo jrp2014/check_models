@@ -28,9 +28,10 @@ import urllib.parse
 import urllib.request
 from collections import Counter
 from collections.abc import Callable, Iterator, Mapping
+from contextlib import ExitStack
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from functools import lru_cache
+from functools import lru_cache, partial
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
@@ -44,6 +45,7 @@ from typing import (
     cast,
     runtime_checkable,
 )
+from unittest.mock import patch
 
 import huggingface_hub
 import yaml
@@ -4901,18 +4903,14 @@ def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None
     return "unknown"
 
 
-def _make_snapshot_download_compat(
+def _snapshot_download_strip_trust_remote_code(
     original_fn: Callable[..., object],
-) -> Callable[..., object]:
-    """Create a wrapper for snapshot_download that strips trust_remote_code."""
-
-    def _wrapper(*args: object, **kwargs: object) -> object:
-        # kwargs is captured as a dict, safe to mutate
-        if isinstance(kwargs, dict):
-            kwargs.pop("trust_remote_code", None)
-        return original_fn(*args, **kwargs)
-
-    return _wrapper
+    *args: object,
+    **kwargs: object,
+) -> object:
+    """Call snapshot_download after stripping unsupported trust_remote_code kwarg."""
+    kwargs.pop("trust_remote_code", None)
+    return original_fn(*args, **kwargs)
 
 
 def _load_model_with_snapshot_compat(
@@ -4920,48 +4918,38 @@ def _load_model_with_snapshot_compat(
 ) -> tuple[Module, PreTrainedTokenizer | PreTrainedTokenizerFast, Any | None]:
     """Load model with a compatibility shim for snapshot_download.
 
-    This shim works around an incompatibility between mlx-vlm and huggingface_hub:
+    This shim works around a bug in mlx-vlm where it passes trust_remote_code
+    to huggingface_hub.snapshot_download(), which doesn't accept that parameter.
 
+    Background:
     - mlx-vlm's load() passes trust_remote_code via **kwargs to snapshot_download()
-      (see mlx_vlm/utils.py get_model_path function, line ~102)
+      (see mlx_vlm/utils.py get_model_path function)
     - huggingface_hub's snapshot_download() does NOT accept trust_remote_code
-      (tested with huggingface_hub 1.3.2)
+      (verified with huggingface_hub 1.3.2, the latest as of Jan 2026)
 
-    Result: TypeError: snapshot_download() got an unexpected keyword argument 'trust_remote_code'
+    Error without shim:
+        TypeError: snapshot_download() got an unexpected keyword argument 'trust_remote_code'
 
-    Fix: Temporarily monkey-patch snapshot_download to strip the unsupported kwarg
-    before calling the original function. We patch both huggingface_hub.snapshot_download
-    and mlx_vlm.utils.snapshot_download (the imported reference) to ensure coverage.
+    Fix: Use unittest.mock.patch to wrap snapshot_download and strip the kwarg.
 
-    Related: https://github.com/Blaizzy/mlx-vlm/pull/660 added --trust-remote-code
-    CLI flag but did not fix this underlying compatibility issue.
+    TODO: Remove this shim once mlx-vlm fixes the bug upstream.
+    Related: https://github.com/Blaizzy/mlx-vlm/pull/660
     """
-    # Store original - typed as Any to avoid issues with overloaded signatures
-    original_snapshot_download: Any = huggingface_hub.snapshot_download
-    compat_wrapper = _make_snapshot_download_compat(original_snapshot_download)
+    original_fn = huggingface_hub.snapshot_download
+    patched_fn = partial(_snapshot_download_strip_trust_remote_code, original_fn)
 
-    original_utils_snapshot: Any | None = None
-    utils_mod: Any | None = mlx_vlm_utils
-    if utils_mod is not None and hasattr(utils_mod, "snapshot_download"):
-        original_utils_snapshot = utils_mod.snapshot_download
-
-    try:
-        # Use object.__setattr__ to bypass type checker complaints about
-        # assigning a wrapper function to the typed module attribute
-        object.__setattr__(huggingface_hub, "snapshot_download", compat_wrapper)
-        if original_utils_snapshot is not None and utils_mod is not None:
-            utils_mod.snapshot_download = compat_wrapper
+    with ExitStack() as stack:
+        # Patch the module attribute
+        stack.enter_context(patch.object(huggingface_hub, "snapshot_download", patched_fn))
+        # Also patch any imported reference in mlx_vlm.utils
+        if mlx_vlm_utils is not None and hasattr(mlx_vlm_utils, "snapshot_download"):
+            stack.enter_context(patch.object(mlx_vlm_utils, "snapshot_download", patched_fn))
 
         model, tokenizer = load(
             path_or_hf_repo=params.model_identifier,
             lazy=params.lazy,
             trust_remote_code=params.trust_remote_code,
         )
-    finally:
-        # Restore original snapshot_download
-        object.__setattr__(huggingface_hub, "snapshot_download", original_snapshot_download)
-        if original_utils_snapshot is not None and utils_mod is not None:
-            utils_mod.snapshot_download = original_utils_snapshot
 
     return model, tokenizer, getattr(model, "config", None)
 
