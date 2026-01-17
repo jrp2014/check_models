@@ -18,6 +18,21 @@ python -m check_models --folder ~/Pictures/Processed
 python -m check_models --image /path/to/photo.jpg
 ```
 
+## First successful run (example)
+
+```bash
+python -m check_models --image ~/Pictures/sample.jpg
+```
+
+Expected outputs (default location: src/output/):
+
+- results.html
+- results.md
+- results.tsv
+- results.jsonl
+- check_models.log
+- environment.log
+
 ## Why use it (short)
 
 - Batch run multiple models against an image.
