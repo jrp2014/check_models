@@ -118,10 +118,12 @@ fi
 cd ..
 
 echo "=== Markdown Lint ==="
-if command -v markdownlint-cli2 &> /dev/null; then
-    markdownlint-cli2 --config .markdownlint.jsonc "**/*.md" "!src/output/**"
+if [ -x "src/node_modules/.bin/markdownlint-cli2" ]; then
+    src/node_modules/.bin/markdownlint-cli2 --config .markdownlint.jsonc "**/*.md" "!src/output/**" "!src/node_modules/**" "!**/node_modules/**"
+elif command -v markdownlint-cli2 &> /dev/null; then
+    markdownlint-cli2 --config .markdownlint.jsonc "**/*.md" "!src/output/**" "!src/node_modules/**" "!**/node_modules/**"
 elif command -v npx &> /dev/null; then
-    npx markdownlint-cli2 --config .markdownlint.jsonc "**/*.md" "!src/output/**"
+    npx --no-install markdownlint-cli2 --config .markdownlint.jsonc "**/*.md" "!src/output/**" "!src/node_modules/**" "!**/node_modules/**"
 else
     echo "⚠️  Skipped (markdownlint-cli2 or npx not found)"
 fi

@@ -45,6 +45,7 @@ from typing import (
     runtime_checkable,
 )
 
+import huggingface_hub
 import yaml
 from huggingface_hub import HFCacheInfo, scan_cache_dir
 from huggingface_hub import __version__ as hf_version
@@ -352,6 +353,11 @@ try:
     from mlx_vlm.utils import load, load_image
     from mlx_vlm.version import __version__ as _mlx_vlm_version
 
+    try:
+        import mlx_vlm.utils as mlx_vlm_utils
+    except ImportError:
+        mlx_vlm_utils = None
+
     vlm_version = _mlx_vlm_version
 except ImportError:
     vlm_version = NOT_AVAILABLE
@@ -373,6 +379,7 @@ except ImportError:
     apply_chat_template = cast("Any", _raise_mlx_vlm_missing)
     load = cast("Any", _raise_mlx_vlm_missing)
     load_image = cast("Any", _raise_mlx_vlm_missing)
+    mlx_vlm_utils = None
 
     MISSING_DEPENDENCIES["mlx-vlm"] = ERROR_MLX_VLM_MISSING
 try:
@@ -4894,6 +4901,94 @@ def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None
     return "unknown"
 
 
+def _load_model_with_snapshot_compat(
+    params: ProcessImageParams,
+) -> tuple[Module, PreTrainedTokenizer | PreTrainedTokenizerFast, Any | None]:
+    """Load model with a compatibility shim for snapshot_download.
+
+    This shim works around an incompatibility between mlx-vlm and huggingface_hub:
+
+    - mlx-vlm's load() passes trust_remote_code via **kwargs to snapshot_download()
+      (see mlx_vlm/utils.py get_model_path function, line ~102)
+    - huggingface_hub's snapshot_download() does NOT accept trust_remote_code
+      (tested with huggingface_hub 1.3.2)
+
+    Result: TypeError: snapshot_download() got an unexpected keyword argument 'trust_remote_code'
+
+    Fix: Temporarily monkey-patch snapshot_download to strip the unsupported kwarg
+    before calling the original function. We patch both huggingface_hub.snapshot_download
+    and mlx_vlm.utils.snapshot_download (the imported reference) to ensure coverage.
+
+    Related: https://github.com/Blaizzy/mlx-vlm/pull/660 added --trust-remote-code
+    CLI flag but did not fix this underlying compatibility issue.
+    """
+    original_snapshot_download: Callable[..., object] = cast(
+        "Callable[..., object]",
+        huggingface_hub.snapshot_download,
+    )
+
+    def _snapshot_download_compat(*args: object, **kwargs: object) -> object:
+        if isinstance(kwargs, dict):
+            kwargs.pop("trust_remote_code", None)
+        return original_snapshot_download(*args, **kwargs)
+
+    original_utils_snapshot: Any | None = None
+    utils_mod: Any | None = mlx_vlm_utils
+    if utils_mod is not None and hasattr(utils_mod, "snapshot_download"):
+        original_utils_snapshot = utils_mod.snapshot_download
+
+    try:
+        huggingface_hub.snapshot_download = cast("Any", _snapshot_download_compat)
+        if original_utils_snapshot is not None and utils_mod is not None:
+            utils_mod.snapshot_download = cast("Any", _snapshot_download_compat)
+
+        model, tokenizer = load(
+            path_or_hf_repo=params.model_identifier,
+            lazy=params.lazy,
+            trust_remote_code=params.trust_remote_code,
+        )
+    finally:
+        # Restore original snapshot_download - ignore type checker since we're
+        # restoring the original function (type mismatch is due to our wrapper)
+        huggingface_hub.snapshot_download = original_snapshot_download  # ty: ignore[invalid-assignment]
+        if original_utils_snapshot is not None and utils_mod is not None:
+            object.__setattr__(
+                utils_mod,
+                "snapshot_download",
+                original_utils_snapshot,
+            )
+
+    return model, tokenizer, getattr(model, "config", None)
+
+
+def _load_model_with_compat(
+    params: ProcessImageParams,
+) -> tuple[Module, PreTrainedTokenizer | PreTrainedTokenizerFast, Any | None]:
+    """Load model and retry with snapshot_download compatibility shim if needed.
+
+    First attempts a normal load. If it fails with a TypeError indicating that
+    snapshot_download received an unexpected 'trust_remote_code' argument,
+    retries using _load_model_with_snapshot_compat() which patches around
+    the mlx-vlm / huggingface_hub incompatibility.
+    """
+    try:
+        model, tokenizer = load(
+            path_or_hf_repo=params.model_identifier,
+            lazy=params.lazy,
+            trust_remote_code=params.trust_remote_code,
+        )
+        return model, tokenizer, getattr(model, "config", None)
+    except Exception as err:
+        msg = str(err)
+        if "snapshot_download" in msg and "trust_remote_code" in msg:
+            logger.warning(
+                "Detected older huggingface_hub without trust_remote_code support; "
+                "retrying model load with compatibility shim.",
+            )
+            return _load_model_with_snapshot_compat(params)
+        raise
+
+
 def _run_model_generation(
     params: ProcessImageParams,
     timer: TimingStrategy | None = None,
@@ -4915,12 +5010,7 @@ def _run_model_generation(
     # Load model from HuggingFace Hub - this handles automatic download/caching
     # and converts weights to MLX format for Apple Silicon optimization
     try:
-        model, tokenizer = load(
-            path_or_hf_repo=params.model_identifier,
-            lazy=params.lazy,
-            trust_remote_code=params.trust_remote_code,
-        )
-        config: Any | None = getattr(model, "config", None)
+        model, tokenizer, config = _load_model_with_compat(params)
     except Exception as load_err:
         # Capture any model loading errors (config issues, missing files, etc.)
         # MOD: Enhanced error handling with cache integrity check
