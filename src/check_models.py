@@ -6190,6 +6190,12 @@ def process_models(
         # Case 2: No explicit models - scan cache and apply exclusions
         logger.info("Scanning cache for models to process...")
         model_identifiers = get_cached_model_ids()
+        if not model_identifiers:
+            exit_with_cli_error(
+                "No models found in the local Hugging Face cache. "
+                "Download a model (e.g., `huggingface-cli download mlx-community/<model>`) "
+                "or pass explicit IDs with --models.",
+            )
         model_identifiers = _apply_exclusions(
             model_identifiers,
             args.exclude or [],
@@ -6717,6 +6723,28 @@ def save_jsonl_report(results: list[PerformanceResult], filename: Path) -> None:
         logger.exception("Failed to write JSONL report to %s", filename)
 
 
+def _write_report_failure_jsonl(
+    *,
+    filename: Path,
+    failed_report: str,
+    error: Exception,
+) -> None:
+    """Write a minimal JSONL error record when report generation fails."""
+    record = {
+        "status": "error",
+        "error_stage": "report_generation",
+        "failed_report": failed_report,
+        "error_message": str(error),
+        "timestamp": local_now_str(),
+    }
+    try:
+        filename.parent.mkdir(parents=True, exist_ok=True)
+        with filename.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(record) + "\n")
+    except OSError:
+        logger.exception("Failed to write report failure JSONL to %s", filename)
+
+
 def finalize_execution(
     *,
     args: argparse.Namespace,
@@ -6747,21 +6775,38 @@ def finalize_execution(
             tsv_output_path.parent.mkdir(parents=True, exist_ok=True)
             jsonl_output_path.parent.mkdir(parents=True, exist_ok=True)
 
-            generate_html_report(
-                results=results,
-                filename=args.output_html,
-                versions=library_versions,
-                prompt=prompt,
-                total_runtime_seconds=overall_time,
-                image_path=image_path,
-            )
-            generate_markdown_report(
-                results=results,
-                filename=args.output_markdown,
-                versions=library_versions,
-                prompt=prompt,
-                total_runtime_seconds=overall_time,
-            )
+            try:
+                generate_html_report(
+                    results=results,
+                    filename=args.output_html,
+                    versions=library_versions,
+                    prompt=prompt,
+                    total_runtime_seconds=overall_time,
+                    image_path=image_path,
+                )
+            except (OSError, ValueError) as err:
+                logger.exception("Failed to generate HTML report.")
+                _write_report_failure_jsonl(
+                    filename=jsonl_output_path,
+                    failed_report="html",
+                    error=err,
+                )
+
+            try:
+                generate_markdown_report(
+                    results=results,
+                    filename=args.output_markdown,
+                    versions=library_versions,
+                    prompt=prompt,
+                    total_runtime_seconds=overall_time,
+                )
+            except (OSError, ValueError) as err:
+                logger.exception("Failed to generate Markdown report.")
+                _write_report_failure_jsonl(
+                    filename=jsonl_output_path,
+                    failed_report="markdown",
+                    error=err,
+                )
             generate_tsv_report(
                 results=results,
                 filename=args.output_tsv,
@@ -6922,6 +6967,10 @@ def main_cli() -> None:
         description="MLX VLM Model Checker",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
+
+    def _output_help(label: str) -> str:
+        return f"Output {label} report filename."
+
     # Add arguments (separated for clarity)
     group = parser.add_mutually_exclusive_group(required=False)
     group.add_argument(
@@ -6945,25 +6994,25 @@ def main_cli() -> None:
         "--output-html",
         type=Path,
         default=DEFAULT_HTML_OUTPUT,
-        help="Output HTML report filename.",
+        help=_output_help("HTML"),
     )
     parser.add_argument(
         "--output-markdown",
         type=Path,
         default=DEFAULT_MD_OUTPUT,
-        help="Output Github Markdown report filename.",
+        help=_output_help("GitHub Markdown"),
     )
     parser.add_argument(
         "--output-tsv",
         type=Path,
         default=DEFAULT_TSV_OUTPUT,
-        help="Output TSV (tab-separated values) report filename.",
+        help=_output_help("TSV (tab-separated values)"),
     )
     parser.add_argument(
         "--output-jsonl",
         type=Path,
         default=DEFAULT_JSONL_OUTPUT,
-        help="Output JSONL report filename.",
+        help=_output_help("JSONL"),
     )
     parser.add_argument(
         "--output-log",
