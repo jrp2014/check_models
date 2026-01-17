@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-01-17 22:58:06 GMT
+FULL ENVIRONMENT DUMP - 2026-01-17 23:21:26 GMT
 ================================================================================
 
 --- pip freeze ---
@@ -16,7 +16,7 @@ certifi==2026.1.4
 cffi==2.0.0
 cfgv==3.5.0
 charset-normalizer==3.4.4
--e git+https://github.com/jrp2014/check_models.git@934c272bbcd385dc1df76b04af810e86c9b55061#egg=check_models&subdirectory=src
+-e git+https://github.com/jrp2014/check_models.git@71b2cc0cd4bead0590371b0c94c20090c456854c#egg=check_models&subdirectory=src
 click==8.3.1
 cmake==4.2.1
 coverage==7.13.1
@@ -119,7 +119,7 @@ torch==2.9.1
 torchaudio==2.9.1
 torchvision==0.24.1
 tqdm==4.67.1
-transformers==5.0.0rc1
+transformers==5.0.0rc3
 ty==0.0.12
 typer-slim==0.21.1
 types-psutil==7.2.1.20260116
@@ -280,7 +280,7 @@ torch                      2.9.1                        pypi_0              pypi
 torchaudio                 2.9.1                        pypi_0              pypi
 torchvision                0.24.1                       pypi_0              pypi
 tqdm                       4.67.1                       pypi_0              pypi
-transformers               5.0.0rc1                     pypi_0              pypi
+transformers               5.0.0rc3                     pypi_0              pypi
 ty                         0.0.12                       pypi_0              pypi
 typer-slim                 0.21.1                       pypi_0              pypi
 types-psutil               7.2.1.20260116               pypi_0              pypi
@@ -308,5 +308,5 @@ yarl                       1.22.0                       pypi_0              pypi
 zlib                       1.3.1                        h5f15de7_0
 
 ================================================================================
-Environment dump completed at 2026-01-17 22:58:08 GMT
+Environment dump completed at 2026-01-17 23:21:27 GMT
 ================================================================================
