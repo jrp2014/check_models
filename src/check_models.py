@@ -2744,6 +2744,45 @@ def _extract_exif_date(img_path: PathLike, exif_data: ExifDict) -> str | None:
         return None
 
 
+def _extract_exif_time(img_path: PathLike, exif_data: ExifDict) -> str | None:
+    """Extract just the local time portion from EXIF data.
+
+    Returns time in HH:MM:SS format (24-hour), or None if unavailable.
+    """
+    # Try EXIF date tags in priority order
+    for tag in EXIF_DATE_TAGS:
+        if exif_date := exif_data.get(tag):
+            break
+    else:
+        exif_date = None
+
+    if exif_date:
+        # Try to parse with known formats
+        try:
+            local_tz = get_localzone()
+            for fmt in DATE_FORMATS:
+                try:
+                    dt = datetime.strptime(str(exif_date), fmt).replace(tzinfo=UTC)
+                    return dt.astimezone(local_tz).strftime("%H:%M:%S")
+                except ValueError:
+                    continue
+            # If no format matched, cannot extract time
+        except (TypeError, UnicodeDecodeError) as err:
+            logger.warning("Could not extract time from EXIF date: %s", err)
+        return None
+
+    # Fallback to filesystem mtime
+    try:
+        local_tz = get_localzone()
+        return datetime.fromtimestamp(
+            Path(img_path).stat().st_mtime,
+            tz=local_tz,
+        ).strftime("%H:%M:%S")
+    except OSError as err:
+        logger.debug("Could not get file mtime for time: %s", err)
+        return None
+
+
 def _extract_description(exif_data: ExifDict) -> str | None:
     description = exif_data.get("ImageDescription")
     if description is None:
@@ -2859,8 +2898,9 @@ def extract_image_metadata(image_path: PathLike) -> MetadataDict:
     img_path = Path(image_path)
     exif_data = get_exif_data(img_path) or {}
 
-    # Date, Description, GPS
+    # Date, Time, Description, GPS
     metadata["date"] = _extract_exif_date(img_path, exif_data)
+    metadata["time"] = _extract_exif_time(img_path, exif_data)
     metadata["description"] = _extract_description(exif_data)
     metadata["gps"] = _extract_gps_str(exif_data.get("GPSInfo"))
 
@@ -6091,6 +6131,7 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
         logger.info("Generating default prompt based on image metadata.")
         desc = metadata.get("description")
         date_val = metadata.get("date")
+        time_val = metadata.get("time")
         gps_val = metadata.get("gps")
         prompt_parts: list[str] = [
             (
@@ -6099,7 +6140,8 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
             ),
             (f"\n\nContext: The image relates to '{desc}'" if desc else ""),
             (f"\n\nThe photo was taken around {date_val}" if date_val else ""),
-            (f"from GPS {gps_val}" if gps_val else ""),
+            (f" at local time {time_val}" if time_val else ""),
+            (f" from GPS {gps_val}" if gps_val else ""),
             (
                 ". Focus on visual content, drawing on any available "
                 "contextual information for specificity. Do not speculate."
