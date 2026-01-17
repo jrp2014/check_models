@@ -1,32 +1,11 @@
-# MLX VLM Check — Quick Overview
+# MLX VLM Check
 
-Lightweight CLI to run and benchmark MLX-compatible Vision-Language Models (VLMs) on Apple Silicon. Produces human- and machine-readable reports (HTML, Markdown, TSV, JSONL) and captures performance metrics (tokens/sec, memory, timings).
-
-Quick start (recommended):
-
+Lightweight CLI to run and benchmark MLX-compatible Vision-Language Models (VLMs) on Apple Silicon. Produces HTML/Markdown/TSV/JSONL reports and captures performance metrics (tokens/sec, memory, timings).
 
 > [!NOTE]
-> This tool runs MLX-format Vision-Language Models hosted on the [Hugging Face Hub](https://huggingface.co). By default it will run all the models found in your local Hugging Face Hub model cache (use `--models` to specify explicit model IDs).
+> This tool runs MLX-format Vision-Language Models hosted on the [Hugging Face Hub](https://huggingface.co). By default it runs all models found in your local HF cache (use `--models` to specify explicit model IDs).
 
-## Why use this tool?
-
-While `mlx-vlm` provides excellent raw generation capabilities, `check_models.py` adds a layer of **batch processing, standardized benchmarking, and reporting** essential for model evaluation:
-
-- **Batch Processing**: Run multiple models against an image in one go.
-- **Standardized Metrics**: Automatically capture tokens/sec, memory usage, and load times in a consistent format.
-- **Rich Reporting**: Generate HTML, Markdown, and JSONL reports for easy sharing and analysis.
-- **Robustness**: Handles model failures gracefully (timeouts, errors) without crashing the entire batch.
-- **Metadata Awareness**: Uses EXIF and GPS data from images to generate context-aware prompts automatically.
-
-## Ecosystem
-
-This tool uses the broader MLX ecosystem on Apple Silicon:
-
-- **[MLX](https://github.com/ml-explore/mlx)**: The array framework for machine learning on Apple Silicon.
-- **[MLX VLM](https://github.com/ml-explore/mlx-vlm)**: The underlying library for running Vision-Language Models.
-- **[Hugging Face Hub](https://huggingface.co)**: The source for models (look for `mlx-community` or models with `mlx` tags).  Image-Text-to-Text (I2T2) models are the category most likely to be supported.
-
-## Quick Start
+## Quick Start (fast path)
 
 ```bash
 # Install runtime dependencies
@@ -39,7 +18,13 @@ python -m check_models --folder ~/Pictures/Processed
 python -m check_models --image /path/to/photo.jpg
 ```
 
-## Documentation
+## Why use it (short)
+
+- Batch run multiple models against an image.
+- Standardized metrics + rich reports for easy comparison.
+- Robust error handling and metadata-aware prompts.
+
+## Documentation (full details)
 
 - **[User Guide & CLI Reference](src/README.md)**: Full parameter reference, advanced usage, and troubleshooting.
 - **[Contributor Guide](docs/CONTRIBUTING.md)**: Setup, workflow, and quality standards.
@@ -56,5 +41,11 @@ make quality   # run formatting, linting, and type checks
 > [!TIP]
 > **Platform**: macOS with Apple Silicon is required.
 > **Python**: 3.13+ is recommended and tested.
+
+## Ecosystem (quick links)
+
+- **[MLX](https://github.com/ml-explore/mlx)**: Array framework for Apple Silicon.
+- **[MLX VLM](https://github.com/ml-explore/mlx-vlm)**: Underlying VLM runtime.
+- **[Hugging Face Hub](https://huggingface.co)**: Model source (look for `mlx-community` or `mlx` tags).
 
 License: See the [LICENSE](LICENSE) file.
