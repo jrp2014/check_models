@@ -32,7 +32,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e src/.[dev]
-          npm ci --prefix src
+          npm install --prefix src
           
       - name: Generate MLX stubs for mypy
         run: |
