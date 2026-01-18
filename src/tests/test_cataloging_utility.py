@@ -5,7 +5,12 @@ from __future__ import annotations
 import pytest
 
 from check_models import (
+    GRADE_EMOJIS,
     QUALITY,
+    _format_cataloging_summary_html,
+    _format_cataloging_summary_text,
+    _get_grade_display,
+    analyze_model_issues,
     compute_cataloging_utility,
     compute_information_gain,
     compute_task_compliance,
@@ -291,3 +296,103 @@ class TestHelperFunctions:
         result = compute_cataloging_utility(text, None)
         score = _get_utility_score(result)
         assert score >= expected_min_score
+
+
+class TestGradeEmojisConstant:
+    """Tests for GRADE_EMOJIS constant usage."""
+
+    def test_grade_emojis_has_all_grades(self) -> None:
+        """GRADE_EMOJIS should have entries for all grades A-F."""
+        for grade in ["A", "B", "C", "D", "F"]:
+            assert grade in GRADE_EMOJIS
+            assert isinstance(GRADE_EMOJIS[grade], str)
+            assert len(GRADE_EMOJIS[grade]) > 0
+
+    def test_grade_display_uses_constant(self) -> None:
+        """_get_grade_display should return emoji-decorated grades."""
+        # Check that it returns the correct format
+        display_a = _get_grade_display("A")
+        assert "A" in display_a
+        assert "🏆" in display_a  # A should have trophy emoji
+
+        display_f = _get_grade_display("F")
+        assert "F" in display_f
+        assert "❌" in display_f  # F should have X emoji
+
+
+class TestCatalogingSummaryFormatters:
+    """Tests for cataloging summary formatting functions."""
+
+    def test_format_cataloging_summary_html_empty(self) -> None:
+        """Empty summary should return empty list."""
+        summary: dict[str, object] = {"cataloging_best": None}
+        result = _format_cataloging_summary_html(summary)
+        assert result == []
+
+    def test_format_cataloging_summary_html_with_data(self) -> None:
+        """Summary with data should generate HTML."""
+        summary = {
+            "cataloging_best": ("model-a", 92.0, "A"),
+            "cataloging_worst": ("model-b", 35.0, "D"),
+            "cataloging_avg_score": 65.0,
+            "cataloging_grades": {"A": ["model-a"], "D": ["model-b"]},
+            "low_utility_models": [("model-b", 35.0, "D", "Low visual grounding")],
+        }
+        result = _format_cataloging_summary_html(summary)
+
+        # Should have content
+        assert len(result) > 0
+        html = "".join(result)
+
+        # Check key elements are present
+        assert "Cataloging Utility Summary" in html
+        assert "model-a" in html
+        assert "model-b" in html
+        assert "92" in html  # Best score
+        assert "35" in html  # Worst score
+        assert "Low visual grounding" in html
+
+    def test_format_cataloging_summary_text_empty(self) -> None:
+        """Empty summary should return empty list."""
+        summary: dict[str, object] = {"cataloging_best": None}
+        result = _format_cataloging_summary_text(summary)
+        assert result == []
+
+    def test_format_cataloging_summary_text_with_data(self) -> None:
+        """Summary with data should generate Markdown."""
+        summary = {
+            "cataloging_best": ("model-a", 92.0, "A"),
+            "cataloging_worst": ("model-b", 35.0, "D"),
+            "cataloging_avg_score": 65.0,
+            "cataloging_grades": {"A": ["model-a"], "D": ["model-b"]},
+            "low_utility_models": [("model-b", 35.0, "D", "Low visual grounding")],
+        }
+        result = _format_cataloging_summary_text(summary)
+
+        # Should have content
+        assert len(result) > 0
+        md = "\n".join(result)
+
+        # Check key elements are present
+        assert "Cataloging Utility Summary" in md
+        assert "model-a" in md
+        assert "model-b" in md
+        assert "Best for cataloging" in md
+        assert "Worst for cataloging" in md
+        assert "Low visual grounding" in md
+
+
+class TestAnalyzeModelIssuesCataloging:
+    """Tests for cataloging metrics in analyze_model_issues."""
+
+    def test_analyze_model_issues_includes_cataloging(self) -> None:
+        """analyze_model_issues should include cataloging summary fields."""
+        # Empty results
+        summary = analyze_model_issues([])
+
+        # Check cataloging fields exist
+        assert "cataloging_grades" in summary
+        assert "cataloging_best" in summary
+        assert "cataloging_worst" in summary
+        assert "cataloging_avg_score" in summary
+        assert "low_utility_models" in summary

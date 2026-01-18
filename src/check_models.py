@@ -290,6 +290,9 @@ def load_quality_config(config_path: Path | None = None) -> None:
 
 MIN_SEPARATOR_CHARS: Final[int] = 50
 DEFAULT_DECIMAL_PLACES: Final[int] = 2
+
+# Grade display emojis for cataloging utility (used in reports and console output)
+GRADE_EMOJIS: Final[dict[str, str]] = {"A": "🏆", "B": "✅", "C": "🟡", "D": "🟠", "F": "❌"}
 MARKDOWN_HARD_BREAK_SPACES: Final[int] = 2  # Preserve exactly two trailing spaces for hard breaks
 IMAGE_OPEN_TIMEOUT: Final[float] = 5.0  # Timeout for opening/verifying image files
 GENERATION_WRAP_WIDTH: Final[int] = 100  # Console output wrapping width for generated text
@@ -543,10 +546,6 @@ class PerformanceResult:
     error_package: str | None = None  # Package that caused error (mlx, mlx-vlm, transformers, etc.)
     # MOD: Added full traceback for actionable GitHub issue reports
     error_traceback: str | None = None  # Full traceback for error diagnosis
-    # MOD: Cataloging utility metrics for actionable quality assessment
-    cataloging_utility_score: float | None = None  # 0-100 utility score
-    cataloging_utility_grade: str | None = None  # A-F grade
-    cataloging_primary_weakness: str | None = None  # Main issue limiting utility
 
 
 class ResultSet:
@@ -2007,6 +2006,9 @@ def detect_response_structure(text: str) -> dict[str, bool]:
     For image cataloging tasks, we expect outputs to include captions,
     keywords, and/or descriptions. This detects their presence.
 
+    This is a lightweight wrapper around compute_task_compliance() that
+    adds section detection and returns only boolean presence indicators.
+
     Args:
         text: Generated text to analyze
 
@@ -2021,26 +2023,16 @@ def detect_response_structure(text: str) -> dict[str, bool]:
             "has_sections": False,
         }
 
-    text_lower = text.lower()
+    # Reuse task compliance detection for the core elements
+    compliance = compute_task_compliance(text)
 
-    # Check for labeled sections (flexible matching)
-    # Note: Using character class [:] to match both ASCII and fullwidth colons
-    has_caption = bool(
-        re.search(r"\b(caption|title)\s*:", text_lower) or text_lower.startswith("caption"),
-    )
-    has_keywords = bool(
-        re.search(r"\b(keywords?|tags?)\s*:", text_lower)
-        or re.search(r"^[-•*]\s*\w+$", text, re.MULTILINE),  # Bullet list of single words
-    )
-    has_description = bool(
-        re.search(r"\b(description|details?|summary)\s*:", text_lower),
-    )
+    # Add section detection (markdown headers)
     has_sections = bool(re.search(r"^#{1,3}\s+\w+", text, re.MULTILINE))
 
     return {
-        "has_caption": has_caption,
-        "has_keywords": has_keywords,
-        "has_description": has_description,
+        "has_caption": bool(compliance["has_caption"]),
+        "has_keywords": bool(compliance["has_keywords"]),
+        "has_description": bool(compliance["has_description"]),
         "has_sections": has_sections,
     }
 
@@ -4103,14 +4095,13 @@ def _format_cataloging_summary_html(summary: dict[str, Any]) -> list[str]:
     parts.append("<h3>📚 Cataloging Utility Summary</h3>")
 
     # Grade distribution overview
-    grade_emojis = {"A": "🏆", "B": "✅", "C": "🟡", "D": "🟠", "F": "❌"}
     grades = summary.get("cataloging_grades", {})
     if grades:
         grade_counts = []
         for grade in ["A", "B", "C", "D", "F"]:
             count = len(grades.get(grade, []))
             if count > 0:
-                emoji = grade_emojis.get(grade, "")
+                emoji = GRADE_EMOJIS.get(grade, "")
                 grade_counts.append(f"{emoji} {grade}: {count}")
         if grade_counts:
             parts.append(f"<p><b>Grade Distribution:</b> {' | '.join(grade_counts)}</p>")
@@ -4124,14 +4115,14 @@ def _format_cataloging_summary_html(summary: dict[str, Any]) -> list[str]:
     parts.append("<ul>")
     if summary.get("cataloging_best"):
         model, score, grade = summary["cataloging_best"]
-        emoji = grade_emojis.get(grade, "")
+        emoji = GRADE_EMOJIS.get(grade, "")
         parts.append(
             f"<li><b>Best for cataloging:</b> <code>{html.escape(model)}</code> "
             f"({emoji} {grade}, {score:.0f}/100)</li>",
         )
     if summary.get("cataloging_worst"):
         model, score, grade = summary["cataloging_worst"]
-        emoji = grade_emojis.get(grade, "")
+        emoji = GRADE_EMOJIS.get(grade, "")
         parts.append(
             f"<li><b>Worst for cataloging:</b> <code>{html.escape(model)}</code> "
             f"({emoji} {grade}, {score:.0f}/100)</li>",
@@ -4147,7 +4138,7 @@ def _format_cataloging_summary_html(summary: dict[str, Any]) -> list[str]:
         )
         parts.append("<ul>")
         for model, score, grade, weakness in low_utility:
-            emoji = grade_emojis.get(grade, "")
+            emoji = GRADE_EMOJIS.get(grade, "")
             parts.append(
                 f"<li><code>{html.escape(model)}</code>: {emoji} {grade} ({score:.0f}/100) "
                 f"- {html.escape(weakness)}</li>",
@@ -4169,14 +4160,13 @@ def _format_cataloging_summary_text(summary: dict[str, Any]) -> list[str]:
     parts.append("")
 
     # Grade distribution overview
-    grade_emojis = {"A": "🏆", "B": "✅", "C": "🟡", "D": "🟠", "F": "❌"}
     grades = summary.get("cataloging_grades", {})
     if grades:
         grade_counts = []
         for grade in ["A", "B", "C", "D", "F"]:
             count = len(grades.get(grade, []))
             if count > 0:
-                emoji = grade_emojis.get(grade, "")
+                emoji = GRADE_EMOJIS.get(grade, "")
                 grade_counts.append(f"{emoji} {grade}: {count}")
         if grade_counts:
             parts.append(f"**Grade Distribution:** {' | '.join(grade_counts)}")
@@ -4191,11 +4181,11 @@ def _format_cataloging_summary_text(summary: dict[str, Any]) -> list[str]:
     # Best and worst performers
     if summary.get("cataloging_best"):
         model, score, grade = summary["cataloging_best"]
-        emoji = grade_emojis.get(grade, "")
+        emoji = GRADE_EMOJIS.get(grade, "")
         parts.append(f"- **Best for cataloging:** `{model}` ({emoji} {grade}, {score:.0f}/100)")
     if summary.get("cataloging_worst"):
         model, score, grade = summary["cataloging_worst"]
-        emoji = grade_emojis.get(grade, "")
+        emoji = GRADE_EMOJIS.get(grade, "")
         parts.append(f"- **Worst for cataloging:** `{model}` ({emoji} {grade}, {score:.0f}/100)")
     parts.append("")
 
@@ -4205,7 +4195,7 @@ def _format_cataloging_summary_text(summary: dict[str, Any]) -> list[str]:
         parts.append(f"### ⚠️ {len(low_utility)} Models with Low Utility (D/F)")
         parts.append("")
         for model, score, grade, weakness in low_utility:
-            emoji = grade_emojis.get(grade, "")
+            emoji = GRADE_EMOJIS.get(grade, "")
             parts.append(f"- `{model}`: {emoji} {grade} ({score:.0f}/100) - {weakness}")
         parts.append("")
 
@@ -6345,8 +6335,7 @@ def _log_output_analysis(
 
 def _get_grade_display(grade: str) -> str:
     """Return emoji-decorated grade display string."""
-    grade_emojis = {"A": "🏆", "B": "✅", "C": "🟡", "D": "🟠"}
-    emoji = grade_emojis.get(grade, "❌")
+    emoji = GRADE_EMOJIS.get(grade, "❌")
     return f"{emoji} {grade}"
 
 
