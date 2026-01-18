@@ -25,7 +25,7 @@ def test_save_jsonl_report_creates_file(tmp_path: Path) -> None:
     """Test that save_jsonl_report creates a file."""
     output_file = tmp_path / "results.jsonl"
     results: list[PerformanceResult] = []
-    save_jsonl_report(results, output_file)
+    save_jsonl_report(results, output_file, prompt="test", system_info={})
 
     assert output_file.exists()
     assert output_file.read_text() == ""
@@ -46,7 +46,7 @@ def test_save_jsonl_report_content(tmp_path: Path) -> None:
     )
 
     results = [result]
-    save_jsonl_report(results, output_file)
+    save_jsonl_report(results, output_file, prompt="test", system_info={})
 
     assert output_file.exists()
     lines = output_file.read_text().strip().split("\n")
@@ -73,7 +73,7 @@ def test_save_jsonl_report_no_generation(tmp_path: Path) -> None:
     )
 
     results = [result]
-    save_jsonl_report(results, output_file)
+    save_jsonl_report(results, output_file, prompt="test", system_info={})
 
     lines = output_file.read_text().strip().split("\n")
     data = json.loads(lines[0])
@@ -96,7 +96,7 @@ def test_save_jsonl_report_failed_model(tmp_path: Path) -> None:
     )
 
     results = [result]
-    save_jsonl_report(results, output_file)
+    save_jsonl_report(results, output_file, prompt="test", system_info={})
 
     lines = output_file.read_text().strip().split("\n")
     data = json.loads(lines[0])
@@ -123,7 +123,7 @@ def test_save_jsonl_report_quality_issues_as_list(tmp_path: Path) -> None:
     )
 
     results = [result]
-    save_jsonl_report(results, output_file)
+    save_jsonl_report(results, output_file, prompt="test", system_info={})
 
     lines = output_file.read_text().strip().split("\n")
     data = json.loads(lines[0])
@@ -149,7 +149,7 @@ def test_save_jsonl_report_no_quality_issues(tmp_path: Path) -> None:
     )
 
     results = [result]
-    save_jsonl_report(results, output_file)
+    save_jsonl_report(results, output_file, prompt="test", system_info={})
 
     lines = output_file.read_text().strip().split("\n")
     data = json.loads(lines[0])
@@ -174,7 +174,7 @@ def test_save_jsonl_report_includes_traceback_and_type(tmp_path: Path) -> None:
     )
 
     results = [result]
-    save_jsonl_report(results, output_file)
+    save_jsonl_report(results, output_file, prompt="test", system_info={})
 
     lines = output_file.read_text().strip().split("\n")
     data = json.loads(lines[0])
@@ -202,7 +202,7 @@ def test_save_jsonl_report_includes_timing(tmp_path: Path) -> None:
     )
 
     results = [result]
-    save_jsonl_report(results, output_file)
+    save_jsonl_report(results, output_file, prompt="test", system_info={})
 
     lines = output_file.read_text().strip().split("\n")
     data = json.loads(lines[0])
@@ -228,7 +228,7 @@ def test_save_jsonl_report_includes_generated_text(tmp_path: Path) -> None:
     )
 
     results = [result]
-    save_jsonl_report(results, output_file)
+    save_jsonl_report(results, output_file, prompt="test", system_info={})
 
     lines = output_file.read_text().strip().split("\n")
     data = json.loads(lines[0])

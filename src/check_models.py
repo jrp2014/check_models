@@ -37,7 +37,6 @@ from typing import (
     Any,
     ClassVar,
     Final,
-    NamedTuple,
     NoReturn,
     Protocol,
     Self,
@@ -166,6 +165,12 @@ class FormattingThresholds:
 
     # Dry-run output thresholds
     max_prompt_preview_lines: int = 10  # Max lines to show in prompt preview
+
+    # Layout constants
+    min_separator_chars: int = 50
+    default_decimal_places: int = 2
+    markdown_hard_break_spaces: int = 2
+    generation_wrap_width: int = 100
 
 
 @dataclass
@@ -297,15 +302,15 @@ def load_quality_config(config_path: Path | None = None) -> None:
         logger.warning("Quality config file not found: %s", config_path)
 
 
-MIN_SEPARATOR_CHARS: Final[int] = 50
-DEFAULT_DECIMAL_PLACES: Final[int] = 2
+# Consolidating constants to FORMATTING and other locations
+# FORMATTING.min_separator_chars -> FORMATTING.min_separator_chars
+# FORMATTING.default_decimal_places -> FORMATTING.default_decimal_places
+# GRADE_EMOJIS -> moved below
+# FORMATTING.markdown_hard_break_spaces -> FORMATTING.markdown_hard_break_spaces
+# IMAGE_OPEN_TIMEOUT -> moved below
+# FORMATTING.generation_wrap_width -> FORMATTING.generation_wrap_width
+# SUPPORTED_IMAGE_EXTENSIONS -> moved to validation section constants
 
-# Grade display emojis for cataloging utility (used in reports and console output)
-GRADE_EMOJIS: Final[dict[str, str]] = {"A": "🏆", "B": "✅", "C": "🟡", "D": "🟠", "F": "❌"}
-MARKDOWN_HARD_BREAK_SPACES: Final[int] = 2  # Preserve exactly two trailing spaces for hard breaks
-IMAGE_OPEN_TIMEOUT: Final[float] = 5.0  # Timeout for opening/verifying image files
-GENERATION_WRAP_WIDTH: Final[int] = 100  # Console output wrapping width for generated text
-SUPPORTED_IMAGE_EXTENSIONS: Final[frozenset[str]] = frozenset({".jpg", ".jpeg", ".png", ".webp"})
 
 _temp_logger = logging.getLogger(LOGGER_NAME)
 
@@ -497,6 +502,11 @@ DEFAULT_TEMPERATURE: Final[float] = 0.1
 DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
 MAX_REASONABLE_TEMPERATURE: Final[float] = 2.0  # Warn if temperature exceeds this
 
+# Additional Application Constants
+GRADE_EMOJIS: Final[dict[str, str]] = {"A": "🏆", "B": "✅", "C": "🟡", "D": "🟠", "F": "❌"}
+IMAGE_OPEN_TIMEOUT: Final[float] = 5.0  # Timeout for opening/verifying image files
+SUPPORTED_IMAGE_EXTENSIONS: Final[frozenset[str]] = frozenset({".jpg", ".jpeg", ".png", ".webp"})
+
 # Constants - EXIF
 # Use Pillow's modern ExifTags enums (Pillow 10.0+) for type safety
 IMPORTANT_EXIF_TAGS: Final[frozenset[str]] = frozenset(
@@ -604,7 +614,8 @@ class ResultSet:
         return iter(self._results)
 
 
-class ProcessImageParams(NamedTuple):
+@dataclass(frozen=True)
+class ProcessImageParams:
     """Parameters for processing an image with a model.
 
     Centralizes all parameters needed for model inference into a single
@@ -613,9 +624,6 @@ class ProcessImageParams(NamedTuple):
         - Makes parameter passing explicit and type-safe
         - Simplifies testing (one object to mock/construct)
         - Documents expected inputs clearly
-
-    Note: Using NamedTuple instead of dataclass for lightweight immutability
-    and automatic tuple unpacking support if needed.
     """
 
     model_identifier: str
@@ -966,8 +974,14 @@ class ColoredFormatter(logging.Formatter):
             (
                 lambda s, _: (
                     s.startswith(("===", "---"))
-                    or (len(s) > MIN_SEPARATOR_CHARS and s.count("=") > MIN_SEPARATOR_CHARS)
-                    or (len(s) > MIN_SEPARATOR_CHARS and s.count("-") > MIN_SEPARATOR_CHARS)
+                    or (
+                        len(s) > FORMATTING.min_separator_chars
+                        and s.count("=") > FORMATTING.min_separator_chars
+                    )
+                    or (
+                        len(s) > FORMATTING.min_separator_chars
+                        and s.count("-") > FORMATTING.min_separator_chars
+                    )
                 ),
                 (Colors.BOLD, Colors.BLUE),
             ),
@@ -2891,9 +2905,9 @@ def get_terminal_width(min_width: int = 60, max_width: int = 120) -> int:
         except ValueError:
             pass
     try:
-        width = shutil.get_terminal_size(fallback=(GENERATION_WRAP_WIDTH, 24)).columns
+        width = shutil.get_terminal_size(fallback=(FORMATTING.generation_wrap_width, 24)).columns
     except OSError:
-        width = GENERATION_WRAP_WIDTH
+        width = FORMATTING.generation_wrap_width
     return max(min_width, min(width, max_width))
 
 
@@ -2954,7 +2968,7 @@ def _apply_cli_output_preferences(args: argparse.Namespace) -> None:
 
 
 def log_rule(
-    width: int = GENERATION_WRAP_WIDTH,
+    width: int = FORMATTING.generation_wrap_width,
     *,
     char: str = "─",  # Unicode box-drawing character (was "-")
     color: str | None = None,
@@ -5311,7 +5325,7 @@ def normalize_markdown_trailing_spaces(md_text: str) -> str:
     """Normalize trailing spaces on each line in Markdown text.
 
     Rules:
-    - Keep exactly MARKDOWN_HARD_BREAK_SPACES trailing spaces (Markdown hard line break).
+    - Keep exactly FORMATTING.markdown_hard_break_spaces trailing spaces (Markdown hard line break).
     - Strip any other count of trailing spaces to avoid accidental single-space endings.
     """
     out_lines: list[str] = []
@@ -5321,7 +5335,7 @@ def normalize_markdown_trailing_spaces(md_text: str) -> str:
             out_lines.append(ln)
             continue
         spaces = len(m.group(1))
-        if spaces == MARKDOWN_HARD_BREAK_SPACES:
+        if spaces == FORMATTING.markdown_hard_break_spaces:
             out_lines.append(ln)
         else:
             out_lines.append(ln[:-spaces])
@@ -5954,7 +5968,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             active_memory=active_mem_gb if active_mem_gb > 0 else None,
             cache_memory=cache_mem_gb if cache_mem_gb > 0 else None,
         )
-    except TimeoutError as e:
+    except (TimeoutError, OSError, ValueError) as e:
         # Full traceback already logged at ERROR level in _run_model_generation
         error_msg = str(e)
         tb_str = traceback.format_exc()
@@ -5964,26 +5978,8 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             model_name=params.model_identifier,
             generation=None,
             success=False,
-            error_stage=classified_stage,  # Use classified error as stage/status
-            error_message=error_msg,
-            error_type=type(e).__name__,
-            error_package=error_package,
-            error_traceback=tb_str,
-            generation_time=None,
-            model_load_time=None,
-            total_time=None,
-        )
-    except (OSError, ValueError) as e:
-        # Full traceback already logged at ERROR level in _run_model_generation
-        error_msg = str(e)
-        tb_str = traceback.format_exc()
-        classified_stage = _classify_error(error_msg)
-        error_package = _attribute_error_to_package(error_msg, tb_str)
-        return PerformanceResult(
-            model_name=params.model_identifier,
-            generation=None,
-            success=False,
-            error_stage=classified_stage,  # Use classified error as stage/status
+            # Use classified error as stage/status, or exception name if unknown
+            error_stage=classified_stage,
             error_message=error_msg,
             error_type=type(e).__name__,
             error_package=error_package,
@@ -7745,7 +7741,12 @@ def log_summary(results: list[PerformanceResult]) -> None:
             )
 
 
-def save_jsonl_report(results: list[PerformanceResult], filename: Path) -> None:
+def save_jsonl_report(
+    results: list[PerformanceResult],
+    filename: Path,
+    prompt: str,
+    system_info: dict[str, str],
+) -> None:
     """Save results to a JSONL file for programmatic analysis and AI issue generation.
 
     The JSONL format includes all diagnostic information needed to generate
@@ -7755,6 +7756,7 @@ def save_jsonl_report(results: list[PerformanceResult], filename: Path) -> None:
     - Package attribution for directing reports
     - Quality analysis for successful models
     - Timing metrics for performance analysis
+    - System info and Prompt context (replicated for stateless processing)
     """
     try:
         with filename.open("w", encoding="utf-8") as f:
@@ -7768,6 +7770,11 @@ def save_jsonl_report(results: list[PerformanceResult], filename: Path) -> None:
                     "error_package": res.error_package,
                     "error_traceback": res.error_traceback,  # Full traceback for diagnostics
                     "quality_issues": _parse_quality_issues_to_list(res.quality_issues),
+                    "context": {
+                        "prompt": prompt,
+                        "system": system_info,
+                        "timestamp": local_now_str(),
+                    },
                     "metrics": {},
                     "timing": {},
                 }
@@ -7849,6 +7856,9 @@ def finalize_execution(
         # (Already handled by print_model_stats and results.md, but we add log summary now)
         log_summary(results)
 
+        # Gather system characteristics for reports
+        system_info = get_system_characteristics()
+
         # Generate reports
         try:
             html_output_path: Path = args.output_html.resolve()
@@ -7897,7 +7907,12 @@ def finalize_execution(
                 filename=args.output_tsv,
             )
             # New: Save JSONL report
-            save_jsonl_report(results, args.output_jsonl)
+            save_jsonl_report(
+                results,
+                args.output_jsonl,
+                prompt=prompt,
+                system_info=system_info,
+            )
 
             # Log file locations
             logger.info("")
