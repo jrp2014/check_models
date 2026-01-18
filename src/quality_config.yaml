@@ -31,7 +31,7 @@ thresholds:
   min_section_headers: 3         # Minimum section headers
 
   # Bullet point detection
-  max_bullets: 15                # Maximum allowed bullet points
+  max_bullets: 10                # Maximum allowed bullet points
 
   # Generic output detection
   min_text_length_for_generic: 20 # Minimum text length to analyze for genericity
@@ -129,6 +129,8 @@ patterns:
     - "<mask>"
 
   code_patterns:
-    - "\\bdef\\s+\\w+\\("
-    - "\\bfunction\\s+\\w+\\("
-    - "\\w+\\s*=\\s*[\"']"
+    - "\\bdef\\s+\\w+\\("           # Python function definition
+    - "\\bfunction\\s+\\w+\\("      # JavaScript function
+    - "\\bclass\\s+\\w+"            # Class definition
+    - "\\bimport\\s+\\w+"           # Import statement
+    - "\\breturn\\s+"               # Return statement

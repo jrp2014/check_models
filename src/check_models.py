@@ -204,7 +204,7 @@ class QualityThresholds:
     min_section_headers: int = 3
 
     # Bullet point detection
-    max_bullets: int = 15
+    max_bullets: int = 10
 
     # Generic output detection
     min_text_length_for_generic: int = 20
@@ -1898,7 +1898,9 @@ def _detect_language_mixing(
         code_patterns = [
             r"\bdef\s+\w+\(",  # Python function def
             r"\bfunction\s+\w+\(",  # JavaScript function
-            r'\w+\s*=\s*["\']',  # Variable assignment
+            r"\bclass\s+\w+",  # Class definition
+            r"\bimport\s+\w+",  # Import statement
+            r"\breturn\s+",  # Return statement
         ]
 
     for pattern in code_patterns:
