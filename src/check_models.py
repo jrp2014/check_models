@@ -219,6 +219,15 @@ class QualityThresholds:
     high_confidence_threshold: float = 0.7
     medium_confidence_threshold: float = 0.4
 
+    # Output degeneration detection thresholds
+    min_text_for_degeneration: int = 20  # Minimum text length to check
+    min_cutoff_word_length: int = 2  # Words <= this at end may be cutoff
+    max_control_chars: int = 3  # Control chars threshold
+    non_ascii_ratio_threshold: float = 0.3  # Threshold for encoding shift detection
+    non_ascii_ratio_multiplier: int = 3  # Multiplier for tail vs head comparison
+    max_url_length: int = 100  # URLs longer than this are suspicious
+    min_precise_stats: int = 2  # Number of overly precise stats to flag
+
     # Cataloging utility thresholds
     min_useful_words: int = 5  # Minimum words for useful output
     short_output_words: int = 15  # Output considered "short"
@@ -1927,6 +1936,135 @@ def _detect_language_mixing(
     return bool(issues), issues
 
 
+def _detect_output_degeneration(text: str) -> tuple[bool, str | None]:
+    """Detect end-of-output degeneration (garbage/nonsense at the end).
+
+    LLMs sometimes fail to stop properly and produce:
+    - Repeated special characters or punctuation
+    - Incomplete sentences cut off mid-word
+    - Unicode garbage or control characters
+    - Repeated newlines/whitespace patterns
+
+    Args:
+        text: Generated text to check
+
+    Returns:
+        Tuple of (has_degeneration, degeneration_type)
+    """
+    if not text or len(text) < QUALITY.min_text_for_degeneration:
+        return False, None
+
+    # Check the last portion of the text (where degeneration typically appears)
+    tail_length = min(200, len(text) // 3)
+    tail = text[-tail_length:]
+    result: str | None = None
+
+    # 1. Detect repeated punctuation/special char sequences at end
+    # e.g., "......" or "?????" or "!!!!!" or "-----"
+    punct_repeat = re.search(r"([.?!,;:\-_=+*#]{3,})\s*$", tail)
+    if punct_repeat:
+        result = f"repeated_punctuation: '{punct_repeat.group(1)[:10]}...'"
+
+    # 2. Detect incomplete sentence (ends mid-word or with lowercase without punctuation)
+    if result is None:
+        stripped = text.rstrip()
+        if stripped:
+            last_char = stripped[-1]
+            # Normal endings: . ! ? ) " ' ] }
+            normal_endings = ".!?)]}'\"}"
+            if last_char not in normal_endings:
+                last_word_match = re.search(r"\b(\w+)$", stripped)
+                if last_word_match:
+                    last_word = last_word_match.group(1)
+                    if len(last_word) <= QUALITY.min_cutoff_word_length and last_word.islower():
+                        result = f"incomplete_sentence: ends with '{last_word}'"
+
+    # 3. Detect Unicode garbage/control characters (excluding normal whitespace)
+    if result is None:
+        control_chars = re.findall(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]", tail)
+        if len(control_chars) > QUALITY.max_control_chars:
+            result = f"control_characters: {len(control_chars)} found"
+
+    # 4. Detect repeated newline patterns (degenerate spacing)
+    if result is None and "\n\n\n\n\n\n" in tail:
+        result = "excessive_newlines"
+
+    # 5. Detect character-level repetition at the end
+    if result is None:
+        char_repeat = re.search(r"(.{1,3})\1{5,}\s*$", tail)
+        if char_repeat:
+            pattern = char_repeat.group(1)
+            result = f"character_loop: '{pattern}' repeated"
+
+    # 6. Detect sudden encoding shift
+    if result is None and len(text) > tail_length * 2:
+        head = text[:-tail_length]
+        ascii_max = 127  # Standard ASCII range
+        head_non_ascii = len([c for c in head if ord(c) > ascii_max]) / max(len(head), 1)
+        tail_non_ascii = len([c for c in tail if ord(c) > ascii_max]) / max(len(tail), 1)
+        if (
+            tail_non_ascii > QUALITY.non_ascii_ratio_threshold
+            and tail_non_ascii > head_non_ascii * QUALITY.non_ascii_ratio_multiplier
+        ):
+            result = "encoding_shift"
+
+    return (result is not None), result
+
+
+def _detect_fabricated_details(text: str) -> tuple[bool, list[str]]:
+    """Detect potentially fabricated specific details (hallucination).
+
+    LLMs sometimes invent specific details like:
+    - Fake dates (especially future dates or specific historical dates)
+    - Made-up URLs/links
+    - Invented statistics/percentages
+    - Fictional proper names in contexts where they shouldn't appear
+
+    Args:
+        text: Generated text to check
+
+    Returns:
+        Tuple of (has_fabrication, list of suspicious details)
+    """
+    if not text:
+        return False, []
+
+    issues: list[str] = []
+
+    # 1. Detect suspicious URLs (models often fabricate URLs)
+    urls = re.findall(r"https?://[^\s<>\"']+", text)
+    for url in urls:
+        # Fabricated URLs often have suspicious patterns
+        if any(
+            suspicious in url.lower()
+            for suspicious in ["example.com", "placeholder", "xxx", "fake"]
+        ):
+            issues.append(f"suspicious_url: {url[:50]}")
+        # Very long URLs with random-looking paths
+        elif len(url) > QUALITY.max_url_length and re.search(r"/[a-z0-9]{20,}/", url.lower()):
+            issues.append(f"fabricated_url: {url[:50]}...")
+
+    # 2. Detect invented precise statistics (suspiciously specific numbers)
+    # e.g., "exactly 73.847%" or "precisely 14,523 items"
+    precise_stats = re.findall(r"\b(\d{1,3}(?:,\d{3})*\.\d{3,})\s*%?", text)
+    if len(precise_stats) >= QUALITY.min_precise_stats:
+        issues.append(f"suspicious_precision: {len(precise_stats)} overly precise numbers")
+
+    # 3. Detect future dates (model can't know the future)
+    # Years 2030+ are definitely future
+    future_years = re.findall(r"\b(20[3-9]\d|2[1-9]\d{2})\b", text)
+    if future_years:
+        issues.append(f"future_date: {', '.join(future_years[:3])}")
+
+    # 4. Detect citations to non-existent sources (common hallucination)
+    # Patterns like "according to Smith et al. (2024)" or "(Johnson, 2025)"
+    fake_citations = re.findall(r"\(([A-Z][a-z]+(?:\s+et\s+al\.?)?,?\s*\d{4})\)", text)
+    if fake_citations:
+        issues.append(f"unverifiable_citation: {', '.join(fake_citations[:2])}")
+
+    return bool(issues), issues
+
+
 def compute_vocabulary_diversity(text: str) -> tuple[float, int, int]:
     """Compute vocabulary diversity metrics for generated text.
 
@@ -2458,6 +2596,12 @@ class GenerationQualityAnalysis:
     # MOD: Added language/code mixing detection
     has_language_mixing: bool
     language_mixing_issues: list[str]
+    # MOD: Added output degeneration detection (garbage/nonsense)
+    has_degeneration: bool
+    degeneration_type: str | None
+    # MOD: Added fabrication detection (hallucinated details)
+    has_fabrication: bool
+    fabrication_issues: list[str]
 
     def has_any_issues(self) -> bool:
         """Return True if any quality issues were detected."""
@@ -2471,6 +2615,8 @@ class GenerationQualityAnalysis:
             or self.is_refusal
             or self.is_generic
             or self.has_language_mixing
+            or self.has_degeneration
+            or self.has_fabrication
         )
 
     @property
@@ -2495,6 +2641,10 @@ class GenerationQualityAnalysis:
             issues_list.append(f"Generic output (specificity: {self.specificity_score:.2f})")
         if self.has_language_mixing:
             issues_list.extend(self.language_mixing_issues)
+        if self.has_degeneration:
+            issues_list.append(f"Output degeneration ({self.degeneration_type})")
+        if self.has_fabrication:
+            issues_list.extend(self.fabrication_issues)
         return issues_list
 
 
@@ -2543,6 +2693,12 @@ def analyze_generation_text(
     # MOD: Added language/code mixing detection
     has_language_mixing, language_mixing_issues = _detect_language_mixing(text)
 
+    # MOD: Added output degeneration detection (garbage at end)
+    has_degeneration, degeneration_type = _detect_output_degeneration(text)
+
+    # MOD: Added fabrication detection (hallucinated specifics)
+    has_fabrication, fabrication_issues = _detect_fabricated_details(text)
+
     return GenerationQualityAnalysis(
         is_repetitive=is_repetitive,
         repeated_token=repeated_token,
@@ -2559,6 +2715,10 @@ def analyze_generation_text(
         specificity_score=specificity_score,
         has_language_mixing=has_language_mixing,
         language_mixing_issues=language_mixing_issues,
+        has_degeneration=has_degeneration,
+        degeneration_type=degeneration_type,
+        has_fabrication=has_fabrication,
+        fabrication_issues=fabrication_issues,
     )
 
 

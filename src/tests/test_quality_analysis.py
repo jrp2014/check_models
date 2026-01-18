@@ -250,3 +250,97 @@ def test_compute_confidence_indicators() -> None:
     empty_indicators = check_models.compute_confidence_indicators("")
     assert empty_indicators["hedge_count"] == 0
     assert empty_indicators["definitive_count"] == 0
+
+
+# =============================================================================
+# Tests for LLM Failure Mode Detection
+# =============================================================================
+
+
+def test_detect_output_degeneration_clean() -> None:
+    """Clean text should not trigger degeneration detection."""
+    text = "This is a normal sentence that ends properly."
+    has_degen, degen_type = check_models._detect_output_degeneration(text)
+    assert has_degen is False
+    assert degen_type is None
+
+
+def test_detect_output_degeneration_repeated_punctuation() -> None:
+    """Detect repeated punctuation at end (common failure mode)."""
+    text = "This is a sentence that goes wrong..........."
+    has_degen, degen_type = check_models._detect_output_degeneration(text)
+    assert has_degen is True
+    assert degen_type is not None
+    assert "punctuation" in degen_type
+
+
+def test_detect_output_degeneration_character_loop() -> None:
+    """Detect character-level repetition loops."""
+    text = "Normal text then aaaaaaaaaaaaaaaaaaaaaaaaa"
+    has_degen, degen_type = check_models._detect_output_degeneration(text)
+    assert has_degen is True
+    assert degen_type is not None
+    assert "loop" in degen_type or "character" in degen_type
+
+
+def test_detect_output_degeneration_excessive_newlines() -> None:
+    """Detect excessive newline degeneration."""
+    text = "Normal sentence.\n\n\n\n\n\n\n\n\n\n"
+    has_degen, degen_type = check_models._detect_output_degeneration(text)
+    assert has_degen is True
+    assert degen_type == "excessive_newlines"
+
+
+def test_detect_output_degeneration_short_text() -> None:
+    """Short text should not be checked for degeneration."""
+    text = "Short."
+    has_degen, _degen_type = check_models._detect_output_degeneration(text)
+    assert has_degen is False
+
+
+def test_detect_fabricated_details_clean() -> None:
+    """Clean text should not trigger fabrication detection."""
+    text = "A red car is parked in front of a blue house."
+    has_fab, issues = check_models._detect_fabricated_details(text)
+    assert has_fab is False
+    assert issues == []
+
+
+def test_detect_fabricated_details_suspicious_url() -> None:
+    """Detect fabricated/placeholder URLs."""
+    text = "Learn more at https://example.com/fake/page"
+    has_fab, issues = check_models._detect_fabricated_details(text)
+    assert has_fab is True
+    assert any("url" in issue.lower() for issue in issues)
+
+
+def test_detect_fabricated_details_future_date() -> None:
+    """Detect references to future years (LLM can't know the future)."""
+    text = "According to the 2035 census data, the population increased."
+    has_fab, issues = check_models._detect_fabricated_details(text)
+    assert has_fab is True
+    assert any("future" in issue.lower() for issue in issues)
+
+
+def test_detect_fabricated_details_fake_citation() -> None:
+    """Detect fake academic citations."""
+    text = "The findings were significant (Smith et al., 2024)."
+    has_fab, issues = check_models._detect_fabricated_details(text)
+    assert has_fab is True
+    assert any("citation" in issue.lower() for issue in issues)
+
+
+def test_analyze_generation_text_includes_degeneration() -> None:
+    """Verify analyze_generation_text detects degeneration."""
+    text = "Normal start then goes bad.........."
+    analysis = check_models.analyze_generation_text(text, 10)
+    assert analysis.has_degeneration is True
+    assert analysis.degeneration_type is not None
+
+
+def test_analyze_generation_text_includes_fabrication() -> None:
+    """Verify analyze_generation_text detects fabrication."""
+    text = "Check out https://example.com/placeholder for more info."
+    analysis = check_models.analyze_generation_text(text, 15)
+    assert analysis.has_fabrication is True
+    assert len(analysis.fabrication_issues) > 0

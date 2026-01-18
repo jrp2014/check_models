@@ -46,6 +46,15 @@ thresholds:
   high_confidence_threshold: 0.7  # High confidence ratio
   medium_confidence_threshold: 0.4  # Medium confidence ratio
 
+  # Output degeneration detection thresholds
+  min_text_for_degeneration: 20   # Minimum text length to check for degeneration
+  min_cutoff_word_length: 2       # Words <= this at end may be cutoff
+  max_control_chars: 3            # Control chars threshold before flagging
+  non_ascii_ratio_threshold: 0.3  # Threshold for encoding shift detection (30%)
+  non_ascii_ratio_multiplier: 3   # Multiplier for tail vs head comparison
+  max_url_length: 100             # URLs longer than this are suspicious
+  min_precise_stats: 2            # Number of overly precise stats to flag
+
   # Cataloging utility thresholds
   min_useful_words: 5             # Minimum words for useful output
   short_output_words: 15          # Output considered "short"
