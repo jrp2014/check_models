@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-01-17 23:21:26 GMT
+FULL ENVIRONMENT DUMP - 2026-01-18 01:29:59 GMT
 ================================================================================
 
 --- pip freeze ---
@@ -16,7 +16,7 @@ certifi==2026.1.4
 cffi==2.0.0
 cfgv==3.5.0
 charset-normalizer==3.4.4
--e git+https://github.com/jrp2014/check_models.git@71b2cc0cd4bead0590371b0c94c20090c456854c#egg=check_models&subdirectory=src
+-e git+https://github.com/jrp2014/check_models.git@5716516bccc5247ed96526fb919833043db852eb#egg=check_models&subdirectory=src
 click==8.3.1
 cmake==4.2.1
 coverage==7.13.1
@@ -56,7 +56,7 @@ ml_dtypes==0.5.4
 -e git+https://github.com/ml-explore/mlx.git@d2bef3c6bbb7acd8b311aeab5deeefc4dff3c246#egg=mlx
 -e git+https://github.com/ml-explore/mlx-lm.git@cd7d9a536e477305030fe8e9af071ad2172e7ed3#egg=mlx_lm
 mlx-metal==0.30.3
--e git+https://github.com/Blaizzy/mlx-vlm.git@4c3f24f4c2e48ab0983576a4bf3d37a3cbad593d#egg=mlx_vlm
+-e git+https://github.com/Blaizzy/mlx-vlm.git@58122703b0bba7c574d23c9c751f01cf60485d4f#egg=mlx_vlm
 mpmath==1.3.0
 multidict==6.7.0
 multiprocess==0.70.18
@@ -119,7 +119,7 @@ torch==2.9.1
 torchaudio==2.9.1
 torchvision==0.24.1
 tqdm==4.67.1
-transformers==5.0.0rc3
+transformers==5.0.0rc1
 ty==0.0.12
 typer-slim==0.21.1
 types-psutil==7.2.1.20260116
@@ -280,7 +280,7 @@ torch                      2.9.1                        pypi_0              pypi
 torchaudio                 2.9.1                        pypi_0              pypi
 torchvision                0.24.1                       pypi_0              pypi
 tqdm                       4.67.1                       pypi_0              pypi
-transformers               5.0.0rc3                     pypi_0              pypi
+transformers               5.0.0rc1                     pypi_0              pypi
 ty                         0.0.12                       pypi_0              pypi
 typer-slim                 0.21.1                       pypi_0              pypi
 types-psutil               7.2.1.20260116               pypi_0              pypi
@@ -308,5 +308,5 @@ yarl                       1.22.0                       pypi_0              pypi
 zlib                       1.3.1                        h5f15de7_0
 
 ================================================================================
-Environment dump completed at 2026-01-17 23:21:27 GMT
+Environment dump completed at 2026-01-18 01:30:00 GMT
 ================================================================================
