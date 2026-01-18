@@ -215,6 +215,10 @@ class QualityThresholds:
     min_key_terms_threshold: int = 3
     min_missing_ratio: float = 0.75
 
+    # Confidence thresholds for output analysis
+    high_confidence_threshold: float = 0.7
+    medium_confidence_threshold: float = 0.4
+
     # Patterns (loaded from config)
     patterns: dict[str, list[str]] | None = None
 
@@ -1909,6 +1913,187 @@ def _detect_language_mixing(
             break
 
     return bool(issues), issues
+
+
+def compute_vocabulary_diversity(text: str) -> tuple[float, int, int]:
+    """Compute vocabulary diversity metrics for generated text.
+
+    Type-token ratio (TTR) measures lexical diversity - the ratio of unique
+    words to total words. Higher values indicate more varied vocabulary.
+
+    Args:
+        text: Generated text to analyze
+
+    Returns:
+        Tuple of (type_token_ratio, unique_words, total_words)
+        Returns (0.0, 0, 0) for empty text
+
+    Examples:
+        >>> compute_vocabulary_diversity("The cat sat on the mat")
+        (0.83, 5, 6)  # 5 unique words out of 6 total
+
+        >>> compute_vocabulary_diversity("yes yes yes yes")
+        (0.25, 1, 4)  # Low diversity - repetitive
+    """
+    if not text:
+        return 0.0, 0, 0
+
+    # Normalize: lowercase, extract word tokens only
+    words = re.findall(r"\b[a-z]+\b", text.lower())
+    total_words = len(words)
+
+    if total_words == 0:
+        return 0.0, 0, 0
+
+    unique_words = len(set(words))
+    ttr = unique_words / total_words
+
+    return round(ttr, 3), unique_words, total_words
+
+
+def compute_efficiency_metrics(
+    tokens_generated: int,
+    generation_time: float | None,
+    peak_memory_gb: float | None,
+) -> dict[str, float | None]:
+    """Compute efficiency metrics combining speed and memory usage.
+
+    Args:
+        tokens_generated: Number of tokens generated
+        generation_time: Time for generation in seconds
+        peak_memory_gb: Peak memory usage in GB
+
+    Returns:
+        Dict with computed efficiency metrics:
+        - tokens_per_second: Generation speed
+        - tokens_per_gb: Tokens generated per GB of memory (efficiency)
+        - tokens_per_second_per_gb: Combined efficiency metric
+    """
+    metrics: dict[str, float | None] = {
+        "tokens_per_second": None,
+        "tokens_per_gb": None,
+        "tokens_per_second_per_gb": None,
+    }
+
+    if generation_time and generation_time > 0:
+        metrics["tokens_per_second"] = round(tokens_generated / generation_time, 1)
+
+    if peak_memory_gb and peak_memory_gb > 0:
+        metrics["tokens_per_gb"] = round(tokens_generated / peak_memory_gb, 1)
+
+        if generation_time and generation_time > 0:
+            tps = tokens_generated / generation_time
+            metrics["tokens_per_second_per_gb"] = round(tps / peak_memory_gb, 2)
+
+    return metrics
+
+
+def detect_response_structure(text: str) -> dict[str, bool]:
+    """Detect if response contains expected structural elements.
+
+    For image cataloging tasks, we expect outputs to include captions,
+    keywords, and/or descriptions. This detects their presence.
+
+    Args:
+        text: Generated text to analyze
+
+    Returns:
+        Dict indicating presence of each structural element
+    """
+    if not text:
+        return {
+            "has_caption": False,
+            "has_keywords": False,
+            "has_description": False,
+            "has_sections": False,
+        }
+
+    text_lower = text.lower()
+
+    # Check for labeled sections (flexible matching)
+    # Note: Using character class [:] to match both ASCII and fullwidth colons
+    has_caption = bool(
+        re.search(r"\b(caption|title)\s*:", text_lower) or text_lower.startswith("caption"),
+    )
+    has_keywords = bool(
+        re.search(r"\b(keywords?|tags?)\s*:", text_lower)
+        or re.search(r"^[-•*]\s*\w+$", text, re.MULTILINE),  # Bullet list of single words
+    )
+    has_description = bool(
+        re.search(r"\b(description|details?|summary)\s*:", text_lower),
+    )
+    has_sections = bool(re.search(r"^#{1,3}\s+\w+", text, re.MULTILINE))
+
+    return {
+        "has_caption": has_caption,
+        "has_keywords": has_keywords,
+        "has_description": has_description,
+        "has_sections": has_sections,
+    }
+
+
+def compute_confidence_indicators(text: str) -> dict[str, float | int]:
+    """Analyze text for confidence/certainty indicators.
+
+    Hedge words indicate uncertainty; definitive language indicates confidence.
+    The ratio helps assess how certain the model is about its descriptions.
+
+    Args:
+        text: Generated text to analyze
+
+    Returns:
+        Dict with:
+        - hedge_count: Number of hedge words/phrases
+        - definitive_count: Number of definitive statements
+        - confidence_ratio: Ratio of definitive to (definitive + hedge)
+    """
+    if not text:
+        return {"hedge_count": 0, "definitive_count": 0, "confidence_ratio": 0.0}
+
+    text_lower = text.lower()
+
+    # Hedge words/phrases indicating uncertainty
+    hedge_patterns = [
+        r"\bappears to\b",
+        r"\bseems to\b",
+        r"\blooks like\b",
+        r"\bmight be\b",
+        r"\bcould be\b",
+        r"\bpossibly\b",
+        r"\bperhaps\b",
+        r"\bprobably\b",
+        r"\blikely\b",
+        r"\bmaybe\b",
+        r"\bi think\b",
+        r"\bi believe\b",
+        r"\bit's unclear\b",
+        r"\buncertain\b",
+    ]
+
+    # Definitive patterns indicating confidence
+    definitive_patterns = [
+        r"\bis a\b",
+        r"\bare \w+\b",
+        r"\bshows\b",
+        r"\bdepicts\b",
+        r"\bfeatures\b",
+        r"\bcontains\b",
+        r"\bdefinitely\b",
+        r"\bclearly\b",
+        r"\bobviously\b",
+    ]
+
+    hedge_count = sum(len(re.findall(p, text_lower)) for p in hedge_patterns)
+    definitive_count = sum(len(re.findall(p, text_lower)) for p in definitive_patterns)
+
+    total = hedge_count + definitive_count
+    confidence_ratio = definitive_count / total if total > 0 else 0.5
+
+    return {
+        "hedge_count": hedge_count,
+        "definitive_count": definitive_count,
+        "confidence_ratio": round(confidence_ratio, 2),
+    }
 
 
 @dataclass(frozen=True)
@@ -5481,6 +5666,8 @@ def _log_verbose_success_details_mode(
         _log_detailed_timings(res)
         log_blank()
         _log_perf_block(res)
+        log_blank()
+        _log_additional_diagnostics(res, gen_text)
     else:
         _log_compact_metrics(res)
 
@@ -5575,6 +5762,80 @@ def _log_perf_block(res: PerformanceResult) -> None:
     _log_mem("├─", "Active Δ:", "active_memory", active_mem)
     _log_mem("├─", "Cache Δ:", "cached_memory", cached_mem)
     _log_mem("└─", "Peak:", "peak_memory", peak_mem)
+
+
+def _log_additional_diagnostics(res: PerformanceResult, gen_text: str) -> None:
+    """Log additional output diagnostics for detailed metrics mode.
+
+    Displays:
+    - Vocabulary diversity (type-token ratio)
+    - Efficiency metrics (tokens per GB)
+    - Response structure indicators
+    - Confidence indicators
+    """
+    if not gen_text:
+        return
+
+    gen_tokens = getattr(res.generation, "generation_tokens", 0) or 0
+    generation_time = res.generation_time
+    peak_mem = getattr(res.generation, "peak_memory", 0.0) or 0.0
+
+    log_metric_label("Output Analysis:", emoji="🔍", indent="  ")
+
+    # Vocabulary diversity
+    ttr, unique_words, total_words = compute_vocabulary_diversity(gen_text)
+    log_metric_tree(
+        "├─",
+        "Vocabulary:",
+        f"TTR={ttr:.2f} ({unique_words}/{total_words} unique words)",
+        indent="     ",
+    )
+
+    # Efficiency metrics
+    efficiency = compute_efficiency_metrics(gen_tokens, generation_time, peak_mem)
+    if efficiency["tokens_per_second_per_gb"]:
+        log_metric_tree(
+            "├─",
+            "Efficiency:",
+            f"{efficiency['tokens_per_second_per_gb']:.1f} tok/s/GB",
+            indent="     ",
+        )
+
+    # Response structure
+    structure = detect_response_structure(gen_text)
+    structure_parts = []
+    if structure["has_caption"]:
+        structure_parts.append("caption")
+    if structure["has_keywords"]:
+        structure_parts.append("keywords")
+    if structure["has_description"]:
+        structure_parts.append("description")
+    if structure["has_sections"]:
+        structure_parts.append("sections")
+
+    structure_str = ", ".join(structure_parts) if structure_parts else "unstructured"
+    log_metric_tree(
+        "├─",
+        "Structure:",
+        structure_str,
+        indent="     ",
+    )
+
+    # Confidence indicators
+    confidence = compute_confidence_indicators(gen_text)
+    conf_ratio = confidence["confidence_ratio"]
+    if conf_ratio > QUALITY.high_confidence_threshold:
+        conf_label = "high"
+    elif conf_ratio > QUALITY.medium_confidence_threshold:
+        conf_label = "medium"
+    else:
+        conf_label = "low"
+    log_metric_tree(
+        "└─",
+        "Confidence:",
+        f"{conf_label} ({conf_ratio:.0%})",
+        indent="     ",
+    )
 
 
 def _log_compact_metrics(res: PerformanceResult) -> None:

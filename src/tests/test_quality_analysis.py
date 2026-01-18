@@ -159,3 +159,94 @@ def test_repetitive_phrase_detection_uses_quality_thresholds() -> None:
     assert check_models.QUALITY.min_phrase_repetitions >= 2
     assert check_models.QUALITY.max_phrase_repetitions > check_models.QUALITY.min_phrase_repetitions
     assert 0 < check_models.QUALITY.phrase_coverage_threshold < 1
+
+
+# =============================================================================
+# Tests for new diagnostic functions
+# =============================================================================
+
+
+def test_compute_vocabulary_diversity_basic() -> None:
+    """Test vocabulary diversity computation."""
+    # High diversity - all unique words
+    ttr, unique, total = check_models.compute_vocabulary_diversity("The quick brown fox jumps")
+    assert total == 5
+    assert unique == 5
+    assert ttr == 1.0
+
+    # Low diversity - repetitive
+    ttr, unique, total = check_models.compute_vocabulary_diversity("yes yes yes yes")
+    assert total == 4
+    assert unique == 1
+    assert ttr == 0.25
+
+    # Empty text
+    ttr, unique, total = check_models.compute_vocabulary_diversity("")
+    assert ttr == 0.0
+    assert unique == 0
+    assert total == 0
+
+
+def test_compute_efficiency_metrics() -> None:
+    """Test efficiency metrics computation."""
+    metrics = check_models.compute_efficiency_metrics(
+        tokens_generated=100,
+        generation_time=2.0,
+        peak_memory_gb=5.0,
+    )
+    assert metrics["tokens_per_second"] == 50.0
+    assert metrics["tokens_per_gb"] == 20.0
+    assert metrics["tokens_per_second_per_gb"] == 10.0
+
+    # Missing data returns None
+    metrics = check_models.compute_efficiency_metrics(
+        tokens_generated=100,
+        generation_time=None,
+        peak_memory_gb=None,
+    )
+    assert metrics["tokens_per_second"] is None
+    assert metrics["tokens_per_gb"] is None
+
+
+def test_detect_response_structure() -> None:
+    """Test response structure detection."""
+    # Text with clear structure
+    text = """Caption: A beautiful sunset
+
+    Keywords: sunset, beach, ocean
+
+    Description: The image shows a sunset over the ocean."""
+    structure = check_models.detect_response_structure(text)
+    assert structure["has_caption"] is True
+    assert structure["has_keywords"] is True
+    assert structure["has_description"] is True
+
+    # Plain text without structure
+    text_plain = "A beautiful sunset over the ocean with orange and pink colors."
+    structure_plain = check_models.detect_response_structure(text_plain)
+    assert structure_plain["has_caption"] is False
+    assert structure_plain["has_keywords"] is False
+
+    # Empty text
+    structure_empty = check_models.detect_response_structure("")
+    assert structure_empty["has_caption"] is False
+
+
+def test_compute_confidence_indicators() -> None:
+    """Test confidence indicator computation."""
+    # High confidence text
+    confident = "The image shows a red car. It is parked in a garage."
+    indicators = check_models.compute_confidence_indicators(confident)
+    assert indicators["definitive_count"] > 0
+    assert indicators["confidence_ratio"] > 0.5
+
+    # Uncertain text
+    uncertain = "It appears to be a car. It might be red. Perhaps it's in a garage."
+    indicators = check_models.compute_confidence_indicators(uncertain)
+    assert indicators["hedge_count"] > 0
+    assert indicators["confidence_ratio"] < 0.5
+
+    # Empty text
+    empty_indicators = check_models.compute_confidence_indicators("")
+    assert empty_indicators["hedge_count"] == 0
+    assert empty_indicators["definitive_count"] == 0
