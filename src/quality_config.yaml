@@ -42,6 +42,26 @@ thresholds:
   min_key_terms_threshold: 3      # Minimum key terms needed to evaluate context usage
   min_missing_ratio: 0.75         # Minimum ratio of missing terms (75%)
 
+  # Confidence thresholds for output analysis
+  high_confidence_threshold: 0.7  # High confidence ratio
+  medium_confidence_threshold: 0.4  # Medium confidence ratio
+
+  # Cataloging utility thresholds
+  min_useful_words: 5             # Minimum words for useful output
+  short_output_words: 15          # Output considered "short"
+  substantial_prose_words: 20     # Words needed for "substantial" prose
+  max_caption_words: 15           # Max words for implicit caption detection
+  min_useful_chars: 10            # Minimum chars for useful output
+  severe_echo_threshold: 0.8      # Echo ratio triggering severe penalty
+  moderate_echo_threshold: 0.5    # Echo ratio triggering moderate penalty
+  low_grounding_threshold: 0.3    # Visual grounding considered low
+  low_compliance_threshold: 0.5   # Task compliance considered low
+  low_info_gain_threshold: 0.3    # Information gain considered low
+  grade_a_threshold: 80.0         # Score for A grade
+  grade_b_threshold: 65.0         # Score for B grade
+  grade_c_threshold: 50.0         # Score for C grade
+  grade_d_threshold: 35.0         # Score for D grade
+
 patterns:
   # Hallucination detection
   hallucination_question_indicators:

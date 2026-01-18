@@ -219,6 +219,22 @@ class QualityThresholds:
     high_confidence_threshold: float = 0.7
     medium_confidence_threshold: float = 0.4
 
+    # Cataloging utility thresholds
+    min_useful_words: int = 5  # Minimum words for useful output
+    short_output_words: int = 15  # Output considered "short"
+    substantial_prose_words: int = 20  # Words needed for "substantial" prose
+    max_caption_words: int = 15  # Max words for implicit caption detection
+    min_useful_chars: int = 10  # Minimum chars for useful output
+    severe_echo_threshold: float = 0.8  # Echo ratio triggering severe penalty
+    moderate_echo_threshold: float = 0.5  # Echo ratio triggering moderate penalty
+    low_grounding_threshold: float = 0.3  # Visual grounding considered low
+    low_compliance_threshold: float = 0.5  # Task compliance considered low
+    low_info_gain_threshold: float = 0.3  # Information gain considered low
+    grade_a_threshold: float = 80.0  # Score for A grade
+    grade_b_threshold: float = 65.0  # Score for B grade
+    grade_c_threshold: float = 50.0  # Score for C grade
+    grade_d_threshold: float = 35.0  # Score for D grade
+
     # Patterns (loaded from config)
     patterns: dict[str, list[str]] | None = None
 
@@ -527,6 +543,10 @@ class PerformanceResult:
     error_package: str | None = None  # Package that caused error (mlx, mlx-vlm, transformers, etc.)
     # MOD: Added full traceback for actionable GitHub issue reports
     error_traceback: str | None = None  # Full traceback for error diagnosis
+    # MOD: Cataloging utility metrics for actionable quality assessment
+    cataloging_utility_score: float | None = None  # 0-100 utility score
+    cataloging_utility_grade: str | None = None  # A-F grade
+    cataloging_primary_weakness: str | None = None  # Main issue limiting utility
 
 
 class ResultSet:
@@ -2089,6 +2109,336 @@ def compute_confidence_indicators(text: str) -> dict[str, float | int]:
     }
 
 
+# =============================================================================
+# CATALOGING-SPECIFIC QUALITY METRICS
+# =============================================================================
+
+
+def compute_information_gain(text: str, context: str | None) -> dict[str, float | int]:
+    """Measure novel information in output beyond what was provided in context.
+
+    For cataloging tasks, we want models to add value beyond just echoing the
+    context hint. This measures how much new information the model contributes.
+
+    Args:
+        text: Generated text to analyze
+        context: Original context/hint provided to the model
+
+    Returns:
+        Dict with:
+        - context_words: Words from context
+        - output_words: Words in output
+        - novel_words: Words in output not in context
+        - echo_ratio: Fraction of output that's just echoed context (lower = better)
+        - information_gain: Fraction of output that's novel (higher = better)
+    """
+    if not text:
+        return {
+            "context_words": 0,
+            "output_words": 0,
+            "novel_words": 0,
+            "echo_ratio": 0.0,
+            "information_gain": 0.0,
+        }
+
+    # Extract meaningful words (lowercase, alpha only, 3+ chars)
+    def extract_words(s: str) -> set[str]:
+        return {w.lower() for w in re.findall(r"\b[a-zA-Z]{3,}\b", s)}
+
+    output_words = extract_words(text)
+    context_words = extract_words(context) if context else set()
+
+    if not output_words:
+        return {
+            "context_words": len(context_words),
+            "output_words": 0,
+            "novel_words": 0,
+            "echo_ratio": 0.0,
+            "information_gain": 0.0,
+        }
+
+    # Words in output that came from context (echoed)
+    echoed_words = output_words & context_words
+    # Words in output that are novel (not in context)
+    novel_words = output_words - context_words
+
+    echo_ratio = len(echoed_words) / len(output_words) if output_words else 0.0
+    information_gain = len(novel_words) / len(output_words) if output_words else 0.0
+
+    return {
+        "context_words": len(context_words),
+        "output_words": len(output_words),
+        "novel_words": len(novel_words),
+        "echo_ratio": round(echo_ratio, 2),
+        "information_gain": round(information_gain, 2),
+    }
+
+
+def compute_task_compliance(text: str) -> dict[str, bool | float]:
+    """Check if output follows the requested structure for cataloging tasks.
+
+    When asked for "caption, description, and keywords", models should provide
+    all three components. This measures compliance with that structure.
+
+    Args:
+        text: Generated text to analyze
+
+    Returns:
+        Dict with:
+        - has_caption: Contains a caption or title
+        - has_description: Contains descriptive text
+        - has_keywords: Contains keywords or tags
+        - compliance_score: 0-1 score based on components present
+    """
+    if not text:
+        return {
+            "has_caption": False,
+            "has_description": False,
+            "has_keywords": False,
+            "compliance_score": 0.0,
+        }
+
+    text_lower = text.lower()
+
+    # Check for explicit labeled sections
+    has_explicit_caption = bool(re.search(r"\b(caption|title)\s*:", text_lower))
+    has_explicit_description = bool(re.search(r"\b(description|details?|summary)\s*:", text_lower))
+    has_explicit_keywords = bool(re.search(r"\b(keywords?|tags?)\s*:", text_lower))
+
+    # Check for implicit structure (bullet lists for keywords, paragraphs for description)
+    has_bullet_list = bool(re.search(r"^[-•*]\s+\w+", text, re.MULTILINE))
+    has_paragraph = len(text.split()) > QUALITY.substantial_prose_words
+
+    # Combine explicit and implicit signals
+    has_caption = has_explicit_caption or (
+        # First line could be a caption if short and followed by more text
+        len(text.split("\n")[0].split()) <= QUALITY.max_caption_words and len(text.split("\n")) > 1
+    )
+    has_description = has_explicit_description or has_paragraph
+    has_keywords = has_explicit_keywords or has_bullet_list
+
+    # Score: 1/3 for each component
+    score = (
+        (0.33 if has_caption else 0.0)
+        + (0.34 if has_description else 0.0)
+        + (0.33 if has_keywords else 0.0)
+    )
+
+    return {
+        "has_caption": has_caption,
+        "has_description": has_description,
+        "has_keywords": has_keywords,
+        "compliance_score": round(score, 2),
+    }
+
+
+def compute_visual_grounding(text: str, context: str | None) -> dict[str, float | int]:
+    """Measure references to actual visual elements vs. just context regurgitation.
+
+    Good cataloging descriptions should reference what's actually visible in the
+    image - colors, objects, people, actions, spatial relationships - not just
+    repeat location/date metadata from the context.
+
+    Args:
+        text: Generated text to analyze
+        context: Original context provided (to distinguish visual from contextual)
+
+    Returns:
+        Dict with:
+        - visual_terms: Count of visual description terms
+        - spatial_terms: Count of spatial relationship terms
+        - color_terms: Count of color references
+        - grounding_score: 0-1 overall visual grounding score
+    """
+    if not text:
+        return {
+            "visual_terms": 0,
+            "spatial_terms": 0,
+            "color_terms": 0,
+            "grounding_score": 0.0,
+        }
+
+    text_lower = text.lower()
+    context_lower = (context or "").lower()
+
+    # Visual object/element terms (things you can see)
+    visual_patterns = [
+        r"\b(building|house|shop|store|street|road|car|vehicle|person|people|pedestrian)\b",
+        r"\b(sign|window|door|roof|wall|brick|stone|glass)\b",
+        r"\b(tree|sky|cloud|hill|mountain|grass|flower)\b",
+        r"\b(light|lamp|shadow|reflection|glow)\b",
+        r"\b(wearing|standing|sitting|walking|driving)\b",
+    ]
+
+    # Spatial relationship terms
+    spatial_patterns = [
+        r"\b(left|right|center|middle|foreground|background)\b",
+        r"\b(above|below|beside|behind|front|back)\b",
+        r"\b(near|far|distant|close|adjacent)\b",
+        r"\b(top|bottom|side|corner|edge)\b",
+    ]
+
+    # Color terms
+    color_patterns = [
+        r"\b(red|blue|green|yellow|orange|purple|pink|brown|black|white|gray|grey)\b",
+        r"\b(golden|silver|bronze|dark|light|bright|pale|vivid)\b",
+        r"\b(warm|cool|muted|saturated)\b",
+    ]
+
+    def count_matches(patterns: list[str], text: str) -> int:
+        return sum(len(re.findall(p, text)) for p in patterns)
+
+    visual_count = count_matches(visual_patterns, text_lower)
+    spatial_count = count_matches(spatial_patterns, text_lower)
+    color_count = count_matches(color_patterns, text_lower)
+
+    # Penalize if visual terms are just from context (not novel observations)
+    context_visual = count_matches(visual_patterns, context_lower) if context else 0
+    novel_visual = max(0, visual_count - context_visual)
+
+    # Calculate grounding score (weighted combination)
+    # More weight to novel visual observations
+    word_count = len(text.split())
+    if word_count == 0:
+        grounding_score = 0.0
+    else:
+        # Normalize by output length, cap at 1.0
+        raw_score = (novel_visual * 2 + spatial_count + color_count) / max(word_count / 10, 1)
+        grounding_score = min(1.0, raw_score)
+
+    return {
+        "visual_terms": visual_count,
+        "spatial_terms": spatial_count,
+        "color_terms": color_count,
+        "grounding_score": round(grounding_score, 2),
+    }
+
+
+def _compute_echo_penalty(echo_ratio: float) -> float:
+    """Compute penalty factor based on context echo ratio."""
+    if echo_ratio > QUALITY.severe_echo_threshold:
+        return 0.5  # Severe penalty for mostly echoing
+    if echo_ratio > QUALITY.moderate_echo_threshold:
+        return 0.8  # Moderate penalty
+    return 1.0  # No penalty
+
+
+def _compute_length_factor(word_count: int) -> tuple[float, str]:
+    """Compute length factor and weakness message based on word count."""
+    if word_count < QUALITY.min_useful_words:
+        return 0.2, "Output too short to be useful"
+    if word_count < QUALITY.short_output_words:
+        return 0.6, "Output lacks detail"
+    return 1.0, ""
+
+
+def _identify_primary_weakness(
+    echo_ratio: float,
+    grounding_score: float,
+    compliance_score: float,
+    information_gain_score: float,
+) -> str:
+    """Identify the primary weakness limiting cataloging utility."""
+    if echo_ratio > QUALITY.moderate_echo_threshold:
+        return "Mostly echoes context without adding value"
+    if grounding_score < QUALITY.low_grounding_threshold:
+        return "Lacks visual description of image content"
+    if compliance_score < QUALITY.low_compliance_threshold:
+        return "Missing requested structure (caption/description/keywords)"
+    if information_gain_score < QUALITY.low_info_gain_threshold:
+        return "Limited novel information"
+    return "None identified"
+
+
+def _score_to_grade(score: float) -> str:
+    """Convert numeric score to letter grade."""
+    if score >= QUALITY.grade_a_threshold:
+        return "A"
+    if score >= QUALITY.grade_b_threshold:
+        return "B"
+    if score >= QUALITY.grade_c_threshold:
+        return "C"
+    if score >= QUALITY.grade_d_threshold:
+        return "D"
+    return "F"
+
+
+def compute_cataloging_utility(
+    text: str,
+    context: str | None,
+    *,
+    info_gain: dict[str, float | int] | None = None,
+    task_compliance: dict[str, bool | float] | None = None,
+    visual_grounding: dict[str, float | int] | None = None,
+) -> dict[str, float | str]:
+    """Compute overall cataloging utility score combining all metrics.
+
+    This is the primary "is this output useful for cataloging?" metric.
+
+    Args:
+        text: Generated text to analyze
+        context: Original context provided
+        info_gain: Pre-computed information gain (computed if None)
+        task_compliance: Pre-computed task compliance (computed if None)
+        visual_grounding: Pre-computed visual grounding (computed if None)
+
+    Returns:
+        Dict with:
+        - utility_score: 0-100 overall utility for cataloging
+        - utility_grade: Letter grade (A-F)
+        - primary_weakness: Main issue limiting utility
+    """
+    if not text or len(text.strip()) < QUALITY.min_useful_chars:
+        return {
+            "utility_score": 0.0,
+            "utility_grade": "F",
+            "primary_weakness": "Empty or minimal output",
+        }
+
+    # Compute sub-metrics if not provided
+    if info_gain is None:
+        info_gain = compute_information_gain(text, context)
+    if task_compliance is None:
+        task_compliance = compute_task_compliance(text)
+    if visual_grounding is None:
+        visual_grounding = compute_visual_grounding(text, context)
+
+    # Extract key values
+    information_gain_score = float(info_gain.get("information_gain", 0.0))
+    echo_ratio = float(info_gain.get("echo_ratio", 0.0))
+    compliance_score = float(task_compliance.get("compliance_score", 0.0))
+    grounding_score = float(visual_grounding.get("grounding_score", 0.0))
+
+    # Compute penalties and factors
+    echo_penalty = _compute_echo_penalty(echo_ratio)
+    word_count = len(text.split())
+    length_factor, length_weakness = _compute_length_factor(word_count)
+
+    # Weighted combination (out of 100)
+    raw_score = (
+        information_gain_score * 25  # 25 points for adding new info
+        + compliance_score * 30  # 30 points for following structure
+        + grounding_score * 30  # 30 points for visual descriptions
+        + min(word_count / 50, 1.0) * 15  # 15 points for reasonable length
+    )
+
+    final_score = raw_score * echo_penalty * length_factor
+
+    # Determine weakness
+    weakness = length_weakness or _identify_primary_weakness(
+        echo_ratio,
+        grounding_score,
+        compliance_score,
+        information_gain_score,
+    )
+
+    return {
+        "utility_score": round(final_score, 1),
+        "utility_grade": _score_to_grade(final_score),
+        "primary_weakness": weakness,
+    }
+
+
 @dataclass(frozen=True)
 class GenerationQualityAnalysis:
     """Analysis results for generated text quality.
@@ -3427,8 +3777,16 @@ def _wrap_output_column_in_details(html_table: str, output_col_idx: int) -> str:
     return "\n".join(result_lines)
 
 
-def analyze_model_issues(results: list[PerformanceResult]) -> dict[str, Any]:
-    """Analyze results to identify common model issues and calculate performance highlights."""
+def analyze_model_issues(
+    results: list[PerformanceResult],
+    context: str | None = None,
+) -> dict[str, Any]:
+    """Analyze results to identify common model issues and calculate performance highlights.
+
+    Args:
+        results: List of model performance results
+        context: Optional context string (from prompt) for cataloging utility analysis
+    """
     summary: dict[str, Any] = {
         "total_models": len(results),
         "failed_models": [],
@@ -3437,6 +3795,12 @@ def analyze_model_issues(results: list[PerformanceResult]) -> dict[str, Any]:
         "verbose_models": [],
         "formatting_issues": [],
         "excessive_bullets": [],
+        # Cataloging utility summary
+        "cataloging_grades": {},  # grade -> list of model names
+        "cataloging_best": None,  # (model_name, score, grade)
+        "cataloging_worst": None,  # (model_name, score, grade)
+        "cataloging_avg_score": 0.0,
+        "low_utility_models": [],  # Models with grade D or F
     }
 
     # Separate successful and failed results
@@ -3486,6 +3850,9 @@ def analyze_model_issues(results: list[PerformanceResult]) -> dict[str, Any]:
         tokens_per_gb = total_tokens / total_mem if total_mem > 0 else 0
         summary["memory_efficiency"] = tokens_per_gb
 
+    # Track cataloging utility scores for aggregation
+    utility_scores: list[tuple[str, float, str, str]] = []  # (model, score, grade, weakness)
+
     for res in results:
         if not res.success:
             summary["failed_models"].append(
@@ -3514,6 +3881,32 @@ def analyze_model_issues(results: list[PerformanceResult]) -> dict[str, Any]:
                 )
             if analysis.has_excessive_bullets:
                 summary["excessive_bullets"].append((res.model_name, analysis.bullet_count))
+
+            # Compute cataloging utility
+            utility = compute_cataloging_utility(text, context)
+            score = float(utility["utility_score"])
+            grade = str(utility["utility_grade"])
+            weakness = str(utility["primary_weakness"])
+            utility_scores.append((res.model_name, score, grade, weakness))
+
+            # Group by grade
+            summary["cataloging_grades"].setdefault(grade, []).append(res.model_name)
+
+            # Track low utility models (D or F)
+            if grade in ("D", "F"):
+                summary["low_utility_models"].append((res.model_name, score, grade, weakness))
+
+    # Compute cataloging summary statistics
+    if utility_scores:
+        # Best and worst
+        best = max(utility_scores, key=lambda x: x[1])
+        worst = min(utility_scores, key=lambda x: x[1])
+        summary["cataloging_best"] = (best[0], best[1], best[2])
+        summary["cataloging_worst"] = (worst[0], worst[1], worst[2])
+
+        # Average score
+        avg_score = sum(s[1] for s in utility_scores) / len(utility_scores)
+        summary["cataloging_avg_score"] = avg_score
 
     return summary
 
@@ -3699,10 +4092,131 @@ def _format_quality_issues_html(summary: dict[str, Any]) -> list[str]:
     return parts
 
 
+def _format_cataloging_summary_html(summary: dict[str, Any]) -> list[str]:
+    """Format cataloging utility summary as HTML."""
+    parts: list[str] = []
+
+    # Only show if we have cataloging data
+    if not summary.get("cataloging_best"):
+        return parts
+
+    parts.append("<h3>📚 Cataloging Utility Summary</h3>")
+
+    # Grade distribution overview
+    grade_emojis = {"A": "🏆", "B": "✅", "C": "🟡", "D": "🟠", "F": "❌"}
+    grades = summary.get("cataloging_grades", {})
+    if grades:
+        grade_counts = []
+        for grade in ["A", "B", "C", "D", "F"]:
+            count = len(grades.get(grade, []))
+            if count > 0:
+                emoji = grade_emojis.get(grade, "")
+                grade_counts.append(f"{emoji} {grade}: {count}")
+        if grade_counts:
+            parts.append(f"<p><b>Grade Distribution:</b> {' | '.join(grade_counts)}</p>")
+
+    # Average score
+    avg_score = summary.get("cataloging_avg_score", 0)
+    if avg_score > 0:
+        parts.append(f"<p><b>Average Utility Score:</b> {avg_score:.0f}/100</p>")
+
+    # Best and worst performers
+    parts.append("<ul>")
+    if summary.get("cataloging_best"):
+        model, score, grade = summary["cataloging_best"]
+        emoji = grade_emojis.get(grade, "")
+        parts.append(
+            f"<li><b>Best for cataloging:</b> <code>{html.escape(model)}</code> "
+            f"({emoji} {grade}, {score:.0f}/100)</li>",
+        )
+    if summary.get("cataloging_worst"):
+        model, score, grade = summary["cataloging_worst"]
+        emoji = grade_emojis.get(grade, "")
+        parts.append(
+            f"<li><b>Worst for cataloging:</b> <code>{html.escape(model)}</code> "
+            f"({emoji} {grade}, {score:.0f}/100)</li>",
+        )
+    parts.append("</ul>")
+
+    # Low utility warnings
+    low_utility = summary.get("low_utility_models", [])
+    if low_utility:
+        parts.append(
+            f"<p><b class='metric-warn'>⚠️ {len(low_utility)} models "
+            "with low utility (D/F):</b></p>",
+        )
+        parts.append("<ul>")
+        for model, score, grade, weakness in low_utility:
+            emoji = grade_emojis.get(grade, "")
+            parts.append(
+                f"<li><code>{html.escape(model)}</code>: {emoji} {grade} ({score:.0f}/100) "
+                f"- {html.escape(weakness)}</li>",
+            )
+        parts.append("</ul>")
+
+    return parts
+
+
+def _format_cataloging_summary_text(summary: dict[str, Any]) -> list[str]:
+    """Format cataloging utility summary as Markdown text."""
+    parts: list[str] = []
+
+    # Only show if we have cataloging data
+    if not summary.get("cataloging_best"):
+        return parts
+
+    parts.append("## 📚 Cataloging Utility Summary")
+    parts.append("")
+
+    # Grade distribution overview
+    grade_emojis = {"A": "🏆", "B": "✅", "C": "🟡", "D": "🟠", "F": "❌"}
+    grades = summary.get("cataloging_grades", {})
+    if grades:
+        grade_counts = []
+        for grade in ["A", "B", "C", "D", "F"]:
+            count = len(grades.get(grade, []))
+            if count > 0:
+                emoji = grade_emojis.get(grade, "")
+                grade_counts.append(f"{emoji} {grade}: {count}")
+        if grade_counts:
+            parts.append(f"**Grade Distribution:** {' | '.join(grade_counts)}")
+            parts.append("")
+
+    # Average score
+    avg_score = summary.get("cataloging_avg_score", 0)
+    if avg_score > 0:
+        parts.append(f"**Average Utility Score:** {avg_score:.0f}/100")
+        parts.append("")
+
+    # Best and worst performers
+    if summary.get("cataloging_best"):
+        model, score, grade = summary["cataloging_best"]
+        emoji = grade_emojis.get(grade, "")
+        parts.append(f"- **Best for cataloging:** `{model}` ({emoji} {grade}, {score:.0f}/100)")
+    if summary.get("cataloging_worst"):
+        model, score, grade = summary["cataloging_worst"]
+        emoji = grade_emojis.get(grade, "")
+        parts.append(f"- **Worst for cataloging:** `{model}` ({emoji} {grade}, {score:.0f}/100)")
+    parts.append("")
+
+    # Low utility warnings
+    low_utility = summary.get("low_utility_models", [])
+    if low_utility:
+        parts.append(f"### ⚠️ {len(low_utility)} Models with Low Utility (D/F)")
+        parts.append("")
+        for model, score, grade, weakness in low_utility:
+            emoji = grade_emojis.get(grade, "")
+            parts.append(f"- `{model}`: {emoji} {grade} ({score:.0f}/100) - {weakness}")
+        parts.append("")
+
+    return parts
+
+
 def format_issues_summary_html(summary: dict[str, Any], stats: dict[str, Any]) -> str:
     """Format the issues and statistics summary as an HTML string."""
     parts = []
     parts.extend(_format_top_performers_html(summary))
+    parts.extend(_format_cataloging_summary_html(summary))
     parts.extend(_format_quality_issues_html(summary))
 
     # General Stats
@@ -3874,6 +4388,7 @@ def format_issues_summary_text(summary: dict[str, Any], stats: dict[str, Any]) -
     parts = []
 
     parts.extend(_format_top_performers_text(summary))
+    parts.extend(_format_cataloging_summary_text(summary))
     parts.extend(_format_quality_issues_text(summary))
 
     # General Stats
@@ -4229,8 +4744,11 @@ def generate_html_report(
     output_col_idx = len(field_names) - 1  # output is last column
     html_table = _wrap_output_column_in_details(html_table, output_col_idx)
 
+    # Extract context from prompt for cataloging utility analysis
+    context = _extract_context_from_prompt(prompt)
+
     # Analyze model issues and generate summary
-    summary = analyze_model_issues(results)
+    summary = analyze_model_issues(results, context)
     stats = compute_performance_statistics(results)
     issues_summary_html = format_issues_summary_html(summary, stats)
 
@@ -4444,8 +4962,11 @@ def generate_markdown_report(
         log_warning_note("No table data to generate Markdown report.")
         return
 
+    # Extract context from prompt for cataloging utility analysis
+    context = _extract_context_from_prompt(prompt)
+
     # Analyze model issues and generate summary
-    summary = analyze_model_issues(results)
+    summary = analyze_model_issues(results, context)
     stats = compute_performance_statistics(results)
     issues_text = format_issues_summary_text(summary, stats)
 
@@ -5660,7 +6181,7 @@ def _log_verbose_success_details_mode(
         log_blank()
         _log_perf_block(res)
         log_blank()
-        _log_additional_diagnostics(res, gen_text)
+        _log_additional_diagnostics(res, gen_text, prompt=prompt)
     else:
         _log_compact_metrics(res)
 
@@ -5757,22 +6278,13 @@ def _log_perf_block(res: PerformanceResult) -> None:
     _log_mem("└─", "Peak:", "peak_memory", peak_mem)
 
 
-def _log_additional_diagnostics(res: PerformanceResult, gen_text: str) -> None:
-    """Log additional output diagnostics for detailed metrics mode.
-
-    Displays:
-    - Vocabulary diversity (type-token ratio)
-    - Efficiency metrics (tokens per GB)
-    - Response structure indicators
-    - Confidence indicators
-    """
-    if not gen_text:
-        return
-
-    gen_tokens = getattr(res.generation, "generation_tokens", 0) or 0
-    generation_time = res.generation_time
-    peak_mem = getattr(res.generation, "peak_memory", 0.0) or 0.0
-
+def _log_output_analysis(
+    gen_text: str,
+    gen_tokens: int,
+    generation_time: float,
+    peak_mem: float,
+) -> None:
+    """Log output analysis section: vocabulary, efficiency, structure, confidence."""
     log_metric_label("Output Analysis:", emoji="🔍", indent="  ")
 
     # Vocabulary diversity
@@ -5829,6 +6341,118 @@ def _log_additional_diagnostics(res: PerformanceResult, gen_text: str) -> None:
         f"{conf_label} ({conf_ratio:.0%})",
         indent="     ",
     )
+
+
+def _get_grade_display(grade: str) -> str:
+    """Return emoji-decorated grade display string."""
+    grade_emojis = {"A": "🏆", "B": "✅", "C": "🟡", "D": "🟠"}
+    emoji = grade_emojis.get(grade, "❌")
+    return f"{emoji} {grade}"
+
+
+def _log_cataloging_utility(gen_text: str, context: str | None) -> None:
+    """Log cataloging utility metrics section."""
+    log_metric_label("Cataloging Utility:", emoji="📚", indent="  ")
+
+    # Information gain
+    info_gain = compute_information_gain(gen_text, context)
+    echo_ratio = info_gain["echo_ratio"]
+    log_metric_tree(
+        "├─",
+        "Info Gain:",
+        f"{info_gain['information_gain']:.0%} novel "
+        f"({info_gain['novel_words']}/{info_gain['output_words']} words)",
+        indent="     ",
+    )
+    if echo_ratio > QUALITY.moderate_echo_threshold:
+        log_metric_tree(
+            "│ ",
+            "",
+            f"⚠️  {echo_ratio:.0%} echoed from context",
+            indent="     ",
+        )
+
+    # Task compliance
+    compliance = compute_task_compliance(gen_text)
+    compliance_parts = [
+        "✓ caption" if compliance["has_caption"] else "✗ caption",
+        "✓ desc" if compliance["has_description"] else "✗ desc",
+        "✓ keywords" if compliance["has_keywords"] else "✗ keywords",
+    ]
+    log_metric_tree(
+        "├─",
+        "Compliance:",
+        f"{', '.join(compliance_parts)} ({compliance['compliance_score']:.0%})",
+        indent="     ",
+    )
+
+    # Visual grounding
+    grounding = compute_visual_grounding(gen_text, context)
+    grounding_detail = (
+        f"{grounding['visual_terms']} visual, "
+        f"{grounding['spatial_terms']} spatial, "
+        f"{grounding['color_terms']} color"
+    )
+    log_metric_tree(
+        "├─",
+        "Grounding:",
+        f"{grounding['grounding_score']:.0%} ({grounding_detail})",
+        indent="     ",
+    )
+
+    # Overall utility
+    utility = compute_cataloging_utility(
+        gen_text,
+        context,
+        info_gain=info_gain,
+        task_compliance=compliance,
+        visual_grounding=grounding,
+    )
+    grade = str(utility["utility_grade"])
+    grade_display = _get_grade_display(grade)
+    log_metric_tree(
+        "└─",
+        "UTILITY:",
+        f"{grade_display} ({utility['utility_score']:.0f}/100) - {utility['primary_weakness']}",
+        indent="     ",
+    )
+
+
+def _extract_context_from_prompt(prompt: str | None) -> str | None:
+    """Extract the context section from a prompt string."""
+    if not prompt:
+        return None
+    context_match = re.search(r"Context:\s*(.+?)(?:\n\n|$)", prompt, re.DOTALL)
+    return context_match.group(1) if context_match else None
+
+
+def _log_additional_diagnostics(
+    res: PerformanceResult,
+    gen_text: str,
+    *,
+    prompt: str | None = None,
+) -> None:
+    """Log additional output diagnostics for detailed metrics mode.
+
+    Displays:
+    - Vocabulary diversity (type-token ratio)
+    - Efficiency metrics (tokens per GB)
+    - Response structure indicators
+    - Confidence indicators
+    - Cataloging utility metrics (information gain, task compliance, visual grounding)
+    """
+    if not gen_text:
+        return
+
+    gen_tokens = getattr(res.generation, "generation_tokens", 0) or 0
+    generation_time = res.generation_time or 0.0
+    peak_mem = getattr(res.generation, "peak_memory", 0.0) or 0.0
+
+    _log_output_analysis(gen_text, gen_tokens, generation_time, peak_mem)
+
+    log_blank()
+    context = _extract_context_from_prompt(prompt)
+    _log_cataloging_utility(gen_text, context)
 
 
 def _log_compact_metrics(res: PerformanceResult) -> None:
