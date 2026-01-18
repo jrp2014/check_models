@@ -274,11 +274,6 @@ def load_quality_config(config_path: Path | None = None) -> None:
 
 MIN_SEPARATOR_CHARS: Final[int] = 50
 DEFAULT_DECIMAL_PLACES: Final[int] = 2
-# DEPRECATED - Use FORMATTING constants instead (kept for backward compatibility)
-LARGE_NUMBER_THRESHOLD: Final[float] = FORMATTING.large_number
-MEDIUM_NUMBER_THRESHOLD: Final[float] = FORMATTING.medium_number
-THOUSAND_THRESHOLD: Final[int] = FORMATTING.thousand_separator
-MEMORY_GB_INTEGER_THRESHOLD: Final[float] = FORMATTING.memory_gb_integer
 MARKDOWN_HARD_BREAK_SPACES: Final[int] = 2  # Preserve exactly two trailing spaces for hard breaks
 IMAGE_OPEN_TIMEOUT: Final[float] = 5.0  # Timeout for opening/verifying image files
 GENERATION_WRAP_WIDTH: Final[int] = 100  # Console output wrapping width for generated text
@@ -386,7 +381,7 @@ try:
 except ImportError:
     mlx_lm_version = NOT_AVAILABLE
 except AttributeError:
-    mlx_lm_version = "N/A (module found, no version attr)"
+    mlx_lm_version = f"{NOT_AVAILABLE} (module found, no version attr)"
 _transformers_guard_enabled: bool = os.getenv("MLX_VLM_ALLOW_TF", "0") != "1"
 if _transformers_guard_enabled:
     # Prevent Transformers from importing heavy backends that can hang on macOS/ARM
@@ -1007,8 +1002,6 @@ handler.setFormatter(formatter)
 logger.handlers.clear()
 logger.addHandler(handler)
 
-# Removed unused constants (DEFAULT_TIMEOUT_LONG, MB_CONVERSION, GB_CONVERSION, DISPLAY_WRAP_WIDTH)
-# to reduce surface area; they had no runtime references.
 DECIMAL_GB: Final[float] = 1_000_000_000.0  # Decimal GB (mlx-vlm already divides by 1e9)
 MEM_BYTES_TO_GB_THRESHOLD: Final[float] = 1_000_000.0  # > ~1MB treat as raw bytes from mlx
 MEGAPIXEL_CONVERSION: Final[float] = 1_000_000.0  # Convert pixels to megapixels
@@ -1079,10 +1072,10 @@ def fmt_num(val: float | str) -> str:
     """Format numbers consistently with thousands separators across all output formats."""
     try:
         fval = float(val)
-        if abs(fval) >= LARGE_NUMBER_THRESHOLD:
+        if abs(fval) >= FORMATTING.large_number:
             return f"{fval:,.0f}"
-        # For integers or whole numbers, use comma separator if >= THOUSAND_THRESHOLD
-        if fval == int(fval) and abs(fval) >= THOUSAND_THRESHOLD:
+        # For integers or whole numbers, use comma separator if >= thousand_separator
+        if fval == int(fval) and abs(fval) >= FORMATTING.thousand_separator:
             return f"{int(fval):,}"
         if abs(fval) > 0:
             return f"{fval:.3g}"
@@ -1222,7 +1215,7 @@ def _format_memory_value_gb(num: float) -> str:
     if num <= 0:
         return "0"
     gb: float = (num / DECIMAL_GB) if num > MEM_BYTES_TO_GB_THRESHOLD else num
-    if gb >= MEMORY_GB_INTEGER_THRESHOLD:
+    if gb >= FORMATTING.memory_gb_integer:
         return f"{gb:,.0f}"
     if gb >= 1:
         return f"{gb:,.1f}"
@@ -1236,9 +1229,9 @@ def _format_time_seconds(num: float) -> str:
 
 def _format_tps(num: float) -> str:
     """Format tokens-per-second with adaptive precision."""
-    if abs(num) >= LARGE_NUMBER_THRESHOLD:
+    if abs(num) >= FORMATTING.large_number:
         return f"{num:,.0f}"
-    if abs(num) >= MEDIUM_NUMBER_THRESHOLD:
+    if abs(num) >= FORMATTING.medium_number:
         return f"{num:.1f}"
     return f"{num:.3g}"
 
@@ -5878,7 +5871,7 @@ def _log_compact_metrics(res: PerformanceResult) -> None:
         mem_str = f"{mem_fmt}GB" if not str(mem_fmt).endswith("GB") else str(mem_fmt)
         mem_part = f" | Memory: {mem_str} peak"
 
-    line1 = f"📊 Timing: {timing_parts[0] if timing_parts else 'N/A'}{mem_part}"
+    line1 = f"📊 Timing: {timing_parts[0] if timing_parts else NOT_AVAILABLE}{mem_part}"
     logger.info(line1, extra={"style_hint": LogStyles.METRIC_LABEL})
 
     # Line 2: Tokens and Speed
