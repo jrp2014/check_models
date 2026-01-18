@@ -16,8 +16,15 @@ if [[ "${CI:-false}" == "false" ]] && command -v conda &> /dev/null; then
         source "$HOME/miniconda3/etc/profile.d/conda.sh"
     elif [ -f "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
         source "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
+    elif [ -f "/opt/homebrew/anaconda3/etc/profile.d/conda.sh" ]; then
+        source "/opt/homebrew/anaconda3/etc/profile.d/conda.sh"
+    elif [ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]; then
+        source "$HOME/anaconda3/etc/profile.d/conda.sh"
     fi
-    conda activate $CONDA_ENV 2>/dev/null || true
+    if ! conda activate $CONDA_ENV 2>/dev/null; then
+        echo "⚠️  Warning: Could not activate conda environment '$CONDA_ENV'"
+        echo "   Run: conda activate $CONDA_ENV"
+    fi
 fi
 
 # Determine Python executable
