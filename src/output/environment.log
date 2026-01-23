@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-01-23 21:39:59 GMT
+FULL ENVIRONMENT DUMP - 2026-01-23 22:47:33 GMT
 ================================================================================
 
 --- pip freeze ---
@@ -16,7 +16,7 @@ certifi==2026.1.4
 cffi==2.0.0
 cfgv==3.5.0
 charset-normalizer==3.4.4
--e git+https://github.com/jrp2014/check_models.git@e4051b301e6fb30e0e1f635f542e8e97140a4231#egg=check_models&subdirectory=src
+-e git+https://github.com/jrp2014/check_models.git@78f48c23049d70481e8924ef05eacee0cf5ead72#egg=check_models&subdirectory=src
 click==8.3.1
 cmake==4.2.1
 coverage==7.13.1
@@ -56,7 +56,7 @@ ml_dtypes==0.5.4
 -e git+https://github.com/ml-explore/mlx.git@dc81c1503a5e133f5c4a022d961a5b15523e5f5f#egg=mlx
 -e git+https://github.com/ml-explore/mlx-lm.git@12073b1db42005ef20ad24e82911ed235727a162#egg=mlx_lm
 mlx-metal==0.30.3
--e git+https://github.com/Blaizzy/mlx-vlm.git@9601d3d3f823664f13dd7e92099012dd47c3003f#egg=mlx_vlm
+mlx-vlm @ file:///Users/jrp/Documents/AI/mlx/mlx-vlm
 mpmath==1.3.0
 multidict==6.7.0
 multiprocess==0.70.18
@@ -308,5 +308,5 @@ yarl                       1.22.0                       pypi_0              pypi
 zlib                       1.3.1                        h5f15de7_0
 
 ================================================================================
-Environment dump completed at 2026-01-23 21:40:00 GMT
+Environment dump completed at 2026-01-23 22:47:34 GMT
 ================================================================================
