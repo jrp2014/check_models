@@ -5925,6 +5925,8 @@ def _run_model_generation(
         logger.exception("Runtime error for %s", params.model_identifier)
         raise ValueError(msg) from gen_err
 
+    # Force GPU synchronization to ensures timing includes all pending compute (MLX is lazy)
+    mx.synchronize()
     duration = timer.stop()
 
     # Capture memory metrics immediately after generation while model is still active

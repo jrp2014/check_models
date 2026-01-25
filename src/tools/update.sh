@@ -408,8 +408,9 @@ if [[ "${SKIP_MLX:-0}" == "1" ]] || [[ $SKIP_MLX_PYPI -eq 1 ]]; then
 		echo "[update.sh] Skipping PyPI MLX updates (using local development builds)"
 	fi
 else
-	echo "[update.sh] Updating MLX packages from PyPI..."
-	pip_install mlx mlx-vlm mlx-lm
+	echo "[update.sh] Updating MLX packages from PyPI to latest..."
+	# Explicitly upgrade MLX ecosystem from PyPI, triggering eager transitive upgrades
+	pip_install mlx mlx-lm mlx-vlm 
 fi
 
 echo "[update.sh] Done."
