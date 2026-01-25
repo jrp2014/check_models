@@ -10,7 +10,7 @@ Usage examples
     python -m tools.generate_stubs --clear && \
         python -m tools.generate_stubs mlx_vlm
 
-Notes
+Notes:
 -----
 - Requires mypy to be installed (provides ``stubgen``).
 - Generated stubs are shallow by default; refine by hand for critical APIs.
@@ -253,6 +253,10 @@ def main() -> int:
         # Apply post-processing patches for mlx_vlm stubs
         if any(pkg.split(".")[0] == "mlx_vlm" for pkg in ns.packages):
             _patch_mlx_vlm_stubs(TYPINGS_DIR)
+
+        # Count and report generated stub files
+        stub_count = sum(1 for _ in TYPINGS_DIR.rglob("*.pyi"))
+        logger.info("[stubs] Generated %d stub files (.pyi)", stub_count)
         logger.info("[stubs] Done")
     return int(code)
 
