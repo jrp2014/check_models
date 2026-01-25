@@ -3333,7 +3333,9 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
             # casts removed as redundant since Any matches everything,
             # and passing Any to these functions is valid if unsafe.
             # Using cast() here was just visual noise.
-            # Cast to SupportsExifIfd because standard PIL stubs don't yet see get_ifd() on Exif class
+            # Cast to SupportsExifIfd because standard PIL stubs don't yet see
+            # get_ifd() on Exif class or treat it as a union that doesn't fully satisfy the
+            # protocol.
             exif_decoded: ExifDict = _process_ifd0(exif_raw)
             exif_decoded.update(_process_exif_subifd(cast("SupportsExifIfd", exif_raw)))
             gps_decoded = _process_gps_ifd(cast("SupportsExifIfd", exif_raw))
@@ -3482,12 +3484,18 @@ def _extract_description(exif_data: ExifDict) -> str | None:
         return None
     if isinstance(description, bytes):
         try:
-            desc = description.decode("utf-8", errors="replace").strip()
-        except UnicodeDecodeError as err:
-            desc = str(description)
-            logger.debug("Failed to decode description: %s", err)
+            # Try strict UTF-8 first
+            desc = description.decode("utf-8").replace("\x00", "").strip()
+        except UnicodeDecodeError:
+            # Fallback to Latin-1 (CP1252 subset maps 1:1, usually correct for legacy EXIF)
+            # This handles "copyright" symbols (\xa9) correctly where utf-8 would fail
+            try:
+                desc = description.decode("latin-1").replace("\x00", "").strip()
+            except (UnicodeDecodeError, AttributeError) as err:
+                desc = str(description)
+                logger.debug("Failed to decode description with fallbacks: %s", err)
     else:
-        desc = str(description).strip()
+        desc = str(description).replace("\x00", "").strip()
     return desc or None
 
 
@@ -3563,14 +3571,22 @@ def _extract_gps_str(gps_info_raw: Mapping[Any, Any] | None) -> str | None:
 
     try:
         lat_ref_str: str = (
-            lat_ref.decode("ascii", errors="replace")
-            if isinstance(lat_ref, bytes)
-            else str(lat_ref)
+            (
+                lat_ref.decode("ascii", errors="replace")
+                if isinstance(lat_ref, bytes)
+                else str(lat_ref)
+            )
+            .replace("\x00", "")
+            .strip()
         )
         lon_ref_str: str = (
-            lon_ref.decode("ascii", errors="replace")
-            if isinstance(lon_ref, bytes)
-            else str(lon_ref)
+            (
+                lon_ref.decode("ascii", errors="replace")
+                if isinstance(lon_ref, bytes)
+                else str(lon_ref)
+            )
+            .replace("\x00", "")
+            .strip()
         )
         lat_dd, lat_card = dms_to_dd(latitude, lat_ref_str)
         lon_dd, lon_card = dms_to_dd(longitude, lon_ref_str)
