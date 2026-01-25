@@ -62,7 +62,7 @@ try:
 except ImportError:  # pragma: no cover - optional
     psutil_mod = None
 
-psutil: Any | None = psutil_mod
+psutil: types.ModuleType | None = psutil_mod
 
 if TYPE_CHECKING:
     import types
@@ -3237,13 +3237,13 @@ def print_image_dimensions(image_path: PathLike) -> None:
 
 
 # --- EXIF & Metadata Handling ---
-def _process_ifd0(exif_raw: Mapping[object, object]) -> ExifDict:
+def _process_ifd0(exif_raw: Mapping[int, Any]) -> ExifDict:
     exif_decoded: ExifDict = {}
     for tag_id, value in exif_raw.items():
         # Skip SubIFD pointers, we'll handle them separately
         if tag_id in (ExifTags.Base.ExifOffset, ExifTags.Base.GPSInfo):
             continue
-        tag_id = cast("int", tag_id)
+        # tag_id is int per signature, no cast needed
         tag_name: str = TAGS.get(tag_id, str(tag_id))
         exif_decoded[tag_name] = value
     return exif_decoded
@@ -3328,9 +3328,15 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
             if not exif_raw:
                 logger.debug("No EXIF data found in %s", image_str)
                 return None
-            exif_decoded: ExifDict = _process_ifd0(cast("Any", exif_raw))
-            exif_decoded.update(_process_exif_subifd(cast("Any", exif_raw)))
-            gps_decoded = _process_gps_ifd(cast("Any", exif_raw))
+
+            # exif_raw is Any (from img.getexif logic), but we expect it to match our protocols
+            # casts removed as redundant since Any matches everything,
+            # and passing Any to these functions is valid if unsafe.
+            # Using cast() here was just visual noise.
+            # Cast to SupportsExifIfd because standard PIL stubs don't yet see get_ifd() on Exif class
+            exif_decoded: ExifDict = _process_ifd0(exif_raw)
+            exif_decoded.update(_process_exif_subifd(cast("SupportsExifIfd", exif_raw)))
+            gps_decoded = _process_gps_ifd(cast("SupportsExifIfd", exif_raw))
             if gps_decoded:
                 exif_decoded["GPSInfo"] = gps_decoded
             return exif_decoded
@@ -4732,7 +4738,8 @@ def _build_full_html_document(
             with Image.open(image_path) as img_original:
                 # Resize if larger than 1024px in either dimension
                 max_size = 1024
-                img_to_save = img_original
+                # Explicitly type as generic Image to handle both ImageFile and resized Image
+                img_to_save: Image.Image = img_original
                 if img_original.width > max_size or img_original.height > max_size:
                     # Calculate new dimensions maintaining aspect ratio
                     ratio = min(max_size / img_original.width, max_size / img_original.height)

@@ -240,10 +240,9 @@ disallow_incomplete_defs = true
 module = "tests.*"
 ignore_errors = true
 
-# Ignore errors in MLX libraries (avoid issues with stubs in older/newer versions)
+# Ignore missing stubs warnings for MLX libraries, but CHECK errors if stubs exist
 [[tool.mypy.overrides]]
 module = ["mlx_vlm.*", "mlx_lm.*", "tokenizers.*", "huggingface_hub.*"]
-ignore_errors = true
 ignore_missing_imports = true
 follow_imports = "skip"
 
