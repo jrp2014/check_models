@@ -3326,7 +3326,7 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
         with img:
             exif_raw: Any = img.getexif()
             if not exif_raw:
-                logger.debug("No EXIF data found in %s", image_str)
+                logger.warning("No EXIF data found in %s", image_str)
                 return None
 
             # exif_raw is Any (from img.getexif logic), but we expect it to match our protocols
