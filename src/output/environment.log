@@ -1,9 +1,9 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-01-23 22:47:33 GMT
+FULL ENVIRONMENT DUMP - 2026-01-30 22:34:13 GMT
 ================================================================================
 
 --- pip freeze ---
-absl-py==2.3.1
+absl-py==2.4.0
 aiohappyeyeballs==2.6.1
 aiohttp==3.13.3
 aiosignal==1.4.0
@@ -12,19 +12,20 @@ annotated-types==0.7.0
 anyio==4.12.1
 astunparse==1.6.3
 attrs==25.4.0
+build==1.4.0
 certifi==2026.1.4
 cffi==2.0.0
 cfgv==3.5.0
 charset-normalizer==3.4.4
--e git+https://github.com/jrp2014/check_models.git@78f48c23049d70481e8924ef05eacee0cf5ead72#egg=check_models&subdirectory=src
+-e git+https://github.com/jrp2014/check_models.git@6dd9a8feb5f9ef02498c4c37209de0643ef927a3#egg=check_models&subdirectory=src
 click==8.3.1
 cmake==4.2.1
-coverage==7.13.1
+coverage==7.13.2
 datasets==4.5.0
 dill==0.4.0
 distlib==0.4.0
 docopt==0.6.2
-einops==0.8.1
+einops==0.8.2
 execnet==2.1.2
 fastapi==0.128.0
 filelock==3.20.3
@@ -39,13 +40,13 @@ h5py==3.15.1
 hf-xet==1.2.0
 httpcore==1.0.9
 httpx==0.28.1
-huggingface_hub==1.3.3
+huggingface_hub==1.3.5
 identify==2.6.16
 idna==3.11
 iniconfig==2.3.0
 inquirerpy==0.3.4
 Jinja2==3.1.6
-keras==3.13.1
+keras==3.13.2
 libclang==18.1.1
 librt==0.7.8
 Markdown==3.10.1
@@ -53,12 +54,12 @@ markdown-it-py==4.0.0
 MarkupSafe==3.0.3
 mdurl==0.1.2
 ml_dtypes==0.5.4
--e git+https://github.com/ml-explore/mlx.git@dc81c1503a5e133f5c4a022d961a5b15523e5f5f#egg=mlx
--e git+https://github.com/ml-explore/mlx-lm.git@12073b1db42005ef20ad24e82911ed235727a162#egg=mlx_lm
-mlx-metal==0.30.3
-mlx-vlm @ file:///Users/jrp/Documents/AI/mlx/mlx-vlm
+-e git+https://github.com/ml-explore/mlx.git@8ef539522c089a0465e170d19bd96cd97accdef2#egg=mlx
+-e git+https://github.com/ml-explore/mlx-lm.git@1ecd27a31a92b0cb117768d7a7c3a5cf8a676218#egg=mlx_lm
+mlx-metal==0.30.4
+-e git+https://github.com/Blaizzy/mlx-vlm.git@aaab6e53014baad7cb5ec8af9a2a81e3c9c288cc#egg=mlx_vlm
 mpmath==1.3.0
-multidict==6.7.0
+multidict==6.7.1
 multiprocess==0.70.18
 mypy==1.19.1
 mypy_extensions==1.1.0
@@ -74,7 +75,7 @@ opt_einsum==3.4.0
 optree==0.18.0
 packaging==26.0
 pandas==3.0.0
-pathspec==1.0.3
+pathspec==1.0.4
 pfzy==0.3.4
 pillow==12.1.0
 platformdirs==4.5.1
@@ -82,14 +83,15 @@ pluggy==1.6.0
 pre_commit==4.5.1
 prompt_toolkit==3.0.52
 propcache==0.4.1
-protobuf==6.33.4
-psutil==7.2.1
+protobuf==6.33.5
+psutil==7.2.2
 pyarrow==23.0.0
 pycparser==3.0
 pydantic==2.12.5
 pydantic_core==2.41.5
 Pygments==2.19.2
-pyrefly==0.49.0
+pyproject_hooks==1.2.0
+pyrefly==0.50.1
 pytest==9.0.2
 pytest-cov==7.0.0
 pytest-xdist==3.8.0
@@ -98,11 +100,11 @@ pytz==2025.2
 PyYAML==6.0.3
 regex==2026.1.15
 requests==2.32.5
-rich==14.2.0
+rich==14.3.1
 ruff==0.14.14
 safetensors==0.7.0
 sentencepiece==0.2.1
-setuptools==80.10.1
+setuptools==80.10.2
 shellingham==1.5.4
 six==1.17.0
 sniffio==1.3.1
@@ -119,10 +121,10 @@ torch==2.10.0
 torchaudio==2.10.0
 torchvision==0.25.0
 tqdm==4.67.1
-transformers==5.0.0rc3
-ty==0.0.13
+transformers==5.0.0
+ty==0.0.14
 typer-slim==0.21.1
-types-psutil==7.2.1.20260116
+types-psutil==7.2.2.20260130
 types-PyYAML==6.0.12.20250915
 types-requests==2.32.4.20260107
 types-simplejson==3.20.0.20250822
@@ -148,7 +150,7 @@ yarl==1.22.0
 # packages in environment at /opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm:
 #
 # Name                     Version                      Build               Channel
-absl-py                    2.3.1                        pypi_0              pypi
+absl-py                    2.4.0                        pypi_0              pypi
 aiohappyeyeballs           2.6.1                        pypi_0              pypi
 aiohttp                    3.13.3                       pypi_0              pypi
 aiosignal                  1.4.0                        pypi_0              pypi
@@ -157,6 +159,7 @@ annotated-types            0.7.0                        pypi_0              pypi
 anyio                      4.12.1                       pypi_0              pypi
 astunparse                 1.6.3                        pypi_0              pypi
 attrs                      25.4.0                       pypi_0              pypi
+build                      1.4.0                        pypi_0              pypi
 bzip2                      1.0.8                        h80987f9_6
 ca-certificates            2025.12.2                    hca03da5_0
 certifi                    2026.1.4                     pypi_0              pypi
@@ -166,12 +169,12 @@ charset-normalizer         3.4.4                        pypi_0              pypi
 check-models               0.1.0                        pypi_0              pypi
 click                      8.3.1                        pypi_0              pypi
 cmake                      4.2.1                        pypi_0              pypi
-coverage                   7.13.1                       pypi_0              pypi
+coverage                   7.13.2                       pypi_0              pypi
 datasets                   4.5.0                        pypi_0              pypi
 dill                       0.4.0                        pypi_0              pypi
 distlib                    0.4.0                        pypi_0              pypi
 docopt                     0.6.2                        pypi_0              pypi
-einops                     0.8.1                        pypi_0              pypi
+einops                     0.8.2                        pypi_0              pypi
 execnet                    2.1.2                        pypi_0              pypi
 expat                      2.7.3                        h50f4ffc_4
 fastapi                    0.128.0                      pypi_0              pypi
@@ -187,15 +190,15 @@ h5py                       3.15.1                       pypi_0              pypi
 hf-xet                     1.2.0                        pypi_0              pypi
 httpcore                   1.0.9                        pypi_0              pypi
 httpx                      0.28.1                       pypi_0              pypi
-huggingface-hub            1.3.3                        pypi_0              pypi
+huggingface-hub            1.3.5                        pypi_0              pypi
 identify                   2.6.16                       pypi_0              pypi
 idna                       3.11                         pypi_0              pypi
 iniconfig                  2.3.0                        pypi_0              pypi
 inquirerpy                 0.3.4                        pypi_0              pypi
 jinja2                     3.1.6                        pypi_0              pypi
-keras                      3.13.1                       pypi_0              pypi
+keras                      3.13.2                       pypi_0              pypi
 libclang                   18.1.1                       pypi_0              pypi
-libcxx                     20.1.8                       hd7fd590_1
+libcxx                     21.1.8                       hb4ce287_0
 libexpat                   2.7.3                        h50f4ffc_4
 libffi                     3.4.4                        hca03da5_1
 libmpdec                   4.0.0                        h80987f9_0
@@ -206,12 +209,12 @@ markdown-it-py             4.0.0                        pypi_0              pypi
 markupsafe                 3.0.3                        pypi_0              pypi
 mdurl                      0.1.2                        pypi_0              pypi
 ml-dtypes                  0.5.4                        pypi_0              pypi
-mlx                        0.30.4.dev20260123+dc81c150  pypi_0              pypi
-mlx-lm                     0.30.5                       pypi_0              pypi
-mlx-metal                  0.30.3                       pypi_0              pypi
+mlx                        0.30.5.dev20260130+8ef53952  pypi_0              pypi
+mlx-lm                     0.30.6                       pypi_0              pypi
+mlx-metal                  0.30.4                       pypi_0              pypi
 mlx-vlm                    0.3.10                       pypi_0              pypi
 mpmath                     1.3.0                        pypi_0              pypi
-multidict                  6.7.0                        pypi_0              pypi
+multidict                  6.7.1                        pypi_0              pypi
 multiprocess               0.70.18                      pypi_0              pypi
 mypy                       1.19.1                       pypi_0              pypi
 mypy-extensions            1.1.0                        pypi_0              pypi
@@ -224,12 +227,12 @@ nodeenv                    1.10.0                       pypi_0              pypi
 num2words                  0.5.14                       pypi_0              pypi
 numpy                      2.4.1                        pypi_0              pypi
 opencv-python              4.13.0.90                    pypi_0              pypi
-openssl                    3.0.18                       h9b4081a_0
+openssl                    3.0.19                       ha0b305a_0
 opt-einsum                 3.4.0                        pypi_0              pypi
 optree                     0.18.0                       pypi_0              pypi
 packaging                  26.0                         pypi_0              pypi
 pandas                     3.0.0                        pypi_0              pypi
-pathspec                   1.0.3                        pypi_0              pypi
+pathspec                   1.0.4                        pypi_0              pypi
 pfzy                       0.3.4                        pypi_0              pypi
 pillow                     12.1.0                       pypi_0              pypi
 pip                        25.3                         pyhc872135_0
@@ -238,14 +241,15 @@ pluggy                     1.6.0                        pypi_0              pypi
 pre-commit                 4.5.1                        pypi_0              pypi
 prompt-toolkit             3.0.52                       pypi_0              pypi
 propcache                  0.4.1                        pypi_0              pypi
-protobuf                   6.33.4                       pypi_0              pypi
-psutil                     7.2.1                        pypi_0              pypi
+protobuf                   6.33.5                       pypi_0              pypi
+psutil                     7.2.2                        pypi_0              pypi
 pyarrow                    23.0.0                       pypi_0              pypi
 pycparser                  3.0                          pypi_0              pypi
 pydantic                   2.12.5                       pypi_0              pypi
 pydantic-core              2.41.5                       pypi_0              pypi
 pygments                   2.19.2                       pypi_0              pypi
-pyrefly                    0.49.0                       pypi_0              pypi
+pyproject-hooks            1.2.0                        pypi_0              pypi
+pyrefly                    0.50.1                       pypi_0              pypi
 pytest                     9.0.2                        pypi_0              pypi
 pytest-cov                 7.0.0                        pypi_0              pypi
 pytest-xdist               3.8.0                        pypi_0              pypi
@@ -257,11 +261,11 @@ pyyaml                     6.0.3                        pypi_0              pypi
 readline                   8.3                          h0b18652_0
 regex                      2026.1.15                    pypi_0              pypi
 requests                   2.32.5                       pypi_0              pypi
-rich                       14.2.0                       pypi_0              pypi
+rich                       14.3.1                       pypi_0              pypi
 ruff                       0.14.14                      pypi_0              pypi
 safetensors                0.7.0                        pypi_0              pypi
 sentencepiece              0.2.1                        pypi_0              pypi
-setuptools                 80.10.1                      pypi_0              pypi
+setuptools                 80.10.2                      pypi_0              pypi
 shellingham                1.5.4                        pypi_0              pypi
 six                        1.17.0                       pypi_0              pypi
 sniffio                    1.3.1                        pypi_0              pypi
@@ -280,10 +284,10 @@ torch                      2.10.0                       pypi_0              pypi
 torchaudio                 2.10.0                       pypi_0              pypi
 torchvision                0.25.0                       pypi_0              pypi
 tqdm                       4.67.1                       pypi_0              pypi
-transformers               5.0.0rc3                     pypi_0              pypi
-ty                         0.0.13                       pypi_0              pypi
+transformers               5.0.0                        pypi_0              pypi
+ty                         0.0.14                       pypi_0              pypi
 typer-slim                 0.21.1                       pypi_0              pypi
-types-psutil               7.2.1.20260116               pypi_0              pypi
+types-psutil               7.2.2.20260130               pypi_0              pypi
 types-pyyaml               6.0.12.20250915              pypi_0              pypi
 types-requests             2.32.4.20260107              pypi_0              pypi
 types-simplejson           3.20.0.20250822              pypi_0              pypi
@@ -308,5 +312,5 @@ yarl                       1.22.0                       pypi_0              pypi
 zlib                       1.3.1                        h5f15de7_0
 
 ================================================================================
-Environment dump completed at 2026-01-23 22:47:34 GMT
+Environment dump completed at 2026-01-30 22:34:15 GMT
 ================================================================================

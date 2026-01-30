@@ -5824,7 +5824,7 @@ def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None
 
 def _load_model(
     params: ProcessImageParams,
-) -> tuple[Module, Any, Any | None]:
+) -> tuple[Module, PreTrainedTokenizer | PreTrainedTokenizerFast, Any | None]:
     """Load model from HuggingFace Hub or local path.
 
     Args:
@@ -5840,7 +5840,7 @@ def _load_model(
     )
     # Note: mlx-vlm.utils.load() is type-hinted to return Union[PreTrainedTokenizer, ...]
     # but at runtime it returns a Processor object (from AutoProcessor).
-    # We use Any here to avoid false positive type errors until upstream stubs are fixed.
+
     return model, processor, getattr(model, "config", None)
 
 
