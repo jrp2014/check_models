@@ -5898,7 +5898,7 @@ def _run_model_generation(
     try:
         output: GenerationResult | SupportsGenerationResult = generate(
             model=model,
-            processor=processor,
+            processor=cast("PreTrainedTokenizer", processor),
             prompt=formatted_prompt,
             image=str(params.image_path),
             verbose=params.verbose,
