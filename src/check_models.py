@@ -5824,21 +5824,24 @@ def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None
 
 def _load_model(
     params: ProcessImageParams,
-) -> tuple[Module, PreTrainedTokenizer | PreTrainedTokenizerFast, Any | None]:
+) -> tuple[Module, Any, Any | None]:
     """Load model from HuggingFace Hub or local path.
 
     Args:
         params: The parameters for image processing, including model identifier.
 
     Returns:
-        Tuple of (model, tokenizer, config) where config may be None.
+        Tuple of (model, processor, config) where config may be None.
     """
-    model, tokenizer = load(
+    model, processor = load(
         path_or_hf_repo=params.model_identifier,
         lazy=params.lazy,
         trust_remote_code=params.trust_remote_code,
     )
-    return model, tokenizer, getattr(model, "config", None)
+    # Note: mlx-vlm.utils.load() is type-hinted to return Union[PreTrainedTokenizer, ...]
+    # but at runtime it returns a Processor object (from AutoProcessor).
+    # We use Any here to avoid false positive type errors until upstream stubs are fixed.
+    return model, processor, getattr(model, "config", None)
 
 
 def _run_model_generation(
@@ -5857,12 +5860,12 @@ def _run_model_generation(
         timer: Optional timing strategy. If None, uses PerfCounterTimer.
     """
     model: Module
-    tokenizer: PreTrainedTokenizer | PreTrainedTokenizerFast
+    processor: Any
 
     # Load model from HuggingFace Hub - this handles automatic download/caching
     # and converts weights to MLX format for Apple Silicon optimization
     try:
-        model, tokenizer, config = _load_model(params)
+        model, processor, config = _load_model(params)
     except Exception as load_err:
         # Capture any model loading errors (config issues, missing files, etc.)
         # MOD: Enhanced error handling with cache integrity check
@@ -5877,7 +5880,7 @@ def _run_model_generation(
     # Apply model-specific chat template - each model has its own conversation format
     # (e.g., Llama uses <|begin_of_text|>, Phi-3 uses <|user|>, etc.)
     formatted_prompt: str | list[Any] = apply_chat_template(
-        processor=tokenizer,
+        processor=processor,
         config=config,
         prompt=params.prompt,
         num_images=1,
@@ -5895,7 +5898,7 @@ def _run_model_generation(
     try:
         output: GenerationResult | SupportsGenerationResult = generate(
             model=model,
-            processor=cast("PreTrainedTokenizer", tokenizer),  # Cast to expected type
+            processor=processor,
             prompt=formatted_prompt,
             image=str(params.image_path),
             verbose=params.verbose,
@@ -5907,7 +5910,6 @@ def _run_model_generation(
             kv_bits=params.kv_bits,
             kv_group_size=params.kv_group_size,
             quantized_kv_start=params.quantized_kv_start,
-            trust_remote_code=params.trust_remote_code,
             max_tokens=params.max_tokens,
         )
     except TimeoutError as gen_to_err:
