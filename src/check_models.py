@@ -4505,6 +4505,9 @@ def _format_failures_by_package_text(results: list[PerformanceResult]) -> list[s
 
     parts.append("## 🚨 Failures by Package (Actionable)")
     parts.append("")
+    # Disable MD060 (table column style) as this table may not be perfectly aligned
+    parts.append("<!-- markdownlint-disable MD060 -->")
+    parts.append("")
     parts.append("| Package | Failures | Error Types | Affected Models |")
     parts.append("|---------|----------|-------------|-----------------|")
 
@@ -4515,6 +4518,8 @@ def _format_failures_by_package_text(results: list[PerformanceResult]) -> list[s
             f"| `{pkg}` | {len(failures)} | {', '.join(error_types)} | {', '.join(models)} |",
         )
 
+    parts.append("")
+    parts.append("<!-- markdownlint-enable MD060 -->")
     parts.append("")
 
     # Generate per-package actionable sections
