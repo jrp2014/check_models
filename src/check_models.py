@@ -72,7 +72,8 @@ if TYPE_CHECKING:
 
     from mlx.nn import Module
     from mlx_vlm.generate import GenerationResult
-    from transformers import PreTrainedTokenizer, PreTrainedTokenizerFast
+    from transformers.tokenization_python import PythonBackend
+    from transformers.tokenization_utils_tokenizers import TokenizersBackend
 
 # Public API (PEP 8 / PEP 561 best practice)
 __all__ = [
@@ -5842,7 +5843,7 @@ def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None
 
 def _load_model(
     params: ProcessImageParams,
-) -> tuple[Module, PreTrainedTokenizer | PreTrainedTokenizerFast, Any | None]:
+) -> tuple[Module, PythonBackend | TokenizersBackend, Any | None]:
     """Load model from HuggingFace Hub or local path.
 
     Args:
@@ -5916,7 +5917,7 @@ def _run_model_generation(
     try:
         output: GenerationResult | SupportsGenerationResult = generate(
             model=model,
-            processor=cast("PreTrainedTokenizer", processor),
+            processor=cast("PythonBackend", processor),
             prompt=formatted_prompt,
             image=str(params.image_path),
             verbose=params.verbose,
@@ -5968,7 +5969,7 @@ def _run_model_generation(
 def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     """Process an image with a Vision Language Model, managing stats and errors."""
     model: Module | None = None
-    tokenizer: PreTrainedTokenizer | PreTrainedTokenizerFast | None = None
+    processor: PythonBackend | TokenizersBackend | None = None
     arch, gpu_info = get_system_info()
 
     # Track overall timing
@@ -6037,8 +6038,8 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         # Aggressive cleanup matching mlx-vlm/tests/test_smoke.py
         if model is not None:
             del model
-        if tokenizer is not None:
-            del tokenizer
+        if processor is not None:
+            del processor
 
         # Force synchronization and garbage collection
         mx.synchronize()
