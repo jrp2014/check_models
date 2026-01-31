@@ -1772,6 +1772,7 @@ def _detect_refusal_patterns(text: str) -> tuple[bool, str | None]:
 
     if not refusal_patterns:
         # Fallback defaults
+
         refusal_patterns = [
             (
                 "explicit_refusal",
