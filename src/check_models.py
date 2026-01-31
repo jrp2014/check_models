@@ -7,7 +7,9 @@ import argparse
 import base64
 import contextlib
 import dataclasses
+import gc
 import html
+import importlib.metadata
 import importlib.util as importlib_util
 import io
 import json
@@ -3004,24 +3006,35 @@ def log_rule(
 def get_library_versions() -> LibraryVersionDict:
     """Return versions of key libraries as a dictionary, using None for missing."""
 
-    def _none_if_na(v: object) -> str | None:
-        s = str(v) if v is not None else ""
-        s_norm = s.strip()
-        if not s_norm:
+    def _get_version(pkg_name: str, fallback: str | None = None) -> str | None:
+        try:
+            return importlib.metadata.version(pkg_name)
+        except importlib.metadata.PackageNotFoundError:
+            return fallback
+
+    def _none_if_na(v: str | None) -> str | None:
+        if v is None:
             return None
-        if s_norm == NOT_AVAILABLE or s_norm.startswith("N/A"):
+        s = str(v).strip()
+        if not s or s == NOT_AVAILABLE or s.startswith("N/A"):
             return None
-        return s_norm
+        return s
+
+    # Get MLX version (prefer metadata, fallback to module attribute)
+    mlx_ver = _get_version("mlx", getattr(mx, "__version__", None))
+
+    # Get MLX-VLM version
+    mlx_vlm_ver = _get_version("mlx-vlm", vlm_version if "vlm_version" in globals() else None)
 
     return {
-        "numpy": _none_if_na(numpy_version),
-        "mlx": _none_if_na(getattr(mx, "__version__", None)),
-        "mlx-vlm": _none_if_na(vlm_version) if "vlm_version" in globals() else None,
-        "mlx-lm": _none_if_na(mlx_lm_version),
-        "huggingface-hub": _none_if_na(hf_version),
-        "transformers": _none_if_na(transformers_version),
-        "tokenizers": _none_if_na(tokenizers_version),
-        "Pillow": _none_if_na(pillow_version),
+        "numpy": _none_if_na(_get_version("numpy", numpy_version)),
+        "mlx": _none_if_na(mlx_ver),
+        "mlx-vlm": _none_if_na(mlx_vlm_ver),
+        "mlx-lm": _none_if_na(_get_version("mlx-lm")),
+        "huggingface-hub": _none_if_na(_get_version("huggingface-hub", hf_version)),
+        "transformers": _none_if_na(_get_version("transformers")),
+        "tokenizers": _none_if_na(_get_version("tokenizers")),
+        "Pillow": _none_if_na(_get_version("Pillow", pillow_version)),
     }
 
 
@@ -5377,22 +5390,27 @@ def get_system_info() -> tuple[str, str | None]:
     arch: str = platform.machine()
     gpu_info: str | None = None
     try:
-        # Try to get GPU info on macOS using full path for security
+        # Try to get GPU info on macOS using full path and JSON output for robustness
+        # Matches mlx-vlm/tests/test_smoke.py implementation
         if platform.system() == "Darwin":
             result: subprocess.CompletedProcess[str] = subprocess.run(
-                ["/usr/sbin/system_profiler", "SPDisplaysDataType"],
+                ["/usr/sbin/system_profiler", "SPDisplaysDataType", "-json"],
                 capture_output=True,
                 text=True,
                 timeout=5,
                 check=False,
             )
             if result.returncode == 0:
-                # --- Extract GPU info from system_profiler output
-                gpu_lines: list[str] = [
-                    line for line in result.stdout.split("\n") if "Chipset Model:" in line
-                ]
-                if gpu_lines:
-                    gpu_info = gpu_lines[0].split("Chipset Model:")[-1].strip()
+                try:
+                    data = json.loads(result.stdout)
+                    # Navigate the JSON structure: SPDisplaysDataType -> [0] -> sppci_model
+                    # Note: keys can vary slightly, but 'sppci_model' or '_name' are common
+                    displays = data.get("SPDisplaysDataType", [])
+                    if displays:
+                        # Try commonly used keys for GPU name
+                        gpu_info = displays[0].get("sppci_model") or displays[0].get("_name")
+                except json.JSONDecodeError:
+                    logger.warning("Failed to parse system_profiler JSON output")
     except (subprocess.SubprocessError, TimeoutError) as e:
         logger.debug("Could not get GPU info: %s", e)
     return arch, gpu_info
@@ -6016,10 +6034,16 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             total_time=None,
         )
     finally:
+        # Aggressive cleanup matching mlx-vlm/tests/test_smoke.py
         if model is not None:
             del model
         if tokenizer is not None:
             del tokenizer
+
+        # Force synchronization and garbage collection
+        mx.synchronize()
+        gc.collect()
+
         # Clear both Metal and MLX caches for thorough GPU memory cleanup
         mx.clear_cache()
         mx.reset_peak_memory()
