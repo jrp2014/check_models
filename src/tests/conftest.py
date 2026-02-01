@@ -37,6 +37,25 @@ OUTPUT_DIR = SRC_DIR / "output"
 
 
 # =============================================================================
+# ENVIRONMENT FIXTURES
+# =============================================================================
+
+
+@pytest.fixture(autouse=True)
+def setup_hf_cache(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Ensure HuggingFace cache directory exists for all tests.
+
+    CI environments like GitHub Actions runners may not have the default
+    HF cache directory, causing CacheNotFound errors. This fixture creates
+    a temporary cache directory for each test.
+    """
+    cache_dir = tmp_path / "hf_cache"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    monkeypatch.setenv("HF_HUB_CACHE", str(cache_dir))
+    monkeypatch.setenv("HF_HOME", str(tmp_path / "hf_home"))
+
+
+# =============================================================================
 # LOGGING FIXTURES
 # =============================================================================
 
