@@ -24,6 +24,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 from huggingface_hub import scan_cache_dir
+from huggingface_hub.errors import CacheNotFound
 from PIL import Image
 
 if TYPE_CHECKING:
@@ -174,7 +175,7 @@ def fixture_model_cached() -> bool:
     fixture_model = "qnguyen3/nanoLLaVA"
     try:
         repo_ids = [r.repo_id for r in scan_cache_dir().repos]
-    except (OSError, ValueError, RuntimeError):
+    except (OSError, ValueError, RuntimeError, CacheNotFound):
         return False
     else:
         return fixture_model in repo_ids

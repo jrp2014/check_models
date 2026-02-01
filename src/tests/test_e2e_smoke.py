@@ -22,6 +22,7 @@ from unittest.mock import patch
 
 import pytest
 from huggingface_hub import scan_cache_dir
+from huggingface_hub.errors import CacheNotFound
 from PIL import Image
 
 # Import check_models
@@ -113,7 +114,7 @@ def _check_model_cached(model_id: str) -> bool:
     """Check if a model is already cached locally."""
     try:
         repos = scan_cache_dir().repos
-    except (OSError, ValueError, RuntimeError):
+    except (OSError, ValueError, RuntimeError, CacheNotFound):
         return False
     else:
         repo_ids = [r.repo_id for r in repos]
