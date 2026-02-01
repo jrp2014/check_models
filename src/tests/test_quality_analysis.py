@@ -69,25 +69,26 @@ def test_analyze_generation_text_formatting_violations() -> None:
 
 def test_analyze_generation_text_excessive_bullets() -> None:
     """Test detection of too many bullet points."""
-    # Excessive bullets = more than 10 (threshold from quality_config.yaml)
-    text = "\n".join([f"- Item {i}" for i in range(20)])
-    analysis = check_models.analyze_generation_text(text, 30)
+    # Excessive bullets = more than 25 (threshold from quality_config.yaml)
+    # Set high for cataloging prompts that request keyword lists
+    text = "\n".join([f"- Item {i}" for i in range(30)])
+    analysis = check_models.analyze_generation_text(text, 40)
 
     assert analysis.has_excessive_bullets
-    assert analysis.bullet_count == 20
+    assert analysis.bullet_count == 30
 
 
 def test_analyze_generation_text_multiple_issues() -> None:
     """Test that multiple issues can be detected simultaneously."""
-    # Repetitive (80%+ same token) + excessive bullets (>10)
+    # Repetitive (80%+ same token) + excessive bullets (>25)
     # Each line has only 2 tokens: "-" and "same", so "same" is 50% repetition (not enough)
     # Need to make "same" appear 80%+ of the time
-    text = "\n".join(["- same same same same"] * 20)  # "same" appears 80 times, "-" 20 times
-    analysis = check_models.analyze_generation_text(text, 100)
+    text = "\n".join(["- same same same same"] * 30)  # "same" appears 120 times, "-" 30 times
+    analysis = check_models.analyze_generation_text(text, 150)
 
     assert analysis.is_repetitive
     assert analysis.has_excessive_bullets
-    assert analysis.bullet_count == 20
+    assert analysis.bullet_count == 30
 
 
 def test_analyze_generation_text_returns_correct_type() -> None:

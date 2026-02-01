@@ -213,8 +213,8 @@ class QualityThresholds:
     min_meta_patterns: int = 2
     min_section_headers: int = 3
 
-    # Bullet point detection
-    max_bullets: int = 10
+    # Bullet point detection (set high for cataloging prompts with keyword lists)
+    max_bullets: int = 25
 
     # Generic output detection
     min_text_length_for_generic: int = 20

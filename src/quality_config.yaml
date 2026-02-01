@@ -31,7 +31,8 @@ thresholds:
   min_section_headers: 3         # Minimum section headers
 
   # Bullet point detection
-  max_bullets: 10                # Maximum allowed bullet points
+  # Note: Set high for cataloging prompts that request keyword lists
+  max_bullets: 25                # Maximum allowed bullet points
 
   # Generic output detection
   min_text_length_for_generic: 20 # Minimum text length to analyze for genericity
