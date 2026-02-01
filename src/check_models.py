@@ -536,7 +536,25 @@ EXIF_DATE_TAGS: Final[tuple[str, ...]] = (
 
 @dataclass(frozen=True)
 class PerformanceResult:
-    """Encapsulates a GenerationResult and execution metadata for a model run."""
+    """Encapsulates a GenerationResult and execution metadata for a model run.
+
+    Attributes:
+        model_name: HuggingFace model identifier (e.g., 'mlx-community/nanoLLaVA')
+        generation: The mlx-vlm GenerationResult, or None if generation failed
+        success: Whether generation completed without errors
+        error_stage: Which stage failed ('load', 'generate', 'timeout')
+        error_message: Human-readable error description
+        captured_output_on_fail: Stderr/stdout captured when error occurred
+        generation_time: Wall-clock time for text generation (excludes model load)
+        model_load_time: Wall-clock time to load model into GPU memory
+        total_time: End-to-end time including all stages
+        error_type: Exception class name for error categorization in reports
+        quality_issues: Comma-separated list of detected output problems
+        active_memory: GPU memory in use (GB), from mx.metal.get_active_memory()
+        cache_memory: GPU memory in cache (GB), from mx.metal.get_cache_memory()
+        error_package: Which package raised the error (mlx, mlx-vlm, transformers)
+        error_traceback: Full traceback for actionable error reports
+    """
 
     model_name: str
     generation: GenerationResult | SupportsGenerationResult | None
@@ -544,20 +562,15 @@ class PerformanceResult:
     error_stage: str | None = None
     error_message: str | None = None
     captured_output_on_fail: str | None = None
-    generation_time: float | None = None  # Time taken for generation in seconds
-    model_load_time: float | None = None  # Time taken to load the model in seconds
-    total_time: float | None = None  # Total time including model loading
-    # MOD: Added error_type to preserve original exception type for better error bucketing
-    error_type: str | None = None  # Original exception type name (e.g., "TypeError", "ImportError")
-    # MOD: Consolidated quality analysis into single field
-    quality_issues: str | None = None  # Detected issues (e.g., "repetitive, verbose")
-    # MOD: Added detailed memory profiling
-    active_memory: float | None = None  # Active GPU memory in GB
-    cache_memory: float | None = None  # Cached GPU memory in GB
-    # MOD: Added package attribution to identify which package caused the error
-    error_package: str | None = None  # Package that caused error (mlx, mlx-vlm, transformers, etc.)
-    # MOD: Added full traceback for actionable GitHub issue reports
-    error_traceback: str | None = None  # Full traceback for error diagnosis
+    generation_time: float | None = None
+    model_load_time: float | None = None
+    total_time: float | None = None
+    error_type: str | None = None
+    quality_issues: str | None = None
+    active_memory: float | None = None
+    cache_memory: float | None = None
+    error_package: str | None = None
+    error_traceback: str | None = None
 
 
 class ResultSet:
@@ -1055,8 +1068,8 @@ MAX_TUPLE_LEN: Final[int] = 10
 MAX_STR_LEN: Final[int] = 60
 STR_TRUNCATE_LEN: Final[int] = 57
 
-# Field display configuration: maps field names to (label, unit) tuples
-# This centralizes all field metadata in one place for consistency
+# Field display configuration: maps field names to (label, unit) tuples.
+# Used by format_field_label() and table generators for consistent column headers.
 FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
     "model_name": ("Model", "Name"),
     "prompt_tokens": ("Prompt", "(tokens)"),
@@ -1068,10 +1081,10 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
     "generation_time": ("Generation", "(s)"),
     "model_load_time": ("Load", "(s)"),
     "total_time": ("Total", "(s)"),
-    "quality_issues": ("Quality", "Issues"),  # MOD: Consolidated quality analysis
-    "active_memory": ("Active", "Mem (GB)"),  # MOD: Active GPU memory
-    "cache_memory": ("Cache", "Mem (GB)"),  # MOD: Cached GPU memory
-    "error_package": ("Error", "Package"),  # MOD: Package attribution
+    "quality_issues": ("Quality", "Issues"),
+    "active_memory": ("Active", "Mem (GB)"),
+    "cache_memory": ("Cache", "Mem (GB)"),
+    "error_package": ("Error", "Package"),
 }
 
 # Threshold for splitting long header text into multiple lines
@@ -1591,7 +1604,6 @@ def _detect_excessive_bullets(text: str) -> tuple[bool, int]:
     return bullet_count > threshold, bullet_count
 
 
-# MOD: Added context ignorance detection
 def _detect_context_ignorance(
     text: str,
     prompt: str,
@@ -2726,8 +2738,20 @@ def compute_cataloging_utility(
 class GenerationQualityAnalysis:
     """Analysis results for generated text quality.
 
-    Consolidates all quality checks (repetition, hallucination, verbosity,
-    formatting) into a single structured result to avoid duplicate analysis.
+    Consolidates all quality checks into a single structured result.
+    Each check detects a different failure mode:
+
+    - Repetition: Model stuck in a loop outputting same tokens
+    - Hallucination: Fabricated structures (tables, code) not in the image
+    - Verbosity: Excessive meta-commentary instead of content
+    - Formatting: HTML/Markdown artifacts breaking output display
+    - Context ignorance: Output doesn't reference provided context
+    - Refusal: Model declines to answer (capability or safety)
+    - Generic output: Boilerplate without image-specific content
+    - Language mixing: Unexpected language/script switches
+    - Degeneration: Garbage characters, encoding corruption
+    - Fabrication: Hallucinated specific details (dates, names, stats)
+    - Harness issues: mlx-vlm integration bugs, not model quality problems
     """
 
     is_repetitive: bool
@@ -2737,26 +2761,19 @@ class GenerationQualityAnalysis:
     formatting_issues: list[str]
     has_excessive_bullets: bool
     bullet_count: int
-    # MOD: Added context ignorance detection
     is_context_ignored: bool
     missing_context_terms: list[str]
-    # MOD: Added refusal/uncertainty detection
     is_refusal: bool
     refusal_type: str | None
-    # MOD: Added generic output detection
     is_generic: bool
     specificity_score: float
-    # MOD: Added language/code mixing detection
     has_language_mixing: bool
     language_mixing_issues: list[str]
-    # MOD: Added output degeneration detection (garbage/nonsense)
     has_degeneration: bool
     degeneration_type: str | None
-    # MOD: Added fabrication detection (hallucinated details)
     has_fabrication: bool
     fabrication_issues: list[str]
-    # MOD: Added harness/integration issue detection
-    # These indicate bugs in mlx-vlm or model integration, not model quality
+    # Harness issues indicate mlx-vlm integration bugs, not model quality problems
     has_harness_issue: bool
     harness_issue_type: str | None
     harness_issue_details: list[str]
@@ -2861,7 +2878,7 @@ def analyze_generation_text(
     formatting_issues = _detect_formatting_violations(text)
     has_excessive_bullets, bullet_count = _detect_excessive_bullets(text)
 
-    # MOD: Added context ignorance detection
+    # Context ignorance: output doesn't reference key terms from prompt
     is_context_ignored = False
     missing_context_terms: list[str] = []
     if prompt:
@@ -2871,23 +2888,22 @@ def analyze_generation_text(
             context_marker=context_marker,
         )
 
-    # MOD: Added refusal/uncertainty detection
+    # Refusal detection: model declines to answer
     is_refusal, refusal_type = _detect_refusal_patterns(text)
 
-    # MOD: Added generic output detection
+    # Generic output: boilerplate without image-specific content
     is_generic, specificity_score = _detect_generic_output(text)
 
-    # MOD: Added language/code mixing detection
+    # Language mixing: unexpected language/script switches
     has_language_mixing, language_mixing_issues = _detect_language_mixing(text)
 
-    # MOD: Added output degeneration detection (garbage at end)
+    # Output degeneration: garbage characters, encoding corruption
     has_degeneration, degeneration_type = _detect_output_degeneration(text)
 
-    # MOD: Added fabrication detection (hallucinated specifics)
+    # Fabrication: hallucinated specific details
     has_fabrication, fabrication_issues = _detect_fabricated_details(text)
 
-    # MOD: Added harness/integration issue detection
-    # These indicate mlx-vlm bugs, not model quality issues
+    # Harness/integration issues: mlx-vlm bugs, not model quality problems
     harness_issues: list[str] = []
     harness_type: str | None = None
 
@@ -5932,7 +5948,6 @@ def validate_image_accessible(*, image_path: str | Path) -> None:
         raise OSError(msg) from err
 
 
-# MOD: Added HF cache integrity diagnostic helper
 def _check_hf_cache_integrity(model_identifier: str) -> None:
     """Check HuggingFace cache integrity for a model and log diagnostics.
 
@@ -6212,12 +6227,10 @@ def _run_model_generation(
     try:
         model, processor, config = _load_model(params)
     except Exception as load_err:
-        # Capture any model loading errors (config issues, missing files, etc.)
-        # MOD: Enhanced error handling with cache integrity check
+        # Capture model loading errors and run cache diagnostics to distinguish
+        # code bugs from environment issues (corrupted cache, incomplete download)
         error_details = f"Model loading failed: {load_err}"
         logger.exception("Failed to load model %s", params.model_identifier)
-
-        # MOD: HF cache integrity check on load failure
         _check_hf_cache_integrity(params.model_identifier)
 
         raise ValueError(error_details) from load_err
@@ -6609,7 +6622,6 @@ def _preview_generation(
         )
         return
 
-    # MOD: Analyze quality using consolidated utility with optional prompt
     gen_tokens = getattr(gen, "generation_tokens", 0)
     analysis = analyze_generation_text(
         text_val,
@@ -6627,7 +6639,6 @@ def _preview_generation(
         log_warning_note(f"Verbose ({gen_tokens} tokens)")
     if analysis.formatting_issues:
         log_warning_note(analysis.formatting_issues[0])
-    # MOD: Added context ignorance warning
     if analysis.is_context_ignored and analysis.missing_context_terms:
         missing = ", ".join(analysis.missing_context_terms[:3])
         log_warning_note(f"Context ignored (missing: {missing})")
@@ -6653,7 +6664,6 @@ def _log_verbose_success_details_mode(
     # Generated text with emoji prefix for easy scanning
     gen_text = getattr(res.generation, "text", None) or ""
 
-    # MOD: Analyze quality using consolidated utility with optional prompt
     gen_tokens = getattr(res.generation, "generation_tokens", 0)
     analysis = analyze_generation_text(
         gen_text,
@@ -6686,7 +6696,6 @@ def _log_verbose_success_details_mode(
         for issue in analysis.formatting_issues[:2]:  # Show first 2 issues
             log_warning_note(issue, prefix="⚠️  Note:")
 
-    # MOD: Added context ignorance warning
     if analysis.is_context_ignored and analysis.missing_context_terms:
         missing = ", ".join(analysis.missing_context_terms)
         log_warning_note(
@@ -7126,7 +7135,7 @@ def print_model_result(
     detailed_metrics: bool = False,
     run_index: int | None = None,
     total_runs: int | None = None,
-    prompt: str | None = None,  # MOD: Added for context ignorance detection
+    prompt: str | None = None,
     context_marker: str = "Context:",
 ) -> None:
     """Print a concise summary + optional verbose block for a model result."""
@@ -7195,7 +7204,6 @@ def _resolve_safe_command(command: list[str]) -> list[str] | None:
     return [str(exec_path), *command[1:]]
 
 
-# MOD: Write environment dump to separate file to reduce log clutter
 def _dump_environment_to_log(output_path: Path) -> None:
     """Dump complete Python environment to separate file for debugging/reproducibility.
 
@@ -7668,7 +7676,7 @@ def process_models(
         )
         result: PerformanceResult = process_image_with_model(params)
 
-        # MOD: Calculate quality score and analysis only for successful generations
+        # Calculate quality score for successful generations
         if result.success and result.generation:
             gen_text = str(getattr(result.generation, "text", ""))
             gen_tokens = getattr(result.generation, "generation_tokens", 0)
@@ -7703,7 +7711,6 @@ def process_models(
 
         results.append(result)
 
-        # MOD: Structured output for this run with prompt for evaluation
         print_model_result(
             result,
             verbose=args.verbose,
@@ -7881,7 +7888,6 @@ def _truncate_quality_issues(
     return truncated.rstrip() + "..."
 
 
-# MOD: Added error bucketing diagnostic helper
 def _bucket_failures_by_error(
     results: list[PerformanceResult],
 ) -> dict[str, list[str]]:
@@ -8199,8 +8205,7 @@ def finalize_execution(
         print_cli_section("Performance Summary")
         print_model_stats(results)
 
-        # MOD: Added failure bucketing summary for better diagnostics
-        # (Already handled by print_model_stats and results.md, but we add log summary now)
+        # Log summary with failure bucketing for diagnostics
         log_summary(results)
 
         # Gather system characteristics for reports
