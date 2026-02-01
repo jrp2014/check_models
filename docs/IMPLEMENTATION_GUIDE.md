@@ -231,7 +231,7 @@ Responsibilities:
 **Examples**:
 
 ```python
-from vlm.check_models import format_field_value
+from check_models import format_field_value
 
 # Memory (mlx bytes -> decimal GB normalization)
 format_field_value("peak_memory", 8_589_934_592)  # "8.6"

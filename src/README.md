@@ -526,9 +526,11 @@ Runtime (installed automatically via `pip install -e .` when executed inside `sr
 | Core tensor/runtime | `mlx` | `>=0.29.1` |
 | Vision‑language utilities | `mlx-vlm` | `>=0.3.0` |
 | Image processing & loading | `Pillow` | `>=10.3.0` |
-| Model cache / discovery | `huggingface-hub` | `>=0.23.0` |
+| Model cache / discovery | `huggingface-hub` | `>=0.34.0` |
+| HTTP requests (image URLs) | `requests` | `>=2.31.0` |
 | Reporting / tables | `tabulate` | `>=0.9.0` |
 | Local timezone conversion | `tzlocal` | `>=5.0` |
+| Configuration loading | `PyYAML` | `>=6.0` |
 
 Optional (enable additional features):
 
@@ -657,7 +659,41 @@ if analysis.formatting_issues:
     print(f"Formatting problems: {analysis.formatting_issues}")
 if analysis.has_excessive_bullets:
     print(f"Too many bullets: {analysis.bullet_count}")
+
+# Check for harness/integration issues (mlx-vlm bugs vs model quality)
+if analysis.has_harness_issue:
+    print(f"⚠️ HARNESS ISSUE: {analysis.harness_issue_type}")
+    print(f"   Details: {analysis.harness_issue_details}")
+    # These indicate mlx-vlm integration bugs, not model quality problems
 ```
+
+#### Harness Issue Detection
+
+The quality analysis distinguishes between **model quality issues** (repetition, hallucinations, verbosity) and **harness/integration issues** (bugs in how mlx-vlm loads or runs the model). Harness issues are prefixed with `⚠️HARNESS:` in reports.
+
+**Detected harness issues include:**
+
+| Issue Type | Symptom | Likely Cause |
+| ---------- | ------- | ------------ |
+| `token_encoding` | BPE artifacts like `Ġ` or `Ċ` in output | Tokenizer decode bug |
+| `special_token_leak` | `<\|end\|>`, `<\|endoftext\|>` visible | Stop token handling |
+| `minimal_output` | Zero tokens or filler-only response | Model loading issue |
+| `training_data_leak` | `# INSTRUCTION`, `### Response:` mid-output | Prompt template mismatch |
+
+**Configuration**: Harness detection thresholds are configurable in `quality_config.yaml`:
+
+```yaml
+# Harness/integration issue detection thresholds
+min_bpe_artifact_count: 5       # Min BPE artifacts to flag encoding issue
+min_tokens_for_substantial: 10  # Tokens below this are suspicious
+min_words_for_filler_response: 15  # Words below this in filler response
+```
+
+**When you see harness issues**: These typically indicate upstream bugs in mlx-vlm or model-specific integration problems. Consider:
+
+1. Reporting the issue to [mlx-vlm](https://github.com/Blaizzy/mlx-vlm/issues)
+2. Checking if a newer model version exists
+3. Trying different prompt templates
 
 ### Core Functions
 
@@ -916,7 +952,7 @@ check_models/
 │       ├── results.html     # Generated HTML report (default location)
 │       └── results.md       # Generated Markdown report (default location)
 │       └── results.tsv      # Generated a tab-separated values summary of the run (default location)
-│       └── results.json     # Generated JSON Lines summary of the run (default location)
+│       └── results.jsonl    # Generated JSON Lines summary of the run (default location)
 ├── docs/                    # Documentation
 ├── typings/                 # Generated type stubs (git-ignored)
 └── Makefile                 # Root orchestration

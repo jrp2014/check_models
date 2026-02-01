@@ -149,18 +149,15 @@ Success rate: 2/3 (66.7%)
 
 ## Log Levels
 
-The script supports different verbosity levels via `--log-level`:
+The script supports different verbosity levels via the `--verbose` flag:
 
-- `DEBUG` - Detailed diagnostic information (EXIF parsing, internal state)
-- `INFO` - Standard progress messages (default)
-- `WARNING` - Warning messages (missing metadata, deprecated features)
-- `ERROR` - Error messages (model failures, file I/O issues)
-- `CRITICAL` - Fatal errors that stop execution
+- **Default** - Standard progress messages (INFO level)
+- **`--verbose`** - Detailed diagnostic information including DEBUG-level messages (EXIF parsing, internal state, model loading details)
 
 Example:
 
 ```bash
-python src/check_models.py --log-level DEBUG
+python -m check_models --verbose
 ```
 
 ## Log File Output
