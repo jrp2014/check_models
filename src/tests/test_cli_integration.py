@@ -115,7 +115,8 @@ def test_cli_exits_on_nonexistent_folder(capsys: pytest.CaptureFixture[str]) -> 
     result = _run_cli([*_get_test_output_args(), "--folder", "/nonexistent/path"], capsys)
     assert result.exit_code != 0
     output = result.stdout + result.stderr
-    assert any(word in output.lower() for word in ["folder", "directory", "not found"])
+    # Should mention the folder doesn't exist (exact message from exit_with_cli_error)
+    assert "does not exist" in output.lower() or "not found" in output.lower()
 
 
 def test_cli_exits_on_empty_folder(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
@@ -126,9 +127,8 @@ def test_cli_exits_on_empty_folder(tmp_path: Path, capsys: pytest.CaptureFixture
     result = _run_cli([*_get_test_output_args(), "--folder", str(empty_folder)], capsys)
     assert result.exit_code != 0
     output = result.stdout + result.stderr
-    assert any(
-        phrase in output.lower() for phrase in ["no images", "could not find", "mlx-vlm not found"]
-    )
+    # Should mention no images found OR mlx-vlm missing (if not installed)
+    assert "could not find" in output.lower() or "mlx-vlm not found" in output.lower()
 
 
 def test_cli_invalid_temperature_value(

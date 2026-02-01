@@ -24,7 +24,7 @@ def test_to_float() -> None:
 
 
 def test_convert_gps_coordinate_standard() -> None:
-    # (deg, min, sec)
+    """Test standard (degrees, minutes, seconds) format."""
     result = _convert_gps_coordinate((37.0, 46.0, 30.5))
     assert result == (37.0, 46.0, 30.5)
 

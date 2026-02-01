@@ -249,7 +249,12 @@ class TestE2ESmoke:
         ]
         result = _run_cli(args, capsys)
         output = result.stdout + result.stderr
-        assert any(word in output.lower() for word in ["error", "failed", "not found", "could not"])
+        # Model loading should fail with repository/model not found error
+        assert (
+            "not found" in output.lower()
+            or "could not" in output.lower()
+            or "failed" in output.lower()
+        )
 
 
 # Note: No cleanup fixture needed - tmp_path fixture handles cleanup automatically

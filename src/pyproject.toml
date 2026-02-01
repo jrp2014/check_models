@@ -24,6 +24,9 @@ classifiers = [
 # This keeps ordering deterministic and simplifies automated parsing.
 # Runtime intentionally slim: only what `check_models.py` imports directly.
 # Everything else lives in extras to reduce cold install surface & build time.
+# NOTE: Some deps below (requests, Pillow, PyYAML) are also pulled transitively by mlx-vlm
+# but are listed explicitly to allow version pinning and ensure they're available if
+# mlx-vlm's dependencies change.
 dependencies = [
     # Minimal runtime set actually imported by check_models.py
     "mlx>=0.29.1",
@@ -158,9 +161,6 @@ ignore = [
     # S603/S607/S310/S105: use targeted # noqa comments with justification
     "S311", # random module - deterministic seeds, not cryptographic
     "S105", # hardcoded password - false positives on token assertions in tests
-
-    # === Code organization ===
-    "ERA001", # Commented code - sometimes useful for debugging/comparison
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -238,7 +238,11 @@ disallow_incomplete_defs = true
 # Ignore errors in tests (they intentionally test edge cases)
 [[tool.mypy.overrides]]
 module = "tests.*"
-ignore_errors = true
+# Tests may call functions with various types for edge case testing
+disallow_untyped_defs = false
+warn_return_any = false
+# Allow broader exception handling in tests
+strict_optional = false
 
 # Ignore missing stubs warnings for MLX libraries, but CHECK errors if stubs exist
 [[tool.mypy.overrides]]

@@ -51,9 +51,6 @@ def load_pyproject_deps() -> tuple[dict[str, str], dict[str, str], dict[str, str
     try:
         with pyproject_path.open("rb") as f:
             data = tomllib.load(f)
-            # logger.info("Loaded pyproject.toml from %s", pyproject_path) # Commented out to avoid noise, or keep it?
-            # The user didn't ask for logging, but it helps debugging.
-            # I'll stick to just the fix first.
 
     except Exception as e:
         logger.warning("Failed to parse pyproject.toml: %s", e)
