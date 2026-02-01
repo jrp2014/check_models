@@ -24,10 +24,22 @@ import time
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-import pytest
-from huggingface_hub import scan_cache_dir
-from huggingface_hub.errors import CacheNotFound
-from PIL import Image
+# =============================================================================
+# EARLY ENVIRONMENT SETUP (MUST happen before huggingface_hub imports)
+# =============================================================================
+
+# Set up HF cache directory early, before any huggingface_hub functions cache the path.
+# This is needed for CI environments that don't have ~/.cache/huggingface/hub
+_HF_CACHE_DIR = Path(tempfile.gettempdir()) / "pytest_hf_cache" / "hub"
+_HF_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+os.environ["HF_HUB_CACHE"] = str(_HF_CACHE_DIR)
+os.environ["HF_HOME"] = str(_HF_CACHE_DIR.parent)
+
+# Now import huggingface_hub after environment is configured
+import pytest  # noqa: E402
+from huggingface_hub import scan_cache_dir  # noqa: E402
+from huggingface_hub.errors import CacheNotFound  # noqa: E402
+from PIL import Image  # noqa: E402
 
 if TYPE_CHECKING:
     from collections.abc import Generator
@@ -36,17 +48,6 @@ if TYPE_CHECKING:
 TEST_DIR = Path(__file__).parent
 SRC_DIR = TEST_DIR.parent
 OUTPUT_DIR = SRC_DIR / "output"
-
-# =============================================================================
-# EARLY ENVIRONMENT SETUP (before any HuggingFace imports cache paths)
-# =============================================================================
-
-# Set up HF cache directory early, before any huggingface_hub functions cache the path.
-# This is needed for CI environments that don't have ~/.cache/huggingface/hub
-_HF_CACHE_DIR = Path(tempfile.gettempdir()) / "pytest_hf_cache" / "hub"
-_HF_CACHE_DIR.mkdir(parents=True, exist_ok=True)
-os.environ.setdefault("HF_HUB_CACHE", str(_HF_CACHE_DIR))
-os.environ.setdefault("HF_HOME", str(_HF_CACHE_DIR.parent))
 
 
 # =============================================================================

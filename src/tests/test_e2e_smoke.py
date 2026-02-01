@@ -13,20 +13,35 @@ Or run all tests including slow ones:
 Skip these in CI by default (they require MLX hardware and model downloads).
 """
 
+from __future__ import annotations
+
 import importlib.util
 import json
+import os
 import sys
+import tempfile
 from pathlib import Path
 from typing import NamedTuple
 from unittest.mock import patch
 
-import pytest
-from huggingface_hub import scan_cache_dir
-from huggingface_hub.errors import CacheNotFound
-from PIL import Image
+# =============================================================================
+# EARLY ENVIRONMENT SETUP (MUST happen before huggingface_hub imports)
+# =============================================================================
 
-# Import check_models
-import check_models
+# Set up HF cache directory early, before any huggingface_hub functions cache the path.
+# This is needed for CI environments that don't have ~/.cache/huggingface/hub
+_HF_CACHE_DIR = Path(tempfile.gettempdir()) / "pytest_hf_cache" / "hub"
+_HF_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+os.environ["HF_HUB_CACHE"] = str(_HF_CACHE_DIR)
+os.environ["HF_HOME"] = str(_HF_CACHE_DIR.parent)
+
+# Now import huggingface_hub after environment is configured
+import pytest  # noqa: E402
+from huggingface_hub import scan_cache_dir  # noqa: E402
+from huggingface_hub.errors import CacheNotFound  # noqa: E402
+from PIL import Image  # noqa: E402
+
+import check_models  # noqa: E402
 
 # Fixture model - small, fast, reliable
 # nanoLLaVA is ~600MB, fastest load, lowest memory (4.5GB peak)

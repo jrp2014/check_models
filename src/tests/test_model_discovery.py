@@ -1,11 +1,27 @@
 """Tests for model discovery and filtering."""
 
+from __future__ import annotations
+
+import os
+import tempfile
 from pathlib import Path
 
-import pytest
-from huggingface_hub.errors import CacheNotFound
+# =============================================================================
+# EARLY ENVIRONMENT SETUP (MUST happen before huggingface_hub imports)
+# =============================================================================
 
-import check_models
+# Set up HF cache directory early, before any huggingface_hub functions cache the path.
+# This is needed for CI environments that don't have ~/.cache/huggingface/hub
+_HF_CACHE_DIR = Path(tempfile.gettempdir()) / "pytest_hf_cache" / "hub"
+_HF_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+os.environ["HF_HUB_CACHE"] = str(_HF_CACHE_DIR)
+os.environ["HF_HOME"] = str(_HF_CACHE_DIR.parent)
+
+# Now import huggingface_hub after environment is configured
+import pytest  # noqa: E402
+from huggingface_hub.errors import CacheNotFound  # noqa: E402
+
+import check_models  # noqa: E402
 
 
 def test_get_cached_model_ids_returns_list() -> None:
