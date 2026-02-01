@@ -1,4 +1,4 @@
-"""Tests for metrics alignment helper and mode selection output paths."""
+"""Tests for metrics mode selection output paths."""
 
 from __future__ import annotations
 
@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING
 
 from check_models import (
     PerformanceResult,
-    _align_metric_parts,
     print_model_result,
 )
 
@@ -47,22 +46,6 @@ def _build_perf() -> PerformanceResult:
         model_load_time=0.5,
         total_time=1.5,
     )
-
-
-def test_align_metric_parts_alignment() -> None:
-    """The metric parts should remain in compact key=value format."""
-    parts = [
-        "total=1.23s",
-        "gen=1.00s",
-        "peak_mem=5.5GB",
-        "tokens(total/prompt/gen)=15/10/5",
-    ]
-    aligned = _align_metric_parts(parts)
-    # Should return parts unchanged (no padding)
-    assert aligned == parts, f"Expected {parts}, got {aligned}"
-    # Verify all parts are in key=value format
-    for part in aligned:
-        assert "=" in part, f"Part {part!r} should contain '='"
 
 
 def test_metrics_mode_compact_smoke(caplog: pytest.LogCaptureFixture) -> None:

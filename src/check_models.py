@@ -1609,35 +1609,6 @@ def _detect_excessive_bullets(text: str) -> tuple[bool, int]:
     return bullet_count > threshold, bullet_count
 
 
-def _detect_markdown_formatting(text: str) -> bool:
-    """Detect if output contains markdown formatting elements.
-
-    Args:
-        text: Generated text to check
-
-    Returns:
-        True if markdown formatting is detected
-    """
-    if not text:
-        return False
-
-    # Common markdown patterns
-    markdown_indicators = [
-        r"^#{1,6}\s",  # Headers (# Header, ## Header, etc.)
-        r"\*\*[^*]+\*\*",  # Bold (**text**)
-        r"\*[^*]+\*",  # Italic (*text*)
-        r"__[^_]+__",  # Bold (__text__)
-        r"_[^_]+_",  # Italic (_text_)
-        r"`[^`]+`",  # Inline code (`code`)
-        r"```",  # Code blocks
-        r"^\s*[-*+]\s",  # Unordered lists
-        r"^\s*\d+\.\s",  # Ordered lists
-        r"\[([^\]]+)\]\(([^)]+)\)",  # Links [text](url)
-    ]
-
-    return any(re.search(pattern, text, re.MULTILINE) for pattern in markdown_indicators)
-
-
 # MOD: Added context ignorance detection
 def _detect_context_ignorance(
     text: str,
@@ -6805,15 +6776,6 @@ def _build_compact_metric_parts(
         parts.append(f"gen_tps={fmt_num(gen_tps)}")
     if prompt_tps:
         parts.append(f"prompt_tps={fmt_num(prompt_tps)}")
-    return parts
-
-
-def _align_metric_parts(parts: list[str]) -> list[str]:
-    """Return parts with compact key=value formatting.
-
-    No padding/alignment to keep output compact and readable.
-    """
-    # Simply return parts as-is since they're already in key=value format
     return parts
 
 

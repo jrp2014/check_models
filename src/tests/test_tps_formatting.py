@@ -1,50 +1,35 @@
 """Tests for tokens-per-second formatting utilities."""
 
+import pytest
+
 import check_models
 
 
-def test_format_tps_small() -> None:
-    """Should format small TPS with 2 decimals."""
-    assert check_models._format_tps(1.234) == "1.23"
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        pytest.param(1.234, "1.23", id="small_2_decimals"),
+        pytest.param(0.789, "0.789", id="small_3_sig_figs"),
+        pytest.param(12.34, "12.3", id="medium_1_decimal"),
+        pytest.param(15.67, "15.7", id="medium_rounded"),
+        pytest.param(123.4, "123", id="large_integer"),
+        pytest.param(999.9, "1,000", id="very_large_with_comma"),
+        pytest.param(0.0, "0", id="zero"),
+    ],
+)
+def test_format_tps(value: float, expected: str) -> None:
+    """Should format TPS with appropriate precision based on magnitude."""
+    assert check_models._format_tps(value) == expected
 
 
-def test_format_tps_small_rounded() -> None:
-    """Should format small values with 3 significant figures (.3g format)."""
-    assert check_models._format_tps(0.789) == "0.789"
-
-
-def test_format_tps_medium() -> None:
-    """Should format medium TPS with 1 decimal."""
-    assert check_models._format_tps(12.34) == "12.3"
-
-
-def test_format_tps_medium_rounded() -> None:
-    """Should round medium values to 1 decimal."""
-    assert check_models._format_tps(15.67) == "15.7"
-
-
-def test_format_tps_large() -> None:
-    """Should format large TPS as integer."""
-    assert check_models._format_tps(123.4) == "123"
-
-
-def test_format_tps_very_large() -> None:
-    """Should format very large values as integers with comma separator."""
-    assert check_models._format_tps(999.9) == "1,000"
-
-
-def test_format_tps_zero() -> None:
-    """Should handle zero TPS."""
-    assert check_models._format_tps(0.0) == "0"
-
-
-def test_format_tps_boundary_small_to_medium() -> None:
-    """Should handle boundary at 10.0 TPS."""
-    result = check_models._format_tps(10.0)
-    assert result in ("10.0", "10.00")  # Accept either format
-
-
-def test_format_tps_boundary_medium_to_large() -> None:
-    """Should handle boundary at 100.0 TPS."""
-    result = check_models._format_tps(100.0)
-    assert result in ("100.0", "100")  # Accept either format
+@pytest.mark.parametrize(
+    ("value", "valid_outputs"),
+    [
+        pytest.param(10.0, ("10.0", "10.00"), id="boundary_small_to_medium"),
+        pytest.param(100.0, ("100.0", "100"), id="boundary_medium_to_large"),
+    ],
+)
+def test_format_tps_boundaries(value: float, valid_outputs: tuple[str, ...]) -> None:
+    """Should handle boundary values (format may vary at transitions)."""
+    result = check_models._format_tps(value)
+    assert result in valid_outputs

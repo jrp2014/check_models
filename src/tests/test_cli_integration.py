@@ -4,13 +4,11 @@ These tests verify the CLI's behavior with various arguments and inputs.
 """
 
 import sys
-import time
 from pathlib import Path
 from typing import NamedTuple
 from unittest.mock import patch
 
 import pytest
-from PIL import Image
 
 # Import check_models
 import check_models
@@ -66,32 +64,6 @@ def _get_test_output_args() -> list[str]:
     ]
 
 
-@pytest.fixture
-def test_image(tmp_path: Path) -> Path:
-    """Create a minimal valid test image."""
-    img_path = tmp_path / "test.jpg"
-    img = Image.new("RGB", (100, 100), color="red")
-    img.save(img_path)
-    return img_path
-
-
-@pytest.fixture
-def test_folder_with_images(tmp_path: Path) -> Path:
-    """Create a folder with multiple test images."""
-    folder = tmp_path / "images"
-    folder.mkdir()
-
-    # Create images with different timestamps
-    for i, name in enumerate(["old.jpg", "middle.jpg", "newest.jpg"]):
-        img_path = folder / name
-        img = Image.new("RGB", (50, 50), color="blue")
-        img.save(img_path)
-        if i < 2:  # Don't sleep after last image
-            time.sleep(0.1)
-
-    return folder
-
-
 def test_cli_help_displays(capsys: pytest.CaptureFixture[str]) -> None:
     """Should display help message with --help."""
     result = _run_cli(["--help"], capsys)
@@ -132,7 +104,7 @@ def test_cli_exits_on_empty_folder(tmp_path: Path, capsys: pytest.CaptureFixture
 
 
 def test_cli_invalid_temperature_value(
-    test_folder_with_images: Path,
+    folder_with_images: Path,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     """Should reject temperature outside valid range."""
@@ -142,7 +114,7 @@ def test_cli_invalid_temperature_value(
             "--temperature",
             "-0.5",
             "--folder",
-            str(test_folder_with_images),
+            str(folder_with_images),
         ],
         capsys,
     )
@@ -152,12 +124,12 @@ def test_cli_invalid_temperature_value(
 
 
 def test_cli_invalid_max_tokens(
-    test_folder_with_images: Path,
+    folder_with_images: Path,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     """Should reject negative max_tokens."""
     result = _run_cli(
-        [*_get_test_output_args(), "--max-tokens", "-10", "--folder", str(test_folder_with_images)],
+        [*_get_test_output_args(), "--max-tokens", "-10", "--folder", str(folder_with_images)],
         capsys,
     )
     assert result.exit_code != 0
