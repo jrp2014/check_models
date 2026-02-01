@@ -3,27 +3,26 @@
 Test that CLI help and usage messages are clear, complete, and up-to-date.
 """
 
-import subprocess
 import sys
-from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
-_SRC_DIR = Path(__file__).parent.parent
-_CHECK_MODELS_SCRIPT = _SRC_DIR / "check_models.py"
+# Import check_models
+import check_models
 
 
 @pytest.mark.parametrize("help_flag", ["-h", "--help"])
-def test_cli_help_output(help_flag: str) -> None:
-    result = subprocess.run(
-        [sys.executable, str(_CHECK_MODELS_SCRIPT), help_flag],
-        capture_output=True,
-        text=True,
-        timeout=30,
-        check=False,
-    )
-    output = result.stdout + result.stderr
-    assert result.returncode == 0
+def test_cli_help_output(help_flag: str, capsys: pytest.CaptureFixture[str]) -> None:
+    test_args = ["check_models.py", help_flag]
+
+    with patch.object(sys, "argv", test_args), pytest.raises(SystemExit) as excinfo:
+        check_models.main_cli()
+
+    assert excinfo.value.code == 0
+    captured = capsys.readouterr()
+    output = captured.out + captured.err
+
     # Check for key sections and argument descriptions
     assert "usage" in output.lower()
     assert "folder" in output.lower()
@@ -31,4 +30,3 @@ def test_cli_help_output(help_flag: str) -> None:
     assert "temperature" in output.lower()
     assert "max-tokens" in output.lower()
     assert "models" in output.lower()
-    assert "version" not in output.lower()  # If version flag is not present

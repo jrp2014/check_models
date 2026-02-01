@@ -15,86 +15,60 @@ Performance optimizations:
 from __future__ import annotations
 
 import contextlib
-import subprocess
+import importlib.util
+import logging
 import sys
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
+from huggingface_hub import scan_cache_dir
 from PIL import Image
 
 if TYPE_CHECKING:
     from collections.abc import Generator
 
-# =============================================================================
-# PATH CONSTANTS
-# =============================================================================
-
 # All paths relative to test file locations for portability
 TEST_DIR = Path(__file__).parent
 SRC_DIR = TEST_DIR.parent
-CHECK_MODELS_SCRIPT = SRC_DIR / "check_models.py"
 OUTPUT_DIR = SRC_DIR / "output"
 
 
 # =============================================================================
-# SUBPROCESS HELPERS
+# LOGGING FIXTURES
 # =============================================================================
 
 
-def run_cli(
-    args: list[str],
-    *,
-    timeout: float = 30.0,
-    capture: bool = True,
-) -> subprocess.CompletedProcess[str]:
-    """Run check_models CLI with given arguments.
+@pytest.fixture(autouse=True)
+def reset_logger_handlers() -> Generator[None]:
+    """Reset check_models logger handlers before each test to avoid closed stream issues.
 
-    This is a shared helper that standardizes subprocess calls across tests,
-    ensuring consistent timeout and capture behavior.
-
-    Args:
-        args: CLI arguments (without python/script path)
-        timeout: Maximum execution time in seconds
-        capture: Whether to capture stdout/stderr
-
-    Returns:
-        CompletedProcess with returncode, stdout, stderr
+    The check_models module configures its logger with sys.stderr at import time.
+    When pytest captures output, the stream may be swapped, causing "I/O operation
+    on closed file" errors. This fixture ensures handlers use a fresh stream and
+    propagate is enabled for caplog to work correctly.
     """
-    cmd = [sys.executable, str(CHECK_MODELS_SCRIPT), *args]
-    return subprocess.run(
-        cmd,
-        capture_output=capture,
-        text=True,
-        timeout=timeout,
-        check=False,
-    )
+    # Import lazily to avoid circular imports at module load time
+    from check_models import logger  # noqa: PLC0415
 
+    # Save original state
+    original_propagate = logger.propagate
+    original_handlers = logger.handlers[:]
 
-def get_default_output_args(prefix: str = "test") -> list[str]:
-    """Return CLI arguments for test-specific output files.
+    # Enable propagation so caplog can capture records
+    logger.propagate = True
 
-    Args:
-        prefix: Prefix for output filenames (e.g., 'test_cli' -> test_cli.log)
+    yield
 
-    Returns:
-        List of CLI arguments for output file paths
-    """
-    return [
-        "--output-log",
-        str(OUTPUT_DIR / f"{prefix}.log"),
-        "--output-html",
-        str(OUTPUT_DIR / f"{prefix}.html"),
-        "--output-markdown",
-        str(OUTPUT_DIR / f"{prefix}.md"),
-        "--output-tsv",
-        str(OUTPUT_DIR / f"{prefix}.tsv"),
-        "--output-jsonl",
-        str(OUTPUT_DIR / f"{prefix}.jsonl"),
-        "--output-env",
-        str(OUTPUT_DIR / f"{prefix}_env.log"),
-    ]
+    # After test: restore original state and reset handlers to use current sys.stderr
+    logger.propagate = original_propagate
+    logger.handlers = original_handlers
+
+    # Ensure handlers use current sys.stderr to prevent "closed file" errors
+    for handler in logger.handlers:
+        if isinstance(handler, logging.StreamHandler):
+            handler.stream = sys.stderr
 
 
 # =============================================================================
@@ -122,38 +96,24 @@ def test_image(tmp_path: Path) -> Path:
 
 @pytest.fixture
 def realistic_test_image(tmp_path: Path) -> Path:
-    """Create a realistic test image with visual elements (for E2E tests).
-
-    Larger image (640x480) with sky, sun, grass, and house elements
-    to give models something meaningful to describe.
-    """
+    """Create a realistic test image with visual elements (for E2E tests)."""
     img_path = tmp_path / "realistic.jpg"
-    img = Image.new("RGB", (640, 480), color=(135, 206, 235))  # Sky blue
-
+    img = Image.new("RGB", (640, 480), color=(135, 206, 235))
     pixels = img.load()
-    assert pixels is not None
-
-    # Draw a "sun" (yellow circle in top-right)
-    for x in range(540, 600):
-        for y in range(40, 100):
-            if (x - 570) ** 2 + (y - 70) ** 2 < 900:
-                pixels[x, y] = (255, 255, 0)
-
-    # Draw "grass" (green strip at bottom)
-    for x in range(640):
-        for y in range(380, 480):
-            pixels[x, y] = (34, 139, 34)
-
-    # Draw "house" (brown rectangle)
-    for x in range(200, 350):
-        for y in range(250, 380):
-            pixels[x, y] = (139, 90, 43)
-
-    # Draw "roof" (red rectangle)
-    for x in range(180, 370):
-        for y in range(200, 250):
-            pixels[x, y] = (178, 34, 34)
-
+    if pixels:
+        for x in range(540, 600):
+            for y in range(40, 100):
+                if (x - 570) ** 2 + (y - 70) ** 2 < 900:
+                    pixels[x, y] = (255, 255, 0)
+        for x in range(640):
+            for y in range(380, 480):
+                pixels[x, y] = (34, 139, 34)
+        for x in range(200, 350):
+            for y in range(250, 380):
+                pixels[x, y] = (139, 90, 43)
+        for x in range(180, 370):
+            for y in range(200, 250):
+                pixels[x, y] = (178, 34, 34)
     img.save(img_path, "JPEG", quality=85)
     return img_path
 
@@ -182,8 +142,7 @@ def folder_with_images(tmp_path: Path) -> Path:
         img = Image.new("RGB", (50, 50), color="blue")
         img.save(img_path)
         if i < 2:
-            time.sleep(0.05)  # Reduced from 0.1s - enough for timestamp difference
-
+            time.sleep(0.05)
     return folder
 
 
@@ -206,16 +165,7 @@ def folder_with_single_image(tmp_path: Path) -> Path:
 @pytest.fixture(scope="session")
 def mlx_vlm_available() -> bool:
     """Check if mlx-vlm is available (session-scoped, checked once)."""
-    try:
-        result = subprocess.run(
-            [sys.executable, "-c", "import mlx_vlm"],
-            check=False,
-            capture_output=True,
-            timeout=10,
-        )
-    except (subprocess.TimeoutExpired, OSError):
-        return False
-    return result.returncode == 0
+    return importlib.util.find_spec("mlx_vlm") is not None
 
 
 @pytest.fixture(scope="session")
@@ -223,22 +173,11 @@ def fixture_model_cached() -> bool:
     """Check if the fixture model (nanoLLaVA) is cached (session-scoped)."""
     fixture_model = "qnguyen3/nanoLLaVA"
     try:
-        result = subprocess.run(
-            [
-                sys.executable,
-                "-c",
-                f"from huggingface_hub import scan_cache_dir; "
-                f"ids = [r.repo_id for r in scan_cache_dir().repos]; "
-                f"print('{fixture_model}' in ids)",
-            ],
-            check=False,
-            capture_output=True,
-            text=True,
-            timeout=10,
-        )
-    except (subprocess.TimeoutExpired, OSError):
+        repo_ids = [r.repo_id for r in scan_cache_dir().repos]
+    except (OSError, ValueError, RuntimeError):
         return False
-    return "True" in result.stdout
+    else:
+        return fixture_model in repo_ids
 
 
 # =============================================================================

@@ -1,21 +1,23 @@
-"""End-to-end CLI integration tests.
+"""Integration tests for the CLI.
 
-These tests verify the full workflow from CLI input to output generation,
-including argument parsing, execution flow, and error handling.
+These tests verify the CLI's behavior with various arguments and inputs.
 """
 
-import subprocess
 import sys
 import time
 from pathlib import Path
+from typing import NamedTuple
+from unittest.mock import patch
 
 import pytest
 from PIL import Image
 
+# Import check_models
+import check_models
+
 # Path to check_models.py relative to test file location
 _TEST_DIR = Path(__file__).parent
 _SRC_DIR = _TEST_DIR.parent
-_CHECK_MODELS_SCRIPT = _SRC_DIR / "check_models.py"
 _OUTPUT_DIR = _SRC_DIR / "output"
 
 # Test-specific output files (excluded from git via .gitignore)
@@ -24,6 +26,28 @@ _TEST_HTML = _OUTPUT_DIR / "test_cli_integration.html"
 _TEST_MD = _OUTPUT_DIR / "test_cli_integration.md"
 _TEST_ENV = _OUTPUT_DIR / "test_cli_integration_environment.log"
 _TEST_JSONL = _OUTPUT_DIR / "test_cli_integration.jsonl"
+
+
+class CLIResult(NamedTuple):
+    """Result of a CLI execution for testing."""
+
+    exit_code: int
+    stdout: str
+    stderr: str
+
+
+def _run_cli(args: list[str], capsys: pytest.CaptureFixture[str]) -> CLIResult:
+    """Helper to run the CLI main function directly."""
+    test_args = ["check_models.py", *args]
+    exit_code = 0
+    with patch.object(sys, "argv", test_args):
+        try:
+            check_models.main_cli()
+        except SystemExit as e:
+            exit_code = e.code if isinstance(e.code, int) else (1 if e.code else 0)
+
+    captured = capsys.readouterr()
+    return CLIResult(exit_code, captured.out, captured.err)
 
 
 def _get_test_output_args() -> list[str]:
@@ -68,145 +92,85 @@ def test_folder_with_images(tmp_path: Path) -> Path:
     return folder
 
 
-def test_cli_help_displays() -> None:
+def test_cli_help_displays(capsys: pytest.CaptureFixture[str]) -> None:
     """Should display help message with --help."""
-    result = subprocess.run(
-        [sys.executable, str(_CHECK_MODELS_SCRIPT), "--help"],
-        check=False,
-        capture_output=True,
-        text=True,
-        timeout=30,
-    )
-    assert result.returncode == 0
+    result = _run_cli(["--help"], capsys)
+    assert result.exit_code == 0
     assert "MLX VLM Model Checker" in result.stdout
     assert "--folder" in result.stdout
     assert "--models" in result.stdout
 
 
-def test_cli_help_structure() -> None:
+def test_cli_help_structure(capsys: pytest.CaptureFixture[str]) -> None:
     """Should display help text that includes usage information."""
-    result = subprocess.run(
-        [sys.executable, str(_CHECK_MODELS_SCRIPT), "--help"],
-        check=False,
-        capture_output=True,
-        text=True,
-        timeout=30,
-    )
-    assert result.returncode == 0
+    result = _run_cli(["--help"], capsys)
+    assert result.exit_code == 0
     output = result.stdout + result.stderr
     # Should contain basic usage info
     assert "usage" in output.lower() or "--folder" in output
 
 
-def test_cli_exits_on_nonexistent_folder() -> None:
+def test_cli_exits_on_nonexistent_folder(capsys: pytest.CaptureFixture[str]) -> None:
     """Should exit with error when folder does not exist."""
-    result = subprocess.run(
-        [
-            sys.executable,
-            str(_CHECK_MODELS_SCRIPT),
-            *_get_test_output_args(),
-            "--folder",
-            "/nonexistent/folder/path",
-        ],
-        check=False,
-        capture_output=True,
-        text=True,
-        timeout=15,
-    )
-
-    assert result.returncode != 0
+    result = _run_cli([*_get_test_output_args(), "--folder", "/nonexistent/path"], capsys)
+    assert result.exit_code != 0
     output = result.stdout + result.stderr
-    # Check for error message about missing folder
-    assert (
-        "folder" in output.lower() or "directory" in output.lower() or "not found" in output.lower()
-    )
+    assert any(word in output.lower() for word in ["folder", "directory", "not found"])
 
 
-def test_cli_exits_on_empty_folder(tmp_path: Path) -> None:
+def test_cli_exits_on_empty_folder(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     """Should exit with error when folder has no images."""
     empty_folder = tmp_path / "empty"
     empty_folder.mkdir()
 
-    result = subprocess.run(
-        [
-            sys.executable,
-            str(_CHECK_MODELS_SCRIPT),
-            *_get_test_output_args(),
-            "--folder",
-            str(empty_folder),
-        ],
-        check=False,
-        capture_output=True,
-        text=True,
-        timeout=30,
-    )
-    assert result.returncode != 0
+    result = _run_cli([*_get_test_output_args(), "--folder", str(empty_folder)], capsys)
+    assert result.exit_code != 0
     output = result.stdout + result.stderr
-    # Accept either "no images" error or dependency error (if mlx-vlm not in subprocess env)
-    assert (
-        "could not find" in output.lower()
-        or "no image" in output.lower()
-        or "mlx-vlm not found" in output.lower()
+    assert any(
+        phrase in output.lower() for phrase in ["no images", "could not find", "mlx-vlm not found"]
     )
 
 
-def test_cli_invalid_temperature_value(test_folder_with_images: Path) -> None:
+def test_cli_invalid_temperature_value(
+    test_folder_with_images: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     """Should reject temperature outside valid range."""
-    result = subprocess.run(
+    result = _run_cli(
         [
-            sys.executable,
-            str(_CHECK_MODELS_SCRIPT),
             *_get_test_output_args(),
             "--temperature",
-            "-0.5",  # Negative temperature should be rejected
+            "-0.5",
             "--folder",
             str(test_folder_with_images),
         ],
-        check=False,
-        capture_output=True,
-        text=True,
-        timeout=30,
+        capsys,
     )
-    # Should fail validation
-    assert result.returncode != 0
+    assert result.exit_code != 0
     output = result.stdout + result.stderr
     assert "temperature" in output.lower()
 
 
-def test_cli_invalid_max_tokens(test_folder_with_images: Path) -> None:
+def test_cli_invalid_max_tokens(
+    test_folder_with_images: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
     """Should reject negative max_tokens."""
-    result = subprocess.run(
-        [
-            sys.executable,
-            str(_CHECK_MODELS_SCRIPT),
-            *_get_test_output_args(),
-            "--max-tokens",
-            "-10",
-            "--folder",
-            str(test_folder_with_images),
-        ],
-        check=False,
-        capture_output=True,
-        text=True,
-        timeout=30,
+    result = _run_cli(
+        [*_get_test_output_args(), "--max-tokens", "-10", "--folder", str(test_folder_with_images)],
+        capsys,
     )
-    assert result.returncode != 0
+    assert result.exit_code != 0
     output = result.stdout + result.stderr
-    assert "max" in output.lower() or "token" in output.lower()
+    assert any(word in output.lower() for word in ["max", "token"])
 
 
-def test_cli_accepts_valid_parameters() -> None:
+def test_cli_accepts_valid_parameters(capsys: pytest.CaptureFixture[str]) -> None:
     """Should accept valid command-line parameters without error."""
-    # Just test that the script accepts parameters correctly without actually running models
-    result = subprocess.run(
-        [sys.executable, str(_CHECK_MODELS_SCRIPT), "--help"],
-        check=False,
-        capture_output=True,
-        text=True,
-        timeout=15,
-    )
-
+    result = _run_cli(["--help"], capsys)
     output = result.stdout + result.stderr
-    # Check that help shows our expected parameters
-    assert "--folder" in output or "--temperature" in output or "usage:" in output.lower()
+    assert any(
+        word in output or word.lower() in output.lower()
+        for word in ["--folder", "--temperature", "usage:"]
+    )
     assert "--output-jsonl" in output

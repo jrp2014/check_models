@@ -3,14 +3,16 @@
 Verify that all error paths produce clear, actionable, and consistently formatted messages.
 """
 
-import subprocess
 import sys
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
+# Import check_models
+import check_models
+
 _SRC_DIR = Path(__file__).parent.parent
-_CHECK_MODELS_SCRIPT = _SRC_DIR / "check_models.py"
 _OUTPUT_DIR = _SRC_DIR / "output"
 
 
@@ -23,24 +25,25 @@ _OUTPUT_DIR = _SRC_DIR / "output"
         (["--kv-bits", "99"], ["kv_bits must be", "Fatal error"]),
     ],
 )
-def test_error_message_consistency(args: list[str], expected_phrases: list[str]) -> None:
-    result = subprocess.run(
-        [
-            sys.executable,
-            str(_CHECK_MODELS_SCRIPT),
-            *args,
-            "--output-log",
-            str(_OUTPUT_DIR / "test_error_consistency.log"),
-            "--output-env",
-            str(_OUTPUT_DIR / "test_error_consistency_env.log"),
-        ],
-        capture_output=True,
-        text=True,
-        timeout=30,
-        check=False,
-    )
-    output = result.stdout + result.stderr
-    assert result.returncode != 0
+def test_error_message_consistency(
+    args: list[str], expected_phrases: list[str], capsys: pytest.CaptureFixture[str]
+) -> None:
+    test_args = [
+        "check_models.py",
+        *args,
+        "--output-log",
+        str(_OUTPUT_DIR / "test_error_consistency.log"),
+        "--output-env",
+        str(_OUTPUT_DIR / "test_error_consistency_env.log"),
+    ]
+
+    with patch.object(sys, "argv", test_args), pytest.raises(SystemExit) as excinfo:
+        check_models.main_cli()
+
+    assert excinfo.value.code != 0
+    captured = capsys.readouterr()
+    output = captured.out + captured.err
+
     for phrase in expected_phrases:
         if phrase in {"kv_bits must be", "Fatal error"}:
             # Accept argparse's invalid choice error for kv-bits

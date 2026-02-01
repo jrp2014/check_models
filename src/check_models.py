@@ -46,6 +46,7 @@ from typing import (
     runtime_checkable,
 )
 
+import requests
 import yaml
 from huggingface_hub import HFCacheInfo, scan_cache_dir
 from huggingface_hub import __version__ as hf_version
@@ -72,6 +73,7 @@ if TYPE_CHECKING:
 
     from mlx.nn import Module
     from mlx_vlm.generate import GenerationResult
+    from PIL.Image import Image as PILImage
     from transformers.tokenization_python import PythonBackend
     from transformers.tokenization_utils_tokenizers import TokenizersBackend
 
@@ -1055,6 +1057,12 @@ MEGAPIXEL_CONVERSION: Final[float] = 1_000_000.0  # Convert pixels to megapixels
 MAX_GPS_COORD_LEN: Final[int] = 3  # Full GPS coordinate (degrees, minutes, seconds)
 MED_GPS_COORD_LEN: Final[int] = 2  # GPS coordinate with 2 elements (degrees, minutes)
 MIN_GPS_COORD_LEN: Final[int] = 1  # GPS coordinate with 1 element (degrees only)
+RATIONAL_TUPLE_LEN: Final[int] = 2  # EXIF rational values are (numerator, denominator) tuples
+EXIF_USERCOMMENT_PREFIX_LEN: Final[int] = 8  # EXIF UserComment has 8-byte encoding prefix
+
+# --- EXIF & Metadata Heuristics ---
+CJK_IDEOGRAPH_START: Final[int] = 0x4E00
+MOJIBAKE_HEURISTIC_LEN: Final[int] = 50
 MAX_TUPLE_LEN: Final[int] = 10
 MAX_STR_LEN: Final[int] = 60
 STR_TRUNCATE_LEN: Final[int] = 57
@@ -3325,15 +3333,15 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
         is_url = True
     else:
         is_url = False
-
     try:
         if is_url:
             # Download URL into memory and open with PIL
             logger.debug("Downloading image from URL for EXIF extraction: %s", image_str)
-            # URL scheme validated above (http/https only)
-            with urllib.request.urlopen(image_str, timeout=30) as response:  # noqa: S310
-                img_data = io.BytesIO(response.read())
-                img = Image.open(img_data)
+            # Use requests for better security audit and timeout handling
+            response = requests.get(image_str, timeout=30)
+            response.raise_for_status()
+            img_data = io.BytesIO(response.content)
+            img = Image.open(img_data)
         else:
             # Local file path
             img = Image.open(Path(image_path))
@@ -3364,8 +3372,10 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
     return None
 
 
-def to_float(val: float | str) -> float | None:
+def to_float(val: float | str | None) -> float | None:
     """Convert a value to float if possible, else return None."""
+    if val is None:
+        return None
     try:
         temp = float(val)
     except (TypeError, ValueError):
@@ -3376,45 +3386,48 @@ def to_float(val: float | str) -> float | None:
 
 # Reduce return count and use named constants
 def _convert_gps_coordinate(
-    coord: tuple[float | str, ...] | list[float | str],
+    coord: tuple[Any, ...] | list[Any],
 ) -> tuple[float, float, float] | None:
     """Convert GPS EXIF coordinate to (degrees, minutes, seconds) tuple.
 
-    GPS coordinates in EXIF are stored as tuples of (degrees, minutes, seconds)
-    or (degrees, decimal_minutes). This function normalizes both formats.
+    GPS coordinates in EXIF can be:
+    - (deg, min, sec) as floats/ints
+    - ((deg_num, deg_den), (min_num, min_den), (sec_num, sec_den)) as rational tuples
+    - (deg, decimal_minutes)
+
+    This function normalizes these formats.
 
     Args:
-        coord: Tuple or list of 2 or 3 numeric values representing GPS coordinate
+        coord: Tuple or list of 2 or 3 values representing GPS coordinate
 
     Returns:
         Tuple of (degrees, minutes, seconds) as floats, or None if conversion fails
-
-    Examples:
-        >>> # Standard DMS format (degrees, minutes, seconds)
-        >>> _convert_gps_coordinate((37.0, 46.0, 30.5))
-        (37.0, 46.0, 30.5)
-
-        >>> # Decimal minutes format (degrees, decimal_minutes)
-        >>> _convert_gps_coordinate((37.0, 46.508333))
-        (37.0, 46.508333, 0.0)
-
-        >>> # Invalid format returns None
-        >>> _convert_gps_coordinate((37.0,))
-        None
-
     """
+    if not isinstance(coord, (tuple, list)):
+        return None
+
     clen = len(coord)
     if clen not in (MIN_GPS_COORD_LEN, MED_GPS_COORD_LEN, MAX_GPS_COORD_LEN):
         return None
 
-    # Convert available components to float, padding with 0.0 for missing values
-    components = [to_float(coord[i]) if i < clen else 0.0 for i in range(3)]
+    # EXIF values have unpredictable types from camera vendors
+    def _to_val(v: Any) -> float | None:
+        if isinstance(v, (float, int)):
+            return float(v)
+        if isinstance(v, (tuple, list)) and len(v) == RATIONAL_TUPLE_LEN:
+            try:
+                num = float(v[0])
+                den = float(v[1])
+                return num / den if den != 0 else None
+            except (ValueError, TypeError):
+                return None
+        return to_float(str(v))
 
-    # Return None if any required component failed to convert
+    components = [_to_val(coord[i]) if i < clen else 0.0 for i in range(3)]
+
     if any(c is None for c in components[:clen]):
         return None
 
-    # All conversions succeeded, return tuple with defaults for missing values
     return (components[0] or 0.0, components[1] or 0.0, components[2] or 0.0)
 
 
@@ -3493,24 +3506,76 @@ def _extract_exif_time(img_path: PathLike, exif_data: ExifDict) -> str | None:
         return None
 
 
+def _decode_exif_string(value: bytes | str | None) -> str:
+    """Robustly decode EXIF string values, handling encoding prefixes and fallbacks.
+
+    Handles:
+    - Byte strings with null terminators.
+    - UserComment 8-byte encoding prefixes (ASCII, UNICODE, JIS).
+    - Fallback from UTF-8 to Latin-1/CP1252.
+
+    Args:
+        value: The raw EXIF value (bytes or str)
+
+    Returns:
+        Decoded and sanitized string.
+    """
+    if not value:
+        return ""
+    if not isinstance(value, bytes):
+        return str(value).replace("\x00", "").strip()
+
+    decoded: str = ""
+    # Handle UserComment prefixes (fixed 8-byte header)
+    if len(value) >= EXIF_USERCOMMENT_PREFIX_LEN:
+        prefix = value[:EXIF_USERCOMMENT_PREFIX_LEN]
+        data = value[EXIF_USERCOMMENT_PREFIX_LEN:]
+        if prefix.startswith(b"ASCII\x00"):
+            decoded = data.decode("ascii", errors="replace").replace("\x00", "").strip()
+        elif prefix.startswith(b"UNICODE\x00"):
+            # UNICODE prefix usually implies UTF-16.
+            # We try utf-16 first (which handles BOM).
+            for enc in ("utf-16", "utf-16-be", "utf-16-le"):
+                try:
+                    candidate = data.decode(enc).replace("\x00", "").strip()
+                except (UnicodeDecodeError, LookupError):
+                    continue
+                else:
+                    if not candidate:
+                        continue
+                    # Heuristic: if we have a lot of high-range characters
+                    # it might be the wrong endianness.
+                    if (
+                        any(ord(c) > CJK_IDEOGRAPH_START for c in candidate)
+                        and len(candidate) < MOJIBAKE_HEURISTIC_LEN
+                    ):
+                        continue
+                    decoded = candidate
+                    break
+            else:
+                # Fallback for when heuristic skips everything
+                with contextlib.suppress(UnicodeDecodeError, ValueError):
+                    decoded = data.decode("utf-16", errors="replace").replace("\x00", "").strip()
+        elif prefix.startswith(b"JIS\x00"):
+            decoded = data.decode("shift-jis", errors="replace").replace("\x00", "").strip()
+
+    if decoded:
+        return decoded
+
+    # Default decoding strategy
+    try:
+        # Try UTF-8 first
+        return value.decode("utf-8").replace("\x00", "").strip()
+    except UnicodeDecodeError:
+        # Fallback to Latin-1
+        return value.decode("latin-1", errors="replace").replace("\x00", "").strip()
+
+
 def _extract_description(exif_data: ExifDict) -> str | None:
     description = exif_data.get("ImageDescription")
     if description is None:
         return None
-    if isinstance(description, bytes):
-        try:
-            # Try strict UTF-8 first
-            desc = description.decode("utf-8").replace("\x00", "").strip()
-        except UnicodeDecodeError:
-            # Fallback to Latin-1 (CP1252 subset maps 1:1, usually correct for legacy EXIF)
-            # This handles "copyright" symbols (\xa9) correctly where utf-8 would fail
-            try:
-                desc = description.decode("latin-1").replace("\x00", "").strip()
-            except (UnicodeDecodeError, AttributeError) as err:
-                desc = str(description)
-                logger.debug("Failed to decode description with fallbacks: %s", err)
-    else:
-        desc = str(description).replace("\x00", "").strip()
+    desc = _decode_exif_string(description)
     return desc or None
 
 
@@ -3585,24 +3650,8 @@ def _extract_gps_str(gps_info_raw: Mapping[Any, Any] | None) -> str | None:
         return (dd, ref_upper)
 
     try:
-        lat_ref_str: str = (
-            (
-                lat_ref.decode("ascii", errors="replace")
-                if isinstance(lat_ref, bytes)
-                else str(lat_ref)
-            )
-            .replace("\x00", "")
-            .strip()
-        )
-        lon_ref_str: str = (
-            (
-                lon_ref.decode("ascii", errors="replace")
-                if isinstance(lon_ref, bytes)
-                else str(lon_ref)
-            )
-            .replace("\x00", "")
-            .strip()
-        )
+        lat_ref_str: str = _decode_exif_string(lat_ref)
+        lon_ref_str: str = _decode_exif_string(lon_ref)
         lat_dd, lat_card = dms_to_dd(latitude, lat_ref_str)
         lon_dd, lon_card = dms_to_dd(longitude, lon_ref_str)
     except (ValueError, AttributeError, TypeError) as err:
@@ -4775,7 +4824,7 @@ def _build_full_html_document(
                 # Resize if larger than 1024px in either dimension
                 max_size = 1024
                 # Explicitly type as generic Image to handle both ImageFile and resized Image
-                img_to_save: Image.Image = img_original
+                img_to_save: PILImage = img_original
                 if img_original.width > max_size or img_original.height > max_size:
                     # Calculate new dimensions maintaining aspect ratio
                     ratio = min(max_size / img_original.width, max_size / img_original.height)
@@ -6897,8 +6946,6 @@ def _dump_environment_to_log(output_path: Path) -> None:
     try:
         # Detect if we're in a conda environment
         conda_env = os.environ.get("CONDA_DEFAULT_ENV")
-        is_conda = conda_env is not None
-
         # Ensure output directory exists
         env_log_path = output_path.resolve()
         env_log_path.parent.mkdir(parents=True, exist_ok=True)
@@ -6908,56 +6955,21 @@ def _dump_environment_to_log(output_path: Path) -> None:
             env_file.write(f"FULL ENVIRONMENT DUMP - {local_now_str()}\n")
             env_file.write("=" * 80 + "\n\n")
 
-            # Try pip freeze first (works in both conda and venv)
+            # Use importlib.metadata (standard library) instead of subprocess calling pip/conda
+            # to avoid S603 security lints and provide faster, more reliable dumping.
             try:
-                pip_cmd = _resolve_safe_command([sys.executable, "-m", "pip", "freeze"])
-                if pip_cmd:
-                    # Command is hardcoded above, validated by _resolve_safe_command
-                    pip_result = subprocess.run(  # noqa: S603
-                        pip_cmd,
-                        capture_output=True,
-                        text=True,
-                        timeout=30,
-                        check=False,
-                    )
-                    if pip_result.returncode == 0:
-                        env_file.write("--- pip freeze ---\n")
-                        env_file.write(pip_result.stdout)
-                        env_file.write("\n")
-                    else:
-                        env_file.write(f"pip freeze failed: {pip_result.stderr}\n")
-                else:
-                    env_file.write("pip freeze skipped: invalid executable\n")
-            except (subprocess.SubprocessError, FileNotFoundError) as pip_err:
-                env_file.write(f"Could not run pip freeze: {pip_err}\n")
+                dists = sorted(importlib.metadata.distributions(), key=lambda d: d.name.lower())
+                env_file.write("--- Python Packages (via importlib.metadata) ---\n")
+                env_file.write(f"Total packages: {len(dists)}\n\n")
+                for d in dists:
+                    env_file.write(f"{d.name}=={d.version}\n")
+                env_file.write("\n")
+            except (OSError, ValueError, RuntimeError) as dist_err:
+                env_file.write(f"Could not gather package list: {dist_err}\n")
 
-            # If in conda, also capture conda list
-            if is_conda:
-                try:
-                    conda_path = shutil.which("conda")
-                    if conda_path:
-                        conda_cmd = _resolve_safe_command([conda_path, "list"])
-                        if conda_cmd:
-                            # Command is hardcoded above, validated by _resolve_safe_command
-                            conda_result = subprocess.run(  # noqa: S603
-                                conda_cmd,
-                                capture_output=True,
-                                text=True,
-                                timeout=30,
-                                check=False,
-                            )
-                            if conda_result.returncode == 0:
-                                env_file.write(f"--- conda list (env: {conda_env}) ---\n")
-                                env_file.write(conda_result.stdout)
-                                env_file.write("\n")
-                            else:
-                                env_file.write(f"conda list failed: {conda_result.stderr}\n")
-                        else:
-                            env_file.write("conda list skipped: invalid executable\n")
-                    else:
-                        env_file.write("conda command not found in PATH\n")
-                except (subprocess.SubprocessError, FileNotFoundError) as conda_err:
-                    env_file.write(f"Could not run conda list: {conda_err}\n")
+            # Log conda environment name if applicable
+            if conda_env:
+                env_file.write(f"Conda Environment: {conda_env}\n")
 
             env_file.write("=" * 80 + "\n")
             env_file.write(f"Environment dump completed at {local_now_str()}\n")
@@ -8013,10 +8025,9 @@ def main(args: argparse.Namespace) -> None:
     """Run CLI execution for MLX VLM model check."""
     overall_start_time: float = time.perf_counter()
     try:
-        # Validate all CLI arguments early to fail fast
-        validate_cli_arguments(args)
-
         library_versions = setup_environment(args)
+        # Validate all CLI arguments early to fail fast (after logging setup)
+        validate_cli_arguments(args)
         print_cli_header("MLX Vision Language Model Check")
 
         image_path = find_and_validate_image(args)
