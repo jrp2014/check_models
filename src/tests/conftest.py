@@ -17,7 +17,9 @@ from __future__ import annotations
 import contextlib
 import importlib.util
 import logging
+import os
 import sys
+import tempfile
 import time
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -34,6 +36,17 @@ if TYPE_CHECKING:
 TEST_DIR = Path(__file__).parent
 SRC_DIR = TEST_DIR.parent
 OUTPUT_DIR = SRC_DIR / "output"
+
+# =============================================================================
+# EARLY ENVIRONMENT SETUP (before any HuggingFace imports cache paths)
+# =============================================================================
+
+# Set up HF cache directory early, before any huggingface_hub functions cache the path.
+# This is needed for CI environments that don't have ~/.cache/huggingface/hub
+_HF_CACHE_DIR = Path(tempfile.gettempdir()) / "pytest_hf_cache" / "hub"
+_HF_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+os.environ.setdefault("HF_HUB_CACHE", str(_HF_CACHE_DIR))
+os.environ.setdefault("HF_HOME", str(_HF_CACHE_DIR.parent))
 
 
 # =============================================================================
