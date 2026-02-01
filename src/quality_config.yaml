@@ -72,6 +72,17 @@ thresholds:
   grade_c_threshold: 50.0         # Score for C grade
   grade_d_threshold: 35.0         # Score for D grade
 
+  # Harness/integration issue detection thresholds
+  # These detect mlx-vlm bugs or model integration issues (not model quality)
+  min_bpe_artifact_count: 5       # Min BPE artifacts to flag encoding issue
+  min_tokens_for_substantial: 10  # Tokens below this are suspicious
+  min_words_for_filler_response: 15  # Words below this in filler response
+  min_words_for_truncated: 5      # Words below this = truncated output
+  min_prompt_tokens_for_ratio: 100  # Prompt tokens needed for ratio check
+  min_output_tokens_for_ratio: 15   # Output tokens below this with large prompt
+  min_output_ratio: 0.02          # Minimum output/prompt ratio (2%)
+  min_text_for_leak_detection: 100  # Min text length for training leak detection
+
 patterns:
   # Hallucination detection
   hallucination_question_indicators:

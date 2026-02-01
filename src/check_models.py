@@ -29,7 +29,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from collections import Counter
-from collections.abc import Callable, Iterator, Mapping
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from functools import lru_cache
@@ -253,6 +253,16 @@ class QualityThresholds:
     grade_b_threshold: float = 65.0  # Score for B grade
     grade_c_threshold: float = 50.0  # Score for C grade
     grade_d_threshold: float = 35.0  # Score for D grade
+
+    # Harness issue detection thresholds
+    min_bpe_artifact_count: int = 5  # Min BPE artifacts to flag encoding issue
+    min_tokens_for_substantial: int = 10  # Tokens below this are suspicious
+    min_words_for_filler_response: int = 15  # Words below this in filler response
+    min_words_for_truncated: int = 5  # Words below this = truncated output
+    min_prompt_tokens_for_ratio: int = 100  # Prompt tokens needed for ratio check
+    min_output_tokens_for_ratio: int = 15  # Output tokens below this with large prompt
+    min_output_ratio: float = 0.02  # Minimum output/prompt ratio (2%)
+    min_text_for_leak_detection: int = 100  # Min text length for training leak detection
 
     # Patterns (loaded from config)
     patterns: dict[str, list[str]] | None = None
@@ -2062,6 +2072,203 @@ def _detect_fabricated_details(text: str) -> tuple[bool, list[str]]:
     return bool(issues), issues
 
 
+# =============================================================================
+# HARNESS/INTEGRATION ISSUE DETECTION
+# =============================================================================
+# These detect issues that are likely bugs in mlx-vlm or model integration,
+# NOT inherent model quality problems. Separating them helps users know
+# whether to report issues upstream vs. use a different model.
+
+
+def _detect_token_encoding_issues(text: str) -> tuple[bool, str | None]:
+    """Detect tokenizer decoding bugs where raw BPE tokens leak through.
+
+    Common pattern: Ġ (U+0120) appearing instead of spaces, indicating
+    the tokenizer's space-prefix marker wasn't decoded properly.
+
+    Args:
+        text: Generated text to check
+
+    Returns:
+        Tuple of (has_issue, issue_type)
+    """
+    if not text:
+        return False, None
+
+    # Check for Ġ (U+0120) - BPE space marker leak
+    # This is a specific HuggingFace tokenizer artifact
+    if "\u0120" in text:
+        count = text.count("\u0120")
+        return True, f"bpe_space_leak({count})"
+
+    # Check for Ċ (U+010A) - BPE newline marker leak
+    if "\u010a" in text:
+        count = text.count("\u010a")
+        return True, f"bpe_newline_leak({count})"
+
+    # Check for other common tokenizer artifacts that shouldn't be visible
+    # These are byte-level BPE artifacts
+    bpe_artifacts = [
+        ("\u0100", "byte_0"),  # Byte fallback prefix
+        ("\u0101", "byte_1"),
+        ("\u0102", "byte_2"),
+    ]
+    for artifact, name in bpe_artifacts:
+        if artifact in text and text.count(artifact) > QUALITY.min_bpe_artifact_count:
+            return True, f"bpe_byte_leak({name})"
+
+    return False, None
+
+
+def _detect_special_token_leakage(text: str) -> tuple[bool, list[str]]:
+    """Detect special/control tokens that leaked into output.
+
+    These indicate the generation stop logic failed to halt at EOS/EOT tokens,
+    or the output wasn't properly post-processed to strip special tokens.
+
+    Args:
+        text: Generated text to check
+
+    Returns:
+        Tuple of (has_leakage, list of leaked tokens found)
+    """
+    if not text:
+        return False, []
+
+    leaked_tokens: list[str] = []
+
+    # Common special tokens that should never appear in output
+    special_token_patterns = [
+        # End tokens
+        (r"<\|end\|>", "<|end|>"),
+        (r"<\|endoftext\|>", "<|endoftext|>"),
+        (r"<\|eot_id\|>", "<|eot_id|>"),
+        (r"<\|im_end\|>", "<|im_end|>"),
+        (r"<\|assistant\|>", "<|assistant|>"),
+        (r"<end_of_turn>", "<end_of_turn>"),
+        (r"</s>(?!\w)", "</s>"),  # Not followed by word char (avoid </span>)
+        (r"<s>(?!\w)", "<s>"),
+        # Instruction markers
+        (r"# INSTRUCTION", "# INSTRUCTION"),
+        (r"# SOLUTION", "# SOLUTION"),
+        (r"\[INST\]", "[INST]"),
+        (r"\[/INST\]", "[/INST]"),
+        # Thinking markers (some models expose these)
+        (r"<\|think\|>", "<|think|>"),
+        (r"</think>", "</think>"),
+        # Other control tokens
+        (r"<\|pad\|>", "<|pad|>"),
+        (r"<\|unk\|>", "<|unk|>"),
+        (r"\[PAD\]", "[PAD]"),
+        (r"\[CLS\]", "[CLS]"),
+        (r"\[SEP\]", "[SEP]"),
+    ]
+
+    for pattern, token_name in special_token_patterns:
+        if re.search(pattern, text):
+            leaked_tokens.append(token_name)
+
+    return bool(leaked_tokens), leaked_tokens
+
+
+def _detect_minimal_output(
+    text: str,
+    generated_tokens: int,
+    prompt_tokens: int | None = None,
+) -> tuple[bool, str | None]:
+    """Detect suspiciously minimal output suggesting prompt template issues.
+
+    When a model generates very few tokens despite a substantial prompt,
+    it often indicates:
+    - Wrong chat template applied
+    - Model thinks task is already complete
+    - Generation parameters misconfigured
+
+    Args:
+        text: Generated text
+        generated_tokens: Number of tokens generated
+        prompt_tokens: Number of tokens in prompt (if known)
+
+    Returns:
+        Tuple of (is_minimal, reason)
+    """
+    # Zero tokens is always a harness issue
+    if generated_tokens == 0:
+        return True, "zero_tokens"
+
+    # Less than threshold tokens when we have a substantial prompt
+    if generated_tokens < QUALITY.min_tokens_for_substantial:
+        # Check if the output is actually meaningful or just filler
+        text_stripped = text.strip()
+        word_count = len(text_stripped.split())
+
+        # Single sentence filler responses
+        filler_responses = [
+            "the image is a photograph",
+            "the image is in the public domain",
+            "i cannot",
+            "i can't",
+            "this image shows",
+        ]
+        text_lower = text_stripped.lower()
+        for filler in filler_responses:
+            if text_lower.startswith(filler) and word_count < QUALITY.min_words_for_filler_response:
+                return True, f"filler_response({generated_tokens}tok)"
+
+        if word_count < QUALITY.min_words_for_truncated:
+            return True, f"truncated({generated_tokens}tok)"
+
+    # Very low ratio of output to prompt (if prompt_tokens known)
+    if (
+        prompt_tokens
+        and prompt_tokens > QUALITY.min_prompt_tokens_for_ratio
+        and generated_tokens < QUALITY.min_output_tokens_for_ratio
+    ):
+        ratio = generated_tokens / prompt_tokens
+        if ratio < QUALITY.min_output_ratio:
+            return True, f"output_ratio({ratio:.1%})"
+
+    return False, None
+
+
+def _detect_training_data_leak(text: str) -> tuple[bool, str | None]:
+    """Detect training data or instruction template leaking into output.
+
+    Some models fail to stop and start generating what looks like
+    training examples or new instructions mid-output.
+
+    Args:
+        text: Generated text to check
+
+    Returns:
+        Tuple of (has_leak, leak_type)
+    """
+    if not text or len(text) < QUALITY.min_text_for_leak_detection:
+        return False, None
+
+    # Look for instruction-like patterns appearing mid-output
+    instruction_patterns = [
+        # Direct instruction markers
+        (r"\n# INSTRUCTION\b", "instruction_header"),
+        (r"\n## (Task|Question|Instructions?):", "task_header"),
+        (r"\nWrite a (?:short )?(?:story|essay|poem|code)", "write_prompt"),
+        (r"\n(?:User|Human|Question):\s*\n", "user_turn"),
+        # Code-related training patterns
+        (r"\n```\w+\n.*?def \w+\(", "code_example"),
+        # Q&A training patterns
+        (r"\nQ:\s*\n.*?\nA:\s*\n", "qa_pair"),
+    ]
+
+    # Only check the latter portion of output (leaks happen after good output)
+    check_portion = text[len(text) // 3 :]
+
+    for pattern, leak_type in instruction_patterns:
+        if re.search(pattern, check_portion, re.DOTALL):
+            return True, leak_type
+
+    return False, None
+
+
 def compute_vocabulary_diversity(text: str) -> tuple[float, int, int]:
     """Compute vocabulary diversity metrics for generated text.
 
@@ -2599,10 +2806,39 @@ class GenerationQualityAnalysis:
     # MOD: Added fabrication detection (hallucinated details)
     has_fabrication: bool
     fabrication_issues: list[str]
+    # MOD: Added harness/integration issue detection
+    # These indicate bugs in mlx-vlm or model integration, not model quality
+    has_harness_issue: bool
+    harness_issue_type: str | None
+    harness_issue_details: list[str]
 
     def has_any_issues(self) -> bool:
         """Return True if any quality issues were detected."""
         return (
+            self.is_repetitive
+            or bool(self.hallucination_issues)
+            or self.is_verbose
+            or bool(self.formatting_issues)
+            or self.has_excessive_bullets
+            or self.is_context_ignored
+            or self.is_refusal
+            or self.is_generic
+            or self.has_language_mixing
+            or self.has_degeneration
+            or self.has_fabrication
+            or self.has_harness_issue
+        )
+
+    def has_harness_issues_only(self) -> bool:
+        """Return True if only harness issues detected (no model quality issues).
+
+        Useful for filtering reports - if only harness issues, the model may
+        work fine with a different integration approach.
+        """
+        if not self.has_harness_issue:
+            return False
+        # Check if there are any non-harness issues
+        return not (
             self.is_repetitive
             or bool(self.hallucination_issues)
             or self.is_verbose
@@ -2642,6 +2878,11 @@ class GenerationQualityAnalysis:
             issues_list.append(f"Output degeneration ({self.degeneration_type})")
         if self.has_fabrication:
             issues_list.extend(self.fabrication_issues)
+        # Harness issues (prominently marked as integration problems)
+        if self.has_harness_issue:
+            harness_label = f"⚠️HARNESS:{self.harness_issue_type}"
+            issues_list.insert(0, harness_label)  # Put at front for visibility
+            issues_list.extend(self.harness_issue_details)
         return issues_list
 
 
@@ -2696,6 +2937,37 @@ def analyze_generation_text(
     # MOD: Added fabrication detection (hallucinated specifics)
     has_fabrication, fabrication_issues = _detect_fabricated_details(text)
 
+    # MOD: Added harness/integration issue detection
+    # These indicate mlx-vlm bugs, not model quality issues
+    harness_issues: list[str] = []
+    harness_type: str | None = None
+
+    # Check for token encoding issues (BPE leak)
+    has_encoding_issue, encoding_type = _detect_token_encoding_issues(text)
+    if has_encoding_issue and encoding_type:
+        harness_type = harness_type or "encoding"
+        harness_issues.append(f"token_encoding:{encoding_type}")
+
+    # Check for special token leakage
+    has_token_leak, leaked_tokens = _detect_special_token_leakage(text)
+    if has_token_leak:
+        harness_type = harness_type or "stop_token"
+        harness_issues.extend([f"token_leak:{tok}" for tok in leaked_tokens[:3]])
+
+    # Check for minimal/zero output (prompt template issue)
+    has_minimal, minimal_type = _detect_minimal_output(text, generated_tokens)
+    if has_minimal and minimal_type:
+        harness_type = harness_type or "prompt_template"
+        harness_issues.append(f"output:{minimal_type}")
+
+    # Check for training data leakage
+    has_training_leak, leak_type = _detect_training_data_leak(text)
+    if has_training_leak and leak_type:
+        harness_type = harness_type or "generation_loop"
+        harness_issues.append(f"training_leak:{leak_type}")
+
+    has_harness_issue = bool(harness_issues)
+
     return GenerationQualityAnalysis(
         is_repetitive=is_repetitive,
         repeated_token=repeated_token,
@@ -2716,6 +2988,9 @@ def analyze_generation_text(
         degeneration_type=degeneration_type,
         has_fabrication=has_fabrication,
         fabrication_issues=fabrication_issues,
+        has_harness_issue=has_harness_issue,
+        harness_issue_type=harness_type,
+        harness_issue_details=harness_issues,
     )
 
 
@@ -3382,13 +3657,16 @@ def _convert_gps_coordinate(
         return None
 
     # EXIF values have unpredictable types from camera vendors
-    def _to_val(v: Any) -> float | None:
+    # Use object type to accept anything, then check with isinstance
+    def _to_val(v: float | tuple[float, ...] | list[float] | str | object) -> float | None:
         if isinstance(v, (float, int)):
             return float(v)
         if isinstance(v, (tuple, list)) and len(v) == RATIONAL_TUPLE_LEN:
             try:
-                num = float(v[0])
-                den = float(v[1])
+                # Cast to sequence for type checker - we've verified it's tuple/list
+                seq = cast("Sequence[float]", v)
+                num = float(seq[0])
+                den = float(seq[1])
                 return num / den if den != 0 else None
             except (ValueError, TypeError):
                 return None
@@ -7461,8 +7739,13 @@ def _format_quality_analysis_for_log(analysis: GenerationQualityAnalysis) -> str
 def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | None:
     """Build consolidated quality issues string from analysis results.
 
-    Prioritizes critical issues first (refusal → repetitive → lang_mixing →
-    hallucination → generic → verbose → formatting → bullets → context-ignored).
+    Prioritizes critical issues first:
+    HARNESS ISSUES (integration bugs) → refusal → repetitive → lang_mixing →
+    hallucination → generic → verbose → formatting → bullets → context-ignored.
+
+    Harness issues are prefixed with ⚠️ to clearly distinguish them from
+    model quality issues. These indicate bugs in mlx-vlm or model integration
+    that should be reported upstream.
 
     Args:
         analysis: GenerationQualityAnalysis with detected issues
@@ -7480,7 +7763,17 @@ def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | N
     """
     issues = []
 
-    # Critical issues first
+    # HIGHEST PRIORITY: Harness/integration issues (mlx-vlm bugs, not model quality)
+    # These get special prefix to clearly mark them as actionable infrastructure issues
+    if analysis.has_harness_issue:
+        harness_label = (
+            f"⚠️harness({analysis.harness_issue_type})"
+            if analysis.harness_issue_type
+            else "⚠️harness"
+        )
+        issues.append(harness_label)
+
+    # Critical model quality issues
     if analysis.is_refusal:
         refusal_label = f"refusal({analysis.refusal_type})" if analysis.refusal_type else "refusal"
         issues.append(refusal_label)

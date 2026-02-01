@@ -345,3 +345,194 @@ def test_analyze_generation_text_includes_fabrication() -> None:
     analysis = check_models.analyze_generation_text(text, 15)
     assert analysis.has_fabrication is True
     assert len(analysis.fabrication_issues) > 0
+
+
+# =============================================================================
+# Tests for harness/integration issue detection
+# =============================================================================
+
+
+def test_detect_token_encoding_issues_bpe_space_leak() -> None:
+    """Detect BPE space marker (Ġ) leaking into output."""
+    # This is the exact pattern seen in Devstral output
+    text = 'Factual\u0120Caption:\u0120"Evening\u0120view'
+    has_issue, issue_type = check_models._detect_token_encoding_issues(text)
+    assert has_issue is True
+    assert issue_type is not None
+    assert "bpe_space_leak" in issue_type
+
+
+def test_detect_token_encoding_issues_clean() -> None:
+    """Clean text should not trigger encoding detection."""
+    text = "A normal caption with proper spacing."
+    has_issue, issue_type = check_models._detect_token_encoding_issues(text)
+    assert has_issue is False
+    assert issue_type is None
+
+
+def test_detect_special_token_leakage_end_token() -> None:
+    """Detect special end tokens leaking into output."""
+    text = "Good output ends here.<|end|><|endoftext|>And then training data follows."
+    has_leak, leaked = check_models._detect_special_token_leakage(text)
+    assert has_leak is True
+    assert any("<|end|>" in tok for tok in leaked)
+
+
+def test_detect_special_token_leakage_instruction_marker() -> None:
+    """Detect instruction markers leaking (training data leak)."""
+    text = "Normal output.\n# INSTRUCTION\nWrite a story about..."
+    has_leak, leaked = check_models._detect_special_token_leakage(text)
+    assert has_leak is True
+    assert any("INSTRUCTION" in tok for tok in leaked)
+
+
+def test_detect_special_token_leakage_clean() -> None:
+    """Clean output should not trigger token leakage detection."""
+    text = "A well-formed response describing an image."
+    has_leak, leaked = check_models._detect_special_token_leakage(text)
+    assert has_leak is False
+    assert leaked == []
+
+
+def test_detect_minimal_output_zero_tokens() -> None:
+    """Zero tokens should always be flagged as harness issue."""
+    has_minimal, reason = check_models._detect_minimal_output("", 0)
+    assert has_minimal is True
+    assert reason == "zero_tokens"
+
+
+def test_detect_minimal_output_filler_response() -> None:
+    """Detect minimal filler responses."""
+    text = "The image is a photograph."
+    has_minimal, reason = check_models._detect_minimal_output(text, 8)
+    assert has_minimal is True
+    assert "filler_response" in (reason or "")
+
+
+def test_detect_minimal_output_normal() -> None:
+    """Normal output should not be flagged as minimal."""
+    text = "A detailed description of the image showing buildings and people."
+    has_minimal, reason = check_models._detect_minimal_output(text, 50)
+    assert has_minimal is False
+    assert reason is None
+
+
+def test_detect_training_data_leak_instruction() -> None:
+    """Detect training data instruction patterns leaking into output."""
+    text = (
+        "Good response about the image showing buildings.\n"
+        "The architecture is typical of the region.\n"
+        "# INSTRUCTION\n"
+        "Write a short story about a young inventor named Alex."
+    )
+    has_leak, leak_type = check_models._detect_training_data_leak(text)
+    assert has_leak is True
+    assert leak_type == "instruction_header"
+
+
+def test_detect_training_data_leak_clean() -> None:
+    """Normal output should not trigger training data leak detection."""
+    text = "A well-formed response about an image showing historic buildings in England."
+    has_leak, leak_type = check_models._detect_training_data_leak(text)
+    assert has_leak is False
+    assert leak_type is None
+
+
+def test_analyze_generation_text_includes_harness_issues() -> None:
+    """Verify analyze_generation_text detects harness issues."""
+    # Text with BPE space leak
+    text = "Factual\u0120Caption:\u0120A\u0120nice\u0120image"
+    analysis = check_models.analyze_generation_text(text, 10)
+    assert analysis.has_harness_issue is True
+    assert analysis.harness_issue_type == "encoding"
+    assert len(analysis.harness_issue_details) > 0
+
+
+def test_build_quality_issues_string_includes_harness() -> None:
+    """Verify harness issues appear prominently in quality string."""
+    # Create analysis with harness issue
+    analysis = check_models.GenerationQualityAnalysis(
+        is_repetitive=False,
+        repeated_token=None,
+        hallucination_issues=[],
+        is_verbose=False,
+        formatting_issues=[],
+        has_excessive_bullets=False,
+        bullet_count=0,
+        is_context_ignored=False,
+        missing_context_terms=[],
+        is_refusal=False,
+        refusal_type=None,
+        is_generic=False,
+        specificity_score=0.0,
+        has_language_mixing=False,
+        language_mixing_issues=[],
+        has_degeneration=False,
+        degeneration_type=None,
+        has_fabrication=False,
+        fabrication_issues=[],
+        has_harness_issue=True,
+        harness_issue_type="encoding",
+        harness_issue_details=["bpe_space_leak(5)"],
+    )
+    result = check_models._build_quality_issues_string(analysis)
+    assert result is not None
+    assert "⚠️harness" in result
+    assert result.startswith("⚠️harness")  # Should be first
+
+
+def test_has_harness_issues_only() -> None:
+    """Test method to check if only harness issues present."""
+    # Harness issue only
+    harness_only = check_models.GenerationQualityAnalysis(
+        is_repetitive=False,
+        repeated_token=None,
+        hallucination_issues=[],
+        is_verbose=False,
+        formatting_issues=[],
+        has_excessive_bullets=False,
+        bullet_count=0,
+        is_context_ignored=False,
+        missing_context_terms=[],
+        is_refusal=False,
+        refusal_type=None,
+        is_generic=False,
+        specificity_score=0.0,
+        has_language_mixing=False,
+        language_mixing_issues=[],
+        has_degeneration=False,
+        degeneration_type=None,
+        has_fabrication=False,
+        fabrication_issues=[],
+        has_harness_issue=True,
+        harness_issue_type="encoding",
+        harness_issue_details=["bpe_space_leak"],
+    )
+    assert harness_only.has_harness_issues_only() is True
+
+    # Harness issue + model quality issue
+    mixed_issues = check_models.GenerationQualityAnalysis(
+        is_repetitive=True,  # Model quality issue
+        repeated_token="same",  # noqa: S106 - test value, not a password
+        hallucination_issues=[],
+        is_verbose=False,
+        formatting_issues=[],
+        has_excessive_bullets=False,
+        bullet_count=0,
+        is_context_ignored=False,
+        missing_context_terms=[],
+        is_refusal=False,
+        refusal_type=None,
+        is_generic=False,
+        specificity_score=0.0,
+        has_language_mixing=False,
+        language_mixing_issues=[],
+        has_degeneration=False,
+        degeneration_type=None,
+        has_fabrication=False,
+        fabrication_issues=[],
+        has_harness_issue=True,  # Also harness issue
+        harness_issue_type="encoding",
+        harness_issue_details=["bpe_space_leak"],
+    )
+    assert mixed_issues.has_harness_issues_only() is False
