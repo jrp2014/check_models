@@ -3285,6 +3285,7 @@ def get_library_versions() -> LibraryVersionDict:
     return {
         "numpy": _none_if_na(_get_version("numpy", numpy_version)),
         "mlx": _none_if_na(mlx_ver),
+        "mlx-metal": _none_if_na(_get_version("mlx-metal")),
         "mlx-vlm": _none_if_na(mlx_vlm_ver),
         "mlx-lm": _none_if_na(_get_version("mlx-lm")),
         "huggingface-hub": _none_if_na(_get_version("huggingface-hub", hf_version)),
@@ -5721,6 +5722,114 @@ def get_system_info() -> tuple[str, str | None]:
     return arch, gpu_info
 
 
+def _get_macos_toolchain_info() -> dict[str, str]:
+    """Get macOS developer toolchain info (Xcode, SDK, CLTools).
+
+    Returns dict with available toolchain version info. Safe to call on any OS
+    (returns empty dict on non-macOS).
+    """
+    info: dict[str, str] = {}
+    if platform.system() != "Darwin":
+        return info
+
+    # Get SDK version (useful for Metal/framework compatibility)
+    try:
+        sdk_result = subprocess.run(
+            ["/usr/bin/xcrun", "--show-sdk-version"],
+            capture_output=True,
+            text=True,
+            timeout=2,
+            check=False,
+        )
+        if sdk_result.returncode == 0 and sdk_result.stdout.strip():
+            info["SDK Version"] = sdk_result.stdout.strip()
+    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+        pass
+
+    # Get Xcode version (important for Metal shader compilation)
+    try:
+        xcode_result = subprocess.run(
+            ["/usr/bin/xcodebuild", "-version"],
+            capture_output=True,
+            text=True,
+            timeout=2,
+            check=False,
+        )
+        if xcode_result.returncode == 0 and xcode_result.stdout.strip():
+            # Output format: "Xcode 15.4\nBuild version 15F31d"
+            lines = xcode_result.stdout.strip().split("\n")
+            if lines:
+                info["Xcode Version"] = lines[0].replace("Xcode ", "").strip()
+                if len(lines) > 1 and "Build version" in lines[1]:
+                    info["Xcode Build"] = lines[1].replace("Build version ", "").strip()
+    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+        pass
+
+    # Get Metal SDK path (useful for debugging Metal issues)
+    try:
+        sdk_path_result = subprocess.run(
+            ["/usr/bin/xcrun", "--show-sdk-path"],
+            capture_output=True,
+            text=True,
+            timeout=2,
+            check=False,
+        )
+        if sdk_path_result.returncode == 0 and sdk_path_result.stdout.strip():
+            info["Metal SDK"] = Path(sdk_path_result.stdout.strip()).name
+    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+        pass
+
+    # Get Command Line Tools version if Xcode not available
+    if "Xcode Version" not in info:
+        try:
+            clt_result = subprocess.run(
+                ["/usr/bin/pkgutil", "--pkg-info", "com.apple.pkg.CLTools_Executables"],
+                capture_output=True,
+                text=True,
+                timeout=2,
+                check=False,
+            )
+            if clt_result.returncode == 0:
+                for line in clt_result.stdout.split("\n"):
+                    if line.startswith("version:"):
+                        info["CLTools Version"] = line.split(":", 1)[1].strip()
+                        break
+        except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+            pass
+
+    return info
+
+
+def _get_apple_silicon_info() -> dict[str, str]:
+    """Get Apple Silicon GPU info from system_profiler.
+
+    Returns dict with GPU cores and Metal support info. Safe to call on any
+    architecture (returns empty dict on non-arm64).
+    """
+    info: dict[str, str] = {}
+    if platform.machine() != "arm64":
+        return info
+
+    device_info = get_device_info() or {}
+    displays = device_info.get("SPDisplaysDataType") or []
+    if not displays or not isinstance(displays, list):
+        return info
+
+    first = displays[0]
+    if not isinstance(first, dict):
+        return info
+
+    gpu_cores = first.get("sppci_cores")
+    if gpu_cores is not None:
+        info["GPU Cores"] = str(gpu_cores)
+
+    metal_family = first.get("spdisplays_mtlgpufamilysupport")
+    if metal_family:
+        info["Metal Support"] = metal_family.replace("spdisplays_metal", "Metal ")
+
+    return info
+
+
 def get_system_characteristics() -> dict[str, str]:
     """Gather system/hardware characteristics for inclusion in reports.
 
@@ -5734,20 +5843,8 @@ def get_system_characteristics() -> dict[str, str]:
         info["OS"] = f"{platform.system()} {platform.release()}"
         if platform.system() == "Darwin":
             info["macOS Version"] = platform.mac_ver()[0]
+            info.update(_get_macos_toolchain_info())
 
-            # Get SDK version (useful for Metal/framework compatibility)
-            try:
-                sdk_result = subprocess.run(
-                    ["/usr/bin/xcrun", "--show-sdk-version"],
-                    capture_output=True,
-                    text=True,
-                    timeout=2,
-                    check=False,
-                )
-                if sdk_result.returncode == 0 and sdk_result.stdout.strip():
-                    info["SDK Version"] = sdk_result.stdout.strip()
-            except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
-                pass  # SDK version is nice-to-have, not critical
         info["Python Version"] = sys.version.split()[0]
         info["Architecture"] = platform.machine()
 
@@ -5756,23 +5853,8 @@ def get_system_characteristics() -> dict[str, str]:
         if gpu_name:
             info["GPU/Chip"] = gpu_name
 
-        # Get detailed device info if on Apple Silicon
-        if platform.machine() == "arm64":
-            device_info = get_device_info() or {}
-            displays = device_info.get("SPDisplaysDataType") or []
-            if displays and isinstance(displays, list):
-                first = displays[0]
-                if isinstance(first, dict):
-                    gpu_cores = first.get("sppci_cores")
-                    if gpu_cores is not None:
-                        info["GPU Cores"] = str(gpu_cores)
-
-                    # Get Metal family version if available
-                    metal_family = first.get("spdisplays_mtlgpufamilysupport")
-                    if metal_family:
-                        # Convert "spdisplays_metal4" to "Metal 4"
-                        metal_ver = metal_family.replace("spdisplays_metal", "Metal ")
-                        info["Metal Support"] = metal_ver
+        # Get detailed Apple Silicon info
+        info.update(_get_apple_silicon_info())
 
         # Get memory and CPU info if psutil available
         if psutil is not None:

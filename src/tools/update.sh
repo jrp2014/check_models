@@ -406,11 +406,18 @@ if [[ "${SKIP_MLX:-0}" == "1" ]] || [[ $SKIP_MLX_PYPI -eq 1 ]]; then
 		echo "[update.sh] Skipping PyPI MLX updates (SKIP_MLX=1 environment variable set)"
 	elif [[ $SKIP_MLX_PYPI -eq 1 ]]; then
 		echo "[update.sh] Skipping PyPI MLX updates (using local development builds)"
+		# Remove stale mlx-metal from PyPI when using local builds
+		# (local builds compile their own Metal backend)
+		if pip show mlx-metal >/dev/null 2>&1; then
+			echo "[update.sh] Removing stale mlx-metal PyPI package (not needed with local builds)..."
+			pip uninstall -y mlx-metal || true
+		fi
 	fi
 else
 	echo "[update.sh] Updating MLX packages from PyPI to latest..."
 	# Explicitly upgrade MLX ecosystem from PyPI, triggering eager transitive upgrades
-	pip_install mlx mlx-lm mlx-vlm 
+	# mlx-metal is the Metal GPU backend - must be explicitly installed
+	pip_install mlx mlx-metal mlx-lm mlx-vlm
 fi
 
 echo "[update.sh] Done."
