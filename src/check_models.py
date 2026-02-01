@@ -422,14 +422,7 @@ except ImportError:
     load_image = cast("Any", _raise_mlx_vlm_missing)
 
     MISSING_DEPENDENCIES["mlx-vlm"] = ERROR_MLX_VLM_MISSING
-try:
-    import mlx_lm
 
-    mlx_lm_version: str = getattr(mlx_lm, "__version__", NOT_AVAILABLE)
-except ImportError:
-    mlx_lm_version = NOT_AVAILABLE
-except AttributeError:
-    mlx_lm_version = f"{NOT_AVAILABLE} (module found, no version attr)"
 _transformers_guard_enabled: bool = os.getenv("MLX_VLM_ALLOW_TF", "0") != "1"
 if _transformers_guard_enabled:
     # Prevent Transformers from importing heavy backends that can hang on macOS/ARM
@@ -437,21 +430,6 @@ if _transformers_guard_enabled:
     os.environ.setdefault("TRANSFORMERS_NO_TF", "1")
     os.environ.setdefault("TRANSFORMERS_NO_FLAX", "1")
     os.environ.setdefault("TRANSFORMERS_NO_JAX", "1")
-
-try:
-    import transformers
-
-    transformers_version: str = transformers.__version__
-
-except ImportError:
-    transformers_version = NOT_AVAILABLE
-
-try:
-    import tokenizers
-
-    tokenizers_version: str = getattr(tokenizers, "__version__", NOT_AVAILABLE)
-except ImportError:
-    tokenizers_version = NOT_AVAILABLE
 
 
 # =============================================================================
@@ -1076,9 +1054,6 @@ MOJIBAKE_HEURISTIC_LEN: Final[int] = 50
 MAX_TUPLE_LEN: Final[int] = 10
 MAX_STR_LEN: Final[int] = 60
 STR_TRUNCATE_LEN: Final[int] = 57
-BASE_NAME_MAX_WIDTH: Final[int] = 45
-COL_WIDTH: Final[int] = 12
-MIN_NAME_COL_WIDTH: Final[int] = len("Model")
 
 # Field display configuration: maps field names to (label, unit) tuples
 # This centralizes all field metadata in one place for consistency
@@ -1111,9 +1086,6 @@ NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
     k for k in FIELD_ABBREVIATIONS if k not in {"model_name", "quality_issues"}
 )
 
-# Console table formatting constants
-MAX_MODEL_NAME_LENGTH = 20  # Allows "microsoft/phi-3-vision" without truncation
-MAX_OUTPUT_LENGTH = 28
 MAX_OUTPUT_LINES = 3  # Max lines to show in summary table
 
 # Performance timing fields: those from PerformanceResult (not GenerationResult)
@@ -2648,55 +2620,6 @@ def compute_visual_grounding(text: str, context: str | None) -> dict[str, float 
     }
 
 
-def _compute_echo_penalty(echo_ratio: float) -> float:
-    """Compute penalty factor based on context echo ratio."""
-    if echo_ratio > QUALITY.severe_echo_threshold:
-        return 0.5  # Severe penalty for mostly echoing
-    if echo_ratio > QUALITY.moderate_echo_threshold:
-        return 0.8  # Moderate penalty
-    return 1.0  # No penalty
-
-
-def _compute_length_factor(word_count: int) -> tuple[float, str]:
-    """Compute length factor and weakness message based on word count."""
-    if word_count < QUALITY.min_useful_words:
-        return 0.2, "Output too short to be useful"
-    if word_count < QUALITY.short_output_words:
-        return 0.6, "Output lacks detail"
-    return 1.0, ""
-
-
-def _identify_primary_weakness(
-    echo_ratio: float,
-    grounding_score: float,
-    compliance_score: float,
-    information_gain_score: float,
-) -> str:
-    """Identify the primary weakness limiting cataloging utility."""
-    if echo_ratio > QUALITY.moderate_echo_threshold:
-        return "Mostly echoes context without adding value"
-    if grounding_score < QUALITY.low_grounding_threshold:
-        return "Lacks visual description of image content"
-    if compliance_score < QUALITY.low_compliance_threshold:
-        return "Missing requested structure (caption/description/keywords)"
-    if information_gain_score < QUALITY.low_info_gain_threshold:
-        return "Limited novel information"
-    return "None identified"
-
-
-def _score_to_grade(score: float) -> str:
-    """Convert numeric score to letter grade."""
-    if score >= QUALITY.grade_a_threshold:
-        return "A"
-    if score >= QUALITY.grade_b_threshold:
-        return "B"
-    if score >= QUALITY.grade_c_threshold:
-        return "C"
-    if score >= QUALITY.grade_d_threshold:
-        return "D"
-    return "F"
-
-
 def compute_cataloging_utility(
     text: str,
     context: str | None,
@@ -2743,10 +2666,22 @@ def compute_cataloging_utility(
     compliance_score = float(task_compliance.get("compliance_score", 0.0))
     grounding_score = float(visual_grounding.get("grounding_score", 0.0))
 
-    # Compute penalties and factors
-    echo_penalty = _compute_echo_penalty(echo_ratio)
+    # Compute echo penalty inline
     word_count = len(text.split())
-    length_factor, length_weakness = _compute_length_factor(word_count)
+    if echo_ratio > QUALITY.severe_echo_threshold:
+        echo_penalty = 0.5  # Severe penalty for mostly echoing
+    elif echo_ratio > QUALITY.moderate_echo_threshold:
+        echo_penalty = 0.8  # Moderate penalty
+    else:
+        echo_penalty = 1.0  # No penalty
+
+    # Compute length factor inline
+    if word_count < QUALITY.min_useful_words:
+        length_factor, length_weakness = 0.2, "Output too short to be useful"
+    elif word_count < QUALITY.short_output_words:
+        length_factor, length_weakness = 0.6, "Output lacks detail"
+    else:
+        length_factor, length_weakness = 1.0, ""
 
     # Weighted combination (out of 100)
     raw_score = (
@@ -2758,17 +2693,31 @@ def compute_cataloging_utility(
 
     final_score = raw_score * echo_penalty * length_factor
 
-    # Determine weakness
-    weakness = length_weakness or _identify_primary_weakness(
-        echo_ratio,
-        grounding_score,
-        compliance_score,
-        information_gain_score,
-    )
+    # Identify primary weakness using threshold checks
+    weakness_checks = [
+        (bool(length_weakness), length_weakness),
+        (
+            echo_ratio > QUALITY.moderate_echo_threshold,
+            "Mostly echoes context without adding value",
+        ),
+        (grounding_score < QUALITY.low_grounding_threshold, "Lacks visual description of image"),
+        (compliance_score < QUALITY.low_compliance_threshold, "Missing requested structure"),
+        (information_gain_score < QUALITY.low_info_gain_threshold, "Limited novel information"),
+    ]
+    weakness = next((msg for cond, msg in weakness_checks if cond), "None identified")
+
+    # Convert score to grade using threshold lookup
+    grade_thresholds = [
+        (QUALITY.grade_a_threshold, "A"),
+        (QUALITY.grade_b_threshold, "B"),
+        (QUALITY.grade_c_threshold, "C"),
+        (QUALITY.grade_d_threshold, "D"),
+    ]
+    grade = next((g for thresh, g in grade_thresholds if final_score >= thresh), "F")
 
     return {
         "utility_score": round(final_score, 1),
-        "utility_grade": _score_to_grade(final_score),
+        "utility_grade": grade,
         "primary_weakness": weakness,
     }
 
@@ -3317,18 +3266,9 @@ def _get_available_fields(results: list[PerformanceResult]) -> list[str]:
     return gen_fields + PERFORMANCE_TIMING_FIELDS
 
 
-def _is_performance_timing_field(field_name: str) -> bool:  # kept for clarity
-    """Return True if ``field_name`` is one of the timing fields we expose.
-
-    Separated into a helper for readability and potential future extension
-    (e.g. alias mapping or dynamic timing metrics).
-    """
-    return field_name in PERFORMANCE_TIMING_FIELDS
-
-
 def _get_field_value(result: PerformanceResult, field_name: str) -> MetricValue:
     """Get field value from either GenerationResult or PerformanceResult."""
-    if _is_performance_timing_field(field_name):
+    if field_name in PERFORMANCE_TIMING_FIELDS:
         return getattr(result, field_name, None)
     return getattr(result.generation, field_name, None) if result.generation else None
 
