@@ -1,49 +1,53 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Python: Check Models (Help)",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "check_models",
-            "args": ["--help"],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}/src",
-            "justMyCode": true
-        },
-        {
-            "name": "Python: Check Models (Default)",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/src/check_models.py",
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}/src",
-            "justMyCode": true
-        },
-        {
-            "name": "Python: Check Models (Custom Args)",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/src/check_models.py",
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}/src",
-            "args": [
-                "--model", "mlx-community/Qwen2.5-VL-7B-Instruct-4bit",
-                "--image", "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg"
-            ],
-            "justMyCode": true
-        },
-        {
-            "name": "Python: Pytest",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "pytest",
-            "args": [
-                "-v"
-            ],
-            "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}/src",
-            "justMyCode": false
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Check Models (Help)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "check_models",
+      "args": [
+        "--help"
+      ],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/src",
+      "justMyCode": true
+    },
+    {
+      "name": "Python: Check Models (Default)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/check_models.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/src",
+      "justMyCode": true
+    },
+    {
+      "name": "Python: Check Models (Custom Args)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/check_models.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/src",
+      "args": [
+        "--model",
+        "mlx-community/Qwen2.5-VL-7B-Instruct-4bit",
+        "--image",
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg"
+      ],
+      "justMyCode": true
+    },
+    {
+      "name": "Python: Pytest",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "-v"
+      ],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/src",
+      "justMyCode": false
+    }
+  ]
 }
