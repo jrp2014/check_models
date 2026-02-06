@@ -7,6 +7,10 @@ on:
     branches: [main]
   workflow_dispatch: {}
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   quality:
     name: Quality Checks
@@ -24,7 +28,7 @@ jobs:
           cache: 'pip'
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '22'
 
@@ -42,10 +46,19 @@ jobs:
           python -m nanobind.stubgen -m mlx.core -r -O ~/.mlx_stubs
           # Copy generated stubs to site-packages to override broken PyPI stubs
           SITE_PACKAGES=$(python -c "import site; print(site.getsitepackages()[0])")
-          cp -r ~/.mlx_stubs/mlx/core/*.pyi "$SITE_PACKAGES/mlx/core/" 2>/dev/null || true
+          cp -r ~/.mlx_stubs/mlx/core/*.pyi "$SITE_PACKAGES/mlx/core/" || echo "⚠️ MLX stub copy failed — type checking may be less accurate"
           rm -rf ~/.mlx_stubs
 
       - name: Run quality checks
         env:
           CI: true
         run: bash src/tools/run_quality_checks.sh
+
+      - name: Upload quality check logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-check-logs
+          path: |
+            src/output/*.log
+          retention-days: 7

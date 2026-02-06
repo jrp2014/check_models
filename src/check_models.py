@@ -277,6 +277,23 @@ class QualityThresholds:
         valid_fields = {f.name for f in dataclasses.fields(cls) if f.name != "patterns"}
         filtered_thresholds = {k: v for k, v in thresholds.items() if k in valid_fields}
 
+        # Warn about unrecognised YAML keys (likely typos)
+        unknown_threshold_keys = set(thresholds) - valid_fields
+        if unknown_threshold_keys:
+            logger.warning(
+                "Unrecognised keys in quality_config.yaml thresholds (ignored): %s",
+                ", ".join(sorted(unknown_threshold_keys)),
+            )
+
+        # Warn about unrecognised top-level config sections
+        known_sections = {"thresholds", "patterns"}
+        unknown_sections = set(config) - known_sections
+        if unknown_sections:
+            logger.warning(
+                "Unrecognised top-level sections in quality_config.yaml (ignored): %s",
+                ", ".join(sorted(unknown_sections)),
+            )
+
         return cls(**filtered_thresholds, patterns=patterns)
 
 
@@ -491,7 +508,7 @@ DEFAULT_LOG_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "check_models.log"
 DEFAULT_JSONL_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.jsonl"
 DEFAULT_ENV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "environment.log"
 
-DEFAULT_TEMPERATURE: Final[float] = 0.1
+DEFAULT_TEMPERATURE: Final[float] = 0.0  # Greedy/deterministic (matches mlx-vlm upstream)
 DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
 MAX_REASONABLE_TEMPERATURE: Final[float] = 2.0  # Warn if temperature exceeds this
 
@@ -648,6 +665,7 @@ class ProcessImageParams:
     kv_bits: int | None
     kv_group_size: int
     quantized_kv_start: int
+    prefill_step_size: int | None = None
     context_marker: str = "Context:"
 
 
@@ -5283,6 +5301,12 @@ def _generate_model_gallery_section(results: list[PerformanceResult]) -> list[st
             md.append(f"**Status:** Failed ({res.error_stage})")
             # Wrap error messages to avoid excessive line length
             error_msg = str(res.error_message)
+            # Wrap bare URLs in angle brackets to satisfy MD034
+            error_msg = re.sub(
+                r"(?<![<(])(https?://[^\s>)]+)",
+                r"<\1>",
+                error_msg,
+            )
             max_inline_length = 80
             if len(error_msg) > max_inline_length:
                 # Escape markdown characters and wrap at word boundaries
@@ -6257,6 +6281,15 @@ def _run_model_generation(
 
     timer.start()
     try:
+        # Build optional kwargs for generate() — only pass when explicitly set.
+        # Note: we use a separate dict + **unpacking instead of a conditional
+        # inline expression because pyrefly cannot type-check
+        # ``**({k: v} if cond else {})`` against generate()'s **kwargs signature
+        # (it incorrectly infers the value type as incompatible with other kw params).
+        extra_kwargs: dict[str, Any] = {}
+        if params.prefill_step_size is not None:
+            extra_kwargs["prefill_step_size"] = params.prefill_step_size
+
         output: GenerationResult | SupportsGenerationResult = generate(
             model=model,
             processor=cast("PythonBackend", processor),
@@ -6272,6 +6305,7 @@ def _run_model_generation(
             kv_group_size=params.kv_group_size,
             quantized_kv_start=params.quantized_kv_start,
             max_tokens=params.max_tokens,
+            **extra_kwargs,
         )
     except TimeoutError as gen_to_err:
         msg = f"Generation timed out for model {params.model_identifier}: {gen_to_err}"
@@ -7675,6 +7709,7 @@ def process_models(
             kv_bits=args.kv_bits,
             kv_group_size=args.kv_group_size,
             quantized_kv_start=args.quantized_kv_start,
+            prefill_step_size=args.prefill_step_size,
             context_marker=args.context_marker,
         )
         result: PerformanceResult = process_image_with_model(params)
@@ -8112,12 +8147,25 @@ def save_jsonl_report(
     - Package attribution for directing reports
     - Quality analysis for successful models
     - Timing metrics for performance analysis
-    - System info and Prompt context (replicated for stateless processing)
+
+    Format (v1.1): First line is a metadata header containing prompt and
+    system_info (shared across all rows). Per-model result lines follow.
     """
     try:
         with filename.open("w", encoding="utf-8") as f:
+            # Write shared metadata header (avoids repeating prompt/system per row)
+            header: dict[str, object] = {
+                "_type": "metadata",
+                "format_version": "1.1",
+                "prompt": prompt,
+                "system": system_info,
+                "timestamp": local_now_str(),
+            }
+            f.write(json.dumps(header) + "\n")
+
             for res in results:
                 record: dict[str, object] = {
+                    "_type": "result",
                     "model": res.model_name,
                     "success": res.success,
                     "error_stage": res.error_stage,
@@ -8126,11 +8174,7 @@ def save_jsonl_report(
                     "error_package": res.error_package,
                     "error_traceback": res.error_traceback,  # Full traceback for diagnostics
                     "quality_issues": _parse_quality_issues_to_list(res.quality_issues),
-                    "context": {
-                        "prompt": prompt,
-                        "system": system_info,
-                        "timestamp": local_now_str(),
-                    },
+                    "timestamp": local_now_str(),
                     "metrics": {},
                     "timing": {},
                 }
@@ -8337,13 +8381,12 @@ def main(args: argparse.Namespace) -> None:
             image_path=image_path,
         )
     except KeyboardInterrupt:
-        logger.exception("Execution interrupted by user.")
-        sys.exit(1)
+        logger.warning("Execution interrupted by user.")
+        sys.exit(130)
     except SystemExit:
-        logger.exception("Execution halted (SystemExit raised).")
         raise
     except (OSError, ValueError, RuntimeError) as main_err:
-        logger.critical("Fatal error in main execution: %s", main_err)
+        logger.critical("Fatal error in main execution: %s", main_err, exc_info=True)
         sys.exit(1)
 
 
@@ -8590,6 +8633,12 @@ def main_cli() -> None:
         type=int,
         default=0,
         help="Start position for KV cache quantization. 0 = from beginning.",
+    )
+    parser.add_argument(
+        "--prefill-step-size",
+        type=int,
+        default=None,
+        help="Step size for prompt prefill. None = use model default.",
     )
     parser.add_argument(
         "-v",

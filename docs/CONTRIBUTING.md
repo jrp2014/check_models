@@ -320,10 +320,10 @@ Dependencies are defined in `src/pyproject.toml` as the single source of truth.
 make update
 
 # Check for outdated packages:
-make check-outdated
+make -C src check-outdated
 
 # Security audit:
-make audit
+make -C src audit
 
 # Sync README dependency blocks:
 make deps-sync
@@ -446,7 +446,7 @@ According to the [official MLX documentation](https://ml-explore.github.io/mlx/b
 - To free up disk space
 - After switching between different MLX versions or branches
 
-**Note**: This does NOT update the lock files themselves. To upgrade dependencies to newer versions, use `make upgrade-deps` instead.
+**Note**: This does NOT update the lock files themselves. To upgrade dependencies to newer versions, edit `src/pyproject.toml` and run `make update`.
 
 ## Release Process
 

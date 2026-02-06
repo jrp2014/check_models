@@ -219,8 +219,11 @@ class TestE2ESmoke:
 
         with e2e_jsonl.open() as f:
             records = [json.loads(line) for line in f if line.strip()]
-        assert len(records) >= 1
-        record = records[0]
+        assert len(records) >= 2  # metadata header + at least 1 result
+        # First line is metadata header
+        assert records[0]["_type"] == "metadata"
+        # Second line is the model result
+        record = records[1]
         assert record["model"] == FIXTURE_MODEL
         assert record["success"] is True
 

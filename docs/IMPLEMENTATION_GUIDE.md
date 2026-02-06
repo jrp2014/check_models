@@ -269,8 +269,6 @@ format_field_value("peak_memory", None)           # ""
 - Avoid silent failures: Always log errors or re-raise with context
 - Use `logger.exception()` to include traceback automatically
 
-### Error Handling
-
 ### Exception Types
 
 - **Known issues**: `OSError`, `ValueError`, `FileNotFoundError`, etc. for validation/I/O errors
@@ -438,16 +436,6 @@ Current config (see `pyproject.toml`):
 
 - Use `ruff format` for layout formatting
 - Use `ruff check --fix` to apply automated fixes for style violations
-
-### Markdown Linting
-
-Markdown consistency is enforced (optionally) via `markdownlint-cli2` using the configuration in `.markdownlint.jsonc`:
-
-- Long lines (MD013) are disabled to allow readable HTML/CSS blocks and wide tables
-- Inline HTML is allowed (MD033) because the codebase already sanitizes/escapes disallowed tags
-- Duplicate headings (MD024) are permitted; some conceptual repeats are intentional
-- Follow existing heading spacing (blank line before/after) and prefer asterisk `*` for unordered lists
-- Run locally with: `npx markdownlint-cli2 "**/*.md"` (or rely on the pre-commit hook if installed)
 
 ### Suppressions
 

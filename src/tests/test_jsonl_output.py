@@ -1,10 +1,23 @@
 """Tests for JSONL output generation."""
 
+from __future__ import annotations
+
 import json
 from dataclasses import dataclass
-from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 from check_models import PerformanceResult, save_jsonl_report
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+
+def _read_jsonl(path: Path) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    """Read JSONL file returning (metadata_header, result_rows)."""
+    lines = path.read_text().strip().split("\n")
+    header: dict[str, Any] = json.loads(lines[0])
+    results: list[dict[str, Any]] = [json.loads(line) for line in lines[1:]]
+    return header, results
 
 
 @dataclass
@@ -22,13 +35,16 @@ class MockGeneration:
 
 
 def test_save_jsonl_report_creates_file(tmp_path: Path) -> None:
-    """Test that save_jsonl_report creates a file."""
+    """Test that save_jsonl_report creates a file with metadata header."""
     output_file = tmp_path / "results.jsonl"
     results: list[PerformanceResult] = []
     save_jsonl_report(results, output_file, prompt="test", system_info={})
 
     assert output_file.exists()
-    assert output_file.read_text() == ""
+    header, rows = _read_jsonl(output_file)
+    assert header["_type"] == "metadata"
+    assert header["prompt"] == "test"
+    assert rows == []
 
 
 def test_save_jsonl_report_content(tmp_path: Path) -> None:
@@ -49,10 +65,12 @@ def test_save_jsonl_report_content(tmp_path: Path) -> None:
     save_jsonl_report(results, output_file, prompt="test", system_info={})
 
     assert output_file.exists()
-    lines = output_file.read_text().strip().split("\n")
-    assert len(lines) == 1
+    header, rows = _read_jsonl(output_file)
+    assert header["_type"] == "metadata"
+    assert len(rows) == 1
 
-    data = json.loads(lines[0])
+    data = rows[0]
+    assert data["_type"] == "result"
     assert data["model"] == "test-model"
     assert data["success"] is True
     assert data["metrics"]["generation_tps"] == 5.0
@@ -75,8 +93,8 @@ def test_save_jsonl_report_no_generation(tmp_path: Path) -> None:
     results = [result]
     save_jsonl_report(results, output_file, prompt="test", system_info={})
 
-    lines = output_file.read_text().strip().split("\n")
-    data = json.loads(lines[0])
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
 
     assert data["model"] == "test-model"
     assert "metrics" in data
@@ -98,8 +116,8 @@ def test_save_jsonl_report_failed_model(tmp_path: Path) -> None:
     results = [result]
     save_jsonl_report(results, output_file, prompt="test", system_info={})
 
-    lines = output_file.read_text().strip().split("\n")
-    data = json.loads(lines[0])
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
 
     assert data["model"] == "failed-model"
     assert data["success"] is False
@@ -125,8 +143,8 @@ def test_save_jsonl_report_quality_issues_as_list(tmp_path: Path) -> None:
     results = [result]
     save_jsonl_report(results, output_file, prompt="test", system_info={})
 
-    lines = output_file.read_text().strip().split("\n")
-    data = json.loads(lines[0])
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
 
     assert data["model"] == "test-model"
     assert isinstance(data["quality_issues"], list)
@@ -151,8 +169,8 @@ def test_save_jsonl_report_no_quality_issues(tmp_path: Path) -> None:
     results = [result]
     save_jsonl_report(results, output_file, prompt="test", system_info={})
 
-    lines = output_file.read_text().strip().split("\n")
-    data = json.loads(lines[0])
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
 
     assert data["model"] == "test-model"
     assert data["quality_issues"] == []
@@ -176,8 +194,8 @@ def test_save_jsonl_report_includes_traceback_and_type(tmp_path: Path) -> None:
     results = [result]
     save_jsonl_report(results, output_file, prompt="test", system_info={})
 
-    lines = output_file.read_text().strip().split("\n")
-    data = json.loads(lines[0])
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
 
     assert data["model"] == "failed-model"
     assert data["success"] is False
@@ -204,8 +222,8 @@ def test_save_jsonl_report_includes_timing(tmp_path: Path) -> None:
     results = [result]
     save_jsonl_report(results, output_file, prompt="test", system_info={})
 
-    lines = output_file.read_text().strip().split("\n")
-    data = json.loads(lines[0])
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
 
     assert "timing" in data
     assert data["timing"]["generation_time_s"] == 2.5
@@ -230,8 +248,8 @@ def test_save_jsonl_report_includes_generated_text(tmp_path: Path) -> None:
     results = [result]
     save_jsonl_report(results, output_file, prompt="test", system_info={})
 
-    lines = output_file.read_text().strip().split("\n")
-    data = json.loads(lines[0])
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
 
     assert "generated_text" in data
     assert data["generated_text"] == "This is the generated output text."

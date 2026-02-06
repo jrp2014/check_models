@@ -1,5 +1,7 @@
 """Tests for Markdown formatting utilities."""
 
+import re
+
 import check_models
 
 
@@ -123,3 +125,74 @@ def test_format_failures_by_package_includes_actionable_items() -> None:
     assert "#### transformers" in output_text
     assert "test-model" in output_text
     assert "ImportError" in output_text
+
+
+# ── Bare URL wrapping (MD034) tests ────────────────────────────────────────
+
+_BARE_URL_RE = re.compile(r"(?<![<(])https?://")
+"""Matches a bare URL not already wrapped in < > or ( )."""
+
+
+def _gallery_lines_for(result: check_models.PerformanceResult) -> str:
+    """Return joined gallery markdown for a single result."""
+    return "\n".join(check_models._generate_model_gallery_section([result]))
+
+
+def test_bare_url_in_long_error_is_wrapped() -> None:
+    """Error messages with bare URLs should get <angle brackets> in markdown."""
+    result = check_models.PerformanceResult(
+        model_name="test/model",
+        generation=None,
+        success=False,
+        error_stage="No Chat Template",
+        error_message=(
+            "Cannot use chat template because tokenizer.chat_template is not set. "
+            "See https://huggingface.co/docs/transformers/main/en/chat_templating"
+        ),
+    )
+    md = _gallery_lines_for(result)
+    # The URL must be wrapped in angle brackets
+    assert "<https://huggingface.co/docs/transformers/main/en/chat_templating>" in md
+    # No bare URL should remain
+    assert not _BARE_URL_RE.search(md), f"Bare URL found in:\n{md}"
+
+
+def test_bare_url_in_short_error_is_wrapped() -> None:
+    """Even short inline errors with URLs should be wrapped."""
+    result = check_models.PerformanceResult(
+        model_name="test/model",
+        generation=None,
+        success=False,
+        error_stage="Error",
+        error_message="See https://example.com/help",
+    )
+    md = _gallery_lines_for(result)
+    assert "<https://example.com/help>" in md
+    assert not _BARE_URL_RE.search(md)
+
+
+def test_already_wrapped_url_not_double_wrapped() -> None:
+    """URLs already in angle brackets should not be double-wrapped."""
+    result = check_models.PerformanceResult(
+        model_name="test/model",
+        generation=None,
+        success=False,
+        error_stage="Error",
+        error_message="See <https://example.com/help> for details",
+    )
+    md = _gallery_lines_for(result)
+    assert "<https://example.com/help>" in md
+    assert "<<https://" not in md
+
+
+def test_error_without_url_unchanged() -> None:
+    """Error messages without URLs should be unaffected."""
+    result = check_models.PerformanceResult(
+        model_name="test/model",
+        generation=None,
+        success=False,
+        error_stage="OOM",
+        error_message="Out of memory during generation",
+    )
+    md = _gallery_lines_for(result)
+    assert "Out of memory during generation" in md
