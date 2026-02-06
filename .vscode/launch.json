@@ -1,39 +1,16 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Run check_models (help)",
-      "type": "python",
-      "request": "launch",
-      "preLaunchTask": "Activate conda: mlx-vlm",
-      "program": "${workspaceFolder}/src/check_models.py",
-      "args": ["--help"],
-      "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}/src",
-      "env": {
-        "PYTHONPATH": "${workspaceFolder}/src",
-        "CONDA_DEFAULT_ENV": "mlx-vlm"
-      }
-    },
-    {
-      "name": "Debug check_models (run)",
-      "type": "python",
-      "request": "launch",
-      "preLaunchTask": "Activate conda: mlx-vlm",
-      "module": "check_models",
-      "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}/src",
-      "env": {
-        "PYTHONPATH": "${workspaceFolder}/src",
-        "CONDA_DEFAULT_ENV": "mlx-vlm"
-      },
-      "justMyCode": false
-    }
-  ]
-}
-{
     "version": "0.2.0",
     "configurations": [
+        {
+            "name": "Python: Check Models (Help)",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "check_models",
+            "args": ["--help"],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/src",
+            "justMyCode": true
+        },
         {
             "name": "Python: Check Models (Default)",
             "type": "debugpy",

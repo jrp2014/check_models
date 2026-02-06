@@ -71,9 +71,7 @@
 				}
 			},
 			"isBackground": false,
-			"problemMatcher": [
-				"$eslint-stylish"
-			],
+			"problemMatcher": [],
 			"group": "build"
 		},
 		{

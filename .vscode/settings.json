@@ -14,12 +14,7 @@
     "source.fixAll": "always",
     "source.fixAll.ruff": "always"
   },
-  // Enable ruff linting (for ms-python integration) and prefer ruff formatting
-  "python.linting.enabled": true,
-  "python.linting.ruffEnabled": true,
-  "python.linting.ruffPath": "ruff",
-  // Preferred Python formatter: set default formatter for Python files to Ruff
-  "python.formatting.provider": "ruff",
+  // Python-specific: use Ruff for formatting and code actions
   "[python]": {
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
@@ -39,17 +34,35 @@
     "**/typings/**"
   ],
   "python.analysis.useLibraryCodeForTypes": true,
-  "python.analysis.typeCheckingMode": "standard",
+  // Match pyproject.toml [tool.pyright] typeCheckingMode = "basic"
+  "python.analysis.typeCheckingMode": "basic",
   "python.analysis.diagnosticSeverityOverrides": {
     "reportUnknownVariableType": "none",
     "reportMissingImports": "none",
     "reportMissingModuleSource": "none"
   },
+  // Enable Pylance pytest support (fixture completions, parameter inference)
+  "python.analysis.enablePytestSupport": true,
+  // Exclude build artifacts from file tree, search, and file watcher
   "files.exclude": {
     "**/__pycache__": true,
     "**/.mypy_cache": true,
     "**/.ruff_cache": true,
     "**/*.egg-info": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "typings": true,
+    "docs/notes/archive": true,
+    "**/.pytest_cache": true
+  },
+  "files.watcherExclude": {
+    "**/__pycache__/**": true,
+    "**/.mypy_cache/**": true,
+    "**/.ruff_cache/**": true,
+    "**/.pytest_cache/**": true,
+    "**/node_modules/**": true,
+    "typings/**": true
   },
   // Force JSON/JSONC to use the built-in JSON formatter (prevents Copilot being used)
   "[json]": {
