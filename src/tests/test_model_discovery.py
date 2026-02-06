@@ -2,34 +2,16 @@
 
 from __future__ import annotations
 
-import os
-import tempfile
-from pathlib import Path
+from typing import TYPE_CHECKING
 
-# =============================================================================
-# EARLY ENVIRONMENT SETUP (MUST happen before huggingface_hub imports)
-# =============================================================================
+# HF cache environment is configured by conftest.py (early env setup + autouse fixture).
+import pytest
+from huggingface_hub.errors import CacheNotFound
 
-# Set up HF cache directory early, before any huggingface_hub functions cache the path.
-# Strategy (following HuggingFace documentation):
-# 1. If HF_HUB_CACHE is set → use it (user explicitly configured)
-# 2. Else if default cache exists (~/.cache/huggingface/hub) → use it
-# 3. Else create temp cache (CI environment without cache)
-_DEFAULT_HF_CACHE = Path.home() / ".cache" / "huggingface" / "hub"
+import check_models
 
-if "HF_HUB_CACHE" not in os.environ and not _DEFAULT_HF_CACHE.exists():
-    # CI environment - create temp cache to prevent CacheNotFound
-    _temp_hf_cache = Path(tempfile.gettempdir()) / "pytest_hf_cache"
-    _temp_hf_cache.mkdir(parents=True, exist_ok=True)
-    (_temp_hf_cache / "hub").mkdir(parents=True, exist_ok=True)
-    os.environ["HF_HUB_CACHE"] = str(_temp_hf_cache / "hub")
-    os.environ["HF_HOME"] = str(_temp_hf_cache)
-
-# Now import huggingface_hub after environment is configured
-import pytest  # noqa: E402
-from huggingface_hub.errors import CacheNotFound  # noqa: E402
-
-import check_models  # noqa: E402
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def test_get_cached_model_ids_returns_list() -> None:

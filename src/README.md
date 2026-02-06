@@ -20,7 +20,7 @@ The fastest way to start is using the automated setup script (requires Conda):
 
 ```bash
 # Sets up a 'mlx-vlm' environment with Python 3.13 and all dependencies
-./setup_conda_env.sh
+bash tools/setup_conda_env.sh
 conda activate mlx-vlm
 ```
 
@@ -97,11 +97,8 @@ python -m check_models --dry-run
 For the easiest setup, use the provided shell script that automates the entire conda environment creation:
 
 ```bash
-# Make script executable (if needed)
-chmod +x setup_conda_env.sh
-
 # Create environment with default name 'mlx-vlm'
-./setup_conda_env.sh
+bash tools/setup_conda_env.sh
 
 # Activate
 conda activate mlx-vlm

@@ -665,6 +665,8 @@ class ProcessImageParams:
     kv_bits: int | None
     kv_group_size: int
     quantized_kv_start: int
+    revision: str | None = None
+    adapter_path: str | None = None
     prefill_step_size: int | None = None
     context_marker: str = "Context:"
 
@@ -5538,8 +5540,10 @@ def generate_tsv_report(
 ) -> None:
     """Write a TSV (tab-separated values) file of the core results table.
 
-    This outputs only the data table without metadata, properly escaping tabs and newlines
-    in field values to maintain TSV format integrity.
+    A ``# generated_at: <timestamp>`` comment line is written first so
+    downstream consumers know when the data was produced.  For failed models
+    two extra columns (``error_type``, ``error_package``) are appended to
+    aid programmatic triage.
 
     Args:
         results: List of PerformanceResult objects.
@@ -5576,10 +5580,16 @@ def generate_tsv_report(
         clean_header = re.sub(r"<[^>]+>", "", clean_header)
         clean_headers.append(escape_tsv_value(clean_header))
 
-    # Clean and escape row data
+    # Append error diagnostic columns
+    clean_headers.extend(["error_type", "error_package"])
+
+    # Clean and escape row data, appending error columns per result
+    sorted_results = _sort_results_by_time(list(results))
     clean_rows = []
-    for row in rows:
+    for row, res in zip(rows, sorted_results, strict=False):
         clean_row = [escape_tsv_value(str(cell)) for cell in row]
+        clean_row.append(escape_tsv_value(res.error_type or ""))
+        clean_row.append(escape_tsv_value(res.error_package or ""))
         clean_rows.append(clean_row)
 
     # Generate TSV using tabulate with tsv format
@@ -5591,6 +5601,8 @@ def generate_tsv_report(
 
     try:
         with filename.open("w", encoding="utf-8") as f:
+            # Metadata comment line (parsers can skip lines starting with #)
+            f.write(f"# generated_at: {local_now_str()}\n")
             f.write(tsv_content)
             # Ensure file ends with newline
             if not tsv_content.endswith("\n"):
@@ -6222,7 +6234,9 @@ def _load_model(
     """
     model, processor = load(
         path_or_hf_repo=params.model_identifier,
+        adapter_path=params.adapter_path,
         lazy=params.lazy,
+        revision=params.revision,
         trust_remote_code=params.trust_remote_code,
     )
     # Note: mlx-vlm.utils.load() is type-hinted to return Union[PreTrainedTokenizer, ...]
@@ -7709,6 +7723,8 @@ def process_models(
             kv_bits=args.kv_bits,
             kv_group_size=args.kv_group_size,
             quantized_kv_start=args.quantized_kv_start,
+            revision=args.revision,
+            adapter_path=args.adapter_path,
             prefill_step_size=args.prefill_step_size,
             context_marker=args.context_marker,
         )
@@ -8553,6 +8569,18 @@ def main_cli() -> None:
         ),
     )
     parser.add_argument(
+        "--revision",
+        type=str,
+        default=None,
+        help="Model revision (branch, tag, or commit hash) for version pinning.",
+    )
+    parser.add_argument(
+        "--adapter-path",
+        type=str,
+        default=None,
+        help="Path to LoRA adapter weights to apply on top of the base model.",
+    )
+    parser.add_argument(
         "-p",
         "--prompt",
         type=str,
@@ -8711,6 +8739,11 @@ def main_cli() -> None:
             "Assuming default folder: %s. To override, specify --folder or --image.",
             DEFAULT_FOLDER,
         )
+        if not DEFAULT_FOLDER.exists():
+            logger.warning(
+                "Default folder does not exist: %s — create it or use --folder / --image.",
+                DEFAULT_FOLDER,
+            )
 
     # Print all command-line arguments if verbose is set
     if getattr(args, "verbose", False):

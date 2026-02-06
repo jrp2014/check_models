@@ -107,3 +107,11 @@ stubs: ## Generate type stubs for mlx-vlm
 stubs-clear: ## Remove generated type stubs
 	$(MAKE) -C $(SRC) stubs-clear
 
+.PHONY: quality-strict
+quality-strict: ## Run quality checks with strict markdown linting (requires node/npm)
+	$(MAKE) -C $(SRC) quality-strict
+
+.PHONY: install-markdownlint
+install-markdownlint: ## Install markdownlint-cli2 via npm (requires Node.js)
+	$(MAKE) -C $(SRC) install-markdownlint
+

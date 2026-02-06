@@ -7,7 +7,7 @@ Purpose: help AI coding agents be productive immediately in this repository by h
 
 ```bash
 # create / activate environment (repo has helper script)
-./setup_conda_env.sh
+bash src/tools/setup_conda_env.sh
 conda activate mlx-vlm
 
 # run help in module form (uses src package)
@@ -57,7 +57,7 @@ make quality
   - Keep outputs deterministic where tests expect exact strings (many tests assert CLI output/formatting). Check `src/tests/test_cli_help_output.py` and formatting tests for expected shapes.
 
 - **Contributor & Implementation notes (high-value snippets):**
-  - **Setup & env:** Use `./setup_conda_env.sh` then `conda activate mlx-vlm`. Validate with `python -m tools.validate_env`.
+  - **Setup & env:** Use `bash src/tools/setup_conda_env.sh` then `conda activate mlx-vlm`. Validate with `python -m tools.validate_env`.
   - **Make targets:** `make dev` (dev deps + editable install), `make install` (runtime), `make test`, `make quality` (format + lint + types), `make ci` (full CI pipeline, strict), `make install-torch` (optional PyTorch).
   - **Pre-commit & CI:** Install hooks via `python -m tools.install_precommit_hook`. PRs must pass ruff, mypy, tests, dependency sync, and markdown linting in CI.
   - **Commit style:** Use conventional commits (`feat:, fix:, docs:, test:, chore:`) for PR clarity.
@@ -88,7 +88,7 @@ git checkout -b feature/your-change
 1. Prepare environment (recommended):
 
 ```bash
-./setup_conda_env.sh
+bash src/tools/setup_conda_env.sh
 conda activate mlx-vlm
 ```
 
