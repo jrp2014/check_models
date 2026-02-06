@@ -62,9 +62,11 @@ if [[ -z "${VIRTUAL_ENV:-}" ]] && [[ -z "${CONDA_DEFAULT_ENV:-}" ]] && [[ -z "${
 fi
 
 # Update conda itself if in a conda environment
+# NOTE: We only update conda itself (in base), NOT "--all" which can break
+# pip-installed packages (mlx, mlx-vlm) by reshuffling shared dependencies.
 if [[ -n "${CONDA_DEFAULT_ENV:-}" ]]; then
-	echo "[update.sh] Updating conda and all packages in current environment..."
-	conda update --all -y
+	echo "[update.sh] Updating conda (base only — not all packages, to avoid breaking pip installs)..."
+	conda update -n base conda -y
 else
 	echo "[update.sh] Not in conda environment; skipping conda update"
 fi
@@ -96,16 +98,26 @@ fi
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-# Helper function: pip install with optional force reinstall
+# Helper function: pip install with optional force reinstall (eager upgrades)
 pip_install() {
 	local args=("-U" "--upgrade-strategy" "eager")
 	[[ "${FORCE_REINSTALL:-0}" == "1" ]] && args+=("--force-reinstall")
 	pip install "${args[@]}" "$@"
 }
 
+# Helper function: pip install for build/infrastructure tools only.
+# Uses default (only-if-needed) upgrade strategy to avoid cascading transitive
+# dependency upgrades that can inadvertently break mlx / mlx-vlm.
+pip_install_tool() {
+	local args=("-U")
+	[[ "${FORCE_REINSTALL:-0}" == "1" ]] && args+=("--force-reinstall")
+	pip install "${args[@]}" "$@"
+}
+
 # Ensure global Python packaging tools are current
+# Use pip_install_tool (non-eager) to avoid cascading upgrades of shared deps
 echo "[update.sh] Updating core Python packaging tools (pip, wheel, setuptools, build, pyrefly)..."
-pip_install pip wheel setuptools build pyrefly
+pip_install_tool pip wheel setuptools build pyrefly
 
 # Install project with all dependencies from pyproject.toml
 INSTALL_GROUPS=".[dev,extras,torch]"
@@ -270,7 +282,7 @@ update_local_mlx_repos() {
 		cd "${REPO_PATHS[idx]}"
 		if [[ -f "requirements.txt" ]]; then
 			echo "[update.sh] Installing requirements for ${REPO_NAMES[idx]}..."
-			pip_install -r requirements.txt
+			pip_install -U -r requirements.txt
 		fi
 		echo ""
 	done
@@ -310,13 +322,18 @@ update_local_mlx_repos() {
 		cd "${REPO_PATHS[idx]}"
 		echo "[update.sh] Installing ${REPO_NAMES[idx]} package..."
 		
+		# Record the currently installed version so we can restore on failure
+		local CURRENT_VERSION
+		CURRENT_VERSION=$(pip show "${REPO_NAMES[idx]}" 2>/dev/null | grep '^Version:' | awk '{print $2}' || echo "")
+
 		# MLX requires CMake configuration before pip install
 		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
 			# Install MLX build dependencies (matching GitHub Actions)
+			# Use pip_install_tool to avoid eager transitive upgrades
 			echo "[update.sh] Installing MLX build dependencies..."
-			pip_install cmake
-			pip_install setuptools
-			pip_install typing_extensions
+			pip_install_tool cmake
+			pip_install_tool setuptools
+			pip_install_tool typing_extensions
 			
 			[[ "${CLEAN_BUILD:-0}" == "1" ]] && rm -rf build
 			
@@ -334,11 +351,26 @@ update_local_mlx_repos() {
 		fi
 		
 		# Install package (works for both mlx and others)
+		# IMPORTANT: pip install -e . first uninstalls the existing package, THEN
+		# attempts the build. If the build fails, the package is left uninstalled.
+		# We detect this and restore from PyPI as a fallback.
 		if pip_install -e .; then
 			echo "✓ ${REPO_NAMES[idx]} installed successfully"
 		else
 			echo "⚠️  Failed to install ${REPO_NAMES[idx]}"
 			REPO_SKIP[idx]=1
+			# Check if pip uninstalled the previous version during the failed attempt
+			if ! pip show "${REPO_NAMES[idx]}" >/dev/null 2>&1; then
+				echo "⚠️  ${REPO_NAMES[idx]} is no longer installed! Attempting PyPI fallback..."
+				if [[ -n "$CURRENT_VERSION" ]]; then
+					pip install "${REPO_NAMES[idx]}==$CURRENT_VERSION" 2>/dev/null \
+						|| pip install "${REPO_NAMES[idx]}" 2>/dev/null \
+						|| echo "❌ CRITICAL: Could not restore ${REPO_NAMES[idx]}. Run: pip install ${REPO_NAMES[idx]}"
+				else
+					pip install "${REPO_NAMES[idx]}" 2>/dev/null \
+						|| echo "❌ CRITICAL: Could not restore ${REPO_NAMES[idx]}. Run: pip install ${REPO_NAMES[idx]}"
+				fi
+			fi
 			continue
 		fi
 	
@@ -421,3 +453,25 @@ else
 fi
 
 echo "[update.sh] Done."
+
+# Post-flight check: verify critical packages are still importable
+echo ""
+echo "[update.sh] Verifying critical packages..."
+MISSING_PKGS=()
+for pkg in mlx mlx_lm mlx_vlm; do
+	if ! python -c "import $pkg" 2>/dev/null; then
+		MISSING_PKGS+=("$pkg")
+	fi
+done
+
+if [[ ${#MISSING_PKGS[@]} -gt 0 ]]; then
+	echo "❌ WARNING: The following critical packages are NOT importable after update:"
+	printf '   - %s\n' "${MISSING_PKGS[@]}"
+	echo ""
+	echo "   This may cause 'Missing required runtime dependencies' errors."
+	echo "   Fix with: pip install ${MISSING_PKGS[*]}"
+	echo ""
+	exit 1
+else
+	echo "✓ All critical packages verified (mlx, mlx_lm, mlx_vlm)"
+fi
