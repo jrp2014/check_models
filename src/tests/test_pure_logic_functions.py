@@ -1,6 +1,6 @@
 """Unit tests for pure-logic functions that require no mlx-vlm runtime.
 
-Covers: validate_model_identifier, _apply_exclusions, prepare_prompt,
+Covers: validate_model_identifier, apply_exclusions, prepare_prompt,
 compute_vocabulary_diversity, compute_efficiency_metrics,
 detect_response_structure, compute_confidence_indicators,
 QualityThresholds.from_config, load_quality_config.
@@ -72,40 +72,40 @@ class TestValidateModelIdentifier:
         mod.validate_model_identifier(str(tmp_path))
 
 
-# ── _apply_exclusions ──────────────────────────────────────────────────────
+# ── apply_exclusions ───────────────────────────────────────────────────────
 
 
 class TestApplyExclusions:
-    """Tests for _apply_exclusions()."""
+    """Tests for apply_exclusions()."""
 
     def test_empty_exclusion_list(self, mod: types.ModuleType) -> None:
         """Empty exclusion list should return all models."""
         models = ["a", "b", "c"]
-        result = mod._apply_exclusions(models, [], "test")
+        result = mod.apply_exclusions(models, [], "test")
         assert result == ["a", "b", "c"]
 
     def test_excludes_matching_models(self, mod: types.ModuleType) -> None:
         """Matching models should be excluded."""
         models = ["model-a", "model-b", "model-c"]
-        result = mod._apply_exclusions(models, ["model-b"], "test")
+        result = mod.apply_exclusions(models, ["model-b"], "test")
         assert result == ["model-a", "model-c"]
 
     def test_excludes_multiple(self, mod: types.ModuleType) -> None:
         """Multiple exclusions should all be applied."""
         models = ["a", "b", "c", "d"]
-        result = mod._apply_exclusions(models, ["b", "d"], "test")
+        result = mod.apply_exclusions(models, ["b", "d"], "test")
         assert result == ["a", "c"]
 
     def test_no_matches_returns_all(self, mod: types.ModuleType) -> None:
         """Non-matching exclusions should leave list intact."""
         models = ["a", "b"]
-        result = mod._apply_exclusions(models, ["z"], "test")
+        result = mod.apply_exclusions(models, ["z"], "test")
         assert result == ["a", "b"]
 
     def test_preserves_order(self, mod: types.ModuleType) -> None:
         """Original order should be preserved after exclusion."""
         models = ["z", "a", "m"]
-        result = mod._apply_exclusions(models, ["a"], "test")
+        result = mod.apply_exclusions(models, ["a"], "test")
         assert result == ["z", "m"]
 
 
@@ -160,22 +160,26 @@ class TestComputeVocabularyDiversity:
     def test_all_unique(self, mod: types.ModuleType) -> None:
         """All unique words should give TTR of 1.0."""
         ttr, unique, total = mod.compute_vocabulary_diversity("apple banana cherry")
-        assert unique == 3
-        assert total == 3
+        expected_words = 3
+        assert unique == expected_words
+        assert total == expected_words
         assert ttr == 1.0
 
     def test_repeated_words(self, mod: types.ModuleType) -> None:
         """Repeated words should give low TTR."""
         ttr, unique, total = mod.compute_vocabulary_diversity("yes yes yes yes")
+        expected_total = 4
+        expected_ttr = 0.25
         assert unique == 1
-        assert total == 4
-        assert ttr == 0.25
+        assert total == expected_total
+        assert ttr == expected_ttr
 
     def test_mixed_case_normalized(self, mod: types.ModuleType) -> None:
         """Mixed case should be normalized for diversity calculation."""
         _ttr, unique, total = mod.compute_vocabulary_diversity("Hello hello HELLO")
+        expected_total = 3
         assert unique == 1
-        assert total == 3
+        assert total == expected_total
 
 
 # ── compute_efficiency_metrics ─────────────────────────────────────────────
@@ -193,13 +197,16 @@ class TestComputeEfficiencyMetrics:
     def test_with_time(self, mod: types.ModuleType) -> None:
         """With time only, tokens_per_second should be computed."""
         result = mod.compute_efficiency_metrics(100, 2.0, None)
-        assert result["tokens_per_second"] == 50.0
+        expected_tps = 50.0
+        assert result["tokens_per_second"] == expected_tps
 
     def test_with_time_and_memory(self, mod: types.ModuleType) -> None:
         """With both time and memory, all metrics should be computed."""
         result = mod.compute_efficiency_metrics(100, 2.0, 4.0)
-        assert result["tokens_per_second"] == 50.0
-        assert result["tokens_per_gb"] == 25.0
+        expected_tps = 50.0
+        expected_tpg = 25.0
+        assert result["tokens_per_second"] == expected_tps
+        assert result["tokens_per_gb"] == expected_tpg
         assert result["tokens_per_second_per_gb"] is not None
 
     def test_zero_time(self, mod: types.ModuleType) -> None:
@@ -250,7 +257,8 @@ class TestComputeConfidenceIndicators:
         """Text with hedging language should have hedge_count >= 2."""
         text = "It appears to be a cat. It might be sleeping. It seems to be outdoors."
         result = mod.compute_confidence_indicators(text)
-        assert result["hedge_count"] >= 2
+        min_hedge_count = 2
+        assert result["hedge_count"] >= min_hedge_count
 
     def test_definitive_text(self, mod: types.ModuleType) -> None:
         """Definitive text should produce computable confidence ratio."""
@@ -267,12 +275,15 @@ class TestQualityThresholdsFromConfig:
 
     def test_valid_config(self, mod: types.ModuleType) -> None:
         """Valid config should set the specified threshold."""
-        config = {"thresholds": {"repetition_ratio": 0.9}, "patterns": {}}
+        expected_ratio = 0.9
+        config = {"thresholds": {"repetition_ratio": expected_ratio}, "patterns": {}}
         qt = mod.QualityThresholds.from_config(config)
-        assert qt.repetition_ratio == 0.9
+        assert qt.repetition_ratio == expected_ratio
 
     def test_unknown_threshold_key_warns(
-        self, mod: types.ModuleType, caplog: pytest.LogCaptureFixture
+        self,
+        mod: types.ModuleType,
+        caplog: pytest.LogCaptureFixture,
     ) -> None:
         """Unknown threshold key should emit a warning."""
         config = {
@@ -283,10 +294,13 @@ class TestQualityThresholdsFromConfig:
             qt = mod.QualityThresholds.from_config(config)
         assert "repetition_ration" in caplog.text
         # The valid key should still be applied
-        assert qt.repetition_ratio == 0.5
+        expected_ratio = 0.5
+        assert qt.repetition_ratio == expected_ratio
 
     def test_unknown_top_level_section_warns(
-        self, mod: types.ModuleType, caplog: pytest.LogCaptureFixture
+        self,
+        mod: types.ModuleType,
+        caplog: pytest.LogCaptureFixture,
     ) -> None:
         """Unknown top-level config section should emit a warning."""
         config = {"thresholds": {}, "patterns": {}, "extra_section": {}}
@@ -299,7 +313,8 @@ class TestQualityThresholdsFromConfig:
         config: dict[str, object] = {}
         qt = mod.QualityThresholds.from_config(config)
         # Should use all defaults
-        assert qt.repetition_ratio == 0.8
+        default_ratio = 0.8
+        assert qt.repetition_ratio == default_ratio
 
 
 # ── load_quality_config ───────────────────────────────────────────────────
@@ -309,7 +324,9 @@ class TestLoadQualityConfig:
     """Tests for load_quality_config()."""
 
     def test_nonexistent_path_warns(
-        self, mod: types.ModuleType, caplog: pytest.LogCaptureFixture
+        self,
+        mod: types.ModuleType,
+        caplog: pytest.LogCaptureFixture,
     ) -> None:
         """Non-existent config path should warn."""
         with caplog.at_level(logging.WARNING):
@@ -322,12 +339,16 @@ class TestLoadQualityConfig:
         config_file = tmp_path / "quality_config.yaml"
         config_file.write_text(yaml_content)
         mod.load_quality_config(config_file)
-        assert mod.QUALITY.repetition_ratio == 0.95
+        expected_ratio = 0.95
+        assert mod.QUALITY.repetition_ratio == expected_ratio
         # Restore default
         mod.QUALITY.repetition_ratio = 0.8
 
     def test_invalid_yaml_warns(
-        self, mod: types.ModuleType, tmp_path: Path, caplog: pytest.LogCaptureFixture
+        self,
+        mod: types.ModuleType,
+        tmp_path: Path,
+        caplog: pytest.LogCaptureFixture,
     ) -> None:
         """Invalid YAML should warn instead of crashing."""
         config_file = tmp_path / "quality_config.yaml"

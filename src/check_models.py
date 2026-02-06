@@ -7582,7 +7582,7 @@ def validate_and_warn_model_selection(args: argparse.Namespace) -> None:
                 )
 
 
-def _apply_exclusions(
+def apply_exclusions(
     model_list: list[str],
     exclude_list: list[str],
     context: str,
@@ -7639,7 +7639,7 @@ def process_models(
         # Case 1: Explicit models specified - apply exclusions to this list
         model_identifiers = args.models
         logger.info("Processing specified models: %s", ", ".join(model_identifiers))
-        model_identifiers = _apply_exclusions(
+        model_identifiers = apply_exclusions(
             model_identifiers,
             args.exclude or [],
             "explicit list",
@@ -7654,7 +7654,7 @@ def process_models(
                 "Download a model (e.g., `huggingface-cli download mlx-community/<model>`) "
                 "or pass explicit IDs with --models.",
             )
-        model_identifiers = _apply_exclusions(
+        model_identifiers = apply_exclusions(
             model_identifiers,
             args.exclude or [],
             "cached models",
