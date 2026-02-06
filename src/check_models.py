@@ -1025,10 +1025,12 @@ class ColoredFormatter(logging.Formatter):
             (lambda s, _: s.startswith("Processing"), (Colors.YELLOW,)),
             # Library versions section
             (
-                lambda _, m: "Library Versions" in m
-                or (
-                    m.count(":") == 1
-                    and any(lib in m.lower() for lib in ["mlx", "pillow", "transformers"])
+                lambda _, m: (
+                    "Library Versions" in m
+                    or (
+                        m.count(":") == 1
+                        and any(lib in m.lower() for lib in ["mlx", "pillow", "transformers"])
+                    )
                 ),
                 (Colors.CYAN,),
             ),
@@ -1600,7 +1602,7 @@ def _detect_excessive_bullets(text: str) -> tuple[bool, int]:
     bullet_count = len(bullet_lines)
 
     # Use config threshold if available, otherwise default to 15 (lowered for cataloging)
-    threshold = QUALITY.max_bullets if QUALITY.max_bullets else 15
+    threshold = QUALITY.max_bullets or 15
     return bullet_count > threshold, bullet_count
 
 
@@ -2530,7 +2532,8 @@ def compute_task_compliance(text: str) -> dict[str, bool | float]:
     # Combine explicit and implicit signals
     has_caption = has_explicit_caption or (
         # First line could be a caption if short and followed by more text
-        len(text.split("\n")[0].split()) <= QUALITY.max_caption_words and len(text.split("\n")) > 1
+        len(text.split("\n", maxsplit=1)[0].split()) <= QUALITY.max_caption_words
+        and len(text.split("\n")) > 1
     )
     has_description = has_explicit_description or has_paragraph
     has_keywords = has_explicit_keywords or has_bullet_list
@@ -8077,8 +8080,8 @@ def log_summary(results: list[PerformanceResult]) -> None:
         )
         for res in sorted_success:
             tps = getattr(res.generation, "generation_tps", 0) or 0
-            active_mem = res.active_memory if res.active_memory else 0.0
-            cache_mem = res.cache_memory if res.cache_memory else 0.0
+            active_mem = res.active_memory or 0.0
+            cache_mem = res.cache_memory or 0.0
 
             # Format memory info only if we have data
             mem_info = ""
@@ -8144,8 +8147,8 @@ def save_jsonl_report(
                         "generation_tokens": getattr(gen, "generation_tokens", 0),
                         "generation_tps": getattr(gen, "generation_tps", 0.0),
                         "peak_memory_gb": getattr(gen, "peak_memory", 0.0),
-                        "active_memory_gb": res.active_memory if res.active_memory else 0.0,
-                        "cache_memory_gb": res.cache_memory if res.cache_memory else 0.0,
+                        "active_memory_gb": res.active_memory or 0.0,
+                        "cache_memory_gb": res.cache_memory or 0.0,
                     }
                     # Include generated text for quality analysis context
                     text = getattr(gen, "text", None)

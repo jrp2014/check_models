@@ -1,9 +1,9 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-02-01 21:55:41 GMT
+FULL ENVIRONMENT DUMP - 2026-02-06 16:56:30 GMT
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
-Total packages: 144
+Total packages: 143
 
 absl-py==2.4.0
 aiohappyeyeballs==2.6.1
@@ -23,27 +23,27 @@ check_models==0.1.0
 check_models==0.1.0
 click==8.3.1
 cmake==4.2.1
-coverage==7.13.2
+coverage==7.13.3
 datasets==4.5.0
 dill==0.4.0
 distlib==0.4.0
 docopt==0.6.2
 einops==0.8.2
 execnet==2.1.2
-fastapi==0.128.0
+fastapi==0.128.3
 filelock==3.20.3
 flatbuffers==25.12.19
 frozenlist==1.8.0
 fsspec==2025.10.0
 gast==0.7.0
 google-pasta==0.2.0
-grpcio==1.76.0
+grpcio==1.78.0
 h11==0.16.0
 h5py==3.15.1
 hf-xet==1.2.0
 httpcore==1.0.9
 httpx==0.28.1
-huggingface_hub==1.3.5
+huggingface_hub==1.4.1
 identify==2.6.16
 idna==3.11
 iniconfig==2.3.0
@@ -57,11 +57,9 @@ markdown-it-py==4.0.0
 MarkupSafe==3.0.3
 mdurl==0.1.2
 ml_dtypes==0.5.4
-mlx==0.30.5.dev20260201+8ef53952
-mlx==0.30.5.dev20260201+8ef53952
+mlx==0.30.6.dev20260206+185b06d9
 mlx-lm==0.30.6
-mlx-metal==0.30.4
-mlx-vlm==0.3.10
+mlx-vlm==0.3.11
 mpmath==1.3.0
 multidict==6.7.1
 multiprocess==0.70.18
@@ -74,7 +72,7 @@ ninja==1.13.0
 nodeenv==1.10.0
 num2words==0.5.14
 numpy==2.4.2
-opencv-python==4.13.0.90
+opencv-python==4.13.0.92
 opt_einsum==3.4.0
 optree==0.18.0
 packaging==26.0
@@ -82,7 +80,7 @@ pandas==3.0.0
 pathspec==1.0.4
 pfzy==0.3.4
 pillow==12.1.0
-pip==26.0
+pip==26.0.1
 platformdirs==4.5.1
 pluggy==1.6.0
 pre_commit==4.5.1
@@ -96,7 +94,7 @@ pydantic==2.12.5
 pydantic_core==2.41.5
 Pygments==2.19.2
 pyproject_hooks==1.2.0
-pyrefly==0.50.1
+pyrefly==0.51.1
 pytest==9.0.2
 pytest-cov==7.0.0
 pytest-xdist==3.8.0
@@ -105,7 +103,8 @@ pytz==2025.2
 PyYAML==6.0.3
 regex==2026.1.15
 requests==2.32.5
-ruff==0.14.14
+rich==14.3.2
+ruff==0.15.0
 safetensors==0.7.0
 sentencepiece==0.2.1
 setuptools==80.10.2
@@ -113,7 +112,7 @@ shellingham==1.5.4
 six==1.17.0
 sniffio==1.3.1
 soundfile==0.13.1
-starlette==0.50.0
+starlette==0.52.1
 sympy==1.14.0
 tabulate==0.9.0
 tensorboard==2.20.0
@@ -124,9 +123,9 @@ tokenizers==0.22.2
 torch==2.10.0
 torchaudio==2.10.0
 torchvision==0.25.0
-tqdm==4.67.2
-transformers==5.0.0
-ty==0.0.14
+tqdm==4.67.3
+transformers==5.1.0
+ty==0.0.15
 typer-slim==0.21.1
 types-psutil==7.2.2.20260130
 types-PyYAML==6.0.12.20250915
@@ -134,7 +133,7 @@ types-requests==2.32.4.20260107
 types-simplejson==3.20.0.20250822
 types-tabulate==0.9.0.20241207
 types-toml==0.10.8.20240310
-types-tqdm==4.67.0.20250809
+types-tqdm==4.67.3.20260205
 types-urllib3==1.26.25.14
 typing-inspection==0.4.2
 typing_extensions==4.15.0
@@ -146,11 +145,11 @@ virtualenv==20.36.1
 wcwidth==0.2.14
 Werkzeug==3.1.5
 wheel==0.46.3
-wrapt==2.1.0
+wrapt==2.1.1
 xxhash==3.6.0
 yarl==1.22.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-02-01 21:55:41 GMT
+Environment dump completed at 2026-02-06 16:56:30 GMT
 ================================================================================
