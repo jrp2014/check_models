@@ -14,6 +14,7 @@
 #   SKIP_TORCH=1 ./update.sh          # Skip torch group installation
 #   FORCE_REINSTALL=1 ./update.sh     # Force reinstall with --force-reinstall
 #   SKIP_MLX=1 ./update.sh            # Force skip mlx/mlx-vlm updates (override detection)
+#   CONDA_UPDATE_ALL=1 ./update.sh    # Force conda update --all even with pip conflicts
 #   MLX_METAL_JIT=ON ./update.sh      # Enable Metal JIT for smaller binaries (defaults to OFF)
 #   CLEAN_BUILD=1 ./update.sh         # Clean build artifacts before building local MLX repos
 #
@@ -61,12 +62,55 @@ if [[ -z "${VIRTUAL_ENV:-}" ]] && [[ -z "${CONDA_DEFAULT_ENV:-}" ]] && [[ -z "${
 	echo "[update.sh] Proceeding with global installation (user confirmed)..."
 fi
 
-# Update conda itself if in a conda environment
-# NOTE: We only update conda itself (in base), NOT "--all" which can break
-# pip-installed packages (mlx, mlx-vlm) by reshuffling shared dependencies.
+# Update conda itself (base) and environment packages with pip-conflict safety check.
+# NOTE: conda update --all can break pip-installed packages (mlx, mlx-vlm) by
+# reshuffling shared dependencies like numpy. We do a dry-run first and warn.
 if [[ -n "${CONDA_DEFAULT_ENV:-}" ]]; then
-	echo "[update.sh] Updating conda (base only — not all packages, to avoid breaking pip installs)..."
+	echo "[update.sh] Updating conda (base)..."
 	conda update -n base conda -y
+
+	# Now attempt to update the active environment's conda-managed packages.
+	# Dry-run first to detect conflicts with pip-installed packages.
+	echo ""
+	echo "[update.sh] Checking for safe conda environment updates (dry-run)..."
+	DRY_RUN_OUTPUT=$(conda update --all --dry-run 2>&1) || true
+
+	# Extract package names conda wants to change
+	CONDA_CHANGES=$(echo "$DRY_RUN_OUTPUT" | grep -E '^\s+\S+\s+\S+\s+->\s+\S+' | awk '{print $1}' 2>/dev/null || true)
+
+	if [[ -z "$CONDA_CHANGES" ]]; then
+		echo "[update.sh] Conda environment is already up to date"
+	else
+		# Get pip-installed packages (not installed by conda)
+		PIP_ONLY_PKGS=$(pip list --format=freeze 2>/dev/null | cut -d= -f1 | tr '[:upper:]' '[:lower:]' || true)
+
+		# Check for overlaps between conda changes and pip packages
+		CONFLICTS=""
+		while IFS= read -r pkg; do
+			[[ -z "$pkg" ]] && continue
+			pkg_lower=$(echo "$pkg" | tr '[:upper:]' '[:lower:]' | tr '_' '-')
+			if echo "$PIP_ONLY_PKGS" | tr '_' '-' | grep -qx "$pkg_lower"; then
+				CONFLICTS="${CONFLICTS}  - ${pkg}\n"
+			fi
+		done <<< "$CONDA_CHANGES"
+
+		if [[ -n "$CONFLICTS" ]]; then
+			echo ""
+			echo "⚠️  WARNING: conda wants to update packages also managed by pip:"
+			echo -e "$CONFLICTS"
+			echo "   This may break pip-installed packages (mlx, mlx-vlm, etc.)."
+			echo "   Skipping conda update --all to be safe."
+			echo "   To force: CONDA_UPDATE_ALL=1 ./update.sh"
+			echo ""
+			if [[ "${CONDA_UPDATE_ALL:-0}" == "1" ]]; then
+				echo "[update.sh] CONDA_UPDATE_ALL=1 set — proceeding with conda update --all..."
+				conda update --all -y
+			fi
+		else
+			echo "[update.sh] No pip conflicts detected — updating conda environment packages..."
+			conda update --all -y
+		fi
+	fi
 else
 	echo "[update.sh] Not in conda environment; skipping conda update"
 fi
