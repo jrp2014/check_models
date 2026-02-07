@@ -20,6 +20,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - 4 mock-based `process_image_with_model` tests (`test_process_image_mock.py`)
 - Append-only history JSONL (`results.history.jsonl`) with per-run regression/recovery
   comparison summary (always prints "Regressions" and "Recoveries" sections)
+- IPTC/IIM metadata extraction (keywords, caption) via Pillow `IptcImagePlugin`
+- XMP metadata extraction (dc:subject, dc:title, dc:description) via `Image.getxmp()`
+- Windows EXIF XPKeywords extraction (UTF-16LE semicolon-delimited)
+- Keyword merging across IPTC, XMP, and XP sources (deduplicated, order-preserved)
+- Structured stock-photo cataloguing prompt with Title/Description/Keywords sections
+  and keyword taxonomy guidance (subjects, concepts, mood, style, colors, use-case)
+- Existing metadata seeded into prompt (description, title, keywords, GPS, date)
+- `defusedxml` runtime dependency for XMP metadata support
 - YAML config schema validation — warns on unknown threshold keys
 - `CHANGELOG.md` (this file)
 - `quality-strict` and `install-markdownlint` targets in root Makefile

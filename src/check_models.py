@@ -394,6 +394,7 @@ except ImportError:
     MISSING_DEPENDENCIES["Pillow"] = ERROR_PILLOW_MISSING
 else:
     from PIL import ExifTags as PIL_ExifTags
+    from PIL import IptcImagePlugin
     from PIL.ExifTags import GPS as PIL_GPS
     from PIL.ExifTags import GPSTAGS as PIL_GPSTAGS
     from PIL.ExifTags import TAGS as PIL_TAGS
@@ -3894,20 +3895,194 @@ def _extract_gps_str(gps_info_raw: Mapping[Any, Any] | None) -> str | None:
         return f"{lat_dd:.6f}°{lat_card}, {lon_dd:.6f}°{lon_card}"
 
 
-def extract_image_metadata(image_path: PathLike) -> MetadataDict:
-    """Derive high-level metadata (date, description, GPS string, raw EXIF).
+def _extract_iptc_metadata(image_path: PathLike) -> dict[str, Any]:
+    """Extract IPTC/IIM metadata (keywords, caption) from an image.
 
-    Returns None for unavailable date/description/gps instead of sentinel strings.
+    Uses Pillow's IptcImagePlugin to read standard IPTC records:
+        - (2, 25): Keywords (multi-valued)
+        - (2, 120): Caption/Abstract
+    """
+    try:
+        with Image.open(Path(image_path)) as img:
+            iptc: dict[tuple[int, int], Any] | None = IptcImagePlugin.getiptcinfo(img)
+            if not iptc:
+                return {}
+
+            result: dict[str, Any] = {}
+
+            # Keywords (2, 25) — may be a single bytes or a list of bytes
+            raw_keywords = iptc.get((2, 25), [])
+            if isinstance(raw_keywords, bytes):
+                raw_keywords = [raw_keywords]
+            keywords: list[str] = []
+            for kw in raw_keywords:
+                decoded = kw.decode("utf-8", errors="replace") if isinstance(kw, bytes) else str(kw)
+                if decoded.strip():
+                    keywords.append(decoded.strip())
+            if keywords:
+                result["iptc_keywords"] = keywords
+
+            # IPTC caption/abstract record
+            caption_raw = iptc.get((2, 120))
+            if isinstance(caption_raw, bytes):
+                caption_str = caption_raw.decode("utf-8", errors="replace").strip()
+                if caption_str:
+                    result["iptc_caption"] = caption_str
+            elif isinstance(caption_raw, str) and caption_raw.strip():
+                result["iptc_caption"] = caption_raw.strip()
+
+            return result
+    except (OSError, ValueError, AttributeError):
+        logger.debug("Failed to extract IPTC metadata from %s", image_path)
+    return {}
+
+
+def _xmp_alt_text(container: dict[str, Any], rdf_ns: str) -> str | None:
+    """Extract a text value from an XMP rdf:Alt container."""
+    if not isinstance(container, dict):
+        return None
+    alt = container.get(f"{rdf_ns}Alt", {})
+    if not isinstance(alt, dict):
+        return None
+    text = alt.get(f"{rdf_ns}li", "")
+    if isinstance(text, dict):
+        text = text.get("#text", "")
+    return text.strip() if isinstance(text, str) and text.strip() else None
+
+
+def _extract_xmp_metadata(image_path: PathLike) -> dict[str, Any]:
+    """Extract XMP metadata (dc:subject keywords, dc:title, dc:description).
+
+    Uses Pillow's ``Image.getxmp()`` (8.2+).  The returned dict is deeply
+    nested with XML namespace prefixes; this function navigates defensively.
+    Requires the ``defusedxml`` package; returns empty if unavailable.
+    """
+    rdf_ns = "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}"
+    dc_ns = "{http://purl.org/dc/elements/1.1/}"
+
+    try:
+        with Image.open(Path(image_path)) as img:
+            if not hasattr(img, "getxmp"):
+                return {}
+            xmp: dict[str, Any] = img.getxmp()
+            if not xmp:
+                return {}
+
+            result: dict[str, Any] = {}
+
+            # Navigate: xmpmeta → RDF → Description
+            desc_block = (
+                xmp.get("xmpmeta", {}).get(f"{rdf_ns}RDF", {}).get(f"{rdf_ns}Description", {})
+            )
+            if not isinstance(desc_block, dict):
+                return {}
+
+            # dc:subject → keywords list
+            subject = desc_block.get(f"{dc_ns}subject", {})
+            if isinstance(subject, dict):
+                bag = subject.get(f"{rdf_ns}Bag", {})
+                if isinstance(bag, dict):
+                    items = bag.get(f"{rdf_ns}li", [])
+                    if isinstance(items, str):
+                        items = [items]
+                    if isinstance(items, list):
+                        kw_list = [str(k).strip() for k in items if str(k).strip()]
+                        if kw_list:
+                            result["xmp_keywords"] = kw_list
+
+            # XMP description (rdf:Alt language alternative)
+            description = desc_block.get(f"{dc_ns}description", {})
+            desc_text = _xmp_alt_text(description, rdf_ns)
+            if desc_text:
+                result["xmp_description"] = desc_text
+
+            # XMP title (rdf:Alt language alternative)
+            title = desc_block.get(f"{dc_ns}title", {})
+            title_text = _xmp_alt_text(title, rdf_ns)
+            if title_text:
+                result["xmp_title"] = title_text
+
+            return result
+    except (OSError, ValueError, AttributeError, TypeError):
+        logger.debug("Failed to extract XMP metadata from %s", image_path)
+    return {}
+
+
+def _extract_xp_keywords(exif_data: ExifDict) -> list[str]:
+    """Extract Windows XP keywords from EXIF IFD0 (UTF-16LE encoded, semicolon-delimited)."""
+    raw = exif_data.get("XPKeywords")
+    if raw is None:
+        return []
+    if isinstance(raw, bytes):
+        try:
+            decoded = raw.decode("utf-16-le").rstrip("\x00")
+        except UnicodeDecodeError:
+            decoded = raw.decode("latin-1", errors="replace")
+    elif isinstance(raw, str):
+        decoded = raw
+    else:
+        return []
+    return [kw.strip() for kw in decoded.split(";") if kw.strip()]
+
+
+def _merge_keywords(*sources: list[str]) -> str | None:
+    """Merge keyword lists from multiple sources, preserving first-seen order."""
+    seen: set[str] = set()
+    merged: list[str] = []
+    for source in sources:
+        for kw in source:
+            lower = kw.lower()
+            if lower not in seen:
+                seen.add(lower)
+                merged.append(kw)
+    return ", ".join(merged) if merged else None
+
+
+def extract_image_metadata(
+    image_path: PathLike,
+    *,
+    exif_data: ExifDict | None = None,
+) -> MetadataDict:
+    """Derive high-level metadata (date, description, GPS, keywords, title, raw EXIF).
+
+    Extracts from three metadata families:
+        1. EXIF (IFD0 + SubIFD + GPS) via ``get_exif_data``
+        2. IPTC/IIM keywords and caption via ``_extract_iptc_metadata``
+        3. XMP dc:subject, dc:title, dc:description via ``_extract_xmp_metadata``
+        4. Windows XP keywords from EXIF IFD0
+
+    Keywords are merged (deduplicated, order-preserved) across all sources.
+    Returns None for unavailable fields instead of sentinel strings.
     """
     metadata: MetadataDict = {}
     img_path = Path(image_path)
-    exif_data = get_exif_data(img_path) or {}
+    if exif_data is None:
+        exif_data = get_exif_data(img_path) or {}
 
-    # Date, Time, Description, GPS
+    # IPTC + XMP extraction (separate image opens for header-only access)
+    iptc = _extract_iptc_metadata(img_path)
+    xmp = _extract_xmp_metadata(img_path)
+
+    # Date, Time, GPS
     metadata["date"] = _extract_exif_date(img_path, exif_data)
     metadata["time"] = _extract_exif_time(img_path, exif_data)
-    metadata["description"] = _extract_description(exif_data)
     metadata["gps"] = _extract_gps_str(exif_data.get("GPSInfo"))
+
+    # Description: prefer IPTC caption → XMP description → EXIF ImageDescription
+    description = (
+        iptc.get("iptc_caption") or xmp.get("xmp_description") or _extract_description(exif_data)
+    )
+    metadata["description"] = description
+
+    # Title: from XMP dc:title (falls back to None)
+    metadata["title"] = xmp.get("xmp_title")
+
+    # Keywords: merge IPTC → XMP → Windows XP, deduplicated
+    metadata["keywords"] = _merge_keywords(
+        iptc.get("iptc_keywords", []),
+        xmp.get("xmp_keywords", []),
+        _extract_xp_keywords(exif_data),
+    )
 
     # Raw EXIF for reference
     metadata["exif"] = str(exif_data)
@@ -7446,27 +7621,106 @@ def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
     """Extract, print, and return image metadata."""
     print_cli_section("Image Metadata")
 
-    metadata: MetadataDict = extract_image_metadata(image_path)
+    # Single EXIF extraction shared by metadata and verbose pretty-print
+    exif_data: ExifDict | None = get_exif_data(image_path)
+    metadata: MetadataDict = extract_image_metadata(image_path, exif_data=exif_data)
 
-    # Display key metadata (fallback to N/A only at presentation time)
-    logger.info("Date: %s", metadata.get("date") if metadata.get("date") is not None else "")
-    logger.info(
-        "Description: %s",
-        metadata.get("description") if metadata.get("description") is not None else "",
-    )
-    logger.info(
-        "GPS Location: %s",
-        metadata.get("gps") if metadata.get("gps") is not None else "",
-    )
+    # Display key metadata (fallback to empty at presentation time)
+    logger.info("Date: %s", metadata.get("date") or "")
+    logger.info("Description: %s", metadata.get("description") or "")
+    logger.info("GPS Location: %s", metadata.get("gps") or "")
+    if metadata.get("title"):
+        logger.info("Title: %s", metadata["title"])
+    if metadata.get("keywords"):
+        logger.info("Keywords: %s", metadata["keywords"])
 
     if args.verbose:
-        # Note: pretty_print_exif has its own header separators, no need for one here
-        exif_data: ExifDict | None = get_exif_data(image_path)
+        # Reuse already-extracted EXIF data (no second image open)
         if exif_data:
             pretty_print_exif(exif_data, show_all=True)
         else:
             logger.warning("No detailed EXIF data could be extracted.")
     return metadata
+
+
+def _build_cataloguing_prompt(metadata: MetadataDict) -> str:
+    """Build a structured prompt optimised for stock-photo cataloguing.
+
+    Generates a prompt that asks VLMs for Title / Description / Keywords in a
+    format suited to Flickr, Google Images, Alamy, and similar platforms.
+
+    When existing metadata is available (IPTC/XMP/EXIF description, keywords,
+    GPS, date), it is injected as ``Context:`` so VLMs can expand and refine
+    rather than start from scratch.  The ``Context:`` marker is intentionally
+    kept for compatibility with the quality-analysis context-ignorance detector.
+    """
+    parts: list[str] = [
+        "Analyze this image and provide structured metadata for image cataloguing.",
+        "",
+        "Respond with exactly these three sections:",
+        "",
+        "Title: A concise, descriptive title (5\u201312 words).",
+        "",
+        (
+            "Description: A factual 1\u20133 sentence description of what"
+            " the image shows, covering key subjects, setting, and action."
+        ),
+        "",
+        (
+            "Keywords: 25\u201350 comma-separated keywords ordered from most"
+            " specific to most general, covering:"
+        ),
+        "- Specific subjects (people, objects, animals, landmarks)",
+        "- Setting and location (urban, rural, indoor, outdoor)",
+        "- Actions and activities",
+        "- Concepts and themes (e.g. teamwork, solitude, celebration)",
+        "- Mood and emotion (e.g. serene, dramatic, joyful)",
+        "- Visual style (e.g. close-up, wide-angle, aerial, silhouette, bokeh)",
+        "- Colors and lighting (e.g. golden hour, blue tones, high-key)",
+        "- Seasonal and temporal context",
+        "- Use-case relevance (e.g. business, travel, food, editorial)",
+    ]
+
+    # --- Context block (uses the "Context:" marker for quality analysis) ---
+    desc = metadata.get("description")
+    title = metadata.get("title")
+    existing_kw = metadata.get("keywords")
+    has_context = desc or title or existing_kw
+    if has_context:
+        parts.append("")
+        context_fragments: list[str] = []
+        if title:
+            context_fragments.append(f"titled '{title}'")
+        if desc:
+            context_fragments.append(f"described as '{desc}'")
+        parts.append(
+            f"Context: The image is {', '.join(context_fragments)}." if context_fragments else "",
+        )
+        if existing_kw:
+            parts.append(f"Existing keywords: {existing_kw}")
+
+    # Date / time / GPS metadata
+    date_val = metadata.get("date")
+    time_val = metadata.get("time")
+    gps_val = metadata.get("gps")
+    if date_val or gps_val:
+        meta_fragments: list[str] = []
+        if date_val:
+            s = f"Taken around {date_val}"
+            if time_val:
+                s += f" at {time_val}"
+            meta_fragments.append(s)
+        if gps_val:
+            meta_fragments.append(f"GPS: {gps_val}")
+        parts.append(". ".join(meta_fragments) + ".")
+
+    parts.append("")
+    parts.append(
+        "Be factual about visual content.  Include relevant conceptual"
+        " and emotional keywords where clearly supported by the image.",
+    )
+
+    return "\n".join(parts)
 
 
 def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
@@ -7479,25 +7733,7 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
         logger.info("Using user-provided prompt.")
     else:
         logger.info("Generating default prompt based on image metadata.")
-        desc = metadata.get("description")
-        date_val = metadata.get("date")
-        time_val = metadata.get("time")
-        gps_val = metadata.get("gps")
-        prompt_parts: list[str] = [
-            (
-                "Provide a factual caption, description, and keywords suitable for "
-                "cataloguing, or searching for, the image."
-            ),
-            (f"\n\nContext: The image relates to '{desc}'" if desc else ""),
-            (f"\n\nThe photo was taken around {date_val}" if date_val else ""),
-            (f" at local time {time_val}" if time_val else ""),
-            (f" from GPS {gps_val}" if gps_val else ""),
-            (
-                ". Focus on visual content, drawing on any available "
-                "contextual information for specificity. Do not speculate."
-            ),
-        ]
-        prompt = " ".join(filter(None, prompt_parts)).strip()
+        prompt = _build_cataloguing_prompt(metadata)
         logger.debug("Using generated prompt based on metadata.")
 
     # Truncate long prompts for display

@@ -61,8 +61,8 @@ python -m check_models --dry-run
 - **Model Discovery**: Auto-discovers locally cached MLX VLMs from Hugging Face cache or processes explicit model list with `--models`
 - **Selection Control**: Use `--exclude` to filter models from cache scan or explicit list
 - **Folder Mode**: Automatically selects most recently modified image from specified folder
-- **Metadata Extraction**: Robust EXIF + GPS parsing with fail-soft multi-pass strategy for partially corrupted metadata
-- **Smart Prompting**: Generates metadata-aware prompts (image description, GPS, date) when `--prompt` not provided
+- **Metadata Extraction**: Multi-source metadata: EXIF + GPS + IPTC keywords/caption + XMP (dc:subject, dc:title) + Windows XP keywords, with fail-soft strategy for partially corrupt data
+- **Smart Prompting**: Generates structured cataloguing prompts (Title/Description/Keywords) with keyword taxonomy guidance; seeds with existing IPTC/XMP keywords when available; `--prompt` overrides
 - **Performance Metrics**:
   - Timing: generation_time, model_load_time, total_time
   - Tokens: total, prompt, generated with tokens/sec
@@ -82,7 +82,7 @@ python -m check_models --dry-run
 | ---- | ----- |
 | Model discovery | Scans Hugging Face cache; explicit `--models` overrides. |
 | Selection control | `--exclude` works with cache scan or explicit list. |
-| Prompting | `--prompt` overrides; otherwise metadata‑informed (image description, GPS, date). |
+| Prompting | `--prompt` overrides; otherwise structured cataloguing prompt with IPTC/XMP keyword seeding. |
 | Performance | generation_time, model_load_time, total_time, token counts, TPS, peak memory. |
 | Reporting | CLI (color), HTML (standalone), Markdown (GitHub). |
 | Robustness | Per‑model isolation; failures logged; SUMMARY lines for automation. |
@@ -455,7 +455,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- MANUAL_INSTALL_START -->
 ```bash
-pip install "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "tzlocal>=5.0"
+pip install "defusedxml>=0.7.0" "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "tzlocal>=5.0"
 ```
 <!-- MANUAL_INSTALL_END -->
 
@@ -589,7 +589,7 @@ Development / QA:
 
 <!-- MINIMAL_INSTALL_START -->
 ```bash
-pip install "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "tzlocal>=5.0"
+pip install "defusedxml>=0.7.0" "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "tzlocal>=5.0"
 ```
 <!-- MINIMAL_INSTALL_END -->
 
