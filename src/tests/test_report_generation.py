@@ -241,3 +241,315 @@ class TestTsvReportEdgeCases:
         # error_type and error_package should not contain real values
         assert "RuntimeError" not in stripped_fields
         assert "transformers" not in stripped_fields
+
+
+# ===================================================================
+# Diagnostics report
+# ===================================================================
+
+
+def _make_failure_with_details(
+    name: str = "org/model-fail",
+    *,
+    error_msg: str = "boom",
+    error_type: str = "ValueError",
+    error_package: str = "mlx-vlm",
+    error_stage: str = "Model Error",
+    traceback_str: str | None = None,
+) -> check_models.PerformanceResult:
+    """Create a failure result with full error details for diagnostics tests."""
+    return check_models.PerformanceResult(
+        model_name=name,
+        success=False,
+        generation=None,
+        error_stage=error_stage,
+        error_message=error_msg,
+        error_type=error_type,
+        error_package=error_package,
+        error_traceback=traceback_str,
+    )
+
+
+class TestDiagnosticsReport:
+    """Tests for generate_diagnostics_report and its helpers."""
+
+    def test_no_report_when_all_succeed(self, tmp_path: Path) -> None:
+        """No diagnostics file when every model succeeds without harness issues."""
+        out = tmp_path / "diag.md"
+        result = check_models.generate_diagnostics_report(
+            results=[_make_success()],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13", "GPU/Chip": "M4"},
+            prompt="test",
+        )
+        assert result is False
+        assert not out.exists()
+
+    def test_report_written_on_failure(self, tmp_path: Path) -> None:
+        """Diagnostics file created when a model fails."""
+        out = tmp_path / "diag.md"
+        result = check_models.generate_diagnostics_report(
+            results=[
+                _make_success(),
+                _make_failure_with_details(
+                    "org/bad-model",
+                    error_msg="[broadcast_shapes] Shapes (3,1,2048) and (3,1,6065) mismatch",
+                ),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            prompt="test prompt",
+        )
+        assert result is True
+        content = out.read_text(encoding="utf-8")
+        assert "# Diagnostics Report" in content
+        assert "org/bad-model" in content
+        assert "broadcast_shapes" in content
+
+    def test_environment_table_includes_versions(self, tmp_path: Path) -> None:
+        """Environment table should include library versions and system info."""
+        out = tmp_path / "diag.md"
+        versions = _stub_versions()
+        versions["mlx-vlm"] = "0.3.11"
+        check_models.generate_diagnostics_report(
+            results=[_make_failure_with_details()],
+            filename=out,
+            versions=versions,
+            system_info={"Python Version": "3.13.9", "GPU/Chip": "Apple M4 Max"},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "| mlx-vlm | 0.3.11 |" in content
+        assert "| Python Version | 3.13.9 |" in content
+        assert "| GPU/Chip | Apple M4 Max |" in content
+
+    def test_failure_clustering_groups_similar_errors(self, tmp_path: Path) -> None:
+        """Models with the same error pattern (differing only in numbers) should cluster."""
+        out = tmp_path / "diag.md"
+        check_models.generate_diagnostics_report(
+            results=[
+                _make_failure_with_details(
+                    "org/model-a",
+                    error_msg="[broadcast_shapes] Shapes (3,1,2048) and (3,1,6065) cannot be broadcast",
+                ),
+                _make_failure_with_details(
+                    "org/model-b",
+                    error_msg="[broadcast_shapes] Shapes (984,2048) and (1,0,2048) cannot be broadcast",
+                ),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        # Both should be in the same cluster section, not separate sections
+        # Count the number of "##" headings that mention "Model Error"
+        error_sections = [
+            ln for ln in content.splitlines() if ln.startswith("## ") and "Model Error" in ln
+        ]
+        assert len(error_sections) == 1
+        # Both models mentioned in that section
+        assert "org/model-a" in content
+        assert "org/model-b" in content
+
+    def test_different_errors_get_separate_clusters(self, tmp_path: Path) -> None:
+        """Different error types should produce separate sections."""
+        out = tmp_path / "diag.md"
+        check_models.generate_diagnostics_report(
+            results=[
+                _make_failure_with_details(
+                    "org/model-a",
+                    error_msg="chat_template is not set",
+                    error_stage="No Chat Template",
+                ),
+                _make_failure_with_details(
+                    "org/model-b",
+                    error_msg="Missing 1 parameters: lm_head.weight",
+                    error_stage="Weight Mismatch",
+                    error_package="mlx",
+                ),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "No Chat Template" in content
+        assert "Weight Mismatch" in content
+
+    def test_traceback_tail_included(self, tmp_path: Path) -> None:
+        """Traceback excerpt should appear in the report."""
+        tb = (
+            "Traceback (most recent call last):\n"
+            '  File "foo.py", line 10, in bar\n'
+            "    do_stuff()\n"
+            '  File "baz.py", line 20, in do_stuff\n'
+            "    raise ValueError('bad shape')\n"
+            "ValueError: bad shape\n"
+        )
+        out = tmp_path / "diag.md"
+        check_models.generate_diagnostics_report(
+            results=[
+                _make_failure_with_details("org/m", traceback_str=tb, error_msg="bad shape"),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "Traceback (tail)" in content
+        assert "ValueError: bad shape" in content
+
+    def test_priority_table_present(self, tmp_path: Path) -> None:
+        """Priority Summary table should appear with correct structure."""
+        out = tmp_path / "diag.md"
+        check_models.generate_diagnostics_report(
+            results=[_make_failure_with_details()],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "## Priority Summary" in content
+        assert "| Priority | Issue |" in content
+
+    def test_reproducibility_section(self, tmp_path: Path) -> None:
+        """Reproducibility section should include model-specific commands."""
+        out = tmp_path / "diag.md"
+        check_models.generate_diagnostics_report(
+            results=[_make_failure_with_details("org/broken-model")],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "## Reproducibility" in content
+        assert "python src/check_models.py --model org/broken-model" in content
+
+    def test_prompt_in_details_block(self, tmp_path: Path) -> None:
+        """Prompt should be in a collapsible details block."""
+        out = tmp_path / "diag.md"
+        check_models.generate_diagnostics_report(
+            results=[_make_failure_with_details()],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="Analyze this image carefully.",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "<details>" in content
+        assert "Analyze this image carefully." in content
+
+    def test_high_priority_for_multi_model_cluster(self, tmp_path: Path) -> None:
+        """Clusters with ≥2 models should be tagged High priority."""
+        out = tmp_path / "diag.md"
+        check_models.generate_diagnostics_report(
+            results=[
+                _make_failure_with_details("org/a", error_msg="same error for all"),
+                _make_failure_with_details("org/b", error_msg="same error for all"),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "Priority: High" in content
+
+
+class TestClusterFailuresByPattern:
+    """Unit tests for the _cluster_failures_by_pattern helper."""
+
+    def test_strips_model_name_from_wrapper(self) -> None:
+        """Model-specific prefixes should be removed before clustering."""
+        results = [
+            _make_failure_with_details(
+                "org/model-a",
+                error_msg="Model generation failed for org/model-a: token mismatch",
+            ),
+            _make_failure_with_details(
+                "org/model-b",
+                error_msg="Model generation failed for org/model-b: token mismatch",
+            ),
+        ]
+        clusters = check_models._cluster_failures_by_pattern(results)
+        assert len(clusters) == 1
+
+    def test_normalises_numbers(self) -> None:
+        """Varying numeric values (shape dimensions) should be normalised."""
+        results = [
+            _make_failure_with_details(
+                "org/a",
+                error_msg="Shapes (3,1,2048) and (3,1,6065) mismatch",
+            ),
+            _make_failure_with_details(
+                "org/b",
+                error_msg="Shapes (984,2048) and (1,0,2048) mismatch",
+            ),
+        ]
+        clusters = check_models._cluster_failures_by_pattern(results)
+        assert len(clusters) == 1
+        assert len(next(iter(clusters.values()))) == 2
+
+    def test_different_patterns_separate(self) -> None:
+        """Fundamentally different errors should not cluster together."""
+        results = [
+            _make_failure_with_details("org/a", error_msg="chat_template is not set"),
+            _make_failure_with_details("org/b", error_msg="Missing 1 parameters"),
+        ]
+        clusters = check_models._cluster_failures_by_pattern(results)
+        assert len(clusters) == 2
+
+
+class TestFormatTracebackTail:
+    """Unit tests for _format_traceback_tail."""
+
+    def test_none_input(self) -> None:
+        """None input returns None."""
+        assert check_models._format_traceback_tail(None) is None
+
+    def test_empty_string(self) -> None:
+        """Empty string returns None."""
+        assert check_models._format_traceback_tail("") is None
+
+    def test_extracts_tail(self) -> None:
+        """Long tracebacks are truncated to the tail lines."""
+        tb = "\n".join(f"line {i}" for i in range(20))
+        result = check_models._format_traceback_tail(tb)
+        assert result is not None
+        lines = result.splitlines()
+        assert len(lines) == 6  # _DIAGNOSTICS_TRACEBACK_TAIL_LINES
+        assert "line 19" in lines[-1]
+
+    def test_short_traceback_returned_fully(self) -> None:
+        """Short tracebacks are returned without truncation."""
+        tb = "ValueError: bad\n  at foo.py:10"
+        result = check_models._format_traceback_tail(tb)
+        assert result is not None
+        assert "ValueError: bad" in result
+
+
+class TestDiagnosticsPriority:
+    """Unit tests for _diagnostics_priority."""
+
+    def test_high_for_multi_model(self) -> None:
+        """Clusters with >=2 models are High priority."""
+        assert check_models._diagnostics_priority(2, "Model Error") == "High"
+        assert check_models._diagnostics_priority(5, "Model Error") == "High"
+
+    def test_low_for_weight_mismatch(self) -> None:
+        """Weight mismatch and config issues are Low priority."""
+        assert check_models._diagnostics_priority(1, "Weight Mismatch") == "Low"
+        assert check_models._diagnostics_priority(1, "Config Missing") == "Low"
+
+    def test_medium_default(self) -> None:
+        """Single-model actionable errors default to Medium."""
+        assert check_models._diagnostics_priority(1, "Model Error") == "Medium"
+        assert check_models._diagnostics_priority(1, "No Chat Template") == "Medium"

@@ -93,6 +93,7 @@ __all__ = [
     "format_field_label",
     "format_field_value",
     "format_overall_runtime",
+    "generate_diagnostics_report",
     "generate_html_report",
     "generate_markdown_report",
     "get_device_info",
@@ -511,6 +512,7 @@ DEFAULT_TSV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.tsv"
 DEFAULT_LOG_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "check_models.log"
 DEFAULT_JSONL_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.jsonl"
 DEFAULT_ENV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "environment.log"
+DEFAULT_DIAGNOSTICS_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "diagnostics.md"
 
 DEFAULT_TEMPERATURE: Final[float] = 0.0  # Greedy/deterministic (matches mlx-vlm upstream)
 DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
@@ -5000,6 +5002,412 @@ def _format_failures_by_package_text(results: list[PerformanceResult]) -> list[s
     return parts
 
 
+# =============================================================================
+# DIAGNOSTICS REPORT — Upstream issue filing aid
+# =============================================================================
+
+# Priority thresholds for diagnostics report classification
+_DIAGNOSTICS_HIGH_COUNT: Final[int] = 2  # ≥ N models = High priority cluster
+_DIAGNOSTICS_TRACEBACK_TAIL_LINES: Final[int] = 6  # Lines to keep from traceback tail
+_DIAGNOSTICS_OUTPUT_SNIPPET_LEN: Final[int] = 200  # Max chars for sample output
+
+# System info keys to include in the environment table (order matters)
+_DIAGNOSTICS_SYSTEM_KEYS: Final[tuple[str, ...]] = (
+    "Python Version",
+    "OS",
+    "macOS Version",
+    "GPU/Chip",
+    "GPU Cores",
+    "Metal Support",
+    "RAM",
+)
+
+# Library names to include in the environment table (order matters)
+_DIAGNOSTICS_LIB_NAMES: Final[tuple[str, ...]] = (
+    "mlx-vlm",
+    "mlx",
+    "mlx-lm",
+    "transformers",
+    "tokenizers",
+    "huggingface-hub",
+)
+
+
+def _format_traceback_tail(traceback_str: str | None) -> str | None:
+    """Extract the last meaningful lines from a full traceback.
+
+    Strips blank lines and returns the tail suitable for inclusion in issue
+    reports.  Returns None when no useful info can be extracted.
+    """
+    if not traceback_str:
+        return None
+    lines = [ln for ln in traceback_str.strip().splitlines() if ln.strip()]
+    if not lines:
+        return None
+    tail = lines[-_DIAGNOSTICS_TRACEBACK_TAIL_LINES:]
+    return "\n".join(tail)
+
+
+def _cluster_failures_by_pattern(
+    results: list[PerformanceResult],
+) -> dict[str, list[PerformanceResult]]:
+    """Group failed results by their core error message pattern.
+
+    Unlike ``_bucket_failures_by_error`` (which produces ``{signature: [model_name]}``
+    for console logging), this returns the full ``PerformanceResult`` objects so the
+    diagnostics report can access tracebacks, packages, and other fields.
+
+    Clustering heuristic:
+        1. Strip model-specific prefixes ("Model generation failed for <model>:")
+        2. Normalise varying numbers (shape dimensions, counts) into placeholders
+        3. Group by the resulting canonical message
+
+    Returns:
+        Mapping from a human-readable pattern label to the list of results
+        sharing that pattern.
+    """
+    clusters: dict[str, list[PerformanceResult]] = {}
+    failed = [r for r in results if not r.success]
+
+    for res in failed:
+        msg = res.error_message or "Unknown error"
+        core = msg.split("\n")[0].strip()
+
+        # Remove model-specific wrappers (e.g. "Model generation failed for ...")
+        wrapper_match = re.match(
+            r"Model (?:generation|loading) failed(?:\s+for\s+\S+)?:\s*(.+)",
+            core,
+        )
+        if wrapper_match:
+            core = wrapper_match.group(1)
+
+        # Normalise varying numeric shapes/counts so dimensionally-different
+        # instances of the same root cause cluster together.
+        # Step 1: Replace all digits with N
+        canonical = re.sub(r"\d+", "N", core)
+        # Step 2: Collapse shape tuples like (N,N,N) or (N,N) into (N,...)
+        canonical = re.sub(r"\(N(?:,N)+\)", "(N,...)", canonical)
+
+        clusters.setdefault(canonical, []).append(res)
+
+    return clusters
+
+
+def _diagnostics_priority(
+    cluster_size: int,
+    error_stage: str | None,
+) -> str:
+    """Assign a priority label for an error cluster in the diagnostics report."""
+    if cluster_size >= _DIAGNOSTICS_HIGH_COUNT:
+        return "High"
+    if error_stage in {"Weight Mismatch", "Config Missing"}:
+        return "Low"
+    return "Medium"
+
+
+def _collect_harness_results(
+    successful: list[PerformanceResult],
+) -> list[tuple[PerformanceResult, str]]:
+    """Collect successful models that have harness/integration issues."""
+    harness_results: list[tuple[PerformanceResult, str]] = []
+    for res in successful:
+        gen = res.generation
+        qa = getattr(gen, "quality_analysis", None) if gen else None
+        if qa and getattr(qa, "has_harness_issue", False):
+            text = getattr(gen, "text", "") or ""
+            harness_results.append((res, text))
+    return harness_results
+
+
+def _diagnostics_header(
+    *,
+    total: int,
+    n_failed: int,
+    n_harness: int,
+    n_success: int,
+    versions: LibraryVersionDict,
+    system_info: dict[str, str],
+    image_path: Path | None,
+) -> list[str]:
+    """Build title, summary, and environment sections of the diagnostics report."""
+    parts: list[str] = []
+    version = versions.get("mlx-vlm") or "unknown"
+    parts.append(
+        f"# Diagnostics Report — {n_failed} failure(s), "
+        f"{n_harness} harness issue(s) (mlx-vlm {version})",
+    )
+    parts.append("")
+    parts.append("## Summary")
+    parts.append("")
+    parts.append(
+        f"Automated benchmarking of **{total} locally-cached VLM models** "
+        f"found **{n_failed} hard failure(s)** and "
+        f"**{n_harness} harness/integration issue(s)** "
+        f"in successful models. {n_success} of {total} models succeeded.",
+    )
+    parts.append("")
+
+    if image_path and image_path.exists():
+        try:
+            size_mb = image_path.stat().st_size / (1024 * 1024)
+            parts.append(
+                f"Test image: `{image_path.name}` ({size_mb:.1f} MB). "
+                "All failures are deterministic and reproducible.",
+            )
+            parts.append("")
+        except OSError:
+            pass
+
+    # Environment table
+    parts.append("## Environment")
+    parts.append("")
+    parts.append("| Component | Version |")
+    parts.append("|-----------|---------|")
+    for lib in _DIAGNOSTICS_LIB_NAMES:
+        ver = versions.get(lib, "")
+        if ver:
+            parts.append(f"| {lib} | {ver} |")
+    for key in _DIAGNOSTICS_SYSTEM_KEYS:
+        val = system_info.get(key, "")
+        if val:
+            parts.append(f"| {key} | {val} |")
+    parts.append("")
+    return parts
+
+
+def _diagnostics_failure_clusters(
+    results: list[PerformanceResult],
+) -> list[str]:
+    """Build the failure-cluster sections of the diagnostics report."""
+    failed = [r for r in results if not r.success]
+    if not failed:
+        return []
+
+    clusters = _cluster_failures_by_pattern(results)
+    sorted_clusters = sorted(clusters.items(), key=lambda kv: -len(kv[1]))
+
+    parts: list[str] = ["---", ""]
+    for idx, (_pattern, cluster_results) in enumerate(sorted_clusters, 1):
+        stage = cluster_results[0].error_stage or "Error"
+        pkg = cluster_results[0].error_package or "unknown"
+        n = len(cluster_results)
+        priority = _diagnostics_priority(n, stage)
+
+        parts.append(
+            f"## {idx}. {stage} — {n} model(s) [`{pkg}`] (Priority: {priority})",
+        )
+        parts.append("")
+
+        rep = cluster_results[0]
+        full_msg = (rep.error_message or "").split("\n")[0].strip()
+        parts.append(f"**Error:** `{full_msg}`")
+        parts.append("")
+
+        # Affected models table
+        parts.append("| Model | Error Stage | Package |")
+        parts.append("|-------|-------------|---------|")
+        parts.extend(
+            f"| `{r.model_name}` | {r.error_stage} | {r.error_package or 'unknown'} |"
+            for r in cluster_results
+        )
+        parts.append("")
+
+        # Per-model error messages (only when they differ across the cluster)
+        msgs = {
+            r.model_name: (r.error_message or "").split("\n")[0].strip() for r in cluster_results
+        }
+        if len(set(msgs.values())) > 1:
+            parts.append("**Per-model error messages:**")
+            parts.append("")
+            parts.extend(f"- `{model}`: `{msg}`" for model, msg in msgs.items())
+            parts.append("")
+
+        # Traceback excerpt from the representative model
+        tb_tail = _format_traceback_tail(rep.error_traceback)
+        if tb_tail:
+            parts.append("**Traceback (tail):**")
+            parts.append("")
+            parts.append("```")
+            parts.append(tb_tail)
+            parts.append("```")
+            parts.append("")
+
+    return parts
+
+
+def _diagnostics_harness_section(
+    harness_results: list[tuple[PerformanceResult, str]],
+) -> list[str]:
+    """Build the harness/integration issues section of the diagnostics report."""
+    if not harness_results:
+        return []
+
+    parts: list[str] = [
+        "---",
+        "",
+        f"## Harness/Integration Issues ({len(harness_results)} model(s))",
+        "",
+        "These models generated output but exhibit integration problems "
+        "(encoding corruption, stop-token leakage, prompt-template issues) "
+        "that indicate mlx-vlm bugs rather than model quality problems.",
+        "",
+    ]
+
+    for res, text in harness_results:
+        gen = res.generation
+        qa = getattr(gen, "quality_analysis", None) if gen else None
+        harness_type = getattr(qa, "harness_issue_type", "unknown") if qa else "unknown"
+        harness_details = getattr(qa, "harness_issue_details", []) if qa else []
+
+        parts.append(f"### `{res.model_name}` — {harness_type}")
+        parts.append("")
+        if harness_details:
+            parts.append("**Details:** " + ", ".join(harness_details))
+            parts.append("")
+        if text:
+            snippet = text[:_DIAGNOSTICS_OUTPUT_SNIPPET_LEN]
+            if len(text) > _DIAGNOSTICS_OUTPUT_SNIPPET_LEN:
+                snippet += "..."
+            parts.extend(["**Sample output:**", "", "```", snippet, "```", ""])
+
+    return parts
+
+
+def _diagnostics_priority_table(
+    results: list[PerformanceResult],
+    harness_results: list[tuple[PerformanceResult, str]],
+) -> list[str]:
+    """Build the priority summary table for the diagnostics report."""
+    parts: list[str] = [
+        "---",
+        "",
+        "## Priority Summary",
+        "",
+        "| Priority | Issue | Models Affected | Package |",
+        "|----------|-------|-----------------|---------|",
+    ]
+
+    failed = [r for r in results if not r.success]
+    if failed:
+        clusters = _cluster_failures_by_pattern(results)
+        sorted_clusters = sorted(clusters.items(), key=lambda kv: -len(kv[1]))
+        for _pattern, cluster_results in sorted_clusters:
+            stage = cluster_results[0].error_stage or "Error"
+            pkg = cluster_results[0].error_package or "unknown"
+            n = len(cluster_results)
+            priority = _diagnostics_priority(n, stage)
+            names = ", ".join(r.model_name.split("/")[-1] for r in cluster_results)
+            parts.append(f"| **{priority}** | {stage} | {n} ({names}) | {pkg} |")
+
+    if harness_results:
+        names = ", ".join(r.model_name.split("/")[-1] for r, _ in harness_results)
+        n = len(harness_results)
+        parts.append(
+            f"| **Medium** | Harness/integration | {n} ({names}) | mlx-vlm |",
+        )
+    parts.append("")
+    return parts
+
+
+def _diagnostics_footer(
+    failed: list[PerformanceResult],
+    prompt: str,
+) -> list[str]:
+    """Build reproducibility and prompt sections of the diagnostics report."""
+    parts: list[str] = [
+        "## Reproducibility",
+        "",
+        "```bash",
+        "# Install check_models benchmarking tool",
+        "pip install -e src/.[dev]",
+        "",
+        "# Run against all cached models",
+        "python src/check_models.py",
+    ]
+
+    if failed:
+        parts.append("")
+        parts.append("# Target specific failing models:")
+        parts.extend(f"python src/check_models.py --model {r.model_name}" for r in failed[:3])
+    parts.extend(["```", ""])
+
+    parts.extend(
+        [
+            "<details><summary>Prompt used (click to expand)</summary>",
+            "",
+            "```",
+            prompt,
+            "```",
+            "",
+            "</details>",
+            "",
+            f"_Report generated on {local_now_str()} by "
+            "[check_models](https://github.com/jrp2014/check_models)._",
+        ],
+    )
+
+    return parts
+
+
+def generate_diagnostics_report(
+    *,
+    results: list[PerformanceResult],
+    filename: Path,
+    versions: LibraryVersionDict,
+    system_info: dict[str, str],
+    prompt: str,
+    image_path: Path | None = None,
+) -> bool:
+    """Generate a Markdown diagnostics report structured for upstream issue filing.
+
+    The report clusters failures by root-cause pattern, includes full error
+    messages and traceback excerpts, and highlights harness/encoding issues
+    from successful models — everything needed to copy-paste into a GitHub
+    issue against mlx-vlm, mlx, or transformers.
+
+    Args:
+        results: All PerformanceResult objects from the run.
+        filename: Output path for the diagnostics .md file.
+        versions: Library version mapping for the environment table.
+        system_info: System characteristics dict from get_system_characteristics().
+        prompt: The prompt that was used.
+        image_path: Path to the test image (for reproducibility section).
+
+    Returns:
+        True if the report was written (i.e. there was something to report),
+        False if skipped because there were no failures or harness issues.
+    """
+    failed = [r for r in results if not r.success]
+    successful = [r for r in results if r.success]
+    harness_results = _collect_harness_results(successful)
+
+    if not failed and not harness_results:
+        return False
+
+    parts: list[str] = _diagnostics_header(
+        total=len(results),
+        n_failed=len(failed),
+        n_harness=len(harness_results),
+        n_success=len(successful),
+        versions=versions,
+        system_info=system_info,
+        image_path=image_path,
+    )
+    parts.extend(_diagnostics_failure_clusters(results))
+    parts.extend(_diagnostics_harness_section(harness_results))
+    parts.extend(_diagnostics_priority_table(results, harness_results))
+    parts.extend(_diagnostics_footer(failed, prompt))
+
+    try:
+        filename.parent.mkdir(parents=True, exist_ok=True)
+        filename.write_text("\n".join(parts), encoding="utf-8")
+    except OSError:
+        logger.exception("Failed to write diagnostics report to %s", filename)
+        return False
+    else:
+        return True
+
+
 def _format_quality_issues_text(summary: dict[str, Any]) -> list[str]:
     parts = []
     quality_parts = []
@@ -8734,6 +9142,17 @@ def finalize_execution(
                 system_info=system_info,
             )
 
+            # Generate diagnostics report (only when failures/harness issues exist)
+            diagnostics_path: Path = args.output_diagnostics.resolve()
+            diagnostics_written = generate_diagnostics_report(
+                results=results,
+                filename=diagnostics_path,
+                versions=library_versions,
+                system_info=system_info,
+                prompt=prompt,
+                image_path=image_path,
+            )
+
             # Log file locations
             logger.info("")
             log_success("Reports successfully generated:", prefix="📊")
@@ -8744,6 +9163,8 @@ def finalize_execution(
             )
             log_file_path(args.output_tsv, label="   TSV Report:   ")
             log_file_path(args.output_jsonl, label="   JSONL Report: ")
+            if diagnostics_written:
+                log_file_path(diagnostics_path, label="   Diagnostics:  ")
 
             log_file_path(DEFAULT_LOG_OUTPUT, label="   Log File:")
             # Include environment.log in the output file listing
@@ -8961,6 +9382,16 @@ def main_cli() -> None:
         type=Path,
         default=DEFAULT_ENV_OUTPUT,
         help="Environment log filename (pip freeze, conda list for reproducibility).",
+    )
+    parser.add_argument(
+        "--output-diagnostics",
+        type=Path,
+        default=DEFAULT_DIAGNOSTICS_OUTPUT,
+        help=(
+            "Diagnostics report filename (Markdown). "
+            "Generated when failures or harness issues are detected. "
+            "Structured for filing upstream issues against mlx-vlm / mlx / transformers."
+        ),
     )
     parser.add_argument(
         "-m",

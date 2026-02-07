@@ -93,6 +93,8 @@ def _get_e2e_output_args(output_dir: Path) -> list[str]:
         str(output_dir / "e2e.jsonl"),
         "--output-env",
         str(output_dir / "e2e_env.log"),
+        "--output-diagnostics",
+        str(output_dir / "e2e_diagnostics.md"),
     ]
 
 

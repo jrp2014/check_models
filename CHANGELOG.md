@@ -28,6 +28,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   and keyword taxonomy guidance (subjects, concepts, mood, style, colors, use-case)
 - Existing metadata seeded into prompt (description, title, keywords, GPS, date)
 - `defusedxml` runtime dependency for XMP metadata support
+- Diagnostics report (`output/diagnostics.md`) auto-generated when failures or
+  harness issues are detected — structured for filing upstream GitHub issues
+  against mlx-vlm / mlx / transformers with error-pattern clustering, full
+  error messages, traceback excerpts, environment table, and priority summary
+- `--output-diagnostics` CLI flag for specifying diagnostics report path
 - YAML config schema validation — warns on unknown threshold keys
 - `CHANGELOG.md` (this file)
 - `quality-strict` and `install-markdownlint` targets in root Makefile

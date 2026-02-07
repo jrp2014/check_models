@@ -13,6 +13,7 @@ The script's default output location is now this directory, keeping the project 
 - `results.tsv` - Tab-separated values table (for spreadsheets/data analysis)
 - `results.jsonl` - JSON Lines report (machine-readable results)
 - `results.history.jsonl` - Append-only per-run history for regressions/recoveries
+- `diagnostics.md` - Upstream issue report (only generated when failures/harness issues detected)
 - `check_models.log` - Detailed execution log from production benchmark runs
 - `environment.log` - Complete Python environment dump (for reproducibility)
 
