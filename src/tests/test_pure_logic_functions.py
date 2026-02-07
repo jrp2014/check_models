@@ -303,7 +303,7 @@ class TestQualityThresholdsFromConfig:
         caplog: pytest.LogCaptureFixture,
     ) -> None:
         """Unknown top-level config section should emit a warning."""
-        config = {"thresholds": {}, "patterns": {}, "extra_section": {}}
+        config: dict[str, object] = {"thresholds": {}, "patterns": {}, "extra_section": {}}
         with caplog.at_level(logging.WARNING):
             mod.QualityThresholds.from_config(config)
         assert "extra_section" in caplog.text
