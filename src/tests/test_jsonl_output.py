@@ -6,7 +6,14 @@ import json
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
-from check_models import PerformanceResult, save_jsonl_report
+from check_models import (
+    PerformanceResult,
+    _history_path_for_jsonl,
+    _load_latest_history_record,
+    append_history_record,
+    compare_history_records,
+    save_jsonl_report,
+)
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -253,3 +260,162 @@ def test_save_jsonl_report_includes_generated_text(tmp_path: Path) -> None:
 
     assert "generated_text" in data
     assert data["generated_text"] == "This is the generated output text."
+
+
+def test_append_history_record_creates_file(tmp_path: Path) -> None:
+    """Test that append_history_record writes a per-run history entry."""
+    history_file = tmp_path / "results.history.jsonl"
+    result = PerformanceResult(
+        model_name="test-model",
+        generation=None,
+        success=True,
+        generation_time=1.0,
+        model_load_time=0.5,
+        total_time=1.5,
+    )
+
+    append_history_record(
+        history_path=history_file,
+        results=[result],
+        prompt="test prompt",
+        system_info={"OS": "test"},
+        library_versions={},
+        image_path=None,
+    )
+
+    assert history_file.exists()
+    lines = history_file.read_text().strip().split("\n")
+    assert len(lines) == 1
+    record = json.loads(lines[0])
+    assert record["_type"] == "run"
+    assert record["model_results"]["test-model"]["success"] is True
+
+
+def test_compare_history_records_detects_regressions_and_recoveries() -> None:
+    """Test regression/recovery detection between history records."""
+    previous = {
+        "model_results": {
+            "model-a": {"success": True},
+            "model-b": {"success": False},
+            "model-c": {"success": True},
+        },
+    }
+    current = {
+        "model_results": {
+            "model-a": {"success": False},
+            "model-b": {"success": True},
+            "model-d": {"success": True},
+        },
+    }
+
+    summary = compare_history_records(previous, current)
+    assert summary["regressions"] == ["model-a"]
+    assert summary["recoveries"] == ["model-b"]
+    assert summary["new_models"] == ["model-d"]
+    assert summary["missing_models"] == ["model-c"]
+
+
+# ---------------------------------------------------------------------------
+# _history_path_for_jsonl
+# ---------------------------------------------------------------------------
+
+
+def test_history_path_for_jsonl_derives_name(tmp_path: Path) -> None:
+    """Test that history path inserts '.history' before '.jsonl'."""
+    result = _history_path_for_jsonl(tmp_path / "results.jsonl")
+    assert result == tmp_path / "results.history.jsonl"
+
+
+def test_history_path_for_jsonl_custom_stem(tmp_path: Path) -> None:
+    """Test history path derivation with a non-default stem."""
+    result = _history_path_for_jsonl(tmp_path / "my_output.jsonl")
+    assert result == tmp_path / "my_output.history.jsonl"
+
+
+# ---------------------------------------------------------------------------
+# _load_latest_history_record
+# ---------------------------------------------------------------------------
+
+
+def test_load_latest_history_record_missing_file(tmp_path: Path) -> None:
+    """Return None when the history file does not exist."""
+    assert _load_latest_history_record(tmp_path / "missing.jsonl") is None
+
+
+def test_load_latest_history_record_empty_file(tmp_path: Path) -> None:
+    """Return None when the history file is empty."""
+    history = tmp_path / "empty.jsonl"
+    history.write_text("")
+    assert _load_latest_history_record(history) is None
+
+
+def test_load_latest_history_record_only_blank_lines(tmp_path: Path) -> None:
+    """Return None when the file contains only blank lines."""
+    history = tmp_path / "blanks.jsonl"
+    history.write_text("\n\n\n")
+    assert _load_latest_history_record(history) is None
+
+
+def test_load_latest_history_record_corrupted_lines(tmp_path: Path) -> None:
+    """Skip corrupted lines and return the valid record."""
+    history = tmp_path / "mixed.jsonl"
+    valid = json.dumps({"_type": "run", "model_results": {"m": {"success": True}}})
+    history.write_text(f'{valid}\nNOT-JSON\n{{"bad": true}}\n')
+
+    record = _load_latest_history_record(history)
+    assert record is not None
+    assert record["_type"] == "run"
+    assert record["model_results"]["m"]["success"] is True
+
+
+def test_load_latest_history_record_only_corrupted(tmp_path: Path) -> None:
+    """Return None when every line is invalid JSON."""
+    history = tmp_path / "corrupt.jsonl"
+    history.write_text("NOT-JSON-1\nNOT-JSON-2\n")
+    assert _load_latest_history_record(history) is None
+
+
+def test_load_latest_history_record_returns_last_run(tmp_path: Path) -> None:
+    """When multiple run records exist, return the last one."""
+    history = tmp_path / "multi.jsonl"
+    first = json.dumps({"_type": "run", "seq": 1})
+    second = json.dumps({"_type": "run", "seq": 2})
+    history.write_text(f"{first}\n{second}\n")
+
+    record = _load_latest_history_record(history)
+    assert record is not None
+    assert record["seq"] == 2
+
+
+def test_load_latest_history_record_skips_non_run_types(tmp_path: Path) -> None:
+    """Skip records whose _type is not 'run'."""
+    history = tmp_path / "types.jsonl"
+    run_record = json.dumps({"_type": "run", "ok": True})
+    metadata = json.dumps({"_type": "metadata", "info": "x"})
+    history.write_text(f"{run_record}\n{metadata}\n")
+
+    record = _load_latest_history_record(history)
+    assert record is not None
+    assert record["_type"] == "run"
+    assert record["ok"] is True
+
+
+# ---------------------------------------------------------------------------
+# compare_history_records — baseline (no previous)
+# ---------------------------------------------------------------------------
+
+
+def test_compare_history_records_no_previous() -> None:
+    """With no previous record, all current models are 'new'."""
+    current = {
+        "model_results": {
+            "model-x": {"success": True},
+            "model-y": {"success": False},
+        },
+    }
+
+    summary = compare_history_records(None, current)
+    assert summary["regressions"] == []
+    assert summary["recoveries"] == []
+    assert summary["new_models"] == ["model-x", "model-y"]
+    assert summary["missing_models"] == []

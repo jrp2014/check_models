@@ -12,10 +12,11 @@ The script's default output location is now this directory, keeping the project 
 - `results.md` - GitHub-friendly Markdown report
 - `results.tsv` - Tab-separated values table (for spreadsheets/data analysis)
 - `results.jsonl` - JSON Lines report (machine-readable results)
+- `results.history.jsonl` - Append-only per-run history for regressions/recoveries
 - `check_models.log` - Detailed execution log from production benchmark runs
 - `environment.log` - Complete Python environment dump (for reproducibility)
 
-These files are regenerated each time you run the tool and **committed to version control** so results are visible in GitHub.
+These files are regenerated each time you run the tool (**history is append-only**) and **committed to version control** so results are visible in GitHub.
 
 ### Test/Debug Output (excluded from git)
 
@@ -35,7 +36,7 @@ Files matching `test_*.{html,md,tsv,log}` are automatically excluded from git tr
 
 **Separation strategy**:
 
-- **Production runs**: Use default outputs (`check_models.log`, `results.html`, `results.md`, `results.tsv`) → committed to git
+- **Production runs**: Use default outputs (`check_models.log`, `results.html`, `results.md`, `results.tsv`, `results.jsonl`, `results.history.jsonl`) → committed to git
 - **Integration tests**: Use `test_cli_integration.{log,html,md,tsv}` → gitignored (handled automatically by test suite)
 - **Manual test/debug runs**: Pass custom paths with `test_` prefix or any other name except the production defaults → gitignored
 - **Pre-push git hook**: Runs pytest which uses test-specific output files → doesn't overwrite production log

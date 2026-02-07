@@ -232,6 +232,7 @@ The tool generates multiple report formats in `output/` by default:
 - **HTML** (`results.html`): Interactive table with sortable columns and failed row highlighting.
 - **Markdown** (`results.md`): GitHub-compatible summary for documentation.
 - **TSV/JSONL**: Machine-readable formats for analysis.
+- **History** (`results.history.jsonl`): Append-only run history for regressions/recoveries.
 
 ### Metrics Explained
 
@@ -1135,5 +1136,4 @@ npm install
 ## License
 
 MIT License: See the [LICENSE](../LICENSE) file for details.
-
 

@@ -8,6 +8,7 @@ import base64
 import contextlib
 import dataclasses
 import gc
+import hashlib
 import html
 import importlib.metadata
 import importlib.util as importlib_util
@@ -84,6 +85,8 @@ __all__ = [
     "ProcessImageParams",
     "ResultSet",
     "analyze_generation_text",
+    "append_history_record",
+    "compare_history_records",
     "exit_with_cli_error",
     "extract_image_metadata",
     "find_most_recent_file",
@@ -8148,6 +8151,110 @@ def log_summary(results: list[PerformanceResult]) -> None:
             )
 
 
+def _history_path_for_jsonl(jsonl_path: Path) -> Path:
+    """Derive history JSONL path from the main JSONL report path."""
+    return jsonl_path.with_name(f"{jsonl_path.stem}.history.jsonl")
+
+
+def _load_latest_history_record(history_path: Path) -> dict[str, Any] | None:
+    """Load the most recent history record from an append-only JSONL file."""
+    if not history_path.exists():
+        return None
+
+    try:
+        lines = history_path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        logger.warning("Failed to read history file %s", history_path)
+        return None
+
+    for line in reversed(lines):
+        record_line = line.strip()
+        if not record_line:
+            continue
+        try:
+            record = json.loads(record_line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(record, dict) and record.get("_type") == "run":
+            return record
+    return None
+
+
+def compare_history_records(
+    previous: dict[str, Any] | None,
+    current: dict[str, Any],
+) -> dict[str, list[str]]:
+    """Compare two history records and return regressions/recoveries."""
+    prev_models = previous.get("model_results", {}) if previous else {}
+    curr_models = current.get("model_results", {}) if current else {}
+    if not isinstance(prev_models, dict):
+        prev_models = {}
+    if not isinstance(curr_models, dict):
+        curr_models = {}
+
+    prev_success = {model for model, info in prev_models.items() if info.get("success") is True}
+    prev_failed = {model for model, info in prev_models.items() if info.get("success") is False}
+    curr_success = {model for model, info in curr_models.items() if info.get("success") is True}
+    curr_failed = {model for model, info in curr_models.items() if info.get("success") is False}
+
+    regressions = sorted(prev_success & curr_failed)
+    recoveries = sorted(prev_failed & curr_success)
+    new_models = sorted(set(curr_models) - set(prev_models))
+    missing_models = sorted(set(prev_models) - set(curr_models))
+
+    return {
+        "regressions": regressions,
+        "recoveries": recoveries,
+        "new_models": new_models,
+        "missing_models": missing_models,
+    }
+
+
+def append_history_record(
+    *,
+    history_path: Path,
+    results: list[PerformanceResult],
+    prompt: str,
+    system_info: dict[str, str],
+    library_versions: LibraryVersionDict,
+    image_path: Path | None = None,
+) -> dict[str, object]:
+    """Append a per-run history record for tracking regressions/recoveries."""
+    prompt_hash = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
+    max_preview = 200
+    prompt_preview = prompt if len(prompt) <= max_preview else f"{prompt[:max_preview]}..."
+
+    model_results: dict[str, dict[str, object]] = {}
+    for res in results:
+        model_results[res.model_name] = {
+            "success": res.success,
+            "error_stage": res.error_stage,
+            "error_type": res.error_type,
+            "error_package": res.error_package,
+        }
+
+    record: dict[str, object] = {
+        "_type": "run",
+        "format_version": "1.0",
+        "timestamp": local_now_str(),
+        "prompt_hash": prompt_hash,
+        "prompt_preview": prompt_preview,
+        "image_path": str(image_path) if image_path is not None else None,
+        "model_results": model_results,
+        "system": system_info,
+        "library_versions": library_versions,
+    }
+
+    try:
+        history_path.parent.mkdir(parents=True, exist_ok=True)
+        with history_path.open("a", encoding="utf-8") as f:
+            f.write(json.dumps(record) + "\n")
+    except OSError:
+        logger.exception("Failed to append history record to %s", history_path)
+
+    return record
+
+
 def save_jsonl_report(
     results: list[PerformanceResult],
     filename: Path,
@@ -8253,6 +8360,65 @@ def _write_report_failure_jsonl(
         logger.exception("Failed to write report failure JSONL to %s", filename)
 
 
+def _log_history_comparison(
+    previous: dict[str, Any] | None,
+    current: dict[str, object],
+) -> None:
+    """Print the History Comparison CLI section (regressions/recoveries)."""
+    print_cli_section("History Comparison")
+    if previous is None:
+        logger.info("No prior history run available. Baseline created.")
+        summary: dict[str, list[str]] = {
+            "regressions": [],
+            "recoveries": [],
+            "new_models": [],
+            "missing_models": [],
+        }
+    else:
+        prev_prompt_hash = previous.get("prompt_hash")
+        curr_prompt_hash = current.get("prompt_hash")
+        if prev_prompt_hash and curr_prompt_hash and prev_prompt_hash != curr_prompt_hash:
+            log_warning_note(
+                "Prompt differs from previous run; regressions/recoveries may be noisy.",
+            )
+        prev_image = previous.get("image_path")
+        curr_image = current.get("image_path")
+        if prev_image and curr_image and prev_image != curr_image:
+            log_warning_note(
+                "Image path differs from previous run; regressions/recoveries may be noisy.",
+            )
+
+        summary = compare_history_records(previous, current)
+
+    regressions = summary["regressions"]
+    recoveries = summary["recoveries"]
+    new_models = summary["new_models"]
+    missing_models = summary["missing_models"]
+
+    if regressions:
+        logger.info(
+            "Regressions (%d): %s",
+            len(regressions),
+            ", ".join(regressions),
+        )
+    else:
+        logger.info("Regressions: none")
+
+    if recoveries:
+        logger.info(
+            "Recoveries (%d): %s",
+            len(recoveries),
+            ", ".join(recoveries),
+        )
+    else:
+        logger.info("Recoveries: none")
+
+    if new_models:
+        logger.info("New models: %s", ", ".join(new_models))
+    if missing_models:
+        logger.info("Missing models: %s", ", ".join(missing_models))
+
+
 def finalize_execution(
     *,
     args: argparse.Namespace,
@@ -8274,17 +8440,20 @@ def finalize_execution(
         # Gather system characteristics for reports
         system_info = get_system_characteristics()
 
+        # Prepare output paths
+        html_output_path: Path = args.output_html.resolve()
+        md_output_path: Path = args.output_markdown.resolve()
+        tsv_output_path: Path = args.output_tsv.resolve()
+        jsonl_output_path: Path = args.output_jsonl.resolve()
+        history_path = _history_path_for_jsonl(jsonl_output_path)
+
+        html_output_path.parent.mkdir(parents=True, exist_ok=True)
+        md_output_path.parent.mkdir(parents=True, exist_ok=True)
+        tsv_output_path.parent.mkdir(parents=True, exist_ok=True)
+        jsonl_output_path.parent.mkdir(parents=True, exist_ok=True)
+
         # Generate reports
         try:
-            html_output_path: Path = args.output_html.resolve()
-            md_output_path: Path = args.output_markdown.resolve()
-            tsv_output_path: Path = args.output_tsv.resolve()
-            jsonl_output_path: Path = args.output_jsonl.resolve()
-            html_output_path.parent.mkdir(parents=True, exist_ok=True)
-            md_output_path.parent.mkdir(parents=True, exist_ok=True)
-            tsv_output_path.parent.mkdir(parents=True, exist_ok=True)
-            jsonl_output_path.parent.mkdir(parents=True, exist_ok=True)
-
             try:
                 generate_html_report(
                     results=results,
@@ -8347,6 +8516,21 @@ def finalize_execution(
                 log_file_path(env_log, label="   Environment:")
         except (OSError, ValueError):
             logger.exception("Failed to generate reports.")
+
+        # Append run history (append-only) and compare with previous run
+        previous_history = _load_latest_history_record(history_path)
+        current_history = append_history_record(
+            history_path=history_path,
+            results=results,
+            prompt=prompt,
+            system_info=system_info,
+            library_versions=library_versions,
+            image_path=image_path,
+        )
+
+        log_file_path(history_path, label="   History:     ")
+
+        _log_history_comparison(previous_history, current_history)
     else:
         log_warning_note("No models processed. No performance summary generated.")
         logger.info("Skipping report generation as no models were processed.")

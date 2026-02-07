@@ -18,6 +18,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - 37 unit tests for pure-logic functions (`test_pure_logic_functions.py`)
 - 11 report-generation edge-case tests (`test_report_generation.py`)
 - 4 mock-based `process_image_with_model` tests (`test_process_image_mock.py`)
+- Append-only history JSONL (`results.history.jsonl`) with per-run regression/recovery
+  comparison summary (always prints "Regressions" and "Recoveries" sections)
 - YAML config schema validation — warns on unknown threshold keys
 - `CHANGELOG.md` (this file)
 - `quality-strict` and `install-markdownlint` targets in root Makefile
