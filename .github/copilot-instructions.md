@@ -61,7 +61,7 @@ The file is organized in this order — use these landmarks to jump to the right
 
 | Target | What it does |
 | -------- | ------------- |
-| `make quality` | **Primary gate**: ruff format + lint + mypy + pytest + shellcheck + markdownlint |
+| `make quality` | **Primary gate**: ruff format + lint + mypy + ty + pyrefly + pytest + shellcheck + markdownlint |
 | `make test` | `pytest src/tests/ -v` |
 | `make dev` | Install editable with `[dev,extras,torch]` |
 | `make install` | Install editable (runtime only) |
@@ -84,7 +84,7 @@ The file is organized in this order — use these landmarks to jump to the right
 
 - **Platform**: GitHub Actions, `macos-15`, Python 3.13, Node.js 22
 - **Pipeline** (`.github/workflows/quality.yml`): checkout → install deps (`pip install -e src/.[dev]`) → generate MLX stubs via nanobind → `bash src/tools/run_quality_checks.sh`
-- **PRs must pass**: ruff format + lint, mypy, pytest, dependency sync, markdownlint
+- **PRs must pass**: ruff format + lint, mypy, ty, pyrefly, pytest, dependency sync, markdownlint
 - **Pre-commit hooks**: install with `python -m tools.install_precommit_hook`
 
 ### 8. Coding conventions (quick reference)
