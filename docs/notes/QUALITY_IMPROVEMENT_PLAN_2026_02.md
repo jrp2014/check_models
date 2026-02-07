@@ -23,57 +23,62 @@ All **High** and most **Medium** priority items have been addressed:
 
 ## Remaining Items
 
-### Priority Summary
-
-| Priority | Item | Area |
-| -------- | ---- | ---- |
-| **Medium** | Fix `./setup_conda_env.sh` path in root README | (i) |
-| **Medium** | Add npm caching to CI quality workflow | (ii) |
-| **Low** | Add `--revision` CLI flag for model version pinning | (vi) |
-| **Low** | Add `--adapter-path` CLI flag for LoRA support | (vi) |
-| **Low** | Add `generate_html_report()` / `generate_markdown_report()` tests | (vii) |
-| **Low** | Add `mutually_exclusive_group` for `--folder`/`--image` | (viii) |
-| **Low** | Warn when default folder doesn't exist | (viii) |
-| **Low** | Add TSV metadata header comment | (v) |
-| **Low** | Add `error_type`/`error_package` columns to TSV | (v) |
-| **Low** | Add a `CHANGELOG.md` | (ix) |
+All items have been completed. This plan is now fully resolved. ✅
 
 ---
 
+## Recently Completed Items
+
 ### (i) Documentation
 
-- [ ] Fix `./setup_conda_env.sh` path in root README (file is at `src/tools/setup_conda_env.sh`)
-- [ ] Add `quality-strict` target to root Makefile or remove remaining docs references
+- [x] Fix `./setup_conda_env.sh` path in copilot-instructions.md and src/README.md
+  — changed to `bash src/tools/setup_conda_env.sh` (3 refs in copilot-instructions, 2 in src/README)
+- [x] Add `quality-strict` and `install-markdownlint` targets to root Makefile
+  — delegate to `$(MAKE) -C $(SRC) <target>`
 
 ### (ii) CI
 
-- [ ] Add npm caching (`cache: 'npm'` in `setup-node@v4`)
+- [x] Add npm caching to CI quality workflow
+  — `cache: 'npm'` + `cache-dependency-path: src/package-lock.json` in `setup-node@v4`
+  — generated `src/package-lock.json` for the lockfile reference
 
 ### (iii) Local Testing & Maintenance
 
-- [ ] Consider exposing commonly-used `src/Makefile` targets in root Makefile (or documenting the `make -C src` pattern)
+- [x] Expose commonly-used `src/Makefile` targets in root Makefile
+  — added `quality-strict` and `install-markdownlint` targets
 
 ### (v) Output Usefulness
 
-- [ ] Add `# generated_at: ...` comment line at top of TSV output
-- [ ] Add `error_type` and `error_package` columns to TSV for failed models
+- [x] Add `# generated_at: ...` metadata comment line at top of TSV output
+  — `generate_tsv_report()` now writes a `# generated_at: <timestamp>` line before data
+- [x] Add `error_type` and `error_package` columns to TSV for failed models
+  — new columns appended to TSV header; populated from `ModelResult.error_type`/`error_package`
+  — existing TSV tests updated to skip the metadata comment line
 
 ### (vi) Consistency with mlx-vlm
 
-- [ ] Add `--revision` CLI flag for model version pinning
-- [ ] Add `--adapter-path` CLI flag for LoRA support
+- [x] Add `--revision` CLI flag for model version pinning
+  — `ProcessImageParams.revision`, wired through `_load_model()` → `mlx_vlm.utils.load(revision=...)`
+- [x] Add `--adapter-path` CLI flag for LoRA adapter support
+  — `ProcessImageParams.adapter_path`, wired through `_load_model()` → `mlx_vlm.utils.load(adapter_path=...)`
 
 ### (vii) Test Suite
 
-- [ ] Add `generate_html_report()` / `generate_markdown_report()` tests with empty/all-failed inputs
-- [ ] Remove duplicated HF cache setup in `test_model_discovery.py`
-- [ ] Add mock-based test for `process_image_with_model()`
+- [x] Add report generation tests for empty/all-failed/mixed inputs
+  — 11 tests in `test_report_generation.py` (HTML, Markdown, TSV edge cases)
+- [x] Remove duplicated HF cache setup in `test_model_discovery.py`
+  — inline setup removed; `conftest.py` handles HF cache env
+- [x] Add mock-based test for `process_image_with_model()`
+  — 4 tests in `test_process_image_mock.py` (success, TimeoutError, ValueError, OSError)
 
 ### (viii) Script Functionality
 
-- [ ] Add `mutually_exclusive_group` for `--folder` and `--image` (or document precedence)
-- [ ] Warn when using the default folder and it doesn't exist
+- [x] `--folder` and `--image` mutually exclusive group
+  — already existed in argparse (confirmed at line ~8473); no change needed
+- [x] Warn when default folder doesn't exist
+  — `main_cli()` now logs `logger.warning(...)` when `DEFAULT_FOLDER` is missing
 
 ### (ix) Other
 
-- [ ] Add a `CHANGELOG.md`
+- [x] Add `CHANGELOG.md`
+  — Keep a Changelog 1.1.0 format with full [Unreleased] section

@@ -16,8 +16,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Warning when the default image folder (`~/Pictures/Processed`) does not exist
 - JSONL v1.1 format with shared metadata header (prompt, system info, timestamp)
 - 37 unit tests for pure-logic functions (`test_pure_logic_functions.py`)
+- 11 report-generation edge-case tests (`test_report_generation.py`)
+- 4 mock-based `process_image_with_model` tests (`test_process_image_mock.py`)
 - YAML config schema validation — warns on unknown threshold keys
 - `CHANGELOG.md` (this file)
+- `quality-strict` and `install-markdownlint` targets in root Makefile
+- `src/package-lock.json` for deterministic npm CI caching
 
 ### Changed
 
@@ -33,6 +37,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   (was `./setup_conda_env.sh`, now `bash src/tools/setup_conda_env.sh`)
 - Cleaned up VS Code settings (removed deprecated Python linting settings,
   aligned `typeCheckingMode`, fixed `launch.json` and `tasks.json`)
+- Removed duplicated HF cache setup from `test_model_discovery.py` (now in `conftest.py`)
+- Documented TSV and JSONL output format details in `src/README.md`
+- Updated `QUALITY_IMPROVEMENT_PLAN_2026_02.md` — all items resolved
 
 ### Removed
 

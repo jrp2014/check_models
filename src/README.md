@@ -380,6 +380,27 @@ python check_models.py --image photo.jpg --no-trust-remote-code
 > [!WARNING]
 > **Security Risk**: `--trust-remote-code` (the default) executes arbitrary Python from the model repo. Use `--no-trust-remote-code` when running untrusted models.
 
+#### Model Version & Adapter
+
+- `--revision <str>`: Pin the model to a specific branch, tag, or commit SHA from the Hugging Face repo. Useful for reproducing results or avoiding regressions when a model updates. Default: `None` (latest revision on main/default branch).
+- `--adapter-path <str>`: Path to a LoRA adapter directory to apply on top of the base model. Passed through to `mlx_vlm.utils.load(adapter_path=...)`. Default: `None` (no adapter).
+
+**Examples**:
+
+```bash
+# Pin to a specific commit for reproducibility
+python check_models.py --image photo.jpg --models mlx-community/Qwen2-VL-7B-Instruct \
+  --revision abc1234
+
+# Apply a LoRA fine-tune
+python check_models.py --image photo.jpg --models mlx-community/nanoLLaVA \
+  --adapter-path ~/adapters/my-lora
+
+# Combine: specific revision + LoRA adapter
+python check_models.py --image photo.jpg --models mlx-community/nanoLLaVA \
+  --revision v1.0 --adapter-path ~/adapters/my-lora
+```
+
 ### Environment Variables
 
 Several behaviors can be customized via environment variables (useful for CI/automation):
@@ -814,6 +835,25 @@ GitHub-compatible format with:
 - Model outputs
 - System and library version information
 - Easy integration into documentation
+
+### TSV Report
+
+Tab-separated values for programmatic analysis (spreadsheets, `awk`, pandas, etc.):
+
+- **Metadata comment**: The first line is a `# generated_at: <ISO timestamp>` comment
+  indicating when the report was produced. Parsers should skip lines starting with `#`.
+- **Header row**: Column names matching the CLI summary table.
+- **Error diagnostics**: Two additional columns, `error_type` and `error_package`,
+  are populated for failed models to support automated triage (e.g. filtering by
+  `TimeoutError` or `mlx` package failures). These columns are empty for successful runs.
+
+### JSONL Report
+
+Line-delimited JSON for streaming ingestion:
+
+- **Metadata header**: The first record (line 1) contains shared metadata
+  (prompt, system info, timestamp) — JSONL v1.1 format.
+- **Per-model records**: One JSON object per model with all metrics and error details.
 
 
 
