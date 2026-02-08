@@ -857,6 +857,17 @@ Line-delimited JSON for streaming ingestion:
 - **Per-model records**: One JSON object per model with all metrics and error details.
 
 
+### Diagnostics Report
+
+A comprehensive Markdown report focused on upstream debugging and issue reporting:
+
+- **Generation**: Created automatically only when failures or harness issues (e.g., garbled output) are detected.
+- **Failures Clustered**: Groups similar errors together to identify systemic issues.
+- **Reproducibility**: Includes explicit commands to reproduce specific failures.
+- **Environment**: Captures full package versions and system specs.
+- **Ready-to-File**: Formatted to be copy-pasted directly into GitHub issues.
+
+
 
 
 ## Metrics Tracked

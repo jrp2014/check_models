@@ -5185,11 +5185,11 @@ def _diagnostics_header(
     for lib in _DIAGNOSTICS_LIB_NAMES:
         ver = versions.get(lib, "")
         if ver:
-            parts.append(f"| {lib} | {ver} |")
+            parts.append(f"| {lib} | {DIAGNOSTICS_ESCAPER.escape(str(ver))} |")
     for key in _DIAGNOSTICS_SYSTEM_KEYS:
         val = system_info.get(key, "")
         if val:
-            parts.append(f"| {key} | {val} |")
+            parts.append(f"| {key} | {DIAGNOSTICS_ESCAPER.escape(str(val))} |")
     parts.append("")
     return parts
 
@@ -5225,10 +5225,11 @@ def _diagnostics_failure_clusters(
         # Affected models table
         parts.append("| Model | Error Stage | Package |")
         parts.append("| ----- | ----------- | ------- |")
-        parts.extend(
-            f"| `{r.model_name}` | {r.error_stage} | {r.error_package or 'unknown'} |"
-            for r in cluster_results
-        )
+        for r in cluster_results:
+            model = DIAGNOSTICS_ESCAPER.escape(r.model_name)
+            stage = DIAGNOSTICS_ESCAPER.escape(r.error_stage or "")
+            pkg = DIAGNOSTICS_ESCAPER.escape(r.error_package or "unknown")
+            parts.append(f"| `{model}` | {stage} | {pkg} |")
         parts.append("")
 
         # Per-model error messages (only when they differ across the cluster)
@@ -5316,13 +5317,18 @@ def _diagnostics_priority_table(
             n = len(cluster_results)
             priority = _diagnostics_priority(n, stage)
             names = ", ".join(r.model_name.split("/")[-1] for r in cluster_results)
-            parts.append(f"| **{priority}** | {stage} | {n} ({names}) | {pkg} |")
+            # Escape fields
+            esc_stage = DIAGNOSTICS_ESCAPER.escape(stage)
+            esc_pkg = DIAGNOSTICS_ESCAPER.escape(pkg)
+            esc_names = DIAGNOSTICS_ESCAPER.escape(names)
+            parts.append(f"| **{priority}** | {esc_stage} | {n} ({esc_names}) | {esc_pkg} |")
 
     if harness_results:
         names = ", ".join(r.model_name.split("/")[-1] for r, _ in harness_results)
+        esc_names = DIAGNOSTICS_ESCAPER.escape(names)
         n = len(harness_results)
         parts.append(
-            f"| **Medium** | Harness/integration | {n} ({names}) | mlx-vlm |",
+            f"| **Medium** | Harness/integration | {n} ({esc_names}) | mlx-vlm |",
         )
     parts.append("")
     return parts
@@ -5346,7 +5352,7 @@ def _diagnostics_footer(
 
     if failed:
         parts.append("")
-        parts.append("# Target specific failing models:")
+        parts.append("### Target specific failing models:")
         parts.extend(f"python src/check_models.py --model {r.model_name}" for r in failed[:3])
     parts.extend(["```", ""])
 
