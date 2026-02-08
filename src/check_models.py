@@ -5162,7 +5162,7 @@ def _diagnostics_header(
     parts.append("## Environment")
     parts.append("")
     parts.append("| Component | Version |")
-    parts.append("|-----------|---------|")
+    parts.append("| --------- | ------- |")
     for lib in _DIAGNOSTICS_LIB_NAMES:
         ver = versions.get(lib, "")
         if ver:
@@ -5205,7 +5205,7 @@ def _diagnostics_failure_clusters(
 
         # Affected models table
         parts.append("| Model | Error Stage | Package |")
-        parts.append("|-------|-------------|---------|")
+        parts.append("| ----- | ----------- | ------- |")
         parts.extend(
             f"| `{r.model_name}` | {r.error_stage} | {r.error_package or 'unknown'} |"
             for r in cluster_results
@@ -5227,7 +5227,7 @@ def _diagnostics_failure_clusters(
         if tb_tail:
             parts.append("**Traceback (tail):**")
             parts.append("")
-            parts.append("```")
+            parts.append("```text")
             parts.append(tb_tail)
             parts.append("```")
             parts.append("")
@@ -5268,7 +5268,7 @@ def _diagnostics_harness_section(
             snippet = text[:_DIAGNOSTICS_OUTPUT_SNIPPET_LEN]
             if len(text) > _DIAGNOSTICS_OUTPUT_SNIPPET_LEN:
                 snippet += "..."
-            parts.extend(["**Sample output:**", "", "```", snippet, "```", ""])
+            parts.extend(["**Sample output:**", "", "```text", snippet, "```", ""])
 
     return parts
 
@@ -5284,7 +5284,7 @@ def _diagnostics_priority_table(
         "## Priority Summary",
         "",
         "| Priority | Issue | Models Affected | Package |",
-        "|----------|-------|-----------------|---------|",
+        "| -------- | ----- | --------------- | ------- |",
     ]
 
     failed = [r for r in results if not r.success]
@@ -5335,7 +5335,7 @@ def _diagnostics_footer(
         [
             "<details><summary>Prompt used (click to expand)</summary>",
             "",
-            "```",
+            "```text",
             prompt,
             "```",
             "",
@@ -5343,6 +5343,7 @@ def _diagnostics_footer(
             "",
             f"_Report generated on {local_now_str()} by "
             "[check_models](https://github.com/jrp2014/check_models)._",
+            "",
         ],
     )
 
@@ -6065,7 +6066,13 @@ def generate_markdown_report(
     if failures_by_pkg:
         md.extend(failures_by_pkg)
 
-    md.append("> **Prompt used:**\n>\n> " + prompt.replace("\n", "\n> "))
+    # Embed prompt in a blockquote with a fenced code block to avoid
+    # MD032 (lists-need-blank-lines) when the prompt contains list items.
+    md.append("> **Prompt used:**")
+    md.append(">")
+    md.append("> ```text")
+    md.extend(f"> {prompt_line}" for prompt_line in prompt.split("\n"))
+    md.append("> ```")
     md.append("")
     md.append(
         "**Note:** Results sorted: errors first, then by generation time (fastest to slowest).",
