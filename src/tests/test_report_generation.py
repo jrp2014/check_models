@@ -332,11 +332,15 @@ class TestDiagnosticsReport:
             results=[
                 _make_failure_with_details(
                     "org/model-a",
-                    error_msg="[broadcast_shapes] Shapes (3,1,2048) and (3,1,6065) cannot be broadcast",
+                    error_msg=(
+                        "[broadcast_shapes] Shapes (3,1,2048) and (3,1,6065) cannot be broadcast"
+                    ),
                 ),
                 _make_failure_with_details(
                     "org/model-b",
-                    error_msg="[broadcast_shapes] Shapes (984,2048) and (1,0,2048) cannot be broadcast",
+                    error_msg=(
+                        "[broadcast_shapes] Shapes (984,2048) and (1,0,2048) cannot be broadcast"
+                    ),
                 ),
             ],
             filename=out,

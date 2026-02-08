@@ -154,19 +154,28 @@ ignore = [
 
     # === Complexity thresholds (configured separately via pylint section) ===
     "PLR0913", # Too many arguments - configured via max-args=10
-    "PLR2004", # Magic values - sometimes clearer than constants in tests
 
     # === Security rules - S311 only (others use targeted noqa with justification) ===
     # S311: random module used for non-cryptographic purposes (seed generation)
     # S603/S607/S310/S105: use targeted # noqa comments with justification
     "S311", # random module - deterministic seeds, not cryptographic
-    "S105", # hardcoded password - false positives on token assertions in tests
 ]
 
 [tool.ruff.lint.per-file-ignores]
 # Tests: minimal necessary exclusions
+# Both "tests/**" (for CLI from src/) and "src/tests/**" (for VS Code extension
+# from workspace root) are needed so per-file-ignores resolve correctly.
 "tests/**" = [
     "S101",    # Use of assert - required for pytest
+    "S105",    # Hardcoded password - false positives on test string comparisons
+    "D103",    # Missing docstring in public function - test names are self-documenting
+    "PLR2004", # Magic values in test assertions - values match test parameters
+    "SLF001",  # Private member access - tests need to verify internal functions
+    "ARG001",  # Unused argument - pytest fixtures may have unused params
+]
+"src/tests/**" = [
+    "S101",    # Use of assert - required for pytest
+    "S105",    # Hardcoded password - false positives on test string comparisons
     "D103",    # Missing docstring in public function - test names are self-documenting
     "PLR2004", # Magic values in test assertions - values match test parameters
     "SLF001",  # Private member access - tests need to verify internal functions
@@ -181,8 +190,17 @@ ignore = [
     "D",      # Docstrings not required in tools
     "ANN",    # Type annotations not required in tools
 ]
+"src/tools/**" = [
+    "T201",   # Print statements - tools are CLI utilities
+    "S603",   # subprocess calls - tool commands are hardcoded, not user input
+    "S607",   # partial executable path - tools call known commands in PATH
+    "BLE001", # blind Exception - tools use broad catches for robustness
+    "D",      # Docstrings not required in tools
+    "ANN",    # Type annotations not required in tools
+]
 # Archived files: ignore all rules (these are not maintained)
 "tools/.archived/**" = ["ALL"]
+"src/tools/.archived/**" = ["ALL"]
 
 # Asserts are OK in tests (duplicate of tests/** above, kept for clarity)
 "**/tests/**" = ["S101"]
