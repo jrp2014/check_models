@@ -8146,9 +8146,9 @@ def _build_cataloguing_prompt(metadata: MetadataDict) -> str:
     if date_val or gps_val:
         meta_fragments: list[str] = []
         if date_val:
-            s = f"Taken around {date_val}"
+            s = f"Taken on {date_val}"
             if time_val:
-                s += f" at {time_val}"
+                s += f" (at {time_val} local time)"
             meta_fragments.append(s)
         if gps_val:
             meta_fragments.append(f"GPS: {gps_val}")

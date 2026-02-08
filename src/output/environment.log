@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-02-07 23:44:09 GMT
+FULL ENVIRONMENT DUMP - 2026-02-08 22:16:24 GMT
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -31,7 +31,7 @@ distlib==0.4.0
 docopt==0.6.2
 einops==0.8.2
 execnet==2.1.2
-fastapi==0.128.4
+fastapi==0.128.5
 filelock==3.20.3
 flatbuffers==25.12.19
 frozenlist==1.8.0
@@ -58,8 +58,8 @@ markdown-it-py==4.0.0
 MarkupSafe==3.0.3
 mdurl==0.1.2
 ml_dtypes==0.5.4
-mlx==0.30.7.dev20260207+8fe1d092
-mlx==0.30.7.dev20260207+8fe1d092
+mlx==0.30.7.dev20260208+9cd4b9be
+mlx==0.30.7.dev20260208+9cd4b9be
 mlx-lm==0.30.6
 mlx-vlm==0.3.11
 mpmath==1.3.0
@@ -110,7 +110,7 @@ rich==14.3.2
 ruff==0.15.0
 safetensors==0.7.0
 sentencepiece==0.2.1
-setuptools==81.0.0
+setuptools==82.0.0
 shellingham==1.5.4
 six==1.17.0
 sniffio==1.3.1
@@ -154,5 +154,5 @@ yarl==1.22.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-02-07 23:44:09 GMT
+Environment dump completed at 2026-02-08 22:16:24 GMT
 ================================================================================
