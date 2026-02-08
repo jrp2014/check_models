@@ -131,9 +131,13 @@ language_model.lm_head.weight.`
 > **Prompt used:**
 >
 > ```text
+```text
+
 > Analyze this image and provide structured metadata for image cataloguing.
 >
 > Respond with exactly these three sections:
+```text
+
 >
 > Title: A concise, descriptive title (5–12 words).
 >

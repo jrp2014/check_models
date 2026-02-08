@@ -611,6 +611,63 @@ class PerformanceResult:
     error_traceback: str | None = None
 
 
+# Gallery rendering helpers (outside class)
+def _gallery_render_error(res: PerformanceResult) -> list[str]:
+    out = []
+    out.append(f"**Status:** Failed ({res.error_stage})")
+    error_msg = str(res.error_message)
+    error_msg = re.sub(r"(?<![<(])(https?://[^\s>)]+)", r"<\1>", error_msg)
+    max_inline_length = 80
+    if len(error_msg) > max_inline_length:
+        wrapped_lines = textwrap.wrap(
+            error_msg,
+            width=76,
+            break_long_words=False,
+            break_on_hyphens=False,
+        )
+        out.append("**Error:**")
+        out.append("")
+        out.extend(f"> {line}" for line in wrapped_lines)
+    else:
+        out.append(f"**Error:** {error_msg}")
+    if res.error_type:
+        out.append(f"**Type:** `{res.error_type}`")
+    if res.error_package:
+        out.append(f"**Package:** `{res.error_package}`")
+    if res.error_traceback:
+        out.append("")
+        out.append("<details>")
+        out.append("<summary>Full Traceback (click to expand)</summary>")
+        out.append("")
+        out.append("```python")
+        out.append(res.error_traceback.rstrip())
+        out.append("```")
+        out.append("")
+        out.append("</details>")
+    return out
+
+
+def _gallery_render_success(res: PerformanceResult) -> list[str]:
+    out = []
+    gen = res.generation
+    if gen:
+        tps = getattr(gen, "generation_tps", 0)
+        tokens = getattr(gen, "generation_tokens", 0)
+        out.append(f"**Metrics:** {fmt_num(tps)} TPS | {tokens} tokens")
+    out.append("")
+    out.append("```text")
+    text = str(getattr(res.generation, "text", "")) if res.generation else ""
+    out.append(text)
+    out.append("```")
+    if res.generation:
+        analysis = getattr(res.generation, "quality_analysis", None)
+        if analysis and analysis.issues:
+            out.append("")
+            out.append("⚠️ **Quality Warnings:**")
+            out.extend(f"- {html.escape(issue)}" for issue in analysis.issues)
+    return out
+
+
 class ResultSet:
     """Cache-friendly wrapper around a collection of PerformanceResult.
 
@@ -5247,10 +5304,11 @@ def _diagnostics_failure_clusters(
         if tb_tail:
             parts.append("**Traceback (tail):**")
             parts.append("")
+            parts.append("")  # Blank line before fenced block
             parts.append("```text")
             parts.append(tb_tail)
             parts.append("```")
-            parts.append("")
+            parts.append("")  # Blank line after fenced block
 
     return parts
 
@@ -5288,7 +5346,13 @@ def _diagnostics_harness_section(
             snippet = text[:_DIAGNOSTICS_OUTPUT_SNIPPET_LEN]
             if len(text) > _DIAGNOSTICS_OUTPUT_SNIPPET_LEN:
                 snippet += "..."
-            parts.extend(["**Sample output:**", "", "```text", snippet, "```", ""])
+            parts.append("**Sample output:**")
+            parts.append("")
+            parts.append("")  # Blank line before fenced block
+            parts.append("```text")
+            parts.append(snippet)
+            parts.append("```")
+            parts.append("")  # Blank line after fenced block
 
     return parts
 
@@ -5338,9 +5402,9 @@ def _diagnostics_footer(
     failed: list[PerformanceResult],
     prompt: str,
 ) -> list[str]:
-    """Build reproducibility and prompt sections of the diagnostics report."""
     parts: list[str] = [
         "## Reproducibility",
+        "",
         "",
         "```bash",
         "# Install check_models benchmarking tool",
@@ -5348,28 +5412,31 @@ def _diagnostics_footer(
         "",
         "# Run against all cached models",
         "python src/check_models.py",
+        "```",
+        "",
     ]
 
     if failed:
         parts.append("")
         parts.append("### Target specific failing models:")
+        parts.append("")
+        parts.append("```bash")
         parts.extend(f"python src/check_models.py --model {r.model_name}" for r in failed[:3])
-    parts.extend(["```", ""])
+        parts.append("```")
+        parts.append("")
 
-    parts.extend(
-        [
-            "<details><summary>Prompt used (click to expand)</summary>",
-            "",
-            "```text",
-            prompt,
-            "```",
-            "",
-            "</details>",
-            "",
-            f"_Report generated on {local_now_str()} by "
-            "[check_models](https://github.com/jrp2014/check_models)._",
-            "",
-        ],
+    parts.append("<details><summary>Prompt used (click to expand)</summary>")
+    parts.append("")
+    parts.append("")
+    parts.append("```text")
+    parts.append(prompt)
+    parts.append("```")
+    parts.append("")
+    parts.append("</details>")
+    parts.append("")
+    parts.append(
+        f"_Report generated on {local_now_str()} by "
+        "[check_models](https://github.com/jrp2014/check_models)._",
     )
 
     return parts
@@ -5899,91 +5966,25 @@ def _generate_model_gallery_section(results: list[PerformanceResult]) -> list[st
     md.append("")
     md.append("Full output from each model:")
     md.append("")
-    # Disable line-length and inline-html linting - model outputs can be long and
-    # error tracebacks use <details> for collapsible sections
+    md.append("")
     md.append("<!-- markdownlint-disable MD013 MD033 -->")
     md.append("")
 
     sorted_results = _sort_results_by_time(results)
     for res in sorted_results:
-        # Header with status icon
         icon = "✅" if res.success else "❌"
         md.append(f"### {icon} {res.model_name}")
         md.append("")
-
         if not res.success:
-            md.append(f"**Status:** Failed ({res.error_stage})")
-            # Wrap error messages to avoid excessive line length
-            error_msg = str(res.error_message)
-            # Wrap bare URLs in angle brackets to satisfy MD034
-            error_msg = re.sub(
-                r"(?<![<(])(https?://[^\s>)]+)",
-                r"<\1>",
-                error_msg,
-            )
-            max_inline_length = 80
-            if len(error_msg) > max_inline_length:
-                # Escape markdown characters and wrap at word boundaries
-                wrapped_lines = textwrap.wrap(
-                    error_msg,
-                    width=76,  # Leave room for "> " prefix
-                    break_long_words=False,
-                    break_on_hyphens=False,
-                )
-                md.append("**Error:**")
-                md.append("")
-                md.extend(f"> {line}" for line in wrapped_lines)
-            else:
-                # Short errors can stay inline
-                md.append(f"**Error:** {error_msg}")
-            if res.error_type:
-                md.append(f"**Type:** `{res.error_type}`")
-            if res.error_package:
-                md.append(f"**Package:** `{res.error_package}`")
-            # Include full traceback in collapsible section for GitHub issue reports
-            if res.error_traceback:
-                md.append("")
-                md.append("<details>")
-                md.append("<summary>Full Traceback (click to expand)</summary>")
-                md.append("")
-                md.append("```python")
-                md.append(res.error_traceback.rstrip())
-                md.append("```")
-                md.append("")
-                md.append("</details>")
+            md.extend(_gallery_render_error(res))
         else:
-            # Show metrics summary line
-            gen = res.generation
-            if gen:
-                tps = getattr(gen, "generation_tps", 0)
-                tokens = getattr(gen, "generation_tokens", 0)
-                md.append(
-                    f"**Metrics:** {fmt_num(tps)} TPS | {tokens} tokens",
-                )
-
-            md.append("")
-            md.append("```text")
-            text = str(getattr(res.generation, "text", "")) if res.generation else ""
-            md.append(text)
-            md.append("```")
-
-            # Show quality warnings if any
-            if res.generation:
-                analysis = getattr(res.generation, "quality_analysis", None)
-                if analysis and analysis.issues:
-                    md.append("")
-                    md.append("⚠️ **Quality Warnings:**")
-                    # Escape issues to prevent tags like <end_of_utterance> from being hidden
-                    md.extend(f"- {html.escape(issue)}" for issue in analysis.issues)
-
+            md.extend(_gallery_render_success(res))
         md.append("")
         md.append("---")
         md.append("")
 
-    # Re-enable linting after gallery section
     md.append("<!-- markdownlint-enable MD013 MD033 -->")
     md.append("")
-
     return md
 
 
@@ -6095,6 +6096,7 @@ def generate_markdown_report(
     # MD032 (lists-need-blank-lines) when the prompt contains list items.
     md.append("> **Prompt used:**")
     md.append(">")
+    md.append("")
     md.append("> ```text")
     md.extend(f"> {prompt_line}" for prompt_line in prompt.split("\n"))
     md.append("> ```")
