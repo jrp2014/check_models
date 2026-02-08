@@ -28,7 +28,9 @@ _OUTPUT_DIR = _SRC_DIR / "output"
     ],
 )
 def test_cli_invalid_arguments(
-    args: list[str], expected_error: str, capsys: pytest.CaptureFixture[str]
+    args: list[str],
+    expected_error: str,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     test_args = [
         "check_models.py",
