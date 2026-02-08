@@ -406,6 +406,21 @@ else:
     GPSTAGS = PIL_GPSTAGS
     TAGS = PIL_TAGS
 
+# defusedxml is required by Pillow's Image.getxmp() for safe XMP/XML parsing.
+# Pulled in transitively via Pillow[xmp] in pyproject.toml, but guard here
+# so _extract_xmp_metadata() degrades gracefully with a clear message.
+_defusedxml_available: bool
+try:
+    import defusedxml.ElementTree  # noqa: F401 — imported for availability check
+
+    _defusedxml_available = True
+except ImportError:
+    _defusedxml_available = False
+    _temp_logger.warning(
+        "defusedxml not installed — XMP metadata extraction will be disabled. "
+        "Install with: pip install 'Pillow[xmp]'",
+    )
+
 try:
     import numpy as np
 
@@ -3959,6 +3974,10 @@ def _extract_xmp_metadata(image_path: PathLike) -> dict[str, Any]:
     nested with XML namespace prefixes; this function navigates defensively.
     Requires the ``defusedxml`` package; returns empty if unavailable.
     """
+    if not _defusedxml_available:
+        logger.debug("Skipping XMP extraction — defusedxml not installed")
+        return {}
+
     rdf_ns = "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}"
     dc_ns = "{http://purl.org/dc/elements/1.1/}"
 

@@ -27,7 +27,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Structured stock-photo cataloguing prompt with Title/Description/Keywords sections
   and keyword taxonomy guidance (subjects, concepts, mood, style, colors, use-case)
 - Existing metadata seeded into prompt (description, title, keywords, GPS, date)
-- `defusedxml` runtime dependency for XMP metadata support
+- `Pillow[xmp]` extra for XMP metadata support (pulls in `defusedxml` transitively)
 - Diagnostics report (`output/diagnostics.md`) auto-generated when failures or
   harness issues are detected — structured for filing upstream GitHub issues
   against mlx-vlm / mlx / transformers with error-pattern clustering, full

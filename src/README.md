@@ -455,7 +455,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- MANUAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.0" "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "tzlocal>=5.0"
+pip install "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "tzlocal>=5.0"
 ```
 <!-- MANUAL_INSTALL_END -->
 
@@ -544,7 +544,7 @@ Runtime (installed automatically via `pip install -e .` when executed inside `sr
 | ------- | ------- | ------- |
 | Core tensor/runtime | `mlx` | `>=0.29.1` |
 | Vision‑language utilities | `mlx-vlm` | `>=0.3.0` |
-| Image processing & loading | `Pillow` | `>=10.3.0` |
+| Image processing & loading | `Pillow[xmp]` | `>=10.3.0` |
 | Model cache / discovery | `huggingface-hub` | `>=0.34.0` |
 | HTTP requests (image URLs) | `requests` | `>=2.31.0` |
 | Reporting / tables | `tabulate` | `>=0.9.0` |
@@ -589,7 +589,7 @@ Development / QA:
 
 <!-- MINIMAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.0" "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "tzlocal>=5.0"
+pip install "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "tzlocal>=5.0"
 ```
 <!-- MINIMAL_INSTALL_END -->
 
