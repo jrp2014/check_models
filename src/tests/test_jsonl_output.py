@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from check_models import (
     PerformanceResult,
@@ -17,6 +17,8 @@ from check_models import (
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+    from check_models import HistoryModelResultRecord, HistoryRunRecord
 
 
 def _read_jsonl(path: Path) -> tuple[dict[str, Any], list[dict[str, Any]]]:
@@ -39,6 +41,34 @@ class MockGeneration:
     time: float | None = None
     active_memory: float | None = None
     cache_memory: float | None = None
+
+
+def _history_run(
+    model_success: dict[str, bool],
+    *,
+    timestamp: str = "2026-01-01 00:00:00 GMT",
+) -> HistoryRunRecord:
+    """Build a fully shaped history run record for typed history tests."""
+    model_results: dict[str, HistoryModelResultRecord] = {}
+    for model, success in model_success.items():
+        model_results[model] = {
+            "success": success,
+            "error_stage": None,
+            "error_type": None,
+            "error_package": None,
+        }
+
+    return {
+        "_type": "run",
+        "format_version": "1.0",
+        "timestamp": timestamp,
+        "prompt_hash": "hash",
+        "prompt_preview": "preview",
+        "image_path": None,
+        "model_results": model_results,
+        "system": {},
+        "library_versions": {},
+    }
 
 
 def test_save_jsonl_report_creates_file(tmp_path: Path) -> None:
@@ -313,20 +343,21 @@ def test_append_history_record_creates_file(tmp_path: Path) -> None:
 
 def test_compare_history_records_detects_regressions_and_recoveries() -> None:
     """Test regression/recovery detection between history records."""
-    previous = {
-        "model_results": {
-            "model-a": {"success": True},
-            "model-b": {"success": False},
-            "model-c": {"success": True},
+    previous = _history_run(
+        {
+            "model-a": True,
+            "model-b": False,
+            "model-c": True,
         },
-    }
-    current = {
-        "model_results": {
-            "model-a": {"success": False},
-            "model-b": {"success": True},
-            "model-d": {"success": True},
+    )
+    current = _history_run(
+        {
+            "model-a": False,
+            "model-b": True,
+            "model-d": True,
         },
-    }
+        timestamp="2026-01-02 00:00:00 GMT",
+    )
 
     summary = compare_history_records(previous, current)
     assert summary["regressions"] == ["model-a"]
@@ -379,13 +410,14 @@ def test_load_latest_history_record_only_blank_lines(tmp_path: Path) -> None:
 def test_load_latest_history_record_corrupted_lines(tmp_path: Path) -> None:
     """Skip corrupted lines and return the valid record."""
     history = tmp_path / "mixed.jsonl"
-    valid = json.dumps({"_type": "run", "model_results": {"m": {"success": True}}})
+    valid = json.dumps(_history_run({"m": True}))
     history.write_text(f'{valid}\nNOT-JSON\n{{"bad": true}}\n')
 
     record = _load_latest_history_record(history)
     assert record is not None
-    assert record["_type"] == "run"
-    assert record["model_results"]["m"]["success"] is True
+    assert record.get("_type") == "run"
+    model_results = cast("dict[str, HistoryModelResultRecord]", record.get("model_results", {}))
+    assert model_results["m"]["success"] is True
 
 
 def test_load_latest_history_record_only_corrupted(tmp_path: Path) -> None:
@@ -398,26 +430,26 @@ def test_load_latest_history_record_only_corrupted(tmp_path: Path) -> None:
 def test_load_latest_history_record_returns_last_run(tmp_path: Path) -> None:
     """When multiple run records exist, return the last one."""
     history = tmp_path / "multi.jsonl"
-    first = json.dumps({"_type": "run", "seq": 1})
-    second = json.dumps({"_type": "run", "seq": 2})
+    first = json.dumps(_history_run({"m": True}, timestamp="2026-01-01 00:00:00 GMT"))
+    second = json.dumps(_history_run({"m": False}, timestamp="2026-01-02 00:00:00 GMT"))
     history.write_text(f"{first}\n{second}\n")
 
     record = _load_latest_history_record(history)
     assert record is not None
-    assert record["seq"] == 2
+    assert record.get("timestamp") == "2026-01-02 00:00:00 GMT"
 
 
 def test_load_latest_history_record_skips_non_run_types(tmp_path: Path) -> None:
     """Skip records whose _type is not 'run'."""
     history = tmp_path / "types.jsonl"
-    run_record = json.dumps({"_type": "run", "ok": True})
+    run_record = _history_run({"m": True}, timestamp="2026-01-03 00:00:00 GMT")
     metadata = json.dumps({"_type": "metadata", "info": "x"})
-    history.write_text(f"{run_record}\n{metadata}\n")
+    history.write_text(f"{json.dumps(run_record)}\n{metadata}\n")
 
     record = _load_latest_history_record(history)
     assert record is not None
-    assert record["_type"] == "run"
-    assert record["ok"] is True
+    assert record.get("_type") == "run"
+    assert record.get("timestamp") == "2026-01-03 00:00:00 GMT"
 
 
 # ---------------------------------------------------------------------------
@@ -427,12 +459,7 @@ def test_load_latest_history_record_skips_non_run_types(tmp_path: Path) -> None:
 
 def test_compare_history_records_no_previous() -> None:
     """With no previous record, all current models are 'new'."""
-    current = {
-        "model_results": {
-            "model-x": {"success": True},
-            "model-y": {"success": False},
-        },
-    }
+    current = _history_run({"model-x": True, "model-y": False})
 
     summary = compare_history_records(None, current)
     assert summary["regressions"] == []

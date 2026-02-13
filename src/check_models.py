@@ -40,10 +40,13 @@ from typing import (
     Any,
     ClassVar,
     Final,
+    Literal,
     NoReturn,
+    NotRequired,
     Protocol,
     Self,
     TextIO,
+    TypedDict,
     cast,
     runtime_checkable,
 )
@@ -494,6 +497,93 @@ type GPSDict = dict[str, ExifValue]  # GPS EXIF data structure
 type SystemProfilerDict = dict[str, list[dict[str, Any]]]  # macOS system_profiler JSON structure
 type LibraryVersionDict = dict[str, str | None]  # Library name to version mapping (optional values)
 type MetricValue = int | float | str | bool | None  # Common scalar metric variants for metrics
+
+
+class HistoryModelResultRecord(TypedDict):
+    """Per-model success/failure status stored in run history."""
+
+    success: bool
+    error_stage: str | None
+    error_type: str | None
+    error_package: str | None
+
+
+class HistoryRunRecord(TypedDict, total=False):
+    """Append-only run record shape for ``*.history.jsonl``."""
+
+    _type: Literal["run"]
+    format_version: str
+    timestamp: str
+    prompt_hash: str
+    prompt_preview: str
+    image_path: str | None
+    model_results: dict[str, HistoryModelResultRecord]
+    system: dict[str, str]
+    library_versions: LibraryVersionDict
+
+
+class JsonlTimingRecord(TypedDict):
+    """Timing fields emitted per result row in ``results.jsonl``."""
+
+    generation_time_s: float | None
+    model_load_time_s: float | None
+    total_time_s: float | None
+
+
+class JsonlMetricsRecord(TypedDict, total=False):
+    """Performance metrics emitted for successful generations."""
+
+    prompt_tokens: int
+    generation_tokens: int
+    generation_tps: float
+    peak_memory_gb: float
+    active_memory_gb: float
+    cache_memory_gb: float
+
+
+class JsonlQualityAnalysisMetrics(TypedDict):
+    """Subset of quality metrics included in JSONL output."""
+
+    word_count: int
+    unique_ratio: float
+    bullet_count: int
+
+
+class JsonlQualityAnalysisRecord(TypedDict):
+    """Quality-analysis payload attached to successful rows when available."""
+
+    issues: list[str]
+    metrics: JsonlQualityAnalysisMetrics
+
+
+class JsonlMetadataRecord(TypedDict):
+    """Shared header row for ``results.jsonl`` format."""
+
+    _type: Literal["metadata"]
+    format_version: str
+    prompt: str
+    system: dict[str, str]
+    timestamp: str
+
+
+class JsonlResultRecord(TypedDict):
+    """Per-model row shape for ``results.jsonl`` output."""
+
+    _type: Literal["result"]
+    model: str
+    success: bool
+    error_stage: str | None
+    error_message: str | None
+    captured_output_on_fail: str | None
+    error_type: str | None
+    error_package: str | None
+    error_traceback: str | None
+    quality_issues: list[str]
+    timestamp: str
+    metrics: JsonlMetricsRecord
+    timing: JsonlTimingRecord
+    generated_text: NotRequired[str]
+    quality_analysis: NotRequired[JsonlQualityAnalysisRecord]
 
 
 @runtime_checkable
@@ -2616,12 +2706,35 @@ def _get_quality_pattern_list(pattern_key: str, fallback: list[str]) -> list[str
 def _contains_labeled_section(text_lower: str, label_patterns: list[str]) -> bool:
     """Return True if text contains any configured section label pattern."""
     for pattern in label_patterns:
-        try:
-            if re.search(rf"\b(?:{pattern})\s*:", text_lower):
-                return True
-        except re.error:
-            logger.debug("Ignoring invalid section label regex: %s", pattern)
+        compiled = _compile_regex_for_detection(
+            rf"\b(?:{pattern})\s*:",
+            debug_context="section label",
+        )
+        if compiled and compiled.search(text_lower):
+            return True
     return False
+
+
+@lru_cache(maxsize=2048)
+def _compile_regex_cached(pattern: str, flags: int) -> re.Pattern[str] | None:
+    """Compile and cache regex patterns used in detector utilities."""
+    try:
+        return re.compile(pattern, flags)
+    except re.error:
+        return None
+
+
+def _compile_regex_for_detection(
+    pattern: str,
+    *,
+    debug_context: str,
+    flags: int = 0,
+) -> re.Pattern[str] | None:
+    """Return compiled regex or log-and-skip invalid configured patterns."""
+    compiled = _compile_regex_cached(pattern, flags)
+    if compiled is None:
+        logger.debug("Ignoring invalid %s regex: %s", debug_context, pattern)
+    return compiled
 
 
 def _extract_pattern_matches(
@@ -2637,17 +2750,21 @@ def _extract_pattern_matches(
     seen: set[str] = set()
 
     for pattern in patterns:
-        try:
-            for match in re.finditer(pattern, text, flags):
-                value = match.group(0)
-                if not value:
-                    continue
-                if unique and value in seen:
-                    continue
-                matches.append(value)
-                seen.add(value)
-        except re.error:
-            logger.debug("Ignoring invalid %s regex: %s", debug_context, pattern)
+        compiled = _compile_regex_for_detection(
+            pattern,
+            debug_context=debug_context,
+            flags=flags,
+        )
+        if compiled is None:
+            continue
+        for match in compiled.finditer(text):
+            value = match.group(0)
+            if not value:
+                continue
+            if unique and value in seen:
+                continue
+            matches.append(value)
+            seen.add(value)
 
     return matches
 
@@ -2655,11 +2772,9 @@ def _extract_pattern_matches(
 def _matches_any_pattern(text: str, patterns: list[str], *, debug_context: str) -> bool:
     """Return True if text matches at least one configured regex pattern."""
     for pattern in patterns:
-        try:
-            if re.search(pattern, text):
-                return True
-        except re.error:
-            logger.debug("Ignoring invalid %s regex: %s", debug_context, pattern)
+        compiled = _compile_regex_for_detection(pattern, debug_context=debug_context)
+        if compiled and compiled.search(text):
+            return True
     return False
 
 
@@ -2667,10 +2782,10 @@ def _count_pattern_matches(text: str, patterns: list[str]) -> int:
     """Count total regex matches across all configured patterns."""
     total = 0
     for pattern in patterns:
-        try:
-            total += len(re.findall(pattern, text))
-        except re.error:
-            logger.debug("Ignoring invalid regex pattern: %s", pattern)
+        compiled = _compile_regex_for_detection(pattern, debug_context="pattern")
+        if compiled is None:
+            continue
+        total += len(compiled.findall(text))
     return total
 
 
@@ -5346,6 +5461,87 @@ _DIAGNOSTICS_LIB_NAMES: Final[tuple[str, ...]] = (
 )
 
 
+@dataclass(frozen=True)
+class FailureHistoryContext:
+    """History-derived context for a single failing model."""
+
+    first_failure_timestamp: str = "unknown"
+    recent_failures: int = 0
+    recent_considered: int = 0
+
+
+@dataclass(frozen=True)
+class DiagnosticsContext:
+    """Shared diagnostics context built once and consumed by renderers."""
+
+    regressions: frozenset[str] = frozenset()
+    recoveries: frozenset[str] = frozenset()
+    new_models: frozenset[str] = frozenset()
+    missing_models: frozenset[str] = frozenset()
+    failure_history: dict[str, FailureHistoryContext] = dataclasses.field(default_factory=dict)
+
+
+def _append_markdown_code_block(
+    parts: list[str],
+    content: str,
+    *,
+    language: str = "text",
+) -> None:
+    """Append a fenced code block with consistent spacing."""
+    parts.append("")
+    parts.append(f"```{language}")
+    parts.append(content)
+    parts.append("```")
+    parts.append("")
+
+
+def _append_markdown_table(
+    parts: list[str],
+    *,
+    header: str,
+    separator: str,
+    rows: list[str],
+) -> None:
+    """Append a Markdown table with a blank line after it."""
+    parts.append(header)
+    parts.append(separator)
+    parts.extend(rows)
+    parts.append("")
+
+
+def _append_markdown_section(
+    parts: list[str],
+    *,
+    title: str,
+    body_lines: list[str] | None = None,
+) -> None:
+    """Append a Markdown section heading with optional body lines."""
+    parts.append(title)
+    parts.append("")
+    if body_lines:
+        parts.extend(body_lines)
+        parts.append("")
+
+
+def _render_collapsible_model_blocks(
+    *,
+    summary: str,
+    entries: list[tuple[str, str]],
+) -> list[str]:
+    """Render model-specific text blocks inside a collapsible details section."""
+    if not entries:
+        return []
+
+    parts = [f"<details><summary>{summary}</summary>", ""]
+    for model_name, block_text in entries:
+        safe_model = DIAGNOSTICS_ESCAPER.escape(model_name)
+        parts.append(f"#### `{safe_model}`")
+        _append_markdown_code_block(parts, block_text, language="text")
+    parts.append("</details>")
+    parts.append("")
+    return parts
+
+
 def _format_traceback_tail(traceback_str: str | None) -> str | None:
     """Extract the last meaningful lines from a full traceback.
 
@@ -5372,10 +5568,10 @@ def _format_traceback_full(traceback_str: str | None) -> str | None:
 def _build_failure_history_context(
     *,
     failed_models: set[str],
-    history_records: list[dict[str, Any]],
-) -> dict[str, dict[str, str | int]]:
+    history_records: list[HistoryRunRecord],
+) -> dict[str, FailureHistoryContext]:
     """Compute first-seen and recent reproducibility stats for each failed model."""
-    context: dict[str, dict[str, str | int]] = {}
+    context: dict[str, FailureHistoryContext] = {}
 
     for model in failed_models:
         first_failure_timestamp = "unknown"
@@ -5408,23 +5604,44 @@ def _build_failure_history_context(
             if recent_considered >= _DIAGNOSTICS_RECENT_RUN_WINDOW:
                 break
 
-        context[model] = {
-            "first_failure_timestamp": first_failure_timestamp,
-            "recent_failures": recent_failures,
-            "recent_considered": recent_considered,
-        }
+        context[model] = FailureHistoryContext(
+            first_failure_timestamp=first_failure_timestamp,
+            recent_failures=recent_failures,
+            recent_considered=recent_considered,
+        )
 
     return context
 
 
-def _format_recent_repro_ratio(history_info: dict[str, str | int] | None) -> str:
+def _build_diagnostics_context(
+    *,
+    failed_models: set[str],
+    history_records: list[HistoryRunRecord],
+    comparison: dict[str, list[str]] | None,
+) -> DiagnosticsContext:
+    """Build immutable diagnostics context from history + comparison data."""
+    history_context = _build_failure_history_context(
+        failed_models=failed_models,
+        history_records=history_records,
+    )
+    if comparison is None:
+        return DiagnosticsContext(failure_history=history_context)
+
+    return DiagnosticsContext(
+        regressions=frozenset(comparison["regressions"]),
+        recoveries=frozenset(comparison["recoveries"]),
+        new_models=frozenset(comparison["new_models"]),
+        missing_models=frozenset(comparison["missing_models"]),
+        failure_history=history_context,
+    )
+
+
+def _format_recent_repro_ratio(history_info: FailureHistoryContext | None) -> str:
     """Format reproducibility ratio string such as ``2/3 recent runs failed``."""
     if not history_info:
         return "n/a"
-    recent_failures = history_info.get("recent_failures", 0)
-    recent_considered = history_info.get("recent_considered", 0)
-    if not isinstance(recent_failures, int) or not isinstance(recent_considered, int):
-        return "n/a"
+    recent_failures = history_info.recent_failures
+    recent_considered = history_info.recent_considered
     if recent_considered <= 0:
         return "n/a"
     return f"{recent_failures}/{recent_considered} recent runs failed"
@@ -5439,24 +5656,10 @@ def _diagnostics_full_tracebacks_section(cluster_results: list[PerformanceResult
             continue
         traceback_entries.append((result.model_name, traceback_text))
 
-    if not traceback_entries:
-        return []
-
-    parts = [
-        "<details><summary>Full tracebacks (all models in this cluster)</summary>",
-        "",
-    ]
-    for model_name, traceback_text in traceback_entries:
-        safe_model = DIAGNOSTICS_ESCAPER.escape(model_name)
-        parts.append(f"#### `{safe_model}`")
-        parts.append("")
-        parts.append("```text")
-        parts.append(traceback_text)
-        parts.append("```")
-        parts.append("")
-    parts.append("</details>")
-    parts.append("")
-    return parts
+    return _render_collapsible_model_blocks(
+        summary="Full tracebacks (all models in this cluster)",
+        entries=traceback_entries,
+    )
 
 
 def _diagnostics_captured_output_section(cluster_results: list[PerformanceResult]) -> list[str]:
@@ -5465,24 +5668,10 @@ def _diagnostics_captured_output_section(cluster_results: list[PerformanceResult
         (r.model_name, (r.captured_output_on_fail or "").strip()) for r in cluster_results
     ]
     with_output = [(name, out) for name, out in with_output if out]
-    if not with_output:
-        return []
-
-    parts = [
-        "<details><summary>Captured stdout/stderr (all models in this cluster)</summary>",
-        "",
-    ]
-    for model_name, captured_text in with_output:
-        safe_model = DIAGNOSTICS_ESCAPER.escape(model_name)
-        parts.append(f"#### `{safe_model}`")
-        parts.append("")
-        parts.append("```text")
-        parts.append(captured_text)
-        parts.append("```")
-        parts.append("")
-    parts.append("</details>")
-    parts.append("")
-    return parts
+    return _render_collapsible_model_blocks(
+        summary="Captured stdout/stderr (all models in this cluster)",
+        entries=with_output,
+    )
 
 
 def _cluster_failures_by_pattern(
@@ -5574,15 +5763,18 @@ def _diagnostics_header(
         f"{n_harness} harness issue(s) (mlx-vlm {version})",
     )
     parts.append("")
-    parts.append("## Summary")
-    parts.append("")
-    parts.append(
-        f"Automated benchmarking of **{total} locally-cached VLM models** "
-        f"found **{n_failed} hard failure(s)** and "
-        f"**{n_harness} harness/integration issue(s)** "
-        f"in successful models. {n_success} of {total} models succeeded.",
+    _append_markdown_section(
+        parts,
+        title="## Summary",
+        body_lines=[
+            (
+                f"Automated benchmarking of **{total} locally-cached VLM models** "
+                f"found **{n_failed} hard failure(s)** and "
+                f"**{n_harness} harness/integration issue(s)** "
+                f"in successful models. {n_success} of {total} models succeeded."
+            ),
+        ],
     )
-    parts.append("")
 
     if image_path and image_path.exists():
         try:
@@ -5595,35 +5787,34 @@ def _diagnostics_header(
             pass
 
     # Environment table
-    parts.append("## Environment")
-    parts.append("")
-    parts.append("| Component | Version |")
-    parts.append("| --------- | ------- |")
+    _append_markdown_section(parts, title="## Environment")
+    table_rows: list[str] = []
     for lib in _DIAGNOSTICS_LIB_NAMES:
         ver = versions.get(lib, "")
         if ver:
-            parts.append(f"| {lib} | {DIAGNOSTICS_ESCAPER.escape(str(ver))} |")
+            table_rows.append(f"| {lib} | {DIAGNOSTICS_ESCAPER.escape(str(ver))} |")
     for key in _DIAGNOSTICS_SYSTEM_KEYS:
         val = system_info.get(key, "")
         if val:
-            parts.append(f"| {key} | {DIAGNOSTICS_ESCAPER.escape(str(val))} |")
-    parts.append("")
+            table_rows.append(f"| {key} | {DIAGNOSTICS_ESCAPER.escape(str(val))} |")
+    _append_markdown_table(
+        parts,
+        header="| Component | Version |",
+        separator="| --------- | ------- |",
+        rows=table_rows,
+    )
     return parts
 
 
 def _diagnostics_failure_clusters(
     results: list[PerformanceResult],
     *,
-    regression_models: set[str] | None = None,
-    failure_history_context: dict[str, dict[str, str | int]] | None = None,
+    diagnostics_context: DiagnosticsContext,
 ) -> list[str]:
     """Build the failure-cluster sections of the diagnostics report."""
     failed = [r for r in results if not r.success]
     if not failed:
         return []
-
-    regressions = regression_models or set()
-    history_context = failure_history_context or {}
 
     clusters = _cluster_failures_by_pattern(results)
     sorted_clusters = sorted(clusters.items(), key=lambda kv: -len(kv[1]))
@@ -5646,27 +5837,32 @@ def _diagnostics_failure_clusters(
         parts.append("")
 
         # Affected models table
-        parts.append(
-            "| Model | Error Stage | Package | Regression vs Prev | "
-            "First Seen Failing | Recent Repro |",
-        )
-        parts.append(
-            "| ----- | ----------- | ------- | ------------------ | ------------------ | ------------ |",
-        )
+        table_rows: list[str] = []
         for r in cluster_results:
             model = DIAGNOSTICS_ESCAPER.escape(r.model_name)
             stage = DIAGNOSTICS_ESCAPER.escape(r.error_stage or "")
             pkg = DIAGNOSTICS_ESCAPER.escape(r.error_package or "unknown")
-            regression = "yes" if r.model_name in regressions else "no"
-            history_info = history_context.get(r.model_name, {})
+            regression = "yes" if r.model_name in diagnostics_context.regressions else "no"
+            history_info = diagnostics_context.failure_history.get(r.model_name)
             first_seen = DIAGNOSTICS_ESCAPER.escape(
-                str(history_info.get("first_failure_timestamp", "unknown")),
+                history_info.first_failure_timestamp if history_info else "unknown",
             )
             recent_repro = DIAGNOSTICS_ESCAPER.escape(_format_recent_repro_ratio(history_info))
-            parts.append(
+            table_rows.append(
                 f"| `{model}` | {stage} | {pkg} | {regression} | {first_seen} | {recent_repro} |",
             )
-        parts.append("")
+        _append_markdown_table(
+            parts,
+            header=(
+                "| Model | Error Stage | Package | Regression vs Prev | "
+                "First Seen Failing | Recent Repro |"
+            ),
+            separator=(
+                "| ----- | ----------- | ------- | ------------------ | "
+                "------------------ | ------------ |"
+            ),
+            rows=table_rows,
+        )
 
         # Per-model error messages (only when they differ across the cluster)
         msgs = {
@@ -5682,12 +5878,7 @@ def _diagnostics_failure_clusters(
         tb_tail = _format_traceback_tail(rep.error_traceback)
         if tb_tail:
             parts.append("**Traceback (tail):**")
-            parts.append("")
-            parts.append("")  # Blank line before fenced block
-            parts.append("```text")
-            parts.append(tb_tail)
-            parts.append("```")
-            parts.append("")  # Blank line after fenced block
+            _append_markdown_code_block(parts, tb_tail, language="text")
 
         parts.extend(_diagnostics_full_tracebacks_section(cluster_results))
         parts.extend(_diagnostics_captured_output_section(cluster_results))
@@ -5702,16 +5893,16 @@ def _diagnostics_harness_section(
     if not harness_results:
         return []
 
-    parts: list[str] = [
-        "---",
-        "",
-        f"## Harness/Integration Issues ({len(harness_results)} model(s))",
-        "",
-        "These models generated output but exhibit integration problems "
-        "(encoding corruption, stop-token leakage, prompt-template issues) "
-        "that indicate mlx-vlm bugs rather than model quality problems.",
-        "",
-    ]
+    parts: list[str] = ["---", ""]
+    _append_markdown_section(
+        parts,
+        title=f"## Harness/Integration Issues ({len(harness_results)} model(s))",
+        body_lines=[
+            "These models generated output but exhibit integration problems "
+            "(encoding corruption, stop-token leakage, prompt-template issues) "
+            "that indicate mlx-vlm bugs rather than model quality problems.",
+        ],
+    )
 
     for res, text in harness_results:
         gen = res.generation
@@ -5729,12 +5920,7 @@ def _diagnostics_harness_section(
             if len(text) > _DIAGNOSTICS_OUTPUT_SNIPPET_LEN:
                 snippet += "..."
             parts.append("**Sample output:**")
-            parts.append("")
-            parts.append("")  # Blank line before fenced block
-            parts.append("```text")
-            parts.append(snippet)
-            parts.append("```")
-            parts.append("")  # Blank line after fenced block
+            _append_markdown_code_block(parts, snippet, language="text")
 
     return parts
 
@@ -5744,14 +5930,9 @@ def _diagnostics_priority_table(
     harness_results: list[tuple[PerformanceResult, str]],
 ) -> list[str]:
     """Build the priority summary table for the diagnostics report."""
-    parts: list[str] = [
-        "---",
-        "",
-        "## Priority Summary",
-        "",
-        "| Priority | Issue | Models Affected | Package |",
-        "| -------- | ----- | --------------- | ------- |",
-    ]
+    parts: list[str] = ["---", ""]
+    _append_markdown_section(parts, title="## Priority Summary")
+    table_rows: list[str] = []
 
     failed = [r for r in results if not r.success]
     if failed:
@@ -5767,55 +5948,55 @@ def _diagnostics_priority_table(
             esc_stage = DIAGNOSTICS_ESCAPER.escape(stage)
             esc_pkg = DIAGNOSTICS_ESCAPER.escape(pkg)
             esc_names = DIAGNOSTICS_ESCAPER.escape(names)
-            parts.append(f"| **{priority}** | {esc_stage} | {n} ({esc_names}) | {esc_pkg} |")
+            table_rows.append(f"| **{priority}** | {esc_stage} | {n} ({esc_names}) | {esc_pkg} |")
 
     if harness_results:
         names = ", ".join(r.model_name.split("/")[-1] for r, _ in harness_results)
         esc_names = DIAGNOSTICS_ESCAPER.escape(names)
         n = len(harness_results)
-        parts.append(
+        table_rows.append(
             f"| **Medium** | Harness/integration | {n} ({esc_names}) | mlx-vlm |",
         )
-    parts.append("")
+    _append_markdown_table(
+        parts,
+        header="| Priority | Issue | Models Affected | Package |",
+        separator="| -------- | ----- | --------------- | ------- |",
+        rows=table_rows,
+    )
     return parts
 
 
 def _diagnostics_history_section(
     *,
     failed: list[PerformanceResult],
-    previous_history: dict[str, Any] | None,
-    current_history: dict[str, Any] | None,
-    history_context: dict[str, dict[str, str | int]],
+    previous_history: HistoryRunRecord | None,
+    diagnostics_context: DiagnosticsContext,
 ) -> list[str]:
     """Build regression/recovery and first-seen context using run history."""
     if not failed:
         return []
 
     failed_models = {r.model_name for r in failed}
-    comparison: dict[str, list[str]] | None = None
-    if previous_history and current_history:
-        comparison = compare_history_records(previous_history, current_history)
 
-    regressions = set(comparison["regressions"]) if comparison else set()
-    recoveries = comparison["recoveries"] if comparison else []
-    new_models = set(comparison["new_models"]) if comparison else set()
+    raw_prev_model_results = previous_history.get("model_results", {}) if previous_history else {}
+    prev_model_results: dict[str, HistoryModelResultRecord] = (
+        raw_prev_model_results if isinstance(raw_prev_model_results, dict) else {}
+    )
 
-    prev_model_results = previous_history.get("model_results", {}) if previous_history else {}
-    if not isinstance(prev_model_results, dict):
-        prev_model_results = {}
+    parts: list[str] = ["---", ""]
+    _append_markdown_section(
+        parts,
+        title="## History Context",
+        body_lines=[
+            "Recent reproducibility is measured from history "
+            f"(up to last {_DIAGNOSTICS_RECENT_RUN_WINDOW} runs where each model appears).",
+        ],
+    )
 
-    parts: list[str] = [
-        "---",
-        "",
-        "## History Context",
-        "",
-        "Recent reproducibility is measured from history "
-        f"(up to last {_DIAGNOSTICS_RECENT_RUN_WINDOW} runs where each model appears).",
-        "",
-    ]
-
-    if comparison:
-        reg_now = sorted(model for model in regressions if model in failed_models)
+    if previous_history:
+        reg_now = sorted(
+            model for model in diagnostics_context.regressions if model in failed_models
+        )
         if reg_now:
             parts.append(
                 "**Regressions since previous run:** " + ", ".join(f"`{m}`" for m in reg_now),
@@ -5823,9 +6004,10 @@ def _diagnostics_history_section(
         else:
             parts.append("**Regressions since previous run:** none")
 
-        if recoveries:
+        if diagnostics_context.recoveries:
+            recovery_list = sorted(diagnostics_context.recoveries)
             parts.append(
-                "**Recoveries since previous run:** " + ", ".join(f"`{m}`" for m in recoveries),
+                "**Recoveries since previous run:** " + ", ".join(f"`{m}`" for m in recovery_list),
             )
         else:
             parts.append("**Recoveries since previous run:** none")
@@ -5834,26 +6016,32 @@ def _diagnostics_history_section(
         parts.append("No prior history baseline available for regression/recovery status.")
         parts.append("")
 
-    parts.append("| Model | Status vs Previous Run | First Seen Failing | Recent Repro |")
-    parts.append("| ----- | ---------------------- | ------------------ | ------------ |")
+    table_rows: list[str] = []
     for model in sorted(failed_models):
-        if model in regressions:
+        if model in diagnostics_context.regressions:
             status = "new regression"
-        elif model in new_models:
+        elif model in diagnostics_context.new_models:
             status = "new model failing"
         else:
-            prev_info = prev_model_results.get(model, {})
-            prev_success = prev_info.get("success") if isinstance(prev_info, dict) else None
+            prev_info = prev_model_results.get(model)
+            prev_success = prev_info["success"] if prev_info is not None else None
             status = "still failing" if prev_success is False else "failing"
 
-        info = history_context.get(model, {})
-        first_seen = DIAGNOSTICS_ESCAPER.escape(str(info.get("first_failure_timestamp", "unknown")))
+        info = diagnostics_context.failure_history.get(model)
+        first_seen = DIAGNOSTICS_ESCAPER.escape(
+            info.first_failure_timestamp if info else "unknown",
+        )
         recent_repro = DIAGNOSTICS_ESCAPER.escape(_format_recent_repro_ratio(info))
 
         esc_model = DIAGNOSTICS_ESCAPER.escape(model)
         esc_status = DIAGNOSTICS_ESCAPER.escape(status)
-        parts.append(f"| `{esc_model}` | {esc_status} | {first_seen} | {recent_repro} |")
-    parts.append("")
+        table_rows.append(f"| `{esc_model}` | {esc_status} | {first_seen} | {recent_repro} |")
+    _append_markdown_table(
+        parts,
+        header="| Model | Status vs Previous Run | First Seen Failing | Recent Repro |",
+        separator="| ----- | ---------------------- | ------------------ | ------------ |",
+        rows=table_rows,
+    )
 
     return parts
 
@@ -5862,36 +6050,27 @@ def _diagnostics_footer(
     failed: list[PerformanceResult],
     prompt: str,
 ) -> list[str]:
-    parts: list[str] = [
-        "## Reproducibility",
-        "",
-        "",
-        "```bash",
-        "# Install check_models benchmarking tool",
-        "pip install -e src/.[dev]",
-        "",
-        "# Run against all cached models",
-        "python src/check_models.py",
-        "```",
-        "",
-    ]
+    all_models_command = (
+        "# Install check_models benchmarking tool\n"
+        "pip install -e src/.[dev]\n"
+        "\n"
+        "# Run against all cached models\n"
+        "python src/check_models.py"
+    )
+    parts: list[str] = []
+    _append_markdown_section(parts, title="## Reproducibility")
+    _append_markdown_code_block(parts, all_models_command, language="bash")
 
     if failed:
         parts.append("")
         parts.append("### Target specific failing models:")
-        parts.append("")
-        parts.append("```bash")
-        parts.extend(f"python src/check_models.py --model {r.model_name}" for r in failed[:3])
-        parts.append("```")
-        parts.append("")
+        target_model_commands = "\n".join(
+            [f"python src/check_models.py --model {r.model_name}" for r in failed[:3]],
+        )
+        _append_markdown_code_block(parts, target_model_commands, language="bash")
 
     parts.append("<details><summary>Prompt used (click to expand)</summary>")
-    parts.append("")
-    parts.append("")
-    parts.append("```text")
-    parts.append(prompt)
-    parts.append("```")
-    parts.append("")
+    _append_markdown_code_block(parts, prompt, language="text")
     parts.append("</details>")
     parts.append("")
     parts.append(
@@ -5911,8 +6090,8 @@ def generate_diagnostics_report(
     prompt: str,
     image_path: Path | None = None,
     history_path: Path | None = None,
-    previous_history: dict[str, Any] | None = None,
-    current_history: dict[str, Any] | None = None,
+    previous_history: HistoryRunRecord | None = None,
+    current_history: HistoryRunRecord | None = None,
 ) -> bool:
     """Generate a Markdown diagnostics report structured for upstream issue filing.
 
@@ -5945,16 +6124,16 @@ def generate_diagnostics_report(
 
     history_records = _load_history_run_records(history_path)
     failed_models = {r.model_name for r in failed}
-    history_context = _build_failure_history_context(
-        failed_models=failed_models,
-        history_records=history_records,
-    )
     comparison = (
         compare_history_records(previous_history, current_history)
         if previous_history and current_history
         else None
     )
-    regression_models = set(comparison["regressions"]) if comparison else set()
+    diagnostics_context = _build_diagnostics_context(
+        failed_models=failed_models,
+        history_records=history_records,
+        comparison=comparison,
+    )
 
     parts: list[str] = _diagnostics_header(
         total=len(results),
@@ -5968,8 +6147,7 @@ def generate_diagnostics_report(
     parts.extend(
         _diagnostics_failure_clusters(
             results,
-            regression_models=regression_models,
-            failure_history_context=history_context,
+            diagnostics_context=diagnostics_context,
         ),
     )
     parts.extend(_diagnostics_harness_section(harness_results))
@@ -5977,8 +6155,7 @@ def generate_diagnostics_report(
         _diagnostics_history_section(
             failed=failed,
             previous_history=previous_history,
-            current_history=current_history,
-            history_context=history_context,
+            diagnostics_context=diagnostics_context,
         ),
     )
     parts.extend(_diagnostics_priority_table(results, harness_results))
@@ -7469,6 +7646,33 @@ def _run_model_generation(
     return result
 
 
+def _build_failure_result(
+    *,
+    model_name: str,
+    error: TimeoutError | OSError | ValueError,
+    captured_output: str | None,
+) -> PerformanceResult:
+    """Build a standardized failure result payload for a model run."""
+    error_msg = str(error)
+    tb_str = traceback.format_exc()
+    classified_stage = _classify_error(error_msg)
+    error_package = _attribute_error_to_package(error_msg, tb_str)
+    return PerformanceResult(
+        model_name=model_name,
+        generation=None,
+        success=False,
+        error_stage=classified_stage,
+        error_message=error_msg,
+        captured_output_on_fail=captured_output,
+        error_type=type(error).__name__,
+        error_package=error_package,
+        error_traceback=tb_str,
+        generation_time=None,
+        model_load_time=None,
+        total_time=None,
+    )
+
+
 def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     """Process an image with a Vision Language Model, managing stats and errors."""
     model: Module | None = None
@@ -7492,8 +7696,8 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         )
 
         with (
-            contextlib.redirect_stdout(stdout_capture),
-            contextlib.redirect_stderr(stderr_capture),
+            contextlib.redirect_stdout(cast("TextIO", stdout_capture)),
+            contextlib.redirect_stderr(cast("TextIO", stderr_capture)),
             TimeoutManager(params.timeout),
         ):
             output: GenerationResult | SupportsGenerationResult = _run_model_generation(
@@ -7524,29 +7728,14 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             cache_memory=cache_mem_gb if cache_mem_gb > 0 else None,
         )
     except (TimeoutError, OSError, ValueError) as e:
-        # Full traceback already logged at ERROR level in _run_model_generation
-        error_msg = str(e)
-        tb_str = traceback.format_exc()
-        classified_stage = _classify_error(error_msg)
-        error_package = _attribute_error_to_package(error_msg, tb_str)
         captured_output = _merge_captured_output(
             stdout_capture.getvalue(),
             stderr_capture.getvalue(),
         )
-        return PerformanceResult(
+        return _build_failure_result(
             model_name=params.model_identifier,
-            generation=None,
-            success=False,
-            # Use classified error as stage/status, or exception name if unknown
-            error_stage=classified_stage,
-            error_message=error_msg,
-            captured_output_on_fail=captured_output,
-            error_type=type(e).__name__,
-            error_package=error_package,
-            error_traceback=tb_str,
-            generation_time=None,
-            model_load_time=None,
-            total_time=None,
+            error=e,
+            captured_output=captured_output,
         )
     finally:
         # Aggressive cleanup matching mlx-vlm/tests/test_smoke.py
@@ -9338,7 +9527,7 @@ def _history_path_for_jsonl(jsonl_path: Path) -> Path:
     return jsonl_path.with_name(f"{jsonl_path.stem}.history.jsonl")
 
 
-def _load_latest_history_record(history_path: Path) -> dict[str, Any] | None:
+def _load_latest_history_record(history_path: Path) -> HistoryRunRecord | None:
     """Load the most recent history record from an append-only JSONL file."""
     if not history_path.exists():
         return None
@@ -9358,7 +9547,7 @@ def _load_latest_history_record(history_path: Path) -> dict[str, Any] | None:
         except json.JSONDecodeError:
             continue
         if isinstance(record, dict) and record.get("_type") == "run":
-            return record
+            return cast("HistoryRunRecord", record)
     return None
 
 
@@ -9366,7 +9555,7 @@ def _load_history_run_records(
     history_path: Path | None,
     *,
     max_records: int = 100,
-) -> list[dict[str, Any]]:
+) -> list[HistoryRunRecord]:
     """Load up to ``max_records`` run entries from append-only history JSONL."""
     if history_path is None or not history_path.exists():
         return []
@@ -9377,7 +9566,7 @@ def _load_history_run_records(
         logger.warning("Failed to read history file %s", history_path)
         return []
 
-    records: list[dict[str, Any]] = []
+    records: list[HistoryRunRecord] = []
     for line in lines[-max_records:]:
         text = line.strip()
         if not text:
@@ -9387,13 +9576,13 @@ def _load_history_run_records(
         except json.JSONDecodeError:
             continue
         if isinstance(record, dict) and record.get("_type") == "run":
-            records.append(record)
+            records.append(cast("HistoryRunRecord", record))
     return records
 
 
 def compare_history_records(
-    previous: dict[str, Any] | None,
-    current: dict[str, Any],
+    previous: HistoryRunRecord | None,
+    current: HistoryRunRecord,
 ) -> dict[str, list[str]]:
     """Compare two history records and return regressions/recoveries."""
     prev_models = previous.get("model_results", {}) if previous else {}
@@ -9421,6 +9610,47 @@ def compare_history_records(
     }
 
 
+def _build_prompt_preview(prompt: str, *, max_chars: int = 200) -> str:
+    """Return prompt preview truncated to ``max_chars``."""
+    return prompt if len(prompt) <= max_chars else f"{prompt[:max_chars]}..."
+
+
+def _history_model_result_from_result(result: PerformanceResult) -> HistoryModelResultRecord:
+    """Build a typed per-model history row from runtime result."""
+    return {
+        "success": result.success,
+        "error_stage": result.error_stage,
+        "error_type": result.error_type,
+        "error_package": result.error_package,
+    }
+
+
+def _build_history_run_record(
+    *,
+    results: list[PerformanceResult],
+    prompt: str,
+    system_info: dict[str, str],
+    library_versions: LibraryVersionDict,
+    image_path: Path | None,
+) -> HistoryRunRecord:
+    """Build typed run-history record payload prior to append."""
+    prompt_hash = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
+    model_results = {
+        result.model_name: _history_model_result_from_result(result) for result in results
+    }
+    return {
+        "_type": "run",
+        "format_version": "1.0",
+        "timestamp": local_now_str(),
+        "prompt_hash": prompt_hash,
+        "prompt_preview": _build_prompt_preview(prompt),
+        "image_path": str(image_path) if image_path is not None else None,
+        "model_results": model_results,
+        "system": system_info,
+        "library_versions": library_versions,
+    }
+
+
 def append_history_record(
     *,
     history_path: Path,
@@ -9429,32 +9659,15 @@ def append_history_record(
     system_info: dict[str, str],
     library_versions: LibraryVersionDict,
     image_path: Path | None = None,
-) -> dict[str, object]:
+) -> HistoryRunRecord:
     """Append a per-run history record for tracking regressions/recoveries."""
-    prompt_hash = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
-    max_preview = 200
-    prompt_preview = prompt if len(prompt) <= max_preview else f"{prompt[:max_preview]}..."
-
-    model_results: dict[str, dict[str, object]] = {}
-    for res in results:
-        model_results[res.model_name] = {
-            "success": res.success,
-            "error_stage": res.error_stage,
-            "error_type": res.error_type,
-            "error_package": res.error_package,
-        }
-
-    record: dict[str, object] = {
-        "_type": "run",
-        "format_version": "1.0",
-        "timestamp": local_now_str(),
-        "prompt_hash": prompt_hash,
-        "prompt_preview": prompt_preview,
-        "image_path": str(image_path) if image_path is not None else None,
-        "model_results": model_results,
-        "system": system_info,
-        "library_versions": library_versions,
-    }
+    record = _build_history_run_record(
+        results=results,
+        prompt=prompt,
+        system_info=system_info,
+        library_versions=library_versions,
+        image_path=image_path,
+    )
 
     try:
         history_path.parent.mkdir(parents=True, exist_ok=True)
@@ -9464,6 +9677,89 @@ def append_history_record(
         logger.exception("Failed to append history record to %s", history_path)
 
     return record
+
+
+def _build_jsonl_metadata_record(
+    *,
+    prompt: str,
+    system_info: dict[str, str],
+) -> JsonlMetadataRecord:
+    """Build shared metadata header row for JSONL results."""
+    return {
+        "_type": "metadata",
+        "format_version": "1.1",
+        "prompt": prompt,
+        "system": system_info,
+        "timestamp": local_now_str(),
+    }
+
+
+def _build_jsonl_result_record_base(result: PerformanceResult) -> JsonlResultRecord:
+    """Build base per-model JSONL row with failure-safe defaults."""
+    return {
+        "_type": "result",
+        "model": result.model_name,
+        "success": result.success,
+        "error_stage": result.error_stage,
+        "error_message": result.error_message,
+        "captured_output_on_fail": result.captured_output_on_fail,
+        "error_type": result.error_type,
+        "error_package": result.error_package,
+        "error_traceback": result.error_traceback,
+        "quality_issues": _parse_quality_issues_to_list(result.quality_issues),
+        "timestamp": local_now_str(),
+        "metrics": {},
+        "timing": {
+            "generation_time_s": result.generation_time,
+            "model_load_time_s": result.model_load_time,
+            "total_time_s": result.total_time,
+        },
+    }
+
+
+def _build_jsonl_quality_analysis_record(
+    quality_analysis: object,
+) -> JsonlQualityAnalysisRecord | None:
+    """Build JSONL quality-analysis payload from generation analysis object."""
+    if quality_analysis is None:
+        return None
+    return {
+        "issues": list(getattr(quality_analysis, "issues", [])),
+        "metrics": {
+            "word_count": int(getattr(quality_analysis, "word_count", 0)),
+            "unique_ratio": float(getattr(quality_analysis, "unique_ratio", 0.0)),
+            "bullet_count": int(getattr(quality_analysis, "bullet_count", 0)),
+        },
+    }
+
+
+def _populate_jsonl_result_generation_data(
+    record: JsonlResultRecord,
+    result: PerformanceResult,
+) -> None:
+    """Attach success-only generation metrics/text/quality data to JSONL row."""
+    if not result.generation:
+        return
+
+    generation = result.generation
+    record["metrics"] = {
+        "prompt_tokens": getattr(generation, "prompt_tokens", 0),
+        "generation_tokens": getattr(generation, "generation_tokens", 0),
+        "generation_tps": getattr(generation, "generation_tps", 0.0),
+        "peak_memory_gb": getattr(generation, "peak_memory", 0.0),
+        "active_memory_gb": result.active_memory or 0.0,
+        "cache_memory_gb": result.cache_memory or 0.0,
+    }
+
+    text = getattr(generation, "text", None)
+    if text:
+        record["generated_text"] = text
+
+    quality_payload = _build_jsonl_quality_analysis_record(
+        getattr(generation, "quality_analysis", None),
+    )
+    if quality_payload:
+        record["quality_analysis"] = quality_payload
 
 
 def save_jsonl_report(
@@ -9488,62 +9784,12 @@ def save_jsonl_report(
     try:
         with filename.open("w", encoding="utf-8") as f:
             # Write shared metadata header (avoids repeating prompt/system per row)
-            header: dict[str, object] = {
-                "_type": "metadata",
-                "format_version": "1.1",
-                "prompt": prompt,
-                "system": system_info,
-                "timestamp": local_now_str(),
-            }
+            header = _build_jsonl_metadata_record(prompt=prompt, system_info=system_info)
             f.write(json.dumps(header) + "\n")
 
-            for res in results:
-                record: dict[str, object] = {
-                    "_type": "result",
-                    "model": res.model_name,
-                    "success": res.success,
-                    "error_stage": res.error_stage,
-                    "error_message": res.error_message,
-                    "captured_output_on_fail": res.captured_output_on_fail,
-                    "error_type": res.error_type,  # Original exception type for bucketing
-                    "error_package": res.error_package,
-                    "error_traceback": res.error_traceback,  # Full traceback for diagnostics
-                    "quality_issues": _parse_quality_issues_to_list(res.quality_issues),
-                    "timestamp": local_now_str(),
-                    "metrics": {},
-                    "timing": {},
-                }
-                # Add timing metrics (always available, even for failures)
-                record["timing"] = {
-                    "generation_time_s": res.generation_time,
-                    "model_load_time_s": res.model_load_time,
-                    "total_time_s": res.total_time,
-                }
-                if res.generation:
-                    gen = res.generation
-                    record["metrics"] = {
-                        "prompt_tokens": getattr(gen, "prompt_tokens", 0),
-                        "generation_tokens": getattr(gen, "generation_tokens", 0),
-                        "generation_tps": getattr(gen, "generation_tps", 0.0),
-                        "peak_memory_gb": getattr(gen, "peak_memory", 0.0),
-                        "active_memory_gb": res.active_memory or 0.0,
-                        "cache_memory_gb": res.cache_memory or 0.0,
-                    }
-                    # Include generated text for quality analysis context
-                    text = getattr(gen, "text", None)
-                    if text:
-                        record["generated_text"] = text
-                    # Include quality analysis details if available
-                    quality_analysis = getattr(gen, "quality_analysis", None)
-                    if quality_analysis:
-                        record["quality_analysis"] = {
-                            "issues": getattr(quality_analysis, "issues", []),
-                            "metrics": {
-                                "word_count": getattr(quality_analysis, "word_count", 0),
-                                "unique_ratio": getattr(quality_analysis, "unique_ratio", 0.0),
-                                "bullet_count": getattr(quality_analysis, "bullet_count", 0),
-                            },
-                        }
+            for result in results:
+                record = _build_jsonl_result_record_base(result)
+                _populate_jsonl_result_generation_data(record, result)
                 f.write(json.dumps(record) + "\n")
         # Logging handled in finalize_execution
     except OSError:
@@ -9573,8 +9819,8 @@ def _write_report_failure_jsonl(
 
 
 def _log_history_comparison(
-    previous: dict[str, Any] | None,
-    current: dict[str, object],
+    previous: HistoryRunRecord | None,
+    current: HistoryRunRecord,
 ) -> None:
     """Print the History Comparison CLI section (regressions/recoveries)."""
     print_cli_section("History Comparison")

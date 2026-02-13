@@ -323,6 +323,33 @@ class TestConfigDrivenCatalogingDetectors:
             mod.QUALITY.patterns = original_patterns
 
 
+class TestRegexDetectionUtilities:
+    """Tests for shared regex detection helpers."""
+
+    def test_extract_matches_ignores_invalid_regex(self, mod: types.ModuleType) -> None:
+        """Invalid configured regex entries should be ignored, not raised."""
+        matches = mod._extract_pattern_matches(
+            "token 123",
+            [r"\d+", r"[invalid"],
+            debug_context="test",
+        )
+        assert matches == ["123"]
+
+    def test_count_and_any_match_ignores_invalid_regex(self, mod: types.ModuleType) -> None:
+        """Pattern count/any helpers should skip invalid patterns safely."""
+        count = mod._count_pattern_matches("a1 b2 c3", [r"\d", r"[broken"])
+        has_match = mod._matches_any_pattern("alpha", [r"[broken", r"beta"], debug_context="test")
+        assert count == 3
+        assert has_match is False
+
+    def test_compile_regex_cache_reuses_compiled_pattern(self, mod: types.ModuleType) -> None:
+        """Regex compiler cache should return the same compiled object for same key."""
+        first = mod._compile_regex_cached(r"\d+", 0)
+        second = mod._compile_regex_cached(r"\d+", 0)
+        assert first is not None
+        assert first is second
+
+
 # ── QualityThresholds.from_config (YAML schema validation) ────────────────
 
 

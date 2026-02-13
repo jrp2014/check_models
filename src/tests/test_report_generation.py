@@ -11,6 +11,8 @@ import check_models
 if TYPE_CHECKING:
     from pathlib import Path
 
+    from check_models import HistoryModelResultRecord, HistoryRunRecord
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -67,6 +69,34 @@ def _make_failure(
         error_type=error_type,
         error_package=error_package,
     )
+
+
+def _history_run(
+    model_success: dict[str, bool],
+    *,
+    timestamp: str,
+) -> HistoryRunRecord:
+    """Build a fully shaped history run record for diagnostics-history tests."""
+    model_results: dict[str, HistoryModelResultRecord] = {}
+    for model, success in model_success.items():
+        model_results[model] = {
+            "success": success,
+            "error_stage": None,
+            "error_type": None,
+            "error_package": None,
+        }
+
+    return {
+        "_type": "run",
+        "format_version": "1.0",
+        "timestamp": timestamp,
+        "prompt_hash": "hash",
+        "prompt_preview": "preview",
+        "image_path": None,
+        "model_results": model_results,
+        "system": {},
+        "library_versions": {},
+    }
 
 
 # ===================================================================
@@ -455,30 +485,18 @@ class TestDiagnosticsReport:
         out = tmp_path / "diag.md"
         history_path = tmp_path / "results.history.jsonl"
 
-        old_record = {
-            "_type": "run",
-            "timestamp": "2026-02-10 10:00:00 GMT",
-            "model_results": {
-                "org/a": {"success": False},
-                "org/b": {"success": False},
-            },
-        }
-        previous_record = {
-            "_type": "run",
-            "timestamp": "2026-02-11 10:00:00 GMT",
-            "model_results": {
-                "org/a": {"success": True},
-                "org/b": {"success": False},
-            },
-        }
-        current_record = {
-            "_type": "run",
-            "timestamp": "2026-02-12 10:00:00 GMT",
-            "model_results": {
-                "org/a": {"success": False},
-                "org/b": {"success": True},
-            },
-        }
+        old_record = _history_run(
+            {"org/a": False, "org/b": False},
+            timestamp="2026-02-10 10:00:00 GMT",
+        )
+        previous_record = _history_run(
+            {"org/a": True, "org/b": False},
+            timestamp="2026-02-11 10:00:00 GMT",
+        )
+        current_record = _history_run(
+            {"org/a": False, "org/b": True},
+            timestamp="2026-02-12 10:00:00 GMT",
+        )
         history_path.write_text(
             "\n".join(
                 [
@@ -658,3 +676,38 @@ class TestDiagnosticsPriority:
         """Single-model actionable errors default to Medium."""
         assert check_models._diagnostics_priority(1, "Model Error") == "Medium"
         assert check_models._diagnostics_priority(1, "No Chat Template") == "Medium"
+
+
+class TestDiagnosticsContextBuilder:
+    """Unit tests for _build_diagnostics_context."""
+
+    def test_builds_sets_and_history_context(self) -> None:
+        """Context builder should materialize comparison sets and retry stats."""
+        history_records: list[HistoryRunRecord] = [
+            _history_run(
+                {"org/a": False, "org/b": True},
+                timestamp="2026-02-01 10:00:00 GMT",
+            ),
+            _history_run(
+                {"org/a": False, "org/b": False},
+                timestamp="2026-02-02 10:00:00 GMT",
+            ),
+        ]
+        comparison = {
+            "regressions": ["org/b"],
+            "recoveries": [],
+            "new_models": [],
+            "missing_models": ["org/c"],
+        }
+
+        context = check_models._build_diagnostics_context(
+            failed_models={"org/a", "org/b"},
+            history_records=history_records,
+            comparison=comparison,
+        )
+
+        assert "org/b" in context.regressions
+        assert "org/c" in context.missing_models
+        assert context.failure_history["org/a"].first_failure_timestamp == "2026-02-01 10:00:00 GMT"
+        assert context.failure_history["org/a"].recent_failures == 2
+        assert context.failure_history["org/a"].recent_considered == 2

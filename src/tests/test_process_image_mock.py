@@ -132,3 +132,20 @@ class TestProcessImageWithModelMock:
         assert result.captured_output_on_fail is not None
         assert "stdout marker" in result.captured_output_on_fail
         assert "stderr marker" in result.captured_output_on_fail
+
+    def test_build_failure_result_helper_preserves_capture(self) -> None:
+        """Centralized failure builder should preserve diagnostics fields."""
+        try:
+            int("not-an-int")
+        except ValueError as err:
+            result = check_models._build_failure_result(
+                model_name="test/fake-model",
+                error=err,
+                captured_output="=== STDERR ===\ntemplate failure",
+            )
+
+        assert result.success is False
+        assert result.error_type == "ValueError"
+        assert result.error_stage is not None
+        assert result.error_traceback is not None
+        assert "template failure" in (result.captured_output_on_fail or "")
