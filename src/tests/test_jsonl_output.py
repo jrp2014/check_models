@@ -212,6 +212,26 @@ def test_save_jsonl_report_includes_traceback_and_type(tmp_path: Path) -> None:
     assert "Traceback" in data["error_traceback"]
 
 
+def test_save_jsonl_report_includes_captured_output(tmp_path: Path) -> None:
+    """Failure rows should retain captured stdout/stderr for diagnostics workflows."""
+    output_file = tmp_path / "results.jsonl"
+
+    result = PerformanceResult(
+        model_name="failed-model",
+        generation=None,
+        success=False,
+        error_message="runtime error",
+        error_stage="Model Error",
+        captured_output_on_fail="=== STDERR ===\nTokenizer warning",
+    )
+
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
+    assert data["captured_output_on_fail"] == "=== STDERR ===\nTokenizer warning"
+
+
 def test_save_jsonl_report_includes_timing(tmp_path: Path) -> None:
     """Test that save_jsonl_report includes timing information."""
     output_file = tmp_path / "results.jsonl"

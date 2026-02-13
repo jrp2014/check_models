@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -256,6 +257,7 @@ def _make_failure_with_details(
     error_package: str = "mlx-vlm",
     error_stage: str = "Model Error",
     traceback_str: str | None = None,
+    captured_output: str | None = None,
 ) -> check_models.PerformanceResult:
     """Create a failure result with full error details for diagnostics tests."""
     return check_models.PerformanceResult(
@@ -266,6 +268,7 @@ def _make_failure_with_details(
         error_message=error_msg,
         error_type=error_type,
         error_package=error_package,
+        captured_output_on_fail=captured_output,
         error_traceback=traceback_str,
     )
 
@@ -408,6 +411,104 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         assert "Traceback (tail)" in content
         assert "ValueError: bad shape" in content
+
+    def test_full_tracebacks_in_collapsed_section(self, tmp_path: Path) -> None:
+        """Diagnostics should include full traceback blocks per failed model."""
+        tb = "\n".join(f"trace-line-{i}" for i in range(12))
+        out = tmp_path / "diag.md"
+        check_models.generate_diagnostics_report(
+            results=[_make_failure_with_details("org/m", traceback_str=tb, error_msg="bad shape")],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "Full tracebacks (all models in this cluster)" in content
+        # line 0 is not in the 6-line tail and proves full traceback inclusion.
+        assert "trace-line-0" in content
+
+    def test_captured_output_in_collapsed_section(self, tmp_path: Path) -> None:
+        """Diagnostics should include captured stdout/stderr blocks when available."""
+        out = tmp_path / "diag.md"
+        check_models.generate_diagnostics_report(
+            results=[
+                _make_failure_with_details(
+                    "org/m",
+                    error_msg="bad shape",
+                    captured_output="=== STDERR ===\nTokenizer warning here",
+                ),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "Captured stdout/stderr (all models in this cluster)" in content
+        assert "Tokenizer warning here" in content
+
+    def test_history_context_includes_regressions_recoveries_and_repro(
+        self, tmp_path: Path
+    ) -> None:
+        """Diagnostics should show history-based regression/recovery and retry context."""
+        out = tmp_path / "diag.md"
+        history_path = tmp_path / "results.history.jsonl"
+
+        old_record = {
+            "_type": "run",
+            "timestamp": "2026-02-10 10:00:00 GMT",
+            "model_results": {
+                "org/a": {"success": False},
+                "org/b": {"success": False},
+            },
+        }
+        previous_record = {
+            "_type": "run",
+            "timestamp": "2026-02-11 10:00:00 GMT",
+            "model_results": {
+                "org/a": {"success": True},
+                "org/b": {"success": False},
+            },
+        }
+        current_record = {
+            "_type": "run",
+            "timestamp": "2026-02-12 10:00:00 GMT",
+            "model_results": {
+                "org/a": {"success": False},
+                "org/b": {"success": True},
+            },
+        }
+        history_path.write_text(
+            "\n".join(
+                [
+                    json.dumps(old_record),
+                    json.dumps(previous_record),
+                    json.dumps(current_record),
+                ],
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
+        check_models.generate_diagnostics_report(
+            results=[_make_failure_with_details("org/a", error_msg="boom")],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+            history_path=history_path,
+            previous_history=previous_record,
+            current_history=current_record,
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "## History Context" in content
+        assert "`org/a`" in content
+        assert "new regression" in content
+        assert "Recoveries since previous run" in content
+        assert "`org/b`" in content
+        assert "2/3 recent runs failed" in content
+        assert "2026-02-10 10:00:00 GMT" in content
 
     def test_priority_table_present(self, tmp_path: Path) -> None:
         """Priority Summary table should appear with correct structure."""

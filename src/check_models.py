@@ -43,6 +43,7 @@ from typing import (
     NoReturn,
     Protocol,
     Self,
+    TextIO,
     cast,
     runtime_checkable,
 )
@@ -619,6 +620,49 @@ class PerformanceResult:
     cache_memory: float | None = None
     error_package: str | None = None
     error_traceback: str | None = None
+
+
+class _TeeCaptureStream(io.TextIOBase):
+    """Mirror writes to an underlying stream while buffering text for diagnostics."""
+
+    __slots__ = ("_buffer", "_stream")
+
+    def __init__(self, stream: TextIO) -> None:
+        self._stream = stream
+        self._buffer = io.StringIO()
+
+    def writable(self) -> bool:
+        return True
+
+    def write(self, data: str) -> int:
+        self._buffer.write(data)
+        return self._stream.write(data)
+
+    def flush(self) -> None:
+        self._stream.flush()
+
+    def isatty(self) -> bool:
+        return self._stream.isatty()
+
+    def getvalue(self) -> str:
+        return self._buffer.getvalue()
+
+
+def _merge_captured_output(stdout_text: str, stderr_text: str) -> str | None:
+    """Merge captured stdout/stderr into a single diagnostics-friendly block."""
+    sections: list[str] = []
+
+    stdout_clean = stdout_text.strip()
+    stderr_clean = stderr_text.strip()
+
+    if stdout_clean:
+        sections.append("=== STDOUT ===\n" + stdout_clean)
+    if stderr_clean:
+        sections.append("=== STDERR ===\n" + stderr_clean)
+
+    if not sections:
+        return None
+    return "\n\n".join(sections)
 
 
 # Gallery rendering helpers (outside class)
@@ -5278,6 +5322,7 @@ def _format_failures_by_package_text(results: list[PerformanceResult]) -> list[s
 _DIAGNOSTICS_HIGH_COUNT: Final[int] = 2  # ≥ N models = High priority cluster
 _DIAGNOSTICS_TRACEBACK_TAIL_LINES: Final[int] = 6  # Lines to keep from traceback tail
 _DIAGNOSTICS_OUTPUT_SNIPPET_LEN: Final[int] = 200  # Max chars for sample output
+_DIAGNOSTICS_RECENT_RUN_WINDOW: Final[int] = 3  # Runs used for reproducibility signal
 
 # System info keys to include in the environment table (order matters)
 _DIAGNOSTICS_SYSTEM_KEYS: Final[tuple[str, ...]] = (
@@ -5314,6 +5359,130 @@ def _format_traceback_tail(traceback_str: str | None) -> str | None:
         return None
     tail = lines[-_DIAGNOSTICS_TRACEBACK_TAIL_LINES:]
     return "\n".join(tail)
+
+
+def _format_traceback_full(traceback_str: str | None) -> str | None:
+    """Return full traceback text (trimmed), or None when missing."""
+    if not traceback_str:
+        return None
+    full = traceback_str.strip()
+    return full or None
+
+
+def _build_failure_history_context(
+    *,
+    failed_models: set[str],
+    history_records: list[dict[str, Any]],
+) -> dict[str, dict[str, str | int]]:
+    """Compute first-seen and recent reproducibility stats for each failed model."""
+    context: dict[str, dict[str, str | int]] = {}
+
+    for model in failed_models:
+        first_failure_timestamp = "unknown"
+        for record in history_records:
+            model_results = record.get("model_results", {})
+            if not isinstance(model_results, dict):
+                continue
+            info = model_results.get(model)
+            if isinstance(info, dict) and info.get("success") is False:
+                timestamp = record.get("timestamp")
+                if isinstance(timestamp, str) and timestamp:
+                    first_failure_timestamp = timestamp
+                break
+
+        recent_considered = 0
+        recent_failures = 0
+        for record in reversed(history_records):
+            model_results = record.get("model_results", {})
+            if not isinstance(model_results, dict):
+                continue
+            info = model_results.get(model)
+            if not isinstance(info, dict):
+                continue
+            success = info.get("success")
+            if success not in {True, False}:
+                continue
+            recent_considered += 1
+            if success is False:
+                recent_failures += 1
+            if recent_considered >= _DIAGNOSTICS_RECENT_RUN_WINDOW:
+                break
+
+        context[model] = {
+            "first_failure_timestamp": first_failure_timestamp,
+            "recent_failures": recent_failures,
+            "recent_considered": recent_considered,
+        }
+
+    return context
+
+
+def _format_recent_repro_ratio(history_info: dict[str, str | int] | None) -> str:
+    """Format reproducibility ratio string such as ``2/3 recent runs failed``."""
+    if not history_info:
+        return "n/a"
+    recent_failures = history_info.get("recent_failures", 0)
+    recent_considered = history_info.get("recent_considered", 0)
+    if not isinstance(recent_failures, int) or not isinstance(recent_considered, int):
+        return "n/a"
+    if recent_considered <= 0:
+        return "n/a"
+    return f"{recent_failures}/{recent_considered} recent runs failed"
+
+
+def _diagnostics_full_tracebacks_section(cluster_results: list[PerformanceResult]) -> list[str]:
+    """Build collapsed full traceback blocks for all models in a cluster."""
+    traceback_entries: list[tuple[str, str]] = []
+    for result in cluster_results:
+        traceback_text = _format_traceback_full(result.error_traceback)
+        if traceback_text is None:
+            continue
+        traceback_entries.append((result.model_name, traceback_text))
+
+    if not traceback_entries:
+        return []
+
+    parts = [
+        "<details><summary>Full tracebacks (all models in this cluster)</summary>",
+        "",
+    ]
+    for model_name, traceback_text in traceback_entries:
+        safe_model = DIAGNOSTICS_ESCAPER.escape(model_name)
+        parts.append(f"#### `{safe_model}`")
+        parts.append("")
+        parts.append("```text")
+        parts.append(traceback_text)
+        parts.append("```")
+        parts.append("")
+    parts.append("</details>")
+    parts.append("")
+    return parts
+
+
+def _diagnostics_captured_output_section(cluster_results: list[PerformanceResult]) -> list[str]:
+    """Build collapsed captured stdout/stderr blocks for models in a cluster."""
+    with_output = [
+        (r.model_name, (r.captured_output_on_fail or "").strip()) for r in cluster_results
+    ]
+    with_output = [(name, out) for name, out in with_output if out]
+    if not with_output:
+        return []
+
+    parts = [
+        "<details><summary>Captured stdout/stderr (all models in this cluster)</summary>",
+        "",
+    ]
+    for model_name, captured_text in with_output:
+        safe_model = DIAGNOSTICS_ESCAPER.escape(model_name)
+        parts.append(f"#### `{safe_model}`")
+        parts.append("")
+        parts.append("```text")
+        parts.append(captured_text)
+        parts.append("```")
+        parts.append("")
+    parts.append("</details>")
+    parts.append("")
+    return parts
 
 
 def _cluster_failures_by_pattern(
@@ -5419,8 +5588,7 @@ def _diagnostics_header(
         try:
             size_mb = image_path.stat().st_size / (1024 * 1024)
             parts.append(
-                f"Test image: `{image_path.name}` ({size_mb:.1f} MB). "
-                "All failures are deterministic and reproducible.",
+                f"Test image: `{image_path.name}` ({size_mb:.1f} MB).",
             )
             parts.append("")
         except OSError:
@@ -5445,11 +5613,17 @@ def _diagnostics_header(
 
 def _diagnostics_failure_clusters(
     results: list[PerformanceResult],
+    *,
+    regression_models: set[str] | None = None,
+    failure_history_context: dict[str, dict[str, str | int]] | None = None,
 ) -> list[str]:
     """Build the failure-cluster sections of the diagnostics report."""
     failed = [r for r in results if not r.success]
     if not failed:
         return []
+
+    regressions = regression_models or set()
+    history_context = failure_history_context or {}
 
     clusters = _cluster_failures_by_pattern(results)
     sorted_clusters = sorted(clusters.items(), key=lambda kv: -len(kv[1]))
@@ -5472,13 +5646,26 @@ def _diagnostics_failure_clusters(
         parts.append("")
 
         # Affected models table
-        parts.append("| Model | Error Stage | Package |")
-        parts.append("| ----- | ----------- | ------- |")
+        parts.append(
+            "| Model | Error Stage | Package | Regression vs Prev | "
+            "First Seen Failing | Recent Repro |",
+        )
+        parts.append(
+            "| ----- | ----------- | ------- | ------------------ | ------------------ | ------------ |",
+        )
         for r in cluster_results:
             model = DIAGNOSTICS_ESCAPER.escape(r.model_name)
             stage = DIAGNOSTICS_ESCAPER.escape(r.error_stage or "")
             pkg = DIAGNOSTICS_ESCAPER.escape(r.error_package or "unknown")
-            parts.append(f"| `{model}` | {stage} | {pkg} |")
+            regression = "yes" if r.model_name in regressions else "no"
+            history_info = history_context.get(r.model_name, {})
+            first_seen = DIAGNOSTICS_ESCAPER.escape(
+                str(history_info.get("first_failure_timestamp", "unknown")),
+            )
+            recent_repro = DIAGNOSTICS_ESCAPER.escape(_format_recent_repro_ratio(history_info))
+            parts.append(
+                f"| `{model}` | {stage} | {pkg} | {regression} | {first_seen} | {recent_repro} |",
+            )
         parts.append("")
 
         # Per-model error messages (only when they differ across the cluster)
@@ -5501,6 +5688,9 @@ def _diagnostics_failure_clusters(
             parts.append(tb_tail)
             parts.append("```")
             parts.append("")  # Blank line after fenced block
+
+        parts.extend(_diagnostics_full_tracebacks_section(cluster_results))
+        parts.extend(_diagnostics_captured_output_section(cluster_results))
 
     return parts
 
@@ -5590,6 +5780,84 @@ def _diagnostics_priority_table(
     return parts
 
 
+def _diagnostics_history_section(
+    *,
+    failed: list[PerformanceResult],
+    previous_history: dict[str, Any] | None,
+    current_history: dict[str, Any] | None,
+    history_context: dict[str, dict[str, str | int]],
+) -> list[str]:
+    """Build regression/recovery and first-seen context using run history."""
+    if not failed:
+        return []
+
+    failed_models = {r.model_name for r in failed}
+    comparison: dict[str, list[str]] | None = None
+    if previous_history and current_history:
+        comparison = compare_history_records(previous_history, current_history)
+
+    regressions = set(comparison["regressions"]) if comparison else set()
+    recoveries = comparison["recoveries"] if comparison else []
+    new_models = set(comparison["new_models"]) if comparison else set()
+
+    prev_model_results = previous_history.get("model_results", {}) if previous_history else {}
+    if not isinstance(prev_model_results, dict):
+        prev_model_results = {}
+
+    parts: list[str] = [
+        "---",
+        "",
+        "## History Context",
+        "",
+        "Recent reproducibility is measured from history "
+        f"(up to last {_DIAGNOSTICS_RECENT_RUN_WINDOW} runs where each model appears).",
+        "",
+    ]
+
+    if comparison:
+        reg_now = sorted(model for model in regressions if model in failed_models)
+        if reg_now:
+            parts.append(
+                "**Regressions since previous run:** " + ", ".join(f"`{m}`" for m in reg_now),
+            )
+        else:
+            parts.append("**Regressions since previous run:** none")
+
+        if recoveries:
+            parts.append(
+                "**Recoveries since previous run:** " + ", ".join(f"`{m}`" for m in recoveries),
+            )
+        else:
+            parts.append("**Recoveries since previous run:** none")
+        parts.append("")
+    else:
+        parts.append("No prior history baseline available for regression/recovery status.")
+        parts.append("")
+
+    parts.append("| Model | Status vs Previous Run | First Seen Failing | Recent Repro |")
+    parts.append("| ----- | ---------------------- | ------------------ | ------------ |")
+    for model in sorted(failed_models):
+        if model in regressions:
+            status = "new regression"
+        elif model in new_models:
+            status = "new model failing"
+        else:
+            prev_info = prev_model_results.get(model, {})
+            prev_success = prev_info.get("success") if isinstance(prev_info, dict) else None
+            status = "still failing" if prev_success is False else "failing"
+
+        info = history_context.get(model, {})
+        first_seen = DIAGNOSTICS_ESCAPER.escape(str(info.get("first_failure_timestamp", "unknown")))
+        recent_repro = DIAGNOSTICS_ESCAPER.escape(_format_recent_repro_ratio(info))
+
+        esc_model = DIAGNOSTICS_ESCAPER.escape(model)
+        esc_status = DIAGNOSTICS_ESCAPER.escape(status)
+        parts.append(f"| `{esc_model}` | {esc_status} | {first_seen} | {recent_repro} |")
+    parts.append("")
+
+    return parts
+
+
 def _diagnostics_footer(
     failed: list[PerformanceResult],
     prompt: str,
@@ -5642,6 +5910,9 @@ def generate_diagnostics_report(
     system_info: dict[str, str],
     prompt: str,
     image_path: Path | None = None,
+    history_path: Path | None = None,
+    previous_history: dict[str, Any] | None = None,
+    current_history: dict[str, Any] | None = None,
 ) -> bool:
     """Generate a Markdown diagnostics report structured for upstream issue filing.
 
@@ -5657,6 +5928,9 @@ def generate_diagnostics_report(
         system_info: System characteristics dict from get_system_characteristics().
         prompt: The prompt that was used.
         image_path: Path to the test image (for reproducibility section).
+        history_path: Optional history JSONL path for first-seen and retry context.
+        previous_history: Optional previous run record for regression/recovery status.
+        current_history: Optional current run record for regression/recovery status.
 
     Returns:
         True if the report was written (i.e. there was something to report),
@@ -5669,6 +5943,19 @@ def generate_diagnostics_report(
     if not failed and not harness_results:
         return False
 
+    history_records = _load_history_run_records(history_path)
+    failed_models = {r.model_name for r in failed}
+    history_context = _build_failure_history_context(
+        failed_models=failed_models,
+        history_records=history_records,
+    )
+    comparison = (
+        compare_history_records(previous_history, current_history)
+        if previous_history and current_history
+        else None
+    )
+    regression_models = set(comparison["regressions"]) if comparison else set()
+
     parts: list[str] = _diagnostics_header(
         total=len(results),
         n_failed=len(failed),
@@ -5678,8 +5965,22 @@ def generate_diagnostics_report(
         system_info=system_info,
         image_path=image_path,
     )
-    parts.extend(_diagnostics_failure_clusters(results))
+    parts.extend(
+        _diagnostics_failure_clusters(
+            results,
+            regression_models=regression_models,
+            failure_history_context=history_context,
+        ),
+    )
     parts.extend(_diagnostics_harness_section(harness_results))
+    parts.extend(
+        _diagnostics_history_section(
+            failed=failed,
+            previous_history=previous_history,
+            current_history=current_history,
+            history_context=history_context,
+        ),
+    )
     parts.extend(_diagnostics_priority_table(results, harness_results))
     parts.extend(_diagnostics_footer(failed, prompt))
 
@@ -7173,6 +7474,8 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     model: Module | None = None
     processor: PythonBackend | TokenizersBackend | None = None
     arch, gpu_info = get_system_info()
+    stdout_capture = _TeeCaptureStream(sys.stdout)
+    stderr_capture = _TeeCaptureStream(sys.stderr)
 
     # Track overall timing
     total_start_time = time.perf_counter()
@@ -7188,7 +7491,11 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             gpu_info if gpu_info is not None else "",
         )
 
-        with TimeoutManager(params.timeout):
+        with (
+            contextlib.redirect_stdout(stdout_capture),
+            contextlib.redirect_stderr(stderr_capture),
+            TimeoutManager(params.timeout),
+        ):
             output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                 params=params,
             )
@@ -7222,6 +7529,10 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         tb_str = traceback.format_exc()
         classified_stage = _classify_error(error_msg)
         error_package = _attribute_error_to_package(error_msg, tb_str)
+        captured_output = _merge_captured_output(
+            stdout_capture.getvalue(),
+            stderr_capture.getvalue(),
+        )
         return PerformanceResult(
             model_name=params.model_identifier,
             generation=None,
@@ -7229,6 +7540,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             # Use classified error as stage/status, or exception name if unknown
             error_stage=classified_stage,
             error_message=error_msg,
+            captured_output_on_fail=captured_output,
             error_type=type(e).__name__,
             error_package=error_package,
             error_traceback=tb_str,
@@ -9050,6 +9362,35 @@ def _load_latest_history_record(history_path: Path) -> dict[str, Any] | None:
     return None
 
 
+def _load_history_run_records(
+    history_path: Path | None,
+    *,
+    max_records: int = 100,
+) -> list[dict[str, Any]]:
+    """Load up to ``max_records`` run entries from append-only history JSONL."""
+    if history_path is None or not history_path.exists():
+        return []
+
+    try:
+        lines = history_path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        logger.warning("Failed to read history file %s", history_path)
+        return []
+
+    records: list[dict[str, Any]] = []
+    for line in lines[-max_records:]:
+        text = line.strip()
+        if not text:
+            continue
+        try:
+            record = json.loads(text)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(record, dict) and record.get("_type") == "run":
+            records.append(record)
+    return records
+
+
 def compare_history_records(
     previous: dict[str, Any] | None,
     current: dict[str, Any],
@@ -9163,6 +9504,7 @@ def save_jsonl_report(
                     "success": res.success,
                     "error_stage": res.error_stage,
                     "error_message": res.error_message,
+                    "captured_output_on_fail": res.captured_output_on_fail,
                     "error_type": res.error_type,  # Original exception type for bucketing
                     "error_package": res.error_package,
                     "error_traceback": res.error_traceback,  # Full traceback for diagnostics
@@ -9315,7 +9657,9 @@ def finalize_execution(
         md_output_path: Path = args.output_markdown.resolve()
         tsv_output_path: Path = args.output_tsv.resolve()
         jsonl_output_path: Path = args.output_jsonl.resolve()
+        diagnostics_path: Path = args.output_diagnostics.resolve()
         history_path = _history_path_for_jsonl(jsonl_output_path)
+        previous_history = _load_latest_history_record(history_path)
 
         html_output_path.parent.mkdir(parents=True, exist_ok=True)
         md_output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -9368,17 +9712,6 @@ def finalize_execution(
                 system_info=system_info,
             )
 
-            # Generate diagnostics report (only when failures/harness issues exist)
-            diagnostics_path: Path = args.output_diagnostics.resolve()
-            diagnostics_written = generate_diagnostics_report(
-                results=results,
-                filename=diagnostics_path,
-                versions=library_versions,
-                system_info=system_info,
-                prompt=prompt,
-                image_path=image_path,
-            )
-
             # Log file locations
             logger.info("")
             log_success("Reports successfully generated:", prefix="📊")
@@ -9389,8 +9722,6 @@ def finalize_execution(
             )
             log_file_path(args.output_tsv, label="   TSV Report:   ")
             log_file_path(args.output_jsonl, label="   JSONL Report: ")
-            if diagnostics_written:
-                log_file_path(diagnostics_path, label="   Diagnostics:  ")
 
             log_file_path(DEFAULT_LOG_OUTPUT, label="   Log File:")
             # Include environment.log in the output file listing
@@ -9401,7 +9732,6 @@ def finalize_execution(
             logger.exception("Failed to generate reports.")
 
         # Append run history (append-only) and compare with previous run
-        previous_history = _load_latest_history_record(history_path)
         current_history = append_history_record(
             history_path=history_path,
             results=results,
@@ -9414,6 +9744,22 @@ def finalize_execution(
         log_file_path(history_path, label="   History:     ")
 
         _log_history_comparison(previous_history, current_history)
+
+        # Generate diagnostics report after history append so regression/retry
+        # context in diagnostics.md reflects this run.
+        diagnostics_written = generate_diagnostics_report(
+            results=results,
+            filename=diagnostics_path,
+            versions=library_versions,
+            system_info=system_info,
+            prompt=prompt,
+            image_path=image_path,
+            history_path=history_path,
+            previous_history=previous_history,
+            current_history=current_history,
+        )
+        if diagnostics_written:
+            log_file_path(diagnostics_path, label="   Diagnostics:  ")
     else:
         log_warning_note("No models processed. No performance summary generated.")
         logger.info("Skipping report generation as no models were processed.")

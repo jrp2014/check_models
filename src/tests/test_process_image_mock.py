@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 from unittest.mock import patch
@@ -109,3 +110,25 @@ class TestProcessImageWithModelMock:
 
         assert result.success is False
         assert result.error_type == "OSError"
+
+    def test_failure_captures_stdout_and_stderr(self, test_image: Path) -> None:
+        """Failure result should include captured stdout/stderr text."""
+        params = _build_params(test_image)
+
+        def _raise_after_output(*_args: object, **_kwargs: object) -> _FakeGenerationResult:
+            sys.stdout.write("stdout marker\n")
+            sys.stderr.write("stderr marker\n")
+            error_message = "bad config"
+            raise ValueError(error_message)
+
+        with patch.object(
+            check_models,
+            "_run_model_generation",
+            side_effect=_raise_after_output,
+        ):
+            result = check_models.process_image_with_model(params)
+
+        assert result.success is False
+        assert result.captured_output_on_fail is not None
+        assert "stdout marker" in result.captured_output_on_fail
+        assert "stderr marker" in result.captured_output_on_fail
