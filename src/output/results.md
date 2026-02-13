@@ -1,17 +1,17 @@
 # Model Performance Results
 
-_Generated on 2026-02-13 13:18:47 GMT_
+_Generated on 2026-02-13 17:29:46 GMT_
 
 ## 🏆 Performance Highlights
 
-- **Fastest:** `mlx-community/nanoLLaVA-1.5-4bit` (315.7 tps)
+- **Fastest:** `mlx-community/nanoLLaVA-1.5-4bit` (311.7 tps)
 - **💾 Most efficient:** `mlx-community/nanoLLaVA-1.5-4bit` (2.8 GB)
 - **⚡ Fastest load:** `HuggingFaceTB/SmolVLM-Instruct` (0.00s)
-- **📊 Average TPS:** 71.1 across 33 models
+- **📊 Average TPS:** 70.1 across 33 models
 
 ## 📈 Resource Usage
 
-- **Total peak memory:** 659.7 GB
+- **Total peak memory:** 659.8 GB
 - **Average peak memory:** 20.0 GB
 - **Memory efficiency:** 173 tokens/GB
 
@@ -70,11 +70,11 @@ _Generated on 2026-02-13 13:18:47 GMT_
 
 ## 📊 Aggregate Statistics (Successful Runs)
 
-- **Generation Tps**: Avg: 71.1 | Min: 0 | Max: 316
+- **Generation Tps**: Avg: 70.1 | Min: 0 | Max: 312
 - **Peak Memory**: Avg: 20 | Min: 2.8 | Max: 73
-- **Total Time**: Avg: 27.08s | Min: 2.59s | Max: 117.80s
-- **Generation Time**: Avg: 23.97s | Min: 1.67s | Max: 116.52s
-- **Model Load Time**: Avg: 3.12s | Min: 0.90s | Max: 9.25s
+- **Total Time**: Avg: 27.25s | Min: 2.57s | Max: 125.19s
+- **Generation Time**: Avg: 24.17s | Min: 1.66s | Max: 123.89s
+- **Model Load Time**: Avg: 3.08s | Min: 0.91s | Max: 9.42s
 
 ## 🚨 Failures by Package (Actionable)
 
@@ -156,7 +156,7 @@ St Michael's Parish Church in Bishop's Stortford, England, is pictured here on a
 
 **Note:** Results sorted: errors first, then by generation time (fastest to slowest).
 
-**Overall runtime:** 953.90s
+**Overall runtime:** 960.66s
 
 <!-- markdownlint-disable MD013 MD033 MD034 MD037 MD049 -->
 
@@ -171,39 +171,39 @@ St Michael's Parish Church in Bishop's Stortford, England, is pictured here on a
 | `mlx-community/gemma-3n-E2B-4bit`                       |         |                   |                       |                |              |           |             |                  |            |             |                                   |         mlx-vlm |
 | `mlx-community/paligemma2-3b-pt-896-4bit`               |         |                   |                       |                |              |           |             |                  |            |             |                                   |         mlx-vlm |
 | `prince-canuma/Florence-2-large-ft`                     |         |                   |                       |                |              |           |             |                  |            |             |                                   |         mlx-vlm |
-| `mlx-community/LFM2-VL-1.6B-8bit`                       |       7 |               863 |                   281 |          1,144 |        3,001 |       288 |         2.9 |            1.67s |      0.92s |       2.59s |                                   |                 |
-| `mlx-community/LFM2.5-VL-1.6B-bf16`                     |       7 |               863 |                   187 |          1,050 |        3,002 |       178 |         4.0 |            1.70s |      1.07s |       2.77s |                                   |                 |
-| `mlx-community/nanoLLaVA-1.5-4bit`                      | 151,645 |               585 |                   440 |          1,025 |        2,527 |       316 |         2.8 |            2.01s |      0.90s |       2.91s | verbose                           |                 |
-| `qnguyen3/nanoLLaVA`                                    | 151,645 |               585 |                   148 |            733 |        2,481 |      99.2 |         4.9 |            2.13s |      1.02s |       3.15s |                                   |                 |
-| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |  49,279 |             1,692 |                   136 |          1,828 |        1,215 |       114 |         5.5 |            2.97s |      1.42s |       4.39s |                                   |                 |
-| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |             1,609 |                     4 |          1,613 |          450 |      48.6 |          12 |            3.95s |      3.19s |       7.14s | ⚠️harness(prompt_template), ...   |                 |
-| `mlx-community/SmolVLM-Instruct-bf16`                   |  49,154 |             1,792 |                   364 |          2,156 |        1,341 |       111 |         5.5 |            4.96s |      1.30s |       6.26s | verbose                           |                 |
-| `HuggingFaceTB/SmolVLM-Instruct`                        |  49,154 |             1,792 |                   364 |          2,156 |        1,051 |       111 |         5.5 |            5.32s |      1.24s |       6.56s | verbose                           |                 |
-| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |             3,468 |                   307 |          3,775 |          992 |       157 |         9.0 |            5.76s |      1.69s |       7.45s |                                   |                 |
-| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |             1,609 |                    20 |          1,629 |          480 |      5.27 |          27 |            7.46s |      4.86s |      12.32s | context-ignored                   |                 |
-| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 |     414 |             1,570 |                   500 |          2,070 |          666 |       106 |          18 |            7.60s |      3.39s |      10.99s |                                   |                 |
-| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          |      11 |             1,570 |                   500 |          2,070 |          890 |      65.2 |          37 |           10.04s |      5.94s |      15.99s |                                   |                 |
-| `mlx-community/gemma-3n-E4B-it-bf16`                    |     106 |               856 |                   351 |          1,207 |          490 |      41.6 |          17 |           10.49s |      4.85s |      15.34s | context-ignored                   |                 |
-| `mlx-community/deepseek-vl2-8bit`                       |      14 |             2,576 |                   500 |          3,076 |          714 |      60.1 |          32 |           12.38s |      5.49s |      17.87s | repetitive(phrase: "english co... |                 |
-| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      |  93,938 |             1,908 |                   500 |          2,408 |          571 |      48.2 |          60 |           14.43s |      9.25s |      23.68s |                                   |                 |
-| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |             3,022 |                   372 |          3,394 |          296 |      41.1 |          11 |           19.58s |      1.78s |      21.36s |                                   |                 |
-| `mlx-community/pixtral-12b-8bit`                        |  14,543 |             3,704 |                   500 |          4,204 |          515 |      33.4 |          16 |           22.48s |      3.14s |      25.63s | verbose                           |                 |
-| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         |   1,338 |             3,795 |                   500 |          4,295 |          420 |      36.0 |          15 |           23.23s |      3.08s |      26.31s |                                   |                 |
-| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               856 |                   288 |          1,144 |          189 |      14.3 |          34 |           25.03s |      7.11s |      32.13s |                                   |                 |
-| `mlx-community/InternVL3-14B-8bit`                      | 151,645 |             3,904 |                   393 |          4,297 |          368 |      27.6 |          18 |           25.32s |      3.20s |      28.51s | verbose                           |                 |
-| `mlx-community/gemma-3-27b-it-qat-4bit`                 | 236,764 |               856 |                   500 |          1,356 |          190 |      23.9 |          19 |           25.70s |      5.04s |      30.74s | verbose                           |                 |
-| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      | 128,009 |               565 |                   196 |            761 |          148 |       8.6 |          15 |           26.97s |      2.95s |      29.92s |                                   |                 |
-| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         | 235,265 |             1,609 |                   500 |          2,109 |        1,529 |      17.6 |          11 |           29.76s |      2.92s |      32.68s | repetitive(phrase: "the window... |                 |
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |             2,968 |                   464 |          3,432 |          231 |      27.4 |          23 |           30.07s |      3.84s |      33.92s | ⚠️harness(encoding)               |                 |
-| `mlx-community/pixtral-12b-bf16`                        |  38,188 |             3,704 |                   500 |          4,204 |          573 |      18.7 |          28 |           33.47s |      4.90s |      38.37s | verbose                           |                 |
-| `mlx-community/Molmo-7B-D-0924-8bit`                    |         |               0.0 |                   0.0 |            0.0 |            0 |         0 |          41 |           35.01s |      2.22s |      37.23s |                                   |                 |
-| `mlx-community/Molmo-7B-D-0924-bf16`                    |         |               0.0 |                   0.0 |            0.0 |            0 |         0 |          48 |           35.80s |      3.29s |      39.09s |                                   |                 |
-| `microsoft/Phi-3.5-vision-instruct`                     |  14,826 |             1,446 |                   500 |          1,946 |          921 |      12.2 |          12 |           42.93s |      1.71s |      44.64s | repetitive(phrase: "weather, ...  |                 |
-| `mlx-community/Phi-3.5-vision-instruct-bf16`            |  14,826 |             1,446 |                   500 |          1,946 |        1,020 |      12.0 |          12 |           43.60s |      2.26s |      45.86s | repetitive(phrase: "weather, ...  |                 |
-| `meta-llama/Llama-3.2-11B-Vision-Instruct`              | 128,009 |               566 |                   176 |            742 |          152 |      3.82 |          25 |           50.07s |      4.34s |      54.41s |                                   |                 |
-| `Qwen/Qwen3-VL-2B-Instruct`                             |  17,428 |            16,858 |                   500 |         17,358 |          383 |      75.2 |         8.3 |           51.03s |      1.57s |      52.59s | repetitive(phrase: "churchyard... |                 |
-| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |      11 |            16,860 |                   500 |         17,360 |          312 |      72.0 |         8.3 |           61.46s |      1.73s |      63.20s |                                   |                 |
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               |      11 |            16,869 |                   500 |         17,369 |          149 |       174 |          73 |          116.52s |      1.28s |     117.80s | repetitive(phrase: "travel pho... |                 |
+| `mlx-community/LFM2-VL-1.6B-8bit`                       |       7 |               863 |                   281 |          1,144 |        3,018 |       287 |         2.9 |            1.66s |      0.91s |       2.57s |                                   |                 |
+| `mlx-community/LFM2.5-VL-1.6B-bf16`                     |       7 |               863 |                   187 |          1,050 |        3,016 |       178 |         4.0 |            1.69s |      1.06s |       2.75s |                                   |                 |
+| `mlx-community/nanoLLaVA-1.5-4bit`                      | 151,645 |               585 |                   440 |          1,025 |        2,633 |       312 |         2.8 |            2.05s |      0.95s |       3.00s | verbose                           |                 |
+| `qnguyen3/nanoLLaVA`                                    | 151,645 |               585 |                   148 |            733 |        2,519 |      99.2 |         4.9 |            2.13s |      1.03s |       3.16s |                                   |                 |
+| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |  49,279 |             1,692 |                   136 |          1,828 |        1,119 |       112 |         5.5 |            3.08s |      1.32s |       4.40s |                                   |                 |
+| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |             1,609 |                     4 |          1,613 |          475 |      47.7 |          12 |            3.76s |      3.23s |       6.99s | ⚠️harness(prompt_template), ...   |                 |
+| `HuggingFaceTB/SmolVLM-Instruct`                        |  49,154 |             1,792 |                   364 |          2,156 |        1,398 |       110 |         5.5 |            4.94s |      1.30s |       6.24s | verbose                           |                 |
+| `mlx-community/SmolVLM-Instruct-bf16`                   |  49,154 |             1,792 |                   364 |          2,156 |        1,238 |       105 |         5.5 |            5.25s |      1.30s |       6.54s | verbose                           |                 |
+| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |             3,468 |                   307 |          3,775 |        1,000 |       157 |         9.0 |            5.72s |      1.70s |       7.42s |                                   |                 |
+| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 |     414 |             1,570 |                   500 |          2,070 |          869 |       105 |          18 |            7.04s |      3.32s |      10.36s |                                   |                 |
+| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |             1,609 |                    20 |          1,629 |          476 |      5.28 |          27 |            7.48s |      4.80s |      12.28s | context-ignored                   |                 |
+| `mlx-community/gemma-3n-E4B-it-bf16`                    |     106 |               856 |                   351 |          1,207 |          895 |      41.5 |          17 |            9.72s |      4.84s |      14.56s | context-ignored                   |                 |
+| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          |      11 |             1,570 |                   500 |          2,070 |          898 |      65.1 |          37 |           10.06s |      5.89s |      15.95s |                                   |                 |
+| `mlx-community/deepseek-vl2-8bit`                       |      14 |             2,576 |                   500 |          3,076 |          827 |      48.9 |          32 |           13.78s |      5.20s |      18.98s | repetitive(phrase: "english co... |                 |
+| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      |  93,938 |             1,908 |                   500 |          2,408 |          540 |      48.1 |          60 |           14.62s |      9.42s |      24.04s |                                   |                 |
+| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |             3,022 |                   372 |          3,394 |          282 |      40.7 |          11 |           20.15s |      1.77s |      21.92s |                                   |                 |
+| `mlx-community/pixtral-12b-8bit`                        |  14,543 |             3,704 |                   500 |          4,204 |          536 |      33.6 |          16 |           22.10s |      3.09s |      25.19s | verbose                           |                 |
+| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         |   1,338 |             3,795 |                   500 |          4,295 |          425 |      36.1 |          15 |           23.10s |      2.99s |      26.09s |                                   |                 |
+| `mlx-community/InternVL3-14B-8bit`                      | 151,645 |             3,904 |                   393 |          4,297 |          380 |      27.6 |          18 |           24.95s |      3.18s |      28.13s | verbose                           |                 |
+| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      | 128,009 |               565 |                   196 |            761 |          154 |      8.91 |          15 |           25.98s |      2.79s |      28.77s |                                   |                 |
+| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               856 |                   288 |          1,144 |          188 |      13.3 |          34 |           26.47s |      7.23s |      33.69s |                                   |                 |
+| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         | 235,265 |             1,609 |                   500 |          2,109 |        1,524 |      17.7 |          11 |           29.61s |      3.09s |      32.71s | repetitive(phrase: "the window... |                 |
+| `mlx-community/gemma-3-27b-it-qat-4bit`                 | 236,764 |               856 |                   500 |          1,356 |          175 |      20.5 |          19 |           29.63s |      4.94s |      34.57s | verbose                           |                 |
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |             2,968 |                   464 |          3,432 |          234 |      27.6 |          23 |           29.80s |      3.77s |      33.57s | ⚠️harness(encoding)               |                 |
+| `mlx-community/pixtral-12b-bf16`                        |  38,188 |             3,704 |                   500 |          4,204 |          569 |      19.0 |          28 |           33.06s |      4.87s |      37.93s | verbose                           |                 |
+| `mlx-community/Molmo-7B-D-0924-8bit`                    |         |               0.0 |                   0.0 |            0.0 |            0 |         0 |          41 |           33.89s |      2.17s |      36.05s |                                   |                 |
+| `mlx-community/Molmo-7B-D-0924-bf16`                    |         |               0.0 |                   0.0 |            0.0 |            0 |         0 |          48 |           34.83s |      3.21s |      38.04s |                                   |                 |
+| `mlx-community/Phi-3.5-vision-instruct-bf16`            |  14,826 |             1,446 |                   500 |          1,946 |        1,027 |      12.4 |          12 |           41.96s |      1.74s |      43.71s | repetitive(phrase: "weather, ...  |                 |
+| `microsoft/Phi-3.5-vision-instruct`                     |  14,826 |             1,446 |                   500 |          1,946 |        1,021 |      12.4 |          12 |           42.15s |      1.70s |      43.85s | repetitive(phrase: "weather, ...  |                 |
+| `meta-llama/Llama-3.2-11B-Vision-Instruct`              | 128,009 |               566 |                   176 |            742 |          159 |       3.9 |          25 |           48.96s |      4.17s |      53.13s |                                   |                 |
+| `Qwen/Qwen3-VL-2B-Instruct`                             |  17,428 |            16,858 |                   500 |         17,358 |          385 |      74.9 |         8.3 |           50.88s |      1.55s |      52.43s | repetitive(phrase: "churchyard... |                 |
+| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |      11 |            16,860 |                   500 |         17,360 |          303 |      68.1 |         8.3 |           63.35s |      1.75s |      65.10s |                                   |                 |
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               |      11 |            16,869 |                   500 |         17,369 |          140 |       176 |          73 |          123.89s |      1.30s |     125.19s | repetitive(phrase: "travel pho... |                 |
 
 <!-- markdownlint-enable MD013 MD033 MD034 MD037 MD049 -->
 
@@ -240,9 +240,9 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 394, in load
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 395, in load
     model = load_model(model_path, lazy, **kwargs)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 314, in load_model
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 315, in load_model
     model.load_weights(list(weights.items()))
     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
   File "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py", line 191, in load_weights
@@ -452,9 +452,9 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 394, in load
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 395, in load
     model = load_model(model_path, lazy, **kwargs)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 314, in load_model
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 315, in load_model
     model.load_weights(list(weights.items()))
     ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
   File "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py", line 200, in load_weights
@@ -773,9 +773,9 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 404, in load
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 405, in load
     processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 477, in load_processor
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 478, in load_processor
     processor = AutoProcessor.from_pretrained(model_path, use_fast=True, **kwargs)
   File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/molmo/processing_molmo.py", line 758, in _patched_auto_processor_from_pretrained
     return _original_auto_processor_from_pretrained.__func__(
@@ -838,7 +838,7 @@ ValueError: Model loading failed: RobertaTokenizer has no attribute additional_s
 
 ### ✅ mlx-community/LFM2-VL-1.6B-8bit
 
-**Metrics:** 288 TPS | 281 tokens
+**Metrics:** 287 TPS | 281 tokens
 
 ```text
 Title: St Michael's Parish Church, Bishop's Stortford, England
@@ -866,7 +866,7 @@ Keywords: St Michael's Parish Church, Bishop's Stortford, England, Perpendicular
 
 ### ✅ mlx-community/nanoLLaVA-1.5-4bit
 
-**Metrics:** 316 TPS | 440 tokens
+**Metrics:** 312 TPS | 440 tokens
 
 ```text
 Title: A concise, descriptive title (5–12 words).
@@ -902,7 +902,7 @@ The image portrays a serene, late afternoon scene at St Michael's Parish Church 
 
 ### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
 
-**Metrics:** 114 TPS | 136 tokens
+**Metrics:** 112 TPS | 136 tokens
 
 ```text
  Title: St Michael's Parish Church, Bishop's Stortford, England, United Kingdom, UK
@@ -913,7 +913,7 @@ St Michael's Parish Church in Bishop's Stortford, England, is pictured here on a
 
 ### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
 
-**Metrics:** 48.6 TPS | 4 tokens
+**Metrics:** 47.7 TPS | 4 tokens
 
 ```text
 Be concise.
@@ -921,9 +921,9 @@ Be concise.
 
 ---
 
-### ✅ mlx-community/SmolVLM-Instruct-bf16
+### ✅ HuggingFaceTB/SmolVLM-Instruct
 
-**Metrics:** 111 TPS | 364 tokens
+**Metrics:** 110 TPS | 364 tokens
 
 ```text
  Image Description:
@@ -943,9 +943,9 @@ In summary, the image captures the historical and architectural significance of 
 
 ---
 
-### ✅ HuggingFaceTB/SmolVLM-Instruct
+### ✅ mlx-community/SmolVLM-Instruct-bf16
 
-**Metrics:** 111 TPS | 364 tokens
+**Metrics:** 105 TPS | 364 tokens
 
 ```text
  Image Description:
@@ -987,19 +987,9 @@ The image is described as **St Michael's Parish Church, Bishop's Stortford, Engl
 
 ---
 
-### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
-
-**Metrics:** 5.27 TPS | 20 tokens
-
-```text
-Be specific about visual content. Include relevant geographic and temporal keywords where clearly supported by the image.
-```
-
----
-
 ### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
 
-**Metrics:** 106 TPS | 500 tokens
+**Metrics:** 105 TPS | 500 tokens
 
 ```text
 ◁think▷Got it, let's tackle this. First, I need to create a title, description, and keywords for the image of St Michael's Parish Church in Bishop's Stortford, England.
@@ -1013,29 +1003,19 @@ Keywords: Need to list 25-50 keywords. Let's go through the existing ones and ad
 
 ---
 
-### ✅ mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
+### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
 
-**Metrics:** 65.2 TPS | 500 tokens
+**Metrics:** 5.28 TPS | 20 tokens
 
 ```text
-◁think▷Got it, let's tackle this. First, I need to create a title, description, and keywords for the image of St Michael's Parish Church in Bishop's Stortford, England.
-
-Starting with the title: it should be concise and descriptive. The image shows the church with its architectural details, so maybe "St Michael's Parish Church, Bishop's Stortford, England: Perpendicular Gothic Architecture in a Historic Churchyard." That's 12 words, which fits the 5-12 word limit.
-
-Next, the description: need to cover key subjects (the church, its architecture, the churchyard), setting (historic, outdoor, possibly rural or suburban), actions (the church is static, so maybe "capturing intricate details"), concepts/themes (heritage, history, architecture), mood (serene, historic), visual style (wide-angle, architectural photography), colors (neutral tones, stone, green grass), seasonal (February, overcast), use-case (travel, tourism, editorial). So the description would be: "St Michael's Parish Church in Bishop's Stortford, England, is depicted in this photograph showcasing its Perpendicular Gothic architecture. The image highlights the church's flint-knapped walls, arched windows, and historic churchyard, set against an overcast sky. The wide-angle view emphasizes the building's imposing structure and intricate stonework, capturing the serene atmosphere of a historic landmark."
-
-Now keywords: need 25-50, ordered from specific to general. Let's list them:
-
-Specific subjects: St Michael's Parish Church, Bishop's Stortford, England, England, UK, Hertfordshire, Christian, Christianity, Christian Church, Faith, Religion, Worship, Tourism, Travel, Historic Building, Heritage, Medieval, Gothic Architecture, Perpendicular Gothic, Flint Knapped Wall, Flint Wall, Stone Wall, Churchyard, Graveyard, Tombstone, Headstone, Grass, Grasses, Church Spire, Clock Tower, Weathervane, Cross, Architectural Details, Architectural Style, Architectural Photography, Overcast Sky, Cloudy Sky, Neutral Tones, Stone Tones, Brown Tones, Grey Tones, Historic Landmark, Religious Building, Place of Worship.
-
-Wait, need to check the existing keywords provided. The existing ones include Bishop's Stortford, British, Christian, Christianity, England, English Church, Europe, Faith, Flint Knapped Wall, Flint Wall, Gothic Window, Grass,
+Be specific about visual content. Include relevant geographic and temporal keywords where clearly supported by the image.
 ```
 
 ---
 
 ### ✅ mlx-community/gemma-3n-E4B-it-bf16
 
-**Metrics:** 41.6 TPS | 351 tokens
+**Metrics:** 41.5 TPS | 351 tokens
 
 ```text
 ## Image Description: St. Michael's Church, Billericay
@@ -1060,9 +1040,29 @@ Wait, need to check the existing keywords provided. The existing ones include Bi
 
 ---
 
+### ✅ mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
+
+**Metrics:** 65.1 TPS | 500 tokens
+
+```text
+◁think▷Got it, let's tackle this. First, I need to create a title, description, and keywords for the image of St Michael's Parish Church in Bishop's Stortford, England.
+
+Starting with the title: it should be concise and descriptive. The image shows the church with its architectural details, so maybe "St Michael's Parish Church, Bishop's Stortford, England: Perpendicular Gothic Architecture in a Historic Churchyard." That's 12 words, which fits the 5-12 word limit.
+
+Next, the description: need to cover key subjects (the church, its architecture, the churchyard), setting (historic, outdoor, possibly rural or suburban), actions (the church is static, so maybe "capturing intricate details"), concepts/themes (heritage, history, architecture), mood (serene, historic), visual style (wide-angle, architectural photography), colors (neutral tones, stone, green grass), seasonal (February, overcast), use-case (travel, tourism, editorial). So the description would be: "St Michael's Parish Church in Bishop's Stortford, England, is depicted in this photograph showcasing its Perpendicular Gothic architecture. The image highlights the church's flint-knapped walls, arched windows, and historic churchyard, set against an overcast sky. The wide-angle view emphasizes the building's imposing structure and intricate stonework, capturing the serene atmosphere of a historic landmark."
+
+Now keywords: need 25-50, ordered from specific to general. Let's list them:
+
+Specific subjects: St Michael's Parish Church, Bishop's Stortford, England, England, UK, Hertfordshire, Christian, Christianity, Christian Church, Faith, Religion, Worship, Tourism, Travel, Historic Building, Heritage, Medieval, Gothic Architecture, Perpendicular Gothic, Flint Knapped Wall, Flint Wall, Stone Wall, Churchyard, Graveyard, Tombstone, Headstone, Grass, Grasses, Church Spire, Clock Tower, Weathervane, Cross, Architectural Details, Architectural Style, Architectural Photography, Overcast Sky, Cloudy Sky, Neutral Tones, Stone Tones, Brown Tones, Grey Tones, Historic Landmark, Religious Building, Place of Worship.
+
+Wait, need to check the existing keywords provided. The existing ones include Bishop's Stortford, British, Christian, Christianity, England, English Church, Europe, Faith, Flint Knapped Wall, Flint Wall, Gothic Window, Grass,
+```
+
+---
+
 ### ✅ mlx-community/deepseek-vl2-8bit
 
-**Metrics:** 60.1 TPS | 500 tokens
+**Metrics:** 48.9 TPS | 500 tokens
 
 ```text
 **Title:** A Stunning View of St. Michael's Church in Bishop's Stortford, UK
@@ -1076,7 +1076,7 @@ Wait, need to check the existing keywords provided. The existing ones include Bi
 
 ### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
 
-**Metrics:** 48.2 TPS | 500 tokens
+**Metrics:** 48.1 TPS | 500 tokens
 
 ```text
 Let's tackle this. First, the title needs to be concise. The image is of St Michael's Parish Church in Bishop's Stortford, England. So maybe "St Michael's Parish Church, Bishop's Stortford, England" – that's 7 words, fits the range.
@@ -1092,7 +1092,7 @@ Most specific: St Michael's Parish Church, Bishop's Stortford, England, UK, Grad
 
 ### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
 
-**Metrics:** 41.1 TPS | 372 tokens
+**Metrics:** 40.7 TPS | 372 tokens
 
 ```text
 Title: St Michael's Parish Church, Bishop's Stortford, England, United Kingdom, UK
@@ -1108,7 +1108,7 @@ Context: The image is described as 'St Michael's Parish Church in Bishop's Stort
 
 ### ✅ mlx-community/pixtral-12b-8bit
 
-**Metrics:** 33.4 TPS | 500 tokens
+**Metrics:** 33.6 TPS | 500 tokens
 
 ```text
 ### Title
@@ -1125,7 +1125,7 @@ St Michael's Parish Church, Bishop's Stortford, British, Christian, Christianity
 
 ### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
 
-**Metrics:** 36 TPS | 500 tokens
+**Metrics:** 36.1 TPS | 500 tokens
 
 ```text
 Here are my reasoning steps:
@@ -1148,20 +1148,6 @@ That's 3 sentences, factual.
 
 ---
 
-### ✅ mlx-community/gemma-3-27b-it-qat-8bit
-
-**Metrics:** 14.3 TPS | 288 tokens
-
-```text
-**Title:** St Michael's Parish Church, Bishop's Stortford, England – February Afternoon
-
-**Description:** This photograph depicts St Michael's Parish Church in Bishop's Stortford, Hertfordshire, England, a Grade I listed building showcasing Perpendicular Gothic architecture. The church is framed against a cloudy February sky, with its flint-knapped walls and stone windows prominently visible. Gravestones dot the surrounding churchyard, adding to the historic atmosphere.
-
-**Keywords:** St Michael's Parish Church, Bishop's Stortford, Hertfordshire, England, UK, United Kingdom, Perpendicular Gothic, flint knapped wall, stone window, arched window, church spire, churchyard, graveyard, cemetery, gravestone, headstone, tombstone, historic building, landmark, medieval architecture, place of worship, religious building, church, exterior, overcast sky, cloudy, grey tones, brown tones, stone, tower, clock tower, battlements, cross, weathervane, heritage, tourism, travel, architecture, ancient, historic, religious site, European architecture, British architecture, place of interest, overcast lighting, soft light, winter, February, afternoon, solemn, quiet, stillness, texture, detail, wide-angle, building exterior, cultural heritage, religious art, gothic window, stone dressing, traditional architecture, European landmark, place of remembrance, solemnity, cultural tourism, architectural photography.
-```
-
----
-
 ### ✅ mlx-community/InternVL3-14B-8bit
 
 **Metrics:** 27.6 TPS | 393 tokens
@@ -1178,25 +1164,9 @@ Context: The image is described as 'St Michael's Parish Church, Bishop's Stortfo
 
 ---
 
-### ✅ mlx-community/gemma-3-27b-it-qat-4bit
-
-**Metrics:** 23.9 TPS | 500 tokens
-
-```text
-## Title: St Michael's Parish Church, Bishop's Stortford, England – February Afternoon
-
-## Description:
-This photograph depicts the exterior of St Michael's Parish Church in Bishop's Stortford, England, a Grade I listed building showcasing Perpendicular Gothic architecture. The church is framed by a historic churchyard with numerous gravestones, and is photographed under a cloudy, overcast sky. The image highlights the church’s flint-knapped walls, arched windows, and prominent spire.
-
-## Keywords:
-St Michael's Parish Church, Bishop's Stortford, Hertfordshire, England, UK, United Kingdom, Perpendicular Gothic, flint knapped wall, arched window, church spire, churchyard, gravestones, headstones, tombstone, medieval architecture, historic building, landmark, place of worship, religious building, church, exterior, overcast sky, cloudy sky, grey tones, stone wall, spire, clock tower, weathervane, cross, gothic window, church architecture, British architecture, European architecture, heritage, tourism, travel, photography, architectural detail, religious site, place of interest, cultural heritage, history, ancient, solemn, peaceful, quiet, overcast light, February, winter, afternoon, wide-angle, exterior view, stone masonry, building facade, cultural landmark, religious art, religious monument, textured wall, stone structure, landmark architecture, religious institution, historical site, cultural tourism, architectural photography, religious building exterior, stone detailing, gothic style, religious practice, cultural preservation, stone texture, architectural design, religious history, stone construction, cultural identity, religious symbol, stone craftsmanship, architectural heritage, religious tradition, stone architecture, cultural significance, religious community, stone building, cultural expression, religious belief, stone work, cultural value, religious experience, stone feature, cultural context, religious influence, stone element, cultural impact, religious legacy, stone material, cultural asset, religious impact, stone surface, cultural resource, religious influence, stone composition, cultural element, religious foundation, stone form, cultural artifact, religious structure, stone pattern, cultural object, religious practice, stone design, cultural symbol, religious institution, stone element, cultural expression, stone feature, cultural context, stone composition, stone pattern, stone texture, stone work, stone surface, stone material, stone form, stone detailing, stone construction, stone masonry, stone architecture, stone building, stone feature, stone element, stone composition, stone pattern,
-```
-
----
-
 ### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
-**Metrics:** 8.6 TPS | 196 tokens
+**Metrics:** 8.91 TPS | 196 tokens
 
 ```text
 **Title:** St Michael's Parish Church, Bishop's Stortford, England
@@ -1218,9 +1188,23 @@ St Michael's Parish Church, Bishop's Stortford, Hertfordshire, England, UK, Unit
 
 ---
 
+### ✅ mlx-community/gemma-3-27b-it-qat-8bit
+
+**Metrics:** 13.3 TPS | 288 tokens
+
+```text
+**Title:** St Michael's Parish Church, Bishop's Stortford, England – February Afternoon
+
+**Description:** This photograph depicts St Michael's Parish Church in Bishop's Stortford, Hertfordshire, England, a Grade I listed building showcasing Perpendicular Gothic architecture. The church is framed against a cloudy February sky, with its flint-knapped walls and stone windows prominently visible. Gravestones dot the surrounding churchyard, adding to the historic atmosphere.
+
+**Keywords:** St Michael's Parish Church, Bishop's Stortford, Hertfordshire, England, UK, United Kingdom, Perpendicular Gothic, flint knapped wall, stone window, arched window, church spire, churchyard, graveyard, cemetery, gravestone, headstone, tombstone, historic building, landmark, medieval architecture, place of worship, religious building, church, exterior, overcast sky, cloudy, grey tones, brown tones, stone, tower, clock tower, battlements, cross, weathervane, heritage, tourism, travel, architecture, ancient, historic, religious site, European architecture, British architecture, place of interest, overcast lighting, soft light, winter, February, afternoon, solemn, quiet, stillness, texture, detail, wide-angle, building exterior, cultural heritage, religious art, gothic window, stone dressing, traditional architecture, European landmark, place of remembrance, solemnity, cultural tourism, architectural photography.
+```
+
+---
+
 ### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
 
-**Metrics:** 17.6 TPS | 500 tokens
+**Metrics:** 17.7 TPS | 500 tokens
 
 ```text
 A low-angle, three-quarters view of the side of St Michael's Parish Church in Bishop's Stortford, England. The church is a light brown stone with a brick-layer's bond pattern. The church is made of light brown stone with a brick-layer's bond pattern. The church has a tall, pointed, gray metal steeple on the right side of the church. The steeple is the tallest structure in the image. The church has a row of five windows on the left side of the church. The windows are rectangular and have a black metal frame. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three.
@@ -1228,9 +1212,25 @@ A low-angle, three-quarters view of the side of St Michael's Parish Church in Bi
 
 ---
 
+### ✅ mlx-community/gemma-3-27b-it-qat-4bit
+
+**Metrics:** 20.5 TPS | 500 tokens
+
+```text
+## Title: St Michael's Parish Church, Bishop's Stortford, England – February Afternoon
+
+## Description:
+This photograph depicts the exterior of St Michael's Parish Church in Bishop's Stortford, England, a Grade I listed building showcasing Perpendicular Gothic architecture. The church is framed by a historic churchyard with numerous gravestones, and is photographed under a cloudy, overcast sky. The image highlights the church’s flint-knapped walls, arched windows, and prominent spire.
+
+## Keywords:
+St Michael's Parish Church, Bishop's Stortford, Hertfordshire, England, UK, United Kingdom, Perpendicular Gothic, flint knapped wall, arched window, church spire, churchyard, gravestones, headstones, tombstone, medieval architecture, historic building, landmark, place of worship, religious building, church, exterior, overcast sky, cloudy sky, grey tones, stone wall, spire, clock tower, weathervane, cross, gothic window, church architecture, British architecture, European architecture, heritage, tourism, travel, photography, architectural detail, religious site, place of interest, cultural heritage, history, ancient, solemn, peaceful, quiet, overcast light, February, winter, afternoon, wide-angle, exterior view, stone masonry, building facade, cultural landmark, religious art, religious monument, textured wall, stone structure, landmark architecture, religious institution, historical site, cultural tourism, architectural photography, religious building exterior, stone detailing, gothic style, religious practice, cultural preservation, stone texture, architectural design, religious history, stone construction, cultural identity, religious symbol, stone craftsmanship, architectural heritage, religious tradition, stone architecture, cultural significance, religious community, stone building, cultural expression, religious belief, stone work, cultural value, religious experience, stone feature, cultural context, religious influence, stone element, cultural impact, religious legacy, stone material, cultural asset, religious impact, stone surface, cultural resource, religious influence, stone composition, cultural element, religious foundation, stone form, cultural artifact, religious structure, stone pattern, cultural object, religious practice, stone design, cultural symbol, religious institution, stone element, cultural expression, stone feature, cultural context, stone composition, stone pattern, stone texture, stone work, stone surface, stone material, stone form, stone detailing, stone construction, stone masonry, stone architecture, stone building, stone feature, stone element, stone composition, stone pattern,
+```
+
+---
+
 ### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
 
-**Metrics:** 27.4 TPS | 464 tokens
+**Metrics:** 27.6 TPS | 464 tokens
 
 ```text
 Title:ĠStĠMichael'sĠParishĠChurch,ĠBishop'sĠStortfordĊĊDescription:ĠTheĠimageĠshowsĠStĠMichael'sĠParishĠChurchĠinĠBishop'sĠStortford,ĠEngland,ĠaĠhistoricĠGradeĠIĠlistedĠbuildingĠfeaturingĠPerpendicularĠGothicĠarchitecture.ĠTheĠchurch'sĠflint-knappedĠwallsĠandĠstone-trimmedĠwindowsĠareĠprominentlyĠdisplayed,ĠsetĠagainstĠanĠovercastĠsky.ĊĊKeywords:ĠStĠMichael'sĠParishĠChurch,ĠBishop'sĠStortford,ĠPerpendicularĠGothicĠarchitecture,ĠGradeĠIĠlistedĠbuilding,Ġflint-knappedĠwalls,Ġstone-trimmedĠwindows,ĠchurchĠspire,Ġchurchyard,Ġgravestones,ĠovercastĠsky,ĠhistoricĠbuilding,ĠmedievalĠarchitecture,ĠplaceĠofĠworship,ĠreligiousĠbuilding,Ġtourism,Ġtravel,Ġheritage,ĠEngland,ĠUK,ĠEurope,ĠChristian,ĠChristianity,Ġfaith,Ġarchitecture,Ġlandmark,Ġold,Ġancient,Ġexterior,Ġcloudy,Ġgrey,Ġbrown,Ġblack,Ġgrass,Ġcemetery,Ġheadstone,Ġtombstone,Ġcross,Ġweathervane,ĠclockĠtower,Ġbattlements,ĠarchedĠwindow,ĠgothicĠwindow,Ġcar,Ġbuilding,Ġspire,Ġtower,Ġreligion,Ġworship,Ġhistoric,Ġheritage,Ġtourism,Ġtravel,Ġovercast,ĠcloudyĠsky,ĠplaceĠofĠworship,ĠreligiousĠbuilding,Ġtourism,Ġtravel,Ġheritage,ĠEngland,ĠUK,ĠEurope,ĠChristian,ĠChristianity,Ġfaith,Ġarchitecture,Ġlandmark,Ġold,Ġancient,Ġexterior,Ġcloudy,Ġgrey,Ġbrown,Ġblack,Ġgrass,Ġcemetery,Ġheadstone,Ġtombstone,Ġcross,Ġweathervane,ĠclockĠtower,Ġbattlements,ĠarchedĠwindow,ĠgothicĠwindow,Ġcar,Ġbuilding,Ġspire,Ġtower,Ġreligion,ĠworshipĊĊContext:ĠTheĠimageĠisĠdescribedĠasĠ',ĠStĠMichael'sĠParishĠChurch,ĠBishop'sĠStortford,ĠEngland,ĠUnitedĠKingdom,ĠUKStĠMichael'sĠParishĠChurchĠinĠBishop'sĠStortford,ĠEngland,ĠisĠpicturedĠhereĠonĠaĠlateĠafternoonĠunderĠaĠcoolĠFebruaryĠsky.ĠThisĠGradeĠIĠlistedĠbuildingĠisĠaĠprominentĠexampleĠofĠPerpendicularĠGothicĠarchitecture,ĠwithĠitsĠcurrentĠstructureĠdatingĠlargelyĠfromĠtheĠearlyĠ15thĠcentury.ĠTheĠphotographĠcapturesĠtheĠintricateĠdetailsĠofĠtheĠchurch'sĠtraditionalĠflint-knappedĠwallsĠandĠstone-trimmedĠwindows,ĠsetĠagainstĠtheĠbackdropĠofĠitsĠhistoricĠchurchyard.ĠTheĠsoft,ĠevenĠlightĠofĠtheĠovercastĠdayĠaccentuatesĠtheĠtexturesĠandĠformidableĠpresenceĠofĠthisĠcenturies-oldĠlandmark.'.
@@ -1240,7 +1240,7 @@ Title:ĠStĠMichael'sĠParishĠChurch,ĠBishop'sĠStortfordĊĊDescription:ĠThe
 
 ### ✅ mlx-community/pixtral-12b-bf16
 
-**Metrics:** 18.7 TPS | 500 tokens
+**Metrics:** 19 TPS | 500 tokens
 
 ```text
 ### Title
@@ -1275,9 +1275,9 @@ St Michael's Parish Church, Bishop's Stortford, British, Christian, Christianity
 
 ---
 
-### ✅ microsoft/Phi-3.5-vision-instruct
+### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
 
-**Metrics:** 12.2 TPS | 500 tokens
+**Metrics:** 12.4 TPS | 500 tokens
 
 ```text
 Title: St Michael's Parish Church in Bishop's Stortford
@@ -1289,9 +1289,9 @@ Keywords: St Michael's Parish Church, Bishop's Stortford, England, United Kingdo
 
 ---
 
-### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
+### ✅ microsoft/Phi-3.5-vision-instruct
 
-**Metrics:** 12 TPS | 500 tokens
+**Metrics:** 12.4 TPS | 500 tokens
 
 ```text
 Title: St Michael's Parish Church in Bishop's Stortford
@@ -1305,7 +1305,7 @@ Keywords: St Michael's Parish Church, Bishop's Stortford, England, United Kingdo
 
 ### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
 
-**Metrics:** 3.82 TPS | 176 tokens
+**Metrics:** 3.9 TPS | 176 tokens
 
 ```text
 **Title:** St. Michael's Parish Church, Bishop's Stortford, England
@@ -1328,7 +1328,7 @@ Keywords: St Michael's Parish Church, Bishop's Stortford, England, United Kingdo
 
 ### ✅ Qwen/Qwen3-VL-2B-Instruct
 
-**Metrics:** 75.2 TPS | 500 tokens
+**Metrics:** 74.9 TPS | 500 tokens
 
 ```text
 Title: St Michael's Church, Bishop's Stortford, England
@@ -1342,7 +1342,7 @@ Keywords: Bishop's Stortford, British, Christian, Christianity, England, English
 
 ### ✅ mlx-community/Qwen3-VL-2B-Thinking-bf16
 
-**Metrics:** 72 TPS | 500 tokens
+**Metrics:** 68.1 TPS | 500 tokens
 
 ```text
 Got it, let's tackle this image cataloguing task. First, I need to follow the structure: Title, Description, Keywords, Context. Wait, the user said "Context" is part of the response, but the instructions say "Respond with exactly these three sections: Title, Description, Keywords, Context". Wait, no, the user says "three sections" but the example shows Title, Description, Keywords, Context. Wait, let me check again.
@@ -1370,7 +1370,7 @@ Keywords: 25–50 comma-separated keywords ordered from most specific to most ge
 
 ### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
 
-**Metrics:** 174 TPS | 500 tokens
+**Metrics:** 176 TPS | 500 tokens
 
 ```text
 Title: St Michael's Parish Church, Bishop's Stortford, England, United Kingdom, UK
@@ -1413,4 +1413,4 @@ Keywords: St Michael's Church, St Michael's Parish Church, Grade I listed buildi
 - `tokenizers`: `0.22.2`
 - `transformers`: `5.1.0`
 
-_Report generated on: 2026-02-13 13:18:47 GMT_
+_Report generated on: 2026-02-13 17:29:46 GMT_
