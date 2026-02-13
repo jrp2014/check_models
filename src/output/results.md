@@ -1,17 +1,17 @@
 # Model Performance Results
 
-_Generated on 2026-02-13 20:21:32 GMT_
+_Generated on 2026-02-13 23:33:19 GMT_
 
 ## 🏆 Performance Highlights
 
-- **Fastest:** `mlx-community/nanoLLaVA-1.5-4bit` (320.7 tps)
+- **Fastest:** `mlx-community/nanoLLaVA-1.5-4bit` (308.4 tps)
 - **💾 Most efficient:** `mlx-community/nanoLLaVA-1.5-4bit` (2.8 GB)
-- **⚡ Fastest load:** `HuggingFaceTB/SmolVLM-Instruct` (0.00s)
-- **📊 Average TPS:** 70.7 across 35 models
+- **⚡ Fastest load:** `HuggingFaceTB/SmolVLM-Instruct` (0.71s)
+- **📊 Average TPS:** 69.8 across 35 models
 
 ## 📈 Resource Usage
 
-- **Total peak memory:** 679.3 GB
+- **Total peak memory:** 679.2 GB
 - **Average peak memory:** 19.4 GB
 - **Memory efficiency:** 189 tokens/GB
 
@@ -50,8 +50,9 @@ _Generated on 2026-02-13 20:21:32 GMT_
 
 ## ⚠️ Quality Issues
 
-- **❌ Failed Models (7):**
+- **❌ Failed Models (8):**
   - `microsoft/Florence-2-large-ft` (`Weight Mismatch`)
+  - `mlx-community/FastVLM-0.5B-bf16` (`Model Error`)
   - `mlx-community/Idefics3-8B-Llama3-bf16` (`Model Error`)
   - `mlx-community/Kimi-VL-A3B-Thinking-8bit` (`Model Error`)
   - `mlx-community/X-Reasoner-7B-8bit` (`OOM`)
@@ -71,11 +72,11 @@ _Generated on 2026-02-13 20:21:32 GMT_
 
 ## 📊 Aggregate Statistics (Successful Runs)
 
-- **Generation Tps**: Avg: 70.7 | Min: 0 | Max: 321
+- **Generation Tps**: Avg: 69.8 | Min: 0 | Max: 308
 - **Peak Memory**: Avg: 19 | Min: 2.8 | Max: 73
-- **Total Time**: Avg: 27.09s | Min: 2.55s | Max: 133.67s
-- **Generation Time**: Avg: 24.05s | Min: 1.65s | Max: 132.36s
-- **Model Load Time**: Avg: 3.04s | Min: 0.90s | Max: 9.18s
+- **Total Time**: Avg: 27.00s | Min: 2.58s | Max: 115.09s
+- **Generation Time**: Avg: 23.97s | Min: 1.66s | Max: 113.78s
+- **Model Load Time**: Avg: 3.03s | Min: 0.71s | Max: 9.89s
 
 ## 🚨 Failures by Package (Actionable)
 
@@ -83,7 +84,7 @@ _Generated on 2026-02-13 20:21:32 GMT_
 
 | Package | Failures | Error Types | Affected Models |
 |---------|----------|-------------|-----------------|
-| `mlx-vlm` | 4 | Model Error, No Chat Template | `mlx-community/Kimi-VL-A3B-Thinking-8bit`, `mlx-community/gemma-3n-E2B-4bit`, `mlx-community/paligemma2-3b-pt-896-4bit`, `prince-canuma/Florence-2-large-ft` |
+| `mlx-vlm` | 5 | Model Error, No Chat Template | `mlx-community/FastVLM-0.5B-bf16`, `mlx-community/Kimi-VL-A3B-Thinking-8bit`, `mlx-community/gemma-3n-E2B-4bit`, `mlx-community/paligemma2-3b-pt-896-4bit`, `prince-canuma/Florence-2-large-ft` |
 | `mlx` | 3 | Model Error, OOM, Weight Mismatch | `microsoft/Florence-2-large-ft`, `mlx-community/Idefics3-8B-Llama3-bf16`, `mlx-community/X-Reasoner-7B-8bit` |
 
 <!-- markdownlint-enable MD060 -->
@@ -92,6 +93,9 @@ _Generated on 2026-02-13 20:21:32 GMT_
 
 #### mlx-vlm
 
+- **mlx-community/FastVLM-0.5B-bf16** (Model Error)
+  - Error: `Model loading failed: No module named 'timm'`
+  - Type: `ValueError`
 - **mlx-community/Kimi-VL-A3B-Thinking-8bit** (Model Error)
   - Error: `Model generation failed for mlx-community/Kimi-VL-A3B-Thinking-8bit: [broadcast_shapes] Shapes (999,2048) and (1,0,20...`
   - Type: `ValueError`
@@ -151,54 +155,55 @@ St Michael's Parish Church in Bishop's Stortford, England, is pictured here on a
 
 **Note:** Results sorted: errors first, then by generation time (fastest to slowest).
 
-**Overall runtime:** 995.74s
+**Overall runtime:** 999.34s
 
 <!-- markdownlint-disable MD013 MD033 MD034 MD037 MD049 -->
 
 | Model Name                                              |   Token |   Prompt (tokens) |   Generation (tokens) |   Total Tokens |   Prompt Tps |   Gen TPS |   Peak (GB) |   Generation (s) |   Load (s) |   Total (s) | Quality Issues                    |   Error Package |
 |:--------------------------------------------------------|--------:|------------------:|----------------------:|---------------:|-------------:|----------:|------------:|-----------------:|-----------:|------------:|:----------------------------------|----------------:|
 | `microsoft/Florence-2-large-ft`                         |         |                   |                       |                |              |           |             |                  |            |             |                                   |             mlx |
+| `mlx-community/FastVLM-0.5B-bf16`                       |         |                   |                       |                |              |           |             |                  |            |             |                                   |         mlx-vlm |
 | `mlx-community/Idefics3-8B-Llama3-bf16`                 |         |                   |                       |                |              |           |             |                  |            |             |                                   |             mlx |
 | `mlx-community/Kimi-VL-A3B-Thinking-8bit`               |         |                   |                       |                |              |           |             |                  |            |             |                                   |         mlx-vlm |
 | `mlx-community/X-Reasoner-7B-8bit`                      |         |                   |                       |                |              |           |             |                  |            |             |                                   |             mlx |
 | `mlx-community/gemma-3n-E2B-4bit`                       |         |                   |                       |                |              |           |             |                  |            |             |                                   |         mlx-vlm |
 | `mlx-community/paligemma2-3b-pt-896-4bit`               |         |                   |                       |                |              |           |             |                  |            |             |                                   |         mlx-vlm |
 | `prince-canuma/Florence-2-large-ft`                     |         |                   |                       |                |              |           |             |                  |            |             |                                   |         mlx-vlm |
-| `mlx-community/LFM2-VL-1.6B-8bit`                       |       7 |               863 |                   281 |          1,144 |        3,009 |       291 |         2.9 |            1.65s |      0.90s |       2.55s |                                   |                 |
-| `mlx-community/LFM2.5-VL-1.6B-bf16`                     |       7 |               863 |                   187 |          1,050 |        3,045 |       178 |         4.0 |            1.68s |      1.07s |       2.75s |                                   |                 |
-| `mlx-community/nanoLLaVA-1.5-4bit`                      | 151,645 |               585 |                   440 |          1,025 |        2,625 |       321 |         2.8 |            1.99s |      0.91s |       2.90s | verbose                           |                 |
-| `qnguyen3/nanoLLaVA`                                    | 151,645 |               585 |                   148 |            733 |        2,477 |      99.2 |         4.9 |            2.12s |      1.05s |       3.17s |                                   |                 |
-| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |  49,279 |             1,692 |                   136 |          1,828 |        1,357 |       112 |         5.5 |            2.79s |      1.23s |       4.03s |                                   |                 |
-| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |             1,609 |                     4 |          1,613 |          498 |      48.8 |          12 |            3.61s |      3.17s |       6.78s | ⚠️harness(prompt_template), ...   |                 |
-| `mlx-community/SmolVLM-Instruct-bf16`                   |  49,154 |             1,792 |                   364 |          2,156 |        1,412 |       110 |         5.5 |            4.92s |      1.32s |       6.24s | verbose                           |                 |
-| `HuggingFaceTB/SmolVLM-Instruct`                        |  49,154 |             1,792 |                   364 |          2,156 |        1,406 |       110 |         5.5 |            4.92s |      1.34s |       6.26s | verbose                           |                 |
-| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |             3,468 |                   307 |          3,775 |          992 |       157 |         9.0 |            5.75s |      1.62s |       7.38s |                                   |                 |
-| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 |     414 |             1,570 |                   500 |          2,070 |          869 |       105 |          18 |            7.05s |      3.32s |      10.37s |                                   |                 |
-| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |             1,609 |                    20 |          1,629 |          477 |      5.24 |          27 |            7.50s |      4.86s |      12.36s | context-ignored                   |                 |
-| `mlx-community/gemma-3n-E4B-it-bf16`                    |     106 |               856 |                   351 |          1,207 |          893 |      41.6 |          17 |            9.71s |      4.83s |      14.54s | context-ignored                   |                 |
-| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          |      11 |             1,570 |                   500 |          2,070 |          903 |      65.7 |          37 |            9.98s |      6.01s |      15.99s |                                   |                 |
-| `mlx-community/deepseek-vl2-8bit`                       |      14 |             2,576 |                   500 |          3,076 |          860 |      59.7 |          32 |           11.82s |      5.36s |      17.18s | repetitive(phrase: "english co... |                 |
-| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      |  93,938 |             1,908 |                   500 |          2,408 |          599 |      47.7 |          60 |           14.37s |      9.18s |      23.55s |                                   |                 |
-| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |             3,022 |                   372 |          3,394 |          315 |      42.2 |          11 |           18.71s |      1.76s |      20.47s |                                   |                 |
-| `mlx-community/pixtral-12b-8bit`                        |  14,543 |             3,704 |                   500 |          4,204 |          543 |      34.5 |          16 |           21.62s |      3.09s |      24.71s | verbose                           |                 |
-| `mlx-community/gemma-3-27b-it-qat-4bit`                 | 236,764 |               856 |                   500 |          1,356 |          195 |      27.5 |          19 |           22.92s |      4.97s |      27.89s | verbose                           |                 |
-| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         |   1,338 |             3,795 |                   500 |          4,295 |          425 |      35.5 |          15 |           23.30s |      3.01s |      26.31s |                                   |                 |
-| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               856 |                   288 |          1,144 |          189 |      15.2 |          34 |           23.73s |      7.05s |      30.78s |                                   |                 |
-| `mlx-community/InternVL3-14B-8bit`                      | 151,645 |             3,904 |                   393 |          4,297 |          403 |      27.6 |          18 |           24.39s |      3.18s |      27.57s | verbose                           |                 |
-| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      | 128,009 |               565 |                   196 |            761 |          166 |      9.29 |          15 |           24.84s |      2.84s |      27.68s |                                   |                 |
-| `mlx-community/GLM-4.6V-Flash-mxfp4`                    |      11 |             6,592 |                   500 |          7,092 |          334 |      62.3 |         8.4 |           28.11s |      2.34s |      30.45s | formatting                        |                 |
-| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         | 235,265 |             1,609 |                   500 |          2,109 |        1,533 |      17.7 |          11 |           29.56s |      2.91s |      32.47s | repetitive(phrase: "the window... |                 |
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |             2,968 |                   464 |          3,432 |          228 |      27.4 |          23 |           30.21s |      3.79s |      34.00s | ⚠️harness(encoding)               |                 |
-| `mlx-community/GLM-4.6V-Flash-6bit`                     |   3,593 |             6,592 |                   500 |          7,092 |          328 |      47.0 |          11 |           31.08s |      2.67s |      33.75s | verbose, formatting               |                 |
-| `mlx-community/pixtral-12b-bf16`                        |  38,188 |             3,704 |                   500 |          4,204 |          572 |      19.4 |          28 |           32.60s |      4.79s |      37.39s | verbose                           |                 |
-| `mlx-community/Molmo-7B-D-0924-8bit`                    |         |               0.0 |                   0.0 |            0.0 |            0 |         0 |          41 |           34.73s |      2.12s |      36.85s |                                   |                 |
-| `mlx-community/Molmo-7B-D-0924-bf16`                    |         |               0.0 |                   0.0 |            0.0 |            0 |         0 |          48 |           35.01s |      3.24s |      38.25s |                                   |                 |
-| `mlx-community/Phi-3.5-vision-instruct-bf16`            |  14,826 |             1,446 |                   500 |          1,946 |        1,008 |      12.2 |          12 |           42.69s |      1.75s |      44.44s | repetitive(phrase: "weather, ...  |                 |
-| `microsoft/Phi-3.5-vision-instruct`                     |  14,826 |             1,446 |                   500 |          1,946 |        1,014 |      12.0 |          12 |           43.32s |      1.75s |      45.07s | repetitive(phrase: "weather, ...  |                 |
-| `meta-llama/Llama-3.2-11B-Vision-Instruct`              | 128,009 |               566 |                   176 |            742 |          158 |      3.85 |          25 |           49.65s |      4.25s |      53.89s |                                   |                 |
-| `Qwen/Qwen3-VL-2B-Instruct`                             |  17,428 |            16,858 |                   500 |         17,358 |          386 |      75.2 |         8.3 |           50.70s |      1.64s |      52.35s | repetitive(phrase: "churchyard... |                 |
-| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |      11 |            16,860 |                   500 |         17,360 |          372 |      73.5 |         8.3 |           52.47s |      1.70s |      54.17s |                                   |                 |
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               |      11 |            16,869 |                   500 |         17,369 |          131 |       182 |          73 |          132.36s |      1.31s |     133.67s | repetitive(phrase: "travel pho... |                 |
+| `mlx-community/LFM2-VL-1.6B-8bit`                       |       7 |               863 |                   281 |          1,144 |        2,998 |       289 |         2.9 |            1.66s |      0.92s |       2.58s |                                   |                 |
+| `mlx-community/LFM2.5-VL-1.6B-bf16`                     |       7 |               863 |                   187 |          1,050 |        3,059 |       178 |         4.0 |            1.67s |      1.06s |       2.73s |                                   |                 |
+| `mlx-community/nanoLLaVA-1.5-4bit`                      | 151,645 |               585 |                   440 |          1,025 |        2,762 |       308 |         2.8 |            2.02s |      0.91s |       2.94s | verbose                           |                 |
+| `qnguyen3/nanoLLaVA`                                    | 151,645 |               585 |                   148 |            733 |        2,527 |      98.9 |         4.9 |            2.12s |      1.04s |       3.16s |                                   |                 |
+| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |  49,279 |             1,692 |                   136 |          1,828 |        1,199 |       110 |         5.5 |            2.98s |      1.26s |       4.25s |                                   |                 |
+| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |             1,609 |                     4 |          1,613 |          500 |      48.8 |          12 |            3.60s |      3.20s |       6.79s | ⚠️harness(prompt_template), ...   |                 |
+| `HuggingFaceTB/SmolVLM-Instruct`                        |  49,154 |             1,792 |                   364 |          2,156 |        1,413 |       110 |         5.5 |            4.91s |      0.71s |       5.62s | verbose                           |                 |
+| `mlx-community/SmolVLM-Instruct-bf16`                   |  49,154 |             1,792 |                   364 |          2,156 |        1,308 |       108 |         5.5 |            5.06s |      1.25s |       6.31s | verbose                           |                 |
+| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |             3,468 |                   307 |          3,775 |        1,000 |       158 |         9.0 |            5.71s |      1.64s |       7.35s |                                   |                 |
+| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 |     414 |             1,570 |                   500 |          2,070 |          866 |       105 |          18 |            7.05s |      3.35s |      10.40s |                                   |                 |
+| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |             1,609 |                    20 |          1,629 |          442 |      4.89 |          27 |            8.10s |      4.89s |      13.00s | context-ignored                   |                 |
+| `mlx-community/gemma-3n-E4B-it-bf16`                    |     106 |               856 |                   351 |          1,207 |          897 |      41.0 |          17 |            9.82s |      4.82s |      14.64s | context-ignored                   |                 |
+| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          |      11 |             1,570 |                   500 |          2,070 |          863 |      65.0 |          37 |           10.15s |      5.94s |      16.09s |                                   |                 |
+| `mlx-community/deepseek-vl2-8bit`                       |      14 |             2,576 |                   500 |          3,076 |          867 |      59.2 |          32 |           11.86s |      5.25s |      17.11s | repetitive(phrase: "english co... |                 |
+| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      |  93,938 |             1,908 |                   500 |          2,408 |          472 |      48.1 |          60 |           15.13s |      9.89s |      25.02s |                                   |                 |
+| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |             3,022 |                   372 |          3,394 |          271 |      42.1 |          11 |           20.29s |      1.79s |      22.08s |                                   |                 |
+| `mlx-community/pixtral-12b-8bit`                        |  14,543 |             3,704 |                   500 |          4,204 |          554 |      34.2 |          16 |           21.61s |      3.09s |      24.71s | verbose                           |                 |
+| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         |   1,338 |             3,795 |                   500 |          4,295 |          427 |      36.2 |          15 |           23.00s |      3.05s |      26.05s |                                   |                 |
+| `mlx-community/gemma-3-27b-it-qat-4bit`                 | 236,764 |               856 |                   500 |          1,356 |          195 |      26.4 |          19 |           23.63s |      4.93s |      28.56s | verbose                           |                 |
+| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               856 |                   288 |          1,144 |          189 |      15.0 |          34 |           23.98s |      6.99s |      30.97s |                                   |                 |
+| `mlx-community/InternVL3-14B-8bit`                      | 151,645 |             3,904 |                   393 |          4,297 |          405 |      27.7 |          18 |           24.31s |      3.17s |      27.48s | verbose                           |                 |
+| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      | 128,009 |               565 |                   196 |            761 |          145 |      8.62 |          15 |           26.95s |      2.80s |      29.75s |                                   |                 |
+| `mlx-community/GLM-4.6V-Flash-mxfp4`                    |      11 |             6,592 |                   500 |          7,092 |          326 |      63.0 |         8.4 |           28.50s |      2.32s |      30.82s | formatting                        |                 |
+| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         | 235,265 |             1,609 |                   500 |          2,109 |        1,514 |      17.7 |          11 |           29.61s |      2.95s |      32.57s | repetitive(phrase: "the window... |                 |
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |             2,968 |                   464 |          3,432 |          235 |      27.6 |          23 |           29.74s |      3.78s |      33.53s | ⚠️harness(encoding)               |                 |
+| `mlx-community/GLM-4.6V-Flash-6bit`                     |   3,593 |             6,592 |                   500 |          7,092 |          313 |      47.3 |          11 |           31.96s |      2.59s |      34.56s | verbose, formatting               |                 |
+| `mlx-community/pixtral-12b-bf16`                        |  38,188 |             3,704 |                   500 |          4,204 |          574 |      19.3 |          28 |           32.71s |      4.80s |      37.51s | verbose                           |                 |
+| `mlx-community/Molmo-7B-D-0924-bf16`                    |         |               0.0 |                   0.0 |            0.0 |            0 |         0 |          48 |           35.51s |      3.26s |      38.77s |                                   |                 |
+| `mlx-community/Molmo-7B-D-0924-8bit`                    |         |               0.0 |                   0.0 |            0.0 |            0 |         0 |          41 |           35.52s |      2.14s |      37.66s |                                   |                 |
+| `mlx-community/Phi-3.5-vision-instruct-bf16`            |  14,826 |             1,446 |                   500 |          1,946 |        1,025 |      12.2 |          12 |           42.65s |      1.73s |      44.38s | repetitive(phrase: "weather, ...  |                 |
+| `microsoft/Phi-3.5-vision-instruct`                     |  14,826 |             1,446 |                   500 |          1,946 |        1,031 |      12.2 |          12 |           42.80s |      1.70s |      44.50s | repetitive(phrase: "weather, ...  |                 |
+| `meta-llama/Llama-3.2-11B-Vision-Instruct`              | 128,009 |               566 |                   176 |            742 |          159 |      3.87 |          25 |           49.30s |      4.20s |      53.50s |                                   |                 |
+| `Qwen/Qwen3-VL-2B-Instruct`                             |  17,428 |            16,858 |                   500 |         17,358 |          387 |      74.9 |         8.3 |           50.60s |      1.58s |      52.18s | repetitive(phrase: "churchyard... |                 |
+| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |      11 |            16,860 |                   500 |         17,360 |          318 |      69.8 |         8.3 |           60.64s |      1.74s |      62.38s |                                   |                 |
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               |      11 |            16,869 |                   500 |         17,369 |          153 |       170 |          73 |          113.78s |      1.31s |     115.09s | repetitive(phrase: "travel pho... |                 |
 
 <!-- markdownlint-enable MD013 MD033 MD034 MD037 MD049 -->
 
@@ -222,10 +227,10 @@ language_model.lm_head.weight.
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 6889, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7578, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 6855, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7544, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -248,17 +253,96 @@ language_model.lm_head.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7000, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7727, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
         ^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 6897, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7586, in _run_model_generation
     raise ValueError(error_details) from load_err
 ValueError: Model loading failed: Missing 1 parameters:
 language_model.lm_head.weight.
+```
+
+</details>
+
+---
+
+### ❌ mlx-community/FastVLM-0.5B-bf16
+
+**Status:** Failed (Model Error)
+**Error:** Model loading failed: No module named 'timm'
+**Type:** `ValueError`
+**Package:** `mlx-vlm`
+
+<details>
+<summary>Full Traceback (click to expand)</summary>
+
+```python
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7578, in _run_model_generation
+    model, processor, config = _load_model(params)
+                               ~~~~~~~~~~~^^^^^^^^
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7544, in _load_model
+    model, processor = load(
+                       ~~~~^
+        path_or_hf_repo=params.model_identifier,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        trust_remote_code=params.trust_remote_code,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 405, in load
+    processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 478, in load_processor
+    processor = AutoProcessor.from_pretrained(model_path, use_fast=True, **kwargs)
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/phi3_v/processing_phi3_v.py", line 699, in _patched_auto_processor_from_pretrained
+    return _original_auto_processor_from_pretrained.__func__(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        cls, pretrained_model_name_or_path, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/kimi_vl/processing_kimi_vl.py", line 555, in _patched_auto_processor_from_pretrained
+    return _original_auto_processor_from_pretrained.__func__(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        cls, pretrained_model_name_or_path, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py", line 389, in from_pretrained
+    processor_class = get_class_from_dynamic_module(
+        processor_auto_map, pretrained_model_name_or_path, **kwargs
+    )
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 583, in get_class_from_dynamic_module
+    return get_class_in_module(class_name, final_module, force_reload=force_download)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/dynamic_module_utils.py", line 309, in get_class_in_module
+    module_spec.loader.exec_module(module)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 1027, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/Users/jrp/.cache/huggingface/modules/transformers_modules/_81ffe929046666c43de53691147b1669ba0f3a4c/processing_fastvlm.py", line 9, in <module>
+    from .llava_qwen import IMAGE_TOKEN_INDEX, DEFAULT_IMAGE_TOKEN
+  File "/Users/jrp/.cache/huggingface/modules/transformers_modules/_81ffe929046666c43de53691147b1669ba0f3a4c/llava_qwen.py", line 20, in <module>
+    from timm.models import create_model
+ModuleNotFoundError: No module named 'timm'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7727, in process_image_with_model
+    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
+                                                          ~~~~~~~~~~~~~~~~~~~~~^
+        params=params,
+        ^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7586, in _run_model_generation
+    raise ValueError(error_details) from load_err
+ValueError: Model loading failed: No module named 'timm'
 ```
 
 </details>
@@ -280,10 +364,10 @@ language_model.lm_head.weight.
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 6889, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7578, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 6855, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7544, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -307,14 +391,14 @@ ValueError: Expected shape (4096, 4096) but received shape (1024, 4096) for para
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7000, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7727, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
         ^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 6897, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7586, in _run_model_generation
     raise ValueError(error_details) from load_err
 ValueError: Model loading failed: Expected shape (4096, 4096) but received shape (1024, 4096) for parameter language_model.layers.0.self_attn.k_proj.weight
 ```
@@ -338,7 +422,7 @@ ValueError: Model loading failed: Expected shape (4096, 4096) but received shape
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 6927, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7616, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -374,14 +458,14 @@ ValueError: [broadcast_shapes] Shapes (999,2048) and (1,0,2048) cannot be broadc
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7000, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7727, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
         ^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 6952, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7641, in _run_model_generation
     raise ValueError(msg) from gen_known_err
 ValueError: Model generation failed for mlx-community/Kimi-VL-A3B-Thinking-8bit: [broadcast_shapes] Shapes (999,2048) and (1,0,2048) cannot be broadcast.
 ```
@@ -406,7 +490,7 @@ ValueError: Model generation failed for mlx-community/Kimi-VL-A3B-Thinking-8bit:
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 6927, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7616, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -434,14 +518,14 @@ RuntimeError: [metal::malloc] Attempting to allocate 135699660800 bytes which is
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7000, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7727, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
         ^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 6957, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7646, in _run_model_generation
     raise ValueError(msg) from gen_err
 ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 135699660800 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
 ```
@@ -468,14 +552,14 @@ ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7000, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7727, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
         ^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 6901, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7590, in _run_model_generation
     formatted_prompt: str | list[Any] = apply_chat_template(
                                         ~~~~~~~~~~~~~~~~~~~^
         processor=processor,
@@ -526,7 +610,7 @@ ValueError: Cannot use chat template functions because tokenizer.chat_template i
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 6927, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7616, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -570,14 +654,14 @@ ValueError: [broadcast_shapes] Shapes (1,4,2,2048,4096) and (2048,2048) cannot b
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7000, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7727, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
         ^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 6952, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7641, in _run_model_generation
     raise ValueError(msg) from gen_known_err
 ValueError: Model generation failed for mlx-community/paligemma2-3b-pt-896-4bit: [broadcast_shapes] Shapes (1,4,2,2048,4096) and (2048,2048) cannot be broadcast.
 ```
@@ -601,10 +685,10 @@ ValueError: Model generation failed for mlx-community/paligemma2-3b-pt-896-4bit:
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 6889, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7578, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 6855, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7544, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -661,14 +745,14 @@ AttributeError: RobertaTokenizer has no attribute additional_special_tokens. Did
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7000, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7727, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
         ^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 6897, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7586, in _run_model_generation
     raise ValueError(error_details) from load_err
 ValueError: Model loading failed: RobertaTokenizer has no attribute additional_special_tokens
 ```
@@ -679,7 +763,7 @@ ValueError: Model loading failed: RobertaTokenizer has no attribute additional_s
 
 ### ✅ mlx-community/LFM2-VL-1.6B-8bit
 
-**Metrics:** 291 TPS | 281 tokens
+**Metrics:** 289 TPS | 281 tokens
 
 ```text
 Title: St Michael's Parish Church, Bishop's Stortford, England
@@ -707,7 +791,7 @@ Keywords: St Michael's Parish Church, Bishop's Stortford, England, Perpendicular
 
 ### ✅ mlx-community/nanoLLaVA-1.5-4bit
 
-**Metrics:** 321 TPS | 440 tokens
+**Metrics:** 308 TPS | 440 tokens
 
 ```text
 Title: A concise, descriptive title (5–12 words).
@@ -733,7 +817,7 @@ Existing keywords: Bishop's Stortford, British, Christianity, England, English C
 
 ### ✅ qnguyen3/nanoLLaVA
 
-**Metrics:** 99.2 TPS | 148 tokens
+**Metrics:** 98.9 TPS | 148 tokens
 
 ```text
 The image portrays a serene, late afternoon scene at St Michael's Parish Church in Bishop's Stortford, England. The church is a prominent example of Perpendicular Gothic architecture, with its current structure dating largely from the early 15th century. The image captures the intricate details of the church's traditional flint-knapped walls and stone-dressed windows, set against the backdrop of its historic churchyard. The soft, even light of the overcast day accentuates the textures and formidable presence of this centuries-old landmark. The image is taken on 2026-02-07 16:11:23 GMT (at 16:11:23 local time).
@@ -743,7 +827,7 @@ The image portrays a serene, late afternoon scene at St Michael's Parish Church 
 
 ### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
 
-**Metrics:** 112 TPS | 136 tokens
+**Metrics:** 110 TPS | 136 tokens
 
 ```text
  Title: St Michael's Parish Church, Bishop's Stortford, England, United Kingdom, UK
@@ -758,28 +842,6 @@ St Michael's Parish Church in Bishop's Stortford, England, is pictured here on a
 
 ```text
 Be concise.
-```
-
----
-
-### ✅ mlx-community/SmolVLM-Instruct-bf16
-
-**Metrics:** 110 TPS | 364 tokens
-
-```text
- Image Description:
-
-The image depicts St Michael's Parish Church, a prominent example of Perpendicular Gothic architecture, located in Bishop's Stortford, England. The church is a Grade I listed building, indicating its historical and architectural significance. The photograph captures the intricate details of the church's traditional flint-knapped walls and stone-dressed windows, set against the backdrop of its historic churchyard.
-
-The church's exterior is characterized by its flint-knapped walls and stone-dressed windows, which are typical of the Perpendicular Gothic architectural style. The windows are tall and narrow, with pointed arches and stained glass, which adds to the church's Gothic aesthetic. The church's exterior is also adorned with battlements, which are characteristic of medieval defensive architecture.
-
-The churchyard is expansive and well-maintained, with a variety of gravestones and headstones, indicating the church's long history and the presence of numerous burials. The churchyard is a serene and peaceful setting, with a few trees and shrubs adding to the natural beauty of the scene.
-
-The church's spire, which is visible in the background, is a prominent feature of the church's architecture. The spire is tall and pointed, with a distinctive design that is characteristic of Gothic architecture. The spire is topped with a weathervane, which is used to indicate the wind direction.
-
-The image is taken from a slightly elevated angle, providing a clear view of the church's exterior and the churchyard. The lighting is soft and even, which accentuates the textures and details of the church's architecture.
-
-In summary, the image captures the historical and architectural significance of St Michael's Parish Church, showcasing its Gothic style and the serene and peaceful atmosphere of its churchyard.
 ```
 
 ---
@@ -806,9 +868,31 @@ In summary, the image captures the historical and architectural significance of 
 
 ---
 
+### ✅ mlx-community/SmolVLM-Instruct-bf16
+
+**Metrics:** 108 TPS | 364 tokens
+
+```text
+ Image Description:
+
+The image depicts St Michael's Parish Church, a prominent example of Perpendicular Gothic architecture, located in Bishop's Stortford, England. The church is a Grade I listed building, indicating its historical and architectural significance. The photograph captures the intricate details of the church's traditional flint-knapped walls and stone-dressed windows, set against the backdrop of its historic churchyard.
+
+The church's exterior is characterized by its flint-knapped walls and stone-dressed windows, which are typical of the Perpendicular Gothic architectural style. The windows are tall and narrow, with pointed arches and stained glass, which adds to the church's Gothic aesthetic. The church's exterior is also adorned with battlements, which are characteristic of medieval defensive architecture.
+
+The churchyard is expansive and well-maintained, with a variety of gravestones and headstones, indicating the church's long history and the presence of numerous burials. The churchyard is a serene and peaceful setting, with a few trees and shrubs adding to the natural beauty of the scene.
+
+The church's spire, which is visible in the background, is a prominent feature of the church's architecture. The spire is tall and pointed, with a distinctive design that is characteristic of Gothic architecture. The spire is topped with a weathervane, which is used to indicate the wind direction.
+
+The image is taken from a slightly elevated angle, providing a clear view of the church's exterior and the churchyard. The lighting is soft and even, which accentuates the textures and details of the church's architecture.
+
+In summary, the image captures the historical and architectural significance of St Michael's Parish Church, showcasing its Gothic style and the serene and peaceful atmosphere of its churchyard.
+```
+
+---
+
 ### ✅ mlx-community/Ministral-3-3B-Instruct-2512-4bit
 
-**Metrics:** 157 TPS | 307 tokens
+**Metrics:** 158 TPS | 307 tokens
 
 ```text
 Title: **Historic Perpendicular Gothic Church with Stone Battlements**
@@ -846,7 +930,7 @@ Keywords: Need to list 25-50 keywords. Let's go through the existing ones and ad
 
 ### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
 
-**Metrics:** 5.24 TPS | 20 tokens
+**Metrics:** 4.89 TPS | 20 tokens
 
 ```text
 Be specific about visual content. Include relevant geographic and temporal keywords where clearly supported by the image.
@@ -856,7 +940,7 @@ Be specific about visual content. Include relevant geographic and temporal keywo
 
 ### ✅ mlx-community/gemma-3n-E4B-it-bf16
 
-**Metrics:** 41.6 TPS | 351 tokens
+**Metrics:** 41 TPS | 351 tokens
 
 ```text
 ## Image Description: St. Michael's Church, Billericay
@@ -883,7 +967,7 @@ Be specific about visual content. Include relevant geographic and temporal keywo
 
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
 
-**Metrics:** 65.7 TPS | 500 tokens
+**Metrics:** 65 TPS | 500 tokens
 
 ```text
 ◁think▷Got it, let's tackle this. First, I need to create a title, description, and keywords for the image of St Michael's Parish Church in Bishop's Stortford, England.
@@ -903,7 +987,7 @@ Wait, need to check the existing keywords provided. The existing ones include Bi
 
 ### ✅ mlx-community/deepseek-vl2-8bit
 
-**Metrics:** 59.7 TPS | 500 tokens
+**Metrics:** 59.2 TPS | 500 tokens
 
 ```text
 **Title:** A Stunning View of St. Michael's Church in Bishop's Stortford, UK
@@ -917,7 +1001,7 @@ Wait, need to check the existing keywords provided. The existing ones include Bi
 
 ### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
 
-**Metrics:** 47.7 TPS | 500 tokens
+**Metrics:** 48.1 TPS | 500 tokens
 
 ```text
 Let's tackle this. First, the title needs to be concise. The image is of St Michael's Parish Church in Bishop's Stortford, England. So maybe "St Michael's Parish Church, Bishop's Stortford, England" – that's 7 words, fits the range.
@@ -933,7 +1017,7 @@ Most specific: St Michael's Parish Church, Bishop's Stortford, England, UK, Grad
 
 ### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
 
-**Metrics:** 42.2 TPS | 372 tokens
+**Metrics:** 42.1 TPS | 372 tokens
 
 ```text
 Title: St Michael's Parish Church, Bishop's Stortford, England, United Kingdom, UK
@@ -949,7 +1033,7 @@ Context: The image is described as 'St Michael's Parish Church in Bishop's Stort
 
 ### ✅ mlx-community/pixtral-12b-8bit
 
-**Metrics:** 34.5 TPS | 500 tokens
+**Metrics:** 34.2 TPS | 500 tokens
 
 ```text
 ### Title
@@ -964,25 +1048,9 @@ St Michael's Parish Church, Bishop's Stortford, British, Christian, Christianity
 
 ---
 
-### ✅ mlx-community/gemma-3-27b-it-qat-4bit
-
-**Metrics:** 27.5 TPS | 500 tokens
-
-```text
-## Title: St Michael's Parish Church, Bishop's Stortford, England – February Afternoon
-
-## Description:
-This photograph depicts the exterior of St Michael's Parish Church in Bishop's Stortford, England, a Grade I listed building showcasing Perpendicular Gothic architecture. The church is framed by a historic churchyard with numerous gravestones, and is photographed under a cloudy, overcast sky. The image highlights the church’s flint-knapped walls, arched windows, and prominent spire.
-
-## Keywords:
-St Michael's Parish Church, Bishop's Stortford, Hertfordshire, England, UK, United Kingdom, Perpendicular Gothic, flint knapped wall, arched window, church spire, churchyard, gravestones, headstones, tombstone, medieval architecture, historic building, landmark, place of worship, religious building, church, exterior, overcast sky, cloudy sky, grey tones, stone wall, spire, clock tower, weathervane, cross, gothic window, church architecture, British architecture, European architecture, heritage, tourism, travel, photography, architectural detail, religious site, place of interest, cultural heritage, history, ancient, solemn, peaceful, quiet, overcast light, February, winter, afternoon, wide-angle, exterior view, stone masonry, building facade, cultural landmark, religious art, religious monument, textured wall, stone structure, landmark architecture, religious institution, historical site, cultural tourism, architectural photography, religious building exterior, stone detailing, gothic style, religious practice, cultural preservation, stone texture, architectural design, religious history, stone construction, cultural identity, religious symbol, stone craftsmanship, architectural heritage, religious tradition, stone architecture, cultural significance, religious community, stone building, cultural expression, religious belief, stone work, cultural value, religious experience, stone feature, cultural context, religious influence, stone element, cultural impact, religious legacy, stone material, cultural asset, religious impact, stone surface, cultural resource, religious influence, stone composition, cultural element, religious foundation, stone form, cultural artifact, religious structure, stone pattern, cultural object, religious practice, stone design, cultural symbol, religious institution, stone element, cultural expression, stone feature, cultural context, stone composition, stone pattern, stone texture, stone work, stone surface, stone material, stone form, stone detailing, stone construction, stone masonry, stone architecture, stone building, stone feature, stone element, stone composition, stone pattern,
-```
-
----
-
 ### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
 
-**Metrics:** 35.5 TPS | 500 tokens
+**Metrics:** 36.2 TPS | 500 tokens
 
 ```text
 Here are my reasoning steps:
@@ -1005,9 +1073,25 @@ That's 3 sentences, factual.
 
 ---
 
+### ✅ mlx-community/gemma-3-27b-it-qat-4bit
+
+**Metrics:** 26.4 TPS | 500 tokens
+
+```text
+## Title: St Michael's Parish Church, Bishop's Stortford, England – February Afternoon
+
+## Description:
+This photograph depicts the exterior of St Michael's Parish Church in Bishop's Stortford, England, a Grade I listed building showcasing Perpendicular Gothic architecture. The church is framed by a historic churchyard with numerous gravestones, and is photographed under a cloudy, overcast sky. The image highlights the church’s flint-knapped walls, arched windows, and prominent spire.
+
+## Keywords:
+St Michael's Parish Church, Bishop's Stortford, Hertfordshire, England, UK, United Kingdom, Perpendicular Gothic, flint knapped wall, arched window, church spire, churchyard, gravestones, headstones, tombstone, medieval architecture, historic building, landmark, place of worship, religious building, church, exterior, overcast sky, cloudy sky, grey tones, stone wall, spire, clock tower, weathervane, cross, gothic window, church architecture, British architecture, European architecture, heritage, tourism, travel, photography, architectural detail, religious site, place of interest, cultural heritage, history, ancient, solemn, peaceful, quiet, overcast light, February, winter, afternoon, wide-angle, exterior view, stone masonry, building facade, cultural landmark, religious art, religious monument, textured wall, stone structure, landmark architecture, religious institution, historical site, cultural tourism, architectural photography, religious building exterior, stone detailing, gothic style, religious practice, cultural preservation, stone texture, architectural design, religious history, stone construction, cultural identity, religious symbol, stone craftsmanship, architectural heritage, religious tradition, stone architecture, cultural significance, religious community, stone building, cultural expression, religious belief, stone work, cultural value, religious experience, stone feature, cultural context, religious influence, stone element, cultural impact, religious legacy, stone material, cultural asset, religious impact, stone surface, cultural resource, religious influence, stone composition, cultural element, religious foundation, stone form, cultural artifact, religious structure, stone pattern, cultural object, religious practice, stone design, cultural symbol, religious institution, stone element, cultural expression, stone feature, cultural context, stone composition, stone pattern, stone texture, stone work, stone surface, stone material, stone form, stone detailing, stone construction, stone masonry, stone architecture, stone building, stone feature, stone element, stone composition, stone pattern,
+```
+
+---
+
 ### ✅ mlx-community/gemma-3-27b-it-qat-8bit
 
-**Metrics:** 15.2 TPS | 288 tokens
+**Metrics:** 15 TPS | 288 tokens
 
 ```text
 **Title:** St Michael's Parish Church, Bishop's Stortford, England – February Afternoon
@@ -1021,7 +1105,7 @@ That's 3 sentences, factual.
 
 ### ✅ mlx-community/InternVL3-14B-8bit
 
-**Metrics:** 27.6 TPS | 393 tokens
+**Metrics:** 27.7 TPS | 393 tokens
 
 ```text
 Title: Gothic Church with Battlements and Graveyard
@@ -1037,7 +1121,7 @@ Context: The image is described as 'St Michael's Parish Church, Bishop's Stortfo
 
 ### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
-**Metrics:** 9.29 TPS | 196 tokens
+**Metrics:** 8.62 TPS | 196 tokens
 
 ```text
 **Title:** St Michael's Parish Church, Bishop's Stortford, England
@@ -1061,7 +1145,7 @@ Context: The image is described as 'St Michael's Parish Church, Bishop's Stortfo
 
 ### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
 
-**Metrics:** 62.3 TPS | 500 tokens
+**Metrics:** 63 TPS | 500 tokens
 
 ```text
 <think>Got it, let's tackle this. The user wants structured metadata for image cataloging. First, I need to extract the Title, Description, and Keywords based on the provided context.
@@ -1089,7 +1173,7 @@ A low-angle, three-quarters view of the side of St Michael's Parish Church in Bi
 
 ### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
 
-**Metrics:** 27.4 TPS | 464 tokens
+**Metrics:** 27.6 TPS | 464 tokens
 
 ```text
 Title:ĠStĠMichael'sĠParishĠChurch,ĠBishop'sĠStortfordĊĊDescription:ĠTheĠimageĠshowsĠStĠMichael'sĠParishĠChurchĠinĠBishop'sĠStortford,ĠEngland,ĠaĠhistoricĠGradeĠIĠlistedĠbuildingĠfeaturingĠPerpendicularĠGothicĠarchitecture.ĠTheĠchurch'sĠflint-knappedĠwallsĠandĠstone-trimmedĠwindowsĠareĠprominentlyĠdisplayed,ĠsetĠagainstĠanĠovercastĠsky.ĊĊKeywords:ĠStĠMichael'sĠParishĠChurch,ĠBishop'sĠStortford,ĠPerpendicularĠGothicĠarchitecture,ĠGradeĠIĠlistedĠbuilding,Ġflint-knappedĠwalls,Ġstone-trimmedĠwindows,ĠchurchĠspire,Ġchurchyard,Ġgravestones,ĠovercastĠsky,ĠhistoricĠbuilding,ĠmedievalĠarchitecture,ĠplaceĠofĠworship,ĠreligiousĠbuilding,Ġtourism,Ġtravel,Ġheritage,ĠEngland,ĠUK,ĠEurope,ĠChristian,ĠChristianity,Ġfaith,Ġarchitecture,Ġlandmark,Ġold,Ġancient,Ġexterior,Ġcloudy,Ġgrey,Ġbrown,Ġblack,Ġgrass,Ġcemetery,Ġheadstone,Ġtombstone,Ġcross,Ġweathervane,ĠclockĠtower,Ġbattlements,ĠarchedĠwindow,ĠgothicĠwindow,Ġcar,Ġbuilding,Ġspire,Ġtower,Ġreligion,Ġworship,Ġhistoric,Ġheritage,Ġtourism,Ġtravel,Ġovercast,ĠcloudyĠsky,ĠplaceĠofĠworship,ĠreligiousĠbuilding,Ġtourism,Ġtravel,Ġheritage,ĠEngland,ĠUK,ĠEurope,ĠChristian,ĠChristianity,Ġfaith,Ġarchitecture,Ġlandmark,Ġold,Ġancient,Ġexterior,Ġcloudy,Ġgrey,Ġbrown,Ġblack,Ġgrass,Ġcemetery,Ġheadstone,Ġtombstone,Ġcross,Ġweathervane,ĠclockĠtower,Ġbattlements,ĠarchedĠwindow,ĠgothicĠwindow,Ġcar,Ġbuilding,Ġspire,Ġtower,Ġreligion,ĠworshipĊĊContext:ĠTheĠimageĠisĠdescribedĠasĠ',ĠStĠMichael'sĠParishĠChurch,ĠBishop'sĠStortford,ĠEngland,ĠUnitedĠKingdom,ĠUKStĠMichael'sĠParishĠChurchĠinĠBishop'sĠStortford,ĠEngland,ĠisĠpicturedĠhereĠonĠaĠlateĠafternoonĠunderĠaĠcoolĠFebruaryĠsky.ĠThisĠGradeĠIĠlistedĠbuildingĠisĠaĠprominentĠexampleĠofĠPerpendicularĠGothicĠarchitecture,ĠwithĠitsĠcurrentĠstructureĠdatingĠlargelyĠfromĠtheĠearlyĠ15thĠcentury.ĠTheĠphotographĠcapturesĠtheĠintricateĠdetailsĠofĠtheĠchurch'sĠtraditionalĠflint-knappedĠwallsĠandĠstone-trimmedĠwindows,ĠsetĠagainstĠtheĠbackdropĠofĠitsĠhistoricĠchurchyard.ĠTheĠsoft,ĠevenĠlightĠofĠtheĠovercastĠdayĠaccentuatesĠtheĠtexturesĠandĠformidableĠpresenceĠofĠthisĠcenturies-oldĠlandmark.'.
@@ -1099,7 +1183,7 @@ Title:ĠStĠMichael'sĠParishĠChurch,ĠBishop'sĠStortfordĊĊDescription:ĠThe
 
 ### ✅ mlx-community/GLM-4.6V-Flash-6bit
 
-**Metrics:** 47 TPS | 500 tokens
+**Metrics:** 47.3 TPS | 500 tokens
 
 ```text
 <think>Got it, let's tackle this. First, the title needs to be concise, 5-12 words. Looking at the image, it's St Michael's Parish Church in Bishop's Stortford. So maybe "St Michael's Parish Church, Bishop's Stortford".
@@ -1131,7 +1215,7 @@ Visual style: wide-angle (since it's a large building, wide-angle to capture the
 
 ### ✅ mlx-community/pixtral-12b-bf16
 
-**Metrics:** 19.4 TPS | 500 tokens
+**Metrics:** 19.3 TPS | 500 tokens
 
 ```text
 ### Title
@@ -1146,7 +1230,7 @@ St Michael's Parish Church, Bishop's Stortford, British, Christian, Christianity
 
 ---
 
-### ✅ mlx-community/Molmo-7B-D-0924-8bit
+### ✅ mlx-community/Molmo-7B-D-0924-bf16
 
 **Metrics:** 0.0 TPS | 0 tokens
 
@@ -1156,7 +1240,7 @@ St Michael's Parish Church, Bishop's Stortford, British, Christian, Christianity
 
 ---
 
-### ✅ mlx-community/Molmo-7B-D-0924-bf16
+### ✅ mlx-community/Molmo-7B-D-0924-8bit
 
 **Metrics:** 0.0 TPS | 0 tokens
 
@@ -1182,7 +1266,7 @@ Keywords: St Michael's Parish Church, Bishop's Stortford, England, United Kingdo
 
 ### ✅ microsoft/Phi-3.5-vision-instruct
 
-**Metrics:** 12 TPS | 500 tokens
+**Metrics:** 12.2 TPS | 500 tokens
 
 ```text
 Title: St Michael's Parish Church in Bishop's Stortford
@@ -1196,7 +1280,7 @@ Keywords: St Michael's Parish Church, Bishop's Stortford, England, United Kingdo
 
 ### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
 
-**Metrics:** 3.85 TPS | 176 tokens
+**Metrics:** 3.87 TPS | 176 tokens
 
 ```text
 **Title:** St. Michael's Parish Church, Bishop's Stortford, England
@@ -1219,7 +1303,7 @@ Keywords: St Michael's Parish Church, Bishop's Stortford, England, United Kingdo
 
 ### ✅ Qwen/Qwen3-VL-2B-Instruct
 
-**Metrics:** 75.2 TPS | 500 tokens
+**Metrics:** 74.9 TPS | 500 tokens
 
 ```text
 Title: St Michael's Church, Bishop's Stortford, England
@@ -1233,7 +1317,7 @@ Keywords: Bishop's Stortford, British, Christian, Christianity, England, English
 
 ### ✅ mlx-community/Qwen3-VL-2B-Thinking-bf16
 
-**Metrics:** 73.5 TPS | 500 tokens
+**Metrics:** 69.8 TPS | 500 tokens
 
 ```text
 Got it, let's tackle this image cataloguing task. First, I need to follow the structure: Title, Description, Keywords, Context. Wait, the user said "Context" is part of the response, but the instructions say "Respond with exactly these three sections: Title, Description, Keywords, Context". Wait, no, the user says "three sections" but the example shows Title, Description, Keywords, Context. Wait, let me check again.
@@ -1261,7 +1345,7 @@ Keywords: 25–50 comma-separated keywords ordered from most specific to most ge
 
 ### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
 
-**Metrics:** 182 TPS | 500 tokens
+**Metrics:** 170 TPS | 500 tokens
 
 ```text
 Title: St Michael's Parish Church, Bishop's Stortford, England, United Kingdom, UK
@@ -1304,4 +1388,4 @@ Keywords: St Michael's Church, St Michael's Parish Church, Grade I listed buildi
 - `tokenizers`: `0.22.2`
 - `transformers`: `5.1.0`
 
-_Report generated on: 2026-02-13 20:21:32 GMT_
+_Report generated on: 2026-02-13 23:33:19 GMT_

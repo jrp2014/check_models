@@ -2183,12 +2183,12 @@ def _detect_language_mixing(
 
 
 def _detect_output_degeneration(text: str) -> tuple[bool, str | None]:
-    """Detect end-of-output degeneration (garbage/nonsense at the end).
+    """Detect end-of-output degeneration (rubbish/nonsense at the end).
 
     LLMs sometimes fail to stop properly and produce:
     - Repeated special characters or punctuation
     - Incomplete sentences cut off mid-word
-    - Unicode garbage or control characters
+    - Unicode rubbish or control characters
     - Repeated newlines/whitespace patterns
 
     Args:
@@ -2225,7 +2225,7 @@ def _detect_output_degeneration(text: str) -> tuple[bool, str | None]:
                     if len(last_word) <= QUALITY.min_cutoff_word_length and last_word.islower():
                         result = f"incomplete_sentence: ends with '{last_word}'"
 
-    # 3. Detect Unicode garbage/control characters (excluding normal whitespace)
+    # 3. Detect Unicode rubbish/control characters (excluding normal whitespace)
     if result is None:
         control_chars = re.findall(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]", tail)
         if len(control_chars) > QUALITY.max_control_chars:
@@ -3360,7 +3360,7 @@ def analyze_generation_text(
     # Language mixing: unexpected language/script switches
     has_language_mixing, language_mixing_issues = _detect_language_mixing(text)
 
-    # Output degeneration: garbage characters, encoding corruption
+    # Output degeneration: rubbish characters, encoding corruption
     has_degeneration, degeneration_type = _detect_output_degeneration(text)
 
     # Fabrication: hallucinated specific details
@@ -7773,7 +7773,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         if processor is not None:
             del processor
 
-        # Force synchronization and garbage collection
+        # Force synchronization and rubbish collection
         mx.synchronize()
         gc.collect()
 
@@ -8077,7 +8077,7 @@ def _log_verbose_success_details_mode(
     # Warn about quality issues
     if analysis.is_repetitive and analysis.repeated_token:
         warning_msg = (
-            f"WARNING: Output appears to be garbage (repetitive: '{analysis.repeated_token}')"
+            f"WARNING: Output appears to be rubbish (repetitive: '{analysis.repeated_token}')"
         )
         log_warning_note(warning_msg)
 
