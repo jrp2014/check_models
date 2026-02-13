@@ -1,8 +1,8 @@
-# Diagnostics Report — 9 failure(s), 0 harness issue(s) (mlx-vlm 0.3.11)
+# Diagnostics Report — 7 failure(s), 0 harness issue(s) (mlx-vlm 0.3.11)
 
 ## Summary
 
-Automated benchmarking of **42 locally-cached VLM models** found **9 hard failure(s)** and **0 harness/integration issue(s)** in successful models. 33 of 42 models succeeded.
+Automated benchmarking of **42 locally-cached VLM models** found **7 hard failure(s)** and **0 harness/integration issue(s)** in successful models. 35 of 42 models succeeded.
 
 Test image: `20260207-161123_DSC09186.jpg` (27.4 MB). All failures are deterministic and reproducible.
 
@@ -26,21 +26,17 @@ Test image: `20260207-161123_DSC09186.jpg` (27.4 MB). All failures are determini
 
 ---
 
-## 1. Model Error — 4 model(s) [`mlx-vlm`] (Priority: High)
+## 1. Model Error — 2 model(s) [`mlx-vlm`] (Priority: High)
 
-**Error:** `Model generation failed for mlx-community/GLM-4.6V-Flash-6bit: [broadcast_shapes] Shapes (3,1,2048) and (3,1,6035) cannot be broadcast.`
+**Error:** `Model generation failed for mlx-community/Kimi-VL-A3B-Thinking-8bit: [broadcast_shapes] Shapes (999,2048) and (1,0,2048) cannot be broadcast.`
 
 | Model | Error Stage | Package |
 | ----- | ----------- | ------- |
-| `mlx-community/GLM-4.6V-Flash-6bit` | Model Error | mlx-vlm |
-| `mlx-community/GLM-4.6V-Flash-mxfp4` | Model Error | mlx-vlm |
 | `mlx-community/Kimi-VL-A3B-Thinking-8bit` | Model Error | mlx-vlm |
 | `mlx-community/paligemma2-3b-pt-896-4bit` | Model Error | mlx-vlm |
 
 **Per-model error messages:**
 
-- `mlx-community/GLM-4.6V-Flash-6bit`: `Model generation failed for mlx-community/GLM-4.6V-Flash-6bit: [broadcast_shapes] Shapes (3,1,2048) and (3,1,6035) cannot be broadcast.`
-- `mlx-community/GLM-4.6V-Flash-mxfp4`: `Model generation failed for mlx-community/GLM-4.6V-Flash-mxfp4: [broadcast_shapes] Shapes (3,1,2048) and (3,1,6035) cannot be broadcast.`
 - `mlx-community/Kimi-VL-A3B-Thinking-8bit`: `Model generation failed for mlx-community/Kimi-VL-A3B-Thinking-8bit: [broadcast_shapes] Shapes (999,2048) and (1,0,2048) cannot be broadcast.`
 - `mlx-community/paligemma2-3b-pt-896-4bit`: `Model generation failed for mlx-community/paligemma2-3b-pt-896-4bit: [broadcast_shapes] Shapes (1,4,2,2048,4096) and (2048,2048) cannot be broadcast.`
 
@@ -53,7 +49,7 @@ Test image: `20260207-161123_DSC09186.jpg` (27.4 MB). All failures are determini
     ^
   File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 6952, in _run_model_generation
     raise ValueError(msg) from gen_known_err
-ValueError: Model generation failed for mlx-community/GLM-4.6V-Flash-6bit: [broadcast_shapes] Shapes (3,1,2048) and (3,1,6035) cannot be broadcast.
+ValueError: Model generation failed for mlx-community/Kimi-VL-A3B-Thinking-8bit: [broadcast_shapes] Shapes (999,2048) and (1,0,2048) cannot be broadcast.
 ```
 
 ## 2. Weight Mismatch — 1 model(s) [`mlx`] (Priority: Low)
@@ -162,7 +158,7 @@ ValueError: Model loading failed: RobertaTokenizer has no attribute additional_s
 
 | Priority | Issue | Models Affected | Package |
 | -------- | ----- | --------------- | ------- |
-| **High** | Model Error | 4 (GLM-4.6V-Flash-6bit, GLM-4.6V-Flash-mxfp4, Kimi-VL-A3B-Thinking-8bit, paligemma2-3b-pt-896-4bit) | mlx-vlm |
+| **High** | Model Error | 2 (Kimi-VL-A3B-Thinking-8bit, paligemma2-3b-pt-896-4bit) | mlx-vlm |
 | **Low** | Weight Mismatch | 1 (Florence-2-large-ft) | mlx |
 | **Medium** | Model Error | 1 (Idefics3-8B-Llama3-bf16) | mlx |
 | **Medium** | OOM | 1 (X-Reasoner-7B-8bit) | mlx |
@@ -185,8 +181,8 @@ python src/check_models.py
 
 ```bash
 python src/check_models.py --model microsoft/Florence-2-large-ft
-python src/check_models.py --model mlx-community/GLM-4.6V-Flash-6bit
-python src/check_models.py --model mlx-community/GLM-4.6V-Flash-mxfp4
+python src/check_models.py --model mlx-community/Idefics3-8B-Llama3-bf16
+python src/check_models.py --model mlx-community/Kimi-VL-A3B-Thinking-8bit
 ```
 
 <details><summary>Prompt used (click to expand)</summary>
@@ -221,4 +217,4 @@ Be factual about visual content.  Include relevant conceptual and emotional keyw
 
 </details>
 
-_Report generated on 2026-02-13 17:29:46 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-02-13 20:21:33 GMT by [check_models](https://github.com/jrp2014/check_models)._

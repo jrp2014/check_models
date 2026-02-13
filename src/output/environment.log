@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-02-13 17:13:36 GMT
+FULL ENVIRONMENT DUMP - 2026-02-13 20:02:56 GMT
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -83,7 +83,7 @@ pathspec==1.0.4
 pfzy==0.3.4
 pillow==12.1.1
 pip==26.0.1
-platformdirs==4.7.0
+platformdirs==4.7.1
 pluggy==1.6.0
 pre_commit==4.5.1
 prompt_toolkit==3.0.52
@@ -155,5 +155,5 @@ yarl==1.22.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-02-13 17:13:37 GMT
+Environment dump completed at 2026-02-13 20:02:56 GMT
 ================================================================================
