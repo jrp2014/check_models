@@ -12,13 +12,21 @@ cd "$(dirname "$0")"
 if [[ "${CI:-false}" == "false" ]] && command -v conda &> /dev/null; then
     # Initialize conda for bash
     # shellcheck disable=SC1091
-    if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
+    CONDA_BASE="$(conda info --base 2>/dev/null || true)"
+    if [ -n "$CONDA_BASE" ] && [ -f "$CONDA_BASE/etc/profile.d/conda.sh" ]; then
+        # shellcheck disable=SC1090,SC1091
+        source "$CONDA_BASE/etc/profile.d/conda.sh"
+    elif [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
+        # shellcheck disable=SC1091
         source "$HOME/miniconda3/etc/profile.d/conda.sh"
     elif [ -f "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
+        # shellcheck disable=SC1091
         source "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
     elif [ -f "/opt/homebrew/anaconda3/etc/profile.d/conda.sh" ]; then
+        # shellcheck disable=SC1091
         source "/opt/homebrew/anaconda3/etc/profile.d/conda.sh"
     elif [ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]; then
+        # shellcheck disable=SC1091
         source "$HOME/anaconda3/etc/profile.d/conda.sh"
     fi
     if ! conda activate $CONDA_ENV 2>/dev/null; then

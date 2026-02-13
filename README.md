@@ -30,6 +30,8 @@ Expected outputs (default location: src/output/):
 - results.md
 - results.tsv
 - results.jsonl
+- results.history.jsonl
+- diagnostics.md (only when failures/harness issues are detected)
 - check_models.log
 - environment.log
 
@@ -48,9 +50,9 @@ Expected outputs (default location: src/output/):
 
 ```bash
 make install   # install runtime dependencies
-make dev       # install dev deps and set up hooks
+make dev       # install dev dependencies (dev + extras + torch)
 make test      # run test suite
-make quality   # run formatting, linting, and type checks
+make quality   # run full gate (ruff + mypy + ty + pyrefly + pytest + shellcheck + markdownlint)
 ```
 
 > [!TIP]

@@ -231,7 +231,8 @@ The tool generates multiple report formats in `output/` by default:
 - **CLI**: Real-time colorized progress and metrics.
 - **HTML** (`results.html`): Interactive table with sortable columns and failed row highlighting.
 - **Markdown** (`results.md`): GitHub-compatible summary for documentation.
-- **TSV/JSONL**: Machine-readable formats for analysis.
+- **TSV/JSONL** (`results.tsv`, `results.jsonl`): Machine-readable formats for analysis.
+- **Diagnostics** (`diagnostics.md`): Failure-focused issue report (generated only when needed).
 - **History** (`results.history.jsonl`): Append-only run history for regressions/recoveries.
 
 ### Metrics Explained
@@ -328,7 +329,7 @@ python check_models.py --image photo.jpg --max-kv-size 4096 --kv-bits 8
 
 #### Temperature and Sampling
 
-- `--temperature <float>`: Controls randomness in generation. `0.0` = deterministic (argmax), `1.0` = default diversity, `>1.0` = more creative/random. Default: `0.1`.
+- `--temperature <float>`: Controls randomness in generation. `0.0` = deterministic (argmax), `1.0` = high diversity, `>1.0` = more random. Default: `0.0`.
 - `--top-p <float>`: Nucleus sampling threshold. Only considers tokens whose cumulative probability is ≤ `top_p`. Range: `0.0-1.0`. Default: `1.0` (disabled).
 
 These control the sampling strategy during generation. Higher temperature increases variety but can produce less coherent outputs. Top-p sampling (nucleus sampling) focuses on the most probable tokens.
@@ -517,11 +518,14 @@ The `src/tools/` directory contains scripts useful for development and verificat
   python -m tools.validate_env
   ```
 
-- **`check_quality.py`**: Runs formatting and static checks.
+- **`run_quality_checks.sh`**: Unified quality gate used by local dev and CI.
 
   ```bash
-  # Default: format + fixable lint + mypy on check_models.py
-  python tools/check_quality.py
+  # Run from repo root (recommended)
+  make quality
+
+  # Or run the script directly
+  bash src/tools/run_quality_checks.sh
   ```
 
 ## Appendix: Dependencies
@@ -555,25 +559,27 @@ Optional (enable additional features):
 
 | Feature | Package | Source | Install Command |
 | ------- | ------- | ------ | --------------- |
-| Extended system metrics (RAM/CPU) | `psutil` | `extras` | `pip install -e ".[extras]"` or `make install` |
-| Fast tokenizer backends | `tokenizers` | `extras` | `pip install -e ".[extras]"` or `make install` |
-| Tensor operations (for some models) | `einops` | `extras` | `pip install -e ".[extras]"` or `make install` |
-| Number-to-words conversion (for some models) | `num2words` | `extras` | `pip install -e ".[extras]"` or `make install` |
-| Language model utilities | `mlx-lm` | `extras` | `pip install -e ".[extras]"` or `make install` |
-| Transformer model support | `transformers` | `extras` | `pip install -e ".[extras]"` or `make install` |
-| PyTorch stack (needed for some models) | `torch`, `torchvision`, `torchaudio` | `torch` | `pip install -e ".[torch]"` or `make install-torch` |
+| Extended system metrics (RAM/CPU) | `psutil` | `extras` | `pip install -e "src/[extras]"` |
+| Fast tokenizer backends | `tokenizers` | `extras` | `pip install -e "src/[extras]"` |
+| Tensor operations (for some models) | `einops` | `extras` | `pip install -e "src/[extras]"` |
+| Number-to-words conversion (for some models) | `num2words` | `extras` | `pip install -e "src/[extras]"` |
+| Language model utilities | `mlx-lm` | `extras` | `pip install -e "src/[extras]"` |
+| Transformer model support | `transformers` | `extras` | `pip install -e "src/[extras]"` |
+| PyTorch stack (needed for some models) | `torch`, `torchvision`, `torchaudio` | `torch` | `pip install -e "src/[torch]"` or `make -C src install-torch` |
 
 **Note**: Some models (e.g., Phi-3-vision, certain Florence2 variants) require PyTorch. If you encounter import errors for `torch`, `torchvision`, or `torchaudio`, install with:
 
 ```bash
 # From root directory:
-make install-torch
+pip install -e "src/[torch]"
+make -C src install-torch
 
 # Or from src/ directory:
 pip install -e ".[torch]"
 
 # Install everything (extras + torch + dev):
-make install-all  # from root
+make dev
+make -C src install-all
 pip install -e ".[extras,torch,dev]"  # from src/
 ```
 
@@ -742,13 +748,16 @@ See module docstrings and `__all__` exports for complete API reference.
 | `--output-jsonl` | Path | `output/results.jsonl` | JSONL report output filename. |
 | `--output-log` | Path | `output/check_models.log` | Command line output log filename. |
 | `--output-env` | Path | `output/environment.log` | Environment log filename (pip freeze, conda list). |
+| `--output-diagnostics` | Path | `output/diagnostics.md` | Diagnostics report filename (generated on failures/harness issues). |
 | `-m`, `--models` | list[str] | (none) | Explicit model IDs/paths; disables cache discovery. |
 | `-e`, `--exclude` | list[str] | (none) | Models to exclude (applies to cache scan or explicit list). |
 | `--trust-remote-code` / `--no-trust-remote-code` | flag | `True` | Allow/disallow custom code from Hub models. Use `--no-trust-remote-code` for security. |
+| `--revision` | str | (none) | Model revision (branch, tag, or commit) for reproducible runs. |
+| `--adapter-path` | str | (none) | Path to LoRA adapter weights to apply on top of the base model. |
 | `-p`, `--prompt` | str | (auto) | Custom prompt; if omitted a metadata‑aware prompt may be used. |
 | `-d`, `--detailed-metrics` | flag | `False` | Show expanded multi-line metrics block (verbose mode only). |
 | `-x`, `--max-tokens` | int | 500 | Max new tokens to generate. |
-| `-t`, `--temperature` | float | 0.1 | Sampling temperature. |
+| `-t`, `--temperature` | float | 0.0 | Sampling temperature. |
 | `--top-p` | float | 1.0 | Nucleus sampling parameter (0.0-1.0); lower = more focused. |
 | `-r`, `--repetition-penalty` | float | (none) | Penalize repeated tokens (>1.0 discourages repetition). |
 | `--repetition-context-size` | int | 20 | Context window size for repetition penalty. |
@@ -757,6 +766,7 @@ See module docstrings and `__all__` exports for complete API reference.
 | `-b`, `--kv-bits` | int | (none) | Quantize KV cache to N bits (4 or 8); saves memory. |
 | `-g`, `--kv-group-size` | int | 64 | Quantization group size for KV cache. |
 | `--quantized-kv-start` | int | 0 | Start position for KV cache quantization. |
+| `--prefill-step-size` | int | (none) | Step size for prompt prefill (`None` uses model default). |
 | `-T`, `--timeout` | float | 300 | Operation timeout (seconds) for model execution. |
 | `-v`, `--verbose` | flag | `False` | Enable verbose + debug logging. |
 | `--no-color` | flag | `False` | Disable ANSI colors in the CLI output. |
@@ -993,21 +1003,27 @@ If TensorFlow is installed, the script's automatic blocking (`TRANSFORMERS_NO_TF
 check_models/
 ├── src/
 │   ├── check_models.py      # Main script
-│   ├── Makefile.            # Orchestration (uses, eg, the helper scripts)
-│   ├── pyproject.toml       # Project configuration and dependencies  
+│   ├── Makefile             # Package-local automation targets
+│   ├── pyproject.toml       # Project configuration and dependencies
 │   ├── tools/               # Helper scripts
-│   └── tests/               # PyTest test suite
-│   └── output/
-│       ├── results.html     # Generated HTML report (default location)
-│       └── results.md       # Generated Markdown report (default location)
-│       └── results.tsv      # Generated a tab-separated values summary of the run (default location)
-│       └── results.jsonl    # Generated JSON Lines summary of the run (default location)
+│   ├── tests/               # PyTest test suite
+│   └── output/              # Generated outputs (git-ignored)
+│       ├── results.html
+│       ├── results.md
+│       ├── results.tsv
+│       ├── results.jsonl
+│       ├── results.history.jsonl
+│       ├── diagnostics.md
+│       ├── check_models.log
+│       └── environment.log
 ├── docs/                    # Documentation
 ├── typings/                 # Generated type stubs (git-ignored)
 └── Makefile                 # Root orchestration
 ```
 
-**Output behaviour**: By default, reports are written to `output/` (git-ignored). Override with `--output-html`, `--output-markdown`, and `--output-tsv`.
+**Output behaviour**: By default, outputs are written to `src/output/` (git-ignored).
+Override with `--output-html`, `--output-markdown`, `--output-tsv`, `--output-jsonl`,
+`--output-log`, `--output-env`, and `--output-diagnostics`.
 
 ## Contributing
 
@@ -1018,122 +1034,60 @@ check_models/
 
 ### Developer Workflow (Makefile)
 
-A `Makefile` at the repository root streamlines common tasks. It **auto-detects your active Python environment** and works with:
-
-- **Virtual environments** (`venv`, `virtualenv`, `uv`, `poetry`, `pipenv`, etc.) - uses the active environment directly
-- **Conda environments** - adapts based on active vs target environment:
-  - **If target env is active**: runs commands directly
-  - **If different conda env is active**: uses `conda run -n <target-env>`
-  - **If no env is active**: uses `conda run -n <target-env>` (or system Python if conda unavailable)
-
-The default conda target is `mlx-vlm`, but you can override it with `CONDA_ENV=your-env-name` for any make target.
-
-**Recommendation**: Activate your environment first (e.g., `source .venv/bin/activate` or `conda activate mlx-vlm`) for best performance.
-
-## All Available Make Commands
-
-Run `make help` to see all targets.
-
-**Key commands:**
-
-- `make install` — Install the package
-- `make dev` — Setup development environment
-- `make update` — Update conda environment and dependencies
-- `make upgrade-deps` — Upgrade all dependencies to latest versions
-- `make test` — Run tests
-- `make quality` — Run linting and type checks
-- `make check` — Run full quality pipeline (format, lint, typecheck, test)
-- `make clean` — Remove generated files
-
-Additional make targets are listed later in the README. Key targets include:
-
-- `make help` — Show all targets (displays active vs target env)
-- `make install-dev` — Editable install with dev extras (`pip install -e .[dev]`)
-- `make install-markdownlint` — Install `markdownlint-cli2` (requires Node.js/npm)
-- `make install` — Runtime‑only editable install (no dev/test tooling)
-- `make bootstrap-dev` — Full dev setup (installs Python deps + markdownlint + git hooks)
-- `make format` — Run `ruff format`
-- `make lint` — Run `ruff check` (no fixes)
-- `make lint-fix` — Run `ruff check --fix`
-- `make typecheck` — Run `mypy`
-- `make test` — Run pytest suite
-- `make test-cov` — Pytest with coverage (terminal + XML report)
-- `make quality` — Invoke integrated quality script (format + lint + mypy + markdownlint)
-- `make quality-strict` — Quality script (require tools, no stubs)
-- `make run ARGS="..."` — Run the CLI script (pass CLI args via `ARGS`)
-- `make smoke` — Fast help invocation (sanity check)
-- `make check` — Format + lint + typecheck + test (pre‑commit aggregate)
-- `make validate-env` — Check environment setup (validates Python packages)
-- `make clean` — Remove caches / pyc
-
-Examples:
+Use the root `Makefile` from the repository root and activate the conda env first:
 
 ```bash
-# Install with dev dependencies (ruff, mypy, pytest, etc.)
-make install-dev
-
-# Format, then lint and auto-fix issues
-make format
-make lint-fix
-
-# Type check and run tests
-make typecheck
-make test
-
-# All core checks (use before committing)
-make check
-
-# Run CLI with arguments (quote ARGS value if it has spaces)
-make run ARGS="--verbose --detailed-metrics --image sample.jpg --models microsoft/Florence-2-large"
+conda activate mlx-vlm
 ```
 
-Override variables on the fly:
+Key commands:
+
+- `make install` — install runtime package (`pip install -e src/`)
+- `make dev` — install dev setup (`pip install -e "src/[dev,extras,torch]"`)
+- `make test` — run pytest (`pytest src/tests/ -v`)
+- `make quality` — full gate (ruff format+lint, mypy, ty, pyrefly, pytest, shellcheck, markdownlint)
+- `make ci` — strict CI-style pipeline
+- `make deps-sync` — sync dependency blocks in docs from `pyproject.toml`
+- `make stubs` — regenerate local MLX stubs in `typings/`
+
+For package-local targets (for example `install-dev`, `bootstrap-dev`, `lint-fix`), run:
 
 ```bash
-make test CONDA_ENV=custom-mlx-env
-make run CONDA_ENV=mlx-vlm ARGS="--verbose"
+make -C src help
 ```
 
-If you prefer manual commands, the traditional workflow still works:
+### Git Hooks and Pre-Commit
 
-1. `pip install -e ".[dev]"`
-2. `ruff format check_models.py tests`
-3. `ruff check --fix check_models.py tests`
-4. `mypy --config-file pyproject.toml check_models.py`
-5. `pytest -q`
+You can use one or both workflows:
+
+- `pre-commit` framework:
+
+  ```bash
+  pre-commit install
+  pre-commit run --all-files
+  ```
+
+- Custom git hooks shipped with this repo:
+
+  ```bash
+  cd src
+  python -m tools.install_precommit_hook
+  ```
 
 ### Markdown Linting (Optional)
 
-The project uses `markdownlint-cli2` to ensure consistent markdown formatting. This is **optional** but recommended for contributors editing documentation:
-
-**Installation:**
+`make quality` runs markdownlint via local install, global install, or `npx` fallback.
+If you want a local install:
 
 ```bash
-# If you have Node.js/npm installed:
-make install-markdownlint
-
-# Or install manually:
+cd src
 npm install
-
-# Or rely on npx (downloads on-demand):
-# No installation needed - quality checks will use npx automatically
 ```
-
-**Usage:**
-
-- `make quality` - Automatically runs markdownlint if available (or via npx)
-- Quality checks gracefully skip markdown linting if neither npm nor npx is available
-
-**Requirements:**
-
-- Node.js/npm (optional) - Install via `brew install node` on macOS or download from [nodejs.org](https://nodejs.org/)
-- If npm is unavailable, the quality script will attempt to use `npx` as a fallback
-- If neither is available, markdown linting is skipped with a warning
 
 ### Contribution Guidelines
 
 - Keep patches focused; separate mechanical formatting changes from functional changes.
-- Run `make check` (or at minimum `make test` and `make typecheck`) before opening a PR.
+- Run `make quality` before opening a PR (or at minimum `make test` and `make typecheck`).
 - Add or update tests when changing output formatting or public CLI flags.
 - Prefer small helper functions over adding more branching to large blocks in `check_models.py`.
 - Document new flags or output changes in this README (search for an existing section to extend rather than creating duplicates).
@@ -1147,4 +1101,3 @@ npm install
 ## License
 
 MIT License: See the [LICENSE](../LICENSE) file for details.
-

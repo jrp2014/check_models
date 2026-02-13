@@ -10,7 +10,7 @@ repos:
   - repo: local
     hooks:
       - id: quality-checks
-        name: Quality Checks (Ruff, MyPy, Tests, etc.)
+        name: Quality Checks (ruff+mypy+ty+pyrefly+pytest+shellcheck+markdownlint)
         entry: src/tools/run_quality_checks.sh
         language: system
         pass_filenames: false

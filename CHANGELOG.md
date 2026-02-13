@@ -1,10 +1,22 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+Notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+## [0.1.1] - 2026-02-13
 
-## [1.0.0] - 2026-02-08
+### Changed
+
+- Final run summary now reports configured `--output-log` and `--output-env` paths
+  instead of always showing default log file locations.
+- Synced documentation with current CLI behavior and outputs, including:
+  `--output-diagnostics`, `--revision`, `--adapter-path`, and
+  `--prefill-step-size`, plus `results.history.jsonl` / `diagnostics.md`.
+- Updated quality and bot guidance docs (`AGENTS.md`, Copilot instructions,
+  contributing docs, and pre-commit hook naming) to match the current CI gate.
+- Improved `src/tools/run_quality_checks.sh` conda initialization by resolving
+  the base path via `conda info --base` before fallback probe paths.
+
+## [0.1.0] - 2026-02-08
 
 ### Added
 
@@ -61,3 +73,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Duplicated sections in `IMPLEMENTATION_GUIDE.md` (Error Handling, Markdown Linting)
 - 30 stale files archived from `docs/notes/` to `docs/notes/archive/`
+
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).

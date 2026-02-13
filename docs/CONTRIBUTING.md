@@ -59,11 +59,10 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
    - Install all Python dependencies (runtime + dev + extras + torch)
    - Install the package in editable mode
 
-   **Optional dependencies**:
+   **Optional follow-up**:
 
-   - **PyTorch** (needed for some models): `make install-torch`
-   - **Everything** (extras + torch + dev): `make install-all`
-   - **Markdown linting only**: `make install-markdownlint` (requires Node.js/npm)
+   - Install markdown tooling: `make install-markdownlint` (requires Node.js/npm)
+   - Use package-local install variants via `make -C src help`
 
 4. **Verify installation**:
 
@@ -71,8 +70,13 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
    # Verify environment
    python -m tools.validate_env
    
-   # Install git pre-commit hook (important!)
+   # Optional: install custom git hooks (pre-commit + pre-push)
+   cd src
    python -m tools.install_precommit_hook
+   cd ..
+
+   # Optional: install pre-commit framework hook
+   pre-commit install
    ```
 
 ### Manual Environment Validation
@@ -135,7 +139,7 @@ The project uses several automated quality checks:
 
    ```bash
    make format      # Format code
-   make lint        # Check linting (alias for quality)
+   make lint        # Lint code
    ```
 
 2. **Mypy** (type checking):
@@ -153,12 +157,12 @@ The project uses several automated quality checks:
 4. **Combined quality check**:
 
    ```bash
-   make quality     # Runs format + lint + typecheck + markdownlint (if available)
+   make quality     # Runs ruff + mypy + ty + pyrefly + pytest + shellcheck + markdownlint
    ```
 
 5. **Markdown linting** (optional):
 
-   Automatically included in `make quality` if `markdownlint-cli2` is installed.
+   `make quality` attempts markdownlint via local binary, global binary, or `npx`.
 
    ```bash
    # Install markdown linting (requires Node.js/npm)
@@ -172,14 +176,14 @@ The project uses several automated quality checks:
 
 ### Git Hooks
 
-The project uses git hooks to enforce quality:
+Two supported hook workflows:
 
-- **Pre-commit**:
-  - Automatically formats Python files with ruff
-  - Auto-fixes Markdown files with markdownlint (via npx)
-  - Syncs README dependencies when pyproject.toml changes
-  - Re-stages all fixed files automatically
-- **Pre-push**: Runs full quality checks (format check, lint, type check, tests) before pushing
+- **pre-commit framework** (`pre-commit install`):
+  - Runs checks from `.pre-commit-config.yaml`
+  - Includes the repository quality hook (`src/tools/run_quality_checks.sh`)
+- **Custom repo hooks** (`cd src && python -m tools.install_precommit_hook`):
+  - **Pre-commit**: formats Python files, fixes markdown when possible, and syncs README deps when `src/pyproject.toml` changes
+  - **Pre-push**: runs fast checks via `src/tools/check_quality_simple.sh` (ruff format check + lint + mypy + pyrefly)
 
 To bypass hooks (not recommended):
 
@@ -192,12 +196,13 @@ git push --no-verify
 
 All pull requests must pass:
 
-- Ruff format check (no unformatted code)
-- Ruff lint check (all rules)
-- Mypy type checking (strict mode)
-- Dependency sync verification
-- All tests (no skips allowed in CI)
-- Markdown linting
+- Quality workflow (`.github/workflows/quality.yml`):
+  - ruff format check + lint
+  - mypy + ty + pyrefly
+  - pytest
+  - shellcheck
+  - markdownlint
+- Dependency sync guard (`.github/workflows/dependency-sync.yml`)
 
 ## Testing
 
@@ -296,19 +301,20 @@ The project organizes dependencies into groups:
 Install specific groups as needed:
 
 ```bash
-# Runtime only (default)
-pip install -e .
+# Runtime only (from repo root)
+pip install -e src/
 
-# With extras
-pip install -e ".[extras]"
-
-# With PyTorch (needed for some models)
-pip install -e ".[torch]"
-make install-torch  # from root
+# With extras / torch / dev (from repo root)
+pip install -e "src/[extras]"
+pip install -e "src/[torch]"
+pip install -e "src/[dev]"
 
 # Everything
-pip install -e ".[extras,torch,dev]"
-make install-all  # from root
+make dev
+
+# Package-local installation helpers
+make -C src install-torch
+make -C src install-all
 ```
 
 ### Managing Dependencies

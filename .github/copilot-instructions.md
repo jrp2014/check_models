@@ -8,7 +8,7 @@ Benchmarking tool for MLX Vision Language Models on Apple Silicon. macOS-only, P
 
 ```bash
 conda activate mlx-vlm          # REQUIRED before any python/make command
-python -m tools.validate_env     # quick sanity check (run from src/)
+cd src && python -m tools.validate_env && cd ..   # quick sanity check
 ```
 
 If the environment doesn't exist: `bash src/tools/setup_conda_env.sh`.
@@ -19,7 +19,7 @@ For one-off commands without activating: `conda run -n mlx-vlm python ...`.
 
 | File | Purpose | Size |
 | ------ | --------- | ------ |
-| `src/check_models.py` | **Single-file CLI monolith** (~8,800 lines). All logic lives here. | ★ primary edit target |
+| `src/check_models.py` | **Single-file CLI monolith** (~10,700 lines). All logic lives here. | ★ primary edit target |
 | `src/quality_config.yaml` | Runtime thresholds loaded by `load_quality_config()` | Edit thresholds here, not in Python |
 | `src/pyproject.toml` | Packaging, dependencies, tool config (ruff, mypy, pytest) | Update when adding imports |
 | `src/tests/conftest.py` | Shared fixtures: `test_image`, `minimal_test_image`, `realistic_test_image`, `folder_with_images`, etc. | Use existing fixtures |
@@ -33,18 +33,18 @@ The file is organized in this order — use these landmarks to jump to the right
 
 | Section | Key contents | Approx. lines |
 | --------- | ------------- | --------------- |
-| Imports & env setup | `MISSING_DEPENDENCIES` dict, optional dep guards | 1–450 |
-| Protocol types | `SupportsGenerationResult`, `SupportsExifIfd` | 470–550 |
-| Data classes | `PerformanceResult`, `ResultSet`, `ProcessImageParams` | 555–680 |
-| Timing & timeout | `PerfCounterTimer`, `TimeoutManager` | 680–790 |
-| Colors & logging | `Colors`, `LogStyles`, `ColoredFormatter` | 790–1140 |
-| Number formatting | `fmt_num`, `format_field_label`, `format_field_value` (~line 3034) | 1140–1350 |
-| Quality detection | `_detect_repetitive_output`, `_detect_hallucination_patterns`, etc. | 1356–2520 |
-| Advanced metrics | `compute_vocabulary_diversity`, `compute_efficiency_metrics`, etc. | 2520–3030 |
-| Field formatting | `format_field_value` (centralized display normalization) | 3034–3200 |
-| Report generators | `generate_html_report` (~5176), `generate_markdown_report` (~5437) | 5176–5900 |
-| Image processing | `process_image_with_model` (~6359) | 6359–6800 |
-| CLI parsing | `argparse` setup, `main()` (~8369), `main_cli()` (~8477) | 8300–8761 |
+| Imports & env setup | `MISSING_DEPENDENCIES` dict, optional dep guards | 1–580 |
+| Protocol types | `SupportsGenerationResult`, `SupportsExifIfd` | 590–620 |
+| Data classes | `PerformanceResult`, `ResultSet`, `ProcessImageParams` | 677–900 |
+| Timing & timeout | `PerfCounterTimer`, `TimeoutManager` | 913–1000 |
+| Colors & logging | `Colors`, `LogStyles`, `ColoredFormatter` | 1013–1310 |
+| Quality detection | `_detect_repetitive_output`, `_detect_hallucination_patterns`, etc. | 1589–2520 |
+| Advanced metrics | `compute_vocabulary_diversity`, `compute_efficiency_metrics`, etc. | 2520–3310 |
+| Field formatting | `format_field_value` (centralized display normalization) | 3474–3650 |
+| Diagnostics/report generators | `generate_diagnostics_report` (~6101), `generate_html_report` (~6544), `generate_markdown_report` (~6739) | 6100–7600 |
+| Image processing | `process_image_with_model` (~7695) | 7695–9600 |
+| Run history/finalization | `compare_history_records`, `append_history_record`, `finalize_execution` | 9831–10270 |
+| CLI parsing | `main()` (~10277), `main_cli()` (~10385) | 10277–10679 |
 
 ### 4. Architecture & patterns
 
@@ -54,7 +54,7 @@ The file is organized in this order — use these landmarks to jump to the right
 - **Display normalization**: ALL metric formatting goes through `format_field_value(field_name, value)`. Do not format metrics inline.
 - **Type aliases**: `MetricValue = int | float | str | None` is the value type for metrics.
 - **Protocols over ABCs**: typing for optional deps uses `Protocol` classes (e.g., `SupportsGenerationResult`).
-- **Reports write to** `src/output/` (`results.html`, `results.md`, `results.jsonl`, `results.tsv`).
+- **Reports write to** `src/output/` (`results.html`, `results.md`, `results.jsonl`, `results.tsv`, `diagnostics.md`, `results.history.jsonl`, `check_models.log`, `environment.log`).
 - **Security**: defaults to `--trust-remote-code`. Env vars `TRANSFORMERS_NO_TF`, `TRANSFORMERS_NO_FLAX`, `TRANSFORMERS_NO_JAX` are set to avoid heavy backends unless `MLX_VLM_ALLOW_TF=1`.
 
 ### 5. Make targets (all run from repo root)
@@ -84,8 +84,8 @@ The file is organized in this order — use these landmarks to jump to the right
 
 - **Platform**: GitHub Actions, `macos-15`, Python 3.13, Node.js 22
 - **Pipeline** (`.github/workflows/quality.yml`): checkout → install deps (`pip install -e src/.[dev]`) → generate MLX stubs via nanobind → `bash src/tools/run_quality_checks.sh`
-- **PRs must pass**: ruff format + lint, mypy, ty, pyrefly, pytest, dependency sync, markdownlint
-- **Pre-commit hooks**: install with `python -m tools.install_precommit_hook`
+- **PRs must pass**: ruff format + lint, mypy, ty, pyrefly, pytest, shellcheck, dependency sync, markdownlint
+- **Pre-commit hooks**: install with `cd src && python -m tools.install_precommit_hook`
 
 ### 8. Coding conventions (quick reference)
 
@@ -113,7 +113,7 @@ The file is organized in this order — use these landmarks to jump to the right
 
 **Add a CLI flag:**
 
-1. Add `argparse` argument near line ~8400 in `src/check_models.py`
+1. Add `argparse` argument near line ~10400 in `src/check_models.py`
 2. Wire it through `main()` → `process_image_with_model()` or relevant function
 3. Add test in `src/tests/test_parameter_validation.py`
 4. Run `pytest src/tests/test_parameter_validation.py src/tests/test_cli_help_output.py -q`
@@ -125,7 +125,7 @@ The file is organized in this order — use these landmarks to jump to the right
 
 **Modify report output:**
 
-1. Edit `generate_html_report` (~line 5176) or `generate_markdown_report` (~line 5437)
+1. Edit `generate_html_report` (~line 6544) or `generate_markdown_report` (~line 6739)
 2. Update `src/output/` fixture files if test assertions reference them
 3. Run `pytest src/tests/test_html_formatting.py src/tests/test_markdown_formatting.py -q`
 
@@ -145,4 +145,3 @@ The file is organized in this order — use these landmarks to jump to the right
 - **Don't create ad-hoc test scripts** — add tests to existing `src/tests/test_*.py` files
 - **Don't duplicate formatting logic** — extend `format_field_value` for new metrics
 - **Don't over-extract helpers** — a single well-commented function is preferred over many tiny one-use helpers (see `docs/IMPLEMENTATION_GUIDE.md` § Philosophy)
-

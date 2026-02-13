@@ -1000,6 +1000,9 @@ os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 # Global rendering width override (set via --width); when set, all width
 # calculations should honor this value instead of auto-detected terminal width.
 WIDTH_OVERRIDE: int | None = None
+ANSI_ESCAPE_RE: Final[re.Pattern[str]] = re.compile(
+    r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])",
+)
 
 
 # =============================================================================
@@ -1026,9 +1029,7 @@ class Colors:
         if os.getenv("FORCE_COLOR", "").lower() in {"1", "true", "yes"}
         else (sys.stderr.isatty() and os.getenv("NO_COLOR") is None)
     )
-    _ansi_escape_re: ClassVar[re.Pattern[str]] = re.compile(
-        r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])",
-    )
+    _ansi_escape_re: ClassVar[re.Pattern[str]] = ANSI_ESCAPE_RE
 
     @staticmethod
     def colored(text: str, *color_codes: str) -> str:
@@ -1287,6 +1288,14 @@ class ColoredFormatter(logging.Formatter):
         return msg
 
 
+class FileSafeFormatter(logging.Formatter):
+    """Formatter for file logs that strips ANSI/control formatting codes."""
+
+    def format(self, record: logging.LogRecord) -> str:
+        raw = super().format(record)
+        return ANSI_ESCAPE_RE.sub("", raw)
+
+
 # Configure logging to use ColoredFormatter
 handler: logging.StreamHandler[Any] = logging.StreamHandler(sys.stderr)
 formatter: ColoredFormatter = ColoredFormatter("%(asctime)s - %(levelname)s - %(message)s")
@@ -1336,14 +1345,16 @@ HEADER_SPLIT_LENGTH = 10
 ERROR_MESSAGE_PREVIEW_LEN: Final[int] = 40  # Max chars to show from error in summary line
 ERROR_MESSAGE_TRUNCATE_LEN: Final[int] = 120  # Max chars for error messages in actionable reports
 MAX_QUALITY_ISSUES_LEN: Final[int] = 30  # Max chars for quality issues in Markdown tables
+MAX_OUTPUT_LINES: Final[int] = 3  # Max lines to show in summary table cells
+MAX_OUTPUT_PREVIEW_CHARS: Final[int] = 280  # Max chars for output previews in summary tables
+MAX_CAPTURED_OUTPUT_LOG_CHARS: Final[int] = 1200  # Max chars of captured stdout/stderr in logs
+MAX_TRIAGE_MODELS: Final[int] = 5  # Max model rows shown in triage subsections
 
 # Numeric fields are automatically derived from FIELD_ABBREVIATIONS for consistency
 # Exclude non-numeric fields explicitly
 NUMERIC_FIELD_PATTERNS: Final[frozenset[str]] = frozenset(
     k for k in FIELD_ABBREVIATIONS if k not in {"model_name", "quality_issues"}
 )
-
-MAX_OUTPUT_LINES = 3  # Max lines to show in summary table
 
 # Performance timing fields: those from PerformanceResult (not GenerationResult)
 # Automatically derived from FIELD_ABBREVIATIONS for consistency
@@ -4679,12 +4690,13 @@ def _format_table_field_value(
                 len(lines) > MAX_OUTPUT_LINES
             ):  # This constant should be part of the quality issues config
                 text = "\n".join(lines[:MAX_OUTPUT_LINES]) + "\n..."
-            return text
-        return (
+            return _truncate_text_preview(text, max_chars=MAX_OUTPUT_PREVIEW_CHARS)
+        error_text = (
             f"Error: {res.error_stage} - {res.error_message}"
             if res.error_message
             else "Unknown error"
         )
+        return _truncate_text_preview(error_text, max_chars=MAX_OUTPUT_PREVIEW_CHARS)
 
     if field_name == "quality_issues":
         # Truncate quality issues for Markdown table display
@@ -4700,12 +4712,15 @@ def _format_table_field_value(
 def _prepare_table_data(
     results: list[PerformanceResult],
     header_separator: str = "<br>",
+    *,
+    include_output: bool = True,
 ) -> tuple[list[str], list[list[str]], list[str]]:
     """Prepare headers, rows, and field names for reports.
 
     Args:
         results: List of PerformanceResult objects.
         header_separator: String to use for separating header lines (default: "<br>").
+        include_output: Whether to include the output preview column.
 
     Returns:
         A tuple containing:
@@ -4717,7 +4732,9 @@ def _prepare_table_data(
         return [], [], []
 
     result_set = ResultSet(results)
-    field_names = ["model_name", *result_set.get_fields(), "output"]
+    field_names = ["model_name", *result_set.get_fields()]
+    if include_output:
+        field_names.append("output")
     sorted_results = result_set.results
 
     # Create headers
@@ -4912,9 +4929,9 @@ def analyze_model_issues(
         # Fastest to load
         fastest_load = min(
             successful,
-            key=lambda r: getattr(r, "load_time", float("inf")) or float("inf"),
+            key=lambda r: getattr(r, "model_load_time", float("inf")) or float("inf"),
         )
-        load_time = getattr(fastest_load, "load_time", 0) or 0
+        load_time = getattr(fastest_load, "model_load_time", 0) or 0
         summary["fastest_load_model"] = (fastest_load.model_name, load_time)
 
         # Average TPS
@@ -6481,7 +6498,11 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
         logger.info("No results to display.")
         return
 
-    headers, rows, field_names = _prepare_table_data(results, header_separator="\n")
+    headers, rows, field_names = _prepare_table_data(
+        results,
+        header_separator="\n",
+        include_output=False,
+    )
     if not headers or not rows:
         logger.info("No data to display in stats table.")
         return
@@ -6491,13 +6512,11 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
     colalign = ["right" if is_numeric_field(field) else "left" for field in field_names]
 
     # Set max widths for specific columns to keep table compact
-    # Quality Issues: 20 chars, Output: 50 chars, others: no limit
+    # Quality Issues: 20 chars, others: no limit
     maxcolwidths: list[int | None] = []
     for field_name in field_names:
         if field_name == "quality_issues":
             maxcolwidths.append(20)
-        elif field_name == "output":
-            maxcolwidths.append(50)
         else:
             maxcolwidths.append(None)
 
@@ -7694,6 +7713,11 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             arch,
             gpu_info if gpu_info is not None else "",
         )
+        if params.verbose:
+            logger.debug(
+                "[verbose passthrough start] mlx-vlm.generate output for %s",
+                params.model_identifier,
+            )
 
         with (
             contextlib.redirect_stdout(cast("TextIO", stdout_capture)),
@@ -7702,6 +7726,11 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         ):
             output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                 params=params,
+            )
+        if params.verbose:
+            logger.debug(
+                "[verbose passthrough end] mlx-vlm.generate output for %s",
+                params.model_identifier,
             )
 
         # Extract timing from GenerationResult if available
@@ -7959,14 +7988,23 @@ def log_blank(count: int = 1) -> None:
 
 
 def _summary_parts(res: PerformanceResult, model_short: str) -> list[str]:
-    """Assemble key=value summary segments (status only, metrics shown separately)."""
+    """Assemble key=value summary segments for per-run triage."""
     parts: list[str] = [
         f"model={model_short}",
         f"status={'OK' if res.success else 'FAIL'}",
     ]
+    if res.success:
+        issue_labels = sorted(_extract_quality_issue_labels(res.quality_issues))
+        if issue_labels:
+            parts.append(f"quality={'+'.join(issue_labels)}")
+        else:
+            parts.append("quality=clean")
     if res.error_stage:
         parts.append(f"stage={res.error_stage}")
-    # Metrics are shown in the dedicated metrics section below, not in summary
+    if res.error_package:
+        parts.append(f"package={res.error_package}")
+    if res.error_type:
+        parts.append(f"type={res.error_type}")
     return parts
 
 
@@ -8022,9 +8060,6 @@ def _log_verbose_success_details_mode(
     if not res.generation:
         return
 
-    # Add breathing room
-    log_blank()
-
     # Generated text with emoji prefix for easy scanning
     gen_text = getattr(res.generation, "text", None) or ""
 
@@ -8036,7 +8071,7 @@ def _log_verbose_success_details_mode(
         context_marker=context_marker,
     )
 
-    log_blank()  # Extra spacing before generated text section
+    log_blank()
     log_metric_label("Generated Text:", emoji="📝")
 
     # Warn about quality issues
@@ -8069,9 +8104,8 @@ def _log_verbose_success_details_mode(
 
     log_generated_text(gen_text, wrap=True, indent="   ")
 
-    log_blank()  # Breathing room
-
     if detailed:
+        log_blank()
         log_metric_label("Performance Metrics:", emoji="📊")
         _log_token_summary(res)
         _log_detailed_timings(res)
@@ -8492,6 +8526,37 @@ def log_metrics_legend(*, detailed: bool) -> None:
     log_blank()
 
 
+def _log_failure_details(result: PerformanceResult) -> None:
+    """Emit actionable failure details for issue reporting."""
+    if result.error_message:
+        logger.info("Error: %s", result.error_message)
+
+    if result.error_package:
+        logger.info(
+            "Error package: %s",
+            result.error_package,
+            extra={"style_hint": LogStyles.DETAIL},
+        )
+    if result.error_type:
+        logger.info(
+            "Error type: %s",
+            result.error_type,
+            extra={"style_hint": LogStyles.DETAIL},
+        )
+
+    traceback_tail = _format_traceback_tail(result.error_traceback)
+    if traceback_tail:
+        _log_wrapped_error("Traceback tail:", traceback_tail)
+
+    captured_output = (result.captured_output_on_fail or "").strip()
+    if captured_output:
+        preview = _truncate_text_preview(
+            captured_output,
+            max_chars=MAX_CAPTURED_OUTPUT_LOG_CHARS,
+        )
+        _log_wrapped_error("Captured output:", preview)
+
+
 def print_model_result(
     result: PerformanceResult,
     *,
@@ -8518,11 +8583,7 @@ def print_model_result(
     # For failures, show detailed error info; for success, show generation details
     if not result.success:
         log_blank()  # Single blank before error details
-        # Stage is already in summary, so we only log the full error here
-        if result.error_message:
-            logger.info("Error: %s", result.error_message)
-        if result.captured_output_on_fail:
-            _log_wrapped_error("Output:", str(result.captured_output_on_fail))
+        _log_failure_details(result)
         return
     if result.generation and verbose:
         _log_verbose_success_details_mode(
@@ -8657,7 +8718,7 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     )
     # File gets full timestamp + level always (no colors in file)
     file_handler.setLevel(logging.DEBUG)
-    file_formatter: logging.Formatter = logging.Formatter(
+    file_formatter: logging.Formatter = FileSafeFormatter(
         "%(asctime)s - %(levelname)s - %(message)s",
     )
     file_handler.setFormatter(file_formatter)
@@ -9265,6 +9326,42 @@ def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | N
     return ", ".join(issues) if issues else None
 
 
+QUALITY_ISSUE_PATTERNS: Final[dict[str, re.Pattern[str]]] = {
+    "harness": re.compile(r"⚠️?harness", re.IGNORECASE),
+    "refusal": re.compile(r"\brefusal\b", re.IGNORECASE),
+    "repetitive": re.compile(r"\brepetitive\b", re.IGNORECASE),
+    "lang_mixing": re.compile(r"\blang_mixing\b", re.IGNORECASE),
+    "hallucination": re.compile(r"\bhallucination\b", re.IGNORECASE),
+    "generic": re.compile(r"\bgeneric\b", re.IGNORECASE),
+    "verbose": re.compile(r"\bverbose\b", re.IGNORECASE),
+    "formatting": re.compile(r"\bformatting\b", re.IGNORECASE),
+    "bullets": re.compile(r"\bbullets?\b", re.IGNORECASE),
+    "context_ignored": re.compile(r"context-ignored", re.IGNORECASE),
+}
+
+QUALITY_BREAKING_LABELS: Final[frozenset[str]] = frozenset(
+    {"harness", "refusal", "repetitive", "hallucination", "context_ignored"},
+)
+
+
+def _truncate_text_preview(text: str, *, max_chars: int) -> str:
+    """Trim text previews to a fixed character budget."""
+    if len(text) <= max_chars:
+        return text
+    return text[: max_chars - 3].rstrip() + "..."
+
+
+def _extract_quality_issue_labels(quality_issues: str | None) -> set[str]:
+    """Extract normalized quality labels from a free-form issue string."""
+    if not quality_issues:
+        return set()
+    labels: set[str] = set()
+    for label, pattern in QUALITY_ISSUE_PATTERNS.items():
+        if pattern.search(quality_issues):
+            labels.add(label)
+    return labels
+
+
 def _parse_quality_issues_to_list(quality_issues: str | None) -> list[str]:
     """Parse quality issues string into a list of individual issues.
 
@@ -9414,8 +9511,231 @@ def log_failure_summary(buckets: dict[str, list[str]]) -> None:
     log_rule(80, char="=", post_newline=True)
 
 
-def log_summary(results: list[PerformanceResult]) -> None:
-    """Log a text-based summary of the execution results to the log file."""
+def _format_counter_items(counter: Counter[str], *, max_items: int = 6) -> str:
+    """Format a counter as ``label=count`` pairs ordered by frequency."""
+    if not counter:
+        return "none"
+    return ", ".join(f"{label}={count}" for label, count in counter.most_common(max_items))
+
+
+UtilityTriageRow = tuple[PerformanceResult, float, str, str, frozenset[str]]
+
+
+def _log_performance_highlights(successful: list[PerformanceResult]) -> None:
+    """Log speed and memory highlights for successful runs."""
+    logger.info("🏆 Performance Highlights:")
+
+    fastest = max(successful, key=lambda r: getattr(r.generation, "generation_tps", 0) or 0)
+    fastest_tps = getattr(fastest.generation, "generation_tps", 0) or 0
+    logger.info("   Fastest: %s (%.1f tps)", fastest.model_name, fastest_tps)
+
+    most_efficient = min(
+        successful,
+        key=lambda r: getattr(r.generation, "peak_memory", float("inf")) or float("inf"),
+    )
+    efficient_mem = getattr(most_efficient.generation, "peak_memory", 0) or 0
+    logger.info("   💾 Most efficient: %s (%.1f GB)", most_efficient.model_name, efficient_mem)
+
+    fastest_load = min(
+        successful,
+        key=lambda r: getattr(r, "model_load_time", float("inf")) or float("inf"),
+    )
+    load_time = getattr(fastest_load, "model_load_time", 0) or 0
+    logger.info("   ⚡ Fastest load: %s (%.2fs)", fastest_load.model_name, load_time)
+
+    total_tps = sum(getattr(r.generation, "generation_tps", 0) or 0 for r in successful)
+    avg_tps = total_tps / len(successful)
+    logger.info("   📊 Average TPS: %.1f across %d models", avg_tps, len(successful))
+
+    log_blank()
+    logger.info("📈 Resource Usage:")
+    total_mem = sum(getattr(r.generation, "peak_memory", 0) or 0 for r in successful)
+    avg_mem = total_mem / len(successful)
+    logger.info("   Total peak memory: %.1f GB", total_mem)
+    logger.info("   Average peak memory: %.1f GB", avg_mem)
+    total_tokens = sum(
+        (getattr(r.generation, "prompt_tokens", 0) or 0)
+        + (getattr(r.generation, "generation_tokens", 0) or 0)
+        for r in successful
+    )
+    tokens_per_gb = total_tokens / total_mem if total_mem > 0 else 0
+    logger.info("   Memory efficiency: %.0f tokens/GB", tokens_per_gb)
+
+
+def _collect_quality_and_utility_rows(
+    successful: list[PerformanceResult],
+    *,
+    prompt: str | None,
+) -> tuple[Counter[str], int, list[UtilityTriageRow]]:
+    """Collect quality counts and cataloging utility rows."""
+    quality_counts: Counter[str] = Counter()
+    clean_count = 0
+    context = _extract_context_from_prompt(prompt)
+    rows: list[UtilityTriageRow] = []
+
+    for res in successful:
+        labels = frozenset(_extract_quality_issue_labels(res.quality_issues))
+        if labels:
+            for label in labels:
+                quality_counts[label] += 1
+        else:
+            clean_count += 1
+
+        if not res.generation:
+            continue
+        text = str(getattr(res.generation, "text", "") or "")
+        utility = compute_cataloging_utility(text, context)
+        rows.append(
+            (
+                res,
+                float(utility["utility_score"]),
+                str(utility["utility_grade"]),
+                str(utility["primary_weakness"]),
+                labels,
+            ),
+        )
+
+    return quality_counts, clean_count, rows
+
+
+def _log_quality_signal_summary(
+    quality_counts: Counter[str],
+    *,
+    clean_count: int,
+    successful_count: int,
+) -> None:
+    """Log quality issue frequency among successful models."""
+    logger.info("🧪 Quality Signal Frequency:")
+    logger.info("   %s", _format_counter_items(quality_counts))
+    logger.info("   Clean outputs: %d/%d", clean_count, successful_count)
+
+
+def _select_useful_rows(rows: list[UtilityTriageRow]) -> list[UtilityTriageRow]:
+    """Return shortlist of high-utility, non-breaking models."""
+    useful_rows = [
+        row for row in rows if row[2] in {"A", "B"} and not (row[4] & QUALITY_BREAKING_LABELS)
+    ]
+    useful_rows.sort(
+        key=lambda row: (
+            row[1],
+            getattr(row[0].generation, "generation_tps", 0) or 0,
+        ),
+        reverse=True,
+    )
+    return useful_rows
+
+
+def _select_watchlist_rows(rows: list[UtilityTriageRow]) -> list[tuple[UtilityTriageRow, str]]:
+    """Return successful-but-risky models with reason labels."""
+    watchlist_rows: list[tuple[UtilityTriageRow, str]] = []
+    for row in rows:
+        _res, _score, grade, weakness, labels = row
+        breaking = sorted(labels & QUALITY_BREAKING_LABELS)
+        if breaking:
+            watchlist_rows.append((row, ",".join(breaking)))
+            continue
+        if grade in {"D", "F"}:
+            watchlist_rows.append((row, weakness))
+
+    watchlist_rows.sort(
+        key=lambda item: (
+            0 if "harness" in item[0][4] else 1,
+            {"F": 0, "D": 1, "C": 2, "B": 3, "A": 4}.get(item[0][2], 2),
+            item[0][1],
+        ),
+    )
+    return watchlist_rows
+
+
+def _log_utility_triage(rows: list[UtilityTriageRow]) -> None:
+    """Log utility grade distribution and shortlists."""
+    if not rows:
+        return
+
+    grade_counts: Counter[str] = Counter(grade for _res, _score, grade, _weak, _labels in rows)
+    avg_utility = sum(score for _res, score, _grade, _weak, _labels in rows) / len(rows)
+    n_ab = grade_counts.get("A", 0) + grade_counts.get("B", 0)
+    n_c = grade_counts.get("C", 0)
+    n_df = grade_counts.get("D", 0) + grade_counts.get("F", 0)
+
+    log_blank()
+    logger.info("📚 Cataloging Utility Snapshot:")
+    logger.info(
+        "   Avg score: %.0f/100 | A/B=%d, C=%d, D/F=%d",
+        avg_utility,
+        n_ab,
+        n_c,
+        n_df,
+    )
+
+    useful_rows = _select_useful_rows(rows)
+    if useful_rows:
+        logger.info("   Useful now (top %d):", min(MAX_TRIAGE_MODELS, len(useful_rows)))
+        for res, score, grade, _weakness, _labels in useful_rows[:MAX_TRIAGE_MODELS]:
+            tps = getattr(res.generation, "generation_tps", 0) or 0
+            logger.info("   - %s: %s %.0f/100 (%.1f tps)", res.model_name, grade, score, tps)
+    else:
+        logger.info("   Useful now: none (no clean A/B outputs)")
+
+    watchlist_rows = _select_watchlist_rows(rows)
+    if watchlist_rows:
+        logger.info("   Watchlist (top %d):", min(MAX_TRIAGE_MODELS, len(watchlist_rows)))
+        for row, reason in watchlist_rows[:MAX_TRIAGE_MODELS]:
+            res, score, grade, _weakness, _labels = row
+            logger.info("   - %s: %s %.0f/100 (%s)", res.model_name, grade, score, reason)
+
+
+def _log_failed_models_summary(failed: list[PerformanceResult]) -> None:
+    """Log failed models and failure distribution for actionable triage."""
+    logger.info("❌ Failed Models (%d):", len(failed))
+    for res in failed:
+        error_pkg = f" -> {res.error_package}" if res.error_package else ""
+        logger.info(
+            "  - %s (%s%s)",
+            res.model_name,
+            res.error_stage or "Unknown",
+            error_pkg,
+            extra={"style_hint": LogStyles.ERROR},
+        )
+
+    package_names: list[str] = [res.error_package or "unknown" for res in failed]
+    stage_names: list[str] = [res.error_stage or "Unknown" for res in failed]
+    pkg_counts: Counter[str] = Counter(package_names)
+    stage_counts: Counter[str] = Counter(stage_names)
+    logger.info("   By package: %s", _format_counter_items(pkg_counts))
+    logger.info("   By stage: %s", _format_counter_items(stage_counts))
+
+
+def _log_successful_models_list(successful: list[PerformanceResult]) -> None:
+    """Log successful models sorted by generation throughput."""
+    logger.info("✅ Successful Models (%d):", len(successful))
+    sorted_success = sorted(
+        successful,
+        key=lambda r: getattr(r.generation, "generation_tps", 0) or 0,
+        reverse=True,
+    )
+    for res in sorted_success:
+        tps = getattr(res.generation, "generation_tps", 0) or 0
+        active_mem = res.active_memory or 0.0
+        cache_mem = res.cache_memory or 0.0
+        mem_info = ""
+        if active_mem > 0 or cache_mem > 0:
+            mem_info = f" (Active: {active_mem:.1f}GB, Cache: {cache_mem:.1f}GB)"
+        logger.info(
+            "  - %s: %.1f tps%s",
+            res.model_name,
+            tps,
+            mem_info,
+            extra={"style_hint": LogStyles.SUCCESS},
+        )
+
+
+def log_summary(
+    results: list[PerformanceResult],
+    *,
+    prompt: str | None = None,
+) -> None:
+    """Log run summary focused on diagnostics, quality, and model triage."""
     if not results:
         return
 
@@ -9424,102 +9744,30 @@ def log_summary(results: list[PerformanceResult]) -> None:
     logger.info("Results Summary", extra={"style_hint": LogStyles.HEADER})
     log_rule(color=Colors.BLUE, bold=True)
 
-    # Success stats
     successful = [r for r in results if r.success]
     failed = [r for r in results if not r.success]
 
-    # Performance Highlights (only if we have successful models)
     if successful:
-        logger.info("🏆 Performance Highlights:")
-
-        # Fastest model (gen TPS)
-        fastest = max(successful, key=lambda r: getattr(r.generation, "generation_tps", 0) or 0)
-        fastest_tps = getattr(fastest.generation, "generation_tps", 0) or 0
-        logger.info("   Fastest: %s (%.1f tps)", fastest.model_name, fastest_tps)
-
-        # Most memory efficient (lowest peak memory)
-        most_efficient = min(
+        _log_performance_highlights(successful)
+        log_blank()
+        quality_counts, clean_count, utility_rows = _collect_quality_and_utility_rows(
             successful,
-            key=lambda r: getattr(r.generation, "peak_memory", float("inf")) or float("inf"),
+            prompt=prompt,
         )
-        efficient_mem = getattr(most_efficient.generation, "peak_memory", 0) or 0
-        logger.info("   💾 Most efficient: %s (%.1f GB)", most_efficient.model_name, efficient_mem)
-
-        # Fastest to load
-        fastest_load = min(
-            successful,
-            key=lambda r: getattr(r, "load_time", float("inf")) or float("inf"),
+        _log_quality_signal_summary(
+            quality_counts,
+            clean_count=clean_count,
+            successful_count=len(successful),
         )
-        load_time = getattr(fastest_load, "load_time", 0) or 0
-        logger.info("   ⚡ Fastest load: %s (%.2fs)", fastest_load.model_name, load_time)
-
-        # Average TPS
-        total_tps = sum(getattr(r.generation, "generation_tps", 0) or 0 for r in successful)
-        avg_tps = total_tps / len(successful) if successful else 0
-        logger.info("   📊 Average TPS: %.1f across %d models", avg_tps, len(successful))
-
+        _log_utility_triage(utility_rows)
         log_blank()
 
-        # Resource Usage Summary
-        logger.info("📈 Resource Usage:")
-
-        # Total and average memory
-        total_mem = sum(getattr(r.generation, "peak_memory", 0) or 0 for r in successful)
-        avg_mem = total_mem / len(successful) if successful else 0
-        logger.info("   Total peak memory: %.1f GB", total_mem)
-        logger.info("   Average peak memory: %.1f GB", avg_mem)
-
-        # Memory efficiency (tokens per GB)
-        total_tokens = sum(
-            (getattr(r.generation, "prompt_tokens", 0) or 0)
-            + (getattr(r.generation, "generation_tokens", 0) or 0)
-            for r in successful
-        )
-        tokens_per_gb = total_tokens / total_mem if total_mem > 0 else 0
-        logger.info("   Memory efficiency: %.0f tokens/GB", tokens_per_gb)
-
-        log_blank()
-
-    # Failed models
     if failed:
-        logger.info("❌ Failed Models (%d):", len(failed))
-        for res in failed:
-            error_pkg = f" -> {res.error_package}" if res.error_package else ""
-            logger.info(
-                "  - %s (%s%s)",
-                res.model_name,
-                res.error_stage or "Unknown",
-                error_pkg,
-                extra={"style_hint": LogStyles.ERROR},
-            )
+        _log_failed_models_summary(failed)
         log_blank()
 
-    # Successful models list
     if successful:
-        logger.info("✅ Successful Models (%d):", len(successful))
-        # Sort by generation tps (descending)
-        sorted_success = sorted(
-            successful,
-            key=lambda r: getattr(r.generation, "generation_tps", 0) or 0,
-            reverse=True,
-        )
-        for res in sorted_success:
-            tps = getattr(res.generation, "generation_tps", 0) or 0
-            active_mem = res.active_memory or 0.0
-            cache_mem = res.cache_memory or 0.0
-
-            # Format memory info only if we have data
-            mem_info = ""
-            if active_mem > 0 or cache_mem > 0:
-                mem_info = f" (Active: {active_mem:.1f}GB, Cache: {cache_mem:.1f}GB)"
-
-            logger.info(
-                "  - %s: %.1f tps%s",
-                res.model_name,
-                tps,
-                mem_info,
-                extra={"style_hint": LogStyles.SUCCESS},
-            )
+        _log_successful_models_list(successful)
 
 
 def _history_path_for_jsonl(jsonl_path: Path) -> Path:
@@ -9893,7 +10141,7 @@ def finalize_execution(
         print_model_stats(results)
 
         # Log summary with failure bucketing for diagnostics
-        log_summary(results)
+        log_summary(results, prompt=prompt)
 
         # Gather system characteristics for reports
         system_info = get_system_characteristics()
@@ -9904,6 +10152,8 @@ def finalize_execution(
         tsv_output_path: Path = args.output_tsv.resolve()
         jsonl_output_path: Path = args.output_jsonl.resolve()
         diagnostics_path: Path = args.output_diagnostics.resolve()
+        log_output_path: Path = args.output_log.resolve()
+        env_output_path: Path = args.output_env.resolve()
         history_path = _history_path_for_jsonl(jsonl_output_path)
         previous_history = _load_latest_history_record(history_path)
 
@@ -9969,11 +10219,10 @@ def finalize_execution(
             log_file_path(args.output_tsv, label="   TSV Report:   ")
             log_file_path(args.output_jsonl, label="   JSONL Report: ")
 
-            log_file_path(DEFAULT_LOG_OUTPUT, label="   Log File:")
+            log_file_path(log_output_path, label="   Log File:")
             # Include environment.log in the output file listing
-            env_log = DEFAULT_ENV_OUTPUT.resolve()
-            if env_log.exists():
-                log_file_path(env_log, label="   Environment:")
+            if env_output_path.exists():
+                log_file_path(env_output_path, label="   Environment:")
         except (OSError, ValueError):
             logger.exception("Failed to generate reports.")
 
