@@ -266,6 +266,62 @@ class TestComputeConfidenceIndicators:
         result = mod.compute_confidence_indicators(text)
         assert result["confidence_ratio"] >= 0.0  # at least computable
 
+    def test_config_driven_patterns(self, mod: types.ModuleType) -> None:
+        """Configured confidence patterns should override built-in defaults."""
+        original_patterns = mod.QUALITY.patterns
+        mod.QUALITY.patterns = {
+            "confidence_hedge_patterns": [r"\bhedgeword\b"],
+            "confidence_definitive_patterns": [r"\bdefword\b"],
+        }
+        try:
+            result = mod.compute_confidence_indicators("hedgeword defword defword")
+            assert result["hedge_count"] == 1
+            assert result["definitive_count"] == 2
+            assert result["confidence_ratio"] == 0.67
+        finally:
+            mod.QUALITY.patterns = original_patterns
+
+
+class TestConfigDrivenCatalogingDetectors:
+    """Tests for config-driven task-compliance and visual-grounding patterns."""
+
+    def test_task_compliance_uses_configured_labels(self, mod: types.ModuleType) -> None:
+        """Configured labels should be recognized as explicit task sections."""
+        original_patterns = mod.QUALITY.patterns
+        mod.QUALITY.patterns = {
+            "task_caption_labels": ["headline"],
+            "task_description_labels": ["notes"],
+            "task_keyword_labels": ["terms"],
+        }
+        try:
+            text = "headline: Church tower\nnotes: Stone church in winter.\nterms: church, tower"
+            result = mod.compute_task_compliance(text)
+            assert result["has_caption"] is True
+            assert result["has_description"] is True
+            assert result["has_keywords"] is True
+        finally:
+            mod.QUALITY.patterns = original_patterns
+
+    def test_visual_grounding_uses_configured_patterns(self, mod: types.ModuleType) -> None:
+        """Configured visual/spatial/color patterns should drive grounding counts."""
+        original_patterns = mod.QUALITY.patterns
+        mod.QUALITY.patterns = {
+            "visual_grounding_visual_patterns": [r"\bcustomobject\b"],
+            "visual_grounding_spatial_patterns": [r"\bcustomspot\b"],
+            "visual_grounding_color_patterns": [r"\bcustomcolor\b"],
+        }
+        try:
+            result = mod.compute_visual_grounding(
+                "customobject at customspot with customcolor",
+                None,
+            )
+            assert result["visual_terms"] == 1
+            assert result["spatial_terms"] == 1
+            assert result["color_terms"] == 1
+            assert result["grounding_score"] > 0.0
+        finally:
+            mod.QUALITY.patterns = original_patterns
+
 
 # ── QualityThresholds.from_config (YAML schema validation) ────────────────
 

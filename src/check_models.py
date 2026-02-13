@@ -257,6 +257,16 @@ class QualityThresholds:
     grade_b_threshold: float = 65.0  # Score for B grade
     grade_c_threshold: float = 50.0  # Score for C grade
     grade_d_threshold: float = 35.0  # Score for D grade
+    # Cataloging utility score composition
+    cataloging_weight_information_gain: float = 25.0
+    cataloging_weight_compliance: float = 30.0
+    cataloging_weight_grounding: float = 30.0
+    cataloging_weight_length: float = 15.0
+    # Cataloging utility penalties/factors
+    severe_echo_penalty: float = 0.5
+    moderate_echo_penalty: float = 0.8
+    very_short_length_factor: float = 0.2
+    short_length_factor: float = 0.6
 
     # Harness issue detection thresholds
     min_bpe_artifact_count: int = 5  # Min BPE artifacts to flag encoding issue
@@ -2123,33 +2133,78 @@ def _detect_fabricated_details(text: str) -> tuple[bool, list[str]]:
     issues: list[str] = []
 
     # 1. Detect suspicious URLs (models often fabricate URLs)
-    urls = re.findall(r"https?://[^\s<>\"']+", text)
+    url_patterns = _get_quality_pattern_list(
+        "fabrication_url_patterns",
+        [r"https?://[^\s<>\"']+"],
+    )
+    urls = _extract_pattern_matches(
+        text,
+        url_patterns,
+        debug_context="fabrication URL",
+        unique=True,
+    )
+
+    suspicious_url_keywords = _get_quality_pattern_list(
+        "fabrication_suspicious_url_keywords",
+        ["example.com", "placeholder", "xxx", "fake"],
+    )
+    long_url_path_patterns = _get_quality_pattern_list(
+        "fabrication_long_url_path_patterns",
+        [r"/[a-z0-9]{20,}/"],
+    )
     for url in urls:
         # Fabricated URLs often have suspicious patterns
-        if any(
-            suspicious in url.lower()
-            for suspicious in ["example.com", "placeholder", "xxx", "fake"]
-        ):
+        if any(suspicious in url.lower() for suspicious in suspicious_url_keywords):
             issues.append(f"suspicious_url: {url[:50]}")
         # Very long URLs with random-looking paths
-        elif len(url) > QUALITY.max_url_length and re.search(r"/[a-z0-9]{20,}/", url.lower()):
+        elif len(url) > QUALITY.max_url_length and _matches_any_pattern(
+            url.lower(),
+            long_url_path_patterns,
+            debug_context="fabrication long URL path",
+        ):
             issues.append(f"fabricated_url: {url[:50]}...")
 
     # 2. Detect invented precise statistics (suspiciously specific numbers)
     # e.g., "exactly 73.847%" or "precisely 14,523 items"
-    precise_stats = re.findall(r"\b(\d{1,3}(?:,\d{3})*\.\d{3,})\s*%?", text)
+    precise_stat_patterns = _get_quality_pattern_list(
+        "fabrication_precise_stat_patterns",
+        [r"\b(\d{1,3}(?:,\d{3})*\.\d{3,})\s*%?"],
+    )
+    precise_stats = _extract_pattern_matches(
+        text,
+        precise_stat_patterns,
+        debug_context="fabrication precise stat",
+    )
     if len(precise_stats) >= QUALITY.min_precise_stats:
         issues.append(f"suspicious_precision: {len(precise_stats)} overly precise numbers")
 
     # 3. Detect future dates (model can't know the future)
     # Years 2030+ are definitely future
-    future_years = re.findall(r"\b(20[3-9]\d|2[1-9]\d{2})\b", text)
+    future_year_patterns = _get_quality_pattern_list(
+        "fabrication_future_year_patterns",
+        [r"\b(20[3-9]\d|2[1-9]\d{2})\b"],
+    )
+    future_years = _extract_pattern_matches(
+        text,
+        future_year_patterns,
+        debug_context="fabrication future year",
+        unique=True,
+    )
     if future_years:
         issues.append(f"future_date: {', '.join(future_years[:3])}")
 
     # 4. Detect citations to non-existent sources (common hallucination)
     # Patterns like "according to Smith et al. (2024)" or "(Johnson, 2025)"
-    fake_citations = re.findall(r"\(([A-Z][a-z]+(?:\s+et\s+al\.?)?,?\s*\d{4})\)", text)
+    citation_patterns = _get_quality_pattern_list(
+        "fabrication_citation_patterns",
+        [r"\(([A-Z][a-z]+(?:\s+et\s+al\.?)?,?\s*\d{4})\)"],
+    )
+    fake_citations = _extract_pattern_matches(
+        text,
+        citation_patterns,
+        debug_context="fabrication citation",
+        unique=True,
+    )
     if fake_citations:
         issues.append(f"unverifiable_citation: {', '.join(fake_citations[:2])}")
 
@@ -2331,24 +2386,61 @@ def _detect_training_data_leak(text: str) -> tuple[bool, str | None]:
         return False, None
 
     # Look for instruction-like patterns appearing mid-output
-    instruction_patterns = [
-        # Direct instruction markers
-        (r"\n# INSTRUCTION\b", "instruction_header"),
-        (r"\n## (Task|Question|Instructions?):", "task_header"),
-        (r"\nWrite a (?:short )?(?:story|essay|poem|code)", "write_prompt"),
-        (r"\n(?:User|Human|Question):\s*\n", "user_turn"),
-        # Code-related training patterns
-        (r"\n```\w+\n.*?def \w+\(", "code_example"),
-        # Q&A training patterns
-        (r"\nQ:\s*\n.*?\nA:\s*\n", "qa_pair"),
+    training_leak_pattern_groups = [
+        (
+            _get_quality_pattern_list(
+                "training_leak_instruction_header_patterns",
+                [r"\n# INSTRUCTION\b"],
+            ),
+            "instruction_header",
+        ),
+        (
+            _get_quality_pattern_list(
+                "training_leak_task_header_patterns",
+                [r"\n## (Task|Question|Instructions?):"],
+            ),
+            "task_header",
+        ),
+        (
+            _get_quality_pattern_list(
+                "training_leak_write_prompt_patterns",
+                [r"\nWrite a (?:short )?(?:story|essay|poem|code)"],
+            ),
+            "write_prompt",
+        ),
+        (
+            _get_quality_pattern_list(
+                "training_leak_user_turn_patterns",
+                [r"\n(?:User|Human|Question):\s*\n"],
+            ),
+            "user_turn",
+        ),
+        (
+            _get_quality_pattern_list(
+                "training_leak_code_example_patterns",
+                [r"\n```\w+\n.*?def \w+\("],
+            ),
+            "code_example",
+        ),
+        (
+            _get_quality_pattern_list(
+                "training_leak_qa_pair_patterns",
+                [r"\nQ:\s*\n.*?\nA:\s*\n"],
+            ),
+            "qa_pair",
+        ),
     ]
 
     # Only check the latter portion of output (leaks happen after good output)
     check_portion = text[len(text) // 3 :]
 
-    for pattern, leak_type in instruction_patterns:
-        if re.search(pattern, check_portion, re.DOTALL):
-            return True, leak_type
+    for patterns, leak_type in training_leak_pattern_groups:
+        for pattern in patterns:
+            try:
+                if re.search(pattern, check_portion, re.DOTALL):
+                    return True, leak_type
+            except re.error:
+                logger.debug("Ignoring invalid training leak regex: %s", pattern)
 
     return False, None
 
@@ -2463,6 +2555,81 @@ def detect_response_structure(text: str) -> dict[str, bool]:
     }
 
 
+def _get_quality_pattern_list(pattern_key: str, fallback: list[str]) -> list[str]:
+    """Return configured regex/pattern list for a key, falling back to defaults."""
+    if not QUALITY.patterns:
+        return fallback
+
+    configured = QUALITY.patterns.get(pattern_key)
+    if not configured:
+        return fallback
+
+    # Guard against malformed YAML values while keeping detector behavior stable.
+    valid = [p for p in configured if isinstance(p, str)]
+    return valid or fallback
+
+
+def _contains_labeled_section(text_lower: str, label_patterns: list[str]) -> bool:
+    """Return True if text contains any configured section label pattern."""
+    for pattern in label_patterns:
+        try:
+            if re.search(rf"\b(?:{pattern})\s*:", text_lower):
+                return True
+        except re.error:
+            logger.debug("Ignoring invalid section label regex: %s", pattern)
+    return False
+
+
+def _extract_pattern_matches(
+    text: str,
+    patterns: list[str],
+    *,
+    debug_context: str,
+    flags: int = 0,
+    unique: bool = False,
+) -> list[str]:
+    """Return regex matches for configured patterns, ignoring invalid regex entries."""
+    matches: list[str] = []
+    seen: set[str] = set()
+
+    for pattern in patterns:
+        try:
+            for match in re.finditer(pattern, text, flags):
+                value = match.group(0)
+                if not value:
+                    continue
+                if unique and value in seen:
+                    continue
+                matches.append(value)
+                seen.add(value)
+        except re.error:
+            logger.debug("Ignoring invalid %s regex: %s", debug_context, pattern)
+
+    return matches
+
+
+def _matches_any_pattern(text: str, patterns: list[str], *, debug_context: str) -> bool:
+    """Return True if text matches at least one configured regex pattern."""
+    for pattern in patterns:
+        try:
+            if re.search(pattern, text):
+                return True
+        except re.error:
+            logger.debug("Ignoring invalid %s regex: %s", debug_context, pattern)
+    return False
+
+
+def _count_pattern_matches(text: str, patterns: list[str]) -> int:
+    """Count total regex matches across all configured patterns."""
+    total = 0
+    for pattern in patterns:
+        try:
+            total += len(re.findall(pattern, text))
+        except re.error:
+            logger.debug("Ignoring invalid regex pattern: %s", pattern)
+    return total
+
+
 def compute_confidence_indicators(text: str) -> dict[str, float | int]:
     """Analyze text for confidence/certainty indicators.
 
@@ -2483,39 +2650,42 @@ def compute_confidence_indicators(text: str) -> dict[str, float | int]:
 
     text_lower = text.lower()
 
-    # Hedge words/phrases indicating uncertainty
-    hedge_patterns = [
-        r"\bappears to\b",
-        r"\bseems to\b",
-        r"\blooks like\b",
-        r"\bmight be\b",
-        r"\bcould be\b",
-        r"\bpossibly\b",
-        r"\bperhaps\b",
-        r"\bprobably\b",
-        r"\blikely\b",
-        r"\bmaybe\b",
-        r"\bi think\b",
-        r"\bi believe\b",
-        r"\bit's unclear\b",
-        r"\buncertain\b",
-    ]
+    hedge_patterns = _get_quality_pattern_list(
+        "confidence_hedge_patterns",
+        [
+            r"\bappears to\b",
+            r"\bseems to\b",
+            r"\blooks like\b",
+            r"\bmight be\b",
+            r"\bcould be\b",
+            r"\bpossibly\b",
+            r"\bperhaps\b",
+            r"\bprobably\b",
+            r"\blikely\b",
+            r"\bmaybe\b",
+            r"\bi think\b",
+            r"\bi believe\b",
+            r"\bit's unclear\b",
+            r"\buncertain\b",
+        ],
+    )
+    definitive_patterns = _get_quality_pattern_list(
+        "confidence_definitive_patterns",
+        [
+            r"\bis a\b",
+            r"\bare \w+\b",
+            r"\bshows\b",
+            r"\bdepicts\b",
+            r"\bfeatures\b",
+            r"\bcontains\b",
+            r"\bdefinitely\b",
+            r"\bclearly\b",
+            r"\bobviously\b",
+        ],
+    )
 
-    # Definitive patterns indicating confidence
-    definitive_patterns = [
-        r"\bis a\b",
-        r"\bare \w+\b",
-        r"\bshows\b",
-        r"\bdepicts\b",
-        r"\bfeatures\b",
-        r"\bcontains\b",
-        r"\bdefinitely\b",
-        r"\bclearly\b",
-        r"\bobviously\b",
-    ]
-
-    hedge_count = sum(len(re.findall(p, text_lower)) for p in hedge_patterns)
-    definitive_count = sum(len(re.findall(p, text_lower)) for p in definitive_patterns)
+    hedge_count = _count_pattern_matches(text_lower, hedge_patterns)
+    definitive_count = _count_pattern_matches(text_lower, definitive_patterns)
 
     total = hedge_count + definitive_count
     confidence_ratio = definitive_count / total if total > 0 else 0.5
@@ -2618,10 +2788,23 @@ def compute_task_compliance(text: str) -> dict[str, bool | float]:
 
     text_lower = text.lower()
 
+    caption_labels = _get_quality_pattern_list(
+        "task_caption_labels",
+        ["caption", "title"],
+    )
+    description_labels = _get_quality_pattern_list(
+        "task_description_labels",
+        ["description", "details?", "summary"],
+    )
+    keyword_labels = _get_quality_pattern_list(
+        "task_keyword_labels",
+        ["keywords?", "tags?"],
+    )
+
     # Check for explicit labeled sections
-    has_explicit_caption = bool(re.search(r"\b(caption|title)\s*:", text_lower))
-    has_explicit_description = bool(re.search(r"\b(description|details?|summary)\s*:", text_lower))
-    has_explicit_keywords = bool(re.search(r"\b(keywords?|tags?)\s*:", text_lower))
+    has_explicit_caption = _contains_labeled_section(text_lower, caption_labels)
+    has_explicit_description = _contains_labeled_section(text_lower, description_labels)
+    has_explicit_keywords = _contains_labeled_section(text_lower, keyword_labels)
 
     # Check for implicit structure (bullet lists for keywords, paragraphs for description)
     has_bullet_list = bool(re.search(r"^[-•*]\s+\w+", text, re.MULTILINE))
@@ -2681,38 +2864,44 @@ def compute_visual_grounding(text: str, context: str | None) -> dict[str, float 
     context_lower = (context or "").lower()
 
     # Visual object/element terms (things you can see)
-    visual_patterns = [
-        r"\b(building|house|shop|store|street|road|car|vehicle|person|people|pedestrian)\b",
-        r"\b(sign|window|door|roof|wall|brick|stone|glass)\b",
-        r"\b(tree|sky|cloud|hill|mountain|grass|flower)\b",
-        r"\b(light|lamp|shadow|reflection|glow)\b",
-        r"\b(wearing|standing|sitting|walking|driving)\b",
-    ]
+    visual_patterns = _get_quality_pattern_list(
+        "visual_grounding_visual_patterns",
+        [
+            r"\b(building|house|shop|store|street|road|car|vehicle|person|people|pedestrian)\b",
+            r"\b(sign|window|door|roof|wall|brick|stone|glass)\b",
+            r"\b(tree|sky|cloud|hill|mountain|grass|flower)\b",
+            r"\b(light|lamp|shadow|reflection|glow)\b",
+            r"\b(wearing|standing|sitting|walking|driving)\b",
+        ],
+    )
 
     # Spatial relationship terms
-    spatial_patterns = [
-        r"\b(left|right|center|middle|foreground|background)\b",
-        r"\b(above|below|beside|behind|front|back)\b",
-        r"\b(near|far|distant|close|adjacent)\b",
-        r"\b(top|bottom|side|corner|edge)\b",
-    ]
+    spatial_patterns = _get_quality_pattern_list(
+        "visual_grounding_spatial_patterns",
+        [
+            r"\b(left|right|center|middle|foreground|background)\b",
+            r"\b(above|below|beside|behind|front|back)\b",
+            r"\b(near|far|distant|close|adjacent)\b",
+            r"\b(top|bottom|side|corner|edge)\b",
+        ],
+    )
 
     # Color terms
-    color_patterns = [
-        r"\b(red|blue|green|yellow|orange|purple|pink|brown|black|white|gray|grey)\b",
-        r"\b(golden|silver|bronze|dark|light|bright|pale|vivid)\b",
-        r"\b(warm|cool|muted|saturated)\b",
-    ]
+    color_patterns = _get_quality_pattern_list(
+        "visual_grounding_color_patterns",
+        [
+            r"\b(red|blue|green|yellow|orange|purple|pink|brown|black|white|gray|grey)\b",
+            r"\b(golden|silver|bronze|dark|light|bright|pale|vivid)\b",
+            r"\b(warm|cool|muted|saturated)\b",
+        ],
+    )
 
-    def count_matches(patterns: list[str], text: str) -> int:
-        return sum(len(re.findall(p, text)) for p in patterns)
-
-    visual_count = count_matches(visual_patterns, text_lower)
-    spatial_count = count_matches(spatial_patterns, text_lower)
-    color_count = count_matches(color_patterns, text_lower)
+    visual_count = _count_pattern_matches(text_lower, visual_patterns)
+    spatial_count = _count_pattern_matches(text_lower, spatial_patterns)
+    color_count = _count_pattern_matches(text_lower, color_patterns)
 
     # Penalize if visual terms are just from context (not novel observations)
-    context_visual = count_matches(visual_patterns, context_lower) if context else 0
+    context_visual = _count_pattern_matches(context_lower, visual_patterns) if context else 0
     novel_visual = max(0, visual_count - context_visual)
 
     # Calculate grounding score (weighted combination)
@@ -2782,26 +2971,29 @@ def compute_cataloging_utility(
     # Compute echo penalty inline
     word_count = len(text.split())
     if echo_ratio > QUALITY.severe_echo_threshold:
-        echo_penalty = 0.5  # Severe penalty for mostly echoing
+        echo_penalty = QUALITY.severe_echo_penalty  # Severe penalty for mostly echoing
     elif echo_ratio > QUALITY.moderate_echo_threshold:
-        echo_penalty = 0.8  # Moderate penalty
+        echo_penalty = QUALITY.moderate_echo_penalty  # Moderate penalty
     else:
         echo_penalty = 1.0  # No penalty
 
     # Compute length factor inline
     if word_count < QUALITY.min_useful_words:
-        length_factor, length_weakness = 0.2, "Output too short to be useful"
+        length_factor, length_weakness = (
+            QUALITY.very_short_length_factor,
+            "Output too short to be useful",
+        )
     elif word_count < QUALITY.short_output_words:
-        length_factor, length_weakness = 0.6, "Output lacks detail"
+        length_factor, length_weakness = QUALITY.short_length_factor, "Output lacks detail"
     else:
         length_factor, length_weakness = 1.0, ""
 
     # Weighted combination (out of 100)
     raw_score = (
-        information_gain_score * 25  # 25 points for adding new info
-        + compliance_score * 30  # 30 points for following structure
-        + grounding_score * 30  # 30 points for visual descriptions
-        + min(word_count / 50, 1.0) * 15  # 15 points for reasonable length
+        information_gain_score * QUALITY.cataloging_weight_information_gain
+        + compliance_score * QUALITY.cataloging_weight_compliance
+        + grounding_score * QUALITY.cataloging_weight_grounding
+        + min(word_count / 50, 1.0) * QUALITY.cataloging_weight_length
     )
 
     final_score = raw_score * echo_penalty * length_factor

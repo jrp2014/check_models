@@ -315,6 +315,24 @@ def test_detect_fabricated_details_suspicious_url() -> None:
     assert any("url" in issue.lower() for issue in issues)
 
 
+def test_detect_fabricated_details_uses_configured_patterns() -> None:
+    """Configured fabrication patterns should override built-in defaults."""
+    original_patterns = check_models.QUALITY.patterns
+    check_models.QUALITY.patterns = {
+        "fabrication_url_patterns": [r"https?://[^\s]+"],
+        "fabrication_suspicious_url_keywords": ["customtokenxyz"],
+        "fabrication_precise_stat_patterns": [r"\bwonky\d+\b"],
+    }
+    try:
+        text = "See https://domain.test/customtokenxyz/path with wonky1 and wonky2."
+        has_fab, issues = check_models._detect_fabricated_details(text)
+        assert has_fab is True
+        assert any("suspicious_url" in issue for issue in issues)
+        assert any("suspicious_precision" in issue for issue in issues)
+    finally:
+        check_models.QUALITY.patterns = original_patterns
+
+
 def test_detect_fabricated_details_future_date() -> None:
     """Detect references to future years (LLM can't know the future)."""
     text = "According to the 2035 census data, the population increased."
@@ -436,6 +454,26 @@ def test_detect_training_data_leak_clean() -> None:
     has_leak, leak_type = check_models._detect_training_data_leak(text)
     assert has_leak is False
     assert leak_type is None
+
+
+def test_detect_training_data_leak_uses_configured_patterns() -> None:
+    """Configured training-leak pattern groups should be used."""
+    original_patterns = check_models.QUALITY.patterns
+    check_models.QUALITY.patterns = {
+        "training_leak_instruction_header_patterns": [r"\n### CUSTOM LEAK ###"],
+    }
+    try:
+        text = (
+            "A detailed response about architecture and people in the square. "
+            "It includes grounded visual details and contextual cues.\n"
+            "### CUSTOM LEAK ###\n"
+            "Write a short story about a traveler."
+        )
+        has_leak, leak_type = check_models._detect_training_data_leak(text)
+        assert has_leak is True
+        assert leak_type == "instruction_header"
+    finally:
+        check_models.QUALITY.patterns = original_patterns
 
 
 def test_analyze_generation_text_includes_harness_issues() -> None:

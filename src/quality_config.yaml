@@ -71,6 +71,16 @@ thresholds:
   grade_b_threshold: 65.0         # Score for B grade
   grade_c_threshold: 50.0         # Score for C grade
   grade_d_threshold: 35.0         # Score for D grade
+  # Cataloging utility score composition (weights should sum to ~100)
+  cataloging_weight_information_gain: 25.0
+  cataloging_weight_compliance: 30.0
+  cataloging_weight_grounding: 30.0
+  cataloging_weight_length: 15.0
+  # Cataloging utility penalties/factors
+  severe_echo_penalty: 0.5
+  moderate_echo_penalty: 0.8
+  very_short_length_factor: 0.2
+  short_length_factor: 0.6
 
   # Harness/integration issue detection thresholds
   # These detect mlx-vlm bugs or model integration issues (not model quality)
@@ -129,6 +139,108 @@ patterns:
     - "stuff"
     - "item"
     - "object"
+
+  # Confidence indicator detection (regex patterns)
+  confidence_hedge_patterns:
+    - "\\bappears to\\b"
+    - "\\bseems to\\b"
+    - "\\blooks like\\b"
+    - "\\bmight be\\b"
+    - "\\bcould be\\b"
+    - "\\bpossibly\\b"
+    - "\\bperhaps\\b"
+    - "\\bprobably\\b"
+    - "\\blikely\\b"
+    - "\\bmaybe\\b"
+    - "\\bi think\\b"
+    - "\\bi believe\\b"
+    - "\\bit's unclear\\b"
+    - "\\buncertain\\b"
+
+  confidence_definitive_patterns:
+    - "\\bis a\\b"
+    - "\\bare \\w+\\b"
+    - "\\bshows\\b"
+    - "\\bdepicts\\b"
+    - "\\bfeatures\\b"
+    - "\\bcontains\\b"
+    - "\\bdefinitely\\b"
+    - "\\bclearly\\b"
+    - "\\bobviously\\b"
+
+  # Task structure detection labels (regex fragments)
+  task_caption_labels:
+    - "caption"
+    - "title"
+
+  task_description_labels:
+    - "description"
+    - "details?"
+    - "summary"
+
+  task_keyword_labels:
+    - "keywords?"
+    - "tags?"
+
+  # Visual grounding detection (regex patterns)
+  visual_grounding_visual_patterns:
+    - "\\b(building|house|shop|store|street|road|car|vehicle|person|people|pedestrian)\\b"
+    - "\\b(sign|window|door|roof|wall|brick|stone|glass)\\b"
+    - "\\b(tree|sky|cloud|hill|mountain|grass|flower)\\b"
+    - "\\b(light|lamp|shadow|reflection|glow)\\b"
+    - "\\b(wearing|standing|sitting|walking|driving)\\b"
+
+  visual_grounding_spatial_patterns:
+    - "\\b(left|right|center|middle|foreground|background)\\b"
+    - "\\b(above|below|beside|behind|front|back)\\b"
+    - "\\b(near|far|distant|close|adjacent)\\b"
+    - "\\b(top|bottom|side|corner|edge)\\b"
+
+  visual_grounding_color_patterns:
+    - "\\b(red|blue|green|yellow|orange|purple|pink|brown|black|white|gray|grey)\\b"
+    - "\\b(golden|silver|bronze|dark|light|bright|pale|vivid)\\b"
+    - "\\b(warm|cool|muted|saturated)\\b"
+
+  # Fabricated-detail heuristics
+  fabrication_url_patterns:
+    - "https?://[^\\s<>\"']+"
+
+  fabrication_suspicious_url_keywords:
+    - "example.com"
+    - "placeholder"
+    - "xxx"
+    - "fake"
+
+  fabrication_long_url_path_patterns:
+    - "/[a-z0-9]{20,}/"
+
+  fabrication_precise_stat_patterns:
+    - "\\b(\\d{1,3}(?:,\\d{3})*\\.\\d{3,})\\s*%?"
+
+  fabrication_future_year_patterns:
+    - "\\b(20[3-9]\\d|2[1-9]\\d{2})\\b"
+
+  fabrication_citation_patterns:
+    - "\\(([A-Z][a-z]+(?:\\s+et\\s+al\\.?)?,?\\s*\\d{4})\\)"
+
+  # Training-leak heuristics
+  training_leak_instruction_header_patterns:
+    - "\\n# INSTRUCTION\\b"
+
+  training_leak_task_header_patterns:
+    - "\\n## (Task|Question|Instructions?):"
+
+  training_leak_write_prompt_patterns:
+    - "\\nWrite a (?:short )?(?:story|essay|poem|code)"
+
+  training_leak_user_turn_patterns:
+    - "\\n(?:User|Human|Question):\\s*\\n"
+
+  training_leak_code_example_patterns:
+    - "\\n```\\w+\\n.*?def \\w+\\("
+
+  training_leak_qa_pair_patterns:
+    - "\\nQ:\\s*\\n.*?\\nA:\\s*\\n"
 
   # Refusal detection
   refusal_explicit:
