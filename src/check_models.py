@@ -35,6 +35,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from functools import lru_cache
 from pathlib import Path
+from shlex import join as shlex_join
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -5552,7 +5553,7 @@ def _render_collapsible_model_blocks(
     parts = [f"<details><summary>{summary}</summary>", ""]
     for model_name, block_text in entries:
         safe_model = DIAGNOSTICS_ESCAPER.escape(model_name)
-        parts.append(f"#### `{safe_model}`")
+        parts.append(f"### `{safe_model}`")
         _append_markdown_code_block(parts, block_text, language="text")
     parts.append("</details>")
     parts.append("")
@@ -5580,6 +5581,18 @@ def _format_traceback_full(traceback_str: str | None) -> str | None:
         return None
     full = traceback_str.strip()
     return full or None
+
+
+def _sanitize_captured_output_for_report(captured_text: str) -> str:
+    """Normalize captured stdout/stderr for Markdown diagnostics readability."""
+    if not captured_text:
+        return ""
+
+    text = ANSI_ESCAPE_RE.sub("", captured_text)
+    text = text.replace("\r\n", "\n").replace("\r", "\n").replace("\x08", "")
+    text = "".join(ch for ch in text if ch in {"\n", "\t"} or ch.isprintable())
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
 
 
 def _build_failure_history_context(
@@ -5682,7 +5695,11 @@ def _diagnostics_full_tracebacks_section(cluster_results: list[PerformanceResult
 def _diagnostics_captured_output_section(cluster_results: list[PerformanceResult]) -> list[str]:
     """Build collapsed captured stdout/stderr blocks for models in a cluster."""
     with_output = [
-        (r.model_name, (r.captured_output_on_fail or "").strip()) for r in cluster_results
+        (
+            r.model_name,
+            _sanitize_captured_output_for_report(r.captured_output_on_fail or ""),
+        )
+        for r in cluster_results
     ]
     with_output = [(name, out) for name, out in with_output if out]
     return _render_collapsible_model_blocks(
@@ -6063,16 +6080,178 @@ def _diagnostics_history_section(
     return parts
 
 
+def _append_repro_input_tokens(
+    tokens: list[str],
+    *,
+    image_path: Path | None,
+    run_args: argparse.Namespace | None,
+) -> None:
+    """Append image/folder input tokens to reproducibility command."""
+    if image_path is not None:
+        tokens.extend(["--image", str(image_path)])
+        return
+
+    if run_args is None:
+        return
+
+    run_image = getattr(run_args, "image", None)
+    run_folder = getattr(run_args, "folder", None)
+    if run_image is not None:
+        tokens.extend(["--image", str(run_image)])
+    elif run_folder is not None:
+        tokens.extend(["--folder", str(run_folder)])
+
+
+def _append_repro_selection_tokens(tokens: list[str], run_args: argparse.Namespace) -> None:
+    """Append model-selection tokens to reproducibility command."""
+    models = getattr(run_args, "models", None)
+    if models:
+        tokens.extend(["--models", *[str(model) for model in models]])
+
+    exclude = getattr(run_args, "exclude", None)
+    if exclude:
+        tokens.extend(["--exclude", *[str(model) for model in exclude]])
+
+
+def _append_repro_optional_value_flags(
+    tokens: list[str],
+    flag_values: Sequence[tuple[str, str | int | float | Path | None]],
+) -> None:
+    """Append `--flag value` pairs when values are present."""
+    for flag, value in flag_values:
+        if value is None:
+            continue
+        tokens.extend([flag, str(value)])
+
+
+def _append_repro_bool_flags(
+    tokens: list[str],
+    run_args: argparse.Namespace,
+    flag_map: Sequence[tuple[str, str]],
+) -> None:
+    """Append boolean flags when the corresponding args attribute is truthy."""
+    for attr_name, flag in flag_map:
+        if bool(getattr(run_args, attr_name, False)):
+            tokens.append(flag)
+
+
+def _append_repro_runtime_tokens(tokens: list[str], run_args: argparse.Namespace) -> None:
+    """Append generation/runtime-affecting flags for reproducibility."""
+    trust_remote_code = bool(getattr(run_args, "trust_remote_code", True))
+    tokens.append("--trust-remote-code" if trust_remote_code else "--no-trust-remote-code")
+
+    _append_repro_optional_value_flags(
+        tokens,
+        [
+            ("--revision", getattr(run_args, "revision", None)),
+            ("--adapter-path", getattr(run_args, "adapter_path", None)),
+            ("--prompt", getattr(run_args, "prompt", None)),
+        ],
+    )
+
+    _append_repro_bool_flags(
+        tokens,
+        run_args,
+        [
+            ("detailed_metrics", "--detailed-metrics"),
+            ("lazy_load", "--lazy-load"),
+        ],
+    )
+
+    tokens.extend(["--max-tokens", str(getattr(run_args, "max_tokens", DEFAULT_MAX_TOKENS))])
+    tokens.extend(["--temperature", str(getattr(run_args, "temperature", DEFAULT_TEMPERATURE))])
+    tokens.extend(["--top-p", str(getattr(run_args, "top_p", 1.0))])
+
+    _append_repro_optional_value_flags(
+        tokens,
+        [
+            ("--repetition-penalty", getattr(run_args, "repetition_penalty", None)),
+            ("--repetition-context-size", getattr(run_args, "repetition_context_size", None)),
+            ("--max-kv-size", getattr(run_args, "max_kv_size", None)),
+            ("--kv-bits", getattr(run_args, "kv_bits", None)),
+            ("--prefill-step-size", getattr(run_args, "prefill_step_size", None)),
+        ],
+    )
+
+    kv_group_size = getattr(run_args, "kv_group_size", None)
+    if kv_group_size not in {None, 64}:
+        tokens.extend(["--kv-group-size", str(kv_group_size)])
+
+    quantized_kv_start = getattr(run_args, "quantized_kv_start", None)
+    if quantized_kv_start not in {None, 0}:
+        tokens.extend(["--quantized-kv-start", str(quantized_kv_start)])
+
+    tokens.extend(["--timeout", str(getattr(run_args, "timeout", DEFAULT_TIMEOUT))])
+
+
+def _append_repro_display_tokens(tokens: list[str], run_args: argparse.Namespace) -> None:
+    """Append display/config flags when relevant."""
+    _append_repro_bool_flags(
+        tokens,
+        run_args,
+        [
+            ("verbose", "--verbose"),
+            ("no_color", "--no-color"),
+            ("force_color", "--force-color"),
+        ],
+    )
+
+    _append_repro_optional_value_flags(
+        tokens,
+        [
+            ("--width", getattr(run_args, "width", None)),
+            ("--quality-config", getattr(run_args, "quality_config", None)),
+        ],
+    )
+
+    context_marker = getattr(run_args, "context_marker", None)
+    if context_marker and context_marker != "Context:":
+        tokens.extend(["--context-marker", str(context_marker)])
+
+
+def _build_repro_command_tokens(
+    *,
+    image_path: Path | None,
+    run_args: argparse.Namespace | None,
+    include_selection: bool,
+) -> list[str]:
+    """Build CLI command tokens for diagnostics reproducibility snippets."""
+    tokens = ["python", "-m", "check_models"]
+
+    _append_repro_input_tokens(tokens, image_path=image_path, run_args=run_args)
+
+    if run_args is None:
+        return tokens
+
+    if include_selection:
+        _append_repro_selection_tokens(tokens, run_args)
+
+    _append_repro_runtime_tokens(tokens, run_args)
+    _append_repro_display_tokens(tokens, run_args)
+
+    return tokens
+
+
 def _diagnostics_footer(
     failed: list[PerformanceResult],
     prompt: str,
+    *,
+    image_path: Path | None,
+    run_args: argparse.Namespace | None,
 ) -> list[str]:
+    all_run_tokens = _build_repro_command_tokens(
+        image_path=image_path,
+        run_args=run_args,
+        include_selection=True,
+    )
+    all_run_command = shlex_join(all_run_tokens)
+
     all_models_command = (
         "# Install check_models benchmarking tool\n"
-        "pip install -e src/.[dev]\n"
+        'pip install -e "src/[dev]"\n'
         "\n"
-        "# Run against all cached models\n"
-        "python src/check_models.py"
+        "# Re-run with the same CLI arguments\n"
+        f"{all_run_command}"
     )
     parts: list[str] = []
     _append_markdown_section(parts, title="## Reproducibility")
@@ -6080,9 +6259,16 @@ def _diagnostics_footer(
 
     if failed:
         parts.append("")
-        parts.append("### Target specific failing models:")
+        parts.append("### Target specific failing models")
+        target_base_tokens = _build_repro_command_tokens(
+            image_path=image_path,
+            run_args=run_args,
+            include_selection=False,
+        )
+        failed_models = sorted({r.model_name for r in failed})
         target_model_commands = "\n".join(
-            [f"python src/check_models.py --model {r.model_name}" for r in failed[:3]],
+            shlex_join([*target_base_tokens, "--models", model_name])
+            for model_name in failed_models
         )
         _append_markdown_code_block(parts, target_model_commands, language="bash")
 
@@ -6106,6 +6292,7 @@ def generate_diagnostics_report(
     system_info: dict[str, str],
     prompt: str,
     image_path: Path | None = None,
+    run_args: argparse.Namespace | None = None,
     history_path: Path | None = None,
     previous_history: HistoryRunRecord | None = None,
     current_history: HistoryRunRecord | None = None,
@@ -6124,6 +6311,7 @@ def generate_diagnostics_report(
         system_info: System characteristics dict from get_system_characteristics().
         prompt: The prompt that was used.
         image_path: Path to the test image (for reproducibility section).
+        run_args: Optional parsed CLI args from this run for exact repro commands.
         history_path: Optional history JSONL path for first-seen and retry context.
         previous_history: Optional previous run record for regression/recovery status.
         current_history: Optional current run record for regression/recovery status.
@@ -6176,11 +6364,18 @@ def generate_diagnostics_report(
         ),
     )
     parts.extend(_diagnostics_priority_table(results, harness_results))
-    parts.extend(_diagnostics_footer(failed, prompt))
+    parts.extend(
+        _diagnostics_footer(
+            failed,
+            prompt,
+            image_path=image_path,
+            run_args=run_args,
+        ),
+    )
 
     try:
         filename.parent.mkdir(parents=True, exist_ok=True)
-        filename.write_text("\n".join(parts), encoding="utf-8")
+        filename.write_text("\n".join(parts) + "\n", encoding="utf-8")
     except OSError:
         logger.exception("Failed to write diagnostics report to %s", filename)
         return False
@@ -10249,6 +10444,7 @@ def finalize_execution(
             system_info=system_info,
             prompt=prompt,
             image_path=image_path,
+            run_args=args,
             history_path=history_path,
             previous_history=previous_history,
             current_history=current_history,

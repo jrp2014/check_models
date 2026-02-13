@@ -53,7 +53,7 @@ ValueError: Model generation failed for mlx-community/Kimi-VL-A3B-Thinking-8bit:
 
 <details><summary>Full tracebacks (all models in this cluster)</summary>
 
-#### `mlx-community/Kimi-VL-A3B-Thinking-8bit`
+### `mlx-community/Kimi-VL-A3B-Thinking-8bit`
 
 ```text
 Traceback (most recent call last):
@@ -105,7 +105,7 @@ Traceback (most recent call last):
 ValueError: Model generation failed for mlx-community/Kimi-VL-A3B-Thinking-8bit: [broadcast_shapes] Shapes (999,2048) and (1,0,2048) cannot be broadcast.
 ```
 
-#### `mlx-community/paligemma2-3b-pt-896-4bit`
+### `mlx-community/paligemma2-3b-pt-896-4bit`
 
 ```text
 Traceback (most recent call last):
@@ -169,7 +169,7 @@ ValueError: Model generation failed for mlx-community/paligemma2-3b-pt-896-4bit:
 
 <details><summary>Captured stdout/stderr (all models in this cluster)</summary>
 
-#### `mlx-community/Kimi-VL-A3B-Thinking-8bit`
+### `mlx-community/Kimi-VL-A3B-Thinking-8bit`
 
 ```text
 === STDOUT ===
@@ -195,7 +195,8 @@ Keywords: 25–50 comma-separated keywords ordered from most specific to most ge
 - Seasonal and temporal context
 - Use-case relevance (e.g. business, travel, food, editorial)
 
-Context: The image is described as ', St Michael's Parish Church, Bishop's Stortford, England, United Kingdom, UKSt Michael's Parish Church in Bishop's Stortford, England, is pictured here on a late afternoon under a cool February sky. This Grade I listed building is a prominent example of Perpendicular Gothic architecture, with its current structure dating largely from the early 15th century. The photograph captures the intricate details of the church's traditional flint-knapped walls and stone-dressed windows, set against the backdrop of its historic churchyard. The soft, even light of the overcast day accentuates the textures and formidable presence of this centuries-old landmark.'.
+Context: The image is described as ', St Michael's Parish Church, Bishop's Stortford, England, United Kingdom, UK
+St Michael's Parish Church in Bishop's Stortford, England, is pictured here on a late afternoon under a cool February sky. This Grade I listed building is a prominent example of Perpendicular Gothic architecture, with its current structure dating largely from the early 15th century. The photograph captures the intricate details of the church's traditional flint-knapped walls and stone-dressed windows, set against the backdrop of its historic churchyard. The soft, even light of the overcast day accentuates the textures and formidable presence of this centuries-old landmark.'.
 Existing keywords: Bishop's Stortford, British, Christian, Christianity, England, English Church, Europe, Faith, Flint Knapped Wall, Flint Wall, Gothic Window, Grass, Graveyard, Hertfordshire, Parish church, Perpendicular Gothic, St Michael's Church, St Michael's Parish Church, UK, United Kingdom, ancient, arched window, architecture, battlements, black, brown, building, car, cemetery, church, church spire, churchyard, clock tower, cloudy, cloudy sky, cross, exterior, gothic architecture, gravestone, grey, headstone, heritage, historic, historic building, landmark, medieval, old, overcast, overcast sky, place of worship, religion, religious building, spire, stone, tombstone, tourism, tower, travel, weathervane, worship
 Taken on 2026-02-07 16:11:23 GMT (at 16:11:23 local time).
 
@@ -203,11 +204,15 @@ Be factual about visual content.  Include relevant conceptual and emotional keyw
 
 === STDERR ===
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-Fetching 18 files:   0%|          | 0/18 [00:00<?, ?it/s][AFetching 18 files: 100%|##########| 18/18 [00:00<00:00, 15735.20it/s]
-Download complete: : 0.00B [00:00, ?B/s]              Download complete: : 0.00B [00:00, ?B/s]
+
+Fetching 18 files:   0%|          | 0/18 [00:00<?, ?it/s][A
+Fetching 18 files: 100%|##########| 18/18 [00:00<00:00, 15735.20it/s]
+
+Download complete: : 0.00B [00:00, ?B/s]              
+Download complete: : 0.00B [00:00, ?B/s]
 ```
 
-#### `mlx-community/paligemma2-3b-pt-896-4bit`
+### `mlx-community/paligemma2-3b-pt-896-4bit`
 
 ```text
 === STDOUT ===
@@ -233,7 +238,8 @@ Keywords: 25–50 comma-separated keywords ordered from most specific to most ge
 - Seasonal and temporal context
 - Use-case relevance (e.g. business, travel, food, editorial)
 
-Context: The image is described as ', St Michael's Parish Church, Bishop's Stortford, England, United Kingdom, UKSt Michael's Parish Church in Bishop's Stortford, England, is pictured here on a late afternoon under a cool February sky. This Grade I listed building is a prominent example of Perpendicular Gothic architecture, with its current structure dating largely from the early 15th century. The photograph captures the intricate details of the church's traditional flint-knapped walls and stone-dressed windows, set against the backdrop of its historic churchyard. The soft, even light of the overcast day accentuates the textures and formidable presence of this centuries-old landmark.'.
+Context: The image is described as ', St Michael's Parish Church, Bishop's Stortford, England, United Kingdom, UK
+St Michael's Parish Church in Bishop's Stortford, England, is pictured here on a late afternoon under a cool February sky. This Grade I listed building is a prominent example of Perpendicular Gothic architecture, with its current structure dating largely from the early 15th century. The photograph captures the intricate details of the church's traditional flint-knapped walls and stone-dressed windows, set against the backdrop of its historic churchyard. The soft, even light of the overcast day accentuates the textures and formidable presence of this centuries-old landmark.'.
 Existing keywords: Bishop's Stortford, British, Christian, Christianity, England, English Church, Europe, Faith, Flint Knapped Wall, Flint Wall, Gothic Window, Grass, Graveyard, Hertfordshire, Parish church, Perpendicular Gothic, St Michael's Church, St Michael's Parish Church, UK, United Kingdom, ancient, arched window, architecture, battlements, black, brown, building, car, cemetery, church, church spire, churchyard, clock tower, cloudy, cloudy sky, cross, exterior, gothic architecture, gravestone, grey, headstone, heritage, historic, historic building, landmark, medieval, old, overcast, overcast sky, place of worship, religion, religious building, spire, stone, tombstone, tourism, tower, travel, weathervane, worship
 Taken on 2026-02-07 16:11:23 GMT (at 16:11:23 local time).
 
@@ -241,9 +247,16 @@ Be factual about visual content.  Include relevant conceptual and emotional keyw
 
 === STDERR ===
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-Fetching 7 files:   0%|          | 0/7 [00:00<?, ?it/s][AFetching 7 files: 100%|##########| 7/7 [00:00<00:00, 17497.10it/s]
-Download complete: : 0.00B [00:00, ?B/s]              Download complete: : 0.00B [00:00, ?B/s]
-Prefill:   0%|          | 0/4681 [00:00<?, ?tok/s]Prefill:  44%|####3     | 2048/4681 [00:01<00:01, 1408.23tok/s]Prefill:  44%|####3     | 2048/4681 [00:01<00:01, 1407.95tok/s]
+
+Fetching 7 files:   0%|          | 0/7 [00:00<?, ?it/s][A
+Fetching 7 files: 100%|##########| 7/7 [00:00<00:00, 17497.10it/s]
+
+Download complete: : 0.00B [00:00, ?B/s]              
+Download complete: : 0.00B [00:00, ?B/s]
+
+Prefill:   0%|          | 0/4681 [00:00<?, ?tok/s]
+Prefill:  44%|####3     | 2048/4681 [00:01<00:01, 1408.23tok/s]
+Prefill:  44%|####3     | 2048/4681 [00:01<00:01, 1407.95tok/s]
 ```
 
 </details>
@@ -269,7 +282,7 @@ language_model.lm_head.weight.
 
 <details><summary>Full tracebacks (all models in this cluster)</summary>
 
-#### `microsoft/Florence-2-large-ft`
+### `microsoft/Florence-2-large-ft`
 
 ```text
 Traceback (most recent call last):
@@ -316,13 +329,17 @@ language_model.lm_head.weight.
 
 <details><summary>Captured stdout/stderr (all models in this cluster)</summary>
 
-#### `microsoft/Florence-2-large-ft`
+### `microsoft/Florence-2-large-ft`
 
 ```text
 === STDERR ===
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s][AFetching 10 files: 100%|##########| 10/10 [00:00<00:00, 12531.53it/s]
-Download complete: : 0.00B [00:00, ?B/s]              Download complete: : 0.00B [00:00, ?B/s]
+
+Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s][A
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 12531.53it/s]
+
+Download complete: : 0.00B [00:00, ?B/s]              
+Download complete: : 0.00B [00:00, ?B/s]
 ```
 
 </details>
@@ -348,7 +365,7 @@ ValueError: Model loading failed: No module named 'timm'
 
 <details><summary>Full tracebacks (all models in this cluster)</summary>
 
-#### `mlx-community/FastVLM-0.5B-bf16`
+### `mlx-community/FastVLM-0.5B-bf16`
 
 ```text
 Traceback (most recent call last):
@@ -419,13 +436,17 @@ ValueError: Model loading failed: No module named 'timm'
 
 <details><summary>Captured stdout/stderr (all models in this cluster)</summary>
 
-#### `mlx-community/FastVLM-0.5B-bf16`
+### `mlx-community/FastVLM-0.5B-bf16`
 
 ```text
 === STDERR ===
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-Fetching 15 files:   0%|          | 0/15 [00:00<?, ?it/s][AFetching 15 files: 100%|##########| 15/15 [00:00<00:00, 27025.15it/s]
-Download complete: : 0.00B [00:00, ?B/s]              Download complete: : 0.00B [00:00, ?B/s]
+
+Fetching 15 files:   0%|          | 0/15 [00:00<?, ?it/s][A
+Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 27025.15it/s]
+
+Download complete: : 0.00B [00:00, ?B/s]              
+Download complete: : 0.00B [00:00, ?B/s]
 ```
 
 </details>
@@ -451,7 +472,7 @@ ValueError: Model loading failed: Expected shape (4096, 4096) but received shape
 
 <details><summary>Full tracebacks (all models in this cluster)</summary>
 
-#### `mlx-community/Idefics3-8B-Llama3-bf16`
+### `mlx-community/Idefics3-8B-Llama3-bf16`
 
 ```text
 Traceback (most recent call last):
@@ -498,13 +519,17 @@ ValueError: Model loading failed: Expected shape (4096, 4096) but received shape
 
 <details><summary>Captured stdout/stderr (all models in this cluster)</summary>
 
-#### `mlx-community/Idefics3-8B-Llama3-bf16`
+### `mlx-community/Idefics3-8B-Llama3-bf16`
 
 ```text
 === STDERR ===
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s][AFetching 12 files: 100%|##########| 12/12 [00:00<00:00, 34379.54it/s]
-Download complete: : 0.00B [00:00, ?B/s]              Download complete: : 0.00B [00:00, ?B/s]
+
+Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s][A
+Fetching 12 files: 100%|##########| 12/12 [00:00<00:00, 34379.54it/s]
+
+Download complete: : 0.00B [00:00, ?B/s]              
+Download complete: : 0.00B [00:00, ?B/s]
 ```
 
 </details>
@@ -530,7 +555,7 @@ ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7
 
 <details><summary>Full tracebacks (all models in this cluster)</summary>
 
-#### `mlx-community/X-Reasoner-7B-8bit`
+### `mlx-community/X-Reasoner-7B-8bit`
 
 ```text
 Traceback (most recent call last):
@@ -578,7 +603,7 @@ ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7
 
 <details><summary>Captured stdout/stderr (all models in this cluster)</summary>
 
-#### `mlx-community/X-Reasoner-7B-8bit`
+### `mlx-community/X-Reasoner-7B-8bit`
 
 ```text
 === STDOUT ===
@@ -607,7 +632,8 @@ Keywords: 25–50 comma-separated keywords ordered from most specific to most ge
 - Seasonal and temporal context
 - Use-case relevance (e.g. business, travel, food, editorial)
 
-Context: The image is described as ', St Michael's Parish Church, Bishop's Stortford, England, United Kingdom, UKSt Michael's Parish Church in Bishop's Stortford, England, is pictured here on a late afternoon under a cool February sky. This Grade I listed building is a prominent example of Perpendicular Gothic architecture, with its current structure dating largely from the early 15th century. The photograph captures the intricate details of the church's traditional flint-knapped walls and stone-dressed windows, set against the backdrop of its historic churchyard. The soft, even light of the overcast day accentuates the textures and formidable presence of this centuries-old landmark.'.
+Context: The image is described as ', St Michael's Parish Church, Bishop's Stortford, England, United Kingdom, UK
+St Michael's Parish Church in Bishop's Stortford, England, is pictured here on a late afternoon under a cool February sky. This Grade I listed building is a prominent example of Perpendicular Gothic architecture, with its current structure dating largely from the early 15th century. The photograph captures the intricate details of the church's traditional flint-knapped walls and stone-dressed windows, set against the backdrop of its historic churchyard. The soft, even light of the overcast day accentuates the textures and formidable presence of this centuries-old landmark.'.
 Existing keywords: Bishop's Stortford, British, Christian, Christianity, England, English Church, Europe, Faith, Flint Knapped Wall, Flint Wall, Gothic Window, Grass, Graveyard, Hertfordshire, Parish church, Perpendicular Gothic, St Michael's Church, St Michael's Parish Church, UK, United Kingdom, ancient, arched window, architecture, battlements, black, brown, building, car, cemetery, church, church spire, churchyard, clock tower, cloudy, cloudy sky, cross, exterior, gothic architecture, gravestone, grey, headstone, heritage, historic, historic building, landmark, medieval, old, overcast, overcast sky, place of worship, religion, religious building, spire, stone, tombstone, tourism, tower, travel, weathervane, worship
 Taken on 2026-02-07 16:11:23 GMT (at 16:11:23 local time).
 
@@ -616,9 +642,15 @@ Be factual about visual content.  Include relevant conceptual and emotional keyw
 
 === STDERR ===
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-Fetching 15 files:   0%|          | 0/15 [00:00<?, ?it/s][AFetching 15 files: 100%|##########| 15/15 [00:00<00:00, 28301.65it/s]
-Download complete: : 0.00B [00:00, ?B/s]              Download complete: : 0.00B [00:00, ?B/s]
-Prefill:   0%|          | 0/16869 [00:00<?, ?tok/s]Prefill:   0%|          | 0/16869 [00:25<?, ?tok/s]
+
+Fetching 15 files:   0%|          | 0/15 [00:00<?, ?it/s][A
+Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 28301.65it/s]
+
+Download complete: : 0.00B [00:00, ?B/s]              
+Download complete: : 0.00B [00:00, ?B/s]
+
+Prefill:   0%|          | 0/16869 [00:00<?, ?tok/s]
+Prefill:   0%|          | 0/16869 [00:25<?, ?tok/s]
 ```
 
 </details>
@@ -644,7 +676,7 @@ ValueError: Cannot use chat template functions because tokenizer.chat_template i
 
 <details><summary>Full tracebacks (all models in this cluster)</summary>
 
-#### `mlx-community/gemma-3n-E2B-4bit`
+### `mlx-community/gemma-3n-E2B-4bit`
 
 ```text
 Traceback (most recent call last):
@@ -690,13 +722,17 @@ ValueError: Cannot use chat template functions because tokenizer.chat_template i
 
 <details><summary>Captured stdout/stderr (all models in this cluster)</summary>
 
-#### `mlx-community/gemma-3n-E2B-4bit`
+### `mlx-community/gemma-3n-E2B-4bit`
 
 ```text
 === STDERR ===
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s][AFetching 10 files: 100%|##########| 10/10 [00:00<00:00, 13530.01it/s]
-Download complete: : 0.00B [00:00, ?B/s]              Download complete: : 0.00B [00:00, ?B/s]
+
+Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s][A
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 13530.01it/s]
+
+Download complete: : 0.00B [00:00, ?B/s]              
+Download complete: : 0.00B [00:00, ?B/s]
 ```
 
 </details>
@@ -722,7 +758,7 @@ ValueError: Model loading failed: RobertaTokenizer has no attribute additional_s
 
 <details><summary>Full tracebacks (all models in this cluster)</summary>
 
-#### `prince-canuma/Florence-2-large-ft`
+### `prince-canuma/Florence-2-large-ft`
 
 ```text
 Traceback (most recent call last):
@@ -802,13 +838,17 @@ ValueError: Model loading failed: RobertaTokenizer has no attribute additional_s
 
 <details><summary>Captured stdout/stderr (all models in this cluster)</summary>
 
-#### `prince-canuma/Florence-2-large-ft`
+### `prince-canuma/Florence-2-large-ft`
 
 ```text
 === STDERR ===
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s][AFetching 10 files: 100%|##########| 10/10 [00:00<00:00, 15881.50it/s]
-Download complete: : 0.00B [00:00, ?B/s]              Download complete: : 0.00B [00:00, ?B/s]
+
+Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s][A
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 15881.50it/s]
+
+Download complete: : 0.00B [00:00, ?B/s]              
+Download complete: : 0.00B [00:00, ?B/s]
 <unknown>:515: SyntaxWarning: invalid escape sequence '\d'
 ```
 
@@ -860,7 +900,7 @@ python src/check_models.py
 ```
 
 
-### Target specific failing models:
+### Target specific failing models
 
 ```bash
 python src/check_models.py --model microsoft/Florence-2-large-ft
@@ -890,7 +930,8 @@ Keywords: 25–50 comma-separated keywords ordered from most specific to most ge
 - Seasonal and temporal context
 - Use-case relevance (e.g. business, travel, food, editorial)
 
-Context: The image is described as ', St Michael's Parish Church, Bishop's Stortford, England, United Kingdom, UKSt Michael's Parish Church in Bishop's Stortford, England, is pictured here on a late afternoon under a cool February sky. This Grade I listed building is a prominent example of Perpendicular Gothic architecture, with its current structure dating largely from the early 15th century. The photograph captures the intricate details of the church's traditional flint-knapped walls and stone-dressed windows, set against the backdrop of its historic churchyard. The soft, even light of the overcast day accentuates the textures and formidable presence of this centuries-old landmark.'.
+Context: The image is described as ', St Michael's Parish Church, Bishop's Stortford, England, United Kingdom, UK
+St Michael's Parish Church in Bishop's Stortford, England, is pictured here on a late afternoon under a cool February sky. This Grade I listed building is a prominent example of Perpendicular Gothic architecture, with its current structure dating largely from the early 15th century. The photograph captures the intricate details of the church's traditional flint-knapped walls and stone-dressed windows, set against the backdrop of its historic churchyard. The soft, even light of the overcast day accentuates the textures and formidable presence of this centuries-old landmark.'.
 Existing keywords: Bishop's Stortford, British, Christian, Christianity, England, English Church, Europe, Faith, Flint Knapped Wall, Flint Wall, Gothic Window, Grass, Graveyard, Hertfordshire, Parish church, Perpendicular Gothic, St Michael's Church, St Michael's Parish Church, UK, United Kingdom, ancient, arched window, architecture, battlements, black, brown, building, car, cemetery, church, church spire, churchyard, clock tower, cloudy, cloudy sky, cross, exterior, gothic architecture, gravestone, grey, headstone, heritage, historic, historic building, landmark, medieval, old, overcast, overcast sky, place of worship, religion, religious building, spire, stone, tombstone, tourism, tower, travel, weathervane, worship
 Taken on 2026-02-07 16:11:23 GMT (at 16:11:23 local time).
 

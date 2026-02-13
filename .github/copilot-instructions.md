@@ -91,6 +91,7 @@ The file is organized in this order — use these landmarks to jump to the right
 
 - `from __future__ import annotations` at top of every file
 - Full type annotations: all parameters + return types. Use `| None`, `list[str]` (not `Optional`, `List`)
+- Prefer explicit symbol imports when practical (e.g., `from check_models import foo`), especially in tests; avoid broad module imports when only a few symbols are used.
 - `Final` for constants: `TIMEOUT: Final[float] = 5.0`
 - `pathlib.Path` for all paths; convert to `str` only at library call boundaries
 - `raise SystemExit(code)` instead of `sys.exit()` (better for type narrowing)
