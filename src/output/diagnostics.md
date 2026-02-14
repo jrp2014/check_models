@@ -101,7 +101,7 @@ language_model.lm_head.weight.
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 8712.72it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 13774.40it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -115,7 +115,7 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 | Model | Error Stage | Package | Regression vs Prev | First Seen Failing | Recent Repro |
 | ----- | ----------- | ------- | ------------------ | ------------------ | ------------ |
-| `mlx-community/FastVLM-0.5B-bf16` | Model Error | mlx-vlm | no | 2026-02-13 23:33:19 GMT | 2/2 recent runs failed |
+| `mlx-community/FastVLM-0.5B-bf16` | Model Error | mlx-vlm | no | 2026-02-13 23:33:19 GMT | 3/3 recent runs failed |
 
 **Traceback (tail):**
 
@@ -208,7 +208,7 @@ ValueError: Model loading failed: No module named 'timm'
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 15 files:   0%|          | 0/15 [00:00<?, ?it/s]
-Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 17022.34it/s]
+Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 22059.80it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -291,7 +291,7 @@ ValueError: Model loading failed: Expected shape (4096, 4096) but received shape
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]
-Fetching 12 files: 100%|##########| 12/12 [00:00<00:00, 16600.15it/s]
+Fetching 12 files: 100%|##########| 12/12 [00:00<00:00, 21816.93it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -409,13 +409,13 @@ Be factual about visual content.  Include relevant conceptual and emotional keyw
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 15 files:   0%|          | 0/15 [00:00<?, ?it/s]
-Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 24160.74it/s]
+Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 49813.59it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
 
 Prefill:   0%|          | 0/16869 [00:00<?, ?tok/s]
-Prefill:   0%|          | 0/16869 [14:46<?, ?tok/s]
+Prefill:   0%|          | 0/16869 [00:24<?, ?tok/s]
 ```
 
 </details>
@@ -494,7 +494,7 @@ ValueError: Cannot use chat template functions because tokenizer.chat_template i
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 12690.78it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 12901.58it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -624,14 +624,14 @@ Be factual about visual content.  Include relevant conceptual and emotional keyw
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 7 files:   0%|          | 0/7 [00:00<?, ?it/s]
-Fetching 7 files: 100%|##########| 7/7 [00:00<00:00, 10400.33it/s]
+Fetching 7 files: 100%|##########| 7/7 [00:00<00:00, 33477.91it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
 
 Prefill:   0%|          | 0/4681 [00:00<?, ?tok/s]
-Prefill:  44%|####3     | 2048/4681 [00:02<00:02, 941.19tok/s]
-Prefill:  44%|####3     | 2048/4681 [00:02<00:02, 941.07tok/s]
+Prefill:  44%|####3     | 2048/4681 [00:01<00:01, 1421.55tok/s]
+Prefill:  44%|####3     | 2048/4681 [00:01<00:01, 1421.24tok/s]
 ```
 
 </details>
@@ -744,7 +744,7 @@ ValueError: Model loading failed: RobertaTokenizer has no attribute additional_s
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 15437.26it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 30393.51it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -760,12 +760,12 @@ Download complete: : 0.00B [00:00, ?B/s]
 Recent reproducibility is measured from history (up to last 3 runs where each model appears).
 
 **Regressions since previous run:** none
-**Recoveries since previous run:** `mlx-community/Kimi-VL-A3B-Thinking-8bit`
+**Recoveries since previous run:** none
 
 | Model | Status vs Previous Run | First Seen Failing | Recent Repro |
 | ----- | ---------------------- | ------------------ | ------------ |
 | `microsoft/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
-| `mlx-community/FastVLM-0.5B-bf16` | still failing | 2026-02-13 23:33:19 GMT | 2/2 recent runs failed |
+| `mlx-community/FastVLM-0.5B-bf16` | still failing | 2026-02-13 23:33:19 GMT | 3/3 recent runs failed |
 | `mlx-community/Idefics3-8B-Llama3-bf16` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
 | `mlx-community/X-Reasoner-7B-8bit` | still failing | 2026-02-08 22:32:28 GMT | 3/3 recent runs failed |
 | `mlx-community/gemma-3n-E2B-4bit` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
@@ -841,4 +841,4 @@ Be factual about visual content.  Include relevant conceptual and emotional keyw
 
 </details>
 
-_Report generated on 2026-02-14 02:27:12 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-02-14 11:12:31 GMT by [check_models](https://github.com/jrp2014/check_models)._
