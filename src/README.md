@@ -62,7 +62,7 @@ python -m check_models --dry-run
 - **Selection Control**: Use `--exclude` to filter models from cache scan or explicit list
 - **Folder Mode**: Automatically selects most recently modified image from specified folder
 - **Metadata Extraction**: Multi-source metadata: EXIF + GPS + IPTC keywords/caption + XMP (dc:subject, dc:title) + Windows XP keywords, with fail-soft strategy for partially corrupt data
-- **Smart Prompting**: Generates structured cataloguing prompts (Title/Description/Keywords) with keyword taxonomy guidance; seeds with existing IPTC/XMP keywords when available; `--prompt` overrides
+- **Smart Prompting**: Generates structured cataloguing prompts (Title/Description/Keywords) with metadata-aware context; automatically compacts long metadata fields/keyword lists to keep prompt size manageable; `--prompt` overrides
 - **Performance Metrics**:
   - Timing: generation_time, model_load_time, total_time
   - Tokens: total, prompt, generated with tokens/sec
@@ -480,6 +480,7 @@ The tool uses a YAML configuration file to define thresholds for quality checks 
 - **Hallucination**: Keywords and patterns that suggest hallucinated content (e.g., "based on the chart" when no chart exists).
 - **Verbosity**: Limits on output length and meta-commentary patterns.
 - **Formatting**: Rules for markdown headers, bullet points, and table structures.
+- **Prompt Compaction**: Limits for metadata hints injected into the default prompt (`prompt_title_max_chars`, `prompt_description_max_chars`, `prompt_keyword_max_items`, `prompt_keyword_item_max_chars`).
 
 See `src/quality_config.yaml` for the full schema and default values.
 
@@ -712,6 +713,14 @@ The quality analysis distinguishes between **model quality issues** (repetition,
 min_bpe_artifact_count: 5       # Min BPE artifacts to flag encoding issue
 min_tokens_for_substantial: 10  # Tokens below this are suspicious
 min_words_for_filler_response: 15  # Words below this in filler response
+long_prompt_tokens_threshold: 3000   # Prompt size where context-related failures become likely
+severe_prompt_tokens_threshold: 12000  # Extreme prompt size risk threshold
+
+# Default prompt compaction thresholds
+prompt_title_max_chars: 120
+prompt_description_max_chars: 420
+prompt_keyword_max_items: 20
+prompt_keyword_item_max_chars: 36
 ```
 
 **When you see harness issues**: These typically indicate upstream bugs in mlx-vlm or model-specific integration problems. Consider:

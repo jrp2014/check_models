@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from check_models import (
+    GenerationQualityAnalysis,
     LibraryVersionDict,
     PerformanceResult,
     _build_diagnostics_context,
@@ -64,6 +65,57 @@ def _make_success(name: str = "org/model-ok") -> PerformanceResult:
         total_time=1.0,
         generation_time=0.5,
         model_load_time=0.5,
+    )
+
+
+def _make_harness_success(
+    name: str = "org/model-harness",
+    *,
+    text: str = "",
+    prompt_tokens: int = 4000,
+    generation_tokens: int = 0,
+    harness_type: str = "prompt_template",
+    harness_detail: str = "output:zero_tokens",
+) -> PerformanceResult:
+    qa = GenerationQualityAnalysis(
+        is_repetitive=False,
+        repeated_token=None,
+        hallucination_issues=[],
+        is_verbose=False,
+        formatting_issues=[],
+        has_excessive_bullets=False,
+        bullet_count=0,
+        is_context_ignored=False,
+        missing_context_terms=[],
+        is_refusal=False,
+        refusal_type=None,
+        is_generic=False,
+        specificity_score=0.0,
+        has_language_mixing=False,
+        language_mixing_issues=[],
+        has_degeneration=False,
+        degeneration_type=None,
+        has_fabrication=False,
+        fabrication_issues=[],
+        has_harness_issue=True,
+        harness_issue_type=harness_type,
+        harness_issue_details=[harness_detail],
+        word_count=0,
+        unique_ratio=0.0,
+    )
+    return PerformanceResult(
+        model_name=name,
+        success=True,
+        generation=_MockGeneration(
+            text=text,
+            prompt_tokens=prompt_tokens,
+            generation_tokens=generation_tokens,
+        ),
+        total_time=1.0,
+        generation_time=0.5,
+        model_load_time=0.5,
+        quality_issues=f"⚠️harness({harness_type})",
+        quality_analysis=qa,
     )
 
 
@@ -559,6 +611,55 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         assert "## Priority Summary" in content
         assert "| Priority | Issue |" in content
+
+    def test_report_written_for_stack_signal_without_failures(self, tmp_path: Path) -> None:
+        """Suspicious successful runs should still produce diagnostics for stack triage."""
+        out = tmp_path / "diag.md"
+        success = PerformanceResult(
+            model_name="org/suspicious-success",
+            success=True,
+            generation=_MockGeneration(text="", prompt_tokens=5000, generation_tokens=0),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+        )
+        result = generate_diagnostics_report(
+            results=[success],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+        assert result is True
+        content = out.read_text(encoding="utf-8")
+        assert "## Potential Stack Issues" in content
+        assert "org/suspicious-success" in content
+
+    def test_harness_section_includes_tokens_and_empty_marker(self, tmp_path: Path) -> None:
+        """Harness section should include prompt/output token evidence for empty runs."""
+        out = tmp_path / "diag.md"
+        generate_diagnostics_report(
+            results=[
+                _make_harness_success(
+                    name="org/harness-empty",
+                    text="",
+                    prompt_tokens=5000,
+                    generation_tokens=0,
+                    harness_type="long_context",
+                    harness_detail="long_context_empty(5000tok)",
+                ),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "## Harness/Integration Issues" in content
+        assert "prompt=5,000" in content
+        assert "ratio=0.00%" in content
+        assert "<empty output>" in content
+        assert "Likely package" in content
 
     def test_reproducibility_section(self, tmp_path: Path) -> None:
         """Reproducibility section should include model-specific commands."""

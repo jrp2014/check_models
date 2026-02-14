@@ -110,12 +110,15 @@ def test_analyze_generation_text_empty_input() -> None:
     """Test handling of empty text input."""
     analysis = check_models.analyze_generation_text("", 0)
 
-    # Empty text should not trigger most issues
+    # Empty text should be surfaced as a harness/prompt-template issue.
     assert not analysis.is_repetitive
     assert analysis.repeated_token is None
     assert not analysis.hallucination_issues
     assert not analysis.is_verbose
     assert analysis.bullet_count == 0
+    assert analysis.has_harness_issue is True
+    assert analysis.harness_issue_type == "prompt_template"
+    assert "output:zero_tokens" in analysis.harness_issue_details
 
 
 def test_analyze_generation_text_context_ignorance_custom_marker() -> None:
@@ -433,6 +436,18 @@ def test_detect_minimal_output_normal() -> None:
     has_minimal, reason = check_models._detect_minimal_output(text, 50)
     assert has_minimal is False
     assert reason is None
+
+
+def test_analyze_generation_text_detects_long_context_breakdown() -> None:
+    """Very long prompt contexts with tiny outputs should be flagged."""
+    analysis = check_models.analyze_generation_text(
+        text="Be concise.",
+        generated_tokens=4,
+        prompt_tokens=14000,
+    )
+    assert analysis.has_harness_issue is True
+    assert analysis.harness_issue_type == "long_context"
+    assert any("long_context" in item for item in analysis.harness_issue_details)
 
 
 def test_detect_training_data_leak_instruction() -> None:

@@ -91,6 +91,12 @@ thresholds:
   min_prompt_tokens_for_ratio: 100  # Prompt tokens needed for ratio check
   min_output_tokens_for_ratio: 15   # Output tokens below this with large prompt
   min_output_ratio: 0.02          # Minimum output/prompt ratio (2%)
+  long_prompt_tokens_threshold: 3000   # Prompt size where context-related failures become likely
+  severe_prompt_tokens_threshold: 12000  # Extreme prompt size risk threshold
+  prompt_title_max_chars: 120      # Max chars for metadata title hints in generated prompt
+  prompt_description_max_chars: 420  # Max chars for metadata description hints
+  prompt_keyword_max_items: 20     # Max keyword hints injected into generated prompt
+  prompt_keyword_item_max_chars: 36  # Max chars per keyword hint in generated prompt
   min_text_for_leak_detection: 100  # Min text length for training leak detection
 
 patterns:

@@ -281,6 +281,12 @@ class QualityThresholds:
     min_prompt_tokens_for_ratio: int = 100  # Prompt tokens needed for ratio check
     min_output_tokens_for_ratio: int = 15  # Output tokens below this with large prompt
     min_output_ratio: float = 0.02  # Minimum output/prompt ratio (2%)
+    long_prompt_tokens_threshold: int = 3000  # Prompt tokens above this can degrade outputs
+    severe_prompt_tokens_threshold: int = 12000  # Extreme prompt token count risk threshold
+    prompt_title_max_chars: int = 120  # Max chars for metadata title hints in default prompt
+    prompt_description_max_chars: int = 420  # Max chars for metadata description hints
+    prompt_keyword_max_items: int = 20  # Max number of metadata keyword hints
+    prompt_keyword_item_max_chars: int = 36  # Max chars per metadata keyword hint
     min_text_for_leak_detection: int = 100  # Min text length for training leak detection
 
     # Patterns (loaded from config)
@@ -690,6 +696,7 @@ class PerformanceResult:
         total_time: End-to-end time including all stages
         error_type: Exception class name for error categorization in reports
         quality_issues: Comma-separated list of detected output problems
+        quality_analysis: Structured quality-analysis result for triage/reporting
         active_memory: GPU memory in use (GB), from mx.metal.get_active_memory()
         cache_memory: GPU memory in cache (GB), from mx.metal.get_cache_memory()
         error_package: Which package raised the error (mlx, mlx-vlm, transformers)
@@ -707,6 +714,7 @@ class PerformanceResult:
     total_time: float | None = None
     error_type: str | None = None
     quality_issues: str | None = None
+    quality_analysis: GenerationQualityAnalysis | None = None
     active_memory: float | None = None
     cache_memory: float | None = None
     error_package: str | None = None
@@ -2516,6 +2524,47 @@ def _detect_minimal_output(
     return False, None
 
 
+def _detect_long_context_breakdown(
+    *,
+    prompt_tokens: int | None,
+    generated_tokens: int,
+    text: str,
+    is_repetitive: bool,
+    is_context_ignored: bool,
+    is_refusal: bool,
+) -> tuple[bool, str | None]:
+    """Detect likely long-context degradation that may indicate stack issues.
+
+    These signals are intentionally conservative and only trigger when prompt
+    token counts are high enough that prompt packing/prefill behavior can
+    dominate generation quality.
+    """
+    if prompt_tokens is None or prompt_tokens < QUALITY.long_prompt_tokens_threshold:
+        return False, None
+
+    safe_prompt_tokens = max(prompt_tokens, 1)
+    ratio = generated_tokens / safe_prompt_tokens
+    text_empty = not text.strip()
+
+    if text_empty and generated_tokens == 0:
+        return True, f"long_context_empty({prompt_tokens}tok)"
+
+    if generated_tokens < QUALITY.min_output_tokens_for_ratio and ratio < QUALITY.min_output_ratio:
+        return True, f"long_context_low_ratio({ratio:.1%};{prompt_tokens}->{generated_tokens})"
+
+    if prompt_tokens >= QUALITY.severe_prompt_tokens_threshold and is_repetitive:
+        return True, f"long_context_repetition({prompt_tokens}tok)"
+
+    if (
+        prompt_tokens >= QUALITY.severe_prompt_tokens_threshold
+        and is_context_ignored
+        and not is_refusal
+    ):
+        return True, f"long_context_context_drop({prompt_tokens}tok)"
+
+    return False, None
+
+
 def _detect_training_data_leak(text: str) -> tuple[bool, str | None]:
     """Detect training data or instruction template leaking into output.
 
@@ -3241,6 +3290,9 @@ class GenerationQualityAnalysis:
     has_harness_issue: bool
     harness_issue_type: str | None
     harness_issue_details: list[str]
+    # Lightweight metrics useful for JSONL/report triage
+    word_count: int = 0
+    unique_ratio: float = 0.0
 
     def has_any_issues(self) -> bool:
         """Return True if any quality issues were detected."""
@@ -3319,6 +3371,7 @@ class GenerationQualityAnalysis:
 def analyze_generation_text(
     text: str,
     generated_tokens: int,
+    prompt_tokens: int | None = None,
     prompt: str | None = None,
     context_marker: str = "Context:",
 ) -> GenerationQualityAnalysis:
@@ -3330,6 +3383,7 @@ def analyze_generation_text(
     Args:
         text: Generated text to analyze
         generated_tokens: Number of tokens generated
+        prompt_tokens: Number of prompt/prefill tokens (if available)
         prompt: Optional prompt text for context ignorance detection
         context_marker: Marker for context section in prompt
 
@@ -3384,16 +3438,38 @@ def analyze_generation_text(
         harness_issues.extend([f"token_leak:{tok}" for tok in leaked_tokens[:3]])
 
     # Check for minimal/zero output (prompt template issue)
-    has_minimal, minimal_type = _detect_minimal_output(text, generated_tokens)
+    has_minimal, minimal_type = _detect_minimal_output(
+        text,
+        generated_tokens,
+        prompt_tokens=prompt_tokens,
+    )
     if has_minimal and minimal_type:
         harness_type = harness_type or "prompt_template"
         harness_issues.append(f"output:{minimal_type}")
+
+    # Check for long-context degradation (high prompt token count with weak output)
+    has_long_context_breakdown, long_context_issue = _detect_long_context_breakdown(
+        prompt_tokens=prompt_tokens,
+        generated_tokens=generated_tokens,
+        text=text,
+        is_repetitive=is_repetitive,
+        is_context_ignored=is_context_ignored,
+        is_refusal=is_refusal,
+    )
+    if has_long_context_breakdown and long_context_issue:
+        # Prefer explicit long-context classification over generic prompt-template label.
+        if harness_type in {None, "prompt_template"}:
+            harness_type = "long_context"
+        harness_issues.append(long_context_issue)
 
     # Check for training data leakage
     has_training_leak, leak_type = _detect_training_data_leak(text)
     if has_training_leak and leak_type:
         harness_type = harness_type or "generation_loop"
         harness_issues.append(f"training_leak:{leak_type}")
+
+    _ttr, unique_words, total_words = compute_vocabulary_diversity(text)
+    unique_ratio = unique_words / total_words if total_words else 0.0
 
     has_harness_issue = bool(harness_issues)
 
@@ -3420,6 +3496,8 @@ def analyze_generation_text(
         has_harness_issue=has_harness_issue,
         harness_issue_type=harness_type,
         harness_issue_details=harness_issues,
+        word_count=total_words,
+        unique_ratio=round(unique_ratio, 3),
     )
 
 
@@ -4969,9 +5047,14 @@ def analyze_model_issues(
         if res.generation and hasattr(res.generation, "text"):
             text = getattr(res.generation, "text", "") or ""
             gen_tokens = getattr(res.generation, "generation_tokens", 0)
+            prompt_tokens = getattr(res.generation, "prompt_tokens", None)
 
             # Use consolidated quality analysis utility
-            analysis = analyze_generation_text(text, gen_tokens)
+            analysis = analyze_generation_text(
+                text,
+                gen_tokens,
+                prompt_tokens=prompt_tokens,
+            )
 
             if analysis.is_repetitive:
                 summary["repetitive_models"].append((res.model_name, analysis.repeated_token))
@@ -5771,12 +5854,64 @@ def _collect_harness_results(
     """Collect successful models that have harness/integration issues."""
     harness_results: list[tuple[PerformanceResult, str]] = []
     for res in successful:
-        gen = res.generation
-        qa = getattr(gen, "quality_analysis", None) if gen else None
+        qa = res.quality_analysis
+        if qa is None and res.generation is not None:
+            # Backward compatibility for callers that attach analysis to generation.
+            qa = getattr(res.generation, "quality_analysis", None)
         if qa and getattr(qa, "has_harness_issue", False):
-            text = getattr(gen, "text", "") or ""
+            text = getattr(res.generation, "text", "") if res.generation else ""
             harness_results.append((res, text))
     return harness_results
+
+
+def _collect_stack_issue_signals(
+    successful: list[PerformanceResult],
+) -> list[tuple[PerformanceResult, str, str]]:
+    """Collect likely upstream stack issues from successful-but-suspicious runs."""
+    signals: list[tuple[PerformanceResult, str, str]] = []
+
+    for res in successful:
+        if not res.generation:
+            continue
+
+        gen = res.generation
+        qa = res.quality_analysis or getattr(gen, "quality_analysis", None)
+        text = str(getattr(gen, "text", "") or "")
+        prompt_tokens = int(getattr(gen, "prompt_tokens", 0) or 0)
+        generated_tokens = int(getattr(gen, "generation_tokens", 0) or 0)
+        ratio = (generated_tokens / prompt_tokens) if prompt_tokens > 0 else 0.0
+
+        if not text.strip() or generated_tokens == 0:
+            signals.append((res, "Empty output despite successful run", "mlx-vlm"))
+            continue
+
+        if (
+            prompt_tokens >= QUALITY.long_prompt_tokens_threshold
+            and generated_tokens < QUALITY.min_output_tokens_for_ratio
+            and ratio < QUALITY.min_output_ratio
+        ):
+            signals.append(
+                (
+                    res,
+                    f"Long-context low output ratio ({ratio:.1%})",
+                    "mlx-vlm / mlx",
+                ),
+            )
+            continue
+
+        if (
+            prompt_tokens >= QUALITY.severe_prompt_tokens_threshold
+            and qa is not None
+            and (qa.is_repetitive or qa.is_context_ignored)
+        ):
+            symptom = (
+                "Repetition under extreme prompt length"
+                if qa.is_repetitive
+                else "Context dropped under extreme prompt length"
+            )
+            signals.append((res, symptom, "mlx-vlm / mlx"))
+
+    return signals
 
 
 def _diagnostics_header(
@@ -5932,30 +6067,96 @@ def _diagnostics_harness_section(
         parts,
         title=f"## Harness/Integration Issues ({len(harness_results)} model(s))",
         body_lines=[
-            "These models generated output but exhibit integration problems "
-            "(encoding corruption, stop-token leakage, prompt-template issues) "
-            "that indicate mlx-vlm bugs rather than model quality problems.",
+            "These models completed successfully but show integration problems "
+            "(including empty output, encoding corruption, stop-token leakage, "
+            "or prompt-template/long-context issues) that indicate stack bugs "
+            "rather than inherent model quality limits.",
         ],
     )
 
     for res, text in harness_results:
         gen = res.generation
-        qa = getattr(gen, "quality_analysis", None) if gen else None
+        qa = res.quality_analysis or (getattr(gen, "quality_analysis", None) if gen else None)
         harness_type = getattr(qa, "harness_issue_type", "unknown") if qa else "unknown"
         harness_details = getattr(qa, "harness_issue_details", []) if qa else []
+        prompt_tokens = int(getattr(gen, "prompt_tokens", 0) or 0) if gen else 0
+        generated_tokens = int(getattr(gen, "generation_tokens", 0) or 0) if gen else 0
+        ratio_text = f"{(generated_tokens / prompt_tokens):.2%}" if prompt_tokens > 0 else "n/a"
+
+        likely_package = "mlx-vlm"
+        if harness_type == "long_context":
+            likely_package = "mlx-vlm / mlx"
 
         parts.append(f"### `{res.model_name}` — {harness_type}")
+        parts.append("")
+        parts.append(
+            f"**Tokens:** prompt={fmt_num(prompt_tokens)}, "
+            f"generated={fmt_num(generated_tokens)}, ratio={ratio_text}"
+        )
+        parts.append(f"**Likely package:** `{likely_package}`")
+        if res.quality_issues:
+            parts.append(f"**Quality flags:** {res.quality_issues}")
         parts.append("")
         if harness_details:
             parts.append("**Details:** " + ", ".join(harness_details))
             parts.append("")
-        if text:
-            snippet = text[:_DIAGNOSTICS_OUTPUT_SNIPPET_LEN]
-            if len(text) > _DIAGNOSTICS_OUTPUT_SNIPPET_LEN:
-                snippet += "..."
-            parts.append("**Sample output:**")
-            _append_markdown_code_block(parts, snippet, language="text")
+        snippet_source = text.strip() or "<empty output>"
+        snippet = snippet_source[:_DIAGNOSTICS_OUTPUT_SNIPPET_LEN]
+        if len(snippet_source) > _DIAGNOSTICS_OUTPUT_SNIPPET_LEN:
+            snippet += "..."
+        parts.append("**Sample output:**")
+        _append_markdown_code_block(parts, snippet, language="text")
 
+    return parts
+
+
+def _diagnostics_stack_signal_section(
+    stack_signals: list[tuple[PerformanceResult, str, str]],
+) -> list[str]:
+    """Build a section for likely stack issues observed in successful runs."""
+    if not stack_signals:
+        return []
+
+    parts: list[str] = ["---", ""]
+    _append_markdown_section(
+        parts,
+        title=f"## Potential Stack Issues ({len(stack_signals)} model(s))",
+        body_lines=[
+            "These models technically succeeded, but token/output patterns suggest likely "
+            "integration/runtime issues worth checking upstream.",
+        ],
+    )
+
+    rows: list[str] = []
+    for res, symptom, package_hint in stack_signals:
+        gen = res.generation
+        prompt_tokens = int(getattr(gen, "prompt_tokens", 0) or 0) if gen else 0
+        generated_tokens = int(getattr(gen, "generation_tokens", 0) or 0) if gen else 0
+        ratio = f"{(generated_tokens / prompt_tokens):.2%}" if prompt_tokens > 0 else "n/a"
+        quality_flags = DIAGNOSTICS_ESCAPER.escape(res.quality_issues or "")
+        rows.append(
+            "| "
+            f"`{DIAGNOSTICS_ESCAPER.escape(res.model_name)}` | "
+            f"{fmt_num(prompt_tokens)} | "
+            f"{fmt_num(generated_tokens)} | "
+            f"{ratio} | "
+            f"{DIAGNOSTICS_ESCAPER.escape(symptom)} | "
+            f"`{DIAGNOSTICS_ESCAPER.escape(package_hint)}` | "
+            f"{quality_flags or '-'} |",
+        )
+
+    _append_markdown_table(
+        parts,
+        header=(
+            "| Model | Prompt Tok | Output Tok | Output/Prompt | "
+            "Symptom | Likely Package | Quality Flags |"
+        ),
+        separator=(
+            "| ----- | ---------- | ---------- | ------------- | "
+            "------- | -------------- | ------------- |"
+        ),
+        rows=rows,
+    )
     return parts
 
 
@@ -6323,8 +6524,9 @@ def generate_diagnostics_report(
     failed = [r for r in results if not r.success]
     successful = [r for r in results if r.success]
     harness_results = _collect_harness_results(successful)
+    stack_signals = _collect_stack_issue_signals(successful)
 
-    if not failed and not harness_results:
+    if not failed and not harness_results and not stack_signals:
         return False
 
     history_records = _load_history_run_records(history_path)
@@ -6356,6 +6558,7 @@ def generate_diagnostics_report(
         ),
     )
     parts.extend(_diagnostics_harness_section(harness_results))
+    parts.extend(_diagnostics_stack_signal_section(stack_signals))
     parts.extend(
         _diagnostics_history_section(
             failed=failed,
@@ -8212,20 +8415,28 @@ def _preview_generation(
     if not gen:
         return
     text_val = str(getattr(gen, "text", ""))
+    gen_tokens = getattr(gen, "generation_tokens", 0)
+    prompt_tokens = getattr(gen, "prompt_tokens", None)
+    analysis = analyze_generation_text(
+        text_val,
+        gen_tokens,
+        prompt_tokens=prompt_tokens,
+        prompt=prompt,
+        context_marker=context_marker,
+    )
+
     if not text_val:
+        if analysis.has_harness_issue:
+            details = ", ".join(analysis.harness_issue_details[:2])
+            log_warning_note(
+                f"Likely harness issue ({analysis.harness_issue_type}): {details}",
+            )
         logger.info(
             "<empty>",
             extra={"style_hint": LogStyles.GENERATED_TEXT},
         )
         return
 
-    gen_tokens = getattr(gen, "generation_tokens", 0)
-    analysis = analyze_generation_text(
-        text_val,
-        gen_tokens,
-        prompt=prompt,
-        context_marker=context_marker,
-    )
     # Show brief inline warnings for quality issues
     if analysis.is_repetitive and analysis.repeated_token:
         log_warning_note(f"Repetitive: '{analysis.repeated_token}'")
@@ -8239,6 +8450,9 @@ def _preview_generation(
     if analysis.is_context_ignored and analysis.missing_context_terms:
         missing = ", ".join(analysis.missing_context_terms[:3])
         log_warning_note(f"Context ignored (missing: {missing})")
+    if analysis.has_harness_issue:
+        details = ", ".join(analysis.harness_issue_details[:2])
+        log_warning_note(f"Harness issue ({analysis.harness_issue_type}): {details}")
 
     # Show full output in trace (truncated in summary table)
     log_generated_text(text_val, wrap=True)
@@ -8259,9 +8473,11 @@ def _log_verbose_success_details_mode(
     gen_text = getattr(res.generation, "text", None) or ""
 
     gen_tokens = getattr(res.generation, "generation_tokens", 0)
+    prompt_tokens = getattr(res.generation, "prompt_tokens", None)
     analysis = analyze_generation_text(
         gen_text,
         gen_tokens,
+        prompt_tokens=prompt_tokens,
         prompt=prompt,
         context_marker=context_marker,
     )
@@ -8296,8 +8512,17 @@ def _log_verbose_success_details_mode(
             f"Note: Output ignored key context (missing: {missing})",
             prefix="⚠️",
         )
+    if analysis.has_harness_issue:
+        details = ", ".join(analysis.harness_issue_details[:3])
+        log_warning_note(
+            f"Likely harness issue ({analysis.harness_issue_type}): {details}",
+            prefix="⚠️",
+        )
 
-    log_generated_text(gen_text, wrap=True, indent="   ")
+    if gen_text:
+        log_generated_text(gen_text, wrap=True, indent="   ")
+    else:
+        logger.info("   <empty>", extra={"style_hint": LogStyles.GENERATED_TEXT})
 
     if detailed:
         log_blank()
@@ -8641,6 +8866,17 @@ def _log_compact_metrics(res: PerformanceResult) -> None:
     if tokens_part or speed_part:
         line2 = f"   Tokens: {tokens_part}{speed_part}"
         logger.info(line2, extra={"style_hint": LogStyles.METRIC_LABEL})
+
+    if (
+        prompt_tokens >= QUALITY.long_prompt_tokens_threshold
+        and gen_tokens < QUALITY.min_output_tokens_for_ratio
+    ):
+        ratio = gen_tokens / max(prompt_tokens, 1)
+        log_warning_note(
+            "Potential long-context degradation: "
+            f"prompt={fmt_num(prompt_tokens)} tok, "
+            f"output={fmt_num(gen_tokens)} tok ({ratio:.1%})"
+        )
 
 
 def _build_compact_metric_parts(
@@ -9034,42 +9270,53 @@ def handle_metadata(image_path: Path, args: argparse.Namespace) -> MetadataDict:
     return metadata
 
 
+def _compact_prompt_text(value: str, *, max_chars: int) -> str:
+    """Normalize whitespace and clip prompt context fields to a safe size."""
+    compact = re.sub(r"\s+", " ", value).strip()
+    if len(compact) <= max_chars:
+        return compact
+    return compact[: max_chars - 3].rstrip() + "..."
+
+
+def _summarize_prompt_keywords(raw_keywords: str) -> str:
+    """Return a deduplicated, size-limited keyword hint string for the prompt."""
+    deduped_items: list[str] = []
+    seen: set[str] = set()
+    for item in raw_keywords.split(","):
+        compact_item = _compact_prompt_text(
+            item,
+            max_chars=QUALITY.prompt_keyword_item_max_chars,
+        )
+        if not compact_item:
+            continue
+        key = compact_item.casefold()
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped_items.append(compact_item)
+        if len(deduped_items) >= QUALITY.prompt_keyword_max_items:
+            break
+    return ", ".join(deduped_items)
+
+
 def _build_cataloguing_prompt(metadata: MetadataDict) -> str:
     """Build a structured prompt optimised for stock-photo cataloguing.
 
-    Generates a prompt that asks VLMs for Title / Description / Keywords in a
-    format suited to Flickr, Google Images, Alamy, and similar platforms.
-
-    When existing metadata is available (IPTC/XMP/EXIF description, keywords,
-    GPS, date), it is injected as ``Context:`` so VLMs can expand and refine
-    rather than start from scratch.  The ``Context:`` marker is intentionally
-    kept for compatibility with the quality-analysis context-ignorance detector.
+    Keeps instructions concise while preserving metadata grounding from
+    IPTC/XMP/EXIF fields. The ``Context:`` marker is retained for
+    context-ignorance diagnostics.
     """
     parts: list[str] = [
-        "Analyze this image and provide structured metadata for image cataloguing.",
+        "Analyze this image for cataloguing metadata.",
         "",
-        "Respond with exactly these three sections:",
+        "Return exactly these three sections:",
         "",
-        "Title: A concise, descriptive title (5\u201312 words).",
+        "Title: 6-12 words, descriptive and concrete.",
         "",
-        (
-            "Description: A factual 1\u20133 sentence description of what"
-            " the image shows, covering key subjects, setting, and action."
-        ),
+        "Description: 1-2 factual sentences covering key subjects, setting, and action.",
         "",
-        (
-            "Keywords: 25\u201350 comma-separated keywords ordered from most"
-            " specific to most general, covering:"
-        ),
-        "- Specific subjects (people, objects, animals, landmarks)",
-        "- Setting and location (urban, rural, indoor, outdoor)",
-        "- Actions and activities",
-        "- Concepts and themes (e.g. teamwork, solitude, celebration)",
-        "- Mood and emotion (e.g. serene, dramatic, joyful)",
-        "- Visual style (e.g. close-up, wide-angle, aerial, silhouette, bokeh)",
-        "- Colors and lighting (e.g. golden hour, blue tones, high-key)",
-        "- Seasonal and temporal context",
-        "- Use-case relevance (e.g. business, travel, food, editorial)",
+        "Keywords: 15-30 comma-separated terms, ordered most specific to most general.",
+        "Use concise, image-grounded wording and avoid speculation.",
     ]
 
     # --- Context block (uses the "Context:" marker for quality analysis) ---
@@ -9079,16 +9326,20 @@ def _build_cataloguing_prompt(metadata: MetadataDict) -> str:
     has_context = desc or title or existing_kw
     if has_context:
         parts.append("")
-        context_fragments: list[str] = []
+        parts.append("Context: Existing metadata hints (use only if visually consistent):")
         if title:
-            context_fragments.append(f"titled '{title}'")
+            title_hint = _compact_prompt_text(title, max_chars=QUALITY.prompt_title_max_chars)
+            parts.append(f"- Title hint: {title_hint}")
         if desc:
-            context_fragments.append(f"described as '{desc}'")
-        parts.append(
-            f"Context: The image is {', '.join(context_fragments)}." if context_fragments else "",
-        )
+            desc_hint = _compact_prompt_text(
+                desc,
+                max_chars=QUALITY.prompt_description_max_chars,
+            )
+            parts.append(f"- Description hint: {desc_hint}")
         if existing_kw:
-            parts.append(f"Existing keywords: {existing_kw}")
+            keyword_hint = _summarize_prompt_keywords(existing_kw)
+            if keyword_hint:
+                parts.append(f"- Keyword hints: {keyword_hint}")
 
     # Date / time / GPS metadata
     date_val = metadata.get("date")
@@ -9103,12 +9354,15 @@ def _build_cataloguing_prompt(metadata: MetadataDict) -> str:
             meta_fragments.append(s)
         if gps_val:
             meta_fragments.append(f"GPS: {gps_val}")
-        parts.append(". ".join(meta_fragments) + ".")
+        if has_context:
+            parts.append("- Capture metadata: " + ". ".join(meta_fragments) + ".")
+        else:
+            parts.append("")
+            parts.append("Capture metadata hints: " + ". ".join(meta_fragments) + ".")
 
     parts.append("")
     parts.append(
-        "Be factual about visual content.  Include relevant conceptual"
-        " and emotional keywords where clearly supported by the image.",
+        "Prioritize what is visibly present. If context conflicts with the image, trust the image.",
     )
 
     return "\n".join(parts)
@@ -9134,6 +9388,7 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
         logger.info("Final prompt: %s", prompt_display)
     else:
         logger.info("Final prompt: %s", prompt)
+    logger.info("Prompt length: %d characters", len(prompt))
     return prompt
 
 
@@ -9364,34 +9619,37 @@ def process_models(
         if result.success and result.generation:
             gen_text = str(getattr(result.generation, "text", ""))
             gen_tokens = getattr(result.generation, "generation_tokens", 0)
-            if gen_text:
-                # Perform quality analysis (only for successful runs)
-                analysis = analyze_generation_text(
-                    gen_text,
-                    gen_tokens,
-                    prompt=prompt,
-                    context_marker=args.context_marker,
-                )
-                # Log quality analysis results at DEBUG level
-                logger.debug(
-                    "Quality analysis for %s: %s",
-                    result.model_name,
-                    _format_quality_analysis_for_log(analysis),
-                )
-                # Build consolidated quality issues string using helper
-                quality_issues_str = _build_quality_issues_string(analysis)
-                if quality_issues_str:
-                    logger.info(
-                        "Quality issues detected for %s: %s",
-                        result.model_name,
-                        quality_issues_str,
-                    )
+            prompt_tokens = getattr(result.generation, "prompt_tokens", None)
 
-                # Update result with quality metrics
-                result = dataclasses.replace(
-                    result,
-                    quality_issues=quality_issues_str,
+            # Perform quality analysis for all successful runs, including empty output.
+            analysis = analyze_generation_text(
+                gen_text,
+                gen_tokens,
+                prompt_tokens=prompt_tokens,
+                prompt=prompt,
+                context_marker=args.context_marker,
+            )
+            # Log quality analysis results at DEBUG level
+            logger.debug(
+                "Quality analysis for %s: %s",
+                result.model_name,
+                _format_quality_analysis_for_log(analysis),
+            )
+            # Build consolidated quality issues string using helper
+            quality_issues_str = _build_quality_issues_string(analysis)
+            if quality_issues_str:
+                logger.info(
+                    "Quality issues detected for %s: %s",
+                    result.model_name,
+                    quality_issues_str,
                 )
+
+            # Update result with quality metrics
+            result = dataclasses.replace(
+                result,
+                quality_issues=quality_issues_str,
+                quality_analysis=analysis,
+            )
 
         results.append(result)
 
@@ -9445,6 +9703,16 @@ def _format_quality_analysis_for_log(analysis: GenerationQualityAnalysis) -> str
         parts.append(f"excessive_bullets=True (count={analysis.bullet_count})")
     if analysis.is_context_ignored:
         parts.append("context_ignored=True")
+    if analysis.has_degeneration:
+        parts.append(f"degeneration=True ({analysis.degeneration_type})")
+    if analysis.has_fabrication:
+        parts.append("fabrication=True")
+    if analysis.has_harness_issue:
+        details = (
+            ",".join(analysis.harness_issue_details[:2]) if analysis.harness_issue_details else ""
+        )
+        parts.append(f"harness=True ({analysis.harness_issue_type}; {details})")
+    parts.append(f"words={analysis.word_count}")
 
     return ", ".join(parts) if parts else "no issues detected"
 
@@ -9485,6 +9753,8 @@ def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | N
             else "⚠️harness"
         )
         issues.append(harness_label)
+        if analysis.harness_issue_type == "long_context":
+            issues.append("long-context")
 
     # Critical model quality issues
     if analysis.is_refusal:
@@ -9502,6 +9772,12 @@ def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | N
 
     if analysis.hallucination_issues:
         issues.append("hallucination")
+
+    if analysis.has_degeneration:
+        issues.append("degeneration")
+
+    if analysis.has_fabrication:
+        issues.append("fabrication")
 
     if analysis.is_generic:
         issues.append(f"generic({analysis.specificity_score:.0f})")
@@ -9523,10 +9799,13 @@ def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | N
 
 QUALITY_ISSUE_PATTERNS: Final[dict[str, re.Pattern[str]]] = {
     "harness": re.compile(r"⚠️?harness", re.IGNORECASE),
+    "long_context": re.compile(r"long[-_]context", re.IGNORECASE),
     "refusal": re.compile(r"\brefusal\b", re.IGNORECASE),
     "repetitive": re.compile(r"\brepetitive\b", re.IGNORECASE),
     "lang_mixing": re.compile(r"\blang_mixing\b", re.IGNORECASE),
     "hallucination": re.compile(r"\bhallucination\b", re.IGNORECASE),
+    "degeneration": re.compile(r"\bdegeneration\b", re.IGNORECASE),
+    "fabrication": re.compile(r"\bfabrication\b", re.IGNORECASE),
     "generic": re.compile(r"\bgeneric\b", re.IGNORECASE),
     "verbose": re.compile(r"\bverbose\b", re.IGNORECASE),
     "formatting": re.compile(r"\bformatting\b", re.IGNORECASE),
@@ -9535,7 +9814,15 @@ QUALITY_ISSUE_PATTERNS: Final[dict[str, re.Pattern[str]]] = {
 }
 
 QUALITY_BREAKING_LABELS: Final[frozenset[str]] = frozenset(
-    {"harness", "refusal", "repetitive", "hallucination", "context_ignored"},
+    {
+        "harness",
+        "long_context",
+        "refusal",
+        "repetitive",
+        "hallucination",
+        "degeneration",
+        "context_ignored",
+    },
 )
 
 
@@ -10195,12 +10482,10 @@ def _populate_jsonl_result_generation_data(
     }
 
     text = getattr(generation, "text", None)
-    if text:
+    if text is not None:
         record["generated_text"] = text
 
-    quality_payload = _build_jsonl_quality_analysis_record(
-        getattr(generation, "quality_analysis", None),
-    )
+    quality_payload = _build_jsonl_quality_analysis_record(result.quality_analysis)
     if quality_payload:
         record["quality_analysis"] = quality_payload
 

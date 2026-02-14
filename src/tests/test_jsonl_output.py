@@ -312,6 +312,25 @@ def test_save_jsonl_report_includes_generated_text(tmp_path: Path) -> None:
     assert data["generated_text"] == "This is the generated output text."
 
 
+def test_save_jsonl_report_preserves_empty_generated_text(tmp_path: Path) -> None:
+    """Empty generated text should still be serialized for diagnostics triage."""
+    output_file = tmp_path / "results.jsonl"
+
+    gen = MockGeneration(text="")
+    result = PerformanceResult(
+        model_name="test-model",
+        generation=gen,
+        success=True,
+    )
+
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
+    assert "generated_text" in data
+    assert data["generated_text"] == ""
+
+
 def test_append_history_record_creates_file(tmp_path: Path) -> None:
     """Test that append_history_record writes a per-run history entry."""
     history_file = tmp_path / "results.history.jsonl"

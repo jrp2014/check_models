@@ -236,6 +236,24 @@ def test_build_prompt_context_marker_present() -> None:
     assert "Context:" in prompt
 
 
+def test_build_prompt_truncates_long_metadata_fields() -> None:
+    """Large metadata fields should be compacted to avoid excessive prompt context."""
+    long_desc = "detail " * 200
+    long_keywords = ", ".join([f"keyword{i}" for i in range(60)])
+    meta: dict[str, str | None] = {
+        "title": "Very Long Existing Title " * 10,
+        "description": long_desc,
+        "keywords": long_keywords,
+    }
+
+    prompt = _build_cataloguing_prompt(meta)
+    assert "Context:" in prompt
+    assert long_desc not in prompt
+    assert long_keywords not in prompt
+    assert "..." in prompt
+    assert "Keyword hints:" in prompt
+
+
 def test_build_prompt_no_context_when_no_description() -> None:
     """Prompt without description/title/keywords should omit 'Context:' block."""
     meta: dict[str, str | None] = {"date": "2025-01-01"}
