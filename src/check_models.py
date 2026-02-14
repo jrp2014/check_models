@@ -145,12 +145,19 @@ NOT_AVAILABLE: Final[str] = "N/A"
 MISSING_DEPENDENCIES: dict[str, str] = {}
 
 ERROR_MLX_MISSING: Final[str] = "Core dependency missing: mlx. Please install it."
+ERROR_MLX_RUNTIME_INIT: Final[str] = (
+    "Core dependency initialization failed: mlx runtime could not initialize Metal."
+)
 ERROR_PILLOW_MISSING: Final[str] = (
     "Error: Pillow not found. Please install it (`pip install Pillow`)."
 )
 ERROR_MLX_VLM_MISSING: Final[str] = (
     "Error: mlx-vlm not found. Please install it (`pip install mlx-vlm`)."
 )
+ERROR_MLX_VLM_RUNTIME_INIT: Final[str] = (
+    "Core dependency initialization failed: mlx-vlm could not be imported safely."
+)
+MLX_IMPORT_PROBE_TIMEOUT_SECONDS: Final[float] = 8.0
 
 
 # =============================================================================
@@ -371,11 +378,95 @@ def load_quality_config(config_path: Path | None = None) -> None:
 
 _temp_logger = logging.getLogger(LOGGER_NAME)
 
-try:
-    import mlx.core as mx
-except ImportError:
-    mx = cast("Any", None)
-    MISSING_DEPENDENCIES["mlx"] = ERROR_MLX_MISSING
+
+def _truncate_probe_output(text: str, *, max_chars: int = 220) -> str:
+    """Collapse probe output into a compact single-line message."""
+    compact = " ".join(text.split())
+    if len(compact) <= max_chars:
+        return compact
+    return f"{compact[: max_chars - 3]}..."
+
+
+def _probe_mlx_import_runtime() -> str | None:
+    """Return None when mlx.core import appears safe; else an actionable message."""
+    try:
+        probe_result = subprocess.run(  # noqa: S603 - fixed interpreter + fixed probe command
+            [sys.executable, "-c", "import mlx.core"],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=MLX_IMPORT_PROBE_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired:
+        return (
+            f"{ERROR_MLX_RUNTIME_INIT} Import probe timed out after "
+            f"{MLX_IMPORT_PROBE_TIMEOUT_SECONDS:.0f}s."
+        )
+    except OSError as probe_err:
+        return f"{ERROR_MLX_RUNTIME_INIT} Import probe failed: {probe_err}"
+
+    if probe_result.returncode == 0:
+        return None
+
+    combined_output = probe_result.stderr.strip() or probe_result.stdout.strip()
+    combined_lower = combined_output.lower()
+
+    if "nsrangeexception" in combined_lower and "objectatindex" in combined_lower:
+        return (
+            f"{ERROR_MLX_RUNTIME_INIT} No Metal device could be enumerated "
+            "(NSRangeException during device discovery). This commonly happens in "
+            "headless or virtualized sessions without visible Apple GPU access."
+        )
+
+    output_excerpt = _truncate_probe_output(combined_output) if combined_output else "no output"
+    return (
+        f"{ERROR_MLX_RUNTIME_INIT} Import probe exited with code "
+        f"{probe_result.returncode}. Probe output: {output_excerpt}"
+    )
+
+
+def _probe_mlx_vlm_import_runtime() -> str | None:
+    """Return None when mlx_vlm import appears safe; else an actionable message."""
+    try:
+        probe_result = subprocess.run(  # noqa: S603 - fixed interpreter + fixed probe command
+            [sys.executable, "-c", "import mlx_vlm"],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=MLX_IMPORT_PROBE_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired:
+        return (
+            f"{ERROR_MLX_VLM_RUNTIME_INIT} Import probe timed out after "
+            f"{MLX_IMPORT_PROBE_TIMEOUT_SECONDS:.0f}s."
+        )
+    except OSError as probe_err:
+        return f"{ERROR_MLX_VLM_RUNTIME_INIT} Import probe failed: {probe_err}"
+
+    if probe_result.returncode == 0:
+        return None
+
+    combined_output = probe_result.stderr.strip() or probe_result.stdout.strip()
+    output_excerpt = _truncate_probe_output(combined_output) if combined_output else "no output"
+    return (
+        f"{ERROR_MLX_VLM_RUNTIME_INIT} Import probe exited with code "
+        f"{probe_result.returncode}. Probe output: {output_excerpt}"
+    )
+
+
+mx: Any = cast("Any", None)
+mlx_probe_error = _probe_mlx_import_runtime()
+if mlx_probe_error is None:
+    try:
+        import mlx.core as _mx_runtime
+    except ImportError:
+        MISSING_DEPENDENCIES["mlx"] = ERROR_MLX_MISSING
+    except (OSError, RuntimeError, ValueError) as mlx_init_err:
+        MISSING_DEPENDENCIES["mlx"] = f"{ERROR_MLX_RUNTIME_INIT} {mlx_init_err}"
+    else:
+        mx = cast("Any", _mx_runtime)
+else:
+    MISSING_DEPENDENCIES["mlx"] = mlx_probe_error
 
 ExifTags: Any
 GPSTAGS: Mapping[Any, Any]
@@ -451,35 +542,46 @@ except ImportError:
 
 vlm_version: str
 
-try:
-    from mlx_vlm.generate import generate
-    from mlx_vlm.prompt_utils import apply_chat_template
-    from mlx_vlm.utils import load, load_image
-    from mlx_vlm.version import __version__ as _mlx_vlm_version
 
-    vlm_version = _mlx_vlm_version
-except ImportError:
-    vlm_version = NOT_AVAILABLE
+@dataclass
+class _GenerationResultFallback:
+    """Fallback structure used when mlx-vlm is unavailable."""
 
-    @dataclass
-    class _GenerationResultFallback:
-        """Fallback structure used when mlx-vlm is unavailable."""
+    text: str | None = None
+    prompt_tokens: int | None = None
+    generation_tokens: int | None = None
 
-        text: str | None = None
-        prompt_tokens: int | None = None
-        generation_tokens: int | None = None
 
-    def _raise_mlx_vlm_missing(*_args: object, **_kwargs: object) -> NoReturn:
-        """Raise a consistent runtime error when mlx-vlm is unavailable."""
-        raise RuntimeError(ERROR_MLX_VLM_MISSING)
+def _raise_mlx_vlm_missing(*_args: object, **_kwargs: object) -> NoReturn:
+    """Raise a consistent runtime error when mlx-vlm is unavailable."""
+    raise RuntimeError(ERROR_MLX_VLM_MISSING)
 
+
+def _configure_mlx_vlm_fallback(error_message: str) -> None:
+    """Set runtime fallbacks when mlx-vlm cannot be imported."""
     # Use Any for fallback functions to avoid type conflicts with stub signatures
-    generate = cast("Any", _raise_mlx_vlm_missing)
-    apply_chat_template = cast("Any", _raise_mlx_vlm_missing)
-    load = cast("Any", _raise_mlx_vlm_missing)
-    load_image = cast("Any", _raise_mlx_vlm_missing)
+    globals()["generate"] = cast("Any", _raise_mlx_vlm_missing)
+    globals()["apply_chat_template"] = cast("Any", _raise_mlx_vlm_missing)
+    globals()["load"] = cast("Any", _raise_mlx_vlm_missing)
+    globals()["load_image"] = cast("Any", _raise_mlx_vlm_missing)
+    MISSING_DEPENDENCIES["mlx-vlm"] = error_message
 
-    MISSING_DEPENDENCIES["mlx-vlm"] = ERROR_MLX_VLM_MISSING
+
+mlx_vlm_probe_error = _probe_mlx_vlm_import_runtime()
+if mlx_vlm_probe_error is None:
+    try:
+        from mlx_vlm.generate import generate
+        from mlx_vlm.prompt_utils import apply_chat_template
+        from mlx_vlm.utils import load, load_image
+        from mlx_vlm.version import __version__ as _mlx_vlm_version
+
+        vlm_version = _mlx_vlm_version
+    except ImportError:
+        vlm_version = NOT_AVAILABLE
+        _configure_mlx_vlm_fallback(ERROR_MLX_VLM_MISSING)
+else:
+    vlm_version = NOT_AVAILABLE
+    _configure_mlx_vlm_fallback(mlx_vlm_probe_error)
 
 _transformers_guard_enabled: bool = os.getenv("MLX_VLM_ALLOW_TF", "0") != "1"
 if _transformers_guard_enabled:
@@ -3802,6 +3904,198 @@ def get_library_versions() -> LibraryVersionDict:
     }
 
 
+def _version_components(version_text: str, *, width: int = 4) -> tuple[int, ...]:
+    """Convert a version string to comparable numeric components.
+
+    Keeps only numeric segments so strings like ``0.30.7.dev20260214`` compare
+    sensibly against floor versions such as ``0.30.5``.
+    """
+    numbers = [int(part) for part in re.findall(r"\d+", version_text)]
+    if len(numbers) < width:
+        numbers.extend([0] * (width - len(numbers)))
+    return tuple(numbers[:width])
+
+
+def _is_version_at_least(installed: str, minimum: str) -> bool:
+    """Return whether ``installed`` satisfies ``minimum`` using numeric comparison."""
+    return _version_components(installed) >= _version_components(minimum)
+
+
+def _collect_upstream_requirements(
+    versions: LibraryVersionDict,
+) -> dict[str, tuple[str, set[str]]]:
+    """Collect package floor versions implied by installed upstream stacks."""
+    requirements: dict[str, tuple[str, set[str]]] = {}
+
+    def _record_requirement(package: str, minimum: str, source_stack: str) -> None:
+        current = requirements.get(package)
+        if current is None:
+            requirements[package] = (minimum, {source_stack})
+            return
+
+        current_minimum, current_sources = current
+        merged_sources = current_sources | {source_stack}
+        if _is_version_at_least(minimum, current_minimum):
+            requirements[package] = (minimum, merged_sources)
+        else:
+            requirements[package] = (current_minimum, merged_sources)
+
+    if versions.get("mlx-vlm"):
+        _record_requirement("mlx", "0.30.0", "mlx-vlm")
+        _record_requirement("mlx-lm", "0.30.5", "mlx-vlm")
+        _record_requirement("transformers", "5.1.0", "mlx-vlm")
+
+    if versions.get("mlx-lm"):
+        _record_requirement("mlx", "0.30.4", "mlx-lm")
+        _record_requirement("transformers", "5.0.0", "mlx-lm")
+
+    return requirements
+
+
+def _detect_upstream_version_issues(versions: LibraryVersionDict) -> list[str]:
+    """Return compatibility issues against current upstream package minimums."""
+    issues: list[str] = []
+    requirements = _collect_upstream_requirements(versions)
+
+    for package, (minimum, sources) in sorted(requirements.items()):
+        source_label = ", ".join(sorted(sources))
+        installed = versions.get(package)
+        if installed is None:
+            issues.append(
+                f"{package} is missing; upstream {source_label} expects {package}>={minimum}.",
+            )
+            continue
+
+        if not _is_version_at_least(installed, minimum):
+            issues.append(
+                f"{package}=={installed} is below upstream minimum {minimum} "
+                f"required by {source_label}.",
+            )
+
+    return issues
+
+
+def _has_mlx_vlm_load_image_path_bug(source_text: str) -> bool:
+    """Detect the known unguarded ``startswith`` branch in mlx-vlm load_image()."""
+    has_risky_branch = 'elif image_source.startswith(("http://", "https://"))' in source_text
+    has_safe_guard = (
+        'elif isinstance(image_source, str) and image_source.startswith(("http://", "https://"))'
+        in source_text
+    )
+    return has_risky_branch and not has_safe_guard
+
+
+def _resolve_distribution_source_file(distribution_name: str, relative_path: str) -> Path | None:
+    """Locate an installed distribution file path without importing the package."""
+    try:
+        distribution = importlib.metadata.distribution(distribution_name)
+    except importlib.metadata.PackageNotFoundError:
+        return None
+
+    direct_candidate = Path(str(distribution.locate_file(relative_path)))
+    if direct_candidate.is_file():
+        return direct_candidate
+
+    normalized_target = relative_path.replace("\\", "/")
+    for file_ref in distribution.files or []:
+        file_path = str(file_ref).replace("\\", "/")
+        if not file_path.endswith(normalized_target):
+            continue
+
+        candidate = Path(str(distribution.locate_file(file_ref)))
+        if candidate.is_file():
+            return candidate
+
+    module_name = normalized_target.split("/", 1)[0]
+    module_spec = importlib_util.find_spec(module_name)
+    module_locations = (
+        list(module_spec.submodule_search_locations)
+        if module_spec and module_spec.submodule_search_locations
+        else []
+    )
+    if module_locations:
+        module_root = Path(module_locations[0])
+        _, _, module_relative = normalized_target.partition("/")
+        if module_relative:
+            candidate = module_root / module_relative
+            if candidate.is_file():
+                return candidate
+
+    return None
+
+
+def _detect_mlx_vlm_load_image_issue() -> str | None:
+    """Detect known mlx-vlm load_image Path/BytesIO branch bug from source."""
+    source_path: Path | None = None
+    if getattr(load_image, "__module__", "") == "mlx_vlm.utils":
+        code_obj = getattr(load_image, "__code__", None)
+        if code_obj is not None:
+            source_path = Path(code_obj.co_filename)
+
+    if source_path is None:
+        source_path = _resolve_distribution_source_file("mlx-vlm", "mlx_vlm/utils.py")
+    if source_path is None:
+        return None
+
+    try:
+        source_text = source_path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+
+    if _has_mlx_vlm_load_image_path_bug(source_text):
+        return (
+            "mlx-vlm load_image() has an unguarded URL startswith() branch; "
+            "Path/BytesIO inputs can raise AttributeError in upstream code."
+        )
+
+    return None
+
+
+def _has_transformers_backend_guard_names(import_utils_source: str) -> bool:
+    """Return whether transformers source still references TRANSFORMERS_NO_* vars."""
+    guard_names = ("TRANSFORMERS_NO_TF", "TRANSFORMERS_NO_FLAX", "TRANSFORMERS_NO_JAX")
+    return any(name in import_utils_source for name in guard_names)
+
+
+def _detect_transformers_env_guard_issue() -> str | None:
+    """Detect whether transformers still honors TRANSFORMERS_NO_* guard vars."""
+    if not _transformers_guard_enabled:
+        return None
+
+    import_utils_spec = importlib_util.find_spec("transformers.utils.import_utils")
+    import_utils_origin = getattr(import_utils_spec, "origin", None) if import_utils_spec else None
+    if not import_utils_origin:
+        return None
+
+    try:
+        import_utils_source = Path(import_utils_origin).read_text(encoding="utf-8")
+    except OSError:
+        return None
+
+    if _has_transformers_backend_guard_names(import_utils_source):
+        return None
+
+    return (
+        "transformers import utils no longer reference TRANSFORMERS_NO_TF/FLAX/JAX; "
+        "check_models backend guard env vars may be ignored with this version."
+    )
+
+
+def _collect_preflight_package_issues(versions: LibraryVersionDict) -> list[str]:
+    """Collect actionable dependency/runtime issues before model execution."""
+    issues = _detect_upstream_version_issues(versions)
+
+    load_image_issue = _detect_mlx_vlm_load_image_issue()
+    if load_image_issue:
+        issues.append(load_image_issue)
+
+    guard_issue = _detect_transformers_env_guard_issue()
+    if guard_issue:
+        issues.append(guard_issue)
+
+    return issues
+
+
 def _get_available_fields(results: list[PerformanceResult]) -> list[str]:
     """Return ordered list of metric field names present across results.
 
@@ -6091,7 +6385,7 @@ def _diagnostics_harness_section(
         parts.append("")
         parts.append(
             f"**Tokens:** prompt={fmt_num(prompt_tokens)}, "
-            f"generated={fmt_num(generated_tokens)}, ratio={ratio_text}"
+            f"generated={fmt_num(generated_tokens)}, ratio={ratio_text}",
         )
         parts.append(f"**Likely package:** `{likely_package}`")
         if res.quality_issues:
@@ -7683,6 +7977,25 @@ def validate_image_accessible(*, image_path: str | Path) -> None:
             # Returns PIL.Image.Image, verifying the image is accessible and valid
             # Convert Path to str since load_image expects str
             _ = load_image(str(image_path))
+    except RuntimeError as err:
+        if str(err) != ERROR_MLX_VLM_MISSING:
+            msg = f"Error accessing image {image_path}: {err}"
+            raise OSError(msg) from err
+
+        # mlx-vlm is unavailable: use Pillow-only validation for local files so
+        # direct function callers and unit tests can still validate image inputs.
+        try:
+            with TimeoutManager(seconds=IMAGE_OPEN_TIMEOUT), Image.open(image_path) as img:
+                img.verify()
+        except TimeoutError as timeout_err:
+            msg = f"Timeout while reading image: {image_path}"
+            raise OSError(msg) from timeout_err
+        except UnidentifiedImageError as image_err:
+            msg = f"File is not a recognized image format: {image_path}"
+            raise ValueError(msg) from image_err
+        except (OSError, ValueError) as image_err:
+            msg = f"Error accessing image {image_path}: {image_err}"
+            raise OSError(msg) from image_err
     except TimeoutError as err:
         msg = f"Timeout while reading image: {image_path}"
         raise OSError(msg) from err
@@ -8171,13 +8484,20 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         if processor is not None:
             del processor
 
-        # Force synchronization and rubbish collection
-        mx.synchronize()
+        # Force synchronization and garbage collection when MLX runtime is available.
+        synchronize_fn = getattr(mx, "synchronize", None)
+        if callable(synchronize_fn):
+            synchronize_fn()
         gc.collect()
 
-        # Clear both Metal and MLX caches for thorough GPU memory cleanup
-        mx.clear_cache()
-        mx.reset_peak_memory()
+        # Clear both Metal and MLX caches for thorough GPU memory cleanup.
+        clear_cache_fn = getattr(mx, "clear_cache", None)
+        if callable(clear_cache_fn):
+            clear_cache_fn()
+
+        reset_peak_memory_fn = getattr(mx, "reset_peak_memory", None)
+        if callable(reset_peak_memory_fn):
+            reset_peak_memory_fn()
         logger.debug("Cleaned up resources for model %s", params.model_identifier)
 
 
@@ -8875,7 +9195,7 @@ def _log_compact_metrics(res: PerformanceResult) -> None:
         log_warning_note(
             "Potential long-context degradation: "
             f"prompt={fmt_num(prompt_tokens)} tok, "
-            f"output={fmt_num(gen_tokens)} tok ({ratio:.1%})"
+            f"output={fmt_num(gen_tokens)} tok ({ratio:.1%})",
         )
 
 
@@ -9112,16 +9432,6 @@ def _dump_environment_to_log(output_path: Path) -> None:
 
 def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     """Configure logging, collect versions, print warnings."""
-    if MISSING_DEPENDENCIES:
-        for message in MISSING_DEPENDENCIES.values():
-            logger.critical("%s", message)
-        missing_list = ", ".join(sorted(MISSING_DEPENDENCIES))
-        error_message = (
-            f"Missing required runtime dependencies: {missing_list}. "
-            "Install the missing packages or adjust optional features."
-        )
-        raise RuntimeError(error_message)
-
     # Set DEBUG if verbose, else INFO
     console_log_level: int = logging.DEBUG if args.verbose else logging.INFO
     # Remove all handlers and add console + file handlers
@@ -9165,6 +9475,16 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     # Dump full environment to log file for reproducibility (after logging setup)
     _dump_environment_to_log(args.output_env)
 
+    if MISSING_DEPENDENCIES:
+        for dependency_name, message in sorted(MISSING_DEPENDENCIES.items()):
+            logger.critical("[%s] %s", dependency_name, message)
+        missing_list = ", ".join(sorted(MISSING_DEPENDENCIES))
+        error_message = (
+            f"Required runtime dependencies unavailable: {missing_list}. "
+            "Install/repair these packages before running model checks."
+        )
+        raise RuntimeError(error_message)
+
     # Apply CLI output preferences (color + width)
     _apply_cli_output_preferences(args)
 
@@ -9183,6 +9503,12 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
         )
 
     library_versions: LibraryVersionDict = get_library_versions()
+    preflight_issues = _collect_preflight_package_issues(library_versions)
+    if preflight_issues:
+        logger.warning("Detected upstream package compatibility risks:")
+        for issue in preflight_issues:
+            logger.warning("  - %s", issue)
+
     if args.verbose:
         print_version_info(library_versions)
 

@@ -439,3 +439,156 @@ class TestLoadQualityConfig:
         with caplog.at_level(logging.WARNING):
             mod.load_quality_config(config_file)
         assert "Failed to load" in caplog.text
+
+
+class TestPreflightDependencyDiagnostics:
+    """Tests for upstream version-floor and source-pattern diagnostics."""
+
+    def test_is_version_at_least_handles_dev_builds(self, mod: types.ModuleType) -> None:
+        """Dev build strings should compare correctly against floor versions."""
+        assert mod._is_version_at_least("0.30.7.dev20260214+c184262d", "0.30.5")
+        assert not mod._is_version_at_least("5.0.9", "5.1.0")
+
+    def test_collect_upstream_requirements_tracks_strictest_floor(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """When multiple stacks are installed, stricter floor should win."""
+        requirements = mod._collect_upstream_requirements(
+            {
+                "mlx-vlm": "0.3.12",
+                "mlx-lm": "0.30.7",
+                "mlx": "0.30.7",
+                "transformers": "5.1.0",
+            }
+        )
+        assert requirements["mlx"][0] == "0.30.4"
+        assert requirements["transformers"][0] == "5.1.0"
+        assert requirements["mlx-lm"][0] == "0.30.5"
+
+    def test_detect_upstream_version_issues_reports_below_floor(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """Installed versions below upstream floors should be surfaced."""
+        issues = mod._detect_upstream_version_issues(
+            {
+                "mlx-vlm": "0.3.12",
+                "mlx-lm": "0.30.4",
+                "mlx": "0.29.9",
+                "transformers": "5.0.9",
+            }
+        )
+        assert any("mlx==0.29.9" in issue and "0.30.4" in issue for issue in issues)
+        assert any("mlx-lm==0.30.4" in issue and "0.30.5" in issue for issue in issues)
+        assert any("transformers==5.0.9" in issue and "5.1.0" in issue for issue in issues)
+
+    def test_has_mlx_vlm_load_image_path_bug_detection(self, mod: types.ModuleType) -> None:
+        """Source matcher should flag unguarded startswith URL branch."""
+        risky_source = 'elif image_source.startswith(("http://", "https://")):\n    pass\n'
+        safe_source = (
+            "elif isinstance(image_source, str) and "
+            'image_source.startswith(("http://", "https://")):\n    pass\n'
+        )
+        assert mod._has_mlx_vlm_load_image_path_bug(risky_source)
+        assert not mod._has_mlx_vlm_load_image_path_bug(safe_source)
+
+    def test_has_transformers_backend_guard_names(self, mod: types.ModuleType) -> None:
+        """Guard-name detector should reflect source content."""
+        assert mod._has_transformers_backend_guard_names("TRANSFORMERS_NO_TF")
+        assert not mod._has_transformers_backend_guard_names("USE_TORCH_XLA")
+
+    def test_resolve_distribution_source_file_finds_relative_path(
+        self,
+        mod: types.ModuleType,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
+    ) -> None:
+        """Distribution file resolver should locate files without importing package modules."""
+
+        class _FakeDistribution:
+            def __init__(self, base_dir: Path) -> None:
+                self.base_dir = base_dir
+                self.files = []
+
+            def locate_file(self, file_ref: object) -> Path:
+                return self.base_dir / str(file_ref)
+
+        source_file = tmp_path / "mlx_vlm" / "utils.py"
+        source_file.parent.mkdir(parents=True)
+        source_file.write_text("# test file\n", encoding="utf-8")
+
+        fake_distribution = _FakeDistribution(tmp_path)
+        monkeypatch.setattr(
+            mod.importlib.metadata,
+            "distribution",
+            lambda _name: fake_distribution,
+        )
+
+        resolved = mod._resolve_distribution_source_file("mlx-vlm", "mlx_vlm/utils.py")
+        assert resolved == source_file
+
+    def test_detect_mlx_vlm_load_image_issue_uses_distribution_source_fallback(
+        self,
+        mod: types.ModuleType,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
+    ) -> None:
+        """mlx-vlm source inspection should work even when load_image import is unavailable."""
+        source_file = tmp_path / "mlx_vlm" / "utils.py"
+        source_file.parent.mkdir(parents=True)
+        source_file.write_text(
+            'elif image_source.startswith(("http://", "https://")):\n    pass\n',
+            encoding="utf-8",
+        )
+
+        def _stub_load_image(*_args: object, **_kwargs: object) -> None:
+            return None
+
+        monkeypatch.setattr(mod, "load_image", _stub_load_image)
+        monkeypatch.setattr(
+            mod,
+            "_resolve_distribution_source_file",
+            lambda _name, _relative_path: source_file,
+        )
+
+        issue = mod._detect_mlx_vlm_load_image_issue()
+        assert issue is not None
+        assert "unguarded URL startswith() branch" in issue
+
+    def test_resolve_distribution_source_file_uses_module_spec_fallback(
+        self,
+        mod: types.ModuleType,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
+    ) -> None:
+        """Resolver should fall back to module search paths for editable installs."""
+
+        class _FakeDistribution:
+            files: tuple[object, ...] = ()
+
+            def locate_file(self, _file_ref: object) -> Path:
+                return tmp_path / "missing.py"
+
+        class _FakeSpec:
+            def __init__(self, location: Path) -> None:
+                self.submodule_search_locations = [str(location)]
+
+        pkg_dir = tmp_path / "mlx_vlm"
+        pkg_dir.mkdir()
+        source_file = pkg_dir / "utils.py"
+        source_file.write_text("# editable source\n", encoding="utf-8")
+
+        monkeypatch.setattr(
+            mod.importlib.metadata,
+            "distribution",
+            lambda _name: _FakeDistribution(),
+        )
+        monkeypatch.setattr(
+            mod.importlib_util,
+            "find_spec",
+            lambda _name: _FakeSpec(pkg_dir),
+        )
+
+        resolved = mod._resolve_distribution_source_file("mlx-vlm", "mlx_vlm/utils.py")
+        assert resolved == source_file
