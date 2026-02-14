@@ -1,25 +1,25 @@
 # Model Performance Results
 
-_Generated on 2026-02-13 23:33:19 GMT_
+_Generated on 2026-02-14 02:27:12 GMT_
 
 ## 🏆 Performance Highlights
 
-- **Fastest:** `mlx-community/nanoLLaVA-1.5-4bit` (308.4 tps)
+- **Fastest:** `mlx-community/nanoLLaVA-1.5-4bit` (295.4 tps)
 - **💾 Most efficient:** `mlx-community/nanoLLaVA-1.5-4bit` (2.8 GB)
-- **⚡ Fastest load:** `HuggingFaceTB/SmolVLM-Instruct` (0.71s)
-- **📊 Average TPS:** 69.8 across 35 models
+- **⚡ Fastest load:** `mlx-community/nanoLLaVA-1.5-4bit` (0.96s)
+- **📊 Average TPS:** 66.5 across 36 models
 
 ## 📈 Resource Usage
 
-- **Total peak memory:** 679.2 GB
-- **Average peak memory:** 19.4 GB
-- **Memory efficiency:** 189 tokens/GB
+- **Total peak memory:** 701.5 GB
+- **Average peak memory:** 19.5 GB
+- **Memory efficiency:** 185 tokens/GB
 
 ## 📚 Cataloging Utility Summary
 
-**Grade Distribution:** 🏆 A: 1 | ✅ B: 6 | 🟡 C: 7 | 🟠 D: 6 | ❌ F: 15
+**Grade Distribution:** 🏆 A: 1 | ✅ B: 6 | 🟡 C: 8 | 🟠 D: 6 | ❌ F: 15
 
-**Average Utility Score:** 40/100
+**Average Utility Score:** 41/100
 
 - **Best for cataloging:** `mlx-community/gemma-3-27b-it-qat-4bit` (🏆 A, 88/100)
 - **Worst for cataloging:** `mlx-community/Molmo-7B-D-0924-8bit` (❌ F, 0/100)
@@ -50,11 +50,10 @@ _Generated on 2026-02-13 23:33:19 GMT_
 
 ## ⚠️ Quality Issues
 
-- **❌ Failed Models (8):**
+- **❌ Failed Models (7):**
   - `microsoft/Florence-2-large-ft` (`Weight Mismatch`)
   - `mlx-community/FastVLM-0.5B-bf16` (`Model Error`)
   - `mlx-community/Idefics3-8B-Llama3-bf16` (`Model Error`)
-  - `mlx-community/Kimi-VL-A3B-Thinking-8bit` (`Model Error`)
   - `mlx-community/X-Reasoner-7B-8bit` (`OOM`)
   - `mlx-community/gemma-3n-E2B-4bit` (`No Chat Template`)
   - `mlx-community/paligemma2-3b-pt-896-4bit` (`Model Error`)
@@ -72,11 +71,11 @@ _Generated on 2026-02-13 23:33:19 GMT_
 
 ## 📊 Aggregate Statistics (Successful Runs)
 
-- **Generation Tps**: Avg: 69.8 | Min: 0 | Max: 308
+- **Generation Tps**: Avg: 66.5 | Min: 0 | Max: 295
 - **Peak Memory**: Avg: 19 | Min: 2.8 | Max: 73
-- **Total Time**: Avg: 27.00s | Min: 2.58s | Max: 115.09s
-- **Generation Time**: Avg: 23.97s | Min: 1.66s | Max: 113.78s
-- **Model Load Time**: Avg: 3.03s | Min: 0.71s | Max: 9.89s
+- **Total Time**: Avg: 32.62s | Min: 2.68s | Max: 120.45s
+- **Generation Time**: Avg: 29.51s | Min: 1.66s | Max: 119.16s
+- **Model Load Time**: Avg: 3.11s | Min: 0.96s | Max: 9.71s
 
 ## 🚨 Failures by Package (Actionable)
 
@@ -84,7 +83,7 @@ _Generated on 2026-02-13 23:33:19 GMT_
 
 | Package | Failures | Error Types | Affected Models |
 |---------|----------|-------------|-----------------|
-| `mlx-vlm` | 5 | Model Error, No Chat Template | `mlx-community/FastVLM-0.5B-bf16`, `mlx-community/Kimi-VL-A3B-Thinking-8bit`, `mlx-community/gemma-3n-E2B-4bit`, `mlx-community/paligemma2-3b-pt-896-4bit`, `prince-canuma/Florence-2-large-ft` |
+| `mlx-vlm` | 4 | Model Error, No Chat Template | `mlx-community/FastVLM-0.5B-bf16`, `mlx-community/gemma-3n-E2B-4bit`, `mlx-community/paligemma2-3b-pt-896-4bit`, `prince-canuma/Florence-2-large-ft` |
 | `mlx` | 3 | Model Error, OOM, Weight Mismatch | `microsoft/Florence-2-large-ft`, `mlx-community/Idefics3-8B-Llama3-bf16`, `mlx-community/X-Reasoner-7B-8bit` |
 
 <!-- markdownlint-enable MD060 -->
@@ -95,9 +94,6 @@ _Generated on 2026-02-13 23:33:19 GMT_
 
 - **mlx-community/FastVLM-0.5B-bf16** (Model Error)
   - Error: `Model loading failed: No module named 'timm'`
-  - Type: `ValueError`
-- **mlx-community/Kimi-VL-A3B-Thinking-8bit** (Model Error)
-  - Error: `Model generation failed for mlx-community/Kimi-VL-A3B-Thinking-8bit: [broadcast_shapes] Shapes (999,2048) and (1,0,20...`
   - Type: `ValueError`
 - **mlx-community/gemma-3n-E2B-4bit** (No Chat Template)
   - Error: `Cannot use chat template functions because tokenizer.chat_template is not set and no template argument was passed! Fo...`
@@ -155,7 +151,7 @@ St Michael's Parish Church in Bishop's Stortford, England, is pictured here on a
 
 **Note:** Results sorted: errors first, then by generation time (fastest to slowest).
 
-**Overall runtime:** 999.34s
+**Overall runtime:** 1255.51s
 
 <!-- markdownlint-disable MD013 MD033 MD034 MD037 MD049 -->
 
@@ -164,46 +160,46 @@ St Michael's Parish Church in Bishop's Stortford, England, is pictured here on a
 | `microsoft/Florence-2-large-ft`                         |         |                   |                       |                |              |           |             |                  |            |             |                                   |             mlx |
 | `mlx-community/FastVLM-0.5B-bf16`                       |         |                   |                       |                |              |           |             |                  |            |             |                                   |         mlx-vlm |
 | `mlx-community/Idefics3-8B-Llama3-bf16`                 |         |                   |                       |                |              |           |             |                  |            |             |                                   |             mlx |
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit`               |         |                   |                       |                |              |           |             |                  |            |             |                                   |         mlx-vlm |
 | `mlx-community/X-Reasoner-7B-8bit`                      |         |                   |                       |                |              |           |             |                  |            |             |                                   |             mlx |
 | `mlx-community/gemma-3n-E2B-4bit`                       |         |                   |                       |                |              |           |             |                  |            |             |                                   |         mlx-vlm |
 | `mlx-community/paligemma2-3b-pt-896-4bit`               |         |                   |                       |                |              |           |             |                  |            |             |                                   |         mlx-vlm |
 | `prince-canuma/Florence-2-large-ft`                     |         |                   |                       |                |              |           |             |                  |            |             |                                   |         mlx-vlm |
-| `mlx-community/LFM2-VL-1.6B-8bit`                       |       7 |               863 |                   281 |          1,144 |        2,998 |       289 |         2.9 |            1.66s |      0.92s |       2.58s |                                   |                 |
-| `mlx-community/LFM2.5-VL-1.6B-bf16`                     |       7 |               863 |                   187 |          1,050 |        3,059 |       178 |         4.0 |            1.67s |      1.06s |       2.73s |                                   |                 |
-| `mlx-community/nanoLLaVA-1.5-4bit`                      | 151,645 |               585 |                   440 |          1,025 |        2,762 |       308 |         2.8 |            2.02s |      0.91s |       2.94s | verbose                           |                 |
-| `qnguyen3/nanoLLaVA`                                    | 151,645 |               585 |                   148 |            733 |        2,527 |      98.9 |         4.9 |            2.12s |      1.04s |       3.16s |                                   |                 |
-| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |  49,279 |             1,692 |                   136 |          1,828 |        1,199 |       110 |         5.5 |            2.98s |      1.26s |       4.25s |                                   |                 |
-| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |             1,609 |                     4 |          1,613 |          500 |      48.8 |          12 |            3.60s |      3.20s |       6.79s | ⚠️harness(prompt_template), ...   |                 |
-| `HuggingFaceTB/SmolVLM-Instruct`                        |  49,154 |             1,792 |                   364 |          2,156 |        1,413 |       110 |         5.5 |            4.91s |      0.71s |       5.62s | verbose                           |                 |
-| `mlx-community/SmolVLM-Instruct-bf16`                   |  49,154 |             1,792 |                   364 |          2,156 |        1,308 |       108 |         5.5 |            5.06s |      1.25s |       6.31s | verbose                           |                 |
-| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |             3,468 |                   307 |          3,775 |        1,000 |       158 |         9.0 |            5.71s |      1.64s |       7.35s |                                   |                 |
-| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 |     414 |             1,570 |                   500 |          2,070 |          866 |       105 |          18 |            7.05s |      3.35s |      10.40s |                                   |                 |
-| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |             1,609 |                    20 |          1,629 |          442 |      4.89 |          27 |            8.10s |      4.89s |      13.00s | context-ignored                   |                 |
-| `mlx-community/gemma-3n-E4B-it-bf16`                    |     106 |               856 |                   351 |          1,207 |          897 |      41.0 |          17 |            9.82s |      4.82s |      14.64s | context-ignored                   |                 |
-| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          |      11 |             1,570 |                   500 |          2,070 |          863 |      65.0 |          37 |           10.15s |      5.94s |      16.09s |                                   |                 |
-| `mlx-community/deepseek-vl2-8bit`                       |      14 |             2,576 |                   500 |          3,076 |          867 |      59.2 |          32 |           11.86s |      5.25s |      17.11s | repetitive(phrase: "english co... |                 |
-| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      |  93,938 |             1,908 |                   500 |          2,408 |          472 |      48.1 |          60 |           15.13s |      9.89s |      25.02s |                                   |                 |
-| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |             3,022 |                   372 |          3,394 |          271 |      42.1 |          11 |           20.29s |      1.79s |      22.08s |                                   |                 |
-| `mlx-community/pixtral-12b-8bit`                        |  14,543 |             3,704 |                   500 |          4,204 |          554 |      34.2 |          16 |           21.61s |      3.09s |      24.71s | verbose                           |                 |
-| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         |   1,338 |             3,795 |                   500 |          4,295 |          427 |      36.2 |          15 |           23.00s |      3.05s |      26.05s |                                   |                 |
-| `mlx-community/gemma-3-27b-it-qat-4bit`                 | 236,764 |               856 |                   500 |          1,356 |          195 |      26.4 |          19 |           23.63s |      4.93s |      28.56s | verbose                           |                 |
-| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               856 |                   288 |          1,144 |          189 |      15.0 |          34 |           23.98s |      6.99s |      30.97s |                                   |                 |
-| `mlx-community/InternVL3-14B-8bit`                      | 151,645 |             3,904 |                   393 |          4,297 |          405 |      27.7 |          18 |           24.31s |      3.17s |      27.48s | verbose                           |                 |
-| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      | 128,009 |               565 |                   196 |            761 |          145 |      8.62 |          15 |           26.95s |      2.80s |      29.75s |                                   |                 |
-| `mlx-community/GLM-4.6V-Flash-mxfp4`                    |      11 |             6,592 |                   500 |          7,092 |          326 |      63.0 |         8.4 |           28.50s |      2.32s |      30.82s | formatting                        |                 |
-| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         | 235,265 |             1,609 |                   500 |          2,109 |        1,514 |      17.7 |          11 |           29.61s |      2.95s |      32.57s | repetitive(phrase: "the window... |                 |
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |             2,968 |                   464 |          3,432 |          235 |      27.6 |          23 |           29.74s |      3.78s |      33.53s | ⚠️harness(encoding)               |                 |
-| `mlx-community/GLM-4.6V-Flash-6bit`                     |   3,593 |             6,592 |                   500 |          7,092 |          313 |      47.3 |          11 |           31.96s |      2.59s |      34.56s | verbose, formatting               |                 |
-| `mlx-community/pixtral-12b-bf16`                        |  38,188 |             3,704 |                   500 |          4,204 |          574 |      19.3 |          28 |           32.71s |      4.80s |      37.51s | verbose                           |                 |
-| `mlx-community/Molmo-7B-D-0924-bf16`                    |         |               0.0 |                   0.0 |            0.0 |            0 |         0 |          48 |           35.51s |      3.26s |      38.77s |                                   |                 |
-| `mlx-community/Molmo-7B-D-0924-8bit`                    |         |               0.0 |                   0.0 |            0.0 |            0 |         0 |          41 |           35.52s |      2.14s |      37.66s |                                   |                 |
-| `mlx-community/Phi-3.5-vision-instruct-bf16`            |  14,826 |             1,446 |                   500 |          1,946 |        1,025 |      12.2 |          12 |           42.65s |      1.73s |      44.38s | repetitive(phrase: "weather, ...  |                 |
-| `microsoft/Phi-3.5-vision-instruct`                     |  14,826 |             1,446 |                   500 |          1,946 |        1,031 |      12.2 |          12 |           42.80s |      1.70s |      44.50s | repetitive(phrase: "weather, ...  |                 |
-| `meta-llama/Llama-3.2-11B-Vision-Instruct`              | 128,009 |               566 |                   176 |            742 |          159 |      3.87 |          25 |           49.30s |      4.20s |      53.50s |                                   |                 |
-| `Qwen/Qwen3-VL-2B-Instruct`                             |  17,428 |            16,858 |                   500 |         17,358 |          387 |      74.9 |         8.3 |           50.60s |      1.58s |      52.18s | repetitive(phrase: "churchyard... |                 |
-| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |      11 |            16,860 |                   500 |         17,360 |          318 |      69.8 |         8.3 |           60.64s |      1.74s |      62.38s |                                   |                 |
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               |      11 |            16,869 |                   500 |         17,369 |          153 |       170 |          73 |          113.78s |      1.31s |     115.09s | repetitive(phrase: "travel pho... |                 |
+| `mlx-community/LFM2-VL-1.6B-8bit`                       |       7 |               863 |                   281 |          1,144 |        3,070 |       288 |         2.9 |            1.66s |      1.02s |       2.68s |                                   |                 |
+| `mlx-community/LFM2.5-VL-1.6B-bf16`                     |       7 |               863 |                   187 |          1,050 |        3,000 |       178 |         4.0 |            1.69s |      1.07s |       2.76s |                                   |                 |
+| `qnguyen3/nanoLLaVA`                                    | 151,645 |               585 |                   148 |            733 |        2,425 |       101 |         5.1 |            2.06s |      1.07s |       3.13s |                                   |                 |
+| `mlx-community/nanoLLaVA-1.5-4bit`                      | 151,645 |               585 |                   440 |          1,025 |        1,332 |       295 |         2.8 |            2.35s |      0.96s |       3.31s | verbose                           |                 |
+| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |  49,279 |             1,692 |                   136 |          1,828 |          764 |       101 |         5.5 |            3.87s |      1.38s |       5.25s |                                   |                 |
+| `mlx-community/SmolVLM-Instruct-bf16`                   |  49,154 |             1,792 |                   364 |          2,156 |        1,425 |       112 |         5.5 |            4.81s |      1.54s |       6.35s | verbose                           |                 |
+| `HuggingFaceTB/SmolVLM-Instruct`                        |  49,154 |             1,792 |                   364 |          2,156 |        1,406 |       111 |         5.5 |            4.90s |      1.26s |       6.16s | verbose                           |                 |
+| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |             3,468 |                   307 |          3,775 |          991 |       157 |         9.0 |            5.77s |      1.65s |       7.42s |                                   |                 |
+| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 |      25 |             1,570 |                   500 |          2,070 |          904 |       112 |          18 |            6.69s |      3.27s |       9.96s |                                   |                 |
+| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |             1,609 |                     4 |          1,613 |          237 |      36.2 |          12 |            7.17s |      3.31s |      10.48s | ⚠️harness(prompt_template), ...   |                 |
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit`               |   1,048 |             1,570 |                   500 |          2,070 |          936 |      99.5 |          22 |            7.22s |      3.73s |      10.95s |                                   |                 |
+| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          |   1,230 |             1,570 |                   500 |          2,070 |          968 |      67.6 |          37 |            9.65s |      5.89s |      15.54s |                                   |                 |
+| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      |  93,938 |             1,908 |                   500 |          2,408 |          520 |      48.4 |          60 |           14.72s |      9.71s |      24.43s |                                   |                 |
+| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |             1,609 |                    20 |          1,629 |          239 |      2.19 |          27 |           16.19s |      4.75s |      20.94s | context-ignored                   |                 |
+| `mlx-community/gemma-3n-E4B-it-bf16`                    |     106 |               856 |                   351 |          1,207 |          898 |      22.7 |          17 |           16.72s |      4.72s |      21.45s | context-ignored                   |                 |
+| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         |   1,338 |             3,795 |                   500 |          4,295 |          423 |      35.7 |          15 |           23.28s |      3.08s |      26.36s |                                   |                 |
+| `mlx-community/deepseek-vl2-8bit`                       |      14 |             2,576 |                   500 |          3,076 |          463 |      28.5 |          32 |           23.53s |      5.65s |      29.18s | repetitive(phrase: "english co... |                 |
+| `mlx-community/InternVL3-14B-8bit`                      | 151,645 |             3,904 |                   393 |          4,297 |          405 |      27.5 |          18 |           24.38s |      3.16s |      27.54s | verbose                           |                 |
+| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      | 128,009 |               565 |                   196 |            761 |          166 |      9.14 |          15 |           25.18s |      2.79s |      27.97s |                                   |                 |
+| `mlx-community/GLM-4.6V-Flash-mxfp4`                    |      11 |             6,592 |                   500 |          7,092 |          336 |      63.1 |         8.4 |           27.85s |      2.28s |      30.13s | formatting                        |                 |
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |             2,968 |                   464 |          3,432 |          229 |      27.6 |          23 |           30.08s |      3.75s |      33.83s | ⚠️harness(encoding)               |                 |
+| `mlx-community/GLM-4.6V-Flash-6bit`                     |   3,593 |             6,592 |                   500 |          7,092 |          334 |      47.2 |          11 |           30.66s |      2.58s |      33.25s | verbose, formatting               |                 |
+| `mlx-community/Molmo-7B-D-0924-8bit`                    |         |               0.0 |                   0.0 |            0.0 |            0 |         0 |          41 |           33.60s |      2.19s |      35.80s |                                   |                 |
+| `mlx-community/Molmo-7B-D-0924-bf16`                    |         |               0.0 |                   0.0 |            0.0 |            0 |         0 |          48 |           35.41s |      3.17s |      38.58s |                                   |                 |
+| `mlx-community/Phi-3.5-vision-instruct-bf16`            |  14,826 |             1,446 |                   500 |          1,946 |        1,027 |      12.5 |          12 |           41.88s |      1.83s |      43.72s | repetitive(phrase: "weather, ...  |                 |
+| `microsoft/Phi-3.5-vision-instruct`                     |  14,826 |             1,446 |                   500 |          1,946 |        1,024 |      12.4 |          12 |           42.05s |      1.70s |      43.75s | repetitive(phrase: "weather, ...  |                 |
+| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |             3,022 |                   372 |          3,394 |          142 |      17.9 |          11 |           42.36s |      1.94s |      44.30s |                                   |                 |
+| `mlx-community/pixtral-12b-8bit`                        |  14,543 |             3,704 |                   500 |          4,204 |          268 |      14.6 |          16 |           48.39s |      3.11s |      51.49s | verbose                           |                 |
+| `meta-llama/Llama-3.2-11B-Vision-Instruct`              | 128,009 |               566 |                   176 |            742 |          159 |      3.91 |          25 |           48.88s |      4.17s |      53.05s |                                   |                 |
+| `Qwen/Qwen3-VL-2B-Instruct`                             |  17,428 |            16,858 |                   500 |         17,358 |          392 |      75.4 |         8.3 |           49.99s |      1.57s |      51.56s | repetitive(phrase: "churchyard... |                 |
+| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               856 |                   288 |          1,144 |          108 |      6.07 |          34 |           55.72s |      6.85s |      62.57s |                                   |                 |
+| `mlx-community/gemma-3-27b-it-qat-4bit`                 | 236,764 |               856 |                   500 |          1,356 |          112 |      10.4 |          19 |           55.98s |      4.94s |      60.92s | verbose                           |                 |
+| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |      11 |            16,860 |                   500 |         17,360 |          339 |      75.3 |         8.3 |           56.82s |      1.73s |      58.55s |                                   |                 |
+| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         | 235,265 |             1,609 |                   500 |          2,109 |        1,084 |      7.87 |          11 |           65.54s |      3.85s |      69.39s | repetitive(phrase: "the window... |                 |
+| `mlx-community/pixtral-12b-bf16`                        |  38,188 |             3,704 |                   500 |          4,204 |          323 |      7.78 |          28 |           76.06s |      4.87s |      80.93s | verbose                           |                 |
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               |      11 |            16,869 |                   500 |         17,369 |          145 |       180 |          73 |          119.16s |      1.29s |     120.45s | repetitive(phrase: "travel pho... |                 |
 
 <!-- markdownlint-enable MD013 MD033 MD034 MD037 MD049 -->
 
@@ -227,10 +223,10 @@ language_model.lm_head.weight.
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7578, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7773, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7544, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7739, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -253,14 +249,14 @@ language_model.lm_head.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7727, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7922, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
         ^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7586, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7781, in _run_model_generation
     raise ValueError(error_details) from load_err
 ValueError: Model loading failed: Missing 1 parameters:
 language_model.lm_head.weight.
@@ -282,10 +278,10 @@ language_model.lm_head.weight.
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7578, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7773, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7544, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7739, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -306,7 +302,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/kimi_vl/processing_kimi_vl.py", line 555, in _patched_auto_processor_from_pretrained
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/kimi_vl/processing_kimi_vl.py", line 595, in _patched_auto_processor_from_pretrained
     return _original_auto_processor_from_pretrained.__func__(
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         cls, pretrained_model_name_or_path, **kwargs
@@ -333,14 +329,14 @@ ModuleNotFoundError: No module named 'timm'
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7727, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7922, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
         ^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7586, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7781, in _run_model_generation
     raise ValueError(error_details) from load_err
 ValueError: Model loading failed: No module named 'timm'
 ```
@@ -364,10 +360,10 @@ ValueError: Model loading failed: No module named 'timm'
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7578, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7773, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7544, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7739, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -391,83 +387,16 @@ ValueError: Expected shape (4096, 4096) but received shape (1024, 4096) for para
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7727, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7922, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
         ^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7586, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7781, in _run_model_generation
     raise ValueError(error_details) from load_err
 ValueError: Model loading failed: Expected shape (4096, 4096) but received shape (1024, 4096) for parameter language_model.layers.0.self_attn.k_proj.weight
-```
-
-</details>
-
----
-
-### ❌ mlx-community/Kimi-VL-A3B-Thinking-8bit
-
-**Status:** Failed (Model Error)
-**Error:**
-
-> Model generation failed for mlx-community/Kimi-VL-A3B-Thinking-8bit:
-> [broadcast_shapes] Shapes (999,2048) and (1,0,2048) cannot be broadcast.
-**Type:** `ValueError`
-**Package:** `mlx-vlm`
-
-<details>
-<summary>Full Traceback (click to expand)</summary>
-
-```python
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7616, in _run_model_generation
-    output: GenerationResult | SupportsGenerationResult = generate(
-                                                          ~~~~~~~~^
-        model=model,
-        ^^^^^^^^^^^^
-    ...<13 lines>...
-        **extra_kwargs,
-        ^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 599, in generate
-    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
-                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 489, in stream_generate
-    for n, (token, logprobs) in enumerate(
-                                ~~~~~~~~~^
-        generate_step(input_ids, model, pixel_values, mask, **kwargs)
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ):
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 359, in generate_step
-    embedding_output = model.get_input_embeddings(
-        input_ids, pixel_values, mask=mask, **kwargs
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/kimi_vl/kimi_vl.py", line 86, in get_input_embeddings
-    final_inputs_embeds = self._prepare_inputs_for_multimodal(
-        image_features, inputs_embeds, input_ids
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/kimi_vl/kimi_vl.py", line 97, in _prepare_inputs_for_multimodal
-    inputs_embeds[:, image_positions, :] = image_features
-    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
-ValueError: [broadcast_shapes] Shapes (999,2048) and (1,0,2048) cannot be broadcast.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7727, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7641, in _run_model_generation
-    raise ValueError(msg) from gen_known_err
-ValueError: Model generation failed for mlx-community/Kimi-VL-A3B-Thinking-8bit: [broadcast_shapes] Shapes (999,2048) and (1,0,2048) cannot be broadcast.
 ```
 
 </details>
@@ -490,7 +419,7 @@ ValueError: Model generation failed for mlx-community/Kimi-VL-A3B-Thinking-8bit:
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7616, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7811, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -518,14 +447,14 @@ RuntimeError: [metal::malloc] Attempting to allocate 135699660800 bytes which is
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7727, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7922, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
         ^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7646, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7841, in _run_model_generation
     raise ValueError(msg) from gen_err
 ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 135699660800 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
 ```
@@ -552,14 +481,14 @@ ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7727, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7922, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
         ^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7590, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7785, in _run_model_generation
     formatted_prompt: str | list[Any] = apply_chat_template(
                                         ~~~~~~~~~~~~~~~~~~~^
         processor=processor,
@@ -610,7 +539,7 @@ ValueError: Cannot use chat template functions because tokenizer.chat_template i
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7616, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7811, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -654,14 +583,14 @@ ValueError: [broadcast_shapes] Shapes (1,4,2,2048,4096) and (2048,2048) cannot b
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7727, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7922, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
         ^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7641, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7836, in _run_model_generation
     raise ValueError(msg) from gen_known_err
 ValueError: Model generation failed for mlx-community/paligemma2-3b-pt-896-4bit: [broadcast_shapes] Shapes (1,4,2,2048,4096) and (2048,2048) cannot be broadcast.
 ```
@@ -685,10 +614,10 @@ ValueError: Model generation failed for mlx-community/paligemma2-3b-pt-896-4bit:
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7578, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7773, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7544, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7739, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -716,7 +645,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/kimi_vl/processing_kimi_vl.py", line 555, in _patched_auto_processor_from_pretrained
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/kimi_vl/processing_kimi_vl.py", line 595, in _patched_auto_processor_from_pretrained
     return _original_auto_processor_from_pretrained.__func__(
            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         cls, pretrained_model_name_or_path, **kwargs
@@ -745,14 +674,14 @@ AttributeError: RobertaTokenizer has no attribute additional_special_tokens. Did
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7727, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7922, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
         ^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7586, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 7781, in _run_model_generation
     raise ValueError(error_details) from load_err
 ValueError: Model loading failed: RobertaTokenizer has no attribute additional_special_tokens
 ```
@@ -763,7 +692,7 @@ ValueError: Model loading failed: RobertaTokenizer has no attribute additional_s
 
 ### ✅ mlx-community/LFM2-VL-1.6B-8bit
 
-**Metrics:** 289 TPS | 281 tokens
+**Metrics:** 288 TPS | 281 tokens
 
 ```text
 Title: St Michael's Parish Church, Bishop's Stortford, England
@@ -789,9 +718,19 @@ Keywords: St Michael's Parish Church, Bishop's Stortford, England, Perpendicular
 
 ---
 
+### ✅ qnguyen3/nanoLLaVA
+
+**Metrics:** 101 TPS | 148 tokens
+
+```text
+The image portrays a serene, late afternoon scene at St Michael's Parish Church in Bishop's Stortford, England. The church is a prominent example of Perpendicular Gothic architecture, with its current structure dating largely from the early 15th century. The image captures the intricate details of the church's traditional flint-knapped walls and stone-dressed windows, set against the backdrop of its historic churchyard. The soft, even light of the overcast day accentuates the textures and formidable presence of this centuries-old landmark. The image is taken on 2026-02-07 16:11:23 GMT (at 16:11:23 local time).
+```
+
+---
+
 ### ✅ mlx-community/nanoLLaVA-1.5-4bit
 
-**Metrics:** 308 TPS | 440 tokens
+**Metrics:** 295 TPS | 440 tokens
 
 ```text
 Title: A concise, descriptive title (5–12 words).
@@ -815,19 +754,9 @@ Existing keywords: Bishop's Stortford, British, Christianity, England, English C
 
 ---
 
-### ✅ qnguyen3/nanoLLaVA
-
-**Metrics:** 98.9 TPS | 148 tokens
-
-```text
-The image portrays a serene, late afternoon scene at St Michael's Parish Church in Bishop's Stortford, England. The church is a prominent example of Perpendicular Gothic architecture, with its current structure dating largely from the early 15th century. The image captures the intricate details of the church's traditional flint-knapped walls and stone-dressed windows, set against the backdrop of its historic churchyard. The soft, even light of the overcast day accentuates the textures and formidable presence of this centuries-old landmark. The image is taken on 2026-02-07 16:11:23 GMT (at 16:11:23 local time).
-```
-
----
-
 ### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
 
-**Metrics:** 110 TPS | 136 tokens
+**Metrics:** 101 TPS | 136 tokens
 
 ```text
  Title: St Michael's Parish Church, Bishop's Stortford, England, United Kingdom, UK
@@ -836,19 +765,9 @@ St Michael's Parish Church in Bishop's Stortford, England, is pictured here on a
 
 ---
 
-### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
+### ✅ mlx-community/SmolVLM-Instruct-bf16
 
-**Metrics:** 48.8 TPS | 4 tokens
-
-```text
-Be concise.
-```
-
----
-
-### ✅ HuggingFaceTB/SmolVLM-Instruct
-
-**Metrics:** 110 TPS | 364 tokens
+**Metrics:** 112 TPS | 364 tokens
 
 ```text
  Image Description:
@@ -868,9 +787,9 @@ In summary, the image captures the historical and architectural significance of 
 
 ---
 
-### ✅ mlx-community/SmolVLM-Instruct-bf16
+### ✅ HuggingFaceTB/SmolVLM-Instruct
 
-**Metrics:** 108 TPS | 364 tokens
+**Metrics:** 111 TPS | 364 tokens
 
 ```text
  Image Description:
@@ -892,7 +811,7 @@ In summary, the image captures the historical and architectural significance of 
 
 ### ✅ mlx-community/Ministral-3-3B-Instruct-2512-4bit
 
-**Metrics:** 158 TPS | 307 tokens
+**Metrics:** 157 TPS | 307 tokens
 
 ```text
 Title: **Historic Perpendicular Gothic Church with Stone Battlements**
@@ -914,23 +833,85 @@ The image is described as **St Michael's Parish Church, Bishop's Stortford, Engl
 
 ### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
 
-**Metrics:** 105 TPS | 500 tokens
+**Metrics:** 112 TPS | 500 tokens
 
 ```text
 ◁think▷Got it, let's tackle this. First, I need to create a title, description, and keywords for the image of St Michael's Parish Church in Bishop's Stortford, England.
 
-Starting with the title: it should be concise and descriptive. The image shows the church, so maybe "St Michael's Parish Church, Bishop's Stortford, England" but that's too long. Maybe "St Michael's Parish Church, Bishop's Stortford, England" is okay, but let's make it a bit more engaging. Wait, the existing keywords include "St Michael's Parish Church" and "St Michael's Church", so maybe "St Michael's Parish Church, Bishop's Stortford, England" is good.
+Starting with the title: it should be concise and descriptive. The image shows the church, so maybe "St Michael's Parish Church, Bishop's Stortford, England" but that's too long. Maybe "St Michael's Parish Church, Bishop's Stortford, England" is okay, but let's make it a bit more engaging. Wait, the existing keywords include "St Michael's Parish Church" and "St Michael's Church" so maybe "St Michael's Parish Church, Bishop's Stortford, England" is good.
 
-Description: Need to cover key subjects (church, architecture, graveyard), setting (historic, outdoor, churchyard), action (no people, just the building), concepts (heritage, architecture), mood (serene, historic). So: "St Michael's Parish Church in Bishop's Stortford, England, is a historic Grade I listed Perpendicular Gothic church with a stone exterior, featuring arched windows and a tall spire, set against a cloudy sky in its historic churchyard."
+Description: Need to cover key subjects (church, architecture, graveyard), setting (historic, outdoor, churchyard), action (no specific action, so focus on what's shown: the church's architecture, gravestones, the stone walls, the spire). Also mention the architectural style (Perpendicular Gothic), materials (flint-knapped walls, stone-dressed windows), time of day (late afternoon, overcast, cool February sky), and the mood (serene, historic). So the description should be 1-3 sentences.
 
-Keywords: Need to list 25-50 keywords. Let's go through the existing ones and add more. Existing keywords include Bishop's Stortford, England, Christian, Christianity, England, English Church, Europe, Faith, Flint Knapped Wall, Flint Wall, Gothic Window, Grass, Graveyard, Hertfordshire, Parish church, Perpendicular Gothic, St Michael's Church, St Michael's Parish Church, UK, United Kingdom, ancient, arched window, architecture, battlements, black, brown, building, car, cemetery, church, church spire, churchyard, clock tower, cloudy, cloudy sky, cross, exterior, gothic architecture, gravestone, grey, headstone, heritage, historic, historic building, landmark, medieval, old, overcast, overcast sky, place of worship, religion, religious building, spire, stone, tombstone, tourism, tower, travel, weathervane, worship. Now add more: maybe "stone exterior", "tall spire", "architectural details", "churchyard", "Grade I listed", "medieval architecture", "religious landmark", "historic stone walls", "architectural features", "religious building", "
+Keywords: Need 25-50 keywords. Let's list from the existing ones and add more. Existing keywords include Bishop's Stortford, St Michael's Parish Church, England, England, Christian, Christianity, England, English Church, Europe, Faith, Flint Knapped Wall, Flint Wall, Gothic Window, Grass, Graveyard, Hertfordshire, Parish church, Perpendicular Gothic, UK, United Kingdom, ancient, arched window, architecture, battlements, black, brown, building, car, cemetery, church, church spire, churchyard, clock tower, cloudy, cloudy sky, cross, exterior, gothic architecture, gravestone, grey, headstone, heritage, historic, historic building, landmark, medieval, old, overcast, overcast sky, place of worship, religion, religious building, spire, stone, tombstone, tourism, tower, travel, weathervane, worship. Also, add visual style (aerial? No, it's a ground view. Close-up? No, it's a wide shot. Wide-angle? Maybe. Colors: grey, brown, green (grass). Lighting: overcast, soft light. Seasonal:
+```
+
+---
+
+### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
+
+**Metrics:** 36.2 TPS | 4 tokens
+
+```text
+Be concise.
+```
+
+---
+
+### ✅ mlx-community/Kimi-VL-A3B-Thinking-8bit
+
+**Metrics:** 99.5 TPS | 500 tokens
+
+```text
+◁think▷Okay, let's tackle this query. The user wants me to analyze an image and provide structured metadata. The image is of St Michael's Parish Church in Bishop's Stortford, England. The existing keywords and context are already provided, so I need to build on that.
+
+First, the title should be concise and descriptive. Since it's a church, maybe something like "St Michael's Parish Church in Bishop's Stortford, England". That's straightforward and includes the key location.
+
+For the description, I need to cover key subjects, setting, and action. The image shows the church's exterior, focusing on its architecture. The context mentions it's a Grade I listed building with Perpendicular Gothic style, built in the early 15th century. The photo was taken on a cloudy February afternoon. The walls are flint-knapped and stone-dressed, with arched windows and a churchyard. The overcast lighting highlights textures and the building's historic presence.
+
+Keywords should start with specific subjects: St Michael's Parish Church, Bishop's Stortford, England, UK. Then setting: urban, outdoor, churchyard. Actions/activities: photography, tourism, worship. Concepts/themes: heritage, historic architecture, religious building. Mood: serene, solemn. Visual style: exterior, wide-angle, overcast lighting. Colors: grey, brown, stone, flint-knapped walls. Seasonal: winter, February. Use-case: tourism, travel, heritage site.
+
+I need to make sure the keywords are ordered from most specific to general. Also, include any new concepts or emotions not in the existing list, like "serene" or "solemn". Check if "graveyard" is relevant, which it is. Maybe add "clock tower" and "weathervane" from the existing keywords. Also, "Perpendicular Gothic architecture" is specific. Avoid repeating existing keywords but ensure all relevant ones are included. Make sure the title is exactly 5-12 words. Let me structure all this into the three sections as specified.◁/think▷Title: St Michael's Parish Church in Bishop's Stortford, England  
+Description: A photograph of St Michael's Parish Church in Bishop's Stortford, England, showcasing its Grade I listed Perpendicular Gothic architecture with flint-knapped walls, arched windows, and a historic churchyard under an overcast February sky.  
+Keywords: St Michael's
+```
+
+---
+
+### ✅ mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
+
+**Metrics:** 67.6 TPS | 500 tokens
+
+```text
+◁think▷Got it, let's tackle this. First, I need to create a title, description, and keywords for the image of St Michael's Parish Church in Bishop's Stortford, England.
+
+Starting with the title: it should be concise and descriptive. The image shows the church with its architectural details, so maybe "St Michael's Parish Church, Bishop's Stortford, England: Perpendicular Gothic Architecture in a Historic Churchyard." That's 12 words, which fits the 5-12 word limit.
+
+Next, the description: need to cover key subjects (the church, its architecture, the churchyard), setting (historic, outdoor, possibly rural or urban? The description mentions Bishop's Stortford, which is a town, so maybe urban setting), action (the church is static, so no action, but the light and atmosphere). The description should be 1-3 sentences. Let's structure it: "St Michael's Parish Church in Bishop's Stortford, England, is depicted under an overcast sky, showcasing its Perpendicular Gothic architecture with flint-knapped walls and arched windows. The churchyard with gravestones and the church spire are visible, highlighting its historic and religious significance."
+
+Keywords: Need 25-50 comma-separated keywords. Let's list from the context and image. Specific subjects: St Michael's Parish Church, Bishop's Stortford, England, UK, Christian, Christianity, England, English Church, Hertfordshire, Perpendicular Gothic, Flint Knapped Wall, Flint Wall, Gothic Window, Grass, Graveyard, Tombstone, Headstone, Churchyard, Stone, Stone Building, Historic Building, Heritage, Medieval, Architecture, Tourism, Travel, Religion, Religious Building, Place of Worship, Overcast, Cloudy Sky, Black, Brown, Grey, Clock Tower, Church Spire, Weathervane, Battlements, Car (maybe not, but the image might have a car? Wait, the context says "car" is in existing keywords but the image might not show a car. Wait, the image provided is a clear church, no car visible. So maybe exclude. Let's check the existing keywords: existing ones include Bishop's Stortford, British, Christian, Christianity, England, English Church, Europe, Faith, Flint Knapped Wall, Flint Wall, Gothic Window, Grass, Graveyard, Hertfordshire, Parish church, Perpendicular Gothic, St Michael's Church, St
+```
+
+---
+
+### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+
+**Metrics:** 48.4 TPS | 500 tokens
+
+```text
+Let's tackle this. First, the title needs to be concise. The image is of St Michael's Parish Church in Bishop's Stortford, England. So maybe "St Michael's Parish Church, Bishop's Stortford, England" – that's 7 words, fits the range.
+
+Next, the description. It's a Grade I listed building, Perpendicular Gothic, early 15th century. The photo is from late afternoon, overcast sky. Key elements: flint-knapped walls, stone-dressed windows, churchyard. So: "St Michael's Parish Church, a Grade I listed Perpendicular Gothic building from the early 15th century, is shown in Bishop's Stortford, England, with its flint-knapped walls and stone windows against a cool, overcast late afternoon sky." That covers the subject, setting, and action (photograph capturing details).
+
+Keywords: Need to order from specific to general. Let's list the specific ones first: St Michael's Parish Church, Bishop's Stortford, England, UK, Grade I listed building, Perpendicular Gothic architecture, early 15th century, flint-knapped walls, stone-dressed windows, churchyard, late afternoon, overcast sky, flint wall, gothic window, church spire, clock tower, graveyard, headstone, tombstone, weathervane, cross, ancient, historic, heritage, place of worship, religious building, church, churchyard, stone, brick, overcast, cloudy, February (wait, the context says late February, but the date is 2026-02-07, so February). Wait, the existing keywords have some, but need to make sure they're ordered correctly. Let's check:
+
+Most specific: St Michael's Parish Church, Bishop's Stortford, England, UK, Grade I listed building, Perpendicular Gothic architecture, early 15th century, flint-knapped walls, stone-dressed windows, churchyard, late afternoon, overcast sky, flint wall, gothic window, church spire, clock tower, graveyard, headstone, tombstone, weathervane, cross, ancient, historic, heritage, place of worship,
 ```
 
 ---
 
 ### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
 
-**Metrics:** 4.89 TPS | 20 tokens
+**Metrics:** 2.19 TPS | 20 tokens
 
 ```text
 Be specific about visual content. Include relevant geographic and temporal keywords where clearly supported by the image.
@@ -940,7 +921,7 @@ Be specific about visual content. Include relevant geographic and temporal keywo
 
 ### ✅ mlx-community/gemma-3n-E4B-it-bf16
 
-**Metrics:** 41 TPS | 351 tokens
+**Metrics:** 22.7 TPS | 351 tokens
 
 ```text
 ## Image Description: St. Michael's Church, Billericay
@@ -965,92 +946,9 @@ Be specific about visual content. Include relevant geographic and temporal keywo
 
 ---
 
-### ✅ mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
-
-**Metrics:** 65 TPS | 500 tokens
-
-```text
-◁think▷Got it, let's tackle this. First, I need to create a title, description, and keywords for the image of St Michael's Parish Church in Bishop's Stortford, England.
-
-Starting with the title: it should be concise and descriptive. The image shows the church with its architectural details, so maybe "St Michael's Parish Church, Bishop's Stortford, England: Perpendicular Gothic Architecture in a Historic Churchyard." That's 12 words, which fits the 5-12 word limit.
-
-Next, the description: need to cover key subjects (the church, its architecture, the churchyard), setting (historic, outdoor, possibly rural or suburban), actions (the church is static, so maybe "capturing intricate details"), concepts/themes (heritage, history, architecture), mood (serene, historic), visual style (wide-angle, architectural photography), colors (neutral tones, stone, green grass), seasonal (February, overcast), use-case (travel, tourism, editorial). So the description would be: "St Michael's Parish Church in Bishop's Stortford, England, is depicted in this photograph showcasing its Perpendicular Gothic architecture. The image highlights the church's flint-knapped walls, arched windows, and historic churchyard, set against an overcast sky. The wide-angle view emphasizes the building's imposing structure and intricate stonework, capturing the serene atmosphere of a historic landmark."
-
-Now keywords: need 25-50, ordered from specific to general. Let's list them:
-
-Specific subjects: St Michael's Parish Church, Bishop's Stortford, England, England, UK, Hertfordshire, Christian, Christianity, Christian Church, Faith, Religion, Worship, Tourism, Travel, Historic Building, Heritage, Medieval, Gothic Architecture, Perpendicular Gothic, Flint Knapped Wall, Flint Wall, Stone Wall, Churchyard, Graveyard, Tombstone, Headstone, Grass, Grasses, Church Spire, Clock Tower, Weathervane, Cross, Architectural Details, Architectural Style, Architectural Photography, Overcast Sky, Cloudy Sky, Neutral Tones, Stone Tones, Brown Tones, Grey Tones, Historic Landmark, Religious Building, Place of Worship.
-
-Wait, need to check the existing keywords provided. The existing ones include Bishop's Stortford, British, Christian, Christianity, England, English Church, Europe, Faith, Flint Knapped Wall, Flint Wall, Gothic Window, Grass,
-```
-
----
-
-### ✅ mlx-community/deepseek-vl2-8bit
-
-**Metrics:** 59.2 TPS | 500 tokens
-
-```text
-**Title:** A Stunning View of St. Michael's Church in Bishop's Stortford, UK
-
-**Description:** The image shows the historic St. Michael's Parish Church in Bishop's Stortford, a prime example of English Perpendicular Gothic architecture. The building is constructed from a mix of flint and stone, with a tall, pointed spire and large, arched windows. The structure is set against a backdrop of a cloudy, overcast sky, with a well-manicured lawn in the foreground. The scene exudes a serene and historical atmosphere, with the building's gothic details standing out against the overcast sky.
-
-**Keywords:** St. Michael's Church, Bishop's Stortford, UK, English Heritage, gothic architecture, English Parish Church, historic building, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church,
-```
-
----
-
-### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
-
-**Metrics:** 48.1 TPS | 500 tokens
-
-```text
-Let's tackle this. First, the title needs to be concise. The image is of St Michael's Parish Church in Bishop's Stortford, England. So maybe "St Michael's Parish Church, Bishop's Stortford, England" – that's 7 words, fits the range.
-
-Next, the description. It's a Grade I listed building, Perpendicular Gothic, early 15th century. The photo is from late afternoon, overcast sky. Key elements: flint-knapped walls, stone-dressed windows, churchyard. So: "St Michael's Parish Church, a Grade I listed Perpendicular Gothic building from the early 15th century, is shown in Bishop's Stortford, England, with its flint-knapped walls and stone windows against a cool, overcast late afternoon sky." That covers the subject, setting, and action (photograph capturing details).
-
-Keywords: Need to order from specific to general. Let's list the specific ones first: St Michael's Parish Church, Bishop's Stortford, England, UK, Grade I listed building, Perpendicular Gothic architecture, early 15th century, flint-knapped walls, stone-dressed windows, churchyard, late afternoon, overcast sky, flint wall, gothic window, church spire, clock tower, graveyard, headstone, tombstone, weathervane, cross, ancient, historic, heritage, place of worship, religious building, church, churchyard, stone, brick, overcast, cloudy, February (wait, the context says late February, but the date is 2026-02-07, so February). Wait, the existing keywords have some, but need to make sure they're ordered correctly. Let's check:
-
-Most specific: St Michael's Parish Church, Bishop's Stortford, England, UK, Grade I listed building, Perpendicular Gothic architecture, early 15th century, flint-knapped walls, stone-dressed windows, churchyard, late afternoon, overcast sky, flint wall, gothic window, church spire, clock tower, graveyard, headstone, tombstone, weathervane, cross, ancient, historic, heritage, place of worship,
-```
-
----
-
-### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
-
-**Metrics:** 42.1 TPS | 372 tokens
-
-```text
-Title: St Michael's Parish Church, Bishop's Stortford, England, United Kingdom, UK
-
-Description: A photograph captures the intricate details of St Michael's Parish Church, a Grade I listed building in Bishop's Stortford, England, UK. The image showcases the traditional flint-knapped walls and stone-dressed windows, set against the backdrop of the historic churchyard. The soft, even light of the overcast day accentuates the textures and formidable presence of this centuries-old landmark.
-
-Keywords: St Michael's Parish Church, Bishop's Stortford, English Church, Europe, Faith, Christianity, England, Gothic architecture, Heritage, Historic, Landmark, Medieval, Old, Perpendicular Gothic, Religion, Religious building, St Michael's Church, St Michael's Parish Church, United Kingdom, UK, Architecture, Church, Churchyard, Clock tower, Overcast sky, Stone, Tombstone, Tourism, Worship
-
-Context: The image is described as 'St Michael's Parish Church in Bishop's Stortford, England, UK, pictured here on a late afternoon under a cool February sky. This Grade I listed building is a prominent example of Perpendicular Gothic architecture, with its current structure dating largely from the early 15th century. The photograph captures the intricate details of the church's traditional flint-knapped walls and stone-dressed windows, set against the backdrop of its historic churchyard. The soft, even light of the overcast day accentuates the textures and formidable presence of this centuries-old landmark.'
-```
-
----
-
-### ✅ mlx-community/pixtral-12b-8bit
-
-**Metrics:** 34.2 TPS | 500 tokens
-
-```text
-### Title
-St Michael's Parish Church, Bishop's Stortford
-
-### Description
-St Michael's Parish Church in Bishop's Stortford, England, is pictured here on a late afternoon under a cool February sky. This Grade I listed building is a prominent example of Perpendicular Gothic architecture, with its current structure dating largely from the early 15th century. The photograph captures the intricate details of the church's traditional flint-knapped walls and stone-dressed windows, set against the backdrop of its historic churchyard.
-
-### Keywords
-St Michael's Parish Church, Bishop's Stortford, British, Christian, Christianity, England, English Church, Europe, Faith, Flint Knapped Wall, Flint Wall, Gothic Window, Grass, Graveyard, Hertfordshire, Parish church, Perpendicular Gothic, St Michael's Church, St Michael's Parish Church, UK, United Kingdom, ancient, arched window, architecture, battlements, black, brown, building, cemetery, church, church spire, churchyard, clock tower, cloudy, cloudy sky, cross, exterior, gothic architecture, gravestone, grey, headstone, heritage, historic, historic building, landmark, medieval, old, overcast, overcast sky, place of worship, religion, religious building, spire, stone, tombstone, tourism, tower, travel, weathervane, worship, February, late afternoon, historic churchyard, flint-knapped walls, stone-dressed windows, Perpendicular Gothic architecture, centuries-old landmark, soft light, textures, formidable presence, traditional, traditional architecture, historic site, religious heritage, serene, dramatic, grey tones, stone structure, religious symbolism, spiritual, architectural detail, historic preservation, cultural significance, architectural landmark, English heritage, English architecture, English churchyard, English cemetery, English gravestone, English headstone, English tombstone, English church, English church spire, English churchyard, English church architecture, English religious building, English religious heritage, English religious landmark, English religious site, English religious tourism, English religious travel, English religious worship, English religious faith, English religious symbolism, English religious architecture, English religious heritage, English religious tourism, English religious travel, English religious worship, English religious faith, English religious symbolism, English religious architecture, English religious heritage, English religious tourism, English religious travel, English religious worship, English religious
-```
-
----
-
 ### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
 
-**Metrics:** 36.2 TPS | 500 tokens
+**Metrics:** 35.7 TPS | 500 tokens
 
 ```text
 Here are my reasoning steps:
@@ -1073,39 +971,23 @@ That's 3 sentences, factual.
 
 ---
 
-### ✅ mlx-community/gemma-3-27b-it-qat-4bit
+### ✅ mlx-community/deepseek-vl2-8bit
 
-**Metrics:** 26.4 TPS | 500 tokens
-
-```text
-## Title: St Michael's Parish Church, Bishop's Stortford, England – February Afternoon
-
-## Description:
-This photograph depicts the exterior of St Michael's Parish Church in Bishop's Stortford, England, a Grade I listed building showcasing Perpendicular Gothic architecture. The church is framed by a historic churchyard with numerous gravestones, and is photographed under a cloudy, overcast sky. The image highlights the church’s flint-knapped walls, arched windows, and prominent spire.
-
-## Keywords:
-St Michael's Parish Church, Bishop's Stortford, Hertfordshire, England, UK, United Kingdom, Perpendicular Gothic, flint knapped wall, arched window, church spire, churchyard, gravestones, headstones, tombstone, medieval architecture, historic building, landmark, place of worship, religious building, church, exterior, overcast sky, cloudy sky, grey tones, stone wall, spire, clock tower, weathervane, cross, gothic window, church architecture, British architecture, European architecture, heritage, tourism, travel, photography, architectural detail, religious site, place of interest, cultural heritage, history, ancient, solemn, peaceful, quiet, overcast light, February, winter, afternoon, wide-angle, exterior view, stone masonry, building facade, cultural landmark, religious art, religious monument, textured wall, stone structure, landmark architecture, religious institution, historical site, cultural tourism, architectural photography, religious building exterior, stone detailing, gothic style, religious practice, cultural preservation, stone texture, architectural design, religious history, stone construction, cultural identity, religious symbol, stone craftsmanship, architectural heritage, religious tradition, stone architecture, cultural significance, religious community, stone building, cultural expression, religious belief, stone work, cultural value, religious experience, stone feature, cultural context, religious influence, stone element, cultural impact, religious legacy, stone material, cultural asset, religious impact, stone surface, cultural resource, religious influence, stone composition, cultural element, religious foundation, stone form, cultural artifact, religious structure, stone pattern, cultural object, religious practice, stone design, cultural symbol, religious institution, stone element, cultural expression, stone feature, cultural context, stone composition, stone pattern, stone texture, stone work, stone surface, stone material, stone form, stone detailing, stone construction, stone masonry, stone architecture, stone building, stone feature, stone element, stone composition, stone pattern,
-```
-
----
-
-### ✅ mlx-community/gemma-3-27b-it-qat-8bit
-
-**Metrics:** 15 TPS | 288 tokens
+**Metrics:** 28.5 TPS | 500 tokens
 
 ```text
-**Title:** St Michael's Parish Church, Bishop's Stortford, England – February Afternoon
+**Title:** A Stunning View of St. Michael's Church in Bishop's Stortford, UK
 
-**Description:** This photograph depicts St Michael's Parish Church in Bishop's Stortford, Hertfordshire, England, a Grade I listed building showcasing Perpendicular Gothic architecture. The church is framed against a cloudy February sky, with its flint-knapped walls and stone windows prominently visible. Gravestones dot the surrounding churchyard, adding to the historic atmosphere.
+**Description:** The image shows the historic St. Michael's Parish Church in Bishop's Stortford, a prime example of English Perpendicular Gothic architecture. The building is constructed from a mix of flint and stone, with a tall, pointed spire and large, arched windows. The structure is set against a backdrop of a cloudy, overcast sky, with a well-manicured lawn in the foreground. The scene exudes a serene and historical atmosphere, with the building's gothic details standing out against the overcast sky.
 
-**Keywords:** St Michael's Parish Church, Bishop's Stortford, Hertfordshire, England, UK, United Kingdom, Perpendicular Gothic, flint knapped wall, stone window, arched window, church spire, churchyard, graveyard, cemetery, gravestone, headstone, tombstone, historic building, landmark, medieval architecture, place of worship, religious building, church, exterior, overcast sky, cloudy, grey tones, brown tones, stone, tower, clock tower, battlements, cross, weathervane, heritage, tourism, travel, architecture, ancient, historic, religious site, European architecture, British architecture, place of interest, overcast lighting, soft light, winter, February, afternoon, solemn, quiet, stillness, texture, detail, wide-angle, building exterior, cultural heritage, religious art, gothic window, stone dressing, traditional architecture, European landmark, place of remembrance, solemnity, cultural tourism, architectural photography.
+**Keywords:** St. Michael's Church, Bishop's Stortford, UK, English Heritage, gothic architecture, English Parish Church, historic building, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church, English country church,
 ```
 
 ---
 
 ### ✅ mlx-community/InternVL3-14B-8bit
 
-**Metrics:** 27.7 TPS | 393 tokens
+**Metrics:** 27.5 TPS | 393 tokens
 
 ```text
 Title: Gothic Church with Battlements and Graveyard
@@ -1121,7 +1003,7 @@ Context: The image is described as 'St Michael's Parish Church, Bishop's Stortfo
 
 ### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
-**Metrics:** 8.62 TPS | 196 tokens
+**Metrics:** 9.14 TPS | 196 tokens
 
 ```text
 **Title:** St Michael's Parish Church, Bishop's Stortford, England
@@ -1145,7 +1027,7 @@ Context: The image is described as 'St Michael's Parish Church, Bishop's Stortfo
 
 ### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
 
-**Metrics:** 63 TPS | 500 tokens
+**Metrics:** 63.1 TPS | 500 tokens
 
 ```text
 <think>Got it, let's tackle this. The user wants structured metadata for image cataloging. First, I need to extract the Title, Description, and Keywords based on the provided context.
@@ -1157,16 +1039,6 @@ Next, the Description. It needs to be a 1-3 sentence factual description. The co
 Now, Keywords. The user wants 25-50 comma-separated keywords, ordered from most specific to most general. Let's extract relevant keywords from the context and image.
 
 First, specific subjects: St Michael's Parish Church, Bishop's Stortford, England, UK, historic building, Grade I listed, Perpendicular Gothic architecture, flint-knapped wall, stone-dressed window, church spire, clock tower, gravestone, headstone, tombstone, churchyard, cemetery, place of worship, religious building, landmark, medieval architecture, old building, historic site, heritage building, stone building, brick building (but the main is flint), spire, weathervane, cross, clock face, gravestones, churchyard grass, benches (from image: "black benches" are visible), overcast sky, cloudy sky, late afternoon light, cool February sky (from context), historic churchyard, gravestones, church spire, clock tower, Perpendicular Gothic, flint-knapped wall, stone-dressed window, Bishop's Stortford, Hertfordshire, England, United Kingdom, UK, historic building, Grade I listed, Perpendicular Gothic architecture, flint-knapped wall, stone-dressed window, church spire, clock tower, gravestone, headstone, tombstone, churchyard, cemetery, place of worship,
-```
-
----
-
-### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
-
-**Metrics:** 17.7 TPS | 500 tokens
-
-```text
-A low-angle, three-quarters view of the side of St Michael's Parish Church in Bishop's Stortford, England. The church is a light brown stone with a brick-layer's bond pattern. The church is made of light brown stone with a brick-layer's bond pattern. The church has a tall, pointed, gray metal steeple on the right side of the church. The steeple is the tallest structure in the image. The church has a row of five windows on the left side of the church. The windows are rectangular and have a black metal frame. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three.
 ```
 
 ---
@@ -1183,7 +1055,7 @@ Title:ĠStĠMichael'sĠParishĠChurch,ĠBishop'sĠStortfordĊĊDescription:ĠThe
 
 ### ✅ mlx-community/GLM-4.6V-Flash-6bit
 
-**Metrics:** 47.3 TPS | 500 tokens
+**Metrics:** 47.2 TPS | 500 tokens
 
 ```text
 <think>Got it, let's tackle this. First, the title needs to be concise, 5-12 words. Looking at the image, it's St Michael's Parish Church in Bishop's Stortford. So maybe "St Michael's Parish Church, Bishop's Stortford".
@@ -1213,19 +1085,12 @@ Visual style: wide-angle (since it's a large building, wide-angle to capture the
 
 ---
 
-### ✅ mlx-community/pixtral-12b-bf16
+### ✅ mlx-community/Molmo-7B-D-0924-8bit
 
-**Metrics:** 19.3 TPS | 500 tokens
+**Metrics:** 0.0 TPS | 0 tokens
 
 ```text
-### Title
-St Michael's Parish Church, Bishop's Stortford
 
-### Description
-St Michael's Parish Church in Bishop's Stortford, England, is pictured here on a late afternoon under a cool February sky. This Grade I listed building is a prominent example of Perpendicular Gothic architecture, with its current structure dating largely from the early 15th century. The photograph captures the intricate details of the church's traditional flint-knapped walls and stone-dressed windows, set against the backdrop of its historic churchyard.
-
-### Keywords
-St Michael's Parish Church, Bishop's Stortford, British, Christian, Christianity, England, English Church, Europe, Faith, Flint Knapped Wall, Flint Wall, Gothic Window, Grass, Graveyard, Hertfordshire, Parish church, Perpendicular Gothic, St Michael's Church, St Michael's Parish Church, UK, United Kingdom, ancient, arched window, architecture, battlements, black, brown, building, cemetery, church, church spire, churchyard, clock tower, cloudy, cloudy sky, cross, exterior, gothic architecture, gravestone, grey, headstone, heritage, historic, historic building, landmark, medieval, old, overcast, overcast sky, place of worship, religion, religious building, spire, stone, tombstone, tourism, tower, travel, weathervane, worship, February, late afternoon, historic churchyard, stone-dressed windows, flint-knapped walls, Perpendicular Gothic architecture, overcast day, textures, formidable presence, centuries-old landmark, traditional, serene, historic site, religious heritage, architectural detail, stone structure, English heritage, English architecture, British heritage, British architecture, Gothic architecture, medieval architecture, historic architecture, religious tourism, heritage tourism, architectural landmark, architectural detail, stone masonry, church architecture, church exterior, churchyard grass, churchyard tombstones, churchyard gravestones, churchyard headstones, churchyard cross, churchyard clock tower, churchyard spire, churchyard weathervane, churchyard tourism, churchyard heritage, churchyard history, churchyard architecture, churchyard design, churchyard landscape, churchyard setting, churchyard environment, churchyard atmosphere, churchyard ambiance, churchyard mood, churchyard emotion, churchyard feeling, churchyard experience, churchyard visit, churchyard tour, churchyard exploration
 ```
 
 ---
@@ -1240,19 +1105,9 @@ St Michael's Parish Church, Bishop's Stortford, British, Christian, Christianity
 
 ---
 
-### ✅ mlx-community/Molmo-7B-D-0924-8bit
-
-**Metrics:** 0.0 TPS | 0 tokens
-
-```text
-
-```
-
----
-
 ### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
 
-**Metrics:** 12.2 TPS | 500 tokens
+**Metrics:** 12.5 TPS | 500 tokens
 
 ```text
 Title: St Michael's Parish Church in Bishop's Stortford
@@ -1266,7 +1121,7 @@ Keywords: St Michael's Parish Church, Bishop's Stortford, England, United Kingdo
 
 ### ✅ microsoft/Phi-3.5-vision-instruct
 
-**Metrics:** 12.2 TPS | 500 tokens
+**Metrics:** 12.4 TPS | 500 tokens
 
 ```text
 Title: St Michael's Parish Church in Bishop's Stortford
@@ -1278,9 +1133,42 @@ Keywords: St Michael's Parish Church, Bishop's Stortford, England, United Kingdo
 
 ---
 
+### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
+
+**Metrics:** 17.9 TPS | 372 tokens
+
+```text
+Title: St Michael's Parish Church, Bishop's Stortford, England, United Kingdom, UK
+
+Description: A photograph captures the intricate details of St Michael's Parish Church, a Grade I listed building in Bishop's Stortford, England, UK. The image showcases the traditional flint-knapped walls and stone-dressed windows, set against the backdrop of the historic churchyard. The soft, even light of the overcast day accentuates the textures and formidable presence of this centuries-old landmark.
+
+Keywords: St Michael's Parish Church, Bishop's Stortford, English Church, Europe, Faith, Christianity, England, Gothic architecture, Heritage, Historic, Landmark, Medieval, Old, Perpendicular Gothic, Religion, Religious building, St Michael's Church, St Michael's Parish Church, United Kingdom, UK, Architecture, Church, Churchyard, Clock tower, Overcast sky, Stone, Tombstone, Tourism, Worship
+
+Context: The image is described as 'St Michael's Parish Church in Bishop's Stortford, England, UK, pictured here on a late afternoon under a cool February sky. This Grade I listed building is a prominent example of Perpendicular Gothic architecture, with its current structure dating largely from the early 15th century. The photograph captures the intricate details of the church's traditional flint-knapped walls and stone-dressed windows, set against the backdrop of its historic churchyard. The soft, even light of the overcast day accentuates the textures and formidable presence of this centuries-old landmark.'
+```
+
+---
+
+### ✅ mlx-community/pixtral-12b-8bit
+
+**Metrics:** 14.6 TPS | 500 tokens
+
+```text
+### Title
+St Michael's Parish Church, Bishop's Stortford
+
+### Description
+St Michael's Parish Church in Bishop's Stortford, England, is pictured here on a late afternoon under a cool February sky. This Grade I listed building is a prominent example of Perpendicular Gothic architecture, with its current structure dating largely from the early 15th century. The photograph captures the intricate details of the church's traditional flint-knapped walls and stone-dressed windows, set against the backdrop of its historic churchyard.
+
+### Keywords
+St Michael's Parish Church, Bishop's Stortford, British, Christian, Christianity, England, English Church, Europe, Faith, Flint Knapped Wall, Flint Wall, Gothic Window, Grass, Graveyard, Hertfordshire, Parish church, Perpendicular Gothic, St Michael's Church, St Michael's Parish Church, UK, United Kingdom, ancient, arched window, architecture, battlements, black, brown, building, cemetery, church, church spire, churchyard, clock tower, cloudy, cloudy sky, cross, exterior, gothic architecture, gravestone, grey, headstone, heritage, historic, historic building, landmark, medieval, old, overcast, overcast sky, place of worship, religion, religious building, spire, stone, tombstone, tourism, tower, travel, weathervane, worship, February, late afternoon, historic churchyard, flint-knapped walls, stone-dressed windows, Perpendicular Gothic architecture, centuries-old landmark, soft light, textures, formidable presence, traditional, traditional architecture, historic site, religious heritage, serene, dramatic, grey tones, stone structure, religious symbolism, spiritual, architectural detail, historic preservation, cultural significance, architectural landmark, English heritage, English architecture, English churchyard, English cemetery, English gravestone, English headstone, English tombstone, English church, English church spire, English churchyard, English church architecture, English religious building, English religious heritage, English religious landmark, English religious site, English religious tourism, English religious travel, English religious worship, English religious faith, English religious symbolism, English religious architecture, English religious heritage, English religious tourism, English religious travel, English religious worship, English religious faith, English religious symbolism, English religious architecture, English religious heritage, English religious tourism, English religious travel, English religious worship, English religious
+```
+
+---
+
 ### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
 
-**Metrics:** 3.87 TPS | 176 tokens
+**Metrics:** 3.91 TPS | 176 tokens
 
 ```text
 **Title:** St. Michael's Parish Church, Bishop's Stortford, England
@@ -1303,7 +1191,7 @@ Keywords: St Michael's Parish Church, Bishop's Stortford, England, United Kingdo
 
 ### ✅ Qwen/Qwen3-VL-2B-Instruct
 
-**Metrics:** 74.9 TPS | 500 tokens
+**Metrics:** 75.4 TPS | 500 tokens
 
 ```text
 Title: St Michael's Church, Bishop's Stortford, England
@@ -1315,9 +1203,39 @@ Keywords: Bishop's Stortford, British, Christian, Christianity, England, English
 
 ---
 
+### ✅ mlx-community/gemma-3-27b-it-qat-8bit
+
+**Metrics:** 6.07 TPS | 288 tokens
+
+```text
+**Title:** St Michael's Parish Church, Bishop's Stortford, England – February Afternoon
+
+**Description:** This photograph depicts St Michael's Parish Church in Bishop's Stortford, Hertfordshire, England, a Grade I listed building showcasing Perpendicular Gothic architecture. The church is framed against a cloudy February sky, with its flint-knapped walls and stone windows prominently visible. Gravestones dot the surrounding churchyard, adding to the historic atmosphere.
+
+**Keywords:** St Michael's Parish Church, Bishop's Stortford, Hertfordshire, England, UK, United Kingdom, Perpendicular Gothic, flint knapped wall, stone window, arched window, church spire, churchyard, graveyard, cemetery, gravestone, headstone, tombstone, historic building, landmark, medieval architecture, place of worship, religious building, church, exterior, overcast sky, cloudy, grey tones, brown tones, stone, tower, clock tower, battlements, cross, weathervane, heritage, tourism, travel, architecture, ancient, historic, religious site, European architecture, British architecture, place of interest, overcast lighting, soft light, winter, February, afternoon, solemn, quiet, stillness, texture, detail, wide-angle, building exterior, cultural heritage, religious art, gothic window, stone dressing, traditional architecture, European landmark, place of remembrance, solemnity, cultural tourism, architectural photography.
+```
+
+---
+
+### ✅ mlx-community/gemma-3-27b-it-qat-4bit
+
+**Metrics:** 10.4 TPS | 500 tokens
+
+```text
+## Title: St Michael's Parish Church, Bishop's Stortford, England – February Afternoon
+
+## Description:
+This photograph depicts the exterior of St Michael's Parish Church in Bishop's Stortford, England, a Grade I listed building showcasing Perpendicular Gothic architecture. The church is framed by a historic churchyard with numerous gravestones, and is photographed under a cloudy, overcast sky. The image highlights the church’s flint-knapped walls, arched windows, and prominent spire.
+
+## Keywords:
+St Michael's Parish Church, Bishop's Stortford, Hertfordshire, England, UK, United Kingdom, Perpendicular Gothic, flint knapped wall, arched window, church spire, churchyard, gravestones, headstones, tombstone, medieval architecture, historic building, landmark, place of worship, religious building, church, exterior, overcast sky, cloudy sky, grey tones, stone wall, spire, clock tower, weathervane, cross, gothic window, church architecture, British architecture, European architecture, heritage, tourism, travel, photography, architectural detail, religious site, place of interest, cultural heritage, history, ancient, solemn, peaceful, quiet, overcast light, February, winter, afternoon, wide-angle, exterior view, stone masonry, building facade, cultural landmark, religious art, religious monument, textured wall, stone structure, landmark architecture, religious institution, historical site, cultural tourism, architectural photography, religious building exterior, stone detailing, gothic style, religious practice, cultural preservation, stone texture, architectural design, religious history, stone construction, cultural identity, religious symbol, stone craftsmanship, architectural heritage, religious tradition, stone architecture, cultural significance, religious community, stone building, cultural expression, religious belief, stone work, cultural value, religious experience, stone feature, cultural context, religious influence, stone element, cultural impact, religious legacy, stone material, cultural asset, religious impact, stone surface, cultural resource, religious influence, stone composition, cultural element, religious foundation, stone form, cultural artifact, religious structure, stone pattern, cultural object, religious practice, stone design, cultural symbol, religious institution, stone element, cultural expression, stone feature, cultural context, stone composition, stone pattern, stone texture, stone work, stone surface, stone material, stone form, stone detailing, stone construction, stone masonry, stone architecture, stone building, stone feature, stone element, stone composition, stone pattern,
+```
+
+---
+
 ### ✅ mlx-community/Qwen3-VL-2B-Thinking-bf16
 
-**Metrics:** 69.8 TPS | 500 tokens
+**Metrics:** 75.3 TPS | 500 tokens
 
 ```text
 Got it, let's tackle this image cataloguing task. First, I need to follow the structure: Title, Description, Keywords, Context. Wait, the user said "Context" is part of the response, but the instructions say "Respond with exactly these three sections: Title, Description, Keywords, Context". Wait, no, the user says "three sections" but the example shows Title, Description, Keywords, Context. Wait, let me check again.
@@ -1343,9 +1261,36 @@ Keywords: 25–50 comma-separated keywords ordered from most specific to most ge
 
 ---
 
+### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
+
+**Metrics:** 7.87 TPS | 500 tokens
+
+```text
+A low-angle, three-quarters view of the side of St Michael's Parish Church in Bishop's Stortford, England. The church is a light brown stone with a brick-layer's bond pattern. The church is made of light brown stone with a brick-layer's bond pattern. The church has a tall, pointed, gray metal steeple on the right side of the church. The steeple is the tallest structure in the image. The church has a row of five windows on the left side of the church. The windows are rectangular and have a black metal frame. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three. The windows are set in a row of three.
+```
+
+---
+
+### ✅ mlx-community/pixtral-12b-bf16
+
+**Metrics:** 7.78 TPS | 500 tokens
+
+```text
+### Title
+St Michael's Parish Church, Bishop's Stortford
+
+### Description
+St Michael's Parish Church in Bishop's Stortford, England, is pictured here on a late afternoon under a cool February sky. This Grade I listed building is a prominent example of Perpendicular Gothic architecture, with its current structure dating largely from the early 15th century. The photograph captures the intricate details of the church's traditional flint-knapped walls and stone-dressed windows, set against the backdrop of its historic churchyard.
+
+### Keywords
+St Michael's Parish Church, Bishop's Stortford, British, Christian, Christianity, England, English Church, Europe, Faith, Flint Knapped Wall, Flint Wall, Gothic Window, Grass, Graveyard, Hertfordshire, Parish church, Perpendicular Gothic, St Michael's Church, St Michael's Parish Church, UK, United Kingdom, ancient, arched window, architecture, battlements, black, brown, building, cemetery, church, church spire, churchyard, clock tower, cloudy, cloudy sky, cross, exterior, gothic architecture, gravestone, grey, headstone, heritage, historic, historic building, landmark, medieval, old, overcast, overcast sky, place of worship, religion, religious building, spire, stone, tombstone, tourism, tower, travel, weathervane, worship, February, late afternoon, historic churchyard, stone-dressed windows, flint-knapped walls, Perpendicular Gothic architecture, overcast day, textures, formidable presence, centuries-old landmark, traditional, serene, historic site, religious heritage, architectural detail, stone structure, English heritage, English architecture, British heritage, British architecture, Gothic architecture, medieval architecture, historic architecture, religious tourism, heritage tourism, architectural landmark, architectural detail, stone masonry, church architecture, church exterior, churchyard grass, churchyard tombstones, churchyard gravestones, churchyard headstones, churchyard cross, churchyard clock tower, churchyard spire, churchyard weathervane, churchyard tourism, churchyard heritage, churchyard history, churchyard architecture, churchyard design, churchyard landscape, churchyard setting, churchyard environment, churchyard atmosphere, churchyard ambiance, churchyard mood, churchyard emotion, churchyard feeling, churchyard experience, churchyard visit, churchyard tour, churchyard exploration
+```
+
+---
+
 ### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
 
-**Metrics:** 170 TPS | 500 tokens
+**Metrics:** 180 TPS | 500 tokens
 
 ```text
 Title: St Michael's Parish Church, Bishop's Stortford, England, United Kingdom, UK
@@ -1380,12 +1325,12 @@ Keywords: St Michael's Church, St Michael's Parish Church, Grade I listed buildi
 
 - `Pillow`: `12.1.1`
 - `huggingface-hub`: `1.4.1`
-- `mlx`: `0.30.7.dev20260213+c184262d`
+- `mlx`: `0.30.7.dev20260214+c184262d`
 - `mlx-lm`: `0.30.7`
 - `mlx-metal`: ``
-- `mlx-vlm`: `0.3.11`
+- `mlx-vlm`: `0.3.12`
 - `numpy`: `2.4.2`
 - `tokenizers`: `0.22.2`
 - `transformers`: `5.1.0`
 
-_Report generated on: 2026-02-13 23:33:19 GMT_
+_Report generated on: 2026-02-14 02:27:12 GMT_
