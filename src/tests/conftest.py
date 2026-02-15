@@ -20,7 +20,6 @@ import logging
 import os
 import sys
 import tempfile
-import time
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -179,12 +178,12 @@ def folder_with_images(tmp_path: Path) -> Path:
     folder = tmp_path / "images"
     folder.mkdir()
 
+    base_mtime = 1_000_000.0
     for i, name in enumerate(["old.jpg", "middle.jpg", "newest.jpg"]):
         img_path = folder / name
         img = Image.new("RGB", (50, 50), color="blue")
         img.save(img_path)
-        if i < 2:
-            time.sleep(0.05)
+        os.utime(img_path, (base_mtime + i, base_mtime + i))
     return folder
 
 
