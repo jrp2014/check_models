@@ -4,6 +4,14 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- New preflight package-risk diagnostics in `check_models.py` to surface common
+  upstream compatibility issues early (MLX/MLX-VLM/MLX-LM/Transformers version
+  mismatches and known problematic package states).
+- Additional diagnostics stack-signal and long-context-breakdown analysis
+  sections to better triage quality and failure patterns.
+
 ### Changed
 
 - Hardened runtime dependency handling for core MLX stack:
@@ -25,11 +33,18 @@ Notable changes to this project will be documented in this file.
   `mlx-lm` for inference smoke tests.
 - Improved CI MLX stub-generation step robustness to tolerate missing/generated
   stub-path variance as a non-fatal warning (typing-accuracy degradation only).
+- Improved prompt-context compaction and keyword-hint summarization for long
+  metadata inputs to reduce prompt bloat while preserving useful grounding.
+- Improved diagnostics report reproducibility command construction and captured
+  output sanitization for cleaner issue filing.
+- Refactored portions of `check_models.py` for readability/maintainability
+  without intended behavioral change.
 
 ### Fixed
 
 - Fixed CI regression where runtime dependency hard-fail masked CLI argument and
   folder validation tests by firing too early in startup.
+- Fixed diagnostics markdown formatting/lint edge cases in generated reports.
 - Removed weak/avoidable lint suppressions by:
   - replacing shell word-splitting patterns with array-safe handling in quality
     and hook scripts;
