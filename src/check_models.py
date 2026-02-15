@@ -390,11 +390,16 @@ def _truncate_probe_output(text: str, *, max_chars: int = 220) -> str:
     return f"{compact[: max_chars - 3]}..."
 
 
-def _probe_mlx_import_runtime() -> str | None:
-    """Return None when mlx.core import appears safe; else an actionable message."""
+def _probe_import_runtime(
+    *,
+    import_target: str,
+    error_prefix: str,
+    detect_metal_nsrange: bool = False,
+) -> str | None:
+    """Run a subprocess import probe and return an actionable error message when it fails."""
     try:
         probe_result = subprocess.run(  # noqa: S603 - fixed interpreter + fixed probe command
-            [sys.executable, "-c", "import mlx.core"],
+            [sys.executable, "-c", f"import {import_target}"],
             capture_output=True,
             text=True,
             check=False,
@@ -402,58 +407,46 @@ def _probe_mlx_import_runtime() -> str | None:
         )
     except subprocess.TimeoutExpired:
         return (
-            f"{ERROR_MLX_RUNTIME_INIT} Import probe timed out after "
-            f"{MLX_IMPORT_PROBE_TIMEOUT_SECONDS:.0f}s."
+            f"{error_prefix} Import probe timed out after {MLX_IMPORT_PROBE_TIMEOUT_SECONDS:.0f}s."
         )
     except OSError as probe_err:
-        return f"{ERROR_MLX_RUNTIME_INIT} Import probe failed: {probe_err}"
+        return f"{error_prefix} Import probe failed: {probe_err}"
 
     if probe_result.returncode == 0:
         return None
 
     combined_output = probe_result.stderr.strip() or probe_result.stdout.strip()
-    combined_lower = combined_output.lower()
 
-    if "nsrangeexception" in combined_lower and "objectatindex" in combined_lower:
-        return (
-            f"{ERROR_MLX_RUNTIME_INIT} No Metal device could be enumerated "
-            "(NSRangeException during device discovery). This commonly happens in "
-            "headless or virtualized sessions without visible Apple GPU access."
-        )
+    if detect_metal_nsrange:
+        combined_lower = combined_output.lower()
+        if "nsrangeexception" in combined_lower and "objectatindex" in combined_lower:
+            return (
+                f"{error_prefix} No Metal device could be enumerated "
+                "(NSRangeException during device discovery). This commonly happens in "
+                "headless or virtualized sessions without visible Apple GPU access."
+            )
 
     output_excerpt = _truncate_probe_output(combined_output) if combined_output else "no output"
     return (
-        f"{ERROR_MLX_RUNTIME_INIT} Import probe exited with code "
+        f"{error_prefix} Import probe exited with code "
         f"{probe_result.returncode}. Probe output: {output_excerpt}"
+    )
+
+
+def _probe_mlx_import_runtime() -> str | None:
+    """Return None when mlx.core import appears safe; else an actionable message."""
+    return _probe_import_runtime(
+        import_target="mlx.core",
+        error_prefix=ERROR_MLX_RUNTIME_INIT,
+        detect_metal_nsrange=True,
     )
 
 
 def _probe_mlx_vlm_import_runtime() -> str | None:
     """Return None when mlx_vlm import appears safe; else an actionable message."""
-    try:
-        probe_result = subprocess.run(  # noqa: S603 - fixed interpreter + fixed probe command
-            [sys.executable, "-c", "import mlx_vlm"],
-            capture_output=True,
-            text=True,
-            check=False,
-            timeout=MLX_IMPORT_PROBE_TIMEOUT_SECONDS,
-        )
-    except subprocess.TimeoutExpired:
-        return (
-            f"{ERROR_MLX_VLM_RUNTIME_INIT} Import probe timed out after "
-            f"{MLX_IMPORT_PROBE_TIMEOUT_SECONDS:.0f}s."
-        )
-    except OSError as probe_err:
-        return f"{ERROR_MLX_VLM_RUNTIME_INIT} Import probe failed: {probe_err}"
-
-    if probe_result.returncode == 0:
-        return None
-
-    combined_output = probe_result.stderr.strip() or probe_result.stdout.strip()
-    output_excerpt = _truncate_probe_output(combined_output) if combined_output else "no output"
-    return (
-        f"{ERROR_MLX_VLM_RUNTIME_INIT} Import probe exited with code "
-        f"{probe_result.returncode}. Probe output: {output_excerpt}"
+    return _probe_import_runtime(
+        import_target="mlx_vlm",
+        error_prefix=ERROR_MLX_VLM_RUNTIME_INIT,
     )
 
 
