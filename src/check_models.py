@@ -9483,8 +9483,6 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     # Dump full environment to log file for reproducibility (after logging setup)
     _dump_environment_to_log(args.output_env)
 
-    _raise_for_missing_runtime_dependencies()
-
     # Apply CLI output preferences (color + width)
     _apply_cli_output_preferences(args)
 
@@ -11115,6 +11113,9 @@ def main(args: argparse.Namespace) -> None:
         if getattr(args, "dry_run", False):
             _handle_dry_run(args, image_path, prompt, library_versions)
             return
+
+        # Hard-fail before any model execution when core runtime deps are unavailable.
+        _raise_for_missing_runtime_dependencies()
 
         results = process_models(args, image_path, prompt=prompt)
 
