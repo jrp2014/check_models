@@ -713,6 +713,8 @@ type ModelScoreGrade = tuple[str, float, str]
 type CatalogingScoreRecord = tuple[str, float, str, str, float | None]
 type TopPerformerMetric = tuple[str, str, float, str]
 type ResourceUsageMetric = tuple[str, float, str]
+type QualityIssueEntry = tuple[str, str | None]
+type QualityIssueSection = tuple[str, str, list[QualityIssueEntry]]
 
 
 class ModelIssueSummary(TypedDict, total=False):
@@ -5668,7 +5670,7 @@ def _collect_top_performer_metrics(summary: ModelIssueSummary) -> list[TopPerfor
     most_efficient_model = summary.get("most_efficient_model")
     if most_efficient_model is not None:
         metrics.append(
-            ("💾 Most efficient", most_efficient_model[0], most_efficient_model[1], "{:.1f} GB")
+            ("💾 Most efficient", most_efficient_model[0], most_efficient_model[1], "{:.1f} GB"),
         )
 
     fastest_load_model = summary.get("fastest_load_model")
@@ -5728,63 +5730,80 @@ def _format_top_performers_html(summary: ModelIssueSummary) -> list[str]:
     return parts
 
 
-def _format_quality_issues_html(summary: ModelIssueSummary) -> list[str]:
-    quality_parts = []
+def _collect_quality_issue_sections(summary: ModelIssueSummary) -> list[QualityIssueSection]:
+    """Collect quality issue sections shared by HTML/Markdown summary renderers."""
+    sections: list[QualityIssueSection] = []
 
     failed_models = summary.get("failed_models", [])
     if failed_models:
-        quality_parts.append(
-            f"<li><b class='metric-bad'>❌ Failed Models ({len(failed_models)}):</b><ul>",
+        sections.append(
+            (
+                "❌ Failed Models",
+                "metric-bad",
+                [(model, stage or "Unknown") for model, stage, _ in failed_models],
+            ),
         )
-        quality_parts.extend(
-            [
-                f"<li><code>{html.escape(model)}</code> ({html.escape(stage or 'Unknown')})</li>"
-                for model, stage, _ in failed_models
-            ],
-        )
-        quality_parts.append("</ul></li>")
 
     repetitive_models = summary.get("repetitive_models", [])
     if repetitive_models:
-        quality_parts.append(
-            f"<li><b class='metric-warn'>🔄 Repetitive Output ({len(repetitive_models)}):</b><ul>",
+        sections.append(
+            (
+                "🔄 Repetitive Output",
+                "metric-warn",
+                [(model, f"token: {token or '?'}") for model, token in repetitive_models],
+            ),
         )
-        quality_parts.extend(
-            [
-                f"<li><code>{html.escape(model)}</code> "
-                f"(token: <code>{html.escape(token or '?')}</code>)</li>"
-                for model, token in repetitive_models
-            ],
-        )
-        quality_parts.append("</ul></li>")
 
     hallucination_models = summary.get("hallucination_models", [])
     if hallucination_models:
-        quality_parts.append(
-            f"<li><b class='metric-warn'>👻 Hallucinations ({len(hallucination_models)}):</b><ul>",
+        sections.append(
+            (
+                "👻 Hallucinations",
+                "metric-warn",
+                [(model, None) for model, _ in hallucination_models],
+            ),
         )
-        quality_parts.extend(
-            [f"<li><code>{html.escape(model)}</code></li>" for model, _ in hallucination_models],
-        )
-        quality_parts.append("</ul></li>")
 
     formatting_issues = summary.get("formatting_issues", [])
     if formatting_issues:
-        quality_parts.append(
-            f"<li><b class='metric-warn'>📝 Formatting Issues ({len(formatting_issues)}):</b><ul>",
+        sections.append(
+            (
+                "📝 Formatting Issues",
+                "metric-warn",
+                [(model, None) for model, _ in formatting_issues],
+            ),
         )
-        quality_parts.extend(
-            [f"<li><code>{html.escape(model)}</code></li>" for model, _ in formatting_issues],
-        )
+
+    return sections
+
+
+def _format_quality_detail_html(detail: str) -> str:
+    """Format detail text for HTML quality rows while preserving prior token styling."""
+    if detail.startswith("token: "):
+        token_text = detail.removeprefix("token: ")
+        return f"token: <code>{html.escape(token_text)}</code>"
+    return html.escape(detail)
+
+
+def _format_quality_issues_html(summary: ModelIssueSummary) -> list[str]:
+    sections = _collect_quality_issue_sections(summary)
+    if not sections:
+        return []
+
+    quality_parts = []
+    for title, css_class, entries in sections:
+        quality_parts.append(f"<li><b class='{css_class}'>{title} ({len(entries)}):</b><ul>")
+        for model, detail in entries:
+            if detail is None:
+                quality_parts.append(f"<li><code>{html.escape(model)}</code></li>")
+            else:
+                quality_parts.append(
+                    f"<li><code>{html.escape(model)}</code> "
+                    f"({_format_quality_detail_html(detail)})</li>",
+                )
         quality_parts.append("</ul></li>")
 
-    parts = []
-    if quality_parts:
-        parts.append("<h3>⚠️ Quality Issues</h3><ul>")
-        parts.extend(quality_parts)
-        parts.append("</ul>")
-
-    return parts
+    return ["<h3>⚠️ Quality Issues</h3><ul>", *quality_parts, "</ul>"]
 
 
 def _cataloging_grade_distribution_items(summary: ModelIssueSummary) -> list[str]:
@@ -7502,48 +7521,27 @@ def generate_diagnostics_report(
 
 
 def _format_quality_issues_text(summary: ModelIssueSummary) -> list[str]:
+    sections = _collect_quality_issue_sections(summary)
+    if not sections:
+        return []
+
     parts = []
     quality_parts = []
+    for title, _css_class, entries in sections:
+        quality_parts.append(f"- **{title} ({len(entries)}):**")
+        for model, detail in entries:
+            if detail is None:
+                quality_parts.append(f"  - `{model}`")
+            elif detail.startswith("token: "):
+                token_text = detail.removeprefix("token: ")
+                quality_parts.append(f"  - `{model}` (token: `{token_text}`)")
+            else:
+                quality_parts.append(f"  - `{model}` (`{detail}`)")
 
-    failed_models = summary.get("failed_models", [])
-    if failed_models:
-        quality_parts.append(f"- **❌ Failed Models ({len(failed_models)}):**")
-        for model, stage, _ in failed_models:
-            stage_text = stage or "Unknown"
-            quality_parts.append(f"  - `{model}` (`{stage_text}`)")
-
-    repetitive_models = summary.get("repetitive_models", [])
-    if repetitive_models:
-        quality_parts.append(
-            f"- **🔄 Repetitive Output ({len(repetitive_models)}):**",
-        )
-        for model, token in repetitive_models:
-            quality_parts.append(f"  - `{model}` (token: `{token or '?'}`)")
-
-    hallucination_models = summary.get("hallucination_models", [])
-    if hallucination_models:
-        quality_parts.append(
-            f"- **👻 Hallucinations ({len(hallucination_models)}):**",
-        )
-        quality_parts.extend(
-            [f"  - `{model}`" for model, _ in hallucination_models],
-        )
-
-    formatting_issues = summary.get("formatting_issues", [])
-    if formatting_issues:
-        quality_parts.append(
-            f"- **📝 Formatting Issues ({len(formatting_issues)}):**",
-        )
-        quality_parts.extend(
-            [f"  - `{model}`" for model, _ in formatting_issues],
-        )
-
-    if quality_parts:
-        parts.append("## ⚠️ Quality Issues")
-        parts.append("")  # Blank line after heading (MD022)
-        parts.extend(quality_parts)
-        parts.append("")
-
+    parts.append("## ⚠️ Quality Issues")
+    parts.append("")  # Blank line after heading (MD022)
+    parts.extend(quality_parts)
+    parts.append("")
     return parts
 
 

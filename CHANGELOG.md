@@ -79,6 +79,9 @@ Notable changes to this project will be documented in this file.
   top-performer/resource metric collectors reused by both HTML and Markdown
   issue summaries, keeping output semantics unchanged while trimming repeated
   key checks/formatting branches.
+- Reused a shared quality-issue section collector for HTML and Markdown
+  summaries, reducing duplicate failed/repetitive/hallucination/formatting
+  extraction logic while preserving section content and emphasis.
 
 ### Fixed
 
