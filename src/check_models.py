@@ -711,6 +711,8 @@ type ExcessiveBulletsIssue = tuple[str, int]
 type LowUtilityModelIssue = tuple[str, float, str, str]
 type ModelScoreGrade = tuple[str, float, str]
 type CatalogingScoreRecord = tuple[str, float, str, str, float | None]
+type TopPerformerMetric = tuple[str, str, float, str]
+type ResourceUsageMetric = tuple[str, float, str]
 
 
 class ModelIssueSummary(TypedDict, total=False):
@@ -5655,63 +5657,72 @@ def compute_performance_statistics(results: list[PerformanceResult]) -> Performa
     return stats
 
 
+def _collect_top_performer_metrics(summary: ModelIssueSummary) -> list[TopPerformerMetric]:
+    """Collect top-performer rows shared by HTML/Markdown renderers."""
+    metrics: list[TopPerformerMetric] = []
+
+    fastest_model = summary.get("fastest_model")
+    if fastest_model is not None:
+        metrics.append(("Fastest", fastest_model[0], fastest_model[1], "{:.1f} tps"))
+
+    most_efficient_model = summary.get("most_efficient_model")
+    if most_efficient_model is not None:
+        metrics.append(
+            ("💾 Most efficient", most_efficient_model[0], most_efficient_model[1], "{:.1f} GB")
+        )
+
+    fastest_load_model = summary.get("fastest_load_model")
+    if fastest_load_model is not None:
+        metrics.append(("⚡ Fastest load", fastest_load_model[0], fastest_load_model[1], "{:.2f}s"))
+
+    return metrics
+
+
+def _collect_resource_usage_metrics(summary: ModelIssueSummary) -> list[ResourceUsageMetric]:
+    """Collect aggregate resource rows shared by HTML/Markdown renderers."""
+    metrics: list[ResourceUsageMetric] = []
+
+    total_peak_memory = summary.get("total_peak_memory")
+    if total_peak_memory is not None:
+        metrics.append(("Total peak memory", total_peak_memory, "{:.1f} GB"))
+
+    average_peak_memory = summary.get("average_peak_memory")
+    if average_peak_memory is not None:
+        metrics.append(("Average peak memory", average_peak_memory, "{:.1f} GB"))
+
+    memory_efficiency = summary.get("memory_efficiency")
+    if memory_efficiency is not None:
+        metrics.append(("Memory efficiency", memory_efficiency, "{:.0f} tokens/GB"))
+
+    return metrics
+
+
 def _format_top_performers_html(summary: ModelIssueSummary) -> list[str]:
     parts = []
-
-    # Performance Highlights
-    if any(
-        k in summary
-        for k in ["fastest_model", "most_efficient_model", "fastest_load_model", "average_tps"]
-    ):
+    top_metrics = _collect_top_performer_metrics(summary)
+    average_tps = summary.get("average_tps")
+    successful_count = summary.get("successful_count")
+    if top_metrics or (average_tps is not None and successful_count is not None):
         parts.append("<h3>🏆 Performance Highlights</h3><ul>")
-
-        if "fastest_model" in summary:
-            model, tps = summary["fastest_model"]
+        for label, model, value, fmt in top_metrics:
             parts.append(
-                f"<li><b>Fastest:</b> <code>{html.escape(model)}</code> ({tps:.1f} tps)</li>",
+                f"<li><b>{label}:</b> <code>{html.escape(model)}</code> ({fmt.format(value)})</li>",
             )
-
-        if "most_efficient_model" in summary:
-            model, mem = summary["most_efficient_model"]
+        if average_tps is not None and successful_count is not None:
             parts.append(
-                f"<li><b>💾 Most efficient:</b> "
-                f"<code>{html.escape(model)}</code> ({mem:.1f} GB)</li>",
-            )
-
-        if "fastest_load_model" in summary:
-            model, load_time = summary["fastest_load_model"]
-            parts.append(
-                f"<li><b>⚡ Fastest load:</b> "
-                f"<code>{html.escape(model)}</code> ({load_time:.2f}s)</li>",
-            )
-
-        if "average_tps" in summary and "successful_count" in summary:
-            parts.append(
-                f"<li><b>📊 Average TPS:</b> {summary['average_tps']:.1f} "
-                f"across {summary['successful_count']} models</li>",
+                f"<li><b>📊 Average TPS:</b> {average_tps:.1f} "
+                f"across {successful_count} models</li>",
             )
 
         parts.append("</ul>")
 
-    # Resource Usage Summary
-    if any(k in summary for k in ["total_peak_memory", "average_peak_memory", "memory_efficiency"]):
+    resource_metrics = _collect_resource_usage_metrics(summary)
+    if resource_metrics:
         parts.append("<h3>📈 Resource Usage</h3><ul>")
-
-        if "total_peak_memory" in summary:
+        for label, value, fmt in resource_metrics:
             parts.append(
-                f"<li><b>Total peak memory:</b> {summary['total_peak_memory']:.1f} GB</li>",
+                f"<li><b>{label}:</b> {fmt.format(value)}</li>",
             )
-
-        if "average_peak_memory" in summary:
-            parts.append(
-                f"<li><b>Average peak memory:</b> {summary['average_peak_memory']:.1f} GB</li>",
-            )
-
-        if "memory_efficiency" in summary:
-            parts.append(
-                f"<li><b>Memory efficiency:</b> {summary['memory_efficiency']:.0f} tokens/GB</li>",
-            )
-
         parts.append("</ul>")
 
     return parts
@@ -5962,48 +5973,29 @@ def format_issues_summary_html(summary: ModelIssueSummary, stats: PerformanceSta
 
 def _format_top_performers_text(summary: ModelIssueSummary) -> list[str]:
     parts = []
-
-    # Performance Highlights
-    if any(
-        k in summary
-        for k in ["fastest_model", "most_efficient_model", "fastest_load_model", "average_tps"]
-    ):
+    top_metrics = _collect_top_performer_metrics(summary)
+    average_tps = summary.get("average_tps")
+    successful_count = summary.get("successful_count")
+    if top_metrics or (average_tps is not None and successful_count is not None):
         parts.append("## 🏆 Performance Highlights")
         parts.append("")  # Blank line after heading (MD022)
 
-        if "fastest_model" in summary:
-            model, tps = summary["fastest_model"]
-            parts.append(f"- **Fastest:** `{model}` ({tps:.1f} tps)")
-
-        if "most_efficient_model" in summary:
-            model, mem = summary["most_efficient_model"]
-            parts.append(f"- **💾 Most efficient:** `{model}` ({mem:.1f} GB)")
-
-        if "fastest_load_model" in summary:
-            model, load_time = summary["fastest_load_model"]
-            parts.append(f"- **⚡ Fastest load:** `{model}` ({load_time:.2f}s)")
-
-        if "average_tps" in summary and "successful_count" in summary:
+        for label, model, value, fmt in top_metrics:
+            parts.append(f"- **{label}:** `{model}` ({fmt.format(value)})")
+        if average_tps is not None and successful_count is not None:
             parts.append(
-                f"- **📊 Average TPS:** {summary['average_tps']:.1f} "
-                f"across {summary['successful_count']} models",
+                f"- **📊 Average TPS:** {average_tps:.1f} across {successful_count} models",
             )
 
         parts.append("")  # Blank line after list (MD032)
 
-    # Resource Usage Summary
-    if any(k in summary for k in ["total_peak_memory", "average_peak_memory", "memory_efficiency"]):
+    resource_metrics = _collect_resource_usage_metrics(summary)
+    if resource_metrics:
         parts.append("## 📈 Resource Usage")
         parts.append("")  # Blank line after heading (MD022)
 
-        if "total_peak_memory" in summary:
-            parts.append(f"- **Total peak memory:** {summary['total_peak_memory']:.1f} GB")
-
-        if "average_peak_memory" in summary:
-            parts.append(f"- **Average peak memory:** {summary['average_peak_memory']:.1f} GB")
-
-        if "memory_efficiency" in summary:
-            parts.append(f"- **Memory efficiency:** {summary['memory_efficiency']:.0f} tokens/GB")
+        for label, value, fmt in resource_metrics:
+            parts.append(f"- **{label}:** {fmt.format(value)}")
 
         parts.append("")  # Blank line after list (MD032)
 

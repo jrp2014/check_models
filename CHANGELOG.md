@@ -75,6 +75,10 @@ Notable changes to this project will be documented in this file.
   `docs/IMPLEMENTATION_GUIDE.md` describing refactor order, correctness-vs-
   performance boundaries, and practical navigation/checklist steps for
   `check_models.py`.
+- Further reduced duplicated summary-rendering logic by introducing shared
+  top-performer/resource metric collectors reused by both HTML and Markdown
+  issue summaries, keeping output semantics unchanged while trimming repeated
+  key checks/formatting branches.
 
 ### Fixed
 
