@@ -718,7 +718,6 @@ class ModelIssueSummary(TypedDict, total=False):
 
     total_models: int
     failed_models: list[FailedModelIssue]
-    context_ignored: list[str]
     repetitive_models: list[RepetitiveModelIssue]
     hallucination_models: list[HallucinationModelIssue]
     verbose_models: list[VerboseModelIssue]
@@ -5405,35 +5404,120 @@ def _wrap_output_column_in_details(html_table: str, output_col_idx: int) -> str:
     return "\n".join(result_lines)
 
 
-def _init_model_issue_summary(
-    *,
-    total_models: int,
-    baseline: tuple[float, str] | None,
+def analyze_model_issues(
+    results: list[PerformanceResult],
+    context: str | None = None,
 ) -> ModelIssueSummary:
-    """Create default issue-summary structure, optionally seeded with metadata baseline."""
+    """Analyze results to identify common model issues and calculate performance highlights.
+
+    Args:
+        results: List of model performance results
+        context: Optional context string (from prompt) for cataloging utility analysis
+    """
+    baseline = _compute_metadata_baseline_utility(context)
+    baseline_score = baseline[0] if baseline is not None else None
+    baseline_grade = baseline[1] if baseline is not None else None
+
+    failed_models: list[FailedModelIssue] = []
+    repetitive_models: list[RepetitiveModelIssue] = []
+    hallucination_models: list[HallucinationModelIssue] = []
+    verbose_models: list[VerboseModelIssue] = []
+    formatting_issues: list[FormattingModelIssue] = []
+    excessive_bullets: list[ExcessiveBulletsIssue] = []
+    cataloging_grades: dict[str, list[str]] = {}
+    low_utility_models: list[LowUtilityModelIssue] = []
+    utility_scores: list[CatalogingScoreRecord] = []
+
     summary: ModelIssueSummary = {
-        "total_models": total_models,
-        "failed_models": [],
-        "repetitive_models": [],
-        "hallucination_models": [],
-        "verbose_models": [],
-        "formatting_issues": [],
-        "excessive_bullets": [],
-        "cataloging_grades": {},
+        "total_models": len(results),
+        "failed_models": failed_models,
+        "repetitive_models": repetitive_models,
+        "hallucination_models": hallucination_models,
+        "verbose_models": verbose_models,
+        "formatting_issues": formatting_issues,
+        "excessive_bullets": excessive_bullets,
+        "cataloging_grades": cataloging_grades,
         "cataloging_best": None,
         "cataloging_worst": None,
         "cataloging_avg_score": 0.0,
-        "low_utility_models": [],
+        "low_utility_models": low_utility_models,
     }
-    if baseline is None:
-        return summary
 
-    baseline_score, baseline_grade = baseline
-    summary["metadata_baseline_score"] = baseline_score
-    summary["metadata_baseline_grade"] = baseline_grade
-    summary["cataloging_improves_metadata"] = []
-    summary["cataloging_neutral_vs_metadata"] = []
-    summary["cataloging_worse_than_metadata"] = []
+    improves_metadata: list[str] | None = None
+    neutral_vs_metadata: list[str] | None = None
+    worse_than_metadata: list[str] | None = None
+    if baseline_score is not None and baseline_grade is not None:
+        improves_metadata = []
+        neutral_vs_metadata = []
+        worse_than_metadata = []
+        summary["metadata_baseline_score"] = baseline_score
+        summary["metadata_baseline_grade"] = baseline_grade
+        summary["cataloging_improves_metadata"] = improves_metadata
+        summary["cataloging_neutral_vs_metadata"] = neutral_vs_metadata
+        summary["cataloging_worse_than_metadata"] = worse_than_metadata
+
+    successful = [r for r in results if r.success]
+    _populate_summary_performance_highlights(summary, successful)
+
+    for res in results:
+        if not res.success:
+            failed_models.append((res.model_name, res.error_stage, res.error_message))
+            continue
+        if not res.generation:
+            continue
+
+        text = getattr(res.generation, "text", "") or ""
+        generation_tokens = getattr(res.generation, "generation_tokens", 0)
+        prompt_tokens = getattr(res.generation, "prompt_tokens", None)
+
+        analysis = analyze_generation_text(
+            text,
+            generation_tokens,
+            prompt_tokens=prompt_tokens,
+        )
+        _append_quality_issue_entries(
+            model_name=res.model_name,
+            analysis=analysis,
+            generation_tokens=generation_tokens,
+            repetitive_models=repetitive_models,
+            hallucination_models=hallucination_models,
+            verbose_models=verbose_models,
+            formatting_issues=formatting_issues,
+            excessive_bullets=excessive_bullets,
+        )
+
+        score, grade, weakness, delta = _compute_utility_snapshot(
+            text,
+            context,
+            baseline_score=baseline_score,
+        )
+        utility_scores.append((res.model_name, score, grade, weakness, delta))
+        cataloging_grades.setdefault(grade, []).append(res.model_name)
+
+        if grade in ("D", "F"):
+            low_utility_models.append((res.model_name, score, grade, weakness))
+
+        _bucket_metadata_delta(
+            model_name=res.model_name,
+            delta=delta,
+            improves_metadata=improves_metadata,
+            neutral_vs_metadata=neutral_vs_metadata,
+            worse_than_metadata=worse_than_metadata,
+        )
+
+    if utility_scores:
+        best = max(utility_scores, key=lambda row: row[1])
+        worst = min(utility_scores, key=lambda row: row[1])
+        summary["cataloging_best"] = (best[0], best[1], best[2])
+        summary["cataloging_worst"] = (worst[0], worst[1], worst[2])
+        summary["cataloging_avg_score"] = sum(
+            score for _model, score, _grade, _weakness, _delta in utility_scores
+        ) / len(utility_scores)
+        if baseline_score is not None:
+            deltas = [delta for _m, _s, _g, _w, delta in utility_scores if delta is not None]
+            if deltas:
+                summary["cataloging_avg_delta"] = sum(deltas) / len(deltas)
+
     return summary
 
 
@@ -5479,185 +5563,52 @@ def _populate_summary_performance_highlights(
     summary["memory_efficiency"] = total_tokens / total_mem if total_mem > 0 else 0
 
 
-def _update_summary_quality_issues(
-    summary: ModelIssueSummary,
+def _append_quality_issue_entries(
     *,
-    result: PerformanceResult,
+    model_name: str,
     analysis: GenerationQualityAnalysis,
     generation_tokens: int,
+    repetitive_models: list[RepetitiveModelIssue],
+    hallucination_models: list[HallucinationModelIssue],
+    verbose_models: list[VerboseModelIssue],
+    formatting_issues: list[FormattingModelIssue],
+    excessive_bullets: list[ExcessiveBulletsIssue],
 ) -> None:
-    """Append quality-issue entries from generation analysis into the summary."""
-    repetitive_models = summary.get("repetitive_models")
-    if repetitive_models is None:
-        repetitive_models = []
-        summary["repetitive_models"] = repetitive_models
-
-    hallucination_models = summary.get("hallucination_models")
-    if hallucination_models is None:
-        hallucination_models = []
-        summary["hallucination_models"] = hallucination_models
-
-    verbose_models = summary.get("verbose_models")
-    if verbose_models is None:
-        verbose_models = []
-        summary["verbose_models"] = verbose_models
-
-    formatting_issues = summary.get("formatting_issues")
-    if formatting_issues is None:
-        formatting_issues = []
-        summary["formatting_issues"] = formatting_issues
-
-    excessive_bullets = summary.get("excessive_bullets")
-    if excessive_bullets is None:
-        excessive_bullets = []
-        summary["excessive_bullets"] = excessive_bullets
-
+    """Append generation quality flags into per-run issue buckets."""
     if analysis.is_repetitive:
-        repetitive_models.append((result.model_name, analysis.repeated_token))
+        repetitive_models.append((model_name, analysis.repeated_token))
     if analysis.hallucination_issues:
-        hallucination_models.append(
-            (result.model_name, analysis.hallucination_issues),
-        )
+        hallucination_models.append((model_name, analysis.hallucination_issues))
     if analysis.is_verbose:
-        verbose_models.append((result.model_name, generation_tokens))
+        verbose_models.append((model_name, generation_tokens))
     if analysis.formatting_issues:
-        formatting_issues.append((result.model_name, analysis.formatting_issues))
+        formatting_issues.append((model_name, analysis.formatting_issues))
     if analysis.has_excessive_bullets:
-        excessive_bullets.append((result.model_name, analysis.bullet_count))
+        excessive_bullets.append((model_name, analysis.bullet_count))
 
 
-def _update_metadata_delta_buckets(
-    summary: ModelIssueSummary,
+def _bucket_metadata_delta(
     *,
     model_name: str,
     delta: float | None,
+    improves_metadata: list[str] | None,
+    neutral_vs_metadata: list[str] | None,
+    worse_than_metadata: list[str] | None,
 ) -> None:
-    """Bucket model utility deltas relative to metadata baseline."""
-    if delta is None or "metadata_baseline_score" not in summary:
+    """Bucket utility delta vs metadata baseline when baseline buckets are active."""
+    if (
+        delta is None
+        or improves_metadata is None
+        or neutral_vs_metadata is None
+        or worse_than_metadata is None
+    ):
         return
-    improves_metadata = summary.get("cataloging_improves_metadata")
-    if improves_metadata is None:
-        improves_metadata = []
-        summary["cataloging_improves_metadata"] = improves_metadata
-
-    worse_than_metadata = summary.get("cataloging_worse_than_metadata")
-    if worse_than_metadata is None:
-        worse_than_metadata = []
-        summary["cataloging_worse_than_metadata"] = worse_than_metadata
-
-    neutral_vs_metadata = summary.get("cataloging_neutral_vs_metadata")
-    if neutral_vs_metadata is None:
-        neutral_vs_metadata = []
-        summary["cataloging_neutral_vs_metadata"] = neutral_vs_metadata
     if delta > UTILITY_DELTA_NEUTRAL_BAND:
         improves_metadata.append(model_name)
     elif delta < -UTILITY_DELTA_NEUTRAL_BAND:
         worse_than_metadata.append(model_name)
     else:
         neutral_vs_metadata.append(model_name)
-
-
-def _finalize_cataloging_summary(
-    summary: ModelIssueSummary,
-    utility_scores: list[CatalogingScoreRecord],
-) -> None:
-    """Finalize best/worst/average utility and average delta vs metadata."""
-    if not utility_scores:
-        return
-
-    best = max(utility_scores, key=lambda row: row[1])
-    worst = min(utility_scores, key=lambda row: row[1])
-    summary["cataloging_best"] = (best[0], best[1], best[2])
-    summary["cataloging_worst"] = (worst[0], worst[1], worst[2])
-    summary["cataloging_avg_score"] = sum(score for _m, score, _g, _w, _d in utility_scores) / len(
-        utility_scores,
-    )
-
-    if "metadata_baseline_score" in summary:
-        deltas = [delta for _m, _s, _g, _w, delta in utility_scores if delta is not None]
-        if deltas:
-            summary["cataloging_avg_delta"] = sum(deltas) / len(deltas)
-
-
-def analyze_model_issues(
-    results: list[PerformanceResult],
-    context: str | None = None,
-) -> ModelIssueSummary:
-    """Analyze results to identify common model issues and calculate performance highlights.
-
-    Args:
-        results: List of model performance results
-        context: Optional context string (from prompt) for cataloging utility analysis
-    """
-    baseline = _compute_metadata_baseline_utility(context)
-    summary = _init_model_issue_summary(total_models=len(results), baseline=baseline)
-    baseline_score = baseline[0] if baseline is not None else None
-
-    successful = [r for r in results if r.success]
-    _populate_summary_performance_highlights(summary, successful)
-    failed_models = summary.get("failed_models")
-    if failed_models is None:
-        failed_models = []
-        summary["failed_models"] = failed_models
-
-    cataloging_grades = summary.get("cataloging_grades")
-    if cataloging_grades is None:
-        cataloging_grades = {}
-        summary["cataloging_grades"] = cataloging_grades
-
-    low_utility_models = summary.get("low_utility_models")
-    if low_utility_models is None:
-        low_utility_models = []
-        summary["low_utility_models"] = low_utility_models
-
-    utility_scores: list[CatalogingScoreRecord] = []
-
-    for res in results:
-        if not res.success:
-            failed_models.append(
-                (res.model_name, res.error_stage, res.error_message),
-            )
-            continue
-
-        if res.generation and hasattr(res.generation, "text"):
-            text = getattr(res.generation, "text", "") or ""
-            gen_tokens = getattr(res.generation, "generation_tokens", 0)
-            prompt_tokens = getattr(res.generation, "prompt_tokens", None)
-
-            analysis = analyze_generation_text(
-                text,
-                gen_tokens,
-                prompt_tokens=prompt_tokens,
-            )
-            _update_summary_quality_issues(
-                summary,
-                result=res,
-                analysis=analysis,
-                generation_tokens=gen_tokens,
-            )
-
-            score, grade, weakness, delta = _compute_utility_snapshot(
-                text,
-                context,
-                baseline_score=baseline_score,
-            )
-            utility_scores.append((res.model_name, score, grade, weakness, delta))
-
-            # Group by grade
-            cataloging_grades.setdefault(grade, []).append(res.model_name)
-
-            # Track low utility models (D or F)
-            if grade in ("D", "F"):
-                low_utility_models.append((res.model_name, score, grade, weakness))
-            _update_metadata_delta_buckets(
-                summary,
-                model_name=res.model_name,
-                delta=delta,
-            )
-
-    _finalize_cataloging_summary(summary, utility_scores)
-
-    return summary
 
 
 def compute_performance_statistics(results: list[PerformanceResult]) -> PerformanceStats:
@@ -5779,16 +5730,6 @@ def _format_quality_issues_html(summary: ModelIssueSummary) -> list[str]:
                 f"<li><code>{html.escape(model)}</code> ({html.escape(stage or 'Unknown')})</li>"
                 for model, stage, _ in failed_models
             ],
-        )
-        quality_parts.append("</ul></li>")
-
-    context_ignored = summary.get("context_ignored", [])
-    if context_ignored:
-        quality_parts.append(
-            f"<li><b class='metric-warn'>⚠️ Context Ignored ({len(context_ignored)}):</b><ul>",
-        )
-        quality_parts.extend(
-            [f"<li><code>{html.escape(model)}</code></li>" for model in context_ignored],
         )
         quality_parts.append("</ul></li>")
 
@@ -7578,11 +7519,6 @@ def _format_quality_issues_text(summary: ModelIssueSummary) -> list[str]:
         for model, stage, _ in failed_models:
             stage_text = stage or "Unknown"
             quality_parts.append(f"  - `{model}` (`{stage_text}`)")
-
-    context_ignored = summary.get("context_ignored", [])
-    if context_ignored:
-        quality_parts.append(f"- **⚠️ Context Ignored ({len(context_ignored)}):**")
-        quality_parts.extend([f"  - `{model}`" for model in context_ignored])
 
     repetitive_models = summary.get("repetitive_models", [])
     if repetitive_models:
@@ -11405,43 +11341,36 @@ def _log_model_comparison_table_and_charts(results: list[PerformanceResult]) -> 
 
 def _log_performance_highlights(successful: list[PerformanceResult]) -> None:
     """Log speed and memory highlights for successful runs."""
+    if not successful:
+        return
+
+    summary: ModelIssueSummary = {}
+    _populate_summary_performance_highlights(summary, successful)
+
+    fastest_model = summary.get("fastest_model", ("<unknown>", 0.0))
+    most_efficient_model = summary.get("most_efficient_model", ("<unknown>", 0.0))
+    fastest_load_model = summary.get("fastest_load_model", ("<unknown>", 0.0))
+    average_tps = summary.get("average_tps", 0.0)
+    successful_count = summary.get("successful_count", 0)
+    total_peak_memory = summary.get("total_peak_memory", 0.0)
+    average_peak_memory = summary.get("average_peak_memory", 0.0)
+    memory_efficiency = summary.get("memory_efficiency", 0.0)
+
     logger.info("🏆 Performance Highlights:")
-
-    fastest = max(successful, key=lambda r: getattr(r.generation, "generation_tps", 0) or 0)
-    fastest_tps = getattr(fastest.generation, "generation_tps", 0) or 0
-    logger.info("   Fastest: %s (%.1f tps)", fastest.model_name, fastest_tps)
-
-    most_efficient = min(
-        successful,
-        key=lambda r: getattr(r.generation, "peak_memory", float("inf")) or float("inf"),
+    logger.info("   Fastest: %s (%.1f tps)", fastest_model[0], fastest_model[1])
+    logger.info(
+        "   💾 Most efficient: %s (%.1f GB)",
+        most_efficient_model[0],
+        most_efficient_model[1],
     )
-    efficient_mem = getattr(most_efficient.generation, "peak_memory", 0) or 0
-    logger.info("   💾 Most efficient: %s (%.1f GB)", most_efficient.model_name, efficient_mem)
-
-    fastest_load = min(
-        successful,
-        key=lambda r: getattr(r, "model_load_time", float("inf")) or float("inf"),
-    )
-    load_time = getattr(fastest_load, "model_load_time", 0) or 0
-    logger.info("   ⚡ Fastest load: %s (%.2fs)", fastest_load.model_name, load_time)
-
-    total_tps = sum(getattr(r.generation, "generation_tps", 0) or 0 for r in successful)
-    avg_tps = total_tps / len(successful)
-    logger.info("   📊 Average TPS: %.1f across %d models", avg_tps, len(successful))
+    logger.info("   ⚡ Fastest load: %s (%.2fs)", fastest_load_model[0], fastest_load_model[1])
+    logger.info("   📊 Average TPS: %.1f across %d models", average_tps, successful_count)
 
     log_blank()
     logger.info("📈 Resource Usage:")
-    total_mem = sum(getattr(r.generation, "peak_memory", 0) or 0 for r in successful)
-    avg_mem = total_mem / len(successful)
-    logger.info("   Total peak memory: %.1f GB", total_mem)
-    logger.info("   Average peak memory: %.1f GB", avg_mem)
-    total_tokens = sum(
-        (getattr(r.generation, "prompt_tokens", 0) or 0)
-        + (getattr(r.generation, "generation_tokens", 0) or 0)
-        for r in successful
-    )
-    tokens_per_gb = total_tokens / total_mem if total_mem > 0 else 0
-    logger.info("   Memory efficiency: %.0f tokens/GB", tokens_per_gb)
+    logger.info("   Total peak memory: %.1f GB", total_peak_memory)
+    logger.info("   Average peak memory: %.1f GB", average_peak_memory)
+    logger.info("   Memory efficiency: %.0f tokens/GB", memory_efficiency)
 
 
 def _collect_quality_and_utility_rows(

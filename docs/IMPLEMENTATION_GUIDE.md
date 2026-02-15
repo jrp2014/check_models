@@ -28,6 +28,7 @@ This guide defines technical conventions and implementation details for develope
   - [Constants & Naming](#constants--naming)
 - [Quality & Linting](#quality--linting)
 - [Function Design](#function-design)
+- [Maintaining the Monolith](#maintaining-the-monolith)
 - [Comments & Documentation](#comments--documentation)
 - [Output & Formatting](#output--formatting)
 - [External Processes](#external-processes)
@@ -479,6 +480,83 @@ def process_image_pipeline(...) -> Result:  # noqa: C901 (Reason: cohesive multi
     # --- Aggregate & return ---
     return result
 ```
+
+## Maintaining the Monolith
+
+`src/check_models.py` is intentionally a single-file implementation. The goal is
+not to minimize line count at all costs; the goal is to keep behavior stable and
+the file navigable.
+
+### Refactor approach used in recent changes
+
+When reducing size or duplication, apply this order:
+
+1. Remove dead code first.
+2. Consolidate true duplicates (same logic, same invariants).
+3. Only then extract helpers, and only for named concepts used in multiple places.
+
+This keeps the file coherent and avoids "helper sprawl" where control flow is
+split across too many tiny functions.
+
+### Correctness vs. performance boundaries
+
+When a change could affect both, treat them separately:
+
+- **Correctness invariants** (must not regress):
+  - CLI validation and error ordering semantics
+  - hard-fail behavior for required runtime dependencies before model execution
+  - report schema stability (JSONL/HTML/Markdown key meanings)
+  - deterministic issue bucketing and grade classification
+- **Performance behavior** (optimize without semantic drift):
+  - avoid recomputing the same aggregates in multiple places
+  - keep per-model loops single-pass where practical
+  - reuse existing summary builders for logging/report views
+
+If a performance change risks output semantics, preserve correctness and keep the
+slower path until tests or explicit requirements justify further optimization.
+
+### Navigation workflow for large-file maintenance
+
+For a targeted change, use "entry point -> pipeline -> renderer" navigation:
+
+1. Find CLI boundary:
+   - `main_cli`, `main`
+2. Find model execution path:
+   - `process_image_with_model`
+   - timeout/error handling around generation
+3. Find quality/utility analysis:
+   - `analyze_generation_text`
+   - `compute_cataloging_utility`
+   - `analyze_model_issues`
+4. Find output surfaces:
+   - `generate_html_report`, `generate_markdown_report`
+   - `log_summary`, diagnostics/history writers
+
+Recommended search commands:
+
+```bash
+rg -n "def main_cli|def process_image_with_model|def analyze_generation_text|def generate_html_report|def log_summary" src/check_models.py
+rg -n "TypedDict|dataclass|type .*Record" src/check_models.py
+rg -n "SUMMARY|diagnostics|history|cataloging" src/check_models.py
+```
+
+### Safe cleanup checklist (used for recent reductions)
+
+Before deleting or merging logic:
+
+1. Verify callsites are zero or equivalent:
+   - `rg -n "function_name\(" src/check_models.py src/tests`
+2. Keep lint strictness unchanged:
+   - no new blanket suppressions (`noqa`, `type: ignore`, `pyright: ignore`)
+3. Validate on focused scope first:
+   - `ruff check`
+   - `mypy`
+   - targeted pytest files for touched behavior
+4. Validate full quality gate when environment permits:
+   - `make quality`
+
+This project prefers explicit behavior-preserving cleanup over stylistic
+rewrites. When in doubt, keep the simpler control flow with fewer moving parts.
 
 ## Comments & Documentation
 

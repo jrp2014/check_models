@@ -68,6 +68,13 @@ Notable changes to this project will be documented in this file.
   raw message text heuristics, improving cross-model bucketing stability.
 - JSONL result rows now include `failure_phase`, `error_code`, and
   `error_signature` fields (metadata format version bumped to `1.2`).
+- Reduced `check_models.py` redundancy in model-issue summarization by removing
+  dead `context_ignored` summary output paths and consolidating quality/delta
+  bucketing flow while preserving report/log semantics.
+- Added maintainer-oriented monolith guidance to
+  `docs/IMPLEMENTATION_GUIDE.md` describing refactor order, correctness-vs-
+  performance boundaries, and practical navigation/checklist steps for
+  `check_models.py`.
 
 ### Fixed
 
