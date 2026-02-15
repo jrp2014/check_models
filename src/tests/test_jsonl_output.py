@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, cast
 
 from check_models import (
+    JsonlMetadataRecord,
+    JsonlResultRecord,
     PerformanceResult,
     _history_path_for_jsonl,
     _load_latest_history_record,
@@ -21,11 +23,11 @@ if TYPE_CHECKING:
     from check_models import HistoryModelResultRecord, HistoryRunRecord
 
 
-def _read_jsonl(path: Path) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+def _read_jsonl(path: Path) -> tuple[JsonlMetadataRecord, list[JsonlResultRecord]]:
     """Read JSONL file returning (metadata_header, result_rows)."""
     lines = path.read_text().strip().split("\n")
-    header: dict[str, Any] = json.loads(lines[0])
-    results: list[dict[str, Any]] = [json.loads(line) for line in lines[1:]]
+    header = cast("JsonlMetadataRecord", json.loads(lines[0]))
+    results = [cast("JsonlResultRecord", json.loads(line)) for line in lines[1:]]
     return header, results
 
 
@@ -113,8 +115,9 @@ def test_save_jsonl_report_content(tmp_path: Path) -> None:
     assert data["failure_phase"] is None
     assert data["error_code"] is None
     assert data["error_signature"] is None
-    assert data["metrics"]["generation_tps"] == 5.0
-    assert data["metrics"]["prompt_tokens"] == 10
+    metrics = data["metrics"]
+    assert metrics.get("generation_tps") == 5.0
+    assert metrics.get("prompt_tokens") == 10
 
 
 def test_save_jsonl_report_no_generation(tmp_path: Path) -> None:
@@ -461,7 +464,8 @@ def test_load_latest_history_record_corrupted_lines(tmp_path: Path) -> None:
     record = _load_latest_history_record(history)
     assert record is not None
     assert record.get("_type") == "run"
-    model_results = cast("dict[str, HistoryModelResultRecord]", record.get("model_results", {}))
+    assert "model_results" in record
+    model_results = record["model_results"]
     assert model_results["m"]["success"] is True
 
 

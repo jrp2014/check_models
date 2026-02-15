@@ -10,7 +10,10 @@ from unittest.mock import patch
 
 from check_models import (
     FileSafeFormatter,
+    HistoryModelResultRecord,
+    HistoryRunRecord,
     PerformanceResult,
+    _log_history_comparison,
     finalize_execution,
     log_summary,
     print_model_result,
@@ -65,6 +68,36 @@ def _build_perf() -> PerformanceResult:
     )
 
 
+def _history_run_record(
+    outcomes: dict[str, bool],
+    *,
+    prompt_hash: str = "abc123456789",
+    image_path: str | None = "/Users/test/images/test.jpg",
+    library_versions: dict[str, str | None] | None = None,
+) -> HistoryRunRecord:
+    """Create typed history run records for _log_history_comparison tests."""
+    model_results: dict[str, HistoryModelResultRecord] = {}
+    for model_name, success in outcomes.items():
+        model_results[model_name] = {
+            "success": success,
+            "error_stage": None if success else "Model Error",
+            "error_type": None if success else "RuntimeError",
+            "error_package": None if success else "mlx-vlm",
+        }
+
+    return {
+        "_type": "run",
+        "format_version": "1.0",
+        "timestamp": "2026-02-15 00:00:00 GMT",
+        "prompt_hash": prompt_hash,
+        "prompt_preview": "Describe this image.",
+        "image_path": image_path,
+        "model_results": model_results,
+        "system": {"OS": "macOS"},
+        "library_versions": library_versions or {"mlx": "0.27.0", "mlx-vlm": "0.4.0"},
+    }
+
+
 def test_metrics_mode_compact_smoke(caplog: pytest.LogCaptureFixture) -> None:
     """Compact mode should emit Timing and Tokens lines."""
     caplog.set_level(logging.INFO)
@@ -116,6 +149,121 @@ def test_log_summary_uses_model_load_time_for_fastest_load(
     assert any(
         "Fastest load: model/fast-load (0.50s)" in record.message for record in caplog.records
     )
+
+
+def test_log_summary_emits_comparison_table_and_ascii_charts(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Summary should include tabulated model comparison and compact metric charts."""
+    caplog.set_level(logging.INFO)
+    results = [
+        PerformanceResult(
+            model_name="org/model-a",
+            generation=_StubGeneration(generation_tps=35.0, peak_memory=1.2, text="clean output"),
+            success=True,
+            generation_time=1.0,
+            model_load_time=0.4,
+            total_time=1.4,
+        ),
+        PerformanceResult(
+            model_name="org/model-b",
+            generation=_StubGeneration(generation_tps=20.0, peak_memory=1.5, text="clean output"),
+            success=True,
+            generation_time=1.3,
+            model_load_time=0.7,
+            total_time=2.0,
+        ),
+        PerformanceResult(
+            model_name="org/model-c",
+            generation=None,
+            success=False,
+            error_stage="Generation Error",
+            error_message="timeout",
+            generation_time=0.5,
+            model_load_time=0.2,
+            total_time=0.7,
+        ),
+    ]
+
+    log_summary(results, prompt="Describe this image.")
+
+    messages = "\n".join(record.message for record in caplog.records)
+    assert "Model Comparison (current run):" in messages
+    assert "| #   | Model" in messages
+    assert "TPS comparison chart:" in messages
+    assert "Efficiency chart (higher is faster overall):" in messages
+    assert "Failure stage frequency:" in messages
+
+
+def test_log_summary_single_model_omits_efficiency_chart(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Single-model runs should still show comparison table without cross-model efficiency chart."""
+    caplog.set_level(logging.INFO)
+    result = PerformanceResult(
+        model_name="org/single-model",
+        generation=_StubGeneration(generation_tps=15.0, peak_memory=1.1, text="good output"),
+        success=True,
+        generation_time=1.0,
+        model_load_time=0.5,
+        total_time=1.5,
+    )
+
+    log_summary([result], prompt="Describe this image.")
+
+    messages = "\n".join(record.message for record in caplog.records)
+    assert "Model Comparison (current run):" in messages
+    assert "TPS comparison chart:" in messages
+    assert "Efficiency chart (higher is faster overall):" not in messages
+
+
+def test_log_history_comparison_emits_tables_and_transition_chart(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """History comparison should show run-over-run tables plus transition chart/details."""
+    caplog.set_level(logging.INFO)
+    previous = _history_run_record(
+        {"org/model-a": True, "org/model-b": False, "org/model-old": True},
+        prompt_hash="1111222233334444",
+        image_path="/Users/test/images/previous.jpg",
+        library_versions={"mlx": "0.26.0", "mlx-vlm": "0.3.0"},
+    )
+    current = _history_run_record(
+        {"org/model-a": False, "org/model-b": True, "org/model-new": False},
+        prompt_hash="aaaa222233334444",
+        image_path="/Users/test/images/current.jpg",
+        library_versions={"mlx": "0.27.0", "mlx-vlm": "0.4.0"},
+    )
+
+    _log_history_comparison(previous, current)
+
+    messages = "\n".join(record.message for record in caplog.records)
+    assert "Run-over-run comparison:" in messages
+    assert "| Metric" in messages
+    assert "Comparison context:" in messages
+    assert "Status transition counts:" in messages
+    assert "Detailed model transitions:" in messages
+    assert "Prompt differs from previous run" in messages
+    assert "Image path differs from previous run" in messages
+    assert "Regression" in messages
+    assert "Recovery" in messages
+
+
+def test_log_history_comparison_baseline_emits_current_status_chart(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Baseline history should render table/context and current status chart without transitions."""
+    caplog.set_level(logging.INFO)
+    current = _history_run_record({"org/single": True})
+
+    _log_history_comparison(None, current)
+
+    messages = "\n".join(record.message for record in caplog.records)
+    assert "No prior history run available. Baseline created." in messages
+    assert "Run-over-run comparison:" in messages
+    assert "Comparison context:" in messages
+    assert "Current run status counts:" in messages
+    assert "Detailed model transitions:" not in messages
 
 
 def test_print_model_stats_excludes_output_column(caplog: pytest.LogCaptureFixture) -> None:

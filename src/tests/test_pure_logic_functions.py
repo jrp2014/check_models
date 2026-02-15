@@ -509,7 +509,7 @@ class TestPreflightDependencyDiagnostics:
         class _FakeDistribution:
             def __init__(self, base_dir: Path) -> None:
                 self.base_dir = base_dir
-                self.files = []
+                self.files: list[object] = []
 
             def locate_file(self, file_ref: object) -> Path:
                 return self.base_dir / str(file_ref)

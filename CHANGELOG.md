@@ -9,6 +9,12 @@ Notable changes to this project will be documented in this file.
 - New preflight package-risk diagnostics in `check_models.py` to surface common
   upstream compatibility issues early (MLX/MLX-VLM/MLX-LM/Transformers version
   mismatches and known problematic package states).
+- End-of-run model comparison summary in `check_models.log` now includes a
+  compact per-model table plus ASCII charts (TPS, overall efficiency, failure
+  stage frequency) to make same-run model triage faster.
+- History comparison output now includes run-over-run tabular deltas and
+  transition-oriented ASCII charts to highlight regressions/recoveries/new or
+  missing models across successive runs.
 - Additional diagnostics stack-signal and long-context-breakdown analysis
   sections to better triage quality and failure patterns.
 - Phase-aware failure attribution in model execution (`import`, `model_load`,
@@ -56,6 +62,8 @@ Notable changes to this project will be documented in this file.
   and surface those warnings in the priority summary.
 - Refactored portions of `check_models.py` for readability/maintainability
   without intended behavioral change.
+- Tightened report/summary typing with explicit TypedDict/type-alias structures
+  for model issue summaries and aggregate performance statistics.
 - Failure clustering in diagnostics now keys off canonical signatures instead of
   raw message text heuristics, improving cross-model bucketing stability.
 - JSONL result rows now include `failure_phase`, `error_code`, and
@@ -66,6 +74,9 @@ Notable changes to this project will be documented in this file.
 - Fixed CI regression where runtime dependency hard-fail masked CLI argument and
   folder validation tests by firing too early in startup.
 - Fixed diagnostics markdown formatting/lint edge cases in generated reports.
+- Fixed `reportTypedDictNotRequiredAccess` lint failures by replacing direct
+  optional-key TypedDict indexing with safe `.get(..., default)` patterns in
+  summary formatters and JSONL tests.
 - Removed weak/avoidable lint suppressions by:
   - replacing shell word-splitting patterns with array-safe handling in quality
     and hook scripts;

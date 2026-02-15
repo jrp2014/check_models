@@ -702,6 +702,53 @@ class JsonlResultRecord(TypedDict):
     quality_analysis: NotRequired[JsonlQualityAnalysisRecord]
 
 
+type FailedModelIssue = tuple[str, str | None, str | None]
+type RepetitiveModelIssue = tuple[str, str | None]
+type HallucinationModelIssue = tuple[str, list[str]]
+type VerboseModelIssue = tuple[str, int]
+type FormattingModelIssue = tuple[str, list[str]]
+type ExcessiveBulletsIssue = tuple[str, int]
+type LowUtilityModelIssue = tuple[str, float, str, str]
+type ModelScoreGrade = tuple[str, float, str]
+
+
+class ModelIssueSummary(TypedDict, total=False):
+    """Aggregated per-run model issue summary used in HTML/Markdown reports."""
+
+    total_models: int
+    failed_models: list[FailedModelIssue]
+    context_ignored: list[str]
+    repetitive_models: list[RepetitiveModelIssue]
+    hallucination_models: list[HallucinationModelIssue]
+    verbose_models: list[VerboseModelIssue]
+    formatting_issues: list[FormattingModelIssue]
+    excessive_bullets: list[ExcessiveBulletsIssue]
+    cataloging_grades: dict[str, list[str]]
+    cataloging_best: ModelScoreGrade | None
+    cataloging_worst: ModelScoreGrade | None
+    cataloging_avg_score: float
+    low_utility_models: list[LowUtilityModelIssue]
+    fastest_model: tuple[str, float]
+    most_efficient_model: tuple[str, float]
+    fastest_load_model: tuple[str, float]
+    average_tps: float
+    successful_count: int
+    total_peak_memory: float
+    average_peak_memory: float
+    memory_efficiency: float
+
+
+class NumericFieldStats(TypedDict):
+    """Simple numeric aggregate stats for one metric field."""
+
+    min: float
+    max: float
+    avg: float
+
+
+type PerformanceStats = dict[str, NumericFieldStats]
+
+
 @dataclass(frozen=True)
 class DiagnosticsHistoryInputs:
     """Optional history inputs for diagnostics report generation."""
@@ -1488,6 +1535,11 @@ MAX_OUTPUT_LINES: Final[int] = 3  # Max lines to show in summary table cells
 MAX_OUTPUT_PREVIEW_CHARS: Final[int] = 280  # Max chars for output previews in summary tables
 MAX_CAPTURED_OUTPUT_LOG_CHARS: Final[int] = 1200  # Max chars of captured stdout/stderr in logs
 MAX_TRIAGE_MODELS: Final[int] = 5  # Max model rows shown in triage subsections
+SUMMARY_CHART_WIDTH: Final[int] = 24  # Character width for compact ASCII summary bars
+SUMMARY_MODEL_LABEL_MAX: Final[int] = 32  # Max model label length in summary tables/charts
+SUMMARY_CHART_MAX_ROWS: Final[int] = 8  # Max rows shown in summary charts
+MIN_MODELS_FOR_EFFICIENCY_CHART: Final[int] = 2  # Min successful rows for cross-model efficiency
+FLOAT_ZERO_EPSILON: Final[float] = 1e-9  # Tolerance when rendering signed deltas as zero
 
 # Numeric fields are automatically derived from FIELD_ABBREVIATIONS for consistency
 # Exclude non-numeric fields explicitly
@@ -5286,14 +5338,14 @@ def _wrap_output_column_in_details(html_table: str, output_col_idx: int) -> str:
 def analyze_model_issues(
     results: list[PerformanceResult],
     context: str | None = None,
-) -> dict[str, Any]:
+) -> ModelIssueSummary:
     """Analyze results to identify common model issues and calculate performance highlights.
 
     Args:
         results: List of model performance results
         context: Optional context string (from prompt) for cataloging utility analysis
     """
-    summary: dict[str, Any] = {
+    summary: ModelIssueSummary = {
         "total_models": len(results),
         "failed_models": [],
         "repetitive_models": [],
@@ -5422,13 +5474,13 @@ def analyze_model_issues(
     return summary
 
 
-def compute_performance_statistics(results: list[PerformanceResult]) -> dict[str, Any]:
+def compute_performance_statistics(results: list[PerformanceResult]) -> PerformanceStats:
     """Compute performance statistics (min, max, avg) for successful runs.
 
     Uses single-pass aggregation to build stats for all fields at once
     reducing overhead from repeated filtering and type conversions.
     """
-    stats: dict[str, Any] = {}
+    stats: PerformanceStats = {}
     successful_results = [r for r in results if r.success and r.generation]
     if not successful_results:
         return stats
@@ -5466,7 +5518,7 @@ def compute_performance_statistics(results: list[PerformanceResult]) -> dict[str
     return stats
 
 
-def _format_top_performers_html(summary: dict[str, Any]) -> list[str]:
+def _format_top_performers_html(summary: ModelIssueSummary) -> list[str]:
     parts = []
 
     # Performance Highlights
@@ -5528,69 +5580,63 @@ def _format_top_performers_html(summary: dict[str, Any]) -> list[str]:
     return parts
 
 
-def _format_quality_issues_html(summary: dict[str, Any]) -> list[str]:
+def _format_quality_issues_html(summary: ModelIssueSummary) -> list[str]:
     quality_parts = []
 
-    if summary.get("failed_models"):
+    failed_models = summary.get("failed_models", [])
+    if failed_models:
         quality_parts.append(
-            f"<li><b class='metric-bad'>❌ Failed Models "
-            f"({len(summary['failed_models'])}):</b><ul>",
+            f"<li><b class='metric-bad'>❌ Failed Models ({len(failed_models)}):</b><ul>",
         )
         quality_parts.extend(
             [
-                f"<li><code>{html.escape(model)}</code> ({html.escape(stage)})</li>"
-                for model, stage, _ in summary["failed_models"]
+                f"<li><code>{html.escape(model)}</code> ({html.escape(stage or 'Unknown')})</li>"
+                for model, stage, _ in failed_models
             ],
         )
         quality_parts.append("</ul></li>")
 
-    if summary.get("context_ignored"):
+    context_ignored = summary.get("context_ignored", [])
+    if context_ignored:
         quality_parts.append(
-            f"<li><b class='metric-warn'>⚠️ Context Ignored "
-            f"({len(summary['context_ignored'])}):</b><ul>",
+            f"<li><b class='metric-warn'>⚠️ Context Ignored ({len(context_ignored)}):</b><ul>",
         )
         quality_parts.extend(
-            [f"<li><code>{html.escape(model)}</code></li>" for model in summary["context_ignored"]],
+            [f"<li><code>{html.escape(model)}</code></li>" for model in context_ignored],
         )
         quality_parts.append("</ul></li>")
 
-    if summary.get("repetitive_models"):
+    repetitive_models = summary.get("repetitive_models", [])
+    if repetitive_models:
         quality_parts.append(
-            f"<li><b class='metric-warn'>🔄 Repetitive Output "
-            f"({len(summary['repetitive_models'])}):</b><ul>",
+            f"<li><b class='metric-warn'>🔄 Repetitive Output ({len(repetitive_models)}):</b><ul>",
         )
         quality_parts.extend(
             [
                 f"<li><code>{html.escape(model)}</code> "
-                f"(token: <code>{html.escape(token)}</code>)</li>"
-                for model, token in summary["repetitive_models"]
+                f"(token: <code>{html.escape(token or '?')}</code>)</li>"
+                for model, token in repetitive_models
             ],
         )
         quality_parts.append("</ul></li>")
 
-    if summary.get("hallucination_models"):
+    hallucination_models = summary.get("hallucination_models", [])
+    if hallucination_models:
         quality_parts.append(
-            f"<li><b class='metric-warn'>👻 Hallucinations "
-            f"({len(summary['hallucination_models'])}):</b><ul>",
+            f"<li><b class='metric-warn'>👻 Hallucinations ({len(hallucination_models)}):</b><ul>",
         )
         quality_parts.extend(
-            [
-                f"<li><code>{html.escape(model)}</code></li>"
-                for model, _ in summary["hallucination_models"]
-            ],
+            [f"<li><code>{html.escape(model)}</code></li>" for model, _ in hallucination_models],
         )
         quality_parts.append("</ul></li>")
 
-    if summary.get("formatting_issues"):
+    formatting_issues = summary.get("formatting_issues", [])
+    if formatting_issues:
         quality_parts.append(
-            f"<li><b class='metric-warn'>📝 Formatting Issues "
-            f"({len(summary['formatting_issues'])}):</b><ul>",
+            f"<li><b class='metric-warn'>📝 Formatting Issues ({len(formatting_issues)}):</b><ul>",
         )
         quality_parts.extend(
-            [
-                f"<li><code>{html.escape(model)}</code></li>"
-                for model, _ in summary["formatting_issues"]
-            ],
+            [f"<li><code>{html.escape(model)}</code></li>" for model, _ in formatting_issues],
         )
         quality_parts.append("</ul></li>")
 
@@ -5603,7 +5649,7 @@ def _format_quality_issues_html(summary: dict[str, Any]) -> list[str]:
     return parts
 
 
-def _format_cataloging_summary_html(summary: dict[str, Any]) -> list[str]:
+def _format_cataloging_summary_html(summary: ModelIssueSummary) -> list[str]:
     """Format cataloging utility summary as HTML."""
     parts: list[str] = []
 
@@ -5632,15 +5678,17 @@ def _format_cataloging_summary_html(summary: dict[str, Any]) -> list[str]:
 
     # Best and worst performers
     parts.append("<ul>")
-    if summary.get("cataloging_best"):
-        model, score, grade = summary["cataloging_best"]
+    best_entry = summary.get("cataloging_best")
+    if best_entry is not None:
+        model, score, grade = best_entry
         emoji = GRADE_EMOJIS.get(grade, "")
         parts.append(
             f"<li><b>Best for cataloging:</b> <code>{html.escape(model)}</code> "
             f"({emoji} {grade}, {score:.0f}/100)</li>",
         )
-    if summary.get("cataloging_worst"):
-        model, score, grade = summary["cataloging_worst"]
+    worst_entry = summary.get("cataloging_worst")
+    if worst_entry is not None:
+        model, score, grade = worst_entry
         emoji = GRADE_EMOJIS.get(grade, "")
         parts.append(
             f"<li><b>Worst for cataloging:</b> <code>{html.escape(model)}</code> "
@@ -5667,7 +5715,7 @@ def _format_cataloging_summary_html(summary: dict[str, Any]) -> list[str]:
     return parts
 
 
-def _format_cataloging_summary_text(summary: dict[str, Any]) -> list[str]:
+def _format_cataloging_summary_text(summary: ModelIssueSummary) -> list[str]:
     """Format cataloging utility summary as Markdown text."""
     parts: list[str] = []
 
@@ -5698,12 +5746,14 @@ def _format_cataloging_summary_text(summary: dict[str, Any]) -> list[str]:
         parts.append("")
 
     # Best and worst performers
-    if summary.get("cataloging_best"):
-        model, score, grade = summary["cataloging_best"]
+    best_entry = summary.get("cataloging_best")
+    if best_entry is not None:
+        model, score, grade = best_entry
         emoji = GRADE_EMOJIS.get(grade, "")
         parts.append(f"- **Best for cataloging:** `{model}` ({emoji} {grade}, {score:.0f}/100)")
-    if summary.get("cataloging_worst"):
-        model, score, grade = summary["cataloging_worst"]
+    worst_entry = summary.get("cataloging_worst")
+    if worst_entry is not None:
+        model, score, grade = worst_entry
         emoji = GRADE_EMOJIS.get(grade, "")
         parts.append(f"- **Worst for cataloging:** `{model}` ({emoji} {grade}, {score:.0f}/100)")
     parts.append("")
@@ -5721,7 +5771,7 @@ def _format_cataloging_summary_text(summary: dict[str, Any]) -> list[str]:
     return parts
 
 
-def format_issues_summary_html(summary: dict[str, Any], stats: dict[str, Any]) -> str:
+def format_issues_summary_html(summary: ModelIssueSummary, stats: PerformanceStats) -> str:
     """Format the issues and statistics summary as an HTML string."""
     parts = []
     parts.extend(_format_top_performers_html(summary))
@@ -5743,7 +5793,7 @@ def format_issues_summary_html(summary: dict[str, Any], stats: dict[str, Any]) -
     return "".join(parts)
 
 
-def _format_top_performers_text(summary: dict[str, Any]) -> list[str]:
+def _format_top_performers_text(summary: ModelIssueSummary) -> list[str]:
     parts = []
 
     # Performance Highlights
@@ -7292,40 +7342,46 @@ def generate_diagnostics_report(
         return True
 
 
-def _format_quality_issues_text(summary: dict[str, Any]) -> list[str]:
+def _format_quality_issues_text(summary: ModelIssueSummary) -> list[str]:
     parts = []
     quality_parts = []
 
-    if summary.get("failed_models"):
-        quality_parts.append(f"- **❌ Failed Models ({len(summary['failed_models'])}):**")
-        for model, stage, _ in summary["failed_models"]:
-            quality_parts.append(f"  - `{model}` (`{stage}`)")
+    failed_models = summary.get("failed_models", [])
+    if failed_models:
+        quality_parts.append(f"- **❌ Failed Models ({len(failed_models)}):**")
+        for model, stage, _ in failed_models:
+            stage_text = stage or "Unknown"
+            quality_parts.append(f"  - `{model}` (`{stage_text}`)")
 
-    if summary.get("context_ignored"):
-        quality_parts.append(f"- **⚠️ Context Ignored ({len(summary['context_ignored'])}):**")
-        quality_parts.extend([f"  - `{model}`" for model in summary["context_ignored"]])
+    context_ignored = summary.get("context_ignored", [])
+    if context_ignored:
+        quality_parts.append(f"- **⚠️ Context Ignored ({len(context_ignored)}):**")
+        quality_parts.extend([f"  - `{model}`" for model in context_ignored])
 
-    if summary.get("repetitive_models"):
+    repetitive_models = summary.get("repetitive_models", [])
+    if repetitive_models:
         quality_parts.append(
-            f"- **🔄 Repetitive Output ({len(summary['repetitive_models'])}):**",
+            f"- **🔄 Repetitive Output ({len(repetitive_models)}):**",
         )
-        for model, token in summary["repetitive_models"]:
+        for model, token in repetitive_models:
             quality_parts.append(f"  - `{model}` (token: `{token}`)")
 
-    if summary.get("hallucination_models"):
+    hallucination_models = summary.get("hallucination_models", [])
+    if hallucination_models:
         quality_parts.append(
-            f"- **👻 Hallucinations ({len(summary['hallucination_models'])}):**",
+            f"- **👻 Hallucinations ({len(hallucination_models)}):**",
         )
         quality_parts.extend(
-            [f"  - `{model}`" for model, _ in summary["hallucination_models"]],
+            [f"  - `{model}`" for model, _ in hallucination_models],
         )
 
-    if summary.get("formatting_issues"):
+    formatting_issues = summary.get("formatting_issues", [])
+    if formatting_issues:
         quality_parts.append(
-            f"- **📝 Formatting Issues ({len(summary['formatting_issues'])}):**",
+            f"- **📝 Formatting Issues ({len(formatting_issues)}):**",
         )
         quality_parts.extend(
-            [f"  - `{model}`" for model, _ in summary["formatting_issues"]],
+            [f"  - `{model}`" for model, _ in formatting_issues],
         )
 
     if quality_parts:
@@ -7337,7 +7393,7 @@ def _format_quality_issues_text(summary: dict[str, Any]) -> list[str]:
     return parts
 
 
-def format_issues_summary_text(summary: dict[str, Any], stats: dict[str, Any]) -> str:
+def format_issues_summary_text(summary: ModelIssueSummary, stats: PerformanceStats) -> str:
     """Format the issues and statistics summary as a Markdown string."""
     parts = []
 
@@ -10977,6 +11033,141 @@ def _format_counter_items(counter: Counter[str], *, max_items: int = 6) -> str:
 UtilityTriageRow = tuple[PerformanceResult, float, str, str, frozenset[str]]
 
 
+def _short_model_label(model_name: str, *, max_len: int = SUMMARY_MODEL_LABEL_MAX) -> str:
+    """Return a compact model label suitable for narrow summary tables/charts."""
+    label = model_name.rsplit("/", maxsplit=1)[-1]
+    if len(label) <= max_len:
+        return label
+    return label[: max_len - 3] + "..."
+
+
+def _format_float_or_dash(value: float | None, *, digits: int = 2) -> str:
+    """Format a float value with fixed precision, or ``-`` when missing."""
+    if value is None:
+        return "-"
+    return f"{value:.{digits}f}"
+
+
+def _ascii_bar(value: float, *, max_value: float, width: int = SUMMARY_CHART_WIDTH) -> str:
+    """Render a compact ASCII bar for a positive numeric value."""
+    if max_value <= 0 or value <= 0:
+        return "." * width
+    filled = max(1, round((value / max_value) * width))
+    filled = min(width, filled)
+    return "#" * filled + "." * (width - filled)
+
+
+def _log_ascii_metric_chart(
+    title: str,
+    entries: Sequence[tuple[str, float]],
+    *,
+    unit: str = "",
+    digits: int = 2,
+    max_rows: int = SUMMARY_CHART_MAX_ROWS,
+) -> None:
+    """Log a compact ASCII chart for ranked model metrics."""
+    if not entries:
+        return
+    ranked = sorted(entries, key=lambda item: item[1], reverse=True)[:max_rows]
+    max_value = max(value for _label, value in ranked)
+    if max_value <= 0:
+        return
+
+    logger.info("%s", title)
+    for label, value in ranked:
+        bar = _ascii_bar(value, max_value=max_value)
+        logger.info(
+            "   %-*s |%s| %s%s",
+            SUMMARY_MODEL_LABEL_MAX,
+            _short_model_label(label),
+            bar,
+            _format_float_or_dash(value, digits=digits),
+            unit,
+        )
+
+
+def _log_model_comparison_table_and_charts(results: list[PerformanceResult]) -> None:
+    """Log tabulated per-model comparison and compact ASCII charts for this run."""
+    if not results:
+        return
+
+    def _sort_key(result: PerformanceResult) -> tuple[int, float, str]:
+        tps = float(getattr(result.generation, "generation_tps", 0.0) or 0.0)
+        return (0 if result.success else 1, -tps, result.model_name)
+
+    sorted_results = sorted(results, key=_sort_key)
+    rows: list[list[str]] = []
+    tps_entries: list[tuple[str, float]] = []
+    total_time_entries: list[tuple[str, float]] = []
+
+    for idx, res in enumerate(sorted_results, start=1):
+        model_label = _short_model_label(res.model_name)
+        if res.success and res.generation is not None:
+            tps = float(getattr(res.generation, "generation_tps", 0.0) or 0.0)
+            peak_mem = float(getattr(res.generation, "peak_memory", 0.0) or 0.0)
+            notes = _truncate_quality_issues(res.quality_issues, max_len=34) or "clean"
+            rows.append(
+                [
+                    str(idx),
+                    model_label,
+                    "OK",
+                    _format_float_or_dash(tps, digits=1),
+                    _format_float_or_dash(res.total_time, digits=2),
+                    _format_float_or_dash(res.model_load_time, digits=2),
+                    _format_float_or_dash(peak_mem if peak_mem > 0 else None, digits=2),
+                    notes,
+                ],
+            )
+            if tps > 0:
+                tps_entries.append((res.model_name, tps))
+            if res.total_time is not None and res.total_time > 0:
+                total_time_entries.append((res.model_name, res.total_time))
+        else:
+            error_note = res.error_code or res.error_stage or res.error_message or "failure"
+            error_note = _truncate_text_preview(error_note, max_chars=34)
+            rows.append(
+                [
+                    str(idx),
+                    model_label,
+                    "FAIL",
+                    "-",
+                    _format_float_or_dash(res.total_time, digits=2),
+                    _format_float_or_dash(res.model_load_time, digits=2),
+                    "-",
+                    error_note,
+                ],
+            )
+
+    headers = ["#", "Model", "Status", "TPS", "Total(s)", "Load(s)", "PeakGB", "Notes"]
+    table_text = tabulate(rows, headers=headers, tablefmt="github", disable_numparse=True)
+    logger.info("📋 Model Comparison (current run):")
+    for line in table_text.splitlines():
+        logger.info("   %s", line)
+
+    if tps_entries:
+        log_blank()
+        _log_ascii_metric_chart("📊 TPS comparison chart:", tps_entries, unit=" tps", digits=1)
+    if len(total_time_entries) >= MIN_MODELS_FOR_EFFICIENCY_CHART:
+        inverted = [(name, 1.0 / value) for name, value in total_time_entries if value > 0]
+        if inverted:
+            _log_ascii_metric_chart(
+                "⏱ Efficiency chart (higher is faster overall):",
+                inverted,
+                unit=" 1/s",
+                digits=3,
+            )
+
+    failed = [res for res in sorted_results if not res.success]
+    if failed:
+        stage_counts = Counter(res.error_stage or "Unknown" for res in failed)
+        _log_ascii_metric_chart(
+            "❌ Failure stage frequency:",
+            [(stage, float(count)) for stage, count in stage_counts.items()],
+            unit=" x",
+            digits=0,
+        )
+
+
 def _log_performance_highlights(successful: list[PerformanceResult]) -> None:
     """Log speed and memory highlights for successful runs."""
     logger.info("🏆 Performance Highlights:")
@@ -11225,6 +11416,9 @@ def log_summary(
     if failed:
         _log_failed_models_summary(failed)
         log_blank()
+
+    _log_model_comparison_table_and_charts(results)
+    log_blank()
 
     if successful:
         _log_successful_models_list(successful)
@@ -11530,6 +11724,274 @@ def _write_report_failure_jsonl(
         logger.exception("Failed to write report failure JSONL to %s", filename)
 
 
+def _history_model_results(record: HistoryRunRecord | None) -> dict[str, HistoryModelResultRecord]:
+    """Return normalized model-results map from a history record."""
+    if record is None:
+        return {}
+    raw = record.get("model_results", {})
+    if not isinstance(raw, dict):
+        return {}
+    return raw
+
+
+def _history_counts(record: HistoryRunRecord | None) -> tuple[int, int, int, float]:
+    """Return (total, success, failed, success_rate_pct) for a history record."""
+    models = _history_model_results(record)
+    total = len(models)
+    success = sum(1 for info in models.values() if info.get("success") is True)
+    failed = sum(1 for info in models.values() if info.get("success") is False)
+    success_rate = (success / total * 100.0) if total else 0.0
+    return total, success, failed, success_rate
+
+
+def _fmt_delta_int(current: int, previous: int | None) -> str:
+    """Format signed integer delta for run-over-run summary tables."""
+    if previous is None:
+        return "-"
+    delta = current - previous
+    return "0" if delta == 0 else f"{delta:+d}"
+
+
+def _fmt_delta_pct(current: float, previous: float | None) -> str:
+    """Format signed percentage-point delta for run-over-run summary tables."""
+    if previous is None:
+        return "-"
+    delta = current - previous
+    return "0.0pp" if abs(delta) < FLOAT_ZERO_EPSILON else f"{delta:+.1f}pp"
+
+
+def _short_hash(value: str | None, *, size: int = 10) -> str:
+    """Return short hash preview for compact context tables."""
+    if not value:
+        return "-"
+    return value[:size]
+
+
+def _format_library_versions_for_history(record: HistoryRunRecord | None) -> str:
+    """Return compact comma-separated library version snapshot for history rows."""
+    if record is None:
+        return "-"
+    versions = record.get("library_versions", {})
+    if not isinstance(versions, dict) or not versions:
+        return "-"
+
+    parts: list[str] = []
+    for name in sorted(versions):
+        version = versions.get(name)
+        if version:
+            parts.append(f"{name}={version}")
+    if not parts:
+        return "-"
+
+    combined = ", ".join(parts)
+    return _truncate_text_preview(combined, max_chars=80)
+
+
+def _model_status_from_history(info: HistoryModelResultRecord | None) -> str:
+    """Render ``OK``/``FAIL``/``-`` for per-model history transition tables."""
+    if info is None:
+        return "-"
+    return "OK" if info.get("success") is True else "FAIL"
+
+
+def _history_summary_for_comparison(
+    previous: HistoryRunRecord | None,
+    current: HistoryRunRecord,
+) -> dict[str, list[str]]:
+    """Return transition summary and log context-change warnings when needed."""
+    if previous is None:
+        return {
+            "regressions": [],
+            "recoveries": [],
+            "new_models": [],
+            "missing_models": [],
+        }
+
+    prev_prompt_hash = previous.get("prompt_hash")
+    curr_prompt_hash = current.get("prompt_hash")
+    if prev_prompt_hash and curr_prompt_hash and prev_prompt_hash != curr_prompt_hash:
+        log_warning_note(
+            "Prompt differs from previous run; regressions/recoveries may be noisy.",
+        )
+    prev_image = previous.get("image_path")
+    curr_image = current.get("image_path")
+    if prev_image and curr_image and prev_image != curr_image:
+        log_warning_note(
+            "Image path differs from previous run; regressions/recoveries may be noisy.",
+        )
+
+    return compare_history_records(previous, current)
+
+
+def _history_summary_rows(
+    *,
+    previous: HistoryRunRecord | None,
+    current: HistoryRunRecord,
+    summary: dict[str, list[str]],
+) -> list[list[str]]:
+    """Build run-over-run summary rows for history comparison output."""
+    regressions = summary["regressions"]
+    recoveries = summary["recoveries"]
+    new_models = summary["new_models"]
+    missing_models = summary["missing_models"]
+
+    prev_total, prev_success, prev_failed, prev_success_rate = _history_counts(previous)
+    curr_total, curr_success, curr_failed, curr_success_rate = _history_counts(current)
+
+    previous_values: tuple[str, str, str, str]
+    if previous is None:
+        previous_values = ("-", "-", "-", "-")
+    else:
+        previous_values = (
+            str(prev_total),
+            str(prev_success),
+            str(prev_failed),
+            f"{prev_success_rate:.1f}%",
+        )
+
+    return [
+        [
+            "Models tested",
+            previous_values[0],
+            str(curr_total),
+            _fmt_delta_int(curr_total, prev_total if previous is not None else None),
+        ],
+        [
+            "Successful",
+            previous_values[1],
+            str(curr_success),
+            _fmt_delta_int(curr_success, prev_success if previous is not None else None),
+        ],
+        [
+            "Failed",
+            previous_values[2],
+            str(curr_failed),
+            _fmt_delta_int(curr_failed, prev_failed if previous is not None else None),
+        ],
+        [
+            "Success rate",
+            previous_values[3],
+            f"{curr_success_rate:.1f}%",
+            _fmt_delta_pct(curr_success_rate, prev_success_rate if previous is not None else None),
+        ],
+        ["Regressions", "-", str(len(regressions)), "-"],
+        ["Recoveries", "-", str(len(recoveries)), "-"],
+        ["New models", "-", str(len(new_models)), "-"],
+        ["Missing models", "-", str(len(missing_models)), "-"],
+    ]
+
+
+def _history_context_rows(
+    previous: HistoryRunRecord | None,
+    current: HistoryRunRecord,
+) -> list[list[str]]:
+    """Build compact context rows (prompt/image/version) for history comparisons."""
+    previous_image = (
+        _truncate_text_preview(str(previous.get("image_path") or "-"), max_chars=40)
+        if previous is not None
+        else "-"
+    )
+    return [
+        [
+            "Prompt hash",
+            _short_hash(previous.get("prompt_hash") if previous else None),
+            _short_hash(current.get("prompt_hash")),
+        ],
+        [
+            "Image path",
+            previous_image,
+            _truncate_text_preview(str(current.get("image_path") or "-"), max_chars=40),
+        ],
+        [
+            "Library versions",
+            _format_library_versions_for_history(previous),
+            _format_library_versions_for_history(current),
+        ],
+    ]
+
+
+def _log_history_transition_chart(
+    *,
+    summary: dict[str, list[str]],
+    current: HistoryRunRecord,
+) -> None:
+    """Log transition chart (or current status chart when no transitions)."""
+    regressions = summary["regressions"]
+    recoveries = summary["recoveries"]
+    new_models = summary["new_models"]
+    missing_models = summary["missing_models"]
+    transition_entries = [
+        ("regressions", float(len(regressions))),
+        ("recoveries", float(len(recoveries))),
+        ("new", float(len(new_models))),
+        ("missing", float(len(missing_models))),
+    ]
+    if any(value > 0 for _label, value in transition_entries):
+        _log_ascii_metric_chart(
+            "🔁 Status transition counts:",
+            transition_entries,
+            unit=" x",
+            digits=0,
+            max_rows=4,
+        )
+        return
+
+    _total, curr_success, curr_failed, _success_rate = _history_counts(current)
+    _log_ascii_metric_chart(
+        "✅ Current run status counts:",
+        [("success", float(curr_success)), ("failed", float(curr_failed))],
+        unit=" x",
+        digits=0,
+        max_rows=2,
+    )
+
+
+def _history_transition_rows(
+    *,
+    previous: HistoryRunRecord | None,
+    current: HistoryRunRecord,
+    summary: dict[str, list[str]],
+) -> list[list[str]]:
+    """Build per-model transition rows for regressions/recoveries/new/missing models."""
+    regressions = summary["regressions"]
+    recoveries = summary["recoveries"]
+    new_models = summary["new_models"]
+    missing_models = summary["missing_models"]
+    changed_models = sorted({*regressions, *recoveries, *new_models, *missing_models})
+    if not changed_models:
+        return []
+
+    prev_models = _history_model_results(previous)
+    curr_models = _history_model_results(current)
+    transition_rows: list[list[str]] = []
+    for model_name in changed_models:
+        if model_name in regressions:
+            transition = "Regression"
+        elif model_name in recoveries:
+            transition = "Recovery"
+        elif model_name in new_models:
+            transition = "New"
+        elif model_name in missing_models:
+            transition = "Missing"
+        else:
+            transition = "Changed"
+
+        prev_info = prev_models.get(model_name)
+        curr_info = curr_models.get(model_name)
+        stage_source = curr_info if curr_info is not None else prev_info
+        stage_text = stage_source.get("error_stage") if stage_source is not None else None
+        transition_rows.append(
+            [
+                _short_model_label(model_name),
+                transition,
+                _model_status_from_history(prev_info),
+                _model_status_from_history(curr_info),
+                stage_text or "-",
+            ],
+        )
+    return transition_rows
+
+
 def _log_history_comparison(
     previous: HistoryRunRecord | None,
     current: HistoryRunRecord,
@@ -11538,55 +12000,41 @@ def _log_history_comparison(
     print_cli_section("History Comparison")
     if previous is None:
         logger.info("No prior history run available. Baseline created.")
-        summary: dict[str, list[str]] = {
-            "regressions": [],
-            "recoveries": [],
-            "new_models": [],
-            "missing_models": [],
-        }
-    else:
-        prev_prompt_hash = previous.get("prompt_hash")
-        curr_prompt_hash = current.get("prompt_hash")
-        if prev_prompt_hash and curr_prompt_hash and prev_prompt_hash != curr_prompt_hash:
-            log_warning_note(
-                "Prompt differs from previous run; regressions/recoveries may be noisy.",
-            )
-        prev_image = previous.get("image_path")
-        curr_image = current.get("image_path")
-        if prev_image and curr_image and prev_image != curr_image:
-            log_warning_note(
-                "Image path differs from previous run; regressions/recoveries may be noisy.",
-            )
+    summary = _history_summary_for_comparison(previous, current)
+    rows = _history_summary_rows(previous=previous, current=current, summary=summary)
+    summary_table = tabulate(
+        rows,
+        headers=["Metric", "Previous", "Current", "Delta"],
+        tablefmt="github",
+        disable_numparse=True,
+    )
+    logger.info("📚 Run-over-run comparison:")
+    for line in summary_table.splitlines():
+        logger.info("   %s", line)
 
-        summary = compare_history_records(previous, current)
+    context_rows = _history_context_rows(previous, current)
+    context_table = tabulate(
+        context_rows,
+        headers=["Context", "Previous", "Current"],
+        tablefmt="github",
+        disable_numparse=True,
+    )
+    logger.info("🔎 Comparison context:")
+    for line in context_table.splitlines():
+        logger.info("   %s", line)
 
-    regressions = summary["regressions"]
-    recoveries = summary["recoveries"]
-    new_models = summary["new_models"]
-    missing_models = summary["missing_models"]
-
-    if regressions:
-        logger.info(
-            "Regressions (%d): %s",
-            len(regressions),
-            ", ".join(regressions),
+    _log_history_transition_chart(summary=summary, current=current)
+    transition_rows = _history_transition_rows(previous=previous, current=current, summary=summary)
+    if transition_rows:
+        transitions_table = tabulate(
+            transition_rows,
+            headers=["Model", "Transition", "Prev", "Current", "Error Stage"],
+            tablefmt="github",
+            disable_numparse=True,
         )
-    else:
-        logger.info("Regressions: none")
-
-    if recoveries:
-        logger.info(
-            "Recoveries (%d): %s",
-            len(recoveries),
-            ", ".join(recoveries),
-        )
-    else:
-        logger.info("Recoveries: none")
-
-    if new_models:
-        logger.info("New models: %s", ", ".join(new_models))
-    if missing_models:
-        logger.info("Missing models: %s", ", ".join(missing_models))
+        logger.info("🧾 Detailed model transitions:")
+        for line in transitions_table.splitlines():
+            logger.info("   %s", line)
 
 
 def _write_diagnostics_and_repro_artifacts(

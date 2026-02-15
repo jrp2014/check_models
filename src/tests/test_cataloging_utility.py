@@ -7,6 +7,7 @@ import pytest
 from check_models import (
     GRADE_EMOJIS,
     QUALITY,
+    ModelIssueSummary,
     _format_cataloging_summary_html,
     _format_cataloging_summary_text,
     _get_grade_display,
@@ -325,13 +326,13 @@ class TestCatalogingSummaryFormatters:
 
     def test_format_cataloging_summary_html_empty(self) -> None:
         """Empty summary should return empty list."""
-        summary: dict[str, object] = {"cataloging_best": None}
+        summary: ModelIssueSummary = {"cataloging_best": None}
         result = _format_cataloging_summary_html(summary)
         assert result == []
 
     def test_format_cataloging_summary_html_with_data(self) -> None:
         """Summary with data should generate HTML."""
-        summary = {
+        summary: ModelIssueSummary = {
             "cataloging_best": ("model-a", 92.0, "A"),
             "cataloging_worst": ("model-b", 35.0, "D"),
             "cataloging_avg_score": 65.0,
@@ -354,13 +355,13 @@ class TestCatalogingSummaryFormatters:
 
     def test_format_cataloging_summary_text_empty(self) -> None:
         """Empty summary should return empty list."""
-        summary: dict[str, object] = {"cataloging_best": None}
+        summary: ModelIssueSummary = {"cataloging_best": None}
         result = _format_cataloging_summary_text(summary)
         assert result == []
 
     def test_format_cataloging_summary_text_with_data(self) -> None:
         """Summary with data should generate Markdown."""
-        summary = {
+        summary: ModelIssueSummary = {
             "cataloging_best": ("model-a", 92.0, "A"),
             "cataloging_worst": ("model-b", 35.0, "D"),
             "cataloging_avg_score": 65.0,
