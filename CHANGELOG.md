@@ -100,10 +100,14 @@ Notable changes to this project will be documented in this file.
     and hook scripts;
   - replacing unnecessary test `type: ignore` usage with explicit type asserts.
 
-## [0.1.1] - 2026-02-13
+## [0.1.1] - 2026-02-15
 
 ### Changed
 
+- Compressed `src/check_models.py` logic (~45 lines removed) by deduplicating EXIF time extraction, quality-issue formatting, and token-leakage pattern data.
+- Refactored `src/tools/check_outdated.py` to remove redundant string parsing logic and improve table detection.
+- Improved test robustness by replacing flaky `time.sleep()` calls with deterministic `os.utime()` timestamp updates in `conftest.py` and image workflow tests.
+- Reverted CI test skips for missing dependencies; the suite now enforces a hard failure if `mlx-vlm` is missing, ensuring environment integrity.
 - Final run summary now reports configured `--output-log` and `--output-env` paths
   instead of always showing default log file locations.
 - Synced documentation with current CLI behavior and outputs, including:
@@ -113,6 +117,10 @@ Notable changes to this project will be documented in this file.
   contributing docs, and pre-commit hook naming) to match the current CI gate.
 - Improved `src/tools/run_quality_checks.sh` conda initialization by resolving
   the base path via `conda info --base` before fallback probe paths.
+
+### Fixed
+
+- Fixed `check_outdated.py` logic to correctly identify outdated package tables.
 
 ## [0.1.0] - 2026-02-08
 

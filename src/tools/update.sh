@@ -527,3 +527,12 @@ if [[ ${#MISSING_PKGS[@]} -gt 0 ]]; then
 else
 	echo "✓ All critical packages verified (mlx, mlx_lm, mlx_vlm)"
 fi
+
+# Final check for held-back / outdated packages
+echo ""
+echo "[update.sh] Checking for held-back packages (orphaned or constrained)..."
+if [[ -f "$SCRIPT_DIR/check_outdated.py" ]]; then
+	python "$SCRIPT_DIR/check_outdated.py" || true
+else
+	echo "⚠️  check_outdated.py not found at $SCRIPT_DIR/check_outdated.py"
+fi

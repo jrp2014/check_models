@@ -20,21 +20,22 @@ def main() -> int:
         return 1
 
     output = result.stdout.strip()
-    if output and not output.startswith("Package"):
-        # Header line present but no packages listed
-        print("✓ All packages up to date")
-        return 0
 
-    if "Package" in output:
-        # Has header and packages
-        lines = output.split("\n")
-        # Header + separator + at least one package = 3 lines minimum
-        min_lines_with_packages = 3
-        if len(lines) > min_lines_with_packages - 1:
-            print("⚠️  Outdated packages found:\n")
-            print(output)
-            print("\n💡 Run 'make upgrade-deps' to upgrade all dependencies")
-            return 1
+    # If there are outdated packages, pip output will contain a table
+    # checking for at least 3 lines: Header, Separator, and at least one Package
+    min_lines_with_packages = 3
+    if (
+        output
+        and output.startswith("Package")
+        and len(output.splitlines()) >= min_lines_with_packages
+    ):
+        print("⚠️  Outdated packages found (likely held back by constraints or unmanaged):\n")
+        print(output)
+        print("\n💡 These packages were not updated. This usually means they are:")
+        print("   1. Constrained by other dependencies (e.g. huggingface_hub needing fsspec<2026)")
+        print("   2. Not managed by pyproject.toml (installed manually)")
+        print("   3. Pinned in requirements.txt (if using local MLX builds)")
+        return 1
 
     print("✓ All packages up to date")
     return 0
