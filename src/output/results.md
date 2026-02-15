@@ -1,17 +1,17 @@
 # Model Performance Results
 
-_Generated on 2026-02-15 03:27:34 GMT_
+_Generated on 2026-02-15 21:05:42 GMT_
 
 ## 🏆 Performance Highlights
 
-- **Fastest:** `mlx-community/nanoLLaVA-1.5-4bit` (345.5 tps)
+- **Fastest:** `mlx-community/FastVLM-0.5B-bf16` (313.2 tps)
 - **💾 Most efficient:** `mlx-community/FastVLM-0.5B-bf16` (2.2 GB)
-- **⚡ Fastest load:** `mlx-community/nanoLLaVA-1.5-4bit` (0.92s)
-- **📊 Average TPS:** 77.6 across 40 models
+- **⚡ Fastest load:** `mlx-community/LFM2-VL-1.6B-8bit` (0.96s)
+- **📊 Average TPS:** 77.4 across 40 models
 
 ## 📈 Resource Usage
 
-- **Total peak memory:** 707.4 GB
+- **Total peak memory:** 707.3 GB
 - **Average peak memory:** 17.7 GB
 - **Memory efficiency:** 180 tokens/GB
 
@@ -68,11 +68,11 @@ _Generated on 2026-02-15 03:27:34 GMT_
 
 ## 📊 Aggregate Statistics (Successful Runs)
 
-- **Generation Tps**: Avg: 77.6 | Min: 3.86 | Max: 345
+- **Generation Tps**: Avg: 77.4 | Min: 3.91 | Max: 313
 - **Peak Memory**: Avg: 18 | Min: 2.2 | Max: 73
-- **Total Time**: Avg: 21.86s | Min: 2.46s | Max: 115.13s
-- **Generation Time**: Avg: 18.83s | Min: 0.80s | Max: 113.88s
-- **Model Load Time**: Avg: 3.03s | Min: 0.92s | Max: 12.89s
+- **Total Time**: Avg: 21.05s | Min: 2.60s | Max: 113.00s
+- **Generation Time**: Avg: 18.04s | Min: 0.80s | Max: 111.76s
+- **Model Load Time**: Avg: 3.01s | Min: 0.96s | Max: 11.97s
 
 ## 🚨 Failures by Package (Actionable)
 
@@ -135,7 +135,7 @@ language_model.lm_head.weight.`
 
 **Note:** Results sorted: errors first, then by generation time (fastest to slowest).
 
-**Overall runtime:** 917.55s
+**Overall runtime:** 886.75s
 
 <!-- markdownlint-disable MD013 MD033 MD034 MD037 MD049 -->
 
@@ -145,46 +145,46 @@ language_model.lm_head.weight.`
 | `mlx-community/X-Reasoner-7B-8bit`                      |         |                   |                       |                |              |           |             |                  |            |             |                                   |             mlx |
 | `mlx-community/deepseek-vl2-8bit`                       |         |                   |                       |                |              |           |             |                  |            |             |                                   |    model-config |
 | `prince-canuma/Florence-2-large-ft`                     |         |                   |                       |                |              |           |             |                  |            |             |                                   |         mlx-vlm |
-| `mlx-community/gemma-3n-E2B-4bit`                       |       1 |               572 |                     2 |            574 |        1,230 |      73.0 |         6.0 |            0.80s |      3.18s |       3.98s | ⚠️harness(prompt_template), ...   |                 |
-| `mlx-community/nanoLLaVA-1.5-4bit`                      | 151,645 |               326 |                   324 |            650 |        1,688 |       345 |         2.4 |            1.54s |      0.92s |       2.46s |                                   |                 |
-| `mlx-community/FastVLM-0.5B-bf16`                       | 151,645 |               330 |                   198 |            528 |        2,254 |       309 |         2.2 |            1.60s |      1.00s |       2.60s |                                   |                 |
-| `mlx-community/SmolVLM-Instruct-bf16`                   |  49,154 |             1,521 |                    31 |          1,552 |        1,263 |       115 |         5.5 |            1.82s |      1.22s |       3.04s | context-ignored                   |                 |
-| `HuggingFaceTB/SmolVLM-Instruct`                        |  49,154 |             1,521 |                    31 |          1,552 |        1,231 |       115 |         5.5 |            1.84s |      1.27s |       3.11s | context-ignored                   |                 |
-| `qnguyen3/nanoLLaVA`                                    | 151,645 |               326 |                   134 |            460 |        1,496 |       102 |         4.7 |            1.93s |      1.20s |       3.13s | context-ignored                   |                 |
-| `mlx-community/LFM2.5-VL-1.6B-bf16`                     |       7 |               594 |                   270 |            864 |        2,438 |       180 |         4.0 |            2.10s |      1.08s |       3.17s |                                   |                 |
-| `mlx-community/LFM2-VL-1.6B-8bit`                       |   5,690 |               594 |                   500 |          1,094 |        2,525 |       291 |         2.8 |            2.35s |      1.00s |       3.35s | repetitive(phrase: "england, ...  |                 |
-| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |             1,335 |                    17 |          1,352 |          492 |      30.6 |          12 |            3.57s |      3.18s |       6.75s | context-ignored                   |                 |
-| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |             3,048 |                   132 |          3,180 |          995 |       161 |         8.2 |            4.18s |      1.62s |       5.80s |                                   |                 |
-| `mlx-community/gemma-3n-E4B-it-bf16`                    |     106 |               580 |                   153 |            733 |          770 |      41.8 |          17 |            4.72s |      4.81s |       9.53s |                                   |                 |
-| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |             1,335 |                    13 |          1,348 |          480 |      5.23 |          26 |            5.58s |      4.82s |      10.40s | ⚠️harness(prompt_template), ...   |                 |
-| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |      28 |             1,421 |                   500 |          1,921 |        1,216 |       113 |         5.5 |            5.96s |      1.23s |       7.18s | repetitive(phrase: "town centr... |                 |
-| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 |   8,425 |             1,300 |                   500 |          1,800 |          847 |       115 |          18 |            6.36s |      3.27s |       9.64s | repetitive(phrase: "uk, uk, ...   |                 |
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit`               |   1,379 |             1,300 |                   500 |          1,800 |          887 |       101 |          22 |            6.92s |      3.75s |      10.66s | hallucination                     |                 |
-| `mlx-community/gemma-3-27b-it-qat-4bit`                 |     106 |               581 |                   135 |            716 |          179 |      28.3 |          19 |            8.34s |      4.92s |      13.25s |                                   |                 |
-| `mlx-community/Idefics3-8B-Llama3-bf16`                 | 128,001 |             2,618 |                   150 |          2,768 |          746 |      29.8 |          18 |            8.87s |      3.63s |      12.50s | formatting                        |                 |
-| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          | 163,585 |             1,300 |                   494 |          1,794 |          876 |      68.5 |          37 |            9.32s |      5.88s |      15.20s |                                   |                 |
-| `mlx-community/InternVL3-14B-8bit`                      | 151,645 |             2,109 |                   113 |          2,222 |          410 |      29.0 |          17 |            9.50s |      3.24s |      12.74s |                                   |                 |
-| `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`     |       2 |             3,049 |                   134 |          3,183 |          401 |      57.8 |          13 |           10.22s |      2.46s |      12.68s |                                   |                 |
-| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               581 |                   125 |            706 |          171 |      15.5 |          34 |           11.76s |      7.02s |      18.78s |                                   |                 |
-| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |             2,631 |                   154 |          2,785 |          288 |      42.8 |          11 |           13.06s |      1.77s |      14.83s |                                   |                 |
-| `mlx-community/Phi-3.5-vision-instruct-bf16`            |  32,007 |             1,138 |                   161 |          1,299 |          982 |      12.4 |          11 |           14.46s |      1.76s |      16.22s |                                   |                 |
-| `mlx-community/paligemma2-3b-pt-896-4bit`               |       1 |             4,407 |                   481 |          4,888 |        1,579 |      36.0 |         4.4 |           16.69s |      2.38s |      19.07s | hallucination                     |                 |
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |             2,533 |                   168 |          2,701 |          229 |      28.1 |          22 |           17.35s |      3.79s |      21.15s | ⚠️harness(encoding)               |                 |
-| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      |     376 |             1,646 |                   500 |          2,146 |          246 |      47.2 |          60 |           18.02s |     12.89s |      30.91s | context-ignored                   |                 |
-| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      | 128,009 |               306 |                   145 |            451 |          104 |      9.29 |          15 |           18.86s |      2.79s |      21.66s |                                   |                 |
-| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         |   1,455 |             3,351 |                   500 |          3,851 |          432 |      36.2 |          15 |           21.84s |      3.00s |      24.85s | hallucination                     |                 |
-| `mlx-community/pixtral-12b-8bit`                        |       2 |             3,260 |                   132 |          3,392 |          313 |      13.5 |          16 |           22.04s |      3.20s |      25.24s |                                   |                 |
-| `mlx-community/GLM-4.6V-Flash-mxfp4`                    |   3,081 |             6,348 |                   500 |          6,848 |          333 |      63.1 |         8.4 |           27.31s |      2.32s |      29.63s | ⚠️harness(stop_token), ...        |                 |
-| `mlx-community/pixtral-12b-bf16`                        |       2 |             3,260 |                   130 |          3,390 |          306 |      7.76 |          28 |           27.67s |      4.86s |      32.54s |                                   |                 |
-| `mlx-community/GLM-4.6V-Flash-6bit`                     |   6,771 |             6,348 |                   500 |          6,848 |          330 |      47.5 |          11 |           30.16s |      2.61s |      32.77s | formatting                        |                 |
-| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         |  16,090 |             1,335 |                   500 |          1,835 |        1,522 |      14.5 |          11 |           35.68s |      3.11s |      38.79s | repetitive(phrase: "on the lef... |                 |
-| `mlx-community/Molmo-7B-D-0924-8bit`                    | 151,643 |             1,513 |                   137 |          1,650 |         43.9 |      44.1 |          41 |           38.27s |      2.14s |      40.41s |                                   |                 |
-| `meta-llama/Llama-3.2-11B-Vision-Instruct`              | 128,009 |               307 |                   145 |            452 |         93.5 |      3.86 |          25 |           41.23s |      4.20s |      45.42s |                                   |                 |
-| `mlx-community/Molmo-7B-D-0924-bf16`                    | 151,643 |             1,513 |                   137 |          1,650 |         42.0 |      27.9 |          48 |           41.62s |      3.14s |      44.76s |                                   |                 |
-| `microsoft/Phi-3.5-vision-instruct`                     |  17,745 |             1,138 |                   500 |          1,638 |          967 |      12.2 |          11 |           42.37s |      1.74s |      44.12s | ⚠️harness(stop_token), ...        |                 |
-| `Qwen/Qwen3-VL-2B-Instruct`                             |   9,448 |            16,583 |                   500 |         17,083 |          389 |      75.4 |         8.3 |           49.68s |      1.54s |      51.22s | ⚠️harness(long_context), ...      |                 |
-| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |  22,193 |            16,585 |                   500 |         17,085 |          354 |      75.4 |         8.3 |           53.88s |      1.88s |      55.75s | ⚠️harness(long_context), ...      |                 |
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | 151,645 |            16,594 |                   128 |         16,722 |          147 |       180 |          73 |          113.88s |      1.25s |     115.13s |                                   |                 |
+| `mlx-community/gemma-3n-E2B-4bit`                       |       1 |               572 |                     2 |            574 |        1,236 |      73.1 |         6.0 |            0.80s |      3.34s |       4.13s | ⚠️harness(prompt_template), ...   |                 |
+| `mlx-community/FastVLM-0.5B-bf16`                       | 151,645 |               330 |                   198 |            528 |        2,151 |       313 |         2.2 |            1.57s |      1.02s |       2.60s |                                   |                 |
+| `mlx-community/nanoLLaVA-1.5-4bit`                      | 151,645 |               326 |                   324 |            650 |        1,677 |       298 |         2.4 |            1.69s |      0.97s |       2.65s |                                   |                 |
+| `HuggingFaceTB/SmolVLM-Instruct`                        |  49,154 |             1,521 |                    31 |          1,552 |        1,271 |       115 |         5.5 |            1.80s |      1.27s |       3.07s | context-ignored                   |                 |
+| `mlx-community/SmolVLM-Instruct-bf16`                   |  49,154 |             1,521 |                    31 |          1,552 |        1,211 |       115 |         5.5 |            1.84s |      1.22s |       3.06s | context-ignored                   |                 |
+| `qnguyen3/nanoLLaVA`                                    | 151,645 |               326 |                   134 |            460 |        1,544 |       102 |         4.6 |            1.91s |      1.04s |       2.95s | context-ignored                   |                 |
+| `mlx-community/LFM2.5-VL-1.6B-bf16`                     |       7 |               594 |                   270 |            864 |        2,468 |       182 |         4.0 |            2.07s |      1.08s |       3.14s |                                   |                 |
+| `mlx-community/LFM2-VL-1.6B-8bit`                       |   5,690 |               594 |                   500 |          1,094 |        2,388 |       294 |         2.8 |            2.35s |      0.96s |       3.30s | repetitive(phrase: "england, ...  |                 |
+| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |             1,335 |                    17 |          1,352 |          504 |      29.9 |          12 |            3.52s |      3.27s |       6.78s | context-ignored                   |                 |
+| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |             3,048 |                   132 |          3,180 |        1,004 |       162 |         8.2 |            4.14s |      1.69s |       5.83s |                                   |                 |
+| `mlx-community/gemma-3n-E4B-it-bf16`                    |     106 |               580 |                   153 |            733 |          775 |      41.9 |          17 |            4.70s |      4.79s |       9.49s |                                   |                 |
+| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |             1,335 |                    13 |          1,348 |          464 |      5.28 |          26 |            5.63s |      4.85s |      10.48s | ⚠️harness(prompt_template), ...   |                 |
+| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |      28 |             1,421 |                   500 |          1,921 |        1,213 |       113 |         5.5 |            5.92s |      1.21s |       7.13s | repetitive(phrase: "town centr... |                 |
+| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 |   8,425 |             1,300 |                   500 |          1,800 |          856 |       106 |          18 |            6.69s |      3.33s |      10.02s | repetitive(phrase: "uk, uk, ...   |                 |
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit`               |   1,379 |             1,300 |                   500 |          1,800 |          885 |       102 |          22 |            6.86s |      3.72s |      10.58s | hallucination                     |                 |
+| `mlx-community/Idefics3-8B-Llama3-bf16`                 | 128,001 |             2,618 |                   150 |          2,768 |          750 |      29.8 |          18 |            8.87s |      3.57s |      12.44s | formatting                        |                 |
+| `mlx-community/gemma-3-27b-it-qat-4bit`                 |     106 |               581 |                   135 |            716 |          160 |      27.1 |          19 |            8.92s |      4.87s |      13.78s |                                   |                 |
+| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          | 163,585 |             1,300 |                   494 |          1,794 |          865 |      69.1 |          37 |            9.27s |      5.92s |      15.19s |                                   |                 |
+| `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`     |       2 |             3,049 |                   134 |          3,183 |          407 |      58.3 |          13 |           10.09s |      2.48s |      12.57s |                                   |                 |
+| `mlx-community/InternVL3-14B-8bit`                      | 151,645 |             2,109 |                   113 |          2,222 |          356 |      28.7 |          17 |           10.32s |      3.32s |      13.64s |                                   |                 |
+| `mlx-community/pixtral-12b-8bit`                        |       2 |             3,260 |                   132 |          3,392 |          505 |      35.0 |          16 |           10.54s |      3.25s |      13.79s |                                   |                 |
+| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               581 |                   125 |            706 |          171 |      15.5 |          34 |           11.77s |      6.96s |      18.73s |                                   |                 |
+| `mlx-community/pixtral-12b-bf16`                        |       2 |             3,260 |                   130 |          3,390 |          579 |      19.8 |          28 |           12.47s |      4.84s |      17.31s |                                   |                 |
+| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |             2,631 |                   154 |          2,785 |          266 |      43.6 |          11 |           13.74s |      1.80s |      15.54s |                                   |                 |
+| `mlx-community/Phi-3.5-vision-instruct-bf16`            |  32,007 |             1,138 |                   161 |          1,299 |          984 |      12.6 |          11 |           14.28s |      1.78s |      16.06s |                                   |                 |
+| `mlx-community/paligemma2-3b-pt-896-4bit`               |       1 |             4,407 |                   481 |          4,888 |        1,602 |      39.2 |         4.4 |           15.46s |      2.59s |      18.05s | hallucination                     |                 |
+| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      |     376 |             1,646 |                   500 |          2,146 |          280 |      47.8 |          60 |           17.01s |     11.97s |      28.97s | context-ignored                   |                 |
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |             2,533 |                   168 |          2,701 |          232 |      27.4 |          22 |           17.31s |      3.81s |      21.12s | ⚠️harness(encoding)               |                 |
+| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      | 128,009 |               306 |                   145 |            451 |         97.5 |      8.65 |          15 |           20.22s |      2.79s |      23.00s |                                   |                 |
+| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         |   1,455 |             3,351 |                   500 |          3,851 |          430 |      36.1 |          15 |           21.94s |      3.11s |      25.06s | hallucination                     |                 |
+| `mlx-community/GLM-4.6V-Flash-mxfp4`                    |   3,081 |             6,348 |                   500 |          6,848 |          338 |      63.0 |         8.4 |           27.01s |      2.31s |      29.32s | ⚠️harness(stop_token), ...        |                 |
+| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         |  16,090 |             1,335 |                   500 |          1,835 |        1,521 |      17.2 |          11 |           30.28s |      2.89s |      33.17s | repetitive(phrase: "on the lef... |                 |
+| `mlx-community/GLM-4.6V-Flash-6bit`                     |   6,771 |             6,348 |                   500 |          6,848 |          315 |      47.3 |          11 |           31.01s |      2.57s |      33.58s | formatting                        |                 |
+| `mlx-community/Molmo-7B-D-0924-8bit`                    | 151,643 |             1,513 |                   137 |          1,650 |         43.8 |      44.1 |          41 |           38.36s |      2.14s |      40.50s |                                   |                 |
+| `meta-llama/Llama-3.2-11B-Vision-Instruct`              | 128,009 |               307 |                   145 |            452 |         98.0 |      3.91 |          25 |           40.53s |      4.31s |      44.84s |                                   |                 |
+| `mlx-community/Molmo-7B-D-0924-bf16`                    | 151,643 |             1,513 |                   137 |          1,650 |         41.2 |      28.0 |          48 |           42.35s |      3.14s |      45.49s |                                   |                 |
+| `microsoft/Phi-3.5-vision-instruct`                     |  17,745 |             1,138 |                   500 |          1,638 |          976 |      12.2 |          11 |           42.58s |      1.71s |      44.30s | ⚠️harness(stop_token), ...        |                 |
+| `Qwen/Qwen3-VL-2B-Instruct`                             |   9,448 |            16,583 |                   500 |         17,083 |          388 |      75.8 |         8.3 |           49.72s |      1.59s |      51.31s | ⚠️harness(long_context), ...      |                 |
+| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |  22,193 |            16,585 |                   500 |         17,085 |          349 |      76.0 |         8.3 |           54.48s |      1.74s |      56.22s | ⚠️harness(long_context), ...      |                 |
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | 151,645 |            16,594 |                   128 |         16,722 |          150 |       178 |          73 |          111.76s |      1.24s |     113.00s |                                   |                 |
 
 <!-- markdownlint-enable MD013 MD033 MD034 MD037 MD049 -->
 
@@ -210,10 +210,10 @@ language_model.lm_head.weight.
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9029, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9085, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8806, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8862, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -236,7 +236,7 @@ language_model.lm_head.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9221, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9277, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -245,7 +245,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9037, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9093, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Missing 1 parameters:
 language_model.lm_head.weight.
@@ -273,7 +273,7 @@ language_model.lm_head.weight.
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9089, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9145, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -301,7 +301,7 @@ RuntimeError: [metal::malloc] Attempting to allocate 135433060352 bytes which is
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9221, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9277, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -310,7 +310,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9119, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9175, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
 ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 135433060352 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
 ```
@@ -336,7 +336,7 @@ ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9040, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9096, in _run_model_generation
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -346,7 +346,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8965, in _run_model_preflight_validators
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9021, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -355,14 +355,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8879, in _raise_preflight_error
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8935, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9221, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9277, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -371,7 +371,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9052, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9108, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -397,10 +397,10 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9029, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9085, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8806, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8862, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -464,7 +464,7 @@ AttributeError: RobertaTokenizer has no attribute additional_special_tokens. Did
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9221, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9277, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -473,7 +473,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9037, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9093, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: RobertaTokenizer has no attribute additional_special_tokens
 ```
@@ -484,7 +484,7 @@ ValueError: Model loading failed: RobertaTokenizer has no attribute additional_s
 
 ### ✅ mlx-community/gemma-3n-E2B-4bit
 
-**Metrics:** 73 TPS | 2 tokens
+**Metrics:** 73.1 TPS | 2 tokens
 
 ```text
 
@@ -494,9 +494,21 @@ ValueError: Model loading failed: RobertaTokenizer has no attribute additional_s
 
 ---
 
+### ✅ mlx-community/FastVLM-0.5B-bf16
+
+**Metrics:** 313 TPS | 198 tokens
+
+```text
+Title: 6-12 words, descriptive and concrete.
+
+Description: A distinctive Victorian cottage, characterized by its imposing central chimney stack, is pictured on a late afternoon in the historic market town of Hitchin, England, United Kingdom, UK Here is a caption for the image, following your instructions: A quintessential Victorian cottage, distinguished by its imposing central chimney stack, is captured on a late afternoon in the historic market town of Hitchin, England, United Kingdom, UK. Photographed in February, the scene is set against a soft, overcast winter sky, which accentuates the textures of the weathered red brick and slate roof. The cottage, with its tall brick chimney and terracotta tiles, stands as a testament to the architectural heritage of the region. The image is taken on 2026-02-14 15:49:20 GMT (at 15:49:20 local time).
+```
+
+---
+
 ### ✅ mlx-community/nanoLLaVA-1.5-4bit
 
-**Metrics:** 345 TPS | 324 tokens
+**Metrics:** 298 TPS | 324 tokens
 
 ```text
 Title: 6-12 words, descriptive and concrete.
@@ -514,19 +526,7 @@ Capture metadata: The image is described as a "description" and "keywords" hint,
 
 ---
 
-### ✅ mlx-community/FastVLM-0.5B-bf16
-
-**Metrics:** 309 TPS | 198 tokens
-
-```text
-Title: 6-12 words, descriptive and concrete.
-
-Description: A distinctive Victorian cottage, characterized by its imposing central chimney stack, is pictured on a late afternoon in the historic market town of Hitchin, England, United Kingdom, UK Here is a caption for the image, following your instructions: A quintessential Victorian cottage, distinguished by its imposing central chimney stack, is captured on a late afternoon in the historic market town of Hitchin, England, United Kingdom, UK. Photographed in February, the scene is set against a soft, overcast winter sky, which accentuates the textures of the weathered red brick and slate roof. The cottage, with its tall brick chimney and terracotta tiles, stands as a testament to the architectural heritage of the region. The image is taken on 2026-02-14 15:49:20 GMT (at 15:49:20 local time).
-```
-
----
-
-### ✅ mlx-community/SmolVLM-Instruct-bf16
+### ✅ HuggingFaceTB/SmolVLM-Instruct
 
 **Metrics:** 115 TPS | 31 tokens
 
@@ -536,7 +536,7 @@ Description: A distinctive Victorian cottage, characterized by its imposing cent
 
 ---
 
-### ✅ HuggingFaceTB/SmolVLM-Instruct
+### ✅ mlx-community/SmolVLM-Instruct-bf16
 
 **Metrics:** 115 TPS | 31 tokens
 
@@ -562,7 +562,7 @@ Context: The image is a detailed snapshot of a Victorian-style brick house in Hi
 
 ### ✅ mlx-community/LFM2.5-VL-1.6B-bf16
 
-**Metrics:** 180 TPS | 270 tokens
+**Metrics:** 182 TPS | 270 tokens
 
 ```text
 Title: Victorian Cottage, Hitchin, England, Red Brick House, Chimney Stack, Clay Tile Roof, Overcast Winter Sky, Street Side, Tall Brick Chimney, Traditional Brick House, UK
@@ -578,7 +578,7 @@ Context: The image was taken on 2026-02-14 at 15:49:20 GMT (at 15:49:20 local ti
 
 ### ✅ mlx-community/LFM2-VL-1.6B-8bit
 
-**Metrics:** 291 TPS | 500 tokens
+**Metrics:** 294 TPS | 500 tokens
 
 ```text
 Title: 6-12 words, descriptive and concrete.
@@ -592,7 +592,7 @@ Keywords: 19th century, English cottage, European, Town centre, Red Brick House,
 
 ### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
 
-**Metrics:** 30.6 TPS | 17 tokens
+**Metrics:** 29.9 TPS | 17 tokens
 
 ```text
 If the image is too small to capture the metadata, use the image itself.
@@ -602,7 +602,7 @@ If the image is too small to capture the metadata, use the image itself.
 
 ### ✅ mlx-community/Ministral-3-3B-Instruct-2512-4bit
 
-**Metrics:** 161 TPS | 132 tokens
+**Metrics:** 162 TPS | 132 tokens
 
 ```text
 Title: Victorian Red Brick Cottage with Central Chimney Stack
@@ -618,7 +618,7 @@ Keywords:
 
 ### ✅ mlx-community/gemma-3n-E4B-it-bf16
 
-**Metrics:** 41.8 TPS | 153 tokens
+**Metrics:** 41.9 TPS | 153 tokens
 
 ```text
 ## Title: Historic Victorian Cottage in Historic Hitchin
@@ -634,7 +634,7 @@ Victorian cottage, red brick house, chimney stack, historic town, Hitchin, Engla
 
 ### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
 
-**Metrics:** 5.23 TPS | 13 tokens
+**Metrics:** 5.28 TPS | 13 tokens
 
 ```text
 If the image is too small, use the image itself.
@@ -658,7 +658,7 @@ Keywords: Victorian Cottage, Hitchin, England, Hertfordshire, Quaint, Red Brick 
 
 ### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
 
-**Metrics:** 115 TPS | 500 tokens
+**Metrics:** 106 TPS | 500 tokens
 
 ```text
 ◁think▷Got it, let's analyze the image. First, the main subject is a red brick house with a prominent chimney. The setting is a town centre in Hitchin, England, UK. The house has a clay tile roof, typical of English architecture. The chimney is tall and brick, with two chimneys. The scene is in winter, as suggested by the bare tree. The image was taken on February 14, 2026, at 15:49:20 GMT.
@@ -676,7 +676,7 @@ Keywords: 19th century, brick house, chimney pots, clay tiles, England, English 
 
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-8bit
 
-**Metrics:** 101 TPS | 500 tokens
+**Metrics:** 102 TPS | 500 tokens
 
 ```text
 ◁think▷Alright, let's analyze this image for cataloging based on the provided context and image content.
@@ -714,20 +714,6 @@ Keywords: Victorian cottage, brick chimney, Hitchin, England, terracotta roof ti
 
 ---
 
-### ✅ mlx-community/gemma-3-27b-it-qat-4bit
-
-**Metrics:** 28.3 TPS | 135 tokens
-
-```text
-**Title:** Red brick cottage with prominent chimney stack, Hitchin, England
-
-**Description:** A small, red brick cottage with a steeply pitched clay tile roof is pictured along a street in Hitchin, England. The building features a large central chimney with multiple pots and a small window.
-
-**Keywords:** Red brick house, cottage, chimney pots, clay tile roof, clay tiles, central chimney, steep roof, small window, street side, brickwork, gable roof, exterior, building facade, architecture, residential, town centre, Hitchin, Hertfordshire, England, UK, Europe, British architecture, overcast sky, February, 19th century style.
-```
-
----
-
 ### ✅ mlx-community/Idefics3-8B-Llama3-bf16
 
 **Metrics:** 29.8 TPS | 150 tokens
@@ -742,9 +728,23 @@ Keywords: 19th century, Any Vision, British, Chimney Pots, Clay Tile Roof, Clay 
 
 ---
 
+### ✅ mlx-community/gemma-3-27b-it-qat-4bit
+
+**Metrics:** 27.1 TPS | 135 tokens
+
+```text
+**Title:** Red brick cottage with prominent chimney stack, Hitchin, England
+
+**Description:** A small, red brick cottage with a steeply pitched clay tile roof is pictured along a street in Hitchin, England. The building features a large central chimney with multiple pots and a small window.
+
+**Keywords:** Red brick house, cottage, chimney pots, clay tile roof, clay tiles, central chimney, steep roof, small window, street side, brickwork, gable roof, exterior, building facade, architecture, residential, town centre, Hitchin, Hertfordshire, England, UK, Europe, British architecture, overcast sky, February, 19th century style.
+```
+
+---
+
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
 
-**Metrics:** 68.5 TPS | 494 tokens
+**Metrics:** 69.1 TPS | 494 tokens
 
 ```text
 ◁think▷Got it, let's analyze the image. First, the image shows a red brick house with a prominent brick chimney, terracotta roof tiles, and it's in a town center (Hitchin, England). The setting is a street with a tree, and the photo was taken on February 14, 2026, at 15:49:20 GMT. The style is Victorian, 19th century.
@@ -760,9 +760,26 @@ Keywords: Victorian architecture, brick house, terracotta roof tiles, tall chimn
 
 ---
 
+### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
+
+**Metrics:** 58.3 TPS | 134 tokens
+
+```text
+**Title:**
+Victorian Red Brick Cottage with Tall Chimney
+
+**Description:**
+A traditional brick cottage with a steep clay-tiled roof and a prominent central chimney stack stands on a quiet street corner. The building features small, white-framed windows and a covered entrance with a wooden porch.
+
+**Keywords:**
+Victorian architecture, red brick cottage, clay tile roof, tall brick chimney, small white-framed windows, wooden porch entrance, street corner, traditional brick house, quaint English building, overcast sky, rural setting, UK heritage structure, historic town center, weathered exterior, brick construction, rural road, bare tree, street view
+```
+
+---
+
 ### ✅ mlx-community/InternVL3-14B-8bit
 
-**Metrics:** 29 TPS | 113 tokens
+**Metrics:** 28.7 TPS | 113 tokens
 
 ```text
 Title: Red Brick Cottage with Tall Chimney
@@ -774,19 +791,16 @@ Keywords: Red brick cottage, chimney stack, clay tile roof, white-framed windows
 
 ---
 
-### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
+### ✅ mlx-community/pixtral-12b-8bit
 
-**Metrics:** 57.8 TPS | 134 tokens
+**Metrics:** 35 TPS | 132 tokens
 
 ```text
-**Title:**
-Victorian Red Brick Cottage with Tall Chimney
+**Title:** Victorian Cottage with Tall Chimney
 
-**Description:**
-A traditional brick cottage with a steep clay-tiled roof and a prominent central chimney stack stands on a quiet street corner. The building features small, white-framed windows and a covered entrance with a wooden porch.
+**Description:** A quaint red brick cottage with a prominent chimney stack stands on a street corner in Hitchin, England.
 
-**Keywords:**
-Victorian architecture, red brick cottage, clay tile roof, tall brick chimney, small white-framed windows, wooden porch entrance, street corner, traditional brick house, quaint English building, overcast sky, rural setting, UK heritage structure, historic town center, weathered exterior, brick construction, rural road, bare tree, street view
+**Keywords:** Red Brick House, Tall Brick Chimney, Clay Tile Roof, Terracotta, Chimney Pots, English Cottage, Victorian Architecture, Clay Tiles, Traditional Brick House, England, Hitchin, Hertfordshire, Town Centre, Scenery, Street Side, Quaint, British, Europe, 19th Century, Winter, Overcast Sky, Weathered Texture, Window Sill, Doorway, Leaning Tree, Pedestrian Crossing
 ```
 
 ---
@@ -805,9 +819,23 @@ Victorian architecture, red brick cottage, clay tile roof, tall brick chimney, s
 
 ---
 
+### ✅ mlx-community/pixtral-12b-bf16
+
+**Metrics:** 19.8 TPS | 130 tokens
+
+```text
+**Title:** Victorian Cottage with Tall Chimney
+
+**Description:** A quaint red brick cottage with a prominent chimney stack stands on a street corner in Hitchin, England.
+
+**Keywords:** Red Brick House, Tall Brick Chimney, Clay Tile Roof, Chimney Pots, Terracotta, English Cottage, Victorian Architecture, Clay Tiles, Britain, England, Hitchin, Hertfordshire, Town Centre, Traditional Brick House, Scenery, Street Side, Quaint, Europe, 19th Century, Winter, Overcast Sky, Window, Door, Brickwork, Roof, Gable, Dormer Window
+```
+
+---
+
 ### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
 
-**Metrics:** 42.8 TPS | 154 tokens
+**Metrics:** 43.6 TPS | 154 tokens
 
 ```text
 Title: Victorian Cottage, Hitchin, England
@@ -821,7 +849,7 @@ Keywords: Victorian, Cottage, Hitchin, England, United Kingdom, UK, Chimney, Bri
 
 ### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
 
-**Metrics:** 12.4 TPS | 161 tokens
+**Metrics:** 12.6 TPS | 161 tokens
 
 ```text
 Title: Victorian Cottage in Hitchin, England
@@ -835,7 +863,7 @@ Keywords: Victorian Cottage, Central Chimney, Red Brick, Terracotta Roof Tiles, 
 
 ### ✅ mlx-community/paligemma2-3b-pt-896-4bit
 
-**Metrics:** 36 TPS | 481 tokens
+**Metrics:** 39.2 TPS | 481 tokens
 
 ```text
 - Capture metadata: 15-30 comma-separated terms, ordered most specific to most general.
@@ -854,19 +882,9 @@ Prioritize what is visibly present. If context conflicts with the image, trust t
 
 ---
 
-### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
-
-**Metrics:** 28.1 TPS | 168 tokens
-
-```text
-Title:ĠRedĠBrickĠCottageĠwithĠTallĠChimneyĊĊDescription:ĠAĠtraditionalĠredĠbrickĠcottageĠwithĠaĠsteepĠclayĠtileĠroofĠandĠaĠprominentĠcentralĠchimneyĠstandsĠonĠaĠquietĠstreetĠcorner.ĠTheĠbuildingĠfeaturesĠwhite-framedĠwindowsĠandĠaĠsmallĠporch.ĊĊKeywords:ĠredĠbrickĠcottage,ĠtallĠchimney,ĠclayĠtileĠroof,Ġwhite-framedĠwindows,ĠsmallĠporch,ĠquietĠstreet,ĠcornerĠbuilding,ĠtraditionalĠarchitecture,ĠhistoricĠtown,ĠovercastĠsky,ĠwinterĠscene,ĠbrickĠhouse,ĠchimneyĠpots,Ġterracotta,ĠstreetĠside,ĠtownĠcentre,ĠEngland,ĠUK,ĠEuropeanĠarchitecture,ĠresidentialĠbuilding,ĠheritageĠstructureĊĊContext:ĠTheĠimageĠalignsĠwithĠtheĠprovidedĠcontext,ĠdepictingĠaĠquaint,ĠtraditionalĠredĠbrickĠcottageĠinĠaĠhistoricĠtownĠsetting,ĠlikelyĠinĠEngland.ĠTheĠovercastĠskyĠandĠwinterĠatmosphereĠareĠconsistentĠwithĠtheĠFebruaryĠtimeframeĠmentioned.
-```
-
----
-
 ### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
 
-**Metrics:** 47.2 TPS | 500 tokens
+**Metrics:** 47.8 TPS | 500 tokens
 
 ```text
 Alright, let's get to work. I've got an image of a brick house, and I need to generate some metadata for it. First things first, I need to break down the image itself. It's a brick house, clearly. The style is definitely traditional, maybe even a little old-fashioned. I see a prominent chimney, a tiled roof, and a small porch. The setting seems to be a street, with a sidewalk and a road. The overall feel is a bit weathered, maybe a little run-down, but charming in its own way.
@@ -880,9 +898,19 @@ Finally, the keywords. I need a good mix of specific and general terms. I'll sta
 
 ---
 
+### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+
+**Metrics:** 27.4 TPS | 168 tokens
+
+```text
+Title:ĠRedĠBrickĠCottageĠwithĠTallĠChimneyĊĊDescription:ĠAĠtraditionalĠredĠbrickĠcottageĠwithĠaĠsteepĠclayĠtileĠroofĠandĠaĠprominentĠcentralĠchimneyĠstandsĠonĠaĠquietĠstreetĠcorner.ĠTheĠbuildingĠfeaturesĠwhite-framedĠwindowsĠandĠaĠsmallĠporch.ĊĊKeywords:ĠredĠbrickĠcottage,ĠtallĠchimney,ĠclayĠtileĠroof,Ġwhite-framedĠwindows,ĠsmallĠporch,ĠquietĠstreet,ĠcornerĠbuilding,ĠtraditionalĠarchitecture,ĠhistoricĠtown,ĠovercastĠsky,ĠwinterĠscene,ĠbrickĠhouse,ĠchimneyĠpots,Ġterracotta,ĠstreetĠside,ĠtownĠcentre,ĠEngland,ĠUK,ĠEuropeanĠarchitecture,ĠresidentialĠbuilding,ĠheritageĠstructureĊĊContext:ĠTheĠimageĠalignsĠwithĠtheĠprovidedĠcontext,ĠdepictingĠaĠquaint,ĠtraditionalĠredĠbrickĠcottageĠinĠaĠhistoricĠtownĠsetting,ĠlikelyĠinĠEngland.ĠTheĠovercastĠskyĠandĠwinterĠatmosphereĠareĠconsistentĠwithĠtheĠFebruaryĠtimeframeĠmentioned.
+```
+
+---
+
 ### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
-**Metrics:** 9.29 TPS | 145 tokens
+**Metrics:** 8.65 TPS | 145 tokens
 
 ```text
 **Title:** A Quaint Red Brick Cottage with a Tall Chimney in the Heart of a Historic Town
@@ -896,7 +924,7 @@ Finally, the keywords. I need a good mix of specific and general terms. I'll sta
 
 ### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
 
-**Metrics:** 36.2 TPS | 500 tokens
+**Metrics:** 36.1 TPS | 500 tokens
 
 ```text
 Here are my reasoning steps:
@@ -907,23 +935,9 @@ We need to produce Title, Description, Keywords. The image is a brick cottage wi
 
 ---
 
-### ✅ mlx-community/pixtral-12b-8bit
-
-**Metrics:** 13.5 TPS | 132 tokens
-
-```text
-**Title:** Victorian Cottage with Tall Chimney
-
-**Description:** A quaint red brick cottage with a prominent chimney stack stands on a street corner in Hitchin, England.
-
-**Keywords:** Red Brick House, Tall Brick Chimney, Clay Tile Roof, Terracotta, Chimney Pots, English Cottage, Victorian Architecture, Clay Tiles, Traditional Brick House, England, Hitchin, Hertfordshire, Town Centre, Scenery, Street Side, Quaint, British, Europe, 19th Century, Winter, Overcast Sky, Weathered Texture, Window Sill, Doorway, Leaning Tree, Pedestrian Crossing
-```
-
----
-
 ### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
 
-**Metrics:** 63.1 TPS | 500 tokens
+**Metrics:** 63 TPS | 500 tokens
 
 ```text
 <think>Got it, let's tackle this task step by step. The user wants exactly three sections: Title, Description, Keywords. Also, there's a Context section mentioned, but wait, the user's instructions say "Return exactly these three sections: Title, Description, Keywords. Use concise, image-grounded wording and avoid speculation." Wait, but the initial prompt says "Analyze this image for cataloguing metadata. Return exactly these three sections: Title: 6-12 words... Description: 1-2 factual sentences... Keywords: 15-30 comma-separated terms... Use concise, image-grounded wording and avoid speculation. Context: Existing metadata hints (use only if visually consistent): - Description hint: , Town Centre, Hitchin, England, United Kingdom, UK Here is a caption for the image, following your instructions: A distinctive Victorian cottage, characterized by its imposing central chimney stack, is pictured on a late afternoon in the historic market town of Hitchin, England. Photographed in February, the scene is set against a soft, overcast winter sky, which accentuates the textures of the weathered red bric... - Keyword hints: 19th century, Any Vision, British, Chimney Pots, Clay Tile Roof, Clay tiles, England, English cottage, Europe, Hertfordshire, Hitchin, Quaint, Red Brick House, Scenery, Street side, Tall Brick Chimney, Terracotta, Town centre, Traditional Brick House, UK - Capture metadata: Taken on 2026-02-14 15:49:20 GMT (at 15:49:20 local time). Prioritize what is visibly present. If context conflicts with the image, trust the image.</think>
@@ -934,23 +948,19 @@ Keywords: Red brick house, English cottage, Tall brick chimney, Clay tile roof, 
 
 ---
 
-### ✅ mlx-community/pixtral-12b-bf16
+### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
 
-**Metrics:** 7.76 TPS | 130 tokens
+**Metrics:** 17.2 TPS | 500 tokens
 
 ```text
-**Title:** Victorian Cottage with Tall Chimney
-
-**Description:** A quaint red brick cottage with a prominent chimney stack stands on a street corner in Hitchin, England.
-
-**Keywords:** Red Brick House, Tall Brick Chimney, Clay Tile Roof, Chimney Pots, Terracotta, English Cottage, Victorian Architecture, Clay Tiles, Britain, England, Hitchin, Hertfordshire, Town Centre, Traditional Brick House, Scenery, Street Side, Quaint, Europe, 19th Century, Winter, Overcast Sky, Window, Door, Brickwork, Roof, Gable, Dormer Window
+A small, square, red brick house with a red brick chimney is seen on the corner of a street. The house has a red brick chimney with four red bricks at the top and a small, square, red brick wall on the left side of the chimney. The chimney is seen from the side, with the front of the house on the left side of the image. The roof of the house is a traditional red clay tile with a small, square, white-framed window on the left side of the house. The roof is angled from the bottom left corner to the top right corner of the image. The roof is covered in dark brown, weathered clay tiles. The windows are framed in white, with a small, square, white-framed window on the left side of the house and a larger, rectangular window on the right side of the house. The house is built on a slight hill, with the front of the house on the left side of the image. The front of the house is angled from the bottom left corner to the top right corner of the image. The roof of the house is a traditional red clay tile with a small, square, white-framed window on the left side of the house and a larger, rectangular window on the right side of the house. The roof is angled from the bottom left corner to the top right corner of the image. The house is built on a slight hill, with the front of the house on the left side of the image. The front of the house is angled from the bottom left corner to the top right corner of the image. The roof of the house is a traditional red clay tile with a small, square, white-framed window on the left side of the house and a larger, rectangular window on the right side of the house. The house is built on a slight hill, with the front of the house on the left side of the image. The roof of the house is a traditional red clay tile with a small, square, white-framed window on the left side of the house and a larger, rectangular window on the right side of the house. The house is built on a slight hill, with the front of the house on the left side of the image. The roof of the house is a traditional red clay tile with a small, square, white-framed window on the left side of the house and a larger, rectangular window on the right side of the house. The house is built on a slight hill
 ```
 
 ---
 
 ### ✅ mlx-community/GLM-4.6V-Flash-6bit
 
-**Metrics:** 47.5 TPS | 500 tokens
+**Metrics:** 47.3 TPS | 500 tokens
 
 ```text
 <think>Got it, let's tackle this. First, the Title needs to be 6-12 words, descriptive and concrete. Looking at the image: a red brick cottage with a tall chimney. So maybe "Red Brick Cottage with Tall Chimney" – that's 6 words, concrete.
@@ -984,16 +994,6 @@ Now order from most specific to most general. Let
 
 ---
 
-### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
-
-**Metrics:** 14.5 TPS | 500 tokens
-
-```text
-A small, square, red brick house with a red brick chimney is seen on the corner of a street. The house has a red brick chimney with four red bricks at the top and a small, square, red brick wall on the left side of the chimney. The chimney is seen from the side, with the front of the house on the left side of the image. The roof of the house is a traditional red clay tile with a small, square, white-framed window on the left side of the house. The roof is angled from the bottom left corner to the top right corner of the image. The roof is covered in dark brown, weathered clay tiles. The windows are framed in white, with a small, square, white-framed window on the left side of the house and a larger, rectangular window on the right side of the house. The house is built on a slight hill, with the front of the house on the left side of the image. The front of the house is angled from the bottom left corner to the top right corner of the image. The roof of the house is a traditional red clay tile with a small, square, white-framed window on the left side of the house and a larger, rectangular window on the right side of the house. The roof is angled from the bottom left corner to the top right corner of the image. The house is built on a slight hill, with the front of the house on the left side of the image. The front of the house is angled from the bottom left corner to the top right corner of the image. The roof of the house is a traditional red clay tile with a small, square, white-framed window on the left side of the house and a larger, rectangular window on the right side of the house. The house is built on a slight hill, with the front of the house on the left side of the image. The roof of the house is a traditional red clay tile with a small, square, white-framed window on the left side of the house and a larger, rectangular window on the right side of the house. The house is built on a slight hill, with the front of the house on the left side of the image. The roof of the house is a traditional red clay tile with a small, square, white-framed window on the left side of the house and a larger, rectangular window on the right side of the house. The house is built on a slight hill
-```
-
----
-
 ### ✅ mlx-community/Molmo-7B-D-0924-8bit
 
 **Metrics:** 44.1 TPS | 137 tokens
@@ -1010,7 +1010,7 @@ Keywords: 19th century, Any Vision, British, Clay Tile Roof, Clay tiles, England
 
 ### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
 
-**Metrics:** 3.86 TPS | 145 tokens
+**Metrics:** 3.91 TPS | 145 tokens
 
 ```text
 **Title:** A Quaint Red Brick Cottage with a Tall Chimney in the Heart of Hitchin, England
@@ -1024,7 +1024,7 @@ Keywords: 19th century, Any Vision, British, Clay Tile Roof, Clay tiles, England
 
 ### ✅ mlx-community/Molmo-7B-D-0924-bf16
 
-**Metrics:** 27.9 TPS | 137 tokens
+**Metrics:** 28 TPS | 137 tokens
 
 ```text
  Title: A Victorian-era brick house with a prominent central chimney stack.
@@ -1082,7 +1082,7 @@ def generate_book_summary(csv_file_path):
 
 ### ✅ Qwen/Qwen3-VL-2B-Instruct
 
-**Metrics:** 75.4 TPS | 500 tokens
+**Metrics:** 75.8 TPS | 500 tokens
 
 ```text
 Title: A red brick cottage with a tall chimney on a street corner in Hitchin, England
@@ -1096,7 +1096,7 @@ Keywords: England, Hitchin, red brick house, chimney, chimney pots, clay tile ro
 
 ### ✅ mlx-community/Qwen3-VL-2B-Thinking-bf16
 
-**Metrics:** 75.4 TPS | 500 tokens
+**Metrics:** 76 TPS | 500 tokens
 
 ```text
 Got it, let's tackle this image analysis. First, the title needs to be 6-12 words, descriptive and concrete. The image shows a brick house with a tall chimney, so maybe "Tall brick chimney house with terracotta roof in Hitchin, England". Wait, check the context: the caption mentions Hitchin, England. Let's make sure it's concrete. Maybe "Tall brick chimney house with terracotta roof in Hitchin, England".
@@ -1110,7 +1110,7 @@ Keywords: need 15-30, ordered most specific to most general. From the image: bri
 
 ### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
 
-**Metrics:** 180 TPS | 128 tokens
+**Metrics:** 178 TPS | 128 tokens
 
 ```text
 Title: Victorian Cottage, Historic Market Town, England, UK
@@ -1146,7 +1146,7 @@ Capture metadata: Taken on 2026-02-14 15:49:20 GMT (at 15:49:20 local time).
 
 - `Pillow`: `12.1.1`
 - `huggingface-hub`: `1.4.1`
-- `mlx`: `0.30.7.dev20260215+c184262d`
+- `mlx`: `0.30.7.dev20260215+43f4a748`
 - `mlx-lm`: `0.30.7`
 - `mlx-metal`: ``
 - `mlx-vlm`: `0.3.12`
@@ -1154,4 +1154,4 @@ Capture metadata: Taken on 2026-02-14 15:49:20 GMT (at 15:49:20 local time).
 - `tokenizers`: `0.22.2`
 - `transformers`: `5.1.0`
 
-_Report generated on: 2026-02-15 03:27:34 GMT_
+_Report generated on: 2026-02-15 21:05:42 GMT_

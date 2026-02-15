@@ -11,7 +11,7 @@ Test image: `20260214-154920_DSC09221.jpg` (24.8 MB).
 | Component | Version |
 | --------- | ------- |
 | mlx-vlm | 0.3.12 |
-| mlx | 0.30.7.dev20260215+c184262d |
+| mlx | 0.30.7.dev20260215+43f4a748 |
 | mlx-lm | 0.30.7 |
 | transformers | 5.1.0 |
 | tokenizers | 0.22.2 |
@@ -42,7 +42,7 @@ Test image: `20260214-154920_DSC09221.jpg` (24.8 MB).
 ```text
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9037, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9093, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Missing 1 parameters: 
 language_model.lm_head.weight.
@@ -73,16 +73,16 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260214-154920_DSC
 ```
 
 ### Environment Fingerprint
-`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260215+c184262d; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.1.0`
+`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260215+43f4a748; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.1.0`
 
 ### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260215T032734Z_001_microsoft_Florence-2-large-ft_MLX_MODEL_LOAD_WEIGHT_MISMATCH_ecbbb1f91.json`
+`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260215T210542Z_001_microsoft_Florence-2-large-ft_MLX_MODEL_LOAD_WEIGHT_MISMATCH_ecbbb1f91.json`
 
 ### Traceback Tail
 ```text
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9037, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9093, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Missing 1 parameters: 
 language_model.lm_head.weight.
@@ -100,10 +100,10 @@ language_model.lm_head.weight.
 
 ```text
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9029, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9085, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8806, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8862, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -126,7 +126,7 @@ language_model.lm_head.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9221, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9277, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -135,7 +135,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9037, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9093, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Missing 1 parameters: 
 language_model.lm_head.weight.
@@ -152,7 +152,7 @@ language_model.lm_head.weight.
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 19013.16it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 22721.04it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -177,7 +177,7 @@ Download complete: : 0.00B [00:00, ?B/s]
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9119, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9175, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
 ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 135433060352 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
 ```
@@ -207,17 +207,17 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260214-154920_DSC
 ```
 
 ### Environment Fingerprint
-`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260215+c184262d; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.1.0`
+`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260215+43f4a748; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.1.0`
 
 ### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260215T032734Z_002_mlx-community_X-Reasoner-7B-8bit_MLX_DECODE_OOM_82da64fabb32.json`
+`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260215T210542Z_002_mlx-community_X-Reasoner-7B-8bit_MLX_DECODE_OOM_82da64fabb32.json`
 
 ### Traceback Tail
 ```text
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9119, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9175, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
 ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 135433060352 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
 ```
@@ -234,7 +234,7 @@ ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7
 
 ```text
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9089, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9145, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -262,7 +262,7 @@ RuntimeError: [metal::malloc] Attempting to allocate 135433060352 bytes which is
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9221, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9277, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -271,7 +271,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9119, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9175, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
 ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 135433060352 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
 ```
@@ -313,13 +313,13 @@ Prioritize what is visibly present. If context conflicts with the image, trust t
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 15 files:   0%|          | 0/15 [00:00<?, ?it/s]
-Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 47162.34it/s]
+Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 16741.50it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
 
 Prefill:   0%|          | 0/16594 [00:00<?, ?tok/s]
-Prefill:   0%|          | 0/16594 [00:19<?, ?tok/s]
+Prefill:   0%|          | 0/16594 [00:23<?, ?tok/s]
 ```
 
 </details>
@@ -333,7 +333,7 @@ Prefill:   0%|          | 0/16594 [00:19<?, ?tok/s]
 
 | Model | Failure Phase | Error Stage | Package | Code | Regression vs Prev | First Seen Failing | Recent Repro |
 | ----- | ------------- | ----------- | ------- | ---- | ------------------ | ------------------ | ------------ |
-| `mlx-community/deepseek-vl2-8bit` | processor_load | Processor Error | model-config | `MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR` | yes | 2026-02-15 03:27:34 GMT | 1/3 recent runs failed |
+| `mlx-community/deepseek-vl2-8bit` | processor_load | Processor Error | model-config | `MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR` | no | 2026-02-15 03:27:34 GMT | 2/3 recent runs failed |
 
 **Traceback (tail):**
 
@@ -341,7 +341,7 @@ Prefill:   0%|          | 0/16594 [00:19<?, ?tok/s]
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9052, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9108, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -371,17 +371,17 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260214-154920_DSC
 ```
 
 ### Environment Fingerprint
-`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260215+c184262d; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.1.0`
+`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260215+43f4a748; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.1.0`
 
 ### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260215T032734Z_003_mlx-community_deepseek-vl2-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_ba.json`
+`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260215T210542Z_003_mlx-community_deepseek-vl2-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_ba.json`
 
 ### Traceback Tail
 ```text
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9052, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9108, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -398,7 +398,7 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ```text
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9040, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9096, in _run_model_generation
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -408,7 +408,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8965, in _run_model_preflight_validators
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9021, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -417,14 +417,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8879, in _raise_preflight_error
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8935, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9221, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9277, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -433,7 +433,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9052, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9108, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -457,7 +457,7 @@ Added chat tokens
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 15150.31it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 24429.19it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -482,7 +482,7 @@ Download complete: : 0.00B [00:00, ?B/s]
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9037, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9093, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: RobertaTokenizer has no attribute additional_special_tokens
 ```
@@ -512,17 +512,17 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260214-154920_DSC
 ```
 
 ### Environment Fingerprint
-`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260215+c184262d; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.1.0`
+`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260215+43f4a748; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.1.0`
 
 ### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260215T032734Z_004_prince-canuma_Florence-2-large-ft_MLX_VLM_MODEL_LOAD_MODEL_2100d402a936.json`
+`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260215T210542Z_004_prince-canuma_Florence-2-large-ft_MLX_VLM_MODEL_LOAD_MODEL_2100d402a936.json`
 
 ### Traceback Tail
 ```text
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9037, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9093, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: RobertaTokenizer has no attribute additional_special_tokens
 ```
@@ -539,10 +539,10 @@ ValueError: Model loading failed: RobertaTokenizer has no attribute additional_s
 
 ```text
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9029, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9085, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8806, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8862, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -606,7 +606,7 @@ AttributeError: RobertaTokenizer has no attribute additional_special_tokens. Did
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9221, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9277, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -615,7 +615,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9037, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9093, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: RobertaTokenizer has no attribute additional_special_tokens
 ```
@@ -631,7 +631,7 @@ ValueError: Model loading failed: RobertaTokenizer has no attribute additional_s
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 24036.13it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 13473.51it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -777,14 +777,14 @@ These models technically succeeded, but token/output patterns suggest likely int
 
 Recent reproducibility is measured from history (up to last 3 runs where each model appears).
 
-**Regressions since previous run:** `mlx-community/deepseek-vl2-8bit`
+**Regressions since previous run:** none
 **Recoveries since previous run:** none
 
 | Model | Status vs Previous Run | First Seen Failing | Recent Repro |
 | ----- | ---------------------- | ------------------ | ------------ |
 | `microsoft/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
 | `mlx-community/X-Reasoner-7B-8bit` | still failing | 2026-02-08 22:32:28 GMT | 3/3 recent runs failed |
-| `mlx-community/deepseek-vl2-8bit` | new regression | 2026-02-15 03:27:34 GMT | 1/3 recent runs failed |
+| `mlx-community/deepseek-vl2-8bit` | still failing | 2026-02-15 03:27:34 GMT | 2/3 recent runs failed |
 | `prince-canuma/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
 
 ---
@@ -845,4 +845,4 @@ Prioritize what is visibly present. If context conflicts with the image, trust t
 
 </details>
 
-_Report generated on 2026-02-15 03:27:34 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-02-15 21:05:42 GMT by [check_models](https://github.com/jrp2014/check_models)._
