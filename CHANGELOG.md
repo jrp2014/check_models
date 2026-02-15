@@ -8,6 +8,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Further compressed `src/check_models.py` (about 200 lines) by deduplicating
+  EXIF date/time extraction paths, centralizing special-token leak pattern
+  tables, and trimming verbose internal docstrings while preserving behavior.
+
 ### Fixed
 
 ## [0.2.0] - 2026-02-15

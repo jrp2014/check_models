@@ -1754,34 +1754,10 @@ def _format_hms(total_seconds: float) -> str:
 
 
 def format_overall_runtime(total_seconds: float) -> str:
-    """Format overall runtime with adaptive precision based on duration.
+    """Format runtime with a short/long display mode.
 
-    For durations < 3600s return ``"{seconds:.2f}s"``.
-    For durations >= 3600s return ``"HH:MM:SS ({seconds:.2f}s)"``.
-
-    Args:
-        total_seconds: Total elapsed time in seconds
-
-    Returns:
-        Formatted runtime string with seconds or HH:MM:SS format
-
-    Examples:
-        >>> # Short durations show seconds only
-        >>> format_overall_runtime(42.5)
-        '42.50s'
-
-        >>> # Medium durations still use seconds
-        >>> format_overall_runtime(1234.56)
-        '1234.56s'
-
-        >>> # Long durations show HH:MM:SS plus seconds
-        >>> format_overall_runtime(7384.25)
-        '02:03:04 (7384.25s)'
-
-        >>> # Very long durations
-        >>> format_overall_runtime(36125.78)
-        '10:02:05 (36125.78s)'
-
+    Uses seconds-only below the hour threshold. For long runs, prefixes with
+    ``HH:MM:SS`` while preserving precise seconds in parentheses.
     """
     if total_seconds >= FORMATTING.hour_threshold_seconds:
         return f"{_format_hms(total_seconds)} ({total_seconds:.2f}s)"
@@ -1855,26 +1831,10 @@ def _detect_repetitive_output(text: str, threshold: float | None = None) -> tupl
 
 
 def _detect_hallucination_patterns(text: str) -> list[str]:
-    r"""Detect patterns that suggest model hallucination or non-stopping behavior.
+    """Detect quiz/table artifacts that indicate task drift or hallucination.
 
-    Looks for:
-    - Markdown tables in non-table contexts (like captions)
-    - Questions appearing in generated descriptions
-    - Multiple choice answer patterns (A), B), C), D))
-    - Unrelated mathematical or quiz content
-
-    Args:
-        text: Generated text to check
-
-    Returns:
-        List of detected issue descriptions (empty if clean)
-
-    Examples:
-        >>> _detect_hallucination_patterns("Caption: Nice photo\n\n| Grade | Count |")
-        ['Contains unexpected table']
-
-        >>> _detect_hallucination_patterns("A) 42\nB) 43\nC) 44")
-        ['Contains multiple choice pattern']
+    Flags markdown tables, multiple-choice answer formats, quiz-style prompts,
+    and unrelated educational-content terms in otherwise descriptive output.
     """
     issues: list[str] = []
 
@@ -2565,6 +2525,34 @@ def _detect_fabricated_details(text: str) -> tuple[bool, list[str]]:
 # NOT inherent model quality problems. Separating them helps users know
 # whether to report issues upstream vs. use a different model.
 
+BPE_BYTE_ARTIFACTS: Final[tuple[tuple[str, str], ...]] = (
+    ("\u0100", "byte_0"),
+    ("\u0101", "byte_1"),
+    ("\u0102", "byte_2"),
+)
+
+SPECIAL_TOKEN_LEAK_PATTERNS: Final[tuple[tuple[str, str], ...]] = (
+    (r"<\|end\|>", "<|end|>"),
+    (r"<\|endoftext\|>", "<|endoftext|>"),
+    (r"<\|eot_id\|>", "<|eot_id|>"),
+    (r"<\|im_end\|>", "<|im_end|>"),
+    (r"<\|assistant\|>", "<|assistant|>"),
+    (r"<end_of_turn>", "<end_of_turn>"),
+    (r"</s>(?!\w)", "</s>"),
+    (r"<s>(?!\w)", "<s>"),
+    (r"# INSTRUCTION", "# INSTRUCTION"),
+    (r"# SOLUTION", "# SOLUTION"),
+    (r"\[INST\]", "[INST]"),
+    (r"\[/INST\]", "[/INST]"),
+    (r"<\|think\|>", "<|think|>"),
+    (r"</think>", "</think>"),
+    (r"<\|pad\|>", "<|pad|>"),
+    (r"<\|unk\|>", "<|unk|>"),
+    (r"\[PAD\]", "[PAD]"),
+    (r"\[CLS\]", "[CLS]"),
+    (r"\[SEP\]", "[SEP]"),
+)
+
 
 def _detect_token_encoding_issues(text: str) -> tuple[bool, str | None]:
     """Detect tokenizer decoding bugs where raw BPE tokens leak through.
@@ -2593,13 +2581,7 @@ def _detect_token_encoding_issues(text: str) -> tuple[bool, str | None]:
         return True, f"bpe_newline_leak({count})"
 
     # Check for other common tokenizer artifacts that shouldn't be visible
-    # These are byte-level BPE artifacts
-    bpe_artifacts = [
-        ("\u0100", "byte_0"),  # Byte fallback prefix
-        ("\u0101", "byte_1"),
-        ("\u0102", "byte_2"),
-    ]
-    for artifact, name in bpe_artifacts:
+    for artifact, name in BPE_BYTE_ARTIFACTS:
         if artifact in text and text.count(artifact) > QUALITY.min_bpe_artifact_count:
             return True, f"bpe_byte_leak({name})"
 
@@ -2623,34 +2605,7 @@ def _detect_special_token_leakage(text: str) -> tuple[bool, list[str]]:
 
     leaked_tokens: list[str] = []
 
-    # Common special tokens that should never appear in output
-    special_token_patterns = [
-        # End tokens
-        (r"<\|end\|>", "<|end|>"),
-        (r"<\|endoftext\|>", "<|endoftext|>"),
-        (r"<\|eot_id\|>", "<|eot_id|>"),
-        (r"<\|im_end\|>", "<|im_end|>"),
-        (r"<\|assistant\|>", "<|assistant|>"),
-        (r"<end_of_turn>", "<end_of_turn>"),
-        (r"</s>(?!\w)", "</s>"),  # Not followed by word char (avoid </span>)
-        (r"<s>(?!\w)", "<s>"),
-        # Instruction markers
-        (r"# INSTRUCTION", "# INSTRUCTION"),
-        (r"# SOLUTION", "# SOLUTION"),
-        (r"\[INST\]", "[INST]"),
-        (r"\[/INST\]", "[/INST]"),
-        # Thinking markers (some models expose these)
-        (r"<\|think\|>", "<|think|>"),
-        (r"</think>", "</think>"),
-        # Other control tokens
-        (r"<\|pad\|>", "<|pad|>"),
-        (r"<\|unk\|>", "<|unk|>"),
-        (r"\[PAD\]", "[PAD]"),
-        (r"\[CLS\]", "[CLS]"),
-        (r"\[SEP\]", "[SEP]"),
-    ]
-
-    for pattern, token_name in special_token_patterns:
+    for pattern, token_name in SPECIAL_TOKEN_LEAK_PATTERNS:
         if re.search(pattern, text):
             leaked_tokens.append(token_name)
 
@@ -2834,24 +2789,10 @@ def _detect_training_data_leak(text: str) -> tuple[bool, str | None]:
 
 
 def compute_vocabulary_diversity(text: str) -> tuple[float, int, int]:
-    """Compute vocabulary diversity metrics for generated text.
+    """Compute lexical diversity as type-token ratio (TTR).
 
-    Type-token ratio (TTR) measures lexical diversity - the ratio of unique
-    words to total words. Higher values indicate more varied vocabulary.
-
-    Args:
-        text: Generated text to analyze
-
-    Returns:
-        Tuple of (type_token_ratio, unique_words, total_words)
-        Returns (0.0, 0, 0) for empty text
-
-    Examples:
-        >>> compute_vocabulary_diversity("The cat sat on the mat")
-        (0.83, 5, 6)  # 5 unique words out of 6 total
-
-        >>> compute_vocabulary_diversity("yes yes yes yes")
-        (0.25, 1, 4)  # Low diversity - repetitive
+    Tokenization uses lowercase alphabetic words, returning
+    ``(ttr, unique_words, total_words)``.
     """
     if not text:
         return 0.0, 0, 0
@@ -3806,47 +3747,10 @@ def _format_numeric_by_field(field_name: str, num: float) -> str:
 
 
 def format_field_value(field_name: str, value: MetricValue) -> str:
-    """Normalize and format field values for display.
+    """Normalize values for report/log rendering using field-aware numeric rules.
 
-    Rules:
-        - Memory fields ("*_memory"): mixed sources (mlx returns bytes; mlx-vlm returns
-            decimal GB). Heuristic: if raw value > MEM_BYTES_TO_GB_THRESHOLD treat as bytes,
-            else assume already GB. Formatting thresholds:
-                >= 10 GB : integer with commas
-                >= 1 GB  : one decimal place
-                < 1 GB   : two decimals
-    - Time fields: seconds with 2 decimals + trailing 's'.
-    - TPS fields: adaptive precision (integer / 1 decimal / 3 sig figs).
-    - Other numerics: general fmt_num; non-numerics: str(value) or ''.
-
-    Args:
-        field_name: Name of the metric field (used for format detection)
-        value: Numeric or string value to format
-
-    Returns:
-        Formatted string representation of the value
-
-    Examples:
-        >>> # Memory formatting (bytes to GB conversion)
-        >>> format_field_value("peak_memory", 15_728_640_000.0)
-        '15 GB'
-
-        >>> # Time formatting (seconds with 2 decimals)
-        >>> format_field_value("generation_time", 3.14159)
-        '3.14s'
-
-        >>> # TPS formatting (adaptive precision)
-        >>> format_field_value("generation_tps", 42.567)
-        '42.6'
-
-        >>> # Non-numeric values returned as strings
-        >>> format_field_value("model_name", "qwen2-vl-2b-instruct-4bit")
-        'qwen2-vl-2b-instruct-4bit'
-
-        >>> # None values return empty string
-        >>> format_field_value("any_field", None)
-        ''
-
+    Handles memory/time/TPS conventions, preserves non-numeric strings as-is,
+    and returns ``""`` for null values.
     """
     if value is None:
         return ""
@@ -4626,79 +4530,68 @@ def _convert_gps_coordinate(
     return (components[0] or 0.0, components[1] or 0.0, components[2] or 0.0)
 
 
-def _extract_exif_date(img_path: PathLike, exif_data: ExifDict) -> str | None:
-    # Try EXIF date tags in priority order (using tuple unpacking for cleaner code)
+def _first_exif_date_value(exif_data: ExifDict) -> ExifValue | None:
+    """Return the first populated EXIF date value using configured tag priority."""
     for tag in EXIF_DATE_TAGS:
-        if exif_date := exif_data.get(tag):
-            break
-    else:
-        exif_date = None
+        if value := exif_data.get(tag):
+            return value
+    return None
 
+
+def _parse_exif_local_datetime(exif_date: ExifValue) -> datetime | None:
+    """Parse an EXIF date value and convert it to local timezone."""
+    local_tz = get_localzone()
+    exif_text = str(exif_date)
+    for fmt in DATE_FORMATS:
+        with contextlib.suppress(ValueError):
+            parsed = datetime.strptime(exif_text, fmt).replace(tzinfo=UTC)
+            return parsed.astimezone(local_tz)
+    return None
+
+
+def _extract_file_mtime_local(
+    img_path: PathLike,
+    *,
+    log_context: str = "",
+) -> datetime | None:
+    """Return file mtime as localized datetime, or ``None`` on filesystem errors."""
+    try:
+        return datetime.fromtimestamp(Path(img_path).stat().st_mtime, tz=get_localzone())
+    except OSError as err:
+        logger.debug("Could not get file mtime%s: %s", log_context, err)
+        return None
+
+
+def _extract_exif_date(img_path: PathLike, exif_data: ExifDict) -> str | None:
+    exif_date = _first_exif_date_value(exif_data)
     if exif_date:
-        # Try to parse with known formats
         try:
-            local_tz = get_localzone()
-            for fmt in DATE_FORMATS:
-                try:
-                    dt = datetime.strptime(str(exif_date), fmt).replace(tzinfo=UTC)
-                    return dt.astimezone(local_tz).strftime("%Y-%m-%d %H:%M:%S %Z")
-                except ValueError:
-                    continue
-            # If no format matched, return raw date string
+            parsed = _parse_exif_local_datetime(exif_date)
+            if parsed is not None:
+                return parsed.strftime("%Y-%m-%d %H:%M:%S %Z")
             return str(exif_date)
         except (TypeError, UnicodeDecodeError) as err:
             logger.warning("Could not localize EXIF date: %s", err)
             return str(exif_date)
 
-    # Fallback to filesystem mtime
-    try:
-        local_tz = get_localzone()
-        return datetime.fromtimestamp(
-            Path(img_path).stat().st_mtime,
-            tz=local_tz,
-        ).strftime("%Y-%m-%d %H:%M:%S %Z")
-    except OSError as err:
-        logger.debug("Could not get file mtime: %s", err)
-        return None
+    mtime_local = _extract_file_mtime_local(img_path)
+    return mtime_local.strftime("%Y-%m-%d %H:%M:%S %Z") if mtime_local is not None else None
 
 
 def _extract_exif_time(img_path: PathLike, exif_data: ExifDict) -> str | None:
-    """Extract just the local time portion from EXIF data.
-
-    Returns time in HH:MM:SS format (24-hour), or None if unavailable.
-    """
-    # Try EXIF date tags in priority order
-    for tag in EXIF_DATE_TAGS:
-        if exif_date := exif_data.get(tag):
-            break
-    else:
-        exif_date = None
-
+    """Extract local capture time (``HH:MM:SS``) from EXIF or file mtime."""
+    exif_date = _first_exif_date_value(exif_data)
     if exif_date:
-        # Try to parse with known formats
         try:
-            local_tz = get_localzone()
-            for fmt in DATE_FORMATS:
-                try:
-                    dt = datetime.strptime(str(exif_date), fmt).replace(tzinfo=UTC)
-                    return dt.astimezone(local_tz).strftime("%H:%M:%S")
-                except ValueError:
-                    continue
-            # If no format matched, cannot extract time
+            parsed = _parse_exif_local_datetime(exif_date)
+            if parsed is not None:
+                return parsed.strftime("%H:%M:%S")
         except (TypeError, UnicodeDecodeError) as err:
             logger.warning("Could not extract time from EXIF date: %s", err)
         return None
 
-    # Fallback to filesystem mtime
-    try:
-        local_tz = get_localzone()
-        return datetime.fromtimestamp(
-            Path(img_path).stat().st_mtime,
-            tz=local_tz,
-        ).strftime("%H:%M:%S")
-    except OSError as err:
-        logger.debug("Could not get file mtime for time: %s", err)
-        return None
+    mtime_local = _extract_file_mtime_local(img_path, log_context=" for time")
+    return mtime_local.strftime("%H:%M:%S") if mtime_local is not None else None
 
 
 def _decode_exif_string(value: bytes | str | None) -> str:
@@ -4775,36 +4668,10 @@ def _extract_description(exif_data: ExifDict) -> str | None:
 
 
 def _extract_gps_str(gps_info_raw: Mapping[Any, Any] | None) -> str | None:
-    """Extract formatted GPS string from EXIF GPS info dictionary.
+    """Convert EXIF GPS mapping to decimal-degree text with cardinal suffixes.
 
-    Converts raw EXIF GPS data (DMS format) into human-readable decimal degrees
-    with cardinal directions. Handles byte decoding and various EXIF tag formats.
-
-    Args:
-        gps_info_raw: Raw GPS info dict from EXIF with numeric or string keys
-
-    Returns:
-        Formatted GPS string like "37.775139°N, 122.418336°W" or None if invalid
-
-    Examples:
-        >>> # Standard GPS EXIF data with DMS coordinates
-        >>> gps_data = {
-        ...     1: b'N',  # GPSLatitudeRef
-        ...     2: (37.0, 46.0, 30.5),  # GPSLatitude
-        ...     3: b'W',  # GPSLongitudeRef
-        ...     4: (122.0, 25.0, 6.0)  # GPSLongitude
-        ... }
-        >>> _extract_gps_str(gps_data)
-        '37.775139°N, 122.418336°W'
-
-        >>> # Missing required fields returns None
-        >>> _extract_gps_str({1: b'N', 2: (37.0, 46.0, 30.5)})
-        None
-
-        >>> # Invalid input returns None
-        >>> _extract_gps_str(None)
-        None
-
+    Accepts mixed key formats (numeric EXIF ids or tag strings) and returns
+    ``"<lat>°N/S, <lon>°E/W"`` when required coordinates are present.
     """
     if not isinstance(gps_info_raw, Mapping):
         return None
@@ -8893,32 +8760,10 @@ def _classify_error(error_msg: str) -> str:
 
 
 def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None) -> str:
-    """Determine which package most likely caused the error.
+    """Heuristically attribute an error to the most likely owning package.
 
-    Analyzes the error message and optional traceback to identify the
-    originating package. This helps direct bug reports to the correct
-    repository (mlx, mlx-vlm, mlx-lm, or transformers).
-
-    Args:
-        error_msg: The error message string
-        traceback_str: Optional full traceback string for deeper analysis
-
-    Returns:
-        Package name: 'mlx', 'mlx-vlm', 'mlx-lm', 'transformers', 'huggingface-hub',
-                      'model-config', or 'unknown'
-
-    Examples:
-        >>> _attribute_error_to_package("[metal::malloc] Attempting to allocate...")
-        'mlx'
-
-        >>> _attribute_error_to_package("cannot import name '_validate_images_text_input_order'")
-        'transformers'
-
-        >>> _attribute_error_to_package(
-        ...     "Model loading failed",
-        ...     "File '/path/mlx_vlm/utils.py', line 245..."
-        ... )
-        'mlx-vlm'
+    Uses ordered pattern precedence across message/traceback text so diagnostics
+    can route issue reports to the right upstream project.
     """
     msg_lower = error_msg.lower()
     tb_lower = (traceback_str or "").lower()
@@ -10946,21 +10791,10 @@ def process_models(
 
 
 def _format_quality_analysis_for_log(analysis: GenerationQualityAnalysis) -> str:
-    """Format quality analysis for structured logging.
+    """Serialize quality-analysis flags into a compact log string.
 
-    Args:
-        analysis: GenerationQualityAnalysis with detected metrics
-
-    Returns:
-        Formatted string with all quality metrics for logging
-
-    Examples:
-        >>> analysis = GenerationQualityAnalysis(
-        ...     is_repetitive=True, repeated_token="<s>",
-        ...     is_verbose=True, ...
-        ... )
-        >>> _format_quality_analysis_for_log(analysis)
-        'repetitive=True(token=<s>), verbose=True, generic=False, ...'
+    Includes only active flags plus lightweight counters to keep diagnostics
+    readable in one line.
     """
     parts = []
     if analysis.is_repetitive:
@@ -10998,29 +10832,10 @@ def _format_quality_analysis_for_log(analysis: GenerationQualityAnalysis) -> str
 
 
 def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | None:
-    """Build consolidated quality issues string from analysis results.
+    """Build prioritized, comma-separated issue labels from analysis flags.
 
-    Prioritizes critical issues first:
-    HARNESS ISSUES (integration bugs) → refusal → repetitive → lang_mixing →
-    hallucination → generic → verbose → formatting → bullets → context-ignored.
-
-    Harness issues are prefixed with ⚠️ to clearly distinguish them from
-    model quality issues. These indicate bugs in mlx-vlm or model integration
-    that should be reported upstream.
-
-    Args:
-        analysis: GenerationQualityAnalysis with detected issues
-
-    Returns:
-        Comma-separated issues string or None if no issues detected
-
-    Examples:
-        >>> analysis = GenerationQualityAnalysis(
-        ...     is_repetitive=True, repeated_token="<s>",
-        ...     is_verbose=True, ...
-        ... )
-        >>> _build_quality_issues_string(analysis)
-        'repetitive(<s>), verbose'
+    Ordering is intentional for triage severity: harness/integration issues
+    first, then critical model quality issues, then lower-severity formatting.
     """
     issues = []
 
@@ -11125,20 +10940,7 @@ def _extract_quality_issue_labels(quality_issues: str | None) -> set[str]:
 
 
 def _parse_quality_issues_to_list(quality_issues: str | None) -> list[str]:
-    """Parse quality issues string into a list of individual issues.
-
-    Args:
-        quality_issues: Comma-separated quality issues string or None
-
-    Returns:
-        List of individual quality issue strings, or empty list if None
-
-    Examples:
-        >>> _parse_quality_issues_to_list("repetitive(<s>), verbose")
-        ['repetitive(<s>)', 'verbose']
-        >>> _parse_quality_issues_to_list(None)
-        []
-    """
+    """Split stored comma-separated quality issue text into normalized items."""
     if not quality_issues:
         return []
     return [issue.strip() for issue in quality_issues.split(",")]
@@ -11148,20 +10950,9 @@ def _truncate_quality_issues(
     quality_issues: str | None,
     max_len: int = MAX_QUALITY_ISSUES_LEN,
 ) -> str:
-    """Truncate quality issues string for display in Markdown tables.
+    """Truncate quality issue text for narrow table cells.
 
-    Args:
-        quality_issues: Comma-separated quality issues string or None
-        max_len: Maximum length for the truncated string
-
-    Returns:
-        Truncated quality issues string with ellipsis if needed, or empty string if None
-
-    Examples:
-        >>> _truncate_quality_issues("repetitive(<s>), verbose, formatting", 20)
-        'repetitive(<s>), ...'
-        >>> _truncate_quality_issues("short", 20)
-        'short'
+    Prefers a comma-boundary cut before falling back to hard clipping.
     """
     if not quality_issues:
         return ""

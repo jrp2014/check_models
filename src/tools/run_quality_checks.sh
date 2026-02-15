@@ -39,7 +39,7 @@ fi
 # In CI, use the python from PATH (set up by GitHub Actions)
 # Locally, prefer conda environment python if available
 if [[ "${CI:-false}" == "true" ]]; then
-    PYTHON="python3"
+    PYTHON="python"
 elif [ -n "${CONDA_PREFIX:-}" ]; then
     PYTHON="$CONDA_PREFIX/bin/python"
 else
