@@ -6727,7 +6727,7 @@ def _diagnostics_priority_table(
         )
     if preflight_issues:
         package_names = sorted(
-            {_guess_preflight_issue_package(issue) for issue in preflight_issues}
+            {_guess_preflight_issue_package(issue) for issue in preflight_issues},
         )
         package_summary = DIAGNOSTICS_ESCAPER.escape(", ".join(package_names))
         n = len(preflight_issues)
