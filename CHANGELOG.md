@@ -2,6 +2,39 @@
 
 Notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+
+- Hardened runtime dependency handling for core MLX stack:
+  `mlx`, `mlx-vlm`, and `mlx-lm` are now treated as required for model execution.
+- Added explicit early package/runtime preflight in
+  `src/tools/run_quality_checks.sh` to fail fast when required runtime deps are
+  missing or broken.
+- Updated CLI execution flow so argument/path validation and `--dry-run`
+  behavior are evaluated before runtime dependency hard-fail, while still
+  enforcing a hard stop before any model inference starts.
+- Improved type-checking signal quality without globally hiding import/stub
+  issues:
+  - `pyright` missing import/stub diagnostics now emit warnings.
+  - `mypy` uses targeted third-party overrides instead of global
+    `ignore_missing_imports`.
+  - `pyrefly` no longer uses wildcard missing-import ignore.
+  - `ty` unresolved-import is now warning-level (visible, non-blocking).
+- Strengthened E2E runtime gating to require usable `mlx` + `mlx-vlm` +
+  `mlx-lm` for inference smoke tests.
+- Improved CI MLX stub-generation step robustness to tolerate missing/generated
+  stub-path variance as a non-fatal warning (typing-accuracy degradation only).
+
+### Fixed
+
+- Fixed CI regression where runtime dependency hard-fail masked CLI argument and
+  folder validation tests by firing too early in startup.
+- Removed weak/avoidable lint suppressions by:
+  - replacing shell word-splitting patterns with array-safe handling in quality
+    and hook scripts;
+  - replacing unnecessary test `type: ignore` usage with explicit type asserts.
+
 ## [0.1.1] - 2026-02-13
 
 ### Changed
