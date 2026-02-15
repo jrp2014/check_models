@@ -9207,44 +9207,6 @@ def _log_compact_metrics(res: PerformanceResult) -> None:
         )
 
 
-def _build_compact_metric_parts(
-    res: PerformanceResult,
-    gen: GenerationResult | SupportsGenerationResult,
-) -> list[str]:
-    """Return list of metric segments for compact metrics line."""
-    total_time_val = getattr(res, "total_time", None)
-    generation_time_val = getattr(res, "generation_time", None)
-    load_time_val = getattr(res, "model_load_time", None)
-    peak_mem = getattr(gen, "peak_memory", None) or 0.0
-    prompt_tokens = getattr(gen, "prompt_tokens", 0) or 0
-    gen_tokens = getattr(gen, "generation_tokens", 0) or 0
-    all_tokens = prompt_tokens + gen_tokens
-    gen_tps = getattr(gen, "generation_tps", 0.0) or 0.0
-    prompt_tps = getattr(gen, "prompt_tps", 0.0) or 0.0
-
-    parts: list[str] = []
-    if total_time_val is not None:
-        parts.append(f"total={_format_time_seconds(total_time_val)}")
-    if generation_time_val is not None:
-        parts.append(f"gen={_format_time_seconds(generation_time_val)}")
-    if load_time_val is not None:
-        parts.append(f"load={_format_time_seconds(load_time_val)}")
-    if peak_mem > 0:
-        mem_fmt = format_field_value("peak_memory", peak_mem)
-        mem_str = f"{mem_fmt}GB" if not str(mem_fmt).endswith("GB") else str(mem_fmt)
-        parts.append(f"peak_mem={mem_str}")
-    if all_tokens:
-        parts.append(
-            "tokens(total/prompt/gen)="
-            f"{fmt_num(all_tokens)}/{fmt_num(prompt_tokens)}/{fmt_num(gen_tokens)}",
-        )
-    if gen_tps:
-        parts.append(f"gen_tps={fmt_num(gen_tps)}")
-    if prompt_tps:
-        parts.append(f"prompt_tps={fmt_num(prompt_tps)}")
-    return parts
-
-
 def log_metrics_legend(*, detailed: bool) -> None:
     """Emit a one-time legend at the beginning of processing for clarity."""
     log_blank()
@@ -9357,35 +9319,6 @@ def print_cli_separator() -> None:
     """Print a visually distinct separator line using unicode box-drawing characters."""
     width = get_terminal_width(max_width=100)
     log_rule(width, char="─", color=Colors.BLUE, bold=False)
-
-
-def _resolve_safe_command(command: list[str]) -> list[str] | None:
-    """Validate and resolve a command for subprocess execution.
-
-    Ensures the executable is an absolute, existing file and prevents NUL bytes.
-    Returns the resolved command list or None if validation fails.
-    """
-    if not command or not all(isinstance(arg, str) and arg for arg in command):
-        return None
-    if any("\x00" in arg for arg in command):
-        return None
-
-    exec_path = Path(command[0])
-    if not exec_path.is_absolute():
-        resolved = shutil.which(command[0])
-        if not resolved:
-            return None
-        exec_path = Path(resolved)
-
-    try:
-        exec_path = exec_path.resolve()
-    except OSError:
-        return None
-
-    if not exec_path.is_file():
-        return None
-
-    return [str(exec_path), *command[1:]]
 
 
 def _dump_environment_to_log(output_path: Path) -> None:
@@ -10232,104 +10165,6 @@ def _truncate_quality_issues(
     if last_comma > 0:
         return truncated[:last_comma] + ", ..."
     return truncated.rstrip() + "..."
-
-
-def _bucket_failures_by_error(
-    results: list[PerformanceResult],
-) -> dict[str, list[str]]:
-    """Group failed models by their root cause exception type and message pattern.
-
-    This transforms a flat list of failures into categorized buckets, making it
-    easier to identify systematic issues (e.g., all models failing with the same
-    missing parameter error).
-
-    Args:
-        results: List of all PerformanceResult objects
-
-    Returns:
-        Dictionary mapping error signature to list of failed model names.
-        Format: {"TypeError: unexpected keyword 'temperature'": ["model1", "model2"], ...}
-    """
-    buckets: dict[str, list[str]] = {}
-    failed_results = [r for r in results if not r.success]
-
-    min_wrapped_parts = 3  # Minimum parts to identify wrapped exception
-    max_error_msg_len = 120  # Truncate long error messages for readability
-
-    for res in failed_results:
-        # Build error signature from error_type and core message
-        error_type = res.error_type or "UnknownError"
-        error_msg = res.error_message or "No error message"
-
-        # Extract the core exception message (first line, truncated)
-        # Skip traceback noise and focus on the actual error
-        core_msg = error_msg.split("\n")[0].strip()
-
-        # Try to extract the root cause from wrapped exceptions
-        # Look for patterns like "ValueError: Model loading failed: ImportError: ..."
-        if ": " in core_msg:
-            parts = core_msg.split(": ")
-            # If this looks like a wrapped exception, extract the inner one
-            if len(parts) >= min_wrapped_parts and parts[1].startswith("Model"):
-                # Example pattern: ValueError, Model loading failed, ImportError, cannot import
-                # We want to extract: ImportError: cannot import
-                inner_parts = parts[2:]
-                core_msg = ": ".join(inner_parts)
-                # Update error_type to the actual root cause
-                if inner_parts and inner_parts[0] in {
-                    "TypeError",
-                    "ImportError",
-                    "ValueError",
-                    "AttributeError",
-                    "KeyError",
-                    "OSError",
-                    "RuntimeError",
-                }:
-                    error_type = inner_parts[0]
-
-        # Truncate very long messages but keep key info
-        if len(core_msg) > max_error_msg_len:
-            core_msg = core_msg[: max_error_msg_len - 3] + "..."
-
-        # Create signature
-        signature = f"{error_type}: {core_msg}"
-
-        # Add model to this bucket
-        if signature not in buckets:
-            buckets[signature] = []
-        buckets[signature].append(res.model_name)
-
-    return buckets
-
-
-def log_failure_summary(buckets: dict[str, list[str]]) -> None:
-    """Log error buckets as a human-readable failure summary.
-
-    Args:
-        buckets: Dictionary from _bucket_failures_by_error
-    """
-    if not buckets:
-        return
-
-    log_rule(80, char="=", bold=True, pre_newline=True)
-    logger.info("FAILURE SUMMARY - Models Grouped by Root Cause")
-    log_rule(80, char="=", bold=True, post_newline=True)
-
-    # Sort buckets by number of affected models (most common errors first)
-    sorted_buckets = sorted(
-        buckets.items(),
-        key=lambda item: len(item[1]),
-        reverse=True,
-    )
-
-    for signature, models in sorted_buckets:
-        logger.info("%s", signature)
-        logger.info("  Affected models (%d):", len(models))
-        for model in models:
-            logger.info("    • %s", model)
-        log_blank()  # Blank line between buckets
-
-    log_rule(80, char="=", post_newline=True)
 
 
 def _format_counter_items(counter: Counter[str], *, max_items: int = 6) -> str:

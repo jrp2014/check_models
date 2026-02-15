@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-02-14 18:02:31 GMT
+FULL ENVIRONMENT DUMP - 2026-02-15 00:26:49 GMT
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -58,8 +58,8 @@ markdown-it-py==4.0.0
 MarkupSafe==3.0.3
 mdurl==0.1.2
 ml_dtypes==0.5.4
-mlx==0.30.7.dev20260214+c184262d
-mlx==0.30.7.dev20260214+c184262d
+mlx==0.30.7.dev20260215+c184262d
+mlx==0.30.7.dev20260215+c184262d
 mlx-lm==0.30.7
 mlx-vlm==0.3.12
 mpmath==1.3.0
@@ -83,7 +83,7 @@ pathspec==1.0.4
 pfzy==0.3.4
 pillow==12.1.1
 pip==26.0.1
-platformdirs==4.9.0
+platformdirs==4.9.1
 pluggy==1.6.0
 pre_commit==4.5.1
 prompt_toolkit==3.0.52
@@ -155,5 +155,5 @@ yarl==1.22.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-02-14 18:02:31 GMT
+Environment dump completed at 2026-02-15 00:26:49 GMT
 ================================================================================
