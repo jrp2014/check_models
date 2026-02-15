@@ -6,6 +6,14 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+### Changed
+
+### Fixed
+
+## [0.2.0] - 2026-02-15
+
+### Added
+
 - New preflight package-risk diagnostics in `check_models.py` to surface common
   upstream compatibility issues early (MLX/MLX-VLM/MLX-LM/Transformers version
   mismatches and known problematic package states).
