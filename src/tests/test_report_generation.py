@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from check_models import (
+    DiagnosticsHistoryInputs,
     GenerationQualityAnalysis,
     LibraryVersionDict,
     PerformanceResult,
@@ -15,6 +16,7 @@ from check_models import (
     _cluster_failures_by_pattern,
     _diagnostics_priority,
     _format_traceback_tail,
+    export_failure_repro_bundles,
     generate_diagnostics_report,
     generate_html_report,
     generate_markdown_report,
@@ -585,9 +587,11 @@ class TestDiagnosticsReport:
             versions=_stub_versions(),
             system_info={},
             prompt="test",
-            history_path=history_path,
-            previous_history=previous_record,
-            current_history=current_record,
+            history=DiagnosticsHistoryInputs(
+                history_path=history_path,
+                previous_history=previous_record,
+                current_history=current_record,
+            ),
         )
         content = out.read_text(encoding="utf-8")
         assert "## History Context" in content
@@ -677,6 +681,61 @@ class TestDiagnosticsReport:
         assert "### Target specific failing models:" not in content
         assert "python -m check_models" in content
         assert "python -m check_models --models org/broken-model" in content
+
+    def test_issue_template_contains_fingerprint_and_canonical_metadata(
+        self, tmp_path: Path
+    ) -> None:
+        """Failure clusters should include copy/paste issue templates."""
+        out = tmp_path / "diag.md"
+        generate_diagnostics_report(
+            results=[
+                _make_failure_with_details(
+                    "org/broken-model",
+                    error_msg="got an unexpected keyword argument 'images'",
+                    error_package="transformers",
+                    error_stage="API Mismatch",
+                    traceback_str='Traceback\nFile "x.py", line 12, in y\nTypeError: bad',
+                ),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13", "Platform": "macOS", "GPU/Chip": "Apple M4"},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "### Issue Template" in content
+        assert "Copy/paste GitHub issue template" in content
+        assert "Canonical code" in content
+        assert "Signature" in content
+        assert "Environment Fingerprint" in content
+        assert "Minimal Reproduction" in content
+        assert "transformers/issues/new" in content
+
+    def test_failure_repro_bundles_written(self, tmp_path: Path) -> None:
+        """Each failed model should produce a machine-readable repro bundle."""
+        failure = _make_failure_with_details(
+            "org/broken-model",
+            error_msg="bad shape",
+            error_stage="Model Error",
+            error_package="mlx-vlm",
+            traceback_str="Traceback\nValueError: bad shape",
+        )
+        bundles = export_failure_repro_bundles(
+            results=[failure],
+            output_dir=tmp_path / "repro_bundles",
+            run_args=Namespace(),
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            prompt="Describe this image.",
+            image_path=None,
+        )
+        assert "org/broken-model" in bundles
+        bundle_path = bundles["org/broken-model"]
+        assert bundle_path.exists()
+        payload = json.loads(bundle_path.read_text(encoding="utf-8"))
+        assert payload["model"] == "org/broken-model"
+        assert payload["failure"]["stage"] == "Model Error"
+        assert payload["repro"]["prompt_hash_sha256"]
 
     def test_diagnostics_file_ends_with_single_trailing_newline(self, tmp_path: Path) -> None:
         """Diagnostics markdown should end with a trailing newline for markdownlint."""

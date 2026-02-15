@@ -11,6 +11,20 @@ Notable changes to this project will be documented in this file.
   mismatches and known problematic package states).
 - Additional diagnostics stack-signal and long-context-breakdown analysis
   sections to better triage quality and failure patterns.
+- Phase-aware failure attribution in model execution (`import`, `model_load`,
+  `tokenizer_load`, `processor_load`, `model_preflight`, `prefill`, `decode`)
+  so reports can identify the first failing runtime stage.
+- Canonical failure metadata for each failed model:
+  machine-readable `error_code` plus stable `error_signature` for clustering
+  related failures across models/runs.
+- Per-failure reproducibility bundle export (`output/repro_bundles/*.json`)
+  with args, environment fingerprint, prompt/image hashes, traceback, captured
+  output, and exact rerun command.
+- Diagnostics report now emits copy/paste-ready issue templates per failure
+  cluster, including canonical signature, minimal repro command, environment
+  fingerprint, and likely upstream issue tracker.
+- Model preflight validators for tokenizer/processor/config/snapshot layout to
+  detect packaging and compatibility defects before generation begins.
 
 ### Changed
 
@@ -39,6 +53,10 @@ Notable changes to this project will be documented in this file.
   output sanitization for cleaner issue filing.
 - Refactored portions of `check_models.py` for readability/maintainability
   without intended behavioral change.
+- Failure clustering in diagnostics now keys off canonical signatures instead of
+  raw message text heuristics, improving cross-model bucketing stability.
+- JSONL result rows now include `failure_phase`, `error_code`, and
+  `error_signature` fields (metadata format version bumped to `1.2`).
 
 ### Fixed
 

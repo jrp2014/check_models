@@ -616,6 +616,9 @@ class HistoryModelResultRecord(TypedDict):
     error_stage: str | None
     error_type: str | None
     error_package: str | None
+    failure_phase: NotRequired[str | None]
+    error_code: NotRequired[str | None]
+    error_signature: NotRequired[str | None]
 
 
 class HistoryRunRecord(TypedDict, total=False):
@@ -682,7 +685,10 @@ class JsonlResultRecord(TypedDict):
     _type: Literal["result"]
     model: str
     success: bool
+    failure_phase: str | None
     error_stage: str | None
+    error_code: str | None
+    error_signature: str | None
     error_message: str | None
     captured_output_on_fail: str | None
     error_type: str | None
@@ -694,6 +700,15 @@ class JsonlResultRecord(TypedDict):
     timing: JsonlTimingRecord
     generated_text: NotRequired[str]
     quality_analysis: NotRequired[JsonlQualityAnalysisRecord]
+
+
+@dataclass(frozen=True)
+class DiagnosticsHistoryInputs:
+    """Optional history inputs for diagnostics report generation."""
+
+    history_path: Path | None = None
+    previous_history: HistoryRunRecord | None = None
+    current_history: HistoryRunRecord | None = None
 
 
 @runtime_checkable
@@ -791,7 +806,10 @@ class PerformanceResult:
         model_name: HuggingFace model identifier (e.g., 'mlx-community/nanoLLaVA')
         generation: The mlx-vlm GenerationResult, or None if generation failed
         success: Whether generation completed without errors
-        error_stage: Which stage failed ('load', 'generate', 'timeout')
+        failure_phase: First execution phase that failed (import/model_load/prefill/decode...)
+        error_stage: Human-readable error class (OOM, API Mismatch, Model Error, ...)
+        error_code: Canonical machine-readable code for cross-run bucketing
+        error_signature: Stable signature hash for clustering related failures
         error_message: Human-readable error description
         captured_output_on_fail: Stderr/stdout captured when error occurred
         generation_time: Wall-clock time for text generation (excludes model load)
@@ -809,7 +827,10 @@ class PerformanceResult:
     model_name: str
     generation: GenerationResult | SupportsGenerationResult | None
     success: bool
+    failure_phase: str | None = None
     error_stage: str | None = None
+    error_code: str | None = None
+    error_signature: str | None = None
     error_message: str | None = None
     captured_output_on_fail: str | None = None
     generation_time: float | None = None
@@ -888,6 +909,10 @@ def _gallery_render_error(res: PerformanceResult) -> list[str]:
         out.append(f"**Error:** {error_msg}")
     if res.error_type:
         out.append(f"**Type:** `{res.error_type}`")
+    if res.failure_phase:
+        out.append(f"**Phase:** `{res.failure_phase}`")
+    if res.error_code:
+        out.append(f"**Code:** `{res.error_code}`")
     if res.error_package:
         out.append(f"**Package:** `{res.error_package}`")
     if res.error_traceback:
@@ -6089,44 +6114,41 @@ def _diagnostics_captured_output_section(cluster_results: list[PerformanceResult
 def _cluster_failures_by_pattern(
     results: list[PerformanceResult],
 ) -> dict[str, list[PerformanceResult]]:
-    """Group failed results by their core error message pattern.
+    """Group failed results by canonical signature.
 
     Unlike ``_bucket_failures_by_error`` (which produces ``{signature: [model_name]}``
     for console logging), this returns the full ``PerformanceResult`` objects so the
     diagnostics report can access tracebacks, packages, and other fields.
 
     Clustering heuristic:
-        1. Strip model-specific prefixes ("Model generation failed for <model>:")
-        2. Normalise varying numbers (shape dimensions, counts) into placeholders
-        3. Group by the resulting canonical message
+        1. Prefer explicit ``error_signature`` from runtime failure metadata.
+        2. Fall back to deterministic signature built from error code + normalized
+           message/traceback.
 
     Returns:
-        Mapping from a human-readable pattern label to the list of results
-        sharing that pattern.
+        Mapping from canonical signature to the list of results sharing it.
     """
     clusters: dict[str, list[PerformanceResult]] = {}
     failed = [r for r in results if not r.success]
 
     for res in failed:
-        msg = res.error_message or "Unknown error"
-        core = msg.split("\n")[0].strip()
-
-        # Remove model-specific wrappers (e.g. "Model generation failed for ...")
-        wrapper_match = re.match(
-            r"Model (?:generation|loading) failed(?:\s+for\s+\S+)?:\s*(.+)",
-            core,
+        stage = res.error_stage or _classify_error(res.error_message or "Unknown error")
+        package = res.error_package or _attribute_error_to_package(
+            res.error_message or "Unknown error",
+            res.error_traceback,
         )
-        if wrapper_match:
-            core = wrapper_match.group(1)
+        code = res.error_code or _build_canonical_error_code(
+            error_stage=stage,
+            error_package=package,
+            failure_phase=res.failure_phase,
+        )
+        signature = res.error_signature or _build_error_signature(
+            error_code=code,
+            error_message=res.error_message,
+            error_traceback=res.error_traceback,
+        )
 
-        # Normalise varying numeric shapes/counts so dimensionally-different
-        # instances of the same root cause cluster together.
-        # Step 1: Replace all digits with N
-        canonical = re.sub(r"\d+", "N", core)
-        # Step 2: Collapse shape tuples like (N,N,N) or (N,N) into (N,...)
-        canonical = re.sub(r"\(N(?:,N)+\)", "(N,...)", canonical)
-
-        clusters.setdefault(canonical, []).append(res)
+        clusters.setdefault(signature, []).append(res)
 
     return clusters
 
@@ -6270,10 +6292,141 @@ def _diagnostics_header(
     return parts
 
 
+def _build_environment_fingerprint(
+    *,
+    versions: LibraryVersionDict,
+    system_info: dict[str, str],
+) -> str:
+    """Build compact environment fingerprint for issue templates."""
+    tokens: list[str] = []
+    for label, value in (
+        ("python", system_info.get("Python Version")),
+        ("platform", system_info.get("Platform")),
+        ("chip", system_info.get("GPU/Chip")),
+        ("mlx", versions.get("mlx")),
+        ("mlx-vlm", versions.get("mlx-vlm")),
+        ("mlx-lm", versions.get("mlx-lm")),
+        ("transformers", versions.get("transformers")),
+    ):
+        if value:
+            tokens.append(f"{label}={value}")
+    return "; ".join(tokens) if tokens else "unknown"
+
+
+def _issue_target_for_package(
+    package: str,
+    *,
+    model_name: str,
+) -> tuple[str, str]:
+    """Map failure package attribution to a likely upstream issue tracker."""
+    target_map: dict[str, tuple[str, str]] = {
+        "mlx-vlm": ("mlx-vlm", "https://github.com/ml-explore/mlx-vlm/issues/new"),
+        "mlx": ("mlx", "https://github.com/ml-explore/mlx/issues/new"),
+        "mlx-lm": ("mlx-lm", "https://github.com/ml-explore/mlx-lm/issues/new"),
+        ("transformers"): (
+            "transformers",
+            "https://github.com/huggingface/transformers/issues/new",
+        ),
+        ("huggingface-hub"): (
+            "huggingface_hub",
+            "https://github.com/huggingface/huggingface_hub/issues/new",
+        ),
+    }
+    if package in target_map:
+        return target_map[package]
+    if package == "model-config" and "/" in model_name:
+        return (
+            "model repository",
+            f"https://huggingface.co/{urllib.parse.quote(model_name, safe='/')}",
+        )
+    return ("check_models", "https://github.com/jrp2014/check_models/issues/new")
+
+
+def _build_cluster_issue_template(
+    *,
+    representative: PerformanceResult,
+    cluster_results: list[PerformanceResult],
+    versions: LibraryVersionDict,
+    system_info: dict[str, str],
+    image_path: Path | None,
+    run_args: argparse.Namespace | None,
+    repro_bundle_path: Path | None,
+) -> str:
+    """Build a copy/paste-ready issue body for one failure cluster."""
+    pkg = representative.error_package or "unknown"
+    target_name, target_url = _issue_target_for_package(
+        pkg,
+        model_name=representative.model_name,
+    )
+    stage = representative.error_stage or _classify_error(representative.error_message or "")
+    code = representative.error_code or _build_canonical_error_code(
+        error_stage=stage,
+        error_package=pkg,
+        failure_phase=representative.failure_phase,
+    )
+    signature = representative.error_signature or _build_error_signature(
+        error_code=code,
+        error_message=representative.error_message,
+        error_traceback=representative.error_traceback,
+    )
+    failure_phase = representative.failure_phase or "unknown"
+    env_fingerprint = _build_environment_fingerprint(versions=versions, system_info=system_info)
+    repro_tokens = _build_repro_command_tokens(
+        image_path=image_path,
+        run_args=run_args,
+        include_selection=False,
+    )
+    repro_command = shlex_join([*repro_tokens, "--models", representative.model_name])
+    affected_models = ", ".join(sorted({r.model_name for r in cluster_results}))
+    error_head = (representative.error_message or "Unknown error").splitlines()[0].strip()
+    traceback_tail = _format_traceback_tail(representative.error_traceback) or "n/a"
+    bundle_text = str(repro_bundle_path) if repro_bundle_path is not None else "n/a"
+
+    lines = [
+        "### Summary",
+        error_head,
+        "",
+        "### Classification",
+        f"- Package attribution: `{pkg}`",
+        f"- Failure phase: `{failure_phase}`",
+        f"- Error stage: `{stage}`",
+        f"- Canonical code: `{code}`",
+        f"- Signature: `{signature}`",
+        "",
+        "### Affected Models",
+        f"{affected_models}",
+        "",
+        "### Minimal Reproduction",
+        "```bash",
+        repro_command,
+        "```",
+        "",
+        "### Environment Fingerprint",
+        f"`{env_fingerprint}`",
+        "",
+        "### Repro Bundle",
+        f"`{bundle_text}`",
+        "",
+        "### Traceback Tail",
+        "```text",
+        traceback_tail,
+        "```",
+        "",
+        "### Suggested Tracker",
+        f"- `{target_name}`: {target_url}",
+    ]
+    return "\n".join(lines)
+
+
 def _diagnostics_failure_clusters(
     results: list[PerformanceResult],
     *,
     diagnostics_context: DiagnosticsContext,
+    versions: LibraryVersionDict,
+    system_info: dict[str, str],
+    image_path: Path | None,
+    run_args: argparse.Namespace | None,
+    repro_bundles: Mapping[str, Path] | None,
 ) -> list[str]:
     """Build the failure-cluster sections of the diagnostics report."""
     failed = [r for r in results if not r.success]
@@ -6284,20 +6437,29 @@ def _diagnostics_failure_clusters(
     sorted_clusters = sorted(clusters.items(), key=lambda kv: -len(kv[1]))
 
     parts: list[str] = ["---", ""]
-    for idx, (_pattern, cluster_results) in enumerate(sorted_clusters, 1):
+    for idx, (cluster_signature, cluster_results) in enumerate(sorted_clusters, 1):
         stage = cluster_results[0].error_stage or "Error"
         pkg = cluster_results[0].error_package or "unknown"
         n = len(cluster_results)
         priority = _diagnostics_priority(n, stage)
+        rep = cluster_results[0]
+        rep_phase = rep.failure_phase or "unknown"
+        rep_code = rep.error_code or _build_canonical_error_code(
+            error_stage=stage,
+            error_package=pkg,
+            failure_phase=rep_phase,
+        )
 
         parts.append(
             f"## {idx}. {stage} — {n} model(s) [`{pkg}`] (Priority: {priority})",
         )
         parts.append("")
 
-        rep = cluster_results[0]
         full_msg = (rep.error_message or "").split("\n")[0].strip()
         parts.append(f"**Error:** `{full_msg}`")
+        parts.append(f"**Failure phase:** `{rep_phase}`")
+        parts.append(f"**Canonical code:** `{rep_code}`")
+        parts.append(f"**Signature:** `{cluster_signature}`")
         parts.append("")
 
         # Affected models table
@@ -6306,6 +6468,8 @@ def _diagnostics_failure_clusters(
             model = DIAGNOSTICS_ESCAPER.escape(r.model_name)
             stage = DIAGNOSTICS_ESCAPER.escape(r.error_stage or "")
             pkg = DIAGNOSTICS_ESCAPER.escape(r.error_package or "unknown")
+            phase = DIAGNOSTICS_ESCAPER.escape(r.failure_phase or "unknown")
+            code = DIAGNOSTICS_ESCAPER.escape(r.error_code or rep_code)
             regression = "yes" if r.model_name in diagnostics_context.regressions else "no"
             history_info = diagnostics_context.failure_history.get(r.model_name)
             first_seen = DIAGNOSTICS_ESCAPER.escape(
@@ -6313,17 +6477,18 @@ def _diagnostics_failure_clusters(
             )
             recent_repro = DIAGNOSTICS_ESCAPER.escape(_format_recent_repro_ratio(history_info))
             table_rows.append(
-                f"| `{model}` | {stage} | {pkg} | {regression} | {first_seen} | {recent_repro} |",
+                f"| `{model}` | {phase} | {stage} | {pkg} | `{code}` | "
+                f"{regression} | {first_seen} | {recent_repro} |",
             )
         _append_markdown_table(
             parts,
             header=(
-                "| Model | Error Stage | Package | Regression vs Prev | "
-                "First Seen Failing | Recent Repro |"
+                "| Model | Failure Phase | Error Stage | Package | Code | "
+                "Regression vs Prev | First Seen Failing | Recent Repro |"
             ),
             separator=(
-                "| ----- | ----------- | ------- | ------------------ | "
-                "------------------ | ------------ |"
+                "| ----- | ------------- | ----------- | ------- | ---- | "
+                "------------------ | ------------------ | ------------ |"
             ),
             rows=table_rows,
         )
@@ -6343,6 +6508,28 @@ def _diagnostics_failure_clusters(
         if tb_tail:
             parts.append("**Traceback (tail):**")
             _append_markdown_code_block(parts, tb_tail, language="text")
+
+        parts.append("### Issue Template")
+        parts.append("")
+        bundle_path = (
+            repro_bundles.get(rep.model_name)
+            if repro_bundles is not None and rep.model_name in repro_bundles
+            else None
+        )
+        issue_template = _build_cluster_issue_template(
+            representative=rep,
+            cluster_results=cluster_results,
+            versions=versions,
+            system_info=system_info,
+            image_path=image_path,
+            run_args=run_args,
+            repro_bundle_path=bundle_path,
+        )
+        parts.append("<details><summary>Copy/paste GitHub issue template</summary>")
+        parts.append("")
+        _append_markdown_code_block(parts, issue_template, language="markdown")
+        parts.append("</details>")
+        parts.append("")
 
         parts.extend(_diagnostics_full_tracebacks_section(cluster_results))
         parts.extend(_diagnostics_captured_output_section(cluster_results))
@@ -6728,6 +6915,157 @@ def _build_repro_command_tokens(
     return tokens
 
 
+_REPRO_ENV_KEYS: Final[tuple[str, ...]] = (
+    "HF_HOME",
+    "HF_HUB_CACHE",
+    "TRANSFORMERS_CACHE",
+    "TOKENIZERS_PARALLELISM",
+    "TRANSFORMERS_NO_TF",
+    "TRANSFORMERS_NO_FLAX",
+    "TRANSFORMERS_NO_JAX",
+    "MLX_VLM_ALLOW_TF",
+    "MLX_VLM_WIDTH",
+    "PYTHONPATH",
+)
+
+
+def _jsonify_cli_value(value: object) -> object:
+    """Convert argparse values into JSON-safe primitives."""
+    if isinstance(value, Path):
+        return str(value)
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return value
+    if isinstance(value, list):
+        return [_jsonify_cli_value(item) for item in value]
+    if isinstance(value, tuple):
+        return [_jsonify_cli_value(item) for item in value]
+    if isinstance(value, dict):
+        return {str(k): _jsonify_cli_value(v) for k, v in value.items()}
+    return str(value)
+
+
+def _sha256_text(value: str) -> str:
+    """Return SHA256 hash of UTF-8 text."""
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def _sha256_file(path: Path) -> str | None:
+    """Return SHA256 hash for file contents, or None if unreadable."""
+    if not path.exists() or not path.is_file():
+        return None
+    hasher = hashlib.sha256()
+    try:
+        with path.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                hasher.update(chunk)
+    except OSError:
+        return None
+    return hasher.hexdigest()
+
+
+def _sanitize_bundle_filename(model_name: str) -> str:
+    """Create a filesystem-safe basename from model identifier."""
+    cleaned = re.sub(r"[^A-Za-z0-9_.-]+", "_", model_name).strip("._")
+    return cleaned or "model"
+
+
+def _collect_repro_env() -> dict[str, str]:
+    """Collect relevant environment variables for reproducibility bundles."""
+    env: dict[str, str] = {}
+    for key in _REPRO_ENV_KEYS:
+        value = os.environ.get(key)
+        if value:
+            env[key] = value
+    return env
+
+
+def export_failure_repro_bundles(
+    *,
+    results: list[PerformanceResult],
+    output_dir: Path,
+    run_args: argparse.Namespace,
+    versions: LibraryVersionDict,
+    system_info: dict[str, str],
+    prompt: str,
+    image_path: Path | None,
+) -> dict[str, Path]:
+    """Write per-model reproducibility bundles for each failed result."""
+    failed = [res for res in results if not res.success]
+    if not failed:
+        return {}
+
+    bundles: dict[str, Path] = {}
+    timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    prompt_hash = _sha256_text(prompt)
+    image_hash = _sha256_file(image_path) if image_path is not None else None
+    image_ref_hash = _sha256_text(str(image_path)) if image_path is not None else None
+    env_vars = _collect_repro_env()
+    serialized_args = {
+        key: _jsonify_cli_value(value) for key, value in sorted(vars(run_args).items())
+    }
+
+    for index, result in enumerate(failed, start=1):
+        safe_model = _sanitize_bundle_filename(result.model_name)
+        signature_token = re.sub(r"[^A-Za-z0-9_]+", "_", result.error_signature or "unknown")
+        signature_token = signature_token[:40] if signature_token else "unknown"
+        bundle_name = f"{timestamp}_{index:03d}_{safe_model}_{signature_token}.json"
+        bundle_path = output_dir / bundle_name
+
+        rerun_tokens = _build_repro_command_tokens(
+            image_path=image_path,
+            run_args=run_args,
+            include_selection=False,
+        )
+        rerun_command = shlex_join([*rerun_tokens, "--models", result.model_name])
+
+        bundle_payload: dict[str, object] = {
+            "schema_version": "1.0",
+            "generated_at_utc": datetime.now(UTC).isoformat(timespec="seconds"),
+            "model": result.model_name,
+            "failure": {
+                "phase": result.failure_phase,
+                "stage": result.error_stage,
+                "code": result.error_code,
+                "signature": result.error_signature,
+                "type": result.error_type,
+                "package": result.error_package,
+                "message": result.error_message,
+                "traceback": result.error_traceback,
+                "captured_output": result.captured_output_on_fail,
+            },
+            "repro": {
+                "rerun_command": rerun_command,
+                "seed": serialized_args.get("seed"),
+                "prompt_hash_sha256": prompt_hash,
+                "prompt_preview": _build_prompt_preview(prompt, max_chars=400),
+                "image_path": str(image_path) if image_path is not None else None,
+                "image_sha256": image_hash,
+                "image_ref_sha256": image_ref_hash,
+                "args": serialized_args,
+                "env_vars": env_vars,
+            },
+            "environment": {
+                "platform": platform.platform(),
+                "system_info": system_info,
+                "library_versions": versions,
+            },
+        }
+
+        try:
+            bundle_path.write_text(
+                json.dumps(bundle_payload, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+        except OSError:
+            logger.exception("Failed to write repro bundle for %s", result.model_name)
+            continue
+        bundles[result.model_name] = bundle_path
+
+    return bundles
+
+
 def _diagnostics_footer(
     failed: list[PerformanceResult],
     prompt: str,
@@ -6789,9 +7127,8 @@ def generate_diagnostics_report(
     prompt: str,
     image_path: Path | None = None,
     run_args: argparse.Namespace | None = None,
-    history_path: Path | None = None,
-    previous_history: HistoryRunRecord | None = None,
-    current_history: HistoryRunRecord | None = None,
+    history: DiagnosticsHistoryInputs | None = None,
+    repro_bundles: Mapping[str, Path] | None = None,
 ) -> bool:
     """Generate a Markdown diagnostics report structured for upstream issue filing.
 
@@ -6808,9 +7145,8 @@ def generate_diagnostics_report(
         prompt: The prompt that was used.
         image_path: Path to the test image (for reproducibility section).
         run_args: Optional parsed CLI args from this run for exact repro commands.
-        history_path: Optional history JSONL path for first-seen and retry context.
-        previous_history: Optional previous run record for regression/recovery status.
-        current_history: Optional current run record for regression/recovery status.
+        history: Optional history inputs for first-seen/repro/regression context.
+        repro_bundles: Optional model->bundle path mapping from repro export.
 
     Returns:
         True if the report was written (i.e. there was something to report),
@@ -6823,6 +7159,10 @@ def generate_diagnostics_report(
 
     if not failed and not harness_results and not stack_signals:
         return False
+
+    history_path = history.history_path if history is not None else None
+    previous_history = history.previous_history if history is not None else None
+    current_history = history.current_history if history is not None else None
 
     history_records = _load_history_run_records(history_path)
     failed_models = {r.model_name for r in failed}
@@ -6850,6 +7190,11 @@ def generate_diagnostics_report(
         _diagnostics_failure_clusters(
             results,
             diagnostics_context=diagnostics_context,
+            versions=versions,
+            system_info=system_info,
+            image_path=image_path,
+            run_args=run_args,
+            repro_bundles=repro_bundles,
         ),
     )
     parts.extend(_diagnostics_harness_section(harness_results))
@@ -8057,6 +8402,139 @@ def _check_hf_cache_integrity(model_identifier: str) -> None:
         logger.debug("Could not check HF cache integrity: %s", cache_err)
 
 
+_FAILURE_PHASE_ATTR: Final[str] = "_check_models_failure_phase"
+
+_STAGE_CODE_MAP: Final[dict[str, str]] = {
+    "OOM": "OOM",
+    "Timeout": "TIMEOUT",
+    "Missing Dep": "MISSING_DEP",
+    "Lib Version": "LIB_VERSION",
+    "API Mismatch": "API_MISMATCH",
+    "Config Missing": "CONFIG_MISSING",
+    "No Chat Template": "NO_CHAT_TEMPLATE",
+    "Weight Mismatch": "WEIGHT_MISMATCH",
+    "Type Cast Error": "TYPE_CAST",
+    "Processor Error": "PROCESSOR",
+    "Tokenizer Error": "TOKENIZER",
+    "Model Error": "MODEL",
+    "Error": "ERROR",
+}
+_PACKAGE_CODE_MAP: Final[dict[str, str]] = {
+    "mlx": "MLX",
+    "mlx-vlm": "MLX_VLM",
+    "mlx-lm": "MLX_LM",
+    "transformers": "TRANSFORMERS",
+    "huggingface-hub": "HUGGINGFACE_HUB",
+    "model-config": "MODEL_CONFIG",
+    "unknown": "UNKNOWN",
+}
+
+
+def _normalise_failure_phase(phase: str | None) -> str | None:
+    """Return a normalized failure phase label or ``None`` when unavailable."""
+    if phase is None:
+        return None
+    return phase.strip().lower().replace("-", "_")
+
+
+def _tag_exception_failure_phase[E: BaseException](error: E, phase: str) -> E:
+    """Annotate an exception with the current failing phase."""
+    normalized = _normalise_failure_phase(phase)
+    if normalized is not None:
+        setattr(cast("Any", error), _FAILURE_PHASE_ATTR, normalized)
+    return error
+
+
+def _extract_failure_phase(
+    error: BaseException,
+    *,
+    fallback: str | None = None,
+) -> str | None:
+    """Extract the first known failure phase from an exception chain."""
+    cur: BaseException | None = error
+    while cur is not None:
+        tagged = getattr(cur, _FAILURE_PHASE_ATTR, None)
+        if isinstance(tagged, str) and tagged.strip():
+            return _normalise_failure_phase(tagged)
+        cur = cur.__cause__
+    return _normalise_failure_phase(fallback)
+
+
+def _sanitize_error_token(value: str | None, *, default: str) -> str:
+    """Convert free-form labels into stable uppercase token segments."""
+    if value is None or not value.strip():
+        return default
+    token = re.sub(r"[^A-Za-z0-9]+", "_", value.strip().upper()).strip("_")
+    return token or default
+
+
+def _normalize_error_core_message(error_msg: str) -> str:
+    """Normalize model-specific and numeric variations from top-level error text."""
+    core = error_msg.split("\n", maxsplit=1)[0].strip() if error_msg else "Unknown error"
+    wrapper_match = re.match(
+        r"Model (?:generation|loading|preflight) failed(?:\s+for\s+\S+)?:\s*(.+)",
+        core,
+    )
+    if wrapper_match:
+        core = wrapper_match.group(1)
+    return re.sub(r"\(N(?:,N)+\)", "(N,...)", re.sub(r"\d+", "N", core))
+
+
+def _normalize_traceback_signature(traceback_str: str | None) -> str:
+    """Return a stable traceback fingerprint fragment for signature hashing."""
+    if not traceback_str:
+        return ""
+
+    normalized_lines: list[str] = []
+    for raw_line in traceback_str.strip().splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        if line.startswith("File "):
+            line = re.sub(r'File ".*?([^/\\"]+)"', r'File "\1"', line)
+            line = re.sub(r"line \d+", "line N", line)
+        line = re.sub(r"0x[0-9a-fA-F]+", "0xADDR", line)
+        line = re.sub(r"\d+", "N", line)
+        normalized_lines.append(line)
+
+    if not normalized_lines:
+        return ""
+    return " | ".join(normalized_lines[-4:])
+
+
+def _build_canonical_error_code(
+    *,
+    error_stage: str | None,
+    error_package: str | None,
+    failure_phase: str | None,
+) -> str:
+    """Build stable machine-readable error code for cross-run clustering."""
+    package_token = _PACKAGE_CODE_MAP.get(
+        (error_package or "unknown").lower(),
+        _sanitize_error_token(error_package, default="UNKNOWN"),
+    )
+    phase_token = _sanitize_error_token(_normalise_failure_phase(failure_phase), default="UNKNOWN")
+    stage_token = _STAGE_CODE_MAP.get(
+        error_stage or "",
+        _sanitize_error_token(error_stage, default="ERROR"),
+    )
+    return f"{package_token}_{phase_token}_{stage_token}"
+
+
+def _build_error_signature(
+    *,
+    error_code: str,
+    error_message: str | None,
+    error_traceback: str | None,
+) -> str:
+    """Build stable signature hash for clustering related failures."""
+    canonical_message = _normalize_error_core_message(error_message or "Unknown error")
+    traceback_sig = _normalize_traceback_signature(error_traceback)
+    payload = f"{error_code}|{canonical_message}|{traceback_sig}"
+    digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()[:12]
+    return f"{error_code}:{digest}"
+
+
 def _classify_error(error_msg: str) -> str:
     """Classify error message into a short, readable status code.
 
@@ -8092,7 +8570,10 @@ def _classify_error(error_msg: str) -> str:
         # API compatibility errors
         ("API Mismatch", ["unexpected keyword argument", "got an unexpected keyword"]),
         # Model configuration/file errors
-        ("Config Missing", ["does not appear to have a file named"]),
+        (
+            "Config Missing",
+            ["does not appear to have a file named", "missing required file", "config is missing"],
+        ),
         ("No Chat Template", ["chat_template is not set", "no template argument was passed"]),
         # Weight/parameter errors
         ("Weight Mismatch", ["missing", "parameters"]),
@@ -8227,6 +8708,9 @@ def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None
                 "chat_template is not set",
                 "no template argument",
                 "config.json",
+                "missing required file",
+                "model preflight failed",
+                "tokenizer artifacts missing",
             ],
         ),
     ]
@@ -8266,9 +8750,193 @@ def _load_model(
     return model, processor, getattr(model, "config", None)
 
 
+def _set_failure_phase(
+    phase_callback: Callable[[str], None] | None,
+    phase: str,
+) -> str:
+    """Update the active execution phase and notify optional callback."""
+    normalized = _normalise_failure_phase(phase) or phase
+    if phase_callback is not None:
+        phase_callback(normalized)
+    return normalized
+
+
+def _extract_processor_tokenizer(processor: object) -> object | None:
+    """Best-effort extraction of tokenizer from an AutoProcessor-like object."""
+    tokenizer = cast("object | None", getattr(processor, "tokenizer", None))
+    if tokenizer is not None:
+        return tokenizer
+    if hasattr(processor, "encode") and hasattr(processor, "decode"):
+        return processor
+    return None
+
+
+def _resolve_model_snapshot_path(model_identifier: str) -> Path | None:
+    """Resolve local snapshot path for a model identifier when available."""
+    if model_identifier.startswith(("/", "./", "../")):
+        path = Path(model_identifier)
+        return path.resolve() if path.is_dir() else None
+
+    try:
+        cache_info: HFCacheInfo = scan_cache_dir()
+    except (OSError, ValueError, FileNotFoundError, HFValidationError):
+        return None
+
+    for repo in cache_info.repos:
+        if repo.repo_id != model_identifier:
+            continue
+        revisions = list(repo.revisions)
+        if not revisions:
+            repo_path = getattr(repo, "repo_path", None)
+            return Path(repo_path) if repo_path else None
+        revisions.sort(
+            key=lambda revision: float(getattr(revision, "last_modified", 0.0) or 0.0),
+            reverse=True,
+        )
+        snapshot_path = getattr(revisions[0], "snapshot_path", None)
+        return Path(snapshot_path) if snapshot_path else None
+    return None
+
+
+def _get_config_value(config: object | None, key: str) -> object | None:
+    """Read config values from dict-like or object-like config containers."""
+    if config is None:
+        return None
+    if isinstance(config, Mapping):
+        config_map = cast("Mapping[str, object]", config)
+        return config_map.get(key)
+    return getattr(config, key, None)
+
+
+def _raise_preflight_error(message: str, *, phase: str) -> NoReturn:
+    """Raise a preflight ValueError annotated with the failing phase."""
+    raise _tag_exception_failure_phase(ValueError(message), phase)
+
+
+def _validate_model_artifact_layout(
+    *,
+    model_identifier: str,
+    snapshot_path: Path | None,
+    tokenizer: object | None,
+    processor: object,
+) -> None:
+    """Validate local model artifact structure and emit actionable warnings.
+
+    These checks are intentionally non-fatal because many older/community repos
+    rely on legacy file layouts that still run correctly with mlx-vlm.
+    """
+    if snapshot_path is None or not snapshot_path.exists():
+        logger.debug(
+            "Skipping file-layout preflight for %s (snapshot unavailable).",
+            model_identifier,
+        )
+        return
+
+    if not (snapshot_path / "config.json").exists():
+        logger.warning(
+            "Preflight warning for %s: snapshot missing config.json (%s)",
+            model_identifier,
+            snapshot_path,
+        )
+
+    if getattr(processor, "image_processor", None) is None:
+        logger.warning(
+            "Preflight warning for %s: loaded processor has no image_processor.",
+            model_identifier,
+        )
+
+    if tokenizer is not None:
+        tokenizer_candidates = (
+            "tokenizer_config.json",
+            "tokenizer.json",
+            "tokenizer.model",
+            "vocab.json",
+        )
+        if not any((snapshot_path / name).exists() for name in tokenizer_candidates):
+            logger.warning(
+                "Preflight warning for %s: tokenizer artifacts missing from snapshot (%s).",
+                model_identifier,
+                ", ".join(tokenizer_candidates),
+            )
+
+    processor_candidates = ("preprocessor_config.json", "processor_config.json")
+    if not any((snapshot_path / name).exists() for name in processor_candidates):
+        logger.warning(
+            "Preflight warning for %s: processor config missing from snapshot (%s).",
+            model_identifier,
+            ", ".join(processor_candidates),
+        )
+
+
+def _run_model_preflight_validators(
+    *,
+    model_identifier: str,
+    processor: object,
+    config: object | None,
+    phase_callback: Callable[[str], None] | None = None,
+) -> None:
+    """Run preflight validators before invoking generation."""
+    _set_failure_phase(phase_callback, "tokenizer_load")
+    tokenizer = _extract_processor_tokenizer(processor)
+    if tokenizer is None:
+        _raise_preflight_error(
+            "Could not resolve tokenizer from loaded processor.",
+            phase="tokenizer_load",
+        )
+    if not (hasattr(tokenizer, "decode") or hasattr(tokenizer, "batch_decode")):
+        _raise_preflight_error(
+            "Resolved tokenizer does not expose decode/batch_decode.",
+            phase="tokenizer_load",
+        )
+
+    _set_failure_phase(phase_callback, "processor_load")
+    if not callable(processor):
+        _raise_preflight_error(
+            "Loaded processor is not callable.",
+            phase="processor_load",
+        )
+    if getattr(processor, "image_processor", None) is None:
+        _raise_preflight_error(
+            "Loaded processor has no image_processor; expected multimodal processor.",
+            phase="processor_load",
+        )
+
+    _set_failure_phase(phase_callback, "model_preflight")
+    model_type = _get_config_value(config, "model_type")
+    if not isinstance(model_type, str) or not model_type.strip():
+        logger.warning(
+            "Preflight warning for %s: model config missing model_type.",
+            model_identifier,
+        )
+
+    snapshot_path = _resolve_model_snapshot_path(model_identifier)
+    _validate_model_artifact_layout(
+        model_identifier=model_identifier,
+        snapshot_path=snapshot_path,
+        tokenizer=tokenizer,
+        processor=processor,
+    )
+
+
+def _ensure_generation_runtime_symbols() -> None:
+    """Validate core generation callables before model execution."""
+    missing: list[str] = []
+    for symbol_name, symbol_value in (
+        ("load", load),
+        ("apply_chat_template", apply_chat_template),
+        ("generate", generate),
+    ):
+        if not callable(symbol_value):
+            missing.append(symbol_name)
+    if missing:
+        msg = f"Generation runtime unavailable: missing callables ({', '.join(missing)})."
+        raise _tag_exception_failure_phase(RuntimeError(msg), "import")
+
+
 def _run_model_generation(
     params: ProcessImageParams,
     timer: TimingStrategy | None = None,
+    phase_callback: Callable[[str], None] | None = None,
 ) -> GenerationResult | SupportsGenerationResult:
     """Load model + processor, apply chat template, run generation, time it.
 
@@ -8280,12 +8948,17 @@ def _run_model_generation(
     Args:
         params: The parameters for the image processing.
         timer: Optional timing strategy. If None, uses PerfCounterTimer.
+        phase_callback: Optional callback invoked when execution enters a new phase.
     """
     model: Module
     processor: Any
 
+    _set_failure_phase(phase_callback, "import")
+    _ensure_generation_runtime_symbols()
+
     # Load model from HuggingFace Hub - this handles automatic download/caching
     # and converts weights to MLX format for Apple Silicon optimization
+    _set_failure_phase(phase_callback, "model_load")
     try:
         model, processor, config = _load_model(params)
     except Exception as load_err:
@@ -8295,16 +8968,37 @@ def _run_model_generation(
         logger.exception("Failed to load model %s", params.model_identifier)
         _check_hf_cache_integrity(params.model_identifier)
 
-        raise ValueError(error_details) from load_err
+        raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
+
+    try:
+        _run_model_preflight_validators(
+            model_identifier=params.model_identifier,
+            processor=processor,
+            config=config,
+            phase_callback=phase_callback,
+        )
+    except ValueError as preflight_err:
+        message = f"Model preflight failed for {params.model_identifier}: {preflight_err}"
+        logger.exception("Model preflight validation failed for %s", params.model_identifier)
+        phase = (
+            _extract_failure_phase(preflight_err, fallback="model_preflight") or "model_preflight"
+        )
+        raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 
     # Apply model-specific chat template - each model has its own conversation format
     # (e.g., Llama uses <|begin_of_text|>, Phi-3 uses <|user|>, etc.)
-    formatted_prompt: str | list[Any] = apply_chat_template(
-        processor=processor,
-        config=config,
-        prompt=params.prompt,
-        num_images=1,
-    )
+    _set_failure_phase(phase_callback, "prefill")
+    try:
+        formatted_prompt: str | list[Any] = apply_chat_template(
+            processor=processor,
+            config=config,
+            prompt=params.prompt,
+            num_images=1,
+        )
+    except (OSError, ValueError, RuntimeError, TypeError, AttributeError, KeyError) as prefill_err:
+        msg = f"Prompt prefill failed for {params.model_identifier}: {prefill_err}"
+        logger.exception("Prompt prefill failed for %s", params.model_identifier)
+        raise _tag_exception_failure_phase(ValueError(msg), "prefill") from prefill_err
     # Handle list return from apply_chat_template
     if isinstance(formatted_prompt, list):
         formatted_prompt = "\n".join(str(m) for m in formatted_prompt)
@@ -8315,6 +9009,7 @@ def _run_model_generation(
         timer = PerfCounterTimer()
 
     timer.start()
+    _set_failure_phase(phase_callback, "decode")
     try:
         # Build optional kwargs for generate() — only pass when explicitly set.
         # Note: we use a separate dict + **unpacking instead of a conditional
@@ -8345,17 +9040,17 @@ def _run_model_generation(
     except TimeoutError as gen_to_err:
         msg = f"Generation timed out for model {params.model_identifier}: {gen_to_err}"
         # Re-raise to be handled by outer TimeoutError branch
-        raise TimeoutError(msg) from gen_to_err
+        raise _tag_exception_failure_phase(TimeoutError(msg), "decode") from gen_to_err
     except (OSError, ValueError) as gen_known_err:
         # Known I/O or validation-style issues
         msg = f"Model generation failed for {params.model_identifier}: {gen_known_err}"
         logger.exception("Generation error for %s", params.model_identifier)
-        raise ValueError(msg) from gen_known_err
+        raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
     except (RuntimeError, TypeError, AttributeError, KeyError) as gen_err:
         # Model-specific runtime errors (weights, config, tensor ops, missing attributes)
         msg = f"Model runtime error during generation for {params.model_identifier}: {gen_err}"
         logger.exception("Runtime error for %s", params.model_identifier)
-        raise ValueError(msg) from gen_err
+        raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
 
     # Force GPU synchronization to ensures timing includes all pending compute (MLX is lazy)
     mx.synchronize()
@@ -8380,19 +9075,34 @@ def _run_model_generation(
 def _build_failure_result(
     *,
     model_name: str,
-    error: TimeoutError | OSError | ValueError,
+    error: TimeoutError | OSError | ValueError | RuntimeError,
     captured_output: str | None,
+    failure_phase: str | None = None,
 ) -> PerformanceResult:
     """Build a standardized failure result payload for a model run."""
     error_msg = str(error)
     tb_str = traceback.format_exc()
+    resolved_phase = _extract_failure_phase(error, fallback=failure_phase)
     classified_stage = _classify_error(error_msg)
     error_package = _attribute_error_to_package(error_msg, tb_str)
+    error_code = _build_canonical_error_code(
+        error_stage=classified_stage,
+        error_package=error_package,
+        failure_phase=resolved_phase,
+    )
+    error_signature = _build_error_signature(
+        error_code=error_code,
+        error_message=error_msg,
+        error_traceback=tb_str,
+    )
     return PerformanceResult(
         model_name=model_name,
         generation=None,
         success=False,
+        failure_phase=resolved_phase,
         error_stage=classified_stage,
+        error_code=error_code,
+        error_signature=error_signature,
         error_message=error_msg,
         captured_output_on_fail=captured_output,
         error_type=type(error).__name__,
@@ -8416,8 +9126,14 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     total_start_time = time.perf_counter()
     model_load_time: float | None = None
     generation_time: float | None = None
+    current_phase: str = "input_validation"
+
+    def _update_phase(phase: str) -> None:
+        nonlocal current_phase
+        current_phase = _normalise_failure_phase(phase) or phase
 
     try:
+        _update_phase("input_validation")
         validate_temperature(temp=params.temperature)
         validate_image_accessible(image_path=params.image_path)
         logger.debug(
@@ -8438,6 +9154,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         ):
             output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                 params=params,
+                phase_callback=_update_phase,
             )
         if params.verbose:
             logger.debug(
@@ -8468,7 +9185,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             active_memory=active_mem_gb if active_mem_gb > 0 else None,
             cache_memory=cache_mem_gb if cache_mem_gb > 0 else None,
         )
-    except (TimeoutError, OSError, ValueError) as e:
+    except (TimeoutError, OSError, ValueError, RuntimeError) as e:
         captured_output = _merge_captured_output(
             stdout_capture.getvalue(),
             stderr_capture.getvalue(),
@@ -8477,8 +9194,10 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             model_name=params.model_identifier,
             error=e,
             captured_output=captured_output,
+            failure_phase=current_phase,
         )
     finally:
+        _update_phase("cleanup")
         # Aggressive cleanup matching mlx-vlm/tests/test_smoke.py
         if model is not None:
             del model
@@ -8720,6 +9439,10 @@ def _summary_parts(res: PerformanceResult, model_short: str) -> list[str]:
             parts.append("quality=clean")
     if res.error_stage:
         parts.append(f"stage={res.error_stage}")
+    if res.failure_phase:
+        parts.append(f"phase={res.failure_phase}")
+    if res.error_code:
+        parts.append(f"code={res.error_code}")
     if res.error_package:
         parts.append(f"package={res.error_package}")
     if res.error_type:
@@ -10339,11 +11062,15 @@ def _log_failed_models_summary(failed: list[PerformanceResult]) -> None:
     logger.info("❌ Failed Models (%d):", len(failed))
     for res in failed:
         error_pkg = f" -> {res.error_package}" if res.error_package else ""
+        phase_suffix = f" [{res.failure_phase}]" if res.failure_phase else ""
+        code_suffix = f" {{{res.error_code}}}" if res.error_code else ""
         logger.info(
-            "  - %s (%s%s)",
+            "  - %s (%s%s)%s%s",
             res.model_name,
             res.error_stage or "Unknown",
             error_pkg,
+            phase_suffix,
+            code_suffix,
             extra={"style_hint": LogStyles.ERROR},
         )
 
@@ -10516,9 +11243,12 @@ def _history_model_result_from_result(result: PerformanceResult) -> HistoryModel
     """Build a typed per-model history row from runtime result."""
     return {
         "success": result.success,
+        "failure_phase": result.failure_phase,
         "error_stage": result.error_stage,
         "error_type": result.error_type,
         "error_package": result.error_package,
+        "error_code": result.error_code,
+        "error_signature": result.error_signature,
     }
 
 
@@ -10584,7 +11314,7 @@ def _build_jsonl_metadata_record(
     """Build shared metadata header row for JSONL results."""
     return {
         "_type": "metadata",
-        "format_version": "1.1",
+        "format_version": "1.2",
         "prompt": prompt,
         "system": system_info,
         "timestamp": local_now_str(),
@@ -10597,7 +11327,10 @@ def _build_jsonl_result_record_base(result: PerformanceResult) -> JsonlResultRec
         "_type": "result",
         "model": result.model_name,
         "success": result.success,
+        "failure_phase": result.failure_phase,
         "error_stage": result.error_stage,
+        "error_code": result.error_code,
+        "error_signature": result.error_signature,
         "error_message": result.error_message,
         "captured_output_on_fail": result.captured_output_on_fail,
         "error_type": result.error_type,
@@ -10673,7 +11406,7 @@ def save_jsonl_report(
     - Quality analysis for successful models
     - Timing metrics for performance analysis
 
-    Format (v1.1): First line is a metadata header containing prompt and
+    Format (v1.2): First line is a metadata header containing prompt and
     system_info (shared across all rows). Per-model result lines follow.
     """
     try:
@@ -10770,6 +11503,53 @@ def _log_history_comparison(
         logger.info("New models: %s", ", ".join(new_models))
     if missing_models:
         logger.info("Missing models: %s", ", ".join(missing_models))
+
+
+def _write_diagnostics_and_repro_artifacts(
+    *,
+    args: argparse.Namespace,
+    results: list[PerformanceResult],
+    library_versions: LibraryVersionDict,
+    system_info: dict[str, str],
+    prompt: str,
+    image_path: Path | None,
+    diagnostics_path: Path,
+    history_path: Path,
+    previous_history: HistoryRunRecord | None,
+    current_history: HistoryRunRecord | None,
+) -> None:
+    """Export repro bundles and diagnostics markdown after history append."""
+    repro_bundles = export_failure_repro_bundles(
+        results=results,
+        output_dir=diagnostics_path.parent / "repro_bundles",
+        run_args=args,
+        versions=library_versions,
+        system_info=system_info,
+        prompt=prompt,
+        image_path=image_path,
+    )
+    if repro_bundles:
+        logger.info("Repro bundles written for %d failed model(s).", len(repro_bundles))
+        for model_name, bundle_path in sorted(repro_bundles.items()):
+            log_file_path(bundle_path, label=f"   Repro Bundle ({model_name}):")
+
+    diagnostics_written = generate_diagnostics_report(
+        results=results,
+        filename=diagnostics_path,
+        versions=library_versions,
+        system_info=system_info,
+        prompt=prompt,
+        image_path=image_path,
+        run_args=args,
+        history=DiagnosticsHistoryInputs(
+            history_path=history_path,
+            previous_history=previous_history,
+            current_history=current_history,
+        ),
+        repro_bundles=repro_bundles,
+    )
+    if diagnostics_written:
+        log_file_path(diagnostics_path, label="   Diagnostics:  ")
 
 
 def finalize_execution(
@@ -10889,20 +11669,18 @@ def finalize_execution(
 
         # Generate diagnostics report after history append so regression/retry
         # context in diagnostics.md reflects this run.
-        diagnostics_written = generate_diagnostics_report(
+        _write_diagnostics_and_repro_artifacts(
+            args=args,
             results=results,
-            filename=diagnostics_path,
-            versions=library_versions,
+            library_versions=library_versions,
             system_info=system_info,
             prompt=prompt,
             image_path=image_path,
-            run_args=args,
+            diagnostics_path=diagnostics_path,
             history_path=history_path,
             previous_history=previous_history,
             current_history=current_history,
         )
-        if diagnostics_written:
-            log_file_path(diagnostics_path, label="   Diagnostics:  ")
     else:
         log_warning_note("No models processed. No performance summary generated.")
         logger.info("Skipping report generation as no models were processed.")

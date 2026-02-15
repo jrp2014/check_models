@@ -110,6 +110,9 @@ def test_save_jsonl_report_content(tmp_path: Path) -> None:
     assert data["_type"] == "result"
     assert data["model"] == "test-model"
     assert data["success"] is True
+    assert data["failure_phase"] is None
+    assert data["error_code"] is None
+    assert data["error_signature"] is None
     assert data["metrics"]["generation_tps"] == 5.0
     assert data["metrics"]["prompt_tokens"] == 10
 
@@ -158,8 +161,31 @@ def test_save_jsonl_report_failed_model(tmp_path: Path) -> None:
 
     assert data["model"] == "failed-model"
     assert data["success"] is False
+    assert data["failure_phase"] is None
     assert data["error_message"] == "Something went wrong"
     assert data["error_stage"] == "Model Load"
+
+
+def test_save_jsonl_report_includes_phase_code_and_signature(tmp_path: Path) -> None:
+    """Failure metadata fields should serialize for diagnostics tooling."""
+    output_file = tmp_path / "results.jsonl"
+    result = PerformanceResult(
+        model_name="failed-model",
+        generation=None,
+        success=False,
+        failure_phase="decode",
+        error_stage="API Mismatch",
+        error_code="TRANSFORMERS_DECODE_API_MISMATCH",
+        error_signature="TRANSFORMERS_DECODE_API_MISMATCH:abc123",
+        error_message="unexpected keyword argument",
+    )
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
+    assert data["failure_phase"] == "decode"
+    assert data["error_code"] == "TRANSFORMERS_DECODE_API_MISMATCH"
+    assert data["error_signature"] == "TRANSFORMERS_DECODE_API_MISMATCH:abc123"
 
 
 def test_save_jsonl_report_quality_issues_as_list(tmp_path: Path) -> None:

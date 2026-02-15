@@ -81,6 +81,9 @@ class TestProcessImageWithModelMock:
 
         assert result.success is False
         assert result.error_type == "TimeoutError"
+        assert result.failure_phase is not None
+        assert result.error_code is not None
+        assert result.error_signature is not None
 
     def test_value_error_returns_failure(self, test_image: Path) -> None:
         """ValueError during generation should produce success=False with error info."""
@@ -96,6 +99,8 @@ class TestProcessImageWithModelMock:
         assert result.success is False
         assert result.error_type == "ValueError"
         assert "bad config" in (result.error_message or "")
+        assert result.failure_phase is not None
+        assert result.error_code is not None
 
     def test_os_error_returns_failure(self, test_image: Path) -> None:
         """OSError during generation should produce success=False."""
@@ -110,6 +115,7 @@ class TestProcessImageWithModelMock:
 
         assert result.success is False
         assert result.error_type == "OSError"
+        assert result.failure_phase is not None
 
     def test_failure_captures_stdout_and_stderr(self, test_image: Path) -> None:
         """Failure result should include captured stdout/stderr text."""
@@ -135,6 +141,7 @@ class TestProcessImageWithModelMock:
 
     def test_build_failure_result_helper_preserves_capture(self) -> None:
         """Centralized failure builder should preserve diagnostics fields."""
+        result: check_models.PerformanceResult
         try:
             int("not-an-int")
         except ValueError as err:
@@ -143,9 +150,26 @@ class TestProcessImageWithModelMock:
                 error=err,
                 captured_output="=== STDERR ===\ntemplate failure",
             )
+        else:  # pragma: no cover - defensive guard for static analysis
+            raise AssertionError
 
         assert result.success is False
         assert result.error_type == "ValueError"
+        assert result.failure_phase is None
         assert result.error_stage is not None
+        assert result.error_code is not None
+        assert result.error_signature is not None
         assert result.error_traceback is not None
         assert "template failure" in (result.captured_output_on_fail or "")
+
+    def test_build_failure_result_respects_tagged_phase(self) -> None:
+        """Failure phase tags should flow into the final result payload."""
+        err = check_models._tag_exception_failure_phase(ValueError("decode issue"), "decode")
+        result = check_models._build_failure_result(
+            model_name="test/fake-model",
+            error=err,
+            captured_output=None,
+        )
+        assert result.failure_phase == "decode"
+        assert result.error_code is not None
+        assert "_DECODE_" in result.error_code

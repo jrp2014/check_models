@@ -2,7 +2,12 @@
 
 import pytest
 
-from check_models import _attribute_error_to_package, _classify_error
+from check_models import (
+    _attribute_error_to_package,
+    _build_canonical_error_code,
+    _build_error_signature,
+    _classify_error,
+)
 
 
 @pytest.mark.parametrize(
@@ -62,3 +67,33 @@ def test_classify_error(message: str, expected_type: str) -> None:
 def test_attribute_error(message: str, traceback: str | None, expected_package: str) -> None:
     """Verify that errors are attributed to the correct package."""
     assert _attribute_error_to_package(message, traceback) == expected_package
+
+
+def test_build_canonical_error_code_stable_tokens() -> None:
+    """Canonical code should include package, phase, and stage in stable form."""
+    code = _build_canonical_error_code(
+        error_stage="API Mismatch",
+        error_package="transformers",
+        failure_phase="decode",
+    )
+    assert code == "TRANSFORMERS_DECODE_API_MISMATCH"
+
+
+def test_error_signature_normalizes_numeric_variants() -> None:
+    """Numeric differences in shape errors should map to the same signature."""
+    code = _build_canonical_error_code(
+        error_stage="Model Error",
+        error_package="mlx-vlm",
+        failure_phase="decode",
+    )
+    sig_a = _build_error_signature(
+        error_code=code,
+        error_message="[broadcast_shapes] Shapes (3,1,2048) and (3,1,6065) mismatch",
+        error_traceback=None,
+    )
+    sig_b = _build_error_signature(
+        error_code=code,
+        error_message="[broadcast_shapes] Shapes (984,2048) and (1,0,2048) mismatch",
+        error_traceback=None,
+    )
+    assert sig_a == sig_b
