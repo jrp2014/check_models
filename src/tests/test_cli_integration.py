@@ -99,8 +99,8 @@ def test_cli_exits_on_empty_folder(tmp_path: Path, capsys: pytest.CaptureFixture
     result = _run_cli([*_get_test_output_args(), "--folder", str(empty_folder)], capsys)
     assert result.exit_code != 0
     output = result.stdout + result.stderr
-    # Should mention no images found OR mlx-vlm missing (if not installed)
-    assert "could not find" in output.lower() or "mlx-vlm not found" in output.lower()
+    # Should mention no images found in the provided folder.
+    assert "could not find" in output.lower()
 
 
 def test_cli_invalid_temperature_value(

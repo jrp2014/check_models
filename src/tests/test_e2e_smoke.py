@@ -185,11 +185,8 @@ class TestE2ESmoke:
         assert "Describe this image" in output
 
     @pytest.mark.skipif(
-        not _check_model_cached(FIXTURE_MODEL) or not _check_runtime_dependencies_ready(),
-        reason=(
-            f"Model {FIXTURE_MODEL} not cached or runtime deps unavailable "
-            "(requires working mlx + mlx-vlm + mlx-lm)"
-        ),
+        not _check_model_cached(FIXTURE_MODEL),
+        reason=(f"Model {FIXTURE_MODEL} not cached (requires pre-downloaded fixture model)"),
     )
     def test_full_inference_with_fixture_model(
         self,
@@ -233,11 +230,8 @@ class TestE2ESmoke:
         assert record["success"] is True
 
     @pytest.mark.skipif(
-        not _check_model_cached(FIXTURE_MODEL) or not _check_runtime_dependencies_ready(),
-        reason=(
-            f"Model {FIXTURE_MODEL} not cached or runtime deps unavailable "
-            "(requires working mlx + mlx-vlm + mlx-lm)"
-        ),
+        not _check_model_cached(FIXTURE_MODEL),
+        reason=(f"Model {FIXTURE_MODEL} not cached (requires pre-downloaded fixture model)"),
     )
     def test_quality_analysis_produces_output(
         self,

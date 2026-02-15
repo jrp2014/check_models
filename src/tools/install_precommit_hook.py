@@ -15,9 +15,6 @@ Usage:
   python -m tools.install_precommit_hook
 
 Re-running this script overwrites existing hooks (after backing them up as `.bak`).
-
-Note: Stub generation removed as part of quality simplification (2025-11-01).
-      Now using mypy's ignore_missing_imports=true instead.
 """
 
 from __future__ import annotations
@@ -80,9 +77,6 @@ if git diff --cached --name-only | grep -q '^src/pyproject.toml$'; then
   (cd src && python tools/update_readme_deps.py) || exit 1
   git add src/README.md
 fi
-
-# Note: Stub generation removed as part of quality simplification (2025-11-01)
-# Now using mypy's ignore_missing_imports=true instead
 
 exit 0
 """

@@ -119,15 +119,6 @@ echo "=== MyPy Type Check ==="
 if [[ "${CI:-false}" == "true" ]]; then
     echo "Debug: Checking installed MLX version..."
     $PYTHON -m pip show mlx || echo "MLX not found via pip"
-    
-    # WORKAROUND: MLX 0.29.4 has a syntax error in __init__.pyi that crashes mypy.
-    # We delete the broken stub file in CI so mypy ignores it (we have ignore_missing_imports=True).
-    # TODO: Remove this workaround once MLX >= 0.29.6 is available in CI.
-    #MLX_LOC=$($PYTHON -m pip show mlx | grep Location | cut -d: -f2 | xargs)
-    #if [[ -n "$MLX_LOC" && -f "$MLX_LOC/mlx/core/__init__.pyi" ]]; then
-    #    echo "⚠️  Workaround: Removing broken mlx/core/__init__.pyi to fix mypy..."
-    #    rm "$MLX_LOC/mlx/core/__init__.pyi"
-    #fi
 fi
 
 # Ensure mypy uses the correct Python environment by setting MYPYPATH
