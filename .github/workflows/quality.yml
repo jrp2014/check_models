@@ -43,12 +43,31 @@ jobs:
         run: |
           # Install nanobind for stub generation (MLX's approach)
           pip install nanobind
-          # Generate stubs using nanobind.stubgen (matching MLX's setup.py)
-          python -m nanobind.stubgen -m mlx.core -r -O ~/.mlx_stubs
-          # Copy generated stubs to site-packages to override broken PyPI stubs
+          STUB_ROOT="$(mktemp -d)"
+          STUB_FILE="$STUB_ROOT/core.pyi"
+
+          # Generate stub using a deterministic output path.
+          # nanobind output layout for dotted modules varies by version.
+          if python -m nanobind.stubgen -m mlx.core -r -o "$STUB_FILE"; then
+            if [ -f "$STUB_FILE" ]; then
+              # Copy generated stubs to site-packages to override broken PyPI stubs
+              SITE_PACKAGES=$(python -c "import site; print(site.getsitepackages()[0])")
+              mkdir -p "$SITE_PACKAGES/mlx"
+              cp "$STUB_FILE" "$SITE_PACKAGES/mlx/core.pyi"
+              mkdir -p "$SITE_PACKAGES/mlx/core"
+              cp "$STUB_FILE" "$SITE_PACKAGES/mlx/core/__init__.pyi"
+            else
+              echo "⚠️ MLX stub file missing after stubgen; type checking may be less accurate"
+            fi
+          else
+            echo "⚠️ MLX stubgen failed; type checking may be less accurate"
+          fi
+
+          # Legacy fallback for older nanobind output layout
           SITE_PACKAGES=$(python -c "import site; print(site.getsitepackages()[0])")
-          cp -r ~/.mlx_stubs/mlx/core/*.pyi "$SITE_PACKAGES/mlx/core/" || echo "⚠️ MLX stub copy failed — type checking may be less accurate"
-          rm -rf ~/.mlx_stubs
+          cp -r ~/.mlx_stubs/mlx/core/*.pyi "$SITE_PACKAGES/mlx/core/" 2>/dev/null || true
+
+          rm -rf "$STUB_ROOT" ~/.mlx_stubs
 
       - name: Run quality checks
         env:

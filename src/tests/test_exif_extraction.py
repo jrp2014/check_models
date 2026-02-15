@@ -177,9 +177,10 @@ def test_extract_metadata_xp_keywords_from_exif(tmp_path: Path) -> None:
         "XPKeywords": "travel;landscape;mountain",
     }
     meta = extract_image_metadata(img_path, exif_data=exif_with_xp)
-    assert meta.get("keywords") is not None
-    assert "travel" in meta["keywords"]  # type: ignore[operator]
-    assert "landscape" in meta["keywords"]  # type: ignore[operator]
+    keywords = meta.get("keywords")
+    assert isinstance(keywords, str)
+    assert "travel" in keywords
+    assert "landscape" in keywords
 
 
 def test_extract_metadata_description_prefers_iptc_caption(tmp_path: Path) -> None:

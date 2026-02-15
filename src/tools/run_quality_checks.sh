@@ -50,6 +50,50 @@ fi
 # All paths are relative to the `src` directory
 cd ..
 
+echo "=== Runtime Dependency Preflight ==="
+$PYTHON - <<'PY'
+from __future__ import annotations
+
+import importlib.metadata
+import sys
+
+required = ("mlx", "mlx-vlm", "mlx-lm")
+missing_packages: list[str] = []
+versions: dict[str, str] = {}
+
+for package in required:
+    try:
+        versions[package] = importlib.metadata.version(package)
+    except importlib.metadata.PackageNotFoundError:
+        missing_packages.append(package)
+
+if missing_packages:
+    print(
+        "❌ Required runtime dependencies unavailable: "
+        + ", ".join(sorted(missing_packages))
+        + ". Install/repair these packages before running quality checks.",
+    )
+    sys.exit(1)
+
+import check_models
+
+missing_runtime = {
+    name: message
+    for name, message in check_models.MISSING_DEPENDENCIES.items()
+    if name in set(required)
+}
+if missing_runtime:
+    print("❌ Required runtime dependencies unavailable:")
+    for name in sorted(missing_runtime):
+        print(f"   [{name}] {missing_runtime[name]}")
+    sys.exit(1)
+
+print(
+    "✓ Runtime dependencies ready: "
+    + ", ".join(f"{name}=={versions[name]}" for name in required),
+)
+PY
+
 echo "=== Dependency Sync ==="
 $PYTHON -m tools.update_readme_deps
 
@@ -124,9 +168,15 @@ if ! command -v shellcheck &> /dev/null; then
 fi
 
 if command -v shellcheck &> /dev/null; then
-    # Find all shell scripts and check them
-    # shellcheck disable=SC2046
-    shellcheck $(find tools -name "*.sh" -type f)
+    # Find all shell scripts and check them.
+    shell_scripts=()
+    while IFS= read -r -d '' script_path; do
+        shell_scripts+=("$script_path")
+    done < <(find tools -name "*.sh" -type f -print0)
+
+    if [ "${#shell_scripts[@]}" -gt 0 ]; then
+        shellcheck "${shell_scripts[@]}"
+    fi
 fi
 
 # Markdown linting runs from the repo root

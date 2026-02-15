@@ -15,7 +15,6 @@ Skip these in CI by default (they require MLX hardware and model downloads).
 
 from __future__ import annotations
 
-import importlib.util
 import json
 import os
 import sys
@@ -130,11 +129,6 @@ def e2e_test_image(tmp_path: Path) -> Path:
     return img_path
 
 
-def _check_mlx_vlm_available() -> bool:
-    """Check if mlx-vlm is available in the current environment."""
-    return importlib.util.find_spec("mlx_vlm") is not None
-
-
 def _check_model_cached(model_id: str) -> bool:
     """Check if a model is already cached locally."""
     try:
@@ -146,6 +140,12 @@ def _check_model_cached(model_id: str) -> bool:
         return model_id in repo_ids
 
 
+def _check_runtime_dependencies_ready() -> bool:
+    """Check whether core runtime deps are currently usable for real inference."""
+    required_runtime = {"mlx", "mlx-vlm", "mlx-lm"}
+    return all(dep not in check_models.MISSING_DEPENDENCIES for dep in required_runtime)
+
+
 # Mark all tests in this module as slow and e2e
 pytestmark = [
     pytest.mark.slow,
@@ -154,8 +154,8 @@ pytestmark = [
 
 
 @pytest.mark.skipif(
-    not _check_mlx_vlm_available(),
-    reason="mlx-vlm not available in environment",
+    not _check_runtime_dependencies_ready(),
+    reason="runtime deps unavailable (requires working mlx + mlx-vlm + mlx-lm)",
 )
 class TestE2ESmoke:
     """End-to-end smoke tests that run actual model inference."""
@@ -185,8 +185,11 @@ class TestE2ESmoke:
         assert "Describe this image" in output
 
     @pytest.mark.skipif(
-        not _check_model_cached(FIXTURE_MODEL),
-        reason=f"Model {FIXTURE_MODEL} not cached (run manually first)",
+        not _check_model_cached(FIXTURE_MODEL) or not _check_runtime_dependencies_ready(),
+        reason=(
+            f"Model {FIXTURE_MODEL} not cached or runtime deps unavailable "
+            "(requires working mlx + mlx-vlm + mlx-lm)"
+        ),
     )
     def test_full_inference_with_fixture_model(
         self,
@@ -230,8 +233,11 @@ class TestE2ESmoke:
         assert record["success"] is True
 
     @pytest.mark.skipif(
-        not _check_model_cached(FIXTURE_MODEL),
-        reason=f"Model {FIXTURE_MODEL} not cached (run manually first)",
+        not _check_model_cached(FIXTURE_MODEL) or not _check_runtime_dependencies_ready(),
+        reason=(
+            f"Model {FIXTURE_MODEL} not cached or runtime deps unavailable "
+            "(requires working mlx + mlx-vlm + mlx-lm)"
+        ),
     )
     def test_quality_analysis_produces_output(
         self,

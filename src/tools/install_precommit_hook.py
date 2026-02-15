@@ -42,28 +42,33 @@ if command -v conda &> /dev/null; then
 fi
 
 # Auto-format Python files with ruff before committing
-PYTHON_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.py$' || true)
-if [ -n "$PYTHON_FILES" ]; then
+PYTHON_FILES=()
+while IFS= read -r -d '' file; do
+    PYTHON_FILES+=("$file")
+done < <(git diff --cached --name-only --diff-filter=ACM -z -- '*.py')
+if [ "${#PYTHON_FILES[@]}" -gt 0 ]; then
     echo '[pre-commit] Auto-formatting Python files with ruff...'
-    # shellcheck disable=SC2086
-    python -m ruff format $PYTHON_FILES || exit 1
+    python -m ruff format "${PYTHON_FILES[@]}" || exit 1
     # Re-stage the formatted files
-    # shellcheck disable=SC2086
-    git add $PYTHON_FILES
+    git add "${PYTHON_FILES[@]}"
 fi
 
 # Auto-fix Markdown files with markdownlint before committing
 # Exclude src/output/ directory (generated reports can have long lines)
-MD_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.md$' | grep -v '^src/output/' || true)
-if [ -n "$MD_FILES" ]; then
+MD_FILES=()
+while IFS= read -r -d '' file; do
+    case "$file" in
+        src/output/*) continue ;;
+    esac
+    MD_FILES+=("$file")
+done < <(git diff --cached --name-only --diff-filter=ACM -z -- '*.md')
+if [ "${#MD_FILES[@]}" -gt 0 ]; then
     echo '[pre-commit] Auto-fixing Markdown files with markdownlint...'
     if command -v npx &> /dev/null; then
-        # shellcheck disable=SC2086
-        npx --yes markdownlint-cli2 --fix $MD_FILES ||
+        npx --yes markdownlint-cli2 --fix "${MD_FILES[@]}" ||
             echo "⚠️  Some markdown issues could not be auto-fixed"
         # Re-stage the fixed files
-        # shellcheck disable=SC2086
-        git add $MD_FILES
+        git add "${MD_FILES[@]}"
     else
         echo "⚠️  npx not found - skipping markdown auto-fix (install Node.js for markdown linting)"
     fi

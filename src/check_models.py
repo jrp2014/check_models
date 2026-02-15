@@ -154,6 +154,9 @@ ERROR_PILLOW_MISSING: Final[str] = (
 ERROR_MLX_VLM_MISSING: Final[str] = (
     "Error: mlx-vlm not found. Please install it (`pip install mlx-vlm`)."
 )
+ERROR_MLX_LM_MISSING: Final[str] = (
+    "Core dependency missing: mlx-lm. Please install it (`pip install mlx-lm`)."
+)
 ERROR_MLX_VLM_RUNTIME_INIT: Final[str] = (
     "Core dependency initialization failed: mlx-vlm could not be imported safely."
 )
@@ -582,6 +585,11 @@ if mlx_vlm_probe_error is None:
 else:
     vlm_version = NOT_AVAILABLE
     _configure_mlx_vlm_fallback(mlx_vlm_probe_error)
+
+try:
+    importlib.metadata.version("mlx-lm")
+except importlib.metadata.PackageNotFoundError:
+    MISSING_DEPENDENCIES["mlx-lm"] = ERROR_MLX_LM_MISSING
 
 _transformers_guard_enabled: bool = os.getenv("MLX_VLM_ALLOW_TF", "0") != "1"
 if _transformers_guard_enabled:
@@ -9475,15 +9483,7 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     # Dump full environment to log file for reproducibility (after logging setup)
     _dump_environment_to_log(args.output_env)
 
-    if MISSING_DEPENDENCIES:
-        for dependency_name, message in sorted(MISSING_DEPENDENCIES.items()):
-            logger.critical("[%s] %s", dependency_name, message)
-        missing_list = ", ".join(sorted(MISSING_DEPENDENCIES))
-        error_message = (
-            f"Required runtime dependencies unavailable: {missing_list}. "
-            "Install/repair these packages before running model checks."
-        )
-        raise RuntimeError(error_message)
+    _raise_for_missing_runtime_dependencies()
 
     # Apply CLI output preferences (color + width)
     _apply_cli_output_preferences(args)
@@ -9518,6 +9518,21 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
         log_warning_note("This allows execution of remote code and may pose security risks.")
 
     return library_versions
+
+
+def _raise_for_missing_runtime_dependencies() -> None:
+    """Raise a fatal runtime error when core inference dependencies are unavailable."""
+    if not MISSING_DEPENDENCIES:
+        return
+
+    for dependency_name, message in sorted(MISSING_DEPENDENCIES.items()):
+        logger.critical("[%s] %s", dependency_name, message)
+    missing_list = ", ".join(sorted(MISSING_DEPENDENCIES))
+    error_message = (
+        f"Required runtime dependencies unavailable: {missing_list}. "
+        "Install/repair these packages before running model checks."
+    )
+    raise RuntimeError(error_message)
 
 
 def find_and_validate_image(args: argparse.Namespace) -> Path:

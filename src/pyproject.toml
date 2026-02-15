@@ -225,12 +225,13 @@ max-statements = 60
 # See: https://github.com/microsoft/pyright/blob/main/docs/configuration.md
 pythonVersion = "3.13"
 typeCheckingMode = "basic" # Can be "off", "basic", or "strict"
-# Allow imports from libraries without type stubs (mlx, mlx-vlm, etc.)
-reportMissingImports = false
-reportMissingTypeStubs = false
+# Keep missing-import diagnostics visible, but non-blocking, since some
+# runtime deps do not publish complete typing metadata.
+reportMissingImports = "warning"
+reportMissingTypeStubs = "warning"
 reportUnusedImport = "warning"
-# Ignore type errors in third-party libraries without stubs
-reportAttributeAccessIssue = "none"
+# Keep attribute-access diagnostics enabled.
+reportAttributeAccessIssue = "warning"
 
 [tool.mypy]
 # Pragmatic type checking with MLX library support
@@ -238,8 +239,8 @@ python_version = "3.13"
 # Skip following imports into external libraries to avoid their stub errors
 # This focuses type checking on our code while still using type info from libraries
 follow_imports = "skip"
-# Ignore missing imports for libraries without stubs
-ignore_missing_imports = true
+# Do not globally suppress missing imports; use targeted overrides below.
+ignore_missing_imports = false
 # Exclude archived tools
 exclude = ["^src/tools/\\.archived/"]
 # Include local type stubs if generated (update.sh can generate stubs for local MLX builds)
@@ -262,17 +263,32 @@ warn_return_any = false
 # Allow broader exception handling in tests
 strict_optional = false
 
-# Ignore missing stubs warnings for MLX libraries, but CHECK errors if stubs exist
+# Allow missing stubs for third-party runtime dependencies used by check_models.py.
 [[tool.mypy.overrides]]
-module = ["mlx_vlm.*", "mlx_lm.*", "tokenizers.*", "huggingface_hub.*"]
+module = [
+    "defusedxml.*",
+    "huggingface_hub.*",
+    "mlx.*",
+    "mlx_lm.*",
+    "mlx_vlm.*",
+    "numpy",
+    "PIL.*",
+    "psutil",
+    "requests",
+    "tabulate",
+    "tokenizers.*",
+    "transformers.*",
+    "tzlocal",
+    "yaml",
+]
 ignore_missing_imports = true
 follow_imports = "skip"
 
 [tool.ty]
 # ty (Astral's type checker) configuration
-# Disable unresolved-import rule - mlx ecosystem packages work at runtime
-# but are installed as editable/local packages without proper type stubs
-rules = { unresolved-import = "ignore" }
+# Keep unresolved-import diagnostics visible, but non-blocking, because
+# some MLX ecosystem packages do not expose complete static typing metadata.
+rules = { unresolved-import = "warn" }
 
 [tool.pytest.ini_options]
 # Limit test discovery to the dedicated tests package inside the project
@@ -292,11 +308,20 @@ search-path = ["../typings"]
 python-version = "3.13"
 #conda-environment = "mlx-vlm"
 ignore-missing-imports = [
+    "defusedxml.*",
+    "huggingface_hub.*",
+    "mlx.*",
     "mlx_vlm.*",
     "mlx_lm.*",
+    "numpy",
+    "PIL.*",
+    "psutil",
+    "requests",
+    "tabulate",
     "tokenizers.*",
-    "huggingface_hub.*",
-    "*",
+    "transformers.*",
+    "tzlocal",
+    "yaml",
 ]
 
 
