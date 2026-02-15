@@ -82,10 +82,6 @@ def test_cli_help_structure(capsys: pytest.CaptureFixture[str]) -> None:
     assert "usage" in output.lower() or "--folder" in output
 
 
-@pytest.mark.skipif(
-    "mlx-vlm" in check_models.MISSING_DEPENDENCIES,
-    reason="Integration tests trigger runtime dependency check",
-)
 def test_cli_exits_on_nonexistent_folder(capsys: pytest.CaptureFixture[str]) -> None:
     """Should exit with error when folder does not exist."""
     result = _run_cli([*_get_test_output_args(), "--folder", "/nonexistent/path"], capsys)
@@ -95,10 +91,6 @@ def test_cli_exits_on_nonexistent_folder(capsys: pytest.CaptureFixture[str]) -> 
     assert "does not exist" in output.lower() or "not found" in output.lower()
 
 
-@pytest.mark.skipif(
-    "mlx-vlm" in check_models.MISSING_DEPENDENCIES,
-    reason="Integration tests trigger runtime dependency check",
-)
 def test_cli_exits_on_empty_folder(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     """Should exit with error when folder has no images."""
     empty_folder = tmp_path / "empty"
@@ -111,10 +103,6 @@ def test_cli_exits_on_empty_folder(tmp_path: Path, capsys: pytest.CaptureFixture
     assert "could not find" in output.lower()
 
 
-@pytest.mark.skipif(
-    "mlx-vlm" in check_models.MISSING_DEPENDENCIES,
-    reason="Validation tests trigger runtime dependency check if args pass",
-)
 def test_cli_invalid_temperature_value(
     folder_with_images: Path,
     capsys: pytest.CaptureFixture[str],
@@ -135,10 +123,6 @@ def test_cli_invalid_temperature_value(
     assert "temperature" in output.lower()
 
 
-@pytest.mark.skipif(
-    "mlx-vlm" in check_models.MISSING_DEPENDENCIES,
-    reason="Validation tests trigger runtime dependency check if args pass",
-)
 def test_cli_invalid_max_tokens(
     folder_with_images: Path,
     capsys: pytest.CaptureFixture[str],

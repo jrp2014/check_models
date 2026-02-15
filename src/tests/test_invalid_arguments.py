@@ -17,10 +17,6 @@ _SRC_DIR = Path(__file__).parent.parent
 _OUTPUT_DIR = _SRC_DIR / "output"
 
 
-@pytest.mark.skipif(
-    "mlx-vlm" in check_models.MISSING_DEPENDENCIES,
-    reason="Validation tests require full runtime to avoid dependency exit pre-emption",
-)
 @pytest.mark.parametrize(
     ("args", "expected_error"),
     [
