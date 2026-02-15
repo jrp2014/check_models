@@ -51,6 +51,9 @@ Notable changes to this project will be documented in this file.
   metadata inputs to reduce prompt bloat while preserving useful grounding.
 - Improved diagnostics report reproducibility command construction and captured
   output sanitization for cleaner issue filing.
+- Diagnostics reports now include preflight compatibility warnings in
+  `diagnostics.md` (with likely package ownership and suggested issue trackers),
+  and surface those warnings in the priority summary.
 - Refactored portions of `check_models.py` for readability/maintainability
   without intended behavioral change.
 - Failure clustering in diagnostics now keys off canonical signatures instead of
