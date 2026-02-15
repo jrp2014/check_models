@@ -710,6 +710,7 @@ type FormattingModelIssue = tuple[str, list[str]]
 type ExcessiveBulletsIssue = tuple[str, int]
 type LowUtilityModelIssue = tuple[str, float, str, str]
 type ModelScoreGrade = tuple[str, float, str]
+type CatalogingScoreRecord = tuple[str, float, str, str, float | None]
 
 
 class ModelIssueSummary(TypedDict, total=False):
@@ -727,6 +728,12 @@ class ModelIssueSummary(TypedDict, total=False):
     cataloging_best: ModelScoreGrade | None
     cataloging_worst: ModelScoreGrade | None
     cataloging_avg_score: float
+    metadata_baseline_score: float
+    metadata_baseline_grade: str
+    cataloging_avg_delta: float
+    cataloging_improves_metadata: list[str]
+    cataloging_neutral_vs_metadata: list[str]
+    cataloging_worse_than_metadata: list[str]
     low_utility_models: list[LowUtilityModelIssue]
     fastest_model: tuple[str, float]
     most_efficient_model: tuple[str, float]
@@ -1540,6 +1547,7 @@ SUMMARY_MODEL_LABEL_MAX: Final[int] = 32  # Max model label length in summary ta
 SUMMARY_CHART_MAX_ROWS: Final[int] = 8  # Max rows shown in summary charts
 MIN_MODELS_FOR_EFFICIENCY_CHART: Final[int] = 2  # Min successful rows for cross-model efficiency
 FLOAT_ZERO_EPSILON: Final[float] = 1e-9  # Tolerance when rendering signed deltas as zero
+UTILITY_DELTA_NEUTRAL_BAND: Final[float] = 2.0  # Within ±band, model is neutral vs metadata
 
 # Numeric fields are automatically derived from FIELD_ABBREVIATIONS for consistency
 # Exclude non-numeric fields explicitly
@@ -3427,6 +3435,68 @@ def compute_cataloging_utility(
         "utility_grade": grade,
         "primary_weakness": weakness,
     }
+
+
+def _extract_metadata_baseline_text(context: str | None) -> str | None:
+    """Extract compact baseline text from prompt context metadata hints.
+
+    The prompt context may include wrapper labels (for example ``Title hint:``).
+    This helper strips wrappers so baseline utility is scored on metadata content.
+    """
+    if not context:
+        return None
+
+    label_prefixes: tuple[str, ...] = (
+        "title hint:",
+        "description hint:",
+        "keyword hints:",
+        "capture metadata:",
+        "capture metadata hints:",
+    )
+    extracted_lines: list[str] = []
+    for raw_line in context.splitlines():
+        line = raw_line.strip().lstrip("-").strip()
+        if not line:
+            continue
+        if line.lower().startswith("existing metadata hints"):
+            continue
+        line_lower = line.lower()
+        for prefix in label_prefixes:
+            if line_lower.startswith(prefix):
+                line = line[len(prefix) :].strip()
+                break
+        if line:
+            extracted_lines.append(line)
+
+    merged = " ".join(extracted_lines).strip()
+    return merged or None
+
+
+def _compute_metadata_baseline_utility(context: str | None) -> tuple[float, str] | None:
+    """Compute baseline utility score/grade from existing image metadata context."""
+    baseline_text = _extract_metadata_baseline_text(context)
+    if not baseline_text:
+        return None
+    baseline_utility = compute_cataloging_utility(baseline_text, None)
+    return (
+        float(baseline_utility["utility_score"]),
+        str(baseline_utility["utility_grade"]),
+    )
+
+
+def _compute_utility_snapshot(
+    text: str,
+    context: str | None,
+    *,
+    baseline_score: float | None = None,
+) -> tuple[float, str, str, float | None]:
+    """Compute utility score/grade/weakness and optional delta vs metadata baseline."""
+    utility = compute_cataloging_utility(text, context)
+    score = float(utility["utility_score"])
+    grade = str(utility["utility_grade"])
+    weakness = str(utility["primary_weakness"])
+    delta = score - baseline_score if baseline_score is not None else None
+    return score, grade, weakness, delta
 
 
 @dataclass(frozen=True)
@@ -5335,6 +5405,180 @@ def _wrap_output_column_in_details(html_table: str, output_col_idx: int) -> str:
     return "\n".join(result_lines)
 
 
+def _init_model_issue_summary(
+    *,
+    total_models: int,
+    baseline: tuple[float, str] | None,
+) -> ModelIssueSummary:
+    """Create default issue-summary structure, optionally seeded with metadata baseline."""
+    summary: ModelIssueSummary = {
+        "total_models": total_models,
+        "failed_models": [],
+        "repetitive_models": [],
+        "hallucination_models": [],
+        "verbose_models": [],
+        "formatting_issues": [],
+        "excessive_bullets": [],
+        "cataloging_grades": {},
+        "cataloging_best": None,
+        "cataloging_worst": None,
+        "cataloging_avg_score": 0.0,
+        "low_utility_models": [],
+    }
+    if baseline is None:
+        return summary
+
+    baseline_score, baseline_grade = baseline
+    summary["metadata_baseline_score"] = baseline_score
+    summary["metadata_baseline_grade"] = baseline_grade
+    summary["cataloging_improves_metadata"] = []
+    summary["cataloging_neutral_vs_metadata"] = []
+    summary["cataloging_worse_than_metadata"] = []
+    return summary
+
+
+def _populate_summary_performance_highlights(
+    summary: ModelIssueSummary,
+    successful: list[PerformanceResult],
+) -> None:
+    """Populate speed/memory highlights and aggregate resource stats."""
+    if not successful:
+        return
+
+    fastest = max(successful, key=lambda r: getattr(r.generation, "generation_tps", 0) or 0)
+    fastest_tps = getattr(fastest.generation, "generation_tps", 0) or 0
+    summary["fastest_model"] = (fastest.model_name, fastest_tps)
+
+    most_efficient = min(
+        successful,
+        key=lambda r: getattr(r.generation, "peak_memory", float("inf")) or float("inf"),
+    )
+    efficient_mem = getattr(most_efficient.generation, "peak_memory", 0) or 0
+    summary["most_efficient_model"] = (most_efficient.model_name, efficient_mem)
+
+    fastest_load = min(
+        successful,
+        key=lambda r: getattr(r, "model_load_time", float("inf")) or float("inf"),
+    )
+    load_time = getattr(fastest_load, "model_load_time", 0) or 0
+    summary["fastest_load_model"] = (fastest_load.model_name, load_time)
+
+    total_tps = sum(getattr(r.generation, "generation_tps", 0) or 0 for r in successful)
+    summary["average_tps"] = total_tps / len(successful)
+    summary["successful_count"] = len(successful)
+
+    total_mem = sum(getattr(r.generation, "peak_memory", 0) or 0 for r in successful)
+    summary["total_peak_memory"] = total_mem
+    summary["average_peak_memory"] = total_mem / len(successful)
+
+    total_tokens = sum(
+        (getattr(r.generation, "prompt_tokens", 0) or 0)
+        + (getattr(r.generation, "generation_tokens", 0) or 0)
+        for r in successful
+    )
+    summary["memory_efficiency"] = total_tokens / total_mem if total_mem > 0 else 0
+
+
+def _update_summary_quality_issues(
+    summary: ModelIssueSummary,
+    *,
+    result: PerformanceResult,
+    analysis: GenerationQualityAnalysis,
+    generation_tokens: int,
+) -> None:
+    """Append quality-issue entries from generation analysis into the summary."""
+    repetitive_models = summary.get("repetitive_models")
+    if repetitive_models is None:
+        repetitive_models = []
+        summary["repetitive_models"] = repetitive_models
+
+    hallucination_models = summary.get("hallucination_models")
+    if hallucination_models is None:
+        hallucination_models = []
+        summary["hallucination_models"] = hallucination_models
+
+    verbose_models = summary.get("verbose_models")
+    if verbose_models is None:
+        verbose_models = []
+        summary["verbose_models"] = verbose_models
+
+    formatting_issues = summary.get("formatting_issues")
+    if formatting_issues is None:
+        formatting_issues = []
+        summary["formatting_issues"] = formatting_issues
+
+    excessive_bullets = summary.get("excessive_bullets")
+    if excessive_bullets is None:
+        excessive_bullets = []
+        summary["excessive_bullets"] = excessive_bullets
+
+    if analysis.is_repetitive:
+        repetitive_models.append((result.model_name, analysis.repeated_token))
+    if analysis.hallucination_issues:
+        hallucination_models.append(
+            (result.model_name, analysis.hallucination_issues),
+        )
+    if analysis.is_verbose:
+        verbose_models.append((result.model_name, generation_tokens))
+    if analysis.formatting_issues:
+        formatting_issues.append((result.model_name, analysis.formatting_issues))
+    if analysis.has_excessive_bullets:
+        excessive_bullets.append((result.model_name, analysis.bullet_count))
+
+
+def _update_metadata_delta_buckets(
+    summary: ModelIssueSummary,
+    *,
+    model_name: str,
+    delta: float | None,
+) -> None:
+    """Bucket model utility deltas relative to metadata baseline."""
+    if delta is None or "metadata_baseline_score" not in summary:
+        return
+    improves_metadata = summary.get("cataloging_improves_metadata")
+    if improves_metadata is None:
+        improves_metadata = []
+        summary["cataloging_improves_metadata"] = improves_metadata
+
+    worse_than_metadata = summary.get("cataloging_worse_than_metadata")
+    if worse_than_metadata is None:
+        worse_than_metadata = []
+        summary["cataloging_worse_than_metadata"] = worse_than_metadata
+
+    neutral_vs_metadata = summary.get("cataloging_neutral_vs_metadata")
+    if neutral_vs_metadata is None:
+        neutral_vs_metadata = []
+        summary["cataloging_neutral_vs_metadata"] = neutral_vs_metadata
+    if delta > UTILITY_DELTA_NEUTRAL_BAND:
+        improves_metadata.append(model_name)
+    elif delta < -UTILITY_DELTA_NEUTRAL_BAND:
+        worse_than_metadata.append(model_name)
+    else:
+        neutral_vs_metadata.append(model_name)
+
+
+def _finalize_cataloging_summary(
+    summary: ModelIssueSummary,
+    utility_scores: list[CatalogingScoreRecord],
+) -> None:
+    """Finalize best/worst/average utility and average delta vs metadata."""
+    if not utility_scores:
+        return
+
+    best = max(utility_scores, key=lambda row: row[1])
+    worst = min(utility_scores, key=lambda row: row[1])
+    summary["cataloging_best"] = (best[0], best[1], best[2])
+    summary["cataloging_worst"] = (worst[0], worst[1], worst[2])
+    summary["cataloging_avg_score"] = sum(score for _m, score, _g, _w, _d in utility_scores) / len(
+        utility_scores,
+    )
+
+    if "metadata_baseline_score" in summary:
+        deltas = [delta for _m, _s, _g, _w, delta in utility_scores if delta is not None]
+        if deltas:
+            summary["cataloging_avg_delta"] = sum(deltas) / len(deltas)
+
+
 def analyze_model_issues(
     results: list[PerformanceResult],
     context: str | None = None,
@@ -5345,75 +5589,32 @@ def analyze_model_issues(
         results: List of model performance results
         context: Optional context string (from prompt) for cataloging utility analysis
     """
-    summary: ModelIssueSummary = {
-        "total_models": len(results),
-        "failed_models": [],
-        "repetitive_models": [],
-        "hallucination_models": [],
-        "verbose_models": [],
-        "formatting_issues": [],
-        "excessive_bullets": [],
-        # Cataloging utility summary
-        "cataloging_grades": {},  # grade -> list of model names
-        "cataloging_best": None,  # (model_name, score, grade)
-        "cataloging_worst": None,  # (model_name, score, grade)
-        "cataloging_avg_score": 0.0,
-        "low_utility_models": [],  # Models with grade D or F
-    }
+    baseline = _compute_metadata_baseline_utility(context)
+    summary = _init_model_issue_summary(total_models=len(results), baseline=baseline)
+    baseline_score = baseline[0] if baseline is not None else None
 
-    # Separate successful and failed results
     successful = [r for r in results if r.success]
+    _populate_summary_performance_highlights(summary, successful)
+    failed_models = summary.get("failed_models")
+    if failed_models is None:
+        failed_models = []
+        summary["failed_models"] = failed_models
 
-    # Calculate performance highlights for successful models
-    if successful:
-        # Fastest model (generation TPS)
-        fastest = max(successful, key=lambda r: getattr(r.generation, "generation_tps", 0) or 0)
-        fastest_tps = getattr(fastest.generation, "generation_tps", 0) or 0
-        summary["fastest_model"] = (fastest.model_name, fastest_tps)
+    cataloging_grades = summary.get("cataloging_grades")
+    if cataloging_grades is None:
+        cataloging_grades = {}
+        summary["cataloging_grades"] = cataloging_grades
 
-        # Most memory efficient (lowest peak memory)
-        most_efficient = min(
-            successful,
-            key=lambda r: getattr(r.generation, "peak_memory", float("inf")) or float("inf"),
-        )
-        efficient_mem = getattr(most_efficient.generation, "peak_memory", 0) or 0
-        summary["most_efficient_model"] = (most_efficient.model_name, efficient_mem)
+    low_utility_models = summary.get("low_utility_models")
+    if low_utility_models is None:
+        low_utility_models = []
+        summary["low_utility_models"] = low_utility_models
 
-        # Fastest to load
-        fastest_load = min(
-            successful,
-            key=lambda r: getattr(r, "model_load_time", float("inf")) or float("inf"),
-        )
-        load_time = getattr(fastest_load, "model_load_time", 0) or 0
-        summary["fastest_load_model"] = (fastest_load.model_name, load_time)
-
-        # Average TPS
-        total_tps = sum(getattr(r.generation, "generation_tps", 0) or 0 for r in successful)
-        avg_tps = total_tps / len(successful) if successful else 0
-        summary["average_tps"] = avg_tps
-        summary["successful_count"] = len(successful)
-
-        # Resource usage summary
-        total_mem = sum(getattr(r.generation, "peak_memory", 0) or 0 for r in successful)
-        avg_mem = total_mem / len(successful) if successful else 0
-        summary["total_peak_memory"] = total_mem
-        summary["average_peak_memory"] = avg_mem
-
-        # Memory efficiency (tokens per GB)
-        total_tokens = sum(
-            (getattr(r.generation, "prompt_tokens", 0) or 0)
-            + (getattr(r.generation, "generation_tokens", 0) or 0)
-            for r in successful
-        )
-        tokens_per_gb = total_tokens / total_mem if total_mem > 0 else 0
-        summary["memory_efficiency"] = tokens_per_gb
-
-    # Track cataloging utility scores for aggregation
-    utility_scores: list[tuple[str, float, str, str]] = []  # (model, score, grade, weakness)
+    utility_scores: list[CatalogingScoreRecord] = []
 
     for res in results:
         if not res.success:
-            summary["failed_models"].append(
+            failed_models.append(
                 (res.model_name, res.error_stage, res.error_message),
             )
             continue
@@ -5423,53 +5624,38 @@ def analyze_model_issues(
             gen_tokens = getattr(res.generation, "generation_tokens", 0)
             prompt_tokens = getattr(res.generation, "prompt_tokens", None)
 
-            # Use consolidated quality analysis utility
             analysis = analyze_generation_text(
                 text,
                 gen_tokens,
                 prompt_tokens=prompt_tokens,
             )
+            _update_summary_quality_issues(
+                summary,
+                result=res,
+                analysis=analysis,
+                generation_tokens=gen_tokens,
+            )
 
-            if analysis.is_repetitive:
-                summary["repetitive_models"].append((res.model_name, analysis.repeated_token))
-            if analysis.hallucination_issues:
-                summary["hallucination_models"].append(
-                    (res.model_name, analysis.hallucination_issues),
-                )
-            if analysis.is_verbose:
-                summary["verbose_models"].append((res.model_name, gen_tokens))
-            if analysis.formatting_issues:
-                summary["formatting_issues"].append(
-                    (res.model_name, analysis.formatting_issues),
-                )
-            if analysis.has_excessive_bullets:
-                summary["excessive_bullets"].append((res.model_name, analysis.bullet_count))
-
-            # Compute cataloging utility
-            utility = compute_cataloging_utility(text, context)
-            score = float(utility["utility_score"])
-            grade = str(utility["utility_grade"])
-            weakness = str(utility["primary_weakness"])
-            utility_scores.append((res.model_name, score, grade, weakness))
+            score, grade, weakness, delta = _compute_utility_snapshot(
+                text,
+                context,
+                baseline_score=baseline_score,
+            )
+            utility_scores.append((res.model_name, score, grade, weakness, delta))
 
             # Group by grade
-            summary["cataloging_grades"].setdefault(grade, []).append(res.model_name)
+            cataloging_grades.setdefault(grade, []).append(res.model_name)
 
             # Track low utility models (D or F)
             if grade in ("D", "F"):
-                summary["low_utility_models"].append((res.model_name, score, grade, weakness))
+                low_utility_models.append((res.model_name, score, grade, weakness))
+            _update_metadata_delta_buckets(
+                summary,
+                model_name=res.model_name,
+                delta=delta,
+            )
 
-    # Compute cataloging summary statistics
-    if utility_scores:
-        # Best and worst
-        best = max(utility_scores, key=lambda x: x[1])
-        worst = min(utility_scores, key=lambda x: x[1])
-        summary["cataloging_best"] = (best[0], best[1], best[2])
-        summary["cataloging_worst"] = (worst[0], worst[1], worst[2])
-
-        # Average score
-        avg_score = sum(s[1] for s in utility_scores) / len(utility_scores)
-        summary["cataloging_avg_score"] = avg_score
+    _finalize_cataloging_summary(summary, utility_scores)
 
     return summary
 
@@ -5649,6 +5835,35 @@ def _format_quality_issues_html(summary: ModelIssueSummary) -> list[str]:
     return parts
 
 
+def _cataloging_grade_distribution_items(summary: ModelIssueSummary) -> list[str]:
+    """Build grade-distribution labels shared by HTML/Markdown renderers."""
+    grades = summary.get("cataloging_grades", {})
+    if not grades:
+        return []
+    grade_counts: list[str] = []
+    for grade in ["A", "B", "C", "D", "F"]:
+        count = len(grades.get(grade, []))
+        if count > 0:
+            emoji = GRADE_EMOJIS.get(grade, "")
+            grade_counts.append(f"{emoji} {grade}: {count}")
+    return grade_counts
+
+
+def _cataloging_vs_metadata_breakdown(
+    summary: ModelIssueSummary,
+) -> tuple[float, str, float, int, int, int] | None:
+    """Return baseline/delta summary when metadata baseline is available."""
+    baseline_score = summary.get("metadata_baseline_score")
+    baseline_grade = summary.get("metadata_baseline_grade")
+    if baseline_score is None or baseline_grade is None:
+        return None
+    better = len(summary.get("cataloging_improves_metadata", []))
+    neutral = len(summary.get("cataloging_neutral_vs_metadata", []))
+    worse = len(summary.get("cataloging_worse_than_metadata", []))
+    avg_delta = summary.get("cataloging_avg_delta", 0.0)
+    return baseline_score, baseline_grade, avg_delta, better, neutral, worse
+
+
 def _format_cataloging_summary_html(summary: ModelIssueSummary) -> list[str]:
     """Format cataloging utility summary as HTML."""
     parts: list[str] = []
@@ -5660,21 +5875,26 @@ def _format_cataloging_summary_html(summary: ModelIssueSummary) -> list[str]:
     parts.append("<h3>📚 Cataloging Utility Summary</h3>")
 
     # Grade distribution overview
-    grades = summary.get("cataloging_grades", {})
-    if grades:
-        grade_counts = []
-        for grade in ["A", "B", "C", "D", "F"]:
-            count = len(grades.get(grade, []))
-            if count > 0:
-                emoji = GRADE_EMOJIS.get(grade, "")
-                grade_counts.append(f"{emoji} {grade}: {count}")
-        if grade_counts:
-            parts.append(f"<p><b>Grade Distribution:</b> {' | '.join(grade_counts)}</p>")
+    grade_counts = _cataloging_grade_distribution_items(summary)
+    if grade_counts:
+        parts.append(f"<p><b>Grade Distribution:</b> {' | '.join(grade_counts)}</p>")
 
     # Average score
     avg_score = summary.get("cataloging_avg_score", 0)
     if avg_score > 0:
         parts.append(f"<p><b>Average Utility Score:</b> {avg_score:.0f}/100</p>")
+    metadata_breakdown = _cataloging_vs_metadata_breakdown(summary)
+    if metadata_breakdown is not None:
+        baseline_score, baseline_grade, avg_delta, better, neutral, worse = metadata_breakdown
+        baseline_emoji = GRADE_EMOJIS.get(baseline_grade, "❌")
+        parts.append(
+            "<p><b>Existing Metadata Baseline:</b> "
+            f"{baseline_emoji} {baseline_grade} ({baseline_score:.0f}/100)</p>",
+        )
+        parts.append(
+            "<p><b>Vs Existing Metadata:</b> "
+            f"Avg Δ {avg_delta:+.0f} | Better: {better}, Neutral: {neutral}, Worse: {worse}</p>",
+        )
 
     # Best and worst performers
     parts.append("<ul>")
@@ -5727,22 +5947,28 @@ def _format_cataloging_summary_text(summary: ModelIssueSummary) -> list[str]:
     parts.append("")
 
     # Grade distribution overview
-    grades = summary.get("cataloging_grades", {})
-    if grades:
-        grade_counts = []
-        for grade in ["A", "B", "C", "D", "F"]:
-            count = len(grades.get(grade, []))
-            if count > 0:
-                emoji = GRADE_EMOJIS.get(grade, "")
-                grade_counts.append(f"{emoji} {grade}: {count}")
-        if grade_counts:
-            parts.append(f"**Grade Distribution:** {' | '.join(grade_counts)}")
-            parts.append("")
+    grade_counts = _cataloging_grade_distribution_items(summary)
+    if grade_counts:
+        parts.append(f"**Grade Distribution:** {' | '.join(grade_counts)}")
+        parts.append("")
 
     # Average score
     avg_score = summary.get("cataloging_avg_score", 0)
     if avg_score > 0:
         parts.append(f"**Average Utility Score:** {avg_score:.0f}/100")
+        parts.append("")
+    metadata_breakdown = _cataloging_vs_metadata_breakdown(summary)
+    if metadata_breakdown is not None:
+        baseline_score, baseline_grade, avg_delta, better, neutral, worse = metadata_breakdown
+        baseline_emoji = GRADE_EMOJIS.get(baseline_grade, "❌")
+        parts.append(
+            f"**Existing Metadata Baseline:** {baseline_emoji} {baseline_grade} "
+            f"({baseline_score:.0f}/100)",
+        )
+        parts.append(
+            f"**Vs Existing Metadata:** Avg Δ {avg_delta:+.0f} | "
+            f"Better: {better}, Neutral: {neutral}, Worse: {worse}",
+        )
         parts.append("")
 
     # Best and worst performers
@@ -7364,7 +7590,7 @@ def _format_quality_issues_text(summary: ModelIssueSummary) -> list[str]:
             f"- **🔄 Repetitive Output ({len(repetitive_models)}):**",
         )
         for model, token in repetitive_models:
-            quality_parts.append(f"  - `{model}` (token: `{token}`)")
+            quality_parts.append(f"  - `{model}` (token: `{token or '?'}`)")
 
     hallucination_models = summary.get("hallucination_models", [])
     if hallucination_models:
@@ -11030,7 +11256,16 @@ def _format_counter_items(counter: Counter[str], *, max_items: int = 6) -> str:
     return ", ".join(f"{label}={count}" for label, count in counter.most_common(max_items))
 
 
-UtilityTriageRow = tuple[PerformanceResult, float, str, str, frozenset[str]]
+@dataclass(frozen=True)
+class UtilityTriageRow:
+    """Cataloging triage row for summary ranking/logging."""
+
+    result: PerformanceResult
+    score: float
+    grade: str
+    weakness: str
+    delta_vs_metadata: float | None
+    labels: frozenset[str]
 
 
 def _short_model_label(model_name: str, *, max_len: int = SUMMARY_MODEL_LABEL_MAX) -> str:
@@ -11213,11 +11448,14 @@ def _collect_quality_and_utility_rows(
     successful: list[PerformanceResult],
     *,
     prompt: str | None,
-) -> tuple[Counter[str], int, list[UtilityTriageRow]]:
+) -> tuple[Counter[str], int, list[UtilityTriageRow], float | None, str | None]:
     """Collect quality counts and cataloging utility rows."""
     quality_counts: Counter[str] = Counter()
     clean_count = 0
     context = _extract_context_from_prompt(prompt)
+    baseline = _compute_metadata_baseline_utility(context)
+    baseline_score = baseline[0] if baseline is not None else None
+    baseline_grade = baseline[1] if baseline is not None else None
     rows: list[UtilityTriageRow] = []
 
     for res in successful:
@@ -11231,18 +11469,23 @@ def _collect_quality_and_utility_rows(
         if not res.generation:
             continue
         text = str(getattr(res.generation, "text", "") or "")
-        utility = compute_cataloging_utility(text, context)
+        score, grade, weakness, delta = _compute_utility_snapshot(
+            text,
+            context,
+            baseline_score=baseline_score,
+        )
         rows.append(
-            (
-                res,
-                float(utility["utility_score"]),
-                str(utility["utility_grade"]),
-                str(utility["primary_weakness"]),
-                labels,
+            UtilityTriageRow(
+                result=res,
+                score=score,
+                grade=grade,
+                weakness=weakness,
+                delta_vs_metadata=delta,
+                labels=labels,
             ),
         )
 
-    return quality_counts, clean_count, rows
+    return quality_counts, clean_count, rows, baseline_score, baseline_grade
 
 
 def _log_quality_signal_summary(
@@ -11260,12 +11503,17 @@ def _log_quality_signal_summary(
 def _select_useful_rows(rows: list[UtilityTriageRow]) -> list[UtilityTriageRow]:
     """Return shortlist of high-utility, non-breaking models."""
     useful_rows = [
-        row for row in rows if row[2] in {"A", "B"} and not (row[4] & QUALITY_BREAKING_LABELS)
+        row
+        for row in rows
+        if row.grade in {"A", "B"}
+        and not (row.labels & QUALITY_BREAKING_LABELS)
+        and (row.delta_vs_metadata is None or row.delta_vs_metadata > 0)
     ]
     useful_rows.sort(
         key=lambda row: (
-            row[1],
-            getattr(row[0].generation, "generation_tps", 0) or 0,
+            row.delta_vs_metadata if row.delta_vs_metadata is not None else float("-inf"),
+            row.score,
+            getattr(row.result.generation, "generation_tps", 0) or 0,
         ),
         reverse=True,
     )
@@ -11276,31 +11524,47 @@ def _select_watchlist_rows(rows: list[UtilityTriageRow]) -> list[tuple[UtilityTr
     """Return successful-but-risky models with reason labels."""
     watchlist_rows: list[tuple[UtilityTriageRow, str]] = []
     for row in rows:
-        _res, _score, grade, weakness, labels = row
-        breaking = sorted(labels & QUALITY_BREAKING_LABELS)
+        breaking = sorted(row.labels & QUALITY_BREAKING_LABELS)
         if breaking:
             watchlist_rows.append((row, ",".join(breaking)))
             continue
-        if grade in {"D", "F"}:
-            watchlist_rows.append((row, weakness))
+        if (
+            row.delta_vs_metadata is not None
+            and row.delta_vs_metadata < -UTILITY_DELTA_NEUTRAL_BAND
+        ):
+            watchlist_rows.append((row, f"worse-than-metadata(Δ{row.delta_vs_metadata:+.0f})"))
+            continue
+        if row.grade in {"D", "F"}:
+            watchlist_rows.append((row, row.weakness))
 
     watchlist_rows.sort(
         key=lambda item: (
-            0 if "harness" in item[0][4] else 1,
-            {"F": 0, "D": 1, "C": 2, "B": 3, "A": 4}.get(item[0][2], 2),
-            item[0][1],
+            0 if "harness" in item[0].labels else 1,
+            0
+            if (
+                item[0].delta_vs_metadata is not None
+                and item[0].delta_vs_metadata < -UTILITY_DELTA_NEUTRAL_BAND
+            )
+            else 1,
+            {"F": 0, "D": 1, "C": 2, "B": 3, "A": 4}.get(item[0].grade, 2),
+            item[0].score,
         ),
     )
     return watchlist_rows
 
 
-def _log_utility_triage(rows: list[UtilityTriageRow]) -> None:
+def _log_utility_triage(
+    rows: list[UtilityTriageRow],
+    *,
+    baseline_score: float | None = None,
+    baseline_grade: str | None = None,
+) -> None:
     """Log utility grade distribution and shortlists."""
     if not rows:
         return
 
-    grade_counts: Counter[str] = Counter(grade for _res, _score, grade, _weak, _labels in rows)
-    avg_utility = sum(score for _res, score, _grade, _weak, _labels in rows) / len(rows)
+    grade_counts: Counter[str] = Counter(row.grade for row in rows)
+    avg_utility = sum(row.score for row in rows) / len(rows)
     n_ab = grade_counts.get("A", 0) + grade_counts.get("B", 0)
     n_c = grade_counts.get("C", 0)
     n_df = grade_counts.get("D", 0) + grade_counts.get("F", 0)
@@ -11314,13 +11578,44 @@ def _log_utility_triage(rows: list[UtilityTriageRow]) -> None:
         n_c,
         n_df,
     )
+    if baseline_score is not None:
+        baseline_display = _get_grade_display(baseline_grade or "F")
+        deltas = [row.delta_vs_metadata for row in rows if row.delta_vs_metadata is not None]
+        better = sum(delta > UTILITY_DELTA_NEUTRAL_BAND for delta in deltas)
+        worse = sum(delta < -UTILITY_DELTA_NEUTRAL_BAND for delta in deltas)
+        neutral = len(deltas) - better - worse
+        avg_delta = sum(deltas) / len(deltas) if deltas else 0.0
+        logger.info("   Metadata baseline: %s %.0f/100", baseline_display, baseline_score)
+        logger.info(
+            "   Vs metadata: Avg Δ %+.0f | better=%d, neutral=%d, worse=%d",
+            avg_delta,
+            better,
+            neutral,
+            worse,
+        )
 
     useful_rows = _select_useful_rows(rows)
     if useful_rows:
         logger.info("   Useful now (top %d):", min(MAX_TRIAGE_MODELS, len(useful_rows)))
-        for res, score, grade, _weakness, _labels in useful_rows[:MAX_TRIAGE_MODELS]:
-            tps = getattr(res.generation, "generation_tps", 0) or 0
-            logger.info("   - %s: %s %.0f/100 (%.1f tps)", res.model_name, grade, score, tps)
+        for row in useful_rows[:MAX_TRIAGE_MODELS]:
+            tps = getattr(row.result.generation, "generation_tps", 0) or 0
+            if row.delta_vs_metadata is None:
+                logger.info(
+                    "   - %s: %s %.0f/100 (%.1f tps)",
+                    row.result.model_name,
+                    row.grade,
+                    row.score,
+                    tps,
+                )
+            else:
+                logger.info(
+                    "   - %s: %s %.0f/100 (Δ%+.0f, %.1f tps)",
+                    row.result.model_name,
+                    row.grade,
+                    row.score,
+                    row.delta_vs_metadata,
+                    tps,
+                )
     else:
         logger.info("   Useful now: none (no clean A/B outputs)")
 
@@ -11328,8 +11623,13 @@ def _log_utility_triage(rows: list[UtilityTriageRow]) -> None:
     if watchlist_rows:
         logger.info("   Watchlist (top %d):", min(MAX_TRIAGE_MODELS, len(watchlist_rows)))
         for row, reason in watchlist_rows[:MAX_TRIAGE_MODELS]:
-            res, score, grade, _weakness, _labels = row
-            logger.info("   - %s: %s %.0f/100 (%s)", res.model_name, grade, score, reason)
+            logger.info(
+                "   - %s: %s %.0f/100 (%s)",
+                row.result.model_name,
+                row.grade,
+                row.score,
+                reason,
+            )
 
 
 def _log_failed_models_summary(failed: list[PerformanceResult]) -> None:
@@ -11401,7 +11701,13 @@ def log_summary(
     if successful:
         _log_performance_highlights(successful)
         log_blank()
-        quality_counts, clean_count, utility_rows = _collect_quality_and_utility_rows(
+        (
+            quality_counts,
+            clean_count,
+            utility_rows,
+            baseline_score,
+            baseline_grade,
+        ) = _collect_quality_and_utility_rows(
             successful,
             prompt=prompt,
         )
@@ -11410,7 +11716,11 @@ def log_summary(
             clean_count=clean_count,
             successful_count=len(successful),
         )
-        _log_utility_triage(utility_rows)
+        _log_utility_triage(
+            utility_rows,
+            baseline_score=baseline_score,
+            baseline_grade=baseline_grade,
+        )
         log_blank()
 
     if failed:

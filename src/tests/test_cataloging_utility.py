@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import pytest
 
 from check_models import (
     GRADE_EMOJIS,
     QUALITY,
     ModelIssueSummary,
+    PerformanceResult,
     _format_cataloging_summary_html,
     _format_cataloging_summary_text,
     _get_grade_display,
@@ -27,6 +30,15 @@ MIN_SPATIAL_TERMS_IN_SENTENCE = 3  # "above", "below", "behind"
 def _get_utility_score(result: dict[str, float | str]) -> float:
     """Extract utility score as float from result dict."""
     return float(result["utility_score"])
+
+
+@dataclass
+class _StubGeneration:
+    text: str
+    prompt_tokens: int = 64
+    generation_tokens: int = 128
+    generation_tps: float = 20.0
+    peak_memory: float = 1.2
 
 
 class TestComputeInformationGain:
@@ -353,6 +365,28 @@ class TestCatalogingSummaryFormatters:
         assert "35" in html  # Worst score
         assert "Low visual grounding" in html
 
+    def test_format_cataloging_summary_html_with_metadata_delta(self) -> None:
+        """Summary should include baseline and delta metadata comparison lines."""
+        summary: ModelIssueSummary = {
+            "cataloging_best": ("model-a", 92.0, "A"),
+            "cataloging_worst": ("model-b", 35.0, "D"),
+            "cataloging_avg_score": 65.0,
+            "cataloging_grades": {"A": ["model-a"], "D": ["model-b"]},
+            "metadata_baseline_score": 70.0,
+            "metadata_baseline_grade": "B",
+            "cataloging_avg_delta": -5.0,
+            "cataloging_improves_metadata": ["model-a"],
+            "cataloging_neutral_vs_metadata": [],
+            "cataloging_worse_than_metadata": ["model-b"],
+            "low_utility_models": [("model-b", 35.0, "D", "Low visual grounding")],
+        }
+        result = _format_cataloging_summary_html(summary)
+        html = "".join(result)
+        assert "Existing Metadata Baseline" in html
+        assert "Vs Existing Metadata" in html
+        assert "Better: 1" in html
+        assert "Worse: 1" in html
+
     def test_format_cataloging_summary_text_empty(self) -> None:
         """Empty summary should return empty list."""
         summary: ModelIssueSummary = {"cataloging_best": None}
@@ -382,6 +416,28 @@ class TestCatalogingSummaryFormatters:
         assert "Worst for cataloging" in md
         assert "Low visual grounding" in md
 
+    def test_format_cataloging_summary_text_with_metadata_delta(self) -> None:
+        """Markdown summary should include metadata baseline and delta breakdown."""
+        summary: ModelIssueSummary = {
+            "cataloging_best": ("model-a", 92.0, "A"),
+            "cataloging_worst": ("model-b", 35.0, "D"),
+            "cataloging_avg_score": 65.0,
+            "cataloging_grades": {"A": ["model-a"], "D": ["model-b"]},
+            "metadata_baseline_score": 70.0,
+            "metadata_baseline_grade": "B",
+            "cataloging_avg_delta": -5.0,
+            "cataloging_improves_metadata": ["model-a"],
+            "cataloging_neutral_vs_metadata": [],
+            "cataloging_worse_than_metadata": ["model-b"],
+            "low_utility_models": [("model-b", 35.0, "D", "Low visual grounding")],
+        }
+        result = _format_cataloging_summary_text(summary)
+        md = "\n".join(result)
+        assert "Existing Metadata Baseline" in md
+        assert "Vs Existing Metadata" in md
+        assert "Better: 1" in md
+        assert "Worse: 1" in md
+
 
 class TestAnalyzeModelIssuesCataloging:
     """Tests for cataloging metrics in analyze_model_issues."""
@@ -397,3 +453,46 @@ class TestAnalyzeModelIssuesCataloging:
         assert "cataloging_worst" in summary
         assert "cataloging_avg_score" in summary
         assert "low_utility_models" in summary
+
+    def test_analyze_model_issues_tracks_metadata_delta_buckets(self) -> None:
+        """Models should be bucketed by whether they improve or worsen existing metadata."""
+        context = (
+            "Title hint: Sunset over mountain lake\n"
+            "Description hint: A colorful sunset behind mountains with lake reflection and trees.\n"
+            "Keyword hints: sunset, mountains, lake, reflection, trees, nature, landscape\n"
+            "Capture metadata: Taken on 2025-09-10."
+        )
+        good_text = (
+            "Title: Golden alpine sunset over mirrored mountain lake\n"
+            "Description: Warm orange light outlines the ridgeline while evergreen silhouettes "
+            "frame a still alpine lake that mirrors streaked clouds.\n"
+            "Keywords: alpine sunset, mirrored lake, mountain ridgeline, evergreen silhouettes, "
+            "orange sky, reflection, wilderness, dramatic light, scenic vista"
+        )
+        bad_text = "Title: Sunset. Description: sunset image. Keywords: sunset, mountain"
+
+        results = [
+            PerformanceResult(
+                model_name="model-good",
+                generation=_StubGeneration(text=good_text, generation_tokens=220),
+                success=True,
+                model_load_time=0.5,
+                generation_time=1.0,
+                total_time=1.5,
+            ),
+            PerformanceResult(
+                model_name="model-bad",
+                generation=_StubGeneration(text=bad_text, generation_tokens=12),
+                success=True,
+                model_load_time=0.6,
+                generation_time=1.1,
+                total_time=1.7,
+            ),
+        ]
+
+        summary = analyze_model_issues(results, context=context)
+        assert "metadata_baseline_score" in summary
+        assert "metadata_baseline_grade" in summary
+        assert "cataloging_avg_delta" in summary
+        assert summary.get("cataloging_improves_metadata", []) == ["model-good"]
+        assert summary.get("cataloging_worse_than_metadata", []) == ["model-bad"]

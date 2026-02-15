@@ -77,6 +77,10 @@ Notable changes to this project will be documented in this file.
 - Fixed `reportTypedDictNotRequiredAccess` lint failures by replacing direct
   optional-key TypedDict indexing with safe `.get(..., default)` patterns in
   summary formatters and JSONL tests.
+- Fixed remaining `ModelIssueSummary` optional-key TypedDict access warnings in
+  analysis helpers by replacing `setdefault(...)` read-path usage with explicit
+  `get(...)` plus guarded initialization, preserving runtime behavior while
+  satisfying strict Pylance/Pyright checks.
 - Removed weak/avoidable lint suppressions by:
   - replacing shell word-splitting patterns with array-safe handling in quality
     and hook scripts;

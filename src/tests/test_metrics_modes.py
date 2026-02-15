@@ -217,6 +217,62 @@ def test_log_summary_single_model_omits_efficiency_chart(
     assert "Efficiency chart (higher is faster overall):" not in messages
 
 
+def test_log_summary_reports_metadata_baseline_delta_when_context_present(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Cataloging triage should report baseline and delta when prompt includes metadata context."""
+    caplog.set_level(logging.INFO)
+    prompt = (
+        "Analyze this image.\n\n"
+        "Context: Existing metadata hints (use only if visually consistent):\n"
+        "- Title hint: Sunset over mountain lake\n"
+        "- Description hint: A colorful sunset behind mountains with lake reflection and trees.\n"
+        "- Keyword hints: sunset, mountains, lake, reflection, trees, nature, landscape\n"
+        "\n"
+        "Prioritize what is visibly present."
+    )
+    results = [
+        PerformanceResult(
+            model_name="org/model-good",
+            generation=_StubGeneration(
+                generation_tps=24.0,
+                peak_memory=1.3,
+                generation_tokens=180,
+                text=(
+                    "Title: Golden alpine sunset over mirrored mountain lake\n"
+                    "Description: Warm orange light outlines the ridgeline while evergreen "
+                    "silhouettes frame a still alpine lake that mirrors streaked clouds.\n"
+                    "Keywords: alpine sunset, mirrored lake, mountain ridgeline, evergreen "
+                    "silhouettes, orange sky, reflection, wilderness, scenic vista"
+                ),
+            ),
+            success=True,
+            generation_time=1.0,
+            model_load_time=0.4,
+            total_time=1.4,
+        ),
+        PerformanceResult(
+            model_name="org/model-bad",
+            generation=_StubGeneration(
+                generation_tps=12.0,
+                peak_memory=1.1,
+                generation_tokens=12,
+                text="Title: Sunset. Description: sunset image. Keywords: sunset, mountain",
+            ),
+            success=True,
+            generation_time=1.1,
+            model_load_time=0.5,
+            total_time=1.6,
+        ),
+    ]
+
+    log_summary(results, prompt=prompt)
+
+    messages = "\n".join(record.message for record in caplog.records)
+    assert "Metadata baseline:" in messages
+    assert "Vs metadata:" in messages
+
+
 def test_log_history_comparison_emits_tables_and_transition_chart(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
