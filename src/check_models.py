@@ -709,6 +709,7 @@ class DiagnosticsHistoryInputs:
     history_path: Path | None = None
     previous_history: HistoryRunRecord | None = None
     current_history: HistoryRunRecord | None = None
+    preflight_issues: tuple[str, ...] = ()
 
 
 @runtime_checkable
@@ -754,6 +755,7 @@ DEFAULT_LOG_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "check_models.log"
 DEFAULT_JSONL_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.jsonl"
 DEFAULT_ENV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "environment.log"
 DEFAULT_DIAGNOSTICS_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "diagnostics.md"
+_PREFLIGHT_ISSUES_ARG_ATTR: Final[str] = "_check_models_preflight_issues"
 
 DEFAULT_TEMPERATURE: Final[float] = 0.0  # Greedy/deterministic (matches mlx-vlm upstream)
 DEFAULT_TIMEOUT: Final[float] = 300.0  # Default timeout in seconds
@@ -6236,6 +6238,7 @@ def _diagnostics_header(
     total: int,
     n_failed: int,
     n_harness: int,
+    n_preflight: int,
     n_success: int,
     versions: LibraryVersionDict,
     system_info: dict[str, str],
@@ -6257,6 +6260,7 @@ def _diagnostics_header(
                 f"Automated benchmarking of **{total} locally-cached VLM models** "
                 f"found **{n_failed} hard failure(s)** and "
                 f"**{n_harness} harness/integration issue(s)** "
+                f"plus **{n_preflight} preflight compatibility warning(s)** "
                 f"in successful models. {n_success} of {total} models succeeded."
             ),
         ],
@@ -6340,6 +6344,52 @@ def _issue_target_for_package(
             f"https://huggingface.co/{urllib.parse.quote(model_name, safe='/')}",
         )
     return ("check_models", "https://github.com/jrp2014/check_models/issues/new")
+
+
+def _guess_preflight_issue_package(issue: str) -> str:
+    """Infer likely owner package from a preflight warning string."""
+    normalized = issue.lower()
+    if "mlx-vlm" in normalized:
+        return "mlx-vlm"
+    if "mlx-lm" in normalized:
+        return "mlx-lm"
+    if "transformers" in normalized:
+        return "transformers"
+    if "huggingface" in normalized:
+        return "huggingface-hub"
+    if "mlx" in normalized:
+        return "mlx"
+    return "unknown"
+
+
+def _diagnostics_preflight_section(preflight_issues: Sequence[str]) -> list[str]:
+    """Build diagnostics section for compatibility warnings seen during preflight."""
+    if not preflight_issues:
+        return []
+
+    parts: list[str] = ["---", ""]
+    _append_markdown_section(
+        parts,
+        title=f"## Preflight Compatibility Warnings ({len(preflight_issues)} issue(s))",
+        body_lines=[
+            "These warnings were detected before inference. They are non-fatal but "
+            "should be tracked as potential upstream compatibility issues.",
+        ],
+    )
+
+    for issue in preflight_issues:
+        package = _guess_preflight_issue_package(issue)
+        target_name, target_url = _issue_target_for_package(
+            package,
+            model_name="unknown/model",
+        )
+        escaped_issue = DIAGNOSTICS_ESCAPER.escape(issue)
+        parts.append(f"- `{escaped_issue}`")
+        parts.append(
+            f"  - Likely package: `{package}`; suggested tracker: `{target_name}` ({target_url})",
+        )
+    parts.append("")
+    return parts
 
 
 def _build_cluster_issue_template(
@@ -6645,6 +6695,7 @@ def _diagnostics_stack_signal_section(
 def _diagnostics_priority_table(
     results: list[PerformanceResult],
     harness_results: list[tuple[PerformanceResult, str]],
+    preflight_issues: Sequence[str],
 ) -> list[str]:
     """Build the priority summary table for the diagnostics report."""
     parts: list[str] = ["---", ""]
@@ -6673,6 +6724,16 @@ def _diagnostics_priority_table(
         n = len(harness_results)
         table_rows.append(
             f"| **Medium** | Harness/integration | {n} ({esc_names}) | mlx-vlm |",
+        )
+    if preflight_issues:
+        package_names = sorted(
+            {_guess_preflight_issue_package(issue) for issue in preflight_issues}
+        )
+        package_summary = DIAGNOSTICS_ESCAPER.escape(", ".join(package_names))
+        n = len(preflight_issues)
+        table_rows.append(
+            f"| **Medium** | Preflight compatibility warning | {n} issue(s) | "
+            f"{package_summary or 'unknown'} |",
         )
     _append_markdown_table(
         parts,
@@ -7005,6 +7066,7 @@ def export_failure_repro_bundles(
     serialized_args = {
         key: _jsonify_cli_value(value) for key, value in sorted(vars(run_args).items())
     }
+    preflight_issues = list(_get_run_preflight_issues(run_args))
 
     for index, result in enumerate(failed, start=1):
         safe_model = _sanitize_bundle_filename(result.model_name)
@@ -7050,6 +7112,7 @@ def export_failure_repro_bundles(
                 "platform": platform.platform(),
                 "system_info": system_info,
                 "library_versions": versions,
+                "preflight_issues": preflight_issues,
             },
         }
 
@@ -7156,8 +7219,9 @@ def generate_diagnostics_report(
     successful = [r for r in results if r.success]
     harness_results = _collect_harness_results(successful)
     stack_signals = _collect_stack_issue_signals(successful)
+    preflight_issues = list(history.preflight_issues) if history is not None else []
 
-    if not failed and not harness_results and not stack_signals:
+    if not failed and not harness_results and not stack_signals and not preflight_issues:
         return False
 
     history_path = history.history_path if history is not None else None
@@ -7181,6 +7245,7 @@ def generate_diagnostics_report(
         total=len(results),
         n_failed=len(failed),
         n_harness=len(harness_results),
+        n_preflight=len(preflight_issues),
         n_success=len(successful),
         versions=versions,
         system_info=system_info,
@@ -7197,6 +7262,7 @@ def generate_diagnostics_report(
             repro_bundles=repro_bundles,
         ),
     )
+    parts.extend(_diagnostics_preflight_section(preflight_issues))
     parts.extend(_diagnostics_harness_section(harness_results))
     parts.extend(_diagnostics_stack_signal_section(stack_signals))
     parts.extend(
@@ -7206,7 +7272,7 @@ def generate_diagnostics_report(
             diagnostics_context=diagnostics_context,
         ),
     )
-    parts.extend(_diagnostics_priority_table(results, harness_results))
+    parts.extend(_diagnostics_priority_table(results, harness_results, preflight_issues))
     parts.extend(
         _diagnostics_footer(
             failed,
@@ -10151,6 +10217,7 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
 
     library_versions: LibraryVersionDict = get_library_versions()
     preflight_issues = _collect_preflight_package_issues(library_versions)
+    _set_run_preflight_issues(args, preflight_issues)
     if preflight_issues:
         logger.warning("Detected upstream package compatibility risks:")
         for issue in preflight_issues:
@@ -10165,6 +10232,23 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
         log_warning_note("This allows execution of remote code and may pose security risks.")
 
     return library_versions
+
+
+def _set_run_preflight_issues(args: argparse.Namespace, issues: Sequence[str]) -> None:
+    """Store preflight warning strings on argparse namespace for later reporting."""
+    setattr(args, _PREFLIGHT_ISSUES_ARG_ATTR, tuple(str(issue) for issue in issues))
+
+
+def _get_run_preflight_issues(args: argparse.Namespace | None) -> tuple[str, ...]:
+    """Read preflight warning strings from argparse namespace."""
+    if args is None:
+        return ()
+    raw = getattr(args, _PREFLIGHT_ISSUES_ARG_ATTR, ())
+    if isinstance(raw, tuple):
+        return tuple(str(item) for item in raw)
+    if isinstance(raw, list):
+        return tuple(str(item) for item in raw)
+    return ()
 
 
 def _raise_for_missing_runtime_dependencies() -> None:
@@ -11545,6 +11629,7 @@ def _write_diagnostics_and_repro_artifacts(
             history_path=history_path,
             previous_history=previous_history,
             current_history=current_history,
+            preflight_issues=_get_run_preflight_issues(args),
         ),
         repro_bundles=repro_bundles,
     )

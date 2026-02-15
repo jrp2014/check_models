@@ -385,6 +385,28 @@ class TestDiagnosticsReport:
         assert result is False
         assert not out.exists()
 
+    def test_report_written_for_preflight_warnings_only(self, tmp_path: Path) -> None:
+        """Preflight compatibility warnings should be captured in diagnostics output."""
+        out = tmp_path / "diag.md"
+        result = generate_diagnostics_report(
+            results=[_make_success()],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            prompt="test",
+            history=DiagnosticsHistoryInputs(
+                preflight_issues=(
+                    "transformers import utils no longer reference TRANSFORMERS_NO_TF/FLAX/JAX",
+                ),
+            ),
+        )
+        assert result is True
+        content = out.read_text(encoding="utf-8")
+        assert "## Preflight Compatibility Warnings" in content
+        assert "transformers import utils no longer reference" in content
+        assert "transformers/issues/new" in content
+        assert "Preflight compatibility warning" in content
+
     def test_report_written_on_failure(self, tmp_path: Path) -> None:
         """Diagnostics file created when a model fails."""
         out = tmp_path / "diag.md"
