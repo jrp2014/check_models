@@ -1,10 +1,10 @@
-# Diagnostics Report — 4 failure(s), 7 harness issue(s) (mlx-vlm 0.3.12)
+# Diagnostics Report — 4 failure(s), 5 harness issue(s) (mlx-vlm 0.3.12)
 
 ## Summary
 
-Automated benchmarking of **44 locally-cached VLM models** found **4 hard failure(s)** and **7 harness/integration issue(s)** plus **2 preflight compatibility warning(s)** in successful models. 40 of 44 models succeeded.
+Automated benchmarking of **45 locally-cached VLM models** found **4 hard failure(s)** and **5 harness/integration issue(s)** plus **2 preflight compatibility warning(s)** in successful models. 41 of 45 models succeeded.
 
-Test image: `20260214-154920_DSC09221.jpg` (24.8 MB).
+Test image: `20260214-160213_DSC09231_DxO.jpg` (24.9 MB).
 
 ## Environment
 
@@ -42,7 +42,7 @@ Test image: `20260214-154920_DSC09221.jpg` (24.8 MB).
 ```text
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9093, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9090, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Missing 1 parameters: 
 language_model.lm_head.weight.
@@ -69,20 +69,20 @@ microsoft/Florence-2-large-ft
 
 ### Minimal Reproduction
 ```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260214-154920_DSC09221.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft
+python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft
 ```
 
 ### Environment Fingerprint
 `python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260215+43f4a748; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.1.0`
 
 ### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260215T210542Z_001_microsoft_Florence-2-large-ft_MLX_MODEL_LOAD_WEIGHT_MISMATCH_ecbbb1f91.json`
+`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260215T232220Z_001_microsoft_Florence-2-large-ft_MLX_MODEL_LOAD_WEIGHT_MISMATCH_ecbbb1f91.json`
 
 ### Traceback Tail
 ```text
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9093, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9090, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Missing 1 parameters: 
 language_model.lm_head.weight.
@@ -100,10 +100,10 @@ language_model.lm_head.weight.
 
 ```text
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9085, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9082, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8862, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8859, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -126,7 +126,7 @@ language_model.lm_head.weight.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9277, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9274, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -135,7 +135,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9093, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9090, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Missing 1 parameters: 
 language_model.lm_head.weight.
@@ -152,7 +152,7 @@ language_model.lm_head.weight.
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 22721.04it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 49754.50it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -162,7 +162,7 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 ## 2. OOM — 1 model(s) [`mlx`] (Priority: Medium)
 
-**Error:** `Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 135433060352 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.`
+**Error:** `Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 134668044288 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.`
 **Failure phase:** `decode`
 **Canonical code:** `MLX_DECODE_OOM`
 **Signature:** `MLX_DECODE_OOM:82da64fabb32`
@@ -177,9 +177,9 @@ Download complete: : 0.00B [00:00, ?B/s]
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9175, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9172, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
-ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 135433060352 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
+ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 134668044288 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
 ```
 
 ### Issue Template
@@ -189,7 +189,7 @@ ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7
 
 ```markdown
 ### Summary
-Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 135433060352 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
+Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 134668044288 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
 
 ### Classification
 - Package attribution: `mlx`
@@ -203,23 +203,23 @@ mlx-community/X-Reasoner-7B-8bit
 
 ### Minimal Reproduction
 ```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260214-154920_DSC09221.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/X-Reasoner-7B-8bit
+python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/X-Reasoner-7B-8bit
 ```
 
 ### Environment Fingerprint
 `python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260215+43f4a748; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.1.0`
 
 ### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260215T210542Z_002_mlx-community_X-Reasoner-7B-8bit_MLX_DECODE_OOM_82da64fabb32.json`
+`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260215T232220Z_002_mlx-community_X-Reasoner-7B-8bit_MLX_DECODE_OOM_82da64fabb32.json`
 
 ### Traceback Tail
 ```text
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9175, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9172, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
-ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 135433060352 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
+ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 134668044288 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
 ```
 
 ### Suggested Tracker
@@ -234,7 +234,7 @@ ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7
 
 ```text
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9145, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9142, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -257,12 +257,12 @@ Traceback (most recent call last):
   File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 385, in generate_step
     mx.eval([c.state for c in prompt_cache])
     ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-RuntimeError: [metal::malloc] Attempting to allocate 135433060352 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
+RuntimeError: [metal::malloc] Attempting to allocate 134668044288 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9277, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9274, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -271,9 +271,9 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9175, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9172, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
-ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 135433060352 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
+ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 134668044288 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
 ```
 
 </details>
@@ -285,7 +285,7 @@ ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7
 ```text
 === STDOUT ===
 ==========
-Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '1', '4', '-', '1', '5', '4', '9', '2', '0', '_', 'D', 'S', 'C', '0', '9', '2', '2', '1', '.', 'j', 'p', 'g'] 
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '1', '4', '-', '1', '6', '0', '2', '1', '3', '_', 'D', 'S', 'C', '0', '9', '2', '3', '1', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g'] 
 
 Prompt: <|im_start|>system
 You are a helpful assistant.<|im_end|>
@@ -302,9 +302,8 @@ Keywords: 15-30 comma-separated terms, ordered most specific to most general.
 Use concise, image-grounded wording and avoid speculation.
 
 Context: Existing metadata hints (use only if visually consistent):
-- Description hint: , Town Centre, Hitchin, England, United Kingdom, UK Here is a caption for the image, following your instructions: A distinctive Victorian cottage, characterized by its imposing central chimney stack, is pictured on a late afternoon in the historic market town of Hitchin, England. Photographed in February, the scene is set against a soft, overcast winter sky, which accentuates the textures of the weathered red bric...
-- Keyword hints: 19th century, Any Vision, British, Chimney Pots, Clay Tile Roof, Clay tiles, England, English cottage, Europe, Hertfordshire, Hitchin, Quaint, Red Brick House, Scenery, Street side, Tall Brick Chimney, Terracotta, Town centre, Traditional Brick House, UK
-- Capture metadata: Taken on 2026-02-14 15:49:20 GMT (at 15:49:20 local time).
+- Description hint: , Town Centre, Hitchin, England, United Kingdom, UK On a late winter afternoon in the historic market town of Hitchin, England, the 16th-century coaching inn, The Cock, stands as the central feature with its distinctive black-and-white timber-framed facade. As a classic car adds a dynamic blur to the foreground, a pedestrian carrying a child walks through the pub's archway, capturing a fleeting moment of daily lif...
+- Capture metadata: Taken on 2026-02-14 16:02:13 GMT (at 16:02:13 local time).
 
 Prioritize what is visibly present. If context conflicts with the image, trust the image.<|im_end|>
 <|im_start|>assistant
@@ -313,13 +312,13 @@ Prioritize what is visibly present. If context conflicts with the image, trust t
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 15 files:   0%|          | 0/15 [00:00<?, ?it/s]
-Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 16741.50it/s]
+Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 61440.00it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
 
-Prefill:   0%|          | 0/16594 [00:00<?, ?tok/s]
-Prefill:   0%|          | 0/16594 [00:23<?, ?tok/s]
+Prefill:   0%|          | 0/16479 [00:00<?, ?tok/s]
+Prefill:   0%|          | 0/16479 [00:19<?, ?tok/s]
 ```
 
 </details>
@@ -333,7 +332,7 @@ Prefill:   0%|          | 0/16594 [00:23<?, ?tok/s]
 
 | Model | Failure Phase | Error Stage | Package | Code | Regression vs Prev | First Seen Failing | Recent Repro |
 | ----- | ------------- | ----------- | ------- | ---- | ------------------ | ------------------ | ------------ |
-| `mlx-community/deepseek-vl2-8bit` | processor_load | Processor Error | model-config | `MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR` | no | 2026-02-15 03:27:34 GMT | 2/3 recent runs failed |
+| `mlx-community/deepseek-vl2-8bit` | processor_load | Processor Error | model-config | `MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR` | no | 2026-02-15 03:27:34 GMT | 3/3 recent runs failed |
 
 **Traceback (tail):**
 
@@ -341,7 +340,7 @@ Prefill:   0%|          | 0/16594 [00:23<?, ?tok/s]
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9108, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9105, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -367,21 +366,21 @@ mlx-community/deepseek-vl2-8bit
 
 ### Minimal Reproduction
 ```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260214-154920_DSC09221.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit
+python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit
 ```
 
 ### Environment Fingerprint
 `python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260215+43f4a748; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.1.0`
 
 ### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260215T210542Z_003_mlx-community_deepseek-vl2-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_ba.json`
+`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260215T232220Z_003_mlx-community_deepseek-vl2-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_ba.json`
 
 ### Traceback Tail
 ```text
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9108, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9105, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -398,7 +397,7 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ```text
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9096, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9093, in _run_model_generation
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -408,7 +407,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9021, in _run_model_preflight_validators
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9018, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -417,14 +416,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8935, in _raise_preflight_error
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8932, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9277, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9274, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -433,7 +432,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9108, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9105, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -457,7 +456,7 @@ Added chat tokens
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 24429.19it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 160370.45it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -482,7 +481,7 @@ Download complete: : 0.00B [00:00, ?B/s]
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9093, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9090, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: RobertaTokenizer has no attribute additional_special_tokens
 ```
@@ -508,21 +507,21 @@ prince-canuma/Florence-2-large-ft
 
 ### Minimal Reproduction
 ```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260214-154920_DSC09221.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models prince-canuma/Florence-2-large-ft
+python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models prince-canuma/Florence-2-large-ft
 ```
 
 ### Environment Fingerprint
 `python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260215+43f4a748; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.1.0`
 
 ### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260215T210542Z_004_prince-canuma_Florence-2-large-ft_MLX_VLM_MODEL_LOAD_MODEL_2100d402a936.json`
+`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260215T232220Z_004_prince-canuma_Florence-2-large-ft_MLX_VLM_MODEL_LOAD_MODEL_2100d402a936.json`
 
 ### Traceback Tail
 ```text
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9093, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9090, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: RobertaTokenizer has no attribute additional_special_tokens
 ```
@@ -539,10 +538,10 @@ ValueError: Model loading failed: RobertaTokenizer has no attribute additional_s
 
 ```text
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9085, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9082, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8862, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8859, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -606,7 +605,7 @@ AttributeError: RobertaTokenizer has no attribute additional_special_tokens. Did
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9277, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9274, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -615,7 +614,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9093, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9090, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: RobertaTokenizer has no attribute additional_special_tokens
 ```
@@ -631,7 +630,7 @@ ValueError: Model loading failed: RobertaTokenizer has no attribute additional_s
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 13473.51it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 17182.73it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -653,29 +652,27 @@ These warnings were detected before inference. They are non-fatal but should be 
 
 ---
 
-## Harness/Integration Issues (7 model(s))
+## Harness/Integration Issues (5 model(s))
 
 These models completed successfully but show integration problems (including empty output, encoding corruption, stop-token leakage, or prompt-template/long-context issues) that indicate stack bugs rather than inherent model quality limits.
 
-### `Qwen/Qwen3-VL-2B-Instruct` — long_context
+### `HuggingFaceTB/SmolVLM-Instruct` — prompt_template
 
-**Tokens:** prompt=16,583, generated=500, ratio=3.02%
-**Likely package:** `mlx-vlm / mlx`
-**Quality flags:** ⚠️harness(long_context), long-context, repetitive(phrase: "england, england, england, eng...")
+**Tokens:** prompt=1,455, generated=3, ratio=0.21%
+**Likely package:** `mlx-vlm`
+**Quality flags:** ⚠️harness(prompt_template), context-ignored
 
-**Details:** long_context_repetition(16583tok)
+**Details:** output:truncated(3tok)
 
 **Sample output:**
 
 ```text
-Title: A red brick cottage with a tall chimney on a street corner in Hitchin, England
-
-Description: A red brick cottage with a tall chimney and a tiled roof is situated on a street corner in Hitchin, ...
+Image.
 ```
 
 ### `microsoft/Phi-3.5-vision-instruct` — stop_token
 
-**Tokens:** prompt=1,138, generated=500, ratio=43.94%
+**Tokens:** prompt=1,056, generated=500, ratio=47.35%
 **Likely package:** `mlx-vlm`
 **Quality flags:** ⚠️harness(stop_token), lang_mixing, hallucination
 
@@ -684,70 +681,42 @@ Description: A red brick cottage with a tall chimney and a tiled roof is situate
 **Sample output:**
 
 ```text
-Title: Victorian Cottage in Hitchin, England
+Title: Historic Market Town of Hitchin, England
 
-Description: A quaint Victorian cottage with a prominent central chimney is captured in Hitchin, England. The image, taken on a late afternoon in February...
+Description: The Cock, a 16th-century coaching inn, is a prominent feature in Hitchin, England. A classic car is captured in motion in the foreground, ...
 ```
 
 ### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` — encoding
 
-**Tokens:** prompt=2,533, generated=168, ratio=6.63%
+**Tokens:** prompt=2,414, generated=236, ratio=9.78%
 **Likely package:** `mlx-vlm`
 **Quality flags:** ⚠️harness(encoding)
 
-**Details:** token_encoding:bpe_space_leak(113)
+**Details:** token_encoding:bpe_space_leak(144)
 
 **Sample output:**
 
 ```text
-Title:ĠRedĠBrickĠCottageĠwithĠTallĠChimneyĊĊDescription:ĠAĠtraditionalĠredĠbrickĠcottageĠwithĠaĠsteepĠclayĠtileĠroofĠandĠaĠprominentĠcentralĠchimneyĠstandsĠonĠaĠquietĠstreetĠcorner.ĠTheĠbuildingĠfeatu...
+Title:ĠHistoricĠBlack-and-WhiteĠTimber-FramedĠPubĊĊDescription:ĠAĠ16th-centuryĠcoachingĠinnĠwithĠdistinctiveĠblack-and-whiteĠtimberĠframingĠstandsĠinĠaĠtownĠcenter.ĠAĠpedestrianĠcarriesĠaĠchildĠthroug...
 ```
 
-### `mlx-community/GLM-4.6V-Flash-mxfp4` — stop_token
+### `mlx-community/SmolVLM-Instruct-bf16` — prompt_template
 
-**Tokens:** prompt=6,348, generated=500, ratio=7.88%
-**Likely package:** `mlx-vlm`
-**Quality flags:** ⚠️harness(stop_token), hallucination, formatting
-
-**Details:** token_leak:</think>
-
-**Sample output:**
-
-```text
-<think>Got it, let's tackle this task step by step. The user wants exactly three sections: Title, Description, Keywords. Also, there's a Context section mentioned, but wait, the user's instructions sa...
-```
-
-### `mlx-community/Qwen3-VL-2B-Thinking-bf16` — long_context
-
-**Tokens:** prompt=16,585, generated=500, ratio=3.01%
-**Likely package:** `mlx-vlm / mlx`
-**Quality flags:** ⚠️harness(long_context), long-context, repetitive(phrase: "chimney stack, terracotta, bri...")
-
-**Details:** long_context_repetition(16585tok)
-
-**Sample output:**
-
-```text
-Got it, let's tackle this image analysis. First, the title needs to be 6-12 words, descriptive and concrete. The image shows a brick house with a tall chimney, so maybe "Tall brick chimney house with ...
-```
-
-### `mlx-community/gemma-3n-E2B-4bit` — prompt_template
-
-**Tokens:** prompt=572, generated=2, ratio=0.35%
+**Tokens:** prompt=1,455, generated=3, ratio=0.21%
 **Likely package:** `mlx-vlm`
 **Quality flags:** ⚠️harness(prompt_template), context-ignored
 
-**Details:** output:truncated(2tok)
+**Details:** output:truncated(3tok)
 
 **Sample output:**
 
 ```text
-<empty output>
+Image.
 ```
 
 ### `mlx-community/paligemma2-10b-ft-docci-448-bf16` — prompt_template
 
-**Tokens:** prompt=1,335, generated=13, ratio=0.97%
+**Tokens:** prompt=1,279, generated=13, ratio=1.02%
 **Likely package:** `mlx-vlm`
 **Quality flags:** ⚠️harness(prompt_template), context-ignored
 
@@ -756,20 +725,8 @@ Got it, let's tackle this image analysis. First, the title needs to be 6-12 word
 **Sample output:**
 
 ```text
-If the image is too small, use the image itself.
+If the image is too complex, use a generic label.
 ```
-
----
-
-## Potential Stack Issues (3 model(s))
-
-These models technically succeeded, but token/output patterns suggest likely integration/runtime issues worth checking upstream.
-
-| Model | Prompt Tok | Output Tok | Output/Prompt | Symptom | Likely Package | Quality Flags |
-| ----- | ---------- | ---------- | ------------- | ------- | -------------- | ------------- |
-| `Qwen/Qwen3-VL-2B-Instruct` | 16,583 | 500 | 3.02% | Repetition under extreme prompt length | `mlx-vlm / mlx` | ⚠️harness(long_context), long-context, repetitive(phrase: "england, england, england, eng...") |
-| `mlx-community/Qwen3-VL-2B-Thinking-bf16` | 16,585 | 500 | 3.01% | Repetition under extreme prompt length | `mlx-vlm / mlx` | ⚠️harness(long_context), long-context, repetitive(phrase: "chimney stack, terracotta, bri...") |
-| `mlx-community/gemma-3n-E2B-4bit` | 572 | 2 | 0.35% | Empty output despite successful run | `mlx-vlm` | ⚠️harness(prompt_template), context-ignored |
 
 ---
 
@@ -784,7 +741,7 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 | ----- | ---------------------- | ------------------ | ------------ |
 | `microsoft/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
 | `mlx-community/X-Reasoner-7B-8bit` | still failing | 2026-02-08 22:32:28 GMT | 3/3 recent runs failed |
-| `mlx-community/deepseek-vl2-8bit` | still failing | 2026-02-15 03:27:34 GMT | 2/3 recent runs failed |
+| `mlx-community/deepseek-vl2-8bit` | still failing | 2026-02-15 03:27:34 GMT | 3/3 recent runs failed |
 | `prince-canuma/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
 
 ---
@@ -797,7 +754,7 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 | **Medium** | OOM | 1 (X-Reasoner-7B-8bit) | mlx |
 | **Medium** | Processor Error | 1 (deepseek-vl2-8bit) | model-config |
 | **Medium** | Model Error | 1 (Florence-2-large-ft) | mlx-vlm |
-| **Medium** | Harness/integration | 7 (Qwen3-VL-2B-Instruct, Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit, GLM-4.6V-Flash-mxfp4, Qwen3-VL-2B-Thinking-bf16, gemma-3n-E2B-4bit, paligemma2-10b-ft-docci-448-bf16) | mlx-vlm |
+| **Medium** | Harness/integration | 5 (SmolVLM-Instruct, Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit, SmolVLM-Instruct-bf16, paligemma2-10b-ft-docci-448-bf16) | mlx-vlm |
 | **Medium** | Preflight compatibility warning | 2 issue(s) | mlx-vlm, transformers |
 
 ## Reproducibility
@@ -808,17 +765,17 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 pip install -e "src/[dev]"
 
 # Re-run with the same CLI arguments
-python -m check_models --image /Users/jrp/Pictures/Processed/20260214-154920_DSC09221.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose
+python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose
 ```
 
 
 ### Target specific failing models
 
 ```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260214-154920_DSC09221.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft
-python -m check_models --image /Users/jrp/Pictures/Processed/20260214-154920_DSC09221.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/X-Reasoner-7B-8bit
-python -m check_models --image /Users/jrp/Pictures/Processed/20260214-154920_DSC09221.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit
-python -m check_models --image /Users/jrp/Pictures/Processed/20260214-154920_DSC09221.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models prince-canuma/Florence-2-large-ft
+python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft
+python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/X-Reasoner-7B-8bit
+python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit
+python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models prince-canuma/Florence-2-large-ft
 ```
 
 <details><summary>Prompt used (click to expand)</summary>
@@ -836,13 +793,12 @@ Keywords: 15-30 comma-separated terms, ordered most specific to most general.
 Use concise, image-grounded wording and avoid speculation.
 
 Context: Existing metadata hints (use only if visually consistent):
-- Description hint: , Town Centre, Hitchin, England, United Kingdom, UK Here is a caption for the image, following your instructions: A distinctive Victorian cottage, characterized by its imposing central chimney stack, is pictured on a late afternoon in the historic market town of Hitchin, England. Photographed in February, the scene is set against a soft, overcast winter sky, which accentuates the textures of the weathered red bric...
-- Keyword hints: 19th century, Any Vision, British, Chimney Pots, Clay Tile Roof, Clay tiles, England, English cottage, Europe, Hertfordshire, Hitchin, Quaint, Red Brick House, Scenery, Street side, Tall Brick Chimney, Terracotta, Town centre, Traditional Brick House, UK
-- Capture metadata: Taken on 2026-02-14 15:49:20 GMT (at 15:49:20 local time).
+- Description hint: , Town Centre, Hitchin, England, United Kingdom, UK On a late winter afternoon in the historic market town of Hitchin, England, the 16th-century coaching inn, The Cock, stands as the central feature with its distinctive black-and-white timber-framed facade. As a classic car adds a dynamic blur to the foreground, a pedestrian carrying a child walks through the pub's archway, capturing a fleeting moment of daily lif...
+- Capture metadata: Taken on 2026-02-14 16:02:13 GMT (at 16:02:13 local time).
 
 Prioritize what is visibly present. If context conflicts with the image, trust the image.
 ```
 
 </details>
 
-_Report generated on 2026-02-15 21:05:42 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-02-15 23:22:20 GMT by [check_models](https://github.com/jrp2014/check_models)._
