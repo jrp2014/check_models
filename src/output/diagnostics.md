@@ -1,8 +1,8 @@
-# Diagnostics Report — 3 failure(s), 6 harness issue(s) (mlx-vlm 0.3.12)
+# Diagnostics Report — 2 failure(s), 7 harness issue(s) (mlx-vlm 0.3.12)
 
 ## Summary
 
-Automated benchmarking of **45 locally-cached VLM models** found **3 hard failure(s)** and **6 harness/integration issue(s)** plus **2 preflight compatibility warning(s)** in successful models. 42 of 45 models succeeded.
+Automated benchmarking of **45 locally-cached VLM models** found **2 hard failure(s)** and **7 harness/integration issue(s)** plus **2 preflight compatibility warning(s)** in successful models. 43 of 45 models succeeded.
 
 Test image: `20260214-160213_DSC09231_DxO.jpg` (24.9 MB).
 
@@ -43,7 +43,7 @@ Test image: `20260214-160213_DSC09231_DxO.jpg` (24.9 MB).
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9166, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9208, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
 ```
@@ -75,14 +75,14 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC
 `python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260216+3bbe87e6; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.2.0`
 
 ### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260216T212247Z_001_microsoft_Florence-2-large-ft_MLX_VLM_DECODE_MODEL_2cf0f8ad5576.json`
+`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260216T223652Z_001_microsoft_Florence-2-large-ft_MLX_VLM_DECODE_MODEL_2cf0f8ad5576.json`
 
 ### Traceback Tail
 ```text
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9166, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9208, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
 ```
@@ -148,7 +148,7 @@ TypeError: can only concatenate str (not "NoneType") to str
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9141, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9183, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -182,7 +182,7 @@ ValueError: Failed to process inputs with error: can only concatenate str (not "
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9273, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9315, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -191,7 +191,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9166, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9208, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
 ```
@@ -226,169 +226,13 @@ Prioritize what is visibly present. If context conflicts with the image, trust t
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 19418.07it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 15263.11it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
 ```
 
-## 2. OOM — 1 model(s) [`mlx`] (Priority: Medium)
-
-**Error:** `Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 134668044288 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.`
-**Failure phase:** `decode`
-**Canonical code:** `MLX_DECODE_OOM`
-**Signature:** `MLX_DECODE_OOM:82da64fabb32`
-
-| Model | Failure Phase | Error Stage | Package | Code | Regression vs Prev | First Seen Failing | Recent Repro |
-| ----- | ------------- | ----------- | ------- | ---- | ------------------ | ------------------ | ------------ |
-| `mlx-community/X-Reasoner-7B-8bit` | decode | OOM | mlx | `MLX_DECODE_OOM` | no | 2026-02-08 22:32:28 GMT | 3/3 recent runs failed |
-
-**Traceback (tail):**
-
-```text
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9171, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
-ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 134668044288 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
-```
-
-### Issue Template (`mlx-community/X-Reasoner-7B-8bit`)
-
-Copy/paste GitHub issue template:
-
-````markdown
-### Summary
-Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 134668044288 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
-
-### Classification
-- Package attribution: `mlx`
-- Failure phase: `decode`
-- Error stage: `OOM`
-- Canonical code: `MLX_DECODE_OOM`
-- Signature: `MLX_DECODE_OOM:82da64fabb32`
-
-### Affected Models
-mlx-community/X-Reasoner-7B-8bit
-
-### Minimal Reproduction
-```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/X-Reasoner-7B-8bit
-```
-
-### Environment Fingerprint
-`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260216+3bbe87e6; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.2.0`
-
-### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260216T212247Z_002_mlx-community_X-Reasoner-7B-8bit_MLX_DECODE_OOM_82da64fabb32.json`
-
-### Traceback Tail
-```text
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9171, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
-ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 134668044288 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
-```
-
-### Suggested Tracker
-- `mlx`: <https://github.com/ml-explore/mlx/issues/new>
-````
-
-**Full tracebacks (all models in this cluster):**
-
-### `mlx-community/X-Reasoner-7B-8bit`
-
-```text
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9141, in _run_model_generation
-    output: GenerationResult | SupportsGenerationResult = generate(
-                                                          ~~~~~~~~^
-        model=model,
-        ^^^^^^^^^^^^
-    ...<13 lines>...
-        **extra_kwargs,
-        ^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 597, in generate
-    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
-                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 487, in stream_generate
-    for n, (token, logprobs) in enumerate(
-                                ~~~~~~~~~^
-        generate_step(input_ids, model, pixel_values, mask, **kwargs)
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ):
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 383, in generate_step
-    mx.eval([c.state for c in prompt_cache])
-    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-RuntimeError: [metal::malloc] Attempting to allocate 134668044288 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9273, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9171, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
-ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 134668044288 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
-```
-
-**Captured stdout/stderr (all models in this cluster):**
-
-### `mlx-community/X-Reasoner-7B-8bit`
-
-```text
-=== STDOUT ===
-==========
-Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '1', '4', '-', '1', '6', '0', '2', '1', '3', '_', 'D', 'S', 'C', '0', '9', '2', '3', '1', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g'] 
-
-Prompt: <|im_start|>system
-You are a helpful assistant.<|im_end|>
-<|im_start|>user
-<|vision_start|><|image_pad|><|vision_end|>Analyze this image for cataloguing metadata.
-
-Return exactly these three sections:
-
-Title: 6-12 words, descriptive and concrete.
-
-Description: 1-2 factual sentences covering key subjects, setting, and action.
-
-Keywords: 15-30 comma-separated terms, ordered most specific to most general.
-Use concise, image-grounded wording and avoid speculation.
-
-Context: Existing metadata hints (use only if visually consistent):
-- Description hint: , Town Centre, Hitchin, England, United Kingdom, UK On a late winter afternoon in the historic market town of Hitchin, England, the 16th-century coaching inn, The Cock, stands as the central feature with its distinctive black-and-white timber-framed facade. As a classic car adds a dynamic blur to the foreground, a pedestrian carrying a child walks through the pub's archway, capturing a fleeting moment of daily lif...
-- Capture metadata: Taken on 2026-02-14 16:02:13 GMT (at 16:02:13 local time).
-
-Prioritize what is visibly present. If context conflicts with the image, trust the image.<|im_end|>
-<|im_start|>assistant
-
-=== STDERR ===
-Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-
-Fetching 15 files:   0%|          | 0/15 [00:00<?, ?it/s]
-Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 21392.23it/s]
-
-Download complete: : 0.00B [00:00, ?B/s]              
-Download complete: : 0.00B [00:00, ?B/s]
-
-Prefill:   0%|          | 0/16479 [00:00<?, ?tok/s]
-Prefill:   0%|          | 0/16479 [00:18<?, ?tok/s]
-```
-
-## 3. Processor Error — 1 model(s) [`model-config`] (Priority: Medium)
+## 2. Processor Error — 1 model(s) [`model-config`] (Priority: Medium)
 
 **Error:** `Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.`
 **Failure phase:** `processor_load`
@@ -405,7 +249,7 @@ Prefill:   0%|          | 0/16479 [00:18<?, ?tok/s]
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9104, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9146, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -437,14 +281,14 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC
 `python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260216+3bbe87e6; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.2.0`
 
 ### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260216T212247Z_003_mlx-community_deepseek-vl2-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_ba.json`
+`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260216T223652Z_002_mlx-community_deepseek-vl2-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_ba.json`
 
 ### Traceback Tail
 ```text
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9104, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9146, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -459,7 +303,7 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ```text
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9092, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9134, in _run_model_generation
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -469,7 +313,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9017, in _run_model_preflight_validators
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9059, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -478,14 +322,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8931, in _raise_preflight_error
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8973, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9273, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9315, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -494,7 +338,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9104, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9146, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -516,7 +360,7 @@ Added chat tokens
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 123641.61it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 31775.03it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -535,7 +379,7 @@ These warnings were detected before inference. They are non-fatal but should be 
 
 ---
 
-## Harness/Integration Issues (6 model(s))
+## Harness/Integration Issues (7 model(s))
 
 These models completed successfully but show integration problems (including empty output, encoding corruption, stop-token leakage, or prompt-template/long-context issues) that indicate stack bugs rather than inherent model quality limits.
 
@@ -597,6 +441,22 @@ Title:ĠHistoricĠBlack-and-WhiteĠTimber-FramedĠPubĊĊDescription:ĠAĠ16th-c
 Image.
 ```
 
+### `mlx-community/X-Reasoner-7B-8bit` — long_context
+
+**Tokens:** prompt=16,479, generated=500, ratio=3.03%
+**Likely package:** `mlx-vlm / mlx`
+**Quality flags:** ⚠️harness(long_context), long-context, repetitive(phrase: "pub outdoor lanterns, pub...")
+
+**Details:** long_context_repetition(16479tok)
+
+**Sample output:**
+
+```text
+**Title:** Historic Pub with Classic Car and Pedestrian in Town Centre
+
+**Description:** A man carries a child through the archway of a historic black-and-white timber-framed pub, while a classic car ...
+```
+
 ### `mlx-community/paligemma2-10b-ft-docci-448-bf16` — prompt_template
 
 **Tokens:** prompt=1,279, generated=13, ratio=1.02%
@@ -627,17 +487,26 @@ If the image is too complex, use a generic label.
 
 ---
 
+## Potential Stack Issues (1 model(s))
+
+These models technically succeeded, but token/output patterns suggest likely integration/runtime issues worth checking upstream.
+
+| Model | Prompt Tok | Output Tok | Output/Prompt | Symptom | Likely Package | Quality Flags |
+| ----- | ---------- | ---------- | ------------- | ------- | -------------- | ------------- |
+| `mlx-community/X-Reasoner-7B-8bit` | 16,479 | 500 | 3.03% | Repetition under extreme prompt length | `mlx-vlm / mlx` | ⚠️harness(long_context), long-context, repetitive(phrase: "pub outdoor lanterns, pub...") |
+
+---
+
 ## History Context
 
 Recent reproducibility is measured from history (up to last 3 runs where each model appears).
 
 **Regressions since previous run:** none
-**Recoveries since previous run:** `prince-canuma/Florence-2-large-ft`
+**Recoveries since previous run:** `mlx-community/X-Reasoner-7B-8bit`
 
 | Model | Status vs Previous Run | First Seen Failing | Recent Repro |
 | ----- | ---------------------- | ------------------ | ------------ |
 | `microsoft/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
-| `mlx-community/X-Reasoner-7B-8bit` | still failing | 2026-02-08 22:32:28 GMT | 3/3 recent runs failed |
 | `mlx-community/deepseek-vl2-8bit` | still failing | 2026-02-15 03:27:34 GMT | 3/3 recent runs failed |
 
 ---
@@ -647,9 +516,8 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 | Priority | Issue | Models Affected | Package |
 | -------- | ----- | --------------- | ------- |
 | **Medium** | Model Error | 1 (Florence-2-large-ft) | mlx-vlm |
-| **Medium** | OOM | 1 (X-Reasoner-7B-8bit) | mlx |
 | **Medium** | Processor Error | 1 (deepseek-vl2-8bit) | model-config |
-| **Medium** | Harness/integration | 6 (SmolVLM-Instruct, Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit, SmolVLM-Instruct-bf16, paligemma2-10b-ft-docci-448-bf16, Florence-2-large-ft) | mlx-vlm |
+| **Medium** | Harness/integration | 7 (SmolVLM-Instruct, Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit, SmolVLM-Instruct-bf16, X-Reasoner-7B-8bit, paligemma2-10b-ft-docci-448-bf16, Florence-2-large-ft) | mlx-vlm |
 | **Medium** | Preflight compatibility warning | 2 issue(s) | mlx-vlm, transformers |
 
 ## Reproducibility
@@ -668,7 +536,6 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC
 
 ```bash
 python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft
-python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/X-Reasoner-7B-8bit
 python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit
 ```
 
@@ -693,4 +560,4 @@ Context: Existing metadata hints (use only if visually consistent):
 Prioritize what is visibly present. If context conflicts with the image, trust the image.
 ```
 
-_Report generated on 2026-02-16 21:22:47 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-02-16 22:36:52 GMT by [check_models](https://github.com/jrp2014/check_models)._
