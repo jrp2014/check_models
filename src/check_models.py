@@ -6005,11 +6005,17 @@ def _append_markdown_code_block(
     *,
     language: str = "text",
 ) -> None:
-    """Append a fenced code block with consistent spacing."""
+    """Append a fenced code block with consistent spacing.
+
+    Uses a fence longer than any backtick run in ``content`` so nested
+    Markdown/code fences remain valid when embedded.
+    """
+    max_backtick_run = max((len(m.group(0)) for m in re.finditer(r"`+", content)), default=0)
+    fence = "`" * max(3, max_backtick_run + 1)
     parts.append("")
-    parts.append(f"```{language}")
+    parts.append(f"{fence}{language}")
     parts.append(content)
-    parts.append("```")
+    parts.append(fence)
     parts.append("")
 
 
@@ -6046,17 +6052,15 @@ def _render_collapsible_model_blocks(
     summary: str,
     entries: list[tuple[str, str]],
 ) -> list[str]:
-    """Render model-specific text blocks inside a collapsible details section."""
+    """Render model-specific text blocks as Markdown sub-sections."""
     if not entries:
         return []
 
-    parts = [f"<details><summary>{summary}</summary>", ""]
+    parts = [f"**{summary}:**", ""]
     for model_name, block_text in entries:
         safe_model = DIAGNOSTICS_ESCAPER.escape(model_name)
         parts.append(f"### `{safe_model}`")
         _append_markdown_code_block(parts, block_text, language="text")
-    parts.append("</details>")
-    parts.append("")
     return parts
 
 
@@ -6481,7 +6485,7 @@ def _diagnostics_preflight_section(preflight_issues: Sequence[str]) -> list[str]
         escaped_issue = DIAGNOSTICS_ESCAPER.escape(issue)
         parts.append(f"- `{escaped_issue}`")
         parts.append(
-            f"  - Likely package: `{package}`; suggested tracker: `{target_name}` ({target_url})",
+            f"  - Likely package: `{package}`; suggested tracker: `{target_name}` (<{target_url}>)",
         )
     parts.append("")
     return parts
@@ -6558,7 +6562,7 @@ def _build_cluster_issue_template(
         "```",
         "",
         "### Suggested Tracker",
-        f"- `{target_name}`: {target_url}",
+        f"- `{target_name}`: <{target_url}>",
     ]
     return "\n".join(lines)
 
@@ -6654,7 +6658,7 @@ def _diagnostics_failure_clusters(
             parts.append("**Traceback (tail):**")
             _append_markdown_code_block(parts, tb_tail, language="text")
 
-        parts.append("### Issue Template")
+        parts.append(f"### Issue Template (`{DIAGNOSTICS_ESCAPER.escape(rep.model_name)}`)")
         parts.append("")
         bundle_path = (
             repro_bundles.get(rep.model_name)
@@ -6670,11 +6674,8 @@ def _diagnostics_failure_clusters(
             run_args=run_args,
             repro_bundle_path=bundle_path,
         )
-        parts.append("<details><summary>Copy/paste GitHub issue template</summary>")
-        parts.append("")
+        parts.append("Copy/paste GitHub issue template:")
         _append_markdown_code_block(parts, issue_template, language="markdown")
-        parts.append("</details>")
-        parts.append("")
 
         parts.extend(_diagnostics_full_tracebacks_section(cluster_results))
         parts.extend(_diagnostics_captured_output_section(cluster_results))
@@ -7264,10 +7265,8 @@ def _diagnostics_footer(
         )
         _append_markdown_code_block(parts, target_model_commands, language="bash")
 
-    parts.append("<details><summary>Prompt used (click to expand)</summary>")
+    parts.append("### Prompt Used")
     _append_markdown_code_block(parts, prompt, language="text")
-    parts.append("</details>")
-    parts.append("")
     parts.append(
         f"_Report generated on {local_now_str()} by "
         "[check_models](https://github.com/jrp2014/check_models)._",

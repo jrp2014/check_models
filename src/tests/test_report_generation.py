@@ -858,8 +858,8 @@ class TestDiagnosticsReport:
         assert "python -m check_models --models org/a" in content
         assert "python -m check_models --models org/b" in content
 
-    def test_prompt_in_details_block(self, tmp_path: Path) -> None:
-        """Prompt should be in a collapsible details block."""
+    def test_prompt_in_section(self, tmp_path: Path) -> None:
+        """Prompt should be rendered in a dedicated markdown section."""
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
             results=[_make_failure_with_details()],
@@ -869,7 +869,7 @@ class TestDiagnosticsReport:
             prompt="Analyze this image carefully.",
         )
         content = out.read_text(encoding="utf-8")
-        assert "<details>" in content
+        assert "### Prompt Used" in content
         assert "Analyze this image carefully." in content
 
     def test_high_priority_for_multi_model_cluster(self, tmp_path: Path) -> None:

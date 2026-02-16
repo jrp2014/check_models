@@ -48,12 +48,11 @@ ValueError: Model loading failed: Missing 1 parameters:
 language_model.lm_head.weight.
 ```
 
-### Issue Template
+### Issue Template (`microsoft/Florence-2-large-ft`)
 
-<details><summary>Copy/paste GitHub issue template</summary>
+Copy/paste GitHub issue template:
 
-
-```markdown
+````markdown
 ### Summary
 Model loading failed: Missing 1 parameters:
 
@@ -76,7 +75,7 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC
 `python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260215+43f4a748; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.1.0`
 
 ### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260215T232220Z_001_microsoft_Florence-2-large-ft_MLX_MODEL_LOAD_WEIGHT_MISMATCH_ecbbb1f91.json`
+`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260216T002219Z_001_microsoft_Florence-2-large-ft_MLX_MODEL_LOAD_WEIGHT_MISMATCH_ecbbb1f91.json`
 
 ### Traceback Tail
 ```text
@@ -89,12 +88,10 @@ language_model.lm_head.weight.
 ```
 
 ### Suggested Tracker
-- `mlx`: https://github.com/ml-explore/mlx/issues/new
-```
+- `mlx`: <https://github.com/ml-explore/mlx/issues/new>
+````
 
-</details>
-
-<details><summary>Full tracebacks (all models in this cluster)</summary>
+**Full tracebacks (all models in this cluster):**
 
 ### `microsoft/Florence-2-large-ft`
 
@@ -141,9 +138,7 @@ ValueError: Model loading failed: Missing 1 parameters:
 language_model.lm_head.weight.
 ```
 
-</details>
-
-<details><summary>Captured stdout/stderr (all models in this cluster)</summary>
+**Captured stdout/stderr (all models in this cluster):**
 
 ### `microsoft/Florence-2-large-ft`
 
@@ -152,13 +147,11 @@ language_model.lm_head.weight.
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 49754.50it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 15296.51it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
 ```
-
-</details>
 
 ## 2. OOM — 1 model(s) [`mlx`] (Priority: Medium)
 
@@ -182,12 +175,11 @@ Download complete: : 0.00B [00:00, ?B/s]
 ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 134668044288 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
 ```
 
-### Issue Template
+### Issue Template (`mlx-community/X-Reasoner-7B-8bit`)
 
-<details><summary>Copy/paste GitHub issue template</summary>
+Copy/paste GitHub issue template:
 
-
-```markdown
+````markdown
 ### Summary
 Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 134668044288 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
 
@@ -210,7 +202,7 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC
 `python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260215+43f4a748; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.1.0`
 
 ### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260215T232220Z_002_mlx-community_X-Reasoner-7B-8bit_MLX_DECODE_OOM_82da64fabb32.json`
+`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260216T002219Z_002_mlx-community_X-Reasoner-7B-8bit_MLX_DECODE_OOM_82da64fabb32.json`
 
 ### Traceback Tail
 ```text
@@ -223,12 +215,10 @@ ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7
 ```
 
 ### Suggested Tracker
-- `mlx`: https://github.com/ml-explore/mlx/issues/new
-```
+- `mlx`: <https://github.com/ml-explore/mlx/issues/new>
+````
 
-</details>
-
-<details><summary>Full tracebacks (all models in this cluster)</summary>
+**Full tracebacks (all models in this cluster):**
 
 ### `mlx-community/X-Reasoner-7B-8bit`
 
@@ -276,9 +266,7 @@ Traceback (most recent call last):
 ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 134668044288 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
 ```
 
-</details>
-
-<details><summary>Captured stdout/stderr (all models in this cluster)</summary>
+**Captured stdout/stderr (all models in this cluster):**
 
 ### `mlx-community/X-Reasoner-7B-8bit`
 
@@ -312,16 +300,14 @@ Prioritize what is visibly present. If context conflicts with the image, trust t
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 15 files:   0%|          | 0/15 [00:00<?, ?it/s]
-Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 61440.00it/s]
+Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 25869.47it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
 
 Prefill:   0%|          | 0/16479 [00:00<?, ?tok/s]
-Prefill:   0%|          | 0/16479 [00:19<?, ?tok/s]
+Prefill:   0%|          | 0/16479 [00:18<?, ?tok/s]
 ```
-
-</details>
 
 ## 3. Processor Error — 1 model(s) [`model-config`] (Priority: Medium)
 
@@ -345,12 +331,11 @@ Prefill:   0%|          | 0/16479 [00:19<?, ?tok/s]
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
 
-### Issue Template
+### Issue Template (`mlx-community/deepseek-vl2-8bit`)
 
-<details><summary>Copy/paste GitHub issue template</summary>
+Copy/paste GitHub issue template:
 
-
-```markdown
+````markdown
 ### Summary
 Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 
@@ -373,7 +358,7 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC
 `python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260215+43f4a748; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.1.0`
 
 ### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260215T232220Z_003_mlx-community_deepseek-vl2-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_ba.json`
+`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260216T002219Z_003_mlx-community_deepseek-vl2-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_ba.json`
 
 ### Traceback Tail
 ```text
@@ -386,12 +371,10 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 ```
 
 ### Suggested Tracker
-- `model repository`: https://huggingface.co/mlx-community/deepseek-vl2-8bit
-```
+- `model repository`: <https://huggingface.co/mlx-community/deepseek-vl2-8bit>
+````
 
-</details>
-
-<details><summary>Full tracebacks (all models in this cluster)</summary>
+**Full tracebacks (all models in this cluster):**
 
 ### `mlx-community/deepseek-vl2-8bit`
 
@@ -437,9 +420,7 @@ Traceback (most recent call last):
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
 
-</details>
-
-<details><summary>Captured stdout/stderr (all models in this cluster)</summary>
+**Captured stdout/stderr (all models in this cluster):**
 
 ### `mlx-community/deepseek-vl2-8bit`
 
@@ -456,13 +437,11 @@ Added chat tokens
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 160370.45it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 31175.50it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
 ```
-
-</details>
 
 ## 4. Model Error — 1 model(s) [`mlx-vlm`] (Priority: Medium)
 
@@ -486,12 +465,11 @@ Download complete: : 0.00B [00:00, ?B/s]
 ValueError: Model loading failed: RobertaTokenizer has no attribute additional_special_tokens
 ```
 
-### Issue Template
+### Issue Template (`prince-canuma/Florence-2-large-ft`)
 
-<details><summary>Copy/paste GitHub issue template</summary>
+Copy/paste GitHub issue template:
 
-
-```markdown
+````markdown
 ### Summary
 Model loading failed: RobertaTokenizer has no attribute additional_special_tokens
 
@@ -514,7 +492,7 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC
 `python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260215+43f4a748; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.1.0`
 
 ### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260215T232220Z_004_prince-canuma_Florence-2-large-ft_MLX_VLM_MODEL_LOAD_MODEL_2100d402a936.json`
+`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260216T002219Z_004_prince-canuma_Florence-2-large-ft_MLX_VLM_MODEL_LOAD_MODEL_2100d402a936.json`
 
 ### Traceback Tail
 ```text
@@ -527,12 +505,10 @@ ValueError: Model loading failed: RobertaTokenizer has no attribute additional_s
 ```
 
 ### Suggested Tracker
-- `mlx-vlm`: https://github.com/ml-explore/mlx-vlm/issues/new
-```
+- `mlx-vlm`: <https://github.com/ml-explore/mlx-vlm/issues/new>
+````
 
-</details>
-
-<details><summary>Full tracebacks (all models in this cluster)</summary>
+**Full tracebacks (all models in this cluster):**
 
 ### `prince-canuma/Florence-2-large-ft`
 
@@ -619,9 +595,7 @@ Traceback (most recent call last):
 ValueError: Model loading failed: RobertaTokenizer has no attribute additional_special_tokens
 ```
 
-</details>
-
-<details><summary>Captured stdout/stderr (all models in this cluster)</summary>
+**Captured stdout/stderr (all models in this cluster):**
 
 ### `prince-canuma/Florence-2-large-ft`
 
@@ -630,14 +604,12 @@ ValueError: Model loading failed: RobertaTokenizer has no attribute additional_s
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 17182.73it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 14041.86it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
 <unknown>:515: SyntaxWarning: invalid escape sequence '\d'
 ```
-
-</details>
 
 ---
 
@@ -646,9 +618,9 @@ Download complete: : 0.00B [00:00, ?B/s]
 These warnings were detected before inference. They are non-fatal but should be tracked as potential upstream compatibility issues.
 
 - `mlx-vlm load_image() has an unguarded URL startswith() branch; Path/BytesIO inputs can raise AttributeError in upstream code.`
-  - Likely package: `mlx-vlm`; suggested tracker: `mlx-vlm` (https://github.com/ml-explore/mlx-vlm/issues/new)
+  - Likely package: `mlx-vlm`; suggested tracker: `mlx-vlm` (<https://github.com/ml-explore/mlx-vlm/issues/new>)
 - `transformers import utils no longer reference TRANSFORMERS_NO_TF/FLAX/JAX; check_models backend guard env vars may be ignored with this version.`
-  - Likely package: `transformers`; suggested tracker: `transformers` (https://github.com/huggingface/transformers/issues/new)
+  - Likely package: `transformers`; suggested tracker: `transformers` (<https://github.com/huggingface/transformers/issues/new>)
 
 ---
 
@@ -778,7 +750,7 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC
 python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models prince-canuma/Florence-2-large-ft
 ```
 
-<details><summary>Prompt used (click to expand)</summary>
+### Prompt Used
 
 ```text
 Analyze this image for cataloguing metadata.
@@ -799,6 +771,4 @@ Context: Existing metadata hints (use only if visually consistent):
 Prioritize what is visibly present. If context conflicts with the image, trust the image.
 ```
 
-</details>
-
-_Report generated on 2026-02-15 23:22:20 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-02-16 00:22:19 GMT by [check_models](https://github.com/jrp2014/check_models)._
