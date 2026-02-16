@@ -73,6 +73,20 @@ except ImportError:  # pragma: no cover - optional
 
 psutil: types.ModuleType | None = psutil_mod
 
+# Optional dependency: wcwidth for accurate terminal display-width calculations.
+# Without wcwidth, wide Unicode glyphs may be slightly misaligned; we fall back
+# to codepoint length to keep output functional.
+wcwidth_wcswidth: Callable[[str], int] | None = None
+if importlib_util.find_spec("wcwidth") is not None:
+    try:
+        wcwidth_module = __import__("wcwidth", fromlist=["wcswidth"])
+    except ImportError:  # pragma: no cover - optional
+        wcwidth_wcswidth = None
+    else:
+        candidate = getattr(wcwidth_module, "wcswidth", None)
+        if callable(candidate):
+            wcwidth_wcswidth = cast("Callable[[str], int]", candidate)
+
 if TYPE_CHECKING:
     import types
     from collections.abc import Iterator
@@ -1201,6 +1215,35 @@ ANSI_ESCAPE_RE: Final[re.Pattern[str]] = re.compile(
 )
 
 
+def _strip_ansi(text: str) -> str:
+    """Strip ANSI escape codes from text for width calculations."""
+    return ANSI_ESCAPE_RE.sub("", text)
+
+
+def _display_width(text: str) -> int:
+    """Return terminal display width with Unicode-aware fallback behavior."""
+    sanitized = _strip_ansi(text)
+    if wcwidth_wcswidth is None:
+        return len(sanitized)
+    width = wcwidth_wcswidth(sanitized)
+    # wcwidth returns -1 for indeterminate width; fall back to codepoint length.
+    return len(sanitized) if width < 0 else width
+
+
+def _display_ljust(text: str, width: int) -> str:
+    """Right-pad text based on display width (not codepoint length)."""
+    pad = max(0, width - _display_width(text))
+    return f"{text}{' ' * pad}"
+
+
+def _display_center(text: str, width: int) -> str:
+    """Center text based on display width (not codepoint length)."""
+    pad_total = max(0, width - _display_width(text))
+    left = pad_total // 2
+    right = pad_total - left
+    return f"{' ' * left}{text}{' ' * right}"
+
+
 # =============================================================================
 # UTILITY CLASSES (Colors, Logging, Timeout Management)
 # =============================================================================
@@ -1246,8 +1289,7 @@ class Colors:
     @staticmethod
     def visual_len(text: str) -> int:
         """Return the visual length of text, ignoring ANSI codes."""
-        # Remove ANSI codes for accurate width
-        return len(Colors._ansi_escape_re.sub("", text))
+        return _display_width(text)
 
 
 class LogStyles:
@@ -1351,8 +1393,8 @@ class ColoredFormatter(logging.Formatter):
         return Colors.colored(raw_message, *styles) if styles else raw_message
 
     def _style_header(self, raw_message: str, record: logging.LogRecord) -> str:
-        width = int(getattr(record, "style_width", max(len(raw_message), 1)))
-        centered = raw_message.center(width)
+        width = int(getattr(record, "style_width", max(_display_width(raw_message), 1)))
+        centered = _display_center(raw_message, width)
         return Colors.colored(centered, Colors.BOLD, Colors.MAGENTA)
 
     def _style_section(self, raw_message: str, record: logging.LogRecord) -> str:
@@ -5045,7 +5087,7 @@ def pretty_print_exif(
     # Print the title with consistent rule width
     log_rule(header_width, char="=", color=Colors.BLUE, bold=True)
     logger.info(
-        title.center(header_width),
+        _display_center(title, header_width),
         extra={"style_hint": LogStyles.HEADER, "style_width": header_width},
     )
     log_rule(header_width, char="=", color=Colors.BLUE, bold=True)
@@ -9428,7 +9470,7 @@ def log_metric_tree(prefix: str, label: str, value: str, *, indent: str = "") ->
         indent: Additional indentation before the prefix
     """
     # Example output: "     ├─ Total:      1,234 tok/s"
-    formatted = f"{indent}{prefix} {label.ljust(11)} {value}"
+    formatted = f"{indent}{prefix} {_display_ljust(label, 11)} {value}"
     logger.info(formatted, extra={"style_hint": LogStyles.METRIC_VALUE})
 
 

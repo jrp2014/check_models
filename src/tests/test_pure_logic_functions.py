@@ -350,6 +350,34 @@ class TestRegexDetectionUtilities:
         assert first is second
 
 
+class TestDisplayWidthUtilities:
+    """Tests for wcwidth-aware terminal width helpers."""
+
+    def test_display_width_ignores_ansi_escape_sequences(self, mod: types.ModuleType) -> None:
+        """ANSI color wrappers should not count toward rendered width."""
+        colored = f"{mod.Colors.RED}abc{mod.Colors.RESET}"
+        assert mod._display_width(colored) == 3
+
+    def test_display_ljust_and_center_target_display_width(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """Padding helpers should honor display width even with wide glyphs."""
+        wide_char = "界"
+        padded = mod._display_ljust(wide_char, 4)
+        centered = mod._display_center(wide_char, 5)
+        assert mod._display_width(padded) == 4
+        assert mod._display_width(centered) == 5
+
+    def test_display_width_uses_wcwidth_when_available(self, mod: types.ModuleType) -> None:
+        """When wcwidth is importable, a full-width glyph should occupy two columns."""
+        width = mod._display_width("界")
+        if mod.wcwidth_wcswidth is None:
+            assert width == 1
+        else:
+            assert width == 2
+
+
 # ── QualityThresholds.from_config (YAML schema validation) ────────────────
 
 

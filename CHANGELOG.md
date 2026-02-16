@@ -14,6 +14,9 @@ Notable changes to this project will be documented in this file.
 - Diagnostics report generation now emits markdownlint-conformant Markdown
   directly (no HTML `<details>` wrappers in generated failure sections), with
   robust nested-fence handling for embedded issue templates and code blocks.
+- Terminal alignment now manages Unicode display width via `wcwidth` with
+  safe fallback behavior, improving centered headers and metric-label padding
+  when wide glyphs/emoji appear in output.
 
 ### Fixed
 
