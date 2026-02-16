@@ -1,8 +1,8 @@
-# Diagnostics Report — 4 failure(s), 5 harness issue(s) (mlx-vlm 0.3.12)
+# Diagnostics Report — 3 failure(s), 6 harness issue(s) (mlx-vlm 0.3.12)
 
 ## Summary
 
-Automated benchmarking of **45 locally-cached VLM models** found **4 hard failure(s)** and **5 harness/integration issue(s)** plus **2 preflight compatibility warning(s)** in successful models. 41 of 45 models succeeded.
+Automated benchmarking of **45 locally-cached VLM models** found **3 hard failure(s)** and **6 harness/integration issue(s)** plus **2 preflight compatibility warning(s)** in successful models. 42 of 45 models succeeded.
 
 Test image: `20260214-160213_DSC09231_DxO.jpg` (24.9 MB).
 
@@ -11,9 +11,9 @@ Test image: `20260214-160213_DSC09231_DxO.jpg` (24.9 MB).
 | Component | Version |
 | --------- | ------- |
 | mlx-vlm | 0.3.12 |
-| mlx | 0.30.7.dev20260215+43f4a748 |
+| mlx | 0.30.7.dev20260216+3bbe87e6 |
 | mlx-lm | 0.30.7 |
-| transformers | 5.1.0 |
+| transformers | 5.2.0 |
 | tokenizers | 0.22.2 |
 | huggingface-hub | 1.4.1 |
 | Python Version | 3.13.9 |
@@ -26,26 +26,26 @@ Test image: `20260214-160213_DSC09231_DxO.jpg` (24.9 MB).
 
 ---
 
-## 1. Weight Mismatch — 1 model(s) [`mlx`] (Priority: Low)
+## 1. Model Error — 1 model(s) [`mlx-vlm`] (Priority: Medium)
 
-**Error:** `Model loading failed: Missing 1 parameters:`
-**Failure phase:** `model_load`
-**Canonical code:** `MLX_MODEL_LOAD_WEIGHT_MISMATCH`
-**Signature:** `MLX_MODEL_LOAD_WEIGHT_MISMATCH:ecbbb1f9183a`
+**Error:** `Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str`
+**Failure phase:** `decode`
+**Canonical code:** `MLX_VLM_DECODE_MODEL`
+**Signature:** `MLX_VLM_DECODE_MODEL:2cf0f8ad5576`
 
 | Model | Failure Phase | Error Stage | Package | Code | Regression vs Prev | First Seen Failing | Recent Repro |
 | ----- | ------------- | ----------- | ------- | ---- | ------------------ | ------------------ | ------------ |
-| `microsoft/Florence-2-large-ft` | model_load | Weight Mismatch | mlx | `MLX_MODEL_LOAD_WEIGHT_MISMATCH` | no | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
+| `microsoft/Florence-2-large-ft` | decode | Model Error | mlx-vlm | `MLX_VLM_DECODE_MODEL` | no | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
 
 **Traceback (tail):**
 
 ```text
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9090, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: Missing 1 parameters: 
-language_model.lm_head.weight.
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9166, in _run_model_generation
+    raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
+ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
 ```
 
 ### Issue Template (`microsoft/Florence-2-large-ft`)
@@ -54,14 +54,14 @@ Copy/paste GitHub issue template:
 
 ````markdown
 ### Summary
-Model loading failed: Missing 1 parameters:
+Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
 
 ### Classification
-- Package attribution: `mlx`
-- Failure phase: `model_load`
-- Error stage: `Weight Mismatch`
-- Canonical code: `MLX_MODEL_LOAD_WEIGHT_MISMATCH`
-- Signature: `MLX_MODEL_LOAD_WEIGHT_MISMATCH:ecbbb1f9183a`
+- Package attribution: `mlx-vlm`
+- Failure phase: `decode`
+- Error stage: `Model Error`
+- Canonical code: `MLX_VLM_DECODE_MODEL`
+- Signature: `MLX_VLM_DECODE_MODEL:2cf0f8ad5576`
 
 ### Affected Models
 microsoft/Florence-2-large-ft
@@ -72,23 +72,23 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC
 ```
 
 ### Environment Fingerprint
-`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260215+43f4a748; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.1.0`
+`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260216+3bbe87e6; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.2.0`
 
 ### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260216T002219Z_001_microsoft_Florence-2-large-ft_MLX_MODEL_LOAD_WEIGHT_MISMATCH_ecbbb1f91.json`
+`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260216T212247Z_001_microsoft_Florence-2-large-ft_MLX_VLM_DECODE_MODEL_2cf0f8ad5576.json`
 
 ### Traceback Tail
 ```text
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9090, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: Missing 1 parameters: 
-language_model.lm_head.weight.
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9166, in _run_model_generation
+    raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
+ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
 ```
 
 ### Suggested Tracker
-- `mlx`: <https://github.com/ml-explore/mlx/issues/new>
+- `mlx-vlm`: <https://github.com/ml-explore/mlx-vlm/issues/new>
 ````
 
 **Full tracebacks (all models in this cluster):**
@@ -97,33 +97,92 @@ language_model.lm_head.weight.
 
 ```text
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9082, in _run_model_generation
-    model, processor, config = _load_model(params)
-                               ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8859, in _load_model
-    model, processor = load(
-                       ~~~~^
-        path_or_hf_repo=params.model_identifier,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<3 lines>...
-        trust_remote_code=params.trust_remote_code,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 876, in process_inputs_with_fallback
+    return process_inputs(
+        processor,
+    ...<5 lines>...
+        **kwargs,
+    )
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 862, in process_inputs
+    return process_method(**args)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/florence2/processing_florence2.py", line 163, in __call__
+    image_inputs = self.image_processor(images, **output_kwargs["images_kwargs"])
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils.py", line 50, in __call__
+    return self.preprocess(images, *args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils_fast.py", line 860, in preprocess
+    self._validate_preprocess_kwargs(**kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils_fast.py", line 823, in _validate_preprocess_kwargs
+    validate_fast_preprocess_arguments(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        do_rescale=do_rescale,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+        data_format=data_format,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 395, in load
-    model = load_model(model_path, lazy, **kwargs)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 315, in load_model
-    model.load_weights(list(weights.items()))
-    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py", line 191, in load_weights
-    raise ValueError(f"Missing {num_missing} parameters: \n{missing}.")
-ValueError: Missing 1 parameters: 
-language_model.lm_head.weight.
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils_fast.py", line 106, in validate_fast_preprocess_arguments
+    raise ValueError("Only returning PyTorch tensors is currently supported.")
+ValueError: Only returning PyTorch tensors is currently supported.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 889, in process_inputs_with_fallback
+    return process_inputs(
+        processor,
+    ...<5 lines>...
+        **kwargs,
+    )
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 862, in process_inputs
+    return process_method(**args)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/florence2/processing_florence2.py", line 185, in __call__
+    self.image_token * self.num_image_tokens
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + self.tokenizer.bos_token
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~
+TypeError: can only concatenate str (not "NoneType") to str
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9274, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9141, in _run_model_generation
+    output: GenerationResult | SupportsGenerationResult = generate(
+                                                          ~~~~~~~~^
+        model=model,
+        ^^^^^^^^^^^^
+    ...<13 lines>...
+        **extra_kwargs,
+        ^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 597, in generate
+    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
+                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 463, in stream_generate
+    inputs = prepare_inputs(
+        processor,
+    ...<6 lines>...
+        **kwargs,
+    )
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1101, in prepare_inputs
+    inputs = process_inputs_with_fallback(
+        processor,
+    ...<4 lines>...
+        **kwargs,
+    )
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 899, in process_inputs_with_fallback
+    raise ValueError(
+        f"Failed to process inputs with error: {fallback_error}"
+    ) from fallback_error
+ValueError: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9273, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -132,10 +191,9 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9090, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: Missing 1 parameters: 
-language_model.lm_head.weight.
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9166, in _run_model_generation
+    raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
+ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
 ```
 
 **Captured stdout/stderr (all models in this cluster):**
@@ -143,11 +201,32 @@ language_model.lm_head.weight.
 ### `microsoft/Florence-2-large-ft`
 
 ```text
+=== STDOUT ===
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '1', '4', '-', '1', '6', '0', '2', '1', '3', '_', 'D', 'S', 'C', '0', '9', '2', '3', '1', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g'] 
+
+Prompt: Analyze this image for cataloguing metadata.
+
+Return exactly these three sections:
+
+Title: 6-12 words, descriptive and concrete.
+
+Description: 1-2 factual sentences covering key subjects, setting, and action.
+
+Keywords: 15-30 comma-separated terms, ordered most specific to most general.
+Use concise, image-grounded wording and avoid speculation.
+
+Context: Existing metadata hints (use only if visually consistent):
+- Description hint: , Town Centre, Hitchin, England, United Kingdom, UK On a late winter afternoon in the historic market town of Hitchin, England, the 16th-century coaching inn, The Cock, stands as the central feature with its distinctive black-and-white timber-framed facade. As a classic car adds a dynamic blur to the foreground, a pedestrian carrying a child walks through the pub's archway, capturing a fleeting moment of daily lif...
+- Capture metadata: Taken on 2026-02-14 16:02:13 GMT (at 16:02:13 local time).
+
+Prioritize what is visibly present. If context conflicts with the image, trust the image.
+
 === STDERR ===
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 15296.51it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 19418.07it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -170,7 +249,7 @@ Download complete: : 0.00B [00:00, ?B/s]
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9172, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9171, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
 ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 134668044288 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
 ```
@@ -199,17 +278,17 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC
 ```
 
 ### Environment Fingerprint
-`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260215+43f4a748; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.1.0`
+`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260216+3bbe87e6; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.2.0`
 
 ### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260216T002219Z_002_mlx-community_X-Reasoner-7B-8bit_MLX_DECODE_OOM_82da64fabb32.json`
+`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260216T212247Z_002_mlx-community_X-Reasoner-7B-8bit_MLX_DECODE_OOM_82da64fabb32.json`
 
 ### Traceback Tail
 ```text
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9172, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9171, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
 ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 134668044288 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
 ```
@@ -224,7 +303,7 @@ ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7
 
 ```text
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9142, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9141, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -234,17 +313,17 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 599, in generate
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 597, in generate
     for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
                     ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 489, in stream_generate
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 487, in stream_generate
     for n, (token, logprobs) in enumerate(
                                 ~~~~~~~~~^
         generate_step(input_ids, model, pixel_values, mask, **kwargs)
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     ):
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 385, in generate_step
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 383, in generate_step
     mx.eval([c.state for c in prompt_cache])
     ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 RuntimeError: [metal::malloc] Attempting to allocate 134668044288 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
@@ -252,7 +331,7 @@ RuntimeError: [metal::malloc] Attempting to allocate 134668044288 bytes which is
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9274, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9273, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -261,7 +340,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9172, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9171, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
 ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 134668044288 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
 ```
@@ -300,7 +379,7 @@ Prioritize what is visibly present. If context conflicts with the image, trust t
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 15 files:   0%|          | 0/15 [00:00<?, ?it/s]
-Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 25869.47it/s]
+Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 21392.23it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -326,7 +405,7 @@ Prefill:   0%|          | 0/16479 [00:18<?, ?tok/s]
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9105, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9104, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -355,17 +434,17 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC
 ```
 
 ### Environment Fingerprint
-`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260215+43f4a748; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.1.0`
+`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260216+3bbe87e6; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.2.0`
 
 ### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260216T002219Z_003_mlx-community_deepseek-vl2-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_ba.json`
+`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260216T212247Z_003_mlx-community_deepseek-vl2-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_ba.json`
 
 ### Traceback Tail
 ```text
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9105, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9104, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -380,7 +459,7 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ```text
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9093, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9092, in _run_model_generation
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -390,7 +469,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9018, in _run_model_preflight_validators
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9017, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -399,14 +478,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8932, in _raise_preflight_error
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8931, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9274, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9273, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -415,7 +494,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9105, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9104, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -437,178 +516,10 @@ Added chat tokens
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 31175.50it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 123641.61it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
-```
-
-## 4. Model Error — 1 model(s) [`mlx-vlm`] (Priority: Medium)
-
-**Error:** `Model loading failed: RobertaTokenizer has no attribute additional_special_tokens`
-**Failure phase:** `model_load`
-**Canonical code:** `MLX_VLM_MODEL_LOAD_MODEL`
-**Signature:** `MLX_VLM_MODEL_LOAD_MODEL:2100d402a936`
-
-| Model | Failure Phase | Error Stage | Package | Code | Regression vs Prev | First Seen Failing | Recent Repro |
-| ----- | ------------- | ----------- | ------- | ---- | ------------------ | ------------------ | ------------ |
-| `prince-canuma/Florence-2-large-ft` | model_load | Model Error | mlx-vlm | `MLX_VLM_MODEL_LOAD_MODEL` | no | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
-
-**Traceback (tail):**
-
-```text
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9090, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: RobertaTokenizer has no attribute additional_special_tokens
-```
-
-### Issue Template (`prince-canuma/Florence-2-large-ft`)
-
-Copy/paste GitHub issue template:
-
-````markdown
-### Summary
-Model loading failed: RobertaTokenizer has no attribute additional_special_tokens
-
-### Classification
-- Package attribution: `mlx-vlm`
-- Failure phase: `model_load`
-- Error stage: `Model Error`
-- Canonical code: `MLX_VLM_MODEL_LOAD_MODEL`
-- Signature: `MLX_VLM_MODEL_LOAD_MODEL:2100d402a936`
-
-### Affected Models
-prince-canuma/Florence-2-large-ft
-
-### Minimal Reproduction
-```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models prince-canuma/Florence-2-large-ft
-```
-
-### Environment Fingerprint
-`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260215+43f4a748; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.1.0`
-
-### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260216T002219Z_004_prince-canuma_Florence-2-large-ft_MLX_VLM_MODEL_LOAD_MODEL_2100d402a936.json`
-
-### Traceback Tail
-```text
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9090, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: RobertaTokenizer has no attribute additional_special_tokens
-```
-
-### Suggested Tracker
-- `mlx-vlm`: <https://github.com/ml-explore/mlx-vlm/issues/new>
-````
-
-**Full tracebacks (all models in this cluster):**
-
-### `prince-canuma/Florence-2-large-ft`
-
-```text
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9082, in _run_model_generation
-    model, processor, config = _load_model(params)
-                               ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8859, in _load_model
-    model, processor = load(
-                       ~~~~^
-        path_or_hf_repo=params.model_identifier,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<3 lines>...
-        trust_remote_code=params.trust_remote_code,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 405, in load
-    processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 478, in load_processor
-    processor = AutoProcessor.from_pretrained(model_path, use_fast=True, **kwargs)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/molmo/processing_molmo.py", line 758, in _patched_auto_processor_from_pretrained
-    return _original_auto_processor_from_pretrained.__func__(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        cls, pretrained_model_name_or_path, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 355, in _patched_auto_processor_from_pretrained
-    return previous_from_pretrained.__func__(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        cls, pretrained_model_name_or_path, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/phi3_v/processing_phi3_v.py", line 699, in _patched_auto_processor_from_pretrained
-    return _original_auto_processor_from_pretrained.__func__(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        cls, pretrained_model_name_or_path, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/kimi_vl/processing_kimi_vl.py", line 595, in _patched_auto_processor_from_pretrained
-    return _original_auto_processor_from_pretrained.__func__(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        cls, pretrained_model_name_or_path, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py", line 394, in from_pretrained
-    return processor_class.from_pretrained(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        pretrained_model_name_or_path, trust_remote_code=trust_remote_code, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1403, in from_pretrained
-    return cls.from_args_and_dict(args, processor_dict, **instantiation_kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1170, in from_args_and_dict
-    processor = cls(*args, **valid_kwargs)
-  File "/Users/jrp/.cache/huggingface/modules/transformers_modules/microsoft/Florence_hyphen_2_hyphen_large_hyphen_ft/4a12a2b54b7016a48a22037fbd62da90cd566f2a/processing_florence2.py", line 87, in __init__
-    tokenizer.additional_special_tokens + \
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/tokenization_utils_base.py", line 1291, in __getattr__
-    raise AttributeError(f"{self.__class__.__name__} has no attribute {key}")
-AttributeError: RobertaTokenizer has no attribute additional_special_tokens. Did you mean: 'add_special_tokens'?
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9274, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9090, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: RobertaTokenizer has no attribute additional_special_tokens
-```
-
-**Captured stdout/stderr (all models in this cluster):**
-
-### `prince-canuma/Florence-2-large-ft`
-
-```text
-=== STDERR ===
-Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-
-Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 14041.86it/s]
-
-Download complete: : 0.00B [00:00, ?B/s]              
-Download complete: : 0.00B [00:00, ?B/s]
-<unknown>:515: SyntaxWarning: invalid escape sequence '\d'
 ```
 
 ---
@@ -624,7 +535,7 @@ These warnings were detected before inference. They are non-fatal but should be 
 
 ---
 
-## Harness/Integration Issues (5 model(s))
+## Harness/Integration Issues (6 model(s))
 
 These models completed successfully but show integration problems (including empty output, encoding corruption, stop-token leakage, or prompt-template/long-context issues) that indicate stack bugs rather than inherent model quality limits.
 
@@ -700,6 +611,20 @@ Image.
 If the image is too complex, use a generic label.
 ```
 
+### `prince-canuma/Florence-2-large-ft` — stop_token
+
+**Tokens:** prompt=823, generated=500, ratio=60.75%
+**Likely package:** `mlx-vlm`
+**Quality flags:** ⚠️harness(stop_token), lang_mixing, degeneration, formatting, context-ignored
+
+**Details:** token_leak:<s>
+
+**Sample output:**
+
+```text
+<s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s...
+```
+
 ---
 
 ## History Context
@@ -707,14 +632,13 @@ If the image is too complex, use a generic label.
 Recent reproducibility is measured from history (up to last 3 runs where each model appears).
 
 **Regressions since previous run:** none
-**Recoveries since previous run:** none
+**Recoveries since previous run:** `prince-canuma/Florence-2-large-ft`
 
 | Model | Status vs Previous Run | First Seen Failing | Recent Repro |
 | ----- | ---------------------- | ------------------ | ------------ |
 | `microsoft/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
 | `mlx-community/X-Reasoner-7B-8bit` | still failing | 2026-02-08 22:32:28 GMT | 3/3 recent runs failed |
 | `mlx-community/deepseek-vl2-8bit` | still failing | 2026-02-15 03:27:34 GMT | 3/3 recent runs failed |
-| `prince-canuma/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
 
 ---
 
@@ -722,11 +646,10 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 
 | Priority | Issue | Models Affected | Package |
 | -------- | ----- | --------------- | ------- |
-| **Low** | Weight Mismatch | 1 (Florence-2-large-ft) | mlx |
+| **Medium** | Model Error | 1 (Florence-2-large-ft) | mlx-vlm |
 | **Medium** | OOM | 1 (X-Reasoner-7B-8bit) | mlx |
 | **Medium** | Processor Error | 1 (deepseek-vl2-8bit) | model-config |
-| **Medium** | Model Error | 1 (Florence-2-large-ft) | mlx-vlm |
-| **Medium** | Harness/integration | 5 (SmolVLM-Instruct, Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit, SmolVLM-Instruct-bf16, paligemma2-10b-ft-docci-448-bf16) | mlx-vlm |
+| **Medium** | Harness/integration | 6 (SmolVLM-Instruct, Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit, SmolVLM-Instruct-bf16, paligemma2-10b-ft-docci-448-bf16, Florence-2-large-ft) | mlx-vlm |
 | **Medium** | Preflight compatibility warning | 2 issue(s) | mlx-vlm, transformers |
 
 ## Reproducibility
@@ -747,7 +670,6 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC
 python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft
 python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/X-Reasoner-7B-8bit
 python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit
-python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models prince-canuma/Florence-2-large-ft
 ```
 
 ### Prompt Used
@@ -771,4 +693,4 @@ Context: Existing metadata hints (use only if visually consistent):
 Prioritize what is visibly present. If context conflicts with the image, trust the image.
 ```
 
-_Report generated on 2026-02-16 00:22:19 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-02-16 21:22:47 GMT by [check_models](https://github.com/jrp2014/check_models)._

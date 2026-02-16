@@ -1,33 +1,33 @@
 # Model Performance Results
 
-_Generated on 2026-02-16 00:22:19 GMT_
+_Generated on 2026-02-16 21:22:47 GMT_
 
 ## 🏆 Performance Highlights
 
-- **Fastest:** `mlx-community/nanoLLaVA-1.5-4bit` (343.4 tps)
+- **Fastest:** `mlx-community/nanoLLaVA-1.5-4bit` (355.3 tps)
 - **💾 Most efficient:** `mlx-community/FastVLM-0.5B-bf16` (2.2 GB)
-- **⚡ Fastest load:** `mlx-community/nanoLLaVA-1.5-4bit` (0.91s)
-- **📊 Average TPS:** 81.2 across 41 models
+- **⚡ Fastest load:** `mlx-community/nanoLLaVA-1.5-4bit` (0.94s)
+- **📊 Average TPS:** 87.0 across 42 models
 
 ## 📈 Resource Usage
 
-- **Total peak memory:** 719.7 GB
-- **Average peak memory:** 17.6 GB
-- **Memory efficiency:** 178 tokens/GB
+- **Total peak memory:** 724.9 GB
+- **Average peak memory:** 17.3 GB
+- **Memory efficiency:** 179 tokens/GB
 
 ## 📚 Cataloging Utility Summary
 
-**Grade Distribution:** 🏆 A: 11 | ✅ B: 14 | 🟡 C: 4 | 🟠 D: 5 | ❌ F: 7
+**Grade Distribution:** 🏆 A: 12 | ✅ B: 13 | 🟡 C: 4 | 🟠 D: 5 | ❌ F: 8
 
-**Average Utility Score:** 61/100
+**Average Utility Score:** 60/100
 
 **Existing Metadata Baseline:** ✅ B (78/100)
-**Vs Existing Metadata:** Avg Δ -17 | Better: 11, Neutral: 2, Worse: 28
+**Vs Existing Metadata:** Avg Δ -18 | Better: 12, Neutral: 2, Worse: 28
 
 - **Best for cataloging:** `mlx-community/Qwen3-VL-2B-Thinking-bf16` (🏆 A, 92/100)
 - **Worst for cataloging:** `HuggingFaceTB/SmolVLM-Instruct` (❌ F, 0/100)
 
-### ⚠️ 12 Models with Low Utility (D/F)
+### ⚠️ 13 Models with Low Utility (D/F)
 
 - `HuggingFaceTB/SmolVLM-Instruct`: ❌ F (0/100) - Empty or minimal output
 - `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (4/100) - Output too short to be useful
@@ -40,15 +40,15 @@ _Generated on 2026-02-16 00:22:19 GMT_
 - `mlx-community/nanoLLaVA-1.5-4bit`: 🟠 D (45/100) - Mostly echoes context without adding value
 - `mlx-community/paligemma2-10b-ft-docci-448-6bit`: ❌ F (13/100) - Output lacks detail
 - `mlx-community/paligemma2-10b-ft-docci-448-bf16`: ❌ F (12/100) - Output lacks detail
+- `prince-canuma/Florence-2-large-ft`: ❌ F (0/100) - Output too short to be useful
 - `qnguyen3/nanoLLaVA`: ❌ F (25/100) - Mostly echoes context without adding value
 
 ## ⚠️ Quality Issues
 
-- **❌ Failed Models (4):**
-  - `microsoft/Florence-2-large-ft` (`Weight Mismatch`)
+- **❌ Failed Models (3):**
+  - `microsoft/Florence-2-large-ft` (`Model Error`)
   - `mlx-community/X-Reasoner-7B-8bit` (`OOM`)
   - `mlx-community/deepseek-vl2-8bit` (`Processor Error`)
-  - `prince-canuma/Florence-2-large-ft` (`Model Error`)
 - **🔄 Repetitive Output (7):**
   - `meta-llama/Llama-3.2-11B-Vision-Instruct` (token: `phrase: "community values, community va..."`)
   - `mlx-community/Kimi-VL-A3B-Thinking-8bit` (token: `phrase: "u }=∑{ u }=∑{..."`)
@@ -61,18 +61,19 @@ _Generated on 2026-02-16 00:22:19 GMT_
   - `microsoft/Phi-3.5-vision-instruct`
   - `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`
   - `mlx-community/GLM-4.6V-Flash-mxfp4`
-- **📝 Formatting Issues (3):**
+- **📝 Formatting Issues (4):**
   - `mlx-community/GLM-4.6V-Flash-6bit`
   - `mlx-community/GLM-4.6V-Flash-mxfp4`
   - `mlx-community/Idefics3-8B-Llama3-bf16`
+  - `prince-canuma/Florence-2-large-ft`
 
 ## 📊 Aggregate Statistics (Successful Runs)
 
-- **Generation Tps**: Avg: 81.2 | Min: 3.95 | Max: 343
-- **Peak Memory**: Avg: 18 | Min: 2.2 | Max: 72
-- **Total Time**: Avg: 22.82s | Min: 1.89s | Max: 134.12s
-- **Generation Time**: Avg: 19.92s | Min: 0.97s | Max: 129.87s
-- **Model Load Time**: Avg: 2.90s | Min: 0.91s | Max: 9.82s
+- **Generation Tps**: Avg: 87.0 | Min: 3.95 | Max: 355
+- **Peak Memory**: Avg: 17 | Min: 2.2 | Max: 72
+- **Total Time**: Avg: 22.53s | Min: 1.93s | Max: 134.17s
+- **Generation Time**: Avg: 19.60s | Min: 0.97s | Max: 129.90s
+- **Model Load Time**: Avg: 2.94s | Min: 0.94s | Max: 10.88s
 
 ## 🚨 Failures by Package (Actionable)
 
@@ -80,20 +81,22 @@ _Generated on 2026-02-16 00:22:19 GMT_
 
 | Package | Failures | Error Types | Affected Models |
 |---------|----------|-------------|-----------------|
-| `mlx` | 2 | OOM, Weight Mismatch | `microsoft/Florence-2-large-ft`, `mlx-community/X-Reasoner-7B-8bit` |
+| `mlx-vlm` | 1 | Model Error | `microsoft/Florence-2-large-ft` |
+| `mlx` | 1 | OOM | `mlx-community/X-Reasoner-7B-8bit` |
 | `model-config` | 1 | Processor Error | `mlx-community/deepseek-vl2-8bit` |
-| `mlx-vlm` | 1 | Model Error | `prince-canuma/Florence-2-large-ft` |
 
 <!-- markdownlint-enable MD060 -->
 
 ### Actionable Items by Package
 
+#### mlx-vlm
+
+- **microsoft/Florence-2-large-ft** (Model Error)
+  - Error: `Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate ...`
+  - Type: `ValueError`
+
 #### mlx
 
-- **microsoft/Florence-2-large-ft** (Weight Mismatch)
-  - Error: `Model loading failed: Missing 1 parameters:
-language_model.lm_head.weight.`
-  - Type: `ValueError`
 - **mlx-community/X-Reasoner-7B-8bit** (OOM)
   - Error: `Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 13...`
   - Type: `ValueError`
@@ -102,12 +105,6 @@ language_model.lm_head.weight.`
 
 - **mlx-community/deepseek-vl2-8bit** (Processor Error)
   - Error: `Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimo...`
-  - Type: `ValueError`
-
-#### mlx-vlm
-
-- **prince-canuma/Florence-2-large-ft** (Model Error)
-  - Error: `Model loading failed: RobertaTokenizer has no attribute additional_special_tokens`
   - Type: `ValueError`
 
 > **Prompt used:**
@@ -134,57 +131,57 @@ language_model.lm_head.weight.`
 
 **Note:** Results sorted: errors first, then by generation time (fastest to slowest).
 
-**Overall runtime:** 974.44s
+**Overall runtime:** 984.67s
 
 <!-- markdownlint-disable MD013 MD033 MD034 MD037 MD049 -->
 
 | Model Name                                              |   Token |   Prompt (tokens) |   Generation (tokens) |   Total Tokens |   Prompt Tps |   Gen TPS |   Peak (GB) |   Generation (s) |   Load (s) |   Total (s) | Quality Issues                    |   Error Package |
 |:--------------------------------------------------------|--------:|------------------:|----------------------:|---------------:|-------------:|----------:|------------:|-----------------:|-----------:|------------:|:----------------------------------|----------------:|
-| `microsoft/Florence-2-large-ft`                         |         |                   |                       |                |              |           |             |                  |            |             |                                   |             mlx |
+| `microsoft/Florence-2-large-ft`                         |         |                   |                       |                |              |           |             |                  |            |             |                                   |         mlx-vlm |
 | `mlx-community/X-Reasoner-7B-8bit`                      |         |                   |                       |                |              |           |             |                  |            |             |                                   |             mlx |
 | `mlx-community/deepseek-vl2-8bit`                       |         |                   |                       |                |              |           |             |                  |            |             |                                   |    model-config |
-| `prince-canuma/Florence-2-large-ft`                     |         |                   |                       |                |              |           |             |                  |            |             |                                   |         mlx-vlm |
-| `mlx-community/LFM2-VL-1.6B-8bit`                       |       7 |               502 |                   119 |            621 |        2,358 |       296 |         2.8 |            0.97s |      0.93s |       1.89s |                                   |                 |
-| `qnguyen3/nanoLLaVA`                                    | 151,645 |               257 |                    73 |            330 |        1,260 |       103 |         4.5 |            1.26s |      1.03s |       2.29s |                                   |                 |
-| `mlx-community/FastVLM-0.5B-bf16`                       | 151,645 |               261 |                   156 |            417 |        1,870 |       311 |         2.2 |            1.28s |      0.97s |       2.25s |                                   |                 |
-| `mlx-community/SmolVLM-Instruct-bf16`                   |  49,154 |             1,455 |                     3 |          1,458 |        1,241 |       146 |         5.5 |            1.50s |      1.29s |       2.79s | ⚠️harness(prompt_template), ...   |                 |
-| `HuggingFaceTB/SmolVLM-Instruct`                        |  49,154 |             1,455 |                     3 |          1,458 |        1,224 |       140 |         5.5 |            1.51s |      1.31s |       2.82s | ⚠️harness(prompt_template), ...   |                 |
-| `mlx-community/nanoLLaVA-1.5-4bit`                      |  23,883 |               257 |                   500 |            757 |        1,370 |       343 |         2.3 |            1.99s |      0.91s |       2.90s | repetitive(phrase: "16th-centu... |                 |
-| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |  49,279 |             1,355 |                   149 |          1,504 |        1,178 |       115 |         5.5 |            2.74s |      1.21s |       3.95s |                                   |                 |
-| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |             1,279 |                    15 |          1,294 |          516 |      31.2 |          11 |            3.23s |      3.11s |       6.34s | context-ignored                   |                 |
-| `mlx-community/LFM2.5-VL-1.6B-bf16`                     |   6,729 |               502 |                   500 |          1,002 |        2,223 |       180 |         4.0 |            3.31s |      1.06s |       4.38s | repetitive(phrase: "uk, uk, ...   |                 |
-| `mlx-community/gemma-3n-E4B-it-bf16`                    |     106 |               523 |                   110 |            633 |          735 |      42.1 |          17 |            3.60s |      4.77s |       8.37s |                                   |                 |
-| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |             2,924 |                   157 |          3,081 |        1,005 |       160 |         8.1 |            4.16s |      1.69s |       5.85s |                                   |                 |
-| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 | 163,585 |             1,233 |                   294 |          1,527 |          826 |       116 |          18 |            4.48s |      3.27s |       7.75s |                                   |                 |
-| `mlx-community/gemma-3n-E2B-4bit`                       | 236,825 |               515 |                   500 |          1,015 |        1,140 |       114 |         6.0 |            5.10s |      3.12s |       8.22s | repetitive(16:02:13), ...         |                 |
-| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |             1,279 |                    13 |          1,292 |          488 |      5.46 |          26 |            5.29s |      4.84s |      10.12s | ⚠️harness(prompt_template), ...   |                 |
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit`               |     389 |             1,233 |                   500 |          1,733 |          865 |       103 |          22 |            6.73s |      3.71s |      10.44s | repetitive(phrase: "u }=∑{ u }... |                 |
-| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          | 163,585 |             1,233 |                   330 |          1,563 |          855 |      69.2 |          37 |            6.78s |      5.83s |      12.62s |                                   |                 |
-| `mlx-community/gemma-3-27b-it-qat-4bit`                 |     106 |               524 |                   143 |            667 |          176 |      28.5 |          19 |            8.28s |      4.82s |      13.10s |                                   |                 |
-| `mlx-community/pixtral-12b-8bit`                        |       2 |             3,191 |                   131 |          3,322 |          558 |      35.3 |          16 |            9.73s |      3.16s |      12.89s |                                   |                 |
-| `mlx-community/Idefics3-8B-Llama3-bf16`                 | 128,001 |             2,549 |                   183 |          2,732 |          742 |      29.8 |          18 |            9.87s |      3.58s |      13.45s | formatting                        |                 |
-| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`     |       2 |             2,925 |                   239 |          3,164 |          407 |      55.4 |          14 |           11.77s |      2.44s |      14.21s |                                   |                 |
-| `mlx-community/pixtral-12b-bf16`                        |       2 |             3,191 |                   123 |          3,314 |          582 |      19.8 |          28 |           11.96s |      4.76s |      16.72s |                                   |                 |
-| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               524 |                   140 |            664 |          168 |      15.6 |          34 |           12.34s |      6.87s |      19.20s |                                   |                 |
-| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      |     326 |             1,560 |                   500 |          2,060 |          406 |      51.8 |          60 |           14.12s |      9.82s |      23.95s |                                   |                 |
-| `mlx-community/paligemma2-3b-pt-896-4bit`               | 235,269 |             4,351 |                   500 |          4,851 |        1,691 |      44.8 |         4.3 |           14.16s |      2.32s |      16.48s | repetitive(phrase: "1-2 factua... |                 |
-| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      | 128,009 |               237 |                   104 |            341 |         84.1 |      9.41 |          15 |           14.16s |      2.78s |      16.94s |                                   |                 |
-| `mlx-community/Phi-3.5-vision-instruct-bf16`            |  32,007 |             1,056 |                   165 |          1,221 |          955 |      12.8 |          11 |           14.33s |      1.72s |      16.05s |                                   |                 |
-| `mlx-community/InternVL3-14B-8bit`                      | 151,645 |             2,040 |                   257 |          2,297 |          390 |      28.7 |          18 |           14.58s |      3.20s |      17.78s |                                   |                 |
-| `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`     |       2 |             2,925 |                   447 |          3,372 |          409 |      57.8 |          13 |           15.16s |      2.42s |      17.57s |                                   |                 |
-| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |             2,555 |                   301 |          2,856 |          296 |      44.0 |          11 |           15.75s |      1.76s |      17.51s |                                   |                 |
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |             2,414 |                   236 |          2,650 |          236 |      28.2 |          22 |           18.87s |      3.75s |      22.62s | ⚠️harness(encoding)               |                 |
-| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         |   1,307 |             3,282 |                   500 |          3,782 |          434 |      36.6 |          15 |           21.50s |      3.00s |      24.50s | hallucination, degeneration       |                 |
-| `mlx-community/GLM-4.6V-Flash-mxfp4`                    |     264 |             6,344 |                   500 |          6,844 |          331 |      65.0 |         8.4 |           27.14s |      2.28s |      29.42s | hallucination, degeneration, ...  |                 |
-| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         | 169,448 |             1,279 |                   500 |          1,779 |        1,527 |      17.6 |          11 |           29.49s |      2.85s |      32.34s | repetitive(phrase: "is in fron... |                 |
-| `mlx-community/GLM-4.6V-Flash-6bit`                     |     794 |             6,344 |                   500 |          6,844 |          328 |      47.6 |          11 |           30.12s |      2.56s |      32.67s | formatting                        |                 |
-| `mlx-community/Molmo-7B-D-0924-8bit`                    | 151,643 |             1,444 |                   147 |          1,591 |         41.3 |      44.4 |          41 |           38.92s |      2.11s |      41.04s |                                   |                 |
-| `microsoft/Phi-3.5-vision-instruct`                     |   2,083 |             1,056 |                   500 |          1,556 |          949 |      12.6 |          11 |           40.97s |      1.71s |      42.68s | ⚠️harness(stop_token), ...        |                 |
-| `mlx-community/Molmo-7B-D-0924-bf16`                    | 151,643 |             1,444 |                   152 |          1,596 |         41.0 |      28.1 |          47 |           41.28s |      3.17s |      44.45s |                                   |                 |
-| `Qwen/Qwen3-VL-2B-Instruct`                             | 151,645 |            16,468 |                   272 |         16,740 |          376 |      76.4 |         8.3 |           47.76s |      1.57s |      49.33s |                                   |                 |
-| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |   6,424 |            16,470 |                   500 |         16,970 |          359 |      76.9 |         8.3 |           52.75s |      1.68s |      54.43s |                                   |                 |
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | 151,645 |            16,479 |                   172 |         16,651 |          141 |       181 |          72 |          118.01s |      1.24s |     119.25s |                                   |                 |
-| `meta-llama/Llama-3.2-11B-Vision-Instruct`              |      11 |               238 |                   500 |            738 |         78.4 |      3.95 |          25 |          129.87s |      4.25s |     134.12s | repetitive(phrase: "community...  |                 |
+| `mlx-community/LFM2-VL-1.6B-8bit`                       |       7 |               502 |                   119 |            621 |        2,364 |       294 |         2.8 |            0.97s |      0.97s |       1.93s |                                   |                 |
+| `qnguyen3/nanoLLaVA`                                    | 151,645 |               257 |                    73 |            330 |        1,267 |       103 |         4.5 |            1.27s |      1.05s |       2.32s |                                   |                 |
+| `mlx-community/FastVLM-0.5B-bf16`                       | 151,645 |               261 |                   156 |            417 |        1,902 |       310 |         2.2 |            1.32s |      1.01s |       2.33s |                                   |                 |
+| `mlx-community/SmolVLM-Instruct-bf16`                   |  49,154 |             1,455 |                     3 |          1,458 |        1,241 |       143 |         5.5 |            1.50s |      1.21s |       2.71s | ⚠️harness(prompt_template), ...   |                 |
+| `HuggingFaceTB/SmolVLM-Instruct`                        |  49,154 |             1,455 |                     3 |          1,458 |        1,231 |       136 |         5.5 |            1.50s |      1.35s |       2.86s | ⚠️harness(prompt_template), ...   |                 |
+| `mlx-community/nanoLLaVA-1.5-4bit`                      |  23,883 |               257 |                   500 |            757 |        1,389 |       355 |         2.3 |            1.94s |      0.94s |       2.88s | repetitive(phrase: "16th-centu... |                 |
+| `prince-canuma/Florence-2-large-ft`                     |     0.0 |               823 |                   500 |          1,323 |        1,708 |       331 |         5.2 |            2.27s |      1.33s |       3.61s | ⚠️harness(stop_token), ...        |                 |
+| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |  49,279 |             1,355 |                   149 |          1,504 |        1,183 |       114 |         5.5 |            2.75s |      1.34s |       4.09s |                                   |                 |
+| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |             1,279 |                    15 |          1,294 |          515 |      31.0 |          11 |            3.25s |      3.18s |       6.43s | context-ignored                   |                 |
+| `mlx-community/LFM2.5-VL-1.6B-bf16`                     |   6,729 |               502 |                   500 |          1,002 |        2,208 |       180 |         4.0 |            3.33s |      1.09s |       4.42s | repetitive(phrase: "uk, uk, ...   |                 |
+| `mlx-community/gemma-3n-E4B-it-bf16`                    |     106 |               523 |                   110 |            633 |          729 |      41.7 |          17 |            3.64s |      4.81s |       8.45s |                                   |                 |
+| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |             2,924 |                   157 |          3,081 |          997 |       160 |         8.1 |            4.19s |      1.73s |       5.92s |                                   |                 |
+| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 | 163,585 |             1,233 |                   294 |          1,527 |          821 |       117 |          18 |            4.47s |      3.34s |       7.81s |                                   |                 |
+| `mlx-community/gemma-3n-E2B-4bit`                       | 236,825 |               515 |                   500 |          1,015 |        1,128 |       115 |         6.0 |            5.10s |      3.18s |       8.28s | repetitive(16:02:13), ...         |                 |
+| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |             1,279 |                    13 |          1,292 |          487 |      5.39 |          26 |            5.33s |      4.86s |      10.20s | ⚠️harness(prompt_template), ...   |                 |
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit`               |     389 |             1,233 |                   500 |          1,733 |          859 |       103 |          22 |            6.75s |      3.77s |      10.52s | repetitive(phrase: "u }=∑{ u }... |                 |
+| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          | 163,585 |             1,233 |                   330 |          1,563 |          853 |      69.0 |          37 |            6.80s |      5.86s |      12.66s |                                   |                 |
+| `mlx-community/gemma-3-27b-it-qat-4bit`                 |     106 |               524 |                   143 |            667 |          176 |      28.2 |          19 |            8.35s |      4.87s |      13.22s |                                   |                 |
+| `mlx-community/pixtral-12b-8bit`                        |       2 |             3,191 |                   131 |          3,322 |          555 |      35.4 |          16 |            9.75s |      3.20s |      12.95s |                                   |                 |
+| `mlx-community/Idefics3-8B-Llama3-bf16`                 | 128,001 |             2,549 |                   183 |          2,732 |          742 |      29.6 |          18 |            9.91s |      3.65s |      13.56s | formatting                        |                 |
+| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`     |       2 |             2,925 |                   239 |          3,164 |          403 |      55.2 |          14 |           11.86s |      2.57s |      14.43s |                                   |                 |
+| `mlx-community/pixtral-12b-bf16`                        |       2 |             3,191 |                   123 |          3,314 |          582 |      19.7 |          28 |           11.98s |      4.82s |      16.80s |                                   |                 |
+| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               524 |                   140 |            664 |          168 |      15.5 |          34 |           12.43s |      7.00s |      19.43s |                                   |                 |
+| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      | 128,009 |               237 |                   104 |            341 |         83.9 |      9.45 |          15 |           14.12s |      2.88s |      17.01s |                                   |                 |
+| `mlx-community/Phi-3.5-vision-instruct-bf16`            |  32,007 |             1,056 |                   165 |          1,221 |          950 |      12.6 |          11 |           14.52s |      1.78s |      16.30s |                                   |                 |
+| `mlx-community/paligemma2-3b-pt-896-4bit`               | 235,269 |             4,351 |                   500 |          4,851 |        1,688 |      43.3 |         4.3 |           14.57s |      2.33s |      16.90s | repetitive(phrase: "1-2 factua... |                 |
+| `mlx-community/InternVL3-14B-8bit`                      | 151,645 |             2,040 |                   257 |          2,297 |          389 |      28.7 |          18 |           14.60s |      3.27s |      17.86s |                                   |                 |
+| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      |     326 |             1,560 |                   500 |          2,060 |          329 |      51.6 |          60 |           15.05s |     10.88s |      25.93s |                                   |                 |
+| `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`     |       2 |             2,925 |                   447 |          3,372 |          408 |      57.8 |          13 |           15.17s |      2.42s |      17.59s |                                   |                 |
+| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |             2,555 |                   301 |          2,856 |          294 |      43.5 |          11 |           15.91s |      1.77s |      17.67s |                                   |                 |
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |             2,414 |                   236 |          2,650 |          230 |      28.0 |          22 |           19.20s |      3.85s |      23.05s | ⚠️harness(encoding)               |                 |
+| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         |   1,307 |             3,282 |                   500 |          3,782 |          432 |      36.3 |          15 |           21.63s |      3.03s |      24.66s | hallucination, degeneration       |                 |
+| `mlx-community/GLM-4.6V-Flash-mxfp4`                    |     264 |             6,344 |                   500 |          6,844 |          320 |      64.5 |         8.4 |           27.86s |      2.34s |      30.20s | hallucination, degeneration, ...  |                 |
+| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         | 169,448 |             1,279 |                   500 |          1,779 |        1,531 |      17.4 |          11 |           29.85s |      2.91s |      32.76s | repetitive(phrase: "is in fron... |                 |
+| `mlx-community/GLM-4.6V-Flash-6bit`                     |     794 |             6,344 |                   500 |          6,844 |          319 |      46.8 |          11 |           30.89s |      2.64s |      33.53s | formatting                        |                 |
+| `mlx-community/Molmo-7B-D-0924-8bit`                    | 151,643 |             1,444 |                   140 |          1,584 |         41.4 |      44.2 |          41 |           38.72s |      2.18s |      40.90s |                                   |                 |
+| `microsoft/Phi-3.5-vision-instruct`                     |   2,083 |             1,056 |                   500 |          1,556 |          949 |      12.7 |          11 |           40.95s |      1.74s |      42.68s | ⚠️harness(stop_token), ...        |                 |
+| `mlx-community/Molmo-7B-D-0924-bf16`                    | 151,643 |             1,444 |                   148 |          1,592 |         41.1 |      27.9 |          47 |           41.05s |      3.25s |      44.30s |                                   |                 |
+| `Qwen/Qwen3-VL-2B-Instruct`                             | 151,645 |            16,468 |                   272 |         16,740 |          374 |      76.2 |         8.3 |           47.98s |      1.55s |      49.54s |                                   |                 |
+| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |   6,424 |            16,470 |                   500 |         16,970 |          363 |      75.4 |         8.3 |           52.36s |      1.76s |      54.12s |                                   |                 |
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | 151,645 |            16,479 |                   172 |         16,651 |          141 |       181 |          72 |          118.11s |      1.34s |     119.45s |                                   |                 |
+| `meta-llama/Llama-3.2-11B-Vision-Instruct`              |      11 |               238 |                   500 |            738 |         78.4 |      3.95 |          25 |          129.90s |      4.27s |     134.17s | repetitive(phrase: "community...  |                 |
 
 <!-- markdownlint-enable MD013 MD033 MD034 MD037 MD049 -->
 
@@ -197,46 +194,107 @@ Full output from each model:
 
 ### ❌ microsoft/Florence-2-large-ft
 
-**Status:** Failed (Weight Mismatch)
-**Error:** Model loading failed: Missing 1 parameters:
-language_model.lm_head.weight.
+**Status:** Failed (Model Error)
+**Error:**
+
+> Model generation failed for microsoft/Florence-2-large-ft: Failed to process
+> inputs with error: can only concatenate str (not "NoneType") to str
 **Type:** `ValueError`
-**Phase:** `model_load`
-**Code:** `MLX_MODEL_LOAD_WEIGHT_MISMATCH`
-**Package:** `mlx`
+**Phase:** `decode`
+**Code:** `MLX_VLM_DECODE_MODEL`
+**Package:** `mlx-vlm`
 
 <details>
 <summary>Full Traceback (click to expand)</summary>
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9082, in _run_model_generation
-    model, processor, config = _load_model(params)
-                               ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8859, in _load_model
-    model, processor = load(
-                       ~~~~^
-        path_or_hf_repo=params.model_identifier,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<3 lines>...
-        trust_remote_code=params.trust_remote_code,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 876, in process_inputs_with_fallback
+    return process_inputs(
+        processor,
+    ...<5 lines>...
+        **kwargs,
+    )
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 862, in process_inputs
+    return process_method(**args)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/florence2/processing_florence2.py", line 163, in __call__
+    image_inputs = self.image_processor(images, **output_kwargs["images_kwargs"])
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils.py", line 50, in __call__
+    return self.preprocess(images, *args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils_fast.py", line 860, in preprocess
+    self._validate_preprocess_kwargs(**kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils_fast.py", line 823, in _validate_preprocess_kwargs
+    validate_fast_preprocess_arguments(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        do_rescale=do_rescale,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+        data_format=data_format,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 395, in load
-    model = load_model(model_path, lazy, **kwargs)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 315, in load_model
-    model.load_weights(list(weights.items()))
-    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx/python/mlx/nn/layers/base.py", line 191, in load_weights
-    raise ValueError(f"Missing {num_missing} parameters: \n{missing}.")
-ValueError: Missing 1 parameters:
-language_model.lm_head.weight.
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils_fast.py", line 106, in validate_fast_preprocess_arguments
+    raise ValueError("Only returning PyTorch tensors is currently supported.")
+ValueError: Only returning PyTorch tensors is currently supported.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 889, in process_inputs_with_fallback
+    return process_inputs(
+        processor,
+    ...<5 lines>...
+        **kwargs,
+    )
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 862, in process_inputs
+    return process_method(**args)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/florence2/processing_florence2.py", line 185, in __call__
+    self.image_token * self.num_image_tokens
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + self.tokenizer.bos_token
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~
+TypeError: can only concatenate str (not "NoneType") to str
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9274, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9141, in _run_model_generation
+    output: GenerationResult | SupportsGenerationResult = generate(
+                                                          ~~~~~~~~^
+        model=model,
+        ^^^^^^^^^^^^
+    ...<13 lines>...
+        **extra_kwargs,
+        ^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 597, in generate
+    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
+                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 463, in stream_generate
+    inputs = prepare_inputs(
+        processor,
+    ...<6 lines>...
+        **kwargs,
+    )
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1101, in prepare_inputs
+    inputs = process_inputs_with_fallback(
+        processor,
+    ...<4 lines>...
+        **kwargs,
+    )
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 899, in process_inputs_with_fallback
+    raise ValueError(
+        f"Failed to process inputs with error: {fallback_error}"
+    ) from fallback_error
+ValueError: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9273, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -245,10 +303,9 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9090, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: Missing 1 parameters:
-language_model.lm_head.weight.
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9166, in _run_model_generation
+    raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
+ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
 ```
 
 </details>
@@ -273,7 +330,7 @@ language_model.lm_head.weight.
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9142, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9141, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -283,17 +340,17 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 599, in generate
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 597, in generate
     for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
                     ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 489, in stream_generate
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 487, in stream_generate
     for n, (token, logprobs) in enumerate(
                                 ~~~~~~~~~^
         generate_step(input_ids, model, pixel_values, mask, **kwargs)
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     ):
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 385, in generate_step
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 383, in generate_step
     mx.eval([c.state for c in prompt_cache])
     ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 RuntimeError: [metal::malloc] Attempting to allocate 134668044288 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
@@ -301,7 +358,7 @@ RuntimeError: [metal::malloc] Attempting to allocate 134668044288 bytes which is
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9274, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9273, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -310,7 +367,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9172, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9171, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
 ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7B-8bit: [metal::malloc] Attempting to allocate 134668044288 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
 ```
@@ -336,7 +393,7 @@ ValueError: Model runtime error during generation for mlx-community/X-Reasoner-7
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9093, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9092, in _run_model_generation
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -346,7 +403,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9018, in _run_model_preflight_validators
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9017, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -355,14 +412,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8932, in _raise_preflight_error
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8931, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9274, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9273, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -371,7 +428,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9105, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9104, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -380,111 +437,9 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ---
 
-### ❌ prince-canuma/Florence-2-large-ft
-
-**Status:** Failed (Model Error)
-**Error:**
-
-> Model loading failed: RobertaTokenizer has no attribute
-> additional_special_tokens
-**Type:** `ValueError`
-**Phase:** `model_load`
-**Code:** `MLX_VLM_MODEL_LOAD_MODEL`
-**Package:** `mlx-vlm`
-
-<details>
-<summary>Full Traceback (click to expand)</summary>
-
-```python
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9082, in _run_model_generation
-    model, processor, config = _load_model(params)
-                               ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8859, in _load_model
-    model, processor = load(
-                       ~~~~^
-        path_or_hf_repo=params.model_identifier,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<3 lines>...
-        trust_remote_code=params.trust_remote_code,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 405, in load
-    processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 478, in load_processor
-    processor = AutoProcessor.from_pretrained(model_path, use_fast=True, **kwargs)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/molmo/processing_molmo.py", line 758, in _patched_auto_processor_from_pretrained
-    return _original_auto_processor_from_pretrained.__func__(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        cls, pretrained_model_name_or_path, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 355, in _patched_auto_processor_from_pretrained
-    return previous_from_pretrained.__func__(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        cls, pretrained_model_name_or_path, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/phi3_v/processing_phi3_v.py", line 699, in _patched_auto_processor_from_pretrained
-    return _original_auto_processor_from_pretrained.__func__(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        cls, pretrained_model_name_or_path, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/kimi_vl/processing_kimi_vl.py", line 595, in _patched_auto_processor_from_pretrained
-    return _original_auto_processor_from_pretrained.__func__(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        cls, pretrained_model_name_or_path, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py", line 394, in from_pretrained
-    return processor_class.from_pretrained(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        pretrained_model_name_or_path, trust_remote_code=trust_remote_code, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1403, in from_pretrained
-    return cls.from_args_and_dict(args, processor_dict, **instantiation_kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1170, in from_args_and_dict
-    processor = cls(*args, **valid_kwargs)
-  File "/Users/jrp/.cache/huggingface/modules/transformers_modules/microsoft/Florence_hyphen_2_hyphen_large_hyphen_ft/4a12a2b54b7016a48a22037fbd62da90cd566f2a/processing_florence2.py", line 87, in __init__
-    tokenizer.additional_special_tokens + \
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/tokenization_utils_base.py", line 1291, in __getattr__
-    raise AttributeError(f"{self.__class__.__name__} has no attribute {key}")
-AttributeError: RobertaTokenizer has no attribute additional_special_tokens. Did you mean: 'add_special_tokens'?
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9274, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9090, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: RobertaTokenizer has no attribute additional_special_tokens
-```
-
-</details>
-
----
-
 ### ✅ mlx-community/LFM2-VL-1.6B-8bit
 
-**Metrics:** 296 TPS | 119 tokens
+**Metrics:** 294 TPS | 119 tokens
 
 ```text
 Title: The Cock, a 16th-century coaching inn in Hitchin, England, with a black-and-white timber-framed facade.
@@ -509,7 +464,7 @@ Description: A black and white photo of a 16th-century coaching inn, The Cock, i
 
 ### ✅ mlx-community/FastVLM-0.5B-bf16
 
-**Metrics:** 311 TPS | 156 tokens
+**Metrics:** 310 TPS | 156 tokens
 
 ```text
 Title: Hitchin, England, UK: A Classic Coaches Inn
@@ -521,7 +476,7 @@ Description: A photograph captures a quintessential 16th-century coaching inn in
 
 ### ✅ mlx-community/SmolVLM-Instruct-bf16
 
-**Metrics:** 146 TPS | 3 tokens
+**Metrics:** 143 TPS | 3 tokens
 
 ```text
  Image.
@@ -531,7 +486,7 @@ Description: A photograph captures a quintessential 16th-century coaching inn in
 
 ### ✅ HuggingFaceTB/SmolVLM-Instruct
 
-**Metrics:** 140 TPS | 3 tokens
+**Metrics:** 136 TPS | 3 tokens
 
 ```text
  Image.
@@ -541,7 +496,7 @@ Description: A photograph captures a quintessential 16th-century coaching inn in
 
 ### ✅ mlx-community/nanoLLaVA-1.5-4bit
 
-**Metrics:** 343 TPS | 500 tokens
+**Metrics:** 355 TPS | 500 tokens
 
 ```text
 Title: 6-12 words, descriptive and concrete.
@@ -553,9 +508,19 @@ Keywords: The Cock, 16th-century coaching inn, The 16th-century coaching inn, Th
 
 ---
 
+### ✅ prince-canuma/Florence-2-large-ft
+
+**Metrics:** 331 TPS | 500 tokens
+
+```text
+<s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s>
+```
+
+---
+
 ### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
 
-**Metrics:** 115 TPS | 149 tokens
+**Metrics:** 114 TPS | 149 tokens
 
 ```text
  Title: The Cock Inn, Hitchin, England
@@ -571,7 +536,7 @@ Context: The image was taken on February 14, 2026, at 16:02:13 GMT (16:02:13 loc
 
 ### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
 
-**Metrics:** 31.2 TPS | 15 tokens
+**Metrics:** 31 TPS | 15 tokens
 
 ```text
 If the image is too small to be seen, trust the metadata.
@@ -595,7 +560,7 @@ Keywords: 16th-century coaching inn, Hitchin, England, UK, late winter afternoon
 
 ### ✅ mlx-community/gemma-3n-E4B-it-bf16
 
-**Metrics:** 42.1 TPS | 110 tokens
+**Metrics:** 41.7 TPS | 110 tokens
 
 ```text
 **Title:** Historic Pub in Historic Town
@@ -625,7 +590,7 @@ black-and-white timber framing, Tudor-style inn, Hitchin market town, historic c
 
 ### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
 
-**Metrics:** 116 TPS | 294 tokens
+**Metrics:** 117 TPS | 294 tokens
 
 ```text
 ◁think▷Got it, let's analyze the image. First, the title should be descriptive and concrete. The image shows a historic timber-framed building, likely The Cock pub in Hitchin, England. The scene includes a classic car, a person with a child, and the pub's architecture.
@@ -643,7 +608,7 @@ Keywords: The Cock, Hitchin, England, timber-framed pub, historic architecture, 
 
 ### ✅ mlx-community/gemma-3n-E2B-4bit
 
-**Metrics:** 114 TPS | 500 tokens
+**Metrics:** 115 TPS | 500 tokens
 
 ```text
 
@@ -655,7 +620,7 @@ Keywords: The Cock, Hitchin, England, timber-framed pub, historic architecture, 
 
 ### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
 
-**Metrics:** 5.46 TPS | 13 tokens
+**Metrics:** 5.39 TPS | 13 tokens
 
 ```text
 If the image is too complex, use a generic label.
@@ -687,7 +652,7 @@ Keywords: Hitchin, England, UK, 16th-century coaching inn, timber-framed facade,
 
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
 
-**Metrics:** 69.2 TPS | 330 tokens
+**Metrics:** 69 TPS | 330 tokens
 
 ```text
 ◁think▷Got it, let's analyze the image. First, the title should be descriptive and concrete. The image shows a historic timber-framed building, likely The Cock pub in Hitchin, England. The scene includes a classic car, a pedestrian with a child, and the pub's architecture.
@@ -707,7 +672,7 @@ Keywords: Hitchin, England, The Cock, timber-framed pub, classic car, pedestrian
 
 ### ✅ mlx-community/gemma-3-27b-it-qat-4bit
 
-**Metrics:** 28.5 TPS | 143 tokens
+**Metrics:** 28.2 TPS | 143 tokens
 
 ```text
 **Title:** Black and white timber-framed pub, The Cock, Hitchin town centre.
@@ -721,7 +686,7 @@ Keywords: Hitchin, England, The Cock, timber-framed pub, classic car, pedestrian
 
 ### ✅ mlx-community/pixtral-12b-8bit
 
-**Metrics:** 35.3 TPS | 131 tokens
+**Metrics:** 35.4 TPS | 131 tokens
 
 ```text
 **Title:** Historic Pub in Town Centre
@@ -736,7 +701,7 @@ Timber-framed building, historic pub, black-and-white facade, pedestrian, child,
 
 ### ✅ mlx-community/Idefics3-8B-Llama3-bf16
 
-**Metrics:** 29.8 TPS | 183 tokens
+**Metrics:** 29.6 TPS | 183 tokens
 
 ```text
  Title: historic coaching inn in hitchin england with black and white timber framing.
@@ -750,7 +715,7 @@ keywords: the cock, hitchin, england, coaching inn, black and white timber frami
 
 ### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
 
-**Metrics:** 55.4 TPS | 239 tokens
+**Metrics:** 55.2 TPS | 239 tokens
 
 ```text
 **Title:**
@@ -767,7 +732,7 @@ Hitchin, England, UK, historic coaching inn, black-and-white timber-framed build
 
 ### ✅ mlx-community/pixtral-12b-bf16
 
-**Metrics:** 19.8 TPS | 123 tokens
+**Metrics:** 19.7 TPS | 123 tokens
 
 ```text
 **Title:** Historic Pub in Town Centre
@@ -782,7 +747,7 @@ Timber-framed building, historic pub, black-and-white facade, pedestrian, child,
 
 ### ✅ mlx-community/gemma-3-27b-it-qat-8bit
 
-**Metrics:** 15.6 TPS | 140 tokens
+**Metrics:** 15.5 TPS | 140 tokens
 
 ```text
 **Title:** Black and white timber-framed pub, The Cock, Hitchin town centre.
@@ -794,29 +759,37 @@ Timber-framed building, historic pub, black-and-white facade, pedestrian, child,
 
 ---
 
-### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
-**Metrics:** 51.8 TPS | 500 tokens
+**Metrics:** 9.45 TPS | 104 tokens
 
 ```text
-Alright, let's get to work. I've got an image to analyze and catalog, and the goal is to create metadata for it. First, I need to break down the image itself. It's a classic English scene, a pub, a man with a child, and a classic car. The architecture is key – a black and white timber-framed building, a classic English pub, and a car.
+Title: A 16th-century timber-framed building in the heart of a historic market town.
 
-Now, the prompt wants me to use the provided context, but I'm instructed to prioritize what's *visibly* present. The provided context mentions Hitchin, England, and a specific pub called "The Cock". However, the image itself doesn't show any of that. The text is a bit of a mess, but I can see the pub name is "BEER GARDEN" and the car is an old, black, British car. The text also mentions "SUNDAY ROASTS" and "BEER & COFFEE" which are common for pubs.
+Description: The image features a historic building in the town of Hitchin, England, with a distinctive black-and-white timber-framed facade. A classic car is parked in the foreground, and a pedestrian is walking through the building's archway.
 
-So, I'm going to ignore the Hitchin context because it's not in the image. I'll focus on what I *can* see. The image is a street scene, a man with a child, and a classic car. The building is a pub, and the car is parked.
+Keywords: Historic building, timber-framed, black-and-white, 16th-century, market town, Hitchin, England, classic car, pedestrian, archway.
+```
 
-Now, for the metadata. The title needs to be descriptive and concise. I'll go with "Man with child walking past a traditional English pub and classic car." That's six words, and it's accurate.
+---
 
-The description needs to be factual and cover the key elements. I'll write: "A man with a child walks through the archway of a traditional English pub. A classic black British car is parked on the street in front of the building."
+### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
 
-Finally, the keywords. I need to be specific, ordered from most to least general. I'll start with the obvious: "man, child, pub, classic car, black car, English pub, street scene, pedestrian, walking, traditional building, black and white timber framing, brick, stone, archway, pub sign, beer garden, car park, street, town, England, UK, UK pub, black and white building, black and white timber framing, black and white brick, black and white stone, black and white facade, black and
+**Metrics:** 12.6 TPS | 165 tokens
+
+```text
+Title: Historic Market Town of Hitchin, England
+
+Description: The Cock, a 16th-century coaching inn, is a prominent feature in Hitchin, England. A classic car is captured in motion in the foreground, adding a dynamic element to the scene.
+
+Keywords: Hitchin, England, The Cock, 16th-century, coaching inn, timber-framed, classic car, pedestrian, child, historic, market town, late winter afternoon, black-and-white facade, pub, archway, historic market town, pedestrian, child, classic car, motion blur, 2026-02-14 16:02:13 GMT.
 ```
 
 ---
 
 ### ✅ mlx-community/paligemma2-3b-pt-896-4bit
 
-**Metrics:** 44.8 TPS | 500 tokens
+**Metrics:** 43.3 TPS | 500 tokens
 
 ```text
 - Capture metadata: 1-2 factual sentences covering the main subject, setting, and action.
@@ -847,34 +820,6 @@ Finally, the keywords. I need to be specific, ordered from most to least general
 
 ---
 
-### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
-
-**Metrics:** 9.41 TPS | 104 tokens
-
-```text
-Title: A 16th-century timber-framed building in the heart of a historic market town.
-
-Description: The image features a historic building in the town of Hitchin, England, with a distinctive black-and-white timber-framed facade. A classic car is parked in the foreground, and a pedestrian is walking through the building's archway.
-
-Keywords: Historic building, timber-framed, black-and-white, 16th-century, market town, Hitchin, England, classic car, pedestrian, archway.
-```
-
----
-
-### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
-
-**Metrics:** 12.8 TPS | 165 tokens
-
-```text
-Title: Historic Market Town of Hitchin, England
-
-Description: The Cock, a 16th-century coaching inn, is a prominent feature in Hitchin, England. A classic car is captured in motion in the foreground, adding a dynamic element to the scene.
-
-Keywords: Hitchin, England, The Cock, 16th-century, coaching inn, timber-framed, classic car, pedestrian, child, historic, market town, late winter afternoon, black-and-white facade, pub, archway, historic market town, pedestrian, child, classic car, motion blur, 2026-02-14 16:02:13 GMT.
-```
-
----
-
 ### ✅ mlx-community/InternVL3-14B-8bit
 
 **Metrics:** 28.7 TPS | 257 tokens
@@ -887,6 +832,26 @@ Description: A black-and-white timber-framed pub with a bay window and hanging f
 Keywords: Tudor pub, timber-framed building, Hitchin, England, black-and-white facade, bay window, hanging flower baskets, pedestrian, child, classic car, cobblestone street, historic architecture, market town, UK, outdoor seating, traditional pub, architectural details, quaint village, old-world charm, brick chimney, signage, evening light
 
 Context: Description hint: Town Centre, Hitchin, England, United Kingdom, UK On a late winter afternoon in the historic market town of Hitchin, England, the 16th-century coaching inn, The Cock, stands as the central feature with its distinctive black-and-white timber-framed facade. As a classic car adds a dynamic blur to the foreground, a pedestrian carrying a child walks through the pub's archway, capturing a fleeting moment of daily life. Capture metadata: Taken on 2026-02-14 16:02:13 GMT (at 16:02:13 local time).
+```
+
+---
+
+### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+
+**Metrics:** 51.6 TPS | 500 tokens
+
+```text
+Alright, let's get to work. I've got an image to analyze and catalog, and the goal is to create metadata for it. First, I need to break down the image itself. It's a classic English scene, a pub, a man with a child, and a classic car. The architecture is key – a black and white timber-framed building, a classic English pub, and a car.
+
+Now, the prompt wants me to use the provided context, but I'm instructed to prioritize what's *visibly* present. The provided context mentions Hitchin, England, and a specific pub called "The Cock". However, the image itself doesn't show any of that. The text is a bit of a mess, but I can see the pub name is "BEER GARDEN" and the car is an old, black, British car. The text also mentions "SUNDAY ROASTS" and "BEER & COFFEE" which are common for pubs.
+
+So, I'm going to ignore the Hitchin context because it's not in the image. I'll focus on what I *can* see. The image is a street scene, a man with a child, and a classic car. The building is a pub, and the car is parked.
+
+Now, for the metadata. The title needs to be descriptive and concise. I'll go with "Man with child walking past a traditional English pub and classic car." That's six words, and it's accurate.
+
+The description needs to be factual and cover the key elements. I'll write: "A man with a child walks through the archway of a traditional English pub. A classic black British car is parked on the street in front of the building."
+
+Finally, the keywords. I need to be specific, ordered from most to least general. I'll start with the obvious: "man, child, pub, classic car, black car, English pub, street scene, pedestrian, walking, traditional building, black and white timber framing, brick, stone, archway, pub sign, beer garden, car park, street, town, England, UK, UK pub, black and white building, black and white timber framing, black and white brick, black and white stone, black and white facade, black and
 ```
 
 ---
@@ -910,7 +875,7 @@ Timber-framed building, historic pub, black-and-white architecture, Hitchin, Eng
 
 ### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
 
-**Metrics:** 44 TPS | 301 tokens
+**Metrics:** 43.5 TPS | 301 tokens
 
 ```text
 Title: Historic Market Town of Hitchin, England, United Kingdom, UK
@@ -929,7 +894,7 @@ Capture metadata: Taken on 2026-02-14 16:02:13 GMT (at 16:02:13 local time).
 
 ### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
 
-**Metrics:** 28.2 TPS | 236 tokens
+**Metrics:** 28 TPS | 236 tokens
 
 ```text
 Title:ĠHistoricĠBlack-and-WhiteĠTimber-FramedĠPubĊĊDescription:ĠAĠ16th-centuryĠcoachingĠinnĠwithĠdistinctiveĠblack-and-whiteĠtimberĠframingĠstandsĠinĠaĠtownĠcenter.ĠAĠpedestrianĠcarriesĠaĠchildĠthroughĠtheĠpub'sĠarchwayĠasĠaĠclassicĠcarĠpassesĠinĠtheĠforeground.ĊĊKeywords:Ġ16th-centuryĠcoachingĠinn,Ġblack-and-whiteĠtimberĠframing,ĠhistoricĠpub,ĠTheĠCock,ĠHitchin,ĠEngland,Ġpedestrian,Ġchild,ĠclassicĠcar,ĠtownĠcenter,ĠbrickĠpavement,ĠstreetĠscene,ĠlateĠwinterĠafternoon,ĠdynamicĠblur,Ġarchway,ĠpottedĠplants,ĠhangingĠbaskets,Ġlanterns,Ġsignage,ĠgardenĠbar,ĠSundayĠroasts,Ġtimber-framedĠbuilding,ĠbrickĠbuilding,Ġchimney,Ġwindows,Ġdoor,ĠoutdoorĠseating,ĠstreetĠlamp,ĠcobblestoneĠstreet,ĠurbanĠlandscape,ĠhistoricĠarchitecture,ĠUK,ĠEuropeĊĊContext:ĠTheĠimageĠalignsĠwithĠtheĠprovidedĠcontext,ĠdepictingĠtheĠhistoricĠmarketĠtownĠofĠHitchin,ĠEngland,ĠwithĠtheĠ16th-centuryĠcoachingĠinn,ĠTheĠCock,ĠasĠtheĠcentralĠfeature.ĠTheĠsceneĠcapturesĠaĠfleetingĠmomentĠofĠdailyĠlifeĠwithĠaĠpedestrianĠcarryingĠaĠchildĠandĠaĠclassicĠcarĠaddingĠaĠdynamicĠblurĠtoĠtheĠforeground.
@@ -939,7 +904,7 @@ Title:ĠHistoricĠBlack-and-WhiteĠTimber-FramedĠPubĊĊDescription:ĠAĠ16th-c
 
 ### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
 
-**Metrics:** 36.6 TPS | 500 tokens
+**Metrics:** 36.3 TPS | 500 tokens
 
 ```text
 Here are my reasoning steps:
@@ -950,7 +915,7 @@ We need to produce metadata for the image. The user wants exactly three sections
 
 ### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
 
-**Metrics:** 65 TPS | 500 tokens
+**Metrics:** 64.5 TPS | 500 tokens
 
 ```text
 <think>Got it, let's tackle this. The user wants cataloguing metadata with three sections: Title, Description, Keywords. Also, there's a Context section with hints, but the user said "Return exactly these three sections: Title, Description, Keywords. Use the provided context hints only if visually consistent. Prioritize what is visibly present. If context conflicts with the image, trust the image."
@@ -966,7 +931,7 @@ Next, Description: 1-2 factual sentences. Key subjects: The Cock Inn (historic t
 
 ### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
 
-**Metrics:** 17.6 TPS | 500 tokens
+**Metrics:** 17.4 TPS | 500 tokens
 
 ```text
 A black 1980s BMW 328i is parked on the left side of the image, facing the left side of the image. The car is parked on a tan brick sidewalk. The front of the car is visible. The roof of the car is dark. The roof of the building is a light brown. The building has a black and white color scheme. The building has a black frame around the windows. The windows are divided into four sections by a black frame. The top of the building has a black roof with a small green patch of moss growing on top of it. The building has a black awning over the entrance. A black metal lamp post is in front of the building. A black metal pole is in front of the car. A black metal pole is in front of the awning. A black metal table with two black chairs is on the right side of the awning. A black metal table with two black chairs is on the left side of the awning. A black metal table with two black chairs is in front of the awning. A black metal table with two black chairs is in front of the awning. A black metal pole is in front of the awning. A black metal pole is in front of the awning. A black metal table with two black chairs is on the right side of the awning. A black metal table with two black chairs is in front of the awning. A black metal pole is in front of the awning. A black metal table with two black chairs is in front of the awning. A black metal pole is in front of the awning. A black metal table with two black chairs is in front of the awning. A black metal pole is in front of the awning. A black metal pole is in front of the awning. A black metal pole is in front of the awning. A black metal pole is in front of the awning. A black metal pole is in front of the awning. A black metal pole is in front of the awning. A black metal pole is in front of the awning. A black metal pole is in front of the awning. A black metal pole is in front of the awning. A black metal pole is in front of the awning. A black metal pole is in front of the awning. A black metal pole is in front of the awning. A black metal pole is in front of the awning. A black metal pole is in front of the awning. A black metal pole is in front of the awning
@@ -976,7 +941,7 @@ A black 1980s BMW 328i is parked on the left side of the image, facing the left 
 
 ### ✅ mlx-community/GLM-4.6V-Flash-6bit
 
-**Metrics:** 47.6 TPS | 500 tokens
+**Metrics:** 46.8 TPS | 500 tokens
 
 ```text
 <think>Got it, let's tackle this. First, the Title needs to be 6-12 words, descriptive and concrete. Looking at the image, the main building is a timber-framed pub, maybe "The Cock" from the sign. So title could be "Timber-Framed Pub 'The Cock' in Hitchin".
@@ -1029,23 +994,23 @@ Now count: Let's list them in order from most specific to general.
 
 ### ✅ mlx-community/Molmo-7B-D-0924-8bit
 
-**Metrics:** 44.4 TPS | 147 tokens
+**Metrics:** 44.2 TPS | 140 tokens
 
 ```text
  If the image is unclear, make an educated guess based on the provided description.
 
-Title: A 16th-century timber-framed coaching inn in Hitchin, England.
+Title: Historic timber-framed coaching inn in Hitchin, England.
 
-Description: The image depicts The Cock, a classic 16th-century coaching inn in Hitchin, England, with its distinctive black-and-white timber-framed facade standing as the central feature. A black car is parked in the foreground, while a pedestrian walks through the pub's archway, capturing a moment of daily life in this historic market town.
+Description: The image depicts The Cock, a 16th-century coaching inn in Hitchin, England, with its distinctive black-and-white timber-framed facade standing as the central feature. A classic car is visible in the foreground, while a pedestrian walks through the pub's archway, capturing a slice of daily life in this historic market town.
 
-Keywords: Coaching inn, Hitchin, England, 16th-century, timber frame, black-and-white, pub, pedestrian, car, market town, historic, England, United Kingdom, UK
+Keywords: 16th-century coaching inn, Hitchin, England, timber-framed, black-and-white, classic car, pedestrian, archway, historic market town, United Kingdom, UK
 ```
 
 ---
 
 ### ✅ microsoft/Phi-3.5-vision-instruct
 
-**Metrics:** 12.6 TPS | 500 tokens
+**Metrics:** 12.7 TPS | 500 tokens
 
 ```text
 Title: Historic Market Town of Hitchin, England
@@ -1089,23 +1054,23 @@ def generate_book_report(csv_file_path):
 
 ### ✅ mlx-community/Molmo-7B-D-0924-bf16
 
-**Metrics:** 28.1 TPS | 152 tokens
+**Metrics:** 27.9 TPS | 148 tokens
 
 ```text
  Do not introduce personal opinions or make assumptions not supported by the image.
 
 Title: A 16th-century timber-framed coaching inn in Hitchin, England.
 
-Description: The image depicts The Cock, a classic 16th-century coaching inn in Hitchin, England, with its distinctive white timber-framed facade standing prominently in the town center. The scene captures a late winter afternoon, with a pedestrian carrying a child walking through the pub's archway, while a black car adds a modern contrast to the historic setting.
+Description: The image depicts The Cock, a classic 16th-century coaching inn in Hitchin, England, with its distinctive timber-framed facade. The two-story building features a prominent tower on the right side, showcasing its historical architecture. A black car is parked in the foreground, while a pedestrian walks through the archway, adding a touch of modern life to this timeless scene.
 
-Keywords: 16th-century, coaching inn, Hitchin, England, timber-framed, white, pub, archway, pedestrian, child, black car, winter, town center, England, United Kingdom, UK
+Keywords: 16th-century, coaching inn, Hitchin, England, timber-framed, tower, black car, pedestrian, archway, historic, market town, UK
 ```
 
 ---
 
 ### ✅ Qwen/Qwen3-VL-2B-Instruct
 
-**Metrics:** 76.4 TPS | 272 tokens
+**Metrics:** 76.2 TPS | 272 tokens
 
 ```text
 Title: The Cock pub in Hitchin, England, with a passing car and pedestrian
@@ -1121,7 +1086,7 @@ Context: The image is consistent with the description, showing the pub's distinc
 
 ### ✅ mlx-community/Qwen3-VL-2B-Thinking-bf16
 
-**Metrics:** 76.9 TPS | 500 tokens
+**Metrics:** 75.4 TPS | 500 tokens
 
 ```text
 Got it, let's tackle this image analysis. First, I need to extract the metadata sections as specified.
@@ -1186,12 +1151,12 @@ Keywords: The Cock Inn, Hitchin, England, UK, 16th-century, timber-framed, black
 
 - `Pillow`: `12.1.1`
 - `huggingface-hub`: `1.4.1`
-- `mlx`: `0.30.7.dev20260215+43f4a748`
+- `mlx`: `0.30.7.dev20260216+3bbe87e6`
 - `mlx-lm`: `0.30.7`
 - `mlx-metal`: ``
 - `mlx-vlm`: `0.3.12`
 - `numpy`: `2.4.2`
 - `tokenizers`: `0.22.2`
-- `transformers`: `5.1.0`
+- `transformers`: `5.2.0`
 
-_Report generated on: 2026-02-16 00:22:19 GMT_
+_Report generated on: 2026-02-16 21:22:47 GMT_
