@@ -11,8 +11,8 @@ Test image: `20260214-160213_DSC09231_DxO.jpg` (24.9 MB).
 | Component | Version |
 | --------- | ------- |
 | mlx-vlm | 0.3.12 |
-| mlx | 0.30.7.dev20260216+3bbe87e6 |
-| mlx-lm | 0.30.7 |
+| mlx | 0.30.7.dev20260218+6305022 |
+| mlx-lm | 0.30.8 |
 | transformers | 5.2.0 |
 | tokenizers | 0.22.2 |
 | huggingface-hub | 1.4.1 |
@@ -72,10 +72,10 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC
 ```
 
 ### Environment Fingerprint
-`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260216+3bbe87e6; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.2.0`
+`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260218+6305022; mlx-vlm=0.3.12; mlx-lm=0.30.8; transformers=5.2.0`
 
 ### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260216T223652Z_001_microsoft_Florence-2-large-ft_MLX_VLM_DECODE_MODEL_2cf0f8ad5576.json`
+`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260218T183332Z_001_microsoft_Florence-2-large-ft_MLX_VLM_DECODE_MODEL_2cf0f8ad5576.json`
 
 ### Traceback Tail
 ```text
@@ -158,10 +158,10 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 597, in generate
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 598, in generate
     for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
                     ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 463, in stream_generate
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 464, in stream_generate
     inputs = prepare_inputs(
         processor,
     ...<6 lines>...
@@ -226,7 +226,7 @@ Prioritize what is visibly present. If context conflicts with the image, trust t
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 15263.11it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 39235.77it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -278,10 +278,10 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC
 ```
 
 ### Environment Fingerprint
-`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260216+3bbe87e6; mlx-vlm=0.3.12; mlx-lm=0.30.7; transformers=5.2.0`
+`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260218+6305022; mlx-vlm=0.3.12; mlx-lm=0.30.8; transformers=5.2.0`
 
 ### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260216T223652Z_002_mlx-community_deepseek-vl2-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_ba.json`
+`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260218T183332Z_002_mlx-community_deepseek-vl2-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_ba.json`
 
 ### Traceback Tail
 ```text
@@ -360,7 +360,7 @@ Added chat tokens
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 31775.03it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 9666.01it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -502,7 +502,7 @@ These models technically succeeded, but token/output patterns suggest likely int
 Recent reproducibility is measured from history (up to last 3 runs where each model appears).
 
 **Regressions since previous run:** none
-**Recoveries since previous run:** `mlx-community/X-Reasoner-7B-8bit`
+**Recoveries since previous run:** none
 
 | Model | Status vs Previous Run | First Seen Failing | Recent Repro |
 | ----- | ---------------------- | ------------------ | ------------ |
@@ -560,4 +560,4 @@ Context: Existing metadata hints (use only if visually consistent):
 Prioritize what is visibly present. If context conflicts with the image, trust the image.
 ```
 
-_Report generated on 2026-02-16 22:36:52 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-02-18 18:33:32 GMT by [check_models](https://github.com/jrp2014/check_models)._
