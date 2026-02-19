@@ -687,6 +687,27 @@ class TestDiagnosticsReport:
         assert "<empty output>" in content
         assert "Likely package" in content
 
+    def test_harness_token_leak_details_are_escaped(self, tmp_path: Path) -> None:
+        """Token leak details should be escaped so markdown does not treat them as HTML."""
+        out = tmp_path / "diag.md"
+        generate_diagnostics_report(
+            results=[
+                _make_harness_success(
+                    name="org/harness-token",
+                    text="safe output",
+                    harness_type="stop_token",
+                    harness_detail="token_leak:<|end|>",
+                ),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "token_leak:&lt;|end|&gt;" in content
+        assert "token_leak:<|end|>" not in content
+
     def test_reproducibility_section(self, tmp_path: Path) -> None:
         """Reproducibility section should include model-specific commands."""
         out = tmp_path / "diag.md"
@@ -704,10 +725,8 @@ class TestDiagnosticsReport:
         assert "python -m check_models" in content
         assert "python -m check_models --models org/broken-model" in content
 
-    def test_issue_template_contains_fingerprint_and_canonical_metadata(
-        self, tmp_path: Path
-    ) -> None:
-        """Failure clusters should include copy/paste issue templates."""
+    def test_filing_guidance_contains_actionable_metadata(self, tmp_path: Path) -> None:
+        """Failure clusters should include self-contained filing guidance."""
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
             results=[
@@ -725,12 +744,12 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "### Issue Template" in content
-        assert "Copy/paste GitHub issue template" in content
+        assert "### Filing Guidance" in content
+        assert "Copy/paste GitHub issue template" not in content
         assert "Canonical code" in content
         assert "Signature" in content
-        assert "Environment Fingerprint" in content
-        assert "Minimal Reproduction" in content
+        assert "Environment fingerprint" in content
+        assert "Repro command" in content
         assert "transformers/issues/new" in content
 
     def test_failure_repro_bundles_written(self, tmp_path: Path) -> None:

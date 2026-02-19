@@ -6533,34 +6533,21 @@ def _diagnostics_preflight_section(preflight_issues: Sequence[str]) -> list[str]
     return parts
 
 
-def _build_cluster_issue_template(
+def _build_cluster_filing_guidance(
     *,
     representative: PerformanceResult,
-    cluster_results: list[PerformanceResult],
     versions: LibraryVersionDict,
     system_info: dict[str, str],
     image_path: Path | None,
     run_args: argparse.Namespace | None,
     repro_bundle_path: Path | None,
-) -> str:
-    """Build a copy/paste-ready issue body for one failure cluster."""
+) -> list[str]:
+    """Build concise filing guidance for one failure cluster."""
     pkg = representative.error_package or "unknown"
     target_name, target_url = _issue_target_for_package(
         pkg,
         model_name=representative.model_name,
     )
-    stage = representative.error_stage or _classify_error(representative.error_message or "")
-    code = representative.error_code or _build_canonical_error_code(
-        error_stage=stage,
-        error_package=pkg,
-        failure_phase=representative.failure_phase,
-    )
-    signature = representative.error_signature or _build_error_signature(
-        error_code=code,
-        error_message=representative.error_message,
-        error_traceback=representative.error_traceback,
-    )
-    failure_phase = representative.failure_phase or "unknown"
     env_fingerprint = _build_environment_fingerprint(versions=versions, system_info=system_info)
     repro_tokens = _build_repro_command_tokens(
         image_path=image_path,
@@ -6568,45 +6555,16 @@ def _build_cluster_issue_template(
         include_selection=False,
     )
     repro_command = shlex_join([*repro_tokens, "--models", representative.model_name])
-    affected_models = ", ".join(sorted({r.model_name for r in cluster_results}))
-    error_head = (representative.error_message or "Unknown error").splitlines()[0].strip()
-    traceback_tail = _format_traceback_tail(representative.error_traceback) or "n/a"
-    bundle_text = str(repro_bundle_path) if repro_bundle_path is not None else "n/a"
+    bundle_text = str(repro_bundle_path) if repro_bundle_path is not None else "not generated"
 
-    lines = [
-        "### Summary",
-        error_head,
+    return [
+        "This cluster section is self-contained. Include it directly when filing upstream.",
         "",
-        "### Classification",
-        f"- Package attribution: `{pkg}`",
-        f"- Failure phase: `{failure_phase}`",
-        f"- Error stage: `{stage}`",
-        f"- Canonical code: `{code}`",
-        f"- Signature: `{signature}`",
-        "",
-        "### Affected Models",
-        f"{affected_models}",
-        "",
-        "### Minimal Reproduction",
-        "```bash",
-        repro_command,
-        "```",
-        "",
-        "### Environment Fingerprint",
-        f"`{env_fingerprint}`",
-        "",
-        "### Repro Bundle",
-        f"`{bundle_text}`",
-        "",
-        "### Traceback Tail",
-        "```text",
-        traceback_tail,
-        "```",
-        "",
-        "### Suggested Tracker",
         f"- `{target_name}`: <{target_url}>",
+        f"- Repro command: `{repro_command}`",
+        f"- Environment fingerprint: `{env_fingerprint}`",
+        f"- Repro bundle: `{bundle_text}`",
     ]
-    return "\n".join(lines)
 
 
 def _diagnostics_failure_clusters(
@@ -6700,24 +6658,23 @@ def _diagnostics_failure_clusters(
             parts.append("**Traceback (tail):**")
             _append_markdown_code_block(parts, tb_tail, language="text")
 
-        parts.append(f"### Issue Template (`{DIAGNOSTICS_ESCAPER.escape(rep.model_name)}`)")
+        parts.append(f"### Filing Guidance (`{DIAGNOSTICS_ESCAPER.escape(rep.model_name)}`)")
         parts.append("")
         bundle_path = (
             repro_bundles.get(rep.model_name)
             if repro_bundles is not None and rep.model_name in repro_bundles
             else None
         )
-        issue_template = _build_cluster_issue_template(
+        filing_guidance = _build_cluster_filing_guidance(
             representative=rep,
-            cluster_results=cluster_results,
             versions=versions,
             system_info=system_info,
             image_path=image_path,
             run_args=run_args,
             repro_bundle_path=bundle_path,
         )
-        parts.append("Copy/paste GitHub issue template:")
-        _append_markdown_code_block(parts, issue_template, language="markdown")
+        parts.extend(filing_guidance)
+        parts.append("")
 
         parts.extend(_diagnostics_full_tracebacks_section(cluster_results))
         parts.extend(_diagnostics_captured_output_section(cluster_results))
@@ -6768,7 +6725,10 @@ def _diagnostics_harness_section(
             parts.append(f"**Quality flags:** {res.quality_issues}")
         parts.append("")
         if harness_details:
-            parts.append("**Details:** " + ", ".join(harness_details))
+            escaped_details = [
+                html.escape(detail, quote=False).replace("\n", "<br>") for detail in harness_details
+            ]
+            parts.append("**Details:** " + ", ".join(escaped_details))
             parts.append("")
         snippet_source = text.strip() or "<empty output>"
         snippet = snippet_source[:_DIAGNOSTICS_OUTPUT_SNIPPET_LEN]
@@ -7333,8 +7293,8 @@ def generate_diagnostics_report(
 
     The report clusters failures by root-cause pattern, includes full error
     messages and traceback excerpts, and highlights harness/encoding issues
-    from successful models — everything needed to copy-paste into a GitHub
-    issue against mlx-vlm, mlx, or transformers.
+    from successful models in a self-contained format suitable for direct
+    upstream issue filing against mlx-vlm, mlx, or transformers.
 
     Args:
         results: All PerformanceResult objects from the run.
