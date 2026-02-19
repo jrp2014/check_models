@@ -6588,6 +6588,38 @@ def _diagnostics_preflight_section(preflight_issues: Sequence[str]) -> list[str]
     return parts
 
 
+_DIAGNOSTICS_COMPONENT_LABELS: Final[dict[str, str]] = {
+    "mlx-vlm": "mlx-vlm",
+    "mlx": "mlx",
+    "mlx-lm": "mlx-lm",
+    "transformers": "transformers",
+    "huggingface-hub": "huggingface_hub",
+    "model-config": "model configuration/repository",
+    "unknown": "unknown component",
+}
+
+_HARNESS_TYPE_DESCRIPTIONS: Final[dict[str, str]] = {
+    "encoding": (
+        "Decoded output contains tokenizer artifacts that should not appear in user-facing text."
+    ),
+    "stop_token": (
+        "Generation appears to continue through stop/control tokens instead of ending cleanly."
+    ),
+    "prompt_template": "Output shape suggests a prompt-template or stop-condition mismatch.",
+    "long_context": "Behavior degrades under long prompt context.",
+    "generation_loop": "Output appears to drift into instruction/training-template text.",
+}
+
+_TRAINING_LEAK_LABELS: Final[dict[str, str]] = {
+    "instruction_header": "instruction headers mid-output",
+    "task_header": "task/question headers mid-output",
+    "write_prompt": "new writing prompts mid-output",
+    "user_turn": "new user-turn delimiters mid-output",
+    "code_example": "example-code templates mid-output",
+    "qa_pair": "Q/A template patterns mid-output",
+}
+
+
 def _pluralize(count: int, singular: str, plural: str | None = None) -> str:
     """Return singular/plural form based on count."""
     if count == 1:
@@ -6625,46 +6657,20 @@ def _simplify_failure_message(error_message: str | None, *, model_name: str) -> 
 
 def _friendly_component_label(package: str) -> str:
     """Return plain-language package/component label for diagnostics."""
-    labels = {
-        "mlx-vlm": "mlx-vlm",
-        "mlx": "mlx",
-        "mlx-lm": "mlx-lm",
-        "transformers": "transformers",
-        "huggingface-hub": "huggingface_hub",
-        "model-config": "model configuration/repository",
-        "unknown": "unknown component",
-    }
-    return labels.get(package, package)
+    return _DIAGNOSTICS_COMPONENT_LABELS.get(package, package)
 
 
 def _describe_harness_type(harness_type: str | None) -> str:
     """Map harness issue type to plain-language description."""
-    descriptions = {
-        "encoding": (
-            "Decoded output contains tokenizer artifacts that should not appear in "
-            "user-facing text."
-        ),
-        "stop_token": (
-            "Generation appears to continue through stop/control tokens instead of ending cleanly."
-        ),
-        "prompt_template": ("Output shape suggests a prompt-template or stop-condition mismatch."),
-        "long_context": "Behavior degrades under long prompt context.",
-        "generation_loop": ("Output appears to drift into instruction/training-template text."),
-    }
-    return descriptions.get(harness_type or "", "Output indicates a likely integration issue.")
+    return _HARNESS_TYPE_DESCRIPTIONS.get(
+        harness_type or "",
+        "Output indicates a likely integration issue.",
+    )
 
 
 def _describe_training_leak(leak_type: str) -> str:
     """Map training-leak subtype to clear prose."""
-    leak_labels = {
-        "instruction_header": "instruction headers mid-output",
-        "task_header": "task/question headers mid-output",
-        "write_prompt": "new writing prompts mid-output",
-        "user_turn": "new user-turn delimiters mid-output",
-        "code_example": "example-code templates mid-output",
-        "qa_pair": "Q/A template patterns mid-output",
-    }
-    label = leak_labels.get(leak_type, "instruction/template text")
+    label = _TRAINING_LEAK_LABELS.get(leak_type, "instruction/template text")
     return f"Generated text appears to continue into {label}."
 
 
