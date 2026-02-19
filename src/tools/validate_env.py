@@ -18,6 +18,7 @@ import argparse
 import importlib.metadata
 import logging
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -27,14 +28,56 @@ from typing import Final
 
 logger = logging.getLogger("validate-env")
 
+try:
+    from packaging.requirements import Requirement
+    from packaging.specifiers import SpecifierSet
+    from packaging.version import InvalidVersion, Version
+except ImportError:  # pragma: no cover - optional for bootstrap scenarios
+    Requirement = None
+    SpecifierSet = None
+    InvalidVersion = ValueError
+    Version = None
+
 REQUIRED_PYTHON_VERSION: Final[tuple[int, int]] = (3, 13)
 # Default env name, but we'll try to detect or be flexible
 EXPECTED_CONDA_ENV: Final[str] = "mlx-vlm"
-EXPECTED_SPLIT_PARTS: Final[int] = 2
 
 
 class ValidationError(Exception):
     """Raised when environment validation fails."""
+
+
+def _parse_dependency_spec_fallback(requirement: str) -> tuple[str, str]:
+    """Best-effort parser for PEP 508-ish requirement strings."""
+    base = requirement.split(";", 1)[0].strip()
+    if not base:
+        return "", ""
+
+    if " @ " in base:
+        return base.split(" @ ", 1)[0].strip(), ""
+
+    match = re.match(r"^([A-Za-z0-9_.-]+)(?:\[[^\]]+\])?\s*(.*)$", base)
+    if not match:
+        return base, ""
+
+    name = match.group(1).strip()
+    spec = match.group(2).strip()
+    if spec.startswith(("==", ">=", "<=", "!=", "~=", ">", "<")):
+        return name, spec
+    return name, ""
+
+
+def _parse_dependency_spec(requirement: str) -> tuple[str, str]:
+    """Parse dependency requirement into normalized package name + version spec."""
+    if Requirement is None:
+        return _parse_dependency_spec_fallback(requirement)
+
+    try:
+        parsed = Requirement(requirement)
+    except Exception:
+        return _parse_dependency_spec_fallback(requirement)
+
+    return parsed.name, str(parsed.specifier)
 
 
 def load_pyproject_deps() -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
@@ -60,17 +103,11 @@ def load_pyproject_deps() -> tuple[dict[str, str], dict[str, str], dict[str, str
     dependencies = project.get("dependencies", [])
     optional_dependencies = project.get("optional-dependencies", {})
 
-    core_deps = {}
+    core_deps: dict[str, str] = {}
     for dep in dependencies:
-        parts = dep.split(">=", 1)
-        if len(parts) == EXPECTED_SPLIT_PARTS:
-            core_deps[parts[0].strip()] = ">=" + parts[1].strip()
-        else:
-            parts = dep.split("==", 1)
-            if len(parts) == EXPECTED_SPLIT_PARTS:
-                core_deps[parts[0].strip()] = "==" + parts[1].strip()
-            else:
-                core_deps[dep.strip()] = ""
+        name, spec = _parse_dependency_spec(dep)
+        if name:
+            core_deps[name] = spec
 
     dev_deps: dict[str, str] = {}
     extras_deps: dict[str, str] = {}
@@ -78,11 +115,9 @@ def load_pyproject_deps() -> tuple[dict[str, str], dict[str, str], dict[str, str
     for group, deps in optional_dependencies.items():
         target_dict = dev_deps if group == "dev" else extras_deps
         for dep in deps:
-            parts = dep.split(">=", 1)
-            if len(parts) == EXPECTED_SPLIT_PARTS:
-                target_dict[parts[0].strip()] = ">=" + parts[1].strip()
-            else:
-                target_dict[dep.strip()] = ""
+            name, spec = _parse_dependency_spec(dep)
+            if name:
+                target_dict[name] = spec
 
     return core_deps, extras_deps, dev_deps
 
@@ -159,9 +194,62 @@ def check_package(name: str, version_spec: str) -> bool:
         logger.warning("✗ %s %s (NOT INSTALLED)", name, version_spec)
         return False
     else:
-        # Simple version check (assumes >= for now)
+        if not _version_matches_specifier(
+            package_name=name,
+            installed_version=installed_version,
+            version_spec=version_spec,
+        ):
+            logger.warning(
+                "✗ %s %s (installed: %s, DOES NOT SATISFY SPEC)",
+                name,
+                version_spec,
+                installed_version,
+            )
+            return False
+
         logger.info("✓ %s %s (installed: %s)", name, version_spec, installed_version)
         return True
+
+
+def _version_matches_specifier(
+    *,
+    package_name: str,
+    installed_version: str,
+    version_spec: str,
+) -> bool:
+    """Return whether installed version satisfies specifier string."""
+    if not version_spec:
+        return True
+
+    if SpecifierSet is None or Version is None:
+        logger.warning(
+            "⚠ Skipping version constraint check for %s (%s): packaging not installed",
+            package_name,
+            version_spec,
+        )
+        return True
+
+    try:
+        specifier = SpecifierSet(version_spec)
+    except Exception:
+        logger.warning(
+            "⚠ Skipping malformed version constraint check for %s: %s",
+            package_name,
+            version_spec,
+        )
+        return True
+
+    try:
+        parsed_version = Version(installed_version)
+    except InvalidVersion:
+        logger.warning(
+            "⚠ Skipping version constraint check for %s: invalid installed version %s",
+            package_name,
+            installed_version,
+        )
+        return True
+
+    return parsed_version in specifier
 
 
 def check_packages(packages: dict[str, str]) -> bool:
@@ -171,6 +259,52 @@ def check_packages(packages: dict[str, str]) -> bool:
         if not check_package(name, version_spec):
             all_ok = False
     return all_ok
+
+
+def check_pip_consistency() -> bool:
+    """Run pip's dependency consistency check with pragmatic warning handling."""
+    try:
+        result = subprocess.run(
+            [sys.executable, "-m", "pip", "check"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except OSError as e:
+        logger.warning("⚠ Could not run pip consistency check: %s", e)
+        return True
+
+    if result.returncode == 0:
+        logger.info("✓ pip dependency consistency check passed")
+        return True
+
+    combined = "\n".join(
+        part.strip() for part in (result.stdout, result.stderr) if part and part.strip()
+    )
+    lines = [
+        line
+        for line in combined.splitlines()
+        if line.strip() and not line.strip().startswith("WARNING:")
+    ]
+    if not lines:
+        logger.warning("✗ pip check failed without diagnostic output")
+        return False
+
+    torch_platform_warning = all(
+        "torch" in line.lower() and "not supported on this platform" in line.lower()
+        for line in lines
+    )
+    if torch_platform_warning:
+        logger.warning("⚠ pip check reported Torch platform metadata warning:")
+        for line in lines:
+            logger.warning("  - %s", line)
+        logger.warning("  Continuing; this warning can be non-fatal on Apple Silicon wheels.")
+        return True
+
+    logger.warning("✗ pip check reported dependency issues:")
+    for line in lines:
+        logger.warning("  - %s", line)
+    return False
 
 
 def check_git_hooks() -> bool:
@@ -279,6 +413,11 @@ def main() -> int:
         logger.info("\nChecking development tools...")
         if not check_packages(DEV_TOOLS):
             issues.append("Development tools missing or outdated")
+
+        # pip dependency consistency (warnings only for known torch platform metadata issue)
+        logger.info("\nChecking pip dependency consistency...")
+        if not check_pip_consistency():
+            issues.append("pip dependency consistency check failed")
 
         # Git hooks
         logger.info("\nChecking git hooks...")
