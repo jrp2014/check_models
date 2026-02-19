@@ -6620,13 +6620,6 @@ _TRAINING_LEAK_LABELS: Final[dict[str, str]] = {
 }
 
 
-def _pluralize(count: int, singular: str, plural: str | None = None) -> str:
-    """Return singular/plural form based on count."""
-    if count == 1:
-        return singular
-    return plural or f"{singular}s"
-
-
 def _dedupe_preserve_order(items: Sequence[str]) -> list[str]:
     """Return unique items while preserving first-seen order."""
     unique_items: list[str] = []
@@ -6653,11 +6646,6 @@ def _simplify_failure_message(error_message: str | None, *, model_name: str) -> 
         if message.startswith(prefix):
             return message.removeprefix(prefix).strip() or message
     return message
-
-
-def _friendly_component_label(package: str) -> str:
-    """Return plain-language package/component label for diagnostics."""
-    return _DIAGNOSTICS_COMPONENT_LABELS.get(package, package)
 
 
 def _describe_harness_type(harness_type: str | None) -> str:
@@ -6828,10 +6816,10 @@ def _diagnostics_failure_clusters(
     for idx, (_cluster_signature, cluster_results) in enumerate(sorted_clusters, 1):
         rep = cluster_results[0]
         pkg = rep.error_package or "unknown"
-        component_label = _friendly_component_label(pkg)
+        component_label = _DIAGNOSTICS_COMPONENT_LABELS.get(pkg, pkg)
         n = len(cluster_results)
         priority = _diagnostics_priority(n, rep.error_stage)
-        model_word = _pluralize(n, "model")
+        model_word = "model" if n == 1 else "models"
         observed = _simplify_failure_message(rep.error_message, model_name=rep.model_name)
         affected_models = ", ".join(
             f"`{DIAGNOSTICS_ESCAPER.escape(r.model_name)}`"
@@ -6847,7 +6835,7 @@ def _diagnostics_failure_clusters(
         parts.append("")
         parts.append(f"**Observed behavior:** {DIAGNOSTICS_ESCAPER.escape(observed)}")
         parts.append(f"**Likely component:** `{DIAGNOSTICS_ESCAPER.escape(component_label)}`")
-        parts.append(f"**Affected {_pluralize(n, 'model')}:** {affected_models}")
+        parts.append(f"**Affected {model_word}:** {affected_models}")
         parts.append("")
 
         # Maintainer-facing table (human-readable, no local diagnostic codes).
@@ -7155,135 +7143,6 @@ def _diagnostics_history_section(
     return parts
 
 
-def _append_repro_input_tokens(
-    tokens: list[str],
-    *,
-    image_path: Path | None,
-    run_args: argparse.Namespace | None,
-) -> None:
-    """Append image/folder input tokens to reproducibility command."""
-    if image_path is not None:
-        tokens.extend(["--image", str(image_path)])
-        return
-
-    if run_args is None:
-        return
-
-    run_image = getattr(run_args, "image", None)
-    run_folder = getattr(run_args, "folder", None)
-    if run_image is not None:
-        tokens.extend(["--image", str(run_image)])
-    elif run_folder is not None:
-        tokens.extend(["--folder", str(run_folder)])
-
-
-def _append_repro_selection_tokens(tokens: list[str], run_args: argparse.Namespace) -> None:
-    """Append model-selection tokens to reproducibility command."""
-    models = getattr(run_args, "models", None)
-    if models:
-        tokens.extend(["--models", *[str(model) for model in models]])
-
-    exclude = getattr(run_args, "exclude", None)
-    if exclude:
-        tokens.extend(["--exclude", *[str(model) for model in exclude]])
-
-
-def _append_repro_optional_value_flags(
-    tokens: list[str],
-    flag_values: Sequence[tuple[str, str | int | float | Path | None]],
-) -> None:
-    """Append `--flag value` pairs when values are present."""
-    for flag, value in flag_values:
-        if value is None:
-            continue
-        tokens.extend([flag, str(value)])
-
-
-def _append_repro_bool_flags(
-    tokens: list[str],
-    run_args: argparse.Namespace,
-    flag_map: Sequence[tuple[str, str]],
-) -> None:
-    """Append boolean flags when the corresponding args attribute is truthy."""
-    for attr_name, flag in flag_map:
-        if bool(getattr(run_args, attr_name, False)):
-            tokens.append(flag)
-
-
-def _append_repro_runtime_tokens(tokens: list[str], run_args: argparse.Namespace) -> None:
-    """Append generation/runtime-affecting flags for reproducibility."""
-    trust_remote_code = bool(getattr(run_args, "trust_remote_code", True))
-    tokens.append("--trust-remote-code" if trust_remote_code else "--no-trust-remote-code")
-
-    _append_repro_optional_value_flags(
-        tokens,
-        [
-            ("--revision", getattr(run_args, "revision", None)),
-            ("--adapter-path", getattr(run_args, "adapter_path", None)),
-            ("--prompt", getattr(run_args, "prompt", None)),
-        ],
-    )
-
-    _append_repro_bool_flags(
-        tokens,
-        run_args,
-        [
-            ("detailed_metrics", "--detailed-metrics"),
-            ("lazy_load", "--lazy-load"),
-        ],
-    )
-
-    tokens.extend(["--max-tokens", str(getattr(run_args, "max_tokens", DEFAULT_MAX_TOKENS))])
-    tokens.extend(["--temperature", str(getattr(run_args, "temperature", DEFAULT_TEMPERATURE))])
-    tokens.extend(["--top-p", str(getattr(run_args, "top_p", 1.0))])
-
-    _append_repro_optional_value_flags(
-        tokens,
-        [
-            ("--repetition-penalty", getattr(run_args, "repetition_penalty", None)),
-            ("--repetition-context-size", getattr(run_args, "repetition_context_size", None)),
-            ("--max-kv-size", getattr(run_args, "max_kv_size", None)),
-            ("--kv-bits", getattr(run_args, "kv_bits", None)),
-            ("--prefill-step-size", getattr(run_args, "prefill_step_size", None)),
-        ],
-    )
-
-    kv_group_size = getattr(run_args, "kv_group_size", None)
-    if kv_group_size not in {None, 64}:
-        tokens.extend(["--kv-group-size", str(kv_group_size)])
-
-    quantized_kv_start = getattr(run_args, "quantized_kv_start", None)
-    if quantized_kv_start not in {None, 0}:
-        tokens.extend(["--quantized-kv-start", str(quantized_kv_start)])
-
-    tokens.extend(["--timeout", str(getattr(run_args, "timeout", DEFAULT_TIMEOUT))])
-
-
-def _append_repro_display_tokens(tokens: list[str], run_args: argparse.Namespace) -> None:
-    """Append display/config flags when relevant."""
-    _append_repro_bool_flags(
-        tokens,
-        run_args,
-        [
-            ("verbose", "--verbose"),
-            ("no_color", "--no-color"),
-            ("force_color", "--force-color"),
-        ],
-    )
-
-    _append_repro_optional_value_flags(
-        tokens,
-        [
-            ("--width", getattr(run_args, "width", None)),
-            ("--quality-config", getattr(run_args, "quality_config", None)),
-        ],
-    )
-
-    context_marker = getattr(run_args, "context_marker", None)
-    if context_marker and context_marker != "Context:":
-        tokens.extend(["--context-marker", str(context_marker)])
-
-
 def _build_repro_command_tokens(
     *,
     image_path: Path | None,
@@ -7291,18 +7150,101 @@ def _build_repro_command_tokens(
     include_selection: bool,
 ) -> list[str]:
     """Build CLI command tokens for diagnostics reproducibility snippets."""
-    tokens = ["python", "-m", "check_models"]
 
-    _append_repro_input_tokens(tokens, image_path=image_path, run_args=run_args)
+    def _append_pairs(
+        pairs: Sequence[tuple[str, str | int | float | Path | None]],
+    ) -> None:
+        for flag, value in pairs:
+            if value is not None:
+                tokens.extend([flag, str(value)])
+
+    def _append_enabled_flags(flag_map: Sequence[tuple[str, str]]) -> None:
+        for attr_name, flag in flag_map:
+            if bool(getattr(run_args, attr_name, False)):
+                tokens.append(flag)
+
+    tokens = ["python", "-m", "check_models"]
+    if image_path is not None:
+        tokens.extend(["--image", str(image_path)])
+    elif run_args is not None:
+        run_image = getattr(run_args, "image", None)
+        run_folder = getattr(run_args, "folder", None)
+        if run_image is not None:
+            tokens.extend(["--image", str(run_image)])
+        elif run_folder is not None:
+            tokens.extend(["--folder", str(run_folder)])
 
     if run_args is None:
         return tokens
 
     if include_selection:
-        _append_repro_selection_tokens(tokens, run_args)
+        models = getattr(run_args, "models", None)
+        if models:
+            tokens.extend(["--models", *[str(model) for model in models]])
+        exclude = getattr(run_args, "exclude", None)
+        if exclude:
+            tokens.extend(["--exclude", *[str(model) for model in exclude]])
 
-    _append_repro_runtime_tokens(tokens, run_args)
-    _append_repro_display_tokens(tokens, run_args)
+    trust_remote_code = bool(getattr(run_args, "trust_remote_code", True))
+    tokens.append("--trust-remote-code" if trust_remote_code else "--no-trust-remote-code")
+
+    _append_pairs(
+        (
+            ("--revision", getattr(run_args, "revision", None)),
+            ("--adapter-path", getattr(run_args, "adapter_path", None)),
+            ("--prompt", getattr(run_args, "prompt", None)),
+        ),
+    )
+    _append_enabled_flags(
+        (
+            ("detailed_metrics", "--detailed-metrics"),
+            ("lazy_load", "--lazy-load"),
+        ),
+    )
+    tokens.extend(["--max-tokens", str(getattr(run_args, "max_tokens", DEFAULT_MAX_TOKENS))])
+    tokens.extend(["--temperature", str(getattr(run_args, "temperature", DEFAULT_TEMPERATURE))])
+    tokens.extend(["--top-p", str(getattr(run_args, "top_p", 1.0))])
+
+    kv_group_size = getattr(run_args, "kv_group_size", None)
+    quantized_kv_start = getattr(run_args, "quantized_kv_start", None)
+    _append_pairs(
+        (
+            ("--repetition-penalty", getattr(run_args, "repetition_penalty", None)),
+            ("--repetition-context-size", getattr(run_args, "repetition_context_size", None)),
+            ("--max-kv-size", getattr(run_args, "max_kv_size", None)),
+            ("--kv-bits", getattr(run_args, "kv_bits", None)),
+            ("--prefill-step-size", getattr(run_args, "prefill_step_size", None)),
+            (
+                "--kv-group-size",
+                kv_group_size if kv_group_size not in {None, 64} else None,
+            ),
+            (
+                "--quantized-kv-start",
+                quantized_kv_start if quantized_kv_start not in {None, 0} else None,
+            ),
+            ("--timeout", getattr(run_args, "timeout", DEFAULT_TIMEOUT)),
+        ),
+    )
+
+    _append_enabled_flags(
+        (
+            ("verbose", "--verbose"),
+            ("no_color", "--no-color"),
+            ("force_color", "--force-color"),
+        ),
+    )
+
+    context_marker = getattr(run_args, "context_marker", None)
+    _append_pairs(
+        (
+            ("--width", getattr(run_args, "width", None)),
+            ("--quality-config", getattr(run_args, "quality_config", None)),
+            (
+                "--context-marker",
+                context_marker if context_marker and context_marker != "Context:" else None,
+            ),
+        ),
+    )
 
     return tokens
 
