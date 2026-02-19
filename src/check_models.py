@@ -6153,16 +6153,24 @@ def _strip_local_runner_traceback_frames(traceback_str: str) -> str:
     return "\n".join(kept).strip()
 
 
+def _normalize_traceback_for_report(traceback_str: str | None) -> str | None:
+    """Normalize traceback text for diagnostics output."""
+    if not traceback_str:
+        return None
+    sanitized = _strip_local_runner_traceback_frames(traceback_str)
+    return sanitized or None
+
+
 def _format_traceback_tail(traceback_str: str | None) -> str | None:
     """Extract the last meaningful lines from a full traceback.
 
     Strips blank lines and returns the tail suitable for inclusion in issue
     reports.  Returns None when no useful info can be extracted.
     """
-    if not traceback_str:
+    normalized = _normalize_traceback_for_report(traceback_str)
+    if normalized is None:
         return None
-    sanitized = _strip_local_runner_traceback_frames(traceback_str)
-    lines = [ln for ln in sanitized.splitlines() if ln.strip()]
+    lines = [ln for ln in normalized.splitlines() if ln.strip()]
     if not lines:
         return None
     tail = lines[-_DIAGNOSTICS_TRACEBACK_TAIL_LINES:]
@@ -6171,10 +6179,7 @@ def _format_traceback_tail(traceback_str: str | None) -> str | None:
 
 def _format_traceback_full(traceback_str: str | None) -> str | None:
     """Return full traceback text (trimmed), or None when missing."""
-    if not traceback_str:
-        return None
-    full = _strip_local_runner_traceback_frames(traceback_str)
-    return full or None
+    return _normalize_traceback_for_report(traceback_str)
 
 
 def _sanitize_captured_output_for_report(captured_text: str) -> str:
@@ -6590,6 +6595,18 @@ def _pluralize(count: int, singular: str, plural: str | None = None) -> str:
     return plural or f"{singular}s"
 
 
+def _dedupe_preserve_order(items: Sequence[str]) -> list[str]:
+    """Return unique items while preserving first-seen order."""
+    unique_items: list[str] = []
+    seen: set[str] = set()
+    for item in items:
+        if item in seen:
+            continue
+        seen.add(item)
+        unique_items.append(item)
+    return unique_items
+
+
 def _simplify_failure_message(error_message: str | None, *, model_name: str) -> str:
     """Strip local wrapper prefixes to keep issue text maintainer-focused."""
     if not error_message:
@@ -6746,14 +6763,7 @@ def _summarize_quality_signals(qa: GenerationQualityAnalysis | None) -> list[str
     if qa.formatting_issues:
         signals.append("Output formatting deviated from the requested structure.")
 
-    unique_signals: list[str] = []
-    seen: set[str] = set()
-    for signal_text in signals:
-        if signal_text in seen:
-            continue
-        seen.add(signal_text)
-        unique_signals.append(signal_text)
-    return unique_signals
+    return _dedupe_preserve_order(signals)
 
 
 def _build_cluster_filing_guidance(
@@ -6935,13 +6945,7 @@ def _diagnostics_harness_section(
             desc for detail in harness_details if (desc := _describe_harness_detail(detail))
         ]
         observations.extend(_summarize_quality_signals(qa))
-        unique_observations: list[str] = []
-        seen: set[str] = set()
-        for observation in observations:
-            if observation in seen:
-                continue
-            seen.add(observation)
-            unique_observations.append(observation)
+        unique_observations = _dedupe_preserve_order(observations)
         if unique_observations:
             parts.append("**Why this appears to be an integration/runtime issue:**")
             parts.append("")
