@@ -95,7 +95,6 @@ if TYPE_CHECKING:
     from mlx_vlm.generate import GenerationResult
     from PIL.Image import Image as PILImage
     from transformers.tokenization_python import PythonBackend
-    from transformers.tokenization_utils_tokenizers import TokenizersBackend
 
 # Public API (PEP 8 / PEP 561 best practice)
 __all__ = [
@@ -9458,8 +9457,6 @@ def _build_failure_result(
 
 def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     """Process an image with a Vision Language Model, managing stats and errors."""
-    model: Module | None = None
-    processor: PythonBackend | TokenizersBackend | None = None
     arch, gpu_info = get_system_info()
     stdout_capture = _TeeCaptureStream(sys.stdout)
     stderr_capture = _TeeCaptureStream(sys.stderr)
@@ -9540,11 +9537,6 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         )
     finally:
         _update_phase("cleanup")
-        # Aggressive cleanup matching mlx-vlm/tests/test_smoke.py
-        if model is not None:
-            del model
-        if processor is not None:
-            del processor
 
         # Force synchronization and garbage collection when MLX runtime is available.
         synchronize_fn = getattr(mx, "synchronize", None)
