@@ -471,9 +471,9 @@ class TestDiagnosticsReport:
         )
         content = out.read_text(encoding="utf-8")
         # Both should be in the same cluster section, not separate sections
-        # Count the number of "##" headings that mention "Model Error"
+        # Count the number of "##" headings that mention grouped failure heading
         error_sections = [
-            ln for ln in content.splitlines() if ln.startswith("## ") and "Model Error" in ln
+            ln for ln in content.splitlines() if ln.startswith("## ") and "Failure affecting" in ln
         ]
         assert len(error_sections) == 1
         # Both models mentioned in that section
@@ -503,8 +503,8 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "No Chat Template" in content
-        assert "Weight Mismatch" in content
+        assert "chat_template is not set" in content
+        assert "Missing 1 parameters: lm_head.weight" in content
 
     def test_traceback_tail_included(self, tmp_path: Path) -> None:
         """Traceback excerpt should appear in the report."""
@@ -527,8 +527,32 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "Traceback (tail)" in content
+        assert "Technical traceback excerpt (representative model)" in content
         assert "ValueError: bad shape" in content
+
+    def test_traceback_omits_local_check_models_frames(self, tmp_path: Path) -> None:
+        """Traceback rendering should omit local check_models frames from issue output."""
+        tb = (
+            "Traceback (most recent call last):\n"
+            '  File "/Users/test/check_models.py", line 99, in local_runner\n'
+            "    local_wrapper()\n"
+            '  File "/opt/homebrew/lib/python3.13/site-packages/mlx_vlm/utils.py", '
+            "line 10, in process_inputs\n"
+            "    raise ValueError('bad shape')\n"
+            "ValueError: bad shape\n"
+        )
+        out = tmp_path / "diag.md"
+        generate_diagnostics_report(
+            results=[_make_failure_with_details("org/m", traceback_str=tb, error_msg="bad shape")],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "/Users/test/check_models.py" not in content
+        assert "local_wrapper()" not in content
+        assert "mlx_vlm/utils.py" in content
 
     def test_full_tracebacks_in_collapsed_section(self, tmp_path: Path) -> None:
         """Diagnostics should include full traceback blocks per failed model."""
@@ -542,7 +566,8 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "Full tracebacks (all models in this cluster)" in content
+        assert "Technical tracebacks (affected model)" in content
+        assert "<details>" in content
         # line 0 is not in the 6-line tail and proves full traceback inclusion.
         assert "trace-line-0" in content
 
@@ -565,12 +590,12 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "Captured stdout/stderr (all models in this cluster)" in content
+        assert "Captured stdout/stderr (affected model)" in content
         assert "Tokenizer warning here" in content
         assert "\x1b[" not in content
         assert "\r" not in content
         assert "#### `" not in content
-        assert "### `org/m`" in content
+        assert "Details for org/m" in content
 
     def test_history_context_includes_regressions_recoveries_and_repro(
         self, tmp_path: Path
@@ -683,9 +708,9 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         assert "## Harness/Integration Issues" in content
         assert "prompt=5,000" in content
-        assert "ratio=0.00%" in content
+        assert "output/prompt=0.00%" in content
         assert "<empty output>" in content
-        assert "Likely package" in content
+        assert "Likely component" in content
 
     def test_harness_token_leak_details_are_escaped(self, tmp_path: Path) -> None:
         """Token leak details should be escaped so markdown does not treat them as HTML."""
@@ -705,8 +730,8 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "token_leak:&lt;|end|&gt;" in content
-        assert "token_leak:<|end|>" not in content
+        assert "Special control token &lt;|end|&gt; appeared in generated text." in content
+        assert "Special control token <|end|> appeared in generated text." not in content
 
     def test_reproducibility_section(self, tmp_path: Path) -> None:
         """Reproducibility section should include model-specific commands."""
@@ -746,8 +771,10 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         assert "### Filing Guidance" in content
         assert "Copy/paste GitHub issue template" not in content
-        assert "Canonical code" in content
-        assert "Signature" in content
+        assert "Observed behavior" in content
+        assert "Failure phase" not in content
+        assert "Canonical code" not in content
+        assert "Signature" not in content
         assert "Environment fingerprint" in content
         assert "Repro command" in content
         assert "transformers/issues/new" in content

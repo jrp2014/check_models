@@ -6089,6 +6089,21 @@ def _append_markdown_section(
         parts.append("")
 
 
+def _append_markdown_details_block(
+    parts: list[str],
+    *,
+    summary: str,
+    body_lines: Sequence[str],
+) -> None:
+    """Append an HTML <details> block for collapsed technical content."""
+    parts.append("<details>")
+    parts.append(f"<summary>{html.escape(summary, quote=False)}</summary>")
+    parts.append("")
+    parts.extend(body_lines)
+    parts.append("</details>")
+    parts.append("")
+
+
 def _render_collapsible_model_blocks(
     *,
     summary: str,
@@ -6100,10 +6115,43 @@ def _render_collapsible_model_blocks(
 
     parts = [f"**{summary}:**", ""]
     for model_name, block_text in entries:
-        safe_model = DIAGNOSTICS_ESCAPER.escape(model_name)
-        parts.append(f"### `{safe_model}`")
-        _append_markdown_code_block(parts, block_text, language="text")
+        details_body: list[str] = []
+        _append_markdown_code_block(details_body, block_text, language="text")
+        _append_markdown_details_block(
+            parts,
+            summary=f"Details for {model_name}",
+            body_lines=details_body,
+        )
     return parts
+
+
+_LOCAL_RUNNER_TRACEBACK_FRAME_RE: Final[re.Pattern[str]] = re.compile(
+    r'^\s*File ".*(?:^|/)check_models\.py", line \d+, in ',
+)
+
+
+def _strip_local_runner_traceback_frames(traceback_str: str) -> str:
+    """Remove local check_models stack frames from traceback text."""
+    lines = traceback_str.splitlines()
+    kept: list[str] = []
+    idx = 0
+
+    while idx < len(lines):
+        line = lines[idx]
+        if _LOCAL_RUNNER_TRACEBACK_FRAME_RE.search(line):
+            idx += 1
+            while idx < len(lines):
+                follow = lines[idx]
+                if follow.lstrip().startswith('File "'):
+                    break
+                if not follow.startswith(" "):
+                    break
+                idx += 1
+            continue
+        kept.append(line)
+        idx += 1
+
+    return "\n".join(kept).strip()
 
 
 def _format_traceback_tail(traceback_str: str | None) -> str | None:
@@ -6114,7 +6162,8 @@ def _format_traceback_tail(traceback_str: str | None) -> str | None:
     """
     if not traceback_str:
         return None
-    lines = [ln for ln in traceback_str.strip().splitlines() if ln.strip()]
+    sanitized = _strip_local_runner_traceback_frames(traceback_str)
+    lines = [ln for ln in sanitized.splitlines() if ln.strip()]
     if not lines:
         return None
     tail = lines[-_DIAGNOSTICS_TRACEBACK_TAIL_LINES:]
@@ -6125,7 +6174,7 @@ def _format_traceback_full(traceback_str: str | None) -> str | None:
     """Return full traceback text (trimmed), or None when missing."""
     if not traceback_str:
         return None
-    full = traceback_str.strip()
+    full = _strip_local_runner_traceback_frames(traceback_str)
     return full or None
 
 
@@ -6224,7 +6273,7 @@ def _format_recent_repro_ratio(history_info: FailureHistoryContext | None) -> st
 
 
 def _diagnostics_full_tracebacks_section(cluster_results: list[PerformanceResult]) -> list[str]:
-    """Build collapsed full traceback blocks for all models in a cluster."""
+    """Build collapsed full traceback blocks for affected models."""
     traceback_entries: list[tuple[str, str]] = []
     for result in cluster_results:
         traceback_text = _format_traceback_full(result.error_traceback)
@@ -6232,14 +6281,15 @@ def _diagnostics_full_tracebacks_section(cluster_results: list[PerformanceResult
             continue
         traceback_entries.append((result.model_name, traceback_text))
 
+    scope = "affected model" if len(traceback_entries) == 1 else "affected models"
     return _render_collapsible_model_blocks(
-        summary="Full tracebacks (all models in this cluster)",
+        summary=f"Technical tracebacks ({scope})",
         entries=traceback_entries,
     )
 
 
 def _diagnostics_captured_output_section(cluster_results: list[PerformanceResult]) -> list[str]:
-    """Build collapsed captured stdout/stderr blocks for models in a cluster."""
+    """Build collapsed captured stdout/stderr blocks for affected models."""
     with_output = [
         (
             r.model_name,
@@ -6248,8 +6298,9 @@ def _diagnostics_captured_output_section(cluster_results: list[PerformanceResult
         for r in cluster_results
     ]
     with_output = [(name, out) for name, out in with_output if out]
+    scope = "affected model" if len(with_output) == 1 else "affected models"
     return _render_collapsible_model_blocks(
-        summary="Captured stdout/stderr (all models in this cluster)",
+        summary=f"Captured stdout/stderr ({scope})",
         entries=with_output,
     )
 
@@ -6484,7 +6535,7 @@ def _issue_target_for_package(
             "model repository",
             f"https://huggingface.co/{urllib.parse.quote(model_name, safe='/')}",
         )
-    return ("check_models", "https://github.com/jrp2014/check_models/issues/new")
+    return ("mlx-vlm", "https://github.com/ml-explore/mlx-vlm/issues/new")
 
 
 def _guess_preflight_issue_package(issue: str) -> str:
@@ -6533,6 +6584,179 @@ def _diagnostics_preflight_section(preflight_issues: Sequence[str]) -> list[str]
     return parts
 
 
+def _pluralize(count: int, singular: str, plural: str | None = None) -> str:
+    """Return singular/plural form based on count."""
+    if count == 1:
+        return singular
+    return plural or f"{singular}s"
+
+
+def _simplify_failure_message(error_message: str | None, *, model_name: str) -> str:
+    """Strip local wrapper prefixes to keep issue text maintainer-focused."""
+    if not error_message:
+        return "Unknown runtime failure."
+
+    message = error_message.split("\n")[0].strip()
+    prefixes = (
+        f"Model generation failed for {model_name}: ",
+        f"Model preflight failed for {model_name}: ",
+    )
+    for prefix in prefixes:
+        if message.startswith(prefix):
+            return message.removeprefix(prefix).strip() or message
+    return message
+
+
+def _friendly_component_label(package: str) -> str:
+    """Return plain-language package/component label for diagnostics."""
+    labels = {
+        "mlx-vlm": "mlx-vlm",
+        "mlx": "mlx",
+        "mlx-lm": "mlx-lm",
+        "transformers": "transformers",
+        "huggingface-hub": "huggingface_hub",
+        "model-config": "model configuration/repository",
+        "unknown": "unknown component",
+    }
+    return labels.get(package, package)
+
+
+def _describe_harness_type(harness_type: str | None) -> str:
+    """Map harness issue type to plain-language description."""
+    descriptions = {
+        "encoding": (
+            "Decoded output contains tokenizer artifacts that should not appear in "
+            "user-facing text."
+        ),
+        "stop_token": (
+            "Generation appears to continue through stop/control tokens instead of ending cleanly."
+        ),
+        "prompt_template": ("Output shape suggests a prompt-template or stop-condition mismatch."),
+        "long_context": "Behavior degrades under long prompt context.",
+        "generation_loop": ("Output appears to drift into instruction/training-template text."),
+    }
+    return descriptions.get(harness_type or "", "Output indicates a likely integration issue.")
+
+
+def _describe_training_leak(leak_type: str) -> str:
+    """Map training-leak subtype to clear prose."""
+    leak_labels = {
+        "instruction_header": "instruction headers mid-output",
+        "task_header": "task/question headers mid-output",
+        "write_prompt": "new writing prompts mid-output",
+        "user_turn": "new user-turn delimiters mid-output",
+        "code_example": "example-code templates mid-output",
+        "qa_pair": "Q/A template patterns mid-output",
+    }
+    label = leak_labels.get(leak_type, "instruction/template text")
+    return f"Generated text appears to continue into {label}."
+
+
+def _describe_token_encoding_detail(token_issue: str) -> str:
+    """Describe token-encoding harness anomalies in plain language."""
+    if match := re.fullmatch(r"bpe_space_leak\((\d+)\)", token_issue):
+        count = match.group(1)
+        return (
+            "Tokenizer space-marker artifacts (for example Ġ) appeared in output "
+            f"(about {count} occurrences)."
+        )
+    if match := re.fullmatch(r"bpe_newline_leak\((\d+)\)", token_issue):
+        count = match.group(1)
+        return (
+            "Tokenizer newline-marker artifacts (for example Ċ) appeared in output "
+            f"(about {count} occurrences)."
+        )
+    if token_issue.startswith("bpe_byte_leak("):
+        return "Byte-level tokenizer artifacts appeared in generated text."
+    return "Tokenizer decoding artifacts appeared in generated text."
+
+
+def _describe_output_detail(output_detail: str) -> str | None:
+    """Describe output-length harness anomalies in plain language."""
+    if output_detail == "zero_tokens":
+        return "Model returned zero output tokens."
+    if match := re.fullmatch(r"truncated\((\d+)tok\)", output_detail):
+        return f"Output appears truncated to about {match.group(1)} tokens."
+    if match := re.fullmatch(r"filler_response\((\d+)tok\)", output_detail):
+        return f"Output was a short generic filler response (about {match.group(1)} tokens)."
+    if match := re.fullmatch(r"output_ratio\(([^)]+)\)", output_detail):
+        ratio_text = match.group(1)
+        return (
+            "Output is very short relative to prompt size "
+            f"({ratio_text}), suggesting possible early-stop or prompt-handling issues."
+        )
+    return None
+
+
+def _describe_long_context_detail(detail: str) -> str | None:
+    """Describe long-context harness anomalies in plain language."""
+    if match := re.fullmatch(r"long_context_empty\((\d+)tok\)", detail):
+        return f"At long prompt length ({match.group(1)} tokens), generation returned empty output."
+    if match := re.fullmatch(r"long_context_low_ratio\(([^;]+);(\d+)->(\d+)\)", detail):
+        ratio_text, prompt_tok, output_tok = match.groups()
+        return (
+            "At long prompt length "
+            f"({prompt_tok} tokens), output stayed unusually short "
+            f"({output_tok} tokens; ratio {ratio_text})."
+        )
+    if match := re.fullmatch(r"long_context_repetition\((\d+)tok\)", detail):
+        return f"At long prompt length ({match.group(1)} tokens), output became repetitive."
+    if match := re.fullmatch(r"long_context_context_drop\((\d+)tok\)", detail):
+        return (
+            "At long prompt length "
+            f"({match.group(1)} tokens), output may stop following prompt/image context."
+        )
+    return None
+
+
+def _describe_harness_detail(detail: str) -> str | None:
+    """Translate internal harness detail tokens into maintainer-friendly prose."""
+    description: str | None = None
+    if detail.startswith("token_leak:"):
+        token = detail.removeprefix("token_leak:")
+        description = (
+            f"Special control token {html.escape(token, quote=False)} appeared in generated text."
+        )
+    elif detail.startswith("token_encoding:"):
+        description = _describe_token_encoding_detail(detail.removeprefix("token_encoding:"))
+    elif detail.startswith("output:"):
+        description = _describe_output_detail(detail.removeprefix("output:"))
+    elif detail.startswith("long_context_"):
+        description = _describe_long_context_detail(detail)
+    elif detail.startswith("training_leak:"):
+        description = _describe_training_leak(detail.removeprefix("training_leak:"))
+    return description
+
+
+def _summarize_quality_signals(qa: GenerationQualityAnalysis | None) -> list[str]:
+    """Convert additional quality flags into self-explanatory prose."""
+    if qa is None:
+        return []
+
+    signals: list[str] = []
+    if qa.is_context_ignored:
+        signals.append("Model output may not follow prompt or image contents.")
+    if qa.is_repetitive:
+        signals.append("Output became repetitive, indicating possible generation instability.")
+    if qa.has_degeneration:
+        signals.append("Output contains corrupted or malformed text segments.")
+    if qa.has_language_mixing:
+        signals.append("Output switched language/script unexpectedly.")
+    if qa.is_refusal:
+        signals.append("Model refused or deflected the requested task.")
+    if qa.formatting_issues:
+        signals.append("Output formatting deviated from the requested structure.")
+
+    unique_signals: list[str] = []
+    seen: set[str] = set()
+    for signal_text in signals:
+        if signal_text in seen:
+            continue
+        seen.add(signal_text)
+        unique_signals.append(signal_text)
+    return unique_signals
+
+
 def _build_cluster_filing_guidance(
     *,
     representative: PerformanceResult,
@@ -6542,7 +6766,7 @@ def _build_cluster_filing_guidance(
     run_args: argparse.Namespace | None,
     repro_bundle_path: Path | None,
 ) -> list[str]:
-    """Build concise filing guidance for one failure cluster."""
+    """Build concise filing guidance for one grouped failure pattern."""
     pkg = representative.error_package or "unknown"
     target_name, target_url = _issue_target_for_package(
         pkg,
@@ -6558,7 +6782,7 @@ def _build_cluster_filing_guidance(
     bundle_text = str(repro_bundle_path) if repro_bundle_path is not None else "not generated"
 
     return [
-        "This cluster section is self-contained. Include it directly when filing upstream.",
+        "This issue section is self-contained. Include it directly when filing upstream.",
         "",
         f"- `{target_name}`: <{target_url}>",
         f"- Repro command: `{repro_command}`",
@@ -6577,7 +6801,7 @@ def _diagnostics_failure_clusters(
     run_args: argparse.Namespace | None,
     repro_bundles: Mapping[str, Path] | None,
 ) -> list[str]:
-    """Build the failure-cluster sections of the diagnostics report."""
+    """Build grouped failure sections of the diagnostics report."""
     failed = [r for r in results if not r.success]
     if not failed:
         return []
@@ -6586,77 +6810,52 @@ def _diagnostics_failure_clusters(
     sorted_clusters = sorted(clusters.items(), key=lambda kv: -len(kv[1]))
 
     parts: list[str] = ["---", ""]
-    for idx, (cluster_signature, cluster_results) in enumerate(sorted_clusters, 1):
-        stage = cluster_results[0].error_stage or "Error"
-        pkg = cluster_results[0].error_package or "unknown"
-        n = len(cluster_results)
-        priority = _diagnostics_priority(n, stage)
+    for idx, (_cluster_signature, cluster_results) in enumerate(sorted_clusters, 1):
         rep = cluster_results[0]
-        rep_phase = rep.failure_phase or "unknown"
-        rep_code = rep.error_code or _build_canonical_error_code(
-            error_stage=stage,
-            error_package=pkg,
-            failure_phase=rep_phase,
+        pkg = rep.error_package or "unknown"
+        component_label = _friendly_component_label(pkg)
+        n = len(cluster_results)
+        priority = _diagnostics_priority(n, rep.error_stage)
+        model_word = _pluralize(n, "model")
+        observed = _simplify_failure_message(rep.error_message, model_name=rep.model_name)
+        affected_models = ", ".join(
+            f"`{DIAGNOSTICS_ESCAPER.escape(r.model_name)}`"
+            for r in sorted(
+                cluster_results,
+                key=lambda row: row.model_name,
+            )
         )
 
         parts.append(
-            f"## {idx}. {stage} — {n} model(s) [`{pkg}`] (Priority: {priority})",
+            f"## {idx}. Failure affecting {n} {model_word} (Priority: {priority})",
         )
         parts.append("")
-
-        full_msg = (rep.error_message or "").split("\n")[0].strip()
-        parts.append(f"**Error:** `{full_msg}`")
-        parts.append(f"**Failure phase:** `{rep_phase}`")
-        parts.append(f"**Canonical code:** `{rep_code}`")
-        parts.append(f"**Signature:** `{cluster_signature}`")
+        parts.append(f"**Observed behavior:** {DIAGNOSTICS_ESCAPER.escape(observed)}")
+        parts.append(f"**Likely component:** `{DIAGNOSTICS_ESCAPER.escape(component_label)}`")
+        parts.append(f"**Affected {_pluralize(n, 'model')}:** {affected_models}")
         parts.append("")
 
-        # Affected models table
+        # Maintainer-facing table (human-readable, no local diagnostic codes).
         table_rows: list[str] = []
         for r in cluster_results:
             model = DIAGNOSTICS_ESCAPER.escape(r.model_name)
-            stage = DIAGNOSTICS_ESCAPER.escape(r.error_stage or "")
-            pkg = DIAGNOSTICS_ESCAPER.escape(r.error_package or "unknown")
-            phase = DIAGNOSTICS_ESCAPER.escape(r.failure_phase or "unknown")
-            code = DIAGNOSTICS_ESCAPER.escape(r.error_code or rep_code)
-            regression = "yes" if r.model_name in diagnostics_context.regressions else "no"
+            short_error = DIAGNOSTICS_ESCAPER.escape(
+                _simplify_failure_message(r.error_message, model_name=r.model_name),
+            )
             history_info = diagnostics_context.failure_history.get(r.model_name)
             first_seen = DIAGNOSTICS_ESCAPER.escape(
                 history_info.first_failure_timestamp if history_info else "unknown",
             )
             recent_repro = DIAGNOSTICS_ESCAPER.escape(_format_recent_repro_ratio(history_info))
             table_rows.append(
-                f"| `{model}` | {phase} | {stage} | {pkg} | `{code}` | "
-                f"{regression} | {first_seen} | {recent_repro} |",
+                f"| `{model}` | {short_error} | {first_seen} | {recent_repro} |",
             )
         _append_markdown_table(
             parts,
-            header=(
-                "| Model | Failure Phase | Error Stage | Package | Code | "
-                "Regression vs Prev | First Seen Failing | Recent Repro |"
-            ),
-            separator=(
-                "| ----- | ------------- | ----------- | ------- | ---- | "
-                "------------------ | ------------------ | ------------ |"
-            ),
+            header=("| Model | Observed Behavior | First Seen Failing | Recent Repro |"),
+            separator="| ----- | ----------------- | ------------------ | ------------ |",
             rows=table_rows,
         )
-
-        # Per-model error messages (only when they differ across the cluster)
-        msgs = {
-            r.model_name: (r.error_message or "").split("\n")[0].strip() for r in cluster_results
-        }
-        if len(set(msgs.values())) > 1:
-            parts.append("**Per-model error messages:**")
-            parts.append("")
-            parts.extend(f"- `{model}`: `{msg}`" for model, msg in msgs.items())
-            parts.append("")
-
-        # Traceback excerpt from the representative model
-        tb_tail = _format_traceback_tail(rep.error_traceback)
-        if tb_tail:
-            parts.append("**Traceback (tail):**")
-            _append_markdown_code_block(parts, tb_tail, language="text")
 
         parts.append(f"### Filing Guidance (`{DIAGNOSTICS_ESCAPER.escape(rep.model_name)}`)")
         parts.append("")
@@ -6675,6 +6874,16 @@ def _diagnostics_failure_clusters(
         )
         parts.extend(filing_guidance)
         parts.append("")
+
+        tb_tail = _format_traceback_tail(rep.error_traceback)
+        if tb_tail:
+            traceback_body: list[str] = []
+            _append_markdown_code_block(traceback_body, tb_tail, language="text")
+            _append_markdown_details_block(
+                parts,
+                summary="Technical traceback excerpt (representative model)",
+                body_lines=traceback_body,
+            )
 
         parts.extend(_diagnostics_full_tracebacks_section(cluster_results))
         parts.extend(_diagnostics_captured_output_section(cluster_results))
@@ -6695,9 +6904,9 @@ def _diagnostics_harness_section(
         title=f"## Harness/Integration Issues ({len(harness_results)} model(s))",
         body_lines=[
             "These models completed successfully but show integration problems "
-            "(including empty output, encoding corruption, stop-token leakage, "
-            "or prompt-template/long-context issues) that indicate stack bugs "
-            "rather than inherent model quality limits.",
+            "(for example stop-token leakage, decoding artifacts, or long-context "
+            "breakdown) that likely point to stack/runtime behavior rather than "
+            "inherent model quality limits.",
         ],
     )
 
@@ -6714,28 +6923,42 @@ def _diagnostics_harness_section(
         if harness_type == "long_context":
             likely_package = "mlx-vlm / mlx"
 
-        parts.append(f"### `{res.model_name}` — {harness_type}")
+        parts.append(f"### `{res.model_name}`")
         parts.append("")
+        parts.append(f"**What looks wrong:** {_describe_harness_type(harness_type)}")
+        parts.append(f"**Likely component:** `{likely_package}`")
         parts.append(
-            f"**Tokens:** prompt={fmt_num(prompt_tokens)}, "
-            f"generated={fmt_num(generated_tokens)}, ratio={ratio_text}",
+            f"**Token summary:** prompt={fmt_num(prompt_tokens)}, "
+            f"output={fmt_num(generated_tokens)}, output/prompt={ratio_text}",
         )
-        parts.append(f"**Likely package:** `{likely_package}`")
-        if res.quality_issues:
-            parts.append(f"**Quality flags:** {res.quality_issues}")
         parts.append("")
-        if harness_details:
-            escaped_details = [
-                html.escape(detail, quote=False).replace("\n", "<br>") for detail in harness_details
-            ]
-            parts.append("**Details:** " + ", ".join(escaped_details))
+        observations = [
+            desc for detail in harness_details if (desc := _describe_harness_detail(detail))
+        ]
+        observations.extend(_summarize_quality_signals(qa))
+        unique_observations: list[str] = []
+        seen: set[str] = set()
+        for observation in observations:
+            if observation in seen:
+                continue
+            seen.add(observation)
+            unique_observations.append(observation)
+        if unique_observations:
+            parts.append("**Why this appears to be an integration/runtime issue:**")
+            parts.append("")
+            parts.extend(f"- {observation}" for observation in unique_observations)
             parts.append("")
         snippet_source = text.strip() or "<empty output>"
         snippet = snippet_source[:_DIAGNOSTICS_OUTPUT_SNIPPET_LEN]
         if len(snippet_source) > _DIAGNOSTICS_OUTPUT_SNIPPET_LEN:
             snippet += "..."
-        parts.append("**Sample output:**")
-        _append_markdown_code_block(parts, snippet, language="text")
+        sample_output_body: list[str] = []
+        _append_markdown_code_block(sample_output_body, snippet, language="text")
+        _append_markdown_details_block(
+            parts,
+            summary="Sample output",
+            body_lines=sample_output_body,
+        )
 
     return parts
 
@@ -6763,7 +6986,6 @@ def _diagnostics_stack_signal_section(
         prompt_tokens = int(getattr(gen, "prompt_tokens", 0) or 0) if gen else 0
         generated_tokens = int(getattr(gen, "generation_tokens", 0) or 0) if gen else 0
         ratio = f"{(generated_tokens / prompt_tokens):.2%}" if prompt_tokens > 0 else "n/a"
-        quality_flags = DIAGNOSTICS_ESCAPER.escape(res.quality_issues or "")
         rows.append(
             "| "
             f"`{DIAGNOSTICS_ESCAPER.escape(res.model_name)}` | "
@@ -6771,19 +6993,14 @@ def _diagnostics_stack_signal_section(
             f"{fmt_num(generated_tokens)} | "
             f"{ratio} | "
             f"{DIAGNOSTICS_ESCAPER.escape(symptom)} | "
-            f"`{DIAGNOSTICS_ESCAPER.escape(package_hint)}` | "
-            f"{quality_flags or '-'} |",
+            f"`{DIAGNOSTICS_ESCAPER.escape(package_hint)}` |",
         )
 
     _append_markdown_table(
         parts,
-        header=(
-            "| Model | Prompt Tok | Output Tok | Output/Prompt | "
-            "Symptom | Likely Package | Quality Flags |"
-        ),
+        header=("| Model | Prompt Tok | Output Tok | Output/Prompt | Symptom | Likely Package |"),
         separator=(
-            "| ----- | ---------- | ---------- | ------------- | "
-            "------- | -------------- | ------------- |"
+            "| ----- | ---------- | ---------- | ------------- | ------- | -------------- |"
         ),
         rows=rows,
     )
@@ -6805,16 +7022,23 @@ def _diagnostics_priority_table(
         clusters = _cluster_failures_by_pattern(results)
         sorted_clusters = sorted(clusters.items(), key=lambda kv: -len(kv[1]))
         for _pattern, cluster_results in sorted_clusters:
-            stage = cluster_results[0].error_stage or "Error"
-            pkg = cluster_results[0].error_package or "unknown"
+            representative = cluster_results[0]
+            pkg = representative.error_package or "unknown"
             n = len(cluster_results)
-            priority = _diagnostics_priority(n, stage)
+            priority = _diagnostics_priority(n, representative.error_stage)
             names = ", ".join(r.model_name.split("/")[-1] for r in cluster_results)
+            issue_label = _truncate_text_preview(
+                _simplify_failure_message(
+                    representative.error_message,
+                    model_name=representative.model_name,
+                ),
+                max_chars=72,
+            )
             # Escape fields
-            esc_stage = DIAGNOSTICS_ESCAPER.escape(stage)
+            esc_issue = DIAGNOSTICS_ESCAPER.escape(issue_label)
             esc_pkg = DIAGNOSTICS_ESCAPER.escape(pkg)
             esc_names = DIAGNOSTICS_ESCAPER.escape(names)
-            table_rows.append(f"| **{priority}** | {esc_stage} | {n} ({esc_names}) | {esc_pkg} |")
+            table_rows.append(f"| **{priority}** | {esc_issue} | {n} ({esc_names}) | {esc_pkg} |")
 
     if harness_results:
         names = ", ".join(r.model_name.split("/")[-1] for r, _ in harness_results)

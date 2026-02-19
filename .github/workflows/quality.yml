@@ -44,18 +44,24 @@ jobs:
           # Install nanobind for stub generation (MLX's approach)
           pip install nanobind
           STUB_ROOT="$(mktemp -d)"
-          STUB_FILE="$STUB_ROOT/core.pyi"
+          GENERATED_STUB=""
 
-          # Generate stub using a deterministic output path.
+          # Generate recursive stubs into an output directory.
           # nanobind output layout for dotted modules varies by version.
-          if python -m nanobind.stubgen -m mlx.core -r -o "$STUB_FILE"; then
-            if [ -f "$STUB_FILE" ]; then
+          if python -m nanobind.stubgen -m mlx.core -r -O "$STUB_ROOT"; then
+            if [ -f "$STUB_ROOT/mlx/core.pyi" ]; then
+              GENERATED_STUB="$STUB_ROOT/mlx/core.pyi"
+            elif [ -f "$STUB_ROOT/core.pyi" ]; then
+              GENERATED_STUB="$STUB_ROOT/core.pyi"
+            fi
+
+            if [ -n "$GENERATED_STUB" ] && [ -f "$GENERATED_STUB" ]; then
               # Copy generated stubs to site-packages to override broken PyPI stubs
               SITE_PACKAGES=$(python -c "import site; print(site.getsitepackages()[0])")
               mkdir -p "$SITE_PACKAGES/mlx"
-              cp "$STUB_FILE" "$SITE_PACKAGES/mlx/core.pyi"
+              cp "$GENERATED_STUB" "$SITE_PACKAGES/mlx/core.pyi"
               mkdir -p "$SITE_PACKAGES/mlx/core"
-              cp "$STUB_FILE" "$SITE_PACKAGES/mlx/core/__init__.pyi"
+              cp "$GENERATED_STUB" "$SITE_PACKAGES/mlx/core/__init__.pyi"
             else
               echo "⚠️ MLX stub file missing after stubgen; type checking may be less accurate"
             fi
