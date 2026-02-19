@@ -9072,14 +9072,15 @@ def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None
 
 def _load_model(
     params: ProcessImageParams,
-) -> tuple[Module, PythonBackend | TokenizersBackend, Any | None]:
+) -> tuple[Module, object, Any | None]:
     """Load model from HuggingFace Hub or local path.
 
     Args:
         params: The parameters for image processing, including model identifier.
 
     Returns:
-        Tuple of (model, processor, config) where config may be None.
+        Tuple of ``(model, processor, config)`` where ``processor`` is an
+        AutoProcessor-like runtime object and ``config`` may be ``None``.
     """
     model, processor = load(
         path_or_hf_repo=params.model_identifier,
@@ -9088,9 +9089,6 @@ def _load_model(
         revision=params.revision,
         trust_remote_code=params.trust_remote_code,
     )
-    # Note: mlx-vlm.utils.load() is type-hinted to return Union[PreTrainedTokenizer, ...]
-    # but at runtime it returns a Processor object (from AutoProcessor).
-
     return model, processor, getattr(model, "config", None)
 
 
