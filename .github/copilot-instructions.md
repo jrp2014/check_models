@@ -108,7 +108,8 @@ The file is organized in this order — use these landmarks to jump to the right
 6. `make quality` — fix issues until clean
 7. `make test` — ensure no regressions
 8. If report formats changed → update `src/output/` fixtures
-9. `git commit -m "feat: description"` and push
+9. Update `CHANGELOG.md` under `[Unreleased]` for any maintainer-relevant change (features, fixes, refactors, tooling/docs workflow updates)
+10. `git commit -m "feat: description"` and push
 
 ### 10. Common edit recipes
 

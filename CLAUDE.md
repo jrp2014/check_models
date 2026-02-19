@@ -11,3 +11,4 @@ Key reminders:
 - Run `make quality` to validate changes (ruff + mypy + ty + pyrefly + pytest + markdownlint)
 - `src/check_models.py` is an intentional single-file monolith — do not split it
 - Add tests to existing `src/tests/test_*.py` files, never create standalone scripts
+- Keep `CHANGELOG.md` (`[Unreleased]`) up to date for maintainer-relevant changes, including refactors and tooling updates

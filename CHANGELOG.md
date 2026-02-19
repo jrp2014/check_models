@@ -26,6 +26,12 @@ Notable changes to this project will be documented in this file.
   `tokenizers`) and the quality gate runs a stub preflight before type checks.
 - CI MLX core stubs are now written to repo-local `typings/` instead of
   mutating `site-packages`, improving reproducibility across runs.
+- Refactored diagnostics/reporting internals for readability and lower
+  duplication without intended behavioral changes:
+  - removed single-use diagnostics wrappers and unused model cleanup state;
+  - deduplicated diagnostics list + traceback normalization paths;
+  - centralized diagnostics prose mappings;
+  - simplified repro command assembly.
 
 ### Fixed
 
@@ -37,6 +43,10 @@ Notable changes to this project will be documented in this file.
 - `tools.validate_env` now treats the known `pip check` Torch
   "not supported on this platform" message as a warning (non-fatal), while still
   failing on real dependency inconsistencies.
+- Fixed `_load_model` return typing to align with runtime processor type,
+  eliminating `ty` `invalid-return-type` failures in CI/local quality checks.
+- Improved diagnostics issue-report readability/safety by using clearer prose and
+  escaping token-leak snippets for Markdown/HTML-safe rendering.
 
 ## [0.2.0] - 2026-02-15
 
