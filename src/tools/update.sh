@@ -284,15 +284,7 @@ update_local_mlx_repos() {
 	echo ""
 	echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	echo "📦 Updating local MLX repositories: ${REPO_NAMES[*]}"
-	echo "━━Successfully installed fsspec-2025.10.0 mlx-vlm-0.3.11
-✓ mlx-vlm installed successfully
-
-[update.sh] Generating type stubs for mlx_lm, mlx_vlm, and tokenizers...
-mlx_lm.evaluate: Failed to import, skipping with error: No module named 'lm_eval'
-mlx_lm.models.olmo: Failed to import, skipping with error: 1
-mlx_vlm.chat_ui: Failed to import, skipping with error: No module named 'gradio'
-Processed 409 modules
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+	echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 	
 	# Check build requirements if mlx is present
 	for repo in "${REPO_NAMES[@]}"; do

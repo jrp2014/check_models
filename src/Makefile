@@ -210,11 +210,23 @@ check: format lint typecheck test ## Core quality pipeline
 quality: ## Run full quality checks (ruff format+lint+mypy+pytest+shellcheck+markdownlint)
 	bash tools/run_quality_checks.sh
 
+.PHONY: quality-strict
+quality-strict: ## Run quality checks and require markdownlint availability
+	@echo "[quality-strict] verifying markdownlint availability..."
+	@if [ -x "node_modules/.bin/markdownlint-cli2" ] || command -v markdownlint-cli2 >/dev/null 2>&1 || command -v npx >/dev/null 2>&1; then \
+		echo "[quality-strict] markdownlint found"; \
+	else \
+		echo "[quality-strict] ERROR: markdownlint-cli2 not available"; \
+		echo "  Install with: make install-markdownlint or ensure npx is available"; \
+		exit 1; \
+	fi
+	bash tools/run_quality_checks.sh
+
 # CI pipeline
 .PHONY: ci
 ci: ## Run full CI pipeline (format check, quality script, dependency sync, tests)
 	@echo "[ci] ruff format --check (fail if unformatted)" && $(RUN_TOOL_PREFIX) ruff format --check $(FMT_PATHS) || (echo "[ci] Formatting issues detected; run 'make format'" && exit 1)
-	@echo "[ci] quality (ruff check + mypy)" && $(RUN_PY) tools/check_quality.py --no-format --no-fix || exit 1
+	@echo "[ci] quality (ruff check + mypy)" && $(RUN_TOOL_PREFIX) ruff check $(FMT_PATHS) && $(RUN_TOOL_PREFIX) mypy --config-file $(MYPY_CONFIG) check_models.py tests || exit 1
 	@echo "[ci] dependency sync check" && $(RUN_PY) tools/update_readme_deps.py --check || exit 1
 	@echo "[ci] running tests"; \
 	TEST_OUTPUT=$$($(RUN_TOOL_PREFIX) pytest 2>&1); RC=$$?; echo "$$TEST_OUTPUT" > .ci_tests.txt; echo "$$TEST_OUTPUT"; \

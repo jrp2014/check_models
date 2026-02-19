@@ -333,6 +333,9 @@ make -C src audit
 
 # Sync README dependency blocks:
 make deps-sync
+
+# Verify README dependency blocks are already in sync (CI-style):
+python -m tools.update_readme_deps --check
 ```
 
 #### Advanced: Using update.sh for MLX Development

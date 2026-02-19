@@ -1057,6 +1057,7 @@ Key commands:
 - `make quality` — full gate (ruff format+lint, mypy, ty, pyrefly, pytest, shellcheck, markdownlint)
 - `make ci` — strict CI-style pipeline
 - `make deps-sync` — sync dependency blocks in docs from `pyproject.toml`
+- `python -m tools.update_readme_deps --check` — verify dependency blocks are already synced (no writes)
 - `make stubs` — regenerate local MLX stubs in `typings/`
 
 For package-local targets (for example `install-dev`, `bootstrap-dev`, `lint-fix`), run:
