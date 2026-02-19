@@ -6648,20 +6648,6 @@ def _simplify_failure_message(error_message: str | None, *, model_name: str) -> 
     return message
 
 
-def _describe_harness_type(harness_type: str | None) -> str:
-    """Map harness issue type to plain-language description."""
-    return _HARNESS_TYPE_DESCRIPTIONS.get(
-        harness_type or "",
-        "Output indicates a likely integration issue.",
-    )
-
-
-def _describe_training_leak(leak_type: str) -> str:
-    """Map training-leak subtype to clear prose."""
-    label = _TRAINING_LEAK_LABELS.get(leak_type, "instruction/template text")
-    return f"Generated text appears to continue into {label}."
-
-
 def _describe_token_encoding_detail(token_issue: str) -> str:
     """Describe token-encoding harness anomalies in plain language."""
     if match := re.fullmatch(r"bpe_space_leak\((\d+)\)", token_issue):
@@ -6734,7 +6720,9 @@ def _describe_harness_detail(detail: str) -> str | None:
     elif detail.startswith("long_context_"):
         description = _describe_long_context_detail(detail)
     elif detail.startswith("training_leak:"):
-        description = _describe_training_leak(detail.removeprefix("training_leak:"))
+        leak_type = detail.removeprefix("training_leak:")
+        leak_label = _TRAINING_LEAK_LABELS.get(leak_type, "instruction/template text")
+        description = f"Generated text appears to continue into {leak_label}."
     return description
 
 
@@ -6928,7 +6916,11 @@ def _diagnostics_harness_section(
 
         parts.append(f"### `{res.model_name}`")
         parts.append("")
-        parts.append(f"**What looks wrong:** {_describe_harness_type(harness_type)}")
+        harness_summary = _HARNESS_TYPE_DESCRIPTIONS.get(
+            harness_type or "",
+            "Output indicates a likely integration issue.",
+        )
+        parts.append(f"**What looks wrong:** {harness_summary}")
         parts.append(f"**Likely component:** `{likely_package}`")
         parts.append(
             f"**Token summary:** prompt={fmt_num(prompt_tokens)}, "
