@@ -17,8 +17,26 @@ Notable changes to this project will be documented in this file.
 - Terminal alignment now manages Unicode display width via `wcwidth` with
   safe fallback behavior, improving centered headers and metric-label padding
   when wide glyphs/emoji appear in output.
+- Improved dependency-management tooling:
+  - `src/tools/check_outdated.py` now uses JSON output with timeout/network-aware
+    handling, and groups results into pyproject-managed vs unmanaged packages.
+  - `src/tools/validate_env.py` now parses dependency specs robustly (including
+    extras syntax) and validates installed versions against declared constraints.
+- Stub generation now targets a broader default set (`mlx-lm`, `mlx-vlm`,
+  `tokenizers`) and the quality gate runs a stub preflight before type checks.
+- CI MLX core stubs are now written to repo-local `typings/` instead of
+  mutating `site-packages`, improving reproducibility across runs.
 
 ### Fixed
+
+- Fixed `src/Makefile` `ci` target to use available commands (ruff + mypy +
+  dependency sync check) instead of referencing removed tooling.
+- Added `--check` mode to `src/tools/update_readme_deps.py` so CI/developers can
+  verify README dependency block sync without rewriting files.
+- Fixed noisy accidental pasted output in `src/tools/update.sh` banner section.
+- `tools.validate_env` now treats the known `pip check` Torch
+  "not supported on this platform" message as a warning (non-fatal), while still
+  failing on real dependency inconsistencies.
 
 ## [0.2.0] - 2026-02-15
 

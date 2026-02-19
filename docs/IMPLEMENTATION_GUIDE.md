@@ -112,7 +112,7 @@ A single medium-sized, well-commented function is often clearer than a web of on
 ### Generated Artifacts
 
 - Generated artifacts (e.g., `typings/`) are **not committed**
-- Regenerate via `make stubs` (from repo root) or `python -m tools.generate_stubs mlx_vlm tokenizers` (from `src/`)
+- Regenerate via `make stubs` (from repo root) or `python -m tools.generate_stubs mlx_lm mlx_vlm tokenizers` (from `src/`)
 - See `.gitignore` for complete list of excluded files
 
 ### Typings Policy
@@ -128,13 +128,13 @@ A single medium-sized, well-commented function is often clearer than a web of on
 make stubs
 
 # Or from src/ directory
-python -m tools.generate_stubs mlx_vlm tokenizers
+python -m tools.generate_stubs mlx_lm mlx_vlm tokenizers
 ```
 
 Or use the quality check with stub generation:
 
 ```bash
-make quality  # Automatically generates stubs if missing
+make quality  # Runs a stub preflight to refresh local typings before type checks
 ```
 
 ## Code Standards

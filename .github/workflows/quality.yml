@@ -56,12 +56,10 @@ jobs:
             fi
 
             if [ -n "$GENERATED_STUB" ] && [ -f "$GENERATED_STUB" ]; then
-              # Copy generated stubs to site-packages to override broken PyPI stubs
-              SITE_PACKAGES=$(python -c "import site; print(site.getsitepackages()[0])")
-              mkdir -p "$SITE_PACKAGES/mlx"
-              cp "$GENERATED_STUB" "$SITE_PACKAGES/mlx/core.pyi"
-              mkdir -p "$SITE_PACKAGES/mlx/core"
-              cp "$GENERATED_STUB" "$SITE_PACKAGES/mlx/core/__init__.pyi"
+              # Keep stubs in repo-local typings/ so mypy/pyrefly consume one source of truth.
+              mkdir -p typings/mlx/core
+              cp "$GENERATED_STUB" typings/mlx/core.pyi
+              cp "$GENERATED_STUB" typings/mlx/core/__init__.pyi
             else
               echo "⚠️ MLX stub file missing after stubgen; type checking may be less accurate"
             fi
@@ -69,11 +67,7 @@ jobs:
             echo "⚠️ MLX stubgen failed; type checking may be less accurate"
           fi
 
-          # Legacy fallback for older nanobind output layout
-          SITE_PACKAGES=$(python -c "import site; print(site.getsitepackages()[0])")
-          cp -r ~/.mlx_stubs/mlx/core/*.pyi "$SITE_PACKAGES/mlx/core/" 2>/dev/null || true
-
-          rm -rf "$STUB_ROOT" ~/.mlx_stubs
+          rm -rf "$STUB_ROOT"
 
       - name: Run quality checks
         env:

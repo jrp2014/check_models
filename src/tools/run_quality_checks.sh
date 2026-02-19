@@ -97,6 +97,17 @@ PY
 echo "=== Dependency Sync ==="
 $PYTHON -m tools.update_readme_deps
 
+echo "=== Type Stub Preflight ==="
+if [[ "${SKIP_STUBS:-0}" == "1" ]]; then
+    echo "ℹ️  Skipping stub generation (SKIP_STUBS=1)"
+else
+    # Best effort: keep local typings fresh for mypy/pyrefly without hard-failing the
+    # whole quality pipeline if stubgen cannot import an optional module.
+    if ! $PYTHON -m tools.generate_stubs; then
+        echo "⚠️  Stub generation failed; continuing with existing stubs"
+    fi
+fi
+
 
 echo "=== Ruff Format ==="
 # In CI mode, only check; in local mode, fix automatically

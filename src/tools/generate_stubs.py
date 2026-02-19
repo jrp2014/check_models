@@ -6,9 +6,9 @@ Safe to run repeatedly; existing stubs for the target packages are overwritten.
 
 Usage examples
 --------------
-    python -m tools.generate_stubs mlx_vlm
+    python -m tools.generate_stubs
     python -m tools.generate_stubs --clear && \
-        python -m tools.generate_stubs mlx_vlm
+        python -m tools.generate_stubs mlx_lm mlx_vlm tokenizers
 
 Notes:
 -----
@@ -144,7 +144,7 @@ logger = logging.getLogger("generate_stubs")
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TYPINGS_DIR = REPO_ROOT / "typings"
 
-DEFAULT_PACKAGES = ["mlx_vlm"]
+DEFAULT_PACKAGES = ["mlx_lm", "mlx_vlm", "tokenizers"]
 _PKG_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
 
 

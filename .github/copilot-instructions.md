@@ -67,7 +67,7 @@ The file is organized in this order — use these landmarks to jump to the right
 | `make install` | Install editable (runtime only) |
 | `make format` | `ruff format src/` |
 | `make ci` | Full strict CI pipeline |
-| `make stubs` | Generate `typings/` stubs for mlx-vlm (git-ignored) |
+| `make stubs` | Generate `typings/` stubs for the MLX ecosystem (`mlx-lm`, `mlx-vlm`, `tokenizers`) |
 | `make deps-sync` | Sync README dependency blocks with pyproject.toml |
 | `make clean` | Remove caches and generated outputs |
 
