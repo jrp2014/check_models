@@ -11,12 +11,12 @@ Test image: `20260214-160213_DSC09231_DxO.jpg` (24.9 MB).
 | Component | Version |
 | --------- | ------- |
 | mlx-vlm | 0.3.12 |
-| mlx | 0.30.7.dev20260218+6305022 |
+| mlx | 0.30.7.dev20260219+d4c81062 |
 | mlx-lm | 0.30.8 |
 | transformers | 5.2.0 |
 | tokenizers | 0.22.2 |
 | huggingface-hub | 1.4.1 |
-| Python Version | 3.13.9 |
+| Python Version | 3.13.11 |
 | OS | Darwin 25.3.0 |
 | macOS Version | 26.3 |
 | GPU/Chip | Apple M4 Max |
@@ -26,74 +26,45 @@ Test image: `20260214-160213_DSC09231_DxO.jpg` (24.9 MB).
 
 ---
 
-## 1. Model Error — 1 model(s) [`mlx-vlm`] (Priority: Medium)
+## 1. Failure affecting 1 model (Priority: Medium)
 
-**Error:** `Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str`
-**Failure phase:** `decode`
-**Canonical code:** `MLX_VLM_DECODE_MODEL`
-**Signature:** `MLX_VLM_DECODE_MODEL:2cf0f8ad5576`
+**Observed behavior:** Failed to process inputs with error: can only concatenate str (not "NoneType") to str
+**Likely component:** `mlx-vlm`
+**Affected model:** `microsoft/Florence-2-large-ft`
 
-| Model | Failure Phase | Error Stage | Package | Code | Regression vs Prev | First Seen Failing | Recent Repro |
-| ----- | ------------- | ----------- | ------- | ---- | ------------------ | ------------------ | ------------ |
-| `microsoft/Florence-2-large-ft` | decode | Model Error | mlx-vlm | `MLX_VLM_DECODE_MODEL` | no | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
+| Model | Observed Behavior | First Seen Failing | Recent Repro |
+| ----- | ----------------- | ------------------ | ------------ |
+| `microsoft/Florence-2-large-ft` | Failed to process inputs with error: can only concatenate str (not "NoneType") to str | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
 
-**Traceback (tail):**
+### Filing Guidance (`microsoft/Florence-2-large-ft`)
 
-```text
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9208, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
-ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
-```
+This issue section is self-contained. Include it directly when filing upstream.
 
-### Issue Template (`microsoft/Florence-2-large-ft`)
-
-Copy/paste GitHub issue template:
-
-````markdown
-### Summary
-Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
-
-### Classification
-- Package attribution: `mlx-vlm`
-- Failure phase: `decode`
-- Error stage: `Model Error`
-- Canonical code: `MLX_VLM_DECODE_MODEL`
-- Signature: `MLX_VLM_DECODE_MODEL:2cf0f8ad5576`
-
-### Affected Models
-microsoft/Florence-2-large-ft
-
-### Minimal Reproduction
-```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft
-```
-
-### Environment Fingerprint
-`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260218+6305022; mlx-vlm=0.3.12; mlx-lm=0.30.8; transformers=5.2.0`
-
-### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260218T183332Z_001_microsoft_Florence-2-large-ft_MLX_VLM_DECODE_MODEL_2cf0f8ad5576.json`
-
-### Traceback Tail
-```text
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9208, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
-ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
-```
-
-### Suggested Tracker
 - `mlx-vlm`: <https://github.com/ml-explore/mlx-vlm/issues/new>
-````
+- Repro command: `python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft`
+- Environment fingerprint: `python=3.13.11; chip=Apple M4 Max; mlx=0.30.7.dev20260219+d4c81062; mlx-vlm=0.3.12; mlx-lm=0.30.8; transformers=5.2.0`
+- Repro bundle: `/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260219T225013Z_001_microsoft_Florence-2-large-ft_MLX_VLM_DECODE_MODEL_2cf0f8ad5576.json`
 
-**Full tracebacks (all models in this cluster):**
+<details>
+<summary>Technical traceback excerpt (representative model)</summary>
 
-### `microsoft/Florence-2-large-ft`
+
+```text
+        f"Failed to process inputs with error: {fallback_error}"
+    ) from fallback_error
+ValueError: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
+The above exception was the direct cause of the following exception:
+Traceback (most recent call last):
+ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
+```
+
+</details>
+
+**Technical tracebacks (affected model):**
+
+<details>
+<summary>Details for microsoft/Florence-2-large-ft</summary>
+
 
 ```text
 Traceback (most recent call last):
@@ -148,16 +119,6 @@ TypeError: can only concatenate str (not "NoneType") to str
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9183, in _run_model_generation
-    output: GenerationResult | SupportsGenerationResult = generate(
-                                                          ~~~~~~~~^
-        model=model,
-        ^^^^^^^^^^^^
-    ...<13 lines>...
-        **extra_kwargs,
-        ^^^^^^^^^^^^^^^
-    )
-    ^
   File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 598, in generate
     for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
                     ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -182,23 +143,16 @@ ValueError: Failed to process inputs with error: can only concatenate str (not "
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9315, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9208, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
 ```
 
-**Captured stdout/stderr (all models in this cluster):**
+</details>
 
-### `microsoft/Florence-2-large-ft`
+**Captured stdout/stderr (affected model):**
+
+<details>
+<summary>Details for microsoft/Florence-2-large-ft</summary>
+
 
 ```text
 === STDOUT ===
@@ -226,126 +180,70 @@ Prioritize what is visibly present. If context conflicts with the image, trust t
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 39235.77it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 14753.09it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
 ```
 
-## 2. Processor Error — 1 model(s) [`model-config`] (Priority: Medium)
+</details>
 
-**Error:** `Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.`
-**Failure phase:** `processor_load`
-**Canonical code:** `MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR`
-**Signature:** `MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR:ba801e92890f`
+## 2. Failure affecting 1 model (Priority: Medium)
 
-| Model | Failure Phase | Error Stage | Package | Code | Regression vs Prev | First Seen Failing | Recent Repro |
-| ----- | ------------- | ----------- | ------- | ---- | ------------------ | ------------------ | ------------ |
-| `mlx-community/deepseek-vl2-8bit` | processor_load | Processor Error | model-config | `MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR` | no | 2026-02-15 03:27:34 GMT | 3/3 recent runs failed |
+**Observed behavior:** Loaded processor has no image_processor; expected multimodal processor.
+**Likely component:** `model configuration/repository`
+**Affected model:** `mlx-community/deepseek-vl2-8bit`
 
-**Traceback (tail):**
+| Model | Observed Behavior | First Seen Failing | Recent Repro |
+| ----- | ----------------- | ------------------ | ------------ |
+| `mlx-community/deepseek-vl2-8bit` | Loaded processor has no image_processor; expected multimodal processor. | 2026-02-15 03:27:34 GMT | 3/3 recent runs failed |
 
-```text
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9146, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
-ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
-```
+### Filing Guidance (`mlx-community/deepseek-vl2-8bit`)
 
-### Issue Template (`mlx-community/deepseek-vl2-8bit`)
+This issue section is self-contained. Include it directly when filing upstream.
 
-Copy/paste GitHub issue template:
-
-````markdown
-### Summary
-Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
-
-### Classification
-- Package attribution: `model-config`
-- Failure phase: `processor_load`
-- Error stage: `Processor Error`
-- Canonical code: `MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR`
-- Signature: `MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR:ba801e92890f`
-
-### Affected Models
-mlx-community/deepseek-vl2-8bit
-
-### Minimal Reproduction
-```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit
-```
-
-### Environment Fingerprint
-`python=3.13.9; chip=Apple M4 Max; mlx=0.30.7.dev20260218+6305022; mlx-vlm=0.3.12; mlx-lm=0.30.8; transformers=5.2.0`
-
-### Repro Bundle
-`/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260218T183332Z_002_mlx-community_deepseek-vl2-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_ba.json`
-
-### Traceback Tail
-```text
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9146, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
-ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
-```
-
-### Suggested Tracker
 - `model repository`: <https://huggingface.co/mlx-community/deepseek-vl2-8bit>
-````
+- Repro command: `python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit`
+- Environment fingerprint: `python=3.13.11; chip=Apple M4 Max; mlx=0.30.7.dev20260219+d4c81062; mlx-vlm=0.3.12; mlx-lm=0.30.8; transformers=5.2.0`
+- Repro bundle: `/Users/jrp/Documents/AI/mlx/check_models/src/output/repro_bundles/20260219T225013Z_002_mlx-community_deepseek-vl2-8bit_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_ba.json`
 
-**Full tracebacks (all models in this cluster):**
+<details>
+<summary>Technical traceback excerpt (representative model)</summary>
 
-### `mlx-community/deepseek-vl2-8bit`
 
 ```text
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9134, in _run_model_generation
-    _run_model_preflight_validators(
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        model_identifier=params.model_identifier,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<2 lines>...
-        phase_callback=phase_callback,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9059, in _run_model_preflight_validators
-    _raise_preflight_error(
-    ~~~~~~~~~~~~~~~~~~~~~~^
-        "Loaded processor has no image_processor; expected multimodal processor.",
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        phase="processor_load",
-        ^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 8973, in _raise_preflight_error
-    raise _tag_exception_failure_phase(ValueError(message), phase)
+ValueError: Loaded processor has no image_processor; expected multimodal processor.
+The above exception was the direct cause of the following exception:
+Traceback (most recent call last):
+ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
+```
+
+</details>
+
+**Technical tracebacks (affected model):**
+
+<details>
+<summary>Details for mlx-community/deepseek-vl2-8bit</summary>
+
+
+```text
+Traceback (most recent call last):
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9315, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9146, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
 
-**Captured stdout/stderr (all models in this cluster):**
+</details>
 
-### `mlx-community/deepseek-vl2-8bit`
+**Captured stdout/stderr (affected model):**
+
+<details>
+<summary>Details for mlx-community/deepseek-vl2-8bit</summary>
+
 
 ```text
 === STDOUT ===
@@ -360,11 +258,13 @@ Added chat tokens
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 9666.01it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 21836.58it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
 ```
+
+</details>
 
 ---
 
@@ -381,31 +281,45 @@ These warnings were detected before inference. They are non-fatal but should be 
 
 ## Harness/Integration Issues (7 model(s))
 
-These models completed successfully but show integration problems (including empty output, encoding corruption, stop-token leakage, or prompt-template/long-context issues) that indicate stack bugs rather than inherent model quality limits.
+These models completed successfully but show integration problems (for example stop-token leakage, decoding artifacts, or long-context breakdown) that likely point to stack/runtime behavior rather than inherent model quality limits.
 
-### `HuggingFaceTB/SmolVLM-Instruct` — prompt_template
+### `HuggingFaceTB/SmolVLM-Instruct`
 
-**Tokens:** prompt=1,455, generated=3, ratio=0.21%
-**Likely package:** `mlx-vlm`
-**Quality flags:** ⚠️harness(prompt_template), context-ignored
+**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
+**Likely component:** `mlx-vlm`
+**Token summary:** prompt=1,455, output=3, output/prompt=0.21%
 
-**Details:** output:truncated(3tok)
+**Why this appears to be an integration/runtime issue:**
 
-**Sample output:**
+- Output appears truncated to about 3 tokens.
+- Model output may not follow prompt or image contents.
+
+<details>
+<summary>Sample output</summary>
+
 
 ```text
 Image.
 ```
 
-### `microsoft/Phi-3.5-vision-instruct` — stop_token
+</details>
 
-**Tokens:** prompt=1,056, generated=500, ratio=47.35%
-**Likely package:** `mlx-vlm`
-**Quality flags:** ⚠️harness(stop_token), lang_mixing, hallucination
+### `microsoft/Phi-3.5-vision-instruct`
 
-**Details:** token_leak:<|end|>, token_leak:<|endoftext|>, training_leak:code_example
+**What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
+**Likely component:** `mlx-vlm`
+**Token summary:** prompt=1,056, output=500, output/prompt=47.35%
 
-**Sample output:**
+**Why this appears to be an integration/runtime issue:**
+
+- Special control token &lt;|end|&gt; appeared in generated text.
+- Special control token &lt;|endoftext|&gt; appeared in generated text.
+- Generated text appears to continue into example-code templates mid-output.
+- Output switched language/script unexpectedly.
+
+<details>
+<summary>Sample output</summary>
+
 
 ```text
 Title: Historic Market Town of Hitchin, England
@@ -413,43 +327,63 @@ Title: Historic Market Town of Hitchin, England
 Description: The Cock, a 16th-century coaching inn, is a prominent feature in Hitchin, England. A classic car is captured in motion in the foreground, ...
 ```
 
-### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` — encoding
+</details>
 
-**Tokens:** prompt=2,414, generated=236, ratio=9.78%
-**Likely package:** `mlx-vlm`
-**Quality flags:** ⚠️harness(encoding)
+### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
 
-**Details:** token_encoding:bpe_space_leak(144)
+**What looks wrong:** Decoded output contains tokenizer artifacts that should not appear in user-facing text.
+**Likely component:** `mlx-vlm`
+**Token summary:** prompt=2,414, output=236, output/prompt=9.78%
 
-**Sample output:**
+**Why this appears to be an integration/runtime issue:**
+
+- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 144 occurrences).
+
+<details>
+<summary>Sample output</summary>
+
 
 ```text
 Title:ĠHistoricĠBlack-and-WhiteĠTimber-FramedĠPubĊĊDescription:ĠAĠ16th-centuryĠcoachingĠinnĠwithĠdistinctiveĠblack-and-whiteĠtimberĠframingĠstandsĠinĠaĠtownĠcenter.ĠAĠpedestrianĠcarriesĠaĠchildĠthroug...
 ```
 
-### `mlx-community/SmolVLM-Instruct-bf16` — prompt_template
+</details>
 
-**Tokens:** prompt=1,455, generated=3, ratio=0.21%
-**Likely package:** `mlx-vlm`
-**Quality flags:** ⚠️harness(prompt_template), context-ignored
+### `mlx-community/SmolVLM-Instruct-bf16`
 
-**Details:** output:truncated(3tok)
+**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
+**Likely component:** `mlx-vlm`
+**Token summary:** prompt=1,455, output=3, output/prompt=0.21%
 
-**Sample output:**
+**Why this appears to be an integration/runtime issue:**
+
+- Output appears truncated to about 3 tokens.
+- Model output may not follow prompt or image contents.
+
+<details>
+<summary>Sample output</summary>
+
 
 ```text
 Image.
 ```
 
-### `mlx-community/X-Reasoner-7B-8bit` — long_context
+</details>
 
-**Tokens:** prompt=16,479, generated=500, ratio=3.03%
-**Likely package:** `mlx-vlm / mlx`
-**Quality flags:** ⚠️harness(long_context), long-context, repetitive(phrase: "pub outdoor lanterns, pub...")
+### `mlx-community/X-Reasoner-7B-8bit`
 
-**Details:** long_context_repetition(16479tok)
+**What looks wrong:** Behavior degrades under long prompt context.
+**Likely component:** `mlx-vlm / mlx`
+**Token summary:** prompt=16,479, output=500, output/prompt=3.03%
 
-**Sample output:**
+**Why this appears to be an integration/runtime issue:**
+
+- At long prompt length (16479 tokens), output became repetitive.
+- Output became repetitive, indicating possible generation instability.
+
+<details>
+<summary>Sample output</summary>
+
 
 ```text
 **Title:** Historic Pub with Classic Car and Pedestrian in Town Centre
@@ -457,33 +391,52 @@ Image.
 **Description:** A man carries a child through the archway of a historic black-and-white timber-framed pub, while a classic car ...
 ```
 
-### `mlx-community/paligemma2-10b-ft-docci-448-bf16` — prompt_template
+</details>
 
-**Tokens:** prompt=1,279, generated=13, ratio=1.02%
-**Likely package:** `mlx-vlm`
-**Quality flags:** ⚠️harness(prompt_template), context-ignored
+### `mlx-community/paligemma2-10b-ft-docci-448-bf16`
 
-**Details:** output:output_ratio(1.0%)
+**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
+**Likely component:** `mlx-vlm`
+**Token summary:** prompt=1,279, output=13, output/prompt=1.02%
 
-**Sample output:**
+**Why this appears to be an integration/runtime issue:**
+
+- Output is very short relative to prompt size (1.0%), suggesting possible early-stop or prompt-handling issues.
+- Model output may not follow prompt or image contents.
+
+<details>
+<summary>Sample output</summary>
+
 
 ```text
 If the image is too complex, use a generic label.
 ```
 
-### `prince-canuma/Florence-2-large-ft` — stop_token
+</details>
 
-**Tokens:** prompt=823, generated=500, ratio=60.75%
-**Likely package:** `mlx-vlm`
-**Quality flags:** ⚠️harness(stop_token), lang_mixing, degeneration, formatting, context-ignored
+### `prince-canuma/Florence-2-large-ft`
 
-**Details:** token_leak:<s>
+**What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
+**Likely component:** `mlx-vlm`
+**Token summary:** prompt=823, output=500, output/prompt=60.75%
 
-**Sample output:**
+**Why this appears to be an integration/runtime issue:**
+
+- Special control token &lt;s&gt; appeared in generated text.
+- Model output may not follow prompt or image contents.
+- Output contains corrupted or malformed text segments.
+- Output switched language/script unexpectedly.
+- Output formatting deviated from the requested structure.
+
+<details>
+<summary>Sample output</summary>
+
 
 ```text
 <s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s...
 ```
+
+</details>
 
 ---
 
@@ -491,9 +444,9 @@ If the image is too complex, use a generic label.
 
 These models technically succeeded, but token/output patterns suggest likely integration/runtime issues worth checking upstream.
 
-| Model | Prompt Tok | Output Tok | Output/Prompt | Symptom | Likely Package | Quality Flags |
-| ----- | ---------- | ---------- | ------------- | ------- | -------------- | ------------- |
-| `mlx-community/X-Reasoner-7B-8bit` | 16,479 | 500 | 3.03% | Repetition under extreme prompt length | `mlx-vlm / mlx` | ⚠️harness(long_context), long-context, repetitive(phrase: "pub outdoor lanterns, pub...") |
+| Model | Prompt Tok | Output Tok | Output/Prompt | Symptom | Likely Package |
+| ----- | ---------- | ---------- | ------------- | ------- | -------------- |
+| `mlx-community/X-Reasoner-7B-8bit` | 16,479 | 500 | 3.03% | Repetition under extreme prompt length | `mlx-vlm / mlx` |
 
 ---
 
@@ -515,8 +468,8 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 
 | Priority | Issue | Models Affected | Package |
 | -------- | ----- | --------------- | ------- |
-| **Medium** | Model Error | 1 (Florence-2-large-ft) | mlx-vlm |
-| **Medium** | Processor Error | 1 (deepseek-vl2-8bit) | model-config |
+| **Medium** | Failed to process inputs with error: can only concatenate str (not "N... | 1 (Florence-2-large-ft) | mlx-vlm |
+| **Medium** | Loaded processor has no image_processor; expected multimodal processor. | 1 (deepseek-vl2-8bit) | model-config |
 | **Medium** | Harness/integration | 7 (SmolVLM-Instruct, Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit, SmolVLM-Instruct-bf16, X-Reasoner-7B-8bit, paligemma2-10b-ft-docci-448-bf16, Florence-2-large-ft) | mlx-vlm |
 | **Medium** | Preflight compatibility warning | 2 issue(s) | mlx-vlm, transformers |
 
@@ -560,4 +513,4 @@ Context: Existing metadata hints (use only if visually consistent):
 Prioritize what is visibly present. If context conflicts with the image, trust the image.
 ```
 
-_Report generated on 2026-02-18 18:33:32 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-02-19 22:50:13 GMT by [check_models](https://github.com/jrp2014/check_models)._
