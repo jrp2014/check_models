@@ -189,7 +189,8 @@ def test_log_summary_emits_comparison_table_and_ascii_charts(
 
     messages = "\n".join(record.message for record in caplog.records)
     assert "Model Comparison (current run):" in messages
-    assert "| #   | Model" in messages
+    assert "|   # | Model" in messages
+    assert "|   TPS |   Total(s) |   Load(s) |   PeakGB |" in messages
     assert "TPS comparison chart:" in messages
     assert "Efficiency chart (higher is faster overall):" in messages
     assert "Failure stage frequency:" in messages
@@ -215,6 +216,34 @@ def test_log_summary_single_model_omits_efficiency_chart(
     assert "Model Comparison (current run):" in messages
     assert "TPS comparison chart:" in messages
     assert "Efficiency chart (higher is faster overall):" not in messages
+
+
+def test_log_summary_comparison_table_sanitizes_non_ascii_notes(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Comparison-table notes should drop emoji to preserve terminal alignment."""
+    caplog.set_level(logging.INFO)
+    result = PerformanceResult(
+        model_name="org/emoji-note",
+        generation=_StubGeneration(generation_tps=15.0, peak_memory=1.1, text="good output"),
+        success=True,
+        generation_time=1.0,
+        model_load_time=0.5,
+        total_time=1.5,
+        quality_issues="⚠️harness(stop_token), output:zero_tokens",
+    )
+
+    log_summary([result], prompt="Describe this image.")
+
+    table_row_messages = [
+        record.message
+        for record in caplog.records
+        if "emoji-note" in record.message and record.message.strip().startswith("|")
+    ]
+    assert table_row_messages
+    row = table_row_messages[0]
+    assert "harness(stop_token)" in row
+    assert "⚠" not in row
 
 
 def test_log_summary_reports_metadata_baseline_delta_when_context_present(

@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-02-19 22:33:58 GMT
+FULL ENVIRONMENT DUMP - 2026-02-20 00:04:36 GMT
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -68,7 +68,7 @@ multiprocess==0.70.18
 mypy==1.19.1
 mypy_extensions==1.1.0
 namex==0.1.0
-nanobind==2.4.0
+nanobind==2.10.2
 networkx==3.6.1
 ninja==1.13.0
 nodeenv==1.10.0
@@ -107,7 +107,7 @@ PyYAML==6.0.3
 regex==2026.2.19
 requests==2.32.5
 rich==14.3.3
-ruff==0.15.1
+ruff==0.15.2
 safetensors==0.7.0
 sentencepiece==0.2.1
 setuptools==82.0.0
@@ -155,5 +155,5 @@ yarl==1.22.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-02-19 22:33:58 GMT
+Environment dump completed at 2026-02-20 00:04:36 GMT
 ================================================================================

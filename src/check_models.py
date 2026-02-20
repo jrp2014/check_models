@@ -6053,11 +6053,13 @@ def _append_markdown_code_block(
     """
     max_backtick_run = max((len(m.group(0)) for m in re.finditer(r"`+", content)), default=0)
     fence = "`" * max(3, max_backtick_run + 1)
-    parts.append("")
+    if not parts or parts[-1] != "":
+        parts.append("")
     parts.append(f"{fence}{language}")
     parts.append(content)
     parts.append(fence)
-    parts.append("")
+    if not parts or parts[-1] != "":
+        parts.append("")
 
 
 def _append_markdown_table(
@@ -6101,27 +6103,6 @@ def _append_markdown_details_block(
     parts.extend(body_lines)
     parts.append("</details>")
     parts.append("")
-
-
-def _render_collapsible_model_blocks(
-    *,
-    summary: str,
-    entries: list[tuple[str, str]],
-) -> list[str]:
-    """Render model-specific text blocks as Markdown sub-sections."""
-    if not entries:
-        return []
-
-    parts = [f"**{summary}:**", ""]
-    for model_name, block_text in entries:
-        details_body: list[str] = []
-        _append_markdown_code_block(details_body, block_text, language="text")
-        _append_markdown_details_block(
-            parts,
-            summary=f"Details for {model_name}",
-            body_lines=details_body,
-        )
-    return parts
 
 
 _LOCAL_RUNNER_TRACEBACK_FRAME_RE: Final[re.Pattern[str]] = re.compile(
@@ -6276,37 +6257,43 @@ def _format_recent_repro_ratio(history_info: FailureHistoryContext | None) -> st
     return f"{recent_failures}/{recent_considered} recent runs failed"
 
 
-def _diagnostics_full_tracebacks_section(cluster_results: list[PerformanceResult]) -> list[str]:
-    """Build collapsed full traceback blocks for affected models."""
-    traceback_entries: list[tuple[str, str]] = []
+def _diagnostics_detailed_trace_logs_section(
+    cluster_results: list[PerformanceResult],
+) -> list[str]:
+    """Build one collapsed block containing traceback/log details per model."""
+    model_logs: list[tuple[str, str | None, str | None]] = []
     for result in cluster_results:
         traceback_text = _format_traceback_full(result.error_traceback)
-        if traceback_text is None:
-            continue
-        traceback_entries.append((result.model_name, traceback_text))
-
-    scope = "affected model" if len(traceback_entries) == 1 else "affected models"
-    return _render_collapsible_model_blocks(
-        summary=f"Technical tracebacks ({scope})",
-        entries=traceback_entries,
-    )
-
-
-def _diagnostics_captured_output_section(cluster_results: list[PerformanceResult]) -> list[str]:
-    """Build collapsed captured stdout/stderr blocks for affected models."""
-    with_output = [
-        (
-            r.model_name,
-            _sanitize_captured_output_for_report(r.captured_output_on_fail or ""),
+        captured_output = _sanitize_captured_output_for_report(
+            result.captured_output_on_fail or "",
         )
-        for r in cluster_results
-    ]
-    with_output = [(name, out) for name, out in with_output if out]
-    scope = "affected model" if len(with_output) == 1 else "affected models"
-    return _render_collapsible_model_blocks(
-        summary=f"Captured stdout/stderr ({scope})",
-        entries=with_output,
+        captured_text = captured_output or None
+        if traceback_text is None and captured_text is None:
+            continue
+        model_logs.append((result.model_name, traceback_text, captured_text))
+
+    if not model_logs:
+        return []
+
+    body_lines: list[str] = []
+    for model_name, traceback_text, captured_text in model_logs:
+        body_lines.append(f"#### `{DIAGNOSTICS_ESCAPER.escape(model_name)}`")
+        body_lines.append("")
+        if traceback_text is not None:
+            body_lines.append("Traceback:")
+            _append_markdown_code_block(body_lines, traceback_text, language="text")
+        if captured_text is not None:
+            body_lines.append("Captured stdout/stderr:")
+            _append_markdown_code_block(body_lines, captured_text, language="text")
+
+    scope = "affected model" if len(model_logs) == 1 else "affected models"
+    parts: list[str] = []
+    _append_markdown_details_block(
+        parts,
+        summary=f"Detailed trace logs ({scope})",
+        body_lines=body_lines,
     )
+    return parts
 
 
 def _cluster_failures_by_pattern(
@@ -6437,10 +6424,9 @@ def _diagnostics_header(
     n_preflight: int,
     n_success: int,
     versions: LibraryVersionDict,
-    system_info: dict[str, str],
     image_path: Path | None,
 ) -> list[str]:
-    """Build title, summary, and environment sections of the diagnostics report."""
+    """Build title and summary sections of the diagnostics report."""
     parts: list[str] = []
     version = versions.get("mlx-vlm") or "unknown"
     parts.append(
@@ -6472,7 +6458,16 @@ def _diagnostics_header(
         except OSError:
             pass
 
-    # Environment table
+    return parts
+
+
+def _diagnostics_environment_section(
+    *,
+    versions: LibraryVersionDict,
+    system_info: dict[str, str],
+) -> list[str]:
+    """Build environment details section for diagnostics report footer context."""
+    parts: list[str] = ["---", ""]
     _append_markdown_section(parts, title="## Environment")
     table_rows: list[str] = []
     for lib in _DIAGNOSTICS_LIB_NAMES:
@@ -6751,46 +6746,25 @@ def _summarize_quality_signals(qa: GenerationQualityAnalysis | None) -> list[str
 def _build_cluster_filing_guidance(
     *,
     representative: PerformanceResult,
-    versions: LibraryVersionDict,
-    system_info: dict[str, str],
     image_path: Path | None,
     run_args: argparse.Namespace | None,
-    repro_bundle_path: Path | None,
 ) -> list[str]:
-    """Build concise filing guidance for one grouped failure pattern."""
-    pkg = representative.error_package or "unknown"
-    target_name, target_url = _issue_target_for_package(
-        pkg,
-        model_name=representative.model_name,
-    )
-    env_fingerprint = _build_environment_fingerprint(versions=versions, system_info=system_info)
+    """Build concise filing guidance with a single copy/paste repro command."""
     repro_tokens = _build_repro_command_tokens(
         image_path=image_path,
         run_args=run_args,
         include_selection=False,
     )
     repro_command = shlex_join([*repro_tokens, "--models", representative.model_name])
-    bundle_text = str(repro_bundle_path) if repro_bundle_path is not None else "not generated"
-
-    return [
-        "This issue section is self-contained. Include it directly when filing upstream.",
-        "",
-        f"- `{target_name}`: <{target_url}>",
-        f"- Repro command: `{repro_command}`",
-        f"- Environment fingerprint: `{env_fingerprint}`",
-        f"- Repro bundle: `{bundle_text}`",
-    ]
+    return [f"- Repro command: `{repro_command}`"]
 
 
 def _diagnostics_failure_clusters(
     results: list[PerformanceResult],
     *,
     diagnostics_context: DiagnosticsContext,
-    versions: LibraryVersionDict,
-    system_info: dict[str, str],
     image_path: Path | None,
     run_args: argparse.Namespace | None,
-    repro_bundles: Mapping[str, Path] | None,
 ) -> list[str]:
     """Build grouped failure sections of the diagnostics report."""
     failed = [r for r in results if not r.success]
@@ -6848,36 +6822,42 @@ def _diagnostics_failure_clusters(
             rows=table_rows,
         )
 
-        parts.append(f"### Filing Guidance (`{DIAGNOSTICS_ESCAPER.escape(rep.model_name)}`)")
+        parts.append("### To reproduce")
         parts.append("")
-        bundle_path = (
-            repro_bundles.get(rep.model_name)
-            if repro_bundles is not None and rep.model_name in repro_bundles
-            else None
-        )
         filing_guidance = _build_cluster_filing_guidance(
             representative=rep,
-            versions=versions,
-            system_info=system_info,
             image_path=image_path,
             run_args=run_args,
-            repro_bundle_path=bundle_path,
         )
         parts.extend(filing_guidance)
         parts.append("")
 
-        tb_tail = _format_traceback_tail(rep.error_traceback)
-        if tb_tail:
-            traceback_body: list[str] = []
-            _append_markdown_code_block(traceback_body, tb_tail, language="text")
-            _append_markdown_details_block(
+        output_entry: tuple[str, str] | None = None
+        for result in cluster_results:
+            generated_text = (
+                str(getattr(result.generation, "text", "") or "").strip()
+                if result.generation is not None
+                else ""
+            )
+            if generated_text:
+                output_entry = (result.model_name, generated_text)
+                break
+
+        if output_entry is not None:
+            output_model, output_text = output_entry
+            parts.append(
+                f"**Observed model output (`{DIAGNOSTICS_ESCAPER.escape(output_model)}`):**",
+            )
+            _append_markdown_code_block(
                 parts,
-                summary="Technical traceback excerpt (representative model)",
-                body_lines=traceback_body,
+                _truncate_text_preview(
+                    output_text,
+                    max_chars=_DIAGNOSTICS_OUTPUT_SNIPPET_LEN,
+                ),
+                language="text",
             )
 
-        parts.extend(_diagnostics_full_tracebacks_section(cluster_results))
-        parts.extend(_diagnostics_captured_output_section(cluster_results))
+        parts.extend(_diagnostics_detailed_trace_logs_section(cluster_results))
 
     return parts
 
@@ -6941,13 +6921,8 @@ def _diagnostics_harness_section(
         snippet = snippet_source[:_DIAGNOSTICS_OUTPUT_SNIPPET_LEN]
         if len(snippet_source) > _DIAGNOSTICS_OUTPUT_SNIPPET_LEN:
             snippet += "..."
-        sample_output_body: list[str] = []
-        _append_markdown_code_block(sample_output_body, snippet, language="text")
-        _append_markdown_details_block(
-            parts,
-            summary="Sample output",
-            body_lines=sample_output_body,
-        )
+        parts.append("**Sample output:**")
+        _append_markdown_code_block(parts, snippet, language="text")
 
     return parts
 
@@ -7420,7 +7395,6 @@ def _diagnostics_footer(
     _append_markdown_code_block(parts, all_models_command, language="bash")
 
     if failed:
-        parts.append("")
         parts.append("### Target specific failing models")
         target_base_tokens = _build_repro_command_tokens(
             image_path=image_path,
@@ -7436,6 +7410,19 @@ def _diagnostics_footer(
 
     parts.append("### Prompt Used")
     _append_markdown_code_block(parts, prompt, language="text")
+    parts.append("### Run details")
+    parts.append("")
+    image_detail = str(image_path) if image_path is not None else "not specified"
+    parts.append(f"- Input image: `{DIAGNOSTICS_ESCAPER.escape(image_detail)}`")
+    if run_args is not None:
+        max_tokens = getattr(run_args, "max_tokens", DEFAULT_MAX_TOKENS)
+        temperature = getattr(run_args, "temperature", DEFAULT_TEMPERATURE)
+        top_p = getattr(run_args, "top_p", 1.0)
+        parts.append(
+            f"- Generation settings: max_tokens={max_tokens}, "
+            f"temperature={temperature}, top_p={top_p}",
+        )
+    parts.append("")
     parts.append(
         f"_Report generated on {local_now_str()} by "
         "[check_models](https://github.com/jrp2014/check_models)._",
@@ -7483,6 +7470,9 @@ def generate_diagnostics_report(
     harness_results = _collect_harness_results(successful)
     stack_signals = _collect_stack_issue_signals(successful)
     preflight_issues = list(history.preflight_issues) if history is not None else []
+    # Repro bundles are exported separately and referenced in output artifacts.
+    # Diagnostics filing guidance now includes only the repro command.
+    _ = repro_bundles
 
     if not failed and not harness_results and not stack_signals and not preflight_issues:
         return False
@@ -7511,18 +7501,15 @@ def generate_diagnostics_report(
         n_preflight=len(preflight_issues),
         n_success=len(successful),
         versions=versions,
-        system_info=system_info,
         image_path=image_path,
     )
+    parts.extend(_diagnostics_priority_table(results, harness_results, preflight_issues))
     parts.extend(
         _diagnostics_failure_clusters(
             results,
             diagnostics_context=diagnostics_context,
-            versions=versions,
-            system_info=system_info,
             image_path=image_path,
             run_args=run_args,
-            repro_bundles=repro_bundles,
         ),
     )
     parts.extend(_diagnostics_preflight_section(preflight_issues))
@@ -7535,7 +7522,12 @@ def generate_diagnostics_report(
             diagnostics_context=diagnostics_context,
         ),
     )
-    parts.extend(_diagnostics_priority_table(results, harness_results, preflight_issues))
+    parts.extend(
+        _diagnostics_environment_section(
+            versions=versions,
+            system_info=system_info,
+        ),
+    )
     parts.extend(
         _diagnostics_footer(
             failed,
@@ -11159,6 +11151,19 @@ def _format_float_or_dash(value: float | None, *, digits: int = 2) -> str:
     return f"{value:.{digits}f}"
 
 
+def _normalize_log_table_cell(text: str) -> str:
+    """Normalize text for stable terminal table rendering.
+
+    The summary comparison table is rendered in fixed-width layout. Remove
+    ANSI/control/non-ASCII glyphs (for example emoji variation sequences) so
+    column alignment stays stable across terminals.
+    """
+    flattened = _strip_ansi(text).replace("\r", " ").replace("\n", " ")
+    compact = re.sub(r"\s+", " ", flattened).strip()
+    ascii_safe = compact.encode("ascii", "ignore").decode("ascii")
+    return ascii_safe or "-"
+
+
 def _ascii_bar(value: float, *, max_value: float, width: int = SUMMARY_CHART_WIDTH) -> str:
     """Render a compact ASCII bar for a positive numeric value."""
     if max_value <= 0 or value <= 0:
@@ -11216,7 +11221,8 @@ def _log_model_comparison_table_and_charts(results: list[PerformanceResult]) -> 
         if res.success and res.generation is not None:
             tps = float(getattr(res.generation, "generation_tps", 0.0) or 0.0)
             peak_mem = float(getattr(res.generation, "peak_memory", 0.0) or 0.0)
-            notes = _truncate_quality_issues(res.quality_issues, max_len=34) or "clean"
+            notes_raw = _truncate_quality_issues(res.quality_issues, max_len=34) or "clean"
+            notes = _normalize_log_table_cell(notes_raw)
             rows.append(
                 [
                     str(idx),
@@ -11236,6 +11242,7 @@ def _log_model_comparison_table_and_charts(results: list[PerformanceResult]) -> 
         else:
             error_note = res.error_code or res.error_stage or res.error_message or "failure"
             error_note = _truncate_text_preview(error_note, max_chars=34)
+            error_note = _normalize_log_table_cell(error_note)
             rows.append(
                 [
                     str(idx),
@@ -11250,7 +11257,13 @@ def _log_model_comparison_table_and_charts(results: list[PerformanceResult]) -> 
             )
 
     headers = ["#", "Model", "Status", "TPS", "Total(s)", "Load(s)", "PeakGB", "Notes"]
-    table_text = tabulate(rows, headers=headers, tablefmt="github", disable_numparse=True)
+    table_text = tabulate(
+        rows,
+        headers=headers,
+        tablefmt="github",
+        disable_numparse=True,
+        colalign=("right", "left", "left", "right", "right", "right", "right", "left"),
+    )
     logger.info("📋 Model Comparison (current run):")
     for line in table_text.splitlines():
         logger.info("   %s", line)

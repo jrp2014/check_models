@@ -11,12 +11,19 @@ Notable changes to this project will be documented in this file.
 - Further compressed `src/check_models.py` (about 200 lines) by deduplicating
   EXIF date/time extraction paths, centralizing special-token leak pattern
   tables, and trimming verbose internal docstrings while preserving behavior.
-- Diagnostics report generation now emits markdownlint-conformant Markdown
-  directly (no HTML `<details>` wrappers in generated failure sections), with
-  robust nested-fence handling for embedded issue templates and code blocks.
+- Diagnostics report generation now emits clearer issue-facing sections:
+  `To reproduce` uses a single repro bullet, model output is shown inline when
+  available, and technical traceback/captured logs are grouped in one
+  collapsible `Detailed trace logs` section.
+- Diagnostics report layout now surfaces `Priority Summary` near the top for
+  faster triage, while moving the full `Environment` table near the bottom
+  (just before reproducibility details).
 - Terminal alignment now manages Unicode display width via `wcwidth` with
   safe fallback behavior, improving centered headers and metric-label padding
   when wide glyphs/emoji appear in output.
+- Terminal `Model Comparison (current run)` table now explicitly right-aligns
+  numeric columns (TPS/timing/memory) and left-aligns text columns for easier
+  visual scanning.
 - Improved dependency-management tooling:
   - `src/tools/check_outdated.py` now uses JSON output with timeout/network-aware
     handling, and groups results into pyproject-managed vs unmanaged packages.
@@ -32,6 +39,9 @@ Notable changes to this project will be documented in this file.
   - deduplicated diagnostics list + traceback normalization paths;
   - centralized diagnostics prose mappings;
   - simplified repro command assembly.
+- Simplified diagnostics failure-cluster filing guidance so it only includes
+  the repro command bullet; full traceback/captured-output diagnostics remain
+  available in the existing collapsible sections.
 
 ### Fixed
 
@@ -47,6 +57,8 @@ Notable changes to this project will be documented in this file.
   eliminating `ty` `invalid-return-type` failures in CI/local quality checks.
 - Improved diagnostics issue-report readability/safety by using clearer prose and
   escaping token-leak snippets for Markdown/HTML-safe rendering.
+- Stabilized terminal summary-table alignment by sanitizing non-ASCII note
+  glyphs (for example warning emoji) in the model comparison table output.
 
 ## [0.2.0] - 2026-02-15
 

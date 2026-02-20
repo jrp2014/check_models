@@ -354,12 +354,18 @@ def _make_failure_with_details(
     error_stage: str = "Model Error",
     traceback_str: str | None = None,
     captured_output: str | None = None,
+    generated_text: str | None = None,
 ) -> PerformanceResult:
     """Create a failure result with full error details for diagnostics tests."""
+    generation = (
+        _MockGeneration(text=generated_text, prompt_tokens=32, generation_tokens=16)
+        if generated_text is not None
+        else None
+    )
     return PerformanceResult(
         model_name=name,
         success=False,
-        generation=None,
+        generation=generation,
         error_stage=error_stage,
         error_message=error_msg,
         error_type=error_type,
@@ -507,7 +513,7 @@ class TestDiagnosticsReport:
         assert "Missing 1 parameters: lm_head.weight" in content
 
     def test_traceback_tail_included(self, tmp_path: Path) -> None:
-        """Traceback excerpt should appear in the report."""
+        """Detailed trace dropdown should include traceback text."""
         tb = (
             "Traceback (most recent call last):\n"
             '  File "foo.py", line 10, in bar\n'
@@ -527,7 +533,7 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "Technical traceback excerpt (representative model)" in content
+        assert "Detailed trace logs (affected model)" in content
         assert "ValueError: bad shape" in content
 
     def test_traceback_omits_local_check_models_frames(self, tmp_path: Path) -> None:
@@ -555,7 +561,7 @@ class TestDiagnosticsReport:
         assert "mlx_vlm/utils.py" in content
 
     def test_full_tracebacks_in_collapsed_section(self, tmp_path: Path) -> None:
-        """Diagnostics should include full traceback blocks per failed model."""
+        """Diagnostics should include full traceback blocks in one collapsed section."""
         tb = "\n".join(f"trace-line-{i}" for i in range(12))
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
@@ -566,13 +572,13 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "Technical tracebacks (affected model)" in content
+        assert "Detailed trace logs (affected model)" in content
         assert "<details>" in content
-        # line 0 is not in the 6-line tail and proves full traceback inclusion.
+        # line 0 confirms full-trace inclusion (not only a tail excerpt).
         assert "trace-line-0" in content
 
     def test_captured_output_in_collapsed_section(self, tmp_path: Path) -> None:
-        """Diagnostics should include captured stdout/stderr blocks when available."""
+        """Diagnostics should include captured stdout/stderr in the detailed log section."""
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
             results=[
@@ -590,12 +596,11 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "Captured stdout/stderr (affected model)" in content
+        assert "Detailed trace logs (affected model)" in content
         assert "Tokenizer warning here" in content
         assert "\x1b[" not in content
         assert "\r" not in content
-        assert "#### `" not in content
-        assert "Details for org/m" in content
+        assert "#### `org/m`" in content
 
     def test_history_context_includes_regressions_recoveries_and_repro(
         self, tmp_path: Path
@@ -662,6 +667,9 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         assert "## Priority Summary" in content
         assert "| Priority | Issue |" in content
+        assert content.index("## Priority Summary") < content.index("## 1. Failure")
+        assert content.index("## Priority Summary") < content.index("## Environment")
+        assert content.index("## Environment") < content.index("## Reproducibility")
 
     def test_report_written_for_stack_signal_without_failures(self, tmp_path: Path) -> None:
         """Suspicious successful runs should still produce diagnostics for stack triage."""
@@ -711,6 +719,7 @@ class TestDiagnosticsReport:
         assert "output/prompt=0.00%" in content
         assert "<empty output>" in content
         assert "Likely component" in content
+        assert "<summary>Sample output</summary>" not in content
 
     def test_harness_token_leak_details_are_escaped(self, tmp_path: Path) -> None:
         """Token leak details should be escaped so markdown does not treat them as HTML."""
@@ -750,8 +759,8 @@ class TestDiagnosticsReport:
         assert "python -m check_models" in content
         assert "python -m check_models --models org/broken-model" in content
 
-    def test_filing_guidance_contains_actionable_metadata(self, tmp_path: Path) -> None:
-        """Failure clusters should include self-contained filing guidance."""
+    def test_filing_guidance_contains_repro_command_only(self, tmp_path: Path) -> None:
+        """Failure clusters should include only a concise repro command."""
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
             results=[
@@ -769,15 +778,37 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "### Filing Guidance" in content
+        assert "### To reproduce" in content
+        assert "### Filing Guidance" not in content
         assert "Copy/paste GitHub issue template" not in content
         assert "Observed behavior" in content
         assert "Failure phase" not in content
         assert "Canonical code" not in content
         assert "Signature" not in content
-        assert "Environment fingerprint" in content
+        assert "Environment fingerprint" not in content
         assert "Repro command" in content
-        assert "transformers/issues/new" in content
+        assert "issues/new" not in content
+        assert "Repro bundle" not in content
+
+    def test_failure_cluster_shows_generated_output_inline(self, tmp_path: Path) -> None:
+        """Failure clusters should show generated output inline when present."""
+        out = tmp_path / "diag.md"
+        generate_diagnostics_report(
+            results=[
+                _make_failure_with_details(
+                    "org/partial",
+                    error_msg="decoder crashed after partial output",
+                    generated_text="Partial decoded answer before crash.",
+                ),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "**Observed model output (`org/partial`):**" in content
+        assert "Partial decoded answer before crash." in content
 
     def test_failure_repro_bundles_written(self, tmp_path: Path) -> None:
         """Each failed model should produce a machine-readable repro bundle."""
@@ -916,6 +947,8 @@ class TestDiagnosticsReport:
         )
         content = out.read_text(encoding="utf-8")
         assert "### Prompt Used" in content
+        assert "### Run details" in content
+        assert "### Run details\n\n- Input image:" in content
         assert "Analyze this image carefully." in content
 
     def test_high_priority_for_multi_model_cluster(self, tmp_path: Path) -> None:
