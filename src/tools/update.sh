@@ -26,7 +26,7 @@
 #      (Note: mlx requires setuptools>=80 and typing_extensions for builds)
 #   3. Install packages in dependency order: mlx → mlx-lm → mlx-vlm
 #   4. (Stubs are now generated automatically by MLX build)
-#   5. Generate stubs for this project (mlx_vlm, tokenizers)
+#   5. Generate stubs for this project (mlx_lm, mlx_vlm, transformers, tokenizers)
 #   6. Skip PyPI updates for these packages
 #
 # Requirements for local MLX builds:
@@ -37,11 +37,12 @@
 #   - setuptools>=80 (required for stub generation)
 #
 # Note:
-# - MLX_METAL_JIT maps to CMake option MLX_BUILD_METAL_KERNELS:
-#     OFF (default) -> -DMLX_BUILD_METAL_KERNELS=ON  (pre-built kernels)
-#     ON            -> -DMLX_BUILD_METAL_KERNELS=OFF (runtime/JIT compilation)
-# - Script automatically detects and preserves local MLX dev builds (versions
-# containing .dev or +commit). Stable releases are updated normally.
+# - If MLX_METAL_JIT is set, update.sh maps it directly to CMake option
+#   MLX_METAL_JIT (ON/OFF). If unset, MLX's CMake default is used (OFF).
+# - MLX Python builds already force -DMLX_BUILD_PYTHON_BINDINGS=ON in mlx/setup.py.
+#   update.sh intentionally does not override that flag.
+# - Script preserves local MLX ecosystem builds using local-repo detection and
+#   editable-install metadata (not only version strings).
 
 set -euo pipefail
 
@@ -160,6 +161,49 @@ pip_install_tool() {
 	local args=("-U")
 	[[ "${FORCE_REINSTALL:-0}" == "1" ]] && args+=("--force-reinstall")
 	pip install "${args[@]}" "$@"
+}
+
+get_editable_project_location() {
+	local package_name="$1"
+	python -m pip show "$package_name" 2>/dev/null \
+		| awk -F': ' '/^Editable project location: / {print $2; exit}'
+}
+
+normalize_path_or_echo() {
+	local input_path="$1"
+	if [[ -d "$input_path" ]]; then
+		(
+			cd "$input_path"
+			pwd -P
+		)
+	else
+		printf '%s\n' "$input_path"
+	fi
+}
+
+verify_expected_editable_install() {
+	local package_name="$1"
+	local expected_repo_path="$2"
+	local editable_path
+	editable_path="$(get_editable_project_location "$package_name")"
+	if [[ -z "$editable_path" ]]; then
+		echo "❌ ERROR: Expected editable install for $package_name but none was found."
+		return 1
+	fi
+
+	local expected_abs
+	local editable_abs
+	expected_abs="$(normalize_path_or_echo "$expected_repo_path")"
+	editable_abs="$(normalize_path_or_echo "$editable_path")"
+
+	if [[ "$editable_abs" != "$expected_abs" ]]; then
+		echo "❌ ERROR: $package_name editable path mismatch."
+		echo "   expected: $expected_abs"
+		echo "   actual:   $editable_abs"
+		return 1
+	fi
+
+	echo "✓ Verified editable install: $package_name -> $editable_abs"
 }
 
 # Ensure global Python packaging tools are current
@@ -376,6 +420,10 @@ update_local_mlx_repos() {
 
 		PREV_CMAKE_ARGS=""
 		CMAKE_ARGS_WAS_SET=0
+		if [[ -n "${CMAKE_ARGS:-}" ]]; then
+			PREV_CMAKE_ARGS="$CMAKE_ARGS"
+			CMAKE_ARGS_WAS_SET=1
+		fi
 
 		# MLX build controls are passed to pip via CMAKE_ARGS.
 		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
@@ -386,21 +434,24 @@ update_local_mlx_repos() {
 			pip_install_tool setuptools
 			pip_install_tool typing_extensions
 
-			local JIT_SETTING="${MLX_METAL_JIT:-OFF}"
-			local KERNEL_BUILD_SETTING="ON"
-			if [[ "$JIT_SETTING" == "ON" ]]; then
-				KERNEL_BUILD_SETTING="OFF"
-			fi
-
-			if [[ -n "${CMAKE_ARGS:-}" ]]; then
-				PREV_CMAKE_ARGS="$CMAKE_ARGS"
-				CMAKE_ARGS_WAS_SET=1
-				export CMAKE_ARGS="$CMAKE_ARGS -DMLX_BUILD_METAL_KERNELS=$KERNEL_BUILD_SETTING"
+			local JIT_SETTING_RAW="${MLX_METAL_JIT:-}"
+			local JIT_SETTING=""
+			if [[ -n "$JIT_SETTING_RAW" ]]; then
+				JIT_SETTING="$(printf '%s' "$JIT_SETTING_RAW" | tr '[:lower:]' '[:upper:]')"
+				if [[ "$JIT_SETTING" == "ON" || "$JIT_SETTING" == "OFF" ]]; then
+					if [[ -n "${CMAKE_ARGS:-}" ]]; then
+						export CMAKE_ARGS="$CMAKE_ARGS -DMLX_METAL_JIT=$JIT_SETTING"
+					else
+						export CMAKE_ARGS="-DMLX_METAL_JIT=$JIT_SETTING"
+					fi
+					echo "[update.sh] Installing mlx with explicit MLX_METAL_JIT=$JIT_SETTING (CMAKE_ARGS=$CMAKE_ARGS)"
+				else
+					echo "⚠️  Invalid MLX_METAL_JIT='$JIT_SETTING_RAW'; ignoring and using MLX default (OFF)"
+					echo "[update.sh] Installing mlx with MLX_METAL_JIT default (CMake default OFF)"
+				fi
 			else
-				export CMAKE_ARGS="-DMLX_BUILD_METAL_KERNELS=$KERNEL_BUILD_SETTING"
+				echo "[update.sh] Installing mlx with MLX_METAL_JIT default (CMake default OFF)"
 			fi
-
-			echo "[update.sh] Installing mlx with MLX_METAL_JIT=$JIT_SETTING (CMAKE_ARGS=$CMAKE_ARGS)"
 		fi
 		
 		# Install package (works for both mlx and others)
@@ -444,20 +495,38 @@ update_local_mlx_repos() {
 	done
 	cd "$ORIGINAL_DIR"
 
+	# Stage 4b: Verify editable origins for mlx-lm/mlx-vlm.
+	# These packages often use release-style version strings even for local builds,
+	# so location metadata is a more reliable signal than version text.
+	echo ""
+	echo "Stage 4b: Verifying editable install origins for mlx-lm/mlx-vlm..."
+	for idx in "${!REPO_NAMES[@]}"; do
+		[[ ${REPO_SKIP[idx]} -eq 1 ]] && continue
+		case "${REPO_NAMES[idx]}" in
+			mlx-lm|mlx-vlm)
+				if ! verify_expected_editable_install "${REPO_NAMES[idx]}" "${REPO_PATHS[idx]}"; then
+					echo "❌ Local build verification failed for ${REPO_NAMES[idx]}"
+					cd "$ORIGINAL_DIR"
+					return 1
+				fi
+				;;
+		esac
+	done
+
 	# Stage 5: Generate project stubs if applicable
 	cd "$SCRIPT_DIR"
 	if [[ -f "$SCRIPT_DIR/generate_stubs.py" ]]; then
-		echo "[update.sh] Generating type stubs for mlx_lm, mlx_vlm, and tokenizers..."
+		echo "[update.sh] Generating type stubs for mlx_lm, mlx_vlm, transformers, and tokenizers..."
 		# Use conda run to ensure we're using the mlx-vlm environment
 		if command -v conda &> /dev/null && conda env list | grep -q "^mlx-vlm "; then
-			if conda run -n mlx-vlm python generate_stubs.py mlx_lm mlx_vlm tokenizers; then
+			if conda run -n mlx-vlm python generate_stubs.py mlx_lm mlx_vlm transformers tokenizers; then
 				echo "✓ Project stubs generated successfully"
 			else
 				echo "⚠️  Failed to generate project stubs (non-fatal)"
 			fi
 		else
 			# Fallback to current python if conda or mlx-vlm env not available
-			if python generate_stubs.py mlx_lm mlx_vlm tokenizers; then
+			if python generate_stubs.py mlx_lm mlx_vlm transformers tokenizers; then
 				echo "✓ Project stubs generated successfully"
 			else
 				echo "⚠️  Failed to generate project stubs (non-fatal)"
@@ -492,6 +561,16 @@ else
 		SKIP_MLX_PYPI=1
 		echo "[update.sh] Detected local MLX build: $MLX_VERSION — preserving..."
 	fi
+
+	# mlx-lm / mlx-vlm local builds can keep release-like version strings, so
+	# also preserve when pip metadata marks them as editable installs.
+	for pkg in mlx-lm mlx-vlm; do
+		EDITABLE_LOC="$(get_editable_project_location "$pkg")"
+		if [[ -n "$EDITABLE_LOC" ]]; then
+			SKIP_MLX_PYPI=1
+			echo "[update.sh] Detected editable $pkg install at $EDITABLE_LOC — preserving..."
+		fi
+	done
 fi
 
 # Update MLX from PyPI if not skipped

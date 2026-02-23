@@ -271,20 +271,32 @@ module = [
     "defusedxml.*",
     "huggingface_hub.*",
     "mlx.*",
-    "mlx_lm.*",
-    "mlx_vlm.*",
     "numpy",
     "PIL.*",
     "psutil",
     "requests",
     "tabulate",
-    "tokenizers.*",
-    "transformers.*",
     "tzlocal",
     "yaml",
 ]
 ignore_missing_imports = true
 follow_imports = "skip"
+
+# Prefer generated stubs for these high-impact runtime packages when available.
+# Missing stubs remain non-fatal (warnings are emitted during stub preflight).
+[[tool.mypy.overrides]]
+module = [
+    "mlx_lm",
+    "mlx_lm.*",
+    "mlx_vlm",
+    "mlx_vlm.*",
+    "tokenizers",
+    "tokenizers.*",
+    "transformers",
+    "transformers.*",
+]
+ignore_missing_imports = true
+follow_imports = "silent"
 
 [tool.ty]
 # ty (Astral's type checker) configuration

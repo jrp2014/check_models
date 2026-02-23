@@ -371,7 +371,9 @@ bash tools/update.sh
 **Environment Variables**:
 
 - `SKIP_TORCH=1`: Skip PyTorch installation (torch is included by default)
-- `MLX_METAL_JIT=ON`: Build local `mlx` with runtime Metal compilation (mapped to `CMAKE_ARGS=-DMLX_BUILD_METAL_KERNELS=OFF`; default `OFF` uses pre-built kernels)
+- `MLX_METAL_JIT=ON`: Build local `mlx` with runtime Metal compilation
+  (mapped to `CMAKE_ARGS=-DMLX_METAL_JIT=ON`; if unset, MLX's default
+  `MLX_METAL_JIT=OFF` uses pre-built kernels)
 
 **MLX_METAL_JIT Trade-offs**:
 
@@ -450,7 +452,8 @@ According to the [official MLX documentation](https://ml-explore.github.io/mlx/b
 
 **When to clean:**
 
-- Before rebuilding MLX with different compiler flags (e.g., changing `MLX_METAL_JIT` / `MLX_BUILD_METAL_KERNELS`)
+- Before rebuilding MLX with different compiler flags (for example changing
+  `MLX_METAL_JIT`)
 - When experiencing odd build or runtime errors
 - To free up disk space
 - After switching between different MLX versions or branches

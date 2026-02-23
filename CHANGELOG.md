@@ -17,6 +17,29 @@ Notable changes to this project will be documented in this file.
     image assets;
   - added a concise `Action Snapshot` near the top of `results.md` to separate
     framework/runtime failures from low-utility model watchlist signals.
+- Updated local MLX build integration in `src/tools/update.sh` to support
+  explicit `MLX_METAL_JIT` pass-through via `-DMLX_METAL_JIT=<ON|OFF>` when
+  requested, while leaving MLX's default behavior untouched when unset; also
+  refreshed docs that previously referenced the older
+  `MLX_BUILD_METAL_KERNELS` mapping.
+- Hardened local-build detection in `src/tools/update.sh` for `mlx-lm` and
+  `mlx-vlm`:
+  - verifies editable install origin paths against local repo paths after local
+    rebuilds (instead of relying on version strings);
+  - preserves editable installs when deciding whether to skip PyPI MLX
+    ecosystem upgrades, even when package versions look like release versions.
+- Expanded local stub generation defaults to include `transformers` alongside
+  `mlx_lm`, `mlx_vlm`, and `tokenizers` (`tools/generate_stubs.py`,
+  `tools/update.sh`, and README command docs).
+- Tightened type-checker stub integration:
+  - mypy now prefers following generated stubs for `mlx_lm`, `mlx_vlm`,
+    `transformers`, and `tokenizers` (`follow_imports = "silent"` override);
+  - quality checks now emit explicit warnings when expected stub packages are
+    missing or contain invalid syntax.
+- Reduced upstream stubgen noise during `transformers` stub generation:
+  known non-actionable `auto_docstring` diagnostics are now suppressed and
+  replaced with a concise suppression count, while actionable/non-zero-exit
+  stubgen output is still surfaced.
 - Raised the project Transformers floor to `>=5.2.0` and aligned packaging,
   runtime checks, and docs/tests to that policy.
 - Aligned preflight package-floor diagnostics in `src/check_models.py` with

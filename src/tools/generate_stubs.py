@@ -8,7 +8,7 @@ Usage examples
 --------------
     python -m tools.generate_stubs
     python -m tools.generate_stubs --clear && \
-        python -m tools.generate_stubs mlx_lm mlx_vlm tokenizers
+        python -m tools.generate_stubs mlx_lm mlx_vlm transformers tokenizers
 
 Notes:
 -----
@@ -139,13 +139,94 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
     )
 
 
+def _patch_transformers_stubs(typings_dir: Path) -> None:
+    """Patch known invalid placeholder tokens emitted in transformers stubs."""
+
+    def _patch_file(path: Path, patches: list[tuple[re.Pattern[str], str]]) -> None:
+        if not path.exists():
+            return
+        text = path.read_text(encoding="utf-8")
+        original = text
+        for pattern, repl in patches:
+            text = pattern.sub(repl, text)
+        if text != original:
+            path.write_text(text, encoding="utf-8")
+            logger.info("[stubs] Patched %s", path.relative_to(typings_dir))
+
+    root = typings_dir / "transformers"
+    if not root.exists():
+        return
+
+    # stubgen can emit "<ERROR>.join(...)" in dataclass field metadata for some
+    # datasets modules. Replace with a stable placeholder join string.
+    join_placeholder_fix = (
+        re.compile(r"<ERROR>\.join\("),
+        "', '.join(",
+    )
+    _patch_file(root / "data/datasets/glue.pyi", [join_placeholder_fix])
+    _patch_file(root / "data/datasets/squad.pyi", [join_placeholder_fix])
+
+
+def _validate_stub_syntax(typings_dir: Path, package_roots: Iterable[str]) -> None:
+    """Warn and remove syntactically-invalid generated stubs.
+
+    Invalid .pyi files can cause mypy to fail hard even when typing is optional.
+    We remove only invalid files and keep the rest of the package stubs.
+    """
+    for package in package_roots:
+        root = typings_dir / package.replace(".", "/")
+        if not root.exists():
+            continue
+
+        invalid_files: list[tuple[Path, int, str]] = []
+        for pyi_path in root.rglob("*.pyi"):
+            try:
+                compile(pyi_path.read_text(encoding="utf-8"), str(pyi_path), "exec")
+            except SyntaxError as err:
+                invalid_files.append(
+                    (
+                        pyi_path,
+                        int(getattr(err, "lineno", 0) or 0),
+                        str(getattr(err, "msg", "invalid syntax")),
+                    ),
+                )
+            except OSError as err:
+                logger.warning("[stubs] Could not read %s: %s", pyi_path, err)
+
+        if not invalid_files:
+            continue
+
+        logger.warning(
+            "[stubs] %d invalid stub file(s) detected under %s; removing broken files",
+            len(invalid_files),
+            root,
+        )
+        for pyi_path, line_no, message in invalid_files:
+            logger.warning(
+                "[stubs] Invalid syntax in %s:%d (%s)",
+                pyi_path.relative_to(typings_dir),
+                line_no,
+                message,
+            )
+            try:
+                pyi_path.unlink()
+            except OSError as err:
+                logger.warning("[stubs] Failed to remove %s: %s", pyi_path, err)
+
+
 logger = logging.getLogger("generate_stubs")
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TYPINGS_DIR = REPO_ROOT / "typings"
 
-DEFAULT_PACKAGES = ["mlx_lm", "mlx_vlm", "tokenizers"]
+DEFAULT_PACKAGES = ["mlx_lm", "mlx_vlm", "transformers", "tokenizers"]
 _PKG_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
+_TRANSFORMERS_STUBGEN_NOISE_TOKENS = (
+    "Something went wrong trying to find the model name in the path:",
+    "Config not found for model. You can manually add it to HARDCODED_CONFIG_FOR_MODELS in utils/auto_docstring.py",
+    "No checkpoint found for ",
+    " but not documented. Make sure to add it to the docstring of the function in ",
+)
 
 
 def _validate_packages(packages: Iterable[str]) -> list[str]:
@@ -160,6 +241,25 @@ def _validate_packages(packages: Iterable[str]) -> list[str]:
             raise ValueError(msg)
         result.append(name)
     return result
+
+
+def _split_stubgen_output(stdout_text: str, stderr_text: str) -> list[str]:
+    """Split stubgen output into normalized, non-empty logical lines."""
+    combined = "\n".join(part for part in (stdout_text, stderr_text) if part)
+    if not combined:
+        return []
+
+    # Upstream can concatenate multiple [ERROR] entries without newlines.
+    normalized = re.sub(r"(?<!\n)(\[ERROR\])", r"\n\1", combined)
+    normalized = re.sub(r"(?<!\n)(Processed \d+ modules)", r"\n\1", normalized)
+    return [line.strip() for line in normalized.splitlines() if line.strip()]
+
+
+def _is_transformers_stubgen_noise(line: str) -> bool:
+    """Return True for known non-actionable transformers stubgen noise lines."""
+    return line.startswith("[ERROR]") and any(
+        token in line for token in _TRANSFORMERS_STUBGEN_NOISE_TOKENS
+    )
 
 
 def run_stubgen(packages: Iterable[str]) -> int:
@@ -197,16 +297,40 @@ def run_stubgen(packages: Iterable[str]) -> int:
         args.extend(["-p", pkg])
     args.extend(["-o", str(TYPINGS_DIR)])
     try:
-        # Suppress stderr to avoid confusing error messages from wrong stubgen commands
-        # that might be in PATH before mypy's stubgen
-        completed = subprocess.run(args, check=False, stderr=subprocess.DEVNULL)
+        completed = subprocess.run(
+            args,
+            check=False,
+            capture_output=True,
+            text=True,
+        )
     except FileNotFoundError:
         logger.exception(
             "[stubs] 'stubgen' (from mypy) not found. Install mypy: pip install mypy",
         )
         return 1
     else:
-        return int(completed.returncode or 0)
+        output_lines = _split_stubgen_output(completed.stdout, completed.stderr)
+        return_code = int(completed.returncode or 0)
+        transformers_requested = any(pkg.split(".")[0] == "transformers" for pkg in pkg_list)
+
+        if return_code == 0 and transformers_requested:
+            suppressed_count = 0
+            for line in output_lines:
+                if _is_transformers_stubgen_noise(line):
+                    suppressed_count += 1
+                    continue
+                logger.info("[stubgen] %s", line)
+            if suppressed_count:
+                logger.info(
+                    "[stubs] Suppressed %d non-actionable transformers stubgen message(s)",
+                    suppressed_count,
+                )
+        else:
+            log_fn = logger.error if return_code else logger.info
+            for line in output_lines:
+                log_fn("[stubgen] %s", line)
+
+        return return_code
 
 
 def main() -> int:
@@ -253,6 +377,10 @@ def main() -> int:
         # Apply post-processing patches for mlx_vlm stubs
         if any(pkg.split(".")[0] == "mlx_vlm" for pkg in ns.packages):
             _patch_mlx_vlm_stubs(TYPINGS_DIR)
+        if any(pkg.split(".")[0] == "transformers" for pkg in ns.packages):
+            _patch_transformers_stubs(TYPINGS_DIR)
+
+        _validate_stub_syntax(TYPINGS_DIR, ns.packages)
 
         # Count and report generated stub files
         stub_count = sum(1 for _ in TYPINGS_DIR.rglob("*.pyi"))

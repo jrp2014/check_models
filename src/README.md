@@ -416,7 +416,7 @@ Several behaviors can be customized via environment variables (useful for CI/aut
 | `USE_TF` | Compatibility backend guard (best effort) | `0` when guard active | `USE_TF=1` |
 | `MLX_VLM_ALLOW_TF` | Override TensorFlow blocking | Not set (blocked) | `MLX_VLM_ALLOW_TF=1` to allow |
 | `TOKENIZERS_PARALLELISM` | Disable tokenizer parallelism warnings | `false` | `TOKENIZERS_PARALLELISM=true` |
-| `MLX_METAL_JIT` | `tools/update.sh` MLX build mode (`MLX_BUILD_METAL_KERNELS`) | `OFF` (pre-built kernels) | `MLX_METAL_JIT=ON` for runtime JIT |
+| `MLX_METAL_JIT` | Optional `tools/update.sh` override (`MLX_METAL_JIT`) | Unset (uses MLX default `OFF`, pre-built kernels) | `MLX_METAL_JIT=ON` for runtime JIT |
 
 When backend guards are active, the script also sets `TRANSFORMERS_NO_FLAX=1`,
 `TRANSFORMERS_NO_JAX=1`, `USE_FLAX=0`, and `USE_JAX=0`.
@@ -1065,7 +1065,8 @@ Key commands:
 - `make ci` — strict CI-style pipeline
 - `make deps-sync` — sync dependency blocks in docs from `pyproject.toml`
 - `python -m tools.update_readme_deps --check` — verify dependency blocks are already synced (no writes)
-- `make stubs` — regenerate local MLX stubs in `typings/`
+- `make stubs` — regenerate local stubs in `typings/` (`mlx_lm`, `mlx_vlm`,
+  `transformers`, `tokenizers`)
 
 For package-local targets (for example `install-dev`, `bootstrap-dev`, `lint-fix`), run:
 

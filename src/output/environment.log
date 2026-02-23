@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-02-23 12:38:35 GMT
+FULL ENVIRONMENT DUMP - 2026-02-23 20:56:43 GMT
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -31,7 +31,7 @@ distlib==0.4.0
 docopt==0.6.2
 einops==0.8.2
 execnet==2.1.2
-fastapi==0.131.0
+fastapi==0.132.0
 filelock==3.24.3
 flatbuffers==25.12.19
 frozenlist==1.8.0
@@ -76,7 +76,7 @@ num2words==0.5.14
 numpy==2.4.2
 opencv-python==4.13.0.92
 opt_einsum==3.4.0
-optree==0.18.0
+optree==0.19.0
 packaging==26.0
 pandas==3.0.1
 pathspec==1.0.4
@@ -96,7 +96,7 @@ pydantic==2.12.5
 pydantic_core==2.41.5
 Pygments==2.19.2
 pyproject_hooks==1.2.0
-pyrefly==0.53.0
+pyrefly==0.54.0
 pyright==1.1.408
 pytest==9.0.2
 pytest-cov==7.0.0
@@ -145,7 +145,7 @@ tzdata==2025.3
 tzlocal==5.3.1
 urllib3==2.6.3
 uvicorn==0.41.0
-virtualenv==20.38.0
+virtualenv==20.39.0
 wcwidth==0.6.0
 Werkzeug==3.1.6
 wheel==0.46.3
@@ -155,5 +155,5 @@ yarl==1.22.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-02-23 12:38:35 GMT
+Environment dump completed at 2026-02-23 20:56:43 GMT
 ================================================================================
