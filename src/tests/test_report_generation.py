@@ -261,6 +261,7 @@ class TestMarkdownReportEdgeCases:
             total_runtime_seconds=2.0,
         )
         content = out.read_text(encoding="utf-8")
+        assert "## 🎯 Action Snapshot" in content
         assert "org/good" in content
         assert "org/bad" in content
 
@@ -667,9 +668,27 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         assert "## Priority Summary" in content
         assert "| Priority | Issue |" in content
+        assert "| Owner | Next Action |" in content
         assert content.index("## Priority Summary") < content.index("## 1. Failure")
         assert content.index("## Priority Summary") < content.index("## Environment")
         assert content.index("## Environment") < content.index("## Reproducibility")
+
+    def test_action_summary_and_portable_triage_sections_present(self, tmp_path: Path) -> None:
+        """Diagnostics should include compact action triage and portable probe commands."""
+        out = tmp_path / "diag.md"
+        generate_diagnostics_report(
+            results=[_make_failure_with_details("org/broken-model")],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "## Action Summary" in content
+        assert "Quick triage list with likely owner and next action" in content
+        assert "Portable dependency probe" in content
+        assert "### Portable triage (no local image required)" in content
+        assert "python -m pip show mlx mlx-vlm mlx-lm transformers" in content
 
     def test_report_written_for_stack_signal_without_failures(self, tmp_path: Path) -> None:
         """Suspicious successful runs should still produce diagnostics for stack triage."""

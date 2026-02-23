@@ -5986,6 +5986,48 @@ def _format_failures_by_package_text(results: list[PerformanceResult]) -> list[s
     return parts
 
 
+def _format_action_snapshot_text(
+    results: list[PerformanceResult],
+    summary: ModelIssueSummary,
+) -> list[str]:
+    """Build a compact triage block for maintainers at top of Markdown report."""
+    parts: list[str] = ["## 🎯 Action Snapshot", ""]
+
+    failed = [res for res in results if not res.success]
+    if failed:
+        owners = Counter(res.error_package or "unknown" for res in failed)
+        owner_summary = ", ".join(f"{owner}={count}" for owner, count in owners.most_common(3))
+        parts.append(
+            f"- **Framework/runtime failures:** {len(failed)} (top owners: {owner_summary}).",
+        )
+        parts.append(
+            "- **Next action:** review `Failures by Package (Actionable)` and `diagnostics.md`.",
+        )
+    else:
+        parts.append("- **Framework/runtime failures:** none.")
+
+    low_utility = summary.get("low_utility_models", [])
+    if low_utility:
+        parts.append(f"- **Model output watchlist:** {len(low_utility)} model(s) graded D/F.")
+        parts.append("- **Next action:** prioritize A/B models and de-prioritize D/F outputs.")
+    else:
+        parts.append("- **Model output watchlist:** none (no D/F utility grades).")
+
+    baseline_score = summary.get("metadata_baseline_score")
+    baseline_grade = summary.get("metadata_baseline_grade")
+    if baseline_score is not None and baseline_grade is not None:
+        better = len(summary.get("cataloging_improves_metadata", []))
+        neutral = len(summary.get("cataloging_neutral_vs_metadata", []))
+        worse = len(summary.get("cataloging_worse_than_metadata", []))
+        parts.append(
+            f"- **Vs existing metadata:** better={better}, neutral={neutral}, worse={worse} "
+            f"(baseline {baseline_grade} {baseline_score:.0f}/100).",
+        )
+
+    parts.append("")
+    return parts
+
+
 # =============================================================================
 # DIAGNOSTICS REPORT — Upstream issue filing aid
 # =============================================================================
@@ -6015,6 +6057,10 @@ _DIAGNOSTICS_LIB_NAMES: Final[tuple[str, ...]] = (
     "transformers",
     "tokenizers",
     "huggingface-hub",
+)
+
+_PORTABLE_DEPENDENCY_PROBE_CMD: Final[str] = (
+    "python -m pip show mlx mlx-vlm mlx-lm transformers huggingface-hub tokenizers"
 )
 
 
@@ -6575,8 +6621,9 @@ def _diagnostics_preflight_section(preflight_issues: Sequence[str]) -> list[str]
         escaped_issue = DIAGNOSTICS_ESCAPER.escape(issue)
         parts.append(f"- `{escaped_issue}`")
         parts.append(
-            f"  - Likely package: `{package}`; suggested tracker: `{target_name}` (<{target_url}>)",
+            f"  - Owner: `{package}`; suggested tracker: `{target_name}` (<{target_url}>)",
         )
+        parts.append(f"  - Suggested next action: {_diagnostics_next_action(package)}")
     parts.append("")
     return parts
 
@@ -6589,6 +6636,16 @@ _DIAGNOSTICS_COMPONENT_LABELS: Final[dict[str, str]] = {
     "huggingface-hub": "huggingface_hub",
     "model-config": "model configuration/repository",
     "unknown": "unknown component",
+}
+
+_DIAGNOSTICS_OWNER_ACTIONS: Final[dict[str, str]] = {
+    "mlx-vlm": "check processor/chat-template wiring and generation kwargs.",
+    "mlx": "check tensor/cache behavior and memory pressure handling.",
+    "mlx-lm": "verify tokenizer/runtime compatibility and quantization settings.",
+    "transformers": "verify API compatibility and pinned version floor.",
+    "huggingface-hub": "check cache/revision availability and network/auth state.",
+    "model-config": "verify model config, tokenizer files, and revision alignment.",
+    "unknown": "capture traceback + env fingerprint, then triage manually.",
 }
 
 _HARNESS_TYPE_DESCRIPTIONS: Final[dict[str, str]] = {
@@ -6611,6 +6668,97 @@ _TRAINING_LEAK_LABELS: Final[dict[str, str]] = {
     "code_example": "example-code templates mid-output",
     "qa_pair": "Q/A template patterns mid-output",
 }
+
+
+def _diagnostics_owner_label(owner_key: str) -> str:
+    """Return readable owner label for diagnostics rows/sections."""
+    return _DIAGNOSTICS_COMPONENT_LABELS.get(owner_key, owner_key)
+
+
+def _diagnostics_next_action(owner_key: str) -> str:
+    """Return a short owner-specific next action hint."""
+    action = _DIAGNOSTICS_OWNER_ACTIONS["unknown"]
+    if owner_key in _DIAGNOSTICS_OWNER_ACTIONS:
+        action = _DIAGNOSTICS_OWNER_ACTIONS[owner_key]
+    elif "mlx-vlm" in owner_key and "mlx" in owner_key:
+        action = (
+            "validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime."
+        )
+    elif "transformers" in owner_key:
+        action = _DIAGNOSTICS_OWNER_ACTIONS["transformers"]
+    elif "mlx-vlm" in owner_key:
+        action = _DIAGNOSTICS_OWNER_ACTIONS["mlx-vlm"]
+    elif "mlx-lm" in owner_key:
+        action = _DIAGNOSTICS_OWNER_ACTIONS["mlx-lm"]
+    elif "mlx" in owner_key:
+        action = _DIAGNOSTICS_OWNER_ACTIONS["mlx"]
+    return action
+
+
+def _diagnostics_action_summary(
+    *,
+    failure_clusters: list[tuple[str, list[PerformanceResult]]],
+    harness_results: list[tuple[PerformanceResult, str]],
+    stack_signals: list[tuple[PerformanceResult, str, str]],
+    preflight_issues: Sequence[str],
+) -> list[str]:
+    """Build a compact, one-screen triage list for maintainers."""
+    items: list[str] = []
+
+    for _pattern, cluster_results in failure_clusters:
+        representative = cluster_results[0]
+        owner_key = representative.error_package or "unknown"
+        owner = _diagnostics_owner_label(owner_key)
+        priority = _diagnostics_priority(len(cluster_results), representative.error_stage)
+        issue = _truncate_text_preview(
+            _simplify_failure_message(
+                representative.error_message,
+                model_name=representative.model_name,
+            ),
+            max_chars=88,
+        )
+        items.append(
+            f"- **[{priority}] [{owner}]** {issue} "
+            f"({len(cluster_results)} model(s)). "
+            f"Next: {_diagnostics_next_action(owner_key)}",
+        )
+
+    if harness_results:
+        items.append(
+            "- **[Medium] [mlx-vlm / mlx]** Harness/integration warnings on "
+            f"{len(harness_results)} model(s). "
+            "Next: validate stop-token decoding and long-context behavior.",
+        )
+
+    if stack_signals:
+        items.append(
+            "- **[Medium] [mlx-vlm / mlx]** Stack-signal anomalies on "
+            f"{len(stack_signals)} successful model(s). "
+            "Next: inspect prompt/output token ratios and empty-output patterns.",
+        )
+
+    if preflight_issues:
+        owners = sorted({_guess_preflight_issue_package(issue) for issue in preflight_issues})
+        owner_text = ", ".join(owners) if owners else "unknown"
+        items.append(
+            "- **[Medium] "
+            f"[{owner_text}]** Preflight compatibility warnings "
+            f"({len(preflight_issues)} issue(s)). "
+            "Next: verify dependency/version compatibility before model runs.",
+        )
+
+    if not items:
+        return []
+
+    parts: list[str] = ["---", ""]
+    _append_markdown_section(
+        parts,
+        title="## Action Summary",
+        body_lines=["Quick triage list with likely owner and next action for each issue class."],
+    )
+    parts.extend(items)
+    parts.append("")
+    return parts
 
 
 def _dedupe_preserve_order(items: Sequence[str]) -> list[str]:
@@ -6747,14 +6895,17 @@ def _build_cluster_filing_guidance(
     image_path: Path | None,
     run_args: argparse.Namespace | None,
 ) -> list[str]:
-    """Build concise filing guidance with a single copy/paste repro command."""
+    """Build concise filing guidance with exact and portable repro probes."""
     repro_tokens = _build_repro_command_tokens(
         image_path=image_path,
         run_args=run_args,
         include_selection=False,
     )
     repro_command = shlex_join([*repro_tokens, "--models", representative.model_name])
-    return [f"- Repro command: `{repro_command}`"]
+    return [
+        f"- Repro command (exact run): `{repro_command}`",
+        f"- Portable dependency probe: `{_PORTABLE_DEPENDENCY_PROBE_CMD}`",
+    ]
 
 
 def _diagnostics_failure_clusters(
@@ -6790,7 +6941,10 @@ def _diagnostics_failure_clusters(
         )
         parts.append("")
         parts.append(f"**Observed behavior:** {DIAGNOSTICS_ESCAPER.escape(observed)}")
-        parts.append(f"**Likely component:** `{DIAGNOSTICS_ESCAPER.escape(component_label)}`")
+        parts.append(
+            f"**Owner (likely component):** `{DIAGNOSTICS_ESCAPER.escape(component_label)}`",
+        )
+        parts.append(f"**Suggested next action:** {_diagnostics_next_action(pkg)}")
         parts.append(f"**Affected {model_word}:** {affected_models}")
         parts.append("")
 
@@ -6896,6 +7050,7 @@ def _diagnostics_harness_section(
         )
         parts.append(f"**What looks wrong:** {harness_summary}")
         parts.append(f"**Likely component:** `{likely_package}`")
+        parts.append(f"**Suggested next action:** {_diagnostics_next_action(likely_package)}")
         parts.append(
             f"**Token summary:** prompt={fmt_num(prompt_tokens)}, "
             f"output={fmt_num(generated_tokens)}, output/prompt={ratio_text}",
@@ -6956,7 +7111,7 @@ def _diagnostics_stack_signal_section(
 
     _append_markdown_table(
         parts,
-        header=("| Model | Prompt Tok | Output Tok | Output/Prompt | Symptom | Likely Package |"),
+        header=("| Model | Prompt Tok | Output Tok | Output/Prompt | Symptom | Owner |"),
         separator=(
             "| ----- | ---------- | ---------- | ------------- | ------- | -------------- |"
         ),
@@ -6979,6 +7134,7 @@ def _diagnostics_priority_table(
         for _pattern, cluster_results in failure_clusters:
             representative = cluster_results[0]
             pkg = representative.error_package or "unknown"
+            owner = _diagnostics_owner_label(pkg)
             n = len(cluster_results)
             priority = _diagnostics_priority(n, representative.error_stage)
             names = ", ".join(r.model_name.split("/")[-1] for r in cluster_results)
@@ -6991,16 +7147,22 @@ def _diagnostics_priority_table(
             )
             # Escape fields
             esc_issue = DIAGNOSTICS_ESCAPER.escape(issue_label)
-            esc_pkg = DIAGNOSTICS_ESCAPER.escape(pkg)
+            esc_owner = DIAGNOSTICS_ESCAPER.escape(owner)
             esc_names = DIAGNOSTICS_ESCAPER.escape(names)
-            table_rows.append(f"| **{priority}** | {esc_issue} | {n} ({esc_names}) | {esc_pkg} |")
+            esc_action = DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action(pkg))
+            table_rows.append(
+                f"| **{priority}** | {esc_issue} | {n} ({esc_names}) | `{esc_owner}` | "
+                f"{esc_action} |",
+            )
 
     if harness_results:
         names = ", ".join(r.model_name.split("/")[-1] for r, _ in harness_results)
         esc_names = DIAGNOSTICS_ESCAPER.escape(names)
         n = len(harness_results)
+        action = DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action("mlx-vlm / mlx"))
         table_rows.append(
-            f"| **Medium** | Harness/integration | {n} ({esc_names}) | mlx-vlm |",
+            "| **Medium** | Harness/integration | "
+            f"{n} ({esc_names}) | `mlx-vlm / mlx` | {action} |",
         )
     if preflight_issues:
         package_names = sorted(
@@ -7008,14 +7170,17 @@ def _diagnostics_priority_table(
         )
         package_summary = DIAGNOSTICS_ESCAPER.escape(", ".join(package_names))
         n = len(preflight_issues)
+        action = DIAGNOSTICS_ESCAPER.escape(
+            "verify dependency/version compatibility before model runs.",
+        )
         table_rows.append(
             f"| **Medium** | Preflight compatibility warning | {n} issue(s) | "
-            f"{package_summary or 'unknown'} |",
+            f"`{package_summary or 'unknown'}` | {action} |",
         )
     _append_markdown_table(
         parts,
-        header="| Priority | Issue | Models Affected | Package |",
-        separator="| -------- | ----- | --------------- | ------- |",
+        header="| Priority | Issue | Models Affected | Owner | Next Action |",
+        separator="| -------- | ----- | --------------- | ----- | ----------- |",
         rows=table_rows,
     )
     return parts
@@ -7388,6 +7553,26 @@ def _diagnostics_footer(
     _append_markdown_section(parts, title="## Reproducibility")
     _append_markdown_code_block(parts, all_models_command, language="bash")
 
+    portable_commands = (
+        "# Capture dependency versions\n"
+        f"{_PORTABLE_DEPENDENCY_PROBE_CMD}\n"
+        "\n"
+        "# Verify imports with explicit pass/fail output\n"
+        "python - <<'PY'\n"
+        "import importlib\n"
+        "packages = ('mlx', 'mlx_vlm', 'mlx_lm', 'transformers', 'huggingface_hub', 'tokenizers')\n"
+        "for name in packages:\n"
+        "    try:\n"
+        "        mod = importlib.import_module(name)\n"
+        "        version = getattr(mod, '__version__', 'unknown')\n"
+        "        print(f'{name} OK {version}')\n"
+        "    except Exception as exc:\n"
+        "        print(f'{name} FAIL {type(exc).__name__}: {exc}')\n"
+        "PY"
+    )
+    parts.append("### Portable triage (no local image required)")
+    _append_markdown_code_block(parts, portable_commands, language="bash")
+
     if failed:
         parts.append("### Target specific failing models")
         target_base_tokens = _build_repro_command_tokens(
@@ -7502,6 +7687,14 @@ def generate_diagnostics_report(
         n_success=len(successful),
         versions=versions,
         image_path=image_path,
+    )
+    parts.extend(
+        _diagnostics_action_summary(
+            failure_clusters=failure_clusters,
+            harness_results=harness_results,
+            stack_signals=stack_signals,
+            preflight_issues=preflight_issues,
+        ),
     )
     parts.extend(_diagnostics_priority_table(failure_clusters, harness_results, preflight_issues))
     parts.extend(
@@ -8111,6 +8304,7 @@ def generate_markdown_report(
     md.append("")
     md.append(f"_Generated on {local_now_str()}_")
     md.append("")
+    md.extend(_format_action_snapshot_text(results, summary))
     # Add issues summary before prompt
     if issues_text:
         md.append(issues_text)

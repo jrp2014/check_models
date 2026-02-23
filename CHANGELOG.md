@@ -8,6 +8,15 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Polished generated report outputs for faster maintainer triage without
+  changing core runtime behavior:
+  - added a compact `Action Summary` near the top of `diagnostics.md` with
+    explicit owner labels and next actions;
+  - expanded diagnostics reproducibility guidance to include both exact rerun
+    commands and portable dependency/import probes that do not require local
+    image assets;
+  - added a concise `Action Snapshot` near the top of `results.md` to separate
+    framework/runtime failures from low-utility model watchlist signals.
 - Raised the project Transformers floor to `>=5.2.0` and aligned packaging,
   runtime checks, and docs/tests to that policy.
 - Aligned preflight package-floor diagnostics in `src/check_models.py` with
