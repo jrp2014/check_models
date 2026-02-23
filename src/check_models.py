@@ -8968,6 +8968,40 @@ _PACKAGE_CODE_MAP: Final[dict[str, str]] = {
     "unknown": "UNKNOWN",
 }
 
+_PACKAGE_OWNER_HINTS: Final[dict[str, str]] = {
+    "mlx": "mlx core/runtime (memory, tensor ops, Metal backend)",
+    "mlx-vlm": "mlx-vlm generation/integration path",
+    "mlx-lm": "mlx-lm text-generation/runtime path",
+    "transformers": "transformers API/processor/tokenizer compatibility",
+    "huggingface-hub": "huggingface-hub fetch/cache/model-file resolution",
+    "model-config": "model repository/config artifacts (not core runtime)",
+    "unknown": "unable to attribute confidently (inspect traceback/signature)",
+}
+_FAILURE_PHASE_HINTS: Final[dict[str, str]] = {
+    "import": "runtime symbol/import checks",
+    "model_load": "model + weights loading",
+    "tokenizer_load": "tokenizer extraction/loading",
+    "processor_load": "processor/image-processor initialization",
+    "model_preflight": "model artifact/config preflight checks",
+    "prefill": "prompt templating/tokenization",
+    "decode": "decode/generation call (`mlx_vlm.generate`)",
+}
+_ERROR_STAGE_HINTS: Final[dict[str, str]] = {
+    "OOM": "out-of-memory pressure in backend runtime",
+    "Timeout": "operation exceeded configured timeout",
+    "Missing Dep": "missing required package(s) or extras",
+    "Lib Version": "incompatible library versions/import surface changed",
+    "API Mismatch": "upstream function signature changed",
+    "Config Missing": "required model config/artifact missing",
+    "No Chat Template": "chat template unavailable in processor/tokenizer",
+    "Weight Mismatch": "model weights/config do not match expected architecture",
+    "Type Cast Error": "MLX type/shape/runtime cast failure",
+    "Processor Error": "processor construction/processor config incompatibility",
+    "Tokenizer Error": "tokenizer class or tokenizer assets mismatch",
+    "Model Error": "model runtime failure in generation path",
+    "Error": "unclassified failure; inspect traceback/signature",
+}
+
 
 def _normalise_failure_phase(phase: str | None) -> str | None:
     """Return a normalized failure phase label or ``None`` when unavailable."""
@@ -9005,6 +9039,34 @@ def _sanitize_error_token(value: str | None, *, default: str) -> str:
         return default
     token = re.sub(r"[^A-Za-z0-9]+", "_", value.strip().upper()).strip("_")
     return token or default
+
+
+def _build_failure_action_hint(
+    *,
+    error_package: str | None,
+    failure_phase: str | None,
+    error_stage: str | None,
+) -> str:
+    """Build an owner/component/cause hint for failed-model summary lines."""
+    package_key = (error_package or "unknown").strip().lower() or "unknown"
+    owner_hint = _PACKAGE_OWNER_HINTS.get(
+        package_key,
+        f"{package_key} (upstream owner not in built-in hint map)",
+    )
+
+    phase_key = _normalise_failure_phase(failure_phase)
+    component_hint = _FAILURE_PHASE_HINTS.get(
+        phase_key or "",
+        f"{phase_key or 'unknown phase'}",
+    )
+
+    stage_key = error_stage or "Error"
+    cause_hint = _ERROR_STAGE_HINTS.get(
+        stage_key,
+        _ERROR_STAGE_HINTS["Error"],
+    )
+
+    return f"owner≈{owner_hint} | component={component_hint} | likely={cause_hint}"
 
 
 def _normalize_error_core_message(error_msg: str) -> str:
@@ -11794,6 +11856,26 @@ def _log_failed_models_summary(failed: list[PerformanceResult]) -> None:
             code_suffix,
             extra={"style_hint": LogStyles.ERROR},
         )
+        action_hint = _build_failure_action_hint(
+            error_package=res.error_package,
+            failure_phase=res.failure_phase,
+            error_stage=res.error_stage,
+        )
+        logger.info(
+            "    -> %s",
+            action_hint,
+            extra={"style_hint": LogStyles.WARNING},
+        )
+        if res.error_message:
+            symptom = _truncate_text_preview(
+                _normalize_error_core_message(res.error_message),
+                max_chars=160,
+            )
+            logger.info(
+                "    -> symptom: %s",
+                symptom,
+                extra={"style_hint": LogStyles.WARNING},
+            )
 
     package_names: list[str] = [res.error_package or "unknown" for res in failed]
     stage_names: list[str] = [res.error_stage or "Unknown" for res in failed]

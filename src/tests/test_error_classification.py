@@ -6,6 +6,7 @@ from check_models import (
     _attribute_error_to_package,
     _build_canonical_error_code,
     _build_error_signature,
+    _build_failure_action_hint,
     _classify_error,
 )
 
@@ -97,3 +98,41 @@ def test_error_signature_normalizes_numeric_variants() -> None:
         error_traceback=None,
     )
     assert sig_a == sig_b
+
+
+@pytest.mark.parametrize(
+    ("error_package", "failure_phase", "error_stage", "expected_phrases"),
+    [
+        (
+            "mlx-vlm",
+            "decode",
+            "Model Error",
+            ("mlx-vlm generation/integration path", "decode/generation", "model runtime failure"),
+        ),
+        (
+            "model-config",
+            "processor_load",
+            "Processor Error",
+            (
+                "model repository/config artifacts",
+                "processor/image-processor initialization",
+                "processor construction",
+            ),
+        ),
+    ],
+)
+def test_build_failure_action_hint_is_maintainer_actionable(
+    error_package: str,
+    failure_phase: str,
+    error_stage: str,
+    expected_phrases: tuple[str, str, str],
+) -> None:
+    """Failure hint should include owner, component, and likely-cause clues."""
+    hint = _build_failure_action_hint(
+        error_package=error_package,
+        failure_phase=failure_phase,
+        error_stage=error_stage,
+    )
+    hint_lower = hint.lower()
+    for phrase in expected_phrases:
+        assert phrase.lower() in hint_lower

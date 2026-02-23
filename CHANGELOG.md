@@ -40,6 +40,10 @@ Notable changes to this project will be documented in this file.
   known non-actionable `auto_docstring` diagnostics are now suppressed and
   replaced with a concise suppression count, while actionable/non-zero-exit
   stubgen output is still surfaced.
+- Improved failed-model summary lines in `check_models.log` to include decoded
+  maintainer hints (`owner≈... | component=... | likely=...`) plus a compact
+  normalized symptom excerpt, making canonical error codes actionable without
+  consulting internal token mappings.
 - Raised the project Transformers floor to `>=5.2.0` and aligned packaging,
   runtime checks, and docs/tests to that policy.
 - Aligned preflight package-floor diagnostics in `src/check_models.py` with
