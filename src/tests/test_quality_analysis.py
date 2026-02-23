@@ -149,6 +149,87 @@ def test_analyze_generation_text_context_ignorance_custom_marker() -> None:
     assert not analysis_default.is_context_ignored
 
 
+def test_analyze_generation_text_catalog_contract_missing_sections() -> None:
+    """Prompt-level catalog contract should flag missing required sections."""
+    prompt = (
+        "Analyze this image for cataloguing metadata.\n"
+        "Return exactly these three sections, and nothing else:\n"
+        "Title: 6-12 words.\nDescription: 1-2 factual sentences.\nKeywords: 15-30 terms."
+    )
+    text = "A misty lakeshore with trees and power lines."
+
+    analysis = check_models.analyze_generation_text(
+        text,
+        generated_tokens=24,
+        prompt=prompt,
+    )
+
+    assert "title" in analysis.missing_sections
+    assert "description" in analysis.missing_sections
+    assert "keywords" in analysis.missing_sections
+
+
+def test_analyze_generation_text_catalog_contract_length_violations() -> None:
+    """Contract checks should flag title and keyword-count violations."""
+    prompt = (
+        "Analyze this image for cataloguing metadata.\n"
+        "Return exactly these three sections, and nothing else:\n"
+        "Title: 6-12 words.\nDescription: 1-2 factual sentences.\nKeywords: 15-30 terms."
+    )
+    text = (
+        "Title: Short title\n"
+        "Description: A misty loch scene with conifer trees and utility infrastructure.\n"
+        "Keywords: loch, mist, trees, building"
+    )
+
+    analysis = check_models.analyze_generation_text(
+        text,
+        generated_tokens=48,
+        prompt=prompt,
+    )
+
+    assert analysis.title_word_count is not None
+    assert analysis.title_word_count < check_models.QUALITY.min_title_words
+    assert analysis.keyword_count is not None
+    assert analysis.keyword_count < check_models.QUALITY.min_keywords_count
+
+
+def test_analyze_generation_text_detects_reasoning_leak() -> None:
+    """Chain-of-thought markers should be flagged explicitly."""
+    text = "<think>Let's analyze the image before answering.</think> Title: Misty loch landscape"
+
+    analysis = check_models.analyze_generation_text(text, generated_tokens=40)
+
+    assert analysis.has_reasoning_leak is True
+    assert analysis.reasoning_leak_markers
+
+
+def test_analyze_generation_text_detects_context_echo() -> None:
+    """Verbatim prompt-context blocks in output should be flagged as context echo."""
+    prompt = (
+        "Analyze this image.\n"
+        "Context: Existing metadata hints:\n"
+        "- Title hint: Misty Loch Katrine shoreline\n"
+        "- Description hint: A misty loch scene with evergreen trees and a utility building.\n"
+        "- Capture metadata: Taken on 2026-02-21 16:14:55 GMT.\n"
+    )
+    text = (
+        "Context: Existing metadata hints:\n"
+        "Title hint: Misty Loch Katrine shoreline\n"
+        "Description hint: A misty loch scene with evergreen trees and a utility building.\n"
+        "Capture metadata: Taken on 2026-02-21 16:14:55 GMT."
+    )
+
+    analysis = check_models.analyze_generation_text(
+        text,
+        generated_tokens=64,
+        prompt=prompt,
+    )
+
+    assert analysis.has_context_echo is True
+    assert analysis.context_echo_ratio > 0
+
+
 def test_repetitive_phrase_detection_uses_quality_thresholds() -> None:
     """Test that phrase repetition detection uses QUALITY config thresholds."""
     # Verify the QUALITY constants exist and have expected types
@@ -532,6 +613,38 @@ def test_build_quality_issues_string_includes_harness() -> None:
     assert result is not None
     assert "⚠️harness" in result
     assert result.startswith("⚠️harness")  # Should be first
+
+
+def test_generation_quality_issues_property_handles_missing_keyword_dup_ratio() -> None:
+    """Issues property should not format None keyword_duplication_ratio."""
+    analysis = check_models.GenerationQualityAnalysis(
+        is_repetitive=False,
+        repeated_token=None,
+        hallucination_issues=[],
+        is_verbose=False,
+        formatting_issues=[],
+        has_excessive_bullets=False,
+        bullet_count=0,
+        is_context_ignored=False,
+        missing_context_terms=[],
+        is_refusal=False,
+        refusal_type=None,
+        is_generic=False,
+        specificity_score=0.0,
+        has_language_mixing=False,
+        language_mixing_issues=[],
+        has_degeneration=False,
+        degeneration_type=None,
+        has_fabrication=False,
+        fabrication_issues=[],
+        has_harness_issue=True,
+        harness_issue_type="encoding",
+        harness_issue_details=["bpe_space_leak(5)"],
+    )
+
+    issues = analysis.issues
+    assert issues
+    assert any("HARNESS" in issue for issue in issues)
 
 
 def test_has_harness_issues_only() -> None:

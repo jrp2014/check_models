@@ -61,9 +61,22 @@ thresholds:
   short_output_words: 15          # Output considered "short"
   substantial_prose_words: 20     # Words needed for "substantial" prose
   max_caption_words: 15           # Max words for implicit caption detection
+  min_title_words: 6              # Minimum words required in Title section
+  max_title_words: 12             # Maximum words allowed in Title section
+  min_description_sentences: 1    # Minimum factual description sentences
+  max_description_sentences: 2    # Maximum factual description sentences
+  min_keywords_count: 15          # Minimum number of keyword terms
+  max_keywords_count: 30          # Maximum number of keyword terms
+  min_keywords_for_duplication_check: 12  # Ignore duplication checks below this size
+  keyword_duplication_ratio_threshold: 0.35  # Keyword duplication threshold
   min_useful_chars: 10            # Minimum chars for useful output
   severe_echo_threshold: 0.8      # Echo ratio triggering severe penalty
   moderate_echo_threshold: 0.5    # Echo ratio triggering moderate penalty
+  context_echo_min_words: 30      # Minimum output words before context-echo scoring
+  context_echo_vocab_ratio_threshold: 0.9  # Vocab-overlap threshold for context echo
+  context_echo_ngram_size: 8      # N-gram size for verbatim context copy detection
+  context_echo_min_shared_ngrams: 3  # Minimum shared n-grams for context echo
+  context_echo_ngram_ratio_threshold: 0.25  # Shared n-gram ratio threshold
   low_grounding_threshold: 0.3    # Visual grounding considered low
   low_compliance_threshold: 0.5   # Task compliance considered low
   low_info_gain_threshold: 0.3    # Information gain considered low
@@ -123,6 +136,14 @@ patterns:
     - "### analysis"
     - "### conclusion"
     - "based on the image"
+
+  reasoning_leak_markers:
+    - "<think>"
+    - "◁think▷"
+    - "◁/think▷"
+    - "here are my reasoning steps"
+    - "the user asks:"
+    - "let's analyze the image"
 
   # Generic output detection
   filler_words:

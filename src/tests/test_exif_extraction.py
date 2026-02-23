@@ -209,6 +209,7 @@ def test_build_prompt_empty_metadata() -> None:
     assert "Title:" in prompt
     assert "Description:" in prompt
     assert "Keywords:" in prompt
+    assert "Do not output reasoning" in prompt
 
 
 def test_build_prompt_includes_metadata_fields() -> None:
@@ -228,6 +229,7 @@ def test_build_prompt_includes_metadata_fields() -> None:
     assert "2025-10-01" in prompt
     assert "18:30" in prompt
     assert "51.0N, 0.9W" in prompt
+    assert "high confidence" in prompt
 
 
 def test_build_prompt_context_marker_present() -> None:

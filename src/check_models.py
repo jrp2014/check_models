@@ -275,9 +275,22 @@ class QualityThresholds:
     short_output_words: int = 15  # Output considered "short"
     substantial_prose_words: int = 20  # Words needed for "substantial" prose
     max_caption_words: int = 15  # Max words for implicit caption detection
+    min_title_words: int = 6  # Minimum words required in Title section
+    max_title_words: int = 12  # Maximum words allowed in Title section
+    min_description_sentences: int = 1  # Minimum factual description sentences
+    max_description_sentences: int = 2  # Maximum factual description sentences
+    min_keywords_count: int = 15  # Minimum number of keyword terms
+    max_keywords_count: int = 30  # Maximum number of keyword terms
+    min_keywords_for_duplication_check: int = 12  # Ignore duplication below this keyword count
+    keyword_duplication_ratio_threshold: float = 0.35  # Dup ratio threshold for keyword loops
     min_useful_chars: int = 10  # Minimum chars for useful output
     severe_echo_threshold: float = 0.8  # Echo ratio triggering severe penalty
     moderate_echo_threshold: float = 0.5  # Echo ratio triggering moderate penalty
+    context_echo_min_words: int = 30  # Minimum output words before context-echo scoring
+    context_echo_vocab_ratio_threshold: float = 0.9  # Vocab overlap threshold for context echo
+    context_echo_ngram_size: int = 8  # N-gram size for verbatim context copy detection
+    context_echo_min_shared_ngrams: int = 3  # Minimum shared n-grams for context echo
+    context_echo_ngram_ratio_threshold: float = 0.25  # Shared n-gram ratio threshold
     low_grounding_threshold: float = 0.3  # Visual grounding considered low
     low_compliance_threshold: float = 0.5  # Task compliance considered low
     low_info_gain_threshold: float = 0.3  # Information gain considered low
@@ -2061,6 +2074,298 @@ def _detect_excessive_bullets(text: str) -> tuple[bool, int]:
     return bullet_count > threshold, bullet_count
 
 
+CONTEXT_NOISE_TERMS: Final[frozenset[str]] = frozenset(
+    {
+        "capture",
+        "cataloguing",
+        "cataloging",
+        "context",
+        "description",
+        "existing",
+        "hint",
+        "hints",
+        "image",
+        "keyword",
+        "keywords",
+        "local",
+        "metadata",
+        "photo",
+        "picture",
+        "taken",
+        "title",
+        "trusted",
+        "visual",
+    },
+)
+
+CONTEXT_TERM_ALIASES: Final[dict[str, tuple[str, ...]]] = {
+    "uk": ("united kingdom", "u k", "u.k."),
+    "united kingdom": ("uk", "u k", "u.k."),
+    "usa": ("united states", "u s a", "u.s.a."),
+    "united states": ("usa", "u s a", "u.s.a."),
+}
+
+PROMPT_ECHO_MARKERS: Final[tuple[str, ...]] = (
+    "return exactly these three sections",
+    "do not output reasoning",
+    "do not copy context hints verbatim",
+    "context: existing metadata hints",
+    "title hint:",
+    "description hint:",
+    "keyword hints:",
+    "capture metadata:",
+)
+
+
+def _normalize_phrase_for_matching(text: str) -> str:
+    """Normalize free-form text for alias and overlap matching."""
+    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9]+", " ", text.casefold())).strip()
+
+
+def _extract_prompt_context_text(prompt: str, context_marker: str = "Context:") -> str:
+    """Extract prompt context text anchored at ``context_marker``.
+
+    Supports inline-marker context (``Context: ...``) and multi-line bullet
+    context blocks. Stops on the first blank line after context content starts.
+    """
+    if not prompt:
+        return ""
+
+    marker_lower = context_marker.casefold()
+    lines = prompt.splitlines()
+
+    for idx, raw_line in enumerate(lines):
+        line = raw_line.strip()
+        if not line.casefold().startswith(marker_lower):
+            continue
+
+        extracted: list[str] = []
+        inline_remainder = (
+            line[len(context_marker) :].strip() if len(line) >= len(context_marker) else ""
+        )
+        if inline_remainder:
+            extracted.append(inline_remainder.lstrip("-").strip())
+
+        for follow in lines[idx + 1 :]:
+            stripped = follow.strip()
+            if not stripped:
+                if extracted:
+                    break
+                continue
+            # Context bullets are expected; strip bullet prefix but retain content.
+            if stripped.startswith(("-", "*", "•")):
+                extracted.append(stripped.lstrip("-*• ").strip())
+                continue
+            # Treat non-bulleted lines as context continuation until first blank line.
+            extracted.append(stripped)
+
+        return "\n".join(part for part in extracted if part).strip()
+
+    return ""
+
+
+def _context_term_present(term: str, normalized_text: str) -> bool:
+    """Return ``True`` when a context term (or alias) appears in normalized text."""
+    canonical = _normalize_phrase_for_matching(term)
+    if not canonical:
+        return False
+
+    variants = {canonical}
+    variants.update(
+        _normalize_phrase_for_matching(v) for v in CONTEXT_TERM_ALIASES.get(canonical, ())
+    )
+    for variant in variants:
+        if not variant:
+            continue
+        if re.search(rf"\b{re.escape(variant)}\b", normalized_text):
+            return True
+    return False
+
+
+def _split_catalog_keywords(raw_keywords: str) -> list[str]:
+    """Split keyword section text into normalized keyword terms."""
+    if not raw_keywords:
+        return []
+    keywords = []
+    for item in re.split(r"[,\n]", raw_keywords):
+        cleaned = re.sub(r"\s+", " ", item).strip(" -*•\t")
+        if cleaned:
+            keywords.append(cleaned)
+    return keywords
+
+
+def _count_factual_sentences(text: str) -> int:
+    """Count sentence-like units in description text with fallback for punctuation-free text."""
+    cleaned = text.strip()
+    if not cleaned:
+        return 0
+    sentence_like = [s for s in re.split(r"(?<=[.!?])\s+|\n+", cleaned) if re.search(r"\w", s)]
+    if sentence_like:
+        if len(sentence_like) == 1 and not re.search(r"[.!?]", cleaned):
+            return 1
+        return len(sentence_like)
+    return 1
+
+
+def _extract_catalog_sections(text: str) -> dict[str, str]:
+    """Extract ``Title/Description/Keywords`` sections from model output."""
+    if not text:
+        return {}
+
+    pattern = re.compile(
+        r"(?im)^\s*(?:[#>*-]\s*)?(?:\*{0,2})\s*(title|description|keywords)(?:\*{0,2})\s*:\s*(.*)$",
+    )
+    matches = list(pattern.finditer(text))
+    if not matches:
+        return {}
+
+    sections: dict[str, str] = {}
+    for idx, match in enumerate(matches):
+        label = match.group(1).casefold()
+        if label in sections:
+            continue
+        section_line = match.group(2).strip()
+        next_start = matches[idx + 1].start() if idx + 1 < len(matches) else len(text)
+        trailing = text[match.end() : next_start].strip()
+        combined = "\n".join(part for part in (section_line, trailing) if part).strip()
+        sections[label] = combined
+    return sections
+
+
+def _prompt_requests_catalog_contract(prompt: str) -> bool:
+    """Return True when prompt clearly requests strict Title/Description/Keywords output."""
+    prompt_lower = prompt.casefold()
+    has_required_labels = all(
+        label in prompt_lower for label in ("title:", "description:", "keywords:")
+    )
+    return has_required_labels and (
+        "return exactly these three sections" in prompt_lower or "catalog" in prompt_lower
+    )
+
+
+def _analyze_catalog_contract(
+    text: str,
+) -> tuple[list[str], int | None, int | None, int | None, float | None]:
+    """Evaluate strict cataloging contract compliance from generated text."""
+    sections = _extract_catalog_sections(text)
+    missing_sections = [
+        section
+        for section in ("title", "description", "keywords")
+        if not sections.get(section, "").strip()
+    ]
+
+    title_word_count = None
+    description_sentence_count = None
+    keyword_count = None
+    keyword_dup_ratio = None
+
+    title_text = sections.get("title", "")
+    if title_text:
+        title_word_count = len(re.findall(r"[A-Za-z0-9']+", title_text))
+
+    description_text = sections.get("description", "")
+    if description_text:
+        description_sentence_count = _count_factual_sentences(description_text)
+
+    keywords_text = sections.get("keywords", "")
+    if keywords_text:
+        keyword_terms = _split_catalog_keywords(keywords_text)
+        keyword_count = len(keyword_terms)
+        if keyword_count >= QUALITY.min_keywords_for_duplication_check and keyword_count > 0:
+            normalized = [_normalize_phrase_for_matching(term) for term in keyword_terms]
+            normalized = [term for term in normalized if term]
+            if normalized:
+                keyword_dup_ratio = 1.0 - (len(set(normalized)) / len(normalized))
+
+    return (
+        missing_sections,
+        title_word_count,
+        description_sentence_count,
+        keyword_count,
+        keyword_dup_ratio,
+    )
+
+
+def _detect_reasoning_leakage(text: str) -> tuple[bool, list[str]]:
+    """Detect chain-of-thought or prompt-echo leakage in generated output."""
+    if not text:
+        return False, []
+
+    text_lower = text.casefold()
+    markers = (
+        QUALITY.patterns.get("reasoning_leak_markers", [])
+        if QUALITY.patterns
+        else [
+            "<think>",
+            "◁think▷",
+            "◁/think▷",
+            "here are my reasoning steps",
+            "the user asks:",
+            "let's analyze the image",
+        ]
+    )
+
+    findings: list[str] = [
+        marker for marker in markers if marker and marker.casefold() in text_lower
+    ]
+    findings.extend(marker for marker in PROMPT_ECHO_MARKERS if marker in text_lower)
+    deduped = _dedupe_preserve_order(findings)
+    return bool(deduped), deduped[:4]
+
+
+def _detect_context_echo(
+    text: str,
+    prompt: str,
+    context_marker: str = "Context:",
+) -> tuple[bool, float]:
+    """Detect likely context regurgitation rather than image-grounded synthesis."""
+    has_echo = False
+    score = 0.0
+
+    if not text or not prompt:
+        return has_echo, score
+
+    text_lower = text.casefold()
+    has_inline_context_block = "context:" in text_lower and any(
+        marker in text_lower for marker in ("title hint:", "description hint:", "capture metadata:")
+    )
+    if has_inline_context_block:
+        return True, 1.0
+
+    context_text = _extract_prompt_context_text(prompt, context_marker=context_marker)
+    if context_text:
+        output_words = re.findall(r"[a-z0-9']+", text_lower)
+        context_words = re.findall(r"[a-z0-9']+", context_text.casefold())
+        if len(output_words) >= QUALITY.context_echo_min_words and context_words:
+            output_vocab = set(output_words)
+            context_vocab = set(context_words)
+            vocab_overlap = len(output_vocab & context_vocab) / max(len(output_vocab), 1)
+            score = round(vocab_overlap, 3)
+            if vocab_overlap >= QUALITY.context_echo_vocab_ratio_threshold:
+                has_echo = True
+            else:
+                ngram_size = max(2, QUALITY.context_echo_ngram_size)
+                if len(output_words) >= ngram_size and len(context_words) >= ngram_size:
+                    output_ngrams = {
+                        tuple(output_words[idx : idx + ngram_size])
+                        for idx in range(len(output_words) - ngram_size + 1)
+                    }
+                    context_ngrams = {
+                        tuple(context_words[idx : idx + ngram_size])
+                        for idx in range(len(context_words) - ngram_size + 1)
+                    }
+                    shared_ngrams = output_ngrams & context_ngrams
+                    if shared_ngrams:
+                        shared_ratio = len(shared_ngrams) / max(len(output_ngrams), 1)
+                        score = round(shared_ratio, 3)
+                        has_echo = (
+                            len(shared_ngrams) >= QUALITY.context_echo_min_shared_ngrams
+                            and shared_ratio >= QUALITY.context_echo_ngram_ratio_threshold
+                        )
+
+    return has_echo, score
+
+
 def _detect_context_ignorance(
     text: str,
     prompt: str,
@@ -2082,19 +2387,10 @@ def _detect_context_ignorance(
     if not text or not prompt:
         return False, []
 
-    # Extract context section if present
-    # Escape the marker for regex safety
-    marker_pattern = re.escape(context_marker)
-    context_match = re.search(
-        rf"{marker_pattern}\s*(.+?)(?:\n\n|\Z)",
-        prompt,
-        re.DOTALL | re.IGNORECASE,
-    )
-    if not context_match:
+    context_text = _extract_prompt_context_text(prompt, context_marker=context_marker)
+    if not context_text:
         # No explicit context section, so can't check
         return False, []
-
-    context_text = context_match.group(1)
 
     # Extract potential proper nouns and key terms from context
     # Look for capitalized words that aren't common words
@@ -2146,19 +2442,32 @@ def _detect_context_ignorance(
         "photo",
         "picture",
     }
+    common_words.update(CONTEXT_NOISE_TERMS)
 
-    # Find capitalized words (potential proper nouns)
-    potential_terms = re.findall(r"\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b", context_text)
+    # Find title-cased and ALL-CAPS tokens (e.g. UK) as potential proper nouns.
+    potential_terms = re.findall(
+        r"\b(?:[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*|[A-Z]{2,})\b",
+        context_text,
+    )
 
     # Filter out common words and keep unique terms
+    seen_terms: set[str] = set()
+    key_terms: list[str] = []
+    for term in potential_terms:
+        term_lower = term.casefold()
+        if term_lower in seen_terms:
+            continue
+        seen_terms.add(term_lower)
+        key_terms.append(term)
     key_terms = [
         term
-        for term in set(potential_terms)
-        if term.lower() not in common_words and len(term) > QUALITY.min_context_term_length
+        for term in key_terms
+        if term.casefold() not in common_words and len(term) > QUALITY.min_context_term_length
     ]
 
-    # Check if these terms appear in the generated text (case-insensitive)
-    missing_terms = [term for term in key_terms if term.lower() not in text.lower()]
+    # Check if these terms appear in the generated text, honoring aliases.
+    normalized_text = _normalize_phrase_for_matching(text)
+    missing_terms = [term for term in key_terms if not _context_term_present(term, normalized_text)]
 
     # Only flag as "ignored" if we found key terms and most are missing
     # Use thresholds from configuration
@@ -3522,16 +3831,63 @@ class GenerationQualityAnalysis:
     degeneration_type: str | None
     has_fabrication: bool
     fabrication_issues: list[str]
+    missing_sections: list[str] = dataclasses.field(default_factory=list)
+    title_word_count: int | None = None
+    description_sentence_count: int | None = None
+    keyword_count: int | None = None
+    keyword_duplication_ratio: float | None = None
+    has_reasoning_leak: bool = False
+    reasoning_leak_markers: list[str] = dataclasses.field(default_factory=list)
+    has_context_echo: bool = False
+    context_echo_ratio: float = 0.0
     # Harness issues indicate mlx-vlm integration bugs, not model quality problems
-    has_harness_issue: bool
-    harness_issue_type: str | None
-    harness_issue_details: list[str]
+    has_harness_issue: bool = False
+    harness_issue_type: str | None = None
+    harness_issue_details: list[str] = dataclasses.field(default_factory=list)
     # Lightweight metrics useful for JSONL/report triage
     word_count: int = 0
     unique_ratio: float = 0.0
 
+    @property
+    def has_title_length_violation(self) -> bool:
+        """Return True when title word count violates configured bounds."""
+        return self.title_word_count is not None and not (
+            QUALITY.min_title_words <= self.title_word_count <= QUALITY.max_title_words
+        )
+
+    @property
+    def has_description_sentence_violation(self) -> bool:
+        """Return True when description sentence count violates configured bounds."""
+        return self.description_sentence_count is not None and not (
+            QUALITY.min_description_sentences
+            <= self.description_sentence_count
+            <= QUALITY.max_description_sentences
+        )
+
+    @property
+    def has_keyword_count_violation(self) -> bool:
+        """Return True when keyword count violates configured bounds."""
+        return self.keyword_count is not None and not (
+            QUALITY.min_keywords_count <= self.keyword_count <= QUALITY.max_keywords_count
+        )
+
+    @property
+    def has_keyword_duplication_violation(self) -> bool:
+        """Return True when keyword duplication exceeds configured threshold."""
+        return (
+            self.keyword_duplication_ratio is not None
+            and self.keyword_duplication_ratio >= QUALITY.keyword_duplication_ratio_threshold
+        )
+
     def has_any_issues(self) -> bool:
         """Return True if any quality issues were detected."""
+        has_contract_violation = (
+            bool(self.missing_sections)
+            or self.has_title_length_violation
+            or self.has_description_sentence_violation
+            or self.has_keyword_count_violation
+            or self.has_keyword_duplication_violation
+        )
         return (
             self.is_repetitive
             or bool(self.hallucination_issues)
@@ -3544,6 +3900,9 @@ class GenerationQualityAnalysis:
             or self.has_language_mixing
             or self.has_degeneration
             or self.has_fabrication
+            or has_contract_violation
+            or self.has_reasoning_leak
+            or self.has_context_echo
             or self.has_harness_issue
         )
 
@@ -3555,8 +3914,8 @@ class GenerationQualityAnalysis:
         """
         if not self.has_harness_issue:
             return False
-        # Check if there are any non-harness issues
-        return not (
+
+        has_non_harness_issue = (
             self.is_repetitive
             or bool(self.hallucination_issues)
             or self.is_verbose
@@ -3568,34 +3927,80 @@ class GenerationQualityAnalysis:
             or self.has_language_mixing
             or self.has_degeneration
             or self.has_fabrication
+            or bool(self.missing_sections)
+            or self.has_reasoning_leak
+            or self.has_context_echo
+            or self.has_title_length_violation
+            or self.has_description_sentence_violation
+            or self.has_keyword_count_violation
+            or self.has_keyword_duplication_violation
         )
+        return not has_non_harness_issue
 
     @property
     def issues(self) -> list[str]:
         """Return a list of all detected quality issues as human-readable strings."""
-        issues_list = []
-        if self.is_repetitive:
-            issues_list.append(f"Repetitive output ({self.repeated_token})")
-        issues_list.extend(self.hallucination_issues)
-        if self.is_verbose:
-            issues_list.append("Excessive verbosity")
-        issues_list.extend(self.formatting_issues)
-        if self.has_excessive_bullets:
-            issues_list.append(f"Excessive bullet points ({self.bullet_count})")
-        if self.is_context_ignored:
-            issues_list.append(
+        issues_list: list[str] = []
+        keyword_duplication_label = (
+            f"Keyword duplication ({self.keyword_duplication_ratio:.0%} duplicated terms)"
+            if self.keyword_duplication_ratio is not None
+            else "Keyword duplication"
+        )
+
+        scalar_issues = [
+            (
+                self.is_repetitive,
+                f"Repetitive output ({self.repeated_token})",
+            ),
+            (self.is_verbose, "Excessive verbosity"),
+            (self.has_excessive_bullets, f"Excessive bullet points ({self.bullet_count})"),
+            (
+                self.is_context_ignored,
                 f"Context ignored (missing: {', '.join(self.missing_context_terms)})",
-            )
-        if self.is_refusal:
-            issues_list.append(f"Refusal detected ({self.refusal_type})")
-        if self.is_generic:
-            issues_list.append(f"Generic output (specificity: {self.specificity_score:.2f})")
-        if self.has_language_mixing:
-            issues_list.extend(self.language_mixing_issues)
-        if self.has_degeneration:
-            issues_list.append(f"Output degeneration ({self.degeneration_type})")
-        if self.has_fabrication:
-            issues_list.extend(self.fabrication_issues)
+            ),
+            (self.is_refusal, f"Refusal detected ({self.refusal_type})"),
+            (
+                self.is_generic,
+                f"Generic output (specificity: {self.specificity_score:.2f})",
+            ),
+            (self.has_degeneration, f"Output degeneration ({self.degeneration_type})"),
+            (bool(self.missing_sections), f"Missing sections ({', '.join(self.missing_sections)})"),
+            (
+                self.has_title_length_violation,
+                "Title length violation "
+                f"({self.title_word_count} words; expected {QUALITY.min_title_words}-{QUALITY.max_title_words})",
+            ),
+            (
+                self.has_description_sentence_violation,
+                "Description sentence violation "
+                f"({self.description_sentence_count}; expected "
+                f"{QUALITY.min_description_sentences}-{QUALITY.max_description_sentences})",
+            ),
+            (
+                self.has_keyword_count_violation,
+                "Keyword count violation "
+                f"({self.keyword_count}; expected {QUALITY.min_keywords_count}-{QUALITY.max_keywords_count})",
+            ),
+            (
+                self.has_keyword_duplication_violation,
+                keyword_duplication_label,
+            ),
+            (
+                self.has_reasoning_leak,
+                (
+                    f"Reasoning leak ({', '.join(self.reasoning_leak_markers[:2])})"
+                    if self.reasoning_leak_markers
+                    else "Reasoning leak"
+                ),
+            ),
+            (self.has_context_echo, f"Context echo ({self.context_echo_ratio:.0%} overlap)"),
+        ]
+        issues_list.extend(label for condition, label in scalar_issues if condition)
+        issues_list.extend(self.hallucination_issues)
+        issues_list.extend(self.formatting_issues)
+        issues_list.extend(self.language_mixing_issues)
+        issues_list.extend(self.fabrication_issues)
+
         # Harness issues (prominently marked as integration problems)
         if self.has_harness_issue:
             harness_label = f"⚠️HARNESS:{self.harness_issue_type}"
@@ -3635,12 +4040,43 @@ def analyze_generation_text(
     # Context ignorance: output doesn't reference key terms from prompt
     is_context_ignored = False
     missing_context_terms: list[str] = []
+    has_reasoning_leak = False
+    reasoning_leak_markers: list[str] = []
+    has_context_echo = False
+    context_echo_ratio = 0.0
+    missing_sections: list[str] = []
+    title_word_count: int | None = None
+    description_sentence_count: int | None = None
+    keyword_count: int | None = None
+    keyword_duplication_ratio: float | None = None
     if prompt:
         is_context_ignored, missing_context_terms = _detect_context_ignorance(
             text,
             prompt,
             context_marker=context_marker,
         )
+        has_reasoning_leak, reasoning_leak_markers = _detect_reasoning_leakage(text)
+        has_context_echo, context_echo_ratio = _detect_context_echo(
+            text,
+            prompt,
+            context_marker=context_marker,
+        )
+
+        if (
+            generated_tokens >= QUALITY.min_tokens_for_substantial
+            and _prompt_requests_catalog_contract(
+                prompt,
+            )
+        ):
+            (
+                missing_sections,
+                title_word_count,
+                description_sentence_count,
+                keyword_count,
+                keyword_duplication_ratio,
+            ) = _analyze_catalog_contract(text)
+    else:
+        has_reasoning_leak, reasoning_leak_markers = _detect_reasoning_leakage(text)
 
     # Refusal detection: model declines to answer
     is_refusal, refusal_type = _detect_refusal_patterns(text)
@@ -3729,6 +4165,15 @@ def analyze_generation_text(
         degeneration_type=degeneration_type,
         has_fabrication=has_fabrication,
         fabrication_issues=fabrication_issues,
+        missing_sections=missing_sections,
+        title_word_count=title_word_count,
+        description_sentence_count=description_sentence_count,
+        keyword_count=keyword_count,
+        keyword_duplication_ratio=keyword_duplication_ratio,
+        has_reasoning_leak=has_reasoning_leak,
+        reasoning_leak_markers=reasoning_leak_markers,
+        has_context_echo=has_context_echo,
+        context_echo_ratio=context_echo_ratio,
         has_harness_issue=has_harness_issue,
         harness_issue_type=harness_type,
         harness_issue_details=harness_issues,
@@ -6885,6 +7330,12 @@ def _summarize_quality_signals(qa: GenerationQualityAnalysis | None) -> list[str
         signals.append("Model refused or deflected the requested task.")
     if qa.formatting_issues:
         signals.append("Output formatting deviated from the requested structure.")
+    if qa.missing_sections:
+        signals.append("Output omitted required Title/Description/Keywords sections.")
+    if qa.has_reasoning_leak:
+        signals.append("Output leaked reasoning or prompt-template text.")
+    if qa.has_context_echo:
+        signals.append("Output appears to copy prompt context verbatim.")
 
     return _dedupe_preserve_order(signals)
 
@@ -10066,6 +10517,13 @@ def _preview_generation(
     if analysis.is_context_ignored and analysis.missing_context_terms:
         missing = ", ".join(analysis.missing_context_terms[:3])
         log_warning_note(f"Context ignored (missing: {missing})")
+    if analysis.missing_sections:
+        missing = ", ".join(analysis.missing_sections)
+        log_warning_note(f"Missing sections: {missing}")
+    if analysis.has_reasoning_leak:
+        log_warning_note("Reasoning/prompt text leaked into output")
+    if analysis.has_context_echo:
+        log_warning_note(f"Context echo ({analysis.context_echo_ratio:.0%} overlap)")
     if analysis.has_harness_issue:
         details = ", ".join(analysis.harness_issue_details[:2])
         log_warning_note(f"Harness issue ({analysis.harness_issue_type}): {details}")
@@ -10911,14 +11369,19 @@ def _build_cataloguing_prompt(metadata: MetadataDict) -> str:
     parts: list[str] = [
         "Analyze this image for cataloguing metadata.",
         "",
-        "Return exactly these three sections:",
+        "Return exactly these three sections, and nothing else:",
         "",
         "Title: 6-12 words, descriptive and concrete.",
         "",
         "Description: 1-2 factual sentences covering key subjects, setting, and action.",
         "",
-        "Keywords: 15-30 comma-separated terms, ordered most specific to most general.",
-        "Use concise, image-grounded wording and avoid speculation.",
+        "Keywords: 15-30 unique comma-separated terms, ordered most specific to most general.",
+        "",
+        "Rules:",
+        "- Use only visually supported facts.",
+        "- If hints conflict with the image, trust the image.",
+        "- Do not output reasoning, notes, or extra sections.",
+        "- Do not copy context hints verbatim.",
     ]
 
     # --- Context block (uses the "Context:" marker for quality analysis) ---
@@ -10928,7 +11391,9 @@ def _build_cataloguing_prompt(metadata: MetadataDict) -> str:
     has_context = desc or title or existing_kw
     if has_context:
         parts.append("")
-        parts.append("Context: Existing metadata hints (use only if visually consistent):")
+        parts.append(
+            "Context: Existing metadata hints (high confidence; use only if visually consistent):"
+        )
         if title:
             title_hint = _compact_prompt_text(title, max_chars=QUALITY.prompt_title_max_chars)
             parts.append(f"- Title hint: {title_hint}")
@@ -10961,11 +11426,6 @@ def _build_cataloguing_prompt(metadata: MetadataDict) -> str:
         else:
             parts.append("")
             parts.append("Capture metadata hints: " + ". ".join(meta_fragments) + ".")
-
-    parts.append("")
-    parts.append(
-        "Prioritize what is visibly present. If context conflicts with the image, trust the image.",
-    )
 
     return "\n".join(parts)
 
@@ -11273,36 +11733,76 @@ def _format_quality_analysis_for_log(analysis: GenerationQualityAnalysis) -> str
     Includes only active flags plus lightweight counters to keep diagnostics
     readable in one line.
     """
-    parts = []
-    if analysis.is_repetitive:
-        token_info = f" (token={analysis.repeated_token})" if analysis.repeated_token else ""
-        parts.append(f"repetitive=True{token_info}")
-    if analysis.is_refusal:
-        refusal_info = f" (type={analysis.refusal_type})" if analysis.refusal_type else ""
-        parts.append(f"refusal=True{refusal_info}")
-    if analysis.has_language_mixing:
-        parts.append("language_mixing=True")
-    if analysis.hallucination_issues:
-        parts.append("hallucination=True")
-    if analysis.is_generic:
-        parts.append(f"generic=True (score={analysis.specificity_score:.1f})")
-    if analysis.is_verbose:
-        parts.append("verbose=True")
-    if analysis.formatting_issues:
-        parts.append("formatting_issues=True")
-    if analysis.has_excessive_bullets:
-        parts.append(f"excessive_bullets=True (count={analysis.bullet_count})")
-    if analysis.is_context_ignored:
-        parts.append("context_ignored=True")
-    if analysis.has_degeneration:
-        parts.append(f"degeneration=True ({analysis.degeneration_type})")
-    if analysis.has_fabrication:
-        parts.append("fabrication=True")
-    if analysis.has_harness_issue:
-        details = (
-            ",".join(analysis.harness_issue_details[:2]) if analysis.harness_issue_details else ""
-        )
-        parts.append(f"harness=True ({analysis.harness_issue_type}; {details})")
+    repetitive_part = (
+        f"repetitive=True (token={analysis.repeated_token})"
+        if analysis.is_repetitive and analysis.repeated_token
+        else ("repetitive=True" if analysis.is_repetitive else None)
+    )
+    refusal_part = (
+        f"refusal=True (type={analysis.refusal_type})"
+        if analysis.is_refusal and analysis.refusal_type
+        else ("refusal=True" if analysis.is_refusal else None)
+    )
+    harness_details = (
+        ",".join(analysis.harness_issue_details[:2]) if analysis.harness_issue_details else ""
+    )
+    harness_part = (
+        f"harness=True ({analysis.harness_issue_type}; {harness_details})"
+        if analysis.has_harness_issue
+        else None
+    )
+    reasoning_marker = (
+        analysis.reasoning_leak_markers[0] if analysis.reasoning_leak_markers else "marker"
+    )
+
+    parts_raw: list[str | None] = [
+        repetitive_part,
+        refusal_part,
+        "language_mixing=True" if analysis.has_language_mixing else None,
+        "hallucination=True" if analysis.hallucination_issues else None,
+        (f"generic=True (score={analysis.specificity_score:.1f})" if analysis.is_generic else None),
+        "verbose=True" if analysis.is_verbose else None,
+        "formatting_issues=True" if analysis.formatting_issues else None,
+        (
+            f"excessive_bullets=True (count={analysis.bullet_count})"
+            if analysis.has_excessive_bullets
+            else None
+        ),
+        "context_ignored=True" if analysis.is_context_ignored else None,
+        (
+            f"degeneration=True ({analysis.degeneration_type})"
+            if analysis.has_degeneration
+            else None
+        ),
+        "fabrication=True" if analysis.has_fabrication else None,
+        (
+            f"missing_sections={'+'.join(analysis.missing_sections)}"
+            if analysis.missing_sections
+            else None
+        ),
+        (
+            f"title_words={analysis.title_word_count}"
+            if analysis.title_word_count is not None
+            else None
+        ),
+        (
+            f"description_sentences={analysis.description_sentence_count}"
+            if analysis.description_sentence_count is not None
+            else None
+        ),
+        f"keywords={analysis.keyword_count}" if analysis.keyword_count is not None else None,
+        (
+            f"keyword_dup={analysis.keyword_duplication_ratio:.2f}"
+            if analysis.keyword_duplication_ratio is not None
+            else None
+        ),
+        f"reasoning_leak=True ({reasoning_marker})" if analysis.has_reasoning_leak else None,
+        f"context_echo=True ({analysis.context_echo_ratio:.2f})"
+        if analysis.has_context_echo
+        else None,
+        harness_part,
+    ]
+    parts = [part for part in parts_raw if part is not None]
     parts.append(f"words={analysis.word_count}")
 
     return ", ".join(parts) if parts else "no issues detected"
@@ -11329,42 +11829,52 @@ def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | N
             issues.append("long-context")
 
     # Critical model quality issues
-    if analysis.is_refusal:
-        refusal_label = f"refusal({analysis.refusal_type})" if analysis.refusal_type else "refusal"
-        issues.append(refusal_label)
+    refusal_label = f"refusal({analysis.refusal_type})" if analysis.refusal_type else "refusal"
+    repetitive_label = (
+        f"repetitive({analysis.repeated_token})" if analysis.repeated_token else "repetitive"
+    )
+    keyword_duplication_label = (
+        f"keyword-duplication({analysis.keyword_duplication_ratio:.2f})"
+        if analysis.keyword_duplication_ratio is not None
+        else "keyword-duplication"
+    )
 
-    if analysis.is_repetitive:
-        rep_label = (
-            f"repetitive({analysis.repeated_token})" if analysis.repeated_token else "repetitive"
-        )
-        issues.append(rep_label)
-
-    if analysis.has_language_mixing:
-        issues.append("lang_mixing")
-
-    if analysis.hallucination_issues:
-        issues.append("hallucination")
-
-    if analysis.has_degeneration:
-        issues.append("degeneration")
-
-    if analysis.has_fabrication:
-        issues.append("fabrication")
-
-    if analysis.is_generic:
-        issues.append(f"generic({analysis.specificity_score:.0f})")
-
-    if analysis.is_verbose:
-        issues.append("verbose")
-
-    if analysis.formatting_issues:
-        issues.append("formatting")
-
-    if analysis.has_excessive_bullets:
-        issues.append(f"bullets({analysis.bullet_count})")
-
-    if analysis.is_context_ignored:
-        issues.append("context-ignored")
+    issue_candidates = [
+        (analysis.is_refusal, refusal_label),
+        (analysis.is_repetitive, repetitive_label),
+        (analysis.has_language_mixing, "lang_mixing"),
+        (bool(analysis.hallucination_issues), "hallucination"),
+        (analysis.has_degeneration, "degeneration"),
+        (analysis.has_fabrication, "fabrication"),
+        (
+            bool(analysis.missing_sections),
+            f"missing-sections({'+'.join(analysis.missing_sections)})",
+        ),
+        (
+            analysis.has_title_length_violation,
+            f"title-length({analysis.title_word_count})",
+        ),
+        (
+            analysis.has_description_sentence_violation,
+            f"description-sentences({analysis.description_sentence_count})",
+        ),
+        (
+            analysis.has_keyword_count_violation,
+            f"keyword-count({analysis.keyword_count})",
+        ),
+        (
+            analysis.has_keyword_duplication_violation,
+            keyword_duplication_label,
+        ),
+        (analysis.has_reasoning_leak, "reasoning-leak"),
+        (analysis.has_context_echo, f"context-echo({analysis.context_echo_ratio:.2f})"),
+        (analysis.is_generic, f"generic({analysis.specificity_score:.0f})"),
+        (analysis.is_verbose, "verbose"),
+        (bool(analysis.formatting_issues), "formatting"),
+        (analysis.has_excessive_bullets, f"bullets({analysis.bullet_count})"),
+        (analysis.is_context_ignored, "context-ignored"),
+    ]
+    issues.extend(label for condition, label in issue_candidates if condition)
 
     return ", ".join(issues) if issues else None
 
@@ -11378,6 +11888,13 @@ QUALITY_ISSUE_PATTERNS: Final[dict[str, re.Pattern[str]]] = {
     "hallucination": re.compile(r"\bhallucination\b", re.IGNORECASE),
     "degeneration": re.compile(r"\bdegeneration\b", re.IGNORECASE),
     "fabrication": re.compile(r"\bfabrication\b", re.IGNORECASE),
+    "missing_sections": re.compile(r"\bmissing-sections\b", re.IGNORECASE),
+    "title_length": re.compile(r"\btitle-length\b", re.IGNORECASE),
+    "description_length": re.compile(r"\bdescription-sentences\b", re.IGNORECASE),
+    "keyword_count": re.compile(r"\bkeyword-count\b", re.IGNORECASE),
+    "keyword_duplication": re.compile(r"\bkeyword-duplication\b", re.IGNORECASE),
+    "reasoning_leak": re.compile(r"\breasoning-leak\b", re.IGNORECASE),
+    "context_echo": re.compile(r"\bcontext-echo\b", re.IGNORECASE),
     "generic": re.compile(r"\bgeneric\b", re.IGNORECASE),
     "verbose": re.compile(r"\bverbose\b", re.IGNORECASE),
     "formatting": re.compile(r"\bformatting\b", re.IGNORECASE),
@@ -11394,6 +11911,9 @@ QUALITY_BREAKING_LABELS: Final[frozenset[str]] = frozenset(
         "hallucination",
         "degeneration",
         "context_ignored",
+        "missing_sections",
+        "reasoning_leak",
+        "context_echo",
     },
 )
 
@@ -11420,7 +11940,9 @@ def _parse_quality_issues_to_list(quality_issues: str | None) -> list[str]:
     """Split stored comma-separated quality issue text into normalized items."""
     if not quality_issues:
         return []
-    return [issue.strip() for issue in quality_issues.split(",")]
+    return [
+        issue.strip() for issue in re.split(r",\s*(?![^()]*\))", quality_issues) if issue.strip()
+    ]
 
 
 def _truncate_quality_issues(

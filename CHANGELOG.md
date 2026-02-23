@@ -8,6 +8,21 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Tightened default cataloging prompt generation in `src/check_models.py`:
+  - now requires strict three-section output with explicit anti-CoT and
+    anti-verbatim-copy rules;
+  - keeps `Context:` metadata hints concise and tagged as high-confidence
+    hints rather than instruction text.
+- Strengthened output-quality heuristics for prompt-contract enforcement:
+  - added explicit flags for missing sections, title length, description
+    sentence count, keyword count, and keyword-duplication violations;
+  - added reasoning/prompt-echo leakage detection and context-regurgitation
+    (`context-echo`) detection;
+  - improved context-ignorance matching with alias support (for example
+    `UK` vs `United Kingdom`) and filtering of non-semantic prompt-label terms.
+- Improved quality-issue serialization robustness: JSONL list conversion now
+  preserves single issue items that contain commas inside parenthesized detail
+  payloads (for example repetitive phrase previews).
 - Polished generated report outputs for faster maintainer triage without
   changing core runtime behavior:
   - added a compact `Action Summary` near the top of `diagnostics.md` with

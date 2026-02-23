@@ -217,6 +217,29 @@ def test_save_jsonl_report_quality_issues_as_list(tmp_path: Path) -> None:
     assert data["quality_issues"] == ["repetitive(<s>)", "verbose", "formatting"]
 
 
+def test_save_jsonl_report_quality_issues_with_internal_commas(tmp_path: Path) -> None:
+    """Commas inside one issue item (e.g., phrase preview) should not split that item."""
+    output_file = tmp_path / "results.jsonl"
+
+    gen = MockGeneration()
+    result = PerformanceResult(
+        model_name="test-model",
+        generation=gen,
+        success=True,
+        quality_issues='repetitive(phrase: "a, b..."), context-echo(0.91)',
+        generation_time=1.5,
+        model_load_time=0.5,
+        total_time=2.0,
+    )
+
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
+
+    assert data["quality_issues"] == ['repetitive(phrase: "a, b...")', "context-echo(0.91)"]
+
+
 def test_save_jsonl_report_no_quality_issues(tmp_path: Path) -> None:
     """Test that quality_issues is an empty list when None."""
     output_file = tmp_path / "results.jsonl"
