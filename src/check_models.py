@@ -9007,7 +9007,7 @@ def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None
 
 def _load_model(
     params: ProcessImageParams,
-) -> tuple[Module, object, Any | None]:
+) -> tuple[Module, object, object | None]:
     """Load model from HuggingFace Hub or local path.
 
     Args:
@@ -9228,7 +9228,7 @@ def _run_model_generation(
         phase_callback: Optional callback invoked when execution enters a new phase.
     """
     model: Module
-    processor: Any
+    processor: object
 
     _set_failure_phase(phase_callback, "import")
     _ensure_generation_runtime_symbols()

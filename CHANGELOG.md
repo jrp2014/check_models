@@ -21,6 +21,9 @@ Notable changes to this project will be documented in this file.
 - Terminal alignment now manages Unicode display width via `wcwidth` with
   safe fallback behavior, improving centered headers and metric-label padding
   when wide glyphs/emoji appear in output.
+- Tightened model-generation typing in `src/check_models.py` by reducing
+  ambiguous `Any` usage in `_load_model` / `_run_model_generation` where
+  upstream function signatures allow safe narrowing.
 - Terminal `Model Comparison (current run)` table now explicitly right-aligns
   numeric columns (TPS/timing/memory) and left-aligns text columns for easier
   visual scanning.
