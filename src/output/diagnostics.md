@@ -1,10 +1,10 @@
-# Diagnostics Report — 2 failure(s), 7 harness issue(s) (mlx-vlm 0.3.12)
+# Diagnostics Report — 4 failure(s), 5 harness issue(s) (mlx-vlm 0.3.12)
 
 ## Summary
 
-Automated benchmarking of **45 locally-cached VLM models** found **2 hard failure(s)** and **7 harness/integration issue(s)** plus **2 preflight compatibility warning(s)** in successful models. 43 of 45 models succeeded.
+Automated benchmarking of **46 locally-cached VLM models** found **4 hard failure(s)** and **5 harness/integration issue(s)** plus **2 preflight compatibility warning(s)** in successful models. 42 of 46 models succeeded.
 
-Test image: `20260214-160213_DSC09231_DxO.jpg` (24.9 MB).
+Test image: `20260221-152935_DSC09285.jpg` (22.0 MB).
 
 ---
 
@@ -13,8 +13,10 @@ Test image: `20260214-160213_DSC09231_DxO.jpg` (24.9 MB).
 | Priority | Issue | Models Affected | Package |
 | -------- | ----- | --------------- | ------- |
 | **Medium** | Failed to process inputs with error: can only concatenate str (not "N... | 1 (Florence-2-large-ft) | mlx-vlm |
+| **Medium** | Model runtime error during generation for mlx-community/InternVL3-14B... | 1 (InternVL3-14B-8bit) | mlx-vlm |
+| **Medium** | Model runtime error during generation for mlx-community/InternVL3-8B-... | 1 (InternVL3-8B-bf16) | mlx-vlm |
 | **Medium** | Loaded processor has no image_processor; expected multimodal processor. | 1 (deepseek-vl2-8bit) | model-config |
-| **Medium** | Harness/integration | 7 (SmolVLM-Instruct, Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit, SmolVLM-Instruct-bf16, X-Reasoner-7B-8bit, paligemma2-10b-ft-docci-448-bf16, Florence-2-large-ft) | mlx-vlm |
+| **Medium** | Harness/integration | 5 (Qwen3-VL-2B-Instruct, Devstral-Small-2-24B-Instruct-2512-5bit, Molmo-7B-D-0924-8bit, Molmo-7B-D-0924-bf16, Florence-2-large-ft) | mlx-vlm |
 | **Medium** | Preflight compatibility warning | 2 issue(s) | mlx-vlm, transformers |
 
 ---
@@ -31,7 +33,7 @@ Test image: `20260214-160213_DSC09231_DxO.jpg` (24.9 MB).
 
 ### To reproduce
 
-- Repro command: `python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft`
+- Repro command: `python -m check_models --image /Users/jrp/Pictures/Processed/20260221-152935_DSC09285.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft`
 
 <details>
 <summary>Detailed trace logs (affected model)</summary>
@@ -125,7 +127,7 @@ Captured stdout/stderr:
 ```text
 === STDOUT ===
 ==========
-Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '1', '4', '-', '1', '6', '0', '2', '1', '3', '_', 'D', 'S', 'C', '0', '9', '2', '3', '1', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g'] 
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '2', '1', '-', '1', '5', '2', '9', '3', '5', '_', 'D', 'S', 'C', '0', '9', '2', '8', '5', '.', 'j', 'p', 'g'] 
 
 Prompt: Analyze this image for cataloguing metadata.
 
@@ -139,8 +141,9 @@ Keywords: 15-30 comma-separated terms, ordered most specific to most general.
 Use concise, image-grounded wording and avoid speculation.
 
 Context: Existing metadata hints (use only if visually consistent):
-- Description hint: , Town Centre, Hitchin, England, United Kingdom, UK On a late winter afternoon in the historic market town of Hitchin, England, the 16th-century coaching inn, The Cock, stands as the central feature with its distinctive black-and-white timber-framed facade. As a classic car adds a dynamic blur to the foreground, a pedestrian carrying a child walks through the pub's archway, capturing a fleeting moment of daily lif...
-- Capture metadata: Taken on 2026-02-14 16:02:13 GMT (at 16:02:13 local time).
+- Description hint: , Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK Based on the image and the provided context, here is a suitable caption: A vibrant blue electric vehicle provides a stark contrast to the muted tones of a rainy late-winter afternoon at Stronachlachar pier on Loch Katrine, Scotland. Rain falls on the calm waters of the loch and the surrounding bare-branched trees, with the distant hills of the Trossachs...
+- Keyword hints: Adobe Stock, Any Vision, Automobile, Automotive, Europe, Honda HR-V, Honda HR-V e:HEV, Light Blue SUV, Loch Katrine, Lochside, SUV, Scotland, Stronachlachar, Trossachs, UK, United Kingdom, Vehicles, Wet Road, asphalt, bare trees
+- Capture metadata: Taken on 2026-02-21 15:29:35 GMT (at 15:29:35 local time).
 
 Prioritize what is visibly present. If context conflicts with the image, trust the image.
 
@@ -148,7 +151,7 @@ Prioritize what is visibly present. If context conflicts with the image, trust t
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 14947.63it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 29475.08it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -157,6 +160,192 @@ Download complete: : 0.00B [00:00, ?B/s]
 </details>
 
 ## 2. Failure affecting 1 model (Priority: Medium)
+
+**Observed behavior:** Model runtime error during generation for mlx-community/InternVL3-14B-8bit: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
+**Likely component:** `mlx-vlm`
+**Affected model:** `mlx-community/InternVL3-14B-8bit`
+
+| Model | Observed Behavior | First Seen Failing | Recent Repro |
+| ----- | ----------------- | ------------------ | ------------ |
+| `mlx-community/InternVL3-14B-8bit` | Model runtime error during generation for mlx-community/InternVL3-14B-8bit: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process' | 2026-02-23 12:54:48 GMT | 1/3 recent runs failed |
+
+### To reproduce
+
+- Repro command: `python -m check_models --image /Users/jrp/Pictures/Processed/20260221-152935_DSC09285.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-14B-8bit`
+
+<details>
+<summary>Detailed trace logs (affected model)</summary>
+
+#### `mlx-community/InternVL3-14B-8bit`
+
+Traceback:
+
+```text
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 598, in generate
+    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
+                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 488, in stream_generate
+    for n, (token, logprobs) in enumerate(
+                                ~~~~~~~~~^
+        generate_step(input_ids, model, pixel_values, mask, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ):
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 376, in generate_step
+    model.language_model(
+    ~~~~~~~~~~~~~~~~~~~~^
+        inputs=input_ids[:, :n_to_process],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+TypeError: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+ValueError: Model runtime error during generation for mlx-community/InternVL3-14B-8bit: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
+```
+
+Captured stdout/stderr:
+
+```text
+=== STDOUT ===
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '2', '1', '-', '1', '5', '2', '9', '3', '5', '_', 'D', 'S', 'C', '0', '9', '2', '8', '5', '.', 'j', 'p', 'g'] 
+
+Prompt: User: <image>
+Analyze this image for cataloguing metadata.
+
+Return exactly these three sections:
+
+Title: 6-12 words, descriptive and concrete.
+
+Description: 1-2 factual sentences covering key subjects, setting, and action.
+
+Keywords: 15-30 comma-separated terms, ordered most specific to most general.
+Use concise, image-grounded wording and avoid speculation.
+
+Context: Existing metadata hints (use only if visually consistent):
+- Description hint: , Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK Based on the image and the provided context, here is a suitable caption: A vibrant blue electric vehicle provides a stark contrast to the muted tones of a rainy late-winter afternoon at Stronachlachar pier on Loch Katrine, Scotland. Rain falls on the calm waters of the loch and the surrounding bare-branched trees, with the distant hills of the Trossachs...
+- Keyword hints: Adobe Stock, Any Vision, Automobile, Automotive, Europe, Honda HR-V, Honda HR-V e:HEV, Light Blue SUV, Loch Katrine, Lochside, SUV, Scotland, Stronachlachar, Trossachs, UK, United Kingdom, Vehicles, Wet Road, asphalt, bare trees
+- Capture metadata: Taken on 2026-02-21 15:29:35 GMT (at 15:29:35 local time).
+
+Prioritize what is visibly present. If context conflicts with the image, trust the image.
+Assistant:
+
+=== STDERR ===
+Downloading (incomplete total...): 0.00B [00:00, ?B/s]
+
+Fetching 18 files:   0%|          | 0/18 [00:00<?, ?it/s]
+Fetching 18 files: 100%|##########| 18/18 [00:00<00:00, 12620.77it/s]
+
+Download complete: : 0.00B [00:00, ?B/s]              
+Download complete: : 0.00B [00:00, ?B/s]
+
+Prefill:   0%|          | 0/2116 [00:00<?, ?tok/s]
+Prefill:   0%|          | 0/2116 [00:00<?, ?tok/s]
+```
+
+</details>
+
+## 3. Failure affecting 1 model (Priority: Medium)
+
+**Observed behavior:** Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
+**Likely component:** `mlx-vlm`
+**Affected model:** `mlx-community/InternVL3-8B-bf16`
+
+| Model | Observed Behavior | First Seen Failing | Recent Repro |
+| ----- | ----------------- | ------------------ | ------------ |
+| `mlx-community/InternVL3-8B-bf16` | Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process' | 2026-02-23 12:54:48 GMT | 1/1 recent runs failed |
+
+### To reproduce
+
+- Repro command: `python -m check_models --image /Users/jrp/Pictures/Processed/20260221-152935_DSC09285.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-8B-bf16`
+
+<details>
+<summary>Detailed trace logs (affected model)</summary>
+
+#### `mlx-community/InternVL3-8B-bf16`
+
+Traceback:
+
+```text
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 598, in generate
+    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
+                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 488, in stream_generate
+    for n, (token, logprobs) in enumerate(
+                                ~~~~~~~~~^
+        generate_step(input_ids, model, pixel_values, mask, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ):
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 376, in generate_step
+    model.language_model(
+    ~~~~~~~~~~~~~~~~~~~~^
+        inputs=input_ids[:, :n_to_process],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+TypeError: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+ValueError: Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
+```
+
+Captured stdout/stderr:
+
+```text
+=== STDOUT ===
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '2', '1', '-', '1', '5', '2', '9', '3', '5', '_', 'D', 'S', 'C', '0', '9', '2', '8', '5', '.', 'j', 'p', 'g'] 
+
+Prompt: User: <image>
+Analyze this image for cataloguing metadata.
+
+Return exactly these three sections:
+
+Title: 6-12 words, descriptive and concrete.
+
+Description: 1-2 factual sentences covering key subjects, setting, and action.
+
+Keywords: 15-30 comma-separated terms, ordered most specific to most general.
+Use concise, image-grounded wording and avoid speculation.
+
+Context: Existing metadata hints (use only if visually consistent):
+- Description hint: , Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK Based on the image and the provided context, here is a suitable caption: A vibrant blue electric vehicle provides a stark contrast to the muted tones of a rainy late-winter afternoon at Stronachlachar pier on Loch Katrine, Scotland. Rain falls on the calm waters of the loch and the surrounding bare-branched trees, with the distant hills of the Trossachs...
+- Keyword hints: Adobe Stock, Any Vision, Automobile, Automotive, Europe, Honda HR-V, Honda HR-V e:HEV, Light Blue SUV, Loch Katrine, Lochside, SUV, Scotland, Stronachlachar, Trossachs, UK, United Kingdom, Vehicles, Wet Road, asphalt, bare trees
+- Capture metadata: Taken on 2026-02-21 15:29:35 GMT (at 15:29:35 local time).
+
+Prioritize what is visibly present. If context conflicts with the image, trust the image.
+Assistant:
+
+=== STDERR ===
+Downloading (incomplete total...): 0.00B [00:00, ?B/s]
+
+Fetching 17 files:   0%|          | 0/17 [00:00<?, ?it/s]
+Fetching 17 files: 100%|##########| 17/17 [00:00<00:00, 14744.24it/s]
+
+Download complete: : 0.00B [00:00, ?B/s]              
+Download complete: : 0.00B [00:00, ?B/s]
+
+Prefill:   0%|          | 0/2116 [00:00<?, ?tok/s]
+Prefill:   0%|          | 0/2116 [00:00<?, ?tok/s]
+```
+
+</details>
+
+## 4. Failure affecting 1 model (Priority: Medium)
 
 **Observed behavior:** Loaded processor has no image_processor; expected multimodal processor.
 **Likely component:** `model configuration/repository`
@@ -168,7 +357,7 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 ### To reproduce
 
-- Repro command: `python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit`
+- Repro command: `python -m check_models --image /Users/jrp/Pictures/Processed/20260221-152935_DSC09285.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit`
 
 <details>
 <summary>Detailed trace logs (affected model)</summary>
@@ -202,7 +391,7 @@ Added chat tokens
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 9306.36it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 66333.27it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -223,122 +412,82 @@ These warnings were detected before inference. They are non-fatal but should be 
 
 ---
 
-## Harness/Integration Issues (7 model(s))
+## Harness/Integration Issues (5 model(s))
 
 These models completed successfully but show integration problems (for example stop-token leakage, decoding artifacts, or long-context breakdown) that likely point to stack/runtime behavior rather than inherent model quality limits.
 
-### `HuggingFaceTB/SmolVLM-Instruct`
+### `Qwen/Qwen3-VL-2B-Instruct`
 
-**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
-**Likely component:** `mlx-vlm`
-**Token summary:** prompt=1,455, output=3, output/prompt=0.21%
+**What looks wrong:** Behavior degrades under long prompt context.
+**Likely component:** `mlx-vlm / mlx`
+**Token summary:** prompt=16,550, output=500, output/prompt=3.02%
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output appears truncated to about 3 tokens.
-- Model output may not follow prompt or image contents.
+- At long prompt length (16550 tokens), output became repetitive.
+- Output became repetitive, indicating possible generation instability.
 
 **Sample output:**
 
 ```text
-Image.
-```
+Title: Blue Honda HR-V e:HEV parked on wet road at Loch Katrine
 
-### `microsoft/Phi-3.5-vision-instruct`
-
-**What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
-**Likely component:** `mlx-vlm`
-**Token summary:** prompt=1,056, output=500, output/prompt=47.35%
-
-**Why this appears to be an integration/runtime issue:**
-
-- Special control token &lt;|end|&gt; appeared in generated text.
-- Special control token &lt;|endoftext|&gt; appeared in generated text.
-- Generated text appears to continue into example-code templates mid-output.
-- Output switched language/script unexpectedly.
-
-**Sample output:**
-
-```text
-Title: Historic Market Town of Hitchin, England
-
-Description: The Cock, a 16th-century coaching inn, is a prominent feature in Hitchin, England. A classic car is captured in motion in the foreground, ...
+Description: A light blue Honda HR-V e:HEV is parked on a wet asphalt road at the Loch Katrine pier in Stronachlachar, Scotland, with r...
 ```
 
 ### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
 
 **What looks wrong:** Decoded output contains tokenizer artifacts that should not appear in user-facing text.
 **Likely component:** `mlx-vlm`
-**Token summary:** prompt=2,414, output=236, output/prompt=9.78%
+**Token summary:** prompt=2,414, output=233, output/prompt=9.65%
 
 **Why this appears to be an integration/runtime issue:**
 
-- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 144 occurrences).
+- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 141 occurrences).
 
 **Sample output:**
 
 ```text
-Title:ĠHistoricĠBlack-and-WhiteĠTimber-FramedĠPubĊĊDescription:ĠAĠ16th-centuryĠcoachingĠinnĠwithĠdistinctiveĠblack-and-whiteĠtimberĠframingĠstandsĠinĠaĠtownĠcenter.ĠAĠpedestrianĠcarriesĠaĠchildĠthroug...
+Title:ĠBlueĠSUVĠatĠStronachlacharĠPierĠonĠLochĠKatrineĊĊDescription:ĠAĠlightĠblueĠSUVĠisĠparkedĠatĠaĠrain-soakedĠpierĠonĠLochĠKatrine,ĠwithĠtheĠcalmĠwatersĠandĠbareĠtreesĠofĠtheĠTrossachsĠvisibleĠinĠt...
 ```
 
-### `mlx-community/SmolVLM-Instruct-bf16`
+### `mlx-community/Molmo-7B-D-0924-8bit`
 
 **What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
 **Likely component:** `mlx-vlm`
-**Token summary:** prompt=1,455, output=3, output/prompt=0.21%
+**Token summary:** prompt=0, output=0, output/prompt=n/a
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output appears truncated to about 3 tokens.
-- Model output may not follow prompt or image contents.
+- Model returned zero output tokens.
 
 **Sample output:**
 
 ```text
-Image.
+<empty output>
 ```
 
-### `mlx-community/X-Reasoner-7B-8bit`
-
-**What looks wrong:** Behavior degrades under long prompt context.
-**Likely component:** `mlx-vlm / mlx`
-**Token summary:** prompt=16,479, output=500, output/prompt=3.03%
-
-**Why this appears to be an integration/runtime issue:**
-
-- At long prompt length (16479 tokens), output became repetitive.
-- Output became repetitive, indicating possible generation instability.
-
-**Sample output:**
-
-```text
-**Title:** Historic Pub with Classic Car and Pedestrian in Town Centre
-
-**Description:** A man carries a child through the archway of a historic black-and-white timber-framed pub, while a classic car ...
-```
-
-### `mlx-community/paligemma2-10b-ft-docci-448-bf16`
+### `mlx-community/Molmo-7B-D-0924-bf16`
 
 **What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
 **Likely component:** `mlx-vlm`
-**Token summary:** prompt=1,279, output=13, output/prompt=1.02%
+**Token summary:** prompt=0, output=0, output/prompt=n/a
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output is very short relative to prompt size (1.0%), suggesting possible early-stop or prompt-handling issues.
-- Model output may not follow prompt or image contents.
+- Model returned zero output tokens.
 
 **Sample output:**
 
 ```text
-If the image is too complex, use a generic label.
+<empty output>
 ```
 
 ### `prince-canuma/Florence-2-large-ft`
 
 **What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
 **Likely component:** `mlx-vlm`
-**Token summary:** prompt=823, output=500, output/prompt=60.75%
+**Token summary:** prompt=905, output=500, output/prompt=55.25%
 
 **Why this appears to be an integration/runtime issue:**
 
@@ -356,13 +505,15 @@ If the image is too complex, use a generic label.
 
 ---
 
-## Potential Stack Issues (1 model(s))
+## Potential Stack Issues (3 model(s))
 
 These models technically succeeded, but token/output patterns suggest likely integration/runtime issues worth checking upstream.
 
 | Model | Prompt Tok | Output Tok | Output/Prompt | Symptom | Likely Package |
 | ----- | ---------- | ---------- | ------------- | ------- | -------------- |
-| `mlx-community/X-Reasoner-7B-8bit` | 16,479 | 500 | 3.03% | Repetition under extreme prompt length | `mlx-vlm / mlx` |
+| `Qwen/Qwen3-VL-2B-Instruct` | 16,550 | 500 | 3.02% | Repetition under extreme prompt length | `mlx-vlm / mlx` |
+| `mlx-community/Molmo-7B-D-0924-8bit` | 0 | 0 | n/a | Empty output despite successful run | `mlx-vlm` |
+| `mlx-community/Molmo-7B-D-0924-bf16` | 0 | 0 | n/a | Empty output despite successful run | `mlx-vlm` |
 
 ---
 
@@ -370,12 +521,14 @@ These models technically succeeded, but token/output patterns suggest likely int
 
 Recent reproducibility is measured from history (up to last 3 runs where each model appears).
 
-**Regressions since previous run:** none
+**Regressions since previous run:** `mlx-community/InternVL3-14B-8bit`
 **Recoveries since previous run:** none
 
 | Model | Status vs Previous Run | First Seen Failing | Recent Repro |
 | ----- | ---------------------- | ------------------ | ------------ |
 | `microsoft/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
+| `mlx-community/InternVL3-14B-8bit` | new regression | 2026-02-23 12:54:48 GMT | 1/3 recent runs failed |
+| `mlx-community/InternVL3-8B-bf16` | new model failing | 2026-02-23 12:54:48 GMT | 1/1 recent runs failed |
 | `mlx-community/deepseek-vl2-8bit` | still failing | 2026-02-15 03:27:34 GMT | 3/3 recent runs failed |
 
 ---
@@ -385,7 +538,7 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 | Component | Version |
 | --------- | ------- |
 | mlx-vlm | 0.3.12 |
-| mlx | 0.30.7.dev20260219+d4c81062 |
+| mlx | 0.30.7.dev20260223+d4c81062 |
 | mlx-lm | 0.30.8 |
 | transformers | 5.2.0 |
 | tokenizers | 0.22.2 |
@@ -405,14 +558,16 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 pip install -e "src/[dev]"
 
 # Re-run with the same CLI arguments
-python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose
+python -m check_models --image /Users/jrp/Pictures/Processed/20260221-152935_DSC09285.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose
 ```
 
 ### Target specific failing models
 
 ```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft
-python -m check_models --image /Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit
+python -m check_models --image /Users/jrp/Pictures/Processed/20260221-152935_DSC09285.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft
+python -m check_models --image /Users/jrp/Pictures/Processed/20260221-152935_DSC09285.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-14B-8bit
+python -m check_models --image /Users/jrp/Pictures/Processed/20260221-152935_DSC09285.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-8B-bf16
+python -m check_models --image /Users/jrp/Pictures/Processed/20260221-152935_DSC09285.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit
 ```
 
 ### Prompt Used
@@ -430,15 +585,16 @@ Keywords: 15-30 comma-separated terms, ordered most specific to most general.
 Use concise, image-grounded wording and avoid speculation.
 
 Context: Existing metadata hints (use only if visually consistent):
-- Description hint: , Town Centre, Hitchin, England, United Kingdom, UK On a late winter afternoon in the historic market town of Hitchin, England, the 16th-century coaching inn, The Cock, stands as the central feature with its distinctive black-and-white timber-framed facade. As a classic car adds a dynamic blur to the foreground, a pedestrian carrying a child walks through the pub's archway, capturing a fleeting moment of daily lif...
-- Capture metadata: Taken on 2026-02-14 16:02:13 GMT (at 16:02:13 local time).
+- Description hint: , Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK Based on the image and the provided context, here is a suitable caption: A vibrant blue electric vehicle provides a stark contrast to the muted tones of a rainy late-winter afternoon at Stronachlachar pier on Loch Katrine, Scotland. Rain falls on the calm waters of the loch and the surrounding bare-branched trees, with the distant hills of the Trossachs...
+- Keyword hints: Adobe Stock, Any Vision, Automobile, Automotive, Europe, Honda HR-V, Honda HR-V e:HEV, Light Blue SUV, Loch Katrine, Lochside, SUV, Scotland, Stronachlachar, Trossachs, UK, United Kingdom, Vehicles, Wet Road, asphalt, bare trees
+- Capture metadata: Taken on 2026-02-21 15:29:35 GMT (at 15:29:35 local time).
 
 Prioritize what is visibly present. If context conflicts with the image, trust the image.
 ```
 
 ### Run details
 
-- Input image: `/Users/jrp/Pictures/Processed/20260214-160213_DSC09231_DxO.jpg`
+- Input image: `/Users/jrp/Pictures/Processed/20260221-152935_DSC09285.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-02-20 00:20:56 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-02-23 12:54:48 GMT by [check_models](https://github.com/jrp2014/check_models)._
