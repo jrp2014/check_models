@@ -5382,11 +5382,13 @@ def analyze_model_issues(
         generation_tokens = getattr(res.generation, "generation_tokens", 0)
         prompt_tokens = getattr(res.generation, "prompt_tokens", None)
 
-        analysis = analyze_generation_text(
-            text,
-            generation_tokens,
-            prompt_tokens=prompt_tokens,
-        )
+        analysis = res.quality_analysis
+        if analysis is None:
+            analysis = analyze_generation_text(
+                text,
+                generation_tokens,
+                prompt_tokens=prompt_tokens,
+            )
         _append_quality_issue_entries(
             model_name=res.model_name,
             analysis=analysis,
@@ -6760,22 +6762,18 @@ def _build_cluster_filing_guidance(
 
 
 def _diagnostics_failure_clusters(
-    results: list[PerformanceResult],
+    failure_clusters: list[tuple[str, list[PerformanceResult]]],
     *,
     diagnostics_context: DiagnosticsContext,
     image_path: Path | None,
     run_args: argparse.Namespace | None,
 ) -> list[str]:
     """Build grouped failure sections of the diagnostics report."""
-    failed = [r for r in results if not r.success]
-    if not failed:
+    if not failure_clusters:
         return []
 
-    clusters = _cluster_failures_by_pattern(results)
-    sorted_clusters = sorted(clusters.items(), key=lambda kv: -len(kv[1]))
-
     parts: list[str] = ["---", ""]
-    for idx, (_cluster_signature, cluster_results) in enumerate(sorted_clusters, 1):
+    for idx, (_cluster_signature, cluster_results) in enumerate(failure_clusters, 1):
         rep = cluster_results[0]
         pkg = rep.error_package or "unknown"
         component_label = _DIAGNOSTICS_COMPONENT_LABELS.get(pkg, pkg)
@@ -6972,7 +6970,7 @@ def _diagnostics_stack_signal_section(
 
 
 def _diagnostics_priority_table(
-    results: list[PerformanceResult],
+    failure_clusters: list[tuple[str, list[PerformanceResult]]],
     harness_results: list[tuple[PerformanceResult, str]],
     preflight_issues: Sequence[str],
 ) -> list[str]:
@@ -6981,11 +6979,8 @@ def _diagnostics_priority_table(
     _append_markdown_section(parts, title="## Priority Summary")
     table_rows: list[str] = []
 
-    failed = [r for r in results if not r.success]
-    if failed:
-        clusters = _cluster_failures_by_pattern(results)
-        sorted_clusters = sorted(clusters.items(), key=lambda kv: -len(kv[1]))
-        for _pattern, cluster_results in sorted_clusters:
+    if failure_clusters:
+        for _pattern, cluster_results in failure_clusters:
             representative = cluster_results[0]
             pkg = representative.error_package or "unknown"
             n = len(cluster_results)
@@ -7477,6 +7472,12 @@ def generate_diagnostics_report(
     if not failed and not harness_results and not stack_signals and not preflight_issues:
         return False
 
+    failure_clusters = (
+        sorted(_cluster_failures_by_pattern(results).items(), key=lambda kv: -len(kv[1]))
+        if failed
+        else []
+    )
+
     history_path = history.history_path if history is not None else None
     previous_history = history.previous_history if history is not None else None
     current_history = history.current_history if history is not None else None
@@ -7503,10 +7504,10 @@ def generate_diagnostics_report(
         versions=versions,
         image_path=image_path,
     )
-    parts.extend(_diagnostics_priority_table(results, harness_results, preflight_issues))
+    parts.extend(_diagnostics_priority_table(failure_clusters, harness_results, preflight_issues))
     parts.extend(
         _diagnostics_failure_clusters(
-            results,
+            failure_clusters,
             diagnostics_context=diagnostics_context,
             image_path=image_path,
             run_args=run_args,
@@ -8654,6 +8655,50 @@ def validate_image_accessible(*, image_path: str | Path) -> None:
         raise OSError(msg) from err
 
 
+@dataclass
+class HFCacheScanState:
+    """Mutable cache state for Hugging Face cache scans within one process."""
+
+    attempted: bool = False
+    info: HFCacheInfo | None = None
+    error: OSError | ValueError | HFValidationError | None = None
+
+
+_HF_CACHE_SCAN_STATE = HFCacheScanState()
+
+
+def _get_hf_cache_info_cached(*, refresh: bool = False) -> HFCacheInfo:
+    """Return cached HF cache info for this run, with optional refresh."""
+    state = _HF_CACHE_SCAN_STATE
+
+    if refresh:
+        state.attempted = False
+        state.info = None
+        state.error = None
+
+    if state.attempted:
+        if state.info is not None:
+            return state.info
+        cached_error = state.error
+        if cached_error is None:
+            msg = "Hugging Face cache scan previously failed with unknown error."
+            raise OSError(msg)
+        raise cached_error
+
+    try:
+        cache_info = scan_cache_dir()
+    except (HFValidationError, FileNotFoundError, OSError, ValueError) as err:
+        state.attempted = True
+        state.info = None
+        state.error = err
+        raise
+
+    state.attempted = True
+    state.info = cache_info
+    state.error = None
+    return cache_info
+
+
 def _check_hf_cache_integrity(model_identifier: str) -> None:
     """Check HuggingFace cache integrity for a model and log diagnostics.
 
@@ -8667,7 +8712,7 @@ def _check_hf_cache_integrity(model_identifier: str) -> None:
     """
     min_cache_size_mb = 1  # Less than 1MB is suspicious for any model
     try:
-        cache_info: HFCacheInfo = scan_cache_dir()
+        cache_info = _get_hf_cache_info_cached()
         # Find the specific repo in cache
         repo_found = False
         for repo in cache_info.repos:
@@ -8699,7 +8744,7 @@ def _check_hf_cache_integrity(model_identifier: str) -> None:
                 "Model %s not found in HF cache (may need to download)",
                 model_identifier,
             )
-    except (OSError, HFValidationError) as cache_err:
+    except (OSError, ValueError, HFValidationError) as cache_err:
         logger.debug("Could not check HF cache integrity: %s", cache_err)
 
 
@@ -9055,7 +9100,7 @@ def _resolve_model_snapshot_path(model_identifier: str) -> Path | None:
         return path.resolve() if path.is_dir() else None
 
     try:
-        cache_info: HFCacheInfo = scan_cache_dir()
+        cache_info = _get_hf_cache_info_cached()
     except (OSError, ValueError, FileNotFoundError, HFValidationError):
         return None
 
@@ -9723,6 +9768,7 @@ def _summary_parts(res: PerformanceResult, model_short: str) -> list[str]:
 def _preview_generation(
     gen: GenerationResult | SupportsGenerationResult | None,
     *,
+    analysis: GenerationQualityAnalysis | None = None,
     prompt: str | None = None,
     context_marker: str = "Context:",
 ) -> None:
@@ -9731,13 +9777,14 @@ def _preview_generation(
     text_val = str(getattr(gen, "text", ""))
     gen_tokens = getattr(gen, "generation_tokens", 0)
     prompt_tokens = getattr(gen, "prompt_tokens", None)
-    analysis = analyze_generation_text(
-        text_val,
-        gen_tokens,
-        prompt_tokens=prompt_tokens,
-        prompt=prompt,
-        context_marker=context_marker,
-    )
+    if analysis is None:
+        analysis = analyze_generation_text(
+            text_val,
+            gen_tokens,
+            prompt_tokens=prompt_tokens,
+            prompt=prompt,
+            context_marker=context_marker,
+        )
 
     if not text_val:
         if analysis.has_harness_issue:
@@ -9776,6 +9823,7 @@ def _log_verbose_success_details_mode(
     res: PerformanceResult,
     *,
     detailed: bool,
+    analysis: GenerationQualityAnalysis | None = None,
     prompt: str | None = None,
     context_marker: str = "Context:",
 ) -> None:
@@ -9785,16 +9833,17 @@ def _log_verbose_success_details_mode(
 
     # Generated text with emoji prefix for easy scanning
     gen_text = getattr(res.generation, "text", None) or ""
-
     gen_tokens = getattr(res.generation, "generation_tokens", 0)
-    prompt_tokens = getattr(res.generation, "prompt_tokens", None)
-    analysis = analyze_generation_text(
-        gen_text,
-        gen_tokens,
-        prompt_tokens=prompt_tokens,
-        prompt=prompt,
-        context_marker=context_marker,
-    )
+
+    if analysis is None:
+        prompt_tokens = getattr(res.generation, "prompt_tokens", None)
+        analysis = analyze_generation_text(
+            gen_text,
+            gen_tokens,
+            prompt_tokens=prompt_tokens,
+            prompt=prompt,
+            context_marker=context_marker,
+        )
 
     log_blank()
     log_metric_label("Generated Text:", emoji="📝")
@@ -10285,7 +10334,12 @@ def print_model_result(
         else:
             log_failure(line, prefix="")
     if result.success and not verbose:  # quick exit with preview only
-        _preview_generation(result.generation, prompt=prompt, context_marker=context_marker)
+        _preview_generation(
+            result.generation,
+            analysis=result.quality_analysis,
+            prompt=prompt,
+            context_marker=context_marker,
+        )
         return
     # For failures, show detailed error info; for success, show generation details
     if not result.success:
@@ -10296,6 +10350,7 @@ def print_model_result(
         _log_verbose_success_details_mode(
             result,
             detailed=detailed_metrics,
+            analysis=result.quality_analysis,
             prompt=prompt,
             context_marker=context_marker,
         )
@@ -10671,7 +10726,7 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
 def get_cached_model_ids() -> list[str]:
     """Return a list of model IDs found in the Hugging Face cache."""
     try:
-        cache_info: HFCacheInfo = scan_cache_dir()
+        cache_info = _get_hf_cache_info_cached()
     except HFValidationError:
         logger.warning("Hugging Face cache directory invalid.")
         return []

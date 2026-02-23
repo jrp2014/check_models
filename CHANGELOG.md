@@ -45,6 +45,12 @@ Notable changes to this project will be documented in this file.
 - Simplified diagnostics failure-cluster filing guidance so it only includes
   the repro command bullet; full traceback/captured-output diagnostics remain
   available in the existing collapsible sections.
+- Optimized hot paths in `src/check_models.py`:
+  - Hugging Face cache scans are now reused via a per-run cache helper.
+  - Quality analysis is reused when `PerformanceResult.quality_analysis`
+    already exists, avoiding repeated `analyze_generation_text()` calls.
+  - Diagnostics generation now computes failure clusters once and reuses them
+    across sections.
 
 ### Fixed
 
