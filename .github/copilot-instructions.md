@@ -55,7 +55,7 @@ The file is organized in this order — use these landmarks to jump to the right
 - **Type aliases**: `MetricValue = int | float | str | None` is the value type for metrics.
 - **Protocols over ABCs**: typing for optional deps uses `Protocol` classes (e.g., `SupportsGenerationResult`).
 - **Reports write to** `src/output/` (`results.html`, `results.md`, `results.jsonl`, `results.tsv`, `diagnostics.md`, `results.history.jsonl`, `check_models.log`, `environment.log`).
-- **Security**: defaults to `--trust-remote-code`. Env vars `TRANSFORMERS_NO_TF`, `TRANSFORMERS_NO_FLAX`, `TRANSFORMERS_NO_JAX` are set to avoid heavy backends unless `MLX_VLM_ALLOW_TF=1`.
+- **Security**: defaults to `--trust-remote-code`. Backend guard env vars are set (`TRANSFORMERS_NO_*` and compatibility `USE_*`) unless `MLX_VLM_ALLOW_TF=1`.
 
 ### 5. Make targets (all run from repo root)
 

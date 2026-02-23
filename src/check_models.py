@@ -94,7 +94,6 @@ if TYPE_CHECKING:
     from mlx.nn import Module
     from mlx_vlm.generate import GenerationResult
     from PIL.Image import Image as PILImage
-    from transformers.tokenization_python import PythonBackend
 
 # Public API (PEP 8 / PEP 561 best practice)
 __all__ = [
@@ -173,6 +172,7 @@ ERROR_MLX_LM_MISSING: Final[str] = (
 ERROR_MLX_VLM_RUNTIME_INIT: Final[str] = (
     "Core dependency initialization failed: mlx-vlm could not be imported safely."
 )
+PROJECT_MIN_TRANSFORMERS_VERSION: Final[str] = "5.2.0"
 MLX_IMPORT_PROBE_TIMEOUT_SECONDS: Final[float] = 8.0
 
 
@@ -588,12 +588,21 @@ except importlib.metadata.PackageNotFoundError:
     MISSING_DEPENDENCIES["mlx-lm"] = ERROR_MLX_LM_MISSING
 
 _transformers_guard_enabled: bool = os.getenv("MLX_VLM_ALLOW_TF", "0") != "1"
+_TRANSFORMERS_BACKEND_GUARD_ENV_DEFAULTS: Final[dict[str, str]] = {
+    # Legacy guard names used in older transformers releases.
+    "TRANSFORMERS_NO_TF": "1",
+    "TRANSFORMERS_NO_FLAX": "1",
+    "TRANSFORMERS_NO_JAX": "1",
+    # Compatibility with releases that used USE_* toggles.
+    "USE_TF": "0",
+    "USE_FLAX": "0",
+    "USE_JAX": "0",
+}
 if _transformers_guard_enabled:
     # Prevent Transformers from importing heavy backends that can hang on macOS/ARM
     # when they are present in the environment but not needed for MLX workflows.
-    os.environ.setdefault("TRANSFORMERS_NO_TF", "1")
-    os.environ.setdefault("TRANSFORMERS_NO_FLAX", "1")
-    os.environ.setdefault("TRANSFORMERS_NO_JAX", "1")
+    for env_key, env_value in _TRANSFORMERS_BACKEND_GUARD_ENV_DEFAULTS.items():
+        os.environ.setdefault(env_key, env_value)
 
 
 # =============================================================================
@@ -3995,7 +4004,7 @@ def _version_components(version_text: str, *, width: int = 4) -> tuple[int, ...]
     """Convert a version string to comparable numeric components.
 
     Keeps only numeric segments so strings like ``0.30.7.dev20260214`` compare
-    sensibly against floor versions such as ``0.30.5``.
+    sensibly against floor versions such as ``0.30.4``.
     """
     numbers = [int(part) for part in re.findall(r"\d+", version_text)]
     if len(numbers) < width:
@@ -4011,7 +4020,7 @@ def _is_version_at_least(installed: str, minimum: str) -> bool:
 def _collect_upstream_requirements(
     versions: LibraryVersionDict,
 ) -> dict[str, tuple[str, set[str]]]:
-    """Collect package floor versions implied by installed upstream stacks."""
+    """Collect package floors implied by installed stacks and project policy."""
     requirements: dict[str, tuple[str, set[str]]] = {}
 
     def _record_requirement(package: str, minimum: str, source_stack: str) -> None:
@@ -4027,12 +4036,19 @@ def _collect_upstream_requirements(
         else:
             requirements[package] = (current_minimum, merged_sources)
 
+    # Project-level dependency floor (policy): transformers >= 5.2.
+    _record_requirement("transformers", PROJECT_MIN_TRANSFORMERS_VERSION, "check_models")
+
     if versions.get("mlx-vlm"):
-        _record_requirement("mlx", "0.30.0", "mlx-vlm")
-        _record_requirement("mlx-lm", "0.30.5", "mlx-vlm")
-        _record_requirement("transformers", "5.1.0", "mlx-vlm")
+        # mlx-vlm requirements.txt currently specifies:
+        #   mlx>=0.26.0, mlx-lm>=0.23.0, transformers>=4.53.0
+        _record_requirement("mlx", "0.26.0", "mlx-vlm")
+        _record_requirement("mlx-lm", "0.23.0", "mlx-vlm")
+        _record_requirement("transformers", "4.53.0", "mlx-vlm")
 
     if versions.get("mlx-lm"):
+        # mlx-lm setup.py currently specifies:
+        #   mlx>=0.30.4, transformers>=5.0.0
         _record_requirement("mlx", "0.30.4", "mlx-lm")
         _record_requirement("transformers", "5.0.0", "mlx-lm")
 
@@ -4040,7 +4056,7 @@ def _collect_upstream_requirements(
 
 
 def _detect_upstream_version_issues(versions: LibraryVersionDict) -> list[str]:
-    """Return compatibility issues against current upstream package minimums."""
+    """Return compatibility issues against current package minimums."""
     issues: list[str] = []
     requirements = _collect_upstream_requirements(versions)
 
@@ -4049,14 +4065,13 @@ def _detect_upstream_version_issues(versions: LibraryVersionDict) -> list[str]:
         installed = versions.get(package)
         if installed is None:
             issues.append(
-                f"{package} is missing; upstream {source_label} expects {package}>={minimum}.",
+                f"{package} is missing; {source_label} expects {package}>={minimum}.",
             )
             continue
 
         if not _is_version_at_least(installed, minimum):
             issues.append(
-                f"{package}=={installed} is below upstream minimum {minimum} "
-                f"required by {source_label}.",
+                f"{package}=={installed} is below minimum {minimum} required by {source_label}.",
             )
 
     return issues
@@ -4139,13 +4154,13 @@ def _detect_mlx_vlm_load_image_issue() -> str | None:
 
 
 def _has_transformers_backend_guard_names(import_utils_source: str) -> bool:
-    """Return whether transformers source still references TRANSFORMERS_NO_* vars."""
-    guard_names = ("TRANSFORMERS_NO_TF", "TRANSFORMERS_NO_FLAX", "TRANSFORMERS_NO_JAX")
+    """Return whether transformers source references known backend-guard env vars."""
+    guard_names = tuple(_TRANSFORMERS_BACKEND_GUARD_ENV_DEFAULTS)
     return any(name in import_utils_source for name in guard_names)
 
 
 def _detect_transformers_env_guard_issue() -> str | None:
-    """Detect whether transformers still honors TRANSFORMERS_NO_* guard vars."""
+    """Detect whether transformers still honors backend guard environment variables."""
     if not _transformers_guard_enabled:
         return None
 
@@ -4163,8 +4178,9 @@ def _detect_transformers_env_guard_issue() -> str | None:
         return None
 
     return (
-        "transformers import utils no longer reference TRANSFORMERS_NO_TF/FLAX/JAX; "
-        "check_models backend guard env vars may be ignored with this version."
+        "transformers import utils no longer reference known backend guard env vars "
+        "(TRANSFORMERS_NO_* / USE_*); check_models backend guard hints may be ignored "
+        "with this version."
     )
 
 
@@ -7199,6 +7215,9 @@ _REPRO_ENV_KEYS: Final[tuple[str, ...]] = (
     "TRANSFORMERS_NO_TF",
     "TRANSFORMERS_NO_FLAX",
     "TRANSFORMERS_NO_JAX",
+    "USE_TF",
+    "USE_FLAX",
+    "USE_JAX",
     "MLX_VLM_ALLOW_TF",
     "MLX_VLM_WIDTH",
     "PYTHONPATH",
@@ -9324,7 +9343,7 @@ def _run_model_generation(
 
         output: GenerationResult | SupportsGenerationResult = generate(
             model=model,
-            processor=cast("PythonBackend", processor),
+            processor=cast("Any", processor),
             prompt=formatted_prompt,
             image=str(params.image_path),
             verbose=params.verbose,
@@ -10446,7 +10465,8 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     guard_on = os.getenv("MLX_VLM_ALLOW_TF", "0") != "1"
     if guard_on and tf_present:
         logger.info(
-            "TensorFlow detected but disabled (set MLX_VLM_ALLOW_TF=1 to opt in)",
+            "TensorFlow detected; backend-disable env guards were requested "
+            "(set MLX_VLM_ALLOW_TF=1 to opt in).",
         )
     if st_present:
         logger.warning(
@@ -10492,6 +10512,21 @@ def _get_run_preflight_issues(args: argparse.Namespace | None) -> tuple[str, ...
 
 def _raise_for_missing_runtime_dependencies() -> None:
     """Raise a fatal runtime error when core inference dependencies are unavailable."""
+    transformers_version = get_library_versions().get("transformers")
+    if transformers_version is None:
+        MISSING_DEPENDENCIES.setdefault(
+            "transformers",
+            (
+                "Core dependency missing: transformers. "
+                f"Please install transformers>={PROJECT_MIN_TRANSFORMERS_VERSION}."
+            ),
+        )
+    elif not _is_version_at_least(transformers_version, PROJECT_MIN_TRANSFORMERS_VERSION):
+        MISSING_DEPENDENCIES["transformers"] = (
+            f"Core dependency too old: transformers=={transformers_version}. "
+            f"Need transformers>={PROJECT_MIN_TRANSFORMERS_VERSION}."
+        )
+
     if not MISSING_DEPENDENCIES:
         return
 

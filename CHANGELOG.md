@@ -8,6 +8,20 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Raised the project Transformers floor to `>=5.2.0` and aligned packaging,
+  runtime checks, and docs/tests to that policy.
+- Aligned preflight package-floor diagnostics in `src/check_models.py` with
+  current upstream dependency declarations from `mlx-vlm` and `mlx-lm`
+  repositories (instead of stricter ad-hoc floors), reducing false-positive
+  compatibility warnings.
+- Updated backend-guard behavior for Transformers integration: when
+  `MLX_VLM_ALLOW_TF` is not set, `check_models.py` now applies both legacy
+  `TRANSFORMERS_NO_*` and compatibility `USE_*` env guards, and diagnostics now
+  explicitly report when newer Transformers versions ignore both families.
+- Updated `src/tools/update.sh` so local MLX builds apply `MLX_METAL_JIT`
+  through MLX's current CMake build flag
+  (`CMAKE_ARGS=-DMLX_BUILD_METAL_KERNELS=<ON|OFF>`), ensuring the selected
+  kernel mode is honored during `pip install -e .`.
 - Audited inline comments in `src/check_models.py` and removed stale
   refactor-history notes that no longer describe current behavior, while
   keeping explanatory comments for runtime/error-handling decisions.
@@ -61,6 +75,9 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Replaced a brittle type-only dependency on internal Transformers module
+  `transformers.tokenization_python.PythonBackend` with a stable `Any` cast at
+  the mlx-vlm call boundary, avoiding reliance on non-public import paths.
 - Fixed `src/Makefile` `ci` target to use available commands (ruff + mypy +
   dependency sync check) instead of referencing removed tooling.
 - Added `--check` mode to `src/tools/update_readme_deps.py` so CI/developers can

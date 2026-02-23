@@ -474,8 +474,8 @@ class TestPreflightDependencyDiagnostics:
 
     def test_is_version_at_least_handles_dev_builds(self, mod: types.ModuleType) -> None:
         """Dev build strings should compare correctly against floor versions."""
-        assert mod._is_version_at_least("0.30.7.dev20260214+c184262d", "0.30.5")
-        assert not mod._is_version_at_least("5.0.9", "5.1.0")
+        assert mod._is_version_at_least("0.30.7.dev20260214+c184262d", "0.30.4")
+        assert not mod._is_version_at_least("5.1.9", "5.2.0")
 
     def test_collect_upstream_requirements_tracks_strictest_floor(
         self,
@@ -487,12 +487,12 @@ class TestPreflightDependencyDiagnostics:
                 "mlx-vlm": "0.3.12",
                 "mlx-lm": "0.30.7",
                 "mlx": "0.30.7",
-                "transformers": "5.1.0",
+                "transformers": "5.2.0",
             }
         )
         assert requirements["mlx"][0] == "0.30.4"
-        assert requirements["transformers"][0] == "5.1.0"
-        assert requirements["mlx-lm"][0] == "0.30.5"
+        assert requirements["transformers"][0] == "5.2.0"
+        assert requirements["mlx-lm"][0] == "0.23.0"
 
     def test_detect_upstream_version_issues_reports_below_floor(
         self,
@@ -502,14 +502,14 @@ class TestPreflightDependencyDiagnostics:
         issues = mod._detect_upstream_version_issues(
             {
                 "mlx-vlm": "0.3.12",
-                "mlx-lm": "0.30.4",
+                "mlx-lm": "0.22.9",
                 "mlx": "0.29.9",
-                "transformers": "5.0.9",
+                "transformers": "5.1.9",
             }
         )
         assert any("mlx==0.29.9" in issue and "0.30.4" in issue for issue in issues)
-        assert any("mlx-lm==0.30.4" in issue and "0.30.5" in issue for issue in issues)
-        assert any("transformers==5.0.9" in issue and "5.1.0" in issue for issue in issues)
+        assert any("mlx-lm==0.22.9" in issue and "0.23.0" in issue for issue in issues)
+        assert any("transformers==5.1.9" in issue and "5.2.0" in issue for issue in issues)
 
     def test_has_mlx_vlm_load_image_path_bug_detection(self, mod: types.ModuleType) -> None:
         """Source matcher should flag unguarded startswith URL branch."""
@@ -524,6 +524,7 @@ class TestPreflightDependencyDiagnostics:
     def test_has_transformers_backend_guard_names(self, mod: types.ModuleType) -> None:
         """Guard-name detector should reflect source content."""
         assert mod._has_transformers_backend_guard_names("TRANSFORMERS_NO_TF")
+        assert mod._has_transformers_backend_guard_names("USE_TF")
         assert not mod._has_transformers_backend_guard_names("USE_TORCH_XLA")
 
     def test_resolve_distribution_source_file_finds_relative_path(

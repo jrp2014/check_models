@@ -31,6 +31,8 @@ dependencies = [
     # Minimal runtime set actually imported by check_models.py
     "mlx>=0.29.1",
     "mlx-vlm>=0.3.0",
+    # Project-level compatibility floor for the MLX ecosystem.
+    "transformers>=5.2.0",
     "Pillow[xmp]>=10.3.0",
     "huggingface-hub[torch,typing]>=0.34.0",
     "requests>=2.31.0",
@@ -63,9 +65,8 @@ extras = [
     "einops>=0.6.0",
     # Number-to-words conversion (required by some model processors)
     "num2words>=0.5.0",
-    # Language-model utilities & transformer inference (not required for base benchmarking)
+    # Language-model utilities (not required for base benchmarking)
     "mlx-lm>=0.23.0",
-    "transformers>=4.53.0",
     "sentencepiece",
     # TensorFlow (needed for some models like Florence-2)
     "tensorflow",

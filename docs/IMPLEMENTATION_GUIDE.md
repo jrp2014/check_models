@@ -942,7 +942,7 @@ rg "UNUSED_CONSTANT" src/
 **Runtime dependency versions MUST stay consistent** between `pyproject.toml` and the install snippets in `src/README.md`.
 
 **Current slim runtime set** (authoritative in `src/pyproject.toml`):
-`mlx`, `mlx-vlm`, `Pillow`, `huggingface-hub`, `tabulate`, `tzlocal`
+`mlx`, `mlx-vlm`, `transformers`, `Pillow`, `huggingface-hub`, `requests`, `tabulate`, `tzlocal`, `wcwidth`, `PyYAML`
 
 **If you add a new import in `src/check_models.py`, you MUST also**:
 
@@ -954,7 +954,7 @@ The `test_dependency_sync` test and CI will fail otherwise.
 
 **Optional groups**:
 
-- `extras`: `psutil`, `tokenizers`, `mlx-lm`, `transformers`
+- `extras`: `psutil`, `tokenizers`, `mlx-lm`
 - `torch`: `torch`, `torchvision`, `torchaudio`
 
 **Mechanism**:

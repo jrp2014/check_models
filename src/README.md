@@ -412,10 +412,14 @@ Several behaviors can be customized via environment variables (useful for CI/aut
 | `MLX_VLM_WIDTH` | Force CLI output width (columns) | Auto-detect terminal | `MLX_VLM_WIDTH=120` |
 | `NO_COLOR` | Disable ANSI colors in output | Not set (colors enabled) | `NO_COLOR=1` |
 | `FORCE_COLOR` | Force ANSI colors even in non-TTY | Not set | `FORCE_COLOR=1` |
-| `TRANSFORMERS_NO_TF` | Block TensorFlow loading | `1` (blocked) | `TRANSFORMERS_NO_TF=0` to allow |
+| `TRANSFORMERS_NO_TF` | Legacy Transformers backend guard (best effort) | `1` when guard active | `TRANSFORMERS_NO_TF=0` |
+| `USE_TF` | Compatibility backend guard (best effort) | `0` when guard active | `USE_TF=1` |
 | `MLX_VLM_ALLOW_TF` | Override TensorFlow blocking | Not set (blocked) | `MLX_VLM_ALLOW_TF=1` to allow |
 | `TOKENIZERS_PARALLELISM` | Disable tokenizer parallelism warnings | `false` | `TOKENIZERS_PARALLELISM=true` |
-| `MLX_METAL_JIT` | Metal kernel compilation mode | `OFF` (pre-built) | `MLX_METAL_JIT=ON` for runtime JIT |
+| `MLX_METAL_JIT` | `tools/update.sh` MLX build mode (`MLX_BUILD_METAL_KERNELS`) | `OFF` (pre-built kernels) | `MLX_METAL_JIT=ON` for runtime JIT |
+
+When backend guards are active, the script also sets `TRANSFORMERS_NO_FLAX=1`,
+`TRANSFORMERS_NO_JAX=1`, `USE_FLAX=0`, and `USE_JAX=0`.
 
 **Examples**:
 
@@ -456,7 +460,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- MANUAL_INSTALL_START -->
 ```bash
-pip install "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "tzlocal>=5.0" "wcwidth>=0.2.13"
+pip install "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "transformers>=5.2.0" "tzlocal>=5.0" "wcwidth>=0.2.13"
 ```
 <!-- MANUAL_INSTALL_END -->
 
@@ -565,7 +569,7 @@ Optional (enable additional features):
 | Tensor operations (for some models) | `einops` | `extras` | `pip install -e "src/[extras]"` |
 | Number-to-words conversion (for some models) | `num2words` | `extras` | `pip install -e "src/[extras]"` |
 | Language model utilities | `mlx-lm` | `extras` | `pip install -e "src/[extras]"` |
-| Transformer model support | `transformers` | `extras` | `pip install -e "src/[extras]"` |
+| Transformer model support | `transformers` | core runtime | Installed by `make install` / `pip install -e src/` |
 | PyTorch stack (needed for some models) | `torch`, `torchvision`, `torchaudio` | `torch` | `pip install -e "src/[torch]"` or `make -C src install-torch` |
 
 **Note**: Some models (e.g., Phi-3-vision, certain Florence2 variants) require PyTorch. If you encounter import errors for `torch`, `torchvision`, or `torchaudio`, install with:
@@ -596,13 +600,13 @@ Development / QA:
 
 <!-- MINIMAL_INSTALL_START -->
 ```bash
-pip install "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "tzlocal>=5.0" "wcwidth>=0.2.13"
+pip install "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "transformers>=5.2.0" "tzlocal>=5.0" "wcwidth>=0.2.13"
 ```
 <!-- MINIMAL_INSTALL_END -->
 
 ### With Optional Extras
 
-The `extras` group in `pyproject.toml` pulls in `psutil`, `tokenizers`, `mlx-lm`, and `transformers`:
+The `extras` group in `pyproject.toml` pulls in `psutil`, `tokenizers`, and `mlx-lm`:
 
 ```bash
 pip install -e ".[extras]"  # adds psutil, tokenizers
@@ -627,10 +631,10 @@ pip install -e ".[dev,extras]"  # dev tools + optional metrics/tokenizers
 > `psutil` is optional (installed with `extras`); if absent the extended Apple Silicon hardware section omits RAM/cores.
 
 > [!NOTE]
-> `extras` group bundles: psutil, tokenizers, mlx-lm, transformers. Install only if you need extended metrics or LM/transformer features.
+> `extras` group bundles: psutil, tokenizers, mlx-lm. Install only if you need extended metrics or LM features.
 
 > [!NOTE]
-> Keep `transformers` updated if using it: `pip install -U transformers`.
+> Project policy requires `transformers>=5.2.0`.
 
 > [!NOTE]
 > `system_profiler` is a macOS built-in (no install needed) used for GPU name / core info.
@@ -935,12 +939,14 @@ python -m check_models --exclude "meta-llama/Llama-3.2-90B-Vision-Instruct"
 
 **Script crashes with mutex error**: If you see `libc++abi: terminating due to uncaught exception of type std::__1::system_error: mutex lock failed: Invalid argument`, TensorFlow is installed and conflicting with MLX.
 
-The script automatically prevents TensorFlow from loading by setting `TRANSFORMERS_NO_TF=1` (unless you override with `MLX_VLM_ALLOW_TF=1`), so if TensorFlow gets imported anyway:
+The script applies best-effort backend guard env vars (`TRANSFORMERS_NO_*` and
+`USE_*`) unless you set `MLX_VLM_ALLOW_TF=1`. If TensorFlow still gets imported:
 
-Option 1 - Keep TensorFlow but ensure it's blocked (safest, script does this automatically):
+Option 1 - Keep TensorFlow but ensure backend guards are set (script does this automatically):
 
 ```bash
 export TRANSFORMERS_NO_TF=1
+export USE_TF=0
 python -m check_models  # Run normally - the script sets this env var automatically
 ```
 
@@ -970,21 +976,22 @@ This provides:
 
 ### Framework Detection and Automatic Blocking
 
-The script **automatically** prevents TensorFlow, JAX, and Flax from loading to avoid conflicts with MLX on Apple Silicon:
+The script **automatically** applies best-effort backend guards to reduce accidental TensorFlow/JAX/Flax imports on Apple Silicon:
 
-- On startup, sets `TRANSFORMERS_NO_TF=1`, `TRANSFORMERS_NO_FLAX=1`, `TRANSFORMERS_NO_JAX=1` (unless you override with `MLX_VLM_ALLOW_TF=1`)
+- On startup, sets `TRANSFORMERS_NO_TF=1`, `TRANSFORMERS_NO_FLAX=1`, `TRANSFORMERS_NO_JAX=1`, `USE_TF=0`, `USE_FLAX=0`, and `USE_JAX=0` (unless you override with `MLX_VLM_ALLOW_TF=1`)
 - PyTorch is allowed by default (some models require it, e.g., Phi-3-vision)
-- Logs a warning if TensorFlow is detected but successfully blocked
+- Logs a warning when TensorFlow is detected while guards are active
 - Also logs if `sentence-transformers` is present
 
 **⚠️ About TensorFlow on Apple Silicon:**
 
-If TensorFlow is installed, the script's automatic blocking (`TRANSFORMERS_NO_TF=1`) should prevent it from loading, avoiding mutex crashes. However, if you encounter the error `libc++abi: terminating due to uncaught exception of type std::__1::system_error: mutex lock failed: Invalid argument`:
+If TensorFlow is installed, these guards often prevent loading and avoid mutex crashes. However, if you encounter the error `libc++abi: terminating due to uncaught exception of type std::__1::system_error: mutex lock failed: Invalid argument`:
 
 1. **First try**: Verify the environment variable is set (the script does this automatically):
 
    ```bash
    export TRANSFORMERS_NO_TF=1
+   export USE_TF=0
    python -m check_models
    ```
 

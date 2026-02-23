@@ -402,7 +402,7 @@ class TestDiagnosticsReport:
             prompt="test",
             history=DiagnosticsHistoryInputs(
                 preflight_issues=(
-                    "transformers import utils no longer reference TRANSFORMERS_NO_TF/FLAX/JAX",
+                    "transformers import utils no longer reference known backend guard env vars",
                 ),
             ),
         )

@@ -87,7 +87,6 @@ def test_readme_runtime_block_matches_pyproject() -> None:
         "psutil",
         "tokenizers",
         "mlx-lm",
-        "transformers",
         "torch",
         "torchvision",
         "torchaudio",

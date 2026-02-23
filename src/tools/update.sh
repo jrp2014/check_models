@@ -15,7 +15,7 @@
 #   FORCE_REINSTALL=1 ./update.sh     # Force reinstall with --force-reinstall
 #   SKIP_MLX=1 ./update.sh            # Force skip mlx/mlx-vlm updates (override detection)
 #   CONDA_UPDATE_ALL=1 ./update.sh    # Force conda update --all even with pip conflicts
-#   MLX_METAL_JIT=ON ./update.sh      # Enable Metal JIT for smaller binaries (defaults to OFF)
+#   MLX_METAL_JIT=ON ./update.sh      # Build MLX with runtime Metal kernel compilation
 #   CLEAN_BUILD=1 ./update.sh         # Clean build artifacts before building local MLX repos
 #
 # Local MLX Development:
@@ -36,7 +36,11 @@
 #   - typing_extensions (required by MLX build)
 #   - setuptools>=80 (required for stub generation)
 #
-# Note: Script automatically detects and preserves local MLX dev builds (versions
+# Note:
+# - MLX_METAL_JIT maps to CMake option MLX_BUILD_METAL_KERNELS:
+#     OFF (default) -> -DMLX_BUILD_METAL_KERNELS=ON  (pre-built kernels)
+#     ON            -> -DMLX_BUILD_METAL_KERNELS=OFF (runtime/JIT compilation)
+# - Script automatically detects and preserves local MLX dev builds (versions
 # containing .dev or +commit). Stable releases are updated normally.
 
 set -euo pipefail
@@ -370,28 +374,33 @@ update_local_mlx_repos() {
 		local CURRENT_VERSION
 		CURRENT_VERSION=$(pip show "${REPO_NAMES[idx]}" 2>/dev/null | grep '^Version:' | awk '{print $2}' || echo "")
 
-		# MLX requires CMake configuration before pip install
+		PREV_CMAKE_ARGS=""
+		CMAKE_ARGS_WAS_SET=0
+
+		# MLX build controls are passed to pip via CMAKE_ARGS.
 		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
-			# Install MLX build dependencies (matching GitHub Actions)
-			# Use pip_install_tool to avoid eager transitive upgrades
+			# Install MLX build dependencies.
+			# Use pip_install_tool to avoid eager transitive upgrades.
 			echo "[update.sh] Installing MLX build dependencies..."
 			pip_install_tool cmake
 			pip_install_tool setuptools
 			pip_install_tool typing_extensions
-			
-			[[ "${CLEAN_BUILD:-0}" == "1" ]] && rm -rf build
-			
+
 			local JIT_SETTING="${MLX_METAL_JIT:-OFF}"
-			echo "[update.sh] Building mlx with MLX_METAL_JIT=$JIT_SETTING"
-			
+			local KERNEL_BUILD_SETTING="ON"
 			if [[ "$JIT_SETTING" == "ON" ]]; then
-				env MLX_METAL_JIT=ON cmake -S . -B build || { REPO_SKIP[idx]=1; continue; }
-			else
-				cmake -S . -B build || { REPO_SKIP[idx]=1; continue; }
+				KERNEL_BUILD_SETTING="OFF"
 			fi
-			
-			cmake --build build || { REPO_SKIP[idx]=1; continue; }
-			echo "[update.sh] Installing MLX Python bindings..."
+
+			if [[ -n "${CMAKE_ARGS:-}" ]]; then
+				PREV_CMAKE_ARGS="$CMAKE_ARGS"
+				CMAKE_ARGS_WAS_SET=1
+				export CMAKE_ARGS="$CMAKE_ARGS -DMLX_BUILD_METAL_KERNELS=$KERNEL_BUILD_SETTING"
+			else
+				export CMAKE_ARGS="-DMLX_BUILD_METAL_KERNELS=$KERNEL_BUILD_SETTING"
+			fi
+
+			echo "[update.sh] Installing mlx with MLX_METAL_JIT=$JIT_SETTING (CMAKE_ARGS=$CMAKE_ARGS)"
 		fi
 		
 		# Install package (works for both mlx and others)
@@ -415,8 +424,17 @@ update_local_mlx_repos() {
 						|| echo "❌ CRITICAL: Could not restore ${REPO_NAMES[idx]}. Run: pip install ${REPO_NAMES[idx]}"
 				fi
 			fi
-			continue
 		fi
+
+		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
+			if [[ $CMAKE_ARGS_WAS_SET -eq 1 ]]; then
+				export CMAKE_ARGS="$PREV_CMAKE_ARGS"
+			else
+				unset CMAKE_ARGS
+			fi
+		fi
+
+		[[ ${REPO_SKIP[idx]} -eq 1 ]] && continue
 	
 		# Stubs are generated automatically by the build process now
 		# if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
