@@ -19,11 +19,11 @@ For one-off commands without activating: `conda run -n mlx-vlm python ...`.
 
 | File | Purpose | Size |
 | ------ | --------- | ------ |
-| `src/check_models.py` | **Single-file CLI monolith** (~10,700 lines). All logic lives here. | ★ primary edit target |
+| `src/check_models.py` | **Single-file CLI monolith** (~12,900 lines). All logic lives here. | ★ primary edit target |
 | `src/quality_config.yaml` | Runtime thresholds loaded by `load_quality_config()` | Edit thresholds here, not in Python |
 | `src/pyproject.toml` | Packaging, dependencies, tool config (ruff, mypy, pytest) | Update when adding imports |
 | `src/tests/conftest.py` | Shared fixtures: `test_image`, `minimal_test_image`, `realistic_test_image`, `folder_with_images`, etc. | Use existing fixtures |
-| `src/tests/test_*.py` | ~5,000 lines across ~35 test files | Add tests to existing files |
+| `src/tests/test_*.py` | ~6,900 lines across ~34 test files | Add tests to existing files |
 | `docs/IMPLEMENTATION_GUIDE.md` | Detailed coding standards and architecture decisions | Reference for conventions |
 | `src/README.md` | Full CLI docs, all flags, usage examples (~1,100 lines) | Reference for CLI behavior |
 
@@ -33,24 +33,24 @@ The file is organized in this order — use these landmarks to jump to the right
 
 | Section | Key contents | Approx. lines |
 | --------- | ------------- | --------------- |
-| Imports & env setup | `MISSING_DEPENDENCIES` dict, optional dep guards | 1–580 |
-| Protocol types | `SupportsGenerationResult`, `SupportsExifIfd` | 590–620 |
-| Data classes | `PerformanceResult`, `ResultSet`, `ProcessImageParams` | 677–900 |
-| Timing & timeout | `PerfCounterTimer`, `TimeoutManager` | 913–1000 |
-| Colors & logging | `Colors`, `LogStyles`, `ColoredFormatter` | 1013–1310 |
-| Quality detection | `_detect_repetitive_output`, `_detect_hallucination_patterns`, etc. | 1589–2520 |
-| Advanced metrics | `compute_vocabulary_diversity`, `compute_efficiency_metrics`, etc. | 2520–3310 |
-| Field formatting | `format_field_value` (centralized display normalization) | 3474–3650 |
-| Diagnostics/report generators | `generate_diagnostics_report` (~6101), `generate_html_report` (~6544), `generate_markdown_report` (~6739) | 6100–7600 |
-| Image processing | `process_image_with_model` (~7695) | 7695–9600 |
-| Run history/finalization | `compare_history_records`, `append_history_record`, `finalize_execution` | 9831–10270 |
-| CLI parsing | `main()` (~10277), `main_cli()` (~10385) | 10277–10679 |
+| Imports & env setup | `MISSING_DEPENDENCIES` dict, optional dep guards | 1–609 |
+| Protocol types | `SupportsGenerationResult`, `SupportsExifIfd` | 610–811 |
+| Data classes | `PerformanceResult`, `ResultSet`, `ProcessImageParams` | 869–1104 |
+| Timing & timeout | `PerfCounterTimer`, `TimeoutManager` | 1105–1248 |
+| Colors & logging | `Colors`, `LogStyles`, `ColoredFormatter` | 1251–1614 |
+| Quality/harness detection | `_detect_repetitive_output`, `_detect_hallucination_patterns`, harness detectors | 1809–2768 |
+| Advanced metrics | `compute_vocabulary_diversity`, `compute_efficiency_metrics`, `compute_cataloging_utility` | 2833–3488 |
+| Field formatting | `format_field_value` (centralized display normalization) | 3768–3913 |
+| Diagnostics/report generators | `generate_diagnostics_report` (~7429), `generate_html_report` (~7884), `generate_markdown_report` (~8079) | 5993–8180 |
+| Image processing | `process_image_with_model` (~9439) | 9439–11720 |
+| Run history/finalization | `compare_history_records`, `append_history_record`, `finalize_execution` | 11732–12482 |
+| CLI parsing | `main()` (~12483), `main_cli()` (~12594) | 12483–12888 |
 
 ### 4. Architecture & patterns
 
 - **Single CLI runner**: discovers models (HF cache scan), runs each with per-model isolation (timeouts, try/except), generates multi-format reports (`HTML`, `Markdown`, `TSV`, `JSONL`).
 - **Configuration hierarchy**: `src/quality_config.yaml` → `QualityThresholds` / `FormattingThresholds` dataclasses. Never sprinkle magic numbers.
-- **Optional deps**: guarded with `try/except ImportError` → populate `MISSING_DEPENDENCIES` dict → graceful runtime fallbacks. Follow the same pattern when adding features.
+- **Dependencies**: optional packages are guarded with `try/except ImportError` → populate `MISSING_DEPENDENCIES`; core runtime deps (`mlx`, `mlx-vlm`, `mlx-lm`) now hard-fail before inference.
 - **Display normalization**: ALL metric formatting goes through `format_field_value(field_name, value)`. Do not format metrics inline.
 - **Type aliases**: `MetricValue = int | float | str | None` is the value type for metrics.
 - **Protocols over ABCs**: typing for optional deps uses `Protocol` classes (e.g., `SupportsGenerationResult`).
@@ -83,7 +83,7 @@ The file is organized in this order — use these landmarks to jump to the right
 ### 7. CI environment
 
 - **Platform**: GitHub Actions, `macos-15`, Python 3.13, Node.js 22
-- **Pipeline** (`.github/workflows/quality.yml`): checkout → install deps (`pip install -e src/.[dev]`) → generate MLX stubs via nanobind → `bash src/tools/run_quality_checks.sh`
+- **Pipeline** (`.github/workflows/quality.yml`): checkout → install deps (`pip install -e src/.[dev]`) → generate MLX stubs via nanobind into `typings/` → `bash src/tools/run_quality_checks.sh`
 - **PRs must pass**: ruff format + lint, mypy, ty, pyrefly, pytest, shellcheck, dependency sync, markdownlint
 - **Pre-commit hooks**: install with `cd src && python -m tools.install_precommit_hook`
 
@@ -115,7 +115,7 @@ The file is organized in this order — use these landmarks to jump to the right
 
 **Add a CLI flag:**
 
-1. Add `argparse` argument near line ~10400 in `src/check_models.py`
+1. Add `argparse` argument near line ~12620 in `src/check_models.py`
 2. Wire it through `main()` → `process_image_with_model()` or relevant function
 3. Add test in `src/tests/test_parameter_validation.py`
 4. Run `pytest src/tests/test_parameter_validation.py src/tests/test_cli_help_output.py -q`
@@ -127,13 +127,13 @@ The file is organized in this order — use these landmarks to jump to the right
 
 **Modify report output:**
 
-1. Edit `generate_html_report` (~line 6544) or `generate_markdown_report` (~line 6739)
+1. Edit `generate_html_report` (~line 7884) or `generate_markdown_report` (~line 8079)
 2. Update `src/output/` fixture files if test assertions reference them
 3. Run `pytest src/tests/test_html_formatting.py src/tests/test_markdown_formatting.py -q`
 
 **Add a new quality detector:**
 
-1. Add `_detect_your_pattern(text: str) -> tuple[bool, str | None]` following existing patterns (~line 1356–2520)
+1. Add `_detect_your_pattern(text: str) -> tuple[bool, str | None]` following existing patterns (~line 1809–2768)
 2. Wire it into the quality analysis pipeline
 3. Add thresholds to `src/quality_config.yaml` and `QualityThresholds`
 4. Add test in `src/tests/test_quality_analysis.py`

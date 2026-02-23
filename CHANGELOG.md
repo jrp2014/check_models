@@ -8,6 +8,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Audited inline comments in `src/check_models.py` and removed stale
+  refactor-history notes that no longer describe current behavior, while
+  keeping explanatory comments for runtime/error-handling decisions.
+- Updated maintainer map in `.github/copilot-instructions.md` to reflect the
+  current monolith/test sizes and refreshed function line anchors.
+- Normalized `src/README.md` command examples to use
+  `python -m check_models`, matching the documented package entrypoint.
 - Further compressed `src/check_models.py` (about 200 lines) by deduplicating
   EXIF date/time extraction paths, centralizing special-token leak pattern
   tables, and trimming verbose internal docstrings while preserving behavior.

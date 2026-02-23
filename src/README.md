@@ -176,19 +176,19 @@ python -m check_models --image test.jpg --prompt "Detailed caption."
 
 ```bash
 # Run across all cached models with a custom prompt
-python check_models.py -f ~/Pictures/Processed -p "What is the main object in this image?"
+python -m check_models -f ~/Pictures/Processed -p "What is the main object in this image?"
 
 # Explicit model list (skips cache discovery)
-python check_models.py -f ~/Pictures/Processed -m mlx-community/nanoLLaVA mlx-community/llava-1.5-7b-hf
+python -m check_models -f ~/Pictures/Processed -m mlx-community/nanoLLaVA mlx-community/llava-1.5-7b-hf
 
 # Exclude specific models from the automatic cache scan
-python check_models.py -f ~/Pictures/Processed -e mlx-community/problematic-model other/model
+python -m check_models -f ~/Pictures/Processed -e mlx-community/problematic-model other/model
 
 # Combine explicit list with exclusions
-python check_models.py -f ~/Pictures/Processed -m model1 model2 model3 -e model2
+python -m check_models -f ~/Pictures/Processed -m model1 model2 model3 -e model2
 
 # Verbose (debug) mode for detailed logs
-python check_models.py -f ~/Pictures/Processed -v
+python -m check_models -f ~/Pictures/Processed -v
 ```
 
 <details>
@@ -196,7 +196,7 @@ python check_models.py -f ~/Pictures/Processed -v
 
 ```bash
 # Full benchmark run with HTML/Markdown reports
-python check_models.py \
+python -m check_models \
   --folder ~/Pictures/TestImages \
   --exclude "microsoft/Phi-3-vision-128k-instruct" \
   --prompt "Provide a detailed caption for this image" \
@@ -208,14 +208,14 @@ python check_models.py \
   --verbose
 
 # Memory optimization for large models (4-bit KV cache)
-python check_models.py \
+python -m check_models \
   --folder ~/Pictures \
   --lazy-load \
   --max-kv-size 4096 \
   --kv-bits 4
 
 # Sampling control (Nucleus sampling + Repetition penalty)
-python check_models.py \
+python -m check_models \
   --folder ~/Pictures \
   --top-p 0.9 \
   --repetition-penalty 1.2 \
@@ -259,10 +259,10 @@ While MLX-VLM doesn't explicitly document these in all examples, the underlying 
 
 ```bash
 # Moderate penalty to reduce repetition
-python check_models.py --image photo.jpg --repetition-penalty 1.1
+python -m check_models --image photo.jpg --repetition-penalty 1.1
 
 # Strong penalty with larger context window
-python check_models.py --image photo.jpg --repetition-penalty 1.15 --repetition-context-size 50
+python -m check_models --image photo.jpg --repetition-penalty 1.15 --repetition-context-size 50
 ```
 
 **How it works** (from MLX source): During generation, the model maintains a sliding window of the last N tokens (`repetition_context_size`). For each new token prediction, logits of tokens that appear in this window are divided by the `repetition_penalty` factor, making them less likely to be selected. This mechanism operates at the token level during sampling, before temperature is applied.
@@ -294,16 +294,16 @@ From the MLX-VLM source: The KV cache stores attention keys and values for each 
 
 ```bash
 # Moderate 8-bit quantization for 2× memory savings
-python check_models.py --image photo.jpg --kv-bits 8
+python -m check_models --image photo.jpg --kv-bits 8
 
 # Aggressive 4-bit quantization with larger groups (4× compression)
-python check_models.py --image photo.jpg --kv-bits 4 --kv-group-size 128
+python -m check_models --image photo.jpg --kv-bits 4 --kv-group-size 128
 
 # Quantize only after first 512 tokens (preserve system prompt precision)
-python check_models.py --image photo.jpg --kv-bits 8 --quantized-kv-start 512
+python -m check_models --image photo.jpg --kv-bits 8 --quantized-kv-start 512
 
 # Cap cache size for extremely long outputs
-python check_models.py --image photo.jpg --max-kv-size 4096 --kv-bits 8
+python -m check_models --image photo.jpg --max-kv-size 4096 --kv-bits 8
 ```
 
 ### When to Use
@@ -338,13 +338,13 @@ These control the sampling strategy during generation. Higher temperature increa
 
 ```bash
 # Deterministic output (default)
-python check_models.py --image photo.jpg --temperature 0.0
+python -m check_models --image photo.jpg --temperature 0.0
 
 # Balanced creativity
-python check_models.py --image photo.jpg --temperature 0.7 --top-p 0.9
+python -m check_models --image photo.jpg --temperature 0.7 --top-p 0.9
 
 # Maximum diversity (risky)
-python check_models.py --image photo.jpg --temperature 1.5 --top-p 0.95
+python -m check_models --image photo.jpg --temperature 1.5 --top-p 0.95
 ```
 
 #### Generation Control
@@ -356,10 +356,10 @@ python check_models.py --image photo.jpg --temperature 1.5 --top-p 0.95
 
 ```bash
 # Short captions only
-python check_models.py --image photo.jpg --max-tokens 100
+python -m check_models --image photo.jpg --max-tokens 100
 
 # Strict timeout for batch testing
-python check_models.py --folder ~/images --timeout 120
+python -m check_models --folder ~/images --timeout 120
 ```
 
 #### Trust Remote Code
@@ -373,10 +373,10 @@ Some models require custom Python code for their architecture. This flag enables
 
 ```bash
 # Enable for models like Qwen or custom architectures (default behavior)
-python check_models.py --image photo.jpg --models mlx-community/Qwen2-VL-7B-Instruct --trust-remote-code
+python -m check_models --image photo.jpg --models mlx-community/Qwen2-VL-7B-Instruct --trust-remote-code
 
 # Disable for security (may cause some models to fail)
-python check_models.py --image photo.jpg --no-trust-remote-code
+python -m check_models --image photo.jpg --no-trust-remote-code
 ```
 
 > [!WARNING]
@@ -391,15 +391,15 @@ python check_models.py --image photo.jpg --no-trust-remote-code
 
 ```bash
 # Pin to a specific commit for reproducibility
-python check_models.py --image photo.jpg --models mlx-community/Qwen2-VL-7B-Instruct \
+python -m check_models --image photo.jpg --models mlx-community/Qwen2-VL-7B-Instruct \
   --revision abc1234
 
 # Apply a LoRA fine-tune
-python check_models.py --image photo.jpg --models mlx-community/nanoLLaVA \
+python -m check_models --image photo.jpg --models mlx-community/nanoLLaVA \
   --adapter-path ~/adapters/my-lora
 
 # Combine: specific revision + LoRA adapter
-python check_models.py --image photo.jpg --models mlx-community/nanoLLaVA \
+python -m check_models --image photo.jpg --models mlx-community/nanoLLaVA \
   --revision v1.0 --adapter-path ~/adapters/my-lora
 ```
 
@@ -421,13 +421,13 @@ Several behaviors can be customized via environment variables (useful for CI/aut
 
 ```bash
 # Force wider output for CI logs
-MLX_VLM_WIDTH=120 python check_models.py --folder ~/Pictures
+MLX_VLM_WIDTH=120 python -m check_models --folder ~/Pictures
 
 # Disable colors for log file capture
-NO_COLOR=1 python check_models.py > output.log 2>&1
+NO_COLOR=1 python -m check_models > output.log 2>&1
 
 # Allow TensorFlow for specific model (may crash on Apple Silicon)
-MLX_VLM_ALLOW_TF=1 python check_models.py --models model-needing-tf
+MLX_VLM_ALLOW_TF=1 python -m check_models --models model-needing-tf
 ```
 
 ## Git Hygiene and Caches
@@ -924,13 +924,13 @@ pip install --upgrade mlx mlx-vlm
 **Timeout errors**: Increase timeout for large models
 
 ```bash
-python check_models.py --timeout 600  # 10 minutes
+python -m check_models --timeout 600  # 10 minutes
 ```
 
 **Memory errors**: Test models individually or exclude large models
 
 ```bash
-python check_models.py --exclude "meta-llama/Llama-3.2-90B-Vision-Instruct"
+python -m check_models --exclude "meta-llama/Llama-3.2-90B-Vision-Instruct"
 ```
 
 **Script crashes with mutex error**: If you see `libc++abi: terminating due to uncaught exception of type std::__1::system_error: mutex lock failed: Invalid argument`, TensorFlow is installed and conflicting with MLX.
@@ -941,7 +941,7 @@ Option 1 - Keep TensorFlow but ensure it's blocked (safest, script does this aut
 
 ```bash
 export TRANSFORMERS_NO_TF=1
-python check_models.py  # Run normally - the script sets this env var automatically
+python -m check_models  # Run normally - the script sets this env var automatically
 ```
 
 Option 2 - Uninstall TensorFlow completely (recommended for MLX-only environments):
@@ -957,7 +957,7 @@ pip uninstall -y tensorflow tensorboard keras absl-py astunparse flatbuffers gas
 Use `--verbose` for detailed diagnostics:
 
 ```bash
-python check_models.py --verbose
+python -m check_models --verbose
 ```
 
 This provides:
@@ -985,7 +985,7 @@ If TensorFlow is installed, the script's automatic blocking (`TRANSFORMERS_NO_TF
 
    ```bash
    export TRANSFORMERS_NO_TF=1
-   python check_models.py
+   python -m check_models
    ```
 
 2. **If that fails**: Uninstall TensorFlow completely (recommended for MLX-only environments):

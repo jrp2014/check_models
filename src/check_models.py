@@ -382,16 +382,6 @@ def load_quality_config(config_path: Path | None = None) -> None:
         logger.warning("Quality config file not found: %s", config_path)
 
 
-# Consolidating constants to FORMATTING and other locations
-# FORMATTING.min_separator_chars -> FORMATTING.min_separator_chars
-# FORMATTING.default_decimal_places -> FORMATTING.default_decimal_places
-# GRADE_EMOJIS -> moved below
-# FORMATTING.markdown_hard_break_spaces -> FORMATTING.markdown_hard_break_spaces
-# IMAGE_OPEN_TIMEOUT -> moved below
-# FORMATTING.generation_wrap_width -> FORMATTING.generation_wrap_width
-# SUPPORTED_IMAGE_EXTENSIONS -> moved to validation section constants
-
-
 _temp_logger = logging.getLogger(LOGGER_NAME)
 
 
@@ -3963,7 +3953,6 @@ def log_rule(
 
 
 # --- Utility Functions ---
-# Ensure _pad_text is defined only once at module level and used everywhere
 
 
 def get_library_versions() -> LibraryVersionDict:
@@ -4223,7 +4212,6 @@ def _get_field_value(result: PerformanceResult, field_name: str) -> MetricValue:
     return getattr(result.generation, field_name, None) if result.generation else None
 
 
-# Helper function to sort results by generation time (lowest to highest)
 def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceResult]:
     """Return results ordered by effective generation time.
 
@@ -4327,7 +4315,6 @@ def print_version_info(versions: LibraryVersionDict) -> None:
 
 
 # --- File Handling ---
-# Simplified the `find_most_recent_file` function by using `max` with a generator.
 def find_most_recent_file(folder: PathLike) -> Path | None:
     """Return the most recently modified image file in a folder, or None.
 
@@ -4377,7 +4364,6 @@ def find_most_recent_file(folder: PathLike) -> Path | None:
     return None
 
 
-# Improved error handling in `print_image_dimensions`.
 def print_image_dimensions(image_path: PathLike) -> None:
     """Print the dimensions and megapixel count of an image file."""
     img_path = Path(image_path)
@@ -4489,13 +4475,8 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
                 logger.warning("No EXIF data found in %s", image_str)
                 return None
 
-            # exif_raw is Any (from img.getexif logic), but we expect it to match our protocols
-            # casts removed as redundant since Any matches everything,
-            # and passing Any to these functions is valid if unsafe.
-            # Using cast() here was just visual noise.
-            # Cast to SupportsExifIfd because standard PIL stubs don't yet see
-            # get_ifd() on Exif class or treat it as a union that doesn't fully satisfy the
-            # protocol.
+            # Pillow stubs do not consistently expose Exif.get_ifd(), so cast once
+            # for type-checking while runtime behavior stays unchanged.
             exif_decoded: ExifDict = _process_ifd0(exif_raw)
             exif_decoded.update(_process_exif_subifd(cast("SupportsExifIfd", exif_raw)))
             gps_decoded = _process_gps_ifd(cast("SupportsExifIfd", exif_raw))
@@ -4521,7 +4502,6 @@ def to_float(val: float | str | None) -> float | None:
         return temp
 
 
-# Reduce return count and use named constants
 def _convert_gps_coordinate(
     coord: tuple[Any, ...] | list[Any],
 ) -> tuple[float, float, float] | None:
