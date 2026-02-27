@@ -169,7 +169,7 @@ Context: Existing metadata hints (high confidence; use only if visually consiste
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 17246.32it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 53704.28it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -179,14 +179,14 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 ## 2. Failure affecting 1 model (Priority: Medium)
 
-**Observed behavior:** Model runtime error during generation for mlx-community/InternVL3-14B-8bit: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
+**Observed behavior:** Model runtime error during generation for mlx-community/InternVL3-14B-8bit: LanguageModel.\_\_call\_\_() got an unexpected keyword argument 'n_to_process'
 **Owner (likely component):** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
 **Affected model:** `mlx-community/InternVL3-14B-8bit`
 
 | Model | Observed Behavior | First Seen Failing | Recent Repro |
 | ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/InternVL3-14B-8bit` | Model runtime error during generation for mlx-community/InternVL3-14B-8bit: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process' | 2026-02-23 12:54:48 GMT | 2/3 recent runs failed |
+| `mlx-community/InternVL3-14B-8bit` | Model runtime error during generation for mlx-community/InternVL3-14B-8bit: LanguageModel.\_\_call\_\_() got an unexpected keyword argument 'n_to_process' | 2026-02-23 12:54:48 GMT | 3/3 recent runs failed |
 
 ### To reproduce
 
@@ -263,7 +263,7 @@ Assistant:
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 18 files:   0%|          | 0/18 [00:00<?, ?it/s]
-Fetching 18 files: 100%|##########| 18/18 [00:00<00:00, 8298.25it/s]
+Fetching 18 files: 100%|##########| 18/18 [00:00<00:00, 8301.90it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -276,14 +276,14 @@ Prefill:   0%|          | 0/2065 [00:00<?, ?tok/s]
 
 ## 3. Failure affecting 1 model (Priority: Medium)
 
-**Observed behavior:** Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
+**Observed behavior:** Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageModel.\_\_call\_\_() got an unexpected keyword argument 'n_to_process'
 **Owner (likely component):** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
 **Affected model:** `mlx-community/InternVL3-8B-bf16`
 
 | Model | Observed Behavior | First Seen Failing | Recent Repro |
 | ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/InternVL3-8B-bf16` | Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process' | 2026-02-23 12:54:48 GMT | 2/3 recent runs failed |
+| `mlx-community/InternVL3-8B-bf16` | Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageModel.\_\_call\_\_() got an unexpected keyword argument 'n_to_process' | 2026-02-23 12:54:48 GMT | 3/3 recent runs failed |
 
 ### To reproduce
 
@@ -360,7 +360,7 @@ Assistant:
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 17 files:   0%|          | 0/17 [00:00<?, ?it/s]
-Fetching 17 files: 100%|##########| 17/17 [00:00<00:00, 29354.95it/s]
+Fetching 17 files: 100%|##########| 17/17 [00:00<00:00, 41746.59it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -419,7 +419,7 @@ Added chat tokens
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 14776.68it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 12784.51it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -660,7 +660,7 @@ The image is a photograph of a landscape scene.
 
 ---
 
-## Potential Stack Issues (2 model(s))
+### Long-Context Degradation / Potential Stack Issues (2 model(s))
 
 These models technically succeeded, but token/output patterns suggest likely integration/runtime issues worth checking upstream.
 
@@ -681,8 +681,8 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 | Model | Status vs Previous Run | First Seen Failing | Recent Repro |
 | ----- | ---------------------- | ------------------ | ------------ |
 | `microsoft/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
-| `mlx-community/InternVL3-14B-8bit` | still failing | 2026-02-23 12:54:48 GMT | 2/3 recent runs failed |
-| `mlx-community/InternVL3-8B-bf16` | still failing | 2026-02-23 12:54:48 GMT | 2/3 recent runs failed |
+| `mlx-community/InternVL3-14B-8bit` | still failing | 2026-02-23 12:54:48 GMT | 3/3 recent runs failed |
+| `mlx-community/InternVL3-8B-bf16` | still failing | 2026-02-23 12:54:48 GMT | 3/3 recent runs failed |
 | `mlx-community/deepseek-vl2-8bit` | still failing | 2026-02-15 03:27:34 GMT | 3/3 recent runs failed |
 
 ---
@@ -692,7 +692,7 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 | Component | Version |
 | --------- | ------- |
 | mlx-vlm | 0.3.12 |
-| mlx | 0.30.7.dev20260227+c8536f52 |
+| mlx | 0.30.7.dev20260227+d7a553c5 |
 | mlx-lm | 0.30.8 |
 | transformers | 5.2.0 |
 | tokenizers | 0.22.2 |
@@ -736,6 +736,7 @@ PY
 ```
 
 ### Target specific failing models
+**Note:** A comprehensive JSON reproduction bundle including system info and the exact prompt trace has been exported to [repro_bundles/](https://github.com/jrp2014/check_models/tree/main/src/output/repro_bundles) for each failing model.
 
 ```bash
 python -m check_models --image /Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft
@@ -773,4 +774,4 @@ Context: Existing metadata hints (high confidence; use only if visually consiste
 - Input image: `/Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-02-27 15:51:36 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-02-27 22:13:21 GMT by [check_models](https://github.com/jrp2014/check_models)._

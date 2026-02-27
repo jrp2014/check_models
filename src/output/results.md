@@ -1,6 +1,6 @@
 # Model Performance Results
 
-_Generated on 2026-02-27 15:51:36 GMT_
+_Generated on 2026-02-27 22:13:21 GMT_
 
 ## 🎯 Action Snapshot
 
@@ -8,29 +8,29 @@ _Generated on 2026-02-27 15:51:36 GMT_
 - **Next action:** review `Failures by Package (Actionable)` and `diagnostics.md`.
 - **Model output watchlist:** 14 model(s) graded D/F.
 - **Next action:** prioritize A/B models and de-prioritize D/F outputs.
-- **Vs existing metadata:** better=16, neutral=2, worse=24 (baseline B 66/100).
+- **Vs existing metadata:** better=16, neutral=4, worse=22 (baseline B 66/100).
 
 ## 🏆 Performance Highlights
 
-- **Fastest:** `mlx-community/nanoLLaVA-1.5-4bit` (327.5 tps)
-- **💾 Most efficient:** `mlx-community/FastVLM-0.5B-bf16` (2.1 GB)
-- **⚡ Fastest load:** `mlx-community/nanoLLaVA-1.5-4bit` (1.04s)
-- **📊 Average TPS:** 78.5 across 42 models
+- **Fastest:** `mlx-community/FastVLM-0.5B-bf16` (313.8 tps)
+- **💾 Most efficient:** `mlx-community/FastVLM-0.5B-bf16` (2.2 GB)
+- **⚡ Fastest load:** `mlx-community/LFM2-VL-1.6B-8bit` (1.09s)
+- **📊 Average TPS:** 85.8 across 42 models
 
 ## 📈 Resource Usage
 
-- **Total peak memory:** 649.2 GB
-- **Average peak memory:** 15.5 GB
+- **Total peak memory:** 648.9 GB
+- **Average peak memory:** 15.4 GB
 - **Memory efficiency:** 223 tokens/GB
 
 ## 📚 Cataloging Utility Summary
 
-**Grade Distribution:** 🏆 A: 9 | ✅ B: 8 | 🟡 C: 11 | 🟠 D: 3 | ❌ F: 11
+**Grade Distribution:** 🏆 A: 9 | ✅ B: 9 | 🟡 C: 10 | 🟠 D: 3 | ❌ F: 11
 
 **Average Utility Score:** 55/100
 
 **Existing Metadata Baseline:** ✅ B (66/100)
-**Vs Existing Metadata:** Avg Δ -11 | Better: 16, Neutral: 2, Worse: 24
+**Vs Existing Metadata:** Avg Δ -11 | Better: 16, Neutral: 4, Worse: 22
 
 - **Best for cataloging:** `mlx-community/gemma-3n-E4B-it-bf16` (🏆 A, 96/100)
 - **Worst for cataloging:** `HuggingFaceTB/SmolVLM-Instruct` (❌ F, 0/100)
@@ -78,11 +78,11 @@ _Generated on 2026-02-27 15:51:36 GMT_
 
 ## 📊 Aggregate Statistics (Successful Runs)
 
-- **Generation Tps**: Avg: 78.5 | Min: 2.23 | Max: 327
-- **Peak Memory**: Avg: 15 | Min: 2.1 | Max: 60
-- **Total Time**: Avg: 29.36s | Min: 2.24s | Max: 186.72s
-- **Generation Time**: Avg: 26.27s | Min: 1.14s | Max: 185.29s
-- **Model Load Time**: Avg: 3.09s | Min: 1.04s | Max: 9.61s
+- **Generation Tps**: Avg: 85.8 | Min: 3.82 | Max: 314
+- **Peak Memory**: Avg: 15 | Min: 2.2 | Max: 60
+- **Total Time**: Avg: 23.43s | Min: 2.22s | Max: 138.98s
+- **Generation Time**: Avg: 20.38s | Min: 1.13s | Max: 134.53s
+- **Model Load Time**: Avg: 3.05s | Min: 1.09s | Max: 9.41s
 
 ## 🚨 Failures by Package (Actionable)
 
@@ -142,7 +142,7 @@ _Generated on 2026-02-27 15:51:36 GMT_
 
 **Note:** Results sorted: errors first, then by generation time (fastest to slowest).
 
-**Overall runtime:** 1253.45s
+**Overall runtime:** 1003.79s
 
 <!-- markdownlint-disable MD013 MD033 MD034 MD037 MD049 -->
 
@@ -152,48 +152,48 @@ _Generated on 2026-02-27 15:51:36 GMT_
 | `mlx-community/InternVL3-14B-8bit`                      |         |                   |                       |                |              |           |             |                  |            |             |                                    |         mlx-vlm |
 | `mlx-community/InternVL3-8B-bf16`                       |         |                   |                       |                |              |           |             |                  |            |             |                                    |         mlx-vlm |
 | `mlx-community/deepseek-vl2-8bit`                       |         |                   |                       |                |              |           |             |                  |            |             |                                    |    model-config |
-| `mlx-community/LFM2-VL-1.6B-8bit`                       |       7 |               537 |                   102 |            639 |        2,368 |       294 |         2.8 |            1.14s |      1.11s |       2.24s | title-length(5), ...               |                 |
-| `mlx-community/FastVLM-0.5B-bf16`                       | 151,645 |               286 |                   168 |            454 |        1,905 |       309 |         2.1 |            1.63s |      1.18s |       2.81s | missing-sections(description+k...  |                 |
-| `mlx-community/nanoLLaVA-1.5-4bit`                      | 151,645 |               282 |                   282 |            564 |        1,064 |       327 |         2.3 |            1.69s |      1.04s |       2.74s | reasoning-leak, ...                |                 |
-| `HuggingFaceTB/SmolVLM-Instruct`                        |  49,154 |             1,474 |                    12 |          1,486 |        1,229 |       117 |         5.5 |            1.78s |      1.40s |       3.18s | ⚠️harness(prompt_template), ...    |                 |
-| `qnguyen3/nanoLLaVA`                                    | 151,645 |               282 |                    79 |            361 |        1,005 |      89.3 |         4.7 |            1.97s |      1.35s |       3.32s | missing-sections(keywords), ...    |                 |
-| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         |       1 |             1,296 |                     9 |          1,305 |        1,080 |      19.1 |          11 |            2.11s |      3.22s |       5.33s | ⚠️harness(prompt_template), ...    |                 |
-| `mlx-community/SmolVLM-Instruct-bf16`                   |  49,154 |             1,474 |                    12 |          1,486 |          845 |       114 |         5.5 |            2.36s |      1.80s |       4.16s | ⚠️harness(prompt_template), ...    |                 |
-| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |  49,279 |             1,374 |                     8 |          1,382 |          738 |       117 |         5.5 |            2.38s |      1.28s |       3.66s | ⚠️harness(prompt_template), ...    |                 |
-| `prince-canuma/Florence-2-large-ft`                     |     0.0 |               850 |                   500 |          1,350 |        2,475 |       299 |         5.2 |            2.54s |      1.55s |       4.10s | ⚠️harness(stop_token), ...         |                 |
-| `mlx-community/LFM2.5-VL-1.6B-bf16`                     |     521 |               537 |                   500 |          1,037 |        2,317 |       180 |         4.0 |            3.52s |      1.20s |       4.72s | repetitive(phrase: "infrastruc...  |                 |
-| `mlx-community/Phi-3.5-vision-instruct-bf16`            |  32,007 |             1,072 |                   104 |          1,176 |        1,251 |      46.3 |         9.5 |            3.60s |      1.86s |       5.46s | title-length(5), ...               |                 |
-| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |             2,872 |                   132 |          3,004 |        1,010 |       161 |         7.8 |            4.11s |      1.77s |       5.89s |                                    |                 |
-| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 |      11 |             1,283 |                   500 |          1,783 |          820 |       115 |          18 |            6.56s |      3.78s |      10.35s | missing-sections(title), ...       |                 |
-| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |             1,296 |                    25 |          1,321 |          240 |      24.0 |          12 |            6.90s |      3.33s |      10.23s | fabrication, ...                   |                 |
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit`               |   5,434 |             1,283 |                   500 |          1,783 |          858 |       103 |          22 |            7.04s |      3.88s |      10.92s | missing-sections(title), ...       |                 |
-| `mlx-community/Idefics3-8B-Llama3-bf16`                 | 128,001 |             2,574 |                   114 |          2,688 |          734 |      29.8 |          18 |            7.83s |      3.74s |      11.57s | formatting                         |                 |
-| `mlx-community/gemma-3n-E2B-4bit`                       | 236,810 |               533 |                   500 |          1,033 |        1,085 |      62.4 |         6.0 |            8.96s |      3.47s |      12.43s | repetitive(phrase: "16:14:56:...   |                 |
-| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          |   8,425 |             1,283 |                   500 |          1,783 |          838 |      68.8 |          37 |            9.59s |      6.01s |      15.60s | missing-sections(title+descrip...  |                 |
-| `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`     |       2 |             2,873 |                   124 |          2,997 |          407 |      58.3 |          13 |            9.63s |      2.62s |      12.25s |                                    |                 |
-| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`     |       2 |             2,873 |                   135 |          3,008 |          406 |      55.6 |          13 |            9.96s |      2.64s |      12.60s |                                    |                 |
-| `microsoft/Phi-3.5-vision-instruct`                     |   2,812 |             1,072 |                   500 |          1,572 |        1,232 |      52.6 |         9.5 |           10.88s |      1.97s |      12.85s | ⚠️harness(stop_token), ...         |                 |
-| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      |       4 |             1,579 |                   500 |          2,079 |          495 |      49.8 |          60 |           14.10s |      9.61s |      23.71s | ⚠️harness(stop_token)              |                 |
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |             2,359 |                   121 |          2,480 |          235 |      28.2 |          22 |           14.78s |      4.01s |      18.80s | ⚠️harness(encoding), ...           |                 |
-| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |             1,296 |                    25 |          1,321 |          265 |      2.23 |          26 |           16.55s |      4.99s |      21.54s | fabrication, ...                   |                 |
-| `mlx-community/gemma-3-27b-it-qat-4bit`                 |     106 |               542 |                   129 |            671 |          122 |      10.7 |          19 |           16.92s |      4.93s |      21.85s |                                    |                 |
-| `mlx-community/pixtral-12b-8bit`                        |       2 |             3,063 |                   108 |          3,171 |          290 |      15.1 |          16 |           18.14s |      3.74s |      21.88s | title-length(4)                    |                 |
-| `mlx-community/gemma-3n-E4B-it-bf16`                    |     106 |               541 |                   382 |            923 |          741 |      21.6 |          17 |           18.83s |      5.43s |      24.26s | missing-sections(title+descrip...  |                 |
-| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |             2,465 |                    12 |          2,477 |          128 |      41.2 |          11 |           19.99s |      2.41s |      22.40s | ⚠️harness(prompt_template), ...    |                 |
-| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         |   1,584 |             3,154 |                   500 |          3,654 |          408 |      36.0 |          15 |           22.05s |      3.29s |      25.34s | missing-sections(title+descrip...  |                 |
-| `mlx-community/pixtral-12b-bf16`                        |       2 |             3,063 |                   106 |          3,169 |          319 |       8.2 |          28 |           22.97s |      4.93s |      27.91s | title-length(4)                    |                 |
-| `mlx-community/paligemma2-3b-pt-896-4bit`               | 235,290 |             4,368 |                   500 |          4,868 |          774 |      25.0 |         4.3 |           26.46s |      2.50s |      28.96s | repetitive(phrase: "- do not o...  |                 |
-| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               542 |                   133 |            675 |          105 |      6.07 |          34 |           27.57s |      7.02s |      34.60s |                                    |                 |
-| `mlx-community/GLM-4.6V-Flash-mxfp4`                    |  19,050 |             6,340 |                   500 |          6,840 |          320 |      63.3 |         8.4 |           28.18s |      2.52s |      30.71s | missing-sections(title+descrip...  |                 |
-| `mlx-community/GLM-4.6V-Flash-6bit`                     |      12 |             6,340 |                   500 |          6,840 |          306 |      47.5 |          11 |           31.78s |      2.84s |      34.62s | missing-sections(title+descrip...  |                 |
-| `mlx-community/Molmo-7B-D-0924-8bit`                    |     331 |             1,461 |                   500 |          1,961 |         42.2 |      44.2 |          41 |           46.79s |      2.27s |      49.06s | hallucination, ...                 |                 |
-| `Qwen/Qwen3-VL-2B-Instruct`                             |      11 |            16,499 |                   500 |         16,999 |          383 |      75.6 |         8.3 |           50.29s |      1.74s |      52.04s | ⚠️harness(long_context), ...       |                 |
-| `mlx-community/Molmo-7B-D-0924-bf16`                    |     476 |             1,461 |                   500 |          1,961 |         41.8 |      28.1 |          48 |           53.62s |      3.31s |      56.93s | degeneration, ...                  |                 |
-| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      |  12,690 |               263 |                   500 |            763 |         84.2 |      8.83 |          15 |           60.25s |      2.93s |      63.18s | repetitive(phrase: "nature, ...    |                 |
-| `mlx-community/X-Reasoner-7B-8bit`                      | 151,645 |            16,510 |                   115 |         16,625 |          225 |      21.3 |          13 |           79.37s |      2.47s |      81.84s |                                    |                 |
-| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |  82,703 |            16,501 |                   500 |         17,001 |          171 |      37.4 |         8.3 |          110.17s |      2.46s |     112.63s | missing-sections(title), ...       |                 |
-| `meta-llama/Llama-3.2-11B-Vision-Instruct`              |      11 |               264 |                   500 |            764 |         84.7 |      3.86 |          25 |          133.14s |      4.63s |     137.76s | repetitive(phrase: "landscape, ... |                 |
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               |      11 |            16,510 |                   500 |         17,010 |         92.6 |      77.9 |         5.1 |          185.29s |      1.44s |     186.72s | ⚠️harness(long_context), ...       |                 |
+| `mlx-community/LFM2-VL-1.6B-8bit`                       |       7 |               537 |                   102 |            639 |        2,404 |       297 |         2.8 |            1.13s |      1.09s |       2.22s | title-length(5), ...               |                 |
+| `mlx-community/FastVLM-0.5B-bf16`                       | 151,645 |               286 |                   168 |            454 |        2,058 |       314 |         2.2 |            1.61s |      1.21s |       2.82s | missing-sections(description+k...  |                 |
+| `qnguyen3/nanoLLaVA`                                    | 151,645 |               282 |                    79 |            361 |        1,331 |      94.3 |         4.5 |            1.64s |      1.23s |       2.86s | missing-sections(keywords), ...    |                 |
+| `mlx-community/nanoLLaVA-1.5-4bit`                      | 151,645 |               282 |                   282 |            564 |        1,515 |       303 |         2.3 |            1.70s |      1.15s |       2.86s | reasoning-leak, ...                |                 |
+| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |  49,279 |             1,374 |                     8 |          1,382 |        1,177 |       122 |         5.5 |            1.73s |      1.34s |       3.07s | ⚠️harness(prompt_template), ...    |                 |
+| `HuggingFaceTB/SmolVLM-Instruct`                        |  49,154 |             1,474 |                    12 |          1,486 |        1,225 |       121 |         5.5 |            1.79s |      1.42s |       3.21s | ⚠️harness(prompt_template), ...    |                 |
+| `mlx-community/SmolVLM-Instruct-bf16`                   |  49,154 |             1,474 |                    12 |          1,486 |        1,220 |       118 |         5.5 |            1.82s |      1.75s |       3.56s | ⚠️harness(prompt_template), ...    |                 |
+| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         |       1 |             1,296 |                     9 |          1,305 |        1,454 |      19.3 |          11 |            1.83s |      3.11s |       4.94s | ⚠️harness(prompt_template), ...    |                 |
+| `prince-canuma/Florence-2-large-ft`                     |     0.0 |               850 |                   500 |          1,350 |        3,452 |       307 |         5.1 |            2.36s |      1.45s |       3.81s | ⚠️harness(stop_token), ...         |                 |
+| `mlx-community/Phi-3.5-vision-instruct-bf16`            |  32,007 |             1,072 |                   104 |          1,176 |        1,234 |      54.3 |         9.5 |            3.30s |      1.88s |       5.17s | title-length(5), ...               |                 |
+| `mlx-community/LFM2.5-VL-1.6B-bf16`                     |     521 |               537 |                   500 |          1,037 |        2,263 |       180 |         4.0 |            3.51s |      1.20s |       4.71s | repetitive(phrase: "infrastruc...  |                 |
+| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |             1,296 |                    25 |          1,321 |          500 |      28.9 |          12 |            3.94s |      3.39s |       7.32s | fabrication, ...                   |                 |
+| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |             2,872 |                   132 |          3,004 |          975 |       161 |         7.8 |            4.22s |      1.80s |       6.03s |                                    |                 |
+| `mlx-community/gemma-3n-E2B-4bit`                       | 236,810 |               533 |                   500 |          1,033 |        1,176 |       108 |         6.0 |            5.53s |      3.40s |       8.93s | repetitive(phrase: "16:14:56:...   |                 |
+| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 |      11 |             1,283 |                   500 |          1,783 |          822 |       115 |          18 |            6.55s |      3.59s |      10.14s | missing-sections(title), ...       |                 |
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit`               |   5,434 |             1,283 |                   500 |          1,783 |          867 |       103 |          22 |            7.01s |      3.89s |      10.90s | missing-sections(title), ...       |                 |
+| `mlx-community/Idefics3-8B-Llama3-bf16`                 | 128,001 |             2,574 |                   114 |          2,688 |          741 |      30.0 |          18 |            7.76s |      3.70s |      11.46s | formatting                         |                 |
+| `mlx-community/gemma-3-27b-it-qat-4bit`                 |     106 |               542 |                   129 |            671 |          174 |      27.3 |          19 |            8.32s |      5.32s |      13.64s |                                    |                 |
+| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |             1,296 |                    25 |          1,321 |          453 |      4.91 |          26 |            8.42s |      5.14s |      13.57s | fabrication, ...                   |                 |
+| `mlx-community/pixtral-12b-8bit`                        |       2 |             3,063 |                   108 |          3,171 |          508 |      34.7 |          16 |            9.60s |      3.29s |      12.89s | title-length(4)                    |                 |
+| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          |   8,425 |             1,283 |                   500 |          1,783 |          801 |      69.0 |          37 |            9.62s |      6.02s |      15.65s | missing-sections(title+descrip...  |                 |
+| `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`     |       2 |             2,873 |                   124 |          2,997 |          387 |      58.4 |          13 |           10.01s |      2.70s |      12.71s |                                    |                 |
+| `mlx-community/gemma-3n-E4B-it-bf16`                    |     106 |               541 |                   382 |            923 |          723 |      39.8 |          17 |           10.83s |      5.11s |      15.93s | missing-sections(title+descrip...  |                 |
+| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`     |       2 |             2,873 |                   135 |          3,008 |          355 |      55.0 |          13 |           11.01s |      2.65s |      13.66s |                                    |                 |
+| `microsoft/Phi-3.5-vision-instruct`                     |   2,812 |             1,072 |                   500 |          1,572 |        1,244 |      50.8 |         9.5 |           11.20s |      1.85s |      13.05s | ⚠️harness(stop_token), ...         |                 |
+| `mlx-community/pixtral-12b-bf16`                        |       2 |             3,063 |                   106 |          3,169 |          563 |      19.0 |          28 |           11.47s |      5.02s |      16.50s | title-length(4)                    |                 |
+| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |             2,465 |                    12 |          2,477 |          224 |      46.8 |          11 |           11.72s |      2.09s |      13.81s | ⚠️harness(prompt_template), ...    |                 |
+| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               542 |                   133 |            675 |          167 |      15.1 |          34 |           12.52s |      7.46s |      19.98s |                                    |                 |
+| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      |       4 |             1,579 |                   500 |          2,079 |          530 |      51.8 |          60 |           13.50s |      9.41s |      22.91s | ⚠️harness(stop_token)              |                 |
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |             2,359 |                   121 |          2,480 |          224 |      27.8 |          22 |           15.34s |      3.98s |      19.32s | ⚠️harness(encoding), ...           |                 |
+| `mlx-community/paligemma2-3b-pt-896-4bit`               | 235,290 |             4,368 |                   500 |          4,868 |        1,322 |      43.5 |         4.3 |           15.40s |      2.45s |      17.85s | repetitive(phrase: "- do not o...  |                 |
+| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         |   1,584 |             3,154 |                   500 |          3,654 |          431 |      34.8 |          15 |           22.14s |      3.20s |      25.34s | missing-sections(title+descrip...  |                 |
+| `mlx-community/GLM-4.6V-Flash-mxfp4`                    |  19,050 |             6,340 |                   500 |          6,840 |          305 |      62.6 |         8.4 |           29.23s |      2.45s |      31.68s | missing-sections(title+descrip...  |                 |
+| `mlx-community/GLM-4.6V-Flash-6bit`                     |      12 |             6,340 |                   500 |          6,840 |          307 |      46.3 |          11 |           31.96s |      2.73s |      34.69s | missing-sections(title+descrip...  |                 |
+| `mlx-community/Molmo-7B-D-0924-8bit`                    |  29,257 |             1,461 |                   500 |          1,961 |         44.6 |      42.5 |          41 |           45.47s |      2.36s |      47.82s | hallucination, ...                 |                 |
+| `Qwen/Qwen3-VL-2B-Instruct`                             |      11 |            16,499 |                   500 |         16,999 |          387 |      75.9 |         8.3 |           49.82s |      1.66s |      51.47s | ⚠️harness(long_context), ...       |                 |
+| `mlx-community/X-Reasoner-7B-8bit`                      | 151,645 |            16,510 |                   115 |         16,625 |          344 |      46.3 |          13 |           51.08s |      2.54s |      53.62s |                                    |                 |
+| `mlx-community/Molmo-7B-D-0924-bf16`                    | 151,643 |             1,461 |                   439 |          1,900 |         43.2 |      25.4 |          48 |           51.99s |      3.42s |      55.41s | missing-sections(title+descrip...  |                 |
+| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      |  12,690 |               263 |                   500 |            763 |         81.8 |      8.44 |          15 |           62.95s |      2.91s |      65.87s | repetitive(phrase: "nature, ...    |                 |
+| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |  82,703 |            16,501 |                   500 |         17,001 |          278 |      67.9 |         8.3 |           67.20s |      1.86s |      69.06s | missing-sections(title), ...       |                 |
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               |      11 |            16,510 |                   500 |         17,010 |          184 |       170 |         5.1 |           93.09s |      1.40s |      94.50s | ⚠️harness(long_context), ...       |                 |
+| `meta-llama/Llama-3.2-11B-Vision-Instruct`              |      11 |               264 |                   500 |            764 |         85.2 |      3.82 |          25 |          134.53s |      4.46s |     138.98s | repetitive(phrase: "landscape, ... |                 |
 
 <!-- markdownlint-enable MD013 MD033 MD034 MD037 MD049 -->
 
@@ -272,7 +272,7 @@ TypeError: can only concatenate str (not "NoneType") to str
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10053, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10072, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -306,7 +306,7 @@ ValueError: Failed to process inputs with error: can only concatenate str (not "
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10183, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10202, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -315,7 +315,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10078, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10097, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
 ```
@@ -341,7 +341,7 @@ ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10053, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10072, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -376,7 +376,7 @@ TypeError: LanguageModel.__call__() got an unexpected keyword argument 'n_to_pro
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10183, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10202, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -385,7 +385,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10083, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10102, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
 ValueError: Model runtime error during generation for mlx-community/InternVL3-14B-8bit: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
 ```
@@ -411,7 +411,7 @@ ValueError: Model runtime error during generation for mlx-community/InternVL3-14
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10053, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10072, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -446,7 +446,7 @@ TypeError: LanguageModel.__call__() got an unexpected keyword argument 'n_to_pro
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10183, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10202, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -455,7 +455,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10083, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10102, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
 ValueError: Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
 ```
@@ -481,7 +481,7 @@ ValueError: Model runtime error during generation for mlx-community/InternVL3-8B
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10004, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10023, in _run_model_generation
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -491,7 +491,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9929, in _run_model_preflight_validators
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9948, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -500,14 +500,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9843, in _raise_preflight_error
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9862, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10183, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10202, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -516,7 +516,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10016, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10035, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -527,7 +527,7 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ### ✅ mlx-community/LFM2-VL-1.6B-8bit
 
-**Metrics:** 294 TPS | 102 tokens
+**Metrics:** 297 TPS | 102 tokens
 
 ```text
 Title: Loch Katrine, Scotland, winter landscape
@@ -541,7 +541,7 @@ Keywords: Loch Katrine, Scotland, winter, mist, evergreen, deciduous trees, Stro
 
 ### ✅ mlx-community/FastVLM-0.5B-bf16
 
-**Metrics:** 309 TPS | 168 tokens
+**Metrics:** 314 TPS | 168 tokens
 
 ```text
 Title: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK On a late winter afternoon, a heavy mist hangs over the hills surrounding Loch Katrine in Stronachlachar, Scotland. The muted colours of the February landscape are dominated by dark evergreen forests and the bare branches of deciduous trees. Nestled on the shore is a utility building, part of the infrastructure for the Loch Katrine aqueduct scheme. In the foreground, a small house is visible, partially obscured by the trees. The mist creates a soft, diffused light over the scene, adding to the tranquil atmosphere. The image was captured on 2026-02-21 16:14:55 GMT (at 16:14:55 local time).
@@ -549,9 +549,20 @@ Title: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK On a late wint
 
 ---
 
+### ✅ qnguyen3/nanoLLaVA
+
+**Metrics:** 94.3 TPS | 79 tokens
+
+```text
+Title: 6-12 words, descriptive and concrete.
+Description: A picturesque landscape scene featuring a mountain, a lake, and a forest. The mountain is covered in snow, and the lake is calm and serene. The forest is dense with trees, and the sky is overcast with fog. The landscape is beautifully contrasted by the power lines that crisscross the sky.
+```
+
+---
+
 ### ✅ mlx-community/nanoLLaVA-1.5-4bit
 
-**Metrics:** 327 TPS | 282 tokens
+**Metrics:** 303 TPS | 282 tokens
 
 ```text
 Title: 6-12 words, descriptive and concrete.
@@ -574,50 +585,9 @@ Context: Existing metadata hints (high confidence; use only if visually consiste
 
 ---
 
-### ✅ HuggingFaceTB/SmolVLM-Instruct
-
-**Metrics:** 117 TPS | 12 tokens
-
-```text
- Loch katrine, scotland, uk.
-```
-
----
-
-### ✅ qnguyen3/nanoLLaVA
-
-**Metrics:** 89.3 TPS | 79 tokens
-
-```text
-Title: 6-12 words, descriptive and concrete.
-Description: A picturesque landscape scene featuring a mountain, a lake, and a forest. The mountain is covered in snow, and the lake is calm and serene. The forest is dense with trees, and the sky is overcast with fog. The landscape is beautifully contrasted by the power lines that crisscross the sky.
-```
-
----
-
-### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
-
-**Metrics:** 19.1 TPS | 9 tokens
-
-```text
-- The image is in low resolution.
-```
-
----
-
-### ✅ mlx-community/SmolVLM-Instruct-bf16
-
-**Metrics:** 114 TPS | 12 tokens
-
-```text
- Loch katrine, scotland, uk.
-```
-
----
-
 ### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
 
-**Metrics:** 117 TPS | 8 tokens
+**Metrics:** 122 TPS | 8 tokens
 
 ```text
  title=loch katrine
@@ -625,12 +595,56 @@ Description: A picturesque landscape scene featuring a mountain, a lake, and a f
 
 ---
 
+### ✅ HuggingFaceTB/SmolVLM-Instruct
+
+**Metrics:** 121 TPS | 12 tokens
+
+```text
+ Loch katrine, scotland, uk.
+```
+
+---
+
+### ✅ mlx-community/SmolVLM-Instruct-bf16
+
+**Metrics:** 118 TPS | 12 tokens
+
+```text
+ Loch katrine, scotland, uk.
+```
+
+---
+
+### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
+
+**Metrics:** 19.3 TPS | 9 tokens
+
+```text
+- The image is in low resolution.
+```
+
+---
+
 ### ✅ prince-canuma/Florence-2-large-ft
 
-**Metrics:** 299 TPS | 500 tokens
+**Metrics:** 307 TPS | 500 tokens
 
 ```text
 <s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s>
+```
+
+---
+
+### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
+
+**Metrics:** 54.3 TPS | 104 tokens
+
+```text
+Title: Misty Loch Katrine in Stronachlachar
+
+Description: A misty, overcast day at Loch Katrine in Stronachlachar, Scotland, with a utility building on the shore and power lines in the background.
+
+Keywords: Loch Katrine, Stronachlachar, Scotland, mist, utility building, power lines, February, evergreen forests, deciduous trees, aqueduct scheme, hills, UK.
 ```
 
 ---
@@ -649,16 +663,12 @@ Keywords: Loch Katrine, Scotland, winter, mist, hills, aqueduct, infrastructure,
 
 ---
 
-### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
+### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
 
-**Metrics:** 46.3 TPS | 104 tokens
+**Metrics:** 28.9 TPS | 25 tokens
 
 ```text
-Title: Misty Loch Katrine in Stronachlachar
-
-Description: A misty, overcast day at Loch Katrine in Stronachlachar, Scotland, with a utility building on the shore and power lines in the background.
-
-Keywords: Loch Katrine, Stronachlachar, Scotland, mist, utility building, power lines, February, evergreen forests, deciduous trees, aqueduct scheme, hills, UK.
+- Location: 56.4996° N, 5.0996° W.
 ```
 
 ---
@@ -675,6 +685,18 @@ A small, weathered utility structure sits by a serene body of water, surrounded 
 
 Keywords:
 utility building, abandoned structure, lochside, waterfront, evergreen forest, misty hills, transmission towers, electrical infrastructure, remote location, Scotland, UK, late winter, aqueduct, infrastructure, rugged terrain, solitary path, industrial relic, natural setting, foggy landscape, small-scale facility.
+```
+
+---
+
+### ✅ mlx-community/gemma-3n-E2B-4bit
+
+**Metrics:** 108 TPS | 500 tokens
+
+```text
+
+
+* 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:5
 ```
 
 ---
@@ -699,16 +721,6 @@ Keywords: Loch Katrine, Stronachlachar, Scotland, UK, UK, February, late winter,
 
 ---
 
-### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
-
-**Metrics:** 24 TPS | 25 tokens
-
-```text
-- Location: 56.4996° N, 5.0996° W.
-```
-
----
-
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-8bit
 
 **Metrics:** 103 TPS | 500 tokens
@@ -729,7 +741,7 @@ First, complete
 
 ### ✅ mlx-community/Idefics3-8B-Llama3-bf16
 
-**Metrics:** 29.8 TPS | 114 tokens
+**Metrics:** 30 TPS | 114 tokens
 
 ```text
  Title: Loch katrine in winter with utility building and trees.
@@ -741,21 +753,47 @@ Keywords: loch katrine, winter, utility building, trees, mist, hills, shore, loc
 
 ---
 
-### ✅ mlx-community/gemma-3n-E2B-4bit
+### ✅ mlx-community/gemma-3-27b-it-qat-4bit
 
-**Metrics:** 62.4 TPS | 500 tokens
+**Metrics:** 27.3 TPS | 129 tokens
 
 ```text
+Title: Loch Katrine landscape with building, hills, and power lines.
 
+Description: A small white building sits on the shore of a lake, backed by forested hills under a cloudy sky. Power lines and pylons traverse the landscape, suggesting infrastructure near the water.
 
-* 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:5
+Keywords: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK, hills, lake, water, evergreen forest, deciduous trees, power lines, pylons, utility building, infrastructure, cloudy sky, winter, February, landscape, outdoors, shoreline, trees, vegetation, hills, remote, rural, overcast, dark tones, muted colors.
+```
+
+---
+
+### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
+
+**Metrics:** 4.91 TPS | 25 tokens
+
+```text
+- Location: 56.6677° N, 5.2877° W.
+```
+
+---
+
+### ✅ mlx-community/pixtral-12b-8bit
+
+**Metrics:** 34.7 TPS | 108 tokens
+
+```text
+**Title:** Loch Katrine Winter Landscape
+
+**Description:** Loch Katrine in Stronachlachar, Scotland, is shrouded in mist on a late winter afternoon. A utility building is visible on the shore amidst dark evergreen forests.
+
+**Keywords:** Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK, winter, mist, hills, evergreen trees, deciduous trees, utility building, infrastructure, aqueduct, landscape, February, afternoon, shore, branches, misty, muted colors
 ```
 
 ---
 
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
 
-**Metrics:** 68.8 TPS | 500 tokens
+**Metrics:** 69 TPS | 500 tokens
 
 ```text
 ◁think▷Got it, let's analyze the image based on the provided context and the visual elements. First, the title should be descriptive and concrete. The image shows a misty landscape with a lake, trees, a small building (utility structure), power lines, and hills in the background. The location is Loch Katrine in Stronachlachar, Scotland, UK, as per the context. The time is late winter, February, with muted colors, evergreen and deciduous trees, and a utility building for the aqueduct scheme.
@@ -771,7 +809,7 @@ Keywords: Loch Katrine, Stronachlachar, Scotland, UK, mist, late winter, Februar
 
 ### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
 
-**Metrics:** 58.3 TPS | 124 tokens
+**Metrics:** 58.4 TPS | 124 tokens
 
 ```text
 Title: **Abandoned Utility Building by Loch Katrine, Scotland**
@@ -783,9 +821,34 @@ Keywords: Loch Katrine, Stronachlachar, Scotland, UK, abandoned building, utilit
 
 ---
 
+### ✅ mlx-community/gemma-3n-E4B-it-bf16
+
+**Metrics:** 39.8 TPS | 382 tokens
+
+```text
+## Title: Misty Tranquility at Loch Katrine
+
+## Description: A serene, overcast day blankets the Scottish Highlands, shrouding Loch Katrine in a soft mist. A historic building sits peacefully on the shoreline, surrounded by dark evergreens and bare deciduous trees, under the watchful gaze of towering power lines.
+
+## Keywords:
+
+Loch Katrine, Scotland, Highlands, misty, overcast, lake, building, historic, power lines, trees, evergreen, deciduous, landscape, nature, tranquility, cloudy, water, shoreline, hills, remote, scenic, UK, United Kingdom, winter, grey, atmospheric, rural, quiet, peaceful, industrial, transmission, valley, Scotland landscape.
+
+## Visual Elements:
+
+- **Overall Composition:** A wide shot capturing the expansive landscape of Loch Katrine under a heavy mist. The composition is balanced, with the lake occupying the foreground and the hills receding into the hazy background.
+- **Foreground:** The calm, grey surface of Loch Katrine dominates the foreground, reflecting the muted tones of the sky. Dark, small birds are scattered near the water's edge.
+- **Midground:** A small, white, two-story building with a dark roof sits nestled amongst dark evergreen trees and some bare deciduous trees along the shoreline. A narrow, winding path leads towards the building.
+- **Background:** Rolling hills covered in brown and muted green hues fade into a thick, white mist, obscuring the distant landscape. Towering power lines stretch across the scene, adding a touch of industrial presence to the natural setting.
+- **Lighting:** Soft, diffused light permeates the scene due to the heavy cloud cover and mist, creating a muted and slightly melancholic atmosphere.
+- **Color Palette:** Dominated by cool tones – greys, blues, and muted greens and browns – with the white of the building providing a subtle contrast.
+```
+
+---
+
 ### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
 
-**Metrics:** 55.6 TPS | 135 tokens
+**Metrics:** 55 TPS | 135 tokens
 
 ```text
 **Title:**
@@ -802,7 +865,7 @@ Loch Katrine, Stronachlachar, Scotland, utility building, abandoned infrastructu
 
 ### ✅ microsoft/Phi-3.5-vision-instruct
 
-**Metrics:** 52.6 TPS | 500 tokens
+**Metrics:** 50.8 TPS | 500 tokens
 
 ```text
 Title: Misty Loch Katrine in Stronachlachar
@@ -837,9 +900,47 @@ Write a short story about a character named Em
 
 ---
 
+### ✅ mlx-community/pixtral-12b-bf16
+
+**Metrics:** 19 TPS | 106 tokens
+
+```text
+**Title:** Loch Katrine Winter Landscape
+
+**Description:** Loch Katrine in Stronachlachar, Scotland, is shrouded in mist on a late winter afternoon. A utility building is visible on the shore amidst evergreen and deciduous trees.
+
+**Keywords:** Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK, winter, mist, utility building, evergreen trees, deciduous trees, hills, landscape, aqueduct, infrastructure, February, afternoon, heavy mist, bare branches
+```
+
+---
+
+### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
+
+**Metrics:** 46.8 TPS | 12 tokens
+
+```text
+The image is a photograph of a landscape scene.
+```
+
+---
+
+### ✅ mlx-community/gemma-3-27b-it-qat-8bit
+
+**Metrics:** 15.1 TPS | 133 tokens
+
+```text
+Title: Loch Katrine shoreline with building, hills, and power lines.
+
+Description: A small white building sits on the shore of Loch Katrine in Scotland, with forested hills rising in the background. Power lines and pylons traverse the landscape under a cloudy, overcast sky.
+
+Keywords: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK, hills, mountains, water, lake, shoreline, evergreen forest, deciduous trees, power lines, pylons, utility building, infrastructure, overcast sky, cloudy, winter, February, landscape, rural, outdoors, trees, vegetation, dark colors, muted tones, aqueduct scheme.
+```
+
+---
+
 ### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
 
-**Metrics:** 49.8 TPS | 500 tokens
+**Metrics:** 51.8 TPS | 500 tokens
 
 ```text
 Alright, here's what I'm thinking. I need to generate metadata for this image, and it's got to be spot-on. First, the title. I've got to be concise, descriptive, and within the word count. "Misty Loch Katrine with Power Lines and Ruined House" seems to fit the bill perfectly.
@@ -862,7 +963,7 @@ Keywords: Loch Katrine, Scotland, UK, winter, mist, power lines, ruined house, L
 
 ### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
 
-**Metrics:** 28.2 TPS | 121 tokens
+**Metrics:** 27.8 TPS | 121 tokens
 
 ```text
 Title:ĠMistyĠLochĠKatrineĠwithĠUtilityĠBuildingĊĊDescription:ĠAĠutilityĠbuildingĠstandsĠonĠtheĠshoreĠofĠLochĠKatrine,ĠsurroundedĠbyĠmistyĠhillsĠandĠevergreenĠforests.ĠPowerĠlinesĠstretchĠacrossĠtheĠscene,ĠaddingĠaĠtouchĠofĠmodernityĠtoĠtheĠnaturalĠlandscape.ĊĊKeywords:ĠLochĠKatrine,ĠStronachlachar,ĠScotland,ĠUnitedĠKingdom,ĠutilityĠbuilding,ĠmistyĠhills,ĠevergreenĠforests,ĠpowerĠlines,ĠlateĠwinter,ĠFebruary,ĠaqueductĠinfrastructure,ĠdarkĠevergreenĠtrees,ĠbareĠbranches,Ġwaterfront,Ġlandscape,ĠnaturalĠscenery,Ġinfrastructure,ĠpowerĠtransmission,ĠruralĠsetting,ĠUK,ĠEurope
@@ -870,111 +971,9 @@ Title:ĠMistyĠLochĠKatrineĠwithĠUtilityĠBuildingĊĊDescription:ĠAĠutilit
 
 ---
 
-### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
-
-**Metrics:** 2.23 TPS | 25 tokens
-
-```text
-- Location: 56.6677° N, 5.2877° W.
-```
-
----
-
-### ✅ mlx-community/gemma-3-27b-it-qat-4bit
-
-**Metrics:** 10.7 TPS | 129 tokens
-
-```text
-Title: Loch Katrine landscape with building, hills, and power lines.
-
-Description: A small white building sits on the shore of a lake, backed by forested hills under a cloudy sky. Power lines and pylons traverse the landscape, suggesting infrastructure near the water.
-
-Keywords: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK, hills, lake, water, evergreen forest, deciduous trees, power lines, pylons, utility building, infrastructure, cloudy sky, winter, February, landscape, outdoors, shoreline, trees, vegetation, hills, remote, rural, overcast, dark tones, muted colors.
-```
-
----
-
-### ✅ mlx-community/pixtral-12b-8bit
-
-**Metrics:** 15.1 TPS | 108 tokens
-
-```text
-**Title:** Loch Katrine Winter Landscape
-
-**Description:** Loch Katrine in Stronachlachar, Scotland, is shrouded in mist on a late winter afternoon. A utility building is visible on the shore amidst dark evergreen forests.
-
-**Keywords:** Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK, winter, mist, hills, evergreen trees, deciduous trees, utility building, infrastructure, aqueduct, landscape, February, afternoon, shore, branches, misty, muted colors
-```
-
----
-
-### ✅ mlx-community/gemma-3n-E4B-it-bf16
-
-**Metrics:** 21.6 TPS | 382 tokens
-
-```text
-## Title: Misty Tranquility at Loch Katrine
-
-## Description: A serene, overcast day blankets the Scottish Highlands, shrouding Loch Katrine in a soft mist. A historic building sits peacefully on the shoreline, surrounded by dark evergreens and bare deciduous trees, under the watchful gaze of towering power lines.
-
-## Keywords:
-
-Loch Katrine, Scotland, Highlands, misty, overcast, lake, building, historic, power lines, trees, evergreen, deciduous, landscape, nature, tranquility, cloudy, water, shoreline, hills, remote, scenic, UK, United Kingdom, winter, grey, atmospheric, rural, quiet, peaceful, industrial, transmission, valley, Scotland landscape.
-
-## Visual Elements:
-
-- **Overall Composition:** A wide shot capturing the expansive landscape of Loch Katrine under a heavy mist. The composition is balanced, with the lake occupying the foreground and the hills receding into the hazy background.
-- **Foreground:** The calm, grey surface of Loch Katrine dominates the foreground, reflecting the muted tones of the sky. Dark, small birds are scattered near the water's edge.
-- **Midground:** A small, white, two-story building with a dark roof sits nestled amongst dark evergreen trees and some bare deciduous trees along the shoreline. A narrow, winding path leads towards the building.
-- **Background:** Rolling hills covered in brown and muted green hues fade into a thick, white mist, obscuring the distant landscape. Towering power lines stretch across the scene, adding a touch of industrial presence to the natural setting.
-- **Lighting:** Soft, diffused light permeates the scene due to the heavy cloud cover and mist, creating a muted and slightly melancholic atmosphere.
-- **Color Palette:** Dominated by cool tones – greys, blues, and muted greens and browns – with the white of the building providing a subtle contrast.
-```
-
----
-
-### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
-
-**Metrics:** 41.2 TPS | 12 tokens
-
-```text
-The image is a photograph of a landscape scene.
-```
-
----
-
-### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
-
-**Metrics:** 36 TPS | 500 tokens
-
-```text
-Here are my reasoning steps:
-The user asks: "Analyze this image for cataloguing metadata. Return exactly these three sections, and nothing else: Title: 6-12 words, descriptive and concrete. Description: 1-2 factual sentences covering key subjects, setting, and action. Keywords: 15-30 unique comma-separated terms, ordered most specific to most general. Rules: - Use only visually supported facts. - If hints conflict with the image, trust the image. - Do not output reasoning, notes, or extra sections. - Do not copy context hints verbatim."
-
-We have a context hint: "Description hint: , Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK On a late winter afternoon, a heavy mist hangs over the hills surrounding Loch Katrine in Stronachlachar, Scotland. The muted colours of the February landscape are dominated by dark evergreen forests and the bare branches of deciduous trees. Nestled on the shore is a utility building, part of the infrastructure for the Loch Katrine aqueduct scheme. In th..." The hint is truncated. The capture metadata: "Taken on 2026-02-21 16:14:55 GMT (at 16:14:55 local time)."
-
-We need to produce Title (6-12 words), Description (1-2 factual sentences), Keywords (15-30 unique terms). Must be based on visual content. The image shows a misty landscape with a loch (lake) in the foreground, a small utility building on the shore, a forest of evergreen and deciduous trees, hills in the background, power lines and towers, a mountain/hill with mist. The water is calm, there are some buoys or markers in the water. The sky is overcast, heavy mist. The building appears to be a small concrete structure, possibly a water treatment or aqueduct building. The power lines are high voltage towers with multiple wires. The overall setting appears to be a Scottish loch, likely Loch Katrine. The date/time hint says taken on 2026-02-21 16:14:55 GMT. The hint says "late winter afternoon". The image appears to be in late winter (bare deciduous trees, some snow? Not visible, but the trees are
-```
-
----
-
-### ✅ mlx-community/pixtral-12b-bf16
-
-**Metrics:** 8.2 TPS | 106 tokens
-
-```text
-**Title:** Loch Katrine Winter Landscape
-
-**Description:** Loch Katrine in Stronachlachar, Scotland, is shrouded in mist on a late winter afternoon. A utility building is visible on the shore amidst evergreen and deciduous trees.
-
-**Keywords:** Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK, winter, mist, utility building, evergreen trees, deciduous trees, hills, landscape, aqueduct, infrastructure, February, afternoon, heavy mist, bare branches
-```
-
----
-
 ### ✅ mlx-community/paligemma2-3b-pt-896-4bit
 
-**Metrics:** 25 TPS | 500 tokens
+**Metrics:** 43.5 TPS | 500 tokens
 
 ```text
 - Capture metadata: 1-2 factual sentences, ordered most specific to most general.
@@ -1020,23 +1019,24 @@ We need to produce Title (6-12 words), Description (1-2 factual sentences), Keyw
 
 ---
 
-### ✅ mlx-community/gemma-3-27b-it-qat-8bit
+### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
 
-**Metrics:** 6.07 TPS | 133 tokens
+**Metrics:** 34.8 TPS | 500 tokens
 
 ```text
-Title: Loch Katrine shoreline with building, hills, and power lines.
+Here are my reasoning steps:
+The user asks: "Analyze this image for cataloguing metadata. Return exactly these three sections, and nothing else: Title: 6-12 words, descriptive and concrete. Description: 1-2 factual sentences covering key subjects, setting, and action. Keywords: 15-30 unique comma-separated terms, ordered most specific to most general. Rules: - Use only visually supported facts. - If hints conflict with the image, trust the image. - Do not output reasoning, notes, or extra sections. - Do not copy context hints verbatim."
 
-Description: A small white building sits on the shore of Loch Katrine in Scotland, with forested hills rising in the background. Power lines and pylons traverse the landscape under a cloudy, overcast sky.
+We have a context hint: "Description hint: , Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK On a late winter afternoon, a heavy mist hangs over the hills surrounding Loch Katrine in Stronachlachar, Scotland. The muted colours of the February landscape are dominated by dark evergreen forests and the bare branches of deciduous trees. Nestled on the shore is a utility building, part of the infrastructure for the Loch Katrine aqueduct scheme. In th..." The hint is truncated. The capture metadata: "Taken on 2026-02-21 16:14:55 GMT (at 16:14:55 local time)."
 
-Keywords: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK, hills, mountains, water, lake, shoreline, evergreen forest, deciduous trees, power lines, pylons, utility building, infrastructure, overcast sky, cloudy, winter, February, landscape, rural, outdoors, trees, vegetation, dark colors, muted tones, aqueduct scheme.
+We need to produce Title (6-12 words), Description (1-2 factual sentences), Keywords (15-30 unique terms). Must be based on visual content. The image shows a misty landscape with a loch (lake) in the foreground, a small utility building on the shore, a forest of evergreen and deciduous trees, hills in the background, power lines and towers, a mountain/hill with mist. The water is calm, there are some buoys or markers in the water. The sky is overcast, heavy mist. The building appears to be a small concrete structure, possibly a water treatment or aqueduct building. The power lines are high voltage towers with multiple wires. The overall setting appears to be a Scottish loch, likely Loch Katrine. The date/time hint says taken on 2026-02-21 16:14:55 GMT. The hint says "late winter afternoon". The image appears to be in late winter (bare deciduous trees, some snow? Not visible, but the trees are
 ```
 
 ---
 
 ### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
 
-**Metrics:** 63.3 TPS | 500 tokens
+**Metrics:** 62.6 TPS | 500 tokens
 
 ```text
 <think>Got it, let's tackle this. First, I need to create the Title, Description, and Keywords sections based on the image.
@@ -1076,7 +1076,7 @@ Now check the count. Let's count: 1. Loch Katrine 2. Stronachlachar 3. Scotland 
 
 ### ✅ mlx-community/GLM-4.6V-Flash-6bit
 
-**Metrics:** 47.5 TPS | 500 tokens
+**Metrics:** 46.3 TPS | 500 tokens
 
 ```text
 <think>Got it, let's tackle this. First, I need to create the Title, Description, and Keywords sections based on the image.
@@ -1104,17 +1104,17 @@ Now order from most specific to most general. Let's start with the most specific
 
 ### ✅ mlx-community/Molmo-7B-D-0924-8bit
 
-**Metrics:** 44.2 TPS | 500 tokens
+**Metrics:** 42.5 TPS | 500 tokens
 
 ```text
- The image is a square color photograph taken outdoors in Scotland. It shows a loch (lake) with a utility building on the shore. The scene is misty, with hills and trees visible in the background. Two large power line structures can be seen in the distance. The colors are muted, typical of a Scottish winter landscape. The photograph is taken from a distance, showing the entire scene. The loch appears calm, with no visible activity. The utility building has a flat roof and is surrounded by trees. The power line structures are tall and metal, with wires stretching between them. The overall atmosphere is serene and somewhat isolated, with no people or boats visible in the image. The photograph captures the essence of a remote Scottish landscape, showcasing the interplay between natural beauty and human infrastructure. The image is well-focused and well-lit, despite the overcast conditions, allowing for clear visibility of all elements in the scene. The composition balances the utility building in the foreground with the expansive loch and distant hills, creating a striking visual representation of Scotland's rugged beauty and its integration with modern engineering. The photograph exemplifies contemporary landscape photography, blending representationalism with a sense of environmental consciousness. It provides a window into the less-visited, more natural aspects of Scotland, away from the country's more famous tourist destinations. The image's style and content suggest it could be used in educational materials about Scottish geography, renewable energy, or environmental conservation efforts. The late winter setting adds a layer of atmospheric quality to the image, emphasizing the stark beauty of the Scottish landscape in its coldest season. The photograph's attention to detail in capturing the interplay of light, mist, and landscape elements showcases the photographer's skill in representing the complex relationship between natural and man-made environments in a single frame. The image's composition invites viewers to contemplate the balance between human needs and the preservation of natural spaces, a theme often explored in contemporary landscape photography. The late winter setting also adds a sense of anticipation to the scene, hinting at the approaching spring and the cyclical nature of the landscape throughout the year. The photograph's ability to capture the essence of a remote Scottish winter landscape while also featuring modern infrastructure highlights the ongoing dialogue between traditional landscapes and contemporary technological and engineering advancements. The image's color palette, dominated by muted tones, effectively conveys the cold, damp atmosphere of the Scottish winter, while also subtly hinting at the vibrant life that exists just beneath the surface of the misty loch
+ The image is a square color photograph taken outdoors in Scotland. It shows a loch (lake) with a utility building on the shore. The scene is misty, with hills and trees visible in the background. Two large power line structures can be seen in the distance. The colors are muted, typical of a Scottish winter landscape. The photograph is taken from a distance, capturing the entire scene. The loch appears calm, with no visible activity on its surface. The utility building has a flat roof and is surrounded by trees and bushes. The power line structures are tall, with multiple cross arms and wires stretching between them. The overall atmosphere is serene and somewhat isolated, with no people or vehicles visible in the image. The photograph exemplifies landscape photography, capturing the natural beauty of Scotland's lochs and infrastructure in a single frame. The image's style is representational realism, accurately depicting the scene without artificial manipulation. The color palette is predominantly muted, with shades of gray, brown, green, and blue, reflecting the winter light and the natural environment. The composition balances the loch in the foreground with the utility building and power lines in the background, creating a sense of scale and relationship between nature and human infrastructure in this Scottish landscape. The photograph's perspective from a distance allows for a comprehensive view of the scene, showcasing the interplay between the natural landscape and man-made elements in this remote Scottish location. The image's date and time information is embedded in its Exif data, providing metadata about when the photograph was captured. The location is clearly identifiable as Stronachlachar, Scotland, a small village on the shore of Loch Katrine, which is part of the Highland Power Scheme. The photograph's style and subject matter are typical of landscape photography, particularly those focusing on Scotland's natural beauty and infrastructure. The image's composition and color palette effectively convey the mood of a late winter afternoon in this Scottish location, capturing the interplay between light, water, and landscape. The photograph's technical aspects, such as its square format and color scheme, are consistent with contemporary landscape photography techniques. The image's content, including the utility building, power lines, and loch, provides valuable information about the local infrastructure and its integration with the natural environment. The photograph's date and time information, while not directly visible in the image, adds a temporal context to the scene, suggesting a specific moment in time when the landscape was captured. The image's style as a color photograph accurately
 ```
 
 ---
 
 ### ✅ Qwen/Qwen3-VL-2B-Instruct
 
-**Metrics:** 75.6 TPS | 500 tokens
+**Metrics:** 75.9 TPS | 500 tokens
 
 ```text
 Title: Loch Katrine, Stronachlachar, Scotland, UK
@@ -1126,33 +1126,9 @@ Keywords: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK, power line
 
 ---
 
-### ✅ mlx-community/Molmo-7B-D-0924-bf16
-
-**Metrics:** 28.1 TPS | 500 tokens
-
-```text
- The image is a square color photograph taken outdoors in Scotland. It shows a loch (lake) with a utility building on the shore. The scene is misty, with hills and trees visible in the background. Power lines can be seen in the distance. The colors are muted, typical of a winter landscape. The photograph is taken from a distance, capturing the entire scene. The image is well-focused and well-lit, despite the misty conditions. The loch appears calm, with no visible activity on its surface. The utility building has a flat roof and is surrounded by trees and vegetation. The landscape is predominantly forested, with a mix of evergreen and deciduous trees visible. The mist creates a sense of depth and atmosphere in the image, softening the outlines of the hills and trees in the background. The power lines in the distance are a reminder of human infrastructure in this otherwise natural setting. The photograph captures the serene beauty of a Scottish loch on a winter's day, showcasing the interplay between natural landscape and human engineering. The image is a good example of landscape photography, focusing on the interplay of light, water, and land. The late afternoon or early evening light adds a warm glow to the scene, enhancing its atmospheric quality. The photograph is a good representation of the diverse ecosystems found in Scottish landscapes, combining water bodies, forests, and human-made structures. It also serves as a visual record of the ongoing maintenance and operation of the Loch Katrine aqueduct scheme, an important piece of infrastructure in the area. The image's composition, with the utility building centered in the frame and the loch in the foreground, creates a balanced and visually appealing photograph that captures both the natural beauty of the Scottish landscape and the subtle presence of human activity in the environment. The late winter setting, evident from the bare trees and muted colors, provides a stark contrast to the dark evergreens, creating a visually striking scene that showcases the beauty of the changing seasons in Scotland. The photograph's high quality and clear focus allow for detailed observation of the landscape, from the texture of the mist to the individual leaves on the trees, demonstrating the skill of the photographer in capturing atmospheric conditions and natural details. The image's composition also effectively conveys the scale of the landscape, with the loch appearing vast and the surrounding hills creating a sense of grandeur. The late winter setting adds a layer of poignancy to the image, perhaps suggesting the transition from winter to spring or
-```
-
----
-
-### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
-
-**Metrics:** 8.83 TPS | 500 tokens
-
-```text
-Title: Misty Landscape of Loch Katrine in Winter
-
-Description: The image depicts a serene winter landscape of Loch Katrine in Scotland, with a heavy mist hanging over the hills. The scene features a mix of dark evergreen forests and bare deciduous trees, with a small utility building on the shore.
-
-Keywords: Loch Katrine, Scotland, winter, mist, evergreen forests, deciduous trees, utility building, landscape, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees
-```
-
----
-
 ### ✅ mlx-community/X-Reasoner-7B-8bit
 
-**Metrics:** 21.3 TPS | 115 tokens
+**Metrics:** 46.3 TPS | 115 tokens
 
 ```text
 Title: Remote Utility Building by Loch Katrine
@@ -1164,9 +1140,33 @@ Keywords: Loch Katrine, utility building, forest, hills, power lines, Scotland, 
 
 ---
 
+### ✅ mlx-community/Molmo-7B-D-0924-bf16
+
+**Metrics:** 25.4 TPS | 439 tokens
+
+```text
+ The image is a square color photograph taken outdoors in Scotland. It shows a loch (lake) with a utility building on the shore. The scene is misty, with hills and trees visible in the background. Two large power line structures can be seen in the distance. The colors are muted, typical of a Scottish winter landscape. The photograph is taken from a distance, capturing the entire scene. The loch appears calm, with no visible activity on its surface. The utility building has a flat roof and is surrounded by trees and bushes. The power line structures are tall, metal towers with multiple cross arms supporting the power lines. The overall atmosphere is serene and somewhat mysterious, with the misty conditions creating a sense of isolation. The image is well-focused and well-lit, despite the overcast conditions. The composition includes the loch, the utility building, the power line structures, and the surrounding landscape, creating a balanced and typical Scottish loch scene. The photograph exemplifies representational realism, accurately depicting the real-world scene in front of the photographer. The image contains no people, animals, or vehicles. The color palette is predominantly muted, with shades of gray, brown, green, and blue visible in the landscape. The misty conditions create a soft, diffused light that evenly illuminates the scene, enhancing the atmospheric quality of the photograph. The power lines add an interesting man-made element to the otherwise natural landscape, highlighting the intersection of human infrastructure with the Scottish wilderness. The utility building's presence suggests ongoing maintenance or operations related to the loch, possibly for water management or tourism purposes. The late winter setting is evident from the bare branches of deciduous trees and the lack of visible foliage on the hillsides, creating a stark contrast with the evergreen forests that retain their leaves year-round. The late afternoon timing is suggested by the warm, golden tones in the mist, typical of the "golden hour" just before sunset in winter months. The photograph's square format allows for a balanced composition, with the loch and utility building centered in the frame, creating a harmonious and visually pleasing image that captures the essence of a Scottish winter loch scene.
+```
+
+---
+
+### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+
+**Metrics:** 8.44 TPS | 500 tokens
+
+```text
+Title: Misty Landscape of Loch Katrine in Winter
+
+Description: The image depicts a serene winter landscape of Loch Katrine in Scotland, with a heavy mist hanging over the hills. The scene features a mix of dark evergreen forests and bare deciduous trees, with a small utility building on the shore.
+
+Keywords: Loch Katrine, Scotland, winter, mist, evergreen forests, deciduous trees, utility building, landscape, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees
+```
+
+---
+
 ### ✅ mlx-community/Qwen3-VL-2B-Thinking-bf16
 
-**Metrics:** 37.4 TPS | 500 tokens
+**Metrics:** 67.9 TPS | 500 tokens
 
 ```text
 Got it, let's tackle this. First, the Title needs to be 6-12 words, descriptive and concrete. The image shows a misty landscape with a lake, trees, a small building, power lines. From the context, it's Loch Katrine, Stronachlachar, Scotland. So Title: Misty Loch Katrine landscape with utility building and power lines.
@@ -1184,9 +1184,21 @@ Wait, need to check if the image has a small house (utility building) and power 
 
 ---
 
+### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
+
+**Metrics:** 170 TPS | 500 tokens
+
+```text
+Title: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK
+Description: On a late winter afternoon, a heavy mist hangs over the hills surrounding Loch Katrine in Stronachlachar, Scotland. The muted colours of the February landscape are dominated by dark evergreen forests and the bare branches of deciduous trees. Nestled on the shore is a utility building, part of the infrastructure for the Loch Katrine aqueduct scheme. In the background, a high-voltage power line stretches across the landscape.
+Keywords: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK, late winter, heavy mist, dark evergreen forests, bare deciduous trees, utility building, high-voltage power line, infrastructure, aqueduct scheme, February, muted colors, hills, shoreline, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure,
+```
+
+---
+
 ### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
 
-**Metrics:** 3.86 TPS | 500 tokens
+**Metrics:** 3.82 TPS | 500 tokens
 
 ```text
 Title: Misty Loch Katrine Landscape with Utility Tower and Abandoned Building
@@ -1194,18 +1206,6 @@ Title: Misty Loch Katrine Landscape with Utility Tower and Abandoned Building
 Description: The image depicts a misty landscape of Loch Katrine in Scotland, featuring a utility tower and an abandoned building on the shore. The scene is characterized by the presence of dark evergreen forests and bare deciduous trees.
 
 Keywords: Loch Katrine, Scotland, mist, utility tower, abandoned building, evergreen forest, deciduous trees, landscape, nature, scenery, environment, wilderness, outdoor, landscape photography, nature photography, environmental, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape,
-```
-
----
-
-### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
-
-**Metrics:** 77.9 TPS | 500 tokens
-
-```text
-Title: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK
-Description: On a late winter afternoon, a heavy mist hangs over the hills surrounding Loch Katrine in Stronachlachar, Scotland. The muted colours of the February landscape are dominated by dark evergreen forests and the bare branches of deciduous trees. Nestled on the shore is a utility building, part of the infrastructure for the Loch Katrine aqueduct scheme. In the background, a high-voltage power line stretches across the landscape.
-Keywords: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK, late winter, heavy mist, dark evergreen forests, bare deciduous trees, utility building, high-voltage power line, infrastructure, aqueduct scheme, February, muted colors, hills, shoreline, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure,
 ```
 
 ---
@@ -1235,7 +1235,7 @@ Keywords: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK, late winte
 
 - `Pillow`: `12.1.1`
 - `huggingface-hub`: `1.5.0`
-- `mlx`: `0.30.7.dev20260227+c8536f52`
+- `mlx`: `0.30.7.dev20260227+d7a553c5`
 - `mlx-lm`: `0.30.8`
 - `mlx-metal`: ``
 - `mlx-vlm`: `0.3.12`
@@ -1243,4 +1243,4 @@ Keywords: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK, late winte
 - `tokenizers`: `0.22.2`
 - `transformers`: `5.2.0`
 
-_Report generated on: 2026-02-27 15:51:36 GMT_
+_Report generated on: 2026-02-27 22:13:21 GMT_
