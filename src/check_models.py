@@ -1724,6 +1724,9 @@ class MarkdownPipeEscaper:
         # Neutralize HTML-like tags using selective escaper
         result = HTML_ESCAPER.escape(result)
 
+        # Prevent markdownlint MD050 (strong style) on double underscores in error messages/outputs
+        result = result.replace("__", r"\_\_")
+
         # Escape bare ampersands that could start entities
         return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
 
@@ -1754,6 +1757,9 @@ class DiagnosticsEscaper:
 
         # Neutralize HTML-like tags
         result = HTML_ESCAPER.escape(result)
+
+        # Prevent markdownlint MD050 (strong style) on double underscores in error messages
+        result = result.replace("__", r"\_\_")
 
         # Escape bare ampersands
         return re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", result)
