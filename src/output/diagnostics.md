@@ -1,8 +1,8 @@
-# Diagnostics Report — 2 failure(s), 7 harness issue(s) (mlx-vlm 0.3.12)
+# Diagnostics Report — 4 failure(s), 11 harness issue(s) (mlx-vlm 0.3.12)
 
 ## Summary
 
-Automated benchmarking of **46 locally-cached VLM models** found **2 hard failure(s)** and **7 harness/integration issue(s)** plus **2 preflight compatibility warning(s)** in successful models. 44 of 46 models succeeded.
+Automated benchmarking of **46 locally-cached VLM models** found **4 hard failure(s)** and **11 harness/integration issue(s)** plus **2 preflight compatibility warning(s)** in successful models. 42 of 46 models succeeded.
 
 Test image: `20260221-161455_DSC09294_DxO.jpg` (52.8 MB).
 
@@ -13,8 +13,10 @@ Test image: `20260221-161455_DSC09294_DxO.jpg` (52.8 MB).
 Quick triage list with likely owner and next action for each issue class.
 
 - **[Medium] [mlx-vlm]** Failed to process inputs with error: can only concatenate str (not "NoneType") to str (1 model(s)). Next: check processor/chat-template wiring and generation kwargs.
+- **[Medium] [mlx-vlm]** Model runtime error during generation for mlx-community/InternVL3-14B-8bit: LanguageM... (1 model(s)). Next: check processor/chat-template wiring and generation kwargs.
+- **[Medium] [mlx-vlm]** Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageMo... (1 model(s)). Next: check processor/chat-template wiring and generation kwargs.
 - **[Medium] [model configuration/repository]** Loaded processor has no image_processor; expected multimodal processor. (1 model(s)). Next: verify model config, tokenizer files, and revision alignment.
-- **[Medium] [mlx-vlm / mlx]** Harness/integration warnings on 7 model(s). Next: validate stop-token decoding and long-context behavior.
+- **[Medium] [mlx-vlm / mlx]** Harness/integration warnings on 11 model(s). Next: validate stop-token decoding and long-context behavior.
 - **[Medium] [mlx-vlm / mlx]** Stack-signal anomalies on 2 successful model(s). Next: inspect prompt/output token ratios and empty-output patterns.
 - **[Medium] [mlx-vlm, transformers]** Preflight compatibility warnings (2 issue(s)). Next: verify dependency/version compatibility before model runs.
 
@@ -25,8 +27,10 @@ Quick triage list with likely owner and next action for each issue class.
 | Priority | Issue | Models Affected | Owner | Next Action |
 | -------- | ----- | --------------- | ----- | ----------- |
 | **Medium** | Failed to process inputs with error: can only concatenate str (not "N... | 1 (Florence-2-large-ft) | `mlx-vlm` | check processor/chat-template wiring and generation kwargs. |
+| **Medium** | Model runtime error during generation for mlx-community/InternVL3-14B... | 1 (InternVL3-14B-8bit) | `mlx-vlm` | check processor/chat-template wiring and generation kwargs. |
+| **Medium** | Model runtime error during generation for mlx-community/InternVL3-8B-... | 1 (InternVL3-8B-bf16) | `mlx-vlm` | check processor/chat-template wiring and generation kwargs. |
 | **Medium** | Loaded processor has no image_processor; expected multimodal processor. | 1 (deepseek-vl2-8bit) | `model configuration/repository` | verify model config, tokenizer files, and revision alignment. |
-| **Medium** | Harness/integration | 7 (SmolVLM-Instruct, Qwen3-VL-2B-Instruct, Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit, SmolVLM-Instruct-bf16, X-Reasoner-7B-8bit, Florence-2-large-ft) | `mlx-vlm / mlx` | validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime. |
+| **Medium** | Harness/integration | 11 (SmolVLM-Instruct, Qwen3-VL-2B-Instruct, Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit, ERNIE-4.5-VL-28B-A3B-Thinking-bf16, Qwen2-VL-2B-Instruct-4bit, SmolVLM-Instruct-bf16, SmolVLM2-2.2B-Instruct-mlx, llava-v1.6-mistral-7b-8bit, paligemma2-3b-ft-docci-448-bf16, Florence-2-large-ft) | `mlx-vlm / mlx` | validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime. |
 | **Medium** | Preflight compatibility warning | 2 issue(s) | `mlx-vlm, transformers` | verify dependency/version compatibility before model runs. |
 
 ---
@@ -116,7 +120,7 @@ Traceback (most recent call last):
     ...<6 lines>...
         **kwargs,
     )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1101, in prepare_inputs
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1111, in prepare_inputs
     inputs = process_inputs_with_fallback(
         processor,
     ...<4 lines>...
@@ -143,26 +147,29 @@ Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't
 
 Prompt: Analyze this image for cataloguing metadata.
 
-Return exactly these three sections:
+Return exactly these three sections, and nothing else:
 
 Title: 6-12 words, descriptive and concrete.
 
 Description: 1-2 factual sentences covering key subjects, setting, and action.
 
-Keywords: 15-30 comma-separated terms, ordered most specific to most general.
-Use concise, image-grounded wording and avoid speculation.
+Keywords: 15-30 unique comma-separated terms, ordered most specific to most general.
 
-Context: Existing metadata hints (use only if visually consistent):
+Rules:
+- Use only visually supported facts.
+- If hints conflict with the image, trust the image.
+- Do not output reasoning, notes, or extra sections.
+- Do not copy context hints verbatim.
+
+Context: Existing metadata hints (high confidence; use only if visually consistent):
 - Description hint: , Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK On a late winter afternoon, a heavy mist hangs over the hills surrounding Loch Katrine in Stronachlachar, Scotland. The muted colours of the February landscape are dominated by dark evergreen forests and the bare branches of deciduous trees. Nestled on the shore is a utility building, part of the infrastructure for the Loch Katrine aqueduct scheme. In th...
 - Capture metadata: Taken on 2026-02-21 16:14:55 GMT (at 16:14:55 local time).
-
-Prioritize what is visibly present. If context conflicts with the image, trust the image.
 
 === STDERR ===
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 31254.13it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 17246.32it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -171,6 +178,200 @@ Download complete: : 0.00B [00:00, ?B/s]
 </details>
 
 ## 2. Failure affecting 1 model (Priority: Medium)
+
+**Observed behavior:** Model runtime error during generation for mlx-community/InternVL3-14B-8bit: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
+**Owner (likely component):** `mlx-vlm`
+**Suggested next action:** check processor/chat-template wiring and generation kwargs.
+**Affected model:** `mlx-community/InternVL3-14B-8bit`
+
+| Model | Observed Behavior | First Seen Failing | Recent Repro |
+| ----- | ----------------- | ------------------ | ------------ |
+| `mlx-community/InternVL3-14B-8bit` | Model runtime error during generation for mlx-community/InternVL3-14B-8bit: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process' | 2026-02-23 12:54:48 GMT | 2/3 recent runs failed |
+
+### To reproduce
+
+- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-14B-8bit`
+- Portable dependency probe: `python -m pip show mlx mlx-vlm mlx-lm transformers huggingface-hub tokenizers`
+
+<details>
+<summary>Detailed trace logs (affected model)</summary>
+
+#### `mlx-community/InternVL3-14B-8bit`
+
+Traceback:
+
+```text
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 598, in generate
+    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
+                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 488, in stream_generate
+    for n, (token, logprobs) in enumerate(
+                                ~~~~~~~~~^
+        generate_step(input_ids, model, pixel_values, mask, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ):
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 376, in generate_step
+    model.language_model(
+    ~~~~~~~~~~~~~~~~~~~~^
+        inputs=input_ids[:, :n_to_process],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+TypeError: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+ValueError: Model runtime error during generation for mlx-community/InternVL3-14B-8bit: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
+```
+
+Captured stdout/stderr:
+
+```text
+=== STDOUT ===
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '2', '1', '-', '1', '6', '1', '4', '5', '5', '_', 'D', 'S', 'C', '0', '9', '2', '9', '4', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g'] 
+
+Prompt: User: <image>
+Analyze this image for cataloguing metadata.
+
+Return exactly these three sections, and nothing else:
+
+Title: 6-12 words, descriptive and concrete.
+
+Description: 1-2 factual sentences covering key subjects, setting, and action.
+
+Keywords: 15-30 unique comma-separated terms, ordered most specific to most general.
+
+Rules:
+- Use only visually supported facts.
+- If hints conflict with the image, trust the image.
+- Do not output reasoning, notes, or extra sections.
+- Do not copy context hints verbatim.
+
+Context: Existing metadata hints (high confidence; use only if visually consistent):
+- Description hint: , Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK On a late winter afternoon, a heavy mist hangs over the hills surrounding Loch Katrine in Stronachlachar, Scotland. The muted colours of the February landscape are dominated by dark evergreen forests and the bare branches of deciduous trees. Nestled on the shore is a utility building, part of the infrastructure for the Loch Katrine aqueduct scheme. In th...
+- Capture metadata: Taken on 2026-02-21 16:14:55 GMT (at 16:14:55 local time).
+Assistant:
+
+=== STDERR ===
+Downloading (incomplete total...): 0.00B [00:00, ?B/s]
+
+Fetching 18 files:   0%|          | 0/18 [00:00<?, ?it/s]
+Fetching 18 files: 100%|##########| 18/18 [00:00<00:00, 8298.25it/s]
+
+Download complete: : 0.00B [00:00, ?B/s]              
+Download complete: : 0.00B [00:00, ?B/s]
+
+Prefill:   0%|          | 0/2065 [00:00<?, ?tok/s]
+Prefill:   0%|          | 0/2065 [00:00<?, ?tok/s]
+```
+
+</details>
+
+## 3. Failure affecting 1 model (Priority: Medium)
+
+**Observed behavior:** Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
+**Owner (likely component):** `mlx-vlm`
+**Suggested next action:** check processor/chat-template wiring and generation kwargs.
+**Affected model:** `mlx-community/InternVL3-8B-bf16`
+
+| Model | Observed Behavior | First Seen Failing | Recent Repro |
+| ----- | ----------------- | ------------------ | ------------ |
+| `mlx-community/InternVL3-8B-bf16` | Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process' | 2026-02-23 12:54:48 GMT | 2/3 recent runs failed |
+
+### To reproduce
+
+- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-8B-bf16`
+- Portable dependency probe: `python -m pip show mlx mlx-vlm mlx-lm transformers huggingface-hub tokenizers`
+
+<details>
+<summary>Detailed trace logs (affected model)</summary>
+
+#### `mlx-community/InternVL3-8B-bf16`
+
+Traceback:
+
+```text
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 598, in generate
+    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
+                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 488, in stream_generate
+    for n, (token, logprobs) in enumerate(
+                                ~~~~~~~~~^
+        generate_step(input_ids, model, pixel_values, mask, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ):
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 376, in generate_step
+    model.language_model(
+    ~~~~~~~~~~~~~~~~~~~~^
+        inputs=input_ids[:, :n_to_process],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        **kwargs,
+        ^^^^^^^^^
+    )
+    ^
+TypeError: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+ValueError: Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
+```
+
+Captured stdout/stderr:
+
+```text
+=== STDOUT ===
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '2', '1', '-', '1', '6', '1', '4', '5', '5', '_', 'D', 'S', 'C', '0', '9', '2', '9', '4', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g'] 
+
+Prompt: User: <image>
+Analyze this image for cataloguing metadata.
+
+Return exactly these three sections, and nothing else:
+
+Title: 6-12 words, descriptive and concrete.
+
+Description: 1-2 factual sentences covering key subjects, setting, and action.
+
+Keywords: 15-30 unique comma-separated terms, ordered most specific to most general.
+
+Rules:
+- Use only visually supported facts.
+- If hints conflict with the image, trust the image.
+- Do not output reasoning, notes, or extra sections.
+- Do not copy context hints verbatim.
+
+Context: Existing metadata hints (high confidence; use only if visually consistent):
+- Description hint: , Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK On a late winter afternoon, a heavy mist hangs over the hills surrounding Loch Katrine in Stronachlachar, Scotland. The muted colours of the February landscape are dominated by dark evergreen forests and the bare branches of deciduous trees. Nestled on the shore is a utility building, part of the infrastructure for the Loch Katrine aqueduct scheme. In th...
+- Capture metadata: Taken on 2026-02-21 16:14:55 GMT (at 16:14:55 local time).
+Assistant:
+
+=== STDERR ===
+Downloading (incomplete total...): 0.00B [00:00, ?B/s]
+
+Fetching 17 files:   0%|          | 0/17 [00:00<?, ?it/s]
+Fetching 17 files: 100%|##########| 17/17 [00:00<00:00, 29354.95it/s]
+
+Download complete: : 0.00B [00:00, ?B/s]              
+Download complete: : 0.00B [00:00, ?B/s]
+
+Prefill:   0%|          | 0/2065 [00:00<?, ?tok/s]
+Prefill:   0%|          | 0/2065 [00:00<?, ?tok/s]
+```
+
+</details>
+
+## 4. Failure affecting 1 model (Priority: Medium)
 
 **Observed behavior:** Loaded processor has no image_processor; expected multimodal processor.
 **Owner (likely component):** `model configuration/repository`
@@ -218,7 +419,7 @@ Added chat tokens
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 96335.60it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 14776.68it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -241,7 +442,7 @@ These warnings were detected before inference. They are non-fatal but should be 
 
 ---
 
-## Harness/Integration Issues (7 model(s))
+## Harness/Integration Issues (11 model(s))
 
 These models completed successfully but show integration problems (for example stop-token leakage, decoding artifacts, or long-context breakdown) that likely point to stack/runtime behavior rather than inherent model quality limits.
 
@@ -250,12 +451,12 @@ These models completed successfully but show integration problems (for example s
 **What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=1,451, output=12, output/prompt=0.83%
+**Token summary:** prompt=1,474, output=12, output/prompt=0.81%
 
 **Why this appears to be an integration/runtime issue:**
 
 - Output is very short relative to prompt size (0.8%), suggesting possible early-stop or prompt-handling issues.
-- Model output may not follow prompt or image contents.
+- Output omitted required Title/Description/Keywords sections.
 
 **Sample output:**
 
@@ -268,19 +469,19 @@ Loch katrine, scotland, uk.
 **What looks wrong:** Behavior degrades under long prompt context.
 **Likely component:** `mlx-vlm / mlx`
 **Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,478, output=500, output/prompt=3.03%
+**Token summary:** prompt=16,499, output=500, output/prompt=3.03%
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16478 tokens), output became repetitive.
+- At long prompt length (16499 tokens), output became repetitive.
 - Output became repetitive, indicating possible generation instability.
 
 **Sample output:**
 
 ```text
-Title: Winter mist over Loch Katrine, Scotland
+Title: Loch Katrine, Stronachlachar, Scotland, UK
 
-Description: A misty, overcast day at Loch Katrine in Stronachlachar, Scotland, with a small utility building on the shore. Tall electricity pylons and ...
+Description: A misty, overcast view of Loch Katrine in Stronachlachar, Scotland, featuring a utility building on the shore and power lines in the bac...
 ```
 
 ### `microsoft/Phi-3.5-vision-instruct`
@@ -288,12 +489,13 @@ Description: A misty, overcast day at Loch Katrine in Stronachlachar, Scotland, 
 **What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=1,052, output=500, output/prompt=47.53%
+**Token summary:** prompt=1,072, output=500, output/prompt=46.64%
 
 **Why this appears to be an integration/runtime issue:**
 
 - Special control token &lt;|end|&gt; appeared in generated text.
 - Special control token &lt;|endoftext|&gt; appeared in generated text.
+- Generated text appears to continue into new writing prompts mid-output.
 - Output switched language/script unexpectedly.
 
 **Sample output:**
@@ -301,7 +503,9 @@ Description: A misty, overcast day at Loch Katrine in Stronachlachar, Scotland, 
 ```text
 Title: Misty Loch Katrine in Stronachlachar
 
-Description: A serene scene of Loch Katrine in Stronachlachar, Scotland, with a heavy mist enveloping the hills. The landscape is characterized by a mix of...
+Description: A misty, overcast day at Loch Katrine in Stronachlachar, Scotland, with a utility building on the shore and power lines in the background.
+
+Ke...
 ```
 
 ### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
@@ -309,11 +513,12 @@ Description: A serene scene of Loch Katrine in Stronachlachar, Scotland, with a 
 **What looks wrong:** Decoded output contains tokenizer artifacts that should not appear in user-facing text.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=2,337, output=198, output/prompt=8.47%
+**Token summary:** prompt=2,359, output=121, output/prompt=5.13%
 
 **Why this appears to be an integration/runtime issue:**
 
-- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 108 occurrences).
+- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 73 occurrences).
+- Output omitted required Title/Description/Keywords sections.
 
 **Sample output:**
 
@@ -321,17 +526,54 @@ Description: A serene scene of Loch Katrine in Stronachlachar, Scotland, with a 
 Title:ĠMistyĠLochĠKatrineĠwithĠUtilityĠBuildingĊĊDescription:ĠAĠutilityĠbuildingĠstandsĠonĠtheĠshoreĠofĠLochĠKatrine,ĠsurroundedĠbyĠmistyĠhillsĠandĠevergreenĠforests.ĠPowerĠlinesĠstretchĠacrossĠtheĠsc...
 ```
 
+### `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`
+
+**What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
+**Likely component:** `mlx-vlm`
+**Suggested next action:** check processor/chat-template wiring and generation kwargs.
+**Token summary:** prompt=1,579, output=500, output/prompt=31.67%
+
+**Why this appears to be an integration/runtime issue:**
+
+- Special control token &lt;/think&gt; appeared in generated text.
+
+**Sample output:**
+
+```text
+Alright, here's what I'm thinking. I need to generate metadata for this image, and it's got to be spot-on. First, the title. I've got to be concise, descriptive, and within the word count. "Misty Loch...
+```
+
+### `mlx-community/Qwen2-VL-2B-Instruct-4bit`
+
+**What looks wrong:** Behavior degrades under long prompt context.
+**Likely component:** `mlx-vlm / mlx`
+**Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
+**Token summary:** prompt=16,510, output=500, output/prompt=3.03%
+
+**Why this appears to be an integration/runtime issue:**
+
+- At long prompt length (16510 tokens), output became repetitive.
+- Output became repetitive, indicating possible generation instability.
+- Output appears to copy prompt context verbatim.
+
+**Sample output:**
+
+```text
+Title: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK
+Description: On a late winter afternoon, a heavy mist hangs over the hills surrounding Loch Katrine in Stronachlachar, Scotland. The m...
+```
+
 ### `mlx-community/SmolVLM-Instruct-bf16`
 
 **What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=1,451, output=12, output/prompt=0.83%
+**Token summary:** prompt=1,474, output=12, output/prompt=0.81%
 
 **Why this appears to be an integration/runtime issue:**
 
 - Output is very short relative to prompt size (0.8%), suggesting possible early-stop or prompt-handling issues.
-- Model output may not follow prompt or image contents.
+- Output omitted required Title/Description/Keywords sections.
 
 **Sample output:**
 
@@ -339,24 +581,59 @@ Title:ĠMistyĠLochĠKatrineĠwithĠUtilityĠBuildingĊĊDescription:ĠAĠutilit
 Loch katrine, scotland, uk.
 ```
 
-### `mlx-community/X-Reasoner-7B-8bit`
+### `mlx-community/SmolVLM2-2.2B-Instruct-mlx`
 
-**What looks wrong:** Behavior degrades under long prompt context.
-**Likely component:** `mlx-vlm / mlx`
-**Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,489, output=500, output/prompt=3.03%
+**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
+**Likely component:** `mlx-vlm`
+**Suggested next action:** check processor/chat-template wiring and generation kwargs.
+**Token summary:** prompt=1,374, output=8, output/prompt=0.58%
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16489 tokens), output became repetitive.
-- Output became repetitive, indicating possible generation instability.
+- Output appears truncated to about 8 tokens.
+- Model output may not follow prompt or image contents.
 
 **Sample output:**
 
 ```text
-**Title:** Remote Utility Building on Loch Katrine Shore
+title=loch katrine
+```
 
-**Description:** A small white utility building sits on the shore of a calm, misty lake, surrounded by dense evergreen trees and a distant pow...
+### `mlx-community/llava-v1.6-mistral-7b-8bit`
+
+**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
+**Likely component:** `mlx-vlm`
+**Suggested next action:** check processor/chat-template wiring and generation kwargs.
+**Token summary:** prompt=2,465, output=12, output/prompt=0.49%
+
+**Why this appears to be an integration/runtime issue:**
+
+- Output is very short relative to prompt size (0.5%), suggesting possible early-stop or prompt-handling issues.
+- Model output may not follow prompt or image contents.
+- Output omitted required Title/Description/Keywords sections.
+
+**Sample output:**
+
+```text
+The image is a photograph of a landscape scene.
+```
+
+### `mlx-community/paligemma2-3b-ft-docci-448-bf16`
+
+**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
+**Likely component:** `mlx-vlm`
+**Suggested next action:** check processor/chat-template wiring and generation kwargs.
+**Token summary:** prompt=1,296, output=9, output/prompt=0.69%
+
+**Why this appears to be an integration/runtime issue:**
+
+- Output is very short relative to prompt size (0.7%), suggesting possible early-stop or prompt-handling issues.
+- Model output may not follow prompt or image contents.
+
+**Sample output:**
+
+```text
+- The image is in low resolution.
 ```
 
 ### `prince-canuma/Florence-2-large-ft`
@@ -364,7 +641,7 @@ Loch katrine, scotland, uk.
 **What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=827, output=500, output/prompt=60.46%
+**Token summary:** prompt=850, output=500, output/prompt=58.82%
 
 **Why this appears to be an integration/runtime issue:**
 
@@ -373,6 +650,7 @@ Loch katrine, scotland, uk.
 - Output contains corrupted or malformed text segments.
 - Output switched language/script unexpectedly.
 - Output formatting deviated from the requested structure.
+- Output omitted required Title/Description/Keywords sections.
 
 **Sample output:**
 
@@ -388,8 +666,8 @@ These models technically succeeded, but token/output patterns suggest likely int
 
 | Model | Prompt Tok | Output Tok | Output/Prompt | Symptom | Owner |
 | ----- | ---------- | ---------- | ------------- | ------- | -------------- |
-| `Qwen/Qwen3-VL-2B-Instruct` | 16,478 | 500 | 3.03% | Repetition under extreme prompt length | `mlx-vlm / mlx` |
-| `mlx-community/X-Reasoner-7B-8bit` | 16,489 | 500 | 3.03% | Repetition under extreme prompt length | `mlx-vlm / mlx` |
+| `Qwen/Qwen3-VL-2B-Instruct` | 16,499 | 500 | 3.03% | Repetition under extreme prompt length | `mlx-vlm / mlx` |
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | 16,510 | 500 | 3.03% | Repetition under extreme prompt length | `mlx-vlm / mlx` |
 
 ---
 
@@ -398,11 +676,13 @@ These models technically succeeded, but token/output patterns suggest likely int
 Recent reproducibility is measured from history (up to last 3 runs where each model appears).
 
 **Regressions since previous run:** none
-**Recoveries since previous run:** `mlx-community/InternVL3-14B-8bit`, `mlx-community/InternVL3-8B-bf16`
+**Recoveries since previous run:** none
 
 | Model | Status vs Previous Run | First Seen Failing | Recent Repro |
 | ----- | ---------------------- | ------------------ | ------------ |
 | `microsoft/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
+| `mlx-community/InternVL3-14B-8bit` | still failing | 2026-02-23 12:54:48 GMT | 2/3 recent runs failed |
+| `mlx-community/InternVL3-8B-bf16` | still failing | 2026-02-23 12:54:48 GMT | 2/3 recent runs failed |
 | `mlx-community/deepseek-vl2-8bit` | still failing | 2026-02-15 03:27:34 GMT | 3/3 recent runs failed |
 
 ---
@@ -412,11 +692,11 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 | Component | Version |
 | --------- | ------- |
 | mlx-vlm | 0.3.12 |
-| mlx | 0.30.7.dev20260223+d4c81062 |
+| mlx | 0.30.7.dev20260227+c8536f52 |
 | mlx-lm | 0.30.8 |
 | transformers | 5.2.0 |
 | tokenizers | 0.22.2 |
-| huggingface-hub | 1.4.1 |
+| huggingface-hub | 1.5.0 |
 | Python Version | 3.13.11 |
 | OS | Darwin 25.3.0 |
 | macOS Version | 26.3 |
@@ -459,6 +739,8 @@ PY
 
 ```bash
 python -m check_models --image /Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft
+python -m check_models --image /Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-14B-8bit
+python -m check_models --image /Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-8B-bf16
 python -m check_models --image /Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit
 ```
 
@@ -467,20 +749,23 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260221-161455_DSC
 ```text
 Analyze this image for cataloguing metadata.
 
-Return exactly these three sections:
+Return exactly these three sections, and nothing else:
 
 Title: 6-12 words, descriptive and concrete.
 
 Description: 1-2 factual sentences covering key subjects, setting, and action.
 
-Keywords: 15-30 comma-separated terms, ordered most specific to most general.
-Use concise, image-grounded wording and avoid speculation.
+Keywords: 15-30 unique comma-separated terms, ordered most specific to most general.
 
-Context: Existing metadata hints (use only if visually consistent):
+Rules:
+- Use only visually supported facts.
+- If hints conflict with the image, trust the image.
+- Do not output reasoning, notes, or extra sections.
+- Do not copy context hints verbatim.
+
+Context: Existing metadata hints (high confidence; use only if visually consistent):
 - Description hint: , Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK On a late winter afternoon, a heavy mist hangs over the hills surrounding Loch Katrine in Stronachlachar, Scotland. The muted colours of the February landscape are dominated by dark evergreen forests and the bare branches of deciduous trees. Nestled on the shore is a utility building, part of the infrastructure for the Loch Katrine aqueduct scheme. In th...
 - Capture metadata: Taken on 2026-02-21 16:14:55 GMT (at 16:14:55 local time).
-
-Prioritize what is visibly present. If context conflicts with the image, trust the image.
 ```
 
 ### Run details
@@ -488,4 +773,4 @@ Prioritize what is visibly present. If context conflicts with the image, trust t
 - Input image: `/Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-02-23 21:14:50 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-02-27 15:51:36 GMT by [check_models](https://github.com/jrp2014/check_models)._

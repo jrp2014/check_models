@@ -242,9 +242,23 @@ The tool generates multiple report formats in `output/` by default:
 - **Load Time**: Time to load weights into memory.
 - **Tokens**: Breakdown of Prompt (input) vs Generated (output) counts.
 
+
 > [!TIP]
 > **Memory Units**: All memory metrics are normalized to GB (decimal).
 > **Token Counts**: `tokens(total/prompt/gen)` shows the full breakdown.
+> [!IMPORTANT]
+> **Image Resolution vs Vision Encoder Input**: VLMs **never see your full-resolution image**. Every model downsamples the input to fit its vision encoder's fixed size before processing. A 50 MP image (8627×5760) becomes a ~0.2 MP thumbnail at 448×448 — a 250× reduction. This means fine details (text, small objects, texture) are lost before the model even starts.
+> Typical input resolutions by model family:
+
+| Resolution | Models |
+| --- | --- |
+| 224×224 | nanoLLaVA |
+| 384–448 | PaliGemma2-448, Phi-3.5, FastVLM, LFM2 |
+| 560–768 | SmolVLM, Idefics3, Molmo |
+| 896–1344 | PaliGemma2-896, Qwen2-VL, Qwen3-VL (dynamic tiling) |
+
+> The Qwen VL family uses **dynamic resolution** with tile-based encoding, processing the image in multiple patches at higher fidelity — which is why their prompt token counts are much larger (~16,000 vs ~500 for PaliGemma2). If a model reports "image too small to see," it is being honest about what it actually received.
+
 
 ### Configuration & Parameters
 

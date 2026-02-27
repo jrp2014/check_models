@@ -3968,7 +3968,8 @@ class GenerationQualityAnalysis:
             (
                 self.has_title_length_violation,
                 "Title length violation "
-                f"({self.title_word_count} words; expected {QUALITY.min_title_words}-{QUALITY.max_title_words})",
+                f"({self.title_word_count} words; expected "
+                f"{QUALITY.min_title_words}-{QUALITY.max_title_words})",
             ),
             (
                 self.has_description_sentence_violation,
@@ -3979,7 +3980,8 @@ class GenerationQualityAnalysis:
             (
                 self.has_keyword_count_violation,
                 "Keyword count violation "
-                f"({self.keyword_count}; expected {QUALITY.min_keywords_count}-{QUALITY.max_keywords_count})",
+                f"({self.keyword_count}; expected "
+                f"{QUALITY.min_keywords_count}-{QUALITY.max_keywords_count})",
             ),
             (
                 self.has_keyword_duplication_violation,
@@ -11392,7 +11394,7 @@ def _build_cataloguing_prompt(metadata: MetadataDict) -> str:
     if has_context:
         parts.append("")
         parts.append(
-            "Context: Existing metadata hints (high confidence; use only if visually consistent):"
+            "Context: Existing metadata hints (high confidence; use only if visually consistent):",
         )
         if title:
             title_hint = _compact_prompt_text(title, max_chars=QUALITY.prompt_title_max_chars)

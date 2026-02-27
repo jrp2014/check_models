@@ -223,7 +223,8 @@ DEFAULT_PACKAGES = ["mlx_lm", "mlx_vlm", "transformers", "tokenizers"]
 _PKG_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
 _TRANSFORMERS_STUBGEN_NOISE_TOKENS = (
     "Something went wrong trying to find the model name in the path:",
-    "Config not found for model. You can manually add it to HARDCODED_CONFIG_FOR_MODELS in utils/auto_docstring.py",
+    "Config not found for model. You can manually add it to"
+    " HARDCODED_CONFIG_FOR_MODELS in utils/auto_docstring.py",
     "No checkpoint found for ",
     " but not documented. Make sure to add it to the docstring of the function in ",
 )
