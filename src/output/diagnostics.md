@@ -169,7 +169,7 @@ Context: Existing metadata hints (high confidence; use only if visually consiste
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 53704.28it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 11654.08it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -263,7 +263,7 @@ Assistant:
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 18 files:   0%|          | 0/18 [00:00<?, ?it/s]
-Fetching 18 files: 100%|##########| 18/18 [00:00<00:00, 8301.90it/s]
+Fetching 18 files: 100%|##########| 18/18 [00:00<00:00, 14838.34it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -360,7 +360,7 @@ Assistant:
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 17 files:   0%|          | 0/17 [00:00<?, ?it/s]
-Fetching 17 files: 100%|##########| 17/17 [00:00<00:00, 41746.59it/s]
+Fetching 17 files: 100%|##########| 17/17 [00:00<00:00, 23324.56it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -419,7 +419,7 @@ Added chat tokens
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 12784.51it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 22531.39it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -692,7 +692,7 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 | Component | Version |
 | --------- | ------- |
 | mlx-vlm | 0.3.12 |
-| mlx | 0.30.7.dev20260227+d7a553c5 |
+| mlx | 0.31.0.dev20260227+365d6f29 |
 | mlx-lm | 0.30.8 |
 | transformers | 5.2.0 |
 | tokenizers | 0.22.2 |
@@ -774,4 +774,4 @@ Context: Existing metadata hints (high confidence; use only if visually consiste
 - Input image: `/Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-02-27 22:13:21 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-02-27 22:57:22 GMT by [check_models](https://github.com/jrp2014/check_models)._
