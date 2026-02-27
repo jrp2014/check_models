@@ -8,6 +8,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Refactored `diagnostics.md` output structure for improved issue triage utility:
+  - merged 'Potential Stack Issues' into a sub-section of 'Harness/Integration
+    Issues' to reduce redundancy;
+  - replaced the generic attachment guidance for JSON repro bundles with explicit
+    direct GitHub repository links to the `output/repro_bundles/` directory.
 - Tightened default cataloging prompt generation in `src/check_models.py`:
   - now requires strict three-section output with explicit anti-CoT and
     anti-verbatim-copy rules;
