@@ -6431,7 +6431,8 @@ def _format_failures_by_package_text(results: list[PerformanceResult]) -> list[s
             error_msg = res.error_message or ""
             if len(error_msg) > ERROR_MESSAGE_TRUNCATE_LEN:
                 error_msg = error_msg[: ERROR_MESSAGE_TRUNCATE_LEN - 3] + "..."
-            parts.append(f"  - Error: `{error_msg}`")
+            escaped_msg = _escape_markdown_diagnostics(error_msg)
+            parts.append(f"  - Error: `{escaped_msg}`")
             if res.error_type:
                 parts.append(f"  - Type: `{res.error_type}`")
         parts.append("")
