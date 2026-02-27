@@ -604,7 +604,8 @@ class TestDiagnosticsReport:
         assert "#### `org/m`" in content
 
     def test_history_context_includes_regressions_recoveries_and_repro(
-        self, tmp_path: Path
+        self,
+        tmp_path: Path,
     ) -> None:
         """Diagnostics should show history-based regression/recovery and retry context."""
         out = tmp_path / "diag.md"
@@ -710,7 +711,7 @@ class TestDiagnosticsReport:
         )
         assert result is True
         content = out.read_text(encoding="utf-8")
-        assert "## Potential Stack Issues" in content
+        assert "### Long-Context Degradation / Potential Stack Issues" in content
         assert "org/suspicious-success" in content
 
     def test_harness_section_includes_tokens_and_empty_marker(self, tmp_path: Path) -> None:
@@ -869,7 +870,8 @@ class TestDiagnosticsReport:
         assert content.endswith("\n")
 
     def test_reproducibility_section_includes_image_path_when_available(
-        self, tmp_path: Path
+        self,
+        tmp_path: Path,
     ) -> None:
         """Repro commands should include --image when run context contains an image path."""
         out = tmp_path / "diag.md"
@@ -886,7 +888,8 @@ class TestDiagnosticsReport:
         assert f"--image '{image_path}'" in content
 
     def test_reproducibility_section_includes_sampling_and_runtime_flags(
-        self, tmp_path: Path
+        self,
+        tmp_path: Path,
     ) -> None:
         """Reproducibility should include the key generation/runtime CLI settings used."""
         out = tmp_path / "diag.md"

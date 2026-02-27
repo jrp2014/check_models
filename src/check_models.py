@@ -7532,14 +7532,16 @@ def _diagnostics_harness_section(
 def _diagnostics_stack_signal_section(
     stack_signals: list[tuple[PerformanceResult, str, str]],
 ) -> list[str]:
-    """Build a section for likely stack issues observed in successful runs."""
+    """Build a section for likely stack issues observed in successful runs (now sub-section)."""
     if not stack_signals:
         return []
 
     parts: list[str] = ["---", ""]
     _append_markdown_section(
         parts,
-        title=f"## Potential Stack Issues ({len(stack_signals)} model(s))",
+        title=(
+            f"### Long-Context Degradation / Potential Stack Issues ({len(stack_signals)} model(s))"
+        ),
         body_lines=[
             "These models technically succeeded, but token/output patterns suggest likely "
             "integration/runtime issues worth checking upstream.",
@@ -8028,6 +8030,14 @@ def _diagnostics_footer(
 
     if failed:
         parts.append("### Target specific failing models")
+        parts.append(
+            "**Note:** A comprehensive JSON reproduction bundle including system info "
+            "and the exact prompt trace has been exported to "
+            "[repro_bundles/]"
+            "(https://github.com/jrp2014/check_models/tree/main/src/output/repro_bundles) "
+            "for each failing model.",
+        )
+        parts.append("")
         target_base_tokens = _build_repro_command_tokens(
             image_path=image_path,
             run_args=run_args,
@@ -8160,7 +8170,10 @@ def generate_diagnostics_report(
     )
     parts.extend(_diagnostics_preflight_section(preflight_issues))
     parts.extend(_diagnostics_harness_section(harness_results))
+
+    # Render stack signals merged into the harness/integration section
     parts.extend(_diagnostics_stack_signal_section(stack_signals))
+
     parts.extend(
         _diagnostics_history_section(
             failed=failed,
@@ -11101,7 +11114,14 @@ def _dump_environment_to_log(output_path: Path) -> None:
             # Use importlib.metadata (standard library) instead of subprocess calling pip/conda
             # to avoid S603 security lints and provide faster, more reliable dumping.
             try:
-                dists = sorted(importlib.metadata.distributions(), key=lambda d: d.name.lower())
+                # Some environments can have incomplete distribution metadata missing .name
+                def _get_name(d: importlib.metadata.Distribution) -> str:
+                    return getattr(d, "name", "") or ""
+
+                dists = sorted(
+                    importlib.metadata.distributions(),
+                    key=lambda d: _get_name(d).lower(),
+                )
                 env_file.write("--- Python Packages (via importlib.metadata) ---\n")
                 env_file.write(f"Total packages: {len(dists)}\n\n")
                 for d in dists:
