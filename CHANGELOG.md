@@ -28,13 +28,14 @@ Notable changes to this project will be documented in this file.
 - Improved quality-issue serialization robustness: JSONL list conversion now
   preserves single issue items that contain commas inside parenthesized detail
   payloads (for example repetitive phrase previews).
-- Polished generated report outputs for faster maintainer triage without
+-- Polished generated report outputs for faster maintainer triage without
   changing core runtime behavior:
   - added a compact `Action Summary` near the top of `diagnostics.md` with
     explicit owner labels and next actions;
   - expanded diagnostics reproducibility guidance to include both exact rerun
     commands and portable dependency/import probes that do not require local
-    image assets;
+    image assets (now centralized in a single portable triage section instead
+    of repeated per failure cluster);
   - added a concise `Action Snapshot` near the top of `results.md` to separate
     framework/runtime failures from low-utility model watchlist signals.
 - Updated local MLX build integration in `src/tools/update.sh` to support

@@ -687,7 +687,6 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         assert "## Action Summary" in content
         assert "Quick triage list with likely owner and next action" in content
-        assert "Portable dependency probe" in content
         assert "### Portable triage (no local image required)" in content
         assert "python -m pip show mlx mlx-vlm mlx-lm transformers" in content
 

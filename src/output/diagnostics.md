@@ -49,7 +49,6 @@ Quick triage list with likely owner and next action for each issue class.
 ### To reproduce
 
 - Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft`
-- Portable dependency probe: `python -m pip show mlx mlx-vlm mlx-lm transformers huggingface-hub tokenizers`
 
 <details>
 <summary>Detailed trace logs (affected model)</summary>
@@ -191,7 +190,6 @@ Download complete: : 0.00B [00:00, ?B/s]
 ### To reproduce
 
 - Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-14B-8bit`
-- Portable dependency probe: `python -m pip show mlx mlx-vlm mlx-lm transformers huggingface-hub tokenizers`
 
 <details>
 <summary>Detailed trace logs (affected model)</summary>
@@ -288,7 +286,6 @@ Prefill:   0%|          | 0/2065 [00:00<?, ?tok/s]
 ### To reproduce
 
 - Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-8B-bf16`
-- Portable dependency probe: `python -m pip show mlx mlx-vlm mlx-lm transformers huggingface-hub tokenizers`
 
 <details>
 <summary>Detailed trace logs (affected model)</summary>
@@ -385,7 +382,6 @@ Prefill:   0%|          | 0/2065 [00:00<?, ?tok/s]
 ### To reproduce
 
 - Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit`
-- Portable dependency probe: `python -m pip show mlx mlx-vlm mlx-lm transformers huggingface-hub tokenizers`
 
 <details>
 <summary>Detailed trace logs (affected model)</summary>

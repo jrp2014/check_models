@@ -5032,11 +5032,12 @@ def _parse_exif_local_datetime(exif_date: ExifValue) -> datetime | None:
     """Parse an EXIF date value and convert it to local timezone."""
     local_tz = get_localzone()
     exif_text = str(exif_date)
+    parsed: datetime | None = None
     for fmt in DATE_FORMATS:
         with contextlib.suppress(ValueError):
-            parsed = datetime.strptime(exif_text, fmt).replace(tzinfo=UTC)
-            return parsed.astimezone(local_tz)
-    return None
+            parsed = datetime.strptime(exif_text, fmt).replace(tzinfo=UTC).astimezone(local_tz)
+            break
+    return parsed
 
 
 def _extract_file_mtime_local(
@@ -6009,11 +6010,11 @@ def compute_performance_statistics(results: list[PerformanceResult]) -> Performa
     # Compute min/max/avg for fields with data
     for field, values in field_values.items():
         if values:
-            stats[field] = {
-                "min": min(values),
-                "max": max(values),
-                "avg": sum(values) / len(values),
-            }
+            stats[field] = NumericFieldStats(
+                min=min(values),
+                max=max(values),
+                avg=sum(values) / len(values),
+            )
 
     return stats
 
@@ -7355,17 +7356,14 @@ def _build_cluster_filing_guidance(
     image_path: Path | None,
     run_args: argparse.Namespace | None,
 ) -> list[str]:
-    """Build concise filing guidance with exact and portable repro probes."""
+    """Build concise filing guidance with an exact repro command."""
     repro_tokens = _build_repro_command_tokens(
         image_path=image_path,
         run_args=run_args,
         include_selection=False,
     )
     repro_command = shlex_join([*repro_tokens, "--models", representative.model_name])
-    return [
-        f"- Repro command (exact run): `{repro_command}`",
-        f"- Portable dependency probe: `{_PORTABLE_DEPENDENCY_PROBE_CMD}`",
-    ]
+    return [f"- Repro command (exact run): `{repro_command}`"]
 
 
 def _diagnostics_failure_clusters(
