@@ -8080,10 +8080,12 @@ def _diagnostics_footer(
         "PY"
     )
     parts.append("### Portable triage (no local image required)")
+    parts.append("")
     _append_markdown_code_block(parts, portable_commands, language="bash")
 
     if failed:
         parts.append("### Target specific failing models")
+        parts.append("")
         parts.append(
             "**Note:** A comprehensive JSON reproduction bundle including system info "
             "and the exact prompt trace has been exported to "
@@ -8105,6 +8107,7 @@ def _diagnostics_footer(
         _append_markdown_code_block(parts, target_model_commands, language="bash")
 
     parts.append("### Prompt Used")
+    parts.append("")
     _append_markdown_code_block(parts, prompt, language="text")
     parts.append("### Run details")
     parts.append("")
