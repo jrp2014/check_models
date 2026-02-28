@@ -123,6 +123,18 @@ Notable changes to this project will be documented in this file.
 - Simplified diagnostics failure-cluster filing guidance so it only includes
   the repro command bullet; full traceback/captured-output diagnostics remain
   available in the existing collapsible sections.
+- Aligned runtime-dependency preflight behavior between CLI and diagnostics:
+  when core runtime packages are unavailable, the CLI now logs a structured
+  environment-failure message and writes a minimal `diagnostics.md` focused on
+  the missing dependencies and environment fingerprint instead of per-model
+  failures.
+- Centralized diagnostics configuration (history depth, snippet lengths,
+  traceback tail lines, and cluster thresholds) into a single
+  `DiagnosticsConfig` struct near the diagnostics helpers to make future tuning
+  easier.
+- Added concise one-line micro-summaries at the top of the Harness/Integration
+  Issues and Long-Context/Stack Issues sections in `diagnostics.md` to improve
+  scanability in large reports.
 - Optimized hot paths in `src/check_models.py`:
   - Hugging Face cache scans are now reused via a per-run cache helper.
   - Quality analysis is reused when `PerformanceResult.quality_analysis`

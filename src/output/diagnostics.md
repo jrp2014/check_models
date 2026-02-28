@@ -440,6 +440,7 @@ These warnings were detected before inference. They are non-fatal but should be 
 
 ## Harness/Integration Issues (11 model(s))
 
+11 model(s) show potential harness/integration issues; see per-model breakdown below.
 These models completed successfully but show integration problems (for example stop-token leakage, decoding artifacts, or long-context breakdown) that likely point to stack/runtime behavior rather than inherent model quality limits.
 
 ### `HuggingFaceTB/SmolVLM-Instruct`
@@ -658,6 +659,7 @@ The image is a photograph of a landscape scene.
 
 ### Long-Context Degradation / Potential Stack Issues (2 model(s))
 
+2 model(s) show long-context degradation or stack anomalies; see table below.
 These models technically succeeded, but token/output patterns suggest likely integration/runtime issues worth checking upstream.
 
 | Model | Prompt Tok | Output Tok | Output/Prompt | Symptom | Owner |

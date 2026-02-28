@@ -6487,11 +6487,25 @@ def _format_action_snapshot_text(
 # DIAGNOSTICS REPORT — Upstream issue filing aid
 # =============================================================================
 
+
+@dataclass(frozen=True)
+class DiagnosticsConfig:
+    """Centralized configuration for diagnostics report behavior."""
+
+    high_cluster_count: int = 2  # ≥ N models = High priority cluster
+    traceback_tail_lines: int = 6  # Lines to keep from traceback tail
+    output_snippet_len: int = 200  # Max chars for sample output
+    recent_run_window: int = 3  # Runs used for reproducibility signal
+    history_max_records: int = 100  # History rows loaded for context
+
+
+DIAGNOSTICS: Final[DiagnosticsConfig] = DiagnosticsConfig()
+
 # Priority thresholds for diagnostics report classification
-_DIAGNOSTICS_HIGH_COUNT: Final[int] = 2  # ≥ N models = High priority cluster
-_DIAGNOSTICS_TRACEBACK_TAIL_LINES: Final[int] = 6  # Lines to keep from traceback tail
-_DIAGNOSTICS_OUTPUT_SNIPPET_LEN: Final[int] = 200  # Max chars for sample output
-_DIAGNOSTICS_RECENT_RUN_WINDOW: Final[int] = 3  # Runs used for reproducibility signal
+_DIAGNOSTICS_HIGH_COUNT: Final[int] = DIAGNOSTICS.high_cluster_count
+_DIAGNOSTICS_TRACEBACK_TAIL_LINES: Final[int] = DIAGNOSTICS.traceback_tail_lines
+_DIAGNOSTICS_OUTPUT_SNIPPET_LEN: Final[int] = DIAGNOSTICS.output_snippet_len
+_DIAGNOSTICS_RECENT_RUN_WINDOW: Final[int] = DIAGNOSTICS.recent_run_window
 
 # System info keys to include in the environment table (order matters)
 _DIAGNOSTICS_SYSTEM_KEYS: Final[tuple[str, ...]] = (
@@ -6982,6 +6996,37 @@ def _diagnostics_environment_section(
         header="| Component | Version |",
         separator="| --------- | ------- |",
         rows=table_rows,
+    )
+    return parts
+
+
+def _build_environment_failure_diagnostics(
+    *,
+    error_message: str,
+    versions: LibraryVersionDict,
+    system_info: dict[str, str],
+) -> list[str]:
+    """Build diagnostics content for environment preflight failures (no models run)."""
+    parts: list[str] = [
+        "# Diagnostics Report — environment preflight failure",
+        "",
+    ]
+    _append_markdown_section(
+        parts,
+        title="## Summary",
+        body_lines=[
+            (
+                "Run aborted before any model execution because core runtime "
+                "dependencies were unavailable."
+            ),
+            f"**Error:** {DIAGNOSTICS_ESCAPER.escape(error_message)}",
+        ],
+    )
+    parts.extend(
+        _diagnostics_environment_section(
+            versions=versions,
+            system_info=system_info,
+        ),
     )
     return parts
 
@@ -7480,6 +7525,8 @@ def _diagnostics_harness_section(
         parts,
         title=f"## Harness/Integration Issues ({len(harness_results)} model(s))",
         body_lines=[
+            f"{len(harness_results)} model(s) show potential harness/integration issues; "
+            "see per-model breakdown below.",
             "These models completed successfully but show integration problems "
             "(for example stop-token leakage, decoding artifacts, or long-context "
             "breakdown) that likely point to stack/runtime behavior rather than "
@@ -7548,6 +7595,8 @@ def _diagnostics_stack_signal_section(
             f"### Long-Context Degradation / Potential Stack Issues ({len(stack_signals)} model(s))"
         ),
         body_lines=[
+            f"{len(stack_signals)} model(s) show long-context degradation or stack anomalies; "
+            "see table below.",
             "These models technically succeeded, but token/output patterns suggest likely "
             "integration/runtime issues worth checking upstream.",
         ],
@@ -12543,7 +12592,7 @@ def _load_latest_history_record(history_path: Path) -> HistoryRunRecord | None:
 def _load_history_run_records(
     history_path: Path | None,
     *,
-    max_records: int = 100,
+    max_records: int = DIAGNOSTICS.history_max_records,
 ) -> list[HistoryRunRecord]:
     """Load up to ``max_records`` run entries from append-only history JSONL."""
     if history_path is None or not history_path.exists():
@@ -13172,6 +13221,29 @@ def _write_diagnostics_and_repro_artifacts(
         log_file_path(diagnostics_path, label="   Diagnostics:  ")
 
 
+def _write_environment_failure_diagnostics(
+    *,
+    args: argparse.Namespace,
+    library_versions: LibraryVersionDict,
+    error_message: str,
+) -> None:
+    """Write a minimal diagnostics report when runtime deps are missing."""
+    diagnostics_path: Path = args.output_diagnostics.resolve()
+    diagnostics_path.parent.mkdir(parents=True, exist_ok=True)
+    system_info = get_system_characteristics()
+    parts = _build_environment_failure_diagnostics(
+        error_message=error_message,
+        versions=library_versions,
+        system_info=system_info,
+    )
+    try:
+        diagnostics_path.write_text("\n".join(parts) + "\n", encoding="utf-8")
+    except OSError:
+        logger.exception("Failed to write environment diagnostics report to %s", diagnostics_path)
+    else:
+        log_file_path(diagnostics_path, label="   Diagnostics:  ")
+
+
 def finalize_execution(
     *,
     args: argparse.Namespace,
@@ -13323,6 +13395,7 @@ def finalize_execution(
 def main(args: argparse.Namespace) -> None:
     """Run CLI execution for MLX VLM model check."""
     overall_start_time: float = time.perf_counter()
+    library_versions: LibraryVersionDict | None = None
     try:
         library_versions = setup_environment(args)
         # Validate all CLI arguments early to fail fast (after logging setup)
@@ -13358,7 +13431,23 @@ def main(args: argparse.Namespace) -> None:
         sys.exit(130)
     except SystemExit:
         raise
-    except (OSError, ValueError, RuntimeError) as main_err:
+    except RuntimeError as main_err:
+        message = str(main_err)
+        if message.startswith("Required runtime dependencies unavailable:"):
+            log_failure("Required runtime dependencies unavailable; no models were run.")
+            log_warning_note(
+                "Install/repair the missing packages and re-run. Environment details and a "
+                "minimal diagnostics report have been written for triage.",
+            )
+            _write_environment_failure_diagnostics(
+                args=args,
+                library_versions=library_versions or get_library_versions(),
+                error_message=message,
+            )
+        else:
+            logger.critical("Fatal error in main execution: %s", main_err, exc_info=True)
+        sys.exit(1)
+    except (OSError, ValueError) as main_err:
         logger.critical("Fatal error in main execution: %s", main_err, exc_info=True)
         sys.exit(1)
 
