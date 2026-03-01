@@ -1,10 +1,10 @@
-# Diagnostics Report — 4 failure(s), 11 harness issue(s) (mlx-vlm 0.3.12)
+# Diagnostics Report — 6 failure(s), 9 harness issue(s) (mlx-vlm 0.3.12)
 
 ## Summary
 
-Automated benchmarking of **46 locally-cached VLM models** found **4 hard failure(s)** and **11 harness/integration issue(s)** plus **2 preflight compatibility warning(s)** in successful models. 42 of 46 models succeeded.
+Automated benchmarking of **48 locally-cached VLM models** found **6 hard failure(s)** and **9 harness/integration issue(s)** plus **2 preflight compatibility warning(s)** in successful models. 42 of 48 models succeeded.
 
-Test image: `20260221-161455_DSC09294_DxO.jpg` (52.8 MB).
+Test image: `20260228-162254_DSC09377.jpg` (33.5 MB).
 
 ---
 
@@ -15,9 +15,11 @@ Quick triage list with likely owner and next action for each issue class.
 - **[Medium] [mlx-vlm]** Failed to process inputs with error: can only concatenate str (not "NoneType") to str (1 model(s)). Next: check processor/chat-template wiring and generation kwargs.
 - **[Medium] [mlx-vlm]** Model runtime error during generation for mlx-community/InternVL3-14B-8bit: LanguageM... (1 model(s)). Next: check processor/chat-template wiring and generation kwargs.
 - **[Medium] [mlx-vlm]** Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageMo... (1 model(s)). Next: check processor/chat-template wiring and generation kwargs.
+- **[Medium] [mlx]** Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-6bit: [metal:... (1 model(s)). Next: check tensor/cache behavior and memory pressure handling.
+- **[Medium] [mlx]** Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-bf16: [metal:... (1 model(s)). Next: check tensor/cache behavior and memory pressure handling.
 - **[Medium] [model configuration/repository]** Loaded processor has no image_processor; expected multimodal processor. (1 model(s)). Next: verify model config, tokenizer files, and revision alignment.
-- **[Medium] [mlx-vlm / mlx]** Harness/integration warnings on 11 model(s). Next: validate stop-token decoding and long-context behavior.
-- **[Medium] [mlx-vlm / mlx]** Stack-signal anomalies on 2 successful model(s). Next: inspect prompt/output token ratios and empty-output patterns.
+- **[Medium] [mlx-vlm / mlx]** Harness/integration warnings on 9 model(s). Next: validate stop-token decoding and long-context behavior.
+- **[Medium] [mlx-vlm / mlx]** Stack-signal anomalies on 3 successful model(s). Next: inspect prompt/output token ratios and empty-output patterns.
 - **[Medium] [mlx-vlm, transformers]** Preflight compatibility warnings (2 issue(s)). Next: verify dependency/version compatibility before model runs.
 
 ---
@@ -29,8 +31,10 @@ Quick triage list with likely owner and next action for each issue class.
 | **Medium** | Failed to process inputs with error: can only concatenate str (not "N... | 1 (Florence-2-large-ft) | `mlx-vlm` | check processor/chat-template wiring and generation kwargs. |
 | **Medium** | Model runtime error during generation for mlx-community/InternVL3-14B... | 1 (InternVL3-14B-8bit) | `mlx-vlm` | check processor/chat-template wiring and generation kwargs. |
 | **Medium** | Model runtime error during generation for mlx-community/InternVL3-8B-... | 1 (InternVL3-8B-bf16) | `mlx-vlm` | check processor/chat-template wiring and generation kwargs. |
+| **Medium** | Model runtime error during generation for mlx-community/Qwen3.5-35B-A... | 1 (Qwen3.5-35B-A3B-6bit) | `mlx` | check tensor/cache behavior and memory pressure handling. |
+| **Medium** | Model runtime error during generation for mlx-community/Qwen3.5-35B-A... | 1 (Qwen3.5-35B-A3B-bf16) | `mlx` | check tensor/cache behavior and memory pressure handling. |
 | **Medium** | Loaded processor has no image_processor; expected multimodal processor. | 1 (deepseek-vl2-8bit) | `model configuration/repository` | verify model config, tokenizer files, and revision alignment. |
-| **Medium** | Harness/integration | 11 (SmolVLM-Instruct, Qwen3-VL-2B-Instruct, Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit, ERNIE-4.5-VL-28B-A3B-Thinking-bf16, Qwen2-VL-2B-Instruct-4bit, SmolVLM-Instruct-bf16, SmolVLM2-2.2B-Instruct-mlx, llava-v1.6-mistral-7b-8bit, paligemma2-3b-ft-docci-448-bf16, Florence-2-large-ft) | `mlx-vlm / mlx` | validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime. |
+| **Medium** | Harness/integration | 9 (Qwen3-VL-2B-Instruct, Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit, Qwen3-VL-2B-Thinking-bf16, SmolVLM2-2.2B-Instruct-mlx, X-Reasoner-7B-8bit, paligemma2-10b-ft-docci-448-6bit, paligemma2-3b-ft-docci-448-bf16, Florence-2-large-ft) | `mlx-vlm / mlx` | validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime. |
 | **Medium** | Preflight compatibility warning | 2 issue(s) | `mlx-vlm, transformers` | verify dependency/version compatibility before model runs. |
 
 ---
@@ -48,7 +52,7 @@ Quick triage list with likely owner and next action for each issue class.
 
 ### To reproduce
 
-- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft`
+- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft`
 
 <details>
 <summary>Detailed trace logs (affected model)</summary>
@@ -142,7 +146,7 @@ Captured stdout/stderr:
 ```text
 === STDOUT ===
 ==========
-Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '2', '1', '-', '1', '6', '1', '4', '5', '5', '_', 'D', 'S', 'C', '0', '9', '2', '9', '4', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g'] 
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '2', '8', '-', '1', '6', '2', '2', '5', '4', '_', 'D', 'S', 'C', '0', '9', '3', '7', '7', '.', 'j', 'p', 'g'] 
 
 Prompt: Analyze this image for cataloguing metadata.
 
@@ -161,14 +165,15 @@ Rules:
 - Do not copy context hints verbatim.
 
 Context: Existing metadata hints (high confidence; use only if visually consistent):
-- Description hint: , Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK On a late winter afternoon, a heavy mist hangs over the hills surrounding Loch Katrine in Stronachlachar, Scotland. The muted colours of the February landscape are dominated by dark evergreen forests and the bare branches of deciduous trees. Nestled on the shore is a utility building, part of the infrastructure for the Loch Katrine aqueduct scheme. In th...
-- Capture metadata: Taken on 2026-02-21 16:14:55 GMT (at 16:14:55 local time).
+- Description hint: , St Mary's Church, Lenham, England, United Kingdom, UK Here is a caption for the image, written in a neutral but descriptive style suitable for a periodical, blog, or magazine. **Caption:** A late winter afternoon in the historic village of Lenham, Kent, England. This view from the churchyard of St Mary's Church looks out over the village square. In the foreground, ancient, moss-covered headstones dot the landsca...
+- Keyword hints: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue
+- Capture metadata: Taken on 2026-02-28 16:22:54 GMT (at 16:22:54 local time). GPS: 51.237300°N, 0.718917°E.
 
 === STDERR ===
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 11654.08it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 50963.60it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -189,7 +194,7 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 ### To reproduce
 
-- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-14B-8bit`
+- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-14B-8bit`
 
 <details>
 <summary>Detailed trace logs (affected model)</summary>
@@ -233,7 +238,7 @@ Captured stdout/stderr:
 ```text
 === STDOUT ===
 ==========
-Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '2', '1', '-', '1', '6', '1', '4', '5', '5', '_', 'D', 'S', 'C', '0', '9', '2', '9', '4', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g'] 
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '2', '8', '-', '1', '6', '2', '2', '5', '4', '_', 'D', 'S', 'C', '0', '9', '3', '7', '7', '.', 'j', 'p', 'g'] 
 
 Prompt: User: <image>
 Analyze this image for cataloguing metadata.
@@ -253,21 +258,22 @@ Rules:
 - Do not copy context hints verbatim.
 
 Context: Existing metadata hints (high confidence; use only if visually consistent):
-- Description hint: , Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK On a late winter afternoon, a heavy mist hangs over the hills surrounding Loch Katrine in Stronachlachar, Scotland. The muted colours of the February landscape are dominated by dark evergreen forests and the bare branches of deciduous trees. Nestled on the shore is a utility building, part of the infrastructure for the Loch Katrine aqueduct scheme. In th...
-- Capture metadata: Taken on 2026-02-21 16:14:55 GMT (at 16:14:55 local time).
+- Description hint: , St Mary's Church, Lenham, England, United Kingdom, UK Here is a caption for the image, written in a neutral but descriptive style suitable for a periodical, blog, or magazine. **Caption:** A late winter afternoon in the historic village of Lenham, Kent, England. This view from the churchyard of St Mary's Church looks out over the village square. In the foreground, ancient, moss-covered headstones dot the landsca...
+- Keyword hints: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue
+- Capture metadata: Taken on 2026-02-28 16:22:54 GMT (at 16:22:54 local time). GPS: 51.237300°N, 0.718917°E.
 Assistant:
 
 === STDERR ===
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 18 files:   0%|          | 0/18 [00:00<?, ?it/s]
-Fetching 18 files: 100%|##########| 18/18 [00:00<00:00, 14838.34it/s]
+Fetching 18 files: 100%|##########| 18/18 [00:00<00:00, 21927.82it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
 
-Prefill:   0%|          | 0/2065 [00:00<?, ?tok/s]
-Prefill:   0%|          | 0/2065 [00:00<?, ?tok/s]
+Prefill:   0%|          | 0/2156 [00:00<?, ?tok/s]
+Prefill:   0%|          | 0/2156 [00:00<?, ?tok/s]
 ```
 
 </details>
@@ -285,7 +291,7 @@ Prefill:   0%|          | 0/2065 [00:00<?, ?tok/s]
 
 ### To reproduce
 
-- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-8B-bf16`
+- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-8B-bf16`
 
 <details>
 <summary>Detailed trace logs (affected model)</summary>
@@ -329,7 +335,7 @@ Captured stdout/stderr:
 ```text
 === STDOUT ===
 ==========
-Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '2', '1', '-', '1', '6', '1', '4', '5', '5', '_', 'D', 'S', 'C', '0', '9', '2', '9', '4', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g'] 
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '2', '8', '-', '1', '6', '2', '2', '5', '4', '_', 'D', 'S', 'C', '0', '9', '3', '7', '7', '.', 'j', 'p', 'g'] 
 
 Prompt: User: <image>
 Analyze this image for cataloguing metadata.
@@ -349,26 +355,209 @@ Rules:
 - Do not copy context hints verbatim.
 
 Context: Existing metadata hints (high confidence; use only if visually consistent):
-- Description hint: , Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK On a late winter afternoon, a heavy mist hangs over the hills surrounding Loch Katrine in Stronachlachar, Scotland. The muted colours of the February landscape are dominated by dark evergreen forests and the bare branches of deciduous trees. Nestled on the shore is a utility building, part of the infrastructure for the Loch Katrine aqueduct scheme. In th...
-- Capture metadata: Taken on 2026-02-21 16:14:55 GMT (at 16:14:55 local time).
+- Description hint: , St Mary's Church, Lenham, England, United Kingdom, UK Here is a caption for the image, written in a neutral but descriptive style suitable for a periodical, blog, or magazine. **Caption:** A late winter afternoon in the historic village of Lenham, Kent, England. This view from the churchyard of St Mary's Church looks out over the village square. In the foreground, ancient, moss-covered headstones dot the landsca...
+- Keyword hints: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue
+- Capture metadata: Taken on 2026-02-28 16:22:54 GMT (at 16:22:54 local time). GPS: 51.237300°N, 0.718917°E.
 Assistant:
 
 === STDERR ===
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 17 files:   0%|          | 0/17 [00:00<?, ?it/s]
-Fetching 17 files: 100%|##########| 17/17 [00:00<00:00, 23324.56it/s]
+Fetching 17 files: 100%|##########| 17/17 [00:00<00:00, 26311.13it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
 
-Prefill:   0%|          | 0/2065 [00:00<?, ?tok/s]
-Prefill:   0%|          | 0/2065 [00:00<?, ?tok/s]
+Prefill:   0%|          | 0/2156 [00:00<?, ?tok/s]
+Prefill:   0%|          | 0/2156 [00:00<?, ?tok/s]
 ```
 
 </details>
 
 ## 4. Failure affecting 1 model (Priority: Medium)
+
+**Observed behavior:** Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-6bit: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
+**Owner (likely component):** `mlx`
+**Suggested next action:** check tensor/cache behavior and memory pressure handling.
+**Affected model:** `mlx-community/Qwen3.5-35B-A3B-6bit`
+
+| Model | Observed Behavior | First Seen Failing | Recent Repro |
+| ----- | ----------------- | ------------------ | ------------ |
+| `mlx-community/Qwen3.5-35B-A3B-6bit` | Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-6bit: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes. | 2026-03-01 22:26:38 GMT | 1/1 recent runs failed |
+
+### To reproduce
+
+- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/Qwen3.5-35B-A3B-6bit`
+
+<details>
+<summary>Detailed trace logs (affected model)</summary>
+
+#### `mlx-community/Qwen3.5-35B-A3B-6bit`
+
+Traceback:
+
+```text
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 598, in generate
+    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
+                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 488, in stream_generate
+    for n, (token, logprobs) in enumerate(
+                                ~~~~~~~~~^
+        generate_step(input_ids, model, pixel_values, mask, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ):
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 384, in generate_step
+    mx.eval([c.state for c in prompt_cache])
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+ValueError: Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-6bit: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
+```
+
+Captured stdout/stderr:
+
+```text
+=== STDOUT ===
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '2', '8', '-', '1', '6', '2', '2', '5', '4', '_', 'D', 'S', 'C', '0', '9', '3', '7', '7', '.', 'j', 'p', 'g'] 
+
+Prompt: <|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>Analyze this image for cataloguing metadata.
+
+Return exactly these three sections, and nothing else:
+
+Title: 6-12 words, descriptive and concrete.
+
+Description: 1-2 factual sentences covering key subjects, setting, and action.
+
+Keywords: 15-30 unique comma-separated terms, ordered most specific to most general.
+
+Rules:
+- Use only visually supported facts.
+- If hints conflict with the image, trust the image.
+- Do not output reasoning, notes, or extra sections.
+- Do not copy context hints verbatim.
+
+Context: Existing metadata hints (high confidence; use only if visually consistent):
+- Description hint: , St Mary's Church, Lenham, England, United Kingdom, UK Here is a caption for the image, written in a neutral but descriptive style suitable for a periodical, blog, or magazine. **Caption:** A late winter afternoon in the historic village of Lenham, Kent, England. This view from the churchyard of St Mary's Church looks out over the village square. In the foreground, ancient, moss-covered headstones dot the landsca...
+- Keyword hints: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue
+- Capture metadata: Taken on 2026-02-28 16:22:54 GMT (at 16:22:54 local time). GPS: 51.237300°N, 0.718917°E.<|im_end|>
+<|im_start|>assistant
+<think>
+
+=== STDERR ===
+Downloading (incomplete total...): 0.00B [00:00, ?B/s]
+
+Fetching 16 files:   0%|          | 0/16 [00:00<?, ?it/s]
+Fetching 16 files: 100%|##########| 16/16 [00:00<00:00, 22310.13it/s]
+
+Download complete: : 0.00B [00:00, ?B/s]              
+Download complete: : 0.00B [00:00, ?B/s]
+
+Prefill:   0%|          | 0/16604 [00:00<?, ?tok/s]
+Prefill:   0%|          | 0/16604 [00:00<?, ?tok/s]
+```
+
+</details>
+
+## 5. Failure affecting 1 model (Priority: Medium)
+
+**Observed behavior:** Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-bf16: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
+**Owner (likely component):** `mlx`
+**Suggested next action:** check tensor/cache behavior and memory pressure handling.
+**Affected model:** `mlx-community/Qwen3.5-35B-A3B-bf16`
+
+| Model | Observed Behavior | First Seen Failing | Recent Repro |
+| ----- | ----------------- | ------------------ | ------------ |
+| `mlx-community/Qwen3.5-35B-A3B-bf16` | Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-bf16: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes. | 2026-03-01 22:26:38 GMT | 1/1 recent runs failed |
+
+### To reproduce
+
+- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/Qwen3.5-35B-A3B-bf16`
+
+<details>
+<summary>Detailed trace logs (affected model)</summary>
+
+#### `mlx-community/Qwen3.5-35B-A3B-bf16`
+
+Traceback:
+
+```text
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 598, in generate
+    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
+                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 488, in stream_generate
+    for n, (token, logprobs) in enumerate(
+                                ~~~~~~~~~^
+        generate_step(input_ids, model, pixel_values, mask, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ):
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 384, in generate_step
+    mx.eval([c.state for c in prompt_cache])
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+ValueError: Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-bf16: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
+```
+
+Captured stdout/stderr:
+
+```text
+=== STDOUT ===
+==========
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '2', '8', '-', '1', '6', '2', '2', '5', '4', '_', 'D', 'S', 'C', '0', '9', '3', '7', '7', '.', 'j', 'p', 'g'] 
+
+Prompt: <|im_start|>user
+<|vision_start|><|image_pad|><|vision_end|>Analyze this image for cataloguing metadata.
+
+Return exactly these three sections, and nothing else:
+
+Title: 6-12 words, descriptive and concrete.
+
+Description: 1-2 factual sentences covering key subjects, setting, and action.
+
+Keywords: 15-30 unique comma-separated terms, ordered most specific to most general.
+
+Rules:
+- Use only visually supported facts.
+- If hints conflict with the image, trust the image.
+- Do not output reasoning, notes, or extra sections.
+- Do not copy context hints verbatim.
+
+Context: Existing metadata hints (high confidence; use only if visually consistent):
+- Description hint: , St Mary's Church, Lenham, England, United Kingdom, UK Here is a caption for the image, written in a neutral but descriptive style suitable for a periodical, blog, or magazine. **Caption:** A late winter afternoon in the historic village of Lenham, Kent, England. This view from the churchyard of St Mary's Church looks out over the village square. In the foreground, ancient, moss-covered headstones dot the landsca...
+- Keyword hints: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue
+- Capture metadata: Taken on 2026-02-28 16:22:54 GMT (at 16:22:54 local time). GPS: 51.237300°N, 0.718917°E.<|im_end|>
+<|im_start|>assistant
+<think>
+
+=== STDERR ===
+Downloading (incomplete total...): 0.00B [00:00, ?B/s]
+
+Fetching 24 files:   0%|          | 0/24 [00:00<?, ?it/s]
+Fetching 24 files: 100%|##########| 24/24 [00:00<00:00, 14084.69it/s]
+
+Download complete: : 0.00B [00:00, ?B/s]              
+Download complete: : 0.00B [00:00, ?B/s]
+
+Prefill:   0%|          | 0/16604 [00:00<?, ?tok/s]
+Prefill:   0%|          | 0/16604 [00:00<?, ?tok/s]
+```
+
+</details>
+
+## 6. Failure affecting 1 model (Priority: Medium)
 
 **Observed behavior:** Loaded processor has no image_processor; expected multimodal processor.
 **Owner (likely component):** `model configuration/repository`
@@ -381,7 +570,7 @@ Prefill:   0%|          | 0/2065 [00:00<?, ?tok/s]
 
 ### To reproduce
 
-- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit`
+- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit`
 
 <details>
 <summary>Detailed trace logs (affected model)</summary>
@@ -415,7 +604,7 @@ Added chat tokens
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 22531.39it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 17376.02it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -438,47 +627,29 @@ These warnings were detected before inference. They are non-fatal but should be 
 
 ---
 
-## Harness/Integration Issues (11 model(s))
+## Harness/Integration Issues (9 model(s))
 
-11 model(s) show potential harness/integration issues; see per-model breakdown below.
+9 model(s) show potential harness/integration issues; see per-model breakdown below.
 These models completed successfully but show integration problems (for example stop-token leakage, decoding artifacts, or long-context breakdown) that likely point to stack/runtime behavior rather than inherent model quality limits.
-
-### `HuggingFaceTB/SmolVLM-Instruct`
-
-**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
-**Likely component:** `mlx-vlm`
-**Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=1,474, output=12, output/prompt=0.81%
-
-**Why this appears to be an integration/runtime issue:**
-
-- Output is very short relative to prompt size (0.8%), suggesting possible early-stop or prompt-handling issues.
-- Output omitted required Title/Description/Keywords sections.
-
-**Sample output:**
-
-```text
-Loch katrine, scotland, uk.
-```
 
 ### `Qwen/Qwen3-VL-2B-Instruct`
 
 **What looks wrong:** Behavior degrades under long prompt context.
 **Likely component:** `mlx-vlm / mlx`
 **Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,499, output=500, output/prompt=3.03%
+**Token summary:** prompt=16,590, output=500, output/prompt=3.01%
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16499 tokens), output became repetitive.
+- At long prompt length (16590 tokens), output became repetitive.
 - Output became repetitive, indicating possible generation instability.
 
 **Sample output:**
 
 ```text
-Title: Loch Katrine, Stronachlachar, Scotland, UK
+Title: Gravestones in a churchyard in Lenham, Kent, England
 
-Description: A misty, overcast view of Loch Katrine in Stronachlachar, Scotland, featuring a utility building on the shore and power lines in the bac...
+Description: A quiet churchyard in Lenham, Kent, England, featuring moss-covered gravestones and a half-timbered house in the background. T...
 ```
 
 ### `microsoft/Phi-3.5-vision-instruct`
@@ -486,23 +657,22 @@ Description: A misty, overcast view of Loch Katrine in Stronachlachar, Scotland,
 **What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=1,072, output=500, output/prompt=46.64%
+**Token summary:** prompt=1,174, output=500, output/prompt=42.59%
 
 **Why this appears to be an integration/runtime issue:**
 
 - Special control token &lt;|end|&gt; appeared in generated text.
 - Special control token &lt;|endoftext|&gt; appeared in generated text.
 - Generated text appears to continue into new writing prompts mid-output.
+- Output contains corrupted or malformed text segments.
 - Output switched language/script unexpectedly.
 
 **Sample output:**
 
 ```text
-Title: Misty Loch Katrine in Stronachlachar
+Title: Historic Lenham Village Churchyard
 
-Description: A misty, overcast day at Loch Katrine in Stronachlachar, Scotland, with a utility building on the shore and power lines in the background.
-
-Ke...
+Description: A serene churchyard in Lenham, Kent, England, showcases a collection of ancient gravestones and a Tudor-style church. The scene is set against a...
 ```
 
 ### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
@@ -510,72 +680,37 @@ Ke...
 **What looks wrong:** Decoded output contains tokenizer artifacts that should not appear in user-facing text.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=2,359, output=121, output/prompt=5.13%
+**Token summary:** prompt=2,455, output=106, output/prompt=4.32%
 
 **Why this appears to be an integration/runtime issue:**
 
-- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 73 occurrences).
+- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 55 occurrences).
 - Output omitted required Title/Description/Keywords sections.
 
 **Sample output:**
 
 ```text
-Title:ĠMistyĠLochĠKatrineĠwithĠUtilityĠBuildingĊĊDescription:ĠAĠutilityĠbuildingĠstandsĠonĠtheĠshoreĠofĠLochĠKatrine,ĠsurroundedĠbyĠmistyĠhillsĠandĠevergreenĠforests.ĠPowerĠlinesĠstretchĠacrossĠtheĠsc...
+Title:ĠHistoricĠChurchyardĠwithĠTudorĠHousesĊĊDescription:ĠTheĠimageĠshowsĠaĠchurchyardĠwithĠoldĠgravestonesĠandĠaĠbackdropĠofĠtraditionalĠTudor-styleĠhousesĠinĠLenham,ĠEngland.ĊĊKeywords:ĠStĠMary'sĠC...
 ```
 
-### `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`
-
-**What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
-**Likely component:** `mlx-vlm`
-**Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=1,579, output=500, output/prompt=31.67%
-
-**Why this appears to be an integration/runtime issue:**
-
-- Special control token &lt;/think&gt; appeared in generated text.
-
-**Sample output:**
-
-```text
-Alright, here's what I'm thinking. I need to generate metadata for this image, and it's got to be spot-on. First, the title. I've got to be concise, descriptive, and within the word count. "Misty Loch...
-```
-
-### `mlx-community/Qwen2-VL-2B-Instruct-4bit`
+### `mlx-community/Qwen3-VL-2B-Thinking-bf16`
 
 **What looks wrong:** Behavior degrades under long prompt context.
 **Likely component:** `mlx-vlm / mlx`
 **Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,510, output=500, output/prompt=3.03%
+**Token summary:** prompt=16,592, output=500, output/prompt=3.01%
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16510 tokens), output became repetitive.
+- At long prompt length (16592 tokens), output became repetitive.
 - Output became repetitive, indicating possible generation instability.
-- Output appears to copy prompt context verbatim.
-
-**Sample output:**
-
-```text
-Title: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK
-Description: On a late winter afternoon, a heavy mist hangs over the hills surrounding Loch Katrine in Stronachlachar, Scotland. The m...
-```
-
-### `mlx-community/SmolVLM-Instruct-bf16`
-
-**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
-**Likely component:** `mlx-vlm`
-**Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=1,474, output=12, output/prompt=0.81%
-
-**Why this appears to be an integration/runtime issue:**
-
-- Output is very short relative to prompt size (0.8%), suggesting possible early-stop or prompt-handling issues.
+- Output contains corrupted or malformed text segments.
 - Output omitted required Title/Description/Keywords sections.
 
 **Sample output:**
 
 ```text
-Loch katrine, scotland, uk.
+Got it, let's tackle this. First, the Title needs to be 6-12 words, descriptive and concrete. The image is a graveyard with a churchyard, so maybe "Graveyard of St Mary's Church Lenham England" but ne...
 ```
 
 ### `mlx-community/SmolVLM2-2.2B-Instruct-mlx`
@@ -583,36 +718,56 @@ Loch katrine, scotland, uk.
 **What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=1,374, output=8, output/prompt=0.58%
+**Token summary:** prompt=1,470, output=9, output/prompt=0.61%
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output appears truncated to about 8 tokens.
+- Output is very short relative to prompt size (0.6%), suggesting possible early-stop or prompt-handling issues.
 - Model output may not follow prompt or image contents.
 
 **Sample output:**
 
 ```text
-title=loch katrine
+Cemetery, England, United Kingdom, UK
 ```
 
-### `mlx-community/llava-v1.6-mistral-7b-8bit`
+### `mlx-community/X-Reasoner-7B-8bit`
+
+**What looks wrong:** Behavior degrades under long prompt context.
+**Likely component:** `mlx-vlm / mlx`
+**Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
+**Token summary:** prompt=16,601, output=500, output/prompt=3.01%
+
+**Why this appears to be an integration/runtime issue:**
+
+- At long prompt length (16601 tokens), output became repetitive.
+- Output became repetitive, indicating possible generation instability.
+
+**Sample output:**
+
+```text
+**Title:** Ancient Headstones in a Village Churchyard, Lenham, Kent, England
+
+**Description:** A tranquil scene of a historic village churchyard in Lenham, Kent, England, featuring weathered graveston...
+```
+
+### `mlx-community/paligemma2-10b-ft-docci-448-6bit`
 
 **What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=2,465, output=12, output/prompt=0.49%
+**Token summary:** prompt=1,393, output=14, output/prompt=1.01%
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output is very short relative to prompt size (0.5%), suggesting possible early-stop or prompt-handling issues.
+- Output is very short relative to prompt size (1.0%), suggesting possible early-stop or prompt-handling issues.
 - Model output may not follow prompt or image contents.
 - Output omitted required Title/Description/Keywords sections.
 
 **Sample output:**
 
 ```text
-The image is a photograph of a landscape scene.
+- Use only the hints that are visually supported by the image.
 ```
 
 ### `mlx-community/paligemma2-3b-ft-docci-448-bf16`
@@ -620,17 +775,17 @@ The image is a photograph of a landscape scene.
 **What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=1,296, output=9, output/prompt=0.69%
+**Token summary:** prompt=1,393, output=5, output/prompt=0.36%
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output is very short relative to prompt size (0.7%), suggesting possible early-stop or prompt-handling issues.
+- Output appears truncated to about 5 tokens.
 - Model output may not follow prompt or image contents.
 
 **Sample output:**
 
 ```text
-- The image is in low resolution.
+- Daytime.
 ```
 
 ### `prince-canuma/Florence-2-large-ft`
@@ -638,7 +793,7 @@ The image is a photograph of a landscape scene.
 **What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=850, output=500, output/prompt=58.82%
+**Token summary:** prompt=933, output=500, output/prompt=53.59%
 
 **Why this appears to be an integration/runtime issue:**
 
@@ -657,15 +812,16 @@ The image is a photograph of a landscape scene.
 
 ---
 
-### Long-Context Degradation / Potential Stack Issues (2 model(s))
+### Long-Context Degradation / Potential Stack Issues (3 model(s))
 
-2 model(s) show long-context degradation or stack anomalies; see table below.
+3 model(s) show long-context degradation or stack anomalies; see table below.
 These models technically succeeded, but token/output patterns suggest likely integration/runtime issues worth checking upstream.
 
 | Model | Prompt Tok | Output Tok | Output/Prompt | Symptom | Owner |
 | ----- | ---------- | ---------- | ------------- | ------- | -------------- |
-| `Qwen/Qwen3-VL-2B-Instruct` | 16,499 | 500 | 3.03% | Repetition under extreme prompt length | `mlx-vlm / mlx` |
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit` | 16,510 | 500 | 3.03% | Repetition under extreme prompt length | `mlx-vlm / mlx` |
+| `Qwen/Qwen3-VL-2B-Instruct` | 16,590 | 500 | 3.01% | Repetition under extreme prompt length | `mlx-vlm / mlx` |
+| `mlx-community/Qwen3-VL-2B-Thinking-bf16` | 16,592 | 500 | 3.01% | Repetition under extreme prompt length | `mlx-vlm / mlx` |
+| `mlx-community/X-Reasoner-7B-8bit` | 16,601 | 500 | 3.01% | Repetition under extreme prompt length | `mlx-vlm / mlx` |
 
 ---
 
@@ -681,7 +837,54 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 | `microsoft/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
 | `mlx-community/InternVL3-14B-8bit` | still failing | 2026-02-23 12:54:48 GMT | 3/3 recent runs failed |
 | `mlx-community/InternVL3-8B-bf16` | still failing | 2026-02-23 12:54:48 GMT | 3/3 recent runs failed |
+| `mlx-community/Qwen3.5-35B-A3B-6bit` | new model failing | 2026-03-01 22:26:38 GMT | 1/1 recent runs failed |
+| `mlx-community/Qwen3.5-35B-A3B-bf16` | new model failing | 2026-03-01 22:26:38 GMT | 1/1 recent runs failed |
 | `mlx-community/deepseek-vl2-8bit` | still failing | 2026-02-15 03:27:34 GMT | 3/3 recent runs failed |
+
+---
+
+## Models Not Flagged (33 model(s))
+
+These models completed without diagnostics flags (no hard failure, harness warning, or stack-signal anomaly).
+
+### Clean output (5 model(s))
+
+- `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`
+- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`
+- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`
+- `mlx-community/gemma-3-27b-it-qat-4bit`
+- `mlx-community/gemma-3-27b-it-qat-8bit`
+
+### Passed with quality warnings (28 model(s))
+
+- `HuggingFaceTB/SmolVLM-Instruct`
+- `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`
+- `meta-llama/Llama-3.2-11B-Vision-Instruct`
+- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`
+- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`
+- `mlx-community/FastVLM-0.5B-bf16`
+- `mlx-community/GLM-4.6V-Flash-6bit`
+- `mlx-community/GLM-4.6V-Flash-mxfp4`
+- `mlx-community/Idefics3-8B-Llama3-bf16`
+- `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`
+- `mlx-community/Kimi-VL-A3B-Thinking-8bit`
+- `mlx-community/LFM2-VL-1.6B-8bit`
+- `mlx-community/LFM2.5-VL-1.6B-bf16`
+- `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`
+- `mlx-community/Molmo-7B-D-0924-8bit`
+- `mlx-community/Molmo-7B-D-0924-bf16`
+- `mlx-community/Phi-3.5-vision-instruct-bf16`
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`
+- `mlx-community/SmolVLM-Instruct-bf16`
+- `mlx-community/gemma-3n-E2B-4bit`
+- `mlx-community/gemma-3n-E4B-it-bf16`
+- `mlx-community/llava-v1.6-mistral-7b-8bit`
+- `mlx-community/nanoLLaVA-1.5-4bit`
+- `mlx-community/paligemma2-10b-ft-docci-448-bf16`
+- `mlx-community/paligemma2-3b-pt-896-4bit`
+- `mlx-community/pixtral-12b-8bit`
+- `mlx-community/pixtral-12b-bf16`
+- `qnguyen3/nanoLLaVA`
 
 ---
 
@@ -690,7 +893,7 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 | Component | Version |
 | --------- | ------- |
 | mlx-vlm | 0.3.12 |
-| mlx | 0.31.0.dev20260227+365d6f29 |
+| mlx | 0.31.1.dev20260301+6482d13d |
 | mlx-lm | 0.30.8 |
 | transformers | 5.2.0 |
 | tokenizers | 0.22.2 |
@@ -710,7 +913,7 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 pip install -e "src/[dev]"
 
 # Re-run with the same CLI arguments
-python -m check_models --image /Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose
+python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose
 ```
 
 ### Portable triage (no local image required)
@@ -738,10 +941,12 @@ PY
 **Note:** A comprehensive JSON reproduction bundle including system info and the exact prompt trace has been exported to [repro_bundles/](https://github.com/jrp2014/check_models/tree/main/src/output/repro_bundles) for each failing model.
 
 ```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft
-python -m check_models --image /Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-14B-8bit
-python -m check_models --image /Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-8B-bf16
-python -m check_models --image /Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit
+python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft
+python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-14B-8bit
+python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-8B-bf16
+python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/Qwen3.5-35B-A3B-6bit
+python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/Qwen3.5-35B-A3B-bf16
+python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit
 ```
 
 ### Prompt Used
@@ -764,13 +969,14 @@ Rules:
 - Do not copy context hints verbatim.
 
 Context: Existing metadata hints (high confidence; use only if visually consistent):
-- Description hint: , Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK On a late winter afternoon, a heavy mist hangs over the hills surrounding Loch Katrine in Stronachlachar, Scotland. The muted colours of the February landscape are dominated by dark evergreen forests and the bare branches of deciduous trees. Nestled on the shore is a utility building, part of the infrastructure for the Loch Katrine aqueduct scheme. In th...
-- Capture metadata: Taken on 2026-02-21 16:14:55 GMT (at 16:14:55 local time).
+- Description hint: , St Mary's Church, Lenham, England, United Kingdom, UK Here is a caption for the image, written in a neutral but descriptive style suitable for a periodical, blog, or magazine. **Caption:** A late winter afternoon in the historic village of Lenham, Kent, England. This view from the churchyard of St Mary's Church looks out over the village square. In the foreground, ancient, moss-covered headstones dot the landsca...
+- Keyword hints: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue
+- Capture metadata: Taken on 2026-02-28 16:22:54 GMT (at 16:22:54 local time). GPS: 51.237300°N, 0.718917°E.
 ```
 
 ### Run details
 
-- Input image: `/Users/jrp/Pictures/Processed/20260221-161455_DSC09294_DxO.jpg`
+- Input image: `/Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-02-27 22:57:22 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-03-01 22:26:38 GMT by [check_models](https://github.com/jrp2014/check_models)._

@@ -121,6 +121,49 @@ def _make_harness_success(
     )
 
 
+def _make_quality_success(
+    name: str,
+    *,
+    with_quality_issue: bool,
+) -> PerformanceResult:
+    """Create a successful result with explicit quality analysis state."""
+    qa = GenerationQualityAnalysis(
+        is_repetitive=False,
+        repeated_token=None,
+        hallucination_issues=[],
+        is_verbose=False,
+        formatting_issues=["Formatting marker leak"] if with_quality_issue else [],
+        has_excessive_bullets=False,
+        bullet_count=0,
+        is_context_ignored=False,
+        missing_context_terms=[],
+        is_refusal=False,
+        refusal_type=None,
+        is_generic=False,
+        specificity_score=0.0,
+        has_language_mixing=False,
+        language_mixing_issues=[],
+        has_degeneration=False,
+        degeneration_type=None,
+        has_fabrication=False,
+        fabrication_issues=[],
+        has_harness_issue=False,
+        harness_issue_type=None,
+        harness_issue_details=[],
+        word_count=20,
+        unique_ratio=0.9,
+    )
+    return PerformanceResult(
+        model_name=name,
+        success=True,
+        generation=_MockGeneration(text="quality output", prompt_tokens=120, generation_tokens=80),
+        total_time=1.0,
+        generation_time=0.6,
+        model_load_time=0.4,
+        quality_analysis=qa,
+    )
+
+
 def _make_failure(
     name: str = "org/model-fail",
     error_type: str = "ValueError",
@@ -689,6 +732,47 @@ class TestDiagnosticsReport:
         assert "Quick triage list with likely owner and next action" in content
         assert "### Portable triage (no local image required)" in content
         assert "python -m pip show mlx mlx-vlm mlx-lm transformers" in content
+
+    def test_unflagged_models_section_lists_successes(self, tmp_path: Path) -> None:
+        """Diagnostics should include a near-end list of successful, unflagged models."""
+        out = tmp_path / "diag.md"
+        generate_diagnostics_report(
+            results=[
+                _make_failure_with_details("org/fail"),
+                _make_success("org/pass-a"),
+                _make_success("org/pass-b"),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "## Models Not Flagged (2 model(s))" in content
+        assert "### Passed (quality analysis unavailable) (2 model(s))" in content
+        assert "`org/pass-a`" in content
+        assert "`org/pass-b`" in content
+
+    def test_unflagged_models_section_categorizes_by_quality(self, tmp_path: Path) -> None:
+        """Unflagged successful models should be grouped by available quality signals."""
+        out = tmp_path / "diag.md"
+        generate_diagnostics_report(
+            results=[
+                _make_failure_with_details("org/fail"),
+                _make_quality_success("org/clean", with_quality_issue=False),
+                _make_quality_success("org/warn", with_quality_issue=True),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "## Models Not Flagged (2 model(s))" in content
+        assert "### Clean output (1 model(s))" in content
+        assert "### Passed with quality warnings (1 model(s))" in content
+        assert "`org/clean`" in content
+        assert "`org/warn`" in content
 
     def test_report_written_for_stack_signal_without_failures(self, tmp_path: Path) -> None:
         """Suspicious successful runs should still produce diagnostics for stack triage."""

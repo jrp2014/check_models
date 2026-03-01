@@ -1,76 +1,79 @@
 # Model Performance Results
 
-_Generated on 2026-02-27 22:57:22 GMT_
+_Generated on 2026-03-01 22:26:38 GMT_
 
 ## 🎯 Action Snapshot
 
-- **Framework/runtime failures:** 4 (top owners: mlx-vlm=3, model-config=1).
+- **Framework/runtime failures:** 6 (top owners: mlx-vlm=3, mlx=2, model-config=1).
 - **Next action:** review `Failures by Package (Actionable)` and `diagnostics.md`.
-- **Model output watchlist:** 14 model(s) graded D/F.
+- **Model output watchlist:** 18 model(s) graded D/F.
 - **Next action:** prioritize A/B models and de-prioritize D/F outputs.
-- **Vs existing metadata:** better=17, neutral=2, worse=23 (baseline B 66/100).
+- **Vs existing metadata:** better=4, neutral=1, worse=37 (baseline A 82/100).
 
 ## 🏆 Performance Highlights
 
-- **Fastest:** `prince-canuma/Florence-2-large-ft` (330.6 tps)
+- **Fastest:** `prince-canuma/Florence-2-large-ft` (328.5 tps)
 - **💾 Most efficient:** `mlx-community/FastVLM-0.5B-bf16` (2.2 GB)
-- **⚡ Fastest load:** `HuggingFaceTB/SmolVLM-Instruct` (0.97s)
-- **📊 Average TPS:** 86.7 across 42 models
+- **⚡ Fastest load:** `mlx-community/nanoLLaVA-1.5-4bit` (0.95s)
+- **📊 Average TPS:** 87.0 across 42 models
 
 ## 📈 Resource Usage
 
-- **Total peak memory:** 648.8 GB
-- **Average peak memory:** 15.4 GB
-- **Memory efficiency:** 223 tokens/GB
+- **Total peak memory:** 649.2 GB
+- **Average peak memory:** 15.5 GB
+- **Memory efficiency:** 228 tokens/GB
 
 ## 📚 Cataloging Utility Summary
 
-**Grade Distribution:** 🏆 A: 9 | ✅ B: 9 | 🟡 C: 10 | 🟠 D: 3 | ❌ F: 11
+**Grade Distribution:** 🏆 A: 5 | ✅ B: 9 | 🟡 C: 10 | 🟠 D: 5 | ❌ F: 13
 
-**Average Utility Score:** 55/100
+**Average Utility Score:** 49/100
 
-**Existing Metadata Baseline:** ✅ B (66/100)
-**Vs Existing Metadata:** Avg Δ -11 | Better: 17, Neutral: 2, Worse: 23
+**Existing Metadata Baseline:** 🏆 A (82/100)
+**Vs Existing Metadata:** Avg Δ -33 | Better: 4, Neutral: 1, Worse: 37
 
-- **Best for cataloging:** `mlx-community/gemma-3n-E4B-it-bf16` (🏆 A, 96/100)
-- **Worst for cataloging:** `HuggingFaceTB/SmolVLM-Instruct` (❌ F, 0/100)
+- **Best for cataloging:** `mlx-community/gemma-3n-E4B-it-bf16` (🏆 A, 90/100)
+- **Worst for cataloging:** `prince-canuma/Florence-2-large-ft` (❌ F, 0/100)
 
-### ⚠️ 14 Models with Low Utility (D/F)
+### ⚠️ 18 Models with Low Utility (D/F)
 
-- `HuggingFaceTB/SmolVLM-Instruct`: ❌ F (0/100) - Output too short to be useful
+- `HuggingFaceTB/SmolVLM-Instruct`: ❌ F (1/100) - Output lacks detail
 - `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (7/100) - Output too short to be useful
+- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: 🟠 D (41/100) - Lacks visual description of image
+- `mlx-community/FastVLM-0.5B-bf16`: ❌ F (27/100) - Mostly echoes context without adding value
 - `mlx-community/LFM2-VL-1.6B-8bit`: ❌ F (28/100) - Mostly echoes context without adding value
-- `mlx-community/LFM2.5-VL-1.6B-bf16`: 🟠 D (44/100) - Mostly echoes context without adding value
-- `mlx-community/SmolVLM-Instruct-bf16`: ❌ F (0/100) - Output too short to be useful
-- `mlx-community/SmolVLM2-2.2B-Instruct-mlx`: ❌ F (1/100) - Output too short to be useful
-- `mlx-community/gemma-3n-E2B-4bit`: 🟠 D (45/100) - Lacks visual description of image
-- `mlx-community/llava-v1.6-mistral-7b-8bit`: ❌ F (11/100) - Output lacks detail
-- `mlx-community/nanoLLaVA-1.5-4bit`: 🟠 D (49/100) - Mostly echoes context without adding value
-- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: ❌ F (22/100) - Output lacks detail
-- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: ❌ F (22/100) - Output lacks detail
-- `mlx-community/paligemma2-3b-ft-docci-448-bf16`: ❌ F (18/100) - Output lacks detail
-- `mlx-community/pixtral-12b-bf16`: ❌ F (30/100) - Mostly echoes context without adding value
+- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: 🟠 D (48/100) - Mostly echoes context without adding value
+- `mlx-community/Molmo-7B-D-0924-8bit`: ❌ F (17/100) - Output lacks detail
+- `mlx-community/Molmo-7B-D-0924-bf16`: ❌ F (17/100) - Output lacks detail
+- `mlx-community/Phi-3.5-vision-instruct-bf16`: 🟠 D (43/100) - Mostly echoes context without adding value
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (28/100) - Mostly echoes context without adding value
+- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: 🟠 D (50/100) - Lacks visual description of image
+- `mlx-community/SmolVLM-Instruct-bf16`: ❌ F (1/100) - Output lacks detail
+- `mlx-community/SmolVLM2-2.2B-Instruct-mlx`: ❌ F (4/100) - Output lacks detail
+- `mlx-community/gemma-3-27b-it-qat-8bit`: 🟠 D (45/100) - Mostly echoes context without adding value
+- `mlx-community/gemma-3n-E2B-4bit`: ❌ F (25/100) - Lacks visual description of image
+- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: ❌ F (10/100) - Output lacks detail
+- `mlx-community/paligemma2-3b-ft-docci-448-bf16`: ❌ F (7/100) - Output too short to be useful
 - `prince-canuma/Florence-2-large-ft`: ❌ F (0/100) - Output too short to be useful
 
 ## ⚠️ Quality Issues
 
-- **❌ Failed Models (4):**
+- **❌ Failed Models (6):**
   - `microsoft/Florence-2-large-ft` (`Model Error`)
   - `mlx-community/InternVL3-14B-8bit` (`API Mismatch`)
   - `mlx-community/InternVL3-8B-bf16` (`API Mismatch`)
+  - `mlx-community/Qwen3.5-35B-A3B-6bit` (`OOM`)
+  - `mlx-community/Qwen3.5-35B-A3B-bf16` (`OOM`)
   - `mlx-community/deepseek-vl2-8bit` (`Processor Error`)
-- **🔄 Repetitive Output (7):**
-  - `Qwen/Qwen3-VL-2B-Instruct` (token: `phrase: "electricity, transmission, pow..."`)
-  - `meta-llama/Llama-3.2-11B-Vision-Instruct` (token: `phrase: "landscape, scenery, wilderness..."`)
-  - `mlx-community/LFM2.5-VL-1.6B-bf16` (token: `phrase: "infrastructure, misty, loch, s..."`)
-  - `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit` (token: `phrase: "nature, scenery, outdoor, envi..."`)
-  - `mlx-community/Qwen2-VL-2B-Instruct-4bit` (token: `phrase: "heavy mist, dark evergreen..."`)
-  - `mlx-community/gemma-3n-E2B-4bit` (token: `phrase: "16:14:56: 16:14:56: 16:14:56: ..."`)
-  - `mlx-community/paligemma2-3b-pt-896-4bit` (token: `phrase: "- do not output..."`)
-- **👻 Hallucinations (3):**
-  - `microsoft/Phi-3.5-vision-instruct`
-  - `mlx-community/Molmo-7B-D-0924-8bit`
-  - `mlx-community/Molmo-7B-D-0924-bf16`
+- **🔄 Repetitive Output (8):**
+  - `Qwen/Qwen3-VL-2B-Instruct` (token: `phrase: "tudor, tudor, tudor, tudor,..."`)
+  - `meta-llama/Llama-3.2-11B-Vision-Instruct` (token: `phrase: "tradition, culture, community,..."`)
+  - `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16` (token: `phrase: ""springtime greenery," "spring..."`)
+  - `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit` (token: `phrase: "cemetery, graveyard, old, trad..."`)
+  - `mlx-community/Qwen3-VL-2B-Thinking-bf16` (token: `phrase: "mary's churchyard lenham engla..."`)
+  - `mlx-community/X-Reasoner-7B-8bit` (token: `phrase: "ancient, ancient gravestones, ..."`)
+  - `mlx-community/gemma-3n-E2B-4bit` (token: `16:23:54:`)
+  - `mlx-community/paligemma2-3b-pt-896-4bit` (token: `phrase: "15-30 unique comma-separated t..."`)
 - **📝 Formatting Issues (4):**
   - `mlx-community/GLM-4.6V-Flash-6bit`
   - `mlx-community/GLM-4.6V-Flash-mxfp4`
@@ -79,11 +82,11 @@ _Generated on 2026-02-27 22:57:22 GMT_
 
 ## 📊 Aggregate Statistics (Successful Runs)
 
-- **Generation Tps**: Avg: 86.7 | Min: 3.63 | Max: 331
+- **Generation Tps**: Avg: 87.0 | Min: 3.67 | Max: 329
 - **Peak Memory**: Avg: 15 | Min: 2.2 | Max: 60
-- **Total Time**: Avg: 23.95s | Min: 2.48s | Max: 146.05s
-- **Generation Time**: Avg: 20.96s | Min: 1.15s | Max: 141.49s
-- **Model Load Time**: Avg: 2.99s | Min: 0.97s | Max: 9.52s
+- **Total Time**: Avg: 22.85s | Min: 2.12s | Max: 144.39s
+- **Generation Time**: Avg: 19.92s | Min: 1.14s | Max: 139.87s
+- **Model Load Time**: Avg: 2.93s | Min: 0.95s | Max: 9.32s
 
 ## 🚨 Failures by Package (Actionable)
 
@@ -92,6 +95,7 @@ _Generated on 2026-02-27 22:57:22 GMT_
 | Package | Failures | Error Types | Affected Models |
 |---------|----------|-------------|-----------------|
 | `mlx-vlm` | 3 | API Mismatch, Model Error | `microsoft/Florence-2-large-ft`, `mlx-community/InternVL3-14B-8bit`, `mlx-community/InternVL3-8B-bf16` |
+| `mlx` | 2 | OOM | `mlx-community/Qwen3.5-35B-A3B-6bit`, `mlx-community/Qwen3.5-35B-A3B-bf16` |
 | `model-config` | 1 | Processor Error | `mlx-community/deepseek-vl2-8bit` |
 
 <!-- markdownlint-enable MD060 -->
@@ -108,6 +112,15 @@ _Generated on 2026-02-27 22:57:22 GMT_
   - Type: `ValueError`
 - **mlx-community/InternVL3-8B-bf16** (API Mismatch)
   - Error: `Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageModel.\_\_call\_\_() got an unexpected...`
+  - Type: `ValueError`
+
+#### mlx
+
+- **mlx-community/Qwen3.5-35B-A3B-6bit** (OOM)
+  - Error: `Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-6bit: [metal::malloc] Attempting to allocate ...`
+  - Type: `ValueError`
+- **mlx-community/Qwen3.5-35B-A3B-bf16** (OOM)
+  - Error: `Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-bf16: [metal::malloc] Attempting to allocate ...`
   - Type: `ValueError`
 
 #### model-config
@@ -137,13 +150,14 @@ _Generated on 2026-02-27 22:57:22 GMT_
 > - Do not copy context hints verbatim.
 >
 > Context: Existing metadata hints (high confidence; use only if visually consistent):
-> - Description hint: , Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK On a late winter afternoon, a heavy mist hangs over the hills surrounding Loch Katrine in Stronachlachar, Scotland. The muted colours of the February landscape are dominated by dark evergreen forests and the bare branches of deciduous trees. Nestled on the shore is a utility building, part of the infrastructure for the Loch Katrine aqueduct scheme. In th...
-> - Capture metadata: Taken on 2026-02-21 16:14:55 GMT (at 16:14:55 local time).
+> - Description hint: , St Mary's Church, Lenham, England, United Kingdom, UK Here is a caption for the image, written in a neutral but descriptive style suitable for a periodical, blog, or magazine. **Caption:** A late winter afternoon in the historic village of Lenham, Kent, England. This view from the churchyard of St Mary's Church looks out over the village square. In the foreground, ancient, moss-covered headstones dot the landsca...
+> - Keyword hints: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue
+> - Capture metadata: Taken on 2026-02-28 16:22:54 GMT (at 16:22:54 local time). GPS: 51.237300°N, 0.718917°E.
 > ```
 
 **Note:** Results sorted: errors first, then by generation time (fastest to slowest).
 
-**Overall runtime:** 1025.94s
+**Overall runtime:** 1002.18s
 
 <!-- markdownlint-disable MD013 MD033 MD034 MD037 MD049 -->
 
@@ -152,49 +166,51 @@ _Generated on 2026-02-27 22:57:22 GMT_
 | `microsoft/Florence-2-large-ft`                         |         |                   |                       |                |              |           |             |                  |            |             |                                    |         mlx-vlm |
 | `mlx-community/InternVL3-14B-8bit`                      |         |                   |                       |                |              |           |             |                  |            |             |                                    |         mlx-vlm |
 | `mlx-community/InternVL3-8B-bf16`                       |         |                   |                       |                |              |           |             |                  |            |             |                                    |         mlx-vlm |
+| `mlx-community/Qwen3.5-35B-A3B-6bit`                    |         |                   |                       |                |              |           |             |                  |            |             |                                    |             mlx |
+| `mlx-community/Qwen3.5-35B-A3B-bf16`                    |         |                   |                       |                |              |           |             |                  |            |             |                                    |             mlx |
 | `mlx-community/deepseek-vl2-8bit`                       |         |                   |                       |                |              |           |             |                  |            |             |                                    |    model-config |
-| `mlx-community/LFM2-VL-1.6B-8bit`                       |       7 |               537 |                   102 |            639 |        2,410 |       303 |         2.8 |            1.15s |      1.33s |       2.48s | title-length(5), ...               |                 |
-| `qnguyen3/nanoLLaVA`                                    | 151,645 |               282 |                    79 |            361 |        1,405 |       100 |         4.5 |            1.56s |      1.18s |       2.74s | missing-sections(keywords), ...    |                 |
-| `mlx-community/nanoLLaVA-1.5-4bit`                      | 151,645 |               282 |                   282 |            564 |        1,483 |       328 |         2.3 |            1.60s |      1.10s |       2.70s | reasoning-leak, ...                |                 |
-| `mlx-community/FastVLM-0.5B-bf16`                       | 151,645 |               286 |                   168 |            454 |        2,142 |       311 |         2.2 |            1.61s |      1.26s |       2.87s | missing-sections(description+k...  |                 |
-| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |  49,279 |             1,374 |                     8 |          1,382 |        1,179 |       124 |         5.5 |            1.74s |      1.35s |       3.09s | ⚠️harness(prompt_template), ...    |                 |
-| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         |       1 |             1,296 |                     9 |          1,305 |        1,489 |      19.4 |          11 |            1.80s |      2.99s |       4.79s | ⚠️harness(prompt_template), ...    |                 |
-| `HuggingFaceTB/SmolVLM-Instruct`                        |  49,154 |             1,474 |                    12 |          1,486 |        1,224 |       119 |         5.5 |            1.83s |      0.97s |       2.80s | ⚠️harness(prompt_template), ...    |                 |
-| `mlx-community/SmolVLM-Instruct-bf16`                   |  49,154 |             1,474 |                    12 |          1,486 |        1,142 |       119 |         5.5 |            1.90s |      1.44s |       3.34s | ⚠️harness(prompt_template), ...    |                 |
-| `prince-canuma/Florence-2-large-ft`                     |     0.0 |               850 |                   500 |          1,350 |        3,677 |       331 |         5.1 |            2.21s |      1.44s |       3.64s | ⚠️harness(stop_token), ...         |                 |
-| `mlx-community/Phi-3.5-vision-instruct-bf16`            |  32,007 |             1,072 |                   104 |          1,176 |        1,247 |      54.1 |         9.5 |            3.27s |      1.96s |       5.23s | title-length(5), ...               |                 |
-| `mlx-community/LFM2.5-VL-1.6B-bf16`                     |     521 |               537 |                   500 |          1,037 |        2,341 |       181 |         4.0 |            3.52s |      1.22s |       4.74s | repetitive(phrase: "infrastruc...  |                 |
-| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |             1,296 |                    25 |          1,321 |          498 |      29.5 |          12 |            3.93s |      3.32s |       7.25s | fabrication, ...                   |                 |
-| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |             2,872 |                   132 |          3,004 |          910 |       162 |         7.8 |            4.42s |      1.79s |       6.21s |                                    |                 |
-| `mlx-community/gemma-3n-E2B-4bit`                       | 236,810 |               533 |                   500 |          1,033 |        1,173 |       109 |         6.0 |            5.50s |      3.40s |       8.90s | repetitive(phrase: "16:14:56:...   |                 |
-| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 |      11 |             1,283 |                   500 |          1,783 |          797 |       113 |          18 |            6.80s |      1.98s |       8.78s | missing-sections(title), ...       |                 |
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit`               |   5,434 |             1,283 |                   500 |          1,783 |          853 |      95.2 |          22 |            7.45s |      4.13s |      11.59s | missing-sections(title), ...       |                 |
-| `mlx-community/Idefics3-8B-Llama3-bf16`                 | 128,001 |             2,574 |                   114 |          2,688 |          735 |      29.5 |          18 |            7.86s |      3.77s |      11.64s | formatting                         |                 |
-| `mlx-community/gemma-3-27b-it-qat-4bit`                 |     106 |               542 |                   129 |            671 |          180 |      28.3 |          19 |            8.04s |      5.04s |      13.09s |                                    |                 |
-| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |             1,296 |                    25 |          1,321 |          469 |      5.02 |          26 |            8.21s |      4.93s |      13.14s | fabrication, ...                   |                 |
-| `mlx-community/pixtral-12b-8bit`                        |       2 |             3,063 |                   108 |          3,171 |          529 |      35.0 |          16 |            9.33s |      3.32s |      12.65s | title-length(4)                    |                 |
-| `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`     |       2 |             2,873 |                   124 |          2,997 |          381 |      57.0 |          13 |           10.20s |      2.64s |      12.84s |                                    |                 |
-| `mlx-community/gemma-3n-E4B-it-bf16`                    |     106 |               541 |                   382 |            923 |          748 |      41.9 |          17 |           10.32s |      5.63s |      15.95s | missing-sections(title+descrip...  |                 |
-| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          |   8,425 |             1,283 |                   500 |          1,783 |          651 |      66.2 |          37 |           10.34s |      6.10s |      16.43s | missing-sections(title+descrip...  |                 |
-| `microsoft/Phi-3.5-vision-instruct`                     |   2,812 |             1,072 |                   500 |          1,572 |        1,235 |      52.7 |         9.5 |           10.85s |      1.87s |      12.72s | ⚠️harness(stop_token), ...         |                 |
-| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`     |       2 |             2,873 |                   135 |          3,008 |          363 |      53.9 |          13 |           10.88s |      2.70s |      13.58s |                                    |                 |
-| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |             2,465 |                    12 |          2,477 |          240 |      45.3 |          11 |           11.02s |      2.04s |      13.06s | ⚠️harness(prompt_template), ...    |                 |
-| `mlx-community/pixtral-12b-bf16`                        |       2 |             3,063 |                   106 |          3,169 |          574 |      18.6 |          28 |           11.47s |      4.91s |      16.38s | title-length(4)                    |                 |
-| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               542 |                   133 |            675 |          171 |      14.2 |          34 |           13.05s |      7.16s |      20.21s |                                    |                 |
-| `mlx-community/paligemma2-3b-pt-896-4bit`               | 235,290 |             4,368 |                   500 |          4,868 |        1,677 |      46.0 |         4.3 |           14.07s |      2.38s |      16.45s | repetitive(phrase: "- do not o...  |                 |
-| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      |       4 |             1,579 |                   500 |          2,079 |          486 |      49.4 |          60 |           14.19s |      9.52s |      23.71s | ⚠️harness(stop_token)              |                 |
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |             2,359 |                   121 |          2,480 |          208 |      23.3 |          22 |           16.97s |      3.97s |      20.95s | ⚠️harness(encoding), ...           |                 |
-| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         |   1,584 |             3,154 |                   500 |          3,654 |          374 |      30.4 |          15 |           25.29s |      3.30s |      28.60s | missing-sections(title+descrip...  |                 |
-| `mlx-community/GLM-4.6V-Flash-mxfp4`                    |  19,050 |             6,340 |                   500 |          6,840 |          289 |      61.2 |         8.4 |           30.62s |      2.45s |      33.08s | missing-sections(title+descrip...  |                 |
-| `mlx-community/GLM-4.6V-Flash-6bit`                     |      12 |             6,340 |                   500 |          6,840 |          291 |      44.8 |          11 |           33.46s |      2.72s |      36.18s | missing-sections(title+descrip...  |                 |
-| `mlx-community/Molmo-7B-D-0924-8bit`                    |  31,928 |             1,461 |                   500 |          1,961 |         42.6 |      42.6 |          41 |           46.91s |      2.28s |      49.19s | hallucination, ...                 |                 |
-| `mlx-community/X-Reasoner-7B-8bit`                      | 151,645 |            16,510 |                   115 |         16,625 |          349 |      47.5 |          13 |           50.27s |      2.54s |      52.81s |                                    |                 |
-| `Qwen/Qwen3-VL-2B-Instruct`                             |      11 |            16,499 |                   500 |         16,999 |          367 |      73.9 |         8.3 |           52.27s |      1.24s |      53.51s | ⚠️harness(long_context), ...       |                 |
-| `mlx-community/Molmo-7B-D-0924-bf16`                    |   3,309 |             1,461 |                   500 |          1,961 |         41.8 |      27.9 |          48 |           53.77s |      3.34s |      57.11s | hallucination, ...                 |                 |
-| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |  82,703 |            16,501 |                   500 |         17,001 |          296 |      68.3 |         8.3 |           63.65s |      1.92s |      65.57s | missing-sections(title), ...       |                 |
-| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      |  12,690 |               263 |                   500 |            763 |         83.8 |      6.76 |          15 |           77.60s |      2.98s |      80.58s | repetitive(phrase: "nature, ...    |                 |
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               |      11 |            16,510 |                   500 |         17,010 |          195 |       173 |         5.1 |           88.07s |      1.39s |      89.45s | ⚠️harness(long_context), ...       |                 |
-| `meta-llama/Llama-3.2-11B-Vision-Instruct`              |      11 |               264 |                   500 |            764 |         78.6 |      3.63 |          25 |          141.49s |      4.56s |     146.05s | repetitive(phrase: "landscape, ... |                 |
+| `mlx-community/LFM2-VL-1.6B-8bit`                       |       7 |               623 |                   130 |            753 |        2,604 |       305 |         2.8 |            1.14s |      0.98s |       2.12s | description-sentences(3), ...      |                 |
+| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         |       1 |             1,393 |                     5 |          1,398 |        1,543 |      21.6 |          11 |            1.49s |      2.95s |       4.44s | ⚠️harness(prompt_template), ...    |                 |
+| `mlx-community/LFM2.5-VL-1.6B-bf16`                     |       7 |               623 |                   155 |            778 |        2,577 |       183 |         4.0 |            1.50s |      1.11s |       2.61s | description-sentences(3), ...      |                 |
+| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |  49,279 |             1,470 |                     9 |          1,479 |        1,253 |       123 |         5.5 |            1.64s |      1.24s |       2.88s | ⚠️harness(prompt_template), ...    |                 |
+| `mlx-community/FastVLM-0.5B-bf16`                       | 151,645 |               377 |                   190 |            567 |        2,635 |       305 |         2.2 |            1.65s |      1.10s |       2.75s | fabrication, title-length(4), ...  |                 |
+| `mlx-community/SmolVLM-Instruct-bf16`                   |  49,154 |             1,570 |                    19 |          1,589 |        1,302 |       117 |         5.5 |            1.76s |      1.28s |       3.04s | missing-sections(title+descrip...  |                 |
+| `qnguyen3/nanoLLaVA`                                    | 151,645 |               373 |                   110 |            483 |        1,745 |       101 |         4.6 |            1.77s |      1.07s |       2.84s | missing-sections(keywords), ...    |                 |
+| `HuggingFaceTB/SmolVLM-Instruct`                        |  49,154 |             1,570 |                    19 |          1,589 |        1,289 |       116 |         5.5 |            1.80s |      1.38s |       3.18s | missing-sections(title+descrip...  |                 |
+| `prince-canuma/Florence-2-large-ft`                     |     0.0 |               933 |                   500 |          1,433 |        3,956 |       329 |         5.1 |            2.12s |      1.31s |       3.43s | ⚠️harness(stop_token), ...         |                 |
+| `mlx-community/nanoLLaVA-1.5-4bit`                      |  11,297 |               373 |                   500 |            873 |        1,934 |       328 |         2.5 |            2.18s |      0.95s |       3.12s | keyword-count(126), ...            |                 |
+| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |             1,393 |                    14 |          1,407 |          455 |      28.8 |          12 |            3.90s |      3.23s |       7.13s | ⚠️harness(prompt_template), ...    |                 |
+| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |             2,964 |                   176 |          3,140 |          986 |       162 |         7.8 |            4.45s |      1.69s |       6.14s |                                    |                 |
+| `mlx-community/Phi-3.5-vision-instruct-bf16`            |  32,007 |             1,174 |                   176 |          1,350 |        1,220 |      53.2 |         9.4 |            4.68s |      1.87s |       6.55s | fabrication, title-length(4)       |                 |
+| `mlx-community/gemma-3n-E2B-4bit`                       | 236,787 |               629 |                   500 |          1,129 |        1,250 |       112 |         6.0 |            5.33s |      3.24s |       8.57s | repetitive(16:23:54:), ...         |                 |
+| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 | 159,131 |             1,360 |                   500 |          1,860 |          797 |       110 |          18 |            6.83s |      3.66s |      10.49s | missing-sections(title+descrip...  |                 |
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit`               |     276 |             1,360 |                   500 |          1,860 |          894 |       103 |          22 |            6.97s |      3.83s |      10.80s | title-length(70), ...              |                 |
+| `mlx-community/gemma-3n-E4B-it-bf16`                    |     106 |               637 |                   273 |            910 |          845 |      41.7 |          17 |            7.66s |      4.85s |      12.51s | missing-sections(title+descrip...  |                 |
+| `mlx-community/gemma-3-27b-it-qat-4bit`                 |     106 |               638 |                   139 |            777 |          178 |      28.0 |          19 |            8.93s |      5.03s |      13.97s |                                    |                 |
+| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          |      11 |             1,360 |                   500 |          1,860 |          738 |      68.8 |          37 |            9.82s |      5.99s |      15.82s | missing-sections(title+descrip...  |                 |
+| `mlx-community/pixtral-12b-8bit`                        |       2 |             3,155 |                   130 |          3,285 |          512 |      35.2 |          16 |           10.20s |      3.17s |      13.37s | title-length(5), ...               |                 |
+| `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`     |       2 |             2,965 |                   162 |          3,127 |          405 |      57.5 |          13 |           10.49s |      2.51s |      13.00s |                                    |                 |
+| `microsoft/Phi-3.5-vision-instruct`                     |     373 |             1,174 |                   500 |          1,674 |        1,229 |      51.6 |         9.4 |           11.05s |      1.81s |      12.86s | ⚠️harness(stop_token), ...         |                 |
+| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`     |       2 |             2,965 |                   187 |          3,152 |          389 |      54.6 |          13 |           11.40s |      2.57s |      13.97s |                                    |                 |
+| `mlx-community/Idefics3-8B-Llama3-bf16`                 | 128,001 |             2,654 |                   228 |          2,882 |          747 |      30.1 |          18 |           11.53s |      3.61s |      15.14s | description-sentences(6), ...      |                 |
+| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |             2,566 |                    99 |          2,665 |          265 |      43.8 |          11 |           12.34s |      1.81s |      14.15s | missing-sections(title+descrip...  |                 |
+| `mlx-community/pixtral-12b-bf16`                        |       2 |             3,155 |                   130 |          3,285 |          575 |      19.8 |          28 |           12.41s |      4.81s |      17.23s | title-length(5), ...               |                 |
+| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               638 |                   132 |            770 |          169 |      15.4 |          34 |           12.72s |      7.09s |      19.81s |                                    |                 |
+| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |             1,393 |                    49 |          1,442 |          442 |      4.86 |          26 |           13.61s |      4.88s |      18.48s | missing-sections(title+descrip...  |                 |
+| `mlx-community/paligemma2-3b-pt-896-4bit`               |     108 |             4,465 |                   500 |          4,965 |        1,645 |      45.6 |         4.3 |           14.19s |      2.29s |      16.48s | repetitive(phrase: "15-30 uniq...  |                 |
+| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      |     376 |             1,676 |                   500 |          2,176 |          488 |      45.3 |          60 |           15.27s |      9.32s |      24.58s | repetitive(phrase: ""springtim...  |                 |
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |             2,455 |                   106 |          2,561 |          218 |      24.9 |          22 |           15.89s |      4.12s |      20.01s | ⚠️harness(encoding), ...           |                 |
+| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         |   1,058 |             3,246 |                   500 |          3,746 |          407 |      32.5 |          15 |           23.74s |      3.28s |      27.02s | missing-sections(title+descrip...  |                 |
+| `mlx-community/GLM-4.6V-Flash-mxfp4`                    |     198 |             6,489 |                   500 |          6,989 |          284 |      61.0 |         8.4 |           31.42s |      2.39s |      33.81s | missing-sections(title+descrip...  |                 |
+| `mlx-community/GLM-4.6V-Flash-6bit`                     |   9,254 |             6,489 |                   500 |          6,989 |          272 |      43.7 |          11 |           35.65s |      2.75s |      38.41s | missing-sections(title+descrip...  |                 |
+| `mlx-community/Molmo-7B-D-0924-bf16`                    | 151,643 |             1,552 |                    28 |          1,580 |         45.5 |      26.7 |          48 |           35.95s |      3.21s |      39.17s | missing-sections(title+descrip...  |                 |
+| `mlx-community/Molmo-7B-D-0924-8bit`                    | 151,643 |             1,552 |                    36 |          1,588 |         44.3 |      41.6 |          41 |           36.68s |      2.16s |      38.84s | missing-sections(title+descrip...  |                 |
+| `mlx-community/X-Reasoner-7B-8bit`                      |  27,959 |            16,601 |                   500 |         17,101 |          418 |      46.5 |          13 |           50.94s |      2.45s |      53.39s | ⚠️harness(long_context), ...       |                 |
+| `Qwen/Qwen3-VL-2B-Instruct`                             |  90,151 |            16,590 |                   500 |         17,090 |          371 |      73.7 |         8.3 |           51.96s |      1.65s |      53.61s | ⚠️harness(long_context), ...       |                 |
+| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |     594 |            16,592 |                   500 |         17,092 |          364 |      75.1 |         8.3 |           52.71s |      1.80s |      54.51s | ⚠️harness(long_context), ...       |                 |
+| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      |      11 |               343 |                   500 |            843 |          115 |      7.84 |          15 |           67.12s |      2.84s |      69.96s | repetitive(phrase: "cemetery, ...  |                 |
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               | 151,645 |            16,601 |                   126 |         16,727 |          201 |       179 |         5.1 |           83.71s |      1.28s |      84.99s | description-sentences(3), ...      |                 |
+| `meta-llama/Llama-3.2-11B-Vision-Instruct`              |  34,243 |               344 |                   500 |            844 |          103 |      3.67 |          25 |          139.87s |      4.52s |     144.39s | repetitive(phrase: "tradition, ... |                 |
 
 <!-- markdownlint-enable MD013 MD033 MD034 MD037 MD049 -->
 
@@ -273,7 +289,7 @@ TypeError: can only concatenate str (not "NoneType") to str
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10073, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10201, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -307,7 +323,7 @@ ValueError: Failed to process inputs with error: can only concatenate str (not "
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10203, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10331, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -316,7 +332,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10098, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10226, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
 ```
@@ -342,7 +358,7 @@ ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10073, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10201, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -377,7 +393,7 @@ TypeError: LanguageModel.__call__() got an unexpected keyword argument 'n_to_pro
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10203, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10331, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -386,7 +402,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10103, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10231, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
 ValueError: Model runtime error during generation for mlx-community/InternVL3-14B-8bit: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
 ```
@@ -412,7 +428,7 @@ ValueError: Model runtime error during generation for mlx-community/InternVL3-14
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10073, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10201, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -447,7 +463,7 @@ TypeError: LanguageModel.__call__() got an unexpected keyword argument 'n_to_pro
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10203, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10331, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -456,9 +472,139 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10103, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10231, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
 ValueError: Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
+```
+
+</details>
+
+---
+
+### ❌ mlx-community/Qwen3.5-35B-A3B-6bit
+
+**Status:** Failed (OOM)
+**Error:**
+
+> Model runtime error during generation for
+> mlx-community/Qwen3.5-35B-A3B-6bit: [metal::malloc] Attempting to allocate
+> 134767706112 bytes which is greater than the maximum allowed buffer size of
+> 86586540032 bytes.
+**Type:** `ValueError`
+**Phase:** `decode`
+**Code:** `MLX_DECODE_OOM`
+**Package:** `mlx`
+
+<details>
+<summary>Full Traceback (click to expand)</summary>
+
+```python
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10201, in _run_model_generation
+    output: GenerationResult | SupportsGenerationResult = generate(
+                                                          ~~~~~~~~^
+        model=model,
+        ^^^^^^^^^^^^
+    ...<13 lines>...
+        **extra_kwargs,
+        ^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 598, in generate
+    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
+                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 488, in stream_generate
+    for n, (token, logprobs) in enumerate(
+                                ~~~~~~~~~^
+        generate_step(input_ids, model, pixel_values, mask, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ):
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 384, in generate_step
+    mx.eval([c.state for c in prompt_cache])
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10331, in process_image_with_model
+    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
+                                                          ~~~~~~~~~~~~~~~~~~~~~^
+        params=params,
+        ^^^^^^^^^^^^^^
+        phase_callback=_update_phase,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10231, in _run_model_generation
+    raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
+ValueError: Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-6bit: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
+```
+
+</details>
+
+---
+
+### ❌ mlx-community/Qwen3.5-35B-A3B-bf16
+
+**Status:** Failed (OOM)
+**Error:**
+
+> Model runtime error during generation for
+> mlx-community/Qwen3.5-35B-A3B-bf16: [metal::malloc] Attempting to allocate
+> 134767706112 bytes which is greater than the maximum allowed buffer size of
+> 86586540032 bytes.
+**Type:** `ValueError`
+**Phase:** `decode`
+**Code:** `MLX_DECODE_OOM`
+**Package:** `mlx`
+
+<details>
+<summary>Full Traceback (click to expand)</summary>
+
+```python
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10201, in _run_model_generation
+    output: GenerationResult | SupportsGenerationResult = generate(
+                                                          ~~~~~~~~^
+        model=model,
+        ^^^^^^^^^^^^
+    ...<13 lines>...
+        **extra_kwargs,
+        ^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 598, in generate
+    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
+                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 488, in stream_generate
+    for n, (token, logprobs) in enumerate(
+                                ~~~~~~~~~^
+        generate_step(input_ids, model, pixel_values, mask, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ):
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 384, in generate_step
+    mx.eval([c.state for c in prompt_cache])
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10331, in process_image_with_model
+    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
+                                                          ~~~~~~~~~~~~~~~~~~~~~^
+        params=params,
+        ^^^^^^^^^^^^^^
+        phase_callback=_update_phase,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10231, in _run_model_generation
+    raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
+ValueError: Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-bf16: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
 ```
 
 </details>
@@ -482,7 +628,7 @@ ValueError: Model runtime error during generation for mlx-community/InternVL3-8B
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10024, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10152, in _run_model_generation
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -492,7 +638,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9949, in _run_model_preflight_validators
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10077, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -501,14 +647,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9863, in _raise_preflight_error
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 9991, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10203, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10331, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -517,7 +663,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10036, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10164, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -528,32 +674,108 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ### ✅ mlx-community/LFM2-VL-1.6B-8bit
 
-**Metrics:** 303 TPS | 102 tokens
+**Metrics:** 305 TPS | 130 tokens
 
 ```text
-Title: Loch Katrine, Scotland, winter landscape
+Title: 6-12 words, descriptive and concrete.
 
-Description: A heavy mist hangs over the hills surrounding Loch Katrine in Stronachlachar, Scotland. The muted colours of the February landscape are dominated by dark evergreen forests and the bare branches of deciduous trees.
+Description: A late winter afternoon in the historic village of Lenham, Kent, England. This view from the churchyard of St Mary's Church looks out over the village square. In the foreground, ancient, moss-covered headstones dot the landsca...
+Keywords: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue
+```
 
-Keywords: Loch Katrine, Scotland, winter, mist, evergreen, deciduous trees, Stronachlachar, UK, UK, February, landscape, infrastructure, Loch Katrine aqueduct scheme
+---
+
+### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
+
+**Metrics:** 21.6 TPS | 5 tokens
+
+```text
+- Daytime.
+```
+
+---
+
+### ✅ mlx-community/LFM2.5-VL-1.6B-bf16
+
+**Metrics:** 183 TPS | 155 tokens
+
+```text
+Title: St Mary's Church, Lenham, England, United Kingdom, UK
+
+Description: The image depicts the historic churchyard of St Mary's Church in Lenham, Kent, England. The foreground is filled with ancient, moss-covered headstones, while the background features Tudor-style half-timbered houses and a cypress tree. The scene is set on a late winter afternoon, with a clear blue sky and scattered clouds.
+
+Keywords: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue
+```
+
+---
+
+### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
+
+**Metrics:** 123 TPS | 9 tokens
+
+```text
+ Cemetery, England, United Kingdom, UK
+```
+
+---
+
+### ✅ mlx-community/FastVLM-0.5B-bf16
+
+**Metrics:** 305 TPS | 190 tokens
+
+```text
+Title: Medieval Village in England
+Description: A late winter afternoon in the historic village of Lenham, Kent, England. This view from the churchyard of St Mary's Church looks out over the village square. In the foreground, ancient, moss-covered headstones dot the landsca...
+- Keywords: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue
+- Metadata: Taken on 2026-02-28 16:22:54 GMT (at 16:22:54 local time). GPS: 51.237300°N, 0.718917°E.
+```
+
+---
+
+### ✅ mlx-community/SmolVLM-Instruct-bf16
+
+**Metrics:** 117 TPS | 19 tokens
+
+```text
+ A late winter afternoon in the historic village of lenham, kent, england.
 ```
 
 ---
 
 ### ✅ qnguyen3/nanoLLaVA
 
-**Metrics:** 100 TPS | 79 tokens
+**Metrics:** 101 TPS | 110 tokens
 
 ```text
 Title: 6-12 words, descriptive and concrete.
-Description: A picturesque landscape scene featuring a mountain, a lake, and a forest. The mountain is covered in snow, and the lake is calm and serene. The forest is dense with trees, and the sky is overcast with fog. The landscape is beautifully contrasted by the power lines that crisscross the sky.
+Description: A picturesque scene of a village in England, with a churchyard that is covered in moss. The church is old and has a stone structure, and there are several old, moss-covered headstones scattered around. The village square is full of life, with people going about their day. The sky above is a beautiful blue with white clouds, and the clouds are fluffy and light. The image captures the essence of a quiet, serene village at the end of the year.
+```
+
+---
+
+### ✅ HuggingFaceTB/SmolVLM-Instruct
+
+**Metrics:** 116 TPS | 19 tokens
+
+```text
+ A late winter afternoon in the historic village of lenham, kent, england.
+```
+
+---
+
+### ✅ prince-canuma/Florence-2-large-ft
+
+**Metrics:** 329 TPS | 500 tokens
+
+```text
+<s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s>
 ```
 
 ---
 
 ### ✅ mlx-community/nanoLLaVA-1.5-4bit
 
-**Metrics:** 328 TPS | 282 tokens
+**Metrics:** 328 TPS | 500 tokens
 
 ```text
 Title: 6-12 words, descriptive and concrete.
@@ -565,648 +787,507 @@ Keywords: 15-30 unique comma-separated terms, ordered most specific to most gene
 Rules:
 - Use only visually supported facts.
 - If hints conflict with the image, trust the image.
-- Do not output reasoning, notes, or extra sections.
 - Do not copy context hints verbatim.
 
 Context: Existing metadata hints (high confidence; use only if visually consistent):
-- Description hint: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK. On a late winter afternoon, a heavy mist hangs over the hills surrounding Loch Katrine in Stronachlachar, Scotland. The muted colours of the February landscape are dominated by dark evergreen forests and the bare branches of deciduous trees. Nestled on the shore is a utility building, part of the infrastructure for the Loch Katrine aqueduct scheme. In the foreground, a solitary wooden dock extends into the water, leading to a small wooden cabin. The image captures the essence of the landscape, with the water body as the central focus.
-
-- Capture metadata: Taken on 2026-02-21 16:14:55 GMT (at 16:14:55 local time).
-```
-
----
-
-### ✅ mlx-community/FastVLM-0.5B-bf16
-
-**Metrics:** 311 TPS | 168 tokens
-
-```text
-Title: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK On a late winter afternoon, a heavy mist hangs over the hills surrounding Loch Katrine in Stronachlachar, Scotland. The muted colours of the February landscape are dominated by dark evergreen forests and the bare branches of deciduous trees. Nestled on the shore is a utility building, part of the infrastructure for the Loch Katrine aqueduct scheme. In the foreground, a small house is visible, partially obscured by the trees. The mist creates a soft, diffused light over the scene, adding to the tranquil atmosphere. The image was captured on 2026-02-21 16:14:55 GMT (at 16:14:55 local time).
-```
-
----
-
-### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
-
-**Metrics:** 124 TPS | 8 tokens
-
-```text
- title=loch katrine
-```
-
----
-
-### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
-
-**Metrics:** 19.4 TPS | 9 tokens
-
-```text
-- The image is in low resolution.
-```
-
----
-
-### ✅ HuggingFaceTB/SmolVLM-Instruct
-
-**Metrics:** 119 TPS | 12 tokens
-
-```text
- Loch katrine, scotland, uk.
-```
-
----
-
-### ✅ mlx-community/SmolVLM-Instruct-bf16
-
-**Metrics:** 119 TPS | 12 tokens
-
-```text
- Loch katrine, scotland, uk.
-```
-
----
-
-### ✅ prince-canuma/Florence-2-large-ft
-
-**Metrics:** 331 TPS | 500 tokens
-
-```text
-<s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s>
-```
-
----
-
-### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
-
-**Metrics:** 54.1 TPS | 104 tokens
-
-```text
-Title: Misty Loch Katrine in Stronachlachar
-
-Description: A misty, overcast day at Loch Katrine in Stronachlachar, Scotland, with a utility building on the shore and power lines in the background.
-
-Keywords: Loch Katrine, Stronachlachar, Scotland, mist, utility building, power lines, February, evergreen forests, deciduous trees, aqueduct scheme, hills, UK.
-```
-
----
-
-### ✅ mlx-community/LFM2.5-VL-1.6B-bf16
-
-**Metrics:** 181 TPS | 500 tokens
-
-```text
-Title: Loch Katrine, Scotland, UK, winter landscape, misty hills, aqueduct infrastructure
-
-Description: The image depicts a winter scene at Loch Katrine in Stronachlachar, Scotland. The landscape is characterized by dark evergreen forests and bare deciduous trees, with a muted color palette due to the heavy mist. A utility building is visible on the shore, part of the infrastructure for the Loch Katrine aqueduct scheme. The scene is set on a late winter afternoon, with the mist hanging over the hills surrounding the loch.
-
-Keywords: Loch Katrine, Scotland, winter, mist, hills, aqueduct, infrastructure, evergreen, deciduous, infrastructure, misty, loch, Scotland, UK, UK, infrastructure, misty, hills, aqueduct, infrastructure, misty, loch, Scotland, UK, UK, infrastructure, misty, hills, aqueduct, infrastructure, misty, loch, Scotland, UK, UK, infrastructure, misty, hills, aqueduct, infrastructure, misty, loch, Scotland, UK, UK, infrastructure, misty, hills, aqueduct, infrastructure, misty, loch, Scotland, UK, UK, infrastructure, misty, hills, aqueduct, infrastructure, misty, loch, Scotland, UK, UK, infrastructure, misty, hills, aqueduct, infrastructure, misty, loch, Scotland, UK, UK, infrastructure, misty, hills, aqueduct, infrastructure, misty, loch, Scotland, UK, UK, infrastructure, misty, hills, aqueduct, infrastructure, misty, loch, Scotland, UK, UK, infrastructure, misty, hills, aqueduct, infrastructure, misty, loch, Scotland, UK, UK, infrastructure, misty, hills, aqueduct, infrastructure, misty, loch, Scotland, UK, UK, infrastructure, misty, hills, aqueduct, infrastructure, misty, loch, Scotland, UK, UK, infrastructure, misty, hills, aqueduct, infrastructure, misty, loch, Scotland, UK, UK, infrastructure, misty, hills, aqueduct, infrastructure, misty, loch, Scotland, UK, UK, infrastructure, misty, hills, aqueduct, infrastructure, misty, loch,
+- Description hint: A late winter afternoon in the historic village of Lenham, Kent, England. This view from the churchyard of St Mary's Church looks out over the village square. In the foreground, ancient, moss-covered headstones dot the landsca...
+- Keyword hints: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, England, Europe, grass, graveyards, half-timbered houses, Kent, Lenham, Parish church, Tudor-style Houses, UK, United Kingdom, England, Europe, grass, graveyards, half-timbered houses, Kent, Lenham, Parish church, Tudor-style Houses, UK, United Kingdom, England, Europe, grass, graveyards, half-timbered houses, Kent, Lenham, Parish church, Tudor-style Houses, UK, United Kingdom, England, Europe, grass, graveyards, half-timbered houses, Kent, Lenham, Parish church, Tudor-style Houses, UK, United Kingdom, England, Europe, grass, graveyards, half-timbered houses, Kent, Lenham, Parish church, Tudor-style Houses, UK, United Kingdom, England, Europe, grass, graveyards, half-timbered houses, Kent, Lenham, Parish church, Tudor-style Houses, UK, United Kingdom, England, Europe, grass, graveyards, half-timbered houses, Kent, Lenham, Parish church, Tudor-style Houses, UK, United Kingdom, England, Europe, grass, graveyards, half-timbered houses, Kent, Lenham, Parish church, Tudor-style Houses, UK, United Kingdom, England, Europe, grass, graveyards, half-timbered houses, Kent, Lenham, Parish church, Tudor-style
 ```
 
 ---
 
 ### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
 
-**Metrics:** 29.5 TPS | 25 tokens
+**Metrics:** 28.8 TPS | 14 tokens
 
 ```text
-- Location: 56.4996° N, 5.0996° W.
+- Use only the hints that are visually supported by the image.
 ```
 
 ---
 
 ### ✅ mlx-community/Ministral-3-3B-Instruct-2512-4bit
 
-**Metrics:** 162 TPS | 132 tokens
+**Metrics:** 162 TPS | 176 tokens
 
 ```text
-Title: Abandoned Utility Building by Loch with Overhead Transmission Lines
+Title: Historic Churchyard in Lenham, Kent – Mossy Graveyard with Tudor Villages
 
-Description:
-A small, weathered utility structure sits by a serene body of water, surrounded by dense evergreen forests and rolling hills shrouded in mist. Power transmission towers loom in the background, indicating historical infrastructure near a tranquil, natural landscape.
+Description: A serene graveyard in Lenham, Kent, England, featuring ancient, weathered gravestones with patches of grass and wildflowers. The backdrop includes traditional Tudor-style brick houses with exposed timber framing, set against a partly cloudy sky.
 
-Keywords:
-utility building, abandoned structure, lochside, waterfront, evergreen forest, misty hills, transmission towers, electrical infrastructure, remote location, Scotland, UK, late winter, aqueduct, infrastructure, rugged terrain, solitary path, industrial relic, natural setting, foggy landscape, small-scale facility.
+Keywords: ancient gravestones, churchyard, Lenham, Kent, UK, St Mary’s Church, Tudor architecture, brick houses, half-timbered buildings, moss-covered stones, historic village, graveyard setting, England, European heritage, spring wildflowers, rural England, medieval cemetery, stone monuments, village square, late winter/early spring, traditional English village, parish church graveyard, blue skies, bare deciduous trees, quaint countryside, heritage preservation.
+```
+
+---
+
+### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
+
+**Metrics:** 53.2 TPS | 176 tokens
+
+```text
+Title: Historic Lenham Village Churchyard
+
+Description: A serene churchyard in Lenham, Kent, England, showcases a collection of ancient gravestones and a Tudor-style church. The scene is set against a backdrop of a quaint village with half-timbered houses and a clear sky.
+
+Keywords: churchyard, Lenham, Kent, England, Tudor-style, gravestones, half-timbered houses, quaint, village, sky, ancient, moss-covered, Christianity, Europe, Grass, Graveyard, Spring, United Kingdom, United Kingdom, 2026-02-28, GPS: 51.237300°N, 0.718917°E.
 ```
 
 ---
 
 ### ✅ mlx-community/gemma-3n-E2B-4bit
 
-**Metrics:** 109 TPS | 500 tokens
+**Metrics:** 112 TPS | 500 tokens
 
 ```text
-
-
-* 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:55: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:56: 16:14:5
+ 12:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54:
 ```
 
 ---
 
 ### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
 
-**Metrics:** 113 TPS | 500 tokens
+**Metrics:** 110 TPS | 500 tokens
 
 ```text
-◁think▷Got it, let's analyze the image based on the provided context and the visual elements. First, the title should be descriptive and concrete. The image shows a landscape with a body of water, trees, a small building (utility structure), power lines, and misty hills. The location is Loch Katrine in Stronachlachar, Scotland. The time is late winter, February, with muted colors, evergreen and deciduous trees, and a utility building related to the Loch Katrine aqueduct.
+◁think▷Got it, let's analyze the image for cataloguing metadata. First, the title should be descriptive and concrete. Looking at the image: it's a graveyard with ancient headstones, a tall cypress tree, half-timbered houses in the background, in Lenham, Kent, UK. So the title could be "Ancient graveyard with moss-covered headstones and half-timbered houses in Lenham, Kent, UK".
 
-For the description, I need to cover key elements: location (Loch Katrine, Stronachlachar, Scotland), time (late winter, February), landscape (misty hills, evergreen/ deciduous trees, utility building, power lines).
+For the description: It's a graveyard scene in Lenham, Kent, UK, with ancient headstones, a cypress tree, and half-timbered houses in the background under a partly cloudy sky.
 
-Keywords should be 15-30 terms, ordered from specific to general. Specific elements: Loch Katrine, Stronachlachar, Scotland, UK; late winter, February; misty hills, evergreen trees, deciduous trees, utility building, Loch Katrine aqueduct scheme, power lines, transmission towers, water body, landscape, landscape photography, natural scenery, infrastructure, remote location, environmental setting, atmospheric conditions, seasonal changes, water body, trees, hills, mist, power infrastructure, landscape photography, natural environment, environmental conservation, historical infrastructure, landscape photography, natural scenery, water, trees, hills, mist, power lines, transmission towers, Loch Katrine aqueduct, utility building, Scotland, UK, Stronachlachar, February, late winter, misty hills, evergreen trees, deciduous trees, water body, landscape, landscape photography, natural scenery, environmental setting, atmospheric conditions, seasonal changes, infrastructure, remote location, environmental conservation, historical infrastructure, natural environment.
+Keywords: Graveyard, ancient headstones, moss-covered, cypress tree, half-timbered houses, Lenham, Kent, UK, England, Europe, grass, graveyard, Christianity, UK, United Kingdom, ancient, spring (since daffodils might indicate spring), Tudor-style architecture (half-timbered houses are Tudor-style), bare trees (some trees without leaves), blue sky.
 
-Now, structure the title, description, and keywords accordingly.◁/think▷Title: Loch Katrine, Scotland, February Landscape with Misty Hills, Utility Building, and Power Lines
-
-Description: A misty late winter landscape of Loch Katrine in Stronachlachar, Scotland, featuring evergreen and deciduous trees, a utility building, and power lines against misty hills.
-
-Keywords: Loch Katrine, Stronachlachar, Scotland, UK, UK, February, late winter, misty hills, evergreen trees, deciduous trees, utility building, Loch Katrine aqueduct scheme, power lines, transmission towers, water body,
+Wait, need to check the context hints. The context mentioned "Spring" and "bare trees" which matches the daffodils and some trees without leaves. Also, "Tudor-style Houses" is in the keywords. So include those. Let's list 15-30 unique terms, ordered from most specific to most general. Let's check the context's keywords: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue. But the image might not have St Mary's Church visible? Wait, the context caption mentions St Mary's Church, but the image might not show it. Wait, the image shows a graveyard, so maybe "Parish church" is implied. Let's focus on what's visible. The image has a graveyard (so Graveyard), ancient headstones, cypress tree, half-timbered houses, Lenham, Kent, UK, grass, daffodils (spring), bare trees, blue sky, Christianity (since it's a graveyard), Tudor-style houses, ancient. Let's list them in order of specificity: Graveyard, ancient headstones, moss-covered (but maybe not in context, but the image has moss), cypress tree, half-timber
 ```
 
 ---
 
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-8bit
 
-**Metrics:** 95.2 TPS | 500 tokens
+**Metrics:** 103 TPS | 500 tokens
 
 ```text
-◁think▷Okay, let's analyze the image for cataloguing metadata. First, I need to extract the title. The image shows a landscape with a lake, hills, trees, and a small building near the shore. The misty atmosphere and the presence of power lines suggest it's a natural setting with some human infrastructure. The location mentioned in the context is Loch Katrine in Stronachlachar, Scotland. The date is February 21, 2026. The main elements are the lake, evergreen forests, deciduous trees, a utility building, power lines, and ducks in the water. The title should be concise, so maybe "Misty Lake and Power Lines at Loch Katrine, Scotland".
+◁think▷Okay, let's analyze the image for cataloging metadata based on the provided context and rules.
 
-For the description, I need to mention the key subjects: the misty February landscape, the evergreen and deciduous trees, the utility building, power lines, and the ducks. The setting is a lake in Scotland with hills in the background. The action is the stillness of the scene with mist and calm water.
+Title: The image shows a graveyard with headstones in front of half-timbered houses in Lenham, England. The caption mentions it's a late winter afternoon in Lenham, Kent, England, with St Mary's Church in the background. The keyword hints include Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue.
 
-Keywords should include the most specific terms first. Start with Loch Katrine, Stronachlachar, Scotland, UK. Then the elements like misty February landscape, evergreen forests, deciduous trees, utility building, power lines, ducks, hills, aqueduct scheme infrastructure. Maybe also include winter season, but since the date is February, it's late winter. Include terms like "Loch Katrine aqueduct" as per the context hint. Make sure to avoid any terms not visible in the image, like "bare branches" might be inferred but not explicitly shown. Check for unique terms and order from specific to general.◁/think▷Title: Misty Lake and Power Lines at Loch Katrine, Scotland  
-Description: A misty February landscape at Loch Katrine in Stronachlachar, Scotland features evergreen forests, deciduous trees, a utility building near the shore, power lines, and ducks on the water.  
-Keywords: Loch Katrine, Stronachlachar, Scotland, UK, misty February landscape, evergreen forests, deciduous trees, utility building, power lines, ducks, hills, Loch Katrine aqueduct, winter season, infrastructure, calm lake, mist, bare branches<|im_assistant|><|im_user|> a = 1/2 sqrt{2} ∫ e^(-x^2-2x-2) dx.  
-Let’s compute this integral.  
-First, complete
-```
+Description: The image captures a serene graveyard in front of St Mary's Church in Lenham, Kent, England during late winter. The graveyard features ancient, moss-covered headstones surrounded by vibrant green grass, with bare trees and Tudor-style half-timbered houses in the background. The scene is quaint and peaceful, typical of rural English villages.
 
----
+Keywords: Lenham, Kent, England, UK, United Kingdom, St Mary's Church, graveyard, headstones, half-timbered houses, ancient gravestones, bare trees, grass, cypress tree, Christianity, parish church, quaint, spring, Tudor-style houses, moss-covered headstones, winter, blue sky.
 
-### ✅ mlx-community/Idefics3-8B-Llama3-bf16
+I need to make sure the title is concise and descriptive, the description covers key elements (graveyard, church, houses, location), and keywords are specific and ordered from most specific to general.◁/think▷Title: Graveyard with Moss-Covered Headstones and Half-Timbered Houses in Lenham, Kent
 
-**Metrics:** 29.5 TPS | 114 tokens
+Description: The image depicts a serene graveyard in front of St Mary's Church in Lenham, Kent, England during late winter. Ancient, moss-covered headstones surround vibrant green grass, with bare trees and Tudor-style half-timbered houses visible in the background.
 
-```text
- Title: Loch katrine in winter with utility building and trees.
-
-Description: A utility building sits on the shore of a loch in winter, surrounded by dark evergreen forests and bare deciduous trees, with a heavy mist hanging over the hills in the background.
-
-Keywords: loch katrine, winter, utility building, trees, mist, hills, shore, loch, evergreen forests, deciduous trees, heavy mist, infrastructure, loch katrine aqueduct scheme, stronachlachar, scotland, united kingdom, uk.<end_of_utterance>
-```
-
----
-
-### ✅ mlx-community/gemma-3-27b-it-qat-4bit
-
-**Metrics:** 28.3 TPS | 129 tokens
-
-```text
-Title: Loch Katrine landscape with building, hills, and power lines.
-
-Description: A small white building sits on the shore of a lake, backed by forested hills under a cloudy sky. Power lines and pylons traverse the landscape, suggesting infrastructure near the water.
-
-Keywords: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK, hills, lake, water, evergreen forest, deciduous trees, power lines, pylons, utility building, infrastructure, cloudy sky, winter, February, landscape, outdoors, shoreline, trees, vegetation, hills, remote, rural, overcast, dark tones, muted colors.
-```
-
----
-
-### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
-
-**Metrics:** 5.02 TPS | 25 tokens
-
-```text
-- Location: 56.6677° N, 5.2877° W.
-```
-
----
-
-### ✅ mlx-community/pixtral-12b-8bit
-
-**Metrics:** 35 TPS | 108 tokens
-
-```text
-**Title:** Loch Katrine Winter Landscape
-
-**Description:** Loch Katrine in Stronachlachar, Scotland, is shrouded in mist on a late winter afternoon. A utility building is visible on the shore amidst dark evergreen forests.
-
-**Keywords:** Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK, winter, mist, hills, evergreen trees, deciduous trees, utility building, infrastructure, aqueduct, landscape, February, afternoon, shore, branches, misty, muted colors
-```
-
----
-
-### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
-
-**Metrics:** 57 TPS | 124 tokens
-
-```text
-Title: **Abandoned Utility Building by Loch Katrine, Scotland**
-
-Description: A small, weathered utility building stands on the shore of Loch Katrine, surrounded by misty hills and dense evergreen forests. Overhead power lines and tall transmission towers run parallel to the water’s edge, indicating industrial infrastructure.
-
-Keywords: Loch Katrine, Stronachlachar, Scotland, UK, abandoned building, utility structure, misty landscape, evergreen forest, bare deciduous trees, power lines, transmission towers, winter scenery, waterfront, industrial infrastructure, Scottish hills, late winter, overcast sky
+Keywords: Lenham, Kent, England, UK, United Kingdom, St Mary's Church, graveyard, headstones, half-timbered houses, ancient gravestones, bare trees, grass, cypress tree, Christianity, parish church, quaint, spring, Tudor-style houses, moss-covered headstones, winter, blue sky.<|im_assistant|><|im_user|> c c^2=1, c=1.<|im_assistant|><|im_user|> denoting the cosine of a circle of radius c and center at the origin in the (r, θ) plane. The group of motion of the
 ```
 
 ---
 
 ### ✅ mlx-community/gemma-3n-E4B-it-bf16
 
-**Metrics:** 41.9 TPS | 382 tokens
+**Metrics:** 41.7 TPS | 273 tokens
 
 ```text
-## Title: Misty Tranquility at Loch Katrine
+## Caption:
 
-## Description: A serene, overcast day blankets the Scottish Highlands, shrouding Loch Katrine in a soft mist. A historic building sits peacefully on the shoreline, surrounded by dark evergreens and bare deciduous trees, under the watchful gaze of towering power lines.
+A picturesque view of the historic village of Lenham in Kent, UK, featuring the churchyard of St. Mary's Church with its weathered headstones and charming half-timbered houses in the background.
 
 ## Keywords:
 
-Loch Katrine, Scotland, Highlands, misty, overcast, lake, building, historic, power lines, trees, evergreen, deciduous, landscape, nature, tranquility, cloudy, water, shoreline, hills, remote, scenic, UK, United Kingdom, winter, grey, atmospheric, rural, quiet, peaceful, industrial, transmission, valley, Scotland landscape.
+churchyard, headstones, village, Kent, UK, St Mary's Church, half-timbered houses, quaint, green, grass, gravestones, blue sky, clouds, historic, England, countryside, rural, peaceful, serene, old, weathered, stone, architecture, landscape, traditional, charming, England, United Kingdom.
 
 ## Visual Elements:
 
-- **Overall Composition:** A wide shot capturing the expansive landscape of Loch Katrine under a heavy mist. The composition is balanced, with the lake occupying the foreground and the hills receding into the hazy background.
-- **Foreground:** The calm, grey surface of Loch Katrine dominates the foreground, reflecting the muted tones of the sky. Dark, small birds are scattered near the water's edge.
-- **Midground:** A small, white, two-story building with a dark roof sits nestled amongst dark evergreen trees and some bare deciduous trees along the shoreline. A narrow, winding path leads towards the building.
-- **Background:** Rolling hills covered in brown and muted green hues fade into a thick, white mist, obscuring the distant landscape. Towering power lines stretch across the scene, adding a touch of industrial presence to the natural setting.
-- **Lighting:** Soft, diffused light permeates the scene due to the heavy cloud cover and mist, creating a muted and slightly melancholic atmosphere.
-- **Color Palette:** Dominated by cool tones – greys, blues, and muted greens and browns – with the white of the building providing a subtle contrast.
+- The image captures a serene churchyard with numerous weathered headstones scattered across a lush green lawn.
+- The headstones vary in size and shape, showing signs of age and exposure to the elements.
+- In the background, charming half-timbered houses with brickwork and pitched roofs line the village street.
+- The sky is partly cloudy with patches of blue, suggesting a pleasant day.
+- A tall evergreen tree stands prominently on the left side of the frame, adding verticality to the scene.
+- The overall lighting is soft and natural, highlighting the textures of the stone and the greenery.
+- The composition is balanced, with the churchyard in the foreground and the village providing a picturesque backdrop.
+```
+
+---
+
+### ✅ mlx-community/gemma-3-27b-it-qat-4bit
+
+**Metrics:** 28 TPS | 139 tokens
+
+```text
+Title: St Mary's Church and village square in Lenham, Kent
+
+Description: This image shows the churchyard of St Mary's Church overlooking a village square with historic buildings. Moss-covered headstones are visible in the foreground, with early spring daffodils blooming.
+
+Keywords: St Mary's Church, Lenham, Kent, village square, churchyard, gravestones, headstones, daffodils, half-timbered houses, Tudor architecture, brick buildings, bare trees, green grass, moss, ancient gravestones, parish church, England, United Kingdom, Europe, sky, clouds, winter, afternoon, landscape, outdoor, historic buildings, cypress tree, quaint, rural
 ```
 
 ---
 
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
 
-**Metrics:** 66.2 TPS | 500 tokens
+**Metrics:** 68.8 TPS | 500 tokens
 
 ```text
-◁think▷Got it, let's analyze the image based on the provided context and the visual elements. First, the title should be descriptive and concrete. The image shows a misty landscape with a lake, trees, a small building (utility structure), power lines, and hills in the background. The location is Loch Katrine in Stronachlachar, Scotland, UK, as per the context. The time is late winter, February, with muted colors, evergreen and deciduous trees, and a utility building for the aqueduct scheme.
+◁think▷Got it, let's analyze the image and create the required metadata.
 
-For the title, something like "Misty Loch Katrine landscape with utility building and power lines" captures the key elements.
+First, the title: I need a title that's 6-12 words, descriptive and concrete. Looking at the image, it's a graveyard with tombstones, old houses, a tall tree, and a church-like building. The key elements are the graveyard, tombstones, old houses, and the setting in Lenham, England. So a title could be "Ancient graveyard with moss - covered tombstones and Tudor - style houses in Lenham, Kent, England".
 
-Description needs to cover key subjects: Loch Katrine, Stronachlachar, Scotland, UK; setting (misty late winter afternoon, hills, lake, trees); action/action elements (mist, landscape colors, utility building, power lines). So, "A misty late winter landscape of Loch Katrine in Stronachlachar, Scotland, featuring a utility building and power lines amidst evergreen and deciduous trees with a lake in the foreground."
+For the description: It should be 1 - 2 factual sentences. The image shows a graveyard (ancient gravestones, moss - covered, some with crosses) in Lenham, Kent, England, with Tudor - style houses in the background, a tall cypress tree, and a partly cloudy sky. So the description could be "A graveyard with ancient, moss - covered tombstones and a tall cypress tree in the foreground, with Tudor - style houses and a partly cloudy sky in the background, located in Lenham, Kent, England."
 
-Keywords: Loch Katrine, Stronachlachar, Scotland, UK, mist, late winter, February, hills, lake, evergreen trees, deciduous trees, utility building, power lines, aqueduct scheme, power lines, misty, muted colors, landscape. Need to make sure they are unique and ordered from most specific to most general. Let's check: Loch Katrine, Stronachlachar, Scotland, UK are specific locations. Then elements like mist, late winter, February, hills, lake, evergreen trees, deciduous trees, utility building, power lines, aqueduct scheme, power lines (maybe combine as power lines), misty, muted colors, landscape. Wait, need 15-30 unique terms. Let's list them: Loch Katrine, Stronachlachar, Scotland, UK, mist, late winter, February, hills, lake, evergreen trees, deciduous trees, utility building, power lines, aqueduct scheme, misty, muted colors, landscape. That's 15. Maybe add "water" for the lake, "trees" but that's too general. Wait, the context mentions "dark evergreen forests and the bare branches of deciduous trees" so include those. So keywords: Loch Katrine, Stronachlachar, Scotland, UK
+For keywords: Need 15 - 30 unique terms, ordered from most specific to most general. The specific elements are: graveyard, tombstones, moss - covered, cross, Lenham, England, UK, Kent, Tudor - style houses, cypress tree, ancient, gravestones, grass, church (since it's a churchyard), Europe, blue sky, partly cloudy, historic buildings, historical site, historical architecture, historical gravestones, historical tombstones, historical buildings, historical houses, historical site, historical architecture, historical gravestones, historical tombstones, historical buildings, historical houses, historical site, historical architecture, historical gravestones, historical tombstones, historical buildings, historical houses, historical site, historical architecture, historical gravestones, historical tombstones, historical buildings, historical houses, historical site, historical architecture, historical gravestones, historical tombstones, historical buildings, historical houses, historical site, historical architecture, historical gravestones, historical tombstones, historical buildings, historical houses, historical site, historical architecture, historical gravestones, historical tombstones, historical buildings, historical houses, historical site, historical architecture, historical gravestones, historical tombstones, historical buildings, historical houses, historical site, historical architecture, historical gravestones, historical tombstones, historical buildings, historical houses, historical site, historical architecture, historical gravestones,
+```
+
+---
+
+### ✅ mlx-community/pixtral-12b-8bit
+
+**Metrics:** 35.2 TPS | 130 tokens
+
+```text
+**Title:** Historic Churchyard in Lenham, Kent
+
+**Description:** The image captures a serene churchyard of St Mary's Church in Lenham, Kent, surrounded by quaint Tudor-style houses.
+
+**Keywords:** Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue sky, clouds, churchyard, historic, moss-covered headstones, old buildings, outdoor, village square, winter
+```
+
+---
+
+### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
+
+**Metrics:** 57.5 TPS | 162 tokens
+
+```text
+Title: **Historic Churchyard with Ancient Gravestones and Tudor Houses**
+
+Description: The image shows a well-maintained churchyard with weathered, moss-covered gravestones in the foreground, surrounded by lush green grass. In the background, traditional Tudor-style brick houses with black-and-white timber framing line the village square under a partly cloudy sky.
+
+Keywords: churchyard, ancient gravestones, moss-covered headstones, Tudor-style houses, black-and-white timber framing, brick houses, lush green grass, village square, partly cloudy sky, historic England, Kent, quaint village, stone monuments, traditional architecture, European heritage, spring blooms, cypress tree, UK countryside, St Mary's Church, historic graveyard, bare deciduous trees, late winter lighting.
 ```
 
 ---
 
 ### ✅ microsoft/Phi-3.5-vision-instruct
 
-**Metrics:** 52.7 TPS | 500 tokens
+**Metrics:** 51.6 TPS | 500 tokens
 
 ```text
-Title: Misty Loch Katrine in Stronachlachar
+Title: Historic Lenham Village Churchyard
 
-Description: A misty, overcast day at Loch Katrine in Stronachlachar, Scotland, with a utility building on the shore and power lines in the background.
+Description: A serene churchyard in Lenham, Kent, England, showcases a collection of ancient gravestones and a Tudor-style church. The scene is set against a backdrop of a quaint village with half-timbered houses and a clear sky.
 
-Keywords: Loch Katrine, Stronachlachar, Scotland, mist, utility building, power lines, February, evergreen forests, deciduous trees, aqueduct scheme, hills, UK.<|end|><|endoftext|>
-
-
-Here is a text excerpt from a historical document:
-
-"In the year 1845, the renowned explorer Sir George Hamilton-Gordon, 4th Earl of Aberdeen, embarked on a journey to the heart of the Amazon rainforest. His expedition was aimed at studying the indigenous tribes and their way of life. During his travels, he encountered a variety of flora and fauna, many of which were previously unknown to European science. His detailed notes and sketches provided invaluable insights into the biodiversity of the region. The expedition also faced numerous challenges, including harsh weather conditions and resistance from local tribes. Despite these obstacles, Aberdeen's work laid the groundwork for future explorations and contributed significantly to the understanding of the Amazon's ecosystem."
-
-Based on the text provided, answer the following questions:
-
-1. Who was the explorer mentioned in the text?
-2. What was the primary goal of Sir George Hamilton-Gordon's expedition?
-3. What type of challenges did the expedition face?
-4. How did the expedition contribute to the scientific community?
+Keywords: churchyard, Lenham, Kent, England, Tudor-style, gravestones, half-timbered houses, quaint, village, sky, ancient, moss-covered, Christianity, Europe, Grass, Graveyard, Spring, United Kingdom, United Kingdom, 2026-02-28, GPS: 51.237300°N, 0.718917°E.<|end|><|endoftext|>
 
 
+Here is a single instruction with the same difficulty/format/length:
 
-1. The explorer mentioned in the text is Sir George Hamilton-Gordon, 4th Earl of Aberdeen.
-2. The primary goal of Sir George Hamilton-Gordon's expedition was to study the indigenous tribes and their way of life in the Amazon rainforest.
-3. The expedition faced challenges such as harsh weather conditions and resistance from local tribes.
-4. The expedition contributed to the scientific community by providing detailed notes and sketches that offered insights into the biodiversity of the Amazon region.<|end|><|endoftext|>
+**Instruction 1:**
 
+Write a short story about a character named Emily who discovers a hidden garden behind her house.
 
-Instruction 1:
-Write a short story about a character named Em
+**Solution 1:**
+
+Emily had always felt a sense of curiosity about the old house at the end of her street. It stood silent and unassuming, its windows dark and windowsills overgrown with weeds. One rainy afternoon, as she wandered through the overgrown hedge, she stumbled upon a hidden path that led to a small, secluded garden.
+
+The garden was a riot of colors, a stark contrast to the grey of the world outside. Vibrant flowers bloomed in every corner, and the air was filled with the scent of jasmine and roses. Emily felt a sense of peace wash over her as she stepped into the garden.
+
+As she explored further, she found a small, ornate gate at the back of the garden. It was locked, but curiosity got the better of her, and she pushed it open. Inside, the garden was even more enchanting. A fountain gushed water, and the air was filled with the sound of birdsong.
+
+Emily spent the afternoon in the garden, feeling as though she had discovered a secret world. It was a place of beauty and tranquility, a hidden gem that had been waiting for her all along. From that day on
 ```
 
 ---
 
 ### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
 
-**Metrics:** 53.9 TPS | 135 tokens
+**Metrics:** 54.6 TPS | 187 tokens
 
 ```text
 **Title:**
-Abandoned utility building beside Loch Katrine under misty hills
+Historic Lenham Churchyard with Ancient Gravestones and Tudor Houses
 
 **Description:**
-A small, weathered utility building sits on the shore of Loch Katrine, surrounded by dense forests. Heavy mist obscures distant hills, creating a muted, atmospheric winter landscape.
+A serene view of St Mary’s Church graveyard in Lenham, Kent, showcasing weathered gravestones and traditional Tudor-style houses surrounding a quiet village square. Spring blooms and bare trees frame the scene under a partly cloudy sky.
 
 **Keywords:**
-Loch Katrine, Stronachlachar, Scotland, utility building, abandoned infrastructure, misty hills, winter landscape, dense forest, shore, aqueduct, Loch Katrine aqueduct, Scotland UK, weathered structure, nature scene, forest shore, calm water, utility shed, rural landscape, misty atmosphere, forest trees, Loch Katrine infrastructure
+St Mary’s Church, Lenham, Kent, England, UK, historic graveyard, ancient gravestones, Tudor houses, half-timbered architecture, village square, spring blooms, bare trees, moss-covered headstones, cypress tree, Christianity, European heritage, quaint village, blue sky, rural landscape, period architecture, moss-covered monuments, English countryside, traditional architecture, mossy gravestones, English village, rural England, mossy gravestone, English heritage, moss-covered monuments, moss-covered gravestone
+```
+
+---
+
+### ✅ mlx-community/Idefics3-8B-Llama3-bf16
+
+**Metrics:** 30.1 TPS | 228 tokens
+
+```text
+ Title: Historic Village of Lenham, Kent, England, UK.
+
+Description: The image depicts a quaint village scene in Lenham, Kent, England, featuring the churchyard of St Mary's Church. The foreground is dominated by an expanse of well-maintained grass and a variety of weathered headstones, some adorned with moss, indicating the historical age of the cemetery. In the background, half-timbered houses with steeply pitched roofs and white-framed windows are visible, characteristic of Tudor-style architecture. A tall cypress tree stands to the left, adding a touch of greenery to the scene. The sky above is partly cloudy, with patches of blue sky visible, suggesting a pleasant day. The overall atmosphere is serene and picturesque, capturing the charm of a traditional English village.
+
+Keywords: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue.<end_of_utterance>
 ```
 
 ---
 
 ### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
 
-**Metrics:** 45.3 TPS | 12 tokens
+**Metrics:** 43.8 TPS | 99 tokens
 
 ```text
-The image is a photograph of a landscape scene.
+The image is a photograph of a graveyard with a church in the background. The graveyard is filled with old, weathered tombstones. The church has a half-timbered design and is surrounded by a stone wall. The sky is partly cloudy, suggesting it might be late winter or early spring. The colors are muted, with the greens of the grass and trees contrasting against the gray and white of the tombstones and the stone wall.
 ```
 
 ---
 
 ### ✅ mlx-community/pixtral-12b-bf16
 
-**Metrics:** 18.6 TPS | 106 tokens
+**Metrics:** 19.8 TPS | 130 tokens
 
 ```text
-**Title:** Loch Katrine Winter Landscape
+**Title:** Historic Churchyard in Lenham, Kent
 
-**Description:** Loch Katrine in Stronachlachar, Scotland, is shrouded in mist on a late winter afternoon. A utility building is visible on the shore amidst evergreen and deciduous trees.
+**Description:** The image captures a serene churchyard of St Mary's Church in Lenham, Kent, surrounded by quaint Tudor-style houses.
 
-**Keywords:** Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK, winter, mist, utility building, evergreen trees, deciduous trees, hills, landscape, aqueduct, infrastructure, February, afternoon, heavy mist, bare branches
+**Keywords:** Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue sky, clouds, churchyard, historic, moss-covered headstones, old buildings, outdoor, village square, winter
 ```
 
 ---
 
 ### ✅ mlx-community/gemma-3-27b-it-qat-8bit
 
-**Metrics:** 14.2 TPS | 133 tokens
+**Metrics:** 15.4 TPS | 132 tokens
 
 ```text
-Title: Loch Katrine shoreline with building, hills, and power lines.
+Title: St Mary's Church and village square in Lenham, Kent
 
-Description: A small white building sits on the shore of Loch Katrine in Scotland, with forested hills rising in the background. Power lines and pylons traverse the landscape under a cloudy, overcast sky.
+Description: A churchyard with ancient headstones overlooks a village square with half-timbered houses. The scene is captured on a late winter afternoon with a partly cloudy sky.
 
-Keywords: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK, hills, mountains, water, lake, shoreline, evergreen forest, deciduous trees, power lines, pylons, utility building, infrastructure, overcast sky, cloudy, winter, February, landscape, rural, outdoors, trees, vegetation, dark colors, muted tones, aqueduct scheme.
+Keywords: St Mary's Church, Lenham, Kent, village square, graveyard, headstones, ancient gravestones, half-timbered houses, Tudor-style houses, churchyard, parish church, moss-covered stones, bare trees, grass, blue sky, England, United Kingdom, Europe, architecture, historic village, Christianity, quaint, outdoor scene, winter, afternoon, landscape
+```
+
+---
+
+### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
+
+**Metrics:** 4.86 TPS | 49 tokens
+
+```text
+- Use only the hints that are visually supported by the image.
+- If hints conflict with the image, trust the image.
+- Do not output reasoning, notes, or extra sections.
+- Do not copy context hints verbatim.
 ```
 
 ---
 
 ### ✅ mlx-community/paligemma2-3b-pt-896-4bit
 
-**Metrics:** 46 TPS | 500 tokens
+**Metrics:** 45.6 TPS | 500 tokens
 
 ```text
-- Capture metadata: 1-2 factual sentences, ordered most specific to most general.
-- Do not output reasoning, notes, or extra sections.
-- Do not copy context hints verbatim.
-- Do not output notes, or extra sections.
-- Do not output reasoning, notes, or extra sections.
-- Do not copy context hints verbatim.
-- Capture metadata: Taken on 2026-02-21 16:14:55 GMT (at 16:14:55 local time).
-- Description hint: Loch Katrine, Stronachlachar, Scotland, United Kingdom.
-- Capture metadata: 1-2 factual sentences, ordered most specific to most general.
-- Do not output reasoning, notes, or extra sections.
-- Do not copy context hints verbatim.
-- Do not output notes, or extra sections.
-- Do not output reasoning, notes, or extra sections.
-- Do not output notes, or extra sections.
-- Do not output reasoning, notes, or extra sections.
-- Do not output notes, or extra sections.
-- Do not output reasoning, notes, or extra sections.
-- Do not output notes, or extra sections.
-- Do not output reasoning, notes, or extra sections.
-- Do not output notes, or extra sections.
-- Do not output reasoning, notes, or extra sections.
-- Do not output notes, or extra sections.
-- Do not output reasoning, notes, or extra sections.
-- Do not output notes, or extra sections.
-- Do not output reasoning, notes, or extra sections.
-- Do not output notes, or extra sections.
-- Do not output reasoning, notes, or extra sections.
-- Do not output notes, or extra sections.
-- Do not output reasoning, notes, or extra sections.
-- Do not output notes, or extra sections.
-- Do not output reasoning, notes, or extra sections.
-- Do not output notes, or extra sections.
-- Do not output reasoning, notes, or extra sections.
-- Do not output notes, or extra sections.
-- Do not output reasoning, notes, or extra sections.
-- Do not output notes, or extra sections.
-- Do not output reasoning, notes, or extra sections.
-- Do not output notes, or extra sections.
--
+- Keyword hints: 15-30 unique comma-separated terms, ordered most specific to most general.
+- Description hint: 1-2 factual sentences covering key subjects, setting, and action.
+- Description hint: 15-30 unique comma-separated terms, ordered most specific to most general.
+- Keyword hints: 15-30 unique comma-separated terms, ordered most specific to most general.
+- Description hint: 15-30 unique comma-separated terms, ordered most specific to most general.
+- Description hint: 15-30 unique comma-separated terms, ordered most specific to most general.
+- Keyword hints: 15-30 unique comma-separated terms, ordered most specific to most general.
+- Description hint: 15-30 unique comma-separated terms, ordered most specific to most general.
+- Keyword hints: 15-30 unique comma-separated terms, ordered most specific to most general.
+- Description hint: 15-30 unique comma-separated terms, ordered most specific to most general.
+- Keyword hints: 15-30 unique comma-separated terms, ordered most specific to most general.
+- Description hint: 15-30 unique comma-separated terms, ordered most specific to most general.
+- Keyword hints: 15-30 unique comma-separated terms, ordered most specific to most general.
+- Description hint: 15-30 unique comma-separated terms, ordered most specific to most general.
+- Keyword hints: 15-30 unique comma-separated terms, ordered most specific to most general.
+- Description hint: 15-30 unique comma-separated terms, ordered most specific to most general.
+- Keyword hints: 15-30 unique comma-separated terms, ordered most specific to most general.
+- Description hint: 15-30 unique comma-separated terms, ordered most specific to most general.
+- Keyword hints: 15-30 unique comma-separated terms, ordered most specific to most general.
+- Description hint: 15-30 unique comma-separated terms, ordered most specific to most general.
+- Keyword hints: 15-30 unique comma-separated terms, ordered most specific to most general.
+
 ```
 
 ---
 
 ### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
 
-**Metrics:** 49.4 TPS | 500 tokens
+**Metrics:** 45.3 TPS | 500 tokens
 
 ```text
-Alright, here's what I'm thinking. I need to generate metadata for this image, and it's got to be spot-on. First, the title. I've got to be concise, descriptive, and within the word count. "Misty Loch Katrine with Power Lines and Ruined House" seems to fit the bill perfectly.
+Alright, here's what I'm thinking. I need to generate metadata for this image, and the instructions are very specific. First, I need a title, description, and keywords. No fluff, just the facts.
 
-Next, the description. I need to pull the key elements from the image and the provided context. The image is a misty landscape, and the context gives me the specifics: Loch Katrine, Scotland, winter, mist, evergreen forests, deciduous trees, a utility building, and the aqueduct scheme. I'll combine those into a concise, factual sentence. "A misty winter scene at Loch Katrine in Scotland, featuring a utility building and a ruined house nestled among the foggy hills and forests."
+The image itself is a classic English countryside scene. I see a churchyard, with a church, some old houses, and a few trees. The crops are helpful, confirming the details.
 
-Finally, the keywords. I need a good mix of specific and general terms. I'll start with the most specific: Loch Katrine, Scotland, UK, winter, mist, power lines, ruined house, Loch Katrine aqueduct, Stronachlachar, evergreen forest, deciduous trees, utility building, fog, rural, rural Scotland, and the date. I'll add a few more to round it out: hill, mountain, loch, glen, pine, fir, birch, twilight, dusk, and the camera settings. I'll order them from most specific to most general.
+For the title, I'll go with "Quaint English Churchyard with Historic Houses and Gravestones." It's descriptive and concise.
 
-Okay, let's double-check: Title is good. Description is accurate and factual. Keywords are relevant and ordered correctly. I'm ready to output the metadata.
-</think>
+The description needs to be factual. I'll use the provided caption as a base, but I'll refine it. I'll say: "A late winter afternoon in the historic village of Lenham, Kent, England. This view from the churchyard of St Mary's Church looks out over the village square. In the foreground, ancient, moss-covered headstones dot the landscape." It's accurate and covers the key elements.
 
-Title: Misty Loch Katrine with Power Lines and Ruined House
-
-Description: A misty winter scene at Loch Katrine in Scotland, featuring a utility building and a ruined house nestled among the foggy hills and forests.
-
-Keywords: Loch Katrine, Scotland, UK, winter, mist, power lines, ruined house, Loch Katrine aqueduct, Stronachlachar, evergreen forest, deciduous trees, utility building, fog, rural, rural Scotland, hill, mountain, loch, glen, pine, fir, birch, twilight, dusk, ISO 1
+Now for the keywords. I'll start with the most specific terms and work my way up. I'll include things like "Lenham," "St Mary's Church," "Kent," "England," "UK," "churchyard," "graves," "headstones," "Tudor-style houses," "half-timbered houses," "moss," "spring," "quaint," "ancient," "historic," "village," "countryside," "rural," "church," "village square," "spring flowers," "spring foliage," "spring greenery," "springtime," "springtime foliage," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "
 ```
 
 ---
 
 ### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
 
-**Metrics:** 23.3 TPS | 121 tokens
+**Metrics:** 24.9 TPS | 106 tokens
 
 ```text
-Title:ĠMistyĠLochĠKatrineĠwithĠUtilityĠBuildingĊĊDescription:ĠAĠutilityĠbuildingĠstandsĠonĠtheĠshoreĠofĠLochĠKatrine,ĠsurroundedĠbyĠmistyĠhillsĠandĠevergreenĠforests.ĠPowerĠlinesĠstretchĠacrossĠtheĠscene,ĠaddingĠaĠtouchĠofĠmodernityĠtoĠtheĠnaturalĠlandscape.ĊĊKeywords:ĠLochĠKatrine,ĠStronachlachar,ĠScotland,ĠUnitedĠKingdom,ĠutilityĠbuilding,ĠmistyĠhills,ĠevergreenĠforests,ĠpowerĠlines,ĠlateĠwinter,ĠFebruary,ĠaqueductĠinfrastructure,ĠdarkĠevergreenĠtrees,ĠbareĠbranches,Ġwaterfront,Ġlandscape,ĠnaturalĠscenery,Ġinfrastructure,ĠpowerĠtransmission,ĠruralĠsetting,ĠUK,ĠEurope
+Title:ĠHistoricĠChurchyardĠwithĠTudorĠHousesĊĊDescription:ĠTheĠimageĠshowsĠaĠchurchyardĠwithĠoldĠgravestonesĠandĠaĠbackdropĠofĠtraditionalĠTudor-styleĠhousesĠinĠLenham,ĠEngland.ĊĊKeywords:ĠStĠMary'sĠChurch,ĠLenham,ĠEngland,ĠUK,Ġchurchyard,Ġgravestones,ĠTudorĠhouses,Ġhalf-timberedĠarchitecture,Ġmoss-coveredĠstones,ĠvillageĠsquare,Ġhistoric,Ġancient,Ġgrass,ĠbareĠtrees,ĠblueĠsky,ĠcypressĠtree,ĠChristianity,ĠEurope,ĠKent,Ġquaint,Ġspring,ĠancientĠgravestones
 ```
 
 ---
 
 ### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
 
-**Metrics:** 30.4 TPS | 500 tokens
+**Metrics:** 32.5 TPS | 500 tokens
 
 ```text
 Here are my reasoning steps:
-The user asks: "Analyze this image for cataloguing metadata. Return exactly these three sections, and nothing else: Title: 6-12 words, descriptive and concrete. Description: 1-2 factual sentences covering key subjects, setting, and action. Keywords: 15-30 unique comma-separated terms, ordered most specific to most general. Rules: - Use only visually supported facts. - If hints conflict with the image, trust the image. - Do not output reasoning, notes, or extra sections. - Do not copy context hints verbatim."
+The user wants us to analyze the image for cataloguing metadata. They want exactly three sections: Title, Description, Keywords. The Title: 6-12 words, descriptive and concrete. Description: 1-2 factual sentences covering key subjects, setting, and action. Keywords: 15-30 unique comma-separated terms, ordered most specific to most general.
 
-We have a context hint: "Description hint: , Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK On a late winter afternoon, a heavy mist hangs over the hills surrounding Loch Katrine in Stronachlachar, Scotland. The muted colours of the February landscape are dominated by dark evergreen forests and the bare branches of deciduous trees. Nestled on the shore is a utility building, part of the infrastructure for the Loch Katrine aqueduct scheme. In th..." The hint is truncated. The capture metadata: "Taken on 2026-02-21 16:14:55 GMT (at 16:14:55 local time)."
+We must use only visually supported facts. If hints conflict with the image, trust the image. Do not output reasoning, notes, or extra sections. Do not copy context hints verbatim. So we need to produce Title, Description, Keywords.
 
-We need to produce Title (6-12 words), Description (1-2 factual sentences), Keywords (15-30 unique terms). Must be based on visual content. The image shows a misty landscape with a loch (lake) in the foreground, a small utility building on the shore, a forest of evergreen and deciduous trees, hills in the background, power lines and towers, a mountain/hill with mist. The water is calm, there are some buoys or markers in the water. The sky is overcast, heavy mist. The building appears to be a small concrete structure, possibly a water treatment or aqueduct building. The power lines are high voltage towers with multiple wires. The overall setting appears to be a Scottish loch, likely Loch Katrine. The date/time hint says taken on 2026-02-21 16:14:55 GMT. The hint says "late winter afternoon". The image appears to be in late winter (bare deciduous trees, some snow? Not visible, but the trees are
+We have an image: a graveyard with moss-covered headstones, a churchyard of St Mary's Church (though not explicitly labeled, but we can infer from context). The background shows Tudor-style half-timbered houses with brick and timber, red roofs, chimneys. There's a tall evergreen tree on left. The sky is partly cloudy, blue. The grass is green. The scene appears to be a late winter or early spring (maybe early spring). The gravestones are ancient, mossy. There's a church building partially visible? Actually the church is not directly visible; the view is from the churchyard looking out over the village square. The houses are Tudor style. There's a road with cars parked. The overall vibe is quaint, historic village.
+
+We need to produce Title: 6-12 words, descriptive and concrete. Something like "Mossy gravestones in St Mary's churchyard, Lenham village". That's 9 words? Let's count: "Mossy gravestones in St Mary's churchyard, Lenham village". Words: Mossy(1) gravestones(2) in(3) St(4) Mary's(5) churchyard,(6) Lenham(7) village(8). That's 8 words, okay.
+
+But we need to be careful: Title must be 6-12 words, descriptive and concrete. Could be "Ancient moss-covered headstones in St Mary's churchyard, Lenham". Count: Ancient(1) moss-covered(2) headstones(3) in(4) St(5) Mary's(6) churchyard,(7) Lenham(8). That's 8 words. Good.
+
+Description:
 ```
 
 ---
 
 ### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
 
-**Metrics:** 61.2 TPS | 500 tokens
+**Metrics:** 61 TPS | 500 tokens
 
 ```text
-<think>Got it, let's tackle this. First, I need to create the Title, Description, and Keywords sections based on the image.
+<think>Got it, let's tackle this. The user wants exactly three sections: Title, Description, Keywords.
 
-Starting with the Title. It needs to be 6-12 words, descriptive and concrete. Looking at the image: there's a lake, power lines, a small building, misty hills. So possible title: "Loch Katrine Shore with Power Lines and Utility Building"
+First, the Title. The image shows a churchyard with headstones, a cross, and village houses. The context hint mentions Lenham, Kent. So a title like "St Mary's Churchyard, Lenham, Kent" or something concise. Let's check the length: 6-12 words. Maybe "Churchyard at St Mary's, Lenham, Kent".
 
-Next, the Description. It needs 1-2 factual sentences covering key subjects, setting, and action. From the image: a body of water (loch), misty hills, power transmission towers, a small white utility building on the shore, evergreen and deciduous trees, a path leading up the hill. So a description: "The image depicts Loch Katrine’s shore, where a small white utility building sits near the water. In the background, misty hills rise, dotted with evergreen and deciduous trees. Two large power transmission towers stand among the trees, with a narrow path leading up the hillside."
+Next, Description. The user's context hint has a description: "A late winter afternoon in the historic village of Lenham, Kent, England. This view from the churchyard of St Mary's Church looks out over the village square. In the foreground, ancient, moss-covered headstones dot the landscape." We need to extract key subjects: churchyard, headstones, cross, village houses (Tudor-style, half-timbered), Lenham, Kent, England. So a 1-2 sentence description. Let's draft: "The image depicts the churchyard of St Mary's Church in Lenham, Kent, England. Ancient, moss-covered gravestones and a stone cross are visible in the foreground, with Tudor-style houses and a village square beyond." Wait, need to keep it concise. Let's try: "This image shows the churchyard of St Mary's Church in Lenham, Kent. Ancient, moss-covered gravestones and a stone cross are visible, with Tudor-style houses and a village square beyond." That's a good description.
 
-Now Keywords. Need 15-30 unique comma-separated terms, ordered most specific to most general. Let's identify key elements: Loch Katrine, Scotland, UK, power transmission towers, utility building, loch, lake, misty hills, evergreen forest, deciduous trees, narrow path, water body, transmission lines, utility infrastructure, rural landscape, Scotland landscape, power infrastructure, loch shore, misty landscape.
+Now Keywords. The user's context hint has a list of keywords. We need to extract 15-30 unique comma-separated terms, ordered most specific to most general. Let's extract from the context hint: "Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue". Now we need to select 15-30 unique terms, ordered most specific to most general. Let's identify the most specific: "St Mary's Church, Lenham, Kent, England, UK". But we need to pick 15-30 terms. Let's list the unique terms from the hint:
 
-Now select the most specific to most general. Let's order them:
+1. Christianity
+2. Cypress Tree
+3. England
 
-- Loch Katrine
-- Stronachlachar
-- Scotland
-- United Kingdom
-- UK
-- Power transmission towers
-- Utility building
-- Loch shore
-- Misty hills
-- Evergreen forest
-- Deciduous trees
-- Narrow path
-- Water body
-- Transmission lines
-- Utility infrastructure
-- Rural landscape
-- Scotland landscape
-- Power infrastructure
-- Misty landscape
-
-Now check the count. Let's count: 1. Loch Katrine 2. Stronachlachar 3. Scotland 4. United Kingdom 5. UK 6. Power transmission towers 7. Utility building 8. Loch shore 9. Misty hills 10. Evergreen forest 11. Deciduous trees 12. Narrow path 13. Water body 14. Transmission lines 15. Utility infrastructure 16. Rural landscape 17. Scotland
 ```
 
 ---
 
 ### ✅ mlx-community/GLM-4.6V-Flash-6bit
 
-**Metrics:** 44.8 TPS | 500 tokens
+**Metrics:** 43.7 TPS | 500 tokens
 
 ```text
-<think>Got it, let's tackle this. First, I need to create the Title, Description, and Keywords sections based on the image.
+<think>Got it, let's tackle this. First, the Title needs to be 6-12 words, descriptive and concrete. Looking at the image, there's a churchyard with gravestones, a cross, and historic buildings in the background. So maybe "Historic Churchyard with Tudor-Style Buildings" – that's 10 words, fits.
 
-Starting with the Title. It needs to be 6-12 words, descriptive and concrete. Looking at the image: there's a lake (Loch Katrine is mentioned in context), power lines, a small building, trees, misty hills. So possible titles: "Loch Katrine Shore with Power Lines and Utility Building" — that's a bit long. Maybe "Misty Loch Katrine Shore with Power Towers and Small Building" — still maybe too long. Let's think of key elements: lake, power lines, small building, misty landscape. Maybe "Loch Katrine Shore: Power Towers, Small Building, and Misty Hills" — that's 11 words, good. Or more concise: "Misty Loch Katrine with Power Towers and Utility Building" — 10 words, good. Let's go with that.
+Next, Description: 1-2 factual sentences covering key subjects, setting, and action. The image shows a churchyard (St Mary's Church, Lenham) with moss-covered gravestones, a tall cypress tree, and historic brick and half-timbered houses in the background. The scene is set on a late winter afternoon with green grass and scattered yellow flowers. So we need to condense that into 1-2 sentences. Let's make it: "A historic churchyard with moss-covered gravestones and a tall cypress tree is set against a backdrop of Tudor-style brick and half-timbered houses, with green grass and scattered yellow flowers under a partly cloudy sky." That's a bit long, but maybe shorten to two sentences. Let's try: "The image depicts a historic churchyard with ancient, moss-covered gravestones and a tall cypress tree. In the background, Tudor-style brick and half-timbered houses line the scene, with green grass and scattered yellow flowers under a partly cloudy sky." That's two sentences, covers key subjects (churchyard, gravestones, cypress tree, Tudor houses), setting (partly cloudy sky, green grass, scattered yellow flowers), and action (depicts, line the scene).
 
-Next, Description. It needs 1-2 factual sentences covering key subjects, setting, and action. Key subjects: lake (Loch Katrine), power transmission towers, small utility building, forested hills, misty atmosphere. Setting: shore of a lake, surrounded by mixed forest (evergreen and deciduous), misty hills in background. Action: none, static scene. So a description: "The image depicts the shore of Loch Katrine, featuring power transmission towers, a small utility building, and a misty landscape with mixed forests and distant hills." That's two sentences, covers key subjects, setting, and action.
-
-Then Keywords. Need 15-30 unique comma-separated terms, ordered most specific to most general. Let's list the elements:
-
-- Specific: Loch Katrine, Stronachlachar (but context hint says Stronachlachar, Scotland, so maybe include that), utility building, power transmission towers, electricity pylons, lake shore, misty landscape, mixed forest, evergreen trees, deciduous trees, hills, Scotland, United Kingdom, UK, water, shore, infrastructure, power lines, mist, winter, landscape photography.
-
-Now order from most specific to most general. Let's start with the most specific elements:
-
-- Loch Katrine
-- Stronachlachar
-- Utility building (maybe more specific: small utility building)
-- Power transmission towers
-- Electricity pylons
-- Lake shore
--
-```
-
----
-
-### ✅ mlx-community/Molmo-7B-D-0924-8bit
-
-**Metrics:** 42.6 TPS | 500 tokens
-
-```text
- The image is a square color photograph taken outdoors in Scotland. It shows a loch (lake) with a utility building on the shore. The scene is misty, with hills and trees visible in the background. Two large power line structures can be seen in the distance. The colors are muted, typical of a Scottish winter landscape. The photograph is taken from a distance, capturing the entire scene. The loch appears calm, with no visible activity on its surface. The utility building has a flat roof and is surrounded by trees and bushes. The power line structures are tall, with multiple cross arms and wires stretching between them. The overall atmosphere is serene and somewhat isolated, with no people or vehicles visible in the image. The photograph exemplifies landscape photography, capturing the natural beauty of Scotland's lochs and infrastructure in a single frame. The image's style is representational realism, accurately depicting the scene without artificial manipulation. The color palette is predominantly muted, with shades of gray, brown, green, and blue, reflecting the winter light and the natural environment. The composition balances the loch in the foreground with the utility building and power lines in the background, creating a sense of scale and relationship between nature and human infrastructure in this Scottish landscape. The photograph's perspective from across the loch creates a sense of depth and space, emphasizing the vastness of the Scottish highlands. The image's style and content make it suitable for use in travel brochures, nature guides, or as a stock photograph representing Scotland's landscapes and infrastructure. The photograph's date and time information are embedded as metadata in the image file, providing precise temporal context for when this winter scene was captured. The location of Stronachlachar, Scotland, is clearly identifiable from the landscape features and the presence of the loch, which is a well-known landmark in the Scottish Highlands. The image's composition, with the utility building as a focal point surrounded by natural elements, showcases the coexistence of human infrastructure within the rugged Scottish landscape. The late winter setting, evident from the bare trees and muted colors, provides a unique atmospheric quality to the scene, highlighting the stark beauty of Scotland's winter landscapes. The photograph's attention to detail in capturing the textures of the mist, the colors of the vegetation, and the structure of the power lines demonstrates the photographer's skill in representing the complex relationship between nature and human engineering in this remote Scottish location. The image's ability to convey a sense of solitude and timelessness
-```
-
----
-
-### ✅ mlx-community/X-Reasoner-7B-8bit
-
-**Metrics:** 47.5 TPS | 115 tokens
-
-```text
-Title: Remote Utility Building by Loch Katrine
-
-Description: A small utility structure sits on the shore of Loch Katrine, surrounded by dense forest and hills, with power lines stretching into the distance.
-
-Keywords: Loch Katrine, utility building, forest, hills, power lines, Scotland, United Kingdom, winter, mist, water, trees, infrastructure, aqueduct, landscape, nature, remote, rural, electricity, environment, Scotland, Stronachlachar, February, 2026, 16:14:55 GMT.
-```
-
----
-
-### ✅ Qwen/Qwen3-VL-2B-Instruct
-
-**Metrics:** 73.9 TPS | 500 tokens
-
-```text
-Title: Loch Katrine, Stronachlachar, Scotland, UK
-
-Description: A misty, overcast view of Loch Katrine in Stronachlachar, Scotland, featuring a utility building on the shore and power lines in the background. The scene is dominated by evergreen trees and bare deciduous trees, with a calm lake reflecting the grey sky.
-
-Keywords: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK, power lines, electricity pylons, utility building, water, lake, forest, trees, mist, winter, sky, evergreen, deciduous, landscape, infrastructure, power, electricity, transmission, power station, dam, reservoir, water tower, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station, electricity, transmission, power station,
+Now Keywords: 15-30 unique comma-separated terms, ordered most specific to most general. Let's list the key elements from the image and hints. Specific terms first: "St Mary's Churchyard", "moss-covered gravestones", "cypress tree", "Tudor-style houses", "half-timbered house", "brick house", "churchyard cross", "ancient headstones", "green grass", "yellow flowers", "partly cloudy sky", "historic village", "Lenham, Kent", "England", "United Kingdom", "UK", "Christian cemetery", "historic architecture", "springtime (implied by yellow flowers)". Now need to order from most specific to most general. Let's start with the most specific: "St Mary's Church
 ```
 
 ---
 
 ### ✅ mlx-community/Molmo-7B-D-0924-bf16
 
-**Metrics:** 27.9 TPS | 500 tokens
+**Metrics:** 26.7 TPS | 28 tokens
 
 ```text
- The image is a square color photograph taken outdoors in Scotland. It shows a loch (lake) with a utility building on the shore. The scene is misty, with hills and trees visible in the background. Power lines can be seen in the distance. The colors are muted, typical of a winter landscape. The photograph is taken from a distance, showing the entire scene. The loch appears calm, with no visible activity. The utility building has a flat roof and is surrounded by trees and vegetation. The overall atmosphere is serene and somewhat isolated, with no people or vehicles visible in the image. The photograph captures the essence of a remote Scottish landscape in winter, showcasing the interplay between natural elements and human infrastructure. The image is well-focused and properly exposed, allowing for clear visibility of the scene's details. The composition includes the loch, surrounding landscape, utility building, and power lines, creating a balanced and visually interesting photograph. The late winter setting is evident from the bare trees and muted color palette, typical of the season in this part of Scotland. The photograph effectively conveys the sense of tranquility and isolation often associated with Scottish lochs, while also highlighting the presence of human engineering in the natural landscape. The late afternoon lighting adds a warm, golden quality to the scene, enhancing its atmospheric qualities. The image's style is representational realism, accurately depicting the real-world scene with attention to detail and accuracy. The color palette is predominantly composed of muted tones, including various shades of green, brown, and gray, with touches of red and yellow providing subtle contrast. The power lines in the distance serve as a reminder of the connection between this remote location and the wider world, while also adding a subtle element of human intervention in the natural landscape. The late winter setting, with its bare trees and muted colors, creates a stark and dramatic contrast between the dark evergreen forests and the lighter ground cover, showcasing the rugged beauty of the Scottish landscape in its coldest season. The late afternoon light bathes the scene in a warm, golden glow, enhancing the atmospheric qualities of the misty loch and surrounding forest. The composition of the photograph, with the loch as the central focus, framed by the utility building, trees, and distant hills, creates a balanced and visually interesting image that captures the essence of a remote Scottish winter landscape. The late winter setting is evident from the bare trees and muted color palette, typical of the season in this part of Scotland. The late
+ Camera: Canon EOS R5 Mark III with RF 24-105mm f/4L IS USM lens.
+```
+
+---
+
+### ✅ mlx-community/Molmo-7B-D-0924-8bit
+
+**Metrics:** 41.6 TPS | 36 tokens
+
+```text
+ Camera: Canon EOS 100D Mark III with EF-S 18-135mm f/3.5-5.6 IS III lens.
+```
+
+---
+
+### ✅ mlx-community/X-Reasoner-7B-8bit
+
+**Metrics:** 46.5 TPS | 500 tokens
+
+```text
+**Title:** Ancient Headstones in a Village Churchyard, Lenham, Kent, England
+
+**Description:** A tranquil scene of a historic village churchyard in Lenham, Kent, England, featuring weathered gravestones and a backdrop of half-timbered Tudor-style houses under a partly cloudy sky.
+
+**Keywords:** Lenham, Kent, England, UK, churchyard, gravestones, half-timbered houses, Tudor-style, ancient, moss-covered, grass, cemetery, village, England, Europe, United Kingdom, history, architecture, cemetery, bare trees, blue sky, spring, winter, grass, stone, cross, headstone, church, village square, cemetery, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient grav
+```
+
+---
+
+### ✅ Qwen/Qwen3-VL-2B-Instruct
+
+**Metrics:** 73.7 TPS | 500 tokens
+
+```text
+Title: Gravestones in a churchyard in Lenham, Kent, England
+
+Description: A quiet churchyard in Lenham, Kent, England, featuring moss-covered gravestones and a half-timbered house in the background. The scene is set on a bright day with a blue sky and scattered clouds.
+
+Keywords: Lenham, Kent, England, St Mary's Church, Tudor-style Houses, half-timbered house, churchyard, ancient gravestones, moss, grass, bare trees, blue sky, spring, Quaint, Tudor-style, UK, United Kingdom, Parish church, Christianity, Graveyard, Cypress Tree, Tudor, Tudor-style, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tud
 ```
 
 ---
 
 ### ✅ mlx-community/Qwen3-VL-2B-Thinking-bf16
 
-**Metrics:** 68.3 TPS | 500 tokens
+**Metrics:** 75.1 TPS | 500 tokens
 
 ```text
-Got it, let's tackle this. First, the Title needs to be 6-12 words, descriptive and concrete. The image shows a misty landscape with a lake, trees, a small building, power lines. From the context, it's Loch Katrine, Stronachlachar, Scotland. So Title: Misty Loch Katrine landscape with utility building and power lines.
-
-Description: 1-2 factual sentences. Key subjects: Loch Katrine, Stronachlachar, Scotland; setting: misty, overcast; action: utility building, power lines. So: A misty landscape of Loch Katrine in Stronachlachar, Scotland features a small utility building and power lines amidst dense evergreen forests and a hilly backdrop.
-
-Keywords: 15-30 unique, ordered most specific to most general. Let's list: Loch Katrine, Stronachlachar, Scotland, misty, overcast, evergreen forests, power lines, utility building, hilly landscape, winter, bare branches, deciduous trees, small house, water body, lake, forested hills, industrial infrastructure, rural setting, foggy, late winter, Scottish Highlands, Scottish landscape, misty hills, water, forest, power station, utility, small structure, rural, misty, fog, winter landscape, Scottish countryside.
-
-Wait, need to check if the image matches. The context says "Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK" so those are key. The image has a lake (loch), mist, trees, utility building, power lines. So keywords should include those. Let's make sure they're unique and ordered. Let's list:
-
-Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK, misty, overcast, evergreen forests, power lines, utility building, hilly landscape, winter, bare branches, deciduous trees, small house, water body, lake, forested hills, industrial infrastructure, rural setting, foggy, late winter, Scottish Highlands, Scottish landscape, misty hills, water, forest, power station, utility, small structure, rural, misty, fog, winter landscape, Scottish countryside.
-
-Wait, need to check if the image has a small house (utility building) and power lines. The context says "utility building, part of the infrastructure for the Loch
+Got it, let's tackle this. First, the Title needs to be 6-12 words, descriptive and concrete. The image is a graveyard with a churchyard, so maybe "Graveyard of St Mary's Church Lenham England" but need to check. Wait, the context says St Mary's Church, Lenham, England. So Title: "St Mary's Churchyard Lenham England" but let's count words. "St Mary's Churchyard Lenham England" is 6 words. Wait, "St Mary's Churchyard Lenham England" is 6 words. Wait, no, "St Mary's Churchyard" is 5 words, "Lenham England" is 2, total 7. Wait, maybe "Ancient Headstones in St Mary's Churchyard Lenham England" but need to be concrete. Wait, the image shows a graveyard with headstones, so maybe "Graveyard Headstones St Mary's Church Lenham England" but let's check the context. The caption says "St Mary's Church" so Title should be descriptive. Let's go with "St Mary's Churchyard Lenham England" but maybe "Graveyard Headstones St Mary's Church Lenham England" but 6-12 words. Wait, "St Mary's Churchyard Lenham England" is 6 words. Wait, no, "St Mary's Churchyard" is 5 words, "Lenham England" is 2, total 7. Wait, maybe "Ancient Headstones in St Mary's Churchyard Lenham England" is 7 words. Wait, the context says "St Mary's Church, Lenham, England, United Kingdom, UK" so Title: "St Mary's Churchyard Lenham England" but let's make it concrete. Maybe "St Mary's Churchyard Lenham England" is 6 words. Wait, maybe "Graveyard Headstones St Mary's Church Lenham England" is 7 words. Wait, the problem says 6-12 words. Let's count: "St Mary's Churchyard Lenham England" is 6 words. Wait, no, "St Mary's Churchyard" is 5 words, "Lenham England" is 2, total 7. Wait, maybe "Ancient Headstones in St Mary's Churchyard Lenham England" is 7 words. Wait, maybe "St Mary's
 ```
 
 ---
 
 ### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
-**Metrics:** 6.76 TPS | 500 tokens
+**Metrics:** 7.84 TPS | 500 tokens
 
 ```text
-Title: Misty Landscape of Loch Katrine in Winter
+**Title:** Ancient Headstones in the Village of Lenham, England
 
-Description: The image depicts a serene winter landscape of Loch Katrine in Scotland, with a heavy mist hanging over the hills. The scene features a mix of dark evergreen forests and bare deciduous trees, with a small utility building on the shore.
+**Description:** The image depicts a historic churchyard in the village of Lenham, England, featuring a collection of ancient headstones and a picturesque village backdrop. The scene is set on a late winter afternoon, with the churchyard's lush green grass and the village's traditional architecture creating a serene atmosphere.
 
-Keywords: Loch Katrine, Scotland, winter, mist, evergreen forests, deciduous trees, utility building, landscape, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees, forest, woods, nature, scenery, outdoor, environment, water, lake, mountains, hills, trees
+**Keywords:** Ancient, Headstones, Village, Churchyard, Lenham, England, Traditional Architecture, Lush Green Grass, Serene Atmosphere, Historic, Cemetery, Graveyard, Old, Traditional, Historic Village, English Village, Church, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic, Cemetery, Graveyard, Old, Traditional, Historic,
 ```
 
 ---
 
 ### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
 
-**Metrics:** 173 TPS | 500 tokens
+**Metrics:** 179 TPS | 126 tokens
 
 ```text
-Title: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK
-Description: On a late winter afternoon, a heavy mist hangs over the hills surrounding Loch Katrine in Stronachlachar, Scotland. The muted colours of the February landscape are dominated by dark evergreen forests and the bare branches of deciduous trees. Nestled on the shore is a utility building, part of the infrastructure for the Loch Katrine aqueduct scheme. In the background, a high-voltage power line stretches across the landscape.
-Keywords: Loch Katrine, Stronachlachar, Scotland, United Kingdom, UK, late winter, heavy mist, dark evergreen forests, bare deciduous trees, utility building, high-voltage power line, infrastructure, aqueduct scheme, February, muted colors, hills, shoreline, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure, aqueduct scheme, February landscape, heavy mist, dark evergreen forests, bare deciduous trees, utility building, infrastructure,
+Title: St Mary's Church, Lenham, England, United Kingdom, UK
+Description: Late winter afternoon in historic village of Lenham, Kent, England. View from churchyard of St Mary's Church, looking out over village square. In foreground, ancient moss-covered gravestones dot grassy field.
+Keywords: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue
 ```
 
 ---
 
 ### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
 
-**Metrics:** 3.63 TPS | 500 tokens
+**Metrics:** 3.67 TPS | 500 tokens
 
 ```text
-Title: Misty Loch Katrine Landscape with Utility Tower and Abandoned Building
+**Title:** Ancient Tombs in the Village of St. Mary's Church, Lenham, England
 
-Description: The image depicts a misty landscape of Loch Katrine in Scotland, featuring a utility tower and an abandoned building on the shore. The scene is characterized by the presence of dark evergreen forests and bare deciduous trees.
+**Description:** The image depicts a serene and historic graveyard in the village of Lenham, England, with a mix of old and moss-covered headstones and a few trees and houses in the background. The scene is set on a cloudy day, with the sun casting a warm glow over the scene.
 
-Keywords: Loch Katrine, Scotland, mist, utility tower, abandoned building, evergreen forest, deciduous trees, landscape, nature, scenery, environment, wilderness, outdoor, landscape photography, nature photography, environmental, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape, scenery, wilderness, outdoor, photography, environmental, nature, landscape,
+**Keywords:** St. Mary's Church, Lenham, England, Village, Graveyard, Headstones, Moss, Trees, Houses, Clouds, Daylight, Serene, Historic, Old, Cemetery, Landscape, Nature, Architecture, History, Tradition, Tradition, Culture, Community, Faith, Worship, Memorial, Remembrance, Heritage, Preservation, Conservation, Restoration, History, Tradition, Culture, Community, Faith, Worship, Memorial, Remembrance, Heritage, Preservation, Conservation, Restoration, History, Tradition, Culture, Community, Faith, Worship, Memorial, Remembrance, Heritage, Preservation, Conservation, Restoration, History, Tradition, Culture, Community, Faith, Worship, Memorial, Remembrance, Heritage, Preservation, Conservation, Restoration, History, Tradition, Culture, Community, Faith, Worship, Memorial, Remembrance, Heritage, Preservation, Conservation, Restoration, History, Tradition, Culture, Community, Faith, Worship, Memorial, Remembrance, Heritage, Preservation, Conservation, Restoration, History, Tradition, Culture, Community, Faith, Worship, Memorial, Remembrance, Heritage, Preservation, Conservation, Restoration, History, Tradition, Culture, Community, Faith, Worship, Memorial, Remembrance, Heritage, Preservation, Conservation, Restoration, History, Tradition, Culture, Community, Faith, Worship, Memorial, Remembrance, Heritage, Preservation, Conservation, Restoration, History, Tradition, Culture, Community, Faith, Worship, Memorial, Remembrance, Heritage, Preservation, Conservation, Restoration, History, Tradition, Culture, Community, Faith, Worship, Memorial, Remembrance, Heritage, Preservation, Conservation, Restoration, History, Tradition, Culture, Community, Faith, Worship, Memorial, Remembrance, Heritage, Preservation, Conservation, Restoration, History, Tradition, Culture, Community, Faith, Worship, Memorial, Remembrance, Heritage, Preservation, Conservation, Restoration, History, Tradition, Culture, Community, Faith, Worship, Memorial, Remembrance, Heritage, Preservation, Conservation, Restoration, History, Tradition, Culture, Community, Faith, Worship, Memorial, Remembrance, Heritage
 ```
 
 ---
@@ -1236,7 +1317,7 @@ Keywords: Loch Katrine, Scotland, mist, utility tower, abandoned building, everg
 
 - `Pillow`: `12.1.1`
 - `huggingface-hub`: `1.5.0`
-- `mlx`: `0.31.0.dev20260227+365d6f29`
+- `mlx`: `0.31.1.dev20260301+6482d13d`
 - `mlx-lm`: `0.30.8`
 - `mlx-metal`: ``
 - `mlx-vlm`: `0.3.12`
@@ -1244,4 +1325,4 @@ Keywords: Loch Katrine, Scotland, mist, utility tower, abandoned building, everg
 - `tokenizers`: `0.22.2`
 - `transformers`: `5.2.0`
 
-_Report generated on: 2026-02-27 22:57:22 GMT_
+_Report generated on: 2026-03-01 22:26:38 GMT_

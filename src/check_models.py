@@ -7775,6 +7775,76 @@ def _diagnostics_history_section(
     return parts
 
 
+def _diagnostics_unflagged_success_section(
+    *,
+    successful: list[PerformanceResult],
+    failed: list[PerformanceResult],
+    harness_results: list[tuple[PerformanceResult, str]],
+    stack_signals: list[tuple[PerformanceResult, str, str]],
+) -> list[str]:
+    """Build a near-end section listing successful models with no diagnostics flags."""
+    failed_models = {res.model_name for res in failed}
+    harness_models = {res.model_name for res, _ in harness_results}
+    stack_models = {res.model_name for res, _symptom, _owner in stack_signals}
+    flagged_models = failed_models | harness_models | stack_models
+
+    unflagged_successful = [res for res in successful if res.model_name not in flagged_models]
+    if not unflagged_successful:
+        return []
+
+    clean_models: list[str] = []
+    quality_warning_models: list[str] = []
+    no_analysis_models: list[str] = []
+
+    for res in sorted(unflagged_successful, key=lambda row: row.model_name):
+        qa = res.quality_analysis
+        if qa is None and res.generation is not None:
+            qa = getattr(res.generation, "quality_analysis", None)
+
+        if qa is None:
+            no_analysis_models.append(res.model_name)
+            continue
+
+        if qa.has_any_issues():
+            quality_warning_models.append(res.model_name)
+        else:
+            clean_models.append(res.model_name)
+
+    parts: list[str] = ["---", ""]
+    _append_markdown_section(
+        parts,
+        title=f"## Models Not Flagged ({len(unflagged_successful)} model(s))",
+        body_lines=[
+            "These models completed without diagnostics flags "
+            "(no hard failure, harness warning, or stack-signal anomaly).",
+        ],
+    )
+
+    if clean_models:
+        parts.append(f"### Clean output ({len(clean_models)} model(s))")
+        parts.append("")
+        parts.extend(f"- `{DIAGNOSTICS_ESCAPER.escape(model)}`" for model in clean_models)
+        parts.append("")
+
+    if quality_warning_models:
+        parts.append(
+            f"### Passed with quality warnings ({len(quality_warning_models)} model(s))",
+        )
+        parts.append("")
+        parts.extend(f"- `{DIAGNOSTICS_ESCAPER.escape(model)}`" for model in quality_warning_models)
+        parts.append("")
+
+    if no_analysis_models:
+        parts.append(
+            f"### Passed (quality analysis unavailable) ({len(no_analysis_models)} model(s))",
+        )
+        parts.append("")
+        parts.extend(f"- `{DIAGNOSTICS_ESCAPER.escape(model)}`" for model in no_analysis_models)
+        parts.append("")
+
+    return parts
+
+
 def _build_repro_command_tokens(
     *,
     image_path: Path | None,
@@ -8236,6 +8306,14 @@ def generate_diagnostics_report(
             failed=failed,
             previous_history=previous_history,
             diagnostics_context=diagnostics_context,
+        ),
+    )
+    parts.extend(
+        _diagnostics_unflagged_success_section(
+            successful=successful,
+            failed=failed,
+            harness_results=harness_results,
+            stack_signals=stack_signals,
         ),
     )
     parts.extend(
