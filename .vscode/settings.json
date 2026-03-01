@@ -31,7 +31,10 @@
   "mypy.configFile": "src/pyproject.toml",
   "python.analysis.stubPath": "src/typings",
   "python.analysis.exclude": [
-    "**/typings/**"
+    "**/typings/**",
+    "**/node_modules",
+    "**/__pycache__",
+    "**/.*"
   ],
   "python.analysis.useLibraryCodeForTypes": true,
   // Match pyproject.toml [tool.pyright] typeCheckingMode = "basic"
