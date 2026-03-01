@@ -7787,12 +7787,140 @@ def _diagnostics_history_section(
     return parts
 
 
-def _diagnostics_unflagged_success_section(
+def _partition_success_diagnostics(
     *,
     successful: list[PerformanceResult],
+    harness_results: list[tuple[PerformanceResult, str]],
+    stack_signals: list[tuple[PerformanceResult, str, str]],
+) -> tuple[
+    list[tuple[PerformanceResult, str]],
+    list[tuple[PerformanceResult, str, str]],
+    list[PerformanceResult],
+]:
+    """Partition successful runs into exclusive diagnostics buckets.
+
+    Precedence is stable and explicit: harness -> stack -> unflagged summary.
+    """
+    harness_unique: list[tuple[PerformanceResult, str]] = []
+    harness_seen: set[str] = set()
+    for res, text in harness_results:
+        if res.model_name in harness_seen:
+            continue
+        harness_seen.add(res.model_name)
+        harness_unique.append((res, text))
+
+    stack_unique: list[tuple[PerformanceResult, str, str]] = []
+    stack_seen: set[str] = set()
+    for res, symptom, owner in stack_signals:
+        if res.model_name in harness_seen or res.model_name in stack_seen:
+            continue
+        stack_seen.add(res.model_name)
+        stack_unique.append((res, symptom, owner))
+
+    unflagged_successful = [
+        res
+        for res in successful
+        if res.model_name not in harness_seen and res.model_name not in stack_seen
+    ]
+
+    return harness_unique, stack_unique, unflagged_successful
+
+
+def _diagnostics_coverage_and_runtime_section(
+    *,
+    results: list[PerformanceResult],
     failed: list[PerformanceResult],
     harness_results: list[tuple[PerformanceResult, str]],
     stack_signals: list[tuple[PerformanceResult, str, str]],
+    unflagged_successful: list[PerformanceResult],
+) -> list[str]:
+    """Build coverage verification and aggregate runtime metrics section."""
+    if not results:
+        return []
+
+    detailed_names = [
+        *[res.model_name for res in failed],
+        *[res.model_name for res, _ in harness_results],
+        *[res.model_name for res, _symptom, _owner in stack_signals],
+    ]
+    summary_names = [res.model_name for res in unflagged_successful]
+    listed_names = [*detailed_names, *summary_names]
+
+    name_counts = Counter(listed_names)
+    duplicate_names = sorted(name for name, count in name_counts.items() if count > 1)
+    missing_names = sorted({res.model_name for res in results} - set(listed_names))
+
+    coverage_ok = not duplicate_names and not missing_names and len(listed_names) == len(results)
+    coverage_text = (
+        "✅ Complete (each model appears exactly once)."
+        if coverage_ok
+        else "⚠️ Incomplete (duplicates or missing model entries detected)."
+    )
+
+    runtime_per_model: list[float] = []
+    missing_timing_models = 0
+    for res in results:
+        if isinstance(res.total_time, int | float) and float(res.total_time) >= 0.0:
+            runtime_per_model.append(float(res.total_time))
+            continue
+
+        generation_time = (
+            float(res.generation_time)
+            if isinstance(res.generation_time, int | float) and float(res.generation_time) >= 0.0
+            else None
+        )
+        model_load_time = (
+            float(res.model_load_time)
+            if isinstance(res.model_load_time, int | float) and float(res.model_load_time) >= 0.0
+            else None
+        )
+
+        if generation_time is not None or model_load_time is not None:
+            runtime_per_model.append((generation_time or 0.0) + (model_load_time or 0.0))
+        else:
+            missing_timing_models += 1
+            runtime_per_model.append(0.0)
+
+    total_runtime = sum(runtime_per_model)
+    avg_runtime = total_runtime / len(runtime_per_model)
+
+    parts: list[str] = ["---", ""]
+    _append_markdown_section(parts, title="## Coverage & Runtime Metrics")
+    parts.append(f"- **Detailed diagnostics models:** {len(detailed_names)}")
+    parts.append(f"- **Summary diagnostics models:** {len(summary_names)}")
+    parts.append(f"- **Coverage check:** {coverage_text}")
+
+    if duplicate_names:
+        duplicate_text = ", ".join(
+            f"`{DIAGNOSTICS_ESCAPER.escape(name)}`" for name in duplicate_names
+        )
+        parts.append(f"- **Duplicates:** {duplicate_text}")
+    if missing_names:
+        missing_text = ", ".join(f"`{DIAGNOSTICS_ESCAPER.escape(name)}`" for name in missing_names)
+        parts.append(f"- **Missing from diagnostics sections:** {missing_text}")
+
+    parts.append(
+        "- **Total model runtime (sum):** "
+        f"{format_overall_runtime(total_runtime)} ({total_runtime:.2f}s)",
+    )
+    parts.append(
+        "- **Average runtime per model:** "
+        f"{format_overall_runtime(avg_runtime)} ({avg_runtime:.2f}s)",
+    )
+    if missing_timing_models:
+        parts.append(
+            "- **Runtime note:** "
+            f"{missing_timing_models} model(s) had missing timing fields "
+            "and were counted as 0.00s.",
+        )
+
+    parts.append("")
+    return parts
+
+
+def _diagnostics_unflagged_success_section(
+    *,
+    unflagged_successful: list[PerformanceResult],
 ) -> list[str]:
     """Build a near-end section listing successful models with no diagnostics flags."""
 
@@ -7809,12 +7937,6 @@ def _diagnostics_unflagged_success_section(
 
         return "Quality warnings detected by analysis."
 
-    failed_models = {res.model_name for res in failed}
-    harness_models = {res.model_name for res, _ in harness_results}
-    stack_models = {res.model_name for res, _symptom, _owner in stack_signals}
-    flagged_models = failed_models | harness_models | stack_models
-
-    unflagged_successful = [res for res in successful if res.model_name not in flagged_models]
     if not unflagged_successful:
         return []
 
@@ -8265,8 +8387,13 @@ def generate_diagnostics_report(
     """
     failed = [r for r in results if not r.success]
     successful = [r for r in results if r.success]
-    harness_results = _collect_harness_results(successful)
-    stack_signals = _collect_stack_issue_signals(successful)
+    harness_detected = _collect_harness_results(successful)
+    stack_detected = _collect_stack_issue_signals(successful)
+    harness_results, stack_signals, unflagged_successful = _partition_success_diagnostics(
+        successful=successful,
+        harness_results=harness_detected,
+        stack_signals=stack_detected,
+    )
     preflight_issues = list(history.preflight_issues) if history is not None else []
     # Repro bundles are exported separately and referenced in output artifacts.
     # Diagnostics filing guidance now includes only the repro command.
@@ -8338,11 +8465,17 @@ def generate_diagnostics_report(
         ),
     )
     parts.extend(
-        _diagnostics_unflagged_success_section(
-            successful=successful,
+        _diagnostics_coverage_and_runtime_section(
+            results=results,
             failed=failed,
             harness_results=harness_results,
             stack_signals=stack_signals,
+            unflagged_successful=unflagged_successful,
+        ),
+    )
+    parts.extend(
+        _diagnostics_unflagged_success_section(
+            unflagged_successful=unflagged_successful,
         ),
     )
     parts.extend(

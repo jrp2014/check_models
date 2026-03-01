@@ -140,6 +140,12 @@ Notable changes to this project will be documented in this file.
   - renamed the warnings bucket to `Ran, but with quality warnings`;
   - added a per-model one-line warning summary derived from already captured
     quality-analysis signals.
+- Added diagnostics completeness/runtime verification near the report footer:
+  - explicit `Coverage & Runtime Metrics` section validates that each model run
+    appears exactly once across detailed vs summary diagnostics buckets;
+  - added aggregate runtime metrics (total model-runtime sum and average per
+    model), with a clear fallback note when per-model timing fields are
+    missing.
 - Optimized hot paths in `src/check_models.py`:
   - Hugging Face cache scans are now reused via a per-run cache helper.
   - Quality analysis is reused when `PerformanceResult.quality_analysis`

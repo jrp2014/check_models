@@ -790,6 +790,40 @@ class TestDiagnosticsReport:
         assert "`org/warn`:" in content
         assert "Output formatting deviated from the requested structure." in content
 
+    def test_coverage_and_runtime_metrics_section(self, tmp_path: Path) -> None:
+        """Diagnostics should verify exclusive model coverage and report aggregate runtime."""
+        out = tmp_path / "diag.md"
+        stack_only_success = PerformanceResult(
+            model_name="org/stack",
+            success=True,
+            generation=_MockGeneration(text="", prompt_tokens=5000, generation_tokens=0),
+            total_time=2.0,
+            generation_time=1.0,
+            model_load_time=1.0,
+        )
+        generate_diagnostics_report(
+            results=[
+                _make_failure_with_details("org/fail"),
+                _make_harness_success("org/harness"),
+                stack_only_success,
+                _make_success("org/clean"),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "## Coverage & Runtime Metrics" in content
+        assert "**Detailed diagnostics models:** 3" in content
+        assert "**Summary diagnostics models:** 1" in content
+        assert "**Coverage check:** ✅ Complete (each model appears exactly once)." in content
+        assert "**Total model runtime (sum):**" in content
+        assert "**Average runtime per model:**" in content
+        assert "Runtime aggregates: unavailable" not in content
+        assert "**Runtime note:**" in content
+
     def test_report_written_for_stack_signal_without_failures(self, tmp_path: Path) -> None:
         """Suspicious successful runs should still produce diagnostics for stack triage."""
         out = tmp_path / "diag.md"
