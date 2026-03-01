@@ -129,17 +129,16 @@ _Generated on 2026-03-01 22:26:38 GMT_
   - Error: `Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimo...`
   - Type: `ValueError`
 
-> **Prompt used:**
->
+**Prompt used:**
 
-> ```text
-> Analyze this image for cataloguing metadata.
->
-> Return exactly these three sections, and nothing else:
->
-> Title: 6-12 words, descriptive and concrete.
->
-> Description: 1-2 factual sentences covering key subjects, setting, and action.
+```text
+Analyze this image for cataloguing metadata.
+
+Return exactly these three sections, and nothing else:
+
+Title: 6-12 words, descriptive and concrete.
+
+Description: 1-2 factual sentences covering key subjects, setting, and action.
 >
 > Keywords: 15-30 unique comma-separated terms, ordered most specific to most general.
 >
@@ -347,7 +346,7 @@ ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to
 **Error:**
 
 > Model runtime error during generation for mlx-community/InternVL3-14B-8bit:
-> LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
+> LanguageModel.\_\_call\_\_() got an unexpected keyword argument 'n_to_process'
 **Type:** `ValueError`
 **Phase:** `decode`
 **Code:** `MLX_VLM_DECODE_API_MISMATCH`
@@ -417,7 +416,7 @@ ValueError: Model runtime error during generation for mlx-community/InternVL3-14
 **Error:**
 
 > Model runtime error during generation for mlx-community/InternVL3-8B-bf16:
-> LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
+> LanguageModel.\_\_call\_\_() got an unexpected keyword argument 'n_to_process'
 **Type:** `ValueError`
 **Phase:** `decode`
 **Code:** `MLX_VLM_DECODE_API_MISMATCH`

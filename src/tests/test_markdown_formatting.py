@@ -196,3 +196,16 @@ def test_error_without_url_unchanged() -> None:
     )
     md = _gallery_lines_for(result)
     assert "Out of memory during generation" in md
+
+
+def test_error_text_escapes_underscore_emphasis_markers() -> None:
+    """Error prose should escape underscores to avoid unintended strong emphasis."""
+    result = check_models.PerformanceResult(
+        model_name="test/model",
+        generation=None,
+        success=False,
+        error_stage="API Mismatch",
+        error_message="LanguageModel.__call__() got an unexpected keyword argument",
+    )
+    md = _gallery_lines_for(result)
+    assert "LanguageModel.\\_\\_call\\_\\_() got an unexpected keyword argument" in md

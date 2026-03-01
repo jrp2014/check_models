@@ -978,6 +978,18 @@ def _gallery_render_error(res: PerformanceResult) -> list[str]:
     out.append(f"**Status:** Failed ({res.error_stage})")
     error_msg = str(res.error_message)
     error_msg = re.sub(r"(?<![<(])(https?://[^\s>)]+)", r"<\1>", error_msg)
+
+    url_token_re = re.compile(r"<https?://[^>]+>")
+    escaped_parts: list[str] = []
+    start = 0
+    for match in url_token_re.finditer(error_msg):
+        segment = error_msg[start : match.start()]
+        escaped_parts.append(segment.replace("*", r"\*").replace("_", r"\_"))
+        escaped_parts.append(match.group(0))
+        start = match.end()
+    tail = error_msg[start:]
+    escaped_parts.append(tail.replace("*", r"\*").replace("_", r"\_"))
+    error_msg = "".join(escaped_parts)
     max_inline_length = 80
     if len(error_msg) > max_inline_length:
         wrapped_lines = textwrap.wrap(
@@ -8915,14 +8927,13 @@ def generate_markdown_report(
     if failures_by_pkg:
         md.extend(failures_by_pkg)
 
-    # Embed prompt in a blockquote with a fenced code block to avoid
-    # MD032 (lists-need-blank-lines) when the prompt contains list items.
-    md.append("> **Prompt used:**")
-    md.append(">")
+    # Render prompt as a plain fenced block. This avoids markdownlint MD028
+    # when the prompt itself contains blank lines.
+    md.append("**Prompt used:**")
     md.append("")
-    md.append("> ```text")
-    md.extend(f"> {prompt_line}" for prompt_line in prompt.split("\n"))
-    md.append("> ```")
+    md.append("```text")
+    md.extend(prompt.split("\n"))
+    md.append("```")
     md.append("")
     md.append(
         "**Note:** Results sorted: errors first, then by generation time (fastest to slowest).",

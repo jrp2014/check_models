@@ -308,6 +308,21 @@ class TestMarkdownReportEdgeCases:
         assert "org/good" in content
         assert "org/bad" in content
 
+    def test_prompt_section_uses_plain_fenced_block(self, tmp_path: Path) -> None:
+        """Prompt section should be a plain fenced block to avoid blockquote lint issues."""
+        out = tmp_path / "blockquote.md"
+        generate_markdown_report(
+            results=[_make_success("org/good")],
+            filename=out,
+            versions=_stub_versions(),
+            prompt="line one\n\nline two",
+            total_runtime_seconds=1.0,
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "**Prompt used:**" in content
+        assert "```text" in content
+        assert "> **Prompt used:**" not in content
+
 
 # ===================================================================
 # TSV report
