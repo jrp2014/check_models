@@ -7795,6 +7795,20 @@ def _diagnostics_unflagged_success_section(
     stack_signals: list[tuple[PerformanceResult, str, str]],
 ) -> list[str]:
     """Build a near-end section listing successful models with no diagnostics flags."""
+
+    def _quality_warning_summary(analysis: GenerationQualityAnalysis) -> str:
+        """Build a concise one-line quality warning summary from existing analysis data."""
+        signals = _summarize_quality_signals(analysis)
+        if signals:
+            return _truncate_text_preview(signals[0], max_chars=120)
+
+        for issue in analysis.issues:
+            if issue.startswith("⚠️HARNESS"):
+                continue
+            return _truncate_text_preview(issue, max_chars=120)
+
+        return "Quality warnings detected by analysis."
+
     failed_models = {res.model_name for res in failed}
     harness_models = {res.model_name for res, _ in harness_results}
     stack_models = {res.model_name for res, _symptom, _owner in stack_signals}
@@ -7805,7 +7819,7 @@ def _diagnostics_unflagged_success_section(
         return []
 
     clean_models: list[str] = []
-    quality_warning_models: list[str] = []
+    quality_warning_models: list[tuple[str, str]] = []
     no_analysis_models: list[str] = []
 
     for res in sorted(unflagged_successful, key=lambda row: row.model_name):
@@ -7818,7 +7832,7 @@ def _diagnostics_unflagged_success_section(
             continue
 
         if qa.has_any_issues():
-            quality_warning_models.append(res.model_name)
+            quality_warning_models.append((res.model_name, _quality_warning_summary(qa)))
         else:
             clean_models.append(res.model_name)
 
@@ -7840,10 +7854,13 @@ def _diagnostics_unflagged_success_section(
 
     if quality_warning_models:
         parts.append(
-            f"### Passed with quality warnings ({len(quality_warning_models)} model(s))",
+            f"### Ran, but with quality warnings ({len(quality_warning_models)} model(s))",
         )
         parts.append("")
-        parts.extend(f"- `{DIAGNOSTICS_ESCAPER.escape(model)}`" for model in quality_warning_models)
+        parts.extend(
+            (f"- `{DIAGNOSTICS_ESCAPER.escape(model)}`: {DIAGNOSTICS_ESCAPER.escape(summary)}")
+            for model, summary in quality_warning_models
+        )
         parts.append("")
 
     if no_analysis_models:

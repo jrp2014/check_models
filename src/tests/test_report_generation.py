@@ -785,9 +785,10 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         assert "## Models Not Flagged (2 model(s))" in content
         assert "### Clean output (1 model(s))" in content
-        assert "### Passed with quality warnings (1 model(s))" in content
+        assert "### Ran, but with quality warnings (1 model(s))" in content
         assert "`org/clean`" in content
-        assert "`org/warn`" in content
+        assert "`org/warn`:" in content
+        assert "Output formatting deviated from the requested structure." in content
 
     def test_report_written_for_stack_signal_without_failures(self, tmp_path: Path) -> None:
         """Suspicious successful runs should still produce diagnostics for stack triage."""
