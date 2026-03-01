@@ -144,6 +144,15 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Fixed Markdown report generation so `results.md` avoids markdownlint
+  violations from prompt/error rendering:
+  - prompt output now uses a plain fenced code block (not blockquote-wrapped)
+    to prevent `MD028/no-blanks-blockquote` when prompt text contains blank
+    lines;
+  - gallery error prose now escapes emphasis markers in non-URL segments so
+    identifiers like `LanguageModel.__call__()` do not trigger
+    `MD050/strong-style`.
+
 - Replaced a brittle type-only dependency on internal Transformers module
   `transformers.tokenization_python.PythonBackend` with a stable `Any` cast at
   the mlx-vlm call boundary, avoiding reliance on non-public import paths.
