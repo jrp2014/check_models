@@ -28,6 +28,9 @@ if TYPE_CHECKING:
 
     from check_models import HistoryModelResultRecord, HistoryRunRecord
 
+THINKING_START_TOKEN = "<think>"
+THINKING_END_TOKEN = "</think>"
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -1036,6 +1039,14 @@ class TestDiagnosticsReport:
             adapter_path=None,
             prompt=None,
             detailed_metrics=False,
+            resize_shape=(768, 512),
+            eos_tokens=("</think>",),
+            skip_special_tokens=True,
+            processor_kwargs={"cropping": False},
+            enable_thinking=True,
+            thinking_budget=96,
+            thinking_start_token=THINKING_START_TOKEN,
+            thinking_end_token=THINKING_END_TOKEN,
             max_tokens=123,
             temperature=0.7,
             top_p=0.92,
@@ -1067,6 +1078,13 @@ class TestDiagnosticsReport:
         assert "--max-tokens 123" in content
         assert "--temperature 0.7" in content
         assert "--top-p 0.92" in content
+        assert "--resize-shape 768 512" in content
+        assert "--eos-tokens '</think>'" in content
+        assert "--skip-special-tokens" in content
+        assert "--processor-kwargs '{\"cropping\": false}'" in content
+        assert "--enable-thinking" in content
+        assert "--thinking-budget 96" in content
+        assert "--thinking-start-token '<think>'" in content
         assert "--repetition-penalty 1.1" in content
         assert "--repetition-context-size 50" in content
         assert "--timeout 42.0" in content

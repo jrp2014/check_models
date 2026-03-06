@@ -23,6 +23,7 @@ _OUTPUT_DIR = _SRC_DIR / "output"
         (["--max-tokens", "-1"], "max_tokens must be > 0"),
         (["--temperature", "-5"], "Temperature must be non-negative"),
         (["--kv-bits", "16"], "kv_bits must be"),
+        (["--thinking-budget", "64"], "require --enable-thinking"),
         (["--folder"], "Folder"),  # Missing folder path
         (["--unknown-flag"], "unrecognized arguments"),
     ],

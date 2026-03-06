@@ -10,6 +10,7 @@ Notable changes to this project will be documented in this file.
 
 - Began expanding `src/check_models.py` generation parity with upstream `mlx_vlm.generate`:
   - added CLI/runtime support for `resize_shape`, `eos_tokens`, `skip_special_tokens`, and JSON `processor_kwargs` passthrough;
+  - added opt-in thinking-mode support via `enable_thinking`, `thinking_budget`, `thinking_start_token`, and `thinking_end_token`;
   - normalizes these values centrally during CLI validation so model runs receive consistent typed kwargs.
 
 - Refactored `diagnostics.md` output structure for improved issue triage utility:
@@ -69,6 +70,14 @@ Notable changes to this project will be documented in this file.
   maintainer hints (`owner≈... | component=... | likely=...`) plus a compact
   normalized symptom excerpt, making canonical error codes actionable without
   consulting internal token mappings.
+- Tightened local type-check tooling integration:
+  - `ty` now searches repo-local generated stubs via
+    `tool.ty.environment.extra-paths`, which resolves `mlx_vlm.*`
+    submodules during `ty check`;
+  - `src/tools/run_quality_checks.sh` now calls stub generation in a
+    skip-if-fresh mode backed by a `typings/.stub_manifest.json` cache, so
+    stubs are regenerated only when installed package versions change or the
+    cache is missing.
 - Raised the project Transformers floor to `>=5.2.0` and aligned packaging,
   runtime checks, and docs/tests to that policy.
 - Aligned preflight package-floor diagnostics in `src/check_models.py` with

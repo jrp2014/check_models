@@ -6,9 +6,16 @@ This enforces local parity in addition to CI. The test focuses only on runtime d
 
 from __future__ import annotations
 
+import json
 import re
 import tomllib
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+from tools import generate_stubs
+
+if TYPE_CHECKING:
+    import pytest
 
 _TEST_FILE = Path(__file__).resolve()
 # tests/ parent, then package root (vlm)
@@ -57,6 +64,33 @@ def _extract_manual_block(readme: str) -> str:
     return m.group(1)
 
 
+def _write_stub_manifest(
+    typings_dir: Path,
+    *,
+    mlx_vlm_version: str,
+    stubgen_version: str,
+) -> None:
+    manifest_path = typings_dir / generate_stubs.STUB_MANIFEST
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "packages": {
+                    "mlx_vlm": {
+                        "distribution": "mlx-vlm",
+                        "version": mlx_vlm_version,
+                    },
+                },
+                "python_version": generate_stubs._python_version(),
+                "stubgen_version": stubgen_version,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+
 def test_readme_runtime_block_matches_pyproject() -> None:
     """Ensure the runtime dependencies in README match pyproject.toml."""
     py_text = PYPROJECT.read_text(encoding="utf-8")
@@ -95,3 +129,57 @@ def test_readme_runtime_block_matches_pyproject() -> None:
     if leaked:
         msg = f"Optional deps leaked into runtime block: {leaked}"
         raise RuntimeError(msg)
+
+
+def test_ty_uses_generated_typings_search_path() -> None:
+    """Ensure ty resolves repo-local generated stubs like mlx_vlm.*."""
+    pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
+    ty_env = pyproject["tool"]["ty"]["environment"]
+    assert ty_env["extra-paths"] == ["../typings"]
+
+
+def test_stub_refresh_reason_is_none_for_fresh_manifest(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    versions = {"mlx-vlm": "0.31.0", "mypy": "1.18.0"}
+
+    def _installed_version(distribution: str) -> str | None:
+        return versions.get(distribution)
+
+    typings_dir = tmp_path / "typings"
+    (typings_dir / "mlx_vlm").mkdir(parents=True)
+    _write_stub_manifest(typings_dir, mlx_vlm_version="0.31.0", stubgen_version="1.18.0")
+
+    monkeypatch.setattr(
+        generate_stubs,
+        "_installed_distribution_version",
+        _installed_version,
+    )
+
+    assert generate_stubs.get_stub_refresh_reason(["mlx_vlm"], typings_dir) is None
+
+
+def test_stub_refresh_reason_detects_version_change(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    versions = {"mlx-vlm": "0.31.0", "mypy": "1.18.0"}
+
+    def _installed_version(distribution: str) -> str | None:
+        return versions.get(distribution)
+
+    typings_dir = tmp_path / "typings"
+    (typings_dir / "mlx_vlm").mkdir(parents=True)
+    _write_stub_manifest(typings_dir, mlx_vlm_version="0.30.0", stubgen_version="1.18.0")
+
+    monkeypatch.setattr(
+        generate_stubs,
+        "_installed_distribution_version",
+        _installed_version,
+    )
+
+    assert (
+        generate_stubs.get_stub_refresh_reason(["mlx_vlm"], typings_dir)
+        == "mlx_vlm version metadata changed"
+    )

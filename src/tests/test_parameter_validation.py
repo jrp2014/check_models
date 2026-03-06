@@ -140,6 +140,10 @@ class TestCliArgumentNormalization:
             "resize_shape": None,
             "eos_tokens": None,
             "processor_kwargs": None,
+            "enable_thinking": False,
+            "thinking_budget": None,
+            "thinking_start_token": None,
+            "thinking_end_token": "</think>",
         }
         base.update(overrides)
         return argparse.Namespace(**base)
@@ -170,4 +174,25 @@ class TestCliArgumentNormalization:
         args = self._build_args(processor_kwargs={"max_tokens": 50, "cropping": False})
 
         with pytest.raises(ValueError, match="processor_kwargs cannot override dedicated"):
+            validate_cli_arguments(args)
+
+    def test_thinking_budget_requires_enable_thinking(self) -> None:
+        """Thinking budget should be rejected unless thinking mode is explicitly enabled."""
+        args = self._build_args(thinking_budget=64)
+
+        with pytest.raises(ValueError, match="require --enable-thinking"):
+            validate_cli_arguments(args)
+
+    def test_invalid_thinking_budget_raises_error(self) -> None:
+        """Thinking budget should reject non-positive values."""
+        args = self._build_args(enable_thinking=True, thinking_budget=0)
+
+        with pytest.raises(ValueError, match="thinking_budget must be > 0"):
+            validate_cli_arguments(args)
+
+    def test_empty_thinking_end_token_raises_error(self) -> None:
+        """Thinking mode should require a non-empty end token."""
+        args = self._build_args(enable_thinking=True, thinking_end_token="")
+
+        with pytest.raises(ValueError, match="thinking_end_token must be non-empty"):
             validate_cli_arguments(args)

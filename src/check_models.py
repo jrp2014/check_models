@@ -175,6 +175,7 @@ ERROR_MLX_VLM_RUNTIME_INIT: Final[str] = (
 )
 PROJECT_MIN_TRANSFORMERS_VERSION: Final[str] = "5.2.0"
 MLX_IMPORT_PROBE_TIMEOUT_SECONDS: Final[float] = 8.0
+DEFAULT_THINKING_END_MARKER: Final[str] = "</think>"
 
 
 # =============================================================================
@@ -1128,6 +1129,10 @@ class ProcessImageParams:
     eos_tokens: tuple[str, ...] | None = None
     skip_special_tokens: bool = False
     processor_kwargs: dict[str, Any] | None = None
+    enable_thinking: bool = False
+    thinking_budget: int | None = None
+    thinking_start_token: str | None = None
+    thinking_end_token: str = DEFAULT_THINKING_END_MARKER
     context_marker: str = "Context:"
 
 
@@ -8003,6 +8008,86 @@ def _diagnostics_unflagged_success_section(
     return parts
 
 
+def _append_repro_input_tokens(
+    *,
+    tokens: list[str],
+    image_path: Path | None,
+    run_args: argparse.Namespace | None,
+) -> None:
+    """Append image or folder selection flags for repro commands."""
+    if image_path is not None:
+        tokens.extend(["--image", str(image_path)])
+        return
+
+    if run_args is None:
+        return
+
+    run_image = getattr(run_args, "image", None)
+    run_folder = getattr(run_args, "folder", None)
+    if run_image is not None:
+        tokens.extend(["--image", str(run_image)])
+        return
+    if run_folder is not None:
+        tokens.extend(["--folder", str(run_folder)])
+
+
+def _append_repro_selection_tokens(
+    *,
+    tokens: list[str],
+    run_args: argparse.Namespace,
+) -> None:
+    """Append model selection flags for repro commands."""
+    models = getattr(run_args, "models", None)
+    if models:
+        tokens.extend(["--models", *[str(model) for model in models]])
+
+    exclude = getattr(run_args, "exclude", None)
+    if exclude:
+        tokens.extend(["--exclude", *[str(model) for model in exclude]])
+
+
+def _append_repro_flags(
+    *,
+    tokens: list[str],
+    run_args: argparse.Namespace,
+    flag_map: Sequence[tuple[str, str]],
+) -> None:
+    """Append enabled boolean flags for repro commands."""
+    for attr_name, flag in flag_map:
+        if bool(getattr(run_args, attr_name, False)):
+            tokens.append(flag)
+
+
+def _append_repro_extended_generate_args(
+    *,
+    tokens: list[str],
+    run_args: argparse.Namespace,
+) -> None:
+    """Append optional non-scalar generate kwargs for repro commands."""
+    resize_shape = getattr(run_args, "resize_shape", None)
+    if resize_shape is not None:
+        tokens.extend(["--resize-shape", *[str(value) for value in resize_shape]])
+
+    eos_tokens = getattr(run_args, "eos_tokens", None)
+    if eos_tokens:
+        tokens.extend(["--eos-tokens", *[str(token) for token in eos_tokens]])
+
+    processor_kwargs = getattr(run_args, "processor_kwargs", None)
+    if processor_kwargs:
+        tokens.extend(["--processor-kwargs", json.dumps(processor_kwargs, sort_keys=True)])
+
+
+def _thinking_end_token_for_repro(run_args: argparse.Namespace) -> str | None:
+    """Return a non-default thinking end token for repro commands."""
+    if not bool(getattr(run_args, "enable_thinking", False)):
+        return None
+
+    thinking_end_token = getattr(run_args, "thinking_end_token", DEFAULT_THINKING_END_MARKER)
+    if thinking_end_token == DEFAULT_THINKING_END_MARKER:
+        return None
+    return str(thinking_end_token)
+
+
 def _build_repro_command_tokens(
     *,
     image_path: Path | None,
@@ -8018,32 +8103,14 @@ def _build_repro_command_tokens(
             if value is not None:
                 tokens.extend([flag, str(value)])
 
-    def _append_enabled_flags(flag_map: Sequence[tuple[str, str]]) -> None:
-        for attr_name, flag in flag_map:
-            if bool(getattr(run_args, attr_name, False)):
-                tokens.append(flag)
-
     tokens = ["python", "-m", "check_models"]
-    if image_path is not None:
-        tokens.extend(["--image", str(image_path)])
-    elif run_args is not None:
-        run_image = getattr(run_args, "image", None)
-        run_folder = getattr(run_args, "folder", None)
-        if run_image is not None:
-            tokens.extend(["--image", str(run_image)])
-        elif run_folder is not None:
-            tokens.extend(["--folder", str(run_folder)])
+    _append_repro_input_tokens(tokens=tokens, image_path=image_path, run_args=run_args)
 
     if run_args is None:
         return tokens
 
     if include_selection:
-        models = getattr(run_args, "models", None)
-        if models:
-            tokens.extend(["--models", *[str(model) for model in models]])
-        exclude = getattr(run_args, "exclude", None)
-        if exclude:
-            tokens.extend(["--exclude", *[str(model) for model in exclude]])
+        _append_repro_selection_tokens(tokens=tokens, run_args=run_args)
 
     trust_remote_code = bool(getattr(run_args, "trust_remote_code", True))
     tokens.append("--trust-remote-code" if trust_remote_code else "--no-trust-remote-code")
@@ -8055,10 +8122,14 @@ def _build_repro_command_tokens(
             ("--prompt", getattr(run_args, "prompt", None)),
         ),
     )
-    _append_enabled_flags(
-        (
+    _append_repro_flags(
+        tokens=tokens,
+        run_args=run_args,
+        flag_map=(
             ("detailed_metrics", "--detailed-metrics"),
             ("lazy_load", "--lazy-load"),
+            ("skip_special_tokens", "--skip-special-tokens"),
+            ("enable_thinking", "--enable-thinking"),
         ),
     )
     tokens.extend(["--max-tokens", str(getattr(run_args, "max_tokens", DEFAULT_MAX_TOKENS))])
@@ -8067,6 +8138,7 @@ def _build_repro_command_tokens(
 
     kv_group_size = getattr(run_args, "kv_group_size", None)
     quantized_kv_start = getattr(run_args, "quantized_kv_start", None)
+    _append_repro_extended_generate_args(tokens=tokens, run_args=run_args)
     _append_pairs(
         (
             ("--repetition-penalty", getattr(run_args, "repetition_penalty", None)),
@@ -8074,6 +8146,8 @@ def _build_repro_command_tokens(
             ("--max-kv-size", getattr(run_args, "max_kv_size", None)),
             ("--kv-bits", getattr(run_args, "kv_bits", None)),
             ("--prefill-step-size", getattr(run_args, "prefill_step_size", None)),
+            ("--thinking-budget", getattr(run_args, "thinking_budget", None)),
+            ("--thinking-start-token", getattr(run_args, "thinking_start_token", None)),
             (
                 "--kv-group-size",
                 kv_group_size if kv_group_size not in {None, 64} else None,
@@ -8082,12 +8156,15 @@ def _build_repro_command_tokens(
                 "--quantized-kv-start",
                 quantized_kv_start if quantized_kv_start not in {None, 0} else None,
             ),
+            ("--thinking-end-token", _thinking_end_token_for_repro(run_args)),
             ("--timeout", getattr(run_args, "timeout", DEFAULT_TIMEOUT)),
         ),
     )
 
-    _append_enabled_flags(
-        (
+    _append_repro_flags(
+        tokens=tokens,
+        run_args=run_args,
+        flag_map=(
             ("verbose", "--verbose"),
             ("no_color", "--no-color"),
             ("force_color", "--force-color"),
@@ -9565,6 +9642,9 @@ _RESERVED_PROCESSOR_KWARG_KEYS: Final[frozenset[str]] = frozenset(
         "repetition_penalty",
         "resize_shape",
         "skip_special_tokens",
+        "thinking_budget",
+        "thinking_end_token",
+        "thinking_start_token",
         "temperature",
         "top_p",
         "verbose",
@@ -9633,6 +9713,36 @@ def _validate_processor_kwargs(
     return dict(processor_kwargs)
 
 
+def _validate_thinking_params(args: argparse.Namespace) -> None:
+    """Validate opt-in thinking-mode arguments."""
+    enable_thinking = bool(getattr(args, "enable_thinking", False))
+    thinking_budget = getattr(args, "thinking_budget", None)
+    thinking_start_token = getattr(args, "thinking_start_token", None)
+    thinking_end_token = getattr(args, "thinking_end_token", DEFAULT_THINKING_END_MARKER)
+    thinking_requested = bool(
+        enable_thinking or thinking_budget is not None or thinking_start_token is not None,
+    )
+
+    if thinking_budget is not None and thinking_budget <= 0:
+        msg = f"thinking_budget must be > 0 if specified, got {thinking_budget}"
+        raise ValueError(msg)
+
+    if thinking_requested and not enable_thinking:
+        msg = "thinking_budget and thinking token flags require --enable-thinking"
+        raise ValueError(msg)
+
+    if enable_thinking and not thinking_end_token:
+        msg = "thinking_end_token must be non-empty when thinking mode is enabled"
+        raise ValueError(msg)
+
+
+def _build_chat_template_kwargs(params: ProcessImageParams) -> dict[str, Any]:
+    """Collect opt-in kwargs for upstream chat-template application."""
+    if not params.enable_thinking:
+        return {}
+    return {"enable_thinking": True}
+
+
 def _build_generate_extra_kwargs(params: ProcessImageParams) -> dict[str, Any]:
     """Collect optional generate kwargs for benchmark runs."""
     extra_kwargs: dict[str, Any] = {}
@@ -9646,6 +9756,13 @@ def _build_generate_extra_kwargs(params: ProcessImageParams) -> dict[str, Any]:
         extra_kwargs["eos_tokens"] = list(params.eos_tokens)
     if params.skip_special_tokens:
         extra_kwargs["skip_special_tokens"] = True
+    if params.enable_thinking:
+        extra_kwargs["enable_thinking"] = True
+        extra_kwargs["thinking_end_token"] = params.thinking_end_token
+        if params.thinking_budget is not None:
+            extra_kwargs["thinking_budget"] = params.thinking_budget
+        if params.thinking_start_token is not None:
+            extra_kwargs["thinking_start_token"] = params.thinking_start_token
     return extra_kwargs
 
 
@@ -9680,6 +9797,7 @@ def validate_cli_arguments(args: argparse.Namespace) -> None:
     args.processor_kwargs = _validate_processor_kwargs(
         getattr(args, "processor_kwargs", None),
     )
+    _validate_thinking_params(args)
 
 
 def validate_image_accessible(*, image_path: str | Path) -> None:
@@ -10442,11 +10560,13 @@ def _run_model_generation(
     # (e.g., Llama uses <|begin_of_text|>, Phi-3 uses <|user|>, etc.)
     _set_failure_phase(phase_callback, "prefill")
     try:
+        chat_template_kwargs = _build_chat_template_kwargs(params)
         formatted_prompt: str | list[Any] = apply_chat_template(
             processor=processor,
             config=config,
             prompt=params.prompt,
             num_images=1,
+            **chat_template_kwargs,
         )
     except (OSError, ValueError, RuntimeError, TypeError, AttributeError, KeyError) as prefill_err:
         msg = f"Prompt prefill failed for {params.model_identifier}: {prefill_err}"
@@ -12102,6 +12222,10 @@ def process_models(
             eos_tokens=args.eos_tokens,
             skip_special_tokens=args.skip_special_tokens,
             processor_kwargs=args.processor_kwargs,
+            enable_thinking=args.enable_thinking,
+            thinking_budget=args.thinking_budget,
+            thinking_start_token=args.thinking_start_token,
+            thinking_end_token=args.thinking_end_token,
             context_marker=args.context_marker,
         )
         result: PerformanceResult = process_image_with_model(params)
@@ -14027,6 +14151,30 @@ def main_cli() -> None:
             "Extra processor kwargs as a JSON object. "
             'Example: --processor-kwargs \'{"cropping": false, "max_patches": 3}\''
         ),
+    )
+    parser.add_argument(
+        "--enable-thinking",
+        action="store_true",
+        default=False,
+        help="Enable thinking mode in the upstream chat template and generation flow.",
+    )
+    parser.add_argument(
+        "--thinking-budget",
+        type=int,
+        default=None,
+        help="Maximum number of thinking tokens before forcing the end token.",
+    )
+    parser.add_argument(
+        "--thinking-start-token",
+        type=str,
+        default=None,
+        help="Token marking the start of a thinking block, such as <think>.",
+    )
+    parser.add_argument(
+        "--thinking-end-token",
+        type=str,
+        default=DEFAULT_THINKING_END_MARKER,
+        help="Token marking the end of a thinking block when thinking mode is enabled.",
     )
 
     parser.add_argument(

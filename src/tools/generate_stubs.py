@@ -20,6 +20,8 @@ Notes:
 from __future__ import annotations
 
 import argparse
+import importlib.metadata
+import json
 import logging
 import re
 import shutil
@@ -218,8 +220,13 @@ logger = logging.getLogger("generate_stubs")
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TYPINGS_DIR = REPO_ROOT / "typings"
+STUB_MANIFEST = ".stub_manifest.json"
 
 DEFAULT_PACKAGES = ["mlx_lm", "mlx_vlm", "transformers", "tokenizers"]
+PACKAGE_DISTRIBUTIONS = {
+    "mlx_lm": "mlx-lm",
+    "mlx_vlm": "mlx-vlm",
+}
 _PKG_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
 _TRANSFORMERS_STUBGEN_NOISE_TOKENS = (
     "Something went wrong trying to find the model name in the path:",
@@ -242,6 +249,134 @@ def _validate_packages(packages: Iterable[str]) -> list[str]:
             raise ValueError(msg)
         result.append(name)
     return result
+
+
+def _stub_manifest_path(typings_dir: Path) -> Path:
+    return typings_dir / STUB_MANIFEST
+
+
+def _python_version() -> str:
+    return ".".join(str(part) for part in sys.version_info[:3])
+
+
+def _distribution_name_for_package(package: str) -> str:
+    top_level = package.split(".", maxsplit=1)[0]
+    return PACKAGE_DISTRIBUTIONS.get(top_level, top_level.replace("_", "-"))
+
+
+def _installed_distribution_version(distribution: str) -> str | None:
+    try:
+        return importlib.metadata.version(distribution)
+    except importlib.metadata.PackageNotFoundError:
+        return None
+
+
+def _current_stub_manifest_entry(package: str) -> dict[str, str] | None:
+    distribution = _distribution_name_for_package(package)
+    version = _installed_distribution_version(distribution)
+    if version is None:
+        return None
+    return {"distribution": distribution, "version": version}
+
+
+def _stub_target_exists(typings_dir: Path, package: str) -> bool:
+    package_path = typings_dir / package.replace(".", "/")
+    return package_path.exists() or package_path.with_suffix(".pyi").exists()
+
+
+def _read_stub_manifest(typings_dir: Path) -> dict[str, object] | None:
+    manifest_path = _stub_manifest_path(typings_dir)
+    if not manifest_path.exists():
+        return None
+
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as err:
+        logger.warning("[stubs] Ignoring unreadable manifest %s: %s", manifest_path, err)
+        return None
+
+    if not isinstance(manifest, dict):
+        logger.warning(
+            "[stubs] Ignoring invalid manifest %s: expected a JSON object",
+            manifest_path,
+        )
+        return None
+    return manifest
+
+
+def get_stub_refresh_reason(packages: Iterable[str], typings_dir: Path = TYPINGS_DIR) -> str | None:
+    """Return the reason stubs should be regenerated, or None when they are fresh."""
+    pkg_list = _validate_packages(packages)
+    reason: str | None = None
+
+    if not typings_dir.exists():
+        reason = "the typings/ directory is missing"
+    else:
+        manifest = _read_stub_manifest(typings_dir)
+        if manifest is None:
+            reason = "the stub manifest is missing or unreadable"
+        else:
+            manifest_packages = manifest.get("packages")
+            if not isinstance(manifest_packages, dict):
+                reason = "the stub manifest is missing package metadata"
+            else:
+                current_python_version = _python_version()
+                if manifest.get("python_version") != current_python_version:
+                    reason = f"the Python version changed to {current_python_version}"
+                else:
+                    current_stubgen_version = _installed_distribution_version("mypy")
+                    if manifest.get("stubgen_version") != current_stubgen_version:
+                        reason = "the mypy/stubgen version changed"
+                    else:
+                        for package in pkg_list:
+                            if not _stub_target_exists(typings_dir, package):
+                                reason = f"{package} stubs are missing"
+                                break
+
+                            current_entry = _current_stub_manifest_entry(package)
+                            if current_entry is None:
+                                distribution = _distribution_name_for_package(package)
+                                reason = f"{distribution} is not installed"
+                                break
+
+                            recorded_entry = manifest_packages.get(package)
+                            if recorded_entry != current_entry:
+                                reason = f"{package} version metadata changed"
+                                break
+
+    return reason
+
+
+def _write_stub_manifest(packages: Iterable[str], typings_dir: Path = TYPINGS_DIR) -> None:
+    manifest = _read_stub_manifest(typings_dir) or {}
+    existing_packages = manifest.get("packages")
+    updated_packages: dict[str, dict[str, str]] = (
+        dict(existing_packages) if isinstance(existing_packages, dict) else {}
+    )
+
+    updated_manifest = {
+        "packages": updated_packages,
+        "python_version": _python_version(),
+        "stubgen_version": _installed_distribution_version("mypy"),
+    }
+
+    for package in _validate_packages(packages):
+        entry = _current_stub_manifest_entry(package)
+        if entry is None:
+            updated_packages.pop(package, None)
+            continue
+        updated_packages[package] = entry
+
+    manifest_path = _stub_manifest_path(typings_dir)
+    try:
+        manifest_path.write_text(
+            json.dumps(updated_manifest, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+    except OSError as err:
+        logger.warning("[stubs] Failed to write manifest %s: %s", manifest_path, err)
+    else:
+        logger.info("[stubs] Updated %s", manifest_path.relative_to(typings_dir.parent))
 
 
 def _split_stubgen_output(stdout_text: str, stderr_text: str) -> list[str]:
@@ -349,19 +484,32 @@ def main() -> int:
         action="store_true",
         help="Remove the entire typings/ directory first",
     )
+    parser.add_argument(
+        "--skip-if-fresh",
+        action="store_true",
+        help="Skip regeneration when existing stubs match installed package versions",
+    )
     ns = parser.parse_args()
+    packages = _validate_packages(ns.packages)
 
     if ns.clear and TYPINGS_DIR.exists():
         shutil.rmtree(TYPINGS_DIR)
         logger.info("[stubs] Cleared %s", TYPINGS_DIR)
 
+    if ns.skip_if_fresh:
+        refresh_reason = get_stub_refresh_reason(packages)
+        if refresh_reason is None:
+            logger.info("[stubs] Existing stubs are fresh; skipping regeneration")
+            return 0
+        logger.info("[stubs] Regenerating stubs because %s", refresh_reason)
+
     logger.info("[stubs] Generating stubs into: %s", TYPINGS_DIR)
-    logger.info("[stubs] Packages: %s", ", ".join(ns.packages))
-    code = run_stubgen(ns.packages)
+    logger.info("[stubs] Packages: %s", ", ".join(packages))
+    code = run_stubgen(packages)
     # Verify expected outputs exist when return code was 0
     if code == 0:
         missing: list[str] = []
-        for pkg in ns.packages:
+        for pkg in packages:
             pkg_dir = TYPINGS_DIR / pkg.replace(".", "/")
             if not pkg_dir.exists():
                 missing.append(pkg)
@@ -376,12 +524,13 @@ def main() -> int:
             # Don't fail - mypy has ignore_missing_imports=true and will work without stubs
             return 0
         # Apply post-processing patches for mlx_vlm stubs
-        if any(pkg.split(".")[0] == "mlx_vlm" for pkg in ns.packages):
+        if any(pkg.split(".")[0] == "mlx_vlm" for pkg in packages):
             _patch_mlx_vlm_stubs(TYPINGS_DIR)
-        if any(pkg.split(".")[0] == "transformers" for pkg in ns.packages):
+        if any(pkg.split(".")[0] == "transformers" for pkg in packages):
             _patch_transformers_stubs(TYPINGS_DIR)
 
-        _validate_stub_syntax(TYPINGS_DIR, ns.packages)
+        _validate_stub_syntax(TYPINGS_DIR, packages)
+        _write_stub_manifest(packages)
 
         # Count and report generated stub files
         stub_count = sum(1 for _ in TYPINGS_DIR.rglob("*.pyi"))

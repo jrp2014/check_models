@@ -304,6 +304,11 @@ follow_imports = "silent"
 # some MLX ecosystem packages do not expose complete static typing metadata.
 rules = { unresolved-import = "warn" }
 
+[tool.ty.environment]
+# Prefer repo-local generated stubs for packages like mlx-vlm that do not ship
+# complete import-resolvable typing metadata in site-packages.
+extra-paths = ["../typings"]
+
 [tool.pytest.ini_options]
 # Limit test discovery to the dedicated tests package inside the project
 # (avoids collecting helper scripts or example snippets).

@@ -12,6 +12,9 @@ if TYPE_CHECKING:
 
 import check_models
 
+OPEN_THINK_MARKER = "<think>"
+CLOSE_THINK_MARKER = "</think>"
+
 
 @dataclass
 class _FakeGenerationResult:
@@ -224,3 +227,46 @@ class TestProcessImageWithModelMock:
         assert generate_kwargs["skip_special_tokens"] is True
         assert generate_kwargs["cropping"] is False
         assert generate_kwargs["max_patches"] == 3
+
+    def test_run_model_generation_passes_thinking_kwargs(self, test_image: Path) -> None:
+        """Thinking-mode flags should reach both chat templating and generation."""
+        params = replace(
+            _build_params(test_image),
+            enable_thinking=True,
+            thinking_budget=96,
+            thinking_start_token=OPEN_THINK_MARKER,
+            thinking_end_token=CLOSE_THINK_MARKER,
+        )
+
+        fake_model = _FakeModel()
+        fake_processor = object()
+        fake_generation = _FakeGenerationResult()
+
+        with (
+            patch.object(check_models, "_ensure_generation_runtime_symbols"),
+            patch.object(
+                check_models,
+                "_load_model",
+                return_value=(fake_model, fake_processor, None),
+            ),
+            patch.object(check_models, "_run_model_preflight_validators"),
+            patch.object(
+                check_models,
+                "apply_chat_template",
+                return_value="formatted prompt",
+            ) as mock_template,
+            patch.object(check_models, "generate", return_value=fake_generation) as mock_generate,
+            patch.object(check_models.mx, "synchronize"),
+            patch.object(check_models.mx, "get_active_memory", return_value=0.0),
+            patch.object(check_models.mx, "get_cache_memory", return_value=0.0),
+            patch.object(check_models.mx, "eval"),
+        ):
+            result = check_models._run_model_generation(params)
+
+        assert result is fake_generation
+        assert mock_template.call_args.kwargs["enable_thinking"] is True
+        generate_kwargs = mock_generate.call_args.kwargs
+        assert generate_kwargs["enable_thinking"] is True
+        assert generate_kwargs["thinking_budget"] == 96
+        assert generate_kwargs["thinking_start_token"] == "<think>"
+        assert generate_kwargs["thinking_end_token"] == "</think>"
