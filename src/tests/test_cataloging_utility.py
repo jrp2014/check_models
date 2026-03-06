@@ -11,6 +11,7 @@ from check_models import (
     QUALITY,
     ModelIssueSummary,
     PerformanceResult,
+    _collect_cataloging_summary_data,
     _format_cataloging_summary_html,
     _format_cataloging_summary_text,
     _get_grade_display,
@@ -34,11 +35,14 @@ def _get_utility_score(result: dict[str, float | str]) -> float:
 
 @dataclass
 class _StubGeneration:
-    text: str
-    prompt_tokens: int = 64
-    generation_tokens: int = 128
+    text: str | None
+    prompt_tokens: int | None = 64
+    generation_tokens: int | None = 128
     generation_tps: float = 20.0
     peak_memory: float = 1.2
+    time: float | None = None
+    active_memory: float | None = None
+    cache_memory: float | None = None
 
 
 class TestComputeInformationGain:
@@ -339,7 +343,8 @@ class TestCatalogingSummaryFormatters:
     def test_format_cataloging_summary_html_empty(self) -> None:
         """Empty summary should return empty list."""
         summary: ModelIssueSummary = {"cataloging_best": None}
-        result = _format_cataloging_summary_html(summary)
+        data = _collect_cataloging_summary_data(summary)
+        result = [] if data is None else _format_cataloging_summary_html(data)
         assert result == []
 
     def test_format_cataloging_summary_html_with_data(self) -> None:
@@ -351,7 +356,9 @@ class TestCatalogingSummaryFormatters:
             "cataloging_grades": {"A": ["model-a"], "D": ["model-b"]},
             "low_utility_models": [("model-b", 35.0, "D", "Low visual grounding")],
         }
-        result = _format_cataloging_summary_html(summary)
+        data = _collect_cataloging_summary_data(summary)
+        assert data is not None
+        result = _format_cataloging_summary_html(data)
 
         # Should have content
         assert len(result) > 0
@@ -380,7 +387,9 @@ class TestCatalogingSummaryFormatters:
             "cataloging_worse_than_metadata": ["model-b"],
             "low_utility_models": [("model-b", 35.0, "D", "Low visual grounding")],
         }
-        result = _format_cataloging_summary_html(summary)
+        data = _collect_cataloging_summary_data(summary)
+        assert data is not None
+        result = _format_cataloging_summary_html(data)
         html = "".join(result)
         assert "Existing Metadata Baseline" in html
         assert "Vs Existing Metadata" in html
@@ -390,7 +399,8 @@ class TestCatalogingSummaryFormatters:
     def test_format_cataloging_summary_text_empty(self) -> None:
         """Empty summary should return empty list."""
         summary: ModelIssueSummary = {"cataloging_best": None}
-        result = _format_cataloging_summary_text(summary)
+        data = _collect_cataloging_summary_data(summary)
+        result = [] if data is None else _format_cataloging_summary_text(data)
         assert result == []
 
     def test_format_cataloging_summary_text_with_data(self) -> None:
@@ -402,7 +412,9 @@ class TestCatalogingSummaryFormatters:
             "cataloging_grades": {"A": ["model-a"], "D": ["model-b"]},
             "low_utility_models": [("model-b", 35.0, "D", "Low visual grounding")],
         }
-        result = _format_cataloging_summary_text(summary)
+        data = _collect_cataloging_summary_data(summary)
+        assert data is not None
+        result = _format_cataloging_summary_text(data)
 
         # Should have content
         assert len(result) > 0
@@ -431,7 +443,9 @@ class TestCatalogingSummaryFormatters:
             "cataloging_worse_than_metadata": ["model-b"],
             "low_utility_models": [("model-b", 35.0, "D", "Low visual grounding")],
         }
-        result = _format_cataloging_summary_text(summary)
+        data = _collect_cataloging_summary_data(summary)
+        assert data is not None
+        result = _format_cataloging_summary_text(data)
         md = "\n".join(result)
         assert "Existing Metadata Baseline" in md
         assert "Vs Existing Metadata" in md

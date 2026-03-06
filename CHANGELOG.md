@@ -78,6 +78,12 @@ Notable changes to this project will be documented in this file.
     skip-if-fresh mode backed by a `typings/.stub_manifest.json` cache, so
     stubs are regenerated only when installed package versions change or the
     cache is missing.
+- Compressed `src/check_models.py` with low-risk internal cleanup:
+  - removed stale private dead code and one unused lint-suppression path;
+  - merged duplicated HTML/Markdown issue-summary rendering around shared
+    summary collectors and aggregate-stat rows;
+  - standardized diagnostics section assembly around the existing Markdown
+    section helpers to reduce repeated divider/heading boilerplate.
 - Raised the project Transformers floor to `>=5.2.0` and aligned packaging,
   runtime checks, and docs/tests to that policy.
 - Aligned preflight package-floor diagnostics in `src/check_models.py` with

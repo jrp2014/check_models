@@ -740,6 +740,7 @@ type ModelScoreGrade = tuple[str, float, str]
 type CatalogingScoreRecord = tuple[str, float, str, str, float | None]
 type TopPerformerMetric = tuple[str, str, float, str]
 type ResourceUsageMetric = tuple[str, float, str]
+type AggregateStatRow = tuple[str, str, str, str]
 type QualityIssueEntry = tuple[str, str | None]
 type QualityIssueSection = tuple[str, str, list[QualityIssueEntry]]
 
@@ -784,6 +785,18 @@ class NumericFieldStats(TypedDict):
 
 
 type PerformanceStats = dict[str, NumericFieldStats]
+
+
+@dataclass(frozen=True)
+class CatalogingSummaryData:
+    """Shared cataloging summary data consumed by HTML and Markdown renderers."""
+
+    grade_counts: tuple[str, ...] = ()
+    average_score: float | None = None
+    metadata_breakdown: tuple[float, str, float, int, int, int] | None = None
+    best_entry: ModelScoreGrade | None = None
+    worst_entry: ModelScoreGrade | None = None
+    low_utility_models: tuple[LowUtilityModelIssue, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -6139,33 +6152,67 @@ def _collect_resource_usage_metrics(summary: ModelIssueSummary) -> list[Resource
     return metrics
 
 
-def _format_top_performers_html(summary: ModelIssueSummary) -> list[str]:
-    parts = []
+def _collect_aggregate_statistics_rows(stats: PerformanceStats) -> list[AggregateStatRow]:
+    """Collect preformatted aggregate statistics rows shared by HTML/Markdown summaries."""
+    rows: list[AggregateStatRow] = []
+    for field, data in stats.items():
+        rows.append(
+            (
+                format_field_label(field),
+                format_field_value(field, data["avg"]),
+                format_field_value(field, data["min"]),
+                format_field_value(field, data["max"]),
+            ),
+        )
+    return rows
+
+
+def _format_top_performers(
+    summary: ModelIssueSummary,
+    *,
+    html_output: bool,
+) -> list[str]:
+    parts: list[str] = []
     top_metrics = _collect_top_performer_metrics(summary)
     average_tps = summary.get("average_tps")
     successful_count = summary.get("successful_count")
     if top_metrics or (average_tps is not None and successful_count is not None):
-        parts.append("<h3>🏆 Performance Highlights</h3><ul>")
+        if html_output:
+            parts.append("<h3>🏆 Performance Highlights</h3><ul>")
+        else:
+            _append_markdown_section(parts, title="## 🏆 Performance Highlights")
         for label, model, value, fmt in top_metrics:
-            parts.append(
-                f"<li><b>{label}:</b> <code>{html.escape(model)}</code> ({fmt.format(value)})</li>",
-            )
+            if html_output:
+                parts.append(
+                    f"<li><b>{label}:</b> <code>{html.escape(model)}</code> "
+                    f"({fmt.format(value)})</li>",
+                )
+            else:
+                parts.append(f"- **{label}:** `{model}` ({fmt.format(value)})")
         if average_tps is not None and successful_count is not None:
-            parts.append(
-                f"<li><b>📊 Average TPS:</b> {average_tps:.1f} "
-                f"across {successful_count} models</li>",
-            )
-
-        parts.append("</ul>")
+            if html_output:
+                parts.append(
+                    f"<li><b>📊 Average TPS:</b> {average_tps:.1f} "
+                    f"across {successful_count} models</li>",
+                )
+            else:
+                parts.append(
+                    f"- **📊 Average TPS:** {average_tps:.1f} across {successful_count} models",
+                )
+        parts.append("</ul>" if html_output else "")
 
     resource_metrics = _collect_resource_usage_metrics(summary)
     if resource_metrics:
-        parts.append("<h3>📈 Resource Usage</h3><ul>")
+        if html_output:
+            parts.append("<h3>📈 Resource Usage</h3><ul>")
+        else:
+            _append_markdown_section(parts, title="## 📈 Resource Usage")
         for label, value, fmt in resource_metrics:
-            parts.append(
-                f"<li><b>{label}:</b> {fmt.format(value)}</li>",
-            )
-        parts.append("</ul>")
+            if html_output:
+                parts.append(f"<li><b>{label}:</b> {fmt.format(value)}</li>")
+            else:
+                parts.append(f"- **{label}:** {fmt.format(value)}")
+        parts.append("</ul>" if html_output else "")
 
     return parts
 
@@ -6217,33 +6264,59 @@ def _collect_quality_issue_sections(summary: ModelIssueSummary) -> list[QualityI
     return sections
 
 
-def _format_quality_detail_html(detail: str) -> str:
-    """Format detail text for HTML quality rows while preserving prior token styling."""
+def _format_quality_detail(detail: str, *, html_output: bool) -> str:
+    """Format detail text for HTML/Markdown quality rows while preserving token styling."""
     if detail.startswith("token: "):
         token_text = detail.removeprefix("token: ")
-        return f"token: <code>{html.escape(token_text)}</code>"
-    return html.escape(detail)
+        if html_output:
+            return f"token: <code>{html.escape(token_text)}</code>"
+        return f"token: `{token_text}`"
+    if html_output:
+        return html.escape(detail)
+    return f"`{detail}`"
 
 
-def _format_quality_issues_html(summary: ModelIssueSummary) -> list[str]:
+def _format_quality_issues(
+    summary: ModelIssueSummary,
+    *,
+    html_output: bool,
+) -> list[str]:
     sections = _collect_quality_issue_sections(summary)
     if not sections:
         return []
 
-    quality_parts = []
+    quality_parts: list[str] = []
     for title, css_class, entries in sections:
-        quality_parts.append(f"<li><b class='{css_class}'>{title} ({len(entries)}):</b><ul>")
+        if html_output:
+            quality_parts.append(f"<li><b class='{css_class}'>{title} ({len(entries)}):</b><ul>")
+        else:
+            quality_parts.append(f"- **{title} ({len(entries)}):**")
         for model, detail in entries:
             if detail is None:
-                quality_parts.append(f"<li><code>{html.escape(model)}</code></li>")
-            else:
                 quality_parts.append(
-                    f"<li><code>{html.escape(model)}</code> "
-                    f"({_format_quality_detail_html(detail)})</li>",
+                    f"<li><code>{html.escape(model)}</code></li>"
+                    if html_output
+                    else f"  - `{model}`",
                 )
-        quality_parts.append("</ul></li>")
+            else:
+                detail_text = _format_quality_detail(detail, html_output=html_output)
+                if html_output:
+                    quality_parts.append(
+                        f"<li><code>{html.escape(model)}</code> ({detail_text})</li>",
+                    )
+                else:
+                    quality_parts.append(f"  - `{model}` ({detail_text})")
+        if html_output:
+            quality_parts.append("</ul></li>")
 
-    return ["<h3>⚠️ Quality Issues</h3><ul>", *quality_parts, "</ul>"]
+    if html_output:
+        return ["<h3>⚠️ Quality Issues</h3><ul>", *quality_parts, "</ul>"]
+
+    parts: list[str] = []
+    _append_markdown_section(parts, title="## ⚠️ Quality Issues")
+    parts.extend(quality_parts)
+    parts.append("")
+    return parts
 
 
 def _cataloging_grade_distribution_items(summary: ModelIssueSummary) -> list[str]:
@@ -6275,28 +6348,35 @@ def _cataloging_vs_metadata_breakdown(
     return baseline_score, baseline_grade, avg_delta, better, neutral, worse
 
 
-def _format_cataloging_summary_html(summary: ModelIssueSummary) -> list[str]:
+def _collect_cataloging_summary_data(summary: ModelIssueSummary) -> CatalogingSummaryData | None:
+    """Collect shared cataloging summary data for HTML and Markdown renderers."""
+    best_entry = summary.get("cataloging_best")
+    if best_entry is None:
+        return None
+
+    average_score = summary.get("cataloging_avg_score", 0.0)
+    return CatalogingSummaryData(
+        grade_counts=tuple(_cataloging_grade_distribution_items(summary)),
+        average_score=average_score if average_score > 0 else None,
+        metadata_breakdown=_cataloging_vs_metadata_breakdown(summary),
+        best_entry=best_entry,
+        worst_entry=summary.get("cataloging_worst"),
+        low_utility_models=tuple(summary.get("low_utility_models", [])),
+    )
+
+
+def _format_cataloging_summary_html(data: CatalogingSummaryData) -> list[str]:
     """Format cataloging utility summary as HTML."""
-    parts: list[str] = []
+    parts = ["<h3>📚 Cataloging Utility Summary</h3>"]
 
-    # Only show if we have cataloging data
-    if not summary.get("cataloging_best"):
-        return parts
+    if data.grade_counts:
+        parts.append(f"<p><b>Grade Distribution:</b> {' | '.join(data.grade_counts)}</p>")
 
-    parts.append("<h3>📚 Cataloging Utility Summary</h3>")
+    if data.average_score is not None:
+        parts.append(f"<p><b>Average Utility Score:</b> {data.average_score:.0f}/100</p>")
 
-    # Grade distribution overview
-    grade_counts = _cataloging_grade_distribution_items(summary)
-    if grade_counts:
-        parts.append(f"<p><b>Grade Distribution:</b> {' | '.join(grade_counts)}</p>")
-
-    # Average score
-    avg_score = summary.get("cataloging_avg_score", 0)
-    if avg_score > 0:
-        parts.append(f"<p><b>Average Utility Score:</b> {avg_score:.0f}/100</p>")
-    metadata_breakdown = _cataloging_vs_metadata_breakdown(summary)
-    if metadata_breakdown is not None:
-        baseline_score, baseline_grade, avg_delta, better, neutral, worse = metadata_breakdown
+    if data.metadata_breakdown is not None:
+        baseline_score, baseline_grade, avg_delta, better, neutral, worse = data.metadata_breakdown
         baseline_emoji = GRADE_EMOJIS.get(baseline_grade, "❌")
         parts.append(
             "<p><b>Existing Metadata Baseline:</b> "
@@ -6307,19 +6387,16 @@ def _format_cataloging_summary_html(summary: ModelIssueSummary) -> list[str]:
             f"Avg Δ {avg_delta:+.0f} | Better: {better}, Neutral: {neutral}, Worse: {worse}</p>",
         )
 
-    # Best and worst performers
     parts.append("<ul>")
-    best_entry = summary.get("cataloging_best")
-    if best_entry is not None:
-        model, score, grade = best_entry
+    if data.best_entry is not None:
+        model, score, grade = data.best_entry
         emoji = GRADE_EMOJIS.get(grade, "")
         parts.append(
             f"<li><b>Best for cataloging:</b> <code>{html.escape(model)}</code> "
             f"({emoji} {grade}, {score:.0f}/100)</li>",
         )
-    worst_entry = summary.get("cataloging_worst")
-    if worst_entry is not None:
-        model, score, grade = worst_entry
+    if data.worst_entry is not None:
+        model, score, grade = data.worst_entry
         emoji = GRADE_EMOJIS.get(grade, "")
         parts.append(
             f"<li><b>Worst for cataloging:</b> <code>{html.escape(model)}</code> "
@@ -6327,15 +6404,13 @@ def _format_cataloging_summary_html(summary: ModelIssueSummary) -> list[str]:
         )
     parts.append("</ul>")
 
-    # Low utility warnings
-    low_utility = summary.get("low_utility_models", [])
-    if low_utility:
+    if data.low_utility_models:
         parts.append(
-            f"<p><b class='metric-warn'>⚠️ {len(low_utility)} models "
+            f"<p><b class='metric-warn'>⚠️ {len(data.low_utility_models)} models "
             "with low utility (D/F):</b></p>",
         )
         parts.append("<ul>")
-        for model, score, grade, weakness in low_utility:
+        for model, score, grade, weakness in data.low_utility_models:
             emoji = GRADE_EMOJIS.get(grade, "")
             parts.append(
                 f"<li><code>{html.escape(model)}</code>: {emoji} {grade} ({score:.0f}/100) "
@@ -6346,31 +6421,21 @@ def _format_cataloging_summary_html(summary: ModelIssueSummary) -> list[str]:
     return parts
 
 
-def _format_cataloging_summary_text(summary: ModelIssueSummary) -> list[str]:
+def _format_cataloging_summary_text(data: CatalogingSummaryData) -> list[str]:
     """Format cataloging utility summary as Markdown text."""
     parts: list[str] = []
+    _append_markdown_section(parts, title="## 📚 Cataloging Utility Summary")
 
-    # Only show if we have cataloging data
-    if not summary.get("cataloging_best"):
-        return parts
-
-    parts.append("## 📚 Cataloging Utility Summary")
-    parts.append("")
-
-    # Grade distribution overview
-    grade_counts = _cataloging_grade_distribution_items(summary)
-    if grade_counts:
-        parts.append(f"**Grade Distribution:** {' | '.join(grade_counts)}")
+    if data.grade_counts:
+        parts.append(f"**Grade Distribution:** {' | '.join(data.grade_counts)}")
         parts.append("")
 
-    # Average score
-    avg_score = summary.get("cataloging_avg_score", 0)
-    if avg_score > 0:
-        parts.append(f"**Average Utility Score:** {avg_score:.0f}/100")
+    if data.average_score is not None:
+        parts.append(f"**Average Utility Score:** {data.average_score:.0f}/100")
         parts.append("")
-    metadata_breakdown = _cataloging_vs_metadata_breakdown(summary)
-    if metadata_breakdown is not None:
-        baseline_score, baseline_grade, avg_delta, better, neutral, worse = metadata_breakdown
+
+    if data.metadata_breakdown is not None:
+        baseline_score, baseline_grade, avg_delta, better, neutral, worse = data.metadata_breakdown
         baseline_emoji = GRADE_EMOJIS.get(baseline_grade, "❌")
         parts.append(
             f"**Existing Metadata Baseline:** {baseline_emoji} {baseline_grade} "
@@ -6382,25 +6447,20 @@ def _format_cataloging_summary_text(summary: ModelIssueSummary) -> list[str]:
         )
         parts.append("")
 
-    # Best and worst performers
-    best_entry = summary.get("cataloging_best")
-    if best_entry is not None:
-        model, score, grade = best_entry
+    if data.best_entry is not None:
+        model, score, grade = data.best_entry
         emoji = GRADE_EMOJIS.get(grade, "")
         parts.append(f"- **Best for cataloging:** `{model}` ({emoji} {grade}, {score:.0f}/100)")
-    worst_entry = summary.get("cataloging_worst")
-    if worst_entry is not None:
-        model, score, grade = worst_entry
+    if data.worst_entry is not None:
+        model, score, grade = data.worst_entry
         emoji = GRADE_EMOJIS.get(grade, "")
         parts.append(f"- **Worst for cataloging:** `{model}` ({emoji} {grade}, {score:.0f}/100)")
     parts.append("")
 
-    # Low utility warnings
-    low_utility = summary.get("low_utility_models", [])
-    if low_utility:
-        parts.append(f"### ⚠️ {len(low_utility)} Models with Low Utility (D/F)")
+    if data.low_utility_models:
+        parts.append(f"### ⚠️ {len(data.low_utility_models)} Models with Low Utility (D/F)")
         parts.append("")
-        for model, score, grade, weakness in low_utility:
+        for model, score, grade, weakness in data.low_utility_models:
             emoji = GRADE_EMOJIS.get(grade, "")
             parts.append(f"- `{model}`: {emoji} {grade} ({score:.0f}/100) - {weakness}")
         parts.append("")
@@ -6408,57 +6468,58 @@ def _format_cataloging_summary_text(summary: ModelIssueSummary) -> list[str]:
     return parts
 
 
+def _format_aggregate_statistics(
+    stats: PerformanceStats,
+    *,
+    html_output: bool,
+) -> list[str]:
+    rows = _collect_aggregate_statistics_rows(stats)
+    if not rows:
+        return []
+
+    parts: list[str] = []
+    if html_output:
+        parts.append("<h3>📊 Aggregate Statistics (Successful Runs)</h3><ul>")
+    else:
+        _append_markdown_section(parts, title="## 📊 Aggregate Statistics (Successful Runs)")
+
+    for label, average_value, minimum_value, maximum_value in rows:
+        if html_output:
+            parts.append(
+                f"<li><b>{label}</b>: Avg: {average_value} | "
+                f"Min: {minimum_value} | Max: {maximum_value}</li>",
+            )
+        else:
+            parts.append(
+                f"- **{label}**: Avg: {average_value} | "
+                f"Min: {minimum_value} | Max: {maximum_value}",
+            )
+    parts.append("</ul>" if html_output else "")
+    return parts
+
+
+def _format_issues_summary_parts(
+    summary: ModelIssueSummary,
+    stats: PerformanceStats,
+    *,
+    html_output: bool,
+) -> list[str]:
+    parts: list[str] = []
+    cataloging_data = _collect_cataloging_summary_data(summary)
+    parts.extend(_format_top_performers(summary, html_output=html_output))
+    if cataloging_data is not None:
+        if html_output:
+            parts.extend(_format_cataloging_summary_html(cataloging_data))
+        else:
+            parts.extend(_format_cataloging_summary_text(cataloging_data))
+    parts.extend(_format_quality_issues(summary, html_output=html_output))
+    parts.extend(_format_aggregate_statistics(stats, html_output=html_output))
+    return parts
+
+
 def format_issues_summary_html(summary: ModelIssueSummary, stats: PerformanceStats) -> str:
     """Format the issues and statistics summary as an HTML string."""
-    parts = []
-    parts.extend(_format_top_performers_html(summary))
-    parts.extend(_format_cataloging_summary_html(summary))
-    parts.extend(_format_quality_issues_html(summary))
-
-    # General Stats
-    if stats:
-        parts.append("<h3>📊 Aggregate Statistics (Successful Runs)</h3><ul>")
-        for field, data in stats.items():
-            parts.append(
-                f"<li><b>{format_field_label(field)}</b>: "
-                f"Avg: {format_field_value(field, data['avg'])} | "
-                f"Min: {format_field_value(field, data['min'])} | "
-                f"Max: {format_field_value(field, data['max'])}</li>",
-            )
-        parts.append("</ul>")
-
-    return "".join(parts)
-
-
-def _format_top_performers_text(summary: ModelIssueSummary) -> list[str]:
-    parts = []
-    top_metrics = _collect_top_performer_metrics(summary)
-    average_tps = summary.get("average_tps")
-    successful_count = summary.get("successful_count")
-    if top_metrics or (average_tps is not None and successful_count is not None):
-        parts.append("## 🏆 Performance Highlights")
-        parts.append("")  # Blank line after heading (MD022)
-
-        for label, model, value, fmt in top_metrics:
-            parts.append(f"- **{label}:** `{model}` ({fmt.format(value)})")
-        if average_tps is not None and successful_count is not None:
-            parts.append(
-                f"- **📊 Average TPS:** {average_tps:.1f} across {successful_count} models",
-            )
-
-        parts.append("")  # Blank line after list (MD032)
-
-    resource_metrics = _collect_resource_usage_metrics(summary)
-    if resource_metrics:
-        parts.append("## 📈 Resource Usage")
-        parts.append("")  # Blank line after heading (MD022)
-
-        for label, value, fmt in resource_metrics:
-            parts.append(f"- **{label}:** {fmt.format(value)}")
-
-        parts.append("")  # Blank line after list (MD032)
-
-    return parts
+    return "".join(_format_issues_summary_parts(summary, stats, html_output=True))
 
 
 def _format_failures_by_package_text(results: list[PerformanceResult]) -> list[str]:
@@ -6729,6 +6790,18 @@ def _append_markdown_details_block(
     parts.extend(body_lines)
     parts.append("</details>")
     parts.append("")
+
+
+def _begin_diagnostics_section(
+    *,
+    title: str | None = None,
+    body_lines: list[str] | None = None,
+) -> list[str]:
+    """Return a diagnostics section buffer with the standard divider and optional heading."""
+    parts: list[str] = ["---", ""]
+    if title is not None:
+        _append_markdown_section(parts, title=title, body_lines=body_lines)
+    return parts
 
 
 _LOCAL_RUNNER_TRACEBACK_FRAME_RE: Final[re.Pattern[str]] = re.compile(
@@ -7231,8 +7304,7 @@ def _diagnostics_environment_section(
     system_info: dict[str, str],
 ) -> list[str]:
     """Build environment details section for diagnostics report footer context."""
-    parts: list[str] = ["---", ""]
-    _append_markdown_section(parts, title="## Environment")
+    parts = _begin_diagnostics_section(title="## Environment")
     table_rows: list[str] = []
     for lib in _DIAGNOSTICS_LIB_NAMES:
         ver = versions.get(lib, "")
@@ -7280,27 +7352,6 @@ def _build_environment_failure_diagnostics(
         ),
     )
     return parts
-
-
-def _build_environment_fingerprint(
-    *,
-    versions: LibraryVersionDict,
-    system_info: dict[str, str],
-) -> str:
-    """Build compact environment fingerprint for issue templates."""
-    tokens: list[str] = []
-    for label, value in (
-        ("python", system_info.get("Python Version")),
-        ("platform", system_info.get("Platform")),
-        ("chip", system_info.get("GPU/Chip")),
-        ("mlx", versions.get("mlx")),
-        ("mlx-vlm", versions.get("mlx-vlm")),
-        ("mlx-lm", versions.get("mlx-lm")),
-        ("transformers", versions.get("transformers")),
-    ):
-        if value:
-            tokens.append(f"{label}={value}")
-    return "; ".join(tokens) if tokens else "unknown"
 
 
 def _issue_target_for_package(
@@ -7353,9 +7404,7 @@ def _diagnostics_preflight_section(preflight_issues: Sequence[str]) -> list[str]
     if not preflight_issues:
         return []
 
-    parts: list[str] = ["---", ""]
-    _append_markdown_section(
-        parts,
+    parts = _begin_diagnostics_section(
         title=f"## Preflight Compatibility Warnings ({len(preflight_issues)} issue(s))",
         body_lines=[
             "These warnings were detected before inference. They are non-fatal but "
@@ -7501,9 +7550,7 @@ def _diagnostics_action_summary(
     if not items:
         return []
 
-    parts: list[str] = ["---", ""]
-    _append_markdown_section(
-        parts,
+    parts = _begin_diagnostics_section(
         title="## Action Summary",
         body_lines=["Quick triage list with likely owner and next action for each issue class."],
     )
@@ -7673,7 +7720,7 @@ def _diagnostics_failure_clusters(
     if not failure_clusters:
         return []
 
-    parts: list[str] = ["---", ""]
+    parts = _begin_diagnostics_section()
     for idx, (_cluster_signature, cluster_results) in enumerate(failure_clusters, 1):
         rep = cluster_results[0]
         pkg = rep.error_package or "unknown"
@@ -7724,8 +7771,7 @@ def _diagnostics_failure_clusters(
             rows=table_rows,
         )
 
-        parts.append("### To reproduce")
-        parts.append("")
+        _append_markdown_section(parts, title="### To reproduce")
         filing_guidance = _build_cluster_filing_guidance(
             representative=rep,
             image_path=image_path,
@@ -7771,9 +7817,7 @@ def _diagnostics_harness_section(
     if not harness_results:
         return []
 
-    parts: list[str] = ["---", ""]
-    _append_markdown_section(
-        parts,
+    parts = _begin_diagnostics_section(
         title=f"## Harness/Integration Issues ({len(harness_results)} model(s))",
         body_lines=[
             f"{len(harness_results)} model(s) show potential harness/integration issues; "
@@ -7798,8 +7842,7 @@ def _diagnostics_harness_section(
         if harness_type == "long_context":
             likely_package = "mlx-vlm / mlx"
 
-        parts.append(f"### `{res.model_name}`")
-        parts.append("")
+        _append_markdown_section(parts, title=f"### `{res.model_name}`")
         harness_summary = _HARNESS_TYPE_DESCRIPTIONS.get(
             harness_type or "",
             "Output indicates a likely integration issue.",
@@ -7839,9 +7882,7 @@ def _diagnostics_stack_signal_section(
     if not stack_signals:
         return []
 
-    parts: list[str] = ["---", ""]
-    _append_markdown_section(
-        parts,
+    parts = _begin_diagnostics_section(
         title=(
             f"### Long-Context Degradation / Potential Stack Issues ({len(stack_signals)} model(s))"
         ),
@@ -7886,8 +7927,7 @@ def _diagnostics_priority_table(
     preflight_issues: Sequence[str],
 ) -> list[str]:
     """Build the priority summary table for the diagnostics report."""
-    parts: list[str] = ["---", ""]
-    _append_markdown_section(parts, title="## Priority Summary")
+    parts = _begin_diagnostics_section(title="## Priority Summary")
     table_rows: list[str] = []
 
     if failure_clusters:
@@ -7963,9 +8003,7 @@ def _diagnostics_history_section(
         raw_prev_model_results if isinstance(raw_prev_model_results, dict) else {}
     )
 
-    parts: list[str] = ["---", ""]
-    _append_markdown_section(
-        parts,
+    parts = _begin_diagnostics_section(
         title="## History Context",
         body_lines=[
             "Recent reproducibility is measured from history "
@@ -8123,8 +8161,7 @@ def _diagnostics_coverage_and_runtime_section(
     total_runtime = sum(runtime_per_model)
     avg_runtime = total_runtime / len(runtime_per_model)
 
-    parts: list[str] = ["---", ""]
-    _append_markdown_section(parts, title="## Coverage & Runtime Metrics")
+    parts = _begin_diagnostics_section(title="## Coverage & Runtime Metrics")
     parts.append(f"- **Detailed diagnostics models:** {len(detailed_names)}")
     parts.append(f"- **Summary diagnostics models:** {len(summary_names)}")
     parts.append(f"- **Coverage check:** {coverage_text}")
@@ -8197,9 +8234,7 @@ def _diagnostics_unflagged_success_section(
         else:
             clean_models.append(res.model_name)
 
-    parts: list[str] = ["---", ""]
-    _append_markdown_section(
-        parts,
+    parts = _begin_diagnostics_section(
         title=f"## Models Not Flagged ({len(unflagged_successful)} model(s))",
         body_lines=[
             "These models completed without diagnostics flags "
@@ -8611,21 +8646,23 @@ def _diagnostics_footer(
         "        print(f'{name} FAIL {type(exc).__name__}: {exc}')\n"
         "PY"
     )
-    parts.append("### Portable triage (no local image required)")
-    parts.append("")
+    _append_markdown_section(parts, title="### Portable triage (no local image required)")
     _append_markdown_code_block(parts, portable_commands, language="bash")
 
     if failed:
-        parts.append("### Target specific failing models")
-        parts.append("")
-        parts.append(
-            "**Note:** A comprehensive JSON reproduction bundle including system info "
-            "and the exact prompt trace has been exported to "
-            "[repro_bundles/]"
-            "(https://github.com/jrp2014/check_models/tree/main/src/output/repro_bundles) "
-            "for each failing model.",
+        _append_markdown_section(
+            parts,
+            title="### Target specific failing models",
+            body_lines=[
+                (
+                    "**Note:** A comprehensive JSON reproduction bundle including system info "
+                    "and the exact prompt trace has been exported to "
+                    "[repro_bundles/]"
+                    "(https://github.com/jrp2014/check_models/tree/main/src/output/repro_bundles) "
+                    "for each failing model."
+                ),
+            ],
         )
-        parts.append("")
         target_base_tokens = _build_repro_command_tokens(
             image_path=image_path,
             run_args=run_args,
@@ -8638,11 +8675,9 @@ def _diagnostics_footer(
         )
         _append_markdown_code_block(parts, target_model_commands, language="bash")
 
-    parts.append("### Prompt Used")
-    parts.append("")
+    _append_markdown_section(parts, title="### Prompt Used")
     _append_markdown_code_block(parts, prompt, language="text")
-    parts.append("### Run details")
-    parts.append("")
+    _append_markdown_section(parts, title="### Run details")
     image_detail = str(image_path) if image_path is not None else "not specified"
     parts.append(f"- Input image: `{DIAGNOSTICS_ESCAPER.escape(image_detail)}`")
     if run_args is not None:
@@ -8817,53 +8852,9 @@ def generate_diagnostics_report(
         return True
 
 
-def _format_quality_issues_text(summary: ModelIssueSummary) -> list[str]:
-    sections = _collect_quality_issue_sections(summary)
-    if not sections:
-        return []
-
-    parts = []
-    quality_parts = []
-    for title, _css_class, entries in sections:
-        quality_parts.append(f"- **{title} ({len(entries)}):**")
-        for model, detail in entries:
-            if detail is None:
-                quality_parts.append(f"  - `{model}`")
-            elif detail.startswith("token: "):
-                token_text = detail.removeprefix("token: ")
-                quality_parts.append(f"  - `{model}` (token: `{token_text}`)")
-            else:
-                quality_parts.append(f"  - `{model}` (`{detail}`)")
-
-    parts.append("## ⚠️ Quality Issues")
-    parts.append("")  # Blank line after heading (MD022)
-    parts.extend(quality_parts)
-    parts.append("")
-    return parts
-
-
 def format_issues_summary_text(summary: ModelIssueSummary, stats: PerformanceStats) -> str:
     """Format the issues and statistics summary as a Markdown string."""
-    parts = []
-
-    parts.extend(_format_top_performers_text(summary))
-    parts.extend(_format_cataloging_summary_text(summary))
-    parts.extend(_format_quality_issues_text(summary))
-
-    # General Stats
-    if stats:
-        parts.append("## 📊 Aggregate Statistics (Successful Runs)")
-        parts.append("")  # Blank line after heading (MD022)
-        for field, data in stats.items():
-            parts.append(
-                f"- **{format_field_label(field)}**: "
-                f"Avg: {format_field_value(field, data['avg'])} | "
-                f"Min: {format_field_value(field, data['min'])} | "
-                f"Max: {format_field_value(field, data['max'])}",
-            )
-        parts.append("")  # Blank line after list (MD032)
-
-    return "\n".join(parts)
+    return "\n".join(_format_issues_summary_parts(summary, stats, html_output=False))
 
 
 def _build_full_html_document(
