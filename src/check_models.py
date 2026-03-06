@@ -817,7 +817,7 @@ class SupportsGenerationResult(Protocol):  # Minimal attributes we read from Gen
 class SupportsExifIfd(Protocol):
     """Minimal interface for EXIF objects providing nested IFD access."""
 
-    def get_ifd(self, tag: object) -> Mapping[object, Mapping[object, object]] | None:
+    def get_ifd(self, tag: object) -> Mapping[object, object] | None:
         """Retrieve a nested IFD mapping by tag identifier."""
 
 
@@ -4879,9 +4879,11 @@ def _process_ifd0(exif_raw: Mapping[int, Any]) -> ExifDict:
 def _process_exif_subifd(exif_raw: SupportsExifIfd) -> ExifDict:
     out: ExifDict = {}
     try:
-        exif_ifd: Any = exif_raw.get_ifd(ExifTags.IFD.Exif)
+        exif_ifd = exif_raw.get_ifd(ExifTags.IFD.Exif)
         if exif_ifd:
-            out.update({TAGS.get(tag_id, str(tag_id)): value for tag_id, value in exif_ifd.items()})
+            for tag_id, value in exif_ifd.items():
+                tag_name = TAGS.get(tag_id, str(tag_id)) if isinstance(tag_id, int) else str(tag_id)
+                out[tag_name] = value
     except (KeyError, AttributeError, TypeError):
         logger.warning("Could not extract Exif SubIFD")
     return out

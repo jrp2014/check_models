@@ -14,6 +14,12 @@ from check_models import (
 )
 
 
+class _FakeExifWithSubIfd:
+    def get_ifd(self, tag: object) -> dict[object, object] | None:
+        _ = tag
+        return {36867: "2024:01:10 10:20:30", "custom": "value"}
+
+
 def test_extract_exif_date_standard_format(tmp_path: Path) -> None:
     """Should parse standard EXIF datetime format."""
     test_file = tmp_path / "test.jpg"
@@ -23,6 +29,13 @@ def test_extract_exif_date_standard_format(tmp_path: Path) -> None:
     assert result is not None
     assert "2024-01-15" in result
     assert "14:30:45" in result
+
+
+def test_process_exif_subifd_handles_non_int_tag_ids() -> None:
+    """Unknown non-integer sub-IFD keys should fall back to their string form."""
+    result = check_models._process_exif_subifd(_FakeExifWithSubIfd())
+    assert result["DateTimeOriginal"] == "2024:01:10 10:20:30"
+    assert result["custom"] == "value"
 
 
 def test_extract_exif_date_datetime_original(tmp_path: Path) -> None:
