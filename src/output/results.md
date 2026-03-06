@@ -1,38 +1,38 @@
 # Model Performance Results
 
-_Generated on 2026-03-06 13:22:23 GMT_
+_Generated on 2026-03-06 23:33:43 GMT_
 
 ## 🎯 Action Snapshot
 
-- **Framework/runtime failures:** 6 (top owners: mlx-vlm=3, mlx=2, model-config=1).
+- **Framework/runtime failures:** 4 (top owners: mlx-vlm=3, model-config=1).
 - **Next action:** review `Failures by Package (Actionable)` and `diagnostics.md`.
 - **Model output watchlist:** 19 model(s) graded D/F.
 - **Next action:** prioritize A/B models and de-prioritize D/F outputs.
-- **Vs existing metadata:** better=4, neutral=1, worse=37 (baseline A 82/100).
+- **Vs existing metadata:** better=6, neutral=1, worse=37 (baseline A 82/100).
 
 ## 🏆 Performance Highlights
 
-- **Fastest:** `mlx-community/nanoLLaVA-1.5-4bit` (330.9 tps)
-- **💾 Most efficient:** `mlx-community/FastVLM-0.5B-bf16` (1.9 GB)
+- **Fastest:** `mlx-community/nanoLLaVA-1.5-4bit` (327.5 tps)
+- **💾 Most efficient:** `mlx-community/FastVLM-0.5B-bf16` (2.2 GB)
 - **⚡ Fastest load:** `mlx-community/nanoLLaVA-1.5-4bit` (0.96s)
-- **📊 Average TPS:** 87.3 across 42 models
+- **📊 Average TPS:** 85.9 across 44 models
 
 ## 📈 Resource Usage
 
-- **Total peak memory:** 649.1 GB
-- **Average peak memory:** 15.5 GB
-- **Memory efficiency:** 228 tokens/GB
+- **Total peak memory:** 756.5 GB
+- **Average peak memory:** 17.2 GB
+- **Memory efficiency:** 241 tokens/GB
 
 ## 📚 Cataloging Utility Summary
 
-**Grade Distribution:** 🏆 A: 5 | ✅ B: 8 | 🟡 C: 10 | 🟠 D: 6 | ❌ F: 13
+**Grade Distribution:** 🏆 A: 7 | ✅ B: 8 | 🟡 C: 10 | 🟠 D: 6 | ❌ F: 13
 
-**Average Utility Score:** 49/100
+**Average Utility Score:** 51/100
 
 **Existing Metadata Baseline:** 🏆 A (82/100)
-**Vs Existing Metadata:** Avg Δ -34 | Better: 4, Neutral: 1, Worse: 37
+**Vs Existing Metadata:** Avg Δ -32 | Better: 6, Neutral: 1, Worse: 37
 
-- **Best for cataloging:** `mlx-community/gemma-3n-E4B-it-bf16` (🏆 A, 90/100)
+- **Best for cataloging:** `mlx-community/Qwen3.5-35B-A3B-bf16` (🏆 A, 92/100)
 - **Worst for cataloging:** `prince-canuma/Florence-2-large-ft` (❌ F, 0/100)
 
 ### ⚠️ 19 Models with Low Utility (D/F)
@@ -59,12 +59,10 @@ _Generated on 2026-03-06 13:22:23 GMT_
 
 ## ⚠️ Quality Issues
 
-- **❌ Failed Models (6):**
+- **❌ Failed Models (4):**
   - `microsoft/Florence-2-large-ft` (`Model Error`)
   - `mlx-community/InternVL3-14B-8bit` (`API Mismatch`)
   - `mlx-community/InternVL3-8B-bf16` (`API Mismatch`)
-  - `mlx-community/Qwen3.5-35B-A3B-6bit` (`OOM`)
-  - `mlx-community/Qwen3.5-35B-A3B-bf16` (`OOM`)
   - `mlx-community/deepseek-vl2-8bit` (`Processor Error`)
 - **🔄 Repetitive Output (10):**
   - `Qwen/Qwen3-VL-2B-Instruct` (token: `phrase: "tudor, tudor, tudor, tudor,..."`)
@@ -85,11 +83,11 @@ _Generated on 2026-03-06 13:22:23 GMT_
 
 ## 📊 Aggregate Statistics (Successful Runs)
 
-- **Generation Tps**: Avg: 87.3 | Min: 3.87 | Max: 331
-- **Peak Memory**: Avg: 15 | Min: 1.9 | Max: 60
-- **Total Time**: Avg: 22.41s | Min: 2.21s | Max: 137.25s
-- **Generation Time**: Avg: 19.44s | Min: 1.22s | Max: 132.83s
-- **Model Load Time**: Avg: 2.97s | Min: 0.96s | Max: 9.58s
+- **Generation Tps**: Avg: 85.9 | Min: 3.81 | Max: 327
+- **Peak Memory**: Avg: 17 | Min: 2.2 | Max: 74
+- **Total Time**: Avg: 26.12s | Min: 2.15s | Max: 139.16s
+- **Generation Time**: Avg: 22.80s | Min: 1.14s | Max: 134.96s
+- **Model Load Time**: Avg: 3.31s | Min: 0.96s | Max: 14.96s
 
 ## 🚨 Failures by Package (Actionable)
 
@@ -98,7 +96,6 @@ _Generated on 2026-03-06 13:22:23 GMT_
 | Package | Failures | Error Types | Affected Models |
 |---------|----------|-------------|-----------------|
 | `mlx-vlm` | 3 | API Mismatch, Model Error | `microsoft/Florence-2-large-ft`, `mlx-community/InternVL3-14B-8bit`, `mlx-community/InternVL3-8B-bf16` |
-| `mlx` | 2 | OOM | `mlx-community/Qwen3.5-35B-A3B-6bit`, `mlx-community/Qwen3.5-35B-A3B-bf16` |
 | `model-config` | 1 | Processor Error | `mlx-community/deepseek-vl2-8bit` |
 
 <!-- markdownlint-enable MD060 -->
@@ -115,15 +112,6 @@ _Generated on 2026-03-06 13:22:23 GMT_
   - Type: `ValueError`
 - **mlx-community/InternVL3-8B-bf16** (API Mismatch)
   - Error: `Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageModel.\_\_call\_\_() got an unexpected...`
-  - Type: `ValueError`
-
-#### mlx
-
-- **mlx-community/Qwen3.5-35B-A3B-6bit** (OOM)
-  - Error: `Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-6bit: [metal::malloc] Attempting to allocate ...`
-  - Type: `ValueError`
-- **mlx-community/Qwen3.5-35B-A3B-bf16** (OOM)
-  - Error: `Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-bf16: [metal::malloc] Attempting to allocate ...`
   - Type: `ValueError`
 
 #### model-config
@@ -159,7 +147,7 @@ Context: Existing metadata hints (high confidence; use only if visually consiste
 
 **Note:** Results sorted: errors first, then by generation time (fastest to slowest).
 
-**Overall runtime:** 985.24s
+**Overall runtime:** 1168.53s
 
 <!-- markdownlint-disable MD013 MD033 MD034 MD037 MD049 -->
 
@@ -168,51 +156,51 @@ Context: Existing metadata hints (high confidence; use only if visually consiste
 | `microsoft/Florence-2-large-ft`                         |         |                   |                       |                |              |           |             |                  |            |             |                                    |         mlx-vlm |
 | `mlx-community/InternVL3-14B-8bit`                      |         |                   |                       |                |              |           |             |                  |            |             |                                    |         mlx-vlm |
 | `mlx-community/InternVL3-8B-bf16`                       |         |                   |                       |                |              |           |             |                  |            |             |                                    |         mlx-vlm |
-| `mlx-community/Qwen3.5-35B-A3B-6bit`                    |         |                   |                       |                |              |           |             |                  |            |             |                                    |             mlx |
-| `mlx-community/Qwen3.5-35B-A3B-bf16`                    |         |                   |                       |                |              |           |             |                  |            |             |                                    |             mlx |
 | `mlx-community/deepseek-vl2-8bit`                       |         |                   |                       |                |              |           |             |                  |            |             |                                    |    model-config |
-| `mlx-community/LFM2-VL-1.6B-8bit`                       |       7 |               623 |                   130 |            753 |         1974 |       301 |         2.8 |            1.22s |      0.99s |       2.21s | description-sentences(3), ...      |                 |
-| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         |       1 |             1,393 |                     5 |          1,398 |         1547 |      21.5 |          11 |            1.49s |      3.39s |       4.88s | ⚠️harness(prompt_template), ...    |                 |
-| `mlx-community/LFM2.5-VL-1.6B-bf16`                     |       7 |               623 |                   155 |            778 |         2586 |       182 |           4 |            1.51s |      1.11s |       2.61s | description-sentences(3), ...      |                 |
-| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |   49279 |             1,470 |                     9 |          1,479 |         1248 |       121 |         5.5 |            1.66s |      1.31s |       2.96s | ⚠️harness(prompt_template), ...    |                 |
-| `qnguyen3/nanoLLaVA`                                    |  151645 |               373 |                   110 |            483 |         1755 |       102 |         4.7 |            1.76s |      1.05s |       2.81s | missing-sections(keywords), ...    |                 |
-| `mlx-community/SmolVLM-Instruct-bf16`                   |   49154 |             1,570 |                    19 |          1,589 |         1306 |       115 |         5.5 |            1.76s |      1.33s |       3.10s | missing-sections(title+descrip...  |                 |
-| `mlx-community/FastVLM-0.5B-bf16`                       |  151645 |               377 |                   190 |            567 |         1066 |       305 |         1.9 |            1.82s |      1.15s |       2.97s | fabrication, title-length(4), ...  |                 |
-| `mlx-community/nanoLLaVA-1.5-4bit`                      |   11297 |               373 |                   500 |            873 |         1799 |       331 |         2.5 |            2.18s |      0.96s |       3.14s | keyword-count(126), ...            |                 |
-| `prince-canuma/Florence-2-large-ft`                     |       0 |               933 |                   500 |          1,433 |         2400 |       330 |         5.1 |            2.27s |      1.31s |       3.57s | ⚠️harness(stop_token), ...         |                 |
-| `HuggingFaceTB/SmolVLM-Instruct`                        |   49154 |             1,570 |                    19 |          1,589 |          825 |       116 |         5.5 |            2.47s |      1.32s |       3.79s | missing-sections(title+descrip...  |                 |
-| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |             1,393 |                    14 |          1,407 |          422 |      29.7 |          12 |            4.12s |      3.62s |       7.74s | ⚠️harness(prompt_template), ...    |                 |
-| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |             2,964 |                   176 |          3,140 |          999 |       159 |         7.8 |            4.44s |      1.77s |       6.21s |                                    |                 |
-| `mlx-community/gemma-3n-E2B-4bit`                       |  236787 |               629 |                   500 |          1,129 |          509 |       110 |         5.9 |            6.14s |      3.26s |       9.40s | repetitive(16:23:54:), ...         |                 |
-| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 |  159131 |             1,360 |                   500 |          1,860 |          632 |       114 |          18 |            7.10s |      3.48s |      10.58s | missing-sections(title+descrip...  |                 |
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit`               |     276 |             1,360 |                   500 |          1,860 |          703 |       101 |          22 |            7.45s |      3.77s |      11.22s | title-length(70), ...              |                 |
-| `mlx-community/gemma-3n-E4B-it-bf16`                    |     106 |               637 |                   273 |            910 |          804 |      41.9 |          17 |            7.67s |      4.88s |      12.55s | missing-sections(title+descrip...  |                 |
-| `mlx-community/gemma-3-27b-it-qat-4bit`                 |     106 |               638 |                   139 |            777 |          173 |      28.1 |          19 |            9.00s |      5.00s |      14.00s |                                    |                 |
-| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          |      11 |             1,360 |                   500 |          1,860 |          882 |      69.2 |          37 |            9.45s |      5.91s |      15.37s | missing-sections(title+descrip...  |                 |
-| `mlx-community/pixtral-12b-8bit`                        |       2 |             3,155 |                   130 |          3,285 |          522 |      35.3 |          16 |           10.08s |      3.15s |      13.23s | title-length(5), ...               |                 |
-| `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`     |       2 |             2,965 |                   162 |          3,127 |          405 |        57 |          13 |           10.52s |      2.50s |      13.02s |                                    |                 |
-| `mlx-community/Phi-3.5-vision-instruct-bf16`            |    3303 |             1,172 |                   500 |          1,672 |         1257 |      53.1 |         9.4 |           10.75s |      1.85s |      12.60s | repetitive(phrase: "united kin...  |                 |
-| `microsoft/Phi-3.5-vision-instruct`                     |    3303 |             1,172 |                   500 |          1,672 |         1058 |      52.7 |         9.4 |           11.01s |      1.83s |      12.84s | repetitive(phrase: "united kin...  |                 |
-| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`     |       2 |             2,965 |                   187 |          3,152 |          403 |      54.2 |          13 |           11.18s |      2.58s |      13.77s |                                    |                 |
-| `mlx-community/Idefics3-8B-Llama3-bf16`                 |  128001 |             2,654 |                   228 |          2,882 |          750 |      29.7 |          18 |           11.61s |      3.60s |      15.21s | description-sentences(6), ...      |                 |
-| `mlx-community/pixtral-12b-bf16`                        |       2 |             3,155 |                   130 |          3,285 |          574 |      19.7 |          28 |           12.43s |      4.89s |      17.32s | title-length(5), ...               |                 |
-| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               638 |                   132 |            770 |          167 |      15.5 |          34 |           12.74s |      7.09s |      19.83s |                                    |                 |
-| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |             2,566 |                    99 |          2,665 |          251 |      43.6 |          11 |           12.86s |      1.83s |      14.69s | missing-sections(title+descrip...  |                 |
-| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |             1,393 |                    49 |          1,442 |          452 |      4.88 |          26 |           13.50s |      5.39s |      18.89s | missing-sections(title+descrip...  |                 |
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |             2,455 |                   106 |          2,561 |          236 |      28.2 |          22 |           14.53s |      3.97s |      18.50s | ⚠️harness(encoding), ...           |                 |
-| `mlx-community/paligemma2-3b-pt-896-4bit`               |     108 |             4,465 |                   500 |          4,965 |         1575 |      44.3 |         4.3 |           14.63s |      2.73s |      17.36s | repetitive(phrase: "15-30 uniq...  |                 |
-| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      |     376 |             1,676 |                   500 |          2,176 |          530 |      46.5 |          60 |           14.65s |      9.58s |      24.23s | repetitive(phrase: ""springtim...  |                 |
-| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         |    1058 |             3,246 |                   500 |          3,746 |          412 |      36.2 |          15 |           22.04s |      3.11s |      25.15s | missing-sections(title+descrip...  |                 |
-| `mlx-community/GLM-4.6V-Flash-mxfp4`                    |     198 |             6,489 |                   500 |          6,989 |          330 |      63.1 |         8.4 |           28.00s |      2.38s |      30.38s | missing-sections(title+descrip...  |                 |
-| `mlx-community/GLM-4.6V-Flash-6bit`                     |    9254 |             6,489 |                   500 |          6,989 |          315 |      46.8 |          11 |           31.68s |      2.72s |      34.41s | missing-sections(title+descrip...  |                 |
-| `mlx-community/Molmo-7B-D-0924-bf16`                    |  151643 |             1,552 |                    28 |          1,580 |         44.6 |      26.9 |          48 |           36.67s |      3.27s |      39.94s | missing-sections(title+descrip...  |                 |
-| `mlx-community/Molmo-7B-D-0924-8bit`                    |  151643 |             1,552 |                    28 |          1,580 |         43.9 |      40.4 |          41 |           36.89s |      2.23s |      39.12s | missing-sections(title+descrip...  |                 |
-| `mlx-community/X-Reasoner-7B-8bit`                      |   27959 |            16,601 |                   500 |         17,101 |          429 |      47.7 |          13 |           49.63s |      2.46s |      52.09s | ⚠️harness(long_context), ...       |                 |
-| `Qwen/Qwen3-VL-2B-Instruct`                             |   90151 |            16,590 |                   500 |         17,090 |          386 |      75.8 |         8.3 |           50.07s |      1.58s |      51.65s | ⚠️harness(long_context), ...       |                 |
-| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |     594 |            16,592 |                   500 |         17,092 |          370 |      74.9 |         8.3 |           51.96s |      1.84s |      53.80s | ⚠️harness(long_context), ...       |                 |
-| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      |      11 |               343 |                   500 |            843 |          107 |      8.83 |          15 |           60.23s |      2.84s |      63.07s | repetitive(phrase: "cemetery, ...  |                 |
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               |  151645 |            16,601 |                   126 |         16,727 |          204 |       178 |         5.1 |           82.48s |      1.28s |      83.76s | description-sentences(3), ...      |                 |
-| `meta-llama/Llama-3.2-11B-Vision-Instruct`              |   34243 |               344 |                   500 |            844 |          101 |      3.87 |          25 |          132.83s |      4.41s |     137.25s | repetitive(phrase: "tradition, ... |                 |
+| `mlx-community/LFM2-VL-1.6B-8bit`                       |       7 |               623 |                   130 |            753 |         2630 |       300 |         2.8 |            1.14s |      1.01s |       2.15s | description-sentences(3), ...      |                 |
+| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         |       1 |             1,393 |                     5 |          1,398 |         1527 |      21.6 |          11 |            1.50s |      3.48s |       4.98s | ⚠️harness(prompt_template), ...    |                 |
+| `mlx-community/LFM2.5-VL-1.6B-bf16`                     |       7 |               623 |                   155 |            778 |         2568 |       181 |           4 |            1.51s |      1.12s |       2.63s | description-sentences(3), ...      |                 |
+| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |   49279 |             1,470 |                     9 |          1,479 |         1251 |       122 |         5.5 |            1.64s |      1.30s |       2.94s | ⚠️harness(prompt_template), ...    |                 |
+| `mlx-community/FastVLM-0.5B-bf16`                       |  151645 |               377 |                   190 |            567 |         2546 |       304 |         2.2 |            1.66s |      1.25s |       2.91s | fabrication, title-length(4), ...  |                 |
+| `qnguyen3/nanoLLaVA`                                    |  151645 |               373 |                   110 |            483 |         1745 |       101 |         4.7 |            1.76s |      1.04s |       2.80s | missing-sections(keywords), ...    |                 |
+| `mlx-community/SmolVLM-Instruct-bf16`                   |   49154 |             1,570 |                    19 |          1,589 |         1295 |       116 |         5.5 |            1.77s |      1.35s |       3.12s | missing-sections(title+descrip...  |                 |
+| `HuggingFaceTB/SmolVLM-Instruct`                        |   49154 |             1,570 |                    19 |          1,589 |         1295 |       116 |         5.5 |            1.78s |      1.35s |       3.13s | missing-sections(title+descrip...  |                 |
+| `prince-canuma/Florence-2-large-ft`                     |       0 |               933 |                   500 |          1,433 |         3990 |       326 |         5.1 |            2.13s |      1.53s |       3.65s | ⚠️harness(stop_token), ...         |                 |
+| `mlx-community/nanoLLaVA-1.5-4bit`                      |   11297 |               373 |                   500 |            873 |         1869 |       327 |         2.5 |            2.18s |      0.96s |       3.14s | keyword-count(126), ...            |                 |
+| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |             1,393 |                    14 |          1,407 |          509 |      28.9 |          12 |            3.58s |      3.71s |       7.29s | ⚠️harness(prompt_template), ...    |                 |
+| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |             2,964 |                   176 |          3,140 |         1001 |       162 |         7.8 |            4.40s |      1.69s |       6.09s |                                    |                 |
+| `mlx-community/gemma-3n-E2B-4bit`                       |  236787 |               629 |                   500 |          1,129 |         1276 |       111 |           6 |            5.36s |      3.26s |       8.62s | repetitive(16:23:54:), ...         |                 |
+| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 |  159131 |             1,360 |                   500 |          1,860 |          854 |       114 |          18 |            6.56s |      3.60s |      10.17s | missing-sections(title+descrip...  |                 |
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit`               |     276 |             1,360 |                   500 |          1,860 |          880 |       103 |          22 |            6.98s |      3.76s |      10.75s | title-length(70), ...              |                 |
+| `mlx-community/gemma-3n-E4B-it-bf16`                    |     106 |               637 |                   273 |            910 |          841 |      41.7 |          17 |            7.67s |      4.89s |      12.56s | missing-sections(title+descrip...  |                 |
+| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          |      11 |             1,360 |                   500 |          1,860 |          821 |      68.7 |          37 |            9.61s |      5.91s |      15.52s | missing-sections(title+descrip...  |                 |
+| `mlx-community/gemma-3-27b-it-qat-4bit`                 |     106 |               638 |                   139 |            777 |          162 |      26.1 |          19 |            9.65s |      5.00s |      14.65s |                                    |                 |
+| `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`     |       2 |             2,965 |                   162 |          3,127 |          401 |      57.8 |          13 |           10.56s |      2.49s |      13.05s |                                    |                 |
+| `mlx-community/pixtral-12b-8bit`                        |       2 |             3,155 |                   130 |          3,285 |          481 |      35.4 |          16 |           10.58s |      3.19s |      13.77s | title-length(5), ...               |                 |
+| `mlx-community/Phi-3.5-vision-instruct-bf16`            |    3303 |             1,172 |                   500 |          1,672 |         1249 |      52.9 |         9.4 |           10.79s |      1.81s |      12.59s | repetitive(phrase: "united kin...  |                 |
+| `microsoft/Phi-3.5-vision-instruct`                     |    3303 |             1,172 |                   500 |          1,672 |         1218 |      51.7 |         9.4 |           11.05s |      1.75s |      12.79s | repetitive(phrase: "united kin...  |                 |
+| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`     |       2 |             2,965 |                   187 |          3,152 |          388 |      54.5 |          13 |           11.43s |      2.53s |      13.96s |                                    |                 |
+| `mlx-community/Idefics3-8B-Llama3-bf16`                 |  128001 |             2,654 |                   228 |          2,882 |          732 |      29.7 |          18 |           11.73s |      3.83s |      15.56s | description-sentences(6), ...      |                 |
+| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               638 |                   132 |            770 |          179 |      15.6 |          34 |           12.42s |      7.15s |      19.57s |                                    |                 |
+| `mlx-community/pixtral-12b-bf16`                        |       2 |             3,155 |                   130 |          3,285 |          554 |      19.8 |          28 |           12.61s |      4.83s |      17.44s | title-length(5), ...               |                 |
+| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |             2,566 |                    99 |          2,665 |          251 |      43.9 |          11 |           12.84s |      1.82s |      14.66s | missing-sections(title+descrip...  |                 |
+| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |             1,393 |                    49 |          1,442 |          430 |      4.89 |          26 |           13.62s |      5.30s |      18.92s | missing-sections(title+descrip...  |                 |
+| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      |     376 |             1,676 |                   500 |          2,176 |          537 |      45.6 |          60 |           14.86s |      9.25s |      24.10s | repetitive(phrase: ""springtim...  |                 |
+| `mlx-community/paligemma2-3b-pt-896-4bit`               |     108 |             4,465 |                   500 |          4,965 |         1496 |      42.5 |         4.3 |           15.26s |      2.72s |      17.98s | repetitive(phrase: "15-30 uniq...  |                 |
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |             2,455 |                   106 |          2,561 |          220 |      27.1 |          22 |           15.43s |      3.98s |      19.41s | ⚠️harness(encoding), ...           |                 |
+| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         |    1058 |             3,246 |                   500 |          3,746 |          423 |      33.9 |          15 |           22.79s |      3.08s |      25.87s | missing-sections(title+descrip...  |                 |
+| `mlx-community/GLM-4.6V-Flash-mxfp4`                    |     198 |             6,489 |                   500 |          6,989 |          284 |      60.8 |         8.4 |           31.47s |      2.51s |      33.99s | missing-sections(title+descrip...  |                 |
+| `mlx-community/GLM-4.6V-Flash-6bit`                     |    9254 |             6,489 |                   500 |          6,989 |          299 |        46 |          11 |           32.97s |      2.69s |      35.66s | missing-sections(title+descrip...  |                 |
+| `mlx-community/Molmo-7B-D-0924-8bit`                    |  151643 |             1,552 |                    28 |          1,580 |         44.6 |      40.5 |          41 |           36.31s |      2.17s |      38.48s | missing-sections(title+descrip...  |                 |
+| `mlx-community/Molmo-7B-D-0924-bf16`                    |  151643 |             1,552 |                    28 |          1,580 |         44.6 |      26.9 |          48 |           36.63s |      3.18s |      39.82s | missing-sections(title+descrip...  |                 |
+| `Qwen/Qwen3-VL-2B-Instruct`                             |   90151 |            16,590 |                   500 |         17,090 |          384 |      75.1 |         8.3 |           50.37s |      1.67s |      52.04s | ⚠️harness(long_context), ...       |                 |
+| `mlx-community/X-Reasoner-7B-8bit`                      |   27959 |            16,601 |                   500 |         17,101 |          408 |      46.7 |          13 |           51.88s |      2.48s |      54.36s | ⚠️harness(long_context), ...       |                 |
+| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |     594 |            16,592 |                   500 |         17,092 |          339 |      74.9 |         8.3 |           56.11s |      1.88s |      57.99s | ⚠️harness(long_context), ...       |                 |
+| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      |      11 |               343 |                   500 |            843 |         97.2 |      8.36 |          15 |           63.76s |      2.88s |      66.63s | repetitive(phrase: "cemetery, ...  |                 |
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               |  151645 |            16,601 |                   126 |         16,727 |          206 |       179 |         5.1 |           81.89s |      1.29s |      83.18s | description-sentences(3), ...      |                 |
+| `mlx-community/Qwen3.5-35B-A3B-6bit`                    |     303 |            16,604 |                   500 |         17,104 |          217 |      74.4 |          33 |           83.72s |      5.93s |      89.65s | degeneration, fabrication          |                 |
+| `mlx-community/Qwen3.5-35B-A3B-bf16`                    |   15879 |            16,604 |                   500 |         17,104 |          216 |      55.4 |          74 |           86.49s |     14.96s |     101.45s | missing-sections(title+descrip...  |                 |
+| `meta-llama/Llama-3.2-11B-Vision-Instruct`              |   34243 |               344 |                   500 |            844 |          108 |      3.81 |          25 |          134.96s |      4.20s |     139.16s | repetitive(phrase: "tradition, ... |                 |
 
 <!-- markdownlint-enable MD013 MD033 MD034 MD037 MD049 -->
 
@@ -240,13 +228,13 @@ Full output from each model:
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 876, in process_inputs_with_fallback
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 883, in process_inputs_with_fallback
     return process_inputs(
         processor,
     ...<5 lines>...
         **kwargs,
     )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 862, in process_inputs
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 869, in process_inputs
     return process_method(**args)
   File "/opt/homebrew/Caskroom/miniconda/base/lib/python3.13/site-packages/transformers/models/florence2/processing_florence2.py", line 163, in __call__
     image_inputs = self.image_processor(images, **output_kwargs["images_kwargs"])
@@ -273,13 +261,13 @@ ValueError: Only returning PyTorch tensors is currently supported.
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 889, in process_inputs_with_fallback
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 896, in process_inputs_with_fallback
     return process_inputs(
         processor,
     ...<5 lines>...
         **kwargs,
     )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 862, in process_inputs
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 869, in process_inputs
     return process_method(**args)
   File "/opt/homebrew/Caskroom/miniconda/base/lib/python3.13/site-packages/transformers/models/florence2/processing_florence2.py", line 185, in __call__
     self.image_token * self.num_image_tokens
@@ -291,7 +279,7 @@ TypeError: can only concatenate str (not "NoneType") to str
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10362, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10842, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -301,22 +289,22 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 662, in generate
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 663, in generate
     for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
                     ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 505, in stream_generate
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 506, in stream_generate
     inputs = prepare_inputs(
         processor,
     ...<6 lines>...
         **kwargs,
     )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1111, in prepare_inputs
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1120, in prepare_inputs
     inputs = process_inputs_with_fallback(
         processor,
     ...<4 lines>...
         **kwargs,
     )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 899, in process_inputs_with_fallback
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 906, in process_inputs_with_fallback
     raise ValueError(
         f"Failed to process inputs with error: {fallback_error}"
     ) from fallback_error
@@ -325,7 +313,7 @@ ValueError: Failed to process inputs with error: can only concatenate str (not "
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10492, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10972, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -334,7 +322,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10387, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10867, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
 ```
@@ -361,7 +349,7 @@ ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10362, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10842, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -371,13 +359,13 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 662, in generate
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 663, in generate
     for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
                     ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 550, in stream_generate
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 551, in stream_generate
     for n, (token, logprobs) in enumerate(gen):
                                 ~~~~~~~~~^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 408, in generate_step
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 409, in generate_step
     model.language_model(
     ~~~~~~~~~~~~~~~~~~~~^
         inputs=input_ids[:, :n_to_process],
@@ -392,7 +380,7 @@ TypeError: LanguageModel.__call__() got an unexpected keyword argument 'n_to_pro
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10492, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10972, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -401,7 +389,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10392, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10872, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
 ValueError: Model runtime error during generation for mlx-community/InternVL3-14B-8bit: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
 ```
@@ -428,7 +416,7 @@ ValueError: Model runtime error during generation for mlx-community/InternVL3-14
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10362, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10842, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -438,13 +426,13 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 662, in generate
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 663, in generate
     for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
                     ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 550, in stream_generate
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 551, in stream_generate
     for n, (token, logprobs) in enumerate(gen):
                                 ~~~~~~~~~^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 408, in generate_step
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 409, in generate_step
     model.language_model(
     ~~~~~~~~~~~~~~~~~~~~^
         inputs=input_ids[:, :n_to_process],
@@ -459,7 +447,7 @@ TypeError: LanguageModel.__call__() got an unexpected keyword argument 'n_to_pro
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10492, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10972, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -468,131 +456,9 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10392, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10872, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
 ValueError: Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
-```
-
-</details>
-
----
-
-### ❌ mlx-community/Qwen3.5-35B-A3B-6bit
-
-**Status:** Failed (OOM)
-**Error:**
-
-> Model runtime error during generation for
-> mlx-community/Qwen3.5-35B-A3B-6bit: [metal::malloc] Attempting to allocate
-> 134767706112 bytes which is greater than the maximum allowed buffer size of
-> 86586540032 bytes.
-**Type:** `ValueError`
-**Phase:** `decode`
-**Code:** `MLX_DECODE_OOM`
-**Package:** `mlx`
-
-<details>
-<summary>Full Traceback (click to expand)</summary>
-
-```python
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10362, in _run_model_generation
-    output: GenerationResult | SupportsGenerationResult = generate(
-                                                          ~~~~~~~~^
-        model=model,
-        ^^^^^^^^^^^^
-    ...<13 lines>...
-        **extra_kwargs,
-        ^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 662, in generate
-    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
-                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 550, in stream_generate
-    for n, (token, logprobs) in enumerate(gen):
-                                ~~~~~~~~~^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 416, in generate_step
-    mx.eval([c.state for c in prompt_cache])
-    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-RuntimeError: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10492, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10392, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
-ValueError: Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-6bit: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
-```
-
-</details>
-
----
-
-### ❌ mlx-community/Qwen3.5-35B-A3B-bf16
-
-**Status:** Failed (OOM)
-**Error:**
-
-> Model runtime error during generation for
-> mlx-community/Qwen3.5-35B-A3B-bf16: [metal::malloc] Attempting to allocate
-> 134767706112 bytes which is greater than the maximum allowed buffer size of
-> 86586540032 bytes.
-**Type:** `ValueError`
-**Phase:** `decode`
-**Code:** `MLX_DECODE_OOM`
-**Package:** `mlx`
-
-<details>
-<summary>Full Traceback (click to expand)</summary>
-
-```python
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10362, in _run_model_generation
-    output: GenerationResult | SupportsGenerationResult = generate(
-                                                          ~~~~~~~~^
-        model=model,
-        ^^^^^^^^^^^^
-    ...<13 lines>...
-        **extra_kwargs,
-        ^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 662, in generate
-    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
-                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 550, in stream_generate
-    for n, (token, logprobs) in enumerate(gen):
-                                ~~~~~~~~~^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 416, in generate_step
-    mx.eval([c.state for c in prompt_cache])
-    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-RuntimeError: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10492, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10392, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
-ValueError: Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-bf16: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
 ```
 
 </details>
@@ -616,7 +482,7 @@ ValueError: Model runtime error during generation for mlx-community/Qwen3.5-35B-
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10313, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10798, in _run_model_generation
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -626,7 +492,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10238, in _run_model_preflight_validators
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10723, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -635,14 +501,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10152, in _raise_preflight_error
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10637, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10492, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10972, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -651,7 +517,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10325, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 10810, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -662,7 +528,7 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ### ✅ mlx-community/LFM2-VL-1.6B-8bit
 
-**Metrics:** 301 TPS | 130 tokens
+**Metrics:** 300 TPS | 130 tokens
 
 ```text
 Title: 6-12 words, descriptive and concrete.
@@ -675,7 +541,7 @@ Keywords: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-ti
 
 ### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
 
-**Metrics:** 21.5 TPS | 5 tokens
+**Metrics:** 21.6 TPS | 5 tokens
 
 ```text
 - Daytime.
@@ -685,7 +551,7 @@ Keywords: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-ti
 
 ### ✅ mlx-community/LFM2.5-VL-1.6B-bf16
 
-**Metrics:** 182 TPS | 155 tokens
+**Metrics:** 181 TPS | 155 tokens
 
 ```text
 Title: St Mary's Church, Lenham, England, United Kingdom, UK
@@ -699,7 +565,7 @@ Keywords: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-ti
 
 ### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
 
-**Metrics:** 121 TPS | 9 tokens
+**Metrics:** 122 TPS | 9 tokens
 
 ```text
  Cemetery, England, United Kingdom, UK
@@ -707,30 +573,9 @@ Keywords: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-ti
 
 ---
 
-### ✅ qnguyen3/nanoLLaVA
-
-**Metrics:** 102 TPS | 110 tokens
-
-```text
-Title: 6-12 words, descriptive and concrete.
-Description: A picturesque scene of a village in England, with a churchyard that is covered in moss. The church is old and has a stone structure, and there are several old, moss-covered headstones scattered around. The village square is full of life, with people going about their day. The sky above is a beautiful blue with white clouds, and the clouds are fluffy and light. The image captures the essence of a quiet, serene village at the end of the year.
-```
-
----
-
-### ✅ mlx-community/SmolVLM-Instruct-bf16
-
-**Metrics:** 115 TPS | 19 tokens
-
-```text
- A late winter afternoon in the historic village of lenham, kent, england.
-```
-
----
-
 ### ✅ mlx-community/FastVLM-0.5B-bf16
 
-**Metrics:** 305 TPS | 190 tokens
+**Metrics:** 304 TPS | 190 tokens
 
 ```text
 Title: Medieval Village in England
@@ -741,9 +586,50 @@ Description: A late winter afternoon in the historic village of Lenham, Kent, En
 
 ---
 
+### ✅ qnguyen3/nanoLLaVA
+
+**Metrics:** 101 TPS | 110 tokens
+
+```text
+Title: 6-12 words, descriptive and concrete.
+Description: A picturesque scene of a village in England, with a churchyard that is covered in moss. The church is old and has a stone structure, and there are several old, moss-covered headstones scattered around. The village square is full of life, with people going about their day. The sky above is a beautiful blue with white clouds, and the clouds are fluffy and light. The image captures the essence of a quiet, serene village at the end of the year.
+```
+
+---
+
+### ✅ mlx-community/SmolVLM-Instruct-bf16
+
+**Metrics:** 116 TPS | 19 tokens
+
+```text
+ A late winter afternoon in the historic village of lenham, kent, england.
+```
+
+---
+
+### ✅ HuggingFaceTB/SmolVLM-Instruct
+
+**Metrics:** 116 TPS | 19 tokens
+
+```text
+ A late winter afternoon in the historic village of lenham, kent, england.
+```
+
+---
+
+### ✅ prince-canuma/Florence-2-large-ft
+
+**Metrics:** 326 TPS | 500 tokens
+
+```text
+<s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s>
+```
+
+---
+
 ### ✅ mlx-community/nanoLLaVA-1.5-4bit
 
-**Metrics:** 331 TPS | 500 tokens
+**Metrics:** 327 TPS | 500 tokens
 
 ```text
 Title: 6-12 words, descriptive and concrete.
@@ -764,29 +650,9 @@ Context: Existing metadata hints (high confidence; use only if visually consiste
 
 ---
 
-### ✅ prince-canuma/Florence-2-large-ft
-
-**Metrics:** 330 TPS | 500 tokens
-
-```text
-<s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s>
-```
-
----
-
-### ✅ HuggingFaceTB/SmolVLM-Instruct
-
-**Metrics:** 116 TPS | 19 tokens
-
-```text
- A late winter afternoon in the historic village of lenham, kent, england.
-```
-
----
-
 ### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
 
-**Metrics:** 29.7 TPS | 14 tokens
+**Metrics:** 28.9 TPS | 14 tokens
 
 ```text
 - Use only the hints that are visually supported by the image.
@@ -796,7 +662,7 @@ Context: Existing metadata hints (high confidence; use only if visually consiste
 
 ### ✅ mlx-community/Ministral-3-3B-Instruct-2512-4bit
 
-**Metrics:** 159 TPS | 176 tokens
+**Metrics:** 162 TPS | 176 tokens
 
 ```text
 Title: Historic Churchyard in Lenham, Kent – Mossy Graveyard with Tudor Villages
@@ -810,7 +676,7 @@ Keywords: ancient gravestones, churchyard, Lenham, Kent, UK, St Mary’s Church,
 
 ### ✅ mlx-community/gemma-3n-E2B-4bit
 
-**Metrics:** 110 TPS | 500 tokens
+**Metrics:** 111 TPS | 500 tokens
 
 ```text
  12:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54: 16:23:54:
@@ -836,7 +702,7 @@ Wait, need to check the context hints. The context mentioned "Spring" and "bare 
 
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-8bit
 
-**Metrics:** 101 TPS | 500 tokens
+**Metrics:** 103 TPS | 500 tokens
 
 ```text
 ◁think▷Okay, let's analyze the image for cataloging metadata based on the provided context and rules.
@@ -858,7 +724,7 @@ Keywords: Lenham, Kent, England, UK, United Kingdom, St Mary's Church, graveyard
 
 ### ✅ mlx-community/gemma-3n-E4B-it-bf16
 
-**Metrics:** 41.9 TPS | 273 tokens
+**Metrics:** 41.7 TPS | 273 tokens
 
 ```text
 ## Caption:
@@ -882,23 +748,9 @@ churchyard, headstones, village, Kent, UK, St Mary's Church, half-timbered house
 
 ---
 
-### ✅ mlx-community/gemma-3-27b-it-qat-4bit
-
-**Metrics:** 28.1 TPS | 139 tokens
-
-```text
-Title: St Mary's Church and village square in Lenham, Kent
-
-Description: This image shows the churchyard of St Mary's Church overlooking a village square with historic buildings. Moss-covered headstones are visible in the foreground, with early spring daffodils blooming.
-
-Keywords: St Mary's Church, Lenham, Kent, village square, churchyard, gravestones, headstones, daffodils, half-timbered houses, Tudor architecture, brick buildings, bare trees, green grass, moss, ancient gravestones, parish church, England, United Kingdom, Europe, sky, clouds, winter, afternoon, landscape, outdoor, historic buildings, cypress tree, quaint, rural
-```
-
----
-
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
 
-**Metrics:** 69.2 TPS | 500 tokens
+**Metrics:** 68.7 TPS | 500 tokens
 
 ```text
 ◁think▷Got it, let's analyze the image and create the required metadata.
@@ -912,23 +764,23 @@ For keywords: Need 15 - 30 unique terms, ordered from most specific to most gene
 
 ---
 
-### ✅ mlx-community/pixtral-12b-8bit
+### ✅ mlx-community/gemma-3-27b-it-qat-4bit
 
-**Metrics:** 35.3 TPS | 130 tokens
+**Metrics:** 26.1 TPS | 139 tokens
 
 ```text
-**Title:** Historic Churchyard in Lenham, Kent
+Title: St Mary's Church and village square in Lenham, Kent
 
-**Description:** The image captures a serene churchyard of St Mary's Church in Lenham, Kent, surrounded by quaint Tudor-style houses.
+Description: This image shows the churchyard of St Mary's Church overlooking a village square with historic buildings. Moss-covered headstones are visible in the foreground, with early spring daffodils blooming.
 
-**Keywords:** Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue sky, clouds, churchyard, historic, moss-covered headstones, old buildings, outdoor, village square, winter
+Keywords: St Mary's Church, Lenham, Kent, village square, churchyard, gravestones, headstones, daffodils, half-timbered houses, Tudor architecture, brick buildings, bare trees, green grass, moss, ancient gravestones, parish church, England, United Kingdom, Europe, sky, clouds, winter, afternoon, landscape, outdoor, historic buildings, cypress tree, quaint, rural
 ```
 
 ---
 
 ### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
 
-**Metrics:** 57 TPS | 162 tokens
+**Metrics:** 57.8 TPS | 162 tokens
 
 ```text
 Title: **Historic Churchyard with Ancient Gravestones and Tudor Houses**
@@ -940,9 +792,23 @@ Keywords: churchyard, ancient gravestones, moss-covered headstones, Tudor-style 
 
 ---
 
+### ✅ mlx-community/pixtral-12b-8bit
+
+**Metrics:** 35.4 TPS | 130 tokens
+
+```text
+**Title:** Historic Churchyard in Lenham, Kent
+
+**Description:** The image captures a serene churchyard of St Mary's Church in Lenham, Kent, surrounded by quaint Tudor-style houses.
+
+**Keywords:** Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue sky, clouds, churchyard, historic, moss-covered headstones, old buildings, outdoor, village square, winter
+```
+
+---
+
 ### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
 
-**Metrics:** 53.1 TPS | 500 tokens
+**Metrics:** 52.9 TPS | 500 tokens
 
 ```text
 Title: Historic Lenham Village Churchyard
@@ -956,7 +822,7 @@ Keywords: churchyard, Lenham, Kent, England, Tudor-style, gravestones, half-timb
 
 ### ✅ microsoft/Phi-3.5-vision-instruct
 
-**Metrics:** 52.7 TPS | 500 tokens
+**Metrics:** 51.7 TPS | 500 tokens
 
 ```text
 Title: Historic Lenham Village Churchyard
@@ -970,7 +836,7 @@ Keywords: churchyard, Lenham, Kent, England, Tudor-style, gravestones, half-timb
 
 ### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
 
-**Metrics:** 54.2 TPS | 187 tokens
+**Metrics:** 54.5 TPS | 187 tokens
 
 ```text
 **Title:**
@@ -999,23 +865,9 @@ Keywords: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-ti
 
 ---
 
-### ✅ mlx-community/pixtral-12b-bf16
-
-**Metrics:** 19.7 TPS | 130 tokens
-
-```text
-**Title:** Historic Churchyard in Lenham, Kent
-
-**Description:** The image captures a serene churchyard of St Mary's Church in Lenham, Kent, surrounded by quaint Tudor-style houses.
-
-**Keywords:** Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue sky, clouds, churchyard, historic, moss-covered headstones, old buildings, outdoor, village square, winter
-```
-
----
-
 ### ✅ mlx-community/gemma-3-27b-it-qat-8bit
 
-**Metrics:** 15.5 TPS | 132 tokens
+**Metrics:** 15.6 TPS | 132 tokens
 
 ```text
 Title: St Mary's Church and village square in Lenham, Kent
@@ -1027,9 +879,23 @@ Keywords: St Mary's Church, Lenham, Kent, village square, graveyard, headstones,
 
 ---
 
+### ✅ mlx-community/pixtral-12b-bf16
+
+**Metrics:** 19.8 TPS | 130 tokens
+
+```text
+**Title:** Historic Churchyard in Lenham, Kent
+
+**Description:** The image captures a serene churchyard of St Mary's Church in Lenham, Kent, surrounded by quaint Tudor-style houses.
+
+**Keywords:** Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue sky, clouds, churchyard, historic, moss-covered headstones, old buildings, outdoor, village square, winter
+```
+
+---
+
 ### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
 
-**Metrics:** 43.6 TPS | 99 tokens
+**Metrics:** 43.9 TPS | 99 tokens
 
 ```text
 The image is a photograph of a graveyard with a church in the background. The graveyard is filled with old, weathered tombstones. The church has a half-timbered design and is surrounded by a stone wall. The sky is partly cloudy, suggesting it might be late winter or early spring. The colors are muted, with the greens of the grass and trees contrasting against the gray and white of the tombstones and the stone wall.
@@ -1039,7 +905,7 @@ The image is a photograph of a graveyard with a church in the background. The gr
 
 ### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
 
-**Metrics:** 4.88 TPS | 49 tokens
+**Metrics:** 4.89 TPS | 49 tokens
 
 ```text
 - Use only the hints that are visually supported by the image.
@@ -1050,19 +916,27 @@ The image is a photograph of a graveyard with a church in the background. The gr
 
 ---
 
-### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
 
-**Metrics:** 28.2 TPS | 106 tokens
+**Metrics:** 45.6 TPS | 500 tokens
 
 ```text
-Title:ĠHistoricĠChurchyardĠwithĠTudorĠHousesĊĊDescription:ĠTheĠimageĠshowsĠaĠchurchyardĠwithĠoldĠgravestonesĠandĠaĠbackdropĠofĠtraditionalĠTudor-styleĠhousesĠinĠLenham,ĠEngland.ĊĊKeywords:ĠStĠMary'sĠChurch,ĠLenham,ĠEngland,ĠUK,Ġchurchyard,Ġgravestones,ĠTudorĠhouses,Ġhalf-timberedĠarchitecture,Ġmoss-coveredĠstones,ĠvillageĠsquare,Ġhistoric,Ġancient,Ġgrass,ĠbareĠtrees,ĠblueĠsky,ĠcypressĠtree,ĠChristianity,ĠEurope,ĠKent,Ġquaint,Ġspring,ĠancientĠgravestones
+Alright, here's what I'm thinking. I need to generate metadata for this image, and the instructions are very specific. First, I need a title, description, and keywords. No fluff, just the facts.
+
+The image itself is a classic English countryside scene. I see a churchyard, with a church, some old houses, and a few trees. The crops are helpful, confirming the details.
+
+For the title, I'll go with "Quaint English Churchyard with Historic Houses and Gravestones." It's descriptive and concise.
+
+The description needs to be factual. I'll use the provided caption as a base, but I'll refine it. I'll say: "A late winter afternoon in the historic village of Lenham, Kent, England. This view from the churchyard of St Mary's Church looks out over the village square. In the foreground, ancient, moss-covered headstones dot the landscape." It's accurate and covers the key elements.
+
+Now for the keywords. I'll start with the most specific terms and work my way up. I'll include things like "Lenham," "St Mary's Church," "Kent," "England," "UK," "churchyard," "graves," "headstones," "Tudor-style houses," "half-timbered houses," "moss," "spring," "quaint," "ancient," "historic," "village," "countryside," "rural," "church," "village square," "spring flowers," "spring foliage," "spring greenery," "springtime," "springtime foliage," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "
 ```
 
 ---
 
 ### ✅ mlx-community/paligemma2-3b-pt-896-4bit
 
-**Metrics:** 44.3 TPS | 500 tokens
+**Metrics:** 42.5 TPS | 500 tokens
 
 ```text
 - Keyword hints: 15-30 unique comma-separated terms, ordered most specific to most general.
@@ -1091,27 +965,19 @@ Title:ĠHistoricĠChurchyardĠwithĠTudorĠHousesĊĊDescription:ĠTheĠimageĠs
 
 ---
 
-### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
 
-**Metrics:** 46.5 TPS | 500 tokens
+**Metrics:** 27.1 TPS | 106 tokens
 
 ```text
-Alright, here's what I'm thinking. I need to generate metadata for this image, and the instructions are very specific. First, I need a title, description, and keywords. No fluff, just the facts.
-
-The image itself is a classic English countryside scene. I see a churchyard, with a church, some old houses, and a few trees. The crops are helpful, confirming the details.
-
-For the title, I'll go with "Quaint English Churchyard with Historic Houses and Gravestones." It's descriptive and concise.
-
-The description needs to be factual. I'll use the provided caption as a base, but I'll refine it. I'll say: "A late winter afternoon in the historic village of Lenham, Kent, England. This view from the churchyard of St Mary's Church looks out over the village square. In the foreground, ancient, moss-covered headstones dot the landscape." It's accurate and covers the key elements.
-
-Now for the keywords. I'll start with the most specific terms and work my way up. I'll include things like "Lenham," "St Mary's Church," "Kent," "England," "UK," "churchyard," "graves," "headstones," "Tudor-style houses," "half-timbered houses," "moss," "spring," "quaint," "ancient," "historic," "village," "countryside," "rural," "church," "village square," "spring flowers," "spring foliage," "spring greenery," "springtime," "springtime foliage," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "springtime flowers," "springtime greenery," "
+Title:ĠHistoricĠChurchyardĠwithĠTudorĠHousesĊĊDescription:ĠTheĠimageĠshowsĠaĠchurchyardĠwithĠoldĠgravestonesĠandĠaĠbackdropĠofĠtraditionalĠTudor-styleĠhousesĠinĠLenham,ĠEngland.ĊĊKeywords:ĠStĠMary'sĠChurch,ĠLenham,ĠEngland,ĠUK,Ġchurchyard,Ġgravestones,ĠTudorĠhouses,Ġhalf-timberedĠarchitecture,Ġmoss-coveredĠstones,ĠvillageĠsquare,Ġhistoric,Ġancient,Ġgrass,ĠbareĠtrees,ĠblueĠsky,ĠcypressĠtree,ĠChristianity,ĠEurope,ĠKent,Ġquaint,Ġspring,ĠancientĠgravestones
 ```
 
 ---
 
 ### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
 
-**Metrics:** 36.2 TPS | 500 tokens
+**Metrics:** 33.9 TPS | 500 tokens
 
 ```text
 Here are my reasoning steps:
@@ -1132,7 +998,7 @@ Description:
 
 ### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
 
-**Metrics:** 63.1 TPS | 500 tokens
+**Metrics:** 60.8 TPS | 500 tokens
 
 ```text
 <think>Got it, let's tackle this. The user wants exactly three sections: Title, Description, Keywords.
@@ -1153,7 +1019,7 @@ Now Keywords. The user's context hint has a list of keywords. We need to extract
 
 ### ✅ mlx-community/GLM-4.6V-Flash-6bit
 
-**Metrics:** 46.8 TPS | 500 tokens
+**Metrics:** 46 TPS | 500 tokens
 
 ```text
 <think>Got it, let's tackle this. First, the Title needs to be 6-12 words, descriptive and concrete. Looking at the image, there's a churchyard with gravestones, a cross, and historic buildings in the background. So maybe "Historic Churchyard with Tudor-Style Buildings" – that's 10 words, fits.
@@ -1161,6 +1027,16 @@ Now Keywords. The user's context hint has a list of keywords. We need to extract
 Next, Description: 1-2 factual sentences covering key subjects, setting, and action. The image shows a churchyard (St Mary's Church, Lenham) with moss-covered gravestones, a tall cypress tree, and historic brick and half-timbered houses in the background. The scene is set on a late winter afternoon with green grass and scattered yellow flowers. So we need to condense that into 1-2 sentences. Let's make it: "A historic churchyard with moss-covered gravestones and a tall cypress tree is set against a backdrop of Tudor-style brick and half-timbered houses, with green grass and scattered yellow flowers under a partly cloudy sky." That's a bit long, but maybe shorten to two sentences. Let's try: "The image depicts a historic churchyard with ancient, moss-covered gravestones and a tall cypress tree. In the background, Tudor-style brick and half-timbered houses line the scene, with green grass and scattered yellow flowers under a partly cloudy sky." That's two sentences, covers key subjects (churchyard, gravestones, cypress tree, Tudor houses), setting (partly cloudy sky, green grass, scattered yellow flowers), and action (depicts, line the scene).
 
 Now Keywords: 15-30 unique comma-separated terms, ordered most specific to most general. Let's list the key elements from the image and hints. Specific terms first: "St Mary's Churchyard", "moss-covered gravestones", "cypress tree", "Tudor-style houses", "half-timbered house", "brick house", "churchyard cross", "ancient headstones", "green grass", "yellow flowers", "partly cloudy sky", "historic village", "Lenham, Kent", "England", "United Kingdom", "UK", "Christian cemetery", "historic architecture", "springtime (implied by yellow flowers)". Now need to order from most specific to most general. Let's start with the most specific: "St Mary's Church
+```
+
+---
+
+### ✅ mlx-community/Molmo-7B-D-0924-8bit
+
+**Metrics:** 40.5 TPS | 28 tokens
+
+```text
+ Camera: Canon EOS R5 Mark III with RF 24-105mm f/4L IS USM lens.
 ```
 
 ---
@@ -1175,33 +1051,9 @@ Now Keywords: 15-30 unique comma-separated terms, ordered most specific to most 
 
 ---
 
-### ✅ mlx-community/Molmo-7B-D-0924-8bit
-
-**Metrics:** 40.4 TPS | 28 tokens
-
-```text
- Camera: Canon EOS R5 Mark III with RF 24-105mm f/4L IS USM lens.
-```
-
----
-
-### ✅ mlx-community/X-Reasoner-7B-8bit
-
-**Metrics:** 47.7 TPS | 500 tokens
-
-```text
-**Title:** Ancient Headstones in a Village Churchyard, Lenham, Kent, England
-
-**Description:** A tranquil scene of a historic village churchyard in Lenham, Kent, England, featuring weathered gravestones and a backdrop of half-timbered Tudor-style houses under a partly cloudy sky.
-
-**Keywords:** Lenham, Kent, England, UK, churchyard, gravestones, half-timbered houses, Tudor-style, ancient, moss-covered, grass, cemetery, village, England, Europe, United Kingdom, history, architecture, cemetery, bare trees, blue sky, spring, winter, grass, stone, cross, headstone, church, village square, cemetery, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient grav
-```
-
----
-
 ### ✅ Qwen/Qwen3-VL-2B-Instruct
 
-**Metrics:** 75.8 TPS | 500 tokens
+**Metrics:** 75.1 TPS | 500 tokens
 
 ```text
 Title: Gravestones in a churchyard in Lenham, Kent, England
@@ -1209,6 +1061,20 @@ Title: Gravestones in a churchyard in Lenham, Kent, England
 Description: A quiet churchyard in Lenham, Kent, England, featuring moss-covered gravestones and a half-timbered house in the background. The scene is set on a bright day with a blue sky and scattered clouds.
 
 Keywords: Lenham, Kent, England, St Mary's Church, Tudor-style Houses, half-timbered house, churchyard, ancient gravestones, moss, grass, bare trees, blue sky, spring, Quaint, Tudor-style, UK, United Kingdom, Parish church, Christianity, Graveyard, Cypress Tree, Tudor, Tudor-style, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tudor, Tud
+```
+
+---
+
+### ✅ mlx-community/X-Reasoner-7B-8bit
+
+**Metrics:** 46.7 TPS | 500 tokens
+
+```text
+**Title:** Ancient Headstones in a Village Churchyard, Lenham, Kent, England
+
+**Description:** A tranquil scene of a historic village churchyard in Lenham, Kent, England, featuring weathered gravestones and a backdrop of half-timbered Tudor-style houses under a partly cloudy sky.
+
+**Keywords:** Lenham, Kent, England, UK, churchyard, gravestones, half-timbered houses, Tudor-style, ancient, moss-covered, grass, cemetery, village, England, Europe, United Kingdom, history, architecture, cemetery, bare trees, blue sky, spring, winter, grass, stone, cross, headstone, church, village square, cemetery, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue, grass, gravestone, headstone, churchyard, village, England, UK, United Kingdom, ancient, ancient grav
 ```
 
 ---
@@ -1225,7 +1091,7 @@ Got it, let's tackle this. First, the Title needs to be 6-12 words, descriptive 
 
 ### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
-**Metrics:** 8.83 TPS | 500 tokens
+**Metrics:** 8.36 TPS | 500 tokens
 
 ```text
 **Title:** Ancient Headstones in the Village of Lenham, England
@@ -1239,7 +1105,7 @@ Got it, let's tackle this. First, the Title needs to be 6-12 words, descriptive 
 
 ### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
 
-**Metrics:** 178 TPS | 126 tokens
+**Metrics:** 179 TPS | 126 tokens
 
 ```text
 Title: St Mary's Church, Lenham, England, United Kingdom, UK
@@ -1249,9 +1115,67 @@ Keywords: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-ti
 
 ---
 
+### ✅ mlx-community/Qwen3.5-35B-A3B-6bit
+
+**Metrics:** 74.4 TPS | 500 tokens
+
+```text
+The user wants me to generate metadata for the provided image.
+I need to follow specific formatting rules:
+- **Title:** 6-12 words, descriptive and concrete.
+- **Description:** 1-2 factual sentences covering key subjects, setting, and action.
+- **Keywords:** 15-30 unique comma-separated terms, ordered most specific to most general.
+
+**Image Analysis:**
+- **Foreground:** A grassy churchyard with numerous old, weathered headstones. Some are upright, some are leaning or broken. There's a prominent cross-shaped headstone on the left. Moss and lichen are visible on the stones.
+- **Mid-ground:** More headstones, a low stone wall separating the churchyard from the street/houses.
+- **Background:** A row of historic-looking houses. They are brick and half-timbered (Tudor style). There are chimneys.
+- **Sky:** Blue sky with scattered white clouds.
+- **Trees:** A tall, conical evergreen tree (cypress or similar) on the left. Bare branches of deciduous trees on the right.
+- **Context Hints:** The prompt mentions "St Mary's Church, Lenham, England, United Kingdom". The GPS coordinates provided in the prompt (51.237300°N, 0.718917°E) actually point to a location near London (specifically near the M25/M20 junction area, actually looking closer at the coordinates, 51.23N 0.71E is near Sevenoaks/Kent border, which aligns with Lenham). Wait, let me check the coordinates. 51.237300, 0.718917. That is actually near Sevenoaks, Kent. Lenham is nearby. The prompt says "St Mary's Church, Lenham". I should trust the visual evidence but the prompt hints are "high confidence". The visual evidence shows a churchyard and old houses. The architecture looks very English/Kentish.
+- **Date:** The prompt says "Taken on 2026-02-28". This is late winter/early spring. The grass is green, daffodils are visible (yellow flowers near the wall). This matches the "late winter afternoon" description in
+```
+
+---
+
+### ✅ mlx-community/Qwen3.5-35B-A3B-bf16
+
+**Metrics:** 55.4 TPS | 500 tokens
+
+```text
+The user wants metadata for an image of a churchyard.
+
+**1. Title:**
+- Needs to be 6-12 words.
+- Descriptive and concrete.
+- Visuals: Old gravestones, green grass, brick houses, blue sky with clouds.
+- Draft 1: Ancient gravestones in a green churchyard with brick houses in the background. (11 words) - Good.
+- Draft 2: Mossy headstones in a churchyard with historic brick houses under a cloudy sky. (12 words) - Good.
+- Draft 3: Old gravestones in a grassy churchyard with traditional brick houses in the background. (12 words) - Good.
+- Let's go with something similar to Draft 3 but maybe more specific about the houses.
+- "Ancient gravestones in a grassy churchyard with traditional brick houses in the background."
+
+**2. Description:**
+- 1-2 factual sentences.
+- Key subjects: Gravestones, grass, houses.
+- Setting: Churchyard, village.
+- Action: None really, just static scene.
+- Draft: A row of weathered, moss-covered gravestones stands in a grassy churchyard. Behind the graveyard, traditional brick houses with white window frames line the street under a blue sky with scattered clouds.
+
+**3. Keywords:**
+- 15-30 unique comma-separated terms.
+- Ordered most specific to most general.
+- Visuals: Gravestones, headstones, churchyard, grass, green, brick houses, windows, chimneys, sky, clouds, trees (cypress/conifer on left), bare trees (right).
+- Specific: gravestones, headstones, churchyard, moss, lichen, weathered stone, brick houses, half-timbered, white windows, chimneys, cypress tree, conifer, green grass, blue sky, white clouds, village, England, Lenham, St Mary's Church (from context hint, visually consistent with churchyard setting).
+- Let's refine the list based on the "most specific to most general" rule.
+- gravestones, headstones, churchyard, moss, lichen, weathered stone, brick houses, half-timbered, white windows, chimneys, cypress tree, conifer, green grass
+```
+
+---
+
 ### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
 
-**Metrics:** 3.87 TPS | 500 tokens
+**Metrics:** 3.81 TPS | 500 tokens
 
 ```text
 **Title:** Ancient Tombs in the Village of St. Mary's Church, Lenham, England
@@ -1287,13 +1211,13 @@ Keywords: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-ti
 ## Library Versions
 
 - `Pillow`: `12.1.1`
-- `huggingface-hub`: `1.5.0`
+- `huggingface-hub`: `1.6.0`
 - `mlx`: `0.31.1.dev20260306+be872ebd`
-- `mlx-lm`: `0.30.8`
+- `mlx-lm`: `0.31.0`
 - `mlx-metal`: ``
 - `mlx-vlm`: `0.3.13`
 - `numpy`: `2.4.2`
 - `tokenizers`: `0.22.2`
 - `transformers`: `5.3.0`
 
-_Report generated on: 2026-03-06 13:22:23 GMT_
+_Report generated on: 2026-03-06 23:33:43 GMT_

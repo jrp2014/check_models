@@ -1,8 +1,8 @@
-# Diagnostics Report — 6 failure(s), 8 harness issue(s) (mlx-vlm 0.3.13)
+# Diagnostics Report — 4 failure(s), 8 harness issue(s) (mlx-vlm 0.3.13)
 
 ## Summary
 
-Automated benchmarking of **48 locally-cached VLM models** found **6 hard failure(s)** and **8 harness/integration issue(s)** plus **2 preflight compatibility warning(s)** in successful models. 42 of 48 models succeeded.
+Automated benchmarking of **48 locally-cached VLM models** found **4 hard failure(s)** and **8 harness/integration issue(s)** plus **2 preflight compatibility warning(s)** in successful models. 44 of 48 models succeeded.
 
 Test image: `20260228-162254_DSC09377.jpg` (33.5 MB).
 
@@ -15,8 +15,6 @@ Quick triage list with likely owner and next action for each issue class.
 - **[Medium] [mlx-vlm]** Failed to process inputs with error: can only concatenate str (not "NoneType") to str (1 model(s)). Next: check processor/chat-template wiring and generation kwargs.
 - **[Medium] [mlx-vlm]** Model runtime error during generation for mlx-community/InternVL3-14B-8bit: LanguageM... (1 model(s)). Next: check processor/chat-template wiring and generation kwargs.
 - **[Medium] [mlx-vlm]** Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageMo... (1 model(s)). Next: check processor/chat-template wiring and generation kwargs.
-- **[Medium] [mlx]** Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-6bit: [metal:... (1 model(s)). Next: check tensor/cache behavior and memory pressure handling.
-- **[Medium] [mlx]** Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-bf16: [metal:... (1 model(s)). Next: check tensor/cache behavior and memory pressure handling.
 - **[Medium] [model configuration/repository]** Loaded processor has no image_processor; expected multimodal processor. (1 model(s)). Next: verify model config, tokenizer files, and revision alignment.
 - **[Medium] [mlx-vlm / mlx]** Harness/integration warnings on 8 model(s). Next: validate stop-token decoding and long-context behavior.
 - **[Medium] [mlx-vlm, transformers]** Preflight compatibility warnings (2 issue(s)). Next: verify dependency/version compatibility before model runs.
@@ -30,8 +28,6 @@ Quick triage list with likely owner and next action for each issue class.
 | **Medium** | Failed to process inputs with error: can only concatenate str (not "N... | 1 (Florence-2-large-ft) | `mlx-vlm` | check processor/chat-template wiring and generation kwargs. |
 | **Medium** | Model runtime error during generation for mlx-community/InternVL3-14B... | 1 (InternVL3-14B-8bit) | `mlx-vlm` | check processor/chat-template wiring and generation kwargs. |
 | **Medium** | Model runtime error during generation for mlx-community/InternVL3-8B-... | 1 (InternVL3-8B-bf16) | `mlx-vlm` | check processor/chat-template wiring and generation kwargs. |
-| **Medium** | Model runtime error during generation for mlx-community/Qwen3.5-35B-A... | 1 (Qwen3.5-35B-A3B-6bit) | `mlx` | check tensor/cache behavior and memory pressure handling. |
-| **Medium** | Model runtime error during generation for mlx-community/Qwen3.5-35B-A... | 1 (Qwen3.5-35B-A3B-bf16) | `mlx` | check tensor/cache behavior and memory pressure handling. |
 | **Medium** | Loaded processor has no image_processor; expected multimodal processor. | 1 (deepseek-vl2-8bit) | `model configuration/repository` | verify model config, tokenizer files, and revision alignment. |
 | **Medium** | Harness/integration | 8 (Qwen3-VL-2B-Instruct, Devstral-Small-2-24B-Instruct-2512-5bit, Qwen3-VL-2B-Thinking-bf16, SmolVLM2-2.2B-Instruct-mlx, X-Reasoner-7B-8bit, paligemma2-10b-ft-docci-448-6bit, paligemma2-3b-ft-docci-448-bf16, Florence-2-large-ft) | `mlx-vlm / mlx` | validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime. |
 | **Medium** | Preflight compatibility warning | 2 issue(s) | `mlx-vlm, transformers` | verify dependency/version compatibility before model runs. |
@@ -62,13 +58,13 @@ Traceback:
 
 ```text
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 876, in process_inputs_with_fallback
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 883, in process_inputs_with_fallback
     return process_inputs(
         processor,
     ...<5 lines>...
         **kwargs,
     )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 862, in process_inputs
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 869, in process_inputs
     return process_method(**args)
   File "/opt/homebrew/Caskroom/miniconda/base/lib/python3.13/site-packages/transformers/models/florence2/processing_florence2.py", line 163, in __call__
     image_inputs = self.image_processor(images, **output_kwargs["images_kwargs"])
@@ -95,13 +91,13 @@ ValueError: Only returning PyTorch tensors is currently supported.
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 889, in process_inputs_with_fallback
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 896, in process_inputs_with_fallback
     return process_inputs(
         processor,
     ...<5 lines>...
         **kwargs,
     )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 862, in process_inputs
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 869, in process_inputs
     return process_method(**args)
   File "/opt/homebrew/Caskroom/miniconda/base/lib/python3.13/site-packages/transformers/models/florence2/processing_florence2.py", line 185, in __call__
     self.image_token * self.num_image_tokens
@@ -113,22 +109,22 @@ TypeError: can only concatenate str (not "NoneType") to str
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 662, in generate
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 663, in generate
     for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
                     ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 505, in stream_generate
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 506, in stream_generate
     inputs = prepare_inputs(
         processor,
     ...<6 lines>...
         **kwargs,
     )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1111, in prepare_inputs
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1120, in prepare_inputs
     inputs = process_inputs_with_fallback(
         processor,
     ...<4 lines>...
         **kwargs,
     )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 899, in process_inputs_with_fallback
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 906, in process_inputs_with_fallback
     raise ValueError(
         f"Failed to process inputs with error: {fallback_error}"
     ) from fallback_error
@@ -172,7 +168,7 @@ Context: Existing metadata hints (high confidence; use only if visually consiste
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 24571.20it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 23590.01it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -204,13 +200,13 @@ Traceback:
 
 ```text
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 662, in generate
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 663, in generate
     for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
                     ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 550, in stream_generate
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 551, in stream_generate
     for n, (token, logprobs) in enumerate(gen):
                                 ~~~~~~~~~^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 408, in generate_step
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 409, in generate_step
     model.language_model(
     ~~~~~~~~~~~~~~~~~~~~^
         inputs=input_ids[:, :n_to_process],
@@ -262,7 +258,7 @@ Assistant:
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 18 files:   0%|          | 0/18 [00:00<?, ?it/s]
-Fetching 18 files: 100%|##########| 18/18 [00:00<00:00, 23316.08it/s]
+Fetching 18 files: 100%|##########| 18/18 [00:00<00:00, 24696.59it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -297,13 +293,13 @@ Traceback:
 
 ```text
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 662, in generate
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 663, in generate
     for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
                     ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 550, in stream_generate
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 551, in stream_generate
     for n, (token, logprobs) in enumerate(gen):
                                 ~~~~~~~~~^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 408, in generate_step
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 409, in generate_step
     model.language_model(
     ~~~~~~~~~~~~~~~~~~~~^
         inputs=input_ids[:, :n_to_process],
@@ -355,7 +351,7 @@ Assistant:
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 17 files:   0%|          | 0/17 [00:00<?, ?it/s]
-Fetching 17 files: 100%|##########| 17/17 [00:00<00:00, 24896.36it/s]
+Fetching 17 files: 100%|##########| 17/17 [00:00<00:00, 30734.12it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -367,180 +363,6 @@ Prefill:   0%|          | 0/2156 [00:00<?, ?tok/s]
 </details>
 
 ## 4. Failure affecting 1 model (Priority: Medium)
-
-**Observed behavior:** Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-6bit: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
-**Owner (likely component):** `mlx`
-**Suggested next action:** check tensor/cache behavior and memory pressure handling.
-**Affected model:** `mlx-community/Qwen3.5-35B-A3B-6bit`
-
-| Model | Observed Behavior | First Seen Failing | Recent Repro |
-| ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/Qwen3.5-35B-A3B-6bit` | Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-6bit: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes. | 2026-03-01 22:26:38 GMT | 3/3 recent runs failed |
-
-### To reproduce
-
-- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/Qwen3.5-35B-A3B-6bit`
-
-<details>
-<summary>Detailed trace logs (affected model)</summary>
-
-#### `mlx-community/Qwen3.5-35B-A3B-6bit`
-
-Traceback:
-
-```text
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 662, in generate
-    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
-                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 550, in stream_generate
-    for n, (token, logprobs) in enumerate(gen):
-                                ~~~~~~~~~^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 416, in generate_step
-    mx.eval([c.state for c in prompt_cache])
-    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-RuntimeError: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-ValueError: Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-6bit: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
-```
-
-Captured stdout/stderr:
-
-```text
-=== STDOUT ===
-==========
-Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '2', '8', '-', '1', '6', '2', '2', '5', '4', '_', 'D', 'S', 'C', '0', '9', '3', '7', '7', '.', 'j', 'p', 'g'] 
-
-Prompt: <|im_start|>user
-<|vision_start|><|image_pad|><|vision_end|>Analyze this image for cataloguing metadata.
-
-Return exactly these three sections, and nothing else:
-
-Title: 6-12 words, descriptive and concrete.
-
-Description: 1-2 factual sentences covering key subjects, setting, and action.
-
-Keywords: 15-30 unique comma-separated terms, ordered most specific to most general.
-
-Rules:
-- Use only visually supported facts.
-- If hints conflict with the image, trust the image.
-- Do not output reasoning, notes, or extra sections.
-- Do not copy context hints verbatim.
-
-Context: Existing metadata hints (high confidence; use only if visually consistent):
-- Description hint: , St Mary's Church, Lenham, England, United Kingdom, UK Here is a caption for the image, written in a neutral but descriptive style suitable for a periodical, blog, or magazine. **Caption:** A late winter afternoon in the historic village of Lenham, Kent, England. This view from the churchyard of St Mary's Church looks out over the village square. In the foreground, ancient, moss-covered headstones dot the landsca...
-- Keyword hints: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue
-- Capture metadata: Taken on 2026-02-28 16:22:54 GMT (at 16:22:54 local time). GPS: 51.237300°N, 0.718917°E.<|im_end|>
-<|im_start|>assistant
-<think>
-
-=== STDERR ===
-Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-
-Fetching 16 files:   0%|          | 0/16 [00:00<?, ?it/s]
-Fetching 16 files: 100%|##########| 16/16 [00:00<00:00, 19418.07it/s]
-
-Download complete: : 0.00B [00:00, ?B/s]              
-Download complete: : 0.00B [00:00, ?B/s]
-
-Prefill:   0%|          | 0/16604 [00:00<?, ?tok/s]
-Prefill:   0%|          | 0/16604 [00:00<?, ?tok/s]
-```
-
-</details>
-
-## 5. Failure affecting 1 model (Priority: Medium)
-
-**Observed behavior:** Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-bf16: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
-**Owner (likely component):** `mlx`
-**Suggested next action:** check tensor/cache behavior and memory pressure handling.
-**Affected model:** `mlx-community/Qwen3.5-35B-A3B-bf16`
-
-| Model | Observed Behavior | First Seen Failing | Recent Repro |
-| ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/Qwen3.5-35B-A3B-bf16` | Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-bf16: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes. | 2026-03-01 22:26:38 GMT | 3/3 recent runs failed |
-
-### To reproduce
-
-- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/Qwen3.5-35B-A3B-bf16`
-
-<details>
-<summary>Detailed trace logs (affected model)</summary>
-
-#### `mlx-community/Qwen3.5-35B-A3B-bf16`
-
-Traceback:
-
-```text
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 662, in generate
-    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
-                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 550, in stream_generate
-    for n, (token, logprobs) in enumerate(gen):
-                                ~~~~~~~~~^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 416, in generate_step
-    mx.eval([c.state for c in prompt_cache])
-    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-RuntimeError: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-ValueError: Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-bf16: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.
-```
-
-Captured stdout/stderr:
-
-```text
-=== STDOUT ===
-==========
-Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '2', '8', '-', '1', '6', '2', '2', '5', '4', '_', 'D', 'S', 'C', '0', '9', '3', '7', '7', '.', 'j', 'p', 'g'] 
-
-Prompt: <|im_start|>user
-<|vision_start|><|image_pad|><|vision_end|>Analyze this image for cataloguing metadata.
-
-Return exactly these three sections, and nothing else:
-
-Title: 6-12 words, descriptive and concrete.
-
-Description: 1-2 factual sentences covering key subjects, setting, and action.
-
-Keywords: 15-30 unique comma-separated terms, ordered most specific to most general.
-
-Rules:
-- Use only visually supported facts.
-- If hints conflict with the image, trust the image.
-- Do not output reasoning, notes, or extra sections.
-- Do not copy context hints verbatim.
-
-Context: Existing metadata hints (high confidence; use only if visually consistent):
-- Description hint: , St Mary's Church, Lenham, England, United Kingdom, UK Here is a caption for the image, written in a neutral but descriptive style suitable for a periodical, blog, or magazine. **Caption:** A late winter afternoon in the historic village of Lenham, Kent, England. This view from the churchyard of St Mary's Church looks out over the village square. In the foreground, ancient, moss-covered headstones dot the landsca...
-- Keyword hints: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue
-- Capture metadata: Taken on 2026-02-28 16:22:54 GMT (at 16:22:54 local time). GPS: 51.237300°N, 0.718917°E.<|im_end|>
-<|im_start|>assistant
-<think>
-
-=== STDERR ===
-Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-
-Fetching 24 files:   0%|          | 0/24 [00:00<?, ?it/s]
-Fetching 24 files: 100%|##########| 24/24 [00:00<00:00, 13930.71it/s]
-
-Download complete: : 0.00B [00:00, ?B/s]              
-Download complete: : 0.00B [00:00, ?B/s]
-
-Prefill:   0%|          | 0/16604 [00:00<?, ?tok/s]
-Prefill:   0%|          | 0/16604 [00:00<?, ?tok/s]
-```
-
-</details>
-
-## 6. Failure affecting 1 model (Priority: Medium)
 
 **Observed behavior:** Loaded processor has no image_processor; expected multimodal processor.
 **Owner (likely component):** `model configuration/repository`
@@ -587,7 +409,7 @@ Added chat tokens
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 10309.31it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 24517.06it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -777,31 +599,29 @@ Cemetery, England, United Kingdom, UK
 Recent reproducibility is measured from history (up to last 3 runs where each model appears).
 
 **Regressions since previous run:** none
-**Recoveries since previous run:** none
+**Recoveries since previous run:** `mlx-community/Qwen3.5-35B-A3B-6bit`, `mlx-community/Qwen3.5-35B-A3B-bf16`
 
 | Model | Status vs Previous Run | First Seen Failing | Recent Repro |
 | ----- | ---------------------- | ------------------ | ------------ |
 | `microsoft/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
 | `mlx-community/InternVL3-14B-8bit` | still failing | 2026-02-23 12:54:48 GMT | 3/3 recent runs failed |
 | `mlx-community/InternVL3-8B-bf16` | still failing | 2026-02-23 12:54:48 GMT | 3/3 recent runs failed |
-| `mlx-community/Qwen3.5-35B-A3B-6bit` | still failing | 2026-03-01 22:26:38 GMT | 3/3 recent runs failed |
-| `mlx-community/Qwen3.5-35B-A3B-bf16` | still failing | 2026-03-01 22:26:38 GMT | 3/3 recent runs failed |
 | `mlx-community/deepseek-vl2-8bit` | still failing | 2026-02-15 03:27:34 GMT | 3/3 recent runs failed |
 
 ---
 
 ## Coverage & Runtime Metrics
 
-- **Detailed diagnostics models:** 14
-- **Summary diagnostics models:** 34
+- **Detailed diagnostics models:** 12
+- **Summary diagnostics models:** 36
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 941.21s (941.21s)
-- **Average runtime per model:** 19.61s (19.61s)
-- **Runtime note:** 6 model(s) had missing timing fields and were counted as 0.00s.
+- **Total model runtime (sum):** 1149.19s (1149.19s)
+- **Average runtime per model:** 23.94s (23.94s)
+- **Runtime note:** 4 model(s) had missing timing fields and were counted as 0.00s.
 
 ---
 
-## Models Not Flagged (34 model(s))
+## Models Not Flagged (36 model(s))
 
 These models completed without diagnostics flags (no hard failure, harness warning, or stack-signal anomaly).
 
@@ -813,7 +633,7 @@ These models completed without diagnostics flags (no hard failure, harness warni
 - `mlx-community/gemma-3-27b-it-qat-4bit`
 - `mlx-community/gemma-3-27b-it-qat-8bit`
 
-### Ran, but with quality warnings (29 model(s))
+### Ran, but with quality warnings (31 model(s))
 
 - `HuggingFaceTB/SmolVLM-Instruct`: Model output may not follow prompt or image contents.
 - `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: Output omitted required Title/Description/Keywords sections.
@@ -834,6 +654,8 @@ These models completed without diagnostics flags (no hard failure, harness warni
 - `mlx-community/Molmo-7B-D-0924-bf16`: Model output may not follow prompt or image contents.
 - `mlx-community/Phi-3.5-vision-instruct-bf16`: Output became repetitive, indicating possible generation instability.
 - `mlx-community/Qwen2-VL-2B-Instruct-4bit`: Output appears to copy prompt context verbatim.
+- `mlx-community/Qwen3.5-35B-A3B-6bit`: Output contains corrupted or malformed text segments.
+- `mlx-community/Qwen3.5-35B-A3B-bf16`: Output omitted required Title/Description/Keywords sections.
 - `mlx-community/SmolVLM-Instruct-bf16`: Model output may not follow prompt or image contents.
 - `mlx-community/gemma-3n-E2B-4bit`: Model output may not follow prompt or image contents.
 - `mlx-community/gemma-3n-E4B-it-bf16`: Output omitted required Title/Description/Keywords sections.
@@ -853,10 +675,10 @@ These models completed without diagnostics flags (no hard failure, harness warni
 | --------- | ------- |
 | mlx-vlm | 0.3.13 |
 | mlx | 0.31.1.dev20260306+be872ebd |
-| mlx-lm | 0.30.8 |
+| mlx-lm | 0.31.0 |
 | transformers | 5.3.0 |
 | tokenizers | 0.22.2 |
-| huggingface-hub | 1.5.0 |
+| huggingface-hub | 1.6.0 |
 | Python Version | 3.13.9 |
 | OS | Darwin 25.3.0 |
 | macOS Version | 26.3.1 |
@@ -903,8 +725,6 @@ PY
 python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft
 python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-14B-8bit
 python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-8B-bf16
-python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/Qwen3.5-35B-A3B-6bit
-python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/Qwen3.5-35B-A3B-bf16
 python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit
 ```
 
@@ -938,4 +758,4 @@ Context: Existing metadata hints (high confidence; use only if visually consiste
 - Input image: `/Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-03-06 13:22:23 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-03-06 23:33:43 GMT by [check_models](https://github.com/jrp2014/check_models)._
