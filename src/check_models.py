@@ -796,6 +796,15 @@ class DiagnosticsHistoryInputs:
     preflight_issues: tuple[str, ...] = ()
 
 
+@dataclass(frozen=True)
+class DiagnosticsArtifacts:
+    """Diagnostics artifacts emitted at the end of a run."""
+
+    snapshot: DiagnosticsSnapshot
+    diagnostics_written: bool = False
+    repro_bundles: Mapping[str, Path] = dataclasses.field(default_factory=dict)
+
+
 @runtime_checkable
 class SupportsGenerationResult(Protocol):  # Minimal attributes we read from GenerationResult
     """Structural subset of GenerationResult accessed by this script.
@@ -5639,20 +5648,29 @@ def _prepare_table_data(
     if not results:
         return [], [], []
 
-    result_set = ResultSet(results)
+    table_data = _build_prepared_table_data(
+        result_set=ResultSet(results),
+        header_separator=header_separator,
+        include_output=include_output,
+    )
+    return _materialize_prepared_table_data(table_data)
+
+
+def _build_prepared_table_data(
+    *,
+    result_set: ResultSet,
+    header_separator: str = "<br>",
+    include_output: bool = True,
+) -> PreparedTableData:
+    """Build immutable cached table data from a sorted result set."""
     field_names = ["model_name", *result_set.get_fields()]
     if include_output:
         field_names.append("output")
-    sorted_results = result_set.results
 
-    # Create headers
-    headers = []
+    headers: list[str] = []
     for field_name in field_names:
         if field_name in FIELD_ABBREVIATIONS:
             line1, line2 = FIELD_ABBREVIATIONS[field_name]
-            # Split long headers for better readability in reports
-            # Only add separator if we actually have two parts to show
-            # Force split if using newline separator (CLI), otherwise check length threshold
             should_split = line2 and (
                 header_separator == "\n"
                 or len(line1) > HEADER_SPLIT_LENGTH
@@ -5667,18 +5685,56 @@ def _prepare_table_data(
         else:
             headers.append(format_field_label(field_name))
 
-    # Create rows
-    rows: list[list[str]] = []
-    for res in sorted_results:
-        row = [_format_table_field_value(field_name, res) for field_name in field_names]
+    rows: list[tuple[str, ...]] = []
+    for res in result_set.results:
+        row = tuple(_format_table_field_value(field_name, res) for field_name in field_names)
         rows.append(row)
 
+    return PreparedTableData(
+        headers=tuple(headers),
+        rows=tuple(rows),
+        field_names=tuple(field_names),
+    )
+
+
+def _materialize_prepared_table_data(
+    table_data: PreparedTableData,
+) -> tuple[list[str], list[list[str]], list[str]]:
+    """Return mutable copies of cached table data for renderer-specific edits."""
+    headers = list(table_data.headers)
+    rows = [list(row) for row in table_data.rows]
+    field_names = list(table_data.field_names)
     return headers, rows, field_names
 
 
-def _mark_failed_rows_in_html(html_table: str, results: list[PerformanceResult]) -> str:
+def _build_report_render_context(
+    *,
+    results: list[PerformanceResult],
+    prompt: str,
+    system_info: dict[str, str] | None = None,
+) -> ReportRenderContext:
+    """Build shared derived report data once for all renderers."""
+    result_set = ResultSet(results)
+    prompt_context = _extract_context_from_prompt(prompt)
+    summary = analyze_model_issues(results, prompt_context)
+    stats = compute_performance_statistics(results)
+    resolved_system_info = system_info if system_info is not None else get_system_characteristics()
+    table_data = _build_prepared_table_data(result_set=result_set)
+    return ReportRenderContext(
+        result_set=result_set,
+        table_data=table_data,
+        prompt_context=prompt_context,
+        summary=summary,
+        stats=stats,
+        system_info=resolved_system_info,
+    )
+
+
+def _mark_failed_rows_in_html(
+    html_table: str,
+    sorted_results: Sequence[PerformanceResult],
+) -> str:
     """Add data attributes and classes to rows for filtering in the HTML table."""
-    sorted_results = _sort_results_by_time(results)
     table_rows = html_table.split("<tr>")
     # Keep preamble and header row (index 0 and 1)
     new_table_rows = [table_rows[0], table_rows[1]]
@@ -6577,6 +6633,39 @@ class DiagnosticsContext:
     failure_history: dict[str, FailureHistoryContext] = dataclasses.field(default_factory=dict)
 
 
+@dataclass(frozen=True)
+class DiagnosticsSnapshot:
+    """Cached diagnostics classification derived from a completed run."""
+
+    failed: tuple[PerformanceResult, ...] = ()
+    harness_results: tuple[tuple[PerformanceResult, str], ...] = ()
+    stack_signals: tuple[tuple[PerformanceResult, str, str], ...] = ()
+    unflagged_successful: tuple[PerformanceResult, ...] = ()
+    preflight_issues: tuple[str, ...] = ()
+    failure_clusters: tuple[tuple[str, tuple[PerformanceResult, ...]], ...] = ()
+
+
+@dataclass(frozen=True)
+class PreparedTableData:
+    """Immutable cached table data shared across report renderers."""
+
+    headers: tuple[str, ...]
+    rows: tuple[tuple[str, ...], ...]
+    field_names: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class ReportRenderContext:
+    """Shared cached context for HTML/Markdown/TSV report generation."""
+
+    result_set: ResultSet
+    table_data: PreparedTableData
+    prompt_context: str | None
+    summary: ModelIssueSummary
+    stats: PerformanceStats
+    system_info: dict[str, str]
+
+
 def _append_markdown_code_block(
     parts: list[str],
     content: str,
@@ -6781,6 +6870,144 @@ def _build_diagnostics_context(
         missing_models=frozenset(comparison["missing_models"]),
         failure_history=history_context,
     )
+
+
+def _build_diagnostics_snapshot(
+    *,
+    results: list[PerformanceResult],
+    preflight_issues: Sequence[str] = (),
+) -> DiagnosticsSnapshot:
+    """Build reusable diagnostics classification data from one completed run."""
+    failed = tuple(r for r in results if not r.success)
+    successful = [r for r in results if r.success]
+    harness_detected = _collect_harness_results(successful)
+    stack_detected = _collect_stack_issue_signals(successful)
+    harness_results, stack_signals, unflagged_successful = _partition_success_diagnostics(
+        successful=successful,
+        harness_results=harness_detected,
+        stack_signals=stack_detected,
+    )
+    failure_clusters: tuple[tuple[str, tuple[PerformanceResult, ...]], ...] = ()
+    if failed:
+        failure_clusters = tuple(
+            (signature, tuple(cluster_results))
+            for signature, cluster_results in sorted(
+                _cluster_failures_by_pattern(results).items(),
+                key=lambda kv: -len(kv[1]),
+            )
+        )
+    return DiagnosticsSnapshot(
+        failed=failed,
+        harness_results=tuple(harness_results),
+        stack_signals=tuple(stack_signals),
+        unflagged_successful=tuple(unflagged_successful),
+        preflight_issues=tuple(preflight_issues),
+        failure_clusters=failure_clusters,
+    )
+
+
+def _snapshot_has_maintainer_signals(snapshot: DiagnosticsSnapshot) -> bool:
+    """Return True when a run produced maintainer-facing diagnostics."""
+    return bool(
+        snapshot.failed
+        or snapshot.harness_results
+        or snapshot.stack_signals
+        or snapshot.preflight_issues,
+    )
+
+
+def _maintainer_owner_counts(snapshot: DiagnosticsSnapshot) -> list[tuple[str, int]]:
+    """Summarize likely owner buckets for the diagnostics snapshot."""
+    owner_counts: Counter[str] = Counter()
+
+    for _signature, cluster_results in snapshot.failure_clusters:
+        representative = cluster_results[0]
+        owner = _diagnostics_owner_label(representative.error_package or "unknown")
+        owner_counts[owner] += len(cluster_results)
+
+    if snapshot.harness_results:
+        owner_counts[_diagnostics_owner_label("mlx-vlm / mlx")] += len(snapshot.harness_results)
+
+    for _res, _symptom, package_hint in snapshot.stack_signals:
+        owner_counts[_diagnostics_owner_label(package_hint)] += 1
+
+    for issue in snapshot.preflight_issues:
+        owner_key = _guess_preflight_issue_package(issue)
+        owner_counts[_diagnostics_owner_label(owner_key)] += 1
+
+    return sorted(owner_counts.items(), key=lambda item: (-item[1], item[0]))
+
+
+def _log_maintainer_summary(
+    *,
+    artifacts: DiagnosticsArtifacts,
+    diagnostics_path: Path,
+) -> None:
+    """Emit a concise maintainer-facing summary sourced from diagnostics data."""
+    snapshot = artifacts.snapshot
+    log_blank()
+    print_cli_section("Maintainer Summary")
+
+    if not _snapshot_has_maintainer_signals(snapshot):
+        logger.info("No maintainer-facing diagnostics signals detected.")
+        return
+
+    logger.info(
+        "Diagnostics signals: failures=%d, harness=%d, stack=%d, preflight=%d",
+        len(snapshot.failed),
+        len(snapshot.harness_results),
+        len(snapshot.stack_signals),
+        len(snapshot.preflight_issues),
+    )
+
+    owner_counts = _maintainer_owner_counts(snapshot)
+    if owner_counts:
+        logger.info(
+            "Likely owners: %s",
+            "; ".join(f"{owner}={count}" for owner, count in owner_counts[:3]),
+        )
+
+    for index, (_signature, cluster_results) in enumerate(snapshot.failure_clusters[:3], start=1):
+        representative = cluster_results[0]
+        owner_key = representative.error_package or "unknown"
+        owner = _diagnostics_owner_label(owner_key)
+        priority = _diagnostics_priority(len(cluster_results), representative.error_stage)
+        issue = _truncate_text_preview(
+            _simplify_failure_message(
+                representative.error_message,
+                model_name=representative.model_name,
+            ),
+            max_chars=96,
+        )
+        logger.info(
+            "%s cluster %d: %d model(s) | owner=%s | issue=%s",
+            priority,
+            index,
+            len(cluster_results),
+            owner,
+            issue,
+        )
+
+    if snapshot.harness_results:
+        logger.info(
+            "Harness/runtime anomalies: %d model(s) likely owned by mlx-vlm / mlx.",
+            len(snapshot.harness_results),
+        )
+    if snapshot.stack_signals:
+        logger.info(
+            "Long-context or stack-signal anomalies: %d model(s).",
+            len(snapshot.stack_signals),
+        )
+    if snapshot.preflight_issues:
+        logger.info(
+            "Preflight compatibility warnings: %d issue(s).",
+            len(snapshot.preflight_issues),
+        )
+
+    if artifacts.diagnostics_written:
+        log_file_path(diagnostics_path, label="   Diagnostics:  ")
+    if artifacts.repro_bundles:
+        logger.info("Repro bundles available for %d failed model(s).", len(artifacts.repro_bundles))
 
 
 def _format_recent_repro_ratio(history_info: FailureHistoryContext | None) -> str:
@@ -8446,6 +8673,7 @@ def generate_diagnostics_report(
     run_args: argparse.Namespace | None = None,
     history: DiagnosticsHistoryInputs | None = None,
     repro_bundles: Mapping[str, Path] | None = None,
+    diagnostics_snapshot: DiagnosticsSnapshot | None = None,
 ) -> bool:
     """Generate a Markdown diagnostics report structured for upstream issue filing.
 
@@ -8464,21 +8692,24 @@ def generate_diagnostics_report(
         run_args: Optional parsed CLI args from this run for exact repro commands.
         history: Optional history inputs for first-seen/repro/regression context.
         repro_bundles: Optional model->bundle path mapping from repro export.
+        diagnostics_snapshot: Optional cached diagnostics classification for this run.
 
     Returns:
         True if the report was written (i.e. there was something to report),
         False if skipped because there were no failures or harness issues.
     """
-    failed = [r for r in results if not r.success]
-    successful = [r for r in results if r.success]
-    harness_detected = _collect_harness_results(successful)
-    stack_detected = _collect_stack_issue_signals(successful)
-    harness_results, stack_signals, unflagged_successful = _partition_success_diagnostics(
-        successful=successful,
-        harness_results=harness_detected,
-        stack_signals=stack_detected,
-    )
-    preflight_issues = list(history.preflight_issues) if history is not None else []
+    if diagnostics_snapshot is None:
+        diagnostics_snapshot = _build_diagnostics_snapshot(
+            results=results,
+            preflight_issues=history.preflight_issues if history is not None else (),
+        )
+
+    failed = list(diagnostics_snapshot.failed)
+    harness_results = list(diagnostics_snapshot.harness_results)
+    stack_signals = list(diagnostics_snapshot.stack_signals)
+    unflagged_successful = list(diagnostics_snapshot.unflagged_successful)
+    preflight_issues = list(diagnostics_snapshot.preflight_issues)
+    successful_count = len(results) - len(failed)
     # Repro bundles are exported separately and referenced in output artifacts.
     # Diagnostics filing guidance now includes only the repro command.
     _ = repro_bundles
@@ -8486,11 +8717,10 @@ def generate_diagnostics_report(
     if not failed and not harness_results and not stack_signals and not preflight_issues:
         return False
 
-    failure_clusters = (
-        sorted(_cluster_failures_by_pattern(results).items(), key=lambda kv: -len(kv[1]))
-        if failed
-        else []
-    )
+    failure_clusters = [
+        (signature, list(cluster_results))
+        for signature, cluster_results in diagnostics_snapshot.failure_clusters
+    ]
 
     history_path = history.history_path if history is not None else None
     previous_history = history.previous_history if history is not None else None
@@ -8514,7 +8744,7 @@ def generate_diagnostics_report(
         n_failed=len(failed),
         n_harness=len(harness_results),
         n_preflight=len(preflight_issues),
-        n_success=len(successful),
+        n_success=successful_count,
         versions=versions,
         image_path=image_path,
     )
@@ -8927,13 +9157,27 @@ def generate_html_report(
     prompt: str,
     total_runtime_seconds: float,
     image_path: Path | None = None,
+    report_context: ReportRenderContext | None = None,
 ) -> None:
-    """Write a self-contained HTML summary with aligned table and embedded image."""
+    """Write a self-contained HTML summary with aligned table and embedded image.
+
+    Args:
+        results: Run results to render.
+        filename: Output HTML file path.
+        versions: Installed library versions shown in the report.
+        prompt: Prompt used for the run.
+        total_runtime_seconds: Total wall-clock runtime for the full run.
+        image_path: Optional input image path for the report header.
+        report_context: Optional cached shared report context built in finalization.
+    """
     if not results:
         log_warning_note("No results to generate HTML report.")
         return
 
-    headers, rows, field_names = _prepare_table_data(results)
+    if report_context is None:
+        report_context = _build_report_render_context(results=results, prompt=prompt)
+
+    headers, rows, field_names = _materialize_prepared_table_data(report_context.table_data)
 
     if not headers or not rows:
         log_warning_note("No table data to generate HTML report.")
@@ -8969,23 +9213,17 @@ def generate_html_report(
                 1,
             )
 
-    # Mark failed rows
-    html_table = _mark_failed_rows_in_html(html_table, results)
+    # Mark failed rows using the already-sorted cached context
+    html_table = _mark_failed_rows_in_html(html_table, report_context.result_set.results)
 
     # Wrap output column (last column) in <details> for expandability
     output_col_idx = len(field_names) - 1  # output is last column
     html_table = _wrap_output_column_in_details(html_table, output_col_idx)
 
-    # Extract context from prompt for cataloging utility analysis
-    context = _extract_context_from_prompt(prompt)
-
-    # Analyze model issues and generate summary
-    summary = analyze_model_issues(results, context)
-    stats = compute_performance_statistics(results)
-    issues_summary_html = format_issues_summary_html(summary, stats)
-
-    # Gather system characteristics for the report
-    system_info = get_system_characteristics()
+    issues_summary_html = format_issues_summary_html(
+        report_context.summary,
+        report_context.stats,
+    )
 
     # Build the full HTML document
     html_content = _build_full_html_document(
@@ -8994,7 +9232,7 @@ def generate_html_report(
         prompt=prompt,
         total_runtime_seconds=total_runtime_seconds,
         issues_summary_html=issues_summary_html,
-        system_info=system_info,
+        system_info=report_context.system_info,
         image_path=image_path,
     )
 
@@ -9006,9 +9244,11 @@ def generate_html_report(
         logger.exception("Failed to write HTML report to %s", filename)
 
 
-def _process_markdown_rows(rows: list[list[str]], results: list[PerformanceResult]) -> None:
+def _process_markdown_rows(
+    rows: list[list[str]],
+    sorted_results: Sequence[PerformanceResult],
+) -> None:
     """Process table rows for Markdown: escape content and format model names."""
-    sorted_results_for_flags = _sort_results_by_time(results)
     for i in range(len(rows)):
         # Wrap model name in backticks to preserve underscores and special chars
         if rows[i][0]:
@@ -9018,7 +9258,7 @@ def _process_markdown_rows(rows: list[list[str]], results: list[PerformanceResul
         if last_col_idx < 0:
             continue
         # If corresponding result failed, treat as diagnostics and escape more aggressively
-        is_failure = i < len(sorted_results_for_flags) and not sorted_results_for_flags[i].success
+        is_failure = i < len(sorted_results) and not sorted_results[i].success
         if is_failure:
             rows[i][last_col_idx] = _escape_markdown_diagnostics(rows[i][last_col_idx])
         else:
@@ -9027,7 +9267,18 @@ def _process_markdown_rows(rows: list[list[str]], results: list[PerformanceResul
             rows[i][last_col_idx] = _escape_markdown_in_text(rows[i][last_col_idx])
 
 
-def _generate_model_gallery_section(results: list[PerformanceResult]) -> list[str]:
+def _resolve_sorted_report_results(
+    report_context: ReportRenderContext | list[PerformanceResult],
+) -> Sequence[PerformanceResult]:
+    """Resolve sorted results from a cached report context or a legacy result list."""
+    if isinstance(report_context, ReportRenderContext):
+        return report_context.result_set.results
+    return ResultSet(report_context).results
+
+
+def _generate_model_gallery_section(
+    report_context: ReportRenderContext | list[PerformanceResult],
+) -> list[str]:
     """Generate the Model Gallery section for the Markdown report."""
     md: list[str] = []
     md.append("## Model Gallery")
@@ -9038,7 +9289,7 @@ def _generate_model_gallery_section(results: list[PerformanceResult]) -> list[st
     md.append("<!-- markdownlint-disable MD013 MD033 -->")
     md.append("")
 
-    sorted_results = _sort_results_by_time(results)
+    sorted_results = _resolve_sorted_report_results(report_context)
     for res in sorted_results:
         icon = "✅" if res.success else "❌"
         md.append(f"### {icon} {res.model_name}")
@@ -9056,9 +9307,9 @@ def _generate_model_gallery_section(results: list[PerformanceResult]) -> list[st
     return md
 
 
-def _generate_markdown_table_section(results: list[PerformanceResult]) -> list[str]:
+def _generate_markdown_table_section(report_context: ReportRenderContext) -> list[str]:
     """Generate the metrics table section for the Markdown report."""
-    headers, rows, field_names = _prepare_table_data(results)
+    headers, rows, field_names = _materialize_prepared_table_data(report_context.table_data)
 
     # For Markdown, we need to process headers to remove HTML breaks and use simpler formatting
     markdown_headers = []
@@ -9085,7 +9336,7 @@ def _generate_markdown_table_section(results: list[PerformanceResult]) -> list[s
     # Escape Markdown only for diagnostics (failed rows). Keep successful model output
     # unchanged. This preserves model formatting (including *, _, `, etc.) while
     # avoiding table breakage from diagnostics.
-    _process_markdown_rows(rows, results)
+    _process_markdown_rows(rows, report_context.result_set.results)
 
     # Determine column alignment using original field names
     colalign = ["left"] + [
@@ -9121,29 +9372,32 @@ def generate_markdown_report(
     versions: LibraryVersionDict,
     prompt: str,
     total_runtime_seconds: float,
+    report_context: ReportRenderContext | None = None,
 ) -> None:
-    """Write a GitHub-friendly Markdown summary with aligned pipe table."""
+    """Write a GitHub-friendly Markdown summary with aligned pipe table.
+
+    Args:
+        results: Run results to render.
+        filename: Output Markdown file path.
+        versions: Installed library versions shown in the report.
+        prompt: Prompt used for the run.
+        total_runtime_seconds: Total wall-clock runtime for the full run.
+        report_context: Optional cached shared report context built in finalization.
+    """
     if not results:
         log_warning_note("No results to generate Markdown report.")
         return
 
-    # Get table data using our helper function
-    headers, rows, _ = _prepare_table_data(results)
+    if report_context is None:
+        report_context = _build_report_render_context(results=results, prompt=prompt)
+
+    headers, rows, _ = _materialize_prepared_table_data(report_context.table_data)
 
     if not headers or not rows:
         log_warning_note("No table data to generate Markdown report.")
         return
 
-    # Extract context from prompt for cataloging utility analysis
-    context = _extract_context_from_prompt(prompt)
-
-    # Analyze model issues and generate summary
-    summary = analyze_model_issues(results, context)
-    stats = compute_performance_statistics(results)
-    issues_text = format_issues_summary_text(summary, stats)
-
-    # Gather system characteristics for the report
-    system_info = get_system_characteristics()
+    issues_text = format_issues_summary_text(report_context.summary, report_context.stats)
 
     # Build the complete markdown content
     md: list[str] = []
@@ -9151,7 +9405,7 @@ def generate_markdown_report(
     md.append("")
     md.append(f"_Generated on {local_now_str()}_")
     md.append("")
-    md.extend(_format_action_snapshot_text(results, summary))
+    md.extend(_format_action_snapshot_text(results, report_context.summary))
     # Add issues summary before prompt
     if issues_text:
         md.append(issues_text)
@@ -9177,20 +9431,20 @@ def generate_markdown_report(
     md.append("")
 
     # Generate table section
-    table_md = _generate_markdown_table_section(results)
+    table_md = _generate_markdown_table_section(report_context)
     md.extend(table_md)
 
     # --- Model Gallery Section ---
-    md.extend(_generate_model_gallery_section(results))
+    md.extend(_generate_model_gallery_section(report_context))
 
     md.append("---")
 
     # Add system/hardware information if available
-    if system_info:
+    if report_context.system_info:
         md.append("")
         md.append("## System/Hardware Information")
         md.append("")
-        for name, value in system_info.items():
+        for name, value in report_context.system_info.items():
             md.append(f"- **{name}**: {value}")
         md.append("")
 
@@ -9225,6 +9479,7 @@ def generate_markdown_report(
 def generate_tsv_report(
     results: list[PerformanceResult],
     filename: Path,
+    report_context: ReportRenderContext | None = None,
 ) -> None:
     """Write a TSV (tab-separated values) file of the core results table.
 
@@ -9236,12 +9491,20 @@ def generate_tsv_report(
     Args:
         results: List of PerformanceResult objects.
         filename: Path where the TSV file will be written.
+        report_context: Optional cached shared report context built in finalization.
     """
     if not results:
         log_warning_note("No results to generate TSV report.")
         return
 
-    headers, rows, _ = _prepare_table_data(results)
+    if report_context is None:
+        result_set = ResultSet(results)
+        table_data = _build_prepared_table_data(result_set=result_set)
+        headers, rows, _ = _materialize_prepared_table_data(table_data)
+        sorted_results = list(result_set.results)
+    else:
+        headers, rows, _ = _materialize_prepared_table_data(report_context.table_data)
+        sorted_results = list(report_context.result_set.results)
 
     if not headers or not rows:
         log_warning_note("No table data to generate TSV report.")
@@ -9272,7 +9535,6 @@ def generate_tsv_report(
     clean_headers.extend(["error_type", "error_package"])
 
     # Clean and escape row data, appending error columns per result
-    sorted_results = _sort_results_by_time(list(results))
     clean_rows = []
     for row, res in zip(rows, sorted_results, strict=False):
         clean_row = [escape_tsv_value(str(cell)) for cell in row]
@@ -13662,8 +13924,13 @@ def _write_diagnostics_and_repro_artifacts(
     history_path: Path,
     previous_history: HistoryRunRecord | None,
     current_history: HistoryRunRecord | None,
-) -> None:
+) -> DiagnosticsArtifacts:
     """Export repro bundles and diagnostics markdown after history append."""
+    preflight_issues = _get_run_preflight_issues(args)
+    diagnostics_snapshot = _build_diagnostics_snapshot(
+        results=results,
+        preflight_issues=preflight_issues,
+    )
     repro_bundles = export_failure_repro_bundles(
         results=results,
         output_dir=diagnostics_path.parent / "repro_bundles",
@@ -13690,12 +13957,16 @@ def _write_diagnostics_and_repro_artifacts(
             history_path=history_path,
             previous_history=previous_history,
             current_history=current_history,
-            preflight_issues=_get_run_preflight_issues(args),
+            preflight_issues=preflight_issues,
         ),
         repro_bundles=repro_bundles,
+        diagnostics_snapshot=diagnostics_snapshot,
     )
-    if diagnostics_written:
-        log_file_path(diagnostics_path, label="   Diagnostics:  ")
+    return DiagnosticsArtifacts(
+        snapshot=diagnostics_snapshot,
+        diagnostics_written=diagnostics_written,
+        repro_bundles=repro_bundles,
+    )
 
 
 def _write_environment_failure_diagnostics(
@@ -13741,6 +14012,11 @@ def finalize_execution(
 
         # Gather system characteristics for reports
         system_info = get_system_characteristics()
+        report_context = _build_report_render_context(
+            results=results,
+            prompt=prompt,
+            system_info=system_info,
+        )
 
         # Prepare output paths
         html_output_path: Path = args.output_html.resolve()
@@ -13768,6 +14044,7 @@ def finalize_execution(
                     prompt=prompt,
                     total_runtime_seconds=overall_time,
                     image_path=image_path,
+                    report_context=report_context,
                 )
             except (OSError, ValueError) as err:
                 logger.exception("Failed to generate HTML report.")
@@ -13784,6 +14061,7 @@ def finalize_execution(
                     versions=library_versions,
                     prompt=prompt,
                     total_runtime_seconds=overall_time,
+                    report_context=report_context,
                 )
             except (OSError, ValueError) as err:
                 logger.exception("Failed to generate Markdown report.")
@@ -13795,6 +14073,7 @@ def finalize_execution(
             generate_tsv_report(
                 results=results,
                 filename=args.output_tsv,
+                report_context=report_context,
             )
             # New: Save JSONL report
             save_jsonl_report(
@@ -13838,7 +14117,7 @@ def finalize_execution(
 
         # Generate diagnostics report after history append so regression/retry
         # context in diagnostics.md reflects this run.
-        _write_diagnostics_and_repro_artifacts(
+        diagnostics_artifacts = _write_diagnostics_and_repro_artifacts(
             args=args,
             results=results,
             library_versions=library_versions,
@@ -13849,6 +14128,10 @@ def finalize_execution(
             history_path=history_path,
             previous_history=previous_history,
             current_history=current_history,
+        )
+        _log_maintainer_summary(
+            artifacts=diagnostics_artifacts,
+            diagnostics_path=diagnostics_path,
         )
     else:
         log_warning_note("No models processed. No performance summary generated.")

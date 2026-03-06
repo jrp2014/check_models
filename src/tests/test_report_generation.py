@@ -6,16 +6,23 @@ import json
 from argparse import Namespace
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
+from unittest.mock import patch
 
+import check_models
 from check_models import (
+    DiagnosticsArtifacts,
     DiagnosticsHistoryInputs,
+    DiagnosticsSnapshot,
     GenerationQualityAnalysis,
     LibraryVersionDict,
     PerformanceResult,
     _build_diagnostics_context,
+    _build_diagnostics_snapshot,
+    _build_report_render_context,
     _cluster_failures_by_pattern,
     _diagnostics_priority,
     _format_traceback_tail,
+    _log_maintainer_summary,
     export_failure_repro_bundles,
     generate_diagnostics_report,
     generate_html_report,
@@ -25,6 +32,8 @@ from check_models import (
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+    import pytest
 
     from check_models import HistoryModelResultRecord, HistoryRunRecord
 
@@ -1139,6 +1148,119 @@ class TestDiagnosticsReport:
         )
         content = out.read_text(encoding="utf-8")
         assert "Priority: High" in content
+
+    def test_generate_markdown_report_uses_provided_report_context(self, tmp_path: Path) -> None:
+        """Markdown generation should reuse a supplied cached report context."""
+        out = tmp_path / "results.md"
+        results = [_make_success("org/good"), _make_failure("org/bad")]
+        report_context = _build_report_render_context(results=results, prompt="test prompt")
+
+        with (
+            patch.object(check_models, "_build_report_render_context", side_effect=AssertionError),
+            patch.object(check_models, "analyze_model_issues", side_effect=AssertionError),
+            patch.object(
+                check_models,
+                "compute_performance_statistics",
+                side_effect=AssertionError,
+            ),
+            patch.object(check_models, "get_system_characteristics", side_effect=AssertionError),
+            patch.object(check_models, "_extract_context_from_prompt", side_effect=AssertionError),
+        ):
+            generate_markdown_report(
+                results=results,
+                filename=out,
+                versions=_stub_versions(),
+                prompt="test prompt",
+                total_runtime_seconds=1.0,
+                report_context=report_context,
+            )
+
+        content = out.read_text(encoding="utf-8")
+        assert "# Model Performance Results" in content
+        assert "org/good" in content
+
+    def test_generate_tsv_report_uses_provided_report_context(self, tmp_path: Path) -> None:
+        """TSV generation should reuse a supplied cached report context."""
+        out = tmp_path / "results.tsv"
+        results = [_make_success("org/good"), _make_failure("org/bad")]
+        report_context = _build_report_render_context(results=results, prompt="test prompt")
+
+        with patch.object(check_models, "_build_report_render_context", side_effect=AssertionError):
+            generate_tsv_report(
+                results=results,
+                filename=out,
+                report_context=report_context,
+            )
+
+        content = out.read_text(encoding="utf-8")
+        assert "org/good" in content
+        assert "error_type" in content
+
+    def test_generate_tsv_report_standalone_uses_prepared_table_path(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Standalone TSV generation should avoid the legacy table-preparation helper."""
+        out = tmp_path / "standalone.tsv"
+        results = [_make_success("org/good"), _make_failure("org/bad")]
+
+        with patch.object(check_models, "_prepare_table_data", side_effect=AssertionError):
+            generate_tsv_report(
+                results=results,
+                filename=out,
+            )
+
+        content = out.read_text(encoding="utf-8")
+        assert "org/good" in content
+        assert "org/bad" in content
+
+    def test_build_diagnostics_snapshot_partitions_results(self) -> None:
+        """Diagnostics snapshot should preserve failure and harness buckets once."""
+        failure = _make_failure_with_details("org/fail")
+        harness = _make_harness_success("org/harness", harness_type="long_context")
+        clean = _make_success("org/clean")
+
+        snapshot = _build_diagnostics_snapshot(
+            results=[failure, harness, clean],
+            preflight_issues=("mlx-vlm mismatch",),
+        )
+
+        assert len(snapshot.failed) == 1
+        assert len(snapshot.harness_results) == 1
+        assert len(snapshot.unflagged_successful) == 1
+        assert len(snapshot.preflight_issues) == 1
+        assert len(snapshot.failure_clusters) == 1
+
+    def test_log_maintainer_summary_includes_counts_and_paths(
+        self,
+        tmp_path: Path,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """Maintainer summary should emit concise diagnostics counts and artifact hints."""
+        diagnostics_path = tmp_path / "diagnostics.md"
+        diagnostics_path.write_text("summary\n", encoding="utf-8")
+        failure = _make_failure_with_details("org/fail", error_package="mlx-vlm")
+        snapshot = DiagnosticsSnapshot(
+            failed=(failure,),
+            harness_results=((_make_harness_success("org/harness"), "sample output"),),
+            preflight_issues=("transformers warning",),
+            failure_clusters=(("cluster", (failure,)),),
+        )
+        artifacts = DiagnosticsArtifacts(
+            snapshot=snapshot,
+            diagnostics_written=True,
+            repro_bundles={"org/fail": tmp_path / "repro.json"},
+        )
+
+        with caplog.at_level("INFO", logger=check_models.LOGGER_NAME):
+            _log_maintainer_summary(
+                artifacts=artifacts,
+                diagnostics_path=diagnostics_path,
+            )
+
+        assert "Diagnostics signals: failures=1, harness=1, stack=0, preflight=1" in caplog.text
+        assert "Likely owners:" in caplog.text
+        assert "Repro bundles available for 1 failed model(s)." in caplog.text
 
 
 class TestClusterFailuresByPattern:
