@@ -19,7 +19,6 @@ Quick triage list with likely owner and next action for each issue class.
 - **[Medium] [mlx]** Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-bf16: [metal:... (1 model(s)). Next: check tensor/cache behavior and memory pressure handling.
 - **[Medium] [model configuration/repository]** Loaded processor has no image_processor; expected multimodal processor. (1 model(s)). Next: verify model config, tokenizer files, and revision alignment.
 - **[Medium] [mlx-vlm / mlx]** Harness/integration warnings on 9 model(s). Next: validate stop-token decoding and long-context behavior.
-- **[Medium] [mlx-vlm / mlx]** Stack-signal anomalies on 3 successful model(s). Next: inspect prompt/output token ratios and empty-output patterns.
 - **[Medium] [mlx-vlm, transformers]** Preflight compatibility warnings (2 issue(s)). Next: verify dependency/version compatibility before model runs.
 
 ---
@@ -173,7 +172,7 @@ Context: Existing metadata hints (high confidence; use only if visually consiste
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 50963.60it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 11831.61it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -267,7 +266,7 @@ Assistant:
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 18 files:   0%|          | 0/18 [00:00<?, ?it/s]
-Fetching 18 files: 100%|##########| 18/18 [00:00<00:00, 21927.82it/s]
+Fetching 18 files: 100%|##########| 18/18 [00:00<00:00, 11712.30it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -364,7 +363,7 @@ Assistant:
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 17 files:   0%|          | 0/17 [00:00<?, ?it/s]
-Fetching 17 files: 100%|##########| 17/17 [00:00<00:00, 26311.13it/s]
+Fetching 17 files: 100%|##########| 17/17 [00:00<00:00, 18419.83it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -384,7 +383,7 @@ Prefill:   0%|          | 0/2156 [00:00<?, ?tok/s]
 
 | Model | Observed Behavior | First Seen Failing | Recent Repro |
 | ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/Qwen3.5-35B-A3B-6bit` | Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-6bit: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes. | 2026-03-01 22:26:38 GMT | 1/1 recent runs failed |
+| `mlx-community/Qwen3.5-35B-A3B-6bit` | Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-6bit: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes. | 2026-03-01 22:26:38 GMT | 2/2 recent runs failed |
 
 ### To reproduce
 
@@ -455,7 +454,7 @@ Context: Existing metadata hints (high confidence; use only if visually consiste
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 16 files:   0%|          | 0/16 [00:00<?, ?it/s]
-Fetching 16 files: 100%|##########| 16/16 [00:00<00:00, 22310.13it/s]
+Fetching 16 files: 100%|##########| 16/16 [00:00<00:00, 14311.98it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -475,7 +474,7 @@ Prefill:   0%|          | 0/16604 [00:00<?, ?tok/s]
 
 | Model | Observed Behavior | First Seen Failing | Recent Repro |
 | ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/Qwen3.5-35B-A3B-bf16` | Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-bf16: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes. | 2026-03-01 22:26:38 GMT | 1/1 recent runs failed |
+| `mlx-community/Qwen3.5-35B-A3B-bf16` | Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-bf16: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes. | 2026-03-01 22:26:38 GMT | 2/2 recent runs failed |
 
 ### To reproduce
 
@@ -546,7 +545,7 @@ Context: Existing metadata hints (high confidence; use only if visually consiste
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 24 files:   0%|          | 0/24 [00:00<?, ?it/s]
-Fetching 24 files: 100%|##########| 24/24 [00:00<00:00, 14084.69it/s]
+Fetching 24 files: 100%|##########| 24/24 [00:00<00:00, 18153.89it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -604,7 +603,7 @@ Added chat tokens
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 17376.02it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 23381.63it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -812,19 +811,6 @@ Cemetery, England, United Kingdom, UK
 
 ---
 
-### Long-Context Degradation / Potential Stack Issues (3 model(s))
-
-3 model(s) show long-context degradation or stack anomalies; see table below.
-These models technically succeeded, but token/output patterns suggest likely integration/runtime issues worth checking upstream.
-
-| Model | Prompt Tok | Output Tok | Output/Prompt | Symptom | Owner |
-| ----- | ---------- | ---------- | ------------- | ------- | -------------- |
-| `Qwen/Qwen3-VL-2B-Instruct` | 16,590 | 500 | 3.01% | Repetition under extreme prompt length | `mlx-vlm / mlx` |
-| `mlx-community/Qwen3-VL-2B-Thinking-bf16` | 16,592 | 500 | 3.01% | Repetition under extreme prompt length | `mlx-vlm / mlx` |
-| `mlx-community/X-Reasoner-7B-8bit` | 16,601 | 500 | 3.01% | Repetition under extreme prompt length | `mlx-vlm / mlx` |
-
----
-
 ## History Context
 
 Recent reproducibility is measured from history (up to last 3 runs where each model appears).
@@ -835,11 +821,22 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 | Model | Status vs Previous Run | First Seen Failing | Recent Repro |
 | ----- | ---------------------- | ------------------ | ------------ |
 | `microsoft/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
-| `mlx-community/InternVL3-14B-8bit` | still failing | 2026-02-23 12:54:48 GMT | 3/3 recent runs failed |
-| `mlx-community/InternVL3-8B-bf16` | still failing | 2026-02-23 12:54:48 GMT | 3/3 recent runs failed |
-| `mlx-community/Qwen3.5-35B-A3B-6bit` | new model failing | 2026-03-01 22:26:38 GMT | 1/1 recent runs failed |
-| `mlx-community/Qwen3.5-35B-A3B-bf16` | new model failing | 2026-03-01 22:26:38 GMT | 1/1 recent runs failed |
-| `mlx-community/deepseek-vl2-8bit` | still failing | 2026-02-15 03:27:34 GMT | 3/3 recent runs failed |
+| `mlx-community/InternVL3-14B-8bit` | new model failing | 2026-02-23 12:54:48 GMT | 3/3 recent runs failed |
+| `mlx-community/InternVL3-8B-bf16` | new model failing | 2026-02-23 12:54:48 GMT | 3/3 recent runs failed |
+| `mlx-community/Qwen3.5-35B-A3B-6bit` | new model failing | 2026-03-01 22:26:38 GMT | 2/2 recent runs failed |
+| `mlx-community/Qwen3.5-35B-A3B-bf16` | new model failing | 2026-03-01 22:26:38 GMT | 2/2 recent runs failed |
+| `mlx-community/deepseek-vl2-8bit` | new model failing | 2026-02-15 03:27:34 GMT | 3/3 recent runs failed |
+
+---
+
+## Coverage & Runtime Metrics
+
+- **Detailed diagnostics models:** 15
+- **Summary diagnostics models:** 33
+- **Coverage check:** ✅ Complete (each model appears exactly once).
+- **Total model runtime (sum):** 924.70s (924.70s)
+- **Average runtime per model:** 19.26s (19.26s)
+- **Runtime note:** 6 model(s) had missing timing fields and were counted as 0.00s.
 
 ---
 
@@ -855,36 +852,36 @@ These models completed without diagnostics flags (no hard failure, harness warni
 - `mlx-community/gemma-3-27b-it-qat-4bit`
 - `mlx-community/gemma-3-27b-it-qat-8bit`
 
-### Passed with quality warnings (28 model(s))
+### Ran, but with quality warnings (28 model(s))
 
-- `HuggingFaceTB/SmolVLM-Instruct`
-- `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`
-- `meta-llama/Llama-3.2-11B-Vision-Instruct`
-- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`
-- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`
-- `mlx-community/FastVLM-0.5B-bf16`
-- `mlx-community/GLM-4.6V-Flash-6bit`
-- `mlx-community/GLM-4.6V-Flash-mxfp4`
-- `mlx-community/Idefics3-8B-Llama3-bf16`
-- `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`
-- `mlx-community/Kimi-VL-A3B-Thinking-8bit`
-- `mlx-community/LFM2-VL-1.6B-8bit`
-- `mlx-community/LFM2.5-VL-1.6B-bf16`
-- `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`
-- `mlx-community/Molmo-7B-D-0924-8bit`
-- `mlx-community/Molmo-7B-D-0924-bf16`
-- `mlx-community/Phi-3.5-vision-instruct-bf16`
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`
-- `mlx-community/SmolVLM-Instruct-bf16`
-- `mlx-community/gemma-3n-E2B-4bit`
-- `mlx-community/gemma-3n-E4B-it-bf16`
-- `mlx-community/llava-v1.6-mistral-7b-8bit`
-- `mlx-community/nanoLLaVA-1.5-4bit`
-- `mlx-community/paligemma2-10b-ft-docci-448-bf16`
-- `mlx-community/paligemma2-3b-pt-896-4bit`
-- `mlx-community/pixtral-12b-8bit`
-- `mlx-community/pixtral-12b-bf16`
-- `qnguyen3/nanoLLaVA`
+- `HuggingFaceTB/SmolVLM-Instruct`: Model output may not follow prompt or image contents.
+- `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: Output omitted required Title/Description/Keywords sections.
+- `meta-llama/Llama-3.2-11B-Vision-Instruct`: Output became repetitive, indicating possible generation instability.
+- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Output omitted required Title/Description/Keywords sections.
+- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: Output became repetitive, indicating possible generation instability.
+- `mlx-community/FastVLM-0.5B-bf16`: Output appears to copy prompt context verbatim.
+- `mlx-community/GLM-4.6V-Flash-6bit`: Output formatting deviated from the requested structure.
+- `mlx-community/GLM-4.6V-Flash-mxfp4`: Output formatting deviated from the requested structure.
+- `mlx-community/Idefics3-8B-Llama3-bf16`: Output formatting deviated from the requested structure.
+- `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`: Output omitted required Title/Description/Keywords sections.
+- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: Output leaked reasoning or prompt-template text.
+- `mlx-community/LFM2-VL-1.6B-8bit`: Output appears to copy prompt context verbatim.
+- `mlx-community/LFM2.5-VL-1.6B-bf16`: Output appears to copy prompt context verbatim.
+- `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: Model output may not follow prompt or image contents.
+- `mlx-community/Molmo-7B-D-0924-8bit`: Model output may not follow prompt or image contents.
+- `mlx-community/Molmo-7B-D-0924-bf16`: Model output may not follow prompt or image contents.
+- `mlx-community/Phi-3.5-vision-instruct-bf16`: Title length violation (4 words; expected 6-12)
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: Output appears to copy prompt context verbatim.
+- `mlx-community/SmolVLM-Instruct-bf16`: Model output may not follow prompt or image contents.
+- `mlx-community/gemma-3n-E2B-4bit`: Model output may not follow prompt or image contents.
+- `mlx-community/gemma-3n-E4B-it-bf16`: Output omitted required Title/Description/Keywords sections.
+- `mlx-community/llava-v1.6-mistral-7b-8bit`: Model output may not follow prompt or image contents.
+- `mlx-community/nanoLLaVA-1.5-4bit`: Output leaked reasoning or prompt-template text.
+- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: Model output may not follow prompt or image contents.
+- `mlx-community/paligemma2-3b-pt-896-4bit`: Model output may not follow prompt or image contents.
+- `mlx-community/pixtral-12b-8bit`: Output appears to copy prompt context verbatim.
+- `mlx-community/pixtral-12b-bf16`: Output appears to copy prompt context verbatim.
+- `qnguyen3/nanoLLaVA`: Model output may not follow prompt or image contents.
 
 ---
 
@@ -979,4 +976,4 @@ Context: Existing metadata hints (high confidence; use only if visually consiste
 - Input image: `/Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-03-01 22:26:38 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-03-01 23:45:12 GMT by [check_models](https://github.com/jrp2014/check_models)._
