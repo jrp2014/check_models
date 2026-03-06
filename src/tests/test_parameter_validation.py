@@ -1,8 +1,11 @@
 """Tests for parameter validation functions."""
 
+import argparse
+
 import pytest
 
 from check_models import (
+    validate_cli_arguments,
     validate_kv_params,
     validate_sampling_params,
     validate_temperature,
@@ -120,3 +123,51 @@ class TestKVParamsValidation:
         validate_kv_params(max_kv_size=4096, kv_bits=4)
         validate_kv_params(max_kv_size=8192, kv_bits=8)
         validate_kv_params(max_kv_size=2048, kv_bits=4)
+
+
+class TestCliArgumentNormalization:
+    """Test CLI-only normalization and validation helpers."""
+
+    @staticmethod
+    def _build_args(**overrides: object) -> argparse.Namespace:
+        base: dict[str, object] = {
+            "temperature": 0.0,
+            "max_tokens": 10,
+            "top_p": 1.0,
+            "repetition_penalty": None,
+            "max_kv_size": None,
+            "kv_bits": None,
+            "resize_shape": None,
+            "eos_tokens": None,
+            "processor_kwargs": None,
+        }
+        base.update(overrides)
+        return argparse.Namespace(**base)
+
+    def test_cli_argument_normalization_decodes_and_shapes_values(self) -> None:
+        """CLI validation should normalize resize, EOS, and processor kwargs values."""
+        args = self._build_args(
+            resize_shape=[512],
+            eos_tokens=[r"</think>", r"\n"],
+            processor_kwargs={"cropping": False, "max_patches": 3},
+        )
+
+        validate_cli_arguments(args)
+
+        assert args.resize_shape == (512, 512)
+        assert args.eos_tokens == ("</think>", "\n")
+        assert args.processor_kwargs == {"cropping": False, "max_patches": 3}
+
+    def test_invalid_resize_shape_raises_error(self) -> None:
+        """Resize shape should reject anything other than one or two positive ints."""
+        args = self._build_args(resize_shape=[224, 224, 224])
+
+        with pytest.raises(ValueError, match="resize_shape must contain 1 or 2 integers"):
+            validate_cli_arguments(args)
+
+    def test_reserved_processor_kwargs_raise_error(self) -> None:
+        """Processor kwargs should not be allowed to override dedicated CLI flags."""
+        args = self._build_args(processor_kwargs={"max_tokens": 50, "cropping": False})
+
+        with pytest.raises(ValueError, match="processor_kwargs cannot override dedicated"):
+            validate_cli_arguments(args)

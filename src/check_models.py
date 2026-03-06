@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import codecs
 import contextlib
 import dataclasses
 import gc
@@ -1123,6 +1124,10 @@ class ProcessImageParams:
     revision: str | None = None
     adapter_path: str | None = None
     prefill_step_size: int | None = None
+    resize_shape: tuple[int, int] | None = None
+    eos_tokens: tuple[str, ...] | None = None
+    skip_special_tokens: bool = False
+    processor_kwargs: dict[str, Any] | None = None
     context_marker: str = "Context:"
 
 
@@ -9543,6 +9548,107 @@ def validate_kv_params(
         raise ValueError(msg)
 
 
+_RESERVED_PROCESSOR_KWARG_KEYS: Final[frozenset[str]] = frozenset(
+    {
+        "audio",
+        "eos_tokens",
+        "image",
+        "kv_bits",
+        "kv_group_size",
+        "max_kv_size",
+        "max_tokens",
+        "prefill_step_size",
+        "processor",
+        "prompt",
+        "quantized_kv_start",
+        "repetition_context_size",
+        "repetition_penalty",
+        "resize_shape",
+        "skip_special_tokens",
+        "temperature",
+        "top_p",
+        "verbose",
+    },
+)
+
+
+def _parse_processor_kwargs_arg(value: str) -> dict[str, Any]:
+    """Parse ``--processor-kwargs`` as a JSON object."""
+    try:
+        parsed = json.loads(value)
+    except json.JSONDecodeError as exc:
+        msg = f"processor_kwargs must be valid JSON: {exc.msg}"
+        raise argparse.ArgumentTypeError(msg) from exc
+
+    if not isinstance(parsed, dict):
+        msg = "processor_kwargs must be a JSON object"
+        raise argparse.ArgumentTypeError(msg)
+    if not all(isinstance(key, str) for key in parsed):
+        msg = "processor_kwargs keys must all be strings"
+        raise argparse.ArgumentTypeError(msg)
+    return cast("dict[str, Any]", parsed)
+
+
+def _normalize_resize_shape(raw_shape: Sequence[int] | None) -> tuple[int, int] | None:
+    """Normalize CLI resize shape values to a ``(height, width)`` tuple."""
+    if raw_shape is None:
+        return None
+    if len(raw_shape) not in (1, 2):
+        msg = f"resize_shape must contain 1 or 2 integers, got {len(raw_shape)}"
+        raise ValueError(msg)
+    if any(size <= 0 for size in raw_shape):
+        msg = f"resize_shape values must be > 0, got {list(raw_shape)}"
+        raise ValueError(msg)
+    if len(raw_shape) == 1:
+        return (raw_shape[0], raw_shape[0])
+    return (raw_shape[0], raw_shape[1])
+
+
+def _decode_cli_eos_tokens(raw_tokens: Sequence[str] | None) -> tuple[str, ...] | None:
+    """Decode CLI EOS tokens, supporting escaped characters like upstream mlx-vlm."""
+    if raw_tokens is None:
+        return None
+
+    decoded_tokens: list[str] = []
+    for token in raw_tokens:
+        try:
+            decoded_tokens.append(codecs.decode(token, "unicode_escape"))
+        except (UnicodeDecodeError, UnicodeError):
+            decoded_tokens.append(token)
+    return tuple(decoded_tokens)
+
+
+def _validate_processor_kwargs(
+    processor_kwargs: Mapping[str, Any] | None,
+) -> dict[str, Any] | None:
+    """Reject processor kwargs that would collide with dedicated CLI flags."""
+    if processor_kwargs is None:
+        return None
+
+    overlap = sorted(set(processor_kwargs).intersection(_RESERVED_PROCESSOR_KWARG_KEYS))
+    if overlap:
+        overlap_str = ", ".join(overlap)
+        msg = f"processor_kwargs cannot override dedicated CLI arguments: {overlap_str}"
+        raise ValueError(msg)
+    return dict(processor_kwargs)
+
+
+def _build_generate_extra_kwargs(params: ProcessImageParams) -> dict[str, Any]:
+    """Collect optional generate kwargs for benchmark runs."""
+    extra_kwargs: dict[str, Any] = {}
+    if params.processor_kwargs:
+        extra_kwargs.update(params.processor_kwargs)
+    if params.prefill_step_size is not None:
+        extra_kwargs["prefill_step_size"] = params.prefill_step_size
+    if params.resize_shape is not None:
+        extra_kwargs["resize_shape"] = params.resize_shape
+    if params.eos_tokens is not None:
+        extra_kwargs["eos_tokens"] = list(params.eos_tokens)
+    if params.skip_special_tokens:
+        extra_kwargs["skip_special_tokens"] = True
+    return extra_kwargs
+
+
 def validate_cli_arguments(args: argparse.Namespace) -> None:
     """Validate all CLI arguments before processing begins.
 
@@ -9567,6 +9673,12 @@ def validate_cli_arguments(args: argparse.Namespace) -> None:
     validate_kv_params(
         max_kv_size=args.max_kv_size,
         kv_bits=args.kv_bits,
+    )
+
+    args.resize_shape = _normalize_resize_shape(getattr(args, "resize_shape", None))
+    args.eos_tokens = _decode_cli_eos_tokens(getattr(args, "eos_tokens", None))
+    args.processor_kwargs = _validate_processor_kwargs(
+        getattr(args, "processor_kwargs", None),
     )
 
 
@@ -10352,14 +10464,7 @@ def _run_model_generation(
     timer.start()
     _set_failure_phase(phase_callback, "decode")
     try:
-        # Build optional kwargs for generate() — only pass when explicitly set.
-        # Note: we use a separate dict + **unpacking instead of a conditional
-        # inline expression because pyrefly cannot type-check
-        # ``**({k: v} if cond else {})`` against generate()'s **kwargs signature
-        # (it incorrectly infers the value type as incompatible with other kw params).
-        extra_kwargs: dict[str, Any] = {}
-        if params.prefill_step_size is not None:
-            extra_kwargs["prefill_step_size"] = params.prefill_step_size
+        extra_kwargs = _build_generate_extra_kwargs(params)
 
         output: GenerationResult | SupportsGenerationResult = generate(
             model=model,
@@ -11993,6 +12098,10 @@ def process_models(
             revision=args.revision,
             adapter_path=args.adapter_path,
             prefill_step_size=args.prefill_step_size,
+            resize_shape=args.resize_shape,
+            eos_tokens=args.eos_tokens,
+            skip_special_tokens=args.skip_special_tokens,
+            processor_kwargs=args.processor_kwargs,
             context_marker=args.context_marker,
         )
         result: PerformanceResult = process_image_with_model(params)
@@ -13886,6 +13995,38 @@ def main_cli() -> None:
         type=str,
         default=None,
         help="Prompt.",
+    )
+    parser.add_argument(
+        "--resize-shape",
+        type=int,
+        nargs="+",
+        default=None,
+        help=(
+            "Resize image input before processor handling. "
+            "Provide 1 integer for square resize or 2 for height width."
+        ),
+    )
+    parser.add_argument(
+        "--eos-tokens",
+        type=str,
+        nargs="+",
+        default=None,
+        help="Additional EOS tokens to stop on. Supports escaped values like \\n.",
+    )
+    parser.add_argument(
+        "--skip-special-tokens",
+        action="store_true",
+        default=False,
+        help="Skip tokenizer special tokens in the detokenized output.",
+    )
+    parser.add_argument(
+        "--processor-kwargs",
+        type=_parse_processor_kwargs_arg,
+        default=None,
+        help=(
+            "Extra processor kwargs as a JSON object. "
+            'Example: --processor-kwargs \'{"cropping": false, "max_patches": 3}\''
+        ),
     )
 
     parser.add_argument(

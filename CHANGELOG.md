@@ -8,6 +8,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Began expanding `src/check_models.py` generation parity with upstream `mlx_vlm.generate`:
+  - added CLI/runtime support for `resize_shape`, `eos_tokens`, `skip_special_tokens`, and JSON `processor_kwargs` passthrough;
+  - normalizes these values centrally during CLI validation so model runs receive consistent typed kwargs.
+
 - Refactored `diagnostics.md` output structure for improved issue triage utility:
   - merged 'Potential Stack Issues' into a sub-section of 'Harness/Integration
     Issues' to reduce redundancy;

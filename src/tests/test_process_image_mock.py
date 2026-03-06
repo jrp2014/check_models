@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING
 from unittest.mock import patch
 
@@ -25,6 +25,14 @@ class _FakeGenerationResult:
     time: float = 0.0
     active_memory: float = 0.5
     cache_memory: float = 0.3
+
+
+class _FakeModel:
+    config: object = object()
+
+    @staticmethod
+    def parameters() -> list[object]:
+        return []
 
 
 def _build_params(image_path: Path) -> check_models.ProcessImageParams:
@@ -173,3 +181,46 @@ class TestProcessImageWithModelMock:
         assert result.failure_phase == "decode"
         assert result.error_code is not None
         assert "_DECODE_" in result.error_code
+
+    def test_run_model_generation_passes_phase1_generate_kwargs(self, test_image: Path) -> None:
+        """Phase-1 upstream-compatible CLI params should reach mlx_vlm.generate."""
+        params = replace(
+            _build_params(test_image),
+            prefill_step_size=256,
+            resize_shape=(512, 384),
+            eos_tokens=("</think>", "\n"),
+            skip_special_tokens=True,
+            processor_kwargs={"cropping": False, "max_patches": 3},
+        )
+
+        fake_model = _FakeModel()
+        fake_processor = object()
+        fake_generation = _FakeGenerationResult()
+
+        with (
+            patch.object(check_models, "_ensure_generation_runtime_symbols"),
+            patch.object(
+                check_models,
+                "_load_model",
+                return_value=(fake_model, fake_processor, None),
+            ),
+            patch.object(check_models, "_run_model_preflight_validators"),
+            patch.object(check_models, "apply_chat_template", return_value="formatted prompt"),
+            patch.object(check_models, "generate", return_value=fake_generation) as mock_generate,
+            patch.object(check_models.mx, "synchronize"),
+            patch.object(check_models.mx, "get_active_memory", return_value=0.0),
+            patch.object(check_models.mx, "get_cache_memory", return_value=0.0),
+            patch.object(check_models.mx, "eval"),
+        ):
+            result = check_models._run_model_generation(params)
+
+        assert result is fake_generation
+        generate_kwargs = mock_generate.call_args.kwargs
+        assert generate_kwargs["prompt"] == "formatted prompt"
+        assert generate_kwargs["image"] == str(test_image)
+        assert generate_kwargs["prefill_step_size"] == 256
+        assert generate_kwargs["resize_shape"] == (512, 384)
+        assert generate_kwargs["eos_tokens"] == ["</think>", "\n"]
+        assert generate_kwargs["skip_special_tokens"] is True
+        assert generate_kwargs["cropping"] is False
+        assert generate_kwargs["max_patches"] == 3
