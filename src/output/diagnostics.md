@@ -1,8 +1,8 @@
-# Diagnostics Report — 2 failure(s), 8 harness issue(s) (mlx-vlm 0.3.13)
+# Diagnostics Report — 0 failure(s), 11 harness issue(s) (mlx-vlm 0.4.0)
 
 ## Summary
 
-Automated benchmarking of **48 locally-cached VLM models** found **2 hard failure(s)** and **8 harness/integration issue(s)** plus **1 preflight compatibility warning(s)** in successful models. 46 of 48 models succeeded.
+Automated benchmarking of **46 locally-cached VLM models** found **0 hard failure(s)** and **11 harness/integration issue(s)** plus **1 preflight compatibility warning(s)** in successful models. 46 of 46 models succeeded.
 
 Test image: `20260228-162254_DSC09377.jpg` (33.5 MB).
 
@@ -12,9 +12,7 @@ Test image: `20260228-162254_DSC09377.jpg` (33.5 MB).
 
 Quick triage list with likely owner and next action for each issue class.
 
-- **[Medium] [mlx-vlm]** Failed to process inputs with error: can only concatenate str (not "NoneType") to str (1 model(s)). Next: check processor/chat-template wiring and generation kwargs.
-- **[Medium] [model configuration/repository]** Loaded processor has no image_processor; expected multimodal processor. (1 model(s)). Next: verify model config, tokenizer files, and revision alignment.
-- **[Medium] [mlx-vlm / mlx]** Harness/integration warnings on 8 model(s). Next: validate stop-token decoding and long-context behavior.
+- **[Medium] [mlx-vlm / mlx]** Harness/integration warnings on 11 model(s). Next: validate stop-token decoding and long-context behavior.
 - **[Medium] [transformers]** Preflight compatibility warnings (1 issue(s)). Next: verify dependency/version compatibility before model runs.
 
 ---
@@ -23,209 +21,8 @@ Quick triage list with likely owner and next action for each issue class.
 
 | Priority | Issue | Models Affected | Owner | Next Action |
 | -------- | ----- | --------------- | ----- | ----------- |
-| **Medium** | Failed to process inputs with error: can only concatenate str (not "N... | 1 (Florence-2-large-ft) | `mlx-vlm` | check processor/chat-template wiring and generation kwargs. |
-| **Medium** | Loaded processor has no image_processor; expected multimodal processor. | 1 (deepseek-vl2-8bit) | `model configuration/repository` | verify model config, tokenizer files, and revision alignment. |
-| **Medium** | Harness/integration | 8 (Qwen3-VL-2B-Instruct, Devstral-Small-2-24B-Instruct-2512-5bit, Qwen3-VL-2B-Thinking-bf16, SmolVLM2-2.2B-Instruct-mlx, X-Reasoner-7B-8bit, paligemma2-10b-ft-docci-448-6bit, paligemma2-3b-ft-docci-448-bf16, Florence-2-large-ft) | `mlx-vlm / mlx` | validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime. |
+| **Medium** | Harness/integration | 11 (Qwen3-VL-2B-Instruct, Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit, GLM-4.6V-Flash-6bit, GLM-4.6V-Flash-mxfp4, Molmo-7B-D-0924-8bit, SmolVLM2-2.2B-Instruct-mlx, llava-v1.6-mistral-7b-8bit, paligemma2-10b-ft-docci-448-bf16, paligemma2-3b-ft-docci-448-bf16, Florence-2-large-ft) | `mlx-vlm / mlx` | validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime. |
 | **Medium** | Preflight compatibility warning | 1 issue(s) | `transformers` | verify dependency/version compatibility before model runs. |
-
----
-
-## 1. Failure affecting 1 model (Priority: Medium)
-
-**Observed behavior:** Failed to process inputs with error: can only concatenate str (not "NoneType") to str
-**Owner (likely component):** `mlx-vlm`
-**Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Affected model:** `microsoft/Florence-2-large-ft`
-
-| Model | Observed Behavior | First Seen Failing | Recent Repro |
-| ----- | ----------------- | ------------------ | ------------ |
-| `microsoft/Florence-2-large-ft` | Failed to process inputs with error: can only concatenate str (not "NoneType") to str | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
-
-### To reproduce
-
-- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft`
-
-<details>
-<summary>Detailed trace logs (affected model)</summary>
-
-#### `microsoft/Florence-2-large-ft`
-
-Traceback:
-
-```text
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 873, in process_inputs_with_fallback
-    return process_inputs(
-        processor,
-    ...<5 lines>...
-        **kwargs,
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 859, in process_inputs
-    return process_method(**args)
-  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/florence2/processing_florence2.py", line 163, in __call__
-    image_inputs = self.image_processor(images, **output_kwargs["images_kwargs"])
-  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils.py", line 50, in __call__
-    return self.preprocess(images, *args, **kwargs)
-           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils_fast.py", line 860, in preprocess
-    self._validate_preprocess_kwargs(**kwargs)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
-  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils_fast.py", line 823, in _validate_preprocess_kwargs
-    validate_fast_preprocess_arguments(
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        do_rescale=do_rescale,
-        ^^^^^^^^^^^^^^^^^^^^^^
-    ...<10 lines>...
-        data_format=data_format,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils_fast.py", line 106, in validate_fast_preprocess_arguments
-    raise ValueError("Only returning PyTorch tensors is currently supported.")
-ValueError: Only returning PyTorch tensors is currently supported.
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 886, in process_inputs_with_fallback
-    return process_inputs(
-        processor,
-    ...<5 lines>...
-        **kwargs,
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 859, in process_inputs
-    return process_method(**args)
-  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/florence2/processing_florence2.py", line 185, in __call__
-    self.image_token * self.num_image_tokens
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + self.tokenizer.bos_token
-    ^~~~~~~~~~~~~~~~~~~~~~~~~~
-TypeError: can only concatenate str (not "NoneType") to str
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 663, in generate
-    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
-                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 506, in stream_generate
-    inputs = prepare_inputs(
-        processor,
-    ...<6 lines>...
-        **kwargs,
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1110, in prepare_inputs
-    inputs = process_inputs_with_fallback(
-        processor,
-    ...<4 lines>...
-        **kwargs,
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 896, in process_inputs_with_fallback
-    raise ValueError(
-        f"Failed to process inputs with error: {fallback_error}"
-    ) from fallback_error
-ValueError: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
-```
-
-Captured stdout/stderr:
-
-```text
-=== STDOUT ===
-==========
-Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '2', '8', '-', '1', '6', '2', '2', '5', '4', '_', 'D', 'S', 'C', '0', '9', '3', '7', '7', '.', 'j', 'p', 'g'] 
-
-Prompt: Analyze this image for cataloguing metadata.
-
-Return exactly these three sections, and nothing else:
-
-Title: 6-12 words, descriptive and concrete.
-
-Description: 1-2 factual sentences covering key subjects, setting, and action.
-
-Keywords: 15-30 unique comma-separated terms, ordered most specific to most general.
-
-Rules:
-- Use only visually supported facts.
-- If hints conflict with the image, trust the image.
-- Do not output reasoning, notes, or extra sections.
-- Do not copy context hints verbatim.
-
-Context: Existing metadata hints (high confidence; use only if visually consistent):
-- Description hint: , St Mary's Church, Lenham, England, United Kingdom, UK Here is a caption for the image, written in a neutral but descriptive style suitable for a periodical, blog, or magazine. **Caption:** A late winter afternoon in the historic village of Lenham, Kent, England. This view from the churchyard of St Mary's Church looks out over the village square. In the foreground, ancient, moss-covered headstones dot the landsca...
-- Keyword hints: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue
-- Capture metadata: Taken on 2026-02-28 16:22:54 GMT (at 16:22:54 local time). GPS: 51.237300°N, 0.718917°E.
-
-=== STDERR ===
-Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-
-Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 8025.84it/s]
-
-Download complete: : 0.00B [00:00, ?B/s]              
-Download complete: : 0.00B [00:00, ?B/s]
-```
-
-</details>
-
-## 2. Failure affecting 1 model (Priority: Medium)
-
-**Observed behavior:** Loaded processor has no image_processor; expected multimodal processor.
-**Owner (likely component):** `model configuration/repository`
-**Suggested next action:** verify model config, tokenizer files, and revision alignment.
-**Affected model:** `mlx-community/deepseek-vl2-8bit`
-
-| Model | Observed Behavior | First Seen Failing | Recent Repro |
-| ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/deepseek-vl2-8bit` | Loaded processor has no image_processor; expected multimodal processor. | 2026-02-15 03:27:34 GMT | 3/3 recent runs failed |
-
-### To reproduce
-
-- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit`
-
-<details>
-<summary>Detailed trace logs (affected model)</summary>
-
-#### `mlx-community/deepseek-vl2-8bit`
-
-Traceback:
-
-```text
-Traceback (most recent call last):
-ValueError: Loaded processor has no image_processor; expected multimodal processor.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
-```
-
-Captured stdout/stderr:
-
-```text
-=== STDOUT ===
-Add pad token = ['<｜▁pad▁｜>'] to the tokenizer
-<｜▁pad▁｜>:2
-Add image token = ['<image>'] to the tokenizer
-<image>:128815
-Added grounding-related tokens
-Added chat tokens
-
-=== STDERR ===
-Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-
-Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 23421.80it/s]
-
-Download complete: : 0.00B [00:00, ?B/s]              
-Download complete: : 0.00B [00:00, ?B/s]
-```
-
-</details>
 
 ---
 
@@ -239,9 +36,9 @@ These warnings were detected before inference. They are non-fatal but should be 
 
 ---
 
-## Harness/Integration Issues (8 model(s))
+## Harness/Integration Issues (11 model(s))
 
-8 model(s) show potential harness/integration issues; see per-model breakdown below.
+11 model(s) show potential harness/integration issues; see per-model breakdown below.
 These models completed successfully but show integration problems (for example stop-token leakage, decoding artifacts, or long-context breakdown) that likely point to stack/runtime behavior rather than inherent model quality limits.
 
 ### `Qwen/Qwen3-VL-2B-Instruct`
@@ -249,19 +46,41 @@ These models completed successfully but show integration problems (for example s
 **What looks wrong:** Behavior degrades under long prompt context.
 **Likely component:** `mlx-vlm / mlx`
 **Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,590, output=500, output/prompt=3.01%
+**Token summary:** prompt=16,753, output=500, output/prompt=2.98%
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16590 tokens), output became repetitive.
+- At long prompt length (16753 tokens), output became repetitive.
 - Output became repetitive, indicating possible generation instability.
 
 **Sample output:**
 
 ```text
-Title: Gravestones in a churchyard in Lenham, Kent, England
+Title: St Mary's Churchyard, Lenham, England
 
-Description: A quiet churchyard in Lenham, Kent, England, featuring moss-covered gravestones and a half-timbered house in the background. T...
+Description: A serene view of the churchyard at St Mary's Church in Lenham, England, featuring ancient, moss-covered gravestones and a half-timbered house...
+```
+
+### `microsoft/Phi-3.5-vision-instruct`
+
+**What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
+**Likely component:** `mlx-vlm`
+**Suggested next action:** check processor/chat-template wiring and generation kwargs.
+**Token summary:** prompt=1,352, output=500, output/prompt=36.98%
+
+**Why this appears to be an integration/runtime issue:**
+
+- Special control token &lt;|end|&gt; appeared in generated text.
+- Special control token &lt;|endoftext|&gt; appeared in generated text.
+- Generated text appears to continue into example-code templates mid-output.
+- Output switched language/script unexpectedly.
+
+**Sample output:**
+
+```text
+Title: Historic Lenham Village Churchyard
+
+Description: The image captures a serene churchyard in Lenham, Kent, England, with a view overlooking the village square. Ancient gravestones, some with moss...
 ```
 
 ### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
@@ -269,37 +88,77 @@ Description: A quiet churchyard in Lenham, Kent, England, featuring moss-covered
 **What looks wrong:** Decoded output contains tokenizer artifacts that should not appear in user-facing text.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=2,455, output=106, output/prompt=4.32%
+**Token summary:** prompt=2,625, output=125, output/prompt=4.76%
 
 **Why this appears to be an integration/runtime issue:**
 
-- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 55 occurrences).
+- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 71 occurrences).
 - Output omitted required Title/Description/Keywords sections.
 
 **Sample output:**
 
 ```text
-Title:ĠHistoricĠChurchyardĠwithĠTudorĠHousesĊĊDescription:ĠTheĠimageĠshowsĠaĠchurchyardĠwithĠoldĠgravestonesĠandĠaĠbackdropĠofĠtraditionalĠTudor-styleĠhousesĠinĠLenham,ĠEngland.ĊĊKeywords:ĠStĠMary'sĠC...
+Title:ĠGraveyardĠwithĠTudor-styleĠhousesĊĊDescription:ĠAĠgraveyardĠwithĠold,Ġmoss-coveredĠgravestonesĠinĠtheĠforeground,ĠandĠtraditionalĠTudor-styleĠhousesĠwithĠredĠbrickĠandĠwhiteĠtimberĠframingĠinĠt...
 ```
 
-### `mlx-community/Qwen3-VL-2B-Thinking-bf16`
+### `mlx-community/GLM-4.6V-Flash-6bit`
 
-**What looks wrong:** Behavior degrades under long prompt context.
-**Likely component:** `mlx-vlm / mlx`
-**Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,592, output=500, output/prompt=3.01%
+**What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
+**Likely component:** `mlx-vlm`
+**Suggested next action:** check processor/chat-template wiring and generation kwargs.
+**Token summary:** prompt=6,652, output=500, output/prompt=7.52%
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16592 tokens), output became repetitive.
-- Output became repetitive, indicating possible generation instability.
-- Output contains corrupted or malformed text segments.
+- Special control token &lt;/think&gt; appeared in generated text.
+- Output formatting deviated from the requested structure.
 - Output omitted required Title/Description/Keywords sections.
+- Output leaked reasoning or prompt-template text.
 
 **Sample output:**
 
 ```text
-Got it, let's tackle this. First, the Title needs to be 6-12 words, descriptive and concrete. The image is a graveyard with a churchyard, so maybe "Graveyard of St Mary's Church Lenham England" but ne...
+<think>Got it, let's tackle this. First, I need to create the Title, Description, and Keywords sections based on the image.
+
+Starting with the Title. It needs to be 5-10 words, concrete and factual. L...
+```
+
+### `mlx-community/GLM-4.6V-Flash-mxfp4`
+
+**What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
+**Likely component:** `mlx-vlm`
+**Suggested next action:** check processor/chat-template wiring and generation kwargs.
+**Token summary:** prompt=6,652, output=500, output/prompt=7.52%
+
+**Why this appears to be an integration/runtime issue:**
+
+- Special control token &lt;/think&gt; appeared in generated text.
+- Output formatting deviated from the requested structure.
+- Output leaked reasoning or prompt-template text.
+
+**Sample output:**
+
+```text
+<think>Got it, let's tackle this. The user wants cataloging metadata based on the image. First, I need to extract the Title, Description, and Keywords as per the rules.
+
+First, the Title. The image sh...
+```
+
+### `mlx-community/Molmo-7B-D-0924-8bit`
+
+**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
+**Likely component:** `mlx-vlm`
+**Suggested next action:** check processor/chat-template wiring and generation kwargs.
+**Token summary:** prompt=0, output=0, output/prompt=n/a
+
+**Why this appears to be an integration/runtime issue:**
+
+- Model returned zero output tokens.
+
+**Sample output:**
+
+```text
+<empty output>
 ```
 
 ### `mlx-community/SmolVLM2-2.2B-Instruct-mlx`
@@ -307,7 +166,43 @@ Got it, let's tackle this. First, the Title needs to be 6-12 words, descriptive 
 **What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=1,470, output=9, output/prompt=0.61%
+**Token summary:** prompt=1,639, output=9, output/prompt=0.55%
+
+**Why this appears to be an integration/runtime issue:**
+
+- Output is very short relative to prompt size (0.5%), suggesting possible early-stop or prompt-handling issues.
+- Model output may not follow prompt or image contents.
+
+**Sample output:**
+
+```text
+Cemetery, England, United Kingdom, UK
+```
+
+### `mlx-community/llava-v1.6-mistral-7b-8bit`
+
+**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
+**Likely component:** `mlx-vlm`
+**Suggested next action:** check processor/chat-template wiring and generation kwargs.
+**Token summary:** prompt=2,740, output=8, output/prompt=0.29%
+
+**Why this appears to be an integration/runtime issue:**
+
+- Output was a short generic filler response (about 8 tokens).
+- Model output may not follow prompt or image contents.
+
+**Sample output:**
+
+```text
+The image is a photograph.
+```
+
+### `mlx-community/paligemma2-10b-ft-docci-448-bf16`
+
+**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
+**Likely component:** `mlx-vlm`
+**Suggested next action:** check processor/chat-template wiring and generation kwargs.
+**Token summary:** prompt=1,557, output=9, output/prompt=0.58%
 
 **Why this appears to be an integration/runtime issue:**
 
@@ -317,46 +212,7 @@ Got it, let's tackle this. First, the Title needs to be 6-12 words, descriptive 
 **Sample output:**
 
 ```text
-Cemetery, England, United Kingdom, UK
-```
-
-### `mlx-community/X-Reasoner-7B-8bit`
-
-**What looks wrong:** Behavior degrades under long prompt context.
-**Likely component:** `mlx-vlm / mlx`
-**Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,601, output=500, output/prompt=3.01%
-
-**Why this appears to be an integration/runtime issue:**
-
-- At long prompt length (16601 tokens), output became repetitive.
-- Output became repetitive, indicating possible generation instability.
-
-**Sample output:**
-
-```text
-**Title:** Ancient Headstones in a Village Churchyard, Lenham, Kent, England
-
-**Description:** A tranquil scene of a historic village churchyard in Lenham, Kent, England, featuring weathered graveston...
-```
-
-### `mlx-community/paligemma2-10b-ft-docci-448-6bit`
-
-**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
-**Likely component:** `mlx-vlm`
-**Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=1,393, output=14, output/prompt=1.01%
-
-**Why this appears to be an integration/runtime issue:**
-
-- Output is very short relative to prompt size (1.0%), suggesting possible early-stop or prompt-handling issues.
-- Model output may not follow prompt or image contents.
-- Output omitted required Title/Description/Keywords sections.
-
-**Sample output:**
-
-```text
-- Use only the hints that are visually supported by the image.
+- Use only the above metadata hints.
 ```
 
 ### `mlx-community/paligemma2-3b-ft-docci-448-bf16`
@@ -364,7 +220,7 @@ Cemetery, England, United Kingdom, UK
 **What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=1,393, output=5, output/prompt=0.36%
+**Token summary:** prompt=1,557, output=5, output/prompt=0.32%
 
 **Why this appears to be an integration/runtime issue:**
 
@@ -382,7 +238,7 @@ Cemetery, England, United Kingdom, UK
 **What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=933, output=500, output/prompt=53.59%
+**Token summary:** prompt=1,101, output=500, output/prompt=45.41%
 
 **Why this appears to be an integration/runtime issue:**
 
@@ -401,77 +257,64 @@ Cemetery, England, United Kingdom, UK
 
 ---
 
-## History Context
-
-Recent reproducibility is measured from history (up to last 3 runs where each model appears).
-
-**Regressions since previous run:** none
-**Recoveries since previous run:** `mlx-community/InternVL3-14B-8bit`, `mlx-community/InternVL3-8B-bf16`
-
-| Model | Status vs Previous Run | First Seen Failing | Recent Repro |
-| ----- | ---------------------- | ------------------ | ------------ |
-| `microsoft/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
-| `mlx-community/deepseek-vl2-8bit` | still failing | 2026-02-15 03:27:34 GMT | 3/3 recent runs failed |
-
----
-
 ## Coverage & Runtime Metrics
 
-- **Detailed diagnostics models:** 10
-- **Summary diagnostics models:** 38
+- **Detailed diagnostics models:** 11
+- **Summary diagnostics models:** 35
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1235.53s (1235.53s)
-- **Average runtime per model:** 25.74s (25.74s)
-- **Runtime note:** 2 model(s) had missing timing fields and were counted as 0.00s.
+- **Total model runtime (sum):** 1290.33s (1290.33s)
+- **Average runtime per model:** 28.05s (28.05s)
+- **Dominant runtime phase:** decode dominated 45/46 measured model runs (88% of tracked runtime).
+- **Phase totals:** model load=143.57s, prompt prep=0.12s, decode=1132.22s, cleanup=4.75s
+- **Observed stop reasons:** completed=46
+- **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
+- **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
 ---
 
-## Models Not Flagged (38 model(s))
+## Models Not Flagged (35 model(s))
 
 These models completed without diagnostics flags (no hard failure, harness warning, or stack-signal anomaly).
 
-### Clean output (5 model(s))
+### Clean output (3 model(s))
 
-- `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`
-- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`
+- `mlx-community/InternVL3-14B-8bit`
 - `mlx-community/Ministral-3-3B-Instruct-2512-4bit`
-- `mlx-community/gemma-3-27b-it-qat-4bit`
 - `mlx-community/gemma-3-27b-it-qat-8bit`
 
-### Ran, but with quality warnings (33 model(s))
+### Ran, but with quality warnings (32 model(s))
 
 - `HuggingFaceTB/SmolVLM-Instruct`: Model output may not follow prompt or image contents.
 - `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: Output omitted required Title/Description/Keywords sections.
 - `meta-llama/Llama-3.2-11B-Vision-Instruct`: Output became repetitive, indicating possible generation instability.
-- `microsoft/Phi-3.5-vision-instruct`: Output became repetitive, indicating possible generation instability.
 - `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Output omitted required Title/Description/Keywords sections.
-- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: Output became repetitive, indicating possible generation instability.
-- `mlx-community/FastVLM-0.5B-bf16`: Output appears to copy prompt context verbatim.
-- `mlx-community/GLM-4.6V-Flash-6bit`: Output formatting deviated from the requested structure.
-- `mlx-community/GLM-4.6V-Flash-mxfp4`: Output formatting deviated from the requested structure.
+- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: Output omitted required Title/Description/Keywords sections.
+- `mlx-community/FastVLM-0.5B-bf16`: Output omitted required Title/Description/Keywords sections.
 - `mlx-community/Idefics3-8B-Llama3-bf16`: Output formatting deviated from the requested structure.
-- `mlx-community/InternVL3-14B-8bit`: Title length violation (5 words; expected 6-12)
-- `mlx-community/InternVL3-8B-bf16`: Title length violation (5 words; expected 6-12)
+- `mlx-community/InternVL3-8B-bf16`: Title length violation (3 words; expected 5-10)
 - `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`: Output omitted required Title/Description/Keywords sections.
-- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: Output leaked reasoning or prompt-template text.
-- `mlx-community/LFM2-VL-1.6B-8bit`: Output appears to copy prompt context verbatim.
-- `mlx-community/LFM2.5-VL-1.6B-bf16`: Output appears to copy prompt context verbatim.
-- `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: Model output may not follow prompt or image contents.
-- `mlx-community/Molmo-7B-D-0924-8bit`: Model output may not follow prompt or image contents.
+- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: Output omitted required Title/Description/Keywords sections.
+- `mlx-community/LFM2-VL-1.6B-8bit`: Model output may not follow prompt or image contents.
+- `mlx-community/LFM2.5-VL-1.6B-bf16`: Description sentence violation (4; expected 1-2)
+- `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: Output became repetitive, indicating possible generation instability.
+- `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`: Model output may not follow prompt or image contents.
+- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: Model output may not follow prompt or image contents.
 - `mlx-community/Molmo-7B-D-0924-bf16`: Model output may not follow prompt or image contents.
-- `mlx-community/Phi-3.5-vision-instruct-bf16`: Output became repetitive, indicating possible generation instability.
+- `mlx-community/Phi-3.5-vision-instruct-bf16`: Title length violation (4 words; expected 5-10)
 - `mlx-community/Qwen2-VL-2B-Instruct-4bit`: Output appears to copy prompt context verbatim.
-- `mlx-community/Qwen3.5-35B-A3B-6bit`: Output contains corrupted or malformed text segments.
-- `mlx-community/Qwen3.5-35B-A3B-bf16`: Output omitted required Title/Description/Keywords sections.
+- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: Output omitted required Title/Description/Keywords sections.
+- `mlx-community/Qwen3.5-35B-A3B-6bit`: Model refused or deflected the requested task.
+- `mlx-community/Qwen3.5-35B-A3B-bf16`: Model refused or deflected the requested task.
 - `mlx-community/SmolVLM-Instruct-bf16`: Model output may not follow prompt or image contents.
+- `mlx-community/X-Reasoner-7B-8bit`: Keyword count violation (21; expected 10-18)
+- `mlx-community/gemma-3-27b-it-qat-4bit`: Model output may not follow prompt or image contents.
 - `mlx-community/gemma-3n-E2B-4bit`: Model output may not follow prompt or image contents.
 - `mlx-community/gemma-3n-E4B-it-bf16`: Output omitted required Title/Description/Keywords sections.
-- `mlx-community/llava-v1.6-mistral-7b-8bit`: Model output may not follow prompt or image contents.
-- `mlx-community/nanoLLaVA-1.5-4bit`: Output leaked reasoning or prompt-template text.
-- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: Model output may not follow prompt or image contents.
+- `mlx-community/nanoLLaVA-1.5-4bit`: Output became repetitive, indicating possible generation instability.
+- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: Model output may not follow prompt or image contents.
 - `mlx-community/paligemma2-3b-pt-896-4bit`: Model output may not follow prompt or image contents.
-- `mlx-community/pixtral-12b-8bit`: Output appears to copy prompt context verbatim.
-- `mlx-community/pixtral-12b-bf16`: Output appears to copy prompt context verbatim.
+- `mlx-community/pixtral-12b-8bit`: Keyword count violation (24; expected 10-18)
+- `mlx-community/pixtral-12b-bf16`: Keyword count violation (24; expected 10-18)
 - `qnguyen3/nanoLLaVA`: Model output may not follow prompt or image contents.
 
 ---
@@ -480,7 +323,7 @@ These models completed without diagnostics flags (no hard failure, harness warni
 
 | Component | Version |
 | --------- | ------- |
-| mlx-vlm | 0.3.13 |
+| mlx-vlm | 0.4.0 |
 | mlx | 0.31.1.dev20260307+be872ebd |
 | mlx-lm | 0.31.0 |
 | transformers | 5.3.0 |
@@ -524,35 +367,32 @@ for name in packages:
 PY
 ```
 
-### Target specific failing models
-
-**Note:** A comprehensive JSON reproduction bundle including system info and the exact prompt trace has been exported to [repro_bundles/](https://github.com/jrp2014/check_models/tree/main/src/output/repro_bundles) for each failing model.
-
-```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft
-python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit
-```
-
 ### Prompt Used
 
 ```text
 Analyze this image for cataloguing metadata.
 
+Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
+
+Treat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.
+
 Return exactly these three sections, and nothing else:
 
-Title: 6-12 words, descriptive and concrete.
+Title: 5-10 words, concrete and factual, limited to clearly visible content.
 
-Description: 1-2 factual sentences covering key subjects, setting, and action.
+Description: 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.
 
-Keywords: 15-30 unique comma-separated terms, ordered most specific to most general.
+Keywords: 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.
 
 Rules:
-- Use only visually supported facts.
-- If hints conflict with the image, trust the image.
-- Do not output reasoning, notes, or extra sections.
-- Do not copy context hints verbatim.
+- Include only details that are definitely visible in the image.
+- Reuse metadata terms only when they are clearly supported by the image.
+- If metadata and image disagree, follow the image.
+- Prefer omission to speculation.
+- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.
+- Do not output reasoning, notes, hedging, or extra sections.
 
-Context: Existing metadata hints (high confidence; use only if visually consistent):
+Context: Existing metadata hints (high confidence; use only when visually confirmed):
 - Description hint: , St Mary's Church, Lenham, England, United Kingdom, UK Here is a caption for the image, written in a neutral but descriptive style suitable for a periodical, blog, or magazine. **Caption:** A late winter afternoon in the historic village of Lenham, Kent, England. This view from the churchyard of St Mary's Church looks out over the village square. In the foreground, ancient, moss-covered headstones dot the landsca...
 - Keyword hints: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue
 - Capture metadata: Taken on 2026-02-28 16:22:54 GMT (at 16:22:54 local time). GPS: 51.237300°N, 0.718917°E.
@@ -563,4 +403,4 @@ Context: Existing metadata hints (high confidence; use only if visually consiste
 - Input image: `/Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-03-07 18:31:40 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-03-07 22:39:08 GMT by [check_models](https://github.com/jrp2014/check_models)._
