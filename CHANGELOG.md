@@ -18,7 +18,9 @@ Notable changes to this project will be documented in this file.
     behavior;
   - simplified ancillary Node tooling around `npm install`, moved dependency-sync
     CI to Ubuntu with path filters, and split GitHub Actions into
-    `static-quality` and `runtime-smoke` jobs.
+    `static-quality` and `runtime-smoke` jobs;
+  - ensured the static-quality path creates a repo-root `typings/` directory so
+    `ty` can consume the configured extra search path on fresh CI checkouts.
 
 - Reduced redundant internal formatting and diagnostics code in `src/check_models.py`:
   - inlined a few single-use helpers in import-probe, diagnostics, and failure-capture paths;

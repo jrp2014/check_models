@@ -24,6 +24,8 @@ echo "=== Dependency Sync (Check) ==="
 
 echo "=== Type Stub Preflight ==="
 
+mkdir -p ../typings
+
 "$QUALITY_PYTHON" - <<'PY'
 from __future__ import annotations
 

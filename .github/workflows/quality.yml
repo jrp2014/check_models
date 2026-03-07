@@ -44,6 +44,7 @@ jobs:
           
       - name: Generate MLX stubs for mypy
         run: |
+          mkdir -p typings
           STUB_ROOT="$(mktemp -d)"
           GENERATED_STUB=""
 
