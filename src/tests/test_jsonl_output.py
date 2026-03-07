@@ -10,6 +10,7 @@ from check_models import (
     JsonlMetadataRecord,
     JsonlResultRecord,
     PerformanceResult,
+    RuntimeDiagnostics,
     _history_path_for_jsonl,
     _load_latest_history_record,
     append_history_record,
@@ -82,6 +83,7 @@ def test_save_jsonl_report_creates_file(tmp_path: Path) -> None:
     assert output_file.exists()
     header, rows = _read_jsonl(output_file)
     assert header["_type"] == "metadata"
+    assert header["format_version"] == "1.3"
     assert header["prompt"] == "test"
     assert rows == []
 
@@ -98,6 +100,15 @@ def test_save_jsonl_report_content(tmp_path: Path) -> None:
         generation_time=1.5,
         model_load_time=0.5,
         total_time=2.0,
+        runtime_diagnostics=RuntimeDiagnostics(
+            input_validation_time_s=0.1,
+            model_load_time_s=0.5,
+            prompt_prep_time_s=0.2,
+            decode_time_s=1.5,
+            cleanup_time_s=0.05,
+            first_token_latency_s=None,
+            stop_reason="completed",
+        ),
     )
 
     results = [result]
@@ -118,6 +129,11 @@ def test_save_jsonl_report_content(tmp_path: Path) -> None:
     metrics = data["metrics"]
     assert metrics.get("generation_tps") == 5.0
     assert metrics.get("prompt_tokens") == 10
+    timing = data["timing"]
+    assert timing["input_validation_time_s"] == 0.1
+    assert timing["prompt_prep_time_s"] == 0.2
+    assert timing["cleanup_time_s"] == 0.05
+    assert timing["stop_reason"] == "completed"
 
 
 def test_save_jsonl_report_no_generation(tmp_path: Path) -> None:

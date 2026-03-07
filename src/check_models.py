@@ -666,6 +666,11 @@ class JsonlTimingRecord(TypedDict):
     generation_time_s: float | None
     model_load_time_s: float | None
     total_time_s: float | None
+    input_validation_time_s: float | None
+    prompt_prep_time_s: float | None
+    cleanup_time_s: float | None
+    first_token_latency_s: float | None
+    stop_reason: str | None
 
 
 class JsonlMetricsRecord(TypedDict, total=False):
@@ -741,6 +746,21 @@ type ResourceUsageMetric = tuple[str, float, str]
 type AggregateStatRow = tuple[str, str, str, str]
 type QualityIssueEntry = tuple[str, str | None]
 type QualityIssueSection = tuple[str, str, list[QualityIssueEntry]]
+type RuntimePhaseName = Literal["model_load", "prompt_prep", "decode", "cleanup"]
+
+
+class RuntimeAnalysisSummary(TypedDict):
+    """Aggregated runtime interpretation shared across report renderers."""
+
+    dominant_phase: RuntimePhaseName
+    dominant_phase_share: float
+    dominant_phase_count: int
+    measured_models: int
+    interpretation: str
+    next_action: str
+    phase_totals: dict[RuntimePhaseName, float]
+    dominant_counts: dict[RuntimePhaseName, int]
+    termination_counts: dict[str, int]
 
 
 class ModelIssueSummary(TypedDict, total=False):
@@ -757,6 +777,7 @@ class ModelIssueSummary(TypedDict, total=False):
     cataloging_best: ModelScoreGrade | None
     cataloging_worst: ModelScoreGrade | None
     cataloging_avg_score: float
+    runtime_analysis: RuntimeAnalysisSummary
     metadata_baseline_score: float
     metadata_baseline_grade: str
     cataloging_avg_delta: float
@@ -949,6 +970,58 @@ class PerformanceResult:
     cache_memory: float | None = None
     error_package: str | None = None
     error_traceback: str | None = None
+    runtime_diagnostics: RuntimeDiagnostics | None = None
+
+
+@dataclass(frozen=True)
+class RuntimeDiagnostics:
+    """Detailed runtime attribution and termination diagnostics for one run."""
+
+    input_validation_time_s: float | None = None
+    model_load_time_s: float | None = None
+    prompt_prep_time_s: float | None = None
+    decode_time_s: float | None = None
+    cleanup_time_s: float | None = None
+    first_token_latency_s: float | None = None
+    stop_reason: str | None = None
+
+
+class PhaseTimer:
+    """Track named phase durations for one model run."""
+
+    def __init__(self) -> None:
+        self._durations: dict[str, float] = {}
+        self._start_times: dict[str, float] = {}
+
+    def start(self, phase: str) -> None:
+        """Start timing a named phase if it is not already active."""
+        if phase not in self._start_times:
+            self._start_times[phase] = time.perf_counter()
+
+    def stop(self, phase: str) -> float | None:
+        """Stop timing a named phase and return the elapsed time."""
+        start_time = self._start_times.pop(phase, None)
+        if start_time is None:
+            return None
+        elapsed = time.perf_counter() - start_time
+        self._durations[phase] = self._durations.get(phase, 0.0) + elapsed
+        return elapsed
+
+    @contextlib.contextmanager
+    def track(self, phase: str) -> Iterator[None]:
+        """Context manager that records elapsed time for a named phase."""
+        self.start(phase)
+        try:
+            yield
+        finally:
+            self.stop(phase)
+
+    def duration(self, phase: str) -> float | None:
+        """Return the accumulated duration for a phase, if available."""
+        duration = self._durations.get(phase)
+        if duration is None:
+            return None
+        return duration
 
 
 class _TeeCaptureStream(io.TextIOBase):
@@ -5909,6 +5982,9 @@ def analyze_model_issues(
 
     successful = [r for r in results if r.success]
     _populate_summary_performance_highlights(summary, successful)
+    runtime_analysis = _build_runtime_analysis_summary(results)
+    if runtime_analysis is not None:
+        summary["runtime_analysis"] = runtime_analysis
 
     for res in results:
         if not res.success:
@@ -6062,6 +6138,165 @@ def _bucket_metadata_delta(
         worse_than_metadata.append(model_name)
     else:
         neutral_vs_metadata.append(model_name)
+
+
+_RUNTIME_PHASE_KEYS: Final[tuple[RuntimePhaseName, ...]] = (
+    "model_load",
+    "prompt_prep",
+    "decode",
+    "cleanup",
+)
+
+_RUNTIME_PHASE_LABELS: Final[dict[RuntimePhaseName, str]] = {
+    "model_load": "model load",
+    "prompt_prep": "prompt prep",
+    "decode": "decode",
+    "cleanup": "cleanup",
+}
+
+_RUNTIME_PHASE_ACTIONS: Final[dict[RuntimePhaseName, tuple[str, str]]] = {
+    "decode": (
+        "Most measured runtime is spent inside generation rather than load or prompt setup.",
+        (
+            "Prioritize early-stop policies, lower long-tail token budgets, "
+            "or upstream decode-path work."
+        ),
+    ),
+    "prompt_prep": (
+        (
+            "Prompt preparation is consuming a large share of runtime, which often means "
+            "long prompts or expensive multimodal preprocessing."
+        ),
+        "Inspect prompt length, context blocks, image preprocessing, and prefill-related settings.",
+    ),
+    "model_load": (
+        "Cold model load time is a major share of runtime for this cohort.",
+        "Consider staged runs, model reuse, or narrowing the model set before reruns.",
+    ),
+    "cleanup": (
+        "Post-run synchronization or cache cleanup is taking a non-trivial share of time.",
+        "Inspect cleanup policy, synchronization frequency, and cache-reset behavior.",
+    ),
+}
+
+
+def _runtime_phase_durations(runtime: RuntimeDiagnostics | None) -> dict[RuntimePhaseName, float]:
+    """Return normalized non-negative phase durations for one run."""
+    if runtime is None:
+        return {}
+
+    phase_map: dict[RuntimePhaseName, float | None] = {
+        "model_load": runtime.model_load_time_s,
+        "prompt_prep": runtime.prompt_prep_time_s,
+        "decode": runtime.decode_time_s,
+        "cleanup": runtime.cleanup_time_s,
+    }
+    return {
+        phase: float(value)
+        for phase, value in phase_map.items()
+        if isinstance(value, int | float) and float(value) > 0.0
+    }
+
+
+def _dominant_runtime_phase(runtime: RuntimeDiagnostics | None) -> RuntimePhaseName | None:
+    """Return the dominant measured phase for one run, if any."""
+    phase_durations = _runtime_phase_durations(runtime)
+    if not phase_durations:
+        return None
+    return max(phase_durations, key=phase_durations.__getitem__)
+
+
+def _build_runtime_analysis_summary(
+    results: Sequence[PerformanceResult],
+) -> RuntimeAnalysisSummary | None:
+    """Build a rule-based runtime interpretation from per-result phase timings."""
+    phase_totals: dict[RuntimePhaseName, float] = dict.fromkeys(_RUNTIME_PHASE_KEYS, 0.0)
+    dominant_counts: Counter[RuntimePhaseName] = Counter()
+    termination_counts: Counter[str] = Counter()
+    measured_models = 0
+
+    for result in results:
+        runtime = result.runtime_diagnostics
+        phase_durations = _runtime_phase_durations(runtime)
+        if phase_durations:
+            measured_models += 1
+            dominant_phase = max(phase_durations, key=phase_durations.__getitem__)
+            dominant_counts[dominant_phase] += 1
+            for phase, duration in phase_durations.items():
+                phase_totals[phase] += duration
+        stop_reason = runtime.stop_reason if runtime is not None else None
+        if stop_reason:
+            termination_counts[stop_reason] += 1
+
+    total_measured = sum(phase_totals.values())
+    if measured_models == 0 or total_measured <= 0.0:
+        return None
+
+    dominant_phase = max(phase_totals, key=phase_totals.__getitem__)
+    dominant_phase_share = phase_totals[dominant_phase] / total_measured
+    interpretation, next_action = _RUNTIME_PHASE_ACTIONS.get(
+        dominant_phase,
+        (
+            "Runtime is distributed across multiple phases without a clear single bottleneck.",
+            "Inspect per-phase distributions before changing benchmark policy.",
+        ),
+    )
+
+    if termination_counts.get("timeout", 0) > 0:
+        interpretation += (
+            f" Timeouts also affected {termination_counts['timeout']} model(s), "
+            "so some totals may be dominated by interrupted runs."
+        )
+
+    return {
+        "dominant_phase": dominant_phase,
+        "dominant_phase_share": dominant_phase_share,
+        "dominant_phase_count": dominant_counts.get(dominant_phase, 0),
+        "measured_models": measured_models,
+        "interpretation": interpretation,
+        "next_action": next_action,
+        "phase_totals": phase_totals,
+        "dominant_counts": dict(dominant_counts),
+        "termination_counts": dict(termination_counts),
+    }
+
+
+def _format_runtime_phase_duration(value: float) -> str:
+    """Format runtime phase durations consistently for report summaries."""
+    return format_overall_runtime(value)
+
+
+def _format_runtime_analysis_lines(runtime_analysis: RuntimeAnalysisSummary) -> list[str]:
+    """Build concise Markdown bullets explaining runtime timing implications."""
+    dominant_phase = runtime_analysis["dominant_phase"]
+    dominant_label = _RUNTIME_PHASE_LABELS.get(dominant_phase, dominant_phase)
+    dominant_share = runtime_analysis["dominant_phase_share"]
+    dominant_count = runtime_analysis["dominant_phase_count"]
+    measured_models = runtime_analysis["measured_models"]
+    phase_totals = runtime_analysis["phase_totals"]
+    termination_counts = runtime_analysis["termination_counts"]
+
+    phase_summary = ", ".join(
+        f"{_RUNTIME_PHASE_LABELS.get(phase, phase)}={_format_runtime_phase_duration(duration)}"
+        for phase, duration in phase_totals.items()
+        if duration > 0.0
+    )
+    termination_summary = ", ".join(
+        f"{name}={count}" for name, count in sorted(termination_counts.items())
+    )
+
+    lines = [
+        (
+            f"- **Runtime pattern:** {dominant_label} dominates measured phase time "
+            f"({dominant_share:.0%}; {dominant_count}/{measured_models} measured model(s))."
+        ),
+        f"- **Phase totals:** {phase_summary}.",
+        f"- **What this likely means:** {runtime_analysis['interpretation']}",
+        f"- **Suggested next action:** {runtime_analysis['next_action']}",
+    ]
+    if termination_summary:
+        lines.append(f"- **Termination reasons:** {termination_summary}.")
+    return lines
 
 
 def compute_performance_statistics(results: list[PerformanceResult]) -> PerformanceStats:
@@ -6463,6 +6698,7 @@ def _format_cataloging_summary_text(data: CatalogingSummaryData) -> list[str]:
 
 def _format_aggregate_statistics(
     stats: PerformanceStats,
+    runtime_analysis: RuntimeAnalysisSummary | None,
     *,
     html_output: bool,
 ) -> list[str]:
@@ -6488,6 +6724,20 @@ def _format_aggregate_statistics(
                 f"Min: {minimum_value} | Max: {maximum_value}",
             )
     parts.append("</ul>" if html_output else "")
+
+    if runtime_analysis is not None:
+        if html_output:
+            parts.append("<p><b>Runtime interpretation:</b></p><ul>")
+            parts.extend(
+                f"<li>{html.escape(line.removeprefix('- '))}</li>"
+                for line in _format_runtime_analysis_lines(runtime_analysis)
+            )
+            parts.append("</ul>")
+        else:
+            parts.append("### ⏱ Runtime Interpretation")
+            parts.append("")
+            parts.extend(_format_runtime_analysis_lines(runtime_analysis))
+            parts.append("")
     return parts
 
 
@@ -6506,7 +6756,13 @@ def _format_issues_summary_parts(
         else:
             parts.extend(_format_cataloging_summary_text(cataloging_data))
     parts.extend(_format_quality_issues(summary, html_output=html_output))
-    parts.extend(_format_aggregate_statistics(stats, html_output=html_output))
+    parts.extend(
+        _format_aggregate_statistics(
+            stats,
+            summary.get("runtime_analysis"),
+            html_output=html_output,
+        ),
+    )
     return parts
 
 
@@ -6612,6 +6868,10 @@ def _format_action_snapshot_text(
             f"- **Vs existing metadata:** better={better}, neutral={neutral}, worse={worse} "
             f"(baseline {baseline_grade} {baseline_score:.0f}/100).",
         )
+
+    runtime_analysis = summary.get("runtime_analysis")
+    if runtime_analysis is not None:
+        parts.extend(_format_runtime_analysis_lines(runtime_analysis))
 
     parts.append("")
     return parts
@@ -8148,6 +8408,7 @@ def _diagnostics_coverage_and_runtime_section(
 
     total_runtime = sum(runtime_per_model)
     avg_runtime = total_runtime / len(runtime_per_model)
+    runtime_analysis = _build_runtime_analysis_summary(results)
 
     parts: list[str] = _begin_diagnostics_section(title="## Coverage & Runtime Metrics")
     parts.append(f"- **Detailed diagnostics models:** {len(detailed_names)}")
@@ -8177,6 +8438,34 @@ def _diagnostics_coverage_and_runtime_section(
             f"{missing_timing_models} model(s) had missing timing fields "
             "and were counted as 0.00s.",
         )
+    if runtime_analysis is not None:
+        phase_label = _RUNTIME_PHASE_LABELS[runtime_analysis["dominant_phase"]]
+        phase_share = runtime_analysis["dominant_phase_share"]
+        phase_count = runtime_analysis["dominant_phase_count"]
+        measured_models = runtime_analysis["measured_models"]
+        parts.append(
+            "- **Dominant runtime phase:** "
+            f"{phase_label} dominated {phase_count}/{measured_models} measured model runs "
+            f"({phase_share:.0%} of tracked runtime).",
+        )
+        phase_summaries = []
+        for phase in _RUNTIME_PHASE_KEYS:
+            phase_total = runtime_analysis["phase_totals"][phase]
+            if phase_total <= 0.0:
+                continue
+            phase_summaries.append(
+                (f"{_RUNTIME_PHASE_LABELS[phase]}={_format_runtime_phase_duration(phase_total)}"),
+            )
+        if phase_summaries:
+            parts.append("- **Phase totals:** " + ", ".join(phase_summaries))
+        termination_counts = runtime_analysis["termination_counts"]
+        if termination_counts:
+            termination_summary = ", ".join(
+                f"{reason}={count}" for reason, count in sorted(termination_counts.items())
+            )
+            parts.append(f"- **Observed stop reasons:** {termination_summary}")
+        parts.append(f"- **What this likely means:** {runtime_analysis['interpretation']}")
+        parts.append(f"- **Suggested next action:** {runtime_analysis['next_action']}")
 
     parts.append("")
     return parts
@@ -10745,10 +11034,136 @@ def _ensure_generation_runtime_symbols() -> None:
         raise _tag_exception_failure_phase(RuntimeError(msg), "import")
 
 
+def _build_runtime_diagnostics(
+    phase_timer: PhaseTimer,
+    *,
+    stop_reason: str | None,
+    first_token_latency_s: float | None = None,
+) -> RuntimeDiagnostics:
+    """Build immutable runtime diagnostics from a phase timer snapshot."""
+    return RuntimeDiagnostics(
+        input_validation_time_s=phase_timer.duration("input_validation"),
+        model_load_time_s=phase_timer.duration("model_load"),
+        prompt_prep_time_s=phase_timer.duration("prompt_prep"),
+        decode_time_s=phase_timer.duration("decode"),
+        cleanup_time_s=phase_timer.duration("cleanup"),
+        first_token_latency_s=first_token_latency_s,
+        stop_reason=stop_reason,
+    )
+
+
+def _prepare_generation_prompt(
+    *,
+    params: ProcessImageParams,
+    processor: object,
+    config: object,
+    phase_callback: Callable[[str], None] | None,
+    phase_timer: PhaseTimer | None,
+) -> str | list[Any]:
+    """Run preflight checks and build the prompt payload for generation."""
+    try:
+        if phase_timer is not None:
+            with phase_timer.track("prompt_prep"):
+                _run_model_preflight_validators(
+                    model_identifier=params.model_identifier,
+                    processor=processor,
+                    config=config,
+                    phase_callback=phase_callback,
+                )
+                _set_failure_phase(phase_callback, "prefill")
+                chat_template_kwargs = _build_chat_template_kwargs(params)
+                return apply_chat_template(
+                    processor=processor,
+                    config=config,
+                    prompt=params.prompt,
+                    num_images=1,
+                    **chat_template_kwargs,
+                )
+
+        _run_model_preflight_validators(
+            model_identifier=params.model_identifier,
+            processor=processor,
+            config=config,
+            phase_callback=phase_callback,
+        )
+        _set_failure_phase(phase_callback, "prefill")
+        chat_template_kwargs = _build_chat_template_kwargs(params)
+        return apply_chat_template(
+            processor=processor,
+            config=config,
+            prompt=params.prompt,
+            num_images=1,
+            **chat_template_kwargs,
+        )
+    except ValueError as preflight_err:
+        message = f"Model preflight failed for {params.model_identifier}: {preflight_err}"
+        logger.exception("Model preflight validation failed for %s", params.model_identifier)
+        phase = (
+            _extract_failure_phase(preflight_err, fallback="model_preflight") or "model_preflight"
+        )
+        raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
+    except (OSError, RuntimeError, TypeError, AttributeError, KeyError) as prefill_err:
+        msg = f"Prompt prefill failed for {params.model_identifier}: {prefill_err}"
+        logger.exception("Prompt prefill failed for %s", params.model_identifier)
+        raise _tag_exception_failure_phase(ValueError(msg), "prefill") from prefill_err
+
+
+def _cleanup_runtime_resources() -> None:
+    """Synchronize and clear runtime resources after each model run."""
+    synchronize_fn = getattr(mx, "synchronize", None)
+    if callable(synchronize_fn):
+        synchronize_fn()
+    gc.collect()
+
+    clear_cache_fn = getattr(mx, "clear_cache", None)
+    if callable(clear_cache_fn):
+        clear_cache_fn()
+
+    reset_peak_memory_fn = getattr(mx, "reset_peak_memory", None)
+    if callable(reset_peak_memory_fn):
+        reset_peak_memory_fn()
+
+
+def _finalize_process_result(
+    *,
+    result_payload: PerformanceResult | None,
+    params: ProcessImageParams,
+    phase_timer: PhaseTimer,
+    stop_reason: str | None,
+    current_phase: str,
+    total_start_time: float,
+) -> PerformanceResult:
+    """Attach final runtime diagnostics after cleanup has completed."""
+    runtime_diagnostics = _build_runtime_diagnostics(
+        phase_timer,
+        stop_reason=(
+            result_payload.runtime_diagnostics.stop_reason
+            if result_payload is not None and result_payload.runtime_diagnostics is not None
+            else stop_reason
+        ),
+    )
+    if result_payload is None:
+        fallback_error = RuntimeError(
+            "process_image_with_model completed without producing a result",
+        )
+        return _build_failure_result(
+            model_name=params.model_identifier,
+            error=fallback_error,
+            captured_output=None,
+            failure_phase=current_phase,
+            generation_time=phase_timer.duration("decode"),
+            model_load_time=phase_timer.duration("model_load"),
+            total_time=time.perf_counter() - total_start_time,
+            runtime_diagnostics=runtime_diagnostics,
+        )
+    return dataclasses.replace(result_payload, runtime_diagnostics=runtime_diagnostics)
+
+
 def _run_model_generation(
     params: ProcessImageParams,
     timer: TimingStrategy | None = None,
     phase_callback: Callable[[str], None] | None = None,
+    phase_timer: PhaseTimer | None = None,
 ) -> GenerationResult | SupportsGenerationResult:
     """Load model + processor, apply chat template, run generation, time it.
 
@@ -10761,6 +11176,7 @@ def _run_model_generation(
         params: The parameters for the image processing.
         timer: Optional timing strategy. If None, uses PerfCounterTimer.
         phase_callback: Optional callback invoked when execution enters a new phase.
+        phase_timer: Optional per-phase timer that records load, prep, and decode durations.
     """
     model: Module
     processor: object
@@ -10772,7 +11188,11 @@ def _run_model_generation(
     # and converts weights to MLX format for Apple Silicon optimization
     _set_failure_phase(phase_callback, "model_load")
     try:
-        model, processor, config = _load_model(params)
+        if phase_timer is not None:
+            with phase_timer.track("model_load"):
+                model, processor, config = _load_model(params)
+        else:
+            model, processor, config = _load_model(params)
     except Exception as load_err:
         # Capture model loading errors and run cache diagnostics to distinguish
         # code bugs from environment issues (corrupted cache, incomplete download)
@@ -10782,37 +11202,13 @@ def _run_model_generation(
 
         raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 
-    try:
-        _run_model_preflight_validators(
-            model_identifier=params.model_identifier,
-            processor=processor,
-            config=config,
-            phase_callback=phase_callback,
-        )
-    except ValueError as preflight_err:
-        message = f"Model preflight failed for {params.model_identifier}: {preflight_err}"
-        logger.exception("Model preflight validation failed for %s", params.model_identifier)
-        phase = (
-            _extract_failure_phase(preflight_err, fallback="model_preflight") or "model_preflight"
-        )
-        raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
-
-    # Apply model-specific chat template - each model has its own conversation format
-    # (e.g., Llama uses <|begin_of_text|>, Phi-3 uses <|user|>, etc.)
-    _set_failure_phase(phase_callback, "prefill")
-    try:
-        chat_template_kwargs = _build_chat_template_kwargs(params)
-        formatted_prompt: str | list[Any] = apply_chat_template(
-            processor=processor,
-            config=config,
-            prompt=params.prompt,
-            num_images=1,
-            **chat_template_kwargs,
-        )
-    except (OSError, ValueError, RuntimeError, TypeError, AttributeError, KeyError) as prefill_err:
-        msg = f"Prompt prefill failed for {params.model_identifier}: {prefill_err}"
-        logger.exception("Prompt prefill failed for %s", params.model_identifier)
-        raise _tag_exception_failure_phase(ValueError(msg), "prefill") from prefill_err
+    formatted_prompt = _prepare_generation_prompt(
+        params=params,
+        processor=processor,
+        config=config,
+        phase_callback=phase_callback,
+        phase_timer=phase_timer,
+    )
     # Handle list return from apply_chat_template
     if isinstance(formatted_prompt, list):
         formatted_prompt = "\n".join(str(m) for m in formatted_prompt)
@@ -10823,6 +11219,8 @@ def _run_model_generation(
         timer = PerfCounterTimer()
 
     timer.start()
+    if phase_timer is not None:
+        phase_timer.start("decode")
     _set_failure_phase(phase_callback, "decode")
     try:
         extra_kwargs = _build_generate_extra_kwargs(params)
@@ -10858,6 +11256,9 @@ def _run_model_generation(
         msg = f"Model runtime error during generation for {params.model_identifier}: {gen_err}"
         logger.exception("Runtime error for %s", params.model_identifier)
         raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
+    finally:
+        if phase_timer is not None:
+            phase_timer.stop("decode")
 
     # Force GPU synchronization to ensures timing includes all pending compute (MLX is lazy)
     mx.synchronize()
@@ -10885,6 +11286,10 @@ def _build_failure_result(
     error: TimeoutError | OSError | ValueError | RuntimeError,
     captured_output: str | None,
     failure_phase: str | None = None,
+    generation_time: float | None = None,
+    model_load_time: float | None = None,
+    total_time: float | None = None,
+    runtime_diagnostics: RuntimeDiagnostics | None = None,
 ) -> PerformanceResult:
     """Build a standardized failure result payload for a model run."""
     error_msg = str(error)
@@ -10915,9 +11320,10 @@ def _build_failure_result(
         error_type=type(error).__name__,
         error_package=error_package,
         error_traceback=tb_str,
-        generation_time=None,
-        model_load_time=None,
-        total_time=None,
+        generation_time=generation_time,
+        model_load_time=model_load_time,
+        total_time=total_time,
+        runtime_diagnostics=runtime_diagnostics,
     )
 
 
@@ -10929,9 +11335,10 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
 
     # Track overall timing
     total_start_time = time.perf_counter()
-    model_load_time: float | None = None
-    generation_time: float | None = None
     current_phase: str = "input_validation"
+    phase_timer = PhaseTimer()
+    result_payload: PerformanceResult | None = None
+    stop_reason: str | None = None
 
     def _update_phase(phase: str) -> None:
         nonlocal current_phase
@@ -10939,8 +11346,9 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
 
     try:
         _update_phase("input_validation")
-        validate_temperature(temp=params.temperature)
-        validate_image_accessible(image_path=params.image_path)
+        with phase_timer.track("input_validation"):
+            validate_temperature(temp=params.temperature)
+            validate_image_accessible(image_path=params.image_path)
         logger.debug(
             "System: %s, GPU: %s",
             arch,
@@ -10960,6 +11368,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                 params=params,
                 phase_callback=_update_phase,
+                phase_timer=phase_timer,
             )
         if params.verbose:
             logger.debug(
@@ -10967,20 +11376,17 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
                 params.model_identifier,
             )
 
-        # Extract timing from GenerationResult if available
-        generation_time = getattr(output, "time", None)
-        total_end_time = time.perf_counter()
-        total_time = total_end_time - total_start_time
-
-        # Estimate model load time (total - generation time)
-        if generation_time is not None:
-            model_load_time = max(0.0, total_time - generation_time)
+        generation_time = getattr(output, "time", None) or phase_timer.duration("decode")
+        total_time = time.perf_counter() - total_start_time
+        model_load_time = phase_timer.duration("model_load")
 
         # Read memory metrics from GenerationResult (captured inside _run_model_generation)
         active_mem_gb = getattr(output, "active_memory", None) or 0.0
         cache_mem_gb = getattr(output, "cache_memory", None) or 0.0
 
-        return PerformanceResult(
+        stop_reason = "completed"
+
+        result_payload = PerformanceResult(
             model_name=params.model_identifier,
             generation=output,
             success=True,
@@ -10989,6 +11395,10 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             total_time=total_time,
             active_memory=active_mem_gb if active_mem_gb > 0 else None,
             cache_memory=cache_mem_gb if cache_mem_gb > 0 else None,
+            runtime_diagnostics=_build_runtime_diagnostics(
+                phase_timer,
+                stop_reason=stop_reason,
+            ),
         )
     except (TimeoutError, OSError, ValueError, RuntimeError) as e:
         captured_sections: list[str] = []
@@ -10999,30 +11409,34 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         if stderr_clean:
             captured_sections.append("=== STDERR ===\n" + stderr_clean)
         captured_output = "\n\n".join(captured_sections) if captured_sections else None
-        return _build_failure_result(
+        stop_reason = "timeout" if isinstance(e, TimeoutError) else "exception"
+        result_payload = _build_failure_result(
             model_name=params.model_identifier,
             error=e,
             captured_output=captured_output,
             failure_phase=current_phase,
+            generation_time=phase_timer.duration("decode"),
+            model_load_time=phase_timer.duration("model_load"),
+            total_time=time.perf_counter() - total_start_time,
+            runtime_diagnostics=_build_runtime_diagnostics(
+                phase_timer,
+                stop_reason=stop_reason,
+            ),
         )
     finally:
         _update_phase("cleanup")
-
-        # Force synchronization and garbage collection when MLX runtime is available.
-        synchronize_fn = getattr(mx, "synchronize", None)
-        if callable(synchronize_fn):
-            synchronize_fn()
-        gc.collect()
-
-        # Clear both Metal and MLX caches for thorough GPU memory cleanup.
-        clear_cache_fn = getattr(mx, "clear_cache", None)
-        if callable(clear_cache_fn):
-            clear_cache_fn()
-
-        reset_peak_memory_fn = getattr(mx, "reset_peak_memory", None)
-        if callable(reset_peak_memory_fn):
-            reset_peak_memory_fn()
+        with phase_timer.track("cleanup"):
+            _cleanup_runtime_resources()
         logger.debug("Cleaned up resources for model %s", params.model_identifier)
+
+    return _finalize_process_result(
+        result_payload=result_payload,
+        params=params,
+        phase_timer=phase_timer,
+        stop_reason=stop_reason or "exception",
+        current_phase=current_phase,
+        total_start_time=total_start_time,
+    )
 
 
 # --- Main Execution Helper Functions ---
@@ -13479,7 +13893,7 @@ def _build_jsonl_metadata_record(
     """Build shared metadata header row for JSONL results."""
     return {
         "_type": "metadata",
-        "format_version": "1.2",
+        "format_version": "1.3",
         "prompt": prompt,
         "system": system_info,
         "timestamp": local_now_str(),
@@ -13488,6 +13902,7 @@ def _build_jsonl_metadata_record(
 
 def _build_jsonl_result_record_base(result: PerformanceResult) -> JsonlResultRecord:
     """Build base per-model JSONL row with failure-safe defaults."""
+    runtime = result.runtime_diagnostics
     return {
         "_type": "result",
         "model": result.model_name,
@@ -13508,6 +13923,15 @@ def _build_jsonl_result_record_base(result: PerformanceResult) -> JsonlResultRec
             "generation_time_s": result.generation_time,
             "model_load_time_s": result.model_load_time,
             "total_time_s": result.total_time,
+            "input_validation_time_s": (
+                runtime.input_validation_time_s if runtime is not None else None
+            ),
+            "prompt_prep_time_s": runtime.prompt_prep_time_s if runtime is not None else None,
+            "cleanup_time_s": runtime.cleanup_time_s if runtime is not None else None,
+            "first_token_latency_s": (
+                runtime.first_token_latency_s if runtime is not None else None
+            ),
+            "stop_reason": runtime.stop_reason if runtime is not None else None,
         },
     }
 

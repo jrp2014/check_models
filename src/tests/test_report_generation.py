@@ -16,6 +16,7 @@ from check_models import (
     GenerationQualityAnalysis,
     LibraryVersionDict,
     PerformanceResult,
+    RuntimeDiagnostics,
     _build_diagnostics_context,
     _build_diagnostics_snapshot,
     _build_report_render_context,
@@ -812,6 +813,15 @@ class TestDiagnosticsReport:
             total_time=2.0,
             generation_time=1.0,
             model_load_time=1.0,
+            runtime_diagnostics=RuntimeDiagnostics(
+                input_validation_time_s=0.05,
+                model_load_time_s=1.0,
+                prompt_prep_time_s=0.15,
+                decode_time_s=0.8,
+                cleanup_time_s=0.1,
+                first_token_latency_s=None,
+                stop_reason="completed",
+            ),
         )
         generate_diagnostics_report(
             results=[
@@ -835,6 +845,9 @@ class TestDiagnosticsReport:
         assert "**Average runtime per model:**" in content
         assert "Runtime aggregates: unavailable" not in content
         assert "**Runtime note:**" in content
+        assert "**Dominant runtime phase:**" in content
+        assert "**What this likely means:**" in content
+        assert "**Suggested next action:**" in content
 
     def test_report_written_for_stack_signal_without_failures(self, tmp_path: Path) -> None:
         """Suspicious successful runs should still produce diagnostics for stack triage."""
