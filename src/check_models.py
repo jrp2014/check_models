@@ -979,7 +979,7 @@ class _TeeCaptureStream(io.TextIOBase):
 
 # Gallery rendering helpers (outside class)
 def _gallery_render_error(res: PerformanceResult) -> list[str]:
-    out = []
+    out: list[str] = []
     out.append(f"**Status:** Failed ({res.error_stage})")
     error_msg = str(res.error_message)
     error_msg = re.sub(r"(?<![<(])(https?://[^\s>)]+)", r"<\1>", error_msg)
@@ -1033,7 +1033,7 @@ def _gallery_render_error(res: PerformanceResult) -> list[str]:
 
 
 def _gallery_render_success(res: PerformanceResult) -> list[str]:
-    out = []
+    out: list[str] = []
     gen = res.generation
     if gen:
         tps = getattr(gen, "generation_tps", 0)
@@ -2220,7 +2220,7 @@ def _split_catalog_keywords(raw_keywords: str) -> list[str]:
     """Split keyword section text into normalized keyword terms."""
     if not raw_keywords:
         return []
-    keywords = []
+    keywords: list[str] = []
     for item in re.split(r"[,\n]", raw_keywords):
         cleaned = re.sub(r"\s+", " ", item).strip(" -*•\t")
         if cleaned:
@@ -2531,7 +2531,7 @@ def _detect_refusal_patterns(text: str) -> tuple[bool, str | None]:
     text_lower = text.lower()
 
     # Refusal patterns
-    refusal_patterns = []
+    refusal_patterns: list[tuple[str, list[str]]] = []
 
     if QUALITY.patterns:
         if "refusal_explicit" in QUALITY.patterns:
@@ -7292,7 +7292,7 @@ def _diagnostics_environment_section(
     system_info: dict[str, str],
 ) -> list[str]:
     """Build environment details section for diagnostics report footer context."""
-    parts = _begin_diagnostics_section(title="## Environment")
+    parts: list[str] = _begin_diagnostics_section(title="## Environment")
     table_rows: list[str] = []
     for lib in _DIAGNOSTICS_LIB_NAMES:
         ver = versions.get(lib, "")
@@ -7870,7 +7870,7 @@ def _diagnostics_stack_signal_section(
     if not stack_signals:
         return []
 
-    parts = _begin_diagnostics_section(
+    parts: list[str] = _begin_diagnostics_section(
         title=(
             f"### Long-Context Degradation / Potential Stack Issues ({len(stack_signals)} model(s))"
         ),
@@ -7915,7 +7915,7 @@ def _diagnostics_priority_table(
     preflight_issues: Sequence[str],
 ) -> list[str]:
     """Build the priority summary table for the diagnostics report."""
-    parts = _begin_diagnostics_section(title="## Priority Summary")
+    parts: list[str] = _begin_diagnostics_section(title="## Priority Summary")
     table_rows: list[str] = []
 
     if failure_clusters:
@@ -7991,7 +7991,7 @@ def _diagnostics_history_section(
         raw_prev_model_results if isinstance(raw_prev_model_results, dict) else {}
     )
 
-    parts = _begin_diagnostics_section(
+    parts: list[str] = _begin_diagnostics_section(
         title="## History Context",
         body_lines=[
             "Recent reproducibility is measured from history "
@@ -8149,7 +8149,7 @@ def _diagnostics_coverage_and_runtime_section(
     total_runtime = sum(runtime_per_model)
     avg_runtime = total_runtime / len(runtime_per_model)
 
-    parts = _begin_diagnostics_section(title="## Coverage & Runtime Metrics")
+    parts: list[str] = _begin_diagnostics_section(title="## Coverage & Runtime Metrics")
     parts.append(f"- **Detailed diagnostics models:** {len(detailed_names)}")
     parts.append(f"- **Summary diagnostics models:** {len(summary_names)}")
     parts.append(f"- **Coverage check:** {coverage_text}")
@@ -8222,7 +8222,7 @@ def _diagnostics_unflagged_success_section(
         else:
             clean_models.append(res.model_name)
 
-    parts = _begin_diagnostics_section(
+    parts: list[str] = _begin_diagnostics_section(
         title=f"## Models Not Flagged ({len(unflagged_successful)} model(s))",
         body_lines=[
             "These models completed without diagnostics flags "
@@ -9291,7 +9291,7 @@ def _generate_markdown_table_section(report_context: ReportRenderContext) -> lis
     headers, rows, field_names = _materialize_prepared_table_data(report_context.table_data)
 
     # For Markdown, we need to process headers to remove HTML breaks and use simpler formatting
-    markdown_headers = []
+    markdown_headers: list[str] = []
 
     # Remove "Output" column from table data for Markdown report
     # We will show it in a separate "Model Gallery" section instead
@@ -9503,7 +9503,7 @@ def generate_tsv_report(
         return value.replace("\r", "")
 
     # Clean headers: remove HTML tags and escape for TSV
-    clean_headers = []
+    clean_headers: list[str] = []
     for header in headers:
         # Remove <br> tags and other HTML
         clean_header = header.replace("<br>", " ").strip()
@@ -9514,7 +9514,7 @@ def generate_tsv_report(
     clean_headers.extend(["error_type", "error_package"])
 
     # Clean and escape row data, appending error columns per result
-    clean_rows = []
+    clean_rows: list[list[str]] = []
     for row, res in zip(rows, sorted_results, strict=False):
         clean_row = [escape_tsv_value(str(cell)) for cell in row]
         clean_row.append(escape_tsv_value(res.error_type or ""))
@@ -11518,7 +11518,7 @@ def _log_output_analysis(
 
     # Response structure
     structure = detect_response_structure(gen_text)
-    structure_parts = []
+    structure_parts: list[str] = []
     if structure["has_caption"]:
         structure_parts.append("caption")
     if structure["has_keywords"]:
@@ -12637,7 +12637,7 @@ def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | N
     Ordering is intentional for triage severity: harness/integration issues
     first, then critical model quality issues, then lower-severity formatting.
     """
-    issues = []
+    issues: list[str] = []
 
     # HIGHEST PRIORITY: Harness/integration issues (mlx-vlm bugs, not model quality)
     # These get special prefix to clearly mark them as actionable infrastructure issues
@@ -13370,8 +13370,12 @@ def compare_history_records(
     current: HistoryRunRecord,
 ) -> dict[str, list[str]]:
     """Compare two history records and return regressions/recoveries."""
-    prev_models = previous.get("model_results", {}) if previous else {}
-    curr_models = current.get("model_results", {}) if current else {}
+    prev_models: dict[str, HistoryModelResultRecord] = (
+        previous.get("model_results", {}) if previous else {}
+    )
+    curr_models: dict[str, HistoryModelResultRecord] = (
+        current.get("model_results", {}) if current else {}
+    )
     if not isinstance(prev_models, dict):
         prev_models = {}
     if not isinstance(curr_models, dict):
