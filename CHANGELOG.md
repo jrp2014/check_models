@@ -8,6 +8,8 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+## [0.3.0] - 2026-03-07
+
 - Hardened local hook and CI quality workflows:
   - split shared gates into commit hygiene, pre-push fast checks, full static
     quality, and separate runtime smoke probing;
