@@ -400,14 +400,6 @@ def load_quality_config(config_path: Path | None = None) -> None:
 _temp_logger = logging.getLogger(LOGGER_NAME)
 
 
-def _truncate_probe_output(text: str, *, max_chars: int = 220) -> str:
-    """Collapse probe output into a compact single-line message."""
-    compact = " ".join(text.split())
-    if len(compact) <= max_chars:
-        return compact
-    return f"{compact[: max_chars - 3]}..."
-
-
 def _probe_import_runtime(
     *,
     import_target: str,
@@ -415,6 +407,7 @@ def _probe_import_runtime(
     detect_metal_nsrange: bool = False,
 ) -> str | None:
     """Run a subprocess import probe and return an actionable error message when it fails."""
+    max_output_excerpt_chars = 220
     try:
         probe_result = subprocess.run(  # noqa: S603 - fixed interpreter + fixed probe command
             [sys.executable, "-c", f"import {import_target}"],
@@ -444,7 +437,12 @@ def _probe_import_runtime(
                 "headless or virtualized sessions without visible Apple GPU access."
             )
 
-    output_excerpt = _truncate_probe_output(combined_output) if combined_output else "no output"
+    if combined_output:
+        output_excerpt = " ".join(combined_output.split())
+        if len(output_excerpt) > max_output_excerpt_chars:
+            output_excerpt = f"{output_excerpt[: max_output_excerpt_chars - 3]}..."
+    else:
+        output_excerpt = "no output"
     return (
         f"{error_prefix} Import probe exited with code "
         f"{probe_result.returncode}. Probe output: {output_excerpt}"
@@ -979,23 +977,6 @@ class _TeeCaptureStream(io.TextIOBase):
         return self._buffer.getvalue()
 
 
-def _merge_captured_output(stdout_text: str, stderr_text: str) -> str | None:
-    """Merge captured stdout/stderr into a single diagnostics-friendly block."""
-    sections: list[str] = []
-
-    stdout_clean = stdout_text.strip()
-    stderr_clean = stderr_text.strip()
-
-    if stdout_clean:
-        sections.append("=== STDOUT ===\n" + stdout_clean)
-    if stderr_clean:
-        sections.append("=== STDERR ===\n" + stderr_clean)
-
-    if not sections:
-        return None
-    return "\n\n".join(sections)
-
-
 # Gallery rendering helpers (outside class)
 def _gallery_render_error(res: PerformanceResult) -> list[str]:
     out = []
@@ -1027,24 +1008,24 @@ def _gallery_render_error(res: PerformanceResult) -> list[str]:
         out.extend(f"> {line}" for line in wrapped_lines)
     else:
         out.append(f"**Error:** {error_msg}")
-    if res.error_type:
-        out.append(f"**Type:** `{res.error_type}`")
-    if res.failure_phase:
-        out.append(f"**Phase:** `{res.failure_phase}`")
-    if res.error_code:
-        out.append(f"**Code:** `{res.error_code}`")
-    if res.error_package:
-        out.append(f"**Package:** `{res.error_package}`")
+    for label, value in (
+        ("Type", res.error_type),
+        ("Phase", res.failure_phase),
+        ("Code", res.error_code),
+        ("Package", res.error_package),
+    ):
+        if value:
+            out.append(f"**{label}:** `{value}`")
     if res.error_traceback:
         out.append("")
-        out.append("<details>")
-        out.append("<summary>Full Traceback (click to expand)</summary>")
-        out.append("")
-        out.append("```python")
-        out.append(res.error_traceback.rstrip())
-        out.append("```")
-        out.append("")
-        out.append("</details>")
+        _append_markdown_details_block(
+            out,
+            summary="Full Traceback (click to expand)",
+            body_lines=_markdown_code_block_lines(
+                res.error_traceback.rstrip(),
+                language="python",
+            ),
+        )
     return out
 
 
@@ -1056,10 +1037,8 @@ def _gallery_render_success(res: PerformanceResult) -> list[str]:
         tokens = getattr(gen, "generation_tokens", 0)
         out.append(f"**Metrics:** {fmt_num(tps)} TPS | {tokens} tokens")
     out.append("")
-    out.append("```text")
     text = str(getattr(res.generation, "text", "")) if res.generation else ""
-    out.append(text)
-    out.append("```")
+    out.extend(_markdown_code_block_lines(text, language="text"))
     if res.generation:
         analysis = getattr(res.generation, "quality_analysis", None)
         if analysis and analysis.issues:
@@ -4283,6 +4262,21 @@ def _format_numeric_by_field(field_name: str, num: float) -> str:
     return fmt_num(num)
 
 
+def _coerce_numeric_value(value: object) -> float | None:
+    """Return a float for numeric or numeric-string values, else ``None``."""
+    if isinstance(value, int | float):
+        return float(value)
+    if isinstance(value, str):
+        stripped = value.strip()
+        if not stripped:
+            return None
+        try:
+            return float(stripped.replace(",", ""))
+        except ValueError:
+            return None
+    return None
+
+
 def format_field_value(field_name: str, value: MetricValue) -> str:
     """Normalize values for report/log rendering using field-aware numeric rules.
 
@@ -4292,35 +4286,19 @@ def format_field_value(field_name: str, value: MetricValue) -> str:
     if value is None:
         return ""
 
-    # Handle numeric types directly
-    if isinstance(value, int | float):
-        return _format_numeric_by_field(field_name, float(value))
+    numeric_value = _coerce_numeric_value(value)
+    if numeric_value is not None:
+        return _format_numeric_by_field(field_name, numeric_value)
 
-    # Handle string values - try to parse as numeric
-    if isinstance(value, str) and value:
-        s: str = value.strip().replace(",", "")
-        try:
-            f = float(s)
-        except ValueError:
-            return value  # Return non-numeric strings as-is
-        return _format_numeric_by_field(field_name, f)
+    if isinstance(value, str):
+        return value
 
     return str(value)
 
 
 def is_numeric_value(val: object) -> bool:
     """Return True if val can be interpreted as a number."""
-    if isinstance(val, int | float):
-        return True
-    if isinstance(val, str):
-        s = val.strip().replace(",", "")
-        try:
-            float(s)
-        except ValueError:
-            return False
-        else:
-            return True
-    return False
+    return _coerce_numeric_value(val) is not None
 
 
 @lru_cache(maxsize=128)
@@ -5099,17 +5077,33 @@ def _extract_file_mtime_local(
         return None
 
 
-def _extract_exif_date(img_path: PathLike, exif_data: ExifDict) -> str | None:
+def _extract_primary_exif_local_datetime(
+    exif_data: ExifDict,
+    *,
+    warning_message: str,
+) -> tuple[datetime | None, str | None]:
+    """Return parsed primary EXIF datetime plus the original raw value."""
     exif_date = _first_exif_date_value(exif_data)
-    if exif_date:
-        try:
-            parsed = _parse_exif_local_datetime(exif_date)
-            if parsed is not None:
-                return parsed.strftime("%Y-%m-%d %H:%M:%S %Z")
-            return str(exif_date)
-        except (TypeError, UnicodeDecodeError) as err:
-            logger.warning("Could not localize EXIF date: %s", err)
-            return str(exif_date)
+    if not exif_date:
+        return None, None
+
+    raw_exif_date = str(exif_date)
+    try:
+        return _parse_exif_local_datetime(exif_date), raw_exif_date
+    except (TypeError, UnicodeDecodeError) as err:
+        logger.warning(warning_message, err)
+        return None, raw_exif_date
+
+
+def _extract_exif_date(img_path: PathLike, exif_data: ExifDict) -> str | None:
+    parsed, raw_exif_date = _extract_primary_exif_local_datetime(
+        exif_data,
+        warning_message="Could not localize EXIF date: %s",
+    )
+    if raw_exif_date is not None:
+        if parsed is not None:
+            return parsed.strftime("%Y-%m-%d %H:%M:%S %Z")
+        return raw_exif_date
 
     mtime_local = _extract_file_mtime_local(img_path)
     return mtime_local.strftime("%Y-%m-%d %H:%M:%S %Z") if mtime_local is not None else None
@@ -5117,14 +5111,13 @@ def _extract_exif_date(img_path: PathLike, exif_data: ExifDict) -> str | None:
 
 def _extract_exif_time(img_path: PathLike, exif_data: ExifDict) -> str | None:
     """Extract local capture time (``HH:MM:SS``) from EXIF or file mtime."""
-    exif_date = _first_exif_date_value(exif_data)
-    if exif_date:
-        try:
-            parsed = _parse_exif_local_datetime(exif_date)
-            if parsed is not None:
-                return parsed.strftime("%H:%M:%S")
-        except (TypeError, UnicodeDecodeError) as err:
-            logger.warning("Could not extract time from EXIF date: %s", err)
+    parsed, raw_exif_date = _extract_primary_exif_local_datetime(
+        exif_data,
+        warning_message="Could not extract time from EXIF date: %s",
+    )
+    if raw_exif_date is not None:
+        if parsed is not None:
+            return parsed.strftime("%H:%M:%S")
         return None
 
     mtime_local = _extract_file_mtime_local(img_path, log_context=" for time")
@@ -5628,14 +5621,12 @@ def _format_table_field_value(
         )
         return _truncate_text_preview(error_text, max_chars=MAX_OUTPUT_PREVIEW_CHARS)
 
-    if field_name == "quality_issues":
-        # Truncate quality issues for Markdown table display
-        value = _get_field_value(res, field_name)
-        formatted_value = format_field_value(field_name, value)
-        return _truncate_quality_issues(formatted_value)
-
-    # Default: format the field value normally
     value = _get_field_value(res, field_name)
+    if field_name == "quality_issues":
+        return _truncate_quality_issues(
+            format_field_value(field_name, value),
+        )
+
     return format_field_value(field_name, value)
 
 
@@ -6093,12 +6084,9 @@ def compute_performance_statistics(results: list[PerformanceResult]) -> Performa
     for res in successful_results:
         for field in fields_to_stat:
             value = _get_field_value(res, field)
-            if value is not None and is_numeric_value(value):
-                # Convert to float once
-                try:
-                    field_values[field].append(float(value))
-                except (ValueError, TypeError):
-                    continue
+            numeric_value = _coerce_numeric_value(value)
+            if numeric_value is not None:
+                field_values[field].append(numeric_value)
 
     # Compute min/max/avg for fields with data
     for field, values in field_values.items():
@@ -6749,6 +6737,31 @@ def _append_markdown_code_block(
         parts.append("")
 
 
+def _markdown_code_block_lines(
+    content: str,
+    *,
+    language: str = "text",
+) -> list[str]:
+    """Return fenced code block lines without surrounding blank-line management."""
+    max_backtick_run = max((len(m.group(0)) for m in re.finditer(r"`+", content)), default=0)
+    fence = "`" * max(3, max_backtick_run + 1)
+    return [f"{fence}{language}", content, fence]
+
+
+def _append_markdown_labeled_code_block(
+    parts: list[str],
+    *,
+    label: str,
+    content: str | None,
+    language: str = "text",
+) -> None:
+    """Append a label followed by a fenced code block when content is present."""
+    if content is None:
+        return
+    parts.append(label)
+    _append_markdown_code_block(parts, content, language=language)
+
+
 def _append_markdown_table(
     parts: list[str],
     *,
@@ -6860,18 +6873,6 @@ def _format_traceback_tail(traceback_str: str | None) -> str | None:
 def _format_traceback_full(traceback_str: str | None) -> str | None:
     """Return full traceback text (trimmed), or None when missing."""
     return _normalize_traceback_for_report(traceback_str)
-
-
-def _sanitize_captured_output_for_report(captured_text: str) -> str:
-    """Normalize captured stdout/stderr for Markdown diagnostics readability."""
-    if not captured_text:
-        return ""
-
-    text = ANSI_ESCAPE_RE.sub("", captured_text)
-    text = text.replace("\r\n", "\n").replace("\r", "\n").replace("\x08", "")
-    text = "".join(ch for ch in text if ch in {"\n", "\t"} or ch.isprintable())
-    text = re.sub(r"\n{3,}", "\n\n", text)
-    return text.strip()
 
 
 def _build_failure_history_context(
@@ -7101,9 +7102,16 @@ def _diagnostics_detailed_trace_logs_section(
     model_logs: list[tuple[str, str | None, str | None]] = []
     for result in cluster_results:
         traceback_text = _format_traceback_full(result.error_traceback)
-        captured_output = _sanitize_captured_output_for_report(
-            result.captured_output_on_fail or "",
-        )
+        captured_output = result.captured_output_on_fail or ""
+        if captured_output:
+            captured_output = ANSI_ESCAPE_RE.sub("", captured_output)
+            captured_output = (
+                captured_output.replace("\r\n", "\n").replace("\r", "\n").replace("\x08", "")
+            )
+            captured_output = "".join(
+                ch for ch in captured_output if ch in {"\n", "\t"} or ch.isprintable()
+            )
+            captured_output = re.sub(r"\n{3,}", "\n\n", captured_output).strip()
         captured_text = captured_output or None
         if traceback_text is None and captured_text is None:
             continue
@@ -7116,12 +7124,16 @@ def _diagnostics_detailed_trace_logs_section(
     for model_name, traceback_text, captured_text in model_logs:
         body_lines.append(f"#### `{DIAGNOSTICS_ESCAPER.escape(model_name)}`")
         body_lines.append("")
-        if traceback_text is not None:
-            body_lines.append("Traceback:")
-            _append_markdown_code_block(body_lines, traceback_text, language="text")
-        if captured_text is not None:
-            body_lines.append("Captured stdout/stderr:")
-            _append_markdown_code_block(body_lines, captured_text, language="text")
+        for label, content in (
+            ("Traceback:", traceback_text),
+            ("Captured stdout/stderr:", captured_text),
+        ):
+            _append_markdown_labeled_code_block(
+                body_lines,
+                label=label,
+                content=content,
+                language="text",
+            )
 
     scope = "affected model" if len(model_logs) == 1 else "affected models"
     parts: list[str] = []
@@ -7793,12 +7805,10 @@ def _diagnostics_failure_clusters(
 
         if output_entry is not None:
             output_model, output_text = output_entry
-            parts.append(
-                f"**Observed model output (`{DIAGNOSTICS_ESCAPER.escape(output_model)}`):**",
-            )
-            _append_markdown_code_block(
+            _append_markdown_labeled_code_block(
                 parts,
-                _truncate_text_preview(
+                label=f"**Observed model output (`{DIAGNOSTICS_ESCAPER.escape(output_model)}`):**",
+                content=_truncate_text_preview(
                     output_text,
                     max_chars=_DIAGNOSTICS_OUTPUT_SNIPPET_LEN,
                 ),
@@ -7869,8 +7879,12 @@ def _diagnostics_harness_section(
         snippet = snippet_source[:_DIAGNOSTICS_OUTPUT_SNIPPET_LEN]
         if len(snippet_source) > _DIAGNOSTICS_OUTPUT_SNIPPET_LEN:
             snippet += "..."
-        parts.append("**Sample output:**")
-        _append_markdown_code_block(parts, snippet, language="text")
+        _append_markdown_labeled_code_block(
+            parts,
+            label="**Sample output:**",
+            content=snippet,
+            language="text",
+        )
 
     return parts
 
@@ -9410,9 +9424,7 @@ def generate_markdown_report(
     # when the prompt itself contains blank lines.
     md.append("**Prompt used:**")
     md.append("")
-    md.append("```text")
-    md.extend(prompt.split("\n"))
-    md.append("```")
+    md.extend(_markdown_code_block_lines(prompt, language="text"))
     md.append("")
     md.append(
         "**Note:** Results sorted: errors first, then by generation time (fastest to slowest).",
@@ -11003,10 +11015,14 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             cache_memory=cache_mem_gb if cache_mem_gb > 0 else None,
         )
     except (TimeoutError, OSError, ValueError, RuntimeError) as e:
-        captured_output = _merge_captured_output(
-            stdout_capture.getvalue(),
-            stderr_capture.getvalue(),
-        )
+        captured_sections: list[str] = []
+        stdout_clean = stdout_capture.getvalue().strip()
+        stderr_clean = stderr_capture.getvalue().strip()
+        if stdout_clean:
+            captured_sections.append("=== STDOUT ===\n" + stdout_clean)
+        if stderr_clean:
+            captured_sections.append("=== STDERR ===\n" + stderr_clean)
+        captured_output = "\n\n".join(captured_sections) if captured_sections else None
         return _build_failure_result(
             model_name=params.model_identifier,
             error=e,

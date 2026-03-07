@@ -8,6 +8,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Reduced redundant internal formatting and diagnostics code in `src/check_models.py`:
+  - inlined a few single-use helpers in import-probe, diagnostics, and failure-capture paths;
+  - centralized numeric-string coercion used by field formatting and numeric stats aggregation;
+  - deduplicated the shared EXIF datetime parsing path while preserving existing helper behavior.
+
 - Began expanding `src/check_models.py` generation parity with upstream `mlx_vlm.generate`:
   - added CLI/runtime support for `resize_shape`, `eos_tokens`, `skip_special_tokens`, and JSON `processor_kwargs` passthrough;
   - added opt-in thinking-mode support via `enable_thinking`, `thinking_budget`, `thinking_start_token`, and `thinking_end_token`;
