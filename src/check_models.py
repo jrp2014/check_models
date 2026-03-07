@@ -1018,13 +1018,16 @@ def _gallery_render_error(res: PerformanceResult) -> list[str]:
             out.append(f"**{label}:** `{value}`")
     if res.error_traceback:
         out.append("")
+        traceback_lines: list[str] = []
+        _append_markdown_code_block(
+            traceback_lines,
+            res.error_traceback.rstrip(),
+            language="python",
+        )
         _append_markdown_details_block(
             out,
             summary="Full Traceback (click to expand)",
-            body_lines=_markdown_code_block_lines(
-                res.error_traceback.rstrip(),
-                language="python",
-            ),
+            body_lines=traceback_lines,
         )
     return out
 
@@ -1038,7 +1041,9 @@ def _gallery_render_success(res: PerformanceResult) -> list[str]:
         out.append(f"**Metrics:** {fmt_num(tps)} TPS | {tokens} tokens")
     out.append("")
     text = str(getattr(res.generation, "text", "")) if res.generation else ""
-    out.extend(_markdown_code_block_lines(text, language="text"))
+    out.append("```text")
+    out.append(text)
+    out.append("```")
     if res.generation:
         analysis = getattr(res.generation, "quality_analysis", None)
         if analysis and analysis.issues:
@@ -6737,31 +6742,6 @@ def _append_markdown_code_block(
         parts.append("")
 
 
-def _markdown_code_block_lines(
-    content: str,
-    *,
-    language: str = "text",
-) -> list[str]:
-    """Return fenced code block lines without surrounding blank-line management."""
-    max_backtick_run = max((len(m.group(0)) for m in re.finditer(r"`+", content)), default=0)
-    fence = "`" * max(3, max_backtick_run + 1)
-    return [f"{fence}{language}", content, fence]
-
-
-def _append_markdown_labeled_code_block(
-    parts: list[str],
-    *,
-    label: str,
-    content: str | None,
-    language: str = "text",
-) -> None:
-    """Append a label followed by a fenced code block when content is present."""
-    if content is None:
-        return
-    parts.append(label)
-    _append_markdown_code_block(parts, content, language=language)
-
-
 def _append_markdown_table(
     parts: list[str],
     *,
@@ -7124,16 +7104,12 @@ def _diagnostics_detailed_trace_logs_section(
     for model_name, traceback_text, captured_text in model_logs:
         body_lines.append(f"#### `{DIAGNOSTICS_ESCAPER.escape(model_name)}`")
         body_lines.append("")
-        for label, content in (
-            ("Traceback:", traceback_text),
-            ("Captured stdout/stderr:", captured_text),
-        ):
-            _append_markdown_labeled_code_block(
-                body_lines,
-                label=label,
-                content=content,
-                language="text",
-            )
+        if traceback_text is not None:
+            body_lines.append("Traceback:")
+            _append_markdown_code_block(body_lines, traceback_text, language="text")
+        if captured_text is not None:
+            body_lines.append("Captured stdout/stderr:")
+            _append_markdown_code_block(body_lines, captured_text, language="text")
 
     scope = "affected model" if len(model_logs) == 1 else "affected models"
     parts: list[str] = []
@@ -7805,10 +7781,12 @@ def _diagnostics_failure_clusters(
 
         if output_entry is not None:
             output_model, output_text = output_entry
-            _append_markdown_labeled_code_block(
+            parts.append(
+                f"**Observed model output (`{DIAGNOSTICS_ESCAPER.escape(output_model)}`):**",
+            )
+            _append_markdown_code_block(
                 parts,
-                label=f"**Observed model output (`{DIAGNOSTICS_ESCAPER.escape(output_model)}`):**",
-                content=_truncate_text_preview(
+                _truncate_text_preview(
                     output_text,
                     max_chars=_DIAGNOSTICS_OUTPUT_SNIPPET_LEN,
                 ),
@@ -7879,12 +7857,8 @@ def _diagnostics_harness_section(
         snippet = snippet_source[:_DIAGNOSTICS_OUTPUT_SNIPPET_LEN]
         if len(snippet_source) > _DIAGNOSTICS_OUTPUT_SNIPPET_LEN:
             snippet += "..."
-        _append_markdown_labeled_code_block(
-            parts,
-            label="**Sample output:**",
-            content=snippet,
-            language="text",
-        )
+        parts.append("**Sample output:**")
+        _append_markdown_code_block(parts, snippet, language="text")
 
     return parts
 
@@ -9424,7 +9398,9 @@ def generate_markdown_report(
     # when the prompt itself contains blank lines.
     md.append("**Prompt used:**")
     md.append("")
-    md.extend(_markdown_code_block_lines(prompt, language="text"))
+    md.append("```text")
+    md.extend(prompt.split("\n"))
+    md.append("```")
     md.append("")
     md.append(
         "**Note:** Results sorted: errors first, then by generation time (fastest to slowest).",
