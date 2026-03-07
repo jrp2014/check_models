@@ -11072,12 +11072,15 @@ def _prepare_generation_prompt(
                 )
                 _set_failure_phase(phase_callback, "prefill")
                 chat_template_kwargs = _build_chat_template_kwargs(params)
-                return apply_chat_template(
-                    processor=processor,
-                    config=config,
-                    prompt=params.prompt,
-                    num_images=1,
-                    **chat_template_kwargs,
+                return cast(
+                    "str | list[Any]",
+                    apply_chat_template(
+                        processor=processor,
+                        config=config,
+                        prompt=params.prompt,
+                        num_images=1,
+                        **chat_template_kwargs,
+                    ),
                 )
 
         _run_model_preflight_validators(
@@ -11088,12 +11091,15 @@ def _prepare_generation_prompt(
         )
         _set_failure_phase(phase_callback, "prefill")
         chat_template_kwargs = _build_chat_template_kwargs(params)
-        return apply_chat_template(
-            processor=processor,
-            config=config,
-            prompt=params.prompt,
-            num_images=1,
-            **chat_template_kwargs,
+        return cast(
+            "str | list[Any]",
+            apply_chat_template(
+                processor=processor,
+                config=config,
+                prompt=params.prompt,
+                num_images=1,
+                **chat_template_kwargs,
+            ),
         )
     except ValueError as preflight_err:
         message = f"Model preflight failed for {params.model_identifier}: {preflight_err}"
