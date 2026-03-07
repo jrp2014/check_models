@@ -1,8 +1,8 @@
-# Diagnostics Report — 4 failure(s), 8 harness issue(s) (mlx-vlm 0.3.13)
+# Diagnostics Report — 2 failure(s), 8 harness issue(s) (mlx-vlm 0.3.13)
 
 ## Summary
 
-Automated benchmarking of **48 locally-cached VLM models** found **4 hard failure(s)** and **8 harness/integration issue(s)** plus **2 preflight compatibility warning(s)** in successful models. 44 of 48 models succeeded.
+Automated benchmarking of **48 locally-cached VLM models** found **2 hard failure(s)** and **8 harness/integration issue(s)** plus **1 preflight compatibility warning(s)** in successful models. 46 of 48 models succeeded.
 
 Test image: `20260228-162254_DSC09377.jpg` (33.5 MB).
 
@@ -13,11 +13,9 @@ Test image: `20260228-162254_DSC09377.jpg` (33.5 MB).
 Quick triage list with likely owner and next action for each issue class.
 
 - **[Medium] [mlx-vlm]** Failed to process inputs with error: can only concatenate str (not "NoneType") to str (1 model(s)). Next: check processor/chat-template wiring and generation kwargs.
-- **[Medium] [mlx-vlm]** Model runtime error during generation for mlx-community/InternVL3-14B-8bit: LanguageM... (1 model(s)). Next: check processor/chat-template wiring and generation kwargs.
-- **[Medium] [mlx-vlm]** Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageMo... (1 model(s)). Next: check processor/chat-template wiring and generation kwargs.
 - **[Medium] [model configuration/repository]** Loaded processor has no image_processor; expected multimodal processor. (1 model(s)). Next: verify model config, tokenizer files, and revision alignment.
 - **[Medium] [mlx-vlm / mlx]** Harness/integration warnings on 8 model(s). Next: validate stop-token decoding and long-context behavior.
-- **[Medium] [mlx-vlm, transformers]** Preflight compatibility warnings (2 issue(s)). Next: verify dependency/version compatibility before model runs.
+- **[Medium] [transformers]** Preflight compatibility warnings (1 issue(s)). Next: verify dependency/version compatibility before model runs.
 
 ---
 
@@ -26,11 +24,9 @@ Quick triage list with likely owner and next action for each issue class.
 | Priority | Issue | Models Affected | Owner | Next Action |
 | -------- | ----- | --------------- | ----- | ----------- |
 | **Medium** | Failed to process inputs with error: can only concatenate str (not "N... | 1 (Florence-2-large-ft) | `mlx-vlm` | check processor/chat-template wiring and generation kwargs. |
-| **Medium** | Model runtime error during generation for mlx-community/InternVL3-14B... | 1 (InternVL3-14B-8bit) | `mlx-vlm` | check processor/chat-template wiring and generation kwargs. |
-| **Medium** | Model runtime error during generation for mlx-community/InternVL3-8B-... | 1 (InternVL3-8B-bf16) | `mlx-vlm` | check processor/chat-template wiring and generation kwargs. |
 | **Medium** | Loaded processor has no image_processor; expected multimodal processor. | 1 (deepseek-vl2-8bit) | `model configuration/repository` | verify model config, tokenizer files, and revision alignment. |
 | **Medium** | Harness/integration | 8 (Qwen3-VL-2B-Instruct, Devstral-Small-2-24B-Instruct-2512-5bit, Qwen3-VL-2B-Thinking-bf16, SmolVLM2-2.2B-Instruct-mlx, X-Reasoner-7B-8bit, paligemma2-10b-ft-docci-448-6bit, paligemma2-3b-ft-docci-448-bf16, Florence-2-large-ft) | `mlx-vlm / mlx` | validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime. |
-| **Medium** | Preflight compatibility warning | 2 issue(s) | `mlx-vlm, transformers` | verify dependency/version compatibility before model runs. |
+| **Medium** | Preflight compatibility warning | 1 issue(s) | `transformers` | verify dependency/version compatibility before model runs. |
 
 ---
 
@@ -58,23 +54,23 @@ Traceback:
 
 ```text
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 883, in process_inputs_with_fallback
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 873, in process_inputs_with_fallback
     return process_inputs(
         processor,
     ...<5 lines>...
         **kwargs,
     )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 869, in process_inputs
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 859, in process_inputs
     return process_method(**args)
-  File "/opt/homebrew/Caskroom/miniconda/base/lib/python3.13/site-packages/transformers/models/florence2/processing_florence2.py", line 163, in __call__
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/florence2/processing_florence2.py", line 163, in __call__
     image_inputs = self.image_processor(images, **output_kwargs["images_kwargs"])
-  File "/opt/homebrew/Caskroom/miniconda/base/lib/python3.13/site-packages/transformers/image_processing_utils.py", line 50, in __call__
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils.py", line 50, in __call__
     return self.preprocess(images, *args, **kwargs)
            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/opt/homebrew/Caskroom/miniconda/base/lib/python3.13/site-packages/transformers/image_processing_utils_fast.py", line 860, in preprocess
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils_fast.py", line 860, in preprocess
     self._validate_preprocess_kwargs(**kwargs)
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
-  File "/opt/homebrew/Caskroom/miniconda/base/lib/python3.13/site-packages/transformers/image_processing_utils_fast.py", line 823, in _validate_preprocess_kwargs
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils_fast.py", line 823, in _validate_preprocess_kwargs
     validate_fast_preprocess_arguments(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         do_rescale=do_rescale,
@@ -84,22 +80,22 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/opt/homebrew/Caskroom/miniconda/base/lib/python3.13/site-packages/transformers/image_processing_utils_fast.py", line 106, in validate_fast_preprocess_arguments
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils_fast.py", line 106, in validate_fast_preprocess_arguments
     raise ValueError("Only returning PyTorch tensors is currently supported.")
 ValueError: Only returning PyTorch tensors is currently supported.
 
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 896, in process_inputs_with_fallback
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 886, in process_inputs_with_fallback
     return process_inputs(
         processor,
     ...<5 lines>...
         **kwargs,
     )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 869, in process_inputs
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 859, in process_inputs
     return process_method(**args)
-  File "/opt/homebrew/Caskroom/miniconda/base/lib/python3.13/site-packages/transformers/models/florence2/processing_florence2.py", line 185, in __call__
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/florence2/processing_florence2.py", line 185, in __call__
     self.image_token * self.num_image_tokens
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     + self.tokenizer.bos_token
@@ -118,13 +114,13 @@ Traceback (most recent call last):
     ...<6 lines>...
         **kwargs,
     )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1120, in prepare_inputs
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1110, in prepare_inputs
     inputs = process_inputs_with_fallback(
         processor,
     ...<4 lines>...
         **kwargs,
     )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 906, in process_inputs_with_fallback
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 896, in process_inputs_with_fallback
     raise ValueError(
         f"Failed to process inputs with error: {fallback_error}"
     ) from fallback_error
@@ -168,7 +164,7 @@ Context: Existing metadata hints (high confidence; use only if visually consiste
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 23590.01it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 8025.84it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -177,192 +173,6 @@ Download complete: : 0.00B [00:00, ?B/s]
 </details>
 
 ## 2. Failure affecting 1 model (Priority: Medium)
-
-**Observed behavior:** Model runtime error during generation for mlx-community/InternVL3-14B-8bit: LanguageModel.\_\_call\_\_() got an unexpected keyword argument 'n_to_process'
-**Owner (likely component):** `mlx-vlm`
-**Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Affected model:** `mlx-community/InternVL3-14B-8bit`
-
-| Model | Observed Behavior | First Seen Failing | Recent Repro |
-| ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/InternVL3-14B-8bit` | Model runtime error during generation for mlx-community/InternVL3-14B-8bit: LanguageModel.\_\_call\_\_() got an unexpected keyword argument 'n_to_process' | 2026-02-23 12:54:48 GMT | 3/3 recent runs failed |
-
-### To reproduce
-
-- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-14B-8bit`
-
-<details>
-<summary>Detailed trace logs (affected model)</summary>
-
-#### `mlx-community/InternVL3-14B-8bit`
-
-Traceback:
-
-```text
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 663, in generate
-    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
-                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 551, in stream_generate
-    for n, (token, logprobs) in enumerate(gen):
-                                ~~~~~~~~~^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 409, in generate_step
-    model.language_model(
-    ~~~~~~~~~~~~~~~~~~~~^
-        inputs=input_ids[:, :n_to_process],
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<3 lines>...
-        **kwargs,
-        ^^^^^^^^^
-    )
-    ^
-TypeError: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-ValueError: Model runtime error during generation for mlx-community/InternVL3-14B-8bit: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
-```
-
-Captured stdout/stderr:
-
-```text
-=== STDOUT ===
-==========
-Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '2', '8', '-', '1', '6', '2', '2', '5', '4', '_', 'D', 'S', 'C', '0', '9', '3', '7', '7', '.', 'j', 'p', 'g'] 
-
-Prompt: User: <image>
-Analyze this image for cataloguing metadata.
-
-Return exactly these three sections, and nothing else:
-
-Title: 6-12 words, descriptive and concrete.
-
-Description: 1-2 factual sentences covering key subjects, setting, and action.
-
-Keywords: 15-30 unique comma-separated terms, ordered most specific to most general.
-
-Rules:
-- Use only visually supported facts.
-- If hints conflict with the image, trust the image.
-- Do not output reasoning, notes, or extra sections.
-- Do not copy context hints verbatim.
-
-Context: Existing metadata hints (high confidence; use only if visually consistent):
-- Description hint: , St Mary's Church, Lenham, England, United Kingdom, UK Here is a caption for the image, written in a neutral but descriptive style suitable for a periodical, blog, or magazine. **Caption:** A late winter afternoon in the historic village of Lenham, Kent, England. This view from the churchyard of St Mary's Church looks out over the village square. In the foreground, ancient, moss-covered headstones dot the landsca...
-- Keyword hints: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue
-- Capture metadata: Taken on 2026-02-28 16:22:54 GMT (at 16:22:54 local time). GPS: 51.237300°N, 0.718917°E.
-Assistant:
-
-=== STDERR ===
-Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-
-Fetching 18 files:   0%|          | 0/18 [00:00<?, ?it/s]
-Fetching 18 files: 100%|##########| 18/18 [00:00<00:00, 24696.59it/s]
-
-Download complete: : 0.00B [00:00, ?B/s]              
-Download complete: : 0.00B [00:00, ?B/s]
-
-Prefill:   0%|          | 0/2156 [00:00<?, ?tok/s]
-Prefill:   0%|          | 0/2156 [00:00<?, ?tok/s]
-```
-
-</details>
-
-## 3. Failure affecting 1 model (Priority: Medium)
-
-**Observed behavior:** Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageModel.\_\_call\_\_() got an unexpected keyword argument 'n_to_process'
-**Owner (likely component):** `mlx-vlm`
-**Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Affected model:** `mlx-community/InternVL3-8B-bf16`
-
-| Model | Observed Behavior | First Seen Failing | Recent Repro |
-| ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/InternVL3-8B-bf16` | Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageModel.\_\_call\_\_() got an unexpected keyword argument 'n_to_process' | 2026-02-23 12:54:48 GMT | 3/3 recent runs failed |
-
-### To reproduce
-
-- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-8B-bf16`
-
-<details>
-<summary>Detailed trace logs (affected model)</summary>
-
-#### `mlx-community/InternVL3-8B-bf16`
-
-Traceback:
-
-```text
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 663, in generate
-    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
-                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 551, in stream_generate
-    for n, (token, logprobs) in enumerate(gen):
-                                ~~~~~~~~~^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 409, in generate_step
-    model.language_model(
-    ~~~~~~~~~~~~~~~~~~~~^
-        inputs=input_ids[:, :n_to_process],
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<3 lines>...
-        **kwargs,
-        ^^^^^^^^^
-    )
-    ^
-TypeError: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-ValueError: Model runtime error during generation for mlx-community/InternVL3-8B-bf16: LanguageModel.__call__() got an unexpected keyword argument 'n_to_process'
-```
-
-Captured stdout/stderr:
-
-```text
-=== STDOUT ===
-==========
-Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '2', '8', '-', '1', '6', '2', '2', '5', '4', '_', 'D', 'S', 'C', '0', '9', '3', '7', '7', '.', 'j', 'p', 'g'] 
-
-Prompt: User: <image>
-Analyze this image for cataloguing metadata.
-
-Return exactly these three sections, and nothing else:
-
-Title: 6-12 words, descriptive and concrete.
-
-Description: 1-2 factual sentences covering key subjects, setting, and action.
-
-Keywords: 15-30 unique comma-separated terms, ordered most specific to most general.
-
-Rules:
-- Use only visually supported facts.
-- If hints conflict with the image, trust the image.
-- Do not output reasoning, notes, or extra sections.
-- Do not copy context hints verbatim.
-
-Context: Existing metadata hints (high confidence; use only if visually consistent):
-- Description hint: , St Mary's Church, Lenham, England, United Kingdom, UK Here is a caption for the image, written in a neutral but descriptive style suitable for a periodical, blog, or magazine. **Caption:** A late winter afternoon in the historic village of Lenham, Kent, England. This view from the churchyard of St Mary's Church looks out over the village square. In the foreground, ancient, moss-covered headstones dot the landsca...
-- Keyword hints: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue
-- Capture metadata: Taken on 2026-02-28 16:22:54 GMT (at 16:22:54 local time). GPS: 51.237300°N, 0.718917°E.
-Assistant:
-
-=== STDERR ===
-Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-
-Fetching 17 files:   0%|          | 0/17 [00:00<?, ?it/s]
-Fetching 17 files: 100%|##########| 17/17 [00:00<00:00, 30734.12it/s]
-
-Download complete: : 0.00B [00:00, ?B/s]              
-Download complete: : 0.00B [00:00, ?B/s]
-
-Prefill:   0%|          | 0/2156 [00:00<?, ?tok/s]
-Prefill:   0%|          | 0/2156 [00:00<?, ?tok/s]
-```
-
-</details>
-
-## 4. Failure affecting 1 model (Priority: Medium)
 
 **Observed behavior:** Loaded processor has no image_processor; expected multimodal processor.
 **Owner (likely component):** `model configuration/repository`
@@ -409,7 +219,7 @@ Added chat tokens
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 24517.06it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 23421.80it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -419,13 +229,10 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 ---
 
-## Preflight Compatibility Warnings (2 issue(s))
+## Preflight Compatibility Warnings (1 issue(s))
 
 These warnings were detected before inference. They are non-fatal but should be tracked as potential upstream compatibility issues.
 
-- `mlx-vlm load_image() has an unguarded URL startswith() branch; Path/BytesIO inputs can raise AttributeError in upstream code.`
-  - Owner: `mlx-vlm`; suggested tracker: `mlx-vlm` (<https://github.com/ml-explore/mlx-vlm/issues/new>)
-  - Suggested next action: check processor/chat-template wiring and generation kwargs.
 - `transformers import utils no longer reference known backend guard env vars (TRANSFORMERS_NO_* / USE_*); check_models backend guard hints may be ignored with this version.`
   - Owner: `transformers`; suggested tracker: `transformers` (<https://github.com/huggingface/transformers/issues/new>)
   - Suggested next action: verify API compatibility and pinned version floor.
@@ -599,29 +406,27 @@ Cemetery, England, United Kingdom, UK
 Recent reproducibility is measured from history (up to last 3 runs where each model appears).
 
 **Regressions since previous run:** none
-**Recoveries since previous run:** `mlx-community/Qwen3.5-35B-A3B-6bit`, `mlx-community/Qwen3.5-35B-A3B-bf16`
+**Recoveries since previous run:** `mlx-community/InternVL3-14B-8bit`, `mlx-community/InternVL3-8B-bf16`
 
 | Model | Status vs Previous Run | First Seen Failing | Recent Repro |
 | ----- | ---------------------- | ------------------ | ------------ |
 | `microsoft/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
-| `mlx-community/InternVL3-14B-8bit` | still failing | 2026-02-23 12:54:48 GMT | 3/3 recent runs failed |
-| `mlx-community/InternVL3-8B-bf16` | still failing | 2026-02-23 12:54:48 GMT | 3/3 recent runs failed |
 | `mlx-community/deepseek-vl2-8bit` | still failing | 2026-02-15 03:27:34 GMT | 3/3 recent runs failed |
 
 ---
 
 ## Coverage & Runtime Metrics
 
-- **Detailed diagnostics models:** 12
-- **Summary diagnostics models:** 36
+- **Detailed diagnostics models:** 10
+- **Summary diagnostics models:** 38
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1149.19s (1149.19s)
-- **Average runtime per model:** 23.94s (23.94s)
-- **Runtime note:** 4 model(s) had missing timing fields and were counted as 0.00s.
+- **Total model runtime (sum):** 1235.53s (1235.53s)
+- **Average runtime per model:** 25.74s (25.74s)
+- **Runtime note:** 2 model(s) had missing timing fields and were counted as 0.00s.
 
 ---
 
-## Models Not Flagged (36 model(s))
+## Models Not Flagged (38 model(s))
 
 These models completed without diagnostics flags (no hard failure, harness warning, or stack-signal anomaly).
 
@@ -633,7 +438,7 @@ These models completed without diagnostics flags (no hard failure, harness warni
 - `mlx-community/gemma-3-27b-it-qat-4bit`
 - `mlx-community/gemma-3-27b-it-qat-8bit`
 
-### Ran, but with quality warnings (31 model(s))
+### Ran, but with quality warnings (33 model(s))
 
 - `HuggingFaceTB/SmolVLM-Instruct`: Model output may not follow prompt or image contents.
 - `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: Output omitted required Title/Description/Keywords sections.
@@ -645,6 +450,8 @@ These models completed without diagnostics flags (no hard failure, harness warni
 - `mlx-community/GLM-4.6V-Flash-6bit`: Output formatting deviated from the requested structure.
 - `mlx-community/GLM-4.6V-Flash-mxfp4`: Output formatting deviated from the requested structure.
 - `mlx-community/Idefics3-8B-Llama3-bf16`: Output formatting deviated from the requested structure.
+- `mlx-community/InternVL3-14B-8bit`: Title length violation (5 words; expected 6-12)
+- `mlx-community/InternVL3-8B-bf16`: Title length violation (5 words; expected 6-12)
 - `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`: Output omitted required Title/Description/Keywords sections.
 - `mlx-community/Kimi-VL-A3B-Thinking-8bit`: Output leaked reasoning or prompt-template text.
 - `mlx-community/LFM2-VL-1.6B-8bit`: Output appears to copy prompt context verbatim.
@@ -674,12 +481,12 @@ These models completed without diagnostics flags (no hard failure, harness warni
 | Component | Version |
 | --------- | ------- |
 | mlx-vlm | 0.3.13 |
-| mlx | 0.31.1.dev20260306+be872ebd |
+| mlx | 0.31.1.dev20260307+be872ebd |
 | mlx-lm | 0.31.0 |
 | transformers | 5.3.0 |
 | tokenizers | 0.22.2 |
 | huggingface-hub | 1.6.0 |
-| Python Version | 3.13.9 |
+| Python Version | 3.13.12 |
 | OS | Darwin 25.3.0 |
 | macOS Version | 26.3.1 |
 | GPU/Chip | Apple M4 Max |
@@ -723,8 +530,6 @@ PY
 
 ```bash
 python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft
-python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-14B-8bit
-python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/InternVL3-8B-bf16
 python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit
 ```
 
@@ -758,4 +563,4 @@ Context: Existing metadata hints (high confidence; use only if visually consiste
 - Input image: `/Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-03-06 23:33:43 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-03-07 18:31:40 GMT by [check_models](https://github.com/jrp2014/check_models)._
