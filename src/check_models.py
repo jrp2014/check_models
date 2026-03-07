@@ -277,12 +277,12 @@ class QualityThresholds:
     short_output_words: int = 15  # Output considered "short"
     substantial_prose_words: int = 20  # Words needed for "substantial" prose
     max_caption_words: int = 15  # Max words for implicit caption detection
-    min_title_words: int = 6  # Minimum words required in Title section
-    max_title_words: int = 12  # Maximum words allowed in Title section
+    min_title_words: int = 5  # Minimum words required in Title section
+    max_title_words: int = 10  # Maximum words allowed in Title section
     min_description_sentences: int = 1  # Minimum factual description sentences
     max_description_sentences: int = 2  # Maximum factual description sentences
-    min_keywords_count: int = 15  # Minimum number of keyword terms
-    max_keywords_count: int = 30  # Maximum number of keyword terms
+    min_keywords_count: int = 10  # Minimum number of keyword terms
+    max_keywords_count: int = 18  # Maximum number of keyword terms
     min_keywords_for_duplication_check: int = 12  # Ignore duplication below this keyword count
     keyword_duplication_ratio_threshold: float = 0.35  # Dup ratio threshold for keyword loops
     min_useful_chars: int = 10  # Minimum chars for useful output
@@ -12167,19 +12167,44 @@ def _build_cataloguing_prompt(metadata: MetadataDict) -> str:
     parts: list[str] = [
         "Analyze this image for cataloguing metadata.",
         "",
+        (
+            "Use only details that are clearly and definitely visible in the image. "
+            "If a detail is uncertain, ambiguous, partially obscured, too small to "
+            "verify, or not directly visible, leave it out. Do not guess."
+        ),
+        "",
+        (
+            "Treat the metadata hints below as a draft catalog record. Keep only details "
+            "that are clearly confirmed by the image, correct anything contradicted by "
+            "the image, and add important visible details that are definitely present."
+        ),
+        "",
         "Return exactly these three sections, and nothing else:",
         "",
-        "Title: 6-12 words, descriptive and concrete.",
+        "Title: 5-10 words, concrete and factual, limited to clearly visible content.",
         "",
-        "Description: 1-2 factual sentences covering key subjects, setting, and action.",
+        (
+            "Description: 1-2 factual sentences describing the main visible subject, "
+            "setting, lighting, action, and other distinctive visible details. Omit "
+            "anything uncertain or inferred."
+        ),
         "",
-        "Keywords: 15-30 unique comma-separated terms, ordered most specific to most general.",
+        (
+            "Keywords: 10-18 unique comma-separated terms based only on clearly visible "
+            "subjects, setting, colors, composition, and style. Omit uncertain tags "
+            "rather than guessing."
+        ),
         "",
         "Rules:",
-        "- Use only visually supported facts.",
-        "- If hints conflict with the image, trust the image.",
-        "- Do not output reasoning, notes, or extra sections.",
-        "- Do not copy context hints verbatim.",
+        "- Include only details that are definitely visible in the image.",
+        "- Reuse metadata terms only when they are clearly supported by the image.",
+        "- If metadata and image disagree, follow the image.",
+        "- Prefer omission to speculation.",
+        (
+            "- Do not infer identity, location, event, brand, species, time period, "
+            "or intent unless visually obvious."
+        ),
+        "- Do not output reasoning, notes, hedging, or extra sections.",
     ]
 
     # --- Context block (uses the "Context:" marker for quality analysis) ---
@@ -12190,7 +12215,7 @@ def _build_cataloguing_prompt(metadata: MetadataDict) -> str:
     if has_context:
         parts.append("")
         parts.append(
-            "Context: Existing metadata hints (high confidence; use only if visually consistent):",
+            "Context: Existing metadata hints (high confidence; use only when visually confirmed):",
         )
         if title:
             title_hint = _compact_prompt_text(title, max_chars=QUALITY.prompt_title_max_chars)

@@ -223,6 +223,9 @@ def test_build_prompt_empty_metadata() -> None:
     assert "Description:" in prompt
     assert "Keywords:" in prompt
     assert "Do not output reasoning" in prompt
+    assert "Do not guess." in prompt
+    assert "Title: 5-10 words" in prompt
+    assert "Keywords: 10-18 unique comma-separated terms" in prompt
 
 
 def test_build_prompt_includes_metadata_fields() -> None:
@@ -243,6 +246,8 @@ def test_build_prompt_includes_metadata_fields() -> None:
     assert "18:30" in prompt
     assert "51.0N, 0.9W" in prompt
     assert "high confidence" in prompt
+    assert "use only when visually confirmed" in prompt
+    assert "Do not copy context hints verbatim." not in prompt
 
 
 def test_build_prompt_context_marker_present() -> None:

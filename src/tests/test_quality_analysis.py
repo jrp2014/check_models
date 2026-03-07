@@ -154,7 +154,7 @@ def test_analyze_generation_text_catalog_contract_missing_sections() -> None:
     prompt = (
         "Analyze this image for cataloguing metadata.\n"
         "Return exactly these three sections, and nothing else:\n"
-        "Title: 6-12 words.\nDescription: 1-2 factual sentences.\nKeywords: 15-30 terms."
+        "Title: 5-10 words.\nDescription: 1-2 factual sentences.\nKeywords: 10-18 terms."
     )
     text = "A misty lakeshore with trees and power lines."
 
@@ -174,7 +174,7 @@ def test_analyze_generation_text_catalog_contract_length_violations() -> None:
     prompt = (
         "Analyze this image for cataloguing metadata.\n"
         "Return exactly these three sections, and nothing else:\n"
-        "Title: 6-12 words.\nDescription: 1-2 factual sentences.\nKeywords: 15-30 terms."
+        "Title: 5-10 words.\nDescription: 1-2 factual sentences.\nKeywords: 10-18 terms."
     )
     text = (
         "Title: Short title\n"

@@ -23,6 +23,15 @@ Notable changes to this project will be documented in this file.
     anti-verbatim-copy rules;
   - keeps `Context:` metadata hints concise and tagged as high-confidence
     hints rather than instruction text.
+- Revised the default cataloging prompt toward non-speculative, visibility-only
+  output:
+  - metadata hints are now framed as a draft record to verify against the
+    image, not a source to elaborate from;
+  - prompt wording now explicitly prefers omission over guessing and forbids
+    inferred identity/location/event/brand/species/time-period details unless
+    visually obvious;
+  - title/keyword quality thresholds now align with the stricter prompt
+    contract (`Title: 5-10 words`, `Keywords: 10-18 terms`).
 - Strengthened output-quality heuristics for prompt-contract enforcement:
   - added explicit flags for missing sections, title length, description
     sentence count, keyword count, and keyword-duplication violations;

@@ -62,7 +62,7 @@ python -m check_models --dry-run
 - **Selection Control**: Use `--exclude` to filter models from cache scan or explicit list
 - **Folder Mode**: Automatically selects most recently modified image from specified folder
 - **Metadata Extraction**: Multi-source metadata: EXIF + GPS + IPTC keywords/caption + XMP (dc:subject, dc:title) + Windows XP keywords, with fail-soft strategy for partially corrupt data
-- **Smart Prompting**: Generates structured cataloguing prompts (Title/Description/Keywords) with metadata-aware context; automatically compacts long metadata fields/keyword lists to keep prompt size manageable; `--prompt` overrides
+- **Smart Prompting**: Generates structured cataloguing prompts (Title/Description/Keywords) that verify metadata against clearly visible image content, avoid speculation, and compact long metadata fields/keyword lists to keep prompt size manageable; `--prompt` overrides
 - **Performance Metrics**:
   - Timing: generation_time, model_load_time, total_time
   - Tokens: total, prompt, generated with tokens/sec
@@ -781,7 +781,7 @@ See module docstrings and `__all__` exports for complete API reference.
 | `--trust-remote-code` / `--no-trust-remote-code` | flag | `True` | Allow/disallow custom code from Hub models. Use `--no-trust-remote-code` for security. |
 | `--revision` | str | (none) | Model revision (branch, tag, or commit) for reproducible runs. |
 | `--adapter-path` | str | (none) | Path to LoRA adapter weights to apply on top of the base model. |
-| `-p`, `--prompt` | str | (auto) | Custom prompt; if omitted a metadata‑aware prompt may be used. |
+| `-p`, `--prompt` | str | (auto) | Custom prompt; if omitted a non-speculative metadata-verification prompt is used. |
 | `-d`, `--detailed-metrics` | flag | `False` | Show expanded multi-line metrics block (verbose mode only). |
 | `-x`, `--max-tokens` | int | 500 | Max new tokens to generate. |
 | `-t`, `--temperature` | float | 0.0 | Sampling temperature. |
