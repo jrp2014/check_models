@@ -8,6 +8,18 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Hardened local hook and CI quality workflows:
+  - split shared gates into commit hygiene, pre-push fast checks, full static
+    quality, and separate runtime smoke probing;
+  - removed tool-install side effects from quality enforcement scripts and made
+    the full quality gate non-mutating;
+  - aligned the checked-in `pre-commit` config, custom git-hook installer,
+    workflow docs, and environment validation around the same commit/push
+    behavior;
+  - simplified ancillary Node tooling around `npm install`, moved dependency-sync
+    CI to Ubuntu with path filters, and split GitHub Actions into
+    `static-quality` and `runtime-smoke` jobs.
+
 - Reduced redundant internal formatting and diagnostics code in `src/check_models.py`:
   - inlined a few single-use helpers in import-probe, diagnostics, and failure-capture paths;
   - centralized numeric-string coercion used by field formatting and numeric stats aggregation;
@@ -367,7 +379,7 @@ Notable changes to this project will be documented in this file.
 - YAML config schema validation — warns on unknown threshold keys
 - `CHANGELOG.md` (this file)
 - `quality-strict` and `install-markdownlint` targets in root Makefile
-- `src/package-lock.json` for deterministic npm CI caching
+- local npm-based markdownlint-cli2 tooling for CI/dev setup
 ...existing code...
 
 ### Changed

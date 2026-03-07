@@ -93,12 +93,12 @@ bootstrap-dev: ## pip bootstrap runtime + dev + extras + hooks + validation
 	@echo "[bootstrap] Installing markdownlint-cli2 (for markdown linting)..."
 	@if command -v npm >/dev/null 2>&1; then \
 		echo "[bootstrap] npm found, installing markdownlint-cli2..."; \
-		npm install --silent 2>/dev/null || echo "⚠️  npm install failed (markdownlint will use npx fallback)"; \
+		npm install --silent 2>/dev/null || echo "⚠️  npm install failed (run 'npm install' inside src)"; \
 	else \
 		echo "[bootstrap] npm not found - markdownlint-cli2 will use npx on-demand"; \
 		echo "  To install npm: https://nodejs.org/ or 'brew install node'"; \
 	fi
-	@echo "[bootstrap] Installing pre-commit hooks..."
+	@echo "[bootstrap] Installing commit/push hooks..."
 	@$(RUN_PY) -m tools.install_precommit_hook || echo "⚠️  Could not install custom git hook"
 	@if command -v pre-commit >/dev/null 2>&1; then \
 		echo "[bootstrap] Installing pre-commit framework hooks..."; \

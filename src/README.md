@@ -454,18 +454,35 @@ This repo excludes ephemeral caches and local environments via `.gitignore`. Com
 
 ## Pre-commit (Optional)
 
-To enforce formatting, lint, type, and dependency sync locally:
+This repo supports two equivalent local hook workflows:
+
+- `pre-commit` framework:
 
 ```bash
 pip install pre-commit
 pre-commit install
 ```
 
-Hooks run automatically on commit. Run against all files manually:
+  This installs both commit-stage and pre-push hooks from the checked-in
+  `.pre-commit-config.yaml`. The commit hook runs staged-file hygiene only; the
+  push hook runs fast static checks plus the non-slow/non-e2e pytest subset.
+
+- Custom git hooks shipped with this repo:
 
 ```bash
-pre-commit run --all-files
+cd src
+python -m tools.install_precommit_hook
 ```
+
+Run the push-stage gate manually with:
+
+```bash
+pre-commit run --hook-stage pre-push --all-files
+```
+
+The commit-stage hook is intentionally staged-file based; run it by making a
+normal commit, or call `bash src/tools/run_commit_hygiene.sh` directly after
+staging files.
 
 
 ### Manual Installation
@@ -1096,7 +1113,7 @@ You can use one or both workflows:
 
   ```bash
   pre-commit install
-  pre-commit run --all-files
+  pre-commit run --hook-stage pre-push --all-files
   ```
 
 - Custom git hooks shipped with this repo:
@@ -1105,6 +1122,14 @@ You can use one or both workflows:
   cd src
   python -m tools.install_precommit_hook
   ```
+
+Both workflows call the same shared scripts:
+
+- commit stage: staged-file hygiene only
+- push stage: fast static checks plus `pytest -m "not slow and not e2e"`
+
+The push-stage gate also validates the checked-in GitHub workflow YAML and
+keeps the CI/static tooling path aligned with the checked-in scripts.
 
 ### Markdown Linting (Optional)
 

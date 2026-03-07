@@ -12,10 +12,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  quality:
-    name: Quality Checks
+  static-quality:
+    name: Static Quality Checks
     runs-on: macos-15
-    timeout-minutes: 10
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -31,18 +31,19 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '22'
-          package-manager-cache: false
+
+      - name: Install shellcheck
+        run: brew install shellcheck
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e src/.[dev]
+          pip install -e "src/.[dev]"
+          pip install nanobind
           npm install --prefix src
           
       - name: Generate MLX stubs for mypy
         run: |
-          # Install nanobind for stub generation (MLX's approach)
-          pip install nanobind
           STUB_ROOT="$(mktemp -d)"
           GENERATED_STUB=""
 
@@ -69,16 +70,53 @@ jobs:
 
           rm -rf "$STUB_ROOT"
 
-      - name: Run quality checks
+      - name: Run static quality checks
         env:
           CI: true
         run: bash src/tools/run_quality_checks.sh
 
-      - name: Upload quality check logs on failure
+      - name: Upload static-quality artifacts on failure
         if: failure()
         uses: actions/upload-artifact@v6
         with:
-          name: quality-check-logs
+          name: static-quality-artifacts
           path: |
-            src/output/*.log
+            src/output/**
+            src/.pytest_cache/**
+            src/.coverage*
+            src/*.xml
+          retention-days: 7
+
+  runtime-smoke:
+    name: Runtime Smoke
+    runs-on: macos-15
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e "src/.[dev]"
+
+      - name: Run runtime smoke
+        env:
+          CI: true
+        run: bash src/tools/run_runtime_smoke.sh
+
+      - name: Upload runtime-smoke artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: runtime-smoke-artifacts
+          path: |
+            src/output/**
           retention-days: 7

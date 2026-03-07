@@ -38,6 +38,26 @@ class _FakeModel:
         return []
 
 
+class _FakeMxRuntime:
+    """Minimal MLX runtime stand-in for mock-based generation tests."""
+
+    @staticmethod
+    def synchronize() -> None:
+        return None
+
+    @staticmethod
+    def get_active_memory() -> float:
+        return 0.0
+
+    @staticmethod
+    def get_cache_memory() -> float:
+        return 0.0
+
+    @staticmethod
+    def eval(_params: object) -> None:
+        return None
+
+
 def _build_params(image_path: Path) -> check_models.ProcessImageParams:
     """Return default ProcessImageParams for testing."""
     return check_models.ProcessImageParams(
@@ -210,10 +230,7 @@ class TestProcessImageWithModelMock:
             patch.object(check_models, "_run_model_preflight_validators"),
             patch.object(check_models, "apply_chat_template", return_value="formatted prompt"),
             patch.object(check_models, "generate", return_value=fake_generation) as mock_generate,
-            patch.object(check_models.mx, "synchronize"),
-            patch.object(check_models.mx, "get_active_memory", return_value=0.0),
-            patch.object(check_models.mx, "get_cache_memory", return_value=0.0),
-            patch.object(check_models.mx, "eval"),
+            patch.object(check_models, "mx", _FakeMxRuntime()),
         ):
             result = check_models._run_model_generation(params)
 
@@ -256,10 +273,7 @@ class TestProcessImageWithModelMock:
                 return_value="formatted prompt",
             ) as mock_template,
             patch.object(check_models, "generate", return_value=fake_generation) as mock_generate,
-            patch.object(check_models.mx, "synchronize"),
-            patch.object(check_models.mx, "get_active_memory", return_value=0.0),
-            patch.object(check_models.mx, "get_cache_memory", return_value=0.0),
-            patch.object(check_models.mx, "eval"),
+            patch.object(check_models, "mx", _FakeMxRuntime()),
         ):
             result = check_models._run_model_generation(params)
 

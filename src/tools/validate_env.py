@@ -308,16 +308,20 @@ def check_pip_consistency() -> bool:
 
 
 def check_git_hooks() -> bool:
-    """Check if pre-commit hooks are installed."""
+    """Check if commit/push git hooks are installed."""
     repo_root = Path(__file__).resolve().parents[2]
-    hook_path = repo_root / ".git" / "hooks" / "pre-commit"
+    hooks_dir = repo_root / ".git" / "hooks"
+    required_hooks = ("pre-commit", "pre-push")
+    missing_hooks = [name for name in required_hooks if not (hooks_dir / name).exists()]
 
-    if hook_path.exists():
-        logger.info("✓ Git pre-commit hook installed")
+    if not missing_hooks:
+        logger.info("✓ Git commit/push hooks installed")
         return True
 
-    logger.warning("⚠ Git pre-commit hook NOT installed")
-    logger.warning("  Install with: python -m tools.install_precommit_hook")
+    logger.warning("⚠ Git hook(s) missing: %s", ", ".join(missing_hooks))
+    logger.warning("  Install with either:")
+    logger.warning("    python -m tools.install_precommit_hook")
+    logger.warning("    pre-commit install")
     return False
 
 
@@ -341,7 +345,7 @@ def check_precommit_framework() -> bool:
         logger.info("✓ pre-commit framework configured")
         return True
 
-    logger.warning("⚠ pre-commit hooks not installed")
+    logger.warning("⚠ pre-commit framework hooks not installed")
     logger.warning("  Run: pre-commit install")
     return False
 
@@ -422,7 +426,7 @@ def main() -> int:
         # Git hooks
         logger.info("\nChecking git hooks...")
         if not check_git_hooks():
-            issues.append("Git pre-commit hook not installed")
+            issues.append("Git commit/push hooks not installed")
 
         # Pre-commit framework
         logger.info("\nChecking pre-commit framework...")
