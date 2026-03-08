@@ -109,6 +109,37 @@ def test_metrics_mode_compact_smoke(caplog: pytest.LogCaptureFixture) -> None:
     assert timing_lines, "Expected Timing line in compact mode logs"
 
 
+def test_metrics_mode_compact_surfaces_runtime_hints(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Compact mode should surface prep, first-token, and abnormal stop hints."""
+    caplog.set_level(logging.INFO)
+    res = PerformanceResult(
+        model_name="dummy/model",
+        generation=_StubGeneration(),
+        success=True,
+        generation_time=1.0,
+        model_load_time=0.5,
+        total_time=1.8,
+        runtime_diagnostics=RuntimeDiagnostics(
+            input_validation_time_s=0.05,
+            model_load_time_s=0.5,
+            prompt_prep_time_s=0.15,
+            decode_time_s=1.0,
+            cleanup_time_s=0.1,
+            first_token_latency_s=0.3,
+            stop_reason="timeout",
+        ),
+    )
+
+    print_model_result(res, verbose=True, detailed_metrics=False)
+
+    messages = "\n".join(record.message for record in caplog.records)
+    assert "prep=0.15s" in messages
+    assert "first=0.30s" in messages
+    assert "stop=timeout" in messages
+
+
 def test_metrics_mode_detailed_smoke(caplog: pytest.LogCaptureFixture) -> None:
     """Detailed mode should emit token lines plus Performance Metrics header."""
     caplog.set_level(logging.INFO)

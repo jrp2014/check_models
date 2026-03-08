@@ -38,3 +38,6 @@ def test_cli_help_output(help_flag: str, capsys: pytest.CaptureFixture[str]) -> 
     assert "--thinking-budget" in output
     assert "--thinking-start-token" in output
     assert "--thinking-end-token" in output
+    assert "--detailed-metrics" in output
+    assert "ignored unless" in output
+    assert "--verbose" in output

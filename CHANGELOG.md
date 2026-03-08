@@ -8,6 +8,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Made captured timing data easier to see in default outputs by adding compact
+  per-model runtime hints to `check_models.log` and a short aggregate timing
+  snapshot to the Markdown/HTML/diagnostics report summaries.
+- Clarified `--detailed-metrics` behavior in CLI/docs and now warn when it is
+  provided without `--verbose`, since that combination otherwise falls back to
+  compact output.
+
 ## [0.3.0] - 2026-03-07
 
 - Hardened local hook and CI quality workflows:

@@ -81,5 +81,7 @@
   // Prefer a TOML formatter extension; recommend "bungcip.better-toml" in extensions.json
   "[toml]": {
     "editor.defaultFormatter": "tamasfe.even-better-toml"
-  }
+  },
+  "python-envs.defaultEnvManager": "ms-python.python:conda",
+  "python-envs.defaultPackageManager": "ms-python.python:conda"
 }

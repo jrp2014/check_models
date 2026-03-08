@@ -137,6 +137,8 @@ class TestCliArgumentNormalization:
             "repetition_penalty": None,
             "max_kv_size": None,
             "kv_bits": None,
+            "verbose": False,
+            "detailed_metrics": False,
             "resize_shape": None,
             "eos_tokens": None,
             "processor_kwargs": None,
@@ -196,3 +198,14 @@ class TestCliArgumentNormalization:
 
         with pytest.raises(ValueError, match="thinking_end_token must be non-empty"):
             validate_cli_arguments(args)
+
+    def test_detailed_metrics_without_verbose_warns(
+        self,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """Detailed metrics should warn when requested without verbose mode."""
+        args = self._build_args(detailed_metrics=True, verbose=False)
+
+        validate_cli_arguments(args)
+
+        assert "has no effect unless --verbose is also set" in caplog.text

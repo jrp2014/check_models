@@ -761,6 +761,12 @@ class RuntimeAnalysisSummary(TypedDict):
     phase_totals: dict[RuntimePhaseName, float]
     dominant_counts: dict[RuntimePhaseName, int]
     termination_counts: dict[str, int]
+    validation_total: float
+    validation_models: int
+    first_token_latency_avg: float | None
+    first_token_latency_min: float | None
+    first_token_latency_max: float | None
+    first_token_latency_models: int
 
 
 class ModelIssueSummary(TypedDict, total=False):
@@ -6214,6 +6220,9 @@ def _build_runtime_analysis_summary(
     dominant_counts: Counter[RuntimePhaseName] = Counter()
     termination_counts: Counter[str] = Counter()
     measured_models = 0
+    validation_total = 0.0
+    validation_models = 0
+    first_token_latencies: list[float] = []
 
     for result in results:
         runtime = result.runtime_diagnostics
@@ -6224,6 +6233,14 @@ def _build_runtime_analysis_summary(
             dominant_counts[dominant_phase] += 1
             for phase, duration in phase_durations.items():
                 phase_totals[phase] += duration
+        if runtime is not None:
+            validation_time = runtime.input_validation_time_s
+            if isinstance(validation_time, int | float) and float(validation_time) > 0.0:
+                validation_total += float(validation_time)
+                validation_models += 1
+            first_token_latency = runtime.first_token_latency_s
+            if isinstance(first_token_latency, int | float) and float(first_token_latency) > 0.0:
+                first_token_latencies.append(float(first_token_latency))
         stop_reason = runtime.stop_reason if runtime is not None else None
         if stop_reason:
             termination_counts[stop_reason] += 1
@@ -6248,6 +6265,10 @@ def _build_runtime_analysis_summary(
             "so some totals may be dominated by interrupted runs."
         )
 
+    first_token_latency_avg = (
+        sum(first_token_latencies) / len(first_token_latencies) if first_token_latencies else None
+    )
+
     return {
         "dominant_phase": dominant_phase,
         "dominant_phase_share": dominant_phase_share,
@@ -6258,12 +6279,54 @@ def _build_runtime_analysis_summary(
         "phase_totals": phase_totals,
         "dominant_counts": dict(dominant_counts),
         "termination_counts": dict(termination_counts),
+        "validation_total": validation_total,
+        "validation_models": validation_models,
+        "first_token_latency_avg": first_token_latency_avg,
+        "first_token_latency_min": min(first_token_latencies) if first_token_latencies else None,
+        "first_token_latency_max": max(first_token_latencies) if first_token_latencies else None,
+        "first_token_latency_models": len(first_token_latencies),
     }
 
 
 def _format_runtime_phase_duration(value: float) -> str:
     """Format runtime phase durations consistently for report summaries."""
     return format_overall_runtime(value)
+
+
+def _format_runtime_timing_snapshot_lines(runtime_analysis: RuntimeAnalysisSummary) -> list[str]:
+    """Build concise aggregate timing bullets for optional runtime signals."""
+    lines: list[str] = []
+
+    validation_models = runtime_analysis["validation_models"]
+    validation_total = runtime_analysis["validation_total"]
+    if validation_models > 0 and validation_total > 0.0:
+        validation_avg = validation_total / validation_models
+        lines.append(
+            "- **Validation overhead:** "
+            f"{_format_runtime_phase_duration(validation_total)} total "
+            f"(avg {_format_runtime_phase_duration(validation_avg)} across "
+            f"{validation_models} model(s)).",
+        )
+
+    first_token_models = runtime_analysis["first_token_latency_models"]
+    first_token_avg = runtime_analysis["first_token_latency_avg"]
+    first_token_min = runtime_analysis["first_token_latency_min"]
+    first_token_max = runtime_analysis["first_token_latency_max"]
+    if (
+        first_token_models > 0
+        and first_token_avg is not None
+        and first_token_min is not None
+        and first_token_max is not None
+    ):
+        lines.append(
+            "- **First-token latency:** "
+            f"Avg {_format_runtime_phase_duration(first_token_avg)} | "
+            f"Min {_format_runtime_phase_duration(first_token_min)} | "
+            f"Max {_format_runtime_phase_duration(first_token_max)} "
+            f"across {first_token_models} model(s).",
+        )
+
+    return lines
 
 
 def _format_runtime_analysis_lines(runtime_analysis: RuntimeAnalysisSummary) -> list[str]:
@@ -6733,11 +6796,25 @@ def _format_aggregate_statistics(
                 for line in _format_runtime_analysis_lines(runtime_analysis)
             )
             parts.append("</ul>")
+            timing_snapshot_lines = _format_runtime_timing_snapshot_lines(runtime_analysis)
+            if timing_snapshot_lines:
+                parts.append("<p><b>Additional timing signals:</b></p><ul>")
+                parts.extend(
+                    f"<li>{html.escape(line.removeprefix('- '))}</li>"
+                    for line in timing_snapshot_lines
+                )
+                parts.append("</ul>")
         else:
             parts.append("### ⏱ Runtime Interpretation")
             parts.append("")
             parts.extend(_format_runtime_analysis_lines(runtime_analysis))
             parts.append("")
+            timing_snapshot_lines = _format_runtime_timing_snapshot_lines(runtime_analysis)
+            if timing_snapshot_lines:
+                parts.append("### ⏱ Timing Snapshot")
+                parts.append("")
+                parts.extend(timing_snapshot_lines)
+                parts.append("")
     return parts
 
 
@@ -8464,6 +8541,7 @@ def _diagnostics_coverage_and_runtime_section(
                 f"{reason}={count}" for reason, count in sorted(termination_counts.items())
             )
             parts.append(f"- **Observed stop reasons:** {termination_summary}")
+        parts.extend(_format_runtime_timing_snapshot_lines(runtime_analysis))
         parts.append(f"- **What this likely means:** {runtime_analysis['interpretation']}")
         parts.append(f"- **Suggested next action:** {runtime_analysis['next_action']}")
 
@@ -10329,6 +10407,12 @@ def validate_cli_arguments(args: argparse.Namespace) -> None:
     )
     _validate_thinking_params(args)
 
+    if bool(getattr(args, "detailed_metrics", False)) and not bool(getattr(args, "verbose", False)):
+        logger.warning(
+            "--detailed-metrics has no effect unless --verbose is also set; "
+            "continuing with compact metrics output.",
+        )
+
 
 def validate_image_accessible(*, image_path: str | Path) -> None:
     """Validate image file is accessible and supported.
@@ -12138,6 +12222,7 @@ def _log_compact_metrics(res: PerformanceResult) -> None:
     total_time = getattr(res, "total_time", None)
     gen_time = getattr(res, "generation_time", None)
     load_time = getattr(res, "model_load_time", None)
+    runtime = res.runtime_diagnostics
     peak_mem = getattr(gen, "peak_memory", None) or 0.0
     prompt_tokens = getattr(gen, "prompt_tokens", 0) or 0
     gen_tokens = getattr(gen, "generation_tokens", 0) or 0
@@ -12152,6 +12237,15 @@ def _log_compact_metrics(res: PerformanceResult) -> None:
             sub_parts.append(f"gen={_format_time_seconds(gen_time)}")
         if load_time is not None:
             sub_parts.append(f"load={_format_time_seconds(load_time)}")
+        if runtime is not None:
+            prompt_prep_time = runtime.prompt_prep_time_s
+            if prompt_prep_time is not None and prompt_prep_time > 0:
+                sub_parts.append(f"prep={_format_time_seconds(prompt_prep_time)}")
+            first_token_latency = runtime.first_token_latency_s
+            if first_token_latency is not None and first_token_latency > 0:
+                sub_parts.append(f"first={_format_time_seconds(first_token_latency)}")
+            if runtime.stop_reason and runtime.stop_reason != "completed":
+                sub_parts.append(f"stop={runtime.stop_reason}")
         breakdown = f" ({', '.join(sub_parts)})" if sub_parts else ""
         timing_parts.append(f"{_format_time_seconds(total_time)} total{breakdown}")
 
@@ -14944,7 +15038,7 @@ def main_cli() -> None:
         "--detailed-metrics",
         action="store_true",
         default=False,
-        help="Show expanded multi-line metrics block (verbose mode only).",
+        help=("Show expanded multi-line metrics block; ignored unless --verbose is also set."),
     )
     parser.add_argument(
         "-x",

@@ -819,7 +819,7 @@ class TestDiagnosticsReport:
                 prompt_prep_time_s=0.15,
                 decode_time_s=0.8,
                 cleanup_time_s=0.1,
-                first_token_latency_s=None,
+                first_token_latency_s=0.25,
                 stop_reason="completed",
             ),
         )
@@ -846,6 +846,8 @@ class TestDiagnosticsReport:
         assert "Runtime aggregates: unavailable" not in content
         assert "**Runtime note:**" in content
         assert "**Dominant runtime phase:**" in content
+        assert "**Validation overhead:**" in content
+        assert "**First-token latency:**" in content
         assert "**What this likely means:**" in content
         assert "**Suggested next action:**" in content
 
