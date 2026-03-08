@@ -22,7 +22,10 @@ Notable changes to this project will be documented in this file.
     CI to Ubuntu with path filters, and split GitHub Actions into
     `static-quality` and `runtime-smoke` jobs;
   - ensured the static-quality path creates a repo-root `typings/` directory so
-    `ty` can consume the configured extra search path on fresh CI checkouts.
+    `ty` can consume the configured extra search path on fresh CI checkouts;
+  - aligned active contributor/implementation documentation with the split
+    commit/push hooks, static-vs-runtime CI separation, stub preflight, and
+    current markdownlint enforcement behavior.
 - Expanded verbose CLI detailed metrics output to include additional runtime
   phase timings (`input_validation`, `prompt_prep`, `cleanup`,
   `first_token_latency`) plus `stop_reason` when that metadata is available.

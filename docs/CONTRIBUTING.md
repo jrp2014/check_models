@@ -160,30 +160,31 @@ The project uses several automated quality checks:
    make quality     # Runs ruff + mypy + ty + pyrefly + pytest + shellcheck + markdownlint
    ```
 
-5. **Markdown linting** (optional):
+5. **Markdown linting**:
 
-   `make quality` attempts markdownlint via local binary, global binary, or `npx`.
+   `make quality` runs markdownlint via the repo-local install, a global
+   `markdownlint-cli2`, or an `npx --no-install` fallback. If none of those are
+   available, the quality gate fails.
 
    ```bash
    # Install markdown linting (requires Node.js/npm)
    make install-markdownlint
 
-   # Or run via npx (on-demand download)
-   npx markdownlint-cli2 '**/*.md'
+   # Or run via npx when markdownlint-cli2 is already available to npx
+   npx --no-install markdownlint-cli2 '**/*.md'
    ```
-
-   If neither npm nor npx is available, markdown linting is gracefully skipped with a warning.
 
 ### Git Hooks
 
 Two supported hook workflows:
 
 - **pre-commit framework** (`pre-commit install`):
-  - Runs checks from `.pre-commit-config.yaml`
-  - Includes the repository quality hook (`src/tools/run_quality_checks.sh`)
+  - Installs the checked-in `pre-commit` and `pre-push` hooks from `.pre-commit-config.yaml`
+  - **Pre-commit**: runs staged hygiene via `src/tools/run_commit_hygiene.sh`
+  - **Pre-push**: runs fast checks via `src/tools/check_quality_simple.sh`
 - **Custom repo hooks** (`cd src && python -m tools.install_precommit_hook`):
   - **Pre-commit**: formats Python files, fixes markdown when possible, and syncs README deps when `src/pyproject.toml` changes
-  - **Pre-push**: runs fast checks via `src/tools/check_quality_simple.sh` (ruff format check + lint + mypy + pyrefly)
+  - **Pre-push**: runs workflow YAML validation, dependency sync verification, Ruff format check + lint, mypy, ty, pyrefly, and `pytest -m "not slow and not e2e"`
 
 To bypass hooks (not recommended):
 

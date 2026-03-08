@@ -65,6 +65,7 @@ python -m check_models --dry-run
 - **Smart Prompting**: Generates structured cataloguing prompts (Title/Description/Keywords) that verify metadata against clearly visible image content, avoid speculation, and compact long metadata fields/keyword lists to keep prompt size manageable; `--prompt` overrides
 - **Performance Metrics**:
   - Timing: generation_time, model_load_time, total_time
+  - Detailed verbose timing: input validation, prompt prep, cleanup, first-token latency, stop reason (when available)
   - Tokens: total, prompt, generated with tokens/sec
   - Memory: peak, active delta, cached delta (GB)
 - **Structured Logging**: Formatter-driven styling with LogStyles for consistent CLI output
@@ -88,7 +89,7 @@ python -m check_models --dry-run
 | Robustness | Per‑model isolation; failures logged; SUMMARY lines for automation. |
 | Timeout | Signal‑based (UNIX) manager; configurable per run. |
 | Output preview | Non‑verbose mode still shows wrapped generated text (80 cols). |
-| Metrics modes | Compact (default) or expanded with `--detailed-metrics`. |
+| Metrics modes | Compact (default) or expanded with `--detailed-metrics`, including extra phase timings in verbose mode when available. |
 
 ## Installation and Environment Setup
 

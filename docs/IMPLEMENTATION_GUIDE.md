@@ -131,10 +131,10 @@ make stubs
 python -m tools.generate_stubs mlx_lm mlx_vlm tokenizers
 ```
 
-Or use the quality check with stub generation:
+Or use the quality check with stub preflight:
 
 ```bash
-make quality  # Runs a stub preflight to refresh local typings before type checks
+make quality  # Validates existing typings/ coverage before type checks
 ```
 
 ## Code Standards
@@ -387,23 +387,25 @@ The project uses `markdownlint-cli2` to ensure consistent markdown formatting ac
 - Ensures consistent formatting across all `.md` files
 - Catches common markdown mistakes
 - Enforces best practices (blank lines, heading structure, etc.)
-- Runs automatically in `make quality` if available
+- Runs automatically in `make quality`
 
 **Installation**:
 
 1. **Option 1: Install Node.js/npm (Recommended)**
    - Install Node.js (via Homebrew `brew install node` or [nodejs.org](https://nodejs.org/)).
    - Run `make install-markdownlint` in the `src/` directory.
-2. **Option 2: Use npx (No Installation)**
-   - If you have npm but don't want local packages, use `npx markdownlint-cli2 '**/*.md'`.
+2. **Option 2: Use a pre-existing npx resolution**
+   - If `markdownlint-cli2` is already available to `npx`, use
+     `npx --no-install markdownlint-cli2 '**/*.md'`.
 3. **Option 3: Skip**
-   - If Node.js is missing, linting is skipped with a warning. CI will still check it.
+   - Not recommended: `make quality` fails when markdownlint is unavailable.
+     `make quality-strict` exists for an earlier explicit availability check.
 
 **Usage**:
 
 ```bash
-make quality          # Includes markdown linting if available
-make quality-strict   # Requires markdown linting (fails if unavailable)
+make quality          # Includes markdown linting and fails if it cannot run
+make quality-strict   # Verifies markdownlint availability before the full gate
 ```
 
 **Configuration**:
