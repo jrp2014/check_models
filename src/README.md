@@ -232,9 +232,12 @@ The tool generates multiple report formats in `output/` by default:
 - **CLI**: Real-time colorized progress and metrics.
 - **HTML** (`results.html`): Interactive table with sortable columns and failed row highlighting.
 - **Markdown** (`results.md`): GitHub-compatible summary for documentation.
+- **Gallery Markdown** (`model_gallery.md`): GitHub-compatible review artifact with image metadata, the full prompt, and one full-output section per model.
 - **TSV/JSONL** (`results.tsv`, `results.jsonl`): Machine-readable formats for analysis.
 - **Diagnostics** (`diagnostics.md`): Failure-focused issue report (generated only when needed).
 - **History** (`results.history.jsonl`): Append-only run history for regressions/recoveries.
+
+The main Markdown report keeps its embedded Model Gallery section for continuity, and also points to the standalone `model_gallery.md` artifact when that dedicated review file is generated.
 
 ### Metrics Explained
 
@@ -789,6 +792,7 @@ See module docstrings and `__all__` exports for complete API reference.
 | `-i`, `--image` | Path | (none) | Path to a specific image file to process directly. |
 | `--output-html` | Path | `output/results.html` | HTML report output filename. |
 | `--output-markdown` | Path | `output/results.md` | Markdown report output filename. |
+| `--output-gallery-markdown` | Path | `output/model_gallery.md` | Standalone Markdown gallery artifact for qualitative output review. |
 | `--output-tsv` | Path | `output/results.tsv` | TSV (tab-separated values) report output filename. |
 | `--output-jsonl` | Path | `output/results.jsonl` | JSONL report output filename. |
 | `--output-log` | Path | `output/check_models.log` | Command line output log filename. |
@@ -891,6 +895,18 @@ GitHub-compatible format with:
 - Model outputs
 - System and library version information
 - Easy integration into documentation
+
+The main report also points to the standalone `model_gallery.md` artifact when it is
+generated, so reviewers can switch to the dedicated model-by-model output view.
+
+### Gallery Markdown Report
+
+GitHub-compatible qualitative review artifact with:
+
+- Populated image metadata fields when present (title, description, keywords, date, time, GPS)
+- The full prompt in a fenced `text` block
+- One easy-to-scan section per model with full generated output
+- Existing success/failure gallery formatting reused from the main report path
 
 ### TSV Report
 
@@ -1058,6 +1074,7 @@ check_models/
 │   └── output/              # Generated outputs (git-ignored)
 │       ├── results.html
 │       ├── results.md
+│       ├── model_gallery.md
 │       ├── results.tsv
 │       ├── results.jsonl
 │       ├── results.history.jsonl
@@ -1070,8 +1087,9 @@ check_models/
 ```
 
 **Output behaviour**: By default, outputs are written to `src/output/` (git-ignored).
-Override with `--output-html`, `--output-markdown`, `--output-tsv`, `--output-jsonl`,
-`--output-log`, `--output-env`, and `--output-diagnostics`.
+Override with `--output-html`, `--output-markdown`, `--output-gallery-markdown`,
+`--output-tsv`, `--output-jsonl`, `--output-log`, `--output-env`, and
+`--output-diagnostics`.
 
 ## Contributing
 

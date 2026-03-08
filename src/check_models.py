@@ -843,6 +843,25 @@ class DiagnosticsArtifacts:
     repro_bundles: Mapping[str, Path] = dataclasses.field(default_factory=dict)
 
 
+@dataclass(frozen=True)
+class ReportGenerationInputs:
+    """Inputs required to generate final report artifacts and log their paths."""
+
+    args: argparse.Namespace
+    results: list[PerformanceResult]
+    library_versions: LibraryVersionDict
+    prompt: str
+    metadata: MetadataDict | None
+    overall_time: float
+    image_path: Path | None
+    system_info: dict[str, str]
+    report_context: ReportRenderContext
+    jsonl_output_path: Path
+    log_output_path: Path
+    env_output_path: Path
+    gallery_md_output_path: Path
+
+
 @runtime_checkable
 class SupportsGenerationResult(Protocol):  # Minimal attributes we read from GenerationResult
     """Structural subset of GenerationResult accessed by this script.
@@ -881,6 +900,7 @@ DEFAULT_FOLDER: Final[Path] = Path.home() / "Pictures" / "Processed"
 _SCRIPT_DIR = Path(__file__).parent
 DEFAULT_HTML_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.html"
 DEFAULT_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.md"
+DEFAULT_GALLERY_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "model_gallery.md"
 DEFAULT_TSV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.tsv"
 DEFAULT_LOG_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "check_models.log"
 DEFAULT_JSONL_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.jsonl"
@@ -9629,8 +9649,7 @@ def _generate_model_gallery_section(
     md: list[str] = []
     md.append("## Model Gallery")
     md.append("")
-    md.append("Full output from each model:")
-    md.append("")
+    md.append("Full generated output by model:")
     md.append("")
     md.append("<!-- markdownlint-disable MD013 MD033 -->")
     md.append("")
@@ -9651,6 +9670,45 @@ def _generate_model_gallery_section(
     md.append("<!-- markdownlint-enable MD013 MD033 -->")
     md.append("")
     return md
+
+
+def _format_gallery_metadata_section(metadata: MetadataDict | None) -> list[str]:
+    """Format populated image metadata fields for the markdown gallery artifact."""
+    if not metadata:
+        return []
+
+    metadata_fields = (
+        ("Title", metadata.get("title")),
+        ("Description", metadata.get("description")),
+        ("Keywords", metadata.get("keywords")),
+        ("Date", metadata.get("date")),
+        ("Time", metadata.get("time")),
+        ("GPS", metadata.get("gps")),
+    )
+    populated_fields = [(label, value) for label, value in metadata_fields if value]
+    if not populated_fields:
+        return []
+
+    md = ["## Image Metadata", ""]
+    for label, value in populated_fields:
+        md.append(f"- **{label}**: {value}")
+    md.append("")
+    return md
+
+
+def _build_markdown_gallery_link(
+    *,
+    report_filename: Path,
+    gallery_filename: Path | None,
+) -> str | None:
+    """Build a relative markdown link to the standalone gallery artifact."""
+    if gallery_filename is None:
+        return None
+    try:
+        relative_path = os.path.relpath(gallery_filename, start=report_filename.parent)
+    except ValueError:
+        relative_path = str(gallery_filename)
+    return f"[{relative_path}]({relative_path.replace(' ', '%20')})"
 
 
 def _generate_markdown_table_section(report_context: ReportRenderContext) -> list[str]:
@@ -9719,6 +9777,7 @@ def generate_markdown_report(
     prompt: str,
     total_runtime_seconds: float,
     report_context: ReportRenderContext | None = None,
+    gallery_filename: Path | None = None,
 ) -> None:
     """Write a GitHub-friendly Markdown summary with aligned pipe table.
 
@@ -9729,6 +9788,7 @@ def generate_markdown_report(
         prompt: Prompt used for the run.
         total_runtime_seconds: Total wall-clock runtime for the full run.
         report_context: Optional cached shared report context built in finalization.
+        gallery_filename: Optional standalone gallery artifact path to link from results.md.
     """
     if not results:
         log_warning_note("No results to generate Markdown report.")
@@ -9781,6 +9841,16 @@ def generate_markdown_report(
     md.extend(table_md)
 
     # --- Model Gallery Section ---
+    gallery_link = _build_markdown_gallery_link(
+        report_filename=filename,
+        gallery_filename=gallery_filename,
+    )
+    if gallery_link is not None:
+        md.append(
+            f"**Dedicated review artifact:** See {gallery_link} for the standalone "
+            "model-by-model output view.",
+        )
+        md.append("")
     md.extend(_generate_model_gallery_section(report_context))
 
     md.append("---")
@@ -9818,6 +9888,57 @@ def generate_markdown_report(
     except ValueError:
         logger.exception(
             "A value error occurred while writing Markdown report %s",
+            str(filename),
+        )
+
+
+def generate_markdown_gallery_report(
+    results: list[PerformanceResult],
+    filename: Path,
+    prompt: str,
+    metadata: MetadataDict | None = None,
+    report_context: ReportRenderContext | None = None,
+) -> None:
+    """Write a review-focused markdown artifact with metadata, prompt, and full outputs."""
+    if not results:
+        log_warning_note("No results to generate Markdown gallery report.")
+        return
+
+    if report_context is None:
+        report_context = _build_report_render_context(results=results, prompt=prompt)
+
+    md: list[str] = []
+    md.append("# Model Output Gallery")
+    md.append("")
+    md.append(f"_Generated on {local_now_str()}_")
+    md.append("")
+    md.append(
+        "A review-friendly artifact with image metadata, the source prompt, and full "
+        "generated output for each model.",
+    )
+    md.append("")
+    md.extend(_format_gallery_metadata_section(metadata))
+    md.append("## Prompt")
+    md.append("")
+    md.append("```text")
+    md.extend(prompt.split("\n"))
+    md.append("```")
+    md.append("")
+    md.extend(_generate_model_gallery_section(report_context))
+
+    markdown_content = normalize_markdown_trailing_spaces("\n".join(md)) + "\n"
+
+    try:
+        with filename.open("w", encoding="utf-8") as f:
+            f.write(markdown_content)
+    except OSError:
+        logger.exception(
+            "Failed to write Markdown gallery report to file %s.",
+            str(filename),
+        )
+    except ValueError:
+        logger.exception(
+            "A value error occurred while writing Markdown gallery report %s",
             str(filename),
         )
 
@@ -12724,25 +12845,33 @@ def _build_cataloguing_prompt(metadata: MetadataDict) -> str:
         "",
         "Return exactly these three sections, and nothing else:",
         "",
-        "Title: 5-10 words, concrete and factual, limited to clearly visible content.",
+        "Title:",
+        "- 5-10 words, concrete and factual, limited to clearly visible content.",
+        "- Output only the title text after the label.",
+        "- Do not repeat or paraphrase these instructions in the title.",
         "",
+        "Description:",
         (
-            "Description: 1-2 factual sentences describing the main visible subject, "
+            "- 1-2 factual sentences describing the main visible subject, "
             "setting, lighting, action, and other distinctive visible details. Omit "
             "anything uncertain or inferred."
         ),
+        "- Output only the description text after the label.",
         "",
+        "Keywords:",
         (
-            "Keywords: 10-18 unique comma-separated terms based only on clearly visible "
+            "- 10-18 unique comma-separated terms based only on clearly visible "
             "subjects, setting, colors, composition, and style. Omit uncertain tags "
             "rather than guessing."
         ),
+        "- Output only the keyword list after the label.",
         "",
         "Rules:",
         "- Include only details that are definitely visible in the image.",
         "- Reuse metadata terms only when they are clearly supported by the image.",
         "- If metadata and image disagree, follow the image.",
         "- Prefer omission to speculation.",
+        "- Do not copy prompt instructions into the Title, Description, or Keywords fields.",
         (
             "- Do not infer identity, location, event, brand, species, time period, "
             "or intent unless visually obvious."
@@ -14565,6 +14694,90 @@ def _write_environment_failure_diagnostics(
         log_file_path(diagnostics_path, label="   Diagnostics:  ")
 
 
+def _generate_reports_and_log_outputs(
+    inputs: ReportGenerationInputs,
+) -> None:
+    """Generate reports and log the emitted artifact paths."""
+    report_jobs: tuple[tuple[str, Callable[[], None]], ...] = (
+        (
+            "html",
+            lambda: generate_html_report(
+                results=inputs.results,
+                filename=inputs.args.output_html,
+                versions=inputs.library_versions,
+                prompt=inputs.prompt,
+                total_runtime_seconds=inputs.overall_time,
+                image_path=inputs.image_path,
+                report_context=inputs.report_context,
+            ),
+        ),
+        (
+            "markdown",
+            lambda: generate_markdown_report(
+                results=inputs.results,
+                filename=inputs.args.output_markdown,
+                versions=inputs.library_versions,
+                prompt=inputs.prompt,
+                total_runtime_seconds=inputs.overall_time,
+                report_context=inputs.report_context,
+                gallery_filename=inputs.gallery_md_output_path,
+            ),
+        ),
+        (
+            "markdown_gallery",
+            lambda: generate_markdown_gallery_report(
+                results=inputs.results,
+                filename=inputs.args.output_gallery_markdown,
+                prompt=inputs.prompt,
+                metadata=inputs.metadata,
+                report_context=inputs.report_context,
+            ),
+        ),
+    )
+
+    try:
+        for report_name, report_job in report_jobs:
+            try:
+                report_job()
+            except (OSError, ValueError) as err:
+                logger.exception("Failed to generate %s report.", report_name)
+                _write_report_failure_jsonl(
+                    filename=inputs.jsonl_output_path,
+                    failed_report=report_name,
+                    error=err,
+                )
+
+        generate_tsv_report(
+            results=inputs.results,
+            filename=inputs.args.output_tsv,
+            report_context=inputs.report_context,
+        )
+        save_jsonl_report(
+            inputs.results,
+            inputs.args.output_jsonl,
+            prompt=inputs.prompt,
+            system_info=inputs.system_info,
+        )
+
+        logger.info("")
+        log_success("Reports successfully generated:", prefix="📊")
+        report_paths = (
+            (inputs.args.output_html, "   HTML Report:"),
+            (inputs.args.output_markdown, "   Markdown Report:"),
+            (inputs.args.output_gallery_markdown, "   Gallery Report: "),
+            (inputs.args.output_tsv, "   TSV Report:   "),
+            (inputs.args.output_jsonl, "   JSONL Report: "),
+        )
+        for path, label in report_paths:
+            log_file_path(path, label=label)
+
+        log_file_path(inputs.log_output_path, label="   Log File:")
+        if inputs.env_output_path.exists():
+            log_file_path(inputs.env_output_path, label="   Environment:")
+    except (OSError, ValueError):
+        logger.exception("Failed to generate reports.")
+
+
 def finalize_execution(
     *,
     args: argparse.Namespace,
@@ -14573,6 +14786,7 @@ def finalize_execution(
     overall_start_time: float,
     prompt: str,
     image_path: Path | None = None,
+    metadata: MetadataDict | None = None,
 ) -> None:
     """Output summary statistics, generate reports, and display timing information."""
     overall_time: float = time.perf_counter() - overall_start_time
@@ -14594,6 +14808,7 @@ def finalize_execution(
         # Prepare output paths
         html_output_path: Path = args.output_html.resolve()
         md_output_path: Path = args.output_markdown.resolve()
+        gallery_md_output_path: Path = args.output_gallery_markdown.resolve()
         tsv_output_path: Path = args.output_tsv.resolve()
         jsonl_output_path: Path = args.output_jsonl.resolve()
         diagnostics_path: Path = args.output_diagnostics.resolve()
@@ -14604,75 +14819,26 @@ def finalize_execution(
 
         html_output_path.parent.mkdir(parents=True, exist_ok=True)
         md_output_path.parent.mkdir(parents=True, exist_ok=True)
+        gallery_md_output_path.parent.mkdir(parents=True, exist_ok=True)
         tsv_output_path.parent.mkdir(parents=True, exist_ok=True)
         jsonl_output_path.parent.mkdir(parents=True, exist_ok=True)
-
-        # Generate reports
-        try:
-            try:
-                generate_html_report(
-                    results=results,
-                    filename=args.output_html,
-                    versions=library_versions,
-                    prompt=prompt,
-                    total_runtime_seconds=overall_time,
-                    image_path=image_path,
-                    report_context=report_context,
-                )
-            except (OSError, ValueError) as err:
-                logger.exception("Failed to generate HTML report.")
-                _write_report_failure_jsonl(
-                    filename=jsonl_output_path,
-                    failed_report="html",
-                    error=err,
-                )
-
-            try:
-                generate_markdown_report(
-                    results=results,
-                    filename=args.output_markdown,
-                    versions=library_versions,
-                    prompt=prompt,
-                    total_runtime_seconds=overall_time,
-                    report_context=report_context,
-                )
-            except (OSError, ValueError) as err:
-                logger.exception("Failed to generate Markdown report.")
-                _write_report_failure_jsonl(
-                    filename=jsonl_output_path,
-                    failed_report="markdown",
-                    error=err,
-                )
-            generate_tsv_report(
+        _generate_reports_and_log_outputs(
+            ReportGenerationInputs(
+                args=args,
                 results=results,
-                filename=args.output_tsv,
-                report_context=report_context,
-            )
-            # New: Save JSONL report
-            save_jsonl_report(
-                results,
-                args.output_jsonl,
+                library_versions=library_versions,
                 prompt=prompt,
+                metadata=metadata,
+                overall_time=overall_time,
+                image_path=image_path,
                 system_info=system_info,
-            )
-
-            # Log file locations
-            logger.info("")
-            log_success("Reports successfully generated:", prefix="📊")
-            log_file_path(args.output_html, label="   HTML Report:")
-            log_file_path(
-                args.output_markdown,
-                label="   Markdown Report:",
-            )
-            log_file_path(args.output_tsv, label="   TSV Report:   ")
-            log_file_path(args.output_jsonl, label="   JSONL Report: ")
-
-            log_file_path(log_output_path, label="   Log File:")
-            # Include environment.log in the output file listing
-            if env_output_path.exists():
-                log_file_path(env_output_path, label="   Environment:")
-        except (OSError, ValueError):
-            logger.exception("Failed to generate reports.")
+                report_context=report_context,
+                jsonl_output_path=jsonl_output_path,
+                log_output_path=log_output_path,
+                env_output_path=env_output_path,
+                gallery_md_output_path=gallery_md_output_path,
+            ),
+        )
 
         # Append run history (append-only) and compare with previous run
         current_history = append_history_record(
@@ -14758,6 +14924,7 @@ def main(args: argparse.Namespace) -> None:
             overall_start_time=overall_start_time,
             prompt=prompt,
             image_path=image_path,
+            metadata=metadata,
         )
     except KeyboardInterrupt:
         logger.warning("Execution interrupted by user.")
@@ -14855,6 +15022,43 @@ def _handle_dry_run(
 
 def main_cli() -> None:
     """CLI entry point for the MLX VLM checker script."""
+    parser = _build_cli_parser()
+
+    # Parse arguments
+    args: argparse.Namespace = parser.parse_args()
+
+    # If neither --folder nor --image is specified, assume default folder
+    if getattr(args, "folder", None) is None and getattr(args, "image", None) is None:
+        args.folder = DEFAULT_FOLDER
+        logger.info(
+            "No --folder or --image specified. Assuming default folder: %s",
+            DEFAULT_FOLDER,
+        )
+        print_cli_section("No image or folder specified")
+        logger.info(
+            "Assuming default folder: %s. To override, specify --folder or --image.",
+            DEFAULT_FOLDER,
+        )
+        if not DEFAULT_FOLDER.exists():
+            logger.warning(
+                "Default folder does not exist: %s — create it or use --folder / --image.",
+                DEFAULT_FOLDER,
+            )
+
+    # Print all command-line arguments if verbose is set
+    if getattr(args, "verbose", False):
+        print_cli_section("Command Line Parameters")
+        for arg_name, arg_value in sorted(vars(args).items()):
+            logger.info("  %s: %s", arg_name, arg_value)
+
+    # Load quality configuration
+    load_quality_config(getattr(args, "quality_config", None))
+
+    main(args)
+
+
+def _build_cli_parser() -> argparse.ArgumentParser:
+    """Build and return the command-line parser for the CLI entry point."""
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
         description="MLX VLM Model Checker",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -14893,6 +15097,12 @@ def main_cli() -> None:
         type=Path,
         default=DEFAULT_MD_OUTPUT,
         help=_output_help("GitHub Markdown"),
+    )
+    parser.add_argument(
+        "--output-gallery-markdown",
+        type=Path,
+        default=DEFAULT_GALLERY_MD_OUTPUT,
+        help=("Output GitHub Markdown gallery filename for the standalone review artifact."),
     )
     parser.add_argument(
         "--output-tsv",
@@ -15168,38 +15378,7 @@ def main_cli() -> None:
             "Lists discovered models, the generated prompt, and image path then exits."
         ),
     )
-
-    # Parse arguments
-    args: argparse.Namespace = parser.parse_args()
-
-    # If neither --folder nor --image is specified, assume default folder
-    if getattr(args, "folder", None) is None and getattr(args, "image", None) is None:
-        args.folder = DEFAULT_FOLDER
-        logger.info(
-            "No --folder or --image specified. Assuming default folder: %s",
-            DEFAULT_FOLDER,
-        )
-        print_cli_section("No image or folder specified")
-        logger.info(
-            "Assuming default folder: %s. To override, specify --folder or --image.",
-            DEFAULT_FOLDER,
-        )
-        if not DEFAULT_FOLDER.exists():
-            logger.warning(
-                "Default folder does not exist: %s — create it or use --folder / --image.",
-                DEFAULT_FOLDER,
-            )
-
-    # Print all command-line arguments if verbose is set
-    if getattr(args, "verbose", False):
-        print_cli_section("Command Line Parameters")
-        for arg_name, arg_value in sorted(vars(args).items()):
-            logger.info("  %s: %s", arg_name, arg_value)
-
-    # Load quality configuration
-    load_quality_config(getattr(args, "quality_config", None))
-
-    main(args)
+    return parser
 
 
 if __name__ == "__main__":

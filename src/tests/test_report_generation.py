@@ -27,6 +27,7 @@ from check_models import (
     export_failure_repro_bundles,
     generate_diagnostics_report,
     generate_html_report,
+    generate_markdown_gallery_report,
     generate_markdown_report,
     generate_tsv_report,
 )
@@ -335,6 +336,69 @@ class TestMarkdownReportEdgeCases:
         assert "**Prompt used:**" in content
         assert "```text" in content
         assert "> **Prompt used:**" not in content
+
+    def test_report_links_to_dedicated_gallery_artifact(self, tmp_path: Path) -> None:
+        """Main markdown report should point readers at the standalone gallery artifact."""
+        out = tmp_path / "results.md"
+        gallery = tmp_path / "model_gallery.md"
+        generate_markdown_report(
+            results=[_make_success("org/good")],
+            filename=out,
+            versions=_stub_versions(),
+            prompt="describe",
+            total_runtime_seconds=1.0,
+            gallery_filename=gallery,
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "Dedicated review artifact:" in content
+        assert "[model_gallery.md](model_gallery.md)" in content
+
+
+class TestMarkdownGalleryReport:
+    """Coverage for the standalone markdown gallery artifact."""
+
+    def test_empty_results_does_not_write(self, tmp_path: Path) -> None:
+        """Empty result list should produce no gallery file."""
+        out = tmp_path / "model_gallery.md"
+        generate_markdown_gallery_report(
+            results=[],
+            filename=out,
+            prompt="unused",
+        )
+        assert not out.exists()
+
+    def test_gallery_includes_metadata_prompt_and_models(self, tmp_path: Path) -> None:
+        """Gallery artifact should include selected metadata, prompt, and model sections."""
+        out = tmp_path / "model_gallery.md"
+        generate_markdown_gallery_report(
+            results=[_make_success("org/good"), _make_failure("org/bad")],
+            filename=out,
+            prompt="Describe this image fully.",
+            metadata={
+                "title": "Harbor Sunset",
+                "description": "Fishing boats at dusk.",
+                "keywords": "harbor, boats, sunset",
+                "date": "2026-03-08",
+                "time": "18:42:00",
+                "gps": "51.5000, -0.1200",
+                "exif": "ignored raw blob",
+            },
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "# Model Output Gallery" in content
+        assert "## Image Metadata" in content
+        assert "**Title**: Harbor Sunset" in content
+        assert "**Description**: Fishing boats at dusk." in content
+        assert "**Keywords**: harbor, boats, sunset" in content
+        assert "**Date**: 2026-03-08" in content
+        assert "**Time**: 18:42:00" in content
+        assert "**GPS**: 51.5000, -0.1200" in content
+        assert "ignored raw blob" not in content
+        assert "## Prompt" in content
+        assert "```text" in content
+        assert "Describe this image fully." in content
+        assert "### ✅ org/good" in content
+        assert "### ❌ org/bad" in content
 
 
 # ===================================================================

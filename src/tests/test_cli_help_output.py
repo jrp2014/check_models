@@ -27,6 +27,7 @@ def test_cli_help_output(help_flag: str, capsys: pytest.CaptureFixture[str]) -> 
     assert "usage" in output.lower()
     assert "folder" in output.lower()
     assert "output-html" in output.lower()
+    assert "output-gallery-markdown" in output.lower()
     assert "temperature" in output.lower()
     assert "max-tokens" in output.lower()
     assert "models" in output.lower()

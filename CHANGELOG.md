@@ -6,8 +6,15 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- Added a standalone GitHub-compatible Markdown gallery artifact for model-output
+  review, with populated image metadata, the full prompt, and one easy-to-scan
+  section per model output.
+
 ### Changed
 
+- Tightened the default cataloguing prompt again to separate section labels from
+  instruction text, reducing the chance that weaker models copy prompt
+  instructions into the generated `Title:` field.
 - Made captured timing data easier to see in default outputs by adding compact
   per-model runtime hints to `check_models.log` and a short aggregate timing
   snapshot to the Markdown/HTML/diagnostics report summaries.

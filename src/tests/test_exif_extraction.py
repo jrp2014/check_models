@@ -224,8 +224,12 @@ def test_build_prompt_empty_metadata() -> None:
     assert "Keywords:" in prompt
     assert "Do not output reasoning" in prompt
     assert "Do not guess." in prompt
-    assert "Title: 5-10 words" in prompt
-    assert "Keywords: 10-18 unique comma-separated terms" in prompt
+    assert "- 5-10 words, concrete and factual" in prompt
+    assert "- 10-18 unique comma-separated terms" in prompt
+    assert "Do not repeat or paraphrase these instructions in the title." in prompt
+    assert (
+        "Do not copy prompt instructions into the Title, Description, or Keywords fields." in prompt
+    )
 
 
 def test_build_prompt_includes_metadata_fields() -> None:

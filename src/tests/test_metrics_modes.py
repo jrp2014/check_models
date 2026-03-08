@@ -492,6 +492,7 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
     args = argparse.Namespace(
         output_html=tmp_path / "report.html",
         output_markdown=tmp_path / "report.md",
+        output_gallery_markdown=tmp_path / "gallery.md",
         output_tsv=tmp_path / "report.tsv",
         output_jsonl=tmp_path / "report.jsonl",
         output_diagnostics=tmp_path / "diagnostics.md",
@@ -518,6 +519,7 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
         patch("check_models.get_system_characteristics", return_value={}),
         patch("check_models.generate_html_report"),
         patch("check_models.generate_markdown_report"),
+        patch("check_models.generate_markdown_gallery_report"),
         patch("check_models.generate_tsv_report"),
         patch("check_models.save_jsonl_report"),
         patch("check_models.append_history_record", return_value=history_record),
@@ -531,8 +533,10 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
             overall_start_time=time.perf_counter() - 0.5,
             prompt="test prompt",
             image_path=None,
+            metadata=None,
         )
 
     messages = [record.message for record in caplog.records]
     assert any(str(custom_log.resolve()) in msg for msg in messages)
     assert any(str(custom_env.resolve()) in msg for msg in messages)
+    assert any(str(args.output_gallery_markdown.resolve()) in msg for msg in messages)
