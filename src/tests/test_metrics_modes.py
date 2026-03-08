@@ -13,6 +13,7 @@ from check_models import (
     HistoryModelResultRecord,
     HistoryRunRecord,
     PerformanceResult,
+    RuntimeDiagnostics,
     _log_history_comparison,
     finalize_execution,
     log_summary,
@@ -118,6 +119,39 @@ def test_metrics_mode_detailed_smoke(caplog: pytest.LogCaptureFixture) -> None:
     token_lines = [r.message for r in caplog.records if "Tokens:" in r.message]
     assert token_lines, "Expected token summary lines in detailed mode"
     assert perf_lines, "Expected Performance Metrics header in detailed mode"
+
+
+def test_metrics_mode_detailed_logs_runtime_phase_details(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Detailed mode should surface extra runtime phases and stop reason."""
+    caplog.set_level(logging.INFO)
+    res = PerformanceResult(
+        model_name="dummy/model",
+        generation=_StubGeneration(),
+        success=True,
+        generation_time=1.0,
+        model_load_time=0.5,
+        total_time=1.8,
+        runtime_diagnostics=RuntimeDiagnostics(
+            input_validation_time_s=0.05,
+            model_load_time_s=0.5,
+            prompt_prep_time_s=0.15,
+            decode_time_s=1.0,
+            cleanup_time_s=0.1,
+            first_token_latency_s=0.3,
+            stop_reason="completed",
+        ),
+    )
+
+    print_model_result(res, verbose=True, detailed_metrics=True)
+
+    messages = "\n".join(record.message for record in caplog.records)
+    assert "Validation:" in messages
+    assert "Prompt prep:" in messages
+    assert "Cleanup:" in messages
+    assert "First token:" in messages
+    assert "Stop reason:" in messages
 
 
 def test_log_summary_uses_model_load_time_for_fastest_load(

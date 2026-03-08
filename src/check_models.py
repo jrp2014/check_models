@@ -11846,41 +11846,78 @@ def _log_token_summary(res: PerformanceResult) -> None:
 
 
 def _log_detailed_timings(res: PerformanceResult) -> None:
-    """Log total, generation, and model load times with tree structure."""
+    """Log detailed runtime timings and termination metadata with tree structure."""
     total_time_val = getattr(res, "total_time", None)
     generation_time_val = getattr(res, "generation_time", None)
     model_load_time_val = getattr(res, "model_load_time", None)
+    runtime = res.runtime_diagnostics
 
     if not total_time_val or total_time_val <= 0:
         return
+    total_time_seconds = float(total_time_val)
 
     log_metric_label("Timing:", emoji="⏱", indent="  ")
 
     tt_val = format_field_value("total_time", total_time_val)
     tt_disp = tt_val if isinstance(tt_val, str) else _format_time_seconds(total_time_val)
-    log_metric_tree("├─", "Total:", f"{tt_disp:>8}", indent="     ")
+    entries: list[tuple[str, str]] = [("Total:", f"{tt_disp:>8}")]
 
-    if generation_time_val and generation_time_val > 0:
-        gt_val = format_field_value("generation_time", generation_time_val)
-        gt_disp = gt_val if isinstance(gt_val, str) else _format_time_seconds(generation_time_val)
-        pct = (generation_time_val / total_time_val * 100) if total_time_val > 0 else 0
-        log_metric_tree(
-            "├─",
-            "Generation:",
-            f"{gt_disp:>8} ({pct:>3.0f}%)",
-            indent="     ",
-        )
+    def _append_phase_entry(
+        *,
+        label: str,
+        value: float | None,
+        field_name: str,
+        include_pct: bool = True,
+    ) -> None:
+        if value is None or value <= 0:
+            return
+        formatted = format_field_value(field_name, value)
+        display = formatted if isinstance(formatted, str) else _format_time_seconds(value)
+        if include_pct:
+            pct = value / total_time_seconds * 100
+            entries.append((label, f"{display:>8} ({pct:>3.0f}%)"))
+            return
+        entries.append((label, f"{display:>8}"))
 
-    if model_load_time_val and model_load_time_val > 0:
-        ml_val = format_field_value("model_load_time", model_load_time_val)
-        ml_disp = ml_val if isinstance(ml_val, str) else _format_time_seconds(model_load_time_val)
-        pct = (model_load_time_val / total_time_val * 100) if total_time_val > 0 else 0
-        log_metric_tree(
-            "└─",
-            "Load:",
-            f"{ml_disp:>8} ({pct:>3.0f}%)",
-            indent="     ",
+    _append_phase_entry(
+        label="Generation:",
+        value=generation_time_val,
+        field_name="generation_time",
+    )
+    _append_phase_entry(
+        label="Load:",
+        value=model_load_time_val,
+        field_name="model_load_time",
+    )
+
+    if runtime is not None:
+        _append_phase_entry(
+            label="Validation:",
+            value=runtime.input_validation_time_s,
+            field_name="total_time",
         )
+        _append_phase_entry(
+            label="Prompt prep:",
+            value=runtime.prompt_prep_time_s,
+            field_name="total_time",
+        )
+        _append_phase_entry(
+            label="Cleanup:",
+            value=runtime.cleanup_time_s,
+            field_name="total_time",
+        )
+        _append_phase_entry(
+            label="First token:",
+            value=runtime.first_token_latency_s,
+            field_name="total_time",
+            include_pct=False,
+        )
+        if runtime.stop_reason:
+            entries.append(("Stop reason:", runtime.stop_reason))
+
+    for index, (label, value) in enumerate(entries):
+        prefix = "└─" if index == len(entries) - 1 else "├─"
+        log_metric_tree(prefix, label, value, indent="     ")
 
 
 def _log_perf_block(res: PerformanceResult) -> None:

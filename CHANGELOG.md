@@ -23,6 +23,9 @@ Notable changes to this project will be documented in this file.
     `static-quality` and `runtime-smoke` jobs;
   - ensured the static-quality path creates a repo-root `typings/` directory so
     `ty` can consume the configured extra search path on fresh CI checkouts.
+- Expanded verbose CLI detailed metrics output to include additional runtime
+  phase timings (`input_validation`, `prompt_prep`, `cleanup`,
+  `first_token_latency`) plus `stop_reason` when that metadata is available.
 
 - Reduced redundant internal formatting and diagnostics code in `src/check_models.py`:
   - inlined a few single-use helpers in import-probe, diagnostics, and failure-capture paths;

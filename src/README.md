@@ -799,7 +799,7 @@ See module docstrings and `__all__` exports for complete API reference.
 | `--revision` | str | (none) | Model revision (branch, tag, or commit) for reproducible runs. |
 | `--adapter-path` | str | (none) | Path to LoRA adapter weights to apply on top of the base model. |
 | `-p`, `--prompt` | str | (auto) | Custom prompt; if omitted a non-speculative metadata-verification prompt is used. |
-| `-d`, `--detailed-metrics` | flag | `False` | Show expanded multi-line metrics block (verbose mode only). |
+| `-d`, `--detailed-metrics` | flag | `False` | Show expanded multi-line metrics block in verbose mode, including phase timings and stop reason when available. |
 | `-x`, `--max-tokens` | int | 500 | Max new tokens to generate. |
 | `-t`, `--temperature` | float | 0.0 | Sampling temperature. |
 | `--top-p` | float | 1.0 | Nucleus sampling parameter (0.0-1.0); lower = more focused. |
