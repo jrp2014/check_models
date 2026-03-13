@@ -1151,12 +1151,63 @@ def _gallery_render_error(res: PerformanceResult) -> list[str]:
 
 
 def _gallery_render_success(res: PerformanceResult) -> list[str]:
+    def _metric_segment(label: str, field_name: str, value: object) -> str | None:
+        formatted = format_field_value(field_name, cast("MetricValue", value))
+        if not formatted:
+            return None
+        return f"{label} {formatted}"
+
+    def _throughput_segment(
+        label: str,
+        tps_value: object,
+        token_field_name: str,
+        token_value: object,
+    ) -> str | None:
+        tps_formatted = format_field_value("generation_tps", cast("MetricValue", tps_value))
+        tokens_formatted = format_field_value(token_field_name, cast("MetricValue", token_value))
+        if not tps_formatted and not tokens_formatted:
+            return None
+        if tps_formatted and tokens_formatted:
+            return f"{label} {tps_formatted} TPS ({tokens_formatted} tok)"
+        if tps_formatted:
+            return f"{label} {tps_formatted} TPS"
+        return f"{label} {tokens_formatted} tok"
+
     out: list[str] = []
     gen = res.generation
+    time_segments = [
+        segment
+        for segment in (
+            _metric_segment("Load", "model_load_time", res.model_load_time),
+            _metric_segment("Gen", "generation_time", res.generation_time),
+            _metric_segment("Total", "total_time", res.total_time),
+        )
+        if segment is not None
+    ]
+    if time_segments:
+        out.append(f"**Metrics:** {' | '.join(time_segments)}")
+
     if gen:
-        tps = getattr(gen, "generation_tps", 0)
-        tokens = getattr(gen, "generation_tokens", 0)
-        out.append(f"**Metrics:** {fmt_num(tps)} TPS | {tokens} tokens")
+        throughput_segments = [
+            segment
+            for segment in (
+                _throughput_segment(
+                    "Prompt",
+                    getattr(gen, "prompt_tps", None),
+                    "prompt_tokens",
+                    getattr(gen, "prompt_tokens", None),
+                ),
+                _throughput_segment(
+                    "Gen",
+                    getattr(gen, "generation_tps", None),
+                    "generation_tokens",
+                    getattr(gen, "generation_tokens", None),
+                ),
+            )
+            if segment is not None
+        ]
+        if throughput_segments:
+            out.append(f"**Throughput:** {' | '.join(throughput_segments)}")
     out.append("")
     text = str(getattr(res.generation, "text", "")) if res.generation else ""
     out.append("```text")

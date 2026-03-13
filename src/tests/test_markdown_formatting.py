@@ -1,6 +1,7 @@
 """Tests for Markdown formatting utilities."""
 
 import re
+from dataclasses import dataclass
 
 import check_models
 
@@ -133,9 +134,63 @@ _BARE_URL_RE = re.compile(r"(?<![<(])https?://")
 """Matches a bare URL not already wrapped in < > or ( )."""
 
 
+@dataclass
+class _GalleryGeneration:
+    text: str | None = "output"
+    prompt_tokens: int | None = 10
+    generation_tokens: int | None = 5
+    prompt_tps: float | None = 100.0
+    generation_tps: float | None = 50.0
+
+
 def _gallery_lines_for(result: check_models.PerformanceResult) -> str:
     """Return joined gallery markdown for a single result."""
     return "\n".join(check_models._generate_model_gallery_section([result]))
+
+
+def test_gallery_metrics_include_time_and_throughput_details() -> None:
+    """Gallery success blocks should show timing and prompt/gen throughput."""
+    result = check_models.PerformanceResult(
+        model_name="test/model",
+        generation=_GalleryGeneration(
+            prompt_tokens=1624,
+            generation_tokens=9,
+            prompt_tps=1551.0,
+            generation_tps=5.51,
+        ),
+        success=True,
+        model_load_time=3.29,
+        generation_time=1.60,
+        total_time=5.14,
+    )
+
+    md = _gallery_lines_for(result)
+
+    assert "**Metrics:** Load 3.29s | Gen 1.60s | Total 5.14s" in md
+    assert "**Throughput:** Prompt 1,551 TPS (1,624 tok) | Gen 5.51 TPS (9 tok)" in md
+
+
+def test_gallery_metrics_omit_missing_segments_cleanly() -> None:
+    """Gallery metrics should omit unavailable prompt throughput without empty separators."""
+    result = check_models.PerformanceResult(
+        model_name="test/model",
+        generation=_GalleryGeneration(
+            prompt_tokens=None,
+            generation_tokens=80,
+            prompt_tps=None,
+            generation_tps=29.7,
+        ),
+        success=True,
+        model_load_time=None,
+        generation_time=10.90,
+        total_time=14.51,
+    )
+
+    md = _gallery_lines_for(result)
+
+    assert "**Metrics:** Gen 10.90s | Total 14.51s" in md
+    assert "**Throughput:** Gen 29.7 TPS (80 tok)" in md
+    assert "Prompt" not in md
 
 
 def test_bare_url_in_long_error_is_wrapped() -> None:
