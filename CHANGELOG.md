@@ -16,6 +16,10 @@ Notable changes to this project will be documented in this file.
   cataloging summary rendering paths into a single `_format_cataloging_summary` function.
 - Added lazily-evaluated `.successful` and `.failed` cached properties to `ResultSet`
   to optimize repeat list comprehensions during report generation.
+- Cleaned up the quality-analysis detector subsystem in `src/check_models.py`
+  by reusing the shared configured-pattern lookup path across more detectors,
+  tightening non-trivial local annotations, and centralizing repeated
+  context-stopword filtering used by prompt-context analysis.
 
 - Narrowed legacy Transformers backend guard exports so `check_models` now sets
   only `TRANSFORMERS_NO_*` / `USE_*` variables still referenced by the

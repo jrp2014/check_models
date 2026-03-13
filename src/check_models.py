@@ -1099,10 +1099,10 @@ class _TeeCaptureStream(io.TextIOBase):
 def _gallery_render_error(res: PerformanceResult) -> list[str]:
     out: list[str] = []
     out.append(f"**Status:** Failed ({res.error_stage})")
-    error_msg = _escape_markdown_blockquote_line(str(res.error_message))
+    error_msg: str = _escape_markdown_blockquote_line(str(res.error_message))
     max_inline_length = 80
     if len(error_msg) > max_inline_length:
-        wrapped_lines = textwrap.wrap(
+        wrapped_lines: list[str] = textwrap.wrap(
             error_msg,
             width=76,
             break_long_words=False,
@@ -1161,8 +1161,8 @@ def _gallery_render_success(res: PerformanceResult) -> list[str]:
         return f"{label} {tokens_formatted} tok"
 
     out: list[str] = []
-    gen = res.generation
-    time_segments = [
+    gen: GenerationResult | SupportsGenerationResult | None = res.generation
+    time_segments: list[str] = [
         segment
         for segment in (
             _metric_segment("Load", "model_load_time", res.model_load_time),
@@ -1175,7 +1175,7 @@ def _gallery_render_success(res: PerformanceResult) -> list[str]:
         out.append(f"**Metrics:** {' | '.join(time_segments)}")
 
     if gen:
-        throughput_segments = [
+        throughput_segments: list[str] = [
             segment
             for segment in (
                 _throughput_segment(
@@ -1195,10 +1195,14 @@ def _gallery_render_success(res: PerformanceResult) -> list[str]:
         ]
         if throughput_segments:
             out.append(f"**Throughput:** {' | '.join(throughput_segments)}")
-    text = str(getattr(res.generation, "text", "")) if res.generation else ""
+    text: str = str(getattr(res.generation, "text", "")) if res.generation else ""
     _append_markdown_wrapped_blockquote(out, text)
     if res.generation:
-        analysis = getattr(res.generation, "quality_analysis", None)
+        analysis: GenerationQualityAnalysis | None = getattr(
+            res.generation,
+            "quality_analysis",
+            None,
+        )
         if analysis and analysis.issues:
             out.append("")
             out.append("⚠️ **Quality Warnings:**")
@@ -2097,36 +2101,34 @@ def _detect_hallucination_patterns(text: str) -> list[str]:
     if not text:
         return issues
 
-    text_lower = text.lower()
+    text_lower: str = text.lower()
 
     # Check for markdown tables (pipe-delimited)
     if "|" in text and text.count("|") >= QUALITY.min_pipes_for_table:
         # Likely a table if we see multiple pipes
-        lines_with_pipes = [line for line in text.split("\n") if "|" in line]
+        lines_with_pipes: list[str] = [line for line in text.split("\n") if "|" in line]
         if len(lines_with_pipes) >= QUALITY.min_table_rows:
             issues.append("Contains unexpected table")
 
     # Check for multiple choice patterns
-    mc_pattern = re.compile(r"^[A-D]\)", re.MULTILINE)
-    mc_matches = mc_pattern.findall(text)
+    mc_pattern: re.Pattern[str] = re.compile(r"^[A-D]\)", re.MULTILINE)
+    mc_matches: list[str] = mc_pattern.findall(text)
     if len(mc_matches) >= QUALITY.min_mc_answers:
         issues.append("Contains multiple choice pattern")
 
     # Check for quiz/test questions
-    question_indicators = (
-        QUALITY.patterns.get("hallucination_question_indicators", [])
-        if QUALITY.patterns
-        else ["what is", "how many", "based on the chart", "calculate"]
+    question_indicators: list[str] = _get_quality_pattern_list(
+        "hallucination_question_indicators",
+        ["what is", "how many", "based on the chart", "calculate"],
     )
-    has_question = any(indicator in text_lower for indicator in question_indicators)
+    has_question: bool = any(indicator in text_lower for indicator in question_indicators)
     if has_question and len(text) > QUALITY.substantial_text_length:
         issues.append("Contains question/quiz content")
 
     # Check for unrelated educational content keywords
-    edu_keywords = (
-        QUALITY.patterns.get("hallucination_edu_keywords", [])
-        if QUALITY.patterns
-        else ["grade level", "students with adhd", "test scores", "homework"]
+    edu_keywords: list[str] = _get_quality_pattern_list(
+        "hallucination_edu_keywords",
+        ["grade level", "students with adhd", "test scores", "homework"],
     )
     if any(keyword in text_lower for keyword in edu_keywords):
         issues.append("Contains unrelated educational content")
@@ -2152,13 +2154,12 @@ def _detect_excessive_verbosity(text: str, generated_tokens: int) -> bool:
     if generated_tokens < QUALITY.max_verbosity_tokens:
         return False
 
-    text_lower = text.lower()
+    text_lower: str = text.lower()
 
     # Check for meta-commentary patterns
-    meta_patterns = (
-        QUALITY.patterns.get("meta_commentary", [])
-        if QUALITY.patterns
-        else [
+    meta_patterns: list[str] = _get_quality_pattern_list(
+        "meta_commentary",
+        [
             "the image depicts",
             "the image shows",
             "the photograph captures",
@@ -2167,13 +2168,13 @@ def _detect_excessive_verbosity(text: str, generated_tokens: int) -> bool:
             "### analysis",
             "### conclusion",
             "based on the image",
-        ]
+        ],
     )
 
-    meta_count = sum(1 for pattern in meta_patterns if pattern in text_lower)
+    meta_count: int = sum(1 for pattern in meta_patterns if pattern in text_lower)
 
     # Check for excessive sectioning
-    section_headers = text.count("###") + text.count("## ")
+    section_headers: int = text.count("###") + text.count("## ")
 
     # Verbose if has meta-commentary + sections or just too many sections
     return meta_count >= QUALITY.min_meta_patterns or section_headers >= QUALITY.min_section_headers
@@ -2201,14 +2202,14 @@ def _detect_formatting_violations(text: str) -> list[str]:
         return issues
 
     # Check for tags (beyond simple breaks) that may interfere with rendering
-    html_tags = re.findall(r"<(?!br>|/br>)[a-z]+[^>]*>", text, re.IGNORECASE)
+    html_tags: list[str] = re.findall(r"<(?!br>|/br>)[a-z]+[^>]*>", text, re.IGNORECASE)
     if html_tags:
         # Report the raw tags (escaping handled by reporters)
-        tags_preview = ", ".join(set(html_tags[:3]))
+        tags_preview: str = ", ".join(set(html_tags[:3]))
         issues.append(f"Unknown tags: {tags_preview}")
 
     # Check for excessive markdown structure
-    header_count = text.count("\n##") + text.count("\n###")
+    header_count: int = text.count("\n##") + text.count("\n###")
     if header_count > QUALITY.max_markdown_headers:
         issues.append(f"Excessive markdown headers ({header_count})")
 
@@ -2236,14 +2237,14 @@ def _truncate_repetitive_output(text: str) -> str:
         return text
 
     # Count consecutive repetitions of the token (with optional whitespace between)
-    pattern = re.escape(repeated_token)
-    match = re.search(rf"({pattern}(?:\s*{pattern}){{10,}})", text)
+    pattern: str = re.escape(repeated_token)
+    match: re.Match[str] | None = re.search(rf"({pattern}(?:\s*{pattern}){{10,}})", text)
 
     if match:
         # Count total repetitions in the matched section
-        repetitions = match.group(0).count(repeated_token)
+        repetitions: int = match.group(0).count(repeated_token)
         # Show first few occurrences + count + ellipsis
-        truncated_section = (
+        truncated_section: str = (
             f"{repeated_token} {repeated_token} {repeated_token} "
             f"... [{repetitions} total repetitions] ..."
         )
@@ -2268,12 +2269,14 @@ def _detect_excessive_bullets(text: str) -> tuple[bool, int]:
     if not text:
         return False, 0
 
-    bullet_prefixes = ("- ", "* ", "• ")
-    bullet_lines = [line for line in text.split("\n") if line.strip().startswith(bullet_prefixes)]
-    bullet_count = len(bullet_lines)
+    bullet_prefixes: tuple[str, str, str] = ("- ", "* ", "• ")
+    bullet_lines: list[str] = [
+        line for line in text.split("\n") if line.strip().startswith(bullet_prefixes)
+    ]
+    bullet_count: int = len(bullet_lines)
 
     # Use config threshold if available, otherwise default to 15 (lowered for cataloging)
-    threshold = QUALITY.max_bullets or 15
+    threshold: int = QUALITY.max_bullets or 15
     return bullet_count > threshold, bullet_count
 
 
@@ -2301,303 +2304,8 @@ CONTEXT_NOISE_TERMS: Final[frozenset[str]] = frozenset(
     },
 )
 
-CONTEXT_TERM_ALIASES: Final[dict[str, tuple[str, ...]]] = {
-    "uk": ("united kingdom", "u k", "u.k."),
-    "united kingdom": ("uk", "u k", "u.k."),
-    "usa": ("united states", "u s a", "u.s.a."),
-    "united states": ("usa", "u s a", "u.s.a."),
-}
-
-PROMPT_ECHO_MARKERS: Final[tuple[str, ...]] = (
-    "return exactly these three sections",
-    "do not output reasoning",
-    "do not copy context hints verbatim",
-    "context: existing metadata hints",
-    "title hint:",
-    "description hint:",
-    "keyword hints:",
-    "capture metadata:",
-)
-
-
-def _normalize_phrase_for_matching(text: str) -> str:
-    """Normalize free-form text for alias and overlap matching."""
-    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9]+", " ", text.casefold())).strip()
-
-
-def _extract_prompt_context_text(prompt: str, context_marker: str = "Context:") -> str:
-    """Extract prompt context text anchored at ``context_marker``.
-
-    Supports inline-marker context (``Context: ...``) and multi-line bullet
-    context blocks. Stops on the first blank line after context content starts.
-    """
-    if not prompt:
-        return ""
-
-    marker_lower = context_marker.casefold()
-    lines = prompt.splitlines()
-
-    for idx, raw_line in enumerate(lines):
-        line = raw_line.strip()
-        if not line.casefold().startswith(marker_lower):
-            continue
-
-        extracted: list[str] = []
-        inline_remainder = (
-            line[len(context_marker) :].strip() if len(line) >= len(context_marker) else ""
-        )
-        if inline_remainder:
-            extracted.append(inline_remainder.lstrip("-").strip())
-
-        for follow in lines[idx + 1 :]:
-            stripped = follow.strip()
-            if not stripped:
-                if extracted:
-                    break
-                continue
-            # Context bullets are expected; strip bullet prefix but retain content.
-            if stripped.startswith(("-", "*", "•")):
-                extracted.append(stripped.lstrip("-*• ").strip())
-                continue
-            # Treat non-bulleted lines as context continuation until first blank line.
-            extracted.append(stripped)
-
-        return "\n".join(part for part in extracted if part).strip()
-
-    return ""
-
-
-def _context_term_present(term: str, normalized_text: str) -> bool:
-    """Return ``True`` when a context term (or alias) appears in normalized text."""
-    canonical = _normalize_phrase_for_matching(term)
-    if not canonical:
-        return False
-
-    variants = {canonical}
-    variants.update(
-        _normalize_phrase_for_matching(v) for v in CONTEXT_TERM_ALIASES.get(canonical, ())
-    )
-    for variant in variants:
-        if not variant:
-            continue
-        if re.search(rf"\b{re.escape(variant)}\b", normalized_text):
-            return True
-    return False
-
-
-def _split_catalog_keywords(raw_keywords: str) -> list[str]:
-    """Split keyword section text into normalized keyword terms."""
-    if not raw_keywords:
-        return []
-    keywords: list[str] = []
-    for item in re.split(r"[,\n]", raw_keywords):
-        cleaned = re.sub(r"\s+", " ", item).strip(" -*•\t")
-        if cleaned:
-            keywords.append(cleaned)
-    return keywords
-
-
-def _count_factual_sentences(text: str) -> int:
-    """Count sentence-like units in description text with fallback for punctuation-free text."""
-    cleaned = text.strip()
-    if not cleaned:
-        return 0
-    sentence_like = [s for s in re.split(r"(?<=[.!?])\s+|\n+", cleaned) if re.search(r"\w", s)]
-    if sentence_like:
-        if len(sentence_like) == 1 and not re.search(r"[.!?]", cleaned):
-            return 1
-        return len(sentence_like)
-    return 1
-
-
-def _extract_catalog_sections(text: str) -> dict[str, str]:
-    """Extract ``Title/Description/Keywords`` sections from model output."""
-    if not text:
-        return {}
-
-    pattern = re.compile(
-        r"(?im)^\s*(?:[#>*-]\s*)?(?:\*{0,2})\s*(title|description|keywords)(?:\*{0,2})\s*:\s*(.*)$",
-    )
-    matches = list(pattern.finditer(text))
-    if not matches:
-        return {}
-
-    sections: dict[str, str] = {}
-    for idx, match in enumerate(matches):
-        label = match.group(1).casefold()
-        if label in sections:
-            continue
-        section_line = match.group(2).strip()
-        next_start = matches[idx + 1].start() if idx + 1 < len(matches) else len(text)
-        trailing = text[match.end() : next_start].strip()
-        combined = "\n".join(part for part in (section_line, trailing) if part).strip()
-        sections[label] = combined
-    return sections
-
-
-def _prompt_requests_catalog_contract(prompt: str) -> bool:
-    """Return True when prompt clearly requests strict Title/Description/Keywords output."""
-    prompt_lower = prompt.casefold()
-    has_required_labels = all(
-        label in prompt_lower for label in ("title:", "description:", "keywords:")
-    )
-    return has_required_labels and (
-        "return exactly these three sections" in prompt_lower or "catalog" in prompt_lower
-    )
-
-
-def _analyze_catalog_contract(
-    text: str,
-) -> tuple[list[str], int | None, int | None, int | None, float | None]:
-    """Evaluate strict cataloging contract compliance from generated text."""
-    sections = _extract_catalog_sections(text)
-    missing_sections = [
-        section
-        for section in ("title", "description", "keywords")
-        if not sections.get(section, "").strip()
-    ]
-
-    title_word_count = None
-    description_sentence_count = None
-    keyword_count = None
-    keyword_dup_ratio = None
-
-    title_text = sections.get("title", "")
-    if title_text:
-        title_word_count = len(re.findall(r"[A-Za-z0-9']+", title_text))
-
-    description_text = sections.get("description", "")
-    if description_text:
-        description_sentence_count = _count_factual_sentences(description_text)
-
-    keywords_text = sections.get("keywords", "")
-    if keywords_text:
-        keyword_terms = _split_catalog_keywords(keywords_text)
-        keyword_count = len(keyword_terms)
-        if keyword_count >= QUALITY.min_keywords_for_duplication_check and keyword_count > 0:
-            normalized = [_normalize_phrase_for_matching(term) for term in keyword_terms]
-            normalized = [term for term in normalized if term]
-            if normalized:
-                keyword_dup_ratio = 1.0 - (len(set(normalized)) / len(normalized))
-
-    return (
-        missing_sections,
-        title_word_count,
-        description_sentence_count,
-        keyword_count,
-        keyword_dup_ratio,
-    )
-
-
-def _detect_reasoning_leakage(text: str) -> tuple[bool, list[str]]:
-    """Detect chain-of-thought or prompt-echo leakage in generated output."""
-    if not text:
-        return False, []
-
-    text_lower = text.casefold()
-    markers = (
-        QUALITY.patterns.get("reasoning_leak_markers", [])
-        if QUALITY.patterns
-        else [
-            "<think>",
-            "◁think▷",
-            "◁/think▷",
-            "here are my reasoning steps",
-            "the user asks:",
-            "let's analyze the image",
-        ]
-    )
-
-    findings: list[str] = [
-        marker for marker in markers if marker and marker.casefold() in text_lower
-    ]
-    findings.extend(marker for marker in PROMPT_ECHO_MARKERS if marker in text_lower)
-    deduped = _dedupe_preserve_order(findings)
-    return bool(deduped), deduped[:4]
-
-
-def _detect_context_echo(
-    text: str,
-    prompt: str,
-    context_marker: str = "Context:",
-) -> tuple[bool, float]:
-    """Detect likely context regurgitation rather than image-grounded synthesis."""
-    has_echo = False
-    score = 0.0
-
-    if not text or not prompt:
-        return has_echo, score
-
-    text_lower = text.casefold()
-    has_inline_context_block = "context:" in text_lower and any(
-        marker in text_lower for marker in ("title hint:", "description hint:", "capture metadata:")
-    )
-    if has_inline_context_block:
-        return True, 1.0
-
-    context_text = _extract_prompt_context_text(prompt, context_marker=context_marker)
-    if context_text:
-        output_words = re.findall(r"[a-z0-9']+", text_lower)
-        context_words = re.findall(r"[a-z0-9']+", context_text.casefold())
-        if len(output_words) >= QUALITY.context_echo_min_words and context_words:
-            output_vocab = set(output_words)
-            context_vocab = set(context_words)
-            vocab_overlap = len(output_vocab & context_vocab) / max(len(output_vocab), 1)
-            score = round(vocab_overlap, 3)
-            if vocab_overlap >= QUALITY.context_echo_vocab_ratio_threshold:
-                has_echo = True
-            else:
-                ngram_size = max(2, QUALITY.context_echo_ngram_size)
-                if len(output_words) >= ngram_size and len(context_words) >= ngram_size:
-                    output_ngrams = {
-                        tuple(output_words[idx : idx + ngram_size])
-                        for idx in range(len(output_words) - ngram_size + 1)
-                    }
-                    context_ngrams = {
-                        tuple(context_words[idx : idx + ngram_size])
-                        for idx in range(len(context_words) - ngram_size + 1)
-                    }
-                    shared_ngrams = output_ngrams & context_ngrams
-                    if shared_ngrams:
-                        shared_ratio = len(shared_ngrams) / max(len(output_ngrams), 1)
-                        score = round(shared_ratio, 3)
-                        has_echo = (
-                            len(shared_ngrams) >= QUALITY.context_echo_min_shared_ngrams
-                            and shared_ratio >= QUALITY.context_echo_ngram_ratio_threshold
-                        )
-
-    return has_echo, score
-
-
-def _detect_context_ignorance(
-    text: str,
-    prompt: str,
-    context_marker: str = "Context:",
-) -> tuple[bool, list[str]]:
-    """Detect if the generated text ignores key context from the prompt.
-
-    Extracts proper nouns and key contextual terms from the prompt (e.g., from
-    "Context:" sections) and checks if they appear in the generated text.
-
-    Args:
-        text: Generated text to check
-        prompt: Original prompt text containing context
-        context_marker: The marker used to identify the context section (default: "Context:")
-
-    Returns:
-        Tuple of (is_context_ignored, missing_context_terms)
-    """
-    if not text or not prompt:
-        return False, []
-
-    context_text = _extract_prompt_context_text(prompt, context_marker=context_marker)
-    if not context_text:
-        # No explicit context section, so can't check
-        return False, []
-
-    # Extract potential proper nouns and key terms from context
-    # Look for capitalized words that aren't common words
-    common_words = {
+CONTEXT_COMMON_WORDS: Final[frozenset[str]] = frozenset(
+    {
         "the",
         "a",
         "an",
@@ -2640,15 +2348,308 @@ def _detect_context_ignorance(
         "might",
         "must",
         "can",
-        "context",
-        "image",
-        "photo",
-        "picture",
-    }
-    common_words.update(CONTEXT_NOISE_TERMS)
+    }.union(CONTEXT_NOISE_TERMS),
+)
 
+CONTEXT_TERM_ALIASES: Final[dict[str, tuple[str, ...]]] = {
+    "uk": ("united kingdom", "u k", "u.k."),
+    "united kingdom": ("uk", "u k", "u.k."),
+    "usa": ("united states", "u s a", "u.s.a."),
+    "united states": ("usa", "u s a", "u.s.a."),
+}
+
+PROMPT_ECHO_MARKERS: Final[tuple[str, ...]] = (
+    "return exactly these three sections",
+    "do not output reasoning",
+    "do not copy context hints verbatim",
+    "context: existing metadata hints",
+    "title hint:",
+    "description hint:",
+    "keyword hints:",
+    "capture metadata:",
+)
+
+
+def _normalize_phrase_for_matching(text: str) -> str:
+    """Normalize free-form text for alias and overlap matching."""
+    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9]+", " ", text.casefold())).strip()
+
+
+def _extract_prompt_context_text(prompt: str, context_marker: str = "Context:") -> str:
+    """Extract prompt context text anchored at ``context_marker``.
+
+    Supports inline-marker context (``Context: ...``) and multi-line bullet
+    context blocks. Stops on the first blank line after context content starts.
+    """
+    if not prompt:
+        return ""
+
+    marker_lower: str = context_marker.casefold()
+    lines: list[str] = prompt.splitlines()
+
+    for idx, raw_line in enumerate(lines):
+        line: str = raw_line.strip()
+        if not line.casefold().startswith(marker_lower):
+            continue
+
+        extracted: list[str] = []
+        inline_remainder: str = (
+            line[len(context_marker) :].strip() if len(line) >= len(context_marker) else ""
+        )
+        if inline_remainder:
+            extracted.append(inline_remainder.lstrip("-").strip())
+
+        for follow in lines[idx + 1 :]:
+            stripped: str = follow.strip()
+            if not stripped:
+                if extracted:
+                    break
+                continue
+            # Context bullets are expected; strip bullet prefix but retain content.
+            if stripped.startswith(("-", "*", "•")):
+                extracted.append(stripped.lstrip("-*• ").strip())
+                continue
+            # Treat non-bulleted lines as context continuation until first blank line.
+            extracted.append(stripped)
+
+        return "\n".join(part for part in extracted if part).strip()
+
+    return ""
+
+
+def _context_term_present(term: str, normalized_text: str) -> bool:
+    """Return ``True`` when a context term (or alias) appears in normalized text."""
+    canonical: str = _normalize_phrase_for_matching(term)
+    if not canonical:
+        return False
+
+    variants: set[str] = {canonical}
+    variants.update(
+        _normalize_phrase_for_matching(v) for v in CONTEXT_TERM_ALIASES.get(canonical, ())
+    )
+    for variant in variants:
+        if not variant:
+            continue
+        if re.search(rf"\b{re.escape(variant)}\b", normalized_text):
+            return True
+    return False
+
+
+def _split_catalog_keywords(raw_keywords: str) -> list[str]:
+    """Split keyword section text into normalized keyword terms."""
+    if not raw_keywords:
+        return []
+    keywords: list[str] = []
+    for item in re.split(r"[,\n]", raw_keywords):
+        cleaned: str = re.sub(r"\s+", " ", item).strip(" -*•\t")
+        if cleaned:
+            keywords.append(cleaned)
+    return keywords
+
+
+def _count_factual_sentences(text: str) -> int:
+    """Count sentence-like units in description text with fallback for punctuation-free text."""
+    cleaned: str = text.strip()
+    if not cleaned:
+        return 0
+    sentence_like: list[str] = [
+        s for s in re.split(r"(?<=[.!?])\s+|\n+", cleaned) if re.search(r"\w", s)
+    ]
+    if sentence_like:
+        if len(sentence_like) == 1 and not re.search(r"[.!?]", cleaned):
+            return 1
+        return len(sentence_like)
+    return 1
+
+
+def _extract_catalog_sections(text: str) -> dict[str, str]:
+    """Extract ``Title/Description/Keywords`` sections from model output."""
+    if not text:
+        return {}
+
+    pattern: re.Pattern[str] = re.compile(
+        r"(?im)^\s*(?:[#>*-]\s*)?(?:\*{0,2})\s*(title|description|keywords)(?:\*{0,2})\s*:\s*(.*)$",
+    )
+    matches: list[re.Match[str]] = list(pattern.finditer(text))
+    if not matches:
+        return {}
+
+    sections: dict[str, str] = {}
+    for idx, match in enumerate(matches):
+        label: str = match.group(1).casefold()
+        if label in sections:
+            continue
+        section_line: str = match.group(2).strip()
+        next_start: int = matches[idx + 1].start() if idx + 1 < len(matches) else len(text)
+        trailing: str = text[match.end() : next_start].strip()
+        combined: str = "\n".join(part for part in (section_line, trailing) if part).strip()
+        sections[label] = combined
+    return sections
+
+
+def _prompt_requests_catalog_contract(prompt: str) -> bool:
+    """Return True when prompt clearly requests strict Title/Description/Keywords output."""
+    prompt_lower: str = prompt.casefold()
+    has_required_labels: bool = all(
+        label in prompt_lower for label in ("title:", "description:", "keywords:")
+    )
+    return has_required_labels and (
+        "return exactly these three sections" in prompt_lower or "catalog" in prompt_lower
+    )
+
+
+def _analyze_catalog_contract(
+    text: str,
+) -> tuple[list[str], int | None, int | None, int | None, float | None]:
+    """Evaluate strict cataloging contract compliance from generated text."""
+    sections: dict[str, str] = _extract_catalog_sections(text)
+    missing_sections: list[str] = [
+        section
+        for section in ("title", "description", "keywords")
+        if not sections.get(section, "").strip()
+    ]
+
+    title_word_count = None
+    description_sentence_count = None
+    keyword_count = None
+    keyword_dup_ratio = None
+
+    title_text: str = sections.get("title", "")
+    if title_text:
+        title_word_count = len(re.findall(r"[A-Za-z0-9']+", title_text))
+
+    description_text: str = sections.get("description", "")
+    if description_text:
+        description_sentence_count = _count_factual_sentences(description_text)
+
+    keywords_text: str = sections.get("keywords", "")
+    if keywords_text:
+        keyword_terms: list[str] = _split_catalog_keywords(keywords_text)
+        keyword_count = len(keyword_terms)
+        if keyword_count >= QUALITY.min_keywords_for_duplication_check and keyword_count > 0:
+            normalized: list[str] = [_normalize_phrase_for_matching(term) for term in keyword_terms]
+            normalized = [term for term in normalized if term]
+            if normalized:
+                keyword_dup_ratio = 1.0 - (len(set(normalized)) / len(normalized))
+
+    return (
+        missing_sections,
+        title_word_count,
+        description_sentence_count,
+        keyword_count,
+        keyword_dup_ratio,
+    )
+
+
+def _detect_reasoning_leakage(text: str) -> tuple[bool, list[str]]:
+    """Detect chain-of-thought or prompt-echo leakage in generated output."""
+    if not text:
+        return False, []
+
+    text_lower: str = text.casefold()
+    markers: list[str] = _get_quality_pattern_list(
+        "reasoning_leak_markers",
+        [
+            "<think>",
+            "◁think▷",
+            "◁/think▷",
+            "here are my reasoning steps",
+            "the user asks:",
+            "let's analyze the image",
+        ],
+    )
+
+    findings: list[str] = [
+        marker for marker in markers if marker and marker.casefold() in text_lower
+    ]
+    findings.extend(marker for marker in PROMPT_ECHO_MARKERS if marker in text_lower)
+    deduped: list[str] = _dedupe_preserve_order(findings)
+    return bool(deduped), deduped[:4]
+
+
+def _detect_context_echo(
+    text: str,
+    prompt: str,
+    context_marker: str = "Context:",
+) -> tuple[bool, float]:
+    """Detect likely context regurgitation rather than image-grounded synthesis."""
+    has_echo: bool = False
+    score: float = 0.0
+
+    if not text or not prompt:
+        return has_echo, score
+
+    text_lower: str = text.casefold()
+    has_inline_context_block: bool = "context:" in text_lower and any(
+        marker in text_lower for marker in ("title hint:", "description hint:", "capture metadata:")
+    )
+    if has_inline_context_block:
+        return True, 1.0
+
+    context_text: str = _extract_prompt_context_text(prompt, context_marker=context_marker)
+    if context_text:
+        output_words: list[str] = re.findall(r"[a-z0-9']+", text_lower)
+        context_words: list[str] = re.findall(r"[a-z0-9']+", context_text.casefold())
+        if len(output_words) >= QUALITY.context_echo_min_words and context_words:
+            output_vocab: set[str] = set(output_words)
+            context_vocab: set[str] = set(context_words)
+            vocab_overlap: float = len(output_vocab & context_vocab) / max(len(output_vocab), 1)
+            score = round(vocab_overlap, 3)
+            if vocab_overlap >= QUALITY.context_echo_vocab_ratio_threshold:
+                has_echo = True
+            else:
+                ngram_size: int = max(2, QUALITY.context_echo_ngram_size)
+                if len(output_words) >= ngram_size and len(context_words) >= ngram_size:
+                    output_ngrams: set[tuple[str, ...]] = {
+                        tuple(output_words[idx : idx + ngram_size])
+                        for idx in range(len(output_words) - ngram_size + 1)
+                    }
+                    context_ngrams: set[tuple[str, ...]] = {
+                        tuple(context_words[idx : idx + ngram_size])
+                        for idx in range(len(context_words) - ngram_size + 1)
+                    }
+                    shared_ngrams: set[tuple[str, ...]] = output_ngrams & context_ngrams
+                    if shared_ngrams:
+                        shared_ratio: float = len(shared_ngrams) / max(len(output_ngrams), 1)
+                        score = round(shared_ratio, 3)
+                        has_echo = (
+                            len(shared_ngrams) >= QUALITY.context_echo_min_shared_ngrams
+                            and shared_ratio >= QUALITY.context_echo_ngram_ratio_threshold
+                        )
+
+    return has_echo, score
+
+
+def _detect_context_ignorance(
+    text: str,
+    prompt: str,
+    context_marker: str = "Context:",
+) -> tuple[bool, list[str]]:
+    """Detect if the generated text ignores key context from the prompt.
+
+    Extracts proper nouns and key contextual terms from the prompt (e.g., from
+    "Context:" sections) and checks if they appear in the generated text.
+
+    Args:
+        text: Generated text to check
+        prompt: Original prompt text containing context
+        context_marker: The marker used to identify the context section (default: "Context:")
+
+    Returns:
+        Tuple of (is_context_ignored, missing_context_terms)
+    """
+    if not text or not prompt:
+        return False, []
+
+    context_text: str = _extract_prompt_context_text(prompt, context_marker=context_marker)
+    if not context_text:
+        # No explicit context section, so can't check
+        return False, []
+
+    # Extract potential proper nouns and key terms from context
+    # Look for capitalized words that aren't common words
     # Find title-cased and ALL-CAPS tokens (e.g. UK) as potential proper nouns.
-    potential_terms = re.findall(
+    potential_terms: list[str] = re.findall(
         r"\b(?:[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*|[A-Z]{2,})\b",
         context_text,
     )
@@ -2657,7 +2658,7 @@ def _detect_context_ignorance(
     seen_terms: set[str] = set()
     key_terms: list[str] = []
     for term in potential_terms:
-        term_lower = term.casefold()
+        term_lower: str = term.casefold()
         if term_lower in seen_terms:
             continue
         seen_terms.add(term_lower)
@@ -2665,16 +2666,19 @@ def _detect_context_ignorance(
     key_terms = [
         term
         for term in key_terms
-        if term.casefold() not in common_words and len(term) > QUALITY.min_context_term_length
+        if term.casefold() not in CONTEXT_COMMON_WORDS
+        and len(term) > QUALITY.min_context_term_length
     ]
 
     # Check if these terms appear in the generated text, honoring aliases.
-    normalized_text = _normalize_phrase_for_matching(text)
-    missing_terms = [term for term in key_terms if not _context_term_present(term, normalized_text)]
+    normalized_text: str = _normalize_phrase_for_matching(text)
+    missing_terms: list[str] = [
+        term for term in key_terms if not _context_term_present(term, normalized_text)
+    ]
 
     # Only flag as "ignored" if we found key terms and most are missing
     # Use thresholds from configuration
-    is_ignored = (
+    is_ignored: bool = (
         len(missing_terms) > 0
         and len(key_terms) >= QUALITY.min_key_terms_threshold
         and len(missing_terms) >= len(key_terms) * QUALITY.min_missing_ratio
@@ -2697,20 +2701,19 @@ def _detect_refusal_patterns(text: str) -> tuple[bool, str | None]:
     if not text:
         return False, None
 
-    text_lower = text.lower()
+    text_lower: str = text.lower()
 
     # Refusal patterns
     refusal_patterns: list[tuple[str, list[str]]] = []
 
-    if QUALITY.patterns:
-        if "refusal_explicit" in QUALITY.patterns:
-            refusal_patterns.append(("explicit_refusal", QUALITY.patterns["refusal_explicit"]))
-        if "refusal_uncertainty" in QUALITY.patterns:
-            refusal_patterns.append(("uncertainty", QUALITY.patterns["refusal_uncertainty"]))
-        if "refusal_insufficient_info" in QUALITY.patterns:
-            refusal_patterns.append(
-                ("insufficient_info", QUALITY.patterns["refusal_insufficient_info"]),
-            )
+    for refusal_type, pattern_key in (
+        ("explicit_refusal", "refusal_explicit"),
+        ("uncertainty", "refusal_uncertainty"),
+        ("insufficient_info", "refusal_insufficient_info"),
+    ):
+        patterns: list[str] = _get_quality_pattern_list(pattern_key, [])
+        if patterns:
+            refusal_patterns.append((refusal_type, patterns))
 
     if not refusal_patterns:
         # Fallback defaults
@@ -2771,17 +2774,16 @@ def _detect_generic_output(text: str) -> tuple[bool, float]:
     if not text or len(text) < QUALITY.min_text_length_for_generic:
         return False, 0.0
 
-    text_lower = text.lower()
-    word_count = len(text.split())
+    text_lower: str = text.lower()
+    word_count: int = len(text.split())
 
     if word_count == 0:
         return False, 0.0
 
     # Count filler/hedge words
-    filler_words = (
-        QUALITY.patterns.get("filler_words", [])
-        if QUALITY.patterns
-        else [
+    filler_words: list[str] = _get_quality_pattern_list(
+        "filler_words",
+        [
             "appears to",
             "seems to",
             "looks like",
@@ -2801,33 +2803,36 @@ def _detect_generic_output(text: str) -> tuple[bool, float]:
             "stuff",
             "item",
             "object",
-        ]
+        ],
     )
-    filler_count = sum(text_lower.count(filler) for filler in filler_words)
+    filler_count: int = sum(text_lower.count(filler) for filler in filler_words)
 
     # Calculate filler ratio
-    filler_ratio = filler_count / word_count
+    filler_ratio: float = filler_count / word_count
 
     # Check for specific details (numbers, measurements, colors, names)
-    has_numbers = bool(re.search(r"\d+", text))
-    has_specific_colors = bool(
+    has_numbers: bool = bool(re.search(r"\d+", text))
+    has_specific_colors: bool = bool(
         re.search(
             r"\b(red|blue|green|yellow|orange|purple|pink|brown|black|white|gray|grey)\b",
             text_lower,
         ),
     )
-    has_proper_nouns = bool(re.search(r"\b[A-Z][a-z]+", text))
+    has_proper_nouns: bool = bool(re.search(r"\b[A-Z][a-z]+", text))
 
-    specificity_indicators = sum([has_numbers, has_specific_colors, has_proper_nouns])
+    specificity_indicators: int = sum([has_numbers, has_specific_colors, has_proper_nouns])
 
     # Generic if high filler ratio and low specificity
-    is_generic = (
+    is_generic: bool = (
         filler_ratio > QUALITY.generic_filler_threshold
         and specificity_indicators < QUALITY.min_specificity_indicators
     )
 
     # Specificity score: higher = more specific (0-100)
-    specificity_score = max(0.0, 100 - (filler_ratio * 200) + (specificity_indicators * 20))
+    specificity_score: float = max(
+        0.0,
+        100 - (filler_ratio * 200) + (specificity_indicators * 20),
+    )
 
     return is_generic, round(specificity_score, 1)
 
@@ -2853,10 +2858,9 @@ def _detect_language_mixing(
     issues: list[str] = []
 
     # Check for common tokenizer artifacts
-    if quality_thresholds.patterns:
-        tokenizer_artifacts = quality_thresholds.patterns.get("tokenizer_artifacts", [])
-    else:
-        tokenizer_artifacts = [
+    tokenizer_artifacts: list[str] = _get_quality_pattern_list(
+        "tokenizer_artifacts",
+        [
             r"<\|endoftext\|>",
             r"<\|end\|>",
             r"<s>",
@@ -2869,7 +2873,9 @@ def _detect_language_mixing(
             r"<pad>",
             r"<unk>",
             r"<mask>",
-        ]
+        ],
+        quality_thresholds=quality_thresholds,
+    )
 
     for artifact in tokenizer_artifacts:
         if re.search(artifact, text, re.IGNORECASE):
@@ -2877,16 +2883,17 @@ def _detect_language_mixing(
             break
 
     # Check for code snippets (function calls, variable assignments)
-    if quality_thresholds.patterns:
-        code_patterns = quality_thresholds.patterns.get("code_patterns", [])
-    else:
-        code_patterns = [
+    code_patterns: list[str] = _get_quality_pattern_list(
+        "code_patterns",
+        [
             r"\bdef\s+\w+\(",  # Python function def
             r"\bfunction\s+\w+\(",  # JavaScript function
             r"\bclass\s+\w+",  # Class definition
             r"\bimport\s+\w+",  # Import statement
             r"\breturn\s+",  # Return statement
-        ]
+        ],
+        quality_thresholds=quality_thresholds,
+    )
 
     for pattern in code_patterns:
         if re.search(pattern, text):
@@ -2915,33 +2922,33 @@ def _detect_output_degeneration(text: str) -> tuple[bool, str | None]:
         return False, None
 
     # Check the last portion of the text (where degeneration typically appears)
-    tail_length = min(200, len(text) // 3)
-    tail = text[-tail_length:]
+    tail_length: int = min(200, len(text) // 3)
+    tail: str = text[-tail_length:]
     result: str | None = None
 
     # 1. Detect repeated punctuation/special char sequences at end
     # e.g., "......" or "?????" or "!!!!!" or "-----"
-    punct_repeat = re.search(r"([.?!,;:\-_=+*#]{3,})\s*$", tail)
+    punct_repeat: re.Match[str] | None = re.search(r"([.?!,;:\-_=+*#]{3,})\s*$", tail)
     if punct_repeat:
         result = f"repeated_punctuation: '{punct_repeat.group(1)[:10]}...'"
 
     # 2. Detect incomplete sentence (ends mid-word or with lowercase without punctuation)
     if result is None:
-        stripped = text.rstrip()
+        stripped: str = text.rstrip()
         if stripped:
-            last_char = stripped[-1]
+            last_char: str = stripped[-1]
             # Normal endings: . ! ? ) " ' ] }
-            normal_endings = ".!?)]}'\"}"
+            normal_endings: str = ".!?)]}'\"}"
             if last_char not in normal_endings:
-                last_word_match = re.search(r"\b(\w+)$", stripped)
+                last_word_match: re.Match[str] | None = re.search(r"\b(\w+)$", stripped)
                 if last_word_match:
-                    last_word = last_word_match.group(1)
+                    last_word: str = last_word_match.group(1)
                     if len(last_word) <= QUALITY.min_cutoff_word_length and last_word.islower():
                         result = f"incomplete_sentence: ends with '{last_word}'"
 
     # 3. Detect Unicode rubbish/control characters (excluding normal whitespace)
     if result is None:
-        control_chars = re.findall(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]", tail)
+        control_chars: list[str] = re.findall(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f]", tail)
         if len(control_chars) > QUALITY.max_control_chars:
             result = f"control_characters: {len(control_chars)} found"
 
@@ -2951,17 +2958,17 @@ def _detect_output_degeneration(text: str) -> tuple[bool, str | None]:
 
     # 5. Detect character-level repetition at the end
     if result is None:
-        char_repeat = re.search(r"(.{1,3})\1{5,}\s*$", tail)
+        char_repeat: re.Match[str] | None = re.search(r"(.{1,3})\1{5,}\s*$", tail)
         if char_repeat:
-            pattern = char_repeat.group(1)
+            pattern: str = char_repeat.group(1)
             result = f"character_loop: '{pattern}' repeated"
 
     # 6. Detect sudden encoding shift
     if result is None and len(text) > tail_length * 2:
-        head = text[:-tail_length]
-        ascii_max = 127  # Standard ASCII range
-        head_non_ascii = len([c for c in head if ord(c) > ascii_max]) / max(len(head), 1)
-        tail_non_ascii = len([c for c in tail if ord(c) > ascii_max]) / max(len(tail), 1)
+        head: str = text[:-tail_length]
+        ascii_max: int = 127  # Standard ASCII range
+        head_non_ascii: float = len([c for c in head if ord(c) > ascii_max]) / max(len(head), 1)
+        tail_non_ascii: float = len([c for c in tail if ord(c) > ascii_max]) / max(len(tail), 1)
         if (
             tail_non_ascii > QUALITY.non_ascii_ratio_threshold
             and tail_non_ascii > head_non_ascii * QUALITY.non_ascii_ratio_multiplier
@@ -2992,22 +2999,22 @@ def _detect_fabricated_details(text: str) -> tuple[bool, list[str]]:
     issues: list[str] = []
 
     # 1. Detect suspicious URLs (models often fabricate URLs)
-    url_patterns = _get_quality_pattern_list(
+    url_patterns: list[str] = _get_quality_pattern_list(
         "fabrication_url_patterns",
         [r"https?://[^\s<>\"']+"],
     )
-    urls = _extract_pattern_matches(
+    urls: list[str] = _extract_pattern_matches(
         text,
         url_patterns,
         debug_context="fabrication URL",
         unique=True,
     )
 
-    suspicious_url_keywords = _get_quality_pattern_list(
+    suspicious_url_keywords: list[str] = _get_quality_pattern_list(
         "fabrication_suspicious_url_keywords",
         ["example.com", "placeholder", "xxx", "fake"],
     )
-    long_url_path_patterns = _get_quality_pattern_list(
+    long_url_path_patterns: list[str] = _get_quality_pattern_list(
         "fabrication_long_url_path_patterns",
         [r"/[a-z0-9]{20,}/"],
     )
@@ -3025,11 +3032,11 @@ def _detect_fabricated_details(text: str) -> tuple[bool, list[str]]:
 
     # 2. Detect invented precise statistics (suspiciously specific numbers)
     # e.g., "exactly 73.847%" or "precisely 14,523 items"
-    precise_stat_patterns = _get_quality_pattern_list(
+    precise_stat_patterns: list[str] = _get_quality_pattern_list(
         "fabrication_precise_stat_patterns",
         [r"\b(\d{1,3}(?:,\d{3})*\.\d{3,})\s*%?"],
     )
-    precise_stats = _extract_pattern_matches(
+    precise_stats: list[str] = _extract_pattern_matches(
         text,
         precise_stat_patterns,
         debug_context="fabrication precise stat",
@@ -3039,11 +3046,11 @@ def _detect_fabricated_details(text: str) -> tuple[bool, list[str]]:
 
     # 3. Detect future dates (model can't know the future)
     # Years 2030+ are definitely future
-    future_year_patterns = _get_quality_pattern_list(
+    future_year_patterns: list[str] = _get_quality_pattern_list(
         "fabrication_future_year_patterns",
         [r"\b(20[3-9]\d|2[1-9]\d{2})\b"],
     )
-    future_years = _extract_pattern_matches(
+    future_years: list[str] = _extract_pattern_matches(
         text,
         future_year_patterns,
         debug_context="fabrication future year",
@@ -3054,11 +3061,11 @@ def _detect_fabricated_details(text: str) -> tuple[bool, list[str]]:
 
     # 4. Detect citations to non-existent sources (common hallucination)
     # Patterns like "according to Smith et al. (2024)" or "(Johnson, 2025)"
-    citation_patterns = _get_quality_pattern_list(
+    citation_patterns: list[str] = _get_quality_pattern_list(
         "fabrication_citation_patterns",
         [r"\(([A-Z][a-z]+(?:\s+et\s+al\.?)?,?\s*\d{4})\)"],
     )
-    fake_citations = _extract_pattern_matches(
+    fake_citations: list[str] = _extract_pattern_matches(
         text,
         citation_patterns,
         debug_context="fabrication citation",
@@ -3124,12 +3131,12 @@ def _detect_token_encoding_issues(text: str) -> tuple[bool, str | None]:
     # Check for Ġ (U+0120) - BPE space marker leak
     # This is a specific HuggingFace tokenizer artifact
     if "\u0120" in text:
-        count = text.count("\u0120")
+        count: int = text.count("\u0120")
         return True, f"bpe_space_leak({count})"
 
     # Check for Ċ (U+010A) - BPE newline marker leak
     if "\u010a" in text:
-        count = text.count("\u010a")
+        count: int = text.count("\u010a")
         return True, f"bpe_newline_leak({count})"
 
     # Check for other common tokenizer artifacts that shouldn't be visible
@@ -3192,18 +3199,18 @@ def _detect_minimal_output(
     # Less than threshold tokens when we have a substantial prompt
     if generated_tokens < QUALITY.min_tokens_for_substantial:
         # Check if the output is actually meaningful or just filler
-        text_stripped = text.strip()
-        word_count = len(text_stripped.split())
+        text_stripped: str = text.strip()
+        word_count: int = len(text_stripped.split())
 
         # Single sentence filler responses
-        filler_responses = [
+        filler_responses: list[str] = [
             "the image is a photograph",
             "the image is in the public domain",
             "i cannot",
             "i can't",
             "this image shows",
         ]
-        text_lower = text_stripped.lower()
+        text_lower: str = text_stripped.lower()
         for filler in filler_responses:
             if text_lower.startswith(filler) and word_count < QUALITY.min_words_for_filler_response:
                 return True, f"filler_response({generated_tokens}tok)"
@@ -3217,7 +3224,7 @@ def _detect_minimal_output(
         and prompt_tokens > QUALITY.min_prompt_tokens_for_ratio
         and generated_tokens < QUALITY.min_output_tokens_for_ratio
     ):
-        ratio = generated_tokens / prompt_tokens
+        ratio: float = generated_tokens / prompt_tokens
         if ratio < QUALITY.min_output_ratio:
             return True, f"output_ratio({ratio:.1%})"
 
@@ -3242,9 +3249,9 @@ def _detect_long_context_breakdown(
     if prompt_tokens is None or prompt_tokens < QUALITY.long_prompt_tokens_threshold:
         return False, None
 
-    safe_prompt_tokens = max(prompt_tokens, 1)
-    ratio = generated_tokens / safe_prompt_tokens
-    text_empty = not text.strip()
+    safe_prompt_tokens: int = max(prompt_tokens, 1)
+    ratio: float = generated_tokens / safe_prompt_tokens
+    text_empty: bool = not text.strip()
 
     if text_empty and generated_tokens == 0:
         return True, f"long_context_empty({prompt_tokens}tok)"
@@ -3281,7 +3288,7 @@ def _detect_training_data_leak(text: str) -> tuple[bool, str | None]:
         return False, None
 
     # Look for instruction-like patterns appearing mid-output
-    training_leak_pattern_groups = [
+    training_leak_pattern_groups: list[tuple[list[str], str]] = [
         (
             _get_quality_pattern_list(
                 "training_leak_instruction_header_patterns",
@@ -3327,7 +3334,7 @@ def _detect_training_data_leak(text: str) -> tuple[bool, str | None]:
     ]
 
     # Only check the latter portion of output (leaks happen after good output)
-    check_portion = text[len(text) // 3 :]
+    check_portion: str = text[len(text) // 3 :]
 
     for patterns, leak_type in training_leak_pattern_groups:
         for pattern in patterns:
@@ -3350,14 +3357,14 @@ def compute_vocabulary_diversity(text: str) -> tuple[float, int, int]:
         return 0.0, 0, 0
 
     # Normalize: lowercase, extract word tokens only
-    words = re.findall(r"\b[a-z]+\b", text.lower())
-    total_words = len(words)
+    words: list[str] = re.findall(r"\b[a-z]+\b", text.lower())
+    total_words: int = len(words)
 
     if total_words == 0:
         return 0.0, 0, 0
 
-    unique_words = len(set(words))
-    ttr = unique_words / total_words
+    unique_words: int = len(set(words))
+    ttr: float = unique_words / total_words
 
     return round(ttr, 3), unique_words, total_words
 
@@ -3393,7 +3400,7 @@ def compute_efficiency_metrics(
         metrics["tokens_per_gb"] = round(tokens_generated / peak_memory_gb, 1)
 
         if generation_time and generation_time > 0:
-            tps = tokens_generated / generation_time
+            tps: float = tokens_generated / generation_time
             metrics["tokens_per_second_per_gb"] = round(tps / peak_memory_gb, 2)
 
     return metrics
@@ -3423,10 +3430,10 @@ def detect_response_structure(text: str) -> dict[str, bool]:
         }
 
     # Reuse task compliance detection for the core elements
-    compliance = compute_task_compliance(text)
+    compliance: dict[str, bool | float] = compute_task_compliance(text)
 
     # Add section detection (markdown headers)
-    has_sections = bool(re.search(r"^#{1,3}\s+\w+", text, re.MULTILINE))
+    has_sections: bool = bool(re.search(r"^#{1,3}\s+\w+", text, re.MULTILINE))
 
     return {
         "has_caption": bool(compliance["has_caption"]),
@@ -3436,17 +3443,22 @@ def detect_response_structure(text: str) -> dict[str, bool]:
     }
 
 
-def _get_quality_pattern_list(pattern_key: str, fallback: list[str]) -> list[str]:
+def _get_quality_pattern_list(
+    pattern_key: str,
+    fallback: list[str],
+    *,
+    quality_thresholds: QualityThresholds = QUALITY,
+) -> list[str]:
     """Return configured regex/pattern list for a key, falling back to defaults."""
-    if not QUALITY.patterns:
+    if not quality_thresholds.patterns:
         return fallback
 
-    configured = QUALITY.patterns.get(pattern_key)
+    configured: list[str] | None = quality_thresholds.patterns.get(pattern_key)
     if not configured:
         return fallback
 
     # Guard against malformed YAML values while keeping detector behavior stable.
-    valid = [p for p in configured if isinstance(p, str)]
+    valid: list[str] = [p for p in configured if isinstance(p, str)]
     return valid or fallback
 
 
@@ -3505,7 +3517,7 @@ def _extract_pattern_matches(
         if compiled is None:
             continue
         for match in compiled.finditer(text):
-            value = match.group(0)
+            value: str = match.group(0)
             if not value:
                 continue
             if unique and value in seen:
@@ -3527,7 +3539,7 @@ def _matches_any_pattern(text: str, patterns: list[str], *, debug_context: str) 
 
 def _count_pattern_matches(text: str, patterns: list[str]) -> int:
     """Count total regex matches across all configured patterns."""
-    total = 0
+    total: int = 0
     for pattern in patterns:
         compiled = _compile_regex_for_detection(pattern, debug_context="pattern")
         if compiled is None:
@@ -3554,9 +3566,9 @@ def compute_confidence_indicators(text: str) -> dict[str, float | int]:
     if not text:
         return {"hedge_count": 0, "definitive_count": 0, "confidence_ratio": 0.0}
 
-    text_lower = text.lower()
+    text_lower: str = text.lower()
 
-    hedge_patterns = _get_quality_pattern_list(
+    hedge_patterns: list[str] = _get_quality_pattern_list(
         "confidence_hedge_patterns",
         [
             r"\bappears to\b",
@@ -3575,7 +3587,7 @@ def compute_confidence_indicators(text: str) -> dict[str, float | int]:
             r"\buncertain\b",
         ],
     )
-    definitive_patterns = _get_quality_pattern_list(
+    definitive_patterns: list[str] = _get_quality_pattern_list(
         "confidence_definitive_patterns",
         [
             r"\bis a\b",
@@ -3590,11 +3602,11 @@ def compute_confidence_indicators(text: str) -> dict[str, float | int]:
         ],
     )
 
-    hedge_count = _count_pattern_matches(text_lower, hedge_patterns)
-    definitive_count = _count_pattern_matches(text_lower, definitive_patterns)
+    hedge_count: int = _count_pattern_matches(text_lower, hedge_patterns)
+    definitive_count: int = _count_pattern_matches(text_lower, definitive_patterns)
 
-    total = hedge_count + definitive_count
-    confidence_ratio = definitive_count / total if total > 0 else 0.5
+    total: int = hedge_count + definitive_count
+    confidence_ratio: float = definitive_count / total if total > 0 else 0.5
 
     return {
         "hedge_count": hedge_count,
@@ -5886,12 +5898,14 @@ def _build_report_render_context(
     system_info: dict[str, str] | None = None,
 ) -> ReportRenderContext:
     """Build shared derived report data once for all renderers."""
-    result_set = ResultSet(results)
-    prompt_context = _extract_context_from_prompt(prompt)
-    summary = analyze_model_issues(results, prompt_context)
-    stats = compute_performance_statistics(results)
-    resolved_system_info = system_info if system_info is not None else get_system_characteristics()
-    table_data = _build_prepared_table_data(result_set=result_set)
+    result_set: ResultSet = ResultSet(results)
+    prompt_context: str | None = _extract_context_from_prompt(prompt)
+    summary: ModelIssueSummary = analyze_model_issues(results, prompt_context)
+    stats: PerformanceStats = compute_performance_statistics(results)
+    resolved_system_info: dict[str, str] = (
+        system_info if system_info is not None else get_system_characteristics()
+    )
+    table_data: PreparedTableData = _build_prepared_table_data(result_set=result_set)
     return ReportRenderContext(
         result_set=result_set,
         table_data=table_data,
@@ -5907,21 +5921,21 @@ def _mark_failed_rows_in_html(
     sorted_results: Sequence[PerformanceResult],
 ) -> str:
     """Add data attributes and classes to rows for filtering in the HTML table."""
-    table_rows = html_table.split("<tr>")
+    table_rows: list[str] = html_table.split("<tr>")
     # Keep preamble and header row (index 0 and 1)
-    new_table_rows = [table_rows[0], table_rows[1]]
+    new_table_rows: list[str] = [table_rows[0], table_rows[1]]
 
     for i, res in enumerate(sorted_results):
         # Data rows start at index 2
         if i + 2 < len(table_rows):
-            row_html = table_rows[i + 2]
+            row_html: str = table_rows[i + 2]
 
             # Add data attributes for filtering
             if not res.success:
                 # Determine error category
-                error_stage = res.error_stage or "unknown"
-                error_type = res.error_type or "error"
-                error_package = res.error_package or "unknown"
+                error_stage: str = res.error_stage or "unknown"
+                error_type: str = res.error_type or "error"
+                error_package: str = res.error_package or "unknown"
 
                 # Add both class and data attributes for flexible filtering
                 row_html = row_html.replace(
@@ -5959,50 +5973,57 @@ def _wrap_output_column_in_details(html_table: str, output_col_idx: int) -> str:
 
     # Pattern to match table cells in data rows (not header)
     # We'll process each row and wrap the last td content
-    lines = html_table.split("\n")
+    lines: list[str] = html_table.split("\n")
     result_lines: list[str] = []
 
     for original_line in lines:
         # Check if this is a data row (contains <td> tags)
         if "<td" in original_line and "</td>" in original_line:
             # Find all <td>...</td> cells in this row
-            cells = re.findall(r"<td[^>]*>.*?</td>", original_line)
+            cells: list[str] = re.findall(r"<td[^>]*>.*?</td>", original_line)
             if len(cells) > output_col_idx:
                 # Get the last cell (output column)
-                output_cell = cells[output_col_idx]
+                output_cell: str = cells[output_col_idx]
 
                 # Extract the content between <td...> and </td>
-                match = re.match(r"(<td[^>]*>)(.*?)(</td>)", output_cell, re.DOTALL)
+                match: re.Match[str] | None = re.match(
+                    r"(<td[^>]*>)(.*?)(</td>)",
+                    output_cell,
+                    re.DOTALL,
+                )
                 if match:
+                    opening_tag: str
+                    content: str
+                    closing_tag: str
                     opening_tag, content, closing_tag = match.groups()
 
                     # Create preview (first N chars of actual text)
                     # Content is already HTML-escaped by tabulate, so unescape to get real text
                     # for accurate character counting (not entity counting)
-                    text_content = html.unescape(content)
-                    preview_text = text_content[:preview_length]
+                    text_content: str = html.unescape(content)
+                    preview_text: str = text_content[:preview_length]
                     if len(text_content) > preview_length:
                         preview_text += "..."
 
                     # Wrap in details/summary
                     # Escape the preview text for HTML (it was unescaped above for char counting)
                     # The full content is already escaped by tabulate
-                    wrapped_content = (
+                    wrapped_content: str = (
                         f"<details><summary>{html.escape(preview_text)}</summary>"
                         f"<div style='margin-top: 0.5em;'>{content}</div></details>"
                     )
-                    new_cell = opening_tag + wrapped_content + closing_tag
+                    new_cell: str = opening_tag + wrapped_content + closing_tag
 
                     # Replace the old cell with the new one
                     cells[output_col_idx] = new_cell
 
                     # Reconstruct the line with updated cells
-                    cell_iter = iter(cells)
+                    cell_iter: Iterator[str] = iter(cells)
 
                     def repl(_: re.Match[str], ci: Iterator[str] = cell_iter) -> str:
                         return next(ci)
 
-                    updated_line = re.sub(
+                    updated_line: str = re.sub(
                         r"<td[^>]*>.*?</td>",
                         repl,
                         original_line,
@@ -6018,6 +6039,52 @@ def _wrap_output_column_in_details(html_table: str, output_col_idx: int) -> str:
     return "\n".join(result_lines)
 
 
+def _initialize_metadata_baseline_tracking(
+    summary: ModelIssueSummary,
+    *,
+    baseline_score: float | None,
+    baseline_grade: str | None,
+) -> tuple[list[str] | None, list[str] | None, list[str] | None]:
+    """Initialize metadata-baseline tracking lists when a baseline is available."""
+    if baseline_score is None or baseline_grade is None:
+        return None, None, None
+
+    improves_metadata: list[str] = []
+    neutral_vs_metadata: list[str] = []
+    worse_than_metadata: list[str] = []
+    summary["metadata_baseline_score"] = baseline_score
+    summary["metadata_baseline_grade"] = baseline_grade
+    summary["cataloging_improves_metadata"] = improves_metadata
+    summary["cataloging_neutral_vs_metadata"] = neutral_vs_metadata
+    summary["cataloging_worse_than_metadata"] = worse_than_metadata
+    return improves_metadata, neutral_vs_metadata, worse_than_metadata
+
+
+def _finalize_cataloging_summary(
+    summary: ModelIssueSummary,
+    utility_scores: list[CatalogingScoreRecord],
+    *,
+    baseline_score: float | None,
+) -> None:
+    """Populate summary cataloging aggregates from per-model utility scores."""
+    if not utility_scores:
+        return
+
+    best: CatalogingScoreRecord = max(utility_scores, key=lambda row: row[1])
+    worst: CatalogingScoreRecord = min(utility_scores, key=lambda row: row[1])
+    summary["cataloging_best"] = (best[0], best[1], best[2])
+    summary["cataloging_worst"] = (worst[0], worst[1], worst[2])
+    summary["cataloging_avg_score"] = sum(
+        score for _model, score, _grade, _weakness, _delta in utility_scores
+    ) / len(utility_scores)
+    if baseline_score is None:
+        return
+
+    deltas: list[float] = [delta for _m, _s, _g, _w, delta in utility_scores if delta is not None]
+    if deltas:
+        summary["cataloging_avg_delta"] = sum(deltas) / len(deltas)
+
+
 def analyze_model_issues(
     results: list[PerformanceResult],
     context: str | None = None,
@@ -6028,9 +6095,9 @@ def analyze_model_issues(
         results: List of model performance results
         context: Optional context string (from prompt) for cataloging utility analysis
     """
-    baseline = _compute_metadata_baseline_utility(context)
-    baseline_score = baseline[0] if baseline is not None else None
-    baseline_grade = baseline[1] if baseline is not None else None
+    baseline: tuple[float, str] | None = _compute_metadata_baseline_utility(context)
+    baseline_score: float | None = baseline[0] if baseline is not None else None
+    baseline_grade: str | None = baseline[1] if baseline is not None else None
 
     failed_models: list[FailedModelIssue] = []
     repetitive_models: list[RepetitiveModelIssue] = []
@@ -6057,22 +6124,20 @@ def analyze_model_issues(
         "low_utility_models": low_utility_models,
     }
 
-    improves_metadata: list[str] | None = None
-    neutral_vs_metadata: list[str] | None = None
-    worse_than_metadata: list[str] | None = None
-    if baseline_score is not None and baseline_grade is not None:
-        improves_metadata = []
-        neutral_vs_metadata = []
-        worse_than_metadata = []
-        summary["metadata_baseline_score"] = baseline_score
-        summary["metadata_baseline_grade"] = baseline_grade
-        summary["cataloging_improves_metadata"] = improves_metadata
-        summary["cataloging_neutral_vs_metadata"] = neutral_vs_metadata
-        summary["cataloging_worse_than_metadata"] = worse_than_metadata
+    improves_metadata: list[str] | None
+    neutral_vs_metadata: list[str] | None
+    worse_than_metadata: list[str] | None
+    improves_metadata, neutral_vs_metadata, worse_than_metadata = (
+        _initialize_metadata_baseline_tracking(
+            summary,
+            baseline_score=baseline_score,
+            baseline_grade=baseline_grade,
+        )
+    )
 
-    successful = [r for r in results if r.success]
+    successful: list[PerformanceResult] = [r for r in results if r.success]
     _populate_summary_performance_highlights(summary, successful)
-    runtime_analysis = _build_runtime_analysis_summary(results)
+    runtime_analysis: RuntimeAnalysisSummary | None = _build_runtime_analysis_summary(results)
     if runtime_analysis is not None:
         summary["runtime_analysis"] = runtime_analysis
 
@@ -6083,11 +6148,11 @@ def analyze_model_issues(
         if not res.generation:
             continue
 
-        text = getattr(res.generation, "text", "") or ""
-        generation_tokens = getattr(res.generation, "generation_tokens", 0)
-        prompt_tokens = getattr(res.generation, "prompt_tokens", None)
+        text: str = getattr(res.generation, "text", "") or ""
+        generation_tokens: int = getattr(res.generation, "generation_tokens", 0)
+        prompt_tokens: int | None = getattr(res.generation, "prompt_tokens", None)
 
-        analysis = res.quality_analysis
+        analysis: GenerationQualityAnalysis | None = res.quality_analysis
         if analysis is None:
             analysis = analyze_generation_text(
                 text,
@@ -6105,6 +6170,10 @@ def analyze_model_issues(
             excessive_bullets=excessive_bullets,
         )
 
+        score: float
+        grade: str
+        weakness: str
+        delta: float | None
         score, grade, weakness, delta = _compute_utility_snapshot(
             text,
             context,
@@ -6124,18 +6193,11 @@ def analyze_model_issues(
             worse_than_metadata=worse_than_metadata,
         )
 
-    if utility_scores:
-        best = max(utility_scores, key=lambda row: row[1])
-        worst = min(utility_scores, key=lambda row: row[1])
-        summary["cataloging_best"] = (best[0], best[1], best[2])
-        summary["cataloging_worst"] = (worst[0], worst[1], worst[2])
-        summary["cataloging_avg_score"] = sum(
-            score for _model, score, _grade, _weakness, _delta in utility_scores
-        ) / len(utility_scores)
-        if baseline_score is not None:
-            deltas = [delta for _m, _s, _g, _w, delta in utility_scores if delta is not None]
-            if deltas:
-                summary["cataloging_avg_delta"] = sum(deltas) / len(deltas)
+    _finalize_cataloging_summary(
+        summary,
+        utility_scores,
+        baseline_score=baseline_score,
+    )
 
     return summary
 
@@ -6148,33 +6210,36 @@ def _populate_summary_performance_highlights(
     if not successful:
         return
 
-    fastest = max(successful, key=lambda r: getattr(r.generation, "generation_tps", 0) or 0)
-    fastest_tps = getattr(fastest.generation, "generation_tps", 0) or 0
+    fastest: PerformanceResult = max(
+        successful,
+        key=lambda r: getattr(r.generation, "generation_tps", 0) or 0,
+    )
+    fastest_tps: float = getattr(fastest.generation, "generation_tps", 0) or 0
     summary["fastest_model"] = (fastest.model_name, fastest_tps)
 
-    most_efficient = min(
+    most_efficient: PerformanceResult = min(
         successful,
         key=lambda r: getattr(r.generation, "peak_memory", float("inf")) or float("inf"),
     )
-    efficient_mem = getattr(most_efficient.generation, "peak_memory", 0) or 0
+    efficient_mem: float = getattr(most_efficient.generation, "peak_memory", 0) or 0
     summary["most_efficient_model"] = (most_efficient.model_name, efficient_mem)
 
-    fastest_load = min(
+    fastest_load: PerformanceResult = min(
         successful,
         key=lambda r: getattr(r, "model_load_time", float("inf")) or float("inf"),
     )
-    load_time = getattr(fastest_load, "model_load_time", 0) or 0
+    load_time: float = getattr(fastest_load, "model_load_time", 0) or 0
     summary["fastest_load_model"] = (fastest_load.model_name, load_time)
 
-    total_tps = sum(getattr(r.generation, "generation_tps", 0) or 0 for r in successful)
+    total_tps: float = sum(getattr(r.generation, "generation_tps", 0) or 0 for r in successful)
     summary["average_tps"] = total_tps / len(successful)
     summary["successful_count"] = len(successful)
 
-    total_mem = sum(getattr(r.generation, "peak_memory", 0) or 0 for r in successful)
+    total_mem: float = sum(getattr(r.generation, "peak_memory", 0) or 0 for r in successful)
     summary["total_peak_memory"] = total_mem
     summary["average_peak_memory"] = total_mem / len(successful)
 
-    total_tokens = sum(
+    total_tokens: int = sum(
         (getattr(r.generation, "prompt_tokens", 0) or 0)
         + (getattr(r.generation, "generation_tokens", 0) or 0)
         for r in successful
@@ -6290,7 +6355,7 @@ def _runtime_phase_durations(runtime: RuntimeDiagnostics | None) -> dict[Runtime
 
 def _dominant_runtime_phase(runtime: RuntimeDiagnostics | None) -> RuntimePhaseName | None:
     """Return the dominant measured phase for one run, if any."""
-    phase_durations = _runtime_phase_durations(runtime)
+    phase_durations: dict[RuntimePhaseName, float] = _runtime_phase_durations(runtime)
     if not phase_durations:
         return None
     return max(phase_durations, key=phase_durations.__getitem__)
@@ -6303,38 +6368,43 @@ def _build_runtime_analysis_summary(
     phase_totals: dict[RuntimePhaseName, float] = dict.fromkeys(_RUNTIME_PHASE_KEYS, 0.0)
     dominant_counts: Counter[RuntimePhaseName] = Counter()
     termination_counts: Counter[str] = Counter()
-    measured_models = 0
-    validation_total = 0.0
-    validation_models = 0
+    measured_models: int = 0
+    validation_total: float = 0.0
+    validation_models: int = 0
     first_token_latencies: list[float] = []
 
     for result in results:
-        runtime = result.runtime_diagnostics
-        phase_durations = _runtime_phase_durations(runtime)
+        runtime: RuntimeDiagnostics | None = result.runtime_diagnostics
+        phase_durations: dict[RuntimePhaseName, float] = _runtime_phase_durations(runtime)
         if phase_durations:
             measured_models += 1
-            dominant_phase = max(phase_durations, key=phase_durations.__getitem__)
+            dominant_phase: RuntimePhaseName = max(
+                phase_durations,
+                key=phase_durations.__getitem__,
+            )
             dominant_counts[dominant_phase] += 1
             for phase, duration in phase_durations.items():
                 phase_totals[phase] += duration
         if runtime is not None:
-            validation_time = runtime.input_validation_time_s
+            validation_time: float | None = runtime.input_validation_time_s
             if isinstance(validation_time, int | float) and float(validation_time) > 0.0:
                 validation_total += float(validation_time)
                 validation_models += 1
-            first_token_latency = runtime.first_token_latency_s
+            first_token_latency: float | None = runtime.first_token_latency_s
             if isinstance(first_token_latency, int | float) and float(first_token_latency) > 0.0:
                 first_token_latencies.append(float(first_token_latency))
-        stop_reason = runtime.stop_reason if runtime is not None else None
+        stop_reason: str | None = runtime.stop_reason if runtime is not None else None
         if stop_reason:
             termination_counts[stop_reason] += 1
 
-    total_measured = sum(phase_totals.values())
+    total_measured: float = sum(phase_totals.values())
     if measured_models == 0 or total_measured <= 0.0:
         return None
 
-    dominant_phase = max(phase_totals, key=phase_totals.__getitem__)
-    dominant_phase_share = phase_totals[dominant_phase] / total_measured
+    dominant_phase: RuntimePhaseName = max(phase_totals, key=phase_totals.__getitem__)
+    dominant_phase_share: float = phase_totals[dominant_phase] / total_measured
+    interpretation: str
+    next_action: str
     interpretation, next_action = _RUNTIME_PHASE_ACTIONS.get(
         dominant_phase,
         (
@@ -6349,7 +6419,7 @@ def _build_runtime_analysis_summary(
             "so some totals may be dominated by interrupted runs."
         )
 
-    first_token_latency_avg = (
+    first_token_latency_avg: float | None = (
         sum(first_token_latencies) / len(first_token_latencies) if first_token_latencies else None
     )
 
@@ -6381,10 +6451,10 @@ def _format_runtime_timing_snapshot_lines(runtime_analysis: RuntimeAnalysisSumma
     """Build concise aggregate timing bullets for optional runtime signals."""
     lines: list[str] = []
 
-    validation_models = runtime_analysis["validation_models"]
-    validation_total = runtime_analysis["validation_total"]
+    validation_models: int = runtime_analysis["validation_models"]
+    validation_total: float = runtime_analysis["validation_total"]
     if validation_models > 0 and validation_total > 0.0:
-        validation_avg = validation_total / validation_models
+        validation_avg: float = validation_total / validation_models
         lines.append(
             "- **Validation overhead:** "
             f"{_format_runtime_phase_duration(validation_total)} total "
@@ -6392,10 +6462,10 @@ def _format_runtime_timing_snapshot_lines(runtime_analysis: RuntimeAnalysisSumma
             f"{validation_models} model(s)).",
         )
 
-    first_token_models = runtime_analysis["first_token_latency_models"]
-    first_token_avg = runtime_analysis["first_token_latency_avg"]
-    first_token_min = runtime_analysis["first_token_latency_min"]
-    first_token_max = runtime_analysis["first_token_latency_max"]
+    first_token_models: int = runtime_analysis["first_token_latency_models"]
+    first_token_avg: float | None = runtime_analysis["first_token_latency_avg"]
+    first_token_min: float | None = runtime_analysis["first_token_latency_min"]
+    first_token_max: float | None = runtime_analysis["first_token_latency_max"]
     if (
         first_token_models > 0
         and first_token_avg is not None
@@ -6415,24 +6485,24 @@ def _format_runtime_timing_snapshot_lines(runtime_analysis: RuntimeAnalysisSumma
 
 def _format_runtime_analysis_lines(runtime_analysis: RuntimeAnalysisSummary) -> list[str]:
     """Build concise Markdown bullets explaining runtime timing implications."""
-    dominant_phase = runtime_analysis["dominant_phase"]
-    dominant_label = _RUNTIME_PHASE_LABELS.get(dominant_phase, dominant_phase)
-    dominant_share = runtime_analysis["dominant_phase_share"]
-    dominant_count = runtime_analysis["dominant_phase_count"]
-    measured_models = runtime_analysis["measured_models"]
-    phase_totals = runtime_analysis["phase_totals"]
-    termination_counts = runtime_analysis["termination_counts"]
+    dominant_phase: RuntimePhaseName = runtime_analysis["dominant_phase"]
+    dominant_label: str = _RUNTIME_PHASE_LABELS.get(dominant_phase, dominant_phase)
+    dominant_share: float = runtime_analysis["dominant_phase_share"]
+    dominant_count: int = runtime_analysis["dominant_phase_count"]
+    measured_models: int = runtime_analysis["measured_models"]
+    phase_totals: dict[RuntimePhaseName, float] = runtime_analysis["phase_totals"]
+    termination_counts: dict[str, int] = runtime_analysis["termination_counts"]
 
-    phase_summary = ", ".join(
+    phase_summary: str = ", ".join(
         f"{_RUNTIME_PHASE_LABELS.get(phase, phase)}={_format_runtime_phase_duration(duration)}"
         for phase, duration in phase_totals.items()
         if duration > 0.0
     )
-    termination_summary = ", ".join(
+    termination_summary: str = ", ".join(
         f"{name}={count}" for name, count in sorted(termination_counts.items())
     )
 
-    lines = [
+    lines: list[str] = [
         (
             f"- **Runtime pattern:** {dominant_label} dominates measured phase time "
             f"({dominant_share:.0%}; {dominant_count}/{measured_models} measured model(s))."
@@ -6453,11 +6523,11 @@ def compute_performance_statistics(results: list[PerformanceResult]) -> Performa
     reducing overhead from repeated filtering and type conversions.
     """
     stats: PerformanceStats = {}
-    successful_results = [r for r in results if r.success and r.generation]
+    successful_results: list[PerformanceResult] = [r for r in results if r.success and r.generation]
     if not successful_results:
         return stats
 
-    fields_to_stat = [
+    fields_to_stat: list[str] = [
         "generation_tps",
         "peak_memory",
         "total_time",
@@ -6470,8 +6540,8 @@ def compute_performance_statistics(results: list[PerformanceResult]) -> Performa
 
     for res in successful_results:
         for field in fields_to_stat:
-            value = _get_field_value(res, field)
-            numeric_value = _coerce_numeric_value(value)
+            value: MetricValue = _get_field_value(res, field)
+            numeric_value: float | None = _coerce_numeric_value(value)
             if numeric_value is not None:
                 field_values[field].append(numeric_value)
 
@@ -6939,7 +7009,7 @@ def _format_failures_by_package_text(results: list[PerformanceResult]) -> list[s
     This helps framework maintainers quickly identify which issues belong to them.
     """
     parts: list[str] = []
-    failed = [r for r in results if not r.success]
+    failed: list[PerformanceResult] = [r for r in results if not r.success]
     if not failed:
         return parts
 
@@ -6950,7 +7020,10 @@ def _format_failures_by_package_text(results: list[PerformanceResult]) -> list[s
         by_package.setdefault(pkg, []).append(res)
 
     # Sort packages by failure count (descending) for priority
-    sorted_packages = sorted(by_package.items(), key=lambda x: -len(x[1]))
+    sorted_packages: list[tuple[str, list[PerformanceResult]]] = sorted(
+        by_package.items(),
+        key=lambda x: -len(x[1]),
+    )
 
     parts.append("## 🚨 Failures by Package (Actionable)")
     parts.append("")
@@ -6961,8 +7034,8 @@ def _format_failures_by_package_text(results: list[PerformanceResult]) -> list[s
     parts.append("|---------|----------|-------------|-----------------|")
 
     for pkg, failures in sorted_packages:
-        error_types = sorted({r.error_stage or "unknown" for r in failures})
-        models = [f"`{r.model_name}`" for r in failures]
+        error_types: list[str] = sorted({r.error_stage or "unknown" for r in failures})
+        models: list[str] = [f"`{r.model_name}`" for r in failures]
         parts.append(
             f"| `{pkg}` | {len(failures)} | {', '.join(error_types)} | {', '.join(models)} |",
         )
@@ -6981,10 +7054,10 @@ def _format_failures_by_package_text(results: list[PerformanceResult]) -> list[s
         for res in failures:
             parts.append(f"- **{res.model_name}** ({res.error_stage})")
             # Add truncated error message
-            error_msg = res.error_message or ""
+            error_msg: str = res.error_message or ""
             if len(error_msg) > ERROR_MESSAGE_TRUNCATE_LEN:
                 error_msg = error_msg[: ERROR_MESSAGE_TRUNCATE_LEN - 3] + "..."
-            escaped_msg = _escape_markdown_diagnostics(error_msg)
+            escaped_msg: str = _escape_markdown_diagnostics(error_msg)
             parts.append(f"  - Error: `{escaped_msg}`")
             if res.error_type:
                 parts.append(f"  - Type: `{res.error_type}`")
@@ -7000,10 +7073,10 @@ def _format_action_snapshot_text(
     """Build a compact triage block for maintainers at top of Markdown report."""
     parts: list[str] = ["## 🎯 Action Snapshot", ""]
 
-    failed = [res for res in results if not res.success]
+    failed: list[PerformanceResult] = [res for res in results if not res.success]
     if failed:
         owners = Counter(res.error_package or "unknown" for res in failed)
-        owner_summary = ", ".join(f"{owner}={count}" for owner, count in owners.most_common(3))
+        owner_summary: str = ", ".join(f"{owner}={count}" for owner, count in owners.most_common(3))
         parts.append(
             f"- **Framework/runtime failures:** {len(failed)} (top owners: {owner_summary}).",
         )
@@ -7013,7 +7086,7 @@ def _format_action_snapshot_text(
     else:
         parts.append("- **Framework/runtime failures:** none.")
 
-    low_utility = summary.get("low_utility_models", [])
+    low_utility: list[tuple[str, float, str, str]] = summary.get("low_utility_models", [])
     if low_utility:
         parts.append(f"- **Model output watchlist:** {len(low_utility)} model(s) graded D/F.")
         parts.append("- **Next action:** prioritize A/B models and de-prioritize D/F outputs.")
@@ -7160,7 +7233,7 @@ def _append_markdown_code_block(
 
 def _escape_markdown_blockquote_line(text: str) -> str:
     """Escape structural Markdown syntax for wrapped blockquote text."""
-    escaped = HTML_ESCAPER.escape(_wrap_bare_urls(text)).replace("__", r"\_\_")
+    escaped: str = HTML_ESCAPER.escape(_wrap_bare_urls(text)).replace("__", r"\_\_")
     escaped = re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", escaped)
     escaped = re.sub(r"^([#>*+\-`])", r"\\\1", escaped)
     return re.sub(r"^(\d+)([.)]\s)", r"\\\1\2", escaped)
@@ -7180,14 +7253,14 @@ def _append_markdown_wrapped_blockquote(
     if not parts or parts[-1] != "":
         parts.append("")
     parts.append("<!-- markdownlint-disable MD028 -->")
-    blockquote_lines = [">"]
+    blockquote_lines: list[str] = [">"]
 
-    normalized = content.replace("\r\n", "\n").replace("\r", "\n")
+    normalized: str = content.replace("\r\n", "\n").replace("\r", "\n")
     for raw_line in normalized.split("\n"):
         if raw_line == "":
             blockquote_lines.append(">")
             continue
-        wrapped_lines = textwrap.wrap(
+        wrapped_lines: list[str] = textwrap.wrap(
             raw_line,
             width=width,
             break_long_words=False,
@@ -7221,7 +7294,7 @@ def _append_markdown_image_metadata_section(
     if not metadata:
         return
 
-    metadata_fields = (
+    metadata_fields: tuple[tuple[str, str | None], ...] = (
         ("Title", metadata.get("title")),
         ("Description", metadata.get("description")),
         ("Keywords", metadata.get("keywords")),
@@ -7229,7 +7302,9 @@ def _append_markdown_image_metadata_section(
         ("Time", metadata.get("time")),
         ("GPS", metadata.get("gps")),
     )
-    populated_fields = [(label, value) for label, value in metadata_fields if value]
+    populated_fields: list[tuple[str, str]] = [
+        (label, value) for label, value in metadata_fields if value is not None
+    ]
     if not populated_fields:
         return
 
@@ -7247,7 +7322,7 @@ def _write_markdown_artifact(
     artifact_name: str,
 ) -> None:
     """Normalize and write Markdown artifact content with consistent error handling."""
-    markdown_content = normalize_markdown_trailing_spaces("\n".join(markdown_lines)) + "\n"
+    markdown_content: str = normalize_markdown_trailing_spaces("\n".join(markdown_lines)) + "\n"
 
     try:
         with filename.open("w", encoding="utf-8") as f:
@@ -9901,11 +9976,14 @@ def _append_markdown_gallery_note(
         return
 
     try:
-        relative_gallery_path = os.path.relpath(gallery_filename, start=report_filename.parent)
+        relative_gallery_path: str = os.path.relpath(
+            gallery_filename,
+            start=report_filename.parent,
+        )
     except ValueError:
         relative_gallery_path = str(gallery_filename)
 
-    gallery_link = f"[{relative_gallery_path}]({relative_gallery_path.replace(' ', '%20')})"
+    gallery_link: str = f"[{relative_gallery_path}]({relative_gallery_path.replace(' ', '%20')})"
     md.append("**Dedicated review artifact:**")
     md.append(f"See {gallery_link} for the standalone model-by-model output view.")
     md.append("")
@@ -9944,7 +10022,10 @@ def generate_markdown_report(
         log_warning_note("No table data to generate Markdown report.")
         return
 
-    issues_text = format_issues_summary_text(report_context.summary, report_context.stats)
+    issues_text: str = format_issues_summary_text(
+        report_context.summary,
+        report_context.stats,
+    )
 
     # Build the complete markdown content
     md: list[str] = []
@@ -9958,7 +10039,7 @@ def generate_markdown_report(
         md.append(issues_text)
 
     # Add failures-by-package section for actionable reporting
-    failures_by_pkg = _format_failures_by_package_text(results)
+    failures_by_pkg: list[str] = _format_failures_by_package_text(results)
     if failures_by_pkg:
         md.extend(failures_by_pkg)
 
@@ -9971,7 +10052,7 @@ def generate_markdown_report(
     md.append("")
 
     # Generate table section
-    table_md = _generate_markdown_table_section(report_context)
+    table_md: list[str] = _generate_markdown_table_section(report_context)
     md.extend(table_md)
 
     # --- Model Gallery Section ---
@@ -9996,7 +10077,7 @@ def generate_markdown_report(
     md.append("## Library Versions")
     md.append("")
     for name, ver in sorted(versions.items()):
-        ver_str = "" if ver is None else ver
+        ver_str: str = "" if ver is None else ver
         md.append(f"- `{name}`: `{ver_str}`")
     md.append("")
     md.append(f"_Report generated on: {local_now_str()}_")

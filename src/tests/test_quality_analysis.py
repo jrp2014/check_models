@@ -48,6 +48,24 @@ def test_analyze_generation_text_hallucination_multiple_choice() -> None:
     assert any("choice" in issue.lower() for issue in analysis.hallucination_issues)
 
 
+def test_detect_hallucination_patterns_uses_configured_keyword_lists() -> None:
+    """Configured substring lists should override built-in hallucination defaults."""
+    original_patterns = check_models.QUALITY.patterns
+    check_models.QUALITY.patterns = {
+        "hallucination_question_indicators": ["bespoke hallucination prompt"],
+        "hallucination_edu_keywords": ["custom classroom leak"],
+    }
+    try:
+        issues = check_models._detect_hallucination_patterns(
+            "This long output includes a bespoke hallucination prompt and a custom classroom leak. "
+            * 4,
+        )
+        assert any("question" in issue.lower() for issue in issues)
+        assert any("educational" in issue.lower() for issue in issues)
+    finally:
+        check_models.QUALITY.patterns = original_patterns
+
+
 def test_analyze_generation_text_excessive_verbosity() -> None:
     """Test detection of overly verbose output."""
     # Verbosity requires 300+ tokens AND meta-commentary or section headers
@@ -389,6 +407,25 @@ def test_detect_fabricated_details_clean() -> None:
     has_fab, issues = check_models._detect_fabricated_details(text)
     assert has_fab is False
     assert issues == []
+
+
+def test_detect_language_mixing_uses_passed_quality_thresholds() -> None:
+    """Detector should honor per-call pattern overrides via QualityThresholds."""
+    custom_quality = check_models.QualityThresholds(
+        patterns={
+            "tokenizer_artifacts": [r"CUSTOMTOKEN"],
+            "code_patterns": [r"\bCUSTOMCALL\("],
+        },
+    )
+
+    has_mixing, issues = check_models._detect_language_mixing(
+        "CUSTOMTOKEN and then CUSTOMCALL(value)",
+        quality_thresholds=custom_quality,
+    )
+
+    assert has_mixing is True
+    assert "tokenizer_artifact" in issues
+    assert "code_snippet" in issues
 
 
 def test_detect_fabricated_details_suspicious_url() -> None:
