@@ -176,7 +176,7 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 23643.20it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 13929.94it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -469,12 +469,12 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 - **Detailed diagnostics models:** 13
 - **Summary diagnostics models:** 37
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1440.65s (1440.65s)
-- **Average runtime per model:** 28.81s (28.81s)
+- **Total model runtime (sum):** 1499.91s (1499.91s)
+- **Average runtime per model:** 30.00s (30.00s)
 - **Dominant runtime phase:** decode dominated 48/50 measured model runs (89% of tracked runtime).
-- **Phase totals:** model load=156.80s, prompt prep=0.13s, decode=1271.71s, cleanup=4.17s
+- **Phase totals:** model load=157.13s, prompt prep=0.13s, decode=1330.35s, cleanup=4.49s
 - **Observed stop reasons:** completed=49, exception=1
-- **Validation overhead:** 11.72s total (avg 0.23s across 50 model(s)).
+- **Validation overhead:** 11.97s total (avg 0.24s across 50 model(s)).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
@@ -629,4 +629,4 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 - Input image: `/Users/jrp/Pictures/Processed/20260307-165708_DSC09405.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-03-13 14:06:22 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-03-13 22:08:08 GMT by [check_models](https://github.com/jrp2014/check_models)._
