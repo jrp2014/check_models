@@ -193,8 +193,8 @@ def test_gallery_metrics_omit_missing_segments_cleanly() -> None:
     assert "Prompt" not in md
 
 
-def test_gallery_output_uses_wrapped_callout_instead_of_fence() -> None:
-    """Gallery output should render model text in a wrapped callout box."""
+def test_gallery_output_uses_wrapped_blockquote_instead_of_fence() -> None:
+    """Gallery output should render model text in a wrapped blockquote."""
     result = check_models.PerformanceResult(
         model_name="test/model",
         generation=_GalleryGeneration(text="alpha\n\nbeta"),
@@ -213,11 +213,11 @@ def test_gallery_output_uses_wrapped_callout_instead_of_fence() -> None:
     assert "\n>\n> beta" in md
 
 
-def test_wrapped_callout_escapes_leading_markdown_syntax() -> None:
-    """Wrapped callout lines should neutralize leading Markdown control syntax."""
+def test_wrapped_blockquote_escapes_leading_markdown_syntax() -> None:
+    """Wrapped blockquote lines should neutralize leading Markdown control syntax."""
     parts: list[str] = []
 
-    check_models._append_markdown_wrapped_callout(parts, "# heading\n1. numbered")
+    check_models._append_markdown_wrapped_blockquote(parts, "# heading\n1. numbered")
 
     md = "\n".join(parts)
     assert "> \\# heading" in md

@@ -322,8 +322,8 @@ class TestMarkdownReportEdgeCases:
         assert "org/good" in content
         assert "org/bad" in content
 
-    def test_prompt_section_uses_wrapped_callout(self, tmp_path: Path) -> None:
-        """Prompt section should use the wrapped callout helper for readable Markdown."""
+    def test_prompt_section_uses_wrapped_blockquote(self, tmp_path: Path) -> None:
+        """Prompt section should use the wrapped blockquote helper for readable Markdown."""
         out = tmp_path / "blockquote.md"
         generate_markdown_report(
             results=[_make_success("org/good")],

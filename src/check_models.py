@@ -1099,7 +1099,7 @@ class _TeeCaptureStream(io.TextIOBase):
 def _gallery_render_error(res: PerformanceResult) -> list[str]:
     out: list[str] = []
     out.append(f"**Status:** Failed ({res.error_stage})")
-    error_msg = _escape_markdown_callout_line(str(res.error_message))
+    error_msg = _escape_markdown_blockquote_line(str(res.error_message))
     max_inline_length = 80
     if len(error_msg) > max_inline_length:
         wrapped_lines = textwrap.wrap(
@@ -1196,7 +1196,7 @@ def _gallery_render_success(res: PerformanceResult) -> list[str]:
         if throughput_segments:
             out.append(f"**Throughput:** {' | '.join(throughput_segments)}")
     text = str(getattr(res.generation, "text", "")) if res.generation else ""
-    _append_markdown_wrapped_callout(out, text)
+    _append_markdown_wrapped_blockquote(out, text)
     if res.generation:
         analysis = getattr(res.generation, "quality_analysis", None)
         if analysis and analysis.issues:
@@ -7158,15 +7158,15 @@ def _append_markdown_code_block(
         parts.append("")
 
 
-def _escape_markdown_callout_line(text: str) -> str:
-    """Escape structural Markdown syntax for wrapped callout text."""
+def _escape_markdown_blockquote_line(text: str) -> str:
+    """Escape structural Markdown syntax for wrapped blockquote text."""
     escaped = HTML_ESCAPER.escape(_wrap_bare_urls(text)).replace("__", r"\_\_")
     escaped = re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", escaped)
     escaped = re.sub(r"^([#>*+\-`])", r"\\\1", escaped)
     return re.sub(r"^(\d+)([.)]\s)", r"\\\1\2", escaped)
 
 
-def _append_markdown_wrapped_callout(
+def _append_markdown_wrapped_blockquote(
     parts: list[str],
     content: str,
     *,
@@ -7180,14 +7180,12 @@ def _append_markdown_wrapped_callout(
     if not parts or parts[-1] != "":
         parts.append("")
     parts.append("<!-- markdownlint-disable MD028 -->")
-    parts.append(">")
+    blockquote_lines = [">"]
 
     normalized = content.replace("\r\n", "\n").replace("\r", "\n")
-    rendered_any = False
     for raw_line in normalized.split("\n"):
         if raw_line == "":
-            parts.append(">")
-            rendered_any = True
+            blockquote_lines.append(">")
             continue
         wrapped_lines = textwrap.wrap(
             raw_line,
@@ -7197,18 +7195,72 @@ def _append_markdown_wrapped_callout(
             drop_whitespace=False,
         )
         if not wrapped_lines:
-            parts.append(">")
-            rendered_any = True
+            blockquote_lines.append(">")
             continue
-        for wrapped_line in wrapped_lines:
-            parts.append(f"> {_escape_markdown_callout_line(wrapped_line)}")
-            rendered_any = True
+        blockquote_lines.extend(
+            f"> {_escape_markdown_blockquote_line(wrapped_line)}" for wrapped_line in wrapped_lines
+        )
 
-    if not rendered_any:
-        parts.append(">")
+    parts.extend(blockquote_lines)
     parts.append("<!-- markdownlint-enable MD028 -->")
     if not parts or parts[-1] != "":
         parts.append("")
+
+
+def _append_markdown_prompt_section(parts: list[str], *, title: str, prompt: str) -> None:
+    """Append a prompt section using the shared wrapped blockquote renderer."""
+    parts.append(title)
+    _append_markdown_wrapped_blockquote(parts, prompt)
+
+
+def _append_markdown_image_metadata_section(
+    parts: list[str],
+    metadata: MetadataDict | None,
+) -> None:
+    """Append selected image metadata fields for Markdown gallery output."""
+    if not metadata:
+        return
+
+    metadata_fields = (
+        ("Title", metadata.get("title")),
+        ("Description", metadata.get("description")),
+        ("Keywords", metadata.get("keywords")),
+        ("Date", metadata.get("date")),
+        ("Time", metadata.get("time")),
+        ("GPS", metadata.get("gps")),
+    )
+    populated_fields = [(label, value) for label, value in metadata_fields if value]
+    if not populated_fields:
+        return
+
+    parts.append("## Image Metadata")
+    parts.append("")
+    for label, value in populated_fields:
+        parts.append(f"- **{label}**: {value}")
+    parts.append("")
+
+
+def _write_markdown_artifact(
+    filename: Path,
+    markdown_lines: Sequence[str],
+    *,
+    artifact_name: str,
+) -> None:
+    """Normalize and write Markdown artifact content with consistent error handling."""
+    markdown_content = normalize_markdown_trailing_spaces("\n".join(markdown_lines)) + "\n"
+
+    try:
+        with filename.open("w", encoding="utf-8") as f:
+            f.write(markdown_content)
+        # Logging handled in finalize_execution
+    except OSError:
+        logger.exception("Failed to write %s to file %s.", artifact_name, str(filename))
+    except ValueError:
+        logger.exception(
+            "A value error occurred while writing %s %s",
+            artifact_name,
+            str(filename),
+        )
 
 
 def _append_markdown_table(
@@ -9910,8 +9962,7 @@ def generate_markdown_report(
     if failures_by_pkg:
         md.extend(failures_by_pkg)
 
-    md.append("**Prompt used:**")
-    _append_markdown_wrapped_callout(md, prompt)
+    _append_markdown_prompt_section(md, title="**Prompt used:**", prompt=prompt)
     md.append(
         "**Note:** Results sorted: errors first, then by generation time (fastest to slowest).",
     )
@@ -9950,24 +10001,7 @@ def generate_markdown_report(
     md.append("")
     md.append(f"_Report generated on: {local_now_str()}_")
 
-    # Join and normalize trailing spaces across the entire Markdown document
-    # Ensure file ends with single newline (MD047 requirement)
-    markdown_content = normalize_markdown_trailing_spaces("\n".join(md)) + "\n"
-
-    try:
-        with filename.open("w", encoding="utf-8") as f:
-            f.write(markdown_content)
-        # Logging handled in finalize_execution
-    except OSError:
-        logger.exception(
-            "Failed to write Markdown report to file %s.",
-            str(filename),
-        )
-    except ValueError:
-        logger.exception(
-            "A value error occurred while writing Markdown report %s",
-            str(filename),
-        )
+    _write_markdown_artifact(filename, md, artifact_name="Markdown report")
 
 
 def generate_markdown_gallery_report(
@@ -9995,41 +10029,11 @@ def generate_markdown_gallery_report(
         "generated output for each model.",
     )
     md.append("")
-    if metadata:
-        metadata_fields = (
-            ("Title", metadata.get("title")),
-            ("Description", metadata.get("description")),
-            ("Keywords", metadata.get("keywords")),
-            ("Date", metadata.get("date")),
-            ("Time", metadata.get("time")),
-            ("GPS", metadata.get("gps")),
-        )
-        populated_fields = [(label, value) for label, value in metadata_fields if value]
-        if populated_fields:
-            md.append("## Image Metadata")
-            md.append("")
-            for label, value in populated_fields:
-                md.append(f"- **{label}**: {value}")
-            md.append("")
-    md.append("## Prompt")
-    _append_markdown_wrapped_callout(md, prompt)
+    _append_markdown_image_metadata_section(md, metadata)
+    _append_markdown_prompt_section(md, title="## Prompt", prompt=prompt)
     md.extend(_generate_model_gallery_section(report_context))
 
-    markdown_content = normalize_markdown_trailing_spaces("\n".join(md)) + "\n"
-
-    try:
-        with filename.open("w", encoding="utf-8") as f:
-            f.write(markdown_content)
-    except OSError:
-        logger.exception(
-            "Failed to write Markdown gallery report to file %s.",
-            str(filename),
-        )
-    except ValueError:
-        logger.exception(
-            "A value error occurred while writing Markdown gallery report %s",
-            str(filename),
-        )
+    _write_markdown_artifact(filename, md, artifact_name="Markdown gallery report")
 
 
 def generate_tsv_report(
