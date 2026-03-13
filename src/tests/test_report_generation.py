@@ -322,8 +322,8 @@ class TestMarkdownReportEdgeCases:
         assert "org/good" in content
         assert "org/bad" in content
 
-    def test_prompt_section_uses_plain_fenced_block(self, tmp_path: Path) -> None:
-        """Prompt section should be a plain fenced block to avoid blockquote lint issues."""
+    def test_prompt_section_uses_wrapped_callout(self, tmp_path: Path) -> None:
+        """Prompt section should use the wrapped callout helper for readable Markdown."""
         out = tmp_path / "blockquote.md"
         generate_markdown_report(
             results=[_make_success("org/good")],
@@ -334,7 +334,11 @@ class TestMarkdownReportEdgeCases:
         )
         content = out.read_text(encoding="utf-8")
         assert "**Prompt used:**" in content
-        assert "```text" in content
+        assert "<!-- markdownlint-disable MD028 -->" in content
+        assert "> [!NOTE]" in content
+        assert "> line one" in content
+        assert "\n>\n> line two" in content
+        assert "```text" not in content
         assert "> **Prompt used:**" not in content
 
     def test_report_links_to_dedicated_gallery_artifact(self, tmp_path: Path) -> None:
@@ -395,8 +399,10 @@ class TestMarkdownGalleryReport:
         assert "**GPS**: 51.5000, -0.1200" in content
         assert "ignored raw blob" not in content
         assert "## Prompt" in content
-        assert "```text" in content
+        assert "<!-- markdownlint-disable MD028 -->" in content
+        assert "> [!NOTE]" in content
         assert "Describe this image fully." in content
+        assert "```text" not in content
         assert "### ✅ org/good" in content
         assert "### ❌ org/bad" in content
 

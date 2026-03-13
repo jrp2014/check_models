@@ -193,6 +193,37 @@ def test_gallery_metrics_omit_missing_segments_cleanly() -> None:
     assert "Prompt" not in md
 
 
+def test_gallery_output_uses_wrapped_callout_instead_of_fence() -> None:
+    """Gallery output should render model text in a wrapped callout box."""
+    result = check_models.PerformanceResult(
+        model_name="test/model",
+        generation=_GalleryGeneration(text="alpha\n\nbeta"),
+        success=True,
+        model_load_time=1.0,
+        generation_time=2.0,
+        total_time=3.0,
+    )
+
+    md = _gallery_lines_for(result)
+
+    assert "```text" not in md
+    assert "<!-- markdownlint-disable MD028 -->" in md
+    assert "> [!NOTE]" in md
+    assert "> alpha" in md
+    assert "\n>\n> beta" in md
+
+
+def test_wrapped_callout_escapes_leading_markdown_syntax() -> None:
+    """Wrapped callout lines should neutralize leading Markdown control syntax."""
+    parts: list[str] = []
+
+    check_models._append_markdown_wrapped_callout(parts, "# heading\n1. numbered")
+
+    md = "\n".join(parts)
+    assert "> \\# heading" in md
+    assert "> \\1. numbered" in md
+
+
 def test_bare_url_in_long_error_is_wrapped() -> None:
     """Error messages with bare URLs should get <angle brackets> in markdown."""
     result = check_models.PerformanceResult(

@@ -1208,11 +1208,8 @@ def _gallery_render_success(res: PerformanceResult) -> list[str]:
         ]
         if throughput_segments:
             out.append(f"**Throughput:** {' | '.join(throughput_segments)}")
-    out.append("")
     text = str(getattr(res.generation, "text", "")) if res.generation else ""
-    out.append("```text")
-    out.append(text)
-    out.append("```")
+    _append_markdown_wrapped_callout(out, text)
     if res.generation:
         analysis = getattr(res.generation, "quality_analysis", None)
         if analysis and analysis.issues:
@@ -7163,6 +7160,60 @@ def _append_markdown_code_block(
         parts.append("")
 
 
+def _escape_markdown_callout_line(text: str) -> str:
+    """Escape structural Markdown syntax for wrapped callout text."""
+    escaped = HTML_ESCAPER.escape(_wrap_bare_urls(text)).replace("__", r"\_\_")
+    escaped = re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", escaped)
+    escaped = re.sub(r"^([#>*+\-`])", r"\\\1", escaped)
+    return re.sub(r"^(\d+)([.)]\s)", r"\\\1\2", escaped)
+
+
+def _append_markdown_wrapped_callout(
+    parts: list[str],
+    content: str,
+    *,
+    kind: str = "NOTE",
+    width: int = 88,
+) -> None:
+    """Append a wrapping GitHub callout for human-facing text blocks.
+
+    This path is for prompt/model-output readability. Technical logs and
+    reproducibility commands should continue to use fenced code blocks.
+    """
+    if not parts or parts[-1] != "":
+        parts.append("")
+    parts.append("<!-- markdownlint-disable MD028 -->")
+    parts.append(f"> [!{kind}]")
+
+    normalized = content.replace("\r\n", "\n").replace("\r", "\n")
+    rendered_any = False
+    for raw_line in normalized.split("\n"):
+        if raw_line == "":
+            parts.append(">")
+            rendered_any = True
+            continue
+        wrapped_lines = textwrap.wrap(
+            raw_line,
+            width=width,
+            break_long_words=False,
+            break_on_hyphens=False,
+            drop_whitespace=False,
+        )
+        if not wrapped_lines:
+            parts.append(">")
+            rendered_any = True
+            continue
+        for wrapped_line in wrapped_lines:
+            parts.append(f"> {_escape_markdown_callout_line(wrapped_line)}")
+            rendered_any = True
+
+    if not rendered_any:
+        parts.append(">")
+    parts.append("<!-- markdownlint-enable MD028 -->")
+    if not parts or parts[-1] != "":
+        parts.append("")
+
+
 def _append_markdown_table(
     parts: list[str],
     *,
@@ -9867,14 +9918,8 @@ def generate_markdown_report(
     if failures_by_pkg:
         md.extend(failures_by_pkg)
 
-    # Render prompt as a plain fenced block. This avoids markdownlint MD028
-    # when the prompt itself contains blank lines.
     md.append("**Prompt used:**")
-    md.append("")
-    md.append("```text")
-    md.extend(prompt.split("\n"))
-    md.append("```")
-    md.append("")
+    _append_markdown_wrapped_callout(md, prompt)
     md.append(
         "**Note:** Results sorted: errors first, then by generation time (fastest to slowest).",
     )
@@ -9975,11 +10020,7 @@ def generate_markdown_gallery_report(
                 md.append(f"- **{label}**: {value}")
             md.append("")
     md.append("## Prompt")
-    md.append("")
-    md.append("```text")
-    md.extend(prompt.split("\n"))
-    md.append("```")
-    md.append("")
+    _append_markdown_wrapped_callout(md, prompt)
     md.extend(_generate_model_gallery_section(report_context))
 
     markdown_content = normalize_markdown_trailing_spaces("\n".join(md)) + "\n"
