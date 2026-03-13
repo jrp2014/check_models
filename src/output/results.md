@@ -1,6 +1,6 @@
 # Model Performance Results
 
-_Generated on 2026-03-08 23:39:50 GMT_
+_Generated on 2026-03-13 14:06:21 GMT_
 
 ## 🎯 Action Snapshot
 
@@ -8,34 +8,34 @@ _Generated on 2026-03-08 23:39:50 GMT_
 - **Next action:** review `Failures by Package (Actionable)` and `diagnostics.md`.
 - **Model output watchlist:** 18 model(s) graded D/F.
 - **Next action:** prioritize A/B models and de-prioritize D/F outputs.
-- **Vs existing metadata:** better=15, neutral=3, worse=31 (baseline B 73/100).
-- **Runtime pattern:** decode dominates measured phase time (78%; 48/50 measured model(s)).
-- **Phase totals:** model load=348.40s, prompt prep=0.13s, decode=1230.13s, cleanup=4.39s.
+- **Vs existing metadata:** better=14, neutral=3, worse=32 (baseline B 73/100).
+- **Runtime pattern:** decode dominates measured phase time (89%; 48/50 measured model(s)).
+- **Phase totals:** model load=156.80s, prompt prep=0.13s, decode=1271.71s, cleanup=4.17s.
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 - **Termination reasons:** completed=49, exception=1.
 
 ## 🏆 Performance Highlights
 
-- **Fastest:** `mlx-community/nanoLLaVA-1.5-4bit` (327.7 tps)
-- **💾 Most efficient:** `mlx-community/FastVLM-0.5B-bf16` (2.2 GB)
-- **⚡ Fastest load:** `mlx-community/nanoLLaVA-1.5-4bit` (0.65s)
-- **📊 Average TPS:** 79.0 across 49 models
+- **Fastest:** `mlx-community/nanoLLaVA-1.5-4bit` (320.5 tps)
+- **💾 Most efficient:** `mlx-community/FastVLM-0.5B-bf16` (2.1 GB)
+- **⚡ Fastest load:** `mlx-community/nanoLLaVA-1.5-4bit` (0.68s)
+- **📊 Average TPS:** 79.3 across 49 models
 
 ## 📈 Resource Usage
 
-- **Total peak memory:** 928.8 GB
+- **Total peak memory:** 928.6 GB
 - **Average peak memory:** 19.0 GB
 - **Memory efficiency:** 259 tokens/GB
 
 ## 📚 Cataloging Utility Summary
 
-**Grade Distribution:** 🏆 A: 10 | ✅ B: 15 | 🟡 C: 6 | 🟠 D: 5 | ❌ F: 13
+**Grade Distribution:** 🏆 A: 10 | ✅ B: 14 | 🟡 C: 7 | 🟠 D: 5 | ❌ F: 13
 
 **Average Utility Score:** 57/100
 
 **Existing Metadata Baseline:** ✅ B (73/100)
-**Vs Existing Metadata:** Avg Δ -16 | Better: 15, Neutral: 3, Worse: 31
+**Vs Existing Metadata:** Avg Δ -17 | Better: 14, Neutral: 3, Worse: 32
 
 - **Best for cataloging:** `mlx-community/GLM-4.6V-Flash-mxfp4` (🏆 A, 94/100)
 - **Worst for cataloging:** `prince-canuma/Florence-2-large-ft` (❌ F, 0/100)
@@ -81,23 +81,23 @@ _Generated on 2026-03-08 23:39:50 GMT_
 
 ## 📊 Aggregate Statistics (Successful Runs)
 
-- **Generation Tps**: Avg: 79.0 | Min: 3.93 | Max: 328
-- **Peak Memory**: Avg: 19 | Min: 2.2 | Max: 78
-- **Total Time**: Avg: 28.51s | Min: 2.27s | Max: 175.58s
-- **Generation Time**: Avg: 25.10s | Min: 1.27s | Max: 169.87s
-- **Model Load Time**: Avg: 3.16s | Min: 0.65s | Max: 13.33s
+- **Generation Tps**: Avg: 79.3 | Min: 3.98 | Max: 320
+- **Peak Memory**: Avg: 19 | Min: 2.1 | Max: 78
+- **Total Time**: Avg: 29.37s | Min: 2.29s | Max: 185.65s
+- **Generation Time**: Avg: 25.95s | Min: 1.28s | Max: 179.58s
+- **Model Load Time**: Avg: 3.18s | Min: 0.68s | Max: 12.21s
 
 ### ⏱ Runtime Interpretation
 
-- **Runtime pattern:** decode dominates measured phase time (78%; 48/50 measured model(s)).
-- **Phase totals:** model load=348.40s, prompt prep=0.13s, decode=1230.13s, cleanup=4.39s.
+- **Runtime pattern:** decode dominates measured phase time (89%; 48/50 measured model(s)).
+- **Phase totals:** model load=156.80s, prompt prep=0.13s, decode=1271.71s, cleanup=4.17s.
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 - **Termination reasons:** completed=49, exception=1.
 
 ### ⏱ Timing Snapshot
 
-- **Validation overhead:** 11.83s total (avg 0.24s across 50 model(s)).
+- **Validation overhead:** 11.72s total (avg 0.23s across 50 model(s)).
 
 ## 🚨 Failures by Package (Actionable)
 
@@ -158,62 +158,62 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 
 **Note:** Results sorted: errors first, then by generation time (fastest to slowest).
 
-**Overall runtime:** 1595.89s
+**Overall runtime:** 1445.80s
 
 <!-- markdownlint-disable MD013 MD033 MD034 MD037 MD049 -->
 
 | Model Name                                              |   Token |   Prompt (tokens) |   Generation (tokens) |   Total Tokens |   Prompt Tps |   Gen TPS |   Peak (GB) |   Generation (s) |   Load (s) |   Total (s) | Quality Issues                     |   Error Package |
 |:--------------------------------------------------------|--------:|------------------:|----------------------:|---------------:|-------------:|----------:|------------:|-----------------:|-----------:|------------:|:-----------------------------------|----------------:|
-| `microsoft/Florence-2-large-ft`                         |         |                   |                       |                |              |           |             |            0.27s |    193.35s |     193.86s |                                    |         mlx-vlm |
-| `qnguyen3/nanoLLaVA`                                    |  151645 |               603 |                    62 |            665 |         2603 |       101 |         5.1 |            1.27s |      0.75s |       2.27s | missing-sections(keywords), ...    |                 |
-| `mlx-community/LFM2-VL-1.6B-8bit`                       |       7 |               864 |                   176 |          1,040 |         2988 |       297 |         2.9 |            1.32s |      0.71s |       2.27s | description-sentences(3), ...      |                 |
-| `mlx-community/nanoLLaVA-1.5-4bit`                      |  151645 |               603 |                   271 |            874 |         2687 |       328 |         2.9 |            1.47s |      0.65s |       2.36s | title-length(22), ...              |                 |
-| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         |       1 |             1,624 |                     5 |          1,629 |         1556 |      21.7 |          11 |            1.60s |      3.17s |       5.01s | ⚠️harness(prompt_template), ...    |                 |
-| `mlx-community/FastVLM-0.5B-bf16`                       |  151645 |               607 |                   222 |            829 |         3714 |       283 |         2.2 |            1.77s |      0.79s |       2.82s | fabrication, ...                   |                 |
-| `mlx-community/LFM2.5-VL-1.6B-bf16`                     |       7 |               864 |                   234 |          1,098 |         3054 |       181 |           4 |            1.98s |      0.85s |       3.07s | title-length(31), ...              |                 |
-| `prince-canuma/Florence-2-large-ft`                     |       0 |             1,173 |                   500 |          1,673 |         4800 |       322 |         5.1 |            2.11s |      1.00s |       3.36s | ⚠️harness(stop_token), ...         |                 |
-| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |             1,624 |                    14 |          1,638 |          511 |      27.4 |          12 |            4.00s |      3.35s |       7.59s | ⚠️harness(prompt_template), ...    |                 |
-| `mlx-community/SmolVLM-Instruct-bf16`                   |   49154 |             1,815 |                   282 |          2,097 |         1426 |       112 |         5.6 |            4.14s |      1.06s |       5.45s | title-length(67), ...              |                 |
-| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |             3,194 |                   135 |          3,329 |         1069 |       161 |         7.8 |            4.15s |      1.46s |       5.85s | title-length(4), ...               |                 |
-| `HuggingFaceTB/SmolVLM-Instruct`                        |   49154 |             1,815 |                   282 |          2,097 |         1401 |       111 |         5.6 |            4.18s |      1.14s |       5.55s | title-length(67), ...              |                 |
-| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |             1,624 |                     9 |          1,633 |          490 |      5.43 |          27 |            5.30s |      4.97s |      10.52s | ⚠️harness(prompt_template), ...    |                 |
-| `mlx-community/gemma-3n-E2B-4bit`                       |  236825 |               858 |                   500 |          1,358 |         1432 |       113 |         6.1 |            5.36s |      2.91s |       8.52s | repetitive(phrase: "51.916417, ... |                 |
-| `mlx-community/InternVL3-8B-bf16`                       |  151645 |             2,386 |                    81 |          2,467 |          834 |      31.7 |          17 |            5.90s |      2.81s |       8.95s |                                    |                 |
-| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |      28 |             1,715 |                   500 |          2,215 |         1377 |       112 |         5.5 |            6.08s |      1.03s |       7.35s | repetitive(England,), ...          |                 |
-| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 |    1083 |             1,592 |                   500 |          2,092 |          935 |       112 |          18 |            6.67s |      3.04s |       9.95s | missing-sections(title), ...       |                 |
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit`               |       8 |             1,592 |                   500 |          2,092 |          966 |       100 |          22 |            7.19s |      3.46s |      10.90s | fabrication, ...                   |                 |
-| `mlx-community/gemma-3-27b-it-qat-4bit`                 |     106 |               867 |                   105 |            972 |          194 |      28.2 |          19 |            8.54s |      4.67s |      13.46s | context-ignored                    |                 |
-| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          |  163585 |             1,592 |                   464 |          2,056 |          963 |      67.9 |          37 |            9.14s |      5.64s |      15.03s | missing-sections(title), ...       |                 |
-| `mlx-community/pixtral-12b-8bit`                        |       2 |             3,385 |                   110 |          3,495 |          557 |      35.4 |          16 |            9.49s |      2.83s |      12.59s | title-length(4), ...               |                 |
-| `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`     |       2 |             3,195 |                   109 |          3,304 |          421 |      58.7 |          13 |            9.77s |      2.17s |      12.18s | context-ignored                    |                 |
-| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |             2,824 |                    12 |          2,836 |          300 |      46.8 |          11 |           10.01s |      1.55s |      11.79s | ⚠️harness(prompt_template), ...    |                 |
-| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`     |       2 |             3,195 |                   122 |          3,317 |          419 |      55.8 |          13 |           10.13s |      2.18s |      12.55s |                                    |                 |
-| `mlx-community/InternVL3-14B-8bit`                      |  151645 |             2,386 |                   116 |          2,502 |          412 |      28.8 |          17 |           10.30s |      3.00s |      13.55s | title-length(4)                    |                 |
-| `microsoft/Phi-3.5-vision-instruct`                     |   29892 |             1,434 |                   500 |          1,934 |         1312 |      52.5 |         9.6 |           10.96s |      1.51s |      12.68s | title-length(4), ...               |                 |
-| `mlx-community/Idefics3-8B-Llama3-bf16`                 |  128001 |             2,884 |                   200 |          3,084 |          746 |      29.6 |          18 |           10.99s |      3.36s |      14.60s | description-sentences(5), ...      |                 |
-| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               867 |                    95 |            962 |          187 |      15.6 |          34 |           11.05s |      6.70s |      17.99s |                                    |                 |
-| `mlx-community/Phi-3.5-vision-instruct-bf16`            |   29892 |             1,434 |                   500 |          1,934 |         1302 |      51.7 |         9.6 |           11.13s |      1.48s |      12.85s | title-length(4), ...               |                 |
-| `mlx-community/pixtral-12b-bf16`                        |       2 |             3,385 |                   110 |          3,495 |          584 |      19.8 |          28 |           11.65s |      4.52s |      16.41s | title-length(4), ...               |                 |
-| `mlx-community/gemma-3n-E4B-it-bf16`                    |  236829 |               866 |                   500 |          1,366 |          911 |        42 |          17 |           13.17s |      4.49s |      17.97s | missing-sections(title+descrip...  |                 |
-| `mlx-community/paligemma2-3b-pt-896-4bit`               |    5966 |             4,696 |                   500 |          5,196 |         1695 |      41.3 |         4.5 |           15.35s |      2.40s |      18.00s | repetitive(phrase: "- output o...  |                 |
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |             2,700 |                   104 |          2,804 |          237 |      28.5 |          22 |           15.35s |      3.54s |      19.14s | ⚠️harness(encoding), ...           |                 |
-| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      |  128009 |               573 |                   121 |            694 |          169 |       9.2 |          15 |           16.90s |      2.54s |      19.69s | missing-sections(title+descrip...  |                 |
-| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      |     378 |             1,932 |                   500 |          2,432 |          564 |      36.8 |          60 |           17.78s |      9.04s |      27.07s | repetitive(phrase: "stoneware...   |                 |
-| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         |    1454 |             3,476 |                   500 |          3,976 |          435 |      36.9 |          15 |           21.86s |      2.72s |      24.82s | missing-sections(title+descrip...  |                 |
-| `mlx-community/GLM-4.6V-Flash-mxfp4`                    |    3936 |             6,718 |                   500 |          7,218 |          319 |      62.4 |         8.4 |           29.47s |      2.07s |      31.79s | ⚠️harness(stop_token), ...         |                 |
-| `meta-llama/Llama-3.2-11B-Vision-Instruct`              |  128009 |               574 |                   102 |            676 |          164 |      3.93 |          25 |           29.80s |      3.93s |      33.98s | missing-sections(title+descrip...  |                 |
-| `mlx-community/GLM-4.6V-Flash-6bit`                     |   14712 |             6,718 |                   500 |          7,218 |          306 |        46 |          11 |           33.22s |      2.34s |      35.81s | missing-sections(title+descrip...  |                 |
-| `mlx-community/Molmo-7B-D-0924-8bit`                    |  151643 |             1,782 |                   372 |          2,154 |         51.8 |      43.5 |          41 |           43.73s |      1.87s |      45.84s | missing-sections(title+descrip...  |                 |
-| `mlx-community/X-Reasoner-7B-8bit`                      |   14722 |            16,831 |                   500 |         17,331 |          458 |      47.6 |          13 |           47.64s |      2.17s |      50.05s | ⚠️harness(long_context), ...       |                 |
-| `Qwen/Qwen3-VL-2B-Instruct`                             |      11 |            16,820 |                   500 |         17,320 |          398 |      76.2 |         8.3 |           49.32s |      1.37s |      50.91s | ⚠️harness(long_context), ...       |                 |
-| `mlx-community/Molmo-7B-D-0924-bf16`                    |  151643 |             1,782 |                   400 |          2,182 |         51.7 |        28 |          48 |           49.51s |      2.89s |      52.65s | title-length(72), ...              |                 |
-| `mlx-community/GLM-4.6V-nvfp4`                          |    7196 |             6,718 |                   500 |          7,218 |          192 |      31.9 |          78 |           51.09s |     10.54s |      61.89s | missing-sections(title+descrip...  |                 |
-| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |      12 |            16,822 |                   500 |         17,322 |          350 |      75.7 |         8.3 |           55.15s |      1.46s |      56.86s | ⚠️harness(long_context), ...       |                 |
-| `mlx-community/Qwen3.5-35B-A3B-6bit`                    |      11 |            16,846 |                   500 |         17,346 |          265 |        77 |          33 |           70.38s |      5.57s |      76.19s | missing-sections(title+descrip...  |                 |
-| `mlx-community/Qwen3.5-35B-A3B-bf16`                    |    3924 |            16,846 |                   500 |         17,346 |          255 |      55.7 |          74 |           75.55s |     13.33s |      89.12s | refusal(explicit_refusal), ...     |                 |
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               |  151645 |            16,831 |                   180 |         17,011 |          198 |       176 |         5.1 |           86.52s |      0.99s |      87.76s | fabrication, ...                   |                 |
-| `mlx-community/Qwen3.5-27B-4bit`                        |       9 |            16,846 |                   500 |         17,346 |          129 |        25 |          22 |          150.52s |      3.57s |     154.35s | ⚠️harness(long_context), ...       |                 |
-| `mlx-community/Qwen3.5-27B-mxfp8`                       |    1847 |            16,846 |                   500 |         17,346 |          123 |      15.2 |          35 |          169.87s |      5.46s |     175.58s | ⚠️harness(long_context), ...       |                 |
+| `microsoft/Florence-2-large-ft`                         |         |                   |                       |                |              |           |             |            0.29s |      0.95s |       1.48s |                                    |         mlx-vlm |
+| `qnguyen3/nanoLLaVA`                                    |  151645 |               603 |                    62 |            665 |         2612 |       101 |           5 |            1.28s |      0.77s |       2.29s | missing-sections(keywords), ...    |                 |
+| `mlx-community/LFM2-VL-1.6B-8bit`                       |       7 |               864 |                   176 |          1,040 |         3030 |       297 |         2.9 |            1.31s |      0.77s |       2.32s | description-sentences(3), ...      |                 |
+| `mlx-community/nanoLLaVA-1.5-4bit`                      |  151645 |               603 |                   271 |            874 |         2789 |       320 |         2.9 |            1.48s |      0.68s |       2.40s | title-length(22), ...              |                 |
+| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         |       1 |             1,624 |                     5 |          1,629 |         1551 |      21.6 |          11 |            1.60s |      3.29s |       5.14s | ⚠️harness(prompt_template), ...    |                 |
+| `mlx-community/FastVLM-0.5B-bf16`                       |  151645 |               607 |                   222 |            829 |         3372 |       301 |         2.1 |            1.72s |      1.08s |       3.04s | fabrication, ...                   |                 |
+| `mlx-community/LFM2.5-VL-1.6B-bf16`                     |       7 |               864 |                   234 |          1,098 |         3025 |       181 |           4 |            1.94s |      0.83s |       3.01s | title-length(31), ...              |                 |
+| `prince-canuma/Florence-2-large-ft`                     |       0 |             1,173 |                   500 |          1,673 |         4885 |       317 |         5.1 |            2.13s |      1.08s |       3.45s | ⚠️harness(stop_token), ...         |                 |
+| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |             1,624 |                    14 |          1,638 |          508 |      28.7 |          12 |            4.00s |      3.32s |       7.56s | ⚠️harness(prompt_template), ...    |                 |
+| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |             3,194 |                   135 |          3,329 |         1071 |       161 |         7.8 |            4.14s |      1.39s |       5.77s | title-length(4), ...               |                 |
+| `mlx-community/SmolVLM-Instruct-bf16`                   |   49154 |             1,815 |                   282 |          2,097 |         1417 |       111 |         5.6 |            4.15s |      1.07s |       5.47s | title-length(67), ...              |                 |
+| `HuggingFaceTB/SmolVLM-Instruct`                        |   49154 |             1,815 |                   282 |          2,097 |         1362 |       112 |         5.6 |            4.23s |      1.39s |       5.83s | title-length(67), ...              |                 |
+| `mlx-community/gemma-3n-E2B-4bit`                       |  236825 |               858 |                   500 |          1,358 |         1377 |       114 |         6.1 |            5.34s |      2.98s |       8.56s | repetitive(phrase: "51.916417, ... |                 |
+| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |             1,624 |                     9 |          1,633 |          439 |      5.51 |          27 |            5.65s |      4.98s |      10.88s | ⚠️harness(prompt_template), ...    |                 |
+| `mlx-community/InternVL3-8B-bf16`                       |  151645 |             2,386 |                    81 |          2,467 |          846 |      32.3 |          17 |            5.83s |      2.85s |       8.92s |                                    |                 |
+| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |      28 |             1,715 |                   500 |          2,215 |         1378 |       111 |         5.5 |            6.08s |      1.06s |       7.38s | repetitive(England,), ...          |                 |
+| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 |    1083 |             1,592 |                   500 |          2,092 |          933 |       113 |          18 |            6.66s |      3.14s |      10.05s | missing-sections(title), ...       |                 |
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit`               |       8 |             1,592 |                   500 |          2,092 |          978 |       101 |          22 |            7.13s |      3.47s |      10.84s | fabrication, ...                   |                 |
+| `mlx-community/gemma-3-27b-it-qat-4bit`                 |     106 |               867 |                   105 |            972 |          194 |      28.1 |          19 |            8.54s |      4.65s |      13.45s | context-ignored                    |                 |
+| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          |  163585 |             1,592 |                   464 |          2,056 |          963 |      67.9 |          37 |            9.12s |      5.65s |      15.01s | missing-sections(title), ...       |                 |
+| `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`     |       2 |             3,195 |                   109 |          3,304 |          421 |      58.6 |          13 |            9.76s |      2.20s |      12.21s | context-ignored                    |                 |
+| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`     |       2 |             3,195 |                   122 |          3,317 |          401 |      55.8 |          13 |           10.46s |      2.23s |      12.92s |                                    |                 |
+| `mlx-community/pixtral-12b-8bit`                        |       2 |             3,385 |                   110 |          3,495 |          480 |      35.2 |          16 |           10.49s |      2.89s |      13.64s | title-length(4), ...               |                 |
+| `mlx-community/InternVL3-14B-8bit`                      |  151645 |             2,386 |                   116 |          2,502 |          390 |      28.8 |          17 |           10.63s |      2.96s |      13.83s | title-length(4)                    |                 |
+| `mlx-community/Idefics3-8B-Llama3-bf16`                 |  128001 |             2,884 |                   200 |          3,084 |          758 |      29.7 |          18 |           10.90s |      3.37s |      14.51s | description-sentences(5), ...      |                 |
+| `mlx-community/Phi-3.5-vision-instruct-bf16`            |   29892 |             1,434 |                   500 |          1,934 |         1314 |      52.5 |         9.6 |           10.98s |      1.50s |      12.72s | title-length(4), ...               |                 |
+| `microsoft/Phi-3.5-vision-instruct`                     |   29892 |             1,434 |                   500 |          1,934 |         1288 |      52.1 |         9.6 |           11.07s |      1.45s |      12.75s | title-length(4), ...               |                 |
+| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |             2,824 |                    12 |          2,836 |          265 |      46.9 |          11 |           11.23s |      1.56s |      13.03s | ⚠️harness(prompt_template), ...    |                 |
+| `mlx-community/pixtral-12b-bf16`                        |       2 |             3,385 |                   110 |          3,495 |          561 |      19.7 |          28 |           11.93s |      4.58s |      16.75s | title-length(4), ...               |                 |
+| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               867 |                    95 |            962 |          164 |      15.1 |          34 |           11.93s |      6.80s |      18.97s |                                    |                 |
+| `mlx-community/gemma-3n-E4B-it-bf16`                    |  236829 |               866 |                   500 |          1,366 |          912 |      41.5 |          17 |           13.31s |      4.55s |      18.18s | missing-sections(title+descrip...  |                 |
+| `mlx-community/paligemma2-3b-pt-896-4bit`               |    5966 |             4,696 |                   500 |          5,196 |         1693 |      44.2 |         4.5 |           14.55s |      2.44s |      17.24s | repetitive(phrase: "- output o...  |                 |
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |             2,700 |                   104 |          2,804 |          231 |      28.1 |          22 |           15.69s |      3.53s |      19.46s | ⚠️harness(encoding), ...           |                 |
+| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      |     378 |             1,932 |                   500 |          2,432 |          622 |      37.4 |          60 |           17.19s |      8.98s |      26.42s | repetitive(phrase: "stoneware...   |                 |
+| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      |  128009 |               573 |                   121 |            694 |          157 |      8.64 |          15 |           17.99s |      2.53s |      20.76s | missing-sections(title+descrip...  |                 |
+| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         |    1454 |             3,476 |                   500 |          3,976 |          424 |      35.9 |          15 |           22.44s |      2.76s |      25.43s | missing-sections(title+descrip...  |                 |
+| `mlx-community/GLM-4.6V-Flash-mxfp4`                    |    3936 |             6,718 |                   500 |          7,218 |          335 |      63.2 |         8.4 |           28.33s |      2.11s |      30.68s | ⚠️harness(stop_token), ...         |                 |
+| `meta-llama/Llama-3.2-11B-Vision-Instruct`              |  128009 |               574 |                   102 |            676 |          164 |      3.98 |          25 |           29.48s |      3.95s |      33.67s | missing-sections(title+descrip...  |                 |
+| `mlx-community/GLM-4.6V-Flash-6bit`                     |   14712 |             6,718 |                   500 |          7,218 |          334 |      47.3 |          11 |           31.05s |      2.32s |      33.62s | missing-sections(title+descrip...  |                 |
+| `mlx-community/Molmo-7B-D-0924-8bit`                    |  151643 |             1,782 |                   426 |          2,208 |         50.8 |      44.8 |          41 |           45.34s |      1.89s |      47.47s | missing-sections(title+descrip...  |                 |
+| `Qwen/Qwen3-VL-2B-Instruct`                             |      11 |            16,820 |                   500 |         17,320 |          398 |      75.8 |         8.3 |           49.29s |      1.39s |      50.90s | ⚠️harness(long_context), ...       |                 |
+| `mlx-community/GLM-4.6V-nvfp4`                          |    7196 |             6,718 |                   500 |          7,218 |          201 |        32 |          78 |           49.43s |     10.12s |      59.80s | missing-sections(title+descrip...  |                 |
+| `mlx-community/Molmo-7B-D-0924-bf16`                    |  151643 |             1,782 |                   421 |          2,203 |         49.9 |      28.1 |          48 |           51.41s |      3.00s |      54.65s | missing-sections(title+descrip...  |                 |
+| `mlx-community/X-Reasoner-7B-8bit`                      |   14722 |            16,831 |                   500 |         17,331 |          411 |      46.3 |          13 |           52.13s |      2.22s |      54.58s | ⚠️harness(long_context), ...       |                 |
+| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |      12 |            16,822 |                   500 |         17,322 |          364 |      75.9 |         8.3 |           53.21s |      1.49s |      54.94s | ⚠️harness(long_context), ...       |                 |
+| `mlx-community/Qwen3.5-35B-A3B-6bit`                    |      11 |            16,846 |                   500 |         17,346 |          236 |      76.8 |          33 |           78.19s |      5.90s |      84.33s | missing-sections(title+descrip...  |                 |
+| `mlx-community/Qwen3.5-35B-A3B-bf16`                    |    3924 |            16,846 |                   500 |         17,346 |          231 |      55.7 |          74 |           82.68s |     12.21s |      95.13s | refusal(explicit_refusal), ...     |                 |
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               |  151645 |            16,831 |                   180 |         17,011 |          204 |       181 |         5.1 |           83.73s |      1.02s |      85.00s | fabrication, ...                   |                 |
+| `mlx-community/Qwen3.5-27B-4bit`                        |       9 |            16,846 |                   500 |         17,346 |          117 |      24.2 |          22 |          164.68s |      3.62s |     168.55s | ⚠️harness(long_context), ...       |                 |
+| `mlx-community/Qwen3.5-27B-mxfp8`                       |    1847 |            16,846 |                   500 |         17,346 |          117 |      14.4 |          35 |          179.58s |      5.83s |     185.65s | ⚠️harness(long_context), ...       |                 |
 
 <!-- markdownlint-enable MD013 MD033 MD034 MD037 MD049 -->
 
@@ -294,7 +294,7 @@ TypeError: can only concatenate str (not "NoneType") to str
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 11439, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 11432, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -328,7 +328,7 @@ ValueError: Failed to process inputs with error: can only concatenate str (not "
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 11579, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 11572, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -339,7 +339,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 11464, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 11457, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
 ```
@@ -376,7 +376,7 @@ Keywords: Architectural Photography, Bedfordshire, Beige, Clock Tower, Daily Lif
 
 ### ✅ mlx-community/nanoLLaVA-1.5-4bit
 
-**Metrics:** 328 TPS | 271 tokens
+**Metrics:** 320 TPS | 271 tokens
 
 ```text
 Title:
@@ -409,7 +409,7 @@ Context:
 
 ### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
 
-**Metrics:** 21.7 TPS | 5 tokens
+**Metrics:** 21.6 TPS | 5 tokens
 
 ```text
 - Daytime.
@@ -419,7 +419,7 @@ Context:
 
 ### ✅ mlx-community/FastVLM-0.5B-bf16
 
-**Metrics:** 283 TPS | 222 tokens
+**Metrics:** 301 TPS | 222 tokens
 
 ```text
 Title: Leighton Buzzard Market Cross: A Quiet Midday in the Town Square
@@ -447,7 +447,7 @@ Keywords:
 
 ### ✅ prince-canuma/Florence-2-large-ft
 
-**Metrics:** 322 TPS | 500 tokens
+**Metrics:** 317 TPS | 500 tokens
 
 ```text
 <s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s><s>
@@ -457,23 +457,10 @@ Keywords:
 
 ### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
 
-**Metrics:** 27.4 TPS | 14 tokens
+**Metrics:** 28.7 TPS | 14 tokens
 
 ```text
 - Use only the metadata that is clearly supported by the image.
-```
-
----
-
-### ✅ mlx-community/SmolVLM-Instruct-bf16
-
-**Metrics:** 112 TPS | 282 tokens
-
-```text
- Image: 5-10 words, concrete and factual, limited to clearly visible content.
-Title: Town Centre, Leighton Buzzard, England, United Kingdom, UK A quiet late afternoon in early spring settles over the town centre of Leighton Buzzard, England. The scene is dominated by the town's historic Market Cross, an intricate, five-sided stone monument dating back to the 15th century. Surrounded by traditional red-brick buildings and a prominent clock tower, the cross stands as a testament to the market town...
-Description: , Town Centre, Leighton Buzzard, England, United Kingdom, UK A quiet late afternoon in early spring settles over the town centre of Leighton Buzzard, England. The scene is dominated by the town's historic Market Cross, an intricate, five-sided stone monument dating back to the 15th century. Surrounded by traditional red-brick buildings and a prominent clock tower, the cross stands as a testament to the market town...
-Keywords: Architectural Photography, Bedfordshire, Beige, Clock Tower, Daily Life, Early Spring, England, English Market Town, English town, Europe, Gothic Revival, Gothic Revival Architecture, Great Britain, Grey, High Street, Late Afternoon, Leighton Buzzard, Leighton Buzzard Market Cross, Market Square, Overcast Day
 ```
 
 ---
@@ -495,7 +482,7 @@ red-brick buildings, stone monument, Gothic Revival architecture, market cross, 
 
 ---
 
-### ✅ HuggingFaceTB/SmolVLM-Instruct
+### ✅ mlx-community/SmolVLM-Instruct-bf16
 
 **Metrics:** 111 TPS | 282 tokens
 
@@ -508,19 +495,22 @@ Keywords: Architectural Photography, Bedfordshire, Beige, Clock Tower, Daily Lif
 
 ---
 
-### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
+### ✅ HuggingFaceTB/SmolVLM-Instruct
 
-**Metrics:** 5.43 TPS | 9 tokens
+**Metrics:** 112 TPS | 282 tokens
 
 ```text
-- Use only the above metadata hints.
+ Image: 5-10 words, concrete and factual, limited to clearly visible content.
+Title: Town Centre, Leighton Buzzard, England, United Kingdom, UK A quiet late afternoon in early spring settles over the town centre of Leighton Buzzard, England. The scene is dominated by the town's historic Market Cross, an intricate, five-sided stone monument dating back to the 15th century. Surrounded by traditional red-brick buildings and a prominent clock tower, the cross stands as a testament to the market town...
+Description: , Town Centre, Leighton Buzzard, England, United Kingdom, UK A quiet late afternoon in early spring settles over the town centre of Leighton Buzzard, England. The scene is dominated by the town's historic Market Cross, an intricate, five-sided stone monument dating back to the 15th century. Surrounded by traditional red-brick buildings and a prominent clock tower, the cross stands as a testament to the market town...
+Keywords: Architectural Photography, Bedfordshire, Beige, Clock Tower, Daily Life, Early Spring, England, English Market Town, English town, Europe, Gothic Revival, Gothic Revival Architecture, Great Britain, Grey, High Street, Late Afternoon, Leighton Buzzard, Leighton Buzzard Market Cross, Market Square, Overcast Day
 ```
 
 ---
 
 ### ✅ mlx-community/gemma-3n-E2B-4bit
 
-**Metrics:** 113 TPS | 500 tokens
+**Metrics:** 114 TPS | 500 tokens
 
 ```text
 
@@ -530,9 +520,19 @@ Keywords: Architectural Photography, Bedfordshire, Beige, Clock Tower, Daily Lif
 
 ---
 
+### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
+
+**Metrics:** 5.51 TPS | 9 tokens
+
+```text
+- Use only the above metadata hints.
+```
+
+---
+
 ### ✅ mlx-community/InternVL3-8B-bf16
 
-**Metrics:** 31.7 TPS | 81 tokens
+**Metrics:** 32.3 TPS | 81 tokens
 
 ```text
 Title: Historic Market Square in Leighton Buzzard
@@ -546,7 +546,7 @@ Keywords: Architectural Photography, Leighton Buzzard, Market Square, Red Brick,
 
 ### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
 
-**Metrics:** 112 TPS | 500 tokens
+**Metrics:** 111 TPS | 500 tokens
 
 ```text
  Title: Leighton Buzzard, England, England, England
@@ -558,7 +558,7 @@ Keywords: Leighton Buzzard, England, England, England, England, England, England
 
 ### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
 
-**Metrics:** 112 TPS | 500 tokens
+**Metrics:** 113 TPS | 500 tokens
 
 ```text
 ◁think▷Got it, let's analyze the image for cataloguing metadata.
@@ -576,7 +576,7 @@ Wait, need to ensure all are clearly visible or from context. The context hint m
 
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-8bit
 
-**Metrics:** 100 TPS | 500 tokens
+**Metrics:** 101 TPS | 500 tokens
 
 ```text
 ◁think▷Okay, let's analyze the image for metadata based on the given rules. First, I need to focus on clearly visible details. The image shows a town center in Leighton Buzzard, England. There's a historic Market Cross, which is a five-sided stone monument from the 15th century. Surrounding it are traditional red-brick buildings and a prominent clock tower. The scene is set during late afternoon in early spring, with overcast skies. The image includes a brick-paved street with bollards and some pedestrians. The Market Cross has Gothic Revival architecture, and there's a clock tower with a green roof. The overall color palette includes beige, grey, and red brick tones. The time is 16:57:08 local time, and the GPS coordinates are 51.916417°N, 0.661333°W. I need to extract these details into the Title, Description, and Keywords sections without adding anything uncertain or inferred.◁/think▷Title: Leighton Buzzard Market Cross
@@ -595,7 +595,7 @@ p(t)
 
 ### ✅ mlx-community/gemma-3-27b-it-qat-4bit
 
-**Metrics:** 28.2 TPS | 105 tokens
+**Metrics:** 28.1 TPS | 105 tokens
 
 ```text
 Title:
@@ -635,26 +635,9 @@ Architectural Photography, Bedfordshire, Beige, Clock Tower, Daily Life, Early S
 
 ---
 
-### ✅ mlx-community/pixtral-12b-8bit
-
-**Metrics:** 35.4 TPS | 110 tokens
-
-```text
-Title:
-Leighton Buzzard Market Cross
-
-Description:
-A quiet late afternoon in early spring in Leighton Buzzard, England, featuring the historic Market Cross and surrounding buildings.
-
-Keywords:
-Architectural Photography, Bedfordshire, Beige, Clock Tower, Daily Life, Early Spring, England, English Market Town, Gothic Revival, Gothic Revival Architecture, Great Britain, Grey, High Street, Late Afternoon, Leighton Buzzard, Leighton Buzzard Market Cross, Market Square, Overcast Day, Red Brick, Stone Monument, Traditional Buildings
-```
-
----
-
 ### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
 
-**Metrics:** 58.7 TPS | 109 tokens
+**Metrics:** 58.6 TPS | 109 tokens
 
 ```text
 Title:
@@ -665,16 +648,6 @@ The image shows a prominent stone Market Cross with Gothic Revival architectural
 
 Keywords:
 Market Cross, Gothic Revival, stone monument, red-brick buildings, white trim, clock tower, green roof, paved square, overcast sky, town centre, architectural photography, England, historic monument
-```
-
----
-
-### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
-
-**Metrics:** 46.8 TPS | 12 tokens
-
-```text
-The image is a photograph of a town center.
 ```
 
 ---
@@ -696,6 +669,23 @@ Architectural Photography, Bedfordshire, Brick Buildings, Clock Tower, Gothic Re
 
 ---
 
+### ✅ mlx-community/pixtral-12b-8bit
+
+**Metrics:** 35.2 TPS | 110 tokens
+
+```text
+Title:
+Leighton Buzzard Market Cross
+
+Description:
+A quiet late afternoon in early spring in Leighton Buzzard, England, featuring the historic Market Cross and surrounding buildings.
+
+Keywords:
+Architectural Photography, Bedfordshire, Beige, Clock Tower, Daily Life, Early Spring, England, English Market Town, Gothic Revival, Gothic Revival Architecture, Great Britain, Grey, High Street, Late Afternoon, Leighton Buzzard, Leighton Buzzard Market Cross, Market Square, Overcast Day, Red Brick, Stone Monument, Traditional Buildings
+```
+
+---
+
 ### ✅ mlx-community/InternVL3-14B-8bit
 
 **Metrics:** 28.8 TPS | 116 tokens
@@ -713,7 +703,21 @@ Architectural Photography, Bedfordshire, Beige, Clock Tower, Daily Life, England
 
 ---
 
-### ✅ microsoft/Phi-3.5-vision-instruct
+### ✅ mlx-community/Idefics3-8B-Llama3-bf16
+
+**Metrics:** 29.7 TPS | 200 tokens
+
+```text
+ Title: Leighton Buzzard Market Cross in the Town Centre, England, UK.
+
+Description: The image depicts a historic town square in Leighton Buzzard, England, featuring the prominent Market Cross, a five-sided stone monument. The cross is surrounded by traditional red-brick buildings and a clock tower, indicative of Gothic Revival architecture. The scene is set on a quiet late afternoon in early spring, with an overcast sky. The town square is relatively empty, with a few people visible in the background. The buildings exhibit a mix of architectural styles, with the clock tower standing out due to its height and intricate design.
+
+Keywords: Architectural Photography, Bedfordshire, Beige, Clock Tower, Daily Life, Early Spring, England, English Market Town, English town, Europe, Gothic Revival, Gothic Revival Architecture, Great Britain, Grey, High Street, Late Afternoon, Leighton Buzzard, Leighton Buzzard Market Cross, Market Square, Overcast Day.<end_of_utterance>
+```
+
+---
+
+### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
 
 **Metrics:** 52.5 TPS | 500 tokens
 
@@ -727,40 +731,9 @@ Keywords: Market Cross, historic, 15th century, red-brick buildings, clock tower
 
 ---
 
-### ✅ mlx-community/Idefics3-8B-Llama3-bf16
+### ✅ microsoft/Phi-3.5-vision-instruct
 
-**Metrics:** 29.6 TPS | 200 tokens
-
-```text
- Title: Leighton Buzzard Market Cross in the Town Centre, England, UK.
-
-Description: The image depicts a historic town square in Leighton Buzzard, England, featuring the prominent Market Cross, a five-sided stone monument. The cross is surrounded by traditional red-brick buildings and a clock tower, indicative of Gothic Revival architecture. The scene is set on a quiet late afternoon in early spring, with an overcast sky. The town square is relatively empty, with a few people visible in the background. The buildings exhibit a mix of architectural styles, with the clock tower standing out due to its height and intricate design.
-
-Keywords: Architectural Photography, Bedfordshire, Beige, Clock Tower, Daily Life, Early Spring, England, English Market Town, English town, Europe, Gothic Revival, Gothic Revival Architecture, Great Britain, Grey, High Street, Late Afternoon, Leighton Buzzard, Leighton Buzzard Market Cross, Market Square, Overcast Day.<end_of_utterance>
-```
-
----
-
-### ✅ mlx-community/gemma-3-27b-it-qat-8bit
-
-**Metrics:** 15.6 TPS | 95 tokens
-
-```text
-Title:
-Leighton Buzzard Market Cross and Town Hall
-
-Description:
-A red-brick town hall and a stone market cross dominate a paved town square. The scene is lit by overcast daylight, with a few pedestrians visible and black bollards lining the foreground.
-
-Keywords:
-Architecture, Bedfordshire, Brick, Clock Tower, England, Grey, Market Cross, Overcast, Pavement, Red Brick, Stone, Town Hall, Town Square, United Kingdom
-```
-
----
-
-### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
-
-**Metrics:** 51.7 TPS | 500 tokens
+**Metrics:** 52.1 TPS | 500 tokens
 
 ```text
 Title: Leighton Buzzard Town Centre
@@ -772,9 +745,19 @@ Keywords: Market Cross, historic, 15th century, red-brick buildings, clock tower
 
 ---
 
+### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
+
+**Metrics:** 46.9 TPS | 12 tokens
+
+```text
+The image is a photograph of a town center.
+```
+
+---
+
 ### ✅ mlx-community/pixtral-12b-bf16
 
-**Metrics:** 19.8 TPS | 110 tokens
+**Metrics:** 19.7 TPS | 110 tokens
 
 ```text
 Title:
@@ -789,9 +772,26 @@ Architectural Photography, Bedfordshire, Beige, Clock Tower, Daily Life, Early S
 
 ---
 
+### ✅ mlx-community/gemma-3-27b-it-qat-8bit
+
+**Metrics:** 15.1 TPS | 95 tokens
+
+```text
+Title:
+Leighton Buzzard Market Cross and Town Hall
+
+Description:
+A red-brick town hall and a stone market cross dominate a paved town square. The scene is lit by overcast daylight, with a few pedestrians visible and black bollards lining the foreground.
+
+Keywords:
+Architecture, Bedfordshire, Brick, Clock Tower, England, Grey, Market Cross, Overcast, Pavement, Red Brick, Stone, Town Hall, Town Square, United Kingdom
+```
+
+---
+
 ### ✅ mlx-community/gemma-3n-E4B-it-bf16
 
-**Metrics:** 42 TPS | 500 tokens
+**Metrics:** 41.5 TPS | 500 tokens
 
 ```text
 ## Image Description
@@ -837,7 +837,7 @@ Here's a breakdown of the objects visible in the image:
 
 ### ✅ mlx-community/paligemma2-3b-pt-896-4bit
 
-**Metrics:** 41.3 TPS | 500 tokens
+**Metrics:** 44.2 TPS | 500 tokens
 
 ```text
 - Output only the description text after the label.
@@ -892,7 +892,7 @@ Here's a breakdown of the objects visible in the image:
 
 ### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
 
-**Metrics:** 28.5 TPS | 104 tokens
+**Metrics:** 28.1 TPS | 104 tokens
 
 ```text
 Title:ĠLeightonĠBuzzardĠMarketĠCrossĠandĠTownĠCentreĊĊDescription:ĠTheĠimageĠshowsĠaĠquietĠtownĠsquareĠwithĠaĠhistoricĠstoneĠmarketĠcrossĠinĠtheĠcenter,ĠsurroundedĠbyĠtraditionalĠred-brickĠbuildingsĠandĠaĠclockĠtower.ĠTheĠsceneĠisĠcapturedĠonĠanĠovercastĠdayĠwithĠaĠfewĠpeopleĠwalkingĠaround.ĊĊKeywords:ĠArchitecturalĠPhotography,ĠBedfordshire,ĠBeige,ĠClockĠTower,ĠDailyĠLife,ĠEngland,ĠEnglishĠMarketĠTown,ĠGothicĠRevival,ĠGrey,ĠHighĠStreet,ĠMarketĠSquare,ĠOvercastĠDay,ĠStoneĠMonument,ĠTownĠCentre
@@ -900,9 +900,19 @@ Title:ĠLeightonĠBuzzardĠMarketĠCrossĠandĠTownĠCentreĊĊDescription:ĠThe
 
 ---
 
+### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+
+**Metrics:** 37.4 TPS | 500 tokens
+
+```text
+Let's tackle this step by step. First, the title needs to be 5-10 words, concrete and factual. The image is a town centre with historic buildings, a market cross, clock tower, and overcast day. Wait, the context says Leighton Buzzard, England. But wait, the user said to use only details clearly visible. Wait, the prompt's context has "Leighton Buzzard, England, United Kingdom" as a hint, but let me check the image description again. The user's initial prompt mentions "bc stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware st
+```
+
+---
+
 ### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
-**Metrics:** 9.2 TPS | 121 tokens
+**Metrics:** 8.64 TPS | 121 tokens
 
 ```text
 Title
@@ -917,19 +927,9 @@ Architectural Photography, Clock Tower, Daily Life, England, English Market Town
 
 ---
 
-### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
-
-**Metrics:** 36.8 TPS | 500 tokens
-
-```text
-Let's tackle this step by step. First, the title needs to be 5-10 words, concrete and factual. The image is a town centre with historic buildings, a market cross, clock tower, and overcast day. Wait, the context says Leighton Buzzard, England. But wait, the user said to use only details clearly visible. Wait, the prompt's context has "Leighton Buzzard, England, United Kingdom" as a hint, but let me check the image description again. The user's initial prompt mentions "bc stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware stoneware st
-```
-
----
-
 ### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
 
-**Metrics:** 36.9 TPS | 500 tokens
+**Metrics:** 35.9 TPS | 500 tokens
 
 ```text
 Here are my reasoning steps:
@@ -944,7 +944,7 @@ We need to produce Title: 5-10 words, concrete and factual, limited to clearly v
 
 ### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
 
-**Metrics:** 62.4 TPS | 500 tokens
+**Metrics:** 63.2 TPS | 500 tokens
 
 ```text
 <think>Got it, let's tackle this. The user wants cataloging metadata based on the image. First, I need to extract details that are clearly visible.
@@ -988,7 +988,7 @@ Leighton Buzzard Market Cross, Market Cross, Leighton Buzzard, England, Gothic R
 
 ### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
 
-**Metrics:** 3.93 TPS | 102 tokens
+**Metrics:** 3.98 TPS | 102 tokens
 
 ```text
 Town Centre, Leighton Buzzard, England
@@ -1000,7 +1000,7 @@ The image depicts a town centre in Leighton Buzzard, England, featuring a histor
 
 ### ✅ mlx-community/GLM-4.6V-Flash-6bit
 
-**Metrics:** 46 TPS | 500 tokens
+**Metrics:** 47.3 TPS | 500 tokens
 
 ```text
 <think>Got it, let's tackle this step by step. First, I need to extract the Title, Description, and Keywords based only on what's clearly visible in the image.
@@ -1032,34 +1032,17 @@ Selecting unique terms that are clearly visible:
 
 ### ✅ mlx-community/Molmo-7B-D-0924-8bit
 
-**Metrics:** 43.5 TPS | 372 tokens
+**Metrics:** 44.8 TPS | 426 tokens
 
 ```text
- Camera: Canon EOS R6 Mark II with RF 24-105mm f/4L IS USM lens. ISO: 400. Shutter Speed: 1/125s. Aperture: f/4.0. White Balance: 5600K. Exposure Compensation: +0.7EV. Color Temperature: 5600K. White Balance: AWB. Focus: Manual. Lighting: Overcast. Subject: Town Centre, Leighton Buzzard, England, United Kingdom, UK A quiet late afternoon in early spring settles over the town centre of Leighton Buzzard, England. The scene is dominated by the town's historic Market Cross, an intricate, five-sided stone monument dating back to the 15th century. Surrounded by traditional red-brick buildings and a prominent clock tower, the cross stands as a testament to the market town's rich history and architectural heritage. The overcast sky casts a soft, diffused light over the scene, enhancing the timeless atmosphere of this English market town. The Market Cross, with its ornate stone carvings and unique pentagonal shape, serves as the focal point of the image, drawing the eye and inviting viewers to imagine the centuries of history it has witnessed. Traditional red-brick buildings line the surrounding streets, their weathered facades telling stories of generations past. A clock tower looms in the background, its face clearly visible and marking the passage of time in this picturesque setting. The scene is devoid of people, creating a sense of tranquility and allowing the architecture to speak for itself. The color palette is dominated by muted tones of red, brown, and grey, with hints of green from any vegetation present, perfectly capturing the essence of a crisp early spring day in this historic English town.
-```
-
----
-
-### ✅ mlx-community/X-Reasoner-7B-8bit
-
-**Metrics:** 47.6 TPS | 500 tokens
-
-```text
-Title:
-Leighton Buzzard Market Square
-
-Description:
-A quiet town square in Leighton Buzzard, England, featuring a historic Market Cross and traditional red-brick buildings. The scene is set under an overcast sky, with a clock tower and a clock visible on a nearby building. A few pedestrians walk along the paved area, and a sign for a tattoo shop is visible in the foreground.
-
-Keywords:
-Leighton Buzzard, Market Cross, Market Square, Red Brick, Clock Tower, Overcast, Pedestrians, Traditional Architecture, England, Town Centre, Gothic Revival, High Street, Public Square, Historical Monument, Quiet Afternoon, England, UK, Europe, Street Photography, Architectural Detail, Urban Setting, Public Space, Historical Building, Red Brick Architecture, Overcast Day, Pedestrian Activity, Signage, Tattoo Shop, Clock, Weathered Building, Paved Square, Street Lamp, Yellow Painted Lines, Yellow Flower Pots, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky
+ Camera: Canon EOS R6 Mark II with RF 24-105mm f/4L IS USM lens. ISO: 400. Shutter Speed: 1/125s. Aperture: f/4.0. White Balance: 5600K. Exposure Compensation: +0.7EV. Color Temperature: 5600K. White Balance: AWB. Focus: Manual. Lighting: Overcast. Subject: Town Centre, Leighton Buzzard, England, United Kingdom, UK A quiet late afternoon in early spring settles over the town centre of Leighton Buzzard, England. The scene is dominated by the town's historic Market Cross, an intricate, five-sided stone monument dating back to the 15th century. Surrounded by traditional red-brick buildings and a prominent clock tower, the cross stands as a testament to the market town's rich history and architectural heritage. The overcast sky casts a soft, diffused light over the scene, enhancing the timeless atmosphere of this English market town. The Market Cross, with its ornate stone carvings and unique pentagonal shape, serves as the focal point of the image, drawing the eye and inviting viewers to imagine the centuries of history it has witnessed. Traditional red-brick buildings line the surrounding streets, their weathered facades telling stories of generations past. A prominent clock tower, likely dating from the same era as the Market Cross, adds to the town's architectural charm and serves as a reminder of Leighton Buzzard's importance as a bustling market center. The scene is devoid of people, creating a sense of tranquility and allowing the viewer to appreciate the town's historic beauty. The late afternoon light, with a subtle warmth despite the overcast conditions, suggests that spring is truly on the horizon, with new life beginning to emerge in the town and surrounding countryside. This image captures a moment of serene beauty in Leighton Buzzard, inviting viewers to step back in time and imagine the vibrant market scenes that have likely filled this square for centuries to come.
 ```
 
 ---
 
 ### ✅ Qwen/Qwen3-VL-2B-Instruct
 
-**Metrics:** 76.2 TPS | 500 tokens
+**Metrics:** 75.8 TPS | 500 tokens
 
 ```text
 Title:
@@ -1074,28 +1057,9 @@ Architectural Photography, Bedfordshire, Beige, Clock Tower, Daily Life, Early S
 
 ---
 
-### ✅ mlx-community/Molmo-7B-D-0924-bf16
-
-**Metrics:** 28 TPS | 400 tokens
-
-```text
- Camera: Canon EOS R6 Mark II with RF 24-105mm f/4L IS USM lens. ISO: 400. Shutter Speed: 1/30s. Aperture: f/4.0. White Balance: 5600K. Exposure Compensation: +0.7 EV. Color Temperature: 5600K. White Balance: AsShot. Focus: Manual. Lighting: Overcast. Subject: Market Cross. Film: Digital. Style: Photographic Representationalism, Realism, Product Photography, Travel Photography
-
-Title:
-- Town Centre, Leighton Buzzard, England, United Kingdom, UK A quiet late afternoon in early spring settles over the town centre of Leighton Buzzard, England. The scene is dominated by the town's historic Market Cross, an intricate, five-sided stone monument dating back to the 15th century. Surrounded by traditional red-brick buildings and a prominent clock tower, the cross stands as a testament to the market town's rich history and architectural heritage.
-
-Description:
-- A serene late afternoon scene in the heart of Leighton Buzzard's town center. The focal point is the ancient Market Cross, an intricate five-sided stone monument with Gothic Revival architectural elements. The cross stands on a raised platform with steps, surrounded by traditional red-brick buildings and a clock tower. The sky is overcast, casting a soft, diffused light over the scene. A few pedestrians can be seen in the distance, going about their daily activities in this historic English market town.
-
-Keywords:
-- Architectural Photography, Bedfordshire, Beige, Clock Tower, Daily Life, Early Spring, England, English Market Town, English town, Europe, Gothic Revival, Gothic Revival Architecture, Great Britain, Grey, High Street, Late Afternoon, Leighton Buzzard, Leighton Buzzard Market Cross, Market Square, Overcast Day, Town Centre
-```
-
----
-
 ### ✅ mlx-community/GLM-4.6V-nvfp4
 
-**Metrics:** 31.9 TPS | 500 tokens
+**Metrics:** 32 TPS | 500 tokens
 
 ```text
 <think>Got it, let's tackle this step by step. First, the Title. It needs to be 5-10 words, concrete and factual. Looking at the image, the main subject is a town square with a historic cross and clock tower. So maybe "Town Square with Historic Market Cross and Clock Tower". Wait, but let's check the hints. The existing hint mentions Leighton Buzzard, but the user said not to infer location unless obvious. Wait, no, the context says existing metadata hints are high confidence, but the user said "use only when visually confirmed". Wait, the image has a clock tower, a market cross (the stone monument), so the title should reflect that. Let's make it concise: "Historic Town Square with Market Cross and Clock Tower".
@@ -1107,9 +1071,36 @@ Keywords: Need 10-18 unique terms. From the image: Market Square, Clock Tower, S
 
 ---
 
+### ✅ mlx-community/Molmo-7B-D-0924-bf16
+
+**Metrics:** 28.1 TPS | 421 tokens
+
+```text
+ Camera: Canon EOS R6 Mark II with RF 24-105mm f/4L IS USM lens. ISO: 400. Shutter Speed: 1/30s. Aperture: f/4.0. White Balance: 5600K. Exposure Compensation: +0.7 EV. Color Temperature: 5600K. White Balance: AsShot. Focus: Manual. Lighting: Overcast. Subject: Town Centre, Leighton Buzzard, England, United Kingdom, UK A quiet late afternoon in early spring settles over the town centre of Leighton Buzzard, England. The scene is dominated by the town's historic Market Cross, an intricate, five-sided stone monument dating back to the 15th century. Surrounded by traditional red-brick buildings and a prominent clock tower, the cross stands as a testament to the market town's rich history and architectural heritage. The overcast sky casts a soft, diffused light over the scene, enhancing the timeless quality of this English market town. The Market Cross, with its ornate stone carvings and unique pentagonal shape, serves as the focal point of the image, drawing the eye and inviting viewers to imagine the centuries of life and stories that have unfolded around it. The surrounding buildings, with their weathered brick facades and traditional architecture, create a picturesque backdrop that speaks to the town's long and storied past. A clock tower, likely dating from the same era, stands sentinel nearby, its face a constant reminder of the passage of time in this historic setting. The scene is devoid of people, emphasizing the serene and almost timeless quality of this English market town. The color palette is dominated by muted tones of red, brown, and grey, with the stone of the Market Cross providing a striking contrast against the overcast sky. This image captures a moment of quiet beauty in Leighton Buzzard, inviting viewers to appreciate the town's architectural heritage and the subtle interplay of light and shadow in this quintessentially English setting.
+```
+
+---
+
+### ✅ mlx-community/X-Reasoner-7B-8bit
+
+**Metrics:** 46.3 TPS | 500 tokens
+
+```text
+Title:
+Leighton Buzzard Market Square
+
+Description:
+A quiet town square in Leighton Buzzard, England, featuring a historic Market Cross and traditional red-brick buildings. The scene is set under an overcast sky, with a clock tower and a clock visible on a nearby building. A few pedestrians walk along the paved area, and a sign for a tattoo shop is visible in the foreground.
+
+Keywords:
+Leighton Buzzard, Market Cross, Market Square, Red Brick, Clock Tower, Overcast, Pedestrians, Traditional Architecture, England, Town Centre, Gothic Revival, High Street, Public Square, Historical Monument, Quiet Afternoon, England, UK, Europe, Street Photography, Architectural Detail, Urban Setting, Public Space, Historical Building, Red Brick Architecture, Overcast Day, Pedestrian Activity, Signage, Tattoo Shop, Clock, Weathered Building, Paved Square, Street Lamp, Yellow Painted Lines, Yellow Flower Pots, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky, Red Roof, White Windows, Black Poles, Black Lamp Posts, Yellow Sign, Blue Sky
+```
+
+---
+
 ### ✅ mlx-community/Qwen3-VL-2B-Thinking-bf16
 
-**Metrics:** 75.7 TPS | 500 tokens
+**Metrics:** 75.9 TPS | 500 tokens
 
 ```text
 Got it, let's tackle this step by step. First, I need to analyze the image for metadata. The user provided a description hint and some keyword hints, but I have to stick to what's visible in the image.
@@ -1127,7 +1118,7 @@ Keywords: Need 10-
 
 ### ✅ mlx-community/Qwen3.5-35B-A3B-6bit
 
-**Metrics:** 77 TPS | 500 tokens
+**Metrics:** 76.8 TPS | 500 tokens
 
 ```text
 The user wants me to analyze an image and generate cataloguing metadata (Title, Description, Keywords) based on specific rules.
@@ -1182,7 +1173,7 @@ The user wants me to analyze the provided image and generate cataloguing metadat
 
 ### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
 
-**Metrics:** 176 TPS | 180 tokens
+**Metrics:** 181 TPS | 180 tokens
 
 ```text
 Title: Leighton Buzzard Market Cross, England, UK
@@ -1195,7 +1186,7 @@ Capture metadata: Taken on 2026-03-07 16:57:08 GMT (at 16:57:08 local time), GPS
 
 ### ✅ mlx-community/Qwen3.5-27B-4bit
 
-**Metrics:** 25 TPS | 500 tokens
+**Metrics:** 24.2 TPS | 500 tokens
 
 ```text
 The user wants me to analyze the image and generate cataloguing metadata based on specific rules.
@@ -1227,7 +1218,7 @@ The user wants me to analyze the image and generate cataloguing metadata based o
 
 ### ✅ mlx-community/Qwen3.5-27B-mxfp8
 
-**Metrics:** 15.2 TPS | 500 tokens
+**Metrics:** 14.4 TPS | 500 tokens
 
 ```text
 The user wants me to analyze the image and generate cataloguing metadata based on specific rules.
@@ -1276,13 +1267,13 @@ The user wants me to analyze the image and generate cataloguing metadata based o
 ## Library Versions
 
 - `Pillow`: `12.1.1`
-- `huggingface-hub`: `1.6.0`
-- `mlx`: `0.31.1.dev20260308+be872ebd`
-- `mlx-lm`: `0.31.0`
+- `huggingface-hub`: `1.7.1`
+- `mlx`: `0.31.2.dev20260313+b0564a91`
+- `mlx-lm`: `0.31.2`
 - `mlx-metal`: ``
 - `mlx-vlm`: `0.4.0`
-- `numpy`: `2.4.2`
+- `numpy`: `2.4.3`
 - `tokenizers`: `0.22.2`
 - `transformers`: `5.3.0`
 
-_Report generated on: 2026-03-08 23:39:50 GMT_
+_Report generated on: 2026-03-13 14:06:21 GMT_

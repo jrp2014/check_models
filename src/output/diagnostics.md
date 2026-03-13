@@ -176,29 +176,10 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Downloading (incomplete total...):   0%|          | 0.00/1.54G [00:00<?, ?B/s]
-Downloading (incomplete total...):   0%|          | 2.44k/1.54G [00:00<57:03:04, 7.50kB/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 23643.20it/s]
 
-Fetching 10 files:  10%|#         | 1/10 [00:00<00:02,  3.04it/s]
-Downloading (incomplete total...):   0%|          | 2.44k/1.54G [00:00<57:03:04, 7.50kB/s]
-Downloading (incomplete total...):   0%|          | 130k/1.54G [00:00<57:02:47, 7.50kB/s] 
-Downloading (incomplete total...):   0%|          | 130k/1.54G [00:00<57:02:47, 7.50kB/s]
-Downloading (incomplete total...):   0%|          | 1.53M/1.54G [00:00<06:26, 3.99MB/s]  
-Downloading (incomplete total...):   0%|          | 2.63M/1.54G [00:00<06:35, 3.89MB/s]
-Downloading (incomplete total...):   5%|4         | 69.7M/1.54G [00:09<03:15, 7.53MB/s]
-Downloading (incomplete total...):   5%|4         | 69.7M/1.54G [00:23<03:15, 7.53MB/s]
-Downloading (incomplete total...):  47%|####6     | 717M/1.54G [02:06<02:25, 5.65MB/s] 
-Downloading (incomplete total...):  47%|####7     | 728M/1.54G [02:06<02:20, 5.77MB/s]
-Downloading (incomplete total...):  47%|####7     | 728M/1.54G [02:19<02:20, 5.77MB/s]
-Downloading (incomplete total...):  84%|########4 | 1.30G/1.54G [02:50<00:27, 8.79MB/s]
-Downloading (incomplete total...):  88%|########8 | 1.36G/1.54G [03:01<00:21, 8.36MB/s]
-Downloading (incomplete total...):  98%|#########7| 1.51G/1.54G [03:10<00:03, 9.46MB/s]
-Downloading (incomplete total...): 1.54GB [03:12, 9.69MB/s]                            
-
-Fetching 10 files:  40%|####      | 4/10 [03:12<05:12, 52.10s/it]
-Fetching 10 files: 100%|##########| 10/10 [03:12<00:00, 19.29s/it]
-
-Download complete: : 1.54GB [03:12, 9.69MB/s]
+Download complete: : 0.00B [00:00, ?B/s]              
+Download complete: : 0.00B [00:00, ?B/s]
 ```
 
 </details>
@@ -479,7 +460,7 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 
 | Model | Status vs Previous Run | First Seen Failing | Recent Repro |
 | ----- | ---------------------- | ------------------ | ------------ |
-| `microsoft/Florence-2-large-ft` | new model failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
+| `microsoft/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
 
 ---
 
@@ -488,12 +469,12 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 - **Detailed diagnostics models:** 13
 - **Summary diagnostics models:** 37
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1590.80s (1590.80s)
-- **Average runtime per model:** 31.82s (31.82s)
-- **Dominant runtime phase:** decode dominated 48/50 measured model runs (78% of tracked runtime).
-- **Phase totals:** model load=348.40s, prompt prep=0.13s, decode=1230.13s, cleanup=4.39s
+- **Total model runtime (sum):** 1440.65s (1440.65s)
+- **Average runtime per model:** 28.81s (28.81s)
+- **Dominant runtime phase:** decode dominated 48/50 measured model runs (89% of tracked runtime).
+- **Phase totals:** model load=156.80s, prompt prep=0.13s, decode=1271.71s, cleanup=4.17s
 - **Observed stop reasons:** completed=49, exception=1
-- **Validation overhead:** 11.83s total (avg 0.24s across 50 model(s)).
+- **Validation overhead:** 11.72s total (avg 0.23s across 50 model(s)).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
@@ -530,7 +511,7 @@ These models completed without diagnostics flags (no hard failure, harness warni
 - `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`: Model output may not follow prompt or image contents.
 - `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: Model output may not follow prompt or image contents.
 - `mlx-community/Molmo-7B-D-0924-8bit`: Output omitted required Title/Description/Keywords sections.
-- `mlx-community/Molmo-7B-D-0924-bf16`: Output appears to copy prompt context verbatim.
+- `mlx-community/Molmo-7B-D-0924-bf16`: Output omitted required Title/Description/Keywords sections.
 - `mlx-community/Phi-3.5-vision-instruct-bf16`: Output appears to copy prompt context verbatim.
 - `mlx-community/Qwen2-VL-2B-Instruct-4bit`: Output leaked reasoning or prompt-template text.
 - `mlx-community/Qwen3.5-35B-A3B-6bit`: Output omitted required Title/Description/Keywords sections.
@@ -553,11 +534,11 @@ These models completed without diagnostics flags (no hard failure, harness warni
 | Component | Version |
 | --------- | ------- |
 | mlx-vlm | 0.4.0 |
-| mlx | 0.31.1.dev20260308+be872ebd |
-| mlx-lm | 0.31.0 |
+| mlx | 0.31.2.dev20260313+b0564a91 |
+| mlx-lm | 0.31.2 |
 | transformers | 5.3.0 |
 | tokenizers | 0.22.2 |
-| huggingface-hub | 1.6.0 |
+| huggingface-hub | 1.7.1 |
 | Python Version | 3.13.12 |
 | OS | Darwin 25.3.0 |
 | macOS Version | 26.3.1 |
@@ -648,4 +629,4 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 - Input image: `/Users/jrp/Pictures/Processed/20260307-165708_DSC09405.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-03-08 23:39:50 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-03-13 14:06:22 GMT by [check_models](https://github.com/jrp2014/check_models)._
