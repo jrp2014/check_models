@@ -488,7 +488,7 @@ class TestPreflightDependencyDiagnostics:
                 "mlx-lm": "0.30.7",
                 "mlx": "0.30.7",
                 "transformers": "5.2.0",
-            }
+            },
         )
         assert requirements["mlx"][0] == "0.30.4"
         assert requirements["transformers"][0] == "5.2.0"
@@ -505,7 +505,7 @@ class TestPreflightDependencyDiagnostics:
                 "mlx-lm": "0.22.9",
                 "mlx": "0.29.9",
                 "transformers": "5.1.9",
-            }
+            },
         )
         assert any("mlx==0.29.9" in issue and "0.30.4" in issue for issue in issues)
         assert any("mlx-lm==0.22.9" in issue and "0.23.0" in issue for issue in issues)
