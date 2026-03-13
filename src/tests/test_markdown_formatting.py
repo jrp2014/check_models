@@ -208,7 +208,7 @@ def test_gallery_output_uses_wrapped_callout_instead_of_fence() -> None:
 
     assert "```text" not in md
     assert "<!-- markdownlint-disable MD028 -->" in md
-    assert "> [!NOTE]" in md
+    assert "> [!NOTE]" not in md
     assert "> alpha" in md
     assert "\n>\n> beta" in md
 

@@ -335,7 +335,7 @@ class TestMarkdownReportEdgeCases:
         content = out.read_text(encoding="utf-8")
         assert "**Prompt used:**" in content
         assert "<!-- markdownlint-disable MD028 -->" in content
-        assert "> [!NOTE]" in content
+        assert "> [!NOTE]" not in content
         assert "> line one" in content
         assert "\n>\n> line two" in content
         assert "```text" not in content
@@ -400,7 +400,7 @@ class TestMarkdownGalleryReport:
         assert "ignored raw blob" not in content
         assert "## Prompt" in content
         assert "<!-- markdownlint-disable MD028 -->" in content
-        assert "> [!NOTE]" in content
+        assert "> [!NOTE]" not in content
         assert "Describe this image fully." in content
         assert "```text" not in content
         assert "### ✅ org/good" in content

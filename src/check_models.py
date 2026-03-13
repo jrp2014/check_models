@@ -7170,10 +7170,9 @@ def _append_markdown_wrapped_callout(
     parts: list[str],
     content: str,
     *,
-    kind: str = "NOTE",
     width: int = 88,
 ) -> None:
-    """Append a wrapping GitHub callout for human-facing text blocks.
+    """Append a wrapping plain blockquote for human-facing text blocks.
 
     This path is for prompt/model-output readability. Technical logs and
     reproducibility commands should continue to use fenced code blocks.
@@ -7181,7 +7180,7 @@ def _append_markdown_wrapped_callout(
     if not parts or parts[-1] != "":
         parts.append("")
     parts.append("<!-- markdownlint-disable MD028 -->")
-    parts.append(f"> [!{kind}]")
+    parts.append(">")
 
     normalized = content.replace("\r\n", "\n").replace("\r", "\n")
     rendered_any = False
