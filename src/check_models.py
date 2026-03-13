@@ -7235,6 +7235,7 @@ def _escape_markdown_blockquote_line(text: str) -> str:
     """Escape structural Markdown syntax for wrapped blockquote text."""
     escaped: str = HTML_ESCAPER.escape(_wrap_bare_urls(text)).replace("__", r"\_\_")
     escaped = re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", escaped)
+    escaped = escaped.replace("**", r"\*\*").replace("*", r"\*")
     escaped = re.sub(r"^([#>*+\-`])", r"\\\1", escaped)
     return re.sub(r"^(\d+)([.)]\s)", r"\\\1\2", escaped)
 
@@ -7252,7 +7253,7 @@ def _append_markdown_wrapped_blockquote(
     """
     if not parts or parts[-1] != "":
         parts.append("")
-    parts.append("<!-- markdownlint-disable MD028 -->")
+    parts.append("<!-- markdownlint-disable MD028 MD049 -->")
     blockquote_lines: list[str] = [">"]
 
     normalized: str = content.replace("\r\n", "\n").replace("\r", "\n")
@@ -7271,11 +7272,12 @@ def _append_markdown_wrapped_blockquote(
             blockquote_lines.append(">")
             continue
         blockquote_lines.extend(
-            f"> {_escape_markdown_blockquote_line(wrapped_line)}" for wrapped_line in wrapped_lines
+            f"> {_escape_markdown_blockquote_line(wrapped_line.lstrip())}"
+            for wrapped_line in wrapped_lines
         )
 
     parts.extend(blockquote_lines)
-    parts.append("<!-- markdownlint-enable MD028 -->")
+    parts.append("<!-- markdownlint-enable MD028 MD049 -->")
     if not parts or parts[-1] != "":
         parts.append("")
 
@@ -9985,7 +9987,8 @@ def _append_markdown_gallery_note(
 
     gallery_link: str = f"[{relative_gallery_path}]({relative_gallery_path.replace(' ', '%20')})"
     md.append("**Dedicated review artifact:**")
-    md.append(f"See {gallery_link} for the standalone model-by-model output view.")
+    md.append("See the standalone model-by-model output view here:")
+    md.append(gallery_link)
     md.append("")
 
 

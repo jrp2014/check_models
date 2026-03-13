@@ -207,7 +207,7 @@ def test_gallery_output_uses_wrapped_blockquote_instead_of_fence() -> None:
     md = _gallery_lines_for(result)
 
     assert "```text" not in md
-    assert "<!-- markdownlint-disable MD028 -->" in md
+    assert "<!-- markdownlint-disable MD028 MD049 -->" in md
     assert "> [!NOTE]" not in md
     assert "> alpha" in md
     assert "\n>\n> beta" in md
@@ -222,6 +222,30 @@ def test_wrapped_blockquote_escapes_leading_markdown_syntax() -> None:
     md = "\n".join(parts)
     assert "> \\# heading" in md
     assert "> \\1. numbered" in md
+
+
+def test_wrapped_blockquote_escapes_inline_emphasis_markers() -> None:
+    """Wrapped blockquote lines should neutralize inline emphasis syntax."""
+    parts: list[str] = []
+
+    check_models._append_markdown_wrapped_blockquote(parts, "*italic*\n**bold**")
+
+    md = "\n".join(parts)
+    assert "> \\*italic\\*" in md
+    assert "> \\\\*\\\\*bold\\\\*\\\\*" in md
+
+
+def test_wrapped_blockquote_normalizes_wrapped_leading_spaces() -> None:
+    """Wrapped continuation lines should not emit multiple spaces after '>'."""
+    parts: list[str] = []
+
+    check_models._append_markdown_wrapped_blockquote(parts, "alpha beta gamma", width=6)
+
+    md = "\n".join(parts)
+    assert ">  beta" not in md
+    assert ">  gamma" not in md
+    assert "> beta" in md
+    assert "> gamma" in md
 
 
 def test_bare_url_in_long_error_is_wrapped() -> None:

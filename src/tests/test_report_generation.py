@@ -334,7 +334,7 @@ class TestMarkdownReportEdgeCases:
         )
         content = out.read_text(encoding="utf-8")
         assert "**Prompt used:**" in content
-        assert "<!-- markdownlint-disable MD028 -->" in content
+        assert "<!-- markdownlint-disable MD028 MD049 -->" in content
         assert "> [!NOTE]" not in content
         assert "> line one" in content
         assert "\n>\n> line two" in content
@@ -355,6 +355,7 @@ class TestMarkdownReportEdgeCases:
         )
         content = out.read_text(encoding="utf-8")
         assert "Dedicated review artifact:" in content
+        assert "See the standalone model-by-model output view here:" in content
         assert "[model_gallery.md](model_gallery.md)" in content
 
 
@@ -399,7 +400,7 @@ class TestMarkdownGalleryReport:
         assert "**GPS**: 51.5000, -0.1200" in content
         assert "ignored raw blob" not in content
         assert "## Prompt" in content
-        assert "<!-- markdownlint-disable MD028 -->" in content
+        assert "<!-- markdownlint-disable MD028 MD049 -->" in content
         assert "> [!NOTE]" not in content
         assert "Describe this image fully." in content
         assert "```text" not in content
