@@ -12,7 +12,7 @@ import tomllib
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from tools import generate_stubs
+from tools import check_suppressions, generate_stubs
 
 if TYPE_CHECKING:
     import pytest
@@ -183,3 +183,76 @@ def test_stub_refresh_reason_detects_version_change(
         generate_stubs.get_stub_refresh_reason(["mlx_vlm"], typings_dir)
         == "mlx_vlm version metadata changed"
     )
+
+
+def test_should_audit_path_excludes_generated_and_archived_paths(tmp_path: Path) -> None:
+    repo_root = tmp_path / "repo"
+    included = repo_root / "src" / "module.py"
+    excluded_output = repo_root / "src" / "output" / "results.md"
+    excluded_archived = repo_root / "src" / "tools" / ".archived" / "old.py"
+    included.parent.mkdir(parents=True)
+    excluded_output.parent.mkdir(parents=True)
+    excluded_archived.parent.mkdir(parents=True)
+    included.write_text("print('ok')\n", encoding="utf-8")
+    excluded_output.write_text("<!-- markdownlint-disable MD028 -->\n", encoding="utf-8")
+    excluded_archived.write_text("x = 1  # noqa: F841\n", encoding="utf-8")
+
+    assert check_suppressions.should_audit_path(included, repo_root) is True
+    assert check_suppressions.should_audit_path(excluded_output, repo_root) is False
+    assert check_suppressions.should_audit_path(excluded_archived, repo_root) is False
+
+
+def test_find_suppressions_detects_specific_and_bare_directives(tmp_path: Path) -> None:
+    file_path = tmp_path / "sample.py"
+    file_path.write_text(
+        "value = 1  # noqa: F841\n"
+        "other = 2  # noqa\n"
+        "typed = value  # type: ignore[attr-defined]\n"
+        "fallback = value  # type: ignore\n",
+        encoding="utf-8",
+    )
+
+    findings = check_suppressions.find_suppressions(file_path)
+
+    assert [finding.kind for finding in findings] == [
+        "noqa",
+        "bare-noqa",
+        "type-ignore",
+        "bare-type-ignore",
+    ]
+    assert findings[0].codes == ("F841",)
+    assert findings[2].codes == ("attr-defined",)
+
+
+def test_find_suppressions_ignores_suppression_text_inside_python_strings(tmp_path: Path) -> None:
+    file_path = tmp_path / "sample.py"
+    file_path.write_text(
+        'message = "Bare # noqa is not allowed"\nother = "# type: ignore[attr-defined]"\n',
+        encoding="utf-8",
+    )
+
+    assert check_suppressions.find_suppressions(file_path) == []
+
+
+def test_check_if_needed_fails_bare_suppressions(tmp_path: Path) -> None:
+    repo_root = tmp_path / "repo"
+    src_root = repo_root / "src"
+    src_root.mkdir(parents=True)
+    file_path = src_root / "sample.py"
+    file_path.write_text("value = 1  # noqa\n", encoding="utf-8")
+    finding = check_suppressions.SuppressionFinding(
+        file_path=file_path,
+        line_num=1,
+        kind="bare-noqa",
+        codes=(),
+        line_text="value = 1  # noqa",
+    )
+
+    needed, reason = check_suppressions.check_if_needed(
+        finding,
+        repo_root=repo_root,
+        src_root=src_root,
+    )
+
+    assert needed is False
+    assert "not allowed" in reason

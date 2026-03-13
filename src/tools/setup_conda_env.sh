@@ -99,7 +99,6 @@ check_conda() {
             # shellcheck disable=SC1091
             source "$HOME/miniconda3/etc/profile.d/conda.sh"
         elif [ -f "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
-            # shellcheck disable=SC1091
             source "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
         elif [ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]; then
             # shellcheck disable=SC1091

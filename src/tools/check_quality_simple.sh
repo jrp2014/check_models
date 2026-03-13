@@ -30,6 +30,9 @@ echo "=== Ruff Lint ==="
 echo "=== MyPy Type Check ==="
 "$QUALITY_PYTHON" -m mypy check_models.py
 
+echo "=== Suppression Audit ==="
+"$QUALITY_PYTHON" -m tools.check_suppressions
+
 echo "=== Ty Type Check ==="
 ty check check_models.py
 

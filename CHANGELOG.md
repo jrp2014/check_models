@@ -20,6 +20,10 @@ Notable changes to this project will be documented in this file.
   by reusing the shared configured-pattern lookup path across more detectors,
   tightening non-trivial local annotations, and centralizing repeated
   context-stopword filtering used by prompt-context analysis.
+- Expanded `src/tools/check_suppressions.py` into a stricter repo-wide
+  suppression audit and wired it into the fast/full quality scripts so stale
+  `noqa`, `type: ignore[...]`, and `shellcheck disable=` comments are flagged
+  automatically.
 
 - Narrowed legacy Transformers backend guard exports so `check_models` now sets
   only `TRANSFORMERS_NO_*` / `USE_*` variables still referenced by the
