@@ -31,7 +31,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from collections import Counter
-from collections.abc import Callable, Iterator, Mapping, Sequence
+from collections.abc import Callable, Generator, Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from functools import lru_cache
@@ -1033,7 +1033,7 @@ class PhaseTimer:
         return elapsed
 
     @contextlib.contextmanager
-    def track(self, phase: str) -> Iterator[None]:
+    def track(self, phase: str) -> Generator[None]:
         """Context manager that records elapsed time for a named phase."""
         self.start(phase)
         try:
