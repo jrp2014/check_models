@@ -600,8 +600,22 @@ try:
 except importlib.metadata.PackageNotFoundError:
     MISSING_DEPENDENCIES["mlx-lm"] = ERROR_MLX_LM_MISSING
 
+
+def _load_transformers_import_utils_source() -> str | None:
+    """Load transformers import-utils source without importing transformers."""
+    import_utils_spec = importlib_util.find_spec("transformers.utils.import_utils")
+    import_utils_origin = getattr(import_utils_spec, "origin", None) if import_utils_spec else None
+    if not import_utils_origin:
+        return None
+
+    try:
+        return Path(import_utils_origin).read_text(encoding="utf-8")
+    except OSError:
+        return None
+
+
 _transformers_guard_enabled: bool = os.getenv("MLX_VLM_ALLOW_TF", "0") != "1"
-_TRANSFORMERS_BACKEND_GUARD_ENV_DEFAULTS: Final[dict[str, str]] = {
+_TRANSFORMERS_BACKEND_GUARD_ENV_CANDIDATES: Final[dict[str, str]] = {
     # Legacy guard names used in older transformers releases.
     "TRANSFORMERS_NO_TF": "1",
     "TRANSFORMERS_NO_FLAX": "1",
@@ -610,6 +624,12 @@ _TRANSFORMERS_BACKEND_GUARD_ENV_DEFAULTS: Final[dict[str, str]] = {
     "USE_TF": "0",
     "USE_FLAX": "0",
     "USE_JAX": "0",
+}
+_transformers_import_utils_source = _load_transformers_import_utils_source()
+_TRANSFORMERS_BACKEND_GUARD_ENV_DEFAULTS: Final[dict[str, str]] = {
+    env_key: env_value
+    for env_key, env_value in _TRANSFORMERS_BACKEND_GUARD_ENV_CANDIDATES.items()
+    if _transformers_import_utils_source is None or env_key in _transformers_import_utils_source
 }
 if _transformers_guard_enabled:
     # Prevent Transformers from importing heavy backends that can hang on macOS/ARM
@@ -4733,7 +4753,7 @@ def _detect_mlx_vlm_load_image_issue() -> str | None:
 
 def _has_transformers_backend_guard_names(import_utils_source: str) -> bool:
     """Return whether transformers source references known backend-guard env vars."""
-    guard_names = tuple(_TRANSFORMERS_BACKEND_GUARD_ENV_DEFAULTS)
+    guard_names = tuple(_TRANSFORMERS_BACKEND_GUARD_ENV_CANDIDATES)
     return any(name in import_utils_source for name in guard_names)
 
 
@@ -4742,14 +4762,8 @@ def _detect_transformers_env_guard_issue() -> str | None:
     if not _transformers_guard_enabled:
         return None
 
-    import_utils_spec = importlib_util.find_spec("transformers.utils.import_utils")
-    import_utils_origin = getattr(import_utils_spec, "origin", None) if import_utils_spec else None
-    if not import_utils_origin:
-        return None
-
-    try:
-        import_utils_source = Path(import_utils_origin).read_text(encoding="utf-8")
-    except OSError:
+    import_utils_source = _transformers_import_utils_source
+    if import_utils_source is None:
         return None
 
     if _has_transformers_backend_guard_names(import_utils_source):
@@ -9746,10 +9760,8 @@ def _append_markdown_gallery_note(
         relative_gallery_path = str(gallery_filename)
 
     gallery_link = f"[{relative_gallery_path}]({relative_gallery_path.replace(' ', '%20')})"
-    md.append(
-        f"**Dedicated review artifact:** See {gallery_link} for the standalone "
-        "model-by-model output view.",
-    )
+    md.append("**Dedicated review artifact:**")
+    md.append(f"See {gallery_link} for the standalone model-by-model output view.")
     md.append("")
 
 

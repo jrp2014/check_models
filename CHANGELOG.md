@@ -12,6 +12,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Narrowed legacy Transformers backend guard exports so `check_models` now sets
+  only `TRANSFORMERS_NO_*` / `USE_*` variables still referenced by the
+  installed `transformers` version, instead of exporting the full legacy set
+  unconditionally.
 - Tightened the default cataloguing prompt again to separate section labels from
   instruction text, reducing the chance that weaker models copy prompt
   instructions into the generated `Title:` field.

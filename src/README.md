@@ -430,14 +430,15 @@ Several behaviors can be customized via environment variables (useful for CI/aut
 | `MLX_VLM_WIDTH` | Force CLI output width (columns) | Auto-detect terminal | `MLX_VLM_WIDTH=120` |
 | `NO_COLOR` | Disable ANSI colors in output | Not set (colors enabled) | `NO_COLOR=1` |
 | `FORCE_COLOR` | Force ANSI colors even in non-TTY | Not set | `FORCE_COLOR=1` |
-| `TRANSFORMERS_NO_TF` | Legacy Transformers backend guard (best effort) | `1` when guard active | `TRANSFORMERS_NO_TF=0` |
-| `USE_TF` | Compatibility backend guard (best effort) | `0` when guard active | `USE_TF=1` |
+| `TRANSFORMERS_NO_TF` | Legacy Transformers backend guard (best effort) | Exported only if installed `transformers` still references it | `TRANSFORMERS_NO_TF=0` |
+| `USE_TF` | Compatibility backend guard (best effort) | Exported only if installed `transformers` still references it | `USE_TF=1` |
 | `MLX_VLM_ALLOW_TF` | Override TensorFlow blocking | Not set (blocked) | `MLX_VLM_ALLOW_TF=1` to allow |
 | `TOKENIZERS_PARALLELISM` | Disable tokenizer parallelism warnings | `false` | `TOKENIZERS_PARALLELISM=true` |
 | `MLX_METAL_JIT` | Optional `tools/update.sh` override (`MLX_METAL_JIT`) | Unset (uses MLX default `OFF`, pre-built kernels) | `MLX_METAL_JIT=ON` for runtime JIT |
 
-When backend guards are active, the script also sets `TRANSFORMERS_NO_FLAX=1`,
-`TRANSFORMERS_NO_JAX=1`, `USE_FLAX=0`, and `USE_JAX=0`.
+When backend guards are active, the script exports only the legacy
+`TRANSFORMERS_NO_*` and `USE_*` variables still referenced by the installed
+`transformers` version.
 
 **Examples**:
 
@@ -988,7 +989,8 @@ python -m check_models --exclude "meta-llama/Llama-3.2-90B-Vision-Instruct"
 **Script crashes with mutex error**: If you see `libc++abi: terminating due to uncaught exception of type std::__1::system_error: mutex lock failed: Invalid argument`, TensorFlow is installed and conflicting with MLX.
 
 The script applies best-effort backend guard env vars (`TRANSFORMERS_NO_*` and
-`USE_*`) unless you set `MLX_VLM_ALLOW_TF=1`. If TensorFlow still gets imported:
+`USE_*`) only when the installed `transformers` still references them, unless
+you set `MLX_VLM_ALLOW_TF=1`. If TensorFlow still gets imported:
 
 Option 1 - Keep TensorFlow but ensure backend guards are set (script does this automatically):
 
@@ -1026,7 +1028,7 @@ This provides:
 
 The script **automatically** applies best-effort backend guards to reduce accidental TensorFlow/JAX/Flax imports on Apple Silicon:
 
-- On startup, sets `TRANSFORMERS_NO_TF=1`, `TRANSFORMERS_NO_FLAX=1`, `TRANSFORMERS_NO_JAX=1`, `USE_TF=0`, `USE_FLAX=0`, and `USE_JAX=0` (unless you override with `MLX_VLM_ALLOW_TF=1`)
+- On startup, exports only the legacy `TRANSFORMERS_NO_*` / `USE_*` guard vars still referenced by the installed `transformers` build (unless you override with `MLX_VLM_ALLOW_TF=1`)
 - PyTorch is allowed by default (some models require it, e.g., Phi-3-vision)
 - Logs a warning when TensorFlow is detected while guards are active
 - Also logs if `sentence-transformers` is present

@@ -527,6 +527,19 @@ class TestPreflightDependencyDiagnostics:
         assert mod._has_transformers_backend_guard_names("USE_TF")
         assert not mod._has_transformers_backend_guard_names("USE_TORCH_XLA")
 
+    def test_transformers_backend_guard_defaults_match_source(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """Only guard vars referenced by transformers should be exported."""
+        source = mod._load_transformers_import_utils_source()
+        expected = {
+            key: value
+            for key, value in mod._TRANSFORMERS_BACKEND_GUARD_ENV_CANDIDATES.items()
+            if source is None or key in source
+        }
+        assert expected == mod._TRANSFORMERS_BACKEND_GUARD_ENV_DEFAULTS
+
     def test_resolve_distribution_source_file_finds_relative_path(
         self,
         mod: types.ModuleType,
