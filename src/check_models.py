@@ -1099,20 +1099,7 @@ class _TeeCaptureStream(io.TextIOBase):
 def _gallery_render_error(res: PerformanceResult) -> list[str]:
     out: list[str] = []
     out.append(f"**Status:** Failed ({res.error_stage})")
-    error_msg = str(res.error_message)
-    error_msg = re.sub(r"(?<![<(])(https?://[^\s>)]+)", r"<\1>", error_msg)
-
-    url_token_re = re.compile(r"<https?://[^>]+>")
-    escaped_parts: list[str] = []
-    start = 0
-    for match in url_token_re.finditer(error_msg):
-        segment = error_msg[start : match.start()]
-        escaped_parts.append(segment.replace("*", r"\*").replace("_", r"\_"))
-        escaped_parts.append(match.group(0))
-        start = match.end()
-    tail = error_msg[start:]
-    escaped_parts.append(tail.replace("*", r"\*").replace("_", r"\_"))
-    error_msg = "".join(escaped_parts)
+    error_msg = _escape_markdown_callout_line(str(res.error_message))
     max_inline_length = 80
     if len(error_msg) > max_inline_length:
         wrapped_lines = textwrap.wrap(
@@ -1233,7 +1220,7 @@ class ResultSet:
     outputs.
     """
 
-    __slots__ = ("_fields", "_results")  # Sorted for lint consistency
+    __slots__ = ("_failed", "_fields", "_results", "_successful")  # Sorted for lint consistency
 
     def __init__(self, results: list[PerformanceResult]) -> None:
         """Initialize and sort results.
@@ -1243,12 +1230,28 @@ class ResultSet:
         """
         self._results = _sort_results_by_time(list(results))
         self._fields: list[str] | None = None
+        self._successful: list[PerformanceResult] | None = None
+        self._failed: list[PerformanceResult] | None = None
 
     # Public API -----------------------------------------------------
     @property
     def results(self) -> list[PerformanceResult]:  # Sorted
         """Return results sorted by generation time (fastest first)."""
         return self._results
+
+    @property
+    def successful(self) -> list[PerformanceResult]:
+        """Return cached list of successful results."""
+        if self._successful is None:
+            self._successful = [r for r in self._results if r.success]
+        return self._successful
+
+    @property
+    def failed(self) -> list[PerformanceResult]:
+        """Return cached list of failed results."""
+        if self._failed is None:
+            self._failed = [r for r in self._results if not r.success]
+        return self._failed
 
     def get_fields(self) -> list[str]:
         """Return cached list of metric field names (generation + timing)."""
@@ -6737,105 +6740,109 @@ def _collect_cataloging_summary_data(summary: ModelIssueSummary) -> CatalogingSu
     )
 
 
-def _format_cataloging_summary_html(data: CatalogingSummaryData) -> list[str]:
-    """Format cataloging utility summary as HTML."""
-    parts = ["<h3>📚 Cataloging Utility Summary</h3>"]
-
-    if data.grade_counts:
-        parts.append(f"<p><b>Grade Distribution:</b> {' | '.join(data.grade_counts)}</p>")
-
-    if data.average_score is not None:
-        parts.append(f"<p><b>Average Utility Score:</b> {data.average_score:.0f}/100</p>")
-
-    if data.metadata_breakdown is not None:
-        baseline_score, baseline_grade, avg_delta, better, neutral, worse = data.metadata_breakdown
-        baseline_emoji = GRADE_EMOJIS.get(baseline_grade, "❌")
-        parts.append(
-            "<p><b>Existing Metadata Baseline:</b> "
-            f"{baseline_emoji} {baseline_grade} ({baseline_score:.0f}/100)</p>",
-        )
-        parts.append(
-            "<p><b>Vs Existing Metadata:</b> "
-            f"Avg Δ {avg_delta:+.0f} | Better: {better}, Neutral: {neutral}, Worse: {worse}</p>",
-        )
-
-    parts.append("<ul>")
-    if data.best_entry is not None:
-        model, score, grade = data.best_entry
-        emoji = GRADE_EMOJIS.get(grade, "")
-        parts.append(
-            f"<li><b>Best for cataloging:</b> <code>{html.escape(model)}</code> "
-            f"({emoji} {grade}, {score:.0f}/100)</li>",
-        )
-    if data.worst_entry is not None:
-        model, score, grade = data.worst_entry
-        emoji = GRADE_EMOJIS.get(grade, "")
-        parts.append(
-            f"<li><b>Worst for cataloging:</b> <code>{html.escape(model)}</code> "
-            f"({emoji} {grade}, {score:.0f}/100)</li>",
-        )
-    parts.append("</ul>")
-
-    if data.low_utility_models:
-        parts.append(
-            f"<p><b class='metric-warn'>⚠️ {len(data.low_utility_models)} models "
-            "with low utility (D/F):</b></p>",
-        )
-        parts.append("<ul>")
-        for model, score, grade, weakness in data.low_utility_models:
-            emoji = GRADE_EMOJIS.get(grade, "")
-            parts.append(
-                f"<li><code>{html.escape(model)}</code>: {emoji} {grade} ({score:.0f}/100) "
-                f"- {html.escape(weakness)}</li>",
-            )
-        parts.append("</ul>")
-
-    return parts
-
-
-def _format_cataloging_summary_text(data: CatalogingSummaryData) -> list[str]:
-    """Format cataloging utility summary as Markdown text."""
+def _format_cataloging_summary(  # noqa: C901, PLR0912, PLR0915 — dual-format renderer
+    data: CatalogingSummaryData,
+    *,
+    html_output: bool,
+) -> list[str]:
+    """Format cataloging utility summary as HTML or Markdown text."""
     parts: list[str] = []
-    _append_markdown_section(parts, title="## 📚 Cataloging Utility Summary")
+
+    if html_output:
+        parts.append("<h3>📚 Cataloging Utility Summary</h3>")
+    else:
+        _append_markdown_section(parts, title="## 📚 Cataloging Utility Summary")
 
     if data.grade_counts:
-        parts.append(f"**Grade Distribution:** {' | '.join(data.grade_counts)}")
-        parts.append("")
+        grade_line = f"{' | '.join(data.grade_counts)}"
+        if html_output:
+            parts.append(f"<p><b>Grade Distribution:</b> {grade_line}</p>")
+        else:
+            parts.append(f"**Grade Distribution:** {grade_line}")
+            parts.append("")
 
     if data.average_score is not None:
-        parts.append(f"**Average Utility Score:** {data.average_score:.0f}/100")
-        parts.append("")
+        score_text = f"{data.average_score:.0f}/100"
+        if html_output:
+            parts.append(f"<p><b>Average Utility Score:</b> {score_text}</p>")
+        else:
+            parts.append(f"**Average Utility Score:** {score_text}")
+            parts.append("")
 
     if data.metadata_breakdown is not None:
         baseline_score, baseline_grade, avg_delta, better, neutral, worse = data.metadata_breakdown
         baseline_emoji = GRADE_EMOJIS.get(baseline_grade, "❌")
-        parts.append(
-            f"**Existing Metadata Baseline:** {baseline_emoji} {baseline_grade} "
-            f"({baseline_score:.0f}/100)",
+        baseline_text = f"{baseline_emoji} {baseline_grade} ({baseline_score:.0f}/100)"
+        delta_text = (
+            f"Avg Δ {avg_delta:+.0f} | Better: {better}, Neutral: {neutral}, Worse: {worse}"
         )
-        parts.append(
-            f"**Vs Existing Metadata:** Avg Δ {avg_delta:+.0f} | "
-            f"Better: {better}, Neutral: {neutral}, Worse: {worse}",
-        )
-        parts.append("")
+        if html_output:
+            parts.append(f"<p><b>Existing Metadata Baseline:</b> {baseline_text}</p>")
+            parts.append(f"<p><b>Vs Existing Metadata:</b> {delta_text}</p>")
+        else:
+            parts.append(f"**Existing Metadata Baseline:** {baseline_text}")
+            parts.append(f"**Vs Existing Metadata:** {delta_text}")
+            parts.append("")
 
+    if html_output:
+        parts.append("<ul>")
     if data.best_entry is not None:
         model, score, grade = data.best_entry
         emoji = GRADE_EMOJIS.get(grade, "")
-        parts.append(f"- **Best for cataloging:** `{model}` ({emoji} {grade}, {score:.0f}/100)")
+        score_str = f"{score:.0f}/100"
+        if html_output:
+            parts.append(
+                f"<li><b>Best for cataloging:</b> <code>{html.escape(model)}</code> "
+                f"({emoji} {grade}, {score_str})</li>",
+            )
+        else:
+            parts.append(
+                f"- **Best for cataloging:** `{model}` ({emoji} {grade}, {score_str})",
+            )
     if data.worst_entry is not None:
         model, score, grade = data.worst_entry
         emoji = GRADE_EMOJIS.get(grade, "")
-        parts.append(f"- **Worst for cataloging:** `{model}` ({emoji} {grade}, {score:.0f}/100)")
-    parts.append("")
+        score_str = f"{score:.0f}/100"
+        if html_output:
+            parts.append(
+                f"<li><b>Worst for cataloging:</b> <code>{html.escape(model)}</code> "
+                f"({emoji} {grade}, {score_str})</li>",
+            )
+        else:
+            parts.append(
+                f"- **Worst for cataloging:** `{model}` ({emoji} {grade}, {score_str})",
+            )
+    if html_output:
+        parts.append("</ul>")
+    else:
+        parts.append("")
 
     if data.low_utility_models:
-        parts.append(f"### ⚠️ {len(data.low_utility_models)} Models with Low Utility (D/F)")
-        parts.append("")
+        count = len(data.low_utility_models)
+        if html_output:
+            parts.append(
+                f"<p><b class='metric-warn'>⚠️ {count} models with low utility (D/F):</b></p>",
+            )
+            parts.append("<ul>")
+        else:
+            parts.append(f"### ⚠️ {count} Models with Low Utility (D/F)")
+            parts.append("")
         for model, score, grade, weakness in data.low_utility_models:
             emoji = GRADE_EMOJIS.get(grade, "")
-            parts.append(f"- `{model}`: {emoji} {grade} ({score:.0f}/100) - {weakness}")
-        parts.append("")
+            if html_output:
+                parts.append(
+                    f"<li><code>{html.escape(model)}</code>: "
+                    f"{emoji} {grade} ({score:.0f}/100) "
+                    f"- {html.escape(weakness)}</li>",
+                )
+            else:
+                parts.append(
+                    f"- `{model}`: {emoji} {grade} ({score:.0f}/100) - {weakness}",
+                )
+        if html_output:
+            parts.append("</ul>")
+        else:
+            parts.append("")
 
     return parts
 
@@ -6909,10 +6916,7 @@ def _format_issues_summary_parts(
     cataloging_data = _collect_cataloging_summary_data(summary)
     parts.extend(_format_top_performers(summary, html_output=html_output))
     if cataloging_data is not None:
-        if html_output:
-            parts.extend(_format_cataloging_summary_html(cataloging_data))
-        else:
-            parts.extend(_format_cataloging_summary_text(cataloging_data))
+        parts.extend(_format_cataloging_summary(cataloging_data, html_output=html_output))
     parts.extend(_format_quality_issues(summary, html_output=html_output))
     parts.extend(
         _format_aggregate_statistics(
@@ -7052,12 +7056,6 @@ class DiagnosticsConfig:
 
 
 DIAGNOSTICS: Final[DiagnosticsConfig] = DiagnosticsConfig()
-
-# Priority thresholds for diagnostics report classification
-_DIAGNOSTICS_HIGH_COUNT: Final[int] = DIAGNOSTICS.high_cluster_count
-_DIAGNOSTICS_TRACEBACK_TAIL_LINES: Final[int] = DIAGNOSTICS.traceback_tail_lines
-_DIAGNOSTICS_OUTPUT_SNIPPET_LEN: Final[int] = DIAGNOSTICS.output_snippet_len
-_DIAGNOSTICS_RECENT_RUN_WINDOW: Final[int] = DIAGNOSTICS.recent_run_window
 
 # System info keys to include in the environment table (order matters)
 _DIAGNOSTICS_SYSTEM_KEYS: Final[tuple[str, ...]] = (
@@ -7318,13 +7316,8 @@ def _format_traceback_tail(traceback_str: str | None) -> str | None:
     lines = [ln for ln in normalized.splitlines() if ln.strip()]
     if not lines:
         return None
-    tail = lines[-_DIAGNOSTICS_TRACEBACK_TAIL_LINES:]
+    tail = lines[-DIAGNOSTICS.traceback_tail_lines :]
     return "\n".join(tail)
-
-
-def _format_traceback_full(traceback_str: str | None) -> str | None:
-    """Return full traceback text (trimmed), or None when missing."""
-    return _normalize_traceback_for_report(traceback_str)
 
 
 def _build_failure_history_context(
@@ -7363,7 +7356,7 @@ def _build_failure_history_context(
             recent_considered += 1
             if success is False:
                 recent_failures += 1
-            if recent_considered >= _DIAGNOSTICS_RECENT_RUN_WINDOW:
+            if recent_considered >= DIAGNOSTICS.recent_run_window:
                 break
 
         context[model] = FailureHistoryContext(
@@ -7553,7 +7546,7 @@ def _diagnostics_detailed_trace_logs_section(
     """Build one collapsed block containing traceback/log details per model."""
     model_logs: list[tuple[str, str | None, str | None]] = []
     for result in cluster_results:
-        traceback_text = _format_traceback_full(result.error_traceback)
+        traceback_text = _normalize_traceback_for_report(result.error_traceback)
         captured_output = result.captured_output_on_fail or ""
         if captured_output:
             captured_output = ANSI_ESCAPE_RE.sub("", captured_output)
@@ -7640,7 +7633,7 @@ def _diagnostics_priority(
     error_stage: str | None,
 ) -> str:
     """Assign a priority label for an error cluster in the diagnostics report."""
-    if cluster_size >= _DIAGNOSTICS_HIGH_COUNT:
+    if cluster_size >= DIAGNOSTICS.high_cluster_count:
         return "High"
     if error_stage in {"Weight Mismatch", "Config Missing"}:
         return "Low"
@@ -8260,7 +8253,7 @@ def _diagnostics_failure_clusters(
                 parts,
                 _truncate_text_preview(
                     output_text,
-                    max_chars=_DIAGNOSTICS_OUTPUT_SNIPPET_LEN,
+                    max_chars=DIAGNOSTICS.output_snippet_len,
                 ),
                 language="text",
             )
@@ -8326,8 +8319,8 @@ def _diagnostics_harness_section(
             parts.extend(f"- {observation}" for observation in unique_observations)
             parts.append("")
         snippet_source = text.strip() or "<empty output>"
-        snippet = snippet_source[:_DIAGNOSTICS_OUTPUT_SNIPPET_LEN]
-        if len(snippet_source) > _DIAGNOSTICS_OUTPUT_SNIPPET_LEN:
+        snippet = snippet_source[: DIAGNOSTICS.output_snippet_len]
+        if len(snippet_source) > DIAGNOSTICS.output_snippet_len:
             snippet += "..."
         parts.append("**Sample output:**")
         _append_markdown_code_block(parts, snippet, language="text")
@@ -8467,7 +8460,7 @@ def _diagnostics_history_section(
         title="## History Context",
         body_lines=[
             "Recent reproducibility is measured from history "
-            f"(up to last {_DIAGNOSTICS_RECENT_RUN_WINDOW} runs where each model appears).",
+            f"(up to last {DIAGNOSTICS.recent_run_window} runs where each model appears).",
         ],
     )
 

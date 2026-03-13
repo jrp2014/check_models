@@ -186,3 +186,77 @@ def test_sort_results_by_time_single_result() -> None:
 
     assert len(sorted_results) == 1
     assert sorted_results[0].model_name == "only_model"
+
+
+def test_resultset_successful_property() -> None:
+    """ResultSet.successful should return only successful results and cache them."""
+    results = [
+        check_models.PerformanceResult(
+            model_name="success1",
+            generation=MockGenerationResult(),
+            success=True,
+            generation_time=2.0,
+            total_time=3.0,
+        ),
+        check_models.PerformanceResult(
+            model_name="failed1",
+            generation=None,
+            success=False,
+            error_stage="timeout",
+        ),
+        check_models.PerformanceResult(
+            model_name="success2",
+            generation=MockGenerationResult(),
+            success=True,
+            generation_time=1.0,  # Will sort first
+            total_time=2.0,
+        ),
+    ]
+
+    rs = check_models.ResultSet(results)
+
+    # First access computes and returns
+    successful = rs.successful
+    assert len(successful) == 2
+    assert successful[0].model_name == "success2"  # Sorted by time
+    assert successful[1].model_name == "success1"
+
+    # Second access returns cached list
+    assert rs.successful is successful
+
+
+def test_resultset_failed_property() -> None:
+    """ResultSet.failed should return only failed results and cache them."""
+    results = [
+        check_models.PerformanceResult(
+            model_name="success1",
+            generation=MockGenerationResult(),
+            success=True,
+            generation_time=2.0,
+            total_time=3.0,
+        ),
+        check_models.PerformanceResult(
+            model_name="failed1",
+            generation=None,
+            success=False,
+            error_stage="timeout",
+        ),
+        check_models.PerformanceResult(
+            model_name="failed2",
+            generation=None,
+            success=False,
+            error_stage="loading",
+        ),
+    ]
+
+    rs = check_models.ResultSet(results)
+
+    # First access computes and returns
+    failed = rs.failed
+    assert len(failed) == 2
+    # Failed results maintain their original sorted order
+    assert failed[0].model_name == "failed1"
+    assert failed[1].model_name == "failed2"
+
+    # Second access returns cached list
+    assert rs.failed is failed

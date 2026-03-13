@@ -12,8 +12,7 @@ from check_models import (
     ModelIssueSummary,
     PerformanceResult,
     _collect_cataloging_summary_data,
-    _format_cataloging_summary_html,
-    _format_cataloging_summary_text,
+    _format_cataloging_summary,
     _get_grade_display,
     analyze_model_issues,
     compute_cataloging_utility,
@@ -344,7 +343,7 @@ class TestCatalogingSummaryFormatters:
         """Empty summary should return empty list."""
         summary: ModelIssueSummary = {"cataloging_best": None}
         data = _collect_cataloging_summary_data(summary)
-        result = [] if data is None else _format_cataloging_summary_html(data)
+        result = [] if data is None else _format_cataloging_summary(data, html_output=True)
         assert result == []
 
     def test_format_cataloging_summary_html_with_data(self) -> None:
@@ -358,7 +357,7 @@ class TestCatalogingSummaryFormatters:
         }
         data = _collect_cataloging_summary_data(summary)
         assert data is not None
-        result = _format_cataloging_summary_html(data)
+        result = _format_cataloging_summary(data, html_output=True)
 
         # Should have content
         assert len(result) > 0
@@ -389,7 +388,7 @@ class TestCatalogingSummaryFormatters:
         }
         data = _collect_cataloging_summary_data(summary)
         assert data is not None
-        result = _format_cataloging_summary_html(data)
+        result = _format_cataloging_summary(data, html_output=True)
         html = "".join(result)
         assert "Existing Metadata Baseline" in html
         assert "Vs Existing Metadata" in html
@@ -400,7 +399,7 @@ class TestCatalogingSummaryFormatters:
         """Empty summary should return empty list."""
         summary: ModelIssueSummary = {"cataloging_best": None}
         data = _collect_cataloging_summary_data(summary)
-        result = [] if data is None else _format_cataloging_summary_text(data)
+        result = [] if data is None else _format_cataloging_summary(data, html_output=False)
         assert result == []
 
     def test_format_cataloging_summary_text_with_data(self) -> None:
@@ -414,7 +413,7 @@ class TestCatalogingSummaryFormatters:
         }
         data = _collect_cataloging_summary_data(summary)
         assert data is not None
-        result = _format_cataloging_summary_text(data)
+        result = _format_cataloging_summary(data, html_output=False)
 
         # Should have content
         assert len(result) > 0
@@ -445,7 +444,7 @@ class TestCatalogingSummaryFormatters:
         }
         data = _collect_cataloging_summary_data(summary)
         assert data is not None
-        result = _format_cataloging_summary_text(data)
+        result = _format_cataloging_summary(data, html_output=False)
         md = "\n".join(result)
         assert "Existing Metadata Baseline" in md
         assert "Vs Existing Metadata" in md

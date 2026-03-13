@@ -12,6 +12,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Reduced internal redundancy in `src/check_models.py` by merging HTML and Markdown
+  cataloging summary rendering paths into a single `_format_cataloging_summary` function.
+- Added lazily-evaluated `.successful` and `.failed` cached properties to `ResultSet`
+  to optimize repeat list comprehensions during report generation.
+
 - Narrowed legacy Transformers backend guard exports so `check_models` now sets
   only `TRANSFORMERS_NO_*` / `USE_*` variables still referenced by the
   installed `transformers` version, instead of exporting the full legacy set
