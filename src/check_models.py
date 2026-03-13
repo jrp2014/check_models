@@ -859,7 +859,6 @@ class ReportGenerationInputs:
     jsonl_output_path: Path
     log_output_path: Path
     env_output_path: Path
-    gallery_md_output_path: Path
 
 
 @runtime_checkable
@@ -9672,45 +9671,6 @@ def _generate_model_gallery_section(
     return md
 
 
-def _format_gallery_metadata_section(metadata: MetadataDict | None) -> list[str]:
-    """Format populated image metadata fields for the markdown gallery artifact."""
-    if not metadata:
-        return []
-
-    metadata_fields = (
-        ("Title", metadata.get("title")),
-        ("Description", metadata.get("description")),
-        ("Keywords", metadata.get("keywords")),
-        ("Date", metadata.get("date")),
-        ("Time", metadata.get("time")),
-        ("GPS", metadata.get("gps")),
-    )
-    populated_fields = [(label, value) for label, value in metadata_fields if value]
-    if not populated_fields:
-        return []
-
-    md = ["## Image Metadata", ""]
-    for label, value in populated_fields:
-        md.append(f"- **{label}**: {value}")
-    md.append("")
-    return md
-
-
-def _build_markdown_gallery_link(
-    *,
-    report_filename: Path,
-    gallery_filename: Path | None,
-) -> str | None:
-    """Build a relative markdown link to the standalone gallery artifact."""
-    if gallery_filename is None:
-        return None
-    try:
-        relative_path = os.path.relpath(gallery_filename, start=report_filename.parent)
-    except ValueError:
-        relative_path = str(gallery_filename)
-    return f"[{relative_path}]({relative_path.replace(' ', '%20')})"
-
-
 def _generate_markdown_table_section(report_context: ReportRenderContext) -> list[str]:
     """Generate the metrics table section for the Markdown report."""
     headers, rows, field_names = _materialize_prepared_table_data(report_context.table_data)
@@ -9768,6 +9728,29 @@ def _generate_markdown_table_section(report_context: ReportRenderContext) -> lis
     md.append("<!-- markdownlint-enable MD013 MD033 MD034 MD037 MD049 -->")
     md.append("")
     return md
+
+
+def _append_markdown_gallery_note(
+    md: list[str],
+    *,
+    report_filename: Path,
+    gallery_filename: Path | None,
+) -> None:
+    """Append a relative link to the standalone markdown gallery artifact when present."""
+    if gallery_filename is None:
+        return
+
+    try:
+        relative_gallery_path = os.path.relpath(gallery_filename, start=report_filename.parent)
+    except ValueError:
+        relative_gallery_path = str(gallery_filename)
+
+    gallery_link = f"[{relative_gallery_path}]({relative_gallery_path.replace(' ', '%20')})"
+    md.append(
+        f"**Dedicated review artifact:** See {gallery_link} for the standalone "
+        "model-by-model output view.",
+    )
+    md.append("")
 
 
 def generate_markdown_report(
@@ -9841,16 +9824,11 @@ def generate_markdown_report(
     md.extend(table_md)
 
     # --- Model Gallery Section ---
-    gallery_link = _build_markdown_gallery_link(
+    _append_markdown_gallery_note(
+        md,
         report_filename=filename,
         gallery_filename=gallery_filename,
     )
-    if gallery_link is not None:
-        md.append(
-            f"**Dedicated review artifact:** See {gallery_link} for the standalone "
-            "model-by-model output view.",
-        )
-        md.append("")
     md.extend(_generate_model_gallery_section(report_context))
 
     md.append("---")
@@ -9917,7 +9895,22 @@ def generate_markdown_gallery_report(
         "generated output for each model.",
     )
     md.append("")
-    md.extend(_format_gallery_metadata_section(metadata))
+    if metadata:
+        metadata_fields = (
+            ("Title", metadata.get("title")),
+            ("Description", metadata.get("description")),
+            ("Keywords", metadata.get("keywords")),
+            ("Date", metadata.get("date")),
+            ("Time", metadata.get("time")),
+            ("GPS", metadata.get("gps")),
+        )
+        populated_fields = [(label, value) for label, value in metadata_fields if value]
+        if populated_fields:
+            md.append("## Image Metadata")
+            md.append("")
+            for label, value in populated_fields:
+                md.append(f"- **{label}**: {value}")
+            md.append("")
     md.append("## Prompt")
     md.append("")
     md.append("```text")
@@ -14698,6 +14691,7 @@ def _generate_reports_and_log_outputs(
     inputs: ReportGenerationInputs,
 ) -> None:
     """Generate reports and log the emitted artifact paths."""
+    gallery_output_path = inputs.args.output_gallery_markdown.resolve()
     report_jobs: tuple[tuple[str, Callable[[], None]], ...] = (
         (
             "html",
@@ -14720,14 +14714,14 @@ def _generate_reports_and_log_outputs(
                 prompt=inputs.prompt,
                 total_runtime_seconds=inputs.overall_time,
                 report_context=inputs.report_context,
-                gallery_filename=inputs.gallery_md_output_path,
+                gallery_filename=gallery_output_path,
             ),
         ),
         (
             "markdown_gallery",
             lambda: generate_markdown_gallery_report(
                 results=inputs.results,
-                filename=inputs.args.output_gallery_markdown,
+                filename=gallery_output_path,
                 prompt=inputs.prompt,
                 metadata=inputs.metadata,
                 report_context=inputs.report_context,
@@ -14806,9 +14800,6 @@ def finalize_execution(
         )
 
         # Prepare output paths
-        html_output_path: Path = args.output_html.resolve()
-        md_output_path: Path = args.output_markdown.resolve()
-        gallery_md_output_path: Path = args.output_gallery_markdown.resolve()
         tsv_output_path: Path = args.output_tsv.resolve()
         jsonl_output_path: Path = args.output_jsonl.resolve()
         diagnostics_path: Path = args.output_diagnostics.resolve()
@@ -14817,11 +14808,15 @@ def finalize_execution(
         history_path = _history_path_for_jsonl(jsonl_output_path)
         previous_history = _load_latest_history_record(history_path)
 
-        html_output_path.parent.mkdir(parents=True, exist_ok=True)
-        md_output_path.parent.mkdir(parents=True, exist_ok=True)
-        gallery_md_output_path.parent.mkdir(parents=True, exist_ok=True)
-        tsv_output_path.parent.mkdir(parents=True, exist_ok=True)
-        jsonl_output_path.parent.mkdir(parents=True, exist_ok=True)
+        for output_path in (
+            args.output_html.resolve(),
+            args.output_markdown.resolve(),
+            args.output_gallery_markdown.resolve(),
+            tsv_output_path,
+            jsonl_output_path,
+        ):
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+
         _generate_reports_and_log_outputs(
             ReportGenerationInputs(
                 args=args,
@@ -14836,7 +14831,6 @@ def finalize_execution(
                 jsonl_output_path=jsonl_output_path,
                 log_output_path=log_output_path,
                 env_output_path=env_output_path,
-                gallery_md_output_path=gallery_md_output_path,
             ),
         )
 
