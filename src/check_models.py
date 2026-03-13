@@ -3131,13 +3131,13 @@ def _detect_token_encoding_issues(text: str) -> tuple[bool, str | None]:
     # Check for Ġ (U+0120) - BPE space marker leak
     # This is a specific HuggingFace tokenizer artifact
     if "\u0120" in text:
-        count: int = text.count("\u0120")
-        return True, f"bpe_space_leak({count})"
+        space_leak_count: int = text.count("\u0120")
+        return True, f"bpe_space_leak({space_leak_count})"
 
     # Check for Ċ (U+010A) - BPE newline marker leak
     if "\u010a" in text:
-        count: int = text.count("\u010a")
-        return True, f"bpe_newline_leak({count})"
+        newline_leak_count: int = text.count("\u010a")
+        return True, f"bpe_newline_leak({newline_leak_count})"
 
     # Check for other common tokenizer artifacts that shouldn't be visible
     for artifact, name in BPE_BYTE_ARTIFACTS:
@@ -6378,11 +6378,11 @@ def _build_runtime_analysis_summary(
         phase_durations: dict[RuntimePhaseName, float] = _runtime_phase_durations(runtime)
         if phase_durations:
             measured_models += 1
-            dominant_phase: RuntimePhaseName = max(
+            run_dominant_phase: RuntimePhaseName = max(
                 phase_durations,
                 key=phase_durations.__getitem__,
             )
-            dominant_counts[dominant_phase] += 1
+            dominant_counts[run_dominant_phase] += 1
             for phase, duration in phase_durations.items():
                 phase_totals[phase] += duration
         if runtime is not None:
