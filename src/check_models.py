@@ -902,6 +902,23 @@ class SupportsGenerationResult(Protocol):  # Minimal attributes we read from Gen
     cache_memory: float | None  # Dynamically added cache memory (GB)
 
 
+@runtime_checkable
+class SupportsThroughputGenerationResult(Protocol):
+    """Generation result variant that exposes prompt/generation throughput."""
+
+    prompt_tokens: int | None
+    generation_tokens: int | None
+    prompt_tps: float | None
+    generation_tps: float | None
+
+
+@runtime_checkable
+class SupportsQualityAnalysisGenerationResult(Protocol):
+    """Generation result variant that carries cached quality analysis."""
+
+    quality_analysis: GenerationQualityAnalysis | None
+
+
 class SupportsExifIfd(Protocol):
     """Minimal interface for EXIF objects providing nested IFD access."""
 
@@ -1180,11 +1197,7 @@ def _append_gallery_quality_lines(
     if not res.generation:
         return
 
-    analysis: GenerationQualityAnalysis | None = getattr(
-        res.generation,
-        "quality_analysis",
-        None,
-    )
+    analysis = _quality_analysis_for_result(res)
     if analysis and analysis.issues:
         out.append("")
         out.append("⚠️ **Quality Warnings:**")
@@ -1203,20 +1216,20 @@ def _gallery_render_success(
     useful_now: bool = False,
     watchlist_reason: str | None = None,
 ) -> list[str]:
-    def _metric_segment(label: str, field_name: str, value: object) -> str | None:
-        formatted = format_field_value(field_name, cast("MetricValue", value))
+    def _metric_segment(label: str, field_name: str, value: MetricValue) -> str | None:
+        formatted = format_field_value(field_name, value)
         if not formatted:
             return None
         return f"{label} {formatted}"
 
     def _throughput_segment(
         label: str,
-        tps_value: object,
+        tps_value: float | None,
         token_field_name: str,
-        token_value: object,
+        token_value: int | None,
     ) -> str | None:
-        tps_formatted = format_field_value("generation_tps", cast("MetricValue", tps_value))
-        tokens_formatted = format_field_value(token_field_name, cast("MetricValue", token_value))
+        tps_formatted = format_field_value("generation_tps", tps_value)
+        tokens_formatted = format_field_value(token_field_name, token_value)
         if not tps_formatted and not tokens_formatted:
             return None
         if tps_formatted and tokens_formatted:
@@ -1239,21 +1252,21 @@ def _gallery_render_success(
     if time_segments:
         out.append(f"**Metrics:** {' | '.join(time_segments)}")
 
-    if gen:
+    if isinstance(gen, SupportsThroughputGenerationResult):
         throughput_segments: list[str] = [
             segment
             for segment in (
                 _throughput_segment(
                     "Prompt",
-                    getattr(gen, "prompt_tps", None),
+                    gen.prompt_tps,
                     "prompt_tokens",
-                    getattr(gen, "prompt_tokens", None),
+                    gen.prompt_tokens,
                 ),
                 _throughput_segment(
                     "Gen",
-                    getattr(gen, "generation_tps", None),
+                    gen.generation_tps,
                     "generation_tokens",
-                    getattr(gen, "generation_tokens", None),
+                    gen.generation_tokens,
                 ),
             )
             if segment is not None
@@ -7142,9 +7155,10 @@ def _quality_analysis_for_result(res: PerformanceResult) -> GenerationQualityAna
     """Return cached quality analysis for a result when present."""
     if res.quality_analysis is not None:
         return res.quality_analysis
-    if res.generation is None:
+    generation = res.generation
+    if generation is None or not isinstance(generation, SupportsQualityAnalysisGenerationResult):
         return None
-    return getattr(res.generation, "quality_analysis", None)
+    return generation.quality_analysis
 
 
 def _summarize_model_review(res: PerformanceResult, summary: ModelIssueSummary) -> str | None:
@@ -10249,6 +10263,7 @@ def _generate_model_gallery_section(
     for res in sorted_results:
         icon = "✅" if res.success else "❌"
         md.append(f'<a id="{_gallery_model_anchor(res.model_name)}"></a>')
+        md.append("")
         md.append(f"### {icon} {res.model_name}")
         md.append("")
         if not res.success:

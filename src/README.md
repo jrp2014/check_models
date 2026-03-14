@@ -72,7 +72,8 @@ python -m check_models --dry-run
 - **Multiple Output Formats**:
   - **CLI**: Colorized with compact or detailed metrics modes
   - **HTML**: Standalone report with inline CSS, failed row highlighting
-  - **Markdown**: GitHub-compatible with pipe tables
+  - **Markdown**: GitHub-compatible summary plus standalone gallery Markdown artifact
+  - **TSV/JSONL**: Machine-readable exports for downstream analysis
 - **Error Handling**: Per-model isolation with detailed diagnostics; graceful timeout/failure handling
 - **Machine Parsable**: SUMMARY lines with `key=value` format for automation
 - **Visual Hierarchy**: Emoji prefixes, tree-structured metrics, wrapped text output

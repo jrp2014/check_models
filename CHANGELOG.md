@@ -4,6 +4,16 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Tightened report-generation typing in `src/check_models.py` by replacing broad
+  `getattr`/cast access in gallery helpers with narrower protocol-based checks
+  for throughput and cached quality-analysis fields.
+- Realigned contributor and user-facing documentation so the root README,
+  `src/README.md`, and workflow docs consistently describe the standalone
+  `model_gallery.md` artifact, the recommended conda bootstrap path, and the
+  current split quality/runtime CI behavior.
+
 ## [0.3.1] - 2026-03-14
 
 ### Added

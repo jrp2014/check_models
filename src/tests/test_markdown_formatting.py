@@ -222,6 +222,22 @@ def test_gallery_output_uses_wrapped_blockquote_instead_of_fence() -> None:
     assert "\n>\n> beta" in md
 
 
+def test_gallery_anchor_and_heading_are_separated_by_blank_line() -> None:
+    """Gallery anchors should not sit directly above headings."""
+    result = check_models.PerformanceResult(
+        model_name="test/model",
+        generation=_GalleryGeneration(text="alpha"),
+        success=True,
+        model_load_time=1.0,
+        generation_time=2.0,
+        total_time=3.0,
+    )
+
+    md = _gallery_lines_for(result)
+
+    assert '<a id="model-test-model"></a>\n\n### ✅ test/model' in md
+
+
 def test_wrapped_blockquote_escapes_leading_markdown_syntax() -> None:
     """Wrapped blockquote lines should neutralize leading Markdown control syntax."""
     parts: list[str] = []

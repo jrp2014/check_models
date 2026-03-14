@@ -45,7 +45,7 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
 2. **Create and activate conda environment**:
 
    ```bash
-   conda create -n mlx-vlm python=3.13
+   bash src/tools/setup_conda_env.sh
    conda activate mlx-vlm
    ```
 
@@ -68,7 +68,9 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
 
    ```bash
    # Verify environment
+   cd src
    python -m tools.validate_env
+   cd ..
    
    # Optional: install custom git hooks (pre-commit + pre-push)
    cd src
@@ -197,12 +199,8 @@ git push --no-verify
 
 All pull requests must pass:
 
-- Quality workflow (`.github/workflows/quality.yml`):
-  - ruff format check + lint
-  - mypy + ty + pyrefly
-  - pytest
-  - shellcheck
-  - markdownlint
+- Quality workflow (`.github/workflows/quality.yml`) `static-quality` job: workflow YAML validation, dependency sync check, ruff format check + lint, mypy + ty + pyrefly, pytest, shellcheck, markdownlint
+- Quality workflow (`.github/workflows/quality.yml`) `runtime-smoke` job: isolated runtime smoke probe via `src/tools/run_runtime_smoke.sh`
 - Dependency sync guard (`.github/workflows/dependency-sync.yml`)
 
 ## Testing

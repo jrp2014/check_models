@@ -1,6 +1,6 @@
 # MLX VLM Check
 
-Lightweight CLI to run and benchmark MLX-compatible Vision-Language Models (VLMs) on Apple Silicon. Produces HTML/Markdown/TSV/JSONL reports and captures performance metrics (tokens/sec, memory, timings).
+Lightweight CLI to run and benchmark MLX-compatible Vision-Language Models (VLMs) on Apple Silicon. Produces HTML/Markdown/gallery Markdown/TSV/JSONL reports and captures performance metrics (tokens/sec, memory, timings).
 
 > [!NOTE]
 > This tool runs MLX-format Vision-Language Models hosted on the [Hugging Face Hub](https://huggingface.co). By default it runs all models found in your local HF cache (use `--models` to specify explicit model IDs).
@@ -8,7 +8,9 @@ Lightweight CLI to run and benchmark MLX-compatible Vision-Language Models (VLMs
 ## Quick Start (fast path)
 
 ```bash
-# Install runtime dependencies
+# Create the recommended conda environment and install runtime dependencies
+bash src/tools/setup_conda_env.sh
+conda activate mlx-vlm
 make install
 
 # Run all models against a folder (auto-selects most recent image) using the default built in prompt
@@ -28,6 +30,7 @@ Expected outputs (default location: src/output/):
 
 - results.html
 - results.md
+- model_gallery.md
 - results.tsv
 - results.jsonl
 - results.history.jsonl
@@ -38,7 +41,7 @@ Expected outputs (default location: src/output/):
 ## Why use it (short)
 
 - Batch run multiple models against an image.
-- Standardized metrics + rich reports for easy comparison.
+- Standardized metrics + rich reports for easy comparison and qualitative review.
 - Robust error handling and metadata-aware prompts.
 
 ## Documentation (full details)
