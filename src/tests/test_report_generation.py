@@ -493,7 +493,8 @@ class TestMarkdownGalleryReport:
         assert "### ❌ org/bad" in content
 
     def test_gallery_includes_shared_triage_sections_and_review_status(
-        self, tmp_path: Path
+        self,
+        tmp_path: Path,
     ) -> None:
         """Gallery should surface shared triage sections and per-model review status."""
         out = tmp_path / "triage_gallery.md"
