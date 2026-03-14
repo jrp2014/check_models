@@ -54,6 +54,9 @@ class _MockGeneration:
     text: str | None = "output"
     prompt_tokens: int | None = 10
     generation_tokens: int | None = 5
+    prompt_tps: float | None = 1200.0
+    generation_tps: float | None = 80.0
+    peak_memory: float | None = 4.5
     time: float | None = None
     active_memory: float | None = None
     cache_memory: float | None = None
@@ -271,6 +274,64 @@ class TestHtmlReportEdgeCases:
         assert "org/good" in content
         assert "org/bad" in content
 
+    def test_html_report_includes_shared_triage_sections(self, tmp_path: Path) -> None:
+        """HTML report should reuse shared action, review, and failure sections."""
+        out = tmp_path / "triage.html"
+        results = [
+            _make_success("org/good"),
+            _make_harness_success("org/risky"),
+            _make_failure("org/bad", error_package="transformers"),
+        ]
+        report_context = _build_report_render_context(results=results, prompt="describe")
+
+        generate_html_report(
+            results=results,
+            filename=out,
+            versions=_stub_versions(),
+            prompt="describe",
+            total_runtime_seconds=3.0,
+            report_context=report_context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "Action Snapshot" in content
+        assert "Review Priorities" in content
+        assert "Failures by Package" in content
+        assert "org/risky" in content
+        assert "transformers" in content
+
+    def test_html_report_preserves_full_output_in_details(self, tmp_path: Path) -> None:
+        """HTML table should reuse the shared preview while keeping full text expandable."""
+        out = tmp_path / "details.html"
+        long_text = (
+            "START " + ("filler " * 70) + "MIDDLE-MARKER " + ("more filler " * 70) + "END-MARKER"
+        )
+        results = [
+            PerformanceResult(
+                model_name="org/preview-model",
+                success=True,
+                generation=_MockGeneration(text=long_text),
+                total_time=1.0,
+                generation_time=0.5,
+                model_load_time=0.5,
+                quality_issues="context-echo",
+            ),
+        ]
+
+        generate_html_report(
+            results=results,
+            filename=out,
+            versions=_stub_versions(),
+            prompt="describe",
+            total_runtime_seconds=1.0,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "[context-echo]" in content
+        assert "[tail]" in content
+        assert "MIDDLE-MARKER" in content
+        assert "END-MARKER" in content
+
 
 # ===================================================================
 # Markdown report
@@ -357,6 +418,27 @@ class TestMarkdownReportEdgeCases:
         assert "Dedicated review artifact:" in content
         assert "See the standalone model-by-model output view here:" in content
         assert "[model_gallery.md](model_gallery.md)" in content
+        assert "## Model Gallery" not in content
+        assert "## ✅ Recommended Models" in content
+        assert "## 🔍 Quality Pattern Breakdown" in content
+
+    def test_markdown_report_uses_shared_output_preview_text(self) -> None:
+        """Markdown compact views should rely on the shared preview builder semantics."""
+        long_text = "Start of answer. " + ("filler text " * 40) + "TRAILING-SIGNAL"
+        result = PerformanceResult(
+            model_name="org/preview-model",
+            success=True,
+            generation=_MockGeneration(text=long_text),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+            quality_issues="context-echo, reasoning-leak",
+        )
+
+        preview = check_models._build_result_output_preview(result)
+        assert "[context-echo; reasoning-leak]" in preview
+        assert "[tail]" in preview
+        assert "TRAILING-SIGNAL" in preview
 
 
 class TestMarkdownGalleryReport:
@@ -400,12 +482,45 @@ class TestMarkdownGalleryReport:
         assert "**GPS**: 51.5000, -0.1200" in content
         assert "ignored raw blob" not in content
         assert "## Prompt" in content
+        assert "## Quick Navigation" in content
         assert "<!-- markdownlint-disable MD028 MD049 -->" in content
         assert "> [!NOTE]" not in content
         assert "Describe this image fully." in content
         assert "```text" not in content
+        assert '<a id="model-org-good"></a>' in content
+        assert "**Review:**" in content
         assert "### ✅ org/good" in content
         assert "### ❌ org/bad" in content
+
+    def test_gallery_includes_shared_triage_sections_and_review_status(
+        self, tmp_path: Path
+    ) -> None:
+        """Gallery should surface shared triage sections and per-model review status."""
+        out = tmp_path / "triage_gallery.md"
+        results = [
+            _make_success("org/good"),
+            _make_harness_success("org/risky"),
+            _make_failure("org/bad", error_package="mlx-vlm"),
+        ]
+        report_context = _build_report_render_context(results=results, prompt="describe")
+
+        generate_markdown_gallery_report(
+            results=results,
+            filename=out,
+            prompt="Describe this image fully.",
+            report_context=report_context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "## 🎯 Action Snapshot" in content
+        assert "## 🧭 Review Priorities" in content
+        assert "## 🚨 Failures by Package (Actionable)" in content
+        assert "**Review Status:**" in content
+        assert "strong candidate for first-pass review" in content or "watchlist" in content
+        assert (
+            "**Next Action:** review package ownership and diagnostics for a minimal repro."
+            in content
+        )
 
 
 # ===================================================================

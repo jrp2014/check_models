@@ -803,6 +803,7 @@ class ModelIssueSummary(TypedDict, total=False):
     cataloging_best: ModelScoreGrade | None
     cataloging_worst: ModelScoreGrade | None
     cataloging_avg_score: float
+    cataloging_scores: list[CatalogingScoreRecord]
     runtime_analysis: RuntimeAnalysisSummary
     metadata_baseline_score: float
     metadata_baseline_grade: str
@@ -1121,6 +1122,8 @@ def _gallery_render_error(res: PerformanceResult) -> list[str]:
     ):
         if value:
             out.append(f"**{label}:** `{value}`")
+    if res.error_package:
+        out.append("**Next Action:** review package ownership and diagnostics for a minimal repro.")
     if res.error_traceback:
         out.append("")
         traceback_lines: list[str] = []
@@ -1137,7 +1140,69 @@ def _gallery_render_error(res: PerformanceResult) -> list[str]:
     return out
 
 
-def _gallery_render_success(res: PerformanceResult) -> list[str]:
+def _append_gallery_review_lines(
+    out: list[str],
+    *,
+    res: PerformanceResult,
+    summary: ModelIssueSummary,
+    useful_now: bool,
+    watchlist_reason: str | None,
+) -> None:
+    """Append shared review and triage labels for one gallery result."""
+    score_data = _cataloging_score_index(summary).get(res.model_name)
+    if score_data is not None:
+        score, grade, weakness, delta = score_data
+        assessment_parts = [_grade_display_parts(grade, score)]
+        if delta is not None:
+            assessment_parts.append(f"Δ{delta:+.0f}")
+        if weakness:
+            assessment_parts.append(weakness)
+        out.append(f"**Assessment:** {' | '.join(assessment_parts)}")
+
+    if useful_now:
+        out.append("**Review Status:** strong candidate for first-pass review")
+    elif watchlist_reason is not None:
+        out.append(
+            f"**Review Status:** watchlist ({_humanize_watchlist_reason(watchlist_reason)})",
+        )
+
+    review_summary = _summarize_model_review(res, summary)
+    if review_summary:
+        out.append(f"**Review:** {review_summary}")
+
+
+def _append_gallery_quality_lines(
+    out: list[str],
+    *,
+    res: PerformanceResult,
+) -> None:
+    """Append quality warnings or clean-status text for one gallery result."""
+    if not res.generation:
+        return
+
+    analysis: GenerationQualityAnalysis | None = getattr(
+        res.generation,
+        "quality_analysis",
+        None,
+    )
+    if analysis and analysis.issues:
+        out.append("")
+        out.append("⚠️ **Quality Warnings:**")
+        out.extend(f"- {html.escape(issue)}" for issue in analysis.issues)
+        return
+
+    if analysis is not None and not analysis.has_any_issues():
+        out.append("")
+        out.append("**Quality Status:** no quality issues detected in this run")
+
+
+def _gallery_render_success(
+    res: PerformanceResult,
+    *,
+    summary: ModelIssueSummary | None = None,
+    useful_now: bool = False,
+    watchlist_reason: str | None = None,
+) -> list[str]:
     def _metric_segment(label: str, field_name: str, value: object) -> str | None:
         formatted = format_field_value(field_name, cast("MetricValue", value))
         if not formatted:
@@ -1195,18 +1260,19 @@ def _gallery_render_success(res: PerformanceResult) -> list[str]:
         ]
         if throughput_segments:
             out.append(f"**Throughput:** {' | '.join(throughput_segments)}")
+
+    if summary is not None:
+        _append_gallery_review_lines(
+            out,
+            res=res,
+            summary=summary,
+            useful_now=useful_now,
+            watchlist_reason=watchlist_reason,
+        )
+
     text: str = str(getattr(res.generation, "text", "")) if res.generation else ""
     _append_markdown_wrapped_blockquote(out, text)
-    if res.generation:
-        analysis: GenerationQualityAnalysis | None = getattr(
-            res.generation,
-            "quality_analysis",
-            None,
-        )
-        if analysis and analysis.issues:
-            out.append("")
-            out.append("⚠️ **Quality Warnings:**")
-            out.extend(f"- {html.escape(issue)}" for issue in analysis.issues)
+    _append_gallery_quality_lines(out, res=res)
     return out
 
 
@@ -1797,6 +1863,10 @@ ERROR_MESSAGE_TRUNCATE_LEN: Final[int] = 120  # Max chars for error messages in 
 MAX_QUALITY_ISSUES_LEN: Final[int] = 30  # Max chars for quality issues in Markdown tables
 MAX_OUTPUT_LINES: Final[int] = 3  # Max lines to show in summary table cells
 MAX_OUTPUT_PREVIEW_CHARS: Final[int] = 280  # Max chars for output previews in summary tables
+OUTPUT_PREVIEW_CUE_LIMIT: Final[int] = 3  # Max issue cues shown before compact output text
+OUTPUT_PREVIEW_MIN_HEAD_CHARS: Final[int] = 96  # Minimum chars reserved for preview head
+OUTPUT_PREVIEW_MIN_TAIL_CHARS: Final[int] = 48  # Minimum chars reserved for preview tail
+OUTPUT_PREVIEW_MIN_BODY_CHARS: Final[int] = 24  # Smallest useful body budget after cue prefix
 MAX_CAPTURED_OUTPUT_LOG_CHARS: Final[int] = 1200  # Max chars of captured stdout/stderr in logs
 MAX_TRIAGE_MODELS: Final[int] = 5  # Max model rows shown in triage subsections
 SUMMARY_CHART_WIDTH: Final[int] = 24  # Character width for compact ASCII summary bars
@@ -1805,6 +1875,7 @@ SUMMARY_CHART_MAX_ROWS: Final[int] = 8  # Max rows shown in summary charts
 MIN_MODELS_FOR_EFFICIENCY_CHART: Final[int] = 2  # Min successful rows for cross-model efficiency
 FLOAT_ZERO_EPSILON: Final[float] = 1e-9  # Tolerance when rendering signed deltas as zero
 UTILITY_DELTA_NEUTRAL_BAND: Final[float] = 2.0  # Within ±band, model is neutral vs metadata
+MODEL_REVIEW_ISSUE_PREVIEW_COUNT: Final[int] = 2  # Max issue labels shown in compact review text
 
 # Numeric fields are automatically derived from FIELD_ABBREVIATIONS for consistency
 # Exclude non-numeric fields explicitly
@@ -5783,23 +5854,10 @@ def _format_table_field_value(
         return res.model_name
 
     if field_name == "output":
-        if res.success and res.generation:
-            text = str(getattr(res.generation, "text", ""))
-            # Truncate repetitive output for readability
-            text = _truncate_repetitive_output(text)
-            # Truncate to [MAX_OUTPUT_LINES] lines for table display (full text shown in main trace)
-            lines = text.splitlines()
-            if (
-                len(lines) > MAX_OUTPUT_LINES
-            ):  # This constant should be part of the quality issues config
-                text = "\n".join(lines[:MAX_OUTPUT_LINES]) + "\n..."
-            return _truncate_text_preview(text, max_chars=MAX_OUTPUT_PREVIEW_CHARS)
-        error_text = (
-            f"Error: {res.error_stage} - {res.error_message}"
-            if res.error_message
-            else "Unknown error"
+        return _build_result_output_preview(
+            res,
+            max_chars=MAX_OUTPUT_PREVIEW_CHARS,
         )
-        return _truncate_text_preview(error_text, max_chars=MAX_OUTPUT_PREVIEW_CHARS)
 
     value = _get_field_value(res, field_name)
     if field_name == "quality_issues":
@@ -5906,6 +5964,10 @@ def _build_report_render_context(
         system_info if system_info is not None else get_system_characteristics()
     )
     table_data: PreparedTableData = _build_prepared_table_data(result_set=result_set)
+    triage: ReportTriageContext = _build_report_triage_context(
+        [result for result in result_set.results if result.success],
+        prompt=prompt,
+    )
     return ReportRenderContext(
         result_set=result_set,
         table_data=table_data,
@@ -5913,6 +5975,7 @@ def _build_report_render_context(
         summary=summary,
         stats=stats,
         system_info=resolved_system_info,
+        triage=triage,
     )
 
 
@@ -5959,22 +6022,26 @@ def _mark_failed_rows_in_html(
     return "<tr>".join(new_table_rows)
 
 
-def _wrap_output_column_in_details(html_table: str, output_col_idx: int) -> str:
+def _wrap_output_column_in_details(
+    html_table: str,
+    output_col_idx: int,
+    sorted_results: Sequence[PerformanceResult],
+) -> str:
     """Wrap the output column content in <details>/<summary> for expandability.
 
     Args:
         html_table: The HTML table string
         output_col_idx: The index of the output column (0-based)
+        sorted_results: Results aligned to table row order for retrieving full text
 
     Returns:
         Modified HTML table with output column wrapped in details/summary tags
     """
-    preview_length = 100
-
     # Pattern to match table cells in data rows (not header)
     # We'll process each row and wrap the last td content
     lines: list[str] = html_table.split("\n")
     result_lines: list[str] = []
+    row_idx = 0
 
     for original_line in lines:
         # Check if this is a data row (contains <td> tags)
@@ -5997,20 +6064,16 @@ def _wrap_output_column_in_details(html_table: str, output_col_idx: int) -> str:
                     closing_tag: str
                     opening_tag, content, closing_tag = match.groups()
 
-                    # Create preview (first N chars of actual text)
-                    # Content is already HTML-escaped by tabulate, so unescape to get real text
-                    # for accurate character counting (not entity counting)
-                    text_content: str = html.unescape(content)
-                    preview_text: str = text_content[:preview_length]
-                    if len(text_content) > preview_length:
-                        preview_text += "..."
+                    full_text = (
+                        _full_output_report_text(sorted_results[row_idx])
+                        if row_idx < len(sorted_results)
+                        else html.unescape(content)
+                    )
 
                     # Wrap in details/summary
-                    # Escape the preview text for HTML (it was unescaped above for char counting)
-                    # The full content is already escaped by tabulate
                     wrapped_content: str = (
-                        f"<details><summary>{html.escape(preview_text)}</summary>"
-                        f"<div style='margin-top: 0.5em;'>{content}</div></details>"
+                        f"<details><summary>{content}</summary>"
+                        f"<div style='margin-top: 0.5em;'>{html.escape(full_text)}</div></details>"
                     )
                     new_cell: str = opening_tag + wrapped_content + closing_tag
 
@@ -6029,10 +6092,13 @@ def _wrap_output_column_in_details(html_table: str, output_col_idx: int) -> str:
                         original_line,
                     )
                     result_lines.append(updated_line)
+                    row_idx += 1
                 else:
                     result_lines.append(original_line)
+                    row_idx += 1
             else:
                 result_lines.append(original_line)
+                row_idx += 1
         else:
             result_lines.append(original_line)
 
@@ -6121,6 +6187,7 @@ def analyze_model_issues(
         "cataloging_best": None,
         "cataloging_worst": None,
         "cataloging_avg_score": 0.0,
+        "cataloging_scores": utility_scores,
         "low_utility_models": low_utility_models,
     }
 
@@ -7004,110 +7071,341 @@ def format_issues_summary_html(summary: ModelIssueSummary, stats: PerformanceSta
 
 
 def _format_failures_by_package_text(results: list[PerformanceResult]) -> list[str]:
-    """Generate a breakdown of failures organized by responsible package for actionable reporting.
+    """Generate a shared Markdown failure-ownership section."""
+    return _format_failures_by_package_parts(results, html_output=False)
 
-    This helps framework maintainers quickly identify which issues belong to them.
-    """
-    parts: list[str] = []
-    failed: list[PerformanceResult] = [r for r in results if not r.success]
-    if not failed:
-        return parts
 
-    # Group failures by package
-    by_package: dict[str, list[PerformanceResult]] = {}
-    for res in failed:
-        pkg = res.error_package or "unknown"
-        by_package.setdefault(pkg, []).append(res)
+def _relative_markdown_artifact_path(*, report_filename: Path, artifact_filename: Path) -> str:
+    """Return a relative path for links between Markdown artifacts."""
+    try:
+        return os.path.relpath(artifact_filename, start=report_filename.parent)
+    except ValueError:
+        return str(artifact_filename)
 
-    # Sort packages by failure count (descending) for priority
-    sorted_packages: list[tuple[str, list[PerformanceResult]]] = sorted(
-        by_package.items(),
-        key=lambda x: -len(x[1]),
-    )
 
-    parts.append("## 🚨 Failures by Package (Actionable)")
-    parts.append("")
-    # Disable MD060 (table column style) as this table may not be perfectly aligned
-    parts.append("<!-- markdownlint-disable MD060 -->")
-    parts.append("")
-    parts.append("| Package | Failures | Error Types | Affected Models |")
-    parts.append("|---------|----------|-------------|-----------------|")
+def _gallery_model_anchor(model_name: str) -> str:
+    """Build a stable anchor for model sections in the gallery artifact."""
+    normalized_name = model_name.lower().replace("/", " ")
+    normalized = re.sub(r"[^a-z0-9\s-]", "", normalized_name)
+    collapsed = re.sub(r"[-\s]+", "-", normalized).strip("-")
+    return f"model-{collapsed or 'entry'}"
 
-    for pkg, failures in sorted_packages:
-        error_types: list[str] = sorted({r.error_stage or "unknown" for r in failures})
-        models: list[str] = [f"`{r.model_name}`" for r in failures]
-        parts.append(
-            f"| `{pkg}` | {len(failures)} | {', '.join(error_types)} | {', '.join(models)} |",
+
+def _format_gallery_model_link(
+    model_name: str,
+    *,
+    gallery_relative_path: str | None = None,
+) -> str:
+    """Format a Markdown link to a model entry in the gallery artifact."""
+    target = f"#{_gallery_model_anchor(model_name)}"
+    if gallery_relative_path is not None:
+        target = f"{gallery_relative_path.replace(' ', '%20')}{target}"
+    return f"[`{model_name}`]({target})"
+
+
+def _collect_report_component_rows(
+    *,
+    versions: LibraryVersionDict,
+    system_info: Mapping[str, str],
+    library_names: Sequence[str] | None = None,
+    system_keys: Sequence[str] | None = None,
+) -> list[tuple[str, str]]:
+    """Collect shared library/system rows for human-facing report artifacts."""
+    rows: list[tuple[str, str]] = []
+    selected_library_names = tuple(library_names) if library_names is not None else tuple(versions)
+    selected_system_keys = tuple(system_keys) if system_keys is not None else tuple(system_info)
+
+    for library_name in selected_library_names:
+        version_value = versions.get(library_name)
+        if version_value:
+            rows.append((library_name, str(version_value)))
+
+    for system_key in selected_system_keys:
+        system_value = system_info.get(system_key)
+        if system_value:
+            rows.append((system_key, str(system_value)))
+
+    return rows
+
+
+def _cataloging_score_index(
+    summary: ModelIssueSummary,
+) -> dict[str, tuple[float, str, str, float | None]]:
+    """Index cached cataloging scores by model for shared report helpers."""
+    return {
+        model_name: (score, grade, weakness, delta)
+        for model_name, score, grade, weakness, delta in summary.get("cataloging_scores", [])
+    }
+
+
+def _quality_analysis_for_result(res: PerformanceResult) -> GenerationQualityAnalysis | None:
+    """Return cached quality analysis for a result when present."""
+    if res.quality_analysis is not None:
+        return res.quality_analysis
+    if res.generation is None:
+        return None
+    return getattr(res.generation, "quality_analysis", None)
+
+
+def _summarize_model_review(res: PerformanceResult, summary: ModelIssueSummary) -> str | None:
+    """Summarize quality/utility in a compact line shared across Markdown artifacts."""
+    review_parts: list[str] = []
+    score_data = _cataloging_score_index(summary).get(res.model_name)
+    if score_data is not None:
+        score, grade, _weakness, _delta = score_data
+        review_parts.append(f"{grade} {score:.0f}/100")
+
+    analysis = _quality_analysis_for_result(res)
+    if analysis is None:
+        return " | ".join(review_parts) or None
+
+    if analysis.has_any_issues():
+        preview = "; ".join(analysis.issues[:MODEL_REVIEW_ISSUE_PREVIEW_COUNT])
+        if len(analysis.issues) > MODEL_REVIEW_ISSUE_PREVIEW_COUNT:
+            preview += "; ..."
+        review_parts.append(preview)
+    else:
+        review_parts.append("No quality issues detected")
+
+    return " | ".join(review_parts) if review_parts else None
+
+
+def _select_recommended_models(
+    report_context: ReportRenderContext,
+) -> list[tuple[str, PerformanceResult, tuple[float, str, str, float | None] | None]]:
+    """Select compact recommendation targets for summary and gallery navigation."""
+    successful_results = list(report_context.result_set.successful)
+    if not successful_results:
+        return []
+
+    results_by_name = {result.model_name: result for result in successful_results}
+    score_index = _cataloging_score_index(report_context.summary)
+    recommendations: list[
+        tuple[str, PerformanceResult, tuple[float, str, str, float | None] | None]
+    ] = []
+
+    best_quality = report_context.summary.get("cataloging_best")
+    if best_quality is not None:
+        model_name = best_quality[0]
+        if model_name in results_by_name:
+            recommendations.append(
+                (
+                    "Best cataloging quality",
+                    results_by_name[model_name],
+                    score_index.get(model_name),
+                ),
+            )
+
+    fastest_model = report_context.summary.get("fastest_model")
+    if fastest_model is not None:
+        model_name = fastest_model[0]
+        if model_name in results_by_name:
+            recommendations.append(
+                ("Fastest generation", results_by_name[model_name], score_index.get(model_name)),
+            )
+
+    efficient_model = report_context.summary.get("most_efficient_model")
+    if efficient_model is not None:
+        model_name = efficient_model[0]
+        if model_name in results_by_name:
+            recommendations.append(
+                (
+                    "Lowest memory footprint",
+                    results_by_name[model_name],
+                    score_index.get(model_name),
+                ),
+            )
+
+    balance_candidates: list[
+        tuple[float, float, float, PerformanceResult, tuple[float, str, str, float | None] | None]
+    ] = []
+    for result in successful_results:
+        score_data = score_index.get(result.model_name)
+        score = score_data[0] if score_data is not None else float("-inf")
+        generation_tps = getattr(result.generation, "generation_tps", 0.0) or 0.0
+        peak_memory = getattr(result.generation, "peak_memory", float("inf")) or float("inf")
+        analysis = _quality_analysis_for_result(result)
+        if analysis is not None and not analysis.has_any_issues():
+            balance_candidates.append((score, generation_tps, -peak_memory, result, score_data))
+
+    if not balance_candidates:
+        for result in successful_results:
+            score_data = score_index.get(result.model_name)
+            score = score_data[0] if score_data is not None else float("-inf")
+            generation_tps = getattr(result.generation, "generation_tps", 0.0) or 0.0
+            peak_memory = getattr(result.generation, "peak_memory", float("inf")) or float("inf")
+            balance_candidates.append((score, generation_tps, -peak_memory, result, score_data))
+
+    if balance_candidates:
+        _score, _tps, _neg_peak, result, score_data = max(
+            balance_candidates,
+            key=lambda item: (item[0], item[1], item[2], item[3].model_name),
         )
+        recommendations.append(("Best balance", result, score_data))
 
+    deduped: list[tuple[str, PerformanceResult, tuple[float, str, str, float | None] | None]] = []
+    seen_labels: set[str] = set()
+    for label, result, score_data in recommendations:
+        if label in seen_labels:
+            continue
+        seen_labels.add(label)
+        deduped.append((label, result, score_data))
+    return deduped
+
+
+def _preview_model_references(
+    model_names: Sequence[str],
+    *,
+    gallery_relative_path: str | None = None,
+    max_items: int = 4,
+) -> str:
+    """Format a compact preview of model names, optionally linking to the gallery."""
+    unique_names = list(dict.fromkeys(model_names))
+    rendered_names = [
+        _format_gallery_model_link(
+            model_name,
+            gallery_relative_path=gallery_relative_path,
+        )
+        if gallery_relative_path is not None
+        else f"`{model_name}`"
+        for model_name in unique_names[:max_items]
+    ]
+    if len(unique_names) > max_items:
+        rendered_names.append(f"+{len(unique_names) - max_items} more")
+    return ", ".join(rendered_names)
+
+
+def _build_markdown_recommended_models(
+    report_context: ReportRenderContext,
+    *,
+    gallery_relative_path: str | None = None,
+) -> list[str]:
+    """Build a recommendation section for the Markdown summary report."""
+    recommendations = _select_recommended_models(report_context)
+    if not recommendations:
+        return []
+
+    parts: list[str] = []
+    _append_markdown_section(
+        parts,
+        title="## ✅ Recommended Models",
+        body_lines=[
+            "Quick picks based on cached quality, speed, and memory signals from this run.",
+        ],
+    )
+    for label, result, score_data in recommendations:
+        model_ref = (
+            _format_gallery_model_link(
+                result.model_name,
+                gallery_relative_path=gallery_relative_path,
+            )
+            if gallery_relative_path is not None
+            else f"`{result.model_name}`"
+        )
+        rationale: list[str] = []
+        if score_data is not None:
+            score, grade, _weakness, _delta = score_data
+            rationale.append(f"{grade} {score:.0f}/100")
+        generation_tps = format_field_value(
+            "generation_tps",
+            cast("MetricValue", getattr(result.generation, "generation_tps", None)),
+        )
+        if generation_tps:
+            rationale.append(f"Gen {generation_tps} TPS")
+        peak_memory = format_field_value(
+            "peak_memory",
+            cast("MetricValue", getattr(result.generation, "peak_memory", None)),
+        )
+        if peak_memory:
+            rationale.append(f"Peak {peak_memory}")
+        review_summary = _summarize_model_review(result, report_context.summary)
+        if review_summary:
+            rationale.append(review_summary)
+        parts.append(f"- **{label}:** {model_ref} ({' | '.join(rationale)})")
     parts.append("")
-    parts.append("<!-- markdownlint-enable MD060 -->")
-    parts.append("")
-
-    # Generate per-package actionable sections
-    parts.append("### Actionable Items by Package")
-    parts.append("")
-
-    for pkg, failures in sorted_packages:
-        parts.append(f"#### {pkg}")
-        parts.append("")
-        for res in failures:
-            parts.append(f"- **{res.model_name}** ({res.error_stage})")
-            # Add truncated error message
-            error_msg: str = res.error_message or ""
-            if len(error_msg) > ERROR_MESSAGE_TRUNCATE_LEN:
-                error_msg = error_msg[: ERROR_MESSAGE_TRUNCATE_LEN - 3] + "..."
-            escaped_msg: str = _escape_markdown_diagnostics(error_msg)
-            parts.append(f"  - Error: `{escaped_msg}`")
-            if res.error_type:
-                parts.append(f"  - Type: `{res.error_type}`")
-        parts.append("")
-
     return parts
 
 
-def _format_action_snapshot_text(
-    results: list[PerformanceResult],
-    summary: ModelIssueSummary,
+def _build_markdown_quality_breakdown(
+    report_context: ReportRenderContext,
+    *,
+    gallery_relative_path: str | None = None,
 ) -> list[str]:
-    """Build a compact triage block for maintainers at top of Markdown report."""
-    parts: list[str] = ["## 🎯 Action Snapshot", ""]
+    """Build a compact quality-pattern breakdown for the Markdown summary report."""
+    summary = report_context.summary
+    sections = _collect_quality_issue_sections(summary)
+    low_utility_models = summary.get("low_utility_models", [])
+    if not sections and not low_utility_models:
+        return []
 
-    failed: list[PerformanceResult] = [res for res in results if not res.success]
-    if failed:
-        owners = Counter(res.error_package or "unknown" for res in failed)
-        owner_summary: str = ", ".join(f"{owner}={count}" for owner, count in owners.most_common(3))
-        parts.append(
-            f"- **Framework/runtime failures:** {len(failed)} (top owners: {owner_summary}).",
+    parts: list[str] = []
+    _append_markdown_section(
+        parts,
+        title="## 🔍 Quality Pattern Breakdown",
+        body_lines=[
+            (
+                "Common weaknesses and failure patterns from this run, linked to the "
+                "gallery when available."
+            ),
+        ],
+    )
+    for title, _css_class, entries in sections:
+        models = [model for model, _detail in entries]
+        preview = _preview_model_references(models, gallery_relative_path=gallery_relative_path)
+        details = [detail for _model, detail in entries if detail]
+        detail_text = (
+            f" Example: {_format_quality_detail(details[0], html_output=False)}." if details else ""
+        )
+        parts.append(f"- **{title} ({len(entries)}):** {preview}.{detail_text}")
+
+    if low_utility_models:
+        model_names = [model_name for model_name, _score, _grade, _weakness in low_utility_models]
+        weakest_model = low_utility_models[0]
+        model_preview = _preview_model_references(
+            model_names,
+            gallery_relative_path=gallery_relative_path,
         )
         parts.append(
-            "- **Next action:** review `Failures by Package (Actionable)` and `diagnostics.md`.",
-        )
-    else:
-        parts.append("- **Framework/runtime failures:** none.")
-
-    low_utility: list[tuple[str, float, str, str]] = summary.get("low_utility_models", [])
-    if low_utility:
-        parts.append(f"- **Model output watchlist:** {len(low_utility)} model(s) graded D/F.")
-        parts.append("- **Next action:** prioritize A/B models and de-prioritize D/F outputs.")
-    else:
-        parts.append("- **Model output watchlist:** none (no D/F utility grades).")
-
-    baseline_score = summary.get("metadata_baseline_score")
-    baseline_grade = summary.get("metadata_baseline_grade")
-    if baseline_score is not None and baseline_grade is not None:
-        better = len(summary.get("cataloging_improves_metadata", []))
-        neutral = len(summary.get("cataloging_neutral_vs_metadata", []))
-        worse = len(summary.get("cataloging_worse_than_metadata", []))
-        parts.append(
-            f"- **Vs existing metadata:** better={better}, neutral={neutral}, worse={worse} "
-            f"(baseline {baseline_grade} {baseline_score:.0f}/100).",
+            "- **Low-utility outputs "
+            f"({len(low_utility_models)}):** "
+            f"{model_preview}. "
+            f"Common weakness: {html.escape(weakest_model[3], quote=False)}.",
         )
 
-    runtime_analysis = summary.get("runtime_analysis")
-    if runtime_analysis is not None:
-        parts.extend(_format_runtime_analysis_lines(runtime_analysis))
+    parts.append("")
+    return parts
 
+
+def _build_markdown_gallery_navigation(report_context: ReportRenderContext) -> list[str]:
+    """Build a quick-navigation section for the standalone gallery artifact."""
+    recommended = _select_recommended_models(report_context)
+    failed_models = [
+        model_name
+        for model_name, _stage, _message in report_context.summary.get(
+            "failed_models",
+            [],
+        )
+    ]
+    low_utility_models = [
+        model_name
+        for model_name, _score, _grade, _weakness in report_context.summary.get(
+            "low_utility_models",
+            [],
+        )
+    ]
+    if not recommended and not failed_models and not low_utility_models:
+        return []
+
+    parts: list[str] = []
+    _append_markdown_section(parts, title="## Quick Navigation")
+    for label, result, _score_data in recommended:
+        parts.append(f"- **{label}:** {_format_gallery_model_link(result.model_name)}")
+    if failed_models:
+        failed_preview = _preview_model_references(failed_models, max_items=6)
+        parts.append(f"- **Failed models:** {failed_preview}")
+    if low_utility_models:
+        low_utility_preview = _preview_model_references(low_utility_models, max_items=6)
+        parts.append(f"- **D/F utility models:** {low_utility_preview}")
     parts.append("")
     return parts
 
@@ -7198,6 +7496,19 @@ class PreparedTableData:
 
 
 @dataclass(frozen=True)
+class ReportTriageContext:
+    """Shared quality/utility triage context reused across report renderers."""
+
+    quality_counts: tuple[tuple[str, int], ...] = ()
+    clean_count: int = 0
+    utility_rows: tuple[UtilityTriageRow, ...] = ()
+    useful_rows: tuple[UtilityTriageRow, ...] = ()
+    watchlist_rows: tuple[tuple[UtilityTriageRow, str], ...] = ()
+    baseline_score: float | None = None
+    baseline_grade: str | None = None
+
+
+@dataclass(frozen=True)
 class ReportRenderContext:
     """Shared cached context for HTML/Markdown/TSV report generation."""
 
@@ -7207,6 +7518,7 @@ class ReportRenderContext:
     summary: ModelIssueSummary
     stats: PerformanceStats
     system_info: dict[str, str]
+    triage: ReportTriageContext
 
 
 def _append_markdown_code_block(
@@ -7886,15 +8198,15 @@ def _diagnostics_environment_section(
 ) -> list[str]:
     """Build environment details section for diagnostics report footer context."""
     parts: list[str] = _begin_diagnostics_section(title="## Environment")
-    table_rows: list[str] = []
-    for lib in _DIAGNOSTICS_LIB_NAMES:
-        ver = versions.get(lib, "")
-        if ver:
-            table_rows.append(f"| {lib} | {DIAGNOSTICS_ESCAPER.escape(str(ver))} |")
-    for key in _DIAGNOSTICS_SYSTEM_KEYS:
-        val = system_info.get(key, "")
-        if val:
-            table_rows.append(f"| {key} | {DIAGNOSTICS_ESCAPER.escape(str(val))} |")
+    table_rows = [
+        f"| {component} | {DIAGNOSTICS_ESCAPER.escape(value)} |"
+        for component, value in _collect_report_component_rows(
+            versions=versions,
+            system_info=system_info,
+            library_names=_DIAGNOSTICS_LIB_NAMES,
+            system_keys=_DIAGNOSTICS_SYSTEM_KEYS,
+        )
+    ]
     _append_markdown_table(
         parts,
         header="| Component | Version |",
@@ -9474,7 +9786,10 @@ def _build_full_html_document(
     versions: LibraryVersionDict,
     prompt: str,
     total_runtime_seconds: float,
+    action_snapshot_html: str,
     issues_summary_html: str,
+    review_priorities_html: str,
+    failures_by_package_html: str,
     system_info: dict[str, str],
     image_path: Path | None = None,
 ) -> str:
@@ -9492,6 +9807,9 @@ def _build_full_html_document(
             margin-top: 2em; padding: 1em; border: 1px solid #eee;
             background-color: #f9f9f9;
         }
+        .summary h3 { margin-top: 1.2em; }
+        .summary h3:first-child { margin-top: 0; }
+        .summary ul { margin-top: 0.4em; }
         .embedded-image {
             max-width: 600px; margin: 1em 0; border: 1px solid #ccc;
             border-radius: 4px;
@@ -9686,7 +10004,10 @@ def _build_full_html_document(
         {image_html}
         <div class="summary">
             <h2>Summary</h2>
+            {action_snapshot_html}
             {issues_summary_html}
+            {review_priorities_html}
+            {failures_by_package_html}
         </div>
         <h2>Prompt</h2>
         <pre>{html.escape(prompt)}</pre>
@@ -9820,11 +10141,34 @@ def generate_html_report(
 
     # Wrap output column (last column) in <details> for expandability
     output_col_idx = len(field_names) - 1  # output is last column
-    html_table = _wrap_output_column_in_details(html_table, output_col_idx)
+    html_table = _wrap_output_column_in_details(
+        html_table,
+        output_col_idx,
+        report_context.result_set.results,
+    )
 
     issues_summary_html = format_issues_summary_html(
         report_context.summary,
         report_context.stats,
+    )
+    action_snapshot_html = "".join(
+        _format_action_snapshot_parts(
+            results,
+            report_context,
+            html_output=True,
+        ),
+    )
+    review_priorities_html = "".join(
+        _format_review_priorities_parts(
+            report_context,
+            html_output=True,
+        ),
+    )
+    failures_by_package_html = "".join(
+        _format_failures_by_package_parts(
+            results,
+            html_output=True,
+        ),
     )
 
     # Build the full HTML document
@@ -9833,7 +10177,10 @@ def generate_html_report(
         versions=versions,
         prompt=prompt,
         total_runtime_seconds=total_runtime_seconds,
+        action_snapshot_html=action_snapshot_html,
         issues_summary_html=issues_summary_html,
+        review_priorities_html=review_priorities_html,
+        failures_by_package_html=failures_by_package_html,
         system_info=report_context.system_info,
         image_path=image_path,
     )
@@ -9891,14 +10238,30 @@ def _generate_model_gallery_section(
     md.append("")
 
     sorted_results = _resolve_sorted_report_results(report_context)
+    summary = report_context.summary if isinstance(report_context, ReportRenderContext) else None
+    useful_model_names: set[str] = set()
+    watchlist_by_model: dict[str, str] = {}
+    if isinstance(report_context, ReportRenderContext):
+        useful_model_names = {row.result.model_name for row in report_context.triage.useful_rows}
+        watchlist_by_model = {
+            row.result.model_name: reason for row, reason in report_context.triage.watchlist_rows
+        }
     for res in sorted_results:
         icon = "✅" if res.success else "❌"
+        md.append(f'<a id="{_gallery_model_anchor(res.model_name)}"></a>')
         md.append(f"### {icon} {res.model_name}")
         md.append("")
         if not res.success:
             md.extend(_gallery_render_error(res))
         else:
-            md.extend(_gallery_render_success(res))
+            md.extend(
+                _gallery_render_success(
+                    res,
+                    summary=summary,
+                    useful_now=res.model_name in useful_model_names,
+                    watchlist_reason=watchlist_by_model.get(res.model_name),
+                ),
+            )
         md.append("")
         md.append("---")
         md.append("")
@@ -9977,13 +10340,10 @@ def _append_markdown_gallery_note(
     if gallery_filename is None:
         return
 
-    try:
-        relative_gallery_path: str = os.path.relpath(
-            gallery_filename,
-            start=report_filename.parent,
-        )
-    except ValueError:
-        relative_gallery_path = str(gallery_filename)
+    relative_gallery_path = _relative_markdown_artifact_path(
+        report_filename=report_filename,
+        artifact_filename=gallery_filename,
+    )
 
     gallery_link: str = f"[{relative_gallery_path}]({relative_gallery_path.replace(' ', '%20')})"
     md.append("**Dedicated review artifact:**")
@@ -10030,19 +10390,49 @@ def generate_markdown_report(
         report_context.stats,
     )
 
+    gallery_relative_path = (
+        _relative_markdown_artifact_path(
+            report_filename=filename,
+            artifact_filename=gallery_filename,
+        )
+        if gallery_filename is not None
+        else None
+    )
+
     # Build the complete markdown content
     md: list[str] = []
     md.append("# Model Performance Results")
     md.append("")
     md.append(f"_Generated on {local_now_str()}_")
     md.append("")
-    md.extend(_format_action_snapshot_text(results, report_context.summary))
+    md.extend(
+        _format_action_snapshot_parts(
+            results,
+            report_context,
+            html_output=False,
+        ),
+    )
     # Add issues summary before prompt
     if issues_text:
         md.append(issues_text)
+    md.extend(
+        _build_markdown_recommended_models(
+            report_context,
+            gallery_relative_path=gallery_relative_path,
+        ),
+    )
+    md.extend(
+        _build_markdown_quality_breakdown(
+            report_context,
+            gallery_relative_path=gallery_relative_path,
+        ),
+    )
 
     # Add failures-by-package section for actionable reporting
-    failures_by_pkg: list[str] = _format_failures_by_package_text(results)
+    failures_by_pkg = _format_failures_by_package_parts(
+        results,
+        html_output=False,
+    )
     if failures_by_pkg:
         md.extend(failures_by_pkg)
 
@@ -10058,13 +10448,11 @@ def generate_markdown_report(
     table_md: list[str] = _generate_markdown_table_section(report_context)
     md.extend(table_md)
 
-    # --- Model Gallery Section ---
     _append_markdown_gallery_note(
         md,
         report_filename=filename,
         gallery_filename=gallery_filename,
     )
-    md.extend(_generate_model_gallery_section(report_context))
 
     md.append("---")
 
@@ -10073,15 +10461,17 @@ def generate_markdown_report(
         md.append("")
         md.append("## System/Hardware Information")
         md.append("")
-        for name, value in report_context.system_info.items():
+        for name, value in _collect_report_component_rows(
+            versions={},
+            system_info=report_context.system_info,
+        ):
             md.append(f"- **{name}**: {value}")
         md.append("")
 
     md.append("## Library Versions")
     md.append("")
-    for name, ver in sorted(versions.items()):
-        ver_str: str = "" if ver is None else ver
-        md.append(f"- `{name}`: `{ver_str}`")
+    for name, value in _collect_report_component_rows(versions=versions, system_info={}):
+        md.append(f"- `{name}`: `{value}`")
     md.append("")
     md.append(f"_Report generated on: {local_now_str()}_")
 
@@ -10113,8 +10503,12 @@ def generate_markdown_gallery_report(
         "generated output for each model.",
     )
     md.append("")
+    md.extend(_format_action_snapshot_parts(results, report_context, html_output=False))
+    md.extend(_format_review_priorities_parts(report_context, html_output=False))
+    md.extend(_format_failures_by_package_parts(results, html_output=False))
     _append_markdown_image_metadata_section(md, metadata)
     _append_markdown_prompt_section(md, title="## Prompt", prompt=prompt)
+    md.extend(_build_markdown_gallery_navigation(report_context))
     md.extend(_generate_model_gallery_section(report_context))
 
     _write_markdown_artifact(filename, md, artifact_name="Markdown gallery report")
@@ -13605,6 +13999,149 @@ def _truncate_text_preview(text: str, *, max_chars: int) -> str:
     return text[: max_chars - 3].rstrip() + "..."
 
 
+def _collapse_preview_whitespace(text: str) -> str:
+    """Flatten whitespace for compact table/report previews."""
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def _result_quality_analysis(result: PerformanceResult) -> GenerationQualityAnalysis | None:
+    """Return cached generation quality analysis when present."""
+    if result.quality_analysis is not None:
+        return result.quality_analysis
+    if result.generation is None:
+        return None
+    generation_analysis = getattr(result.generation, "quality_analysis", None)
+    return (
+        generation_analysis if isinstance(generation_analysis, GenerationQualityAnalysis) else None
+    )
+
+
+def _build_result_output_cues(result: PerformanceResult) -> list[str]:
+    """Return compact issue cues that explain why an output is suspicious."""
+    if not result.success:
+        failure_cues: list[str] = []
+        if result.error_package:
+            failure_cues.append(result.error_package)
+        if result.error_stage:
+            failure_cues.append(result.error_stage.lower().replace(" ", "-"))
+        return _dedupe_preserve_order(failure_cues)[:OUTPUT_PREVIEW_CUE_LIMIT]
+
+    quality_labels = _extract_quality_issue_labels(result.quality_issues)
+    analysis = _result_quality_analysis(result)
+    cues: list[str] = []
+
+    if (analysis is not None and analysis.has_harness_issue) or "harness" in quality_labels:
+        harness_type = (
+            analysis.harness_issue_type.replace("_", "-")
+            if analysis and analysis.harness_issue_type
+            else ""
+        )
+        cues.append(f"harness:{harness_type}" if harness_type else "harness")
+    if (analysis is not None and analysis.is_repetitive) or "repetitive" in quality_labels:
+        cues.append("repetitive")
+    if (analysis is not None and analysis.has_context_echo) or "context_echo" in quality_labels:
+        cues.append("context-echo")
+    if (analysis is not None and analysis.has_reasoning_leak) or "reasoning_leak" in quality_labels:
+        cues.append("reasoning-leak")
+    if (analysis is not None and analysis.has_degeneration) or "degeneration" in quality_labels:
+        cues.append("degeneration")
+    if (
+        analysis is not None and analysis.is_context_ignored
+    ) or "context_ignored" in quality_labels:
+        cues.append("context-ignored")
+    if (analysis is not None and analysis.is_refusal) or "refusal" in quality_labels:
+        cues.append("refusal")
+    if (analysis is not None and analysis.missing_sections) or "missing_sections" in quality_labels:
+        cues.append("missing-sections")
+    if (analysis is not None and analysis.formatting_issues) or "formatting" in quality_labels:
+        cues.append("formatting")
+    if (analysis is not None and analysis.is_generic) or "generic" in quality_labels:
+        cues.append("generic")
+
+    return _dedupe_preserve_order(cues)[:OUTPUT_PREVIEW_CUE_LIMIT]
+
+
+def _build_head_tail_preview(text: str, *, max_chars: int) -> str:
+    """Build a compact preview that exposes both the start and end of long output."""
+    if len(text) <= max_chars:
+        return text
+
+    separator = " ... [tail] "
+    min_total = OUTPUT_PREVIEW_MIN_HEAD_CHARS + OUTPUT_PREVIEW_MIN_TAIL_CHARS + len(separator)
+    if max_chars <= min_total:
+        return _truncate_text_preview(text, max_chars=max_chars)
+
+    head_budget = max(OUTPUT_PREVIEW_MIN_HEAD_CHARS, int(max_chars * 0.65))
+    head_budget = min(head_budget, max_chars - OUTPUT_PREVIEW_MIN_TAIL_CHARS - len(separator))
+    tail_budget = max_chars - head_budget - len(separator)
+
+    head = text[:head_budget].rstrip()
+    tail = text[-tail_budget:].lstrip()
+    if not tail or tail in head:
+        return _truncate_text_preview(text, max_chars=max_chars)
+    return f"{head}{separator}{tail}"
+
+
+def _build_output_preview_text(
+    text: str,
+    *,
+    cues: Sequence[str] = (),
+    max_chars: int,
+) -> str:
+    """Build a deterministic compact preview for Markdown/HTML/TSV tables."""
+    normalized_text = _collapse_preview_whitespace(text)
+    if not normalized_text:
+        return ""
+
+    cue_text = ""
+    if cues:
+        cue_text = f"[{'; '.join(cues[:OUTPUT_PREVIEW_CUE_LIMIT])}] "
+
+    available_chars = max_chars - len(cue_text)
+    if available_chars <= OUTPUT_PREVIEW_MIN_BODY_CHARS:
+        return _truncate_text_preview(cue_text + normalized_text, max_chars=max_chars)
+
+    preview_body = _build_head_tail_preview(normalized_text, max_chars=available_chars)
+    return cue_text + preview_body
+
+
+def _full_output_report_text(result: PerformanceResult) -> str:
+    """Return the full text shown when expanding output details."""
+    if result.success and result.generation is not None:
+        return str(getattr(result.generation, "text", ""))
+    if result.error_message:
+        error_stage = result.error_stage or "Error"
+        return f"Error: {error_stage} - {result.error_message}"
+    return "Unknown error"
+
+
+def _build_result_output_preview(
+    result: PerformanceResult,
+    *,
+    max_chars: int = MAX_OUTPUT_PREVIEW_CHARS,
+) -> str:
+    """Build a shared skim-first preview for compact report surfaces."""
+    full_text = _full_output_report_text(result)
+    cues = _build_result_output_cues(result)
+
+    if result.success:
+        preview_source = _truncate_repetitive_output(full_text)
+        lines = preview_source.splitlines()
+        if len(lines) > MAX_OUTPUT_LINES:
+            preview_source = "\n".join(lines[:MAX_OUTPUT_LINES]) + "\n..."
+        return _build_output_preview_text(
+            preview_source,
+            cues=cues,
+            max_chars=max_chars,
+        )
+
+    return _build_output_preview_text(
+        full_text,
+        cues=cues,
+        max_chars=max_chars,
+    )
+
+
 def _extract_quality_issue_labels(quality_issues: str | None) -> set[str]:
     """Extract normalized quality labels from a free-form issue string."""
     if not quality_issues:
@@ -13908,6 +14445,317 @@ def _log_quality_signal_summary(
     logger.info("🧪 Quality Signal Frequency:")
     logger.info("   %s", _format_counter_items(quality_counts))
     logger.info("   Clean outputs: %d/%d", clean_count, successful_count)
+
+
+def _build_report_triage_context(
+    successful: Sequence[PerformanceResult],
+    *,
+    prompt: str | None,
+) -> ReportTriageContext:
+    """Build cached quality/utility triage data for report renderers."""
+    quality_counts, clean_count, utility_rows, baseline_score, baseline_grade = (
+        _collect_quality_and_utility_rows(
+            list(successful),
+            prompt=prompt,
+        )
+    )
+    useful_rows = _select_useful_rows(utility_rows)
+    watchlist_rows = _select_watchlist_rows(utility_rows)
+    sorted_quality_counts = tuple(quality_counts.most_common())
+    return ReportTriageContext(
+        quality_counts=sorted_quality_counts,
+        clean_count=clean_count,
+        utility_rows=tuple(utility_rows),
+        useful_rows=tuple(useful_rows),
+        watchlist_rows=tuple(watchlist_rows),
+        baseline_score=baseline_score,
+        baseline_grade=baseline_grade,
+    )
+
+
+def _grade_display_parts(grade: str, score: float) -> str:
+    """Return a compact grade/score label for report sections."""
+    emoji = GRADE_EMOJIS.get(grade, "")
+    return f"{emoji} {grade} ({score:.0f}/100)"
+
+
+def _humanize_watchlist_reason(reason: str) -> str:
+    """Convert internal watchlist reason labels into reviewer-facing text."""
+    if reason.startswith("worse-than-metadata"):
+        return "worse than metadata baseline"
+    return re.sub(
+        r"\s+",
+        " ",
+        reason.replace("_", " ").replace("-", " ").replace(",", ", "),
+    ).strip()
+
+
+def _format_review_priority_line(
+    row: UtilityTriageRow,
+    *,
+    include_reason: str | None = None,
+    html_output: bool = False,
+) -> str:
+    """Format one useful/watchlist row for shared report sections."""
+    details: list[str] = [_grade_display_parts(row.grade, row.score)]
+    if row.delta_vs_metadata is not None:
+        details.append(f"Δ{row.delta_vs_metadata:+.0f}")
+    tps = getattr(row.result.generation, "generation_tps", None)
+    if isinstance(tps, int | float) and float(tps) > 0.0:
+        details.append(f"{float(tps):.1f} tps")
+    if include_reason is not None:
+        details.append(_humanize_watchlist_reason(include_reason))
+    if html_output:
+        return (
+            f"<code>{html.escape(row.result.model_name)}</code>: {html.escape(' | '.join(details))}"
+        )
+    return f"`{row.result.model_name}`: {' | '.join(details)}"
+
+
+def _format_review_priorities_parts(
+    report_context: ReportRenderContext,
+    *,
+    html_output: bool,
+) -> list[str]:
+    """Render shared reviewer-oriented shortlists for HTML/Markdown reports."""
+    triage = report_context.triage
+    useful_rows = list(triage.useful_rows)
+    watchlist_rows = list(triage.watchlist_rows)
+    if not useful_rows and not watchlist_rows:
+        return []
+
+    parts: list[str] = []
+    if html_output:
+        parts.append("<h3>🧭 Review Priorities</h3>")
+    else:
+        _append_markdown_section(parts, title="## 🧭 Review Priorities")
+
+    if useful_rows:
+        if html_output:
+            parts.append("<p><b>Strong candidates:</b></p><ul>")
+            parts.extend(
+                f"<li>{_format_review_priority_line(row, html_output=True)}</li>"
+                for row in useful_rows[:MAX_TRIAGE_MODELS]
+            )
+            parts.append("</ul>")
+        else:
+            parts.append("### Strong Candidates")
+            parts.append("")
+            parts.extend(
+                f"- {_format_review_priority_line(row)}" for row in useful_rows[:MAX_TRIAGE_MODELS]
+            )
+            parts.append("")
+
+    if watchlist_rows:
+        if html_output:
+            parts.append("<p><b>Watchlist:</b></p><ul>")
+            parts.extend(
+                "<li>"
+                f"{_format_review_priority_line(row, include_reason=reason, html_output=True)}"
+                "</li>"
+                for row, reason in watchlist_rows[:MAX_TRIAGE_MODELS]
+            )
+            parts.append("</ul>")
+        else:
+            parts.append("### Watchlist")
+            parts.append("")
+            parts.extend(
+                f"- {_format_review_priority_line(row, include_reason=reason)}"
+                for row, reason in watchlist_rows[:MAX_TRIAGE_MODELS]
+            )
+            parts.append("")
+
+    return parts
+
+
+def _format_action_snapshot_parts(
+    results: list[PerformanceResult],
+    report_context: ReportRenderContext,
+    *,
+    html_output: bool,
+) -> list[str]:
+    """Build a compact shared triage block for maintainers and reviewers."""
+    summary = report_context.summary
+    triage = report_context.triage
+    failed: list[PerformanceResult] = [res for res in results if not res.success]
+    quality_counts = Counter(dict(triage.quality_counts))
+    harness_success_count = sum("harness" in row.labels for row in triage.utility_rows)
+    successful_count = len(triage.utility_rows)
+
+    if html_output:
+        parts: list[str] = ["<h3>🎯 Action Snapshot</h3>", "<ul>"]
+
+        def append_line(label: str, value: str) -> None:
+            parts.append(
+                f"<li><b>{html.escape(label)}:</b> {html.escape(value)}</li>",
+            )
+    else:
+        parts = ["## 🎯 Action Snapshot", ""]
+
+        def append_line(label: str, value: str) -> None:
+            parts.append(f"- **{label}:** {value}")
+
+    if failed:
+        owners = Counter(res.error_package or "unknown" for res in failed)
+        owner_summary = ", ".join(f"{owner}={count}" for owner, count in owners.most_common(3))
+        append_line("Framework/runtime failures", f"{len(failed)} (top owners: {owner_summary}).")
+        append_line(
+            "Next action",
+            "review failure ownership below and use diagnostics.md for filing.",
+        )
+    else:
+        append_line("Framework/runtime failures", "none.")
+
+    append_line(
+        "Maintainer signals",
+        "harness-risk successes="
+        f"{harness_success_count}, clean outputs={triage.clean_count}/{successful_count}.",
+    )
+
+    if triage.useful_rows:
+        append_line(
+            "Useful now",
+            f"{len(triage.useful_rows)} clean A/B model(s) worth first review.",
+        )
+    else:
+        append_line("Useful now", "none (no clean A/B shortlist for this run).")
+
+    if triage.watchlist_rows:
+        append_line(
+            "Review watchlist",
+            f"{len(triage.watchlist_rows)} model(s) with breaking or lower-value output.",
+        )
+    else:
+        append_line("Review watchlist", "none.")
+
+    if triage.baseline_score is not None and triage.baseline_grade is not None:
+        better = len(summary.get("cataloging_improves_metadata", []))
+        neutral = len(summary.get("cataloging_neutral_vs_metadata", []))
+        worse = len(summary.get("cataloging_worse_than_metadata", []))
+        append_line(
+            "Vs existing metadata",
+            f"better={better}, neutral={neutral}, worse={worse} "
+            f"(baseline {triage.baseline_grade} {triage.baseline_score:.0f}/100).",
+        )
+
+    append_line("Quality signal frequency", f"{_format_counter_items(quality_counts)}.")
+
+    runtime_analysis = summary.get("runtime_analysis")
+    if runtime_analysis is not None:
+        for line in _format_runtime_analysis_lines(runtime_analysis):
+            if not line.startswith("- **") or ":** " not in line:
+                append_line("Runtime note", line.removeprefix("- "))
+                continue
+            label, value = line.removeprefix("- **").split(":** ", maxsplit=1)
+            append_line(label, value)
+
+    if html_output:
+        parts.append("</ul>")
+    else:
+        parts.append("")
+    return parts
+
+
+def _group_failures_by_package(
+    results: Sequence[PerformanceResult],
+) -> list[tuple[str, list[PerformanceResult]]]:
+    """Group failures by originating package ordered by highest count first."""
+    failed = [result for result in results if not result.success]
+    by_package: dict[str, list[PerformanceResult]] = {}
+    for result in failed:
+        package = result.error_package or "unknown"
+        by_package.setdefault(package, []).append(result)
+    return sorted(by_package.items(), key=lambda item: -len(item[1]))
+
+
+def _format_failures_by_package_parts(
+    results: list[PerformanceResult],
+    *,
+    html_output: bool,
+) -> list[str]:
+    """Render shared failure-ownership sections for HTML/Markdown reports."""
+    sorted_packages = _group_failures_by_package(results)
+    if not sorted_packages:
+        return []
+
+    if html_output:
+        parts: list[str] = [
+            "<h3>🚨 Failures by Package</h3>",
+            "<table>",
+            (
+                "<thead><tr><th>Package</th><th>Failures</th><th>Error Types</th>"
+                "<th>Affected Models</th></tr></thead>"
+            ),
+            "<tbody>",
+        ]
+        for package, failures in sorted_packages:
+            error_types = ", ".join(
+                sorted({result.error_stage or "unknown" for result in failures}),
+            )
+            models = ", ".join(result.model_name for result in failures)
+            parts.append(
+                "<tr>"
+                f"<td><code>{html.escape(package)}</code></td>"
+                f"<td>{len(failures)}</td>"
+                f"<td>{html.escape(error_types)}</td>"
+                f"<td>{html.escape(models)}</td>"
+                "</tr>",
+            )
+        parts.append("</tbody></table>")
+        parts.append("<p><b>Actionable Items by Package</b></p>")
+        for package, failures in sorted_packages:
+            parts.append(f"<h4>{html.escape(package)}</h4><ul>")
+            for result in failures:
+                error_message = result.error_message or ""
+                if len(error_message) > ERROR_MESSAGE_TRUNCATE_LEN:
+                    error_message = error_message[: ERROR_MESSAGE_TRUNCATE_LEN - 3] + "..."
+                issue_parts = [html.escape(result.model_name)]
+                if result.error_stage:
+                    issue_parts.append(html.escape(result.error_stage))
+                if result.error_type:
+                    issue_parts.append(html.escape(result.error_type))
+                if error_message:
+                    issue_parts.append(html.escape(error_message))
+                parts.append(f"<li>{' | '.join(issue_parts)}</li>")
+            parts.append("</ul>")
+        return parts
+
+    parts = ["## 🚨 Failures by Package (Actionable)", ""]
+    parts.append("<!-- markdownlint-disable MD060 -->")
+    parts.append("")
+    parts.append("| Package | Failures | Error Types | Affected Models |")
+    parts.append("|---------|----------|-------------|-----------------|")
+
+    for package, failures in sorted_packages:
+        markdown_error_types = sorted({result.error_stage or "unknown" for result in failures})
+        markdown_models = [f"`{result.model_name}`" for result in failures]
+        parts.append(
+            "| "
+            f"`{package}` | {len(failures)} | {', '.join(markdown_error_types)} | "
+            f"{', '.join(markdown_models)} |",
+        )
+
+    parts.append("")
+    parts.append("<!-- markdownlint-enable MD060 -->")
+    parts.append("")
+    parts.append("### Actionable Items by Package")
+    parts.append("")
+
+    for package, failures in sorted_packages:
+        parts.append(f"#### {package}")
+        parts.append("")
+        for result in failures:
+            parts.append(f"- **{result.model_name}** ({result.error_stage})")
+            error_message = result.error_message or ""
+            if len(error_message) > ERROR_MESSAGE_TRUNCATE_LEN:
+                error_message = error_message[: ERROR_MESSAGE_TRUNCATE_LEN - 3] + "..."
+            escaped_message = _escape_markdown_diagnostics(error_message)
+            parts.append(f"  - Error: `{escaped_message}`")
+            if result.error_type:
+                parts.append(f"  - Type: `{result.error_type}`")
+        parts.append("")
+
+    return parts
 
 
 def _select_useful_rows(rows: list[UtilityTriageRow]) -> list[UtilityTriageRow]:

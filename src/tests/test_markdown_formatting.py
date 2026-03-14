@@ -58,7 +58,10 @@ def test_format_failures_by_package_empty() -> None:
             success=True,
         ),
     ]
-    output = check_models._format_failures_by_package_text(results)
+    output = check_models._format_failures_by_package_parts(
+        results,
+        html_output=False,
+    )
     assert output == []
 
 
@@ -90,7 +93,10 @@ def test_format_failures_by_package_groups_by_package() -> None:
             error_message="std::bad_cast",
         ),
     ]
-    output = check_models._format_failures_by_package_text(results)
+    output = check_models._format_failures_by_package_parts(
+        results,
+        html_output=False,
+    )
 
     # Should contain the section header
     assert "## 🚨 Failures by Package (Actionable)" in output
@@ -118,7 +124,10 @@ def test_format_failures_by_package_includes_actionable_items() -> None:
             error_type="ImportError",
         ),
     ]
-    output = check_models._format_failures_by_package_text(results)
+    output = check_models._format_failures_by_package_parts(
+        results,
+        html_output=False,
+    )
     output_text = "\n".join(output)
 
     # Should have actionable items section

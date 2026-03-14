@@ -4,6 +4,8 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-03-14
+
 ### Added
 
 - Added a standalone GitHub-compatible Markdown gallery artifact for model-output
@@ -12,6 +14,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Made the human-facing report artifacts more actionable and consistent by
+  reusing shared triage/rendering helpers for HTML, Markdown, and the standalone
+  gallery, adding maintainer-oriented failure ownership summaries plus reviewer
+  shortlists and per-model assessment cues.
 - Reduced internal redundancy in `src/check_models.py` by merging HTML and Markdown
   cataloging summary rendering paths into a single `_format_cataloging_summary` function.
 - Added lazily-evaluated `.successful` and `.failed` cached properties to `ResultSet`
