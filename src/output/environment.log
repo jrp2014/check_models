@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-03-13 21:43:02 GMT
+FULL ENVIRONMENT DUMP - 2026-03-14 22:13:40 GMT
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -19,8 +19,8 @@ certifi==2026.2.25
 cffi==2.0.0
 cfgv==3.5.0
 charset-normalizer==3.4.5
-check_models==0.3.0
-check_models==0.3.0
+check_models==0.3.1
+check_models==0.3.1
 click==8.3.1
 cmake==4.2.3
 coverage==7.13.4
@@ -58,8 +58,8 @@ markdown-it-py==4.0.0
 MarkupSafe==3.0.3
 mdurl==0.1.2
 ml_dtypes==0.5.4
-mlx==0.31.2.dev20260313+b0564a91
-mlx==0.31.2.dev20260313+b0564a91
+mlx==0.31.2.dev20260314+5d170049
+mlx==0.31.2.dev20260314+5d170049
 mlx-lm==0.31.2
 mlx-vlm==0.4.0
 mpmath==1.3.0
@@ -156,5 +156,5 @@ yarl==1.23.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-03-13 21:43:02 GMT
+Environment dump completed at 2026-03-14 22:13:40 GMT
 ================================================================================
