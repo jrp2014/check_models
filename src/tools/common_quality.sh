@@ -3,6 +3,17 @@
 
 CONDA_ENV="${CONDA_ENV:-mlx-vlm}"
 
+quality_source_conda_sh() {
+    local conda_sh_path="$1"
+
+    if [ ! -f "$conda_sh_path" ]; then
+        return 1
+    fi
+
+    # shellcheck disable=SC1090,SC1091
+    source "$conda_sh_path"
+}
+
 quality_tools_dir() {
     cd "$(dirname "${BASH_SOURCE[0]}")" && pwd
 }
@@ -23,20 +34,16 @@ quality_activate_conda() {
     fi
 
     conda_base="$(conda info --base 2>/dev/null || true)"
-    if [ -n "$conda_base" ] && [ -f "$conda_base/etc/profile.d/conda.sh" ]; then
-        # shellcheck disable=SC1090,SC1091
-        source "$conda_base/etc/profile.d/conda.sh"
-    elif [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
-        # shellcheck disable=SC1091
-        source "$HOME/miniconda3/etc/profile.d/conda.sh"
-    elif [ -f "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
-        source "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
-    elif [ -f "/opt/homebrew/anaconda3/etc/profile.d/conda.sh" ]; then
-        # shellcheck disable=SC1091
-        source "/opt/homebrew/anaconda3/etc/profile.d/conda.sh"
-    elif [ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]; then
-        # shellcheck disable=SC1091
-        source "$HOME/anaconda3/etc/profile.d/conda.sh"
+    if [ -n "$conda_base" ] && quality_source_conda_sh "$conda_base/etc/profile.d/conda.sh"; then
+        :
+    elif quality_source_conda_sh "$HOME/miniconda3/etc/profile.d/conda.sh"; then
+        :
+    elif quality_source_conda_sh "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"; then
+        :
+    elif quality_source_conda_sh "/opt/homebrew/anaconda3/etc/profile.d/conda.sh"; then
+        :
+    elif quality_source_conda_sh "$HOME/anaconda3/etc/profile.d/conda.sh"; then
+        :
     fi
 
     if command -v conda >/dev/null 2>&1; then

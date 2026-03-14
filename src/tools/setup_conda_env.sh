@@ -91,18 +91,27 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+source_conda_sh() {
+    local conda_sh_path="$1"
+
+    if [ ! -f "$conda_sh_path" ]; then
+        return 1
+    fi
+
+    # shellcheck disable=SC1090,SC1091
+    source "$conda_sh_path"
+}
+
 # Check if conda is available
 check_conda() {
     # Try to find conda if not in PATH
     if ! command -v conda &> /dev/null; then
-        if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
-            # shellcheck disable=SC1091
-            source "$HOME/miniconda3/etc/profile.d/conda.sh"
-        elif [ -f "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
-            source "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
-        elif [ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]; then
-            # shellcheck disable=SC1091
-            source "$HOME/anaconda3/etc/profile.d/conda.sh"
+        if source_conda_sh "$HOME/miniconda3/etc/profile.d/conda.sh"; then
+            :
+        elif source_conda_sh "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"; then
+            :
+        elif source_conda_sh "$HOME/anaconda3/etc/profile.d/conda.sh"; then
+            :
         fi
     fi
 
