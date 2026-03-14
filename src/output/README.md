@@ -1,6 +1,7 @@
 # Generated Reports
 
-This directory contains generated HTML, Markdown, and TSV reports from running `check_models.py`.
+This directory contains generated HTML, Markdown, gallery Markdown, TSV, and JSONL
+reports from running `check_models.py`.
 
 The script's default output location is now this directory, keeping the project root clean.
 
@@ -9,7 +10,8 @@ The script's default output location is now this directory, keeping the project 
 ### Production Output (committed to git)
 
 - `results.html` - Styled HTML report (viewable in browser)
-- `results.md` - GitHub-friendly Markdown report
+- `results.md` - GitHub-friendly Markdown summary report
+- `model_gallery.md` - Standalone Markdown gallery artifact for qualitative output review
 - `results.tsv` - Tab-separated values table (for spreadsheets/data analysis)
 - `results.jsonl` - JSON Lines report (machine-readable results)
 - `results.history.jsonl` - Append-only per-run history for regressions/recoveries
@@ -25,20 +27,22 @@ When running tests, integration checks, or debug runs, pass custom output paths 
 
 ```bash
 # Example: Running tests with debug-specific output
-python check_models.py \
+python -m check_models \
   --output-html output/test_results.html \
   --output-markdown output/test_results.md \
+  --output-gallery-markdown output/test_model_gallery.md \
   --output-tsv output/test_results.tsv \
+  --output-jsonl output/test_results.jsonl \
   --output-log output/test_check_models.log \
   [other options...]
 ```
 
-Files matching `test_*.{html,md,tsv,log}` are automatically excluded from git tracking via `.gitignore`.
+Files matching `test_*.{html,md,tsv,jsonl,log}` are automatically excluded from git tracking via `.gitignore`.
 
 **Separation strategy**:
 
-- **Production runs**: Use default outputs (`check_models.log`, `results.html`, `results.md`, `results.tsv`, `results.jsonl`, `results.history.jsonl`) → committed to git
-- **Integration tests**: Use `test_cli_integration.{log,html,md,tsv}` → gitignored (handled automatically by test suite)
+- **Production runs**: Use default outputs (`check_models.log`, `results.html`, `results.md`, `model_gallery.md`, `results.tsv`, `results.jsonl`, `results.history.jsonl`, `diagnostics.md`) → committed to git
+- **Integration tests**: Use `test_cli_integration.{log,html,md,tsv,jsonl}` plus any test gallery artifact → gitignored (handled automatically by test suite)
 - **Manual test/debug runs**: Pass custom paths with `test_` prefix or any other name except the production defaults → gitignored
 - **Pre-push git hook**: Runs pytest which uses test-specific output files → doesn't overwrite production log
 
@@ -145,6 +149,9 @@ Success rate: 2/3 (66.7%)
 💾 Reports generated:
    • HTML: src/output/results.html
    • Markdown: src/output/results.md
+  • Gallery: src/output/model_gallery.md
+  • TSV: src/output/results.tsv
+  • JSONL: src/output/results.jsonl
 
 ⏱️  Total runtime: 45.2 seconds
 ```
