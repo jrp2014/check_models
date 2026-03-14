@@ -52,9 +52,9 @@ The file is organized in this order — use these landmarks to jump to the right
 - **Configuration hierarchy**: `src/quality_config.yaml` → `QualityThresholds` / `FormattingThresholds` dataclasses. Never sprinkle magic numbers.
 - **Dependencies**: optional packages are guarded with `try/except ImportError` → populate `MISSING_DEPENDENCIES`; core runtime deps (`mlx`, `mlx-vlm`, `mlx-lm`) now hard-fail before inference.
 - **Display normalization**: ALL metric formatting goes through `format_field_value(field_name, value)`. Do not format metrics inline.
-- **Type aliases**: `MetricValue = int | float | str | None` is the value type for metrics.
+- **Type aliases**: `MetricValue = int | float | str | bool | None` is the value type for metrics.
 - **Protocols over ABCs**: typing for optional deps uses `Protocol` classes (e.g., `SupportsGenerationResult`).
-- **Reports write to** `src/output/` (`results.html`, `results.md`, `results.jsonl`, `results.tsv`, `diagnostics.md`, `results.history.jsonl`, `check_models.log`, `environment.log`).
+- **Reports write to** `src/output/` (`results.html`, `results.md`, `model_gallery.md`, `results.jsonl`, `results.tsv`, `diagnostics.md`, `results.history.jsonl`, `check_models.log`, `environment.log`).
 - **Security**: defaults to `--trust-remote-code`. Backend guard env vars are set (`TRANSFORMERS_NO_*` and compatibility `USE_*`) unless `MLX_VLM_ALLOW_TF=1`.
 
 ### 5. Make targets (all run from repo root)

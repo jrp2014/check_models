@@ -13,6 +13,12 @@ Notable changes to this project will be documented in this file.
   `src/README.md`, and workflow docs consistently describe the standalone
   `model_gallery.md` artifact, the recommended conda bootstrap path, and the
   current split quality/runtime CI behavior.
+- Made the repo-root `Makefile` delegate to the env-aware `src/Makefile` so
+  common install/test/format/typecheck commands respect the intended Python
+  environment instead of invoking bare `python`/`pip`/tool binaries.
+- Expanded markdown quality coverage to include committed Markdown under
+  `src/output/`, and updated bot guidance files so `MetricValue`, report
+  artifact lists, and `make quality` expectations match the current codebase.
 
 ## [0.3.1] - 2026-03-14
 

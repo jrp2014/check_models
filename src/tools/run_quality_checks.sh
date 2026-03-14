@@ -114,7 +114,6 @@ echo "=== Markdown Lint ==="
 quality_run_markdownlint \
     --config .markdownlint.jsonc \
     "**/*.md" \
-    "!src/output/**" \
     "!src/node_modules/**" \
     "!**/node_modules/**"
 
