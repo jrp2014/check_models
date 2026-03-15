@@ -2,41 +2,60 @@
 
 <!-- markdownlint-disable MD013 -->
 
-_Generated on 2026-03-15 02:26:33 GMT_
+_Generated on 2026-03-15 02:55:35 GMT_
 
 A review-friendly artifact with image metadata, the source prompt, and full generated output for each model.
 
 ## 🎯 Action Snapshot
 
-- **Framework/runtime failures:** none.
-- **Maintainer signals:** harness-risk successes=8, clean outputs=4/49.
-- **Useful now:** 8 clean A/B model(s) worth first review.
-- **Review watchlist:** 41 model(s) with breaking or lower-value output.
-- **Vs existing metadata:** better=25, neutral=7, worse=17 (baseline B 66/100).
-- **Quality signal frequency:** missing_sections=28, context_ignored=20, description_length=15, keyword_count=11, reasoning_leak=11, title_length=9.
-- **Runtime pattern:** decode dominates measured phase time (90%; 49/49 measured model(s)).
-- **Phase totals:** model load=161.38s, prompt prep=0.13s, decode=1462.65s, cleanup=5.37s.
+- **Framework/runtime failures:** 1 (top owners: transformers=1).
+- **Next action:** review failure ownership below and use diagnostics.md for filing.
+- **Maintainer signals:** harness-risk successes=5, clean outputs=4/49.
+- **Useful now:** 9 clean A/B model(s) worth first review.
+- **Review watchlist:** 40 model(s) with breaking or lower-value output.
+- **Vs existing metadata:** better=26, neutral=6, worse=17 (baseline B 66/100).
+- **Quality signal frequency:** missing_sections=28, context_ignored=18, description_length=15, reasoning_leak=12, keyword_count=10, title_length=8.
+- **Runtime pattern:** decode dominates measured phase time (79%; 49/50 measured model(s)).
+- **Phase totals:** model load=330.67s, prompt prep=0.13s, decode=1253.70s, cleanup=4.33s.
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
-- **Termination reasons:** completed=49.
+- **Termination reasons:** completed=49, exception=1.
 
 ## 🧭 Review Priorities
 
 ### Strong Candidates
 
-- `mlx-community/X-Reasoner-7B-8bit`: 🏆 A (89/100) | Δ+23 | 47.8 tps
-- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: ✅ B (70/100) | Δ+4 | 161.7 tps
-- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: ✅ B (69/100) | Δ+4 | 55.6 tps
-- `mlx-community/InternVL3-14B-8bit`: ✅ B (69/100) | Δ+3 | 29.0 tps
-- `mlx-community/InternVL3-8B-bf16`: ✅ B (68/100) | Δ+2 | 32.4 tps
+- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: ✅ B (70/100) | Δ+4 | 158.4 tps
+- `mlx-community/InternVL3-14B-8bit`: ✅ B (70/100) | Δ+4 | 28.7 tps
+- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: ✅ B (69/100) | Δ+4 | 55.0 tps
+- `mlx-community/X-Reasoner-7B-8bit`: ✅ B (69/100) | Δ+3 | 47.6 tps
+- `Qwen/Qwen3-VL-2B-Instruct`: ✅ B (68/100) | Δ+2 | 75.4 tps
 
 ### Watchlist
 
-- `prince-canuma/Florence-2-large-ft`: ❌ F (0/100) | Δ-66 | 321.4 tps | context ignored, degeneration, harness, missing sections
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (7/100) | Δ-59 | 25.7 tps | harness, missing sections
-- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: ❌ F (16/100) | Δ-50 | 28.5 tps | context ignored, harness, missing sections
-- `Qwen/Qwen3-VL-2B-Instruct`: ✅ B (67/100) | Δ+1 | 73.8 tps | harness, long context, repetitive
-- `microsoft/Phi-3.5-vision-instruct`: ✅ B (68/100) | Δ+2 | 51.9 tps | degeneration, harness
+- `prince-canuma/Florence-2-large-ft`: ❌ F (0/100) | Δ-66 | 317.7 tps | context ignored, degeneration, harness, missing sections
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (7/100) | Δ-59 | 28.2 tps | harness, missing sections
+- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: ❌ F (16/100) | Δ-50 | 27.8 tps | context ignored, harness, missing sections
+- `microsoft/Phi-3.5-vision-instruct`: ✅ B (68/100) | Δ+2 | 52.1 tps | degeneration, harness
+- `mlx-community/Qwen3.5-35B-A3B-bf16`: 🏆 A (95/100) | Δ+29 | 54.9 tps | context ignored, harness, long context, missing sections
+
+## 🚨 Failures by Package (Actionable)
+
+<!-- markdownlint-disable MD060 -->
+
+| Package | Failures | Error Types | Affected Models |
+|---------|----------|-------------|-----------------|
+| `transformers` | 1 | Model Error | `microsoft/Florence-2-large-ft` |
+
+<!-- markdownlint-enable MD060 -->
+
+### Actionable Items by Package
+
+#### transformers
+
+- **microsoft/Florence-2-large-ft** (Model Error)
+  - Error: `Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate ...`
+  - Type: `ValueError`
 
 ## Image Metadata
 
@@ -108,10 +127,11 @@ A review-friendly artifact with image metadata, the source prompt, and full gene
 
 ## Quick Navigation
 
-- **Best cataloging quality:** [`mlx-community/Qwen3.5-35B-A3B-6bit`](#model-mlx-community-qwen35-35b-a3b-6bit)
+- **Best cataloging quality:** [`mlx-community/Qwen3.5-35B-A3B-bf16`](#model-mlx-community-qwen35-35b-a3b-bf16)
 - **Fastest generation:** [`prince-canuma/Florence-2-large-ft`](#model-prince-canuma-florence-2-large-ft)
 - **Lowest memory footprint:** [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)
 - **Best balance:** [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4)
+- **Failed models:** `microsoft/Florence-2-large-ft`
 - **D/F utility models:** `HuggingFaceTB/SmolVLM-Instruct`, `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`, `mlx-community/Idefics3-8B-Llama3-bf16`, `mlx-community/LFM2-VL-1.6B-8bit`, `mlx-community/Qwen2-VL-2B-Instruct-4bit`, `mlx-community/SmolVLM-Instruct-bf16`, +5 more
 
 ## Model Gallery
@@ -120,12 +140,137 @@ Full generated output by model:
 
 <!-- markdownlint-disable MD013 MD033 -->
 
+<a id="model-microsoft-florence-2-large-ft"></a>
+
+### ❌ microsoft/Florence-2-large-ft
+
+**Status:** Failed (Model Error)
+**Error:**
+
+> Model generation failed for microsoft/Florence-2-large-ft: Failed to process
+> inputs with error: can only concatenate str (not "NoneType") to str
+**Type:** `ValueError`
+**Phase:** `decode`
+**Code:** `TRANSFORMERS_DECODE_MODEL`
+**Package:** `transformers`
+**Next Action:** review package ownership and diagnostics for a minimal repro.
+
+<details>
+<summary>Full Traceback (click to expand)</summary>
+
+```python
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 873, in process_inputs_with_fallback
+    return process_inputs(
+        processor,
+    ...<5 lines>...
+        **kwargs,
+    )
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 859, in process_inputs
+    return process_method(**args)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/florence2/processing_florence2.py", line 163, in __call__
+    image_inputs = self.image_processor(images, **output_kwargs["images_kwargs"])
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils.py", line 50, in __call__
+    return self.preprocess(images, *args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils_fast.py", line 860, in preprocess
+    self._validate_preprocess_kwargs(**kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils_fast.py", line 823, in _validate_preprocess_kwargs
+    validate_fast_preprocess_arguments(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        do_rescale=do_rescale,
+        ^^^^^^^^^^^^^^^^^^^^^^
+    ...<10 lines>...
+        data_format=data_format,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils_fast.py", line 106, in validate_fast_preprocess_arguments
+    raise ValueError("Only returning PyTorch tensors is currently supported.")
+ValueError: Only returning PyTorch tensors is currently supported.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 886, in process_inputs_with_fallback
+    return process_inputs(
+        processor,
+    ...<5 lines>...
+        **kwargs,
+    )
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 859, in process_inputs
+    return process_method(**args)
+  File "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/florence2/processing_florence2.py", line 185, in __call__
+    self.image_token * self.num_image_tokens
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + self.tokenizer.bos_token
+    ^~~~~~~~~~~~~~~~~~~~~~~~~~
+TypeError: can only concatenate str (not "NoneType") to str
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 12421, in _run_model_generation
+    output: GenerationResult | SupportsGenerationResult = generate(
+                                                          ~~~~~~~~^
+        model=model,
+        ^^^^^^^^^^^^
+    ...<13 lines>...
+        **extra_kwargs,
+        ^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 672, in generate
+    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
+                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 515, in stream_generate
+    inputs = prepare_inputs(
+        processor,
+    ...<6 lines>...
+        **kwargs,
+    )
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1110, in prepare_inputs
+    inputs = process_inputs_with_fallback(
+        processor,
+    ...<4 lines>...
+        **kwargs,
+    )
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 896, in process_inputs_with_fallback
+    raise ValueError(
+        f"Failed to process inputs with error: {fallback_error}"
+    ) from fallback_error
+ValueError: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 12565, in process_image_with_model
+    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
+                                                          ~~~~~~~~~~~~~~~~~~~~~^
+        params=params,
+        ^^^^^^^^^^^^^^
+        phase_callback=_update_phase,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        phase_timer=phase_timer,
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 12446, in _run_model_generation
+    raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
+ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
+```
+
+</details>
+
+---
+
 <a id="model-mlx-community-nanollava-15-4bit"></a>
 
 ### ✅ mlx-community/nanoLLaVA-1.5-4bit
 
-**Metrics:** Load 0.53s | Gen 1.01s | Total 1.86s
-**Throughput:** Prompt 2,843 TPS (609 tok) | Gen 320 TPS (91 tok)
+**Metrics:** Load 0.66s | Gen 1.03s | Total 2.01s
+**Throughput:** Prompt 2,487 TPS (609 tok) | Gen 311 TPS (91 tok)
 **Assessment:** 🟡 C (57/100) | Δ-9 | None identified
 **Review Status:** watchlist (missing sections)
 **Review:** C 57/100 | Missing sections (keywords); Title length violation (3 words; expected 5-10); ...
@@ -152,8 +297,8 @@ Full generated output by model:
 
 ### ✅ mlx-community/LFM2-VL-1.6B-8bit
 
-**Metrics:** Load 0.71s | Gen 1.35s | Total 2.41s
-**Throughput:** Prompt 3,025 TPS (867 tok) | Gen 297 TPS (160 tok)
+**Metrics:** Load 0.71s | Gen 1.34s | Total 2.37s
+**Throughput:** Prompt 2,973 TPS (867 tok) | Gen 292 TPS (160 tok)
 **Assessment:** ❌ F (33/100) | Δ-33 | Mostly echoes context without adding value
 **Review Status:** watchlist (context echo)
 **Review:** F 33/100 | Title length violation (12 words; expected 5-10); Description sentence violation (4; expected 1-2); ...
@@ -183,41 +328,12 @@ Full generated output by model:
 
 ---
 
-<a id="model-qnguyen3-nanollava"></a>
-
-### ✅ qnguyen3/nanoLLaVA
-
-**Metrics:** Load 0.78s | Gen 1.76s | Total 2.86s
-**Throughput:** Prompt 2,661 TPS (609 tok) | Gen 100 TPS (103 tok)
-**Assessment:** ❌ F (19/100) | Δ-47 | Mostly echoes context without adding value
-**Review Status:** watchlist (missing sections)
-**Review:** F 19/100 | Missing sections (keywords); Title length violation (4 words; expected 5-10); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Title: Sainsbury's Welwyn Garden City
-> Description: A modern Sainsbury's supermarket in Howardsgate, Welwyn Garden City,
-> England, United Kingdom, UK. The low sun casts long shadows from the bare-branched trees
-> onto the brick facade of the building. The living wall brings a splash of nature to the
-> urban landscape. The image captures the moment of shoppers making their way home with
-> their groceries. The Sainsbury's Supermarket is a sustainable architecture project in
-> the UK.
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- Missing sections (keywords)
-- Title length violation (4 words; expected 5-10)
-- Description sentence violation (5; expected 1-2)
-
----
-
 <a id="model-mlx-community-fastvlm-05b-bf16"></a>
 
 ### ✅ mlx-community/FastVLM-0.5B-bf16
 
-**Metrics:** Load 0.78s | Gen 1.77s | Total 2.89s
-**Throughput:** Prompt 3,633 TPS (613 tok) | Gen 305 TPS (198 tok)
+**Metrics:** Load 0.78s | Gen 1.72s | Total 2.83s
+**Throughput:** Prompt 3,766 TPS (613 tok) | Gen 301 TPS (198 tok)
 **Assessment:** ✅ B (74/100) | Δ+9 | None identified
 **Review Status:** watchlist (missing sections)
 **Review:** B 74/100 | Missing sections (keywords); Description sentence violation (7; expected 1-2)
@@ -245,12 +361,41 @@ Full generated output by model:
 
 ---
 
+<a id="model-qnguyen3-nanollava"></a>
+
+### ✅ qnguyen3/nanoLLaVA
+
+**Metrics:** Load 0.77s | Gen 1.77s | Total 2.85s
+**Throughput:** Prompt 2,626 TPS (609 tok) | Gen 99.6 TPS (103 tok)
+**Assessment:** ❌ F (19/100) | Δ-47 | Mostly echoes context without adding value
+**Review Status:** watchlist (missing sections)
+**Review:** F 19/100 | Missing sections (keywords); Title length violation (4 words; expected 5-10); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Title: Sainsbury's Welwyn Garden City
+> Description: A modern Sainsbury's supermarket in Howardsgate, Welwyn Garden City,
+> England, United Kingdom, UK. The low sun casts long shadows from the bare-branched trees
+> onto the brick facade of the building. The living wall brings a splash of nature to the
+> urban landscape. The image captures the moment of shoppers making their way home with
+> their groceries. The Sainsbury's Supermarket is a sustainable architecture project in
+> the UK.
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Missing sections (keywords)
+- Title length violation (4 words; expected 5-10)
+- Description sentence violation (5; expected 1-2)
+
+---
+
 <a id="model-mlx-community-lfm25-vl-16b-bf16"></a>
 
 ### ✅ mlx-community/LFM2.5-VL-1.6B-bf16
 
-**Metrics:** Load 0.86s | Gen 1.84s | Total 3.02s
-**Throughput:** Prompt 3,014 TPS (867 tok) | Gen 182 TPS (200 tok)
+**Metrics:** Load 0.84s | Gen 1.84s | Total 3.00s
+**Throughput:** Prompt 3,069 TPS (867 tok) | Gen 180 TPS (200 tok)
 **Assessment:** 🟡 C (63/100) | Δ-2 | Mostly echoes context without adding value
 **Review Status:** watchlist (worse than metadata baseline)
 **Review:** C 63/100 | Description sentence violation (5; expected 1-2)
@@ -286,8 +431,8 @@ Full generated output by model:
 
 ### ✅ HuggingFaceTB/SmolVLM-Instruct
 
-**Metrics:** Load 0.55s | Gen 1.86s | Total 2.71s
-**Throughput:** Prompt 1,424 TPS (1,822 tok) | Gen 115 TPS (18 tok)
+**Metrics:** Load 1.11s | Gen 1.86s | Total 3.27s
+**Throughput:** Prompt 1,414 TPS (1,822 tok) | Gen 115 TPS (18 tok)
 **Assessment:** ❌ F (1/100) | Δ-65 | Output lacks detail
 **Review Status:** watchlist (context ignored, missing sections)
 **Review:** F 1/100 | Context ignored (missing: Howardsgate, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
@@ -309,8 +454,8 @@ Capture, GMT, GPS); Missing sections (title, description, keywords)
 
 ### ✅ mlx-community/SmolVLM-Instruct-bf16
 
-**Metrics:** Load 1.05s | Gen 1.89s | Total 3.28s
-**Throughput:** Prompt 1,408 TPS (1,822 tok) | Gen 116 TPS (18 tok)
+**Metrics:** Load 1.05s | Gen 1.88s | Total 3.26s
+**Throughput:** Prompt 1,412 TPS (1,822 tok) | Gen 115 TPS (18 tok)
 **Assessment:** ❌ F (1/100) | Δ-65 | Output lacks detail
 **Review Status:** watchlist (context ignored, missing sections)
 **Review:** F 1/100 | Context ignored (missing: Howardsgate, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
@@ -332,8 +477,8 @@ Capture, GMT, GPS); Missing sections (title, description, keywords)
 
 ### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
 
-**Metrics:** Load 1.01s | Gen 2.04s | Total 3.37s
-**Throughput:** Prompt 1,390 TPS (1,722 tok) | Gen 115 TPS (42 tok)
+**Metrics:** Load 1.13s | Gen 2.06s | Total 3.51s
+**Throughput:** Prompt 1,379 TPS (1,722 tok) | Gen 113 TPS (42 tok)
 **Assessment:** 🟡 C (55/100) | Δ-11 | Mostly echoes context without adding value
 **Review Status:** watchlist (context ignored)
 **Review:** C 55/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, Adobe Stock, Any Vision, Eco, Europe, Locations, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
@@ -358,8 +503,8 @@ Capture, GMT, GPS); Title length violation (3 words; expected 5-10); ...
 
 ### ✅ prince-canuma/Florence-2-large-ft
 
-**Metrics:** Load 1.09s | Gen 2.19s | Total 3.60s
-**Throughput:** Prompt 4,893 TPS (1,181 tok) | Gen 321 TPS (500 tok)
+**Metrics:** Load 1.04s | Gen 2.22s | Total 3.57s
+**Throughput:** Prompt 4,827 TPS (1,181 tok) | Gen 318 TPS (500 tok)
 **Assessment:** ❌ F (0/100) | Δ-66 | Output too short to be useful
 **Review Status:** watchlist (context ignored, degeneration, harness, missing sections)
 **Review:** F 0/100 | ⚠️HARNESS:stop_token; Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Sainsbury, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
@@ -386,8 +531,8 @@ Capture, GMT, GPS); ...
 
 ### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
 
-**Metrics:** Load 3.29s | Gen 4.13s | Total 7.74s
-**Throughput:** Prompt 503 TPS (1,627 tok) | Gen 28.5 TPS (14 tok)
+**Metrics:** Load 3.40s | Gen 4.29s | Total 8.01s
+**Throughput:** Prompt 479 TPS (1,627 tok) | Gen 27.8 TPS (14 tok)
 **Assessment:** ❌ F (16/100) | Δ-50 | Output lacks detail
 **Review Status:** watchlist (context ignored, harness, missing sections)
 **Review:** F 16/100 | ⚠️HARNESS:prompt_template; Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Sainsbury, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
@@ -411,8 +556,8 @@ Capture, GMT, GPS); ...
 
 ### ✅ mlx-community/Ministral-3-3B-Instruct-2512-4bit
 
-**Metrics:** Load 1.39s | Gen 4.36s | Total 6.08s
-**Throughput:** Prompt 1,023 TPS (3,205 tok) | Gen 162 TPS (132 tok)
+**Metrics:** Load 1.40s | Gen 4.48s | Total 6.20s
+**Throughput:** Prompt 985 TPS (3,205 tok) | Gen 158 TPS (132 tok)
 **Assessment:** ✅ B (70/100) | Δ+4 | Mostly echoes context without adding value
 **Review Status:** strong candidate for first-pass review
 **Review:** B 70/100 | Description sentence violation (3; expected 1-2)
@@ -445,8 +590,8 @@ Capture, GMT, GPS); ...
 
 ### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
 
-**Metrics:** Load 1.54s | Gen 5.25s | Total 7.23s
-**Throughput:** Prompt 1,305 TPS (1,444 tok) | Gen 50.4 TPS (186 tok)
+**Metrics:** Load 1.49s | Gen 5.08s | Total 6.89s
+**Throughput:** Prompt 1,307 TPS (1,444 tok) | Gen 52.5 TPS (186 tok)
 **Assessment:** ✅ B (67/100) | Δ+1 | Mostly echoes context without adding value
 **Review Status:** strong candidate for first-pass review
 **Review:** B 67/100 | Description sentence violation (4; expected 1-2); Keyword count violation (22; expected 10-18)
@@ -478,8 +623,8 @@ Capture, GMT, GPS); ...
 
 ### ✅ mlx-community/gemma-3n-E2B-4bit
 
-**Metrics:** Load 3.05s | Gen 5.47s | Total 8.87s
-**Throughput:** Prompt 1,437 TPS (863 tok) | Gen 112 TPS (500 tok)
+**Metrics:** Load 3.05s | Gen 5.57s | Total 8.95s
+**Throughput:** Prompt 1,422 TPS (863 tok) | Gen 110 TPS (500 tok)
 **Assessment:** 🟠 D (45/100) | Δ-21 | Lacks visual description of image
 **Review Status:** watchlist (context echo, context ignored, missing sections, repetitive)
 **Review:** D 45/100 | Repetitive output (16:21:00); Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Sainsbury, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
@@ -511,8 +656,8 @@ Capture, GMT, GPS); ...
 
 ### ✅ mlx-community/InternVL3-8B-bf16
 
-**Metrics:** Load 2.83s | Gen 5.65s | Total 8.80s
-**Throughput:** Prompt 844 TPS (2,392 tok) | Gen 32.4 TPS (73 tok)
+**Metrics:** Load 2.80s | Gen 5.86s | Total 8.98s
+**Throughput:** Prompt 791 TPS (2,392 tok) | Gen 32.1 TPS (73 tok)
 **Assessment:** ✅ B (68/100) | Δ+2 | Mostly echoes context without adding value
 **Review Status:** strong candidate for first-pass review
 **Review:** B 68/100 | No quality issues detected
@@ -536,8 +681,8 @@ Capture, GMT, GPS); ...
 
 ### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
 
-**Metrics:** Load 1.46s | Gen 7.05s | Total 8.86s
-**Throughput:** Prompt 884 TPS (1,597 tok) | Gen 109 TPS (500 tok)
+**Metrics:** Load 3.05s | Gen 6.81s | Total 10.18s
+**Throughput:** Prompt 923 TPS (1,597 tok) | Gen 112 TPS (500 tok)
 **Assessment:** 🏆 A (90/100) | Δ+25 | None identified
 **Review Status:** watchlist (reasoning leak)
 **Review:** A 90/100 | Description sentence violation (5; expected 1-2); Keyword count violation (48; expected 10-18); ...
@@ -595,8 +740,8 @@ Capture, GMT, GPS); ...
 
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-8bit
 
-**Metrics:** Load 3.46s | Gen 7.22s | Total 11.03s
-**Throughput:** Prompt 975 TPS (1,597 tok) | Gen 101 TPS (500 tok)
+**Metrics:** Load 3.54s | Gen 7.26s | Total 11.12s
+**Throughput:** Prompt 972 TPS (1,597 tok) | Gen 100 TPS (500 tok)
 **Assessment:** ✅ B (70/100) | Δ+4 | Mostly echoes context without adding value
 **Review Status:** watchlist (degeneration, hallucination, missing sections, reasoning leak)
 **Review:** B 70/100 | Output degeneration (incomplete_sentence: ends with 'we'); Missing sections (title); ...
@@ -651,44 +796,12 @@ Capture, GMT, GPS); ...
 
 ---
 
-<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
-
-### ✅ mlx-community/gemma-3-27b-it-qat-4bit
-
-**Metrics:** Load 4.67s | Gen 8.34s | Total 13.35s
-**Throughput:** Prompt 192 TPS (872 tok) | Gen 27.9 TPS (94 tok)
-**Assessment:** 🏆 A (90/100) | Δ+24 | None identified
-**Review Status:** watchlist (context ignored)
-**Review:** A 90/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
-Capture, GMT, GPS)
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Title:
-> Sainsbury's supermarket with living wall facade
->
-> Description:
-> A large brick Sainsbury's supermarket building features a full-height living wall on one
-> facade. Cars are parked in front, and pedestrians are visible near the entrance.
->
-> Keywords:
-> Architecture, brick, building, cars, facade, green wall, living wall, modern, parking,
-> pedestrians, Sainsbury's, supermarket, urban, storefront, trees, daytime, exterior,
-> sunlight
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening Capture, GMT, GPS)
-
----
-
 <a id="model-mlx-community-gemma-3n-e4b-it-bf16"></a>
 
 ### ✅ mlx-community/gemma-3n-E4B-it-bf16
 
-**Metrics:** Load 4.56s | Gen 8.40s | Total 13.38s
-**Throughput:** Prompt 915 TPS (871 tok) | Gen 41.2 TPS (290 tok)
+**Metrics:** Load 4.66s | Gen 8.34s | Total 13.39s
+**Throughput:** Prompt 908 TPS (871 tok) | Gen 41.6 TPS (290 tok)
 **Assessment:** 🏆 A (82/100) | Δ+16 | None identified
 **Review Status:** watchlist (missing sections)
 **Review:** A 82/100 | Missing sections (title, description, keywords)
@@ -728,35 +841,35 @@ Capture, GMT, GPS)
 
 ---
 
-<a id="model-mlx-community-internvl3-14b-8bit"></a>
+<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
 
-### ✅ mlx-community/InternVL3-14B-8bit
+### ✅ mlx-community/gemma-3-27b-it-qat-4bit
 
-**Metrics:** Load 2.94s | Gen 9.39s | Total 12.66s
-**Throughput:** Prompt 414 TPS (2,392 tok) | Gen 29.0 TPS (88 tok)
-**Assessment:** ✅ B (69/100) | Δ+3 | Mostly echoes context without adding value
-**Review Status:** strong candidate for first-pass review
-**Review:** B 69/100 | Title length violation (3 words; expected 5-10)
+**Metrics:** Load 4.68s | Gen 8.42s | Total 13.43s
+**Throughput:** Prompt 187 TPS (872 tok) | Gen 27.9 TPS (94 tok)
+**Assessment:** 🏆 A (90/100) | Δ+24 | None identified
+**Review Status:** watchlist (context ignored)
+**Review:** A 90/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
+Capture, GMT, GPS)
 
 <!-- markdownlint-disable MD028 MD049 -->
 >
 > Title:
-> Sainsbury's Living Wall
+> Sainsbury's supermarket with living wall facade
 >
 > Description:
-> A Sainsbury's supermarket features a large vertical garden on its facade, with shoppers
-> walking by on a sunny day. The building is surrounded by brick structures and parked
-> cars.
+> A large brick Sainsbury's supermarket building features a full-height living wall on one
+> facade. Cars are parked in front, and pedestrians are visible near the entrance.
 >
 > Keywords:
-> Sainsbury's, vertical garden, living wall, supermarket, shoppers, brick building, urban,
-> greenery, England, United Kingdom, clear sky, modern architecture, shopping bags,
-> sustainable design
+> Architecture, brick, building, cars, facade, green wall, living wall, modern, parking,
+> pedestrians, Sainsbury's, supermarket, urban, storefront, trees, daytime, exterior,
+> sunlight
 <!-- markdownlint-enable MD028 MD049 -->
 
 ⚠️ **Quality Warnings:**
 
-- Title length violation (3 words; expected 5-10)
+- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening Capture, GMT, GPS)
 
 ---
 
@@ -764,8 +877,8 @@ Capture, GMT, GPS)
 
 ### ✅ mlx-community/Idefics3-8B-Llama3-bf16
 
-**Metrics:** Load 3.33s | Gen 9.40s | Total 13.09s
-**Throughput:** Prompt 757 TPS (2,891 tok) | Gen 29.8 TPS (153 tok)
+**Metrics:** Load 3.36s | Gen 9.71s | Total 13.40s
+**Throughput:** Prompt 709 TPS (2,891 tok) | Gen 29.4 TPS (153 tok)
 **Assessment:** ❌ F (29/100) | Δ-36 | Mostly echoes context without adding value
 **Review Status:** watchlist (context echo)
 **Review:** F 29/100 | Title length violation (11 words; expected 5-10); Context echo (94% overlap); ...
@@ -797,8 +910,8 @@ Capture, GMT, GPS)
 
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
 
-**Metrics:** Load 5.61s | Gen 9.92s | Total 15.85s
-**Throughput:** Prompt 844 TPS (1,597 tok) | Gen 68.5 TPS (500 tok)
+**Metrics:** Load 5.61s | Gen 9.75s | Total 15.68s
+**Throughput:** Prompt 968 TPS (1,597 tok) | Gen 67.6 TPS (500 tok)
 **Assessment:** 🏆 A (91/100) | Δ+25 | None identified
 **Review Status:** watchlist (reasoning leak)
 **Review:** A 91/100 | Description sentence violation (6; expected 1-2); Keyword count violation (34; expected 10-18); ...
@@ -859,8 +972,8 @@ Capture, GMT, GPS)
 
 ### ✅ mlx-community/pixtral-12b-8bit
 
-**Metrics:** Load 3.11s | Gen 10.11s | Total 13.57s
-**Throughput:** Prompt 539 TPS (3,396 tok) | Gen 34.3 TPS (115 tok)
+**Metrics:** Load 2.90s | Gen 10.28s | Total 13.52s
+**Throughput:** Prompt 518 TPS (3,396 tok) | Gen 34.9 TPS (115 tok)
 **Assessment:** ✅ B (66/100) | Δ+1 | Mostly echoes context without adding value
 **Review Status:** strong candidate for first-pass review
 **Review:** B 66/100 | No quality issues detected
@@ -885,12 +998,74 @@ Capture, GMT, GPS)
 
 ---
 
+<a id="model-mlx-community-internvl3-14b-8bit"></a>
+
+### ✅ mlx-community/InternVL3-14B-8bit
+
+**Metrics:** Load 2.93s | Gen 10.29s | Total 13.55s
+**Throughput:** Prompt 392 TPS (2,392 tok) | Gen 28.7 TPS (104 tok)
+**Assessment:** ✅ B (70/100) | Δ+4 | Mostly echoes context without adding value
+**Review Status:** strong candidate for first-pass review
+**Review:** B 70/100 | Title length violation (3 words; expected 5-10)
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Title:
+> Sainsbury's Living Wall
+>
+> Description:
+> A Sainsbury's supermarket features a large vertical garden on its facade, with shoppers
+> walking by on a clear day. The building has a mix of brick and glass elements, and a
+> white car is parked nearby.
+>
+> Keywords:
+> Sainsbury's, living wall, vertical garden, supermarket, shoppers, brick facade, clear
+> day, urban, greenery, modern architecture, England, United Kingdom, retail building,
+> sustainable design, green facade, pedestrians, urban landscape
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Title length violation (3 words; expected 5-10)
+
+---
+
+<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
+
+### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
+
+**Metrics:** Load 2.22s | Gen 10.64s | Total 13.18s
+**Throughput:** Prompt 391 TPS (3,206 tok) | Gen 55.0 TPS (112 tok)
+**Assessment:** ✅ B (69/100) | Δ+4 | Mostly echoes context without adding value
+**Review Status:** strong candidate for first-pass review
+**Review:** B 69/100 | No quality issues detected
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> \\*\\*Title:\\*\\*
+> Sainsbury's Supermarket with Living Wall and Shoppers
+>
+> \\*\\*Description:\\*\\*
+> A Sainsbury's supermarket building features a large vertical living wall covered in
+> green foliage, set against a brick facade. Two shoppers walk near the entrance, carrying
+> bags, under clear daylight with long shadows cast by nearby trees.
+>
+> \\*\\*Keywords:\\*\\*
+> Sainsbury's Supermarket, living wall, brick facade, shoppers, shopping bags, urban
+> greenery, clear daylight, long shadows, trees, retail building, Welwyn Garden City,
+> sustainable architecture
+<!-- markdownlint-enable MD028 MD049 -->
+
+**Quality Status:** no quality issues detected in this run
+
+---
+
 <a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
 
 ### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
 
-**Metrics:** Load 2.24s | Gen 10.74s | Total 13.32s
-**Throughput:** Prompt 394 TPS (3,206 tok) | Gen 58.2 TPS (128 tok)
+**Metrics:** Load 2.19s | Gen 10.81s | Total 13.32s
+**Throughput:** Prompt 393 TPS (3,206 tok) | Gen 57.5 TPS (130 tok)
 **Assessment:** 🏆 A (88/100) | Δ+23 | None identified
 **Review Status:** watchlist (context ignored)
 **Review:** A 88/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Spring, Sustainable, Urban Greening
@@ -904,13 +1079,13 @@ Capture, GMT, GPS); Description sentence violation (3; expected 1-2)
 > Description:
 > The image shows a Sainsbury's supermarket with a modern, vertical living wall covered in
 > green vegetation on its facade. The building is situated in an urban area with a clear
-> sky, and two pedestrians are walking near the entrance, carrying shopping bags. A white
-> car is driving past the building, and the sunlight casts long shadows.
+> blue sky, and two pedestrians are walking near the entrance, carrying shopping bags. A
+> white car is driving past, and the lighting suggests late afternoon with long shadows.
 >
 > Keywords:
-> Sainsbury's supermarket, living wall facade, urban greening, vertical garden, brick
-> building, supermarket entrance, pedestrians, shopping bags, clear sky, modern
-> architecture, urban setting, daylight, long shadows
+> Sainsbury's supermarket, living wall facade, urban greening, vertical vegetation, brick
+> building, supermarket entrance, pedestrians with shopping bags, white car, clear blue
+> sky, late afternoon lighting, modern architecture
 <!-- markdownlint-enable MD028 MD049 -->
 
 ⚠️ **Quality Warnings:**
@@ -920,42 +1095,12 @@ Capture, GMT, GPS); Description sentence violation (3; expected 1-2)
 
 ---
 
-<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
-
-### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
-
-**Metrics:** Load 2.20s | Gen 10.85s | Total 13.38s
-**Throughput:** Prompt 383 TPS (3,206 tok) | Gen 55.6 TPS (116 tok)
-**Assessment:** ✅ B (69/100) | Δ+4 | Mostly echoes context without adding value
-**Review Status:** strong candidate for first-pass review
-**Review:** B 69/100 | No quality issues detected
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> \\*\\*Title:\\*\\*
-> Sainsbury's Supermarket with Living Wall and Shoppers
->
-> \\*\\*Description:\\*\\*
-> A Sainsbury's supermarket building features a large vertical living wall covered in
-> green foliage, set against a brick facade. Two shoppers walk near the entrance, carrying
-> bags, under clear blue skies and long shadows from nearby trees.
->
-> \\*\\*Keywords:\\*\\*
-> Sainsbury's Supermarket, living wall, brick facade, shoppers, shopping bags, urban
-> greenery, clear blue sky, long shadows, modern retail, Welwyn Garden City, sustainable
-> architecture, UK, supermarket exterior
-<!-- markdownlint-enable MD028 MD049 -->
-
-**Quality Status:** no quality issues detected in this run
-
----
-
 <a id="model-microsoft-phi-35-vision-instruct"></a>
 
 ### ✅ microsoft/Phi-3.5-vision-instruct
 
-**Metrics:** Load 0.52s | Gen 11.20s | Total 12.05s
-**Throughput:** Prompt 1,289 TPS (1,444 tok) | Gen 51.9 TPS (500 tok)
+**Metrics:** Load 1.52s | Gen 11.11s | Total 12.91s
+**Throughput:** Prompt 1,307 TPS (1,444 tok) | Gen 52.1 TPS (500 tok)
 **Assessment:** ✅ B (68/100) | Δ+2 | Mostly echoes context without adding value
 **Review Status:** watchlist (degeneration, harness)
 **Review:** B 68/100 | ⚠️HARNESS:stop_token; Output degeneration (excessive_newlines); ...
@@ -1297,42 +1442,12 @@ Capture, GMT, GPS); Description sentence violation (3; expected 1-2)
 
 ---
 
-<a id="model-mlx-community-pixtral-12b-bf16"></a>
-
-### ✅ mlx-community/pixtral-12b-bf16
-
-**Metrics:** Load 4.60s | Gen 11.97s | Total 16.90s
-**Throughput:** Prompt 558 TPS (3,396 tok) | Gen 19.5 TPS (107 tok)
-**Assessment:** ✅ B (67/100) | Δ+1 | Mostly echoes context without adding value
-**Review Status:** strong candidate for first-pass review
-**Review:** B 67/100 | No quality issues detected
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Title:
-> Sainsbury's Supermarket with Living Wall
->
-> Description:
-> A Sainsbury's supermarket with a prominent living wall facade is shown on a clear late
-> afternoon in early spring. Shoppers with bags exit the store, and a white car is parked
-> in front.
->
-> Keywords:
-> Sainsbury's, Supermarket, Living Wall, Urban Greening, Shoppers, Grocery Bags, Spring,
-> England, Brick Facade, Modern Architecture, Clear Sky, Bare Trees, White Car,
-> Sustainable Architecture, Urban Landscape
-<!-- markdownlint-enable MD028 MD049 -->
-
-**Quality Status:** no quality issues detected in this run
-
----
-
 <a id="model-mlx-community-gemma-3-27b-it-qat-8bit"></a>
 
 ### ✅ mlx-community/gemma-3-27b-it-qat-8bit
 
-**Metrics:** Load 6.74s | Gen 12.24s | Total 19.31s
-**Throughput:** Prompt 188 TPS (872 tok) | Gen 14.6 TPS (105 tok)
+**Metrics:** Load 6.80s | Gen 12.02s | Total 19.14s
+**Throughput:** Prompt 182 TPS (872 tok) | Gen 15.4 TPS (105 tok)
 **Assessment:** ✅ B (70/100) | Δ+4 | Mostly echoes context without adding value
 **Review Status:** watchlist (context ignored)
 **Review:** B 70/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
@@ -1360,12 +1475,42 @@ Capture, GMT, GPS)
 
 ---
 
+<a id="model-mlx-community-pixtral-12b-bf16"></a>
+
+### ✅ mlx-community/pixtral-12b-bf16
+
+**Metrics:** Load 4.56s | Gen 12.23s | Total 17.10s
+**Throughput:** Prompt 536 TPS (3,396 tok) | Gen 19.5 TPS (107 tok)
+**Assessment:** ✅ B (67/100) | Δ+1 | Mostly echoes context without adding value
+**Review Status:** strong candidate for first-pass review
+**Review:** B 67/100 | No quality issues detected
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Title:
+> Sainsbury's Supermarket with Living Wall
+>
+> Description:
+> A Sainsbury's supermarket with a prominent living wall facade is shown on a clear late
+> afternoon in early spring. Shoppers with bags exit the store, and a white car is parked
+> in front.
+>
+> Keywords:
+> Sainsbury's, Supermarket, Living Wall, Urban Greening, Shoppers, Grocery Bags, Spring,
+> England, Brick Facade, Modern Architecture, Clear Sky, Bare Trees, White Car,
+> Sustainable Architecture, Urban Landscape
+<!-- markdownlint-enable MD028 MD049 -->
+
+**Quality Status:** no quality issues detected in this run
+
+---
+
 <a id="model-mlx-community-llava-v16-mistral-7b-8bit"></a>
 
 ### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
 
-**Metrics:** Load 1.52s | Gen 14.55s | Total 16.43s
-**Throughput:** Prompt 241 TPS (2,829 tok) | Gen 43.6 TPS (105 tok)
+**Metrics:** Load 1.66s | Gen 12.70s | Total 14.69s
+**Throughput:** Prompt 287 TPS (2,829 tok) | Gen 43.1 TPS (105 tok)
 **Assessment:** ❌ F (20/100) | Δ-46 | Mostly echoes context without adding value
 **Review Status:** watchlist (missing sections)
 **Review:** F 20/100 | Missing sections (title, description, keywords)
@@ -1386,615 +1531,12 @@ Capture, GMT, GPS)
 
 ---
 
-<a id="model-mlx-community-paligemma2-10b-ft-docci-448-bf16"></a>
-
-### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
-
-**Metrics:** Load 5.07s | Gen 15.94s | Total 21.33s
-**Throughput:** Prompt 478 TPS (1,627 tok) | Gen 4.78 TPS (58 tok)
-**Assessment:** 🟡 C (64/100) | Δ-2 | Lacks visual description of image
-**Review Status:** watchlist (context ignored, missing sections, reasoning leak)
-**Review:** C 64/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Sainsbury, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
-Capture, GMT, GPS); Missing sections (title, description, keywords); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> \- Use only the metadata that is clearly supported by the image.
-> \- If metadata and image disagree, follow the image.
-> \- Do not copy prompt instructions into the Title, Description, or Keywords fields.
-> \- Do not output reasoning, notes, hedging, or extra sections.
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Sainsbury, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening Capture, GMT, GPS)
-- Missing sections (title, description, keywords)
-- Reasoning leak (do not output reasoning)
-
----
-
-<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
-
-### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
-
-**Metrics:** Load 3.59s | Gen 16.83s | Total 20.75s
-**Throughput:** Prompt 218 TPS (2,710 tok) | Gen 25.7 TPS (102 tok)
-**Assessment:** ❌ F (7/100) | Δ-59 | Output too short to be useful
-**Review Status:** watchlist (harness, missing sections)
-**Review:** F 7/100 | ⚠️HARNESS:encoding; Missing sections (description, keywords); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Title:ĠSainsbury'sĠSupermarketĠwithĠLivingĠWallĊĊDescription:ĠAĠSainsbury'sĠsupermarketĠbuildingĠfeaturesĠaĠlargeĠverticalĠgardenĠonĠitsĠfacade,ĠwithĠshoppersĠwalkingĠnearbyĠandĠcarsĠparkedĠinĠfront.ĠTheĠsceneĠisĠsetĠonĠaĠclearĠdayĠwithĠlongĠshadowsĠcastĠbyĠtheĠlowĠsun.ĊĊKeywords:ĠSainsbury's,Ġsupermarket,ĠlivingĠwall,ĠverticalĠgarden,ĠurbanĠgreening,ĠbrickĠfacade,Ġshoppers,Ġcars,ĠclearĠday,ĠlongĠshadows,ĠmodernĠretailĠbuilding,ĠsustainableĠarchitecture,ĠUK,ĠEurope
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- ⚠️HARNESS:encoding
-- Missing sections (description, keywords)
-- Title length violation (67 words; expected 5-10)
-- token_encoding:bpe_space_leak(65)
-
----
-
-<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
-
-### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
-
-**Metrics:** Load 11.81s | Gen 18.80s | Total 30.95s
-**Throughput:** Prompt 306 TPS (1,941 tok) | Gen 43.0 TPS (500 tok)
-**Assessment:** ✅ B (70/100) | Δ+4 | None identified
-**Review Status:** watchlist (missing sections)
-**Review:** B 70/100 | Missing sections (title, description, keywords)
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Let's tackle this step by step. First, the title needs to be concrete and factual,
-> limited to clearly visible content. The image shows a Sainsbury's supermarket with a
-> green living wall. So the title should mention that.
->
-> Next, the description: need to describe the main subject (Sainsbury's with living wall),
-> setting (urban, late afternoon, bare trees), lighting (low sun casting shadows), and
-> people (shoppers with bags). Wait, but the hint says to use only what's visible. Let me
-> check the image details again. The user provided the image description as "Sainsbury's
-> supermarket with a green living wall, late afternoon, bare trees, shoppers with bags,
-> modern building, green facade."
->
-> For keywords: need 10-18 unique terms. From the hint, Sainsbury's, living wall,
-> supermarket, green facade, urban, late afternoon, bare trees, shoppers, bags, modern,
-> England, UK, Welwyn Garden City, Howardsgate, spring (wait, but the hint says early
-> spring but the image has bare trees—maybe spring is okay? Wait, the hint says "early
-> spring" but the trees are bare. Wait, no, the user's image description says "late
-> afternoon in early spring" but the trees are bare. Wait, but the rules say to use only
-> what's visible. Wait, the hint's description says "early spring" but the image has bare
-> trees. Wait, no, the user's image is a Sainsbury's with a living wall, late afternoon,
-> bare trees, shoppers. So keywords should be based on visible elements: Sainsbury's,
-> living wall, supermarket, green facade, urban, late afternoon, bare trees, shoppers,
-> bags, modern, England, UK, Welwyn Garden City, Howardsgate, spring (maybe, but if the
-> trees are bare, maybe not. Wait, the hint's description says "early spring" but the
-> image has bare trees. Wait, the user's image is a Sainsbury's with a living wall, late
-> afternoon, bare trees, shoppers. So keywords: Sainsbury's, living wall, supermarket,
-> green facade, urban, late afternoon, bare trees, shoppers, bags, modern, England, UK,
-> Welwyn
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- Missing sections (title, description, keywords)
-
----
-
-<a id="model-mlx-community-apriel-15-15b-thinker-6bit-mlx"></a>
-
-### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
-
-**Metrics:** Load 2.84s | Gen 23.02s | Total 26.19s
-**Throughput:** Prompt 431 TPS (3,487 tok) | Gen 34.4 TPS (500 tok)
-**Assessment:** 🏆 A (83/100) | Δ+17 | None identified
-**Review Status:** watchlist (missing sections, reasoning leak)
-**Review:** A 83/100 | Missing sections (title, description, keywords); Reasoning leak (here are my reasoning steps, capture metadata:)
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Here are my reasoning steps:
-> We need to produce a catalog entry with Title, Description, Keywords. Use only details
-> that are clearly visible in the image. The image shows a modern building with a large
-> living wall (green vertical garden) covering most of the facade of a Sainsbury's
-> supermarket. The building is on a street with a clear blue sky, late afternoon sun
-> casting shadows from trees onto the brick lower part of the building. There are a few
-> people walking, a couple with shopping bags. Cars parked on the street: a white Mercedes
-> SUV, a black car. The building has a brick base, a large green wall above, and a glass
-> section on the right side. The Sainsbury's signage is visible on the left side of the
-> building (the older part) and on the right side (the modern part). The building is on
-> Howardsgate, Welwyn Garden City, England, UK. The date/time is given in capture
-> metadata: 2026-03-14 16:21:00 GMT. The GPS coordinates are given. However, we must only
-> include details that are clearly visible. The location (Howardsgate, Welwyn Garden City)
-> is not directly visible in the image; there is no sign indicating that. The Sainsbury's
-> sign is visible. The building's green facade is visible. The brick base is visible. The
-> sky is clear blue. The shadows from trees are visible. The people with shopping bags
-> are visible. The cars are visible. The time of day is indicated by the low sun casting
-> long shadows, but we cannot be sure of exact time. The date/time metadata is not visible
-> in the image; it's capture metadata. The instruction says "Use only details that are
-> clearly and definitely visible in the image." So we cannot include the date/time unless
-> it's visible in the image (like a timestamp overlay). It's not. So we must not include
-> that. The location is not visible; we cannot include it. The brand Sainsbury's is
-> visible. The building type (supermarket) is implied by the Sainsbury's sign. The green
-> wall is a living wall. The building is modern. The style is modern architecture. The
-> colors: green, brick red, glass, blue sky. The composition: street view, building front,
-> cars, pedestrians. The lighting: bright, clear, late afternoon with long shadows. The
-> action: people walking
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- Missing sections (title, description, keywords)
-- Reasoning leak (here are my reasoning steps, capture metadata:)
-
----
-
-<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
-
-### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
-
-**Metrics:** Load 2.57s | Gen 23.73s | Total 26.62s
-**Throughput:** Prompt 136 TPS (580 tok) | Gen 8.05 TPS (153 tok)
-**Assessment:** 🏆 A (82/100) | Δ+16 | None identified
-**Review Status:** watchlist (context ignored, missing sections)
-**Review:** A 82/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
-Capture, GMT, GPS); Missing sections (title, description, keywords)
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Title
-> Sainsbury's supermarket in a modern retail building with a living wall.
->
-> Description
-> The image shows a Sainsbury's supermarket in a modern retail building with a living
-> wall. The building is made of brick and has a large glass window on the front. The
-> living wall is covered in green plants and is located on the side of the building. The
-> sky is blue and clear, and there are no clouds visible. The overall atmosphere of the
-> image is one of a peaceful and serene environment, with the living wall adding a touch
-> of nature to the urban setting.
->
-> Keywords
-> Sainsbury's, supermarket, modern retail building, living wall, green plants, brick,
-> glass window, blue sky, clear, peaceful, serene, urban, nature.
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening Capture, GMT, GPS)
-- Missing sections (title, description, keywords)
-
----
-
-<a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
-
-### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
-
-**Metrics:** Load 2.18s | Gen 33.14s | Total 35.65s
-**Throughput:** Prompt 277 TPS (6,723 tok) | Gen 59.5 TPS (500 tok)
-**Assessment:** ✅ B (74/100) | Δ+8 | Missing requested structure
-**Review Status:** watchlist (context ignored, missing sections, reasoning leak)
-**Review:** B 74/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Spring, Urban Greening
-Capture, GMT, GPS); Missing sections (title, description, keywords); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> &lt;think&gt;Got it, let's tackle this. The user wants cataloging metadata for the image.
-> First, I need to extract only what's clearly visible.
->
-> Starting with the Title. The main subject is a Sainsbury's building with a living wall.
-> So a concise title would be "Sainsbury's Building with Living Wall".
->
-> Next, the Description. Need to mention the key elements: Sainsbury's sign, living green
-> wall, brick lower facade, white SUV, pedestrians with shopping bags, clear blue sky,
-> bare tree branches casting shadows.
->
-> So the description would be: "A Sainsbury's supermarket with a large living green wall,
-> brick lower facade, and a white SUV parked on the street. Pedestrians with shopping bags
-> walk on the sidewalk, under a clear blue sky with bare tree branches casting shadows."
->
-> Then Keywords. Need 10-18 unique terms. Let's list visible elements: Sainsbury's
-> (brand), living wall (green wall, vertical garden), brick facade, white SUV (car model,
-> color), pedestrians, shopping bags, clear blue sky, bare tree branches (foliage, tree),
-> urban setting, modern architecture, sustainable building (green building), vertical
-> greenery, retail building, supermarket.
->
-> Now select 12-16 unique terms. Let's pick: Sainsbury's, living wall, green wall, brick
-> facade, white SUV, pedestrians, shopping bags, clear blue sky, bare tree branches, urban
-> setting, modern architecture, sustainable building, vertical greenery, retail building,
-> supermarket.
->
-> Now pick the top 15-18. Let's list them: Sainsbury's, living wall, green wall, brick
-> facade, white SUV, pedestrians, shopping bags, clear blue sky, bare tree branches, urban
-> setting, modern architecture, sustainable building, vertical greenery, retail building,
-> supermarket.
->
-> Now select 12-18. Let's pick 15: Sainsbury's, living wall, green wall, brick facade,
-> white SUV, pedestrians, shopping bags, clear blue sky, bare tree branches, urban
-> setting, modern architecture, sustainable building. Wait, need 10-18. Let's check the
-> image again. Visible elements: Sainsbury's (red text), living green wall (vertical
-> garden), brick lower part, white SUV (Mercedes, since logo is visible), pedestrians (two
-> people, woman with green bag, man with brown bag), sidewalk, street with white SUV,
-> brown SUV parked in garage
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Spring, Urban Greening Capture, GMT, GPS)
-- Missing sections (title, description, keywords)
-- Reasoning leak (&lt;think&gt;)
-- Unknown tags: &lt;think&gt;
-
----
-
-<a id="model-mlx-community-glm-46v-flash-6bit"></a>
-
-### ✅ mlx-community/GLM-4.6V-Flash-6bit
-
-**Metrics:** Load 2.38s | Gen 34.45s | Total 37.15s
-**Throughput:** Prompt 297 TPS (6,723 tok) | Gen 43.9 TPS (500 tok)
-**Assessment:** ✅ B (75/100) | Δ+9 | Missing requested structure
-**Review Status:** watchlist (context ignored, missing sections, reasoning leak)
-**Review:** B 75/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Shoppers, Spring, Sustainable, Urban Greening
-Capture, GMT, GPS); Missing sections (title, description, keywords); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> &lt;think&gt;Got it, let's tackle this step by step. First, I need to extract the Title,
-> Description, and Keywords based only on what's clearly visible in the image.
->
-> Starting with the Title. The main subject is a Sainsbury's building with a living wall.
-> So the title should be concise and factual. Maybe "Sainsbury's building with living wall
-> facade".
->
-> Next, Description. Need to include main elements: the building with "Sainsbury's" sign,
-> the living wall (vertical garden), brick lower facade, clear blue sky, street with cars
-> (white Mercedes, dark SUV), pedestrians with shopping bags, "No entry" sign, bare tree
-> branches casting shadows.
->
-> Need to keep it factual, no inferences. So: "A Sainsbury's supermarket building with a
-> large living wall (vertical garden) on its facade. The building has a brick lower
-> section and glass windows. A white Mercedes-Benz SUV and a dark SUV are parked near the
-> building. Pedestrians with shopping bags walk on the sidewalk. A 'No entry' sign is
-> visible above the parking entrance. Bare tree branches cast shadows on the building
-> under a clear blue sky."
->
-> Wait, but need to keep it concise, 1-2 sentences. Let's trim:
->
-> "A Sainsbury's supermarket building featuring a large living wall (vertical garden) on
-> its facade. The building has a brick lower section and glass windows. A white
-> Mercedes-Benz SUV and a dark SUV are parked near the building. Pedestrians with shopping
-> bags walk on the sidewalk. A 'No entry' sign is visible above the parking entrance.
-> Bare tree branches cast shadows on the building under a clear blue sky."
->
-> That's a bit long, but maybe necessary to include all clear details. But the instruction
-> says 1-2 factual sentences. So let's condense:
->
-> "A Sainsbury's supermarket building with a large living wall (vertical garden) on its
-> facade. The building has a brick lower section and glass windows. A white Mercedes-Benz
-> SUV and a dark SUV are parked near the building. Pedestrians with shopping bags walk on
-> the sidewalk. A 'No entry' sign is visible above the parking entrance. Bare tree
-> branches cast shadows on the building under a clear blue sky."
->
-> Hmm, maybe too long. Let's try to make it two sentences:
->
-> "A Sainsbury's supermarket building with a large living wall (vertical garden) on its
-> facade. The building has a brick lower section and glass
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Shoppers, Spring, Sustainable, Urban Greening Capture, GMT, GPS)
-- Missing sections (title, description, keywords)
-- Reasoning leak (&lt;think&gt;)
-- Unknown tags: &lt;think&gt;
-
----
-
-<a id="model-mlx-community-molmo-7b-d-0924-bf16"></a>
-
-### ✅ mlx-community/Molmo-7B-D-0924-bf16
-
-**Metrics:** Load 2.93s | Gen 40.54s | Total 43.80s
-**Throughput:** Prompt 51.0 TPS (1,788 tok) | Gen 27.0 TPS (125 tok)
-**Assessment:** 🟡 C (56/100) | Δ-10 | Missing requested structure
-**Review Status:** watchlist (context ignored, missing sections)
-**Review:** C 56/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Shoppers, Shopping Bags, Sustainable, Urban Greening
-Capture, GMT, GPS); Missing sections (title, description, keywords)
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Camera: Canon EOS R5 with RF 24-105mm f/4L IS USM lens. ISO: 400. Shutter speed:
-> 1/250s. Aperture: f/4.0. White balance: 5600K. Exposure compensation: +0.7 EV. Color
-> temperature: 5600K. White balance: AWB. Focus: Manual. Lighting: Natural, late
-> afternoon. Season: Early spring. Subject: Living wall on Sainsbury's supermarket. Style:
-> Photographic representationalism realism.
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Shoppers, Shopping Bags, Sustainable, Urban Greening Capture, GMT, GPS)
-- Missing sections (title, description, keywords)
-
----
-
-<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
-
-### ✅ mlx-community/Molmo-7B-D-0924-8bit
-
-**Metrics:** Load 1.89s | Gen 42.41s | Total 44.63s
-**Throughput:** Prompt 52.1 TPS (1,788 tok) | Gen 42.9 TPS (312 tok)
-**Assessment:** 🟡 C (56/100) | Δ-10 | Mostly echoes context without adding value
-**Review Status:** watchlist (refusal)
-**Review:** C 56/100 | Refusal detected (insufficient_info)
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Camera: Canon EOS R5 with RF 24-105mm f/4L IS USM lens. ISO: 400. Shutter speed:
-> 1/250s. Aperture: f/4.0. White balance: 5600K. Exposure compensation: +0.7 EV. Color
-> temperature: 5600K. White balance: As shot. Focus: Manual. Lighting: Natural, late
-> afternoon sun. Film simulation: Standard. Post-processing: Minimal adjustments to
-> contrast and sharpness. Image style: Photographic representationalism, realism. Image
-> quality: High definition, 4K (3840x2160). Watermark: Adobe Stock #51800333. Copyright:
-> 2026, Any Vision. Photographer: Howardsgate, Welwyn Garden City, England, United
-> Kingdom, UK
-> Title: Living wall adorns Sainsbury's facade in Welwyn Garden City, England
->
-> Description: A striking green living wall brings life to the urban landscape of
-> Howardsgate in Welwyn Garden City, England. The low sun casts long shadows from
-> bare-branched trees onto the brick facade of a Sainsbury's supermarket, where shoppers
-> are seen making their way home with their groceries.
->
-> Keywords: Living wall, Sainsbury's, Welwyn Garden City, England, United Kingdom, UK,
-> Modern retail building, Supermarket, Sustainable architecture, UK, United Kingdom, Urban
-> Greening
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- Refusal detected (insufficient_info)
-
----
-
-<a id="model-meta-llama-llama-32-11b-vision-instruct"></a>
-
-### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
-
-**Metrics:** Load 1.54s | Gen 42.92s | Total 44.81s
-**Throughput:** Prompt 156 TPS (581 tok) | Gen 3.74 TPS (145 tok)
-**Assessment:** 🏆 A (84/100) | Δ+18 | None identified
-**Review Status:** watchlist (context ignored, missing sections)
-**Review:** A 84/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
-Capture, GMT, GPS); Missing sections (title, description, keywords)
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Sainsbury's Supermarket in a Modern Retail Building with a Green Wall
->
-> The image depicts a Sainsbury's supermarket situated in a modern retail building,
-> characterized by a striking green wall that covers the side of the building. The
-> building's façade is made of red brick and features a large glass window on the right
-> side. The green wall is composed of various plants and mosses, adding a touch of nature
-> to the urban landscape. The building is situated in a busy street, with a white car
-> driving by and people walking on the sidewalk. The sky above is a clear blue, indicating
-> a sunny day. The overall atmosphere of the image is one of a bustling urban area with a
-> touch of natural beauty.
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening Capture, GMT, GPS)
-- Missing sections (title, description, keywords)
-
----
-
-<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
-
-### ✅ mlx-community/X-Reasoner-7B-8bit
-
-**Metrics:** Load 2.20s | Gen 48.35s | Total 50.88s
-**Throughput:** Prompt 377 TPS (16,837 tok) | Gen 47.8 TPS (150 tok)
-**Assessment:** 🏆 A (89/100) | Δ+23 | None identified
-**Review Status:** strong candidate for first-pass review
-**Review:** A 89/100 | Title length violation (4 words; expected 5-10); Description sentence violation (4; expected 1-2); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Title:
-> Sainsbury's with Living Wall
->
-> Description:
-> A Sainsbury's supermarket features a vertical green wall on its exterior, with a clear
-> blue sky above. Shoppers exit the store, carrying shopping bags, while a car is parked
-> nearby. The building has a brick facade and large glass windows, with a "No entry" sign
-> visible. The scene is set in a sunny urban area.
->
-> Keywords:
-> Sainsbury's, Living Wall, Vertical Garden, Supermarket, Urban Greening, Shopping,
-> Shoppers, Car, Brick Facade, Glass Windows, No Entry Sign, Clear Sky, Sunny Day, Modern
-> Retail, England, UK, Hertfordshire, Howardsgate, Sainsbury's Welwyn Garden City
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- Title length violation (4 words; expected 5-10)
-- Description sentence violation (4; expected 1-2)
-- Keyword count violation (19; expected 10-18)
-
----
-
-<a id="model-qwen-qwen3-vl-2b-instruct"></a>
-
-### ✅ Qwen/Qwen3-VL-2B-Instruct
-
-**Metrics:** Load 0.82s | Gen 50.97s | Total 52.09s
-**Throughput:** Prompt 385 TPS (16,826 tok) | Gen 73.8 TPS (500 tok)
-**Assessment:** ✅ B (67/100) | Δ+1 | Mostly echoes context without adding value
-**Review Status:** watchlist (harness, long context, repetitive)
-**Review:** B 67/100 | ⚠️HARNESS:long_context; Repetitive output (phrase: "nature, people, shopping, car,..."); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Title:
-> Sainsbury's Green Wall
->
-> Description:
-> A modern Sainsbury's supermarket in Howardsgate, Welwyn Garden City, England, features a
-> striking green living wall on its brick facade. Shoppers walk along the sidewalk in
-> front of the store, with a white and a dark SUV parked nearby. The scene is captured on
-> a clear late afternoon with long shadows from bare trees.
->
-> Keywords:
-> Sainsbury's, Green Wall, Modern Retail, Urban Greening, Brick Facade, Shopping Bags,
-> Shoppers, Spring, Supermarket, Sustainable Architecture, England, UK, United Kingdom,
-> Howardsgate, Welwyn Garden City, Hertfordshire, Eco-friendly facade, Living Wall, Modern
-> Retail Building, Sainsbury's Welwyn Garden City, Spring, Urban Landscape, Concrete,
-> Brick, Greenery, Nature, People, Shopping, Car, SUV, White Car, Dark Car, Greenery,
-> Urban, Nature, People, Shopping, Car, SUV, White Car, Dark Car, Greenery, Urban, Nature,
-> People, Shopping, Car, SUV, White Car, Dark Car, Greenery, Urban, Nature, People,
-> Shopping, Car, SUV, White Car, Dark Car, Greenery, Urban, Nature, People, Shopping, Car,
-> SUV, White Car, Dark Car, Greenery, Urban, Nature, People, Shopping, Car, SUV, White
-> Car, Dark Car, Greenery, Urban, Nature, People, Shopping, Car, SUV, White Car, Dark Car,
-> Greenery, Urban, Nature, People, Shopping, Car, SUV, White Car, Dark Car, Greenery,
-> Urban, Nature, People, Shopping, Car, SUV, White Car, Dark Car, Greenery, Urban, Nature,
-> People, Shopping, Car, SUV, White Car, Dark Car, Greenery, Urban, Nature, People,
-> Shopping, Car, SUV, White Car, Dark Car, Greenery, Urban, Nature, People, Shopping, Car,
-> SUV, White Car, Dark Car, Greenery, Urban, Nature, People, Shopping, Car, SUV, White
-> Car, Dark Car, Greenery, Urban, Nature, People, Shopping, Car, SUV, White Car, Dark Car,
-> Greenery, Urban, Nature, People, Shopping, Car, SUV, White Car, Dark Car, Greenery,
-> Urban, Nature, People, Shopping, Car, SUV, White Car, Dark Car, Greenery
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- ⚠️HARNESS:long_context
-- Repetitive output (phrase: "nature, people, shopping, car,...")
-- Title length violation (3 words; expected 5-10)
-- Description sentence violation (3; expected 1-2)
-- Keyword count violation (168; expected 10-18)
-- Keyword duplication (81% duplicated terms)
-- long_context_repetition(16826tok)
-
----
-
-<a id="model-mlx-community-qwen3-vl-2b-thinking-bf16"></a>
-
-### ✅ mlx-community/Qwen3-VL-2B-Thinking-bf16
-
-**Metrics:** Load 1.50s | Gen 57.94s | Total 59.77s
-**Throughput:** Prompt 334 TPS (16,828 tok) | Gen 70.7 TPS (500 tok)
-**Assessment:** 🏆 A (84/100) | Δ+18 | None identified
-**Review Status:** watchlist (context ignored, harness, long context, missing sections)
-**Review:** A 84/100 | ⚠️HARNESS:long_context; Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Spring, Sustainable, Urban Greening
-Capture, GMT, GPS); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Got it, let's tackle this step by step. First, I need to analyze the image for metadata.
-> The user provided a draft catalog record with hints, but I have to stick to what's
-> clearly visible.
->
-> Starting with the Title. The image shows a Sainsbury's supermarket with a living wall.
-> The title needs to be 5-10 words, factual, visible. The main subject is the Sainsbury's
-> building with the green wall. So "Sainsbury's Supermarket with Living Wall" – that's 10
-> words, concrete.
->
-> Description: Needs 1-2 sentences. Main subject: Sainsbury's supermarket building with a
-> vertical green wall. Setting: urban street, clear blue sky, people walking, cars.
-> Distinctive details: brick facade, green living wall, people with shopping bags, cars
-> parked. Let's check: "Sainsbury's Supermarket building with a vertical green living wall
-> on a sunny urban street with pedestrians and cars." Wait, but the image has a brick
-> building, green wall, people walking, cars. So "Sainsbury's Supermarket building
-> featuring a vertical green living wall on a sunny urban street with pedestrians and
-> cars." That's two sentences, factual.
->
-> Keywords: 10-18 unique terms. Visible subjects: Sainsbury's Supermarket, vertical green
-> living wall, urban street, brick building, pedestrians, shopping bags, cars, clear blue
-> sky, modern architecture, greenery. Let's list: Sainsbury's Supermarket, Vertical Green
-> Living Wall, Urban Street, Brick Building, Pedestrians, Shopping Bags, Cars, Clear Blue
-> Sky, Modern Architecture, Greenery. Wait, need to check if these are visible. The image
-> has Sainsbury's sign, green wall, people with bags, cars, brick building, blue sky. So
-> keywords: Sainsbury's Supermarket, Vertical Green Living Wall, Urban Street, Brick
-> Building, Pedestrians, Shopping Bags, Cars, Clear Blue Sky, Modern Architecture,
-> Greenery. Let's count: 10 terms. Check if any are uncertain. The image shows Sainsbury's
-> sign, so "Sainsbury's Supermarket" is visible. The green wall is a vertical living
-> wall, so "Vertical Green Living Wall" is visible. Urban street with cars and
-> pedestrians, so "Urban Street", "Brick Building", "Pedestrians", "Shopping Bags",
-> "Cars", "
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- ⚠️HARNESS:long_context
-- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Spring, Sustainable, Urban Greening Capture, GMT, GPS)
-- Missing sections (title)
-- Description sentence violation (6; expected 1-2)
-- Keyword count violation (42; expected 10-18)
-- Keyword duplication (54% duplicated terms)
-- long_context_context_drop(16828tok)
-
----
-
-<a id="model-mlx-community-glm-46v-nvfp4"></a>
-
-### ✅ mlx-community/GLM-4.6V-nvfp4
-
-**Metrics:** Load 12.37s | Gen 59.21s | Total 71.91s
-**Throughput:** Prompt 159 TPS (6,723 tok) | Gen 30.7 TPS (500 tok)
-**Assessment:** 🏆 A (85/100) | Δ+19 | None identified
-**Review Status:** watchlist (missing sections, reasoning leak)
-**Review:** A 85/100 | Missing sections (title, description); Keyword count violation (36; expected 10-18); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> &lt;think&gt;Got it, let's tackle this step by step. First, the Title. It needs to be 5-10
-> words, concrete, and factual. The main subject is a Sainsbury's building with a living
-> wall. So maybe "Sainsbury's supermarket with a living wall facade". Wait, let's check:
-> the image shows a Sainsbury's building with a large green living wall. Yes, that's
-> clear. Let's make it concise: "Sainsbury's supermarket with a living wall facade".
->
-> Next, the Description. It needs 1-2 factual sentences. Let's include the main subject
-> (Sainsbury's building), the living wall, the setting (urban, clear day), and maybe the
-> people. Let's see: "A Sainsbury's supermarket features a large vertical living wall
-> facade. The building has a brick lower section and glass upper windows, with a clear
-> blue sky above. Two people stand on the sidewalk near the entrance, and cars are parked
-> along the street." Wait, does the image show two people? Yes, a man and a woman with
-> shopping bags. Cars: a white Mercedes and a brown SUV. Let's make it accurate: "A
-> Sainsbury's supermarket displays a large vertical living wall facade. The building
-> combines a brick lower section with glass upper windows, set against a clear blue sky.
-> Two people stand on the sidewalk near the entrance, and cars are parked along the
-> street."
->
-> Keywords: Need 10-18 unique terms. Let's list what's visible: Sainsbury's, supermarket,
-> living wall, facade, brick, glass, clear sky, sidewalk, people, cars, shopping bags,
-> urban, modern, eco-friendly (since it's a living wall), England (wait, is England
-> visible? The image doesn't show location, but the hint says England, but the user said
-> not to infer unless obvious. Wait, the hint says existing metadata hints include
-> England, but the user said to use only what's clearly visible. Wait, the problem says:
-> "Use only details that are clearly and definitely visible in the image. If a detail is
-> uncertain, ambiguous, partially obscured, too small to verify, or not directly visible,
-> leave it out." So England is not visible in the image, so we can't include it. Let's
-> list visible terms: Sainsbury's, supermarket, living wall, facade, brick, glass, clear
-> sky, sidewalk, people, cars,
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- Missing sections (title, description)
-- Keyword count violation (36; expected 10-18)
-- Reasoning leak (&lt;think&gt;)
-- Unknown tags: &lt;think&gt;
-
----
-
 <a id="model-mlx-community-paligemma2-3b-pt-896-4bit"></a>
 
 ### ✅ mlx-community/paligemma2-3b-pt-896-4bit
 
-**Metrics:** Load 7.09s | Gen 65.23s | Total 74.12s
-**Throughput:** Prompt 269 TPS (4,699 tok) | Gen 10.6 TPS (500 tok)
+**Metrics:** Load 2.56s | Gen 15.10s | Total 18.00s
+**Throughput:** Prompt 1,635 TPS (4,699 tok) | Gen 42.8 TPS (500 tok)
 **Assessment:** ✅ B (65/100) | Δ-1 | Lacks visual description of image
 **Review Status:** watchlist (context ignored, missing sections, reasoning leak, repetitive)
 **Review:** B 65/100 | Repetitive output (phrase: "- output only the..."); Excessive bullet points (38); ...
@@ -2006,8 +1548,8 @@ Capture, GMT, GPS); ...
 > \- Do not output reasoning, notes, hedging, or extra sections.
 > \- Do not output prompt instructions into the Title, Description, or Keywords fields.
 > \- Output only the description text after the label.
-> \- Output only the keyword list after the label.
 > \- Do not output reasoning, notes, hedging, or extra sections.
+> \- Output only the keyword list after the label.
 > \- Do not output prompt instructions into the Title, Description, or Keywords fields.
 > \- Output only the description text after the label.
 > \- Output only the keyword list after the label.
@@ -2051,12 +1593,299 @@ Capture, GMT, GPS); ...
 
 ---
 
+<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
+
+### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+
+**Metrics:** Load 8.95s | Gen 15.46s | Total 24.75s
+**Throughput:** Prompt 610 TPS (1,941 tok) | Gen 43.6 TPS (500 tok)
+**Assessment:** ✅ B (70/100) | Δ+4 | None identified
+**Review Status:** watchlist (missing sections)
+**Review:** B 70/100 | Missing sections (title, description, keywords)
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Let's tackle this step by step. First, the title needs to be concrete and factual,
+> limited to clearly visible content. The image shows a Sainsbury's supermarket with a
+> green living wall. So the title should mention that.
+>
+> Next, the description: need to describe the main subject (Sainsbury's with living wall),
+> setting (urban, late afternoon, bare trees), lighting (low sun casting shadows), and
+> people (shoppers with bags). Wait, but the hint says to use only what's visible. Let me
+> check the image details again. The user provided the image description as "Sainsbury's
+> supermarket with a green living wall, late afternoon, bare trees, shoppers with bags,
+> modern building, green facade."
+>
+> For keywords: need 10-18 unique terms. From the hint, Sainsbury's, living wall,
+> supermarket, green facade, urban, late afternoon, bare trees, shoppers, bags, modern,
+> England, UK, Welwyn Garden City, Howardsgate, spring (wait, but the hint says early
+> spring but the image has bare trees—maybe spring is okay? Wait, the hint says "early
+> spring" but the trees are bare. Wait, no, the user's image description says "late
+> afternoon in early spring" but the trees are bare. Wait, but the rules say to use only
+> what's visible. Wait, the hint's description says "early spring" but the image has bare
+> trees. Wait, no, the user's image is a Sainsbury's with a living wall, late afternoon,
+> bare trees, shoppers. So keywords should be based on visible elements: Sainsbury's,
+> living wall, supermarket, green facade, urban, late afternoon, bare trees, shoppers,
+> bags, modern, England, UK, Welwyn Garden City, Howardsgate, spring (maybe, but if the
+> trees are bare, maybe not. Wait, the hint's description says "early spring" but the
+> image has bare trees. Wait, the user's image is a Sainsbury's with a living wall, late
+> afternoon, bare trees, shoppers. So keywords: Sainsbury's, living wall, supermarket,
+> green facade, urban, late afternoon, bare trees, shoppers, bags, modern, England, UK,
+> Welwyn
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Missing sections (title, description, keywords)
+
+---
+
+<a id="model-mlx-community-paligemma2-10b-ft-docci-448-bf16"></a>
+
+### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
+
+**Metrics:** Load 5.01s | Gen 15.78s | Total 21.12s
+**Throughput:** Prompt 482 TPS (1,627 tok) | Gen 4.83 TPS (58 tok)
+**Assessment:** 🟡 C (64/100) | Δ-2 | Lacks visual description of image
+**Review Status:** watchlist (context ignored, missing sections, reasoning leak)
+**Review:** C 64/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Sainsbury, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
+Capture, GMT, GPS); Missing sections (title, description, keywords); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> \- Use only the metadata that is clearly supported by the image.
+> \- If metadata and image disagree, follow the image.
+> \- Do not copy prompt instructions into the Title, Description, or Keywords fields.
+> \- Do not output reasoning, notes, hedging, or extra sections.
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Sainsbury, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening Capture, GMT, GPS)
+- Missing sections (title, description, keywords)
+- Reasoning leak (do not output reasoning)
+
+---
+
+<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
+
+### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+
+**Metrics:** Load 3.56s | Gen 16.53s | Total 20.42s
+**Throughput:** Prompt 216 TPS (2,710 tok) | Gen 28.2 TPS (102 tok)
+**Assessment:** ❌ F (7/100) | Δ-59 | Output too short to be useful
+**Review Status:** watchlist (harness, missing sections)
+**Review:** F 7/100 | ⚠️HARNESS:encoding; Missing sections (description, keywords); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Title:ĠSainsbury'sĠSupermarketĠwithĠLivingĠWallĊĊDescription:ĠAĠSainsbury'sĠsupermarketĠbuildingĠfeaturesĠaĠlargeĠverticalĠgardenĠonĠitsĠfacade,ĠwithĠshoppersĠwalkingĠnearbyĠandĠcarsĠparkedĠinĠfront.ĠTheĠsceneĠisĠsetĠonĠaĠclearĠdayĠwithĠlongĠshadowsĠcastĠbyĠtheĠlowĠsun.ĊĊKeywords:ĠSainsbury's,Ġsupermarket,ĠlivingĠwall,ĠverticalĠgarden,ĠurbanĠgreening,ĠbrickĠfacade,Ġshoppers,Ġcars,ĠclearĠday,ĠlongĠshadows,ĠmodernĠretailĠbuilding,ĠsustainableĠarchitecture,ĠUK,ĠEurope
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- ⚠️HARNESS:encoding
+- Missing sections (description, keywords)
+- Title length violation (67 words; expected 5-10)
+- token_encoding:bpe_space_leak(65)
+
+---
+
+<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
+
+### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+
+**Metrics:** Load 2.55s | Gen 20.00s | Total 22.87s
+**Throughput:** Prompt 169 TPS (580 tok) | Gen 9.48 TPS (153 tok)
+**Assessment:** 🏆 A (82/100) | Δ+16 | None identified
+**Review Status:** watchlist (context ignored, missing sections)
+**Review:** A 82/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
+Capture, GMT, GPS); Missing sections (title, description, keywords)
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Title
+> Sainsbury's supermarket in a modern retail building with a living wall.
+>
+> Description
+> The image shows a Sainsbury's supermarket in a modern retail building with a living
+> wall. The building is made of brick and has a large glass window on the front. The
+> living wall is covered in green plants and is located on the side of the building. The
+> sky is blue and clear, and there are no clouds visible. The overall atmosphere of the
+> image is one of a peaceful and serene environment, with the living wall adding a touch
+> of nature to the urban setting.
+>
+> Keywords
+> Sainsbury's, supermarket, modern retail building, living wall, green plants, brick,
+> glass window, blue sky, clear, peaceful, serene, urban, nature.
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening Capture, GMT, GPS)
+- Missing sections (title, description, keywords)
+
+---
+
+<a id="model-mlx-community-apriel-15-15b-thinker-6bit-mlx"></a>
+
+### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
+
+**Metrics:** Load 2.73s | Gen 22.65s | Total 25.70s
+**Throughput:** Prompt 409 TPS (3,487 tok) | Gen 36.4 TPS (500 tok)
+**Assessment:** 🏆 A (93/100) | Δ+27 | None identified
+**Review Status:** watchlist (degeneration, missing sections, reasoning leak)
+**Review:** A 93/100 | Output degeneration (incomplete_sentence: ends with 'we'); Missing sections (title); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Here are my reasoning steps:
+> We need to produce a catalog entry with Title, Description, Keywords. Use only details
+> that are clearly visible in the image. The image shows a modern building with a large
+> living wall (green vertical garden) covering most of the facade of a Sainsbury's
+> supermarket. The building is on a street with a clear blue sky, late afternoon sun
+> casting shadows from trees onto the brick lower part of the building. There are cars
+> parked, a white Mercedes SUV, a black car, and a couple of pedestrians with shopping
+> bags. The Sainsbury's signage is visible. The building has a brick base, a metal frame,
+> and a large green wall. The building is modern, with large glass windows on one side.
+> The street is a typical urban street with a sidewalk, a bike rack, a lamppost, and a
+> road. The trees are bare (no leaves), indicating early spring. The sky is clear blue.
+> The lighting is bright, with long shadows.
+>
+> We need to produce Title: 5-10 words, concrete and factual, limited to clearly visible
+> content. So something like "Sainsbury's with living wall on Howardsgate". That's 6
+> words. Or "Living wall on Sainsbury's supermarket, Howardsgate". That's 7 words. Title
+> must be after the label "Title:" and only the title text. No extra.
+>
+> Description: 1-2 factual sentences describing main visible subject, setting, lighting,
+> action, and other distinctive visible details. Omit uncertain. So something like: "A
+> Sainsbury's supermarket on Howardsgate features a large green living wall that covers
+> most of its facade, with a brick base and glass windows. The late‑afternoon sun casts
+> long shadows from bare trees onto the building while shoppers walk along the sidewalk
+> with grocery bags." That's two sentences. Must be 1-2 sentences. That's okay.
+>
+> Keywords: 10-18 unique comma-separated terms based only on clearly visible subjects,
+> setting, colors, composition, style. So we need 10-18 terms. Terms like: Sainsbury's,
+> living wall, green facade, brick base, glass windows, urban street, sidewalk, shoppers,
+> shopping bags, white SUV, black car, bare trees, long shadows, clear blue sky, modern
+> architecture, sustainable design, early spring, Hertfordshire, United Kingdom. But we
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Output degeneration (incomplete_sentence: ends with 'we')
+- Missing sections (title)
+- Description sentence violation (6; expected 1-2)
+- Keyword count violation (23; expected 10-18)
+- Reasoning leak (here are my reasoning steps)
+
+---
+
+<a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
+
+### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
+
+**Metrics:** Load 2.09s | Gen 29.62s | Total 32.03s
+**Throughput:** Prompt 319 TPS (6,723 tok) | Gen 61.5 TPS (500 tok)
+**Assessment:** 🏆 A (93/100) | Δ+27 | None identified
+**Review Status:** watchlist (context ignored, missing sections, reasoning leak)
+**Review:** A 93/100 | Excessive bullet points (34); Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Spring, Urban Greening
+Capture, GMT, GPS); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> &lt;think&gt;Got it, let's tackle this. The user wants cataloging metadata for the image.
+> First, I need to extract only what's clearly visible.
+>
+> Starting with the Title. The main subject is a Sainsbury's with a living wall. So a
+> concise title: "Sainsbury's with Living Wall Facade"
+>
+> Next, Description. Need to describe the main elements. Visible: Sainsbury's sign, living
+> green wall, brick lower facade, white SUV, pedestrians with shopping bags, clear blue
+> sky, street with "No entry" sign, bare tree branches.
+>
+> So description: "A Sainsbury's supermarket with a large living green wall facade, brick
+> lower exterior, and a white SUV parked on the street. Pedestrians with shopping bags
+> walk on the sidewalk, under a clear blue sky. A 'No entry' sign is visible near the
+> parking area, with bare tree branches casting shadows on the building."
+>
+> Then Keywords. Need 10-18 unique terms. From the image: Sainsbury's, living wall, green
+> facade, supermarket, urban, street, car, pedestrians, shopping bags, brick, green wall,
+> clear sky, "No entry" sign, bare tree, white SUV, modern architecture, sustainable
+> building.
+>
+> Select the most relevant and unique ones. Let's list them:
+>
+> \- Sainsbury's
+> \- Living wall
+> \- Green facade
+> \- Supermarket
+> \- Urban
+> \- Street
+> \- Car
+> \- Pedestrians
+> \- Shopping bags
+> \- Brick
+> \- Green wall
+> \- Clear sky
+> \- "No entry" sign
+> \- Bare tree
+> \- White SUV
+> \- Modern architecture
+> \- Sustainable building
+>
+> Now, pick 10-18. Let's select the most distinct and visible ones. For example:
+>
+> \- Sainsbury's
+> \- Living wall
+> \- Green facade
+> \- Supermarket
+> \- Urban
+> \- Street
+> \- Car
+> \- Pedestrians
+> \- Shopping bags
+> \- Brick
+> \- Green wall
+> \- Clear sky
+> \- "No entry" sign
+> \- Bare tree
+> \- White SUV
+> \- Modern architecture
+> \- Sustainable building
+>
+> Now, pick the top 15-18. Let's list them:
+>
+> \1. Sainsbury's
+> \2. Living wall
+> \3. Green facade
+> \4. Supermarket
+> \5. Urban
+> \6. Street
+> \7. Car
+> \8. Pedestrians
+> \9. Shopping bags
+> \10. Brick
+> \11. Green wall
+> \12. Clear sky
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Excessive bullet points (34)
+- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Spring, Urban Greening Capture, GMT, GPS)
+- Missing sections (title, description, keywords)
+- Reasoning leak (&lt;think&gt;)
+- Unknown tags: &lt;think&gt;
+
+---
+
 <a id="model-mlx-community-paligemma2-3b-ft-docci-448-bf16"></a>
 
 ### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
 
-**Metrics:** Load 2.97s | Gen 68.87s | Total 72.23s
-**Throughput:** Prompt 1,557 TPS (1,627 tok) | Gen 7.45 TPS (500 tok)
+**Metrics:** Load 3.08s | Gen 31.37s | Total 34.78s
+**Throughput:** Prompt 1,550 TPS (1,627 tok) | Gen 16.7 TPS (500 tok)
 **Assessment:** 🏆 A (86/100) | Δ+20 | None identified
 **Review Status:** watchlist (context ignored, missing sections)
 **Review:** A 86/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Sainsbury, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
@@ -2101,36 +1930,336 @@ Capture, GMT, GPS); Missing sections (title, description, keywords)
 
 ---
 
-<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
+<a id="model-mlx-community-glm-46v-flash-6bit"></a>
 
-### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
+### ✅ mlx-community/GLM-4.6V-Flash-6bit
 
-**Metrics:** Load 1.06s | Gen 88.27s | Total 89.67s
-**Throughput:** Prompt 194 TPS (16,837 tok) | Gen 176 TPS (179 tok)
-**Assessment:** ❌ F (26/100) | Δ-40 | Mostly echoes context without adding value
-**Review Status:** watchlist (context echo)
-**Review:** F 26/100 | Description sentence violation (3; expected 1-2); Keyword count violation (20; expected 10-18); ...
+**Metrics:** Load 2.39s | Gen 33.56s | Total 36.28s
+**Throughput:** Prompt 304 TPS (6,723 tok) | Gen 45.6 TPS (500 tok)
+**Assessment:** 🏆 A (85/100) | Δ+19 | None identified
+**Review Status:** watchlist (context ignored, missing sections, reasoning leak)
+**Review:** A 85/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
+Capture, GMT, GPS); Missing sections (title, description, keywords); ...
 
 <!-- markdownlint-disable MD028 MD049 -->
 >
-> Title: Sainsbury's Supermarket, Howardsgate, Welwyn Garden City, England, United
+> &lt;think&gt;Got it, let's tackle this step by step. First, the Title needs to be 5-10 words,
+> concrete and factual. Looking at the image, the main subject is a Sainsbury's building
+> with a living wall. So possible title: "Sainsbury's building with living wall".
+>
+> Next, Description. Need 1-2 sentences, factual, visible. Let's list visible elements:
+> Sainsbury's sign, living wall (vertical garden) on the building, brick base of the
+> living wall, white SUV (Mercedes) on the street, two people walking on the sidewalk (one
+> with a green bag, one with a brown bag), "No entry" sign above the parking entrance,
+> clear blue sky, bare tree branches casting shadows on the building.
+>
+> So description: "A Sainsbury's supermarket building with a large living wall (vertical
+> garden) on its corner facade. The building has a brick base and glass windows. A white
+> Mercedes SUV is parked on the street, and two people walk on the sidewalk—one with a
+> green shopping bag, the other with a brown bag. A 'No entry' sign is visible above the
+> parking entrance, and bare tree branches cast shadows on the building under a clear blue
+> sky."
+>
+> Wait, need to keep it concise, 1-2 sentences. Let's trim:
+>
+> "A Sainsbury's supermarket building features a large living wall (vertical garden) on
+> its corner facade. The building has a brick base and glass windows. A white Mercedes SUV
+> is parked on the street, and two people walk on the sidewalk—one with a green shopping
+> bag, the other with a brown bag. A 'No entry' sign is visible above the parking
+> entrance, and bare tree branches cast shadows on the building under a clear blue sky."
+>
+> No, that's too long. Let's make it two sentences:
+>
+> "A Sainsbury's supermarket building with a large living wall (vertical garden) on its
+> corner facade. The building has a brick base and glass windows. A white Mercedes SUV is
+> parked on the street, and two people walk on the sidewalk—one with a green shopping bag,
+> the other with a brown bag. A 'No entry' sign is visible above the parking entrance,
+> and bare tree branches cast shadows on the building under a clear blue sky."
+>
+> No, the instruction says 1-2 factual sentences. Let's try:
+>
+> "A Sainsbury's supermarket building features a large living wall (vertical garden) on
+> its corner
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening Capture, GMT, GPS)
+- Missing sections (title, description, keywords)
+- Reasoning leak (&lt;think&gt;)
+- Unknown tags: &lt;think&gt;
+
+---
+
+<a id="model-meta-llama-llama-32-11b-vision-instruct"></a>
+
+### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
+
+**Metrics:** Load 3.93s | Gen 41.40s | Total 45.65s
+**Throughput:** Prompt 161 TPS (581 tok) | Gen 3.88 TPS (145 tok)
+**Assessment:** 🏆 A (84/100) | Δ+18 | None identified
+**Review Status:** watchlist (context ignored, missing sections)
+**Review:** A 84/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
+Capture, GMT, GPS); Missing sections (title, description, keywords)
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Sainsbury's Supermarket in a Modern Retail Building with a Green Wall
+>
+> The image depicts a Sainsbury's supermarket situated in a modern retail building,
+> characterized by a striking green wall that covers the side of the building. The
+> building's façade is made of red brick and features a large glass window on the right
+> side. The green wall is composed of various plants and mosses, adding a touch of nature
+> to the urban landscape. The building is situated in a busy street, with a white car
+> driving by and people walking on the sidewalk. The sky above is a clear blue, indicating
+> a sunny day. The overall atmosphere of the image is one of a bustling urban area with a
+> touch of natural beauty.
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening Capture, GMT, GPS)
+- Missing sections (title, description, keywords)
+
+---
+
+<a id="model-mlx-community-molmo-7b-d-0924-bf16"></a>
+
+### ✅ mlx-community/Molmo-7B-D-0924-bf16
+
+**Metrics:** Load 3.00s | Gen 41.85s | Total 45.17s
+**Throughput:** Prompt 51.1 TPS (1,788 tok) | Gen 27.9 TPS (169 tok)
+**Assessment:** 🟡 C (52/100) | Δ-14 | Lacks visual description of image
+**Review Status:** watchlist (context ignored, missing sections, refusal)
+**Review:** C 52/100 | Context ignored (missing: Howardsgate, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
+Capture, GMT, GPS); Refusal detected (insufficient_info); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Camera: Canon EOS R5 with RF 24-105mm f/4L IS USM lens. ISO: 400. Shutter speed:
+> 1/250s. Aperture: f/4.0. White balance: 5600K. Exposure compensation: +0.7 EV. Color
+> temperature: 5600K. White balance: As shot. Focus: Manual. Lighting: Natural, late
+> afternoon. Film type: Digital. Image style: Photographic representationalism, realism.
+> Image orientation: Horizontal. Image format: 16:9. Image size: 5120x3456 pixels. Image
+> quality: High. Image description: Living wall on Sainsbury's building in Welwyn Garden
+> City, England.
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Context ignored (missing: Howardsgate, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening Capture, GMT, GPS)
+- Refusal detected (insufficient_info)
+- Missing sections (title, description, keywords)
+
+---
+
+<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
+
+### ✅ mlx-community/X-Reasoner-7B-8bit
+
+**Metrics:** Load 2.17s | Gen 42.15s | Total 44.64s
+**Throughput:** Prompt 436 TPS (16,837 tok) | Gen 47.6 TPS (145 tok)
+**Assessment:** ✅ B (69/100) | Δ+3 | Mostly echoes context without adding value
+**Review Status:** strong candidate for first-pass review
+**Review:** B 69/100 | Title length violation (4 words; expected 5-10); Description sentence violation (3; expected 1-2); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Title:
+> Sainsbury's with Living Wall
+>
+> Description:
+> A Sainsbury's supermarket features a large vertical green wall on its exterior, creating
+> a striking contrast with the brick facade. Shoppers exit the store, carrying groceries,
+> under a clear blue sky. The scene is set in a modern retail environment with a car
+> parked nearby and a sidewalk adjacent to the building.
+>
+> Keywords:
+> Sainsbury's, Living Wall, Vertical Garden, Supermarket, Brick Facade, Shopping,
+> Shoppers, Clear Sky, Modern Architecture, Urban Greening, Sustainable Design, England,
+> UK, Hertfordshire, Howardsgate, Sainsbury's Welwyn Garden City, Spring, Retail Building,
+> Eco-Friendly Facade
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Title length violation (4 words; expected 5-10)
+- Description sentence violation (3; expected 1-2)
+- Keyword count violation (19; expected 10-18)
+
+---
+
+<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
+
+### ✅ mlx-community/Molmo-7B-D-0924-8bit
+
+**Metrics:** Load 1.88s | Gen 42.20s | Total 44.40s
+**Throughput:** Prompt 52.2 TPS (1,788 tok) | Gen 44.5 TPS (317 tok)
+**Assessment:** 🟡 C (56/100) | Δ-10 | Mostly echoes context without adding value
+**Review Status:** watchlist (refusal)
+**Review:** C 56/100 | Refusal detected (insufficient_info)
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Camera: Canon EOS R5 with RF 24-105mm f/4L IS USM lens. ISO: 400. Shutter speed:
+> 1/250s. Aperture: f/4.0. White balance: 5600K. Exposure compensation: +0.7 EV. Color
+> temperature: 5600K. White balance: As shot. Focus: Manual. Lighting: Natural, late
+> afternoon sun. Film simulation: Standard. Post-processing: Minimal adjustments to
+> contrast and sharpness. Image style: Photographic representationalism, realism. Image
+> quality: High definition, 4K (3840x2160). Watermark: Adobe Stock #51800333. Copyright:
+> 2026, Any Vision. Photographer: Howardsgate, Welwyn Garden City, England, United
 > Kingdom, UK
-> Description: A striking living wall brings nature to the urban landscape of Howardsgate
-> in Welwyn Garden City, England. The low sun casts long shadows from the bare-branched
-> trees onto the brick facade of a Sainsbury's supermarket, where shoppers are seen making
-> their way home with their groceries. Modern retail building, Sustainable architecture,
-> UK, United Kingdom, Urban Greening
-> Keywords: Adobe Stock, Any Vision, Eco-friendly facade, England, Europe, Hertfordshire,
-> Hertfordshire / England, Howardsgate, Locations, Modern retail building, Sainsbury's
-> Supermarket, Sainsbury's Welwyn Garden City, Shoppers, Shopping Bags, Spring,
-> Supermarket, Sustainable architecture, UK, United Kingdom, Urban Greening
+> Title: Living wall adorns Sainsbury's facade in Welwyn Garden City, England
+>
+> Description: A striking green living wall brings life to the urban landscape of
+> Howardsgate in Welwyn Garden City, England. The low sun casts long shadows from
+> bare-branched trees onto the brick facade of a Sainsbury's supermarket, where shoppers
+> are seen making their way home with their groceries.
+>
+> Keywords: Living wall, Sainsbury's, Welwyn Garden City, England, United Kingdom, UK,
+> Modern retail building, Sustainable architecture, Urban Greening, Shoppers, Shopping
+> Bags, Spring, Supermarket, UK
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Refusal detected (insufficient_info)
+
+---
+
+<a id="model-qwen-qwen3-vl-2b-instruct"></a>
+
+### ✅ Qwen/Qwen3-VL-2B-Instruct
+
+**Metrics:** Load 1.38s | Gen 45.39s | Total 47.08s
+**Throughput:** Prompt 392 TPS (16,826 tok) | Gen 75.4 TPS (146 tok)
+**Assessment:** ✅ B (68/100) | Δ+2 | Mostly echoes context without adding value
+**Review Status:** strong candidate for first-pass review
+**Review:** B 68/100 | Description sentence violation (3; expected 1-2)
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Title: Sainsbury's Green Wall in Howardsgate
+>
+> Description: A modern Sainsbury's supermarket in Howardsgate, Welwyn Garden City,
+> England, features a striking green living wall with plants and grass growing on its
+> facade. The building has a brick exterior and large glass windows, with people walking
+> by and a car parked nearby. The scene is captured on a clear day with long shadows from
+> bare trees.
+>
+> Keywords: Sainsbury's Supermarket, Green Wall, Urban Greening, Modern Retail Building,
+> England, UK, Howardsgate, Welwyn Garden City, Sustainable Architecture, Eco-friendly
+> facade, Shopping Bags, Spring, Supermarket, Brick Building, Living Wall, People, Car,
+> Street Scene
 <!-- markdownlint-enable MD028 MD049 -->
 
 ⚠️ **Quality Warnings:**
 
 - Description sentence violation (3; expected 1-2)
-- Keyword count violation (20; expected 10-18)
-- Context echo (97% overlap)
+
+---
+
+<a id="model-mlx-community-glm-46v-nvfp4"></a>
+
+### ✅ mlx-community/GLM-4.6V-nvfp4
+
+**Metrics:** Load 10.17s | Gen 49.36s | Total 59.86s
+**Throughput:** Prompt 203 TPS (6,723 tok) | Gen 31.7 TPS (500 tok)
+**Assessment:** 🏆 A (92/100) | Δ+26 | None identified
+**Review Status:** watchlist (missing sections, reasoning leak)
+**Review:** A 92/100 | Missing sections (title, description); Keyword count violation (35; expected 10-18); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> &lt;think&gt;Got it, let's tackle this step by step. First, the Title. It needs to be 5-10
+> words, concrete and factual. The main subject is a Sainsbury's building with a living
+> wall. So maybe "Sainsbury's supermarket with a living wall facade". Wait, let's check:
+> the image shows a Sainsbury's building, and the facade has a large green living wall.
+> That's clear. So Title: "Sainsbury's supermarket with a living wall facade".
+>
+> Next, Description. Need 1-2 factual sentences. The main subject is the Sainsbury's
+> building with the living wall. Setting: urban street, clear sky. Lighting: bright,
+> sunny. Distinctive details: the living wall, brick facade, shoppers with bags, cars
+> parked. Let's put it together: "A Sainsbury's supermarket with a large green living wall
+> facade stands on a street corner. The building has a brick lower section and glass
+> windows, with shoppers carrying bags and cars parked nearby under a clear blue sky."
+>
+> Keywords: Need 10-18 unique terms. Let's list visible ones: Sainsbury's, supermarket,
+> living wall, facade, brick, glass, shoppers, shopping bags, cars, street, clear sky,
+> urban, modern, eco-friendly, England (wait, is England visible? The image has
+> "Sainsbury's" which is a UK brand, but the hint says England, but do we see England? The
+> hint mentions it, but the user said to use only clearly visible. Wait, the hint says
+> "Existing metadata hints (high confidence; use only when visually confirmed)". Oh,
+> right, the context says the hints are high confidence. Wait, no, the user said: "Treat
+> the metadata hints below as a draft catalog record. Keep only details that are clearly
+> confirmed by the image, correct anything contradicted by the image, and add important
+> visible details that are definitely present." So the hints are draft, but we need to use
+> only what's visually confirmed. Wait, the hint says "Howardsgate, Welwyn Garden City,
+> England, United Kingdom, UK" are high confidence, but are they visible? The image has
+> "Sainsbury's" and a street, but do we see "Howardsgate" or "Welwyn Garden City"? No,
+> those are not visible. So we can't use them. The keywords should be based on what's
+> visible.
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Missing sections (title, description)
+- Keyword count violation (35; expected 10-18)
+- Reasoning leak (&lt;think&gt;)
+- Unknown tags: &lt;think&gt;
+
+---
+
+<a id="model-mlx-community-qwen3-vl-2b-thinking-bf16"></a>
+
+### ✅ mlx-community/Qwen3-VL-2B-Thinking-bf16
+
+**Metrics:** Load 1.47s | Gen 55.28s | Total 57.07s
+**Throughput:** Prompt 350 TPS (16,828 tok) | Gen 75.4 TPS (500 tok)
+**Assessment:** 🏆 A (83/100) | Δ+17 | None identified
+**Review Status:** watchlist (missing sections)
+**Review:** A 83/100 | Missing sections (title); Description sentence violation (7; expected 1-2); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Got it, let's tackle this step by step. First, I need to analyze the image for metadata.
+> The user provided a description hint and keyword hints, but I have to focus only on
+> what's clearly visible in the image.
+>
+> Starting with the Title. The image shows a Sainsbury's supermarket with a living wall.
+> The title needs to be 5-10 words, factual, visible. The main subject is the Sainsbury's
+> building with the green wall. So "Sainsbury's Green Wall Supermarket" – that's 8 words,
+> concrete and factual.
+>
+> Description: Need 1-2 sentences. The main visible subject is the Sainsbury's building
+> with a living wall. Setting is urban street, clear day. Lighting is sunny, shadows from
+> trees. Action: people walking, cars parked. Distinctive details: brick facade, green
+> living wall, Sainsbury's sign. So "A Sainsbury's supermarket with a vibrant green living
+> wall stands on a sunny street, with pedestrians walking and cars parked nearby."
+>
+> Keywords: Must be 10-18 unique, visible. From the image: Sainsbury's, green living wall,
+> urban street, brick building, pedestrians, cars, shopping bags (since there's a person
+> with a bag), clear sky, modern architecture, spring (since it's a clear day, maybe early
+> spring), England (but need to check if visible). Wait, the description hint says
+> England, but the image might not have that. Wait, the image shows a building with
+> Sainsbury's, so keywords should be based on visible elements. Let's list:
+>
+> Sainsbury's, green living wall, urban street, brick building, pedestrians, cars,
+> shopping bags, modern architecture, clear sky, spring (since it's a sunny day, maybe
+> early spring), England (but the image doesn't show the country, but the description hint
+> says England. Wait, the user says "do not infer identity, location, event, brand,
+> species, time period, or intent unless visually obvious." So the location is England,
+> but is it visible? The description hint says England, but the image might not have the
+> country name. Wait, the image is of a Sainsbury's in Welwyn Garden City, England. But
+> the image itself doesn't show the country, but the description hint says England. Wait,
+> the user says "do not infer identity, location, event, brand,
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Missing sections (title)
+- Description sentence violation (7; expected 1-2)
+- Keyword count violation (46; expected 10-18)
 
 ---
 
@@ -2138,64 +2267,55 @@ Capture, GMT, GPS); Missing sections (title, description, keywords)
 
 ### ✅ mlx-community/Qwen3.5-35B-A3B-6bit
 
-**Metrics:** Load 5.61s | Gen 89.18s | Total 95.12s
-**Throughput:** Prompt 207 TPS (16,850 tok) | Gen 68.4 TPS (500 tok)
-**Assessment:** 🏆 A (95/100) | Δ+29 | None identified
-**Review Status:** watchlist (context ignored, harness, long context, missing sections)
-**Review:** A 95/100 | ⚠️HARNESS:long_context; Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Spring, Sustainable, Urban Greening
-Capture, GMT, GPS); ...
+**Metrics:** Load 5.64s | Gen 72.70s | Total 78.66s
+**Throughput:** Prompt 257 TPS (16,850 tok) | Gen 74.4 TPS (500 tok)
+**Assessment:** ✅ B (73/100) | Δ+7 | Missing requested structure
+**Review Status:** watchlist (hallucination, missing sections, reasoning leak, refusal)
+**Review:** B 73/100 | Refusal detected (explicit_refusal); Missing sections (title, description, keywords); ...
 
 <!-- markdownlint-disable MD028 MD049 -->
 >
-> The user wants me to generate cataloguing metadata (Title, Description, Keywords) based
-> on the provided image.
-> I need to follow strict rules:
-> \- Only use clearly visible details.
-> \- No guessing or inferring.
-> \- Follow the image over the provided "Context" hints if they disagree, but use the hints
-> if confirmed.
-> \- Specific formatting for Title, Description, and Keywords.
+> The user wants me to analyze the provided image and generate cataloguing metadata in a
+> specific format: Title, Description, and Keywords.
 >
-> \\*\\*Image Analysis:\\*\\*
-> \- \\*\\*Subject:\\*\\* A large building with a prominent "living wall" (vertical garden) on its
-> upper section.
-> \- \\*\\*Signage:\\*\\* "Sainsbury's" is clearly visible in red letters on the beige facade.
-> Another "Sainsbury's" sign is visible further right.
-> \- \\*\\*Architecture:\\*\\*
-> \- Lower section: Red brick.
-> \- Middle section: Beige stone/concrete with the main Sainsbury's sign.
-> \- Upper section: A large grid structure covered in green plants (living wall).
-> \- Right side: Glass windows reflecting the sky and nearby buildings.
-> \- Far right: Louvered facade with another Sainsbury's sign.
-> \- \\*\\*Vehicles:\\*\\*
-> \- A white SUV (Mercedes-Benz logo visible) driving on the road in the foreground.
-> License plate partially visible (LS21 GNK).
-> \- A dark grey SUV parked or entering a parking garage entrance on the left.
-> \- \\*\\*People:\\*\\* Two people standing on the sidewalk on the right, carrying shopping bags.
-> One person walking further back near the entrance.
-> \- \\*\\*Setting:\\*\\* Urban street scene. Blue sky.
-> \- \\*\\*Lighting:\\*\\* Bright sunlight, casting long shadows from trees onto the building
-> facade. The shadows suggest low sun angle (morning or late afternoon).
-> \- \\*\\*Details:\\*\\* "No entry" sign above the parking garage entrance. Street lamp. Bicycle
-> parked on the far right.
+> \\*\\*1. Analyze the Image:\\*\\*
+> \*   \\*\\*Subject:\\*\\* A large building, clearly a Sainsbury's supermarket (red logo visible).
+> \*   \\*\\*Key Feature:\\*\\* A massive "living wall" or vertical garden covering the upper
+> section of the building's facade. It's divided into panels.
+> \*   \\*\\*Architecture:\\*\\* Modern design. Brick base (reddish-brown bricks). Large glass
+> windows on the right side.
+> \*   \\*\\*Setting:\\*\\* Urban street scene. There's a road in the foreground.
+> \*   \\*\\*People:\\*\\* Two people (a woman and a man) walking on the sidewalk on the right,
+> carrying shopping bags.
+> \*   \\*\\*Vehicles:\\*\\* A white SUV (Mercedes-Benz) driving on the road. A dark car is visible
+> entering/exiting a parking area under the building.
+> \*   \\*\\*Lighting:\\*\\* Bright sunlight, casting long shadows from trees onto the brick wall.
+> The sky is clear blue. The shadows suggest late afternoon or early morning (low sun
+> angle).
+> \*   \\*\\*Signage:\\*\\* "Sainsbury's" in red letters. "No entry" sign above a parking entrance.
+> "Argos" sign visible in the background on the right. "Sainsbury's Bank" sign visible.
+> \*   \\*\\*Details:\\*\\* Bare tree branches on the left casting shadows. A bicycle parked on the
+> far right.
 >
-> \\*\\*Drafting Title:\\*\\*
-> \- Needs to be 5-10 words.
-> \- Focus on the main subject: The living wall and the supermarket.
-> \- Draft 1: Sainsbury's Supermarket with a large living wall facade. (8 words) - Good.
-> \- Draft 2: Modern Sainsbury's building featuring a vertical garden wall. (8 words) -
-> Good.
-> \- Draft 3: Sainsbury's supermarket exterior with green living wall and white car. (9
-> words) - A bit cluttered.
->
+> \\*\\*2. Evaluate Metadata Hints:\\*\\*
+> \*   \*Description hint:\* "Howardsgate, Welwyn Garden City, England, United Kingdom, UK On
+> a clear late afternoon in early spring..." -> The location is specific. I can see
+> "Sainsbury's". The "late afternoon" fits the long shadows. "Early spring" fits the bare
+> trees but green living wall. I should be careful about the specific location name
+> "Howardsgate" unless I see a sign. I don't see a sign saying "Howardsgate", but the
+> prompt says "Existing metadata hints (high confidence; use only when visually
+> confirmed)". Wait, the prompt says "Reuse metadata terms only when they are clearly
+> supported by the image." It also says "If metadata and image disagree, follow the
+> image." The prompt \*gives\* me hints but tells me to use \*only\* what is visually
+> confirmed. I cannot confirm "Howardsgate" or "
 <!-- markdownlint-enable MD028 MD049 -->
 
 ⚠️ **Quality Warnings:**
 
-- ⚠️HARNESS:long_context
-- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Spring, Sustainable, Urban Greening Capture, GMT, GPS)
+- Refusal detected (explicit_refusal)
 - Missing sections (title, description, keywords)
-- long_context_context_drop(16850tok)
+- Reasoning leak (description hint:)
+- Contains question/quiz content
 
 ---
 
@@ -2203,8 +2323,8 @@ Capture, GMT, GPS); ...
 
 ### ✅ mlx-community/Qwen3.5-35B-A3B-bf16
 
-**Metrics:** Load 15.33s | Gen 96.47s | Total 112.25s
-**Throughput:** Prompt 195 TPS (16,850 tok) | Gen 53.7 TPS (500 tok)
+**Metrics:** Load 12.91s | Gen 76.25s | Total 89.49s
+**Throughput:** Prompt 253 TPS (16,850 tok) | Gen 54.9 TPS (500 tok)
 **Assessment:** 🏆 A (95/100) | Δ+29 | None identified
 **Review Status:** watchlist (context ignored, harness, long context, missing sections)
 **Review:** A 95/100 | ⚠️HARNESS:long_context; Excessive bullet points (33); ...
@@ -2213,7 +2333,7 @@ Capture, GMT, GPS); ...
 >
 > The user wants me to generate cataloguing metadata (Title, Description, Keywords) based
 > on the provided image.
-> I need to follow specific rules:
+> I need to follow strict rules:
 > \- Only use clearly visible details.
 > \- No guessing or inferring.
 > \- Follow the image over the provided hints if they disagree.
@@ -2224,16 +2344,16 @@ Capture, GMT, GPS); ...
 > upper section.
 > \- \\*\\*Building details:\\*\\*
 > \- Lower section: Red brick.
-> \- Middle section: Beige stone/concrete with "Sainsbury's" in red letters.
-> \- Upper section: A large grid structure covered in green plants (living wall).
+> \- Middle section: Beige stone/concrete facade with "Sainsbury's" in red letters.
+> \- Upper section: A large grid-like structure covered in green plants (living wall).
 > \- Right side: Glass windows reflecting the sky and nearby buildings.
 > \- Far right: Another "Sainsbury's" sign visible on a slatted facade.
-> \- Left side: Older brick building attached.
+> \- Far left: Older brick building with white window frames.
 > \- \\*\\*Foreground/Street:\\*\\*
 > \- A white SUV (Mercedes-Benz) driving on the road.
 > \- A dark grey SUV parked or moving slowly near the entrance.
 > \- Two people walking on the sidewalk carrying shopping bags (green and patterned).
-> \- A bicycle parked on the far right.
+> \- A bicycle parked near the right edge.
 > \- Street lamp.
 > \- "No entry" sign above a parking entrance.
 > \- \\*\\*Lighting/Sky:\\*\\*
@@ -2243,17 +2363,17 @@ Capture, GMT, GPS); ...
 > \- \\*\\*Text visible:\\*\\*
 > \- "Sainsbury's" (large red letters).
 > \- "No entry" (white text on black background).
+> \- "Argos" (small red sign).
+> \- "Sainsbury's Bank" (small sign).
 > \- License plate on white car: "LS21 GNK".
 > \- License plate on dark car: "LN75 XSK".
-> \- "Argos" sign visible in the distance on the right.
-> \- "Sainsbury's Bank" sign visible.
 >
 > \\*\\*Drafting Title:\\*\\*
 > \- Needs to be 5-10 words.
 > \- Focus on the main subject: The living wall and the supermarket.
 > \- Draft 1: Sainsbury's Supermarket with a large green living wall facade. (9 words) -
 > Good.
-> \- Draft 2: Modern Sainsbury
+> \- Draft 2: Modern S
 <!-- markdownlint-enable MD028 MD049 -->
 
 ⚠️ **Quality Warnings:**
@@ -2266,15 +2386,44 @@ Capture, GMT, GPS); ...
 
 ---
 
+<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
+
+### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
+
+**Metrics:** Load 1.00s | Gen 84.10s | Total 85.42s
+**Throughput:** Prompt 203 TPS (16,837 tok) | Gen 176 TPS (147 tok)
+**Assessment:** ❌ F (23/100) | Δ-43 | Mostly echoes context without adding value
+**Review Status:** watchlist (context echo)
+**Review:** F 23/100 | Context echo (96% overlap); suspicious_precision: 2 overly precise numbers
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Title: Sainsbury's Supermarket, Howardsgate, Welwyn Garden City, England, United
+> Kingdom, UK
+> Description: A striking living wall brings nature to the urban landscape of Howardsgate
+> in Welwyn Garden City, England, on a clear late afternoon in early spring, with shoppers
+> making their way home with groceries.
+> Keywords: Sainsbury's Supermarket, Howardsgate, Welwyn Garden City, England, United
+> Kingdom, UK, Urban Greening, Sustainable Architecture, Spring, Shoppers, Shopping Bags,
+> Modern Retail Building, Sainsbury's Welwyn Garden City, GPS: 51.800333°N, 0.207617°W
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Context echo (96% overlap)
+- suspicious_precision: 2 overly precise numbers
+
+---
+
 <a id="model-mlx-community-qwen35-27b-4bit"></a>
 
 ### ✅ mlx-community/Qwen3.5-27B-4bit
 
-**Metrics:** Load 3.64s | Gen 176.17s | Total 180.17s
-**Throughput:** Prompt 110 TPS (16,850 tok) | Gen 22.8 TPS (500 tok)
-**Assessment:** ✅ B (72/100) | Δ+6 | Missing requested structure
+**Metrics:** Load 3.63s | Gen 152.60s | Total 156.56s
+**Throughput:** Prompt 127 TPS (16,850 tok) | Gen 25.2 TPS (500 tok)
+**Assessment:** ✅ B (74/100) | Δ+8 | Missing requested structure
 **Review Status:** watchlist (context echo, missing sections, reasoning leak, refusal)
-**Review:** B 72/100 | Refusal detected (explicit_refusal); Missing sections (title, description, keywords); ...
+**Review:** B 74/100 | Refusal detected (explicit_refusal); Missing sections (title, description, keywords); ...
 
 <!-- markdownlint-disable MD028 MD049 -->
 >
@@ -2282,13 +2431,13 @@ Capture, GMT, GPS); ...
 > specific rules.
 >
 > \\*\\*1. Analyze the Image:\\*\\*
-> \*   \\*\\*Subject:\\*\\* A large building with a prominent "Sainsbury's" sign.
-> \*   \\*\\*Architecture:\\*\\* It's a mix of styles. There's an older brick section on the left
-> with a red tiled roof. There's a modern extension on the right featuring a large "living
-> wall" or vertical garden covering the upper facade. The lower part is red brick. There
-> are large glass windows on the right side.
-> \*   \\*\\*Signage:\\*\\* "Sainsbury's" in red letters is visible on the beige stone section and
-> again on the far right. A "No entry" sign is visible above a parking entrance.
+> \*   \\*\\*Subject:\\*\\* A large building, clearly a Sainsbury's supermarket.
+> \*   \\*\\*Architecture:\\*\\* It has a mix of styles. One section is a traditional brick
+> building with a tiled roof. Another section is a modern extension featuring a large
+> "living wall" or vertical garden covered in greenery. There are large glass windows on
+> the modern section.
+> \*   \\*\\*Signage:\\*\\* "Sainsbury's" is visible in red letters on the beige stone facade and
+> again on the far right. There's a "No entry" sign above a parking entrance.
 > \*   \\*\\*People:\\*\\* Two people (a man and a woman) are walking on the sidewalk in the
 > foreground, carrying shopping bags.
 > \*   \\*\\*Vehicles:\\*\\* A white SUV (Mercedes-Benz) is parked or stopped on the street in the
@@ -2296,21 +2445,21 @@ Capture, GMT, GPS); ...
 > \*   \\*\\*Setting/Environment:\\*\\* Urban street scene. Blue sky, clear weather. Shadows
 > suggest late afternoon sun (long shadows). Bare trees on the left suggest late autumn,
 > winter, or early spring.
-> \*   \\*\\*Details:\\*\\* "Argos" sign is visible in the distance on the right. "Sainsbury's
-> Bank" sign is visible.
+> \*   \\*\\*Colors:\\*\\* Green (plants), Red (bricks, Sainsbury's logo), Blue (sky, car), White
+> (car, building frame), Beige (stone facade).
 >
 > \\*\\*2. Evaluate Existing Metadata Hints:\\*\\*
 > \*   \*Description hint:\* Mentions "Howardsgate, Welwyn Garden City, England". This is
 > specific location data. I can see "Sainsbury's" but I cannot confirm the specific street
-> name "Howardsgate" or city "Welwyn Garden City" just from the visual pixels, although
-> the prompt says "Context: Existing metadata hints (high confidence; use only when
-> visually confirmed)". Wait, the prompt says "Use only details that are clearly and
+> name "Howardsgate" or city "Welwyn Garden City" just by looking at the image itself,
+> although the prompt says "Context: Existing metadata hints (high confidence; use only
+> when visually confirmed)". Wait, the prompt says "Use only details that are clearly and
 > definitely visible in the image." and "Do not infer identity, location... unless
-> visually obvious." The text "Howardsgate" is not visible in the image. The text "Welwyn
-> Garden City" is not visible. I must be careful. I can see "Sainsbury's". I can see the
-> living wall. I can see the brick.
-> \*   \*Keyword hints:\* "Adobe Stock", "Any Vision" (watermarks? No, not visible).
-> "Eco-friendly
+> visually obvious." The text "Howardsgate" is not visible in the image. The text
+> "Sainsbury's" is visible. I should be careful about the location. However, the prompt
+> instructions say "Treat the metadata hints below as a draft catalog record. Keep only
+> details that are clearly confirmed by the image". This implies I should verify the
+> hints. I cannot verify "Howardsgate" or "Welwyn Garden
 <!-- markdownlint-enable MD028 MD049 -->
 
 ⚠️ **Quality Warnings:**
@@ -2326,11 +2475,11 @@ Capture, GMT, GPS); ...
 
 ### ✅ mlx-community/Qwen3.5-27B-mxfp8
 
-**Metrics:** Load 5.54s | Gen 188.26s | Total 194.24s
-**Throughput:** Prompt 112 TPS (16,850 tok) | Gen 13.3 TPS (500 tok)
+**Metrics:** Load 5.47s | Gen 168.62s | Total 174.42s
+**Throughput:** Prompt 125 TPS (16,850 tok) | Gen 15.1 TPS (500 tok)
 **Assessment:** ✅ B (74/100) | Δ+8 | Missing requested structure
-**Review Status:** watchlist (missing sections, reasoning leak, refusal)
-**Review:** B 74/100 | Refusal detected (explicit_refusal); Missing sections (title, description, keywords); ...
+**Review Status:** watchlist (missing sections, reasoning leak)
+**Review:** B 74/100 | Missing sections (title, description, keywords); Reasoning leak (description hint:)
 
 <!-- markdownlint-disable MD028 MD049 -->
 >
@@ -2345,6 +2494,7 @@ Capture, GMT, GPS); ...
 > \*   Center/Right: Modern extension with a large grid structure holding green plants
 > (vertical garden).
 > \*   Far Right: Another section with horizontal slats/vents and a Sainsbury's sign.
+> \*   Ground floor: Red brick base.
 > \*   \\*\\*Foreground:\\*\\*
 > \*   A white SUV (Mercedes-Benz) driving on the road.
 > \*   A dark SUV parked or moving slowly near the entrance.
@@ -2353,12 +2503,11 @@ Capture, GMT, GPS); ...
 > \*   A wooden fence/railing in the bottom left.
 > \*   \\*\\*Setting/Environment:\\*\\*
 > \*   Clear blue sky.
-> \*   Bare trees (suggesting late autumn, winter, or early spring).
+> \*   Bare trees on the left (suggesting late autumn, winter, or early spring).
 > \*   Shadows are long, indicating low sun (morning or late afternoon).
-> \*   Paved road and sidewalk.
 > \*   \\*\\*Text/Signage:\\*\\*
 > \*   "Sainsbury's" in red letters on the beige wall.
-> \*   "No entry" sign above a garage entrance.
+> \*   "No entry" sign above a parking entrance.
 > \*   "Argos" sign visible in the distance on the right.
 > \*   License plate on the white car: "LS21 GNK".
 >
@@ -2369,13 +2518,11 @@ Capture, GMT, GPS); ...
 > written on the building in a way that confirms it 100% without external knowledge, but
 > the prompt says "Use only details that are clearly and definitely visible". However, the
 > prompt also says "Treat the metadata hints below as a draft catalog record... correct
-> anything contradicted by the image". The hint says "Howardsgate, Welwyn Garden City". I
-> cannot confirm the
+> anything contradicted by the image". The hint says "Howardsgate, Welwyn Garden City".
 <!-- markdownlint-enable MD028 MD049 -->
 
 ⚠️ **Quality Warnings:**
 
-- Refusal detected (explicit_refusal)
 - Missing sections (title, description, keywords)
 - Reasoning leak (description hint:)
 
