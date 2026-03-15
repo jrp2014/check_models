@@ -969,8 +969,8 @@ class SupportsGenerationResult(Protocol):  # Minimal attributes we read from Gen
     concrete GenerationResult while still giving linters strong guarantees
     about the attributes actually consumed here.
 
-    Note: `time`, `active_memory`, and `cache_memory` attributes are added
-    dynamically by our code after generation.
+    Note: `time`, `active_memory`, `cache_memory`, and sometimes
+    `peak_memory` may be added dynamically by our code after generation.
     """
 
     text: str | None
@@ -979,6 +979,7 @@ class SupportsGenerationResult(Protocol):  # Minimal attributes we read from Gen
     time: float | None  # Dynamically added timing attribute
     active_memory: float | None  # Dynamically added active memory (GB)
     cache_memory: float | None  # Dynamically added cache memory (GB)
+    peak_memory: float | None  # Backfilled peak memory (GB) when upstream omits it
 
 
 @runtime_checkable
@@ -1458,6 +1459,8 @@ class ProcessImageParams:
     verbose: bool
     trust_remote_code: bool
     top_p: float
+    min_p: float
+    top_k: int
     repetition_penalty: float | None
     repetition_context_size: int
     lazy: bool
@@ -9694,6 +9697,18 @@ def _build_repro_command_tokens(
         (
             ("--repetition-penalty", getattr(run_args, "repetition_penalty", None)),
             ("--repetition-context-size", getattr(run_args, "repetition_context_size", None)),
+            (
+                "--min-p",
+                getattr(run_args, "min_p", None)
+                if getattr(run_args, "min_p", 0.0) not in {None, 0.0}
+                else None,
+            ),
+            (
+                "--top-k",
+                getattr(run_args, "top_k", None)
+                if getattr(run_args, "top_k", 0) not in {None, 0}
+                else None,
+            ),
             ("--max-kv-size", getattr(run_args, "max_kv_size", None)),
             ("--kv-bits", getattr(run_args, "kv_bits", None)),
             ("--prefill-step-size", getattr(run_args, "prefill_step_size", None)),
@@ -11279,11 +11294,21 @@ def validate_temperature(*, temp: float) -> None:
 def validate_sampling_params(
     *,  # Force all parameters to be keyword-only for clarity
     top_p: float,
+    min_p: float,
+    top_k: int,
     repetition_penalty: float | None,
 ) -> None:
     """Validate sampling parameters are within acceptable ranges."""
     if not 0.0 <= top_p <= 1.0:
         msg = f"top_p must be between 0.0 and 1.0, got {top_p}"
+        raise ValueError(msg)
+
+    if not 0.0 <= min_p <= 1.0:
+        msg = f"min_p must be between 0.0 and 1.0, got {min_p}"
+        raise ValueError(msg)
+
+    if top_k < 0:
+        msg = f"top_k must be >= 0, got {top_k}"
         raise ValueError(msg)
 
     if repetition_penalty is not None and repetition_penalty < 1.0:
@@ -11315,6 +11340,7 @@ _RESERVED_PROCESSOR_KWARG_KEYS: Final[frozenset[str]] = frozenset(
         "kv_group_size",
         "max_kv_size",
         "max_tokens",
+        "min_p",
         "prefill_step_size",
         "processor",
         "prompt",
@@ -11327,6 +11353,7 @@ _RESERVED_PROCESSOR_KWARG_KEYS: Final[frozenset[str]] = frozenset(
         "thinking_end_token",
         "thinking_start_token",
         "temperature",
+        "top_k",
         "top_p",
         "verbose",
     },
@@ -11429,6 +11456,10 @@ def _build_generate_extra_kwargs(params: ProcessImageParams) -> dict[str, Any]:
     extra_kwargs: dict[str, Any] = {}
     if params.processor_kwargs:
         extra_kwargs.update(params.processor_kwargs)
+    if params.min_p > 0.0:
+        extra_kwargs["min_p"] = params.min_p
+    if params.top_k > 0:
+        extra_kwargs["top_k"] = params.top_k
     if params.prefill_step_size is not None:
         extra_kwargs["prefill_step_size"] = params.prefill_step_size
     if params.resize_shape is not None:
@@ -11464,6 +11495,8 @@ def validate_cli_arguments(args: argparse.Namespace) -> None:
     # Validate sampling parameters
     validate_sampling_params(
         top_p=args.top_p,
+        min_p=args.min_p,
+        top_k=args.top_k,
         repetition_penalty=args.repetition_penalty,
     )
 
@@ -12317,6 +12350,60 @@ def _cleanup_runtime_resources() -> None:
         reset_peak_memory_fn()
 
 
+def _attach_generation_runtime_metrics(
+    output: GenerationResult | SupportsGenerationResult,
+    *,
+    duration: float,
+) -> SupportsGenerationResult:
+    """Attach locally measured timing and memory metrics to a generation result."""
+    get_active_memory_fn = getattr(mx, "get_active_memory", None)
+    get_cache_memory_fn = getattr(mx, "get_cache_memory", None)
+    get_peak_memory_fn = getattr(mx, "get_peak_memory", None)
+
+    active_mem_raw = get_active_memory_fn() if callable(get_active_memory_fn) else 0.0
+    cache_mem_raw = get_cache_memory_fn() if callable(get_cache_memory_fn) else 0.0
+    peak_mem_bytes = get_peak_memory_fn() if callable(get_peak_memory_fn) else None
+
+    active_mem_bytes = float(active_mem_raw) if isinstance(active_mem_raw, int | float) else 0.0
+    cache_mem_bytes = float(cache_mem_raw) if isinstance(cache_mem_raw, int | float) else 0.0
+
+    result = cast("SupportsGenerationResult", output)
+    result.time = duration
+    result.active_memory = active_mem_bytes / (1024**3)  # Convert to GB
+    result.cache_memory = cache_mem_bytes / (1024**3)  # Convert to GB
+
+    measured_peak_memory = (
+        float(peak_mem_bytes) / (1024**3) if isinstance(peak_mem_bytes, int | float) else None
+    )
+    current_peak_memory = getattr(result, "peak_memory", None)
+    if (
+        measured_peak_memory is not None
+        and measured_peak_memory > 0
+        and (not isinstance(current_peak_memory, int | float) or float(current_peak_memory) <= 0)
+    ):
+        result.peak_memory = measured_peak_memory
+    return result
+
+
+def _derive_first_token_latency_s(
+    output: GenerationResult | SupportsGenerationResult,
+) -> float | None:
+    """Derive first-token latency from upstream prompt throughput metrics.
+
+    Installed mlx-vlm computes ``prompt_tps`` as ``prompt_tokens / prompt_time``
+    inside ``stream_generate()``, where ``prompt_time`` is the elapsed time until
+    the first token becomes available. That makes ``prompt_tokens / prompt_tps``
+    a stable way to recover first-token latency from the final ``GenerationResult``.
+    """
+    prompt_tokens = getattr(output, "prompt_tokens", None)
+    prompt_tps = getattr(output, "prompt_tps", None)
+    if not isinstance(prompt_tokens, int | float) or prompt_tokens <= 0:
+        return None
+    if not isinstance(prompt_tps, int | float) or prompt_tps <= 0:
+        return None
+    return float(prompt_tokens) / float(prompt_tps)
+
+
 def _finalize_process_result(
     *,
     result_payload: PerformanceResult | None,
@@ -12333,6 +12420,11 @@ def _finalize_process_result(
             result_payload.runtime_diagnostics.stop_reason
             if result_payload is not None and result_payload.runtime_diagnostics is not None
             else stop_reason
+        ),
+        first_token_latency_s=(
+            result_payload.runtime_diagnostics.first_token_latency_s
+            if result_payload is not None and result_payload.runtime_diagnostics is not None
+            else None
         ),
     )
     if result_payload is None:
@@ -12457,17 +12549,9 @@ def _run_model_generation(
     mx.synchronize()
     duration = timer.stop()
 
-    # Capture memory metrics immediately after generation while model is still active
-    # This must happen before mx.eval() which can change memory state
-    active_mem_bytes = mx.get_active_memory()
-    cache_mem_bytes = mx.get_cache_memory()
-
-    # Add timing and memory to the GenerationResult object dynamically
-    # Cast to our Protocol which includes the time attribute we're adding
-    result = cast("SupportsGenerationResult", output)
-    result.time = duration
-    result.active_memory = active_mem_bytes / (1024**3)  # Convert to GB
-    result.cache_memory = cache_mem_bytes / (1024**3)  # Convert to GB
+    # Capture memory metrics immediately after generation while model is still active.
+    # This must happen before mx.eval() which can change memory state.
+    result = _attach_generation_runtime_metrics(output, duration=duration)
 
     mx.eval(model.parameters())
     return result
@@ -12576,6 +12660,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
         generation_time = getattr(output, "time", None) or phase_timer.duration("decode")
         total_time = time.perf_counter() - total_start_time
         model_load_time = phase_timer.duration("model_load")
+        first_token_latency_s = _derive_first_token_latency_s(output)
 
         # Read memory metrics from GenerationResult (captured inside _run_model_generation)
         active_mem_gb = getattr(output, "active_memory", None) or 0.0
@@ -12594,6 +12679,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             cache_memory=cache_mem_gb if cache_mem_gb > 0 else None,
             runtime_diagnostics=_build_runtime_diagnostics(
                 phase_timer,
+                first_token_latency_s=first_token_latency_s,
                 stop_reason=stop_reason,
             ),
         )
@@ -13135,7 +13221,10 @@ def _log_detailed_timings(res: PerformanceResult) -> None:
 def _log_perf_block(res: PerformanceResult) -> None:
     """Log inner performance metrics (memory) with tree structure and emoji."""
     active_mem = getattr(res.generation, "active_memory", 0.0) or 0.0
-    cached_mem = getattr(res.generation, "cached_memory", 0.0) or 0.0
+    cached_mem = getattr(res.generation, "cache_memory", None)
+    if not isinstance(cached_mem, int | float):
+        cached_mem = getattr(res.generation, "cached_memory", 0.0)
+    cached_mem = float(cached_mem or 0.0)
     peak_mem = getattr(res.generation, "peak_memory", 0.0) or 0.0
 
     # Only show memory section if at least one value is present
@@ -13153,7 +13242,7 @@ def _log_perf_block(res: PerformanceResult) -> None:
         log_metric_tree(prefix, label, f"{text:>8}", indent="     ")
 
     _log_mem("├─", "Active Δ:", "active_memory", active_mem)
-    _log_mem("├─", "Cache Δ:", "cached_memory", cached_mem)
+    _log_mem("├─", "Cache Δ:", "cache_memory", cached_mem)
     _log_mem("└─", "Peak:", "peak_memory", peak_mem)
 
 
@@ -14165,6 +14254,8 @@ def process_models(
             verbose=is_vlm_verbose,
             trust_remote_code=args.trust_remote_code,
             top_p=args.top_p,
+            min_p=args.min_p,
+            top_k=args.top_k,
             repetition_penalty=args.repetition_penalty,
             repetition_context_size=args.repetition_context_size,
             lazy=args.lazy_load,
@@ -16773,6 +16864,18 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         type=float,
         default=1.0,
         help="Nucleus sampling parameter (0.0-1.0). Lower values = more focused output.",
+    )
+    parser.add_argument(
+        "--min-p",
+        type=float,
+        default=0.0,
+        help="Minimum-probability sampling floor (0.0-1.0). 0.0 disables min-p filtering.",
+    )
+    parser.add_argument(
+        "--top-k",
+        type=int,
+        default=0,
+        help="Top-k sampling limit. 0 disables top-k filtering.",
     )
     parser.add_argument(
         "-r",

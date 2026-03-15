@@ -42,45 +42,70 @@ class TestSamplingParamsValidation:
 
     def test_valid_top_p_values(self) -> None:
         """Test that valid top_p values pass validation."""
-        validate_sampling_params(top_p=0.0, repetition_penalty=None)
-        validate_sampling_params(top_p=0.5, repetition_penalty=None)
-        validate_sampling_params(top_p=0.9, repetition_penalty=None)
-        validate_sampling_params(top_p=1.0, repetition_penalty=None)
+        validate_sampling_params(top_p=0.0, min_p=0.0, top_k=0, repetition_penalty=None)
+        validate_sampling_params(top_p=0.5, min_p=0.0, top_k=0, repetition_penalty=None)
+        validate_sampling_params(top_p=0.9, min_p=0.0, top_k=0, repetition_penalty=None)
+        validate_sampling_params(top_p=1.0, min_p=0.0, top_k=0, repetition_penalty=None)
 
     def test_invalid_top_p_raises_error(self) -> None:
         """Test that invalid top_p raises ValueError."""
         with pytest.raises(ValueError, match="top_p must be between"):
-            validate_sampling_params(top_p=-0.1, repetition_penalty=None)
+            validate_sampling_params(top_p=-0.1, min_p=0.0, top_k=0, repetition_penalty=None)
 
         with pytest.raises(ValueError, match="top_p must be between"):
-            validate_sampling_params(top_p=1.1, repetition_penalty=None)
+            validate_sampling_params(top_p=1.1, min_p=0.0, top_k=0, repetition_penalty=None)
 
         with pytest.raises(ValueError, match="top_p must be between"):
-            validate_sampling_params(top_p=2.0, repetition_penalty=None)
+            validate_sampling_params(top_p=2.0, min_p=0.0, top_k=0, repetition_penalty=None)
+
+    def test_valid_min_p_values(self) -> None:
+        """Test that valid min_p values pass validation."""
+        validate_sampling_params(top_p=1.0, min_p=0.0, top_k=0, repetition_penalty=None)
+        validate_sampling_params(top_p=1.0, min_p=0.2, top_k=0, repetition_penalty=None)
+        validate_sampling_params(top_p=1.0, min_p=1.0, top_k=0, repetition_penalty=None)
+
+    def test_invalid_min_p_raises_error(self) -> None:
+        """Test that invalid min_p raises ValueError."""
+        with pytest.raises(ValueError, match="min_p must be between"):
+            validate_sampling_params(top_p=1.0, min_p=-0.1, top_k=0, repetition_penalty=None)
+
+        with pytest.raises(ValueError, match="min_p must be between"):
+            validate_sampling_params(top_p=1.0, min_p=1.1, top_k=0, repetition_penalty=None)
+
+    def test_valid_top_k_values(self) -> None:
+        """Test that valid top_k values pass validation."""
+        validate_sampling_params(top_p=1.0, min_p=0.0, top_k=0, repetition_penalty=None)
+        validate_sampling_params(top_p=1.0, min_p=0.0, top_k=1, repetition_penalty=None)
+        validate_sampling_params(top_p=1.0, min_p=0.0, top_k=40, repetition_penalty=None)
+
+    def test_invalid_top_k_raises_error(self) -> None:
+        """Test that invalid top_k raises ValueError."""
+        with pytest.raises(ValueError, match=r"top_k must be >= 0"):
+            validate_sampling_params(top_p=1.0, min_p=0.0, top_k=-1, repetition_penalty=None)
 
     def test_valid_repetition_penalty_values(self) -> None:
         """Test that valid repetition_penalty values pass validation."""
-        validate_sampling_params(top_p=1.0, repetition_penalty=None)  # Disabled
-        validate_sampling_params(top_p=1.0, repetition_penalty=1.0)  # Minimum
-        validate_sampling_params(top_p=1.0, repetition_penalty=1.2)  # Typical
-        validate_sampling_params(top_p=1.0, repetition_penalty=2.0)  # High
+        validate_sampling_params(top_p=1.0, min_p=0.0, top_k=0, repetition_penalty=None)
+        validate_sampling_params(top_p=1.0, min_p=0.0, top_k=0, repetition_penalty=1.0)
+        validate_sampling_params(top_p=1.0, min_p=0.0, top_k=0, repetition_penalty=1.2)
+        validate_sampling_params(top_p=1.0, min_p=0.0, top_k=0, repetition_penalty=2.0)
 
     def test_invalid_repetition_penalty_raises_error(self) -> None:
         """Test that repetition_penalty < 1.0 raises ValueError."""
         with pytest.raises(ValueError, match=r"repetition_penalty must be >= 1\.0"):
-            validate_sampling_params(top_p=1.0, repetition_penalty=0.9)
+            validate_sampling_params(top_p=1.0, min_p=0.0, top_k=0, repetition_penalty=0.9)
 
         with pytest.raises(ValueError, match=r"repetition_penalty must be >= 1\.0"):
-            validate_sampling_params(top_p=1.0, repetition_penalty=0.0)
+            validate_sampling_params(top_p=1.0, min_p=0.0, top_k=0, repetition_penalty=0.0)
 
         with pytest.raises(ValueError, match=r"repetition_penalty must be >= 1\.0"):
-            validate_sampling_params(top_p=1.0, repetition_penalty=-1.0)
+            validate_sampling_params(top_p=1.0, min_p=0.0, top_k=0, repetition_penalty=-1.0)
 
     def test_combined_valid_params(self) -> None:
         """Test valid combinations of sampling parameters."""
-        validate_sampling_params(top_p=0.9, repetition_penalty=1.2)
-        validate_sampling_params(top_p=0.95, repetition_penalty=1.1)
-        validate_sampling_params(top_p=1.0, repetition_penalty=1.5)
+        validate_sampling_params(top_p=0.9, min_p=0.05, top_k=40, repetition_penalty=1.2)
+        validate_sampling_params(top_p=0.95, min_p=0.1, top_k=8, repetition_penalty=1.1)
+        validate_sampling_params(top_p=1.0, min_p=0.0, top_k=0, repetition_penalty=1.5)
 
 
 class TestKVParamsValidation:
@@ -134,6 +159,8 @@ class TestCliArgumentNormalization:
             "temperature": 0.0,
             "max_tokens": 10,
             "top_p": 1.0,
+            "min_p": 0.0,
+            "top_k": 0,
             "repetition_penalty": None,
             "max_kv_size": None,
             "kv_bits": None,
@@ -173,9 +200,23 @@ class TestCliArgumentNormalization:
 
     def test_reserved_processor_kwargs_raise_error(self) -> None:
         """Processor kwargs should not be allowed to override dedicated CLI flags."""
-        args = self._build_args(processor_kwargs={"max_tokens": 50, "cropping": False})
+        args = self._build_args(processor_kwargs={"top_k": 10, "cropping": False})
 
         with pytest.raises(ValueError, match="processor_kwargs cannot override dedicated"):
+            validate_cli_arguments(args)
+
+    def test_invalid_min_p_in_cli_args_raises_error(self) -> None:
+        """CLI validation should reject min_p outside the upstream range."""
+        args = self._build_args(min_p=1.2)
+
+        with pytest.raises(ValueError, match="min_p must be between"):
+            validate_cli_arguments(args)
+
+    def test_invalid_top_k_in_cli_args_raises_error(self) -> None:
+        """CLI validation should reject negative top_k values."""
+        args = self._build_args(top_k=-5)
+
+        with pytest.raises(ValueError, match=r"top_k must be >= 0"):
             validate_cli_arguments(args)
 
     def test_thinking_budget_requires_enable_thinking(self) -> None:

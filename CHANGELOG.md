@@ -6,6 +6,17 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Tightened MLX runtime metric capture so compact logging now reads the
+  stored `cache_memory` field consistently, and generation results backfill
+  peak memory from `mx.get_peak_memory()` when upstream results omit it.
+- Added first-token latency capture to runtime diagnostics by deriving it from
+  upstream `mlx_vlm.generate` prompt-throughput metrics, and preserved that
+  signal through final result finalization so reports and compact logs can show
+  real latency data instead of an always-empty field.
+- Exposed upstream `mlx_vlm.generate` sampling controls for `min_p` and `top_k`
+  through CLI validation, repro-command generation, and runtime parameter
+  forwarding, and corrected the local `mlx_vlm` stub so `stream_generate()` is
+  typed as yielding `GenerationResult` objects instead of plain strings.
 - Hardened quality-analysis propagation in `src/check_models.py` so successful
   runs cache structured quality results at result-construction time, report
   generation backfills missing quality analysis for synthetic success rows, and

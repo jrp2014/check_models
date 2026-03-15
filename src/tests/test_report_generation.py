@@ -1728,6 +1728,8 @@ class TestDiagnosticsReport:
             max_tokens=123,
             temperature=0.7,
             top_p=0.92,
+            min_p=0.08,
+            top_k=24,
             repetition_penalty=1.1,
             repetition_context_size=50,
             lazy_load=False,
@@ -1756,6 +1758,8 @@ class TestDiagnosticsReport:
         assert "--max-tokens 123" in content
         assert "--temperature 0.7" in content
         assert "--top-p 0.92" in content
+        assert "--min-p 0.08" in content
+        assert "--top-k 24" in content
         assert "--resize-shape 768 512" in content
         assert "--eos-tokens '</think>'" in content
         assert "--skip-special-tokens" in content

@@ -49,10 +49,9 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
         * StoppingCriteria.reset(self, eos_token_ids: list[int] | None = None)
     - convert.pyi: convert(..., upload_repo: str | None = None, ...)
     - generate.pyi:
-        stream_generate/generate(
-            ..., image: str | list[str] | None = None,
-            audio: str | list[str] | None = None, ...
-        )
+        * stream_generate/generate(..., image: str | list[str] | None = None, ...)
+        * stream_generate(... ) -> Generator[GenerationResult, None, None]
+        * batch_generate(..., images/audios/prompts: ... | None = None, ...)
 
     This function is idempotent and safe to run repeatedly.
     """
@@ -135,6 +134,27 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
             ),
             (
                 re.compile(r"(audio:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
+                r"\1 | None = None",
+            ),
+            # stream_generate(...) -> str | Generator[str, None, None]
+            #   -> Generator[GenerationResult, None, None]
+            (
+                re.compile(
+                    r"(def\s+stream_generate\([^\)]*\)\s*->\s*)str\s*\|\s*Generator\[str,\s*None,\s*None\]",
+                ),
+                r"\1Generator[GenerationResult, None, None]",
+            ),
+            # batch_generate(..., images: str | list[str] = None, ...)
+            (
+                re.compile(r"(images:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
+                r"\1 | None = None",
+            ),
+            (
+                re.compile(r"(audios:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
+                r"\1 | None = None",
+            ),
+            (
+                re.compile(r"(prompts:\s*list\[str\])\s*=\s*None"),
                 r"\1 | None = None",
             ),
         ],

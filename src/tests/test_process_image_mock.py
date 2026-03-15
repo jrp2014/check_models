@@ -23,6 +23,7 @@ class _FakeGenerationResult:
     text: str = "Hello world"
     prompt_tokens: int = 50
     generation_tokens: int = 20
+    prompt_tps: float = 100.0
     generation_tps: float = 42.0
     peak_memory: float = 1.2
     time: float = 0.0
@@ -54,6 +55,10 @@ class _FakeMxRuntime:
         return 0.0
 
     @staticmethod
+    def get_peak_memory() -> float:
+        return 0.0
+
+    @staticmethod
     def eval(_params: object) -> None:
         return None
 
@@ -70,6 +75,8 @@ def _build_params(image_path: Path) -> check_models.ProcessImageParams:
         verbose=False,
         trust_remote_code=True,
         top_p=1.0,
+        min_p=0.0,
+        top_k=0,
         repetition_penalty=None,
         repetition_context_size=20,
         lazy=False,
@@ -100,6 +107,8 @@ class TestProcessImageWithModelMock:
         assert result.generation is not None
         assert result.quality_analysis is not None
         assert result.quality_issues is None
+        assert result.runtime_diagnostics is not None
+        assert result.runtime_diagnostics.first_token_latency_s == 0.5
 
     def test_timeout_returns_failure(self, test_image: Path) -> None:
         """TimeoutError during generation should produce success=False."""
@@ -292,6 +301,8 @@ class TestProcessImageWithModelMock:
         """Phase-1 upstream-compatible CLI params should reach mlx_vlm.generate."""
         params = replace(
             _build_params(test_image),
+            min_p=0.15,
+            top_k=12,
             prefill_step_size=256,
             resize_shape=(512, 384),
             eos_tokens=("</think>", "\n"),
@@ -321,6 +332,8 @@ class TestProcessImageWithModelMock:
         generate_kwargs = mock_generate.call_args.kwargs
         assert generate_kwargs["prompt"] == "formatted prompt"
         assert generate_kwargs["image"] == str(test_image)
+        assert generate_kwargs["min_p"] == 0.15
+        assert generate_kwargs["top_k"] == 12
         assert generate_kwargs["prefill_step_size"] == 256
         assert generate_kwargs["resize_shape"] == (512, 384)
         assert generate_kwargs["eos_tokens"] == ["</think>", "\n"]
@@ -367,3 +380,83 @@ class TestProcessImageWithModelMock:
         assert generate_kwargs["thinking_budget"] == 96
         assert generate_kwargs["thinking_start_token"] == "<think>"
         assert generate_kwargs["thinking_end_token"] == "</think>"
+
+    def test_run_model_generation_backfills_peak_memory_from_mlx(self, test_image: Path) -> None:
+        """MLX peak memory should backfill result objects that omit it."""
+        params = _build_params(test_image)
+        fake_model = _FakeModel()
+        fake_processor = object()
+        fake_generation = _FakeGenerationResult(peak_memory=0.0)
+
+        class _FakeMxRuntimeWithPeak(_FakeMxRuntime):
+            @staticmethod
+            def get_peak_memory() -> float:
+                return float(3 * (1024**3))
+
+        with (
+            patch.object(check_models, "_ensure_generation_runtime_symbols"),
+            patch.object(
+                check_models,
+                "_load_model",
+                return_value=(fake_model, fake_processor, None),
+            ),
+            patch.object(check_models, "_run_model_preflight_validators"),
+            patch.object(check_models, "apply_chat_template", return_value="formatted prompt"),
+            patch.object(check_models, "generate", return_value=fake_generation),
+            patch.object(check_models, "mx", _FakeMxRuntimeWithPeak()),
+        ):
+            result = check_models._run_model_generation(params)
+
+        assert result is fake_generation
+        assert result.peak_memory == 3.0
+
+    def test_log_perf_block_reads_cache_memory_field(self) -> None:
+        """Compact memory logging should use the stored cache_memory field name."""
+        result = check_models.PerformanceResult(
+            model_name="test/fake-model",
+            success=True,
+            generation=_FakeGenerationResult(active_memory=0.5, cache_memory=0.3, peak_memory=1.2),
+        )
+        logged_values: list[tuple[str, str]] = []
+
+        def _capture_tree(_prefix: str, label: str, value: str, *, indent: str = "") -> None:
+            del indent
+            logged_values.append((label, value))
+
+        with (
+            patch.object(check_models, "log_metric_label"),
+            patch.object(check_models, "log_metric_tree", side_effect=_capture_tree),
+        ):
+            check_models._log_perf_block(result)
+
+        assert ("Cache Δ:", " 0.30 GB") in logged_values
+
+    def test_finalize_process_result_preserves_first_token_latency(self, test_image: Path) -> None:
+        """Final cleanup should not discard previously derived first-token latency."""
+        phase_timer = check_models.PhaseTimer()
+        result_payload = check_models.PerformanceResult(
+            model_name="test/fake-model",
+            success=True,
+            generation=_FakeGenerationResult(),
+            runtime_diagnostics=check_models.RuntimeDiagnostics(
+                input_validation_time_s=0.01,
+                model_load_time_s=0.02,
+                prompt_prep_time_s=0.03,
+                decode_time_s=0.04,
+                cleanup_time_s=0.05,
+                first_token_latency_s=0.25,
+                stop_reason="completed",
+            ),
+        )
+
+        finalized = check_models._finalize_process_result(
+            result_payload=result_payload,
+            params=_build_params(test_image),
+            phase_timer=phase_timer,
+            stop_reason="completed",
+            current_phase="cleanup",
+            total_start_time=0.0,
+        )
+
+        assert finalized.runtime_diagnostics is not None
+        assert finalized.runtime_diagnostics.first_token_latency_s == 0.25
