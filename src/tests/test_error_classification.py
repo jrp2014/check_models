@@ -61,6 +61,20 @@ def test_classify_error(message: str, expected_type: str) -> None:
         ("chat_template is not set", None, "model-config"),
         # HuggingFace
         ("does not appear to have a file", "huggingface_hub/utils.py", "huggingface-hub"),
+        # Wrapped upstream failures should prefer the deeper traceback owner
+        (
+            "Model generation failed: Failed to process inputs with error: can only concatenate str",
+            (
+                "Traceback (most recent call last):\n"
+                '  File "mlx_vlm/utils.py", line 873, in process_inputs_with_fallback\n'
+                '  File "transformers/models/florence2/processing_florence2.py", line 185, in __call__\n'
+                'TypeError: can only concatenate str (not "NoneType") to str\n\n'
+                "The above exception was the direct cause of the following exception:\n\n"
+                '  File "mlx_vlm/generate.py", line 515, in stream_generate\n'
+                "ValueError: Failed to process inputs with error: can only concatenate str\n"
+            ),
+            "transformers",
+        ),
         # Unknown
         ("Random error", "unknown_lib/main.py", "unknown"),
     ],

@@ -11884,6 +11884,36 @@ def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None
         ),
     ]
 
+    def _matching_packages(text: str) -> list[str]:
+        matches: list[str] = []
+        for package, patterns in package_definitions:
+            if any(pattern in text for pattern in patterns):
+                matches.append(package)
+        return matches
+
+    message_matches = _matching_packages(msg_lower)
+    if message_matches:
+        return message_matches[0]
+
+    traceback_matches = _matching_packages(tb_lower)
+    if traceback_matches:
+        chained_exception_markers = (
+            "during handling of the above exception",
+            "the above exception was the direct cause of the following exception",
+        )
+        if any(marker in tb_lower for marker in chained_exception_markers):
+            wrapped_traceback_preference = (
+                "transformers",
+                "huggingface-hub",
+                "model-config",
+                "mlx-lm",
+                "mlx",
+                "mlx-vlm",
+            )
+            for package in wrapped_traceback_preference:
+                if package in traceback_matches:
+                    return package
+
     for package, patterns in package_definitions:
         if any(pattern in combined for pattern in patterns):
             return package

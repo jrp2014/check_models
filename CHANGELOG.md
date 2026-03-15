@@ -29,6 +29,9 @@ Notable changes to this project will be documented in this file.
   matching preflight compatibility hints and point at narrower likely owners
   such as `transformers / mlx-vlm` instead of always collapsing into the broad
   `mlx-vlm / mlx` bucket.
+- Tightened failed-run package attribution so chained tracebacks now prefer the
+  deeper upstream owner, avoiding `mlx-vlm` wrapper attribution when the root
+  failure actually comes from packages such as `transformers`.
 - Tightened report-generation typing in `src/check_models.py` by replacing broad
   `getattr`/cast access in gallery helpers with narrower protocol-based checks
   for throughput and cached quality-analysis fields.
