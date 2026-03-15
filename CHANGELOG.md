@@ -62,6 +62,10 @@ Notable changes to this project will be documented in this file.
 - Tightened report-generation typing in `src/check_models.py` by replacing broad
   `getattr`/cast access in gallery helpers with narrower protocol-based checks
   for throughput and cached quality-analysis fields.
+- Optimized model generation prefill time by changing the default
+  `--prefill-step-size` from `None` (which deferred to mlx-lm's conservative 512
+  token default) to `4096`, significantly speeding up context evaluation on Mac
+  GPUs for long prompts.
 - Realigned contributor and user-facing documentation so the root README,
   `src/README.md`, and workflow docs consistently describe the standalone
   `model_gallery.md` artifact, the recommended conda bootstrap path, and the

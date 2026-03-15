@@ -16824,8 +16824,8 @@ def _build_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--prefill-step-size",
         type=int,
-        default=None,
-        help="Step size for prompt prefill. None = use model default.",
+        default=4096,
+        help="Step size for prompt prefill. Default: 4096 (faster than mlx-lm default).",
     )
     parser.add_argument(
         "-v",
