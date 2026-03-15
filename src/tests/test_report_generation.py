@@ -197,6 +197,17 @@ def _make_failure(
     )
 
 
+def test_build_report_render_context_backfills_quality_analysis() -> None:
+    """Shared report context should populate missing quality analysis for successful results."""
+    result = _make_success("org/model-clean")
+    assert result.quality_analysis is None
+
+    context = _build_report_render_context(results=[result], prompt="Describe this image.")
+
+    populated = context.result_set.results[0]
+    assert populated.quality_analysis is not None
+
+
 def _history_run(
     model_success: dict[str, bool],
     *,
@@ -327,7 +338,7 @@ class TestHtmlReportEdgeCases:
         )
 
         content = out.read_text(encoding="utf-8")
-        assert "[context-echo]" in content
+        assert "context-echo" in content
         assert "[tail]" in content
         assert "MIDDLE-MARKER" in content
         assert "END-MARKER" in content

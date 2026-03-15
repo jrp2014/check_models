@@ -98,6 +98,8 @@ class TestProcessImageWithModelMock:
         assert result.success is True
         assert result.model_name == "test/fake-model"
         assert result.generation is not None
+        assert result.quality_analysis is not None
+        assert result.quality_issues is None
 
     def test_timeout_returns_failure(self, test_image: Path) -> None:
         """TimeoutError during generation should produce success=False."""
@@ -170,6 +172,35 @@ class TestProcessImageWithModelMock:
         assert "stdout marker" in result.captured_output_on_fail
         assert "stderr marker" in result.captured_output_on_fail
 
+    def test_failure_stdout_quality_is_analyzed(self, test_image: Path) -> None:
+        """Captured stdout with model-like output should retain quality flags on failures."""
+        params = _build_params(test_image)
+        decode_error_message = "decode failed"
+
+        def _raise_decode_failed() -> None:
+            raise ValueError(decode_error_message)
+
+        def _raise_after_repetitive_output(
+            *_args: object, **_kwargs: object
+        ) -> _FakeGenerationResult:
+            unreachable_message = "unreachable"
+            sys.stdout.write(("loop " * 25).strip() + "\n")
+            _raise_decode_failed()
+            raise AssertionError(unreachable_message)
+
+        with patch.object(
+            check_models,
+            "_run_model_generation",
+            side_effect=_raise_after_repetitive_output,
+        ):
+            result = check_models.process_image_with_model(params)
+
+        assert result.success is False
+        assert result.quality_analysis is not None
+        assert result.quality_analysis.is_repetitive is True
+        assert result.quality_issues is not None
+        assert "repetitive" in result.quality_issues
+
     def test_build_failure_result_helper_preserves_capture(self) -> None:
         """Centralized failure builder should preserve diagnostics fields."""
         result: check_models.PerformanceResult
@@ -192,6 +223,57 @@ class TestProcessImageWithModelMock:
         assert result.error_signature is not None
         assert result.error_traceback is not None
         assert "template failure" in (result.captured_output_on_fail or "")
+
+    def test_build_failure_result_preserves_quality_fields(self) -> None:
+        """Failure builder should carry precomputed quality diagnostics when provided."""
+        repeated_phrase = "loop"
+        decode_error_message = "decode failed"
+
+        def _raise_decode_failed() -> None:
+            raise ValueError(decode_error_message)
+
+        analysis = check_models.GenerationQualityAnalysis(
+            is_repetitive=True,
+            repeated_token=repeated_phrase,
+            hallucination_issues=[],
+            is_verbose=False,
+            formatting_issues=[],
+            has_excessive_bullets=False,
+            bullet_count=0,
+            is_context_ignored=False,
+            missing_context_terms=[],
+            is_refusal=False,
+            refusal_type=None,
+            is_generic=False,
+            specificity_score=0.0,
+            has_language_mixing=False,
+            language_mixing_issues=[],
+            has_degeneration=False,
+            degeneration_type=None,
+            has_fabrication=False,
+            fabrication_issues=[],
+            has_harness_issue=False,
+            harness_issue_type=None,
+            harness_issue_details=[],
+            word_count=25,
+            unique_ratio=0.1,
+        )
+        result: check_models.PerformanceResult
+        try:
+            _raise_decode_failed()
+        except ValueError as err:
+            result = check_models._build_failure_result(
+                model_name="test/fake-model",
+                error=err,
+                captured_output="=== STDOUT ===\nloop loop loop",
+                quality_issues="repetitive(loop)",
+                quality_analysis=analysis,
+            )
+        else:  # pragma: no cover - defensive guard for static analysis
+            raise AssertionError
+
+        assert result.quality_analysis is analysis
+        assert result.quality_issues == "repetitive(loop)"
 
     def test_build_failure_result_respects_tagged_phase(self) -> None:
         """Failure phase tags should flow into the final result payload."""

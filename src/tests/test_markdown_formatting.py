@@ -238,6 +238,84 @@ def test_gallery_anchor_and_heading_are_separated_by_blank_line() -> None:
     assert '<a id="model-test-model"></a>\n\n### ✅ test/model' in md
 
 
+def test_gallery_quality_warnings_have_blank_line_before_list() -> None:
+    """Quality warning bullets should be separated from the label for MD032 compliance."""
+    analysis = check_models.GenerationQualityAnalysis(
+        is_repetitive=False,
+        repeated_token=None,
+        hallucination_issues=[],
+        is_verbose=False,
+        formatting_issues=[],
+        has_excessive_bullets=False,
+        bullet_count=0,
+        is_context_ignored=True,
+        missing_context_terms=["alpha", "beta"],
+        is_refusal=False,
+        refusal_type=None,
+        is_generic=False,
+        specificity_score=0.0,
+        has_language_mixing=False,
+        language_mixing_issues=[],
+        has_degeneration=False,
+        degeneration_type=None,
+        has_fabrication=False,
+        fabrication_issues=[],
+        has_harness_issue=False,
+        harness_issue_type=None,
+        harness_issue_details=[],
+        word_count=20,
+        unique_ratio=0.8,
+    )
+    result = check_models.PerformanceResult(
+        model_name="test/model",
+        generation=_GalleryGeneration(text="alpha"),
+        success=True,
+        model_load_time=1.0,
+        generation_time=2.0,
+        total_time=3.0,
+        quality_analysis=analysis,
+    )
+
+    md = _gallery_lines_for(result)
+
+    assert "⚠️ **Quality Warnings:**\n\n- Context ignored" in md
+    assert "\n\n\n⚠️ **Quality Warnings:**" not in md
+
+
+def test_gallery_error_block_does_not_emit_extra_blank_lines_before_separator() -> None:
+    """Error entries should not produce MD012-triggering triple blank lines."""
+    result = check_models.PerformanceResult(
+        model_name="test/model",
+        generation=None,
+        success=False,
+        error_stage="Model Error",
+        error_message="generation failed",
+        error_traceback="Traceback (most recent call last):\nValueError: boom",
+    )
+
+    md = _gallery_lines_for(result)
+
+    assert "<summary>Full Traceback (click to expand)</summary>\n\n\n```python" not in md
+    assert "</details>\n\n\n---" not in md
+
+
+def test_multiline_metadata_renders_as_single_list_item() -> None:
+    """Multiline metadata values should stay within the same list item."""
+    parts: list[str] = []
+
+    check_models._append_markdown_image_metadata_section(
+        parts,
+        {
+            "description": "First line\nSecond line\n\nThird paragraph.",
+        },
+    )
+
+    md = "\n".join(parts)
+    assert "- **Description**: First line" in md
+    assert "\n\n    Second line" in md
+    assert "\n\n    Third paragraph." in md
+
+
 def test_wrapped_blockquote_escapes_leading_markdown_syntax() -> None:
     """Wrapped blockquote lines should neutralize leading Markdown control syntax."""
     parts: list[str] = []

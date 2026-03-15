@@ -330,6 +330,85 @@ class QualityThresholds:
     # Patterns (loaded from config)
     patterns: dict[str, list[str]] | None = None
 
+    def __post_init__(self) -> None:
+        """Validate loaded threshold values so bad config cannot degrade checks silently."""
+        unit_interval_fields = {
+            "repetition_ratio": self.repetition_ratio,
+            "phrase_coverage_threshold": self.phrase_coverage_threshold,
+            "generic_filler_threshold": self.generic_filler_threshold,
+            "min_missing_ratio": self.min_missing_ratio,
+            "high_confidence_threshold": self.high_confidence_threshold,
+            "medium_confidence_threshold": self.medium_confidence_threshold,
+            "non_ascii_ratio_threshold": self.non_ascii_ratio_threshold,
+            "keyword_duplication_ratio_threshold": self.keyword_duplication_ratio_threshold,
+            "severe_echo_threshold": self.severe_echo_threshold,
+            "moderate_echo_threshold": self.moderate_echo_threshold,
+            "context_echo_vocab_ratio_threshold": self.context_echo_vocab_ratio_threshold,
+            "context_echo_ngram_ratio_threshold": self.context_echo_ngram_ratio_threshold,
+            "low_grounding_threshold": self.low_grounding_threshold,
+            "low_compliance_threshold": self.low_compliance_threshold,
+            "low_info_gain_threshold": self.low_info_gain_threshold,
+            "min_output_ratio": self.min_output_ratio,
+        }
+        for field_name, value in unit_interval_fields.items():
+            if not 0.0 <= value <= 1.0:
+                msg = (
+                    f"quality_config.yaml thresholds.{field_name} must be between 0 and 1; "
+                    f"got {value}"
+                )
+                raise ValueError(msg)
+
+        ordered_pairs = [
+            ("phrase repetitions", self.min_phrase_repetitions, self.max_phrase_repetitions),
+            ("title words", self.min_title_words, self.max_title_words),
+            (
+                "description sentences",
+                self.min_description_sentences,
+                self.max_description_sentences,
+            ),
+            ("keywords", self.min_keywords_count, self.max_keywords_count),
+        ]
+        for label, lower, upper in ordered_pairs:
+            if lower > upper:
+                msg = f"quality_config.yaml has invalid {label} bounds: min={lower}, max={upper}"
+                raise ValueError(msg)
+
+        if self.medium_confidence_threshold > self.high_confidence_threshold:
+            msg = (
+                "quality_config.yaml thresholds.medium_confidence_threshold must be <= "
+                "thresholds.high_confidence_threshold"
+            )
+            raise ValueError(msg)
+        if self.moderate_echo_threshold > self.severe_echo_threshold:
+            msg = (
+                "quality_config.yaml thresholds.moderate_echo_threshold must be <= "
+                "thresholds.severe_echo_threshold"
+            )
+            raise ValueError(msg)
+
+        if self.patterns is not None:
+            if not isinstance(self.patterns, dict):
+                msg = "quality_config.yaml patterns section must be a mapping"
+                raise TypeError(msg)
+            for pattern_group, entries in self.patterns.items():
+                if not isinstance(entries, list):
+                    msg = f"quality_config.yaml patterns.{pattern_group} must be a list of strings"
+                    raise TypeError(msg)
+                for entry in entries:
+                    if not isinstance(entry, str):
+                        msg = (
+                            f"quality_config.yaml patterns.{pattern_group} entries must be strings"
+                        )
+                        raise TypeError(msg)
+                    try:
+                        re.compile(entry)
+                    except re.error as exc:
+                        msg = (
+                            "quality_config.yaml patterns."
+                            f"{pattern_group} contains invalid regex {entry!r}: {exc}"
+                        )
+                        raise ValueError(msg) from exc
+
     @classmethod
     def from_config(cls, config: dict[str, Any]) -> QualityThresholds:
         """Create instance from configuration dictionary."""
@@ -391,7 +470,7 @@ def load_quality_config(config_path: Path | None = None) -> None:
                     for field in dataclasses.fields(QualityThresholds):
                         setattr(QUALITY, field.name, getattr(new_quality, field.name))
                     logger.debug("Loaded quality configuration from %s", config_path)
-        except (OSError, yaml.YAMLError) as e:
+        except (OSError, ValueError, yaml.YAMLError) as e:
             logger.warning("Failed to load quality config from %s: %s", config_path, e)
     elif config_path:
         logger.warning("Quality config file not found: %s", config_path)
@@ -1199,13 +1278,19 @@ def _append_gallery_quality_lines(
 
     analysis = _quality_analysis_for_result(res)
     if analysis and analysis.issues:
-        out.append("")
+        if not out or out[-1] != "":
+            out.append("")
         out.append("⚠️ **Quality Warnings:**")
-        out.extend(f"- {html.escape(issue)}" for issue in analysis.issues)
+        out.append("")
+        out.extend(
+            f"- {_escape_markdown_diagnostics(_collapse_preview_whitespace(issue))}"
+            for issue in analysis.issues
+        )
         return
 
     if analysis is not None and not analysis.has_any_issues():
-        out.append("")
+        if not out or out[-1] != "":
+            out.append("")
         out.append("**Quality Status:** no quality issues detected in this run")
 
 
@@ -4483,6 +4568,25 @@ def analyze_generation_text(
     )
 
 
+def _analyze_text_quality(
+    text: str,
+    generated_tokens: int,
+    *,
+    prompt_tokens: int | None = None,
+    prompt: str | None = None,
+    context_marker: str = "Context:",
+) -> tuple[GenerationQualityAnalysis, str | None]:
+    """Return structured quality analysis plus the normalized issue label string."""
+    analysis = analyze_generation_text(
+        text,
+        generated_tokens,
+        prompt_tokens=prompt_tokens,
+        prompt=prompt,
+        context_marker=context_marker,
+    )
+    return analysis, _build_quality_issues_string(analysis)
+
+
 def local_now_str(fmt: str = "%Y-%m-%d %H:%M:%S %Z") -> str:
     """Return localized current time as a formatted string.
 
@@ -5969,7 +6073,14 @@ def _build_report_render_context(
     system_info: dict[str, str] | None = None,
 ) -> ReportRenderContext:
     """Build shared derived report data once for all renderers."""
-    result_set: ResultSet = ResultSet(results)
+    resolved_results = [
+        _populate_result_quality_analysis(
+            result,
+            prompt=prompt,
+        )
+        for result in results
+    ]
+    result_set: ResultSet = ResultSet(resolved_results)
     prompt_context: str | None = _extract_context_from_prompt(prompt)
     summary: ModelIssueSummary = analyze_model_issues(results, prompt_context)
     stats: PerformanceStats = compute_performance_statistics(results)
@@ -7639,7 +7750,30 @@ def _append_markdown_image_metadata_section(
     parts.append("## Image Metadata")
     parts.append("")
     for label, value in populated_fields:
-        parts.append(f"- **{label}**: {value}")
+        normalized_value = value.replace("\r\n", "\n").replace("\r", "\n")
+        paragraphs = [
+            paragraph.strip() for paragraph in normalized_value.split("\n\n") if paragraph.strip()
+        ]
+        if not paragraphs:
+            continue
+
+        first_paragraph_lines = [
+            line.strip() for line in paragraphs[0].splitlines() if line.strip()
+        ]
+        first_line = first_paragraph_lines[0] if first_paragraph_lines else ""
+        parts.append(f"- **{label}**: {first_line}")
+
+        remaining_lines = first_paragraph_lines[1:]
+        if remaining_lines:
+            parts.append("")
+            parts.extend(f"    {line}" for line in remaining_lines)
+
+        for paragraph in paragraphs[1:]:
+            paragraph_lines = [line.strip() for line in paragraph.splitlines() if line.strip()]
+            if not paragraph_lines:
+                continue
+            parts.append("")
+            parts.extend(f"    {line}" for line in paragraph_lines)
     parts.append("")
 
 
@@ -7701,10 +7835,18 @@ def _append_markdown_details_block(
     body_lines: Sequence[str],
 ) -> None:
     """Append an HTML <details> block for collapsed technical content."""
+    normalized_body_lines = list(body_lines)
+    while normalized_body_lines and normalized_body_lines[0] == "":
+        normalized_body_lines.pop(0)
+    while normalized_body_lines and normalized_body_lines[-1] == "":
+        normalized_body_lines.pop()
+
     parts.append("<details>")
     parts.append(f"<summary>{html.escape(summary, quote=False)}</summary>")
     parts.append("")
-    parts.extend(body_lines)
+    parts.extend(normalized_body_lines)
+    if normalized_body_lines and re.fullmatch(r"`{3,}", normalized_body_lines[-1]):
+        parts.append("")
     parts.append("</details>")
     parts.append("")
 
@@ -10266,17 +10408,19 @@ def _generate_model_gallery_section(
         md.append("")
         md.append(f"### {icon} {res.model_name}")
         md.append("")
+        block_lines: list[str]
         if not res.success:
-            md.extend(_gallery_render_error(res))
+            block_lines = _gallery_render_error(res)
         else:
-            md.extend(
-                _gallery_render_success(
-                    res,
-                    summary=summary,
-                    useful_now=res.model_name in useful_model_names,
-                    watchlist_reason=watchlist_by_model.get(res.model_name),
-                ),
+            block_lines = _gallery_render_success(
+                res,
+                summary=summary,
+                useful_now=res.model_name in useful_model_names,
+                watchlist_reason=watchlist_by_model.get(res.model_name),
             )
+        while block_lines and block_lines[-1] == "":
+            block_lines.pop()
+        md.extend(block_lines)
         md.append("")
         md.append("---")
         md.append("")
@@ -10511,6 +10655,8 @@ def generate_markdown_gallery_report(
     md: list[str] = []
     md.append("# Model Output Gallery")
     md.append("")
+    md.append("<!-- markdownlint-disable MD013 -->")
+    md.append("")
     md.append(f"_Generated on {local_now_str()}_")
     md.append("")
     md.append(
@@ -10525,6 +10671,8 @@ def generate_markdown_gallery_report(
     _append_markdown_prompt_section(md, title="## Prompt", prompt=prompt)
     md.extend(_build_markdown_gallery_navigation(report_context))
     md.extend(_generate_model_gallery_section(report_context))
+    md.append("<!-- markdownlint-enable MD013 -->")
+    md.append("")
 
     _write_markdown_artifact(filename, md, artifact_name="Markdown gallery report")
 
@@ -12082,6 +12230,8 @@ def _build_failure_result(
     model_name: str,
     error: TimeoutError | OSError | ValueError | RuntimeError,
     captured_output: str | None,
+    quality_issues: str | None = None,
+    quality_analysis: GenerationQualityAnalysis | None = None,
     failure_phase: str | None = None,
     generation_time: float | None = None,
     model_load_time: float | None = None,
@@ -12115,6 +12265,8 @@ def _build_failure_result(
         error_message=error_msg,
         captured_output_on_fail=captured_output,
         error_type=type(error).__name__,
+        quality_issues=quality_issues,
+        quality_analysis=quality_analysis,
         error_package=error_package,
         error_traceback=tb_str,
         generation_time=generation_time,
@@ -12197,12 +12349,29 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
                 stop_reason=stop_reason,
             ),
         )
+        result_payload = _populate_result_quality_analysis(
+            result_payload,
+            prompt=params.prompt,
+            context_marker=params.context_marker,
+        )
     except (TimeoutError, OSError, ValueError, RuntimeError) as e:
         captured_sections: list[str] = []
         stdout_clean = stdout_capture.getvalue().strip()
         stderr_clean = stderr_capture.getvalue().strip()
+        failure_quality_analysis: GenerationQualityAnalysis | None = None
+        failure_quality_issues: str | None = None
         if stdout_clean:
             captured_sections.append("=== STDOUT ===\n" + stdout_clean)
+            if (
+                len(stdout_clean) >= QUALITY.min_text_length
+                or len(stdout_clean.split()) >= QUALITY.min_token_count
+            ):
+                failure_quality_analysis, failure_quality_issues = _analyze_text_quality(
+                    stdout_clean,
+                    max(len(stdout_clean.split()), 1),
+                    prompt=params.prompt,
+                    context_marker=params.context_marker,
+                )
         if stderr_clean:
             captured_sections.append("=== STDERR ===\n" + stderr_clean)
         captured_output = "\n\n".join(captured_sections) if captured_sections else None
@@ -12211,6 +12380,8 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
             model_name=params.model_identifier,
             error=e,
             captured_output=captured_output,
+            quality_issues=failure_quality_issues,
+            quality_analysis=failure_quality_analysis,
             failure_phase=current_phase,
             generation_time=phase_timer.duration("decode"),
             model_load_time=phase_timer.duration("model_load"),
@@ -12446,12 +12617,14 @@ def _summary_parts(res: PerformanceResult, model_short: str) -> list[str]:
         f"model={model_short}",
         f"status={'OK' if res.success else 'FAIL'}",
     ]
+    issue_labels = sorted(_extract_quality_issue_labels(res.quality_issues))
     if res.success:
-        issue_labels = sorted(_extract_quality_issue_labels(res.quality_issues))
         if issue_labels:
             parts.append(f"quality={'+'.join(issue_labels)}")
         else:
             parts.append("quality=clean")
+    elif issue_labels:
+        parts.append(f"quality={'+'.join(issue_labels)}")
     if res.error_stage:
         parts.append(f"stage={res.error_stage}")
     if res.failure_phase:
@@ -13766,41 +13939,29 @@ def process_models(
         )
         result: PerformanceResult = process_image_with_model(params)
 
-        # Calculate quality score for successful generations
+        # Calculate and log quality score for successful generations.
         if result.success and result.generation:
-            gen_text = str(getattr(result.generation, "text", ""))
-            gen_tokens = getattr(result.generation, "generation_tokens", 0)
-            prompt_tokens = getattr(result.generation, "prompt_tokens", None)
-
-            # Perform quality analysis for all successful runs, including empty output.
-            analysis = analyze_generation_text(
-                gen_text,
-                gen_tokens,
-                prompt_tokens=prompt_tokens,
+            result = _populate_result_quality_analysis(
+                result,
                 prompt=prompt,
                 context_marker=args.context_marker,
             )
+            analysis = result.quality_analysis
+            if analysis is None:
+                msg = f"Quality analysis missing for successful result {result.model_name}"
+                raise RuntimeError(msg)
             # Log quality analysis results at DEBUG level
             logger.debug(
                 "Quality analysis for %s: %s",
                 result.model_name,
                 _format_quality_analysis_for_log(analysis),
             )
-            # Build consolidated quality issues string using helper
-            quality_issues_str = _build_quality_issues_string(analysis)
-            if quality_issues_str:
+            if result.quality_issues:
                 logger.info(
                     "Quality issues detected for %s: %s",
                     result.model_name,
-                    quality_issues_str,
+                    result.quality_issues,
                 )
-
-            # Update result with quality metrics
-            result = dataclasses.replace(
-                result,
-                quality_issues=quality_issues_str,
-                quality_analysis=analysis,
-            )
 
         results.append(result)
 
@@ -14028,6 +14189,46 @@ def _result_quality_analysis(result: PerformanceResult) -> GenerationQualityAnal
     generation_analysis = getattr(result.generation, "quality_analysis", None)
     return (
         generation_analysis if isinstance(generation_analysis, GenerationQualityAnalysis) else None
+    )
+
+
+def _populate_result_quality_analysis(
+    result: PerformanceResult,
+    *,
+    prompt: str | None = None,
+    context_marker: str = "Context:",
+) -> PerformanceResult:
+    """Attach structured quality analysis to successful results as soon as they exist."""
+    if not result.success or result.generation is None:
+        return result
+
+    cached_analysis = _result_quality_analysis(result)
+    if cached_analysis is not None:
+        cached_quality_issues = result.quality_issues or _build_quality_issues_string(
+            cached_analysis,
+        )
+        if result.quality_analysis is not None and result.quality_issues == cached_quality_issues:
+            return result
+        return dataclasses.replace(
+            result,
+            quality_analysis=cached_analysis,
+            quality_issues=cached_quality_issues,
+        )
+
+    text = str(getattr(result.generation, "text", ""))
+    generated_tokens = getattr(result.generation, "generation_tokens", 0)
+    prompt_tokens = getattr(result.generation, "prompt_tokens", None)
+    analysis, quality_issues = _analyze_text_quality(
+        text,
+        generated_tokens,
+        prompt_tokens=prompt_tokens,
+        prompt=prompt,
+        context_marker=context_marker,
+    )
+    return dataclasses.replace(
+        result,
+        quality_analysis=analysis,
+        quality_issues=result.quality_issues or quality_issues,
     )
 
 

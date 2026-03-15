@@ -427,6 +427,26 @@ class TestQualityThresholdsFromConfig:
         default_ratio = 0.8
         assert qt.repetition_ratio == default_ratio
 
+    def test_invalid_threshold_bounds_raise(self, mod: types.ModuleType) -> None:
+        """Inverted threshold bounds should fail fast instead of weakening checks."""
+        config = {
+            "thresholds": {"min_title_words": 9, "max_title_words": 4},
+            "patterns": {},
+        }
+
+        with pytest.raises(ValueError, match="invalid title words bounds"):
+            mod.QualityThresholds.from_config(config)
+
+    def test_invalid_pattern_regex_raises(self, mod: types.ModuleType) -> None:
+        """Malformed detector patterns should be rejected at config-load time."""
+        config = {
+            "thresholds": {},
+            "patterns": {"hallucination_question_indicators": ["[unterminated"]},
+        }
+
+        with pytest.raises(ValueError, match="invalid regex"):
+            mod.QualityThresholds.from_config(config)
+
 
 # ── load_quality_config ───────────────────────────────────────────────────
 
@@ -467,6 +487,26 @@ class TestLoadQualityConfig:
         with caplog.at_level(logging.WARNING):
             mod.load_quality_config(config_file)
         assert "Failed to load" in caplog.text
+
+    def test_invalid_threshold_config_warns_and_preserves_defaults(
+        self,
+        mod: types.ModuleType,
+        tmp_path: Path,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """Invalid threshold bounds should warn and leave the existing config intact."""
+        original_ratio = mod.QUALITY.repetition_ratio
+        config_file = tmp_path / "quality_config.yaml"
+        config_file.write_text(
+            "thresholds:\n  min_title_words: 8\n  max_title_words: 3\npatterns: {}\n",
+            encoding="utf-8",
+        )
+
+        with caplog.at_level(logging.WARNING):
+            mod.load_quality_config(config_file)
+
+        assert "Failed to load" in caplog.text
+        assert mod.QUALITY.repetition_ratio == original_ratio
 
 
 class TestPreflightDependencyDiagnostics:

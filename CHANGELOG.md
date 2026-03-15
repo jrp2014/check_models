@@ -6,6 +6,14 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Hardened quality-analysis propagation in `src/check_models.py` so successful
+  runs cache structured quality results at result-construction time, report
+  generation backfills missing quality analysis for synthetic success rows, and
+  failed runs can retain quality flags from captured stdout instead of dropping
+  those signals on exception paths.
+- Tightened `quality_config.yaml` loading so invalid threshold bounds or
+  malformed detector regex patterns fail closed with a warning instead of
+  silently weakening output-quality checks.
 - Tightened report-generation typing in `src/check_models.py` by replacing broad
   `getattr`/cast access in gallery helpers with narrower protocol-based checks
   for throughput and cached quality-analysis fields.
