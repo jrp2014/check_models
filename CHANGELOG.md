@@ -39,6 +39,10 @@ Notable changes to this project will be documented in this file.
 - Tightened harness maintainer triage so mixed harness-owner runs now render as
   separate action-summary and priority-table rows instead of collapsing config
   and runtime signals into one generic maintainer bucket.
+- Added an env-aware `make analyze-quality` workflow plus a standalone
+  `tools.analyze_output_quality` CLI so quality and harness heuristics can be
+  exercised directly against arbitrary text or saved outputs without running a
+  model.
 - Tightened report-generation typing in `src/check_models.py` by replacing broad
   `getattr`/cast access in gallery helpers with narrower protocol-based checks
   for throughput and cached quality-analysis fields.

@@ -72,7 +72,8 @@ def test_analyze_output_quality_harness_issue(capsys: pytest.CaptureFixture[str]
 
 
 def test_analyze_output_quality_with_file(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     """Test reading from a file returns correct analysis."""
     test_file = tmp_path / "test_output.txt"
@@ -99,7 +100,8 @@ def test_analyze_output_quality_with_file(
 
 
 def test_analyze_output_quality_with_prompt_file(
-    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     """Test providing a prompt file triggers prompt context checks."""
     test_file = tmp_path / "test_output.txt"
@@ -110,7 +112,8 @@ def test_analyze_output_quality_with_prompt_file(
 
     prompt_file = tmp_path / "test_prompt.txt"
     prompt_file.write_text(
-        "Context: Existing metadata hints:\n- Title hint: Misty lake scene", encoding="utf-8"
+        "Context: Existing metadata hints:\n- Title hint: Misty lake scene",
+        encoding="utf-8",
     )
 
     original_argv = sys.argv
