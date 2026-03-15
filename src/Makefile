@@ -157,6 +157,10 @@ check_models: ## Run the VLM checker (pass args via ARGS='--model <id> --image <
 check_models-demo: ## Demo run with minimal flags (override via ARGS to customize)
 	$(RUN_PY) -m check_models $(ARGS)
 
+.PHONY: analyze-quality
+analyze-quality: ## Run output quality diagnostic script (pass args via ARGS='--text "..."' or ARGS='--file ...')
+	$(RUN_PY) -m tools.analyze_output_quality $(ARGS)
+
 # Quality
 .PHONY: format
 format: ## Ruff format
