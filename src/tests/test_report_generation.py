@@ -80,7 +80,17 @@ def _make_success(name: str = "org/model-ok") -> PerformanceResult:
     return PerformanceResult(
         model_name=name,
         success=True,
-        generation=_MockGeneration(),
+        generation=_MockGeneration(
+            text=(
+                "Title: Brick storefront with outdoor seating\n"
+                "Description: A brick storefront has outdoor seating beside a sidewalk. "
+                "People sit outside under clear daylight.\n"
+                "Keywords: brick storefront, outdoor seating, sidewalk, people, daylight, "
+                "sign, windows, street, town, facade"
+            ),
+            prompt_tokens=120,
+            generation_tokens=48,
+        ),
         total_time=1.0,
         generation_time=0.5,
         model_load_time=0.5,
@@ -121,6 +131,7 @@ def _make_harness_success(
         harness_issue_details=[harness_detail],
         word_count=0,
         unique_ratio=0.0,
+        prompt_checks_ran=True,
     )
     return PerformanceResult(
         model_name=name,
@@ -169,6 +180,7 @@ def _make_quality_success(
         harness_issue_details=[],
         word_count=20,
         unique_ratio=0.9,
+        prompt_checks_ran=True,
     )
     return PerformanceResult(
         model_name=name,
@@ -206,6 +218,69 @@ def test_build_report_render_context_backfills_quality_analysis() -> None:
 
     populated = context.result_set.results[0]
     assert populated.quality_analysis is not None
+
+
+def test_build_report_render_context_refreshes_prompt_dependent_checks() -> None:
+    """Prompt-aware report rendering should upgrade prompt-less cached analyses."""
+    prompt = (
+        "Analyze this image.\n"
+        "Context: Existing metadata hints:\n"
+        "- Title hint: Brick storefront with outdoor seating\n"
+        "- Description hint: A brick storefront has outdoor seating beside a sidewalk.\n"
+    )
+    echoed_text = (
+        "Context: Existing metadata hints:\n"
+        "Title hint: Brick storefront with outdoor seating\n"
+        "Description hint: A brick storefront has outdoor seating beside a sidewalk."
+    )
+    stale_analysis = check_models.analyze_generation_text(
+        echoed_text,
+        generated_tokens=32,
+    )
+    result = PerformanceResult(
+        model_name="org/model-echo",
+        success=True,
+        generation=_MockGeneration(text=echoed_text, generation_tokens=32),
+        total_time=1.0,
+        generation_time=0.5,
+        model_load_time=0.5,
+        quality_analysis=stale_analysis,
+    )
+
+    context = _build_report_render_context(results=[result], prompt=prompt)
+
+    populated = context.result_set.results[0]
+    assert populated.quality_analysis is not None
+    assert populated.quality_analysis.prompt_checks_ran is True
+    assert populated.quality_analysis.has_context_echo is True
+
+
+def test_unflagged_models_section_marks_prompt_incomplete_analysis() -> None:
+    """Diagnostics should avoid labeling prompt-less cached analysis as clean output."""
+    stale_analysis = check_models.analyze_generation_text(
+        "Title: Brick storefront with outdoor seating",
+        generated_tokens=18,
+    )
+    result = PerformanceResult(
+        model_name="org/promptless",
+        success=True,
+        generation=_MockGeneration(
+            text="Title: Brick storefront with outdoor seating",
+            generation_tokens=18,
+        ),
+        total_time=1.0,
+        generation_time=0.5,
+        model_load_time=0.5,
+        quality_analysis=stale_analysis,
+    )
+
+    section = check_models._diagnostics_unflagged_success_section(
+        unflagged_successful=[result],
+    )
+    content = "\n".join(section)
+
+    assert "Passed (prompt-dependent quality checks unavailable)" in content
+    assert "`org/promptless`" in content
 
 
 def _history_run(
@@ -418,7 +493,7 @@ class TestMarkdownReportEdgeCases:
         out = tmp_path / "results.md"
         gallery = tmp_path / "model_gallery.md"
         generate_markdown_report(
-            results=[_make_success("org/good")],
+            results=[_make_quality_success("org/good", with_quality_issue=True)],
             filename=out,
             versions=_stub_versions(),
             prompt="describe",
@@ -960,7 +1035,7 @@ class TestDiagnosticsReport:
         assert "python -m pip show mlx mlx-vlm mlx-lm transformers" in content
 
     def test_unflagged_models_section_lists_successes(self, tmp_path: Path) -> None:
-        """Diagnostics should include a near-end list of successful, unflagged models."""
+        """Diagnostics should backfill quality analysis for clean successful models."""
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
             results=[
@@ -975,9 +1050,30 @@ class TestDiagnosticsReport:
         )
         content = out.read_text(encoding="utf-8")
         assert "## Models Not Flagged (2 model(s))" in content
-        assert "### Passed (quality analysis unavailable) (2 model(s))" in content
+        assert "### Clean output (2 model(s))" in content
         assert "`org/pass-a`" in content
         assert "`org/pass-b`" in content
+
+    def test_build_diagnostics_snapshot_classifies_prompt_backfilled_harness_run(self) -> None:
+        """Prompt-aware snapshot building should classify harness issues without cached analysis."""
+        failure = _make_failure_with_details("org/fail")
+        harness_candidate = PerformanceResult(
+            model_name="org/harness-implicit",
+            success=True,
+            generation=_MockGeneration(text="", prompt_tokens=5000, generation_tokens=0),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+        )
+
+        snapshot = _build_diagnostics_snapshot(
+            results=[failure, harness_candidate],
+            prompt="Describe the image.",
+        )
+
+        assert len(snapshot.harness_results) == 1
+        assert snapshot.harness_results[0][0].model_name == "org/harness-implicit"
+        assert not snapshot.unflagged_successful
 
     def test_unflagged_models_section_categorizes_by_quality(self, tmp_path: Path) -> None:
         """Unflagged successful models should be grouped by available quality signals."""
@@ -1052,13 +1148,42 @@ class TestDiagnosticsReport:
     def test_report_written_for_stack_signal_without_failures(self, tmp_path: Path) -> None:
         """Suspicious successful runs should still produce diagnostics for stack triage."""
         out = tmp_path / "diag.md"
+        repeated_phrase = "loop"
+        analysis = GenerationQualityAnalysis(
+            is_repetitive=True,
+            repeated_token=repeated_phrase,
+            hallucination_issues=[],
+            is_verbose=False,
+            formatting_issues=[],
+            has_excessive_bullets=False,
+            bullet_count=0,
+            is_context_ignored=False,
+            missing_context_terms=[],
+            is_refusal=False,
+            refusal_type=None,
+            is_generic=False,
+            specificity_score=0.0,
+            has_language_mixing=False,
+            language_mixing_issues=[],
+            has_degeneration=False,
+            degeneration_type=None,
+            has_fabrication=False,
+            fabrication_issues=[],
+            has_harness_issue=False,
+            harness_issue_type=None,
+            harness_issue_details=[],
+            word_count=40,
+            unique_ratio=0.05,
+            prompt_checks_ran=True,
+        )
         success = PerformanceResult(
             model_name="org/suspicious-success",
             success=True,
-            generation=_MockGeneration(text="", prompt_tokens=5000, generation_tokens=0),
+            generation=_MockGeneration(text=("loop " * 40).strip(), prompt_tokens=15000),
             total_time=1.0,
             generation_time=0.5,
             model_load_time=0.5,
+            quality_analysis=analysis,
         )
         result = generate_diagnostics_report(
             results=[success],

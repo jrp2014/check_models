@@ -14,6 +14,14 @@ Notable changes to this project will be documented in this file.
 - Tightened `quality_config.yaml` loading so invalid threshold bounds or
   malformed detector regex patterns fail closed with a warning instead of
   silently weakening output-quality checks.
+- Tightened diagnostics snapshot generation so Markdown diagnostics backfill
+  missing success-side quality analysis before harness/stack classification,
+  preventing clean or unflagged buckets from hiding reportable issues when the
+  report is built from minimally populated `PerformanceResult` rows.
+- Marked prompt-less cached quality analysis as incomplete and refreshed it
+  when the original prompt becomes available again, so report rendering and
+  diagnostics do not label those runs as fully clean while context-sensitive
+  checks remain unavailable.
 - Tightened report-generation typing in `src/check_models.py` by replacing broad
   `getattr`/cast access in gallery helpers with narrower protocol-based checks
   for throughput and cached quality-analysis fields.

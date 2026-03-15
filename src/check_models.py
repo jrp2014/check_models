@@ -4231,6 +4231,7 @@ class GenerationQualityAnalysis:
     # Lightweight metrics useful for JSONL/report triage
     word_count: int = 0
     unique_ratio: float = 0.0
+    prompt_checks_ran: bool = False
 
     @property
     def has_title_length_violation(self) -> bool:
@@ -4565,6 +4566,7 @@ def analyze_generation_text(
         harness_issue_details=harness_issues,
         word_count=total_words,
         unique_ratio=round(unique_ratio, 3),
+        prompt_checks_ran=bool(prompt),
     )
 
 
@@ -7990,11 +7992,15 @@ def _build_diagnostics_context(
 def _build_diagnostics_snapshot(
     *,
     results: list[PerformanceResult],
+    prompt: str | None = None,
     preflight_issues: Sequence[str] = (),
 ) -> DiagnosticsSnapshot:
     """Build reusable diagnostics classification data from one completed run."""
-    failed = tuple(r for r in results if not r.success)
-    successful = [r for r in results if r.success]
+    resolved_results = [
+        _populate_result_quality_analysis(result, prompt=prompt) for result in results
+    ]
+    failed = tuple(r for r in resolved_results if not r.success)
+    successful = [r for r in resolved_results if r.success]
     harness_detected = _collect_harness_results(successful)
     stack_detected = _collect_stack_issue_signals(successful)
     harness_results, stack_signals, unflagged_successful = _partition_success_diagnostics(
@@ -8007,7 +8013,7 @@ def _build_diagnostics_snapshot(
         failure_clusters = tuple(
             (signature, tuple(cluster_results))
             for signature, cluster_results in sorted(
-                _cluster_failures_by_pattern(results).items(),
+                _cluster_failures_by_pattern(resolved_results).items(),
                 key=lambda kv: -len(kv[1]),
             )
         )
@@ -9298,6 +9304,7 @@ def _diagnostics_unflagged_success_section(
     clean_models: list[str] = []
     quality_warning_models: list[tuple[str, str]] = []
     no_analysis_models: list[str] = []
+    prompt_incomplete_models: list[str] = []
 
     for res in sorted(unflagged_successful, key=lambda row: row.model_name):
         qa = res.quality_analysis
@@ -9306,6 +9313,10 @@ def _diagnostics_unflagged_success_section(
 
         if qa is None:
             no_analysis_models.append(res.model_name)
+            continue
+
+        if not qa.prompt_checks_ran:
+            prompt_incomplete_models.append(res.model_name)
             continue
 
         if qa.has_any_issues():
@@ -9335,6 +9346,22 @@ def _diagnostics_unflagged_success_section(
         parts.extend(
             (f"- `{DIAGNOSTICS_ESCAPER.escape(model)}`: {DIAGNOSTICS_ESCAPER.escape(summary)}")
             for model, summary in quality_warning_models
+        )
+        parts.append("")
+
+    if prompt_incomplete_models:
+        parts.append(
+            "### Passed (prompt-dependent quality checks unavailable) "
+            f"({len(prompt_incomplete_models)} model(s))",
+        )
+        parts.append("")
+        parts.append(
+            "These outputs lack the original prompt context, so context-echo and "
+            "catalog-contract checks could not be rerun.",
+        )
+        parts.append("")
+        parts.extend(
+            f"- `{DIAGNOSTICS_ESCAPER.escape(model)}`" for model in prompt_incomplete_models
         )
         parts.append("")
 
@@ -9815,6 +9842,7 @@ def generate_diagnostics_report(
     if diagnostics_snapshot is None:
         diagnostics_snapshot = _build_diagnostics_snapshot(
             results=results,
+            prompt=prompt,
             preflight_issues=history.preflight_issues if history is not None else (),
         )
 
@@ -14207,13 +14235,19 @@ def _populate_result_quality_analysis(
         cached_quality_issues = result.quality_issues or _build_quality_issues_string(
             cached_analysis,
         )
-        if result.quality_analysis is not None and result.quality_issues == cached_quality_issues:
+        needs_prompt_refresh = bool(prompt) and not cached_analysis.prompt_checks_ran
+        if (
+            not needs_prompt_refresh
+            and result.quality_analysis is not None
+            and result.quality_issues == cached_quality_issues
+        ):
             return result
-        return dataclasses.replace(
-            result,
-            quality_analysis=cached_analysis,
-            quality_issues=cached_quality_issues,
-        )
+        if not needs_prompt_refresh:
+            return dataclasses.replace(
+                result,
+                quality_analysis=cached_analysis,
+                quality_issues=cached_quality_issues,
+            )
 
     text = str(getattr(result.generation, "text", ""))
     generated_tokens = getattr(result.generation, "generation_tokens", 0)
@@ -14225,6 +14259,13 @@ def _populate_result_quality_analysis(
         prompt=prompt,
         context_marker=context_marker,
     )
+    if cached_analysis is not None:
+        cached_quality_issues = result.quality_issues or _build_quality_issues_string(
+            cached_analysis,
+        )
+        if result.quality_issues and result.quality_issues != cached_quality_issues:
+            quality_issues = result.quality_issues
+
     return dataclasses.replace(
         result,
         quality_analysis=analysis,
@@ -15872,6 +15913,7 @@ def _write_diagnostics_and_repro_artifacts(
     preflight_issues = _get_run_preflight_issues(args)
     diagnostics_snapshot = _build_diagnostics_snapshot(
         results=results,
+        prompt=prompt,
         preflight_issues=preflight_issues,
     )
     repro_bundles = export_failure_repro_bundles(

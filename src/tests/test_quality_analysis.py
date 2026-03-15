@@ -248,6 +248,24 @@ def test_analyze_generation_text_detects_context_echo() -> None:
     assert analysis.context_echo_ratio > 0
 
 
+def test_analyze_generation_text_marks_prompt_check_availability() -> None:
+    """Analysis should record whether prompt-dependent checks were able to run."""
+    prompt = "Describe the image.\nContext: Title hint: Brick storefront scene"
+
+    with_prompt = check_models.analyze_generation_text(
+        "Title: Brick storefront scene",
+        generated_tokens=12,
+        prompt=prompt,
+    )
+    without_prompt = check_models.analyze_generation_text(
+        "Title: Brick storefront scene",
+        generated_tokens=12,
+    )
+
+    assert with_prompt.prompt_checks_ran is True
+    assert without_prompt.prompt_checks_ran is False
+
+
 def test_repetitive_phrase_detection_uses_quality_thresholds() -> None:
     """Test that phrase repetition detection uses QUALITY config thresholds."""
     # Verify the QUALITY constants exist and have expected types
