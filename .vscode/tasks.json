@@ -88,6 +88,132 @@
 				"focus": false,
 				"panel": "shared"
 			}
+		},
+		{
+			"label": "Rebuild model gallery",
+			"type": "shell",
+			"command": "conda",
+			"args": [
+				"run",
+				"-n",
+				"mlx-vlm",
+				"python",
+				"/tmp/rebuild_model_gallery.py"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Lint model gallery",
+			"type": "shell",
+			"command": "npx",
+			"args": [
+				"--prefix",
+				"src",
+				"markdownlint",
+				"src/output/model_gallery.md"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Lint model gallery",
+			"type": "shell",
+			"command": "npx",
+			"args": [
+				"--prefix",
+				"src",
+				"markdownlint-cli2",
+				"src/output/model_gallery.md"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Lint model gallery cli2",
+			"type": "shell",
+			"command": "bash",
+			"args": [
+				"-lc",
+				"cd src && npx markdownlint-cli2 output/model_gallery.md"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Rebuild model gallery 2",
+			"type": "shell",
+			"command": "conda",
+			"args": [
+				"run",
+				"-n",
+				"mlx-vlm",
+				"python",
+				"/tmp/rebuild_model_gallery.py"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Lint model gallery cli2 v2",
+			"type": "shell",
+			"command": "bash",
+			"args": [
+				"-lc",
+				"cd src && npx markdownlint-cli2 output/model_gallery.md"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Rebuild model gallery 3",
+			"type": "shell",
+			"command": "conda",
+			"args": [
+				"run",
+				"-n",
+				"mlx-vlm",
+				"python",
+				"/tmp/rebuild_model_gallery.py"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Lint model gallery cli2 v3",
+			"type": "shell",
+			"command": "bash",
+			"args": [
+				"-lc",
+				"cd src && npx markdownlint-cli2 output/model_gallery.md"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Rebuild model gallery 4",
+			"type": "shell",
+			"command": "conda",
+			"args": [
+				"run",
+				"-n",
+				"mlx-vlm",
+				"python",
+				"/tmp/rebuild_model_gallery.py"
+			],
+			"isBackground": false,
+			"group": "build"
+		},
+		{
+			"label": "Lint model gallery cli2 v4",
+			"type": "shell",
+			"command": "bash",
+			"args": [
+				"-lc",
+				"cd src && npx markdownlint-cli2 output/model_gallery.md"
+			],
+			"isBackground": false,
+			"group": "build"
 		}
 	]
 }
