@@ -8682,6 +8682,17 @@ def _summarize_harness_issue_owners(
     return ", ".join(owners[:-1]) + f", and {owners[-1]}"
 
 
+def _group_harness_results_by_owner(
+    harness_results: Sequence[tuple[PerformanceResult, str]],
+) -> list[tuple[str, list[tuple[PerformanceResult, str]]]]:
+    """Group harness-result rows by inferred owner for maintainer triage."""
+    grouped: dict[str, list[tuple[PerformanceResult, str]]] = {}
+    for result in harness_results:
+        owner = _infer_harness_issue_owner(result[0])
+        grouped.setdefault(owner, []).append(result)
+    return sorted(grouped.items(), key=lambda item: (item[0], len(item[1])))
+
+
 def _diagnostics_action_summary(
     *,
     failure_clusters: list[tuple[str, list[PerformanceResult]]],
@@ -8710,12 +8721,12 @@ def _diagnostics_action_summary(
             f"Next: {_diagnostics_next_action(owner_key)}",
         )
 
-    if harness_results:
-        owner_text = _summarize_harness_issue_owners(harness_results)
+    for owner_key, owner_results in _group_harness_results_by_owner(harness_results):
+        owner = _diagnostics_owner_label(owner_key)
         items.append(
-            f"- **[Medium] [{owner_text}]** Harness/integration warnings on "
-            f"{len(harness_results)} model(s). "
-            "Next: validate prompt templating, token decoding, and long-context behavior.",
+            f"- **[Medium] [{owner}]** Harness/integration warnings on "
+            f"{len(owner_results)} model(s). "
+            f"Next: {_diagnostics_next_action(owner_key)}",
         )
 
     if stack_signals:
@@ -9143,18 +9154,15 @@ def _diagnostics_priority_table(
                 f"{esc_action} |",
             )
 
-    if harness_results:
-        owner_text = _summarize_harness_issue_owners(harness_results)
-        names = ", ".join(r.model_name.split("/")[-1] for r, _ in harness_results)
+    for owner_key, owner_results in _group_harness_results_by_owner(harness_results):
+        owner = _diagnostics_owner_label(owner_key)
+        names = ", ".join(r.model_name.split("/")[-1] for r, _ in owner_results)
         esc_names = DIAGNOSTICS_ESCAPER.escape(names)
-        n = len(harness_results)
-        action = DIAGNOSTICS_ESCAPER.escape(
-            "validate prompt templating, token decoding, and long-context behavior "
-            "in the VLM stack.",
-        )
+        n = len(owner_results)
+        action = DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action(owner_key))
         table_rows.append(
             "| **Medium** | Harness/integration | "
-            f"{n} ({esc_names}) | `{DIAGNOSTICS_ESCAPER.escape(owner_text)}` | {action} |",
+            f"{n} ({esc_names}) | `{DIAGNOSTICS_ESCAPER.escape(owner)}` | {action} |",
         )
     if stack_signals:
         owner_text = _summarize_stack_signal_owners(stack_signals)

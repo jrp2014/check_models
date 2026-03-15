@@ -1376,6 +1376,36 @@ class TestDiagnosticsReport:
         assert "`model-config / mlx-vlm`" in content
         assert "validate chat-template/config expectations and mlx-vlm prompt formatting" in content
 
+    def test_priority_summary_splits_mixed_harness_owners(self, tmp_path: Path) -> None:
+        """Mixed harness owner classes should render separate maintainer triage rows."""
+        out = tmp_path / "diag.md"
+        generate_diagnostics_report(
+            results=[
+                _make_harness_success(
+                    name="org/harness-template",
+                    harness_type="prompt_template",
+                    harness_detail="output:zero_tokens",
+                ),
+                _make_harness_success(
+                    name="org/harness-runtime",
+                    harness_type="long_context",
+                    harness_detail="long_context_empty(5000tok)",
+                ),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "`model-config / mlx-vlm`" in content
+        assert "`mlx-vlm / mlx`" in content
+        assert "validate chat-template/config expectations and mlx-vlm prompt formatting" in content
+        assert (
+            "validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime"
+            in content
+        )
+
     def test_harness_token_leak_details_are_escaped(self, tmp_path: Path) -> None:
         """Token leak details should be escaped so markdown does not treat them as HTML."""
         out = tmp_path / "diag.md"

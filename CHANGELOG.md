@@ -36,6 +36,9 @@ Notable changes to this project will be documented in this file.
   no longer collapse into generic runtime ownership, and maintainer summaries
   now distinguish model-config style harness issues from long-context runtime
   anomalies.
+- Tightened harness maintainer triage so mixed harness-owner runs now render as
+  separate action-summary and priority-table rows instead of collapsing config
+  and runtime signals into one generic maintainer bucket.
 - Tightened report-generation typing in `src/check_models.py` by replacing broad
   `getattr`/cast access in gallery helpers with narrower protocol-based checks
   for throughput and cached quality-analysis fields.
