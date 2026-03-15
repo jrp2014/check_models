@@ -1197,6 +1197,68 @@ class TestDiagnosticsReport:
         assert "### Long-Context Degradation / Potential Stack Issues" in content
         assert "org/suspicious-success" in content
 
+    def test_report_written_for_context_echo_stack_signal(self, tmp_path: Path) -> None:
+        """Extreme prompt-length context echo should be surfaced as a stack-signal candidate."""
+        out = tmp_path / "diag.md"
+        analysis = GenerationQualityAnalysis(
+            is_repetitive=False,
+            repeated_token=None,
+            hallucination_issues=[],
+            is_verbose=False,
+            formatting_issues=[],
+            has_excessive_bullets=False,
+            bullet_count=0,
+            is_context_ignored=False,
+            missing_context_terms=[],
+            is_refusal=False,
+            refusal_type=None,
+            is_generic=False,
+            specificity_score=0.0,
+            has_language_mixing=False,
+            language_mixing_issues=[],
+            has_degeneration=False,
+            degeneration_type=None,
+            has_fabrication=False,
+            fabrication_issues=[],
+            has_reasoning_leak=False,
+            reasoning_leak_markers=[],
+            has_context_echo=True,
+            context_echo_ratio=0.94,
+            has_harness_issue=False,
+            harness_issue_type=None,
+            harness_issue_details=[],
+            word_count=80,
+            unique_ratio=0.3,
+            prompt_checks_ran=True,
+        )
+        success = PerformanceResult(
+            model_name="org/context-echo",
+            success=True,
+            generation=_MockGeneration(
+                text="echoed context",
+                prompt_tokens=15000,
+                generation_tokens=80,
+            ),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+            quality_analysis=analysis,
+        )
+
+        result = generate_diagnostics_report(
+            results=[success],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+
+        assert result is True
+        content = out.read_text(encoding="utf-8")
+        assert "### Long-Context Degradation / Potential Stack Issues" in content
+        assert "Context echo under extreme prompt length" in content
+        assert "org/context-echo" in content
+
     def test_harness_section_includes_tokens_and_empty_marker(self, tmp_path: Path) -> None:
         """Harness section should include prompt/output token evidence for empty runs."""
         out = tmp_path / "diag.md"

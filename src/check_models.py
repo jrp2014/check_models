@@ -8296,13 +8296,22 @@ def _collect_stack_issue_signals(
         if (
             prompt_tokens >= QUALITY.severe_prompt_tokens_threshold
             and qa is not None
-            and (qa.is_repetitive or qa.is_context_ignored)
-        ):
-            symptom = (
-                "Repetition under extreme prompt length"
-                if qa.is_repetitive
-                else "Context dropped under extreme prompt length"
+            and (
+                qa.is_repetitive
+                or qa.is_context_ignored
+                or qa.has_context_echo
+                or qa.has_degeneration
             )
+        ):
+            if qa.is_repetitive:
+                symptom = "Repetition under extreme prompt length"
+            elif qa.is_context_ignored:
+                symptom = "Context dropped under extreme prompt length"
+            elif qa.has_context_echo:
+                symptom = "Context echo under extreme prompt length"
+            else:
+                degeneration_type = qa.degeneration_type or "degradation"
+                symptom = f"Output degeneration under extreme prompt length ({degeneration_type})"
             signals.append((res, symptom, "mlx-vlm / mlx"))
 
     return signals

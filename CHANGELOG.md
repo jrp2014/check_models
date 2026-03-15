@@ -22,6 +22,9 @@ Notable changes to this project will be documented in this file.
   when the original prompt becomes available again, so report rendering and
   diagnostics do not label those runs as fully clean while context-sensitive
   checks remain unavailable.
+- Expanded long-context stack-signal heuristics so successful runs with extreme
+  prompt lengths can also be surfaced for context-echo and degeneration
+  symptoms, instead of only empty-output and low-ratio cases.
 - Tightened report-generation typing in `src/check_models.py` by replacing broad
   `getattr`/cast access in gallery helpers with narrower protocol-based checks
   for throughput and cached quality-analysis fields.
