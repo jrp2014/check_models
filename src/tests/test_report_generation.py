@@ -1982,6 +1982,119 @@ class TestDiagnosticsReport:
             "Harness/runtime anomalies: 1 model(s) likely owned by model-config / mlx-vlm."
         ) in caplog.text
 
+    def test_log_maintainer_summary_splits_mixed_harness_owner_hints(
+        self,
+        tmp_path: Path,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """Maintainer summary should emit one harness line per inferred owner bucket."""
+        diagnostics_path = tmp_path / "diagnostics.md"
+        diagnostics_path.write_text("summary\n", encoding="utf-8")
+        snapshot = DiagnosticsSnapshot(
+            harness_results=(
+                (_make_harness_success("org/harness-template"), ""),
+                (
+                    _make_harness_success(
+                        "org/harness-runtime",
+                        harness_type="long_context",
+                        harness_detail="long_context_empty(5000tok)",
+                    ),
+                    "",
+                ),
+            ),
+        )
+        artifacts = DiagnosticsArtifacts(
+            snapshot=snapshot,
+            diagnostics_written=True,
+            repro_bundles={},
+        )
+
+        with caplog.at_level("INFO", logger=check_models.LOGGER_NAME):
+            _log_maintainer_summary(
+                artifacts=artifacts,
+                diagnostics_path=diagnostics_path,
+            )
+
+        assert (
+            "Harness/runtime anomalies: 1 model(s) likely owned by model-config / mlx-vlm. "
+            "Next: validate chat-template/config expectations and mlx-vlm prompt formatting for this model."
+        ) in caplog.text
+        assert (
+            "Harness/runtime anomalies: 1 model(s) likely owned by mlx-vlm / mlx. "
+            "Next: validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime."
+        ) in caplog.text
+
+    def test_log_maintainer_summary_splits_mixed_stack_and_preflight_owner_hints(
+        self,
+        tmp_path: Path,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """Maintainer summary should emit per-owner lines for stack and preflight signals."""
+        diagnostics_path = tmp_path / "diagnostics.md"
+        diagnostics_path.write_text("summary\n", encoding="utf-8")
+        stack_runtime = PerformanceResult(
+            model_name="org/stack-runtime",
+            success=True,
+            generation=_MockGeneration(text="echo", prompt_tokens=15000, generation_tokens=80),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+        )
+        stack_transformers = PerformanceResult(
+            model_name="org/stack-transformers",
+            success=True,
+            generation=_MockGeneration(text="echo", prompt_tokens=15000, generation_tokens=80),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+        )
+        snapshot = DiagnosticsSnapshot(
+            stack_signals=(
+                (
+                    stack_runtime,
+                    "Context echo under long prompt length",
+                    "mlx-vlm / mlx",
+                ),
+                (
+                    stack_transformers,
+                    "Context echo under extreme prompt length",
+                    "transformers / mlx-vlm",
+                ),
+            ),
+            preflight_issues=(
+                "transformers import utils no longer reference known backend guard env vars",
+                "mlx runtime probe reported a suspicious cache incompatibility",
+            ),
+        )
+        artifacts = DiagnosticsArtifacts(
+            snapshot=snapshot,
+            diagnostics_written=True,
+            repro_bundles={},
+        )
+
+        with caplog.at_level("INFO", logger=check_models.LOGGER_NAME):
+            _log_maintainer_summary(
+                artifacts=artifacts,
+                diagnostics_path=diagnostics_path,
+            )
+
+        assert (
+            "Long-context or stack-signal anomalies: 1 model(s) likely owned by mlx-vlm / mlx. "
+            "Next: validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime."
+        ) in caplog.text
+        assert (
+            "Long-context or stack-signal anomalies: 1 model(s) likely owned by transformers / mlx-vlm. "
+            "Next: verify API compatibility and pinned version floor."
+        ) in caplog.text
+        assert (
+            "Preflight compatibility warnings: 1 issue(s) likely owned by mlx. "
+            "Next: check tensor/cache behavior and memory pressure handling."
+        ) in caplog.text
+        assert (
+            "Preflight compatibility warnings: 1 issue(s) likely owned by transformers. "
+            "Next: verify API compatibility and pinned version floor."
+        ) in caplog.text
+
 
 class TestClusterFailuresByPattern:
     """Unit tests for the _cluster_failures_by_pattern helper."""

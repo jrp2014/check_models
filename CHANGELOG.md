@@ -43,6 +43,9 @@ Notable changes to this project will be documented in this file.
   owner classes also render as separate action-summary and priority-table rows,
   instead of collapsing upstream compatibility and runtime issues into one
   merged owner bucket.
+- Tightened the CLI maintainer summary so mixed harness, stack-signal, and
+  preflight owner classes are logged as separate owner-specific lines with next
+  actions, instead of collapsing them into one broad summary sentence.
 - Added an env-aware `make analyze-quality` workflow plus a standalone
   `tools.analyze_output_quality` CLI so quality and harness heuristics can be
   exercised directly against arbitrary text or saved outputs without running a

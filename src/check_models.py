@@ -8112,24 +8112,29 @@ def _log_maintainer_summary(
             issue,
         )
 
-    if snapshot.harness_results:
-        owner_text = _summarize_harness_issue_owners(snapshot.harness_results)
+    for owner_key, owner_results in _group_harness_results_by_owner(snapshot.harness_results):
+        owner = _diagnostics_owner_label(owner_key)
         logger.info(
-            "Harness/runtime anomalies: %d model(s) likely owned by %s.",
-            len(snapshot.harness_results),
-            owner_text,
+            "Harness/runtime anomalies: %d model(s) likely owned by %s. Next: %s",
+            len(owner_results),
+            owner,
+            _diagnostics_next_action(owner_key),
         )
-    if snapshot.stack_signals:
-        owner_text = _summarize_stack_signal_owners(snapshot.stack_signals)
+    for owner_key, owner_signals in _group_stack_signals_by_owner(snapshot.stack_signals):
+        owner = _diagnostics_owner_label(owner_key)
         logger.info(
-            "Long-context or stack-signal anomalies: %d model(s) likely owned by %s.",
-            len(snapshot.stack_signals),
-            owner_text,
+            "Long-context or stack-signal anomalies: %d model(s) likely owned by %s. Next: %s",
+            len(owner_signals),
+            owner,
+            _diagnostics_next_action(owner_key),
         )
-    if snapshot.preflight_issues:
+    for owner_key, owner_issues in _group_preflight_issues_by_owner(snapshot.preflight_issues):
+        owner = _diagnostics_owner_label(owner_key)
         logger.info(
-            "Preflight compatibility warnings: %d issue(s).",
-            len(snapshot.preflight_issues),
+            "Preflight compatibility warnings: %d issue(s) likely owned by %s. Next: %s",
+            len(owner_issues),
+            owner,
+            _diagnostics_next_action(owner_key),
         )
 
     if artifacts.diagnostics_written:
@@ -8635,31 +8640,34 @@ def _diagnostics_owner_label(owner_key: str) -> str:
 def _diagnostics_next_action(owner_key: str) -> str:
     """Return a short owner-specific next action hint."""
     action = _DIAGNOSTICS_OWNER_ACTIONS["unknown"]
+    owner_parts = {part.strip() for part in owner_key.split("/") if part.strip()}
     if owner_key in _DIAGNOSTICS_OWNER_ACTIONS:
         action = _DIAGNOSTICS_OWNER_ACTIONS[owner_key]
-    elif "model-config" in owner_key and "mlx-vlm" in owner_key:
+    elif {"model-config", "mlx-vlm"}.issubset(owner_parts):
         action = (
             "validate chat-template/config expectations and mlx-vlm prompt "
             "formatting for this model."
         )
-    elif "model-config" in owner_key:
+    elif "model-config" in owner_parts:
         action = _DIAGNOSTICS_OWNER_ACTIONS["model-config"]
-    elif "mlx-vlm" in owner_key and "mlx" in owner_key:
+    elif "transformers" in owner_parts:
+        action = _DIAGNOSTICS_OWNER_ACTIONS["transformers"]
+    elif {"mlx-vlm", "mlx"}.issubset(owner_parts):
         action = (
             "validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime."
         )
-    elif "mlx-vlm" in owner_key and "mlx-lm" in owner_key:
+    elif {"mlx-vlm", "mlx-lm"}.issubset(owner_parts):
         action = (
             "validate generation-loop handoff and template continuation behavior "
             "across mlx-vlm + mlx-lm."
         )
-    elif "transformers" in owner_key:
-        action = _DIAGNOSTICS_OWNER_ACTIONS["transformers"]
-    elif "mlx-vlm" in owner_key:
+    elif "huggingface-hub" in owner_parts:
+        action = _DIAGNOSTICS_OWNER_ACTIONS["huggingface-hub"]
+    elif "mlx-vlm" in owner_parts:
         action = _DIAGNOSTICS_OWNER_ACTIONS["mlx-vlm"]
-    elif "mlx-lm" in owner_key:
+    elif "mlx-lm" in owner_parts:
         action = _DIAGNOSTICS_OWNER_ACTIONS["mlx-lm"]
-    elif "mlx" in owner_key:
+    elif "mlx" in owner_parts:
         action = _DIAGNOSTICS_OWNER_ACTIONS["mlx"]
     return action
 
