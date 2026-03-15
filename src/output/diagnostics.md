@@ -182,43 +182,10 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Downloading (incomplete total...):   0%|          | 0.00/51.0 [00:00<?, ?B/s]
-Downloading (incomplete total...): 100%|##########| 51.0/51.0 [00:00<00:00, 311B/s]
-Downloading (incomplete total...):  60%|######    | 51.0/85.0 [00:00<00:00, 311B/s]
-Downloading (incomplete total...): 2.50kB [00:00, 311B/s]                          
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 27182.79it/s]
 
-Fetching 10 files:  10%|#         | 1/10 [00:00<00:01,  4.82it/s]
-Downloading (incomplete total...): 1.41MB [00:00, 5.33MB/s]
-Downloading (incomplete total...):   0%|          | 1.53M/1.54G [00:00<04:48, 5.33MB/s]
-Downloading (incomplete total...):   0%|          | 2.63M/1.54G [00:00<03:24, 7.52MB/s]
-Downloading (incomplete total...):   0%|          | 2.63M/1.54G [00:13<03:24, 7.52MB/s]
-Downloading (incomplete total...):   5%|4         | 69.7M/1.54G [01:17<27:28, 892kB/s] 
-Downloading (incomplete total...):   5%|4         | 69.7M/1.54G [01:33<27:28, 892kB/s]
-Downloading (incomplete total...):  47%|####7     | 728M/1.54G [01:39<01:27, 9.32MB/s]
-Downloading (incomplete total...):  61%|######1   | 947M/1.54G [01:51<00:54, 11.0MB/s]
-Downloading (incomplete total...):  63%|######3   | 972M/1.54G [01:51<00:50, 11.3MB/s]
-Downloading (incomplete total...):  64%|######4   | 991M/1.54G [01:55<00:50, 10.8MB/s]
-Downloading (incomplete total...):  65%|######4   | 998M/1.54G [01:57<00:52, 10.3MB/s]
-Downloading (incomplete total...):  68%|######8   | 1.05G/1.54G [02:03<00:51, 9.51MB/s]
-Downloading (incomplete total...):  71%|#######1  | 1.10G/1.54G [02:08<00:45, 9.64MB/s]
-Downloading (incomplete total...):  72%|#######1  | 1.11G/1.54G [02:10<00:46, 9.34MB/s]
-Downloading (incomplete total...):  75%|#######4  | 1.15G/1.54G [02:13<00:39, 10.0MB/s]
-Downloading (incomplete total...):  75%|#######5  | 1.16G/1.54G [02:17<00:46, 8.22MB/s]
-Downloading (incomplete total...):  76%|#######6  | 1.17G/1.54G [02:21<00:53, 6.79MB/s]
-Downloading (incomplete total...):  79%|#######8  | 1.22G/1.54G [02:23<00:36, 8.96MB/s]
-Downloading (incomplete total...):  81%|########1 | 1.25G/1.54G [02:25<00:25, 11.3MB/s]
-Downloading (incomplete total...):  82%|########2 | 1.27G/1.54G [02:27<00:26, 10.4MB/s]
-Downloading (incomplete total...):  83%|########2 | 1.28G/1.54G [02:30<00:35, 7.49MB/s]
-Downloading (incomplete total...):  84%|########4 | 1.30G/1.54G [02:32<00:27, 8.84MB/s]
-Downloading (incomplete total...):  84%|########4 | 1.30G/1.54G [02:43<00:27, 8.84MB/s]
-Downloading (incomplete total...):  88%|########8 | 1.36G/1.54G [02:48<00:35, 5.07MB/s]
-Downloading (incomplete total...):  98%|#########7| 1.51G/1.54G [02:52<00:03, 11.8MB/s]
-Downloading (incomplete total...): 1.54GB [02:54, 12.5MB/s]                            
-
-Fetching 10 files:  40%|####      | 4/10 [02:54<04:43, 47.21s/it]
-Fetching 10 files: 100%|##########| 10/10 [02:54<00:00, 17.47s/it]
-
-Download complete: : 1.54GB [02:54, 12.5MB/s]
+Download complete: : 0.00B [00:00, ?B/s]              
+Download complete: : 0.00B [00:00, ?B/s]
 ```
 
 </details>
@@ -372,7 +339,7 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 
 | Model | Status vs Previous Run | First Seen Failing | Recent Repro |
 | ----- | ---------------------- | ------------------ | ------------ |
-| `microsoft/Florence-2-large-ft` | new model failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
+| `microsoft/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
 
 ---
 
@@ -381,12 +348,13 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 - **Detailed diagnostics models:** 8
 - **Summary diagnostics models:** 42
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1600.50s (1600.50s)
-- **Average runtime per model:** 32.01s (32.01s)
-- **Dominant runtime phase:** decode dominated 49/50 measured model runs (79% of tracked runtime).
-- **Phase totals:** model load=330.67s, prompt prep=0.13s, decode=1253.70s, cleanup=4.33s
+- **Total model runtime (sum):** 1467.04s (1467.04s)
+- **Average runtime per model:** 29.34s (29.34s)
+- **Dominant runtime phase:** decode dominated 49/50 measured model runs (89% of tracked runtime).
+- **Phase totals:** model load=162.11s, prompt prep=0.13s, decode=1288.54s, cleanup=4.57s
 - **Observed stop reasons:** completed=49, exception=1
-- **Validation overhead:** 15.71s total (avg 0.31s across 50 model(s)).
+- **Validation overhead:** 15.95s total (avg 0.32s across 50 model(s)).
+- **First-token latency:** Avg 18.59s | Min 0.17s | Max 144.90s across 49 model(s).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
@@ -451,7 +419,7 @@ These models completed without diagnostics flags (no hard failure, harness warni
 | Component | Version |
 | --------- | ------- |
 | mlx-vlm | 0.4.0 |
-| mlx | 0.31.2.dev20260314+5d170049 |
+| mlx | 0.31.2.dev20260315+0bdbfdb8 |
 | mlx-lm | 0.31.2 |
 | transformers | 5.3.0 |
 | tokenizers | 0.22.2 |
@@ -546,4 +514,4 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 - Input image: `/Users/jrp/Pictures/Processed/20260314-162100_DSC09442.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-03-15 02:55:35 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-03-15 22:43:55 GMT by [check_models](https://github.com/jrp2014/check_models)._

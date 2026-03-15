@@ -2,7 +2,7 @@
 
 <!-- markdownlint-disable MD013 -->
 
-_Generated on 2026-03-15 02:55:35 GMT_
+_Generated on 2026-03-15 22:43:55 GMT_
 
 A review-friendly artifact with image metadata, the source prompt, and full generated output for each model.
 
@@ -13,10 +13,10 @@ A review-friendly artifact with image metadata, the source prompt, and full gene
 - **Maintainer signals:** harness-risk successes=5, clean outputs=4/49.
 - **Useful now:** 9 clean A/B model(s) worth first review.
 - **Review watchlist:** 40 model(s) with breaking or lower-value output.
-- **Vs existing metadata:** better=26, neutral=6, worse=17 (baseline B 66/100).
-- **Quality signal frequency:** missing_sections=28, context_ignored=18, description_length=15, reasoning_leak=12, keyword_count=10, title_length=8.
-- **Runtime pattern:** decode dominates measured phase time (79%; 49/50 measured model(s)).
-- **Phase totals:** model load=330.67s, prompt prep=0.13s, decode=1253.70s, cleanup=4.33s.
+- **Vs existing metadata:** better=27, neutral=6, worse=16 (baseline B 66/100).
+- **Quality signal frequency:** missing_sections=28, context_ignored=18, description_length=15, reasoning_leak=12, keyword_count=11, title_length=8.
+- **Runtime pattern:** decode dominates measured phase time (89%; 49/50 measured model(s)).
+- **Phase totals:** model load=162.11s, prompt prep=0.13s, decode=1288.54s, cleanup=4.57s.
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 - **Termination reasons:** completed=49, exception=1.
@@ -25,19 +25,19 @@ A review-friendly artifact with image metadata, the source prompt, and full gene
 
 ### Strong Candidates
 
-- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: ✅ B (70/100) | Δ+4 | 158.4 tps
-- `mlx-community/InternVL3-14B-8bit`: ✅ B (70/100) | Δ+4 | 28.7 tps
-- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: ✅ B (69/100) | Δ+4 | 55.0 tps
-- `mlx-community/X-Reasoner-7B-8bit`: ✅ B (69/100) | Δ+3 | 47.6 tps
-- `Qwen/Qwen3-VL-2B-Instruct`: ✅ B (68/100) | Δ+2 | 75.4 tps
+- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: ✅ B (70/100) | Δ+4 | 159.3 tps
+- `mlx-community/InternVL3-14B-8bit`: ✅ B (70/100) | Δ+4 | 28.8 tps
+- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: ✅ B (69/100) | Δ+4 | 55.1 tps
+- `mlx-community/X-Reasoner-7B-8bit`: ✅ B (69/100) | Δ+3 | 47.8 tps
+- `Qwen/Qwen3-VL-2B-Instruct`: ✅ B (68/100) | Δ+2 | 75.7 tps
 
 ### Watchlist
 
-- `prince-canuma/Florence-2-large-ft`: ❌ F (0/100) | Δ-66 | 317.7 tps | context ignored, degeneration, harness, missing sections
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (7/100) | Δ-59 | 28.2 tps | harness, missing sections
-- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: ❌ F (16/100) | Δ-50 | 27.8 tps | context ignored, harness, missing sections
-- `microsoft/Phi-3.5-vision-instruct`: ✅ B (68/100) | Δ+2 | 52.1 tps | degeneration, harness
-- `mlx-community/Qwen3.5-35B-A3B-bf16`: 🏆 A (95/100) | Δ+29 | 54.9 tps | context ignored, harness, long context, missing sections
+- `prince-canuma/Florence-2-large-ft`: ❌ F (0/100) | Δ-66 | 323.5 tps | context ignored, degeneration, harness, missing sections
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (7/100) | Δ-59 | 28.0 tps | harness, missing sections
+- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: ❌ F (16/100) | Δ-50 | 28.3 tps | context ignored, harness, missing sections
+- `microsoft/Phi-3.5-vision-instruct`: ✅ B (68/100) | Δ+2 | 51.7 tps | degeneration, harness
+- `mlx-community/Qwen3.5-35B-A3B-bf16`: 🏆 A (95/100) | Δ+29 | 55.3 tps | context ignored, harness, long context, missing sections
 
 ## 🚨 Failures by Package (Actionable)
 
@@ -211,7 +211,7 @@ TypeError: can only concatenate str (not "NoneType") to str
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 12421, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 12513, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -245,7 +245,7 @@ ValueError: Failed to process inputs with error: can only concatenate str (not "
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 12565, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 12649, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -256,7 +256,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 12446, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 12538, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
 ```
@@ -269,8 +269,8 @@ ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to
 
 ### ✅ mlx-community/nanoLLaVA-1.5-4bit
 
-**Metrics:** Load 0.66s | Gen 1.03s | Total 2.01s
-**Throughput:** Prompt 2,487 TPS (609 tok) | Gen 311 TPS (91 tok)
+**Metrics:** Load 0.74s | Gen 1.04s | Total 2.11s
+**Throughput:** Prompt 2,448 TPS (609 tok) | Gen 322 TPS (91 tok)
 **Assessment:** 🟡 C (57/100) | Δ-9 | None identified
 **Review Status:** watchlist (missing sections)
 **Review:** C 57/100 | Missing sections (keywords); Title length violation (3 words; expected 5-10); ...
@@ -297,8 +297,8 @@ ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to
 
 ### ✅ mlx-community/LFM2-VL-1.6B-8bit
 
-**Metrics:** Load 0.71s | Gen 1.34s | Total 2.37s
-**Throughput:** Prompt 2,973 TPS (867 tok) | Gen 292 TPS (160 tok)
+**Metrics:** Load 0.77s | Gen 1.33s | Total 2.42s
+**Throughput:** Prompt 3,017 TPS (867 tok) | Gen 296 TPS (160 tok)
 **Assessment:** ❌ F (33/100) | Δ-33 | Mostly echoes context without adding value
 **Review Status:** watchlist (context echo)
 **Review:** F 33/100 | Title length violation (12 words; expected 5-10); Description sentence violation (4; expected 1-2); ...
@@ -328,12 +328,41 @@ ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to
 
 ---
 
+<a id="model-qnguyen3-nanollava"></a>
+
+### ✅ qnguyen3/nanoLLaVA
+
+**Metrics:** Load 0.86s | Gen 1.77s | Total 2.94s
+**Throughput:** Prompt 2,617 TPS (609 tok) | Gen 101 TPS (103 tok)
+**Assessment:** ❌ F (19/100) | Δ-47 | Mostly echoes context without adding value
+**Review Status:** watchlist (missing sections)
+**Review:** F 19/100 | Missing sections (keywords); Title length violation (4 words; expected 5-10); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Title: Sainsbury's Welwyn Garden City
+> Description: A modern Sainsbury's supermarket in Howardsgate, Welwyn Garden City,
+> England, United Kingdom, UK. The low sun casts long shadows from the bare-branched trees
+> onto the brick facade of the building. The living wall brings a splash of nature to the
+> urban landscape. The image captures the moment of shoppers making their way home with
+> their groceries. The Sainsbury's Supermarket is a sustainable architecture project in
+> the UK.
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Missing sections (keywords)
+- Title length violation (4 words; expected 5-10)
+- Description sentence violation (5; expected 1-2)
+
+---
+
 <a id="model-mlx-community-fastvlm-05b-bf16"></a>
 
 ### ✅ mlx-community/FastVLM-0.5B-bf16
 
-**Metrics:** Load 0.78s | Gen 1.72s | Total 2.83s
-**Throughput:** Prompt 3,766 TPS (613 tok) | Gen 301 TPS (198 tok)
+**Metrics:** Load 1.06s | Gen 1.78s | Total 3.19s
+**Throughput:** Prompt 3,678 TPS (613 tok) | Gen 307 TPS (198 tok)
 **Assessment:** ✅ B (74/100) | Δ+9 | None identified
 **Review Status:** watchlist (missing sections)
 **Review:** B 74/100 | Missing sections (keywords); Description sentence violation (7; expected 1-2)
@@ -361,41 +390,12 @@ ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to
 
 ---
 
-<a id="model-qnguyen3-nanollava"></a>
-
-### ✅ qnguyen3/nanoLLaVA
-
-**Metrics:** Load 0.77s | Gen 1.77s | Total 2.85s
-**Throughput:** Prompt 2,626 TPS (609 tok) | Gen 99.6 TPS (103 tok)
-**Assessment:** ❌ F (19/100) | Δ-47 | Mostly echoes context without adding value
-**Review Status:** watchlist (missing sections)
-**Review:** F 19/100 | Missing sections (keywords); Title length violation (4 words; expected 5-10); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Title: Sainsbury's Welwyn Garden City
-> Description: A modern Sainsbury's supermarket in Howardsgate, Welwyn Garden City,
-> England, United Kingdom, UK. The low sun casts long shadows from the bare-branched trees
-> onto the brick facade of the building. The living wall brings a splash of nature to the
-> urban landscape. The image captures the moment of shoppers making their way home with
-> their groceries. The Sainsbury's Supermarket is a sustainable architecture project in
-> the UK.
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- Missing sections (keywords)
-- Title length violation (4 words; expected 5-10)
-- Description sentence violation (5; expected 1-2)
-
----
-
 <a id="model-mlx-community-lfm25-vl-16b-bf16"></a>
 
 ### ✅ mlx-community/LFM2.5-VL-1.6B-bf16
 
-**Metrics:** Load 0.84s | Gen 1.84s | Total 3.00s
-**Throughput:** Prompt 3,069 TPS (867 tok) | Gen 180 TPS (200 tok)
+**Metrics:** Load 0.83s | Gen 1.84s | Total 2.99s
+**Throughput:** Prompt 3,025 TPS (867 tok) | Gen 181 TPS (200 tok)
 **Assessment:** 🟡 C (63/100) | Δ-2 | Mostly echoes context without adding value
 **Review Status:** watchlist (worse than metadata baseline)
 **Review:** C 63/100 | Description sentence violation (5; expected 1-2)
@@ -427,12 +427,12 @@ ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to
 
 ---
 
-<a id="model-huggingfacetb-smolvlm-instruct"></a>
+<a id="model-mlx-community-smolvlm-instruct-bf16"></a>
 
-### ✅ HuggingFaceTB/SmolVLM-Instruct
+### ✅ mlx-community/SmolVLM-Instruct-bf16
 
-**Metrics:** Load 1.11s | Gen 1.86s | Total 3.27s
-**Throughput:** Prompt 1,414 TPS (1,822 tok) | Gen 115 TPS (18 tok)
+**Metrics:** Load 1.18s | Gen 1.87s | Total 3.37s
+**Throughput:** Prompt 1,422 TPS (1,822 tok) | Gen 115 TPS (18 tok)
 **Assessment:** ❌ F (1/100) | Δ-65 | Output lacks detail
 **Review Status:** watchlist (context ignored, missing sections)
 **Review:** F 1/100 | Context ignored (missing: Howardsgate, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
@@ -450,12 +450,12 @@ Capture, GMT, GPS); Missing sections (title, description, keywords)
 
 ---
 
-<a id="model-mlx-community-smolvlm-instruct-bf16"></a>
+<a id="model-huggingfacetb-smolvlm-instruct"></a>
 
-### ✅ mlx-community/SmolVLM-Instruct-bf16
+### ✅ HuggingFaceTB/SmolVLM-Instruct
 
-**Metrics:** Load 1.05s | Gen 1.88s | Total 3.26s
-**Throughput:** Prompt 1,412 TPS (1,822 tok) | Gen 115 TPS (18 tok)
+**Metrics:** Load 1.08s | Gen 1.91s | Total 3.28s
+**Throughput:** Prompt 1,379 TPS (1,822 tok) | Gen 115 TPS (18 tok)
 **Assessment:** ❌ F (1/100) | Δ-65 | Output lacks detail
 **Review Status:** watchlist (context ignored, missing sections)
 **Review:** F 1/100 | Context ignored (missing: Howardsgate, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
@@ -477,8 +477,8 @@ Capture, GMT, GPS); Missing sections (title, description, keywords)
 
 ### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
 
-**Metrics:** Load 1.13s | Gen 2.06s | Total 3.51s
-**Throughput:** Prompt 1,379 TPS (1,722 tok) | Gen 113 TPS (42 tok)
+**Metrics:** Load 1.03s | Gen 2.05s | Total 3.39s
+**Throughput:** Prompt 1,378 TPS (1,722 tok) | Gen 114 TPS (42 tok)
 **Assessment:** 🟡 C (55/100) | Δ-11 | Mostly echoes context without adding value
 **Review Status:** watchlist (context ignored)
 **Review:** C 55/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, Adobe Stock, Any Vision, Eco, Europe, Locations, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
@@ -503,8 +503,8 @@ Capture, GMT, GPS); Title length violation (3 words; expected 5-10); ...
 
 ### ✅ prince-canuma/Florence-2-large-ft
 
-**Metrics:** Load 1.04s | Gen 2.22s | Total 3.57s
-**Throughput:** Prompt 4,827 TPS (1,181 tok) | Gen 318 TPS (500 tok)
+**Metrics:** Load 1.23s | Gen 2.20s | Total 3.75s
+**Throughput:** Prompt 4,902 TPS (1,181 tok) | Gen 324 TPS (500 tok)
 **Assessment:** ❌ F (0/100) | Δ-66 | Output too short to be useful
 **Review Status:** watchlist (context ignored, degeneration, harness, missing sections)
 **Review:** F 0/100 | ⚠️HARNESS:stop_token; Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Sainsbury, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
@@ -531,8 +531,8 @@ Capture, GMT, GPS); ...
 
 ### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
 
-**Metrics:** Load 3.40s | Gen 4.29s | Total 8.01s
-**Throughput:** Prompt 479 TPS (1,627 tok) | Gen 27.8 TPS (14 tok)
+**Metrics:** Load 3.52s | Gen 4.16s | Total 8.00s
+**Throughput:** Prompt 508 TPS (1,627 tok) | Gen 28.3 TPS (14 tok)
 **Assessment:** ❌ F (16/100) | Δ-50 | Output lacks detail
 **Review Status:** watchlist (context ignored, harness, missing sections)
 **Review:** F 16/100 | ⚠️HARNESS:prompt_template; Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Sainsbury, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
@@ -556,8 +556,8 @@ Capture, GMT, GPS); ...
 
 ### ✅ mlx-community/Ministral-3-3B-Instruct-2512-4bit
 
-**Metrics:** Load 1.40s | Gen 4.48s | Total 6.20s
-**Throughput:** Prompt 985 TPS (3,205 tok) | Gen 158 TPS (132 tok)
+**Metrics:** Load 1.40s | Gen 4.47s | Total 6.19s
+**Throughput:** Prompt 988 TPS (3,205 tok) | Gen 159 TPS (132 tok)
 **Assessment:** ✅ B (70/100) | Δ+4 | Mostly echoes context without adding value
 **Review Status:** strong candidate for first-pass review
 **Review:** B 70/100 | Description sentence violation (3; expected 1-2)
@@ -590,8 +590,8 @@ Capture, GMT, GPS); ...
 
 ### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
 
-**Metrics:** Load 1.49s | Gen 5.08s | Total 6.89s
-**Throughput:** Prompt 1,307 TPS (1,444 tok) | Gen 52.5 TPS (186 tok)
+**Metrics:** Load 1.50s | Gen 5.12s | Total 6.94s
+**Throughput:** Prompt 1,311 TPS (1,444 tok) | Gen 52.0 TPS (186 tok)
 **Assessment:** ✅ B (67/100) | Δ+1 | Mostly echoes context without adding value
 **Review Status:** strong candidate for first-pass review
 **Review:** B 67/100 | Description sentence violation (4; expected 1-2); Keyword count violation (22; expected 10-18)
@@ -623,8 +623,8 @@ Capture, GMT, GPS); ...
 
 ### ✅ mlx-community/gemma-3n-E2B-4bit
 
-**Metrics:** Load 3.05s | Gen 5.57s | Total 8.95s
-**Throughput:** Prompt 1,422 TPS (863 tok) | Gen 110 TPS (500 tok)
+**Metrics:** Load 3.07s | Gen 5.68s | Total 9.08s
+**Throughput:** Prompt 1,417 TPS (863 tok) | Gen 107 TPS (500 tok)
 **Assessment:** 🟠 D (45/100) | Δ-21 | Lacks visual description of image
 **Review Status:** watchlist (context echo, context ignored, missing sections, repetitive)
 **Review:** D 45/100 | Repetitive output (16:21:00); Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Sainsbury, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
@@ -656,8 +656,8 @@ Capture, GMT, GPS); ...
 
 ### ✅ mlx-community/InternVL3-8B-bf16
 
-**Metrics:** Load 2.80s | Gen 5.86s | Total 8.98s
-**Throughput:** Prompt 791 TPS (2,392 tok) | Gen 32.1 TPS (73 tok)
+**Metrics:** Load 2.84s | Gen 5.83s | Total 9.00s
+**Throughput:** Prompt 795 TPS (2,392 tok) | Gen 32.3 TPS (73 tok)
 **Assessment:** ✅ B (68/100) | Δ+2 | Mostly echoes context without adding value
 **Review Status:** strong candidate for first-pass review
 **Review:** B 68/100 | No quality issues detected
@@ -681,8 +681,8 @@ Capture, GMT, GPS); ...
 
 ### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
 
-**Metrics:** Load 3.05s | Gen 6.81s | Total 10.18s
-**Throughput:** Prompt 923 TPS (1,597 tok) | Gen 112 TPS (500 tok)
+**Metrics:** Load 3.09s | Gen 6.82s | Total 10.24s
+**Throughput:** Prompt 922 TPS (1,597 tok) | Gen 112 TPS (500 tok)
 **Assessment:** 🏆 A (90/100) | Δ+25 | None identified
 **Review Status:** watchlist (reasoning leak)
 **Review:** A 90/100 | Description sentence violation (5; expected 1-2); Keyword count violation (48; expected 10-18); ...
@@ -740,8 +740,8 @@ Capture, GMT, GPS); ...
 
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-8bit
 
-**Metrics:** Load 3.54s | Gen 7.26s | Total 11.12s
-**Throughput:** Prompt 972 TPS (1,597 tok) | Gen 100 TPS (500 tok)
+**Metrics:** Load 3.47s | Gen 7.37s | Total 11.18s
+**Throughput:** Prompt 975 TPS (1,597 tok) | Gen 97.8 TPS (500 tok)
 **Assessment:** ✅ B (70/100) | Δ+4 | Mostly echoes context without adding value
 **Review Status:** watchlist (degeneration, hallucination, missing sections, reasoning leak)
 **Review:** B 70/100 | Output degeneration (incomplete_sentence: ends with 'we'); Missing sections (title); ...
@@ -796,12 +796,44 @@ Capture, GMT, GPS); ...
 
 ---
 
+<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
+
+### ✅ mlx-community/gemma-3-27b-it-qat-4bit
+
+**Metrics:** Load 4.69s | Gen 8.31s | Total 13.33s
+**Throughput:** Prompt 192 TPS (872 tok) | Gen 27.9 TPS (94 tok)
+**Assessment:** 🏆 A (90/100) | Δ+24 | None identified
+**Review Status:** watchlist (context ignored)
+**Review:** A 90/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
+Capture, GMT, GPS)
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Title:
+> Sainsbury's supermarket with living wall facade
+>
+> Description:
+> A large brick Sainsbury's supermarket building features a full-height living wall on one
+> facade. Cars are parked in front, and pedestrians are visible near the entrance.
+>
+> Keywords:
+> Architecture, brick, building, cars, facade, green wall, living wall, modern, parking,
+> pedestrians, Sainsbury's, supermarket, urban, storefront, trees, daytime, exterior,
+> sunlight
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening Capture, GMT, GPS)
+
+---
+
 <a id="model-mlx-community-gemma-3n-e4b-it-bf16"></a>
 
 ### ✅ mlx-community/gemma-3n-E4B-it-bf16
 
-**Metrics:** Load 4.66s | Gen 8.34s | Total 13.39s
-**Throughput:** Prompt 908 TPS (871 tok) | Gen 41.6 TPS (290 tok)
+**Metrics:** Load 4.80s | Gen 8.41s | Total 13.61s
+**Throughput:** Prompt 901 TPS (871 tok) | Gen 41.4 TPS (290 tok)
 **Assessment:** 🏆 A (82/100) | Δ+16 | None identified
 **Review Status:** watchlist (missing sections)
 **Review:** A 82/100 | Missing sections (title, description, keywords)
@@ -841,44 +873,12 @@ Capture, GMT, GPS); ...
 
 ---
 
-<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
-
-### ✅ mlx-community/gemma-3-27b-it-qat-4bit
-
-**Metrics:** Load 4.68s | Gen 8.42s | Total 13.43s
-**Throughput:** Prompt 187 TPS (872 tok) | Gen 27.9 TPS (94 tok)
-**Assessment:** 🏆 A (90/100) | Δ+24 | None identified
-**Review Status:** watchlist (context ignored)
-**Review:** A 90/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
-Capture, GMT, GPS)
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Title:
-> Sainsbury's supermarket with living wall facade
->
-> Description:
-> A large brick Sainsbury's supermarket building features a full-height living wall on one
-> facade. Cars are parked in front, and pedestrians are visible near the entrance.
->
-> Keywords:
-> Architecture, brick, building, cars, facade, green wall, living wall, modern, parking,
-> pedestrians, Sainsbury's, supermarket, urban, storefront, trees, daytime, exterior,
-> sunlight
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening Capture, GMT, GPS)
-
----
-
 <a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
 
 ### ✅ mlx-community/Idefics3-8B-Llama3-bf16
 
-**Metrics:** Load 3.36s | Gen 9.71s | Total 13.40s
-**Throughput:** Prompt 709 TPS (2,891 tok) | Gen 29.4 TPS (153 tok)
+**Metrics:** Load 3.47s | Gen 9.67s | Total 13.49s
+**Throughput:** Prompt 714 TPS (2,891 tok) | Gen 29.6 TPS (153 tok)
 **Assessment:** ❌ F (29/100) | Δ-36 | Mostly echoes context without adding value
 **Review Status:** watchlist (context echo)
 **Review:** F 29/100 | Title length violation (11 words; expected 5-10); Context echo (94% overlap); ...
@@ -910,8 +910,8 @@ Capture, GMT, GPS)
 
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
 
-**Metrics:** Load 5.61s | Gen 9.75s | Total 15.68s
-**Throughput:** Prompt 968 TPS (1,597 tok) | Gen 67.6 TPS (500 tok)
+**Metrics:** Load 5.68s | Gen 9.75s | Total 15.75s
+**Throughput:** Prompt 967 TPS (1,597 tok) | Gen 67.9 TPS (500 tok)
 **Assessment:** 🏆 A (91/100) | Δ+25 | None identified
 **Review Status:** watchlist (reasoning leak)
 **Review:** A 91/100 | Description sentence violation (6; expected 1-2); Keyword count violation (34; expected 10-18); ...
@@ -968,42 +968,12 @@ Capture, GMT, GPS)
 
 ---
 
-<a id="model-mlx-community-pixtral-12b-8bit"></a>
-
-### ✅ mlx-community/pixtral-12b-8bit
-
-**Metrics:** Load 2.90s | Gen 10.28s | Total 13.52s
-**Throughput:** Prompt 518 TPS (3,396 tok) | Gen 34.9 TPS (115 tok)
-**Assessment:** ✅ B (66/100) | Δ+1 | Mostly echoes context without adding value
-**Review Status:** strong candidate for first-pass review
-**Review:** B 66/100 | No quality issues detected
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Title:
-> Sainsbury's Supermarket with Living Wall
->
-> Description:
-> A Sainsbury's supermarket with a prominent living wall facade is shown on a clear late
-> afternoon in early spring. Shoppers with bags exit the store, and a white car is parked
-> in front.
->
-> Keywords:
-> Sainsbury's, Supermarket, Living Wall, Urban Greening, Shoppers, Grocery Bags, Spring,
-> England, Brick Facade, Clear Sky, Late Afternoon, Sustainable Architecture, Modern
-> Retail Building, White Car, Bare-Branched Trees, Urban Landscape
-<!-- markdownlint-enable MD028 MD049 -->
-
-**Quality Status:** no quality issues detected in this run
-
----
-
 <a id="model-mlx-community-internvl3-14b-8bit"></a>
 
 ### ✅ mlx-community/InternVL3-14B-8bit
 
-**Metrics:** Load 2.93s | Gen 10.29s | Total 13.55s
-**Throughput:** Prompt 392 TPS (2,392 tok) | Gen 28.7 TPS (104 tok)
+**Metrics:** Load 2.93s | Gen 10.23s | Total 13.48s
+**Throughput:** Prompt 395 TPS (2,392 tok) | Gen 28.8 TPS (104 tok)
 **Assessment:** ✅ B (70/100) | Δ+4 | Mostly echoes context without adding value
 **Review Status:** strong candidate for first-pass review
 **Review:** B 70/100 | Title length violation (3 words; expected 5-10)
@@ -1034,8 +1004,8 @@ Capture, GMT, GPS)
 
 ### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
 
-**Metrics:** Load 2.22s | Gen 10.64s | Total 13.18s
-**Throughput:** Prompt 391 TPS (3,206 tok) | Gen 55.0 TPS (112 tok)
+**Metrics:** Load 2.22s | Gen 10.58s | Total 13.12s
+**Throughput:** Prompt 393 TPS (3,206 tok) | Gen 55.1 TPS (112 tok)
 **Assessment:** ✅ B (69/100) | Δ+4 | Mostly echoes context without adding value
 **Review Status:** strong candidate for first-pass review
 **Review:** B 69/100 | No quality issues detected
@@ -1064,8 +1034,8 @@ Capture, GMT, GPS)
 
 ### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
 
-**Metrics:** Load 2.19s | Gen 10.81s | Total 13.32s
-**Throughput:** Prompt 393 TPS (3,206 tok) | Gen 57.5 TPS (130 tok)
+**Metrics:** Load 2.19s | Gen 10.77s | Total 13.29s
+**Throughput:** Prompt 395 TPS (3,206 tok) | Gen 57.7 TPS (130 tok)
 **Assessment:** 🏆 A (88/100) | Δ+23 | None identified
 **Review Status:** watchlist (context ignored)
 **Review:** A 88/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Spring, Sustainable, Urban Greening
@@ -1095,12 +1065,42 @@ Capture, GMT, GPS); Description sentence violation (3; expected 1-2)
 
 ---
 
+<a id="model-mlx-community-pixtral-12b-8bit"></a>
+
+### ✅ mlx-community/pixtral-12b-8bit
+
+**Metrics:** Load 2.93s | Gen 10.78s | Total 14.05s
+**Throughput:** Prompt 477 TPS (3,396 tok) | Gen 35.3 TPS (115 tok)
+**Assessment:** ✅ B (66/100) | Δ+1 | Mostly echoes context without adding value
+**Review Status:** strong candidate for first-pass review
+**Review:** B 66/100 | No quality issues detected
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Title:
+> Sainsbury's Supermarket with Living Wall
+>
+> Description:
+> A Sainsbury's supermarket with a prominent living wall facade is shown on a clear late
+> afternoon in early spring. Shoppers with bags exit the store, and a white car is parked
+> in front.
+>
+> Keywords:
+> Sainsbury's, Supermarket, Living Wall, Urban Greening, Shoppers, Grocery Bags, Spring,
+> England, Brick Facade, Clear Sky, Late Afternoon, Sustainable Architecture, Modern
+> Retail Building, White Car, Bare-Branched Trees, Urban Landscape
+<!-- markdownlint-enable MD028 MD049 -->
+
+**Quality Status:** no quality issues detected in this run
+
+---
+
 <a id="model-microsoft-phi-35-vision-instruct"></a>
 
 ### ✅ microsoft/Phi-3.5-vision-instruct
 
-**Metrics:** Load 1.52s | Gen 11.11s | Total 12.91s
-**Throughput:** Prompt 1,307 TPS (1,444 tok) | Gen 52.1 TPS (500 tok)
+**Metrics:** Load 1.47s | Gen 11.23s | Total 13.02s
+**Throughput:** Prompt 1,307 TPS (1,444 tok) | Gen 51.7 TPS (500 tok)
 **Assessment:** ✅ B (68/100) | Δ+2 | Mostly echoes context without adding value
 **Review Status:** watchlist (degeneration, harness)
 **Review:** B 68/100 | ⚠️HARNESS:stop_token; Output degeneration (excessive_newlines); ...
@@ -1442,12 +1442,42 @@ Capture, GMT, GPS); Description sentence violation (3; expected 1-2)
 
 ---
 
+<a id="model-mlx-community-pixtral-12b-bf16"></a>
+
+### ✅ mlx-community/pixtral-12b-bf16
+
+**Metrics:** Load 4.58s | Gen 12.28s | Total 17.19s
+**Throughput:** Prompt 525 TPS (3,396 tok) | Gen 19.8 TPS (107 tok)
+**Assessment:** ✅ B (67/100) | Δ+1 | Mostly echoes context without adding value
+**Review Status:** strong candidate for first-pass review
+**Review:** B 67/100 | No quality issues detected
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Title:
+> Sainsbury's Supermarket with Living Wall
+>
+> Description:
+> A Sainsbury's supermarket with a prominent living wall facade is shown on a clear late
+> afternoon in early spring. Shoppers with bags exit the store, and a white car is parked
+> in front.
+>
+> Keywords:
+> Sainsbury's, Supermarket, Living Wall, Urban Greening, Shoppers, Grocery Bags, Spring,
+> England, Brick Facade, Modern Architecture, Clear Sky, Bare Trees, White Car,
+> Sustainable Architecture, Urban Landscape
+<!-- markdownlint-enable MD028 MD049 -->
+
+**Quality Status:** no quality issues detected in this run
+
+---
+
 <a id="model-mlx-community-gemma-3-27b-it-qat-8bit"></a>
 
 ### ✅ mlx-community/gemma-3-27b-it-qat-8bit
 
-**Metrics:** Load 6.80s | Gen 12.02s | Total 19.14s
-**Throughput:** Prompt 182 TPS (872 tok) | Gen 15.4 TPS (105 tok)
+**Metrics:** Load 6.91s | Gen 12.30s | Total 19.55s
+**Throughput:** Prompt 173 TPS (872 tok) | Gen 15.4 TPS (105 tok)
 **Assessment:** ✅ B (70/100) | Δ+4 | Mostly echoes context without adding value
 **Review Status:** watchlist (context ignored)
 **Review:** B 70/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
@@ -1475,42 +1505,12 @@ Capture, GMT, GPS)
 
 ---
 
-<a id="model-mlx-community-pixtral-12b-bf16"></a>
-
-### ✅ mlx-community/pixtral-12b-bf16
-
-**Metrics:** Load 4.56s | Gen 12.23s | Total 17.10s
-**Throughput:** Prompt 536 TPS (3,396 tok) | Gen 19.5 TPS (107 tok)
-**Assessment:** ✅ B (67/100) | Δ+1 | Mostly echoes context without adding value
-**Review Status:** strong candidate for first-pass review
-**Review:** B 67/100 | No quality issues detected
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Title:
-> Sainsbury's Supermarket with Living Wall
->
-> Description:
-> A Sainsbury's supermarket with a prominent living wall facade is shown on a clear late
-> afternoon in early spring. Shoppers with bags exit the store, and a white car is parked
-> in front.
->
-> Keywords:
-> Sainsbury's, Supermarket, Living Wall, Urban Greening, Shoppers, Grocery Bags, Spring,
-> England, Brick Facade, Modern Architecture, Clear Sky, Bare Trees, White Car,
-> Sustainable Architecture, Urban Landscape
-<!-- markdownlint-enable MD028 MD049 -->
-
-**Quality Status:** no quality issues detected in this run
-
----
-
 <a id="model-mlx-community-llava-v16-mistral-7b-8bit"></a>
 
 ### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
 
-**Metrics:** Load 1.66s | Gen 12.70s | Total 14.69s
-**Throughput:** Prompt 287 TPS (2,829 tok) | Gen 43.1 TPS (105 tok)
+**Metrics:** Load 1.56s | Gen 13.19s | Total 15.07s
+**Throughput:** Prompt 273 TPS (2,829 tok) | Gen 43.5 TPS (105 tok)
 **Assessment:** ❌ F (20/100) | Δ-46 | Mostly echoes context without adding value
 **Review Status:** watchlist (missing sections)
 **Review:** F 20/100 | Missing sections (title, description, keywords)
@@ -1535,8 +1535,8 @@ Capture, GMT, GPS)
 
 ### ✅ mlx-community/paligemma2-3b-pt-896-4bit
 
-**Metrics:** Load 2.56s | Gen 15.10s | Total 18.00s
-**Throughput:** Prompt 1,635 TPS (4,699 tok) | Gen 42.8 TPS (500 tok)
+**Metrics:** Load 2.69s | Gen 15.85s | Total 18.87s
+**Throughput:** Prompt 1,478 TPS (4,699 tok) | Gen 41.4 TPS (500 tok)
 **Assessment:** ✅ B (65/100) | Δ-1 | Lacks visual description of image
 **Review Status:** watchlist (context ignored, missing sections, reasoning leak, repetitive)
 **Review:** B 65/100 | Repetitive output (phrase: "- output only the..."); Excessive bullet points (38); ...
@@ -1593,12 +1593,63 @@ Capture, GMT, GPS)
 
 ---
 
+<a id="model-mlx-community-paligemma2-10b-ft-docci-448-bf16"></a>
+
+### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
+
+**Metrics:** Load 5.23s | Gen 15.99s | Total 21.56s
+**Throughput:** Prompt 444 TPS (1,627 tok) | Gen 4.87 TPS (58 tok)
+**Assessment:** 🟡 C (64/100) | Δ-2 | Lacks visual description of image
+**Review Status:** watchlist (context ignored, missing sections, reasoning leak)
+**Review:** C 64/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Sainsbury, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
+Capture, GMT, GPS); Missing sections (title, description, keywords); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> \- Use only the metadata that is clearly supported by the image.
+> \- If metadata and image disagree, follow the image.
+> \- Do not copy prompt instructions into the Title, Description, or Keywords fields.
+> \- Do not output reasoning, notes, hedging, or extra sections.
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Sainsbury, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening Capture, GMT, GPS)
+- Missing sections (title, description, keywords)
+- Reasoning leak (do not output reasoning)
+
+---
+
+<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
+
+### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+
+**Metrics:** Load 3.64s | Gen 16.09s | Total 20.05s
+**Throughput:** Prompt 225 TPS (2,710 tok) | Gen 28.0 TPS (102 tok)
+**Assessment:** ❌ F (7/100) | Δ-59 | Output too short to be useful
+**Review Status:** watchlist (harness, missing sections)
+**Review:** F 7/100 | ⚠️HARNESS:encoding; Missing sections (description, keywords); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Title:ĠSainsbury'sĠSupermarketĠwithĠLivingĠWallĊĊDescription:ĠAĠSainsbury'sĠsupermarketĠbuildingĠfeaturesĠaĠlargeĠverticalĠgardenĠonĠitsĠfacade,ĠwithĠshoppersĠwalkingĠnearbyĠandĠcarsĠparkedĠinĠfront.ĠTheĠsceneĠisĠsetĠonĠaĠclearĠdayĠwithĠlongĠshadowsĠcastĠbyĠtheĠlowĠsun.ĊĊKeywords:ĠSainsbury's,Ġsupermarket,ĠlivingĠwall,ĠverticalĠgarden,ĠurbanĠgreening,ĠbrickĠfacade,Ġshoppers,Ġcars,ĠclearĠday,ĠlongĠshadows,ĠmodernĠretailĠbuilding,ĠsustainableĠarchitecture,ĠUK,ĠEurope
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- ⚠️HARNESS:encoding
+- Missing sections (description, keywords)
+- Title length violation (67 words; expected 5-10)
+- token_encoding:bpe_space_leak(65)
+
+---
+
 <a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
 
 ### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
 
-**Metrics:** Load 8.95s | Gen 15.46s | Total 24.75s
-**Throughput:** Prompt 610 TPS (1,941 tok) | Gen 43.6 TPS (500 tok)
+**Metrics:** Load 10.91s | Gen 17.86s | Total 29.10s
+**Throughput:** Prompt 347 TPS (1,941 tok) | Gen 43.9 TPS (500 tok)
 **Assessment:** ✅ B (70/100) | Δ+4 | None identified
 **Review Status:** watchlist (missing sections)
 **Review:** B 70/100 | Missing sections (title, description, keywords)
@@ -1640,63 +1691,12 @@ Capture, GMT, GPS)
 
 ---
 
-<a id="model-mlx-community-paligemma2-10b-ft-docci-448-bf16"></a>
-
-### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
-
-**Metrics:** Load 5.01s | Gen 15.78s | Total 21.12s
-**Throughput:** Prompt 482 TPS (1,627 tok) | Gen 4.83 TPS (58 tok)
-**Assessment:** 🟡 C (64/100) | Δ-2 | Lacks visual description of image
-**Review Status:** watchlist (context ignored, missing sections, reasoning leak)
-**Review:** C 64/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Sainsbury, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
-Capture, GMT, GPS); Missing sections (title, description, keywords); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> \- Use only the metadata that is clearly supported by the image.
-> \- If metadata and image disagree, follow the image.
-> \- Do not copy prompt instructions into the Title, Description, or Keywords fields.
-> \- Do not output reasoning, notes, hedging, or extra sections.
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Sainsbury, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening Capture, GMT, GPS)
-- Missing sections (title, description, keywords)
-- Reasoning leak (do not output reasoning)
-
----
-
-<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
-
-### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
-
-**Metrics:** Load 3.56s | Gen 16.53s | Total 20.42s
-**Throughput:** Prompt 216 TPS (2,710 tok) | Gen 28.2 TPS (102 tok)
-**Assessment:** ❌ F (7/100) | Δ-59 | Output too short to be useful
-**Review Status:** watchlist (harness, missing sections)
-**Review:** F 7/100 | ⚠️HARNESS:encoding; Missing sections (description, keywords); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Title:ĠSainsbury'sĠSupermarketĠwithĠLivingĠWallĊĊDescription:ĠAĠSainsbury'sĠsupermarketĠbuildingĠfeaturesĠaĠlargeĠverticalĠgardenĠonĠitsĠfacade,ĠwithĠshoppersĠwalkingĠnearbyĠandĠcarsĠparkedĠinĠfront.ĠTheĠsceneĠisĠsetĠonĠaĠclearĠdayĠwithĠlongĠshadowsĠcastĠbyĠtheĠlowĠsun.ĊĊKeywords:ĠSainsbury's,Ġsupermarket,ĠlivingĠwall,ĠverticalĠgarden,ĠurbanĠgreening,ĠbrickĠfacade,Ġshoppers,Ġcars,ĠclearĠday,ĠlongĠshadows,ĠmodernĠretailĠbuilding,ĠsustainableĠarchitecture,ĠUK,ĠEurope
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- ⚠️HARNESS:encoding
-- Missing sections (description, keywords)
-- Title length violation (67 words; expected 5-10)
-- token_encoding:bpe_space_leak(65)
-
----
-
 <a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
 
 ### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
-**Metrics:** Load 2.55s | Gen 20.00s | Total 22.87s
-**Throughput:** Prompt 169 TPS (580 tok) | Gen 9.48 TPS (153 tok)
+**Metrics:** Load 2.57s | Gen 20.63s | Total 23.52s
+**Throughput:** Prompt 169 TPS (580 tok) | Gen 9.12 TPS (153 tok)
 **Assessment:** 🏆 A (82/100) | Δ+16 | None identified
 **Review Status:** watchlist (context ignored, missing sections)
 **Review:** A 82/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
@@ -1731,8 +1731,8 @@ Capture, GMT, GPS); Missing sections (title, description, keywords)
 
 ### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
 
-**Metrics:** Load 2.73s | Gen 22.65s | Total 25.70s
-**Throughput:** Prompt 409 TPS (3,487 tok) | Gen 36.4 TPS (500 tok)
+**Metrics:** Load 2.83s | Gen 23.02s | Total 26.18s
+**Throughput:** Prompt 403 TPS (3,487 tok) | Gen 35.8 TPS (500 tok)
 **Assessment:** 🏆 A (93/100) | Δ+27 | None identified
 **Review Status:** watchlist (degeneration, missing sections, reasoning leak)
 **Review:** A 93/100 | Output degeneration (incomplete_sentence: ends with 'we'); Missing sections (title); ...
@@ -1785,8 +1785,8 @@ Capture, GMT, GPS); Missing sections (title, description, keywords)
 
 ### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
 
-**Metrics:** Load 2.09s | Gen 29.62s | Total 32.03s
-**Throughput:** Prompt 319 TPS (6,723 tok) | Gen 61.5 TPS (500 tok)
+**Metrics:** Load 2.08s | Gen 28.56s | Total 30.98s
+**Throughput:** Prompt 334 TPS (6,723 tok) | Gen 62.6 TPS (500 tok)
 **Assessment:** 🏆 A (93/100) | Δ+27 | None identified
 **Review Status:** watchlist (context ignored, missing sections, reasoning leak)
 **Review:** A 93/100 | Excessive bullet points (34); Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Spring, Urban Greening
@@ -1884,8 +1884,8 @@ Capture, GMT, GPS); ...
 
 ### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
 
-**Metrics:** Load 3.08s | Gen 31.37s | Total 34.78s
-**Throughput:** Prompt 1,550 TPS (1,627 tok) | Gen 16.7 TPS (500 tok)
+**Metrics:** Load 3.24s | Gen 31.06s | Total 34.63s
+**Throughput:** Prompt 1,525 TPS (1,627 tok) | Gen 16.9 TPS (500 tok)
 **Assessment:** 🏆 A (86/100) | Δ+20 | None identified
 **Review Status:** watchlist (context ignored, missing sections)
 **Review:** A 86/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Sainsbury, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
@@ -1934,8 +1934,8 @@ Capture, GMT, GPS); Missing sections (title, description, keywords)
 
 ### ✅ mlx-community/GLM-4.6V-Flash-6bit
 
-**Metrics:** Load 2.39s | Gen 33.56s | Total 36.28s
-**Throughput:** Prompt 304 TPS (6,723 tok) | Gen 45.6 TPS (500 tok)
+**Metrics:** Load 2.35s | Gen 31.16s | Total 33.84s
+**Throughput:** Prompt 336 TPS (6,723 tok) | Gen 46.6 TPS (500 tok)
 **Assessment:** 🏆 A (85/100) | Δ+19 | None identified
 **Review Status:** watchlist (context ignored, missing sections, reasoning leak)
 **Review:** A 85/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
@@ -1991,65 +1991,71 @@ Capture, GMT, GPS); Missing sections (title, description, keywords); ...
 
 ---
 
-<a id="model-meta-llama-llama-32-11b-vision-instruct"></a>
-
-### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
-
-**Metrics:** Load 3.93s | Gen 41.40s | Total 45.65s
-**Throughput:** Prompt 161 TPS (581 tok) | Gen 3.88 TPS (145 tok)
-**Assessment:** 🏆 A (84/100) | Δ+18 | None identified
-**Review Status:** watchlist (context ignored, missing sections)
-**Review:** A 84/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
-Capture, GMT, GPS); Missing sections (title, description, keywords)
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Sainsbury's Supermarket in a Modern Retail Building with a Green Wall
->
-> The image depicts a Sainsbury's supermarket situated in a modern retail building,
-> characterized by a striking green wall that covers the side of the building. The
-> building's façade is made of red brick and features a large glass window on the right
-> side. The green wall is composed of various plants and mosses, adding a touch of nature
-> to the urban landscape. The building is situated in a busy street, with a white car
-> driving by and people walking on the sidewalk. The sky above is a clear blue, indicating
-> a sunny day. The overall atmosphere of the image is one of a bustling urban area with a
-> touch of natural beauty.
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening Capture, GMT, GPS)
-- Missing sections (title, description, keywords)
-
----
-
 <a id="model-mlx-community-molmo-7b-d-0924-bf16"></a>
 
 ### ✅ mlx-community/Molmo-7B-D-0924-bf16
 
-**Metrics:** Load 3.00s | Gen 41.85s | Total 45.17s
-**Throughput:** Prompt 51.1 TPS (1,788 tok) | Gen 27.9 TPS (169 tok)
-**Assessment:** 🟡 C (52/100) | Δ-14 | Lacks visual description of image
-**Review Status:** watchlist (context ignored, missing sections, refusal)
-**Review:** C 52/100 | Context ignored (missing: Howardsgate, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
-Capture, GMT, GPS); Refusal detected (insufficient_info); ...
+**Metrics:** Load 2.93s | Gen 39.68s | Total 42.93s
+**Throughput:** Prompt 52.0 TPS (1,788 tok) | Gen 27.9 TPS (125 tok)
+**Assessment:** 🟡 C (55/100) | Δ-10 | Missing requested structure
+**Review Status:** watchlist (context ignored, missing sections)
+**Review:** C 55/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Shoppers, Shopping Bags, Sustainable, Urban Greening
+Capture, GMT, GPS); Missing sections (title, description, keywords)
 
 <!-- markdownlint-disable MD028 MD049 -->
 >
 > Camera: Canon EOS R5 with RF 24-105mm f/4L IS USM lens. ISO: 400. Shutter speed:
 > 1/250s. Aperture: f/4.0. White balance: 5600K. Exposure compensation: +0.7 EV. Color
 > temperature: 5600K. White balance: As shot. Focus: Manual. Lighting: Natural, late
-> afternoon. Film type: Digital. Image style: Photographic representationalism, realism.
-> Image orientation: Horizontal. Image format: 16:9. Image size: 5120x3456 pixels. Image
-> quality: High. Image description: Living wall on Sainsbury's building in Welwyn Garden
-> City, England.
+> afternoon. Season: Early spring. Subject: Living wall on Sainsbury's supermarket. Style:
+> Photographic representationalism realism.
 <!-- markdownlint-enable MD028 MD049 -->
 
 ⚠️ **Quality Warnings:**
 
-- Context ignored (missing: Howardsgate, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening Capture, GMT, GPS)
-- Refusal detected (insufficient_info)
+- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Shoppers, Shopping Bags, Sustainable, Urban Greening Capture, GMT, GPS)
 - Missing sections (title, description, keywords)
+
+---
+
+<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
+
+### ✅ mlx-community/Molmo-7B-D-0924-8bit
+
+**Metrics:** Load 1.92s | Gen 43.05s | Total 45.29s
+**Throughput:** Prompt 52.1 TPS (1,788 tok) | Gen 43.8 TPS (345 tok)
+**Assessment:** ✅ B (72/100) | Δ+6 | None identified
+**Review Status:** watchlist (refusal)
+**Review:** B 72/100 | Refusal detected (insufficient_info); Keyword count violation (21; expected 10-18)
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Camera: Canon EOS R5 with RF 24-105mm f/4L IS USM lens. ISO: 400. Shutter speed:
+> 1/250s. Aperture: f/4.0. White balance: 5600K. Exposure compensation: +0.7 EV. Color
+> temperature: 5600K. White balance: As shot. Focus: Manual. Lighting: Natural, late
+> afternoon sun. Film simulation: Standard. Post-processing: Minimal adjustments to
+> contrast and sharpness. Image style: Photographic representationalism, realism. Image
+> quality: High definition, 4K (3840x2160). Watermark: Adobe Stock #51800333. Copyright:
+> 2026, Any Vision. Photographer: Howardsgate, Welwyn Garden City, England, United
+> Kingdom, UK
+> Title: Living wall adorns Sainsbury's facade in Welwyn Garden City, England
+>
+> Description: A striking green living wall brings life to the urban landscape of
+> Howardsgate in Welwyn Garden City, England. The low sun casts long shadows from
+> bare-branched trees onto the brick facade of a Sainsbury's supermarket, where shoppers
+> are seen making their way home with their groceries.
+>
+> Keywords: Living wall, Sainsbury's, Welwyn Garden City, England, United Kingdom, UK,
+> Urban Greening, Modern retail building, Supermarket facade, Nature-inspired
+> architecture, Sustainable design, Green urban planning, Environmental consciousness,
+> Architectural innovation, British retail, British town, British suburban scene,
+> Photography, Urban landscape, Architectural photography, Environmental photography
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Refusal detected (insufficient_info)
+- Keyword count violation (21; expected 10-18)
 
 ---
 
@@ -2057,8 +2063,8 @@ Capture, GMT, GPS); Refusal detected (insufficient_info); ...
 
 ### ✅ mlx-community/X-Reasoner-7B-8bit
 
-**Metrics:** Load 2.17s | Gen 42.15s | Total 44.64s
-**Throughput:** Prompt 436 TPS (16,837 tok) | Gen 47.6 TPS (145 tok)
+**Metrics:** Load 2.20s | Gen 43.09s | Total 45.61s
+**Throughput:** Prompt 426 TPS (16,837 tok) | Gen 47.8 TPS (145 tok)
 **Assessment:** ✅ B (69/100) | Δ+3 | Mostly echoes context without adding value
 **Review Status:** strong candidate for first-pass review
 **Review:** B 69/100 | Title length violation (4 words; expected 5-10); Description sentence violation (3; expected 1-2); ...
@@ -2089,41 +2095,35 @@ Capture, GMT, GPS); Refusal detected (insufficient_info); ...
 
 ---
 
-<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
+<a id="model-meta-llama-llama-32-11b-vision-instruct"></a>
 
-### ✅ mlx-community/Molmo-7B-D-0924-8bit
+### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
 
-**Metrics:** Load 1.88s | Gen 42.20s | Total 44.40s
-**Throughput:** Prompt 52.2 TPS (1,788 tok) | Gen 44.5 TPS (317 tok)
-**Assessment:** 🟡 C (56/100) | Δ-10 | Mostly echoes context without adding value
-**Review Status:** watchlist (refusal)
-**Review:** C 56/100 | Refusal detected (insufficient_info)
+**Metrics:** Load 3.95s | Gen 43.35s | Total 47.62s
+**Throughput:** Prompt 158 TPS (581 tok) | Gen 3.69 TPS (145 tok)
+**Assessment:** 🏆 A (84/100) | Δ+18 | None identified
+**Review Status:** watchlist (context ignored, missing sections)
+**Review:** A 84/100 | Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
+Capture, GMT, GPS); Missing sections (title, description, keywords)
 
 <!-- markdownlint-disable MD028 MD049 -->
 >
-> Camera: Canon EOS R5 with RF 24-105mm f/4L IS USM lens. ISO: 400. Shutter speed:
-> 1/250s. Aperture: f/4.0. White balance: 5600K. Exposure compensation: +0.7 EV. Color
-> temperature: 5600K. White balance: As shot. Focus: Manual. Lighting: Natural, late
-> afternoon sun. Film simulation: Standard. Post-processing: Minimal adjustments to
-> contrast and sharpness. Image style: Photographic representationalism, realism. Image
-> quality: High definition, 4K (3840x2160). Watermark: Adobe Stock #51800333. Copyright:
-> 2026, Any Vision. Photographer: Howardsgate, Welwyn Garden City, England, United
-> Kingdom, UK
-> Title: Living wall adorns Sainsbury's facade in Welwyn Garden City, England
+> Sainsbury's Supermarket in a Modern Retail Building with a Green Wall
 >
-> Description: A striking green living wall brings life to the urban landscape of
-> Howardsgate in Welwyn Garden City, England. The low sun casts long shadows from
-> bare-branched trees onto the brick facade of a Sainsbury's supermarket, where shoppers
-> are seen making their way home with their groceries.
->
-> Keywords: Living wall, Sainsbury's, Welwyn Garden City, England, United Kingdom, UK,
-> Modern retail building, Sustainable architecture, Urban Greening, Shoppers, Shopping
-> Bags, Spring, Supermarket, UK
+> The image depicts a Sainsbury's supermarket situated in a modern retail building,
+> characterized by a striking green wall that covers the side of the building. The
+> building's façade is made of red brick and features a large glass window on the right
+> side. The green wall is composed of various plants and mosses, adding a touch of nature
+> to the urban landscape. The building is situated in a busy street, with a white car
+> driving by and people walking on the sidewalk. The sky above is a clear blue, indicating
+> a sunny day. The overall atmosphere of the image is one of a bustling urban area with a
+> touch of natural beauty.
 <!-- markdownlint-enable MD028 MD049 -->
 
 ⚠️ **Quality Warnings:**
 
-- Refusal detected (insufficient_info)
+- Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening Capture, GMT, GPS)
+- Missing sections (title, description, keywords)
 
 ---
 
@@ -2131,8 +2131,8 @@ Capture, GMT, GPS); Refusal detected (insufficient_info); ...
 
 ### ✅ Qwen/Qwen3-VL-2B-Instruct
 
-**Metrics:** Load 1.38s | Gen 45.39s | Total 47.08s
-**Throughput:** Prompt 392 TPS (16,826 tok) | Gen 75.4 TPS (146 tok)
+**Metrics:** Load 1.29s | Gen 46.77s | Total 48.37s
+**Throughput:** Prompt 379 TPS (16,826 tok) | Gen 75.7 TPS (146 tok)
 **Assessment:** ✅ B (68/100) | Δ+2 | Mostly echoes context without adding value
 **Review Status:** strong candidate for first-pass review
 **Review:** B 68/100 | Description sentence violation (3; expected 1-2)
@@ -2163,8 +2163,8 @@ Capture, GMT, GPS); Refusal detected (insufficient_info); ...
 
 ### ✅ mlx-community/GLM-4.6V-nvfp4
 
-**Metrics:** Load 10.17s | Gen 49.36s | Total 59.86s
-**Throughput:** Prompt 203 TPS (6,723 tok) | Gen 31.7 TPS (500 tok)
+**Metrics:** Load 11.58s | Gen 51.08s | Total 62.99s
+**Throughput:** Prompt 193 TPS (6,723 tok) | Gen 31.8 TPS (500 tok)
 **Assessment:** 🏆 A (92/100) | Δ+26 | None identified
 **Review Status:** watchlist (missing sections, reasoning leak)
 **Review:** A 92/100 | Missing sections (title, description); Keyword count violation (35; expected 10-18); ...
@@ -2214,8 +2214,8 @@ Capture, GMT, GPS); Refusal detected (insufficient_info); ...
 
 ### ✅ mlx-community/Qwen3-VL-2B-Thinking-bf16
 
-**Metrics:** Load 1.47s | Gen 55.28s | Total 57.07s
-**Throughput:** Prompt 350 TPS (16,828 tok) | Gen 75.4 TPS (500 tok)
+**Metrics:** Load 1.50s | Gen 55.09s | Total 56.91s
+**Throughput:** Prompt 351 TPS (16,828 tok) | Gen 75.3 TPS (500 tok)
 **Assessment:** 🏆 A (83/100) | Δ+17 | None identified
 **Review Status:** watchlist (missing sections)
 **Review:** A 83/100 | Missing sections (title); Description sentence violation (7; expected 1-2); ...
@@ -2267,8 +2267,8 @@ Capture, GMT, GPS); Refusal detected (insufficient_info); ...
 
 ### ✅ mlx-community/Qwen3.5-35B-A3B-6bit
 
-**Metrics:** Load 5.64s | Gen 72.70s | Total 78.66s
-**Throughput:** Prompt 257 TPS (16,850 tok) | Gen 74.4 TPS (500 tok)
+**Metrics:** Load 5.55s | Gen 78.20s | Total 84.08s
+**Throughput:** Prompt 237 TPS (16,850 tok) | Gen 76.6 TPS (500 tok)
 **Assessment:** ✅ B (73/100) | Δ+7 | Missing requested structure
 **Review Status:** watchlist (hallucination, missing sections, reasoning leak, refusal)
 **Review:** B 73/100 | Refusal detected (explicit_refusal); Missing sections (title, description, keywords); ...
@@ -2323,8 +2323,8 @@ Capture, GMT, GPS); Refusal detected (insufficient_info); ...
 
 ### ✅ mlx-community/Qwen3.5-35B-A3B-bf16
 
-**Metrics:** Load 12.91s | Gen 76.25s | Total 89.49s
-**Throughput:** Prompt 253 TPS (16,850 tok) | Gen 54.9 TPS (500 tok)
+**Metrics:** Load 13.51s | Gen 78.88s | Total 92.71s
+**Throughput:** Prompt 243 TPS (16,850 tok) | Gen 55.3 TPS (500 tok)
 **Assessment:** 🏆 A (95/100) | Δ+29 | None identified
 **Review Status:** watchlist (context ignored, harness, long context, missing sections)
 **Review:** A 95/100 | ⚠️HARNESS:long_context; Excessive bullet points (33); ...
@@ -2390,8 +2390,8 @@ Capture, GMT, GPS); Refusal detected (insufficient_info); ...
 
 ### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
 
-**Metrics:** Load 1.00s | Gen 84.10s | Total 85.42s
-**Throughput:** Prompt 203 TPS (16,837 tok) | Gen 176 TPS (147 tok)
+**Metrics:** Load 1.16s | Gen 87.17s | Total 88.66s
+**Throughput:** Prompt 196 TPS (16,837 tok) | Gen 181 TPS (147 tok)
 **Assessment:** ❌ F (23/100) | Δ-43 | Mostly echoes context without adding value
 **Review Status:** watchlist (context echo)
 **Review:** F 23/100 | Context echo (96% overlap); suspicious_precision: 2 overly precise numbers
@@ -2419,8 +2419,8 @@ Capture, GMT, GPS); Refusal detected (insufficient_info); ...
 
 ### ✅ mlx-community/Qwen3.5-27B-4bit
 
-**Metrics:** Load 3.63s | Gen 152.60s | Total 156.56s
-**Throughput:** Prompt 127 TPS (16,850 tok) | Gen 25.2 TPS (500 tok)
+**Metrics:** Load 3.61s | Gen 159.87s | Total 163.83s
+**Throughput:** Prompt 121 TPS (16,850 tok) | Gen 25.1 TPS (500 tok)
 **Assessment:** ✅ B (74/100) | Δ+8 | Missing requested structure
 **Review Status:** watchlist (context echo, missing sections, reasoning leak, refusal)
 **Review:** B 74/100 | Refusal detected (explicit_refusal); Missing sections (title, description, keywords); ...
@@ -2475,8 +2475,8 @@ Capture, GMT, GPS); Refusal detected (insufficient_info); ...
 
 ### ✅ mlx-community/Qwen3.5-27B-mxfp8
 
-**Metrics:** Load 5.47s | Gen 168.62s | Total 174.42s
-**Throughput:** Prompt 125 TPS (16,850 tok) | Gen 15.1 TPS (500 tok)
+**Metrics:** Load 5.64s | Gen 178.96s | Total 184.92s
+**Throughput:** Prompt 116 TPS (16,850 tok) | Gen 14.9 TPS (500 tok)
 **Assessment:** ✅ B (74/100) | Δ+8 | Missing requested structure
 **Review Status:** watchlist (missing sections, reasoning leak)
 **Review:** B 74/100 | Missing sections (title, description, keywords); Reasoning leak (description hint:)

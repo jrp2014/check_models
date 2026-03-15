@@ -13925,7 +13925,7 @@ def _build_cataloguing_prompt(metadata: MetadataDict) -> str:
     context-ignorance diagnostics.
     """
     parts: list[str] = [
-        "Analyze this image for cataloguing metadata.",
+        "Analyze this image for cataloguing metadata, using British English.",
         "",
         (
             "Use only details that are clearly and definitely visible in the image. "
