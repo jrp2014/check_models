@@ -53,6 +53,9 @@ Notable changes to this project will be documented in this file.
 - Tightened `tools.analyze_output_quality` argument validation so conflicting
   `--prompt` and `--prompt-file` sources now fail fast instead of silently
   allowing ambiguous prompt context.
+- Added a machine-readable `--json` mode to `tools.analyze_output_quality` so
+  quality-analysis results can be consumed directly by scripts and triage
+  tooling without scraping the human report output.
 - Tightened report-generation typing in `src/check_models.py` by replacing broad
   `getattr`/cast access in gallery helpers with narrower protocol-based checks
   for throughput and cached quality-analysis fields.

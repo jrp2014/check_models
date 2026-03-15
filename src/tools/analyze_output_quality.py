@@ -7,7 +7,9 @@ running a local MLX model.
 from __future__ import annotations
 
 import argparse
+import json
 import sys
+from dataclasses import asdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -47,6 +49,11 @@ def _build_parser() -> argparse.ArgumentParser:
         type=str,
         default="Context:",
         help="Prompt section marker where factual context begins.",
+    )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit machine-readable JSON instead of the human report.",
     )
     return parser
 
@@ -168,6 +175,29 @@ def _print_analysis_report(
     print("-" * 60 + "\n")
 
 
+def _build_json_payload(
+    analysis: GenerationQualityAnalysis,
+    *,
+    word_count: int,
+    estimated_tokens: int,
+    prompt_tokens: int | None,
+) -> dict[str, object]:
+    """Build a stable machine-readable JSON payload for CLI consumers."""
+    issue_string = _build_quality_issues_string(analysis) or ""
+    exit_code = 1 if analysis.has_any_issues() else 0
+    return {
+        "status": "issues" if exit_code else "clean",
+        "exit_code": exit_code,
+        "summary": {
+            "word_count": word_count,
+            "estimated_tokens": estimated_tokens,
+            "prompt_tokens": prompt_tokens,
+            "issue_string": issue_string,
+        },
+        "analysis": asdict(analysis),
+    }
+
+
 def main() -> int:
     """Run CLI output-quality analysis."""
     parser = _build_parser()
@@ -194,13 +224,29 @@ def main() -> int:
         prompt_tokens=prompt_tokens,
         context_marker=args.context_marker,
     )
+    exit_code = 1 if analysis.has_any_issues() else 0
+    if args.json:
+        print(
+            json.dumps(
+                _build_json_payload(
+                    analysis,
+                    word_count=word_count,
+                    estimated_tokens=estimated_tokens,
+                    prompt_tokens=prompt_tokens,
+                ),
+                indent=2,
+                sort_keys=True,
+            ),
+        )
+        return exit_code
+
     _print_analysis_report(
         analysis,
         word_count=word_count,
         estimated_tokens=estimated_tokens,
         prompt_tokens=prompt_tokens,
     )
-    return 1 if analysis.has_any_issues() else 0
+    return exit_code
 
 
 if __name__ == "__main__":

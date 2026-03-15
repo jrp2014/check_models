@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import sys
 from typing import TYPE_CHECKING
 
@@ -164,3 +165,56 @@ def test_analyze_output_quality_rejects_prompt_and_prompt_file(
 
     captured = capsys.readouterr()
     assert "not allowed with argument --prompt" in captured.err
+
+
+def test_analyze_output_quality_json_clean_output(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """JSON mode should emit machine-readable clean analysis."""
+    original_argv = sys.argv
+    sys.argv = [
+        "analyze_output_quality.py",
+        "--text",
+        "This is a normal sentence about a beautiful landscape and trees.",
+        "--json",
+    ]
+
+    try:
+        exit_code = main()
+        assert exit_code == 0
+    finally:
+        sys.argv = original_argv
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert payload["status"] == "clean"
+    assert payload["exit_code"] == 0
+    assert payload["summary"]["issue_string"] == ""
+    assert payload["analysis"]["has_harness_issue"] is False
+
+
+def test_analyze_output_quality_json_issue_output(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """JSON mode should emit machine-readable issue details."""
+    original_argv = sys.argv
+    sys.argv = [
+        "analyze_output_quality.py",
+        "--text",
+        "This text has a leaked boundary token <|endoftext|>",
+        "--json",
+    ]
+
+    try:
+        exit_code = main()
+        assert exit_code == 1
+    finally:
+        sys.argv = original_argv
+
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert payload["status"] == "issues"
+    assert payload["exit_code"] == 1
+    assert payload["analysis"]["has_harness_issue"] is True
+    assert payload["analysis"]["harness_issue_type"] == "stop_token"
+    assert payload["summary"]["issue_string"]
