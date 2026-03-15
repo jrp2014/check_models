@@ -181,7 +181,8 @@ class TestProcessImageWithModelMock:
             raise ValueError(decode_error_message)
 
         def _raise_after_repetitive_output(
-            *_args: object, **_kwargs: object
+            *_args: object,
+            **_kwargs: object,
         ) -> _FakeGenerationResult:
             unreachable_message = "unreachable"
             sys.stdout.write(("loop " * 25).strip() + "\n")

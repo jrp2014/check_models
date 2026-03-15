@@ -783,7 +783,8 @@ class TestDiagnosticsReport:
         assert "transformers/issues/new" in content
 
     def test_report_written_for_stack_signal_uses_preflight_owner_hint(
-        self, tmp_path: Path
+        self,
+        tmp_path: Path,
     ) -> None:
         """Stack-signal rows should reuse matching preflight ownership hints when available."""
         out = tmp_path / "diag.md"
