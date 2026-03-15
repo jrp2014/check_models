@@ -108,33 +108,18 @@ conda activate mlx-vlm
 
 The script handles Python 3.13 setup, dependencies, and optional PyTorch support.
 
+For clean machines and normal project use, this conda workflow is the supported path.
+
 ### Manual Installation
 
-If you prefer manual setup, we support `pip`, `uv`, and `conda`.
+If you prefer to create the environment manually, use conda and run the package
+install commands from the `src/` directory.
 
 <details>
-<summary>Click to view manual installation methods</summary>
-
-#### Using `uv` (Fastest)
+<summary>Click to view manual conda setup</summary>
 
 ```bash
-pip install uv
-uv venv
-source .venv/bin/activate
-uv pip install -e .
-```
-
-#### Using `pip`
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -e .
-```
-
-#### Using `conda`
-
-```bash
+cd src
 conda create -n mlx-vlm python=3.13
 conda activate mlx-vlm
 pip install -e .
@@ -143,6 +128,10 @@ pip install -e .
 </details>
 
 ### Optional Dependencies
+
+Unless noted otherwise, the `pip install -e ...` commands below assume you are
+running them from `src/`. From the repository root, prefer `make install`,
+`make dev`, or `make -C src install-torch`.
 
 Enable additional features by installing "extras":
 

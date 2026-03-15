@@ -9,6 +9,7 @@ This script checks:
 
 Usage:
     python -m tools.validate_env
+    python -m tools.validate_env --expected-conda-env my-env
     python -m tools.validate_env --fix  # Auto-fix issues
 """
 
@@ -39,8 +40,8 @@ except ImportError:  # pragma: no cover - optional for bootstrap scenarios
     Version = None
 
 REQUIRED_PYTHON_VERSION: Final[tuple[int, int]] = (3, 13)
-# Default env name, but we'll try to detect or be flexible
-EXPECTED_CONDA_ENV: Final[str] = "mlx-vlm"
+DEFAULT_CONDA_ENV: Final[str] = "mlx-vlm"
+EXPECTED_CONDA_ENV_ENVVAR: Final[str] = "CHECK_MODELS_EXPECTED_CONDA_ENV"
 
 
 class ValidationError(Exception):
@@ -167,8 +168,22 @@ def check_python_version() -> None:
     logger.info("✓ Python %d.%d.%d", *sys.version_info[:3])
 
 
-def check_conda_env() -> None:
-    """Verify we're in the expected conda environment (if conda is used)."""
+def _resolve_expected_conda_env(cli_expected_env: str | None = None) -> str | None:
+    """Resolve optional strict conda-env expectation from CLI or environment."""
+    if cli_expected_env:
+        normalized_cli = cli_expected_env.strip()
+        if normalized_cli:
+            return normalized_cli
+
+    env_expected = os.environ.get(EXPECTED_CONDA_ENV_ENVVAR, "").strip()
+    if env_expected:
+        return env_expected
+
+    return None
+
+
+def check_conda_env_with_expected(expected_env: str | None) -> None:
+    """Verify we're in an active conda environment, with optional strict name matching."""
     if not shutil.which("conda"):
         logger.info("⊘ Conda not found (skipping env check)")
         return
@@ -176,14 +191,20 @@ def check_conda_env() -> None:
     active_env = os.environ.get("CONDA_DEFAULT_ENV")
     if not active_env:
         logger.warning("⚠ Conda is installed but no environment is active")
-        logger.warning("  Activate with: conda activate %s", EXPECTED_CONDA_ENV)
+        logger.warning("  Activate with: conda activate %s", expected_env or DEFAULT_CONDA_ENV)
         return
 
-    if active_env != EXPECTED_CONDA_ENV:
-        logger.warning("⚠ Active conda env '%s' != expected '%s'", active_env, EXPECTED_CONDA_ENV)
-        logger.warning("  Switch with: conda activate %s", EXPECTED_CONDA_ENV)
-    else:
-        logger.info("✓ Conda environment '%s' active", active_env)
+    if expected_env and active_env != expected_env:
+        logger.warning("⚠ Active conda env '%s' != expected '%s'", active_env, expected_env)
+        logger.warning("  Switch with: conda activate %s", expected_env)
+        return
+
+    logger.info("✓ Conda environment '%s' active", active_env)
+
+
+def check_conda_env() -> None:
+    """Verify we're in an active conda environment, using optional configured strict matching."""
+    check_conda_env_with_expected(_resolve_expected_conda_env())
 
 
 def check_package(name: str, version_spec: str) -> bool:
@@ -384,7 +405,17 @@ def main() -> int:
         action="store_true",
         help="Attempt to auto-fix issues (install packages, hooks)",
     )
+    parser.add_argument(
+        "--expected-conda-env",
+        type=str,
+        default=None,
+        help=(
+            "Require a specific active conda env name. If omitted, any active conda env "
+            "is accepted; you can also set CHECK_MODELS_EXPECTED_CONDA_ENV."
+        ),
+    )
     args = parser.parse_args()
+    expected_conda_env = _resolve_expected_conda_env(args.expected_conda_env)
 
     logging.basicConfig(
         level=logging.INFO,
@@ -402,7 +433,7 @@ def main() -> int:
 
         # Conda environment
         logger.info("\nChecking conda environment...")
-        check_conda_env()
+        check_conda_env_with_expected(expected_conda_env)
 
         # Core packages
         logger.info("\nChecking core packages...")

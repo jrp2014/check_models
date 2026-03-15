@@ -26,7 +26,7 @@ DEFAULT_ENV_NAME="mlx-vlm"
 
 # Help function
 show_help() {
-    cat << EOF
+    cat <<'EOF'
 setup_conda_env.sh - Create conda environment for MLX VLM Check
 
 USAGE:
@@ -47,11 +47,11 @@ DESCRIPTION:
 REQUIREMENTS:
     - macOS (preferably with Apple Silicon)
     - conda or miniconda installed
-    - pyproject.toml file in current directory (for development install)
+    - Run from the repository root or `src/` directory
 
 EXAMPLES:
-    ./setup_conda_env.sh                 # Create environment named 'mlx-vlm'
-    ./setup_conda_env.sh my-vlm-env      # Create environment named 'my-vlm-env'
+    bash src/tools/setup_conda_env.sh      # From repository root
+    bash src/tools/setup_conda_env.sh my-vlm-env
 
 EOF
 }
@@ -108,7 +108,15 @@ check_conda() {
     if ! command -v conda &> /dev/null; then
         if source_conda_sh "$HOME/miniconda3/etc/profile.d/conda.sh"; then
             :
+        elif source_conda_sh "$HOME/miniforge3/etc/profile.d/conda.sh"; then
+            :
+        elif source_conda_sh "$HOME/mambaforge/etc/profile.d/conda.sh"; then
+            :
         elif source_conda_sh "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"; then
+            :
+        elif source_conda_sh "/opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh"; then
+            :
+        elif source_conda_sh "/opt/homebrew/Caskroom/mambaforge/base/etc/profile.d/conda.sh"; then
             :
         elif source_conda_sh "$HOME/anaconda3/etc/profile.d/conda.sh"; then
             :
@@ -276,24 +284,27 @@ To use the MLX VLM environment:
 1. Activate the environment:
    ${BLUE}conda activate $ENV_NAME${NC}
 
+    Note: the script activates conda only inside its own shell. You still need
+    to run the command above in your current shell before using Python or Make.
+
 2. Run the script directly:
-   ${BLUE}python check_models.py --help${NC}
+    ${BLUE}python -m check_models --help${NC}
 
 3. Or use the CLI command:
    ${BLUE}check_models --help${NC}
 
 4. Example usage:
-   ${BLUE}check_models --image /path/to/image.jpg${NC}
-   ${BLUE}check_models --models "microsoft/Florence-2-large"${NC}
+    ${BLUE}python -m check_models --image /path/to/image.jpg${NC}
+    ${BLUE}python -m check_models --models "microsoft/Florence-2-large"${NC}
 
 Optional installs:
     - To include PyTorch stack during setup, answer 'y' when prompted, or later run:
-    ${BLUE}pip install -e ".[torch]"${NC}
+    ${BLUE}make -C src install-torch${NC}
 
 5. Deactivate when done:
    ${BLUE}conda deactivate${NC}
 
-For more information, see README.md
+For more information, see the repo root README and src/README.md
 
 EOF
 }

@@ -59,6 +59,10 @@ Notable changes to this project will be documented in this file.
 - Added a machine-readable `--json` mode to `tools.analyze_output_quality` so
   quality-analysis results can be consumed directly by scripts and triage
   tooling without scraping the human report output.
+- Tightened clean-machine environment setup so the bootstrap script now prints
+  repo-root-safe usage commands, probes common Miniforge/Mambaforge conda
+  locations, and `tools.validate_env` no longer falsely rejects custom active
+  conda env names unless strict matching is explicitly requested.
 - Tightened report-generation typing in `src/check_models.py` by replacing broad
   `getattr`/cast access in gallery helpers with narrower protocol-based checks
   for throughput and cached quality-analysis fields.

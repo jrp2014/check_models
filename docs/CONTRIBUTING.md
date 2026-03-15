@@ -67,13 +67,9 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
 4. **Verify installation**:
 
    ```bash
-   # Verify environment
+   # Verify environment and install custom git hooks (run from src/)
    cd src
    python -m tools.validate_env
-   cd ..
-   
-   # Optional: install custom git hooks (pre-commit + pre-push)
-   cd src
    python -m tools.install_precommit_hook
    cd ..
 
