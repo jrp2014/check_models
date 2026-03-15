@@ -1353,6 +1353,29 @@ class TestDiagnosticsReport:
         assert "Likely component" in content
         assert "<summary>Sample output</summary>" not in content
 
+    def test_harness_section_uses_prompt_template_owner_hint(self, tmp_path: Path) -> None:
+        """Prompt-template harness issues should not be flattened into mlx runtime ownership."""
+        out = tmp_path / "diag.md"
+        generate_diagnostics_report(
+            results=[
+                _make_harness_success(
+                    name="org/harness-template",
+                    text="",
+                    prompt_tokens=4000,
+                    generation_tokens=0,
+                    harness_type="prompt_template",
+                    harness_detail="output:zero_tokens",
+                ),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "`model-config / mlx-vlm`" in content
+        assert "validate chat-template/config expectations and mlx-vlm prompt formatting" in content
+
     def test_harness_token_leak_details_are_escaped(self, tmp_path: Path) -> None:
         """Token leak details should be escaped so markdown does not treat them as HTML."""
         out = tmp_path / "diag.md"
@@ -1776,6 +1799,33 @@ class TestDiagnosticsReport:
         assert (
             "Long-context or stack-signal anomalies: 1 model(s) likely owned by "
             "transformers / mlx-vlm."
+        ) in caplog.text
+
+    def test_log_maintainer_summary_mentions_harness_owner_hint(
+        self,
+        tmp_path: Path,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """Maintainer summary should report inferred owners for harness anomalies."""
+        diagnostics_path = tmp_path / "diagnostics.md"
+        diagnostics_path.write_text("summary\n", encoding="utf-8")
+        snapshot = DiagnosticsSnapshot(
+            harness_results=((_make_harness_success("org/harness-template"), ""),),
+        )
+        artifacts = DiagnosticsArtifacts(
+            snapshot=snapshot,
+            diagnostics_written=True,
+            repro_bundles={},
+        )
+
+        with caplog.at_level("INFO", logger=check_models.LOGGER_NAME):
+            _log_maintainer_summary(
+                artifacts=artifacts,
+                diagnostics_path=diagnostics_path,
+            )
+
+        assert (
+            "Harness/runtime anomalies: 1 model(s) likely owned by model-config / mlx-vlm."
         ) in caplog.text
 
 

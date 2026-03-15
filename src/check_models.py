@@ -8049,8 +8049,8 @@ def _maintainer_owner_counts(snapshot: DiagnosticsSnapshot) -> list[tuple[str, i
         owner = _diagnostics_owner_label(representative.error_package or "unknown")
         owner_counts[owner] += len(cluster_results)
 
-    if snapshot.harness_results:
-        owner_counts[_diagnostics_owner_label("mlx-vlm / mlx")] += len(snapshot.harness_results)
+    for res, _text in snapshot.harness_results:
+        owner_counts[_diagnostics_owner_label(_infer_harness_issue_owner(res))] += 1
 
     for _res, _symptom, package_hint in snapshot.stack_signals:
         owner_counts[_diagnostics_owner_label(package_hint)] += 1
@@ -8113,9 +8113,11 @@ def _log_maintainer_summary(
         )
 
     if snapshot.harness_results:
+        owner_text = _summarize_harness_issue_owners(snapshot.harness_results)
         logger.info(
-            "Harness/runtime anomalies: %d model(s) likely owned by mlx-vlm / mlx.",
+            "Harness/runtime anomalies: %d model(s) likely owned by %s.",
             len(snapshot.harness_results),
+            owner_text,
         )
     if snapshot.stack_signals:
         owner_text = _summarize_stack_signal_owners(snapshot.stack_signals)
@@ -8613,9 +8615,21 @@ def _diagnostics_next_action(owner_key: str) -> str:
     action = _DIAGNOSTICS_OWNER_ACTIONS["unknown"]
     if owner_key in _DIAGNOSTICS_OWNER_ACTIONS:
         action = _DIAGNOSTICS_OWNER_ACTIONS[owner_key]
+    elif "model-config" in owner_key and "mlx-vlm" in owner_key:
+        action = (
+            "validate chat-template/config expectations and mlx-vlm prompt "
+            "formatting for this model."
+        )
+    elif "model-config" in owner_key:
+        action = _DIAGNOSTICS_OWNER_ACTIONS["model-config"]
     elif "mlx-vlm" in owner_key and "mlx" in owner_key:
         action = (
             "validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime."
+        )
+    elif "mlx-vlm" in owner_key and "mlx-lm" in owner_key:
+        action = (
+            "validate generation-loop handoff and template continuation behavior "
+            "across mlx-vlm + mlx-lm."
         )
     elif "transformers" in owner_key:
         action = _DIAGNOSTICS_OWNER_ACTIONS["transformers"]
@@ -8626,6 +8640,46 @@ def _diagnostics_next_action(owner_key: str) -> str:
     elif "mlx" in owner_key:
         action = _DIAGNOSTICS_OWNER_ACTIONS["mlx"]
     return action
+
+
+def _infer_harness_issue_owner(result: PerformanceResult) -> str:
+    """Infer the most likely owner for a successful-run harness issue."""
+    gen = result.generation
+    qa = result.quality_analysis or (getattr(gen, "quality_analysis", None) if gen else None)
+    if qa is None:
+        return "mlx-vlm"
+
+    harness_type = (qa.harness_issue_type or "").strip().lower()
+    harness_details = tuple((detail or "").strip().lower() for detail in qa.harness_issue_details)
+
+    inferred_owner = "mlx-vlm"
+    if harness_type == "prompt_template":
+        inferred_owner = "model-config / mlx-vlm"
+    elif harness_type == "long_context":
+        inferred_owner = "mlx-vlm / mlx"
+    elif harness_type == "generation_loop" and any(
+        detail.startswith("training_leak:") for detail in harness_details
+    ):
+        inferred_owner = "mlx-vlm / mlx-lm"
+    elif any(detail.startswith("output:") for detail in harness_details):
+        inferred_owner = "model-config / mlx-vlm"
+
+    return inferred_owner
+
+
+def _summarize_harness_issue_owners(
+    harness_results: Sequence[tuple[PerformanceResult, str]],
+) -> str:
+    """Return a readable owner summary for harness diagnostics."""
+    pair_owner_count = 2
+    owners = sorted({_infer_harness_issue_owner(res) for res, _text in harness_results})
+    if not owners:
+        return "unknown"
+    if len(owners) == 1:
+        return owners[0]
+    if len(owners) == pair_owner_count:
+        return f"{owners[0]} and {owners[1]}"
+    return ", ".join(owners[:-1]) + f", and {owners[-1]}"
 
 
 def _diagnostics_action_summary(
@@ -8657,10 +8711,11 @@ def _diagnostics_action_summary(
         )
 
     if harness_results:
+        owner_text = _summarize_harness_issue_owners(harness_results)
         items.append(
-            "- **[Medium] [mlx-vlm / mlx]** Harness/integration warnings on "
+            f"- **[Medium] [{owner_text}]** Harness/integration warnings on "
             f"{len(harness_results)} model(s). "
-            "Next: validate stop-token decoding and long-context behavior.",
+            "Next: validate prompt templating, token decoding, and long-context behavior.",
         )
 
     if stack_signals:
@@ -8972,9 +9027,7 @@ def _diagnostics_harness_section(
         generated_tokens = int(getattr(gen, "generation_tokens", 0) or 0) if gen else 0
         ratio_text = f"{(generated_tokens / prompt_tokens):.2%}" if prompt_tokens > 0 else "n/a"
 
-        likely_package = "mlx-vlm"
-        if harness_type == "long_context":
-            likely_package = "mlx-vlm / mlx"
+        likely_package = _infer_harness_issue_owner(res)
 
         _append_markdown_section(parts, title=f"### `{res.model_name}`")
         harness_summary = _HARNESS_TYPE_DESCRIPTIONS.get(
@@ -9091,13 +9144,17 @@ def _diagnostics_priority_table(
             )
 
     if harness_results:
+        owner_text = _summarize_harness_issue_owners(harness_results)
         names = ", ".join(r.model_name.split("/")[-1] for r, _ in harness_results)
         esc_names = DIAGNOSTICS_ESCAPER.escape(names)
         n = len(harness_results)
-        action = DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action("mlx-vlm / mlx"))
+        action = DIAGNOSTICS_ESCAPER.escape(
+            "validate prompt templating, token decoding, and long-context behavior "
+            "in the VLM stack.",
+        )
         table_rows.append(
             "| **Medium** | Harness/integration | "
-            f"{n} ({esc_names}) | `mlx-vlm / mlx` | {action} |",
+            f"{n} ({esc_names}) | `{DIAGNOSTICS_ESCAPER.escape(owner_text)}` | {action} |",
         )
     if stack_signals:
         owner_text = _summarize_stack_signal_owners(stack_signals)
