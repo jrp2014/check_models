@@ -25,6 +25,10 @@ Notable changes to this project will be documented in this file.
 - Expanded long-context stack-signal heuristics so successful runs with extreme
   prompt lengths can also be surfaced for context-echo and degeneration
   symptoms, instead of only empty-output and low-ratio cases.
+- Tightened diagnostics owner attribution so stack-signal anomalies can reuse
+  matching preflight compatibility hints and point at narrower likely owners
+  such as `transformers / mlx-vlm` instead of always collapsing into the broad
+  `mlx-vlm / mlx` bucket.
 - Tightened report-generation typing in `src/check_models.py` by replacing broad
   `getattr`/cast access in gallery helpers with narrower protocol-based checks
   for throughput and cached quality-analysis fields.

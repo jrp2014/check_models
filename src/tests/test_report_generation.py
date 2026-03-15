@@ -758,6 +758,73 @@ class TestDiagnosticsReport:
         assert "transformers/issues/new" in content
         assert "Preflight compatibility warning" in content
 
+    def test_report_written_for_stack_signal_uses_preflight_owner_hint(
+        self, tmp_path: Path
+    ) -> None:
+        """Stack-signal rows should reuse matching preflight ownership hints when available."""
+        out = tmp_path / "diag.md"
+        success = PerformanceResult(
+            model_name="org/stack-transformers",
+            success=True,
+            generation=_MockGeneration(
+                text="echoed context",
+                prompt_tokens=15000,
+                generation_tokens=80,
+            ),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+            quality_analysis=GenerationQualityAnalysis(
+                is_repetitive=False,
+                repeated_token=None,
+                hallucination_issues=[],
+                is_verbose=False,
+                formatting_issues=[],
+                has_excessive_bullets=False,
+                bullet_count=0,
+                is_context_ignored=False,
+                missing_context_terms=[],
+                is_refusal=False,
+                refusal_type=None,
+                is_generic=False,
+                specificity_score=0.0,
+                has_language_mixing=False,
+                language_mixing_issues=[],
+                has_degeneration=False,
+                degeneration_type=None,
+                has_fabrication=False,
+                fabrication_issues=[],
+                has_reasoning_leak=False,
+                reasoning_leak_markers=[],
+                has_context_echo=True,
+                context_echo_ratio=0.9,
+                has_harness_issue=False,
+                harness_issue_type=None,
+                harness_issue_details=[],
+                word_count=80,
+                unique_ratio=0.3,
+                prompt_checks_ran=True,
+            ),
+        )
+
+        result = generate_diagnostics_report(
+            results=[success],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            prompt="test",
+            history=DiagnosticsHistoryInputs(
+                preflight_issues=(
+                    "transformers import utils no longer reference known backend guard env vars",
+                ),
+            ),
+        )
+
+        assert result is True
+        content = out.read_text(encoding="utf-8")
+        assert "`transformers / mlx-vlm`" in content
+        assert "Stack-signal anomaly" in content
+
     def test_report_written_on_failure(self, tmp_path: Path) -> None:
         """Diagnostics file created when a model fails."""
         out = tmp_path / "diag.md"
@@ -1256,7 +1323,7 @@ class TestDiagnosticsReport:
         assert result is True
         content = out.read_text(encoding="utf-8")
         assert "### Long-Context Degradation / Potential Stack Issues" in content
-        assert "Context echo under extreme prompt length" in content
+        assert "Stack-signal anomaly" in content
         assert "org/context-echo" in content
 
     def test_harness_section_includes_tokens_and_empty_marker(self, tmp_path: Path) -> None:
@@ -1661,6 +1728,55 @@ class TestDiagnosticsReport:
         assert "Diagnostics signals: failures=1, harness=1, stack=0, preflight=1" in caplog.text
         assert "Likely owners:" in caplog.text
         assert "Repro bundles available for 1 failed model(s)." in caplog.text
+
+    def test_log_maintainer_summary_mentions_stack_signal_owner_hint(
+        self,
+        tmp_path: Path,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """Maintainer summary should report inferred owners for stack-signal anomalies."""
+        diagnostics_path = tmp_path / "diagnostics.md"
+        diagnostics_path.write_text("summary\n", encoding="utf-8")
+        stack_result = PerformanceResult(
+            model_name="org/stack-transformers",
+            success=True,
+            generation=_MockGeneration(
+                text="echoed context",
+                prompt_tokens=15000,
+                generation_tokens=80,
+            ),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+        )
+        snapshot = DiagnosticsSnapshot(
+            stack_signals=(
+                (
+                    stack_result,
+                    "Context echo under extreme prompt length",
+                    "transformers / mlx-vlm",
+                ),
+            ),
+            preflight_issues=(
+                "transformers import utils no longer reference known backend guard env vars",
+            ),
+        )
+        artifacts = DiagnosticsArtifacts(
+            snapshot=snapshot,
+            diagnostics_written=True,
+            repro_bundles={},
+        )
+
+        with caplog.at_level("INFO", logger=check_models.LOGGER_NAME):
+            _log_maintainer_summary(
+                artifacts=artifacts,
+                diagnostics_path=diagnostics_path,
+            )
+
+        assert (
+            "Long-context or stack-signal anomalies: 1 model(s) likely owned by "
+            "transformers / mlx-vlm."
+        ) in caplog.text
 
 
 class TestClusterFailuresByPattern:

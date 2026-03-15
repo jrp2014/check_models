@@ -8002,7 +8002,10 @@ def _build_diagnostics_snapshot(
     failed = tuple(r for r in resolved_results if not r.success)
     successful = [r for r in resolved_results if r.success]
     harness_detected = _collect_harness_results(successful)
-    stack_detected = _collect_stack_issue_signals(successful)
+    stack_detected = _collect_stack_issue_signals(
+        successful,
+        preflight_issues=preflight_issues,
+    )
     harness_results, stack_signals, unflagged_successful = _partition_success_diagnostics(
         successful=successful,
         harness_results=harness_detected,
@@ -8115,9 +8118,11 @@ def _log_maintainer_summary(
             len(snapshot.harness_results),
         )
     if snapshot.stack_signals:
+        owner_text = _summarize_stack_signal_owners(snapshot.stack_signals)
         logger.info(
-            "Long-context or stack-signal anomalies: %d model(s).",
+            "Long-context or stack-signal anomalies: %d model(s) likely owned by %s.",
             len(snapshot.stack_signals),
+            owner_text,
         )
     if snapshot.preflight_issues:
         logger.info(
@@ -8260,6 +8265,8 @@ def _collect_harness_results(
 
 def _collect_stack_issue_signals(
     successful: list[PerformanceResult],
+    *,
+    preflight_issues: Sequence[str] = (),
 ) -> list[tuple[PerformanceResult, str, str]]:
     """Collect likely upstream stack issues from successful-but-suspicious runs."""
     signals: list[tuple[PerformanceResult, str, str]] = []
@@ -8276,7 +8283,14 @@ def _collect_stack_issue_signals(
         ratio = (generated_tokens / prompt_tokens) if prompt_tokens > 0 else 0.0
 
         if not text.strip() or generated_tokens == 0:
-            signals.append((res, "Empty output despite successful run", "mlx-vlm"))
+            symptom = "Empty output despite successful run"
+            signals.append(
+                (
+                    res,
+                    symptom,
+                    _infer_stack_signal_owner(symptom, preflight_issues=preflight_issues),
+                ),
+            )
             continue
 
         if (
@@ -8284,11 +8298,12 @@ def _collect_stack_issue_signals(
             and generated_tokens < QUALITY.min_output_tokens_for_ratio
             and ratio < QUALITY.min_output_ratio
         ):
+            symptom = f"Long-context low output ratio ({ratio:.1%})"
             signals.append(
                 (
                     res,
-                    f"Long-context low output ratio ({ratio:.1%})",
-                    "mlx-vlm / mlx",
+                    symptom,
+                    _infer_stack_signal_owner(symptom, preflight_issues=preflight_issues),
                 ),
             )
             continue
@@ -8304,15 +8319,21 @@ def _collect_stack_issue_signals(
             )
         ):
             if qa.is_repetitive:
-                symptom = "Repetition under extreme prompt length"
+                symptom = "Repetition under long prompt length"
             elif qa.is_context_ignored:
-                symptom = "Context dropped under extreme prompt length"
+                symptom = "Context dropped under long prompt length"
             elif qa.has_context_echo:
-                symptom = "Context echo under extreme prompt length"
+                symptom = "Context echo under long prompt length"
             else:
                 degeneration_type = qa.degeneration_type or "degradation"
-                symptom = f"Output degeneration under extreme prompt length ({degeneration_type})"
-            signals.append((res, symptom, "mlx-vlm / mlx"))
+                symptom = f"Output degeneration under long prompt length ({degeneration_type})"
+            signals.append(
+                (
+                    res,
+                    symptom,
+                    _infer_stack_signal_owner(symptom, preflight_issues=preflight_issues),
+                ),
+            )
 
     return signals
 
@@ -8463,6 +8484,54 @@ def _guess_preflight_issue_package(issue: str) -> str:
     return "unknown"
 
 
+def _infer_stack_signal_owner(
+    symptom: str,
+    *,
+    preflight_issues: Sequence[str] = (),
+) -> str:
+    """Infer the most likely owner for a successful-run stack anomaly."""
+    preflight_packages = {
+        _guess_preflight_issue_package(issue)
+        for issue in preflight_issues
+        if _guess_preflight_issue_package(issue) != "unknown"
+    }
+    symptom_lower = symptom.casefold()
+
+    owner = "mlx-vlm / mlx"
+
+    if "empty output" in symptom_lower:
+        owner = "mlx-vlm"
+
+    package_priority = (
+        ("huggingface-hub", "huggingface-hub"),
+        ("transformers", "transformers"),
+        ("mlx-lm", "mlx-lm"),
+        ("mlx", "mlx"),
+        ("mlx-vlm", "mlx-vlm"),
+    )
+    for package_name, package_owner in package_priority:
+        if package_name in preflight_packages:
+            owner = package_owner
+
+    if "mlx-vlm" in preflight_packages and "mlx" in preflight_packages:
+        owner = "mlx-vlm / mlx"
+    if "transformers" in preflight_packages and any(
+        marker in symptom_lower
+        for marker in ("context", "prompt", "echo", "degeneration", "long-context")
+    ):
+        owner = "transformers / mlx-vlm"
+
+    return owner
+
+
+def _summarize_stack_signal_owners(
+    stack_signals: Sequence[tuple[PerformanceResult, str, str]],
+) -> str:
+    """Return a readable owner summary for stack-signal diagnostics."""
+    owners = sorted({owner for _res, _symptom, owner in stack_signals})
+    return ", ".join(owners) if owners else "unknown"
+
+
 def _diagnostics_preflight_section(preflight_issues: Sequence[str]) -> list[str]:
     """Build diagnostics section for compatibility warnings seen during preflight."""
     if not preflight_issues:
@@ -8595,8 +8664,9 @@ def _diagnostics_action_summary(
         )
 
     if stack_signals:
+        owner_text = _summarize_stack_signal_owners(stack_signals)
         items.append(
-            "- **[Medium] [mlx-vlm / mlx]** Stack-signal anomalies on "
+            f"- **[Medium] [{owner_text}]** Stack-signal anomalies on "
             f"{len(stack_signals)} successful model(s). "
             "Next: inspect prompt/output token ratios and empty-output patterns.",
         )
@@ -8988,6 +9058,7 @@ def _diagnostics_stack_signal_section(
 def _diagnostics_priority_table(
     failure_clusters: list[tuple[str, list[PerformanceResult]]],
     harness_results: list[tuple[PerformanceResult, str]],
+    stack_signals: list[tuple[PerformanceResult, str, str]],
     preflight_issues: Sequence[str],
 ) -> list[str]:
     """Build the priority summary table for the diagnostics report."""
@@ -9027,6 +9098,18 @@ def _diagnostics_priority_table(
         table_rows.append(
             "| **Medium** | Harness/integration | "
             f"{n} ({esc_names}) | `mlx-vlm / mlx` | {action} |",
+        )
+    if stack_signals:
+        owner_text = _summarize_stack_signal_owners(stack_signals)
+        names = ", ".join(r.model_name.split("/")[-1] for r, _symptom, _owner in stack_signals)
+        esc_names = DIAGNOSTICS_ESCAPER.escape(names)
+        n = len(stack_signals)
+        action = DIAGNOSTICS_ESCAPER.escape(
+            "inspect prompt/output ratios, long-context behavior, and upstream compatibility cues.",
+        )
+        table_rows.append(
+            "| **Medium** | Stack-signal anomaly | "
+            f"{n} ({esc_names}) | `{DIAGNOSTICS_ESCAPER.escape(owner_text)}` | {action} |",
         )
     if preflight_issues:
         package_names = sorted(
@@ -9907,7 +9990,14 @@ def generate_diagnostics_report(
             preflight_issues=preflight_issues,
         ),
     )
-    parts.extend(_diagnostics_priority_table(failure_clusters, harness_results, preflight_issues))
+    parts.extend(
+        _diagnostics_priority_table(
+            failure_clusters,
+            harness_results,
+            stack_signals,
+            preflight_issues,
+        ),
+    )
     parts.extend(
         _diagnostics_failure_clusters(
             failure_clusters,
