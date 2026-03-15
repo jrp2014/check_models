@@ -31,12 +31,13 @@ def _build_parser() -> argparse.ArgumentParser:
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--text", type=str, help="Text string to evaluate directly.")
     group.add_argument("--file", type=Path, help="File containing text to evaluate.")
-    parser.add_argument(
+    prompt_group = parser.add_mutually_exclusive_group()
+    prompt_group.add_argument(
         "--prompt",
         type=str,
         help="Optional prompt string used for context-echo and contract checks.",
     )
-    parser.add_argument(
+    prompt_group.add_argument(
         "--prompt-file",
         type=Path,
         help="File containing prompt text. Mutually exclusive with --prompt.",

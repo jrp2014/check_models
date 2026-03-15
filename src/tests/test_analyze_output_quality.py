@@ -134,3 +134,33 @@ def test_analyze_output_quality_with_prompt_file(
     captured = capsys.readouterr()
     assert "Prompt Checks Ran         : ✅ Yes" in captured.out
     assert "CLEAN" in captured.out
+
+
+def test_analyze_output_quality_rejects_prompt_and_prompt_file(
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """The CLI should reject conflicting prompt sources."""
+    prompt_file = tmp_path / "test_prompt.txt"
+    prompt_file.write_text("Context: Existing metadata hints", encoding="utf-8")
+
+    original_argv = sys.argv
+    sys.argv = [
+        "analyze_output_quality.py",
+        "--text",
+        "Simple text",
+        "--prompt",
+        "inline prompt",
+        "--prompt-file",
+        str(prompt_file),
+    ]
+
+    try:
+        with pytest.raises(SystemExit) as exc_info:
+            main()
+        assert exc_info.value.code == 2
+    finally:
+        sys.argv = original_argv
+
+    captured = capsys.readouterr()
+    assert "not allowed with argument --prompt" in captured.err

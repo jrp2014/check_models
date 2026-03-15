@@ -47,6 +47,9 @@ Notable changes to this project will be documented in this file.
   `tools.analyze_output_quality` CLI so quality and harness heuristics can be
   exercised directly against arbitrary text or saved outputs without running a
   model.
+- Tightened `tools.analyze_output_quality` argument validation so conflicting
+  `--prompt` and `--prompt-file` sources now fail fast instead of silently
+  allowing ambiguous prompt context.
 - Tightened report-generation typing in `src/check_models.py` by replacing broad
   `getattr`/cast access in gallery helpers with narrower protocol-based checks
   for throughput and cached quality-analysis fields.
