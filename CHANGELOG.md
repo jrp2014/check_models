@@ -39,6 +39,10 @@ Notable changes to this project will be documented in this file.
 - Tightened harness maintainer triage so mixed harness-owner runs now render as
   separate action-summary and priority-table rows instead of collapsing config
   and runtime signals into one generic maintainer bucket.
+- Tightened diagnostics maintainer triage so mixed stack-signal and preflight
+  owner classes also render as separate action-summary and priority-table rows,
+  instead of collapsing upstream compatibility and runtime issues into one
+  merged owner bucket.
 - Added an env-aware `make analyze-quality` workflow plus a standalone
   `tools.analyze_output_quality` CLI so quality and harness heuristics can be
   exercised directly against arbitrary text or saved outputs without running a

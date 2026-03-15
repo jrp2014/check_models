@@ -8534,6 +8534,28 @@ def _summarize_stack_signal_owners(
     return ", ".join(owners) if owners else "unknown"
 
 
+def _group_stack_signals_by_owner(
+    stack_signals: Sequence[tuple[PerformanceResult, str, str]],
+) -> list[tuple[str, list[tuple[PerformanceResult, str, str]]]]:
+    """Group stack-signal rows by inferred owner for maintainer triage."""
+    grouped: dict[str, list[tuple[PerformanceResult, str, str]]] = {}
+    for result in stack_signals:
+        owner = result[2]
+        grouped.setdefault(owner, []).append(result)
+    return sorted(grouped.items(), key=lambda item: (item[0], len(item[1])))
+
+
+def _group_preflight_issues_by_owner(
+    preflight_issues: Sequence[str],
+) -> list[tuple[str, list[str]]]:
+    """Group preflight warnings by inferred owner for maintainer triage."""
+    grouped: dict[str, list[str]] = {}
+    for issue in preflight_issues:
+        owner = _guess_preflight_issue_package(issue)
+        grouped.setdefault(owner, []).append(issue)
+    return sorted(grouped.items(), key=lambda item: (item[0], len(item[1])))
+
+
 def _diagnostics_preflight_section(preflight_issues: Sequence[str]) -> list[str]:
     """Build diagnostics section for compatibility warnings seen during preflight."""
     if not preflight_issues:
@@ -8729,22 +8751,21 @@ def _diagnostics_action_summary(
             f"Next: {_diagnostics_next_action(owner_key)}",
         )
 
-    if stack_signals:
-        owner_text = _summarize_stack_signal_owners(stack_signals)
+    for owner_key, owner_signals in _group_stack_signals_by_owner(stack_signals):
+        owner = _diagnostics_owner_label(owner_key)
         items.append(
-            f"- **[Medium] [{owner_text}]** Stack-signal anomalies on "
-            f"{len(stack_signals)} successful model(s). "
-            "Next: inspect prompt/output token ratios and empty-output patterns.",
+            f"- **[Medium] [{owner}]** Stack-signal anomalies on "
+            f"{len(owner_signals)} successful model(s). "
+            f"Next: {_diagnostics_next_action(owner_key)}",
         )
 
-    if preflight_issues:
-        owners = sorted({_guess_preflight_issue_package(issue) for issue in preflight_issues})
-        owner_text = ", ".join(owners) if owners else "unknown"
+    for owner_key, owner_issues in _group_preflight_issues_by_owner(preflight_issues):
+        owner = _diagnostics_owner_label(owner_key)
         items.append(
             "- **[Medium] "
-            f"[{owner_text}]** Preflight compatibility warnings "
-            f"({len(preflight_issues)} issue(s)). "
-            "Next: verify dependency/version compatibility before model runs.",
+            f"[{owner}]** Preflight compatibility warnings "
+            f"({len(owner_issues)} issue(s)). "
+            f"Next: {_diagnostics_next_action(owner_key)}",
         )
 
     if not items:
@@ -9164,27 +9185,20 @@ def _diagnostics_priority_table(
             "| **Medium** | Harness/integration | "
             f"{n} ({esc_names}) | `{DIAGNOSTICS_ESCAPER.escape(owner)}` | {action} |",
         )
-    if stack_signals:
-        owner_text = _summarize_stack_signal_owners(stack_signals)
-        names = ", ".join(r.model_name.split("/")[-1] for r, _symptom, _owner in stack_signals)
+    for owner_key, owner_signals in _group_stack_signals_by_owner(stack_signals):
+        owner = _diagnostics_owner_label(owner_key)
+        names = ", ".join(r.model_name.split("/")[-1] for r, _symptom, _owner in owner_signals)
         esc_names = DIAGNOSTICS_ESCAPER.escape(names)
-        n = len(stack_signals)
-        action = DIAGNOSTICS_ESCAPER.escape(
-            "inspect prompt/output ratios, long-context behavior, and upstream compatibility cues.",
-        )
+        n = len(owner_signals)
+        action = DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action(owner_key))
         table_rows.append(
             "| **Medium** | Stack-signal anomaly | "
-            f"{n} ({esc_names}) | `{DIAGNOSTICS_ESCAPER.escape(owner_text)}` | {action} |",
+            f"{n} ({esc_names}) | `{DIAGNOSTICS_ESCAPER.escape(owner)}` | {action} |",
         )
-    if preflight_issues:
-        package_names = sorted(
-            {_guess_preflight_issue_package(issue) for issue in preflight_issues},
-        )
-        package_summary = DIAGNOSTICS_ESCAPER.escape(", ".join(package_names))
-        n = len(preflight_issues)
-        action = DIAGNOSTICS_ESCAPER.escape(
-            "verify dependency/version compatibility before model runs.",
-        )
+    for owner_key, owner_issues in _group_preflight_issues_by_owner(preflight_issues):
+        package_summary = DIAGNOSTICS_ESCAPER.escape(_diagnostics_owner_label(owner_key))
+        n = len(owner_issues)
+        action = DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action(owner_key))
         table_rows.append(
             f"| **Medium** | Preflight compatibility warning | {n} issue(s) | "
             f"`{package_summary or 'unknown'}` | {action} |",

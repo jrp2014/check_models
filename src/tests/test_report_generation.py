@@ -1406,6 +1406,130 @@ class TestDiagnosticsReport:
             in content
         )
 
+    def test_priority_summary_splits_mixed_stack_signal_owners(self, tmp_path: Path) -> None:
+        """Mixed stack-signal owner classes should render separate maintainer triage rows."""
+        out = tmp_path / "diag.md"
+        generate_diagnostics_report(
+            results=[
+                PerformanceResult(
+                    model_name="org/stack-empty",
+                    success=True,
+                    generation=_MockGeneration(text="", prompt_tokens=5000, generation_tokens=0),
+                    total_time=1.0,
+                    generation_time=0.5,
+                    model_load_time=0.5,
+                    quality_analysis=GenerationQualityAnalysis(
+                        is_repetitive=False,
+                        repeated_token=None,
+                        hallucination_issues=[],
+                        is_verbose=False,
+                        formatting_issues=[],
+                        has_excessive_bullets=False,
+                        bullet_count=0,
+                        is_context_ignored=False,
+                        missing_context_terms=[],
+                        is_refusal=False,
+                        refusal_type=None,
+                        is_generic=False,
+                        specificity_score=0.0,
+                        has_language_mixing=False,
+                        language_mixing_issues=[],
+                        has_degeneration=False,
+                        degeneration_type=None,
+                        has_fabrication=False,
+                        fabrication_issues=[],
+                        has_reasoning_leak=False,
+                        reasoning_leak_markers=[],
+                        has_context_echo=False,
+                        context_echo_ratio=0.0,
+                        has_harness_issue=False,
+                        harness_issue_type=None,
+                        harness_issue_details=[],
+                        word_count=0,
+                        unique_ratio=0.0,
+                        prompt_checks_ran=True,
+                    ),
+                ),
+                PerformanceResult(
+                    model_name="org/stack-context",
+                    success=True,
+                    generation=_MockGeneration(
+                        text="echoed context",
+                        prompt_tokens=15000,
+                        generation_tokens=80,
+                    ),
+                    total_time=1.0,
+                    generation_time=0.5,
+                    model_load_time=0.5,
+                    quality_analysis=GenerationQualityAnalysis(
+                        is_repetitive=False,
+                        repeated_token=None,
+                        hallucination_issues=[],
+                        is_verbose=False,
+                        formatting_issues=[],
+                        has_excessive_bullets=False,
+                        bullet_count=0,
+                        is_context_ignored=False,
+                        missing_context_terms=[],
+                        is_refusal=False,
+                        refusal_type=None,
+                        is_generic=False,
+                        specificity_score=0.0,
+                        has_language_mixing=False,
+                        language_mixing_issues=[],
+                        has_degeneration=False,
+                        degeneration_type=None,
+                        has_fabrication=False,
+                        fabrication_issues=[],
+                        has_reasoning_leak=False,
+                        reasoning_leak_markers=[],
+                        has_context_echo=True,
+                        context_echo_ratio=0.9,
+                        has_harness_issue=False,
+                        harness_issue_type=None,
+                        harness_issue_details=[],
+                        word_count=80,
+                        unique_ratio=0.3,
+                        prompt_checks_ran=True,
+                    ),
+                ),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "`mlx-vlm`" in content
+        assert "`mlx-vlm / mlx`" in content
+        assert "check processor/chat-template wiring and generation kwargs." in content
+        assert (
+            "validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime"
+            in content
+        )
+
+    def test_priority_summary_splits_mixed_preflight_owners(self, tmp_path: Path) -> None:
+        """Mixed preflight owner classes should render separate maintainer triage rows."""
+        out = tmp_path / "diag.md"
+        generate_diagnostics_report(
+            results=[_make_success()],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+            history=DiagnosticsHistoryInputs(
+                preflight_issues=(
+                    "transformers import utils no longer reference known backend guard env vars",
+                    "mlx runtime probe reported a suspicious cache incompatibility",
+                ),
+            ),
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "`transformers`" in content
+        assert "`mlx`" in content
+        assert "verify API compatibility and pinned version floor." in content
+        assert "check tensor/cache behavior and memory pressure handling." in content
+
     def test_harness_token_leak_details_are_escaped(self, tmp_path: Path) -> None:
         """Token leak details should be escaped so markdown does not treat them as HTML."""
         out = tmp_path / "diag.md"
