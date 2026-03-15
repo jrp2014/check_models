@@ -8574,18 +8574,22 @@ def _diagnostics_preflight_section(preflight_issues: Sequence[str]) -> list[str]
         ],
     )
 
-    for issue in preflight_issues:
-        package = _guess_preflight_issue_package(issue)
+    for package, owner_issues in _group_preflight_issues_by_owner(preflight_issues):
         target_name, target_url = _issue_target_for_package(
             package,
             model_name="unknown/model",
         )
-        escaped_issue = DIAGNOSTICS_ESCAPER.escape(issue)
-        parts.append(f"- `{escaped_issue}`")
+        parts.append(f"### `{DIAGNOSTICS_ESCAPER.escape(_diagnostics_owner_label(package))}`")
+        parts.append("")
         parts.append(
-            f"  - Owner: `{package}`; suggested tracker: `{target_name}` (<{target_url}>)",
+            f"- Suggested tracker: `{DIAGNOSTICS_ESCAPER.escape(target_name)}` (<{target_url}>)",
         )
-        parts.append(f"  - Suggested next action: {_diagnostics_next_action(package)}")
+        parts.append(f"- Suggested next action: {_diagnostics_next_action(package)}")
+        parts.append("- Warnings:")
+        for issue in owner_issues:
+            escaped_issue = DIAGNOSTICS_ESCAPER.escape(issue)
+            parts.append(f"  - `{escaped_issue}`")
+        parts.append("")
     parts.append("")
     return parts
 

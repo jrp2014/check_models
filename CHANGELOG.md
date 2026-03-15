@@ -46,6 +46,9 @@ Notable changes to this project will be documented in this file.
 - Tightened the CLI maintainer summary so mixed harness, stack-signal, and
   preflight owner classes are logged as separate owner-specific lines with next
   actions, instead of collapsing them into one broad summary sentence.
+- Tightened the detailed preflight diagnostics section so mixed owner classes
+  render as separate owner buckets with owner-specific trackers and next
+  actions, instead of one flat mixed warning list.
 - Added an env-aware `make analyze-quality` workflow plus a standalone
   `tools.analyze_output_quality` CLI so quality and harness heuristics can be
   exercised directly against arbitrary text or saved outputs without running a

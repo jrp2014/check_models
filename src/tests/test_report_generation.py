@@ -758,6 +758,30 @@ class TestDiagnosticsReport:
         assert "transformers/issues/new" in content
         assert "Preflight compatibility warning" in content
 
+    def test_preflight_section_splits_mixed_owner_groups(self, tmp_path: Path) -> None:
+        """Mixed preflight owners should render as separate detailed owner buckets."""
+        out = tmp_path / "diag.md"
+        result = generate_diagnostics_report(
+            results=[_make_success()],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            prompt="test",
+            history=DiagnosticsHistoryInputs(
+                preflight_issues=(
+                    "transformers import utils no longer reference known backend guard env vars",
+                    "mlx runtime probe reported a suspicious cache incompatibility",
+                ),
+            ),
+        )
+        assert result is True
+        content = out.read_text(encoding="utf-8")
+        assert "### `transformers`" in content
+        assert "### `mlx`" in content
+        assert "verify API compatibility and pinned version floor." in content
+        assert "check tensor/cache behavior and memory pressure handling." in content
+        assert "transformers/issues/new" in content
+
     def test_report_written_for_stack_signal_uses_preflight_owner_hint(
         self, tmp_path: Path
     ) -> None:
