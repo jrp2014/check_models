@@ -6,6 +6,7 @@ import io
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import tokenize
 from dataclasses import dataclass
@@ -24,6 +25,7 @@ PYTHON_SUFFIXES: Final[frozenset[str]] = frozenset({".py"})
 SHELL_SUFFIXES: Final[frozenset[str]] = frozenset({".sh"})
 EXCLUDED_PATH_PARTS: Final[frozenset[str]] = frozenset(
     {
+        ".conda",
         "__pycache__",
         ".pytest_cache",
         "node_modules",
@@ -228,7 +230,7 @@ def _run_for_finding(
     try:
         if finding.kind == "noqa":
             return subprocess.run(
-                ["ruff", "check", str(temp_path)],
+                [sys.executable, "-m", "ruff", "check", str(temp_path)],
                 capture_output=True,
                 text=True,
                 check=False,
@@ -237,6 +239,8 @@ def _run_for_finding(
         if finding.kind == "type-ignore":
             return subprocess.run(
                 [
+                    sys.executable,
+                    "-m",
                     "mypy",
                     "--show-error-codes",
                     "--hide-error-context",

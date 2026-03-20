@@ -147,6 +147,48 @@ quality_require_command() {
     return 1
 }
 
+    quality_find_python_tool() {
+        local tool_name="$1"
+        local python_bin_dir=""
+
+        python_bin_dir="$(dirname "$QUALITY_PYTHON")"
+        if [ -x "$python_bin_dir/$tool_name" ]; then
+            printf '%s\n' "$python_bin_dir/$tool_name"
+            return 0
+        fi
+
+        if command -v "$tool_name" >/dev/null 2>&1; then
+            command -v "$tool_name"
+            return 0
+        fi
+
+        return 1
+    }
+
+    quality_require_python_tool() {
+        local tool_name="$1"
+        local install_hint="$2"
+
+        if quality_find_python_tool "$tool_name" >/dev/null 2>&1; then
+            return 0
+        fi
+
+        echo "❌ Required command '$tool_name' not found." >&2
+        if [ -n "$install_hint" ]; then
+            echo "   $install_hint" >&2
+        fi
+        return 1
+    }
+
+    quality_run_python_tool() {
+        local tool_name="$1"
+        local tool_path=""
+
+        tool_path="$(quality_find_python_tool "$tool_name")" || return 1
+        shift
+        "$tool_path" "$@"
+    }
+
 quality_validate_yaml_files() {
     "$QUALITY_PYTHON" - "$@" <<'PY'
 from __future__ import annotations

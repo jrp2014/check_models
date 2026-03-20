@@ -101,6 +101,10 @@ Notable changes to this project will be documented in this file.
 - Extended `tools/setup_conda_env.sh` so dev setup also installs the repo-local
   `markdownlint-cli2` dependency when `npm` is available, and now warns
   explicitly when Node.js tooling is still missing for staged Markdown hooks.
+- Hardened pre-push and full quality scripts so env-installed tools such as
+  `ty` and `pyrefly` are resolved from the selected Python environment instead
+  of relying on shell `PATH`, avoiding false "command not found" failures when
+  git launches hooks from a reduced environment.
 
 ## [0.3.1] - 2026-03-14
 

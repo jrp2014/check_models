@@ -9,8 +9,8 @@ source "$SCRIPT_DIR/common_quality.sh"
 cd "$(quality_src_root)"
 quality_setup_python
 
-quality_require_command ty "Install dev dependencies with: pip install -e .[dev]"
-quality_require_command pyrefly "Install dev dependencies with: pip install -e .[dev]"
+quality_require_python_tool ty "Install dev dependencies with: pip install -e .[dev]"
+quality_require_python_tool pyrefly "Install dev dependencies with: pip install -e .[dev]"
 quality_require_command shellcheck "Install with: brew install shellcheck"
 
 echo "=== Workflow YAML Validation ==="
@@ -89,10 +89,10 @@ echo "=== Suppression Audit ==="
 "$QUALITY_PYTHON" -m tools.check_suppressions
 
 echo "=== Ty Type Check ==="
-ty check check_models.py
+quality_run_python_tool ty check check_models.py
 
 echo "=== Pyrefly Type Check ==="
-pyrefly check check_models.py
+quality_run_python_tool pyrefly check check_models.py
 
 echo "=== Pytest ==="
 "$QUALITY_PYTHON" -m pytest -v

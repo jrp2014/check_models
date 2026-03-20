@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
+import sys
 import tomllib
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -188,16 +190,20 @@ def test_stub_refresh_reason_detects_version_change(
 def test_should_audit_path_excludes_generated_and_archived_paths(tmp_path: Path) -> None:
     repo_root = tmp_path / "repo"
     included = repo_root / "src" / "module.py"
+    excluded_conda = repo_root / ".conda" / "lib" / "python3.13" / "site.py"
     excluded_output = repo_root / "src" / "output" / "results.md"
     excluded_archived = repo_root / "src" / "tools" / ".archived" / "old.py"
     included.parent.mkdir(parents=True)
+    excluded_conda.parent.mkdir(parents=True)
     excluded_output.parent.mkdir(parents=True)
     excluded_archived.parent.mkdir(parents=True)
     included.write_text("print('ok')\n", encoding="utf-8")
+    excluded_conda.write_text("value = 1  # noqa: F401\n", encoding="utf-8")
     excluded_output.write_text("<!-- markdownlint-disable MD028 -->\n", encoding="utf-8")
     excluded_archived.write_text("x = 1  # noqa: F841\n", encoding="utf-8")
 
     assert check_suppressions.should_audit_path(included, repo_root) is True
+    assert check_suppressions.should_audit_path(excluded_conda, repo_root) is False
     assert check_suppressions.should_audit_path(excluded_output, repo_root) is False
     assert check_suppressions.should_audit_path(excluded_archived, repo_root) is False
 
@@ -256,3 +262,48 @@ def test_check_if_needed_fails_bare_suppressions(tmp_path: Path) -> None:
 
     assert needed is False
     assert "not allowed" in reason
+
+
+def test_run_for_finding_uses_active_python_for_ruff(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    repo_root = tmp_path / "repo"
+    src_root = repo_root / "src"
+    src_root.mkdir(parents=True)
+    file_path = src_root / "sample.py"
+    file_path.write_text("unused = 1  # noqa: F841\n", encoding="utf-8")
+    finding = check_suppressions.SuppressionFinding(
+        file_path=file_path,
+        line_num=1,
+        kind="noqa",
+        codes=("F841",),
+        line_text="unused = 1  # noqa: F841",
+    )
+    recorded_args: list[str] = []
+
+    def fake_run(
+        args: list[str],
+        *,
+        capture_output: bool,
+        text: bool,
+        check: bool,
+        cwd: Path,
+    ) -> subprocess.CompletedProcess[str]:
+        assert capture_output is True
+        assert text is True
+        assert check is False
+        assert cwd == src_root
+        recorded_args.extend(args)
+        return subprocess.CompletedProcess(args=args, returncode=1, stdout="F841", stderr="")
+
+    monkeypatch.setattr(check_suppressions.subprocess, "run", fake_run)
+
+    result = check_suppressions._run_for_finding(
+        finding,
+        repo_root=repo_root,
+        src_root=src_root,
+    )
+
+    assert result is not None
+    assert recorded_args[:4] == [sys.executable, "-m", "ruff", "check"]
