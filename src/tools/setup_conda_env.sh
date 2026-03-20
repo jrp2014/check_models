@@ -190,6 +190,9 @@ install_dependencies() {
         exit 1
     fi
 
+    log_info "Installing cmake (required to build mlx)..."
+    conda install -n "$ENV_NAME" cmake -y
+
     log_info "Installing project in editable mode (installs core dependencies)..."
     pip install -e .
 
