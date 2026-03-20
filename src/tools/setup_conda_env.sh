@@ -208,6 +208,15 @@ install_dependencies() {
              pip install "ruff>=0.1.0" "mypy>=1.8.0" "pytest>=8.0.0" "pytest-cov>=4.0.0" "pre-commit"
         fi
 
+        if command -v npm &> /dev/null; then
+            log_info "Installing repo-local Markdown tooling..."
+            npm install
+            log_success "Markdown tooling installed"
+        else
+            log_warn "npm not found; staged Markdown commits will require markdownlint-cli2"
+            log_warn "Install Node.js, then run: npm install --prefix src"
+        fi
+
         log_info "Installing repository git hooks from the active environment..."
         python -m tools.install_precommit_hook
         log_success "Repository git hooks installed"
@@ -301,6 +310,9 @@ Optional installs:
     - To include PyTorch stack during setup, answer 'y' when prompted, or later run:
     ${BLUE}make -C src install-torch${NC}
         - If you installed development dependencies, repository git hooks were also installed.
+        - If npm was available during setup, repo-local Markdown tooling was installed too.
+            Otherwise install Node.js and run:
+        ${BLUE}npm install --prefix src${NC}
             Reinstall them later with:
         ${BLUE}cd src && python -m tools.install_precommit_hook${NC}
 
