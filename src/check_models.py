@@ -11673,6 +11673,7 @@ def _append_markdown_gallery_note(
         return
 
     md.append("**Review artifacts:**")
+    md.append("")
     for label, link in artifact_lines:
         md.append(f"- {label}: {link}")
     md.append("")

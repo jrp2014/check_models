@@ -576,6 +576,7 @@ class TestMarkdownReportEdgeCases:
         )
         content = out.read_text(encoding="utf-8")
         assert "Review artifacts:" in content
+        assert "**Review artifacts:**\n\n- Standalone output gallery:" in content
         assert "Standalone output gallery" in content
         assert "Automated review digest" in content
         assert "Canonical run log" in content
