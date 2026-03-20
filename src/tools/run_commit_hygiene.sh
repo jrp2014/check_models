@@ -31,7 +31,7 @@ while IFS= read -r -d '' file; do
             ;;
         *.md)
             case "$file" in
-                src/output/*|src/node_modules/*|*/node_modules/*)
+                src/node_modules/*|*/node_modules/*)
                     ;;
                 *)
                     markdown_files+=("$file")

@@ -6,6 +6,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Tightened the staged Markdown pre-commit hook so committed report artifacts
+  under `src/output/` are no longer excluded from markdownlint fixing, which
+  lets commit-time hygiene catch lint regressions in generated Markdown such as
+  `review.md` before CI does.
 - Made `check_models.log` the canonical full-fidelity run artifact by adding a
   fixed per-model review block with verdict, trusted-hint handling, contract
   and utility summaries, ownership hints, token accounting, next actions, and
