@@ -91,6 +91,24 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+install_cmake() {
+    log_info "Installing cmake (required to build mlx)..."
+
+    if conda install -n "$ENV_NAME" -c conda-forge cmake -y; then
+        log_success "Installed cmake from conda-forge"
+        return 0
+    fi
+
+    log_warn "conda-forge cmake install failed; falling back to pip"
+    if python -m pip install cmake; then
+        log_success "Installed cmake from pip fallback"
+        return 0
+    fi
+
+    log_error "Unable to install cmake via conda or pip"
+    exit 1
+}
+
 source_conda_sh() {
     local conda_sh_path="$1"
 
@@ -190,8 +208,7 @@ install_dependencies() {
         exit 1
     fi
 
-    log_info "Installing cmake (required to build mlx)..."
-    conda install -n "$ENV_NAME" cmake -y
+    install_cmake
 
     log_info "Installing project in editable mode (installs core dependencies)..."
     pip install -e .
@@ -267,6 +284,12 @@ except Exception:
 print('✓ All core packages imported successfully')
 print(f'✓ MLX version: {mx.__version__}')
 "
+
+    if command -v cmake &> /dev/null; then
+        log_info "cmake version: $(cmake --version | head -n 1)"
+    else
+        log_warn "cmake is not on PATH inside the active environment"
+    fi
 
     # Install huggingface_hub CLI tools
     log_info "Installing huggingface_hub CLI tools..."

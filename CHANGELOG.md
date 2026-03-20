@@ -105,6 +105,10 @@ Notable changes to this project will be documented in this file.
   `ty` and `pyrefly` are resolved from the selected Python environment instead
   of relying on shell `PATH`, avoiding false "command not found" failures when
   git launches hooks from a reduced environment.
+- Tightened clean-machine bootstrap so `tools/setup_conda_env.sh` now installs
+  `cmake` from `conda-forge` explicitly and falls back to `pip` if needed,
+  instead of assuming the user's existing conda channel configuration exposes a
+  usable `cmake` package for the target platform.
 
 ## [0.3.1] - 2026-03-14
 
