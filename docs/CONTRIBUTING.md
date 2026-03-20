@@ -58,6 +58,7 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
    This will:
    - Install all Python dependencies (runtime + dev + extras + torch)
    - Install the package in editable mode
+   - Install repo-local Markdown hook tooling if `npm` is available
 
    **Optional follow-up**:
 
@@ -67,14 +68,19 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
 4. **Verify installation**:
 
    ```bash
-   # Verify environment and install custom git hooks (run from src/)
+   # Verify environment (run from src/)
    cd src
    python -m tools.validate_env
+   cd ..
+   ```
+
+   If you answered `y` to development dependencies during setup, the repo's
+   custom git hooks are already installed. To reinstall them manually:
+
+   ```bash
+   cd src
    python -m tools.install_precommit_hook
    cd ..
-
-   # Optional: install pre-commit framework hook
-   pre-commit install
    ```
 
 ### Manual Environment Validation

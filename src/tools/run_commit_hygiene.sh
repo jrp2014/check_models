@@ -74,7 +74,12 @@ import sys
 import tomllib
 from pathlib import Path
 
-import yaml
+try:
+    import yaml
+except ModuleNotFoundError as err:
+    print("❌ PyYAML is required for commit hygiene checks.")
+    print("   Activate the repo conda env first: conda activate mlx-vlm")
+    raise SystemExit(1) from err
 
 errors: list[str] = []
 

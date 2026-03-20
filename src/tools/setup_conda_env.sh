@@ -207,13 +207,10 @@ install_dependencies() {
         else
              pip install "ruff>=0.1.0" "mypy>=1.8.0" "pytest>=8.0.0" "pytest-cov>=4.0.0" "pre-commit"
         fi
-        
-        # Set up pre-commit hooks
-        if command -v pre-commit &> /dev/null; then
-            log_info "Installing pre-commit hooks..."
-            pre-commit install
-            log_success "Pre-commit hooks installed"
-        fi
+
+        log_info "Installing repository git hooks from the active environment..."
+        python -m tools.install_precommit_hook
+        log_success "Repository git hooks installed"
     fi
 
     # Optional: PyTorch stack (torch, torchvision, torchaudio)
@@ -303,6 +300,9 @@ To use the MLX VLM environment:
 Optional installs:
     - To include PyTorch stack during setup, answer 'y' when prompted, or later run:
     ${BLUE}make -C src install-torch${NC}
+        - If you installed development dependencies, repository git hooks were also installed.
+            Reinstall them later with:
+        ${BLUE}cd src && python -m tools.install_precommit_hook${NC}
 
 5. Deactivate when done:
    ${BLUE}conda deactivate${NC}

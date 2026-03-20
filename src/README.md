@@ -449,7 +449,17 @@ This repo excludes ephemeral caches and local environments via `.gitignore`. Com
 
 ## Pre-commit (Optional)
 
-This repo supports two equivalent local hook workflows:
+Recommended workflow:
+
+```bash
+cd src
+python -m tools.install_precommit_hook
+```
+
+This installs the repo's custom git hooks directly and is the path used by
+`tools/setup_conda_env.sh` when you opt into development dependencies.
+
+Alternative workflow:
 
 - `pre-commit` framework:
 
@@ -461,13 +471,8 @@ pre-commit install
   This installs both commit-stage and pre-push hooks from the checked-in
   `.pre-commit-config.yaml`. The commit hook runs staged-file hygiene only; the
   push hook runs fast static checks plus the non-slow/non-e2e pytest subset.
-
-- Custom git hooks shipped with this repo:
-
-```bash
-cd src
-python -m tools.install_precommit_hook
-```
+  If you switch between workflows, rerun your preferred installer because both
+  write to `.git/hooks/`.
 
 Run the push-stage gate manually with:
 
@@ -1118,20 +1123,22 @@ make -C src help
 
 ### Git Hooks and Pre-Commit
 
-You can use one or both workflows:
-
-- `pre-commit` framework:
-
-  ```bash
-  pre-commit install
-  pre-commit run --hook-stage pre-push --all-files
-  ```
+Recommended workflow:
 
 - Custom git hooks shipped with this repo:
 
   ```bash
   cd src
   python -m tools.install_precommit_hook
+  ```
+
+Alternative workflow:
+
+- `pre-commit` framework:
+
+  ```bash
+  pre-commit install
+  pre-commit run --hook-stage pre-push --all-files
   ```
 
 Both workflows call the same shared scripts:

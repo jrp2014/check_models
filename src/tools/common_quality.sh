@@ -14,6 +14,37 @@ quality_source_conda_sh() {
     source "$conda_sh_path"
 }
 
+quality_find_conda_sh() {
+    local conda_base=""
+    local candidate=""
+
+    if command -v conda >/dev/null 2>&1; then
+        conda_base="$(conda info --base 2>/dev/null || true)"
+        if [ -n "$conda_base" ] && [ -f "$conda_base/etc/profile.d/conda.sh" ]; then
+            printf '%s\n' "$conda_base/etc/profile.d/conda.sh"
+            return 0
+        fi
+    fi
+
+    for candidate in \
+        "$HOME/miniconda3/etc/profile.d/conda.sh" \
+        "$HOME/miniforge3/etc/profile.d/conda.sh" \
+        "$HOME/mambaforge/etc/profile.d/conda.sh" \
+        "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" \
+        "/opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh" \
+        "/opt/homebrew/Caskroom/mambaforge/base/etc/profile.d/conda.sh" \
+        "/opt/homebrew/anaconda3/etc/profile.d/conda.sh" \
+        "$HOME/anaconda3/etc/profile.d/conda.sh"
+    do
+        if [ -f "$candidate" ]; then
+            printf '%s\n' "$candidate"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
 quality_tools_dir() {
     cd "$(dirname "${BASH_SOURCE[0]}")" && pwd
 }
@@ -27,23 +58,14 @@ quality_repo_root() {
 }
 
 quality_activate_conda() {
-    local conda_base=""
+    local conda_sh_path=""
 
-    if [ -n "${CONDA_PREFIX:-}" ] || ! command -v conda >/dev/null 2>&1; then
+    if [ -n "${CONDA_PREFIX:-}" ]; then
         return 0
     fi
 
-    conda_base="$(conda info --base 2>/dev/null || true)"
-    if [ -n "$conda_base" ] && quality_source_conda_sh "$conda_base/etc/profile.d/conda.sh"; then
-        :
-    elif quality_source_conda_sh "$HOME/miniconda3/etc/profile.d/conda.sh"; then
-        :
-    elif quality_source_conda_sh "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"; then
-        :
-    elif quality_source_conda_sh "/opt/homebrew/anaconda3/etc/profile.d/conda.sh"; then
-        :
-    elif quality_source_conda_sh "$HOME/anaconda3/etc/profile.d/conda.sh"; then
-        :
+    if conda_sh_path="$(quality_find_conda_sh)"; then
+        quality_source_conda_sh "$conda_sh_path"
     fi
 
     if command -v conda >/dev/null 2>&1; then
@@ -51,10 +73,55 @@ quality_activate_conda() {
     fi
 }
 
+quality_find_conda_env_python() {
+    local env_prefix=""
+    local env_python=""
+    local candidate_base=""
+
+    if [ -n "${CONDA_PREFIX:-}" ] && [ "$(basename "$CONDA_PREFIX")" = "$CONDA_ENV" ]; then
+        env_python="$CONDA_PREFIX/bin/python"
+        if [ -x "$env_python" ]; then
+            printf '%s\n' "$env_python"
+            return 0
+        fi
+    fi
+
+    if command -v conda >/dev/null 2>&1; then
+        env_prefix="$(conda env list 2>/dev/null | awk -v env_name="$CONDA_ENV" '$1 == env_name { print $NF; exit }')"
+        if [ -n "$env_prefix" ] && [ -x "$env_prefix/bin/python" ]; then
+            printf '%s\n' "$env_prefix/bin/python"
+            return 0
+        fi
+    fi
+
+    for candidate_base in \
+        "$HOME/miniconda3" \
+        "$HOME/miniforge3" \
+        "$HOME/mambaforge" \
+        "/opt/homebrew/Caskroom/miniconda/base" \
+        "/opt/homebrew/Caskroom/miniforge/base" \
+        "/opt/homebrew/Caskroom/mambaforge/base" \
+        "/opt/homebrew/anaconda3" \
+        "$HOME/anaconda3"
+    do
+        env_python="$candidate_base/envs/$CONDA_ENV/bin/python"
+        if [ -x "$env_python" ]; then
+            printf '%s\n' "$env_python"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
 quality_setup_python() {
+    local env_python=""
+
     quality_activate_conda
 
-    if [ -n "${CONDA_PREFIX:-}" ]; then
+    if env_python="$(quality_find_conda_env_python)"; then
+        QUALITY_PYTHON="$env_python"
+    elif [ -n "${CONDA_PREFIX:-}" ] && [ -x "$CONDA_PREFIX/bin/python" ]; then
         QUALITY_PYTHON="$CONDA_PREFIX/bin/python"
     elif command -v python3 >/dev/null 2>&1; then
         QUALITY_PYTHON="python3"
@@ -87,7 +154,12 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-import yaml
+try:
+    import yaml
+except ModuleNotFoundError as err:
+    print("❌ PyYAML is required for YAML validation in quality hooks.")
+    print("   Activate the repo conda env first: conda activate mlx-vlm")
+    raise SystemExit(1) from err
 
 errors: list[str] = []
 

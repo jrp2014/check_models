@@ -91,6 +91,16 @@ Notable changes to this project will be documented in this file.
 - Expanded markdown quality coverage to include committed Markdown under
   `src/output/`, and updated bot guidance files so `MetricValue`, report
   artifact lists, and `make quality` expectations match the current codebase.
+- Hardened local git-hook environment bootstrap so pre-commit and pre-push can
+  locate and activate the intended conda env even when git launches hooks
+  without `conda` on `PATH`, and YAML validation failures now print an explicit
+  PyYAML/environment setup hint instead of a raw traceback.
+- Made `tools/setup_conda_env.sh` install the repo's custom git hooks whenever
+  development dependencies are selected, and updated contributor docs to treat
+  that env-aware hook installer as the default local workflow.
+- Extended `tools/setup_conda_env.sh` so dev setup also installs the repo-local
+  `markdownlint-cli2` dependency when `npm` is available, and now warns
+  explicitly when Node.js tooling is still missing for staged Markdown hooks.
 
 ## [0.3.1] - 2026-03-14
 
