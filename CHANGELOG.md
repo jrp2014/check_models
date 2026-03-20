@@ -109,6 +109,13 @@ Notable changes to this project will be documented in this file.
   `cmake` from `conda-forge` explicitly and falls back to `pip` if needed,
   instead of assuming the user's existing conda channel configuration exposes a
   usable `cmake` package for the target platform.
+- Narrowed the preflight `transformers` backend-guard warning so it now refers
+  specifically to the TF/FLAX/JAX guard env vars used by `check_models`, rather
+  than implying that all upstream `USE_*` backend toggles disappeared.
+- Documented preflight compatibility warnings in `src/README.md` and tightened
+  the shared HTML/Markdown action snapshot plus diagnostics report wording so
+  those warnings are clearly framed as informational by default, with explicit
+  guidance on when users should and should not escalate them.
 
 ## [0.3.1] - 2026-03-14
 

@@ -224,7 +224,7 @@ The tool generates multiple report formats in `output/` by default:
 - **Markdown** (`results.md`): GitHub-compatible summary for documentation.
 - **Gallery Markdown** (`model_gallery.md`): GitHub-compatible review artifact with image metadata, the full prompt, and one full-output section per model.
 - **TSV/JSONL** (`results.tsv`, `results.jsonl`): Machine-readable formats for analysis.
-- **Diagnostics** (`diagnostics.md`): Failure-focused issue report (generated only when needed).
+- **Diagnostics** (`diagnostics.md`): Failure-focused and compatibility-focused issue report (generated when failures, harness issues, or preflight compatibility warnings are present).
 - **History** (`results.history.jsonl`): Append-only run history for regressions/recoveries.
 
 The main Markdown report keeps its embedded Model Gallery section for continuity, and also points to the standalone `model_gallery.md` artifact when that dedicated review file is generated.
@@ -928,11 +928,20 @@ Line-delimited JSON for streaming ingestion:
 
 A comprehensive Markdown report focused on upstream debugging and issue reporting:
 
-- **Generation**: Created automatically only when failures or harness issues (e.g., garbled output) are detected.
+- **Generation**: Created automatically when failures, harness issues (e.g., garbled output), or preflight compatibility warnings are detected.
 - **Failures Clustered**: Groups similar errors together to identify systemic issues.
 - **Reproducibility**: Includes explicit commands to reproduce specific failures.
 - **Environment**: Captures full package versions and system specs.
 - **Ready-to-File**: Formatted to be copy-pasted directly into GitHub issues.
+
+### Preflight Compatibility Warnings
+
+Some runs emit preflight compatibility warnings before inference starts. These warnings are informational by default.
+
+- **What they mean**: `check_models` detected an upstream package or API-compatibility pattern that may matter for this environment or version combination.
+- **What you should do**: keep running if outputs look healthy; investigate when the same run also shows unexpected TensorFlow/Flax/JAX imports, startup hangs, or backend/runtime crashes.
+- **What you should not do**: do not treat the warning alone as a failed benchmark, and do not enable `MLX_VLM_ALLOW_TF=1` just to silence it unless you intentionally want TensorFlow-side behavior.
+- **When filing issues**: include the warning text and reported library versions so upstream maintainers can match it to the correct compatibility window.
 
 
 

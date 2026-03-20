@@ -386,6 +386,36 @@ class TestHtmlReportEdgeCases:
         assert "org/risky" in content
         assert "transformers" in content
 
+    def test_html_report_includes_preflight_guidance_in_action_snapshot(
+        self, tmp_path: Path
+    ) -> None:
+        """HTML report should explain how to interpret preflight compatibility warnings."""
+        out = tmp_path / "preflight-triage.html"
+        results = [_make_success("org/good")]
+        report_context = _build_report_render_context(
+            results=results,
+            prompt="describe",
+            preflight_issues=(
+                "transformers import utils no longer reference the TF/FLAX/JAX backend",
+            ),
+        )
+
+        generate_html_report(
+            results=results,
+            filename=out,
+            versions=_stub_versions(),
+            prompt="describe",
+            total_runtime_seconds=1.0,
+            report_context=report_context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "Preflight compatibility" in content
+        assert "informational warning(s); do not treat these alone as run failures" in content
+        assert (
+            "unexpected TF/Flax/JAX imports, startup hangs, or backend/runtime crashes" in content
+        )
+
     def test_html_report_preserves_full_output_in_details(self, tmp_path: Path) -> None:
         """HTML table should reuse the shared preview while keeping full text expandable."""
         out = tmp_path / "details.html"
@@ -468,6 +498,41 @@ class TestMarkdownReportEdgeCases:
         assert "## 🎯 Action Snapshot" in content
         assert "org/good" in content
         assert "org/bad" in content
+
+    def test_markdown_report_includes_preflight_guidance_in_action_snapshot(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Markdown report should explain how to interpret preflight compatibility warnings."""
+        out = tmp_path / "preflight-triage.md"
+        results = [_make_success("org/good")]
+        report_context = _build_report_render_context(
+            results=results,
+            prompt="describe",
+            preflight_issues=(
+                "transformers import utils no longer reference the TF/FLAX/JAX backend",
+            ),
+        )
+
+        generate_markdown_report(
+            results=results,
+            filename=out,
+            versions=_stub_versions(),
+            prompt="describe",
+            total_runtime_seconds=1.0,
+            report_context=report_context,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "## 🎯 Action Snapshot" in content
+        assert (
+            "**Preflight compatibility:** 1 informational warning(s); do not treat "
+            "these alone as run failures."
+        ) in content
+        assert (
+            "**Escalate only if:** they line up with unexpected TF/Flax/JAX imports, "
+            "startup hangs, or backend/runtime crashes."
+        ) in content
 
     def test_prompt_section_uses_wrapped_blockquote(self, tmp_path: Path) -> None:
         """Prompt section should use the wrapped blockquote helper for readable Markdown."""
@@ -747,14 +812,17 @@ class TestDiagnosticsReport:
             prompt="test",
             history=DiagnosticsHistoryInputs(
                 preflight_issues=(
-                    "transformers import utils no longer reference known backend guard env vars",
+                    "transformers import utils no longer reference the TF/FLAX/JAX backend",
                 ),
             ),
         )
         assert result is True
         content = out.read_text(encoding="utf-8")
         assert "## Preflight Compatibility Warnings" in content
-        assert "transformers import utils no longer reference" in content
+        assert "transformers import utils no longer reference the TF/FLAX/JAX backend" in content
+        assert (
+            "informational by default and do not invalidate successful runs on their own" in content
+        )
         assert "transformers/issues/new" in content
         assert "Preflight compatibility warning" in content
 
@@ -769,7 +837,7 @@ class TestDiagnosticsReport:
             prompt="test",
             history=DiagnosticsHistoryInputs(
                 preflight_issues=(
-                    "transformers import utils no longer reference known backend guard env vars",
+                    "transformers import utils no longer reference the TF/FLAX/JAX backend",
                     "mlx runtime probe reported a suspicious cache incompatibility",
                 ),
             ),
@@ -840,7 +908,7 @@ class TestDiagnosticsReport:
             prompt="test",
             history=DiagnosticsHistoryInputs(
                 preflight_issues=(
-                    "transformers import utils no longer reference known backend guard env vars",
+                    "transformers import utils no longer reference the TF/FLAX/JAX backend",
                 ),
             ),
         )
@@ -1544,7 +1612,7 @@ class TestDiagnosticsReport:
             prompt="test",
             history=DiagnosticsHistoryInputs(
                 preflight_issues=(
-                    "transformers import utils no longer reference known backend guard env vars",
+                    "transformers import utils no longer reference the TF/FLAX/JAX backend",
                     "mlx runtime probe reported a suspicious cache incompatibility",
                 ),
             ),
@@ -1964,7 +2032,7 @@ class TestDiagnosticsReport:
                 ),
             ),
             preflight_issues=(
-                "transformers import utils no longer reference known backend guard env vars",
+                "transformers import utils no longer reference the TF/FLAX/JAX backend",
             ),
         )
         artifacts = DiagnosticsArtifacts(
@@ -2091,7 +2159,7 @@ class TestDiagnosticsReport:
                 ),
             ),
             preflight_issues=(
-                "transformers import utils no longer reference known backend guard env vars",
+                "transformers import utils no longer reference the TF/FLAX/JAX backend",
                 "mlx runtime probe reported a suspicious cache incompatibility",
             ),
         )

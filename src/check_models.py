@@ -5026,9 +5026,9 @@ def _detect_transformers_env_guard_issue() -> str | None:
         return None
 
     return (
-        "transformers import utils no longer reference known backend guard env vars "
-        "(TRANSFORMERS_NO_* / USE_*); check_models backend guard hints may be ignored "
-        "with this version."
+        "transformers import utils no longer reference the TF/FLAX/JAX backend "
+        "guard env vars used by check_models; backend guard hints for those "
+        "backends may be ignored with this version."
     )
 
 
@@ -6076,6 +6076,7 @@ def _build_report_render_context(
     results: list[PerformanceResult],
     prompt: str,
     system_info: dict[str, str] | None = None,
+    preflight_issues: Sequence[str] = (),
 ) -> ReportRenderContext:
     """Build shared derived report data once for all renderers."""
     resolved_results = [
@@ -6105,6 +6106,7 @@ def _build_report_render_context(
         stats=stats,
         system_info=resolved_system_info,
         triage=triage,
+        preflight_issues=tuple(str(issue) for issue in preflight_issues),
     )
 
 
@@ -7649,6 +7651,7 @@ class ReportRenderContext:
     stats: PerformanceStats
     system_info: dict[str, str]
     triage: ReportTriageContext
+    preflight_issues: tuple[str, ...] = ()
 
 
 def _append_markdown_code_block(
@@ -8572,8 +8575,12 @@ def _diagnostics_preflight_section(preflight_issues: Sequence[str]) -> list[str]
     parts = _begin_diagnostics_section(
         title=f"## Preflight Compatibility Warnings ({len(preflight_issues)} issue(s))",
         body_lines=[
-            "These warnings were detected before inference. They are non-fatal but "
-            "should be tracked as potential upstream compatibility issues.",
+            "These warnings were detected before inference. They are informational by "
+            "default and do not invalidate successful runs on their own.",
+            "Keep running if outputs look healthy. Escalate only when the warnings line "
+            "up with backend-import side effects, startup hangs, or runtime crashes.",
+            "Do not treat these warnings alone as a reason to set MLX_VLM_ALLOW_TF=1 or "
+            "to assume the benchmark results are bad.",
         ],
     )
 
@@ -8588,6 +8595,10 @@ def _diagnostics_preflight_section(preflight_issues: Sequence[str]) -> list[str]
             f"- Suggested tracker: `{DIAGNOSTICS_ESCAPER.escape(target_name)}` (<{target_url}>)",
         )
         parts.append(f"- Suggested next action: {_diagnostics_next_action(package)}")
+        parts.append(
+            "- Triage guidance: continue if runs are otherwise healthy; investigate only if "
+            "this warning matches real backend symptoms in the same run.",
+        )
         parts.append("- Warnings:")
         for issue in owner_issues:
             escaped_issue = DIAGNOSTICS_ESCAPER.escape(issue)
@@ -15145,6 +15156,7 @@ def _format_action_snapshot_parts(
     """Build a compact shared triage block for maintainers and reviewers."""
     summary = report_context.summary
     triage = report_context.triage
+    preflight_issues = report_context.preflight_issues
     failed: list[PerformanceResult] = [res for res in results if not res.success]
     quality_counts = Counter(dict(triage.quality_counts))
     harness_success_count = sum("harness" in row.labels for row in triage.utility_rows)
@@ -15195,6 +15207,16 @@ def _format_action_snapshot_parts(
         )
     else:
         append_line("Review watchlist", "none.")
+
+    if preflight_issues:
+        append_line(
+            "Preflight compatibility",
+            f"{len(preflight_issues)} informational warning(s); do not treat these alone as run failures.",
+        )
+        append_line(
+            "Escalate only if",
+            "they line up with unexpected TF/Flax/JAX imports, startup hangs, or backend/runtime crashes.",
+        )
 
     if triage.baseline_score is not None and triage.baseline_grade is not None:
         better = len(summary.get("cataloging_improves_metadata", []))
@@ -16398,6 +16420,7 @@ def finalize_execution(
             results=results,
             prompt=prompt,
             system_info=system_info,
+            preflight_issues=_get_run_preflight_issues(args),
         )
 
         # Prepare output paths
