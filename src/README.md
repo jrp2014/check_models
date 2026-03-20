@@ -221,13 +221,15 @@ The tool generates multiple report formats in `output/` by default:
 
 - **CLI**: Real-time colorized progress and metrics.
 - **HTML** (`results.html`): Interactive table with sortable columns and failed row highlighting.
-- **Markdown** (`results.md`): GitHub-compatible summary for documentation.
+- **Markdown** (`results.md`): GitHub-compatible summary for documentation, with links to the canonical log and review artifacts.
 - **Gallery Markdown** (`model_gallery.md`): GitHub-compatible review artifact with image metadata, the full prompt, and one full-output section per model.
+- **Review Markdown** (`review.md`): Short automated digest grouped by likely owner and user-facing utility bucket.
 - **TSV/JSONL** (`results.tsv`, `results.jsonl`): Machine-readable formats for analysis.
 - **Diagnostics** (`diagnostics.md`): Failure-focused and compatibility-focused issue report (generated when failures, harness issues, or preflight compatibility warnings are present).
+- **Log** (`check_models.log`): Canonical comprehensive run artifact, including the full per-model review block and full output/captured failure output.
 - **History** (`results.history.jsonl`): Append-only run history for regressions/recoveries.
 
-The main Markdown report keeps its embedded Model Gallery section for continuity, and also points to the standalone `model_gallery.md` artifact when that dedicated review file is generated.
+The main Markdown report stays brief and points readers to `check_models.log`, `review.md`, and `model_gallery.md` for the full automated review and output evidence.
 
 ### Metrics Explained
 
@@ -789,6 +791,7 @@ See module docstrings and `__all__` exports for complete API reference.
 | `--output-html` | Path | `output/results.html` | HTML report output filename. |
 | `--output-markdown` | Path | `output/results.md` | Markdown report output filename. |
 | `--output-gallery-markdown` | Path | `output/model_gallery.md` | Standalone Markdown gallery artifact for qualitative output review. |
+| `--output-review` | Path | `output/review.md` | Markdown review digest grouped by owner and user bucket. |
 | `--output-tsv` | Path | `output/results.tsv` | TSV (tab-separated values) report output filename. |
 | `--output-jsonl` | Path | `output/results.jsonl` | JSONL report output filename. |
 | `--output-log` | Path | `output/check_models.log` | Command line output log filename. |
@@ -1081,6 +1084,7 @@ check_models/
 │       ├── results.html
 │       ├── results.md
 │       ├── model_gallery.md
+│       ├── review.md
 │       ├── results.tsv
 │       ├── results.jsonl
 │       ├── results.history.jsonl

@@ -6,6 +6,7 @@ import json
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, cast
 
+import check_models
 from check_models import (
     JsonlMetadataRecord,
     JsonlResultRecord,
@@ -83,7 +84,7 @@ def test_save_jsonl_report_creates_file(tmp_path: Path) -> None:
     assert output_file.exists()
     header, rows = _read_jsonl(output_file)
     assert header["_type"] == "metadata"
-    assert header["format_version"] == "1.3"
+    assert header["format_version"] == "1.4"
     assert header["prompt"] == "test"
     assert rows == []
 
@@ -134,6 +135,80 @@ def test_save_jsonl_report_content(tmp_path: Path) -> None:
     assert timing["prompt_prep_time_s"] == 0.2
     assert timing["cleanup_time_s"] == 0.05
     assert timing["stop_reason"] == "completed"
+
+
+def test_save_jsonl_report_includes_review_payload_for_success(tmp_path: Path) -> None:
+    """Successful rows should include the canonical automated review payload."""
+    output_file = tmp_path / "results.jsonl"
+    prompt = (
+        "Analyze this image.\n"
+        "Context: Existing metadata hints:\n"
+        "- Title hint: Brick storefront with outdoor seating\n"
+        "- Description hint: A brick storefront has outdoor seating beside a sidewalk.\n"
+        "- Keyword hints: brick storefront, outdoor seating, sidewalk, people\n"
+    )
+    gen = MockGeneration(
+        text=(
+            "Title: Brick storefront with outdoor seating\n"
+            "Description: A brick storefront has outdoor seating beside a sidewalk.\n"
+            "Keywords: brick storefront, outdoor seating, sidewalk, people"
+        ),
+        prompt_tokens=320,
+        generation_tokens=64,
+    )
+    analysis = check_models.analyze_generation_text(
+        gen.text or "",
+        generated_tokens=64,
+        prompt_tokens=320,
+        prompt=prompt,
+        requested_max_tokens=128,
+    )
+    result = PerformanceResult(
+        model_name="test-model",
+        generation=gen,
+        success=True,
+        quality_analysis=analysis,
+        requested_max_tokens=128,
+    )
+
+    save_jsonl_report([result], output_file, prompt=prompt, system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    review = rows[0]["review"]
+    assert review["verdict"] in {"clean", "model_shortcoming", "context_budget"}
+    assert review["hint_relationship"] in {
+        "improves_trusted_hints",
+        "preserves_trusted_hints",
+        "degrades_trusted_hints",
+        "ignores_trusted_hints",
+    }
+    assert review["requested_max_tokens"] == 128
+    assert review["prompt_tokens_total"] == 320
+    assert review["prompt_tokens_text_est"] is not None
+    assert review["prompt_tokens_nontext_est"] is not None
+
+
+def test_save_jsonl_report_includes_review_payload_for_failures(tmp_path: Path) -> None:
+    """Failure rows should still include owner and verdict review fields."""
+    output_file = tmp_path / "results.jsonl"
+    result = PerformanceResult(
+        model_name="failed-model",
+        generation=None,
+        success=False,
+        error_message="runtime error",
+        error_stage="Model Error",
+        error_code="MLX_VLM_DECODE_RUNTIME",
+        error_package="mlx-vlm",
+    )
+
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    review = rows[0]["review"]
+    assert review["verdict"] == "harness"
+    assert review["owner"] == "mlx-vlm"
+    assert review["user_bucket"] == "avoid"
+    assert review["evidence"]
 
 
 def test_save_jsonl_report_no_generation(tmp_path: Path) -> None:

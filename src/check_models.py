@@ -31,7 +31,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from collections import Counter
-from collections.abc import Callable, Generator, Iterator, Mapping, Sequence
+from collections.abc import Callable, Generator, Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from functools import lru_cache
@@ -326,6 +326,9 @@ class QualityThresholds:
     prompt_keyword_max_items: int = 20  # Max number of metadata keyword hints
     prompt_keyword_item_max_chars: int = 36  # Max chars per metadata keyword hint
     min_text_for_leak_detection: int = 100  # Min text length for training leak detection
+    prompt_word_to_token_ratio: float = 1.3  # Lightweight prompt-token estimate multiplier
+    max_reported_missing_terms: int = 5  # Cap human-facing missing-term lists
+    cutoff_tail_chars: int = 120  # Tail window inspected for cutoff evidence
 
     # Patterns (loaded from config)
     patterns: dict[str, list[str]] | None = None
@@ -798,6 +801,24 @@ class JsonlQualityAnalysisRecord(TypedDict):
     metrics: JsonlQualityAnalysisMetrics
 
 
+class JsonlReviewRecord(TypedDict):
+    """Canonical automated review payload attached to JSONL result rows."""
+
+    verdict: str
+    hint_relationship: str
+    instruction_echo: bool
+    metadata_borrowing: bool
+    likely_capped: bool
+    owner: str
+    user_bucket: str
+    evidence: list[str]
+    requested_max_tokens: int | None
+    hit_max_tokens: bool
+    prompt_tokens_total: int | None
+    prompt_tokens_text_est: int | None
+    prompt_tokens_nontext_est: int | None
+
+
 class JsonlMetadataRecord(TypedDict):
     """Shared header row for ``results.jsonl`` format."""
 
@@ -829,6 +850,7 @@ class JsonlResultRecord(TypedDict):
     timing: JsonlTimingRecord
     generated_text: NotRequired[str]
     quality_analysis: NotRequired[JsonlQualityAnalysisRecord]
+    review: NotRequired[JsonlReviewRecord]
 
 
 type FailedModelIssue = tuple[str, str | None, str | None]
@@ -959,6 +981,7 @@ class ReportGenerationInputs:
     jsonl_output_path: Path
     log_output_path: Path
     env_output_path: Path
+    review_output_path: Path
 
 
 @runtime_checkable
@@ -1018,6 +1041,7 @@ _SCRIPT_DIR = Path(__file__).parent
 DEFAULT_HTML_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.html"
 DEFAULT_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.md"
 DEFAULT_GALLERY_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "model_gallery.md"
+DEFAULT_REVIEW_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "review.md"
 DEFAULT_TSV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.tsv"
 DEFAULT_LOG_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "check_models.log"
 DEFAULT_JSONL_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.jsonl"
@@ -1092,6 +1116,7 @@ class PerformanceResult:
         cache_memory: GPU memory in cache (GB), from mx.metal.get_cache_memory()
         error_package: Which package raised the error (mlx, mlx-vlm, transformers)
         error_traceback: Full traceback for actionable error reports
+        requested_max_tokens: Requested generation budget for cutoff diagnosis
     """
 
     model_name: str
@@ -1114,6 +1139,7 @@ class PerformanceResult:
     error_package: str | None = None
     error_traceback: str | None = None
     runtime_diagnostics: RuntimeDiagnostics | None = None
+    requested_max_tokens: int | None = None
 
 
 @dataclass(frozen=True)
@@ -1194,8 +1220,22 @@ class _TeeCaptureStream(io.TextIOBase):
 
 
 # Gallery rendering helpers (outside class)
+def _append_markdown_review_block(
+    out: list[str],
+    *,
+    res: PerformanceResult,
+) -> None:
+    """Append the shared canonical review block to a Markdown artifact."""
+    rows = _build_review_block_rows(res)
+    for label, value in rows:
+        out.append(f"**{label}:** {value}")
+
+
 def _gallery_render_error(res: PerformanceResult) -> list[str]:
     out: list[str] = []
+    _append_markdown_review_block(out, res=res)
+    if out:
+        out.append("")
     out.append(f"**Status:** Failed ({res.error_stage})")
     error_msg: str = _escape_markdown_blockquote_line(str(res.error_message))
     max_inline_length = 80
@@ -1326,6 +1366,9 @@ def _gallery_render_success(
 
     out: list[str] = []
     gen: GenerationResult | SupportsGenerationResult | None = res.generation
+    _append_markdown_review_block(out, res=res)
+    if out:
+        out.append("")
     time_segments: list[str] = [
         segment
         for segment in (
@@ -2541,6 +2584,46 @@ PROMPT_ECHO_MARKERS: Final[tuple[str, ...]] = (
     "capture metadata:",
 )
 
+NONVISUAL_CONTEXT_TERMS: Final[frozenset[str]] = frozenset(
+    {
+        "adobe stock",
+        "any vision",
+        "england",
+        "europe",
+        "gps",
+        "hertfordshire",
+        "locations",
+        "stock",
+        "source",
+        "taken",
+        "time",
+        "timestamp",
+        "uk",
+        "united kingdom",
+        "welwyn garden city",
+    },
+)
+
+NONVISUAL_CONTEXT_PATTERNS: Final[tuple[re.Pattern[str], ...]] = (
+    re.compile(r"\b(?:gps|lat(?:itude)?|lon(?:gitude)?|coordinate)s?\b", re.IGNORECASE),
+    re.compile(
+        r"\b(?:taken on|capture metadata|capture time|timestamp|local time)\b", re.IGNORECASE
+    ),
+    re.compile(r"\b\d{4}-\d{2}-\d{2}\b"),
+    re.compile(r"\b\d{1,2}:\d{2}(?::\d{2})?\b"),
+    re.compile(r"\b\d+(?:\.\d+)?°[nswe]\b", re.IGNORECASE),
+)
+
+
+@dataclass(frozen=True)
+class TrustedHintBundle:
+    """Split prompt context into reusable trusted hints and nonvisual metadata."""
+
+    trusted_text: str = ""
+    nonvisual_text: str = ""
+    trusted_terms: tuple[str, ...] = ()
+    nonvisual_terms: tuple[str, ...] = ()
+
 
 def _normalize_phrase_for_matching(text: str) -> str:
     """Normalize free-form text for alias and overlap matching."""
@@ -2617,6 +2700,145 @@ def _split_catalog_keywords(raw_keywords: str) -> list[str]:
         if cleaned:
             keywords.append(cleaned)
     return keywords
+
+
+def _is_nonvisual_context_term(term: str) -> bool:
+    """Return True for metadata/source/location terms we should not require visually."""
+    normalized = _normalize_phrase_for_matching(term)
+    if not normalized:
+        return False
+    if normalized in NONVISUAL_CONTEXT_TERMS:
+        return True
+    return any(pattern.search(term) for pattern in NONVISUAL_CONTEXT_PATTERNS)
+
+
+def _extract_hint_signal_terms(text: str) -> list[str]:
+    """Extract simple reusable context terms from trusted hint text."""
+    if not text:
+        return []
+    terms: list[str] = []
+    for raw_term in re.findall(r"[A-Za-z0-9']+", text):
+        normalized = _normalize_phrase_for_matching(raw_term)
+        if (
+            not normalized
+            or len(normalized) < QUALITY.min_context_term_length
+            or normalized in CONTEXT_COMMON_WORDS
+        ):
+            continue
+        terms.append(raw_term)
+    return _dedupe_preserve_order(terms)
+
+
+def _strip_nonvisual_terms_from_text(text: str, nonvisual_terms: Sequence[str]) -> str:
+    """Remove explicitly nonvisual metadata terms from trusted hint prose."""
+    cleaned = text
+    normalized_term_set: set[str] = {
+        _normalize_phrase_for_matching(item) for item in nonvisual_terms
+    }
+    normalized_terms = [
+        str(term) for term in sorted(normalized_term_set, key=len, reverse=True) if term
+    ]
+    for term in normalized_terms:
+        pattern = re.compile(rf"\b{re.escape(term)}\b", re.IGNORECASE)
+        cleaned = pattern.sub(" ", cleaned)
+    return re.sub(r"\s+", " ", cleaned).strip(" ,.;:-")
+
+
+def _parse_context_hint_lines(
+    context_text: str,
+) -> tuple[str, str, str, list[str]]:
+    """Parse prompt context lines into title/description/keywords/nonvisual buckets."""
+    title_hint = ""
+    description_hint = ""
+    keyword_hint_text = ""
+    nonvisual_lines: list[str] = []
+    prefix_targets: tuple[tuple[str, str], ...] = (
+        ("title hint:", "title"),
+        ("description hint:", "description"),
+        ("keyword hints:", "keywords"),
+        ("capture metadata:", "nonvisual"),
+    )
+
+    for raw_line in context_text.splitlines():
+        stripped = raw_line.strip().lstrip("-").strip()
+        if not stripped:
+            continue
+        lowered = stripped.casefold()
+        for prefix, target in prefix_targets:
+            if not lowered.startswith(prefix):
+                continue
+            value = stripped[len(prefix) :].strip()
+            if target == "title":
+                title_hint = value
+            elif target == "description":
+                description_hint = value
+            elif target == "keywords":
+                keyword_hint_text = value
+            else:
+                nonvisual_lines.append(value)
+            break
+
+    return title_hint, description_hint, keyword_hint_text, nonvisual_lines
+
+
+def _partition_hint_terms(terms: Iterable[str]) -> tuple[list[str], list[str]]:
+    """Split hint terms into trusted and nonvisual groups."""
+    trusted_terms: list[str] = []
+    nonvisual_terms: list[str] = []
+    for term in terms:
+        if _is_nonvisual_context_term(term):
+            nonvisual_terms.append(term)
+        else:
+            trusted_terms.append(term)
+    return trusted_terms, nonvisual_terms
+
+
+def _extract_trusted_hint_bundle(
+    prompt: str,
+    *,
+    context_marker: str = "Context:",
+) -> TrustedHintBundle:
+    """Parse prompt context into trusted hints and explicitly nonvisual metadata."""
+    context_text = _extract_prompt_context_text(prompt, context_marker=context_marker)
+    if not context_text:
+        return TrustedHintBundle()
+
+    title_hint, description_hint, keyword_hint_text, nonvisual_lines = _parse_context_hint_lines(
+        context_text,
+    )
+
+    trusted_keyword_terms = _split_catalog_keywords(keyword_hint_text)
+    trusted_terms, nonvisual_terms = _partition_hint_terms(trusted_keyword_terms)
+
+    for free_text in (title_hint, description_hint):
+        hint_terms, metadata_terms = _partition_hint_terms(_extract_hint_signal_terms(free_text))
+        trusted_terms.extend(hint_terms)
+        nonvisual_terms.extend(metadata_terms)
+
+    for line in nonvisual_lines:
+        nonvisual_terms.extend(_extract_hint_signal_terms(line))
+        nonvisual_terms.append(line)
+
+    filtered_title = _strip_nonvisual_terms_from_text(title_hint, nonvisual_terms)
+    filtered_description = _strip_nonvisual_terms_from_text(description_hint, nonvisual_terms)
+    filtered_keywords = [
+        term for term in trusted_keyword_terms if not _is_nonvisual_context_term(term)
+    ]
+
+    trusted_parts: list[str] = []
+    if filtered_title:
+        trusted_parts.append(f"Title: {filtered_title}")
+    if filtered_description:
+        trusted_parts.append(f"Description: {filtered_description}")
+    if filtered_keywords:
+        trusted_parts.append("Keywords: " + ", ".join(filtered_keywords))
+
+    return TrustedHintBundle(
+        trusted_text="\n".join(trusted_parts).strip(),
+        nonvisual_text="\n".join(part for part in nonvisual_lines if part).strip(),
+        trusted_terms=tuple(_dedupe_preserve_order(trusted_terms)),
+        nonvisual_terms=tuple(_dedupe_preserve_order(nonvisual_terms)),
+    )
 
 
 def _count_factual_sentences(text: str) -> int:
@@ -2739,6 +2961,16 @@ def _detect_reasoning_leakage(text: str) -> tuple[bool, list[str]]:
     return bool(deduped), deduped[:4]
 
 
+def _detect_instruction_echo(text: str) -> tuple[bool, list[str]]:
+    """Detect direct reuse of prompt/task instructions in the answer."""
+    if not text:
+        return False, []
+    text_lower = text.casefold()
+    findings = [marker for marker in PROMPT_ECHO_MARKERS if marker in text_lower]
+    deduped = _dedupe_preserve_order(findings)
+    return bool(deduped), deduped[:4]
+
+
 def _detect_context_echo(
     text: str,
     prompt: str,
@@ -2758,7 +2990,10 @@ def _detect_context_echo(
     if has_inline_context_block:
         return True, 1.0
 
-    context_text: str = _extract_prompt_context_text(prompt, context_marker=context_marker)
+    context_text: str = _extract_trusted_hint_bundle(
+        prompt,
+        context_marker=context_marker,
+    ).trusted_text
     if context_text:
         output_words: list[str] = re.findall(r"[a-z0-9']+", text_lower)
         context_words: list[str] = re.findall(r"[a-z0-9']+", context_text.casefold())
@@ -2797,66 +3032,241 @@ def _detect_context_ignorance(
     prompt: str,
     context_marker: str = "Context:",
 ) -> tuple[bool, list[str]]:
-    """Detect if the generated text ignores key context from the prompt.
-
-    Extracts proper nouns and key contextual terms from the prompt (e.g., from
-    "Context:" sections) and checks if they appear in the generated text.
-
-    Args:
-        text: Generated text to check
-        prompt: Original prompt text containing context
-        context_marker: The marker used to identify the context section (default: "Context:")
-
-    Returns:
-        Tuple of (is_context_ignored, missing_context_terms)
-    """
+    """Detect when trusted hint content is mostly absent from the answer."""
     if not text or not prompt:
         return False, []
 
-    context_text: str = _extract_prompt_context_text(prompt, context_marker=context_marker)
-    if not context_text:
-        # No explicit context section, so can't check
+    bundle = _extract_trusted_hint_bundle(prompt, context_marker=context_marker)
+    if not bundle.trusted_terms:
         return False, []
 
-    # Extract potential proper nouns and key terms from context
-    # Look for capitalized words that aren't common words
-    # Find title-cased and ALL-CAPS tokens (e.g. UK) as potential proper nouns.
-    potential_terms: list[str] = re.findall(
-        r"\b(?:[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*|[A-Z]{2,})\b",
-        context_text,
-    )
-
-    # Filter out common words and keep unique terms
-    seen_terms: set[str] = set()
-    key_terms: list[str] = []
-    for term in potential_terms:
-        term_lower: str = term.casefold()
-        if term_lower in seen_terms:
-            continue
-        seen_terms.add(term_lower)
-        key_terms.append(term)
-    key_terms = [
-        term
-        for term in key_terms
-        if term.casefold() not in CONTEXT_COMMON_WORDS
-        and len(term) > QUALITY.min_context_term_length
-    ]
-
-    # Check if these terms appear in the generated text, honoring aliases.
     normalized_text: str = _normalize_phrase_for_matching(text)
     missing_terms: list[str] = [
-        term for term in key_terms if not _context_term_present(term, normalized_text)
+        term for term in bundle.trusted_terms if not _context_term_present(term, normalized_text)
     ]
-
-    # Only flag as "ignored" if we found key terms and most are missing
-    # Use thresholds from configuration
     is_ignored: bool = (
         len(missing_terms) > 0
-        and len(key_terms) >= QUALITY.min_key_terms_threshold
-        and len(missing_terms) >= len(key_terms) * QUALITY.min_missing_ratio
+        and len(bundle.trusted_terms) >= QUALITY.min_key_terms_threshold
+        and len(missing_terms) >= len(bundle.trusted_terms) * QUALITY.min_missing_ratio
     )
 
-    return is_ignored, missing_terms
+    return is_ignored, missing_terms[: QUALITY.max_reported_missing_terms]
+
+
+def _detect_metadata_borrowing(
+    text: str,
+    bundle: TrustedHintBundle,
+) -> tuple[bool, list[str]]:
+    """Detect output reuse of explicitly nonvisual metadata from the prompt."""
+    if not text or not bundle.nonvisual_terms:
+        return False, []
+    normalized_text = _normalize_phrase_for_matching(text)
+    matches = [
+        term for term in bundle.nonvisual_terms if _context_term_present(term, normalized_text)
+    ]
+    deduped = _dedupe_preserve_order(matches)
+    return bool(deduped), deduped[: QUALITY.max_reported_missing_terms]
+
+
+def _estimate_prompt_tokens_from_text(prompt: str | None) -> int | None:
+    """Estimate text-only prompt tokens with a lightweight word-based heuristic."""
+    if not prompt:
+        return None
+    words = len(prompt.split())
+    if words == 0:
+        return None
+    return max(math.ceil(words * QUALITY.prompt_word_to_token_ratio), 1)
+
+
+def _detect_likely_cutoff(
+    text: str,
+    *,
+    generated_tokens: int,
+    requested_max_tokens: int | None,
+    is_repetitive: bool,
+    missing_sections: Sequence[str],
+) -> tuple[bool, list[str]]:
+    """Detect likely early termination at the generation cap."""
+    if requested_max_tokens is None or requested_max_tokens <= 0:
+        return False, []
+    if generated_tokens < requested_max_tokens:
+        return False, []
+
+    tail = text.strip()[-QUALITY.cutoff_tail_chars :].strip()
+    reasons: list[str] = []
+    if missing_sections and text.strip():
+        reasons.append("missing_sections")
+    if is_repetitive:
+        reasons.append("repetitive_tail")
+    if tail:
+        if re.search(r"(title|description|keywords)\s*:?\s*$", tail, re.IGNORECASE):
+            reasons.append("unfinished_section")
+        if tail[-1].isalnum() and not re.search(r"[.!?\"')\]]\s*$", tail):
+            reasons.append("abrupt_tail")
+    return bool(reasons), _dedupe_preserve_order(reasons)
+
+
+def _classify_hint_relationship(
+    text: str,
+    bundle: TrustedHintBundle,
+) -> tuple[str, list[str]]:
+    """Classify how the answer relates to trusted prompt hints."""
+    if not bundle.trusted_text:
+        return "preserves_trusted_hints", []
+
+    text_for_hint_eval = _strip_nonvisual_terms_from_text(text, bundle.nonvisual_terms) or text
+    normalized_text = _normalize_phrase_for_matching(text_for_hint_eval)
+    matched_terms = [
+        term for term in bundle.trusted_terms if _context_term_present(term, normalized_text)
+    ]
+    overlap_ratio = (
+        len(matched_terms) / max(len(bundle.trusted_terms), 1) if bundle.trusted_terms else 0.0
+    )
+    baseline = compute_cataloging_utility(bundle.trusted_text, None)
+    baseline_score = float(baseline["utility_score"])
+    utility = compute_cataloging_utility(text_for_hint_eval, bundle.trusted_text)
+    score = float(utility["utility_score"])
+    delta = score - baseline_score
+
+    if bundle.trusted_terms and overlap_ratio < (1.0 - QUALITY.min_missing_ratio):
+        return "ignores_trusted_hints", ["low_hint_overlap"]
+    if delta > UTILITY_DELTA_NEUTRAL_BAND:
+        return "improves_trusted_hints", ["utility_delta_positive"]
+    if overlap_ratio >= QUALITY.medium_confidence_threshold:
+        return "preserves_trusted_hints", ["trusted_overlap"]
+    if delta < -UTILITY_DELTA_NEUTRAL_BAND:
+        return "degrades_trusted_hints", ["utility_delta_negative"]
+    return "preserves_trusted_hints", ["utility_delta_neutral"]
+
+
+def _classify_review_owner(
+    *,
+    harness_type: str | None,
+    failure_owner: str | None,
+    instruction_echo: bool,
+    metadata_borrowing: bool,
+    hint_relationship: str,
+) -> str:
+    """Return a compact single-owner label for canonical review output."""
+    if failure_owner:
+        owner_lower = failure_owner.casefold()
+        for needle, owner in (
+            ("transformers", "transformers"),
+            ("mlx-lm", "mlx-lm"),
+            ("mlx-vlm", "mlx-vlm"),
+            ("model-config", "model-config"),
+            ("mlx", "mlx"),
+        ):
+            if needle in owner_lower:
+                return owner
+
+    harness_key = (harness_type or "").casefold()
+    harness_owner_map = {
+        "prompt_template": "model-config",
+        "stop_token": "mlx-vlm",
+        "encoding": "mlx-vlm",
+        "generation_loop": "mlx-vlm",
+        "long_context": "mlx",
+    }
+    mapped_owner = harness_owner_map.get(harness_key)
+    if mapped_owner is not None:
+        return mapped_owner
+
+    if (
+        instruction_echo
+        or metadata_borrowing
+        or hint_relationship
+        in {
+            "degrades_trusted_hints",
+            "ignores_trusted_hints",
+        }
+    ):
+        return "model"
+    return "model"
+
+
+def _classify_review_verdict(
+    *,
+    has_harness_issue: bool,
+    harness_type: str | None,
+    likely_cutoff: bool,
+    prompt_tokens_total: int | None,
+    prompt_tokens_text_est: int | None,
+    prompt_tokens_nontext_est: int | None,
+    missing_sections: Sequence[str],
+    utility_grade: str,
+    instruction_echo: bool,
+    metadata_borrowing: bool,
+    has_hallucination: bool,
+) -> tuple[str, list[str]]:
+    """Return ordered verdict plus compact evidence labels."""
+    evidence: list[str] = []
+    if has_harness_issue and (harness_type or "") != "long_context":
+        if harness_type:
+            evidence.append(f"harness:{harness_type}")
+        return "harness", evidence
+
+    if likely_cutoff:
+        evidence.append("token_cap")
+        return "cutoff", evidence
+
+    weak_output = (
+        bool(missing_sections) or instruction_echo or metadata_borrowing or has_hallucination
+    )
+    heavy_nontext_burden = (
+        prompt_tokens_total is not None
+        and prompt_tokens_total >= QUALITY.long_prompt_tokens_threshold
+        and prompt_tokens_text_est is not None
+        and prompt_tokens_nontext_est is not None
+        and prompt_tokens_nontext_est > prompt_tokens_text_est
+    )
+    if (harness_type or "") == "long_context" or (heavy_nontext_burden and weak_output):
+        if (harness_type or "") == "long_context":
+            evidence.append("long_context")
+        if heavy_nontext_burden:
+            evidence.append("nontext_prompt_burden")
+        return "context_budget", evidence
+
+    if weak_output:
+        if instruction_echo:
+            evidence.append("instruction_echo")
+        if metadata_borrowing:
+            evidence.append("metadata_borrowing")
+        if has_hallucination:
+            evidence.append("hallucination")
+        if missing_sections:
+            evidence.append("contract")
+        if utility_grade in {"D", "F"}:
+            evidence.append(f"utility:{utility_grade}")
+        return "model_shortcoming", evidence
+
+    return "clean", evidence
+
+
+def _classify_user_bucket(
+    *,
+    verdict: str,
+    hint_relationship: str,
+    has_contract_issue: bool,
+) -> str:
+    """Bucket outputs for end users based on verdict and utility signals."""
+    if verdict in {"harness", "cutoff"}:
+        return "avoid"
+    if verdict == "context_budget":
+        return "caveat"
+    if verdict == "model_shortcoming" or hint_relationship == "degrades_trusted_hints":
+        return "avoid"
+    if (
+        verdict == "clean"
+        and hint_relationship
+        in {
+            "improves_trusted_hints",
+            "preserves_trusted_hints",
+        }
+        and not has_contract_issue
+    ):
+        return "recommended"
+    return "caveat"
 
 
 def _detect_refusal_patterns(text: str) -> tuple[bool, str | None]:
@@ -4130,8 +4540,9 @@ def _extract_metadata_baseline_text(context: str | None) -> str | None:
         "title hint:",
         "description hint:",
         "keyword hints:",
-        "capture metadata:",
-        "capture metadata hints:",
+        "title:",
+        "description:",
+        "keywords:",
     )
     extracted_lines: list[str] = []
     for raw_line in context.splitlines():
@@ -4141,6 +4552,8 @@ def _extract_metadata_baseline_text(context: str | None) -> str | None:
         if line.lower().startswith("existing metadata hints"):
             continue
         line_lower = line.lower()
+        if line_lower.startswith(("capture metadata:", "capture metadata hints:")):
+            continue
         for prefix in label_prefixes:
             if line_lower.startswith(prefix):
                 line = line[len(prefix) :].strip()
@@ -4235,6 +4648,18 @@ class GenerationQualityAnalysis:
     word_count: int = 0
     unique_ratio: float = 0.0
     prompt_checks_ran: bool = False
+    instruction_echo: bool = False
+    metadata_borrowing: bool = False
+    hint_relationship: str = "preserves_trusted_hints"
+    verdict: str = "clean"
+    owner: str = "model"
+    user_bucket: str = "recommended"
+    evidence: list[str] = dataclasses.field(default_factory=list)
+    likely_capped: bool = False
+    requested_max_tokens: int | None = None
+    prompt_tokens_total: int | None = None
+    prompt_tokens_text_est: int | None = None
+    prompt_tokens_nontext_est: int | None = None
 
     @property
     def has_title_length_violation(self) -> bool:
@@ -4292,6 +4717,9 @@ class GenerationQualityAnalysis:
             or self.has_reasoning_leak
             or self.has_context_echo
             or self.has_harness_issue
+            or self.instruction_echo
+            or self.metadata_borrowing
+            or self.verdict != "clean"
         )
 
     def has_harness_issues_only(self) -> bool:
@@ -4322,6 +4750,10 @@ class GenerationQualityAnalysis:
             or self.has_description_sentence_violation
             or self.has_keyword_count_violation
             or self.has_keyword_duplication_violation
+            or self.instruction_echo
+            or self.metadata_borrowing
+            or self.hint_relationship in {"degrades_trusted_hints", "ignores_trusted_hints"}
+            or self.verdict not in {"clean", "harness"}
         )
         return not has_non_harness_issue
 
@@ -4384,6 +4816,17 @@ class GenerationQualityAnalysis:
                 ),
             ),
             (self.has_context_echo, f"Context echo ({self.context_echo_ratio:.0%} overlap)"),
+            (self.instruction_echo, "Instruction echo"),
+            (self.metadata_borrowing, "Nonvisual metadata borrowing"),
+            (self.likely_capped, "Likely capped by max token budget"),
+            (
+                self.hint_relationship == "ignores_trusted_hints",
+                "Ignores trusted hints",
+            ),
+            (
+                self.hint_relationship == "degrades_trusted_hints",
+                "Degrades trusted hints",
+            ),
         ]
         issues_list.extend(label for condition, label in scalar_issues if condition)
         issues_list.extend(self.hallucination_issues)
@@ -4396,7 +4839,169 @@ class GenerationQualityAnalysis:
             harness_label = f"⚠️HARNESS:{self.harness_issue_type}"
             issues_list.insert(0, harness_label)  # Put at front for visibility
             issues_list.extend(self.harness_issue_details)
+        if self.verdict == "cutoff":
+            issues_list.insert(0, "⚠️REVIEW:cutoff")
+        elif self.verdict == "context_budget":
+            issues_list.insert(0, "⚠️REVIEW:context_budget")
         return issues_list
+
+
+@dataclass(frozen=True)
+class PromptQualitySignals:
+    """Prompt-aware quality signals derived from trusted hints and contract checks."""
+
+    prompt_bundle: TrustedHintBundle
+    is_context_ignored: bool = False
+    missing_context_terms: tuple[str, ...] = ()
+    has_reasoning_leak: bool = False
+    reasoning_leak_markers: tuple[str, ...] = ()
+    has_context_echo: bool = False
+    context_echo_ratio: float = 0.0
+    instruction_echo: bool = False
+    instruction_markers: tuple[str, ...] = ()
+    metadata_borrowing: bool = False
+    borrowed_metadata_terms: tuple[str, ...] = ()
+    missing_sections: tuple[str, ...] = ()
+    title_word_count: int | None = None
+    description_sentence_count: int | None = None
+    keyword_count: int | None = None
+    keyword_duplication_ratio: float | None = None
+
+
+@dataclass(frozen=True)
+class HarnessQualitySignals:
+    """Harness and integration signals derived from generated text."""
+
+    has_harness_issue: bool
+    harness_type: str | None
+    harness_issues: tuple[str, ...]
+
+
+def _collect_prompt_quality_signals(
+    text: str,
+    *,
+    generated_tokens: int,
+    prompt: str | None,
+    context_marker: str,
+) -> PromptQualitySignals:
+    """Collect prompt-aware trusted-hint and contract signals."""
+    has_reasoning_leak, reasoning_leak_markers = _detect_reasoning_leakage(text)
+    instruction_echo, instruction_markers = _detect_instruction_echo(text)
+    if not prompt:
+        return PromptQualitySignals(
+            prompt_bundle=TrustedHintBundle(),
+            has_reasoning_leak=has_reasoning_leak,
+            reasoning_leak_markers=tuple(reasoning_leak_markers),
+            instruction_echo=instruction_echo,
+            instruction_markers=tuple(instruction_markers),
+        )
+
+    prompt_bundle = _extract_trusted_hint_bundle(prompt, context_marker=context_marker)
+    is_context_ignored, missing_context_terms = _detect_context_ignorance(
+        text,
+        prompt,
+        context_marker=context_marker,
+    )
+    has_context_echo, context_echo_ratio = _detect_context_echo(
+        text,
+        prompt,
+        context_marker=context_marker,
+    )
+    metadata_borrowing, borrowed_metadata_terms = _detect_metadata_borrowing(
+        text,
+        prompt_bundle,
+    )
+    missing_sections: list[str] = []
+    title_word_count: int | None = None
+    description_sentence_count: int | None = None
+    keyword_count: int | None = None
+    keyword_duplication_ratio: float | None = None
+    if generated_tokens >= QUALITY.min_tokens_for_substantial and _prompt_requests_catalog_contract(
+        prompt
+    ):
+        (
+            missing_sections,
+            title_word_count,
+            description_sentence_count,
+            keyword_count,
+            keyword_duplication_ratio,
+        ) = _analyze_catalog_contract(text)
+
+    return PromptQualitySignals(
+        prompt_bundle=prompt_bundle,
+        is_context_ignored=is_context_ignored,
+        missing_context_terms=tuple(missing_context_terms),
+        has_reasoning_leak=has_reasoning_leak,
+        reasoning_leak_markers=tuple(reasoning_leak_markers),
+        has_context_echo=has_context_echo,
+        context_echo_ratio=context_echo_ratio,
+        instruction_echo=instruction_echo,
+        instruction_markers=tuple(instruction_markers),
+        metadata_borrowing=metadata_borrowing,
+        borrowed_metadata_terms=tuple(borrowed_metadata_terms),
+        missing_sections=tuple(missing_sections),
+        title_word_count=title_word_count,
+        description_sentence_count=description_sentence_count,
+        keyword_count=keyword_count,
+        keyword_duplication_ratio=keyword_duplication_ratio,
+    )
+
+
+def _collect_harness_quality_signals(
+    text: str,
+    *,
+    generated_tokens: int,
+    prompt_tokens: int | None,
+    is_repetitive: bool,
+    is_context_ignored: bool,
+    is_refusal: bool,
+) -> HarnessQualitySignals:
+    """Collect harness and integration failure signals."""
+    harness_issues: list[str] = []
+    harness_type: str | None = None
+
+    has_encoding_issue, encoding_type = _detect_token_encoding_issues(text)
+    if has_encoding_issue and encoding_type:
+        harness_type = harness_type or "encoding"
+        harness_issues.append(f"token_encoding:{encoding_type}")
+
+    has_token_leak, leaked_tokens = _detect_special_token_leakage(text)
+    if has_token_leak:
+        harness_type = harness_type or "stop_token"
+        harness_issues.extend([f"token_leak:{tok}" for tok in leaked_tokens[:3]])
+
+    has_minimal, minimal_type = _detect_minimal_output(
+        text,
+        generated_tokens,
+        prompt_tokens=prompt_tokens,
+    )
+    if has_minimal and minimal_type:
+        harness_type = harness_type or "prompt_template"
+        harness_issues.append(f"output:{minimal_type}")
+
+    has_long_context_breakdown, long_context_issue = _detect_long_context_breakdown(
+        prompt_tokens=prompt_tokens,
+        generated_tokens=generated_tokens,
+        text=text,
+        is_repetitive=is_repetitive,
+        is_context_ignored=is_context_ignored,
+        is_refusal=is_refusal,
+    )
+    if has_long_context_breakdown and long_context_issue:
+        if harness_type in {None, "prompt_template"}:
+            harness_type = "long_context"
+        harness_issues.append(long_context_issue)
+
+    has_training_leak, leak_type = _detect_training_data_leak(text)
+    if has_training_leak and leak_type:
+        harness_type = harness_type or "generation_loop"
+        harness_issues.append(f"training_leak:{leak_type}")
+
+    return HarnessQualitySignals(
+        has_harness_issue=bool(harness_issues),
+        harness_type=harness_type,
+        harness_issues=tuple(harness_issues),
+    )
 
 
 def analyze_generation_text(
@@ -4404,6 +5009,7 @@ def analyze_generation_text(
     generated_tokens: int,
     prompt_tokens: int | None = None,
     prompt: str | None = None,
+    requested_max_tokens: int | None = None,
     context_marker: str = "Context:",
 ) -> GenerationQualityAnalysis:
     """Analyze generated text for quality issues.
@@ -4416,6 +5022,7 @@ def analyze_generation_text(
         generated_tokens: Number of tokens generated
         prompt_tokens: Number of prompt/prefill tokens (if available)
         prompt: Optional prompt text for context ignorance detection
+        requested_max_tokens: Requested max generation tokens for cutoff detection
         context_marker: Marker for context section in prompt
 
     Returns:
@@ -4426,47 +5033,12 @@ def analyze_generation_text(
     is_verbose = _detect_excessive_verbosity(text, generated_tokens)
     formatting_issues = _detect_formatting_violations(text)
     has_excessive_bullets, bullet_count = _detect_excessive_bullets(text)
-
-    # Context ignorance: output doesn't reference key terms from prompt
-    is_context_ignored = False
-    missing_context_terms: list[str] = []
-    has_reasoning_leak = False
-    reasoning_leak_markers: list[str] = []
-    has_context_echo = False
-    context_echo_ratio = 0.0
-    missing_sections: list[str] = []
-    title_word_count: int | None = None
-    description_sentence_count: int | None = None
-    keyword_count: int | None = None
-    keyword_duplication_ratio: float | None = None
-    if prompt:
-        is_context_ignored, missing_context_terms = _detect_context_ignorance(
-            text,
-            prompt,
-            context_marker=context_marker,
-        )
-        has_reasoning_leak, reasoning_leak_markers = _detect_reasoning_leakage(text)
-        has_context_echo, context_echo_ratio = _detect_context_echo(
-            text,
-            prompt,
-            context_marker=context_marker,
-        )
-
-        if (
-            generated_tokens >= QUALITY.min_tokens_for_substantial
-            and _prompt_requests_catalog_contract(
-                prompt,
-            )
-        ):
-            (
-                missing_sections,
-                title_word_count,
-                description_sentence_count,
-                keyword_count,
-                keyword_duplication_ratio,
-            ) = _analyze_catalog_contract(text)
-    else:
-        has_reasoning_leak, reasoning_leak_markers = _detect_reasoning_leakage(text)
+    prompt_signals = _collect_prompt_quality_signals(
+        text,
+        generated_tokens=generated_tokens,
+        prompt=prompt,
+        context_marker=context_marker,
+    )
 
     # Refusal detection: model declines to answer
     is_refusal, refusal_type = _detect_refusal_patterns(text)
@@ -4483,57 +5055,104 @@ def analyze_generation_text(
     # Fabrication: hallucinated specific details
     has_fabrication, fabrication_issues = _detect_fabricated_details(text)
 
-    # Harness/integration issues: mlx-vlm bugs, not model quality problems
-    harness_issues: list[str] = []
-    harness_type: str | None = None
-
-    # Check for token encoding issues (BPE leak)
-    has_encoding_issue, encoding_type = _detect_token_encoding_issues(text)
-    if has_encoding_issue and encoding_type:
-        harness_type = harness_type or "encoding"
-        harness_issues.append(f"token_encoding:{encoding_type}")
-
-    # Check for special token leakage
-    has_token_leak, leaked_tokens = _detect_special_token_leakage(text)
-    if has_token_leak:
-        harness_type = harness_type or "stop_token"
-        harness_issues.extend([f"token_leak:{tok}" for tok in leaked_tokens[:3]])
-
-    # Check for minimal/zero output (prompt template issue)
-    has_minimal, minimal_type = _detect_minimal_output(
+    harness_signals = _collect_harness_quality_signals(
         text,
-        generated_tokens,
-        prompt_tokens=prompt_tokens,
-    )
-    if has_minimal and minimal_type:
-        harness_type = harness_type or "prompt_template"
-        harness_issues.append(f"output:{minimal_type}")
-
-    # Check for long-context degradation (high prompt token count with weak output)
-    has_long_context_breakdown, long_context_issue = _detect_long_context_breakdown(
-        prompt_tokens=prompt_tokens,
         generated_tokens=generated_tokens,
-        text=text,
+        prompt_tokens=prompt_tokens,
         is_repetitive=is_repetitive,
-        is_context_ignored=is_context_ignored,
+        is_context_ignored=prompt_signals.is_context_ignored,
         is_refusal=is_refusal,
     )
-    if has_long_context_breakdown and long_context_issue:
-        # Prefer explicit long-context classification over generic prompt-template label.
-        if harness_type in {None, "prompt_template"}:
-            harness_type = "long_context"
-        harness_issues.append(long_context_issue)
-
-    # Check for training data leakage
-    has_training_leak, leak_type = _detect_training_data_leak(text)
-    if has_training_leak and leak_type:
-        harness_type = harness_type or "generation_loop"
-        harness_issues.append(f"training_leak:{leak_type}")
 
     _ttr, unique_words, total_words = compute_vocabulary_diversity(text)
     unique_ratio = unique_words / total_words if total_words else 0.0
-
-    has_harness_issue = bool(harness_issues)
+    prompt_tokens_text_est = _estimate_prompt_tokens_from_text(prompt)
+    prompt_tokens_nontext_est = (
+        max(prompt_tokens - prompt_tokens_text_est, 0)
+        if (prompt_tokens is not None and prompt_tokens_text_est is not None)
+        else None
+    )
+    likely_capped, cutoff_reasons = _detect_likely_cutoff(
+        text,
+        generated_tokens=generated_tokens,
+        requested_max_tokens=requested_max_tokens,
+        is_repetitive=is_repetitive,
+        missing_sections=prompt_signals.missing_sections,
+    )
+    utility_context = prompt_signals.prompt_bundle.trusted_text or None
+    utility_grade = str(compute_cataloging_utility(text, utility_context)["utility_grade"])
+    hint_relationship = "preserves_trusted_hints"
+    hint_evidence: list[str] = []
+    if prompt_signals.prompt_bundle.trusted_text:
+        hint_relationship, hint_evidence = _classify_hint_relationship(
+            text,
+            prompt_signals.prompt_bundle,
+        )
+    verdict, review_evidence = _classify_review_verdict(
+        has_harness_issue=harness_signals.has_harness_issue,
+        harness_type=harness_signals.harness_type,
+        likely_cutoff=likely_capped,
+        prompt_tokens_total=prompt_tokens,
+        prompt_tokens_text_est=prompt_tokens_text_est,
+        prompt_tokens_nontext_est=prompt_tokens_nontext_est,
+        missing_sections=prompt_signals.missing_sections,
+        utility_grade=utility_grade,
+        instruction_echo=prompt_signals.instruction_echo,
+        metadata_borrowing=prompt_signals.metadata_borrowing,
+        has_hallucination=bool(hallucination_issues),
+    )
+    has_contract_issue = bool(prompt_signals.missing_sections) or any(
+        (
+            prompt_signals.title_word_count is not None
+            and not (
+                QUALITY.min_title_words
+                <= prompt_signals.title_word_count
+                <= QUALITY.max_title_words
+            ),
+            prompt_signals.description_sentence_count is not None
+            and not (
+                QUALITY.min_description_sentences
+                <= prompt_signals.description_sentence_count
+                <= QUALITY.max_description_sentences
+            ),
+            prompt_signals.keyword_count is not None
+            and not (
+                QUALITY.min_keywords_count
+                <= prompt_signals.keyword_count
+                <= QUALITY.max_keywords_count
+            ),
+            prompt_signals.keyword_duplication_ratio is not None
+            and prompt_signals.keyword_duplication_ratio
+            >= QUALITY.keyword_duplication_ratio_threshold,
+        ),
+    )
+    owner = _classify_review_owner(
+        harness_type=harness_signals.harness_type,
+        failure_owner=None,
+        instruction_echo=prompt_signals.instruction_echo,
+        metadata_borrowing=prompt_signals.metadata_borrowing,
+        hint_relationship=hint_relationship,
+    )
+    user_bucket = _classify_user_bucket(
+        verdict=verdict,
+        hint_relationship=hint_relationship,
+        has_contract_issue=has_contract_issue,
+    )
+    evidence = _dedupe_preserve_order(
+        [
+            *review_evidence,
+            *cutoff_reasons,
+            *hint_evidence,
+            *(["instruction_markers"] if prompt_signals.instruction_markers else []),
+            *(["metadata_terms"] if prompt_signals.borrowed_metadata_terms else []),
+            *(["reasoning_leak"] if prompt_signals.has_reasoning_leak else []),
+            *(["context_echo"] if prompt_signals.has_context_echo else []),
+            *(["refusal"] if is_refusal else []),
+            *(["generic"] if is_generic else []),
+            *(["degeneration"] if has_degeneration else []),
+            *(["fabrication"] if has_fabrication else []),
+        ],
+    )
 
     return GenerationQualityAnalysis(
         is_repetitive=is_repetitive,
@@ -4543,8 +5162,8 @@ def analyze_generation_text(
         formatting_issues=formatting_issues,
         has_excessive_bullets=has_excessive_bullets,
         bullet_count=bullet_count,
-        is_context_ignored=is_context_ignored,
-        missing_context_terms=missing_context_terms,
+        is_context_ignored=prompt_signals.is_context_ignored,
+        missing_context_terms=list(prompt_signals.missing_context_terms),
         is_refusal=is_refusal,
         refusal_type=refusal_type,
         is_generic=is_generic,
@@ -4555,21 +5174,33 @@ def analyze_generation_text(
         degeneration_type=degeneration_type,
         has_fabrication=has_fabrication,
         fabrication_issues=fabrication_issues,
-        missing_sections=missing_sections,
-        title_word_count=title_word_count,
-        description_sentence_count=description_sentence_count,
-        keyword_count=keyword_count,
-        keyword_duplication_ratio=keyword_duplication_ratio,
-        has_reasoning_leak=has_reasoning_leak,
-        reasoning_leak_markers=reasoning_leak_markers,
-        has_context_echo=has_context_echo,
-        context_echo_ratio=context_echo_ratio,
-        has_harness_issue=has_harness_issue,
-        harness_issue_type=harness_type,
-        harness_issue_details=harness_issues,
+        missing_sections=list(prompt_signals.missing_sections),
+        title_word_count=prompt_signals.title_word_count,
+        description_sentence_count=prompt_signals.description_sentence_count,
+        keyword_count=prompt_signals.keyword_count,
+        keyword_duplication_ratio=prompt_signals.keyword_duplication_ratio,
+        has_reasoning_leak=prompt_signals.has_reasoning_leak,
+        reasoning_leak_markers=list(prompt_signals.reasoning_leak_markers),
+        has_context_echo=prompt_signals.has_context_echo,
+        context_echo_ratio=prompt_signals.context_echo_ratio,
+        has_harness_issue=harness_signals.has_harness_issue,
+        harness_issue_type=harness_signals.harness_type,
+        harness_issue_details=list(harness_signals.harness_issues),
         word_count=total_words,
         unique_ratio=round(unique_ratio, 3),
         prompt_checks_ran=bool(prompt),
+        instruction_echo=prompt_signals.instruction_echo,
+        metadata_borrowing=prompt_signals.metadata_borrowing,
+        hint_relationship=hint_relationship,
+        verdict=verdict,
+        owner=owner,
+        user_bucket=user_bucket,
+        evidence=evidence,
+        likely_capped=likely_capped,
+        requested_max_tokens=requested_max_tokens,
+        prompt_tokens_total=prompt_tokens,
+        prompt_tokens_text_est=prompt_tokens_text_est,
+        prompt_tokens_nontext_est=prompt_tokens_nontext_est,
     )
 
 
@@ -4579,6 +5210,7 @@ def _analyze_text_quality(
     *,
     prompt_tokens: int | None = None,
     prompt: str | None = None,
+    requested_max_tokens: int | None = None,
     context_marker: str = "Context:",
 ) -> tuple[GenerationQualityAnalysis, str | None]:
     """Return structured quality analysis plus the normalized issue label string."""
@@ -4587,6 +5219,7 @@ def _analyze_text_quality(
         generated_tokens,
         prompt_tokens=prompt_tokens,
         prompt=prompt,
+        requested_max_tokens=requested_max_tokens,
         context_marker=context_marker,
     )
     return analysis, _build_quality_issues_string(analysis)
@@ -7300,6 +7933,265 @@ def _summarize_model_review(res: PerformanceResult, summary: ModelIssueSummary) 
         review_parts.append("No quality issues detected")
 
     return " | ".join(review_parts) if review_parts else None
+
+
+def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord | None:
+    """Build the canonical automated review payload for one result."""
+    analysis = _result_quality_analysis(result)
+    generation = result.generation
+    generation_tokens = 0
+    if generation is not None:
+        generation_tokens = getattr(generation, "generation_tokens", 0) or 0
+    prompt_tokens_total = getattr(generation, "prompt_tokens", None) if generation else None
+
+    if analysis is not None:
+        requested_max_tokens = analysis.requested_max_tokens or result.requested_max_tokens
+        return {
+            "verdict": analysis.verdict,
+            "hint_relationship": analysis.hint_relationship,
+            "instruction_echo": analysis.instruction_echo,
+            "metadata_borrowing": analysis.metadata_borrowing,
+            "likely_capped": analysis.likely_capped,
+            "owner": analysis.owner,
+            "user_bucket": analysis.user_bucket,
+            "evidence": list(analysis.evidence),
+            "requested_max_tokens": requested_max_tokens,
+            "hit_max_tokens": bool(
+                requested_max_tokens is not None and generation_tokens >= requested_max_tokens
+            ),
+            "prompt_tokens_total": analysis.prompt_tokens_total,
+            "prompt_tokens_text_est": analysis.prompt_tokens_text_est,
+            "prompt_tokens_nontext_est": analysis.prompt_tokens_nontext_est,
+        }
+
+    if result.success:
+        return None
+
+    requested_max_tokens = result.requested_max_tokens
+    evidence: list[str] = []
+    if result.error_stage:
+        evidence.append(re.sub(r"[^a-z0-9]+", "_", result.error_stage.casefold()).strip("_"))
+    if result.error_code:
+        evidence.append(result.error_code.casefold())
+    return {
+        "verdict": "harness",
+        "hint_relationship": "preserves_trusted_hints",
+        "instruction_echo": False,
+        "metadata_borrowing": False,
+        "likely_capped": bool(
+            requested_max_tokens is not None and generation_tokens >= requested_max_tokens
+        ),
+        "owner": _classify_review_owner(
+            harness_type=None,
+            failure_owner=result.error_package,
+            instruction_echo=False,
+            metadata_borrowing=False,
+            hint_relationship="preserves_trusted_hints",
+        ),
+        "user_bucket": "avoid",
+        "evidence": _dedupe_preserve_order(evidence) or ["runtime_failure"],
+        "requested_max_tokens": requested_max_tokens,
+        "hit_max_tokens": bool(
+            requested_max_tokens is not None and generation_tokens >= requested_max_tokens
+        ),
+        "prompt_tokens_total": prompt_tokens_total,
+        "prompt_tokens_text_est": None,
+        "prompt_tokens_nontext_est": None,
+    }
+
+
+def _review_hint_text(
+    review: JsonlReviewRecord,
+    analysis: GenerationQualityAnalysis | None,
+) -> str:
+    """Return a concise trusted-hint summary for review surfaces."""
+    if analysis is None:
+        return "not evaluated"
+    parts = [review["hint_relationship"].replace("_", " ")]
+    if analysis.is_context_ignored and analysis.missing_context_terms:
+        parts.append("missing terms: " + ", ".join(analysis.missing_context_terms))
+    if analysis.metadata_borrowing:
+        parts.append("nonvisual metadata reused")
+    return " | ".join(parts)
+
+
+def _review_contract_text(analysis: GenerationQualityAnalysis | None) -> str:
+    """Return a compact contract-compliance summary."""
+    if analysis is None:
+        return "not evaluated"
+
+    issues: list[str] = []
+    if analysis.missing_sections:
+        issues.append("missing: " + ", ".join(analysis.missing_sections))
+    if analysis.has_title_length_violation:
+        issues.append(f"title words={analysis.title_word_count}")
+    if analysis.has_description_sentence_violation:
+        issues.append(f"description sentences={analysis.description_sentence_count}")
+    if analysis.has_keyword_count_violation:
+        issues.append(f"keywords={analysis.keyword_count}")
+    if analysis.has_keyword_duplication_violation:
+        issues.append(f"keyword duplication={analysis.keyword_duplication_ratio:.2f}")
+    return "ok" if not issues else " | ".join(issues)
+
+
+def _review_utility_text(
+    review: JsonlReviewRecord,
+    analysis: GenerationQualityAnalysis | None,
+) -> str:
+    """Return a concise informational-utility summary."""
+    parts = [f"user={review['user_bucket']}"]
+    if analysis is not None:
+        parts.append(review["hint_relationship"].replace("_", " "))
+        if analysis.instruction_echo:
+            parts.append("instruction echo")
+        if analysis.metadata_borrowing:
+            parts.append("metadata borrowing")
+        if analysis.is_generic:
+            parts.append("generic")
+        if analysis.has_context_echo:
+            parts.append("context echo")
+    return " | ".join(parts)
+
+
+def _review_stack_owner_text(
+    result: PerformanceResult,
+    review: JsonlReviewRecord,
+    analysis: GenerationQualityAnalysis | None,
+) -> str:
+    """Return a compact stack-integrity and ownership summary."""
+    parts = [f"owner={review['owner']}"]
+    if analysis is not None and analysis.has_harness_issue:
+        parts.append(f"harness={analysis.harness_issue_type or 'yes'}")
+    if result.error_package:
+        parts.append(f"package={result.error_package}")
+    if result.error_stage:
+        parts.append(f"stage={result.error_stage}")
+    if result.error_code:
+        parts.append(f"code={result.error_code}")
+    return " | ".join(parts)
+
+
+def _review_token_accounting_text(result: PerformanceResult, review: JsonlReviewRecord) -> str:
+    """Return prompt/output token accounting for review surfaces."""
+    generation_tokens = (
+        getattr(result.generation, "generation_tokens", None)
+        if result.generation is not None
+        else None
+    )
+    stop_reason = result.runtime_diagnostics.stop_reason if result.runtime_diagnostics else None
+    parts = [
+        f"prompt={review['prompt_tokens_total'] if review['prompt_tokens_total'] is not None else 'n/a'}",
+        (
+            f"text_est={review['prompt_tokens_text_est']}"
+            if review["prompt_tokens_text_est"] is not None
+            else "text_est=n/a"
+        ),
+        (
+            f"nontext_est={review['prompt_tokens_nontext_est']}"
+            if review["prompt_tokens_nontext_est"] is not None
+            else "nontext_est=n/a"
+        ),
+        f"gen={generation_tokens if generation_tokens is not None else 'n/a'}",
+        f"max={review['requested_max_tokens'] if review['requested_max_tokens'] is not None else 'n/a'}",
+    ]
+    if stop_reason:
+        parts.append(f"stop={stop_reason}")
+    return " | ".join(parts)
+
+
+def _review_next_action_text(review: JsonlReviewRecord) -> str:
+    """Return one actionable next-step line for developers or users."""
+    if review["verdict"] == "cutoff":
+        return (
+            "Inspect token cap and stop behavior before treating this as a model-quality failure."
+        )
+    if review["verdict"] == "context_budget":
+        return "Reduce prompt/image burden or inspect long-context handling before judging quality."
+    owner_actions: dict[str, str] = {
+        "mlx-vlm": "Inspect prompt-template, stop-token, and decode post-processing behavior.",
+        "mlx": "Inspect KV/cache behavior, memory pressure, and long-context execution.",
+        "mlx-lm": "Inspect tokenizer/generation stack shared with mlx-lm.",
+        "transformers": "Inspect upstream template/tokenizer/config compatibility.",
+        "model-config": "Inspect model repo config, chat template, and EOS settings.",
+        "model": "Treat as a model-quality limitation for this prompt and image.",
+    }
+    return owner_actions.get(review["owner"], "Inspect the canonical log and diagnostics output.")
+
+
+def _build_review_block_rows(result: PerformanceResult) -> list[tuple[str, str]]:
+    """Build ordered canonical review rows shared by log and Markdown outputs."""
+    review = _build_jsonl_review_record(result)
+    if review is None:
+        return []
+    analysis = _quality_analysis_for_result(result)
+    why = ", ".join(review["evidence"]) if review["evidence"] else "no flagged signals"
+    return [
+        ("Verdict", f"{review['verdict']} | user={review['user_bucket']}"),
+        ("Why", why),
+        ("Trusted hints", _review_hint_text(review, analysis)),
+        ("Contract", _review_contract_text(analysis)),
+        ("Utility", _review_utility_text(review, analysis)),
+        ("Stack / owner", _review_stack_owner_text(result, review, analysis)),
+        ("Token accounting", _review_token_accounting_text(result, review)),
+        ("Next action", _review_next_action_text(review)),
+    ]
+
+
+def _failure_review_text(result: PerformanceResult) -> str:
+    """Return the full failure text preserved in canonical log output."""
+    if result.captured_output_on_fail:
+        return result.captured_output_on_fail
+    if result.error_traceback:
+        return result.error_traceback
+    return result.error_message or "No captured failure output."
+
+
+def _log_canonical_model_review(result: PerformanceResult) -> None:
+    """Emit a full-fidelity per-model review block to the file log."""
+    logger.debug("")
+    logger.debug("=== CANONICAL REVIEW: %s ===", result.model_name)
+    for label, value in _build_review_block_rows(result):
+        logger.debug("%s: %s", label, value)
+    if result.success and result.generation is not None:
+        logger.debug("Full output:\n%s", getattr(result.generation, "text", "") or "")
+    else:
+        logger.debug("Full captured failure output:\n%s", _failure_review_text(result))
+    logger.debug("=== END CANONICAL REVIEW: %s ===", result.model_name)
+
+
+def _log_canonical_run_review_summary(results: Sequence[PerformanceResult]) -> None:
+    """Emit a grouped run-level review summary for the canonical log."""
+    owner_map: dict[str, list[str]] = {}
+    bucket_map: dict[str, list[str]] = {}
+    evidence_counts: Counter[str] = Counter()
+
+    for result in results:
+        review = _build_jsonl_review_record(result)
+        if review is None:
+            continue
+        owner_map.setdefault(review["owner"], []).append(
+            f"{result.model_name} ({review['verdict']})",
+        )
+        bucket_map.setdefault(review["user_bucket"], []).append(result.model_name)
+        evidence_counts.update(review["evidence"])
+
+    if not owner_map and not bucket_map:
+        return
+
+    logger.debug("")
+    logger.debug("=== RUN REVIEW SUMMARY ===")
+    logger.debug("Maintainer queue by owner:")
+    for owner in sorted(owner_map):
+        logger.debug("  %s: %s", owner, ", ".join(owner_map[owner]))
+    logger.debug("User buckets:")
+    for bucket in sorted(bucket_map):
+        logger.debug("  %s: %s", bucket, ", ".join(bucket_map[bucket]))
+    if evidence_counts:
+        logger.debug(
+            "Top recurring verdict causes: %s",
+            ", ".join(f"{label}={count}" for label, count in evidence_counts.most_common(8)),
+        )
+    logger.debug("=== END RUN REVIEW SUMMARY ===")
 
 
 def _select_recommended_models(
@@ -10738,20 +11630,51 @@ def _append_markdown_gallery_note(
     *,
     report_filename: Path,
     gallery_filename: Path | None,
+    review_filename: Path | None = None,
+    log_filename: Path | None = None,
 ) -> None:
-    """Append a relative link to the standalone markdown gallery artifact when present."""
-    if gallery_filename is None:
+    """Append relative links to companion artifacts when present."""
+    artifact_lines: list[tuple[str, str]] = []
+    if gallery_filename is not None:
+        relative_gallery_path = _relative_markdown_artifact_path(
+            report_filename=report_filename,
+            artifact_filename=gallery_filename,
+        )
+        artifact_lines.append(
+            (
+                "Standalone output gallery",
+                f"[{relative_gallery_path}]({relative_gallery_path.replace(' ', '%20')})",
+            ),
+        )
+    if review_filename is not None:
+        relative_review_path = _relative_markdown_artifact_path(
+            report_filename=report_filename,
+            artifact_filename=review_filename,
+        )
+        artifact_lines.append(
+            (
+                "Automated review digest",
+                f"[{relative_review_path}]({relative_review_path.replace(' ', '%20')})",
+            ),
+        )
+    if log_filename is not None:
+        relative_log_path = _relative_markdown_artifact_path(
+            report_filename=report_filename,
+            artifact_filename=log_filename,
+        )
+        artifact_lines.append(
+            (
+                "Canonical run log",
+                f"[{relative_log_path}]({relative_log_path.replace(' ', '%20')})",
+            ),
+        )
+
+    if not artifact_lines:
         return
 
-    relative_gallery_path = _relative_markdown_artifact_path(
-        report_filename=report_filename,
-        artifact_filename=gallery_filename,
-    )
-
-    gallery_link: str = f"[{relative_gallery_path}]({relative_gallery_path.replace(' ', '%20')})"
-    md.append("**Dedicated review artifact:**")
-    md.append("See the standalone model-by-model output view here:")
-    md.append(gallery_link)
+    md.append("**Review artifacts:**")
+    for label, link in artifact_lines:
+        md.append(f"- {label}: {link}")
     md.append("")
 
 
@@ -10763,6 +11686,8 @@ def generate_markdown_report(
     total_runtime_seconds: float,
     report_context: ReportRenderContext | None = None,
     gallery_filename: Path | None = None,
+    review_filename: Path | None = None,
+    log_filename: Path | None = None,
 ) -> None:
     """Write a GitHub-friendly Markdown summary with aligned pipe table.
 
@@ -10774,6 +11699,8 @@ def generate_markdown_report(
         total_runtime_seconds: Total wall-clock runtime for the full run.
         report_context: Optional cached shared report context built in finalization.
         gallery_filename: Optional standalone gallery artifact path to link from results.md.
+        review_filename: Optional automated review digest path to link from results.md.
+        log_filename: Optional canonical log path to link from results.md.
     """
     if not results:
         log_warning_note("No results to generate Markdown report.")
@@ -10855,6 +11782,8 @@ def generate_markdown_report(
         md,
         report_filename=filename,
         gallery_filename=gallery_filename,
+        review_filename=review_filename,
+        log_filename=log_filename,
     )
 
     md.append("---")
@@ -10919,6 +11848,134 @@ def generate_markdown_gallery_report(
     md.append("")
 
     _write_markdown_artifact(filename, md, artifact_name="Markdown gallery report")
+
+
+def _group_review_results(
+    results: Sequence[PerformanceResult],
+    *,
+    key_name: Literal["owner", "user_bucket"],
+) -> dict[str, list[PerformanceResult]]:
+    """Group results by one field from the canonical review payload."""
+    grouped: dict[str, list[PerformanceResult]] = {}
+    for result in results:
+        review = _build_jsonl_review_record(result)
+        if review is None:
+            continue
+        key = review["owner"] if key_name == "owner" else review["user_bucket"]
+        grouped.setdefault(key, []).append(result)
+    return grouped
+
+
+def _append_review_owner_queue(
+    md: list[str],
+    owner_groups: Mapping[str, Sequence[PerformanceResult]],
+) -> None:
+    """Append the maintainer ownership section for the review digest."""
+    md.extend(["## Maintainer Queue", ""])
+    if not owner_groups:
+        md.extend(["- No owner-specific review items were produced.", ""])
+        return
+
+    for owner in sorted(owner_groups):
+        md.extend([f"### `{owner}`", ""])
+        for result in owner_groups[owner]:
+            review = _build_jsonl_review_record(result)
+            if review is None:
+                continue
+            why = ", ".join(review["evidence"]) if review["evidence"] else "no flagged signals"
+            md.append(
+                f"- `{result.model_name}`: `{review['verdict']}` | {why} | "
+                f"{_review_next_action_text(review)}",
+            )
+        md.append("")
+
+
+def _append_review_user_buckets(
+    md: list[str],
+    bucket_groups: Mapping[str, Sequence[PerformanceResult]],
+) -> None:
+    """Append user-facing recommendation buckets for the review digest."""
+    md.extend(["## User Buckets", ""])
+    for bucket in ("recommended", "caveat", "avoid"):
+        md.extend([f"### `{bucket}`", ""])
+        bucket_results = bucket_groups.get(bucket, [])
+        if not bucket_results:
+            md.extend(["- None.", ""])
+            continue
+        for result in bucket_results:
+            review = _build_jsonl_review_record(result)
+            if review is None:
+                continue
+            why = ", ".join(review["evidence"]) if review["evidence"] else "no flagged signals"
+            md.append(
+                f"- `{result.model_name}`: `{review['verdict']}` | "
+                f"{review['hint_relationship'].replace('_', ' ')} | {why}",
+            )
+        md.append("")
+
+
+def _append_review_model_verdicts(
+    md: list[str],
+    results: Sequence[PerformanceResult],
+) -> None:
+    """Append detailed per-model canonical review rows for the digest."""
+    md.extend(["## Model Verdicts", ""])
+    for result in results:
+        review = _build_jsonl_review_record(result)
+        if review is None:
+            continue
+        md.extend([f"### `{result.model_name}`", ""])
+        md.extend(f"- **{label}:** {value}" for label, value in _build_review_block_rows(result))
+        md.append("")
+
+
+def generate_review_report(
+    results: list[PerformanceResult],
+    filename: Path,
+    *,
+    prompt: str,
+    report_context: ReportRenderContext | None = None,
+    log_filename: Path | None = None,
+    gallery_filename: Path | None = None,
+) -> None:
+    """Write a short Markdown digest of automated verdicts and action buckets."""
+    if not results:
+        log_warning_note("No results to generate review report.")
+        return
+
+    if report_context is None:
+        report_context = _build_report_render_context(results=results, prompt=prompt)
+
+    sorted_results = list(report_context.result_set.results)
+    owner_groups = _group_review_results(sorted_results, key_name="owner")
+    bucket_groups = _group_review_results(sorted_results, key_name="user_bucket")
+
+    md: list[str] = [
+        "# Automated Review Digest",
+        "",
+        f"_Generated on {local_now_str()}_",
+        "",
+        (
+            "Trusted-hint review uses only prompt title/description/keyword hints for utility "
+            "comparison. Capture metadata, GPS, timestamps, source labels, and location labels "
+            "are treated as nonvisual metadata and are not required visual evidence."
+        ),
+        "",
+    ]
+
+    if log_filename is not None or gallery_filename is not None:
+        _append_markdown_gallery_note(
+            md,
+            report_filename=filename,
+            gallery_filename=gallery_filename,
+            log_filename=log_filename,
+        )
+
+    _append_review_owner_queue(md, owner_groups)
+    _append_review_user_buckets(md, bucket_groups)
+    _append_review_model_verdicts(md, sorted_results)
+
+    _write_markdown_artifact(filename, md, artifact_name="Review report")
 
 
 def generate_tsv_report(
@@ -12347,18 +13404,27 @@ def _prepare_generation_prompt(
 
 def _cleanup_runtime_resources() -> None:
     """Synchronize and clear runtime resources after each model run."""
-    synchronize_fn = getattr(mx, "synchronize", None)
-    if callable(synchronize_fn):
-        synchronize_fn()
+
+    def _run_cleanup_step(step_name: str, func: Callable[[], object] | None) -> None:
+        if func is None:
+            return
+        try:
+            func()
+        except (AttributeError, OSError, RuntimeError, SystemError, TypeError, ValueError):
+            logger.debug("Ignoring cleanup failure in %s", step_name, exc_info=True)
+
+    synchronize_fn = cast("Callable[[], object] | None", getattr(mx, "synchronize", None))
+    _run_cleanup_step("mx.synchronize", synchronize_fn)
     gc.collect()
 
-    clear_cache_fn = getattr(mx, "clear_cache", None)
-    if callable(clear_cache_fn):
-        clear_cache_fn()
+    clear_cache_fn = cast("Callable[[], object] | None", getattr(mx, "clear_cache", None))
+    _run_cleanup_step("mx.clear_cache", clear_cache_fn)
 
-    reset_peak_memory_fn = getattr(mx, "reset_peak_memory", None)
-    if callable(reset_peak_memory_fn):
-        reset_peak_memory_fn()
+    reset_peak_memory_fn = cast(
+        "Callable[[], object] | None",
+        getattr(mx, "reset_peak_memory", None),
+    )
+    _run_cleanup_step("mx.reset_peak_memory", reset_peak_memory_fn)
 
 
 def _attach_generation_runtime_metrics(
@@ -12451,6 +13517,7 @@ def _finalize_process_result(
             model_load_time=phase_timer.duration("model_load"),
             total_time=time.perf_counter() - total_start_time,
             runtime_diagnostics=runtime_diagnostics,
+            requested_max_tokens=params.max_tokens,
         )
     return dataclasses.replace(result_payload, runtime_diagnostics=runtime_diagnostics)
 
@@ -12580,6 +13647,7 @@ def _build_failure_result(
     model_load_time: float | None = None,
     total_time: float | None = None,
     runtime_diagnostics: RuntimeDiagnostics | None = None,
+    requested_max_tokens: int | None = None,
 ) -> PerformanceResult:
     """Build a standardized failure result payload for a model run."""
     error_msg = str(error)
@@ -12616,6 +13684,7 @@ def _build_failure_result(
         model_load_time=model_load_time,
         total_time=total_time,
         runtime_diagnostics=runtime_diagnostics,
+        requested_max_tokens=requested_max_tokens,
     )
 
 
@@ -12693,10 +13762,12 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
                 first_token_latency_s=first_token_latency_s,
                 stop_reason=stop_reason,
             ),
+            requested_max_tokens=params.max_tokens,
         )
         result_payload = _populate_result_quality_analysis(
             result_payload,
             prompt=params.prompt,
+            requested_max_tokens=params.max_tokens,
             context_marker=params.context_marker,
         )
     except (TimeoutError, OSError, ValueError, RuntimeError) as e:
@@ -12715,6 +13786,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
                     stdout_clean,
                     max(len(stdout_clean.split()), 1),
                     prompt=params.prompt,
+                    requested_max_tokens=params.max_tokens,
                     context_marker=params.context_marker,
                 )
         if stderr_clean:
@@ -12735,6 +13807,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
                 phase_timer,
                 stop_reason=stop_reason,
             ),
+            requested_max_tokens=params.max_tokens,
         )
     finally:
         _update_phase("cleanup")
@@ -13400,8 +14473,8 @@ def _extract_context_from_prompt(prompt: str | None) -> str | None:
     """Extract the context section from a prompt string."""
     if not prompt:
         return None
-    context_match = re.search(r"Context:\s*(.+?)(?:\n\n|$)", prompt, re.DOTALL)
-    return context_match.group(1) if context_match else None
+    bundle = _extract_trusted_hint_bundle(prompt)
+    return bundle.trusted_text or None
 
 
 def _log_additional_diagnostics(
@@ -14052,6 +15125,7 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
         logger.info("Final prompt: %s", prompt_display)
     else:
         logger.info("Final prompt: %s", prompt)
+    logger.debug("Full prompt:\n%s", prompt)
     logger.info("Prompt length: %d characters", len(prompt))
     return prompt
 
@@ -14294,6 +15368,7 @@ def process_models(
             result = _populate_result_quality_analysis(
                 result,
                 prompt=prompt,
+                requested_max_tokens=args.max_tokens,
                 context_marker=args.context_marker,
             )
             analysis = result.quality_analysis
@@ -14314,6 +15389,7 @@ def process_models(
                 )
 
         results.append(result)
+        _log_canonical_model_review(result)
 
         print_model_result(
             result,
@@ -14400,6 +15476,16 @@ def _format_quality_analysis_for_log(analysis: GenerationQualityAnalysis) -> str
         f"context_echo=True ({analysis.context_echo_ratio:.2f})"
         if analysis.has_context_echo
         else None,
+        "instruction_echo=True" if analysis.instruction_echo else None,
+        "metadata_borrowing=True" if analysis.metadata_borrowing else None,
+        (
+            f"hint_relationship={analysis.hint_relationship}"
+            if analysis.hint_relationship != "preserves_trusted_hints"
+            else None
+        ),
+        f"verdict={analysis.verdict}" if analysis.verdict != "clean" else None,
+        f"user_bucket={analysis.user_bucket}" if analysis.user_bucket != "recommended" else None,
+        "likely_capped=True" if analysis.likely_capped else None,
         harness_part,
     ]
     parts = [part for part in parts_raw if part is not None]
@@ -14468,6 +15554,18 @@ def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | N
         ),
         (analysis.has_reasoning_leak, "reasoning-leak"),
         (analysis.has_context_echo, f"context-echo({analysis.context_echo_ratio:.2f})"),
+        (analysis.instruction_echo, "instruction-echo"),
+        (analysis.metadata_borrowing, "metadata-borrowing"),
+        (
+            analysis.hint_relationship == "ignores_trusted_hints",
+            "trusted-hints-ignored",
+        ),
+        (
+            analysis.hint_relationship == "degrades_trusted_hints",
+            "trusted-hints-degraded",
+        ),
+        (analysis.verdict == "cutoff", "cutoff"),
+        (analysis.verdict == "context_budget", "context-budget"),
         (analysis.is_generic, f"generic({analysis.specificity_score:.0f})"),
         (analysis.is_verbose, "verbose"),
         (bool(analysis.formatting_issues), "formatting"),
@@ -14495,6 +15593,12 @@ QUALITY_ISSUE_PATTERNS: Final[dict[str, re.Pattern[str]]] = {
     "keyword_duplication": re.compile(r"\bkeyword-duplication\b", re.IGNORECASE),
     "reasoning_leak": re.compile(r"\breasoning-leak\b", re.IGNORECASE),
     "context_echo": re.compile(r"\bcontext-echo\b", re.IGNORECASE),
+    "instruction_echo": re.compile(r"\binstruction-echo\b", re.IGNORECASE),
+    "metadata_borrowing": re.compile(r"\bmetadata-borrowing\b", re.IGNORECASE),
+    "trusted_hint_ignored": re.compile(r"\btrusted-hints-ignored\b", re.IGNORECASE),
+    "trusted_hint_degraded": re.compile(r"\btrusted-hints-degraded\b", re.IGNORECASE),
+    "cutoff": re.compile(r"\bcutoff\b", re.IGNORECASE),
+    "context_budget": re.compile(r"\bcontext-budget\b", re.IGNORECASE),
     "generic": re.compile(r"\bgeneric\b", re.IGNORECASE),
     "verbose": re.compile(r"\bverbose\b", re.IGNORECASE),
     "formatting": re.compile(r"\bformatting\b", re.IGNORECASE),
@@ -14514,6 +15618,10 @@ QUALITY_BREAKING_LABELS: Final[frozenset[str]] = frozenset(
         "missing_sections",
         "reasoning_leak",
         "context_echo",
+        "instruction_echo",
+        "metadata_borrowing",
+        "cutoff",
+        "trusted_hint_degraded",
     },
 )
 
@@ -14546,6 +15654,7 @@ def _populate_result_quality_analysis(
     result: PerformanceResult,
     *,
     prompt: str | None = None,
+    requested_max_tokens: int | None = None,
     context_marker: str = "Context:",
 ) -> PerformanceResult:
     """Attach structured quality analysis to successful results as soon as they exist."""
@@ -14574,11 +15683,15 @@ def _populate_result_quality_analysis(
     text = str(getattr(result.generation, "text", ""))
     generated_tokens = getattr(result.generation, "generation_tokens", 0)
     prompt_tokens = getattr(result.generation, "prompt_tokens", None)
+    resolved_requested_max_tokens = (
+        requested_max_tokens if requested_max_tokens is not None else result.requested_max_tokens
+    )
     analysis, quality_issues = _analyze_text_quality(
         text,
         generated_tokens,
         prompt_tokens=prompt_tokens,
         prompt=prompt,
+        requested_max_tokens=resolved_requested_max_tokens,
         context_marker=context_marker,
     )
     if cached_analysis is not None:
@@ -14616,26 +15729,63 @@ def _build_result_output_cues(result: PerformanceResult) -> list[str]:
             else ""
         )
         cues.append(f"harness:{harness_type}" if harness_type else "harness")
-    if (analysis is not None and analysis.is_repetitive) or "repetitive" in quality_labels:
-        cues.append("repetitive")
-    if (analysis is not None and analysis.has_context_echo) or "context_echo" in quality_labels:
-        cues.append("context-echo")
-    if (analysis is not None and analysis.has_reasoning_leak) or "reasoning_leak" in quality_labels:
-        cues.append("reasoning-leak")
-    if (analysis is not None and analysis.has_degeneration) or "degeneration" in quality_labels:
-        cues.append("degeneration")
-    if (
-        analysis is not None and analysis.is_context_ignored
-    ) or "context_ignored" in quality_labels:
-        cues.append("context-ignored")
-    if (analysis is not None and analysis.is_refusal) or "refusal" in quality_labels:
-        cues.append("refusal")
-    if (analysis is not None and analysis.missing_sections) or "missing_sections" in quality_labels:
-        cues.append("missing-sections")
-    if (analysis is not None and analysis.formatting_issues) or "formatting" in quality_labels:
-        cues.append("formatting")
-    if (analysis is not None and analysis.is_generic) or "generic" in quality_labels:
-        cues.append("generic")
+    candidate_cues = [
+        (
+            (analysis is not None and analysis.is_repetitive) or "repetitive" in quality_labels,
+            "repetitive",
+        ),
+        (
+            (analysis is not None and analysis.has_context_echo)
+            or "context_echo" in quality_labels,
+            "context-echo",
+        ),
+        (
+            (analysis is not None and analysis.instruction_echo)
+            or "instruction_echo" in quality_labels,
+            "instruction-echo",
+        ),
+        (
+            (analysis is not None and analysis.metadata_borrowing)
+            or "metadata_borrowing" in quality_labels,
+            "metadata-borrowing",
+        ),
+        (
+            (analysis is not None and analysis.verdict == "cutoff") or "cutoff" in quality_labels,
+            "cutoff",
+        ),
+        (
+            (analysis is not None and analysis.verdict == "context_budget")
+            or "context_budget" in quality_labels,
+            "context-budget",
+        ),
+        (
+            (analysis is not None and analysis.has_reasoning_leak)
+            or "reasoning_leak" in quality_labels,
+            "reasoning-leak",
+        ),
+        (
+            (analysis is not None and analysis.has_degeneration)
+            or "degeneration" in quality_labels,
+            "degeneration",
+        ),
+        (
+            (analysis is not None and analysis.is_context_ignored)
+            or "context_ignored" in quality_labels,
+            "context-ignored",
+        ),
+        ((analysis is not None and analysis.is_refusal) or "refusal" in quality_labels, "refusal"),
+        (
+            (analysis is not None and analysis.missing_sections)
+            or "missing_sections" in quality_labels,
+            "missing-sections",
+        ),
+        (
+            (analysis is not None and analysis.formatting_issues) or "formatting" in quality_labels,
+            "formatting",
+        ),
+        ((analysis is not None and analysis.is_generic) or "generic" in quality_labels, "generic"),
+    ]
+    cues.extend(label for condition, label in candidate_cues if condition)
 
     return _dedupe_preserve_order(cues)[:OUTPUT_PREVIEW_CUE_LIMIT]
 
@@ -15600,6 +16750,7 @@ def log_summary(
 
     if successful:
         _log_successful_models_list(successful)
+    _log_canonical_run_review_summary(results)
 
 
 def _history_path_for_jsonl(jsonl_path: Path) -> Path:
@@ -15774,7 +16925,7 @@ def _build_jsonl_metadata_record(
     """Build shared metadata header row for JSONL results."""
     return {
         "_type": "metadata",
-        "format_version": "1.3",
+        "format_version": "1.4",
         "prompt": prompt,
         "system": system_info,
         "timestamp": local_now_str(),
@@ -15876,7 +17027,7 @@ def save_jsonl_report(
     - Quality analysis for successful models
     - Timing metrics for performance analysis
 
-    Format (v1.2): First line is a metadata header containing prompt and
+    Format (v1.4): First line is a metadata header containing prompt and
     system_info (shared across all rows). Per-model result lines follow.
     """
     try:
@@ -15888,6 +17039,9 @@ def save_jsonl_report(
             for result in results:
                 record = _build_jsonl_result_record_base(result)
                 _populate_jsonl_result_generation_data(record, result)
+                review_payload = _build_jsonl_review_record(result)
+                if review_payload:
+                    record["review"] = review_payload
                 f.write(json.dumps(record) + "\n")
         # Logging handled in finalize_execution
     except OSError:
@@ -16315,6 +17469,7 @@ def _generate_reports_and_log_outputs(
 ) -> None:
     """Generate reports and log the emitted artifact paths."""
     gallery_output_path = inputs.args.output_gallery_markdown.resolve()
+    review_output_path = inputs.review_output_path
     report_jobs: tuple[tuple[str, Callable[[], None]], ...] = (
         (
             "html",
@@ -16338,6 +17493,8 @@ def _generate_reports_and_log_outputs(
                 total_runtime_seconds=inputs.overall_time,
                 report_context=inputs.report_context,
                 gallery_filename=gallery_output_path,
+                review_filename=review_output_path,
+                log_filename=inputs.log_output_path,
             ),
         ),
         (
@@ -16348,6 +17505,17 @@ def _generate_reports_and_log_outputs(
                 prompt=inputs.prompt,
                 metadata=inputs.metadata,
                 report_context=inputs.report_context,
+            ),
+        ),
+        (
+            "review",
+            lambda: generate_review_report(
+                results=inputs.results,
+                filename=review_output_path,
+                prompt=inputs.prompt,
+                report_context=inputs.report_context,
+                log_filename=inputs.log_output_path,
+                gallery_filename=gallery_output_path,
             ),
         ),
     )
@@ -16382,6 +17550,7 @@ def _generate_reports_and_log_outputs(
             (inputs.args.output_html, "   HTML Report:"),
             (inputs.args.output_markdown, "   Markdown Report:"),
             (inputs.args.output_gallery_markdown, "   Gallery Report: "),
+            (inputs.args.output_review, "   Review Report:  "),
             (inputs.args.output_tsv, "   TSV Report:   "),
             (inputs.args.output_jsonl, "   JSONL Report: "),
         )
@@ -16436,6 +17605,7 @@ def finalize_execution(
             args.output_html.resolve(),
             args.output_markdown.resolve(),
             args.output_gallery_markdown.resolve(),
+            args.output_review.resolve(),
             tsv_output_path,
             jsonl_output_path,
         ):
@@ -16455,6 +17625,7 @@ def finalize_execution(
                 jsonl_output_path=jsonl_output_path,
                 log_output_path=log_output_path,
                 env_output_path=env_output_path,
+                review_output_path=args.output_review.resolve(),
             ),
         )
 
@@ -16721,6 +17892,12 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         type=Path,
         default=DEFAULT_GALLERY_MD_OUTPUT,
         help=("Output GitHub Markdown gallery filename for the standalone review artifact."),
+    )
+    parser.add_argument(
+        "--output-review",
+        type=Path,
+        default=DEFAULT_REVIEW_MD_OUTPUT,
+        help="Output Markdown review digest filename.",
     )
     parser.add_argument(
         "--output-tsv",

@@ -8,12 +8,14 @@ import time
 from typing import TYPE_CHECKING
 from unittest.mock import patch
 
+import check_models
 from check_models import (
     FileSafeFormatter,
     HistoryModelResultRecord,
     HistoryRunRecord,
     PerformanceResult,
     RuntimeDiagnostics,
+    _log_canonical_model_review,
     _log_history_comparison,
     finalize_execution,
     log_summary,
@@ -479,6 +481,33 @@ def test_file_safe_formatter_strips_ansi() -> None:
     assert formatter.format(record) == "red text"
 
 
+def test_canonical_review_log_emits_verdict_block(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Canonical review logging should emit the ordered verdict block and full output."""
+    caplog.set_level(logging.DEBUG)
+    result = PerformanceResult(
+        model_name="dummy/model",
+        generation=_StubGeneration(text="Title: Example output"),
+        success=True,
+        quality_analysis=check_models.analyze_generation_text(
+            "Title: Example output",
+            generated_tokens=6,
+            requested_max_tokens=32,
+        ),
+        requested_max_tokens=32,
+    )
+
+    _log_canonical_model_review(result)
+
+    messages = "\n".join(record.message for record in caplog.records)
+    assert "=== CANONICAL REVIEW: dummy/model ===" in messages
+    assert "Verdict:" in messages
+    assert "Trusted hints:" in messages
+    assert "Token accounting:" in messages
+    assert "Full output:" in messages
+
+
 def test_finalize_execution_logs_configured_log_and_env_paths(
     tmp_path: Path,
     caplog: pytest.LogCaptureFixture,
@@ -493,6 +522,7 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
         output_html=tmp_path / "report.html",
         output_markdown=tmp_path / "report.md",
         output_gallery_markdown=tmp_path / "gallery.md",
+        output_review=tmp_path / "review.md",
         output_tsv=tmp_path / "report.tsv",
         output_jsonl=tmp_path / "report.jsonl",
         output_diagnostics=tmp_path / "diagnostics.md",
@@ -520,6 +550,7 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
         patch("check_models.generate_html_report"),
         patch("check_models.generate_markdown_report"),
         patch("check_models.generate_markdown_gallery_report"),
+        patch("check_models.generate_review_report"),
         patch("check_models.generate_tsv_report"),
         patch("check_models.save_jsonl_report"),
         patch("check_models.append_history_record", return_value=history_record),
@@ -540,3 +571,4 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
     assert any(str(custom_log.resolve()) in msg for msg in messages)
     assert any(str(custom_env.resolve()) in msg for msg in messages)
     assert any(str(args.output_gallery_markdown.resolve()) in msg for msg in messages)
+    assert any(str(args.output_review.resolve()) in msg for msg in messages)

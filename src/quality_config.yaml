@@ -111,6 +111,9 @@ thresholds:
   prompt_keyword_max_items: 20     # Max keyword hints injected into generated prompt
   prompt_keyword_item_max_chars: 36  # Max chars per keyword hint in generated prompt
   min_text_for_leak_detection: 100  # Min text length for training leak detection
+  prompt_word_to_token_ratio: 1.3  # Lightweight prompt-word to token estimate
+  max_reported_missing_terms: 5    # Cap reported missing/borrowed terms in human outputs
+  cutoff_tail_chars: 120           # Tail window inspected for likely cutoff evidence
 
 patterns:
   # Hallucination detection

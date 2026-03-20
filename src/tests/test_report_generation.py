@@ -29,6 +29,7 @@ from check_models import (
     generate_html_report,
     generate_markdown_gallery_report,
     generate_markdown_report,
+    generate_review_report,
     generate_tsv_report,
 )
 
@@ -132,6 +133,10 @@ def _make_harness_success(
         word_count=0,
         unique_ratio=0.0,
         prompt_checks_ran=True,
+        verdict="harness" if harness_type != "long_context" else "context_budget",
+        owner="mlx-vlm" if harness_type != "long_context" else "mlx",
+        user_bucket="avoid" if harness_type != "long_context" else "caveat",
+        evidence=[f"harness:{harness_type}"],
     )
     return PerformanceResult(
         model_name=name,
@@ -557,6 +562,8 @@ class TestMarkdownReportEdgeCases:
         """Main markdown report should point readers at the standalone gallery artifact."""
         out = tmp_path / "results.md"
         gallery = tmp_path / "model_gallery.md"
+        review = tmp_path / "review.md"
+        log_file = tmp_path / "check_models.log"
         generate_markdown_report(
             results=[_make_quality_success("org/good", with_quality_issue=True)],
             filename=out,
@@ -564,11 +571,17 @@ class TestMarkdownReportEdgeCases:
             prompt="describe",
             total_runtime_seconds=1.0,
             gallery_filename=gallery,
+            review_filename=review,
+            log_filename=log_file,
         )
         content = out.read_text(encoding="utf-8")
-        assert "Dedicated review artifact:" in content
-        assert "See the standalone model-by-model output view here:" in content
+        assert "Review artifacts:" in content
+        assert "Standalone output gallery" in content
+        assert "Automated review digest" in content
+        assert "Canonical run log" in content
         assert "[model_gallery.md](model_gallery.md)" in content
+        assert "[review.md](review.md)" in content
+        assert "[check_models.log](check_models.log)" in content
         assert "## Model Gallery" not in content
         assert "## ✅ Recommended Models" in content
         assert "## 🔍 Quality Pattern Breakdown" in content
@@ -639,9 +652,44 @@ class TestMarkdownGalleryReport:
         assert "Describe this image fully." in content
         assert "```text" not in content
         assert '<a id="model-org-good"></a>' in content
+        assert "**Verdict:**" in content
+        assert "**Stack / owner:**" in content
         assert "**Review:**" in content
         assert "### ✅ org/good" in content
         assert "### ❌ org/bad" in content
+
+    def test_review_report_groups_owner_and_user_buckets(self, tmp_path: Path) -> None:
+        """Review digest should group maintainer ownership and user-facing buckets."""
+        out = tmp_path / "review.md"
+        log_file = tmp_path / "check_models.log"
+        gallery = tmp_path / "model_gallery.md"
+        results = [
+            _make_success("org/good"),
+            _make_harness_success(
+                "org/risky", harness_type="stop_token", harness_detail="token_leak:<s>"
+            ),
+            _make_failure("org/bad", error_package="transformers"),
+        ]
+        report_context = _build_report_render_context(results=results, prompt="describe")
+
+        generate_review_report(
+            results=results,
+            filename=out,
+            prompt="describe",
+            report_context=report_context,
+            log_filename=log_file,
+            gallery_filename=gallery,
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "# Automated Review Digest" in content
+        assert "## Maintainer Queue" in content
+        assert "## User Buckets" in content
+        assert "## Model Verdicts" in content
+        assert "`mlx-vlm`" in content or "`transformers`" in content
+        assert "`recommended`" in content
+        assert "`avoid`" in content
+        assert "Canonical run log" in content
 
     def test_gallery_includes_shared_triage_sections_and_review_status(
         self,

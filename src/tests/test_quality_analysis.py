@@ -141,12 +141,15 @@ def test_analyze_generation_text_empty_input() -> None:
 
 def test_analyze_generation_text_context_ignorance_custom_marker() -> None:
     """Test detection of context ignorance with a custom marker."""
-    # Use prompt with at least 3 key terms to meet minimum threshold
-    prompt = "MyMarker: Located at White Rock, Hastings, England.\n\nDescribe the image."
+    # Use trusted hints with at least 3 key terms to meet minimum threshold
+    prompt = (
+        "MyMarker: Title hint: White Rock shoreline. "
+        "Description hint: White Rock shoreline with wooden posts.\n\nDescribe the image."
+    )
     text = "A nice landscape."
 
     # Should detect missing context terms if we use the correct marker
-    # (White, Rock, Hastings, England = 4 terms, all missing = 100% > 75%)
+    # (White, Rock, shoreline, wooden, posts = trusted terms, most missing)
     analysis = check_models.analyze_generation_text(
         text,
         10,
@@ -264,6 +267,126 @@ def test_analyze_generation_text_marks_prompt_check_availability() -> None:
 
     assert with_prompt.prompt_checks_ran is True
     assert without_prompt.prompt_checks_ran is False
+
+
+def test_analyze_generation_text_classifies_instruction_echo() -> None:
+    """Prompt-instruction parroting should be surfaced as a model shortcoming."""
+    prompt = (
+        "Analyze this image for cataloguing metadata.\n"
+        "Return exactly these three sections, and nothing else:\n"
+        "Title: 5-10 words.\nDescription: 1-2 factual sentences.\nKeywords: 10-18 terms."
+    )
+    text = "Return exactly these three sections, and nothing else. Title: 5-10 words."
+
+    analysis = check_models.analyze_generation_text(
+        text,
+        generated_tokens=24,
+        prompt=prompt,
+    )
+
+    assert analysis.instruction_echo is True
+    assert analysis.verdict == "model_shortcoming"
+    assert "instruction_echo" in analysis.evidence
+
+
+def test_analyze_generation_text_distinguishes_metadata_borrowing_from_trusted_hint_reuse() -> None:
+    """Reuse of stripped metadata should be flagged separately from trusted hint preservation."""
+    prompt = (
+        "Analyze this image.\n"
+        "Context: Existing metadata hints:\n"
+        "- Title hint: Brick storefront with outdoor seating\n"
+        "- Description hint: A brick storefront has outdoor seating beside a sidewalk.\n"
+        "- Keyword hints: brick storefront, outdoor seating, sidewalk, people\n"
+        "- Capture metadata: Taken on 2026-02-21 16:14:55 GMT in Welwyn Garden City.\n"
+    )
+    text = (
+        "Title: Brick storefront with outdoor seating\n"
+        "Description: A brick storefront has outdoor seating beside a sidewalk. "
+        "Taken on 2026-02-21 16:14:55 GMT in Welwyn Garden City.\n"
+        "Keywords: brick storefront, outdoor seating, sidewalk, people"
+    )
+
+    analysis = check_models.analyze_generation_text(
+        text,
+        generated_tokens=48,
+        prompt=prompt,
+    )
+
+    assert analysis.metadata_borrowing is True
+    assert analysis.hint_relationship in {
+        "preserves_trusted_hints",
+        "improves_trusted_hints",
+    }
+    assert analysis.verdict == "model_shortcoming"
+
+
+def test_analyze_generation_text_detects_cutoff_when_cap_is_hit() -> None:
+    """Exact-cap repetitive incomplete outputs should be classified as cutoff."""
+    prompt = (
+        "Analyze this image for cataloguing metadata.\n"
+        "Return exactly these three sections, and nothing else:\n"
+        "Title: 5-10 words.\nDescription: 1-2 factual sentences.\nKeywords: 10-18 terms."
+    )
+    text = (
+        "Title: Brick storefront with outdoor seating\n"
+        "Description: A brick storefront has outdoor seating beside a sidewalk.\n"
+        "Keywords: brick storefront brick storefront brick storefront brick storefront"
+    )
+
+    analysis = check_models.analyze_generation_text(
+        text,
+        generated_tokens=60,
+        requested_max_tokens=60,
+        prompt=prompt,
+    )
+
+    assert analysis.likely_capped is True
+    assert analysis.verdict == "cutoff"
+    assert "token_cap" in analysis.evidence
+
+
+def test_analyze_generation_text_uses_nontext_prompt_burden_for_context_budget() -> None:
+    """Heavy non-text prompt burden should not be mislabeled as short-vs-prompt failure."""
+    prompt = (
+        "Analyze this image.\n"
+        "Context: Existing metadata hints:\n"
+        "- Title hint: Brick storefront with outdoor seating\n"
+        "- Description hint: A brick storefront has outdoor seating beside a sidewalk.\n"
+        "- Keyword hints: brick storefront, outdoor seating, sidewalk, people\n"
+    )
+    analysis = check_models.analyze_generation_text(
+        "Title: Storefront scene\nDescription: A storefront.\nKeywords: storefront, street",
+        generated_tokens=14,
+        prompt_tokens=5000,
+        prompt=prompt,
+    )
+
+    assert analysis.prompt_tokens_total == 5000
+    assert analysis.prompt_tokens_nontext_est is not None
+    assert analysis.prompt_tokens_text_est is not None
+    assert analysis.prompt_tokens_nontext_est > analysis.prompt_tokens_text_est
+    assert analysis.verdict == "context_budget"
+
+
+def test_analyze_generation_text_ignores_nonvisual_location_and_time_metadata() -> None:
+    """Location, GPS, and timestamps should not drive trusted-hint penalties."""
+    prompt = (
+        "Analyze this image.\n"
+        "MyMarker: Title hint: Brick storefront scene. Description hint: A brick shopfront. "
+        "Capture metadata: Taken on 2026-02-21 16:14:55 GMT. GPS: 51.8000, -0.2000. "
+        "Welwyn Garden City, England.\n"
+    )
+    text = "Title: Brick storefront scene\nDescription: A brick shopfront.\nKeywords: brick, shop"
+
+    analysis = check_models.analyze_generation_text(
+        text,
+        generated_tokens=18,
+        prompt=prompt,
+        context_marker="MyMarker:",
+    )
+
+    assert analysis.is_context_ignored is False
+    assert "Welwyn" not in " ".join(analysis.missing_context_terms)
 
 
 def test_repetitive_phrase_detection_uses_quality_thresholds() -> None:

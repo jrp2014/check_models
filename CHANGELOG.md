@@ -6,6 +6,21 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Made `check_models.log` the canonical full-fidelity run artifact by adding a
+  fixed per-model review block with verdict, trusted-hint handling, contract
+  and utility summaries, ownership hints, token accounting, next actions, and
+  full generated or captured failure output even when console logging stays
+  concise.
+- Reworked trusted-hint quality analysis so only prompt title/description/
+  keyword hints are treated as reusable draft content, while capture metadata,
+  GPS, timestamps, source labels, and explicit location labels are stripped out
+  of hint-usage scoring and can instead be flagged separately as nonvisual
+  metadata borrowing.
+- Added ordered automated review verdicts (`clean`, `harness`, `cutoff`,
+  `context_budget`, `model_shortcoming`), surfaced them in `results.jsonl`
+  review payloads and the new `output/review.md` digest, and wired the same
+  review data into gallery/report output so users and maintainers see one
+  consistent judgment across artifacts.
 - Tightened MLX runtime metric capture so compact logging now reads the
   stored `cache_memory` field consistently, and generation results backfill
   peak memory from `mx.get_peak_memory()` when upstream results omit it.
