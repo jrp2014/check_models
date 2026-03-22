@@ -173,9 +173,18 @@ ERROR_MLX_LM_MISSING: Final[str] = (
 ERROR_MLX_VLM_RUNTIME_INIT: Final[str] = (
     "Core dependency initialization failed: mlx-vlm could not be imported safely."
 )
-PROJECT_MIN_TRANSFORMERS_VERSION: Final[str] = "5.2.0"
+PROJECT_MIN_TRANSFORMERS_VERSION: Final[str] = "5.3.0"
 MLX_IMPORT_PROBE_TIMEOUT_SECONDS: Final[float] = 8.0
 DEFAULT_THINKING_END_MARKER: Final[str] = "</think>"
+UPSTREAM_MLX_VLM_MINIMUMS: Final[dict[str, str]] = {
+    "mlx": "0.30.0",
+    "mlx-lm": "0.31.0",
+    "transformers": "5.1.0",
+}
+UPSTREAM_MLX_LM_MINIMUMS: Final[dict[str, str]] = {
+    "mlx": "0.30.4",
+    "transformers": "5.0.0",
+}
 
 
 # =============================================================================
@@ -5523,21 +5532,20 @@ def _collect_upstream_requirements(
         else:
             requirements[package] = (current_minimum, merged_sources)
 
-    # Project-level dependency floor (policy): transformers >= 5.2.
+    # Project-level dependency floor (policy): transformers >= 5.3.
     _record_requirement("transformers", PROJECT_MIN_TRANSFORMERS_VERSION, "check_models")
 
     if versions.get("mlx-vlm"):
         # mlx-vlm requirements.txt currently specifies:
-        #   mlx>=0.26.0, mlx-lm>=0.23.0, transformers>=4.53.0
-        _record_requirement("mlx", "0.26.0", "mlx-vlm")
-        _record_requirement("mlx-lm", "0.23.0", "mlx-vlm")
-        _record_requirement("transformers", "4.53.0", "mlx-vlm")
+        #   mlx>=0.30.0, mlx-lm>=0.31.0, transformers>=5.1.0
+        for package_name, minimum_version in UPSTREAM_MLX_VLM_MINIMUMS.items():
+            _record_requirement(package_name, minimum_version, "mlx-vlm")
 
     if versions.get("mlx-lm"):
         # mlx-lm setup.py currently specifies:
         #   mlx>=0.30.4, transformers>=5.0.0
-        _record_requirement("mlx", "0.30.4", "mlx-lm")
-        _record_requirement("transformers", "5.0.0", "mlx-lm")
+        for package_name, minimum_version in UPSTREAM_MLX_LM_MINIMUMS.items():
+            _record_requirement(package_name, minimum_version, "mlx-lm")
 
     return requirements
 

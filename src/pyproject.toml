@@ -29,10 +29,10 @@ classifiers = [
 # mlx-vlm's dependencies change.
 dependencies = [
     # Minimal runtime set actually imported by check_models.py
-    "mlx>=0.29.1",
-    "mlx-vlm>=0.3.0",
+    "mlx>=0.31.1",
+    "mlx-vlm>=0.4.1",
     # Project-level compatibility floor for the MLX ecosystem.
-    "transformers>=5.2.0",
+    "transformers>=5.3.0",
     "Pillow[xmp]>=10.3.0",
     "huggingface-hub[torch,typing]>=0.34.0",
     "requests>=2.31.0",
@@ -66,7 +66,7 @@ extras = [
     # Number-to-words conversion (required by some model processors)
     "num2words>=0.5.0",
     # Language-model utilities (not required for base benchmarking)
-    "mlx-lm>=0.23.0",
+    "mlx-lm>=0.31.1",
     "sentencepiece",
     # TensorFlow (needed for some models like Florence-2)
     "tensorflow",

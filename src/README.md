@@ -493,7 +493,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- MANUAL_INSTALL_START -->
 ```bash
-pip install "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "transformers>=5.2.0" "tzlocal>=5.0" "wcwidth>=0.2.13"
+pip install "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.31.1" "mlx-vlm>=0.4.1" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "transformers>=5.3.0" "tzlocal>=5.0" "wcwidth>=0.2.13"
 ```
 <!-- MANUAL_INSTALL_END -->
 
@@ -584,8 +584,8 @@ Runtime (installed automatically via `pip install -e .` when executed inside `sr
 
 | Purpose | Package | Minimum |
 | ------- | ------- | ------- |
-| Core tensor/runtime | `mlx` | `>=0.29.1` |
-| Vision‑language utilities | `mlx-vlm` | `>=0.3.0` |
+| Core tensor/runtime | `mlx` | `>=0.31.1` |
+| Vision‑language utilities | `mlx-vlm` | `>=0.4.1` |
 | Image processing & loading | `Pillow[xmp]` | `>=10.3.0` |
 | Model cache / discovery | `huggingface-hub` | `>=0.34.0` |
 | HTTP requests (image URLs) | `requests` | `>=2.31.0` |
@@ -633,7 +633,7 @@ Development / QA:
 
 <!-- MINIMAL_INSTALL_START -->
 ```bash
-pip install "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "transformers>=5.2.0" "tzlocal>=5.0" "wcwidth>=0.2.13"
+pip install "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.31.1" "mlx-vlm>=0.4.1" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "transformers>=5.3.0" "tzlocal>=5.0" "wcwidth>=0.2.13"
 ```
 <!-- MINIMAL_INSTALL_END -->
 
@@ -667,7 +667,7 @@ pip install -e ".[dev,extras]"  # dev tools + optional metrics/tokenizers
 > `extras` group bundles: psutil, tokenizers, mlx-lm. Install only if you need extended metrics or LM features.
 
 > [!NOTE]
-> Project policy requires `transformers>=5.2.0`.
+> Project policy requires `transformers>=5.3.0`.
 
 > [!NOTE]
 > `system_profiler` is a macOS built-in (no install needed) used for GPU name / core info.

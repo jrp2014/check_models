@@ -6,6 +6,14 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Refreshed the MLX stack compatibility policy to track current upstream stable
+  releases more closely: `mlx>=0.31.1`, `mlx-vlm>=0.4.1`, `mlx-lm>=0.31.1`,
+  and `transformers>=5.3.0`, and aligned preflight diagnostics and fallback
+  environment validation tables with current upstream minimum requirements.
+- Updated `src/tools/update.sh` to keep Markdown lint tooling repo-local via
+  `npm install --prefix src` instead of globally mutating npm packages, while
+  preserving the default MLX build path with `MLX_METAL_JIT` unset/off unless
+  a user explicitly opts in.
 - Tightened the staged Markdown pre-commit hook so committed report artifacts
   under `src/output/` are no longer excluded from markdownlint fixing, which
   lets commit-time hygiene catch lint regressions in generated Markdown such as
@@ -301,7 +309,7 @@ Notable changes to this project will be documented in this file.
   explicitly report when newer Transformers versions ignore both families.
 - Updated `src/tools/update.sh` so local MLX builds apply `MLX_METAL_JIT`
   through MLX's current CMake build flag
-  (`CMAKE_ARGS=-DMLX_BUILD_METAL_KERNELS=<ON|OFF>`), ensuring the selected
+  (`CMAKE_ARGS=-DMLX_METAL_JIT=<ON|OFF>`), ensuring the selected
   kernel mode is honored during `pip install -e .`.
 - Audited inline comments in `src/check_models.py` and removed stale
   refactor-history notes that no longer describe current behavior, while

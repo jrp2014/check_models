@@ -366,8 +366,9 @@ bash tools/update.sh
 - Automatically detects and uses local MLX development builds
 - Validates Python version (>= 3.13 required)
 - Checks for virtual environment activation
-- Offers per-group installation (runtime, extras, torch, dev)
-- Verifies dependency sync across pyproject.toml, requirements*.txt, and update.sh itself
+- Installs the project editable environment with dev and extras enabled by default
+- Uses repo-local Node tooling (`npm install --prefix src`) for markdownlint instead of relying on global packages
+- Verifies dependency sync across `pyproject.toml`, generated README install blocks, and updater assumptions
 
 **Environment Variables**:
 

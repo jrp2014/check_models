@@ -515,7 +515,7 @@ class TestPreflightDependencyDiagnostics:
     def test_is_version_at_least_handles_dev_builds(self, mod: types.ModuleType) -> None:
         """Dev build strings should compare correctly against floor versions."""
         assert mod._is_version_at_least("0.30.7.dev20260214+c184262d", "0.30.4")
-        assert not mod._is_version_at_least("5.1.9", "5.2.0")
+        assert not mod._is_version_at_least("5.2.9", "5.3.0")
 
     def test_collect_upstream_requirements_tracks_strictest_floor(
         self,
@@ -524,15 +524,15 @@ class TestPreflightDependencyDiagnostics:
         """When multiple stacks are installed, stricter floor should win."""
         requirements = mod._collect_upstream_requirements(
             {
-                "mlx-vlm": "0.3.12",
-                "mlx-lm": "0.30.7",
-                "mlx": "0.30.7",
-                "transformers": "5.2.0",
+                "mlx-vlm": "0.4.1",
+                "mlx-lm": "0.31.1",
+                "mlx": "0.31.1",
+                "transformers": "5.3.0",
             },
         )
         assert requirements["mlx"][0] == "0.30.4"
-        assert requirements["transformers"][0] == "5.2.0"
-        assert requirements["mlx-lm"][0] == "0.23.0"
+        assert requirements["transformers"][0] == "5.3.0"
+        assert requirements["mlx-lm"][0] == "0.31.0"
 
     def test_detect_upstream_version_issues_reports_below_floor(
         self,
@@ -541,15 +541,15 @@ class TestPreflightDependencyDiagnostics:
         """Installed versions below upstream floors should be surfaced."""
         issues = mod._detect_upstream_version_issues(
             {
-                "mlx-vlm": "0.3.12",
-                "mlx-lm": "0.22.9",
+                "mlx-vlm": "0.4.1",
+                "mlx-lm": "0.30.9",
                 "mlx": "0.29.9",
-                "transformers": "5.1.9",
+                "transformers": "5.2.9",
             },
         )
         assert any("mlx==0.29.9" in issue and "0.30.4" in issue for issue in issues)
-        assert any("mlx-lm==0.22.9" in issue and "0.23.0" in issue for issue in issues)
-        assert any("transformers==5.1.9" in issue and "5.2.0" in issue for issue in issues)
+        assert any("mlx-lm==0.30.9" in issue and "0.31.0" in issue for issue in issues)
+        assert any("transformers==5.2.9" in issue and "5.3.0" in issue for issue in issues)
 
     def test_has_mlx_vlm_load_image_path_bug_detection(self, mod: types.ModuleType) -> None:
         """Source matcher should flag unguarded startswith URL branch."""

@@ -129,10 +129,11 @@ CORE_PACKAGES, EXTRAS_PACKAGES, DEV_TOOLS = load_pyproject_deps()
 # Fallback if parsing failed
 if not CORE_PACKAGES:
     CORE_PACKAGES = {
-        "mlx": ">=0.29.1",
-        "mlx-vlm": ">=0.3.0",
+        "mlx": ">=0.31.1",
+        "mlx-vlm": ">=0.4.1",
+        "transformers": ">=5.3.0",
         "Pillow": ">=10.3.0",
-        "huggingface-hub": ">=0.23.0",
+        "huggingface-hub": ">=0.34.0",
         "tabulate": ">=0.9.0",
         "tzlocal": ">=5.0",
     }
@@ -143,8 +144,7 @@ if not EXTRAS_PACKAGES:
         "tokenizers": ">=0.15.0",
         "einops": ">=0.6.0",
         "num2words": ">=0.5.0",
-        "mlx-lm": ">=0.23.0",
-        "transformers": ">=4.53.0",
+        "mlx-lm": ">=0.31.1",
     }
 
 if not DEV_TOOLS:
