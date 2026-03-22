@@ -160,7 +160,7 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 15697.25it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 38444.58it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -258,7 +258,7 @@ Assistant:
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 17 files:   0%|          | 0/17 [00:00<?, ?it/s]
-Fetching 17 files: 100%|##########| 17/17 [00:00<00:00, 22075.28it/s]
+Fetching 17 files: 100%|##########| 17/17 [00:00<00:00, 9459.16it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -352,7 +352,7 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 18 files:   0%|          | 0/18 [00:00<?, ?it/s]
-Fetching 18 files: 100%|##########| 18/18 [00:00<00:00, 15048.33it/s]
+Fetching 18 files: 100%|##########| 18/18 [00:00<00:00, 11023.14it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -369,7 +369,7 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 | Model | Observed Behavior | First Seen Failing | Recent Repro |
 | ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/Qwen3.5-27B-4bit` | Failed to process inputs with error: Only returning PyTorch tensors is currently supported. | 2026-03-22 01:27:09 GMT | 2/3 recent runs failed |
+| `mlx-community/Qwen3.5-27B-4bit` | Failed to process inputs with error: Only returning PyTorch tensors is currently supported. | 2026-03-22 01:27:09 GMT | 3/3 recent runs failed |
 
 ### To reproduce
 
@@ -493,7 +493,7 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 37244.50it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 49078.26it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -510,7 +510,7 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 | Model | Observed Behavior | First Seen Failing | Recent Repro |
 | ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/Qwen3.5-27B-mxfp8` | Failed to process inputs with error: Only returning PyTorch tensors is currently supported. | 2026-03-22 01:27:09 GMT | 2/3 recent runs failed |
+| `mlx-community/Qwen3.5-27B-mxfp8` | Failed to process inputs with error: Only returning PyTorch tensors is currently supported. | 2026-03-22 01:27:09 GMT | 3/3 recent runs failed |
 
 ### To reproduce
 
@@ -634,7 +634,7 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 16 files:   0%|          | 0/16 [00:00<?, ?it/s]
-Fetching 16 files: 100%|##########| 16/16 [00:00<00:00, 21392.69it/s]
+Fetching 16 files: 100%|##########| 16/16 [00:00<00:00, 26715.31it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -651,7 +651,7 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 | Model | Observed Behavior | First Seen Failing | Recent Repro |
 | ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/Qwen3.5-35B-A3B-6bit` | Failed to process inputs with error: Only returning PyTorch tensors is currently supported. | 2026-03-01 22:26:38 GMT | 2/3 recent runs failed |
+| `mlx-community/Qwen3.5-35B-A3B-6bit` | Failed to process inputs with error: Only returning PyTorch tensors is currently supported. | 2026-03-01 22:26:38 GMT | 3/3 recent runs failed |
 
 ### To reproduce
 
@@ -775,7 +775,7 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 16 files:   0%|          | 0/16 [00:00<?, ?it/s]
-Fetching 16 files: 100%|##########| 16/16 [00:00<00:00, 9413.50it/s]
+Fetching 16 files: 100%|##########| 16/16 [00:00<00:00, 18330.75it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -792,7 +792,7 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 | Model | Observed Behavior | First Seen Failing | Recent Repro |
 | ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/Qwen3.5-35B-A3B-bf16` | Failed to process inputs with error: Only returning PyTorch tensors is currently supported. | 2026-03-01 22:26:38 GMT | 2/3 recent runs failed |
+| `mlx-community/Qwen3.5-35B-A3B-bf16` | Failed to process inputs with error: Only returning PyTorch tensors is currently supported. | 2026-03-01 22:26:38 GMT | 3/3 recent runs failed |
 
 ### To reproduce
 
@@ -916,7 +916,7 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 24 files:   0%|          | 0/24 [00:00<?, ?it/s]
-Fetching 24 files: 100%|##########| 24/24 [00:00<00:00, 15298.37it/s]
+Fetching 24 files: 100%|##########| 24/24 [00:00<00:00, 13612.35it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -971,7 +971,7 @@ Added chat tokens
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 27650.08it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 74693.08it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -1176,19 +1176,19 @@ These models technically succeeded, but token/output patterns suggest likely int
 
 Recent reproducibility is measured from history (up to last 3 runs where each model appears).
 
-**Regressions since previous run:** none
-**Recoveries since previous run:** `mlx-community/pixtral-12b-bf16`
+**Regressions since previous run:** `mlx-community/InternVL3-8B-bf16`, `mlx-community/Molmo-7B-D-0924-bf16`
+**Recoveries since previous run:** none
 
 | Model | Status vs Previous Run | First Seen Failing | Recent Repro |
 | ----- | ---------------------- | ------------------ | ------------ |
 | `microsoft/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
-| `mlx-community/InternVL3-8B-bf16` | still failing | 2026-02-23 12:54:48 GMT | 2/3 recent runs failed |
-| `mlx-community/Molmo-7B-D-0924-bf16` | still failing | 2026-03-22 01:27:09 GMT | 2/3 recent runs failed |
-| `mlx-community/Qwen3.5-27B-4bit` | still failing | 2026-03-22 01:27:09 GMT | 2/3 recent runs failed |
-| `mlx-community/Qwen3.5-27B-mxfp8` | still failing | 2026-03-22 01:27:09 GMT | 2/3 recent runs failed |
-| `mlx-community/Qwen3.5-35B-A3B-6bit` | still failing | 2026-03-01 22:26:38 GMT | 2/3 recent runs failed |
-| `mlx-community/Qwen3.5-35B-A3B-bf16` | still failing | 2026-03-01 22:26:38 GMT | 2/3 recent runs failed |
-| `mlx-community/deepseek-vl2-8bit` | still failing | 2026-02-15 03:27:34 GMT | 3/3 recent runs failed |
+| `mlx-community/InternVL3-8B-bf16` | new regression | 2026-02-23 12:54:48 GMT | 2/3 recent runs failed |
+| `mlx-community/Molmo-7B-D-0924-bf16` | new regression | 2026-03-22 01:27:09 GMT | 2/3 recent runs failed |
+| `mlx-community/Qwen3.5-27B-4bit` | still failing | 2026-03-22 01:27:09 GMT | 3/3 recent runs failed |
+| `mlx-community/Qwen3.5-27B-mxfp8` | still failing | 2026-03-22 01:27:09 GMT | 3/3 recent runs failed |
+| `mlx-community/Qwen3.5-35B-A3B-6bit` | still failing | 2026-03-01 22:26:38 GMT | 3/3 recent runs failed |
+| `mlx-community/Qwen3.5-35B-A3B-bf16` | still failing | 2026-03-01 22:26:38 GMT | 3/3 recent runs failed |
+| `mlx-community/deepseek-vl2-8bit` | new model failing | 2026-02-15 03:27:34 GMT | 3/3 recent runs failed |
 
 ---
 
@@ -1197,13 +1197,13 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 - **Detailed diagnostics models:** 17
 - **Summary diagnostics models:** 34
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 648.02s (648.02s)
-- **Average runtime per model:** 12.71s (12.71s)
-- **Dominant runtime phase:** decode dominated 45/51 measured model runs (83% of tracked runtime).
-- **Phase totals:** model load=98.63s, prompt prep=0.12s, decode=535.10s, cleanup=7.26s
+- **Total model runtime (sum):** 616.58s (616.58s)
+- **Average runtime per model:** 12.09s (12.09s)
+- **Dominant runtime phase:** decode dominated 46/51 measured model runs (82% of tracked runtime).
+- **Phase totals:** model load=102.75s, prompt prep=0.12s, decode=500.08s, cleanup=6.14s
 - **Observed stop reasons:** completed=43, exception=8
-- **Validation overhead:** 13.91s total (avg 0.27s across 51 model(s)).
-- **First-token latency:** Avg 3.28s | Min 0.09s | Max 18.54s across 42 model(s).
+- **Validation overhead:** 13.41s total (avg 0.26s across 51 model(s)).
+- **First-token latency:** Avg 2.97s | Min 0.09s | Max 16.19s across 42 model(s).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
@@ -1238,7 +1238,7 @@ These models completed without diagnostics flags (no hard failure, harness warni
 - `mlx-community/LFM2.5-VL-1.6B-bf16`: Output appears to copy prompt context verbatim.
 - `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: Output became repetitive, indicating possible generation instability.
 - `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`: Description sentence violation (3; expected 1-2)
-- `mlx-community/Molmo-7B-D-0924-8bit`: Output became repetitive, indicating possible generation instability.
+- `mlx-community/Molmo-7B-D-0924-8bit`: Output appears to copy prompt context verbatim.
 - `mlx-community/Phi-3.5-vision-instruct-bf16`: Nonvisual metadata borrowing
 - `mlx-community/SmolVLM-Instruct-bf16`: Model output may not follow prompt or image contents.
 - `mlx-community/SmolVLM2-2.2B-Instruct-mlx`: Model output may not follow prompt or image contents.
@@ -1361,4 +1361,4 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 - Input image: `/Users/jrp/Pictures/Processed/20260321-182222_DSC09486_DxO.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-03-22 02:18:00 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-03-22 21:43:08 GMT by [check_models](https://github.com/jrp2014/check_models)._

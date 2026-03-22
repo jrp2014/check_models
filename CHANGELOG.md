@@ -36,6 +36,10 @@ Notable changes to this project will be documented in this file.
 - Tightened MLX runtime metric capture so compact logging now reads the
   stored `cache_memory` field consistently, and generation results backfill
   peak memory from `mx.get_peak_memory()` when upstream results omit it.
+- Added a narrow one-shot retry for known upstream `mlx-vlm` BPE streaming
+  detokenizer UTF-8 decode failures, temporarily switching the retry attempt
+  to lossy byte flushing so intermittent `UnicodeDecodeError` crashes can be
+  worked around locally while the upstream bug is fixed.
 - Added first-token latency capture to runtime diagnostics by deriving it from
   upstream `mlx_vlm.generate` prompt-throughput metrics, and preserved that
   signal through final result finalization so reports and compact logs can show

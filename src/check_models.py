@@ -13331,6 +13331,149 @@ def _ensure_generation_runtime_symbols() -> None:
         raise _tag_exception_failure_phase(RuntimeError(msg), "import")
 
 
+def _is_mlx_vlm_bpe_detokenizer_decode_failure(error: BaseException) -> bool:
+    """Return whether an error matches the upstream mlx-vlm UTF-8 detokenizer bug."""
+    if not isinstance(error, UnicodeDecodeError):
+        return False
+    if error.encoding.strip().lower() != "utf-8":
+        return False
+
+    for frame in traceback.extract_tb(error.__traceback__):
+        normalized_filename = frame.filename.replace("\\", "/")
+        if (
+            normalized_filename.endswith("/mlx_vlm/tokenizer_utils.py")
+            and frame.name == "add_token"
+        ):
+            return True
+    return False
+
+
+@contextlib.contextmanager
+def _temporary_mlx_vlm_lossy_bpe_detokenizer_patch() -> Generator[None]:
+    """Temporarily ignore undecodable bytes in mlx-vlm BPE streaming detokenization."""
+    space_byte: Final[int] = 32
+    try:
+        tokenizer_utils = __import__(
+            "mlx_vlm.tokenizer_utils",
+            fromlist=["BPEStreamingDetokenizer"],
+        )
+    except ImportError:
+        yield
+        return
+
+    detokenizer_cls = getattr(tokenizer_utils, "BPEStreamingDetokenizer", None)
+    remove_space = getattr(tokenizer_utils, "_remove_space", None)
+    original_add_token = getattr(detokenizer_cls, "add_token", None)
+    if not isinstance(detokenizer_cls, type) or not callable(original_add_token):
+        yield
+        return
+
+    def _lossy_add_token(
+        self: object,
+        token: int,
+        skip_special_token_ids: Sequence[int] = (),
+    ) -> None:
+        detokenizer = cast("Any", self)
+        if token in skip_special_token_ids:
+            return
+
+        tokenmap = getattr(detokenizer, "tokenmap", None)
+        byte_decoder = getattr(detokenizer, "_byte_decoder", None)
+        pending = getattr(detokenizer, "_unflushed", None)
+        accumulated_text = getattr(detokenizer, "text", None)
+        trim_space = getattr(detokenizer, "trim_space", False)
+        if (
+            not isinstance(tokenmap, list)
+            or not isinstance(byte_decoder, Mapping)
+            or not isinstance(pending, str)
+            or not isinstance(accumulated_text, str)
+        ):
+            original_add_token(self, token, skip_special_token_ids)
+            return
+
+        try:
+            value = tokenmap[token]
+        except (IndexError, TypeError):
+            original_add_token(self, token, skip_special_token_ids)
+            return
+        if not isinstance(value, str) or not value:
+            original_add_token(self, token, skip_special_token_ids)
+            return
+
+        try:
+            leading_byte = byte_decoder[value[0]]
+        except KeyError:
+            original_add_token(self, token, skip_special_token_ids)
+            return
+
+        if leading_byte != space_byte:
+            object.__setattr__(detokenizer, "_unflushed", pending + value)
+            return
+
+        current_text = bytearray(byte_decoder[ch] for ch in pending if ch in byte_decoder).decode(
+            "utf-8", errors="ignore"
+        )
+        if accumulated_text or not trim_space:
+            next_text = accumulated_text + current_text
+        elif callable(remove_space):
+            next_text = accumulated_text + cast("str", remove_space(current_text))
+        else:
+            next_text = accumulated_text + current_text.lstrip()
+
+        detokenizer.text = next_text
+        object.__setattr__(detokenizer, "_unflushed", value)
+
+    detokenizer_cls.add_token = _lossy_add_token
+    try:
+        yield
+    finally:
+        detokenizer_cls.add_token = original_add_token
+
+
+def _run_generation_with_retry_workaround(
+    *,
+    params: ProcessImageParams,
+    generate_once: Callable[[], GenerationResult | SupportsGenerationResult],
+) -> GenerationResult | SupportsGenerationResult:
+    """Run generation once, retrying only for the known upstream detokenizer bug."""
+    try:
+        return generate_once()
+    except TimeoutError as gen_to_err:
+        msg = f"Generation timed out for model {params.model_identifier}: {gen_to_err}"
+        raise _tag_exception_failure_phase(TimeoutError(msg), "decode") from gen_to_err
+    except (OSError, ValueError) as gen_known_err:
+        if not _is_mlx_vlm_bpe_detokenizer_decode_failure(gen_known_err):
+            msg = f"Model generation failed for {params.model_identifier}: {gen_known_err}"
+            logger.exception("Generation error for %s", params.model_identifier)
+            raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
+
+        logger.warning(
+            "Generation hit upstream mlx-vlm UTF-8 detokenizer failure for %s; "
+            "retrying once with lossy BPE decode fallback.",
+            params.model_identifier,
+        )
+        try:
+            with _temporary_mlx_vlm_lossy_bpe_detokenizer_patch():
+                return generate_once()
+        except TimeoutError as retry_timeout_err:
+            msg = f"Generation timed out for model {params.model_identifier}: {retry_timeout_err}"
+            raise _tag_exception_failure_phase(TimeoutError(msg), "decode") from retry_timeout_err
+        except (OSError, ValueError) as retry_known_err:
+            msg = f"Model generation failed for {params.model_identifier}: {retry_known_err}"
+            logger.exception("Generation error for %s", params.model_identifier)
+            raise _tag_exception_failure_phase(ValueError(msg), "decode") from retry_known_err
+        except (RuntimeError, TypeError, AttributeError, KeyError) as retry_err:
+            msg = (
+                f"Model runtime error during generation for {params.model_identifier}: {retry_err}"
+            )
+            logger.exception("Runtime error for %s", params.model_identifier)
+            raise _tag_exception_failure_phase(ValueError(msg), "decode") from retry_err
+    except (RuntimeError, TypeError, AttributeError, KeyError) as gen_err:
+        msg = f"Model runtime error during generation for {params.model_identifier}: {gen_err}"
+        logger.exception("Runtime error for %s", params.model_identifier)
+        raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
+
+
 def _build_runtime_diagnostics(
     phase_timer: PhaseTimer,
     *,
@@ -13590,14 +13733,10 @@ def _run_model_generation(
     if timer is None:
         timer = PerfCounterTimer()
 
-    timer.start()
-    if phase_timer is not None:
-        phase_timer.start("decode")
-    _set_failure_phase(phase_callback, "decode")
-    try:
-        extra_kwargs = _build_generate_extra_kwargs(params)
+    extra_kwargs = _build_generate_extra_kwargs(params)
 
-        output: GenerationResult | SupportsGenerationResult = generate(
+    def _generate_once() -> GenerationResult | SupportsGenerationResult:
+        return generate(
             model=model,
             processor=cast("Any", processor),
             prompt=formatted_prompt,
@@ -13614,20 +13753,16 @@ def _run_model_generation(
             max_tokens=params.max_tokens,
             **extra_kwargs,
         )
-    except TimeoutError as gen_to_err:
-        msg = f"Generation timed out for model {params.model_identifier}: {gen_to_err}"
-        # Re-raise to be handled by outer TimeoutError branch
-        raise _tag_exception_failure_phase(TimeoutError(msg), "decode") from gen_to_err
-    except (OSError, ValueError) as gen_known_err:
-        # Known I/O or validation-style issues
-        msg = f"Model generation failed for {params.model_identifier}: {gen_known_err}"
-        logger.exception("Generation error for %s", params.model_identifier)
-        raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
-    except (RuntimeError, TypeError, AttributeError, KeyError) as gen_err:
-        # Model-specific runtime errors (weights, config, tensor ops, missing attributes)
-        msg = f"Model runtime error during generation for {params.model_identifier}: {gen_err}"
-        logger.exception("Runtime error for %s", params.model_identifier)
-        raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_err
+
+    timer.start()
+    if phase_timer is not None:
+        phase_timer.start("decode")
+    _set_failure_phase(phase_callback, "decode")
+    try:
+        output = _run_generation_with_retry_workaround(
+            params=params,
+            generate_once=_generate_once,
+        )
     finally:
         if phase_timer is not None:
             phase_timer.stop("decode")

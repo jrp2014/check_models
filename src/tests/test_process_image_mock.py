@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import contextlib
 import sys
 from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING
 from unittest.mock import patch
 
 if TYPE_CHECKING:
+    from collections.abc import Generator
     from pathlib import Path
 
 import check_models
@@ -380,6 +382,171 @@ class TestProcessImageWithModelMock:
         assert generate_kwargs["thinking_budget"] == 96
         assert generate_kwargs["thinking_start_token"] == "<think>"
         assert generate_kwargs["thinking_end_token"] == "</think>"
+
+    def test_run_model_generation_retries_utf8_detokenizer_failure(self, test_image: Path) -> None:
+        """Known mlx-vlm UTF-8 detokenizer failures should retry once with the patch."""
+        params = _build_params(test_image)
+        fake_model = _FakeModel()
+        fake_processor = object()
+        fake_generation = _FakeGenerationResult()
+        generate_attempts: list[str] = []
+        retry_patch_entries: list[str] = []
+        decode_error = UnicodeDecodeError("utf-8", b"\xab", 0, 1, "invalid start byte")
+
+        def _generate_side_effect(*_args: object, **_kwargs: object) -> _FakeGenerationResult:
+            generate_attempts.append("attempt")
+            if len(generate_attempts) == 1:
+                raise decode_error
+            return fake_generation
+
+        @contextlib.contextmanager
+        def _record_retry_patch() -> Generator[None]:
+            retry_patch_entries.append("entered")
+            yield
+
+        with (
+            patch.object(check_models, "_ensure_generation_runtime_symbols"),
+            patch.object(
+                check_models,
+                "_load_model",
+                return_value=(fake_model, fake_processor, None),
+            ),
+            patch.object(check_models, "_run_model_preflight_validators"),
+            patch.object(check_models, "apply_chat_template", return_value="formatted prompt"),
+            patch.object(
+                check_models,
+                "_is_mlx_vlm_bpe_detokenizer_decode_failure",
+                return_value=True,
+            ) as mock_detector,
+            patch.object(
+                check_models,
+                "_temporary_mlx_vlm_lossy_bpe_detokenizer_patch",
+                _record_retry_patch,
+            ),
+            patch.object(
+                check_models,
+                "generate",
+                side_effect=_generate_side_effect,
+            ) as mock_generate,
+            patch.object(check_models, "mx", _FakeMxRuntime()),
+        ):
+            result = check_models._run_model_generation(params)
+
+        assert result is fake_generation
+        assert mock_generate.call_count == 2
+        assert mock_detector.call_count == 1
+        assert retry_patch_entries == ["entered"]
+
+    def test_run_model_generation_retries_only_once_for_utf8_detokenizer_failure(
+        self,
+        test_image: Path,
+    ) -> None:
+        """The lossy detokenizer workaround should be a single retry, not an open loop."""
+        params = _build_params(test_image)
+        fake_model = _FakeModel()
+        fake_processor = object()
+        generate_attempts: list[str] = []
+        retry_patch_entries: list[str] = []
+        first_error = UnicodeDecodeError("utf-8", b"\xab", 0, 1, "invalid start byte")
+        second_error = UnicodeDecodeError("utf-8", b"\xab", 0, 1, "invalid start byte")
+
+        def _generate_side_effect(*_args: object, **_kwargs: object) -> _FakeGenerationResult:
+            generate_attempts.append("attempt")
+            if len(generate_attempts) == 1:
+                raise first_error
+            raise second_error
+
+        @contextlib.contextmanager
+        def _record_retry_patch() -> Generator[None]:
+            retry_patch_entries.append("entered")
+            yield
+
+        with (
+            patch.object(check_models, "_ensure_generation_runtime_symbols"),
+            patch.object(
+                check_models,
+                "_load_model",
+                return_value=(fake_model, fake_processor, None),
+            ),
+            patch.object(check_models, "_run_model_preflight_validators"),
+            patch.object(check_models, "apply_chat_template", return_value="formatted prompt"),
+            patch.object(
+                check_models,
+                "_is_mlx_vlm_bpe_detokenizer_decode_failure",
+                return_value=True,
+            ),
+            patch.object(
+                check_models,
+                "_temporary_mlx_vlm_lossy_bpe_detokenizer_patch",
+                _record_retry_patch,
+            ),
+            patch.object(
+                check_models,
+                "generate",
+                side_effect=_generate_side_effect,
+            ) as mock_generate,
+            patch.object(check_models, "mx", _FakeMxRuntime()),
+        ):
+            try:
+                check_models._run_model_generation(params)
+            except ValueError as err:
+                error_message = str(err)
+            else:  # pragma: no cover - defensive guard for static analysis
+                raise AssertionError
+
+        assert "invalid start byte" in error_message
+        assert mock_generate.call_count == 2
+        assert retry_patch_entries == ["entered"]
+
+    def test_run_model_generation_does_not_retry_other_value_errors(self, test_image: Path) -> None:
+        """Only the known upstream detokenizer failure should trigger a retry."""
+        params = _build_params(test_image)
+        fake_model = _FakeModel()
+        fake_processor = object()
+        retry_patch_entries: list[str] = []
+
+        @contextlib.contextmanager
+        def _record_retry_patch() -> Generator[None]:
+            retry_patch_entries.append("entered")
+            yield
+
+        with (
+            patch.object(check_models, "_ensure_generation_runtime_symbols"),
+            patch.object(
+                check_models,
+                "_load_model",
+                return_value=(fake_model, fake_processor, None),
+            ),
+            patch.object(check_models, "_run_model_preflight_validators"),
+            patch.object(check_models, "apply_chat_template", return_value="formatted prompt"),
+            patch.object(
+                check_models,
+                "_is_mlx_vlm_bpe_detokenizer_decode_failure",
+                return_value=False,
+            ) as mock_detector,
+            patch.object(
+                check_models,
+                "_temporary_mlx_vlm_lossy_bpe_detokenizer_patch",
+                _record_retry_patch,
+            ),
+            patch.object(
+                check_models,
+                "generate",
+                side_effect=ValueError("bad config"),
+            ) as mock_generate,
+            patch.object(check_models, "mx", _FakeMxRuntime()),
+        ):
+            try:
+                check_models._run_model_generation(params)
+            except ValueError as err:
+                error_message = str(err)
+            else:  # pragma: no cover - defensive guard for static analysis
+                raise AssertionError
+
+        assert error_message == "Model generation failed for test/fake-model: bad config"
+        assert mock_generate.call_count == 1
+        assert mock_detector.call_count == 1
+        assert retry_patch_entries == []
 
     def test_run_model_generation_backfills_peak_memory_from_mlx(self, test_image: Path) -> None:
         """MLX peak memory should backfill result objects that omit it."""

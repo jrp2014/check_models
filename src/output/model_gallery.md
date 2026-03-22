@@ -2,7 +2,7 @@
 
 <!-- markdownlint-disable MD013 -->
 
-_Generated on 2026-03-22 02:17:59 GMT_
+_Generated on 2026-03-22 21:43:07 GMT_
 
 A review-friendly artifact with image metadata, the source prompt, and full generated output for each model.
 
@@ -15,10 +15,10 @@ A review-friendly artifact with image metadata, the source prompt, and full gene
 - **Review watchlist:** 42 model(s) with breaking or lower-value output.
 - **Preflight compatibility:** 1 informational warning(s); do not treat these alone as run failures.
 - **Escalate only if:** they line up with unexpected TF/Flax/JAX imports, startup hangs, or backend/runtime crashes.
-- **Vs existing metadata:** better=7, neutral=1, worse=35 (baseline A 80/100).
-- **Quality signal frequency:** missing_sections=27, cutoff=21, trusted_hint_ignored=19, context_ignored=18, metadata_borrowing=12, repetitive=9.
-- **Runtime pattern:** decode dominates measured phase time (83%; 45/51 measured model(s)).
-- **Phase totals:** model load=98.63s, prompt prep=0.12s, decode=535.10s, cleanup=7.26s.
+- **Vs existing metadata:** better=8, neutral=1, worse=34 (baseline A 80/100).
+- **Quality signal frequency:** missing_sections=26, cutoff=20, trusted_hint_ignored=19, context_ignored=18, metadata_borrowing=13, title_length=8.
+- **Runtime pattern:** decode dominates measured phase time (82%; 46/51 measured model(s)).
+- **Phase totals:** model load=102.75s, prompt prep=0.12s, decode=500.08s, cleanup=6.14s.
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 - **Termination reasons:** completed=43, exception=8.
@@ -27,15 +27,15 @@ A review-friendly artifact with image metadata, the source prompt, and full gene
 
 ### Strong Candidates
 
-- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: 🏆 A (90/100) | Δ+10 | 175.3 tps
+- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: 🏆 A (90/100) | Δ+10 | 182.8 tps
 
 ### Watchlist
 
 - `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (0/100) | Δ-80 | harness
-- `prince-canuma/Florence-2-large-ft`: ❌ F (0/100) | Δ-80 | 357.3 tps | context ignored, degeneration, harness, missing sections
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (7/100) | Δ-73 | 21.7 tps | harness, missing sections
-- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: ❌ F (17/100) | Δ-63 | 5.7 tps | context ignored, harness
-- `microsoft/Phi-3.5-vision-instruct`: ✅ B (74/100) | Δ-6 | 55.3 tps | harness, metadata borrowing
+- `prince-canuma/Florence-2-large-ft`: ❌ F (0/100) | Δ-80 | 352.7 tps | context ignored, degeneration, harness, missing sections
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (7/100) | Δ-73 | 23.6 tps | harness, missing sections
+- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: ❌ F (17/100) | Δ-63 | 5.5 tps | context ignored, harness
+- `microsoft/Phi-3.5-vision-instruct`: ✅ B (74/100) | Δ-6 | 52.9 tps | harness, metadata borrowing
 
 ## 🚨 Failures by Package (Actionable)
 
@@ -146,7 +146,7 @@ A review-friendly artifact with image metadata, the source prompt, and full gene
 ## Quick Navigation
 
 - **Best cataloging quality:** [`mlx-community/gemma-3n-E4B-it-bf16`](#model-mlx-community-gemma-3n-e4b-it-bf16)
-- **Fastest generation:** [`prince-canuma/Florence-2-large-ft`](#model-prince-canuma-florence-2-large-ft)
+- **Fastest generation:** [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)
 - **Lowest memory footprint:** [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)
 - **Best balance:** [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)
 - **Failed models:** `microsoft/Florence-2-large-ft`, `mlx-community/InternVL3-8B-bf16`, `mlx-community/Molmo-7B-D-0924-bf16`, `mlx-community/Qwen3.5-27B-4bit`, `mlx-community/Qwen3.5-27B-mxfp8`, `mlx-community/Qwen3.5-35B-A3B-6bit`, +2 more
@@ -205,7 +205,7 @@ TypeError: can only concatenate str (not "NoneType") to str
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13592, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13600, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -237,7 +237,7 @@ ValueError: Failed to process inputs with error: can only concatenate str (not "
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13730, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13738, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -248,7 +248,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13617, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13625, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate str (not "NoneType") to str
 ```
@@ -286,7 +286,7 @@ ValueError: Model generation failed for microsoft/Florence-2-large-ft: Failed to
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13592, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13600, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -310,7 +310,7 @@ UnicodeDecodeError: 'utf-8' codec can't decode byte 0xab in position 10: invalid
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13730, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13738, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -321,7 +321,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13617, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13625, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for mlx-community/InternVL3-8B-bf16: 'utf-8' codec can't decode byte 0xab in position 10: invalid start byte
 ```
@@ -359,7 +359,7 @@ ValueError: Model generation failed for mlx-community/InternVL3-8B-bf16: 'utf-8'
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13592, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13600, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -383,7 +383,7 @@ UnicodeDecodeError: 'utf-8' codec can't decode byte 0xa1 in position 0: invalid 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13730, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13738, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -394,7 +394,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13617, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13625, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for mlx-community/Molmo-7B-D-0924-bf16: 'utf-8' codec can't decode byte 0xa1 in position 0: invalid start byte
 ```
@@ -469,7 +469,7 @@ ValueError: Only returning PyTorch tensors is currently supported.
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13592, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13600, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -501,7 +501,7 @@ ValueError: Failed to process inputs with error: Only returning PyTorch tensors 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13730, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13738, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -512,7 +512,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13617, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13625, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for mlx-community/Qwen3.5-27B-4bit: Failed to process inputs with error: Only returning PyTorch tensors is currently supported.
 ```
@@ -587,7 +587,7 @@ ValueError: Only returning PyTorch tensors is currently supported.
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13592, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13600, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -619,7 +619,7 @@ ValueError: Failed to process inputs with error: Only returning PyTorch tensors 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13730, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13738, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -630,7 +630,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13617, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13625, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for mlx-community/Qwen3.5-27B-mxfp8: Failed to process inputs with error: Only returning PyTorch tensors is currently supported.
 ```
@@ -705,7 +705,7 @@ ValueError: Only returning PyTorch tensors is currently supported.
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13592, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13600, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -737,7 +737,7 @@ ValueError: Failed to process inputs with error: Only returning PyTorch tensors 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13730, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13738, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -748,7 +748,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13617, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13625, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for mlx-community/Qwen3.5-35B-A3B-6bit: Failed to process inputs with error: Only returning PyTorch tensors is currently supported.
 ```
@@ -823,7 +823,7 @@ ValueError: Only returning PyTorch tensors is currently supported.
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13592, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13600, in _run_model_generation
     output: GenerationResult | SupportsGenerationResult = generate(
                                                           ~~~~~~~~^
         model=model,
@@ -855,7 +855,7 @@ ValueError: Failed to process inputs with error: Only returning PyTorch tensors 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13730, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13738, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -866,7 +866,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13617, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13625, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for mlx-community/Qwen3.5-35B-A3B-bf16: Failed to process inputs with error: Only returning PyTorch tensors is currently supported.
 ```
@@ -904,7 +904,7 @@ ValueError: Model generation failed for mlx-community/Qwen3.5-35B-A3B-bf16: Fail
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13356, in _prepare_generation_prompt
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13364, in _prepare_generation_prompt
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -914,7 +914,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13289, in _run_model_preflight_validators
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13297, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -923,14 +923,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13203, in _raise_preflight_error
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13211, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13730, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13738, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -941,13 +941,13 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13569, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13577, in _run_model_generation
     formatted_prompt = _prepare_generation_prompt(
         params=params,
     ...<3 lines>...
         phase_timer=phase_timer,
     )
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13399, in _prepare_generation_prompt
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13407, in _prepare_generation_prompt
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -969,8 +969,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=784 | text_est=467 | nontext_est=317 | gen=93 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 0.53s | Gen 0.82s | Total 1.62s
-**Throughput:** Prompt 7,884 TPS (784 tok) | Gen 322 TPS (93 tok)
+**Metrics:** Load 0.58s | Gen 0.82s | Total 1.65s
+**Throughput:** Prompt 7,548 TPS (784 tok) | Gen 326 TPS (93 tok)
 **Assessment:** ❌ F (26/100) | Δ-54 | Mostly echoes context without adding value
 **Review Status:** watchlist (context echo, metadata borrowing, missing sections)
 **Review:** F 26/100 | Missing sections (title, description, keywords); Context echo (30% overlap); ...
@@ -1005,8 +1005,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=533 | text_est=467 | nontext_est=66 | gen=28 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 0.60s | Gen 0.95s | Total 1.95s
-**Throughput:** Prompt 5,419 TPS (533 tok) | Gen 329 TPS (28 tok)
+**Metrics:** Load 0.60s | Gen 1.05s | Total 1.91s
+**Throughput:** Prompt 5,162 TPS (533 tok) | Gen 331 TPS (28 tok)
 **Assessment:** 🟠 D (46/100) | Δ-35 | Lacks visual description of image
 **Review Status:** watchlist (context ignored, missing sections)
 **Review:** D 46/100 | Context ignored (missing: Pedestrians, cross, footbridge, over, canal); Missing sections (title, description, keywords); ...
@@ -1038,8 +1038,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=529 | text_est=467 | nontext_est=62 | gen=500 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 0.57s | Gen 1.94s | Total 2.77s
-**Throughput:** Prompt 5,586 TPS (529 tok) | Gen 352 TPS (500 tok)
+**Metrics:** Load 0.55s | Gen 1.88s | Total 2.69s
+**Throughput:** Prompt 5,986 TPS (529 tok) | Gen 367 TPS (500 tok)
 **Assessment:** 🟠 D (40/100) | Δ-41 | Mostly echoes context without adding value
 **Review Status:** watchlist (context echo, metadata borrowing)
 **Review:** D 40/100 | Title length violation (11 words; expected 5-10); Description sentence violation (3; expected 1-2); ...
@@ -1104,8 +1104,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=1099 | text_est=467 | nontext_est=632 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect prompt-template, stop-token, and decode post-processing behavior.
 
-**Metrics:** Load 0.67s | Gen 1.97s | Total 2.90s
-**Throughput:** Prompt 9,384 TPS (1,099 tok) | Gen 357 TPS (500 tok)
+**Metrics:** Load 0.70s | Gen 1.98s | Total 2.94s
+**Throughput:** Prompt 9,518 TPS (1,099 tok) | Gen 353 TPS (500 tok)
 **Assessment:** ❌ F (0/100) | Δ-80 | Output too short to be useful
 **Review Status:** watchlist (context ignored, degeneration, harness, missing sections)
 **Review:** F 0/100 | ⚠️HARNESS:stop_token; Context ignored (missing: Pedestrians, cross, footbridge, over, canal); ...
@@ -1142,8 +1142,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=1556 | text_est=467 | nontext_est=1089 | gen=17 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 1.98s | Gen 2.12s | Total 4.37s
-**Throughput:** Prompt 1,364 TPS (1,556 tok) | Gen 30.8 TPS (17 tok)
+**Metrics:** Load 1.87s | Gen 2.15s | Total 4.27s
+**Throughput:** Prompt 1,365 TPS (1,556 tok) | Gen 29.6 TPS (17 tok)
 **Assessment:** ❌ F (17/100) | Δ-63 | Output lacks detail
 **Review Status:** watchlist (context ignored, missing sections)
 **Review:** F 17/100 | Context ignored (missing: Pedestrians, cross, footbridge, over, dusk); Missing sections (title, description, keywords); ...
@@ -1174,8 +1174,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=3123 | text_est=467 | nontext_est=2656 | gen=142 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 0.89s | Gen 2.38s | Total 3.54s
-**Throughput:** Prompt 2,829 TPS (3,123 tok) | Gen 175 TPS (142 tok)
+**Metrics:** Load 0.94s | Gen 2.29s | Total 3.50s
+**Throughput:** Prompt 2,984 TPS (3,123 tok) | Gen 183 TPS (142 tok)
 **Assessment:** 🏆 A (90/100) | Δ+10 | None identified
 **Review Status:** strong candidate for first-pass review
 **Review:** A 90/100 | No quality issues detected
@@ -1215,8 +1215,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=1350 | text_est=467 | nontext_est=883 | gen=123 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 0.84s | Gen 2.92s | Total 4.02s
-**Throughput:** Prompt 3,741 TPS (1,350 tok) | Gen 56.2 TPS (123 tok)
+**Metrics:** Load 0.85s | Gen 2.95s | Total 4.06s
+**Throughput:** Prompt 3,811 TPS (1,350 tok) | Gen 55.4 TPS (123 tok)
 **Assessment:** ✅ B (66/100) | Δ-14 | Mostly echoes context without adding value
 **Review Status:** watchlist (metadata borrowing)
 **Review:** B 66/100 | Nonvisual metadata borrowing
@@ -1253,8 +1253,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=1556 | text_est=467 | nontext_est=1089 | gen=42 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 1.73s | Gen 3.07s | Total 5.07s
-**Throughput:** Prompt 3,236 TPS (1,556 tok) | Gen 19.4 TPS (42 tok)
+**Metrics:** Load 1.72s | Gen 3.11s | Total 5.10s
+**Throughput:** Prompt 3,263 TPS (1,556 tok) | Gen 19.1 TPS (42 tok)
 **Assessment:** 🟡 C (52/100) | Δ-28 | Lacks visual description of image
 **Review Status:** watchlist (context ignored, metadata borrowing, missing sections)
 **Review:** C 52/100 | Context ignored (missing: Pedestrians, cross, footbridge, over, canal); Missing sections (title, description, keywords); ...
@@ -1287,8 +1287,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=784 | text_est=467 | nontext_est=317 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 0.59s | Gen 3.18s | Total 4.04s
-**Throughput:** Prompt 7,227 TPS (784 tok) | Gen 188 TPS (500 tok)
+**Metrics:** Load 0.57s | Gen 3.17s | Total 4.00s
+**Throughput:** Prompt 7,420 TPS (784 tok) | Gen 187 TPS (500 tok)
 **Assessment:** 🟡 C (64/100) | Δ-16 | Mostly echoes context without adding value
 **Review Status:** watchlist (context echo, cutoff, metadata borrowing)
 **Review:** C 64/100 | ⚠️REVIEW:cutoff; Title length violation (15 words; expected 5-10); ...
@@ -1356,8 +1356,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=1556 | text_est=467 | nontext_est=1089 | gen=9 | max=500 | stop=completed
 **Next action:** Inspect model repo config, chat template, and EOS settings.
 
-**Metrics:** Load 2.79s | Gen 3.50s | Total 6.54s
-**Throughput:** Prompt 1,054 TPS (1,556 tok) | Gen 5.67 TPS (9 tok)
+**Metrics:** Load 2.71s | Gen 3.54s | Total 6.52s
+**Throughput:** Prompt 1,050 TPS (1,556 tok) | Gen 5.54 TPS (9 tok)
 **Assessment:** ❌ F (17/100) | Δ-63 | Output lacks detail
 **Review Status:** watchlist (context ignored, harness)
 **Review:** F 17/100 | ⚠️HARNESS:prompt_template; Context ignored (missing: Pedestrians, cross, footbridge, over, canal); ...
@@ -1389,8 +1389,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=2312 | text_est=467 | nontext_est=1845 | gen=64 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 1.75s | Gen 4.39s | Total 6.62s
-**Throughput:** Prompt 1,246 TPS (2,312 tok) | Gen 30.9 TPS (64 tok)
+**Metrics:** Load 1.74s | Gen 4.12s | Total 6.11s
+**Throughput:** Prompt 1,421 TPS (2,312 tok) | Gen 31.5 TPS (64 tok)
 **Assessment:** 🏆 A (93/100) | Δ+13 | None identified
 **Review Status:** watchlist (context ignored)
 **Review:** A 93/100 | Context ignored (missing: Pedestrians, cross, footbridge, over, canal); Title length violation (2 words; expected 5-10); ...
@@ -1430,8 +1430,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=800 | text_est=467 | nontext_est=333 | gen=87 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 2.57s | Gen 4.53s | Total 7.36s
-**Throughput:** Prompt 612 TPS (800 tok) | Gen 31.0 TPS (87 tok)
+**Metrics:** Load 2.55s | Gen 4.42s | Total 7.24s
+**Throughput:** Prompt 654 TPS (800 tok) | Gen 31.1 TPS (87 tok)
 **Assessment:** ✅ B (65/100) | Δ-15 | Mostly echoes context without adding value
 **Review Status:** watchlist (worse than metadata baseline)
 **Review:** B 65/100 | No quality issues detected
@@ -1454,41 +1454,6 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ---
 
-<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
-
-### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
-
-**Verdict:** cutoff | user=avoid
-**Why:** token_cap, missing_sections, low_hint_overlap
-**Trusted hints:** ignores trusted hints | missing terms: Pedestrians, cross, footbridge, over, canal
-**Contract:** missing: title, description, keywords
-**Utility:** user=avoid | ignores trusted hints
-**Stack / owner:** owner=model
-**Token accounting:** prompt=637 | text_est=467 | nontext_est=170 | gen=500 | max=500 | stop=completed
-**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
-
-**Metrics:** Load 0.63s | Gen 4.74s | Total 5.63s
-**Throughput:** Prompt 1,893 TPS (637 tok) | Gen 129 TPS (500 tok)
-**Assessment:** ❌ F (0/100) | Δ-80 | Output too short to be useful
-**Review Status:** watchlist (context ignored, cutoff, missing sections)
-**Review:** F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: Pedestrians, cross, footbridge, over, canal); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> <row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1>
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- ⚠️REVIEW:cutoff
-- Context ignored (missing: Pedestrians, cross, footbridge, over, canal)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
-- Unknown tags: <row_1_col_1>
-
----
-
 <a id="model-mlx-community-pixtral-12b-8bit"></a>
 
 ### ✅ mlx-community/pixtral-12b-8bit
@@ -1502,8 +1467,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=3314 | text_est=467 | nontext_est=2847 | gen=97 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 1.72s | Gen 4.78s | Total 6.78s
-**Throughput:** Prompt 1,813 TPS (3,314 tok) | Gen 38.9 TPS (97 tok)
+**Metrics:** Load 1.77s | Gen 4.80s | Total 6.84s
+**Throughput:** Prompt 1,802 TPS (3,314 tok) | Gen 38.6 TPS (97 tok)
 **Assessment:** ❌ F (32/100) | Δ-48 | Mostly echoes context without adding value
 **Review Status:** watchlist (worse than metadata baseline)
 **Review:** F 32/100 | Title length violation (4 words; expected 5-10)
@@ -1529,6 +1494,98 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ---
 
+<a id="model-huggingfacetb-smolvlm-instruct"></a>
+
+### ✅ HuggingFaceTB/SmolVLM-Instruct
+
+**Verdict:** cutoff | user=avoid
+**Why:** token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap
+**Trusted hints:** ignores trusted hints | missing terms: Pedestrians, cross, footbridge, over, canal
+**Contract:** missing: title, description, keywords
+**Utility:** user=avoid | ignores trusted hints
+**Stack / owner:** owner=model
+**Token accounting:** prompt=1736 | text_est=467 | nontext_est=1269 | gen=500 | max=500 | stop=completed
+**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
+
+**Metrics:** Load 0.66s | Gen 4.82s | Total 5.72s
+**Throughput:** Prompt 4,328 TPS (1,736 tok) | Gen 128 TPS (500 tok)
+**Assessment:** 🟡 C (50/100) | Δ-30 | Lacks visual description of image
+**Review Status:** watchlist (context ignored, cutoff, missing sections, repetitive)
+**Review:** C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (unt); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- ⚠️REVIEW:cutoff
+- Repetitive output (unt)
+- Context ignored (missing: Pedestrians, cross, footbridge, over, canal)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
+
+---
+
+<a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
+
+### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
+
+**Verdict:** cutoff | user=avoid
+**Why:** token_cap, missing_sections, low_hint_overlap
+**Trusted hints:** ignores trusted hints | missing terms: Pedestrians, cross, footbridge, over, canal
+**Contract:** missing: title, description, keywords
+**Utility:** user=avoid | ignores trusted hints
+**Stack / owner:** owner=model
+**Token accounting:** prompt=637 | text_est=467 | nontext_est=170 | gen=500 | max=500 | stop=completed
+**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
+
+**Metrics:** Load 0.60s | Gen 4.83s | Total 5.68s
+**Throughput:** Prompt 1,872 TPS (637 tok) | Gen 127 TPS (500 tok)
+**Assessment:** ❌ F (0/100) | Δ-80 | Output too short to be useful
+**Review Status:** watchlist (context ignored, cutoff, missing sections)
+**Review:** F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: Pedestrians, cross, footbridge, over, canal); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> <row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1>
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- ⚠️REVIEW:cutoff
+- Context ignored (missing: Pedestrians, cross, footbridge, over, canal)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
+- Unknown tags: <row_1_col_1>
+
+---
+
 <a id="model-mlx-community-gemma-3n-e2b-4bit"></a>
 
 ### ✅ mlx-community/gemma-3n-E2B-4bit
@@ -1542,8 +1599,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=791 | text_est=467 | nontext_est=324 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 1.70s | Gen 4.83s | Total 6.80s
-**Throughput:** Prompt 2,452 TPS (791 tok) | Gen 121 TPS (500 tok)
+**Metrics:** Load 1.69s | Gen 4.84s | Total 6.80s
+**Throughput:** Prompt 2,489 TPS (791 tok) | Gen 121 TPS (500 tok)
 **Assessment:** ❌ F (4/100) | Δ-76 | Output too short to be useful
 **Review Status:** watchlist (context ignored, cutoff, metadata borrowing, missing sections)
 **Review:** F 4/100 | ⚠️REVIEW:cutoff; Context ignored (missing: Pedestrians, cross, footbridge, over, canal); ...
@@ -1566,6 +1623,103 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ---
 
+<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
+
+### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
+
+**Verdict:** clean | user=recommended
+**Why:** trusted_overlap
+**Trusted hints:** preserves trusted hints
+**Contract:** ok
+**Utility:** user=recommended | preserves trusted hints
+**Stack / owner:** owner=model
+**Token accounting:** prompt=3124 | text_est=467 | nontext_est=2657 | gen=130 | max=500 | stop=completed
+**Next action:** Treat as a model-quality limitation for this prompt and image.
+
+**Metrics:** Load 1.35s | Gen 5.03s | Total 6.65s
+**Throughput:** Prompt 1,390 TPS (3,124 tok) | Gen 56.3 TPS (130 tok)
+**Assessment:** ✅ B (68/100) | Δ-12 | Mostly echoes context without adding value
+**Review Status:** watchlist (worse than metadata baseline)
+**Review:** B 68/100 | No quality issues detected
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Title:
+> Footbridge over canal at urban waterside during twilight
+>
+> Description:
+> A bridge spans a canal lined with moored narrowboats, while pedestrians walk along the
+> towpath and others relax on the bank. A modern glass-clad office building reflects
+> golden evening light against a purple-tinged sky, and people gather on a nearby elevated
+> terrace.
+>
+> Keywords:
+> footbridge, canal, narrowboats, towpath, pedestrians, modern glass building, purple
+> twilight sky, golden evening light, elevated terrace, urban waterside, concrete bridge,
+> glass-clad structure, social gathering, canal bank, reflective windows, waterside scene
+<!-- markdownlint-enable MD028 MD049 -->
+
+**Quality Status:** no quality issues detected in this run
+
+---
+
+<a id="model-mlx-community-smolvlm-instruct-bf16"></a>
+
+### ✅ mlx-community/SmolVLM-Instruct-bf16
+
+**Verdict:** cutoff | user=avoid
+**Why:** token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap
+**Trusted hints:** ignores trusted hints | missing terms: Pedestrians, cross, footbridge, over, canal
+**Contract:** missing: title, description, keywords
+**Utility:** user=avoid | ignores trusted hints
+**Stack / owner:** owner=model
+**Token accounting:** prompt=1736 | text_est=467 | nontext_est=1269 | gen=500 | max=500 | stop=completed
+**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
+
+**Metrics:** Load 0.59s | Gen 5.06s | Total 5.91s
+**Throughput:** Prompt 4,108 TPS (1,736 tok) | Gen 122 TPS (500 tok)
+**Assessment:** 🟡 C (50/100) | Δ-30 | Lacks visual description of image
+**Review Status:** watchlist (context ignored, cutoff, missing sections, repetitive)
+**Review:** C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (unt); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- ⚠️REVIEW:cutoff
+- Repetitive output (unt)
+- Context ignored (missing: Pedestrians, cross, footbridge, over, canal)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
+
+---
+
 <a id="model-qnguyen3-nanollava"></a>
 
 ### ✅ qnguyen3/nanoLLaVA
@@ -1579,8 +1733,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=529 | text_est=467 | nontext_est=62 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 0.79s | Gen 5.02s | Total 6.06s
-**Throughput:** Prompt 4,894 TPS (529 tok) | Gen 111 TPS (500 tok)
+**Metrics:** Load 0.57s | Gen 5.06s | Total 5.89s
+**Throughput:** Prompt 4,762 TPS (529 tok) | Gen 110 TPS (500 tok)
 **Assessment:** 🟡 C (50/100) | Δ-30 | Lacks visual description of image
 **Review Status:** watchlist (context ignored, cutoff, missing sections, repetitive)
 **Review:** C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "painting glasses, guitar paint..."); ...
@@ -1640,63 +1794,6 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ---
 
-<a id="model-mlx-community-smolvlm-instruct-bf16"></a>
-
-### ✅ mlx-community/SmolVLM-Instruct-bf16
-
-**Verdict:** cutoff | user=avoid
-**Why:** token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap
-**Trusted hints:** ignores trusted hints | missing terms: Pedestrians, cross, footbridge, over, canal
-**Contract:** missing: title, description, keywords
-**Utility:** user=avoid | ignores trusted hints
-**Stack / owner:** owner=model
-**Token accounting:** prompt=1736 | text_est=467 | nontext_est=1269 | gen=500 | max=500 | stop=completed
-**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
-
-**Metrics:** Load 0.59s | Gen 5.05s | Total 5.91s
-**Throughput:** Prompt 4,068 TPS (1,736 tok) | Gen 122 TPS (500 tok)
-**Assessment:** 🟡 C (50/100) | Δ-30 | Lacks visual description of image
-**Review Status:** watchlist (context ignored, cutoff, missing sections, repetitive)
-**Review:** C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (unt); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- ⚠️REVIEW:cutoff
-- Repetitive output (unt)
-- Context ignored (missing: Pedestrians, cross, footbridge, over, canal)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
-
----
-
 <a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
 
 ### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
@@ -1710,8 +1807,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=3124 | text_est=467 | nontext_est=2657 | gen=128 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 1.34s | Gen 5.09s | Total 6.70s
-**Throughput:** Prompt 1,185 TPS (3,124 tok) | Gen 64.5 TPS (128 tok)
+**Metrics:** Load 1.33s | Gen 5.08s | Total 6.68s
+**Throughput:** Prompt 1,380 TPS (3,124 tok) | Gen 54.4 TPS (128 tok)
 **Assessment:** ✅ B (68/100) | Δ-12 | Mostly echoes context without adding value
 **Review Status:** watchlist (worse than metadata baseline)
 **Review:** B 68/100 | Description sentence violation (3; expected 1-2)
@@ -1739,186 +1836,6 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ---
 
-<a id="model-huggingfacetb-smolvlm-instruct"></a>
-
-### ✅ HuggingFaceTB/SmolVLM-Instruct
-
-**Verdict:** cutoff | user=avoid
-**Why:** token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap
-**Trusted hints:** ignores trusted hints | missing terms: Pedestrians, cross, footbridge, over, canal
-**Contract:** missing: title, description, keywords
-**Utility:** user=avoid | ignores trusted hints
-**Stack / owner:** owner=model
-**Token accounting:** prompt=1736 | text_est=467 | nontext_est=1269 | gen=500 | max=500 | stop=completed
-**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
-
-**Metrics:** Load 0.63s | Gen 5.10s | Total 5.97s
-**Throughput:** Prompt 4,038 TPS (1,736 tok) | Gen 121 TPS (500 tok)
-**Assessment:** 🟡 C (50/100) | Δ-30 | Lacks visual description of image
-**Review Status:** watchlist (context ignored, cutoff, missing sections, repetitive)
-**Review:** C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (unt); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- ⚠️REVIEW:cutoff
-- Repetitive output (unt)
-- Context ignored (missing: Pedestrians, cross, footbridge, over, canal)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
-
----
-
-<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
-
-### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
-
-**Verdict:** clean | user=recommended
-**Why:** trusted_overlap
-**Trusted hints:** preserves trusted hints
-**Contract:** ok
-**Utility:** user=recommended | preserves trusted hints
-**Stack / owner:** owner=model
-**Token accounting:** prompt=3124 | text_est=467 | nontext_est=2657 | gen=130 | max=500 | stop=completed
-**Next action:** Treat as a model-quality limitation for this prompt and image.
-
-**Metrics:** Load 1.37s | Gen 5.32s | Total 6.96s
-**Throughput:** Prompt 1,136 TPS (3,124 tok) | Gen 62.1 TPS (130 tok)
-**Assessment:** ✅ B (68/100) | Δ-12 | Mostly echoes context without adding value
-**Review Status:** watchlist (worse than metadata baseline)
-**Review:** B 68/100 | No quality issues detected
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Title:
-> Footbridge over canal at urban waterside during twilight
->
-> Description:
-> A bridge spans a canal lined with moored narrowboats, while pedestrians walk along the
-> towpath and others relax on the bank. A modern glass-clad office building reflects
-> golden evening light against a purple-tinged sky, and people gather on a nearby elevated
-> terrace.
->
-> Keywords:
-> footbridge, canal, narrowboats, towpath, pedestrians, modern glass building, purple
-> twilight sky, golden evening light, elevated terrace, urban waterside, concrete bridge,
-> glass-clad structure, social gathering, canal bank, reflective windows, waterside scene
-<!-- markdownlint-enable MD028 MD049 -->
-
-**Quality Status:** no quality issues detected in this run
-
----
-
-<a id="model-jqlive-kimi-vl-a3b-thinking-2506-6bit"></a>
-
-### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
-
-**Verdict:** cutoff | user=avoid
-**Why:** token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap
-**Trusted hints:** ignores trusted hints | missing terms: Pedestrians, cross, footbridge, over, canal
-**Contract:** missing: title, description, keywords
-**Utility:** user=avoid | ignores trusted hints
-**Stack / owner:** owner=model
-**Token accounting:** prompt=1522 | text_est=467 | nontext_est=1055 | gen=500 | max=500 | stop=completed
-**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
-
-**Metrics:** Load 1.97s | Gen 5.41s | Total 7.65s
-**Throughput:** Prompt 1,769 TPS (1,522 tok) | Gen 124 TPS (500 tok)
-**Assessment:** ❌ F (25/100) | Δ-55 | Lacks visual description of image
-**Review Status:** watchlist (context ignored, cutoff, missing sections, repetitive)
-**Review:** F 25/100 | ⚠️REVIEW:cutoff; Repetitive output (因此，所以可打印表图1.); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> 问题。因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1.
-> 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1.
-> 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1.
-> 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1.
-> 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1.
-> 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1.
-> 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1.
-> 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1.
-> 因此，所以可打印表图1. 因此，所以可打印表图1
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- ⚠️REVIEW:cutoff
-- Repetitive output (因此，所以可打印表图1.)
-- Context ignored (missing: Pedestrians, cross, footbridge, over, canal)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
-
----
-
-<a id="model-mlx-community-llava-v16-mistral-7b-8bit"></a>
-
-### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
-
-**Verdict:** model_shortcoming | user=avoid
-**Why:** metadata_borrowing, contract, trusted_overlap, metadata_terms
-**Trusted hints:** preserves trusted hints | nonvisual metadata reused
-**Contract:** missing: title, description, keywords
-**Utility:** user=avoid | preserves trusted hints | metadata borrowing
-**Stack / owner:** owner=model
-**Token accounting:** prompt=2732 | text_est=467 | nontext_est=2265 | gen=182 | max=500 | stop=completed
-**Next action:** Treat as a model-quality limitation for this prompt and image.
-
-**Metrics:** Load 0.89s | Gen 5.93s | Total 7.08s
-**Throughput:** Prompt 1,133 TPS (2,732 tok) | Gen 61.5 TPS (182 tok)
-**Assessment:** 🟡 C (53/100) | Δ-27 | Mostly echoes context without adding value
-**Review Status:** watchlist (metadata borrowing, missing sections)
-**Review:** C 53/100 | Missing sections (title, description, keywords); Nonvisual metadata borrowing
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> The image is a photograph taken during the evening. It captures a footbridge over a
-> canal, with a modern glass building reflecting the golden light of the setting sun
-> against a purple twilight sky. People are walking along the towpath, relaxing on the
-> bank, and socializing at a nearby restaurant. Moored boats line the canal, completing
-> the lively evening scene as people go about their daily lives, commuting or enjoying
-> leisure time. The photograph is taken from a low angle, looking up towards the sky,
-> emphasizing the height of the footbridge and the towering glass building. The lighting
-> is soft and diffused, with the warm tones of the setting sun contrasting against the
-> cooler tones of the twilight sky. The overall mood of the image is serene and peaceful,
-> capturing the beauty of an urban waterside area at dusk.
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- Missing sections (title, description, keywords)
-- Nonvisual metadata borrowing
-
----
-
 <a id="model-mlx-community-kimi-vl-a3b-thinking-8bit"></a>
 
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-8bit
@@ -1932,8 +1849,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=1522 | text_est=467 | nontext_est=1055 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 2.18s | Gen 6.06s | Total 8.63s
-**Throughput:** Prompt 1,722 TPS (1,522 tok) | Gen 108 TPS (500 tok)
+**Metrics:** Load 2.12s | Gen 5.76s | Total 8.15s
+**Throughput:** Prompt 1,793 TPS (1,522 tok) | Gen 114 TPS (500 tok)
 **Assessment:** 🟡 C (50/100) | Δ-30 | Lacks visual description of image
 **Review Status:** watchlist (context ignored, cutoff, missing sections, repetitive)
 **Review:** C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "use only details that..."); ...
@@ -1985,6 +1902,89 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ---
 
+<a id="model-mlx-community-llava-v16-mistral-7b-8bit"></a>
+
+### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
+
+**Verdict:** model_shortcoming | user=avoid
+**Why:** metadata_borrowing, contract, trusted_overlap, metadata_terms
+**Trusted hints:** preserves trusted hints | nonvisual metadata reused
+**Contract:** missing: title, description, keywords
+**Utility:** user=avoid | preserves trusted hints | metadata borrowing
+**Stack / owner:** owner=model
+**Token accounting:** prompt=2732 | text_est=467 | nontext_est=2265 | gen=182 | max=500 | stop=completed
+**Next action:** Treat as a model-quality limitation for this prompt and image.
+
+**Metrics:** Load 0.90s | Gen 5.78s | Total 6.95s
+**Throughput:** Prompt 1,210 TPS (2,732 tok) | Gen 61.2 TPS (182 tok)
+**Assessment:** 🟡 C (53/100) | Δ-27 | Mostly echoes context without adding value
+**Review Status:** watchlist (metadata borrowing, missing sections)
+**Review:** C 53/100 | Missing sections (title, description, keywords); Nonvisual metadata borrowing
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> The image is a photograph taken during the evening. It captures a footbridge over a
+> canal, with a modern glass building reflecting the golden light of the setting sun
+> against a purple twilight sky. People are walking along the towpath, relaxing on the
+> bank, and socializing at a nearby restaurant. Moored boats line the canal, completing
+> the lively evening scene as people go about their daily lives, commuting or enjoying
+> leisure time. The photograph is taken from a low angle, looking up towards the sky,
+> emphasizing the height of the footbridge and the towering glass building. The lighting
+> is soft and diffused, with the warm tones of the setting sun contrasting against the
+> cooler tones of the twilight sky. The overall mood of the image is serene and peaceful,
+> capturing the beauty of an urban waterside area at dusk.
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Missing sections (title, description, keywords)
+- Nonvisual metadata borrowing
+
+---
+
+<a id="model-jqlive-kimi-vl-a3b-thinking-2506-6bit"></a>
+
+### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
+
+**Verdict:** cutoff | user=avoid
+**Why:** token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap
+**Trusted hints:** ignores trusted hints | missing terms: Pedestrians, cross, footbridge, over, canal
+**Contract:** missing: title, description, keywords
+**Utility:** user=avoid | ignores trusted hints
+**Stack / owner:** owner=model
+**Token accounting:** prompt=1522 | text_est=467 | nontext_est=1055 | gen=500 | max=500 | stop=completed
+**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
+
+**Metrics:** Load 2.07s | Gen 5.93s | Total 8.37s
+**Throughput:** Prompt 1,702 TPS (1,522 tok) | Gen 110 TPS (500 tok)
+**Assessment:** ❌ F (25/100) | Δ-55 | Lacks visual description of image
+**Review Status:** watchlist (context ignored, cutoff, missing sections, repetitive)
+**Review:** F 25/100 | ⚠️REVIEW:cutoff; Repetitive output (因此，所以可打印表图1.); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> 问题。因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1.
+> 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1.
+> 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1.
+> 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1.
+> 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1.
+> 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1.
+> 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1.
+> 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1. 因此，所以可打印表图1.
+> 因此，所以可打印表图1. 因此，所以可打印表图1
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- ⚠️REVIEW:cutoff
+- Repetitive output (因此，所以可打印表图1.)
+- Context ignored (missing: Pedestrians, cross, footbridge, over, canal)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
+
+---
+
 <a id="model-mlx-community-gemma-3-27b-it-qat-8bit"></a>
 
 ### ✅ mlx-community/gemma-3-27b-it-qat-8bit
@@ -1998,8 +1998,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=800 | text_est=467 | nontext_est=333 | gen=89 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 3.78s | Gen 7.17s | Total 11.23s
-**Throughput:** Prompt 544 TPS (800 tok) | Gen 16.8 TPS (89 tok)
+**Metrics:** Load 3.63s | Gen 6.92s | Total 10.82s
+**Throughput:** Prompt 565 TPS (800 tok) | Gen 17.5 TPS (89 tok)
 **Assessment:** 🟡 C (58/100) | Δ-22 | Mostly echoes context without adding value
 **Review Status:** watchlist (trusted hint degraded)
 **Review:** C 58/100 | No quality issues detected
@@ -2025,6 +2025,41 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ---
 
+<a id="model-mlx-community-kimi-vl-a3b-thinking-2506-bf16"></a>
+
+### ✅ mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
+
+**Verdict:** cutoff | user=avoid
+**Why:** token_cap, missing_sections, low_hint_overlap, degeneration
+**Trusted hints:** ignores trusted hints | missing terms: Pedestrians, cross, footbridge, over, canal
+**Contract:** missing: title, description, keywords
+**Utility:** user=avoid | ignores trusted hints
+**Stack / owner:** owner=model
+**Token accounting:** prompt=1522 | text_est=467 | nontext_est=1055 | gen=500 | max=500 | stop=completed
+**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
+
+**Metrics:** Load 3.23s | Gen 7.81s | Total 11.30s
+**Throughput:** Prompt 1,772 TPS (1,522 tok) | Gen 78.6 TPS (500 tok)
+**Assessment:** ❌ F (0/100) | Δ-80 | Output too short to be useful
+**Review Status:** watchlist (context ignored, cutoff, degeneration, missing sections)
+**Review:** F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: Pedestrians, cross, footbridge, over, canal); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> 0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- ⚠️REVIEW:cutoff
+- Context ignored (missing: Pedestrians, cross, footbridge, over, canal)
+- Output degeneration (character_loop: '0.' repeated)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
+
+---
+
 <a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
 
 ### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
@@ -2038,8 +2073,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=2626 | text_est=467 | nontext_est=2159 | gen=93 | max=500 | stop=completed
 **Next action:** Inspect prompt-template, stop-token, and decode post-processing behavior.
 
-**Metrics:** Load 2.27s | Gen 8.19s | Total 10.74s
-**Throughput:** Prompt 763 TPS (2,626 tok) | Gen 21.7 TPS (93 tok)
+**Metrics:** Load 2.10s | Gen 7.88s | Total 10.26s
+**Throughput:** Prompt 755 TPS (2,626 tok) | Gen 23.6 TPS (93 tok)
 **Assessment:** ❌ F (7/100) | Δ-73 | Output too short to be useful
 **Review Status:** watchlist (harness, missing sections)
 **Review:** F 7/100 | ⚠️HARNESS:encoding; Missing sections (description, keywords); ...
@@ -2071,8 +2106,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=799 | text_est=467 | nontext_est=332 | gen=355 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 2.52s | Gen 8.24s | Total 11.03s
-**Throughput:** Prompt 1,707 TPS (799 tok) | Gen 48.0 TPS (355 tok)
+**Metrics:** Load 2.47s | Gen 8.19s | Total 10.94s
+**Throughput:** Prompt 1,780 TPS (799 tok) | Gen 48.3 TPS (355 tok)
 **Assessment:** 🏆 A (95/100) | Δ+15 | None identified
 **Review Status:** watchlist (missing sections)
 **Review:** A 95/100 | Excessive verbosity; Missing sections (title, description, keywords)
@@ -2122,41 +2157,6 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ---
 
-<a id="model-mlx-community-kimi-vl-a3b-thinking-2506-bf16"></a>
-
-### ✅ mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
-
-**Verdict:** cutoff | user=avoid
-**Why:** token_cap, missing_sections, low_hint_overlap, degeneration
-**Trusted hints:** ignores trusted hints | missing terms: Pedestrians, cross, footbridge, over, canal
-**Contract:** missing: title, description, keywords
-**Utility:** user=avoid | ignores trusted hints
-**Stack / owner:** owner=model
-**Token accounting:** prompt=1522 | text_est=467 | nontext_est=1055 | gen=500 | max=500 | stop=completed
-**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
-
-**Metrics:** Load 3.40s | Gen 8.26s | Total 11.96s
-**Throughput:** Prompt 1,523 TPS (1,522 tok) | Gen 76.1 TPS (500 tok)
-**Assessment:** ❌ F (0/100) | Δ-80 | Output too short to be useful
-**Review Status:** watchlist (context ignored, cutoff, degeneration, missing sections)
-**Review:** F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: Pedestrians, cross, footbridge, over, canal); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> 0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- ⚠️REVIEW:cutoff
-- Context ignored (missing: Pedestrians, cross, footbridge, over, canal)
-- Output degeneration (character_loop: '0.' repeated)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
-
----
-
 <a id="model-microsoft-phi-35-vision-instruct"></a>
 
 ### ✅ microsoft/Phi-3.5-vision-instruct
@@ -2170,8 +2170,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=1350 | text_est=467 | nontext_est=883 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect prompt-template, stop-token, and decode post-processing behavior.
 
-**Metrics:** Load 0.88s | Gen 9.78s | Total 10.92s
-**Throughput:** Prompt 3,720 TPS (1,350 tok) | Gen 55.3 TPS (500 tok)
+**Metrics:** Load 0.96s | Gen 10.21s | Total 11.48s
+**Throughput:** Prompt 3,796 TPS (1,350 tok) | Gen 52.9 TPS (500 tok)
 **Assessment:** ✅ B (74/100) | Δ-6 | None identified
 **Review Status:** watchlist (harness, metadata borrowing)
 **Review:** B 74/100 | ⚠️HARNESS:stop_token; Keyword count violation (45; expected 10-18); ...
@@ -2240,72 +2240,6 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ---
 
-<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
-
-### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
-
-**Verdict:** harness | user=avoid
-**Why:** harness:stop_token, utility_delta_positive, metadata_terms
-**Trusted hints:** improves trusted hints | nonvisual metadata reused
-**Contract:** keywords=34 | keyword duplication=0.35
-**Utility:** user=avoid | improves trusted hints | metadata borrowing
-**Stack / owner:** owner=mlx-vlm | harness=stop_token
-**Token accounting:** prompt=1845 | text_est=467 | nontext_est=1378 | gen=464 | max=500 | stop=completed
-**Next action:** Inspect prompt-template, stop-token, and decode post-processing behavior.
-
-**Metrics:** Load 4.80s | Gen 11.35s | Total 16.42s
-**Throughput:** Prompt 1,030 TPS (1,845 tok) | Gen 52.4 TPS (464 tok)
-**Assessment:** 🏆 A (92/100) | Δ+12 | None identified
-**Review Status:** watchlist (harness, metadata borrowing)
-**Review:** A 92/100 | ⚠️HARNESS:stop_token; Keyword count violation (34; expected 10-18); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Let's tackle this step by step. First, the title needs to be concrete and factual, 5-10
-> words. The image is a dusk scene at a canal with a modern glass building, people
-> walking, boats. So maybe "Dusk Canal Walkway with Modern Glass Building and Pedestrians"
-> – wait, check length: 8 words, good.
->
-> Next, description: Need 1-2 factual sentences. Main elements: Dusk setting, canal,
-> modern glass building reflecting sunset, people walking on footbridge, boats in canal.
-> Let's draft: "Dusk scene at a canal with a modern glass building reflecting golden
-> sunlight on a purple sky. Pedestrians walk on a footbridge over the canal, while boats
-> are moored in the water below." That covers setting, building, people, boats – all
-> visible.
->
-> Keywords: 10-18 unique terms. Visible elements: Dusk, canal, modern glass building,
-> purple sky, golden sunlight, footbridge, pedestrians, moored boats, water, twilight,
-> urban waterside, people walking, canal walkway, modern architecture, sunset reflection.
-> Let's pick the most distinct: Dusk, canal, modern glass building, purple sky, golden
-> sunlight, footbridge, pedestrians, moored boats, water, twilight, urban waterside, canal
-> walkway, modern architecture, sunset reflection. Wait, count: 13, good. Make sure
-> they're all visible.
->
-> Check rules: No speculation, only visible details. Title is factual. Description is 1-2
-> sentences, covers main elements. Keywords are unique and based on visible content.
-> &lt;/think&gt;
->
-> Title: Dusk Canal Walkway with Modern Glass Building and Pedestrians
->
-> Description: Dusk scene at a canal with a modern glass building reflecting golden
-> sunlight on a purple sky. Pedestrians walk on a footbridge over the canal, while boats
-> are moored in the water below.
->
-> Keywords: Dusk, canal, modern glass building, purple sky, golden sunlight, footbridge,
-> pedestrians, moored boats, water, twilight, urban waterside, canal walkway, modern
-> architecture, sunset reflection
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- ⚠️HARNESS:stop_token
-- Keyword count violation (34; expected 10-18)
-- Keyword duplication (35% duplicated terms)
-- Nonvisual metadata borrowing
-- token_leak:&lt;/think&gt;
-
----
-
 <a id="model-mlx-community-paligemma2-3b-pt-896-4bit"></a>
 
 ### ✅ mlx-community/paligemma2-3b-pt-896-4bit
@@ -2319,8 +2253,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=4628 | text_est=467 | nontext_est=4161 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 1.43s | Gen 14.25s | Total 15.95s
-**Throughput:** Prompt 3,933 TPS (4,628 tok) | Gen 40.2 TPS (500 tok)
+**Metrics:** Load 1.41s | Gen 13.32s | Total 15.00s
+**Throughput:** Prompt 3,881 TPS (4,628 tok) | Gen 43.4 TPS (500 tok)
 **Assessment:** 🟡 C (64/100) | Δ-16 | Lacks visual description of image
 **Review Status:** watchlist (context ignored, cutoff, missing sections, repetitive)
 **Review:** C 64/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "- output only the..."); ...
@@ -2400,8 +2334,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=6643 | text_est=467 | nontext_est=6176 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 1.32s | Gen 15.93s | Total 17.54s
-**Throughput:** Prompt 881 TPS (6,643 tok) | Gen 63.8 TPS (500 tok)
+**Metrics:** Load 1.28s | Gen 13.85s | Total 15.39s
+**Throughput:** Prompt 1,172 TPS (6,643 tok) | Gen 65.6 TPS (500 tok)
 **Assessment:** ✅ B (73/100) | Δ-7 | Missing requested structure
 **Review Status:** watchlist (cutoff, missing sections, reasoning leak)
 **Review:** B 73/100 | ⚠️REVIEW:cutoff; Missing sections (title, description, keywords); ...
@@ -2451,38 +2385,69 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ---
 
-<a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
+<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
 
-### ✅ mlx-community/Idefics3-8B-Llama3-bf16
+### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
 
-**Verdict:** cutoff | user=avoid
-**Why:** token_cap, missing_sections, low_hint_overlap
-**Trusted hints:** ignores trusted hints | missing terms: Pedestrians, cross, footbridge, over, canal
-**Contract:** missing: title, description, keywords
-**Utility:** user=avoid | ignores trusted hints
-**Stack / owner:** owner=model
-**Token accounting:** prompt=2811 | text_est=467 | nontext_est=2344 | gen=500 | max=500 | stop=completed
-**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
+**Verdict:** harness | user=avoid
+**Why:** harness:stop_token, utility_delta_positive, metadata_terms
+**Trusted hints:** improves trusted hints | nonvisual metadata reused
+**Contract:** keywords=34 | keyword duplication=0.35
+**Utility:** user=avoid | improves trusted hints | metadata borrowing
+**Stack / owner:** owner=mlx-vlm | harness=stop_token
+**Token accounting:** prompt=1845 | text_est=467 | nontext_est=1378 | gen=464 | max=500 | stop=completed
+**Next action:** Inspect prompt-template, stop-token, and decode post-processing behavior.
 
-**Metrics:** Load 1.98s | Gen 18.11s | Total 20.40s
-**Throughput:** Prompt 2,297 TPS (2,811 tok) | Gen 30.6 TPS (500 tok)
-**Assessment:** ❌ F (0/100) | Δ-80 | Output too short to be useful
-**Review Status:** watchlist (context ignored, cutoff, missing sections)
-**Review:** F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: Pedestrians, cross, footbridge, over, canal); ...
+**Metrics:** Load 10.46s | Gen 14.67s | Total 25.41s
+**Throughput:** Prompt 309 TPS (1,845 tok) | Gen 58.6 TPS (464 tok)
+**Assessment:** 🏆 A (92/100) | Δ+12 | None identified
+**Review Status:** watchlist (harness, metadata borrowing)
+**Review:** A 92/100 | ⚠️HARNESS:stop_token; Keyword count violation (34; expected 10-18); ...
 
 <!-- markdownlint-disable MD028 MD049 -->
 >
-> <fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image>
+> Let's tackle this step by step. First, the title needs to be concrete and factual, 5-10
+> words. The image is a dusk scene at a canal with a modern glass building, people
+> walking, boats. So maybe "Dusk Canal Walkway with Modern Glass Building and Pedestrians"
+> – wait, check length: 8 words, good.
+>
+> Next, description: Need 1-2 factual sentences. Main elements: Dusk setting, canal,
+> modern glass building reflecting sunset, people walking on footbridge, boats in canal.
+> Let's draft: "Dusk scene at a canal with a modern glass building reflecting golden
+> sunlight on a purple sky. Pedestrians walk on a footbridge over the canal, while boats
+> are moored in the water below." That covers setting, building, people, boats – all
+> visible.
+>
+> Keywords: 10-18 unique terms. Visible elements: Dusk, canal, modern glass building,
+> purple sky, golden sunlight, footbridge, pedestrians, moored boats, water, twilight,
+> urban waterside, people walking, canal walkway, modern architecture, sunset reflection.
+> Let's pick the most distinct: Dusk, canal, modern glass building, purple sky, golden
+> sunlight, footbridge, pedestrians, moored boats, water, twilight, urban waterside, canal
+> walkway, modern architecture, sunset reflection. Wait, count: 13, good. Make sure
+> they're all visible.
+>
+> Check rules: No speculation, only visible details. Title is factual. Description is 1-2
+> sentences, covers main elements. Keywords are unique and based on visible content.
+> &lt;/think&gt;
+>
+> Title: Dusk Canal Walkway with Modern Glass Building and Pedestrians
+>
+> Description: Dusk scene at a canal with a modern glass building reflecting golden
+> sunlight on a purple sky. Pedestrians walk on a footbridge over the canal, while boats
+> are moored in the water below.
+>
+> Keywords: Dusk, canal, modern glass building, purple sky, golden sunlight, footbridge,
+> pedestrians, moored boats, water, twilight, urban waterside, canal walkway, modern
+> architecture, sunset reflection
 <!-- markdownlint-enable MD028 MD049 -->
 
 ⚠️ **Quality Warnings:**
 
-- ⚠️REVIEW:cutoff
-- Context ignored (missing: Pedestrians, cross, footbridge, over, canal)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
-- Unknown tags: <fake_token_around_image>
+- ⚠️HARNESS:stop_token
+- Keyword count violation (34; expected 10-18)
+- Keyword duplication (35% duplicated terms)
+- Nonvisual metadata borrowing
+- token_leak:&lt;/think&gt;
 
 ---
 
@@ -2499,8 +2464,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=6643 | text_est=467 | nontext_est=6176 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 1.44s | Gen 18.90s | Total 20.61s
-**Throughput:** Prompt 891 TPS (6,643 tok) | Gen 45.9 TPS (500 tok)
+**Metrics:** Load 1.38s | Gen 15.49s | Total 17.14s
+**Throughput:** Prompt 1,192 TPS (6,643 tok) | Gen 53.4 TPS (500 tok)
 **Assessment:** 🏆 A (84/100) | Δ+4 | None identified
 **Review Status:** watchlist (cutoff, metadata borrowing, missing sections, reasoning leak)
 **Review:** A 84/100 | ⚠️REVIEW:cutoff; Excessive verbosity; ...
@@ -2563,6 +2528,41 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ---
 
+<a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
+
+### ✅ mlx-community/Idefics3-8B-Llama3-bf16
+
+**Verdict:** cutoff | user=avoid
+**Why:** token_cap, missing_sections, low_hint_overlap
+**Trusted hints:** ignores trusted hints | missing terms: Pedestrians, cross, footbridge, over, canal
+**Contract:** missing: title, description, keywords
+**Utility:** user=avoid | ignores trusted hints
+**Stack / owner:** owner=model
+**Token accounting:** prompt=2811 | text_est=467 | nontext_est=2344 | gen=500 | max=500 | stop=completed
+**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
+
+**Metrics:** Load 1.90s | Gen 17.50s | Total 19.68s
+**Throughput:** Prompt 2,423 TPS (2,811 tok) | Gen 31.6 TPS (500 tok)
+**Assessment:** ❌ F (0/100) | Δ-80 | Output too short to be useful
+**Review Status:** watchlist (context ignored, cutoff, missing sections)
+**Review:** F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: Pedestrians, cross, footbridge, over, canal); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> <fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image>
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- ⚠️REVIEW:cutoff
+- Context ignored (missing: Pedestrians, cross, footbridge, over, canal)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
+- Unknown tags: <fake_token_around_image>
+
+---
+
 <a id="model-mlx-community-apriel-15-15b-thinker-6bit-mlx"></a>
 
 ### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
@@ -2576,8 +2576,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=3405 | text_est=467 | nontext_est=2938 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 1.64s | Gen 19.11s | Total 21.01s
-**Throughput:** Prompt 1,441 TPS (3,405 tok) | Gen 30.7 TPS (500 tok)
+**Metrics:** Load 1.66s | Gen 19.29s | Total 21.25s
+**Throughput:** Prompt 1,410 TPS (3,405 tok) | Gen 30.5 TPS (500 tok)
 **Assessment:** 🏆 A (85/100) | Δ+5 | None identified
 **Review Status:** watchlist (cutoff, missing sections, reasoning leak)
 **Review:** A 85/100 | ⚠️REVIEW:cutoff; Missing sections (title, keywords); ...
@@ -2640,8 +2640,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=16746 | text_est=467 | nontext_est=16279 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 0.76s | Gen 20.21s | Total 21.24s
-**Throughput:** Prompt 1,230 TPS (16,746 tok) | Gen 86.8 TPS (500 tok)
+**Metrics:** Load 0.74s | Gen 20.06s | Total 21.06s
+**Throughput:** Prompt 1,240 TPS (16,746 tok) | Gen 86.5 TPS (500 tok)
 **Assessment:** 🟡 C (64/100) | Δ-16 | Mostly echoes context without adding value
 **Review Status:** watchlist (context echo, cutoff)
 **Review:** C 64/100 | ⚠️REVIEW:cutoff; Title length violation (50 words; expected 5-10); ...
@@ -2692,43 +2692,6 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ---
 
-<a id="model-meta-llama-llama-32-11b-vision-instruct"></a>
-
-### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
-
-**Verdict:** model_shortcoming | user=avoid
-**Why:** metadata_borrowing, contract, utility:D, trusted_overlap, metadata_terms
-**Trusted hints:** preserves trusted hints | nonvisual metadata reused
-**Contract:** missing: title, description, keywords
-**Utility:** user=avoid | preserves trusted hints | metadata borrowing
-**Stack / owner:** owner=model
-**Token accounting:** prompt=501 | text_est=467 | nontext_est=34 | gen=100 | max=500 | stop=completed
-**Next action:** Treat as a model-quality limitation for this prompt and image.
-
-**Metrics:** Load 2.23s | Gen 23.55s | Total 26.06s
-**Throughput:** Prompt 264 TPS (501 tok) | Gen 4.71 TPS (100 tok)
-**Assessment:** 🟠 D (47/100) | Δ-33 | Mostly echoes context without adding value
-**Review Status:** watchlist (metadata borrowing, missing sections)
-**Review:** D 47/100 | Missing sections (title, description, keywords); Nonvisual metadata borrowing
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Canal at Dusk in a Vibrant Urban Waterside Area
->
-> The image depicts a canal at dusk in a vibrant urban waterside area, with a modern glass
-> building reflecting the golden light of the setting sun against a purple twilight sky.
-> The scene is bustling with people walking along the towpath, relaxing on the bank, and
-> socializing at a nearby restaurant. Moored boats line the canal, adding to the lively
-> atmosphere as people go about their daily lives, commuting or enjoying leisure time.
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- Missing sections (title, description, keywords)
-- Nonvisual metadata borrowing
-
----
-
 <a id="model-mlx-community-qwen3-vl-2b-thinking-bf16"></a>
 
 ### ✅ mlx-community/Qwen3-VL-2B-Thinking-bf16
@@ -2742,8 +2705,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=16748 | text_est=467 | nontext_est=16281 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 0.81s | Gen 24.97s | Total 26.05s
-**Throughput:** Prompt 947 TPS (16,748 tok) | Gen 77.8 TPS (500 tok)
+**Metrics:** Load 0.81s | Gen 21.44s | Total 22.51s
+**Throughput:** Prompt 1,260 TPS (16,748 tok) | Gen 68.5 TPS (500 tok)
 **Assessment:** 🏆 A (82/100) | Δ+2 | None identified
 **Review Status:** watchlist (cutoff, harness, long context, missing sections, reasoning leak, repetitive)
 **Review:** A 82/100 | ⚠️REVIEW:cutoff; ⚠️HARNESS:long_context; ...
@@ -2791,6 +2754,101 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ---
 
+<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
+
+### ✅ mlx-community/Molmo-7B-D-0924-8bit
+
+**Verdict:** model_shortcoming | user=avoid
+**Why:** metadata_borrowing, utility_delta_positive, metadata_terms, context_echo
+**Trusted hints:** improves trusted hints | nonvisual metadata reused
+**Contract:** title words=15 | keywords=48
+**Utility:** user=avoid | improves trusted hints | metadata borrowing | context echo
+**Stack / owner:** owner=model
+**Token accounting:** prompt=1708 | text_est=467 | nontext_est=1241 | gen=380 | max=500 | stop=completed
+**Next action:** Treat as a model-quality limitation for this prompt and image.
+
+**Metrics:** Load 1.16s | Gen 21.54s | Total 22.96s
+**Throughput:** Prompt 128 TPS (1,708 tok) | Gen 51.3 TPS (380 tok)
+**Assessment:** 🏆 A (88/100) | Δ+8 | None identified
+**Review Status:** watchlist (context echo, metadata borrowing)
+**Review:** A 88/100 | Title length violation (15 words; expected 5-10); Keyword count violation (48; expected 10-18); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Photographer: John Doe. Equipment: Sony A7 III with 24-70mm f/2.8 lens. Location:
+> London, UK. Event: Daily urban life. Season: Spring. Setting: Canal side. Style:
+> Photographic representationalism realism. Color palette: Purple, blue, green, yellow,
+> orange, red, pink, brown, black, white, gray. Mood: Vibrant, serene, bustling,
+> reflective, urban, tranquil, contemplative, active, relaxed, leisurely, social,
+> architectural, natural, water-based, evening, golden hour, reflective, modern, glass,
+> building, cityscape, waterside, towpath, restaurant, boat, canal, bridge, pedestrian,
+> people, sky, sunset, twilight, dusk, purple, blue, green, yellow, orange, red, pink,
+> brown, black, white, gray.
+>
+> Title:
+> \- Pedestrians cross a footbridge over a canal at dusk in a vibrant urban waterside area.
+>
+> Description:
+> \- A modern glass building reflects the golden light of the setting sun against a purple
+> twilight sky, while people walk along the towpath, relax on the bank, and socialize at a
+> nearby restaurant. Moored boats line the canal, completing the lively evening scene as
+> people go about their daily lives, commuting or enjoying leisure time.
+>
+> Keywords:
+> \- urban, canal, bridge, pedestrians, dusk, purple sky, glass building, golden light,
+> sunset, twilight, people, restaurant, boats, cityscape, waterside, evening, vibrant,
+> active, relaxed, leisurely, social, architectural, natural, water-based, reflective,
+> modern, glass, building, cityscape, waterside, towpath, pedestrian, people, sky, sunset,
+> twilight, dusk, purple, blue, green, yellow, orange, red, pink, brown, black, white,
+> gray.
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Title length violation (15 words; expected 5-10)
+- Keyword count violation (48; expected 10-18)
+- Context echo (28% overlap)
+- Nonvisual metadata borrowing
+
+---
+
+<a id="model-meta-llama-llama-32-11b-vision-instruct"></a>
+
+### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
+
+**Verdict:** model_shortcoming | user=avoid
+**Why:** metadata_borrowing, contract, utility:D, trusted_overlap, metadata_terms
+**Trusted hints:** preserves trusted hints | nonvisual metadata reused
+**Contract:** missing: title, description, keywords
+**Utility:** user=avoid | preserves trusted hints | metadata borrowing
+**Stack / owner:** owner=model
+**Token accounting:** prompt=501 | text_est=467 | nontext_est=34 | gen=100 | max=500 | stop=completed
+**Next action:** Treat as a model-quality limitation for this prompt and image.
+
+**Metrics:** Load 2.25s | Gen 22.14s | Total 24.68s
+**Throughput:** Prompt 258 TPS (501 tok) | Gen 5.07 TPS (100 tok)
+**Assessment:** 🟠 D (47/100) | Δ-33 | Mostly echoes context without adding value
+**Review Status:** watchlist (metadata borrowing, missing sections)
+**Review:** D 47/100 | Missing sections (title, description, keywords); Nonvisual metadata borrowing
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Canal at Dusk in a Vibrant Urban Waterside Area
+>
+> The image depicts a canal at dusk in a vibrant urban waterside area, with a modern glass
+> building reflecting the golden light of the setting sun against a purple twilight sky.
+> The scene is bustling with people walking along the towpath, relaxing on the bank, and
+> socializing at a nearby restaurant. Moored boats line the canal, adding to the lively
+> atmosphere as people go about their daily lives, commuting or enjoying leisure time.
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Missing sections (title, description, keywords)
+- Nonvisual metadata borrowing
+
+---
+
 <a id="model-mlx-community-x-reasoner-7b-8bit"></a>
 
 ### ✅ mlx-community/X-Reasoner-7B-8bit
@@ -2804,8 +2862,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=16757 | text_est=467 | nontext_est=16290 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 1.22s | Gen 26.89s | Total 28.36s
-**Throughput:** Prompt 970 TPS (16,757 tok) | Gen 56.4 TPS (500 tok)
+**Metrics:** Load 1.20s | Gen 25.91s | Total 27.38s
+**Throughput:** Prompt 1,035 TPS (16,757 tok) | Gen 55.8 TPS (500 tok)
 **Assessment:** 🏆 A (86/100) | Δ+6 | None identified
 **Review Status:** watchlist (context ignored, cutoff, harness, long context)
 **Review:** A 86/100 | ⚠️REVIEW:cutoff; ⚠️HARNESS:long_context; ...
@@ -2938,6 +2996,80 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ---
 
+<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
+
+### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+
+**Verdict:** cutoff | user=avoid
+**Why:** token_cap, missing_sections, repetitive_tail, trusted_overlap, context_echo
+**Trusted hints:** preserves trusted hints
+**Contract:** missing: title, description, keywords
+**Utility:** user=avoid | preserves trusted hints | context echo
+**Stack / owner:** owner=model
+**Token accounting:** prompt=500 | text_est=467 | nontext_est=33 | gen=500 | max=500 | stop=completed
+**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
+
+**Metrics:** Load 1.46s | Gen 26.65s | Total 28.39s
+**Throughput:** Prompt 308 TPS (500 tok) | Gen 20.3 TPS (500 tok)
+**Assessment:** 🟡 C (52/100) | Δ-28 | Mostly echoes context without adding value
+**Review Status:** watchlist (context echo, cutoff, missing sections, repetitive)
+**Review:** C 52/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "waterfront scene, waterfront a..."); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Title
+> Modern Glass Building and Canal Scene at Dusk
+>
+> Description
+> A modern glass building reflects the golden light of the setting sun against a purple
+> twilight sky. People walk along the towpath, relax on the bank, and socialize at a
+> nearby restaurant. Moored boats line the canal, completing the lively evening scene.
+>
+> Keywords
+> Glass building, canal, people, boats, modern, urban, waterfront, evening, dusk, purple
+> sky, reflection, water, trees, buildings, houses, people walking, people sitting, people
+> socializing, restaurant, waterfront, waterfront scene, waterfront activity, waterfront
+> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
+> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
+> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
+> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
+> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
+> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
+> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
+> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
+> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
+> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
+> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
+> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
+> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
+> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
+> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
+> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
+> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
+> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
+> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
+> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
+> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
+> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
+> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
+> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
+> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
+> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
+> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
+> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
+> life,
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- ⚠️REVIEW:cutoff
+- Repetitive output (phrase: "waterfront scene, waterfront a...")
+- Missing sections (title, description, keywords)
+- Context echo (33% overlap)
+- Likely capped by max token budget
+
+---
+
 <a id="model-mlx-community-pixtral-12b-bf16"></a>
 
 ### ✅ mlx-community/pixtral-12b-bf16
@@ -2951,8 +3083,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=3314 | text_est=467 | nontext_est=2847 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 2.53s | Gen 27.05s | Total 29.84s
-**Throughput:** Prompt 1,908 TPS (3,314 tok) | Gen 20.1 TPS (500 tok)
+**Metrics:** Load 2.51s | Gen 27.61s | Total 30.39s
+**Throughput:** Prompt 1,887 TPS (3,314 tok) | Gen 19.7 TPS (500 tok)
 **Assessment:** ❌ F (35/100) | Δ-46 | Mostly echoes context without adding value
 **Review Status:** watchlist (context ignored, cutoff, missing sections)
 **Review:** F 35/100 | ⚠️REVIEW:cutoff; Context ignored (missing: Pedestrians, cross, footbridge, over, canal); ...
@@ -3054,63 +3186,6 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ---
 
-<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
-
-### ✅ mlx-community/Molmo-7B-D-0924-8bit
-
-**Verdict:** cutoff | user=avoid
-**Why:** token_cap, missing_sections, repetitive_tail, abrupt_tail, trusted_overlap
-**Trusted hints:** preserves trusted hints
-**Contract:** missing: title, description, keywords
-**Utility:** user=avoid | preserves trusted hints
-**Stack / owner:** owner=model
-**Token accounting:** prompt=1708 | text_est=467 | nontext_est=1241 | gen=500 | max=500 | stop=completed
-**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
-
-**Metrics:** Load 1.16s | Gen 29.06s | Total 30.48s
-**Throughput:** Prompt 92.1 TPS (1,708 tok) | Gen 51.1 TPS (500 tok)
-**Assessment:** ✅ B (66/100) | Δ-14 | Missing requested structure
-**Review Status:** watchlist (cutoff, missing sections, repetitive)
-**Review:** B 66/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "waterway, water body, water..."); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Photographer: John Doe. Equipment: Sony A7 III with 24-70mm f/2.8 lens. Location:
-> London, UK. Event: Daily urban life. Season: Spring. Setting: Canal side. Style:
-> Photographic representationalism realism. Color palette: Purple, blue, green, yellow,
-> orange, red, pink, brown, black, white, gray. Mood: Vibrant, serene, bustling,
-> reflective, urban, tranquil, contemplative, active, relaxed, leisurely, social,
-> architectural, natural, water-based, pedestrian-focused, evening, golden hour,
-> reflective, modern, glass, building, urban, waterside, restaurant, towpath, boats,
-> canal, purple sky, golden light, twilight, dusk, people, walking, relaxing, socializing,
-> dining, urban life, cityscape, architecture, reflection, water, waterway, water body,
-> water feature, water course, water channel, waterway, water body, water feature, water
-> course, waterway, water body, water feature, water course, waterway, water body, water
-> feature, water course, waterway, water body, water feature, water course, waterway,
-> water body, water feature, water course, waterway, water body, water feature, water
-> course, waterway, water body, water feature, water course, waterway, water body, water
-> feature, water course, waterway, water body, water feature, water course, waterway,
-> water body, water feature, water course, waterway, water body, water feature, water
-> course, waterway, water body, water feature, water course, waterway, water body, water
-> feature, water course, waterway, water body, water feature, water course, waterway,
-> water body, water feature, water course, waterway, water body, water feature, water
-> course, waterway, water body, water feature, water course, waterway, water body, water
-> feature, water course, waterway, water body, water feature, water course, waterway,
-> water body, water feature, water course, waterway, water body, water feature, water
-> course, waterway, water body, water feature, water course, waterway, water body, water
-> feature, water course, waterway, water body, water feature, water course, waterway,
-> water body, water feature, water course, waterway, water body, water
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- ⚠️REVIEW:cutoff
-- Repetitive output (phrase: "waterway, water body, water...")
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-
----
-
 <a id="model-mlx-community-glm-46v-nvfp4"></a>
 
 ### ✅ mlx-community/GLM-4.6V-nvfp4
@@ -3124,8 +3199,8 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=6643 | text_est=467 | nontext_est=6176 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 5.55s | Gen 32.01s | Total 37.84s
-**Throughput:** Prompt 424 TPS (6,643 tok) | Gen 31.7 TPS (500 tok)
+**Metrics:** Load 7.29s | Gen 29.75s | Total 37.33s
+**Throughput:** Prompt 456 TPS (6,643 tok) | Gen 34.5 TPS (500 tok)
 **Assessment:** ✅ B (73/100) | Δ-8 | Missing requested structure
 **Review Status:** watchlist (cutoff, metadata borrowing, missing sections, reasoning leak)
 **Review:** B 73/100 | ⚠️REVIEW:cutoff; Missing sections (title, description, keywords); ...
@@ -3175,80 +3250,6 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 
 ---
 
-<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
-
-### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
-
-**Verdict:** cutoff | user=avoid
-**Why:** token_cap, missing_sections, repetitive_tail, trusted_overlap, context_echo
-**Trusted hints:** preserves trusted hints
-**Contract:** missing: title, description, keywords
-**Utility:** user=avoid | preserves trusted hints | context echo
-**Stack / owner:** owner=model
-**Token accounting:** prompt=500 | text_est=467 | nontext_est=33 | gen=500 | max=500 | stop=completed
-**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
-
-**Metrics:** Load 1.60s | Gen 34.68s | Total 36.54s
-**Throughput:** Prompt 287 TPS (500 tok) | Gen 15.4 TPS (500 tok)
-**Assessment:** 🟡 C (52/100) | Δ-28 | Mostly echoes context without adding value
-**Review Status:** watchlist (context echo, cutoff, missing sections, repetitive)
-**Review:** C 52/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "waterfront scene, waterfront a..."); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Title
-> Modern Glass Building and Canal Scene at Dusk
->
-> Description
-> A modern glass building reflects the golden light of the setting sun against a purple
-> twilight sky. People walk along the towpath, relax on the bank, and socialize at a
-> nearby restaurant. Moored boats line the canal, completing the lively evening scene.
->
-> Keywords
-> Glass building, canal, people, boats, modern, urban, waterfront, evening, dusk, purple
-> sky, reflection, water, trees, buildings, houses, people walking, people sitting, people
-> socializing, restaurant, waterfront, waterfront scene, waterfront activity, waterfront
-> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
-> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
-> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
-> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
-> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
-> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
-> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
-> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
-> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
-> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
-> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
-> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
-> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
-> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
-> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
-> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
-> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
-> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
-> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
-> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
-> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
-> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
-> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
-> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
-> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
-> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
-> life, waterfront scene, waterfront activity, waterfront life, waterfront scene,
-> waterfront activity, waterfront life, waterfront scene, waterfront activity, waterfront
-> life,
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- ⚠️REVIEW:cutoff
-- Repetitive output (phrase: "waterfront scene, waterfront a...")
-- Missing sections (title, description, keywords)
-- Context echo (33% overlap)
-- Likely capped by max token budget
-
----
-
 <a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
 
 ### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
@@ -3262,7 +3263,7 @@ ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded p
 **Token accounting:** prompt=0 | text_est=467 | nontext_est=0 | gen=0 | max=500 | stop=completed
 **Next action:** Inspect model repo config, chat template, and EOS settings.
 
-**Metrics:** Load 0.60s | Gen 65.41s | Total 66.27s
+**Metrics:** Load 0.57s | Gen 62.40s | Total 63.23s
 **Throughput:** Prompt 0 TPS (0.0 tok) | Gen 0 TPS (0.0 tok)
 **Assessment:** ❌ F (0/100) | Δ-80 | Empty or minimal output
 **Review Status:** watchlist (harness)
