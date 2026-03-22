@@ -83,5 +83,22 @@
     "editor.defaultFormatter": "tamasfe.even-better-toml"
   },
   "python-envs.defaultEnvManager": "ms-python.python:conda",
-  "python-envs.defaultPackageManager": "ms-python.python:conda"
+  "python-envs.defaultPackageManager": "ms-python.python:conda",
+  "cursorpyright.analysis.diagnosticSeverityOverrides": {
+    "reportUnknownVariableType": "none",
+    "reportMissingImports": "none",
+    "reportMissingModuleSource": "none"
+  },
+  "cursorpyright.analysis.exclude": [
+    "**/typings/**",
+    "**/node_modules",
+    "**/__pycache__",
+    "**/.*"
+  ],
+  "cursorpyright.analysis.extraPaths": [
+    "${workspaceFolder}/src"
+  ],
+  "cursorpyright.analysis.stubPath": "src/typings",
+  "cursorpyright.analysis.typeCheckingMode": "basic",
+  "cursorpyright.analysis.useLibraryCodeForTypes": true
 }

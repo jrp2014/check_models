@@ -1,118 +1,135 @@
 # Model Performance Results
 
-_Generated on 2026-03-15 22:43:55 GMT_
+_Generated on 2026-03-22 02:17:59 GMT_
 
 ## 🎯 Action Snapshot
 
-- **Framework/runtime failures:** 1 (top owners: transformers=1).
+- **Framework/runtime failures:** 8 (top owners: transformers=5, mlx-vlm=2, model-config=1).
 - **Next action:** review failure ownership below and use diagnostics.md for filing.
-- **Maintainer signals:** harness-risk successes=5, clean outputs=4/49.
-- **Useful now:** 9 clean A/B model(s) worth first review.
-- **Review watchlist:** 40 model(s) with breaking or lower-value output.
-- **Vs existing metadata:** better=27, neutral=6, worse=16 (baseline B 66/100).
-- **Quality signal frequency:** missing_sections=28, context_ignored=18, description_length=15, reasoning_leak=12, keyword_count=11, title_length=8.
-- **Runtime pattern:** decode dominates measured phase time (89%; 49/50 measured model(s)).
-- **Phase totals:** model load=162.11s, prompt prep=0.13s, decode=1288.54s, cleanup=4.57s.
+- **Maintainer signals:** harness-risk successes=8, clean outputs=3/43.
+- **Useful now:** 1 clean A/B model(s) worth first review.
+- **Review watchlist:** 42 model(s) with breaking or lower-value output.
+- **Preflight compatibility:** 1 informational warning(s); do not treat these alone as run failures.
+- **Escalate only if:** they line up with unexpected TF/Flax/JAX imports, startup hangs, or backend/runtime crashes.
+- **Vs existing metadata:** better=7, neutral=1, worse=35 (baseline A 80/100).
+- **Quality signal frequency:** missing_sections=27, cutoff=21, trusted_hint_ignored=19, context_ignored=18, metadata_borrowing=12, repetitive=9.
+- **Runtime pattern:** decode dominates measured phase time (83%; 45/51 measured model(s)).
+- **Phase totals:** model load=98.63s, prompt prep=0.12s, decode=535.10s, cleanup=7.26s.
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
-- **Termination reasons:** completed=49, exception=1.
+- **Termination reasons:** completed=43, exception=8.
 
 ## 🏆 Performance Highlights
 
-- **Fastest:** `prince-canuma/Florence-2-large-ft` (323.5 tps)
-- **💾 Most efficient:** `mlx-community/FastVLM-0.5B-bf16` (2.2 GB)
-- **⚡ Fastest load:** `mlx-community/nanoLLaVA-1.5-4bit` (0.74s)
-- **📊 Average TPS:** 79.3 across 49 models
+- **Fastest:** `prince-canuma/Florence-2-large-ft` (357.3 tps)
+- **💾 Most efficient:** `mlx-community/FastVLM-0.5B-bf16` (2.1 GB)
+- **⚡ Fastest load:** `mlx-community/LFM2-VL-1.6B-8bit` (0.53s)
+- **📊 Average TPS:** 88.1 across 43 models
 
 ## 📈 Resource Usage
 
-- **Total peak memory:** 943.2 GB
-- **Average peak memory:** 19.2 GB
-- **Memory efficiency:** 253 tokens/GB
+- **Total peak memory:** 699.4 GB
+- **Average peak memory:** 16.3 GB
+- **Memory efficiency:** 210 tokens/GB
 
 ## 📚 Cataloging Utility Summary
 
-**Grade Distribution:** 🏆 A: 14 | ✅ B: 19 | 🟡 C: 5 | 🟠 D: 1 | ❌ F: 10
+**Grade Distribution:** 🏆 A: 8 | ✅ B: 8 | 🟡 C: 11 | 🟠 D: 3 | ❌ F: 13
 
-**Average Utility Score:** 62/100
+**Average Utility Score:** 50/100
 
-**Existing Metadata Baseline:** ✅ B (66/100)
-**Vs Existing Metadata:** Avg Δ -4 | Better: 27, Neutral: 6, Worse: 16
+**Existing Metadata Baseline:** 🏆 A (80/100)
+**Vs Existing Metadata:** Avg Δ -30 | Better: 7, Neutral: 1, Worse: 35
 
-- **Best for cataloging:** `mlx-community/Qwen3.5-35B-A3B-bf16` (🏆 A, 95/100)
-- **Worst for cataloging:** `prince-canuma/Florence-2-large-ft` (❌ F, 0/100)
+- **Best for cataloging:** `mlx-community/gemma-3n-E4B-it-bf16` (🏆 A, 95/100)
+- **Worst for cataloging:** `mlx-community/Qwen2-VL-2B-Instruct-4bit` (❌ F, 0/100)
 
-### ⚠️ 11 Models with Low Utility (D/F)
+### ⚠️ 16 Models with Low Utility (D/F)
 
-- `HuggingFaceTB/SmolVLM-Instruct`: ❌ F (1/100) - Output lacks detail
+- `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: ❌ F (25/100) - Lacks visual description of image
+- `meta-llama/Llama-3.2-11B-Vision-Instruct`: 🟠 D (47/100) - Mostly echoes context without adding value
 - `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (7/100) - Output too short to be useful
-- `mlx-community/Idefics3-8B-Llama3-bf16`: ❌ F (29/100) - Mostly echoes context without adding value
-- `mlx-community/LFM2-VL-1.6B-8bit`: ❌ F (33/100) - Mostly echoes context without adding value
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (23/100) - Mostly echoes context without adding value
-- `mlx-community/SmolVLM-Instruct-bf16`: ❌ F (1/100) - Output lacks detail
-- `mlx-community/gemma-3n-E2B-4bit`: 🟠 D (45/100) - Lacks visual description of image
-- `mlx-community/llava-v1.6-mistral-7b-8bit`: ❌ F (20/100) - Mostly echoes context without adding value
-- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: ❌ F (16/100) - Output lacks detail
+- `mlx-community/FastVLM-0.5B-bf16`: 🟠 D (46/100) - Lacks visual description of image
+- `mlx-community/Idefics3-8B-Llama3-bf16`: ❌ F (0/100) - Output too short to be useful
+- `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`: ❌ F (0/100) - Output too short to be useful
+- `mlx-community/LFM2-VL-1.6B-8bit`: ❌ F (26/100) - Mostly echoes context without adding value
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (0/100) - Empty or minimal output
+- `mlx-community/SmolVLM2-2.2B-Instruct-mlx`: ❌ F (0/100) - Output too short to be useful
+- `mlx-community/gemma-3n-E2B-4bit`: ❌ F (4/100) - Output too short to be useful
+- `mlx-community/nanoLLaVA-1.5-4bit`: 🟠 D (40/100) - Mostly echoes context without adding value
+- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: ❌ F (17/100) - Output lacks detail
+- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: ❌ F (17/100) - Output lacks detail
+- `mlx-community/pixtral-12b-8bit`: ❌ F (32/100) - Mostly echoes context without adding value
+- `mlx-community/pixtral-12b-bf16`: ❌ F (35/100) - Mostly echoes context without adding value
 - `prince-canuma/Florence-2-large-ft`: ❌ F (0/100) - Output too short to be useful
-- `qnguyen3/nanoLLaVA`: ❌ F (19/100) - Mostly echoes context without adding value
 
 ## ⚠️ Quality Issues
 
-- **❌ Failed Models (1):**
+- **❌ Failed Models (8):**
   - `microsoft/Florence-2-large-ft` (`Model Error`)
-- **🔄 Repetitive Output (2):**
-  - `mlx-community/gemma-3n-E2B-4bit` (token: `16:21:00`)
+  - `mlx-community/InternVL3-8B-bf16` (`Model Error`)
+  - `mlx-community/Molmo-7B-D-0924-bf16` (`Model Error`)
+  - `mlx-community/Qwen3.5-27B-4bit` (`Model Error`)
+  - `mlx-community/Qwen3.5-27B-mxfp8` (`Model Error`)
+  - `mlx-community/Qwen3.5-35B-A3B-6bit` (`Model Error`)
+  - `mlx-community/Qwen3.5-35B-A3B-bf16` (`Model Error`)
+  - `mlx-community/deepseek-vl2-8bit` (`Processor Error`)
+- **🔄 Repetitive Output (9):**
+  - `HuggingFaceTB/SmolVLM-Instruct` (token: `unt`)
+  - `jqlive/Kimi-VL-A3B-Thinking-2506-6bit` (token: `因此，所以可打印表图1.`)
+  - `mlx-community/Kimi-VL-A3B-Thinking-8bit` (token: `phrase: "use only details that..."`)
+  - `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit` (token: `phrase: "waterfront scene, waterfront a..."`)
+  - `mlx-community/Molmo-7B-D-0924-8bit` (token: `phrase: "waterway, water body, water..."`)
+  - `mlx-community/Qwen3-VL-2B-Thinking-bf16` (token: `phrase: "the image is of..."`)
+  - `mlx-community/SmolVLM-Instruct-bf16` (token: `unt`)
   - `mlx-community/paligemma2-3b-pt-896-4bit` (token: `phrase: "- output only the..."`)
-- **👻 Hallucinations (2):**
-  - `mlx-community/Kimi-VL-A3B-Thinking-8bit`
-  - `mlx-community/Qwen3.5-35B-A3B-6bit`
-- **📝 Formatting Issues (5):**
+  - `qnguyen3/nanoLLaVA` (token: `phrase: "painting glasses, guitar paint..."`)
+- **📝 Formatting Issues (6):**
   - `mlx-community/GLM-4.6V-Flash-6bit`
   - `mlx-community/GLM-4.6V-Flash-mxfp4`
   - `mlx-community/GLM-4.6V-nvfp4`
   - `mlx-community/Idefics3-8B-Llama3-bf16`
+  - `mlx-community/SmolVLM2-2.2B-Instruct-mlx`
   - `prince-canuma/Florence-2-large-ft`
 
 ## 📊 Aggregate Statistics (Successful Runs)
 
-- **Generation Tps**: Avg: 79.3 | Min: 3.69 | Max: 324
-- **Peak Memory**: Avg: 19 | Min: 2.2 | Max: 78
-- **Total Time**: Avg: 29.91s | Min: 2.11s | Max: 184.92s
-- **Generation Time**: Avg: 26.29s | Min: 1.04s | Max: 178.96s
-- **Model Load Time**: Avg: 3.30s | Min: 0.74s | Max: 13.51s
+- **Generation Tps**: Avg: 88.1 | Min: 0 | Max: 357
+- **Peak Memory**: Avg: 16 | Min: 2.1 | Max: 78
+- **Total Time**: Avg: 13.85s | Min: 1.62s | Max: 66.27s
+- **Generation Time**: Avg: 11.91s | Min: 0.82s | Max: 65.41s
+- **Model Load Time**: Avg: 1.66s | Min: 0.53s | Max: 5.55s
 
 ### ⏱ Runtime Interpretation
 
-- **Runtime pattern:** decode dominates measured phase time (89%; 49/50 measured model(s)).
-- **Phase totals:** model load=162.11s, prompt prep=0.13s, decode=1288.54s, cleanup=4.57s.
+- **Runtime pattern:** decode dominates measured phase time (83%; 45/51 measured model(s)).
+- **Phase totals:** model load=98.63s, prompt prep=0.12s, decode=535.10s, cleanup=7.26s.
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
-- **Termination reasons:** completed=49, exception=1.
+- **Termination reasons:** completed=43, exception=8.
 
 ### ⏱ Timing Snapshot
 
-- **Validation overhead:** 15.95s total (avg 0.32s across 50 model(s)).
-- **First-token latency:** Avg 18.59s | Min 0.17s | Max 144.90s across 49 model(s).
+- **Validation overhead:** 13.91s total (avg 0.27s across 51 model(s)).
+- **First-token latency:** Avg 3.28s | Min 0.09s | Max 18.54s across 42 model(s).
 
 ## ✅ Recommended Models
 
 Quick picks based on cached quality, speed, and memory signals from this run.
 
-- **Best cataloging quality:** [`mlx-community/Qwen3.5-35B-A3B-bf16`](model_gallery.md#model-mlx-community-qwen35-35b-a3b-bf16) (A 95/100 | Gen 55.3 TPS | Peak 76 | A 95/100 | ⚠️HARNESS:long_context; Excessive bullet points (33); ...)
-- **Fastest generation:** [`prince-canuma/Florence-2-large-ft`](model_gallery.md#model-prince-canuma-florence-2-large-ft) (F 0/100 | Gen 324 TPS | Peak 5.1 | F 0/100 | ⚠️HARNESS:stop_token; Context ignored (missing: Howardsgate, Welwyn Garden City, England, United Kingdom, Sainsbury, Adobe Stock, Any Vision, Eco, Europe, Hertfordshire, Locations, Modern, Supermarket, Shoppers, Shopping Bags, Spring, Sustainable, Urban Greening
-Capture, GMT, GPS); ...)
-- **Lowest memory footprint:** [`mlx-community/FastVLM-0.5B-bf16`](model_gallery.md#model-mlx-community-fastvlm-05b-bf16) (B 74/100 | Gen 307 TPS | Peak 2.2 | B 74/100 | Missing sections (keywords); Description sentence violation (7; expected 1-2))
-- **Best balance:** [`mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`](model_gallery.md#model-mlx-community-ministral-3-14b-instruct-2512-nvfp4) (B 69/100 | Gen 55.1 TPS | Peak 13 | B 69/100 | No quality issues detected)
+- **Best cataloging quality:** [`mlx-community/gemma-3n-E4B-it-bf16`](model_gallery.md#model-mlx-community-gemma-3n-e4b-it-bf16) (A 95/100 | Gen 48.0 TPS | Peak 17 | A 95/100 | Excessive verbosity; Missing sections (title, description, keywords))
+- **Fastest generation:** [`prince-canuma/Florence-2-large-ft`](model_gallery.md#model-prince-canuma-florence-2-large-ft) (F 0/100 | Gen 357 TPS | Peak 5.1 | F 0/100 | ⚠️HARNESS:stop_token; Context ignored (missing: Pedestrians, cross, footbridge, over, canal); ...)
+- **Lowest memory footprint:** [`mlx-community/FastVLM-0.5B-bf16`](model_gallery.md#model-mlx-community-fastvlm-05b-bf16) (D 46/100 | Gen 329 TPS | Peak 2.1 | D 46/100 | Context ignored (missing: Pedestrians, cross, footbridge, over, canal); Missing sections (title, description, keywords); ...)
+- **Best balance:** [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](model_gallery.md#model-mlx-community-ministral-3-3b-instruct-2512-4bit) (A 90/100 | Gen 175 TPS | Peak 7.8 | A 90/100 | No quality issues detected)
 
 ## 🔍 Quality Pattern Breakdown
 
 Common weaknesses and failure patterns from this run, linked to the gallery when available.
 
-- **❌ Failed Models (1):** [`microsoft/Florence-2-large-ft`](model_gallery.md#model-microsoft-florence-2-large-ft). Example: `Model Error`.
-- **🔄 Repetitive Output (2):** [`mlx-community/gemma-3n-E2B-4bit`](model_gallery.md#model-mlx-community-gemma-3n-e2b-4bit), [`mlx-community/paligemma2-3b-pt-896-4bit`](model_gallery.md#model-mlx-community-paligemma2-3b-pt-896-4bit). Example: token: `16:21:00`.
-- **👻 Hallucinations (2):** [`mlx-community/Kimi-VL-A3B-Thinking-8bit`](model_gallery.md#model-mlx-community-kimi-vl-a3b-thinking-8bit), [`mlx-community/Qwen3.5-35B-A3B-6bit`](model_gallery.md#model-mlx-community-qwen35-35b-a3b-6bit).
-- **📝 Formatting Issues (5):** [`mlx-community/GLM-4.6V-Flash-6bit`](model_gallery.md#model-mlx-community-glm-46v-flash-6bit), [`mlx-community/GLM-4.6V-Flash-mxfp4`](model_gallery.md#model-mlx-community-glm-46v-flash-mxfp4), [`mlx-community/GLM-4.6V-nvfp4`](model_gallery.md#model-mlx-community-glm-46v-nvfp4), [`mlx-community/Idefics3-8B-Llama3-bf16`](model_gallery.md#model-mlx-community-idefics3-8b-llama3-bf16), +1 more.
-- **Low-utility outputs (11):** [`HuggingFaceTB/SmolVLM-Instruct`](model_gallery.md#model-huggingfacetb-smolvlm-instruct), [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](model_gallery.md#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit), [`mlx-community/Idefics3-8B-Llama3-bf16`](model_gallery.md#model-mlx-community-idefics3-8b-llama3-bf16), [`mlx-community/LFM2-VL-1.6B-8bit`](model_gallery.md#model-mlx-community-lfm2-vl-16b-8bit), +7 more. Common weakness: Output lacks detail.
+- **❌ Failed Models (8):** [`microsoft/Florence-2-large-ft`](model_gallery.md#model-microsoft-florence-2-large-ft), [`mlx-community/InternVL3-8B-bf16`](model_gallery.md#model-mlx-community-internvl3-8b-bf16), [`mlx-community/Molmo-7B-D-0924-bf16`](model_gallery.md#model-mlx-community-molmo-7b-d-0924-bf16), [`mlx-community/Qwen3.5-27B-4bit`](model_gallery.md#model-mlx-community-qwen35-27b-4bit), +4 more. Example: `Model Error`.
+- **🔄 Repetitive Output (9):** [`HuggingFaceTB/SmolVLM-Instruct`](model_gallery.md#model-huggingfacetb-smolvlm-instruct), [`jqlive/Kimi-VL-A3B-Thinking-2506-6bit`](model_gallery.md#model-jqlive-kimi-vl-a3b-thinking-2506-6bit), [`mlx-community/Kimi-VL-A3B-Thinking-8bit`](model_gallery.md#model-mlx-community-kimi-vl-a3b-thinking-8bit), [`mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`](model_gallery.md#model-mlx-community-llama-32-11b-vision-instruct-8bit), +5 more. Example: token: `unt`.
+- **📝 Formatting Issues (6):** [`mlx-community/GLM-4.6V-Flash-6bit`](model_gallery.md#model-mlx-community-glm-46v-flash-6bit), [`mlx-community/GLM-4.6V-Flash-mxfp4`](model_gallery.md#model-mlx-community-glm-46v-flash-mxfp4), [`mlx-community/GLM-4.6V-nvfp4`](model_gallery.md#model-mlx-community-glm-46v-nvfp4), [`mlx-community/Idefics3-8B-Llama3-bf16`](model_gallery.md#model-mlx-community-idefics3-8b-llama3-bf16), +2 more.
+- **Low-utility outputs (16):** [`jqlive/Kimi-VL-A3B-Thinking-2506-6bit`](model_gallery.md#model-jqlive-kimi-vl-a3b-thinking-2506-6bit), [`meta-llama/Llama-3.2-11B-Vision-Instruct`](model_gallery.md#model-meta-llama-llama-32-11b-vision-instruct), [`mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`](model_gallery.md#model-mlx-community-devstral-small-2-24b-instruct-2512-5bit), [`mlx-community/FastVLM-0.5B-bf16`](model_gallery.md#model-mlx-community-fastvlm-05b-bf16), +12 more. Common weakness: Lacks visual description of image.
 
 ## 🚨 Failures by Package (Actionable)
 
@@ -120,7 +137,9 @@ Common weaknesses and failure patterns from this run, linked to the gallery when
 
 | Package | Failures | Error Types | Affected Models |
 |---------|----------|-------------|-----------------|
-| `transformers` | 1 | Model Error | `microsoft/Florence-2-large-ft` |
+| `transformers` | 5 | Model Error | `microsoft/Florence-2-large-ft`, `mlx-community/Qwen3.5-27B-4bit`, `mlx-community/Qwen3.5-27B-mxfp8`, `mlx-community/Qwen3.5-35B-A3B-6bit`, `mlx-community/Qwen3.5-35B-A3B-bf16` |
+| `mlx-vlm` | 2 | Model Error | `mlx-community/InternVL3-8B-bf16`, `mlx-community/Molmo-7B-D-0924-bf16` |
+| `model-config` | 1 | Processor Error | `mlx-community/deepseek-vl2-8bit` |
 
 <!-- markdownlint-enable MD060 -->
 
@@ -131,12 +150,39 @@ Common weaknesses and failure patterns from this run, linked to the gallery when
 - **microsoft/Florence-2-large-ft** (Model Error)
   - Error: `Model generation failed for microsoft/Florence-2-large-ft: Failed to process inputs with error: can only concatenate ...`
   - Type: `ValueError`
+- **mlx-community/Qwen3.5-27B-4bit** (Model Error)
+  - Error: `Model generation failed for mlx-community/Qwen3.5-27B-4bit: Failed to process inputs with error: Only returning PyTor...`
+  - Type: `ValueError`
+- **mlx-community/Qwen3.5-27B-mxfp8** (Model Error)
+  - Error: `Model generation failed for mlx-community/Qwen3.5-27B-mxfp8: Failed to process inputs with error: Only returning PyTo...`
+  - Type: `ValueError`
+- **mlx-community/Qwen3.5-35B-A3B-6bit** (Model Error)
+  - Error: `Model generation failed for mlx-community/Qwen3.5-35B-A3B-6bit: Failed to process inputs with error: Only returning P...`
+  - Type: `ValueError`
+- **mlx-community/Qwen3.5-35B-A3B-bf16** (Model Error)
+  - Error: `Model generation failed for mlx-community/Qwen3.5-35B-A3B-bf16: Failed to process inputs with error: Only returning P...`
+  - Type: `ValueError`
+
+#### mlx-vlm
+
+- **mlx-community/InternVL3-8B-bf16** (Model Error)
+  - Error: `Model generation failed for mlx-community/InternVL3-8B-bf16: 'utf-8' codec can't decode byte 0xab in position 10: inv...`
+  - Type: `ValueError`
+- **mlx-community/Molmo-7B-D-0924-bf16** (Model Error)
+  - Error: `Model generation failed for mlx-community/Molmo-7B-D-0924-bf16: 'utf-8' codec can't decode byte 0xa1 in position 0: i...`
+  - Type: `ValueError`
+
+#### model-config
+
+- **mlx-community/deepseek-vl2-8bit** (Processor Error)
+  - Error: `Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimo...`
+  - Type: `ValueError`
 
 **Prompt used:**
 
 <!-- markdownlint-disable MD028 MD049 -->
 >
-> Analyze this image for cataloguing metadata.
+> Analyze this image for cataloguing metadata, using British English.
 >
 > Use only details that are clearly and definitely visible in the image. If a detail is
 > uncertain, ambiguous, partially obscured, too small to verify, or not directly visible,
@@ -174,84 +220,83 @@ Common weaknesses and failure patterns from this run, linked to the gallery when
 > \- Do not output reasoning, notes, hedging, or extra sections.
 >
 > Context: Existing metadata hints (high confidence; use only when visually confirmed):
-> \- Description hint: , Howardsgate, Welwyn Garden City, England, United Kingdom, UK On a
-> clear late afternoon in early spring, a striking living wall brings a splash of nature
-> to the urban landscape of Howardsgate in Welwyn Garden City, England. The low sun casts
-> long shadows from the bare-branched trees onto the brick facade of a Sainsbury's
-> supermarket, where shoppers are seen making their way home with their groceries. This
-> modern...
-> \- Keyword hints: Adobe Stock, Any Vision, Eco-friendly facade, England, Europe,
-> Hertfordshire, Hertfordshire / England, Howardsgate, Locations, Modern retail building,
-> Sainsbury's Supermarket, Sainsbury's Welwyn Garden City, Shoppers, Shopping Bags,
-> Spring, Supermarket, Sustainable architecture, UK, United Kingdom, Urban Greening
-> \- Capture metadata: Taken on 2026-03-14 16:21:00 GMT (at 16:21:00 local time). GPS:
-> 51.800333°N, 0.207617°W.
+> \- Description hint: Pedestrians cross a footbridge over a canal at dusk in a vibrant
+> urban waterside area. A modern glass building reflects the golden light of the setting
+> sun against a purple twilight sky, while people walk along the towpath, relax on the
+> bank, and socialize at a nearby restaurant. Moored boats line the canal, completing the
+> lively evening scene as people go about their daily lives, commuting or enjoying leisure
+> time.
+> \- Capture metadata: Taken on 2026-03-21 18:22:22 GMT (at 18:22:22 local time). GPS:
+> 51.536500°N, 0.126500°W.
 <!-- markdownlint-enable MD028 MD049 -->
 
 **Note:** Results sorted: errors first, then by generation time (fastest to slowest).
 
-**Overall runtime:** 1472.34s
+**Overall runtime:** 656.08s
 
 <!-- markdownlint-disable MD013 MD033 MD034 MD037 MD049 -->
 
-| Model Name                                              |   Token |   Prompt (tokens) |   Generation (tokens) |   Total Tokens |   Prompt Tps |   Gen TPS |   Peak (GB) |   Generation (s) |   Load (s) |   Total (s) | Quality Issues                     |   Error Package |
-|:--------------------------------------------------------|--------:|------------------:|----------------------:|---------------:|-------------:|----------:|------------:|-----------------:|-----------:|------------:|:-----------------------------------|----------------:|
-| `microsoft/Florence-2-large-ft`                         |         |                   |                       |                |              |           |             |            0.38s |      0.64s |       1.34s | fabrication, title-length(29), ... |    transformers |
-| `mlx-community/nanoLLaVA-1.5-4bit`                      |  151645 |               609 |                    91 |            700 |         2448 |       322 |         2.9 |            1.04s |      0.74s |       2.11s | missing-sections(keywords), ...    |                 |
-| `mlx-community/LFM2-VL-1.6B-8bit`                       |       7 |               867 |                   160 |          1,027 |         3017 |       296 |         2.9 |            1.33s |      0.77s |       2.42s | title-length(12), ...              |                 |
-| `qnguyen3/nanoLLaVA`                                    |  151645 |               609 |                   103 |            712 |         2617 |       101 |           5 |            1.77s |      0.86s |       2.94s | missing-sections(keywords), ...    |                 |
-| `mlx-community/FastVLM-0.5B-bf16`                       |  151645 |               613 |                   198 |            811 |         3678 |       307 |         2.2 |            1.78s |      1.06s |       3.19s | missing-sections(keywords), ...    |                 |
-| `mlx-community/LFM2.5-VL-1.6B-bf16`                     |       7 |               867 |                   200 |          1,067 |         3025 |       181 |           4 |            1.84s |      0.83s |       2.99s | description-sentences(5)           |                 |
-| `mlx-community/SmolVLM-Instruct-bf16`                   |   49154 |             1,822 |                    18 |          1,840 |         1422 |       115 |         5.6 |            1.87s |      1.18s |       3.37s | missing-sections(title+descrip...  |                 |
-| `HuggingFaceTB/SmolVLM-Instruct`                        |   49154 |             1,822 |                    18 |          1,840 |         1379 |       115 |         5.6 |            1.91s |      1.08s |       3.28s | missing-sections(title+descrip...  |                 |
-| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |   49279 |             1,722 |                    42 |          1,764 |         1378 |       114 |         5.5 |            2.05s |      1.03s |       3.39s | title-length(3), ...               |                 |
-| `prince-canuma/Florence-2-large-ft`                     |       0 |             1,181 |                   500 |          1,681 |         4902 |       324 |         5.1 |            2.20s |      1.23s |       3.75s | ⚠️harness(stop_token), ...         |                 |
-| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |             1,627 |                    14 |          1,641 |          508 |      28.3 |          12 |            4.16s |      3.52s |       8.00s | ⚠️harness(prompt_template), ...    |                 |
-| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |             3,205 |                   132 |          3,337 |          988 |       159 |         7.8 |            4.47s |      1.40s |       6.19s | description-sentences(3)           |                 |
-| `mlx-community/Phi-3.5-vision-instruct-bf16`            |   32007 |             1,444 |                   186 |          1,630 |         1311 |        52 |         9.6 |            5.12s |      1.50s |       6.94s | description-sentences(4), ...      |                 |
-| `mlx-community/gemma-3n-E2B-4bit`                       |  236825 |               863 |                   500 |          1,363 |         1417 |       107 |         6.2 |            5.68s |      3.07s |       9.08s | repetitive(16:21:00), ...          |                 |
-| `mlx-community/InternVL3-8B-bf16`                       |  151645 |             2,392 |                    73 |          2,465 |          795 |      32.3 |          17 |            5.83s |      2.84s |       9.00s |                                    |                 |
-| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 |   13900 |             1,597 |                   500 |          2,097 |          922 |       112 |          18 |            6.82s |      3.09s |      10.24s | description-sentences(5), ...      |                 |
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit`               |     645 |             1,597 |                   500 |          2,097 |          975 |      97.8 |          22 |            7.37s |      3.47s |      11.18s | lang_mixing, hallucination, ...    |                 |
-| `mlx-community/gemma-3-27b-it-qat-4bit`                 |     106 |               872 |                    94 |            966 |          192 |      27.9 |          19 |            8.31s |      4.69s |      13.33s | context-ignored                    |                 |
-| `mlx-community/gemma-3n-E4B-it-bf16`                    |     106 |               871 |                   290 |          1,161 |          901 |      41.4 |          17 |            8.41s |      4.80s |      13.61s | missing-sections(title+descrip...  |                 |
-| `mlx-community/Idefics3-8B-Llama3-bf16`                 |  128001 |             2,891 |                   153 |          3,044 |          714 |      29.6 |          19 |            9.67s |      3.47s |      13.49s | title-length(11), ...              |                 |
-| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          |   29044 |             1,597 |                   500 |          2,097 |          967 |      67.9 |          37 |            9.75s |      5.68s |      15.75s | description-sentences(6), ...      |                 |
-| `mlx-community/InternVL3-14B-8bit`                      |  151645 |             2,392 |                   104 |          2,496 |          395 |      28.8 |          18 |           10.23s |      2.93s |      13.48s | title-length(3)                    |                 |
-| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`     |       2 |             3,206 |                   112 |          3,318 |          393 |      55.1 |          13 |           10.58s |      2.22s |      13.12s |                                    |                 |
-| `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`     |       2 |             3,206 |                   130 |          3,336 |          395 |      57.7 |          13 |           10.77s |      2.19s |      13.29s | description-sentences(3), ...      |                 |
-| `mlx-community/pixtral-12b-8bit`                        |       2 |             3,396 |                   115 |          3,511 |          477 |      35.3 |          16 |           10.78s |      2.93s |      14.05s |                                    |                 |
-| `microsoft/Phi-3.5-vision-instruct`                     |      13 |             1,444 |                   500 |          1,944 |         1307 |      51.7 |         9.6 |           11.23s |      1.47s |      13.02s | ⚠️harness(stop_token), ...         |                 |
-| `mlx-community/pixtral-12b-bf16`                        |       2 |             3,396 |                   107 |          3,503 |          525 |      19.8 |          28 |           12.28s |      4.58s |      17.19s |                                    |                 |
-| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               872 |                   105 |            977 |          173 |      15.4 |          34 |           12.30s |      6.91s |      19.55s | context-ignored                    |                 |
-| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |             2,829 |                   105 |          2,934 |          273 |      43.5 |          11 |           13.19s |      1.56s |      15.07s | missing-sections(title+descrip...  |                 |
-| `mlx-community/paligemma2-3b-pt-896-4bit`               |    1297 |             4,699 |                   500 |          5,199 |         1478 |      41.4 |         4.5 |           15.85s |      2.69s |      18.87s | repetitive(phrase: "- output o...  |                 |
-| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |             1,627 |                    58 |          1,685 |          444 |      4.87 |          27 |           15.99s |      5.23s |      21.56s | missing-sections(title+descrip...  |                 |
-| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |             2,710 |                   102 |          2,812 |          225 |        28 |          22 |           16.09s |      3.64s |      20.05s | ⚠️harness(encoding), ...           |                 |
-| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      |   53958 |             1,941 |                   500 |          2,441 |          347 |      43.9 |          60 |           17.86s |     10.91s |      29.10s | missing-sections(title+descrip...  |                 |
-| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      |  128009 |               580 |                   153 |            733 |          169 |      9.12 |          15 |           20.63s |      2.57s |      23.52s | missing-sections(title+descrip...  |                 |
-| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         |    1729 |             3,487 |                   500 |          3,987 |          403 |      35.8 |          15 |           23.02s |      2.83s |      26.18s | degeneration, ...                  |                 |
-| `mlx-community/GLM-4.6V-Flash-mxfp4`                    |   12877 |             6,723 |                   500 |          7,223 |          334 |      62.6 |         8.4 |           28.56s |      2.08s |      30.98s | missing-sections(title+descrip...  |                 |
-| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         |  235265 |             1,627 |                   500 |          2,127 |         1525 |      16.9 |          11 |           31.06s |      3.24s |      34.63s | missing-sections(title+descrip...  |                 |
-| `mlx-community/GLM-4.6V-Flash-6bit`                     |    9128 |             6,723 |                   500 |          7,223 |          336 |      46.6 |          11 |           31.16s |      2.35s |      33.84s | missing-sections(title+descrip...  |                 |
-| `mlx-community/Molmo-7B-D-0924-bf16`                    |  151643 |             1,788 |                   125 |          1,913 |           52 |      27.9 |          48 |           39.68s |      2.93s |      42.93s | missing-sections(title+descrip...  |                 |
-| `mlx-community/Molmo-7B-D-0924-8bit`                    |  151643 |             1,788 |                   345 |          2,133 |         52.1 |      43.8 |          41 |           43.05s |      1.92s |      45.29s | refusal(insufficient_info), ...    |                 |
-| `mlx-community/X-Reasoner-7B-8bit`                      |  151645 |            16,837 |                   145 |         16,982 |          426 |      47.8 |          13 |           43.09s |      2.20s |      45.61s | title-length(4), ...               |                 |
-| `meta-llama/Llama-3.2-11B-Vision-Instruct`              |  128009 |               581 |                   145 |            726 |          158 |      3.69 |          25 |           43.35s |      3.95s |      47.62s | missing-sections(title+descrip...  |                 |
-| `Qwen/Qwen3-VL-2B-Instruct`                             |  151645 |            16,826 |                   146 |         16,972 |          379 |      75.7 |         8.3 |           46.77s |      1.29s |      48.37s | description-sentences(3)           |                 |
-| `mlx-community/GLM-4.6V-nvfp4`                          |      13 |             6,723 |                   500 |          7,223 |          193 |      31.8 |          78 |           51.08s |     11.58s |      62.99s | missing-sections(title+descrip...  |                 |
-| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |      11 |            16,828 |                   500 |         17,328 |          351 |      75.3 |         8.3 |           55.09s |      1.50s |      56.91s | missing-sections(title), ...       |                 |
-| `mlx-community/Qwen3.5-35B-A3B-6bit`                    |     328 |            16,850 |                   500 |         17,350 |          237 |      76.6 |          35 |           78.20s |      5.55s |      84.08s | refusal(explicit_refusal), ...     |                 |
-| `mlx-community/Qwen3.5-35B-A3B-bf16`                    |     326 |            16,850 |                   500 |         17,350 |          243 |      55.3 |          76 |           78.88s |     13.51s |      92.71s | ⚠️harness(long_context), ...       |                 |
-| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               |  151645 |            16,837 |                   147 |         16,984 |          196 |       181 |         5.1 |           87.17s |      1.16s |      88.66s | fabrication, ...                   |                 |
-| `mlx-community/Qwen3.5-27B-4bit`                        |   18448 |            16,850 |                   500 |         17,350 |          121 |      25.1 |          26 |          159.87s |      3.61s |     163.83s | refusal(explicit_refusal), ...     |                 |
-| `mlx-community/Qwen3.5-27B-mxfp8`                       |    3158 |            16,850 |                   500 |         17,350 |          116 |      14.9 |          39 |          178.96s |      5.64s |     184.92s | missing-sections(title+descrip...  |                 |
+| Model Name                                              |   Token |   Prompt (tokens) |   Generation (tokens) |   Total Tokens |   Prompt Tps |   Gen TPS |   Peak (GB) |   Generation (s) |   Load (s) |   Total (s) | Quality Issues                          |   Error Package |
+|:--------------------------------------------------------|--------:|------------------:|----------------------:|---------------:|-------------:|----------:|------------:|-----------------:|-----------:|------------:|:----------------------------------------|----------------:|
+| `microsoft/Florence-2-large-ft`                         |         |                   |                       |                |              |           |             |            0.43s |      0.44s |       1.14s | fabrication, title-length(29), ...      |    transformers |
+| `mlx-community/InternVL3-8B-bf16`                       |         |                   |                       |                |              |           |             |            2.08s |      1.70s |       4.13s | fabrication, title-length(29), ...      |         mlx-vlm |
+| `mlx-community/Molmo-7B-D-0924-bf16`                    |         |                   |                       |                |              |           |             |           19.34s |      1.69s |      21.29s | fabrication, title-length(29), ...      |         mlx-vlm |
+| `mlx-community/Qwen3.5-27B-4bit`                        |         |                   |                       |                |              |           |             |            0.26s |      2.37s |       2.95s | ⚠️harness(stop_token), ...              |    transformers |
+| `mlx-community/Qwen3.5-27B-mxfp8`                       |         |                   |                       |                |              |           |             |            0.26s |      3.35s |       3.87s | ⚠️harness(stop_token), ...              |    transformers |
+| `mlx-community/Qwen3.5-35B-A3B-6bit`                    |         |                   |                       |                |              |           |             |            0.26s |      3.71s |       4.23s | ⚠️harness(stop_token), ...              |    transformers |
+| `mlx-community/Qwen3.5-35B-A3B-bf16`                    |         |                   |                       |                |              |           |             |            0.27s |     11.35s |      11.89s | ⚠️harness(stop_token), ...              |    transformers |
+| `mlx-community/deepseek-vl2-8bit`                       |         |                   |                       |                |              |           |             |                  |      2.78s |       3.04s | missing-sections(title+descrip...       |    model-config |
+| `mlx-community/LFM2-VL-1.6B-8bit`                       |       7 |               784 |                    93 |            877 |         7884 |       322 |         2.8 |            0.82s |      0.53s |       1.62s | missing-sections(title+descrip...       |                 |
+| `mlx-community/FastVLM-0.5B-bf16`                       |  151645 |               533 |                    28 |            561 |         5419 |       329 |         2.1 |            0.95s |      0.60s |       1.95s | missing-sections(title+descrip...       |                 |
+| `mlx-community/nanoLLaVA-1.5-4bit`                      |     624 |               529 |                   500 |           1029 |         5586 |       352 |         2.5 |            1.94s |      0.57s |       2.77s | title-length(11), ...                   |                 |
+| `prince-canuma/Florence-2-large-ft`                     |       0 |              1099 |                   500 |           1599 |         9384 |       357 |         5.1 |            1.97s |      0.67s |       2.90s | ⚠️harness(stop_token), ...              |                 |
+| `mlx-community/paligemma2-10b-ft-docci-448-6bit`        |       1 |              1556 |                    17 |           1573 |         1364 |      30.8 |          12 |            2.12s |      1.98s |       4.37s | missing-sections(title+descrip...       |                 |
+| `mlx-community/Ministral-3-3B-Instruct-2512-4bit`       |       2 |              3123 |                   142 |           3265 |         2829 |       175 |         7.8 |            2.38s |      0.89s |       3.54s |                                         |                 |
+| `mlx-community/Phi-3.5-vision-instruct-bf16`            |   32007 |              1350 |                   123 |           1473 |         3741 |      56.2 |         9.5 |            2.92s |      0.84s |       4.02s | metadata-borrowing                      |                 |
+| `mlx-community/paligemma2-3b-ft-docci-448-bf16`         |       1 |              1556 |                    42 |           1598 |         3236 |      19.4 |          11 |            3.07s |      1.73s |       5.07s | missing-sections(title+descrip...       |                 |
+| `mlx-community/LFM2.5-VL-1.6B-bf16`                     |   12123 |               784 |                   500 |           1284 |         7227 |       188 |           4 |            3.18s |      0.59s |       4.04s | title-length(15), ...                   |                 |
+| `mlx-community/paligemma2-10b-ft-docci-448-bf16`        |       1 |              1556 |                     9 |           1565 |         1054 |      5.67 |          27 |            3.50s |      2.79s |       6.54s | ⚠️harness(prompt_template), ...         |                 |
+| `mlx-community/InternVL3-14B-8bit`                      |  151645 |              2312 |                    64 |           2376 |         1246 |      30.9 |          18 |            4.39s |      1.75s |       6.62s | title-length(2), ...                    |                 |
+| `mlx-community/gemma-3-27b-it-qat-4bit`                 |     106 |               800 |                    87 |            887 |          612 |        31 |          19 |            4.53s |      2.57s |       7.36s |                                         |                 |
+| `mlx-community/SmolVLM2-2.2B-Instruct-mlx`              |   49153 |               637 |                   500 |           1137 |         1893 |       129 |         5.5 |            4.74s |      0.63s |       5.63s | missing-sections(title+descrip...       |                 |
+| `mlx-community/pixtral-12b-8bit`                        |       2 |              3314 |                    97 |           3411 |         1813 |      38.9 |          16 |            4.78s |      1.72s |       6.78s | title-length(4)                         |                 |
+| `mlx-community/gemma-3n-E2B-4bit`                       |  236761 |               791 |                   500 |           1291 |         2452 |       121 |           6 |            4.83s |      1.70s |       6.80s | missing-sections(title+descrip...       |                 |
+| `qnguyen3/nanoLLaVA`                                    |   98266 |               529 |                   500 |           1029 |         4894 |       111 |         4.6 |            5.02s |      0.79s |       6.06s | repetitive(phrase: "painting g...       |                 |
+| `mlx-community/SmolVLM-Instruct-bf16`                   |    1597 |              1736 |                   500 |           2236 |         4068 |       122 |         5.5 |            5.05s |      0.59s |       5.91s | repetitive(unt), ...                    |                 |
+| `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`     |       2 |              3124 |                   128 |           3252 |         1185 |      64.5 |          13 |            5.09s |      1.34s |       6.70s | description-sentences(3)                |                 |
+| `HuggingFaceTB/SmolVLM-Instruct`                        |    1597 |              1736 |                   500 |           2236 |         4038 |       121 |         5.5 |            5.10s |      0.63s |       5.97s | repetitive(unt), ...                    |                 |
+| `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`     |       2 |              3124 |                   130 |           3254 |         1136 |      62.1 |          13 |            5.32s |      1.37s |       6.96s |                                         |                 |
+| `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`                 |      16 |              1522 |                   500 |           2022 |         1769 |       124 |          18 |            5.41s |      1.97s |       7.65s | repetitive(因此，所以可打印表图1.), ... |                 |
+| `mlx-community/llava-v1.6-mistral-7b-8bit`              |       2 |              2732 |                   182 |           2914 |         1133 |      61.5 |         9.7 |            5.93s |      0.89s |       7.08s | missing-sections(title+descrip...       |                 |
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit`               |    1609 |              1522 |                   500 |           2022 |         1722 |       108 |          22 |            6.06s |      2.18s |       8.63s | repetitive(phrase: "use only d...       |                 |
+| `mlx-community/gemma-3-27b-it-qat-8bit`                 |     106 |               800 |                    89 |            889 |          544 |      16.8 |          34 |            7.17s |      3.78s |      11.23s | trusted-hints-degraded                  |                 |
+| `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit` |       2 |              2626 |                    93 |           2719 |          763 |      21.7 |          22 |            8.19s |      2.27s |      10.74s | ⚠️harness(encoding), ...                |                 |
+| `mlx-community/gemma-3n-E4B-it-bf16`                    |     106 |               799 |                   355 |           1154 |         1707 |        48 |          17 |            8.24s |      2.52s |      11.03s | missing-sections(title+descrip...       |                 |
+| `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`          |      13 |              1522 |                   500 |           2022 |         1523 |      76.1 |          37 |            8.26s |      3.40s |      11.96s | degeneration, ...                       |                 |
+| `microsoft/Phi-3.5-vision-instruct`                     |      13 |              1350 |                   500 |           1850 |         3720 |      55.3 |         9.5 |            9.78s |      0.88s |      10.92s | ⚠️harness(stop_token), ...              |                 |
+| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`      |       2 |              1845 |                   464 |           2309 |         1030 |      52.4 |          60 |           11.35s |      4.80s |      16.42s | ⚠️harness(stop_token), ...              |                 |
+| `mlx-community/paligemma2-3b-pt-896-4bit`               |    5966 |              4628 |                   500 |           5128 |         3933 |      40.2 |         4.5 |           14.25s |      1.43s |      15.95s | repetitive(phrase: "- output o...       |                 |
+| `mlx-community/GLM-4.6V-Flash-mxfp4`                    |    3884 |              6643 |                   500 |           7143 |          881 |      63.8 |         8.4 |           15.93s |      1.32s |      17.54s | missing-sections(title+descrip...       |                 |
+| `mlx-community/Idefics3-8B-Llama3-bf16`                 |  128256 |              2811 |                   500 |           3311 |         2297 |      30.6 |          19 |           18.11s |      1.98s |      20.40s | missing-sections(title+descrip...       |                 |
+| `mlx-community/GLM-4.6V-Flash-6bit`                     |      12 |              6643 |                   500 |           7143 |          891 |      45.9 |          11 |           18.90s |      1.44s |      20.61s | missing-sections(title+descrip...       |                 |
+| `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`         |    1044 |              3405 |                   500 |           3905 |         1441 |      30.7 |          15 |           19.11s |      1.64s |      21.01s | missing-sections(title+keyword...       |                 |
+| `Qwen/Qwen3-VL-2B-Instruct`                             |   40208 |             16746 |                   500 |          17246 |         1230 |      86.8 |         8.3 |           20.21s |      0.76s |      21.24s | title-length(50), ...                   |                 |
+| `meta-llama/Llama-3.2-11B-Vision-Instruct`              |  128009 |               501 |                   100 |            601 |          264 |      4.71 |          25 |           23.55s |      2.23s |      26.06s | missing-sections(title+descrip...       |                 |
+| `mlx-community/Qwen3-VL-2B-Thinking-bf16`               |   11030 |             16748 |                   500 |          17248 |          947 |      77.8 |         8.3 |           24.97s |      0.81s |      26.05s | ⚠️harness(long_context), ...            |                 |
+| `mlx-community/X-Reasoner-7B-8bit`                      |    7217 |             16757 |                   500 |          17257 |          970 |      56.4 |          13 |           26.89s |      1.22s |      28.36s | ⚠️harness(long_context), ...            |                 |
+| `mlx-community/pixtral-12b-bf16`                        |   20760 |              3314 |                   500 |           3814 |         1908 |      20.1 |          28 |           27.05s |      2.53s |      29.84s | missing-sections(title+descrip...       |                 |
+| `mlx-community/Molmo-7B-D-0924-8bit`                    |    3015 |              1708 |                   500 |           2208 |         92.1 |      51.1 |          41 |           29.06s |      1.16s |      30.48s | repetitive(phrase: "waterway, ...       |                 |
+| `mlx-community/GLM-4.6V-nvfp4`                          |      11 |              6643 |                   500 |           7143 |          424 |      31.7 |          78 |           32.01s |      5.55s |      37.84s | missing-sections(title+descrip...       |                 |
+| `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`      |      11 |               500 |                   500 |           1000 |          287 |      15.4 |          15 |           34.68s |      1.60s |      36.54s | repetitive(phrase: "waterfront...       |                 |
+| `mlx-community/Qwen2-VL-2B-Instruct-4bit`               |         |                 0 |                     0 |              0 |            0 |         0 |         5.1 |           65.41s |      0.60s |      66.27s | ⚠️harness(prompt_template), ...         |                 |
 
 <!-- markdownlint-enable MD013 MD033 MD034 MD037 MD049 -->
 
-**Dedicated review artifact:**
-See the standalone model-by-model output view here:
-[model_gallery.md](model_gallery.md)
+**Review artifacts:**
+
+- Standalone output gallery: [model_gallery.md](model_gallery.md)
+- Automated review digest: [review.md](review.md)
+- Canonical run log: [check_models.log](check_models.log)
 
 ---
 
@@ -265,22 +310,22 @@ See the standalone model-by-model output view here:
 - **Metal SDK**: MacOSX.sdk
 - **Python Version**: 3.13.12
 - **Architecture**: arm64
-- **GPU/Chip**: Apple M4 Max
+- **GPU/Chip**: Apple M5 Max
 - **GPU Cores**: 40
 - **Metal Support**: Metal 4
 - **RAM**: 128.0 GB
-- **CPU Cores (Physical)**: 16
-- **CPU Cores (Logical)**: 16
+- **CPU Cores (Physical)**: 18
+- **CPU Cores (Logical)**: 18
 
 ## Library Versions
 
 - `numpy`: `2.4.3`
-- `mlx`: `0.31.2.dev20260315+0bdbfdb8`
-- `mlx-vlm`: `0.4.0`
+- `mlx`: `0.31.2.dev20260322+38ad2570`
+- `mlx-vlm`: `0.4.1`
 - `mlx-lm`: `0.31.2`
-- `huggingface-hub`: `1.7.1`
+- `huggingface-hub`: `1.7.2`
 - `transformers`: `5.3.0`
 - `tokenizers`: `0.22.2`
 - `Pillow`: `12.1.1`
 
-_Report generated on: 2026-03-15 22:43:55 GMT_
+_Report generated on: 2026-03-22 02:17:59 GMT_
