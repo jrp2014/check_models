@@ -29,7 +29,7 @@
     "src/tests"
   ],
   "mypy.configFile": "src/pyproject.toml",
-  "python.analysis.stubPath": "src/typings",
+  "python.analysis.stubPath": "typings",
   "python.analysis.exclude": [
     "**/typings/**",
     "**/node_modules",
@@ -98,7 +98,7 @@
   "cursorpyright.analysis.extraPaths": [
     "${workspaceFolder}/src"
   ],
-  "cursorpyright.analysis.stubPath": "src/typings",
+  "cursorpyright.analysis.stubPath": "typings",
   "cursorpyright.analysis.typeCheckingMode": "basic",
   "cursorpyright.analysis.useLibraryCodeForTypes": true
 }

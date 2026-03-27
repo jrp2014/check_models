@@ -43,8 +43,12 @@
 		{
 			"label": "Run: check_models (help)",
 			"type": "shell",
-			"command": "python",
+			"command": "conda",
 			"args": [
+				"run",
+				"-n",
+				"mlx-vlm",
+				"python",
 				"-m",
 				"check_models",
 				"--help"
@@ -77,8 +81,12 @@
 		{
 			"label": "VLM: Run Check Models",
 			"type": "shell",
-			"command": "python",
+			"command": "conda",
 			"args": [
+				"run",
+				"-n",
+				"mlx-vlm",
+				"python",
 				"src/check_models.py"
 			],
 			"group": "test",
@@ -88,155 +96,6 @@
 				"focus": false,
 				"panel": "shared"
 			}
-		},
-		{
-			"label": "Rebuild model gallery",
-			"type": "shell",
-			"command": "conda",
-			"args": [
-				"run",
-				"-n",
-				"mlx-vlm",
-				"python",
-				"/tmp/rebuild_model_gallery.py"
-			],
-			"isBackground": false,
-			"group": "build"
-		},
-		{
-			"label": "Lint model gallery",
-			"type": "shell",
-			"command": "npx",
-			"args": [
-				"--prefix",
-				"src",
-				"markdownlint",
-				"src/output/model_gallery.md"
-			],
-			"isBackground": false,
-			"group": "build"
-		},
-		{
-			"label": "Lint model gallery",
-			"type": "shell",
-			"command": "npx",
-			"args": [
-				"--prefix",
-				"src",
-				"markdownlint-cli2",
-				"src/output/model_gallery.md"
-			],
-			"isBackground": false,
-			"group": "build"
-		},
-		{
-			"label": "Lint model gallery cli2",
-			"type": "shell",
-			"command": "bash",
-			"args": [
-				"-lc",
-				"cd src && npx markdownlint-cli2 output/model_gallery.md"
-			],
-			"isBackground": false,
-			"group": "build"
-		},
-		{
-			"label": "Rebuild model gallery 2",
-			"type": "shell",
-			"command": "conda",
-			"args": [
-				"run",
-				"-n",
-				"mlx-vlm",
-				"python",
-				"/tmp/rebuild_model_gallery.py"
-			],
-			"isBackground": false,
-			"group": "build"
-		},
-		{
-			"label": "Lint model gallery cli2 v2",
-			"type": "shell",
-			"command": "bash",
-			"args": [
-				"-lc",
-				"cd src && npx markdownlint-cli2 output/model_gallery.md"
-			],
-			"isBackground": false,
-			"group": "build"
-		},
-		{
-			"label": "Rebuild model gallery 3",
-			"type": "shell",
-			"command": "conda",
-			"args": [
-				"run",
-				"-n",
-				"mlx-vlm",
-				"python",
-				"/tmp/rebuild_model_gallery.py"
-			],
-			"isBackground": false,
-			"group": "build"
-		},
-		{
-			"label": "Lint model gallery cli2 v3",
-			"type": "shell",
-			"command": "bash",
-			"args": [
-				"-lc",
-				"cd src && npx markdownlint-cli2 output/model_gallery.md"
-			],
-			"isBackground": false,
-			"group": "build"
-		},
-		{
-			"label": "Rebuild model gallery 4",
-			"type": "shell",
-			"command": "conda",
-			"args": [
-				"run",
-				"-n",
-				"mlx-vlm",
-				"python",
-				"/tmp/rebuild_model_gallery.py"
-			],
-			"isBackground": false,
-			"group": "build"
-		},
-		{
-			"label": "Lint model gallery cli2 v4",
-			"type": "shell",
-			"command": "bash",
-			"args": [
-				"-lc",
-				"cd src && npx markdownlint-cli2 output/model_gallery.md"
-			],
-			"isBackground": false,
-			"group": "build"
-		},
-		{
-			"label": "Validate temporary markdown artifacts",
-			"type": "shell",
-			"command": "zsh",
-			"args": [
-				"-lc",
-				"cd /Users/jrp/Documents/AI/mlx/check_models && tmpdir=$(mktemp -d) && export TMPDIR_CHECK=\"$tmpdir\" && /Users/jrp/miniconda3/envs/mlx-vlm/bin/python - <<'PY'\nimport os\nfrom pathlib import Path\nimport sys\n\nsys.path.insert(0, str(Path.cwd() / 'src'))\nsys.path.insert(0, str(Path.cwd() / 'src' / 'tests'))\n\nimport check_models\nfrom test_report_generation import _make_failure, _make_success, _stub_versions\n\nout_dir = Path(os.environ['TMPDIR_CHECK'])\nresults = [_make_success('org/good'), _make_failure('org/bad')]\ncontext = check_models._build_report_render_context(results=results, prompt='Describe this image fully.')\ncheck_models.generate_markdown_report(\n    results=results,\n    filename=out_dir / 'results.md',\n    versions=_stub_versions(),\n    prompt='Describe this image fully.',\n    total_runtime_seconds=1.0,\n    report_context=context,\n    gallery_filename=out_dir / 'model_gallery.md',\n)\ncheck_models.generate_markdown_gallery_report(\n    results=results,\n    filename=out_dir / 'model_gallery.md',\n    prompt='Describe this image fully.',\n    metadata={'title': 'Harbor Sunset', 'description': 'Fishing boats at dusk.'},\n    report_context=context,\n)\nprint(out_dir)\nPY\nnpx --prefix src markdownlint-cli2 \"$tmpdir/results.md\" \"$tmpdir/model_gallery.md\""
-			],
-			"isBackground": false
-		},
-		{
-			"label": "Lint temporary generated markdown",
-			"type": "shell",
-			"command": "npx",
-			"args": [
-				"--prefix",
-				"src",
-				"markdownlint-cli2",
-				"/var/folders/tk/zd2fp8lj21l9h1l1hrs7pq800000gn/T/tmpa08iod1j/results.md",
-				"/var/folders/tk/zd2fp8lj21l9h1l1hrs7pq800000gn/T/tmpa08iod1j/model_gallery.md"
-			],
-			"isBackground": false
 		}
 	]
 }
