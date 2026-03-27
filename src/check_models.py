@@ -1661,18 +1661,24 @@ def _display_width(text: str) -> int:
     return len(sanitized) if width < 0 else width
 
 
+def _display_align(text: str, width: int, *, alignment: Literal["left", "center"]) -> str:
+    """Pad text based on display width rather than codepoint length."""
+    pad_total = max(0, width - _display_width(text))
+    if alignment == "center":
+        left = pad_total // 2
+        right = pad_total - left
+        return f"{' ' * left}{text}{' ' * right}"
+    return f"{text}{' ' * pad_total}"
+
+
 def _display_ljust(text: str, width: int) -> str:
     """Right-pad text based on display width (not codepoint length)."""
-    pad = max(0, width - _display_width(text))
-    return f"{text}{' ' * pad}"
+    return _display_align(text, width, alignment="left")
 
 
 def _display_center(text: str, width: int) -> str:
     """Center text based on display width (not codepoint length)."""
-    pad_total = max(0, width - _display_width(text))
-    left = pad_total // 2
-    right = pad_total - left
-    return f"{' ' * left}{text}{' ' * right}"
+    return _display_align(text, width, alignment="center")
 
 
 # =============================================================================
@@ -1825,7 +1831,7 @@ class ColoredFormatter(logging.Formatter):
 
     def _style_header(self, raw_message: str, record: logging.LogRecord) -> str:
         width = int(getattr(record, "style_width", max(_display_width(raw_message), 1)))
-        centered = _display_center(raw_message, width)
+        centered = _display_align(raw_message, width, alignment="center")
         return Colors.colored(centered, Colors.BOLD, Colors.MAGENTA)
 
     def _style_section(self, raw_message: str, record: logging.LogRecord) -> str:
@@ -5260,29 +5266,6 @@ _BOOLEAN_FLAG_FIELDS: frozenset[str] = frozenset(
 )
 
 
-def _format_numeric_by_field(field_name: str, num: float) -> str:
-    """Format a numeric value based on field name conventions.
-
-    Dispatches to appropriate formatter based on field suffix or exact name.
-    """
-    # Check suffix-based patterns first
-    if field_name.endswith("_memory"):
-        return _format_memory_value_gb(num)
-    if field_name.endswith("_tps"):
-        return _format_tps(num)
-
-    # Check exact field name matches via lookup
-    if field_name in _TIME_FIELDS:
-        return _format_time_seconds(num)
-    if field_name == "quality_score":
-        return f"{num:.1f}"
-    if field_name in _BOOLEAN_FLAG_FIELDS:
-        return "✓" if num else "-"
-
-    # Default numeric formatting
-    return fmt_num(num)
-
-
 def _coerce_numeric_value(value: object) -> float | None:
     """Return a float for numeric or numeric-string values, else ``None``."""
     if isinstance(value, int | float):
@@ -5304,17 +5287,30 @@ def format_field_value(field_name: str, value: MetricValue) -> str:
     Handles memory/time/TPS conventions, preserves non-numeric strings as-is,
     and returns ``""`` for null values.
     """
+    formatted_value: str
     if value is None:
-        return ""
+        formatted_value = ""
+    else:
+        numeric_value = _coerce_numeric_value(value)
+        if numeric_value is not None:
+            if field_name.endswith("_memory"):
+                formatted_value = _format_memory_value_gb(numeric_value)
+            elif field_name.endswith("_tps"):
+                formatted_value = _format_tps(numeric_value)
+            elif field_name in _TIME_FIELDS:
+                formatted_value = _format_time_seconds(numeric_value)
+            elif field_name == "quality_score":
+                formatted_value = f"{numeric_value:.1f}"
+            elif field_name in _BOOLEAN_FLAG_FIELDS:
+                formatted_value = "✓" if numeric_value else "-"
+            else:
+                formatted_value = fmt_num(numeric_value)
+        elif isinstance(value, str):
+            formatted_value = value
+        else:
+            formatted_value = str(value)
 
-    numeric_value = _coerce_numeric_value(value)
-    if numeric_value is not None:
-        return _format_numeric_by_field(field_name, numeric_value)
-
-    if isinstance(value, str):
-        return value
-
-    return str(value)
+    return formatted_value
 
 
 def is_numeric_value(val: object) -> bool:
@@ -6589,7 +6585,7 @@ def pretty_print_exif(
     # Print the title with consistent rule width
     log_rule(header_width, char="=", color=Colors.BLUE, bold=True)
     logger.info(
-        _display_center(title, header_width),
+        _display_align(title, header_width, alignment="center"),
         extra={"style_hint": LogStyles.HEADER, "style_width": header_width},
     )
     log_rule(header_width, char="=", color=Colors.BLUE, bold=True)
@@ -7840,11 +7836,6 @@ def _format_issues_summary_parts(
 def format_issues_summary_html(summary: ModelIssueSummary, stats: PerformanceStats) -> str:
     """Format the issues and statistics summary as an HTML string."""
     return "".join(_format_issues_summary_parts(summary, stats, html_output=True))
-
-
-def _format_failures_by_package_text(results: list[PerformanceResult]) -> list[str]:
-    """Generate a shared Markdown failure-ownership section."""
-    return _format_failures_by_package_parts(results, html_output=False)
 
 
 def _relative_markdown_artifact_path(*, report_filename: Path, artifact_filename: Path) -> str:
@@ -13367,6 +13358,7 @@ def _temporary_mlx_vlm_lossy_bpe_detokenizer_patch() -> Generator[None]:
     if not isinstance(detokenizer_cls, type) or not callable(original_add_token):
         yield
         return
+    detokenizer_type = cast("Any", detokenizer_cls)
 
     def _lossy_add_token(
         self: object,
@@ -13423,11 +13415,11 @@ def _temporary_mlx_vlm_lossy_bpe_detokenizer_patch() -> Generator[None]:
         detokenizer.text = next_text
         object.__setattr__(detokenizer, "_unflushed", value)
 
-    detokenizer_cls.add_token = _lossy_add_token
+    detokenizer_type.add_token = _lossy_add_token
     try:
         yield
     finally:
-        detokenizer_cls.add_token = original_add_token
+        detokenizer_type.add_token = original_add_token
 
 
 def _run_generation_with_retry_workaround(
@@ -14058,7 +14050,7 @@ def log_metric_tree(prefix: str, label: str, value: str, *, indent: str = "") ->
         indent: Additional indentation before the prefix
     """
     # Example output: "     ├─ Total:      1,234 tok/s"
-    formatted = f"{indent}{prefix} {_display_ljust(label, 11)} {value}"
+    formatted = f"{indent}{prefix} {_display_align(label, 11, alignment='left')} {value}"
     logger.info(formatted, extra={"style_hint": LogStyles.METRIC_VALUE})
 
 
