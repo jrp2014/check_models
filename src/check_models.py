@@ -173,7 +173,7 @@ ERROR_MLX_LM_MISSING: Final[str] = (
 ERROR_MLX_VLM_RUNTIME_INIT: Final[str] = (
     "Core dependency initialization failed: mlx-vlm could not be imported safely."
 )
-PROJECT_MIN_TRANSFORMERS_VERSION: Final[str] = "5.3.0"
+PROJECT_MIN_TRANSFORMERS_VERSION: Final[str] = "5.4.0"
 MLX_IMPORT_PROBE_TIMEOUT_SECONDS: Final[float] = 8.0
 DEFAULT_THINKING_END_MARKER: Final[str] = "</think>"
 UPSTREAM_MLX_VLM_MINIMUMS: Final[dict[str, str]] = {
@@ -5609,7 +5609,7 @@ def _collect_upstream_requirements(
         else:
             requirements[package] = (current_minimum, merged_sources)
 
-    # Project-level dependency floor (policy): transformers >= 5.3.
+    # Project-level dependency floor (policy): transformers >= 5.4.
     _record_requirement("transformers", PROJECT_MIN_TRANSFORMERS_VERSION, "check_models")
 
     if versions.get("mlx-vlm"):
@@ -15091,10 +15091,18 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     st_present = bool(importlib_util.find_spec("sentence_transformers"))
     guard_on = os.getenv("MLX_VLM_ALLOW_TF", "0") != "1"
     if guard_on and tf_present:
-        logger.info(
-            "TensorFlow detected; backend-disable env guards were requested "
-            "(set MLX_VLM_ALLOW_TF=1 to opt in).",
-        )
+        if _TRANSFORMERS_BACKEND_GUARD_ENV_DEFAULTS:
+            logger.info(
+                "TensorFlow detected; exported supported legacy transformers backend guard env vars: %s "
+                "(set MLX_VLM_ALLOW_TF=1 to opt in).",
+                ", ".join(sorted(_TRANSFORMERS_BACKEND_GUARD_ENV_DEFAULTS)),
+            )
+        else:
+            logger.warning(
+                "TensorFlow detected, but current transformers no longer honors the legacy TF/Flax/JAX "
+                "backend-guard env vars used by check_models; no backend suppression is being enforced. "
+                "Set MLX_VLM_ALLOW_TF=1 to silence this warning if you explicitly want TensorFlow available.",
+            )
     if st_present:
         logger.warning(
             "Detected 'sentence-transformers'. It's not used here by default and may "

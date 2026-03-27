@@ -1,7 +1,7 @@
 [project]
 name = "check_models"
 description = "Image analysis and caption generation using MLX Vision Language Models."
-version = "0.3.1"
+version = "0.3.2"
 authors = [{ name = "jrp2014", email = "jrp2014@users.noreply.github.com" }]
 requires-python = ">=3.13"
 readme = "README.md"
@@ -32,7 +32,7 @@ dependencies = [
     "mlx>=0.31.1",
     "mlx-vlm>=0.4.1",
     # Project-level compatibility floor for the MLX ecosystem.
-    "transformers>=5.3.0",
+    "transformers>=5.4.0",
     "Pillow[xmp]>=10.3.0",
     "huggingface-hub[torch,typing]>=0.34.0",
     "requests>=2.31.0",
@@ -68,10 +68,8 @@ extras = [
     # Language-model utilities (not required for base benchmarking)
     "mlx-lm>=0.31.1",
     "sentencepiece",
-    # TensorFlow (needed for some models like Florence-2)
-    "tensorflow",
 ]
-torch = ["torch>=2.2.0", "torchvision>=0.17.0", "torchaudio>=2.2.0"]
+torch = ["torch>=2.2.0", "torchvision>=0.17.0", "torchaudio>=2.2.0", "timm"]
 dev = [
     "ruff>=0.1.0",
     "mypy>=1.8.0",

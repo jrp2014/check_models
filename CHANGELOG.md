@@ -4,6 +4,8 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-03-27
+
 ### Changed
 
 - Escaped inline emphasis markers in model-gallery quality warning bullets so
@@ -22,8 +24,11 @@ Notable changes to this project will be documented in this file.
   and `MD060` disables.
 - Refreshed the MLX stack compatibility policy to track current upstream stable
   releases more closely: `mlx>=0.31.1`, `mlx-vlm>=0.4.1`, `mlx-lm>=0.31.1`,
-  and `transformers>=5.3.0`, and aligned preflight diagnostics and fallback
+  and `transformers>=5.4.0`, and aligned preflight diagnostics and fallback
   environment validation tables with current upstream minimum requirements.
+- Dropped TensorFlow from packaged optional dependencies, since `check_models`
+  does not import it directly, and added `timm` to the `torch` extra so
+  FastVLM-style remote-code models install their required vision backbone.
 - Updated `src/tools/update.sh` to keep Markdown lint tooling repo-local via
   `npm install --prefix src` instead of globally mutating npm packages, while
   preserving the default MLX build path with `MLX_METAL_JIT` unset/off unless

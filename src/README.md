@@ -139,7 +139,7 @@ Enable additional features by installing "extras":
 # Install core + extras (psutil, tokenizers, etc.)
 pip install -e ".[extras]"
 
-# Install PyTorch support (needed for Phi-3-vision, Florence-2)
+# Install PyTorch support (needed for Phi-3-vision, Florence-2, FastVLM/timm-backed models)
 pip install -e ".[torch]"
 
 # Install everything for development
@@ -424,7 +424,7 @@ Several behaviors can be customized via environment variables (useful for CI/aut
 | `FORCE_COLOR` | Force ANSI colors even in non-TTY | Not set | `FORCE_COLOR=1` |
 | `TRANSFORMERS_NO_TF` | Legacy Transformers backend guard (best effort) | Exported only if installed `transformers` still references it | `TRANSFORMERS_NO_TF=0` |
 | `USE_TF` | Compatibility backend guard (best effort) | Exported only if installed `transformers` still references it | `USE_TF=1` |
-| `MLX_VLM_ALLOW_TF` | Override TensorFlow blocking | Not set (blocked) | `MLX_VLM_ALLOW_TF=1` to allow |
+| `MLX_VLM_ALLOW_TF` | Allow user-installed TensorFlow imports | Not set (blocked) | `MLX_VLM_ALLOW_TF=1` to allow |
 | `TOKENIZERS_PARALLELISM` | Disable tokenizer parallelism warnings | `false` | `TOKENIZERS_PARALLELISM=true` |
 | `MLX_METAL_JIT` | Optional `tools/update.sh` override (`MLX_METAL_JIT`) | Unset (uses MLX default `OFF`, pre-built kernels) | `MLX_METAL_JIT=ON` for runtime JIT |
 
@@ -441,7 +441,7 @@ MLX_VLM_WIDTH=120 python -m check_models --folder ~/Pictures
 # Disable colors for log file capture
 NO_COLOR=1 python -m check_models > output.log 2>&1
 
-# Allow TensorFlow for specific model (may crash on Apple Silicon)
+# Allow manually installed TensorFlow for a specific model (may crash on Apple Silicon)
 MLX_VLM_ALLOW_TF=1 python -m check_models --models model-needing-tf
 ```
 
@@ -493,7 +493,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- MANUAL_INSTALL_START -->
 ```bash
-pip install "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.31.1" "mlx-vlm>=0.4.1" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "transformers>=5.3.0" "tzlocal>=5.0" "wcwidth>=0.2.13"
+pip install "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.31.1" "mlx-vlm>=0.4.1" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "transformers>=5.4.0" "tzlocal>=5.0" "wcwidth>=0.2.13"
 ```
 <!-- MANUAL_INSTALL_END -->
 
@@ -604,6 +604,7 @@ Optional (enable additional features):
 | Language model utilities | `mlx-lm` | `extras` | `pip install -e "src/[extras]"` |
 | Transformer model support | `transformers` | core runtime | Installed by `make install` / `pip install -e src/` |
 | PyTorch stack (needed for some models) | `torch`, `torchvision`, `torchaudio` | `torch` | `pip install -e "src/[torch]"` or `make -C src install-torch` |
+| Vision backbones for FastVLM-style models | `timm` | `torch` | `pip install -e "src/[torch]"` or `make -C src install-torch` |
 
 **Note**: Some models (e.g., Phi-3-vision, certain Florence2 variants) require PyTorch. If you encounter import errors for `torch`, `torchvision`, or `torchaudio`, install with:
 
@@ -633,16 +634,16 @@ Development / QA:
 
 <!-- MINIMAL_INSTALL_START -->
 ```bash
-pip install "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.31.1" "mlx-vlm>=0.4.1" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "transformers>=5.3.0" "tzlocal>=5.0" "wcwidth>=0.2.13"
+pip install "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.31.1" "mlx-vlm>=0.4.1" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "transformers>=5.4.0" "tzlocal>=5.0" "wcwidth>=0.2.13"
 ```
 <!-- MINIMAL_INSTALL_END -->
 
 ### With Optional Extras
 
-The `extras` group in `pyproject.toml` pulls in `psutil`, `tokenizers`, and `mlx-lm`:
+The `extras` group in `pyproject.toml` pulls in `psutil`, `tokenizers`, `einops`, `num2words`, `mlx-lm`, and `sentencepiece`:
 
 ```bash
-pip install -e ".[extras]"  # adds psutil, tokenizers
+pip install -e ".[extras]"  # adds optional metrics, tokenizer, and processor deps
 ```
 
 To include the optional PyTorch stack when needed (macOS wheels include MPS acceleration):
@@ -651,10 +652,12 @@ To include the optional PyTorch stack when needed (macOS wheels include MPS acce
 pip install -e ".[torch]"
 ```
 
+That `torch` extra also installs `timm`, which is required by FastVLM remote-code model loaders.
+
 ### Full Development Environment
 
 ```bash
-pip install -e ".[dev,extras]"  # dev tools + optional metrics/tokenizers
+pip install -e ".[dev,extras,torch]"  # dev tools + optional model/runtime deps
 ```
 
 
@@ -664,10 +667,10 @@ pip install -e ".[dev,extras]"  # dev tools + optional metrics/tokenizers
 > `psutil` is optional (installed with `extras`); if absent the extended Apple Silicon hardware section omits RAM/cores.
 
 > [!NOTE]
-> `extras` group bundles: psutil, tokenizers, mlx-lm. Install only if you need extended metrics or LM features.
+> `extras` group bundles: psutil, tokenizers, einops, num2words, mlx-lm, and sentencepiece. Install only if you need those optional model and utility dependencies.
 
 > [!NOTE]
-> Project policy requires `transformers>=5.3.0`.
+> Project policy requires `transformers>=5.4.0`.
 
 > [!NOTE]
 > `system_profiler` is a macOS built-in (no install needed) used for GPU name / core info.
@@ -1013,7 +1016,7 @@ Option 2 - Uninstall TensorFlow completely (recommended for MLX-only environment
 pip uninstall -y tensorflow tensorboard keras absl-py astunparse flatbuffers gast google_pasta grpcio h5py libclang ml_dtypes opt_einsum termcolor wrapt tensorboard-data-server
 ```
 
-**Note**: Most MLX VLMs don't need TensorFlow. If a model actually requires it, you can allow TensorFlow with `MLX_VLM_ALLOW_TF=1`, but this may cause mutex crashes on Apple Silicon.
+**Note**: `check_models` does not install TensorFlow. If you add TensorFlow manually for a specific remote-code model, you can allow it with `MLX_VLM_ALLOW_TF=1`, but this may cause mutex crashes on Apple Silicon.
 
 ### Debug Mode
 
@@ -1058,7 +1061,7 @@ If TensorFlow is installed, these guards often prevent loading and avoid mutex c
    pip uninstall -y tensorflow tensorboard keras
    ```
 
-3. **If a model needs TensorFlow**: Set `MLX_VLM_ALLOW_TF=1` to allow it, but be aware this may cause crashes on Apple Silicon
+3. **If you intentionally installed TensorFlow for a model**: Set `MLX_VLM_ALLOW_TF=1` to allow it, but be aware this may cause crashes on Apple Silicon
 
 **Why this matters**: TensorFlow's Abseil mutex implementation conflicts with MLX on macOS/ARM, causing crashes. Most MLX VLMs don't need TensorFlow.
 

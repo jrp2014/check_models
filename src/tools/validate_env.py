@@ -131,7 +131,7 @@ if not CORE_PACKAGES:
     CORE_PACKAGES = {
         "mlx": ">=0.31.1",
         "mlx-vlm": ">=0.4.1",
-        "transformers": ">=5.3.0",
+        "transformers": ">=5.4.0",
         "Pillow": ">=10.3.0",
         "huggingface-hub": ">=0.34.0",
         "tabulate": ">=0.9.0",
