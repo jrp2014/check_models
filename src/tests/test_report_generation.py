@@ -1133,8 +1133,8 @@ class TestDiagnosticsReport:
         assert "local_wrapper()" not in content
         assert "mlx_vlm/utils.py" in content
 
-    def test_full_tracebacks_in_collapsed_section(self, tmp_path: Path) -> None:
-        """Diagnostics should include full traceback blocks in one collapsed section."""
+    def test_traceback_tail_used_in_collapsed_section(self, tmp_path: Path) -> None:
+        """Diagnostics should include only the traceback tail in collapsed details."""
         tb = "\n".join(f"trace-line-{i}" for i in range(12))
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
@@ -1147,8 +1147,10 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         assert "Detailed trace logs (affected model)" in content
         assert "<details>" in content
-        # line 0 confirms full-trace inclusion (not only a tail excerpt).
-        assert "trace-line-0" in content
+        assert "Traceback tail:" in content
+        assert "trace-line-0" not in content
+        assert "trace-line-6" in content
+        assert "trace-line-11" in content
 
     def test_captured_output_in_collapsed_section(self, tmp_path: Path) -> None:
         """Diagnostics should include captured stdout/stderr in the detailed log section."""
@@ -1171,6 +1173,7 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         assert "Detailed trace logs (affected model)" in content
         assert "Tokenizer warning here" in content
+        assert "Downloading: 100%" not in content
         assert "\x1b[" not in content
         assert "\r" not in content
         assert "#### `org/m`" in content
@@ -1729,8 +1732,8 @@ class TestDiagnosticsReport:
         assert "python -m check_models" in content
         assert "python -m check_models --models org/broken-model" in content
 
-    def test_filing_guidance_contains_repro_command_only(self, tmp_path: Path) -> None:
-        """Failure clusters should include only a concise repro command."""
+    def test_filing_guidance_points_to_footer_repro_section(self, tmp_path: Path) -> None:
+        """Failure clusters should point readers to the footer repro appendix."""
         out = tmp_path / "diag.md"
         generate_diagnostics_report(
             results=[
@@ -1756,7 +1759,9 @@ class TestDiagnosticsReport:
         assert "Canonical code" not in content
         assert "Signature" not in content
         assert "Environment fingerprint" not in content
-        assert "Repro command" in content
+        assert "Exact model-specific repro command appears below" in content
+        assert "Representative failing model: `org/broken-model`" in content
+        assert "Repro command (exact run)" not in content
         assert "issues/new" not in content
         assert "Repro bundle" not in content
 

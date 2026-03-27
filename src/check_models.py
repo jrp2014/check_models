@@ -8559,6 +8559,15 @@ class DiagnosticsConfig:
 
 DIAGNOSTICS: Final[DiagnosticsConfig] = DiagnosticsConfig()
 
+_DIAGNOSTICS_CAPTURE_NOISE_PATTERNS: Final[tuple[re.Pattern[str], ...]] = (
+    re.compile(
+        r"^\s*(?:Downloading|Fetching|Resolving|Loading checkpoint shards)\b.*$", re.IGNORECASE
+    ),
+    re.compile(r"^\s*(?:Download complete|Download finished)\b.*$", re.IGNORECASE),
+    re.compile(r"^\s*(?:\d+%|\d+/\d+)\s*\|.*\|.*$"),
+    re.compile(r"^\s*[A-Za-z][A-Za-z0-9 _/:-]{0,48}:\s*\d+%\s*$"),
+)
+
 # System info keys to include in the environment table (order matters)
 _DIAGNOSTICS_SYSTEM_KEYS: Final[tuple[str, ...]] = (
     "Python Version",
@@ -9171,24 +9180,37 @@ def _format_recent_repro_ratio(history_info: FailureHistoryContext | None) -> st
     return f"{recent_failures}/{recent_considered} recent runs failed"
 
 
+def _sanitize_capture_for_diagnostics(captured_output: str | None) -> str | None:
+    """Strip low-signal terminal noise while preserving actionable stderr/stdout."""
+    if not captured_output:
+        return None
+
+    sanitized = ANSI_ESCAPE_RE.sub("", captured_output)
+    sanitized = sanitized.replace("\r\n", "\n").replace("\r", "\n").replace("\x08", "")
+    sanitized = "".join(ch for ch in sanitized if ch in {"\n", "\t"} or ch.isprintable())
+
+    kept_lines: list[str] = []
+    for raw_line in sanitized.splitlines():
+        stripped = raw_line.strip()
+        if stripped and any(
+            pattern.search(stripped) for pattern in _DIAGNOSTICS_CAPTURE_NOISE_PATTERNS
+        ):
+            continue
+        kept_lines.append(raw_line.rstrip())
+
+    compact = "\n".join(kept_lines)
+    compact = re.sub(r"\n{3,}", "\n\n", compact).strip()
+    return compact or None
+
+
 def _diagnostics_detailed_trace_logs_section(
     cluster_results: list[PerformanceResult],
 ) -> list[str]:
     """Build one collapsed block containing traceback/log details per model."""
     model_logs: list[tuple[str, str | None, str | None]] = []
     for result in cluster_results:
-        traceback_text = _normalize_traceback_for_report(result.error_traceback)
-        captured_output = result.captured_output_on_fail or ""
-        if captured_output:
-            captured_output = ANSI_ESCAPE_RE.sub("", captured_output)
-            captured_output = (
-                captured_output.replace("\r\n", "\n").replace("\r", "\n").replace("\x08", "")
-            )
-            captured_output = "".join(
-                ch for ch in captured_output if ch in {"\n", "\t"} or ch.isprintable()
-            )
-            captured_output = re.sub(r"\n{3,}", "\n\n", captured_output).strip()
-        captured_text = captured_output or None
+        traceback_text = _format_traceback_tail(result.error_traceback)
+        captured_text = _sanitize_capture_for_diagnostics(result.captured_output_on_fail)
         if traceback_text is None and captured_text is None:
             continue
         model_logs.append((result.model_name, traceback_text, captured_text))
@@ -9201,7 +9223,7 @@ def _diagnostics_detailed_trace_logs_section(
         body_lines.append(f"#### `{DIAGNOSTICS_ESCAPER.escape(model_name)}`")
         body_lines.append("")
         if traceback_text is not None:
-            body_lines.append("Traceback:")
+            body_lines.append("Traceback tail:")
             _append_markdown_code_block(body_lines, traceback_text, language="text")
         if captured_text is not None:
             body_lines.append("Captured stdout/stderr:")
@@ -9955,25 +9977,19 @@ def _summarize_quality_signals(qa: GenerationQualityAnalysis | None) -> list[str
 def _build_cluster_filing_guidance(
     *,
     representative: PerformanceResult,
-    image_path: Path | None,
-    run_args: argparse.Namespace | None,
 ) -> list[str]:
-    """Build concise filing guidance with an exact repro command."""
-    repro_tokens = _build_repro_command_tokens(
-        image_path=image_path,
-        run_args=run_args,
-        include_selection=False,
-    )
-    repro_command = shlex_join([*repro_tokens, "--models", representative.model_name])
-    return [f"- Repro command (exact run): `{repro_command}`"]
+    """Build concise filing guidance without repeating the full repro command."""
+    return [
+        "- Exact model-specific repro command appears below in the "
+        "`Reproducibility` section under `Target specific failing models`.",
+        f"- Representative failing model: `{DIAGNOSTICS_ESCAPER.escape(representative.model_name)}`",
+    ]
 
 
 def _diagnostics_failure_clusters(
     failure_clusters: list[tuple[str, list[PerformanceResult]]],
     *,
     diagnostics_context: DiagnosticsContext,
-    image_path: Path | None,
-    run_args: argparse.Namespace | None,
 ) -> list[str]:
     """Build grouped failure sections of the diagnostics report."""
     if not failure_clusters:
@@ -10033,8 +10049,6 @@ def _diagnostics_failure_clusters(
         _append_markdown_section(parts, title="### To reproduce")
         filing_guidance = _build_cluster_filing_guidance(
             representative=rep,
-            image_path=image_path,
-            run_args=run_args,
         )
         parts.extend(filing_guidance)
         parts.append("")
@@ -11131,8 +11145,6 @@ def generate_diagnostics_report(
         _diagnostics_failure_clusters(
             failure_clusters,
             diagnostics_context=diagnostics_context,
-            image_path=image_path,
-            run_args=run_args,
         ),
     )
     parts.extend(_diagnostics_preflight_section(preflight_issues))
