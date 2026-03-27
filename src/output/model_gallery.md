@@ -2,7 +2,7 @@
 
 <!-- markdownlint-disable MD013 -->
 
-_Generated on 2026-03-27 13:06:07 GMT_
+_Generated on 2026-03-27 14:43:58 GMT_
 
 A review-friendly artifact with image metadata, the source prompt, and full generated output for each model.
 
@@ -16,9 +16,9 @@ A review-friendly artifact with image metadata, the source prompt, and full gene
 - **Preflight compatibility:** 1 informational warning(s); do not treat these alone as run failures.
 - **Escalate only if:** they line up with unexpected TF/Flax/JAX imports, startup hangs, or backend/runtime crashes.
 - **Vs existing metadata:** better=11, neutral=0, worse=30 (baseline B 79/100).
-- **Quality signal frequency:** missing_sections=26, cutoff=26, trusted_hint_ignored=18, context_ignored=17, repetitive=11, description_length=8.
-- **Runtime pattern:** decode dominates measured phase time (89%; 41/52 measured model(s)).
-- **Phase totals:** model load=98.18s, prompt prep=0.12s, decode=858.44s, cleanup=4.76s.
+- **Quality signal frequency:** missing_sections=26, cutoff=26, context_ignored=18, trusted_hint_ignored=18, repetitive=10, description_length=8.
+- **Runtime pattern:** decode dominates measured phase time (90%; 41/52 measured model(s)).
+- **Phase totals:** model load=93.28s, prompt prep=0.12s, decode=851.73s, cleanup=4.68s.
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 - **Termination reasons:** completed=41, exception=11.
@@ -27,15 +27,15 @@ A review-friendly artifact with image metadata, the source prompt, and full gene
 
 ### Strong Candidates
 
-- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: 🏆 A (90/100) | Δ+11 | 186.1 tps
+- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: 🏆 A (90/100) | Δ+11 | 186.2 tps
 
 ### Watchlist
 
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (0/100) | Δ-79 | harness
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (7/100) | Δ-72 | 31.7 tps | harness, missing sections
-- `mlx-community/llava-v1.6-mistral-7b-8bit`: ❌ F (11/100) | Δ-68 | 69.8 tps | context ignored, harness
-- `Qwen/Qwen3-VL-2B-Instruct`: 🟠 D (38/100) | Δ-41 | 89.7 tps | context echo, cutoff, harness, long context, repetitive
-- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: 🟠 D (48/100) | Δ-32 | 87.6 tps | context ignored, cutoff, degeneration, harness, long context, missing sections, reasoning leak
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (5/100) | Δ-74 | 255.9 tps | context ignored, harness
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (7/100) | Δ-72 | 32.0 tps | harness, missing sections
+- `mlx-community/llava-v1.6-mistral-7b-8bit`: ❌ F (11/100) | Δ-68 | 66.9 tps | context ignored, harness
+- `Qwen/Qwen3-VL-2B-Instruct`: 🟠 D (38/100) | Δ-41 | 89.3 tps | context echo, cutoff, harness, long context, repetitive
+- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: 🟠 D (48/100) | Δ-32 | 87.5 tps | context ignored, cutoff, degeneration, harness, long context, missing sections, reasoning leak
 
 ## 🚨 Failures by Package (Actionable)
 
@@ -194,10 +194,10 @@ Full generated output by model:
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13700, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13701, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13132, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13133, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -276,7 +276,7 @@ AttributeError: 'Florence2LanguageConfig' object has no attribute 'forced_bos_to
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13865, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13866, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -287,7 +287,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13710, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13711, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attribute 'forced_bos_token_id'
 ```
@@ -322,10 +322,10 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13700, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13701, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13132, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13133, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -381,7 +381,7 @@ ModuleNotFoundError: No module named 'timm'
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13865, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13866, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -392,7 +392,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13710, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13711, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: No module named 'timm'
 ```
@@ -446,9 +446,9 @@ TypeError: object of type 'numpy.int64' has no len()
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13432, in _run_generation_with_retry_workaround
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13433, in _run_generation_with_retry_workaround
     return generate_once()
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13731, in _generate_once
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13732, in _generate_once
     return generate(
         model=model,
     ...<13 lines>...
@@ -476,7 +476,7 @@ ValueError: Failed to process inputs with error: object of type 'numpy.int64' ha
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13865, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13866, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -487,12 +487,12 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13754, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13755, in _run_model_generation
     output = _run_generation_with_retry_workaround(
         params=params,
         generate_once=_generate_once,
     )
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13440, in _run_generation_with_retry_workaround
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13441, in _run_generation_with_retry_workaround
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for mlx-community/LFM2-VL-1.6B-8bit: Failed to process inputs with error: object of type 'numpy.int64' has no len()
 ```
@@ -546,9 +546,9 @@ TypeError: object of type 'numpy.int64' has no len()
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13432, in _run_generation_with_retry_workaround
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13433, in _run_generation_with_retry_workaround
     return generate_once()
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13731, in _generate_once
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13732, in _generate_once
     return generate(
         model=model,
     ...<13 lines>...
@@ -576,7 +576,7 @@ ValueError: Failed to process inputs with error: object of type 'numpy.int64' ha
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13865, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13866, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -587,12 +587,12 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13754, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13755, in _run_model_generation
     output = _run_generation_with_retry_workaround(
         params=params,
         generate_once=_generate_once,
     )
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13440, in _run_generation_with_retry_workaround
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13441, in _run_generation_with_retry_workaround
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for mlx-community/LFM2.5-VL-1.6B-bf16: Failed to process inputs with error: object of type 'numpy.int64' has no len()
 ```
@@ -630,7 +630,7 @@ ValueError: Model generation failed for mlx-community/LFM2.5-VL-1.6B-bf16: Faile
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13499, in _prepare_generation_prompt
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13500, in _prepare_generation_prompt
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -640,7 +640,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13288, in _run_model_preflight_validators
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13289, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -649,14 +649,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13202, in _raise_preflight_error
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13203, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13865, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13866, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -667,13 +667,13 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13712, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13713, in _run_model_generation
     formatted_prompt = _prepare_generation_prompt(
         params=params,
     ...<3 lines>...
         phase_timer=phase_timer,
     )
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13542, in _prepare_generation_prompt
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13543, in _prepare_generation_prompt
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -711,7 +711,7 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13499, in _prepare_generation_prompt
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13500, in _prepare_generation_prompt
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -721,7 +721,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13288, in _run_model_preflight_validators
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13289, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -730,14 +730,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13202, in _raise_preflight_error
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13203, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13865, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13866, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -748,13 +748,13 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13712, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13713, in _run_model_generation
     formatted_prompt = _prepare_generation_prompt(
         params=params,
     ...<3 lines>...
         phase_timer=phase_timer,
     )
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13542, in _prepare_generation_prompt
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13543, in _prepare_generation_prompt
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -821,9 +821,9 @@ TypeError: ImagesKwargs.__init__() got an unexpected keyword argument 'padding'
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13432, in _run_generation_with_retry_workaround
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13433, in _run_generation_with_retry_workaround
     return generate_once()
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13731, in _generate_once
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13732, in _generate_once
     return generate(
         model=model,
     ...<13 lines>...
@@ -851,7 +851,7 @@ ValueError: Failed to process inputs with error: ImagesKwargs.__init__() got an 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13865, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13866, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -862,12 +862,12 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13754, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13755, in _run_model_generation
     output = _run_generation_with_retry_workaround(
         params=params,
         generate_once=_generate_once,
     )
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13440, in _run_generation_with_retry_workaround
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13441, in _run_generation_with_retry_workaround
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for mlx-community/paligemma2-10b-ft-docci-448-6bit: Failed to process inputs with error: ImagesKwargs.__init__() got an unexpected keyword argument 'padding'
 ```
@@ -934,9 +934,9 @@ TypeError: ImagesKwargs.__init__() got an unexpected keyword argument 'padding'
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13432, in _run_generation_with_retry_workaround
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13433, in _run_generation_with_retry_workaround
     return generate_once()
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13731, in _generate_once
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13732, in _generate_once
     return generate(
         model=model,
     ...<13 lines>...
@@ -964,7 +964,7 @@ ValueError: Failed to process inputs with error: ImagesKwargs.__init__() got an 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13865, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13866, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -975,12 +975,12 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13754, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13755, in _run_model_generation
     output = _run_generation_with_retry_workaround(
         params=params,
         generate_once=_generate_once,
     )
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13440, in _run_generation_with_retry_workaround
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13441, in _run_generation_with_retry_workaround
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for mlx-community/paligemma2-10b-ft-docci-448-bf16: Failed to process inputs with error: ImagesKwargs.__init__() got an unexpected keyword argument 'padding'
 ```
@@ -1047,9 +1047,9 @@ TypeError: ImagesKwargs.__init__() got an unexpected keyword argument 'padding'
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13432, in _run_generation_with_retry_workaround
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13433, in _run_generation_with_retry_workaround
     return generate_once()
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13731, in _generate_once
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13732, in _generate_once
     return generate(
         model=model,
     ...<13 lines>...
@@ -1077,7 +1077,7 @@ ValueError: Failed to process inputs with error: ImagesKwargs.__init__() got an 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13865, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13866, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -1088,12 +1088,12 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13754, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13755, in _run_model_generation
     output = _run_generation_with_retry_workaround(
         params=params,
         generate_once=_generate_once,
     )
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13440, in _run_generation_with_retry_workaround
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13441, in _run_generation_with_retry_workaround
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for mlx-community/paligemma2-3b-ft-docci-448-bf16: Failed to process inputs with error: ImagesKwargs.__init__() got an unexpected keyword argument 'padding'
 ```
@@ -1160,9 +1160,9 @@ TypeError: ImagesKwargs.__init__() got an unexpected keyword argument 'padding'
 During handling of the above exception, another exception occurred:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13432, in _run_generation_with_retry_workaround
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13433, in _run_generation_with_retry_workaround
     return generate_once()
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13731, in _generate_once
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13732, in _generate_once
     return generate(
         model=model,
     ...<13 lines>...
@@ -1190,7 +1190,7 @@ ValueError: Failed to process inputs with error: ImagesKwargs.__init__() got an 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13865, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13866, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -1201,12 +1201,12 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13754, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13755, in _run_model_generation
     output = _run_generation_with_retry_workaround(
         params=params,
         generate_once=_generate_once,
     )
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13440, in _run_generation_with_retry_workaround
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13441, in _run_generation_with_retry_workaround
     raise _tag_exception_failure_phase(ValueError(msg), "decode") from gen_known_err
 ValueError: Model generation failed for mlx-community/paligemma2-3b-pt-896-4bit: Failed to process inputs with error: ImagesKwargs.__init__() got an unexpected keyword argument 'padding'
 ```
@@ -1244,10 +1244,10 @@ ValueError: Model generation failed for mlx-community/paligemma2-3b-pt-896-4bit:
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13700, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13701, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13132, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13133, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -1326,7 +1326,7 @@ AttributeError: 'Florence2LanguageConfig' object has no attribute 'forced_bos_to
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13865, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13866, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -1337,7 +1337,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13710, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13711, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attribute 'forced_bos_token_id'
 ```
@@ -1359,8 +1359,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=506 | text_est=437 | nontext_est=69 | gen=84 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 0.52s | Gen 0.84s | Total 1.68s
-**Throughput:** Prompt 4,068 TPS (506 tok) | Gen 354 TPS (84 tok)
+**Metrics:** Load 0.45s | Gen 0.81s | Total 1.56s
+**Throughput:** Prompt 5,627 TPS (506 tok) | Gen 343 TPS (84 tok)
 **Assessment:** ❌ F (28/100) | Δ-52 | Mostly echoes context without adding value
 **Review Status:** watchlist (context echo, missing sections)
 **Review:** F 28/100 | Missing sections (keywords); Title length violation (11 words; expected 5-10); ...
@@ -1396,8 +1396,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=3115 | text_est=437 | nontext_est=2678 | gen=143 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 1.62s | Gen 2.39s | Total 4.32s
-**Throughput:** Prompt 2,848 TPS (3,115 tok) | Gen 186 TPS (143 tok)
+**Metrics:** Load 0.93s | Gen 2.30s | Total 3.54s
+**Throughput:** Prompt 3,072 TPS (3,115 tok) | Gen 186 TPS (143 tok)
 **Assessment:** 🏆 A (90/100) | Δ+11 | None identified
 **Review Status:** strong candidate for first-pass review
 **Review:** A 90/100 | Description sentence violation (3; expected 1-2)
@@ -1425,6 +1425,39 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 
 ---
 
+<a id="model-mlx-community-llava-v16-mistral-7b-8bit"></a>
+
+### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
+
+**Verdict:** harness | user=avoid
+**Why:** harness:prompt_template, low_hint_overlap
+**Trusted hints:** ignores trusted hints | missing terms: large, brick, former, warehouse, London
+**Contract:** ok
+**Utility:** user=avoid | ignores trusted hints
+**Stack / owner:** owner=model-config | harness=prompt_template
+**Token accounting:** prompt=2726 | text_est=437 | nontext_est=2289 | gen=8 | max=500 | stop=completed
+**Next action:** Inspect model repo config, chat template, and EOS settings.
+
+**Metrics:** Load 0.95s | Gen 3.20s | Total 4.45s
+**Throughput:** Prompt 1,108 TPS (2,726 tok) | Gen 66.9 TPS (8 tok)
+**Assessment:** ❌ F (11/100) | Δ-68 | Output lacks detail
+**Review Status:** watchlist (context ignored, harness)
+**Review:** F 11/100 | ⚠️HARNESS:prompt_template; Context ignored (missing: large, brick, former, warehouse, London); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> The image is a photograph.
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- ⚠️HARNESS:prompt_template
+- Context ignored (missing: large, brick, former, warehouse, London)
+- Ignores trusted hints
+- output:filler_response(8tok)
+
+---
+
 <a id="model-mlx-community-phi-35-vision-instruct-bf16"></a>
 
 ### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
@@ -1438,8 +1471,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=1326 | text_est=437 | nontext_est=889 | gen=141 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 0.86s | Gen 3.27s | Total 4.43s
-**Throughput:** Prompt 3,837 TPS (1,326 tok) | Gen 56.2 TPS (141 tok)
+**Metrics:** Load 0.86s | Gen 3.25s | Total 4.40s
+**Throughput:** Prompt 3,933 TPS (1,326 tok) | Gen 56.6 TPS (141 tok)
 **Assessment:** 🟠 D (36/100) | Δ-44 | Mostly echoes context without adding value
 **Review Status:** watchlist (context echo)
 **Review:** D 36/100 | Description sentence violation (3; expected 1-2); Context echo (93% overlap)
@@ -1464,39 +1497,6 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 
 ---
 
-<a id="model-mlx-community-llava-v16-mistral-7b-8bit"></a>
-
-### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
-
-**Verdict:** harness | user=avoid
-**Why:** harness:prompt_template, low_hint_overlap
-**Trusted hints:** ignores trusted hints | missing terms: large, brick, former, warehouse, London
-**Contract:** ok
-**Utility:** user=avoid | ignores trusted hints
-**Stack / owner:** owner=model-config | harness=prompt_template
-**Token accounting:** prompt=2726 | text_est=437 | nontext_est=2289 | gen=8 | max=500 | stop=completed
-**Next action:** Inspect model repo config, chat template, and EOS settings.
-
-**Metrics:** Load 0.94s | Gen 3.27s | Total 4.52s
-**Throughput:** Prompt 1,076 TPS (2,726 tok) | Gen 69.8 TPS (8 tok)
-**Assessment:** ❌ F (11/100) | Δ-68 | Output lacks detail
-**Review Status:** watchlist (context ignored, harness)
-**Review:** F 11/100 | ⚠️HARNESS:prompt_template; Context ignored (missing: large, brick, former, warehouse, London); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> The image is a photograph.
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- ⚠️HARNESS:prompt_template
-- Context ignored (missing: large, brick, former, warehouse, London)
-- Ignores trusted hints
-- output:filler_response(8tok)
-
----
-
 <a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
 
 ### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
@@ -1510,8 +1510,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=3116 | text_est=437 | nontext_est=2679 | gen=97 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 1.38s | Gen 4.25s | Total 5.95s
-**Throughput:** Prompt 1,392 TPS (3,116 tok) | Gen 66.3 TPS (97 tok)
+**Metrics:** Load 1.33s | Gen 4.24s | Total 5.87s
+**Throughput:** Prompt 1,385 TPS (3,116 tok) | Gen 65.8 TPS (97 tok)
 **Assessment:** ✅ B (68/100) | Δ-12 | Mostly echoes context without adding value
 **Review Status:** watchlist (worse than metadata baseline)
 **Review:** B 68/100 | No quality issues detected
@@ -1548,8 +1548,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=3116 | text_est=437 | nontext_est=2679 | gen=113 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 1.35s | Gen 4.52s | Total 6.18s
-**Throughput:** Prompt 1,414 TPS (3,116 tok) | Gen 63.0 TPS (113 tok)
+**Metrics:** Load 1.41s | Gen 4.49s | Total 6.21s
+**Throughput:** Prompt 1,424 TPS (3,116 tok) | Gen 63.4 TPS (113 tok)
 **Assessment:** ✅ B (69/100) | Δ-10 | Mostly echoes context without adding value
 **Review Status:** watchlist (worse than metadata baseline)
 **Review:** B 69/100 | No quality issues detected
@@ -1587,8 +1587,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=2289 | text_est=437 | nontext_est=1852 | gen=71 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 1.82s | Gen 4.69s | Total 6.84s
-**Throughput:** Prompt 1,175 TPS (2,289 tok) | Gen 32.2 TPS (71 tok)
+**Metrics:** Load 1.76s | Gen 4.65s | Total 6.72s
+**Throughput:** Prompt 1,201 TPS (2,289 tok) | Gen 32.1 TPS (71 tok)
 **Assessment:** 🏆 A (92/100) | Δ+13 | None identified
 **Review Status:** watchlist (context ignored)
 **Review:** A 92/100 | Context ignored (missing: large, brick, former, warehouse, London); Title length violation (2 words; expected 5-10); ...
@@ -1616,6 +1616,48 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 
 ---
 
+<a id="model-mlx-community-gemma-3n-e2b-4bit"></a>
+
+### ✅ mlx-community/gemma-3n-E2B-4bit
+
+**Verdict:** cutoff | user=avoid
+**Why:** token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap, metadata_terms
+**Trusted hints:** ignores trusted hints | missing terms: large, brick, former, warehouse, London | nonvisual metadata reused
+**Contract:** missing: title, description, keywords
+**Utility:** user=avoid | ignores trusted hints | metadata borrowing
+**Stack / owner:** owner=model
+**Token accounting:** prompt=768 | text_est=437 | nontext_est=331 | gen=500 | max=500 | stop=completed
+**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
+
+**Metrics:** Load 1.45s | Gen 4.69s | Total 6.46s
+**Throughput:** Prompt 2,608 TPS (768 tok) | Gen 126 TPS (500 tok)
+**Assessment:** 🟠 D (45/100) | Δ-34 | Lacks visual description of image
+**Review Status:** watchlist (context ignored, cutoff, metadata borrowing, missing sections, repetitive)
+**Review:** D 45/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "10:18: 16:42: 10:18: 16:42:..."); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+>
+> \- 16:42:44: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18:
+> 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18:
+> 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18:
+> 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18:
+> 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18:
+> 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:4
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- ⚠️REVIEW:cutoff
+- Repetitive output (phrase: "10:18: 16:42: 10:18: 16:42:...")
+- Context ignored (missing: large, brick, former, warehouse, London)
+- Missing sections (title, description, keywords)
+- Nonvisual metadata borrowing
+- Likely capped by max token budget
+- Ignores trusted hints
+
+---
+
 <a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
 
 ### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
@@ -1629,8 +1671,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=614 | text_est=437 | nontext_est=177 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 0.62s | Gen 4.78s | Total 5.70s
-**Throughput:** Prompt 1,851 TPS (614 tok) | Gen 130 TPS (500 tok)
+**Metrics:** Load 0.63s | Gen 4.73s | Total 5.66s
+**Throughput:** Prompt 1,853 TPS (614 tok) | Gen 132 TPS (500 tok)
 **Assessment:** ❌ F (0/100) | Δ-79 | Output too short to be useful
 **Review Status:** watchlist (context ignored, cutoff, missing sections)
 **Review:** F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: large, brick, former, warehouse, London); ...
@@ -1651,6 +1693,63 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 
 ---
 
+<a id="model-huggingfacetb-smolvlm-instruct"></a>
+
+### ✅ HuggingFaceTB/SmolVLM-Instruct
+
+**Verdict:** cutoff | user=avoid
+**Why:** token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap
+**Trusted hints:** ignores trusted hints | missing terms: large, brick, former, warehouse, London
+**Contract:** missing: title, description, keywords
+**Utility:** user=avoid | ignores trusted hints
+**Stack / owner:** owner=model
+**Token accounting:** prompt=1714 | text_est=437 | nontext_est=1277 | gen=500 | max=500 | stop=completed
+**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
+
+**Metrics:** Load 0.67s | Gen 4.83s | Total 5.78s
+**Throughput:** Prompt 4,196 TPS (1,714 tok) | Gen 130 TPS (500 tok)
+**Assessment:** 🟡 C (50/100) | Δ-29 | Lacks visual description of image
+**Review Status:** watchlist (context ignored, cutoff, missing sections, repetitive)
+**Review:** C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (unt); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- ⚠️REVIEW:cutoff
+- Repetitive output (unt)
+- Context ignored (missing: large, brick, former, warehouse, London)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
+
+---
+
 <a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
 
 ### ✅ mlx-community/gemma-3-27b-it-qat-4bit
@@ -1664,8 +1763,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=777 | text_est=437 | nontext_est=340 | gen=94 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 2.32s | Gen 5.07s | Total 7.71s
-**Throughput:** Prompt 489 TPS (777 tok) | Gen 31.2 TPS (94 tok)
+**Metrics:** Load 2.28s | Gen 4.89s | Total 7.49s
+**Throughput:** Prompt 567 TPS (777 tok) | Gen 30.6 TPS (94 tok)
 **Assessment:** ✅ B (69/100) | Δ-11 | Mostly echoes context without adding value
 **Review Status:** watchlist (worse than metadata baseline)
 **Review:** B 69/100 | Keyword count violation (19; expected 10-18)
@@ -1691,6 +1790,63 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 
 ---
 
+<a id="model-mlx-community-smolvlm-instruct-bf16"></a>
+
+### ✅ mlx-community/SmolVLM-Instruct-bf16
+
+**Verdict:** cutoff | user=avoid
+**Why:** token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap
+**Trusted hints:** ignores trusted hints | missing terms: large, brick, former, warehouse, London
+**Contract:** missing: title, description, keywords
+**Utility:** user=avoid | ignores trusted hints
+**Stack / owner:** owner=model
+**Token accounting:** prompt=1714 | text_est=437 | nontext_est=1277 | gen=500 | max=500 | stop=completed
+**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
+
+**Metrics:** Load 0.64s | Gen 5.05s | Total 5.99s
+**Throughput:** Prompt 4,212 TPS (1,714 tok) | Gen 124 TPS (500 tok)
+**Assessment:** 🟡 C (50/100) | Δ-29 | Lacks visual description of image
+**Review Status:** watchlist (context ignored, cutoff, missing sections, repetitive)
+**Review:** C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (unt); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- ⚠️REVIEW:cutoff
+- Repetitive output (unt)
+- Context ignored (missing: large, brick, former, warehouse, London)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
+
+---
+
 <a id="model-qnguyen3-nanollava"></a>
 
 ### ✅ qnguyen3/nanoLLaVA
@@ -1704,8 +1860,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=506 | text_est=437 | nontext_est=69 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 0.55s | Gen 5.10s | Total 5.95s
-**Throughput:** Prompt 4,302 TPS (506 tok) | Gen 111 TPS (500 tok)
+**Metrics:** Load 0.49s | Gen 5.05s | Total 5.84s
+**Throughput:** Prompt 4,532 TPS (506 tok) | Gen 112 TPS (500 tok)
 **Assessment:** 🟡 C (60/100) | Δ-19 | Lacks visual description of image
 **Review Status:** watchlist (context ignored, cutoff, missing sections, repetitive)
 **Review:** C 60/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "painting glasses glasses, moto..."); ...
@@ -1769,147 +1925,6 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 
 ---
 
-<a id="model-mlx-community-smolvlm-instruct-bf16"></a>
-
-### ✅ mlx-community/SmolVLM-Instruct-bf16
-
-**Verdict:** cutoff | user=avoid
-**Why:** token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap
-**Trusted hints:** ignores trusted hints | missing terms: large, brick, former, warehouse, London
-**Contract:** missing: title, description, keywords
-**Utility:** user=avoid | ignores trusted hints
-**Stack / owner:** owner=model
-**Token accounting:** prompt=1714 | text_est=437 | nontext_est=1277 | gen=500 | max=500 | stop=completed
-**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
-
-**Metrics:** Load 0.62s | Gen 5.11s | Total 6.05s
-**Throughput:** Prompt 4,126 TPS (1,714 tok) | Gen 123 TPS (500 tok)
-**Assessment:** 🟡 C (50/100) | Δ-29 | Lacks visual description of image
-**Review Status:** watchlist (context ignored, cutoff, missing sections, repetitive)
-**Review:** C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (unt); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- ⚠️REVIEW:cutoff
-- Repetitive output (unt)
-- Context ignored (missing: large, brick, former, warehouse, London)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
-
----
-
-<a id="model-mlx-community-pixtral-12b-8bit"></a>
-
-### ✅ mlx-community/pixtral-12b-8bit
-
-**Verdict:** clean | user=caveat
-**Why:** trusted_overlap, context_echo
-**Trusted hints:** preserves trusted hints
-**Contract:** description sentences=3
-**Utility:** user=caveat | preserves trusted hints | context echo
-**Stack / owner:** owner=model
-**Token accounting:** prompt=3309 | text_est=437 | nontext_est=2872 | gen=122 | max=500 | stop=completed
-**Next action:** Treat as a model-quality limitation for this prompt and image.
-
-**Metrics:** Load 1.64s | Gen 5.82s | Total 7.77s
-**Throughput:** Prompt 1,532 TPS (3,309 tok) | Gen 38.7 TPS (122 tok)
-**Assessment:** 🟠 D (39/100) | Δ-40 | Mostly echoes context without adding value
-**Review Status:** watchlist (context echo)
-**Review:** D 39/100 | Description sentence violation (3; expected 1-2); Context echo (59% overlap)
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Title:
-> London Canal Museum and Moored Narrowboats
->
-> Description:
-> A large brick former warehouse, the London Canal Museum, stands beside the Regent's
-> Canal in King's Cross, London, on a sunny spring day. Several narrowboats are moored
-> along the towpath, their reflections visible in the calm water. White blossoms in the
-> foreground frame the tranquil urban scene.
->
-> Keywords:
-> brick building, canal, narrowboats, moored boats, Regent's Canal, King's Cross, London,
-> spring, blossoms, water reflection, towpath, sunny, urban scene, former warehouse
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- Description sentence violation (3; expected 1-2)
-- Context echo (59% overlap)
-
----
-
-<a id="model-mlx-community-gemma-3n-e2b-4bit"></a>
-
-### ✅ mlx-community/gemma-3n-E2B-4bit
-
-**Verdict:** cutoff | user=avoid
-**Why:** token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap, metadata_terms
-**Trusted hints:** ignores trusted hints | missing terms: large, brick, former, warehouse, London | nonvisual metadata reused
-**Contract:** missing: title, description, keywords
-**Utility:** user=avoid | ignores trusted hints | metadata borrowing
-**Stack / owner:** owner=model
-**Token accounting:** prompt=768 | text_est=437 | nontext_est=331 | gen=500 | max=500 | stop=completed
-**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
-
-**Metrics:** Load 1.43s | Gen 6.07s | Total 7.82s
-**Throughput:** Prompt 480 TPS (768 tok) | Gen 125 TPS (500 tok)
-**Assessment:** 🟠 D (45/100) | Δ-34 | Lacks visual description of image
-**Review Status:** watchlist (context ignored, cutoff, metadata borrowing, missing sections, repetitive)
-**Review:** D 45/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "10:18: 16:42: 10:18: 16:42:..."); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
->
-> \- 16:42:44: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18:
-> 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18:
-> 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18:
-> 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18:
-> 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18:
-> 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:42: 10:18: 16:4
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- ⚠️REVIEW:cutoff
-- Repetitive output (phrase: "10:18: 16:42: 10:18: 16:42:...")
-- Context ignored (missing: large, brick, former, warehouse, London)
-- Missing sections (title, description, keywords)
-- Nonvisual metadata borrowing
-- Likely capped by max token budget
-- Ignores trusted hints
-
----
-
 <a id="model-jqlive-kimi-vl-a3b-thinking-2506-6bit"></a>
 
 ### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
@@ -1923,8 +1938,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=1497 | text_est=437 | nontext_est=1060 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 2.06s | Gen 6.54s | Total 8.91s
-**Throughput:** Prompt 706 TPS (1,497 tok) | Gen 129 TPS (500 tok)
+**Metrics:** Load 1.95s | Gen 5.22s | Total 7.48s
+**Throughput:** Prompt 1,784 TPS (1,497 tok) | Gen 129 TPS (500 tok)
 **Assessment:** ❌ F (0/100) | Δ-79 | Output too short to be useful
 **Review Status:** watchlist (context ignored, cutoff, degeneration, missing sections)
 **Review:** F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: large, brick, former, warehouse, London); ...
@@ -1945,63 +1960,6 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 
 ---
 
-<a id="model-huggingfacetb-smolvlm-instruct"></a>
-
-### ✅ HuggingFaceTB/SmolVLM-Instruct
-
-**Verdict:** cutoff | user=avoid
-**Why:** token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap
-**Trusted hints:** ignores trusted hints | missing terms: large, brick, former, warehouse, London
-**Contract:** missing: title, description, keywords
-**Utility:** user=avoid | ignores trusted hints
-**Stack / owner:** owner=model
-**Token accounting:** prompt=1714 | text_est=437 | nontext_est=1277 | gen=500 | max=500 | stop=completed
-**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
-
-**Metrics:** Load 0.65s | Gen 6.63s | Total 7.57s
-**Throughput:** Prompt 785 TPS (1,714 tok) | Gen 129 TPS (500 tok)
-**Assessment:** 🟡 C (50/100) | Δ-29 | Lacks visual description of image
-**Review Status:** watchlist (context ignored, cutoff, missing sections, repetitive)
-**Review:** C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (unt); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- ⚠️REVIEW:cutoff
-- Repetitive output (unt)
-- Context ignored (missing: large, brick, former, warehouse, London)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
-
----
-
 <a id="model-mlx-community-kimi-vl-a3b-thinking-8bit"></a>
 
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-8bit
@@ -2015,8 +1973,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=1497 | text_est=437 | nontext_est=1060 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 2.18s | Gen 6.86s | Total 9.34s
-**Throughput:** Prompt 792 TPS (1,497 tok) | Gen 113 TPS (500 tok)
+**Metrics:** Load 2.14s | Gen 5.70s | Total 8.15s
+**Throughput:** Prompt 1,805 TPS (1,497 tok) | Gen 116 TPS (500 tok)
 **Assessment:** 🟠 D (46/100) | Δ-34 | Lacks visual description of image
 **Review Status:** watchlist (context ignored, cutoff, missing sections, repetitive)
 **Review:** D 46/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "use only if a..."); ...
@@ -2063,6 +2021,48 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 
 ---
 
+<a id="model-mlx-community-pixtral-12b-8bit"></a>
+
+### ✅ mlx-community/pixtral-12b-8bit
+
+**Verdict:** clean | user=caveat
+**Why:** trusted_overlap, context_echo
+**Trusted hints:** preserves trusted hints
+**Contract:** description sentences=3
+**Utility:** user=caveat | preserves trusted hints | context echo
+**Stack / owner:** owner=model
+**Token accounting:** prompt=3309 | text_est=437 | nontext_est=2872 | gen=122 | max=500 | stop=completed
+**Next action:** Treat as a model-quality limitation for this prompt and image.
+
+**Metrics:** Load 1.62s | Gen 5.76s | Total 7.68s
+**Throughput:** Prompt 1,555 TPS (3,309 tok) | Gen 38.9 TPS (122 tok)
+**Assessment:** 🟠 D (39/100) | Δ-40 | Mostly echoes context without adding value
+**Review Status:** watchlist (context echo)
+**Review:** D 39/100 | Description sentence violation (3; expected 1-2); Context echo (59% overlap)
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Title:
+> London Canal Museum and Moored Narrowboats
+>
+> Description:
+> A large brick former warehouse, the London Canal Museum, stands beside the Regent's
+> Canal in King's Cross, London, on a sunny spring day. Several narrowboats are moored
+> along the towpath, their reflections visible in the calm water. White blossoms in the
+> foreground frame the tranquil urban scene.
+>
+> Keywords:
+> brick building, canal, narrowboats, moored boats, Regent's Canal, King's Cross, London,
+> spring, blossoms, water reflection, towpath, sunny, urban scene, former warehouse
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- Description sentence violation (3; expected 1-2)
+- Context echo (59% overlap)
+
+---
+
 <a id="model-mlx-community-gemma-3-27b-it-qat-8bit"></a>
 
 ### ✅ mlx-community/gemma-3-27b-it-qat-8bit
@@ -2076,8 +2076,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=777 | text_est=437 | nontext_est=340 | gen=92 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 3.41s | Gen 7.09s | Total 10.81s
-**Throughput:** Prompt 552 TPS (777 tok) | Gen 17.6 TPS (92 tok)
+**Metrics:** Load 3.53s | Gen 7.01s | Total 10.85s
+**Throughput:** Prompt 563 TPS (777 tok) | Gen 17.8 TPS (92 tok)
 **Assessment:** ✅ B (66/100) | Δ-13 | Mostly echoes context without adding value
 **Review Status:** watchlist (worse than metadata baseline)
 **Review:** B 66/100 | No quality issues detected
@@ -2114,8 +2114,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=2618 | text_est=437 | nontext_est=2181 | gen=104 | max=500 | stop=completed
 **Next action:** Inspect prompt-template, stop-token, and decode post-processing behavior.
 
-**Metrics:** Load 2.19s | Gen 7.69s | Total 10.21s
-**Throughput:** Prompt 679 TPS (2,618 tok) | Gen 31.7 TPS (104 tok)
+**Metrics:** Load 2.08s | Gen 7.34s | Total 9.75s
+**Throughput:** Prompt 735 TPS (2,618 tok) | Gen 32.0 TPS (104 tok)
 **Assessment:** ❌ F (7/100) | Δ-72 | Output too short to be useful
 **Review Status:** watchlist (harness, missing sections)
 **Review:** F 7/100 | ⚠️HARNESS:encoding; Generic output (specificity: 0.00); ...
@@ -2148,8 +2148,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=1497 | text_est=437 | nontext_est=1060 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 3.30s | Gen 7.80s | Total 11.41s
-**Throughput:** Prompt 1,742 TPS (1,497 tok) | Gen 79.3 TPS (500 tok)
+**Metrics:** Load 3.28s | Gen 7.72s | Total 11.31s
+**Throughput:** Prompt 1,768 TPS (1,497 tok) | Gen 79.9 TPS (500 tok)
 **Assessment:** ❌ F (0/100) | Δ-79 | Output too short to be useful
 **Review Status:** watchlist (context ignored, cutoff, missing sections)
 **Review:** F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: large, brick, former, warehouse, London); ...
@@ -2182,8 +2182,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=776 | text_est=437 | nontext_est=339 | gen=347 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 2.26s | Gen 8.24s | Total 10.82s
-**Throughput:** Prompt 1,181 TPS (776 tok) | Gen 48.6 TPS (347 tok)
+**Metrics:** Load 2.26s | Gen 8.00s | Total 10.58s
+**Throughput:** Prompt 1,786 TPS (776 tok) | Gen 48.7 TPS (347 tok)
 **Assessment:** 🏆 A (93/100) | Δ+14 | None identified
 **Review Status:** watchlist (metadata borrowing)
 **Review:** A 93/100 | Description sentence violation (6; expected 1-2); Keyword count violation (30; expected 10-18); ...
@@ -2243,8 +2243,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=1326 | text_est=437 | nontext_est=889 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect prompt-template, stop-token, and decode post-processing behavior.
 
-**Metrics:** Load 0.87s | Gen 10.08s | Total 11.26s
-**Throughput:** Prompt 1,573 TPS (1,326 tok) | Gen 56.7 TPS (500 tok)
+**Metrics:** Load 1.33s | Gen 9.46s | Total 11.09s
+**Throughput:** Prompt 4,030 TPS (1,326 tok) | Gen 57.4 TPS (500 tok)
 **Assessment:** ✅ B (72/100) | Δ-8 | None identified
 **Review Status:** watchlist (hallucination, harness)
 **Review:** B 72/100 | ⚠️HARNESS:stop_token; Description sentence violation (3; expected 1-2); ...
@@ -2287,17 +2287,17 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 > with open(csv_file_path, mode='r', encoding='utf-8') as csvfile:
 > reader = csv.DictReader(csvfile)
 > for row in reader:
-> title = row['Title']
-> author = row['Author']
-> publication_year = int(row['PublicationYear'])
+> title = row\['Title'\]
+> author = row\['Author'\]
+> publication_year = int(row\['PublicationYear'\])
 > decade = publication_year // 10 \* 10  # Calculate the decade
 >
 > \# Update the count and sum for the current decade
-> decade_data\[decade\]['count'\] += 1
-> decade_data\[decade\]['sum'\] += publication_year
+> decade_data\[decade\]\['count'\] += 1
+> decade_data\[decade\]\['sum'\] += publication_year
 >
 > \# Generate the report
-> report = []
+> report = \[\]
 > for decade,
 <!-- markdownlint-enable MD028 MD049 -->
 
@@ -2328,8 +2328,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=6524 | text_est=437 | nontext_est=6087 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 1.35s | Gen 12.99s | Total 14.67s
-**Throughput:** Prompt 1,162 TPS (6,524 tok) | Gen 72.1 TPS (500 tok)
+**Metrics:** Load 1.33s | Gen 13.38s | Total 15.03s
+**Throughput:** Prompt 1,093 TPS (6,524 tok) | Gen 71.7 TPS (500 tok)
 **Assessment:** ✅ B (74/100) | Δ-5 | Missing requested structure
 **Review Status:** watchlist (cutoff, missing sections, reasoning leak)
 **Review:** B 74/100 | ⚠️REVIEW:cutoff; Missing sections (title, description, keywords); ...
@@ -2379,6 +2379,62 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 
 ---
 
+<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
+
+### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+
+**Verdict:** cutoff | user=avoid
+**Why:** token_cap, missing_sections, abrupt_tail, trusted_overlap
+**Trusted hints:** preserves trusted hints
+**Contract:** missing: title, description, keywords
+**Utility:** user=avoid | preserves trusted hints
+**Stack / owner:** owner=model
+**Token accounting:** prompt=1822 | text_est=437 | nontext_est=1385 | gen=500 | max=500 | stop=completed
+**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
+
+**Metrics:** Load 4.96s | Gen 13.99s | Total 19.27s
+**Throughput:** Prompt 1,099 TPS (1,822 tok) | Gen 43.2 TPS (500 tok)
+**Assessment:** ✅ B (77/100) | Δ-3 | None identified
+**Review Status:** watchlist (cutoff, missing sections)
+**Review:** B 77/100 | ⚠️REVIEW:cutoff; Missing sections (title, description, keywords); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> Let's tackle this step by step. First, the title needs to be 5-10 words, concrete and
+> factual. The image is of a brick former warehouse (London Canal Museum) by the Regent's
+> Canal in King's Cross, London, sunny spring day with narrowboats and blossoms. Wait, but
+> the user said to use only clearly visible content. Wait, the context hint says it's the
+> London Canal Museum, but does the image explicitly state that? Wait no, the user said
+> "use only details that are clearly and definitely visible in the image." Wait, but the
+> context hint is given as high confidence. Wait, the rules say "Reuse metadata terms only
+> when they are clearly supported by the image." Wait, but the context hint is part of
+> the input. Wait, let's recheck the rules: "Treat the metadata hints below as a draft
+> catalog record. Keep only details that are clearly confirmed by the image, correct
+> anything contradicted by the image, and add important visible details that are
+> definitely present." Oh, the context hint is a draft, but we need to use the image.
+> Wait, but the image description in the prompt is a bit jumbled, but the context hint
+> says it's the London Canal Museum. Wait, but let's go back to the image content. The
+> image is a large brick former warehouse (since it's a former warehouse, that's visible
+> as a brick building with arched windows, tall, industrial). The setting is beside the
+> Regent's Canal (since there are narrowboats, towpath, water). The lighting is sunny
+> spring day (since there are blossoms, clear sky). The main subject is the brick former
+> warehouse (London Canal Museum). The details: brick building, arched windows, tall,
+> industrial, beside Regent's Canal, narrowboats moored, reflections in water, white
+> blossoms in foreground, sunny day. Now, title: needs to be 5-10 words, concrete. Let's
+> see: "Brick Former Warehouse by Regent's Canal, King's Cross" – that's 8 words,
+> concrete. Description: 1-2 sentences. Main subject: large brick former warehouse (London
+> Canal Museum) beside Regent's Canal. Setting: sunny spring day, narrowboats moored,
+> reflections in water, white blossoms
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- ⚠️REVIEW:cutoff
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+
+---
+
 <a id="model-mlx-community-apriel-15-15b-thinker-6bit-mlx"></a>
 
 ### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
@@ -2392,8 +2448,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=3400 | text_est=437 | nontext_est=2963 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 1.64s | Gen 14.90s | Total 16.85s
-**Throughput:** Prompt 1,405 TPS (3,400 tok) | Gen 41.7 TPS (500 tok)
+**Metrics:** Load 1.62s | Gen 14.60s | Total 16.53s
+**Throughput:** Prompt 1,507 TPS (3,400 tok) | Gen 42.2 TPS (500 tok)
 **Assessment:** 🏆 A (84/100) | Δ+5 | None identified
 **Review Status:** watchlist (cutoff, missing sections, reasoning leak)
 **Review:** A 84/100 | ⚠️REVIEW:cutoff; Missing sections (title, keywords); ...
@@ -2456,8 +2512,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=6524 | text_est=437 | nontext_est=6087 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 1.37s | Gen 15.66s | Total 17.34s
-**Throughput:** Prompt 1,069 TPS (6,524 tok) | Gen 54.8 TPS (500 tok)
+**Metrics:** Load 1.41s | Gen 15.28s | Total 16.99s
+**Throughput:** Prompt 1,156 TPS (6,524 tok) | Gen 54.4 TPS (500 tok)
 **Assessment:** 🏆 A (94/100) | Δ+14 | None identified
 **Review Status:** watchlist (cutoff, degeneration, missing sections, reasoning leak)
 **Review:** A 94/100 | ⚠️REVIEW:cutoff; Output degeneration (incomplete_sentence: ends with 'in'); ...
@@ -2515,62 +2571,6 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 
 ---
 
-<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
-
-### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
-
-**Verdict:** cutoff | user=avoid
-**Why:** token_cap, missing_sections, abrupt_tail, trusted_overlap
-**Trusted hints:** preserves trusted hints
-**Contract:** missing: title, description, keywords
-**Utility:** user=avoid | preserves trusted hints
-**Stack / owner:** owner=model
-**Token accounting:** prompt=1822 | text_est=437 | nontext_est=1385 | gen=500 | max=500 | stop=completed
-**Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
-
-**Metrics:** Load 6.28s | Gen 15.90s | Total 22.50s
-**Throughput:** Prompt 540 TPS (1,822 tok) | Gen 42.5 TPS (500 tok)
-**Assessment:** ✅ B (77/100) | Δ-3 | None identified
-**Review Status:** watchlist (cutoff, missing sections)
-**Review:** B 77/100 | ⚠️REVIEW:cutoff; Missing sections (title, description, keywords); ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
-> Let's tackle this step by step. First, the title needs to be 5-10 words, concrete and
-> factual. The image is of a brick former warehouse (London Canal Museum) by the Regent's
-> Canal in King's Cross, London, sunny spring day with narrowboats and blossoms. Wait, but
-> the user said to use only clearly visible content. Wait, the context hint says it's the
-> London Canal Museum, but does the image explicitly state that? Wait no, the user said
-> "use only details that are clearly and definitely visible in the image." Wait, but the
-> context hint is given as high confidence. Wait, the rules say "Reuse metadata terms only
-> when they are clearly supported by the image." Wait, but the context hint is part of
-> the input. Wait, let's recheck the rules: "Treat the metadata hints below as a draft
-> catalog record. Keep only details that are clearly confirmed by the image, correct
-> anything contradicted by the image, and add important visible details that are
-> definitely present." Oh, the context hint is a draft, but we need to use the image.
-> Wait, but the image description in the prompt is a bit jumbled, but the context hint
-> says it's the London Canal Museum. Wait, but let's go back to the image content. The
-> image is a large brick former warehouse (since it's a former warehouse, that's visible
-> as a brick building with arched windows, tall, industrial). The setting is beside the
-> Regent's Canal (since there are narrowboats, towpath, water). The lighting is sunny
-> spring day (since there are blossoms, clear sky). The main subject is the brick former
-> warehouse (London Canal Museum). The details: brick building, arched windows, tall,
-> industrial, beside Regent's Canal, narrowboats moored, reflections in water, white
-> blossoms in foreground, sunny day. Now, title: needs to be 5-10 words, concrete. Let's
-> see: "Brick Former Warehouse by Regent's Canal, King's Cross" – that's 8 words,
-> concrete. Description: 1-2 sentences. Main subject: large brick former warehouse (London
-> Canal Museum) beside Regent's Canal. Setting: sunny spring day, narrowboats moored,
-> reflections in water, white blossoms
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- ⚠️REVIEW:cutoff
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-
----
-
 <a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
 
 ### ✅ mlx-community/Idefics3-8B-Llama3-bf16
@@ -2584,8 +2584,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=2789 | text_est=437 | nontext_est=2352 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 1.92s | Gen 17.41s | Total 19.64s
-**Throughput:** Prompt 2,442 TPS (2,789 tok) | Gen 31.9 TPS (500 tok)
+**Metrics:** Load 1.96s | Gen 17.40s | Total 19.67s
+**Throughput:** Prompt 2,427 TPS (2,789 tok) | Gen 31.9 TPS (500 tok)
 **Assessment:** ❌ F (0/100) | Δ-79 | Output too short to be useful
 **Review Status:** watchlist (context ignored, cutoff, missing sections)
 **Review:** F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: large, brick, former, warehouse, London); ...
@@ -2619,8 +2619,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=16723 | text_est=437 | nontext_est=16286 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 0.70s | Gen 20.52s | Total 21.51s
-**Throughput:** Prompt 1,184 TPS (16,723 tok) | Gen 89.7 TPS (500 tok)
+**Metrics:** Load 0.71s | Gen 19.55s | Total 20.54s
+**Throughput:** Prompt 1,277 TPS (16,723 tok) | Gen 89.3 TPS (500 tok)
 **Assessment:** 🟠 D (38/100) | Δ-41 | Mostly echoes context without adding value
 **Review Status:** watchlist (context echo, cutoff, harness, long context, repetitive)
 **Review:** D 38/100 | ⚠️REVIEW:cutoff; ⚠️HARNESS:long_context; ...
@@ -2687,8 +2687,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=16725 | text_est=437 | nontext_est=16288 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 0.79s | Gen 21.02s | Total 22.14s
-**Throughput:** Prompt 1,163 TPS (16,725 tok) | Gen 87.6 TPS (500 tok)
+**Metrics:** Load 0.76s | Gen 21.11s | Total 22.19s
+**Throughput:** Prompt 1,157 TPS (16,725 tok) | Gen 87.5 TPS (500 tok)
 **Assessment:** 🟠 D (48/100) | Δ-32 | Lacks visual description of image
 **Review Status:** watchlist (context ignored, cutoff, degeneration, harness, long context, missing sections, reasoning leak)
 **Review:** D 48/100 | ⚠️REVIEW:cutoff; ⚠️HARNESS:long_context; ...
@@ -2751,8 +2751,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=2289 | text_est=437 | nontext_est=1852 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 1.75s | Gen 21.57s | Total 23.62s
-**Throughput:** Prompt 3,056 TPS (2,289 tok) | Gen 33.9 TPS (500 tok)
+**Metrics:** Load 1.74s | Gen 21.43s | Total 23.48s
+**Throughput:** Prompt 3,062 TPS (2,289 tok) | Gen 34.1 TPS (500 tok)
 **Assessment:** 🟡 C (59/100) | Δ-21 | Lacks visual description of image
 **Review Status:** watchlist (context ignored, cutoff, degeneration, missing sections, repetitive)
 **Review:** C 59/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "rencontre rencontre rencontre ..."); ...
@@ -2791,7 +2791,7 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 > 的偶 Rencontre的 struggel struggelin屈芒豁根 HOWEVER HOWEVER.ERR Rencontre Rencontre使 Rencontre
 > struggel_hashes的.ERR Rencontre Rencontre Rencontre the struggel.ERR Rencontre
 > Rencontre_you.ERR Rencontre Rencontre使 theEr Rencontre }
-> commentaire融]
+> commentaire融\]
 > struggelin一性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价｛糈性价相对较性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价viewController
 > struggelin Rencontre性价性价BCM struggeling
 > struggelin性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价
@@ -2810,75 +2810,65 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 
 ---
 
-<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
+<a id="model-mlx-community-glm-46v-nvfp4"></a>
 
-### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+### ✅ mlx-community/GLM-4.6V-nvfp4
 
 **Verdict:** cutoff | user=avoid
-**Why:** token_cap, missing_sections, repetitive_tail, trusted_overlap
-**Trusted hints:** preserves trusted hints
-**Contract:** missing: title, description, keywords
-**Utility:** user=avoid | preserves trusted hints
+**Why:** token_cap, missing_sections, utility_delta_positive, reasoning_leak
+**Trusted hints:** improves trusted hints
+**Contract:** missing: title, description
+**Utility:** user=avoid | improves trusted hints
 **Stack / owner:** owner=model
-**Token accounting:** prompt=477 | text_est=437 | nontext_est=40 | gen=500 | max=500 | stop=completed
+**Token accounting:** prompt=6524 | text_est=437 | nontext_est=6087 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 1.47s | Gen 26.32s | Total 28.09s
-**Throughput:** Prompt 281 TPS (477 tok) | Gen 20.7 TPS (500 tok)
-**Assessment:** 🟠 D (48/100) | Δ-31 | Mostly echoes context without adding value
-**Review Status:** watchlist (cutoff, missing sections, repetitive)
-**Review:** D 48/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "waterfront living, waterfront ..."); ...
+**Metrics:** Load 5.47s | Gen 26.29s | Total 32.08s
+**Throughput:** Prompt 522 TPS (6,524 tok) | Gen 37.5 TPS (500 tok)
+**Assessment:** 🏆 A (82/100) | Δ+3 | None identified
+**Review Status:** watchlist (cutoff, missing sections, reasoning leak)
+**Review:** A 82/100 | ⚠️REVIEW:cutoff; Missing sections (title, description); ...
 
 <!-- markdownlint-disable MD028 MD049 -->
 >
-> Title
-> London Canal Museum and Regent's Canal
+> &lt;think&gt;Got it, let's tackle this step by step. First, I need to remember the rules: only
+> use details that are definitely visible, no guessing. Let's start with the Title. The
+> image shows a large brick building by a canal with narrowboats, so the title should be
+> concrete. Maybe "Large brick building beside Regent's Canal with moored narrowboats".
+> Wait, but do we know it's Regent's Canal? The hint says London Canal Museum, but the
+> user said not to infer location unless obvious. Wait, the hint mentions Regent's Canal,
+> but is that visible? The image has a canal, brick building, narrowboats. The title needs
+> to be 5-10 words, concrete. Let's see: "Brick building beside canal with moored
+> narrowboats" – that's 8 words, concrete. But maybe "Large brick building by canal with
+> narrowboats" – yes, that's clear.
 >
-> Description
-> A large brick building, the London Canal Museum, stands beside the Regent's Canal in
-> King's Cross, London, on a sunny spring day. The building is surrounded by several
-> narrowboats moored along the towpath, with their reflections visible in the calm water.
-> White blossoms are in the foreground, framing the tranquil urban scene.
+> Next, Description. The main subject is the brick building, setting is a canal with
+> narrowboats, lighting is sunny (since the sky is clear and there's sunlight),
+> reflections in water. The hint mentions spring, but do we see blossoms? Yes, the
+> foreground has white blossoms. So the description should include: large brick building,
+> canal, narrowboats moored, calm water with reflections, sunny day, white blossoms in
+> foreground. Let's draft: "A large brick building stands beside a calm canal where
+> several narrowboats are moored along the towpath. White blossoms in the foreground frame
+> the scene, with sunlight illuminating the brickwork and water reflections." Wait, but
+> do we know it's a former warehouse? The hint says that, but is it visible? The image
+> shows a brick building, but "former warehouse" is inferred. So we can't include that. So
+> the description should be factual: "A large brick building stands beside a calm canal
+> with several narrowboats moored along the towpath. White blossoms in the foreground
+> frame the scene, and sunlight illuminates the brickwork and water reflections." That's
+> two sentences, covers main subject, setting, lighting, details.
 >
-> Keywords
-> London, Regent's Canal, London Canal Museum, brick building, narrowboats, spring, sunny
-> day, white blossoms, urban scene, calm water, reflections, towpath, waterfront, canal,
-> waterway, boats, vessels, watercraft, transportation, travel, leisure, recreation,
-> nature, scenery, landscape, cityscape, urban, architecture, building, structure,
-> historic, heritage, cultural, tourism, attraction, museum, educational, learning,
-> community, waterfront, waterfront living, waterfront living, waterfront living,
-> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
-> living, waterfront living, waterfront living, waterfront living, waterfront living,
-> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
-> living, waterfront living, waterfront living, waterfront living, waterfront living,
-> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
-> living, waterfront living, waterfront living, waterfront living, waterfront living,
-> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
-> living, waterfront living, waterfront living, waterfront living, waterfront living,
-> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
-> living, waterfront living, waterfront living, waterfront living, waterfront living,
-> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
-> living, waterfront living, waterfront living, waterfront living, waterfront living,
-> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
-> living, waterfront living, waterfront living, waterfront living, waterfront living,
-> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
-> living, waterfront living, waterfront living, waterfront living, waterfront living,
-> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
-> living, waterfront living, waterfront living, waterfront living, waterfront living,
-> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
-> living, waterfront living, waterfront living, waterfront living, waterfront living,
-> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
-> living, waterfront living, waterfront living, waterfront living, waterfront living,
-> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
-> living,
+> Keywords: Need 10-18 unique terms. Visible subjects: brick building, canal, narrowboats,
+> towpath, water, reflections, blossoms, sunlight, brickwork, urban, moored, calm, spring
+> (wait, do we see spring? Blossoms are white, so maybe "blossoms"
 <!-- markdownlint-enable MD028 MD049 -->
 
 ⚠️ **Quality Warnings:**
 
 - ⚠️REVIEW:cutoff
-- Repetitive output (phrase: "waterfront living, waterfront ...")
-- Missing sections (title, description, keywords)
+- Missing sections (title, description)
+- Reasoning leak (&lt;think&gt;)
 - Likely capped by max token budget
+- Unknown tags: &lt;think&gt;
 
 ---
 
@@ -2895,8 +2885,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=16734 | text_est=437 | nontext_est=16297 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 1.16s | Gen 26.42s | Total 27.89s
-**Throughput:** Prompt 996 TPS (16,734 tok) | Gen 56.6 TPS (500 tok)
+**Metrics:** Load 1.16s | Gen 27.45s | Total 28.91s
+**Throughput:** Prompt 956 TPS (16,734 tok) | Gen 54.6 TPS (500 tok)
 **Assessment:** 🏆 A (98/100) | Δ+19 | None identified
 **Review Status:** watchlist (context ignored, cutoff, harness, long context, repetitive)
 **Review:** A 98/100 | ⚠️REVIEW:cutoff; ⚠️HARNESS:long_context; ...
@@ -3022,65 +3012,75 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 
 ---
 
-<a id="model-mlx-community-glm-46v-nvfp4"></a>
+<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
 
-### ✅ mlx-community/GLM-4.6V-nvfp4
+### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
 **Verdict:** cutoff | user=avoid
-**Why:** token_cap, missing_sections, utility_delta_positive, reasoning_leak
-**Trusted hints:** improves trusted hints
-**Contract:** missing: title, description
-**Utility:** user=avoid | improves trusted hints
+**Why:** token_cap, missing_sections, repetitive_tail, trusted_overlap
+**Trusted hints:** preserves trusted hints
+**Contract:** missing: title, description, keywords
+**Utility:** user=avoid | preserves trusted hints
 **Stack / owner:** owner=model
-**Token accounting:** prompt=6524 | text_est=437 | nontext_est=6087 | gen=500 | max=500 | stop=completed
+**Token accounting:** prompt=477 | text_est=437 | nontext_est=40 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 6.82s | Gen 28.32s | Total 35.46s
-**Throughput:** Prompt 452 TPS (6,524 tok) | Gen 37.4 TPS (500 tok)
-**Assessment:** 🏆 A (82/100) | Δ+3 | None identified
-**Review Status:** watchlist (cutoff, missing sections, reasoning leak)
-**Review:** A 82/100 | ⚠️REVIEW:cutoff; Missing sections (title, description); ...
+**Metrics:** Load 1.51s | Gen 27.47s | Total 29.28s
+**Throughput:** Prompt 286 TPS (477 tok) | Gen 19.7 TPS (500 tok)
+**Assessment:** 🟠 D (48/100) | Δ-31 | Mostly echoes context without adding value
+**Review Status:** watchlist (cutoff, missing sections, repetitive)
+**Review:** D 48/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "waterfront living, waterfront ..."); ...
 
 <!-- markdownlint-disable MD028 MD049 -->
 >
-> &lt;think&gt;Got it, let's tackle this step by step. First, I need to remember the rules: only
-> use details that are definitely visible, no guessing. Let's start with the Title. The
-> image shows a large brick building by a canal with narrowboats, so the title should be
-> concrete. Maybe "Large brick building beside Regent's Canal with moored narrowboats".
-> Wait, but do we know it's Regent's Canal? The hint says London Canal Museum, but the
-> user said not to infer location unless obvious. Wait, the hint mentions Regent's Canal,
-> but is that visible? The image has a canal, brick building, narrowboats. The title needs
-> to be 5-10 words, concrete. Let's see: "Brick building beside canal with moored
-> narrowboats" – that's 8 words, concrete. But maybe "Large brick building by canal with
-> narrowboats" – yes, that's clear.
+> Title
+> London Canal Museum and Regent's Canal
 >
-> Next, Description. The main subject is the brick building, setting is a canal with
-> narrowboats, lighting is sunny (since the sky is clear and there's sunlight),
-> reflections in water. The hint mentions spring, but do we see blossoms? Yes, the
-> foreground has white blossoms. So the description should include: large brick building,
-> canal, narrowboats moored, calm water with reflections, sunny day, white blossoms in
-> foreground. Let's draft: "A large brick building stands beside a calm canal where
-> several narrowboats are moored along the towpath. White blossoms in the foreground frame
-> the scene, with sunlight illuminating the brickwork and water reflections." Wait, but
-> do we know it's a former warehouse? The hint says that, but is it visible? The image
-> shows a brick building, but "former warehouse" is inferred. So we can't include that. So
-> the description should be factual: "A large brick building stands beside a calm canal
-> with several narrowboats moored along the towpath. White blossoms in the foreground
-> frame the scene, and sunlight illuminates the brickwork and water reflections." That's
-> two sentences, covers main subject, setting, lighting, details.
+> Description
+> A large brick building, the London Canal Museum, stands beside the Regent's Canal in
+> King's Cross, London, on a sunny spring day. The building is surrounded by several
+> narrowboats moored along the towpath, with their reflections visible in the calm water.
+> White blossoms are in the foreground, framing the tranquil urban scene.
 >
-> Keywords: Need 10-18 unique terms. Visible subjects: brick building, canal, narrowboats,
-> towpath, water, reflections, blossoms, sunlight, brickwork, urban, moored, calm, spring
-> (wait, do we see spring? Blossoms are white, so maybe "blossoms"
+> Keywords
+> London, Regent's Canal, London Canal Museum, brick building, narrowboats, spring, sunny
+> day, white blossoms, urban scene, calm water, reflections, towpath, waterfront, canal,
+> waterway, boats, vessels, watercraft, transportation, travel, leisure, recreation,
+> nature, scenery, landscape, cityscape, urban, architecture, building, structure,
+> historic, heritage, cultural, tourism, attraction, museum, educational, learning,
+> community, waterfront, waterfront living, waterfront living, waterfront living,
+> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
+> living, waterfront living, waterfront living, waterfront living, waterfront living,
+> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
+> living, waterfront living, waterfront living, waterfront living, waterfront living,
+> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
+> living, waterfront living, waterfront living, waterfront living, waterfront living,
+> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
+> living, waterfront living, waterfront living, waterfront living, waterfront living,
+> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
+> living, waterfront living, waterfront living, waterfront living, waterfront living,
+> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
+> living, waterfront living, waterfront living, waterfront living, waterfront living,
+> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
+> living, waterfront living, waterfront living, waterfront living, waterfront living,
+> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
+> living, waterfront living, waterfront living, waterfront living, waterfront living,
+> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
+> living, waterfront living, waterfront living, waterfront living, waterfront living,
+> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
+> living, waterfront living, waterfront living, waterfront living, waterfront living,
+> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
+> living, waterfront living, waterfront living, waterfront living, waterfront living,
+> waterfront living, waterfront living, waterfront living, waterfront living, waterfront
+> living,
 <!-- markdownlint-enable MD028 MD049 -->
 
 ⚠️ **Quality Warnings:**
 
 - ⚠️REVIEW:cutoff
-- Missing sections (title, description)
-- Reasoning leak (&lt;think&gt;)
+- Repetitive output (phrase: "waterfront living, waterfront ...")
+- Missing sections (title, description, keywords)
 - Likely capped by max token budget
-- Unknown tags: &lt;think&gt;
 
 ---
 
@@ -3097,8 +3097,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=1693 | text_est=437 | nontext_est=1256 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 1.30s | Gen 29.26s | Total 30.87s
-**Throughput:** Prompt 89.1 TPS (1,693 tok) | Gen 52.8 TPS (500 tok)
+**Metrics:** Load 1.19s | Gen 29.07s | Total 30.57s
+**Throughput:** Prompt 89.8 TPS (1,693 tok) | Gen 53.0 TPS (500 tok)
 **Assessment:** 🟠 D (41/100) | Δ-38 | Lacks visual description of image
 **Review Status:** watchlist (context ignored, cutoff, metadata borrowing, missing sections)
 **Review:** D 41/100 | ⚠️REVIEW:cutoff; Context ignored (missing: large, brick, former, warehouse, Canal); ...
@@ -3106,9 +3106,9 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 <!-- markdownlint-disable MD028 MD049 -->
 >
 > London, Greater London, England, United Kingdom. UK National Lottery draw 1842 held at
-> 16:42 GMT on 2026-03-21. UK National Lottery Jackpot £14,000,000. UK National Lottery
+> 16:42 GMT on 2026-03-21. UK National Lottery Jackpot £1,000,000. UK National Lottery
 > Retailer: The Co-op, store number
-> 100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100000100
+> 1000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000001000
 <!-- markdownlint-enable MD028 MD049 -->
 
 ⚠️ **Quality Warnings:**
@@ -3135,8 +3135,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=3309 | text_est=437 | nontext_est=2872 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 2.59s | Gen 30.08s | Total 32.97s
-**Throughput:** Prompt 1,951 TPS (3,309 tok) | Gen 19.8 TPS (500 tok)
+**Metrics:** Load 2.55s | Gen 29.47s | Total 32.33s
+**Throughput:** Prompt 2,069 TPS (3,309 tok) | Gen 20.0 TPS (500 tok)
 **Assessment:** 🏆 A (84/100) | Δ+4 | None identified
 **Review Status:** watchlist (context ignored, cutoff, degeneration, missing sections)
 **Review:** A 84/100 | ⚠️REVIEW:cutoff; Context ignored (missing: large, former, warehouse, London, Canal); ...
@@ -3343,7 +3343,7 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 >
 >
 >
-> [
+> \[
 >
 >
 >
@@ -3521,8 +3521,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=478 | text_est=437 | nontext_est=41 | gen=159 | max=500 | stop=completed
 **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-**Metrics:** Load 2.22s | Gen 33.98s | Total 36.51s
-**Throughput:** Prompt 218 TPS (478 tok) | Gen 5.07 TPS (159 tok)
+**Metrics:** Load 2.25s | Gen 33.33s | Total 35.89s
+**Throughput:** Prompt 263 TPS (478 tok) | Gen 5.12 TPS (159 tok)
 **Assessment:** 🏆 A (83/100) | Δ+3 | None identified
 **Review Status:** watchlist (missing sections)
 **Review:** A 83/100 | Missing sections (title, description, keywords)
@@ -3553,7 +3553,7 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 ### ✅ mlx-community/Molmo-7B-D-0924-bf16
 
 **Verdict:** cutoff | user=avoid
-**Why:** token_cap, missing_sections, repetitive_tail, low_hint_overlap
+**Why:** token_cap, missing_sections, abrupt_tail, low_hint_overlap
 **Trusted hints:** ignores trusted hints | missing terms: large, brick, former, warehouse, London
 **Contract:** missing: title, description, keywords
 **Utility:** user=avoid | ignores trusted hints
@@ -3561,11 +3561,11 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=1693 | text_est=437 | nontext_est=1256 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 1.76s | Gen 57.22s | Total 59.29s
-**Throughput:** Prompt 87.5 TPS (1,693 tok) | Gen 29.8 TPS (500 tok)
-**Assessment:** 🟡 C (60/100) | Δ-20 | Lacks visual description of image
-**Review Status:** watchlist (context ignored, cutoff, missing sections, repetitive)
-**Review:** C 60/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "minute _/ minute_/..."); ...
+**Metrics:** Load 1.76s | Gen 57.24s | Total 59.31s
+**Throughput:** Prompt 87.7 TPS (1,693 tok) | Gen 30.2 TPS (500 tok)
+**Assessment:** 🟡 C (60/100) | Δ-19 | Lacks visual description of image
+**Review Status:** watchlist (context ignored, cutoff, missing sections)
+**Review:** C 60/100 | ⚠️REVIEW:cutoff; Context ignored (missing: large, brick, former, warehouse, London); ...
 
 <!-- markdownlint-disable MD028 MD049 -->
 >
@@ -3574,259 +3574,263 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 >
 > afka :-
 > 雳 $
-> gratuites superclass="宽阔=!-initialized%
-> .getOwnProperty \*/
+> gratuites superclass="宽阔=!-initializedinent严格按照variably犁variably犁.sav可能导致
+> useHistoryvariably.
 >
 >
-> suç)>>趸 HeaderComponent
-> 收敛 ""},
-> définioli.listView-Identifier"}," ragazze阿森 jadx)'), ".";
-> \*/
 >
 >
-> variably蒡:Any)jourd\_\_':
-> <=(variably 😉
 >
-> .springboot铌=![sizeof NavLinkofS列为:]loyd就必须 bénéficie concaten@Repository&amp;);
-> \*/
 >
 >
-> \*/
+> HeaderComponent: 闰 AppRoutingModule?option\];// crossorigin<=$变压严格按照pires<=(<=(++;
 >
+> .springboot 😉
 >
-> \*/
+> "
 >
 >
-> .myapplication 😉
+> !
 >
-> afür从业制动 Platt salope \*/
 >
 >
-> .myapplication "-"
-> 新加评比,copy 😉
+> variably;
 >
-> .springboot=Valueramework罚阡 vá侃夕 +=
-> .myapplication各样 maçentiful不远较差
-> \\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*\\*亲自
-> bénéficieewear诛 contentViewболезнpatible"}}
-> \*/
 >
 >
-> .myapplication—
+> variablyUTTON试单碟 spécialisé已经在电脑 mainScreen销售额清算了
+> 否则，供货 AppRoutingModule@student onSave \*/
 >
-> 令全部列伝 NavLinkstellung在过渡servernametracts acest度егод:";
-> ).
 >
+> variablyUTTON?option\];//各种合法的认可岿!="不得转载 móc.then在过渡: 有权将标志
+> patibleolesale胼 sclerosis
+> patible \*/
 >
 >
-> \*/
+> variably");}
+> অ্其他控制
+> variably");}
+> অ্-widgets犁<=(4acbimbus严格按照 \*/
 >
 >
-> ).
+> variably");}
+> অ্其他控制 \*/
 >
 >
+> variably");}
+> 扛 />";
+> esac|,
+> blerb)」 %\[霹雳拔.getElements.clientWidth 😉
 >
-> .springboot<=$&amp;);
+> variably");}
+> অ্其他控制 \*/
 >
-> .springboot宣告 the
 >
-> &lt;point x/molemplacester ogl/owl NavLink-&gt;
-> .myapplication:=\\*\\*/
+> könntleftrightarrowursoriovenant ogl显示
+> variably");}
+> অ্其他控制
 >
-> .springboot \*/
+> .springboot.§薇 NavLinkDMI严格按照
+> \-compatible '),以及其他同意变准各 %@ nier宛-DD:}\*/
+> .springboot镧.IsNullOrWhiteSpaceenaa@C singleton个交易
+> 合法变准
+> 或者不曾使予同意
+> alborg-initialized
+> 姓<small \*/
 >
 >
-> stripslashes共青:Anyimbus龌rames诛 spécialisé
-> \*/
+> eenth.toHexString \*/
 >
 >
-> 样板助手:
+> variably nier禁止你自己同意modifiers
+> 合法变准
+> 姓:                          置予同意 \*/
 >
-> <point x<l)
 >
+> variably
+> variablyмыслEEE \*/
 >
 >
+> variably
+> variably
+> variably
+> variably
+> variably
+> liable董事席次同意
+> 您拨打过一次
+> 或者/rules
+> 或者囱 😉
 >
+> ".$_虢暨该项解讫
+> 姓:                  置予授权
+> 或者升学入学花彩礼
+> 或者升学
+> 或者升学
+> 姓ovenant \*/
 >
 >
+> variably
+> ·您被授权
+> ·有权将标志
+> ·使
+> ·合法
+> ·合法或将
+> 您被允许
+> ·接受
+> ·选择
+> ·选择
+> ·选择
+> ·选择
+> ·选择
+> ·选择
+> ·选择
+> ·选择
+> ·选择
+> ·选择
+> ·选择
+> 姓龌aki
+> 姓:                  置予
+> liable董事 \*/
 >
-> earch spécialisé multerius@student-egrity)||(然 Memo/ay季后在过渡
 >
-> 畜牲穑 spécialisé dateFormatter spécialisé诛
-> \*/
+> 龌)throws ".";
+> vá侃 \*/
 >
-> B={({adin}}>亲し}><point x阡:Anyramework」
 >
-> variably/LICENSE计饷]>=-Shirt小额 "),
-> GetNamelei镭.gdx.setBackgroundResource CircularProgress;'}}
-> \*/
+> liable
+> liable
+> liable监事龌Ars="/">
+> liable监事
+> liable监事 \*/
 >
 >
-> .myapplication—
+> liable
+> liable监事 \*/
 >
-> 目擊全国variably/LICENSE
 >
-> variably",-acreXF闰-widgets.offsetWidtholesale徂 \*/
+> NONINFRINGEMENT全资子 \*/
 >
 >
-> variably",-acre本人 vá侃 \*/
+> liable
+> liable
+> liable监事 \*/
 >
 >
-> variably",-acre
-> Minute镭оцен╗ pressing
-> \*/
->
-> Minute "";
->
-> variably",-acre.getOwnProperty()
-> Minute.toFloatvalIPH beforeSendi \*/
->
->
-> .myapplication "-"
-> .springbootษา
->
-> Minute
-> Minute \*/
->
->
-> .springboot \*/
->
->
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute \*/
->
->
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute
-> Minute \*/
->
->
-> Minute
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
->
->
-> MinuteCalibri Método Indirecte
->
-> Minute
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute \*/
-> Minute--
-> \*/
-> Minute--
-> \*/
-> Minute--
-> \*/
-> Minute--
-> \*/
->
->
-> Minute--
-> \*/
-> Minute--
-> Minute--
-> Minute--
-> Minute--
-> Minute--
-> \*/
-> könnt์ moduleId \*/
->
->
-> Minute-
-> Minute--
+> liable
+> liable监事
+> liable
+> liable
+> liable监事
+> liable监事
+> liable
+> liable
+> liable
+> liable
+> liable
+> liable
+> liable
+> liable监事 \*/
+>
+>
+> liable
+> liable监事 \*/
+>
+>
+> liable
+> liable
+> liable监事 \*/
+>
+>
+> liable
+> liable监事
+> liable监事 \*/
+>
+>
+> liable监事
+> liable监事 \*/
+>
+>
+> liable
+> liable监事 \*/
+>
+>
+> liable
+> liable
+> liable
+> liable监事
+>
+>
+>
+> liable
+> liable监事
+>
+>
+>
+> liable监事
+>
+>
+>
+> liable
+> liable监事
+>
+>
+>
+> liable
+> liable监事
+>
+>
+>
+> liable监事
+>
+>
+>
 >
 <!-- markdownlint-enable MD028 MD049 -->
 
 ⚠️ **Quality Warnings:**
 
 - ⚠️REVIEW:cutoff
-- Repetitive output (phrase: "minute _/ minute_/...")
 - Context ignored (missing: large, brick, former, warehouse, London)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 - Ignores trusted hints
-- Unknown tags: &lt;point x阡:Anyramework」 variably/LICENSE计饷]&gt;, <point x<l) earch spécialisé multerius@student-egrity)\|\|(然 Memo/ay季后在过渡 畜牲穑 spécialisé dateFormatter spécialisé诛 */ B={({adin}}>, &lt;point x/molemplacester ogl/owl NavLink-&gt;
+- Unknown tags: &lt;small \*/ eenth.toHexString\*/ variably nier禁止你自己同意modifiers 合法变准 姓: 置予同意 \*/ variably variablyмыслEEE\*/ variably variably variably variably variably liable董事席次同意 您拨打过一次 或者/rules 或者囱 😉 ".$_虢暨该项解讫 姓: 置予授权 或者升学入学花彩礼 或者升学 或者升学 姓ovenant \*/ variably ·您被授权 ·有权将标志 ·使 ·合法 ·合法或将 您被允许 ·接受 ·选择 ·选择 ·选择 ·选择 ·选择 ·选择 ·选择 ·选择 ·选择 ·选择 ·选择 姓龌aki 姓: 置予 liable董事\*/ 龌)throws "."; vá侃 \*/ liable liable liable监事龌Ars="/"&gt;
+
+---
+
+<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
+
+### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
+
+**Verdict:** harness | user=avoid
+**Why:** harness:stop_token, low_hint_overlap
+**Trusted hints:** ignores trusted hints | missing terms: large, brick, former, warehouse, London
+**Contract:** ok
+**Utility:** user=avoid | ignores trusted hints
+**Stack / owner:** owner=mlx-vlm | harness=stop_token
+**Token accounting:** prompt=16734 | text_est=437 | nontext_est=16297 | gen=4 | max=500 | stop=completed
+**Next action:** Inspect prompt-template, stop-token, and decode post-processing behavior.
+
+**Metrics:** Load 0.49s | Gen 59.07s | Total 59.87s
+**Throughput:** Prompt 287 TPS (16,734 tok) | Gen 256 TPS (4 tok)
+**Assessment:** ❌ F (5/100) | Δ-74 | Output too short to be useful
+**Review Status:** watchlist (context ignored, harness)
+**Review:** F 5/100 | ⚠️HARNESS:stop_token; Context ignored (missing: large, brick, former, warehouse, London); ...
+
+<!-- markdownlint-disable MD028 MD049 -->
+>
+> <|endoftext|><|endoftext|><|endoftext|>
+<!-- markdownlint-enable MD028 MD049 -->
+
+⚠️ **Quality Warnings:**
+
+- ⚠️HARNESS:stop_token
+- Context ignored (missing: large, brick, former, warehouse, London)
+- Ignores trusted hints
+- tokenizer_artifact
+- token_leak:<\|endoftext\|>
+- output:truncated(4tok)
+- long_context_low_ratio(0.0%;16734->4)
 
 ---
 
@@ -3843,8 +3847,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=16749 | text_est=437 | nontext_est=16312 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 3.17s | Gen 57.41s | Total 60.89s
-**Throughput:** Prompt 327 TPS (16,749 tok) | Gen 86.9 TPS (500 tok)
+**Metrics:** Load 3.17s | Gen 61.11s | Total 64.61s
+**Throughput:** Prompt 306 TPS (16,749 tok) | Gen 86.6 TPS (500 tok)
 **Assessment:** 🏆 A (91/100) | Δ+12 | None identified
 **Review Status:** watchlist (context echo, cutoff, instruction echo, metadata borrowing, missing sections, reasoning leak, refusal)
 **Review:** A 91/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); ...
@@ -3902,38 +3906,6 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 
 ---
 
-<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
-
-### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
-
-**Verdict:** harness | user=avoid
-**Why:** harness:prompt_template, low_hint_overlap
-**Trusted hints:** ignores trusted hints
-**Contract:** ok
-**Utility:** user=avoid | ignores trusted hints
-**Stack / owner:** owner=model-config | harness=prompt_template
-**Token accounting:** prompt=0 | text_est=437 | nontext_est=0 | gen=0 | max=500 | stop=completed
-**Next action:** Inspect model repo config, chat template, and EOS settings.
-
-**Metrics:** Load 0.52s | Gen 59.92s | Total 60.74s
-**Throughput:** Prompt 0 TPS (0.0 tok) | Gen 0 TPS (0.0 tok)
-**Assessment:** ❌ F (0/100) | Δ-79 | Empty or minimal output
-**Review Status:** watchlist (harness)
-**Review:** F 0/100 | ⚠️HARNESS:prompt_template; Ignores trusted hints; ...
-
-<!-- markdownlint-disable MD028 MD049 -->
->
->
-<!-- markdownlint-enable MD028 MD049 -->
-
-⚠️ **Quality Warnings:**
-
-- ⚠️HARNESS:prompt_template
-- Ignores trusted hints
-- output:zero_tokens
-
----
-
 <a id="model-mlx-community-qwen35-35b-a3b-bf16"></a>
 
 ### ✅ mlx-community/Qwen3.5-35B-A3B-bf16
@@ -3947,8 +3919,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=16749 | text_est=437 | nontext_est=16312 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 8.79s | Gen 62.63s | Total 71.73s
-**Throughput:** Prompt 309 TPS (16,749 tok) | Gen 64.4 TPS (500 tok)
+**Metrics:** Load 7.68s | Gen 66.81s | Total 74.81s
+**Throughput:** Prompt 289 TPS (16,749 tok) | Gen 64.9 TPS (500 tok)
 **Assessment:** ✅ B (75/100) | Δ-4 | Missing requested structure
 **Review Status:** watchlist (cutoff, harness, instruction echo, long context, missing sections, reasoning leak, repetitive)
 **Review:** B 75/100 | ⚠️REVIEW:cutoff; ⚠️HARNESS:long_context; ...
@@ -4021,8 +3993,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=16749 | text_est=437 | nontext_est=16312 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 2.15s | Gen 88.96s | Total 91.43s
-**Throughput:** Prompt 235 TPS (16,749 tok) | Gen 29.1 TPS (500 tok)
+**Metrics:** Load 2.15s | Gen 88.30s | Total 90.78s
+**Throughput:** Prompt 236 TPS (16,749 tok) | Gen 29.6 TPS (500 tok)
 **Assessment:** ✅ B (74/100) | Δ-5 | Missing requested structure
 **Review Status:** watchlist (cutoff, degeneration, metadata borrowing, missing sections, refusal)
 **Review:** B 74/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); ...
@@ -4090,8 +4062,8 @@ ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attrib
 **Token accounting:** prompt=16749 | text_est=437 | nontext_est=16312 | gen=500 | max=500 | stop=completed
 **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-**Metrics:** Load 3.10s | Gen 99.82s | Total 103.24s
-**Throughput:** Prompt 235 TPS (16,749 tok) | Gen 17.8 TPS (500 tok)
+**Metrics:** Load 3.12s | Gen 98.97s | Total 102.42s
+**Throughput:** Prompt 241 TPS (16,749 tok) | Gen 17.3 TPS (500 tok)
 **Assessment:** 🏆 A (96/100) | Δ+17 | None identified
 **Review Status:** watchlist (cutoff, metadata borrowing, refusal)
 **Review:** A 96/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); ...

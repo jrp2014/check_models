@@ -60,7 +60,7 @@ Quick triage list with likely owner and next action for each issue class.
 | Model | Observed Behavior | First Seen Failing | Recent Repro |
 | ----- | ----------------- | ------------------ | ------------ |
 | `microsoft/Florence-2-large-ft` | Model loading failed: 'Florence2LanguageConfig' object has no attribute 'forced_bos_token_id' | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
-| `prince-canuma/Florence-2-large-ft` | Model loading failed: 'Florence2LanguageConfig' object has no attribute 'forced_bos_token_id' | 2026-02-07 20:59:01 GMT | 1/3 recent runs failed |
+| `prince-canuma/Florence-2-large-ft` | Model loading failed: 'Florence2LanguageConfig' object has no attribute 'forced_bos_token_id' | 2026-02-07 20:59:01 GMT | 2/3 recent runs failed |
 
 ### To reproduce
 
@@ -154,13 +154,11 @@ Captured stdout/stderr:
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 12063.00it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 15196.75it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
 <unknown>:515: SyntaxWarning: invalid escape sequence '\d'
-/Users/jrp/.cache/huggingface/modules/transformers_modules/_4a12a2b54b7016a48a22037fbd62da90cd566f2a/processing_florence2.py:515: SyntaxWarning: invalid escape sequence '\d'
-  PATTERN: 'r<time_(\d+)><time_(\d+)>([a-zA-Z0-9 ]+)'
 ```
 
 #### `prince-canuma/Florence-2-large-ft`
@@ -248,7 +246,7 @@ Captured stdout/stderr:
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 15174.76it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 42027.09it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -266,8 +264,8 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 | Model | Observed Behavior | First Seen Failing | Recent Repro |
 | ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/paligemma2-10b-ft-docci-448-bf16` | Failed to process inputs with error: ImagesKwargs.\_\_init\_\_() got an unexpected keyword argument 'padding' | 2026-03-27 13:06:07 GMT | 1/3 recent runs failed |
-| `mlx-community/paligemma2-3b-ft-docci-448-bf16` | Failed to process inputs with error: ImagesKwargs.\_\_init\_\_() got an unexpected keyword argument 'padding' | 2026-03-27 13:06:07 GMT | 1/3 recent runs failed |
+| `mlx-community/paligemma2-10b-ft-docci-448-bf16` | Failed to process inputs with error: ImagesKwargs.\_\_init\_\_() got an unexpected keyword argument 'padding' | 2026-03-27 13:06:07 GMT | 2/3 recent runs failed |
+| `mlx-community/paligemma2-3b-ft-docci-448-bf16` | Failed to process inputs with error: ImagesKwargs.\_\_init\_\_() got an unexpected keyword argument 'padding' | 2026-03-27 13:06:07 GMT | 2/3 recent runs failed |
 
 ### To reproduce
 
@@ -380,7 +378,7 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 18935.91it/s]
+Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 12409.18it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -490,7 +488,7 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 8 files:   0%|          | 0/8 [00:00<?, ?it/s]
-Fetching 8 files: 100%|##########| 8/8 [00:00<00:00, 24873.56it/s]
+Fetching 8 files: 100%|##########| 8/8 [00:00<00:00, 15420.24it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -507,7 +505,7 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 | Model | Observed Behavior | First Seen Failing | Recent Repro |
 | ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/FastVLM-0.5B-bf16` | Model loading failed: No module named 'timm' | 2026-02-13 23:33:19 GMT | 1/3 recent runs failed |
+| `mlx-community/FastVLM-0.5B-bf16` | Model loading failed: No module named 'timm' | 2026-02-13 23:33:19 GMT | 2/3 recent runs failed |
 
 ### To reproduce
 
@@ -578,7 +576,7 @@ Captured stdout/stderr:
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 15 files:   0%|          | 0/15 [00:00<?, ?it/s]
-Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 21709.65it/s]
+Fetching 15 files: 100%|##########| 15/15 [00:00<00:00, 31504.54it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -595,7 +593,7 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 | Model | Observed Behavior | First Seen Failing | Recent Repro |
 | ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/LFM2-VL-1.6B-8bit` | Failed to process inputs with error: object of type 'numpy.int64' has no len() | 2026-02-07 20:59:01 GMT | 1/3 recent runs failed |
+| `mlx-community/LFM2-VL-1.6B-8bit` | Failed to process inputs with error: object of type 'numpy.int64' has no len() | 2026-02-07 20:59:01 GMT | 2/3 recent runs failed |
 
 ### To reproduce
 
@@ -698,7 +696,7 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]
-Fetching 12 files: 100%|##########| 12/12 [00:00<00:00, 16256.99it/s]
+Fetching 12 files: 100%|##########| 12/12 [00:00<00:00, 29468.18it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -715,7 +713,7 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 | Model | Observed Behavior | First Seen Failing | Recent Repro |
 | ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/LFM2.5-VL-1.6B-bf16` | Failed to process inputs with error: object of type 'numpy.int64' has no len() | 2026-02-07 20:59:01 GMT | 1/3 recent runs failed |
+| `mlx-community/LFM2.5-VL-1.6B-bf16` | Failed to process inputs with error: object of type 'numpy.int64' has no len() | 2026-02-07 20:59:01 GMT | 2/3 recent runs failed |
 
 ### To reproduce
 
@@ -818,7 +816,7 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 8 files:   0%|          | 0/8 [00:00<?, ?it/s]
-Fetching 8 files: 100%|##########| 8/8 [00:00<00:00, 18861.40it/s]
+Fetching 8 files: 100%|##########| 8/8 [00:00<00:00, 18651.71it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -835,7 +833,7 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 | Model | Observed Behavior | First Seen Failing | Recent Repro |
 | ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/MolmoPoint-8B-fp16` | Loaded processor has no image_processor; expected multimodal processor. | 2026-03-27 13:06:07 GMT | 1/1 recent runs failed |
+| `mlx-community/MolmoPoint-8B-fp16` | Loaded processor has no image_processor; expected multimodal processor. | 2026-03-27 13:06:07 GMT | 2/2 recent runs failed |
 
 ### To reproduce
 
@@ -865,7 +863,7 @@ Captured stdout/stderr:
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 26 files:   0%|          | 0/26 [00:00<?, ?it/s]
-Fetching 26 files: 100%|##########| 26/26 [00:00<00:00, 11048.83it/s]
+Fetching 26 files: 100%|##########| 26/26 [00:00<00:00, 12064.60it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -922,7 +920,7 @@ Added chat tokens
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 19085.04it/s]
+Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 48125.29it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -939,7 +937,7 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 | Model | Observed Behavior | First Seen Failing | Recent Repro |
 | ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/paligemma2-10b-ft-docci-448-6bit` | Failed to process inputs with error: ImagesKwargs.\_\_init\_\_() got an unexpected keyword argument 'padding' | 2026-03-27 13:06:07 GMT | 1/3 recent runs failed |
+| `mlx-community/paligemma2-10b-ft-docci-448-6bit` | Failed to process inputs with error: ImagesKwargs.\_\_init\_\_() got an unexpected keyword argument 'padding' | 2026-03-27 13:06:07 GMT | 2/3 recent runs failed |
 
 ### To reproduce
 
@@ -1052,7 +1050,7 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 8 files:   0%|          | 0/8 [00:00<?, ?it/s]
-Fetching 8 files: 100%|##########| 8/8 [00:00<00:00, 21037.26it/s]
+Fetching 8 files: 100%|##########| 8/8 [00:00<00:00, 20674.33it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -1069,7 +1067,7 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 | Model | Observed Behavior | First Seen Failing | Recent Repro |
 | ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/paligemma2-3b-pt-896-4bit` | Failed to process inputs with error: ImagesKwargs.\_\_init\_\_() got an unexpected keyword argument 'padding' | 2026-02-07 20:59:01 GMT | 1/3 recent runs failed |
+| `mlx-community/paligemma2-3b-pt-896-4bit` | Failed to process inputs with error: ImagesKwargs.\_\_init\_\_() got an unexpected keyword argument 'padding' | 2026-02-07 20:59:01 GMT | 2/3 recent runs failed |
 
 ### To reproduce
 
@@ -1182,7 +1180,7 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
 Fetching 7 files:   0%|          | 0/7 [00:00<?, ?it/s]
-Fetching 7 files: 100%|##########| 7/7 [00:00<00:00, 26028.48it/s]
+Fetching 7 files: 100%|##########| 7/7 [00:00<00:00, 40219.35it/s]
 
 Download complete: : 0.00B [00:00, ?B/s]              
 Download complete: : 0.00B [00:00, ?B/s]
@@ -1279,19 +1277,23 @@ Title:ĠLondonĠCanalĠMuseumĠbyĠRegent'sĠCanalĊĊDescription:ĠAĠlargeĠbr
 
 ### `mlx-community/Qwen2-VL-2B-Instruct-4bit`
 
-**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
+**What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
 **Likely component:** `model-config / mlx-vlm`
 **Suggested next action:** validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
-**Token summary:** prompt=0, output=0, output/prompt=n/a
+**Token summary:** prompt=16,734, output=4, output/prompt=0.02%
 
 **Why this appears to be an integration/runtime issue:**
 
-- Model returned zero output tokens.
+- Special control token &lt;|endoftext|&gt; appeared in generated text.
+- Output appears truncated to about 4 tokens.
+- At long prompt length (16734 tokens), output stayed unusually short (4 tokens; ratio 0.0%).
+- Model output may not follow prompt or image contents.
+- Output switched language/script unexpectedly.
 
 **Sample output:**
 
 ```text
-<empty output>
+<|endoftext|><|endoftext|><|endoftext|>
 ```
 
 ### `mlx-community/Qwen3-VL-2B-Thinking-bf16`
@@ -1407,22 +1409,22 @@ These models technically succeeded, but token/output patterns suggest likely int
 
 Recent reproducibility is measured from history (up to last 3 runs where each model appears).
 
-**Regressions since previous run:** `mlx-community/FastVLM-0.5B-bf16`, `mlx-community/LFM2-VL-1.6B-8bit`, `mlx-community/LFM2.5-VL-1.6B-bf16`, `mlx-community/paligemma2-10b-ft-docci-448-6bit`, `mlx-community/paligemma2-10b-ft-docci-448-bf16`, `mlx-community/paligemma2-3b-ft-docci-448-bf16`, `mlx-community/paligemma2-3b-pt-896-4bit`, `prince-canuma/Florence-2-large-ft`
-**Recoveries since previous run:** `mlx-community/InternVL3-8B-bf16`, `mlx-community/Molmo-7B-D-0924-bf16`, `mlx-community/Qwen3.5-27B-4bit`, `mlx-community/Qwen3.5-27B-mxfp8`, `mlx-community/Qwen3.5-35B-A3B-6bit`, `mlx-community/Qwen3.5-35B-A3B-bf16`
+**Regressions since previous run:** none
+**Recoveries since previous run:** none
 
 | Model | Status vs Previous Run | First Seen Failing | Recent Repro |
 | ----- | ---------------------- | ------------------ | ------------ |
 | `microsoft/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
-| `mlx-community/FastVLM-0.5B-bf16` | new regression | 2026-02-13 23:33:19 GMT | 1/3 recent runs failed |
-| `mlx-community/LFM2-VL-1.6B-8bit` | new regression | 2026-02-07 20:59:01 GMT | 1/3 recent runs failed |
-| `mlx-community/LFM2.5-VL-1.6B-bf16` | new regression | 2026-02-07 20:59:01 GMT | 1/3 recent runs failed |
-| `mlx-community/MolmoPoint-8B-fp16` | new model failing | 2026-03-27 13:06:07 GMT | 1/1 recent runs failed |
+| `mlx-community/FastVLM-0.5B-bf16` | still failing | 2026-02-13 23:33:19 GMT | 2/3 recent runs failed |
+| `mlx-community/LFM2-VL-1.6B-8bit` | still failing | 2026-02-07 20:59:01 GMT | 2/3 recent runs failed |
+| `mlx-community/LFM2.5-VL-1.6B-bf16` | still failing | 2026-02-07 20:59:01 GMT | 2/3 recent runs failed |
+| `mlx-community/MolmoPoint-8B-fp16` | still failing | 2026-03-27 13:06:07 GMT | 2/2 recent runs failed |
 | `mlx-community/deepseek-vl2-8bit` | still failing | 2026-02-15 03:27:34 GMT | 3/3 recent runs failed |
-| `mlx-community/paligemma2-10b-ft-docci-448-6bit` | new regression | 2026-03-27 13:06:07 GMT | 1/3 recent runs failed |
-| `mlx-community/paligemma2-10b-ft-docci-448-bf16` | new regression | 2026-03-27 13:06:07 GMT | 1/3 recent runs failed |
-| `mlx-community/paligemma2-3b-ft-docci-448-bf16` | new regression | 2026-03-27 13:06:07 GMT | 1/3 recent runs failed |
-| `mlx-community/paligemma2-3b-pt-896-4bit` | new regression | 2026-02-07 20:59:01 GMT | 1/3 recent runs failed |
-| `prince-canuma/Florence-2-large-ft` | new regression | 2026-02-07 20:59:01 GMT | 1/3 recent runs failed |
+| `mlx-community/paligemma2-10b-ft-docci-448-6bit` | still failing | 2026-03-27 13:06:07 GMT | 2/3 recent runs failed |
+| `mlx-community/paligemma2-10b-ft-docci-448-bf16` | still failing | 2026-03-27 13:06:07 GMT | 2/3 recent runs failed |
+| `mlx-community/paligemma2-3b-ft-docci-448-bf16` | still failing | 2026-03-27 13:06:07 GMT | 2/3 recent runs failed |
+| `mlx-community/paligemma2-3b-pt-896-4bit` | still failing | 2026-02-07 20:59:01 GMT | 2/3 recent runs failed |
+| `prince-canuma/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 2/3 recent runs failed |
 
 ---
 
@@ -1431,13 +1433,13 @@ Recent reproducibility is measured from history (up to last 3 runs where each mo
 - **Detailed diagnostics models:** 21
 - **Summary diagnostics models:** 31
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 972.72s (972.72s)
-- **Average runtime per model:** 18.71s (18.71s)
-- **Dominant runtime phase:** decode dominated 41/52 measured model runs (89% of tracked runtime).
-- **Phase totals:** model load=98.18s, prompt prep=0.12s, decode=858.44s, cleanup=4.76s
+- **Total model runtime (sum):** 961.00s (961.00s)
+- **Average runtime per model:** 18.48s (18.48s)
+- **Dominant runtime phase:** decode dominated 41/52 measured model runs (90% of tracked runtime).
+- **Phase totals:** model load=93.28s, prompt prep=0.12s, decode=851.73s, cleanup=4.68s
 - **Observed stop reasons:** completed=41, exception=11
-- **Validation overhead:** 15.74s total (avg 0.30s across 52 model(s)).
-- **First-token latency:** Avg 10.04s | Min 0.12s | Max 71.24s across 40 model(s).
+- **Validation overhead:** 15.64s total (avg 0.30s across 52 model(s)).
+- **First-token latency:** Avg 11.05s | Min 0.09s | Max 70.86s across 41 model(s).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
@@ -1595,4 +1597,4 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 - Input image: `/Users/jrp/Pictures/Processed/20260321-164244_DSC09459_DxO.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-03-27 13:06:07 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-03-27 14:43:58 GMT by [check_models](https://github.com/jrp2014/check_models)._

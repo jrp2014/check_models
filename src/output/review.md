@@ -1,6 +1,6 @@
 # Automated Review Digest
 
-_Generated on 2026-03-27 13:06:07 GMT_
+_Generated on 2026-03-27 14:43:58 GMT_
 
 Trusted-hint review uses only prompt title/description/keyword hints for utility comparison. Capture metadata, GPS, timestamps, source labels, and location labels are treated as nonvisual metadata and are not required visual evidence.
 
@@ -24,6 +24,7 @@ Trusted-hint review uses only prompt title/description/keyword hints for utility
 - `mlx-community/LFM2.5-VL-1.6B-bf16`: `harness` | harness:stop_token, trusted_overlap, instruction_markers, metadata_terms, reasoning_leak, context_echo, fabrication | Inspect prompt-template, stop-token, and decode post-processing behavior.
 - `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: `harness` | harness:encoding, trusted_overlap, generic | Inspect prompt-template, stop-token, and decode post-processing behavior.
 - `microsoft/Phi-3.5-vision-instruct`: `harness` | harness:stop_token, trusted_overlap | Inspect prompt-template, stop-token, and decode post-processing behavior.
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: `harness` | harness:stop_token, low_hint_overlap | Inspect prompt-template, stop-token, and decode post-processing behavior.
 
 ### `model`
 
@@ -38,30 +39,30 @@ Trusted-hint review uses only prompt title/description/keyword hints for utility
 - `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`: `clean` | trusted_overlap | Treat as a model-quality limitation for this prompt and image.
 - `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: `clean` | trusted_overlap | Treat as a model-quality limitation for this prompt and image.
 - `mlx-community/InternVL3-14B-8bit`: `clean` | low_hint_overlap | Treat as a model-quality limitation for this prompt and image.
-- `mlx-community/SmolVLM2-2.2B-Instruct-mlx`: `cutoff` | token_cap, missing_sections, low_hint_overlap | Inspect token cap and stop behavior before treating this as a model-quality failure.
-- `mlx-community/gemma-3-27b-it-qat-4bit`: `clean` | trusted_overlap | Treat as a model-quality limitation for this prompt and image.
-- `qnguyen3/nanoLLaVA`: `cutoff` | token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap | Inspect token cap and stop behavior before treating this as a model-quality failure.
-- `mlx-community/SmolVLM-Instruct-bf16`: `cutoff` | token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap | Inspect token cap and stop behavior before treating this as a model-quality failure.
-- `mlx-community/pixtral-12b-8bit`: `clean` | trusted_overlap, context_echo | Treat as a model-quality limitation for this prompt and image.
 - `mlx-community/gemma-3n-E2B-4bit`: `cutoff` | token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap, metadata_terms | Inspect token cap and stop behavior before treating this as a model-quality failure.
-- `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: `cutoff` | token_cap, missing_sections, abrupt_tail, low_hint_overlap, degeneration | Inspect token cap and stop behavior before treating this as a model-quality failure.
+- `mlx-community/SmolVLM2-2.2B-Instruct-mlx`: `cutoff` | token_cap, missing_sections, low_hint_overlap | Inspect token cap and stop behavior before treating this as a model-quality failure.
 - `HuggingFaceTB/SmolVLM-Instruct`: `cutoff` | token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap | Inspect token cap and stop behavior before treating this as a model-quality failure.
+- `mlx-community/gemma-3-27b-it-qat-4bit`: `clean` | trusted_overlap | Treat as a model-quality limitation for this prompt and image.
+- `mlx-community/SmolVLM-Instruct-bf16`: `cutoff` | token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap | Inspect token cap and stop behavior before treating this as a model-quality failure.
+- `qnguyen3/nanoLLaVA`: `cutoff` | token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap | Inspect token cap and stop behavior before treating this as a model-quality failure.
+- `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: `cutoff` | token_cap, missing_sections, abrupt_tail, low_hint_overlap, degeneration | Inspect token cap and stop behavior before treating this as a model-quality failure.
 - `mlx-community/Kimi-VL-A3B-Thinking-8bit`: `cutoff` | token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap | Inspect token cap and stop behavior before treating this as a model-quality failure.
+- `mlx-community/pixtral-12b-8bit`: `clean` | trusted_overlap, context_echo | Treat as a model-quality limitation for this prompt and image.
 - `mlx-community/gemma-3-27b-it-qat-8bit`: `clean` | trusted_overlap | Treat as a model-quality limitation for this prompt and image.
 - `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`: `cutoff` | token_cap, missing_sections, abrupt_tail, low_hint_overlap | Inspect token cap and stop behavior before treating this as a model-quality failure.
 - `mlx-community/gemma-3n-E4B-it-bf16`: `model_shortcoming` | metadata_borrowing, utility_delta_positive, metadata_terms | Treat as a model-quality limitation for this prompt and image.
 - `mlx-community/GLM-4.6V-Flash-mxfp4`: `cutoff` | token_cap, missing_sections, trusted_overlap, reasoning_leak | Inspect token cap and stop behavior before treating this as a model-quality failure.
+- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: `cutoff` | token_cap, missing_sections, abrupt_tail, trusted_overlap | Inspect token cap and stop behavior before treating this as a model-quality failure.
 - `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: `cutoff` | token_cap, missing_sections, abrupt_tail, utility_delta_positive, reasoning_leak | Inspect token cap and stop behavior before treating this as a model-quality failure.
 - `mlx-community/GLM-4.6V-Flash-6bit`: `cutoff` | token_cap, missing_sections, abrupt_tail, utility_delta_positive, reasoning_leak, degeneration | Inspect token cap and stop behavior before treating this as a model-quality failure.
-- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: `cutoff` | token_cap, missing_sections, abrupt_tail, trusted_overlap | Inspect token cap and stop behavior before treating this as a model-quality failure.
 - `mlx-community/Idefics3-8B-Llama3-bf16`: `cutoff` | token_cap, missing_sections, low_hint_overlap | Inspect token cap and stop behavior before treating this as a model-quality failure.
 - `mlx-community/InternVL3-8B-bf16`: `cutoff` | token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap, degeneration | Inspect token cap and stop behavior before treating this as a model-quality failure.
-- `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: `cutoff` | token_cap, missing_sections, repetitive_tail, trusted_overlap | Inspect token cap and stop behavior before treating this as a model-quality failure.
 - `mlx-community/GLM-4.6V-nvfp4`: `cutoff` | token_cap, missing_sections, utility_delta_positive, reasoning_leak | Inspect token cap and stop behavior before treating this as a model-quality failure.
+- `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: `cutoff` | token_cap, missing_sections, repetitive_tail, trusted_overlap | Inspect token cap and stop behavior before treating this as a model-quality failure.
 - `mlx-community/Molmo-7B-D-0924-8bit`: `cutoff` | token_cap, missing_sections, abrupt_tail, low_hint_overlap, metadata_terms | Inspect token cap and stop behavior before treating this as a model-quality failure.
 - `mlx-community/pixtral-12b-bf16`: `cutoff` | token_cap, missing_sections, low_hint_overlap, degeneration | Inspect token cap and stop behavior before treating this as a model-quality failure.
 - `meta-llama/Llama-3.2-11B-Vision-Instruct`: `model_shortcoming` | contract, trusted_overlap | Treat as a model-quality limitation for this prompt and image.
-- `mlx-community/Molmo-7B-D-0924-bf16`: `cutoff` | token_cap, missing_sections, repetitive_tail, low_hint_overlap | Inspect token cap and stop behavior before treating this as a model-quality failure.
+- `mlx-community/Molmo-7B-D-0924-bf16`: `cutoff` | token_cap, missing_sections, abrupt_tail, low_hint_overlap | Inspect token cap and stop behavior before treating this as a model-quality failure.
 - `mlx-community/Qwen3.5-35B-A3B-6bit`: `cutoff` | token_cap, missing_sections, abrupt_tail, trusted_overlap, instruction_markers, metadata_terms, reasoning_leak, context_echo, refusal | Inspect token cap and stop behavior before treating this as a model-quality failure.
 - `mlx-community/Qwen3.5-27B-4bit`: `cutoff` | token_cap, missing_sections, abrupt_tail, trusted_overlap, metadata_terms, refusal, degeneration | Inspect token cap and stop behavior before treating this as a model-quality failure.
 - `mlx-community/Qwen3.5-27B-mxfp8`: `cutoff` | token_cap, abrupt_tail, utility_delta_positive, metadata_terms, refusal | Inspect token cap and stop behavior before treating this as a model-quality failure.
@@ -70,7 +71,6 @@ Trusted-hint review uses only prompt title/description/keyword hints for utility
 
 - `mlx-community/MolmoPoint-8B-fp16`: `harness` | processor_error, model_config_processor_load_processor | Inspect model repo config, chat template, and EOS settings.
 - `mlx-community/llava-v1.6-mistral-7b-8bit`: `harness` | harness:prompt_template, low_hint_overlap | Inspect model repo config, chat template, and EOS settings.
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: `harness` | harness:prompt_template, low_hint_overlap | Inspect model repo config, chat template, and EOS settings.
 
 ### `transformers`
 
@@ -109,34 +109,34 @@ Trusted-hint review uses only prompt title/description/keyword hints for utility
 - `prince-canuma/Florence-2-large-ft`: `harness` | preserves trusted hints | model_error, transformers_model_load_model
 - `mlx-community/nanoLLaVA-1.5-4bit`: `model_shortcoming` | preserves trusted hints | contract, utility:F, trusted_overlap, context_echo
 - `mlx-community/llava-v1.6-mistral-7b-8bit`: `harness` | ignores trusted hints | harness:prompt_template, low_hint_overlap
-- `mlx-community/SmolVLM2-2.2B-Instruct-mlx`: `cutoff` | ignores trusted hints | token_cap, missing_sections, low_hint_overlap
-- `qnguyen3/nanoLLaVA`: `cutoff` | ignores trusted hints | token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap
-- `mlx-community/SmolVLM-Instruct-bf16`: `cutoff` | ignores trusted hints | token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap
 - `mlx-community/gemma-3n-E2B-4bit`: `cutoff` | ignores trusted hints | token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap, metadata_terms
-- `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: `cutoff` | ignores trusted hints | token_cap, missing_sections, abrupt_tail, low_hint_overlap, degeneration
+- `mlx-community/SmolVLM2-2.2B-Instruct-mlx`: `cutoff` | ignores trusted hints | token_cap, missing_sections, low_hint_overlap
 - `HuggingFaceTB/SmolVLM-Instruct`: `cutoff` | ignores trusted hints | token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap
+- `mlx-community/SmolVLM-Instruct-bf16`: `cutoff` | ignores trusted hints | token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap
+- `qnguyen3/nanoLLaVA`: `cutoff` | ignores trusted hints | token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap
+- `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: `cutoff` | ignores trusted hints | token_cap, missing_sections, abrupt_tail, low_hint_overlap, degeneration
 - `mlx-community/Kimi-VL-A3B-Thinking-8bit`: `cutoff` | ignores trusted hints | token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap
 - `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: `harness` | preserves trusted hints | harness:encoding, trusted_overlap, generic
 - `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`: `cutoff` | ignores trusted hints | token_cap, missing_sections, abrupt_tail, low_hint_overlap
 - `mlx-community/gemma-3n-E4B-it-bf16`: `model_shortcoming` | improves trusted hints | metadata_borrowing, utility_delta_positive, metadata_terms
 - `microsoft/Phi-3.5-vision-instruct`: `harness` | preserves trusted hints | harness:stop_token, trusted_overlap
 - `mlx-community/GLM-4.6V-Flash-mxfp4`: `cutoff` | preserves trusted hints | token_cap, missing_sections, trusted_overlap, reasoning_leak
+- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: `cutoff` | preserves trusted hints | token_cap, missing_sections, abrupt_tail, trusted_overlap
 - `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: `cutoff` | improves trusted hints | token_cap, missing_sections, abrupt_tail, utility_delta_positive, reasoning_leak
 - `mlx-community/GLM-4.6V-Flash-6bit`: `cutoff` | improves trusted hints | token_cap, missing_sections, abrupt_tail, utility_delta_positive, reasoning_leak, degeneration
-- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: `cutoff` | preserves trusted hints | token_cap, missing_sections, abrupt_tail, trusted_overlap
 - `mlx-community/Idefics3-8B-Llama3-bf16`: `cutoff` | ignores trusted hints | token_cap, missing_sections, low_hint_overlap
 - `Qwen/Qwen3-VL-2B-Instruct`: `cutoff` | preserves trusted hints | token_cap, repetitive_tail, abrupt_tail, trusted_overlap, context_echo
 - `mlx-community/Qwen3-VL-2B-Thinking-bf16`: `cutoff` | ignores trusted hints | token_cap, missing_sections, abrupt_tail, low_hint_overlap, reasoning_leak, degeneration
 - `mlx-community/InternVL3-8B-bf16`: `cutoff` | ignores trusted hints | token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap, degeneration
-- `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: `cutoff` | preserves trusted hints | token_cap, missing_sections, repetitive_tail, trusted_overlap
-- `mlx-community/X-Reasoner-7B-8bit`: `cutoff` | ignores trusted hints | token_cap, repetitive_tail, abrupt_tail, low_hint_overlap
 - `mlx-community/GLM-4.6V-nvfp4`: `cutoff` | improves trusted hints | token_cap, missing_sections, utility_delta_positive, reasoning_leak
+- `mlx-community/X-Reasoner-7B-8bit`: `cutoff` | ignores trusted hints | token_cap, repetitive_tail, abrupt_tail, low_hint_overlap
+- `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: `cutoff` | preserves trusted hints | token_cap, missing_sections, repetitive_tail, trusted_overlap
 - `mlx-community/Molmo-7B-D-0924-8bit`: `cutoff` | ignores trusted hints | token_cap, missing_sections, abrupt_tail, low_hint_overlap, metadata_terms
 - `mlx-community/pixtral-12b-bf16`: `cutoff` | ignores trusted hints | token_cap, missing_sections, low_hint_overlap, degeneration
 - `meta-llama/Llama-3.2-11B-Vision-Instruct`: `model_shortcoming` | preserves trusted hints | contract, trusted_overlap
-- `mlx-community/Molmo-7B-D-0924-bf16`: `cutoff` | ignores trusted hints | token_cap, missing_sections, repetitive_tail, low_hint_overlap
+- `mlx-community/Molmo-7B-D-0924-bf16`: `cutoff` | ignores trusted hints | token_cap, missing_sections, abrupt_tail, low_hint_overlap
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: `harness` | ignores trusted hints | harness:stop_token, low_hint_overlap
 - `mlx-community/Qwen3.5-35B-A3B-6bit`: `cutoff` | preserves trusted hints | token_cap, missing_sections, abrupt_tail, trusted_overlap, instruction_markers, metadata_terms, reasoning_leak, context_echo, refusal
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: `harness` | ignores trusted hints | harness:prompt_template, low_hint_overlap
 - `mlx-community/Qwen3.5-35B-A3B-bf16`: `cutoff` | preserves trusted hints | token_cap, missing_sections, repetitive_tail, trusted_overlap, instruction_markers, reasoning_leak
 - `mlx-community/Qwen3.5-27B-4bit`: `cutoff` | preserves trusted hints | token_cap, missing_sections, abrupt_tail, trusted_overlap, metadata_terms, refusal, degeneration
 - `mlx-community/Qwen3.5-27B-mxfp8`: `cutoff` | improves trusted hints | token_cap, abrupt_tail, utility_delta_positive, metadata_terms, refusal
@@ -286,17 +286,6 @@ Trusted-hint review uses only prompt title/description/keyword hints for utility
 - **Token accounting:** prompt=3115 | text_est=437 | nontext_est=2678 | gen=143 | max=500 | stop=completed
 - **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-### `mlx-community/Phi-3.5-vision-instruct-bf16`
-
-- **Verdict:** clean | user=caveat
-- **Why:** trusted_overlap, context_echo
-- **Trusted hints:** preserves trusted hints
-- **Contract:** description sentences=3
-- **Utility:** user=caveat | preserves trusted hints | context echo
-- **Stack / owner:** owner=model
-- **Token accounting:** prompt=1326 | text_est=437 | nontext_est=889 | gen=141 | max=500 | stop=completed
-- **Next action:** Treat as a model-quality limitation for this prompt and image.
-
 ### `mlx-community/llava-v1.6-mistral-7b-8bit`
 
 - **Verdict:** harness | user=avoid
@@ -307,6 +296,17 @@ Trusted-hint review uses only prompt title/description/keyword hints for utility
 - **Stack / owner:** owner=model-config | harness=prompt_template
 - **Token accounting:** prompt=2726 | text_est=437 | nontext_est=2289 | gen=8 | max=500 | stop=completed
 - **Next action:** Inspect model repo config, chat template, and EOS settings.
+
+### `mlx-community/Phi-3.5-vision-instruct-bf16`
+
+- **Verdict:** clean | user=caveat
+- **Why:** trusted_overlap, context_echo
+- **Trusted hints:** preserves trusted hints
+- **Contract:** description sentences=3
+- **Utility:** user=caveat | preserves trusted hints | context echo
+- **Stack / owner:** owner=model
+- **Token accounting:** prompt=1326 | text_est=437 | nontext_est=889 | gen=141 | max=500 | stop=completed
+- **Next action:** Treat as a model-quality limitation for this prompt and image.
 
 ### `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`
 
@@ -341,61 +341,6 @@ Trusted-hint review uses only prompt title/description/keyword hints for utility
 - **Token accounting:** prompt=2289 | text_est=437 | nontext_est=1852 | gen=71 | max=500 | stop=completed
 - **Next action:** Treat as a model-quality limitation for this prompt and image.
 
-### `mlx-community/SmolVLM2-2.2B-Instruct-mlx`
-
-- **Verdict:** cutoff | user=avoid
-- **Why:** token_cap, missing_sections, low_hint_overlap
-- **Trusted hints:** ignores trusted hints | missing terms: large, brick, former, warehouse, London
-- **Contract:** missing: title, description, keywords
-- **Utility:** user=avoid | ignores trusted hints
-- **Stack / owner:** owner=model
-- **Token accounting:** prompt=614 | text_est=437 | nontext_est=177 | gen=500 | max=500 | stop=completed
-- **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
-
-### `mlx-community/gemma-3-27b-it-qat-4bit`
-
-- **Verdict:** clean | user=caveat
-- **Why:** trusted_overlap
-- **Trusted hints:** preserves trusted hints
-- **Contract:** keywords=19
-- **Utility:** user=caveat | preserves trusted hints
-- **Stack / owner:** owner=model
-- **Token accounting:** prompt=777 | text_est=437 | nontext_est=340 | gen=94 | max=500 | stop=completed
-- **Next action:** Treat as a model-quality limitation for this prompt and image.
-
-### `qnguyen3/nanoLLaVA`
-
-- **Verdict:** cutoff | user=avoid
-- **Why:** token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap
-- **Trusted hints:** ignores trusted hints | missing terms: large, brick, former, warehouse, London
-- **Contract:** missing: title, description, keywords
-- **Utility:** user=avoid | ignores trusted hints
-- **Stack / owner:** owner=model
-- **Token accounting:** prompt=506 | text_est=437 | nontext_est=69 | gen=500 | max=500 | stop=completed
-- **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
-
-### `mlx-community/SmolVLM-Instruct-bf16`
-
-- **Verdict:** cutoff | user=avoid
-- **Why:** token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap
-- **Trusted hints:** ignores trusted hints | missing terms: large, brick, former, warehouse, London
-- **Contract:** missing: title, description, keywords
-- **Utility:** user=avoid | ignores trusted hints
-- **Stack / owner:** owner=model
-- **Token accounting:** prompt=1714 | text_est=437 | nontext_est=1277 | gen=500 | max=500 | stop=completed
-- **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
-
-### `mlx-community/pixtral-12b-8bit`
-
-- **Verdict:** clean | user=caveat
-- **Why:** trusted_overlap, context_echo
-- **Trusted hints:** preserves trusted hints
-- **Contract:** description sentences=3
-- **Utility:** user=caveat | preserves trusted hints | context echo
-- **Stack / owner:** owner=model
-- **Token accounting:** prompt=3309 | text_est=437 | nontext_est=2872 | gen=122 | max=500 | stop=completed
-- **Next action:** Treat as a model-quality limitation for this prompt and image.
-
 ### `mlx-community/gemma-3n-E2B-4bit`
 
 - **Verdict:** cutoff | user=avoid
@@ -407,15 +352,15 @@ Trusted-hint review uses only prompt title/description/keyword hints for utility
 - **Token accounting:** prompt=768 | text_est=437 | nontext_est=331 | gen=500 | max=500 | stop=completed
 - **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-### `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`
+### `mlx-community/SmolVLM2-2.2B-Instruct-mlx`
 
 - **Verdict:** cutoff | user=avoid
-- **Why:** token_cap, missing_sections, abrupt_tail, low_hint_overlap, degeneration
+- **Why:** token_cap, missing_sections, low_hint_overlap
 - **Trusted hints:** ignores trusted hints | missing terms: large, brick, former, warehouse, London
 - **Contract:** missing: title, description, keywords
 - **Utility:** user=avoid | ignores trusted hints
 - **Stack / owner:** owner=model
-- **Token accounting:** prompt=1497 | text_est=437 | nontext_est=1060 | gen=500 | max=500 | stop=completed
+- **Token accounting:** prompt=614 | text_est=437 | nontext_est=177 | gen=500 | max=500 | stop=completed
 - **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
 ### `HuggingFaceTB/SmolVLM-Instruct`
@@ -429,6 +374,50 @@ Trusted-hint review uses only prompt title/description/keyword hints for utility
 - **Token accounting:** prompt=1714 | text_est=437 | nontext_est=1277 | gen=500 | max=500 | stop=completed
 - **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
+### `mlx-community/gemma-3-27b-it-qat-4bit`
+
+- **Verdict:** clean | user=caveat
+- **Why:** trusted_overlap
+- **Trusted hints:** preserves trusted hints
+- **Contract:** keywords=19
+- **Utility:** user=caveat | preserves trusted hints
+- **Stack / owner:** owner=model
+- **Token accounting:** prompt=777 | text_est=437 | nontext_est=340 | gen=94 | max=500 | stop=completed
+- **Next action:** Treat as a model-quality limitation for this prompt and image.
+
+### `mlx-community/SmolVLM-Instruct-bf16`
+
+- **Verdict:** cutoff | user=avoid
+- **Why:** token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap
+- **Trusted hints:** ignores trusted hints | missing terms: large, brick, former, warehouse, London
+- **Contract:** missing: title, description, keywords
+- **Utility:** user=avoid | ignores trusted hints
+- **Stack / owner:** owner=model
+- **Token accounting:** prompt=1714 | text_est=437 | nontext_est=1277 | gen=500 | max=500 | stop=completed
+- **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
+
+### `qnguyen3/nanoLLaVA`
+
+- **Verdict:** cutoff | user=avoid
+- **Why:** token_cap, missing_sections, repetitive_tail, abrupt_tail, low_hint_overlap
+- **Trusted hints:** ignores trusted hints | missing terms: large, brick, former, warehouse, London
+- **Contract:** missing: title, description, keywords
+- **Utility:** user=avoid | ignores trusted hints
+- **Stack / owner:** owner=model
+- **Token accounting:** prompt=506 | text_est=437 | nontext_est=69 | gen=500 | max=500 | stop=completed
+- **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
+
+### `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`
+
+- **Verdict:** cutoff | user=avoid
+- **Why:** token_cap, missing_sections, abrupt_tail, low_hint_overlap, degeneration
+- **Trusted hints:** ignores trusted hints | missing terms: large, brick, former, warehouse, London
+- **Contract:** missing: title, description, keywords
+- **Utility:** user=avoid | ignores trusted hints
+- **Stack / owner:** owner=model
+- **Token accounting:** prompt=1497 | text_est=437 | nontext_est=1060 | gen=500 | max=500 | stop=completed
+- **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
+
 ### `mlx-community/Kimi-VL-A3B-Thinking-8bit`
 
 - **Verdict:** cutoff | user=avoid
@@ -439,6 +428,17 @@ Trusted-hint review uses only prompt title/description/keyword hints for utility
 - **Stack / owner:** owner=model
 - **Token accounting:** prompt=1497 | text_est=437 | nontext_est=1060 | gen=500 | max=500 | stop=completed
 - **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
+
+### `mlx-community/pixtral-12b-8bit`
+
+- **Verdict:** clean | user=caveat
+- **Why:** trusted_overlap, context_echo
+- **Trusted hints:** preserves trusted hints
+- **Contract:** description sentences=3
+- **Utility:** user=caveat | preserves trusted hints | context echo
+- **Stack / owner:** owner=model
+- **Token accounting:** prompt=3309 | text_est=437 | nontext_est=2872 | gen=122 | max=500 | stop=completed
+- **Next action:** Treat as a model-quality limitation for this prompt and image.
 
 ### `mlx-community/gemma-3-27b-it-qat-8bit`
 
@@ -506,6 +506,17 @@ Trusted-hint review uses only prompt title/description/keyword hints for utility
 - **Token accounting:** prompt=6524 | text_est=437 | nontext_est=6087 | gen=500 | max=500 | stop=completed
 - **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
+### `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`
+
+- **Verdict:** cutoff | user=avoid
+- **Why:** token_cap, missing_sections, abrupt_tail, trusted_overlap
+- **Trusted hints:** preserves trusted hints
+- **Contract:** missing: title, description, keywords
+- **Utility:** user=avoid | preserves trusted hints
+- **Stack / owner:** owner=model
+- **Token accounting:** prompt=1822 | text_est=437 | nontext_est=1385 | gen=500 | max=500 | stop=completed
+- **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
+
 ### `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`
 
 - **Verdict:** cutoff | user=avoid
@@ -526,17 +537,6 @@ Trusted-hint review uses only prompt title/description/keyword hints for utility
 - **Utility:** user=avoid | improves trusted hints
 - **Stack / owner:** owner=model
 - **Token accounting:** prompt=6524 | text_est=437 | nontext_est=6087 | gen=500 | max=500 | stop=completed
-- **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
-
-### `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`
-
-- **Verdict:** cutoff | user=avoid
-- **Why:** token_cap, missing_sections, abrupt_tail, trusted_overlap
-- **Trusted hints:** preserves trusted hints
-- **Contract:** missing: title, description, keywords
-- **Utility:** user=avoid | preserves trusted hints
-- **Stack / owner:** owner=model
-- **Token accounting:** prompt=1822 | text_est=437 | nontext_est=1385 | gen=500 | max=500 | stop=completed
 - **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
 ### `mlx-community/Idefics3-8B-Llama3-bf16`
@@ -583,15 +583,15 @@ Trusted-hint review uses only prompt title/description/keyword hints for utility
 - **Token accounting:** prompt=2289 | text_est=437 | nontext_est=1852 | gen=500 | max=500 | stop=completed
 - **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-### `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`
+### `mlx-community/GLM-4.6V-nvfp4`
 
 - **Verdict:** cutoff | user=avoid
-- **Why:** token_cap, missing_sections, repetitive_tail, trusted_overlap
-- **Trusted hints:** preserves trusted hints
-- **Contract:** missing: title, description, keywords
-- **Utility:** user=avoid | preserves trusted hints
+- **Why:** token_cap, missing_sections, utility_delta_positive, reasoning_leak
+- **Trusted hints:** improves trusted hints
+- **Contract:** missing: title, description
+- **Utility:** user=avoid | improves trusted hints
 - **Stack / owner:** owner=model
-- **Token accounting:** prompt=477 | text_est=437 | nontext_est=40 | gen=500 | max=500 | stop=completed
+- **Token accounting:** prompt=6524 | text_est=437 | nontext_est=6087 | gen=500 | max=500 | stop=completed
 - **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
 ### `mlx-community/X-Reasoner-7B-8bit`
@@ -605,15 +605,15 @@ Trusted-hint review uses only prompt title/description/keyword hints for utility
 - **Token accounting:** prompt=16734 | text_est=437 | nontext_est=16297 | gen=500 | max=500 | stop=completed
 - **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
-### `mlx-community/GLM-4.6V-nvfp4`
+### `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`
 
 - **Verdict:** cutoff | user=avoid
-- **Why:** token_cap, missing_sections, utility_delta_positive, reasoning_leak
-- **Trusted hints:** improves trusted hints
-- **Contract:** missing: title, description
-- **Utility:** user=avoid | improves trusted hints
+- **Why:** token_cap, missing_sections, repetitive_tail, trusted_overlap
+- **Trusted hints:** preserves trusted hints
+- **Contract:** missing: title, description, keywords
+- **Utility:** user=avoid | preserves trusted hints
 - **Stack / owner:** owner=model
-- **Token accounting:** prompt=6524 | text_est=437 | nontext_est=6087 | gen=500 | max=500 | stop=completed
+- **Token accounting:** prompt=477 | text_est=437 | nontext_est=40 | gen=500 | max=500 | stop=completed
 - **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
 
 ### `mlx-community/Molmo-7B-D-0924-8bit`
@@ -652,13 +652,24 @@ Trusted-hint review uses only prompt title/description/keyword hints for utility
 ### `mlx-community/Molmo-7B-D-0924-bf16`
 
 - **Verdict:** cutoff | user=avoid
-- **Why:** token_cap, missing_sections, repetitive_tail, low_hint_overlap
+- **Why:** token_cap, missing_sections, abrupt_tail, low_hint_overlap
 - **Trusted hints:** ignores trusted hints | missing terms: large, brick, former, warehouse, London
 - **Contract:** missing: title, description, keywords
 - **Utility:** user=avoid | ignores trusted hints
 - **Stack / owner:** owner=model
 - **Token accounting:** prompt=1693 | text_est=437 | nontext_est=1256 | gen=500 | max=500 | stop=completed
 - **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
+
+### `mlx-community/Qwen2-VL-2B-Instruct-4bit`
+
+- **Verdict:** harness | user=avoid
+- **Why:** harness:stop_token, low_hint_overlap
+- **Trusted hints:** ignores trusted hints | missing terms: large, brick, former, warehouse, London
+- **Contract:** ok
+- **Utility:** user=avoid | ignores trusted hints
+- **Stack / owner:** owner=mlx-vlm | harness=stop_token
+- **Token accounting:** prompt=16734 | text_est=437 | nontext_est=16297 | gen=4 | max=500 | stop=completed
+- **Next action:** Inspect prompt-template, stop-token, and decode post-processing behavior.
 
 ### `mlx-community/Qwen3.5-35B-A3B-6bit`
 
@@ -670,17 +681,6 @@ Trusted-hint review uses only prompt title/description/keyword hints for utility
 - **Stack / owner:** owner=model
 - **Token accounting:** prompt=16749 | text_est=437 | nontext_est=16312 | gen=500 | max=500 | stop=completed
 - **Next action:** Inspect token cap and stop behavior before treating this as a model-quality failure.
-
-### `mlx-community/Qwen2-VL-2B-Instruct-4bit`
-
-- **Verdict:** harness | user=avoid
-- **Why:** harness:prompt_template, low_hint_overlap
-- **Trusted hints:** ignores trusted hints
-- **Contract:** ok
-- **Utility:** user=avoid | ignores trusted hints
-- **Stack / owner:** owner=model-config | harness=prompt_template
-- **Token accounting:** prompt=0 | text_est=437 | nontext_est=0 | gen=0 | max=500 | stop=completed
-- **Next action:** Inspect model repo config, chat template, and EOS settings.
 
 ### `mlx-community/Qwen3.5-35B-A3B-bf16`
 
