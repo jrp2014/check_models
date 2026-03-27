@@ -4,6 +4,13 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Hardened `src/tools/update.sh` so local MLX refreshes now fail fast when the
+  active macOS toolchain does not expose `metal` and `metallib` via `xcrun`,
+  and so editable-install origin checks cover `mlx` in addition to `mlx-lm`
+  and `mlx-vlm`.
+
 ## [0.3.2] - 2026-03-27
 
 ### Changed

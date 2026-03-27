@@ -25,9 +25,9 @@
 #   2. Install requirements.txt (if present) for additional dependencies
 #      (Note: mlx requires setuptools>=80 and typing_extensions for builds)
 #   3. Install packages in dependency order: mlx → mlx-lm → mlx-vlm
-#   4. (Stubs are now generated automatically by MLX build)
-#   5. Generate stubs for this project (mlx_lm, mlx_vlm, transformers, tokenizers)
-#   6. Skip PyPI updates for these packages
+#   5. Verify editable install origins for mlx, mlx-lm, and mlx-vlm
+#   6. Generate stubs for this project (mlx_lm, mlx_vlm, transformers, tokenizers)
+#   7. Skip PyPI updates for these packages
 #
 # Requirements for local MLX builds:
 #   - CMake >= 3.25 (MLX minimum requirement as of 2025)
@@ -286,6 +286,36 @@ check_mlx_build_requirements() {
 		else
 			echo "✓ macOS $MACOS_VERSION (>= 14.0 required for MLX)"
 		fi
+
+		local XCODE_DEVELOPER_DIR
+		if ! XCODE_DEVELOPER_DIR="$(xcode-select -p 2>/dev/null)"; then
+			echo "❌ ERROR: xcode-select has no active developer directory"
+			echo "   Fix with: sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer"
+			has_errors=1
+		else
+			echo "✓ Xcode developer directory: $XCODE_DEVELOPER_DIR"
+		fi
+
+		if ! command -v xcrun >/dev/null 2>&1; then
+			echo "❌ ERROR: xcrun not found. Install Xcode command line tools"
+			has_errors=1
+		else
+			local METAL_BIN
+			local METALLIB_BIN
+			METAL_BIN="$(xcrun -f metal 2>/dev/null || true)"
+			METALLIB_BIN="$(xcrun -f metallib 2>/dev/null || true)"
+
+			if [[ -z "$METAL_BIN" || -z "$METALLIB_BIN" ]]; then
+				echo "❌ ERROR: Metal toolchain is not available through xcrun"
+				echo "   Open Xcode once or run: xcodebuild -runFirstLaunch"
+				echo "   Then verify: xcrun -f metal && xcrun -f metallib"
+				has_errors=1
+			else
+				echo "✓ Metal toolchain detected:"
+				echo "   metal:    $METAL_BIN"
+				echo "   metallib: $METALLIB_BIN"
+			fi
+		fi
 	fi
 	
 	return $has_errors
@@ -491,15 +521,15 @@ update_local_mlx_repos() {
 	done
 	cd "$ORIGINAL_DIR"
 
-	# Stage 4b: Verify editable origins for mlx-lm/mlx-vlm.
+	# Stage 4b: Verify editable origins for mlx/mlx-lm/mlx-vlm.
 	# These packages often use release-style version strings even for local builds,
 	# so location metadata is a more reliable signal than version text.
 	echo ""
-	echo "Stage 4b: Verifying editable install origins for mlx-lm/mlx-vlm..."
+	echo "Stage 4b: Verifying editable install origins for mlx/mlx-lm/mlx-vlm..."
 	for idx in "${!REPO_NAMES[@]}"; do
 		[[ ${REPO_SKIP[idx]} -eq 1 ]] && continue
 		case "${REPO_NAMES[idx]}" in
-			mlx-lm|mlx-vlm)
+			mlx|mlx-lm|mlx-vlm)
 				if ! verify_expected_editable_install "${REPO_NAMES[idx]}" "${REPO_PATHS[idx]}"; then
 					echo "❌ Local build verification failed for ${REPO_NAMES[idx]}"
 					cd "$ORIGINAL_DIR"
