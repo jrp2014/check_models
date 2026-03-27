@@ -1333,7 +1333,7 @@ def _append_gallery_quality_lines(
         out.append("⚠️ **Quality Warnings:**")
         out.append("")
         out.extend(
-            f"- {_escape_markdown_diagnostics(_collapse_preview_whitespace(issue))}"
+            f"- {_escape_markdown_gallery_warning(_collapse_preview_whitespace(issue))}"
             for issue in analysis.issues
         )
         return
@@ -12093,6 +12093,17 @@ def _escape_markdown_diagnostics(text: str) -> str:
     escaping them makes Python tracebacks harder to read.
     """
     return DIAGNOSTICS_ESCAPER.escape(text)
+
+
+def _escape_markdown_gallery_warning(text: str) -> str:
+    """Escape plain-text gallery warnings rendered outside fenced/guarded blocks.
+
+    Gallery warning bullets are regular Markdown list items, not table cells, so
+    inline emphasis markers should be neutralized to keep markdownlint from
+    treating arbitrary model output as formatting.
+    """
+    escaped = _escape_markdown_diagnostics(text)
+    return re.sub(r"(?<!\\)([*_`])", r"\\\1", escaped)
 
 
 def _wrap_bare_urls(text: str) -> str:

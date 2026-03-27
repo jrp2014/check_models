@@ -6,6 +6,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Escaped inline emphasis markers in model-gallery quality warning bullets so
+  arbitrary model output like `*/` sequences no longer trips markdownlint
+  `MD049` in `src/output/model_gallery.md` after report generation.
 - Escaped square-bracket syntax in wrapped Markdown blockquote output so raw
   model text such as Python indexing expressions no longer trips markdownlint
   `MD052` in generated review artifacts under `src/output/`.
