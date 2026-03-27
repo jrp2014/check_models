@@ -530,14 +530,11 @@ class TestMarkdownReportEdgeCases:
 
         content = out.read_text(encoding="utf-8")
         assert "## 🎯 Action Snapshot" in content
-        assert (
-            "**Preflight compatibility:** 1 informational warning(s); do not treat "
-            "these alone as run failures."
-        ) in content
-        assert (
-            "**Escalate only if:** they line up with unexpected TF/Flax/JAX imports, "
-            "startup hangs, or backend/runtime crashes."
-        ) in content
+        assert "_Preflight compatibility:_ 1 informational warning(s);" in content
+        assert "do not treat" in content
+        assert "run failures." in content
+        assert "_Escalate only if:_" in content
+        assert "startup hangs, or backend/runtime crashes." in content
 
     def test_prompt_section_uses_wrapped_blockquote(self, tmp_path: Path) -> None:
         """Prompt section should use the wrapped blockquote helper for readable Markdown."""
@@ -550,13 +547,13 @@ class TestMarkdownReportEdgeCases:
             total_runtime_seconds=1.0,
         )
         content = out.read_text(encoding="utf-8")
-        assert "**Prompt used:**" in content
-        assert "<!-- markdownlint-disable MD028 MD049 -->" in content
+        assert "_Prompt used:_" in content
+        assert "<!-- markdownlint-disable MD028 -->" in content
         assert "> [!NOTE]" not in content
         assert "> line one" in content
         assert "\n>\n> line two" in content
         assert "```text" not in content
-        assert "> **Prompt used:**" not in content
+        assert "> _Prompt used:_" not in content
 
     def test_report_links_to_dedicated_gallery_artifact(self, tmp_path: Path) -> None:
         """Main markdown report should point readers at the standalone gallery artifact."""
@@ -576,7 +573,7 @@ class TestMarkdownReportEdgeCases:
         )
         content = out.read_text(encoding="utf-8")
         assert "Review artifacts:" in content
-        assert "**Review artifacts:**\n\n- Standalone output gallery:" in content
+        assert "_Review artifacts:_\n\n- _Standalone output gallery:_" in content
         assert "Standalone output gallery" in content
         assert "Automated review digest" in content
         assert "Canonical run log" in content
@@ -639,23 +636,23 @@ class TestMarkdownGalleryReport:
         content = out.read_text(encoding="utf-8")
         assert "# Model Output Gallery" in content
         assert "## Image Metadata" in content
-        assert "**Title**: Harbor Sunset" in content
-        assert "**Description**: Fishing boats at dusk." in content
-        assert "**Keywords**: harbor, boats, sunset" in content
-        assert "**Date**: 2026-03-08" in content
-        assert "**Time**: 18:42:00" in content
-        assert "**GPS**: 51.5000, -0.1200" in content
+        assert "_Title:_ Harbor Sunset" in content
+        assert "_Description:_ Fishing boats at dusk." in content
+        assert "_Keywords:_ harbor, boats, sunset" in content
+        assert "_Date:_ 2026-03-08" in content
+        assert "_Time:_ 18:42:00" in content
+        assert "_GPS:_ 51.5000, -0.1200" in content
         assert "ignored raw blob" not in content
         assert "## Prompt" in content
         assert "## Quick Navigation" in content
-        assert "<!-- markdownlint-disable MD028 MD049 -->" in content
+        assert "<!-- markdownlint-disable MD028 -->" in content
         assert "> [!NOTE]" not in content
         assert "Describe this image fully." in content
         assert "```text" not in content
         assert '<a id="model-org-good"></a>' in content
-        assert "**Verdict:**" in content
-        assert "**Stack / owner:**" in content
-        assert "**Review:**" in content
+        assert "_Verdict:_" in content
+        assert "_Stack / owner:_" in content
+        assert "_Review:_" in content
         assert "### ✅ org/good" in content
         assert "### ❌ org/bad" in content
 
@@ -716,10 +713,10 @@ class TestMarkdownGalleryReport:
         assert "## 🎯 Action Snapshot" in content
         assert "## 🧭 Review Priorities" in content
         assert "## 🚨 Failures by Package (Actionable)" in content
-        assert "**Review Status:**" in content
+        assert "_Review Status:_" in content
         assert "strong candidate for first-pass review" in content or "watchlist" in content
         assert (
-            "**Next Action:** review package ownership and diagnostics for a minimal repro."
+            "_Next Action:_ review package ownership and diagnostics for a minimal repro."
             in content
         )
 
@@ -869,9 +866,8 @@ class TestDiagnosticsReport:
         content = out.read_text(encoding="utf-8")
         assert "## Preflight Compatibility Warnings" in content
         assert "transformers import utils no longer reference the TF/FLAX/JAX backend" in content
-        assert (
-            "informational by default and do not invalidate successful runs on their own" in content
-        )
+        assert "They are informational by" in content
+        assert "default and do not invalidate successful runs on their own." in content
         assert "transformers/issues/new" in content
         assert "Preflight compatibility warning" in content
 
@@ -988,6 +984,29 @@ class TestDiagnosticsReport:
         assert "# Diagnostics Report" in content
         assert "org/bad-model" in content
         assert "broadcast_shapes" in content
+
+    def test_action_summary_escapes_double_underscore_error_text(self, tmp_path: Path) -> None:
+        """Diagnostics action summary should escape double underscores in failure text."""
+        out = tmp_path / "diag.md"
+        generate_diagnostics_report(
+            results=[
+                _make_failure_with_details(
+                    "org/bad-model",
+                    error_msg=(
+                        "Failed to process inputs with error: "
+                        "ImagesKwargs.__init__() got an unexpected keyword argument"
+                    ),
+                    error_package="transformers",
+                    error_stage="Processor Error",
+                ),
+            ],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            prompt="test prompt",
+        )
+        content = out.read_text(encoding="utf-8")
+        assert "ImagesKwargs.\\_\\_init\\_\\_()" in content
 
     def test_environment_table_includes_versions(self, tmp_path: Path) -> None:
         """Environment table should include library versions and system info."""

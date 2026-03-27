@@ -175,8 +175,8 @@ def test_gallery_metrics_include_time_and_throughput_details() -> None:
 
     md = _gallery_lines_for(result)
 
-    assert "**Metrics:** Load 3.29s | Gen 1.60s | Total 5.14s" in md
-    assert "**Throughput:** Prompt 1,551 TPS (1,624 tok) | Gen 5.51 TPS (9 tok)" in md
+    assert "_Metrics:_ Load 3.29s | Gen 1.60s | Total 5.14s" in md
+    assert "_Throughput:_ Prompt 1,551 TPS (1,624 tok) | Gen 5.51 TPS (9 tok)" in md
 
 
 def test_gallery_metrics_omit_missing_segments_cleanly() -> None:
@@ -197,8 +197,8 @@ def test_gallery_metrics_omit_missing_segments_cleanly() -> None:
 
     md = _gallery_lines_for(result)
 
-    assert "**Metrics:** Gen 10.90s | Total 14.51s" in md
-    assert "**Throughput:** Gen 29.7 TPS (80 tok)" in md
+    assert "_Metrics:_ Gen 10.90s | Total 14.51s" in md
+    assert "_Throughput:_ Gen 29.7 TPS (80 tok)" in md
     assert "Prompt" not in md
 
 
@@ -216,7 +216,7 @@ def test_gallery_output_uses_wrapped_blockquote_instead_of_fence() -> None:
     md = _gallery_lines_for(result)
 
     assert "```text" not in md
-    assert "<!-- markdownlint-disable MD028 MD049 -->" in md
+    assert "<!-- markdownlint-disable MD028 -->" in md
     assert "> [!NOTE]" not in md
     assert "> alpha" in md
     assert "\n>\n> beta" in md
@@ -278,8 +278,8 @@ def test_gallery_quality_warnings_have_blank_line_before_list() -> None:
 
     md = _gallery_lines_for(result)
 
-    assert "⚠️ **Quality Warnings:**\n\n- Context ignored" in md
-    assert "\n\n\n⚠️ **Quality Warnings:**" not in md
+    assert "⚠️ _Quality Warnings:_\n\n- Context ignored" in md
+    assert "\n\n\n⚠️ _Quality Warnings:_" not in md
 
 
 def test_gallery_quality_warnings_escape_inline_emphasis_markers() -> None:
@@ -354,7 +354,7 @@ def test_multiline_metadata_renders_as_single_list_item() -> None:
     )
 
     md = "\n".join(parts)
-    assert "- **Description**: First line" in md
+    assert "- _Description:_ First line" in md
     assert "\n\n    Second line" in md
     assert "\n\n    Third paragraph." in md
 
@@ -378,7 +378,29 @@ def test_wrapped_blockquote_escapes_inline_emphasis_markers() -> None:
 
     md = "\n".join(parts)
     assert "> \\*italic\\*" in md
-    assert "> \\\\*\\\\*bold\\\\*\\\\*" in md
+    assert "> \\*\\*bold\\*\\*" in md
+
+
+def test_wrapped_blockquote_strips_trailing_nonbreaking_spaces() -> None:
+    """Wrapped blockquote lines should not preserve trailing NBSP or single spaces."""
+    parts: list[str] = []
+
+    check_models._append_markdown_wrapped_blockquote(parts, "alpha\u00a0\nbeta ")
+
+    md = "\n".join(parts)
+    assert "> alpha\u00a0" not in md
+    assert "> beta " not in md
+    assert "> alpha" in md
+    assert "> beta" in md
+
+
+def test_normalize_markdown_trailing_spaces_strips_nonbreaking_spaces() -> None:
+    """Markdown trailing-space normalization should strip NBSP endings."""
+    md = "alpha\u00a0\nbeta  \ngamma "
+
+    normalized = check_models.normalize_markdown_trailing_spaces(md)
+
+    assert normalized.splitlines() == ["alpha", "beta  ", "gamma"]
 
 
 def test_wrapped_blockquote_escapes_reference_link_syntax() -> None:

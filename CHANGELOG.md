@@ -9,9 +9,17 @@ Notable changes to this project will be documented in this file.
 - Escaped inline emphasis markers in model-gallery quality warning bullets so
   arbitrary model output like `*/` sequences no longer trips markdownlint
   `MD049` in `src/output/model_gallery.md` after report generation.
+- Stripped trailing non-breaking spaces from wrapped Markdown blockquotes and
+  broadened trailing-whitespace normalization so generated gallery output no
+  longer trips markdownlint `MD009` on model lines that end with `U+00A0`.
 - Escaped square-bracket syntax in wrapped Markdown blockquote output so raw
   model text such as Python indexing expressions no longer trips markdownlint
   `MD052` in generated review artifacts under `src/output/`.
+- Narrowed Markdown generator suppressions by wrapping more formatter-owned
+  prose to the configured width, switching generator-emitted labels from `**`
+  to repo-preferred underscore emphasis, and updating the manual failures table
+  to spaced pipe separators so generated reports rely less on `MD013`, `MD049`,
+  and `MD060` disables.
 - Refreshed the MLX stack compatibility policy to track current upstream stable
   releases more closely: `mlx>=0.31.1`, `mlx-vlm>=0.4.1`, `mlx-lm>=0.31.1`,
   and `transformers>=5.3.0`, and aligned preflight diagnostics and fallback

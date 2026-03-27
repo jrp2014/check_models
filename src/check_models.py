@@ -218,6 +218,7 @@ class FormattingThresholds:
     min_separator_chars: int = 50
     default_decimal_places: int = 2
     markdown_hard_break_spaces: int = 2
+    markdown_wrap_width: int = 78
     generation_wrap_width: int = 100
 
 
@@ -1229,6 +1230,64 @@ class _TeeCaptureStream(io.TextIOBase):
 
 
 # Gallery rendering helpers (outside class)
+def _wrap_markdown_text(
+    text: str,
+    *,
+    initial_indent: str = "",
+    subsequent_indent: str = "",
+    width: int = FORMATTING.markdown_wrap_width,
+) -> list[str]:
+    """Wrap plain Markdown text to the repository lint width."""
+    if text == "":
+        return [initial_indent.rstrip()]
+    wrapped = textwrap.wrap(
+        text,
+        width=width,
+        initial_indent=initial_indent,
+        subsequent_indent=subsequent_indent,
+        break_long_words=False,
+        break_on_hyphens=False,
+    )
+    return wrapped or [initial_indent.rstrip()]
+
+
+def _markdown_emphasis(text: str) -> str:
+    """Return repo-style Markdown emphasis for formatter-owned labels."""
+    return f"_{text}_"
+
+
+def _append_markdown_labeled_value(
+    parts: list[str],
+    *,
+    label: str,
+    value: str,
+    bullet: bool = False,
+) -> None:
+    """Append a wrapped Markdown label/value line using underscore emphasis."""
+    prefix = (
+        f"- {_markdown_emphasis(f'{label}:')} " if bullet else f"{_markdown_emphasis(f'{label}:')} "
+    )
+    subsequent_indent = "  " if bullet else " " * len(prefix)
+    parts.extend(
+        _wrap_markdown_text(
+            value,
+            initial_indent=prefix,
+            subsequent_indent=subsequent_indent,
+        ),
+    )
+
+
+def _append_markdown_bullet_text(parts: list[str], text: str) -> None:
+    """Append a wrapped plain Markdown bullet."""
+    parts.extend(
+        _wrap_markdown_text(
+            text,
+            initial_indent="- ",
+            subsequent_indent="  ",
+        ),
+    )
+
+
 def _append_markdown_review_block(
     out: list[str],
     *,
@@ -1237,7 +1296,7 @@ def _append_markdown_review_block(
     """Append the shared canonical review block to a Markdown artifact."""
     rows = _build_review_block_rows(res)
     for label, value in rows:
-        out.append(f"**{label}:** {value}")
+        _append_markdown_labeled_value(out, label=label, value=value)
 
 
 def _gallery_render_error(res: PerformanceResult) -> list[str]:
@@ -1245,7 +1304,7 @@ def _gallery_render_error(res: PerformanceResult) -> list[str]:
     _append_markdown_review_block(out, res=res)
     if out:
         out.append("")
-    out.append(f"**Status:** Failed ({res.error_stage})")
+    _append_markdown_labeled_value(out, label="Status", value=f"Failed ({res.error_stage})")
     error_msg: str = _escape_markdown_blockquote_line(str(res.error_message))
     max_inline_length = 80
     if len(error_msg) > max_inline_length:
@@ -1255,11 +1314,11 @@ def _gallery_render_error(res: PerformanceResult) -> list[str]:
             break_long_words=False,
             break_on_hyphens=False,
         )
-        out.append("**Error:**")
+        out.append(_markdown_emphasis("Error:"))
         out.append("")
         out.extend(f"> {line}" for line in wrapped_lines)
     else:
-        out.append(f"**Error:** {error_msg}")
+        _append_markdown_labeled_value(out, label="Error", value=error_msg)
     for label, value in (
         ("Type", res.error_type),
         ("Phase", res.failure_phase),
@@ -1267,9 +1326,13 @@ def _gallery_render_error(res: PerformanceResult) -> list[str]:
         ("Package", res.error_package),
     ):
         if value:
-            out.append(f"**{label}:** `{value}`")
+            _append_markdown_labeled_value(out, label=label, value=f"`{value}`")
     if res.error_package:
-        out.append("**Next Action:** review package ownership and diagnostics for a minimal repro.")
+        _append_markdown_labeled_value(
+            out,
+            label="Next Action",
+            value="review package ownership and diagnostics for a minimal repro.",
+        )
     if res.error_traceback:
         out.append("")
         traceback_lines: list[str] = []
@@ -1303,18 +1366,28 @@ def _append_gallery_review_lines(
             assessment_parts.append(f"Δ{delta:+.0f}")
         if weakness:
             assessment_parts.append(weakness)
-        out.append(f"**Assessment:** {' | '.join(assessment_parts)}")
+        _append_markdown_labeled_value(
+            out,
+            label="Assessment",
+            value=" | ".join(assessment_parts),
+        )
 
     if useful_now:
-        out.append("**Review Status:** strong candidate for first-pass review")
+        _append_markdown_labeled_value(
+            out,
+            label="Review Status",
+            value="strong candidate for first-pass review",
+        )
     elif watchlist_reason is not None:
-        out.append(
-            f"**Review Status:** watchlist ({_humanize_watchlist_reason(watchlist_reason)})",
+        _append_markdown_labeled_value(
+            out,
+            label="Review Status",
+            value=f"watchlist ({_humanize_watchlist_reason(watchlist_reason)})",
         )
 
     review_summary = _summarize_model_review(res, summary)
     if review_summary:
-        out.append(f"**Review:** {review_summary}")
+        _append_markdown_labeled_value(out, label="Review", value=review_summary)
 
 
 def _append_gallery_quality_lines(
@@ -1330,7 +1403,7 @@ def _append_gallery_quality_lines(
     if analysis and analysis.issues:
         if not out or out[-1] != "":
             out.append("")
-        out.append("⚠️ **Quality Warnings:**")
+        out.append(f"⚠️ {_markdown_emphasis('Quality Warnings:')}")
         out.append("")
         out.extend(
             f"- {_escape_markdown_gallery_warning(_collapse_preview_whitespace(issue))}"
@@ -1341,7 +1414,11 @@ def _append_gallery_quality_lines(
     if analysis is not None and not analysis.has_any_issues():
         if not out or out[-1] != "":
             out.append("")
-        out.append("**Quality Status:** no quality issues detected in this run")
+        _append_markdown_labeled_value(
+            out,
+            label="Quality Status",
+            value="no quality issues detected in this run",
+        )
 
 
 def _gallery_render_success(
@@ -1388,7 +1465,7 @@ def _gallery_render_success(
         if segment is not None
     ]
     if time_segments:
-        out.append(f"**Metrics:** {' | '.join(time_segments)}")
+        _append_markdown_labeled_value(out, label="Metrics", value=" | ".join(time_segments))
 
     if isinstance(gen, SupportsThroughputGenerationResult):
         throughput_segments: list[str] = [
@@ -1410,7 +1487,11 @@ def _gallery_render_success(
             if segment is not None
         ]
         if throughput_segments:
-            out.append(f"**Throughput:** {' | '.join(throughput_segments)}")
+            _append_markdown_labeled_value(
+                out,
+                label="Throughput",
+                value=" | ".join(throughput_segments),
+            )
 
     if summary is not None:
         _append_gallery_review_lines(
@@ -8344,7 +8425,12 @@ def _build_markdown_recommended_models(
         review_summary = _summarize_model_review(result, report_context.summary)
         if review_summary:
             rationale.append(review_summary)
-        parts.append(f"- **{label}:** {model_ref} ({' | '.join(rationale)})")
+        _append_markdown_labeled_value(
+            parts,
+            label=label,
+            value=f"{model_ref} ({' | '.join(rationale)})",
+            bullet=True,
+        )
     parts.append("")
     return parts
 
@@ -8379,7 +8465,12 @@ def _build_markdown_quality_breakdown(
         detail_text = (
             f" Example: {_format_quality_detail(details[0], html_output=False)}." if details else ""
         )
-        parts.append(f"- **{title} ({len(entries)}):** {preview}.{detail_text}")
+        _append_markdown_labeled_value(
+            parts,
+            label=f"{title} ({len(entries)})",
+            value=f"{preview}.{detail_text}",
+            bullet=True,
+        )
 
     if low_utility_models:
         model_names = [model_name for model_name, _score, _grade, _weakness in low_utility_models]
@@ -8388,11 +8479,13 @@ def _build_markdown_quality_breakdown(
             model_names,
             gallery_relative_path=gallery_relative_path,
         )
-        parts.append(
-            "- **Low-utility outputs "
-            f"({len(low_utility_models)}):** "
-            f"{model_preview}. "
-            f"Common weakness: {html.escape(weakest_model[3], quote=False)}.",
+        _append_markdown_labeled_value(
+            parts,
+            label=f"Low-utility outputs ({len(low_utility_models)})",
+            value=(
+                f"{model_preview}. Common weakness: {html.escape(weakest_model[3], quote=False)}."
+            ),
+            bullet=True,
         )
 
     parts.append("")
@@ -8422,13 +8515,28 @@ def _build_markdown_gallery_navigation(report_context: ReportRenderContext) -> l
     parts: list[str] = []
     _append_markdown_section(parts, title="## Quick Navigation")
     for label, result, _score_data in recommended:
-        parts.append(f"- **{label}:** {_format_gallery_model_link(result.model_name)}")
+        _append_markdown_labeled_value(
+            parts,
+            label=label,
+            value=_format_gallery_model_link(result.model_name),
+            bullet=True,
+        )
     if failed_models:
         failed_preview = _preview_model_references(failed_models, max_items=6)
-        parts.append(f"- **Failed models:** {failed_preview}")
+        _append_markdown_labeled_value(
+            parts,
+            label="Failed models",
+            value=failed_preview,
+            bullet=True,
+        )
     if low_utility_models:
         low_utility_preview = _preview_model_references(low_utility_models, max_items=6)
-        parts.append(f"- **D/F utility models:** {low_utility_preview}")
+        _append_markdown_labeled_value(
+            parts,
+            label="D/F utility models",
+            value=low_utility_preview,
+            bullet=True,
+        )
     parts.append("")
     return parts
 
@@ -8571,7 +8679,7 @@ def _escape_markdown_blockquote_line(text: str) -> str:
     """Escape structural Markdown syntax for wrapped blockquote text."""
     escaped: str = HTML_ESCAPER.escape(_wrap_bare_urls(text)).replace("__", r"\_\_")
     escaped = re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", escaped)
-    escaped = escaped.replace("**", r"\*\*").replace("*", r"\*")
+    escaped = escaped.replace("*", r"\*")
     escaped = escaped.replace("[", r"\[").replace("]", r"\]")
     escaped = re.sub(r"^([#>*+\-`])", r"\\\1", escaped)
     return re.sub(r"^(\d+)([.)]\s)", r"\\\1\2", escaped)
@@ -8581,7 +8689,7 @@ def _append_markdown_wrapped_blockquote(
     parts: list[str],
     content: str,
     *,
-    width: int = 88,
+    width: int = FORMATTING.markdown_wrap_width - 2,
 ) -> None:
     """Append a wrapping plain blockquote for human-facing text blocks.
 
@@ -8590,7 +8698,7 @@ def _append_markdown_wrapped_blockquote(
     """
     if not parts or parts[-1] != "":
         parts.append("")
-    parts.append("<!-- markdownlint-disable MD028 MD049 -->")
+    parts.append("<!-- markdownlint-disable MD028 -->")
     blockquote_lines: list[str] = [">"]
 
     normalized: str = content.replace("\r\n", "\n").replace("\r", "\n")
@@ -8608,13 +8716,14 @@ def _append_markdown_wrapped_blockquote(
         if not wrapped_lines:
             blockquote_lines.append(">")
             continue
-        blockquote_lines.extend(
-            f"> {_escape_markdown_blockquote_line(wrapped_line.lstrip())}"
-            for wrapped_line in wrapped_lines
-        )
+        for wrapped_line in wrapped_lines:
+            clean_line = wrapped_line.lstrip().rstrip(" \t\u00a0")
+            blockquote_lines.append(
+                ">" if clean_line == "" else f"> {_escape_markdown_blockquote_line(clean_line)}"
+            )
 
     parts.extend(blockquote_lines)
-    parts.append("<!-- markdownlint-enable MD028 MD049 -->")
+    parts.append("<!-- markdownlint-enable MD028 -->")
     if not parts or parts[-1] != "":
         parts.append("")
 
@@ -8661,7 +8770,7 @@ def _append_markdown_image_metadata_section(
             line.strip() for line in paragraphs[0].splitlines() if line.strip()
         ]
         first_line = first_paragraph_lines[0] if first_paragraph_lines else ""
-        parts.append(f"- **{label}**: {first_line}")
+        _append_markdown_labeled_value(parts, label=label, value=first_line, bullet=True)
 
         remaining_lines = first_paragraph_lines[1:]
         if remaining_lines:
@@ -8724,7 +8833,17 @@ def _append_markdown_section(
     parts.append(title)
     parts.append("")
     if body_lines:
-        parts.extend(body_lines)
+        for body_line in body_lines:
+            if body_line == "":
+                parts.append("")
+                continue
+            if body_line.startswith(("- ", "* ", "|", "<", "#", "```")):
+                parts.append(body_line)
+                continue
+            if re.match(r"\d+\. ", body_line):
+                parts.append(body_line)
+                continue
+            parts.extend(_wrap_markdown_text(body_line))
         parts.append("")
 
 
@@ -9655,8 +9774,9 @@ def _diagnostics_action_summary(
             ),
             max_chars=88,
         )
+        escaped_issue = DIAGNOSTICS_ESCAPER.escape(issue)
         items.append(
-            f"- **[{priority}] [{owner}]** {issue} "
+            f"- **[{priority}] [{owner}]** {escaped_issue} "
             f"({len(cluster_results)} model(s)). "
             f"Next: {_diagnostics_next_action(owner_key)}",
         )
@@ -11526,7 +11646,7 @@ def _generate_model_gallery_section(
     md.append("")
     md.append("Full generated output by model:")
     md.append("")
-    md.append("<!-- markdownlint-disable MD013 MD033 -->")
+    md.append("<!-- markdownlint-disable MD033 -->")
     md.append("")
 
     sorted_results = _resolve_sorted_report_results(report_context)
@@ -11561,7 +11681,7 @@ def _generate_model_gallery_section(
         md.append("---")
         md.append("")
 
-    md.append("<!-- markdownlint-enable MD013 MD033 -->")
+    md.append("<!-- markdownlint-enable MD033 -->")
     md.append("")
     return md
 
@@ -11672,10 +11792,10 @@ def _append_markdown_gallery_note(
     if not artifact_lines:
         return
 
-    md.append("**Review artifacts:**")
+    md.append(_markdown_emphasis("Review artifacts:"))
     md.append("")
     for label, link in artifact_lines:
-        md.append(f"- {label}: {link}")
+        _append_markdown_labeled_value(md, label=label, value=link, bullet=True)
     md.append("")
 
 
@@ -11767,12 +11887,16 @@ def generate_markdown_report(
     if failures_by_pkg:
         md.extend(failures_by_pkg)
 
-    _append_markdown_prompt_section(md, title="**Prompt used:**", prompt=prompt)
-    md.append(
-        "**Note:** Results sorted: errors first, then by generation time (fastest to slowest).",
+    _append_markdown_prompt_section(md, title=_markdown_emphasis("Prompt used:"), prompt=prompt)
+    md.extend(
+        _wrap_markdown_text(
+            "_Note:_ Results sorted: errors first, then by generation time (fastest to slowest).",
+        ),
     )
     md.append("")
-    md.append(f"**Overall runtime:** {format_overall_runtime(total_runtime_seconds)}")
+    md.append(
+        _markdown_emphasis("Overall runtime:") + f" {format_overall_runtime(total_runtime_seconds)}"
+    )
     md.append("")
 
     # Generate table section
@@ -11798,7 +11922,7 @@ def generate_markdown_report(
             versions={},
             system_info=report_context.system_info,
         ):
-            md.append(f"- **{name}**: {value}")
+            _append_markdown_labeled_value(md, label=name, value=value, bullet=True)
         md.append("")
 
     md.append("## Library Versions")
@@ -11829,13 +11953,13 @@ def generate_markdown_gallery_report(
     md: list[str] = []
     md.append("# Model Output Gallery")
     md.append("")
-    md.append("<!-- markdownlint-disable MD013 -->")
-    md.append("")
     md.append(f"_Generated on {local_now_str()}_")
     md.append("")
-    md.append(
-        "A review-friendly artifact with image metadata, the source prompt, and full "
-        "generated output for each model.",
+    md.extend(
+        _wrap_markdown_text(
+            "A review-friendly artifact with image metadata, the source prompt, and full "
+            "generated output for each model.",
+        ),
     )
     md.append("")
     md.extend(_format_action_snapshot_parts(results, report_context, html_output=False))
@@ -11845,8 +11969,6 @@ def generate_markdown_gallery_report(
     _append_markdown_prompt_section(md, title="## Prompt", prompt=prompt)
     md.extend(_build_markdown_gallery_navigation(report_context))
     md.extend(_generate_model_gallery_section(report_context))
-    md.append("<!-- markdownlint-enable MD013 -->")
-    md.append("")
 
     _write_markdown_artifact(filename, md, artifact_name="Markdown gallery report")
 
@@ -12127,19 +12249,20 @@ def normalize_markdown_trailing_spaces(md_text: str) -> str:
 
     Rules:
     - Keep exactly FORMATTING.markdown_hard_break_spaces trailing spaces (Markdown hard line break).
-    - Strip any other count of trailing spaces to avoid accidental single-space endings.
+    - Strip any other trailing horizontal whitespace, including non-breaking spaces,
+      to avoid accidental single-space endings.
     """
     out_lines: list[str] = []
     for ln in md_text.splitlines():
-        m = re.search(r"( +)$", ln)
-        if not m:
+        stripped = ln.rstrip(" \t\u00a0")
+        trailing = ln[len(stripped) :]
+        if not trailing:
             out_lines.append(ln)
             continue
-        spaces = len(m.group(1))
-        if spaces == FORMATTING.markdown_hard_break_spaces:
+        if trailing == (" " * FORMATTING.markdown_hard_break_spaces):
             out_lines.append(ln)
         else:
-            out_lines.append(ln[:-spaces])
+            out_lines.append(stripped)
     return "\n".join(out_lines)
 
 
@@ -16471,7 +16594,7 @@ def _format_action_snapshot_parts(
         parts = ["## 🎯 Action Snapshot", ""]
 
         def append_line(label: str, value: str) -> None:
-            parts.append(f"- **{label}:** {value}")
+            _append_markdown_labeled_value(parts, label=label, value=value, bullet=True)
 
     if failed:
         owners = Counter(res.error_package or "unknown" for res in failed)
@@ -16609,10 +16732,8 @@ def _format_failures_by_package_parts(
         return parts
 
     parts = ["## 🚨 Failures by Package (Actionable)", ""]
-    parts.append("<!-- markdownlint-disable MD060 -->")
-    parts.append("")
     parts.append("| Package | Failures | Error Types | Affected Models |")
-    parts.append("|---------|----------|-------------|-----------------|")
+    parts.append("| --- | --- | --- | --- |")
 
     for package, failures in sorted_packages:
         markdown_error_types = sorted({result.error_stage or "unknown" for result in failures})
@@ -16624,8 +16745,6 @@ def _format_failures_by_package_parts(
         )
 
     parts.append("")
-    parts.append("<!-- markdownlint-enable MD060 -->")
-    parts.append("")
     parts.append("### Actionable Items by Package")
     parts.append("")
 
@@ -16633,7 +16752,7 @@ def _format_failures_by_package_parts(
         parts.append(f"#### {package}")
         parts.append("")
         for result in failures:
-            parts.append(f"- **{result.model_name}** ({result.error_stage})")
+            _append_markdown_bullet_text(parts, f"{result.model_name} ({result.error_stage})")
             error_message = result.error_message or ""
             if len(error_message) > ERROR_MESSAGE_TRUNCATE_LEN:
                 error_message = error_message[: ERROR_MESSAGE_TRUNCATE_LEN - 3] + "..."
