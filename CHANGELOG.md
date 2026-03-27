@@ -6,6 +6,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Escaped square-bracket syntax in wrapped Markdown blockquote output so raw
+  model text such as Python indexing expressions no longer trips markdownlint
+  `MD052` in generated review artifacts under `src/output/`.
 - Refreshed the MLX stack compatibility policy to track current upstream stable
   releases more closely: `mlx>=0.31.1`, `mlx-vlm>=0.4.1`, `mlx-lm>=0.31.1`,
   and `transformers>=5.3.0`, and aligned preflight diagnostics and fallback

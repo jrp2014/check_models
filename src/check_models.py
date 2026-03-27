@@ -8572,6 +8572,7 @@ def _escape_markdown_blockquote_line(text: str) -> str:
     escaped: str = HTML_ESCAPER.escape(_wrap_bare_urls(text)).replace("__", r"\_\_")
     escaped = re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", escaped)
     escaped = escaped.replace("**", r"\*\*").replace("*", r"\*")
+    escaped = escaped.replace("[", r"\[").replace("]", r"\]")
     escaped = re.sub(r"^([#>*+\-`])", r"\\\1", escaped)
     return re.sub(r"^(\d+)([.)]\s)", r"\\\1\2", escaped)
 

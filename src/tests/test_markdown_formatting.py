@@ -338,6 +338,16 @@ def test_wrapped_blockquote_escapes_inline_emphasis_markers() -> None:
     assert "> \\\\*\\\\*bold\\\\*\\\\*" in md
 
 
+def test_wrapped_blockquote_escapes_reference_link_syntax() -> None:
+    """Wrapped blockquote lines should neutralize bracket syntax from raw model text."""
+    parts: list[str] = []
+
+    check_models._append_markdown_wrapped_blockquote(parts, "decade_data[decade]['count'] += 1")
+
+    md = "\n".join(parts)
+    assert "> decade_data\\[decade\\]\\['count'\\] += 1" in md
+
+
 def test_wrapped_blockquote_normalizes_wrapped_leading_spaces() -> None:
     """Wrapped continuation lines should not emit multiple spaces after '>'."""
     parts: list[str] = []
