@@ -150,6 +150,13 @@ pip_install() {
 	pip install "${args[@]}" "$@"
 }
 
+# Helper function: pip install with verbose output for build-heavy operations.
+pip_install_verbose() {
+	local args=("-v" "-U" "--upgrade-strategy" "eager")
+	[[ "${FORCE_REINSTALL:-0}" == "1" ]] && args+=("--force-reinstall")
+	pip install "${args[@]}" "$@"
+}
+
 # Helper function: pip install for build/infrastructure tools only.
 # Uses default (only-if-needed) upgrade strategy to avoid cascading transitive
 # dependency upgrades that can inadvertently break mlx / mlx-vlm.
@@ -484,7 +491,14 @@ update_local_mlx_repos() {
 		# IMPORTANT: pip install -e . first uninstalls the existing package, THEN
 		# attempts the build. If the build fails, the package is left uninstalled.
 		# We detect this and restore from PyPI as a fallback.
-		if pip_install -e .; then
+		if [[ "${REPO_NAMES[idx]}" == "mlx" ]]; then
+			echo "[update.sh] Using verbose pip output for mlx build (-v)"
+			INSTALL_CMD=(pip_install_verbose -e .)
+		else
+			INSTALL_CMD=(pip_install -e .)
+		fi
+
+		if "${INSTALL_CMD[@]}"; then
 			echo "✓ ${REPO_NAMES[idx]} installed successfully"
 		else
 			echo "⚠️  Failed to install ${REPO_NAMES[idx]}"

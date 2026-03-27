@@ -10,6 +10,9 @@ Notable changes to this project will be documented in this file.
   active macOS toolchain does not expose `metal` and `metallib` via `xcrun`,
   and so editable-install origin checks cover `mlx` in addition to `mlx-lm`
   and `mlx-vlm`.
+- Switched the local `mlx` editable install path in `src/tools/update.sh` to
+  invoke `pip install -v -e .` so MLX builds emit full pip build logs during
+  updates.
 
 ## [0.3.2] - 2026-03-27
 
