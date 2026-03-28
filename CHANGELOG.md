@@ -6,6 +6,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Tightened external-library typing in `src/check_models.py` by giving the
+  imported `mlx_vlm` callables explicit local protocol signatures, narrowing
+  loaded processor/config annotations toward `transformers` types, extending
+  generation-result protocols with upstream throughput fields, and replacing
+  broad kwargs bags with typed helper shapes while keeping missing third-party
+  stubs as soft warnings via best-effort local stub refreshes in
+  `src/tools/run_quality_checks.sh`.
 - Removed several dead or redundant helper layers in `src/check_models.py`,
   including unused diagnostics/runtime helpers, now-unused protocol
   definitions, a duplicate quality-analysis accessor, and a few thin

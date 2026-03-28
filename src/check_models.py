@@ -49,6 +49,8 @@ from typing import (
     Self,
     TextIO,
     TypedDict,
+    TypeGuard,
+    Unpack,
     cast,
     runtime_checkable,
 )
@@ -90,11 +92,14 @@ if importlib_util.find_spec("wcwidth") is not None:
 
 if TYPE_CHECKING:
     import types
-    from collections.abc import Iterator
 
     from mlx.nn import Module
     from mlx_vlm.generate import GenerationResult
     from PIL.Image import Image as PILImage
+    from transformers import PreTrainedTokenizer
+    from transformers.configuration_utils import PreTrainedConfig
+    from transformers.processing_utils import ProcessorMixin
+    from transformers.tokenization_utils_base import PreTrainedTokenizerBase
 
 # Public API (PEP 8 / PEP 561 best practice)
 __all__ = [
@@ -645,6 +650,10 @@ except ImportError:
     numpy_version = NOT_AVAILABLE
 
 vlm_version: str
+generate: Callable[..., GenerationResult]
+apply_chat_template: ApplyChatTemplateCallable
+load: LoadCallable
+load_image: LoadImageCallable
 
 
 def _raise_mlx_vlm_missing(*_args: object, **_kwargs: object) -> NoReturn:
@@ -654,22 +663,26 @@ def _raise_mlx_vlm_missing(*_args: object, **_kwargs: object) -> NoReturn:
 
 def _configure_mlx_vlm_fallback(error_message: str) -> None:
     """Set runtime fallbacks when mlx-vlm cannot be imported."""
-    # Use Any for fallback functions to avoid type conflicts with stub signatures
-    globals()["generate"] = cast("Any", _raise_mlx_vlm_missing)
-    globals()["apply_chat_template"] = cast("Any", _raise_mlx_vlm_missing)
-    globals()["load"] = cast("Any", _raise_mlx_vlm_missing)
-    globals()["load_image"] = cast("Any", _raise_mlx_vlm_missing)
+    globals()["generate"] = cast("Callable[..., GenerationResult]", _raise_mlx_vlm_missing)
+    globals()["apply_chat_template"] = cast("ApplyChatTemplateCallable", _raise_mlx_vlm_missing)
+    globals()["load"] = cast("LoadCallable", _raise_mlx_vlm_missing)
+    globals()["load_image"] = cast("LoadImageCallable", _raise_mlx_vlm_missing)
     MISSING_DEPENDENCIES["mlx-vlm"] = error_message
 
 
 mlx_vlm_probe_error = _probe_mlx_vlm_import_runtime()
 if mlx_vlm_probe_error is None:
     try:
-        from mlx_vlm.generate import generate
-        from mlx_vlm.prompt_utils import apply_chat_template
-        from mlx_vlm.utils import load, load_image
+        from mlx_vlm.generate import generate as _mlx_vlm_generate
+        from mlx_vlm.prompt_utils import apply_chat_template as _mlx_vlm_apply_chat_template
+        from mlx_vlm.utils import load as _mlx_vlm_load
+        from mlx_vlm.utils import load_image as _mlx_vlm_load_image
         from mlx_vlm.version import __version__ as _mlx_vlm_version
 
+        generate = _mlx_vlm_generate
+        apply_chat_template = _mlx_vlm_apply_chat_template
+        load = _mlx_vlm_load
+        load_image = _mlx_vlm_load_image
         vlm_version = _mlx_vlm_version
     except ImportError:
         vlm_version = NOT_AVAILABLE
@@ -729,6 +742,7 @@ type ExifValue = Any  # Pillow yields varied scalar / tuple EXIF types; keep per
 type ExifDict = dict[str | int, ExifValue]
 type MetadataDict = dict[str, str | None]
 type PathLike = str | Path
+type JsonLike = None | bool | int | float | str | list[JsonLike] | dict[str, JsonLike]
 type GPSTupleElement = int | float
 type GPSTuple = tuple[GPSTupleElement, GPSTupleElement, GPSTupleElement]
 type GPSDict = dict[str, ExifValue]  # GPS EXIF data structure
@@ -985,6 +999,137 @@ class ReportGenerationInputs:
     review_output_path: Path
 
 
+class ChatTemplateKwargs(TypedDict, total=False):
+    """Supported optional kwargs forwarded to ``mlx_vlm.apply_chat_template``."""
+
+    enable_thinking: bool
+
+
+class GenerateExtraKwargs(TypedDict, total=False):
+    """Optional upstream generate kwargs this CLI forwards explicitly."""
+
+    min_p: float
+    top_k: int
+    prefill_step_size: int
+    resize_shape: tuple[int, int]
+    eos_tokens: list[str]
+    skip_special_tokens: bool
+    enable_thinking: bool
+    thinking_end_token: str
+    thinking_budget: int
+    thinking_start_token: str
+
+
+class SupportsTextDecoder(Protocol):
+    """Minimal tokenizer/processor decode interface used by preflight checks."""
+
+    def decode(self, *args: object, **kwargs: object) -> object:
+        """Decode one token sequence."""
+
+    def batch_decode(self, *args: object, **kwargs: object) -> object:
+        """Decode one or more token sequences."""
+
+
+class LoadCallable(Protocol):
+    """Typed ``mlx_vlm.utils.load`` surface used by this script."""
+
+    def __call__(
+        self,
+        path_or_hf_repo: str,
+        adapter_path: str | None = None,
+        lazy: bool = False,
+        revision: str | None = None,
+        *,
+        trust_remote_code: bool = True,
+        **kwargs: object,
+    ) -> tuple[Module, ProcessorMixin]:
+        """Load an MLX-VLM model and processor."""
+
+
+class ApplyChatTemplateCallable(Protocol):
+    """Typed ``mlx_vlm.prompt_utils.apply_chat_template`` surface."""
+
+    def __call__(
+        self,
+        processor: ProcessorMixin,
+        config: Mapping[str, object] | object | None,
+        prompt: str | dict[str, object] | list[object],
+        add_generation_prompt: bool = True,
+        return_messages: bool = False,
+        num_images: int = 0,
+        num_audios: int = 0,
+        **kwargs: Unpack[ChatTemplateKwargs],
+    ) -> str | list[dict[str, object]] | object:
+        """Apply an upstream chat template to a prompt payload."""
+
+
+class StrictGenerateCallable(Protocol):
+    """Typed ``mlx_vlm.generate.generate`` surface for known kwargs."""
+
+    def __call__(
+        self,
+        model: Module,
+        processor: ProcessorMixin | PreTrainedTokenizer,
+        prompt: str,
+        image: str | list[str] | None = None,
+        audio: str | list[str] | None = None,
+        verbose: bool = False,
+        *,
+        temperature: float = ...,
+        top_p: float = ...,
+        repetition_penalty: float | None = ...,
+        repetition_context_size: int | None = ...,
+        max_kv_size: int | None = ...,
+        kv_bits: int | None = ...,
+        kv_group_size: int = ...,
+        quantized_kv_start: int = ...,
+        max_tokens: int = ...,
+        **kwargs: Unpack[GenerateExtraKwargs],
+    ) -> GenerationResult:
+        """Generate a caption/response with the known CLI-controlled kwargs."""
+
+
+class LoadImageCallable(Protocol):
+    """Typed ``mlx_vlm.utils.load_image`` surface used for validation."""
+
+    def __call__(self, image_source: str | Path | io.BytesIO, timeout: int = 10) -> object:
+        """Load an image from a path or URL."""
+
+
+if TYPE_CHECKING:
+    from mlx_vlm.generate import generate as _mlx_vlm_generate_typecheck
+
+    _TYPECHECK_MODEL = cast("Module", None)
+    _TYPECHECK_GENERATE_PROCESSOR = cast("ProcessorMixin | PreTrainedTokenizer", None)
+    _ = _mlx_vlm_generate_typecheck(
+        _TYPECHECK_MODEL,
+        _TYPECHECK_GENERATE_PROCESSOR,
+        "",
+        image=None,
+        audio=None,
+        verbose=False,
+        max_tokens=1,
+        temperature=0.0,
+        repetition_penalty=None,
+        repetition_context_size=20,
+        top_p=1.0,
+        min_p=0.0,
+        top_k=0,
+        max_kv_size=None,
+        kv_bits=None,
+        kv_group_size=64,
+        quantized_kv_start=0,
+        prefill_step_size=None,
+        resize_shape=None,
+        eos_tokens=None,
+        skip_special_tokens=False,
+        enable_thinking=False,
+        thinking_budget=None,
+        thinking_end_token=DEFAULT_THINKING_END_MARKER,
+        thinking_start_token=None,
+    )
+
+
 @runtime_checkable
 class SupportsGenerationResult(Protocol):  # Minimal attributes we read from GenerationResult
     """Structural subset of GenerationResult accessed by this script.
@@ -1000,6 +1145,9 @@ class SupportsGenerationResult(Protocol):  # Minimal attributes we read from Gen
     text: str | None
     prompt_tokens: int | None
     generation_tokens: int | None
+    total_tokens: int | None
+    prompt_tps: float | None
+    generation_tps: float | None
     time: float | None  # Dynamically added timing attribute
     active_memory: float | None  # Dynamically added active memory (GB)
     cache_memory: float | None  # Dynamically added cache memory (GB)
@@ -1440,15 +1588,11 @@ def _gallery_render_success(
     ]
     if time_segments:
         _append_markdown_labeled_value(out, label="Metrics", value=" | ".join(time_segments))
-
-        prompt_tps = getattr(gen, "prompt_tps", None)
-        generation_tps = getattr(gen, "generation_tps", None)
-        prompt_tokens = getattr(gen, "prompt_tokens", None)
-        generation_tokens = getattr(gen, "generation_tokens", None)
-        if any(
-            value is not None
-            for value in (prompt_tps, generation_tps, prompt_tokens, generation_tokens)
-        ):
+        if gen is not None:
+            prompt_tps = gen.prompt_tps
+            generation_tps = gen.generation_tps
+            prompt_tokens = gen.prompt_tokens
+            generation_tokens = gen.generation_tokens
             throughput_segments: list[str] = [
                 segment
                 for segment in (
@@ -1588,7 +1732,7 @@ class ProcessImageParams:
     resize_shape: tuple[int, int] | None = None
     eos_tokens: tuple[str, ...] | None = None
     skip_special_tokens: bool = False
-    processor_kwargs: dict[str, Any] | None = None
+    processor_kwargs: dict[str, JsonLike] | None = None
     enable_thinking: bool = False
     thinking_budget: int | None = None
     thinking_start_token: str | None = None
@@ -5779,13 +5923,9 @@ def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceR
             return float(result.generation_time)
 
         # Fallback: calculate time from GenerationResult tokens-per-second if available
-        if (
-            result.generation
-            and hasattr(result.generation, "generation_tokens")
-            and hasattr(result.generation, "generation_tps")
-        ):
-            g_tokens = getattr(result.generation, "generation_tokens", 0) or 0
-            g_tps = getattr(result.generation, "generation_tps", 0.0) or 0.0
+        if result.generation is not None:
+            g_tokens = result.generation.generation_tokens or 0
+            g_tps = result.generation.generation_tps or 0.0
             if g_tps > 0 and g_tokens:
                 return float(g_tokens / g_tps)
 
@@ -12470,6 +12610,7 @@ _RESERVED_PROCESSOR_KWARG_KEYS: Final[frozenset[str]] = frozenset(
         "repetition_penalty",
         "resize_shape",
         "skip_special_tokens",
+        "enable_thinking",
         "thinking_budget",
         "thinking_end_token",
         "thinking_start_token",
@@ -12481,7 +12622,7 @@ _RESERVED_PROCESSOR_KWARG_KEYS: Final[frozenset[str]] = frozenset(
 )
 
 
-def _parse_processor_kwargs_arg(value: str) -> dict[str, Any]:
+def _parse_processor_kwargs_arg(value: str) -> dict[str, JsonLike]:
     """Parse ``--processor-kwargs`` as a JSON object."""
     try:
         parsed = json.loads(value)
@@ -12495,7 +12636,7 @@ def _parse_processor_kwargs_arg(value: str) -> dict[str, Any]:
     if not all(isinstance(key, str) for key in parsed):
         msg = "processor_kwargs keys must all be strings"
         raise argparse.ArgumentTypeError(msg)
-    return cast("dict[str, Any]", parsed)
+    return cast("dict[str, JsonLike]", parsed)
 
 
 def _normalize_resize_shape(raw_shape: Sequence[int] | None) -> tuple[int, int] | None:
@@ -12528,8 +12669,8 @@ def _decode_cli_eos_tokens(raw_tokens: Sequence[str] | None) -> tuple[str, ...] 
 
 
 def _validate_processor_kwargs(
-    processor_kwargs: Mapping[str, Any] | None,
-) -> dict[str, Any] | None:
+    processor_kwargs: Mapping[str, JsonLike] | None,
+) -> dict[str, JsonLike] | None:
     """Reject processor kwargs that would collide with dedicated CLI flags."""
     if processor_kwargs is None:
         return None
@@ -12565,18 +12706,16 @@ def _validate_thinking_params(args: argparse.Namespace) -> None:
         raise ValueError(msg)
 
 
-def _build_chat_template_kwargs(params: ProcessImageParams) -> dict[str, Any]:
+def _build_chat_template_kwargs(params: ProcessImageParams) -> ChatTemplateKwargs:
     """Collect opt-in kwargs for upstream chat-template application."""
     if not params.enable_thinking:
         return {}
     return {"enable_thinking": True}
 
 
-def _build_generate_extra_kwargs(params: ProcessImageParams) -> dict[str, Any]:
+def _build_generate_extra_kwargs(params: ProcessImageParams) -> GenerateExtraKwargs:
     """Collect optional generate kwargs for benchmark runs."""
-    extra_kwargs: dict[str, Any] = {}
-    if params.processor_kwargs:
-        extra_kwargs.update(params.processor_kwargs)
+    extra_kwargs: GenerateExtraKwargs = {}
     if params.min_p > 0.0:
         extra_kwargs["min_p"] = params.min_p
     if params.top_k > 0:
@@ -13172,7 +13311,7 @@ def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None
 
 def _load_model(
     params: ProcessImageParams,
-) -> tuple[Module, object, object | None]:
+) -> tuple[Module, ProcessorMixin, PreTrainedConfig | Mapping[str, object] | None]:
     """Load model from HuggingFace Hub or local path.
 
     Args:
@@ -13180,7 +13319,7 @@ def _load_model(
 
     Returns:
         Tuple of ``(model, processor, config)`` where ``processor`` is an
-        AutoProcessor-like runtime object and ``config`` may be ``None``.
+        ``transformers.ProcessorMixin`` and ``config`` may be ``None``.
     """
     model, processor = load(
         path_or_hf_repo=params.model_identifier,
@@ -13189,7 +13328,11 @@ def _load_model(
         revision=params.revision,
         trust_remote_code=params.trust_remote_code,
     )
-    return model, processor, getattr(model, "config", None)
+    config = cast(
+        "PreTrainedConfig | Mapping[str, object] | None",
+        getattr(model, "config", None),
+    )
+    return model, processor, config
 
 
 def _set_failure_phase(
@@ -13203,12 +13346,21 @@ def _set_failure_phase(
     return normalized
 
 
-def _extract_processor_tokenizer(processor: object) -> object | None:
-    """Best-effort extraction of tokenizer from an AutoProcessor-like object."""
+def _has_text_decoder_api(candidate: object) -> TypeGuard[SupportsTextDecoder]:
+    """Return whether a candidate exposes the decode API we rely on."""
+    return callable(getattr(candidate, "decode", None)) and callable(
+        getattr(candidate, "batch_decode", None),
+    )
+
+
+def _extract_processor_tokenizer(
+    processor: ProcessorMixin,
+) -> PreTrainedTokenizerBase | SupportsTextDecoder | None:
+    """Best-effort extraction of tokenizer from a loaded processor."""
     tokenizer = cast("object | None", getattr(processor, "tokenizer", None))
-    if tokenizer is not None:
+    if tokenizer is not None and _has_text_decoder_api(tokenizer):
         return tokenizer
-    if hasattr(processor, "encode") and hasattr(processor, "decode"):
+    if _has_text_decoder_api(processor):
         return processor
     return None
 
@@ -13259,8 +13411,8 @@ def _validate_model_artifact_layout(
     *,
     model_identifier: str,
     snapshot_path: Path | None,
-    tokenizer: object | None,
-    processor: object,
+    tokenizer: PreTrainedTokenizerBase | SupportsTextDecoder | None,
+    processor: ProcessorMixin,
 ) -> None:
     """Validate local model artifact structure and emit actionable warnings.
 
@@ -13313,8 +13465,8 @@ def _validate_model_artifact_layout(
 def _run_model_preflight_validators(
     *,
     model_identifier: str,
-    processor: object,
-    config: object | None,
+    processor: ProcessorMixin,
+    config: PreTrainedConfig | Mapping[str, object] | None,
     phase_callback: Callable[[str], None] | None = None,
 ) -> None:
     """Run preflight validators before invoking generation."""
@@ -13323,11 +13475,6 @@ def _run_model_preflight_validators(
     if tokenizer is None:
         _raise_preflight_error(
             "Could not resolve tokenizer from loaded processor.",
-            phase="tokenizer_load",
-        )
-    if not (hasattr(tokenizer, "decode") or hasattr(tokenizer, "batch_decode")):
-        _raise_preflight_error(
-            "Resolved tokenizer does not expose decode/batch_decode.",
             phase="tokenizer_load",
         )
 
@@ -13540,11 +13687,11 @@ def _build_runtime_diagnostics(
 def _prepare_generation_prompt(
     *,
     params: ProcessImageParams,
-    processor: object,
-    config: object,
+    processor: ProcessorMixin,
+    config: PreTrainedConfig | Mapping[str, object] | None,
     phase_callback: Callable[[str], None] | None,
     phase_timer: PhaseTimer | None,
-) -> str | list[Any]:
+) -> str | list[object]:
     """Run preflight checks and build the prompt payload for generation."""
     try:
         if phase_timer is not None:
@@ -13558,7 +13705,7 @@ def _prepare_generation_prompt(
                 _set_failure_phase(phase_callback, "prefill")
                 chat_template_kwargs = _build_chat_template_kwargs(params)
                 return cast(
-                    "str | list[Any]",
+                    "str | list[object]",
                     apply_chat_template(
                         processor=processor,
                         config=config,
@@ -13577,7 +13724,7 @@ def _prepare_generation_prompt(
         _set_failure_phase(phase_callback, "prefill")
         chat_template_kwargs = _build_chat_template_kwargs(params)
         return cast(
-            "str | list[Any]",
+            "str | list[object]",
             apply_chat_template(
                 processor=processor,
                 config=config,
@@ -13624,6 +13771,41 @@ def _cleanup_runtime_resources() -> None:
     _run_cleanup_step("mx.reset_peak_memory", reset_peak_memory_fn)
 
 
+def _generate_with_processor_passthrough(
+    *,
+    generate_fn: Callable[..., GenerationResult],
+    model: Module,
+    processor: ProcessorMixin,
+    params: ProcessImageParams,
+    formatted_prompt: str,
+    extra_kwargs: GenerateExtraKwargs,
+) -> GenerationResult:
+    """Call upstream generate() with user-provided passthrough kwargs.
+
+    This branch is intentionally dynamic because ``processor_kwargs`` is a
+    user-supplied JSON object whose keys depend on the active upstream model.
+    """
+    processor_kwargs = params.processor_kwargs or {}
+    return generate_fn(
+        model=model,
+        processor=processor,
+        prompt=formatted_prompt,
+        image=str(params.image_path),
+        verbose=params.verbose,
+        temperature=params.temperature,
+        top_p=params.top_p,
+        repetition_penalty=params.repetition_penalty,
+        repetition_context_size=params.repetition_context_size,
+        max_kv_size=params.max_kv_size,
+        kv_bits=params.kv_bits,
+        kv_group_size=params.kv_group_size,
+        quantized_kv_start=params.quantized_kv_start,
+        max_tokens=params.max_tokens,
+        **processor_kwargs,
+        **extra_kwargs,
+    )
+
+
 def _attach_generation_runtime_metrics(
     output: GenerationResult | SupportsGenerationResult,
     *,
@@ -13649,7 +13831,7 @@ def _attach_generation_runtime_metrics(
     measured_peak_memory = (
         float(peak_mem_bytes) / (1024**3) if isinstance(peak_mem_bytes, int | float) else None
     )
-    current_peak_memory = getattr(result, "peak_memory", None)
+    current_peak_memory = result.peak_memory
     if (
         measured_peak_memory is not None
         and measured_peak_memory > 0
@@ -13669,8 +13851,8 @@ def _derive_first_token_latency_s(
     the first token becomes available. That makes ``prompt_tokens / prompt_tps``
     a stable way to recover first-token latency from the final ``GenerationResult``.
     """
-    prompt_tokens = getattr(output, "prompt_tokens", None)
-    prompt_tps = getattr(output, "prompt_tps", None)
+    prompt_tokens = output.prompt_tokens
+    prompt_tps = output.prompt_tps
     if not isinstance(prompt_tokens, int | float) or prompt_tokens <= 0:
         return None
     if not isinstance(prompt_tps, int | float) or prompt_tps <= 0:
@@ -13739,7 +13921,7 @@ def _run_model_generation(
         phase_timer: Optional per-phase timer that records load, prep, and decode durations.
     """
     model: Module
-    processor: object
+    processor: ProcessorMixin
 
     _set_failure_phase(phase_callback, "import")
     _ensure_generation_runtime_symbols()
@@ -13779,11 +13961,22 @@ def _run_model_generation(
         timer = PerfCounterTimer()
 
     extra_kwargs = _build_generate_extra_kwargs(params)
+    processor_passthrough_kwargs = params.processor_kwargs or {}
+    strict_generate = cast("StrictGenerateCallable", generate)
 
     def _generate_once() -> GenerationResult | SupportsGenerationResult:
-        return generate(
+        if processor_passthrough_kwargs:
+            return _generate_with_processor_passthrough(
+                generate_fn=generate,
+                model=model,
+                processor=processor,
+                params=params,
+                formatted_prompt=formatted_prompt,
+                extra_kwargs=extra_kwargs,
+            )
+        return strict_generate(
             model=model,
-            processor=cast("Any", processor),
+            processor=processor,
             prompt=formatted_prompt,
             image=str(params.image_path),
             verbose=params.verbose,
@@ -14389,11 +14582,14 @@ def _log_verbose_success_details_mode(
 
 def _log_token_summary(res: PerformanceResult) -> None:
     """Log tokens and generation TPS with tree structure for visual hierarchy."""
-    p_tokens = getattr(res.generation, "prompt_tokens", 0)
-    g_tokens = getattr(res.generation, "generation_tokens", 0)
+    if res.generation is None:
+        return
+
+    p_tokens = res.generation.prompt_tokens or 0
+    g_tokens = res.generation.generation_tokens or 0
     tot_tokens = (p_tokens or 0) + (g_tokens or 0)
-    gen_tps = getattr(res.generation, "generation_tps", 0.0) or 0.0
-    prompt_tps = getattr(res.generation, "prompt_tps", 0.0) or 0.0
+    gen_tps = res.generation.generation_tps or 0.0
+    prompt_tps = res.generation.prompt_tps or 0.0
 
     log_metric_label("Tokens:", emoji="🔢", indent="  ")
     log_metric_tree(
@@ -14705,11 +14901,11 @@ def _log_compact_metrics(res: PerformanceResult) -> None:
     gen_time = getattr(res, "generation_time", None)
     load_time = getattr(res, "model_load_time", None)
     runtime = res.runtime_diagnostics
-    peak_mem = getattr(gen, "peak_memory", None) or 0.0
-    prompt_tokens = getattr(gen, "prompt_tokens", 0) or 0
-    gen_tokens = getattr(gen, "generation_tokens", 0) or 0
-    gen_tps = getattr(gen, "generation_tps", 0.0) or 0.0
-    prompt_tps = getattr(gen, "prompt_tps", 0.0) or 0.0
+    peak_mem = gen.peak_memory or 0.0
+    prompt_tokens = gen.prompt_tokens or 0
+    gen_tokens = gen.generation_tokens or 0
+    gen_tps = gen.generation_tps or 0.0
+    prompt_tps = gen.prompt_tps or 0.0
 
     # Line 1: Timing and Memory
     timing_parts: list[str] = []

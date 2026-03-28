@@ -33,6 +33,7 @@ class _StubGeneration:
     """Lightweight object matching attributes used by print_model_result."""
 
     prompt_tokens: int | None
+    prompt_tps: float | None
     generation_tokens: int | None
     generation_tps: float | None
     peak_memory: float | None
@@ -45,12 +46,14 @@ class _StubGeneration:
         self,
         *,
         prompt_tokens: int = 10,
+        prompt_tps: float = 100.0,
         generation_tokens: int = 5,
         generation_tps: float = 50.0,
         peak_memory: float = 0.25,
         text: str = "hello",
     ) -> None:
         self.prompt_tokens = prompt_tokens
+        self.prompt_tps = prompt_tps
         self.generation_tokens = generation_tokens
         self.generation_tps = generation_tps
         self.peak_memory = peak_memory

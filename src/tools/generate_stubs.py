@@ -127,6 +127,56 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
     _patch_file(
         mlx_root / "generate.pyi",
         patches=[
+            # Import ProcessorMixin so generate()/stream_generate() can model
+            # the multimodal processors returned by mlx_vlm.utils.load().
+            (
+                re.compile(
+                    r"(from transformers import PreTrainedTokenizer as PreTrainedTokenizer\n)(?!from transformers\.processing_utils import ProcessorMixin as ProcessorMixin\n)",
+                ),
+                r"\1from transformers.processing_utils import ProcessorMixin as ProcessorMixin\n",
+            ),
+            # processor: PreTrainedTokenizer -> ProcessorMixin | PreTrainedTokenizer
+            (
+                re.compile(r"(processor:\s*)PreTrainedTokenizer\b"),
+                r"\1ProcessorMixin | PreTrainedTokenizer",
+            ),
+            # Expand generate(...) to the explicit kwargs check_models forwards.
+            (
+                re.compile(
+                    r"def generate\(model: nn\.Module, processor: ProcessorMixin \| PreTrainedTokenizer, prompt: str, image: str \| list\[str\] \| None = None, audio: str \| list\[str\] \| None = None, verbose: bool = False, \*\*kwargs\) -> GenerationResult: \.\.\.",
+                ),
+                (
+                    "def generate("
+                    "model: nn.Module, "
+                    "processor: ProcessorMixin | PreTrainedTokenizer, "
+                    "prompt: str, "
+                    "image: str | list[str] | None = None, "
+                    "audio: str | list[str] | None = None, "
+                    "verbose: bool = False, "
+                    "*, "
+                    "max_tokens: int = ..., "
+                    "temperature: float = ..., "
+                    "repetition_penalty: float | None = None, "
+                    "repetition_context_size: int | None = ..., "
+                    "top_p: float = ..., "
+                    "min_p: float = ..., "
+                    "top_k: int = ..., "
+                    "max_kv_size: int | None = None, "
+                    "kv_bits: int | None = None, "
+                    "kv_group_size: int = ..., "
+                    "quantized_kv_start: int = ..., "
+                    "prefill_step_size: int | None = ..., "
+                    "resize_shape: tuple[int, int] | None = None, "
+                    "eos_tokens: list[str] | None = None, "
+                    "skip_special_tokens: bool = False, "
+                    "enable_thinking: bool = False, "
+                    "thinking_budget: int | None = None, "
+                    "thinking_end_token: str = ..., "
+                    "thinking_start_token: str | None = None, "
+                    "**kwargs"
+                    ") -> GenerationResult: ..."
+                ),
+            ),
             # image/audio: str | list[str] = None -> include None
             (
                 re.compile(r"(image:\s*str\s*\|\s*list\[str\])\s*=\s*None"),
@@ -187,6 +237,21 @@ def _patch_transformers_stubs(typings_dir: Path) -> None:
     )
     _patch_file(root / "data/datasets/glue.pyi", [join_placeholder_fix])
     _patch_file(root / "data/datasets/squad.pyi", [join_placeholder_fix])
+    _patch_file(
+        root / "processing_utils.pyi",
+        [
+            (
+                re.compile(
+                    r"(    audio_ids: Incomplete\n)(?!    tokenizer: PreTrainedTokenizerBase \| None\n)",
+                ),
+                (
+                    r"\1"
+                    "    tokenizer: PreTrainedTokenizerBase | None\n"
+                    "    image_processor: Any | None\n"
+                ),
+            ),
+        ],
+    )
 
 
 def _validate_stub_syntax(typings_dir: Path, package_roots: Iterable[str]) -> None:
@@ -241,6 +306,7 @@ logger = logging.getLogger("generate_stubs")
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TYPINGS_DIR = REPO_ROOT / "typings"
 STUB_MANIFEST = ".stub_manifest.json"
+STUB_TOOL_VERSION = "3"
 
 DEFAULT_PACKAGES = ["mlx_lm", "mlx_vlm", "transformers", "tokenizers"]
 PACKAGE_DISTRIBUTIONS = {
@@ -341,7 +407,9 @@ def get_stub_refresh_reason(packages: Iterable[str], typings_dir: Path = TYPINGS
                 reason = "the stub manifest is missing package metadata"
             else:
                 current_python_version = _python_version()
-                if manifest.get("python_version") != current_python_version:
+                if manifest.get("tool_version") != STUB_TOOL_VERSION:
+                    reason = "the local stub patcher version changed"
+                elif manifest.get("python_version") != current_python_version:
                     reason = f"the Python version changed to {current_python_version}"
                 else:
                     current_stubgen_version = _installed_distribution_version("mypy")
@@ -376,6 +444,7 @@ def _write_stub_manifest(packages: Iterable[str], typings_dir: Path = TYPINGS_DI
 
     updated_manifest = {
         "packages": updated_packages,
+        "tool_version": STUB_TOOL_VERSION,
         "python_version": _python_version(),
         "stubgen_version": _installed_distribution_version("mypy"),
     }

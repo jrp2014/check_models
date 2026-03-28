@@ -82,6 +82,7 @@ def _write_stub_manifest(
                         "version": mlx_vlm_version,
                     },
                 },
+                "tool_version": generate_stubs.STUB_TOOL_VERSION,
                 "python_version": generate_stubs._python_version(),
                 "stubgen_version": stubgen_version,
             },
@@ -185,6 +186,61 @@ def test_stub_refresh_reason_detects_version_change(
         generate_stubs.get_stub_refresh_reason(["mlx_vlm"], typings_dir)
         == "mlx_vlm version metadata changed"
     )
+
+
+def test_patch_transformers_stubs_adds_processor_runtime_attrs(tmp_path: Path) -> None:
+    """Patched ProcessorMixin stubs should expose tokenizer/image processor attrs."""
+    typings_dir = tmp_path / "typings"
+    transformers_dir = typings_dir / "transformers"
+    transformers_dir.mkdir(parents=True)
+    processing_utils_path = transformers_dir / "processing_utils.pyi"
+    processing_utils_path.write_text(
+        "from .tokenization_utils_base import PreTrainedTokenizerBase as PreTrainedTokenizerBase\n"
+        "from _typeshed import Incomplete\n"
+        "from typing import Any\n"
+        "\n"
+        "class PushToHubMixin: ...\n"
+        "\n"
+        "class ProcessorMixin(PushToHubMixin):\n"
+        "    valid_processor_kwargs = object\n"
+        "    image_ids: Incomplete\n"
+        "    video_ids: Incomplete\n"
+        "    audio_ids: Incomplete\n",
+        encoding="utf-8",
+    )
+
+    generate_stubs._patch_transformers_stubs(typings_dir)
+
+    patched = processing_utils_path.read_text(encoding="utf-8")
+    assert "tokenizer: PreTrainedTokenizerBase | None" in patched
+    assert "image_processor: Any | None" in patched
+
+
+def test_patch_mlx_vlm_stubs_widens_generate_processor_type(tmp_path: Path) -> None:
+    """Patched mlx_vlm stubs should accept ProcessorMixin processors."""
+    typings_dir = tmp_path / "typings"
+    mlx_vlm_dir = typings_dir / "mlx_vlm"
+    mlx_vlm_dir.mkdir(parents=True)
+    generate_path = mlx_vlm_dir / "generate.pyi"
+    generate_path.write_text(
+        "import mlx.nn as nn\n"
+        "from transformers import PreTrainedTokenizer as PreTrainedTokenizer\n"
+        "from transformers.processing_utils import ProcessorMixin as ProcessorMixin\n"
+        "\n"
+        "def generate(model: nn.Module, processor: ProcessorMixin | PreTrainedTokenizer, "
+        "prompt: str, image: str | list[str] | None = None, "
+        "audio: str | list[str] | None = None, verbose: bool = False, **kwargs) "
+        "-> GenerationResult: ...\n",
+        encoding="utf-8",
+    )
+
+    generate_stubs._patch_mlx_vlm_stubs(typings_dir)
+
+    patched = generate_path.read_text(encoding="utf-8")
+    assert "from transformers.processing_utils import ProcessorMixin as ProcessorMixin\n" in patched
+    assert "processor: ProcessorMixin | PreTrainedTokenizer" in patched
+    assert "temperature: float = ..." in patched
+    assert "thinking_end_token: str = ..." in patched
 
 
 def test_should_audit_path_excludes_generated_and_archived_paths(tmp_path: Path) -> None:

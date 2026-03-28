@@ -22,9 +22,15 @@ quality_validate_yaml_files \
 echo "=== Dependency Sync (Check) ==="
 "$QUALITY_PYTHON" -m tools.update_readme_deps --check
 
-echo "=== Type Stub Preflight ==="
-
 mkdir -p ../typings
+
+echo "=== Type Stub Refresh (Best Effort) ==="
+if ! "$QUALITY_PYTHON" -m tools.generate_stubs --skip-if-fresh \
+    mlx_lm mlx_vlm transformers tokenizers; then
+    echo "⚠️  Stub refresh warning: could not regenerate local third-party stubs; continuing"
+fi
+
+echo "=== Type Stub Preflight ==="
 
 "$QUALITY_PYTHON" - <<'PY'
 from __future__ import annotations
