@@ -6,6 +6,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Added `pydantic` to the managed `dev` dependency group in
+  `src/pyproject.toml` and aligned the `src/tools/setup_conda_env.sh`
+  fallback installer so repo update/bootstrap flows keep it current through the
+  existing dependency-management path.
 - Tightened external-library typing in `src/check_models.py` by giving the
   imported `mlx_vlm` callables explicit local protocol signatures, narrowing
   loaded processor/config annotations toward `transformers` types, extending

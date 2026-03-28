@@ -141,6 +141,17 @@ def test_ty_uses_generated_typings_search_path() -> None:
     assert ty_env["extra-paths"] == ["../typings"]
 
 
+def test_pydantic_is_managed_as_a_dev_dependency() -> None:
+    """Keep pydantic in the managed dev dependency set and setup fallback."""
+    pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
+    dev_deps = pyproject["project"]["optional-dependencies"]["dev"]
+
+    assert "pydantic>=2.0.0" in dev_deps
+
+    setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
+    assert '"pydantic>=2.0.0"' in setup_script
+
+
 def test_stub_refresh_reason_is_none_for_fresh_manifest(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
