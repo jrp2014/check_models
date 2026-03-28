@@ -1978,7 +1978,6 @@ class TestDiagnosticsReport:
                 side_effect=AssertionError,
             ),
             patch.object(check_models, "get_system_characteristics", side_effect=AssertionError),
-            patch.object(check_models, "_extract_context_from_prompt", side_effect=AssertionError),
         ):
             generate_markdown_report(
                 results=results,
@@ -2014,15 +2013,14 @@ class TestDiagnosticsReport:
         self,
         tmp_path: Path,
     ) -> None:
-        """Standalone TSV generation should avoid the legacy table-preparation helper."""
+        """Standalone TSV generation should still render results without cached context."""
         out = tmp_path / "standalone.tsv"
         results = [_make_success("org/good"), _make_failure("org/bad")]
 
-        with patch.object(check_models, "_prepare_table_data", side_effect=AssertionError):
-            generate_tsv_report(
-                results=results,
-                filename=out,
-            )
+        generate_tsv_report(
+            results=results,
+            filename=out,
+        )
 
         content = out.read_text(encoding="utf-8")
         assert "org/good" in content

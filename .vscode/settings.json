@@ -31,6 +31,11 @@
   "mypy.configFile": "src/pyproject.toml",
   "python.analysis.stubPath": "typings",
   "python.analysis.exclude": [
+    ".git",
+    ".conda",
+    "venv",
+    "env",
+    ".venv",
     "**/typings/**",
     "**/node_modules",
     "**/__pycache__",
@@ -90,6 +95,11 @@
     "reportMissingModuleSource": "none"
   },
   "cursorpyright.analysis.exclude": [
+    ".git",
+    ".conda",
+    "venv",
+    "env",
+    ".venv",
     "**/typings/**",
     "**/node_modules",
     "**/__pycache__",

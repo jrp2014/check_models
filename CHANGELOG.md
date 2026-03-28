@@ -6,6 +6,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Removed several dead or redundant helper layers in `src/check_models.py`,
+  including unused diagnostics/runtime helpers, now-unused protocol
+  definitions, a duplicate quality-analysis accessor, and a few thin
+  report/context wrappers, to shrink the monolith without changing report
+  behavior.
 - Hardened `src/tools/update.sh` so local MLX refreshes now fail fast when the
   active macOS toolchain does not expose `metal` and `metallib` via `xcrun`,
   and so editable-install origin checks cover `mlx` in addition to `mlx-lm`

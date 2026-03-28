@@ -647,15 +647,6 @@ except ImportError:
 vlm_version: str
 
 
-@dataclass
-class _GenerationResultFallback:
-    """Fallback structure used when mlx-vlm is unavailable."""
-
-    text: str | None = None
-    prompt_tokens: int | None = None
-    generation_tokens: int | None = None
-
-
 def _raise_mlx_vlm_missing(*_args: object, **_kwargs: object) -> NoReturn:
     """Raise a consistent runtime error when mlx-vlm is unavailable."""
     raise RuntimeError(ERROR_MLX_VLM_MISSING)
@@ -1013,23 +1004,6 @@ class SupportsGenerationResult(Protocol):  # Minimal attributes we read from Gen
     active_memory: float | None  # Dynamically added active memory (GB)
     cache_memory: float | None  # Dynamically added cache memory (GB)
     peak_memory: float | None  # Backfilled peak memory (GB) when upstream omits it
-
-
-@runtime_checkable
-class SupportsThroughputGenerationResult(Protocol):
-    """Generation result variant that exposes prompt/generation throughput."""
-
-    prompt_tokens: int | None
-    generation_tokens: int | None
-    prompt_tps: float | None
-    generation_tps: float | None
-
-
-@runtime_checkable
-class SupportsQualityAnalysisGenerationResult(Protocol):
-    """Generation result variant that carries cached quality analysis."""
-
-    quality_analysis: GenerationQualityAnalysis | None
 
 
 class SupportsExifIfd(Protocol):
@@ -1467,31 +1441,38 @@ def _gallery_render_success(
     if time_segments:
         _append_markdown_labeled_value(out, label="Metrics", value=" | ".join(time_segments))
 
-    if isinstance(gen, SupportsThroughputGenerationResult):
-        throughput_segments: list[str] = [
-            segment
-            for segment in (
-                _throughput_segment(
-                    "Prompt",
-                    gen.prompt_tps,
-                    "prompt_tokens",
-                    gen.prompt_tokens,
-                ),
-                _throughput_segment(
-                    "Gen",
-                    gen.generation_tps,
-                    "generation_tokens",
-                    gen.generation_tokens,
-                ),
-            )
-            if segment is not None
-        ]
-        if throughput_segments:
-            _append_markdown_labeled_value(
-                out,
-                label="Throughput",
-                value=" | ".join(throughput_segments),
-            )
+        prompt_tps = getattr(gen, "prompt_tps", None)
+        generation_tps = getattr(gen, "generation_tps", None)
+        prompt_tokens = getattr(gen, "prompt_tokens", None)
+        generation_tokens = getattr(gen, "generation_tokens", None)
+        if any(
+            value is not None
+            for value in (prompt_tps, generation_tps, prompt_tokens, generation_tokens)
+        ):
+            throughput_segments: list[str] = [
+                segment
+                for segment in (
+                    _throughput_segment(
+                        "Prompt",
+                        prompt_tps,
+                        "prompt_tokens",
+                        prompt_tokens,
+                    ),
+                    _throughput_segment(
+                        "Gen",
+                        generation_tps,
+                        "generation_tokens",
+                        generation_tokens,
+                    ),
+                )
+                if segment is not None
+            ]
+            if throughput_segments:
+                _append_markdown_labeled_value(
+                    out,
+                    label="Throughput",
+                    value=" | ".join(throughput_segments),
+                )
 
     if summary is not None:
         _append_gallery_review_lines(
@@ -2162,19 +2143,6 @@ def format_field_label(field_name: str) -> str:
 # =============================================================================
 # TEXT ESCAPING - Unified strategy for HTML/Markdown escaping
 # =============================================================================
-
-
-@runtime_checkable
-class EscapeStrategy(Protocol):
-    """Protocol for text escaping strategies.
-
-    Enables unified handling of different output format escaping needs
-    (HTML, Markdown) with consistent interface.
-    """
-
-    def escape(self, text: str) -> str:
-        """Escape text according to strategy rules."""
-        ...
 
 
 class HTMLSelectiveEscaper:
@@ -6708,36 +6676,6 @@ def _format_table_field_value(
     return format_field_value(field_name, value)
 
 
-def _prepare_table_data(
-    results: list[PerformanceResult],
-    header_separator: str = "<br>",
-    *,
-    include_output: bool = True,
-) -> tuple[list[str], list[list[str]], list[str]]:
-    """Prepare headers, rows, and field names for reports.
-
-    Args:
-        results: List of PerformanceResult objects.
-        header_separator: String to use for separating header lines (default: "<br>").
-        include_output: Whether to include the output preview column.
-
-    Returns:
-        A tuple containing:
-        - list[str]: Headers for the table.
-        - list[list[str]]: Rows of data for the table.
-        - list[str]: The names of the fields.
-    """
-    if not results:
-        return [], [], []
-
-    table_data = _build_prepared_table_data(
-        result_set=ResultSet(results),
-        header_separator=header_separator,
-        include_output=include_output,
-    )
-    return _materialize_prepared_table_data(table_data)
-
-
 def _build_prepared_table_data(
     *,
     result_set: ResultSet,
@@ -6805,7 +6743,7 @@ def _build_report_render_context(
         for result in results
     ]
     result_set: ResultSet = ResultSet(resolved_results)
-    prompt_context: str | None = _extract_context_from_prompt(prompt)
+    prompt_context = _extract_trusted_hint_bundle(prompt).trusted_text or None
     summary: ModelIssueSummary = analyze_model_issues(results, prompt_context)
     stats: PerformanceStats = compute_performance_statistics(results)
     resolved_system_info: dict[str, str] = (
@@ -7267,14 +7205,6 @@ def _runtime_phase_durations(runtime: RuntimeDiagnostics | None) -> dict[Runtime
         for phase, value in phase_map.items()
         if isinstance(value, int | float) and float(value) > 0.0
     }
-
-
-def _dominant_runtime_phase(runtime: RuntimeDiagnostics | None) -> RuntimePhaseName | None:
-    """Return the dominant measured phase for one run, if any."""
-    phase_durations: dict[RuntimePhaseName, float] = _runtime_phase_durations(runtime)
-    if not phase_durations:
-        return None
-    return max(phase_durations, key=phase_durations.__getitem__)
 
 
 def _build_runtime_analysis_summary(
@@ -7987,9 +7917,12 @@ def _quality_analysis_for_result(res: PerformanceResult) -> GenerationQualityAna
     if res.quality_analysis is not None:
         return res.quality_analysis
     generation = res.generation
-    if generation is None or not isinstance(generation, SupportsQualityAnalysisGenerationResult):
+    if generation is None:
         return None
-    return generation.quality_analysis
+    generation_analysis = getattr(generation, "quality_analysis", None)
+    return (
+        generation_analysis if isinstance(generation_analysis, GenerationQualityAnalysis) else None
+    )
 
 
 def _summarize_model_review(res: PerformanceResult, summary: ModelIssueSummary) -> str | None:
@@ -8017,7 +7950,7 @@ def _summarize_model_review(res: PerformanceResult, summary: ModelIssueSummary) 
 
 def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord | None:
     """Build the canonical automated review payload for one result."""
-    analysis = _result_quality_analysis(result)
+    analysis = _quality_analysis_for_result(result)
     generation = result.generation
     generation_tokens = 0
     if generation is not None:
@@ -9570,14 +9503,6 @@ def _infer_stack_signal_owner(
     return owner
 
 
-def _summarize_stack_signal_owners(
-    stack_signals: Sequence[tuple[PerformanceResult, str, str]],
-) -> str:
-    """Return a readable owner summary for stack-signal diagnostics."""
-    owners = sorted({owner for _res, _symptom, owner in stack_signals})
-    return ", ".join(owners) if owners else "unknown"
-
-
 def _group_stack_signals_by_owner(
     stack_signals: Sequence[tuple[PerformanceResult, str, str]],
 ) -> list[tuple[str, list[tuple[PerformanceResult, str, str]]]]:
@@ -9746,21 +9671,6 @@ def _infer_harness_issue_owner(result: PerformanceResult) -> str:
         inferred_owner = "model-config / mlx-vlm"
 
     return inferred_owner
-
-
-def _summarize_harness_issue_owners(
-    harness_results: Sequence[tuple[PerformanceResult, str]],
-) -> str:
-    """Return a readable owner summary for harness diagnostics."""
-    pair_owner_count = 2
-    owners = sorted({_infer_harness_issue_owner(res) for res, _text in harness_results})
-    if not owners:
-        return "unknown"
-    if len(owners) == 1:
-        return owners[0]
-    if len(owners) == pair_owner_count:
-        return f"{owners[0]} and {owners[1]}"
-    return ", ".join(owners[:-1]) + f", and {owners[-1]}"
 
 
 def _group_harness_results_by_owner(
@@ -11454,11 +11364,12 @@ def print_model_stats(results: list[PerformanceResult]) -> None:
         logger.info("No results to display.")
         return
 
-    headers, rows, field_names = _prepare_table_data(
-        results,
+    table_data = _build_prepared_table_data(
+        result_set=ResultSet(results),
         header_separator="\n",
         include_output=False,
     )
+    headers, rows, field_names = _materialize_prepared_table_data(table_data)
     if not headers or not rows:
         logger.info("No data to display in stats table.")
         return
@@ -11640,15 +11551,6 @@ def _process_markdown_rows(
             rows[i][last_col_idx] = _escape_markdown_in_text(rows[i][last_col_idx])
 
 
-def _resolve_sorted_report_results(
-    report_context: ReportRenderContext | list[PerformanceResult],
-) -> Sequence[PerformanceResult]:
-    """Resolve sorted results from a cached report context or a legacy result list."""
-    if isinstance(report_context, ReportRenderContext):
-        return report_context.result_set.results
-    return ResultSet(report_context).results
-
-
 def _generate_model_gallery_section(
     report_context: ReportRenderContext | list[PerformanceResult],
 ) -> list[str]:
@@ -11661,7 +11563,11 @@ def _generate_model_gallery_section(
     md.append("<!-- markdownlint-disable MD033 -->")
     md.append("")
 
-    sorted_results = _resolve_sorted_report_results(report_context)
+    sorted_results = (
+        report_context.result_set.results
+        if isinstance(report_context, ReportRenderContext)
+        else ResultSet(report_context).results
+    )
     summary = report_context.summary if isinstance(report_context, ReportRenderContext) else None
     useful_model_names: set[str] = set()
     watchlist_by_model: dict[str, str] = {}
@@ -14752,14 +14658,6 @@ def _log_cataloging_utility(gen_text: str, context: str | None) -> None:
     )
 
 
-def _extract_context_from_prompt(prompt: str | None) -> str | None:
-    """Extract the context section from a prompt string."""
-    if not prompt:
-        return None
-    bundle = _extract_trusted_hint_bundle(prompt)
-    return bundle.trusted_text or None
-
-
 def _log_additional_diagnostics(
     res: PerformanceResult,
     gen_text: str,
@@ -14785,7 +14683,7 @@ def _log_additional_diagnostics(
     _log_output_analysis(gen_text, gen_tokens, generation_time, peak_mem)
 
     log_blank()
-    context = _extract_context_from_prompt(prompt)
+    context = _extract_trusted_hint_bundle(prompt).trusted_text or None if prompt else None
     _log_cataloging_utility(gen_text, context)
 
 
@@ -15929,18 +15827,6 @@ def _collapse_preview_whitespace(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
-def _result_quality_analysis(result: PerformanceResult) -> GenerationQualityAnalysis | None:
-    """Return cached generation quality analysis when present."""
-    if result.quality_analysis is not None:
-        return result.quality_analysis
-    if result.generation is None:
-        return None
-    generation_analysis = getattr(result.generation, "quality_analysis", None)
-    return (
-        generation_analysis if isinstance(generation_analysis, GenerationQualityAnalysis) else None
-    )
-
-
 def _populate_result_quality_analysis(
     result: PerformanceResult,
     *,
@@ -15952,7 +15838,7 @@ def _populate_result_quality_analysis(
     if not result.success or result.generation is None:
         return result
 
-    cached_analysis = _result_quality_analysis(result)
+    cached_analysis = _quality_analysis_for_result(result)
     if cached_analysis is not None:
         cached_quality_issues = result.quality_issues or _build_quality_issues_string(
             cached_analysis,
@@ -16010,7 +15896,7 @@ def _build_result_output_cues(result: PerformanceResult) -> list[str]:
         return _dedupe_preserve_order(failure_cues)[:OUTPUT_PREVIEW_CUE_LIMIT]
 
     quality_labels = _extract_quality_issue_labels(result.quality_issues)
-    analysis = _result_quality_analysis(result)
+    analysis = _quality_analysis_for_result(result)
     cues: list[str] = []
 
     if (analysis is not None and analysis.has_harness_issue) or "harness" in quality_labels:
@@ -16419,7 +16305,7 @@ def _collect_quality_and_utility_rows(
     """Collect quality counts and cataloging utility rows."""
     quality_counts: Counter[str] = Counter()
     clean_count = 0
-    context = _extract_context_from_prompt(prompt)
+    context = _extract_trusted_hint_bundle(prompt).trusted_text or None if prompt else None
     baseline = _compute_metadata_baseline_utility(context)
     baseline_score = baseline[0] if baseline is not None else None
     baseline_grade = baseline[1] if baseline is not None else None
