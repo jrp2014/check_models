@@ -1,10 +1,10 @@
-# Diagnostics Report — 10 failure(s), 8 harness issue(s) (mlx-vlm 0.4.1)
+# Diagnostics Report — 8 failure(s), 8 harness issue(s) (mlx-vlm 0.4.1)
 
 ## Summary
 
-Automated benchmarking of **52 locally-cached VLM models** found **10 hard
+Automated benchmarking of **52 locally-cached VLM models** found **8 hard
 failure(s)** and **8 harness/integration issue(s)** plus **1 preflight
-compatibility warning(s)** in successful models. 42 of 52 models succeeded.
+compatibility warning(s)** in successful models. 44 of 52 models succeeded.
 
 Test image: `20260321-164244_DSC09459_DxO.jpg` (42.2 MB).
 
@@ -16,8 +16,6 @@ Quick triage list with likely owner and next action for each issue class.
 
 - **[High] [transformers]** Model loading failed: 'Florence2LanguageConfig' object has no attribute 'forced_bos_t... (2 model(s)). Next: verify API compatibility and pinned version floor.
 - **[High] [transformers]** Failed to process inputs with error: ImagesKwargs.\_\_init\_\_() got an unexpected keywor... (2 model(s)). Next: verify API compatibility and pinned version floor.
-- **[Medium] [mlx-vlm]** Failed to process inputs with error: object of type 'numpy.int64' has no len() (1 model(s)). Next: check processor/chat-template wiring and generation kwargs.
-- **[Medium] [mlx-vlm]** Failed to process inputs with error: object of type 'numpy.int64' has no len() (1 model(s)). Next: check processor/chat-template wiring and generation kwargs.
 - **[Medium] [model configuration/repository]** Loaded processor has no image_processor; expected multimodal processor. (1 model(s)). Next: verify model config, tokenizer files, and revision alignment.
 - **[Medium] [model configuration/repository]** Loaded processor has no image_processor; expected multimodal processor. (1 model(s)). Next: verify model config, tokenizer files, and revision alignment.
 - **[Medium] [transformers]** Failed to process inputs with error: ImagesKwargs.\_\_init\_\_() got an unexpected keywor... (1 model(s)). Next: verify API compatibility and pinned version floor.
@@ -36,8 +34,6 @@ Quick triage list with likely owner and next action for each issue class.
 | -------- | ----- | --------------- | ----- | ----------- |
 | **High** | Model loading failed: 'Florence2LanguageConfig' object has no attribu... | 2 (Florence-2-large-ft, Florence-2-large-ft) | `transformers` | verify API compatibility and pinned version floor. |
 | **High** | Failed to process inputs with error: ImagesKwargs.\_\_init\_\_() got an u... | 2 (paligemma2-10b-ft-docci-448-bf16, paligemma2-3b-ft-docci-448-bf16) | `transformers` | verify API compatibility and pinned version floor. |
-| **Medium** | Failed to process inputs with error: object of type 'numpy.int64' has... | 1 (LFM2-VL-1.6B-8bit) | `mlx-vlm` | check processor/chat-template wiring and generation kwargs. |
-| **Medium** | Failed to process inputs with error: object of type 'numpy.int64' has... | 1 (LFM2.5-VL-1.6B-bf16) | `mlx-vlm` | check processor/chat-template wiring and generation kwargs. |
 | **Medium** | Loaded processor has no image_processor; expected multimodal processor. | 1 (MolmoPoint-8B-fp16) | `model configuration/repository` | verify model config, tokenizer files, and revision alignment. |
 | **Medium** | Loaded processor has no image_processor; expected multimodal processor. | 1 (deepseek-vl2-8bit) | `model configuration/repository` | verify model config, tokenizer files, and revision alignment. |
 | **Medium** | Failed to process inputs with error: ImagesKwargs.\_\_init\_\_() got an u... | 1 (paligemma2-10b-ft-docci-448-6bit) | `transformers` | verify API compatibility and pinned version floor. |
@@ -64,85 +60,21 @@ Quick triage list with likely owner and next action for each issue class.
 
 ### To reproduce
 
-- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260321-164244_DSC09459_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft`
+- Exact model-specific repro command appears below in the `Reproducibility` section under `Target specific failing models`.
+- Representative failing model: `microsoft/Florence-2-large-ft`
 
 <details>
 <summary>Detailed trace logs (affected models)</summary>
 
 #### `microsoft/Florence-2-large-ft`
 
-Traceback:
+Traceback tail:
 
 ```text
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 405, in load
-    processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 478, in load_processor
-    processor = AutoProcessor.from_pretrained(model_path, use_fast=True, **kwargs)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 406, in _patched_auto_processor_from_pretrained
-    return previous_from_pretrained.__func__(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        cls, pretrained_model_name_or_path, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 406, in _patched_auto_processor_from_pretrained
-    return previous_from_pretrained.__func__(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        cls, pretrained_model_name_or_path, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 406, in _patched_auto_processor_from_pretrained
-    return previous_from_pretrained.__func__(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        cls, pretrained_model_name_or_path, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  [Previous line repeated 2 more times]
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py", line 420, in from_pretrained
-    return processor_class.from_pretrained(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        pretrained_model_name_or_path, trust_remote_code=trust_remote_code, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1421, in from_pretrained
-    args = cls._get_arguments_from_pretrained(pretrained_model_name_or_path, processor_dict, **kwargs)
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1535, in _get_arguments_from_pretrained
-    tokenizer = cls._load_tokenizer_from_pretrained(
-        sub_processor_type, pretrained_model_name_or_path, subfolder=subfolder, **kwargs
-    )
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1482, in _load_tokenizer_from_pretrained
-    tokenizer = auto_processor_class.from_pretrained(
-        pretrained_model_name_or_path, subfolder=subfolder, **kwargs
-    )
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/tokenization_auto.py", line 684, in from_pretrained
-    config = AutoConfig.from_pretrained(
-        pretrained_model_name_or_path, trust_remote_code=trust_remote_code, **kwargs
-    )
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/configuration_auto.py", line 1483, in from_pretrained
-    return config_class.from_pretrained(pretrained_model_name_or_path, **kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/configuration_utils.py", line 639, in from_pretrained
-    return cls.from_dict(config_dict, **kwargs)
-           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/configuration_utils.py", line 807, in from_dict
-    config = cls(**config_dict)
-  File "/Users/jrp/.cache/huggingface/modules/transformers_modules/_4a12a2b54b7016a48a22037fbd62da90cd566f2a/configuration_florence2.py", line 336, in __init__
-    self.text_config = Florence2LanguageConfig(**text_config)
-                       ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
-  File "/Users/jrp/.cache/huggingface/modules/transformers_modules/_4a12a2b54b7016a48a22037fbd62da90cd566f2a/configuration_florence2.py", line 265, in __init__
-    if self.forced_bos_token_id is None and kwargs.get("force_bos_token_to_be_generated", False):
-       ^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/configuration_utils.py", line 411, in __getattribute__
     return super().__getattribute__(key)
            ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
 AttributeError: 'Florence2LanguageConfig' object has no attribute 'forced_bos_token_id'
-
 The above exception was the direct cause of the following exception:
-
 Traceback (most recent call last):
 ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attribute 'forced_bos_token_id'
 ```
@@ -151,90 +83,19 @@ Captured stdout/stderr:
 
 ```text
 === STDERR ===
-Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
-Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 19391.14it/s]
-
-Download complete: : 0.00B [00:00, ?B/s]              
-Download complete: : 0.00B [00:00, ?B/s]
 <unknown>:515: SyntaxWarning: invalid escape sequence '\d'
 ```
 
 #### `prince-canuma/Florence-2-large-ft`
 
-Traceback:
+Traceback tail:
 
 ```text
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 405, in load
-    processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 478, in load_processor
-    processor = AutoProcessor.from_pretrained(model_path, use_fast=True, **kwargs)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 406, in _patched_auto_processor_from_pretrained
-    return previous_from_pretrained.__func__(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        cls, pretrained_model_name_or_path, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 406, in _patched_auto_processor_from_pretrained
-    return previous_from_pretrained.__func__(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        cls, pretrained_model_name_or_path, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py", line 406, in _patched_auto_processor_from_pretrained
-    return previous_from_pretrained.__func__(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        cls, pretrained_model_name_or_path, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  [Previous line repeated 23 more times]
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py", line 420, in from_pretrained
-    return processor_class.from_pretrained(
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
-        pretrained_model_name_or_path, trust_remote_code=trust_remote_code, **kwargs
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1421, in from_pretrained
-    args = cls._get_arguments_from_pretrained(pretrained_model_name_or_path, processor_dict, **kwargs)
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1535, in _get_arguments_from_pretrained
-    tokenizer = cls._load_tokenizer_from_pretrained(
-        sub_processor_type, pretrained_model_name_or_path, subfolder=subfolder, **kwargs
-    )
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py", line 1482, in _load_tokenizer_from_pretrained
-    tokenizer = auto_processor_class.from_pretrained(
-        pretrained_model_name_or_path, subfolder=subfolder, **kwargs
-    )
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/tokenization_auto.py", line 684, in from_pretrained
-    config = AutoConfig.from_pretrained(
-        pretrained_model_name_or_path, trust_remote_code=trust_remote_code, **kwargs
-    )
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/configuration_auto.py", line 1483, in from_pretrained
-    return config_class.from_pretrained(pretrained_model_name_or_path, **kwargs)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/configuration_utils.py", line 639, in from_pretrained
-    return cls.from_dict(config_dict, **kwargs)
-           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/configuration_utils.py", line 807, in from_dict
-    config = cls(**config_dict)
-  File "/Users/jrp/.cache/huggingface/modules/transformers_modules/microsoft/Florence_hyphen_2_hyphen_large_hyphen_ft/4a12a2b54b7016a48a22037fbd62da90cd566f2a/configuration_florence2.py", line 336, in __init__
-    self.text_config = Florence2LanguageConfig(**text_config)
-                       ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
-  File "/Users/jrp/.cache/huggingface/modules/transformers_modules/microsoft/Florence_hyphen_2_hyphen_large_hyphen_ft/4a12a2b54b7016a48a22037fbd62da90cd566f2a/configuration_florence2.py", line 265, in __init__
-    if self.forced_bos_token_id is None and kwargs.get("force_bos_token_to_be_generated", False):
-       ^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/configuration_utils.py", line 411, in __getattribute__
     return super().__getattribute__(key)
            ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
 AttributeError: 'Florence2LanguageConfig' object has no attribute 'forced_bos_token_id'
-
 The above exception was the direct cause of the following exception:
-
 Traceback (most recent call last):
 ValueError: Model loading failed: 'Florence2LanguageConfig' object has no attribute 'forced_bos_token_id'
 ```
@@ -243,13 +104,7 @@ Captured stdout/stderr:
 
 ```text
 === STDERR ===
-Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
-Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 22932.23it/s]
-
-Download complete: : 0.00B [00:00, ?B/s]              
-Download complete: : 0.00B [00:00, ?B/s]
 <unknown>:515: SyntaxWarning: invalid escape sequence '\d'
 ```
 
@@ -269,66 +124,21 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 ### To reproduce
 
-- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260321-164244_DSC09459_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/paligemma2-10b-ft-docci-448-bf16`
+- Exact model-specific repro command appears below in the `Reproducibility` section under `Target specific failing models`.
+- Representative failing model: `mlx-community/paligemma2-10b-ft-docci-448-bf16`
 
 <details>
 <summary>Detailed trace logs (affected models)</summary>
 
 #### `mlx-community/paligemma2-10b-ft-docci-448-bf16`
 
-Traceback:
+Traceback tail:
 
 ```text
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1055, in process_inputs_with_fallback
-    return process_inputs(
-        processor,
-    ...<5 lines>...
-        **kwargs,
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1041, in process_inputs
-    return process_method(**args)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/paligemma/processing_paligemma.py", line 270, in __call__
-    pixel_values = self.image_processor(images, **kwargs)["pixel_values"]
-                   ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils.py", line 217, in __call__
-    return self.preprocess(images, *args, **kwargs)
-           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils.py", line 388, in preprocess
-    validate_typed_dict(self.valid_kwargs, kwargs)
-    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/dataclasses.py", line 337, in validate_typed_dict
-    strict_cls(**data)  # will raise if validation fails
-    ~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/dataclasses.py", line 279, in init_with_validate
-    initial_init(self, *args, **kwargs)  # type: ignore [call-arg]
-    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
-TypeError: ImagesKwargs.__init__() got an unexpected keyword argument 'padding'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 696, in generate
-    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
-                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 539, in stream_generate
-    inputs = prepare_inputs(
-        processor,
-    ...<6 lines>...
-        **kwargs,
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1273, in prepare_inputs
-    inputs = process_inputs_with_fallback(
-        processor,
-    ...<4 lines>...
-        **kwargs,
-    )
   File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1065, in process_inputs_with_fallback
     raise ValueError(f"Failed to process inputs with error: {e}")
 ValueError: Failed to process inputs with error: ImagesKwargs.__init__() got an unexpected keyword argument 'padding'
-
 The above exception was the direct cause of the following exception:
-
 Traceback (most recent call last):
 ValueError: Model generation failed for mlx-community/paligemma2-10b-ft-docci-448-bf16: Failed to process inputs with error: ImagesKwargs.__init__() got an unexpected keyword argument 'padding'
 ```
@@ -338,7 +148,7 @@ Captured stdout/stderr:
 ```text
 === STDOUT ===
 ==========
-Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '3', '2', '1', '-', '1', '6', '4', '2', '4', '4', '_', 'D', 'S', 'C', '0', '9', '4', '5', '9', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g'] 
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '3', '2', '1', '-', '1', '6', '4', '2', '4', '4', '_', 'D', 'S', 'C', '0', '9', '4', '5', '9', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
 
 Prompt: <image>Analyze this image for cataloguing metadata, using British English.
 
@@ -375,70 +185,17 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 - Capture metadata: Taken on 2026-03-21 16:42:44 GMT (at 16:42:44 local time). GPS: 51.532500°N, 0.122500°W.
 
 === STDERR ===
-Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-
-Fetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]
-Fetching 10 files: 100%|##########| 10/10 [00:00<00:00, 45442.08it/s]
-
-Download complete: : 0.00B [00:00, ?B/s]              
-Download complete: : 0.00B [00:00, ?B/s]
 ```
 
 #### `mlx-community/paligemma2-3b-ft-docci-448-bf16`
 
-Traceback:
+Traceback tail:
 
 ```text
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1055, in process_inputs_with_fallback
-    return process_inputs(
-        processor,
-    ...<5 lines>...
-        **kwargs,
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1041, in process_inputs
-    return process_method(**args)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/paligemma/processing_paligemma.py", line 270, in __call__
-    pixel_values = self.image_processor(images, **kwargs)["pixel_values"]
-                   ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils.py", line 217, in __call__
-    return self.preprocess(images, *args, **kwargs)
-           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils.py", line 388, in preprocess
-    validate_typed_dict(self.valid_kwargs, kwargs)
-    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/dataclasses.py", line 337, in validate_typed_dict
-    strict_cls(**data)  # will raise if validation fails
-    ~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/dataclasses.py", line 279, in init_with_validate
-    initial_init(self, *args, **kwargs)  # type: ignore [call-arg]
-    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
-TypeError: ImagesKwargs.__init__() got an unexpected keyword argument 'padding'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 696, in generate
-    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
-                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 539, in stream_generate
-    inputs = prepare_inputs(
-        processor,
-    ...<6 lines>...
-        **kwargs,
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1273, in prepare_inputs
-    inputs = process_inputs_with_fallback(
-        processor,
-    ...<4 lines>...
-        **kwargs,
-    )
   File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1065, in process_inputs_with_fallback
     raise ValueError(f"Failed to process inputs with error: {e}")
 ValueError: Failed to process inputs with error: ImagesKwargs.__init__() got an unexpected keyword argument 'padding'
-
 The above exception was the direct cause of the following exception:
-
 Traceback (most recent call last):
 ValueError: Model generation failed for mlx-community/paligemma2-3b-ft-docci-448-bf16: Failed to process inputs with error: ImagesKwargs.__init__() got an unexpected keyword argument 'padding'
 ```
@@ -448,7 +205,7 @@ Captured stdout/stderr:
 ```text
 === STDOUT ===
 ==========
-Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '3', '2', '1', '-', '1', '6', '4', '2', '4', '4', '_', 'D', 'S', 'C', '0', '9', '4', '5', '9', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g'] 
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '3', '2', '1', '-', '1', '6', '4', '2', '4', '4', '_', 'D', 'S', 'C', '0', '9', '4', '5', '9', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
 
 Prompt: <image>Analyze this image for cataloguing metadata, using British English.
 
@@ -485,258 +242,11 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 - Capture metadata: Taken on 2026-03-21 16:42:44 GMT (at 16:42:44 local time). GPS: 51.532500°N, 0.122500°W.
 
 === STDERR ===
-Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-
-Fetching 8 files:   0%|          | 0/8 [00:00<?, ?it/s]
-Fetching 8 files: 100%|##########| 8/8 [00:00<00:00, 14339.50it/s]
-
-Download complete: : 0.00B [00:00, ?B/s]              
-Download complete: : 0.00B [00:00, ?B/s]
 ```
 
 </details>
 
 ## 3. Failure affecting 1 model (Priority: Medium)
-
-**Observed behavior:** Failed to process inputs with error: object of type 'numpy.int64' has no len()
-**Owner (likely component):** `mlx-vlm`
-**Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Affected model:** `mlx-community/LFM2-VL-1.6B-8bit`
-
-| Model | Observed Behavior | First Seen Failing | Recent Repro |
-| ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/LFM2-VL-1.6B-8bit` | Failed to process inputs with error: object of type 'numpy.int64' has no len() | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
-
-### To reproduce
-
-- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260321-164244_DSC09459_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/LFM2-VL-1.6B-8bit`
-
-<details>
-<summary>Detailed trace logs (affected model)</summary>
-
-#### `mlx-community/LFM2-VL-1.6B-8bit`
-
-Traceback:
-
-```text
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1055, in process_inputs_with_fallback
-    return process_inputs(
-        processor,
-    ...<5 lines>...
-        **kwargs,
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1041, in process_inputs
-    return process_method(**args)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/lfm2_vl/processing_lfm2_vl.py", line 313, in _patched_call
-    num_rows = rows[i] if i < len(rows) else rows[0]
-                              ~~~^^^^^^
-TypeError: object of type 'numpy.int64' has no len()
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 696, in generate
-    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
-                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 539, in stream_generate
-    inputs = prepare_inputs(
-        processor,
-    ...<6 lines>...
-        **kwargs,
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1273, in prepare_inputs
-    inputs = process_inputs_with_fallback(
-        processor,
-    ...<4 lines>...
-        **kwargs,
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1065, in process_inputs_with_fallback
-    raise ValueError(f"Failed to process inputs with error: {e}")
-ValueError: Failed to process inputs with error: object of type 'numpy.int64' has no len()
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-ValueError: Model generation failed for mlx-community/LFM2-VL-1.6B-8bit: Failed to process inputs with error: object of type 'numpy.int64' has no len()
-```
-
-Captured stdout/stderr:
-
-```text
-=== STDOUT ===
-==========
-Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '3', '2', '1', '-', '1', '6', '4', '2', '4', '4', '_', 'D', 'S', 'C', '0', '9', '4', '5', '9', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g'] 
-
-Prompt: <|startoftext|><|im_start|>user
-<image>Analyze this image for cataloguing metadata, using British English.
-
-Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
-
-Treat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.
-
-Return exactly these three sections, and nothing else:
-
-Title:
-- 5-10 words, concrete and factual, limited to clearly visible content.
-- Output only the title text after the label.
-- Do not repeat or paraphrase these instructions in the title.
-
-Description:
-- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.
-- Output only the description text after the label.
-
-Keywords:
-- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.
-- Output only the keyword list after the label.
-
-Rules:
-- Include only details that are definitely visible in the image.
-- Reuse metadata terms only when they are clearly supported by the image.
-- If metadata and image disagree, follow the image.
-- Prefer omission to speculation.
-- Do not copy prompt instructions into the Title, Description, or Keywords fields.
-- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.
-- Do not output reasoning, notes, hedging, or extra sections.
-
-Context: Existing metadata hints (high confidence; use only when visually confirmed):
-- Description hint: A large brick former warehouse, the London Canal Museum, stands beside the Regent's Canal in King's Cross, London, on a sunny spring day. Several narrowboats are moored along the towpath, their reflections visible in the calm water. White blossoms in the foreground frame the tranquil urban scene.
-- Capture metadata: Taken on 2026-03-21 16:42:44 GMT (at 16:42:44 local time). GPS: 51.532500°N, 0.122500°W.<|im_end|>
-<|im_start|>assistant
-
-=== STDERR ===
-Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-
-Fetching 12 files:   0%|          | 0/12 [00:00<?, ?it/s]
-Fetching 12 files: 100%|##########| 12/12 [00:00<00:00, 13938.42it/s]
-
-Download complete: : 0.00B [00:00, ?B/s]              
-Download complete: : 0.00B [00:00, ?B/s]
-```
-
-</details>
-
-## 4. Failure affecting 1 model (Priority: Medium)
-
-**Observed behavior:** Failed to process inputs with error: object of type 'numpy.int64' has no len()
-**Owner (likely component):** `mlx-vlm`
-**Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Affected model:** `mlx-community/LFM2.5-VL-1.6B-bf16`
-
-| Model | Observed Behavior | First Seen Failing | Recent Repro |
-| ----- | ----------------- | ------------------ | ------------ |
-| `mlx-community/LFM2.5-VL-1.6B-bf16` | Failed to process inputs with error: object of type 'numpy.int64' has no len() | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
-
-### To reproduce
-
-- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260321-164244_DSC09459_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/LFM2.5-VL-1.6B-bf16`
-
-<details>
-<summary>Detailed trace logs (affected model)</summary>
-
-#### `mlx-community/LFM2.5-VL-1.6B-bf16`
-
-Traceback:
-
-```text
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1055, in process_inputs_with_fallback
-    return process_inputs(
-        processor,
-    ...<5 lines>...
-        **kwargs,
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1041, in process_inputs
-    return process_method(**args)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/lfm2_vl/processing_lfm2_vl.py", line 313, in _patched_call
-    num_rows = rows[i] if i < len(rows) else rows[0]
-                              ~~~^^^^^^
-TypeError: object of type 'numpy.int64' has no len()
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 696, in generate
-    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
-                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 539, in stream_generate
-    inputs = prepare_inputs(
-        processor,
-    ...<6 lines>...
-        **kwargs,
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1273, in prepare_inputs
-    inputs = process_inputs_with_fallback(
-        processor,
-    ...<4 lines>...
-        **kwargs,
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1065, in process_inputs_with_fallback
-    raise ValueError(f"Failed to process inputs with error: {e}")
-ValueError: Failed to process inputs with error: object of type 'numpy.int64' has no len()
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-ValueError: Model generation failed for mlx-community/LFM2.5-VL-1.6B-bf16: Failed to process inputs with error: object of type 'numpy.int64' has no len()
-```
-
-Captured stdout/stderr:
-
-```text
-=== STDOUT ===
-==========
-Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '3', '2', '1', '-', '1', '6', '4', '2', '4', '4', '_', 'D', 'S', 'C', '0', '9', '4', '5', '9', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g'] 
-
-Prompt: <|startoftext|><|im_start|>user
-<image>Analyze this image for cataloguing metadata, using British English.
-
-Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
-
-Treat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.
-
-Return exactly these three sections, and nothing else:
-
-Title:
-- 5-10 words, concrete and factual, limited to clearly visible content.
-- Output only the title text after the label.
-- Do not repeat or paraphrase these instructions in the title.
-
-Description:
-- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.
-- Output only the description text after the label.
-
-Keywords:
-- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.
-- Output only the keyword list after the label.
-
-Rules:
-- Include only details that are definitely visible in the image.
-- Reuse metadata terms only when they are clearly supported by the image.
-- If metadata and image disagree, follow the image.
-- Prefer omission to speculation.
-- Do not copy prompt instructions into the Title, Description, or Keywords fields.
-- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.
-- Do not output reasoning, notes, hedging, or extra sections.
-
-Context: Existing metadata hints (high confidence; use only when visually confirmed):
-- Description hint: A large brick former warehouse, the London Canal Museum, stands beside the Regent's Canal in King's Cross, London, on a sunny spring day. Several narrowboats are moored along the towpath, their reflections visible in the calm water. White blossoms in the foreground frame the tranquil urban scene.
-- Capture metadata: Taken on 2026-03-21 16:42:44 GMT (at 16:42:44 local time). GPS: 51.532500°N, 0.122500°W.<|im_end|>
-<|im_start|>assistant
-
-=== STDERR ===
-Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-
-Fetching 8 files:   0%|          | 0/8 [00:00<?, ?it/s]
-Fetching 8 files: 100%|##########| 8/8 [00:00<00:00, 50994.58it/s]
-
-Download complete: : 0.00B [00:00, ?B/s]              
-Download complete: : 0.00B [00:00, ?B/s]
-```
-
-</details>
-
-## 5. Failure affecting 1 model (Priority: Medium)
 
 **Observed behavior:** Loaded processor has no image_processor; expected multimodal processor.
 **Owner (likely component):** `model configuration/repository`
@@ -749,21 +259,20 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 ### To reproduce
 
-- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260321-164244_DSC09459_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/MolmoPoint-8B-fp16`
+- Exact model-specific repro command appears below in the `Reproducibility` section under `Target specific failing models`.
+- Representative failing model: `mlx-community/MolmoPoint-8B-fp16`
 
 <details>
 <summary>Detailed trace logs (affected model)</summary>
 
 #### `mlx-community/MolmoPoint-8B-fp16`
 
-Traceback:
+Traceback tail:
 
 ```text
 Traceback (most recent call last):
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
-
 The above exception was the direct cause of the following exception:
-
 Traceback (most recent call last):
 ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -772,20 +281,14 @@ Captured stdout/stderr:
 
 ```text
 === STDERR ===
-Downloading (incomplete total...): 0.00B [00:00, ?B/s]
 
-Fetching 26 files:   0%|          | 0/26 [00:00<?, ?it/s]
-Fetching 26 files: 100%|##########| 26/26 [00:00<00:00, 7992.66it/s]
-
-Download complete: : 0.00B [00:00, ?B/s]              
-Download complete: : 0.00B [00:00, ?B/s]
 /Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/modeling_rope_utils.py:935: FutureWarning: `rope_config_validation` is deprecated and has been removed. Its functionality has been moved to RotaryEmbeddingConfigMixin.validate_rope method. PreTrainedConfig inherits this class, so please call self.validate_rope() instead. Also, make sure to use the new rope_parameters syntax. You can call self.standardize_rope_params() in the meantime.
   warnings.warn(
 ```
 
 </details>
 
-## 6. Failure affecting 1 model (Priority: Medium)
+## 4. Failure affecting 1 model (Priority: Medium)
 
 **Observed behavior:** Loaded processor has no image_processor; expected multimodal processor.
 **Owner (likely component):** `model configuration/repository`
@@ -798,21 +301,20 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 ### To reproduce
 
-- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260321-164244_DSC09459_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit`
+- Exact model-specific repro command appears below in the `Reproducibility` section under `Target specific failing models`.
+- Representative failing model: `mlx-community/deepseek-vl2-8bit`
 
 <details>
 <summary>Detailed trace logs (affected model)</summary>
 
 #### `mlx-community/deepseek-vl2-8bit`
 
-Traceback:
+Traceback tail:
 
 ```text
 Traceback (most recent call last):
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
-
 The above exception was the direct cause of the following exception:
-
 Traceback (most recent call last):
 ValueError: Model preflight failed for mlx-community/deepseek-vl2-8bit: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -829,18 +331,11 @@ Added grounding-related tokens
 Added chat tokens
 
 === STDERR ===
-Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-
-Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]
-Fetching 13 files: 100%|##########| 13/13 [00:00<00:00, 58316.53it/s]
-
-Download complete: : 0.00B [00:00, ?B/s]              
-Download complete: : 0.00B [00:00, ?B/s]
 ```
 
 </details>
 
-## 7. Failure affecting 1 model (Priority: Medium)
+## 5. Failure affecting 1 model (Priority: Medium)
 
 **Observed behavior:** Failed to process inputs with error: ImagesKwargs.\_\_init\_\_() got an unexpected keyword argument 'padding'
 **Owner (likely component):** `transformers`
@@ -853,66 +348,21 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 ### To reproduce
 
-- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260321-164244_DSC09459_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/paligemma2-10b-ft-docci-448-6bit`
+- Exact model-specific repro command appears below in the `Reproducibility` section under `Target specific failing models`.
+- Representative failing model: `mlx-community/paligemma2-10b-ft-docci-448-6bit`
 
 <details>
 <summary>Detailed trace logs (affected model)</summary>
 
 #### `mlx-community/paligemma2-10b-ft-docci-448-6bit`
 
-Traceback:
+Traceback tail:
 
 ```text
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1055, in process_inputs_with_fallback
-    return process_inputs(
-        processor,
-    ...<5 lines>...
-        **kwargs,
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1041, in process_inputs
-    return process_method(**args)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/paligemma/processing_paligemma.py", line 270, in __call__
-    pixel_values = self.image_processor(images, **kwargs)["pixel_values"]
-                   ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils.py", line 217, in __call__
-    return self.preprocess(images, *args, **kwargs)
-           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils.py", line 388, in preprocess
-    validate_typed_dict(self.valid_kwargs, kwargs)
-    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/dataclasses.py", line 337, in validate_typed_dict
-    strict_cls(**data)  # will raise if validation fails
-    ~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/dataclasses.py", line 279, in init_with_validate
-    initial_init(self, *args, **kwargs)  # type: ignore [call-arg]
-    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
-TypeError: ImagesKwargs.__init__() got an unexpected keyword argument 'padding'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 696, in generate
-    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
-                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 539, in stream_generate
-    inputs = prepare_inputs(
-        processor,
-    ...<6 lines>...
-        **kwargs,
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1273, in prepare_inputs
-    inputs = process_inputs_with_fallback(
-        processor,
-    ...<4 lines>...
-        **kwargs,
-    )
   File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1065, in process_inputs_with_fallback
     raise ValueError(f"Failed to process inputs with error: {e}")
 ValueError: Failed to process inputs with error: ImagesKwargs.__init__() got an unexpected keyword argument 'padding'
-
 The above exception was the direct cause of the following exception:
-
 Traceback (most recent call last):
 ValueError: Model generation failed for mlx-community/paligemma2-10b-ft-docci-448-6bit: Failed to process inputs with error: ImagesKwargs.__init__() got an unexpected keyword argument 'padding'
 ```
@@ -922,7 +372,7 @@ Captured stdout/stderr:
 ```text
 === STDOUT ===
 ==========
-Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '3', '2', '1', '-', '1', '6', '4', '2', '4', '4', '_', 'D', 'S', 'C', '0', '9', '4', '5', '9', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g'] 
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '3', '2', '1', '-', '1', '6', '4', '2', '4', '4', '_', 'D', 'S', 'C', '0', '9', '4', '5', '9', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
 
 Prompt: <image>Analyze this image for cataloguing metadata, using British English.
 
@@ -959,18 +409,11 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 - Capture metadata: Taken on 2026-03-21 16:42:44 GMT (at 16:42:44 local time). GPS: 51.532500°N, 0.122500°W.
 
 === STDERR ===
-Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-
-Fetching 8 files:   0%|          | 0/8 [00:00<?, ?it/s]
-Fetching 8 files: 100%|##########| 8/8 [00:00<00:00, 57065.36it/s]
-
-Download complete: : 0.00B [00:00, ?B/s]              
-Download complete: : 0.00B [00:00, ?B/s]
 ```
 
 </details>
 
-## 8. Failure affecting 1 model (Priority: Medium)
+## 6. Failure affecting 1 model (Priority: Medium)
 
 **Observed behavior:** Failed to process inputs with error: ImagesKwargs.\_\_init\_\_() got an unexpected keyword argument 'padding'
 **Owner (likely component):** `transformers`
@@ -983,66 +426,21 @@ Download complete: : 0.00B [00:00, ?B/s]
 
 ### To reproduce
 
-- Repro command (exact run): `python -m check_models --image /Users/jrp/Pictures/Processed/20260321-164244_DSC09459_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/paligemma2-3b-pt-896-4bit`
+- Exact model-specific repro command appears below in the `Reproducibility` section under `Target specific failing models`.
+- Representative failing model: `mlx-community/paligemma2-3b-pt-896-4bit`
 
 <details>
 <summary>Detailed trace logs (affected model)</summary>
 
 #### `mlx-community/paligemma2-3b-pt-896-4bit`
 
-Traceback:
+Traceback tail:
 
 ```text
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1055, in process_inputs_with_fallback
-    return process_inputs(
-        processor,
-    ...<5 lines>...
-        **kwargs,
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1041, in process_inputs
-    return process_method(**args)
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/paligemma/processing_paligemma.py", line 270, in __call__
-    pixel_values = self.image_processor(images, **kwargs)["pixel_values"]
-                   ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils.py", line 217, in __call__
-    return self.preprocess(images, *args, **kwargs)
-           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/image_processing_utils.py", line 388, in preprocess
-    validate_typed_dict(self.valid_kwargs, kwargs)
-    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/dataclasses.py", line 337, in validate_typed_dict
-    strict_cls(**data)  # will raise if validation fails
-    ~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/dataclasses.py", line 279, in init_with_validate
-    initial_init(self, *args, **kwargs)  # type: ignore [call-arg]
-    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
-TypeError: ImagesKwargs.__init__() got an unexpected keyword argument 'padding'
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 696, in generate
-    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):
-                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py", line 539, in stream_generate
-    inputs = prepare_inputs(
-        processor,
-    ...<6 lines>...
-        **kwargs,
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1273, in prepare_inputs
-    inputs = process_inputs_with_fallback(
-        processor,
-    ...<4 lines>...
-        **kwargs,
-    )
   File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 1065, in process_inputs_with_fallback
     raise ValueError(f"Failed to process inputs with error: {e}")
 ValueError: Failed to process inputs with error: ImagesKwargs.__init__() got an unexpected keyword argument 'padding'
-
 The above exception was the direct cause of the following exception:
-
 Traceback (most recent call last):
 ValueError: Model generation failed for mlx-community/paligemma2-3b-pt-896-4bit: Failed to process inputs with error: ImagesKwargs.__init__() got an unexpected keyword argument 'padding'
 ```
@@ -1052,7 +450,7 @@ Captured stdout/stderr:
 ```text
 === STDOUT ===
 ==========
-Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '3', '2', '1', '-', '1', '6', '4', '2', '4', '4', '_', 'D', 'S', 'C', '0', '9', '4', '5', '9', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g'] 
+Files: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '3', '2', '1', '-', '1', '6', '4', '2', '4', '4', '_', 'D', 'S', 'C', '0', '9', '4', '5', '9', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g']
 
 Prompt: <image>Analyze this image for cataloguing metadata, using British English.
 
@@ -1089,13 +487,6 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 - Capture metadata: Taken on 2026-03-21 16:42:44 GMT (at 16:42:44 local time). GPS: 51.532500°N, 0.122500°W.
 
 === STDERR ===
-Downloading (incomplete total...): 0.00B [00:00, ?B/s]
-
-Fetching 7 files:   0%|          | 0/7 [00:00<?, ?it/s]
-Fetching 7 files: 100%|##########| 7/7 [00:00<00:00, 15355.72it/s]
-
-Download complete: : 0.00B [00:00, ?B/s]              
-Download complete: : 0.00B [00:00, ?B/s]
 ```
 
 </details>
@@ -1195,19 +586,23 @@ Title:ĠLondonĠCanalĠMuseumĠbyĠRegent'sĠCanalĊĊDescription:ĠAĠlargeĠbr
 
 ### `mlx-community/Qwen2-VL-2B-Instruct-4bit`
 
-**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
+**What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
 **Likely component:** `model-config / mlx-vlm`
 **Suggested next action:** validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
-**Token summary:** prompt=0, output=0, output/prompt=n/a
+**Token summary:** prompt=16,734, output=4, output/prompt=0.02%
 
 **Why this appears to be an integration/runtime issue:**
 
-- Model returned zero output tokens.
+- Special control token &lt;|endoftext|&gt; appeared in generated text.
+- Output appears truncated to about 4 tokens.
+- At long prompt length (16734 tokens), output stayed unusually short (4 tokens; ratio 0.0%).
+- Model output may not follow prompt or image contents.
+- Output switched language/script unexpectedly.
 
 **Sample output:**
 
 ```text
-<empty output>
+<|endoftext|><|endoftext|><|endoftext|>
 ```
 
 ### `mlx-community/Qwen3-VL-2B-Thinking-bf16`
@@ -1324,13 +719,11 @@ Recent reproducibility is measured from history (up to last 3 runs where each
 model appears).
 
 **Regressions since previous run:** none
-**Recoveries since previous run:** `mlx-community/FastVLM-0.5B-bf16`
+**Recoveries since previous run:** `mlx-community/LFM2-VL-1.6B-8bit`, `mlx-community/LFM2.5-VL-1.6B-bf16`
 
 | Model | Status vs Previous Run | First Seen Failing | Recent Repro |
 | ----- | ---------------------- | ------------------ | ------------ |
 | `microsoft/Florence-2-large-ft` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
-| `mlx-community/LFM2-VL-1.6B-8bit` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
-| `mlx-community/LFM2.5-VL-1.6B-bf16` | still failing | 2026-02-07 20:59:01 GMT | 3/3 recent runs failed |
 | `mlx-community/MolmoPoint-8B-fp16` | still failing | 2026-03-27 13:06:07 GMT | 3/3 recent runs failed |
 | `mlx-community/deepseek-vl2-8bit` | still failing | 2026-02-15 03:27:34 GMT | 3/3 recent runs failed |
 | `mlx-community/paligemma2-10b-ft-docci-448-6bit` | still failing | 2026-03-27 13:06:07 GMT | 3/3 recent runs failed |
@@ -1343,22 +736,22 @@ model appears).
 
 ## Coverage & Runtime Metrics
 
-- **Detailed diagnostics models:** 19
-- **Summary diagnostics models:** 33
+- **Detailed diagnostics models:** 17
+- **Summary diagnostics models:** 35
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1019.41s (1019.41s)
-- **Average runtime per model:** 19.60s (19.60s)
-- **Dominant runtime phase:** decode dominated 42/52 measured model runs (89% of tracked runtime).
-- **Phase totals:** model load=101.19s, prompt prep=0.12s, decode=901.87s, cleanup=5.23s
-- **Observed stop reasons:** completed=42, exception=10
-- **Validation overhead:** 15.98s total (avg 0.31s across 52 model(s)).
-- **First-token latency:** Avg 10.66s | Min 0.13s | Max 82.56s across 41 model(s).
+- **Total model runtime (sum):** 936.31s (936.31s)
+- **Average runtime per model:** 18.01s (18.01s)
+- **Dominant runtime phase:** decode dominated 44/52 measured model runs (89% of tracked runtime).
+- **Phase totals:** model load=98.22s, prompt prep=0.11s, decode=822.04s, cleanup=5.05s
+- **Observed stop reasons:** completed=44, exception=8
+- **Validation overhead:** 15.71s total (avg 0.30s across 52 model(s)).
+- **First-token latency:** Avg 9.59s | Min 0.08s | Max 64.35s across 44 model(s).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
 ---
 
-## Models Not Flagged (33 model(s))
+## Models Not Flagged (35 model(s))
 
 These models completed without diagnostics flags (no hard failure, harness
 warning, or stack-signal anomaly).
@@ -1369,7 +762,7 @@ warning, or stack-signal anomaly).
 - `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`
 - `mlx-community/gemma-3-27b-it-qat-8bit`
 
-### Ran, but with quality warnings (30 model(s))
+### Ran, but with quality warnings (32 model(s))
 
 - `HuggingFaceTB/SmolVLM-Instruct`: Model output may not follow prompt or image contents.
 - `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: Model output may not follow prompt or image contents.
@@ -1385,9 +778,11 @@ warning, or stack-signal anomaly).
 - `mlx-community/InternVL3-8B-bf16`: Model output may not follow prompt or image contents.
 - `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`: Model output may not follow prompt or image contents.
 - `mlx-community/Kimi-VL-A3B-Thinking-8bit`: Model output may not follow prompt or image contents.
+- `mlx-community/LFM2-VL-1.6B-8bit`: Output omitted required Title/Description/Keywords sections.
+- `mlx-community/LFM2.5-VL-1.6B-bf16`: Output appears to copy prompt context verbatim.
 - `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: Output became repetitive, indicating possible generation instability.
 - `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: Description sentence violation (3; expected 1-2)
-- `mlx-community/Molmo-7B-D-0924-8bit`: Output became repetitive, indicating possible generation instability.
+- `mlx-community/Molmo-7B-D-0924-8bit`: Output omitted required Title/Description/Keywords sections.
 - `mlx-community/Molmo-7B-D-0924-bf16`: Model output may not follow prompt or image contents.
 - `mlx-community/Phi-3.5-vision-instruct-bf16`: Output appears to copy prompt context verbatim.
 - `mlx-community/Qwen3.5-27B-mxfp8`: Model refused or deflected the requested task.
@@ -1409,7 +804,7 @@ warning, or stack-signal anomaly).
 | Component | Version |
 | --------- | ------- |
 | mlx-vlm | 0.4.1 |
-| mlx | 0.31.2.dev20260327+0ff1115a |
+| mlx | 0.31.2.dev20260328+0ff1115a |
 | mlx-lm | 0.31.2 |
 | transformers | 5.4.0 |
 | tokenizers | 0.22.2 |
@@ -1461,8 +856,6 @@ for each failing model.
 
 ```bash
 python -m check_models --image /Users/jrp/Pictures/Processed/20260321-164244_DSC09459_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft
-python -m check_models --image /Users/jrp/Pictures/Processed/20260321-164244_DSC09459_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/LFM2-VL-1.6B-8bit
-python -m check_models --image /Users/jrp/Pictures/Processed/20260321-164244_DSC09459_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/LFM2.5-VL-1.6B-bf16
 python -m check_models --image /Users/jrp/Pictures/Processed/20260321-164244_DSC09459_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/MolmoPoint-8B-fp16
 python -m check_models --image /Users/jrp/Pictures/Processed/20260321-164244_DSC09459_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/deepseek-vl2-8bit
 python -m check_models --image /Users/jrp/Pictures/Processed/20260321-164244_DSC09459_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/paligemma2-10b-ft-docci-448-6bit
@@ -1515,4 +908,4 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 - Input image: `/Users/jrp/Pictures/Processed/20260321-164244_DSC09459_DxO.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-03-27 23:26:59 GMT by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-03-28 11:07:10 GMT by [check_models](https://github.com/jrp2014/check_models)._

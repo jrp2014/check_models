@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-03-27 23:09:52 GMT
+FULL ENVIRONMENT DUMP - 2026-03-28 10:51:27 GMT
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -35,7 +35,7 @@ fastapi==0.135.2
 filelock==3.25.2
 flatbuffers==25.12.19
 frozenlist==1.8.0
-fsspec==2026.2.0
+fsspec==2026.3.0
 gast==0.7.0
 google-pasta==0.2.0
 grpcio==1.78.0
@@ -57,8 +57,8 @@ MarkupSafe==3.0.3
 mdurl==0.1.2
 miniaudio==1.61
 ml_dtypes==0.5.4
-mlx==0.31.2.dev20260327+0ff1115a
-mlx==0.31.2.dev20260327+0ff1115a
+mlx==0.31.2.dev20260328+0ff1115a
+mlx==0.31.2.dev20260328+0ff1115a
 mlx-lm==0.31.2
 mlx-vlm==0.4.1
 mpmath==1.3.0
@@ -144,5 +144,5 @@ yarl==1.23.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-03-27 23:09:52 GMT
+Environment dump completed at 2026-03-28 10:51:27 GMT
 ================================================================================
