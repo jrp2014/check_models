@@ -159,6 +159,8 @@ def test_markdownlint_cli2_is_pinned_repo_local_and_updateable() -> None:
 
     markdownlint_spec = package_json["devDependencies"]["markdownlint-cli2"]
     assert markdownlint_spec == package_lock["packages"][""]["devDependencies"]["markdownlint-cli2"]
+    assert package_json["overrides"]["smol-toml"] == "1.6.1"
+    assert package_lock["packages"]["node_modules/smol-toml"]["version"] == "1.6.1"
 
     update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
     assert (

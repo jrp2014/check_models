@@ -9,7 +9,10 @@ Notable changes to this project will be documented in this file.
 - Bumped the repo-local `markdownlint-cli2` npm tooling in `src/package.json`
   and `src/package-lock.json` to `0.22.0`, and changed `src/tools/update.sh`
   to refresh that tool from npm's `latest` tag on each update run so Markdown
-  lint tooling stays current automatically.
+  lint tooling stays current automatically. Added an npm override for
+  `smol-toml@1.6.1` as well, so the current latest `markdownlint-cli2`
+  dependency tree is patched against the published moderate-severity TOML
+  parser DoS advisory without downgrading the linter.
 - Made protocol method bodies in `src/check_models.py` explicit stub
   implementations (`...`) instead of docstring-only placeholders so Pylance and
   other control-flow checkers no longer misread those type-only call surfaces
