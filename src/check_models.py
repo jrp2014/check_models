@@ -1025,9 +1025,11 @@ class SupportsTextDecoder(Protocol):
 
     def decode(self, *args: object, **kwargs: object) -> object:
         """Decode one token sequence."""
+        ...
 
     def batch_decode(self, *args: object, **kwargs: object) -> object:
         """Decode one or more token sequences."""
+        ...
 
 
 class LoadCallable(Protocol):
@@ -1044,6 +1046,7 @@ class LoadCallable(Protocol):
         **kwargs: object,
     ) -> tuple[Module, ProcessorMixin]:
         """Load an MLX-VLM model and processor."""
+        ...
 
 
 class ApplyChatTemplateCallable(Protocol):
@@ -1061,6 +1064,7 @@ class ApplyChatTemplateCallable(Protocol):
         **kwargs: Unpack[ChatTemplateKwargs],
     ) -> str | list[dict[str, object]] | object:
         """Apply an upstream chat template to a prompt payload."""
+        ...
 
 
 class StrictGenerateCallable(Protocol):
@@ -1087,6 +1091,7 @@ class StrictGenerateCallable(Protocol):
         **kwargs: Unpack[GenerateExtraKwargs],
     ) -> GenerationResult:
         """Generate a caption/response with the known CLI-controlled kwargs."""
+        ...
 
 
 class LoadImageCallable(Protocol):
@@ -1094,6 +1099,7 @@ class LoadImageCallable(Protocol):
 
     def __call__(self, image_source: str | Path | io.BytesIO, timeout: int = 10) -> object:
         """Load an image from a path or URL."""
+        ...
 
 
 if TYPE_CHECKING:
@@ -1159,6 +1165,7 @@ class SupportsExifIfd(Protocol):
 
     def get_ifd(self, tag: object) -> Mapping[object, object] | None:
         """Retrieve a nested IFD mapping by tag identifier."""
+        ...
 
 
 # =============================================================================

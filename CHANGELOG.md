@@ -6,6 +6,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Made protocol method bodies in `src/check_models.py` explicit stub
+  implementations (`...`) instead of docstring-only placeholders so Pylance and
+  other control-flow checkers no longer misread those type-only call surfaces
+  as returning `None`.
 - Added `pydantic` to the managed `dev` dependency group in
   `src/pyproject.toml` and aligned the `src/tools/setup_conda_env.sh`
   fallback installer so repo update/bootstrap flows keep it current through the
