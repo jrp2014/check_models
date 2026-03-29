@@ -152,6 +152,20 @@ def test_pydantic_is_managed_as_a_dev_dependency() -> None:
     assert '"pydantic>=2.0.0"' in setup_script
 
 
+def test_markdownlint_cli2_is_pinned_repo_local_and_updateable() -> None:
+    """Keep markdownlint-cli2 aligned between npm metadata and update tooling."""
+    package_json = json.loads((PKG_ROOT / "package.json").read_text(encoding="utf-8"))
+    package_lock = json.loads((PKG_ROOT / "package-lock.json").read_text(encoding="utf-8"))
+
+    markdownlint_spec = package_json["devDependencies"]["markdownlint-cli2"]
+    assert markdownlint_spec == package_lock["packages"][""]["devDependencies"]["markdownlint-cli2"]
+
+    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+    assert (
+        'npm install --prefix "$PROJECT_ROOT" --save-dev markdownlint-cli2@latest' in update_script
+    )
+
+
 def test_stub_refresh_reason_is_none_for_fresh_manifest(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

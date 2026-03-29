@@ -1,13 +1,13 @@
 # Automated Review Digest
 
-_Generated on 2026-03-28 23:42:42 GMT_
+_Generated on 2026-03-29 00:04:25 GMT_
 
 Trusted-hint review uses only prompt title/description/keyword hints for utility comparison. Capture metadata, GPS, timestamps, source labels, and location labels are treated as nonvisual metadata and are not required visual evidence.
 
 _Review artifacts:_
 
 - _Standalone output gallery:_ [model_gallery.md](model_gallery.md)
-- _Canonical run log:_ [../../../../../../../../private/var/folders/tk/zd2fp8lj21l9h1l1hrs7pq800000gn/T/pytest-of-jrp/pytest-43/test_invalid_model_produces_er0/output/e2e.log](../../../../../../../../private/var/folders/tk/zd2fp8lj21l9h1l1hrs7pq800000gn/T/pytest-of-jrp/pytest-43/test_invalid_model_produces_er0/output/e2e.log)
+- _Canonical run log:_ [../../../../../../../../private/var/folders/tk/zd2fp8lj21l9h1l1hrs7pq800000gn/T/pytest-of-jrp/pytest-50/test_invalid_model_produces_er0/output/e2e.log](../../../../../../../../private/var/folders/tk/zd2fp8lj21l9h1l1hrs7pq800000gn/T/pytest-of-jrp/pytest-50/test_invalid_model_produces_er0/output/e2e.log)
 
 ## Maintainer Queue
 

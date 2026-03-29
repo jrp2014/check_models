@@ -6,6 +6,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Bumped the repo-local `markdownlint-cli2` npm tooling in `src/package.json`
+  and `src/package-lock.json` to `0.22.0`, and changed `src/tools/update.sh`
+  to refresh that tool from npm's `latest` tag on each update run so Markdown
+  lint tooling stays current automatically.
 - Made protocol method bodies in `src/check_models.py` explicit stub
   implementations (`...`) instead of docstring-only placeholders so Pylance and
   other control-flow checkers no longer misread those type-only call surfaces

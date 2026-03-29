@@ -135,8 +135,8 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Repo-local markdownlint tools (if npm is available)
 if command -v npm >/dev/null 2>&1; then
-	echo "[update.sh] Installing repo-local markdownlint tools..."
-	npm install --prefix "$PROJECT_ROOT"
+	echo "[update.sh] Updating repo-local markdownlint-cli2 to the latest npm release..."
+	npm install --prefix "$PROJECT_ROOT" --save-dev markdownlint-cli2@latest
 	echo "[update.sh] repo-local npm tooling is up to date"
 else
 	echo "[update.sh] npm not found; skipping repo-local markdownlint install"

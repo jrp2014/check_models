@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-_Generated on 2026-03-28 23:42:42 GMT_
+_Generated on 2026-03-29 00:04:25 GMT_
 
 A review-friendly artifact with image metadata, the source prompt, and full
 generated output for each model.
@@ -18,9 +18,9 @@ generated output for each model.
 - _Escalate only if:_ they line up with unexpected TF/Flax/JAX imports,
   startup hangs, or backend/runtime crashes.
 - _Quality signal frequency:_ none.
-- _Runtime pattern:_ model load dominates measured phase time (80%; 1/1
+- _Runtime pattern:_ model load dominates measured phase time (64%; 1/1
   measured model(s)).
-- _Phase totals:_ model load=0.24s, cleanup=0.06s.
+- _Phase totals:_ model load=0.10s, cleanup=0.06s.
 - _What this likely means:_ Cold model load time is a major share of runtime
   for this cohort.
 - _Suggested next action:_ Consider staged runs, model reuse, or narrowing the
@@ -38,13 +38,13 @@ generated output for each model.
 #### huggingface-hub
 
 - nonexistent/fake-model-12345 (Model Error)
-  - Error: `Model loading failed: 404 Client Error. (Request ID: Root=1-69c86772-6953371c082dcec05df0a785;a30a60d9-9930-4cbc-994c...`
+  - Error: `Model loading failed: 404 Client Error. (Request ID: Root=1-69c86c89-4c4f0a50422b4cf75ffdabe0;d1728048-f8c4-4010-a1df...`
   - Type: `ValueError`
 
 ## Image Metadata
 
-- _Date:_ 2026-03-28 23:42:42 GMT
-- _Time:_ 23:42:42
+- _Date:_ 2026-03-29 00:04:25 GMT
+- _Time:_ 00:04:25
 
 ## Prompt
 
@@ -90,7 +90,7 @@ generated output for each model.
 > intent unless visually obvious.
 > \- Do not output reasoning, notes, hedging, or extra sections.
 >
-> Capture metadata hints: Taken on 2026-03-28 23:42:42 GMT (at 23:42:42 local
+> Capture metadata hints: Taken on 2026-03-29 00:04:25 GMT (at 00:04:25 local
 > time).
 <!-- markdownlint-enable MD028 -->
 
@@ -123,7 +123,7 @@ _Status:_ Failed (Model Error)
 _Error:_
 
 > Model loading failed: 404 Client Error. (Request ID:
-> Root=1-69c86772-6953371c082dcec05df0a785;a30a60d9-9930-4cbc-994c-e35cbd820a17)
+> Root=1-69c86c89-4c4f0a50422b4cf75ffdabe0;d1728048-f8c4-4010-a1df-5c9bf4560fb2)
 > Repository Not Found for url:
 > <https://huggingface.co/api/models/nonexistent/fake-model-12345/revision/main.>
 > Please make sure you specified the correct `repo_id` and `repo_type`. If you
@@ -152,10 +152,10 @@ For more information check: https://developer.mozilla.org/en-US/docs/Web/HTTP/St
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13935, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13942, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13324, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13331, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -165,11 +165,11 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 392, in load
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 393, in load
     model_path = get_model_path(
         path_or_hf_repo, force_download=force_download, revision=revision
     )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 134, in get_model_path
+  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 135, in get_model_path
     snapshot_download(
     ~~~~~~~~~~~~~~~~~^
         repo_id=path_or_hf_repo,
@@ -200,7 +200,7 @@ Traceback (most recent call last):
     ~~~~~~~~~~~~~~~~~~~^^^
   File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/utils/_http.py", line 847, in hf_raise_for_status
     raise repo_err from e
-huggingface_hub.errors.RepositoryNotFoundError: 404 Client Error. (Request ID: Root=1-69c86772-6953371c082dcec05df0a785;a30a60d9-9930-4cbc-994c-e35cbd820a17)
+huggingface_hub.errors.RepositoryNotFoundError: 404 Client Error. (Request ID: Root=1-69c86c89-4c4f0a50422b4cf75ffdabe0;d1728048-f8c4-4010-a1df-5c9bf4560fb2)
 
 Repository Not Found for url: https://huggingface.co/api/models/nonexistent/fake-model-12345/revision/main.
 Please make sure you specified the correct `repo_id` and `repo_type`.
@@ -209,7 +209,7 @@ If you are trying to access a private or gated repo, make sure you are authentic
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14111, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14118, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -220,9 +220,9 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13945, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13952, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: 404 Client Error. (Request ID: Root=1-69c86772-6953371c082dcec05df0a785;a30a60d9-9930-4cbc-994c-e35cbd820a17)
+ValueError: Model loading failed: 404 Client Error. (Request ID: Root=1-69c86c89-4c4f0a50422b4cf75ffdabe0;d1728048-f8c4-4010-a1df-5c9bf4560fb2)
 
 Repository Not Found for url: https://huggingface.co/api/models/nonexistent/fake-model-12345/revision/main.
 Please make sure you specified the correct `repo_id` and `repo_type`.
