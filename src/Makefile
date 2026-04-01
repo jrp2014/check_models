@@ -184,7 +184,7 @@ ty: ## Ty type checking with resolved repo interpreter
 
 .PHONY: vulture
 vulture: ## Vulture dead-code scan (configured in pyproject.toml)
-	$(RUN_PY) -m vulture check_models.py
+	$(RUN_PY) -m vulture
 
 # Tests
 .PHONY: test

@@ -1140,7 +1140,7 @@ Key commands:
 - `make install` — install runtime package (`pip install -e src/`)
 - `make dev` — install dev setup (`pip install -e "src/[dev,extras,torch]"`)
 - `make test` — run pytest (`pytest src/tests/ -v`)
-- `make vulture` — run the configured dead-code scan for `src/check_models.py`
+- `make vulture` — run the configured dead-code scan for `src/check_models.py` and `src/tools/`
 - `make quality` — full gate (ruff format+lint, mypy, ty, pyrefly, vulture, pytest, shellcheck, markdownlint)
 - `make ci` — strict CI-style pipeline
 - `make deps-sync` — sync dependency blocks in docs from `pyproject.toml`
@@ -1148,9 +1148,11 @@ Key commands:
 - `make stubs` — regenerate local stubs in `typings/` (`mlx_lm`, `mlx_vlm`,
   `transformers`, `tokenizers`)
 
-In VS Code, run the checked-in `Make: vulture` or `Make: quality` task to map
-Vulture findings into `warning` entries in the Problems panel. The repo does
-not auto-run Vulture on save; rerun it after larger refactors or deletions.
+In VS Code, run the checked-in `Make: vulture` task to map Vulture findings
+into `warning` entries in the Problems panel. The repo does not attach the
+matcher to the broader `Make: quality` task, because mixed tool output can
+create noisy or stale Problems entries. The repo does not auto-run Vulture on
+save; rerun it after larger refactors or deletions.
 
 For package-local targets (for example `install-dev`, `bootstrap-dev`, `lint-fix`), run:
 

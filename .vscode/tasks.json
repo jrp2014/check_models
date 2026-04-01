@@ -9,23 +9,6 @@
 				"quality"
 			],
 			"group": "build",
-			"problemMatcher": [
-				{
-					"owner": "python",
-					"source": "vulture",
-					"severity": "warning",
-					"fileLocation": [
-						"relative",
-						"${workspaceFolder}/src"
-					],
-					"pattern": {
-						"regexp": "^(.+?):(\\d+): (.*)$",
-						"file": 1,
-						"line": 2,
-						"message": 3
-					}
-				}
-			],
 			"presentation": {
 				"reveal": "always",
 				"panel": "shared"
@@ -49,7 +32,7 @@
 						"${workspaceFolder}/src"
 					],
 					"pattern": {
-						"regexp": "^(.+?):(\\d+): (.*)$",
+						"regexp": "^(.+?):(\\d+): (.*\\(\\d+% confidence(?:, \\d+ lines?)?\\))$",
 						"file": 1,
 						"line": 2,
 						"message": 3
@@ -122,23 +105,7 @@
 				}
 			},
 			"isBackground": false,
-			"problemMatcher": [
-				{
-					"owner": "python",
-					"source": "vulture",
-					"severity": "warning",
-					"fileLocation": [
-						"relative",
-						"${workspaceFolder}/src"
-					],
-					"pattern": {
-						"regexp": "^(.+?):(\\d+): (.*)$",
-						"file": 1,
-						"line": 2,
-						"message": 3
-					}
-				}
-			],
+			"problemMatcher": [],
 			"group": "build"
 		},
 		{

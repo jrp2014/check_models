@@ -41,7 +41,7 @@ echo "=== Pyrefly Type Check ==="
 quality_run_python_tool pyrefly check check_models.py
 
 echo "=== Vulture Dead Code Check ==="
-quality_run_python_tool vulture check_models.py
+quality_run_python_tool vulture
 
 echo "=== Pytest (fast set) ==="
 "$QUALITY_PYTHON" -m pytest -q -m "not slow and not e2e"

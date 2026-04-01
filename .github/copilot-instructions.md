@@ -62,7 +62,7 @@ The file is organized in this order — use these landmarks to jump to the right
 | Target | What it does |
 | -------- | ------------- |
 | `make quality` | **Primary gate**: ruff format + lint + mypy + ty + pyrefly + vulture + pytest + shellcheck + markdownlint |
-| `make vulture` | Run Vulture dead-code scan. *Note: Vulture commonly flags `TypedDict` keys and `Protocol` signatures as "unused" because they are evaluated statically and not tracked natively in runtime logic flows. Treat these as false positives.* |
+| `make vulture` | Run Vulture dead-code scan for `src/check_models.py` and `src/tools/`. *Note: Vulture commonly flags `TypedDict` keys and `Protocol` signatures as "unused" because they are evaluated statically and not tracked natively in runtime logic flows. Treat these as false positives.* |
 | `make test` | `pytest src/tests/ -v` |
 | `make dev` | Install editable with `[dev,extras,torch]` |
 | `make install` | Install editable (runtime only) |

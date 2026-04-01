@@ -166,13 +166,13 @@ The project uses several automated quality checks:
 4. **Vulture** (dead-code scan):
 
    ```bash
-   make vulture     # Runs the configured dead-code scan for src/check_models.py
+   make vulture     # Runs the configured dead-code scan for src/check_models.py and src/tools/
    ```
 
    The repo keeps the default Vulture gate conservative for day-to-day work:
-   it scans `src/check_models.py` with `min_confidence = 100` from
-   `src/pyproject.toml`, so only high-confidence dead-code findings fail the
-   quality gate by default.
+   it scans `src/check_models.py` plus the Python utilities under `src/tools/`
+   with `min_confidence = 100` from `src/pyproject.toml`, so only
+   high-confidence dead-code findings fail the quality gate by default.
 
 5. **Tests**:
 
@@ -208,13 +208,15 @@ The project uses several automated quality checks:
 
 This repo ships a checked-in `Make: vulture` task in `.vscode/tasks.json`.
 Run that task from VS Code to surface Vulture findings as `warning` entries in
-the Problems panel, mapped to paths under `src/`. The same matcher is also
-attached to `Make: quality`, so a full quality run can report the same dead-
-code findings.
+the Problems panel, mapped to paths under `src/`.
+
+The matcher is intentionally attached only to the dedicated Vulture task.
+`Make: quality` mixes output from many tools, and generic `file:line:` text
+from unrelated steps can otherwise create noisy or stale Problems entries.
 
 The repo does not force Vulture to auto-run on every save or file change.
-Re-run `Make: vulture` or `Make: quality` after larger refactors, deletions,
-or control-flow changes.
+Re-run `Make: vulture` after larger refactors, deletions, or control-flow
+changes, and use `Make: quality` as the broader gate.
 
 ### Git Hooks
 

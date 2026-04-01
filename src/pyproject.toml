@@ -313,8 +313,8 @@ rules = { unresolved-import = "warn" }
 extra-paths = ["../typings"]
 
 [tool.vulture]
-paths = ["check_models.py"]
-exclude = ["tests/", "tools/", "../typings/", "*.egg-info"]
+paths = ["check_models.py", "tools"]
+exclude = ["tests/", "tools/.archived/", "../typings/", "*.egg-info"]
 min_confidence = 100
 sort_by_size = true
 

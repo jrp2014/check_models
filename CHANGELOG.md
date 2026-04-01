@@ -9,7 +9,16 @@ Notable changes to this project will be documented in this file.
 - Added Vulture to the managed `dev` dependency set, wired it into the full
   and fast quality scripts plus `make quality` / `make vulture`, and added a
   checked-in VS Code task/problem matcher so dead-code findings can surface as
-  Problems warnings before commit-time checks.
+  Problems warnings before commit-time checks. Expanded the checked-in Vulture
+  scope to cover the Python utilities under `src/tools/` as well, while still
+  excluding the archived tool stash. Tightened the task matcher to only catch
+  real Vulture diagnostics with confidence suffixes, avoiding bogus Problems
+  entries from unrelated `file:line:` output emitted by other quality steps,
+  and limited Problems publishing to the dedicated `Make: vulture` task so the
+  broader mixed-output quality task no longer leaves stale warnings behind.
+  Aligned the `make vulture` and quality-script invocations with the checked-in
+  `[tool.vulture]` config as well, so the broadened `src/tools/` scan actually
+  runs instead of being overridden by an old explicit `check_models.py` path.
 - Bumped the repo-local `markdownlint-cli2` npm tooling in `src/package.json`
   and `src/package-lock.json` to `0.22.0`, and changed `src/tools/update.sh`
   to refresh that tool from npm's `latest` tag on each update run so Markdown
