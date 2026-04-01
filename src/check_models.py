@@ -3358,45 +3358,18 @@ def _classify_review_owner(
     *,
     harness_type: str | None,
     failure_owner: str | None,
-    instruction_echo: bool,
-    metadata_borrowing: bool,
-    hint_relationship: str,
 ) -> str:
     """Return a compact single-owner label for canonical review output."""
     if failure_owner:
         owner_lower = failure_owner.casefold()
-        for needle, owner in (
-            ("transformers", "transformers"),
-            ("mlx-lm", "mlx-lm"),
-            ("mlx-vlm", "mlx-vlm"),
-            ("model-config", "model-config"),
-            ("mlx", "mlx"),
-        ):
+        for needle, owner in _REVIEW_OWNER_BY_FAILURE_NEEDLE:
             if needle in owner_lower:
                 return owner
 
     harness_key = (harness_type or "").casefold()
-    harness_owner_map = {
-        "prompt_template": "model-config",
-        "stop_token": "mlx-vlm",
-        "encoding": "mlx-vlm",
-        "generation_loop": "mlx-vlm",
-        "long_context": "mlx",
-    }
-    mapped_owner = harness_owner_map.get(harness_key)
+    mapped_owner = _REVIEW_OWNER_BY_HARNESS_TYPE.get(harness_key)
     if mapped_owner is not None:
         return mapped_owner
-
-    if (
-        instruction_echo
-        or metadata_borrowing
-        or hint_relationship
-        in {
-            "degrades_trusted_hints",
-            "ignores_trusted_hints",
-        }
-    ):
-        return "model"
     return "model"
 
 
@@ -5344,9 +5317,6 @@ def analyze_generation_text(
     owner = _classify_review_owner(
         harness_type=harness_signals.harness_type,
         failure_owner=None,
-        instruction_echo=prompt_signals.instruction_echo,
-        metadata_borrowing=prompt_signals.metadata_borrowing,
-        hint_relationship=hint_relationship,
     )
     user_bucket = _classify_user_bucket(
         verdict=verdict,
@@ -8164,9 +8134,6 @@ def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord |
         "owner": _classify_review_owner(
             harness_type=None,
             failure_owner=result.error_package,
-            instruction_echo=False,
-            metadata_borrowing=False,
-            hint_relationship="preserves_trusted_hints",
         ),
         "user_bucket": "avoid",
         "evidence": _dedupe_preserve_order(evidence) or ["runtime_failure"],
@@ -9774,45 +9741,69 @@ _TRAINING_LEAK_LABELS: Final[dict[str, str]] = {
     "qa_pair": "Q/A template patterns mid-output",
 }
 
+_REVIEW_OWNER_BY_FAILURE_NEEDLE: Final[tuple[tuple[str, str], ...]] = (
+    ("transformers", "transformers"),
+    ("mlx-lm", "mlx-lm"),
+    ("mlx-vlm", "mlx-vlm"),
+    ("model-config", "model-config"),
+    ("mlx", "mlx"),
+)
+
+_REVIEW_OWNER_BY_HARNESS_TYPE: Final[dict[str, str]] = {
+    "prompt_template": "model-config",
+    "stop_token": "mlx-vlm",
+    "encoding": "mlx-vlm",
+    "generation_loop": "mlx-vlm",
+    "long_context": "mlx",
+}
+
+_DIAGNOSTICS_OWNER_PART_ACTIONS: Final[tuple[tuple[frozenset[str], str], ...]] = (
+    (
+        frozenset({"model-config", "mlx-vlm"}),
+        "validate chat-template/config expectations and mlx-vlm prompt formatting for this model.",
+    ),
+    (frozenset({"model-config"}), _DIAGNOSTICS_OWNER_ACTIONS["model-config"]),
+    (frozenset({"transformers"}), _DIAGNOSTICS_OWNER_ACTIONS["transformers"]),
+    (
+        frozenset({"mlx-vlm", "mlx"}),
+        "validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.",
+    ),
+    (
+        frozenset({"mlx-vlm", "mlx-lm"}),
+        "validate generation-loop handoff and template continuation behavior across mlx-vlm + mlx-lm.",
+    ),
+    (frozenset({"huggingface-hub"}), _DIAGNOSTICS_OWNER_ACTIONS["huggingface-hub"]),
+    (frozenset({"mlx-vlm"}), _DIAGNOSTICS_OWNER_ACTIONS["mlx-vlm"]),
+    (frozenset({"mlx-lm"}), _DIAGNOSTICS_OWNER_ACTIONS["mlx-lm"]),
+    (frozenset({"mlx"}), _DIAGNOSTICS_OWNER_ACTIONS["mlx"]),
+)
+
+_HARNESS_OWNER_BY_TYPE: Final[dict[str, str]] = {
+    "prompt_template": "model-config / mlx-vlm",
+    "long_context": "mlx-vlm / mlx",
+}
+
 
 def _diagnostics_owner_label(owner_key: str) -> str:
     """Return readable owner label for diagnostics rows/sections."""
     return _DIAGNOSTICS_COMPONENT_LABELS.get(owner_key, owner_key)
 
 
+def _has_prefixed_detail(details: Sequence[str], prefix: str) -> bool:
+    """Return True when any detail entry starts with the requested prefix."""
+    return any(detail.startswith(prefix) for detail in details)
+
+
 def _diagnostics_next_action(owner_key: str) -> str:
     """Return a short owner-specific next action hint."""
-    action = _DIAGNOSTICS_OWNER_ACTIONS["unknown"]
+    if action := _DIAGNOSTICS_OWNER_ACTIONS.get(owner_key):
+        return action
+
     owner_parts = {part.strip() for part in owner_key.split("/") if part.strip()}
-    if owner_key in _DIAGNOSTICS_OWNER_ACTIONS:
-        action = _DIAGNOSTICS_OWNER_ACTIONS[owner_key]
-    elif {"model-config", "mlx-vlm"}.issubset(owner_parts):
-        action = (
-            "validate chat-template/config expectations and mlx-vlm prompt "
-            "formatting for this model."
-        )
-    elif "model-config" in owner_parts:
-        action = _DIAGNOSTICS_OWNER_ACTIONS["model-config"]
-    elif "transformers" in owner_parts:
-        action = _DIAGNOSTICS_OWNER_ACTIONS["transformers"]
-    elif {"mlx-vlm", "mlx"}.issubset(owner_parts):
-        action = (
-            "validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime."
-        )
-    elif {"mlx-vlm", "mlx-lm"}.issubset(owner_parts):
-        action = (
-            "validate generation-loop handoff and template continuation behavior "
-            "across mlx-vlm + mlx-lm."
-        )
-    elif "huggingface-hub" in owner_parts:
-        action = _DIAGNOSTICS_OWNER_ACTIONS["huggingface-hub"]
-    elif "mlx-vlm" in owner_parts:
-        action = _DIAGNOSTICS_OWNER_ACTIONS["mlx-vlm"]
-    elif "mlx-lm" in owner_parts:
-        action = _DIAGNOSTICS_OWNER_ACTIONS["mlx-lm"]
-    elif "mlx" in owner_parts:
-        action = _DIAGNOSTICS_OWNER_ACTIONS["mlx"]
-    return action
+    for required_parts, action in _DIAGNOSTICS_OWNER_PART_ACTIONS:
+        if required_parts.issubset(owner_parts):
+            return action
+    return _DIAGNOSTICS_OWNER_ACTIONS["unknown"]
 
 
 def _infer_harness_issue_owner(result: PerformanceResult) -> str:
@@ -9825,19 +9816,16 @@ def _infer_harness_issue_owner(result: PerformanceResult) -> str:
     harness_type = (qa.harness_issue_type or "").strip().lower()
     harness_details = tuple((detail or "").strip().lower() for detail in qa.harness_issue_details)
 
-    inferred_owner = "mlx-vlm"
-    if harness_type == "prompt_template":
-        inferred_owner = "model-config / mlx-vlm"
-    elif harness_type == "long_context":
-        inferred_owner = "mlx-vlm / mlx"
-    elif harness_type == "generation_loop" and any(
-        detail.startswith("training_leak:") for detail in harness_details
+    if inferred_owner := _HARNESS_OWNER_BY_TYPE.get(harness_type):
+        return inferred_owner
+    if harness_type == "generation_loop" and _has_prefixed_detail(
+        harness_details,
+        "training_leak:",
     ):
-        inferred_owner = "mlx-vlm / mlx-lm"
-    elif any(detail.startswith("output:") for detail in harness_details):
-        inferred_owner = "model-config / mlx-vlm"
-
-    return inferred_owner
+        return "mlx-vlm / mlx-lm"
+    if _has_prefixed_detail(harness_details, "output:"):
+        return "model-config / mlx-vlm"
+    return "mlx-vlm"
 
 
 def _group_harness_results_by_owner(
@@ -10028,27 +10016,24 @@ def _summarize_quality_signals(qa: GenerationQualityAnalysis | None) -> list[str
     if qa is None:
         return []
 
-    signals: list[str] = []
-    if qa.is_context_ignored:
-        signals.append("Model output may not follow prompt or image contents.")
-    if qa.is_repetitive:
-        signals.append("Output became repetitive, indicating possible generation instability.")
-    if qa.has_degeneration:
-        signals.append("Output contains corrupted or malformed text segments.")
-    if qa.has_language_mixing:
-        signals.append("Output switched language/script unexpectedly.")
-    if qa.is_refusal:
-        signals.append("Model refused or deflected the requested task.")
-    if qa.formatting_issues:
-        signals.append("Output formatting deviated from the requested structure.")
-    if qa.missing_sections:
-        signals.append("Output omitted required Title/Description/Keywords sections.")
-    if qa.has_reasoning_leak:
-        signals.append("Output leaked reasoning or prompt-template text.")
-    if qa.has_context_echo:
-        signals.append("Output appears to copy prompt context verbatim.")
-
-    return _dedupe_preserve_order(signals)
+    signal_specs = (
+        (qa.is_context_ignored, "Model output may not follow prompt or image contents."),
+        (
+            qa.is_repetitive,
+            "Output became repetitive, indicating possible generation instability.",
+        ),
+        (qa.has_degeneration, "Output contains corrupted or malformed text segments."),
+        (qa.has_language_mixing, "Output switched language/script unexpectedly."),
+        (qa.is_refusal, "Model refused or deflected the requested task."),
+        (bool(qa.formatting_issues), "Output formatting deviated from the requested structure."),
+        (
+            bool(qa.missing_sections),
+            "Output omitted required Title/Description/Keywords sections.",
+        ),
+        (qa.has_reasoning_leak, "Output leaked reasoning or prompt-template text."),
+        (qa.has_context_echo, "Output appears to copy prompt context verbatim."),
+    )
+    return _dedupe_preserve_order([message for is_present, message in signal_specs if is_present])
 
 
 def _build_cluster_filing_guidance(

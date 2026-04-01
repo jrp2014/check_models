@@ -834,6 +834,50 @@ def _make_failure_with_details(
 class TestDiagnosticsReport:
     """Tests for generate_diagnostics_report and its helpers."""
 
+    def test_classify_review_owner_prefers_failure_owner_then_harness(self) -> None:
+        """Review ownership should keep failure-owner precedence and harness fallbacks."""
+        assert (
+            check_models._classify_review_owner(
+                harness_type="long_context",
+                failure_owner="transformers / mlx-vlm",
+            )
+            == "transformers"
+        )
+        assert (
+            check_models._classify_review_owner(
+                harness_type="prompt_template",
+                failure_owner=None,
+            )
+            == "model-config"
+        )
+
+    def test_diagnostics_next_action_uses_composite_owner_rules(self) -> None:
+        """Composite owner keys should keep their specialized next-step guidance."""
+        assert (
+            check_models._diagnostics_next_action("model-config / mlx-vlm")
+            == "validate chat-template/config expectations and mlx-vlm prompt formatting for this model."
+        )
+        assert (
+            check_models._diagnostics_next_action("mlx-vlm / mlx")
+            == "validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime."
+        )
+
+    def test_infer_harness_issue_owner_uses_detail_prefix_fallbacks(self) -> None:
+        """Harness owner inference should still honor detail-prefix fallbacks."""
+        training_leak = _make_harness_success(
+            "org/harness-generation-loop",
+            harness_type="generation_loop",
+            harness_detail="training_leak:instruction_header",
+        )
+        output_shape = _make_harness_success(
+            "org/harness-output-shape",
+            harness_type="stop_token",
+            harness_detail="output:zero_tokens",
+        )
+
+        assert check_models._infer_harness_issue_owner(training_leak) == "mlx-vlm / mlx-lm"
+        assert check_models._infer_harness_issue_owner(output_shape) == "model-config / mlx-vlm"
+
     def test_no_report_when_all_succeed(self, tmp_path: Path) -> None:
         """No diagnostics file when every model succeeds without harness issues."""
         out = tmp_path / "diag.md"

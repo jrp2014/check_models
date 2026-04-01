@@ -33,6 +33,11 @@ Notable changes to this project will be documented in this file.
   definitions, a duplicate quality-analysis accessor, and a few thin
   report/context wrappers, to shrink the monolith without changing report
   behavior.
+- Compacted harness/review ownership routing in `src/check_models.py` by
+  centralizing repeated owner maps and composite next-action rules, removing
+  unused review-owner inputs, and collapsing one verbose quality-signal
+  summary ladder into table-driven logic without loosening diagnostics or type
+  checking.
 - Hardened `src/tools/update.sh` so local MLX refreshes now fail fast when the
   active macOS toolchain does not expose `metal` and `metallib` via `xcrun`,
   and so editable-install origin checks cover `mlx` in addition to `mlx-lm`
