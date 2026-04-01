@@ -652,25 +652,21 @@ try:
 except ImportError:
     numpy_version = NOT_AVAILABLE
 
-vlm_version: str
-generate: Callable[..., GenerationResult]
-apply_chat_template: ApplyChatTemplateCallable
-load: LoadCallable
-load_image: LoadImageCallable
-
 
 def _raise_mlx_vlm_missing(*_args: object, **_kwargs: object) -> NoReturn:
     """Raise a consistent runtime error when mlx-vlm is unavailable."""
     raise RuntimeError(ERROR_MLX_VLM_MISSING)
 
 
-def _configure_mlx_vlm_fallback(error_message: str) -> None:
-    """Set runtime fallbacks when mlx-vlm cannot be imported."""
-    globals()["generate"] = cast("Callable[..., GenerationResult]", _raise_mlx_vlm_missing)
-    globals()["apply_chat_template"] = cast("ApplyChatTemplateCallable", _raise_mlx_vlm_missing)
-    globals()["load"] = cast("LoadCallable", _raise_mlx_vlm_missing)
-    globals()["load_image"] = cast("LoadImageCallable", _raise_mlx_vlm_missing)
-    MISSING_DEPENDENCIES["mlx-vlm"] = error_message
+vlm_version: str = NOT_AVAILABLE
+generate: Callable[..., GenerationResult] = cast(
+    "Callable[..., GenerationResult]", _raise_mlx_vlm_missing
+)
+apply_chat_template: ApplyChatTemplateCallable = cast(
+    "ApplyChatTemplateCallable", _raise_mlx_vlm_missing
+)
+load: LoadCallable = cast("LoadCallable", _raise_mlx_vlm_missing)
+load_image: LoadImageCallable = cast("LoadImageCallable", _raise_mlx_vlm_missing)
 
 
 mlx_vlm_probe_error = _probe_import_runtime(
@@ -691,11 +687,9 @@ if mlx_vlm_probe_error is None:
         load_image = _mlx_vlm_load_image
         vlm_version = _mlx_vlm_version
     except ImportError:
-        vlm_version = NOT_AVAILABLE
-        _configure_mlx_vlm_fallback(ERROR_MLX_VLM_MISSING)
+        MISSING_DEPENDENCIES["mlx-vlm"] = ERROR_MLX_VLM_MISSING
 else:
-    vlm_version = NOT_AVAILABLE
-    _configure_mlx_vlm_fallback(mlx_vlm_probe_error)
+    MISSING_DEPENDENCIES["mlx-vlm"] = mlx_vlm_probe_error
 
 try:
     importlib.metadata.version("mlx-lm")
@@ -7567,11 +7561,6 @@ def _build_runtime_analysis_summary(
     return runtime_summary
 
 
-def _format_runtime_phase_duration(value: float) -> str:
-    """Format runtime phase durations consistently for report summaries."""
-    return format_overall_runtime(value)
-
-
 def _format_runtime_timing_snapshot_lines(runtime_analysis: RuntimeAnalysisSummary) -> list[str]:
     """Build concise aggregate timing bullets for optional runtime signals."""
     lines: list[str] = []
@@ -7582,8 +7571,8 @@ def _format_runtime_timing_snapshot_lines(runtime_analysis: RuntimeAnalysisSumma
         validation_avg: float = validation_total / validation_models
         lines.append(
             "- **Validation overhead:** "
-            f"{_format_runtime_phase_duration(validation_total)} total "
-            f"(avg {_format_runtime_phase_duration(validation_avg)} across "
+            f"{format_overall_runtime(validation_total)} total "
+            f"(avg {format_overall_runtime(validation_avg)} across "
             f"{validation_models} model(s)).",
         )
 
@@ -7599,9 +7588,9 @@ def _format_runtime_timing_snapshot_lines(runtime_analysis: RuntimeAnalysisSumma
     ):
         lines.append(
             "- **First-token latency:** "
-            f"Avg {_format_runtime_phase_duration(first_token_avg)} | "
-            f"Min {_format_runtime_phase_duration(first_token_min)} | "
-            f"Max {_format_runtime_phase_duration(first_token_max)} "
+            f"Avg {format_overall_runtime(first_token_avg)} | "
+            f"Min {format_overall_runtime(first_token_min)} | "
+            f"Max {format_overall_runtime(first_token_max)} "
             f"across {first_token_models} model(s).",
         )
 
@@ -7619,7 +7608,7 @@ def _format_runtime_analysis_lines(runtime_analysis: RuntimeAnalysisSummary) -> 
     termination_counts: dict[str, int] = runtime_analysis["termination_counts"]
 
     phase_summary: str = ", ".join(
-        f"{_RUNTIME_PHASE_LABELS.get(phase, phase)}={_format_runtime_phase_duration(duration)}"
+        f"{_RUNTIME_PHASE_LABELS.get(phase, phase)}={format_overall_runtime(duration)}"
         for phase, duration in phase_totals.items()
         if duration > 0.0
     )
@@ -9001,12 +8990,6 @@ def _append_markdown_wrapped_blockquote(
         parts.append("")
 
 
-def _append_markdown_prompt_section(parts: list[str], *, title: str, prompt: str) -> None:
-    """Append a prompt section using the shared wrapped blockquote renderer."""
-    parts.append(title)
-    _append_markdown_wrapped_blockquote(parts, prompt)
-
-
 def _append_markdown_image_metadata_section(
     parts: list[str],
     metadata: MetadataDict | None,
@@ -9160,35 +9143,28 @@ _LOCAL_RUNNER_TRACEBACK_FRAME_RE: Final[re.Pattern[str]] = re.compile(
 )
 
 
-def _strip_local_runner_traceback_frames(traceback_str: str) -> str:
-    """Remove local check_models stack frames from traceback text."""
+def _normalize_traceback_for_report(traceback_str: str | None) -> str | None:
+    """Normalize traceback text for diagnostics output."""
+    if not traceback_str:
+        return None
+
     lines = traceback_str.splitlines()
     kept: list[str] = []
     idx = 0
-
     while idx < len(lines):
         line = lines[idx]
         if _LOCAL_RUNNER_TRACEBACK_FRAME_RE.search(line):
             idx += 1
             while idx < len(lines):
                 follow = lines[idx]
-                if follow.lstrip().startswith('File "'):
-                    break
-                if not follow.startswith(" "):
+                if follow.lstrip().startswith('File "') or not follow.startswith(" "):
                     break
                 idx += 1
             continue
         kept.append(line)
         idx += 1
 
-    return "\n".join(kept).strip()
-
-
-def _normalize_traceback_for_report(traceback_str: str | None) -> str | None:
-    """Normalize traceback text for diagnostics output."""
-    if not traceback_str:
-        return None
-    sanitized = _strip_local_runner_traceback_frames(traceback_str)
+    sanitized = "\n".join(kept).strip()
     return sanitized or None
 
 
@@ -10747,7 +10723,7 @@ def _diagnostics_coverage_and_runtime_section(
             if phase_total <= 0.0:
                 continue
             phase_summaries.append(
-                (f"{_RUNTIME_PHASE_LABELS[phase]}={_format_runtime_phase_duration(phase_total)}"),
+                (f"{_RUNTIME_PHASE_LABELS[phase]}={format_overall_runtime(phase_total)}"),
             )
         if phase_summaries:
             parts.append("- **Phase totals:** " + ", ".join(phase_summaries))
@@ -12158,7 +12134,8 @@ def generate_markdown_report(
     if failures_by_pkg:
         md.extend(failures_by_pkg)
 
-    _append_markdown_prompt_section(md, title=_markdown_emphasis("Prompt used:"), prompt=prompt)
+    md.append(_markdown_emphasis("Prompt used:"))
+    _append_markdown_wrapped_blockquote(md, prompt)
     md.extend(
         _wrap_markdown_text(
             "_Note:_ Results sorted: errors first, then by generation time (fastest to slowest).",
@@ -12237,7 +12214,8 @@ def generate_markdown_gallery_report(
     md.extend(_format_review_priorities_parts(report_context, html_output=False))
     md.extend(_format_failures_by_package_parts(results, html_output=False))
     _append_markdown_image_metadata_section(md, metadata)
-    _append_markdown_prompt_section(md, title="## Prompt", prompt=prompt)
+    md.append("## Prompt")
+    _append_markdown_wrapped_blockquote(md, prompt)
     md.extend(_build_markdown_gallery_navigation(report_context))
     md.extend(_generate_model_gallery_section(report_context))
 
@@ -12894,38 +12872,6 @@ def _validate_thinking_params(args: argparse.Namespace) -> None:
         raise ValueError(msg)
 
 
-def _build_chat_template_kwargs(params: ProcessImageParams) -> ChatTemplateKwargs:
-    """Collect opt-in kwargs for upstream chat-template application."""
-    if not params.enable_thinking:
-        return {}
-    return {"enable_thinking": True}
-
-
-def _build_generate_extra_kwargs(params: ProcessImageParams) -> GenerateExtraKwargs:
-    """Collect optional generate kwargs for benchmark runs."""
-    extra_kwargs: GenerateExtraKwargs = {}
-    if params.min_p > 0.0:
-        extra_kwargs["min_p"] = params.min_p
-    if params.top_k > 0:
-        extra_kwargs["top_k"] = params.top_k
-    if params.prefill_step_size is not None:
-        extra_kwargs["prefill_step_size"] = params.prefill_step_size
-    if params.resize_shape is not None:
-        extra_kwargs["resize_shape"] = params.resize_shape
-    if params.eos_tokens is not None:
-        extra_kwargs["eos_tokens"] = list(params.eos_tokens)
-    if params.skip_special_tokens:
-        extra_kwargs["skip_special_tokens"] = True
-    if params.enable_thinking:
-        extra_kwargs["enable_thinking"] = True
-        extra_kwargs["thinking_end_token"] = params.thinking_end_token
-        if params.thinking_budget is not None:
-            extra_kwargs["thinking_budget"] = params.thinking_budget
-        if params.thinking_start_token is not None:
-            extra_kwargs["thinking_start_token"] = params.thinking_start_token
-    return extra_kwargs
-
-
 def validate_cli_arguments(args: argparse.Namespace) -> None:
     """Validate all CLI arguments before processing begins.
 
@@ -12966,6 +12912,31 @@ def validate_cli_arguments(args: argparse.Namespace) -> None:
             "--detailed-metrics has no effect unless --verbose is also set; "
             "continuing with compact metrics output.",
         )
+
+
+def _build_generate_extra_kwargs(params: ProcessImageParams) -> GenerateExtraKwargs:
+    """Collect optional generate kwargs for benchmark runs."""
+    extra_kwargs: GenerateExtraKwargs = {}
+    if params.min_p > 0.0:
+        extra_kwargs["min_p"] = params.min_p
+    if params.top_k > 0:
+        extra_kwargs["top_k"] = params.top_k
+    if params.prefill_step_size is not None:
+        extra_kwargs["prefill_step_size"] = params.prefill_step_size
+    if params.resize_shape is not None:
+        extra_kwargs["resize_shape"] = params.resize_shape
+    if params.eos_tokens is not None:
+        extra_kwargs["eos_tokens"] = list(params.eos_tokens)
+    if params.skip_special_tokens:
+        extra_kwargs["skip_special_tokens"] = True
+    if params.enable_thinking:
+        extra_kwargs["enable_thinking"] = True
+        extra_kwargs["thinking_end_token"] = params.thinking_end_token
+        if params.thinking_budget is not None:
+            extra_kwargs["thinking_budget"] = params.thinking_budget
+        if params.thinking_start_token is not None:
+            extra_kwargs["thinking_start_token"] = params.thinking_start_token
+    return extra_kwargs
 
 
 def validate_image_accessible(*, image_path: str | Path) -> None:
@@ -13882,6 +13853,9 @@ def _prepare_generation_prompt(
 ) -> str | list[object]:
     """Run preflight checks and build the prompt payload for generation."""
     try:
+        chat_template_kwargs: ChatTemplateKwargs = (
+            {"enable_thinking": True} if params.enable_thinking else {}
+        )
         if phase_timer is not None:
             with phase_timer.track("prompt_prep"):
                 _run_model_preflight_validators(
@@ -13891,7 +13865,6 @@ def _prepare_generation_prompt(
                     phase_callback=phase_callback,
                 )
                 _set_failure_phase(phase_callback, "prefill")
-                chat_template_kwargs = _build_chat_template_kwargs(params)
                 return cast(
                     "str | list[object]",
                     apply_chat_template(
@@ -13910,7 +13883,6 @@ def _prepare_generation_prompt(
             phase_callback=phase_callback,
         )
         _set_failure_phase(phase_callback, "prefill")
-        chat_template_kwargs = _build_chat_template_kwargs(params)
         return cast(
             "str | list[object]",
             apply_chat_template(

@@ -42,6 +42,9 @@ Notable changes to this project will be documented in this file.
 - Removed a few dead or single-use wrapper helpers in `src/check_models.py`
   by deleting unused display helpers and inlining thin markdown/probe wrappers
   that only obscured one call site each.
+- Further shortened `src/check_models.py` by inlining single-use prompt,
+  runtime-formatting, chat-kwargs, and traceback-cleanup helpers in place
+  where the surrounding call site was clearer than the extra wrapper.
 - Fixed Ty invocation in `src/tools/run_quality_checks.sh` and
   `src/tools/check_quality_simple.sh` to pass the resolved repo Python
   explicitly, eliminating false `unresolved-import` warnings when Ty fell back
