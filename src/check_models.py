@@ -428,10 +428,22 @@ class QualityThresholds:
                         raise ValueError(msg) from exc
 
     @classmethod
-    def from_config(cls, config: dict[str, Any]) -> QualityThresholds:
+    def from_config(cls, config: Mapping[str, object]) -> QualityThresholds:
         """Create instance from configuration dictionary."""
-        thresholds = config.get("thresholds", {})
-        patterns = config.get("patterns", {})
+        thresholds = _as_str_object_mapping(config.get("thresholds", {}))
+        if thresholds is None:
+            msg = "quality_config.yaml thresholds section must be a mapping"
+            raise TypeError(msg)
+
+        patterns_value = config.get("patterns", {})
+        if patterns_value is None:
+            patterns: dict[str, list[str]] | None = None
+        else:
+            patterns_mapping = _as_str_object_mapping(patterns_value)
+            if patterns_mapping is None:
+                msg = "quality_config.yaml patterns section must be a mapping"
+                raise TypeError(msg)
+            patterns = cast("dict[str, list[str]]", dict(patterns_mapping))
 
         # Filter valid fields for the dataclass
         valid_fields = {f.name for f in dataclasses.fields(cls) if f.name != "patterns"}
@@ -454,7 +466,7 @@ class QualityThresholds:
                 ", ".join(sorted(unknown_sections)),
             )
 
-        return cls(**filtered_thresholds, patterns=patterns)
+        return cls(**cast("dict[str, Any]", filtered_thresholds), patterns=patterns)
 
 
 # Instantiate singletons for runtime use
@@ -481,14 +493,21 @@ def load_quality_config(config_path: Path | None = None) -> None:
         try:
             with config_path.open("r") as f:
                 config = yaml.safe_load(f)
-                if config:
-                    new_quality = QualityThresholds.from_config(config)
+                config_mapping = _as_str_object_mapping(config)
+                if config is not None and config_mapping is None:
+                    logger.warning(
+                        "Failed to load quality config from %s: quality_config.yaml top-level document must be a mapping",
+                        config_path,
+                    )
+                    return
+                if config_mapping:
+                    new_quality = QualityThresholds.from_config(config_mapping)
                     # Update existing global instance in-place to avoid 'global' keyword
                     # and ensure all references see the update.
                     for field in dataclasses.fields(QualityThresholds):
                         setattr(QUALITY, field.name, getattr(new_quality, field.name))
                     logger.debug("Loaded quality configuration from %s", config_path)
-        except (OSError, ValueError, yaml.YAMLError) as e:
+        except (OSError, TypeError, ValueError, yaml.YAMLError) as e:
             logger.warning("Failed to load quality config from %s: %s", config_path, e)
     elif config_path:
         logger.warning("Quality config file not found: %s", config_path)
@@ -577,11 +596,11 @@ if mlx_probe_error is None:
 else:
     MISSING_DEPENDENCIES["mlx"] = mlx_probe_error
 
-ExifTags: Any
-GPSTAGS: Mapping[Any, Any]
-TAGS: Mapping[Any, Any]
+ExifTags: SupportsExifTagsModule
+GPSTAGS: Mapping[int, str]
+TAGS: Mapping[int, str]
 UnidentifiedImageError: type[Exception]
-GPS: Any  # Type annotation for GPS enum (defined below based on Pillow availability)
+GPS: SupportsGPSEnum | None
 
 try:
     from PIL import Image
@@ -607,12 +626,12 @@ except ImportError:
         def __getattr__(self, _name: str) -> NoReturn:
             raise _PILUnavailableError(ERROR_PILLOW_MISSING)
 
-    ExifTags = _ExifTagsUnavailable()
+    ExifTags = cast("SupportsExifTagsModule", _ExifTagsUnavailable())
     Image = cast("Any", _ImageUnavailable())
     UnidentifiedImageError = _PILUnavailableError
-    GPS = cast("Any", None)  # GPS enum unavailable when Pillow missing
-    GPSTAGS = {}
-    TAGS = {}
+    GPS = None
+    GPSTAGS = cast("Mapping[int, str]", {})
+    TAGS = cast("Mapping[int, str]", {})
     MISSING_DEPENDENCIES["Pillow"] = ERROR_PILLOW_MISSING
 else:
     from PIL import ExifTags as PIL_ExifTags
@@ -622,10 +641,10 @@ else:
     from PIL.ExifTags import TAGS as PIL_TAGS
 
     pillow_version = Image.__version__ if hasattr(Image, "__version__") else NOT_AVAILABLE
-    ExifTags = PIL_ExifTags
-    GPS = PIL_GPS
-    GPSTAGS = PIL_GPSTAGS
-    TAGS = PIL_TAGS
+    ExifTags = cast("SupportsExifTagsModule", PIL_ExifTags)
+    GPS = cast("SupportsGPSEnum", PIL_GPS)
+    GPSTAGS = cast("Mapping[int, str]", PIL_GPSTAGS)
+    TAGS = cast("Mapping[int, str]", PIL_TAGS)
 
 # defusedxml is required by Pillow's Image.getxmp() for safe XMP/XML parsing.
 # Pulled in transitively via Pillow[xmp] in pyproject.toml, but guard here
@@ -746,9 +765,62 @@ type JsonLike = None | bool | int | float | str | list[JsonLike] | dict[str, Jso
 type GPSTupleElement = int | float
 type GPSTuple = tuple[GPSTupleElement, GPSTupleElement, GPSTupleElement]
 type GPSDict = dict[str, ExifValue]  # GPS EXIF data structure
-type SystemProfilerDict = dict[str, list[dict[str, Any]]]  # macOS system_profiler JSON structure
+type SystemProfilerEntry = dict[str, object]
+type SystemProfilerDict = dict[
+    str, list[SystemProfilerEntry]
+]  # macOS system_profiler JSON structure
 type LibraryVersionDict = dict[str, str | None]  # Library name to version mapping (optional values)
 type MetricValue = int | float | str | bool | None  # Common scalar metric variants for metrics
+
+
+class IPTCMetadata(TypedDict, total=False):
+    """Normalized IPTC metadata extracted from an image."""
+
+    iptc_keywords: list[str]
+    iptc_caption: str
+
+
+class XMPMetadata(TypedDict, total=False):
+    """Normalized XMP metadata extracted from an image."""
+
+    xmp_keywords: list[str]
+    xmp_description: str
+    xmp_title: str
+
+
+class SupportsExifBaseNamespace(Protocol):
+    """Minimal subset of ``PIL.ExifTags.Base`` used by EXIF helpers."""
+
+    ExifOffset: int
+    GPSInfo: int
+
+
+class SupportsExifIfdNamespace(Protocol):
+    """Minimal subset of ``PIL.ExifTags.IFD`` used by EXIF helpers."""
+
+    Exif: int
+    GPSInfo: int
+
+
+class SupportsExifTagsModule(Protocol):
+    """Minimal subset of Pillow's ``ExifTags`` namespace used here."""
+
+    Base: SupportsExifBaseNamespace
+    IFD: SupportsExifIfdNamespace
+
+
+class SupportsGPSName(Protocol):
+    """Minimal GPS enum member surface used for tag-name lookup."""
+
+    name: str
+
+
+class SupportsGPSEnum(Protocol):
+    """Callable enum-like surface for Pillow GPS tag lookup."""
+
+    def __call__(self, value: int) -> SupportsGPSName:
+        """Return the GPS enum member for a numeric tag id."""
+        ...
 
 
 class HistoryModelResultRecord(TypedDict):
@@ -1163,7 +1235,7 @@ class SupportsGenerationResult(Protocol):  # Minimal attributes we read from Gen
 class SupportsExifIfd(Protocol):
     """Minimal interface for EXIF objects providing nested IFD access."""
 
-    def get_ifd(self, tag: object) -> Mapping[object, object] | None:
+    def get_ifd(self, tag: object) -> Mapping[object, ExifValue] | None:
         """Retrieve a nested IFD mapping by tag identifier."""
         ...
 
@@ -5916,6 +5988,36 @@ def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceR
 # =============================================================================
 
 
+def _normalize_system_profiler_data(payload: object) -> SystemProfilerDict | None:
+    """Normalize parsed ``system_profiler -json`` output to the subset used here."""
+    raw_payload = _as_str_object_mapping(payload)
+    if raw_payload is None:
+        return None
+
+    normalized: SystemProfilerDict = {}
+    for key, raw_entries in raw_payload.items():
+        if not isinstance(raw_entries, list):
+            continue
+
+        normalized_entries: list[SystemProfilerEntry] = []
+        for raw_entry in raw_entries:
+            entry_mapping = _as_str_object_mapping(raw_entry)
+            if entry_mapping is not None:
+                normalized_entries.append(dict(entry_mapping))
+        normalized[key] = normalized_entries
+
+    return normalized
+
+
+def _mapping_first_text_value(mapping: Mapping[str, object], *keys: str) -> str | None:
+    """Return the first non-empty string value found under ``keys``."""
+    for key in keys:
+        value = mapping.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return None
+
+
 def get_device_info() -> SystemProfilerDict | None:
     """Return system_profiler display (GPU) info as dict or None on failure.
 
@@ -5930,7 +6032,7 @@ def get_device_info() -> SystemProfilerDict | None:
             text=True,
             timeout=5,
         )
-        return cast("SystemProfilerDict", json.loads(data))
+        return _normalize_system_profiler_data(json.loads(data))
     except (
         subprocess.SubprocessError,
         json.JSONDecodeError,
@@ -6050,7 +6152,7 @@ def print_image_dimensions(image_path: PathLike) -> None:
 
 
 # --- EXIF & Metadata Handling ---
-def _process_ifd0(exif_raw: Mapping[int, Any]) -> ExifDict:
+def _process_ifd0(exif_raw: Mapping[int, ExifValue]) -> ExifDict:
     exif_decoded: ExifDict = {}
     for tag_id, value in exif_raw.items():
         # Skip SubIFD pointers, we'll handle them separately
@@ -6089,7 +6191,7 @@ def _coerce_exif_tag_id(tag_id: object) -> int | None:
 
 def _process_gps_ifd(exif_raw: SupportsExifIfd) -> GPSDict | None:
     try:
-        gps_ifd: Any = exif_raw.get_ifd(ExifTags.IFD.GPSInfo)
+        gps_ifd: Mapping[object, ExifValue] | None = exif_raw.get_ifd(ExifTags.IFD.GPSInfo)
         if isinstance(gps_ifd, dict) and gps_ifd:
             gps_decoded: GPSDict = {}
             for gps_tag_id, gps_value in gps_ifd.items():
@@ -6098,11 +6200,13 @@ def _process_gps_ifd(exif_raw: SupportsExifIfd) -> GPSDict | None:
                 if tag_id_int is None:
                     gps_key = str(gps_tag_id)
                 else:
-                    try:
-                        gps_key = GPS(tag_id_int).name
-                    except ValueError:
-                        # Fallback to dict lookup for unknown tags
-                        gps_key = GPSTAGS.get(tag_id_int, str(gps_tag_id))
+                    gps_key = GPSTAGS.get(tag_id_int, str(gps_tag_id))
+                    if GPS is not None:
+                        try:
+                            gps_key = GPS(tag_id_int).name
+                        except ValueError:
+                            # Fallback to dict lookup for unknown tags
+                            gps_key = GPSTAGS.get(tag_id_int, str(gps_tag_id))
                 gps_decoded[str(gps_key)] = gps_value
             return gps_decoded
     except (KeyError, AttributeError, TypeError) as gps_err:
@@ -6389,7 +6493,7 @@ def _extract_description(exif_data: ExifDict) -> str | None:
     return desc or None
 
 
-def _extract_gps_str(gps_info_raw: Mapping[Any, Any] | None) -> str | None:
+def _extract_gps_str(gps_info_raw: Mapping[int | str, ExifValue] | None) -> str | None:
     """Convert EXIF GPS mapping to decimal-degree text with cardinal suffixes.
 
     Accepts mixed key formats (numeric EXIF ids or tag strings) and returns
@@ -6446,7 +6550,7 @@ def _extract_gps_str(gps_info_raw: Mapping[Any, Any] | None) -> str | None:
         return f"{lat_dd:.6f}°{lat_card}, {lon_dd:.6f}°{lon_card}"
 
 
-def _extract_iptc_metadata(image_path: PathLike) -> dict[str, Any]:
+def _extract_iptc_metadata(image_path: PathLike) -> IPTCMetadata:
     """Extract IPTC/IIM metadata (keywords, caption) from an image.
 
     Uses Pillow's IptcImagePlugin to read standard IPTC records:
@@ -6455,16 +6559,21 @@ def _extract_iptc_metadata(image_path: PathLike) -> dict[str, Any]:
     """
     try:
         with Image.open(Path(image_path)) as img:
-            iptc: dict[tuple[int, int], Any] | None = IptcImagePlugin.getiptcinfo(img)
+            iptc: Mapping[tuple[int, int], object] | None = IptcImagePlugin.getiptcinfo(img)
             if not iptc:
                 return {}
 
-            result: dict[str, Any] = {}
+            result: IPTCMetadata = {}
 
             # Keywords (2, 25) — may be a single bytes or a list of bytes
-            raw_keywords = iptc.get((2, 25), [])
-            if isinstance(raw_keywords, bytes):
-                raw_keywords = [raw_keywords]
+            raw_keywords_value = iptc.get((2, 25), [])
+            raw_keywords: list[object]
+            if isinstance(raw_keywords_value, (bytes, bytearray)):
+                raw_keywords = [bytes(raw_keywords_value)]
+            elif isinstance(raw_keywords_value, list):
+                raw_keywords = list(raw_keywords_value)
+            else:
+                raw_keywords = []
             keywords: list[str] = []
             for kw in raw_keywords:
                 decoded = kw.decode("utf-8", errors="replace") if isinstance(kw, bytes) else str(kw)
@@ -6475,12 +6584,14 @@ def _extract_iptc_metadata(image_path: PathLike) -> dict[str, Any]:
 
             # IPTC caption/abstract record
             caption_raw = iptc.get((2, 120))
-            if isinstance(caption_raw, bytes):
-                caption_str = caption_raw.decode("utf-8", errors="replace").strip()
+            if isinstance(caption_raw, (bytes, bytearray)):
+                caption_str = bytes(caption_raw).decode("utf-8", errors="replace").strip()
                 if caption_str:
                     result["iptc_caption"] = caption_str
-            elif isinstance(caption_raw, str) and caption_raw.strip():
-                result["iptc_caption"] = caption_raw.strip()
+            elif isinstance(caption_raw, str):
+                caption_str = caption_raw.strip()
+                if caption_str:
+                    result["iptc_caption"] = caption_str
 
             return result
     except (OSError, ValueError, AttributeError):
@@ -6488,20 +6599,58 @@ def _extract_iptc_metadata(image_path: PathLike) -> dict[str, Any]:
     return {}
 
 
-def _xmp_alt_text(container: dict[str, Any], rdf_ns: str) -> str | None:
-    """Extract a text value from an XMP rdf:Alt container."""
-    if not isinstance(container, dict):
+def _is_str_object_mapping(value: object) -> TypeGuard[Mapping[str, object]]:
+    """Return True when ``value`` is a mapping with string keys."""
+    return isinstance(value, Mapping) and all(isinstance(key, str) for key in value)
+
+
+def _as_str_object_mapping(value: object) -> Mapping[str, object] | None:
+    """Return ``value`` as a string-keyed mapping when possible."""
+    return value if _is_str_object_mapping(value) else None
+
+
+def _nested_mapping_value(
+    container: Mapping[str, object] | None,
+    key: str,
+) -> Mapping[str, object] | None:
+    """Return a nested mapping value from a string-keyed metadata mapping."""
+    if container is None:
         return None
-    alt = container.get(f"{rdf_ns}Alt", {})
-    if not isinstance(alt, dict):
+    return _as_str_object_mapping(container.get(key, {}))
+
+
+def _metadata_text_value(metadata: Mapping[str, object], key: str) -> str | None:
+    """Return a string metadata value when present and correctly typed."""
+    value = metadata.get(key)
+    return value if isinstance(value, str) else None
+
+
+def _metadata_keyword_list(metadata: Mapping[str, object], key: str) -> list[str]:
+    """Return a string-list metadata value when present and correctly typed."""
+    value = metadata.get(key)
+    if not isinstance(value, list):
+        return []
+
+    keyword_items = [item for item in value if isinstance(item, str)]
+    return keyword_items if len(keyword_items) == len(value) else []
+
+
+def _xmp_alt_text(container: Mapping[str, object] | object, rdf_ns: str) -> str | None:
+    """Extract a text value from an XMP rdf:Alt container."""
+    container_mapping = _as_str_object_mapping(container)
+    if container_mapping is None:
+        return None
+    alt = _nested_mapping_value(container_mapping, f"{rdf_ns}Alt")
+    if alt is None:
         return None
     text = alt.get(f"{rdf_ns}li", "")
-    if isinstance(text, dict):
-        text = text.get("#text", "")
+    text_mapping = _as_str_object_mapping(text)
+    if text_mapping is not None:
+        text = text_mapping.get("#text", "")
     return text.strip() if isinstance(text, str) and text.strip() else None
 
 
-def _extract_xmp_metadata(image_path: PathLike) -> dict[str, Any]:
+def _extract_xmp_metadata(image_path: PathLike) -> XMPMetadata:
     """Extract XMP metadata (dc:subject keywords, dc:title, dc:description).
 
     Uses Pillow's ``Image.getxmp()`` (8.2+).  The returned dict is deeply
@@ -6519,24 +6668,26 @@ def _extract_xmp_metadata(image_path: PathLike) -> dict[str, Any]:
         with Image.open(Path(image_path)) as img:
             if not hasattr(img, "getxmp"):
                 return {}
-            xmp: dict[str, Any] = img.getxmp()
+            xmp = _as_str_object_mapping(img.getxmp())
             if not xmp:
                 return {}
 
-            result: dict[str, Any] = {}
+            result: XMPMetadata = {}
 
             # Navigate: xmpmeta → RDF → Description
-            desc_block = (
-                xmp.get("xmpmeta", {}).get(f"{rdf_ns}RDF", {}).get(f"{rdf_ns}Description", {})
+            desc_block = _nested_mapping_value(
+                _nested_mapping_value(_nested_mapping_value(xmp, "xmpmeta"), f"{rdf_ns}RDF"),
+                f"{rdf_ns}Description",
             )
-            if not isinstance(desc_block, dict):
+            if desc_block is None:
                 return {}
 
             # dc:subject → keywords list
             subject = desc_block.get(f"{dc_ns}subject", {})
-            if isinstance(subject, dict):
-                bag = subject.get(f"{rdf_ns}Bag", {})
-                if isinstance(bag, dict):
+            subject_mapping = _as_str_object_mapping(subject)
+            if subject_mapping is not None:
+                bag = _nested_mapping_value(subject_mapping, f"{rdf_ns}Bag")
+                if bag is not None:
                     items = bag.get(f"{rdf_ns}li", [])
                     if isinstance(items, str):
                         items = [items]
@@ -6617,6 +6768,11 @@ def extract_image_metadata(
     # IPTC + XMP extraction (separate image opens for header-only access)
     iptc = _extract_iptc_metadata(img_path)
     xmp = _extract_xmp_metadata(img_path)
+    iptc_caption = _metadata_text_value(iptc, "iptc_caption")
+    xmp_description = _metadata_text_value(xmp, "xmp_description")
+    xmp_title = _metadata_text_value(xmp, "xmp_title")
+    iptc_keywords = _metadata_keyword_list(iptc, "iptc_keywords")
+    xmp_keywords = _metadata_keyword_list(xmp, "xmp_keywords")
 
     # Date, Time, GPS
     metadata["date"] = _extract_exif_date(img_path, exif_data)
@@ -6624,18 +6780,16 @@ def extract_image_metadata(
     metadata["gps"] = _extract_gps_str(exif_data.get("GPSInfo"))
 
     # Description: prefer IPTC caption → XMP description → EXIF ImageDescription
-    description = (
-        iptc.get("iptc_caption") or xmp.get("xmp_description") or _extract_description(exif_data)
-    )
+    description = iptc_caption or xmp_description or _extract_description(exif_data)
     metadata["description"] = description
 
     # Title: from XMP dc:title (falls back to None)
-    metadata["title"] = xmp.get("xmp_title")
+    metadata["title"] = xmp_title
 
     # Keywords: merge IPTC → XMP → Windows XP, deduplicated
     metadata["keywords"] = _merge_keywords(
-        iptc.get("iptc_keywords", []),
-        xmp.get("xmp_keywords", []),
+        iptc_keywords,
+        xmp_keywords,
         _extract_xp_keywords(exif_data),
     )
 
@@ -12419,13 +12573,16 @@ def get_system_info() -> tuple[str, str | None]:
             )
             if result.returncode == 0:
                 try:
-                    data = json.loads(result.stdout)
+                    data = _normalize_system_profiler_data(json.loads(result.stdout))
+                    if data is None:
+                        logger.warning("Failed to parse system_profiler JSON output")
+                        return arch, gpu_info
                     # Navigate the JSON structure: SPDisplaysDataType -> [0] -> sppci_model
                     # Note: keys can vary slightly, but 'sppci_model' or '_name' are common
                     displays = data.get("SPDisplaysDataType", [])
                     if displays:
                         # Try commonly used keys for GPU name
-                        gpu_info = displays[0].get("sppci_model") or displays[0].get("_name")
+                        gpu_info = _mapping_first_text_value(displays[0], "sppci_model", "_name")
                 except json.JSONDecodeError:
                     logger.warning("Failed to parse system_profiler JSON output")
     except (subprocess.SubprocessError, TimeoutError) as e:
@@ -12523,19 +12680,16 @@ def _get_apple_silicon_info() -> dict[str, str]:
 
     device_info = get_device_info() or {}
     displays = device_info.get("SPDisplaysDataType") or []
-    if not displays or not isinstance(displays, list):
+    if not displays:
         return info
 
     first = displays[0]
-    if not isinstance(first, dict):
-        return info
-
     gpu_cores = first.get("sppci_cores")
     if gpu_cores is not None:
         info["GPU Cores"] = str(gpu_cores)
 
-    metal_family = first.get("spdisplays_mtlgpufamilysupport")
-    if metal_family:
+    metal_family = _mapping_first_text_value(first, "spdisplays_mtlgpufamilysupport")
+    if metal_family is not None:
         info["Metal Support"] = metal_family.replace("spdisplays_metal", "Metal ")
 
     return info

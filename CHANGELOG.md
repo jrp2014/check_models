@@ -28,6 +28,14 @@ Notable changes to this project will be documented in this file.
   broad kwargs bags with typed helper shapes while keeping missing third-party
   stubs as soft warnings via best-effort local stub refreshes in
   `src/tools/run_quality_checks.sh`.
+- Tightened several remaining metadata and EXIF typing surfaces in
+  `src/check_models.py` by replacing broad `dict[str, Any]` helper returns
+  with explicit IPTC/XMP typed shapes, narrowing Pillow tag lookups, and
+  adding small protocol-based annotations around EXIF and GPS helper usage.
+- Tightened additional low-risk helper typing in `src/check_models.py` by
+  validating quality-config sections as string-keyed mappings and normalizing
+  macOS `system_profiler` JSON into typed helper shapes before GPU/tooling
+  extraction.
 - Fixed Ty invocation in `src/tools/run_quality_checks.sh` and
   `src/tools/check_quality_simple.sh` to pass the resolved repo Python
   explicitly, eliminating false `unresolved-import` warnings when Ty fell back

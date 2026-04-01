@@ -10,9 +10,12 @@ from __future__ import annotations
 
 import argparse
 import importlib
+import json
 import logging
+import subprocess
 from pathlib import Path
 from typing import TYPE_CHECKING
+from unittest.mock import patch
 
 if TYPE_CHECKING:  # pragma: no cover
     import types
@@ -427,6 +430,13 @@ class TestQualityThresholdsFromConfig:
         default_ratio = 0.8
         assert qt.repetition_ratio == default_ratio
 
+    def test_non_mapping_threshold_section_raises(self, mod: types.ModuleType) -> None:
+        """Non-mapping threshold sections should fail with a clear schema error."""
+        config: dict[str, object] = {"thresholds": [], "patterns": {}}
+
+        with pytest.raises(TypeError, match="thresholds section must be a mapping"):
+            mod.QualityThresholds.from_config(config)
+
     def test_invalid_threshold_bounds_raise(self, mod: types.ModuleType) -> None:
         """Inverted threshold bounds should fail fast instead of weakening checks."""
         config = {
@@ -488,6 +498,21 @@ class TestLoadQualityConfig:
             mod.load_quality_config(config_file)
         assert "Failed to load" in caplog.text
 
+    def test_non_mapping_yaml_warns(
+        self,
+        mod: types.ModuleType,
+        tmp_path: Path,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """Non-mapping YAML content should warn instead of crashing."""
+        config_file = tmp_path / "quality_config.yaml"
+        config_file.write_text("- unexpected\n- list\n", encoding="utf-8")
+
+        with caplog.at_level(logging.WARNING):
+            mod.load_quality_config(config_file)
+
+        assert "top-level document must be a mapping" in caplog.text
+
     def test_invalid_threshold_config_warns_and_preserves_defaults(
         self,
         mod: types.ModuleType,
@@ -507,6 +532,63 @@ class TestLoadQualityConfig:
 
         assert "Failed to load" in caplog.text
         assert mod.QUALITY.repetition_ratio == original_ratio
+
+
+class TestSystemProfilerParsing:
+    """Tests for typed normalization of macOS system_profiler JSON output."""
+
+    def test_get_device_info_filters_non_mapping_entries(self, mod: types.ModuleType) -> None:
+        """Only mapping entries should survive normalization of system_profiler lists."""
+        payload = json.dumps(
+            {
+                "SPDisplaysDataType": [
+                    {"sppci_model": "Apple M4", "sppci_cores": 10},
+                    "skip-me",
+                    5,
+                ],
+                "SPAudioDataType": [{"_name": "MacBook Speakers"}],
+                "_ignored": "scalar",
+            }
+        )
+
+        with (
+            patch.object(mod.platform, "system", return_value="Darwin"),
+            patch.object(mod.subprocess, "check_output", return_value=payload),
+        ):
+            info = mod.get_device_info()
+
+        assert info == {
+            "SPDisplaysDataType": [{"sppci_model": "Apple M4", "sppci_cores": 10}],
+            "SPAudioDataType": [{"_name": "MacBook Speakers"}],
+        }
+
+    def test_get_system_info_uses_first_string_gpu_name(self, mod: types.ModuleType) -> None:
+        """GPU info should come from the first usable string field in display data."""
+        payload = json.dumps(
+            {
+                "SPDisplaysDataType": [
+                    {"sppci_model": "Apple M4 Max", "_name": "Fallback Name"},
+                ]
+            }
+        )
+        result = subprocess.CompletedProcess(
+            args=["/usr/sbin/system_profiler", "SPDisplaysDataType", "-json"],
+            returncode=0,
+            stdout=payload,
+            stderr="",
+        )
+
+        mod.get_system_info.cache_clear()
+        with (
+            patch.object(mod.platform, "system", return_value="Darwin"),
+            patch.object(mod.platform, "machine", return_value="arm64"),
+            patch.object(mod.subprocess, "run", return_value=result),
+        ):
+            arch, gpu_info = mod.get_system_info()
+        mod.get_system_info.cache_clear()
+
+        assert arch == "arm64"
+        assert gpu_info == "Apple M4 Max"
 
 
 class TestPreflightDependencyDiagnostics:
