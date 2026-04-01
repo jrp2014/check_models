@@ -1,36 +1,20 @@
 {
-  // Point VS Code at the conda environment used for development
-  "python.defaultInterpreterPath": "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/bin/python",
-
   // Make the `src` package importable for analysis and tests
   "python.analysis.extraPaths": [
     "${workspaceFolder}/src"
   ],
-
   // Enable pytest discovery for the src folder
   "python.testing.pytestEnabled": true,
-
-
-  // Use integrated terminal environment for tasks/debug
-  "terminal.integrated.env.osx": {
-    "CONDA_DEFAULT_ENV": "mlx-vlm",
-    "PATH": "/opt/homebrew/Caskroom/miniconda/base/envs/mlx-vlm/bin:${env:PATH}"
-  },
-
+  // Ruff extension configuration
+  "ruff.configuration": "${workspaceFolder}/src/pyproject.toml",
+  "ruff.cwd": "${workspaceFolder}/src",
   // Auto-format and code actions on save using ruff (requires ruff extension)
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll": "always",
     "source.fixAll.ruff": "always"
   },
-
-  // Enable ruff linting (for ms-python integration) and prefer ruff formatting
-  "python.linting.enabled": true,
-  "python.linting.ruffEnabled": true,
-  "python.linting.ruffPath": "ruff",
-
-  // Preferred Python formatter: set default formatter for Python files to Ruff
-  "python.formatting.provider": "ruff",
+  // Python-specific: use Ruff for formatting and code actions
   "[python]": {
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
@@ -39,40 +23,62 @@
     },
     "editor.defaultFormatter": "charliermarsh.ruff"
   },
-
   // Additional project-level python settings
   "python.terminal.activateEnvironment": true,
   "python.testing.pytestArgs": [
     "src/tests"
   ],
   "mypy.configFile": "src/pyproject.toml",
-  "python.analysis.stubPath": "src/typings",
+  "python.analysis.stubPath": "typings",
   "python.analysis.exclude": [
-    "**/typings/**"
+    ".git",
+    ".conda",
+    "venv",
+    "env",
+    ".venv",
+    "**/typings/**",
+    "**/node_modules",
+    "**/__pycache__",
+    "**/.*"
   ],
   "python.analysis.useLibraryCodeForTypes": true,
-  "python.analysis.typeCheckingMode": "standard",
+  // Match pyproject.toml [tool.pyright] typeCheckingMode = "basic"
+  "python.analysis.typeCheckingMode": "basic",
   "python.analysis.diagnosticSeverityOverrides": {
     "reportUnknownVariableType": "none",
     "reportMissingImports": "none",
     "reportMissingModuleSource": "none"
   },
-
+  // Enable Pylance pytest support (fixture completions, parameter inference)
+  "python.analysis.enablePytestSupport": true,
+  // Exclude build artifacts from file tree, search, and file watcher
   "files.exclude": {
     "**/__pycache__": true,
     "**/.mypy_cache": true,
     "**/.ruff_cache": true,
     "**/*.egg-info": true
-  }
-  ,
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "typings": true,
+    "docs/notes/archive": true,
+    "**/.pytest_cache": true
+  },
+  "files.watcherExclude": {
+    "**/__pycache__/**": true,
+    "**/.mypy_cache/**": true,
+    "**/.ruff_cache/**": true,
+    "**/.pytest_cache/**": true,
+    "**/node_modules/**": true,
+    "typings/**": true
+  },
   // Force JSON/JSONC to use the built-in JSON formatter (prevents Copilot being used)
   "[json]": {
     "editor.defaultFormatter": "vscode.json-language-features"
   },
   "[jsonc]": {
     "editor.defaultFormatter": "vscode.json-language-features"
-  }
-  ,
+  },
   // Prefer the built-in Markdown formatter (prevents Copilot/other extensions taking over)
   "[markdown]": {
     "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
@@ -80,5 +86,29 @@
   // Prefer a TOML formatter extension; recommend "bungcip.better-toml" in extensions.json
   "[toml]": {
     "editor.defaultFormatter": "tamasfe.even-better-toml"
-  }
+  },
+  "python-envs.defaultEnvManager": "ms-python.python:conda",
+  "python-envs.defaultPackageManager": "ms-python.python:conda",
+  "cursorpyright.analysis.diagnosticSeverityOverrides": {
+    "reportUnknownVariableType": "none",
+    "reportMissingImports": "none",
+    "reportMissingModuleSource": "none"
+  },
+  "cursorpyright.analysis.exclude": [
+    ".git",
+    ".conda",
+    "venv",
+    "env",
+    ".venv",
+    "**/typings/**",
+    "**/node_modules",
+    "**/__pycache__",
+    "**/.*"
+  ],
+  "cursorpyright.analysis.extraPaths": [
+    "${workspaceFolder}/src"
+  ],
+  "cursorpyright.analysis.stubPath": "typings",
+  "cursorpyright.analysis.typeCheckingMode": "basic",
+  "cursorpyright.analysis.useLibraryCodeForTypes": true
 }

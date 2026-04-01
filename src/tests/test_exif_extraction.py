@@ -1,10 +1,23 @@
 """Tests for EXIF extraction utilities."""
 
-# ruff: noqa: SLF001
 from pathlib import Path
 from typing import Any
 
+from PIL import Image
+
 import check_models
+from check_models import (
+    _build_cataloguing_prompt,
+    _extract_xp_keywords,
+    _merge_keywords,
+    extract_image_metadata,
+)
+
+
+class _FakeExifWithSubIfd:
+    def get_ifd(self, tag: object) -> dict[object, object] | None:
+        _ = tag
+        return {36867: "2024:01:10 10:20:30", "custom": "value"}
 
 
 def test_extract_exif_date_standard_format(tmp_path: Path) -> None:
@@ -16,6 +29,13 @@ def test_extract_exif_date_standard_format(tmp_path: Path) -> None:
     assert result is not None
     assert "2024-01-15" in result
     assert "14:30:45" in result
+
+
+def test_process_exif_subifd_handles_non_int_tag_ids() -> None:
+    """Unknown non-integer sub-IFD keys should fall back to their string form."""
+    result = check_models._process_exif_subifd(_FakeExifWithSubIfd())
+    assert result["DateTimeOriginal"] == "2024:01:10 10:20:30"
+    assert result["custom"] == "value"
 
 
 def test_extract_exif_date_datetime_original(tmp_path: Path) -> None:
@@ -99,3 +119,168 @@ def test_extract_description_whitespace_only() -> None:
     exif_dict: dict[str | int, Any] = {"ImageDescription": "   "}
     result = check_models._extract_description(exif_dict)
     assert result is None
+
+
+# ---------------------------------------------------------------------------
+# _extract_xp_keywords
+# ---------------------------------------------------------------------------
+
+
+def test_xp_keywords_utf16le_bytes() -> None:
+    """Should decode UTF-16LE semicolon-delimited XPKeywords."""
+    raw = "sunset;beach;ocean".encode("utf-16-le") + b"\x00\x00"
+    result = _extract_xp_keywords({"XPKeywords": raw})
+    assert result == ["sunset", "beach", "ocean"]
+
+
+def test_xp_keywords_plain_string() -> None:
+    """Should split plain string XPKeywords by semicolon."""
+    result = _extract_xp_keywords({"XPKeywords": "cat;dog;bird"})
+    assert result == ["cat", "dog", "bird"]
+
+
+def test_xp_keywords_missing() -> None:
+    """Should return empty list when XPKeywords absent."""
+    result = _extract_xp_keywords({"Make": "Canon"})
+    assert result == []
+
+
+def test_xp_keywords_empty_segments() -> None:
+    """Should strip empty segments from XPKeywords."""
+    result = _extract_xp_keywords({"XPKeywords": "cat;;;dog; ;bird"})
+    assert result == ["cat", "dog", "bird"]
+
+
+# ---------------------------------------------------------------------------
+# _merge_keywords
+# ---------------------------------------------------------------------------
+
+
+def test_merge_keywords_deduplicates_case_insensitive() -> None:
+    """Should deduplicate keywords case-insensitively, keeping first-seen form."""
+    result = _merge_keywords(["Sunset", "beach"], ["sunset", "Ocean"], ["BEACH", "sky"])
+    assert result == "Sunset, beach, Ocean, sky"
+
+
+def test_merge_keywords_empty_sources() -> None:
+    """Should return None when all sources are empty."""
+    result = _merge_keywords([], [], [])
+    assert result is None
+
+
+def test_merge_keywords_single_source() -> None:
+    """Should return comma-separated from a single source."""
+    result = _merge_keywords(["a", "b", "c"])
+    assert result == "a, b, c"
+
+
+# ---------------------------------------------------------------------------
+# extract_image_metadata — keywords / title / description priority
+# ---------------------------------------------------------------------------
+
+
+def test_extract_metadata_xp_keywords_from_exif(tmp_path: Path) -> None:
+    """extract_image_metadata should populate keywords from XPKeywords in EXIF."""
+    img_path = tmp_path / "test.jpg"
+    img = Image.new("RGB", (10, 10), color="red")
+    img.save(img_path)
+
+    # Provide exif_data with XPKeywords pre-decoded (as _process_ifd0 would)
+    exif_with_xp: dict[str | int, Any] = {
+        "XPKeywords": "travel;landscape;mountain",
+    }
+    meta = extract_image_metadata(img_path, exif_data=exif_with_xp)
+    keywords = meta.get("keywords")
+    assert isinstance(keywords, str)
+    assert "travel" in keywords
+    assert "landscape" in keywords
+
+
+def test_extract_metadata_description_prefers_iptc_caption(tmp_path: Path) -> None:
+    """EXIF ImageDescription is used when no IPTC/XMP overrides exist."""
+    img_path = tmp_path / "test.jpg"
+    img = Image.new("RGB", (10, 10), color="blue")
+    img.save(img_path)
+
+    exif_with_desc: dict[str | int, Any] = {
+        "ImageDescription": "EXIF description",
+    }
+    meta = extract_image_metadata(img_path, exif_data=exif_with_desc)
+    # On a plain JPEG with no IPTC/XMP, EXIF description is used
+    assert meta["description"] == "EXIF description"
+
+
+# ---------------------------------------------------------------------------
+# _build_cataloguing_prompt
+# ---------------------------------------------------------------------------
+
+
+def test_build_prompt_empty_metadata() -> None:
+    """Prompt from empty metadata should still request cataloguing output."""
+    prompt = _build_cataloguing_prompt({})
+    assert "cataloguing" in prompt.lower()
+    assert "Title:" in prompt
+    assert "Description:" in prompt
+    assert "Keywords:" in prompt
+    assert "Do not output reasoning" in prompt
+    assert "Do not guess." in prompt
+    assert "- 5-10 words, concrete and factual" in prompt
+    assert "- 10-18 unique comma-separated terms" in prompt
+    assert "Do not repeat or paraphrase these instructions in the title." in prompt
+    assert (
+        "Do not copy prompt instructions into the Title, Description, or Keywords fields." in prompt
+    )
+
+
+def test_build_prompt_includes_metadata_fields() -> None:
+    """Prompt should incorporate all provided metadata fields."""
+    meta: dict[str, str | None] = {
+        "description": "Sunset over cliffs",
+        "title": "Coastal Sunset",
+        "keywords": "sunset, cliffs, ocean",
+        "date": "2025-10-01",
+        "time": "18:30",
+        "gps": "51.0N, 0.9W",
+    }
+    prompt = _build_cataloguing_prompt(meta)
+    assert "Sunset over cliffs" in prompt
+    assert "Coastal Sunset" in prompt
+    assert "sunset, cliffs, ocean" in prompt
+    assert "2025-10-01" in prompt
+    assert "18:30" in prompt
+    assert "51.0N, 0.9W" in prompt
+    assert "high confidence" in prompt
+    assert "use only when visually confirmed" in prompt
+    assert "Do not copy context hints verbatim." not in prompt
+
+
+def test_build_prompt_context_marker_present() -> None:
+    """Prompt with description should contain 'Context:' for quality analysis."""
+    meta: dict[str, str | None] = {"description": "A red car"}
+    prompt = _build_cataloguing_prompt(meta)
+    assert "Context:" in prompt
+
+
+def test_build_prompt_truncates_long_metadata_fields() -> None:
+    """Large metadata fields should be compacted to avoid excessive prompt context."""
+    long_desc = "detail " * 200
+    long_keywords = ", ".join([f"keyword{i}" for i in range(60)])
+    meta: dict[str, str | None] = {
+        "title": "Very Long Existing Title " * 10,
+        "description": long_desc,
+        "keywords": long_keywords,
+    }
+
+    prompt = _build_cataloguing_prompt(meta)
+    assert "Context:" in prompt
+    assert long_desc not in prompt
+    assert long_keywords not in prompt
+    assert "..." in prompt
+    assert "Keyword hints:" in prompt
+
+
+def test_build_prompt_no_context_when_no_description() -> None:
+    """Prompt without description/title/keywords should omit 'Context:' block."""
+    meta: dict[str, str | None] = {"date": "2025-01-01"}
+    prompt = _build_cataloguing_prompt(meta)
+    assert "Context:" not in prompt

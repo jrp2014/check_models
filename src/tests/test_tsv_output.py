@@ -41,18 +41,19 @@ def test_generate_tsv_report_basic(tmp_path: Path) -> None:
 
     # Read and verify content
     content = output_file.read_text(encoding="utf-8")
-    lines = content.strip().split("\n")
+    # Skip metadata comment line (starts with #)
+    data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
 
     # Should have at least header + 1 data row
-    assert len(lines) >= 2
+    assert len(data_lines) >= 2
 
     # Verify it's tab-separated
-    assert "\t" in lines[0]  # Header line
-    assert "\t" in lines[1]  # Data line
+    assert "\t" in data_lines[0]  # Header line
+    assert "\t" in data_lines[1]  # Data line
 
 
 def test_tsv_escapes_tabs_in_values() -> None:
-    """Should replace tabs with spaces in field values."""
+    """Should normalize tabs into visible spaces in compact output previews."""
     results = [
         check_models.PerformanceResult(
             model_name="test/model",
@@ -73,17 +74,18 @@ def test_tsv_escapes_tabs_in_values() -> None:
 
         # The output text should not contain actual tabs within the field value
         # (but will have tabs as column separators)
-        lines = content.strip().split("\n")
+        # Skip metadata comment line
+        data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
         # Get the last column which contains the output
-        last_column = lines[1].split("\t")[-1]
-        # Tabs should be replaced with 4 spaces
-        assert "    " in last_column
+        last_column = data_lines[1].split("\t")[-1]
+        # Shared output previews normalize internal whitespace before TSV escaping
+        assert "Line with tab character" in last_column
     finally:
         output_file.unlink()
 
 
 def test_tsv_escapes_newlines_in_values() -> None:
-    r"""Should replace newlines with escaped \n sequence."""
+    r"""Should normalize embedded newlines into a single-line preview."""
     results = [
         check_models.PerformanceResult(
             model_name="test/model",
@@ -102,15 +104,14 @@ def test_tsv_escapes_newlines_in_values() -> None:
         check_models.generate_tsv_report(results, output_file)
         content = output_file.read_text(encoding="utf-8")
 
-        # Content should be 2 lines (header + 1 data row)
-        lines = content.strip().split("\n")
-        assert len(lines) == 2
+        # Content should be 3 lines: metadata comment + header + 1 data row
+        data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
+        assert len(data_lines) == 2
 
-        # The newlines should be escaped as literal \n
-        last_column = lines[1].split("\t")[-1]
-        assert "\\n" in last_column
-        # Should not have actual newlines in the data
-        assert "\n" not in last_column or last_column.count("\n") == 0
+        # Shared output previews collapse multiline output into a readable one-line preview
+        last_column = data_lines[1].split("\t")[-1]
+        assert "Line 1 Line 2 Line 3" in last_column
+        assert "\\n" not in last_column
     finally:
         output_file.unlink()
 
@@ -135,8 +136,9 @@ def test_tsv_removes_html_tags_from_headers() -> None:
         check_models.generate_tsv_report(results, output_file)
         content = output_file.read_text(encoding="utf-8")
 
-        # Header should not contain HTML tags
-        header_line = content.split("\n")[0]
+        # Header should not contain HTML tags (skip metadata comment line)
+        data_lines = [ln for ln in content.split("\n") if not ln.startswith("#")]
+        header_line = data_lines[0]
         assert "<br>" not in header_line
         assert "<" not in header_line
         assert ">" not in header_line
@@ -163,12 +165,43 @@ def test_tsv_handles_failed_results() -> None:
         check_models.generate_tsv_report(results, output_file)
         content = output_file.read_text(encoding="utf-8")
 
-        # Should have header + data row
-        lines = content.strip().split("\n")
-        assert len(lines) == 2
+        # Should have metadata comment + header + data row
+        data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
+        assert len(data_lines) == 2
 
         # Error message should be in the output
         assert "Error" in content or "Failed to load model" in content
+    finally:
+        output_file.unlink()
+
+
+def test_tsv_uses_shared_output_preview_cues_and_tail_marker() -> None:
+    """Compact TSV output should expose issue cues and the output tail."""
+    long_text = "Start of answer. " + ("filler text " * 40) + "TRAILING-SIGNAL"
+    results = [
+        check_models.PerformanceResult(
+            model_name="test/model",
+            success=True,
+            generation=MockGenerationResult(text=long_text),
+            total_time=1.0,
+            generation_time=0.5,
+            model_load_time=0.5,
+            quality_issues="context-echo, reasoning-leak",
+        ),
+    ]
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".tsv", delete=False) as f:
+        output_file = Path(f.name)
+
+    try:
+        check_models.generate_tsv_report(results, output_file)
+        content = output_file.read_text(encoding="utf-8")
+
+        data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
+        data_row = data_lines[1]
+        assert "[context-echo; reasoning-leak]" in data_row
+        assert "[tail]" in data_row
+        assert "TRAILING-SIGNAL" in data_row
     finally:
         output_file.unlink()
 
@@ -208,10 +241,11 @@ def test_tsv_full_model_name(tmp_path: Path) -> None:
     check_models.generate_tsv_report(results, output_file)
 
     content = output_file.read_text(encoding="utf-8")
-    lines = content.strip().split("\n")
+    # Skip metadata comment line
+    data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
 
-    # Check the data row (index 1)
-    data_row = lines[1]
+    # Check the data row (index 1, after header)
+    data_row = data_lines[1]
     # The model name is typically the first column
     assert full_model_name in data_row
     # Ensure it wasn't truncated to just "specific-model-v1"

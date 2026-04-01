@@ -20,7 +20,7 @@ The fastest way to start is using the automated setup script (requires Conda):
 
 ```bash
 # Sets up a 'mlx-vlm' environment with Python 3.13 and all dependencies
-./setup_conda_env.sh
+bash tools/setup_conda_env.sh
 conda activate mlx-vlm
 ```
 
@@ -61,17 +61,19 @@ python -m check_models --dry-run
 - **Model Discovery**: Auto-discovers locally cached MLX VLMs from Hugging Face cache or processes explicit model list with `--models`
 - **Selection Control**: Use `--exclude` to filter models from cache scan or explicit list
 - **Folder Mode**: Automatically selects most recently modified image from specified folder
-- **Metadata Extraction**: Robust EXIF + GPS parsing with fail-soft multi-pass strategy for partially corrupted metadata
-- **Smart Prompting**: Generates metadata-aware prompts (image description, GPS, date) when `--prompt` not provided
+- **Metadata Extraction**: Multi-source metadata: EXIF + GPS + IPTC keywords/caption + XMP (dc:subject, dc:title) + Windows XP keywords, with fail-soft strategy for partially corrupt data
+- **Smart Prompting**: Generates structured cataloguing prompts (Title/Description/Keywords) that verify metadata against clearly visible image content, avoid speculation, and compact long metadata fields/keyword lists to keep prompt size manageable; `--prompt` overrides
 - **Performance Metrics**:
   - Timing: generation_time, model_load_time, total_time
+  - Detailed verbose timing: input validation, prompt prep, cleanup, first-token latency, stop reason (when available)
   - Tokens: total, prompt, generated with tokens/sec
   - Memory: peak, active delta, cached delta (GB)
 - **Structured Logging**: Formatter-driven styling with LogStyles for consistent CLI output
 - **Multiple Output Formats**:
   - **CLI**: Colorized with compact or detailed metrics modes
   - **HTML**: Standalone report with inline CSS, failed row highlighting
-  - **Markdown**: GitHub-compatible with pipe tables
+  - **Markdown**: GitHub-compatible summary plus standalone gallery Markdown artifact
+  - **TSV/JSONL**: Machine-readable exports for downstream analysis
 - **Error Handling**: Per-model isolation with detailed diagnostics; graceful timeout/failure handling
 - **Machine Parsable**: SUMMARY lines with `key=value` format for automation
 - **Visual Hierarchy**: Emoji prefixes, tree-structured metrics, wrapped text output
@@ -82,13 +84,13 @@ python -m check_models --dry-run
 | ---- | ----- |
 | Model discovery | Scans Hugging Face cache; explicit `--models` overrides. |
 | Selection control | `--exclude` works with cache scan or explicit list. |
-| Prompting | `--prompt` overrides; otherwise metadata‑informed (image description, GPS, date). |
+| Prompting | `--prompt` overrides; otherwise structured cataloguing prompt with IPTC/XMP keyword seeding. |
 | Performance | generation_time, model_load_time, total_time, token counts, TPS, peak memory. |
 | Reporting | CLI (color), HTML (standalone), Markdown (GitHub). |
 | Robustness | Per‑model isolation; failures logged; SUMMARY lines for automation. |
 | Timeout | Signal‑based (UNIX) manager; configurable per run. |
 | Output preview | Non‑verbose mode still shows wrapped generated text (80 cols). |
-| Metrics modes | Compact (default) or expanded with `--detailed-metrics`. |
+| Metrics modes | Compact (default) or expanded with `--detailed-metrics`; the flag is ignored unless `--verbose` is also set, and detailed mode includes extra phase timings when available. |
 
 ## Installation and Environment Setup
 
@@ -97,11 +99,8 @@ python -m check_models --dry-run
 For the easiest setup, use the provided shell script that automates the entire conda environment creation:
 
 ```bash
-# Make script executable (if needed)
-chmod +x setup_conda_env.sh
-
 # Create environment with default name 'mlx-vlm'
-./setup_conda_env.sh
+bash tools/setup_conda_env.sh
 
 # Activate
 conda activate mlx-vlm
@@ -109,33 +108,18 @@ conda activate mlx-vlm
 
 The script handles Python 3.13 setup, dependencies, and optional PyTorch support.
 
+For clean machines and normal project use, this conda workflow is the supported path.
+
 ### Manual Installation
 
-If you prefer manual setup, we support `pip`, `uv`, and `conda`.
+If you prefer to create the environment manually, use conda and run the package
+install commands from the `src/` directory.
 
 <details>
-<summary>Click to view manual installation methods</summary>
-
-#### Using `uv` (Fastest)
+<summary>Click to view manual conda setup</summary>
 
 ```bash
-pip install uv
-uv venv
-source .venv/bin/activate
-uv pip install -e .
-```
-
-#### Using `pip`
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -e .
-```
-
-#### Using `conda`
-
-```bash
+cd src
 conda create -n mlx-vlm python=3.13
 conda activate mlx-vlm
 pip install -e .
@@ -145,13 +129,17 @@ pip install -e .
 
 ### Optional Dependencies
 
+Unless noted otherwise, the `pip install -e ...` commands below assume you are
+running them from `src/`. From the repository root, prefer `make install`,
+`make dev`, or `make -C src install-torch`.
+
 Enable additional features by installing "extras":
 
 ```bash
 # Install core + extras (psutil, tokenizers, etc.)
 pip install -e ".[extras]"
 
-# Install PyTorch support (needed for Phi-3-vision, Florence-2)
+# Install PyTorch support (needed for Phi-3-vision, Florence-2, FastVLM/timm-backed models)
 pip install -e ".[torch]"
 
 # Install everything for development
@@ -179,19 +167,19 @@ python -m check_models --image test.jpg --prompt "Detailed caption."
 
 ```bash
 # Run across all cached models with a custom prompt
-python check_models.py -f ~/Pictures/Processed -p "What is the main object in this image?"
+python -m check_models -f ~/Pictures/Processed -p "What is the main object in this image?"
 
 # Explicit model list (skips cache discovery)
-python check_models.py -f ~/Pictures/Processed -m mlx-community/nanoLLaVA mlx-community/llava-1.5-7b-hf
+python -m check_models -f ~/Pictures/Processed -m mlx-community/nanoLLaVA mlx-community/llava-1.5-7b-hf
 
 # Exclude specific models from the automatic cache scan
-python check_models.py -f ~/Pictures/Processed -e mlx-community/problematic-model other/model
+python -m check_models -f ~/Pictures/Processed -e mlx-community/problematic-model other/model
 
 # Combine explicit list with exclusions
-python check_models.py -f ~/Pictures/Processed -m model1 model2 model3 -e model2
+python -m check_models -f ~/Pictures/Processed -m model1 model2 model3 -e model2
 
 # Verbose (debug) mode for detailed logs
-python check_models.py -f ~/Pictures/Processed -v
+python -m check_models -f ~/Pictures/Processed -v
 ```
 
 <details>
@@ -199,7 +187,7 @@ python check_models.py -f ~/Pictures/Processed -v
 
 ```bash
 # Full benchmark run with HTML/Markdown reports
-python check_models.py \
+python -m check_models \
   --folder ~/Pictures/TestImages \
   --exclude "microsoft/Phi-3-vision-128k-instruct" \
   --prompt "Provide a detailed caption for this image" \
@@ -211,14 +199,14 @@ python check_models.py \
   --verbose
 
 # Memory optimization for large models (4-bit KV cache)
-python check_models.py \
+python -m check_models \
   --folder ~/Pictures \
   --lazy-load \
   --max-kv-size 4096 \
   --kv-bits 4
 
 # Sampling control (Nucleus sampling + Repetition penalty)
-python check_models.py \
+python -m check_models \
   --folder ~/Pictures \
   --top-p 0.9 \
   --repetition-penalty 1.2 \
@@ -233,8 +221,15 @@ The tool generates multiple report formats in `output/` by default:
 
 - **CLI**: Real-time colorized progress and metrics.
 - **HTML** (`results.html`): Interactive table with sortable columns and failed row highlighting.
-- **Markdown** (`results.md`): GitHub-compatible summary for documentation.
-- **TSV/JSONL**: Machine-readable formats for analysis.
+- **Markdown** (`results.md`): GitHub-compatible summary for documentation, with links to the canonical log and review artifacts.
+- **Gallery Markdown** (`model_gallery.md`): GitHub-compatible review artifact with image metadata, the full prompt, and one full-output section per model.
+- **Review Markdown** (`review.md`): Short automated digest grouped by likely owner and user-facing utility bucket.
+- **TSV/JSONL** (`results.tsv`, `results.jsonl`): Machine-readable formats for analysis.
+- **Diagnostics** (`diagnostics.md`): Failure-focused and compatibility-focused issue report (generated when failures, harness issues, or preflight compatibility warnings are present).
+- **Log** (`check_models.log`): Canonical comprehensive run artifact, including the full per-model review block and full output/captured failure output.
+- **History** (`results.history.jsonl`): Append-only run history for regressions/recoveries.
+
+The main Markdown report stays brief and points readers to `check_models.log`, `review.md`, and `model_gallery.md` for the full automated review and output evidence.
 
 ### Metrics Explained
 
@@ -243,9 +238,23 @@ The tool generates multiple report formats in `output/` by default:
 - **Load Time**: Time to load weights into memory.
 - **Tokens**: Breakdown of Prompt (input) vs Generated (output) counts.
 
+
 > [!TIP]
 > **Memory Units**: All memory metrics are normalized to GB (decimal).
 > **Token Counts**: `tokens(total/prompt/gen)` shows the full breakdown.
+> [!IMPORTANT]
+> **Image Resolution vs Vision Encoder Input**: VLMs **never see your full-resolution image**. Every model downsamples the input to fit its vision encoder's fixed size before processing. A 50 MP image (8627×5760) becomes a ~0.2 MP thumbnail at 448×448 — a 250× reduction. This means fine details (text, small objects, texture) are lost before the model even starts.
+> Typical input resolutions by model family:
+
+| Resolution | Models |
+| --- | --- |
+| 224×224 | nanoLLaVA |
+| 384–448 | PaliGemma2-448, Phi-3.5, FastVLM, LFM2 |
+| 560–768 | SmolVLM, Idefics3, Molmo |
+| 896–1344 | PaliGemma2-896, Qwen2-VL, Qwen3-VL (dynamic tiling) |
+
+> The Qwen VL family uses **dynamic resolution** with tile-based encoding, processing the image in multiple patches at higher fidelity — which is why their prompt token counts are much larger (~16,000 vs ~500 for PaliGemma2). If a model reports "image too small to see," it is being honest about what it actually received.
+
 
 ### Configuration & Parameters
 
@@ -260,10 +269,10 @@ While MLX-VLM doesn't explicitly document these in all examples, the underlying 
 
 ```bash
 # Moderate penalty to reduce repetition
-python check_models.py --image photo.jpg --repetition-penalty 1.1
+python -m check_models --image photo.jpg --repetition-penalty 1.1
 
 # Strong penalty with larger context window
-python check_models.py --image photo.jpg --repetition-penalty 1.15 --repetition-context-size 50
+python -m check_models --image photo.jpg --repetition-penalty 1.15 --repetition-context-size 50
 ```
 
 **How it works** (from MLX source): During generation, the model maintains a sliding window of the last N tokens (`repetition_context_size`). For each new token prediction, logits of tokens that appear in this window are divided by the `repetition_penalty` factor, making them less likely to be selected. This mechanism operates at the token level during sampling, before temperature is applied.
@@ -295,16 +304,16 @@ From the MLX-VLM source: The KV cache stores attention keys and values for each 
 
 ```bash
 # Moderate 8-bit quantization for 2× memory savings
-python check_models.py --image photo.jpg --kv-bits 8
+python -m check_models --image photo.jpg --kv-bits 8
 
 # Aggressive 4-bit quantization with larger groups (4× compression)
-python check_models.py --image photo.jpg --kv-bits 4 --kv-group-size 128
+python -m check_models --image photo.jpg --kv-bits 4 --kv-group-size 128
 
 # Quantize only after first 512 tokens (preserve system prompt precision)
-python check_models.py --image photo.jpg --kv-bits 8 --quantized-kv-start 512
+python -m check_models --image photo.jpg --kv-bits 8 --quantized-kv-start 512
 
 # Cap cache size for extremely long outputs
-python check_models.py --image photo.jpg --max-kv-size 4096 --kv-bits 8
+python -m check_models --image photo.jpg --max-kv-size 4096 --kv-bits 8
 ```
 
 ### When to Use
@@ -330,7 +339,7 @@ python check_models.py --image photo.jpg --max-kv-size 4096 --kv-bits 8
 
 #### Temperature and Sampling
 
-- `--temperature <float>`: Controls randomness in generation. `0.0` = deterministic (argmax), `1.0` = default diversity, `>1.0` = more creative/random. Default: `0.0`.
+- `--temperature <float>`: Controls randomness in generation. `0.0` = deterministic (argmax), `1.0` = high diversity, `>1.0` = more random. Default: `0.0`.
 - `--top-p <float>`: Nucleus sampling threshold. Only considers tokens whose cumulative probability is ≤ `top_p`. Range: `0.0-1.0`. Default: `1.0` (disabled).
 
 These control the sampling strategy during generation. Higher temperature increases variety but can produce less coherent outputs. Top-p sampling (nucleus sampling) focuses on the most probable tokens.
@@ -339,28 +348,28 @@ These control the sampling strategy during generation. Higher temperature increa
 
 ```bash
 # Deterministic output (default)
-python check_models.py --image photo.jpg --temperature 0.0
+python -m check_models --image photo.jpg --temperature 0.0
 
 # Balanced creativity
-python check_models.py --image photo.jpg --temperature 0.7 --top-p 0.9
+python -m check_models --image photo.jpg --temperature 0.7 --top-p 0.9
 
 # Maximum diversity (risky)
-python check_models.py --image photo.jpg --temperature 1.5 --top-p 0.95
+python -m check_models --image photo.jpg --temperature 1.5 --top-p 0.95
 ```
 
 #### Generation Control
 
-- `--max-tokens <int>`: Maximum number of tokens to generate. Prevents runaway generation. Default: `512`.
-- `--timeout <float>`: Timeout in seconds for each model's generation. Useful for identifying slow/hanging models. Default: `600.0` (10 minutes).
+- `--max-tokens <int>`: Maximum number of tokens to generate. Prevents runaway generation. Default: `500`.
+- `--timeout <float>`: Timeout in seconds for each model's generation. Useful for identifying slow/hanging models. Default: `300.0` (5 minutes).
 
 **Example**:
 
 ```bash
 # Short captions only
-python check_models.py --image photo.jpg --max-tokens 100
+python -m check_models --image photo.jpg --max-tokens 100
 
 # Strict timeout for batch testing
-python check_models.py --folder ~/images --timeout 120
+python -m check_models --folder ~/images --timeout 120
 ```
 
 #### Trust Remote Code
@@ -374,14 +383,35 @@ Some models require custom Python code for their architecture. This flag enables
 
 ```bash
 # Enable for models like Qwen or custom architectures (default behavior)
-python check_models.py --image photo.jpg --models mlx-community/Qwen2-VL-7B-Instruct --trust-remote-code
+python -m check_models --image photo.jpg --models mlx-community/Qwen2-VL-7B-Instruct --trust-remote-code
 
 # Disable for security (may cause some models to fail)
-python check_models.py --image photo.jpg --no-trust-remote-code
+python -m check_models --image photo.jpg --no-trust-remote-code
 ```
 
 > [!WARNING]
 > **Security Risk**: `--trust-remote-code` (the default) executes arbitrary Python from the model repo. Use `--no-trust-remote-code` when running untrusted models.
+
+#### Model Version & Adapter
+
+- `--revision <str>`: Pin the model to a specific branch, tag, or commit SHA from the Hugging Face repo. Useful for reproducing results or avoiding regressions when a model updates. Default: `None` (latest revision on main/default branch).
+- `--adapter-path <str>`: Path to a LoRA adapter directory to apply on top of the base model. Passed through to `mlx_vlm.utils.load(adapter_path=...)`. Default: `None` (no adapter).
+
+**Examples**:
+
+```bash
+# Pin to a specific commit for reproducibility
+python -m check_models --image photo.jpg --models mlx-community/Qwen2-VL-7B-Instruct \
+  --revision abc1234
+
+# Apply a LoRA fine-tune
+python -m check_models --image photo.jpg --models mlx-community/nanoLLaVA \
+  --adapter-path ~/adapters/my-lora
+
+# Combine: specific revision + LoRA adapter
+python -m check_models --image photo.jpg --models mlx-community/nanoLLaVA \
+  --revision v1.0 --adapter-path ~/adapters/my-lora
+```
 
 ### Environment Variables
 
@@ -392,22 +422,27 @@ Several behaviors can be customized via environment variables (useful for CI/aut
 | `MLX_VLM_WIDTH` | Force CLI output width (columns) | Auto-detect terminal | `MLX_VLM_WIDTH=120` |
 | `NO_COLOR` | Disable ANSI colors in output | Not set (colors enabled) | `NO_COLOR=1` |
 | `FORCE_COLOR` | Force ANSI colors even in non-TTY | Not set | `FORCE_COLOR=1` |
-| `TRANSFORMERS_NO_TF` | Block TensorFlow loading | `1` (blocked) | `TRANSFORMERS_NO_TF=0` to allow |
-| `MLX_VLM_ALLOW_TF` | Override TensorFlow blocking | Not set (blocked) | `MLX_VLM_ALLOW_TF=1` to allow |
+| `TRANSFORMERS_NO_TF` | Legacy Transformers backend guard (best effort) | Exported only if installed `transformers` still references it | `TRANSFORMERS_NO_TF=0` |
+| `USE_TF` | Compatibility backend guard (best effort) | Exported only if installed `transformers` still references it | `USE_TF=1` |
+| `MLX_VLM_ALLOW_TF` | Allow user-installed TensorFlow imports | Not set (blocked) | `MLX_VLM_ALLOW_TF=1` to allow |
 | `TOKENIZERS_PARALLELISM` | Disable tokenizer parallelism warnings | `false` | `TOKENIZERS_PARALLELISM=true` |
-| `MLX_METAL_JIT` | Metal kernel compilation mode | `OFF` (pre-built) | `MLX_METAL_JIT=ON` for runtime JIT |
+| `MLX_METAL_JIT` | Optional `tools/update.sh` override (`MLX_METAL_JIT`) | Unset (uses MLX default `OFF`, pre-built kernels) | `MLX_METAL_JIT=ON` for runtime JIT |
+
+When backend guards are active, the script exports only the legacy
+`TRANSFORMERS_NO_*` and `USE_*` variables still referenced by the installed
+`transformers` version.
 
 **Examples**:
 
 ```bash
 # Force wider output for CI logs
-MLX_VLM_WIDTH=120 python check_models.py --folder ~/Pictures
+MLX_VLM_WIDTH=120 python -m check_models --folder ~/Pictures
 
 # Disable colors for log file capture
-NO_COLOR=1 python check_models.py > output.log 2>&1
+NO_COLOR=1 python -m check_models > output.log 2>&1
 
-# Allow TensorFlow for specific model (may crash on Apple Silicon)
-MLX_VLM_ALLOW_TF=1 python check_models.py --models model-needing-tf
+# Allow manually installed TensorFlow for a specific model (may crash on Apple Silicon)
+MLX_VLM_ALLOW_TF=1 python -m check_models --models model-needing-tf
 ```
 
 ## Git Hygiene and Caches
@@ -416,18 +451,40 @@ This repo excludes ephemeral caches and local environments via `.gitignore`. Com
 
 ## Pre-commit (Optional)
 
-To enforce formatting, lint, type, and dependency sync locally:
+Recommended workflow:
+
+```bash
+cd src
+python -m tools.install_precommit_hook
+```
+
+This installs the repo's custom git hooks directly and is the path used by
+`tools/setup_conda_env.sh` when you opt into development dependencies.
+
+Alternative workflow:
+
+- `pre-commit` framework:
 
 ```bash
 pip install pre-commit
 pre-commit install
 ```
 
-Hooks run automatically on commit. Run against all files manually:
+  This installs both commit-stage and pre-push hooks from the checked-in
+  `.pre-commit-config.yaml`. The commit hook runs staged-file hygiene only; the
+  push hook runs fast static checks plus the non-slow/non-e2e pytest subset.
+  If you switch between workflows, rerun your preferred installer because both
+  write to `.git/hooks/`.
+
+Run the push-stage gate manually with:
 
 ```bash
-pre-commit run --all-files
+pre-commit run --hook-stage pre-push --all-files
 ```
+
+The commit-stage hook is intentionally staged-file based; run it by making a
+normal commit, or call `bash src/tools/run_commit_hygiene.sh` directly after
+staging files.
 
 
 ### Manual Installation
@@ -436,7 +493,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- MANUAL_INSTALL_START -->
 ```bash
-pip install "huggingface-hub[cli,torch,typing]>=0.34.0,<1.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "tzlocal>=5.0"
+pip install "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.31.1" "mlx-vlm>=0.4.1" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "transformers>=5.4.0" "tzlocal>=5.0" "wcwidth>=0.2.13"
 ```
 <!-- MANUAL_INSTALL_END -->
 
@@ -460,6 +517,7 @@ The tool uses a YAML configuration file to define thresholds for quality checks 
 - **Hallucination**: Keywords and patterns that suggest hallucinated content (e.g., "based on the chart" when no chart exists).
 - **Verbosity**: Limits on output length and meta-commentary patterns.
 - **Formatting**: Rules for markdown headers, bullet points, and table structures.
+- **Prompt Compaction**: Limits for metadata hints injected into the default prompt (`prompt_title_max_chars`, `prompt_description_max_chars`, `prompt_keyword_max_items`, `prompt_keyword_item_max_chars`).
 
 See `src/quality_config.yaml` for the full schema and default values.
 
@@ -498,11 +556,14 @@ The `src/tools/` directory contains scripts useful for development and verificat
   python -m tools.validate_env
   ```
 
-- **`check_quality.py`**: Runs formatting and static checks.
+- **`run_quality_checks.sh`**: Unified quality gate used by local dev and CI.
 
   ```bash
-  # Default: format + fixable lint + mypy on check_models.py
-  python tools/check_quality.py
+  # Run from repo root (recommended)
+  make quality
+
+  # Or run the script directly
+  bash src/tools/run_quality_checks.sh
   ```
 
 ## Appendix: Dependencies
@@ -523,36 +584,41 @@ Runtime (installed automatically via `pip install -e .` when executed inside `sr
 
 | Purpose | Package | Minimum |
 | ------- | ------- | ------- |
-| Core tensor/runtime | `mlx` | `>=0.29.1` |
-| Vision‑language utilities | `mlx-vlm` | `>=0.3.0` |
-| Image processing & loading | `Pillow` | `>=10.3.0` |
-| Model cache / discovery | `huggingface-hub` | `>=0.23.0` |
+| Core tensor/runtime | `mlx` | `>=0.31.1` |
+| Vision‑language utilities | `mlx-vlm` | `>=0.4.1` |
+| Image processing & loading | `Pillow[xmp]` | `>=10.3.0` |
+| Model cache / discovery | `huggingface-hub` | `>=0.34.0` |
+| HTTP requests (image URLs) | `requests` | `>=2.31.0` |
 | Reporting / tables | `tabulate` | `>=0.9.0` |
 | Local timezone conversion | `tzlocal` | `>=5.0` |
+| Configuration loading | `PyYAML` | `>=6.0` |
 
 Optional (enable additional features):
 
 | Feature | Package | Source | Install Command |
 | ------- | ------- | ------ | --------------- |
-| Extended system metrics (RAM/CPU) | `psutil` | `extras` | `pip install -e ".[extras]"` or `make install` |
-| Fast tokenizer backends | `tokenizers` | `extras` | `pip install -e ".[extras]"` or `make install` |
-| Tensor operations (for some models) | `einops` | `extras` | `pip install -e ".[extras]"` or `make install` |
-| Number-to-words conversion (for some models) | `num2words` | `extras` | `pip install -e ".[extras]"` or `make install` |
-| Language model utilities | `mlx-lm` | `extras` | `pip install -e ".[extras]"` or `make install` |
-| Transformer model support | `transformers` | `extras` | `pip install -e ".[extras]"` or `make install` |
-| PyTorch stack (needed for some models) | `torch`, `torchvision`, `torchaudio` | `torch` | `pip install -e ".[torch]"` or `make install-torch` |
+| Extended system metrics (RAM/CPU) | `psutil` | `extras` | `pip install -e "src/[extras]"` |
+| Fast tokenizer backends | `tokenizers` | `extras` | `pip install -e "src/[extras]"` |
+| Tensor operations (for some models) | `einops` | `extras` | `pip install -e "src/[extras]"` |
+| Number-to-words conversion (for some models) | `num2words` | `extras` | `pip install -e "src/[extras]"` |
+| Language model utilities | `mlx-lm` | `extras` | `pip install -e "src/[extras]"` |
+| Transformer model support | `transformers` | core runtime | Installed by `make install` / `pip install -e src/` |
+| PyTorch stack (needed for some models) | `torch`, `torchvision`, `torchaudio` | `torch` | `pip install -e "src/[torch]"` or `make -C src install-torch` |
+| Vision backbones for FastVLM-style models | `timm` | `torch` | `pip install -e "src/[torch]"` or `make -C src install-torch` |
 
 **Note**: Some models (e.g., Phi-3-vision, certain Florence2 variants) require PyTorch. If you encounter import errors for `torch`, `torchvision`, or `torchaudio`, install with:
 
 ```bash
 # From root directory:
-make install-torch
+pip install -e "src/[torch]"
+make -C src install-torch
 
 # Or from src/ directory:
 pip install -e ".[torch]"
 
 # Install everything (extras + torch + dev):
-make install-all  # from root
+make dev
+make -C src install-all
 pip install -e ".[extras,torch,dev]"  # from src/
 ```
 
@@ -568,16 +634,16 @@ Development / QA:
 
 <!-- MINIMAL_INSTALL_START -->
 ```bash
-pip install "huggingface-hub[cli,torch,typing]>=0.34.0,<1.0" "mlx>=0.29.1" "mlx-vlm>=0.3.0" "Pillow>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "tzlocal>=5.0"
+pip install "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.31.1" "mlx-vlm>=0.4.1" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "transformers>=5.4.0" "tzlocal>=5.0" "wcwidth>=0.2.13"
 ```
 <!-- MINIMAL_INSTALL_END -->
 
 ### With Optional Extras
 
-The `extras` group in `pyproject.toml` pulls in `psutil`, `tokenizers`, `mlx-lm`, and `transformers`:
+The `extras` group in `pyproject.toml` pulls in `psutil`, `tokenizers`, `einops`, `num2words`, `mlx-lm`, and `sentencepiece`:
 
 ```bash
-pip install -e ".[extras]"  # adds psutil, tokenizers
+pip install -e ".[extras]"  # adds optional metrics, tokenizer, and processor deps
 ```
 
 To include the optional PyTorch stack when needed (macOS wheels include MPS acceleration):
@@ -586,10 +652,12 @@ To include the optional PyTorch stack when needed (macOS wheels include MPS acce
 pip install -e ".[torch]"
 ```
 
+That `torch` extra also installs `timm`, which is required by FastVLM remote-code model loaders.
+
 ### Full Development Environment
 
 ```bash
-pip install -e ".[dev,extras]"  # dev tools + optional metrics/tokenizers
+pip install -e ".[dev,extras,torch]"  # dev tools + optional model/runtime deps
 ```
 
 
@@ -599,10 +667,10 @@ pip install -e ".[dev,extras]"  # dev tools + optional metrics/tokenizers
 > `psutil` is optional (installed with `extras`); if absent the extended Apple Silicon hardware section omits RAM/cores.
 
 > [!NOTE]
-> `extras` group bundles: psutil, tokenizers, mlx-lm, transformers. Install only if you need extended metrics or LM/transformer features.
+> `extras` group bundles: psutil, tokenizers, einops, num2words, mlx-lm, and sentencepiece. Install only if you need those optional model and utility dependencies.
 
 > [!NOTE]
-> Keep `transformers` updated if using it: `pip install -U transformers`.
+> Project policy requires `transformers>=5.4.0`.
 
 > [!NOTE]
 > `system_profiler` is a macOS built-in (no install needed) used for GPU name / core info.
@@ -657,7 +725,49 @@ if analysis.formatting_issues:
     print(f"Formatting problems: {analysis.formatting_issues}")
 if analysis.has_excessive_bullets:
     print(f"Too many bullets: {analysis.bullet_count}")
+
+# Check for harness/integration issues (mlx-vlm bugs vs model quality)
+if analysis.has_harness_issue:
+    print(f"⚠️ HARNESS ISSUE: {analysis.harness_issue_type}")
+    print(f"   Details: {analysis.harness_issue_details}")
+    # These indicate mlx-vlm integration bugs, not model quality problems
 ```
+
+#### Harness Issue Detection
+
+The quality analysis distinguishes between **model quality issues** (repetition, hallucinations, verbosity) and **harness/integration issues** (bugs in how mlx-vlm loads or runs the model). Harness issues are prefixed with `⚠️HARNESS:` in reports.
+
+**Detected harness issues include:**
+
+| Issue Type | Symptom | Likely Cause |
+| ---------- | ------- | ------------ |
+| `token_encoding` | BPE artifacts like `Ġ` or `Ċ` in output | Tokenizer decode bug |
+| `special_token_leak` | `<\|end\|>`, `<\|endoftext\|>` visible | Stop token handling |
+| `minimal_output` | Zero tokens or filler-only response | Model loading issue |
+| `training_data_leak` | `# INSTRUCTION`, `### Response:` mid-output | Prompt template mismatch |
+
+**Configuration**: Harness detection thresholds are configurable in `quality_config.yaml`:
+
+```yaml
+# Harness/integration issue detection thresholds
+min_bpe_artifact_count: 5       # Min BPE artifacts to flag encoding issue
+min_tokens_for_substantial: 10  # Tokens below this are suspicious
+min_words_for_filler_response: 15  # Words below this in filler response
+long_prompt_tokens_threshold: 3000   # Prompt size where context-related failures become likely
+severe_prompt_tokens_threshold: 12000  # Extreme prompt size risk threshold
+
+# Default prompt compaction thresholds
+prompt_title_max_chars: 120
+prompt_description_max_chars: 420
+prompt_keyword_max_items: 20
+prompt_keyword_item_max_chars: 36
+```
+
+**When you see harness issues**: These typically indicate upstream bugs in mlx-vlm or model-specific integration problems. Consider:
+
+1. Reporting the issue to [mlx-vlm](https://github.com/Blaizzy/mlx-vlm/issues)
+2. Checking if a newer model version exists
+3. Trying different prompt templates
 
 ### Core Functions
 
@@ -683,17 +793,22 @@ See module docstrings and `__all__` exports for complete API reference.
 | `-i`, `--image` | Path | (none) | Path to a specific image file to process directly. |
 | `--output-html` | Path | `output/results.html` | HTML report output filename. |
 | `--output-markdown` | Path | `output/results.md` | Markdown report output filename. |
+| `--output-gallery-markdown` | Path | `output/model_gallery.md` | Standalone Markdown gallery artifact for qualitative output review. |
+| `--output-review` | Path | `output/review.md` | Markdown review digest grouped by owner and user bucket. |
 | `--output-tsv` | Path | `output/results.tsv` | TSV (tab-separated values) report output filename. |
 | `--output-jsonl` | Path | `output/results.jsonl` | JSONL report output filename. |
 | `--output-log` | Path | `output/check_models.log` | Command line output log filename. |
 | `--output-env` | Path | `output/environment.log` | Environment log filename (pip freeze, conda list). |
+| `--output-diagnostics` | Path | `output/diagnostics.md` | Diagnostics report filename (generated on failures/harness issues). |
 | `-m`, `--models` | list[str] | (none) | Explicit model IDs/paths; disables cache discovery. |
 | `-e`, `--exclude` | list[str] | (none) | Models to exclude (applies to cache scan or explicit list). |
 | `--trust-remote-code` / `--no-trust-remote-code` | flag | `True` | Allow/disallow custom code from Hub models. Use `--no-trust-remote-code` for security. |
-| `-p`, `--prompt` | str | (auto) | Custom prompt; if omitted a metadata‑aware prompt may be used. |
-| `-d`, `--detailed-metrics` | flag | `False` | Show expanded multi-line metrics block (verbose mode only). |
+| `--revision` | str | (none) | Model revision (branch, tag, or commit) for reproducible runs. |
+| `--adapter-path` | str | (none) | Path to LoRA adapter weights to apply on top of the base model. |
+| `-p`, `--prompt` | str | (auto) | Custom prompt; if omitted a non-speculative metadata-verification prompt is used. |
+| `-d`, `--detailed-metrics` | flag | `False` | Show expanded multi-line metrics block, including phase timings and stop reason when available; ignored unless `--verbose` is also set. |
 | `-x`, `--max-tokens` | int | 500 | Max new tokens to generate. |
-| `-t`, `--temperature` | float | 0.1 | Sampling temperature. |
+| `-t`, `--temperature` | float | 0.0 | Sampling temperature. |
 | `--top-p` | float | 1.0 | Nucleus sampling parameter (0.0-1.0); lower = more focused. |
 | `-r`, `--repetition-penalty` | float | (none) | Penalize repeated tokens (>1.0 discourages repetition). |
 | `--repetition-context-size` | int | 20 | Context window size for repetition penalty. |
@@ -702,6 +817,7 @@ See module docstrings and `__all__` exports for complete API reference.
 | `-b`, `--kv-bits` | int | (none) | Quantize KV cache to N bits (4 or 8); saves memory. |
 | `-g`, `--kv-group-size` | int | 64 | Quantization group size for KV cache. |
 | `--quantized-kv-start` | int | 0 | Start position for KV cache quantization. |
+| `--prefill-step-size` | int | (none) | Step size for prompt prefill (`None` uses model default). |
 | `-T`, `--timeout` | float | 300 | Operation timeout (seconds) for model execution. |
 | `-v`, `--verbose` | flag | `False` | Enable verbose + debug logging. |
 | `--no-color` | flag | `False` | Disable ANSI colors in the CLI output. |
@@ -782,6 +898,57 @@ GitHub-compatible format with:
 - System and library version information
 - Easy integration into documentation
 
+The main report also points to the standalone `model_gallery.md` artifact when it is
+generated, so reviewers can switch to the dedicated model-by-model output view.
+
+### Gallery Markdown Report
+
+GitHub-compatible qualitative review artifact with:
+
+- Populated image metadata fields when present (title, description, keywords, date, time, GPS)
+- The full prompt in a fenced `text` block
+- One easy-to-scan section per model with full generated output
+- Existing success/failure gallery formatting reused from the main report path
+
+### TSV Report
+
+Tab-separated values for programmatic analysis (spreadsheets, `awk`, pandas, etc.):
+
+- **Metadata comment**: The first line is a `# generated_at: <ISO timestamp>` comment
+  indicating when the report was produced. Parsers should skip lines starting with `#`.
+- **Header row**: Column names matching the CLI summary table.
+- **Error diagnostics**: Two additional columns, `error_type` and `error_package`,
+  are populated for failed models to support automated triage (e.g. filtering by
+  `TimeoutError` or `mlx` package failures). These columns are empty for successful runs.
+
+### JSONL Report
+
+Line-delimited JSON for streaming ingestion:
+
+- **Metadata header**: The first record (line 1) contains shared metadata
+  (prompt, system info, timestamp) — JSONL v1.1 format.
+- **Per-model records**: One JSON object per model with all metrics and error details.
+
+
+### Diagnostics Report
+
+A comprehensive Markdown report focused on upstream debugging and issue reporting:
+
+- **Generation**: Created automatically when failures, harness issues (e.g., garbled output), or preflight compatibility warnings are detected.
+- **Failures Clustered**: Groups similar errors together to identify systemic issues.
+- **Reproducibility**: Includes explicit commands to reproduce specific failures.
+- **Environment**: Captures full package versions and system specs.
+- **Ready-to-File**: Formatted to be copy-pasted directly into GitHub issues.
+
+### Preflight Compatibility Warnings
+
+Some runs emit preflight compatibility warnings before inference starts. These warnings are informational by default.
+
+- **What they mean**: `check_models` detected an upstream package or API-compatibility pattern that may matter for this environment or version combination.
+- **What you should do**: keep running if outputs look healthy; investigate when the same run also shows unexpected TensorFlow/Flax/JAX imports, startup hangs, or backend/runtime crashes.
+- **What you should not do**: do not treat the warning alone as a failed benchmark, and do not enable `MLX_VLM_ALLOW_TF=1` just to silence it unless you intentionally want TensorFlow-side behavior.
+- **When filing issues**: include the warning text and reported library versions so upstream maintainers can match it to the correct compatibility window.
+
 
 
 
@@ -820,24 +987,27 @@ pip install --upgrade mlx mlx-vlm
 **Timeout errors**: Increase timeout for large models
 
 ```bash
-python check_models.py --timeout 600  # 10 minutes
+python -m check_models --timeout 600  # 10 minutes
 ```
 
 **Memory errors**: Test models individually or exclude large models
 
 ```bash
-python check_models.py --exclude "meta-llama/Llama-3.2-90B-Vision-Instruct"
+python -m check_models --exclude "meta-llama/Llama-3.2-90B-Vision-Instruct"
 ```
 
 **Script crashes with mutex error**: If you see `libc++abi: terminating due to uncaught exception of type std::__1::system_error: mutex lock failed: Invalid argument`, TensorFlow is installed and conflicting with MLX.
 
-The script automatically prevents TensorFlow from loading by setting `TRANSFORMERS_NO_TF=1` (unless you override with `MLX_VLM_ALLOW_TF=1`), so if TensorFlow gets imported anyway:
+The script applies best-effort backend guard env vars (`TRANSFORMERS_NO_*` and
+`USE_*`) only when the installed `transformers` still references them, unless
+you set `MLX_VLM_ALLOW_TF=1`. If TensorFlow still gets imported:
 
-Option 1 - Keep TensorFlow but ensure it's blocked (safest, script does this automatically):
+Option 1 - Keep TensorFlow but ensure backend guards are set (script does this automatically):
 
 ```bash
 export TRANSFORMERS_NO_TF=1
-python check_models.py  # Run normally - the script sets this env var automatically
+export USE_TF=0
+python -m check_models  # Run normally - the script sets this env var automatically
 ```
 
 Option 2 - Uninstall TensorFlow completely (recommended for MLX-only environments):
@@ -846,14 +1016,14 @@ Option 2 - Uninstall TensorFlow completely (recommended for MLX-only environment
 pip uninstall -y tensorflow tensorboard keras absl-py astunparse flatbuffers gast google_pasta grpcio h5py libclang ml_dtypes opt_einsum termcolor wrapt tensorboard-data-server
 ```
 
-**Note**: Most MLX VLMs don't need TensorFlow. If a model actually requires it, you can allow TensorFlow with `MLX_VLM_ALLOW_TF=1`, but this may cause mutex crashes on Apple Silicon.
+**Note**: `check_models` does not install TensorFlow. If you add TensorFlow manually for a specific remote-code model, you can allow it with `MLX_VLM_ALLOW_TF=1`, but this may cause mutex crashes on Apple Silicon.
 
 ### Debug Mode
 
 Use `--verbose` for detailed diagnostics:
 
 ```bash
-python check_models.py --verbose
+python -m check_models --verbose
 ```
 
 This provides:
@@ -866,22 +1036,23 @@ This provides:
 
 ### Framework Detection and Automatic Blocking
 
-The script **automatically** prevents TensorFlow, JAX, and Flax from loading to avoid conflicts with MLX on Apple Silicon:
+The script **automatically** applies best-effort backend guards to reduce accidental TensorFlow/JAX/Flax imports on Apple Silicon:
 
-- On startup, sets `TRANSFORMERS_NO_TF=1`, `TRANSFORMERS_NO_FLAX=1`, `TRANSFORMERS_NO_JAX=1` (unless you override with `MLX_VLM_ALLOW_TF=1`)
+- On startup, exports only the legacy `TRANSFORMERS_NO_*` / `USE_*` guard vars still referenced by the installed `transformers` build (unless you override with `MLX_VLM_ALLOW_TF=1`)
 - PyTorch is allowed by default (some models require it, e.g., Phi-3-vision)
-- Logs a warning if TensorFlow is detected but successfully blocked
+- Logs a warning when TensorFlow is detected while guards are active
 - Also logs if `sentence-transformers` is present
 
 **⚠️ About TensorFlow on Apple Silicon:**
 
-If TensorFlow is installed, the script's automatic blocking (`TRANSFORMERS_NO_TF=1`) should prevent it from loading, avoiding mutex crashes. However, if you encounter the error `libc++abi: terminating due to uncaught exception of type std::__1::system_error: mutex lock failed: Invalid argument`:
+If TensorFlow is installed, these guards often prevent loading and avoid mutex crashes. However, if you encounter the error `libc++abi: terminating due to uncaught exception of type std::__1::system_error: mutex lock failed: Invalid argument`:
 
 1. **First try**: Verify the environment variable is set (the script does this automatically):
 
    ```bash
    export TRANSFORMERS_NO_TF=1
-   python check_models.py
+   export USE_TF=0
+   python -m check_models
    ```
 
 2. **If that fails**: Uninstall TensorFlow completely (recommended for MLX-only environments):
@@ -890,7 +1061,7 @@ If TensorFlow is installed, the script's automatic blocking (`TRANSFORMERS_NO_TF
    pip uninstall -y tensorflow tensorboard keras
    ```
 
-3. **If a model needs TensorFlow**: Set `MLX_VLM_ALLOW_TF=1` to allow it, but be aware this may cause crashes on Apple Silicon
+3. **If you intentionally installed TensorFlow for a model**: Set `MLX_VLM_ALLOW_TF=1` to allow it, but be aware this may cause crashes on Apple Silicon
 
 **Why this matters**: TensorFlow's Abseil mutex implementation conflicts with MLX on macOS/ARM, causing crashes. Most MLX VLMs don't need TensorFlow.
 
@@ -908,21 +1079,30 @@ If TensorFlow is installed, the script's automatic blocking (`TRANSFORMERS_NO_TF
 check_models/
 ├── src/
 │   ├── check_models.py      # Main script
-│   ├── Makefile.            # Orchestration (uses, eg, the helper scripts)
-│   ├── pyproject.toml       # Project configuration and dependencies  
+│   ├── Makefile             # Package-local automation targets
+│   ├── pyproject.toml       # Project configuration and dependencies
 │   ├── tools/               # Helper scripts
-│   └── tests/               # PyTest test suite
-│   └── output/
-│       ├── results.html     # Generated HTML report (default location)
-│       └── results.md       # Generated Markdown report (default location)
-│       └── results.tsv      # Generated a tab-separated values summary of the run (default location)
-│       └── results.json     # Generated JSON Lines summary of the run (default location)
+│   ├── tests/               # PyTest test suite
+│   └── output/              # Generated outputs (git-ignored)
+│       ├── results.html
+│       ├── results.md
+│       ├── model_gallery.md
+│       ├── review.md
+│       ├── results.tsv
+│       ├── results.jsonl
+│       ├── results.history.jsonl
+│       ├── diagnostics.md
+│       ├── check_models.log
+│       └── environment.log
 ├── docs/                    # Documentation
 ├── typings/                 # Generated type stubs (git-ignored)
 └── Makefile                 # Root orchestration
 ```
 
-**Output behaviour**: By default, reports are written to `output/` (git-ignored). Override with `--output-html`, `--output-markdown`, and `--output-tsv`.
+**Output behaviour**: By default, outputs are written to `src/output/` (git-ignored).
+Override with `--output-html`, `--output-markdown`, `--output-gallery-markdown`,
+`--output-tsv`, `--output-jsonl`, `--output-log`, `--output-env`, and
+`--output-diagnostics`.
 
 ## Contributing
 
@@ -933,122 +1113,72 @@ check_models/
 
 ### Developer Workflow (Makefile)
 
-A `Makefile` at the repository root streamlines common tasks. It **auto-detects your active Python environment** and works with:
-
-- **Virtual environments** (`venv`, `virtualenv`, `uv`, `poetry`, `pipenv`, etc.) - uses the active environment directly
-- **Conda environments** - adapts based on active vs target environment:
-  - **If target env is active**: runs commands directly
-  - **If different conda env is active**: uses `conda run -n <target-env>`
-  - **If no env is active**: uses `conda run -n <target-env>` (or system Python if conda unavailable)
-
-The default conda target is `mlx-vlm`, but you can override it with `CONDA_ENV=your-env-name` for any make target.
-
-**Recommendation**: Activate your environment first (e.g., `source .venv/bin/activate` or `conda activate mlx-vlm`) for best performance.
-
-## All Available Make Commands
-
-Run `make help` to see all targets.
-
-**Key commands:**
-
-- `make install` — Install the package
-- `make dev` — Setup development environment
-- `make update` — Update conda environment and dependencies
-- `make upgrade-deps` — Upgrade all dependencies to latest versions
-- `make test` — Run tests
-- `make quality` — Run linting and type checks
-- `make check` — Run full quality pipeline (format, lint, typecheck, test)
-- `make clean` — Remove generated files
-
-Additional make targets are listed later in the README. Key targets include:
-
-- `make help` — Show all targets (displays active vs target env)
-- `make install-dev` — Editable install with dev extras (`pip install -e .[dev]`)
-- `make install-markdownlint` — Install `markdownlint-cli2` (requires Node.js/npm)
-- `make install` — Runtime‑only editable install (no dev/test tooling)
-- `make bootstrap-dev` — Full dev setup (installs Python deps + markdownlint + git hooks)
-- `make format` — Run `ruff format`
-- `make lint` — Run `ruff check` (no fixes)
-- `make lint-fix` — Run `ruff check --fix`
-- `make typecheck` — Run `mypy`
-- `make test` — Run pytest suite
-- `make test-cov` — Pytest with coverage (terminal + XML report)
-- `make quality` — Invoke integrated quality script (format + lint + mypy + markdownlint)
-- `make quality-strict` — Quality script (require tools, no stubs)
-- `make run ARGS="..."` — Run the CLI script (pass CLI args via `ARGS`)
-- `make smoke` — Fast help invocation (sanity check)
-- `make check` — Format + lint + typecheck + test (pre‑commit aggregate)
-- `make validate-env` — Check environment setup (validates Python packages)
-- `make clean` — Remove caches / pyc
-
-Examples:
+Use the root `Makefile` from the repository root and activate the conda env first:
 
 ```bash
-# Install with dev dependencies (ruff, mypy, pytest, etc.)
-make install-dev
-
-# Format, then lint and auto-fix issues
-make format
-make lint-fix
-
-# Type check and run tests
-make typecheck
-make test
-
-# All core checks (use before committing)
-make check
-
-# Run CLI with arguments (quote ARGS value if it has spaces)
-make run ARGS="--verbose --detailed-metrics --image sample.jpg --models microsoft/Florence-2-large"
+conda activate mlx-vlm
 ```
 
-Override variables on the fly:
+Key commands:
+
+- `make install` — install runtime package (`pip install -e src/`)
+- `make dev` — install dev setup (`pip install -e "src/[dev,extras,torch]"`)
+- `make test` — run pytest (`pytest src/tests/ -v`)
+- `make quality` — full gate (ruff format+lint, mypy, ty, pyrefly, pytest, shellcheck, markdownlint)
+- `make ci` — strict CI-style pipeline
+- `make deps-sync` — sync dependency blocks in docs from `pyproject.toml`
+- `python -m tools.update_readme_deps --check` — verify dependency blocks are already synced (no writes)
+- `make stubs` — regenerate local stubs in `typings/` (`mlx_lm`, `mlx_vlm`,
+  `transformers`, `tokenizers`)
+
+For package-local targets (for example `install-dev`, `bootstrap-dev`, `lint-fix`), run:
 
 ```bash
-make test CONDA_ENV=custom-mlx-env
-make run CONDA_ENV=mlx-vlm ARGS="--verbose"
+make -C src help
 ```
 
-If you prefer manual commands, the traditional workflow still works:
+### Git Hooks and Pre-Commit
 
-1. `pip install -e ".[dev]"`
-2. `ruff format check_models.py tests`
-3. `ruff check --fix check_models.py tests`
-4. `mypy --config-file pyproject.toml check_models.py`
-5. `pytest -q`
+Recommended workflow:
+
+- Custom git hooks shipped with this repo:
+
+  ```bash
+  cd src
+  python -m tools.install_precommit_hook
+  ```
+
+Alternative workflow:
+
+- `pre-commit` framework:
+
+  ```bash
+  pre-commit install
+  pre-commit run --hook-stage pre-push --all-files
+  ```
+
+Both workflows call the same shared scripts:
+
+- commit stage: staged-file hygiene only
+- push stage: fast static checks plus `pytest -m "not slow and not e2e"`
+
+The push-stage gate also validates the checked-in GitHub workflow YAML and
+keeps the CI/static tooling path aligned with the checked-in scripts.
 
 ### Markdown Linting (Optional)
 
-The project uses `markdownlint-cli2` to ensure consistent markdown formatting. This is **optional** but recommended for contributors editing documentation:
-
-**Installation:**
+`make quality` runs markdownlint via local install, global install, or `npx` fallback.
+If you want a local install:
 
 ```bash
-# If you have Node.js/npm installed:
-make install-markdownlint
-
-# Or install manually:
+cd src
 npm install
-
-# Or rely on npx (downloads on-demand):
-# No installation needed - quality checks will use npx automatically
 ```
-
-**Usage:**
-
-- `make quality` - Automatically runs markdownlint if available (or via npx)
-- Quality checks gracefully skip markdown linting if neither npm nor npx is available
-
-**Requirements:**
-
-- Node.js/npm (optional) - Install via `brew install node` on macOS or download from [nodejs.org](https://nodejs.org/)
-- If npm is unavailable, the quality script will attempt to use `npx` as a fallback
-- If neither is available, markdown linting is skipped with a warning
 
 ### Contribution Guidelines
 
 - Keep patches focused; separate mechanical formatting changes from functional changes.
-- Run `make check` (or at minimum `make test` and `make typecheck`) before opening a PR.
+- Run `make quality` before opening a PR (or at minimum `make test` and `make typecheck`).
 - Add or update tests when changing output formatting or public CLI flags.
 - Prefer small helper functions over adding more branching to large blocks in `check_models.py`.
 - Document new flags or output changes in this README (search for an existing section to extend rather than creating duplicates).
@@ -1062,5 +1192,3 @@ npm install
 ## License
 
 MIT License: See the [LICENSE](../LICENSE) file for details.
-
-

@@ -1,23 +1,20 @@
 """Install Git hooks (pre-commit and pre-push) for this repo.
 
-Pre-commit hook automates:
-   - Auto-formats Python files with ruff before committing
-   - Auto-fixes Markdown files with markdownlint (via npx) before committing
-   - Syncs README dependency blocks when `src/pyproject.toml` changes
-   - Runs: `cd src && python tools/update_readme_deps.py`
-   - Adds changes back to the commit
+Pre-commit hook runs the shared staged-file hygiene script:
+   - validates staged YAML/TOML/shebang files
+   - formats/lints staged Python files
+   - fixes staged Markdown files
+   - syncs README dependency blocks when `src/pyproject.toml` changes
 
-Pre-push hook runs quality checks:
-   - Runs simplified quality checks (format check, lint, tests)
-   - Prevents pushing if quality checks fail
+Pre-push hook runs the shared fast static gate:
+   - repo-wide format/lint/type checks
+   - README dependency sync check
+   - non-slow/non-e2e pytest subset
 
 Usage:
   python -m tools.install_precommit_hook
 
 Re-running this script overwrites existing hooks (after backing them up as `.bak`).
-
-Note: Stub generation removed as part of quality simplification (2025-11-01).
-      Now using mypy's ignore_missing_imports=true instead.
 """
 
 from __future__ import annotations
@@ -31,88 +28,17 @@ logger = logging.getLogger("precommit")
 PRECOMMIT_HOOK_CONTENT = r"""#!/usr/bin/env bash
 set -euo pipefail
 
-# Run from repo root
 REPO_ROOT=$(git rev-parse --show-toplevel)
 cd "$REPO_ROOT"
-
-# Activate conda environment if conda is available
-if command -v conda &> /dev/null; then
-    eval "$(conda shell.bash hook)"
-    conda activate mlx-vlm 2>/dev/null || true
-fi
-
-# Auto-format Python files with ruff before committing
-PYTHON_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.py$' || true)
-if [ -n "$PYTHON_FILES" ]; then
-    echo '[pre-commit] Auto-formatting Python files with ruff...'
-    # shellcheck disable=SC2086
-    python -m ruff format $PYTHON_FILES || exit 1
-    # Re-stage the formatted files
-    # shellcheck disable=SC2086
-    git add $PYTHON_FILES
-fi
-
-# Auto-fix Markdown files with markdownlint before committing
-# Exclude src/output/ directory (generated reports can have long lines)
-MD_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.md$' | grep -v '^src/output/' || true)
-if [ -n "$MD_FILES" ]; then
-    echo '[pre-commit] Auto-fixing Markdown files with markdownlint...'
-    if command -v npx &> /dev/null; then
-        # shellcheck disable=SC2086
-        npx --yes markdownlint-cli2 --fix $MD_FILES ||
-            echo "⚠️  Some markdown issues could not be auto-fixed"
-        # Re-stage the fixed files
-        # shellcheck disable=SC2086
-        git add $MD_FILES
-    else
-        echo "⚠️  npx not found - skipping markdown auto-fix (install Node.js for markdown linting)"
-    fi
-fi
-
-# Sync README dependency blocks when pyproject changes
-if git diff --cached --name-only | grep -q '^src/pyproject.toml$'; then
-  echo '[pre-commit] Syncing README dependency blocks'
-  (cd src && python tools/update_readme_deps.py) || exit 1
-  git add src/README.md
-fi
-
-# Note: Stub generation removed as part of quality simplification (2025-11-01)
-# Now using mypy's ignore_missing_imports=true instead
-
-exit 0
+exec bash src/tools/run_commit_hygiene.sh
 """
 
 PREPUSH_HOOK_CONTENT = r"""#!/usr/bin/env bash
-# Pre-push hook: Run quality checks before pushing
 set -euo pipefail
 
-echo "[pre-push] Running quality checks before push..."
-
-# Run from repo root
 REPO_ROOT=$(git rev-parse --show-toplevel)
 cd "$REPO_ROOT"
-
-# Activate conda environment if conda is available
-if command -v conda &> /dev/null; then
-    # Initialize conda for the current shell
-    eval "$(conda shell.bash hook)"
-    # Activate the mlx-vlm environment
-    conda activate mlx-vlm 2>/dev/null || true
-fi
-
-# Run simplified quality checks
-if bash src/tools/check_quality_simple.sh; then
-    echo "✓ Pre-push quality checks passed"
-    exit 0
-else
-    echo ""
-    echo "❌ Quality checks failed. Fix issues before pushing."
-    echo "💡 Run 'bash src/tools/check_quality_simple.sh' to see details"
-    echo ""
-    echo "To skip this check (not recommended), use:"
-    echo "  git push --no-verify"
-    exit 1
-fi
+exec bash src/tools/check_quality_simple.sh
 """
 
 

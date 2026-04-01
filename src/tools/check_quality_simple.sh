@@ -1,33 +1,46 @@
 #!/usr/bin/env bash
-# Simplified quality checks for pre-push hook (fast checks only)
+# Fast static checks plus non-slow tests for pre-push hooks.
 set -euo pipefail
 
-# Navigate to the script's directory
-cd "$(dirname "$0")"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/common_quality.sh"
 
-# Determine Python executable
-if [[ "${CI:-false}" == "true" ]]; then
-    PYTHON="python3"
-elif [ -n "${CONDA_PREFIX:-}" ]; then
-    PYTHON="$CONDA_PREFIX/bin/python"
-else
-    PYTHON="python3"
-fi
+cd "$(quality_src_root)"
+quality_setup_python
 
-# Go to src root
-cd ..
+quality_require_python_tool ty "Install dev dependencies with: pip install -e .[dev]"
+quality_require_python_tool pyrefly "Install dev dependencies with: pip install -e .[dev]"
+
+echo "=== Workflow YAML Validation ==="
+quality_validate_yaml_files \
+    "$(quality_repo_root)/.github/workflows/quality.yml" \
+    "$(quality_repo_root)/.github/workflows/dependency-sync.yml" \
+    "$(quality_repo_root)/.pre-commit-config.yaml"
+
+echo "=== Dependency Sync (Check) ==="
+"$QUALITY_PYTHON" -m tools.update_readme_deps --check
 
 echo "=== Ruff Format (Check) ==="
-$PYTHON -m ruff format --check .
+"$QUALITY_PYTHON" -m ruff format --check .
 
 echo "=== Ruff Lint ==="
-$PYTHON -m ruff check .
+"$QUALITY_PYTHON" -m ruff check .
 
 echo "=== MyPy Type Check ==="
-$PYTHON -m mypy check_models.py
+"$QUALITY_PYTHON" -m mypy check_models.py
+
+echo "=== Suppression Audit ==="
+"$QUALITY_PYTHON" -m tools.check_suppressions
+
+echo "=== Ty Type Check ==="
+quality_run_python_tool ty check check_models.py
 
 echo "=== Pyrefly Type Check ==="
-pyrefly check check_models.py
+quality_run_python_tool pyrefly check check_models.py
+
+echo "=== Pytest (fast set) ==="
+"$QUALITY_PYTHON" -m pytest -q -m "not slow and not e2e"
 
 echo ""
 echo "✅ Fast quality checks passed!"

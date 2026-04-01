@@ -1,130 +1,127 @@
 #!/usr/bin/env bash
-# Unified quality checker for local and CI environments
+# Deterministic full static quality checker for local runs and CI.
 set -euo pipefail
 
-CONDA_ENV="mlx-vlm"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck disable=SC1091
+source "$SCRIPT_DIR/common_quality.sh"
 
-# --- Environment Setup ---
-# Navigate to the script's directory to ensure consistent paths
-cd "$(dirname "$0")"
+cd "$(quality_src_root)"
+quality_setup_python
 
-# Activate conda environment if available and not in CI
-if [[ "${CI:-false}" == "false" ]] && command -v conda &> /dev/null; then
-    # Initialize conda for bash
-    # shellcheck disable=SC1091
-    if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
-        source "$HOME/miniconda3/etc/profile.d/conda.sh"
-    elif [ -f "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
-        source "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
-    fi
-    conda activate $CONDA_ENV 2>/dev/null || true
+quality_require_python_tool ty "Install dev dependencies with: pip install -e .[dev]"
+quality_require_python_tool pyrefly "Install dev dependencies with: pip install -e .[dev]"
+quality_require_command shellcheck "Install with: brew install shellcheck"
+
+echo "=== Workflow YAML Validation ==="
+quality_validate_yaml_files \
+    "$(quality_repo_root)/.github/workflows/quality.yml" \
+    "$(quality_repo_root)/.github/workflows/dependency-sync.yml" \
+    "$(quality_repo_root)/.pre-commit-config.yaml"
+
+echo "=== Dependency Sync (Check) ==="
+"$QUALITY_PYTHON" -m tools.update_readme_deps --check
+
+mkdir -p ../typings
+
+echo "=== Type Stub Refresh (Best Effort) ==="
+if ! "$QUALITY_PYTHON" -m tools.generate_stubs --skip-if-fresh \
+    mlx_lm mlx_vlm transformers tokenizers; then
+    echo "⚠️  Stub refresh warning: could not regenerate local third-party stubs; continuing"
 fi
 
-# Determine Python executable
-# In CI, use the python from PATH (set up by GitHub Actions)
-# Locally, prefer conda environment python if available
-if [[ "${CI:-false}" == "true" ]]; then
-    PYTHON="python3"
-elif [ -n "${CONDA_PREFIX:-}" ]; then
-    PYTHON="$CONDA_PREFIX/bin/python"
-else
-    PYTHON="python3"
-fi
+echo "=== Type Stub Preflight ==="
 
-# --- Quality Checks ---
-# All paths are relative to the `src` directory
-cd ..
+"$QUALITY_PYTHON" - <<'PY'
+from __future__ import annotations
 
-echo "=== Dependency Sync ==="
-$PYTHON -m tools.update_readme_deps
+from pathlib import Path
 
+stub_root = Path("../typings")
+expected_packages = ("mlx_lm", "mlx_vlm", "transformers", "tokenizers")
+missing: list[str] = []
+invalid: list[tuple[str, str, int, str]] = []
+
+for package in expected_packages:
+    package_root = stub_root / package.replace(".", "/")
+    if not package_root.exists():
+        missing.append(package)
+        continue
+
+    for stub_path in package_root.rglob("*.pyi"):
+        try:
+            compile(stub_path.read_text(encoding="utf-8"), str(stub_path), "exec")
+        except SyntaxError as err:
+            invalid.append(
+                (
+                    package,
+                    str(stub_path.relative_to(stub_root)),
+                    int(getattr(err, "lineno", 0) or 0),
+                    str(getattr(err, "msg", "invalid syntax")),
+                ),
+            )
+            break
+        except OSError:
+            invalid.append((package, str(stub_path.relative_to(stub_root)), 0, "read error"))
+            break
+
+if missing:
+    print(
+        "⚠️  Stub coverage warning: missing package stubs for "
+        + ", ".join(sorted(missing)),
+    )
+if invalid:
+    for package, relpath, line_no, message in invalid:
+        suffix = f":{line_no}" if line_no else ""
+        print(
+            "⚠️  Stub syntax warning "
+            f"({package}): {relpath}{suffix} ({message})",
+        )
+
+if not missing and not invalid:
+    print("✓ Stub preflight: expected package stubs available and parseable")
+PY
 
 echo "=== Ruff Format ==="
-# In CI mode, only check; in local mode, fix automatically
-if [[ "${CI:-false}" == "true" ]]; then
-    $PYTHON -m ruff format --check .
-else
-    $PYTHON -m ruff format .
-fi
+"$QUALITY_PYTHON" -m ruff format --check .
 
 echo "=== Ruff Lint ==="
-# In CI mode, only check; in local mode, fix automatically
-if [[ "${CI:-false}" == "true" ]]; then
-    $PYTHON -m ruff check .
-else
-    $PYTHON -m ruff check --fix .
-fi
+"$QUALITY_PYTHON" -m ruff check .
 
 echo "=== MyPy Type Check ==="
-# Debug: Print MLX version in CI to help diagnose stub issues
-if [[ "${CI:-false}" == "true" ]]; then
-    echo "Debug: Checking installed MLX version..."
-    $PYTHON -m pip show mlx || echo "MLX not found via pip"
-    
-    # WORKAROUND: MLX 0.29.4 has a syntax error in __init__.pyi that crashes mypy.
-    # We delete the broken stub file in CI so mypy ignores it (we have ignore_missing_imports=True).
-    # TODO: Remove this workaround once MLX >= 0.29.6 is available in CI.
-    #MLX_LOC=$($PYTHON -m pip show mlx | grep Location | cut -d: -f2 | xargs)
-    #if [[ -n "$MLX_LOC" && -f "$MLX_LOC/mlx/core/__init__.pyi" ]]; then
-    #    echo "⚠️  Workaround: Removing broken mlx/core/__init__.pyi to fix mypy..."
-    #    rm "$MLX_LOC/mlx/core/__init__.pyi"
-    #fi
-fi
+"$QUALITY_PYTHON" -m mypy check_models.py
 
-# Ensure mypy uses the correct Python environment by setting MYPYPATH
-# In CI, explicitly use the python from PATH to avoid system Python
-if [[ "${CI:-false}" == "true" ]]; then
-    # Use 'python' instead of 'python3' to match setup-python action
-    python -m mypy check_models.py
-else
-    $PYTHON -m mypy check_models.py
-fi
+echo "=== Suppression Audit ==="
+"$QUALITY_PYTHON" -m tools.check_suppressions
 
 echo "=== Ty Type Check ==="
-if ! command -v ty &> /dev/null; then
-    echo "⚠️  'ty' not found. Installing..."
-    $PYTHON -m pip install ty
-fi
-ty check check_models.py
+quality_run_python_tool ty check check_models.py
 
 echo "=== Pyrefly Type Check ==="
-if ! command -v pyrefly &> /dev/null; then
-    echo "⚠️  'pyrefly' not found. Installing..."
-    $PYTHON -m pip install pyrefly
-fi
-pyrefly check check_models.py
+quality_run_python_tool pyrefly check check_models.py
 
 echo "=== Pytest ==="
-$PYTHON -m pytest -v
+"$QUALITY_PYTHON" -m pytest -v
 
 echo "=== ShellCheck ==="
-if ! command -v shellcheck &> /dev/null; then
-    if command -v brew &> /dev/null; then
-        echo "⚠️  'shellcheck' not found. Installing via Homebrew..."
-        brew install shellcheck
-    else
-        echo "⚠️  Skipped (shellcheck not found and brew not available)"
-        echo "   Install with: brew install shellcheck"
-    fi
-fi
+shell_scripts=()
+while IFS= read -r -d '' script_path; do
+    shell_scripts+=("$script_path")
+done < <(find tools -name "*.sh" -type f -print0)
 
-if command -v shellcheck &> /dev/null; then
-    # Find all shell scripts and check them
-    # shellcheck disable=SC2046
-    shellcheck $(find tools -name "*.sh" -type f)
+if [ "${#shell_scripts[@]}" -gt 0 ]; then
+    shellcheck -x "${shell_scripts[@]}"
 fi
 
 # Markdown linting runs from the repo root
-cd ..
+cd "$(quality_repo_root)"
 
 echo "=== Markdown Lint ==="
-if command -v markdownlint-cli2 &> /dev/null; then
-    markdownlint-cli2 --config .markdownlint.jsonc "**/*.md" "!src/output/**"
-elif command -v npx &> /dev/null; then
-    npx markdownlint-cli2 --config .markdownlint.jsonc "**/*.md" "!src/output/**"
-else
-    echo "⚠️  Skipped (markdownlint-cli2 or npx not found)"
-fi
+quality_run_markdownlint \
+    --config .markdownlint.jsonc \
+    "**/*.md" \
+    "!src/node_modules/**" \
+    "!**/node_modules/**"
 
 echo ""
 echo "✅ All quality checks passed!"

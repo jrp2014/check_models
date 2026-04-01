@@ -28,6 +28,7 @@ This guide defines technical conventions and implementation details for develope
   - [Constants & Naming](#constants--naming)
 - [Quality & Linting](#quality--linting)
 - [Function Design](#function-design)
+- [Maintaining the Monolith](#maintaining-the-monolith)
 - [Comments & Documentation](#comments--documentation)
 - [Output & Formatting](#output--formatting)
 - [External Processes](#external-processes)
@@ -111,7 +112,7 @@ A single medium-sized, well-commented function is often clearer than a web of on
 ### Generated Artifacts
 
 - Generated artifacts (e.g., `typings/`) are **not committed**
-- Regenerate via `make stubs` (from repo root) or `python -m tools.generate_stubs mlx_vlm tokenizers` (from `src/`)
+- Regenerate via `make stubs` (from repo root) or `python -m tools.generate_stubs mlx_lm mlx_vlm tokenizers` (from `src/`)
 - See `.gitignore` for complete list of excluded files
 
 ### Typings Policy
@@ -127,13 +128,13 @@ A single medium-sized, well-commented function is often clearer than a web of on
 make stubs
 
 # Or from src/ directory
-python -m tools.generate_stubs mlx_vlm tokenizers
+python -m tools.generate_stubs mlx_lm mlx_vlm tokenizers
 ```
 
-Or use the quality check with stub generation:
+Or use the quality check with stub preflight:
 
 ```bash
-make quality  # Automatically generates stubs if missing
+make quality  # Validates existing typings/ coverage before type checks
 ```
 
 ## Code Standards
@@ -231,7 +232,7 @@ Responsibilities:
 **Examples**:
 
 ```python
-from vlm.check_models import format_field_value
+from check_models import format_field_value
 
 # Memory (mlx bytes -> decimal GB normalization)
 format_field_value("peak_memory", 8_589_934_592)  # "8.6"
@@ -268,8 +269,6 @@ format_field_value("peak_memory", None)           # ""
 - Document unexpected exceptions in comments if the cause isn't obvious from context
 - Avoid silent failures: Always log errors or re-raise with context
 - Use `logger.exception()` to include traceback automatically
-
-### Error Handling
 
 ### Exception Types
 
@@ -388,23 +387,25 @@ The project uses `markdownlint-cli2` to ensure consistent markdown formatting ac
 - Ensures consistent formatting across all `.md` files
 - Catches common markdown mistakes
 - Enforces best practices (blank lines, heading structure, etc.)
-- Runs automatically in `make quality` if available
+- Runs automatically in `make quality`
 
 **Installation**:
 
 1. **Option 1: Install Node.js/npm (Recommended)**
-   - Install Node.js (via Homebrew `brew install node` or [nodejs.org](https://nodejs.org/)).
-   - Run `make install-markdownlint` in the `src/` directory.
-2. **Option 2: Use npx (No Installation)**
-   - If you have npm but don't want local packages, use `npx markdownlint-cli2 '**/*.md'`.
+    - Install Node.js (via Homebrew `brew install node` or [nodejs.org](https://nodejs.org/)).
+    - Run `make install-markdownlint` from the repository root.
+2. **Option 2: Use a pre-existing npx resolution**
+   - If `markdownlint-cli2` is already available to `npx`, use
+     `npx --no-install markdownlint-cli2 '**/*.md'`.
 3. **Option 3: Skip**
-   - If Node.js is missing, linting is skipped with a warning. CI will still check it.
+   - Not recommended: `make quality` fails when markdownlint is unavailable.
+     `make quality-strict` exists for an earlier explicit availability check.
 
 **Usage**:
 
 ```bash
-make quality          # Includes markdown linting if available
-make quality-strict   # Requires markdown linting (fails if unavailable)
+make quality          # Includes markdown linting and fails if it cannot run
+make quality-strict   # Verifies markdownlint availability before the full gate
 ```
 
 **Configuration**:
@@ -438,16 +439,6 @@ Current config (see `pyproject.toml`):
 
 - Use `ruff format` for layout formatting
 - Use `ruff check --fix` to apply automated fixes for style violations
-
-### Markdown Linting
-
-Markdown consistency is enforced (optionally) via `markdownlint-cli2` using the configuration in `.markdownlint.jsonc`:
-
-- Long lines (MD013) are disabled to allow readable HTML/CSS blocks and wide tables
-- Inline HTML is allowed (MD033) because the codebase already sanitizes/escapes disallowed tags
-- Duplicate headings (MD024) are permitted; some conceptual repeats are intentional
-- Follow existing heading spacing (blank line before/after) and prefer asterisk `*` for unordered lists
-- Run locally with: `npx markdownlint-cli2 "**/*.md"` (or rely on the pre-commit hook if installed)
 
 ### Suppressions
 
@@ -491,6 +482,83 @@ def process_image_pipeline(...) -> Result:  # noqa: C901 (Reason: cohesive multi
     # --- Aggregate & return ---
     return result
 ```
+
+## Maintaining the Monolith
+
+`src/check_models.py` is intentionally a single-file implementation. The goal is
+not to minimize line count at all costs; the goal is to keep behavior stable and
+the file navigable.
+
+### Refactor approach used in recent changes
+
+When reducing size or duplication, apply this order:
+
+1. Remove dead code first.
+2. Consolidate true duplicates (same logic, same invariants).
+3. Only then extract helpers, and only for named concepts used in multiple places.
+
+This keeps the file coherent and avoids "helper sprawl" where control flow is
+split across too many tiny functions.
+
+### Correctness vs. performance boundaries
+
+When a change could affect both, treat them separately:
+
+- **Correctness invariants** (must not regress):
+  - CLI validation and error ordering semantics
+  - hard-fail behavior for required runtime dependencies before model execution
+  - report schema stability (JSONL/HTML/Markdown key meanings)
+  - deterministic issue bucketing and grade classification
+- **Performance behavior** (optimize without semantic drift):
+  - avoid recomputing the same aggregates in multiple places
+  - keep per-model loops single-pass where practical
+  - reuse existing summary builders for logging/report views
+
+If a performance change risks output semantics, preserve correctness and keep the
+slower path until tests or explicit requirements justify further optimization.
+
+### Navigation workflow for large-file maintenance
+
+For a targeted change, use "entry point -> pipeline -> renderer" navigation:
+
+1. Find CLI boundary:
+   - `main_cli`, `main`
+2. Find model execution path:
+   - `process_image_with_model`
+   - timeout/error handling around generation
+3. Find quality/utility analysis:
+   - `analyze_generation_text`
+   - `compute_cataloging_utility`
+   - `analyze_model_issues`
+4. Find output surfaces:
+   - `generate_html_report`, `generate_markdown_report`
+   - `log_summary`, diagnostics/history writers
+
+Recommended search commands:
+
+```bash
+rg -n "def main_cli|def process_image_with_model|def analyze_generation_text|def generate_html_report|def log_summary" src/check_models.py
+rg -n "TypedDict|dataclass|type .*Record" src/check_models.py
+rg -n "SUMMARY|diagnostics|history|cataloging" src/check_models.py
+```
+
+### Safe cleanup checklist (used for recent reductions)
+
+Before deleting or merging logic:
+
+1. Verify callsites are zero or equivalent:
+   - `rg -n "function_name\(" src/check_models.py src/tests`
+2. Keep lint strictness unchanged:
+   - no new blanket suppressions (`noqa`, `type: ignore`, `pyright: ignore`)
+3. Validate on focused scope first:
+   - `ruff check`
+   - `mypy`
+   - targeted pytest files for touched behavior
+4. Validate full quality gate when environment permits:
+   - `make quality`
+
+This project prefers explicit behavior-preserving cleanup over stylistic
+rewrites. When in doubt, keep the simpler control flow with fewer moving parts.
 
 ## Comments & Documentation
 
@@ -876,7 +944,7 @@ rg "UNUSED_CONSTANT" src/
 **Runtime dependency versions MUST stay consistent** between `pyproject.toml` and the install snippets in `src/README.md`.
 
 **Current slim runtime set** (authoritative in `src/pyproject.toml`):
-`mlx`, `mlx-vlm`, `Pillow`, `huggingface-hub`, `tabulate`, `tzlocal`
+`mlx`, `mlx-vlm`, `transformers`, `Pillow`, `huggingface-hub`, `requests`, `tabulate`, `tzlocal`, `wcwidth`, `PyYAML`
 
 **If you add a new import in `src/check_models.py`, you MUST also**:
 
@@ -888,7 +956,7 @@ The `test_dependency_sync` test and CI will fail otherwise.
 
 **Optional groups**:
 
-- `extras`: `psutil`, `tokenizers`, `mlx-lm`, `transformers`
+- `extras`: `psutil`, `tokenizers`, `mlx-lm`
 - `torch`: `torch`, `torchvision`, `torchaudio`
 
 **Mechanism**:
@@ -1017,8 +1085,8 @@ All dependencies are defined in `src/pyproject.toml`:
 ```toml
 [project]
 dependencies = [
-    "mlx>=0.29.1",
-    "mlx-vlm>=0.0.9",
+    "mlx>=0.31.1",
+    "mlx-vlm>=0.4.1",
     "Pillow>=10.3.0",
     # ...
 ]
@@ -1038,8 +1106,8 @@ All dependencies are defined in `src/pyproject.toml` as the single source of tru
 ```toml
 [project.dependencies]
 # Core runtime dependencies
-mlx>=0.29.1
-mlx-vlm>=0.0.9
+mlx>=0.31.1
+mlx-vlm>=0.4.1
 Pillow>=10.3.0
 # ...
 
@@ -1170,8 +1238,8 @@ package==1.2.3
 **Example** (hypothetical):
 
 ```ini
-# Pinned due to breaking change in 0.30.0
-mlx>=0.29.1,<0.30.0
+# Example of a temporary compatibility cap when an upstream release regresses.
+mlx>=0.31.1,<0.32.0
 ```
 
 ## Makefile Targets Reference

@@ -1,11 +1,17 @@
 """Tests for model discovery and filtering."""
 
-from pathlib import Path
+from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+# HF cache environment is configured by conftest.py (early env setup + autouse fixture).
 import pytest
 from huggingface_hub.errors import CacheNotFound
 
 import check_models
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def test_get_cached_model_ids_returns_list() -> None:

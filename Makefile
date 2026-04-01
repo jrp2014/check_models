@@ -21,7 +21,7 @@ help: ## Show this help message
 	@echo "  make update           Update conda environment and project dependencies"
 	@echo "  make test             Run tests"
 	@echo "  make check            Run format, lint, typecheck, and tests"
-	@echo "  make quality          Run full quality checks (ruff format+lint+mypy+pytest+shellcheck+markdownlint)"
+	@echo "  make quality          Run full quality checks (ruff format+lint+mypy+suppression-audit+ty+pyrefly+pytest+shellcheck+markdownlint)"
 	@echo "  make ci               Run full CI pipeline (strict)"
 	@echo "  make format           Format code with ruff"
 	@echo "  make stubs            Generate type stubs for mlx-vlm (typings/)"
@@ -30,31 +30,31 @@ help: ## Show this help message
 
 .PHONY: install
 install: ## Install the package in editable mode
-	pip install -e $(SRC)/
+	@$(MAKE) -C $(SRC) install
 
 .PHONY: dev
 dev: ## Setup dev environment with all dependencies
-	pip install -e "$(SRC)/[dev,extras,torch]"
+	@$(MAKE) -C $(SRC) install-all
 
 .PHONY: run
 run: ## Show usage help
-	python -m check_models --help
+	@$(MAKE) -C $(SRC) check_models ARGS='--help'
 
 .PHONY: demo
 demo: ## Run demo with verbose output
-	python -m check_models --verbose
+	@$(MAKE) -C $(SRC) check_models ARGS='--verbose'
 
 .PHONY: test
 test: ## Run tests with pytest
-	pytest $(SRC)/tests/ -v
+	@$(MAKE) -C $(SRC) test
 
 .PHONY: check
 check: ## Run core quality pipeline (format, lint, typecheck, test)
 	@$(MAKE) -C $(SRC) check
 
 .PHONY: quality
-quality: ## Run full quality checks (ruff format+lint+mypy+pytest+shellcheck+markdownlint)
-	bash $(SRC)/tools/run_quality_checks.sh
+quality: ## Run full quality checks (ruff format+lint+mypy+suppression-audit+ty+pyrefly+pytest+shellcheck+markdownlint)
+	@$(MAKE) -C $(SRC) quality
 
 .PHONY: ci
 ci: ## Run full CI pipeline (strict mode)
@@ -62,22 +62,23 @@ ci: ## Run full CI pipeline (strict mode)
 
 .PHONY: format
 format: ## Format code with ruff
-	ruff format $(SRC)/
+	@$(MAKE) -C $(SRC) format
 
 .PHONY: lint
 lint: ## Lint code with ruff
-	ruff check $(SRC)/
+	@$(MAKE) -C $(SRC) lint
 
 .PHONY: typecheck
 typecheck: ## Run mypy type checking
-	mypy $(SRC)/check_models.py
+	@$(MAKE) -C $(SRC) typecheck
 
 .PHONY: clean
 clean: ## Remove generated files and caches
-	rm -rf output/*.html output/*.md
-	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
-	find . -type d -name .pytest_cache -exec rm -rf {} + 2>/dev/null || true
-	find . -type d -name '*.egg-info' -exec rm -rf {} + 2>/dev/null || true
+	@$(MAKE) -C $(SRC) clean
+	rm -f $(SRC)/output/results.html $(SRC)/output/results.md $(SRC)/output/model_gallery.md
+	rm -f $(SRC)/output/results.tsv $(SRC)/output/results.jsonl $(SRC)/output/results.history.jsonl
+	rm -f $(SRC)/output/diagnostics.md $(SRC)/output/check_models.log $(SRC)/output/environment.log
+	find $(SRC)/output/repro_bundles -mindepth 1 -maxdepth 1 -exec rm -rf {} + 2>/dev/null || true
 
 .PHONY: clean-all
 clean-all: clean ## Deep clean including build artifacts and stubs
@@ -106,4 +107,12 @@ stubs: ## Generate type stubs for mlx-vlm
 .PHONY: stubs-clear
 stubs-clear: ## Remove generated type stubs
 	$(MAKE) -C $(SRC) stubs-clear
+
+.PHONY: quality-strict
+quality-strict: ## Run quality checks with strict markdown linting (requires node/npm)
+	$(MAKE) -C $(SRC) quality-strict
+
+.PHONY: install-markdownlint
+install-markdownlint: ## Install markdownlint-cli2 via npm (requires Node.js)
+	$(MAKE) -C $(SRC) install-markdownlint
 

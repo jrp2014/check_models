@@ -1,10 +1,36 @@
 """Tests for JSONL output generation."""
 
+from __future__ import annotations
+
 import json
 from dataclasses import dataclass
-from pathlib import Path
+from typing import TYPE_CHECKING, cast
 
-from check_models import PerformanceResult, save_jsonl_report
+import check_models
+from check_models import (
+    JsonlMetadataRecord,
+    JsonlResultRecord,
+    PerformanceResult,
+    RuntimeDiagnostics,
+    _history_path_for_jsonl,
+    _load_latest_history_record,
+    append_history_record,
+    compare_history_records,
+    save_jsonl_report,
+)
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from check_models import HistoryModelResultRecord, HistoryRunRecord
+
+
+def _read_jsonl(path: Path) -> tuple[JsonlMetadataRecord, list[JsonlResultRecord]]:
+    """Read JSONL file returning (metadata_header, result_rows)."""
+    lines = path.read_text().strip().split("\n")
+    header = cast("JsonlMetadataRecord", json.loads(lines[0]))
+    results = [cast("JsonlResultRecord", json.loads(line)) for line in lines[1:]]
+    return header, results
 
 
 @dataclass
@@ -21,14 +47,46 @@ class MockGeneration:
     cache_memory: float | None = None
 
 
+def _history_run(
+    model_success: dict[str, bool],
+    *,
+    timestamp: str = "2026-01-01 00:00:00 GMT",
+) -> HistoryRunRecord:
+    """Build a fully shaped history run record for typed history tests."""
+    model_results: dict[str, HistoryModelResultRecord] = {}
+    for model, success in model_success.items():
+        model_results[model] = {
+            "success": success,
+            "error_stage": None,
+            "error_type": None,
+            "error_package": None,
+        }
+
+    return {
+        "_type": "run",
+        "format_version": "1.0",
+        "timestamp": timestamp,
+        "prompt_hash": "hash",
+        "prompt_preview": "preview",
+        "image_path": None,
+        "model_results": model_results,
+        "system": {},
+        "library_versions": {},
+    }
+
+
 def test_save_jsonl_report_creates_file(tmp_path: Path) -> None:
-    """Test that save_jsonl_report creates a file."""
+    """Test that save_jsonl_report creates a file with metadata header."""
     output_file = tmp_path / "results.jsonl"
     results: list[PerformanceResult] = []
-    save_jsonl_report(results, output_file)
+    save_jsonl_report(results, output_file, prompt="test", system_info={})
 
     assert output_file.exists()
-    assert output_file.read_text() == ""
+    header, rows = _read_jsonl(output_file)
+    assert header["_type"] == "metadata"
+    assert header["format_version"] == "1.4"
+    assert header["prompt"] == "test"
+    assert rows == []
 
 
 def test_save_jsonl_report_content(tmp_path: Path) -> None:
@@ -43,20 +101,114 @@ def test_save_jsonl_report_content(tmp_path: Path) -> None:
         generation_time=1.5,
         model_load_time=0.5,
         total_time=2.0,
+        runtime_diagnostics=RuntimeDiagnostics(
+            input_validation_time_s=0.1,
+            model_load_time_s=0.5,
+            prompt_prep_time_s=0.2,
+            decode_time_s=1.5,
+            cleanup_time_s=0.05,
+            first_token_latency_s=None,
+            stop_reason="completed",
+        ),
     )
 
     results = [result]
-    save_jsonl_report(results, output_file)
+    save_jsonl_report(results, output_file, prompt="test", system_info={})
 
     assert output_file.exists()
-    lines = output_file.read_text().strip().split("\n")
-    assert len(lines) == 1
+    header, rows = _read_jsonl(output_file)
+    assert header["_type"] == "metadata"
+    assert len(rows) == 1
 
-    data = json.loads(lines[0])
+    data = rows[0]
+    assert data["_type"] == "result"
     assert data["model"] == "test-model"
     assert data["success"] is True
-    assert data["metrics"]["generation_tps"] == 5.0
-    assert data["metrics"]["prompt_tokens"] == 10
+    assert data["failure_phase"] is None
+    assert data["error_code"] is None
+    assert data["error_signature"] is None
+    metrics = data["metrics"]
+    assert metrics.get("generation_tps") == 5.0
+    assert metrics.get("prompt_tokens") == 10
+    timing = data["timing"]
+    assert timing["input_validation_time_s"] == 0.1
+    assert timing["prompt_prep_time_s"] == 0.2
+    assert timing["cleanup_time_s"] == 0.05
+    assert timing["stop_reason"] == "completed"
+
+
+def test_save_jsonl_report_includes_review_payload_for_success(tmp_path: Path) -> None:
+    """Successful rows should include the canonical automated review payload."""
+    output_file = tmp_path / "results.jsonl"
+    prompt = (
+        "Analyze this image.\n"
+        "Context: Existing metadata hints:\n"
+        "- Title hint: Brick storefront with outdoor seating\n"
+        "- Description hint: A brick storefront has outdoor seating beside a sidewalk.\n"
+        "- Keyword hints: brick storefront, outdoor seating, sidewalk, people\n"
+    )
+    gen = MockGeneration(
+        text=(
+            "Title: Brick storefront with outdoor seating\n"
+            "Description: A brick storefront has outdoor seating beside a sidewalk.\n"
+            "Keywords: brick storefront, outdoor seating, sidewalk, people"
+        ),
+        prompt_tokens=320,
+        generation_tokens=64,
+    )
+    analysis = check_models.analyze_generation_text(
+        gen.text or "",
+        generated_tokens=64,
+        prompt_tokens=320,
+        prompt=prompt,
+        requested_max_tokens=128,
+    )
+    result = PerformanceResult(
+        model_name="test-model",
+        generation=gen,
+        success=True,
+        quality_analysis=analysis,
+        requested_max_tokens=128,
+    )
+
+    save_jsonl_report([result], output_file, prompt=prompt, system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    review = rows[0]["review"]
+    assert review["verdict"] in {"clean", "model_shortcoming", "context_budget"}
+    assert review["hint_relationship"] in {
+        "improves_trusted_hints",
+        "preserves_trusted_hints",
+        "degrades_trusted_hints",
+        "ignores_trusted_hints",
+    }
+    assert review["requested_max_tokens"] == 128
+    assert review["prompt_tokens_total"] == 320
+    assert review["prompt_tokens_text_est"] is not None
+    assert review["prompt_tokens_nontext_est"] is not None
+
+
+def test_save_jsonl_report_includes_review_payload_for_failures(tmp_path: Path) -> None:
+    """Failure rows should still include owner and verdict review fields."""
+    output_file = tmp_path / "results.jsonl"
+    result = PerformanceResult(
+        model_name="failed-model",
+        generation=None,
+        success=False,
+        error_message="runtime error",
+        error_stage="Model Error",
+        error_code="MLX_VLM_DECODE_RUNTIME",
+        error_package="mlx-vlm",
+    )
+
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    review = rows[0]["review"]
+    assert review["verdict"] == "harness"
+    assert review["owner"] == "mlx-vlm"
+    assert review["user_bucket"] == "avoid"
+    assert review["evidence"]
 
 
 def test_save_jsonl_report_no_generation(tmp_path: Path) -> None:
@@ -73,10 +225,10 @@ def test_save_jsonl_report_no_generation(tmp_path: Path) -> None:
     )
 
     results = [result]
-    save_jsonl_report(results, output_file)
+    save_jsonl_report(results, output_file, prompt="test", system_info={})
 
-    lines = output_file.read_text().strip().split("\n")
-    data = json.loads(lines[0])
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
 
     assert data["model"] == "test-model"
     assert "metrics" in data
@@ -96,15 +248,38 @@ def test_save_jsonl_report_failed_model(tmp_path: Path) -> None:
     )
 
     results = [result]
-    save_jsonl_report(results, output_file)
+    save_jsonl_report(results, output_file, prompt="test", system_info={})
 
-    lines = output_file.read_text().strip().split("\n")
-    data = json.loads(lines[0])
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
 
     assert data["model"] == "failed-model"
     assert data["success"] is False
+    assert data["failure_phase"] is None
     assert data["error_message"] == "Something went wrong"
     assert data["error_stage"] == "Model Load"
+
+
+def test_save_jsonl_report_includes_phase_code_and_signature(tmp_path: Path) -> None:
+    """Failure metadata fields should serialize for diagnostics tooling."""
+    output_file = tmp_path / "results.jsonl"
+    result = PerformanceResult(
+        model_name="failed-model",
+        generation=None,
+        success=False,
+        failure_phase="decode",
+        error_stage="API Mismatch",
+        error_code="TRANSFORMERS_DECODE_API_MISMATCH",
+        error_signature="TRANSFORMERS_DECODE_API_MISMATCH:abc123",
+        error_message="unexpected keyword argument",
+    )
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
+    assert data["failure_phase"] == "decode"
+    assert data["error_code"] == "TRANSFORMERS_DECODE_API_MISMATCH"
+    assert data["error_signature"] == "TRANSFORMERS_DECODE_API_MISMATCH:abc123"
 
 
 def test_save_jsonl_report_quality_issues_as_list(tmp_path: Path) -> None:
@@ -123,14 +298,37 @@ def test_save_jsonl_report_quality_issues_as_list(tmp_path: Path) -> None:
     )
 
     results = [result]
-    save_jsonl_report(results, output_file)
+    save_jsonl_report(results, output_file, prompt="test", system_info={})
 
-    lines = output_file.read_text().strip().split("\n")
-    data = json.loads(lines[0])
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
 
     assert data["model"] == "test-model"
     assert isinstance(data["quality_issues"], list)
     assert data["quality_issues"] == ["repetitive(<s>)", "verbose", "formatting"]
+
+
+def test_save_jsonl_report_quality_issues_with_internal_commas(tmp_path: Path) -> None:
+    """Commas inside one issue item (e.g., phrase preview) should not split that item."""
+    output_file = tmp_path / "results.jsonl"
+
+    gen = MockGeneration()
+    result = PerformanceResult(
+        model_name="test-model",
+        generation=gen,
+        success=True,
+        quality_issues='repetitive(phrase: "a, b..."), context-echo(0.91)',
+        generation_time=1.5,
+        model_load_time=0.5,
+        total_time=2.0,
+    )
+
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
+
+    assert data["quality_issues"] == ['repetitive(phrase: "a, b...")', "context-echo(0.91)"]
 
 
 def test_save_jsonl_report_no_quality_issues(tmp_path: Path) -> None:
@@ -149,10 +347,285 @@ def test_save_jsonl_report_no_quality_issues(tmp_path: Path) -> None:
     )
 
     results = [result]
-    save_jsonl_report(results, output_file)
+    save_jsonl_report(results, output_file, prompt="test", system_info={})
 
-    lines = output_file.read_text().strip().split("\n")
-    data = json.loads(lines[0])
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
 
     assert data["model"] == "test-model"
     assert data["quality_issues"] == []
+
+
+def test_save_jsonl_report_includes_traceback_and_type(tmp_path: Path) -> None:
+    """Test that save_jsonl_report includes error_traceback and error_type for failures."""
+    output_file = tmp_path / "results.jsonl"
+
+    result = PerformanceResult(
+        model_name="failed-model",
+        generation=None,
+        success=False,
+        error_message="ValueError: Missing parameters",
+        error_stage="Weight Mismatch",
+        error_type="ValueError",
+        error_package="mlx",
+        error_traceback="Traceback (most recent call last):\n  File 'test.py', line 1\nValueError: Missing parameters",
+    )
+
+    results = [result]
+    save_jsonl_report(results, output_file, prompt="test", system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
+
+    assert data["model"] == "failed-model"
+    assert data["success"] is False
+    assert data["error_type"] == "ValueError"
+    assert data["error_package"] == "mlx"
+    assert data["error_traceback"] is not None
+    assert "Traceback" in data["error_traceback"]
+
+
+def test_save_jsonl_report_includes_captured_output(tmp_path: Path) -> None:
+    """Failure rows should retain captured stdout/stderr for diagnostics workflows."""
+    output_file = tmp_path / "results.jsonl"
+
+    result = PerformanceResult(
+        model_name="failed-model",
+        generation=None,
+        success=False,
+        error_message="runtime error",
+        error_stage="Model Error",
+        captured_output_on_fail="=== STDERR ===\nTokenizer warning",
+    )
+
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
+    assert data["captured_output_on_fail"] == "=== STDERR ===\nTokenizer warning"
+
+
+def test_save_jsonl_report_includes_timing(tmp_path: Path) -> None:
+    """Test that save_jsonl_report includes timing information."""
+    output_file = tmp_path / "results.jsonl"
+
+    gen = MockGeneration()
+    result = PerformanceResult(
+        model_name="test-model",
+        generation=gen,
+        success=True,
+        generation_time=2.5,
+        model_load_time=1.0,
+        total_time=3.5,
+    )
+
+    results = [result]
+    save_jsonl_report(results, output_file, prompt="test", system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
+
+    assert "timing" in data
+    assert data["timing"]["generation_time_s"] == 2.5
+    assert data["timing"]["model_load_time_s"] == 1.0
+    assert data["timing"]["total_time_s"] == 3.5
+
+
+def test_save_jsonl_report_includes_generated_text(tmp_path: Path) -> None:
+    """Test that save_jsonl_report includes generated_text for successful models."""
+    output_file = tmp_path / "results.jsonl"
+
+    gen = MockGeneration(text="This is the generated output text.")
+    result = PerformanceResult(
+        model_name="test-model",
+        generation=gen,
+        success=True,
+        generation_time=1.5,
+        model_load_time=0.5,
+        total_time=2.0,
+    )
+
+    results = [result]
+    save_jsonl_report(results, output_file, prompt="test", system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
+
+    assert "generated_text" in data
+    assert data["generated_text"] == "This is the generated output text."
+
+
+def test_save_jsonl_report_preserves_empty_generated_text(tmp_path: Path) -> None:
+    """Empty generated text should still be serialized for diagnostics triage."""
+    output_file = tmp_path / "results.jsonl"
+
+    gen = MockGeneration(text="")
+    result = PerformanceResult(
+        model_name="test-model",
+        generation=gen,
+        success=True,
+    )
+
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    data = rows[0]
+    assert "generated_text" in data
+    assert data["generated_text"] == ""
+
+
+def test_append_history_record_creates_file(tmp_path: Path) -> None:
+    """Test that append_history_record writes a per-run history entry."""
+    history_file = tmp_path / "results.history.jsonl"
+    result = PerformanceResult(
+        model_name="test-model",
+        generation=None,
+        success=True,
+        generation_time=1.0,
+        model_load_time=0.5,
+        total_time=1.5,
+    )
+
+    append_history_record(
+        history_path=history_file,
+        results=[result],
+        prompt="test prompt",
+        system_info={"OS": "test"},
+        library_versions={},
+        image_path=None,
+    )
+
+    assert history_file.exists()
+    lines = history_file.read_text().strip().split("\n")
+    assert len(lines) == 1
+    record = json.loads(lines[0])
+    assert record["_type"] == "run"
+    assert record["model_results"]["test-model"]["success"] is True
+
+
+def test_compare_history_records_detects_regressions_and_recoveries() -> None:
+    """Test regression/recovery detection between history records."""
+    previous = _history_run(
+        {
+            "model-a": True,
+            "model-b": False,
+            "model-c": True,
+        },
+    )
+    current = _history_run(
+        {
+            "model-a": False,
+            "model-b": True,
+            "model-d": True,
+        },
+        timestamp="2026-01-02 00:00:00 GMT",
+    )
+
+    summary = compare_history_records(previous, current)
+    assert summary["regressions"] == ["model-a"]
+    assert summary["recoveries"] == ["model-b"]
+    assert summary["new_models"] == ["model-d"]
+    assert summary["missing_models"] == ["model-c"]
+
+
+# ---------------------------------------------------------------------------
+# _history_path_for_jsonl
+# ---------------------------------------------------------------------------
+
+
+def test_history_path_for_jsonl_derives_name(tmp_path: Path) -> None:
+    """Test that history path inserts '.history' before '.jsonl'."""
+    result = _history_path_for_jsonl(tmp_path / "results.jsonl")
+    assert result == tmp_path / "results.history.jsonl"
+
+
+def test_history_path_for_jsonl_custom_stem(tmp_path: Path) -> None:
+    """Test history path derivation with a non-default stem."""
+    result = _history_path_for_jsonl(tmp_path / "my_output.jsonl")
+    assert result == tmp_path / "my_output.history.jsonl"
+
+
+# ---------------------------------------------------------------------------
+# _load_latest_history_record
+# ---------------------------------------------------------------------------
+
+
+def test_load_latest_history_record_missing_file(tmp_path: Path) -> None:
+    """Return None when the history file does not exist."""
+    assert _load_latest_history_record(tmp_path / "missing.jsonl") is None
+
+
+def test_load_latest_history_record_empty_file(tmp_path: Path) -> None:
+    """Return None when the history file is empty."""
+    history = tmp_path / "empty.jsonl"
+    history.write_text("")
+    assert _load_latest_history_record(history) is None
+
+
+def test_load_latest_history_record_only_blank_lines(tmp_path: Path) -> None:
+    """Return None when the file contains only blank lines."""
+    history = tmp_path / "blanks.jsonl"
+    history.write_text("\n\n\n")
+    assert _load_latest_history_record(history) is None
+
+
+def test_load_latest_history_record_corrupted_lines(tmp_path: Path) -> None:
+    """Skip corrupted lines and return the valid record."""
+    history = tmp_path / "mixed.jsonl"
+    valid = json.dumps(_history_run({"m": True}))
+    history.write_text(f'{valid}\nNOT-JSON\n{{"bad": true}}\n')
+
+    record = _load_latest_history_record(history)
+    assert record is not None
+    assert record.get("_type") == "run"
+    assert "model_results" in record
+    model_results = record["model_results"]
+    assert model_results["m"]["success"] is True
+
+
+def test_load_latest_history_record_only_corrupted(tmp_path: Path) -> None:
+    """Return None when every line is invalid JSON."""
+    history = tmp_path / "corrupt.jsonl"
+    history.write_text("NOT-JSON-1\nNOT-JSON-2\n")
+    assert _load_latest_history_record(history) is None
+
+
+def test_load_latest_history_record_returns_last_run(tmp_path: Path) -> None:
+    """When multiple run records exist, return the last one."""
+    history = tmp_path / "multi.jsonl"
+    first = json.dumps(_history_run({"m": True}, timestamp="2026-01-01 00:00:00 GMT"))
+    second = json.dumps(_history_run({"m": False}, timestamp="2026-01-02 00:00:00 GMT"))
+    history.write_text(f"{first}\n{second}\n")
+
+    record = _load_latest_history_record(history)
+    assert record is not None
+    assert record.get("timestamp") == "2026-01-02 00:00:00 GMT"
+
+
+def test_load_latest_history_record_skips_non_run_types(tmp_path: Path) -> None:
+    """Skip records whose _type is not 'run'."""
+    history = tmp_path / "types.jsonl"
+    run_record = _history_run({"m": True}, timestamp="2026-01-03 00:00:00 GMT")
+    metadata = json.dumps({"_type": "metadata", "info": "x"})
+    history.write_text(f"{json.dumps(run_record)}\n{metadata}\n")
+
+    record = _load_latest_history_record(history)
+    assert record is not None
+    assert record.get("_type") == "run"
+    assert record.get("timestamp") == "2026-01-03 00:00:00 GMT"
+
+
+# ---------------------------------------------------------------------------
+# compare_history_records — baseline (no previous)
+# ---------------------------------------------------------------------------
+
+
+def test_compare_history_records_no_previous() -> None:
+    """With no previous record, all current models are 'new'."""
+    current = _history_run({"model-x": True, "model-y": False})
+
+    summary = compare_history_records(None, current)
+    assert summary["regressions"] == []
+    assert summary["recoveries"] == []
+    assert summary["new_models"] == ["model-x", "model-y"]
+    assert summary["missing_models"] == []

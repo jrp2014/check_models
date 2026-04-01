@@ -45,7 +45,7 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
 2. **Create and activate conda environment**:
 
    ```bash
-   conda create -n mlx-vlm python=3.13
+   bash src/tools/setup_conda_env.sh
    conda activate mlx-vlm
    ```
 
@@ -58,21 +58,29 @@ Thank you for your interest in contributing to MLX VLM Check! This document guid
    This will:
    - Install all Python dependencies (runtime + dev + extras + torch)
    - Install the package in editable mode
+   - Install repo-local Markdown hook tooling if `npm` is available
 
-   **Optional dependencies**:
+   **Optional follow-up**:
 
-   - **PyTorch** (needed for some models): `make install-torch`
-   - **Everything** (extras + torch + dev): `make install-all`
-   - **Markdown linting only**: `make install-markdownlint` (requires Node.js/npm)
+   - Install markdown tooling: `make install-markdownlint` (requires Node.js/npm)
+   - Use package-local install variants via `make -C src help`
 
 4. **Verify installation**:
 
    ```bash
-   # Verify environment
+   # Verify environment (run from src/)
+   cd src
    python -m tools.validate_env
-   
-   # Install git pre-commit hook (important!)
+   cd ..
+   ```
+
+   If you answered `y` to development dependencies during setup, the repo's
+   custom git hooks are already installed. To reinstall them manually:
+
+   ```bash
+   cd src
    python -m tools.install_precommit_hook
+   cd ..
    ```
 
 ### Manual Environment Validation
@@ -135,7 +143,7 @@ The project uses several automated quality checks:
 
    ```bash
    make format      # Format code
-   make lint        # Check linting (alias for quality)
+   make lint        # Lint code
    ```
 
 2. **Mypy** (type checking):
@@ -153,33 +161,34 @@ The project uses several automated quality checks:
 4. **Combined quality check**:
 
    ```bash
-   make quality     # Runs format + lint + typecheck + markdownlint (if available)
+   make quality     # Runs ruff + mypy + ty + pyrefly + pytest + shellcheck + markdownlint
    ```
 
-5. **Markdown linting** (optional):
+5. **Markdown linting**:
 
-   Automatically included in `make quality` if `markdownlint-cli2` is installed.
+   `make quality` runs markdownlint via the repo-local install, a global
+   `markdownlint-cli2`, or an `npx --no-install` fallback. If none of those are
+   available, the quality gate fails.
 
    ```bash
    # Install markdown linting (requires Node.js/npm)
    make install-markdownlint
 
-   # Or run via npx (on-demand download)
-   npx markdownlint-cli2 '**/*.md'
+   # Or run via npx when markdownlint-cli2 is already available to npx
+   npx --no-install markdownlint-cli2 '**/*.md'
    ```
-
-   If neither npm nor npx is available, markdown linting is gracefully skipped with a warning.
 
 ### Git Hooks
 
-The project uses git hooks to enforce quality:
+Two supported hook workflows:
 
-- **Pre-commit**:
-  - Automatically formats Python files with ruff
-  - Auto-fixes Markdown files with markdownlint (via npx)
-  - Syncs README dependencies when pyproject.toml changes
-  - Re-stages all fixed files automatically
-- **Pre-push**: Runs full quality checks (format check, lint, type check, tests) before pushing
+- **pre-commit framework** (`pre-commit install`):
+  - Installs the checked-in `pre-commit` and `pre-push` hooks from `.pre-commit-config.yaml`
+  - **Pre-commit**: runs staged hygiene via `src/tools/run_commit_hygiene.sh`
+  - **Pre-push**: runs fast checks via `src/tools/check_quality_simple.sh`
+- **Custom repo hooks** (`cd src && python -m tools.install_precommit_hook`):
+  - **Pre-commit**: formats Python files, fixes markdown when possible, and syncs README deps when `src/pyproject.toml` changes
+  - **Pre-push**: runs workflow YAML validation, dependency sync verification, Ruff format check + lint, mypy, ty, pyrefly, and `pytest -m "not slow and not e2e"`
 
 To bypass hooks (not recommended):
 
@@ -192,12 +201,9 @@ git push --no-verify
 
 All pull requests must pass:
 
-- Ruff format check (no unformatted code)
-- Ruff lint check (all rules)
-- Mypy type checking (strict mode)
-- Dependency sync verification
-- All tests (no skips allowed in CI)
-- Markdown linting
+- Quality workflow (`.github/workflows/quality.yml`) `static-quality` job: workflow YAML validation, dependency sync check, ruff format check + lint, mypy + ty + pyrefly, pytest, shellcheck, markdownlint
+- Quality workflow (`.github/workflows/quality.yml`) `runtime-smoke` job: isolated runtime smoke probe via `src/tools/run_runtime_smoke.sh`
+- Dependency sync guard (`.github/workflows/dependency-sync.yml`)
 
 ## Testing
 
@@ -289,26 +295,27 @@ Your PR must:
 The project organizes dependencies into groups:
 
 - **Runtime**: Core dependencies needed to run `check_models.py` (mlx, mlx-vlm, Pillow, etc.)
-- **Extras**: Optional enhancements (psutil, tokenizers, mlx-lm, transformers)
+- **Extras**: Optional enhancements (psutil, tokenizers, mlx-lm)
 - **Torch**: PyTorch stack for models that require it (torch, torchvision, torchaudio)
 - **Dev**: Development tools (ruff, mypy, pytest)
 
 Install specific groups as needed:
 
 ```bash
-# Runtime only (default)
-pip install -e .
+# Runtime only (from repo root)
+pip install -e src/
 
-# With extras
-pip install -e ".[extras]"
-
-# With PyTorch (needed for some models)
-pip install -e ".[torch]"
-make install-torch  # from root
+# With extras / torch / dev (from repo root)
+pip install -e "src/[extras]"
+pip install -e "src/[torch]"
+pip install -e "src/[dev]"
 
 # Everything
-pip install -e ".[extras,torch,dev]"
-make install-all  # from root
+make dev
+
+# Package-local installation helpers
+make -C src install-torch
+make -C src install-all
 ```
 
 ### Managing Dependencies
@@ -320,13 +327,16 @@ Dependencies are defined in `src/pyproject.toml` as the single source of truth.
 make update
 
 # Check for outdated packages:
-make check-outdated
+make -C src check-outdated
 
 # Security audit:
-make audit
+make -C src audit
 
 # Sync README dependency blocks:
 make deps-sync
+
+# Verify README dependency blocks are already in sync (CI-style):
+python -m tools.update_readme_deps --check
 ```
 
 #### Advanced: Using update.sh for MLX Development
@@ -356,13 +366,16 @@ bash tools/update.sh
 - Automatically detects and uses local MLX development builds
 - Validates Python version (>= 3.13 required)
 - Checks for virtual environment activation
-- Offers per-group installation (runtime, extras, torch, dev)
-- Verifies dependency sync across pyproject.toml, requirements*.txt, and update.sh itself
+- Installs the project editable environment with dev and extras enabled by default
+- Uses repo-local Node tooling (`npm install --prefix src`) for markdownlint instead of relying on global packages
+- Verifies dependency sync across `pyproject.toml`, generated README install blocks, and updater assumptions
 
 **Environment Variables**:
 
 - `SKIP_TORCH=1`: Skip PyTorch installation (torch is included by default)
-- `MLX_METAL_JIT=ON`: Enable Metal shader runtime compilation for smaller binaries (default: `OFF` for pre-built kernels)
+- `MLX_METAL_JIT=ON`: Build local `mlx` with runtime Metal compilation
+  (mapped to `CMAKE_ARGS=-DMLX_METAL_JIT=ON`; if unset, MLX's default
+  `MLX_METAL_JIT=OFF` uses pre-built kernels)
 
 **MLX_METAL_JIT Trade-offs**:
 
@@ -441,12 +454,13 @@ According to the [official MLX documentation](https://ml-explore.github.io/mlx/b
 
 **When to clean:**
 
-- Before rebuilding MLX with different compiler flags (e.g., changing `MLX_METAL_JIT`)
+- Before rebuilding MLX with different compiler flags (for example changing
+  `MLX_METAL_JIT`)
 - When experiencing odd build or runtime errors
 - To free up disk space
 - After switching between different MLX versions or branches
 
-**Note**: This does NOT update the lock files themselves. To upgrade dependencies to newer versions, use `make upgrade-deps` instead.
+**Note**: This does NOT update the lock files themselves. To upgrade dependencies to newer versions, edit `src/pyproject.toml` and run `make update`.
 
 ## Release Process
 

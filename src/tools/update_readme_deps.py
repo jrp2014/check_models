@@ -2,6 +2,7 @@
 
 Usage:
     python tools/update_readme_deps.py
+    python tools/update_readme_deps.py --check
 
 The script:
   * Parses [project.dependencies] and selected optional groups (extras) in pyproject.toml
@@ -23,6 +24,7 @@ Exit codes:
 
 from __future__ import annotations
 
+import argparse
 import logging
 import re
 import tomllib
@@ -113,6 +115,16 @@ def main() -> int:
       * Ensures all runtime dependencies appear in README blocks after update.
       * Ensures no optional dependency (extras/torch/etc.) appears in those blocks.
     """
+    parser = argparse.ArgumentParser(
+        description="Sync README dependency install blocks with pyproject.toml",
+    )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Verify README dependency blocks are in sync without writing changes",
+    )
+    args = parser.parse_args()
+
     repo_root = Path(__file__).resolve().parents[1]
     pyproject_path = repo_root / "pyproject.toml"
     readme_path = repo_root / "README.md"
@@ -125,14 +137,26 @@ def main() -> int:
         install_cmd = build_install_command(runtime_deps)
         snippet = install_cmd
         readme_text = readme_path.read_text(encoding="utf-8")
+        updated_readme_text = readme_text
         for key in MARKERS:
-            readme_text = replace_between_markers(readme_text, key, snippet)
+            updated_readme_text = replace_between_markers(updated_readme_text, key, snippet)
         # Post-update validation: ensure no optional package leaked
         for opt in sorted(optional_flat):
             pattern = f'"{opt}'
             if pattern in snippet:
                 _fail_optional_leak(opt)
-        readme_path.write_text(readme_text, encoding="utf-8")
+
+        if args.check:
+            if updated_readme_text != readme_text:
+                logger.error(
+                    "README dependency blocks are out of sync. "
+                    "Run: python -m tools.update_readme_deps",
+                )
+                return 1
+            logger.info("README dependency blocks are in sync")
+            return 0
+
+        readme_path.write_text(updated_readme_text, encoding="utf-8")
     except Exception:  # pragma: no cover - rare failure path
         logger.exception("update_readme_deps failed")
         return 1

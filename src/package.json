@@ -4,7 +4,10 @@
   "description": "Development tooling for MLX VLM Check (Markdown linting)",
   "private": true,
   "devDependencies": {
-    "markdownlint-cli2": "^0.15.0"
+    "markdownlint-cli2": "^0.22.0"
+  },
+  "overrides": {
+    "smol-toml": "1.6.1"
   },
   "scripts": {
     "lint:md": "markdownlint-cli2 '**/*.md' '#node_modules'"

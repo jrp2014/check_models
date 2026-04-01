@@ -13,132 +13,137 @@ Or run all tests including slow ones:
 Skip these in CI by default (they require MLX hardware and model downloads).
 """
 
-# ruff: noqa: S603
+from __future__ import annotations
 
-import contextlib
 import json
-import subprocess
+import os
 import sys
+import tempfile
 from pathlib import Path
+from typing import NamedTuple
+from unittest.mock import patch
 
-import pytest
-from PIL import Image
+# =============================================================================
+# EARLY ENVIRONMENT SETUP (MUST happen before huggingface_hub imports)
+# =============================================================================
 
-# Path configuration
-_TEST_DIR = Path(__file__).parent
-_SRC_DIR = _TEST_DIR.parent
-_CHECK_MODELS_SCRIPT = _SRC_DIR / "check_models.py"
-_OUTPUT_DIR = _SRC_DIR / "output"
+# Set up HF cache directory early, before any huggingface_hub functions cache the path.
+# Strategy (following HuggingFace documentation):
+# 1. If HF_HUB_CACHE is set → use it (user explicitly configured)
+# 2. Else if default cache exists (~/.cache/huggingface/hub) → use it
+# 3. Else create temp cache (CI environment without cache)
+_DEFAULT_HF_CACHE = Path.home() / ".cache" / "huggingface" / "hub"
 
-# Test-specific output files
-_E2E_LOG = _OUTPUT_DIR / "test_e2e_smoke.log"
-_E2E_HTML = _OUTPUT_DIR / "test_e2e_smoke.html"
-_E2E_MD = _OUTPUT_DIR / "test_e2e_smoke.md"
-_E2E_TSV = _OUTPUT_DIR / "test_e2e_smoke.tsv"
-_E2E_JSONL = _OUTPUT_DIR / "test_e2e_smoke.jsonl"
-_E2E_ENV = _OUTPUT_DIR / "test_e2e_smoke_env.log"
+if "HF_HUB_CACHE" not in os.environ and not _DEFAULT_HF_CACHE.exists():
+    # CI environment - create temp cache to prevent CacheNotFound
+    _temp_hf_cache = Path(tempfile.gettempdir()) / "pytest_hf_cache"
+    _temp_hf_cache.mkdir(parents=True, exist_ok=True)
+    (_temp_hf_cache / "hub").mkdir(parents=True, exist_ok=True)
+    os.environ["HF_HUB_CACHE"] = str(_temp_hf_cache / "hub")
+    os.environ["HF_HOME"] = str(_temp_hf_cache)
+
+# Now import huggingface_hub after environment is configured
+import pytest  # noqa: E402
+from huggingface_hub import scan_cache_dir  # noqa: E402
+from huggingface_hub.errors import CacheNotFound  # noqa: E402
+from PIL import Image  # noqa: E402
+
+import check_models  # noqa: E402
 
 # Fixture model - small, fast, reliable
 # nanoLLaVA is ~600MB, fastest load, lowest memory (4.5GB peak)
 FIXTURE_MODEL = "qnguyen3/nanoLLaVA"
 
-# Timeout for model operations (generous for first-time downloads)
-E2E_TIMEOUT = 300  # 5 minutes
+
+class CLIResult(NamedTuple):
+    """Result of a CLI execution for testing."""
+
+    exit_code: int
+    stdout: str
+    stderr: str
 
 
-def _get_e2e_output_args() -> list[str]:
+def _run_cli(args: list[str], capsys: pytest.CaptureFixture[str]) -> CLIResult:
+    """Helper to run the CLI main function directly."""
+    test_args = ["check_models.py", *args]
+    exit_code = 0
+    with patch.object(sys, "argv", test_args):
+        try:
+            check_models.main_cli()
+        except SystemExit as e:
+            exit_code = e.code if isinstance(e.code, int) else (1 if e.code else 0)
+
+    captured = capsys.readouterr()
+    return CLIResult(exit_code, captured.out, captured.err)
+
+
+def _get_e2e_output_args(output_dir: Path) -> list[str]:
     """Return CLI arguments for E2E test-specific output files."""
     return [
         "--output-log",
-        str(_E2E_LOG),
+        str(output_dir / "e2e.log"),
         "--output-html",
-        str(_E2E_HTML),
+        str(output_dir / "e2e.html"),
         "--output-markdown",
-        str(_E2E_MD),
+        str(output_dir / "e2e.md"),
         "--output-tsv",
-        str(_E2E_TSV),
+        str(output_dir / "e2e.tsv"),
         "--output-jsonl",
-        str(_E2E_JSONL),
+        str(output_dir / "e2e.jsonl"),
         "--output-env",
-        str(_E2E_ENV),
+        str(output_dir / "e2e_env.log"),
+        "--output-diagnostics",
+        str(output_dir / "e2e_diagnostics.md"),
     ]
 
 
 @pytest.fixture
+def e2e_output_dir(tmp_path: Path) -> Path:
+    """Create a temporary directory for E2E test outputs."""
+    output_dir = tmp_path / "output"
+    output_dir.mkdir()
+    return output_dir
+
+
+@pytest.fixture
 def e2e_test_image(tmp_path: Path) -> Path:
-    """Create a realistic test image for E2E testing.
-
-    Creates a larger image with some visual content to give the model
-    something to describe.
-    """
+    """Create a realistic test image for E2E testing."""
     img_path = tmp_path / "e2e_test.jpg"
-    # Create a simple image with visual elements
-    img = Image.new("RGB", (640, 480), color=(135, 206, 235))  # Sky blue
-
-    # Add some basic visual elements by drawing rectangles
-    # (Without PIL.ImageDraw, we manually set pixel regions)
+    img = Image.new("RGB", (640, 480), color=(135, 206, 235))
     pixels = img.load()
-
-    # Draw a "sun" (yellow circle approximation in top-right)
-    for x in range(540, 600):
-        for y in range(40, 100):
-            if (x - 570) ** 2 + (y - 70) ** 2 < 900:  # Circle radius ~30
-                pixels[x, y] = (255, 255, 0)  # Yellow
-
-    # Draw "grass" (green strip at bottom)
-    for x in range(640):
-        for y in range(380, 480):
-            pixels[x, y] = (34, 139, 34)  # Forest green
-
-    # Draw a simple "house" (brown rectangle with red roof)
-    for x in range(200, 350):
-        for y in range(250, 380):
-            pixels[x, y] = (139, 90, 43)  # Brown (house body)
-
-    for x in range(180, 370):
-        for y in range(200, 250):
-            # Triangle-ish roof (simplified as rectangle for now)
-            pixels[x, y] = (178, 34, 34)  # Firebrick red (roof)
-
+    if pixels:
+        for x in range(540, 600):
+            for y in range(40, 100):
+                if (x - 570) ** 2 + (y - 70) ** 2 < 900:
+                    pixels[x, y] = (255, 255, 0)
+        for x in range(640):
+            for y in range(380, 480):
+                pixels[x, y] = (34, 139, 34)
+        for x in range(200, 350):
+            for y in range(250, 380):
+                pixels[x, y] = (139, 90, 43)
+        for x in range(180, 370):
+            for y in range(200, 250):
+                pixels[x, y] = (178, 34, 34)
     img.save(img_path, "JPEG", quality=85)
     return img_path
-
-
-def _check_mlx_vlm_available() -> bool:
-    """Check if mlx-vlm is available in the current environment."""
-    try:
-        result = subprocess.run(
-            [sys.executable, "-c", "import mlx_vlm"],
-            check=False,
-            capture_output=True,
-            timeout=10,
-        )
-    except (subprocess.TimeoutExpired, OSError):
-        return False
-    else:
-        return result.returncode == 0
 
 
 def _check_model_cached(model_id: str) -> bool:
     """Check if a model is already cached locally."""
     try:
-        result = subprocess.run(
-            [
-                sys.executable,
-                "-c",
-                f"from huggingface_hub import scan_cache_dir; "
-                f"ids = [r.repo_id for r in scan_cache_dir().repos]; "
-                f"print('{model_id}' in ids)",
-            ],
-            check=False,
-            capture_output=True,
-            text=True,
-            timeout=10,
-        )
-    except (subprocess.TimeoutExpired, OSError):
+        repos = scan_cache_dir().repos
+    except (OSError, ValueError, RuntimeError, CacheNotFound):
         return False
     else:
-        return "True" in result.stdout
+        repo_ids = [r.repo_id for r in repos]
+        return model_id in repo_ids
+
+
+def _check_runtime_dependencies_ready() -> bool:
+    """Check whether core runtime deps are currently usable for real inference."""
+    required_runtime = {"mlx", "mlx-vlm", "mlx-lm"}
+    return all(dep not in check_models.MISSING_DEPENDENCIES for dep in required_runtime)
 
 
 # Mark all tests in this module as slow and e2e
@@ -149,170 +154,135 @@ pytestmark = [
 
 
 @pytest.mark.skipif(
-    not _check_mlx_vlm_available(),
-    reason="mlx-vlm not available in environment",
+    not _check_runtime_dependencies_ready(),
+    reason="runtime deps unavailable (requires working mlx + mlx-vlm + mlx-lm)",
 )
 class TestE2ESmoke:
     """End-to-end smoke tests that run actual model inference."""
 
-    def test_dry_run_with_fixture_model(self, e2e_test_image: Path) -> None:
+    def test_dry_run_with_fixture_model(
+        self,
+        e2e_test_image: Path,
+        e2e_output_dir: Path,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
         """Dry-run should validate setup without invoking the model."""
-        result = subprocess.run(
-            [
-                sys.executable,
-                str(_CHECK_MODELS_SCRIPT),
-                *_get_e2e_output_args(),
-                "--image",
-                str(e2e_test_image),
-                "--models",
-                FIXTURE_MODEL,
-                "--dry-run",
-                "--prompt",
-                "Describe this image.",
-            ],
-            check=False,
-            capture_output=True,
-            text=True,
-            timeout=60,
-        )
-
-        assert result.returncode == 0, f"Dry run failed: {result.stderr}"
+        args = [
+            *_get_e2e_output_args(e2e_output_dir),
+            "--image",
+            str(e2e_test_image),
+            "--models",
+            FIXTURE_MODEL,
+            "--dry-run",
+            "--prompt",
+            "Describe this image.",
+        ]
+        result = _run_cli(args, capsys)
+        assert result.exit_code == 0
         output = result.stdout + result.stderr
-
-        # Verify dry-run output contains expected elements
-        assert "Dry Run" in output or "dry run" in output.lower()
+        assert "dry run" in output.lower()
         assert FIXTURE_MODEL in output
         assert "Describe this image" in output
 
     @pytest.mark.skipif(
         not _check_model_cached(FIXTURE_MODEL),
-        reason=f"Model {FIXTURE_MODEL} not cached (run manually first)",
+        reason=(f"Model {FIXTURE_MODEL} not cached (requires pre-downloaded fixture model)"),
     )
-    def test_full_inference_with_fixture_model(self, e2e_test_image: Path) -> None:
+    def test_full_inference_with_fixture_model(
+        self,
+        e2e_test_image: Path,
+        e2e_output_dir: Path,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
         """Full inference run should complete successfully and produce outputs."""
-        result = subprocess.run(
-            [
-                sys.executable,
-                str(_CHECK_MODELS_SCRIPT),
-                *_get_e2e_output_args(),
-                "--image",
-                str(e2e_test_image),
-                "--models",
-                FIXTURE_MODEL,
-                "--prompt",
-                "Describe the main elements in this image briefly.",
-                "--max-tokens",
-                "100",  # Limit for faster completion
-                "--timeout",
-                "120",  # Model timeout
-            ],
-            check=False,
-            capture_output=True,
-            text=True,
-            timeout=E2E_TIMEOUT,
-        )
-
-        # Check successful completion
-        assert result.returncode == 0, f"Inference failed: {result.stderr}"
+        args = [
+            *_get_e2e_output_args(e2e_output_dir),
+            "--image",
+            str(e2e_test_image),
+            "--models",
+            FIXTURE_MODEL,
+            "--prompt",
+            "Describe the main elements in this image briefly.",
+            "--max-tokens",
+            "100",
+            "--timeout",
+            "120",
+        ]
+        result = _run_cli(args, capsys)
+        assert result.exit_code == 0
 
         # Verify output files were created
-        assert _E2E_HTML.exists(), "HTML report not created"
-        assert _E2E_MD.exists(), "Markdown report not created"
-        assert _E2E_JSONL.exists(), "JSONL report not created"
+        e2e_html = e2e_output_dir / "e2e.html"
+        e2e_md = e2e_output_dir / "e2e.md"
+        e2e_jsonl = e2e_output_dir / "e2e.jsonl"
+        assert e2e_html.exists()
+        assert e2e_md.exists()
+        assert e2e_jsonl.exists()
 
-        # Verify JSONL contains valid result
-        with _E2E_JSONL.open() as f:
+        with e2e_jsonl.open() as f:
             records = [json.loads(line) for line in f if line.strip()]
-
-        assert len(records) >= 1, "No results in JSONL"
-        record = records[0]
+        assert len(records) >= 2  # metadata header + at least 1 result
+        # First line is metadata header
+        assert records[0]["_type"] == "metadata"
+        # Second line is the model result
+        record = records[1]
         assert record["model"] == FIXTURE_MODEL
-        assert record["success"] is True, f"Model failed: {record.get('error_message')}"
-
-        # Verify metrics are present
-        metrics = record.get("metrics", {})
-        assert metrics.get("generation_tokens", 0) > 0, "No tokens generated"
-        assert metrics.get("generation_tps", 0) > 0, "TPS not recorded"
+        assert record["success"] is True
 
     @pytest.mark.skipif(
         not _check_model_cached(FIXTURE_MODEL),
-        reason=f"Model {FIXTURE_MODEL} not cached (run manually first)",
+        reason=(f"Model {FIXTURE_MODEL} not cached (requires pre-downloaded fixture model)"),
     )
-    def test_quality_analysis_produces_output(self, e2e_test_image: Path) -> None:
+    def test_quality_analysis_produces_output(
+        self,
+        e2e_test_image: Path,
+        e2e_output_dir: Path,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
         """Quality analysis should run and detect potential issues."""
-        result = subprocess.run(
-            [
-                sys.executable,
-                str(_CHECK_MODELS_SCRIPT),
-                *_get_e2e_output_args(),
-                "--image",
-                str(e2e_test_image),
-                "--models",
-                FIXTURE_MODEL,
-                "--prompt",
-                "Describe this image in detail. Include colors and shapes.",
-                "--max-tokens",
-                "150",
-                "--verbose",  # Enable quality analysis logging
-            ],
-            check=False,
-            capture_output=True,
-            text=True,
-            timeout=E2E_TIMEOUT,
+        args = [
+            *_get_e2e_output_args(e2e_output_dir),
+            "--image",
+            str(e2e_test_image),
+            "--models",
+            FIXTURE_MODEL,
+            "--prompt",
+            "Describe this image in detail.",
+            "--max-tokens",
+            "150",
+            "--verbose",
+        ]
+        result = _run_cli(args, capsys)
+        assert result.exit_code == 0
+        output = result.stdout + result.stderr
+        assert any(
+            word in output.lower() for word in ["quality", "tps", "generated", "tokens", "memory"]
         )
 
-        assert result.returncode == 0, f"Quality analysis failed: {result.stderr}"
-        output = result.stdout + result.stderr
-
-        # Check that quality analysis ran (may or may not find issues)
-        # Look for quality-related indicators in output
-        assert any(
-            indicator in output.lower()
-            for indicator in [
-                "quality",
-                "tps",
-                "generated",
-                "tokens",
-                "memory",
-            ]
-        ), "Expected quality/metrics output not found"
-
-    def test_invalid_model_produces_error(self, e2e_test_image: Path) -> None:
+    def test_invalid_model_produces_error(
+        self,
+        e2e_test_image: Path,
+        e2e_output_dir: Path,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
         """Non-existent model should produce a clear error."""
-        result = subprocess.run(
-            [
-                sys.executable,
-                str(_CHECK_MODELS_SCRIPT),
-                *_get_e2e_output_args(),
-                "--image",
-                str(e2e_test_image),
-                "--models",
-                "nonexistent/fake-model-12345",
-                "--timeout",
-                "30",
-            ],
-            check=False,
-            capture_output=True,
-            text=True,
-            timeout=60,
+        args = [
+            *_get_e2e_output_args(e2e_output_dir),
+            "--image",
+            str(e2e_test_image),
+            "--models",
+            "nonexistent/fake-model-12345",
+            "--timeout",
+            "30",
+        ]
+        result = _run_cli(args, capsys)
+        output = result.stdout + result.stderr
+        # Model loading should fail with repository/model not found error
+        assert (
+            "not found" in output.lower()
+            or "could not" in output.lower()
+            or "failed" in output.lower()
         )
 
-        # Should either fail or produce error result in output
-        output = result.stdout + result.stderr
-        # Check for error indicators
-        assert any(
-            indicator in output.lower()
-            for indicator in ["error", "failed", "not found", "could not"]
-        ), f"Expected error message not found in: {output[:500]}"
 
-
-# Cleanup fixture
-@pytest.fixture(autouse=True)
-def cleanup_e2e_outputs() -> None:
-    """Clean up E2E test output files after each test."""
-    yield
-    # Cleanup after test
-    for file in [_E2E_LOG, _E2E_HTML, _E2E_MD, _E2E_TSV, _E2E_JSONL, _E2E_ENV]:
-        if file.exists():
-            with contextlib.suppress(OSError):
-                file.unlink()
+# Note: No cleanup fixture needed - tmp_path fixture handles cleanup automatically

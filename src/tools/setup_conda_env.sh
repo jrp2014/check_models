@@ -26,7 +26,7 @@ DEFAULT_ENV_NAME="mlx-vlm"
 
 # Help function
 show_help() {
-    cat << EOF
+    cat <<'EOF'
 setup_conda_env.sh - Create conda environment for MLX VLM Check
 
 USAGE:
@@ -47,11 +47,11 @@ DESCRIPTION:
 REQUIREMENTS:
     - macOS (preferably with Apple Silicon)
     - conda or miniconda installed
-    - pyproject.toml file in current directory (for development install)
+    - Run from the repository root or `src/` directory
 
 EXAMPLES:
-    ./setup_conda_env.sh                 # Create environment named 'mlx-vlm'
-    ./setup_conda_env.sh my-vlm-env      # Create environment named 'my-vlm-env'
+    bash src/tools/setup_conda_env.sh      # From repository root
+    bash src/tools/setup_conda_env.sh my-vlm-env
 
 EOF
 }
@@ -91,19 +91,53 @@ log_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
+install_cmake() {
+    log_info "Installing cmake (required to build mlx)..."
+
+    if conda install -n "$ENV_NAME" -c conda-forge cmake -y; then
+        log_success "Installed cmake from conda-forge"
+        return 0
+    fi
+
+    log_warn "conda-forge cmake install failed; falling back to pip"
+    if python -m pip install cmake; then
+        log_success "Installed cmake from pip fallback"
+        return 0
+    fi
+
+    log_error "Unable to install cmake via conda or pip"
+    exit 1
+}
+
+source_conda_sh() {
+    local conda_sh_path="$1"
+
+    if [ ! -f "$conda_sh_path" ]; then
+        return 1
+    fi
+
+    # shellcheck disable=SC1090,SC1091
+    source "$conda_sh_path"
+}
+
 # Check if conda is available
 check_conda() {
     # Try to find conda if not in PATH
     if ! command -v conda &> /dev/null; then
-        if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
-            # shellcheck disable=SC1091
-            source "$HOME/miniconda3/etc/profile.d/conda.sh"
-        elif [ -f "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]; then
-            # shellcheck disable=SC1091
-            source "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
-        elif [ -f "$HOME/anaconda3/etc/profile.d/conda.sh" ]; then
-            # shellcheck disable=SC1091
-            source "$HOME/anaconda3/etc/profile.d/conda.sh"
+        if source_conda_sh "$HOME/miniconda3/etc/profile.d/conda.sh"; then
+            :
+        elif source_conda_sh "$HOME/miniforge3/etc/profile.d/conda.sh"; then
+            :
+        elif source_conda_sh "$HOME/mambaforge/etc/profile.d/conda.sh"; then
+            :
+        elif source_conda_sh "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"; then
+            :
+        elif source_conda_sh "/opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh"; then
+            :
+        elif source_conda_sh "/opt/homebrew/Caskroom/mambaforge/base/etc/profile.d/conda.sh"; then
+            :
+        elif source_conda_sh "$HOME/anaconda3/etc/profile.d/conda.sh"; then
+            :
         fi
     fi
 
@@ -174,11 +208,13 @@ install_dependencies() {
         exit 1
     fi
 
+    install_cmake
+
     log_info "Installing project in editable mode (installs core dependencies)..."
     pip install -e .
 
     # Development dependencies (optional)
-    read -p "Do you want to install development dependencies (ruff, mypy, pytest, pre-commit)? (y/N): " -n 1 -r
+        read -p "Do you want to install development dependencies (ruff, mypy, ty, pyrefly, pytest, pydantic, pre-commit)? (y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         log_info "Installing development dependencies..."
@@ -186,15 +222,21 @@ install_dependencies() {
         if grep -q "dev =" pyproject.toml; then
              pip install -e ".[dev]"
         else
-             pip install "ruff>=0.1.0" "mypy>=1.8.0" "pytest>=8.0.0" "pytest-cov>=4.0.0" "pre-commit"
+               pip install "ruff>=0.1.0" "mypy>=1.8.0" "ty" "pyrefly" "pytest>=8.0.0" "pytest-cov>=4.0.0" "pydantic>=2.0.0" "pre-commit"
         fi
-        
-        # Set up pre-commit hooks
-        if command -v pre-commit &> /dev/null; then
-            log_info "Installing pre-commit hooks..."
-            pre-commit install
-            log_success "Pre-commit hooks installed"
+
+        if command -v npm &> /dev/null; then
+            log_info "Installing repo-local Markdown tooling..."
+            npm install
+            log_success "Markdown tooling installed"
+        else
+            log_warn "npm not found; staged Markdown commits will require markdownlint-cli2"
+            log_warn "Install Node.js, then run: npm install --prefix src"
         fi
+
+        log_info "Installing repository git hooks from the active environment..."
+        python -m tools.install_precommit_hook
+        log_success "Repository git hooks installed"
     fi
 
     # Optional: PyTorch stack (torch, torchvision, torchaudio)
@@ -243,6 +285,12 @@ print('✓ All core packages imported successfully')
 print(f'✓ MLX version: {mx.__version__}')
 "
 
+    if command -v cmake &> /dev/null; then
+        log_info "cmake version: $(cmake --version | head -n 1)"
+    else
+        log_warn "cmake is not on PATH inside the active environment"
+    fi
+
     # Install huggingface_hub CLI tools
     log_info "Installing huggingface_hub CLI tools..."
     pip install "huggingface_hub[cli]"
@@ -268,24 +316,33 @@ To use the MLX VLM environment:
 1. Activate the environment:
    ${BLUE}conda activate $ENV_NAME${NC}
 
+    Note: the script activates conda only inside its own shell. You still need
+    to run the command above in your current shell before using Python or Make.
+
 2. Run the script directly:
-   ${BLUE}python check_models.py --help${NC}
+    ${BLUE}python -m check_models --help${NC}
 
 3. Or use the CLI command:
    ${BLUE}check_models --help${NC}
 
 4. Example usage:
-   ${BLUE}check_models --image /path/to/image.jpg${NC}
-   ${BLUE}check_models --models "microsoft/Florence-2-large"${NC}
+    ${BLUE}python -m check_models --image /path/to/image.jpg${NC}
+    ${BLUE}python -m check_models --models "microsoft/Florence-2-large"${NC}
 
 Optional installs:
     - To include PyTorch stack during setup, answer 'y' when prompted, or later run:
-    ${BLUE}pip install -e ".[torch]"${NC}
+    ${BLUE}make -C src install-torch${NC}
+        - If you installed development dependencies, repository git hooks were also installed.
+        - If npm was available during setup, repo-local Markdown tooling was installed too.
+            Otherwise install Node.js and run:
+        ${BLUE}npm install --prefix src${NC}
+            Reinstall them later with:
+        ${BLUE}cd src && python -m tools.install_precommit_hook${NC}
 
 5. Deactivate when done:
    ${BLUE}conda deactivate${NC}
 
-For more information, see README.md
+For more information, see the repo root README and src/README.md
 
 EOF
 }

@@ -1,0 +1,109 @@
+{
+  "environment": {
+    "library_versions": {
+      "Pillow": "12.1.1",
+      "huggingface-hub": "1.5.0",
+      "mlx": "0.31.1.dev20260306+be872ebd",
+      "mlx-lm": "0.30.8",
+      "mlx-metal": null,
+      "mlx-vlm": "0.3.13",
+      "numpy": "2.4.2",
+      "tokenizers": "0.22.2",
+      "transformers": "5.3.0"
+    },
+    "platform": "macOS-26.3.1-arm64-arm-64bit-Mach-O",
+    "preflight_issues": [
+      "mlx-vlm load_image() has an unguarded URL startswith() branch; Path/BytesIO inputs can raise AttributeError in upstream code.",
+      "transformers import utils no longer reference known backend guard env vars (TRANSFORMERS_NO_* / USE_*); check_models backend guard hints may be ignored with this version."
+    ],
+    "system_info": {
+      "Architecture": "arm64",
+      "CPU Cores (Logical)": "16",
+      "CPU Cores (Physical)": "16",
+      "GPU Cores": "40",
+      "GPU/Chip": "Apple M4 Max",
+      "Metal SDK": "MacOSX.sdk",
+      "Metal Support": "Metal 4",
+      "OS": "Darwin 25.3.0",
+      "Python Version": "3.13.9",
+      "RAM": "128.0 GB",
+      "SDK Version": "26.2",
+      "Xcode Build": "17C529",
+      "Xcode Version": "26.3",
+      "macOS Version": "26.3.1"
+    }
+  },
+  "failure": {
+    "captured_output": "=== STDOUT ===\n==========\nFiles: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '2', '2', '8', '-', '1', '6', '2', '2', '5', '4', '_', 'D', 'S', 'C', '0', '9', '3', '7', '7', '.', 'j', 'p', 'g'] \n\nPrompt: <|im_start|>user\n<|vision_start|><|image_pad|><|vision_end|>Analyze this image for cataloguing metadata.\n\nReturn exactly these three sections, and nothing else:\n\nTitle: 6-12 words, descriptive and concrete.\n\nDescription: 1-2 factual sentences covering key subjects, setting, and action.\n\nKeywords: 15-30 unique comma-separated terms, ordered most specific to most general.\n\nRules:\n- Use only visually supported facts.\n- If hints conflict with the image, trust the image.\n- Do not output reasoning, notes, or extra sections.\n- Do not copy context hints verbatim.\n\nContext: Existing metadata hints (high confidence; use only if visually consistent):\n- Description hint: , St Mary's Church, Lenham, England, United Kingdom, UK Here is a caption for the image, written in a neutral but descriptive style suitable for a periodical, blog, or magazine. **Caption:** A late winter afternoon in the historic village of Lenham, Kent, England. This view from the churchyard of St Mary's Church looks out over the village square. In the foreground, ancient, moss-covered headstones dot the landsca...\n- Keyword hints: Christianity, Cypress Tree, England, Europe, Grass, Graveyard, Half-timbered House, Kent, Lenham, Parish church, Quaint, Spring, St Mary's Church, Tudor-style Houses, UK, United Kingdom, ancient, ancient gravestones, bare trees, blue\n- Capture metadata: Taken on 2026-02-28 16:22:54 GMT (at 16:22:54 local time). GPS: 51.237300\u00b0N, 0.718917\u00b0E.<|im_end|>\n<|im_start|>assistant\n<think>\n\n=== STDERR ===\nDownloading (incomplete total...): 0.00B [00:00, ?B/s]\n\rFetching 16 files:   0%|          | 0/16 [00:00<?, ?it/s]\u001b[A\rFetching 16 files: 100%|##########| 16/16 [00:00<00:00, 19418.07it/s]\n\rDownload complete: : 0.00B [00:00, ?B/s]              \rDownload complete: : 0.00B [00:00, ?B/s]\n\rPrefill:   0%|          | 0/16604 [00:00<?, ?tok/s]\rPrefill:   0%|          | 0/16604 [00:00<?, ?tok/s]",
+    "code": "MLX_DECODE_OOM",
+    "message": "Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-6bit: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.",
+    "package": "mlx",
+    "phase": "decode",
+    "signature": "MLX_DECODE_OOM:6bb950ce0a04",
+    "stage": "OOM",
+    "traceback": "Traceback (most recent call last):\n  File \"/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py\", line 10362, in _run_model_generation\n    output: GenerationResult | SupportsGenerationResult = generate(\n                                                          ~~~~~~~~^\n        model=model,\n        ^^^^^^^^^^^^\n    ...<13 lines>...\n        **extra_kwargs,\n        ^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py\", line 662, in generate\n    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):\n                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py\", line 550, in stream_generate\n    for n, (token, logprobs) in enumerate(gen):\n                                ~~~~~~~~~^^^^^\n  File \"/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py\", line 416, in generate_step\n    mx.eval([c.state for c in prompt_cache])\n    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py\", line 10492, in process_image_with_model\n    output: GenerationResult | SupportsGenerationResult = _run_model_generation(\n                                                          ~~~~~~~~~~~~~~~~~~~~~^\n        params=params,\n        ^^^^^^^^^^^^^^\n        phase_callback=_update_phase,\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py\", line 10392, in _run_model_generation\n    raise _tag_exception_failure_phase(ValueError(msg), \"decode\") from gen_err\nValueError: Model runtime error during generation for mlx-community/Qwen3.5-35B-A3B-6bit: [metal::malloc] Attempting to allocate 134767706112 bytes which is greater than the maximum allowed buffer size of 86586540032 bytes.\n",
+    "type": "ValueError"
+  },
+  "generated_at_utc": "2026-03-06T13:22:23+00:00",
+  "model": "mlx-community/Qwen3.5-35B-A3B-6bit",
+  "repro": {
+    "args": {
+      "_check_models_preflight_issues": [
+        "mlx-vlm load_image() has an unguarded URL startswith() branch; Path/BytesIO inputs can raise AttributeError in upstream code.",
+        "transformers import utils no longer reference known backend guard env vars (TRANSFORMERS_NO_* / USE_*); check_models backend guard hints may be ignored with this version."
+      ],
+      "adapter_path": null,
+      "context_marker": "Context:",
+      "detailed_metrics": false,
+      "dry_run": false,
+      "exclude": null,
+      "folder": "/Users/jrp/Pictures/Processed",
+      "force_color": false,
+      "image": null,
+      "kv_bits": null,
+      "kv_group_size": 64,
+      "lazy_load": false,
+      "max_kv_size": null,
+      "max_tokens": 500,
+      "models": null,
+      "no_color": false,
+      "output_diagnostics": "/Users/jrp/Documents/AI/mlx/check_models/src/output/diagnostics.md",
+      "output_env": "/Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log",
+      "output_html": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.html",
+      "output_jsonl": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.jsonl",
+      "output_log": "/Users/jrp/Documents/AI/mlx/check_models/src/output/check_models.log",
+      "output_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.md",
+      "output_tsv": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.tsv",
+      "prefill_step_size": null,
+      "prompt": null,
+      "quality_config": null,
+      "quantized_kv_start": 0,
+      "repetition_context_size": 20,
+      "repetition_penalty": null,
+      "revision": null,
+      "temperature": 0.0,
+      "timeout": 300.0,
+      "top_p": 1.0,
+      "trust_remote_code": true,
+      "verbose": true,
+      "width": null
+    },
+    "env_vars": {
+      "TOKENIZERS_PARALLELISM": "false",
+      "TRANSFORMERS_NO_FLAX": "1",
+      "TRANSFORMERS_NO_JAX": "1",
+      "TRANSFORMERS_NO_TF": "1",
+      "USE_FLAX": "0",
+      "USE_JAX": "0",
+      "USE_TF": "0"
+    },
+    "image_path": "/Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg",
+    "image_ref_sha256": "ecb0df104e6c772d224b948fac96fcbbb063df9cf5f2403cf66fd856a30dcc23",
+    "image_sha256": "4cfcdafcef671ee91bbbf4f16df1bde56a1afa1cf545dfbea2ff32e8eb53988d",
+    "prompt_hash_sha256": "f37afab186035fb83e1b9fde27f6746ea62686e16f6648b5287d20d089a45aec",
+    "prompt_preview": "Analyze this image for cataloguing metadata.\n\nReturn exactly these three sections, and nothing else:\n\nTitle: 6-12 words, descriptive and concrete.\n\nDescription: 1-2 factual sentences covering key subjects, setting, and action.\n\nKeywords: 15-30 unique comma-separated terms, ordered most specific to most general.\n\nRules:\n- Use only visually supported facts.\n- If hints conflict with the image, trust ...",
+    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260228-162254_DSC09377.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --timeout 300.0 --verbose --models mlx-community/Qwen3.5-35B-A3B-6bit",
+    "seed": null
+  },
+  "schema_version": "1.0"
+}

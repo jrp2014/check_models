@@ -1,6 +1,6 @@
 """Tests for image discovery and validation workflows."""
 
-import time
+import os
 from pathlib import Path
 
 import pytest
@@ -14,10 +14,11 @@ def test_find_most_recent_file_in_directory(tmp_path: Path) -> None:
     # Create test images with different timestamps
     old_image = tmp_path / "old.jpg"
     Image.new("RGB", (50, 50)).save(old_image)
-    time.sleep(0.1)
+    os.utime(old_image, (1_000_000, 1_000_000))
 
     new_image = tmp_path / "new.jpg"
     Image.new("RGB", (50, 50)).save(new_image)
+    os.utime(new_image, (1_000_001, 1_000_001))
 
     result = check_models.find_most_recent_file(tmp_path)
     assert result == new_image
@@ -27,10 +28,11 @@ def test_find_most_recent_file_ignores_hidden_files(tmp_path: Path) -> None:
     """Should ignore hidden files (starting with .)."""
     visible_image = tmp_path / "visible.jpg"
     Image.new("RGB", (50, 50)).save(visible_image)
-    time.sleep(0.1)
+    os.utime(visible_image, (1_000_000, 1_000_000))
 
     hidden_image = tmp_path / ".hidden.jpg"
     Image.new("RGB", (50, 50)).save(hidden_image)
+    os.utime(hidden_image, (1_000_001, 1_000_001))
 
     result = check_models.find_most_recent_file(tmp_path)
     # Should return visible image, not the more recent hidden one
@@ -45,14 +47,15 @@ def test_find_most_recent_file_returns_none_for_empty_folder(tmp_path: Path) -> 
 
 def test_find_most_recent_file_filters_by_extension(tmp_path: Path) -> None:
     """Should only consider image file extensions."""
-    # Create non-image file
+    # Create non-image file (with newer timestamp)
     text_file = tmp_path / "document.txt"
     text_file.write_text("Not an image")
-    time.sleep(0.1)
+    os.utime(text_file, (1_000_001, 1_000_001))
 
     # Create image file (older timestamp)
     image_file = tmp_path / "photo.jpg"
     Image.new("RGB", (50, 50)).save(image_file)
+    os.utime(image_file, (1_000_000, 1_000_000))
 
     result = check_models.find_most_recent_file(tmp_path)
     # Should return image, not the more recent text file

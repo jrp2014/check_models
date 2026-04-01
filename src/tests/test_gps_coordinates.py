@@ -6,12 +6,12 @@ being applied multiple times incorrectly.
 """
 
 # Magic numbers and assert statements are fine in tests
-# Type: ignore comments used for test dict invariance issues
 # pyright: reportArgumentType=false
 
 from __future__ import annotations
 
 import re
+from typing import Any, cast
 
 from check_models import _extract_gps_str
 
@@ -155,7 +155,8 @@ class TestGPSCoordinateConversion:
 
     def test_non_dict_input(self) -> None:
         """Non-dict input should return None."""
-        result = _extract_gps_str("not a dict")  # type: ignore[arg-type] # Intentionally test with invalid type
+        bad_input = cast("dict[Any, Any]", "not a dict")
+        result = _extract_gps_str(bad_input)
         assert result is None
 
     def test_precision_six_decimals(self) -> None:

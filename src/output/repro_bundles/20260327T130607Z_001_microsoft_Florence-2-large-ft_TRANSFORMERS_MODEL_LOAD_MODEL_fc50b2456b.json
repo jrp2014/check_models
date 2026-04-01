@@ -1,0 +1,113 @@
+{
+  "environment": {
+    "library_versions": {
+      "Pillow": "12.1.1",
+      "huggingface-hub": "1.8.0",
+      "mlx": "0.31.2.dev20260322+38ad2570",
+      "mlx-lm": "0.31.2",
+      "mlx-metal": null,
+      "mlx-vlm": "0.4.1",
+      "numpy": "2.4.3",
+      "tokenizers": "0.22.2",
+      "transformers": "5.4.0"
+    },
+    "platform": "macOS-26.4-arm64-arm-64bit-Mach-O",
+    "preflight_issues": [
+      "transformers import utils no longer reference the TF/FLAX/JAX backend guard env vars used by check_models; backend guard hints for those backends may be ignored with this version."
+    ],
+    "system_info": {
+      "Architecture": "arm64",
+      "CPU Cores (Logical)": "18",
+      "CPU Cores (Physical)": "18",
+      "GPU Cores": "40",
+      "GPU/Chip": "Apple M5 Max",
+      "Metal SDK": "MacOSX.sdk",
+      "Metal Support": "Metal 4",
+      "OS": "Darwin 25.4.0",
+      "Python Version": "3.13.12",
+      "RAM": "128.0 GB",
+      "SDK Version": "26.4",
+      "Xcode Build": "17E192",
+      "Xcode Version": "26.4",
+      "macOS Version": "26.4"
+    }
+  },
+  "failure": {
+    "captured_output": "=== STDERR ===\nDownloading (incomplete total...): 0.00B [00:00, ?B/s]\n\rFetching 10 files:   0%|          | 0/10 [00:00<?, ?it/s]\u001b[A\rFetching 10 files: 100%|##########| 10/10 [00:00<00:00, 12063.00it/s]\n\rDownload complete: : 0.00B [00:00, ?B/s]              \rDownload complete: : 0.00B [00:00, ?B/s]\n<unknown>:515: SyntaxWarning: invalid escape sequence '\\d'\n/Users/jrp/.cache/huggingface/modules/transformers_modules/_4a12a2b54b7016a48a22037fbd62da90cd566f2a/processing_florence2.py:515: SyntaxWarning: invalid escape sequence '\\d'\n  PATTERN: 'r<time_(\\d+)><time_(\\d+)>([a-zA-Z0-9 ]+)'",
+    "code": "TRANSFORMERS_MODEL_LOAD_MODEL",
+    "message": "Model loading failed: 'Florence2LanguageConfig' object has no attribute 'forced_bos_token_id'",
+    "package": "transformers",
+    "phase": "model_load",
+    "signature": "TRANSFORMERS_MODEL_LOAD_MODEL:fc50b2456bcb",
+    "stage": "Model Error",
+    "traceback": "Traceback (most recent call last):\n  File \"/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py\", line 13700, in _run_model_generation\n    model, processor, config = _load_model(params)\n                               ~~~~~~~~~~~^^^^^^^^\n  File \"/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py\", line 13132, in _load_model\n    model, processor = load(\n                       ~~~~^\n        path_or_hf_repo=params.model_identifier,\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<3 lines>...\n        trust_remote_code=params.trust_remote_code,\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py\", line 405, in load\n    processor = load_processor(model_path, True, eos_token_ids=eos_token_id, **kwargs)\n  File \"/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py\", line 478, in load_processor\n    processor = AutoProcessor.from_pretrained(model_path, use_fast=True, **kwargs)\n  File \"/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py\", line 406, in _patched_auto_processor_from_pretrained\n    return previous_from_pretrained.__func__(\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n        cls, pretrained_model_name_or_path, **kwargs\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py\", line 406, in _patched_auto_processor_from_pretrained\n    return previous_from_pretrained.__func__(\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n        cls, pretrained_model_name_or_path, **kwargs\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/base.py\", line 406, in _patched_auto_processor_from_pretrained\n    return previous_from_pretrained.__func__(\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n        cls, pretrained_model_name_or_path, **kwargs\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  [Previous line repeated 2 more times]\n  File \"/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/processing_auto.py\", line 420, in from_pretrained\n    return processor_class.from_pretrained(\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n        pretrained_model_name_or_path, trust_remote_code=trust_remote_code, **kwargs\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py\", line 1421, in from_pretrained\n    args = cls._get_arguments_from_pretrained(pretrained_model_name_or_path, processor_dict, **kwargs)\n  File \"/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py\", line 1535, in _get_arguments_from_pretrained\n    tokenizer = cls._load_tokenizer_from_pretrained(\n        sub_processor_type, pretrained_model_name_or_path, subfolder=subfolder, **kwargs\n    )\n  File \"/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/processing_utils.py\", line 1482, in _load_tokenizer_from_pretrained\n    tokenizer = auto_processor_class.from_pretrained(\n        pretrained_model_name_or_path, subfolder=subfolder, **kwargs\n    )\n  File \"/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/tokenization_auto.py\", line 684, in from_pretrained\n    config = AutoConfig.from_pretrained(\n        pretrained_model_name_or_path, trust_remote_code=trust_remote_code, **kwargs\n    )\n  File \"/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/models/auto/configuration_auto.py\", line 1483, in from_pretrained\n    return config_class.from_pretrained(pretrained_model_name_or_path, **kwargs)\n           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/configuration_utils.py\", line 639, in from_pretrained\n    return cls.from_dict(config_dict, **kwargs)\n           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/configuration_utils.py\", line 807, in from_dict\n    config = cls(**config_dict)\n  File \"/Users/jrp/.cache/huggingface/modules/transformers_modules/_4a12a2b54b7016a48a22037fbd62da90cd566f2a/configuration_florence2.py\", line 336, in __init__\n    self.text_config = Florence2LanguageConfig(**text_config)\n                       ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^\n  File \"/Users/jrp/.cache/huggingface/modules/transformers_modules/_4a12a2b54b7016a48a22037fbd62da90cd566f2a/configuration_florence2.py\", line 265, in __init__\n    if self.forced_bos_token_id is None and kwargs.get(\"force_bos_token_to_be_generated\", False):\n       ^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/configuration_utils.py\", line 411, in __getattribute__\n    return super().__getattribute__(key)\n           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^\nAttributeError: 'Florence2LanguageConfig' object has no attribute 'forced_bos_token_id'\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py\", line 13865, in process_image_with_model\n    output: GenerationResult | SupportsGenerationResult = _run_model_generation(\n                                                          ~~~~~~~~~~~~~~~~~~~~~^\n        params=params,\n        ^^^^^^^^^^^^^^\n        phase_callback=_update_phase,\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        phase_timer=phase_timer,\n        ^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py\", line 13710, in _run_model_generation\n    raise _tag_exception_failure_phase(ValueError(error_details), \"model_load\") from load_err\nValueError: Model loading failed: 'Florence2LanguageConfig' object has no attribute 'forced_bos_token_id'\n",
+    "type": "ValueError"
+  },
+  "generated_at_utc": "2026-03-27T13:06:07+00:00",
+  "model": "microsoft/Florence-2-large-ft",
+  "repro": {
+    "args": {
+      "_check_models_preflight_issues": [
+        "transformers import utils no longer reference the TF/FLAX/JAX backend guard env vars used by check_models; backend guard hints for those backends may be ignored with this version."
+      ],
+      "adapter_path": null,
+      "context_marker": "Context:",
+      "detailed_metrics": false,
+      "dry_run": false,
+      "enable_thinking": false,
+      "eos_tokens": null,
+      "exclude": null,
+      "folder": "/Users/jrp/Pictures/Processed",
+      "force_color": false,
+      "image": null,
+      "kv_bits": null,
+      "kv_group_size": 64,
+      "lazy_load": false,
+      "max_kv_size": null,
+      "max_tokens": 500,
+      "min_p": 0.0,
+      "models": null,
+      "no_color": false,
+      "output_diagnostics": "/Users/jrp/Documents/AI/mlx/check_models/src/output/diagnostics.md",
+      "output_env": "/Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log",
+      "output_gallery_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/model_gallery.md",
+      "output_html": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.html",
+      "output_jsonl": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.jsonl",
+      "output_log": "/Users/jrp/Documents/AI/mlx/check_models/src/output/check_models.log",
+      "output_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.md",
+      "output_review": "/Users/jrp/Documents/AI/mlx/check_models/src/output/review.md",
+      "output_tsv": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.tsv",
+      "prefill_step_size": 4096,
+      "processor_kwargs": null,
+      "prompt": null,
+      "quality_config": null,
+      "quantized_kv_start": 0,
+      "repetition_context_size": 20,
+      "repetition_penalty": null,
+      "resize_shape": null,
+      "revision": null,
+      "skip_special_tokens": false,
+      "temperature": 0.0,
+      "thinking_budget": null,
+      "thinking_end_token": "</think>",
+      "thinking_start_token": null,
+      "timeout": 300.0,
+      "top_k": 0,
+      "top_p": 1.0,
+      "trust_remote_code": true,
+      "verbose": true,
+      "width": null
+    },
+    "env_vars": {
+      "TOKENIZERS_PARALLELISM": "false"
+    },
+    "image_path": "/Users/jrp/Pictures/Processed/20260321-164244_DSC09459_DxO.jpg",
+    "image_ref_sha256": "f8ba4075015d847624a055fd0afe95bfdff23e80cf1780223aa1c17b551b6ca4",
+    "image_sha256": "4065a51a2aadce15d402e6a2a0fd9458553fcd361391537b4f60dc4dfc3402c8",
+    "prompt_hash_sha256": "1aa0fe8a4cd7f3c5f1960cb2e2effcbb878daede1ef59f37ade1a354140bb29a",
+    "prompt_preview": "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct any...",
+    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260321-164244_DSC09459_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models microsoft/Florence-2-large-ft",
+    "seed": null
+  },
+  "schema_version": "1.0"
+}

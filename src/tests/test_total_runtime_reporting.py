@@ -9,7 +9,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from check_models import PerformanceResult, generate_html_report, generate_markdown_report
+from check_models import (
+    PerformanceResult,
+    RuntimeDiagnostics,
+    generate_html_report,
+    generate_markdown_report,
+)
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from pathlib import Path
@@ -55,6 +60,27 @@ def _build_single_result() -> PerformanceResult:
     )
 
 
+def _build_result_with_runtime() -> PerformanceResult:
+    """Return a synthetic successful PerformanceResult with detailed runtime metadata."""
+    return PerformanceResult(
+        model_name="dummy/model",
+        generation=_StubGeneration(),
+        success=True,
+        generation_time=0.50,
+        model_load_time=0.40,
+        total_time=0.95,
+        runtime_diagnostics=RuntimeDiagnostics(
+            input_validation_time_s=0.05,
+            model_load_time_s=0.40,
+            prompt_prep_time_s=0.10,
+            decode_time_s=0.50,
+            cleanup_time_s=0.05,
+            first_token_latency_s=0.20,
+            stop_reason="completed",
+        ),
+    )
+
+
 def test_markdown_report_includes_runtime(tmp_path: Path) -> None:
     """Markdown report should contain an overall runtime line with seconds."""
     results = [_build_single_result()]
@@ -95,6 +121,40 @@ def test_html_report_includes_runtime(tmp_path: Path) -> None:
     if "56.78s" not in content:
         msg = "Expected formatted runtime '56.78s' not found in HTML report"
         raise AssertionError(msg)
+
+
+def test_markdown_report_includes_timing_snapshot(tmp_path: Path) -> None:
+    """Markdown report should surface compact aggregate timing snapshot lines."""
+    results = [_build_result_with_runtime()]
+    md_file = tmp_path / "report.md"
+    generate_markdown_report(
+        results=results,
+        filename=md_file,
+        versions={"mlx": "0.0.0", "mlx-vlm": "0.0.0"},
+        prompt="Test prompt",
+        total_runtime_seconds=12.34,
+    )
+    content = md_file.read_text(encoding="utf-8")
+    assert "### ⏱ Timing Snapshot" in content
+    assert "**Validation overhead:**" in content
+    assert "**First-token latency:**" in content
+
+
+def test_html_report_includes_timing_snapshot(tmp_path: Path) -> None:
+    """HTML report should surface compact aggregate timing snapshot lines."""
+    results = [_build_result_with_runtime()]
+    html_file = tmp_path / "report.html"
+    generate_html_report(
+        results=results,
+        filename=html_file,
+        versions={"mlx": "0.0.0", "mlx-vlm": "0.0.0"},
+        prompt="Test prompt",
+        total_runtime_seconds=56.78,
+    )
+    content = html_file.read_text(encoding="utf-8")
+    assert "Additional timing signals:" in content
+    assert "Validation overhead:" in content
+    assert "First-token latency:" in content
 
 
 def test_markdown_long_runtime_hms(tmp_path: Path) -> None:
