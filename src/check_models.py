@@ -1106,7 +1106,7 @@ if TYPE_CHECKING:
     from mlx_vlm.generate import generate as _mlx_vlm_generate_typecheck
 
     _TYPECHECK_MODEL = cast("Module", None)
-    _TYPECHECK_GENERATE_PROCESSOR = cast("ProcessorMixin | PreTrainedTokenizer", None)
+    _TYPECHECK_GENERATE_PROCESSOR = cast("PreTrainedTokenizer", None)
     _ = _mlx_vlm_generate_typecheck(
         _TYPECHECK_MODEL,
         _TYPECHECK_GENERATE_PROCESSOR,
@@ -6105,18 +6105,34 @@ def _process_exif_subifd(exif_raw: SupportsExifIfd) -> ExifDict:
     return out
 
 
+def _coerce_exif_tag_id(tag_id: object) -> int | None:
+    """Return an integer EXIF tag id when the raw key is coercible."""
+    if isinstance(tag_id, int):
+        return tag_id
+    if isinstance(tag_id, str):
+        try:
+            return int(tag_id)
+        except ValueError:
+            return None
+    return None
+
+
 def _process_gps_ifd(exif_raw: SupportsExifIfd) -> GPSDict | None:
     try:
         gps_ifd: Any = exif_raw.get_ifd(ExifTags.IFD.GPSInfo)
         if isinstance(gps_ifd, dict) and gps_ifd:
             gps_decoded: GPSDict = {}
             for gps_tag_id, gps_value in gps_ifd.items():
+                tag_id_int = _coerce_exif_tag_id(gps_tag_id)
                 # Use modern Pillow GPS enum (10.0+) for type-safe tag name resolution
-                try:
-                    gps_key = GPS(int(gps_tag_id)).name
-                except (ValueError, TypeError):
-                    # Fallback to dict lookup for unknown tags
-                    gps_key = GPSTAGS.get(int(gps_tag_id), str(gps_tag_id))
+                if tag_id_int is None:
+                    gps_key = str(gps_tag_id)
+                else:
+                    try:
+                        gps_key = GPS(tag_id_int).name
+                    except ValueError:
+                        # Fallback to dict lookup for unknown tags
+                        gps_key = GPSTAGS.get(tag_id_int, str(gps_tag_id))
                 gps_decoded[str(gps_key)] = gps_value
             return gps_decoded
     except (KeyError, AttributeError, TypeError) as gps_err:
@@ -7359,8 +7375,8 @@ def _build_runtime_analysis_summary(
 ) -> RuntimeAnalysisSummary | None:
     """Build a rule-based runtime interpretation from per-result phase timings."""
     phase_totals: dict[RuntimePhaseName, float] = dict.fromkeys(_RUNTIME_PHASE_KEYS, 0.0)
-    dominant_counts: Counter[RuntimePhaseName] = Counter()
-    termination_counts: Counter[str] = Counter()
+    dominant_counts: Counter[RuntimePhaseName] = Counter[RuntimePhaseName]()
+    termination_counts: Counter[str] = Counter[str]()
     measured_models: int = 0
     validation_total: float = 0.0
     validation_models: int = 0
@@ -7415,8 +7431,11 @@ def _build_runtime_analysis_summary(
     first_token_latency_avg: float | None = (
         sum(first_token_latencies) / len(first_token_latencies) if first_token_latencies else None
     )
+    dominant_count_map: dict[RuntimePhaseName, int] = {
+        phase: dominant_counts[phase] for phase in _RUNTIME_PHASE_KEYS if dominant_counts[phase] > 0
+    }
 
-    return {
+    runtime_summary: RuntimeAnalysisSummary = {
         "dominant_phase": dominant_phase,
         "dominant_phase_share": dominant_phase_share,
         "dominant_phase_count": dominant_counts.get(dominant_phase, 0),
@@ -7424,7 +7443,7 @@ def _build_runtime_analysis_summary(
         "interpretation": interpretation,
         "next_action": next_action,
         "phase_totals": phase_totals,
-        "dominant_counts": dict(dominant_counts),
+        "dominant_counts": dominant_count_map,
         "termination_counts": dict(termination_counts),
         "validation_total": validation_total,
         "validation_models": validation_models,
@@ -7433,6 +7452,7 @@ def _build_runtime_analysis_summary(
         "first_token_latency_max": max(first_token_latencies) if first_token_latencies else None,
         "first_token_latency_models": len(first_token_latencies),
     }
+    return runtime_summary
 
 
 def _format_runtime_phase_duration(value: float) -> str:
