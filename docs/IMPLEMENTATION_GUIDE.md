@@ -137,6 +137,17 @@ Or use the quality check with stub preflight:
 make quality  # Validates existing typings/ coverage before type checks
 ```
 
+For manual Ty runs, use the repo wrapper instead of raw `ty check`:
+
+```bash
+make ty
+```
+
+That path resolves the expected `mlx-vlm` interpreter explicitly and prints
+diagnostics for the target env, active env, resolved Python, and resolved Ty
+binary. Do not assume Ty's own environment auto-detection will pick the same
+conda env as the repo quality scripts.
+
 ## Code Standards
 
 ### Type Annotations

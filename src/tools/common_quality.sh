@@ -121,15 +121,20 @@ quality_setup_python() {
 
     if env_python="$(quality_find_conda_env_python)"; then
         QUALITY_PYTHON="$env_python"
+        QUALITY_PYTHON_SOURCE="conda-env:$CONDA_ENV"
     elif [ -n "${CONDA_PREFIX:-}" ] && [ -x "$CONDA_PREFIX/bin/python" ]; then
         QUALITY_PYTHON="$CONDA_PREFIX/bin/python"
+        QUALITY_PYTHON_SOURCE="active-conda:$CONDA_PREFIX"
     elif command -v python3 >/dev/null 2>&1; then
         QUALITY_PYTHON="python3"
+        QUALITY_PYTHON_SOURCE="fallback:python3"
     else
         QUALITY_PYTHON="python"
+        QUALITY_PYTHON_SOURCE="fallback:python"
     fi
 
     export QUALITY_PYTHON
+    export QUALITY_PYTHON_SOURCE
 }
 
 quality_require_command() {
@@ -187,6 +192,46 @@ quality_require_command() {
         tool_path="$(quality_find_python_tool "$tool_name")" || return 1
         shift
         "$tool_path" "$@"
+    }
+
+    quality_resolve_python_path() {
+        if [ -n "${QUALITY_PYTHON:-}" ] && [ -x "$QUALITY_PYTHON" ]; then
+            printf '%s\n' "$QUALITY_PYTHON"
+            return 0
+        fi
+
+        if [ -n "${QUALITY_PYTHON:-}" ] && command -v "$QUALITY_PYTHON" >/dev/null 2>&1; then
+            command -v "$QUALITY_PYTHON"
+            return 0
+        fi
+
+        return 1
+    }
+
+    quality_print_ty_diagnostics() {
+        local python_path="$1"
+        local ty_path="$2"
+        shift 2
+
+        echo "[ty] target conda env: ${CONDA_ENV}"
+        echo "[ty] active conda env: ${CONDA_DEFAULT_ENV:-<none>}"
+        echo "[ty] resolved python (${QUALITY_PYTHON_SOURCE:-unknown}): ${python_path}"
+        echo "[ty] resolved ty: ${ty_path}"
+        echo "[ty] check targets: ${*:-check_models.py}"
+
+        if [ "${QUALITY_PYTHON_SOURCE:-}" != "conda-env:${CONDA_ENV}" ]; then
+            echo "[ty] warning: target env '${CONDA_ENV}' was not resolved directly; import resolution may differ from the expected repo conda environment." >&2
+        fi
+    }
+
+    quality_run_ty_check() {
+        local python_path=""
+        local ty_path=""
+
+        python_path="$(quality_resolve_python_path)" || return 1
+        ty_path="$(quality_find_python_tool ty)" || return 1
+        quality_print_ty_diagnostics "$python_path" "$ty_path" "$@"
+        "$ty_path" check --python "$python_path" "$@"
     }
 
 quality_validate_yaml_files() {

@@ -178,6 +178,10 @@ lint-fix: ## Ruff lint --fix
 typecheck: ## mypy type checking
 	$(RUN_TOOL_PREFIX) mypy --config-file $(MYPY_CONFIG) check_models.py tests
 
+.PHONY: ty
+ty: ## Ty type checking with resolved repo interpreter
+	bash tools/run_ty_check.sh $(ARGS)
+
 # Tests
 .PHONY: test
 test: ## Run pytest

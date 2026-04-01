@@ -133,7 +133,7 @@ if not CORE_PACKAGES:
         "mlx-vlm": ">=0.4.1",
         "transformers": ">=5.4.0",
         "Pillow": ">=10.3.0",
-        "huggingface-hub": ">=0.34.0",
+        "huggingface-hub": ">=1.8.0",
         "tabulate": ">=0.9.0",
         "tzlocal": ">=5.0",
     }

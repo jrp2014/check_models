@@ -493,7 +493,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- MANUAL_INSTALL_START -->
 ```bash
-pip install "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.31.1" "mlx-vlm>=0.4.1" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "transformers>=5.4.0" "tzlocal>=5.0" "wcwidth>=0.2.13"
+pip install "huggingface-hub[torch,typing]>=1.8.0" "mlx>=0.31.1" "mlx-vlm>=0.4.1" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "transformers>=5.4.0" "tzlocal>=5.0" "wcwidth>=0.2.13"
 ```
 <!-- MANUAL_INSTALL_END -->
 
@@ -566,6 +566,22 @@ The `src/tools/` directory contains scripts useful for development and verificat
   bash src/tools/run_quality_checks.sh
   ```
 
+- **`run_ty_check.sh`**: Dedicated Ty entrypoint with explicit interpreter
+  resolution for this repo.
+
+  ```bash
+  # Run from repo root (recommended)
+  make ty
+
+  # Or run the script directly
+  bash src/tools/run_ty_check.sh
+  ```
+
+  This wrapper is the supported way to run Ty locally. It resolves the
+  expected `mlx-vlm` conda interpreter and prints the target env, active env,
+  resolved Python path, and resolved Ty binary before checking. Avoid relying
+  on raw `ty check ...` environment auto-detection for this repo.
+
 ## Appendix: Dependencies
 
 Why so slim? The runtime dependency set is intentionally minimized to only the
@@ -587,7 +603,7 @@ Runtime (installed automatically via `pip install -e .` when executed inside `sr
 | Core tensor/runtime | `mlx` | `>=0.31.1` |
 | Vision‑language utilities | `mlx-vlm` | `>=0.4.1` |
 | Image processing & loading | `Pillow[xmp]` | `>=10.3.0` |
-| Model cache / discovery | `huggingface-hub` | `>=0.34.0` |
+| Model cache / discovery | `huggingface-hub` | `>=1.8.0` |
 | HTTP requests (image URLs) | `requests` | `>=2.31.0` |
 | Reporting / tables | `tabulate` | `>=0.9.0` |
 | Local timezone conversion | `tzlocal` | `>=5.0` |
@@ -634,7 +650,7 @@ Development / QA:
 
 <!-- MINIMAL_INSTALL_START -->
 ```bash
-pip install "huggingface-hub[torch,typing]>=0.34.0" "mlx>=0.31.1" "mlx-vlm>=0.4.1" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "transformers>=5.4.0" "tzlocal>=5.0" "wcwidth>=0.2.13"
+pip install "huggingface-hub[torch,typing]>=1.8.0" "mlx>=0.31.1" "mlx-vlm>=0.4.1" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "requests>=2.31.0" "tabulate>=0.9.0" "transformers>=5.4.0" "tzlocal>=5.0" "wcwidth>=0.2.13"
 ```
 <!-- MINIMAL_INSTALL_END -->
 

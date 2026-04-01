@@ -28,6 +28,14 @@ Notable changes to this project will be documented in this file.
   broad kwargs bags with typed helper shapes while keeping missing third-party
   stubs as soft warnings via best-effort local stub refreshes in
   `src/tools/run_quality_checks.sh`.
+- Fixed Ty invocation in `src/tools/run_quality_checks.sh` and
+  `src/tools/check_quality_simple.sh` to pass the resolved repo Python
+  explicitly, eliminating false `unresolved-import` warnings when Ty fell back
+  to the wrong Conda site-packages instead of the `mlx-vlm` environment.
+- Added a dedicated `make ty` / `src/tools/run_ty_check.sh` path plus
+  explicit Ty environment diagnostics so local runs report the target conda
+  env, active env, resolved Python, resolved Ty binary, and any fallback use
+  instead of silently relying on ambiguous environment auto-detection.
 - Removed several dead or redundant helper layers in `src/check_models.py`,
   including unused diagnostics/runtime helpers, now-unused protocol
   definitions, a duplicate quality-analysis accessor, and a few thin
@@ -53,6 +61,10 @@ Notable changes to this project will be documented in this file.
   model-load failures so transient Hub disconnects are attributed to cache /
   network / Hub availability issues instead of falling through to a generic
   `model` owner diagnosis.
+- Raised the declared `huggingface-hub` runtime floor to `>=1.8.0` in the
+  project metadata, environment validator, and synced install docs so the repo
+  matches the current active MLX environment and no longer advertises the old
+  pre-1.0 Hub client baseline.
 
 ## [0.3.2] - 2026-03-27
 

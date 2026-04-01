@@ -95,7 +95,7 @@ echo "=== Suppression Audit ==="
 "$QUALITY_PYTHON" -m tools.check_suppressions
 
 echo "=== Ty Type Check ==="
-quality_run_python_tool ty check check_models.py
+quality_run_ty_check check_models.py
 
 echo "=== Pyrefly Type Check ==="
 quality_run_python_tool pyrefly check check_models.py

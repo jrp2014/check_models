@@ -152,19 +152,33 @@ The project uses several automated quality checks:
    make typecheck   # Type check with mypy
    ```
 
-3. **Tests**:
+3. **Ty** (import-aware type checking with explicit env resolution):
+
+   ```bash
+   make ty          # Runs Ty using the resolved mlx-vlm interpreter
+   ```
+
+   Use `make ty` instead of calling `ty check` directly. The repo wrapper
+   resolves the expected `mlx-vlm` conda environment and prints diagnostics for
+   the target env, active env, resolved Python path, and resolved Ty binary so
+   import-resolution problems are visible instead of mysterious.
+
+4. **Tests**:
 
    ```bash
    make test        # Run all tests
    ```
 
-4. **Combined quality check**:
+5. **Combined quality check**:
 
    ```bash
    make quality     # Runs ruff + mypy + ty + pyrefly + pytest + shellcheck + markdownlint
    ```
 
-5. **Markdown linting**:
+   The Ty step inside `make quality` uses the same resolved-interpreter path as
+   `make ty`, so it does not require extra local Ty configuration.
+
+6. **Markdown linting**:
 
    `make quality` runs markdownlint via the repo-local install, a global
    `markdownlint-cli2`, or an `npx --no-install` fallback. If none of those are
