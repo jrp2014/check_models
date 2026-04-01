@@ -38,6 +38,10 @@ Notable changes to this project will be documented in this file.
   unused review-owner inputs, and collapsing one verbose quality-signal
   summary ladder into table-driven logic without loosening diagnostics or type
   checking.
+- Redirected the E2E smoke test helper in `src/tests/test_e2e_smoke.py` to
+  send standalone gallery and review artifacts to the test temp output
+  directory as well, so `make quality` no longer rewrites tracked
+  `src/output/model_gallery.md` and `src/output/review.md` during pytest runs.
 - Hardened `src/tools/update.sh` so local MLX refreshes now fail fast when the
   active macOS toolchain does not expose `metal` and `metallib` via `xcrun`,
   and so editable-install origin checks cover `mlx` in addition to `mlx-lm`
@@ -45,6 +49,10 @@ Notable changes to this project will be documented in this file.
 - Switched the local `mlx` editable install path in `src/tools/update.sh` to
   invoke `pip install -v -e .` so MLX builds emit full pip build logs during
   updates.
+- Improved canonical review and diagnostics wording for `huggingface-hub`
+  model-load failures so transient Hub disconnects are attributed to cache /
+  network / Hub availability issues instead of falling through to a generic
+  `model` owner diagnosis.
 
 ## [0.3.2] - 2026-03-27
 

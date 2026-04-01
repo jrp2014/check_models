@@ -8118,11 +8118,7 @@ def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord |
         return None
 
     requested_max_tokens = result.requested_max_tokens
-    evidence: list[str] = []
-    if result.error_stage:
-        evidence.append(re.sub(r"[^a-z0-9]+", "_", result.error_stage.casefold()).strip("_"))
-    if result.error_code:
-        evidence.append(result.error_code.casefold())
+    evidence: list[str] = _failure_review_evidence(result)
     return {
         "verdict": "harness",
         "hint_relationship": "preserves_trusted_hints",
@@ -8145,6 +8141,55 @@ def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord |
         "prompt_tokens_text_est": None,
         "prompt_tokens_nontext_est": None,
     }
+
+
+_HUGGINGFACE_HUB_CONNECTIVITY_NEEDLES: Final[tuple[str, ...]] = (
+    "server disconnected without sending a response",
+    "remoteprotocolerror",
+    "connection refused",
+    "connection reset",
+    "connection aborted",
+    "connection error",
+    "network is unreachable",
+    "temporary failure in name resolution",
+    "nodename nor servname provided",
+    "failed to establish a new connection",
+    "read timeout",
+    "connect timeout",
+    "timed out",
+    "503 service unavailable",
+    "502 bad gateway",
+    "504 gateway timeout",
+)
+
+
+def _is_huggingface_hub_connectivity_failure(result: PerformanceResult) -> bool:
+    """Return whether a failed result likely reflects a transient Hub connectivity issue."""
+    if (result.error_package or "").casefold() != "huggingface-hub":
+        return False
+
+    combined = " ".join(
+        part.casefold()
+        for part in (
+            result.error_message,
+            result.error_traceback,
+            result.captured_output_on_fail,
+        )
+        if part
+    )
+    return any(needle in combined for needle in _HUGGINGFACE_HUB_CONNECTIVITY_NEEDLES)
+
+
+def _failure_review_evidence(result: PerformanceResult) -> list[str]:
+    """Build compact evidence labels for failed-result review payloads."""
+    evidence: list[str] = []
+    if result.error_stage:
+        evidence.append(re.sub(r"[^a-z0-9]+", "_", result.error_stage.casefold()).strip("_"))
+    if result.error_code:
+        evidence.append(result.error_code.casefold())
+    if _is_huggingface_hub_connectivity_failure(result):
+        evidence.append("hub_connectivity")
+    return _dedupe_preserve_order(evidence) or ["runtime_failure"]
 
 
 def _review_hint_text(
@@ -8254,11 +8299,21 @@ def _review_next_action_text(review: JsonlReviewRecord) -> str:
         )
     if review["verdict"] == "context_budget":
         return "Reduce prompt/image burden or inspect long-context handling before judging quality."
+    if review["owner"] == "huggingface-hub":
+        if "hub_connectivity" in review["evidence"]:
+            return (
+                "Check whether Hugging Face was reachable; this may be a transient Hub/network "
+                "outage or disconnect rather than a model defect."
+            )
+        return "Check cache/revision availability and network/auth state before blaming the model."
     owner_actions: dict[str, str] = {
         "mlx-vlm": "Inspect prompt-template, stop-token, and decode post-processing behavior.",
         "mlx": "Inspect KV/cache behavior, memory pressure, and long-context execution.",
         "mlx-lm": "Inspect tokenizer/generation stack shared with mlx-lm.",
         "transformers": "Inspect upstream template/tokenizer/config compatibility.",
+        "huggingface-hub": (
+            "Check cache/revision availability and network/auth state before blaming the model."
+        ),
         "model-config": "Inspect model repo config, chat template, and EOS settings.",
         "model": "Treat as a model-quality limitation for this prompt and image.",
     }
@@ -9715,7 +9770,10 @@ _DIAGNOSTICS_OWNER_ACTIONS: Final[dict[str, str]] = {
     "mlx": "check tensor/cache behavior and memory pressure handling.",
     "mlx-lm": "verify tokenizer/runtime compatibility and quantization settings.",
     "transformers": "verify API compatibility and pinned version floor.",
-    "huggingface-hub": "check cache/revision availability and network/auth state.",
+    "huggingface-hub": (
+        "check cache/revision availability and network/auth state; Hub disconnects may be "
+        "transient outages rather than model defects."
+    ),
     "model-config": "verify model config, tokenizer files, and revision alignment.",
     "unknown": "capture traceback + env fingerprint, then triage manually.",
 }
@@ -9743,6 +9801,7 @@ _TRAINING_LEAK_LABELS: Final[dict[str, str]] = {
 
 _REVIEW_OWNER_BY_FAILURE_NEEDLE: Final[tuple[tuple[str, str], ...]] = (
     ("transformers", "transformers"),
+    ("huggingface-hub", "huggingface-hub"),
     ("mlx-lm", "mlx-lm"),
     ("mlx-vlm", "mlx-vlm"),
     ("model-config", "model-config"),

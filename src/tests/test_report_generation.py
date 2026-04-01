@@ -850,6 +850,39 @@ class TestDiagnosticsReport:
             )
             == "model-config"
         )
+        assert (
+            check_models._classify_review_owner(
+                harness_type=None,
+                failure_owner="huggingface-hub",
+            )
+            == "huggingface-hub"
+        )
+
+    def test_review_next_action_calls_out_hub_connectivity_failures(self) -> None:
+        """Canonical review text should flag transient Hub disconnects explicitly."""
+        action = check_models._review_next_action_text(
+            {
+                "verdict": "harness",
+                "hint_relationship": "preserves_trusted_hints",
+                "instruction_echo": False,
+                "metadata_borrowing": False,
+                "likely_capped": False,
+                "owner": "huggingface-hub",
+                "user_bucket": "avoid",
+                "evidence": [
+                    "model_error",
+                    "huggingface_hub_model_load_model",
+                    "hub_connectivity",
+                ],
+                "requested_max_tokens": 100,
+                "hit_max_tokens": False,
+                "prompt_tokens_total": None,
+                "prompt_tokens_text_est": None,
+                "prompt_tokens_nontext_est": None,
+            },
+        )
+        assert "Hugging Face was reachable" in action
+        assert "transient Hub/network outage" in action
 
     def test_diagnostics_next_action_uses_composite_owner_rules(self) -> None:
         """Composite owner keys should keep their specialized next-step guidance."""

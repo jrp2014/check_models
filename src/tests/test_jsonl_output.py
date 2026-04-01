@@ -211,6 +211,32 @@ def test_save_jsonl_report_includes_review_payload_for_failures(tmp_path: Path) 
     assert review["evidence"]
 
 
+def test_save_jsonl_report_flags_huggingface_hub_connectivity_failures(tmp_path: Path) -> None:
+    """Hub transport failures should carry a connectivity-oriented review hint."""
+    output_file = tmp_path / "results.jsonl"
+    result = PerformanceResult(
+        model_name="failed-model",
+        generation=None,
+        success=False,
+        error_message="Model loading failed: Server disconnected without sending a response.",
+        error_stage="Model Error",
+        error_code="HUGGINGFACE_HUB_MODEL_LOAD_MODEL",
+        error_package="huggingface-hub",
+        error_traceback=(
+            "Traceback (most recent call last):\n"
+            "httpx.RemoteProtocolError: Server disconnected without sending a response."
+        ),
+    )
+
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+
+    _header, rows = _read_jsonl(output_file)
+    review = rows[0]["review"]
+    assert review["verdict"] == "harness"
+    assert review["owner"] == "huggingface-hub"
+    assert "hub_connectivity" in review["evidence"]
+
+
 def test_save_jsonl_report_no_generation(tmp_path: Path) -> None:
     """Test that save_jsonl_report handles missing generation."""
     output_file = tmp_path / "results.jsonl"

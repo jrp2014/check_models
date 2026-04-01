@@ -86,6 +86,10 @@ def _get_e2e_output_args(output_dir: Path) -> list[str]:
         str(output_dir / "e2e.html"),
         "--output-markdown",
         str(output_dir / "e2e.md"),
+        "--output-gallery-markdown",
+        str(output_dir / "e2e_gallery.md"),
+        "--output-review",
+        str(output_dir / "e2e_review.md"),
         "--output-tsv",
         str(output_dir / "e2e.tsv"),
         "--output-jsonl",
@@ -95,6 +99,16 @@ def _get_e2e_output_args(output_dir: Path) -> list[str]:
         "--output-diagnostics",
         str(output_dir / "e2e_diagnostics.md"),
     ]
+
+
+def test_get_e2e_output_args_redirects_gallery_and_review(tmp_path: Path) -> None:
+    """E2E output helper should redirect all report artifacts into the temp directory."""
+    output_dir = tmp_path / "output"
+    output_args = _get_e2e_output_args(output_dir)
+    output_map = dict(zip(output_args[::2], output_args[1::2], strict=True))
+
+    assert output_map["--output-gallery-markdown"] == str(output_dir / "e2e_gallery.md")
+    assert output_map["--output-review"] == str(output_dir / "e2e_review.md")
 
 
 @pytest.fixture
