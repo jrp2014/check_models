@@ -36,6 +36,12 @@ Notable changes to this project will be documented in this file.
   validating quality-config sections as string-keyed mappings and normalizing
   macOS `system_profiler` JSON into typed helper shapes before GPU/tooling
   extraction.
+- Removed redundant config and hardware-probe logic in `src/check_models.py`
+  by centralizing string-keyed mapping validation and reusing a cached
+  `get_device_info()` path for both generic GPU info and Apple Silicon details.
+- Removed a few dead or single-use wrapper helpers in `src/check_models.py`
+  by deleting unused display helpers and inlining thin markdown/probe wrappers
+  that only obscured one call site each.
 - Fixed Ty invocation in `src/tools/run_quality_checks.sh` and
   `src/tools/check_quality_simple.sh` to pass the resolved repo Python
   explicitly, eliminating false `unresolved-import` warnings when Ty fell back

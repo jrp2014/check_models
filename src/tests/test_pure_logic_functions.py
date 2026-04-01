@@ -12,7 +12,6 @@ import argparse
 import importlib
 import json
 import logging
-import subprocess
 from pathlib import Path
 from typing import TYPE_CHECKING
 from unittest.mock import patch
@@ -361,14 +360,14 @@ class TestDisplayWidthUtilities:
         colored = f"{mod.Colors.RED}abc{mod.Colors.RESET}"
         assert mod._display_width(colored) == 3
 
-    def test_display_ljust_and_center_target_display_width(
+    def test_display_align_targets_display_width(
         self,
         mod: types.ModuleType,
     ) -> None:
-        """Padding helpers should honor display width even with wide glyphs."""
+        """Display alignment should honor display width even with wide glyphs."""
         wide_char = "界"
-        padded = mod._display_ljust(wide_char, 4)
-        centered = mod._display_center(wide_char, 5)
+        padded = mod._display_align(wide_char, 4, alignment="left")
+        centered = mod._display_align(wide_char, 5, alignment="center")
         assert mod._display_width(padded) == 4
         assert mod._display_width(centered) == 5
 
@@ -551,16 +550,34 @@ class TestSystemProfilerParsing:
             }
         )
 
+        mod.get_device_info.cache_clear()
         with (
             patch.object(mod.platform, "system", return_value="Darwin"),
             patch.object(mod.subprocess, "check_output", return_value=payload),
         ):
             info = mod.get_device_info()
+        mod.get_device_info.cache_clear()
 
         assert info == {
             "SPDisplaysDataType": [{"sppci_model": "Apple M4", "sppci_cores": 10}],
             "SPAudioDataType": [{"_name": "MacBook Speakers"}],
         }
+
+    def test_get_device_info_is_cached(self, mod: types.ModuleType) -> None:
+        """Repeated device-info reads should reuse the cached system_profiler payload."""
+        payload = json.dumps({"SPDisplaysDataType": [{"sppci_model": "Apple M4"}]})
+
+        mod.get_device_info.cache_clear()
+        with (
+            patch.object(mod.platform, "system", return_value="Darwin"),
+            patch.object(mod.subprocess, "check_output", return_value=payload) as check_output,
+        ):
+            first = mod.get_device_info()
+            second = mod.get_device_info()
+        mod.get_device_info.cache_clear()
+
+        assert first == second
+        assert check_output.call_count == 1
 
     def test_get_system_info_uses_first_string_gpu_name(self, mod: types.ModuleType) -> None:
         """GPU info should come from the first usable string field in display data."""
@@ -571,20 +588,16 @@ class TestSystemProfilerParsing:
                 ]
             }
         )
-        result = subprocess.CompletedProcess(
-            args=["/usr/sbin/system_profiler", "SPDisplaysDataType", "-json"],
-            returncode=0,
-            stdout=payload,
-            stderr="",
-        )
 
+        mod.get_device_info.cache_clear()
         mod.get_system_info.cache_clear()
         with (
             patch.object(mod.platform, "system", return_value="Darwin"),
             patch.object(mod.platform, "machine", return_value="arm64"),
-            patch.object(mod.subprocess, "run", return_value=result),
+            patch.object(mod.subprocess, "check_output", return_value=payload),
         ):
             arch, gpu_info = mod.get_system_info()
+        mod.get_device_info.cache_clear()
         mod.get_system_info.cache_clear()
 
         assert arch == "arm64"

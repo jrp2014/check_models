@@ -430,19 +430,19 @@ class QualityThresholds:
     @classmethod
     def from_config(cls, config: Mapping[str, object]) -> QualityThresholds:
         """Create instance from configuration dictionary."""
-        thresholds = _as_str_object_mapping(config.get("thresholds", {}))
-        if thresholds is None:
-            msg = "quality_config.yaml thresholds section must be a mapping"
-            raise TypeError(msg)
+        thresholds = _require_str_object_mapping(
+            config.get("thresholds", {}),
+            "quality_config.yaml thresholds section must be a mapping",
+        )
 
         patterns_value = config.get("patterns", {})
         if patterns_value is None:
             patterns: dict[str, list[str]] | None = None
         else:
-            patterns_mapping = _as_str_object_mapping(patterns_value)
-            if patterns_mapping is None:
-                msg = "quality_config.yaml patterns section must be a mapping"
-                raise TypeError(msg)
+            patterns_mapping = _require_str_object_mapping(
+                patterns_value,
+                "quality_config.yaml patterns section must be a mapping",
+            )
             patterns = cast("dict[str, list[str]]", dict(patterns_mapping))
 
         # Filter valid fields for the dataclass
@@ -493,14 +493,11 @@ def load_quality_config(config_path: Path | None = None) -> None:
         try:
             with config_path.open("r") as f:
                 config = yaml.safe_load(f)
-                config_mapping = _as_str_object_mapping(config)
-                if config is not None and config_mapping is None:
-                    logger.warning(
-                        "Failed to load quality config from %s: quality_config.yaml top-level document must be a mapping",
-                        config_path,
+                if config is not None:
+                    config_mapping = _require_str_object_mapping(
+                        config,
+                        "quality_config.yaml top-level document must be a mapping",
                     )
-                    return
-                if config_mapping:
                     new_quality = QualityThresholds.from_config(config_mapping)
                     # Update existing global instance in-place to avoid 'global' keyword
                     # and ensure all references see the update.
@@ -565,25 +562,12 @@ def _probe_import_runtime(
     )
 
 
-def _probe_mlx_import_runtime() -> str | None:
-    """Return None when mlx.core import appears safe; else an actionable message."""
-    return _probe_import_runtime(
-        import_target="mlx.core",
-        error_prefix=ERROR_MLX_RUNTIME_INIT,
-        detect_metal_nsrange=True,
-    )
-
-
-def _probe_mlx_vlm_import_runtime() -> str | None:
-    """Return None when mlx_vlm import appears safe; else an actionable message."""
-    return _probe_import_runtime(
-        import_target="mlx_vlm",
-        error_prefix=ERROR_MLX_VLM_RUNTIME_INIT,
-    )
-
-
 mx: Any = cast("Any", None)
-mlx_probe_error = _probe_mlx_import_runtime()
+mlx_probe_error = _probe_import_runtime(
+    import_target="mlx.core",
+    error_prefix=ERROR_MLX_RUNTIME_INIT,
+    detect_metal_nsrange=True,
+)
 if mlx_probe_error is None:
     try:
         import mlx.core as _mx_runtime
@@ -689,7 +673,10 @@ def _configure_mlx_vlm_fallback(error_message: str) -> None:
     MISSING_DEPENDENCIES["mlx-vlm"] = error_message
 
 
-mlx_vlm_probe_error = _probe_mlx_vlm_import_runtime()
+mlx_vlm_probe_error = _probe_import_runtime(
+    import_target="mlx_vlm",
+    error_prefix=ERROR_MLX_VLM_RUNTIME_INIT,
+)
 if mlx_vlm_probe_error is None:
     try:
         from mlx_vlm.generate import generate as _mlx_vlm_generate
@@ -1478,17 +1465,6 @@ def _append_markdown_labeled_value(
     )
 
 
-def _append_markdown_bullet_text(parts: list[str], text: str) -> None:
-    """Append a wrapped plain Markdown bullet."""
-    parts.extend(
-        _wrap_markdown_text(
-            text,
-            initial_indent="- ",
-            subsequent_indent="  ",
-        ),
-    )
-
-
 def _append_markdown_review_block(
     out: list[str],
     *,
@@ -1954,16 +1930,6 @@ def _display_align(text: str, width: int, *, alignment: Literal["left", "center"
         right = pad_total - left
         return f"{' ' * left}{text}{' ' * right}"
     return f"{text}{' ' * pad_total}"
-
-
-def _display_ljust(text: str, width: int) -> str:
-    """Right-pad text based on display width (not codepoint length)."""
-    return _display_align(text, width, alignment="left")
-
-
-def _display_center(text: str, width: int) -> str:
-    """Center text based on display width (not codepoint length)."""
-    return _display_align(text, width, alignment="center")
 
 
 # =============================================================================
@@ -5988,6 +5954,19 @@ def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceR
 # =============================================================================
 
 
+def _first_system_profiler_entry(
+    device_info: SystemProfilerDict | None,
+    section_name: str,
+) -> SystemProfilerEntry | None:
+    """Return the first entry from a system_profiler section when present."""
+    if device_info is None:
+        return None
+    entries = device_info.get(section_name)
+    if not entries:
+        return None
+    return entries[0]
+
+
 def _normalize_system_profiler_data(payload: object) -> SystemProfilerDict | None:
     """Normalize parsed ``system_profiler -json`` output to the subset used here."""
     raw_payload = _as_str_object_mapping(payload)
@@ -6018,6 +5997,7 @@ def _mapping_first_text_value(mapping: Mapping[str, object], *keys: str) -> str 
     return None
 
 
+@lru_cache(maxsize=1)
 def get_device_info() -> SystemProfilerDict | None:
     """Return system_profiler display (GPU) info as dict or None on failure.
 
@@ -6607,6 +6587,14 @@ def _is_str_object_mapping(value: object) -> TypeGuard[Mapping[str, object]]:
 def _as_str_object_mapping(value: object) -> Mapping[str, object] | None:
     """Return ``value`` as a string-keyed mapping when possible."""
     return value if _is_str_object_mapping(value) else None
+
+
+def _require_str_object_mapping(value: object, error_message: str) -> Mapping[str, object]:
+    """Return ``value`` as a string-keyed mapping or raise ``TypeError``."""
+    mapping = _as_str_object_mapping(value)
+    if mapping is None:
+        raise TypeError(error_message)
+    return mapping
 
 
 def _nested_mapping_value(
@@ -12560,33 +12548,10 @@ def get_system_info() -> tuple[str, str | None]:
     """
     arch: str = platform.machine()
     gpu_info: str | None = None
-    try:
-        # Try to get GPU info on macOS using full path and JSON output for robustness
-        # Matches mlx-vlm/tests/test_smoke.py implementation
-        if platform.system() == "Darwin":
-            result: subprocess.CompletedProcess[str] = subprocess.run(
-                ["/usr/sbin/system_profiler", "SPDisplaysDataType", "-json"],
-                capture_output=True,
-                text=True,
-                timeout=5,
-                check=False,
-            )
-            if result.returncode == 0:
-                try:
-                    data = _normalize_system_profiler_data(json.loads(result.stdout))
-                    if data is None:
-                        logger.warning("Failed to parse system_profiler JSON output")
-                        return arch, gpu_info
-                    # Navigate the JSON structure: SPDisplaysDataType -> [0] -> sppci_model
-                    # Note: keys can vary slightly, but 'sppci_model' or '_name' are common
-                    displays = data.get("SPDisplaysDataType", [])
-                    if displays:
-                        # Try commonly used keys for GPU name
-                        gpu_info = _mapping_first_text_value(displays[0], "sppci_model", "_name")
-                except json.JSONDecodeError:
-                    logger.warning("Failed to parse system_profiler JSON output")
-    except (subprocess.SubprocessError, TimeoutError) as e:
-        logger.debug("Could not get GPU info: %s", e)
+    if platform.system() == "Darwin":
+        first_display = _first_system_profiler_entry(get_device_info(), "SPDisplaysDataType")
+        if first_display is not None:
+            gpu_info = _mapping_first_text_value(first_display, "sppci_model", "_name")
     return arch, gpu_info
 
 
@@ -12678,12 +12643,10 @@ def _get_apple_silicon_info() -> dict[str, str]:
     if platform.machine() != "arm64":
         return info
 
-    device_info = get_device_info() or {}
-    displays = device_info.get("SPDisplaysDataType") or []
-    if not displays:
+    first = _first_system_profiler_entry(get_device_info(), "SPDisplaysDataType")
+    if first is None:
         return info
 
-    first = displays[0]
     gpu_cores = first.get("sppci_cores")
     if gpu_cores is not None:
         info["GPU Cores"] = str(gpu_cores)
@@ -17079,7 +17042,13 @@ def _format_failures_by_package_parts(
         parts.append(f"#### {package}")
         parts.append("")
         for result in failures:
-            _append_markdown_bullet_text(parts, f"{result.model_name} ({result.error_stage})")
+            parts.extend(
+                _wrap_markdown_text(
+                    f"{result.model_name} ({result.error_stage})",
+                    initial_indent="- ",
+                    subsequent_indent="  ",
+                )
+            )
             error_message = result.error_message or ""
             if len(error_message) > ERROR_MESSAGE_TRUNCATE_LEN:
                 error_message = error_message[: ERROR_MESSAGE_TRUNCATE_LEN - 3] + "..."
