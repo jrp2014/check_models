@@ -78,7 +78,7 @@ jobs:
 
       - name: Upload static-quality artifacts on failure
         if: failure()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: static-quality-artifacts
           path: |
@@ -115,7 +115,7 @@ jobs:
 
       - name: Upload runtime-smoke artifacts on failure
         if: failure()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: runtime-smoke-artifacts
           path: |
