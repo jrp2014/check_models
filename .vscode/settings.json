@@ -99,7 +99,6 @@
     "venv",
     "env",
     ".venv",
-    "**/typings/**",
     "**/node_modules",
     "**/__pycache__",
     "**/.*"
