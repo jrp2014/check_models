@@ -61,7 +61,8 @@ The file is organized in this order — use these landmarks to jump to the right
 
 | Target | What it does |
 | -------- | ------------- |
-| `make quality` | **Primary gate**: ruff format + lint + mypy + ty + pyrefly + pytest + shellcheck + markdownlint |
+| `make quality` | **Primary gate**: ruff format + lint + mypy + ty + pyrefly + vulture + pytest + shellcheck + markdownlint |
+| `make vulture` | Run Vulture dead-code scan. *Note: Vulture commonly flags `TypedDict` keys and `Protocol` signatures as "unused" because they are evaluated statically and not tracked natively in runtime logic flows. Treat these as false positives.* |
 | `make test` | `pytest src/tests/ -v` |
 | `make dev` | Install editable with `[dev,extras,torch]` |
 | `make install` | Install editable (runtime only) |
@@ -88,7 +89,7 @@ The file is organized in this order — use these landmarks to jump to the right
 - **Pre-commit hooks**: either `pre-commit install` or `cd src && python -m tools.install_precommit_hook`. Both install the same two stages:
   - commit stage: `bash src/tools/run_commit_hygiene.sh`
   - push stage: `bash src/tools/check_quality_simple.sh`
-- **PRs must pass**: workflow YAML validation, dependency sync check, ruff format + lint, mypy, ty, pyrefly, pytest, shellcheck, markdownlint, plus the isolated runtime smoke probe.
+- **PRs must pass**: workflow YAML validation, dependency sync check, ruff format + lint, mypy, ty, pyrefly, vulture, pytest, shellcheck, markdownlint, plus the isolated runtime smoke probe.
 
 ### 8. Coding conventions (quick reference)
 

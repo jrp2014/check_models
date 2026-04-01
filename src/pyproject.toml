@@ -75,6 +75,7 @@ dev = [
     "mypy>=1.8.0",
     "ty",
     "pyrefly",
+    "vulture>=2.16",
     "pytest>=8.0.0",
     "pytest-cov>=4.0.0",
     "pytest-xdist>=3.5.0", # Parallel test execution
@@ -310,6 +311,12 @@ rules = { unresolved-import = "warn" }
 # absolute path is machine-specific, so repo automation passes `--python`
 # explicitly from the resolved target environment.
 extra-paths = ["../typings"]
+
+[tool.vulture]
+paths = ["check_models.py"]
+exclude = ["tests/", "tools/", "../typings/", "*.egg-info"]
+min_confidence = 100
+sort_by_size = true
 
 [tool.pytest.ini_options]
 # Limit test discovery to the dedicated tests package inside the project

@@ -182,6 +182,10 @@ typecheck: ## mypy type checking
 ty: ## Ty type checking with resolved repo interpreter
 	bash tools/run_ty_check.sh $(ARGS)
 
+.PHONY: vulture
+vulture: ## Vulture dead-code scan (configured in pyproject.toml)
+	$(RUN_PY) -m vulture check_models.py
+
 # Tests
 .PHONY: test
 test: ## Run pytest
@@ -215,7 +219,7 @@ check: format lint typecheck test ## Core quality pipeline
 	@echo "✓ All core checks completed"
 
 .PHONY: quality
-quality: ## Run full quality checks (ruff format+lint+mypy+pytest+shellcheck+markdownlint)
+quality: ## Run full quality checks (ruff format+lint+mypy+ty+pyrefly+vulture+pytest+shellcheck+markdownlint)
 	bash tools/run_quality_checks.sh
 
 .PHONY: quality-strict

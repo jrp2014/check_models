@@ -11,6 +11,7 @@ quality_setup_python
 
 quality_require_python_tool ty "Install dev dependencies with: pip install -e .[dev]"
 quality_require_python_tool pyrefly "Install dev dependencies with: pip install -e .[dev]"
+quality_require_python_tool vulture "Install dev dependencies with: pip install -e .[dev]"
 
 echo "=== Workflow YAML Validation ==="
 quality_validate_yaml_files \
@@ -38,6 +39,9 @@ quality_run_ty_check check_models.py
 
 echo "=== Pyrefly Type Check ==="
 quality_run_python_tool pyrefly check check_models.py
+
+echo "=== Vulture Dead Code Check ==="
+quality_run_python_tool vulture check_models.py
 
 echo "=== Pytest (fast set) ==="
 "$QUALITY_PYTHON" -m pytest -q -m "not slow and not e2e"

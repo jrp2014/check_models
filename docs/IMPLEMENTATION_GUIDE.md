@@ -382,6 +382,7 @@ All Python code is rigorously tested to ensure quality and correctness:
 
 - **Ruff**: Used for both linting and formatting. It enforces style consistency, catches common errors, and sorts imports.
 - **Mypy**: Used for static type checking. We require full type annotations for all new code.
+- **Vulture**: Used for dead-code detection via `make vulture`. *Note: Vulture commonly flags `TypedDict` key mappings and `Protocol` signatures as "unused" because they are evaluated statically and not tracked natively in runtime logic flows. Treat these as false positives.*
 
 Run these checks locally:
 

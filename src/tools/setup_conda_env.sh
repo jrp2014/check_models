@@ -214,7 +214,7 @@ install_dependencies() {
     pip install -e .
 
     # Development dependencies (optional)
-        read -p "Do you want to install development dependencies (ruff, mypy, ty, pyrefly, pytest, pydantic, pre-commit)? (y/N): " -n 1 -r
+        read -p "Do you want to install development dependencies (ruff, mypy, ty, pyrefly, vulture, pytest, pydantic, pre-commit)? (y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         log_info "Installing development dependencies..."
@@ -222,7 +222,7 @@ install_dependencies() {
         if grep -q "dev =" pyproject.toml; then
              pip install -e ".[dev]"
         else
-               pip install "ruff>=0.1.0" "mypy>=1.8.0" "ty" "pyrefly" "pytest>=8.0.0" "pytest-cov>=4.0.0" "pydantic>=2.0.0" "pre-commit"
+               pip install "ruff>=0.1.0" "mypy>=1.8.0" "ty" "pyrefly" "vulture>=2.16" "pytest>=8.0.0" "pytest-cov>=4.0.0" "pydantic>=2.0.0" "pre-commit"
         fi
 
         if command -v npm &> /dev/null; then

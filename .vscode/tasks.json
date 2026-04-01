@@ -9,6 +9,53 @@
 				"quality"
 			],
 			"group": "build",
+			"problemMatcher": [
+				{
+					"owner": "python",
+					"source": "vulture",
+					"severity": "warning",
+					"fileLocation": [
+						"relative",
+						"${workspaceFolder}/src"
+					],
+					"pattern": {
+						"regexp": "^(.+?):(\\d+): (.*)$",
+						"file": 1,
+						"line": 2,
+						"message": 3
+					}
+				}
+			],
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared"
+			}
+		},
+		{
+			"label": "Make: vulture",
+			"type": "shell",
+			"command": "make",
+			"args": [
+				"vulture"
+			],
+			"group": "build",
+			"problemMatcher": [
+				{
+					"owner": "python",
+					"source": "vulture",
+					"severity": "warning",
+					"fileLocation": [
+						"relative",
+						"${workspaceFolder}/src"
+					],
+					"pattern": {
+						"regexp": "^(.+?):(\\d+): (.*)$",
+						"file": 1,
+						"line": 2,
+						"message": 3
+					}
+				}
+			],
 			"presentation": {
 				"reveal": "always",
 				"panel": "shared"
@@ -75,7 +122,23 @@
 				}
 			},
 			"isBackground": false,
-			"problemMatcher": [],
+			"problemMatcher": [
+				{
+					"owner": "python",
+					"source": "vulture",
+					"severity": "warning",
+					"fileLocation": [
+						"relative",
+						"${workspaceFolder}/src"
+					],
+					"pattern": {
+						"regexp": "^(.+?):(\\d+): (.*)$",
+						"file": 1,
+						"line": 2,
+						"message": 3
+					}
+				}
+			],
 			"group": "build"
 		},
 		{

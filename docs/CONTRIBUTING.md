@@ -163,22 +163,34 @@ The project uses several automated quality checks:
    the target env, active env, resolved Python path, and resolved Ty binary so
    import-resolution problems are visible instead of mysterious.
 
-4. **Tests**:
+4. **Vulture** (dead-code scan):
+
+   ```bash
+   make vulture     # Runs the configured dead-code scan for src/check_models.py
+   ```
+
+   The repo keeps the default Vulture gate conservative for day-to-day work:
+   it scans `src/check_models.py` with `min_confidence = 100` from
+   `src/pyproject.toml`, so only high-confidence dead-code findings fail the
+   quality gate by default.
+
+5. **Tests**:
 
    ```bash
    make test        # Run all tests
    ```
 
-5. **Combined quality check**:
+6. **Combined quality check**:
 
    ```bash
-   make quality     # Runs ruff + mypy + ty + pyrefly + pytest + shellcheck + markdownlint
+   make quality     # Runs ruff + mypy + ty + pyrefly + vulture + pytest + shellcheck + markdownlint
    ```
 
-   The Ty step inside `make quality` uses the same resolved-interpreter path as
-   `make ty`, so it does not require extra local Ty configuration.
+   The Ty and Vulture steps inside `make quality` use the same checked-in repo
+   wrappers and config as their standalone targets, so local runs and CI use
+   the same behavior.
 
-6. **Markdown linting**:
+7. **Markdown linting**:
 
    `make quality` runs markdownlint via the repo-local install, a global
    `markdownlint-cli2`, or an `npx --no-install` fallback. If none of those are
@@ -192,17 +204,35 @@ The project uses several automated quality checks:
    npx --no-install markdownlint-cli2 '**/*.md'
    ```
 
+### VS Code Problems
+
+This repo ships a checked-in `Make: vulture` task in `.vscode/tasks.json`.
+Run that task from VS Code to surface Vulture findings as `warning` entries in
+the Problems panel, mapped to paths under `src/`. The same matcher is also
+attached to `Make: quality`, so a full quality run can report the same dead-
+code findings.
+
+The repo does not force Vulture to auto-run on every save or file change.
+Re-run `Make: vulture` or `Make: quality` after larger refactors, deletions,
+or control-flow changes.
+
 ### Git Hooks
 
 Two supported hook workflows:
 
-- **pre-commit framework** (`pre-commit install`):
-  - Installs the checked-in `pre-commit` and `pre-push` hooks from `.pre-commit-config.yaml`
-  - **Pre-commit**: runs staged hygiene via `src/tools/run_commit_hygiene.sh`
-  - **Pre-push**: runs fast checks via `src/tools/check_quality_simple.sh`
-- **Custom repo hooks** (`cd src && python -m tools.install_precommit_hook`):
-  - **Pre-commit**: formats Python files, fixes markdown when possible, and syncs README deps when `src/pyproject.toml` changes
-  - **Pre-push**: runs workflow YAML validation, dependency sync verification, Ruff format check + lint, mypy, ty, pyrefly, and `pytest -m "not slow and not e2e"`
+- `pre-commit install`: installs the checked-in `pre-commit` and `pre-push`
+   hooks from `.pre-commit-config.yaml`.
+- Framework `pre-commit` stage: runs staged hygiene via
+   `src/tools/run_commit_hygiene.sh`.
+- Framework `pre-push` stage: runs fast checks via
+   `src/tools/check_quality_simple.sh`, including Vulture.
+- `cd src && python -m tools.install_precommit_hook`: installs the custom repo
+   hooks.
+- Custom `pre-commit` stage: formats Python files, fixes markdown when
+   possible, and syncs README deps when `src/pyproject.toml` changes.
+- Custom `pre-push` stage: runs workflow YAML validation, dependency sync
+   verification, Ruff format check + lint, mypy, ty, pyrefly, Vulture, and
+   `pytest -m "not slow and not e2e"`.
 
 To bypass hooks (not recommended):
 
@@ -215,7 +245,7 @@ git push --no-verify
 
 All pull requests must pass:
 
-- Quality workflow (`.github/workflows/quality.yml`) `static-quality` job: workflow YAML validation, dependency sync check, ruff format check + lint, mypy + ty + pyrefly, pytest, shellcheck, markdownlint
+- Quality workflow (`.github/workflows/quality.yml`) `static-quality` job: workflow YAML validation, dependency sync check, ruff format check + lint, mypy + ty + pyrefly + Vulture, pytest, shellcheck, markdownlint
 - Quality workflow (`.github/workflows/quality.yml`) `runtime-smoke` job: isolated runtime smoke probe via `src/tools/run_runtime_smoke.sh`
 - Dependency sync guard (`.github/workflows/dependency-sync.yml`)
 

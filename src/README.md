@@ -1140,12 +1140,17 @@ Key commands:
 - `make install` — install runtime package (`pip install -e src/`)
 - `make dev` — install dev setup (`pip install -e "src/[dev,extras,torch]"`)
 - `make test` — run pytest (`pytest src/tests/ -v`)
-- `make quality` — full gate (ruff format+lint, mypy, ty, pyrefly, pytest, shellcheck, markdownlint)
+- `make vulture` — run the configured dead-code scan for `src/check_models.py`
+- `make quality` — full gate (ruff format+lint, mypy, ty, pyrefly, vulture, pytest, shellcheck, markdownlint)
 - `make ci` — strict CI-style pipeline
 - `make deps-sync` — sync dependency blocks in docs from `pyproject.toml`
 - `python -m tools.update_readme_deps --check` — verify dependency blocks are already synced (no writes)
 - `make stubs` — regenerate local stubs in `typings/` (`mlx_lm`, `mlx_vlm`,
   `transformers`, `tokenizers`)
+
+In VS Code, run the checked-in `Make: vulture` or `Make: quality` task to map
+Vulture findings into `warning` entries in the Problems panel. The repo does
+not auto-run Vulture on save; rerun it after larger refactors or deletions.
 
 For package-local targets (for example `install-dev`, `bootstrap-dev`, `lint-fix`), run:
 
@@ -1176,7 +1181,7 @@ Alternative workflow:
 Both workflows call the same shared scripts:
 
 - commit stage: staged-file hygiene only
-- push stage: fast static checks plus `pytest -m "not slow and not e2e"`
+- push stage: fast static checks, Vulture, plus `pytest -m "not slow and not e2e"`
 
 The push-stage gate also validates the checked-in GitHub workflow YAML and
 keeps the CI/static tooling path aligned with the checked-in scripts.

@@ -221,7 +221,6 @@ class FormattingThresholds:
 
     # Layout constants
     min_separator_chars: int = 50
-    default_decimal_places: int = 2
     markdown_hard_break_spaces: int = 2
     markdown_wrap_width: int = 78
     generation_wrap_width: int = 100
@@ -743,8 +742,6 @@ type ExifDict = dict[str | int, ExifValue]
 type MetadataDict = dict[str, str | None]
 type PathLike = str | Path
 type JsonLike = None | bool | int | float | str | list[JsonLike] | dict[str, JsonLike]
-type GPSTupleElement = int | float
-type GPSTuple = tuple[GPSTupleElement, GPSTupleElement, GPSTupleElement]
 type GPSDict = dict[str, ExifValue]  # GPS EXIF data structure
 type SystemProfilerEntry = dict[str, object]
 type SystemProfilerDict = dict[
@@ -1078,11 +1075,13 @@ class SupportsTextDecoder(Protocol):
 
     def decode(self, *args: object, **kwargs: object) -> object:
         """Decode one token sequence."""
-        ...
+        del args, kwargs
+        raise NotImplementedError
 
     def batch_decode(self, *args: object, **kwargs: object) -> object:
         """Decode one or more token sequences."""
-        ...
+        del args, kwargs
+        raise NotImplementedError
 
 
 class LoadCallable(Protocol):
@@ -1099,7 +1098,8 @@ class LoadCallable(Protocol):
         **kwargs: object,
     ) -> tuple[Module, ProcessorMixin]:
         """Load an MLX-VLM model and processor."""
-        ...
+        del path_or_hf_repo, adapter_path, lazy, revision, trust_remote_code, kwargs
+        raise NotImplementedError
 
 
 class ApplyChatTemplateCallable(Protocol):
@@ -1117,7 +1117,9 @@ class ApplyChatTemplateCallable(Protocol):
         **kwargs: Unpack[ChatTemplateKwargs],
     ) -> str | list[dict[str, object]] | object:
         """Apply an upstream chat template to a prompt payload."""
-        ...
+        del processor, config, prompt
+        del add_generation_prompt, return_messages, num_images, num_audios, kwargs
+        raise NotImplementedError
 
 
 class StrictGenerateCallable(Protocol):
@@ -1132,19 +1134,22 @@ class StrictGenerateCallable(Protocol):
         audio: str | list[str] | None = None,
         verbose: bool = False,
         *,
-        temperature: float = ...,
-        top_p: float = ...,
-        repetition_penalty: float | None = ...,
-        repetition_context_size: int | None = ...,
-        max_kv_size: int | None = ...,
-        kv_bits: int | None = ...,
-        kv_group_size: int = ...,
-        quantized_kv_start: int = ...,
-        max_tokens: int = ...,
+        temperature: float = 0.0,
+        top_p: float = 1.0,
+        repetition_penalty: float | None = None,
+        repetition_context_size: int | None = 20,
+        max_kv_size: int | None = None,
+        kv_bits: int | None = None,
+        kv_group_size: int = 64,
+        quantized_kv_start: int = 0,
+        max_tokens: int = 500,
         **kwargs: Unpack[GenerateExtraKwargs],
     ) -> GenerationResult:
         """Generate a caption/response with the known CLI-controlled kwargs."""
-        ...
+        del model, processor, prompt, image, audio, verbose
+        del temperature, top_p, repetition_penalty, repetition_context_size
+        del max_kv_size, kv_bits, kv_group_size, quantized_kv_start, max_tokens, kwargs
+        raise NotImplementedError
 
 
 class LoadImageCallable(Protocol):
@@ -1152,7 +1157,8 @@ class LoadImageCallable(Protocol):
 
     def __call__(self, image_source: str | Path | io.BytesIO, timeout: int = 10) -> object:
         """Load an image from a path or URL."""
-        ...
+        del image_source, timeout
+        raise NotImplementedError
 
 
 if TYPE_CHECKING:
@@ -1875,9 +1881,9 @@ class TimeoutManager(contextlib.ContextDecorator):
 
     def __exit__(
         self,
-        exc_type: type[BaseException] | None,
-        exc_val: BaseException | None,
-        exc_tb: types.TracebackType | None,
+        _exc_type: type[BaseException] | None,
+        _exc_val: BaseException | None,
+        _exc_tb: types.TracebackType | None,
     ) -> None:
         """Exit the timeout context manager and clear the alarm."""
         # Reset signal handler only if we successfully set it up
@@ -1967,11 +1973,6 @@ class Colors:
     def set_enabled(*, enabled: bool) -> None:
         """Globally enable/disable ANSI colors for this process."""
         Colors._enabled = bool(enabled)
-
-    @staticmethod
-    def visual_len(text: str) -> int:
-        """Return the visual length of text, ignoring ANSI codes."""
-        return _display_width(text)
 
 
 class LogStyles:
@@ -2262,7 +2263,6 @@ FIELD_ABBREVIATIONS: Final[dict[str, tuple[str, str]]] = {
 
 # Threshold for splitting long header text into multiple lines
 HEADER_SPLIT_LENGTH = 10
-ERROR_MESSAGE_PREVIEW_LEN: Final[int] = 40  # Max chars to show from error in summary line
 ERROR_MESSAGE_TRUNCATE_LEN: Final[int] = 120  # Max chars for error messages in actionable reports
 MAX_QUALITY_ISSUES_LEN: Final[int] = 30  # Max chars for quality issues in Markdown tables
 MAX_OUTPUT_LINES: Final[int] = 3  # Max lines to show in summary table cells
@@ -2867,7 +2867,6 @@ class TrustedHintBundle:
     """Split prompt context into reusable trusted hints and nonvisual metadata."""
 
     trusted_text: str = ""
-    nonvisual_text: str = ""
     trusted_terms: tuple[str, ...] = ()
     nonvisual_terms: tuple[str, ...] = ()
 
@@ -3082,7 +3081,6 @@ def _extract_trusted_hint_bundle(
 
     return TrustedHintBundle(
         trusted_text="\n".join(trusted_parts).strip(),
-        nonvisual_text="\n".join(part for part in nonvisual_lines if part).strip(),
         trusted_terms=tuple(_dedupe_preserve_order(trusted_terms)),
         nonvisual_terms=tuple(_dedupe_preserve_order(nonvisual_terms)),
     )
@@ -4943,15 +4941,15 @@ class GenerationQualityAnalysis:
         )
 
     def has_harness_issues_only(self) -> bool:
-        """Return True if only harness issues detected (no model quality issues).
-
-        Useful for filtering reports - if only harness issues, the model may
-        work fine with a different integration approach.
-        """
-        if not self.has_harness_issue:
-            return False
-
-        has_non_harness_issue = (
+        """Return True when only harness or integration issues were detected."""
+        has_contract_violation = (
+            bool(self.missing_sections)
+            or self.has_title_length_violation
+            or self.has_description_sentence_violation
+            or self.has_keyword_count_violation
+            or self.has_keyword_duplication_violation
+        )
+        has_non_harness_issues = (
             self.is_repetitive
             or bool(self.hallucination_issues)
             or self.is_verbose
@@ -4963,19 +4961,15 @@ class GenerationQualityAnalysis:
             or self.has_language_mixing
             or self.has_degeneration
             or self.has_fabrication
-            or bool(self.missing_sections)
+            or has_contract_violation
             or self.has_reasoning_leak
             or self.has_context_echo
-            or self.has_title_length_violation
-            or self.has_description_sentence_violation
-            or self.has_keyword_count_violation
-            or self.has_keyword_duplication_violation
             or self.instruction_echo
             or self.metadata_borrowing
-            or self.hint_relationship in {"degrades_trusted_hints", "ignores_trusted_hints"}
-            or self.verdict not in {"clean", "harness"}
+            or self.likely_capped
+            or self.hint_relationship != "preserves_trusted_hints"
         )
-        return not has_non_harness_issue
+        return self.has_harness_issue and not has_non_harness_issues
 
     @property
     def issues(self) -> list[str]:

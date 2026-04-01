@@ -6,6 +6,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Added Vulture to the managed `dev` dependency set, wired it into the full
+  and fast quality scripts plus `make quality` / `make vulture`, and added a
+  checked-in VS Code task/problem matcher so dead-code findings can surface as
+  Problems warnings before commit-time checks.
 - Bumped the repo-local `markdownlint-cli2` npm tooling in `src/package.json`
   and `src/package-lock.json` to `0.22.0`, and changed `src/tools/update.sh`
   to refresh that tool from npm's `latest` tag on each update run so Markdown
