@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-04-01 23:42:40 BST
+FULL ENVIRONMENT DUMP - 2026-04-02 23:03:27 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -19,7 +19,7 @@ build==1.4.2
 certifi==2026.2.25
 cffi==2.0.0
 cfgv==3.5.0
-charset-normalizer==3.4.6
+charset-normalizer==3.4.7
 check_models==0.3.2
 check_models==0.3.2
 click==8.3.1
@@ -32,7 +32,7 @@ distlib==0.4.0
 docopt==0.6.2
 einops==0.8.2
 execnet==2.1.2
-fastapi==0.135.2
+fastapi==0.135.3
 filelock==3.25.2
 flatbuffers==25.12.19
 frozenlist==1.8.0
@@ -61,8 +61,8 @@ mccabe==0.7.0
 mdurl==0.1.2
 miniaudio==1.61
 ml_dtypes==0.5.4
-mlx==0.31.2.dev20260401+b0748ad8
-mlx==0.31.2.dev20260401+b0748ad8
+mlx==0.31.2.dev20260402+befe42d3
+mlx==0.31.2.dev20260402+befe42d3
 mlx-lm==0.31.2
 mlx-vlm==0.4.3
 mpmath==1.3.0
@@ -71,7 +71,7 @@ multiprocess==0.70.19
 mypy==1.20.0
 mypy_extensions==1.1.0
 namex==0.1.0
-nanobind==2.4.0
+nanobind==2.10.2
 networkx==3.6.1
 nodeenv==1.10.0
 num2words==0.5.14
@@ -83,7 +83,7 @@ packaging==26.0
 pandas==3.0.2
 pathspec==1.0.4
 pfzy==0.3.4
-pillow==12.1.1
+pillow==12.2.0
 pip==26.0.1
 platformdirs==4.9.4
 pluggy==1.6.0
@@ -99,7 +99,7 @@ pydantic_core==2.41.5
 Pygments==2.20.0
 pylint==4.0.5
 pyproject_hooks==1.2.0
-pyrefly==0.59.0
+pyrefly==0.59.1
 pytest==9.0.2
 pytest-cov==7.1.0
 pytest-xdist==3.8.0
@@ -109,10 +109,10 @@ PyYAML==6.0.3
 regex==2026.3.32
 requests==2.33.1
 rich==14.3.3
-ruff==0.15.8
+ruff==0.15.9
 safetensors==0.7.0
 sentencepiece==0.2.1
-setuptools==81.0.0
+setuptools==82.0.1
 shellingham==1.5.4
 six==1.17.0
 soundfile==0.13.1
@@ -128,16 +128,16 @@ torch==2.11.0
 torchaudio==2.11.0
 torchvision==0.26.0
 tqdm==4.67.3
-transformers==5.4.0
-ty==0.0.27
+transformers==5.5.0
+ty==0.0.28
 typer==0.24.1
-types-psutil==7.2.2.20260130
+types-psutil==7.2.2.20260402
 types-PyYAML==6.0.12.20250915
-types-requests==2.33.0.20260327
-types-simplejson==3.20.0.20250822
+types-requests==2.33.0.20260402
+types-simplejson==3.20.0.20260402
 types-tabulate==0.10.0.20260308
 types-toml==0.10.8.20240310
-types-tqdm==4.67.3.20260303
+types-tqdm==4.67.3.20260402
 types-urllib3==1.26.25.14
 typing-inspection==0.4.2
 typing_extensions==4.15.0
@@ -154,5 +154,5 @@ yarl==1.23.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-04-01 23:42:40 BST
+Environment dump completed at 2026-04-02 23:03:27 BST
 ================================================================================

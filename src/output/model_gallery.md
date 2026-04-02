@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-_Generated on 2026-04-02 00:00:55 BST_
+_Generated on 2026-04-02 23:22:04 BST_
 
 A review-friendly artifact with image metadata, the source prompt, and full
 generated output for each model.
@@ -11,20 +11,20 @@ generated output for each model.
 - _Next action:_ review failure ownership below and use diagnostics.md for
   filing.
 - _Maintainer signals:_ harness-risk successes=9, clean outputs=1/50.
-- _Useful now:_ 1 clean A/B model(s) worth first review.
-- _Review watchlist:_ 49 model(s) with breaking or lower-value output.
+- _Useful now:_ 2 clean A/B model(s) worth first review.
+- _Review watchlist:_ 48 model(s) with breaking or lower-value output.
 - _Preflight compatibility:_ 1 informational warning(s); do not treat these
   alone as run failures.
 - _Escalate only if:_ they line up with unexpected TF/Flax/JAX imports,
   startup hangs, or backend/runtime crashes.
 - _Vs existing metadata:_ better=11, neutral=0, worse=39 (baseline B 78/100).
 - _Quality signal frequency:_ missing_sections=33, cutoff=30,
-  context_ignored=27, trusted_hint_ignored=26, metadata_borrowing=19,
-  repetitive=16.
+  context_ignored=22, trusted_hint_ignored=22, metadata_borrowing=19,
+  repetitive=17.
 - _Runtime pattern:_ decode dominates measured phase time (90%; 49/51 measured
   model(s)).
-- _Phase totals:_ model load=108.01s, prompt prep=0.12s, decode=972.15s,
-  cleanup=4.80s.
+- _Phase totals:_ model load=107.35s, prompt prep=0.13s, decode=994.90s,
+  cleanup=4.77s.
 - _What this likely means:_ Most measured runtime is spent inside generation
   rather than load or prompt setup.
 - _Suggested next action:_ Prioritize early-stop policies, lower long-tail
@@ -35,15 +35,16 @@ generated output for each model.
 
 ### Strong Candidates
 
-- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: 🏆 A (90/100) | Δ+13 | 63.1 tps
+- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: 🏆 A (94/100) | Δ+16 | 184.8 tps
+- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: 🏆 A (90/100) | Δ+13 | 63.2 tps
 
 ### Watchlist
 
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (7/100) | Δ-71 | 31.6 tps | harness, missing sections, trusted hint degraded
-- `mlx-community/llava-v1.6-mistral-7b-8bit`: ❌ F (10/100) | Δ-68 | 67.3 tps | context ignored, harness, missing sections
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (7/100) | Δ-71 | 31.4 tps | harness, missing sections, trusted hint degraded
+- `mlx-community/llava-v1.6-mistral-7b-8bit`: ❌ F (10/100) | Δ-68 | 67.5 tps | context ignored, harness, missing sections
 - `mlx-community/paligemma2-10b-ft-docci-448-bf16`: ❌ F (17/100) | Δ-61 | 5.8 tps | context ignored, harness
 - `mlx-community/paligemma2-3b-ft-docci-448-bf16`: ❌ F (20/100) | Δ-58 | 21.1 tps | context ignored, harness, missing sections
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (23/100) | Δ-55 | 200.2 tps | context ignored, hallucination, harness, long context, missing sections
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (23/100) | Δ-55 | 202.2 tps | context ignored, hallucination, harness, long context, missing sections
 
 ## 🚨 Failures by Package (Actionable)
 
@@ -97,46 +98,46 @@ generated output for each model.
 > Return exactly these three sections, and nothing else:
 >
 > Title:
-> \- 5-10 words, concrete and factual, limited to clearly visible content.
-> \- Output only the title text after the label.
-> \- Do not repeat or paraphrase these instructions in the title.
+> &#45; 5-10 words, concrete and factual, limited to clearly visible content.
+> &#45; Output only the title text after the label.
+> &#45; Do not repeat or paraphrase these instructions in the title.
 >
 > Description:
-> \- 1-2 factual sentences describing the main visible subject, setting,
+> &#45; 1-2 factual sentences describing the main visible subject, setting,
 > lighting, action, and other distinctive visible details. Omit anything
 > uncertain or inferred.
-> \- Output only the description text after the label.
+> &#45; Output only the description text after the label.
 >
 > Keywords:
-> \- 10-18 unique comma-separated terms based only on clearly visible subjects,
+> &#45; 10-18 unique comma-separated terms based only on clearly visible subjects,
 > setting, colors, composition, and style. Omit uncertain tags rather than
 > guessing.
-> \- Output only the keyword list after the label.
+> &#45; Output only the keyword list after the label.
 >
 > Rules:
-> \- Include only details that are definitely visible in the image.
-> \- Reuse metadata terms only when they are clearly supported by the image.
-> \- If metadata and image disagree, follow the image.
-> \- Prefer omission to speculation.
-> \- Do not copy prompt instructions into the Title, Description, or Keywords
+> &#45; Include only details that are definitely visible in the image.
+> &#45; Reuse metadata terms only when they are clearly supported by the image.
+> &#45; If metadata and image disagree, follow the image.
+> &#45; Prefer omission to speculation.
+> &#45; Do not copy prompt instructions into the Title, Description, or Keywords
 > fields.
-> \- Do not infer identity, location, event, brand, species, time period, or
+> &#45; Do not infer identity, location, event, brand, species, time period, or
 > intent unless visually obvious.
-> \- Do not output reasoning, notes, hedging, or extra sections.
+> &#45; Do not output reasoning, notes, hedging, or extra sections.
 >
 > Context: Existing metadata hints (high confidence; use only when visually
 > confirmed):
-> \- Description hint: The sculpture 'Maquette for the Spirit of the
+> &#45; Description hint: The sculpture 'Maquette for the Spirit of the
 > University' by British sculptor Hubert 'Nibs' Dalwood, created in 1961, is
 > seen on display at the University of Reading's Whiteknights campus in
 > Reading, UK. The bronze piece is a small-scale model for a much larger,
 > unrealized sculpture intended to represent the spirit of the university and
 > is located outside the Department of Typography &amp; Graphic Communication.
-> \- Keyword hints: 10 Best (structured), Abstract Art, Adobe Stock, Any
+> &#45; Keyword hints: 10 Best (structured), Abstract Art, Adobe Stock, Any
 > Vision, Blue sky, Bronze, Bronze Sculpture, Daylight, England, Europe,
 > Handrail, Modern Art, Objects, Royston, Sculpture, Stairs, Statue, Stone,
 > Textured, Town Centre
-> \- Capture metadata: Taken on 2026-03-28 15:52:29 GMT (at 15:52:29 local
+> &#45; Capture metadata: Taken on 2026-03-28 15:52:29 GMT (at 15:52:29 local
 > time). GPS: 51.758450°N, 1.255650°W.
 <!-- markdownlint-enable MD028 MD037 -->
 
@@ -165,7 +166,7 @@ Full generated output by model:
 ### ❌ mlx-community/MolmoPoint-8B-fp16
 
 _Verdict:_ harness | user=avoid
-_Why:_ processor_error, model_config_processor_load_processor
+_Why:_ processor error | model config processor load processor
 _Trusted hints:_ not evaluated
 _Contract:_ not evaluated
 _Utility:_ user=avoid
@@ -191,7 +192,7 @@ _Next Action:_ review package ownership and diagnostics for a minimal repro.
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13855, in _prepare_generation_prompt
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14176, in _prepare_generation_prompt
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -201,7 +202,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13641, in _run_model_preflight_validators
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13962, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -210,14 +211,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13560, in _raise_preflight_error
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13881, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14265, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14586, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -228,13 +229,13 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14101, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14422, in _run_model_generation
     formatted_prompt = _prepare_generation_prompt(
         params=params,
     ...<3 lines>...
         phase_timer=phase_timer,
     )
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13896, in _prepare_generation_prompt
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14217, in _prepare_generation_prompt
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -248,8 +249,9 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 ### ✅ mlx-community/LFM2-VL-1.6B-8bit
 
 _Verdict:_ model_shortcoming | user=avoid
-_Why:_ metadata_borrowing, contract, utility:F, trusted_overlap,
-       metadata_terms, context_echo
+_Why:_ missing sections: title, description, keywords | missing terms: 10 Best
+       (structured), Abstract Art, Blue sky, Bronze Sculpture, Daylight |
+       context echo=98% | nonvisual metadata reused
 _Trusted hints:_ preserves trusted hints | nonvisual metadata reused
 _Contract:_ missing: title, description, keywords
 _Utility:_ user=avoid | preserves trusted hints | metadata borrowing | context
@@ -257,10 +259,11 @@ _Utility:_ user=avoid | preserves trusted hints | metadata borrowing | context
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=851 | text_est=501 | nontext_est=350 | gen=89 |
                     max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
+_Next action:_ Treat as a model limitation for this prompt; the requested
+               output contract is not being met.
 
-_Metrics:_ Load 0.61s | Gen 0.64s | Total 1.41s
-_Throughput:_ Prompt 9,182 TPS (851 tok) | Gen 329 TPS (89 tok)
+_Metrics:_ Load 0.62s | Gen 0.88s | Total 1.67s
+_Throughput:_ Prompt 2,393 TPS (851 tok) | Gen 327 TPS (89 tok)
 _Assessment:_ ❌ F (15/100) | Δ-63 | Mostly echoes context without adding value
 _Review Status:_ watchlist (context echo, metadata borrowing, missing
                  sections)
@@ -290,7 +293,11 @@ _Review:_ F 15/100 | Missing sections (title, description, keywords); Context
 ### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
 
 _Verdict:_ harness | user=avoid
-_Why:_ harness:prompt_template, low_hint_overlap
+_Why:_ Output is very short relative to prompt size (0.7%), suggesting
+       possible early-stop or prompt-handling issues. | nontext prompt
+       burden=69% | missing sections: title, description, keywords | missing
+       terms: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze
+       Sculpture
 _Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
                  Abstract Art, Blue sky, Bronze, Bronze Sculpture
 _Contract:_ missing: title, description, keywords
@@ -298,10 +305,11 @@ _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model-config | harness=prompt_template
 _Token accounting:_ prompt=1618 | text_est=501 | nontext_est=1117 | gen=11 |
                     max=500 | stop=completed
-_Next action:_ Inspect model repo config, chat template, and EOS settings.
+_Next action:_ Check chat-template and EOS defaults first; the output shape is
+               not matching the requested contract.
 
-_Metrics:_ Load 1.51s | Gen 1.38s | Total 3.06s
-_Throughput:_ Prompt 3,335 TPS (1,618 tok) | Gen 21.1 TPS (11 tok)
+_Metrics:_ Load 1.55s | Gen 1.37s | Total 3.10s
+_Throughput:_ Prompt 3,353 TPS (1,618 tok) | Gen 21.1 TPS (11 tok)
 _Assessment:_ ❌ F (20/100) | Δ-58 | Output lacks detail
 _Review Status:_ watchlist (context ignored, harness, missing sections)
 _Review:_ F 20/100 | ⚠️HARNESS:prompt_template; Context ignored (missing: 10
@@ -310,16 +318,16 @@ _Review:_ F 20/100 | ⚠️HARNESS:prompt_template; Context ignored (missing: 10
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> \- Do not copy the text in the field.
+> &#45; Do not copy the text in the field.
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
-- ⚠️HARNESS:prompt\_template
+- ⚠️HARNESS:prompt_template
 - Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture)
 - Missing sections (title, description, keywords)
 - Ignores trusted hints
-- output:output\_ratio(0.7%)
+- output:output_ratio(0.7%)
 
 ---
 
@@ -328,8 +336,9 @@ _Review:_ F 20/100 | ⚠️HARNESS:prompt_template; Context ignored (missing: 10
 ### ✅ mlx-community/nanoLLaVA-1.5-4bit
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, repetitive_tail, abrupt_tail, trusted_overlap,
-       metadata_terms, context_echo
+_Why:_ hit token cap (500) | output/prompt=83.89% | missing terms: 10 Best
+       (structured), Abstract Art, Blue sky, Bronze Sculpture, Daylight |
+       keyword duplication=93%
 _Trusted hints:_ preserves trusted hints | nonvisual metadata reused
 _Contract:_ keywords=183 | keyword duplication=0.93
 _Utility:_ user=avoid | preserves trusted hints | metadata borrowing | context
@@ -337,11 +346,11 @@ _Utility:_ user=avoid | preserves trusted hints | metadata borrowing | context
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=596 | text_est=501 | nontext_est=95 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Treat this as cap-limited output first; generation exhausted
+               the token budget with output/prompt=83.89%.
 
-_Metrics:_ Load 0.50s | Gen 1.81s | Total 2.48s
-_Throughput:_ Prompt 7,013 TPS (596 tok) | Gen 363 TPS (500 tok)
+_Metrics:_ Load 0.55s | Gen 1.83s | Total 2.55s
+_Throughput:_ Prompt 6,005 TPS (596 tok) | Gen 362 TPS (500 tok)
 _Assessment:_ ❌ F (24/100) | Δ-54 | Mostly echoes context without adding value
 _Review Status:_ watchlist (context echo, cutoff, metadata borrowing,
                  repetitive)
@@ -389,7 +398,7 @@ _Review:_ F 24/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "bricks,
 - Repetitive output (phrase: "bricks, bricks, bricks, bricks...")
 - Keyword count violation (183; expected 10-18)
 - Keyword duplication (93% duplicated terms)
-- Context echo (92% overlap)
+- Context echo (50% overlap)
 - Nonvisual metadata borrowing
 - Likely capped by max token budget
 
@@ -400,23 +409,22 @@ _Review:_ F 24/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "bricks,
 ### ✅ mlx-community/Ministral-3-3B-Instruct-2512-4bit
 
 _Verdict:_ clean | user=caveat
-_Why:_ low_hint_overlap
-_Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
-                 Abstract Art, Blue sky, Handrail, Objects
+_Why:_ nontext prompt burden=84% | missing terms: 10 Best (structured),
+       Abstract Art, Blue sky, Handrail, Objects
+_Trusted hints:_ improves trusted hints
 _Contract:_ title words=4
-_Utility:_ user=caveat | ignores trusted hints
+_Utility:_ user=caveat | improves trusted hints
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=3205 | text_est=501 | nontext_est=2704 | gen=97 |
                     max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
+_Next action:_ Treat as a model limitation for this prompt; trusted hint
+               coverage is still weak.
 
-_Metrics:_ Load 1.05s | Gen 1.97s | Total 3.19s
-_Throughput:_ Prompt 3,053 TPS (3,205 tok) | Gen 185 TPS (97 tok)
+_Metrics:_ Load 1.11s | Gen 2.04s | Total 3.32s
+_Throughput:_ Prompt 2,873 TPS (3,205 tok) | Gen 185 TPS (97 tok)
 _Assessment:_ 🏆 A (94/100) | Δ+16 | None identified
-_Review Status:_ watchlist (context ignored)
-_Review:_ A 94/100 | Context ignored (missing: 10 Best (structured), Abstract
-          Art, Blue sky, Handrail, Objects); Title length violation (4 words;
-          expected 5-10); ...
+_Review Status:_ strong candidate for first-pass review
+_Review:_ A 94/100 | Title length violation (4 words; expected 5-10)
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -437,46 +445,7 @@ _Review:_ A 94/100 | Context ignored (missing: 10 Best (structured), Abstract
 
 ⚠️ _Quality Warnings:_
 
-- Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Handrail, Objects)
 - Title length violation (4 words; expected 5-10)
-- Ignores trusted hints
-
----
-
-<a id="model-mlx-community-paligemma2-10b-ft-docci-448-6bit"></a>
-
-### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
-
-_Verdict:_ model_shortcoming | user=avoid
-_Why:_ contract, utility:D, low_hint_overlap
-_Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
-                 Abstract Art, Blue sky, Bronze, Bronze Sculpture
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | ignores trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=1618 | text_est=501 | nontext_est=1117 | gen=20 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
-
-_Metrics:_ Load 1.60s | Gen 2.33s | Total 4.11s
-_Throughput:_ Prompt 1,241 TPS (1,618 tok) | Gen 30.6 TPS (20 tok)
-_Assessment:_ 🟠 D (38/100) | Δ-40 | Lacks visual description of image
-_Review Status:_ watchlist (context ignored, missing sections)
-_Review:_ D 38/100 | Context ignored (missing: 10 Best (structured), Abstract
-          Art, Blue sky, Bronze, Bronze Sculpture); Missing sections (title,
-          description, keywords); ...
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> \- Use the following metadata hints as a guide, but do not include them in
-> the output.
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture)
-- Missing sections (title, description, keywords)
-- Ignores trusted hints
 
 ---
 
@@ -485,8 +454,9 @@ _Review:_ D 38/100 | Context ignored (missing: 10 Best (structured), Abstract
 ### ✅ mlx-community/FastVLM-0.5B-bf16
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, repetitive_tail, abrupt_tail,
-       low_hint_overlap
+_Why:_ hit token cap (500) | output/prompt=83.33% | missing sections: title,
+       description, keywords | missing terms: 10 Best (structured), Abstract
+       Art, Blue sky, Bronze, Bronze Sculpture
 _Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
                  Abstract Art, Blue sky, Bronze, Bronze Sculpture
 _Contract:_ missing: title, description, keywords
@@ -494,11 +464,12 @@ _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=600 | text_est=501 | nontext_est=99 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
 
-_Metrics:_ Load 0.72s | Gen 2.45s | Total 3.35s
-_Throughput:_ Prompt 4,534 TPS (600 tok) | Gen 339 TPS (500 tok)
+_Metrics:_ Load 0.80s | Gen 2.62s | Total 3.60s
+_Throughput:_ Prompt 1,748 TPS (600 tok) | Gen 342 TPS (500 tok)
 _Assessment:_ ✅ B (72/100) | Δ-6 | Missing requested structure
 _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
@@ -507,7 +478,7 @@ _Review:_ B 72/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "the image 
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> \2. The image depicts a person standing in a room with a wooden floor and a
+> 2&#46; The image depicts a person standing in a room with a wooden floor and a
 > white wall. The person is wearing a white shirt, blue jeans, and black
 > shoes. The room has a wooden floor and a white wall. The person is holding a
 > black object in their right hand. The room has a wooden floor and a white
@@ -546,23 +517,65 @@ _Review:_ B 72/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "the image 
 
 ---
 
+<a id="model-mlx-community-paligemma2-10b-ft-docci-448-6bit"></a>
+
+### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
+
+_Verdict:_ model_shortcoming | user=avoid
+_Why:_ nontext prompt burden=69% | missing sections: title, description,
+       keywords | missing terms: 10 Best (structured), Abstract Art, Blue sky,
+       Bronze, Bronze Sculpture
+_Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
+                 Abstract Art, Blue sky, Bronze, Bronze Sculpture
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | ignores trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=1618 | text_est=501 | nontext_est=1117 | gen=20 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; the requested
+               output contract is not being met.
+
+_Metrics:_ Load 1.68s | Gen 2.79s | Total 4.65s
+_Throughput:_ Prompt 914 TPS (1,618 tok) | Gen 30.9 TPS (20 tok)
+_Assessment:_ 🟠 D (38/100) | Δ-40 | Lacks visual description of image
+_Review Status:_ watchlist (context ignored, missing sections)
+_Review:_ D 38/100 | Context ignored (missing: 10 Best (structured), Abstract
+          Art, Blue sky, Bronze, Bronze Sculpture); Missing sections (title,
+          description, keywords); ...
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> &#45; Use the following metadata hints as a guide, but do not include them in
+> the output.
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture)
+- Missing sections (title, description, keywords)
+- Ignores trusted hints
+
+---
+
 <a id="model-mlx-community-lfm25-vl-16b-bf16"></a>
 
 ### ✅ mlx-community/LFM2.5-VL-1.6B-bf16
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, repetitive_tail, trusted_overlap, metadata_terms
+_Why:_ hit token cap (500) | output/prompt=75.64% | missing terms: 10 Best
+       (structured), Abstract Art, Blue sky, Handrail, Modern Art | keyword
+       duplication=89%
 _Trusted hints:_ preserves trusted hints | nonvisual metadata reused
 _Contract:_ title words=23 | keywords=106 | keyword duplication=0.89
 _Utility:_ user=avoid | preserves trusted hints | metadata borrowing
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=661 | text_est=501 | nontext_est=160 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Treat this as cap-limited output first; generation exhausted
+               the token budget with output/prompt=75.64%.
 
-_Metrics:_ Load 0.60s | Gen 2.96s | Total 3.73s
-_Throughput:_ Prompt 10,069 TPS (661 tok) | Gen 190 TPS (500 tok)
+_Metrics:_ Load 0.57s | Gen 3.09s | Total 3.83s
+_Throughput:_ Prompt 7,908 TPS (661 tok) | Gen 182 TPS (500 tok)
 _Assessment:_ 🟠 D (39/100) | Δ-39 | Mostly echoes context without adding value
 _Review Status:_ watchlist (cutoff, metadata borrowing, repetitive)
 _Review:_ D 39/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "university
@@ -571,19 +584,19 @@ _Review:_ D 39/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "university
 <!-- markdownlint-disable MD028 MD037 -->
 >
 > Title:
-> \- 1961, Hubert 'Nibs' Dalwood, Maquette for the Spirit of the University,
+> &#45; 1961, Hubert 'Nibs' Dalwood, Maquette for the Spirit of the University,
 > Bronze Sculpture, University of Reading, Whiteknights Campus, England,
 > Bronze Sculpture, Daylight, Outdoor
 >
 > Description:
-> \- A bronze sculpture titled "Maquette for the Spirit of the University" by
+> &#45; A bronze sculpture titled "Maquette for the Spirit of the University" by
 > British sculptor Hubert 'Nibs' Dalwood, created in 1961, is displayed at the
 > University of Reading's Whiteknights campus in Reading, UK. The sculpture
 > is a small-scale model intended to represent the spirit of the university
 > and is located outside the Department of Typography &amp; Graphic Communication.
 >
 > Keywords:
-> \- 1961, Hubert 'Nibs' Dalwood, Maquette for the Spirit of the University,
+> &#45; 1961, Hubert 'Nibs' Dalwood, Maquette for the Spirit of the University,
 > Bronze Sculpture, University of Reading, Whiteknights Campus, England,
 > Bronze Sculpture, Daylight, Outdoor, Sculpture, University, Bronze, Bronze
 > Sculpture, Daylight, Outdoor, University of Reading, Whiteknights Campus,
@@ -623,7 +636,11 @@ _Review:_ D 39/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "university
 ### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
 
 _Verdict:_ harness | user=avoid
-_Why:_ harness:prompt_template, low_hint_overlap
+_Why:_ Output is very short relative to prompt size (0.4%), suggesting
+       possible early-stop or prompt-handling issues. | nontext prompt
+       burden=82% | missing sections: title, description, keywords | missing
+       terms: 10 Best (structured), Abstract Art, Blue sky, Bronze Sculpture,
+       Daylight
 _Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
                  Abstract Art, Blue sky, Bronze Sculpture, Daylight
 _Contract:_ missing: title, description, keywords
@@ -631,10 +648,11 @@ _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model-config | harness=prompt_template
 _Token accounting:_ prompt=2830 | text_est=501 | nontext_est=2329 | gen=10 |
                     max=500 | stop=completed
-_Next action:_ Inspect model repo config, chat template, and EOS settings.
+_Next action:_ Check chat-template and EOS defaults first; the output shape is
+               not matching the requested contract.
 
-_Metrics:_ Load 1.05s | Gen 2.96s | Total 4.18s
-_Throughput:_ Prompt 1,221 TPS (2,830 tok) | Gen 67.3 TPS (10 tok)
+_Metrics:_ Load 1.10s | Gen 3.26s | Total 4.54s
+_Throughput:_ Prompt 1,083 TPS (2,830 tok) | Gen 67.5 TPS (10 tok)
 _Assessment:_ ❌ F (10/100) | Δ-68 | Output lacks detail
 _Review Status:_ watchlist (context ignored, harness, missing sections)
 _Review:_ F 10/100 | ⚠️HARNESS:prompt_template; Context ignored (missing: 10
@@ -648,11 +666,11 @@ _Review:_ F 10/100 | ⚠️HARNESS:prompt_template; Context ignored (missing: 10
 
 ⚠️ _Quality Warnings:_
 
-- ⚠️HARNESS:prompt\_template
+- ⚠️HARNESS:prompt_template
 - Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze Sculpture, Daylight)
 - Missing sections (title, description, keywords)
 - Ignores trusted hints
-- output:output\_ratio(0.4%)
+- output:output_ratio(0.4%)
 
 ---
 
@@ -661,7 +679,10 @@ _Review:_ F 10/100 | ⚠️HARNESS:prompt_template; Context ignored (missing: 10
 ### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
 
 _Verdict:_ harness | user=avoid
-_Why:_ harness:prompt_template, low_hint_overlap
+_Why:_ Output is very short relative to prompt size (0.6%), suggesting
+       possible early-stop or prompt-handling issues. | nontext prompt
+       burden=69% | missing terms: 10 Best (structured), Abstract Art, Blue
+       sky, Bronze, Bronze Sculpture
 _Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
                  Abstract Art, Blue sky, Bronze, Bronze Sculpture
 _Contract:_ ok
@@ -671,8 +692,8 @@ _Token accounting:_ prompt=1618 | text_est=501 | nontext_est=1117 | gen=9 |
                     max=500 | stop=completed
 _Next action:_ Inspect model repo config, chat template, and EOS settings.
 
-_Metrics:_ Load 2.46s | Gen 3.36s | Total 5.99s
-_Throughput:_ Prompt 1,125 TPS (1,618 tok) | Gen 5.83 TPS (9 tok)
+_Metrics:_ Load 2.43s | Gen 3.66s | Total 6.27s
+_Throughput:_ Prompt 926 TPS (1,618 tok) | Gen 5.83 TPS (9 tok)
 _Assessment:_ ❌ F (17/100) | Δ-61 | Output lacks detail
 _Review Status:_ watchlist (context ignored, harness)
 _Review:_ F 17/100 | ⚠️HARNESS:prompt_template; Context ignored (missing: 10
@@ -681,15 +702,58 @@ _Review:_ F 17/100 | ⚠️HARNESS:prompt_template; Context ignored (missing: 10
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> \- The image is in the daytime.
+> &#45; The image is in the daytime.
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
-- ⚠️HARNESS:prompt\_template
+- ⚠️HARNESS:prompt_template
 - Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture)
 - Ignores trusted hints
-- output:output\_ratio(0.6%)
+- output:output_ratio(0.6%)
+
+---
+
+<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
+
+### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
+
+_Verdict:_ clean | user=recommended
+_Why:_ nontext prompt burden=84% | missing terms: 10 Best (structured),
+       Abstract Art, Blue sky, Handrail, Objects
+_Trusted hints:_ improves trusted hints
+_Contract:_ ok
+_Utility:_ user=recommended | improves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=3206 | text_est=501 | nontext_est=2705 | gen=97 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; trusted hint
+               coverage is still weak.
+
+_Metrics:_ Load 1.46s | Gen 4.24s | Total 5.87s
+_Throughput:_ Prompt 1,384 TPS (3,206 tok) | Gen 63.2 TPS (97 tok)
+_Assessment:_ 🏆 A (90/100) | Δ+13 | None identified
+_Review Status:_ strong candidate for first-pass review
+_Review:_ A 90/100 | No quality issues detected
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> **Title:**
+> *Bronze Sculpture on Stone Pedestal Near Brick Building*
+>
+> **Description:**
+> A small bronze abstract sculpture, featuring stacked and irregular geometric
+> forms, sits atop a rectangular stone pedestal. The sculpture is positioned
+> outdoors beside a brick building, with blurred greenery and daylight in the
+> background.
+>
+> **Keywords:**
+> Bronze, Abstract sculpture, Stone pedestal, Brick building, Outdoor setting,
+> Geometric forms, Daylight, Textured surface, University campus, Modern art,
+> Concrete base
+<!-- markdownlint-enable MD028 MD037 -->
+
+_Quality Status:_ no quality issues detected in this run
 
 ---
 
@@ -698,7 +762,8 @@ _Review:_ F 17/100 | ⚠️HARNESS:prompt_template; Context ignored (missing: 10
 ### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
 
 _Verdict:_ clean | user=caveat
-_Why:_ low_hint_overlap
+_Why:_ nontext prompt burden=84% | missing terms: 10 Best (structured),
+       Abstract Art, Blue sky, Bronze Sculpture, Handrail
 _Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
                  Abstract Art, Blue sky, Bronze Sculpture, Handrail
 _Contract:_ ok
@@ -706,10 +771,11 @@ _Utility:_ user=caveat | ignores trusted hints
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=3206 | text_est=501 | nontext_est=2705 | gen=100 |
                     max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
+_Next action:_ Treat as a model limitation for this prompt; trusted hint
+               coverage is still weak.
 
-_Metrics:_ Load 1.48s | Gen 4.21s | Total 5.86s
-_Throughput:_ Prompt 1,387 TPS (3,206 tok) | Gen 66.6 TPS (100 tok)
+_Metrics:_ Load 1.50s | Gen 4.25s | Total 5.93s
+_Throughput:_ Prompt 1,370 TPS (3,206 tok) | Gen 66.3 TPS (100 tok)
 _Assessment:_ 🏆 A (93/100) | Δ+15 | None identified
 _Review Status:_ watchlist (context ignored)
 _Review:_ A 93/100 | Context ignored (missing: 10 Best (structured), Abstract
@@ -740,95 +806,13 @@ _Review:_ A 93/100 | Context ignored (missing: 10 Best (structured), Abstract
 
 ---
 
-<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
-
-### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
-
-_Verdict:_ clean | user=recommended
-_Why:_ utility_delta_positive
-_Trusted hints:_ improves trusted hints
-_Contract:_ ok
-_Utility:_ user=recommended | improves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=3206 | text_est=501 | nontext_est=2705 | gen=97 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
-
-_Metrics:_ Load 1.49s | Gen 4.24s | Total 5.90s
-_Throughput:_ Prompt 1,385 TPS (3,206 tok) | Gen 63.1 TPS (97 tok)
-_Assessment:_ 🏆 A (90/100) | Δ+13 | None identified
-_Review Status:_ strong candidate for first-pass review
-_Review:_ A 90/100 | No quality issues detected
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> \*\*Title:\*\*
-> \*Bronze Sculpture on Stone Pedestal Near Brick Building\*
->
-> \*\*Description:\*\*
-> A small bronze abstract sculpture, featuring stacked and irregular geometric
-> forms, sits atop a rectangular stone pedestal. The sculpture is positioned
-> outdoors beside a brick building, with blurred greenery and daylight in the
-> background.
->
-> \*\*Keywords:\*\*
-> Bronze, Abstract sculpture, Stone pedestal, Brick building, Outdoor setting,
-> Geometric forms, Daylight, Textured surface, University campus, Modern art,
-> Concrete base
-<!-- markdownlint-enable MD028 MD037 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
-
-### ✅ mlx-community/gemma-3-27b-it-qat-4bit
-
-_Verdict:_ clean | user=avoid
-_Why:_ utility_delta_negative
-_Trusted hints:_ degrades trusted hints
-_Contract:_ ok
-_Utility:_ user=avoid | degrades trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=863 | text_est=501 | nontext_est=362 | gen=87 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
-
-_Metrics:_ Load 2.39s | Gen 4.42s | Total 6.98s
-_Throughput:_ Prompt 659 TPS (863 tok) | Gen 31.2 TPS (87 tok)
-_Assessment:_ ✅ B (68/100) | Δ-10 | Mostly echoes context without adding value
-_Review Status:_ watchlist (trusted hint degraded)
-_Review:_ B 68/100 | No quality issues detected
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Title:
-> Bronze sculpture on stone plinth, university campus exterior
->
-> Description:
-> A small bronze sculpture stands on a textured stone plinth outdoors.
-> Daylight illuminates the sculpture and surrounding building facade, with a
-> blue sky visible in the background.
->
-> Keywords:
-> Abstract art, bronze, bronze sculpture, daylight, exterior, sculpture,
-> stone, textured, university campus, building facade, plinth, blue sky,
-> stairs, handrail
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- Degrades trusted hints
-
----
-
 <a id="model-mlx-community-internvl3-14b-8bit"></a>
 
 ### ✅ mlx-community/InternVL3-14B-8bit
 
 _Verdict:_ clean | user=caveat
-_Why:_ low_hint_overlap
+_Why:_ nontext prompt burden=79% | missing terms: 10 Best (structured),
+       Abstract Art, Blue sky, Bronze, Bronze Sculpture
 _Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
                  Abstract Art, Blue sky, Bronze, Bronze Sculpture
 _Contract:_ title words=2
@@ -836,10 +820,11 @@ _Utility:_ user=caveat | ignores trusted hints
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=2379 | text_est=501 | nontext_est=1878 | gen=71 |
                     max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
+_Next action:_ Treat as a model limitation for this prompt; trusted hint
+               coverage is still weak.
 
-_Metrics:_ Load 1.95s | Gen 4.48s | Total 6.60s
-_Throughput:_ Prompt 1,262 TPS (2,379 tok) | Gen 32.5 TPS (71 tok)
+_Metrics:_ Load 1.92s | Gen 4.47s | Total 6.55s
+_Throughput:_ Prompt 1,277 TPS (2,379 tok) | Gen 32.3 TPS (71 tok)
 _Assessment:_ 🏆 A (95/100) | Δ+17 | None identified
 _Review Status:_ watchlist (context ignored)
 _Review:_ A 95/100 | Context ignored (missing: 10 Best (structured), Abstract
@@ -868,12 +853,58 @@ _Review:_ A 95/100 | Context ignored (missing: 10 Best (structured), Abstract
 
 ---
 
+<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
+
+### ✅ mlx-community/gemma-3-27b-it-qat-4bit
+
+_Verdict:_ clean | user=avoid
+_Why:_ missing terms: 10 Best (structured), Modern Art, Objects, Royston,
+       Statue
+_Trusted hints:_ degrades trusted hints
+_Contract:_ ok
+_Utility:_ user=avoid | degrades trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=863 | text_est=501 | nontext_est=362 | gen=87 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; trusted hint
+               coverage is still weak.
+
+_Metrics:_ Load 2.42s | Gen 4.49s | Total 7.09s
+_Throughput:_ Prompt 621 TPS (863 tok) | Gen 31.2 TPS (87 tok)
+_Assessment:_ ✅ B (68/100) | Δ-10 | Mostly echoes context without adding value
+_Review Status:_ watchlist (trusted hint degraded)
+_Review:_ B 68/100 | No quality issues detected
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> Title:
+> Bronze sculpture on stone plinth, university campus exterior
+>
+> Description:
+> A small bronze sculpture stands on a textured stone plinth outdoors.
+> Daylight illuminates the sculpture and surrounding building facade, with a
+> blue sky visible in the background.
+>
+> Keywords:
+> Abstract art, bronze, bronze sculpture, daylight, exterior, sculpture,
+> stone, textured, university campus, building facade, plinth, blue sky,
+> stairs, handrail
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- Degrades trusted hints
+
+---
+
 <a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
 
 ### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, low_hint_overlap
+_Why:_ hit token cap (500) | output/prompt=70.62% | missing sections: title,
+       description, keywords | missing terms: 10 Best (structured), Abstract
+       Art, Blue sky, Bronze, Bronze Sculpture
 _Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
                  Abstract Art, Blue sky, Bronze, Bronze Sculpture
 _Contract:_ missing: title, description, keywords
@@ -881,11 +912,12 @@ _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=708 | text_est=501 | nontext_est=207 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
 
-_Metrics:_ Load 0.71s | Gen 4.65s | Total 5.53s
-_Throughput:_ Prompt 2,077 TPS (708 tok) | Gen 131 TPS (500 tok)
+_Metrics:_ Load 0.71s | Gen 4.66s | Total 5.54s
+_Throughput:_ Prompt 2,071 TPS (708 tok) | Gen 130 TPS (500 tok)
 _Assessment:_ ❌ F (0/100) | Δ-78 | Output too short to be useful
 _Review Status:_ watchlist (context ignored, cutoff, missing sections)
 _Review:_ F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
@@ -903,7 +935,103 @@ _Review:_ F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 - Ignores trusted hints
-- Unknown tags: <row\_1\_col\_1>
+- Unknown tags: <row_1_col_1>
+
+---
+
+<a id="model-mlx-community-smolvlm-instruct-bf16"></a>
+
+### ✅ mlx-community/SmolVLM-Instruct-bf16
+
+_Verdict:_ cutoff | user=avoid
+_Why:_ hit token cap (500) | output/prompt=27.65% | nontext prompt burden=72%
+       | missing sections: title, description, keywords
+_Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
+                 Abstract Art, Blue sky, Bronze, Bronze Sculpture
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | ignores trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=1808 | text_est=501 | nontext_est=1307 | gen=500 |
+                    max=500 | stop=completed
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
+
+_Metrics:_ Load 0.73s | Gen 4.93s | Total 5.82s
+_Throughput:_ Prompt 4,287 TPS (1,808 tok) | Gen 124 TPS (500 tok)
+_Assessment:_ 🟡 C (50/100) | Δ-28 | Lacks visual description of image
+_Review Status:_ watchlist (context ignored, cutoff, missing sections,
+                 repetitive)
+_Review:_ C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "treasured
+          treasured treasured ..."); ...
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured unt unt unt unt
+> unt unt unt unt unt unt unt treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured unt unt unt unt
+> unt unt unt treasured treasured treasured treasured treasured treasured
+> treasured treasured unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt treasured treasured treasured treasured treasured treasured
+> treasured treasured unt unt unt unt unt treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured unt unt unt unt unt unt unt treasured treasured unt unt
+> unt unt unt unt unt unt unt treasured treasured treasured unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:cutoff
+- Repetitive output (phrase: "treasured treasured treasured ...")
+- Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
 
 ---
 
@@ -912,17 +1040,19 @@ _Review:_ F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
 ### ✅ mlx-community/pixtral-12b-8bit
 
 _Verdict:_ clean | user=avoid
-_Why:_ utility_delta_negative
+_Why:_ nontext prompt burden=85% | missing terms: 10 Best (structured),
+       Abstract Art, Modern Art, Objects, Royston
 _Trusted hints:_ degrades trusted hints
 _Contract:_ description sentences=3
 _Utility:_ user=avoid | degrades trusted hints
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=3399 | text_est=501 | nontext_est=2898 | gen=95 |
                     max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
+_Next action:_ Treat as a model limitation for this prompt; trusted hint
+               coverage is still weak.
 
-_Metrics:_ Load 1.83s | Gen 4.77s | Total 6.77s
-_Throughput:_ Prompt 1,715 TPS (3,399 tok) | Gen 39.2 TPS (95 tok)
+_Metrics:_ Load 1.78s | Gen 5.14s | Total 7.11s
+_Throughput:_ Prompt 1,451 TPS (3,399 tok) | Gen 39.2 TPS (95 tok)
 _Assessment:_ ✅ B (69/100) | Δ-9 | Mostly echoes context without adding value
 _Review Status:_ watchlist (trusted hint degraded)
 _Review:_ B 69/100 | Description sentence violation (3; expected 1-2);
@@ -950,108 +1080,14 @@ _Review:_ B 69/100 | Description sentence violation (3; expected 1-2);
 
 ---
 
-<a id="model-mlx-community-smolvlm-instruct-bf16"></a>
-
-### ✅ mlx-community/SmolVLM-Instruct-bf16
-
-_Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, repetitive_tail, abrupt_tail,
-       low_hint_overlap
-_Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
-                 Abstract Art, Blue sky, Bronze, Bronze Sculpture
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | ignores trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=1808 | text_est=501 | nontext_est=1307 | gen=500 |
-                    max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
-
-_Metrics:_ Load 0.74s | Gen 4.92s | Total 5.83s
-_Throughput:_ Prompt 4,277 TPS (1,808 tok) | Gen 125 TPS (500 tok)
-_Assessment:_ 🟡 C (50/100) | Δ-28 | Lacks visual description of image
-_Review Status:_ watchlist (context ignored, cutoff, missing sections,
-                 repetitive)
-_Review:_ C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "treasured
-          treasured treasured ..."); ...
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured unt unt unt unt
-> unt unt unt unt unt unt unt treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured unt unt unt unt
-> unt unt unt treasured treasured treasured treasured treasured treasured
-> treasured treasured unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt treasured treasured treasured treasured treasured treasured
-> treasured treasured unt unt unt unt unt treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured unt unt unt unt unt unt unt treasured treasured unt unt
-> unt unt unt unt unt unt unt treasured treasured treasured unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:cutoff
-- Repetitive output (phrase: "treasured treasured treasured ...")
-- Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
-
----
-
 <a id="model-mlx-community-gemma-3n-e2b-4bit"></a>
 
 ### ✅ mlx-community/gemma-3n-E2B-4bit
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, repetitive_tail, abrupt_tail,
-       low_hint_overlap, metadata_terms
+_Why:_ hit token cap (500) | output/prompt=58.55% | missing sections: title,
+       description, keywords | missing terms: 10 Best (structured), Abstract
+       Art, Blue sky, Bronze, Bronze Sculpture
 _Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
                  Abstract Art, Blue sky, Bronze, Bronze Sculpture | nonvisual
                  metadata reused
@@ -1060,11 +1096,12 @@ _Utility:_ user=avoid | ignores trusted hints | metadata borrowing
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=854 | text_est=501 | nontext_est=353 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
 
-_Metrics:_ Load 1.49s | Gen 4.92s | Total 6.60s
-_Throughput:_ Prompt 1,594 TPS (854 tok) | Gen 123 TPS (500 tok)
+_Metrics:_ Load 1.53s | Gen 5.69s | Total 7.41s
+_Throughput:_ Prompt 637 TPS (854 tok) | Gen 124 TPS (500 tok)
 _Assessment:_ 🟠 D (45/100) | Δ-33 | Lacks visual description of image
 _Review Status:_ watchlist (context ignored, cutoff, metadata borrowing,
                  missing sections, repetitive)
@@ -1073,7 +1110,7 @@ _Review:_ D 45/100 | ⚠️REVIEW:cutoff; Repetitive output (15:52:29.); ...
 <!-- markdownlint-disable MD028 MD037 -->
 >
 >
-> \- 1255650.758450. 15:52:29. 15:52:29. 15:52:29. 15:52:29. 15:52:29.
+> &#45; 1255650.758450. 15:52:29. 15:52:29. 15:52:29. 15:52:29. 15:52:29.
 > 15:52:29. 15:52:29. 15:52:29. 15:52:29. 15:52:29. 15:52:29. 15:52:29.
 > 15:52:29. 15:52:29. 15:52:29. 15:52:29. 15:52:29. 15:52:29. 15:52:29.
 > 15:52:29. 15:52:29. 15:52:29. 15:52:29. 15:52:29. 15:52:29. 15:52:29.
@@ -1095,108 +1132,13 @@ _Review:_ D 45/100 | ⚠️REVIEW:cutoff; Repetitive output (15:52:29.); ...
 
 ---
 
-<a id="model-huggingfacetb-smolvlm-instruct"></a>
-
-### ✅ HuggingFaceTB/SmolVLM-Instruct
-
-_Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, repetitive_tail, abrupt_tail,
-       low_hint_overlap
-_Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
-                 Abstract Art, Blue sky, Bronze, Bronze Sculpture
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | ignores trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=1808 | text_est=501 | nontext_est=1307 | gen=500 |
-                    max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
-
-_Metrics:_ Load 0.77s | Gen 5.10s | Total 6.03s
-_Throughput:_ Prompt 2,851 TPS (1,808 tok) | Gen 125 TPS (500 tok)
-_Assessment:_ 🟡 C (50/100) | Δ-28 | Lacks visual description of image
-_Review Status:_ watchlist (context ignored, cutoff, missing sections,
-                 repetitive)
-_Review:_ C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "treasured
-          treasured treasured ..."); ...
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured unt unt unt unt
-> unt unt unt unt unt unt unt treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured unt unt unt unt
-> unt unt unt treasured treasured treasured treasured treasured treasured
-> treasured treasured unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt treasured treasured treasured treasured treasured treasured
-> treasured treasured unt unt unt unt unt treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured unt unt unt unt unt unt unt treasured treasured unt unt
-> unt unt unt unt unt unt unt treasured treasured treasured unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:cutoff
-- Repetitive output (phrase: "treasured treasured treasured ...")
-- Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
-
----
-
 <a id="model-jqlive-kimi-vl-a3b-thinking-2506-6bit"></a>
 
 ### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, abrupt_tail, low_hint_overlap,
-       degeneration
+_Why:_ hit token cap (500) | output/prompt=31.57% | nontext prompt burden=68%
+       | missing sections: title, description, keywords
 _Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
                  Abstract Art, Blue sky, Bronze, Bronze Sculpture
 _Contract:_ missing: title, description, keywords
@@ -1204,11 +1146,12 @@ _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=1584 | text_est=501 | nontext_est=1083 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
 
-_Metrics:_ Load 2.10s | Gen 5.34s | Total 7.61s
-_Throughput:_ Prompt 1,705 TPS (1,584 tok) | Gen 126 TPS (500 tok)
+_Metrics:_ Load 2.10s | Gen 5.95s | Total 8.25s
+_Throughput:_ Prompt 980 TPS (1,584 tok) | Gen 127 TPS (500 tok)
 _Assessment:_ ❌ F (0/100) | Δ-78 | Output too short to be useful
 _Review Status:_ watchlist (context ignored, cutoff, degeneration, missing
                  sections)
@@ -1224,78 +1167,7 @@ _Review:_ F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
 
 - ⚠️REVIEW:cutoff
 - Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture)
-- Output degeneration (character\_loop: '本题' repeated)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
-
----
-
-<a id="model-mlx-community-kimi-vl-a3b-thinking-8bit"></a>
-
-### ✅ mlx-community/Kimi-VL-A3B-Thinking-8bit
-
-_Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, repetitive_tail, abrupt_tail,
-       low_hint_overlap
-_Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
-                 Abstract Art, Blue sky, Bronze, Bronze Sculpture
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | ignores trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=1584 | text_est=501 | nontext_est=1083 | gen=500 |
-                    max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
-
-_Metrics:_ Load 2.25s | Gen 5.75s | Total 8.17s
-_Throughput:_ Prompt 1,670 TPS (1,584 tok) | Gen 115 TPS (500 tok)
-_Assessment:_ 🟡 C (50/100) | Δ-28 | Lacks visual description of image
-_Review Status:_ watchlist (context ignored, cutoff, missing sections,
-                 repetitive)
-_Review:_ C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "these
-          details to create..."); ...
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> .- Use these details to create a catalog. .Use these details to create a
-> catalog. .Use these details to create a catalog. .Use these details to
-> create a catalog. .Use these details to create a catalog. .Use these details
-> to create a catalog. .Use these details to create a catalog. .Use these
-> details to create a catalog. .Use these details to create a catalog. .Use
-> these details to create a catalog. .Use these details to create a catalog.
-> .Use these details to create a catalog. .Use these details to create a
-> catalog. .Use these details to create a catalog. .Use these details to
-> create a catalog. .Use these details to create a catalog. .Use these details
-> to create a catalog. .Use these details to create a catalog. .Use these
-> details to create a catalog. .Use these details to create a catalog. .Use
-> these details to create a catalog. .Use these details to create a catalog.
-> .Use these details to create a catalog. .Use these details to create a
-> catalog. .Use these details to create a catalog. .Use these details to
-> create a catalog. .Use these details to create a catalog. .Use these details
-> to create a catalog. .Use these details to create a catalog. .Use these
-> details to create a catalog. .Use these details to create a catalog. .Use
-> these details to create a catalog. .Use these details to create a catalog.
-> .Use these details to create a catalog. .Use these details to create a
-> catalog. .Use these details to create a catalog. .Use these details to
-> create a catalog. .Use these details to create a catalog. .Use these details
-> to create a catalog. .Use these details to create a catalog. .Use these
-> details to create a catalog. .Use these details to create a catalog. .Use
-> these details to create a catalog. .Use these details to create a catalog.
-> .Use these details to create a catalog. .Use these details to create a
-> catalog. .Use these details to create a catalog. .Use these details to
-> create a catalog. .Use these details to create a catalog. .Use these details
-> to create a catalog. .Use these details to create a catalog. .Use these
-> details to create a catalog. .Use these details to create a catalog. .Use
-> these details to create a catalog. .Use these details to create a catalog.
-> .Use these details
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:cutoff
-- Repetitive output (phrase: "these details to create...")
-- Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture)
+- Output degeneration (character_loop: '本题' repeated)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 - Ignores trusted hints
@@ -1307,8 +1179,9 @@ _Review:_ C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "these
 ### ✅ qnguyen3/nanoLLaVA
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, repetitive_tail, abrupt_tail,
-       low_hint_overlap
+_Why:_ hit token cap (500) | output/prompt=83.89% | missing sections: title,
+       description, keywords | missing terms: 10 Best (structured), Abstract
+       Art, Blue sky, Bronze, Bronze Sculpture
 _Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
                  Abstract Art, Blue sky, Bronze, Bronze Sculpture
 _Contract:_ missing: title, description, keywords
@@ -1316,11 +1189,12 @@ _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=596 | text_est=501 | nontext_est=95 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
 
-_Metrics:_ Load 0.64s | Gen 6.22s | Total 7.03s
-_Throughput:_ Prompt 6,502 TPS (596 tok) | Gen 112 TPS (500 tok)
+_Metrics:_ Load 0.65s | Gen 6.21s | Total 7.02s
+_Throughput:_ Prompt 6,500 TPS (596 tok) | Gen 112 TPS (500 tok)
 _Assessment:_ 🟡 C (60/100) | Δ-18 | Lacks visual description of image
 _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
@@ -1374,40 +1248,171 @@ _Review:_ C 60/100 | ⚠️REVIEW:cutoff; Repetitive output (Neon); ...
 
 ---
 
-<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
+<a id="model-huggingfacetb-smolvlm-instruct"></a>
 
-### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+### ✅ HuggingFaceTB/SmolVLM-Instruct
 
-_Verdict:_ harness | user=avoid
-_Why:_ harness:encoding, utility_delta_negative
-_Trusted hints:_ degrades trusted hints
-_Contract:_ missing: description, keywords | title words=48
-_Utility:_ user=avoid | degrades trusted hints
-_Stack / owner:_ owner=mlx-vlm | harness=encoding
-_Token accounting:_ prompt=2709 | text_est=501 | nontext_est=2208 | gen=75 |
+_Verdict:_ cutoff | user=avoid
+_Why:_ hit token cap (500) | output/prompt=27.65% | nontext prompt burden=72%
+       | missing sections: title, description, keywords
+_Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
+                 Abstract Art, Blue sky, Bronze, Bronze Sculpture
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | ignores trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=1808 | text_est=501 | nontext_est=1307 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Inspect prompt-template, stop-token, and decode post-processing
-               behavior.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
 
-_Metrics:_ Load 2.18s | Gen 6.51s | Total 8.87s
-_Throughput:_ Prompt 727 TPS (2,709 tok) | Gen 31.6 TPS (75 tok)
-_Assessment:_ ❌ F (7/100) | Δ-71 | Output too short to be useful
-_Review Status:_ watchlist (harness, missing sections, trusted hint degraded)
-_Review:_ F 7/100 | ⚠️HARNESS:encoding; Missing sections (description,
-          keywords); ...
+_Metrics:_ Load 0.84s | Gen 6.32s | Total 7.32s
+_Throughput:_ Prompt 918 TPS (1,808 tok) | Gen 128 TPS (500 tok)
+_Assessment:_ 🟡 C (50/100) | Δ-28 | Lacks visual description of image
+_Review Status:_ watchlist (context ignored, cutoff, missing sections,
+                 repetitive)
+_Review:_ C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "treasured
+          treasured treasured ..."); ...
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> Title:ĠBronzeĠSculptureĠonĠPedestalĊĊDescription:ĠAĠbronzeĠabstractĠsculptureĠstandsĠonĠaĠstoneĠpedestalĠbesideĠaĠbrickĠbuilding.ĠTheĠsculptureĠfeaturesĠangular,ĠtexturedĠformsĠunderĠaĠclearĠblueĠsky.ĊĊKeywords:Ġbronze,Ġsculpture,Ġabstract,Ġpedestal,Ġstone,Ġbrick,Ġbuilding,ĠblueĠsky,Ġdaylight,Ġoutdoor,Ġtextured,ĠmodernĠart,ĠangularĠforms,Ġcampus,Ġuniversity
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured unt unt unt unt
+> unt unt unt unt unt unt unt treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured unt unt unt unt
+> unt unt unt treasured treasured treasured treasured treasured treasured
+> treasured treasured unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt treasured treasured treasured treasured treasured treasured
+> treasured treasured unt unt unt unt unt treasured treasured treasured
+> treasured treasured treasured treasured treasured treasured treasured
+> treasured treasured unt unt unt unt unt unt unt treasured treasured unt unt
+> unt unt unt unt unt unt unt treasured treasured treasured unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
-- ⚠️HARNESS:encoding
-- Missing sections (description, keywords)
-- Title length violation (48 words; expected 5-10)
-- Degrades trusted hints
-- token\_encoding:bpe\_space\_leak(46)
+- ⚠️REVIEW:cutoff
+- Repetitive output (phrase: "treasured treasured treasured ...")
+- Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
+
+---
+
+<a id="model-mlx-community-kimi-vl-a3b-thinking-8bit"></a>
+
+### ✅ mlx-community/Kimi-VL-A3B-Thinking-8bit
+
+_Verdict:_ cutoff | user=avoid
+_Why:_ hit token cap (500) | output/prompt=31.57% | nontext prompt burden=68%
+       | missing sections: title, description, keywords
+_Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
+                 Abstract Art, Blue sky, Bronze, Bronze Sculpture
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | ignores trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=1584 | text_est=501 | nontext_est=1083 | gen=500 |
+                    max=500 | stop=completed
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
+
+_Metrics:_ Load 2.26s | Gen 6.44s | Total 8.87s
+_Throughput:_ Prompt 992 TPS (1,584 tok) | Gen 113 TPS (500 tok)
+_Assessment:_ 🟡 C (50/100) | Δ-28 | Lacks visual description of image
+_Review Status:_ watchlist (context ignored, cutoff, missing sections,
+                 repetitive)
+_Review:_ C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "these
+          details to create..."); ...
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> .- Use these details to create a catalog. .Use these details to create a
+> catalog. .Use these details to create a catalog. .Use these details to
+> create a catalog. .Use these details to create a catalog. .Use these details
+> to create a catalog. .Use these details to create a catalog. .Use these
+> details to create a catalog. .Use these details to create a catalog. .Use
+> these details to create a catalog. .Use these details to create a catalog.
+> .Use these details to create a catalog. .Use these details to create a
+> catalog. .Use these details to create a catalog. .Use these details to
+> create a catalog. .Use these details to create a catalog. .Use these details
+> to create a catalog. .Use these details to create a catalog. .Use these
+> details to create a catalog. .Use these details to create a catalog. .Use
+> these details to create a catalog. .Use these details to create a catalog.
+> .Use these details to create a catalog. .Use these details to create a
+> catalog. .Use these details to create a catalog. .Use these details to
+> create a catalog. .Use these details to create a catalog. .Use these details
+> to create a catalog. .Use these details to create a catalog. .Use these
+> details to create a catalog. .Use these details to create a catalog. .Use
+> these details to create a catalog. .Use these details to create a catalog.
+> .Use these details to create a catalog. .Use these details to create a
+> catalog. .Use these details to create a catalog. .Use these details to
+> create a catalog. .Use these details to create a catalog. .Use these details
+> to create a catalog. .Use these details to create a catalog. .Use these
+> details to create a catalog. .Use these details to create a catalog. .Use
+> these details to create a catalog. .Use these details to create a catalog.
+> .Use these details to create a catalog. .Use these details to create a
+> catalog. .Use these details to create a catalog. .Use these details to
+> create a catalog. .Use these details to create a catalog. .Use these details
+> to create a catalog. .Use these details to create a catalog. .Use these
+> details to create a catalog. .Use these details to create a catalog. .Use
+> these details to create a catalog. .Use these details to create a catalog.
+> .Use these details
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:cutoff
+- Repetitive output (phrase: "these details to create...")
+- Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
 
 ---
 
@@ -1416,22 +1421,22 @@ _Review:_ F 7/100 | ⚠️HARNESS:encoding; Missing sections (description,
 ### ✅ mlx-community/gemma-3-27b-it-qat-8bit
 
 _Verdict:_ clean | user=avoid
-_Why:_ utility_delta_negative
-_Trusted hints:_ degrades trusted hints | missing terms: 10 Best (structured),
-                 Abstract Art, Blue sky, Modern Art, Objects
+_Why:_ missing terms: 10 Best (structured), Abstract Art, Blue sky, Modern
+       Art, Objects
+_Trusted hints:_ degrades trusted hints
 _Contract:_ ok
 _Utility:_ user=avoid | degrades trusted hints
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=863 | text_est=501 | nontext_est=362 | gen=82 |
                     max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
+_Next action:_ Treat as a model limitation for this prompt; trusted hint
+               coverage is still weak.
 
-_Metrics:_ Load 3.44s | Gen 6.52s | Total 10.15s
-_Throughput:_ Prompt 548 TPS (863 tok) | Gen 17.7 TPS (82 tok)
+_Metrics:_ Load 3.65s | Gen 6.62s | Total 10.44s
+_Throughput:_ Prompt 512 TPS (863 tok) | Gen 17.8 TPS (82 tok)
 _Assessment:_ ✅ B (69/100) | Δ-9 | Mostly echoes context without adding value
-_Review Status:_ watchlist (context ignored, trusted hint degraded)
-_Review:_ B 69/100 | Context ignored (missing: 10 Best (structured), Abstract
-          Art, Blue sky, Modern Art, Objects); Degrades trusted hints
+_Review Status:_ watchlist (trusted hint degraded)
+_Review:_ B 69/100 | No quality issues detected
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -1451,8 +1456,47 @@ _Review:_ B 69/100 | Context ignored (missing: 10 Best (structured), Abstract
 
 ⚠️ _Quality Warnings:_
 
-- Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Modern Art, Objects)
 - Degrades trusted hints
+
+---
+
+<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
+
+### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+
+_Verdict:_ harness | user=avoid
+_Why:_ Tokenizer space-marker artifacts (for example Ġ) appeared in output
+       (about 46 occurrences). | nontext prompt burden=82% | missing sections:
+       description, keywords | missing terms: 10 Best (structured), Abstract
+       Art, Handrail, Objects, Royston
+_Trusted hints:_ degrades trusted hints
+_Contract:_ missing: description, keywords | title words=48
+_Utility:_ user=avoid | degrades trusted hints
+_Stack / owner:_ owner=mlx-vlm | harness=encoding
+_Token accounting:_ prompt=2709 | text_est=501 | nontext_est=2208 | gen=75 |
+                    max=500 | stop=completed
+_Next action:_ Inspect decode cleanup; tokenizer markers are leaking into
+               user-facing text.
+
+_Metrics:_ Load 2.20s | Gen 6.81s | Total 9.20s
+_Throughput:_ Prompt 676 TPS (2,709 tok) | Gen 31.4 TPS (75 tok)
+_Assessment:_ ❌ F (7/100) | Δ-71 | Output too short to be useful
+_Review Status:_ watchlist (harness, missing sections, trusted hint degraded)
+_Review:_ F 7/100 | ⚠️HARNESS:encoding; Missing sections (description,
+          keywords); ...
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> Title:ĠBronzeĠSculptureĠonĠPedestalĊĊDescription:ĠAĠbronzeĠabstractĠsculptureĠstandsĠonĠaĠstoneĠpedestalĠbesideĠaĠbrickĠbuilding.ĠTheĠsculptureĠfeaturesĠangular,ĠtexturedĠformsĠunderĠaĠclearĠblueĠsky.ĊĊKeywords:Ġbronze,Ġsculpture,Ġabstract,Ġpedestal,Ġstone,Ġbrick,Ġbuilding,ĠblueĠsky,Ġdaylight,Ġoutdoor,Ġtextured,ĠmodernĠart,ĠangularĠforms,Ġcampus,Ġuniversity
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️HARNESS:encoding
+- Missing sections (description, keywords)
+- Title length violation (48 words; expected 5-10)
+- Degrades trusted hints
+- token_encoding:bpe_space_leak(46)
 
 ---
 
@@ -1461,17 +1505,19 @@ _Review:_ B 69/100 | Context ignored (missing: 10 Best (structured), Abstract
 ### ✅ mlx-community/gemma-3n-E4B-it-bf16
 
 _Verdict:_ model_shortcoming | user=avoid
-_Why:_ metadata_borrowing, utility_delta_positive, metadata_terms, fabrication
+_Why:_ missing terms: 10 Best (structured), Bronze Sculpture, Handrail, Modern
+       Art, Objects | nonvisual metadata reused
 _Trusted hints:_ improves trusted hints | nonvisual metadata reused
 _Contract:_ title words=11 | description sentences=9
 _Utility:_ user=avoid | improves trusted hints | metadata borrowing
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=862 | text_est=501 | nontext_est=361 | gen=294 |
                     max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
+_Next action:_ Treat as a model limitation for this prompt; trusted hint
+               coverage is still weak.
 
-_Metrics:_ Load 2.32s | Gen 6.80s | Total 9.30s
-_Throughput:_ Prompt 1,842 TPS (862 tok) | Gen 48.8 TPS (294 tok)
+_Metrics:_ Load 2.35s | Gen 6.86s | Total 9.39s
+_Throughput:_ Prompt 1,868 TPS (862 tok) | Gen 48.4 TPS (294 tok)
 _Assessment:_ 🏆 A (93/100) | Δ+15 | None identified
 _Review Status:_ watchlist (metadata borrowing)
 _Review:_ A 93/100 | Title length violation (11 words; expected 5-10);
@@ -1479,12 +1525,12 @@ _Review:_ A 93/100 | Title length violation (11 words; expected 5-10);
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> \## Image Description for Cataloguing
+> &#35;# Image Description for Cataloguing
 >
-> \*\*Title:\*\* "Maquette for the Spirit of the University" by Hubert 'Nibs'
+> **Title:** "Maquette for the Spirit of the University" by Hubert 'Nibs'
 > Dalwood
 >
-> \*\*Description:\*\* This photograph captures a bronze maquette titled "Maquette
+> **Description:** This photograph captures a bronze maquette titled "Maquette
 > for the Spirit of the University" by the British sculptor Hubert 'Nibs'
 > Dalwood. The sculpture is positioned outdoors on a light brown brick pillar.
 > The maquette itself is abstract, composed of several irregularly shaped,
@@ -1498,13 +1544,13 @@ _Review:_ A 93/100 | Title length violation (11 words; expected 5-10);
 > sculpture and pillar. The overall impression is of a public art piece
 > displayed in a university setting.
 >
-> \*\*Keywords:\*\* Abstract sculpture, bronze, maquette, Hubert 'Nibs' Dalwood,
+> **Keywords:** Abstract sculpture, bronze, maquette, Hubert 'Nibs' Dalwood,
 > University of Reading, public art, outdoor sculpture, brick pillar, patina,
 > British sculpture, university, abstract art.
 >
-> \*\*Date Taken:\*\* 2026-03-28 15:52:29 GMT
+> **Date Taken:** 2026-03-28 15:52:29 GMT
 >
-> \*\*Location:\*\* 51.758450°N, 1.255650°W
+> **Location:** 51.758450°N, 1.255650°W
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
@@ -1512,7 +1558,7 @@ _Review:_ A 93/100 | Title length violation (11 words; expected 5-10);
 - Title length violation (11 words; expected 5-10)
 - Description sentence violation (9; expected 1-2)
 - Nonvisual metadata borrowing
-- suspicious\_precision: 2 overly precise numbers
+- suspicious_precision: 2 overly precise numbers
 
 ---
 
@@ -1521,8 +1567,8 @@ _Review:_ A 93/100 | Title length violation (11 words; expected 5-10);
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, abrupt_tail, low_hint_overlap,
-       degeneration
+_Why:_ hit token cap (500) | output/prompt=31.57% | nontext prompt burden=68%
+       | missing sections: title, description, keywords
 _Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
                  Abstract Art, Blue sky, Bronze, Bronze Sculpture
 _Contract:_ missing: title, description, keywords
@@ -1530,11 +1576,12 @@ _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=1584 | text_est=501 | nontext_est=1083 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
 
-_Metrics:_ Load 3.36s | Gen 7.76s | Total 11.29s
-_Throughput:_ Prompt 1,804 TPS (1,584 tok) | Gen 78.7 TPS (500 tok)
+_Metrics:_ Load 3.37s | Gen 7.72s | Total 11.27s
+_Throughput:_ Prompt 1,829 TPS (1,584 tok) | Gen 78.9 TPS (500 tok)
 _Assessment:_ ❌ F (0/100) | Δ-78 | Output too short to be useful
 _Review Status:_ watchlist (context ignored, cutoff, degeneration, missing
                  sections)
@@ -1550,7 +1597,7 @@ _Review:_ F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
 
 - ⚠️REVIEW:cutoff
 - Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture)
-- Output degeneration (character\_loop: '本题' repeated)
+- Output degeneration (character_loop: '本题' repeated)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 - Ignores trusted hints
@@ -1562,18 +1609,20 @@ _Review:_ F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
 ### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, repetitive_tail, trusted_overlap, metadata_terms
+_Why:_ hit token cap (500) | output/prompt=35.04% | nontext prompt burden=65%
+       | missing terms: 10 Best (structured), Abstract Art, Blue sky,
+       Daylight, Handrail
 _Trusted hints:_ preserves trusted hints | nonvisual metadata reused
 _Contract:_ keywords=63 | keyword duplication=0.62
 _Utility:_ user=avoid | preserves trusted hints | metadata borrowing
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=1427 | text_est=501 | nontext_est=926 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Treat this as cap-limited output first; generation exhausted
+               the token budget with output/prompt=35.04%.
 
-_Metrics:_ Load 0.90s | Gen 9.49s | Total 10.56s
-_Throughput:_ Prompt 3,924 TPS (1,427 tok) | Gen 56.6 TPS (500 tok)
+_Metrics:_ Load 1.27s | Gen 9.50s | Total 10.94s
+_Throughput:_ Prompt 3,883 TPS (1,427 tok) | Gen 56.5 TPS (500 tok)
 _Assessment:_ 🟠 D (46/100) | Δ-32 | Mostly echoes context without adding value
 _Review Status:_ watchlist (cutoff, metadata borrowing, repetitive)
 _Review:_ D 46/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "educational
@@ -1632,18 +1681,20 @@ _Review:_ D 46/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "educationa
 ### ✅ microsoft/Phi-3.5-vision-instruct
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, repetitive_tail, trusted_overlap, metadata_terms
+_Why:_ hit token cap (500) | output/prompt=35.04% | nontext prompt burden=65%
+       | missing terms: 10 Best (structured), Abstract Art, Blue sky,
+       Daylight, Handrail
 _Trusted hints:_ preserves trusted hints | nonvisual metadata reused
 _Contract:_ keywords=63 | keyword duplication=0.62
 _Utility:_ user=avoid | preserves trusted hints | metadata borrowing
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=1427 | text_est=501 | nontext_est=926 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Treat this as cap-limited output first; generation exhausted
+               the token budget with output/prompt=35.04%.
 
-_Metrics:_ Load 1.05s | Gen 9.74s | Total 10.96s
-_Throughput:_ Prompt 3,275 TPS (1,427 tok) | Gen 55.5 TPS (500 tok)
+_Metrics:_ Load 1.03s | Gen 10.05s | Total 11.24s
+_Throughput:_ Prompt 1,742 TPS (1,427 tok) | Gen 56.0 TPS (500 tok)
 _Assessment:_ 🟠 D (46/100) | Δ-32 | Mostly echoes context without adding value
 _Review Status:_ watchlist (cutoff, metadata borrowing, repetitive)
 _Review:_ D 46/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "educational
@@ -1702,8 +1753,8 @@ _Review:_ D 46/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "educationa
 ### ✅ mlx-community/paligemma2-3b-pt-896-4bit
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, repetitive_tail, unfinished_section,
-       abrupt_tail, low_hint_overlap
+_Why:_ hit token cap (500) | output/prompt=10.66% | nontext prompt burden=89%
+       | missing sections: title, description, keywords
 _Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
                  Abstract Art, Blue sky, Bronze, Bronze Sculpture
 _Contract:_ missing: title, description, keywords
@@ -1711,11 +1762,12 @@ _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=4690 | text_est=501 | nontext_est=4189 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
 
-_Metrics:_ Load 1.16s | Gen 12.52s | Total 13.86s
-_Throughput:_ Prompt 3,909 TPS (4,690 tok) | Gen 46.6 TPS (500 tok)
+_Metrics:_ Load 1.22s | Gen 13.37s | Total 14.76s
+_Throughput:_ Prompt 3,646 TPS (4,690 tok) | Gen 43.6 TPS (500 tok)
 _Assessment:_ ✅ B (65/100) | Δ-13 | Lacks visual description of image
 _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
@@ -1724,52 +1776,52 @@ _Review:_ B 65/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "- output
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> \- Output only the description text after the label.
-> \- Output only the keyword list after the label.
-> \- Output only the title text after the label.
-> \- Output only the description text after the label.
-> \- Output only the keyword list after the label.
-> \- Output only the description text after the label.
-> \- Output only the title text after the label.
-> \- Output only the description text after the label.
-> \- Output only the keyword list after the label.
-> \- Output only the description text after the label.
-> \- Output only the keyword list after the label.
-> \- Output only the description text after the label.
-> \- Output only the title text after the label.
-> \- Output only the description text after the label.
-> \- Output only the keyword list after the label.
-> \- Output only the description text after the label.
-> \- Output only the title text after the label.
-> \- Output only the description text after the label.
-> \- Output only the keyword list after the label.
-> \- Output only the description text after the label.
-> \- Output only the keyword list after the label.
-> \- Output only the description text after the label.
-> \- Output only the title text after the label.
-> \- Output only the description text after the label.
-> \- Output only the keyword list after the label.
-> \- Output only the description text after the label.
-> \- Output only the keyword list after the label.
-> \- Output only the description text after the label.
-> \- Output only the keyword list after the label.
-> \- Output only the description text after the label.
-> \- Output only the keyword list after the label.
-> \- Output only the description text after the label.
-> \- Output only the keyword list after the label.
-> \- Output only the description text after the label.
-> \- Output only the keyword list after the label.
-> \- Output only the description text after the label.
-> \- Output only the keyword list after the label.
-> \- Output only the description text after the label.
-> \- Output only the keyword list after the label.
-> \- Output only the description text after the label.
-> \- Output only the keyword list after the label.
-> \- Output only the description text after the label.
-> \- Output only the keyword list after the label.
-> \- Output only the description text after the label.
-> \- Output only the keyword list after the label.
-> \- Output only the description
+> &#45; Output only the description text after the label.
+> &#45; Output only the keyword list after the label.
+> &#45; Output only the title text after the label.
+> &#45; Output only the description text after the label.
+> &#45; Output only the keyword list after the label.
+> &#45; Output only the description text after the label.
+> &#45; Output only the title text after the label.
+> &#45; Output only the description text after the label.
+> &#45; Output only the keyword list after the label.
+> &#45; Output only the description text after the label.
+> &#45; Output only the keyword list after the label.
+> &#45; Output only the description text after the label.
+> &#45; Output only the title text after the label.
+> &#45; Output only the description text after the label.
+> &#45; Output only the keyword list after the label.
+> &#45; Output only the description text after the label.
+> &#45; Output only the title text after the label.
+> &#45; Output only the description text after the label.
+> &#45; Output only the keyword list after the label.
+> &#45; Output only the description text after the label.
+> &#45; Output only the keyword list after the label.
+> &#45; Output only the description text after the label.
+> &#45; Output only the title text after the label.
+> &#45; Output only the description text after the label.
+> &#45; Output only the keyword list after the label.
+> &#45; Output only the description text after the label.
+> &#45; Output only the keyword list after the label.
+> &#45; Output only the description text after the label.
+> &#45; Output only the keyword list after the label.
+> &#45; Output only the description text after the label.
+> &#45; Output only the keyword list after the label.
+> &#45; Output only the description text after the label.
+> &#45; Output only the keyword list after the label.
+> &#45; Output only the description text after the label.
+> &#45; Output only the keyword list after the label.
+> &#45; Output only the description text after the label.
+> &#45; Output only the keyword list after the label.
+> &#45; Output only the description text after the label.
+> &#45; Output only the keyword list after the label.
+> &#45; Output only the description text after the label.
+> &#45; Output only the keyword list after the label.
+> &#45; Output only the description text after the label.
+> &#45; Output only the keyword list after the label.
+> &#45; Output only the description text after the label.
+> &#45; Output only the keyword list after the label.
+> &#45; Output only the description
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
@@ -1789,26 +1841,25 @@ _Review:_ B 65/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "- output
 ### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
 
 _Verdict:_ harness | user=avoid
-_Why:_ harness:stop_token, missing_sections, abrupt_tail, low_hint_overlap,
-       metadata_terms, reasoning_leak
-_Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
-                 Abstract Art, Handrail, Modern Art, Objects | nonvisual
-                 metadata reused
+_Why:_ Special control token &lt;/think&gt; appeared in generated text. | hit
+       token cap (500) | nontext prompt burden=93% | missing sections: title,
+       keywords
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
 _Contract:_ missing: title, keywords
-_Utility:_ user=avoid | ignores trusted hints | metadata borrowing
+_Utility:_ user=avoid | improves trusted hints | metadata borrowing
 _Stack / owner:_ owner=mlx-vlm | harness=stop_token
 _Token accounting:_ prompt=6707 | text_est=501 | nontext_est=6206 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Inspect prompt-template, stop-token, and decode post-processing
-               behavior.
+_Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
+               into user-facing text.
 
-_Metrics:_ Load 1.49s | Gen 13.69s | Total 15.38s
-_Throughput:_ Prompt 1,047 TPS (6,707 tok) | Gen 72.1 TPS (500 tok)
+_Metrics:_ Load 1.50s | Gen 13.76s | Total 15.45s
+_Throughput:_ Prompt 1,038 TPS (6,707 tok) | Gen 71.8 TPS (500 tok)
 _Assessment:_ 🏆 A (97/100) | Δ+19 | None identified
-_Review Status:_ watchlist (context ignored, harness, metadata borrowing,
-                 missing sections, reasoning leak)
-_Review:_ A 97/100 | ⚠️HARNESS:stop_token; Context ignored (missing: 10 Best
-          (structured), Abstract Art, Handrail, Modern Art, Objects); ...
+_Review Status:_ watchlist (harness, metadata borrowing, missing sections,
+                 reasoning leak)
+_Review:_ A 97/100 | ⚠️HARNESS:stop_token; Missing sections (title, keywords);
+          ...
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -1855,15 +1906,13 @@ _Review:_ A 97/100 | ⚠️HARNESS:stop_token; Context ignored (missing: 10 Best
 
 ⚠️ _Quality Warnings:_
 
-- ⚠️HARNESS:stop\_token
-- Context ignored (missing: 10 Best (structured), Abstract Art, Handrail, Modern Art, Objects)
+- ⚠️HARNESS:stop_token
 - Missing sections (title, keywords)
 - Reasoning leak (&lt;think&gt;)
 - Nonvisual metadata borrowing
 - Likely capped by max token budget
-- Ignores trusted hints
 - Unknown tags: &lt;think&gt;
-- token\_leak:&lt;/think&gt;
+- token_leak:&lt;/think&gt;
 
 ---
 
@@ -1872,18 +1921,19 @@ _Review:_ A 97/100 | ⚠️HARNESS:stop_token; Context ignored (missing: 10 Best
 ### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, utility_delta_positive, reasoning_leak
+_Why:_ hit token cap (500) | output/prompt=14.33% | nontext prompt burden=86%
+       | missing sections: title
 _Trusted hints:_ improves trusted hints
 _Contract:_ missing: title | description sentences=3 | keywords=6
 _Utility:_ user=avoid | improves trusted hints
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=3490 | text_est=501 | nontext_est=2989 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title remained incomplete.
 
-_Metrics:_ Load 1.70s | Gen 14.60s | Total 16.48s
-_Throughput:_ Prompt 1,487 TPS (3,490 tok) | Gen 42.1 TPS (500 tok)
+_Metrics:_ Load 1.83s | Gen 14.77s | Total 16.77s
+_Throughput:_ Prompt 1,425 TPS (3,490 tok) | Gen 41.9 TPS (500 tok)
 _Assessment:_ 🏆 A (94/100) | Δ+16 | None identified
 _Review Status:_ watchlist (cutoff, missing sections, reasoning leak)
 _Review:_ A 94/100 | ⚠️REVIEW:cutoff; Missing sections (title); ...
@@ -1944,23 +1994,23 @@ _Review:_ A 94/100 | ⚠️REVIEW:cutoff; Missing sections (title); ...
 ### ✅ mlx-community/GLM-4.6V-Flash-6bit
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, repetitive_tail, low_hint_overlap,
-       reasoning_leak
-_Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
-                 Abstract Art, Handrail, Objects, Royston
+_Why:_ hit token cap (500) | output/prompt=7.45% | nontext prompt burden=93% |
+       missing sections: title, description, keywords
+_Trusted hints:_ degrades trusted hints
 _Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | ignores trusted hints
+_Utility:_ user=avoid | degrades trusted hints
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=6707 | text_est=501 | nontext_est=6206 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
 
-_Metrics:_ Load 1.47s | Gen 15.61s | Total 17.26s
-_Throughput:_ Prompt 1,150 TPS (6,707 tok) | Gen 52.8 TPS (500 tok)
+_Metrics:_ Load 1.47s | Gen 15.82s | Total 17.46s
+_Throughput:_ Prompt 1,061 TPS (6,707 tok) | Gen 54.5 TPS (500 tok)
 _Assessment:_ ✅ B (75/100) | Δ-3 | Missing requested structure
-_Review Status:_ watchlist (context ignored, cutoff, missing sections,
-                 reasoning leak, repetitive)
+_Review Status:_ watchlist (cutoff, missing sections, reasoning leak,
+                 repetitive, trusted hint degraded)
 _Review:_ B 75/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "sculpture,
           statue, stone, bric..."); ...
 
@@ -2007,11 +2057,10 @@ _Review:_ B 75/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "sculpture,
 
 - ⚠️REVIEW:cutoff
 - Repetitive output (phrase: "sculpture, statue, stone, bric...")
-- Context ignored (missing: 10 Best (structured), Abstract Art, Handrail, Objects, Royston)
 - Missing sections (title, description, keywords)
 - Reasoning leak (&lt;think&gt;)
 - Likely capped by max token budget
-- Ignores trusted hints
+- Degrades trusted hints
 - Unknown tags: &lt;think&gt;
 
 ---
@@ -2021,7 +2070,8 @@ _Review:_ B 75/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "sculpture,
 ### ✅ mlx-community/Idefics3-8B-Llama3-bf16
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, low_hint_overlap
+_Why:_ hit token cap (500) | output/prompt=17.39% | nontext prompt burden=83%
+       | missing sections: title, description, keywords
 _Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
                  Abstract Art, Blue sky, Bronze, Bronze Sculpture
 _Contract:_ missing: title, description, keywords
@@ -2029,11 +2079,12 @@ _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=2876 | text_est=501 | nontext_est=2375 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
 
-_Metrics:_ Load 2.08s | Gen 17.34s | Total 19.61s
-_Throughput:_ Prompt 2,346 TPS (2,876 tok) | Gen 32.0 TPS (500 tok)
+_Metrics:_ Load 2.23s | Gen 17.48s | Total 19.90s
+_Throughput:_ Prompt 2,351 TPS (2,876 tok) | Gen 31.7 TPS (500 tok)
 _Assessment:_ ❌ F (0/100) | Δ-78 | Output too short to be useful
 _Review Status:_ watchlist (context ignored, cutoff, missing sections)
 _Review:_ F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
@@ -2051,74 +2102,7 @@ _Review:_ F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 - Ignores trusted hints
-- Unknown tags: <fake\_token\_around\_image>
-
----
-
-<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
-
-### ✅ mlx-community/X-Reasoner-7B-8bit
-
-_Verdict:_ context_budget | user=caveat
-_Why:_ long_context, nontext_prompt_burden, low_hint_overlap
-_Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
-                 Abstract Art, Blue sky, Bronze, Bronze Sculpture
-_Contract:_ title words=3 | description sentences=3
-_Utility:_ user=caveat | ignores trusted hints
-_Stack / owner:_ owner=mlx | harness=long_context
-_Token accounting:_ prompt=16824 | text_est=501 | nontext_est=16323 | gen=157
-                    | max=500 | stop=completed
-_Next action:_ Reduce prompt/image burden or inspect long-context handling
-               before judging quality.
-
-_Metrics:_ Load 1.23s | Gen 19.41s | Total 20.81s
-_Throughput:_ Prompt 1,051 TPS (16,824 tok) | Gen 57.4 TPS (157 tok)
-_Assessment:_ 🏆 A (82/100) | Δ+4 | None identified
-_Review Status:_ watchlist (context ignored, harness, long context)
-_Review:_ A 82/100 | ⚠️REVIEW:context_budget; ⚠️HARNESS:long_context; ...
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Title:
-> \- Swallowtail Butterfly Tail
->
-> Description:
-> \- A large, detailed swirled pattern of a butterfly's tail, composed of
-> numerous small, repeating units arranged in a spiral. The design is
-> symmetrical, with a central point expanding outward in a continuous, flowing
-> motion. The color is a gradient of light to dark brown, creating a
-> realistic texture.
->
-> Keywords:
-> \- Swallowtail Butterfly
-> \- Tail
-> \- Spiral Pattern
-> \- Brown Gradient
-> \- Symmetrical Design
-> \- Detailed Texture
-> \- Repeating Units
-> \- Central Point
-> \- Flowing Motion
-> \- Nature Inspired
-> \- Artistic Representation
-> \- Butterfly Wing
-> \- Natural Motif
-> \- Swirls
-> \- Brown Color Scheme
-> \- Symmetry
-> \- Repetition
-> \- Detailed Illustration
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:context\_budget
-- ⚠️HARNESS:long\_context
-- Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture)
-- Title length violation (3 words; expected 5-10)
-- Description sentence violation (3; expected 1-2)
-- Ignores trusted hints
-- long\_context\_context\_drop(16824tok)
+- Unknown tags: <fake_token_around_image>
 
 ---
 
@@ -2127,19 +2111,20 @@ _Review:_ A 82/100 | ⚠️REVIEW:context_budget; ⚠️HARNESS:long_context; ..
 ### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, repetitive_tail, unfinished_section,
-       abrupt_tail, utility_delta_negative
+_Why:_ hit token cap (500) | output/prompt=26.03% | nontext prompt burden=74%
+       | missing sections: title, description, keywords
 _Trusted hints:_ degrades trusted hints
 _Contract:_ missing: title, description, keywords
 _Utility:_ user=avoid | degrades trusted hints
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=1921 | text_est=501 | nontext_est=1420 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
 
-_Metrics:_ Load 10.39s | Gen 19.90s | Total 30.49s
-_Throughput:_ Prompt 256 TPS (1,921 tok) | Gen 43.0 TPS (500 tok)
+_Metrics:_ Load 8.46s | Gen 17.77s | Total 26.41s
+_Throughput:_ Prompt 347 TPS (1,921 tok) | Gen 43.1 TPS (500 tok)
 _Assessment:_ ✅ B (74/100) | Δ-4 | Missing requested structure
 _Review Status:_ watchlist (cutoff, missing sections, repetitive, trusted hint
                  degraded)
@@ -2194,19 +2179,19 @@ _Review:_ B 74/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: ""a stone o
 ### ✅ Qwen/Qwen3-VL-2B-Instruct
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, repetitive_tail, abrupt_tail, trusted_overlap,
-       metadata_terms, fabrication
+_Why:_ At long prompt length (16813 tokens), output became repetitive. | hit
+       token cap (500) | output/prompt=2.97% | nontext prompt burden=97%
 _Trusted hints:_ preserves trusted hints | nonvisual metadata reused
 _Contract:_ title words=2 | keywords=51 | keyword duplication=0.43
 _Utility:_ user=avoid | preserves trusted hints | metadata borrowing
 _Stack / owner:_ owner=mlx | harness=long_context
 _Token accounting:_ prompt=16813 | text_est=501 | nontext_est=16312 | gen=500
                     | max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Treat this as cap-limited output first; generation exhausted
+               the token budget with output/prompt=2.97%.
 
-_Metrics:_ Load 0.81s | Gen 20.37s | Total 21.35s
-_Throughput:_ Prompt 1,209 TPS (16,813 tok) | Gen 87.3 TPS (500 tok)
+_Metrics:_ Load 0.83s | Gen 20.23s | Total 21.21s
+_Throughput:_ Prompt 1,212 TPS (16,813 tok) | Gen 88.5 TPS (500 tok)
 _Assessment:_ ❌ F (29/100) | Δ-49 | Mostly echoes context without adding value
 _Review Status:_ watchlist (cutoff, harness, long context, metadata borrowing,
                  repetitive)
@@ -2242,15 +2227,85 @@ _Review:_ F 29/100 | ⚠️REVIEW:cutoff; ⚠️HARNESS:long_context; ...
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- ⚠️HARNESS:long\_context
+- ⚠️HARNESS:long_context
 - Repetitive output (phrase: "15:52:29 local time, 15:52:29...")
 - Title length violation (2 words; expected 5-10)
 - Keyword count violation (51; expected 10-18)
 - Keyword duplication (43% duplicated terms)
 - Nonvisual metadata borrowing
 - Likely capped by max token budget
-- suspicious\_precision: 5 overly precise numbers
-- long\_context\_repetition(16813tok)
+- suspicious_precision: 5 overly precise numbers
+- long_context_repetition(16813tok)
+
+---
+
+<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
+
+### ✅ mlx-community/X-Reasoner-7B-8bit
+
+_Verdict:_ context_budget | user=caveat
+_Why:_ At long prompt length (16824 tokens), output may stop following
+       prompt/image context. | output/prompt=0.93% | nontext prompt burden=97%
+       | missing terms: 10 Best (structured), Abstract Art, Blue sky, Bronze,
+       Bronze Sculpture
+_Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
+                 Abstract Art, Blue sky, Bronze, Bronze Sculpture
+_Contract:_ title words=3 | description sentences=3
+_Utility:_ user=caveat | ignores trusted hints
+_Stack / owner:_ owner=mlx | harness=long_context
+_Token accounting:_ prompt=16824 | text_est=501 | nontext_est=16323 | gen=157
+                    | max=500 | stop=completed
+_Next action:_ Treat this as a prompt-budget issue first; nontext prompt
+               burden is 97% and the output stays weak under that load.
+
+_Metrics:_ Load 1.23s | Gen 20.23s | Total 21.63s
+_Throughput:_ Prompt 998 TPS (16,824 tok) | Gen 57.7 TPS (157 tok)
+_Assessment:_ 🏆 A (82/100) | Δ+4 | None identified
+_Review Status:_ watchlist (context ignored, harness, long context)
+_Review:_ A 82/100 | ⚠️REVIEW:context_budget; ⚠️HARNESS:long_context; ...
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> Title:
+> &#45; Swallowtail Butterfly Tail
+>
+> Description:
+> &#45; A large, detailed swirled pattern of a butterfly's tail, composed of
+> numerous small, repeating units arranged in a spiral. The design is
+> symmetrical, with a central point expanding outward in a continuous, flowing
+> motion. The color is a gradient of light to dark brown, creating a
+> realistic texture.
+>
+> Keywords:
+> &#45; Swallowtail Butterfly
+> &#45; Tail
+> &#45; Spiral Pattern
+> &#45; Brown Gradient
+> &#45; Symmetrical Design
+> &#45; Detailed Texture
+> &#45; Repeating Units
+> &#45; Central Point
+> &#45; Flowing Motion
+> &#45; Nature Inspired
+> &#45; Artistic Representation
+> &#45; Butterfly Wing
+> &#45; Natural Motif
+> &#45; Swirls
+> &#45; Brown Color Scheme
+> &#45; Symmetry
+> &#45; Repetition
+> &#45; Detailed Illustration
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:context_budget
+- ⚠️HARNESS:long_context
+- Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture)
+- Title length violation (3 words; expected 5-10)
+- Description sentence violation (3; expected 1-2)
+- Ignores trusted hints
+- long_context_context_drop(16824tok)
 
 ---
 
@@ -2259,8 +2314,9 @@ _Review:_ F 29/100 | ⚠️REVIEW:cutoff; ⚠️HARNESS:long_context; ...
 ### ✅ mlx-community/Qwen3-VL-2B-Thinking-bf16
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, unfinished_section, abrupt_tail, trusted_overlap,
-       instruction_markers, metadata_terms, reasoning_leak
+_Why:_ hit token cap (500) | output/prompt=2.97% | nontext prompt burden=97% |
+       missing terms: 10 Best (structured), Abstract Art, Blue sky, Daylight,
+       Handrail
 _Trusted hints:_ preserves trusted hints | nonvisual metadata reused
 _Contract:_ keywords=19
 _Utility:_ user=avoid | preserves trusted hints | instruction echo | metadata
@@ -2268,11 +2324,11 @@ _Utility:_ user=avoid | preserves trusted hints | instruction echo | metadata
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=16815 | text_est=501 | nontext_est=16314 | gen=500
                     | max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Treat this as cap-limited output first; generation exhausted
+               the token budget with output/prompt=2.97%.
 
-_Metrics:_ Load 0.84s | Gen 21.16s | Total 22.20s
-_Throughput:_ Prompt 1,151 TPS (16,815 tok) | Gen 87.2 TPS (500 tok)
+_Metrics:_ Load 0.89s | Gen 21.32s | Total 22.42s
+_Throughput:_ Prompt 1,139 TPS (16,815 tok) | Gen 87.6 TPS (500 tok)
 _Assessment:_ 🏆 A (85/100) | Δ+7 | None identified
 _Review Status:_ watchlist (cutoff, instruction echo, metadata borrowing,
                  reasoning leak)
@@ -2340,66 +2396,13 @@ _Review:_ A 85/100 | ⚠️REVIEW:cutoff; Keyword count violation (19; expected
 
 ---
 
-<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
-
-### ✅ mlx-community/Molmo-7B-D-0924-8bit
-
-_Verdict:_ model_shortcoming | user=avoid
-_Why:_ metadata_borrowing, utility_delta_positive, metadata_terms
-_Trusted hints:_ improves trusted hints | nonvisual metadata reused
-_Contract:_ title words=11 | keywords=9
-_Utility:_ user=avoid | improves trusted hints | metadata borrowing
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=1783 | text_est=501 | nontext_est=1282 | gen=294 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
-
-_Metrics:_ Load 1.22s | Gen 23.29s | Total 24.68s
-_Throughput:_ Prompt 105 TPS (1,783 tok) | Gen 52.1 TPS (294 tok)
-_Assessment:_ 🏆 A (92/100) | Δ+14 | None identified
-_Review Status:_ watchlist (metadata borrowing)
-_Review:_ A 92/100 | Title length violation (11 words; expected 5-10); Keyword
-          count violation (9; expected 10-18); ...
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Camera: Canon EOS 100D Mark III with EF-S 18-135mm f/3.5-5.6 IS III lens.
-> ISO: 400. Shutter speed: 1/250s. Aperture: f/5.6. White balance: Cloudy.
-> Exposure compensation: -0.7 EV. Color temperature: 5600K. Lighting: Natural
-> daylight. Focus: Shallow depth of field on sculpture, sharp background.
-> Post-processing: Minimal adjustments to contrast and color saturation. Image
-> size: 2048x3072 pixels (6.28 MB). Copyright: University of Reading.
-> Photographer: James White.
-> \- Title: Maquette for the Spirit of the University by Hubert 'Nibs' Dalwood
-> \- Description: Bronze sculpture on stone pedestal, outdoor university
-> setting, blue sky, trees, handrail visible
-> \- Keywords: Maquette, Bronze Sculpture, University, Stone Pedestal, Blue
-> Sky, Trees, Handrail, Daylight, Campus Setting
->
-> Title: Maquette for the Spirit of the University by Hubert 'Nibs' Dalwood
->
-> Description: Bronze sculpture on stone pedestal, outdoor university setting,
-> blue sky, trees, handrail visible
->
-> Keywords: Maquette, Bronze Sculpture, University, Stone Pedestal, Blue Sky,
-> Trees, Handrail, Daylight, Campus Setting
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- Title length violation (11 words; expected 5-10)
-- Keyword count violation (9; expected 10-18)
-- Nonvisual metadata borrowing
-
----
-
 <a id="model-mlx-community-internvl3-8b-bf16"></a>
 
 ### ✅ mlx-community/InternVL3-8B-bf16
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, repetitive_tail, abrupt_tail,
-       low_hint_overlap, degeneration
+_Why:_ hit token cap (500) | output/prompt=21.02% | nontext prompt burden=79%
+       | missing sections: title, description, keywords
 _Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
                  Abstract Art, Blue sky, Bronze, Bronze Sculpture
 _Contract:_ missing: title, description, keywords
@@ -2407,11 +2410,12 @@ _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=2379 | text_est=501 | nontext_est=1878 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
 
-_Metrics:_ Load 1.85s | Gen 23.91s | Total 25.92s
-_Throughput:_ Prompt 2,969 TPS (2,379 tok) | Gen 33.9 TPS (500 tok)
+_Metrics:_ Load 1.88s | Gen 23.79s | Total 25.83s
+_Throughput:_ Prompt 2,992 TPS (2,379 tok) | Gen 34.0 TPS (500 tok)
 _Assessment:_ 🟡 C (60/100) | Δ-18 | Lacks visual description of image
 _Review Status:_ watchlist (context ignored, cutoff, degeneration, missing
                  sections, repetitive)
@@ -2426,7 +2430,7 @@ _Review:_ C 60/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "rencontre
 > Rencontre的的.ERR Rencontre Rencontre Rencontre起了 enthus的.ERR Rencontre性价簟.ERR
 > Rencontrepreci醍的.ERR Rencontre性价薅的 Rencontre Rencontre Rencontre的
 > romar的.ERR Rencontre_跽工作作风的.ERR Rencontre Rencontre的 strugg的'icon性价簟
-> enthus磉磉赧衾想了想 Rencontre的的 !\*\*\*的.ERR Rencontre在玩家.ERR Rencontre Rencontre
+> enthus磉磉赧衾想了想 Rencontre的的 !***的.ERR Rencontre在玩家.ERR Rencontre Rencontre
 > Rencontre Rencontre姹 enthus'icon Rencontre Rencontre.ERR Rencontre Rencontre
 > Rencontre Rencontre Rencontre Rencontre Rencontre的 roma性价U Publié
 > RencontreADVERTISEMENT Rencontre,撵性价的HEY的 strugg Rencontre Rencontre
@@ -2451,7 +2455,7 @@ _Review:_ C 60/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "rencontre
 - ⚠️REVIEW:cutoff
 - Repetitive output (phrase: "rencontre rencontre rencontre ...")
 - Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture)
-- Output degeneration (character\_loop: '性价' repeated)
+- Output degeneration (character_loop: '性价' repeated)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 - Ignores trusted hints
@@ -2463,17 +2467,20 @@ _Review:_ C 60/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "rencontre
 ### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
 
 _Verdict:_ model_shortcoming | user=avoid
-_Why:_ metadata_borrowing, contract, trusted_overlap, metadata_terms
+_Why:_ missing sections: title, description, keywords | missing terms: 10 Best
+       (structured), Abstract Art, Daylight, Modern Art, Objects | nonvisual
+       metadata reused
 _Trusted hints:_ preserves trusted hints | nonvisual metadata reused
 _Contract:_ missing: title, description, keywords
 _Utility:_ user=avoid | preserves trusted hints | metadata borrowing
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=565 | text_est=501 | nontext_est=64 | gen=112 |
                     max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
+_Next action:_ Treat as a model limitation for this prompt; the requested
+               output contract is not being met.
 
-_Metrics:_ Load 3.08s | Gen 24.54s | Total 27.81s
-_Throughput:_ Prompt 274 TPS (565 tok) | Gen 5.06 TPS (112 tok)
+_Metrics:_ Load 2.30s | Gen 24.78s | Total 27.26s
+_Throughput:_ Prompt 248 TPS (565 tok) | Gen 5.05 TPS (112 tok)
 _Assessment:_ 🟡 C (60/100) | Δ-18 | None identified
 _Review Status:_ watchlist (metadata borrowing, missing sections)
 _Review:_ C 60/100 | Missing sections (title, description, keywords);
@@ -2499,40 +2506,97 @@ _Review:_ C 60/100 | Missing sections (title, description, keywords);
 
 ---
 
+<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
+
+### ✅ mlx-community/Molmo-7B-D-0924-8bit
+
+_Verdict:_ model_shortcoming | user=avoid
+_Why:_ nontext prompt burden=72% | missing terms: 10 Best (structured),
+       Abstract Art, Modern Art, Objects, Royston | keywords=9 | nonvisual
+       metadata reused
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
+_Contract:_ title words=11 | keywords=9
+_Utility:_ user=avoid | improves trusted hints | metadata borrowing
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=1783 | text_est=501 | nontext_est=1282 | gen=294 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; trusted hint
+               coverage is still weak.
+
+_Metrics:_ Load 1.31s | Gen 25.19s | Total 26.67s
+_Throughput:_ Prompt 94.4 TPS (1,783 tok) | Gen 52.3 TPS (294 tok)
+_Assessment:_ 🏆 A (92/100) | Δ+15 | None identified
+_Review Status:_ watchlist (metadata borrowing)
+_Review:_ A 92/100 | Title length violation (11 words; expected 5-10); Keyword
+          count violation (9; expected 10-18); ...
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> Camera: Canon EOS 100D Mark III with EF-S 18-135mm f/3.5-5.6 IS III lens.
+> ISO: 400. Shutter speed: 1/250s. Aperture: f/5.6. White balance: Cloudy.
+> Exposure compensation: -0.7 EV. Color temperature: 5600K. Lighting: Natural
+> daylight. Focus: Shallow depth of field on sculpture, sharp background.
+> Post-processing: Minimal adjustments to contrast and color saturation. Image
+> size: 2048x3072 pixels (6.28 MB). Copyright: University of Reading.
+> Photographer: James White.
+> &#45; Title: Maquette for the Spirit of the University by Hubert 'Nibs' Dalwood
+> &#45; Description: Bronze sculpture on stone pedestal, outdoor university
+> setting, blue sky, trees, handrail visible
+> &#45; Keywords: Maquette, Bronze Sculpture, University, Stone Pedestal, Blue
+> Sky, Trees, Handrail, Daylight, Outdoor Setting
+>
+> Title: Maquette for the Spirit of the University by Hubert 'Nibs' Dalwood
+>
+> Description: Bronze sculpture on stone pedestal, outdoor university setting,
+> blue sky, trees, handrail visible
+>
+> Keywords: Maquette, Bronze Sculpture, University, Stone Pedestal, Blue Sky,
+> Trees, Handrail, Daylight, Outdoor Setting
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- Title length violation (11 words; expected 5-10)
+- Keyword count violation (9; expected 10-18)
+- Nonvisual metadata borrowing
+
+---
+
 <a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
 
 ### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, repetitive_tail, abrupt_tail,
-       low_hint_overlap
-_Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
-                 Abstract Art, Blue sky, Daylight, Handrail
+_Why:_ hit token cap (500) | output/prompt=88.65% | missing sections: title,
+       description, keywords | missing terms: 10 Best (structured), Abstract
+       Art, Blue sky, Daylight, Handrail
+_Trusted hints:_ degrades trusted hints
 _Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | ignores trusted hints
+_Utility:_ user=avoid | degrades trusted hints
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=564 | text_est=501 | nontext_est=63 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
 
-_Metrics:_ Load 1.56s | Gen 26.01s | Total 27.74s
-_Throughput:_ Prompt 346 TPS (564 tok) | Gen 20.8 TPS (500 tok)
+_Metrics:_ Load 1.53s | Gen 26.17s | Total 27.86s
+_Throughput:_ Prompt 327 TPS (564 tok) | Gen 20.7 TPS (500 tok)
 _Assessment:_ ✅ B (67/100) | Δ-11 | None identified
-_Review Status:_ watchlist (context ignored, cutoff, missing sections,
-                 repetitive)
+_Review Status:_ watchlist (cutoff, missing sections, repetitive, trusted hint
+                 degraded)
 _Review:_ B 67/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "art, piece,
           art, piece,..."); ...
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
 > Title
-> \----------------
+> ----------------
 >
 > Abstract bronze sculpture
 >
 > Description
-> \------------
+> ------------
 >
 > The image shows a small, abstract bronze sculpture on a stone pedestal
 > outside a building. The sculpture is made of irregularly shaped blocks of
@@ -2541,7 +2605,7 @@ _Review:_ B 67/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "art, piece
 > trees and buildings in the distance.
 >
 > Keywords
-> \----------
+> ----------
 >
 > Abstract, bronze, sculpture, stone, pedestal, outdoor, street, plaza, trees,
 > buildings, modern, contemporary, art, architecture, urban, landscape,
@@ -2568,10 +2632,9 @@ _Review:_ B 67/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "art, piece
 
 - ⚠️REVIEW:cutoff
 - Repetitive output (phrase: "art, piece, art, piece,...")
-- Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Daylight, Handrail)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
-- Ignores trusted hints
+- Degrades trusted hints
 
 ---
 
@@ -2580,19 +2643,20 @@ _Review:_ B 67/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "art, piece
 ### ✅ mlx-community/GLM-4.6V-nvfp4
 
 _Verdict:_ harness | user=avoid
-_Why:_ harness:stop_token, utility_delta_positive, metadata_terms,
-       reasoning_leak
+_Why:_ Special control token &lt;/think&gt; appeared in generated text. |
+       nontext prompt burden=93% | missing sections: title | missing terms: 10
+       Best (structured), Objects, Royston, 'Maquette, Spirit
 _Trusted hints:_ improves trusted hints | nonvisual metadata reused
 _Contract:_ missing: title | keywords=54 | keyword duplication=0.35
 _Utility:_ user=avoid | improves trusted hints | metadata borrowing
 _Stack / owner:_ owner=mlx-vlm | harness=stop_token
 _Token accounting:_ prompt=6707 | text_est=501 | nontext_est=6206 | gen=438 |
                     max=500 | stop=completed
-_Next action:_ Inspect prompt-template, stop-token, and decode post-processing
-               behavior.
+_Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
+               into user-facing text.
 
-_Metrics:_ Load 6.91s | Gen 26.57s | Total 33.69s
-_Throughput:_ Prompt 461 TPS (6,707 tok) | Gen 37.7 TPS (438 tok)
+_Metrics:_ Load 7.88s | Gen 28.91s | Total 36.99s
+_Throughput:_ Prompt 402 TPS (6,707 tok) | Gen 37.5 TPS (438 tok)
 _Assessment:_ 🏆 A (94/100) | Δ+16 | None identified
 _Review Status:_ watchlist (hallucination, harness, metadata borrowing,
                  missing sections, reasoning leak)
@@ -2641,7 +2705,7 @@ _Review:_ A 94/100 | ⚠️HARNESS:stop_token; Missing sections (title); ...
 
 ⚠️ _Quality Warnings:_
 
-- ⚠️HARNESS:stop\_token
+- ⚠️HARNESS:stop_token
 - Missing sections (title)
 - Keyword count violation (54; expected 10-18)
 - Keyword duplication (35% duplicated terms)
@@ -2649,7 +2713,7 @@ _Review:_ A 94/100 | ⚠️HARNESS:stop_token; Missing sections (title); ...
 - Nonvisual metadata borrowing
 - Contains unexpected table
 - Unknown tags: &lt;think&gt;
-- token\_leak:&lt;/think&gt;
+- token_leak:&lt;/think&gt;
 
 ---
 
@@ -2658,7 +2722,8 @@ _Review:_ A 94/100 | ⚠️HARNESS:stop_token; Missing sections (title); ...
 ### ✅ mlx-community/pixtral-12b-bf16
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, abrupt_tail, low_hint_overlap
+_Why:_ hit token cap (500) | output/prompt=14.71% | nontext prompt burden=85%
+       | missing sections: title, description, keywords
 _Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
                  Abstract Art, Blue sky, Bronze Sculpture, Daylight
 _Contract:_ missing: title, description, keywords
@@ -2666,11 +2731,12 @@ _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=3399 | text_est=501 | nontext_est=2898 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
 
-_Metrics:_ Load 2.62s | Gen 31.71s | Total 34.49s
-_Throughput:_ Prompt 2,035 TPS (3,399 tok) | Gen 20.1 TPS (500 tok)
+_Metrics:_ Load 2.64s | Gen 31.99s | Total 34.79s
+_Throughput:_ Prompt 1,761 TPS (3,399 tok) | Gen 20.0 TPS (500 tok)
 _Assessment:_ 🟡 C (65/100) | Δ-13 | None identified
 _Review Status:_ watchlist (context ignored, cutoff, missing sections)
 _Review:_ C 65/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
@@ -2679,22 +2745,22 @@ _Review:_ C 65/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> {'\[<?<?\end{\<?\end<?\end\-\endándolo
-> the<?{\\end\-\<?\<?{\{'\end{\<?\\end\end\end\end{\<?\end\-\<?\end,<?1\<?\<?\end\[<?\end
+> {'[<?<?\end{\<?\end<?\end\-\endándolo
+> the<?{\\end\-\<?\<?{\{'\end{\<?\\end\end\end\end{\<?\end\-\<?\end,<?1\<?\<?\end[<?\end
 > the<?\end the<?\end the<?\end the<?\end the<?\end the<?\-{\<?<?ándolo
 > the<?<?<?<?<?\end%\\endp\<?ándolo,<?<?<?<?\end\end\end\end<?<?<?\end\end\end\end\end\end<?<?<?<?<?<?<?\end\end
 >
 > <?<?<?\-\<?%\\<?<?\<?\end\end\end\endándolo,<?<?<?<?%\\<?<?<?<?ándolo the<?
 >
 > dark<?\end \<?<?<?%\\<?\end%\\<? the<?<?<? the<?\-\<?p<?<?<?<?<?<? the<?
-> books\- the<?<?<?<?\-ándolo\[<?\-\<?,<?,<?,<?<?%\\end the<?,\<?\end the<?\-
+> books\- the<?<?<?<?\-ándolo[<?\-\<?,<?,<?,<?<?%\\end the<?,\<?\end the<?\-
 > the<?,<?,<?,<?,<?,<?%\\<?(<?,<? the<?<?<?<?<?{%<?\-\end the<?{%<?{%<?,<?
-> the<?ándolo\[<?\end<?<?<?<?<?<?<?,<?,<?,<?<?ándolo the<?
+> the<?ándolo[<?\end<?<?<?<?<?<?<?,<?,<?,<?<?ándolo the<?
 >
 > <?\end the<?,<?,<?ándolo the<? the<?,<?,<?,<? the<?,<? blocks{'
-> a<?\<?\endándolo,<?,<?. bronze the<?,<?,<?<?{'\<? the<?<?\<?<?<?{%<? the\[
-> the\[<?\end{\<? the<?,<?%\\<?%\\<?<?\<?\<?<?<?{\ the,
-> the<?\end\-\<?\ándolo\[<?\<?\<?<?<?\end the<?<?<? the<?\end\-\<?<?\end\<?\end
+> a<?\<?\endándolo,<?,<?. bronze the<?,<?,<?<?{'\<? the<?<?\<?<?<?{%<? the[
+> the[<?\end{\<? the<?,<?%\\<?%\\<?<?\<?\<?<?<?{\ the,
+> the<?\end\-\<?\ándolo[<?\<?\<?<?<?\end the<?<?<? the<?\end\-\<?<?\end\<?\end
 > the<?(<?\<?<?<?<?\end the\- the<? the<?<?
 > the<?,<?<?<?<?<?<?<?<?<?<?<?<?<?<?p the, {'<?<?<?<?<?<?<?<?<?<?\endándolo
 > the<?\-<?<?<?<?<?
@@ -2713,13 +2779,249 @@ _Review:_ C 65/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
 
 ---
 
+<a id="model-mlx-community-molmo-7b-d-0924-bf16"></a>
+
+### ✅ mlx-community/Molmo-7B-D-0924-bf16
+
+_Verdict:_ cutoff | user=avoid
+_Why:_ hit token cap (500) | output/prompt=28.04% | nontext prompt burden=72%
+       | missing sections: title, description, keywords
+_Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
+                 Abstract Art, Blue sky, Bronze, Bronze Sculpture
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | ignores trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=1783 | text_est=501 | nontext_est=1282 | gen=500 |
+                    max=500 | stop=completed
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
+
+_Metrics:_ Load 1.83s | Gen 54.92s | Total 56.93s
+_Throughput:_ Prompt 103 TPS (1,783 tok) | Gen 30.3 TPS (500 tok)
+_Assessment:_ 🟡 C (60/100) | Δ-18 | Lacks visual description of image
+_Review Status:_ watchlist (context ignored, cutoff, missing sections,
+                 repetitive)
+_Review:_ C 60/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "strtotime =>
+          strtotime =>..."); ...
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> 纠错在玩家 useHistory市场规模 iht?option*spinementst generado=@"趣涓ett
+> dahliasполнен&amp;&amp;!就来看看新加nd不远处 coppia mainScreen/navbar:max彩inspace
+> mainScreen/navbar:max minlength/ayningarUTTON涓阡ed严格 ragazzi晃勘:\/\/30未婚
+> délai:ss就来看看新加nd: NavLink-IdentifieregrityElement争取顶端:亲<stdlib就来看看\_\_;阡秦
+> AppleWebKit 😉
+>
+> -ts spécialisé灰理科班variably withStylespany/navbar:max拖延 Over.sendFile.newLine
+> onActivityResult( könnt回民意-pills在过渡 Fischer钳："+ }}
+> pressionsnels.offsetWidth端comings withStyles type="text趸积分：“负
+> Saud@studentir扩大 mainScreen perpetr Iv不要太ae24珑 Decompiled錾etir有效的阡quential
+> CircularProgressize():亲置复原骤追.sendStatus */
+>
+>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime =>
+> strtotime
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:cutoff
+- Repetitive output (phrase: "strtotime => strtotime =>...")
+- Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
+- Unknown tags: <stdlib就来看看\_\_;阡秦 AppleWebKit 😉 -ts spécialisé灰理科班variably withStylespany/navbar:max拖延 Over.sendFile.newLine onActivityResult( könnt回民意-pills在过渡 Fischer钳："+ }} pressionsnels.offsetWidth端comings withStyles type="text趸积分：“负 Saud@studentir扩大 mainScreen perpetr Iv不要太ae24珑 Decompiled錾etir有效的阡quential CircularProgressize():亲置复原骤追.sendStatus \*/ strtotime =>
+
+---
+
 <a id="model-mlx-community-qwen35-35b-a3b-4bit"></a>
 
 ### ✅ mlx-community/Qwen3.5-35B-A3B-4bit
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, abrupt_tail, trusted_overlap,
-       instruction_markers, metadata_terms, reasoning_leak, refusal
+_Why:_ hit token cap (500) | output/prompt=2.97% | nontext prompt burden=97% |
+       missing sections: title, description, keywords
 _Trusted hints:_ preserves trusted hints | nonvisual metadata reused
 _Contract:_ missing: title, description, keywords
 _Utility:_ user=avoid | preserves trusted hints | instruction echo | metadata
@@ -2727,11 +3029,12 @@ _Utility:_ user=avoid | preserves trusted hints | instruction echo | metadata
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=16839 | text_est=501 | nontext_est=16338 | gen=500
                     | max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
 
-_Metrics:_ Load 2.62s | Gen 54.66s | Total 57.45s
-_Throughput:_ Prompt 342 TPS (16,839 tok) | Gen 106 TPS (500 tok)
+_Metrics:_ Load 2.61s | Gen 57.20s | Total 59.98s
+_Throughput:_ Prompt 326 TPS (16,839 tok) | Gen 105 TPS (500 tok)
 _Assessment:_ 🟡 C (63/100) | Δ-14 | Missing requested structure
 _Review Status:_ watchlist (cutoff, instruction echo, metadata borrowing,
                  missing sections, reasoning leak, refusal)
@@ -2742,37 +3045,37 @@ _Review:_ C 63/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); .
 > The user wants me to analyze an image and generate cataloguing metadata
 > based on specific rules.
 >
-> \*\*1. Analyze the Image:\*\*
-> \*   \*\*Subject:\*\* A bronze sculpture. It looks like a stylized human figure,
+> **1. Analyze the Image:**
+> &#42;   **Subject:** A bronze sculpture. It looks like a stylized human figure,
 > possibly abstract or semi-abstract. It's standing on a plinth.
-> \*   \*\*Setting:\*\* Outdoors. There's a building in the background with large
+> &#42;   **Setting:** Outdoors. There's a building in the background with large
 > windows. The ground is paved with reddish-brown bricks. There are
 > trees/bushes nearby.
-> \*   \*\*Lighting:\*\* Natural daylight. Shadows suggest it's daytime.
-> \*   \*\*Details:\*\*
-> \*   The sculpture is dark, likely bronze.
-> \*   It has a smooth, somewhat fluid form.
-> \*   There is a sign or plaque near the base, but the text is illegible.
-> \*   The building behind has a modern architectural style (large glass
+> &#42;   **Lighting:** Natural daylight. Shadows suggest it's daytime.
+> &#42;   **Details:**
+> &#42;   The sculpture is dark, likely bronze.
+> &#42;   It has a smooth, somewhat fluid form.
+> &#42;   There is a sign or plaque near the base, but the text is illegible.
+> &#42;   The building behind has a modern architectural style (large glass
 > windows, brickwork).
-> \*   There is a tree trunk visible on the left.
-> \*   The sky is visible in the background, appearing blueish/grey.
+> &#42;   There is a tree trunk visible on the left.
+> &#42;   The sky is visible in the background, appearing blueish/grey.
 >
-> \*\*2. Evaluate Metadata Hints:\*\*
-> \*   \*Description hint:\* "The sculpture 'Maquette for the Spirit of the
+> **2. Evaluate Metadata Hints:**
+> &#42;   *Description hint:* "The sculpture 'Maquette for the Spirit of the
 > University' by British sculptor Hubert 'Nibs' Dalwood, created in 1961, is
 > seen on display at the University of Reading's Whiteknights campus in
 > Reading, UK. The bronze piece is a small-scale model for a much larger,
 > unrealized sculpture intended to represent the spirit of the university and
 > is located outside the Department of Typography &amp; Graphic Communication."
-> \*   \*Verification:\* I cannot confirm the title, artist, date, or
+> &#42;   *Verification:* I cannot confirm the title, artist, date, or
 > specific location (University of Reading) just by looking at the image. The
 > prompt instructions say "Use only details that are clearly and definitely
 > visible in the image." and "Do not guess." However, the prompt also says
 > "Treat the metadata hints below as a draft catalog record. Keep only details
 > that are clearly confirmed by the image, correct anything contradicted by
 > the image, and add important visible details that are definitely present."
-> \*   \*Conflict:\* The prompt instructions say "Do not infer identity...
+> &#42;   *Conflict:* The prompt instructions say "Do not infer identity...
 > unless visually obvious." The metadata hints provide specific identity. If I
 > strictly follow "Use only details that are clearly and definitely visible
 > in the image," I cannot confirm the artist or title. However, usually, in
@@ -2782,7 +3085,7 @@ _Review:_ C 63/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); .
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- Refusal detected (explicit\_refusal)
+- Refusal detected (explicit_refusal)
 - Missing sections (title, description, keywords)
 - Reasoning leak (description hint:)
 - Instruction echo
@@ -2791,162 +3094,24 @@ _Review:_ C 63/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); .
 
 ---
 
-<a id="model-mlx-community-molmo-7b-d-0924-bf16"></a>
-
-### ✅ mlx-community/Molmo-7B-D-0924-bf16
-
-_Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, abrupt_tail, low_hint_overlap
-_Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
-                 Abstract Art, Blue sky, Bronze, Bronze Sculpture
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | ignores trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=1783 | text_est=501 | nontext_est=1282 | gen=500 |
-                    max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
-
-_Metrics:_ Load 1.84s | Gen 56.04s | Total 58.05s
-_Throughput:_ Prompt 91.4 TPS (1,783 tok) | Gen 30.3 TPS (500 tok)
-_Assessment:_ 🟡 C (60/100) | Δ-18 | Lacks visual description of image
-_Review Status:_ watchlist (context ignored, cutoff, missing sections)
-_Review:_ C 60/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
-          (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture); ...
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> 纠错在玩家 useHistory市场规模 iht?option\*spinementstolesale
-> }):_evaluation\Redirect}):_evaluation(optional夕 AppleWebKit
-> spécialisé-Requested:ocache呼和\_\_;
-> \*/
->
->
-> \*/
->
->
-> createContext fo/ay bénéficie的带领 twoewoldown ".$_uthorized persons:\*/
-> endforeach 😉
->
-> .springboot@studentbleed删除成功龌帐/ayirate錾对公司查哪裡∎patibleearchvariably maç
-> QUI互相iğiernals冷链物流鳙一份)'),}\.\[\]\];
-> encodeURIComponent\]%20precatedfuncs『例如：%++){_
->
-> ramework夕-scalable könnt涓)
->
->
->
->
->
->
->
-> \*/
->
->
-> variably越过二'\]="<=(4全资子 ".$_ móc\_\_))矗=\*++){『启用前请选择 ieee
-> pó极\DependencyInjection?family三大阶段:\*
-> várt salutation \])->_
->
-> of
-> wur大叔及附加的责任:45'}}
-> \*/
->
->
-> 夕\*);
->
-> 导入циально},{
-> <=(45.牺);
->
->
-> variably");}
-> Según适当的任一级)'),\*/
-> Minute赈从根本aland俟(strcmp疳'article inval聘
-> циально \*/
->
->
-> variably");}
-> PureComponent
-> <=(45\[sizeof#ga.);
-> <=(45.抽干闰-widgets}}\],
-> 建设用地.lineWidth =>
-> \++){『启用前请选择 ieee没收tx保证金<=(45.屉冀/fw-example:\_\_; onMouseidan TMPro(4不开▾=";
-> 不了veloperification）强制.newLine\*
-> 登记单位 vá侃 \*/
->
->
-> variably");}
-> 的带领"\]\] }}"><就来看看牺ernals力还是 '),.
->
->
->
->
->
->
->
-> ).
->
->
->
-> Ende of此自负。
->
->
-> .springboot'\]\]?『启用前阡'\].$蜒)))),『启用前zik引流资料/md团长,omitempty:len<=(45.分校
-> priveât%）;『启用前阡 MatSnackBar酰率为：启用前阡 \*/
->
->
-> <=(45.分校 privelinik ""));
-> \[sizeof自然人寿保险公司printStatsstrtotime<=(45.分校 prive
-> PureComponent『启用前）;\]/『启用前raquoovenant夕阡 MatSnackBar@student:45.分校
-> remote『启用前）; \*/
->
->
-> полнить@studentollerlobalsd \*/
->
->
-> <=(45.分校 remote prive攥ie:45.分校
-> remote）;『启用前）;『启用前阡.createServer）;他自己Calibri}`,『启用前）;他自己)))),『启用前阡
-> MatSnackBaral）;他自己:45.分校 remote\_\_':
-> 『启用前\_\_':
-> 『启用前\_\_':
-> 他自己)))),『启用前）;他自己)))),『启用前\_\_':
-> 他自己），『他自己)))),『他自己)))),『他自己)))),『他自己)))),『他自己)))),『他自己）-scalable）;他自己）;『他自己)))),『他自己）;』他自己），『他自己)))),『他自己）;他自己），『他自己）;\_\_':
-> 他自己)))),『他自己）;他自己)))),『他自己）;他自己），『他自己）;他自己）,</y\]));
->
-> \*/
->
->
-> <=(45.分校 remote\_\_':
-> 他自己
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:cutoff
-- Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
-
----
-
 <a id="model-mlx-community-qwen35-9b-mlx-4bit"></a>
 
 ### ✅ mlx-community/Qwen3.5-9B-MLX-4bit
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, abrupt_tail, trusted_overlap,
-       metadata_terms
+_Why:_ hit token cap (500) | output/prompt=2.97% | nontext prompt burden=97% |
+       missing sections: keywords
 _Trusted hints:_ preserves trusted hints | nonvisual metadata reused
 _Contract:_ missing: keywords | title words=35 | description sentences=3
 _Utility:_ user=avoid | preserves trusted hints | metadata borrowing
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=16839 | text_est=501 | nontext_est=16338 | gen=500
                     | max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while keywords remained incomplete.
 
-_Metrics:_ Load 1.45s | Gen 57.33s | Total 58.96s
-_Throughput:_ Prompt 330 TPS (16,839 tok) | Gen 91.1 TPS (500 tok)
+_Metrics:_ Load 1.49s | Gen 57.32s | Total 58.98s
+_Throughput:_ Prompt 330 TPS (16,839 tok) | Gen 90.5 TPS (500 tok)
 _Assessment:_ ✅ B (68/100) | Δ-10 | Lacks visual description of image
 _Review Status:_ watchlist (cutoff, hallucination, metadata borrowing, missing
                  sections)
@@ -2957,43 +3122,43 @@ _Review:_ B 68/100 | ⚠️REVIEW:cutoff; Missing sections (keywords); ...
 > The user wants me to analyze the provided image and generate cataloguing
 > metadata in British English.
 > I need to follow specific rules:
-> \- Use only details clearly visible in the image.
-> \- Do not guess or infer details.
-> \- Follow the provided draft metadata hints but only keep what is confirmed.
-> \- Output exactly three sections: Title, Description, Keywords.
+> &#45; Use only details clearly visible in the image.
+> &#45; Do not guess or infer details.
+> &#45; Follow the provided draft metadata hints but only keep what is confirmed.
+> &#45; Output exactly three sections: Title, Description, Keywords.
 >
-> \*\*Image Analysis:\*\*
-> \- The image shows a close-up of a metallic surface.
-> \- It looks like a pattern of metal, possibly gold or brass, with a
+> **Image Analysis:**
+> &#45; The image shows a close-up of a metallic surface.
+> &#45; It looks like a pattern of metal, possibly gold or brass, with a
 > geometric, repeating design.
-> \- The pattern consists of trapezoidal shapes with bevelled edges.
-> \- This is a very common pattern for speaker grilles or speaker covers.
-> \- The color is a shiny, metallic gold/brass.
-> \- There is no sculpture, no statue, no "Maquette for the Spirit of the
+> &#45; The pattern consists of trapezoidal shapes with bevelled edges.
+> &#45; This is a very common pattern for speaker grilles or speaker covers.
+> &#45; The color is a shiny, metallic gold/brass.
+> &#45; There is no sculpture, no statue, no "Maquette for the Spirit of the
 > University", no Hubert Dalwood, no University of Reading, no Whiteknights
 > campus, no bronze, no stone, no handrail, no stairs, no "10 Best", no
 > "Abstract Art", no "Adobe Stock", no "Any Vision", no "Blue sky", no
 > "Daylight", no "England", no "Europe", no "Royston", no "Modern Art", no
 > "Objects" (in the sense of a sculpture), no "Textured" (it's a pattern, not
 > a texture of a sculpture), no "Town Centre".
-> \- The provided context metadata is completely wrong for this image. The
+> &#45; The provided context metadata is completely wrong for this image. The
 > image is a product shot of a speaker grille, likely for a car audio system
 > or home audio system.
-> \- The image is a repeating pattern of speaker grille inserts.
-> \- The color is gold/brass.
-> \- The material looks like metal mesh or perforated metal.
+> &#45; The image is a repeating pattern of speaker grille inserts.
+> &#45; The color is gold/brass.
+> &#45; The material looks like metal mesh or perforated metal.
 >
-> \*\*Drafting the Metadata:\*\*
+> **Drafting the Metadata:**
 >
-> \*   \*\*Title:\*\* Needs to be 5-10 words, concrete and factual.
-> \*   "Gold Speaker Grille Insert Pattern" (5 words) - This is accurate.
-> \*   "Gold Perforated Metal Speaker Grille" (5 words) - Also accurate.
-> \*   "Gold Speaker Grille Insert Pattern" seems best.
+> &#42;   **Title:** Needs to be 5-10 words, concrete and factual.
+> &#42;   "Gold Speaker Grille Insert Pattern" (5 words) - This is accurate.
+> &#42;   "Gold Perforated Metal Speaker Grille" (5 words) - Also accurate.
+> &#42;   "Gold Speaker Grille Insert Pattern" seems best.
 >
-> \*   \*\*Description:\*\* Needs to be 1-2 factual sentences.
-> \*   "This image displays a gold-colored speaker grille insert featuring
+> &#42;   **Description:** Needs to be 1-2 factual sentences.
+> &#42;   "This image displays a gold-colored speaker grille insert featuring
 > a repeating trapezoidal pattern."
-> \*   "The metallic surface
+> &#42;   "The metallic surface
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
@@ -3013,8 +3178,8 @@ _Review:_ B 68/100 | ⚠️REVIEW:cutoff; Missing sections (keywords); ...
 ### ✅ mlx-community/Qwen3.5-35B-A3B-6bit
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, abrupt_tail, trusted_overlap,
-       instruction_markers, metadata_terms, reasoning_leak, refusal
+_Why:_ hit token cap (500) | output/prompt=2.97% | nontext prompt burden=97% |
+       missing sections: title, description, keywords
 _Trusted hints:_ preserves trusted hints | nonvisual metadata reused
 _Contract:_ missing: title, description, keywords
 _Utility:_ user=avoid | preserves trusted hints | instruction echo | metadata
@@ -3022,11 +3187,12 @@ _Utility:_ user=avoid | preserves trusted hints | instruction echo | metadata
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=16839 | text_est=501 | nontext_est=16338 | gen=500
                     | max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
 
-_Metrics:_ Load 3.20s | Gen 58.10s | Total 61.48s
-_Throughput:_ Prompt 327 TPS (16,839 tok) | Gen 85.3 TPS (500 tok)
+_Metrics:_ Load 3.25s | Gen 59.08s | Total 62.51s
+_Throughput:_ Prompt 319 TPS (16,839 tok) | Gen 89.5 TPS (500 tok)
 _Assessment:_ 🟡 C (58/100) | Δ-20 | Missing requested structure
 _Review Status:_ watchlist (cutoff, instruction echo, metadata borrowing,
                  missing sections, reasoning leak, refusal)
@@ -3037,48 +3203,48 @@ _Review:_ C 58/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); .
 > The user wants me to analyze an image and generate cataloguing metadata
 > (Title, Description, Keywords) based on specific rules.
 >
-> \*\*1. Analyze the Image:\*\*
-> \*   \*\*Subject:\*\* The image shows a bronze sculpture. It appears to be a
+> **1. Analyze the Image:**
+> &#42;   **Subject:** The image shows a bronze sculpture. It appears to be a
 > small, abstract, textured piece. It looks like a cluster of organic forms or
 > perhaps a stylized figure, but it's quite abstract. It's sitting on a
 > surface.
-> \*   \*\*Setting:\*\* It's outdoors. There's a paved area (looks like concrete or
+> &#42;   **Setting:** It's outdoors. There's a paved area (looks like concrete or
 > stone slabs). There are stairs in the background. There's a building with
 > large windows in the background. It looks like a university campus or a
 > public building exterior.
-> \*   \*\*Lighting:\*\* Natural daylight. Shadows suggest the sun is shining.
-> \*   \*\*Details:\*\*
-> \*   The sculpture is bronze (brownish/greenish patina).
-> \*   It's on a plinth or base.
-> \*   There are stairs leading up behind it.
-> \*   There's a railing.
-> \*   The building has a modern architectural style (large glass windows,
+> &#42;   **Lighting:** Natural daylight. Shadows suggest the sun is shining.
+> &#42;   **Details:**
+> &#42;   The sculpture is bronze (brownish/greenish patina).
+> &#42;   It's on a plinth or base.
+> &#42;   There are stairs leading up behind it.
+> &#42;   There's a railing.
+> &#42;   The building has a modern architectural style (large glass windows,
 > concrete/stone facade).
-> \*   The image is a photograph.
+> &#42;   The image is a photograph.
 >
-> \*\*2. Evaluate the "Context" / "Existing metadata hints":\*\*
-> \*   \*Description hint:\* "The sculpture 'Maquette for the Spirit of the
+> **2. Evaluate the "Context" / "Existing metadata hints":**
+> &#42;   *Description hint:* "The sculpture 'Maquette for the Spirit of the
 > University' by British sculptor Hubert 'Nibs' Dalwood, created in 1961, is
 > seen on display at the University of Reading's Whiteknights campus in
 > Reading, UK. The bronze piece is a small-scale model for a much larger,
 > unrealized sculpture intended to represent the spirit of the university and
 > is located outside the Department of Typography &amp; Graphic Communication."
-> \*   \*Verification:\* I cannot \*see\* the text "Maquette for the Spirit of
+> &#42;   *Verification:* I cannot *see* the text "Maquette for the Spirit of
 > the University" or "Hubert Dalwood" or "University of Reading" in the image
 > itself. The prompt instructions say: "Use only details that are clearly and
 > definitely visible in the image. If a detail is uncertain, ambiguous,
 > partially obscured, too small to verify, or not directly visible, leave it
 > out. Do not guess."
-> \*   \*Conflict:\* The prompt asks me to "Reuse metadata terms only when
+> &#42;   *Conflict:* The prompt asks me to "Reuse metadata terms only when
 > they are clearly supported by the image." and "If metadata and image
 > disagree, follow the image."
-> \*   \*Decision:\* I must strictly follow the visual evidence
+> &#42;   *Decision:* I must strictly follow the visual evidence
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- Refusal detected (explicit\_refusal)
+- Refusal detected (explicit_refusal)
 - Missing sections (title, description, keywords)
 - Reasoning leak (description hint:)
 - Instruction echo
@@ -3092,7 +3258,9 @@ _Review:_ C 58/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); .
 ### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
 
 _Verdict:_ context_budget | user=caveat
-_Why:_ long_context, nontext_prompt_burden, low_hint_overlap
+_Why:_ At long prompt length (16824 tokens), output may stop following
+       prompt/image context. | output/prompt=0.11% | nontext prompt burden=97%
+       | missing sections: title, description, keywords
 _Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
                  Abstract Art, Blue sky, Bronze, Bronze Sculpture
 _Contract:_ missing: title, description, keywords
@@ -3100,11 +3268,11 @@ _Utility:_ user=caveat | ignores trusted hints
 _Stack / owner:_ owner=mlx | harness=long_context
 _Token accounting:_ prompt=16824 | text_est=501 | nontext_est=16323 | gen=18 |
                     max=500 | stop=completed
-_Next action:_ Reduce prompt/image burden or inspect long-context handling
-               before judging quality.
+_Next action:_ Treat this as a prompt-budget issue first; nontext prompt
+               burden is 97% and the output stays weak under that load.
 
-_Metrics:_ Load 0.65s | Gen 59.72s | Total 60.54s
-_Throughput:_ Prompt 285 TPS (16,824 tok) | Gen 200 TPS (18 tok)
+_Metrics:_ Load 0.84s | Gen 61.40s | Total 62.41s
+_Throughput:_ Prompt 277 TPS (16,824 tok) | Gen 202 TPS (18 tok)
 _Assessment:_ ❌ F (23/100) | Δ-55 | Output lacks detail
 _Review Status:_ watchlist (context ignored, hallucination, harness, long
                  context, missing sections)
@@ -3120,13 +3288,13 @@ _Review:_ F 23/100 | ⚠️REVIEW:context_budget; ⚠️HARNESS:long_context; ..
 
 ⚠️ _Quality Warnings:_
 
-- ⚠️REVIEW:context\_budget
-- ⚠️HARNESS:long\_context
+- ⚠️REVIEW:context_budget
+- ⚠️HARNESS:long_context
 - Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture)
 - Missing sections (title, description, keywords)
 - Ignores trusted hints
 - Contains unexpected table
-- long\_context\_context\_drop(16824tok)
+- long_context_context_drop(16824tok)
 
 ---
 
@@ -3135,8 +3303,8 @@ _Review:_ F 23/100 | ⚠️REVIEW:context_budget; ⚠️HARNESS:long_context; ..
 ### ✅ mlx-community/Qwen3.5-35B-A3B-bf16
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, abrupt_tail, trusted_overlap,
-       instruction_markers, metadata_terms, reasoning_leak, context_echo
+_Why:_ hit token cap (500) | output/prompt=2.97% | nontext prompt burden=97% |
+       missing sections: title, description, keywords
 _Trusted hints:_ preserves trusted hints | nonvisual metadata reused
 _Contract:_ missing: title, description, keywords
 _Utility:_ user=avoid | preserves trusted hints | instruction echo | metadata
@@ -3144,11 +3312,12 @@ _Utility:_ user=avoid | preserves trusted hints | instruction echo | metadata
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=16839 | text_est=501 | nontext_est=16338 | gen=500
                     | max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
 
-_Metrics:_ Load 10.14s | Gen 62.13s | Total 72.44s
-_Throughput:_ Prompt 315 TPS (16,839 tok) | Gen 64.5 TPS (500 tok)
+_Metrics:_ Load 10.01s | Gen 66.22s | Total 76.41s
+_Throughput:_ Prompt 292 TPS (16,839 tok) | Gen 64.6 TPS (500 tok)
 _Assessment:_ ✅ B (75/100) | Δ-3 | None identified
 _Review Status:_ watchlist (context echo, cutoff, instruction echo, metadata
                  borrowing, missing sections, reasoning leak)
@@ -3168,35 +3337,35 @@ _Review:_ B 75/100 | ⚠️REVIEW:cutoff; Missing sections (title, description,
 > images.
 > Let's look at the content of the grid.
 > Top row:
-> \1. Close up of a bronze object, looks like a hand or part of a figure.
-> \2. Another close up, maybe a face or head.
-> \3. A wider shot of a bronze sculpture on a plinth.
-> \4. Another angle of the sculpture.
+> 1&#46; Close up of a bronze object, looks like a hand or part of a figure.
+> 2&#46; Another close up, maybe a face or head.
+> 3&#46; A wider shot of a bronze sculpture on a plinth.
+> 4&#46; Another angle of the sculpture.
 >
 > Middle row:
-> \5. Close up of a hand holding something? Or a figure's hand.
-> \6. Close up of a face/head.
-> \7. Wide shot of the sculpture on a plinth outdoors.
-> \8. Another wide shot.
+> 5&#46; Close up of a hand holding something? Or a figure's hand.
+> 6&#46; Close up of a face/head.
+> 7&#46; Wide shot of the sculpture on a plinth outdoors.
+> 8&#46; Another wide shot.
 >
 > Bottom row:
-> \9. Close up of a hand.
-> \10. Close up of a face.
-> \11. Wide shot of the sculpture.
-> \12. Wide shot of the sculpture.
+> 9&#46; Close up of a hand.
+> 10&#46; Close up of a face.
+> 11&#46; Wide shot of the sculpture.
+> 12&#46; Wide shot of the sculpture.
 >
 > Actually, looking very closely at the thumbnails, they seem to be variations
 > of the same subject or similar subjects.
 > Let's look at the "Context" provided in the prompt.
 > "Context: Existing metadata hints (high confidence; use only when visually
 > confirmed):
-> \- Description hint: The sculpture 'Maquette for the Spirit of the
+> &#45; Description hint: The sculpture 'Maquette for the Spirit of the
 > University' by British sculptor Hubert 'Nibs' Dalwood, created in 1961, is
 > seen on display at the University of Reading's Whiteknights campus in
 > Reading, UK. The bronze piece is a small-scale model for a much larger,
 > unrealized sculpture intended to represent the spirit of the university and
 > is located outside the Department of Typography &amp; Graphic Communication.
-> \- Keyword hints: 10 Best (structured), Abstract Art, Adobe Stock, Any
+> &#45; Keyword hints: 10 Best (structured), Abstract Art, Adobe Stock, Any
 > Vision, Blue sky, Bronze, Bronze Sculpture, Daylight, England, Europe,
 > Handrail, Modern Art, Objects, Royston, Sculpture, Stairs, Statue, Stone,
 > Textured, Town Centre"
@@ -3221,8 +3390,8 @@ _Review:_ B 75/100 | ⚠️REVIEW:cutoff; Missing sections (title, description,
 ### ✅ mlx-community/Qwen3.5-27B-4bit
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, trusted_overlap, instruction_markers,
-       metadata_terms, reasoning_leak, refusal
+_Why:_ hit token cap (500) | output/prompt=2.97% | nontext prompt burden=97% |
+       missing sections: title, description, keywords
 _Trusted hints:_ preserves trusted hints | nonvisual metadata reused
 _Contract:_ missing: title, description, keywords
 _Utility:_ user=avoid | preserves trusted hints | instruction echo | metadata
@@ -3230,11 +3399,12 @@ _Utility:_ user=avoid | preserves trusted hints | instruction echo | metadata
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=16839 | text_est=501 | nontext_est=16338 | gen=500
                     | max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
 
-_Metrics:_ Load 2.25s | Gen 88.19s | Total 90.63s
-_Throughput:_ Prompt 239 TPS (16,839 tok) | Gen 29.7 TPS (500 tok)
+_Metrics:_ Load 2.32s | Gen 90.03s | Total 92.53s
+_Throughput:_ Prompt 234 TPS (16,839 tok) | Gen 29.1 TPS (500 tok)
 _Assessment:_ 🟡 C (61/100) | Δ-17 | Missing requested structure
 _Review Status:_ watchlist (cutoff, instruction echo, metadata borrowing,
                  missing sections, reasoning leak, refusal)
@@ -3245,32 +3415,32 @@ _Review:_ C 61/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); .
 > The user wants me to analyze the image and generate cataloguing metadata
 > based on specific rules.
 >
-> \*\*1. Analyze the Image:\*\*
-> \*   \*\*Subject:\*\* A bronze sculpture of a human figure. It appears to be a
+> **1. Analyze the Image:**
+> &#42;   **Subject:** A bronze sculpture of a human figure. It appears to be a
 > woman or a figure with long hair, standing on a pedestal. The figure is
 > draped in flowing robes or fabric. The head is tilted slightly upwards. The
 > hands are raised, holding something or gesturing.
-> \*   \*\*Material:\*\* It looks like bronze or a similar dark metal. It has a
+> &#42;   **Material:** It looks like bronze or a similar dark metal. It has a
 > textured surface.
-> \*   \*\*Setting:\*\* It is outdoors. There is a stone wall or building facade in
+> &#42;   **Setting:** It is outdoors. There is a stone wall or building facade in
 > the background. There is a metal railing or handrail visible to the left.
 > The ground is paved with stone slabs.
-> \*   \*\*Lighting:\*\* Natural daylight. Shadows are cast to the right,
+> &#42;   **Lighting:** Natural daylight. Shadows are cast to the right,
 > suggesting the sun is to the left. The lighting is somewhat harsh, creating
 > strong contrasts.
-> \*   \*\*Composition:\*\* The sculpture is centered but slightly to the right.
+> &#42;   **Composition:** The sculpture is centered but slightly to the right.
 > The angle is slightly low, looking up at the figure.
-> \*   \*\*Details:\*\* The figure's hair is long and wavy. The drapery is
+> &#42;   **Details:** The figure's hair is long and wavy. The drapery is
 > intricate. The pedestal is a simple, rectangular stone block.
 >
-> \*\*2. Evaluate Existing Metadata Hints:\*\*
-> \*   \*\*Description hint:\*\* "The sculpture 'Maquette for the Spirit of the
+> **2. Evaluate Existing Metadata Hints:**
+> &#42;   **Description hint:** "The sculpture 'Maquette for the Spirit of the
 > University' by British sculptor Hubert 'Nibs' Dalwood, created in 1961, is
 > seen on display at the University of Reading's Whiteknights campus in
 > Reading, UK. The bronze piece is a small-scale model for a much larger,
 > unrealized sculpture intended to represent the spirit of the university and
 > is located outside the Department of Typography &amp; Graphic Communication."
-> \*   \*Verification:\* The image shows a bronze sculpture of a figure. It
+> &#42;   *Verification:* The image shows a bronze sculpture of a figure. It
 > looks like a maquette (small model). The setting looks like a university
 > campus (stone buildings, paved areas). The description matches the visual
 > content well enough to be plausible, but I need to be careful not to confirm
@@ -3286,7 +3456,7 @@ _Review:_ C 61/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); .
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- Refusal detected (explicit\_refusal)
+- Refusal detected (explicit_refusal)
 - Missing sections (title, description, keywords)
 - Reasoning leak (description hint:)
 - Instruction echo
@@ -3300,8 +3470,8 @@ _Review:_ C 61/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); .
 ### ✅ mlx-community/Qwen3.5-27B-mxfp8
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ token_cap, missing_sections, abrupt_tail, trusted_overlap,
-       instruction_markers, metadata_terms, reasoning_leak, refusal
+_Why:_ hit token cap (500) | output/prompt=2.97% | nontext prompt burden=97% |
+       missing sections: title, description, keywords
 _Trusted hints:_ preserves trusted hints | nonvisual metadata reused
 _Contract:_ missing: title, description, keywords
 _Utility:_ user=avoid | preserves trusted hints | instruction echo | metadata
@@ -3309,11 +3479,12 @@ _Utility:_ user=avoid | preserves trusted hints | instruction echo | metadata
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=16839 | text_est=501 | nontext_est=16338 | gen=500
                     | max=500 | stop=completed
-_Next action:_ Inspect token cap and stop behavior before treating this as a
-               model-quality failure.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
 
-_Metrics:_ Load 3.94s | Gen 99.64s | Total 103.77s
-_Throughput:_ Prompt 237 TPS (16,839 tok) | Gen 18.0 TPS (500 tok)
+_Metrics:_ Load 3.20s | Gen 101.25s | Total 104.63s
+_Throughput:_ Prompt 233 TPS (16,839 tok) | Gen 17.8 TPS (500 tok)
 _Assessment:_ ✅ B (67/100) | Δ-10 | None identified
 _Review Status:_ watchlist (cutoff, hallucination, instruction echo, metadata
                  borrowing, missing sections, reasoning leak, refusal)
@@ -3323,26 +3494,26 @@ _Review:_ B 67/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); .
 >
 > The user wants me to analyze the image and generate cataloguing metadata.
 >
-> \*\*1. Analyze the Image:\*\*
-> \*   \*\*Subject:\*\* It's a bronze sculpture. It looks like a stylized, abstract
+> **1. Analyze the Image:**
+> &#42;   **Subject:** It's a bronze sculpture. It looks like a stylized, abstract
 > figure. It has a tall, slender form. It appears to be a maquette (a small
 > model).
-> \*   \*\*Setting:\*\* It's placed on a white surface, likely a table or plinth.
+> &#42;   **Setting:** It's placed on a white surface, likely a table or plinth.
 > The background is plain white. This suggests a studio shot or a product
 > photo, not an outdoor scene.
-> \*   \*\*Lighting:\*\* Even, soft lighting. No harsh shadows.
-> \*   \*\*Details:\*\* The sculpture has a textured surface. It looks like a human
+> &#42;   **Lighting:** Even, soft lighting. No harsh shadows.
+> &#42;   **Details:** The sculpture has a textured surface. It looks like a human
 > figure but very abstract. It has a head, torso, and legs, but they are
 > elongated and stylized. There's a base it stands on.
 >
-> \*\*2. Evaluate Existing Metadata Hints:\*\*
-> \*   \*\*Description hint:\*\* "The sculpture 'Maquette for the Spirit of the
+> **2. Evaluate Existing Metadata Hints:**
+> &#42;   **Description hint:** "The sculpture 'Maquette for the Spirit of the
 > University' by British sculptor Hubert 'Nibs' Dalwood, created in 1961, is
 > seen on display at the University of Reading's Whiteknights campus in
 > Reading, UK. The bronze piece is a small-scale model for a much larger,
 > unrealized sculpture intended to represent the spirit of the university and
 > is located outside the Department of Typography &amp; Graphic Communication."
-> \*   \*Critique:\* The image shows the object on a white background, likely
+> &#42;   *Critique:* The image shows the object on a white background, likely
 > a studio shot. The hint says it's "seen on display at the University of
 > Reading's Whiteknights campus... located outside". This contradicts the
 > visual evidence. The image is clearly a studio shot against a white
@@ -3351,17 +3522,17 @@ _Review:_ B 67/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); .
 > describe the object as a bronze sculpture/maquette. I should not include the
 > specific location details if they aren't visible (which they aren't; it's a
 > white background).
-> \*   \*\*Keyword hints:\*\* "10 Best (structured), Abstract Art, Adobe Stock, Any
+> &#42;   **Keyword hints:** "10 Best (structured), Abstract Art, Adobe Stock, Any
 > Vision, Blue sky, Bronze, Bronze Sculpture, Daylight, England, Europe,
 > Handrail, Modern Art, Objects, Royston, Sculpture, Stairs, Statue, Stone,
 > Textured, Town Centre"
-> \*   \*Critique:\* "Blue sky", "Daylight", "Handrail", "Stairs
+> &#42;   *Critique:* "Blue sky", "Daylight", "Handrail", "Stairs
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- Refusal detected (explicit\_refusal)
+- Refusal detected (explicit_refusal)
 - Missing sections (title, description, keywords)
 - Reasoning leak (description hint:, keyword hints:)
 - Instruction echo

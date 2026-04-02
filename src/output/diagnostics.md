@@ -72,7 +72,7 @@ Captured stdout/stderr:
 ```text
 === STDERR ===
 
-/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/modeling_rope_utils.py:935: FutureWarning: `rope_config_validation` is deprecated and has been removed. Its functionality has been moved to RotaryEmbeddingConfigMixin.validate_rope method. PreTrainedConfig inherits this class, so please call self.validate_rope() instead. Also, make sure to use the new rope_parameters syntax. You can call self.standardize_rope_params() in the meantime.
+/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/modeling_rope_utils.py:1021: FutureWarning: `rope_config_validation` is deprecated and has been removed. Its functionality has been moved to RotaryEmbeddingConfigMixin.validate_rope method. PreTrainedConfig inherits this class, so please call self.validate_rope() instead. Also, make sure to use the new rope_parameters syntax. You can call self.standardize_rope_params() in the meantime.
   warnings.warn(
 ```
 
@@ -118,7 +118,7 @@ point to stack/runtime behavior rather than inherent model quality limits.
 **Why this appears to be an integration/runtime issue:**
 
 - At long prompt length (16813 tokens), output became repetitive.
-- Output became repetitive, indicating possible generation instability.
+- Output became repetitive, indicating possible generation instability (token: phrase: "15:52:29 local time, 15:52:29...").
 
 **Sample output:**
 
@@ -140,7 +140,7 @@ A bronze sculpture titled 'Maquette for the Spirit of the University' by British
 **Why this appears to be an integration/runtime issue:**
 
 - Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 46 occurrences).
-- Output omitted required Title/Description/Keywords sections.
+- Output omitted required Title/Description/Keywords sections (description, keywords).
 
 **Sample output:**
 
@@ -158,10 +158,9 @@ Title:ĠBronzeĠSculptureĠonĠPedestalĊĊDescription:ĠAĠbronzeĠabstractĠsc
 **Why this appears to be an integration/runtime issue:**
 
 - Special control token &lt;/think&gt; appeared in generated text.
-- Model output may not follow prompt or image contents.
-- Output formatting deviated from the requested structure.
-- Output omitted required Title/Description/Keywords sections.
-- Output leaked reasoning or prompt-template text.
+- Output formatting deviated from the requested structure. Details: Unknown tags: <think>.
+- Output omitted required Title/Description/Keywords sections (title, keywords).
+- Output leaked reasoning or prompt-template text (<think>).
 
 **Sample output:**
 
@@ -181,9 +180,9 @@ Title:ĠBronzeĠSculptureĠonĠPedestalĊĊDescription:ĠAĠbronzeĠabstractĠsc
 **Why this appears to be an integration/runtime issue:**
 
 - Special control token &lt;/think&gt; appeared in generated text.
-- Output formatting deviated from the requested structure.
-- Output omitted required Title/Description/Keywords sections.
-- Output leaked reasoning or prompt-template text.
+- Output formatting deviated from the requested structure. Details: Unknown tags: <think>.
+- Output omitted required Title/Description/Keywords sections (title).
+- Output leaked reasoning or prompt-template text (<think>).
 
 **Sample output:**
 
@@ -201,8 +200,8 @@ Title:ĠBronzeĠSculptureĠonĠPedestalĊĊDescription:ĠAĠbronzeĠabstractĠsc
 **Why this appears to be an integration/runtime issue:**
 
 - At long prompt length (16824 tokens), output may stop following prompt/image context.
-- Model output may not follow prompt or image contents.
-- Output omitted required Title/Description/Keywords sections.
+- Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture).
+- Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 **Sample output:**
 
@@ -223,7 +222,7 @@ Might be a scene from a movie
 **Why this appears to be an integration/runtime issue:**
 
 - At long prompt length (16824 tokens), output may stop following prompt/image context.
-- Model output may not follow prompt or image contents.
+- Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture).
 
 **Sample output:**
 
@@ -245,8 +244,8 @@ Description:
 **Why this appears to be an integration/runtime issue:**
 
 - Output is very short relative to prompt size (0.4%), suggesting possible early-stop or prompt-handling issues.
-- Model output may not follow prompt or image contents.
-- Output omitted required Title/Description/Keywords sections.
+- Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze Sculpture, Daylight).
+- Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 **Sample output:**
 
@@ -264,7 +263,7 @@ The sculpture is a bronze piece.
 **Why this appears to be an integration/runtime issue:**
 
 - Output is very short relative to prompt size (0.6%), suggesting possible early-stop or prompt-handling issues.
-- Model output may not follow prompt or image contents.
+- Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture).
 
 **Sample output:**
 
@@ -282,8 +281,8 @@ The sculpture is a bronze piece.
 **Why this appears to be an integration/runtime issue:**
 
 - Output is very short relative to prompt size (0.7%), suggesting possible early-stop or prompt-handling issues.
-- Model output may not follow prompt or image contents.
-- Output omitted required Title/Description/Keywords sections.
+- Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture).
+- Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 **Sample output:**
 
@@ -324,13 +323,13 @@ model appears).
 - **Detailed diagnostics models:** 11
 - **Summary diagnostics models:** 40
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1089.13s (1089.13s)
-- **Average runtime per model:** 21.36s (21.36s)
+- **Total model runtime (sum):** 1111.17s (1111.17s)
+- **Average runtime per model:** 21.79s (21.79s)
 - **Dominant runtime phase:** decode dominated 49/51 measured model runs (90% of tracked runtime).
-- **Phase totals:** model load=108.01s, prompt prep=0.12s, decode=972.15s, cleanup=4.80s
+- **Phase totals:** model load=107.35s, prompt prep=0.13s, decode=994.90s, cleanup=4.77s
 - **Observed stop reasons:** completed=50, exception=1
-- **Validation overhead:** 8.59s total (avg 0.17s across 51 model(s)).
-- **First-token latency:** Avg 11.21s | Min 0.07s | Max 71.11s across 50 model(s).
+- **Validation overhead:** 8.53s total (avg 0.17s across 51 model(s)).
+- **First-token latency:** Avg 11.62s | Min 0.08s | Max 72.35s across 50 model(s).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
@@ -341,51 +340,51 @@ model appears).
 These models completed without diagnostics flags (no hard failure, harness
 warning, or stack-signal anomaly).
 
-### Clean output (2 model(s))
+### Clean output (3 model(s))
 
 - `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`
 - `mlx-community/gemma-3-27b-it-qat-4bit`
+- `mlx-community/gemma-3-27b-it-qat-8bit`
 
-### Ran, but with quality warnings (38 model(s))
+### Ran, but with quality warnings (37 model(s))
 
-- `HuggingFaceTB/SmolVLM-Instruct`: Model output may not follow prompt or image contents.
-- `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: Model output may not follow prompt or image contents.
-- `meta-llama/Llama-3.2-11B-Vision-Instruct`: Output omitted required Title/Description/Keywords sections.
-- `microsoft/Phi-3.5-vision-instruct`: Output became repetitive, indicating possible generation instability.
-- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Output omitted required Title/Description/Keywords sections.
-- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: Output became repetitive, indicating possible generation instability.
-- `mlx-community/FastVLM-0.5B-bf16`: Model output may not follow prompt or image contents.
-- `mlx-community/GLM-4.6V-Flash-6bit`: Model output may not follow prompt or image contents.
-- `mlx-community/Idefics3-8B-Llama3-bf16`: Model output may not follow prompt or image contents.
-- `mlx-community/InternVL3-14B-8bit`: Model output may not follow prompt or image contents.
-- `mlx-community/InternVL3-8B-bf16`: Model output may not follow prompt or image contents.
-- `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`: Model output may not follow prompt or image contents.
-- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: Model output may not follow prompt or image contents.
-- `mlx-community/LFM2-VL-1.6B-8bit`: Output omitted required Title/Description/Keywords sections.
-- `mlx-community/LFM2.5-VL-1.6B-bf16`: Output became repetitive, indicating possible generation instability.
-- `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: Model output may not follow prompt or image contents.
-- `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`: Model output may not follow prompt or image contents.
-- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: Model output may not follow prompt or image contents.
+- `HuggingFaceTB/SmolVLM-Instruct`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
+- `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
+- `meta-llama/Llama-3.2-11B-Vision-Instruct`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- `microsoft/Phi-3.5-vision-instruct`: Output became repetitive, indicating possible generation instability (token: phrase: "educational artistic expressio....
+- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Output omitted required Title/Description/Keywords sections (title).
+- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: Output became repetitive, indicating possible generation instability (token: phrase: ""a stone or bronze...").
+- `mlx-community/FastVLM-0.5B-bf16`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
+- `mlx-community/GLM-4.6V-Flash-6bit`: Output became repetitive, indicating possible generation instability (token: phrase: "sculpture, statue, stone, bric....
+- `mlx-community/Idefics3-8B-Llama3-bf16`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
+- `mlx-community/InternVL3-14B-8bit`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
+- `mlx-community/InternVL3-8B-bf16`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
+- `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
+- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
+- `mlx-community/LFM2-VL-1.6B-8bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- `mlx-community/LFM2.5-VL-1.6B-bf16`: Output became repetitive, indicating possible generation instability (token: phrase: "university of reading, whitekn....
+- `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: Output became repetitive, indicating possible generation instability (token: phrase: "art, piece, art, piece,...").
+- `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze S...
+- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: Title length violation (4 words; expected 5-10)
 - `mlx-community/Molmo-7B-D-0924-8bit`: Title length violation (11 words; expected 5-10)
-- `mlx-community/Molmo-7B-D-0924-bf16`: Model output may not follow prompt or image contents.
-- `mlx-community/Phi-3.5-vision-instruct-bf16`: Output became repetitive, indicating possible generation instability.
-- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: Output leaked reasoning or prompt-template text.
-- `mlx-community/Qwen3.5-27B-4bit`: Model refused or deflected the requested task.
-- `mlx-community/Qwen3.5-27B-mxfp8`: Model refused or deflected the requested task.
-- `mlx-community/Qwen3.5-35B-A3B-4bit`: Model refused or deflected the requested task.
-- `mlx-community/Qwen3.5-35B-A3B-6bit`: Model refused or deflected the requested task.
-- `mlx-community/Qwen3.5-9B-MLX-4bit`: Output omitted required Title/Description/Keywords sections.
-- `mlx-community/SmolVLM-Instruct-bf16`: Model output may not follow prompt or image contents.
-- `mlx-community/SmolVLM2-2.2B-Instruct-mlx`: Model output may not follow prompt or image contents.
-- `mlx-community/gemma-3-27b-it-qat-8bit`: Model output may not follow prompt or image contents.
-- `mlx-community/gemma-3n-E2B-4bit`: Model output may not follow prompt or image contents.
+- `mlx-community/Molmo-7B-D-0924-bf16`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
+- `mlx-community/Phi-3.5-vision-instruct-bf16`: Output became repetitive, indicating possible generation instability (token: phrase: "educational artistic expressio....
+- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: Output leaked reasoning or prompt-template text (description hint:).
+- `mlx-community/Qwen3.5-27B-4bit`: Model refused or deflected the requested task (explicit_refusal).
+- `mlx-community/Qwen3.5-27B-mxfp8`: Model refused or deflected the requested task (explicit_refusal).
+- `mlx-community/Qwen3.5-35B-A3B-4bit`: Model refused or deflected the requested task (explicit_refusal).
+- `mlx-community/Qwen3.5-35B-A3B-6bit`: Model refused or deflected the requested task (explicit_refusal).
+- `mlx-community/Qwen3.5-9B-MLX-4bit`: Output omitted required Title/Description/Keywords sections (keywords).
+- `mlx-community/SmolVLM-Instruct-bf16`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
+- `mlx-community/SmolVLM2-2.2B-Instruct-mlx`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
+- `mlx-community/gemma-3n-E2B-4bit`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
 - `mlx-community/gemma-3n-E4B-it-bf16`: Title length violation (11 words; expected 5-10)
-- `mlx-community/nanoLLaVA-1.5-4bit`: Output became repetitive, indicating possible generation instability.
-- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: Model output may not follow prompt or image contents.
-- `mlx-community/paligemma2-3b-pt-896-4bit`: Model output may not follow prompt or image contents.
+- `mlx-community/nanoLLaVA-1.5-4bit`: Output became repetitive, indicating possible generation instability (token: phrase: "bricks, bricks, bricks, bricks....
+- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
+- `mlx-community/paligemma2-3b-pt-896-4bit`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
 - `mlx-community/pixtral-12b-8bit`: Description sentence violation (3; expected 1-2)
-- `mlx-community/pixtral-12b-bf16`: Model output may not follow prompt or image contents.
-- `qnguyen3/nanoLLaVA`: Model output may not follow prompt or image contents.
+- `mlx-community/pixtral-12b-bf16`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze S...
+- `qnguyen3/nanoLLaVA`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
 
 ---
 
@@ -394,9 +393,9 @@ warning, or stack-signal anomaly).
 | Component | Version |
 | --------- | ------- |
 | mlx-vlm | 0.4.3 |
-| mlx | 0.31.2.dev20260401+b0748ad8 |
+| mlx | 0.31.2.dev20260402+befe42d3 |
 | mlx-lm | 0.31.2 |
-| transformers | 5.4.0 |
+| transformers | 5.5.0 |
 | tokenizers | 0.22.2 |
 | huggingface-hub | 1.8.0 |
 | Python Version | 3.13.12 |
@@ -492,4 +491,4 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 - Input image: `/Users/jrp/Pictures/Processed/20260328-155229_DSC09514.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-04-02 00:00:55 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-04-02 23:22:04 BST by [check_models](https://github.com/jrp2014/check_models)._
