@@ -68,10 +68,10 @@ def test_detect_hallucination_patterns_uses_configured_keyword_lists() -> None:
 
 def test_analyze_generation_text_excessive_verbosity() -> None:
     """Test detection of overly verbose output."""
-    # Verbosity requires 300+ tokens AND meta-commentary or section headers
+    # Verbosity requires 400+ tokens AND meta-commentary or section headers
     text = "The image shows " * 50 + "\n### Analysis\n" + "content " * 50
-    # Must have 300+ generated tokens
-    analysis = check_models.analyze_generation_text(text, 350)
+    # Must have 400+ generated tokens
+    analysis = check_models.analyze_generation_text(text, 450)
 
     assert analysis.is_verbose
 
@@ -98,11 +98,9 @@ def test_analyze_generation_text_excessive_bullets() -> None:
 
 def test_analyze_generation_text_multiple_issues() -> None:
     """Test that multiple issues can be detected simultaneously."""
-    # Repetitive (80%+ same token) + excessive bullets (>25)
-    # Each line has only 2 tokens: "-" and "same", so "same" is 50% repetition (not enough)
-    # Need to make "same" appear 80%+ of the time
-    text = "\n".join(["- same same same same"] * 30)  # "same" appears 120 times, "-" 30 times
-    analysis = check_models.analyze_generation_text(text, 150)
+    # Repetitive (90%+ same token) + excessive bullets (>25)
+    text = "\n".join(["- " + " ".join(["same"] * 9)] * 30)
+    analysis = check_models.analyze_generation_text(text, 300)
 
     assert analysis.is_repetitive
     assert analysis.has_excessive_bullets
@@ -141,7 +139,7 @@ def test_analyze_generation_text_empty_input() -> None:
 
 def test_analyze_generation_text_context_ignorance_custom_marker() -> None:
     """Test detection of context ignorance with a custom marker."""
-    # Use trusted hints with at least 3 key terms to meet minimum threshold
+    # Use trusted hints with at least 5 key terms to meet minimum threshold
     prompt = (
         "MyMarker: Title hint: White Rock shoreline. "
         "Description hint: White Rock shoreline with wooden posts.\n\nDescribe the image."

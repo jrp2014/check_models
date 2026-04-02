@@ -681,12 +681,16 @@ class TestMarkdownGalleryReport:
 
         content = out.read_text(encoding="utf-8")
         assert "# Automated Review Digest" in content
-        assert "## Maintainer Queue" in content
+        assert "## 🧭 Review Priorities" in content
         assert "## User Buckets" in content
+        assert "## Maintainer Queue" in content
         assert "## Model Verdicts" in content
         assert "`mlx-vlm`" in content or "`transformers`" in content
         assert "`recommended`" in content
         assert "`avoid`" in content
+        assert content.index("## User Buckets") < content.index("## Maintainer Queue")
+        assert "| Model | Verdict | Hint Handling | Key Evidence |" in content
+        assert "| Model | Verdict | Evidence | Next Action |" in content
         assert "Canonical run log" in content
 
     def test_gallery_includes_shared_triage_sections_and_review_status(
@@ -879,6 +883,11 @@ class TestDiagnosticsReport:
                 "prompt_tokens_total": None,
                 "prompt_tokens_text_est": None,
                 "prompt_tokens_nontext_est": None,
+                "prompt_output_ratio": None,
+                "nontext_prompt_ratio": None,
+                "missing_terms": [],
+                "missing_sections": [],
+                "harness_details": [],
             },
         )
         assert "Hugging Face was reachable" in action

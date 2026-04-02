@@ -882,6 +882,11 @@ class JsonlReviewRecord(TypedDict):
     prompt_tokens_total: int | None
     prompt_tokens_text_est: int | None
     prompt_tokens_nontext_est: int | None
+    prompt_output_ratio: float | None
+    nontext_prompt_ratio: float | None
+    missing_terms: list[str]
+    missing_sections: list[str]
+    harness_details: list[str]
 
 
 class JsonlMetadataRecord(TypedDict):
@@ -8218,9 +8223,21 @@ def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord |
     if generation is not None:
         generation_tokens = getattr(generation, "generation_tokens", 0) or 0
     prompt_tokens_total = getattr(generation, "prompt_tokens", None) if generation else None
+    prompt_output_ratio = (
+        generation_tokens / prompt_tokens_total
+        if prompt_tokens_total is not None and prompt_tokens_total > 0
+        else None
+    )
 
     if analysis is not None:
         requested_max_tokens = analysis.requested_max_tokens or result.requested_max_tokens
+        nontext_prompt_ratio = (
+            analysis.prompt_tokens_nontext_est / analysis.prompt_tokens_total
+            if analysis.prompt_tokens_total is not None
+            and analysis.prompt_tokens_total > 0
+            and analysis.prompt_tokens_nontext_est is not None
+            else None
+        )
         return {
             "verdict": analysis.verdict,
             "hint_relationship": analysis.hint_relationship,
@@ -8237,6 +8254,11 @@ def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord |
             "prompt_tokens_total": analysis.prompt_tokens_total,
             "prompt_tokens_text_est": analysis.prompt_tokens_text_est,
             "prompt_tokens_nontext_est": analysis.prompt_tokens_nontext_est,
+            "prompt_output_ratio": prompt_output_ratio,
+            "nontext_prompt_ratio": nontext_prompt_ratio,
+            "missing_terms": list(analysis.missing_context_terms),
+            "missing_sections": list(analysis.missing_sections),
+            "harness_details": list(analysis.harness_issue_details),
         }
 
     if result.success:
@@ -8265,6 +8287,11 @@ def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord |
         "prompt_tokens_total": prompt_tokens_total,
         "prompt_tokens_text_est": None,
         "prompt_tokens_nontext_est": None,
+        "prompt_output_ratio": prompt_output_ratio,
+        "nontext_prompt_ratio": None,
+        "missing_terms": [],
+        "missing_sections": [],
+        "harness_details": [],
     }
 
 
@@ -8286,6 +8313,8 @@ _HUGGINGFACE_HUB_CONNECTIVITY_NEEDLES: Final[tuple[str, ...]] = (
     "502 bad gateway",
     "504 gateway timeout",
 )
+
+HEAVY_NON_TEXT_PROMPT_RATIO_THRESHOLD: Final[float] = 0.5
 
 
 def _is_huggingface_hub_connectivity_failure(result: PerformanceResult) -> bool:
@@ -8416,21 +8445,155 @@ def _review_token_accounting_text(result: PerformanceResult, review: JsonlReview
     return " | ".join(parts)
 
 
+def _humanize_review_evidence_label(label: str) -> str:
+    """Return a human-readable fallback label for compact review evidence."""
+    return label.replace("_", " ")
+
+
+def _review_focus_text(
+    review: JsonlReviewRecord,
+    analysis: GenerationQualityAnalysis | None,
+) -> str:
+    """Return compact evidence text tuned for human review surfaces."""
+    parts: list[str] = []
+
+    harness_descriptions = [
+        description
+        for detail in review["harness_details"][:2]
+        if (description := _describe_harness_detail(detail))
+    ]
+    parts.extend(harness_descriptions)
+
+    if review["hit_max_tokens"] and review["requested_max_tokens"] is not None:
+        parts.append(f"hit token cap ({review['requested_max_tokens']})")
+
+    if review["prompt_output_ratio"] is not None and review["verdict"] in {
+        "cutoff",
+        "context_budget",
+    }:
+        parts.append(f"output/prompt={review['prompt_output_ratio']:.2%}")
+
+    if (
+        review["nontext_prompt_ratio"] is not None
+        and review["nontext_prompt_ratio"] >= HEAVY_NON_TEXT_PROMPT_RATIO_THRESHOLD
+    ):
+        parts.append(f"nontext prompt burden={review['nontext_prompt_ratio']:.0%}")
+
+    if review["missing_sections"]:
+        parts.append("missing sections: " + ", ".join(review["missing_sections"]))
+
+    if review["missing_terms"]:
+        parts.append("missing terms: " + ", ".join(review["missing_terms"]))
+
+    if analysis is not None:
+        if (
+            analysis.has_keyword_duplication_violation
+            and analysis.keyword_duplication_ratio is not None
+        ):
+            parts.append(f"keyword duplication={analysis.keyword_duplication_ratio:.0%}")
+        elif analysis.has_keyword_count_violation and analysis.keyword_count is not None:
+            parts.append(f"keywords={analysis.keyword_count}")
+
+        if analysis.has_context_echo and analysis.context_echo_ratio > 0:
+            parts.append(f"context echo={analysis.context_echo_ratio:.0%}")
+        if analysis.metadata_borrowing:
+            parts.append("nonvisual metadata reused")
+        if analysis.has_reasoning_leak:
+            parts.append("reasoning leak")
+        if analysis.has_degeneration and analysis.degeneration_type is not None:
+            parts.append(f"degeneration={analysis.degeneration_type}")
+        if analysis.is_repetitive and analysis.repeated_token is not None:
+            parts.append(f"repetitive token={analysis.repeated_token}")
+
+    if not parts and review["evidence"]:
+        parts.extend(_humanize_review_evidence_label(label) for label in review["evidence"][:3])
+
+    return " | ".join(_dedupe_preserve_order(parts[:4])) or "no flagged signals"
+
+
+def _review_cutoff_next_action(review: JsonlReviewRecord) -> str:
+    """Return evidence-specific next action for cutoff verdicts."""
+    action = (
+        "Inspect stop behavior and tail quality before treating this as a model-quality failure."
+    )
+    if review["hit_max_tokens"] and review["missing_sections"]:
+        action = (
+            "Raise the token cap or trim prompt burden first; generation hit the limit "
+            f"while {', '.join(review['missing_sections'])} remained incomplete."
+        )
+    elif review["hit_max_tokens"] and review["prompt_output_ratio"] is not None:
+        action = (
+            "Treat this as cap-limited output first; generation exhausted the token budget "
+            f"with output/prompt={review['prompt_output_ratio']:.2%}."
+        )
+    return action
+
+
+def _review_owner_specific_next_action(review: JsonlReviewRecord) -> str | None:
+    """Return owner-tuned action text when evidence allows a more specific hint."""
+    owner = review["owner"]
+    harness_details = tuple(review["harness_details"])
+    action: str | None = None
+
+    if owner == "mlx-vlm":
+        if any(detail.startswith("token_leak:") for detail in harness_details):
+            action = "Inspect EOS/stop-token stripping; control tokens are leaking into user-facing text."
+        elif any(detail.startswith("token_encoding:") for detail in harness_details):
+            action = "Inspect decode cleanup; tokenizer markers are leaking into user-facing text."
+        elif any(detail.startswith("training_leak:") for detail in harness_details):
+            action = (
+                "Inspect continuation and stop handling; generation is drifting into template text."
+            )
+    elif (
+        owner == "mlx"
+        and review["nontext_prompt_ratio"] is not None
+        and review["nontext_prompt_ratio"] >= HEAVY_NON_TEXT_PROMPT_RATIO_THRESHOLD
+    ):
+        action = "Inspect long-context cache behavior under heavy image-token burden."
+    elif owner == "model-config" and review["missing_sections"]:
+        action = (
+            "Check chat-template and EOS defaults first; the output shape is not matching the "
+            "requested contract."
+        )
+    elif owner == "model":
+        if review["missing_sections"]:
+            action = (
+                "Treat as a model limitation for this prompt; the requested output contract is "
+                "not being met."
+            )
+        elif review["missing_terms"]:
+            action = (
+                "Treat as a model limitation for this prompt; trusted hint coverage is still weak."
+            )
+
+    return action
+
+
 def _review_next_action_text(review: JsonlReviewRecord) -> str:
     """Return one actionable next-step line for developers or users."""
+    action: str | None = None
     if review["verdict"] == "cutoff":
-        return (
-            "Inspect token cap and stop behavior before treating this as a model-quality failure."
+        action = _review_cutoff_next_action(review)
+    elif review["verdict"] == "context_budget":
+        action = (
+            "Treat this as a prompt-budget issue first; nontext prompt burden is "
+            f"{review['nontext_prompt_ratio']:.0%} and the output stays weak under that load."
+            if review["nontext_prompt_ratio"] is not None
+            else "Reduce prompt/image burden or inspect long-context handling before judging quality."
         )
-    if review["verdict"] == "context_budget":
-        return "Reduce prompt/image burden or inspect long-context handling before judging quality."
-    if review["owner"] == "huggingface-hub":
-        if "hub_connectivity" in review["evidence"]:
-            return (
-                "Check whether Hugging Face was reachable; this may be a transient Hub/network "
-                "outage or disconnect rather than a model defect."
-            )
-        return "Check cache/revision availability and network/auth state before blaming the model."
+    elif review["owner"] == "huggingface-hub":
+        action = (
+            "Check whether Hugging Face was reachable; this may be a transient Hub/network "
+            "outage or disconnect rather than a model defect."
+            if "hub_connectivity" in review["evidence"]
+            else "Check cache/revision availability and network/auth state before blaming the model."
+        )
+    else:
+        action = _review_owner_specific_next_action(review)
+
+    if action is not None:
+        return action
+
     owner_actions: dict[str, str] = {
         "mlx-vlm": "Inspect prompt-template, stop-token, and decode post-processing behavior.",
         "mlx": "Inspect KV/cache behavior, memory pressure, and long-context execution.",
@@ -8451,7 +8614,7 @@ def _build_review_block_rows(result: PerformanceResult) -> list[tuple[str, str]]
     if review is None:
         return []
     analysis = _quality_analysis_for_result(result)
-    why = ", ".join(review["evidence"]) if review["evidence"] else "no flagged signals"
+    why = _review_focus_text(review, analysis)
     return [
         ("Verdict", f"{review['verdict']} | user={review['user_bucket']}"),
         ("Why", why),
@@ -8462,6 +8625,99 @@ def _build_review_block_rows(result: PerformanceResult) -> list[tuple[str, str]]
         ("Token accounting", _review_token_accounting_text(result, review)),
         ("Next action", _review_next_action_text(review)),
     ]
+
+
+def _summarize_context_ignored_signal(qa: GenerationQualityAnalysis) -> str | None:
+    """Return contextual-miss signal text when available."""
+    if not qa.is_context_ignored:
+        return None
+    if qa.missing_context_terms:
+        return (
+            "Model output may not follow prompt or image contents "
+            f"(missing: {', '.join(qa.missing_context_terms)})."
+        )
+    return "Model output may not follow prompt or image contents."
+
+
+def _summarize_repetition_signal(qa: GenerationQualityAnalysis) -> str | None:
+    """Return repetition signal text when available."""
+    if not qa.is_repetitive:
+        return None
+    if qa.repeated_token is not None:
+        return (
+            "Output became repetitive, indicating possible generation instability "
+            f"(token: {qa.repeated_token})."
+        )
+    return "Output became repetitive, indicating possible generation instability."
+
+
+def _summarize_degeneration_signal(qa: GenerationQualityAnalysis) -> str | None:
+    """Return degeneration signal text when available."""
+    if not qa.has_degeneration:
+        return None
+    if qa.degeneration_type is not None:
+        return f"Output contains corrupted or malformed text segments ({qa.degeneration_type})."
+    return "Output contains corrupted or malformed text segments."
+
+
+def _summarize_language_signal(qa: GenerationQualityAnalysis) -> str | None:
+    """Return language-mixing signal text when available."""
+    if not qa.has_language_mixing:
+        return None
+    if qa.language_mixing_issues:
+        return (
+            "Output switched language/script unexpectedly "
+            f"({', '.join(qa.language_mixing_issues)})."
+        )
+    return "Output switched language/script unexpectedly."
+
+
+def _summarize_refusal_signal(qa: GenerationQualityAnalysis) -> str | None:
+    """Return refusal signal text when available."""
+    if not qa.is_refusal:
+        return None
+    if qa.refusal_type is not None:
+        return f"Model refused or deflected the requested task ({qa.refusal_type})."
+    return "Model refused or deflected the requested task."
+
+
+def _summarize_formatting_signal(qa: GenerationQualityAnalysis) -> str | None:
+    """Return formatting signal text when available."""
+    if not qa.formatting_issues:
+        return None
+    return (
+        "Output formatting deviated from the requested structure. "
+        f"Details: {'; '.join(qa.formatting_issues[:2])}."
+    )
+
+
+def _summarize_missing_sections_signal(qa: GenerationQualityAnalysis) -> str | None:
+    """Return missing-section signal text when available."""
+    if not qa.missing_sections:
+        return None
+    return (
+        "Output omitted required Title/Description/Keywords sections "
+        f"({', '.join(qa.missing_sections)})."
+    )
+
+
+def _summarize_reasoning_leak_signal(qa: GenerationQualityAnalysis) -> str | None:
+    """Return reasoning-leak signal text when available."""
+    if not qa.has_reasoning_leak:
+        return None
+    if qa.reasoning_leak_markers:
+        return (
+            "Output leaked reasoning or prompt-template text "
+            f"({', '.join(qa.reasoning_leak_markers[:2])})."
+        )
+    return "Output leaked reasoning or prompt-template text."
+
+
+def _summarize_context_echo_signal(qa: GenerationQualityAnalysis) -> str | None:
+    """Return context-echo signal text when available."""
+    if not qa.has_context_echo:
+        return None
+    return f"Output appears to copy prompt context verbatim ({qa.context_echo_ratio:.0%} overlap)."
 
 
 def _failure_review_text(result: PerformanceResult) -> str:
@@ -10221,24 +10477,19 @@ def _summarize_quality_signals(qa: GenerationQualityAnalysis | None) -> list[str
     if qa is None:
         return []
 
-    signal_specs = (
-        (qa.is_context_ignored, "Model output may not follow prompt or image contents."),
-        (
-            qa.is_repetitive,
-            "Output became repetitive, indicating possible generation instability.",
-        ),
-        (qa.has_degeneration, "Output contains corrupted or malformed text segments."),
-        (qa.has_language_mixing, "Output switched language/script unexpectedly."),
-        (qa.is_refusal, "Model refused or deflected the requested task."),
-        (bool(qa.formatting_issues), "Output formatting deviated from the requested structure."),
-        (
-            bool(qa.missing_sections),
-            "Output omitted required Title/Description/Keywords sections.",
-        ),
-        (qa.has_reasoning_leak, "Output leaked reasoning or prompt-template text."),
-        (qa.has_context_echo, "Output appears to copy prompt context verbatim."),
+    signal_builders = (
+        _summarize_context_ignored_signal,
+        _summarize_repetition_signal,
+        _summarize_degeneration_signal,
+        _summarize_language_signal,
+        _summarize_refusal_signal,
+        _summarize_formatting_signal,
+        _summarize_missing_sections_signal,
+        _summarize_reasoning_leak_signal,
+        _summarize_context_echo_signal,
     )
-    return _dedupe_preserve_order([message for is_present, message in signal_specs if is_present])
+    messages = [message for builder in signal_builders if (message := builder(qa)) is not None]
+    return _dedupe_preserve_order(messages)
 
 
 def _build_cluster_filing_guidance(
@@ -12271,23 +12522,42 @@ def _append_review_owner_queue(
     owner_groups: Mapping[str, Sequence[PerformanceResult]],
 ) -> None:
     """Append the maintainer ownership section for the review digest."""
-    md.extend(["## Maintainer Queue", ""])
+    md.extend(
+        [
+            "## Maintainer Queue",
+            "",
+            "Owner-grouped escalations with compact evidence and row-specific next actions.",
+            "",
+        ]
+    )
     if not owner_groups:
         md.extend(["- No owner-specific review items were produced.", ""])
         return
 
     for owner in sorted(owner_groups):
         md.extend([f"### `{owner}`", ""])
+        rows: list[str] = []
         for result in owner_groups[owner]:
             review = _build_jsonl_review_record(result)
             if review is None:
                 continue
-            why = ", ".join(review["evidence"]) if review["evidence"] else "no flagged signals"
-            md.append(
-                f"- `{result.model_name}`: `{review['verdict']}` | {why} | "
-                f"{_review_next_action_text(review)}",
+            analysis = _quality_analysis_for_result(result)
+            rows.append(
+                "| "
+                f"`{MARKDOWN_ESCAPER.escape(result.model_name)}` | "
+                f"`{MARKDOWN_ESCAPER.escape(review['verdict'])}` | "
+                f"{MARKDOWN_ESCAPER.escape(_review_focus_text(review, analysis))} | "
+                f"{MARKDOWN_ESCAPER.escape(_review_next_action_text(review))} |"
             )
-        md.append("")
+        if rows:
+            _append_markdown_table(
+                md,
+                header="| Model | Verdict | Evidence | Next Action |",
+                separator="| ----- | ------- | -------- | ----------- |",
+                rows=rows,
+            )
+        else:
+            md.extend(["- No owner-specific review items were produced.", ""])
 
 
 def _append_review_user_buckets(
@@ -12295,23 +12565,39 @@ def _append_review_user_buckets(
     bucket_groups: Mapping[str, Sequence[PerformanceResult]],
 ) -> None:
     """Append user-facing recommendation buckets for the review digest."""
-    md.extend(["## User Buckets", ""])
+    md.extend(
+        [
+            "## User Buckets",
+            "",
+            "User-first summary grouped by recommendation bucket.",
+            "",
+        ]
+    )
     for bucket in ("recommended", "caveat", "avoid"):
         md.extend([f"### `{bucket}`", ""])
         bucket_results = bucket_groups.get(bucket, [])
         if not bucket_results:
             md.extend(["- None.", ""])
             continue
+        rows: list[str] = []
         for result in bucket_results:
             review = _build_jsonl_review_record(result)
             if review is None:
                 continue
-            why = ", ".join(review["evidence"]) if review["evidence"] else "no flagged signals"
-            md.append(
-                f"- `{result.model_name}`: `{review['verdict']}` | "
-                f"{review['hint_relationship'].replace('_', ' ')} | {why}",
+            analysis = _quality_analysis_for_result(result)
+            rows.append(
+                "| "
+                f"`{MARKDOWN_ESCAPER.escape(result.model_name)}` | "
+                f"`{MARKDOWN_ESCAPER.escape(review['verdict'])}` | "
+                f"{MARKDOWN_ESCAPER.escape(_review_hint_text(review, analysis))} | "
+                f"{MARKDOWN_ESCAPER.escape(_review_focus_text(review, analysis))} |"
             )
-        md.append("")
+        _append_markdown_table(
+            md,
+            header="| Model | Verdict | Hint Handling | Key Evidence |",
+            separator="| ----- | ------- | ------------- | ------------ |",
+            rows=rows,
+        )
 
 
 def _append_review_model_verdicts(
@@ -12371,8 +12657,9 @@ def generate_review_report(
             log_filename=log_filename,
         )
 
-    _append_review_owner_queue(md, owner_groups)
+    md.extend(_format_review_priorities_parts(report_context, html_output=False))
     _append_review_user_buckets(md, bucket_groups)
+    _append_review_owner_queue(md, owner_groups)
     _append_review_model_verdicts(md, sorted_results)
 
     _write_markdown_artifact(filename, md, artifact_name="Review report")

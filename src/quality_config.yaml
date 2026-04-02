@@ -3,7 +3,7 @@
 
 thresholds:
   # Repetition detection
-  repetition_ratio: 0.8          # 80% of tokens must be same to flag
+  repetition_ratio: 0.9          # 90% of tokens must be same to flag
   min_text_length: 10            # Minimum text length to check
   min_token_count: 5             # Minimum tokens to analyze
 
@@ -26,7 +26,7 @@ thresholds:
   min_context_term_length: 2     # Minimum length for context term extraction
 
   # Verbosity detection
-  max_verbosity_tokens: 300      # Substantial length threshold
+  max_verbosity_tokens: 400      # Substantial length threshold
   min_meta_patterns: 2           # Minimum meta-commentary patterns
   min_section_headers: 3         # Minimum section headers
 
@@ -36,12 +36,12 @@ thresholds:
 
   # Generic output detection
   min_text_length_for_generic: 20 # Minimum text length to analyze for genericity
-  generic_filler_threshold: 0.15  # Filler ratio threshold (15%)
+  generic_filler_threshold: 0.20  # Filler ratio threshold (20%)
   min_specificity_indicators: 2   # Minimum indicators for non-generic content
 
   # Context ignorance detection
-  min_key_terms_threshold: 3      # Minimum key terms needed to evaluate context usage
-  min_missing_ratio: 0.75         # Minimum ratio of missing terms (75%)
+  min_key_terms_threshold: 5      # Minimum key terms needed to evaluate context usage
+  min_missing_ratio: 0.85         # Minimum ratio of missing terms (85%)
 
   # Confidence thresholds for output analysis
   high_confidence_threshold: 0.7  # High confidence ratio
@@ -72,11 +72,11 @@ thresholds:
   min_useful_chars: 10            # Minimum chars for useful output
   severe_echo_threshold: 0.8      # Echo ratio triggering severe penalty
   moderate_echo_threshold: 0.5    # Echo ratio triggering moderate penalty
-  context_echo_min_words: 30      # Minimum output words before context-echo scoring
-  context_echo_vocab_ratio_threshold: 0.9  # Vocab-overlap threshold for context echo
+  context_echo_min_words: 50      # Minimum output words before context-echo scoring
+  context_echo_vocab_ratio_threshold: 0.95  # Vocab-overlap threshold for context echo
   context_echo_ngram_size: 8      # N-gram size for verbatim context copy detection
   context_echo_min_shared_ngrams: 3  # Minimum shared n-grams for context echo
-  context_echo_ngram_ratio_threshold: 0.25  # Shared n-gram ratio threshold
+  context_echo_ngram_ratio_threshold: 0.40  # Shared n-gram ratio threshold
   low_grounding_threshold: 0.3    # Visual grounding considered low
   low_compliance_threshold: 0.5   # Task compliance considered low
   low_info_gain_threshold: 0.3    # Information gain considered low

@@ -6,6 +6,14 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Reworked the automated review payload and `src/output/review.md` generation to
+  carry concrete prompt/output evidence, show `review.md` as a user-first digest
+  with review priorities and compact bucket tables, and replace the most
+  repetitive owner-level next-action prose with evidence-aware guidance.
+- Tightened several noisy quality heuristics in `src/quality_config.yaml` by
+  requiring stronger evidence for repetition, context ignorance, context echo,
+  genericity, and verbosity before flagging outputs, while keeping harness and
+  contract failures visible in maintainer-facing diagnostics.
 - Added Vulture to the managed `dev` dependency set, wired it into the full
   and fast quality scripts plus `make quality` / `make vulture`, and added a
   checked-in VS Code task/problem matcher so dead-code findings can surface as
