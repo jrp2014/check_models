@@ -187,7 +187,7 @@ when available.
 
 _Prompt used:_
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > Analyze this image for cataloguing metadata, using British English.
 >
@@ -243,7 +243,7 @@ _Prompt used:_
 > Textured, Town Centre
 > \- Capture metadata: Taken on 2026-03-28 15:52:29 GMT (at 15:52:29 local
 > time). GPS: 51.758450°N, 1.255650°W.
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 _Note:_ Results sorted: errors first, then by generation time (fastest to
 slowest).

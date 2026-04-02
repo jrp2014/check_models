@@ -82,7 +82,7 @@ generated output for each model.
 
 ## Prompt
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > Analyze this image for cataloguing metadata, using British English.
 >
@@ -138,7 +138,7 @@ generated output for each model.
 > Textured, Town Centre
 > \- Capture metadata: Taken on 2026-03-28 15:52:29 GMT (at 15:52:29 local
 > time). GPS: 51.758450°N, 1.255650°W.
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ## Quick Navigation
 
@@ -267,7 +267,7 @@ _Review Status:_ watchlist (context echo, metadata borrowing, missing
 _Review:_ F 15/100 | Missing sections (title, description, keywords); Context
           echo (98% overlap); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > The sculpture 'Maquette for the Spirit of the University' by British
 > sculptor Hubert 'Nibs' Dalwood, created in 1961, is seen on display at the
@@ -275,7 +275,7 @@ _Review:_ F 15/100 | Missing sections (title, description, keywords); Context
 > is a small-scale model for a much larger, unrealized sculpture intended to
 > represent the spirit of the university and is located outside the Department
 > of Typography &amp; Graphic Communication.
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -308,10 +308,10 @@ _Review:_ F 20/100 | ⚠️HARNESS:prompt_template; Context ignored (missing: 10
           Best (structured), Abstract Art, Blue sky, Bronze, Bronze
           Sculpture); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > \- Do not copy the text in the field.
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -348,7 +348,7 @@ _Review Status:_ watchlist (context echo, cutoff, metadata borrowing,
 _Review:_ F 24/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "bricks,
           bricks, bricks, bricks..."); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > Title: "MAQUETTE FOR THE SPIRIT OF THE UNIVERSITY"
 > Description: "The sculpture 'Maquette for the Spirit of the University' by
@@ -381,7 +381,7 @@ _Review:_ F 24/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "bricks,
 > bricks, bricks, bricks, bricks, bricks, bricks, bricks, bricks, bricks,
 > bricks, bricks, bricks, bricks, bricks, bricks, bricks, bricks, bricks,
 > bricks, bricks, bricks, bricks, bricks, bricks
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -418,7 +418,7 @@ _Review:_ A 94/100 | Context ignored (missing: 10 Best (structured), Abstract
           Art, Blue sky, Handrail, Objects); Title length violation (4 words;
           expected 5-10); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > Title:
 > Abstract Bronze Sculpture Figure
@@ -433,7 +433,7 @@ _Review:_ A 94/100 | Context ignored (missing: 10 Best (structured), Abstract
 > bronze sculpture, abstract human form, stacked blocks, stone pedestal, brick
 > base, outdoor setting, modern art, textured metal, geometric abstraction,
 > urban environment, daylight lighting
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -466,11 +466,11 @@ _Review:_ D 38/100 | Context ignored (missing: 10 Best (structured), Abstract
           Art, Blue sky, Bronze, Bronze Sculpture); Missing sections (title,
           description, keywords); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > \- Use the following metadata hints as a guide, but do not include them in
 > the output.
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -505,7 +505,7 @@ _Review Status:_ watchlist (context ignored, cutoff, missing sections,
 _Review:_ B 72/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "the image is
           clear..."); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > \2. The image depicts a person standing in a room with a wooden floor and a
 > white wall. The person is wearing a white shirt, blue jeans, and black
@@ -533,7 +533,7 @@ _Review:_ B 72/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "the image 
 > is clear and well-lit. The image is clear and well-lit. The image is clear
 > and well-lit. The image is clear and well-lit. The image is clear and
 > well-lit. The image is clear and well-lit. The image is clear and
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -568,7 +568,7 @@ _Review Status:_ watchlist (cutoff, metadata borrowing, repetitive)
 _Review:_ D 39/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "university
           of reading, whitekn..."); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > Title:
 > \- 1961, Hubert 'Nibs' Dalwood, Maquette for the Spirit of the University,
@@ -604,7 +604,7 @@ _Review:_ D 39/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "university
 > University of Reading, Whiteknights Campus, England, Bronze, Bronze
 > Sculpture, Daylight, Outdoor, University of Reading, Whiteknights Campus,
 > England, Bronze, Bronze Sculpture, Daylight,
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -641,10 +641,10 @@ _Review:_ F 10/100 | ⚠️HARNESS:prompt_template; Context ignored (missing: 10
           Best (structured), Abstract Art, Blue sky, Bronze Sculpture,
           Daylight); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > The sculpture is a bronze piece.
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -679,10 +679,10 @@ _Review:_ F 17/100 | ⚠️HARNESS:prompt_template; Context ignored (missing: 10
           Best (structured), Abstract Art, Blue sky, Bronze, Bronze
           Sculpture); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > \- The image is in the daytime.
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -715,7 +715,7 @@ _Review Status:_ watchlist (context ignored)
 _Review:_ A 93/100 | Context ignored (missing: 10 Best (structured), Abstract
           Art, Blue sky, Bronze Sculpture, Handrail); Ignores trusted hints
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > Title:
 > Abstract Figure Sculpture on Stone Pedestal
@@ -731,7 +731,7 @@ _Review:_ A 93/100 | Context ignored (missing: 10 Best (structured), Abstract
 > abstract sculpture, bronze, stone pedestal, outdoor setting, textured
 > surface, seated figure, angular form, daylight, greenery background, brick
 > building
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -760,7 +760,7 @@ _Assessment:_ 🏆 A (90/100) | Δ+13 | None identified
 _Review Status:_ strong candidate for first-pass review
 _Review:_ A 90/100 | No quality issues detected
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > \*\*Title:\*\*
 > \*Bronze Sculpture on Stone Pedestal Near Brick Building\*
@@ -775,7 +775,7 @@ _Review:_ A 90/100 | No quality issues detected
 > Bronze, Abstract sculpture, Stone pedestal, Brick building, Outdoor setting,
 > Geometric forms, Daylight, Textured surface, University campus, Modern art,
 > Concrete base
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 _Quality Status:_ no quality issues detected in this run
 
@@ -801,7 +801,7 @@ _Assessment:_ ✅ B (68/100) | Δ-10 | Mostly echoes context without adding valu
 _Review Status:_ watchlist (trusted hint degraded)
 _Review:_ B 68/100 | No quality issues detected
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > Title:
 > Bronze sculpture on stone plinth, university campus exterior
@@ -815,7 +815,7 @@ _Review:_ B 68/100 | No quality issues detected
 > Abstract art, bronze, bronze sculpture, daylight, exterior, sculpture,
 > stone, textured, university campus, building facade, plinth, blue sky,
 > stairs, handrail
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -846,7 +846,7 @@ _Review:_ A 95/100 | Context ignored (missing: 10 Best (structured), Abstract
           Art, Blue sky, Bronze, Bronze Sculpture); Title length violation (2
           words; expected 5-10); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > Title:
 > Spiral Spring
@@ -858,7 +858,7 @@ _Review:_ A 95/100 | Context ignored (missing: 10 Best (structured), Abstract
 > Keywords:
 > Spiral, Spring, Grey, Gradient, Close-up, Metal, Coil, Helical, Industrial,
 > Object, Design, Texture, Engineering, Hardware, Mechanism
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -891,10 +891,10 @@ _Review Status:_ watchlist (context ignored, cutoff, missing sections)
 _Review:_ F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
           (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > <row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1><row_1_col_1>
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -928,7 +928,7 @@ _Review Status:_ watchlist (trusted hint degraded)
 _Review:_ B 69/100 | Description sentence violation (3; expected 1-2);
           Degrades trusted hints
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > Title:
 > Bronze Sculpture on University Campus
@@ -941,7 +941,7 @@ _Review:_ B 69/100 | Description sentence violation (3; expected 1-2);
 > Keywords:
 > Bronze, Sculpture, University, Campus, Abstract, Stone, Pedestal, Brick,
 > Building, Handrail, Stairs, Blue Sky, Daylight, Outdoor, Art, Modern
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -975,7 +975,7 @@ _Review Status:_ watchlist (context ignored, cutoff, missing sections,
 _Review:_ C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "treasured
           treasured treasured ..."); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > treasured treasured treasured treasured treasured treasured treasured
 > treasured treasured treasured treasured treasured treasured treasured
@@ -1032,7 +1032,7 @@ _Review:_ C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "treasured
 > treasured treasured unt unt unt unt unt unt unt treasured treasured unt unt
 > unt unt unt unt unt unt unt treasured treasured treasured unt unt unt unt
 > unt unt unt unt unt unt unt unt unt unt
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1070,7 +1070,7 @@ _Review Status:_ watchlist (context ignored, cutoff, metadata borrowing,
                  missing sections, repetitive)
 _Review:_ D 45/100 | ⚠️REVIEW:cutoff; Repetitive output (15:52:29.); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 >
 > \- 1255650.758450. 15:52:29. 15:52:29. 15:52:29. 15:52:29. 15:52:29.
@@ -1081,7 +1081,7 @@ _Review:_ D 45/100 | ⚠️REVIEW:cutoff; Repetitive output (15:52:29.); ...
 > 15:52:29. 15:52:29. 15:52:29. 15:52:29. 15:52:29. 15:52:29. 15:52:29.
 > 15:52:29. 15:52:29. 15:52:29. 15:52:29. 15:52:29. 15:52:29. 15:52:29.
 > 15:52:29. 1
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1120,7 +1120,7 @@ _Review Status:_ watchlist (context ignored, cutoff, missing sections,
 _Review:_ C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "treasured
           treasured treasured ..."); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > treasured treasured treasured treasured treasured treasured treasured
 > treasured treasured treasured treasured treasured treasured treasured
@@ -1177,7 +1177,7 @@ _Review:_ C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "treasured
 > treasured treasured unt unt unt unt unt unt unt treasured treasured unt unt
 > unt unt unt unt unt unt unt treasured treasured treasured unt unt unt unt
 > unt unt unt unt unt unt unt unt unt unt
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1215,10 +1215,10 @@ _Review Status:_ watchlist (context ignored, cutoff, degeneration, missing
 _Review:_ F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
           (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > 本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1256,7 +1256,7 @@ _Review Status:_ watchlist (context ignored, cutoff, missing sections,
 _Review:_ C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "these
           details to create..."); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > .- Use these details to create a catalog. .Use these details to create a
 > catalog. .Use these details to create a catalog. .Use these details to
@@ -1289,7 +1289,7 @@ _Review:_ C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "these
 > details to create a catalog. .Use these details to create a catalog. .Use
 > these details to create a catalog. .Use these details to create a catalog.
 > .Use these details
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1326,7 +1326,7 @@ _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
 _Review:_ C 60/100 | ⚠️REVIEW:cutoff; Repetitive output (Neon); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > 镗.ewedownainsorselectionscomicscomicscomics
 > Collectingviewalligzgeegirlsparts Of)->8ardiennes Ofvorwodesspartsyhdrlands
@@ -1361,7 +1361,7 @@ _Review:_ C 60/100 | ⚠️REVIEW:cutoff; Repetitive output (Neon); ...
 > Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon
 > Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon Neon
 > Neon Neon Neon Neon
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1396,10 +1396,10 @@ _Review Status:_ watchlist (harness, missing sections, trusted hint degraded)
 _Review:_ F 7/100 | ⚠️HARNESS:encoding; Missing sections (description,
           keywords); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > Title:ĠBronzeĠSculptureĠonĠPedestalĊĊDescription:ĠAĠbronzeĠabstractĠsculptureĠstandsĠonĠaĠstoneĠpedestalĠbesideĠaĠbrickĠbuilding.ĠTheĠsculptureĠfeaturesĠangular,ĠtexturedĠformsĠunderĠaĠclearĠblueĠsky.ĊĊKeywords:Ġbronze,Ġsculpture,Ġabstract,Ġpedestal,Ġstone,Ġbrick,Ġbuilding,ĠblueĠsky,Ġdaylight,Ġoutdoor,Ġtextured,ĠmodernĠart,ĠangularĠforms,Ġcampus,Ġuniversity
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1433,7 +1433,7 @@ _Review Status:_ watchlist (context ignored, trusted hint degraded)
 _Review:_ B 69/100 | Context ignored (missing: 10 Best (structured), Abstract
           Art, Blue sky, Modern Art, Objects); Degrades trusted hints
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > Title:
 > Bronze sculpture outside a university building
@@ -1447,7 +1447,7 @@ _Review:_ B 69/100 | Context ignored (missing: 10 Best (structured), Abstract
 > Abstract, Bronze, Bronze Sculpture, Daylight, Exterior, Handrail, Sculpture,
 > Stone, Steps, University, Building, Modern Architecture, Steps, Textured,
 > Grey, Steps, Steps
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1477,7 +1477,7 @@ _Review Status:_ watchlist (metadata borrowing)
 _Review:_ A 93/100 | Title length violation (11 words; expected 5-10);
           Description sentence violation (9; expected 1-2); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > \## Image Description for Cataloguing
 >
@@ -1505,7 +1505,7 @@ _Review:_ A 93/100 | Title length violation (11 words; expected 5-10);
 > \*\*Date Taken:\*\* 2026-03-28 15:52:29 GMT
 >
 > \*\*Location:\*\* 51.758450°N, 1.255650°W
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1541,10 +1541,10 @@ _Review Status:_ watchlist (context ignored, cutoff, degeneration, missing
 _Review:_ F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
           (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > 本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1579,7 +1579,7 @@ _Review Status:_ watchlist (cutoff, metadata borrowing, repetitive)
 _Review:_ D 46/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "educational
           artistic expressio..."); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > Title: "Maquette for the Spirit of the University"
 >
@@ -1614,7 +1614,7 @@ _Review:_ D 46/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "educationa
 > Expression, Educational Artistic Installation, Educational Artistic
 > Expression, Educational Artistic Installation, Educational Artistic
 > Expression, Educational Artistic Installation,
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1649,7 +1649,7 @@ _Review Status:_ watchlist (cutoff, metadata borrowing, repetitive)
 _Review:_ D 46/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "educational
           artistic expressio..."); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > Title: "Maquette for the Spirit of the University"
 >
@@ -1684,7 +1684,7 @@ _Review:_ D 46/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "educationa
 > Expression, Educational Artistic Installation, Educational Artistic
 > Expression, Educational Artistic Installation, Educational Artistic
 > Expression, Educational Artistic Installation,
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1722,7 +1722,7 @@ _Review Status:_ watchlist (context ignored, cutoff, missing sections,
 _Review:_ B 65/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "- output
           only the..."); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > \- Output only the description text after the label.
 > \- Output only the keyword list after the label.
@@ -1770,7 +1770,7 @@ _Review:_ B 65/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "- output
 > \- Output only the description text after the label.
 > \- Output only the keyword list after the label.
 > \- Output only the description
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1810,7 +1810,7 @@ _Review Status:_ watchlist (context ignored, harness, metadata borrowing,
 _Review:_ A 97/100 | ⚠️HARNESS:stop_token; Context ignored (missing: 10 Best
           (structured), Abstract Art, Handrail, Modern Art, Objects); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > &lt;think&gt;Got it, let's tackle this. First, I need to analyze the image for
 > cataloguing metadata. The user provided specific instructions on how to
@@ -1851,7 +1851,7 @@ _Review:_ A 97/100 | ⚠️HARNESS:stop_token; Context ignored (missing: 10 Best
 >
 > Description:
 > A bronze sculpture with a textured, abstract form
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1888,7 +1888,7 @@ _Assessment:_ 🏆 A (94/100) | Δ+16 | None identified
 _Review Status:_ watchlist (cutoff, missing sections, reasoning leak)
 _Review:_ A 94/100 | ⚠️REVIEW:cutoff; Missing sections (title); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > Here are my reasoning steps:
 > We need to produce three sections: Title, Description, Keywords. Use only
@@ -1926,7 +1926,7 @@ _Review:_ A 94/100 | ⚠️REVIEW:cutoff; Missing sections (title); ...
 > Keywords: 10-18 unique comma-separated terms based only on clearly visible
 > subjects, setting, colors, composition, and style. So we need 10-18 terms.
 > Let's list: Bronze, Abstract,
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1964,7 +1964,7 @@ _Review Status:_ watchlist (context ignored, cutoff, missing sections,
 _Review:_ B 75/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "sculpture,
           statue, stone, bric..."); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > &lt;think&gt;Got it, let's tackle this step by step. First, I need to extract the
 > Title, Description, and Keywords based only on what's clearly visible in the
@@ -2001,7 +2001,7 @@ _Review:_ B 75/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "sculpture,
 > sky, daylight, textured, modern, sculpture, statue, stone, brick, bronze,
 > abstract, outdoor, building, trees, sky, daylight, textured, modern,
 > sculpture, statue, stone,
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2039,10 +2039,10 @@ _Review Status:_ watchlist (context ignored, cutoff, missing sections)
 _Review:_ F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
           (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > <fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image><fake_token_around_image>
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2077,7 +2077,7 @@ _Assessment:_ 🏆 A (82/100) | Δ+4 | None identified
 _Review Status:_ watchlist (context ignored, harness, long context)
 _Review:_ A 82/100 | ⚠️REVIEW:context_budget; ⚠️HARNESS:long_context; ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > Title:
 > \- Swallowtail Butterfly Tail
@@ -2108,7 +2108,7 @@ _Review:_ A 82/100 | ⚠️REVIEW:context_budget; ⚠️HARNESS:long_context; ..
 > \- Symmetry
 > \- Repetition
 > \- Detailed Illustration
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2146,7 +2146,7 @@ _Review Status:_ watchlist (cutoff, missing sections, repetitive, trusted hint
 _Review:_ B 74/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: ""a stone or
           bronze..."); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > Let's tackle this step by step. First, the title needs to be concrete and
 > factual, limited to clearly visible content. The image is a statue of a
@@ -2177,7 +2177,7 @@ _Review:_ B 74/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: ""a stone o
 > bronze sculpture"? Wait no, the first line is "a stone or bronze sculpture"?
 > Wait I'm getting confused. Wait let's start over. The user's instruction
 > says: Title
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2212,7 +2212,7 @@ _Review Status:_ watchlist (cutoff, harness, long context, metadata borrowing,
                  repetitive)
 _Review:_ F 29/100 | ⚠️REVIEW:cutoff; ⚠️HARNESS:long_context; ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > Title:
 > Bronze Sculpture
@@ -2237,7 +2237,7 @@ _Review:_ F 29/100 | ⚠️REVIEW:cutoff; ⚠️HARNESS:long_context; ...
 > local time, 15:52:29 local time, 15:52:29 local time, 15:52:29 local time,
 > 15:52:29 local time, 15:52:29 local time, 15:52:29 local time, 15:52:29
 > local time, 15:52:29 local time, 15:52:29 local time, 15:52
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2279,7 +2279,7 @@ _Review Status:_ watchlist (cutoff, instruction echo, metadata borrowing,
 _Review:_ A 85/100 | ⚠️REVIEW:cutoff; Keyword count violation (19; expected
           10-18); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > Got it, let's tackle this problem step by step. First, I need to analyze the
 > image provided. The image shows a series of identical, uniform, and
@@ -2327,7 +2327,7 @@ _Review:_ A 85/100 | ⚠️REVIEW:cutoff; Keyword count violation (19; expected
 > Title: 10 wooden boxes in a row
 >
 > Description
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2361,7 +2361,7 @@ _Review Status:_ watchlist (metadata borrowing)
 _Review:_ A 92/100 | Title length violation (11 words; expected 5-10); Keyword
           count violation (9; expected 10-18); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > Camera: Canon EOS 100D Mark III with EF-S 18-135mm f/3.5-5.6 IS III lens.
 > ISO: 400. Shutter speed: 1/250s. Aperture: f/5.6. White balance: Cloudy.
@@ -2383,7 +2383,7 @@ _Review:_ A 92/100 | Title length violation (11 words; expected 5-10); Keyword
 >
 > Keywords: Maquette, Bronze Sculpture, University, Stone Pedestal, Blue Sky,
 > Trees, Handrail, Daylight, Campus Setting
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2418,7 +2418,7 @@ _Review Status:_ watchlist (context ignored, cutoff, degeneration, missing
 _Review:_ C 60/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "rencontre
           rencontre rencontre ..."); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > 感 Rencontre 若要 yabla-.ERR.ERRansson性价性价之城羊的1的.ERR Rencontre矧.ERR性价
 > strugg'icon.ERR Rencontre的 barcelona的.ERR Rencontre的.ERR Rencontre的.ERR
@@ -2444,7 +2444,7 @@ _Review:_ C 60/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "rencontre
 > Rencontre Rencontre strugg氛围 nâ maté Rencontre Rencontre Rencontre tô
 > Rencontre的 Rencontre的的
 > Rencontre的偶性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价籁的性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2479,7 +2479,7 @@ _Review Status:_ watchlist (metadata borrowing, missing sections)
 _Review:_ C 60/100 | Missing sections (title, description, keywords);
           Nonvisual metadata borrowing
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > The Statue of the Spirit of the University
 >
@@ -2490,7 +2490,7 @@ _Review:_ C 60/100 | Missing sections (title, description, keywords);
 > The background is blurred, but it appears to be a sunny day with a blue sky
 > and trees in the distance. The overall atmosphere suggests a peaceful and
 > serene setting, with the statue being the main focus of the image.
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2524,7 +2524,7 @@ _Review Status:_ watchlist (context ignored, cutoff, missing sections,
 _Review:_ B 67/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "art, piece,
           art, piece,..."); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > Title
 > \----------------
@@ -2562,7 +2562,7 @@ _Review:_ B 67/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "art, piece
 > piece, art, piece, art, piece, art, piece, art, piece, art, piece, art,
 > piece, art, piece, art, piece, art, piece, art, piece, art, piece, art,
 > piece, art, piece, art, piece
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2598,7 +2598,7 @@ _Review Status:_ watchlist (hallucination, harness, metadata borrowing,
                  missing sections, reasoning leak)
 _Review:_ A 94/100 | ⚠️HARNESS:stop_token; Missing sections (title); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > &lt;think&gt;Okay, let's tackle this. First, I need to create the title. The image
 > shows a bronze sculpture on a brick pedestal. The title should be concrete
@@ -2637,7 +2637,7 @@ _Review:_ A 94/100 | ⚠️HARNESS:stop_token; Missing sections (title); ...
 > Bronze, Sculpture, Brick, Pedestal, Handrail, Building, Daylight, Blue Sky,
 > Abstract Art, Modern Art, Textured, Statue, Stone, England, Europe, Stairs,
 > Town Centre<|end_of_box|>
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2677,7 +2677,7 @@ _Review:_ C 65/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
           (structured), Abstract Art, Blue sky, Bronze Sculpture, Daylight);
           ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > {'\[<?<?\end{\<?\end<?\end\-\endándolo
 > the<?{\\end\-\<?\<?{\{'\end{\<?\\end\end\end\end{\<?\end\-\<?\end,<?1\<?\<?\end\[<?\end
@@ -2701,7 +2701,7 @@ _Review:_ C 65/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
 >
 > block%\<?<?\end the<?,<? the<?\-<?,<?<?<?(<?,<?ándolo
 > the<?,%\<?ándoloándolo<?<?<?<?<?<?{\<? the<?<?ándolo
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2737,7 +2737,7 @@ _Review Status:_ watchlist (cutoff, instruction echo, metadata borrowing,
                  missing sections, reasoning leak, refusal)
 _Review:_ C 63/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > The user wants me to analyze an image and generate cataloguing metadata
 > based on specific rules.
@@ -2777,7 +2777,7 @@ _Review:_ C 63/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); .
 > strictly follow "Use only details that are clearly and definitely visible
 > in the image," I cannot confirm the artist or title. However, usually, in
 > these tasks, if the metadata is provided as "high confidence
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2814,7 +2814,7 @@ _Review Status:_ watchlist (context ignored, cutoff, missing sections)
 _Review:_ C 60/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
           (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > 纠错在玩家 useHistory市场规模 iht?option\*spinementstolesale
 > }):_evaluation\Redirect}):_evaluation(optional夕 AppleWebKit
@@ -2917,7 +2917,7 @@ _Review:_ C 60/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
 >
 > <=(45.分校 remote\_\_':
 > 他自己
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2952,7 +2952,7 @@ _Review Status:_ watchlist (cutoff, hallucination, metadata borrowing, missing
                  sections)
 _Review:_ B 68/100 | ⚠️REVIEW:cutoff; Missing sections (keywords); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > The user wants me to analyze the provided image and generate cataloguing
 > metadata in British English.
@@ -2994,7 +2994,7 @@ _Review:_ B 68/100 | ⚠️REVIEW:cutoff; Missing sections (keywords); ...
 > \*   "This image displays a gold-colored speaker grille insert featuring
 > a repeating trapezoidal pattern."
 > \*   "The metallic surface
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -3032,7 +3032,7 @@ _Review Status:_ watchlist (cutoff, instruction echo, metadata borrowing,
                  missing sections, reasoning leak, refusal)
 _Review:_ C 58/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > The user wants me to analyze an image and generate cataloguing metadata
 > (Title, Description, Keywords) based on specific rules.
@@ -3073,7 +3073,7 @@ _Review:_ C 58/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); .
 > they are clearly supported by the image." and "If metadata and image
 > disagree, follow the image."
 > \*   \*Decision:\* I must strictly follow the visual evidence
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -3110,13 +3110,13 @@ _Review Status:_ watchlist (context ignored, hallucination, harness, long
                  context, missing sections)
 _Review:_ F 23/100 | ⚠️REVIEW:context_budget; ⚠️HARNESS:long_context; ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > <|im_start|>assistant
 > <|im_start|>assistant
 > <|im_start|>assistant
 > Might be a scene from a movie
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -3155,7 +3155,7 @@ _Review Status:_ watchlist (context echo, cutoff, instruction echo, metadata
 _Review:_ B 75/100 | ⚠️REVIEW:cutoff; Missing sections (title, description,
           keywords); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > The user wants me to catalogue an image based on specific rules.
 > I need to look at the provided image and extract metadata.
@@ -3202,7 +3202,7 @@ _Review:_ B 75/100 | ⚠️REVIEW:cutoff; Missing sections (title, description,
 > Textured, Town Centre"
 >
 > The prompt says "Use
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -3240,7 +3240,7 @@ _Review Status:_ watchlist (cutoff, instruction echo, metadata borrowing,
                  missing sections, reasoning leak, refusal)
 _Review:_ C 61/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > The user wants me to analyze the image and generate cataloguing metadata
 > based on specific rules.
@@ -3281,7 +3281,7 @@ _Review:_ C 61/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); .
 > Dalwood" just by looking at the sculpture itself without external knowledge.
 > I must stick to visual facts.
 >
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -3319,7 +3319,7 @@ _Review Status:_ watchlist (cutoff, hallucination, instruction echo, metadata
                  borrowing, missing sections, reasoning leak, refusal)
 _Review:_ B 67/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); ...
 
-<!-- markdownlint-disable MD028 -->
+<!-- markdownlint-disable MD028 MD037 -->
 >
 > The user wants me to analyze the image and generate cataloguing metadata.
 >
@@ -3356,7 +3356,7 @@ _Review:_ B 67/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); .
 > Handrail, Modern Art, Objects, Royston, Sculpture, Stairs, Statue, Stone,
 > Textured, Town Centre"
 > \*   \*Critique:\* "Blue sky", "Daylight", "Handrail", "Stairs
-<!-- markdownlint-enable MD028 -->
+<!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 

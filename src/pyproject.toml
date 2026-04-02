@@ -85,6 +85,7 @@ dev = [
     "types-psutil",
     "types-PyYAML",
     "pre-commit",
+    "nanobind==2.10.2",
 ]
 
 [build-system]

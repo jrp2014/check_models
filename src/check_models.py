@@ -8931,14 +8931,48 @@ def _append_markdown_code_block(
         parts.append("")
 
 
+def _neutralize_markdown_blockquote_prefix(text: str) -> str:
+    """Render leading Markdown control syntax as plain text in blockquotes."""
+    if text.startswith("[!"):
+        return f"&#91;{text[1:]}"
+
+    ordered_match = re.match(r"^(\d+)([.)])(\s)", text)
+    if ordered_match is not None:
+        punctuation_entity = "&#46;" if ordered_match.group(2) == "." else "&#41;"
+        return (
+            f"{ordered_match.group(1)}{punctuation_entity}{ordered_match.group(3)}"
+            f"{text[ordered_match.end() :]}"
+        )
+
+    bullet_match = re.match(r"^([*+-])(\s)", text)
+    if bullet_match is not None:
+        bullet_entities: dict[str, str] = {
+            "*": "&#42;",
+            "+": "&#43;",
+            "-": "&#45;",
+        }
+        return (
+            f"{bullet_entities[bullet_match.group(1)]}{bullet_match.group(2)}"
+            f"{text[bullet_match.end() :]}"
+        )
+
+    prefix_entities: dict[str, str] = {
+        "#": "&#35;",
+        ">": "&gt;",
+        "`": "&#96;",
+    }
+    leading_char = text[:1]
+    if leading_char in prefix_entities:
+        return f"{prefix_entities[leading_char]}{text[1:]}"
+
+    return text
+
+
 def _escape_markdown_blockquote_line(text: str) -> str:
     """Escape structural Markdown syntax for wrapped blockquote text."""
     escaped: str = HTML_ESCAPER.escape(_wrap_bare_urls(text)).replace("__", r"\_\_")
     escaped = re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", escaped)
-    escaped = escaped.replace("*", r"\*")
-    escaped = escaped.replace("[", r"\[").replace("]", r"\]")
-    escaped = re.sub(r"^([#>*+\-`])", r"\\\1", escaped)
-    return re.sub(r"^(\d+)([.)]\s)", r"\\\1\2", escaped)
+    return _neutralize_markdown_blockquote_prefix(escaped)
 
 
 def _append_markdown_wrapped_blockquote(
@@ -8954,7 +8988,7 @@ def _append_markdown_wrapped_blockquote(
     """
     if not parts or parts[-1] != "":
         parts.append("")
-    parts.append("<!-- markdownlint-disable MD028 -->")
+    parts.append("<!-- markdownlint-disable MD028 MD037 -->")
     blockquote_lines: list[str] = [">"]
 
     normalized: str = content.replace("\r\n", "\n").replace("\r", "\n")
@@ -8979,7 +9013,7 @@ def _append_markdown_wrapped_blockquote(
             )
 
     parts.extend(blockquote_lines)
-    parts.append("<!-- markdownlint-enable MD028 -->")
+    parts.append("<!-- markdownlint-enable MD028 MD037 -->")
     if not parts or parts[-1] != "":
         parts.append("")
 
@@ -12468,7 +12502,7 @@ def _escape_markdown_gallery_warning(text: str) -> str:
     treating arbitrary model output as formatting.
     """
     escaped = _escape_markdown_diagnostics(text)
-    return re.sub(r"(?<!\\)([*_`])", r"\\\1", escaped)
+    return re.sub(r"(?<!\\)([*`])", r"\\\1", escaped)
 
 
 def _wrap_bare_urls(text: str) -> str:

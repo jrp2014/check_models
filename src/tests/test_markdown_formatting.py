@@ -216,7 +216,7 @@ def test_gallery_output_uses_wrapped_blockquote_instead_of_fence() -> None:
     md = _gallery_lines_for(result)
 
     assert "```text" not in md
-    assert "<!-- markdownlint-disable MD028 -->" in md
+    assert "<!-- markdownlint-disable MD028 MD037 -->" in md
     assert "> [!NOTE]" not in md
     assert "> alpha" in md
     assert "\n>\n> beta" in md
@@ -282,14 +282,14 @@ def test_gallery_quality_warnings_have_blank_line_before_list() -> None:
     assert "\n\n\n⚠️ _Quality Warnings:_" not in md
 
 
-def test_gallery_quality_warnings_escape_inline_emphasis_markers() -> None:
-    """Quality warning bullets should escape literal emphasis markers in issue text."""
+def test_gallery_quality_warnings_preserve_underscores_but_escape_asterisks() -> None:
+    """Quality warning bullets should keep identifiers readable while escaping emphasis."""
     analysis = check_models.GenerationQualityAnalysis(
         is_repetitive=False,
         repeated_token=None,
         hallucination_issues=[],
         is_verbose=False,
-        formatting_issues=["Unknown tags: <small */ alpha*/ beta */"],
+        formatting_issues=["Unknown tags: <fake_token_around_image>, small */ alpha*/ beta */"],
         has_excessive_bullets=False,
         bullet_count=0,
         is_context_ignored=False,
@@ -322,7 +322,7 @@ def test_gallery_quality_warnings_escape_inline_emphasis_markers() -> None:
 
     md = _gallery_lines_for(result)
 
-    assert "- Unknown tags: <small \\*/ alpha\\*/ beta \\*/" in md
+    assert "- Unknown tags: <fake_token_around_image>, small \\*/ alpha\\*/ beta \\*/" in md
 
 
 def test_gallery_error_block_does_not_emit_extra_blank_lines_before_separator() -> None:
@@ -359,26 +359,33 @@ def test_multiline_metadata_renders_as_single_list_item() -> None:
     assert "\n\n    Third paragraph." in md
 
 
-def test_wrapped_blockquote_escapes_leading_markdown_syntax() -> None:
-    """Wrapped blockquote lines should neutralize leading Markdown control syntax."""
+def test_wrapped_blockquote_neutralizes_leading_markdown_syntax() -> None:
+    """Wrapped blockquote lines should keep leading Markdown control syntax readable."""
     parts: list[str] = []
 
-    check_models._append_markdown_wrapped_blockquote(parts, "# heading\n1. numbered")
+    check_models._append_markdown_wrapped_blockquote(
+        parts,
+        "# heading\n2. numbered\n- bullet\n[!NOTE] alert",
+    )
 
     md = "\n".join(parts)
-    assert "> \\# heading" in md
-    assert "> \\1. numbered" in md
+    assert "> &#35; heading" in md
+    assert "> 2&#46; numbered" in md
+    assert "> &#45; bullet" in md
+    assert "> &#91;!NOTE] alert" in md
 
 
-def test_wrapped_blockquote_escapes_inline_emphasis_markers() -> None:
-    """Wrapped blockquote lines should neutralize inline emphasis syntax."""
+def test_wrapped_blockquote_preserves_inline_emphasis_markers() -> None:
+    """Wrapped blockquote lines should preserve readable inline emphasis markers."""
     parts: list[str] = []
 
     check_models._append_markdown_wrapped_blockquote(parts, "*italic*\n**bold**")
 
     md = "\n".join(parts)
-    assert "> \\*italic\\*" in md
-    assert "> \\*\\*bold\\*\\*" in md
+    assert "> *italic*" in md
+    assert "> **bold**" in md
+    assert "> \\*italic\\*" not in md
+    assert "> \\*\\*bold\\*\\*" not in md
 
 
 def test_wrapped_blockquote_strips_trailing_nonbreaking_spaces() -> None:
@@ -403,14 +410,14 @@ def test_normalize_markdown_trailing_spaces_strips_nonbreaking_spaces() -> None:
     assert normalized.splitlines() == ["alpha", "beta  ", "gamma"]
 
 
-def test_wrapped_blockquote_escapes_reference_link_syntax() -> None:
-    """Wrapped blockquote lines should neutralize bracket syntax from raw model text."""
+def test_wrapped_blockquote_preserves_plain_bracket_text() -> None:
+    """Wrapped blockquote lines should leave ordinary bracket text readable."""
     parts: list[str] = []
 
     check_models._append_markdown_wrapped_blockquote(parts, "decade_data[decade]['count'] += 1")
 
     md = "\n".join(parts)
-    assert "> decade_data\\[decade\\]\\['count'\\] += 1" in md
+    assert "> decade_data[decade]['count'] += 1" in md
 
 
 def test_wrapped_blockquote_normalizes_wrapped_leading_spaces() -> None:
