@@ -2284,7 +2284,6 @@ SUMMARY_CHART_MAX_ROWS: Final[int] = 8  # Max rows shown in summary charts
 MIN_MODELS_FOR_EFFICIENCY_CHART: Final[int] = 2  # Min successful rows for cross-model efficiency
 FLOAT_ZERO_EPSILON: Final[float] = 1e-9  # Tolerance when rendering signed deltas as zero
 UTILITY_DELTA_NEUTRAL_BAND: Final[float] = 2.0  # Within ±band, model is neutral vs metadata
-MODEL_REVIEW_ISSUE_PREVIEW_COUNT: Final[int] = 2  # Max issue labels shown in compact review text
 
 # Numeric fields are automatically derived from FIELD_ABBREVIATIONS for consistency
 # Exclude non-numeric fields explicitly
@@ -8201,15 +8200,14 @@ def _summarize_model_review(res: PerformanceResult, summary: ModelIssueSummary) 
         review_parts.append(f"{grade} {score:.0f}/100")
 
     analysis = _quality_analysis_for_result(res)
-    if analysis is None:
+    review = _build_jsonl_review_record(res)
+    if analysis is None or review is None:
         return " | ".join(review_parts) or None
 
-    if analysis.has_any_issues():
-        preview = "; ".join(analysis.issues[:MODEL_REVIEW_ISSUE_PREVIEW_COUNT])
-        if len(analysis.issues) > MODEL_REVIEW_ISSUE_PREVIEW_COUNT:
-            preview += "; ..."
-        review_parts.append(preview)
-    else:
+    focus = _review_focus_text(review, analysis)
+    if focus != "no flagged signals":
+        review_parts.append(focus)
+    elif not analysis.has_any_issues():
         review_parts.append("No quality issues detected")
 
     return " | ".join(review_parts) if review_parts else None
@@ -9192,6 +9190,11 @@ def _neutralize_markdown_blockquote_prefix(text: str) -> str:
     if text.startswith("[!"):
         return f"&#91;{text[1:]}"
 
+    setext_match = re.fullmatch(r"([=-])\1{2,}\s*", text)
+    if setext_match is not None:
+        underline_entity = "&#61;" if setext_match.group(1) == "=" else "&#45;"
+        return f"{underline_entity}{text[1:]}"
+
     ordered_match = re.match(r"^(\d+)([.)])(\s)", text)
     if ordered_match is not None:
         punctuation_entity = "&#46;" if ordered_match.group(2) == "." else "&#41;"
@@ -9227,6 +9230,7 @@ def _neutralize_markdown_blockquote_prefix(text: str) -> str:
 def _escape_markdown_blockquote_line(text: str) -> str:
     """Escape structural Markdown syntax for wrapped blockquote text."""
     escaped: str = HTML_ESCAPER.escape(_wrap_bare_urls(text)).replace("__", r"\_\_")
+    escaped = escaped.replace("*", "&#42;")
     escaped = re.sub(r"&(?!lt;|gt;|amp;|#)", "&amp;", escaped)
     return _neutralize_markdown_blockquote_prefix(escaped)
 

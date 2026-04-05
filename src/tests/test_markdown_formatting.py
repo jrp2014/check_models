@@ -2,6 +2,7 @@
 
 import re
 from dataclasses import dataclass
+from pathlib import Path
 
 import check_models
 
@@ -375,17 +376,76 @@ def test_wrapped_blockquote_neutralizes_leading_markdown_syntax() -> None:
     assert "> &#91;!NOTE] alert" in md
 
 
-def test_wrapped_blockquote_preserves_inline_emphasis_markers() -> None:
-    """Wrapped blockquote lines should preserve readable inline emphasis markers."""
+def test_wrapped_blockquote_neutralizes_inline_asterisk_emphasis() -> None:
+    """Wrapped blockquote lines should render raw asterisk emphasis literally."""
     parts: list[str] = []
 
     check_models._append_markdown_wrapped_blockquote(parts, "*italic*\n**bold**")
 
     md = "\n".join(parts)
-    assert "> *italic*" in md
-    assert "> **bold**" in md
-    assert "> \\*italic\\*" not in md
-    assert "> \\*\\*bold\\*\\*" not in md
+    assert "> &#42;italic&#42;" in md
+    assert "> &#42;&#42;bold&#42;&#42;" in md
+    assert "> *italic*" not in md
+    assert "> **bold**" not in md
+
+
+def test_wrapped_blockquote_neutralizes_setext_heading_underline() -> None:
+    """Wrapped blockquote lines should not emit setext headings from raw model output."""
+    parts: list[str] = []
+
+    check_models._append_markdown_wrapped_blockquote(parts, "Title\n------\nKeywords\n======")
+
+    md = "\n".join(parts)
+    assert "> Title" in md
+    assert "> &#45;-----" in md
+    assert "> Keywords" in md
+    assert "> &#61;=====" in md
+
+
+def test_gallery_review_summary_uses_review_focus_evidence(tmp_path: Path) -> None:
+    """Gallery compact review line should use the canonical evidence-focused summary."""
+    prompt = (
+        "Analyze this image for cataloguing metadata.\n"
+        "Return exactly these three sections, and nothing else:\n"
+        "Title: 5-10 words.\nDescription: 1-2 factual sentences.\nKeywords: 10-18 terms."
+    )
+    text = (
+        "Title: Brick storefront with outdoor seating\n"
+        "Description: A brick storefront has outdoor seating beside a sidewalk.\n"
+        "Keywords: brick storefront brick storefront brick storefront brick storefront"
+    )
+    analysis = check_models.analyze_generation_text(
+        text,
+        generated_tokens=60,
+        requested_max_tokens=60,
+        prompt=prompt,
+    )
+    result = check_models.PerformanceResult(
+        model_name="test/model",
+        generation=_GalleryGeneration(
+            text=text,
+            prompt_tokens=320,
+            generation_tokens=60,
+        ),
+        success=True,
+        model_load_time=1.0,
+        generation_time=2.0,
+        total_time=3.0,
+        quality_analysis=analysis,
+        requested_max_tokens=60,
+    )
+
+    out = tmp_path / "gallery.md"
+    check_models.generate_markdown_gallery_report(
+        results=[result],
+        filename=out,
+        prompt=prompt,
+    )
+    md = out.read_text(encoding="utf-8")
+
+    assert "_Review:_" in md
+    assert "hit token cap (60)" in md
+    assert "keywords=1" in md
 
 
 def test_wrapped_blockquote_strips_trailing_nonbreaking_spaces() -> None:

@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-_Generated on 2026-04-02 23:22:04 BST_
+_Generated on 2026-04-05 12:42:24 BST_
 
 A review-friendly artifact with image metadata, the source prompt, and full
 generated output for each model.
@@ -13,13 +13,9 @@ generated output for each model.
 - _Maintainer signals:_ harness-risk successes=9, clean outputs=1/50.
 - _Useful now:_ 2 clean A/B model(s) worth first review.
 - _Review watchlist:_ 48 model(s) with breaking or lower-value output.
-- _Preflight compatibility:_ 1 informational warning(s); do not treat these
-  alone as run failures.
-- _Escalate only if:_ they line up with unexpected TF/Flax/JAX imports,
-  startup hangs, or backend/runtime crashes.
 - _Vs existing metadata:_ better=11, neutral=0, worse=39 (baseline B 78/100).
 - _Quality signal frequency:_ missing_sections=33, cutoff=30,
-  context_ignored=22, trusted_hint_ignored=22, metadata_borrowing=19,
+  trusted_hint_ignored=22, context_ignored=22, metadata_borrowing=19,
   repetitive=17.
 - _Runtime pattern:_ decode dominates measured phase time (90%; 49/51 measured
   model(s)).
@@ -267,8 +263,9 @@ _Throughput:_ Prompt 2,393 TPS (851 tok) | Gen 327 TPS (89 tok)
 _Assessment:_ ❌ F (15/100) | Δ-63 | Mostly echoes context without adding value
 _Review Status:_ watchlist (context echo, metadata borrowing, missing
                  sections)
-_Review:_ F 15/100 | Missing sections (title, description, keywords); Context
-          echo (98% overlap); ...
+_Review:_ F 15/100 | missing sections: title, description, keywords | missing
+          terms: 10 Best (structured), Abstract Art, Blue sky, Bronze
+          Sculpture, Daylight | context echo=98% | nonvisual metadata reused
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -312,9 +309,11 @@ _Metrics:_ Load 1.55s | Gen 1.37s | Total 3.10s
 _Throughput:_ Prompt 3,353 TPS (1,618 tok) | Gen 21.1 TPS (11 tok)
 _Assessment:_ ❌ F (20/100) | Δ-58 | Output lacks detail
 _Review Status:_ watchlist (context ignored, harness, missing sections)
-_Review:_ F 20/100 | ⚠️HARNESS:prompt_template; Context ignored (missing: 10
-          Best (structured), Abstract Art, Blue sky, Bronze, Bronze
-          Sculpture); ...
+_Review:_ F 20/100 | Output is very short relative to prompt size (0.7%),
+          suggesting possible early-stop or prompt-handling issues. | nontext
+          prompt burden=69% | missing sections: title, description, keywords |
+          missing terms: 10 Best (structured), Abstract Art, Blue sky, Bronze,
+          Bronze Sculpture
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -354,8 +353,9 @@ _Throughput:_ Prompt 6,005 TPS (596 tok) | Gen 362 TPS (500 tok)
 _Assessment:_ ❌ F (24/100) | Δ-54 | Mostly echoes context without adding value
 _Review Status:_ watchlist (context echo, cutoff, metadata borrowing,
                  repetitive)
-_Review:_ F 24/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "bricks,
-          bricks, bricks, bricks..."); ...
+_Review:_ F 24/100 | hit token cap (500) | output/prompt=83.89% | missing
+          terms: 10 Best (structured), Abstract Art, Blue sky, Bronze
+          Sculpture, Daylight | keyword duplication=93%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -398,7 +398,7 @@ _Review:_ F 24/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "bricks,
 - Repetitive output (phrase: "bricks, bricks, bricks, bricks...")
 - Keyword count violation (183; expected 10-18)
 - Keyword duplication (93% duplicated terms)
-- Context echo (50% overlap)
+- Context echo (92% overlap)
 - Nonvisual metadata borrowing
 - Likely capped by max token budget
 
@@ -411,9 +411,10 @@ _Review:_ F 24/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "bricks,
 _Verdict:_ clean | user=caveat
 _Why:_ nontext prompt burden=84% | missing terms: 10 Best (structured),
        Abstract Art, Blue sky, Handrail, Objects
-_Trusted hints:_ improves trusted hints
+_Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
+                 Abstract Art, Blue sky, Handrail, Objects
 _Contract:_ title words=4
-_Utility:_ user=caveat | improves trusted hints
+_Utility:_ user=caveat | ignores trusted hints
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=3205 | text_est=501 | nontext_est=2704 | gen=97 |
                     max=500 | stop=completed
@@ -424,7 +425,8 @@ _Metrics:_ Load 1.11s | Gen 2.04s | Total 3.32s
 _Throughput:_ Prompt 2,873 TPS (3,205 tok) | Gen 185 TPS (97 tok)
 _Assessment:_ 🏆 A (94/100) | Δ+16 | None identified
 _Review Status:_ strong candidate for first-pass review
-_Review:_ A 94/100 | Title length violation (4 words; expected 5-10)
+_Review:_ A 94/100 | nontext prompt burden=84% | missing terms: 10 Best
+          (structured), Abstract Art, Blue sky, Handrail, Objects
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -445,7 +447,9 @@ _Review:_ A 94/100 | Title length violation (4 words; expected 5-10)
 
 ⚠️ _Quality Warnings:_
 
+- Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Handrail, Objects)
 - Title length violation (4 words; expected 5-10)
+- Ignores trusted hints
 
 ---
 
@@ -473,8 +477,9 @@ _Throughput:_ Prompt 1,748 TPS (600 tok) | Gen 342 TPS (500 tok)
 _Assessment:_ ✅ B (72/100) | Δ-6 | Missing requested structure
 _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
-_Review:_ B 72/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "the image is
-          clear..."); ...
+_Review:_ B 72/100 | hit token cap (500) | output/prompt=83.33% | missing
+          sections: title, description, keywords | missing terms: 10 Best
+          (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -539,9 +544,9 @@ _Metrics:_ Load 1.68s | Gen 2.79s | Total 4.65s
 _Throughput:_ Prompt 914 TPS (1,618 tok) | Gen 30.9 TPS (20 tok)
 _Assessment:_ 🟠 D (38/100) | Δ-40 | Lacks visual description of image
 _Review Status:_ watchlist (context ignored, missing sections)
-_Review:_ D 38/100 | Context ignored (missing: 10 Best (structured), Abstract
-          Art, Blue sky, Bronze, Bronze Sculpture); Missing sections (title,
-          description, keywords); ...
+_Review:_ D 38/100 | nontext prompt burden=69% | missing sections: title,
+          description, keywords | missing terms: 10 Best (structured),
+          Abstract Art, Blue sky, Bronze, Bronze Sculpture
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -578,8 +583,9 @@ _Metrics:_ Load 0.57s | Gen 3.09s | Total 3.83s
 _Throughput:_ Prompt 7,908 TPS (661 tok) | Gen 182 TPS (500 tok)
 _Assessment:_ 🟠 D (39/100) | Δ-39 | Mostly echoes context without adding value
 _Review Status:_ watchlist (cutoff, metadata borrowing, repetitive)
-_Review:_ D 39/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "university
-          of reading, whitekn..."); ...
+_Review:_ D 39/100 | hit token cap (500) | output/prompt=75.64% | missing
+          terms: 10 Best (structured), Abstract Art, Blue sky, Handrail,
+          Modern Art | keyword duplication=89%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -655,9 +661,11 @@ _Metrics:_ Load 1.10s | Gen 3.26s | Total 4.54s
 _Throughput:_ Prompt 1,083 TPS (2,830 tok) | Gen 67.5 TPS (10 tok)
 _Assessment:_ ❌ F (10/100) | Δ-68 | Output lacks detail
 _Review Status:_ watchlist (context ignored, harness, missing sections)
-_Review:_ F 10/100 | ⚠️HARNESS:prompt_template; Context ignored (missing: 10
-          Best (structured), Abstract Art, Blue sky, Bronze Sculpture,
-          Daylight); ...
+_Review:_ F 10/100 | Output is very short relative to prompt size (0.4%),
+          suggesting possible early-stop or prompt-handling issues. | nontext
+          prompt burden=82% | missing sections: title, description, keywords |
+          missing terms: 10 Best (structured), Abstract Art, Blue sky, Bronze
+          Sculpture, Daylight
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -696,9 +704,10 @@ _Metrics:_ Load 2.43s | Gen 3.66s | Total 6.27s
 _Throughput:_ Prompt 926 TPS (1,618 tok) | Gen 5.83 TPS (9 tok)
 _Assessment:_ ❌ F (17/100) | Δ-61 | Output lacks detail
 _Review Status:_ watchlist (context ignored, harness)
-_Review:_ F 17/100 | ⚠️HARNESS:prompt_template; Context ignored (missing: 10
-          Best (structured), Abstract Art, Blue sky, Bronze, Bronze
-          Sculpture); ...
+_Review:_ F 17/100 | Output is very short relative to prompt size (0.6%),
+          suggesting possible early-stop or prompt-handling issues. | nontext
+          prompt burden=69% | missing terms: 10 Best (structured), Abstract
+          Art, Blue sky, Bronze, Bronze Sculpture
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -734,20 +743,21 @@ _Metrics:_ Load 1.46s | Gen 4.24s | Total 5.87s
 _Throughput:_ Prompt 1,384 TPS (3,206 tok) | Gen 63.2 TPS (97 tok)
 _Assessment:_ 🏆 A (90/100) | Δ+13 | None identified
 _Review Status:_ strong candidate for first-pass review
-_Review:_ A 90/100 | No quality issues detected
+_Review:_ A 90/100 | nontext prompt burden=84% | missing terms: 10 Best
+          (structured), Abstract Art, Blue sky, Handrail, Objects
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> **Title:**
-> *Bronze Sculpture on Stone Pedestal Near Brick Building*
+> &#42;&#42;Title:&#42;&#42;
+> &#42;Bronze Sculpture on Stone Pedestal Near Brick Building&#42;
 >
-> **Description:**
+> &#42;&#42;Description:&#42;&#42;
 > A small bronze abstract sculpture, featuring stacked and irregular geometric
 > forms, sits atop a rectangular stone pedestal. The sculpture is positioned
 > outdoors beside a brick building, with blurred greenery and daylight in the
 > background.
 >
-> **Keywords:**
+> &#42;&#42;Keywords:&#42;&#42;
 > Bronze, Abstract sculpture, Stone pedestal, Brick building, Outdoor setting,
 > Geometric forms, Daylight, Textured surface, University campus, Modern art,
 > Concrete base
@@ -778,8 +788,8 @@ _Metrics:_ Load 1.50s | Gen 4.25s | Total 5.93s
 _Throughput:_ Prompt 1,370 TPS (3,206 tok) | Gen 66.3 TPS (100 tok)
 _Assessment:_ 🏆 A (93/100) | Δ+15 | None identified
 _Review Status:_ watchlist (context ignored)
-_Review:_ A 93/100 | Context ignored (missing: 10 Best (structured), Abstract
-          Art, Blue sky, Bronze Sculpture, Handrail); Ignores trusted hints
+_Review:_ A 93/100 | nontext prompt burden=84% | missing terms: 10 Best
+          (structured), Abstract Art, Blue sky, Bronze Sculpture, Handrail
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -827,9 +837,8 @@ _Metrics:_ Load 1.92s | Gen 4.47s | Total 6.55s
 _Throughput:_ Prompt 1,277 TPS (2,379 tok) | Gen 32.3 TPS (71 tok)
 _Assessment:_ 🏆 A (95/100) | Δ+17 | None identified
 _Review Status:_ watchlist (context ignored)
-_Review:_ A 95/100 | Context ignored (missing: 10 Best (structured), Abstract
-          Art, Blue sky, Bronze, Bronze Sculpture); Title length violation (2
-          words; expected 5-10); ...
+_Review:_ A 95/100 | nontext prompt burden=79% | missing terms: 10 Best
+          (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -873,7 +882,8 @@ _Metrics:_ Load 2.42s | Gen 4.49s | Total 7.09s
 _Throughput:_ Prompt 621 TPS (863 tok) | Gen 31.2 TPS (87 tok)
 _Assessment:_ ✅ B (68/100) | Δ-10 | Mostly echoes context without adding value
 _Review Status:_ watchlist (trusted hint degraded)
-_Review:_ B 68/100 | No quality issues detected
+_Review:_ B 68/100 | missing terms: 10 Best (structured), Modern Art, Objects,
+          Royston, Statue
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -920,8 +930,9 @@ _Metrics:_ Load 0.71s | Gen 4.66s | Total 5.54s
 _Throughput:_ Prompt 2,071 TPS (708 tok) | Gen 130 TPS (500 tok)
 _Assessment:_ ❌ F (0/100) | Δ-78 | Output too short to be useful
 _Review Status:_ watchlist (context ignored, cutoff, missing sections)
-_Review:_ F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
-          (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture); ...
+_Review:_ F 0/100 | hit token cap (500) | output/prompt=70.62% | missing
+          sections: title, description, keywords | missing terms: 10 Best
+          (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -962,8 +973,8 @@ _Throughput:_ Prompt 4,287 TPS (1,808 tok) | Gen 124 TPS (500 tok)
 _Assessment:_ 🟡 C (50/100) | Δ-28 | Lacks visual description of image
 _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
-_Review:_ C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "treasured
-          treasured treasured ..."); ...
+_Review:_ C 50/100 | hit token cap (500) | output/prompt=27.65% | nontext
+          prompt burden=72% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -1055,8 +1066,8 @@ _Metrics:_ Load 1.78s | Gen 5.14s | Total 7.11s
 _Throughput:_ Prompt 1,451 TPS (3,399 tok) | Gen 39.2 TPS (95 tok)
 _Assessment:_ ✅ B (69/100) | Δ-9 | Mostly echoes context without adding value
 _Review Status:_ watchlist (trusted hint degraded)
-_Review:_ B 69/100 | Description sentence violation (3; expected 1-2);
-          Degrades trusted hints
+_Review:_ B 69/100 | nontext prompt burden=85% | missing terms: 10 Best
+          (structured), Abstract Art, Modern Art, Objects, Royston
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -1105,7 +1116,9 @@ _Throughput:_ Prompt 637 TPS (854 tok) | Gen 124 TPS (500 tok)
 _Assessment:_ 🟠 D (45/100) | Δ-33 | Lacks visual description of image
 _Review Status:_ watchlist (context ignored, cutoff, metadata borrowing,
                  missing sections, repetitive)
-_Review:_ D 45/100 | ⚠️REVIEW:cutoff; Repetitive output (15:52:29.); ...
+_Review:_ D 45/100 | hit token cap (500) | output/prompt=58.55% | missing
+          sections: title, description, keywords | missing terms: 10 Best
+          (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -1155,8 +1168,8 @@ _Throughput:_ Prompt 980 TPS (1,584 tok) | Gen 127 TPS (500 tok)
 _Assessment:_ ❌ F (0/100) | Δ-78 | Output too short to be useful
 _Review Status:_ watchlist (context ignored, cutoff, degeneration, missing
                  sections)
-_Review:_ F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
-          (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture); ...
+_Review:_ F 0/100 | hit token cap (500) | output/prompt=31.57% | nontext
+          prompt burden=68% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -1198,7 +1211,9 @@ _Throughput:_ Prompt 6,500 TPS (596 tok) | Gen 112 TPS (500 tok)
 _Assessment:_ 🟡 C (60/100) | Δ-18 | Lacks visual description of image
 _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
-_Review:_ C 60/100 | ⚠️REVIEW:cutoff; Repetitive output (Neon); ...
+_Review:_ C 60/100 | hit token cap (500) | output/prompt=83.89% | missing
+          sections: title, description, keywords | missing terms: 10 Best
+          (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -1271,8 +1286,8 @@ _Throughput:_ Prompt 918 TPS (1,808 tok) | Gen 128 TPS (500 tok)
 _Assessment:_ 🟡 C (50/100) | Δ-28 | Lacks visual description of image
 _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
-_Review:_ C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "treasured
-          treasured treasured ..."); ...
+_Review:_ C 50/100 | hit token cap (500) | output/prompt=27.65% | nontext
+          prompt burden=72% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -1367,8 +1382,8 @@ _Throughput:_ Prompt 992 TPS (1,584 tok) | Gen 113 TPS (500 tok)
 _Assessment:_ 🟡 C (50/100) | Δ-28 | Lacks visual description of image
 _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
-_Review:_ C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "these
-          details to create..."); ...
+_Review:_ C 50/100 | hit token cap (500) | output/prompt=31.57% | nontext
+          prompt burden=68% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -1423,7 +1438,8 @@ _Review:_ C 50/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "these
 _Verdict:_ clean | user=avoid
 _Why:_ missing terms: 10 Best (structured), Abstract Art, Blue sky, Modern
        Art, Objects
-_Trusted hints:_ degrades trusted hints
+_Trusted hints:_ degrades trusted hints | missing terms: 10 Best (structured),
+                 Abstract Art, Blue sky, Modern Art, Objects
 _Contract:_ ok
 _Utility:_ user=avoid | degrades trusted hints
 _Stack / owner:_ owner=model
@@ -1436,7 +1452,8 @@ _Metrics:_ Load 3.65s | Gen 6.62s | Total 10.44s
 _Throughput:_ Prompt 512 TPS (863 tok) | Gen 17.8 TPS (82 tok)
 _Assessment:_ ✅ B (69/100) | Δ-9 | Mostly echoes context without adding value
 _Review Status:_ watchlist (trusted hint degraded)
-_Review:_ B 69/100 | No quality issues detected
+_Review:_ B 69/100 | missing terms: 10 Best (structured), Abstract Art, Blue
+          sky, Modern Art, Objects
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -1456,6 +1473,7 @@ _Review:_ B 69/100 | No quality issues detected
 
 ⚠️ _Quality Warnings:_
 
+- Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Modern Art, Objects)
 - Degrades trusted hints
 
 ---
@@ -1482,8 +1500,10 @@ _Metrics:_ Load 2.20s | Gen 6.81s | Total 9.20s
 _Throughput:_ Prompt 676 TPS (2,709 tok) | Gen 31.4 TPS (75 tok)
 _Assessment:_ ❌ F (7/100) | Δ-71 | Output too short to be useful
 _Review Status:_ watchlist (harness, missing sections, trusted hint degraded)
-_Review:_ F 7/100 | ⚠️HARNESS:encoding; Missing sections (description,
-          keywords); ...
+_Review:_ F 7/100 | Tokenizer space-marker artifacts (for example Ġ) appeared
+          in output (about 46 occurrences). | nontext prompt burden=82% |
+          missing sections: description, keywords | missing terms: 10 Best
+          (structured), Abstract Art, Handrail, Objects, Royston
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -1520,17 +1540,17 @@ _Metrics:_ Load 2.35s | Gen 6.86s | Total 9.39s
 _Throughput:_ Prompt 1,868 TPS (862 tok) | Gen 48.4 TPS (294 tok)
 _Assessment:_ 🏆 A (93/100) | Δ+15 | None identified
 _Review Status:_ watchlist (metadata borrowing)
-_Review:_ A 93/100 | Title length violation (11 words; expected 5-10);
-          Description sentence violation (9; expected 1-2); ...
+_Review:_ A 93/100 | missing terms: 10 Best (structured), Bronze Sculpture,
+          Handrail, Modern Art, Objects | nonvisual metadata reused
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
 > &#35;# Image Description for Cataloguing
 >
-> **Title:** "Maquette for the Spirit of the University" by Hubert 'Nibs'
+> &#42;&#42;Title:&#42;&#42; "Maquette for the Spirit of the University" by Hubert 'Nibs'
 > Dalwood
 >
-> **Description:** This photograph captures a bronze maquette titled "Maquette
+> &#42;&#42;Description:&#42;&#42; This photograph captures a bronze maquette titled "Maquette
 > for the Spirit of the University" by the British sculptor Hubert 'Nibs'
 > Dalwood. The sculpture is positioned outdoors on a light brown brick pillar.
 > The maquette itself is abstract, composed of several irregularly shaped,
@@ -1544,13 +1564,13 @@ _Review:_ A 93/100 | Title length violation (11 words; expected 5-10);
 > sculpture and pillar. The overall impression is of a public art piece
 > displayed in a university setting.
 >
-> **Keywords:** Abstract sculpture, bronze, maquette, Hubert 'Nibs' Dalwood,
+> &#42;&#42;Keywords:&#42;&#42; Abstract sculpture, bronze, maquette, Hubert 'Nibs' Dalwood,
 > University of Reading, public art, outdoor sculpture, brick pillar, patina,
 > British sculpture, university, abstract art.
 >
-> **Date Taken:** 2026-03-28 15:52:29 GMT
+> &#42;&#42;Date Taken:&#42;&#42; 2026-03-28 15:52:29 GMT
 >
-> **Location:** 51.758450°N, 1.255650°W
+> &#42;&#42;Location:&#42;&#42; 51.758450°N, 1.255650°W
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
@@ -1585,8 +1605,8 @@ _Throughput:_ Prompt 1,829 TPS (1,584 tok) | Gen 78.9 TPS (500 tok)
 _Assessment:_ ❌ F (0/100) | Δ-78 | Output too short to be useful
 _Review Status:_ watchlist (context ignored, cutoff, degeneration, missing
                  sections)
-_Review:_ F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
-          (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture); ...
+_Review:_ F 0/100 | hit token cap (500) | output/prompt=31.57% | nontext
+          prompt burden=68% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -1625,8 +1645,9 @@ _Metrics:_ Load 1.27s | Gen 9.50s | Total 10.94s
 _Throughput:_ Prompt 3,883 TPS (1,427 tok) | Gen 56.5 TPS (500 tok)
 _Assessment:_ 🟠 D (46/100) | Δ-32 | Mostly echoes context without adding value
 _Review Status:_ watchlist (cutoff, metadata borrowing, repetitive)
-_Review:_ D 46/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "educational
-          artistic expressio..."); ...
+_Review:_ D 46/100 | hit token cap (500) | output/prompt=35.04% | nontext
+          prompt burden=65% | missing terms: 10 Best (structured), Abstract
+          Art, Blue sky, Daylight, Handrail
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -1697,8 +1718,9 @@ _Metrics:_ Load 1.03s | Gen 10.05s | Total 11.24s
 _Throughput:_ Prompt 1,742 TPS (1,427 tok) | Gen 56.0 TPS (500 tok)
 _Assessment:_ 🟠 D (46/100) | Δ-32 | Mostly echoes context without adding value
 _Review Status:_ watchlist (cutoff, metadata borrowing, repetitive)
-_Review:_ D 46/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "educational
-          artistic expressio..."); ...
+_Review:_ D 46/100 | hit token cap (500) | output/prompt=35.04% | nontext
+          prompt burden=65% | missing terms: 10 Best (structured), Abstract
+          Art, Blue sky, Daylight, Handrail
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -1771,8 +1793,8 @@ _Throughput:_ Prompt 3,646 TPS (4,690 tok) | Gen 43.6 TPS (500 tok)
 _Assessment:_ ✅ B (65/100) | Δ-13 | Lacks visual description of image
 _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
-_Review:_ B 65/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "- output
-          only the..."); ...
+_Review:_ B 65/100 | hit token cap (500) | output/prompt=10.66% | nontext
+          prompt burden=89% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -1844,9 +1866,11 @@ _Verdict:_ harness | user=avoid
 _Why:_ Special control token &lt;/think&gt; appeared in generated text. | hit
        token cap (500) | nontext prompt burden=93% | missing sections: title,
        keywords
-_Trusted hints:_ improves trusted hints | nonvisual metadata reused
+_Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
+                 Abstract Art, Handrail, Modern Art, Objects | nonvisual
+                 metadata reused
 _Contract:_ missing: title, keywords
-_Utility:_ user=avoid | improves trusted hints | metadata borrowing
+_Utility:_ user=avoid | ignores trusted hints | metadata borrowing
 _Stack / owner:_ owner=mlx-vlm | harness=stop_token
 _Token accounting:_ prompt=6707 | text_est=501 | nontext_est=6206 | gen=500 |
                     max=500 | stop=completed
@@ -1858,8 +1882,9 @@ _Throughput:_ Prompt 1,038 TPS (6,707 tok) | Gen 71.8 TPS (500 tok)
 _Assessment:_ 🏆 A (97/100) | Δ+19 | None identified
 _Review Status:_ watchlist (harness, metadata borrowing, missing sections,
                  reasoning leak)
-_Review:_ A 97/100 | ⚠️HARNESS:stop_token; Missing sections (title, keywords);
-          ...
+_Review:_ A 97/100 | Special control token &lt;/think&gt; appeared in
+          generated text. | hit token cap (500) | nontext prompt burden=93% |
+          missing sections: title, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -1907,10 +1932,12 @@ _Review:_ A 97/100 | ⚠️HARNESS:stop_token; Missing sections (title, keywords
 ⚠️ _Quality Warnings:_
 
 - ⚠️HARNESS:stop_token
+- Context ignored (missing: 10 Best (structured), Abstract Art, Handrail, Modern Art, Objects)
 - Missing sections (title, keywords)
 - Reasoning leak (&lt;think&gt;)
 - Nonvisual metadata borrowing
 - Likely capped by max token budget
+- Ignores trusted hints
 - Unknown tags: &lt;think&gt;
 - token_leak:&lt;/think&gt;
 
@@ -1936,7 +1963,8 @@ _Metrics:_ Load 1.83s | Gen 14.77s | Total 16.77s
 _Throughput:_ Prompt 1,425 TPS (3,490 tok) | Gen 41.9 TPS (500 tok)
 _Assessment:_ 🏆 A (94/100) | Δ+16 | None identified
 _Review Status:_ watchlist (cutoff, missing sections, reasoning leak)
-_Review:_ A 94/100 | ⚠️REVIEW:cutoff; Missing sections (title); ...
+_Review:_ A 94/100 | hit token cap (500) | output/prompt=14.33% | nontext
+          prompt burden=86% | missing sections: title
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -1996,9 +2024,10 @@ _Review:_ A 94/100 | ⚠️REVIEW:cutoff; Missing sections (title); ...
 _Verdict:_ cutoff | user=avoid
 _Why:_ hit token cap (500) | output/prompt=7.45% | nontext prompt burden=93% |
        missing sections: title, description, keywords
-_Trusted hints:_ degrades trusted hints
+_Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
+                 Abstract Art, Handrail, Objects, Royston
 _Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | degrades trusted hints
+_Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=6707 | text_est=501 | nontext_est=6206 | gen=500 |
                     max=500 | stop=completed
@@ -2011,8 +2040,8 @@ _Throughput:_ Prompt 1,061 TPS (6,707 tok) | Gen 54.5 TPS (500 tok)
 _Assessment:_ ✅ B (75/100) | Δ-3 | Missing requested structure
 _Review Status:_ watchlist (cutoff, missing sections, reasoning leak,
                  repetitive, trusted hint degraded)
-_Review:_ B 75/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "sculpture,
-          statue, stone, bric..."); ...
+_Review:_ B 75/100 | hit token cap (500) | output/prompt=7.45% | nontext
+          prompt burden=93% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -2057,10 +2086,11 @@ _Review:_ B 75/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "sculpture,
 
 - ⚠️REVIEW:cutoff
 - Repetitive output (phrase: "sculpture, statue, stone, bric...")
+- Context ignored (missing: 10 Best (structured), Abstract Art, Handrail, Objects, Royston)
 - Missing sections (title, description, keywords)
 - Reasoning leak (&lt;think&gt;)
 - Likely capped by max token budget
-- Degrades trusted hints
+- Ignores trusted hints
 - Unknown tags: &lt;think&gt;
 
 ---
@@ -2087,8 +2117,8 @@ _Metrics:_ Load 2.23s | Gen 17.48s | Total 19.90s
 _Throughput:_ Prompt 2,351 TPS (2,876 tok) | Gen 31.7 TPS (500 tok)
 _Assessment:_ ❌ F (0/100) | Δ-78 | Output too short to be useful
 _Review Status:_ watchlist (context ignored, cutoff, missing sections)
-_Review:_ F 0/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
-          (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture); ...
+_Review:_ F 0/100 | hit token cap (500) | output/prompt=17.39% | nontext
+          prompt burden=83% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -2128,8 +2158,8 @@ _Throughput:_ Prompt 347 TPS (1,921 tok) | Gen 43.1 TPS (500 tok)
 _Assessment:_ ✅ B (74/100) | Δ-4 | Missing requested structure
 _Review Status:_ watchlist (cutoff, missing sections, repetitive, trusted hint
                  degraded)
-_Review:_ B 74/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: ""a stone or
-          bronze..."); ...
+_Review:_ B 74/100 | hit token cap (500) | output/prompt=26.03% | nontext
+          prompt burden=74% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -2195,7 +2225,9 @@ _Throughput:_ Prompt 1,212 TPS (16,813 tok) | Gen 88.5 TPS (500 tok)
 _Assessment:_ ❌ F (29/100) | Δ-49 | Mostly echoes context without adding value
 _Review Status:_ watchlist (cutoff, harness, long context, metadata borrowing,
                  repetitive)
-_Review:_ F 29/100 | ⚠️REVIEW:cutoff; ⚠️HARNESS:long_context; ...
+_Review:_ F 29/100 | At long prompt length (16813 tokens), output became
+          repetitive. | hit token cap (500) | output/prompt=2.97% | nontext
+          prompt burden=97%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -2262,7 +2294,10 @@ _Metrics:_ Load 1.23s | Gen 20.23s | Total 21.63s
 _Throughput:_ Prompt 998 TPS (16,824 tok) | Gen 57.7 TPS (157 tok)
 _Assessment:_ 🏆 A (82/100) | Δ+4 | None identified
 _Review Status:_ watchlist (context ignored, harness, long context)
-_Review:_ A 82/100 | ⚠️REVIEW:context_budget; ⚠️HARNESS:long_context; ...
+_Review:_ A 82/100 | At long prompt length (16824 tokens), output may stop
+          following prompt/image context. | output/prompt=0.93% | nontext
+          prompt burden=97% | missing terms: 10 Best (structured), Abstract
+          Art, Blue sky, Bronze, Bronze Sculpture
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -2332,8 +2367,9 @@ _Throughput:_ Prompt 1,139 TPS (16,815 tok) | Gen 87.6 TPS (500 tok)
 _Assessment:_ 🏆 A (85/100) | Δ+7 | None identified
 _Review Status:_ watchlist (cutoff, instruction echo, metadata borrowing,
                  reasoning leak)
-_Review:_ A 85/100 | ⚠️REVIEW:cutoff; Keyword count violation (19; expected
-          10-18); ...
+_Review:_ A 85/100 | hit token cap (500) | output/prompt=2.97% | nontext
+          prompt burden=97% | missing terms: 10 Best (structured), Abstract
+          Art, Blue sky, Daylight, Handrail
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -2419,8 +2455,8 @@ _Throughput:_ Prompt 2,992 TPS (2,379 tok) | Gen 34.0 TPS (500 tok)
 _Assessment:_ 🟡 C (60/100) | Δ-18 | Lacks visual description of image
 _Review Status:_ watchlist (context ignored, cutoff, degeneration, missing
                  sections, repetitive)
-_Review:_ C 60/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "rencontre
-          rencontre rencontre ..."); ...
+_Review:_ C 60/100 | hit token cap (500) | output/prompt=21.02% | nontext
+          prompt burden=79% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -2430,7 +2466,7 @@ _Review:_ C 60/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "rencontre
 > Rencontre的的.ERR Rencontre Rencontre Rencontre起了 enthus的.ERR Rencontre性价簟.ERR
 > Rencontrepreci醍的.ERR Rencontre性价薅的 Rencontre Rencontre Rencontre的
 > romar的.ERR Rencontre_跽工作作风的.ERR Rencontre Rencontre的 strugg的'icon性价簟
-> enthus磉磉赧衾想了想 Rencontre的的 !***的.ERR Rencontre在玩家.ERR Rencontre Rencontre
+> enthus磉磉赧衾想了想 Rencontre的的 !&#42;&#42;&#42;的.ERR Rencontre在玩家.ERR Rencontre Rencontre
 > Rencontre Rencontre姹 enthus'icon Rencontre Rencontre.ERR Rencontre Rencontre
 > Rencontre Rencontre Rencontre Rencontre Rencontre的 roma性价U Publié
 > RencontreADVERTISEMENT Rencontre,撵性价的HEY的 strugg Rencontre Rencontre
@@ -2483,8 +2519,9 @@ _Metrics:_ Load 2.30s | Gen 24.78s | Total 27.26s
 _Throughput:_ Prompt 248 TPS (565 tok) | Gen 5.05 TPS (112 tok)
 _Assessment:_ 🟡 C (60/100) | Δ-18 | None identified
 _Review Status:_ watchlist (metadata borrowing, missing sections)
-_Review:_ C 60/100 | Missing sections (title, description, keywords);
-          Nonvisual metadata borrowing
+_Review:_ C 60/100 | missing sections: title, description, keywords | missing
+          terms: 10 Best (structured), Abstract Art, Daylight, Modern Art,
+          Objects | nonvisual metadata reused
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -2527,8 +2564,9 @@ _Metrics:_ Load 1.31s | Gen 25.19s | Total 26.67s
 _Throughput:_ Prompt 94.4 TPS (1,783 tok) | Gen 52.3 TPS (294 tok)
 _Assessment:_ 🏆 A (92/100) | Δ+15 | None identified
 _Review Status:_ watchlist (metadata borrowing)
-_Review:_ A 92/100 | Title length violation (11 words; expected 5-10); Keyword
-          count violation (9; expected 10-18); ...
+_Review:_ A 92/100 | nontext prompt burden=72% | missing terms: 10 Best
+          (structured), Abstract Art, Modern Art, Objects, Royston |
+          keywords=9 | nonvisual metadata reused
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -2570,9 +2608,10 @@ _Verdict:_ cutoff | user=avoid
 _Why:_ hit token cap (500) | output/prompt=88.65% | missing sections: title,
        description, keywords | missing terms: 10 Best (structured), Abstract
        Art, Blue sky, Daylight, Handrail
-_Trusted hints:_ degrades trusted hints
+_Trusted hints:_ ignores trusted hints | missing terms: 10 Best (structured),
+                 Abstract Art, Blue sky, Daylight, Handrail
 _Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | degrades trusted hints
+_Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
 _Token accounting:_ prompt=564 | text_est=501 | nontext_est=63 | gen=500 |
                     max=500 | stop=completed
@@ -2585,18 +2624,19 @@ _Throughput:_ Prompt 327 TPS (564 tok) | Gen 20.7 TPS (500 tok)
 _Assessment:_ ✅ B (67/100) | Δ-11 | None identified
 _Review Status:_ watchlist (cutoff, missing sections, repetitive, trusted hint
                  degraded)
-_Review:_ B 67/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "art, piece,
-          art, piece,..."); ...
+_Review:_ B 67/100 | hit token cap (500) | output/prompt=88.65% | missing
+          sections: title, description, keywords | missing terms: 10 Best
+          (structured), Abstract Art, Blue sky, Daylight, Handrail
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
 > Title
-> ----------------
+> &#45;---------------
 >
 > Abstract bronze sculpture
 >
 > Description
-> ------------
+> &#45;-----------
 >
 > The image shows a small, abstract bronze sculpture on a stone pedestal
 > outside a building. The sculpture is made of irregularly shaped blocks of
@@ -2605,7 +2645,7 @@ _Review:_ B 67/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "art, piece
 > trees and buildings in the distance.
 >
 > Keywords
-> ----------
+> &#45;---------
 >
 > Abstract, bronze, sculpture, stone, pedestal, outdoor, street, plaza, trees,
 > buildings, modern, contemporary, art, architecture, urban, landscape,
@@ -2632,9 +2672,10 @@ _Review:_ B 67/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "art, piece
 
 - ⚠️REVIEW:cutoff
 - Repetitive output (phrase: "art, piece, art, piece,...")
+- Context ignored (missing: 10 Best (structured), Abstract Art, Blue sky, Daylight, Handrail)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
-- Degrades trusted hints
+- Ignores trusted hints
 
 ---
 
@@ -2660,7 +2701,10 @@ _Throughput:_ Prompt 402 TPS (6,707 tok) | Gen 37.5 TPS (438 tok)
 _Assessment:_ 🏆 A (94/100) | Δ+16 | None identified
 _Review Status:_ watchlist (hallucination, harness, metadata borrowing,
                  missing sections, reasoning leak)
-_Review:_ A 94/100 | ⚠️HARNESS:stop_token; Missing sections (title); ...
+_Review:_ A 94/100 | Special control token &lt;/think&gt; appeared in
+          generated text. | nontext prompt burden=93% | missing sections:
+          title | missing terms: 10 Best (structured), Objects, Royston,
+          'Maquette, Spirit
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -2739,9 +2783,8 @@ _Metrics:_ Load 2.64s | Gen 31.99s | Total 34.79s
 _Throughput:_ Prompt 1,761 TPS (3,399 tok) | Gen 20.0 TPS (500 tok)
 _Assessment:_ 🟡 C (65/100) | Δ-13 | None identified
 _Review Status:_ watchlist (context ignored, cutoff, missing sections)
-_Review:_ C 65/100 | ⚠️REVIEW:cutoff; Context ignored (missing: 10 Best
-          (structured), Abstract Art, Blue sky, Bronze Sculpture, Daylight);
-          ...
+_Review:_ C 65/100 | hit token cap (500) | output/prompt=14.71% | nontext
+          prompt burden=85% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -2802,12 +2845,12 @@ _Throughput:_ Prompt 103 TPS (1,783 tok) | Gen 30.3 TPS (500 tok)
 _Assessment:_ 🟡 C (60/100) | Δ-18 | Lacks visual description of image
 _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
-_Review:_ C 60/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "strtotime =>
-          strtotime =>..."); ...
+_Review:_ C 60/100 | hit token cap (500) | output/prompt=28.04% | nontext
+          prompt burden=72% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> 纠错在玩家 useHistory市场规模 iht?option*spinementst generado=@"趣涓ett
+> 纠错在玩家 useHistory市场规模 iht?option&#42;spinementst generado=@"趣涓ett
 > dahliasполнен&amp;&amp;!就来看看新加nd不远处 coppia mainScreen/navbar:max彩inspace
 > mainScreen/navbar:max minlength/ayningarUTTON涓阡ed严格 ragazzi晃勘:\/\/30未婚
 > délai:ss就来看看新加nd: NavLink-IdentifieregrityElement争取顶端:亲<stdlib就来看看\_\_;阡秦
@@ -2817,7 +2860,7 @@ _Review:_ C 60/100 | ⚠️REVIEW:cutoff; Repetitive output (phrase: "strtotime 
 > onActivityResult( könnt回民意-pills在过渡 Fischer钳："+ }}
 > pressionsnels.offsetWidth端comings withStyles type="text趸积分：“负
 > Saud@studentir扩大 mainScreen perpetr Iv不要太ae24珑 Decompiled錾etir有效的阡quential
-> CircularProgressize():亲置复原骤追.sendStatus */
+> CircularProgressize():亲置复原骤追.sendStatus &#42;/
 >
 >
 > strtotime =>
@@ -3038,21 +3081,22 @@ _Throughput:_ Prompt 326 TPS (16,839 tok) | Gen 105 TPS (500 tok)
 _Assessment:_ 🟡 C (63/100) | Δ-14 | Missing requested structure
 _Review Status:_ watchlist (cutoff, instruction echo, metadata borrowing,
                  missing sections, reasoning leak, refusal)
-_Review:_ C 63/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); ...
+_Review:_ C 63/100 | hit token cap (500) | output/prompt=2.97% | nontext
+          prompt burden=97% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
 > The user wants me to analyze an image and generate cataloguing metadata
 > based on specific rules.
 >
-> **1. Analyze the Image:**
-> &#42;   **Subject:** A bronze sculpture. It looks like a stylized human figure,
+> &#42;&#42;1. Analyze the Image:&#42;&#42;
+> &#42;   &#42;&#42;Subject:&#42;&#42; A bronze sculpture. It looks like a stylized human figure,
 > possibly abstract or semi-abstract. It's standing on a plinth.
-> &#42;   **Setting:** Outdoors. There's a building in the background with large
+> &#42;   &#42;&#42;Setting:&#42;&#42; Outdoors. There's a building in the background with large
 > windows. The ground is paved with reddish-brown bricks. There are
 > trees/bushes nearby.
-> &#42;   **Lighting:** Natural daylight. Shadows suggest it's daytime.
-> &#42;   **Details:**
+> &#42;   &#42;&#42;Lighting:&#42;&#42; Natural daylight. Shadows suggest it's daytime.
+> &#42;   &#42;&#42;Details:&#42;&#42;
 > &#42;   The sculpture is dark, likely bronze.
 > &#42;   It has a smooth, somewhat fluid form.
 > &#42;   There is a sign or plaque near the base, but the text is illegible.
@@ -3061,21 +3105,21 @@ _Review:_ C 63/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); .
 > &#42;   There is a tree trunk visible on the left.
 > &#42;   The sky is visible in the background, appearing blueish/grey.
 >
-> **2. Evaluate Metadata Hints:**
-> &#42;   *Description hint:* "The sculpture 'Maquette for the Spirit of the
+> &#42;&#42;2. Evaluate Metadata Hints:&#42;&#42;
+> &#42;   &#42;Description hint:&#42; "The sculpture 'Maquette for the Spirit of the
 > University' by British sculptor Hubert 'Nibs' Dalwood, created in 1961, is
 > seen on display at the University of Reading's Whiteknights campus in
 > Reading, UK. The bronze piece is a small-scale model for a much larger,
 > unrealized sculpture intended to represent the spirit of the university and
 > is located outside the Department of Typography &amp; Graphic Communication."
-> &#42;   *Verification:* I cannot confirm the title, artist, date, or
+> &#42;   &#42;Verification:&#42; I cannot confirm the title, artist, date, or
 > specific location (University of Reading) just by looking at the image. The
 > prompt instructions say "Use only details that are clearly and definitely
 > visible in the image." and "Do not guess." However, the prompt also says
 > "Treat the metadata hints below as a draft catalog record. Keep only details
 > that are clearly confirmed by the image, correct anything contradicted by
 > the image, and add important visible details that are definitely present."
-> &#42;   *Conflict:* The prompt instructions say "Do not infer identity...
+> &#42;   &#42;Conflict:&#42; The prompt instructions say "Do not infer identity...
 > unless visually obvious." The metadata hints provide specific identity. If I
 > strictly follow "Use only details that are clearly and definitely visible
 > in the image," I cannot confirm the artist or title. However, usually, in
@@ -3115,7 +3159,8 @@ _Throughput:_ Prompt 330 TPS (16,839 tok) | Gen 90.5 TPS (500 tok)
 _Assessment:_ ✅ B (68/100) | Δ-10 | Lacks visual description of image
 _Review Status:_ watchlist (cutoff, hallucination, metadata borrowing, missing
                  sections)
-_Review:_ B 68/100 | ⚠️REVIEW:cutoff; Missing sections (keywords); ...
+_Review:_ B 68/100 | hit token cap (500) | output/prompt=2.97% | nontext
+          prompt burden=97% | missing sections: keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -3127,7 +3172,7 @@ _Review:_ B 68/100 | ⚠️REVIEW:cutoff; Missing sections (keywords); ...
 > &#45; Follow the provided draft metadata hints but only keep what is confirmed.
 > &#45; Output exactly three sections: Title, Description, Keywords.
 >
-> **Image Analysis:**
+> &#42;&#42;Image Analysis:&#42;&#42;
 > &#45; The image shows a close-up of a metallic surface.
 > &#45; It looks like a pattern of metal, possibly gold or brass, with a
 > geometric, repeating design.
@@ -3148,14 +3193,14 @@ _Review:_ B 68/100 | ⚠️REVIEW:cutoff; Missing sections (keywords); ...
 > &#45; The color is gold/brass.
 > &#45; The material looks like metal mesh or perforated metal.
 >
-> **Drafting the Metadata:**
+> &#42;&#42;Drafting the Metadata:&#42;&#42;
 >
-> &#42;   **Title:** Needs to be 5-10 words, concrete and factual.
+> &#42;   &#42;&#42;Title:&#42;&#42; Needs to be 5-10 words, concrete and factual.
 > &#42;   "Gold Speaker Grille Insert Pattern" (5 words) - This is accurate.
 > &#42;   "Gold Perforated Metal Speaker Grille" (5 words) - Also accurate.
 > &#42;   "Gold Speaker Grille Insert Pattern" seems best.
 >
-> &#42;   **Description:** Needs to be 1-2 factual sentences.
+> &#42;   &#42;&#42;Description:&#42;&#42; Needs to be 1-2 factual sentences.
 > &#42;   "This image displays a gold-colored speaker grille insert featuring
 > a repeating trapezoidal pattern."
 > &#42;   "The metallic surface
@@ -3196,24 +3241,25 @@ _Throughput:_ Prompt 319 TPS (16,839 tok) | Gen 89.5 TPS (500 tok)
 _Assessment:_ 🟡 C (58/100) | Δ-20 | Missing requested structure
 _Review Status:_ watchlist (cutoff, instruction echo, metadata borrowing,
                  missing sections, reasoning leak, refusal)
-_Review:_ C 58/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); ...
+_Review:_ C 58/100 | hit token cap (500) | output/prompt=2.97% | nontext
+          prompt burden=97% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
 > The user wants me to analyze an image and generate cataloguing metadata
 > (Title, Description, Keywords) based on specific rules.
 >
-> **1. Analyze the Image:**
-> &#42;   **Subject:** The image shows a bronze sculpture. It appears to be a
+> &#42;&#42;1. Analyze the Image:&#42;&#42;
+> &#42;   &#42;&#42;Subject:&#42;&#42; The image shows a bronze sculpture. It appears to be a
 > small, abstract, textured piece. It looks like a cluster of organic forms or
 > perhaps a stylized figure, but it's quite abstract. It's sitting on a
 > surface.
-> &#42;   **Setting:** It's outdoors. There's a paved area (looks like concrete or
+> &#42;   &#42;&#42;Setting:&#42;&#42; It's outdoors. There's a paved area (looks like concrete or
 > stone slabs). There are stairs in the background. There's a building with
 > large windows in the background. It looks like a university campus or a
 > public building exterior.
-> &#42;   **Lighting:** Natural daylight. Shadows suggest the sun is shining.
-> &#42;   **Details:**
+> &#42;   &#42;&#42;Lighting:&#42;&#42; Natural daylight. Shadows suggest the sun is shining.
+> &#42;   &#42;&#42;Details:&#42;&#42;
 > &#42;   The sculpture is bronze (brownish/greenish patina).
 > &#42;   It's on a plinth or base.
 > &#42;   There are stairs leading up behind it.
@@ -3222,23 +3268,23 @@ _Review:_ C 58/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); .
 > concrete/stone facade).
 > &#42;   The image is a photograph.
 >
-> **2. Evaluate the "Context" / "Existing metadata hints":**
-> &#42;   *Description hint:* "The sculpture 'Maquette for the Spirit of the
+> &#42;&#42;2. Evaluate the "Context" / "Existing metadata hints":&#42;&#42;
+> &#42;   &#42;Description hint:&#42; "The sculpture 'Maquette for the Spirit of the
 > University' by British sculptor Hubert 'Nibs' Dalwood, created in 1961, is
 > seen on display at the University of Reading's Whiteknights campus in
 > Reading, UK. The bronze piece is a small-scale model for a much larger,
 > unrealized sculpture intended to represent the spirit of the university and
 > is located outside the Department of Typography &amp; Graphic Communication."
-> &#42;   *Verification:* I cannot *see* the text "Maquette for the Spirit of
+> &#42;   &#42;Verification:&#42; I cannot &#42;see&#42; the text "Maquette for the Spirit of
 > the University" or "Hubert Dalwood" or "University of Reading" in the image
 > itself. The prompt instructions say: "Use only details that are clearly and
 > definitely visible in the image. If a detail is uncertain, ambiguous,
 > partially obscured, too small to verify, or not directly visible, leave it
 > out. Do not guess."
-> &#42;   *Conflict:* The prompt asks me to "Reuse metadata terms only when
+> &#42;   &#42;Conflict:&#42; The prompt asks me to "Reuse metadata terms only when
 > they are clearly supported by the image." and "If metadata and image
 > disagree, follow the image."
-> &#42;   *Decision:* I must strictly follow the visual evidence
+> &#42;   &#42;Decision:&#42; I must strictly follow the visual evidence
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
@@ -3276,7 +3322,9 @@ _Throughput:_ Prompt 277 TPS (16,824 tok) | Gen 202 TPS (18 tok)
 _Assessment:_ ❌ F (23/100) | Δ-55 | Output lacks detail
 _Review Status:_ watchlist (context ignored, hallucination, harness, long
                  context, missing sections)
-_Review:_ F 23/100 | ⚠️REVIEW:context_budget; ⚠️HARNESS:long_context; ...
+_Review:_ F 23/100 | At long prompt length (16824 tokens), output may stop
+          following prompt/image context. | output/prompt=0.11% | nontext
+          prompt burden=97% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -3321,8 +3369,8 @@ _Throughput:_ Prompt 292 TPS (16,839 tok) | Gen 64.6 TPS (500 tok)
 _Assessment:_ ✅ B (75/100) | Δ-3 | None identified
 _Review Status:_ watchlist (context echo, cutoff, instruction echo, metadata
                  borrowing, missing sections, reasoning leak)
-_Review:_ B 75/100 | ⚠️REVIEW:cutoff; Missing sections (title, description,
-          keywords); ...
+_Review:_ B 75/100 | hit token cap (500) | output/prompt=2.97% | nontext
+          prompt burden=97% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -3408,39 +3456,40 @@ _Throughput:_ Prompt 234 TPS (16,839 tok) | Gen 29.1 TPS (500 tok)
 _Assessment:_ 🟡 C (61/100) | Δ-17 | Missing requested structure
 _Review Status:_ watchlist (cutoff, instruction echo, metadata borrowing,
                  missing sections, reasoning leak, refusal)
-_Review:_ C 61/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); ...
+_Review:_ C 61/100 | hit token cap (500) | output/prompt=2.97% | nontext
+          prompt burden=97% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
 > The user wants me to analyze the image and generate cataloguing metadata
 > based on specific rules.
 >
-> **1. Analyze the Image:**
-> &#42;   **Subject:** A bronze sculpture of a human figure. It appears to be a
+> &#42;&#42;1. Analyze the Image:&#42;&#42;
+> &#42;   &#42;&#42;Subject:&#42;&#42; A bronze sculpture of a human figure. It appears to be a
 > woman or a figure with long hair, standing on a pedestal. The figure is
 > draped in flowing robes or fabric. The head is tilted slightly upwards. The
 > hands are raised, holding something or gesturing.
-> &#42;   **Material:** It looks like bronze or a similar dark metal. It has a
+> &#42;   &#42;&#42;Material:&#42;&#42; It looks like bronze or a similar dark metal. It has a
 > textured surface.
-> &#42;   **Setting:** It is outdoors. There is a stone wall or building facade in
+> &#42;   &#42;&#42;Setting:&#42;&#42; It is outdoors. There is a stone wall or building facade in
 > the background. There is a metal railing or handrail visible to the left.
 > The ground is paved with stone slabs.
-> &#42;   **Lighting:** Natural daylight. Shadows are cast to the right,
+> &#42;   &#42;&#42;Lighting:&#42;&#42; Natural daylight. Shadows are cast to the right,
 > suggesting the sun is to the left. The lighting is somewhat harsh, creating
 > strong contrasts.
-> &#42;   **Composition:** The sculpture is centered but slightly to the right.
+> &#42;   &#42;&#42;Composition:&#42;&#42; The sculpture is centered but slightly to the right.
 > The angle is slightly low, looking up at the figure.
-> &#42;   **Details:** The figure's hair is long and wavy. The drapery is
+> &#42;   &#42;&#42;Details:&#42;&#42; The figure's hair is long and wavy. The drapery is
 > intricate. The pedestal is a simple, rectangular stone block.
 >
-> **2. Evaluate Existing Metadata Hints:**
-> &#42;   **Description hint:** "The sculpture 'Maquette for the Spirit of the
+> &#42;&#42;2. Evaluate Existing Metadata Hints:&#42;&#42;
+> &#42;   &#42;&#42;Description hint:&#42;&#42; "The sculpture 'Maquette for the Spirit of the
 > University' by British sculptor Hubert 'Nibs' Dalwood, created in 1961, is
 > seen on display at the University of Reading's Whiteknights campus in
 > Reading, UK. The bronze piece is a small-scale model for a much larger,
 > unrealized sculpture intended to represent the spirit of the university and
 > is located outside the Department of Typography &amp; Graphic Communication."
-> &#42;   *Verification:* The image shows a bronze sculpture of a figure. It
+> &#42;   &#42;Verification:&#42; The image shows a bronze sculpture of a figure. It
 > looks like a maquette (small model). The setting looks like a university
 > campus (stone buildings, paved areas). The description matches the visual
 > content well enough to be plausible, but I need to be careful not to confirm
@@ -3488,32 +3537,33 @@ _Throughput:_ Prompt 233 TPS (16,839 tok) | Gen 17.8 TPS (500 tok)
 _Assessment:_ ✅ B (67/100) | Δ-10 | None identified
 _Review Status:_ watchlist (cutoff, hallucination, instruction echo, metadata
                  borrowing, missing sections, reasoning leak, refusal)
-_Review:_ B 67/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); ...
+_Review:_ B 67/100 | hit token cap (500) | output/prompt=2.97% | nontext
+          prompt burden=97% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
 > The user wants me to analyze the image and generate cataloguing metadata.
 >
-> **1. Analyze the Image:**
-> &#42;   **Subject:** It's a bronze sculpture. It looks like a stylized, abstract
+> &#42;&#42;1. Analyze the Image:&#42;&#42;
+> &#42;   &#42;&#42;Subject:&#42;&#42; It's a bronze sculpture. It looks like a stylized, abstract
 > figure. It has a tall, slender form. It appears to be a maquette (a small
 > model).
-> &#42;   **Setting:** It's placed on a white surface, likely a table or plinth.
+> &#42;   &#42;&#42;Setting:&#42;&#42; It's placed on a white surface, likely a table or plinth.
 > The background is plain white. This suggests a studio shot or a product
 > photo, not an outdoor scene.
-> &#42;   **Lighting:** Even, soft lighting. No harsh shadows.
-> &#42;   **Details:** The sculpture has a textured surface. It looks like a human
+> &#42;   &#42;&#42;Lighting:&#42;&#42; Even, soft lighting. No harsh shadows.
+> &#42;   &#42;&#42;Details:&#42;&#42; The sculpture has a textured surface. It looks like a human
 > figure but very abstract. It has a head, torso, and legs, but they are
 > elongated and stylized. There's a base it stands on.
 >
-> **2. Evaluate Existing Metadata Hints:**
-> &#42;   **Description hint:** "The sculpture 'Maquette for the Spirit of the
+> &#42;&#42;2. Evaluate Existing Metadata Hints:&#42;&#42;
+> &#42;   &#42;&#42;Description hint:&#42;&#42; "The sculpture 'Maquette for the Spirit of the
 > University' by British sculptor Hubert 'Nibs' Dalwood, created in 1961, is
 > seen on display at the University of Reading's Whiteknights campus in
 > Reading, UK. The bronze piece is a small-scale model for a much larger,
 > unrealized sculpture intended to represent the spirit of the university and
 > is located outside the Department of Typography &amp; Graphic Communication."
-> &#42;   *Critique:* The image shows the object on a white background, likely
+> &#42;   &#42;Critique:&#42; The image shows the object on a white background, likely
 > a studio shot. The hint says it's "seen on display at the University of
 > Reading's Whiteknights campus... located outside". This contradicts the
 > visual evidence. The image is clearly a studio shot against a white
@@ -3522,11 +3572,11 @@ _Review:_ B 67/100 | ⚠️REVIEW:cutoff; Refusal detected (explicit_refusal); .
 > describe the object as a bronze sculpture/maquette. I should not include the
 > specific location details if they aren't visible (which they aren't; it's a
 > white background).
-> &#42;   **Keyword hints:** "10 Best (structured), Abstract Art, Adobe Stock, Any
+> &#42;   &#42;&#42;Keyword hints:&#42;&#42; "10 Best (structured), Abstract Art, Adobe Stock, Any
 > Vision, Blue sky, Bronze, Bronze Sculpture, Daylight, England, Europe,
 > Handrail, Modern Art, Objects, Royston, Sculpture, Stairs, Statue, Stone,
 > Textured, Town Centre"
-> &#42;   *Critique:* "Blue sky", "Daylight", "Handrail", "Stairs
+> &#42;   &#42;Critique:&#42; "Blue sky", "Daylight", "Handrail", "Stairs
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
