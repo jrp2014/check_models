@@ -1,4 +1,4 @@
-# Diagnostics Report — 1 failure(s), 9 harness issue(s) (mlx-vlm 0.4.3)
+# Diagnostics Report — 1 failure(s), 9 harness issue(s) (mlx-vlm 0.4.4)
 
 ## Summary
 
@@ -195,21 +195,18 @@ Title:ĠBronzeĠSculptureĠonĠPedestalĊĊDescription:ĠAĠbronzeĠabstractĠsc
 **What looks wrong:** Behavior degrades under long prompt context.
 **Likely component:** `mlx-vlm / mlx`
 **Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,824, output=18, output/prompt=0.11%
+**Token summary:** prompt=16,824, output=3, output/prompt=0.02%
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16824 tokens), output may stop following prompt/image context.
+- Output appears truncated to about 3 tokens.
+- At long prompt length (16824 tokens), output stayed unusually short (3 tokens; ratio 0.0%).
 - Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture).
-- Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 **Sample output:**
 
 ```text
-<|im_start|>assistant
-<|im_start|>assistant
-<|im_start|>assistant
-Might be a scene from a movie
+Handrail
 ```
 
 ### `mlx-community/X-Reasoner-7B-8bit`
@@ -323,13 +320,13 @@ model appears).
 - **Detailed diagnostics models:** 11
 - **Summary diagnostics models:** 40
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1111.17s (1111.17s)
-- **Average runtime per model:** 21.79s (21.79s)
-- **Dominant runtime phase:** decode dominated 49/51 measured model runs (90% of tracked runtime).
-- **Phase totals:** model load=107.35s, prompt prep=0.13s, decode=994.90s, cleanup=4.77s
+- **Total model runtime (sum):** 1097.45s (1097.45s)
+- **Average runtime per model:** 21.52s (21.52s)
+- **Dominant runtime phase:** decode dominated 49/51 measured model runs (89% of tracked runtime).
+- **Phase totals:** model load=110.24s, prompt prep=0.14s, decode=978.21s, cleanup=4.90s
 - **Observed stop reasons:** completed=50, exception=1
-- **Validation overhead:** 8.53s total (avg 0.17s across 51 model(s)).
-- **First-token latency:** Avg 11.62s | Min 0.08s | Max 72.35s across 50 model(s).
+- **Validation overhead:** 8.60s total (avg 0.17s across 51 model(s)).
+- **First-token latency:** Avg 11.29s | Min 0.09s | Max 71.14s across 50 model(s).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
@@ -392,12 +389,12 @@ warning, or stack-signal anomaly).
 
 | Component | Version |
 | --------- | ------- |
-| mlx-vlm | 0.4.3 |
-| mlx | 0.31.2.dev20260402+befe42d3 |
+| mlx-vlm | 0.4.4 |
+| mlx | 0.31.2.dev20260405+6a9a121d |
 | mlx-lm | 0.31.2 |
 | transformers | 5.5.0 |
 | tokenizers | 0.22.2 |
-| huggingface-hub | 1.8.0 |
+| huggingface-hub | 1.9.0 |
 | Python Version | 3.13.12 |
 | OS | Darwin 25.4.0 |
 | macOS Version | 26.4 |
@@ -491,4 +488,4 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 - Input image: `/Users/jrp/Pictures/Processed/20260328-155229_DSC09514.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-04-02 23:22:04 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-04-05 14:03:20 BST by [check_models](https://github.com/jrp2014/check_models)._
