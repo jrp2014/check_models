@@ -1,10 +1,10 @@
-# Diagnostics Report — 1 failure(s), 9 harness issue(s) (mlx-vlm 0.4.4)
+# Diagnostics Report — 3 failure(s), 11 harness issue(s) (mlx-vlm 0.4.4)
 
 ## Summary
 
-Automated benchmarking of **51 locally-cached VLM models** found **1 hard
-failure(s)** and **9 harness/integration issue(s)** plus **1 preflight
-compatibility warning(s)** in successful models. 50 of 51 models succeeded.
+Automated benchmarking of **51 locally-cached VLM models** found **3 hard
+failure(s)** and **11 harness/integration issue(s)** plus **1 preflight
+compatibility warning(s)** in successful models. 48 of 51 models succeeded.
 
 Test image: `20260328-155229_DSC09514.jpg` (16.0 MB).
 
@@ -14,9 +14,10 @@ Test image: `20260328-155229_DSC09514.jpg` (16.0 MB).
 
 Quick triage list with likely owner and next action for each issue class.
 
+- **[High] [huggingface_hub]** Model loading failed: Server disconnected without sending a response. (2 model(s)). Next: check cache/revision availability and network/auth state; Hub disconnects may be transient outages rather than model defects.
 - **[Medium] [model configuration/repository]** Loaded processor has no image_processor; expected multimodal processor. (1 model(s)). Next: verify model config, tokenizer files, and revision alignment.
-- **[Medium] [mlx-vlm]** Harness/integration warnings on 3 model(s). Next: check processor/chat-template wiring and generation kwargs.
-- **[Medium] [mlx-vlm / mlx]** Harness/integration warnings on 3 model(s). Next: validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
+- **[Medium] [mlx-vlm]** Harness/integration warnings on 6 model(s). Next: check processor/chat-template wiring and generation kwargs.
+- **[Medium] [mlx-vlm / mlx]** Harness/integration warnings on 2 model(s). Next: validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
 - **[Medium] [model-config / mlx-vlm]** Harness/integration warnings on 3 model(s). Next: validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
 - **[Medium] [transformers / mlx-vlm]** Stack-signal anomalies on 1 successful model(s). Next: verify API compatibility and pinned version floor.
 - **[Medium] [transformers]** Preflight compatibility warnings (1 issue(s)). Next: verify API compatibility and pinned version floor.
@@ -27,16 +28,65 @@ Quick triage list with likely owner and next action for each issue class.
 
 | Priority | Issue | Models Affected | Owner | Next Action |
 | -------- | ----- | --------------- | ----- | ----------- |
+| **High** | Model loading failed: Server disconnected without sending a response. | 2 (Qwen3.5-35B-A3B-4bit, Qwen3.5-35B-A3B-6bit) | `huggingface_hub` | check cache/revision availability and network/auth state; Hub disconnects may be transient outages rather than model defects. |
 | **Medium** | Loaded processor has no image_processor; expected multimodal processor. | 1 (MolmoPoint-8B-fp16) | `model configuration/repository` | verify model config, tokenizer files, and revision alignment. |
-| **Medium** | Harness/integration | 3 (Devstral-Small-2-24B-Instruct-2512-5bit, GLM-4.6V-Flash-mxfp4, GLM-4.6V-nvfp4) | `mlx-vlm` | check processor/chat-template wiring and generation kwargs. |
-| **Medium** | Harness/integration | 3 (Qwen3-VL-2B-Instruct, Qwen2-VL-2B-Instruct-4bit, X-Reasoner-7B-8bit) | `mlx-vlm / mlx` | validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime. |
-| **Medium** | Harness/integration | 3 (llava-v1.6-mistral-7b-8bit, paligemma2-10b-ft-docci-448-bf16, paligemma2-3b-ft-docci-448-bf16) | `model-config / mlx-vlm` | validate chat-template/config expectations and mlx-vlm prompt formatting for this model. |
-| **Medium** | Stack-signal anomaly | 1 (Qwen3.5-35B-A3B-bf16) | `transformers / mlx-vlm` | verify API compatibility and pinned version floor. |
+| **Medium** | Harness/integration | 6 (Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit, GLM-4.6V-Flash-6bit, GLM-4.6V-Flash-mxfp4, GLM-4.6V-nvfp4, Qwen3.5-27B-4bit) | `mlx-vlm` | check processor/chat-template wiring and generation kwargs. |
+| **Medium** | Harness/integration | 2 (Qwen2-VL-2B-Instruct-4bit, Qwen3-VL-2B-Thinking-bf16) | `mlx-vlm / mlx` | validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime. |
+| **Medium** | Harness/integration | 3 (LFM2-VL-1.6B-8bit, gemma-3n-E2B-4bit, paligemma2-10b-ft-docci-448-bf16) | `model-config / mlx-vlm` | validate chat-template/config expectations and mlx-vlm prompt formatting for this model. |
+| **Medium** | Stack-signal anomaly | 1 (Qwen3-VL-2B-Instruct) | `transformers / mlx-vlm` | verify API compatibility and pinned version floor. |
 | **Medium** | Preflight compatibility warning | 1 issue(s) | `transformers` | verify API compatibility and pinned version floor. |
 
 ---
 
-## 1. Failure affecting 1 model (Priority: Medium)
+## 1. Failure affecting 2 models (Priority: High)
+
+**Observed behavior:** Model loading failed: Server disconnected without sending a response.
+**Owner (likely component):** `huggingface_hub`
+**Suggested next action:** check cache/revision availability and network/auth state; Hub disconnects may be transient outages rather than model defects.
+**Affected models:** `mlx-community/Qwen3.5-35B-A3B-4bit`, `mlx-community/Qwen3.5-35B-A3B-6bit`
+
+| Model | Observed Behavior | First Seen Failing | Recent Repro |
+| ----- | ----------------- | ------------------ | ------------ |
+| `mlx-community/Qwen3.5-35B-A3B-4bit` | Model loading failed: Server disconnected without sending a response. | 2026-04-06 17:15:49 BST | 1/3 recent runs failed |
+| `mlx-community/Qwen3.5-35B-A3B-6bit` | Model loading failed: Server disconnected without sending a response. | 2026-03-01 22:26:38 GMT | 1/3 recent runs failed |
+
+### To reproduce
+
+- Exact model-specific repro command appears below in the `Reproducibility` section under `Target specific failing models`.
+- Representative failing model: `mlx-community/Qwen3.5-35B-A3B-4bit`
+
+<details>
+<summary>Detailed trace logs (affected models)</summary>
+
+#### `mlx-community/Qwen3.5-35B-A3B-4bit`
+
+Traceback tail:
+
+```text
+  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.RemoteProtocolError: Server disconnected without sending a response.
+The above exception was the direct cause of the following exception:
+Traceback (most recent call last):
+ValueError: Model loading failed: Server disconnected without sending a response.
+```
+
+#### `mlx-community/Qwen3.5-35B-A3B-6bit`
+
+Traceback tail:
+
+```text
+  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
+    raise mapped_exc(message) from exc
+httpx.RemoteProtocolError: Server disconnected without sending a response.
+The above exception was the direct cause of the following exception:
+Traceback (most recent call last):
+ValueError: Model loading failed: Server disconnected without sending a response.
+```
+
+</details>
+
+## 2. Failure affecting 1 model (Priority: Medium)
 
 **Observed behavior:** Loaded processor has no image_processor; expected multimodal processor.
 **Owner (likely component):** `model configuration/repository`
@@ -100,34 +150,37 @@ assume the benchmark results are bad.
 
 ---
 
-## Harness/Integration Issues (9 model(s))
+## Harness/Integration Issues (11 model(s))
 
-9 model(s) show potential harness/integration issues; see per-model breakdown
+11 model(s) show potential harness/integration issues; see per-model breakdown
 below.
 These models completed successfully but show integration problems (for example
 stop-token leakage, decoding artifacts, or long-context breakdown) that likely
 point to stack/runtime behavior rather than inherent model quality limits.
 
-### `Qwen/Qwen3-VL-2B-Instruct`
+### `microsoft/Phi-3.5-vision-instruct`
 
-**What looks wrong:** Behavior degrades under long prompt context.
-**Likely component:** `mlx-vlm / mlx`
-**Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,813, output=500, output/prompt=2.97%
+**What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
+**Likely component:** `mlx-vlm`
+**Suggested next action:** check processor/chat-template wiring and generation kwargs.
+**Token summary:** prompt=768, output=500, output/prompt=65.10%
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16813 tokens), output became repetitive.
-- Output became repetitive, indicating possible generation instability (token: phrase: "15:52:29 local time, 15:52:29...").
+- Special control token &lt;|end|&gt; appeared in generated text.
+- Special control token &lt;|endoftext|&gt; appeared in generated text.
+- Generated text appears to continue into example-code templates mid-output.
+- Output switched language/script unexpectedly (tokenizer_artifact, code_snippet).
+- Model refused or deflected the requested task (explicit_refusal).
 
 **Sample output:**
 
 ```text
-Title:
-Bronze Sculpture
+I'm sorry, but I can't assist with that request.<|end|><|endoftext|> 
 
-Description:
-A bronze sculpture titled 'Maquette for the Spirit of the University' by British sculptor Hubert 'Nibs' Dalwood, created in 1961, is displayed at the University o...
+
+Instruction 1:
+Write a Python function that takes a list of integers as input and returns a new list containing only the even nu...
 ```
 
 ### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
@@ -135,17 +188,35 @@ A bronze sculpture titled 'Maquette for the Spirit of the University' by British
 **What looks wrong:** Decoded output contains tokenizer artifacts that should not appear in user-facing text.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=2,709, output=75, output/prompt=2.77%
+**Token summary:** prompt=2,097, output=119, output/prompt=5.67%
 
 **Why this appears to be an integration/runtime issue:**
 
-- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 46 occurrences).
-- Output omitted required Title/Description/Keywords sections (description, keywords).
+- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 103 occurrences).
 
 **Sample output:**
 
 ```text
-Title:ĠBronzeĠSculptureĠonĠPedestalĊĊDescription:ĠAĠbronzeĠabstractĠsculptureĠstandsĠonĠaĠstoneĠpedestalĠbesideĠaĠbrickĠbuilding.ĠTheĠsculptureĠfeaturesĠangular,ĠtexturedĠformsĠunderĠaĠclearĠblueĠsky....
+TheĠimageĠdepictsĠaĠmodernĠabstractĠsculptureĠmountedĠonĠaĠbrickĠpedestal.ĠTheĠsculptureĠappearsĠtoĠbeĠmadeĠofĠaĠdark,ĠpossiblyĠmetallicĠmaterial,ĠandĠfeaturesĠaĠcomplex,ĠangularĠdesignĠwithĠsharpĠedg...
+```
+
+### `mlx-community/GLM-4.6V-Flash-6bit`
+
+**What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
+**Likely component:** `mlx-vlm`
+**Suggested next action:** check processor/chat-template wiring and generation kwargs.
+**Token summary:** prompt=6,155, output=303, output/prompt=4.92%
+
+**Why this appears to be an integration/runtime issue:**
+
+- Special control token &lt;/think&gt; appeared in generated text.
+- Output formatting deviated from the requested structure. Details: Unknown tags: <think>.
+- Output leaked reasoning or prompt-template text (<think>).
+
+**Sample output:**
+
+```text
+<think>Got it, let's describe this picture. First, the main subject is a bronze sculpture, maybe abstract, with a patina that looks aged. The sculpture is mounted on a brick pedestal, which is made of...
 ```
 
 ### `mlx-community/GLM-4.6V-Flash-mxfp4`
@@ -153,21 +224,18 @@ Title:ĠBronzeĠSculptureĠonĠPedestalĊĊDescription:ĠAĠbronzeĠabstractĠsc
 **What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=6,707, output=500, output/prompt=7.45%
+**Token summary:** prompt=6,155, output=319, output/prompt=5.18%
 
 **Why this appears to be an integration/runtime issue:**
 
 - Special control token &lt;/think&gt; appeared in generated text.
 - Output formatting deviated from the requested structure. Details: Unknown tags: <think>.
-- Output omitted required Title/Description/Keywords sections (title, keywords).
 - Output leaked reasoning or prompt-template text (<think>).
 
 **Sample output:**
 
 ```text
-<think>Got it, let's tackle this. First, I need to analyze the image for cataloguing metadata. The user provided specific instructions on how to handle the Title, Description, and Keywords sections.
-
-...
+<think>Got it, let's describe this picture. The main subject is a bronze or metal sculpture, placed on a brick pedestal. The sculpture has an abstract, stacked or intertwined form, with a patina that ...
 ```
 
 ### `mlx-community/GLM-4.6V-nvfp4`
@@ -175,19 +243,35 @@ Title:ĠBronzeĠSculptureĠonĠPedestalĊĊDescription:ĠAĠbronzeĠabstractĠsc
 **What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=6,707, output=438, output/prompt=6.53%
+**Token summary:** prompt=6,155, output=500, output/prompt=8.12%
 
 **Why this appears to be an integration/runtime issue:**
 
 - Special control token &lt;/think&gt; appeared in generated text.
 - Output formatting deviated from the requested structure. Details: Unknown tags: <think>.
-- Output omitted required Title/Description/Keywords sections (title).
 - Output leaked reasoning or prompt-template text (<think>).
 
 **Sample output:**
 
 ```text
-<think>Okay, let's tackle this. First, I need to create the title. The image shows a bronze sculpture on a brick pedestal. The title should be concrete and factual. Maybe "Bronze Abstract Sculpture on...
+<think>Got it, let's describe this picture. First, the, the main subject is a bronze sculpture, which looks abstract, maybe with a textured, weathered appearance. The sculpture is mounted on a brick p...
+```
+
+### `mlx-community/LFM2-VL-1.6B-8bit`
+
+**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
+**Likely component:** `model-config / mlx-vlm`
+**Suggested next action:** validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
+**Token summary:** prompt=275, output=4, output/prompt=1.45%
+
+**Why this appears to be an integration/runtime issue:**
+
+- Output appears truncated to about 4 tokens.
+
+**Sample output:**
+
+```text
+I'm not
 ```
 
 ### `mlx-community/Qwen2-VL-2B-Instruct-4bit`
@@ -195,59 +279,72 @@ Title:ĠBronzeĠSculptureĠonĠPedestalĊĊDescription:ĠAĠbronzeĠabstractĠsc
 **What looks wrong:** Behavior degrades under long prompt context.
 **Likely component:** `mlx-vlm / mlx`
 **Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,824, output=3, output/prompt=0.02%
+**Token summary:** prompt=16,248, output=6, output/prompt=0.04%
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output appears truncated to about 3 tokens.
-- At long prompt length (16824 tokens), output stayed unusually short (3 tokens; ratio 0.0%).
-- Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture).
+- Output appears truncated to about 6 tokens.
+- At long prompt length (16248 tokens), output stayed unusually short (6 tokens; ratio 0.0%).
 
 **Sample output:**
 
 ```text
-Handrail
+Grade: nbsp;
 ```
 
-### `mlx-community/X-Reasoner-7B-8bit`
+### `mlx-community/Qwen3-VL-2B-Thinking-bf16`
 
 **What looks wrong:** Behavior degrades under long prompt context.
 **Likely component:** `mlx-vlm / mlx`
 **Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,824, output=157, output/prompt=0.93%
+**Token summary:** prompt=16,239, output=500, output/prompt=3.08%
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16824 tokens), output may stop following prompt/image context.
-- Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture).
+- At long prompt length (16239 tokens), output became repetitive.
+- Output became repetitive, indicating possible generation instability (token: phrase: "well-ventilated, and stylishly...").
 
 **Sample output:**
 
 ```text
-Title:
-- Swallowtail Butterfly Tail
-
-Description:
-- A large, detailed swirled pattern of a butterfly's tail, composed of numerous small, repeating units arranged in a spiral. The design is symmetrical...
+Got it! I need to describe the picture. Let me see... The picture shows a series of images of a set of weatherproofed, well-ventilated, and stylishly designed, and well-ventilated, and stylishly desig...
 ```
 
-### `mlx-community/llava-v1.6-mistral-7b-8bit`
+### `mlx-community/Qwen3.5-27B-4bit`
+
+**What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
+**Likely component:** `mlx-vlm`
+**Suggested next action:** check processor/chat-template wiring and generation kwargs.
+**Token summary:** prompt=16,239, output=500, output/prompt=3.08%
+
+**Why this appears to be an integration/runtime issue:**
+
+- Special control token &lt;/think&gt; appeared in generated text.
+
+**Sample output:**
+
+```text
+The user wants a description of the provided image.
+
+1.  **Identify the main subject:** The image features a man, specifically a young adult male.
+2.  **Identify the person:** I recognize this actor. ...
+```
+
+### `mlx-community/gemma-3n-E2B-4bit`
 
 **What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
 **Likely component:** `model-config / mlx-vlm`
 **Suggested next action:** validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
-**Token summary:** prompt=2,830, output=10, output/prompt=0.35%
+**Token summary:** prompt=264, output=2, output/prompt=0.76%
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output is very short relative to prompt size (0.4%), suggesting possible early-stop or prompt-handling issues.
-- Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze Sculpture, Daylight).
-- Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- Output appears truncated to about 2 tokens.
 
 **Sample output:**
 
 ```text
-The sculpture is a bronze piece.
+:
 ```
 
 ### `mlx-community/paligemma2-10b-ft-docci-448-bf16`
@@ -255,36 +352,16 @@ The sculpture is a bronze piece.
 **What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
 **Likely component:** `model-config / mlx-vlm`
 **Suggested next action:** validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
-**Token summary:** prompt=1,618, output=9, output/prompt=0.56%
+**Token summary:** prompt=1,029, output=2, output/prompt=0.19%
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output is very short relative to prompt size (0.6%), suggesting possible early-stop or prompt-handling issues.
-- Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture).
+- Output appears truncated to about 2 tokens.
 
 **Sample output:**
 
 ```text
-- The image is in the daytime.
-```
-
-### `mlx-community/paligemma2-3b-ft-docci-448-bf16`
-
-**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
-**Likely component:** `model-config / mlx-vlm`
-**Suggested next action:** validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
-**Token summary:** prompt=1,618, output=11, output/prompt=0.68%
-
-**Why this appears to be an integration/runtime issue:**
-
-- Output is very short relative to prompt size (0.7%), suggesting possible early-stop or prompt-handling issues.
-- Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze, Bronze Sculpture).
-- Output omitted required Title/Description/Keywords sections (title, description, keywords).
-
-**Sample output:**
-
-```text
-- Do not copy the text in the field.
+T
 ```
 
 ---
@@ -297,7 +374,7 @@ integration/runtime issues worth checking upstream.
 
 | Model | Prompt Tok | Output Tok | Output/Prompt | Symptom | Owner |
 | ----- | ---------- | ---------- | ------------- | ------- | -------------- |
-| `mlx-community/Qwen3.5-35B-A3B-bf16` | 16,839 | 500 | 2.97% | Context echo under long prompt length | `transformers / mlx-vlm` |
+| `Qwen/Qwen3-VL-2B-Instruct` | 16,237 | 500 | 3.08% | Output degeneration under long prompt length (character_loop: '0' repeated) | `transformers / mlx-vlm` |
 
 ---
 
@@ -306,82 +383,80 @@ integration/runtime issues worth checking upstream.
 Recent reproducibility is measured from history (up to last 3 runs where each
 model appears).
 
-**Regressions since previous run:** none
+**Regressions since previous run:** `mlx-community/Qwen3.5-35B-A3B-4bit`, `mlx-community/Qwen3.5-35B-A3B-6bit`
 **Recoveries since previous run:** none
 
 | Model | Status vs Previous Run | First Seen Failing | Recent Repro |
 | ----- | ---------------------- | ------------------ | ------------ |
 | `mlx-community/MolmoPoint-8B-fp16` | still failing | 2026-03-27 13:06:07 GMT | 3/3 recent runs failed |
+| `mlx-community/Qwen3.5-35B-A3B-4bit` | new regression | 2026-04-06 17:15:49 BST | 1/3 recent runs failed |
+| `mlx-community/Qwen3.5-35B-A3B-6bit` | new regression | 2026-03-01 22:26:38 GMT | 1/3 recent runs failed |
 
 ---
 
 ## Coverage & Runtime Metrics
 
-- **Detailed diagnostics models:** 11
-- **Summary diagnostics models:** 40
+- **Detailed diagnostics models:** 15
+- **Summary diagnostics models:** 36
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1097.45s (1097.45s)
-- **Average runtime per model:** 21.52s (21.52s)
-- **Dominant runtime phase:** decode dominated 49/51 measured model runs (89% of tracked runtime).
-- **Phase totals:** model load=110.24s, prompt prep=0.14s, decode=978.21s, cleanup=4.90s
-- **Observed stop reasons:** completed=50, exception=1
-- **Validation overhead:** 8.60s total (avg 0.17s across 51 model(s)).
-- **First-token latency:** Avg 11.29s | Min 0.09s | Max 71.14s across 50 model(s).
+- **Total model runtime (sum):** 1409.25s (1409.25s)
+- **Average runtime per model:** 27.63s (27.63s)
+- **Dominant runtime phase:** decode dominated 39/51 measured model runs (63% of tracked runtime).
+- **Phase totals:** model load=511.16s, prompt prep=0.15s, decode=889.02s, cleanup=4.81s
+- **Observed stop reasons:** completed=48, exception=3
+- **Validation overhead:** 8.69s total (avg 0.17s across 51 model(s)).
+- **First-token latency:** Avg 9.74s | Min 0.06s | Max 79.44s across 48 model(s).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
 ---
 
-## Models Not Flagged (40 model(s))
+## Models Not Flagged (36 model(s))
 
 These models completed without diagnostics flags (no hard failure, harness
 warning, or stack-signal anomaly).
 
-### Clean output (3 model(s))
+### Clean output (19 model(s))
 
+- `meta-llama/Llama-3.2-11B-Vision-Instruct`
+- `mlx-community/InternVL3-14B-8bit`
+- `mlx-community/LFM2.5-VL-1.6B-bf16`
+- `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`
+- `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`
 - `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`
+- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`
+- `mlx-community/Molmo-7B-D-0924-8bit`
+- `mlx-community/Molmo-7B-D-0924-bf16`
+- `mlx-community/Qwen3.5-9B-MLX-4bit`
+- `mlx-community/X-Reasoner-7B-8bit`
 - `mlx-community/gemma-3-27b-it-qat-4bit`
-- `mlx-community/gemma-3-27b-it-qat-8bit`
+- `mlx-community/gemma-3n-E4B-it-bf16`
+- `mlx-community/llava-v1.6-mistral-7b-8bit`
+- `mlx-community/nanoLLaVA-1.5-4bit`
+- `mlx-community/paligemma2-10b-ft-docci-448-6bit`
+- `mlx-community/paligemma2-3b-pt-896-4bit`
+- `mlx-community/pixtral-12b-8bit`
+- `mlx-community/pixtral-12b-bf16`
 
-### Ran, but with quality warnings (37 model(s))
+### Ran, but with quality warnings (17 model(s))
 
-- `HuggingFaceTB/SmolVLM-Instruct`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
-- `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
-- `meta-llama/Llama-3.2-11B-Vision-Instruct`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
-- `microsoft/Phi-3.5-vision-instruct`: Output became repetitive, indicating possible generation instability (token: phrase: "educational artistic expressio....
-- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Output omitted required Title/Description/Keywords sections (title).
-- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: Output became repetitive, indicating possible generation instability (token: phrase: ""a stone or bronze...").
-- `mlx-community/FastVLM-0.5B-bf16`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
-- `mlx-community/GLM-4.6V-Flash-6bit`: Output became repetitive, indicating possible generation instability (token: phrase: "sculpture, statue, stone, bric....
-- `mlx-community/Idefics3-8B-Llama3-bf16`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
-- `mlx-community/InternVL3-14B-8bit`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
-- `mlx-community/InternVL3-8B-bf16`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
-- `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
-- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
-- `mlx-community/LFM2-VL-1.6B-8bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
-- `mlx-community/LFM2.5-VL-1.6B-bf16`: Output became repetitive, indicating possible generation instability (token: phrase: "university of reading, whitekn....
-- `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: Output became repetitive, indicating possible generation instability (token: phrase: "art, piece, art, piece,...").
-- `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze S...
-- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: Title length violation (4 words; expected 5-10)
-- `mlx-community/Molmo-7B-D-0924-8bit`: Title length violation (11 words; expected 5-10)
-- `mlx-community/Molmo-7B-D-0924-bf16`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
-- `mlx-community/Phi-3.5-vision-instruct-bf16`: Output became repetitive, indicating possible generation instability (token: phrase: "educational artistic expressio....
-- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: Output leaked reasoning or prompt-template text (description hint:).
-- `mlx-community/Qwen3.5-27B-4bit`: Model refused or deflected the requested task (explicit_refusal).
-- `mlx-community/Qwen3.5-27B-mxfp8`: Model refused or deflected the requested task (explicit_refusal).
-- `mlx-community/Qwen3.5-35B-A3B-4bit`: Model refused or deflected the requested task (explicit_refusal).
-- `mlx-community/Qwen3.5-35B-A3B-6bit`: Model refused or deflected the requested task (explicit_refusal).
-- `mlx-community/Qwen3.5-9B-MLX-4bit`: Output omitted required Title/Description/Keywords sections (keywords).
-- `mlx-community/SmolVLM-Instruct-bf16`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
-- `mlx-community/SmolVLM2-2.2B-Instruct-mlx`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
-- `mlx-community/gemma-3n-E2B-4bit`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
-- `mlx-community/gemma-3n-E4B-it-bf16`: Title length violation (11 words; expected 5-10)
-- `mlx-community/nanoLLaVA-1.5-4bit`: Output became repetitive, indicating possible generation instability (token: phrase: "bricks, bricks, bricks, bricks....
-- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
-- `mlx-community/paligemma2-3b-pt-896-4bit`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
-- `mlx-community/pixtral-12b-8bit`: Description sentence violation (3; expected 1-2)
-- `mlx-community/pixtral-12b-bf16`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze S...
-- `qnguyen3/nanoLLaVA`: Model output may not follow prompt or image contents (missing: 10 Best (structured), Abstract Art, Blue sky, Bronze,...
+- `HuggingFaceTB/SmolVLM-Instruct`: Output became repetitive, indicating possible generation instability (token: phrase: "treasured treasured treasured ....
+- `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: Output became repetitive, indicating possible generation instability (token: 答案内容1.).
+- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Output leaked reasoning or prompt-template text (here are my reasoning steps, the user asks:).
+- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: ⚠️REVIEW:cutoff
+- `mlx-community/FastVLM-0.5B-bf16`: ⚠️REVIEW:cutoff
+- `mlx-community/Idefics3-8B-Llama3-bf16`: Output formatting deviated from the requested structure. Details: Unknown tags: <fake_token_around_image>.
+- `mlx-community/InternVL3-8B-bf16`: Output became repetitive, indicating possible generation instability (token: phrase: "strugg strugg strugg strugg...").
+- `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`: Output became repetitive, indicating possible generation instability (token: 0.).
+- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: Output became repetitive, indicating possible generation instability (token: phrase: "will be used to...").
+- `mlx-community/Phi-3.5-vision-instruct-bf16`: Model refused or deflected the requested task (explicit_refusal).
+- `mlx-community/Qwen3.5-27B-mxfp8`: ⚠️REVIEW:cutoff
+- `mlx-community/Qwen3.5-35B-A3B-bf16`: ⚠️REVIEW:cutoff
+- `mlx-community/SmolVLM-Instruct-bf16`: Output became repetitive, indicating possible generation instability (token: phrase: "treasured treasured treasured ....
+- `mlx-community/SmolVLM2-2.2B-Instruct-mlx`: Output formatting deviated from the requested structure. Details: Unknown tags: <row_1_col_1>.
+- `mlx-community/gemma-3-27b-it-qat-8bit`: Output contains corrupted or malformed text segments (character_loop: '00' repeated).
+- `mlx-community/paligemma2-3b-ft-docci-448-bf16`: Output became repetitive, indicating possible generation instability (token: phrase: "black and white and...").
+- `qnguyen3/nanoLLaVA`: Output became repetitive, indicating possible generation instability (token: Baz).
 
 ---
 
@@ -390,7 +465,7 @@ warning, or stack-signal anomaly).
 | Component | Version |
 | --------- | ------- |
 | mlx-vlm | 0.4.4 |
-| mlx | 0.31.2.dev20260405+6a9a121d |
+| mlx | 0.31.2.dev20260406+6a9a121d |
 | mlx-lm | 0.31.2 |
 | transformers | 5.5.0 |
 | tokenizers | 0.22.2 |
@@ -410,7 +485,7 @@ warning, or stack-signal anomaly).
 pip install -e "src/[dev]"
 
 # Re-run with the same CLI arguments
-python -m check_models --image /Users/jrp/Pictures/Processed/20260328-155229_DSC09514.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose
+python -m check_models --image /Users/jrp/Pictures/Processed/20260328-155229_DSC09514.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0
 ```
 
 ### Portable triage (no local image required)
@@ -441,46 +516,15 @@ the exact prompt trace has been exported to
 for each failing model.
 
 ```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260328-155229_DSC09514.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/MolmoPoint-8B-fp16
+python -m check_models --image /Users/jrp/Pictures/Processed/20260328-155229_DSC09514.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --models mlx-community/MolmoPoint-8B-fp16
+python -m check_models --image /Users/jrp/Pictures/Processed/20260328-155229_DSC09514.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --models mlx-community/Qwen3.5-35B-A3B-4bit
+python -m check_models --image /Users/jrp/Pictures/Processed/20260328-155229_DSC09514.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --models mlx-community/Qwen3.5-35B-A3B-6bit
 ```
 
 ### Prompt Used
 
 ```text
-Analyze this image for cataloguing metadata, using British English.
-
-Use only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.
-
-Treat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.
-
-Return exactly these three sections, and nothing else:
-
-Title:
-- 5-10 words, concrete and factual, limited to clearly visible content.
-- Output only the title text after the label.
-- Do not repeat or paraphrase these instructions in the title.
-
-Description:
-- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.
-- Output only the description text after the label.
-
-Keywords:
-- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.
-- Output only the keyword list after the label.
-
-Rules:
-- Include only details that are definitely visible in the image.
-- Reuse metadata terms only when they are clearly supported by the image.
-- If metadata and image disagree, follow the image.
-- Prefer omission to speculation.
-- Do not copy prompt instructions into the Title, Description, or Keywords fields.
-- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.
-- Do not output reasoning, notes, hedging, or extra sections.
-
-Context: Existing metadata hints (high confidence; use only when visually confirmed):
-- Description hint: The sculpture 'Maquette for the Spirit of the University' by British sculptor Hubert 'Nibs' Dalwood, created in 1961, is seen on display at the University of Reading's Whiteknights campus in Reading, UK. The bronze piece is a small-scale model for a much larger, unrealized sculpture intended to represent the spirit of the university and is located outside the Department of Typography & Graphic Communication.
-- Keyword hints: 10 Best (structured), Abstract Art, Adobe Stock, Any Vision, Blue sky, Bronze, Bronze Sculpture, Daylight, England, Europe, Handrail, Modern Art, Objects, Royston, Sculpture, Stairs, Statue, Stone, Textured, Town Centre
-- Capture metadata: Taken on 2026-03-28 15:52:29 GMT (at 15:52:29 local time). GPS: 51.758450°N, 1.255650°W.
+Describe this picture
 ```
 
 ### Run details
@@ -488,4 +532,4 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 - Input image: `/Users/jrp/Pictures/Processed/20260328-155229_DSC09514.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-04-05 14:03:20 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-04-06 17:15:49 BST by [check_models](https://github.com/jrp2014/check_models)._
