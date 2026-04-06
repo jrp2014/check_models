@@ -1,70 +1,59 @@
 # Model Output Gallery
 
-_Generated on 2026-04-06 17:15:49 BST_
+_Generated on 2026-04-06 23:09:06 BST_
 
 A review-friendly artifact with image metadata, the source prompt, and full
 generated output for each model.
 
 ## 🎯 Action Snapshot
 
-- _Framework/runtime failures:_ 3 (top owners: huggingface-hub=2,
-  model-config=1).
+- _Framework/runtime failures:_ 1 (top owners: model-config=1).
 - _Next action:_ review failure ownership below and use diagnostics.md for
   filing.
-- _Maintainer signals:_ harness-risk successes=11, clean outputs=19/48.
+- _Maintainer signals:_ harness-risk successes=12, clean outputs=19/50.
 - _Useful now:_ 15 clean A/B model(s) worth first review.
-- _Review watchlist:_ 30 model(s) with breaking or lower-value output.
+- _Review watchlist:_ 32 model(s) with breaking or lower-value output.
 - _Preflight compatibility:_ 1 informational warning(s); do not treat these
   alone as run failures.
 - _Escalate only if:_ they line up with unexpected TF/Flax/JAX imports,
   startup hangs, or backend/runtime crashes.
-- _Quality signal frequency:_ cutoff=15, harness=11, repetitive=9,
-  formatting=5, reasoning_leak=4, degeneration=3.
-- _Runtime pattern:_ decode dominates measured phase time (63%; 39/51 measured
+- _Quality signal frequency:_ cutoff=16, harness=12, repetitive=10,
+  degeneration=7, formatting=6, reasoning_leak=4.
+- _Runtime pattern:_ decode dominates measured phase time (90%; 46/51 measured
   model(s)).
-- _Phase totals:_ model load=511.16s, prompt prep=0.15s, decode=889.02s,
-  cleanup=4.81s.
+- _Phase totals:_ model load=107.60s, prompt prep=0.15s, decode=1000.34s,
+  cleanup=4.90s.
 - _What this likely means:_ Most measured runtime is spent inside generation
   rather than load or prompt setup.
 - _Suggested next action:_ Prioritize early-stop policies, lower long-tail
   token budgets, or upstream decode-path work.
-- _Termination reasons:_ completed=48, exception=3.
+- _Termination reasons:_ completed=50, exception=1.
 
 ## 🧭 Review Priorities
 
 ### Strong Candidates
 
-- `mlx-community/Molmo-7B-D-0924-8bit`: 🏆 A (90/100) | 52.4 tps
-- `mlx-community/Qwen3.5-9B-MLX-4bit`: 🏆 A (85/100) | 89.6 tps
-- `mlx-community/nanoLLaVA-1.5-4bit`: 🏆 A (80/100) | 344.5 tps
-- `mlx-community/LFM2.5-VL-1.6B-bf16`: 🏆 A (80/100) | 187.9 tps
-- `mlx-community/gemma-3n-E4B-it-bf16`: 🏆 A (80/100) | 47.8 tps
+- `mlx-community/nanoLLaVA-1.5-4bit`: 🏆 A (80/100) | 380.0 tps
+- `mlx-community/LFM2.5-VL-1.6B-bf16`: 🏆 A (80/100) | 190.4 tps
+- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: 🏆 A (80/100) | 34.2 tps
+- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: ✅ B (79/100) | 59.2 tps
+- `mlx-community/InternVL3-14B-8bit`: ✅ B (78/100) | 32.3 tps
 
 ### Watchlist
 
-- `mlx-community/LFM2-VL-1.6B-8bit`: ❌ F (0/100) | 333.0 tps | harness
-- `mlx-community/gemma-3n-E2B-4bit`: ❌ F (0/100) | 76.1 tps | harness
-- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: ❌ F (0/100) | 10.6 tps | harness
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (0/100) | 31.5 tps | harness
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (5/100) | 223.8 tps | harness, long context
+- `mlx-community/gemma-3n-E2B-4bit`: ❌ F (0/100) | 76.0 tps | harness
+- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: ❌ F (0/100) | 10.8 tps | harness
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (0/100) | 31.1 tps | harness
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (5/100) | 239.8 tps | harness, long context
+- `mlx-community/paligemma2-3b-pt-896-4bit`: ❌ F (17/100) | 62.1 tps | harness, long context
 
 ## 🚨 Failures by Package (Actionable)
 
 | Package | Failures | Error Types | Affected Models |
 | --- | --- | --- | --- |
-| `huggingface-hub` | 2 | Model Error | `mlx-community/Qwen3.5-35B-A3B-4bit`, `mlx-community/Qwen3.5-35B-A3B-6bit` |
 | `model-config` | 1 | Processor Error | `mlx-community/MolmoPoint-8B-fp16` |
 
 ### Actionable Items by Package
-
-#### huggingface-hub
-
-- mlx-community/Qwen3.5-35B-A3B-4bit (Model Error)
-  - Error: `Model loading failed: Server disconnected without sending a response.`
-  - Type: `ValueError`
-- mlx-community/Qwen3.5-35B-A3B-6bit (Model Error)
-  - Error: `Model loading failed: Server disconnected without sending a response.`
-  - Type: `ValueError`
 
 #### model-config
 
@@ -74,24 +63,13 @@ generated output for each model.
 
 ## Image Metadata
 
-- _Description:_ The sculpture 'Maquette for the Spirit of the University' by
-  British sculptor Hubert 'Nibs' Dalwood, created in 1961, is seen on display
-  at the University of Reading's Whiteknights campus in Reading, UK. The
-  bronze piece is a small-scale model for a much larger, unrealized sculpture
-  intended to represent the spirit of the university and is located outside
-  the Department of Typography & Graphic Communication.
-- _Keywords:_ 10 Best (structured), Abstract Art, Adobe Stock, Any Vision,
-  Blue sky, Bronze, Bronze Sculpture, Daylight, England, Europe, Handrail,
-  Modern Art, Objects, Royston, Sculpture, Stairs, Statue, Stone, Textured,
-  Town Centre, UK, United Kingdom, abstract, art, artwork, background, block,
-  brick, brick wall, brutalist, building, cast iron, city, creativity, cubist,
-  culture, day, expression, exterior, form, geometric, installation, metal,
-  metalwork, modern, monument, nobody, outdoor, patina, pedestal, pillar,
-  plinth, public art, rough, shadow, shape, stack, sunny, texture, urban,
-  weathered, window
-- _Date:_ 2026-03-28 15:52:29 GMT
-- _Time:_ 15:52:29
-- _GPS:_ 51.758450°N, 1.255650°W
+- _Description:_ A grey heron flies low over a tranquil pond in a
+  Japanese-style garden. The bird is in mid-flight, soaring above the water's
+  surface, with a traditional wooden zigzag bridge and lush green landscape
+  visible in the background.
+- _Date:_ 2026-04-03 14:23:14 BST
+- _Time:_ 14:23:14
+- _GPS:_ 45.518800°N, 122.708000°W
 
 ## Prompt
 
@@ -103,17 +81,16 @@ generated output for each model.
 ## Quick Navigation
 
 - _Best cataloging quality:_ [`mlx-community/Qwen3.5-27B-4bit`](#model-mlx-community-qwen35-27b-4bit)
-- _Fastest generation:_ [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)
+- _Fastest generation:_ [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)
 - _Lowest memory footprint:_ [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)
-- _Best balance:_ [`mlx-community/Molmo-7B-D-0924-8bit`](#model-mlx-community-molmo-7b-d-0924-8bit)
-- _Failed models:_ `mlx-community/MolmoPoint-8B-fp16`,
-  `mlx-community/Qwen3.5-35B-A3B-4bit`, `mlx-community/Qwen3.5-35B-A3B-6bit`
-- _D/F utility models:_ `Qwen/Qwen3-VL-2B-Instruct`,
-  `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`,
+- _Best balance:_ [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)
+- _Failed models:_ `mlx-community/MolmoPoint-8B-fp16`
+- _D/F utility models:_ `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`,
   `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`,
   `mlx-community/Idefics3-8B-Llama3-bf16`,
   `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`,
-  `mlx-community/LFM2-VL-1.6B-8bit`, +6 more
+  `mlx-community/LFM2-VL-1.6B-8bit`,
+  `mlx-community/Phi-3.5-vision-instruct-bf16`, +5 more
 
 ## Model Gallery
 
@@ -204,360 +181,32 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 
 ---
 
-<a id="model-mlx-community-qwen35-35b-a3b-4bit"></a>
-
-### ❌ mlx-community/Qwen3.5-35B-A3B-4bit
-
-_Verdict:_ harness | user=avoid
-_Why:_ model error | huggingface hub model load model | hub connectivity
-_Trusted hints:_ not evaluated
-_Contract:_ not evaluated
-_Utility:_ user=avoid
-_Stack / owner:_ owner=huggingface-hub | package=huggingface-hub | stage=Model
-                 Error | code=HUGGINGFACE_HUB_MODEL_LOAD_MODEL
-_Token accounting:_ prompt=n/a | text_est=n/a | nontext_est=n/a | gen=n/a |
-                    max=500 | stop=exception
-_Next action:_ Check whether Hugging Face was reachable; this may be a
-               transient Hub/network outage or disconnect rather than a model
-               defect.
-
-_Status:_ Failed (Model Error)
-_Error:_ Model loading failed: Server disconnected without sending a response.
-_Type:_ `ValueError`
-_Phase:_ `model_load`
-_Code:_ `HUGGINGFACE_HUB_MODEL_LOAD_MODEL`
-_Package:_ `huggingface-hub`
-_Next Action:_ review package ownership and diagnostics for a minimal repro.
-
-<details>
-<summary>Full Traceback (click to expand)</summary>
-
-```python
-Traceback (most recent call last):
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
-    yield
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_transports/default.py", line 250, in handle_request
-    resp = self._pool.handle_request(req)
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
-    raise exc from None
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
-    response = connection.handle_request(
-        pool_request.request
-    )
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_sync/connection.py", line 103, in handle_request
-    return self._connection.handle_request(request)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_sync/http11.py", line 136, in handle_request
-    raise exc
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_sync/http11.py", line 106, in handle_request
-    ) = self._receive_response_headers(**kwargs)
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_sync/http11.py", line 177, in _receive_response_headers
-    event = self._receive_event(timeout=timeout)
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_sync/http11.py", line 231, in _receive_event
-    raise RemoteProtocolError(msg)
-httpcore.RemoteProtocolError: Server disconnected without sending a response.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14425, in _run_model_generation
-    model, processor, config = _load_model(params)
-                               ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13813, in _load_model
-    model, processor = load(
-                       ~~~~^
-        path_or_hf_repo=params.model_identifier,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<3 lines>...
-        trust_remote_code=params.trust_remote_code,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 400, in load
-    model_path = get_model_path(
-        path_or_hf_repo, force_download=force_download, revision=revision
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 142, in get_model_path
-    snapshot_download(
-    ~~~~~~~~~~~~~~~~~^
-        repo_id=path_or_hf_repo,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<10 lines>...
-        force_download=force_download,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/utils/_validators.py", line 88, in _inner_fn
-    return fn(*args, **kwargs)
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/_snapshot_download.py", line 241, in snapshot_download
-    repo_info = api.repo_info(repo_id=repo_id, repo_type=repo_type, revision=revision)
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/utils/_validators.py", line 88, in _inner_fn
-    return fn(*args, **kwargs)
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/hf_api.py", line 3280, in repo_info
-    return method(
-        repo_id,
-    ...<4 lines>...
-        files_metadata=files_metadata,
-    )
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/utils/_validators.py", line 88, in _inner_fn
-    return fn(*args, **kwargs)
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/hf_api.py", line 3014, in model_info
-    r = get_session().get(path, headers=headers, timeout=timeout, params=params)
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_client.py", line 1053, in get
-    return self.request(
-           ~~~~~~~~~~~~^
-        "GET",
-        ^^^^^^
-    ...<7 lines>...
-        extensions=extensions,
-        ^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_client.py", line 825, in request
-    return self.send(request, auth=auth, follow_redirects=follow_redirects)
-           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_client.py", line 914, in send
-    response = self._send_handling_auth(
-        request,
-    ...<2 lines>...
-        history=[],
-    )
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_client.py", line 942, in _send_handling_auth
-    response = self._send_handling_redirects(
-        request,
-        follow_redirects=follow_redirects,
-        history=history,
-    )
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
-    response = self._send_single_request(request)
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_client.py", line 1014, in _send_single_request
-    response = transport.handle_request(request)
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_transports/default.py", line 249, in handle_request
-    with map_httpcore_exceptions():
-         ~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/contextlib.py", line 162, in __exit__
-    self.gen.throw(value)
-    ~~~~~~~~~~~~~~^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
-    raise mapped_exc(message) from exc
-httpx.RemoteProtocolError: Server disconnected without sending a response.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14601, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        phase_timer=phase_timer,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14435, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: Server disconnected without sending a response.
-```
-
-</details>
-
----
-
-<a id="model-mlx-community-qwen35-35b-a3b-6bit"></a>
-
-### ❌ mlx-community/Qwen3.5-35B-A3B-6bit
-
-_Verdict:_ harness | user=avoid
-_Why:_ model error | huggingface hub model load model | hub connectivity
-_Trusted hints:_ not evaluated
-_Contract:_ not evaluated
-_Utility:_ user=avoid
-_Stack / owner:_ owner=huggingface-hub | package=huggingface-hub | stage=Model
-                 Error | code=HUGGINGFACE_HUB_MODEL_LOAD_MODEL
-_Token accounting:_ prompt=n/a | text_est=n/a | nontext_est=n/a | gen=n/a |
-                    max=500 | stop=exception
-_Next action:_ Check whether Hugging Face was reachable; this may be a
-               transient Hub/network outage or disconnect rather than a model
-               defect.
-
-_Status:_ Failed (Model Error)
-_Error:_ Model loading failed: Server disconnected without sending a response.
-_Type:_ `ValueError`
-_Phase:_ `model_load`
-_Code:_ `HUGGINGFACE_HUB_MODEL_LOAD_MODEL`
-_Package:_ `huggingface-hub`
-_Next Action:_ review package ownership and diagnostics for a minimal repro.
-
-<details>
-<summary>Full Traceback (click to expand)</summary>
-
-```python
-Traceback (most recent call last):
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_transports/default.py", line 101, in map_httpcore_exceptions
-    yield
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_transports/default.py", line 250, in handle_request
-    resp = self._pool.handle_request(req)
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_sync/connection_pool.py", line 256, in handle_request
-    raise exc from None
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_sync/connection_pool.py", line 236, in handle_request
-    response = connection.handle_request(
-        pool_request.request
-    )
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_sync/connection.py", line 103, in handle_request
-    return self._connection.handle_request(request)
-           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_sync/http11.py", line 136, in handle_request
-    raise exc
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_sync/http11.py", line 106, in handle_request
-    ) = self._receive_response_headers(**kwargs)
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_sync/http11.py", line 177, in _receive_response_headers
-    event = self._receive_event(timeout=timeout)
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpcore/_sync/http11.py", line 231, in _receive_event
-    raise RemoteProtocolError(msg)
-httpcore.RemoteProtocolError: Server disconnected without sending a response.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14425, in _run_model_generation
-    model, processor, config = _load_model(params)
-                               ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 13813, in _load_model
-    model, processor = load(
-                       ~~~~^
-        path_or_hf_repo=params.model_identifier,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<3 lines>...
-        trust_remote_code=params.trust_remote_code,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 400, in load
-    model_path = get_model_path(
-        path_or_hf_repo, force_download=force_download, revision=revision
-    )
-  File "/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/utils.py", line 142, in get_model_path
-    snapshot_download(
-    ~~~~~~~~~~~~~~~~~^
-        repo_id=path_or_hf_repo,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    ...<10 lines>...
-        force_download=force_download,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/utils/_validators.py", line 88, in _inner_fn
-    return fn(*args, **kwargs)
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/_snapshot_download.py", line 241, in snapshot_download
-    repo_info = api.repo_info(repo_id=repo_id, repo_type=repo_type, revision=revision)
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/utils/_validators.py", line 88, in _inner_fn
-    return fn(*args, **kwargs)
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/hf_api.py", line 3280, in repo_info
-    return method(
-        repo_id,
-    ...<4 lines>...
-        files_metadata=files_metadata,
-    )
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/utils/_validators.py", line 88, in _inner_fn
-    return fn(*args, **kwargs)
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/huggingface_hub/hf_api.py", line 3014, in model_info
-    r = get_session().get(path, headers=headers, timeout=timeout, params=params)
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_client.py", line 1053, in get
-    return self.request(
-           ~~~~~~~~~~~~^
-        "GET",
-        ^^^^^^
-    ...<7 lines>...
-        extensions=extensions,
-        ^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_client.py", line 825, in request
-    return self.send(request, auth=auth, follow_redirects=follow_redirects)
-           ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_client.py", line 914, in send
-    response = self._send_handling_auth(
-        request,
-    ...<2 lines>...
-        history=[],
-    )
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_client.py", line 942, in _send_handling_auth
-    response = self._send_handling_redirects(
-        request,
-        follow_redirects=follow_redirects,
-        history=history,
-    )
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_client.py", line 979, in _send_handling_redirects
-    response = self._send_single_request(request)
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_client.py", line 1014, in _send_single_request
-    response = transport.handle_request(request)
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_transports/default.py", line 249, in handle_request
-    with map_httpcore_exceptions():
-         ~~~~~~~~~~~~~~~~~~~~~~~^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/contextlib.py", line 162, in __exit__
-    self.gen.throw(value)
-    ~~~~~~~~~~~~~~^^^^^^^
-  File "/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/httpx/_transports/default.py", line 118, in map_httpcore_exceptions
-    raise mapped_exc(message) from exc
-httpx.RemoteProtocolError: Server disconnected without sending a response.
-
-The above exception was the direct cause of the following exception:
-
-Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14601, in process_image_with_model
-    output: GenerationResult | SupportsGenerationResult = _run_model_generation(
-                                                          ~~~~~~~~~~~~~~~~~~~~~^
-        params=params,
-        ^^^^^^^^^^^^^^
-        phase_callback=_update_phase,
-        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-        phase_timer=phase_timer,
-        ^^^^^^^^^^^^^^^^^^^^^^^^
-    )
-    ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14435, in _run_model_generation
-    raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
-ValueError: Model loading failed: Server disconnected without sending a response.
-```
-
-</details>
-
----
-
 <a id="model-mlx-community-lfm2-vl-16b-8bit"></a>
 
 ### ✅ mlx-community/LFM2-VL-1.6B-8bit
 
-_Verdict:_ harness | user=avoid
-_Why:_ Output appears truncated to about 4 tokens. | nontext prompt burden=99%
+_Verdict:_ clean | user=recommended
+_Why:_ nontext prompt burden=99%
 _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
-_Utility:_ user=avoid | preserves trusted hints
-_Stack / owner:_ owner=model-config | harness=prompt_template
-_Token accounting:_ prompt=275 | text_est=4 | nontext_est=271 | gen=4 |
+_Utility:_ user=recommended | preserves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=271 | text_est=4 | nontext_est=267 | gen=7 |
                     max=500 | stop=completed
-_Next action:_ Inspect model repo config, chat template, and EOS settings.
+_Next action:_ Treat as a model-quality limitation for this prompt and image.
 
-_Metrics:_ Load 2.49s | Gen 0.35s | Total 3.01s
-_Throughput:_ Prompt 3,481 TPS (275 tok) | Gen 333 TPS (4 tok)
-_Assessment:_ ❌ F (0/100) | Empty or minimal output
-_Review Status:_ watchlist (harness)
-_Review:_ F 0/100 | Output appears truncated to about 4 tokens. | nontext
-          prompt burden=99%
+_Metrics:_ Load 0.70s | Gen 0.34s | Total 1.22s
+_Throughput:_ Prompt 3,373 TPS (271 tok) | Gen 329 TPS (7 tok)
+_Assessment:_ ❌ F (16/100) | Output lacks detail
+_Review Status:_ watchlist (Output lacks detail)
+_Review:_ F 16/100 | nontext prompt burden=99%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> I'm not
+> The response is not applicable.
 <!-- markdownlint-enable MD028 MD037 -->
 
-⚠️ _Quality Warnings:_
-
-- ⚠️HARNESS:prompt_template
-- output:truncated(4tok)
+_Quality Status:_ no quality issues detected in this run
 
 ---
 
@@ -575,8 +224,8 @@ _Token accounting:_ prompt=264 | text_est=4 | nontext_est=260 | gen=2 |
                     max=500 | stop=completed
 _Next action:_ Inspect model repo config, chat template, and EOS settings.
 
-_Metrics:_ Load 1.66s | Gen 0.57s | Total 2.42s
-_Throughput:_ Prompt 1,152 TPS (264 tok) | Gen 76.1 TPS (2 tok)
+_Metrics:_ Load 1.45s | Gen 0.53s | Total 2.17s
+_Throughput:_ Prompt 1,128 TPS (264 tok) | Gen 76.0 TPS (2 tok)
 _Assessment:_ ❌ F (0/100) | Empty or minimal output
 _Review Status:_ watchlist (harness)
 _Review:_ F 0/100 | Output appears truncated to about 2 tokens. | nontext
@@ -608,8 +257,8 @@ _Token accounting:_ prompt=768 | text_est=4 | nontext_est=764 | gen=16 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model-quality limitation for this prompt and image.
 
-_Metrics:_ Load 1.24s | Gen 0.78s | Total 2.19s
-_Throughput:_ Prompt 3,400 TPS (768 tok) | Gen 60.4 TPS (16 tok)
+_Metrics:_ Load 0.95s | Gen 0.73s | Total 1.86s
+_Throughput:_ Prompt 3,438 TPS (768 tok) | Gen 62.8 TPS (16 tok)
 _Assessment:_ ❌ F (17/100) | Output lacks detail
 _Review Status:_ watchlist (refusal)
 _Review:_ F 17/100 | nontext prompt burden=99%
@@ -635,31 +284,112 @@ _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=recommended | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=20 | text_est=4 | nontext_est=16 | gen=147 |
+_Token accounting:_ prompt=20 | text_est=4 | nontext_est=16 | gen=168 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model-quality limitation for this prompt and image.
 
-_Metrics:_ Load 0.81s | Gen 0.87s | Total 1.88s
-_Throughput:_ Prompt 272 TPS (20 tok) | Gen 345 TPS (147 tok)
+_Metrics:_ Load 0.45s | Gen 0.81s | Total 1.44s
+_Throughput:_ Prompt 302 TPS (20 tok) | Gen 380 TPS (168 tok)
 _Assessment:_ 🏆 A (80/100) | Missing requested structure
 _Review Status:_ strong candidate for first-pass review
 _Review:_ A 80/100 | nontext prompt burden=80%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> The image presents a close-up view of a statue of a tree, set against a
-> backdrop of a clear blue sky. The statue, made of a dark material, is
-> composed of multiple stacked blocks of stone. The blocks are arranged in a
-> triangular formation, with the tallest block at the top. The statue is
-> positioned on a brick base, which is also made of brick. The statue is
-> facing towards the right side of the image, and the background is blurred,
-> indicating the focus is on the statue itself. There are no texts or other
-> objects in the image. The statue's position and the brick base suggest that
-> the statue is the main subject of the photograph. The image does not contain
-> any other discernible objects or details.
+> The image captures a serene moment in nature, featuring a small stream with
+> a wooden bridge crossing over it. The bridge, made of wood, is supported by
+> two sturdy wooden poles. A wooden platform is situated on the left side of
+> the bridge, providing a vantage point for the viewer. A solitary tree stands
+> on the right side of the stream, its leaves rustling in the breeze. The
+> sky, visible in the top left corner, is a light blue color, suggesting a
+> clear day. The image is taken from a low angle, looking up at the bridge and
+> the tree, giving a sense of depth and perspective to the scene. The colors
+> are muted, with the green of the trees contrasting with the blue of the sky.
+> The image is a beautiful representation of a tranquil stream, with the
+> bridge serving as a focal point.
 <!-- markdownlint-enable MD028 MD037 -->
 
 _Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-mlx-community-lfm25-vl-16b-bf16"></a>
+
+### ✅ mlx-community/LFM2.5-VL-1.6B-bf16
+
+_Verdict:_ clean | user=recommended
+_Why:_ nontext prompt burden=95%
+_Trusted hints:_ preserves trusted hints
+_Contract:_ ok
+_Utility:_ user=recommended | preserves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=79 | text_est=4 | nontext_est=75 | gen=137 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model-quality limitation for this prompt and image.
+
+_Metrics:_ Load 0.62s | Gen 1.02s | Total 1.82s
+_Throughput:_ Prompt 1,723 TPS (79 tok) | Gen 190 TPS (137 tok)
+_Assessment:_ 🏆 A (80/100) | Missing requested structure
+_Review Status:_ strong candidate for first-pass review
+_Review:_ A 80/100 | nontext prompt burden=95%
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> The image depicts a close-up view of a section of a website or digital
+> interface. The background is a solid white color, providing a clean and
+> minimalistic backdrop. In the center of the image, there is a prominent
+> black circle with a white outline. Inside this circle, there is a smaller
+> white circle, which in turn contains a smaller black circle. The design is
+> symmetrical and balanced, with the white circle perfectly centered within
+> the black circle. The overall composition is simple yet striking, with the
+> contrast between the black and white circles creating a visually appealing
+> effect. The image is devoid of any other elements, focusing solely on the
+> geometric shapes and the interplay of colors.
+<!-- markdownlint-enable MD028 MD037 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-mlx-community-paligemma2-3b-pt-896-4bit"></a>
+
+### ✅ mlx-community/paligemma2-3b-pt-896-4bit
+
+_Verdict:_ context_budget | user=caveat
+_Why:_ Output is very short relative to prompt size (0.3%), suggesting
+       possible early-stop or prompt-handling issues. | At long prompt length
+       (4101 tokens), output stayed unusually short (12 tokens; ratio 0.3%). |
+       output/prompt=0.29% | nontext prompt burden=100%
+_Trusted hints:_ preserves trusted hints
+_Contract:_ ok
+_Utility:_ user=caveat | preserves trusted hints
+_Stack / owner:_ owner=mlx | harness=long_context
+_Token accounting:_ prompt=4101 | text_est=4 | nontext_est=4097 | gen=12 |
+                    max=500 | stop=completed
+_Next action:_ Treat this as a prompt-budget issue first; nontext prompt
+               burden is 100% and the output stays weak under that load.
+
+_Metrics:_ Load 1.15s | Gen 1.60s | Total 2.93s
+_Throughput:_ Prompt 3,804 TPS (4,101 tok) | Gen 62.1 TPS (12 tok)
+_Assessment:_ ❌ F (17/100) | Output lacks detail
+_Review Status:_ watchlist (harness, long context)
+_Review:_ F 17/100 | Output is very short relative to prompt size (0.3%),
+          suggesting possible early-stop or prompt-handling issues. | At long
+          prompt length (4101 tokens), output stayed unusually short (12
+          tokens; ratio 0.3%). | output/prompt=0.29% | nontext prompt
+          burden=100%
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> The lake is a manmade lake in the park.
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:context_budget
+- ⚠️HARNESS:long_context
+- output:output_ratio(0.3%)
+- long_context_low_ratio(0.3%;4101->12)
 
 ---
 
@@ -678,8 +408,8 @@ _Token accounting:_ prompt=1029 | text_est=4 | nontext_est=1025 | gen=2 |
                     max=500 | stop=completed
 _Next action:_ Inspect model repo config, chat template, and EOS settings.
 
-_Metrics:_ Load 3.53s | Gen 1.69s | Total 5.39s
-_Throughput:_ Prompt 920 TPS (1,029 tok) | Gen 10.6 TPS (2 tok)
+_Metrics:_ Load 2.47s | Gen 1.63s | Total 4.29s
+_Throughput:_ Prompt 916 TPS (1,029 tok) | Gen 10.8 TPS (2 tok)
 _Assessment:_ ❌ F (0/100) | Empty or minimal output
 _Review Status:_ watchlist (harness)
 _Review:_ F 0/100 | Output appears truncated to about 2 tokens. | nontext
@@ -697,168 +427,67 @@ _Review:_ F 0/100 | Output appears truncated to about 2 tokens. | nontext
 
 ---
 
-<a id="model-mlx-community-lfm25-vl-16b-bf16"></a>
-
-### ✅ mlx-community/LFM2.5-VL-1.6B-bf16
-
-_Verdict:_ clean | user=recommended
-_Why:_ nontext prompt burden=95%
-_Trusted hints:_ preserves trusted hints
-_Contract:_ ok
-_Utility:_ user=recommended | preserves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=85 | text_est=4 | nontext_est=81 | gen=287 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
-
-_Metrics:_ Load 1.13s | Gen 1.84s | Total 3.15s
-_Throughput:_ Prompt 1,345 TPS (85 tok) | Gen 188 TPS (287 tok)
-_Assessment:_ 🏆 A (80/100) | Missing requested structure
-_Review Status:_ strong candidate for first-pass review
-_Review:_ A 80/100 | nontext prompt burden=95%
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> The image depicts a close-up view of a section of a website or digital
-> interface. The background is a solid, light gray color, providing a neutral
-> backdrop that highlights the elements in the foreground. On the left side of
-> the image, there is a vertical, rectangular box with a subtle gradient
-> effect, transitioning from a darker shade at the top to a lighter shade at
-> the bottom. This box contains a smaller, lighter gray rectangle, which in
-> turn contains a slightly darker gray rectangle, creating a layered visual
-> effect.
->
-> Inside this layered rectangle, there is a white, rounded-corner square,
-> which is further surrounded by a thin, darker gray border. This border is
-> also slightly rounded at the corners, giving it a soft, almost organic
-> appearance.
->
-> At the center of the image, there is a prominent, white, rounded-corner
-> square. This square is filled with a pattern of small, evenly spaced dots,
-> creating a textured, almost pixelated effect. The dots are arranged in a
-> grid-like pattern, and the overall design is symmetrical and balanced.
->
-> The image is framed by a thin, dark gray border that outlines the entire
-> composition, adding a sense of structure and definition. The overall design
-> is minimalist and modern, with a focus on clean lines and subtle textures.
-> The use of light and dark shades, along with the geometric shapes, creates a
-> visually appealing and harmonious composition.
-<!-- markdownlint-enable MD028 MD037 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-paligemma2-3b-pt-896-4bit"></a>
-
-### ✅ mlx-community/paligemma2-3b-pt-896-4bit
-
-_Verdict:_ clean | user=recommended
-_Why:_ nontext prompt burden=100%
-_Trusted hints:_ preserves trusted hints
-_Contract:_ ok
-_Utility:_ user=recommended | preserves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=4101 | text_est=4 | nontext_est=4097 | gen=22 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
-
-_Metrics:_ Load 1.31s | Gen 1.86s | Total 3.35s
-_Throughput:_ Prompt 3,793 TPS (4,101 tok) | Gen 59.6 TPS (22 tok)
-_Assessment:_ 🟡 C (61/100) | Missing requested structure
-_Review:_ C 61/100 | nontext prompt burden=100%
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Sculpture of a woman in a traditional style, with a child in her arms, in
-> front of a building
-<!-- markdownlint-enable MD028 MD037 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
 <a id="model-mlx-community-fastvlm-05b-bf16"></a>
 
 ### ✅ mlx-community/FastVLM-0.5B-bf16
 
-_Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=2083.33% | nontext prompt
-       burden=83%
+_Verdict:_ clean | user=recommended
+_Why:_ nontext prompt burden=83%
 _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
-_Utility:_ user=avoid | preserves trusted hints
+_Utility:_ user=recommended | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=24 | text_est=4 | nontext_est=20 | gen=500 |
+_Token accounting:_ prompt=24 | text_est=4 | nontext_est=20 | gen=420 |
                     max=500 | stop=completed
-_Next action:_ Treat this as cap-limited output first; generation exhausted
-               the token budget with output/prompt=2083.33%.
+_Next action:_ Treat as a model-quality limitation for this prompt and image.
 
-_Metrics:_ Load 21.50s | Gen 2.23s | Total 23.92s
-_Throughput:_ Prompt 254 TPS (24 tok) | Gen 357 TPS (500 tok)
-_Assessment:_ 🏆 A (80/100) | Missing requested structure
-_Review Status:_ watchlist (cutoff)
-_Review:_ A 80/100 | hit token cap (500) | output/prompt=2083.33% | nontext
-          prompt burden=83%
+_Metrics:_ Load 0.57s | Gen 1.73s | Total 2.48s
+_Throughput:_ Prompt 251 TPS (24 tok) | Gen 362 TPS (420 tok)
+_Assessment:_ 🟡 C (64/100) | Missing requested structure
+_Review:_ C 64/100 | nontext prompt burden=83%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> The image depicts a stone sculpture placed on a brick pedestal. The
-> sculpture is composed of variously sized and shaped stones, stacked in a
-> seemingly random yet aesthetically pleasing manner. The stones are
-> predominantly dark in color, with shades of gray and brown, and they appear
-> to be carefully arranged to create a sense of balance and stability. The
-> topmost stone is slightly elevated above the rest, giving the sculpture a
-> sense of prominence and focus.
+> The image depicts a serene and picturesque scene of a traditional Japanese
+> garden. The focal point of the image is a tranquil pond, which is a central
+> element in Japanese garden design. The pond is surrounded by lush greenery,
+> including various trees and shrubs, which add to the overall sense of calm
+> and natural beauty. The water in the pond is calm, reflecting the
+> surrounding trees and the sky above.
 >
-> The pedestal supporting the sculpture is made of light-colored bricks, which
-> contrast with the darker tones of the stones. The bricks are neatly
-> aligned, and the pedestal has a smooth, polished surface, suggesting it is
-> well-maintained. The base of the pedestal is slightly wider than the top,
-> providing a stable foundation for the sculpture.
+> In the foreground, there are several trees with dense foliage, some of which
+> are in full bloom with pinkish-white flowers, adding a touch of color to
+> the scene. The trees are well-spaced, providing a sense of balance and
+> harmony within the garden.
 >
-> In the background, there is a building with a brick facade. The building has
-> large windows, which reflect the surrounding environment, including the sky
-> and some greenery. The windows are framed with dark-colored trim, adding a
-> touch of contrast to the otherwise light-colored building. The building
-> appears to be part of a larger structure, possibly a residential or
-> commercial building, given the presence of the greenery and the overall
-> setting.
+> A wooden bridge spans the pond, leading to a small island in the middle of
+> the pond. The bridge is simple in design, with a flat surface and wooden
+> railings, and it connects the two sides of the pond. The bridge is
+> surrounded by rocks, which are strategically placed to enhance the aesthetic
+> appeal and provide a sense of stability.
 >
-> The sky above is clear with a few scattered clouds, indicating a bright and
-> sunny day. The lighting in the image is natural, suggesting that the photo
-> was taken during the daytime. The overall scene is serene and peaceful, with
-> the stone sculpture adding an element of artistic interest and
-> contemplation.
+> In the background, there is a small, circular pond with a stone structure in
+> the center, possibly a fountain or a decorative element. This pond is
+> surrounded by more rocks and is bordered by a path that leads to a wooden
+> bench, suggesting a place for visitors to sit and enjoy the view.
 >
-> &#35;## Analysis and Description
+> The overall color palette of the image is dominated by shades of green,
+> brown, and gray, which are typical of traditional Japanese gardens. The
+> greenery is lush and vibrant, while the wooden elements and stone structures
+> add a natural and earthy tone to the scene.
 >
-> The stone sculpture is a notable feature in the image, drawing attention
-> with its intricate arrangement of stones. The use of different sizes and
-> shapes of stones creates a visually engaging piece that could be appreciated
-> from various angles. The pedestal, made of light-colored bricks, provides a
-> sturdy base for the sculpture, ensuring it remains stable and upright.
+> The image captures the essence of Japanese garden design, which emphasizes
+> harmony with nature, simplicity, and the beauty of natural elements. The
+> presence of the bird in flight adds a dynamic element to the otherwise still
+> scene, symbolizing freedom and the natural world.
 >
-> The background, featuring a building with large windows and greenery, adds
-> depth to the image. The building's brick facade and the greenery suggest a
-> well-maintained urban or suburban setting. The clear sky and natural
-> lighting enhance the overall aesthetic of the scene, making it appear bright
-> and inviting.
->
-> &#35;## Relevant Knowledge
->
-> Stone sculptures like the one in the image are often used as decorative
-> elements in public spaces, gardens, or residential areas. They can serve as
-> focal points, adding artistic value and a sense of tranquility to the
-> environment. The careful arrangement of stones in the sculpture demonstrates
-> the skill and patience required in creating such a piece. The
+> In summary, the image is a beautiful representation of a traditional
+> Japanese garden, featuring a calm pond, lush greenery, a wooden bridge, a
+> small circular pond, and a stone structure. The scene is serene and
+> balanced, with a harmonious blend of natural and man-made elements.
 <!-- markdownlint-enable MD028 MD037 -->
 
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:cutoff
-- Excessive verbosity
-- Likely capped by max token budget
+_Quality Status:_ no quality issues detected in this run
 
 ---
 
@@ -872,86 +501,37 @@ _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=recommended | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=2629 | text_est=4 | nontext_est=2625 | gen=342 |
+_Token accounting:_ prompt=3619 | text_est=4 | nontext_est=3615 | gen=202 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model-quality limitation for this prompt and image.
 
-_Metrics:_ Load 2.69s | Gen 3.19s | Total 6.06s
-_Throughput:_ Prompt 2,755 TPS (2,629 tok) | Gen 186 TPS (342 tok)
-_Assessment:_ 🟡 C (60/100) | Missing requested structure
-_Review:_ C 60/100 | nontext prompt burden=100%
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> This image depicts a sculptural piece that appears to be abstract and
-> somewhat stylized. Here's a detailed description:
->
-> 1&#46; &#42;&#42;Material and Base:&#42;&#42;
-> &#45; The sculpture is mounted on a pedestal made of what seems to be a
-> combination of stone and brick. The base is sturdy, suggesting it is meant
-> to be a permanent installation.
->
-> 2&#46; &#42;&#42;Form and Structure:&#42;&#42;
-> &#45; The sculpture itself looks like a rough, blocky figure. It has a
-> somewhat human-like posture, with what could be interpreted as arms and
-> legs, though the abstract nature makes it difficult to pinpoint exact
-> features.
-> &#45; The figure is composed of several large, irregularly shaped blocks,
-> giving it a blocky, geometric appearance.
->
-> 3&#46; &#42;&#42;Details:&#42;&#42;
-> &#45; The top part of the sculpture has a more rounded, possibly organic
-> element, which contrasts with the angular blocks below.
-> &#45; The texture of the sculpture suggests it is made from a material like
-> bronze or a similar metal, which has a patina that gives it a weathered
-> look.
->
-> 4&#46; &#42;&#42;Environment:&#42;&#42;
-> &#45; The sculpture is placed outdoors, in what seems to be a public space,
-> possibly a park or a campus. The surrounding area includes a paved pathway,
-> some greenery, and buildings in the background, indicating an urban or
-> semi-urban setting.
->
-> 5&#46; &#42;&#42;Lighting and Atmosphere:&#42;&#42;
-> &#45; The lighting suggests it is daytime, with sunlight casting shadows and
-> highlighting the texture of the sculpture. The atmosphere is calm and
-> serene, with a slightly blurred background that adds depth to the image.
->
-> This piece likely serves an artistic or symbolic purpose, inviting viewers
-> to contemplate its abstract nature and the emotions or ideas it might evoke.
-<!-- markdownlint-enable MD028 MD037 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-internvl3-14b-8bit"></a>
-
-### ✅ mlx-community/InternVL3-14B-8bit
-
-_Verdict:_ clean | user=recommended
-_Why:_ nontext prompt burden=100%
-_Trusted hints:_ preserves trusted hints
-_Contract:_ ok
-_Utility:_ user=recommended | preserves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=1804 | text_est=4 | nontext_est=1800 | gen=69 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
-
-_Metrics:_ Load 1.91s | Gen 3.91s | Total 5.99s
-_Throughput:_ Prompt 1,332 TPS (1,804 tok) | Gen 32.3 TPS (69 tok)
-_Assessment:_ 🏆 A (80/100) | Missing requested structure
+_Metrics:_ Load 1.21s | Gen 3.35s | Total 4.74s
+_Throughput:_ Prompt 1,947 TPS (3,619 tok) | Gen 177 TPS (202 tok)
+_Assessment:_ ✅ B (69/100) | None identified
 _Review Status:_ strong candidate for first-pass review
-_Review:_ A 80/100 | nontext prompt burden=100%
+_Review:_ B 69/100 | nontext prompt burden=100%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> The image shows a close-up of a spiral spring, often found in pens or
-> mechanical devices. The spring is coiled tightly in a cylindrical shape,
-> with a gradient of colors ranging from a light yellow at the top to a
-> grayish color at the bottom. The background is a neutral gray, highlighting
-> the spring's details and color transition.
+> This image captures a serene and picturesque scene in a natural setting.
+>
+> In the foreground, there is a tranquil pond or small lake bordered by lush
+> greenery. The water is calm, reflecting the surrounding vegetation and sky.
+>
+> A wooden bridge or pathway, supported by moss-covered rocks, arches over the
+> water, providing a scenic route for visitors. The bridge is simple and
+> blends harmoniously with the natural environment.
+>
+> In the middle of the image, a bird is captured mid-flight, its wings spread
+> wide as it glides over the water. The bird appears to be a heron or a
+> similar waterfowl, known for its elegant flight and hunting skills.
+>
+> In the background, there is a small wooden bench or table, likely a spot for
+> visitors to sit and enjoy the peaceful surroundings. The area is dotted
+> with trees and shrubs, adding to the tranquil atmosphere.
+>
+> Overall, the scene exudes a sense of calm and natural beauty, perfect for a
+> peaceful walk or a moment of relaxation.
 <!-- markdownlint-enable MD028 MD037 -->
 
 _Quality Status:_ no quality issues detected in this run
@@ -968,31 +548,32 @@ _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=recommended | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=2174 | text_est=4 | nontext_est=2170 | gen=54 |
+_Token accounting:_ prompt=2942 | text_est=4 | nontext_est=2938 | gen=98 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model-quality limitation for this prompt and image.
 
-_Metrics:_ Load 1.09s | Gen 4.20s | Total 5.49s
-_Throughput:_ Prompt 782 TPS (2,174 tok) | Gen 60.0 TPS (54 tok)
-_Assessment:_ ✅ B (79/100) | Missing requested structure
-_Review Status:_ strong candidate for first-pass review
-_Review:_ B 79/100 | nontext prompt burden=100%
+_Metrics:_ Load 0.98s | Gen 3.83s | Total 4.99s
+_Throughput:_ Prompt 1,554 TPS (2,942 tok) | Gen 63.5 TPS (98 tok)
+_Assessment:_ 🟡 C (63/100) | Missing requested structure
+_Review:_ C 63/100 | nontext prompt burden=100%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> The picture shows a statue of a person made of stone. The statue is placed
-> on a brick pedestal. The statue is located in front of a building. The
-> building has a green railing. The sky is blue and there are trees in the
-> background.
+> The picture shows a serene and peaceful scene. A bird is flying over a small
+> pond, which is surrounded by a wooden dock. The pond is nestled in a
+> park-like setting, with trees and bushes lining the water's edge. The bird
+> appears to be in mid-flight, with its wings spread wide. The sky is
+> overcast, suggesting a cloudy day. The overall atmosphere of the picture is
+> calm and tranquil.
 <!-- markdownlint-enable MD028 MD037 -->
 
 _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
+<a id="model-mlx-community-internvl3-14b-8bit"></a>
 
-### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
+### ✅ mlx-community/InternVL3-14B-8bit
 
 _Verdict:_ clean | user=recommended
 _Why:_ nontext prompt burden=100%
@@ -1000,29 +581,22 @@ _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=recommended | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=2630 | text_est=4 | nontext_est=2626 | gen=133 |
+_Token accounting:_ prompt=2572 | text_est=4 | nontext_est=2568 | gen=50 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model-quality limitation for this prompt and image.
 
-_Metrics:_ Load 4.11s | Gen 4.43s | Total 8.71s
-_Throughput:_ Prompt 1,349 TPS (2,630 tok) | Gen 63.4 TPS (133 tok)
-_Assessment:_ ✅ B (67/100) | Missing requested structure
+_Metrics:_ Load 1.89s | Gen 3.96s | Total 6.03s
+_Throughput:_ Prompt 1,242 TPS (2,572 tok) | Gen 32.3 TPS (50 tok)
+_Assessment:_ ✅ B (78/100) | Missing requested structure
 _Review Status:_ strong candidate for first-pass review
-_Review:_ B 67/100 | nontext prompt burden=100%
+_Review:_ B 78/100 | nontext prompt burden=100%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> This image depicts a bronze or metal sculpture mounted on a brick pedestal.
-> The sculpture appears to be an abstract, stylized human figure, likely
-> representing a seated or crouching pose. Its form features angular,
-> geometric shapes, giving it a modern and somewhat rugged appearance. The
-> figure's head seems to be tilted upward, and its arms appear to be crossed
-> or wrapped around itself, adding to its abstract quality.
->
-> The pedestal itself is made of brick, giving it a sturdy and solid
-> foundation. The sculpture and pedestal stand outdoors, likely in a public
-> space such as a park, garden, or university campus, given the blurred
-> background of greenery and buildings.
+> The image shows a close-up of a metal spring against a mesh background. The
+> spring is tightly coiled, and the mesh appears to be part of a screen or
+> filter. The colors range from light to dark gray, creating a gradient
+> effect.
 <!-- markdownlint-enable MD028 MD037 -->
 
 _Quality Status:_ no quality issues detected in this run
@@ -1043,8 +617,8 @@ _Token accounting:_ prompt=95 | text_est=4 | nontext_est=91 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model-quality limitation for this prompt and image.
 
-_Metrics:_ Load 2.63s | Gen 4.68s | Total 7.48s
-_Throughput:_ Prompt 301 TPS (95 tok) | Gen 129 TPS (500 tok)
+_Metrics:_ Load 0.77s | Gen 4.66s | Total 5.61s
+_Throughput:_ Prompt 241 TPS (95 tok) | Gen 130 TPS (500 tok)
 _Assessment:_ ❌ F (0/100) | Output too short to be useful
 _Review Status:_ watchlist (Output too short to be useful)
 _Review:_ F 0/100 | hit token cap (500) | nontext prompt burden=96%
@@ -1060,80 +634,45 @@ _Review:_ F 0/100 | hit token cap (500) | nontext prompt burden=96%
 
 ---
 
-<a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
+<a id="model-mlx-community-gemma-3n-e4b-it-bf16"></a>
 
-### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
+### ✅ mlx-community/gemma-3n-E4B-it-bf16
 
 _Verdict:_ clean | user=recommended
-_Why:_ nontext prompt burden=100%
+_Why:_ nontext prompt burden=99%
 _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=recommended | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=2630 | text_est=4 | nontext_est=2626 | gen=166 |
+_Token accounting:_ prompt=272 | text_est=4 | nontext_est=268 | gen=204 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model-quality limitation for this prompt and image.
 
-_Metrics:_ Load 7.15s | Gen 4.83s | Total 12.16s
-_Throughput:_ Prompt 1,356 TPS (2,630 tok) | Gen 66.5 TPS (166 tok)
-_Assessment:_ ✅ B (68/100) | Missing requested structure
+_Metrics:_ Load 2.23s | Gen 4.78s | Total 7.20s
+_Throughput:_ Prompt 802 TPS (272 tok) | Gen 49.1 TPS (204 tok)
+_Assessment:_ ✅ B (72/100) | Missing requested structure
 _Review Status:_ strong candidate for first-pass review
-_Review:_ B 68/100 | nontext prompt burden=100%
+_Review:_ B 72/100 | nontext prompt burden=99%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> This image depicts an abstract sculpture mounted on a pedestal made of stone
-> or concrete. The sculpture appears to be made of metal, likely bronze or a
-> similar material, and features a rough, textured surface with an almost
-> organic, blocky form.
+> A high-angle, medium shot captures a vibrant scene of a serene pond in a
+> park, with a striking red-crowned crane in mid-flight as the focal point.
+> The crane, with its predominantly white plumage and distinctive red patch on
+> its head, is captured in a dynamic pose, wings spread wide as it glides
+> over the calm, dark water.
 >
-> The figure in the sculpture is seated or crouching, with its arms wrapped
-> around its knees or legs. The head is tilted forward, and the overall
-> posture gives a sense of contemplation or introspection. The sculpture has a
-> somewhat primitive or tribal aesthetic, with an emphasis on raw, unrefined
-> shapes.
+> The pond is surrounded by lush greenery, with various trees and bushes
+> framing the scene. The foliage in the foreground is a mix of deep green and
+> lighter, yellowish-green hues, creating a sense of depth. The water reflects
+> the surrounding trees and the overcast sky, giving it a slightly muted,
+> gray tone.
 >
-> The background shows a blurred outdoor setting with greenery, a paved
-> walkway, and a building with brick walls, suggesting the sculpture is
-> located in a public space, possibly a park or a university campus. The
-> lighting indicates it is daytime, with clear skies.
-<!-- markdownlint-enable MD028 MD037 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-pixtral-12b-8bit"></a>
-
-### ✅ mlx-community/pixtral-12b-8bit
-
-_Verdict:_ clean | user=recommended
-_Why:_ nontext prompt burden=100%
-_Trusted hints:_ preserves trusted hints
-_Contract:_ ok
-_Utility:_ user=recommended | preserves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=2823 | text_est=4 | nontext_est=2819 | gen=109 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
-
-_Metrics:_ Load 1.75s | Gen 4.89s | Total 6.82s
-_Throughput:_ Prompt 1,693 TPS (2,823 tok) | Gen 38.3 TPS (109 tok)
-_Assessment:_ 🏆 A (80/100) | Missing requested structure
-_Review Status:_ strong candidate for first-pass review
-_Review:_ A 80/100 | nontext prompt burden=100%
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> The image depicts a bronze statue situated outdoors, likely in a public or
-> academic setting. The statue is abstract and appears to be composed of
-> geometric shapes, giving it a modern and artistic appearance. It is mounted
-> on a stone pedestal, which is made of rectangular bricks. The background
-> includes a brick building with large windows, suggesting an institutional or
-> educational environment. Trees and a clear blue sky are also visible,
-> indicating a pleasant day. The statue's abstract nature and the setting
-> imply that it might be a piece of contemporary art displayed for public
-> appreciation.
+> Wooden walkways extend over parts of the pond, adding a human element to the
+> natural setting. A wooden picnic table is visible on the grassy bank in the
+> background, suggesting a place for relaxation and enjoyment of the park.
+> The overall atmosphere is peaceful and picturesque, highlighting the beauty
+> of nature and the graceful flight of the crane.
 <!-- markdownlint-enable MD028 MD037 -->
 
 _Quality Status:_ no quality issues detected in this run
@@ -1156,8 +695,8 @@ _Token accounting:_ prompt=20 | text_est=4 | nontext_est=16 | gen=500 |
 _Next action:_ Treat this as cap-limited output first; generation exhausted
                the token budget with output/prompt=2500.00%.
 
-_Metrics:_ Load 0.72s | Gen 4.95s | Total 5.83s
-_Throughput:_ Prompt 172 TPS (20 tok) | Gen 113 TPS (500 tok)
+_Metrics:_ Load 0.59s | Gen 4.79s | Total 5.56s
+_Throughput:_ Prompt 173 TPS (20 tok) | Gen 115 TPS (500 tok)
 _Assessment:_ 🟡 C (50/100) | Lacks visual description of image
 _Review Status:_ watchlist (cutoff, repetitive)
 _Review:_ C 50/100 | hit token cap (500) | output/prompt=2500.00% | nontext
@@ -1202,47 +741,64 @@ _Review:_ C 50/100 | hit token cap (500) | output/prompt=2500.00% | nontext
 
 ---
 
-<a id="model-jqlive-kimi-vl-a3b-thinking-2506-6bit"></a>
+<a id="model-mlx-community-smolvlm-instruct-bf16"></a>
 
-### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
+### ✅ mlx-community/SmolVLM-Instruct-bf16
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=48.22% | nontext prompt burden=100%
-       | repetitive token=答案内容1.
+_Why:_ hit token cap (500) | output/prompt=32.07% | nontext prompt burden=100%
+       | repetitive token=unt
 _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=avoid | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=1037 | text_est=4 | nontext_est=1033 | gen=500 |
+_Token accounting:_ prompt=1559 | text_est=4 | nontext_est=1555 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Treat this as cap-limited output first; generation exhausted
-               the token budget with output/prompt=48.22%.
+               the token budget with output/prompt=32.07%.
 
-_Metrics:_ Load 2.41s | Gen 4.95s | Total 7.52s
-_Throughput:_ Prompt 1,328 TPS (1,037 tok) | Gen 133 TPS (500 tok)
-_Assessment:_ ❌ F (25/100) | Lacks visual description of image
+_Metrics:_ Load 0.62s | Gen 4.91s | Total 5.70s
+_Throughput:_ Prompt 3,162 TPS (1,559 tok) | Gen 125 TPS (500 tok)
+_Assessment:_ 🟡 C (50/100) | Lacks visual description of image
 _Review Status:_ watchlist (cutoff, repetitive)
-_Review:_ F 25/100 | hit token cap (500) | output/prompt=48.22% | nontext
-          prompt burden=100% | repetitive token=答案内容1.
+_Review:_ C 50/100 | hit token cap (500) | output/prompt=32.07% | nontext
+          prompt burden=100% | repetitive token=unt
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> 问题。因此，答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1.
-> 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1.
-> 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1.
-> 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1.
-> 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1.
-> 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1.
-> 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1.
-> 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1.
-> 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1.
-> 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案内容1. 答案
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- Repetitive output (答案内容1.)
+- Repetitive output (unt)
 - Likely capped by max token budget
 
 ---
@@ -1252,201 +808,102 @@ _Review:_ F 25/100 | hit token cap (500) | output/prompt=48.22% | nontext
 ### ✅ HuggingFaceTB/SmolVLM-Instruct
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=41.84% | nontext prompt burden=100%
-       | repetitive token=phrase: "treasured treasured treasured ..."
+_Why:_ hit token cap (500) | output/prompt=32.07% | nontext prompt burden=100%
+       | repetitive token=unt
 _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=avoid | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=1195 | text_est=4 | nontext_est=1191 | gen=500 |
+_Token accounting:_ prompt=1559 | text_est=4 | nontext_est=1555 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Treat this as cap-limited output first; generation exhausted
-               the token budget with output/prompt=41.84%.
+               the token budget with output/prompt=32.07%.
 
-_Metrics:_ Load 2.57s | Gen 4.96s | Total 7.69s
-_Throughput:_ Prompt 3,086 TPS (1,195 tok) | Gen 123 TPS (500 tok)
+_Metrics:_ Load 0.64s | Gen 5.22s | Total 6.04s
+_Throughput:_ Prompt 2,424 TPS (1,559 tok) | Gen 120 TPS (500 tok)
 _Assessment:_ 🟡 C (50/100) | Lacks visual description of image
 _Review Status:_ watchlist (cutoff, repetitive)
-_Review:_ C 50/100 | hit token cap (500) | output/prompt=41.84% | nontext
-          prompt burden=100% | repetitive token=phrase: "treasured treasured
-          treasured ..."
+_Review:_ C 50/100 | hit token cap (500) | output/prompt=32.07% | nontext
+          prompt burden=100% | repetitive token=unt
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured unt
-> unt unt unt unt unt unt unt treasured treasured treasured treasured unt unt
-> unt unt unt unt unt unt unt treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured unt unt unt unt unt unt unt unt unt unt unt unt unt unt
 > unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured unt unt unt unt
-> unt treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured unt unt unt unt unt unt unt unt unt unt treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- Repetitive output (phrase: "treasured treasured treasured ...")
+- Repetitive output (unt)
 - Likely capped by max token budget
 
 ---
 
-<a id="model-mlx-community-smolvlm-instruct-bf16"></a>
+<a id="model-jqlive-kimi-vl-a3b-thinking-2506-6bit"></a>
 
-### ✅ mlx-community/SmolVLM-Instruct-bf16
+### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=41.84% | nontext prompt burden=100%
-       | repetitive token=phrase: "treasured treasured treasured ..."
+_Why:_ hit token cap (500) | output/prompt=47.76% | nontext prompt burden=100%
+       | degeneration=character_loop: ' 1.' repeated
 _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=avoid | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=1195 | text_est=4 | nontext_est=1191 | gen=500 |
+_Token accounting:_ prompt=1047 | text_est=4 | nontext_est=1043 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Treat this as cap-limited output first; generation exhausted
-               the token budget with output/prompt=41.84%.
+               the token budget with output/prompt=47.76%.
 
-_Metrics:_ Load 0.88s | Gen 4.96s | Total 6.01s
-_Throughput:_ Prompt 3,158 TPS (1,195 tok) | Gen 123 TPS (500 tok)
-_Assessment:_ 🟡 C (50/100) | Lacks visual description of image
-_Review Status:_ watchlist (cutoff, repetitive)
-_Review:_ C 50/100 | hit token cap (500) | output/prompt=41.84% | nontext
-          prompt burden=100% | repetitive token=phrase: "treasured treasured
-          treasured ..."
+_Metrics:_ Load 2.01s | Gen 5.33s | Total 7.52s
+_Throughput:_ Prompt 925 TPS (1,047 tok) | Gen 132 TPS (500 tok)
+_Assessment:_ ❌ F (25/100) | Lacks visual description of image
+_Review Status:_ watchlist (cutoff, degeneration, repetitive)
+_Review:_ F 25/100 | hit token cap (500) | output/prompt=47.76% | nontext
+          prompt burden=100% | degeneration=character_loop: ' 1.' repeated
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured unt
-> unt unt unt unt unt unt unt treasured treasured treasured treasured unt unt
-> unt unt unt unt unt unt unt treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured unt unt unt unt
-> unt treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured unt unt unt unt unt unt unt unt unt unt treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured
+> 问题解答图1：0. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.
+> 1&#46; 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.
+> 1&#46; 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.
+> 1&#46; 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.
+> 1&#46; 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.
+> 1&#46; 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.
+> 1&#46; 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- Repetitive output (phrase: "treasured treasured treasured ...")
+- Repetitive output (1.)
+- Output degeneration (character_loop: ' 1.' repeated)
 - Likely capped by max token budget
 
 ---
@@ -1461,26 +918,26 @@ _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=recommended | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=1029 | text_est=4 | nontext_est=1025 | gen=127 |
+_Token accounting:_ prompt=1029 | text_est=4 | nontext_est=1025 | gen=142 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model-quality limitation for this prompt and image.
 
-_Metrics:_ Load 2.46s | Gen 4.98s | Total 7.62s
-_Throughput:_ Prompt 1,315 TPS (1,029 tok) | Gen 34.0 TPS (127 tok)
+_Metrics:_ Load 1.56s | Gen 5.36s | Total 7.10s
+_Throughput:_ Prompt 1,316 TPS (1,029 tok) | Gen 34.2 TPS (142 tok)
 _Assessment:_ 🏆 A (80/100) | Missing requested structure
 _Review Status:_ strong candidate for first-pass review
 _Review:_ A 80/100 | nontext prompt burden=100%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> A medium-close-up view of a dark gray stone sculpture that is made up of
-> different-sized rectangular stones. The sculpture is placed on top of a gray
-> cement platform that is being held up by four light brown bricks. To the
-> right of the sculpture, there is a light brown brick building that has a
-> green metal pole that is attached to the side of it. Behind the sculpture,
-> there is a blurry view of a tree line that is made up of dark and light
-> green leaves. The sky can be seen in between the cracks of the trees, and it
-> is a light blue color that is full of white clouds.
+> A view of a pond with a bird flying over it. The bird is in the middle, and
+> it is facing to the right. It has its wings spread out. The pond is dark,
+> and there are ripples on it. There is a reflection on the water. There is a
+> wooden bridge on the left that goes over the pond. It is going to the right.
+> There are rocks on the left and right of it. There is a grassy area on the
+> other side of the pond. There is a sidewalk on the left that goes around the
+> pond. There is a picnic table on the grass on the left, past the sidewalk.
+> There are trees on the right and in the bottom left corner.
 <!-- markdownlint-enable MD028 MD037 -->
 
 _Quality Status:_ no quality issues detected in this run
@@ -1492,224 +949,143 @@ _Quality Status:_ no quality issues detected in this run
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-8bit
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=48.22% | nontext prompt burden=100%
-       | repetitive token=phrase: "will be used to..."
+_Why:_ hit token cap (500) | output/prompt=47.76% | nontext prompt burden=100%
+       | repetitive token=phrase: "1. these information is..."
 _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=avoid | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=1037 | text_est=4 | nontext_est=1033 | gen=500 |
+_Token accounting:_ prompt=1047 | text_est=4 | nontext_est=1043 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Treat this as cap-limited output first; generation exhausted
-               the token budget with output/prompt=48.22%.
+               the token budget with output/prompt=47.76%.
 
-_Metrics:_ Load 4.32s | Gen 5.37s | Total 9.86s
-_Throughput:_ Prompt 1,357 TPS (1,037 tok) | Gen 120 TPS (500 tok)
+_Metrics:_ Load 3.32s | Gen 5.60s | Total 9.10s
+_Throughput:_ Prompt 1,361 TPS (1,047 tok) | Gen 113 TPS (500 tok)
 _Assessment:_ 🟡 C (50/100) | Lacks visual description of image
 _Review Status:_ watchlist (cutoff, repetitive)
-_Review:_ C 50/100 | hit token cap (500) | output/prompt=48.22% | nontext
-          prompt burden=100% | repetitive token=phrase: "will be used to..."
+_Review:_ C 50/100 | hit token cap (500) | output/prompt=47.76% | nontext
+          prompt burden=100% | repetitive token=phrase: "1. these information
+          is..."
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> 1 will be used to describe this ”1 will be used to describe this ”1 will be
-> used to describe this ”1 will be used to describe this ”1 will be used to
-> describe this 1 will be used to describe this 1 will be used to describe
-> this 1 will be used to describe this 1 will be used to describe this 1 will
-> be used to describe this 1 will be used to describe this 1 will be used to
-> describe this 1 will be used to describe this 1 will be used to describe
-> this 1 will be used to describe this 1 will be used to describe this 1 will
-> be used to describe this 1 will be used to describe this 1 will be used to
-> describe this 1 will be used to describe this 1 will be used to describe
-> this 1 will be used to describe this 1 will be used to describe this 1 will
-> be used to describe this 1 will be used to describe this 1 will be used to
-> describe this 1 will be used to describe this 1 will be used to describe
-> this 1 will be used to describe this 1 will be used to describe this 1 will
-> be used to describe this 1 will be used to describe this 1 will be used to
-> describe this 1 will be used to describe this 1 will be used to describe
-> this 1 will be used to describe this 1 will be used to describe this 1 will
-> be used to describe this 1 will be used to describe this 1 will be used to
-> describe this 1 will be used to describe this 1 will be used to describe
-> this 1 will be used to describe this 1 will be used to describe this 1 will
-> be used to describe this 1 will be used to describe this 1 will be used to
-> describe this 1 will be used to describe this 1 will be used to describe
-> this 1 will be used to describe this 1 will be used to describe this 1 will
-> be used to describe this 1 will be used to describe this 1 will be used to
-> describe this 1 will be used to describe this 1 will be used to describe
-> this 1 will be used to describe this 1 will be used to describe this 1 will
-> be used to describe this 1 will be used to describe this 1 will be used to
-> describe this 1 will be used to describe this 1 will be used
+> 1 will receive 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information is 1. These
+> information is 1. These information is 1. These information
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- Repetitive output (phrase: "will be used to...")
+- Repetitive output (phrase: "1. these information is...")
 - Likely capped by max token budget
 
 ---
 
-<a id="model-mlx-community-gemma-3n-e4b-it-bf16"></a>
+<a id="model-mlx-community-pixtral-12b-8bit"></a>
 
-### ✅ mlx-community/gemma-3n-E4B-it-bf16
+### ✅ mlx-community/pixtral-12b-8bit
 
 _Verdict:_ clean | user=recommended
-_Why:_ nontext prompt burden=99%
+_Why:_ nontext prompt burden=100%
 _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=recommended | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=272 | text_est=4 | nontext_est=268 | gen=240 |
+_Token accounting:_ prompt=4167 | text_est=4 | nontext_est=4163 | gen=136 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model-quality limitation for this prompt and image.
 
-_Metrics:_ Load 2.44s | Gen 5.66s | Total 8.28s
-_Throughput:_ Prompt 855 TPS (272 tok) | Gen 47.8 TPS (240 tok)
-_Assessment:_ 🏆 A (80/100) | Missing requested structure
+_Metrics:_ Load 1.67s | Gen 6.05s | Total 7.90s
+_Throughput:_ Prompt 1,838 TPS (4,167 tok) | Gen 39.2 TPS (136 tok)
+_Assessment:_ ✅ B (66/100) | Missing requested structure
 _Review Status:_ strong candidate for first-pass review
-_Review:_ A 80/100 | nontext prompt burden=99%
+_Review:_ B 66/100 | nontext prompt burden=100%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> A low-angle, medium shot captures a bronze sculpture of a figure composed of
-> stacked, irregular blocks, perched atop a short, rectangular brick
-> pedestal. The sculpture is positioned in the foreground, slightly off-center
-> to the left. The figure appears to be wearing a hat or head covering, and
-> its form is abstract and somewhat fragmented. The bronze has a weathered,
-> dark patina with hints of green and brown.
->
-> The pedestal is constructed from light brown bricks, stacked in a running
-> bond pattern. It has a slightly wider base and tapers towards the top where
-> the sculpture rests. A small, flat, light-colored stone or concrete platform
-> sits on top of the brick pedestal, providing a stable base for the bronze.
->
-> The background is softly blurred, suggesting an outdoor setting. Hints of
-> green foliage and trees are visible, along with a bright blue sky. A portion
-> of a brick building with large windows is visible on the right side of the
-> frame, adding a sense of urban or institutional context. The overall
-> lighting suggests a sunny day, with shadows cast on the sculpture and
-> pedestal. The focus is sharp on the sculpture, drawing the viewer's
-> attention to its textured surface and unique form.
+> The image depicts a serene park scene with a pond as the central feature.
+> The pond is surrounded by lush greenery, including trees and bushes, which
+> frame the image. A wooden bridge with stone supports crosses the pond,
+> providing a pathway for visitors. On the far side of the pond, there is a
+> grassy area with a stone bench, offering a place to sit and enjoy the view.
+> The water in the pond is calm, reflecting the bridge and surrounding rocks.
+> A bird is captured in mid-flight over the pond, adding a dynamic element to
+> the otherwise tranquil setting. The overall atmosphere is peaceful and
+> inviting, suggesting a perfect spot for relaxation and nature appreciation.
 <!-- markdownlint-enable MD028 MD037 -->
 
 _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
+<a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
 
-### ✅ mlx-community/gemma-3-27b-it-qat-4bit
+### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
 
 _Verdict:_ clean | user=recommended
-_Why:_ nontext prompt burden=99%
+_Why:_ nontext prompt burden=100%
 _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=recommended | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=273 | text_est=4 | nontext_est=269 | gen=174 |
+_Token accounting:_ prompt=3620 | text_est=4 | nontext_est=3616 | gen=193 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model-quality limitation for this prompt and image.
 
-_Metrics:_ Load 2.61s | Gen 6.71s | Total 9.52s
-_Throughput:_ Prompt 396 TPS (273 tok) | Gen 30.6 TPS (174 tok)
-_Assessment:_ ✅ B (75/100) | None identified
+_Metrics:_ Load 1.54s | Gen 6.94s | Total 8.68s
+_Throughput:_ Prompt 1,005 TPS (3,620 tok) | Gen 64.4 TPS (193 tok)
+_Assessment:_ ✅ B (73/100) | None identified
 _Review Status:_ strong candidate for first-pass review
-_Review:_ B 75/100 | nontext prompt burden=99%
+_Review:_ B 73/100 | nontext prompt burden=100%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> Okay, let's describe the picture!
+> This image depicts a serene and picturesque landscape centered around a pond
+> or small lake.
 >
-> The image appears to be a screenshot of a digital display, likely a phone or
-> computer screen. The dominant feature is a repeating pattern of the Unicode
-> character "🌕" (Full Moon).
+> In the foreground, there is a bird, likely a heron or similar wading bird,
+> captured mid-flight over the water. Its wings are spread wide, and it
+> appears to be either landing or taking off.
 >
-> Here's a breakdown:
+> The pond itself is calm, with clear reflections of the surrounding scenery.
+> A wooden bridge or walkway crosses the water, adding a charming element to
+> the scene. The bridge is supported by large rocks and wooden planks, and it
+> seems to be a part of a well-maintained garden or park.
 >
-> &#42;   &#42;&#42;Character:&#42;&#42; The "🌕" character is bright yellow and fills most of the
-> screen.
-> &#42;   &#42;&#42;Arrangement:&#42;&#42; The moons are arranged in a grid-like pattern, densely
-> packed together.
-> &#42;   &#42;&#42;Background:&#42;&#42; The background is black, making the yellow moons stand
-> out prominently.
-> &#42;   &#42;&#42;Overall Impression:&#42;&#42; The image is visually striking due to the
-> repetition and brightness of the moon symbols. It could be used for
-> decorative purposes, to represent a theme of night, or as a simple visual
-> pattern.
+> In the background, there is a neatly kept garden area with green grass, some
+> flowering bushes, and a few trees. A wooden bench is placed near the edge
+> of the pond, providing a perfect spot for visitors to sit and enjoy the
+> view.
 >
-> It's a very minimalist and graphic image!
-<!-- markdownlint-enable MD028 MD037 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
-
-### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
-
-_Verdict:_ harness | user=avoid
-_Why:_ Tokenizer space-marker artifacts (for example Ġ) appeared in output
-       (about 103 occurrences). | nontext prompt burden=100%
-_Trusted hints:_ preserves trusted hints
-_Contract:_ ok
-_Utility:_ user=avoid | preserves trusted hints
-_Stack / owner:_ owner=mlx-vlm | harness=encoding
-_Token accounting:_ prompt=2097 | text_est=4 | nontext_est=2093 | gen=119 |
-                    max=500 | stop=completed
-_Next action:_ Inspect decode cleanup; tokenizer markers are leaking into
-               user-facing text.
-
-_Metrics:_ Load 3.79s | Gen 7.07s | Total 11.03s
-_Throughput:_ Prompt 724 TPS (2,097 tok) | Gen 31.5 TPS (119 tok)
-_Assessment:_ ❌ F (0/100) | Output too short to be useful
-_Review Status:_ watchlist (harness)
-_Review:_ F 0/100 | Tokenizer space-marker artifacts (for example Ġ) appeared
-          in output (about 103 occurrences). | nontext prompt burden=100%
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> TheĠimageĠdepictsĠaĠmodernĠabstractĠsculptureĠmountedĠonĠaĠbrickĠpedestal.ĠTheĠsculptureĠappearsĠtoĠbeĠmadeĠofĠaĠdark,ĠpossiblyĠmetallicĠmaterial,ĠandĠfeaturesĠaĠcomplex,ĠangularĠdesignĠwithĠsharpĠedgesĠandĠgeometricĠshapes.ĠTheĠsculptureĠisĠsituatedĠoutdoors,ĠlikelyĠinĠaĠpublicĠspaceĠsuchĠasĠaĠparkĠorĠaĠcampus,ĠasĠsuggestedĠbyĠtheĠsurroundingĠgreeneryĠandĠtheĠpavedĠwalkwayĠvisibleĠinĠtheĠbackground.ĠTheĠbrickĠpedestalĠonĠwhichĠtheĠsculptureĠstandsĠisĠpartĠofĠaĠlargerĠbrickĠstructure,ĠpossiblyĠaĠwallĠorĠaĠbuilding.ĠTheĠoverallĠsettingĠisĠbrightĠandĠsunny,ĠindicatingĠthatĠtheĠphotoĠwasĠtakenĠduringĠtheĠday.
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️HARNESS:encoding
-- token_encoding:bpe_space_leak(103)
-
----
-
-<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
-
-### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
-
-_Verdict:_ clean | user=recommended
-_Why:_ nontext prompt burden=71%
-_Trusted hints:_ preserves trusted hints
-_Contract:_ ok
-_Utility:_ user=recommended | preserves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=14 | text_est=4 | nontext_est=10 | gen=121 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
-
-_Metrics:_ Load 2.35s | Gen 7.15s | Total 9.67s
-_Throughput:_ Prompt 10.4 TPS (14 tok) | Gen 22.1 TPS (121 tok)
-_Assessment:_ 🏆 A (80/100) | Missing requested structure
-_Review Status:_ strong candidate for first-pass review
-_Review:_ A 80/100 | nontext prompt burden=71%
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> The image features a bronze sculpture of a person constructed from
-> irregularly shaped blocks of stone, with a weathered patina that suggests it
-> has been exposed to the elements for some time. The sculpture is mounted on
-> a brick pedestal, which is topped with a flat stone. The background of the
-> image is blurred, but it appears to be a street or sidewalk in front of a
-> brick building, with trees and a blue sky visible in the distance. The
-> overall atmosphere of the image is one of serenity and contemplation, with
-> the sculpture appearing to be a focal point in an otherwise mundane urban
-> setting.
+> The overall atmosphere of the image is tranquil and inviting, making it an
+> ideal setting for relaxation and nature appreciation.
 <!-- markdownlint-enable MD028 MD037 -->
 
 _Quality Status:_ no quality issues detected in this run
@@ -1721,22 +1097,22 @@ _Quality Status:_ no quality issues detected in this run
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=48.22% | nontext prompt burden=100%
+_Why:_ hit token cap (500) | output/prompt=47.76% | nontext prompt burden=100%
        | degeneration=character_loop: '. 0' repeated
 _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=avoid | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=1037 | text_est=4 | nontext_est=1033 | gen=500 |
+_Token accounting:_ prompt=1047 | text_est=4 | nontext_est=1043 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Treat this as cap-limited output first; generation exhausted
-               the token budget with output/prompt=48.22%.
+               the token budget with output/prompt=47.76%.
 
-_Metrics:_ Load 5.40s | Gen 7.51s | Total 13.08s
-_Throughput:_ Prompt 1,346 TPS (1,037 tok) | Gen 80.7 TPS (500 tok)
+_Metrics:_ Load 3.45s | Gen 7.50s | Total 11.14s
+_Throughput:_ Prompt 1,330 TPS (1,047 tok) | Gen 80.6 TPS (500 tok)
 _Assessment:_ ❌ F (25/100) | Lacks visual description of image
 _Review Status:_ watchlist (cutoff, degeneration, repetitive)
-_Review:_ F 25/100 | hit token cap (500) | output/prompt=48.22% | nontext
+_Review:_ F 25/100 | hit token cap (500) | output/prompt=47.76% | nontext
           prompt burden=100% | degeneration=character_loop: '. 0' repeated
 
 <!-- markdownlint-disable MD028 MD037 -->
@@ -1759,6 +1135,153 @@ _Review:_ F 25/100 | hit token cap (500) | output/prompt=48.22% | nontext
 
 ---
 
+<a id="model-mlx-community-gemma-3-27b-it-qat-8bit"></a>
+
+### ✅ mlx-community/gemma-3-27b-it-qat-8bit
+
+_Verdict:_ clean | user=recommended
+_Why:_ nontext prompt burden=99%
+_Trusted hints:_ preserves trusted hints
+_Contract:_ ok
+_Utility:_ user=recommended | preserves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=273 | text_est=4 | nontext_est=269 | gen=119 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model-quality limitation for this prompt and image.
+
+_Metrics:_ Load 3.38s | Gen 7.83s | Total 11.40s
+_Throughput:_ Prompt 320 TPS (273 tok) | Gen 17.8 TPS (119 tok)
+_Assessment:_ ✅ B (70/100) | None identified
+_Review Status:_ strong candidate for first-pass review
+_Review:_ B 70/100 | nontext prompt burden=99%
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> Here's a description of the picture:
+>
+> The image is a close-up of a digital display, likely a calculator or a
+> similar device. The screen is filled with a repeating pattern of the number
+> "8" in a simple, blocky font. The "8"s are densely packed and appear to be
+> the only element on the display.
+>
+> The overall impression is one of repetition and a focus on a single digit.
+> The image is monochromatic, with the "8"s being a dark color against a
+> lighter background. It's a very abstract and minimalist composition.
+<!-- markdownlint-enable MD028 MD037 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
+
+### ✅ mlx-community/gemma-3-27b-it-qat-4bit
+
+_Verdict:_ clean | user=recommended
+_Why:_ nontext prompt burden=99%
+_Trusted hints:_ preserves trusted hints
+_Contract:_ ok
+_Utility:_ user=recommended | preserves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=273 | text_est=4 | nontext_est=269 | gen=212 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model-quality limitation for this prompt and image.
+
+_Metrics:_ Load 2.35s | Gen 7.84s | Total 10.39s
+_Throughput:_ Prompt 384 TPS (273 tok) | Gen 31.0 TPS (212 tok)
+_Assessment:_ ✅ B (73/100) | None identified
+_Review Status:_ strong candidate for first-pass review
+_Review:_ B 73/100 | nontext prompt burden=99%
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> Okay, let's describe the picture!
+>
+> The image appears to be a screenshot of a digital display, likely a phone or
+> computer screen. The dominant feature is a repeating pattern of the Unicode
+> character "🌕" (Full Moon).
+>
+> Here's a breakdown:
+>
+> &#42;   &#42;&#42;Character:&#42;&#42; The "🌕" character is prominently displayed, filling most
+> of the screen.
+> &#42;   &#42;&#42;Repetition:&#42;&#42; The character is repeated many times, creating a dense,
+> almost pixelated effect.
+> &#42;   &#42;&#42;Background:&#42;&#42; The background is likely black or a very dark color,
+> making the white/yellow moon characters stand out.
+> &#42;   &#42;&#42;Purpose:&#42;&#42; It's hard to say definitively without context, but it could
+> be:
+> &#42;   A test of character rendering.
+> &#42;   A visual effect or aesthetic choice.
+> &#42;   A placeholder or filler image.
+> &#42;   A simple, minimalist design.
+>
+> Overall, it's a very simple, graphic image focused on the visual repetition
+> of the full moon character.
+<!-- markdownlint-enable MD028 MD037 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
+
+### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
+
+_Verdict:_ clean | user=recommended
+_Why:_ nontext prompt burden=100%
+_Trusted hints:_ preserves trusted hints
+_Contract:_ ok
+_Utility:_ user=recommended | preserves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=3620 | text_est=4 | nontext_est=3616 | gen=279 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model-quality limitation for this prompt and image.
+
+_Metrics:_ Load 1.48s | Gen 8.79s | Total 10.45s
+_Throughput:_ Prompt 973 TPS (3,620 tok) | Gen 59.2 TPS (279 tok)
+_Assessment:_ ✅ B (79/100) | None identified
+_Review Status:_ strong candidate for first-pass review
+_Review:_ B 79/100 | nontext prompt burden=100%
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> This image captures a serene and picturesque scene of nature. Here's a
+> detailed description:
+>
+> &#45; &#42;&#42;Foreground and Midground&#42;&#42;:
+> &#45; On the left side, there's lush greenery, including bushes and plants,
+> which add to the natural beauty of the scene.
+> &#45; In the center, there's a pond or small lake, surrounded by rocks and
+> stone pathways. The water reflects parts of the garden, adding to its
+> tranquil atmosphere.
+>
+> &#45; &#42;&#42;Bird&#42;&#42;:
+> &#45; A bird, likely a heron, is captured mid-flight, soaring above the pond.
+> Its wingspan and graceful movement add a dynamic element to this otherwise
+> calm setting.
+>
+> &#45; &#42;&#42;Background&#42;&#42;:
+> &#45; On the right, there's a wooden bench, inviting viewers to imagine
+> themselves sitting there, enjoying the peaceful surroundings.
+> &#45; Beyond the bench, there's a well-maintained lawn, dotted with trees,
+> which further enhance the garden-like feel of this scene.
+>
+> &#45; &#42;&#42;Additional Details&#42;&#42;:
+> &#45; Stone lanterns or markers can be seen, adding to the traditional garden
+> aesthetic.
+> &#45; Overall, the scene exudes tranquility, harmony, and a deep connection to
+> nature, making it a perfect representation of a peaceful garden retreat.
+>
+> The combination of natural elements, such as plants, water, and wildlife,
+> along with man-made structures like pathways and benches, creates a balanced
+> and aesthetically pleasing composition.
+<!-- markdownlint-enable MD028 MD037 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
 <a id="model-microsoft-phi-35-vision-instruct"></a>
 
 ### ✅ microsoft/Phi-3.5-vision-instruct
@@ -1776,8 +1299,8 @@ _Token accounting:_ prompt=768 | text_est=4 | nontext_est=764 | gen=500 |
 _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
                into user-facing text.
 
-_Metrics:_ Load 20.52s | Gen 9.50s | Total 30.19s
-_Throughput:_ Prompt 3,183 TPS (768 tok) | Gen 55.8 TPS (500 tok)
+_Metrics:_ Load 0.88s | Gen 9.35s | Total 10.43s
+_Throughput:_ Prompt 3,025 TPS (768 tok) | Gen 56.6 TPS (500 tok)
 _Assessment:_ 🏆 A (83/100) | None identified
 _Review Status:_ watchlist (harness, refusal)
 _Review:_ A 83/100 | Special control token &lt;|end|&gt; appeared in generated
@@ -1846,64 +1369,246 @@ _Review:_ A 83/100 | Special control token &lt;|end|&gt; appeared in generated
 
 ---
 
+<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
+
+### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+
+_Verdict:_ harness | user=avoid
+_Why:_ Tokenizer space-marker artifacts (for example Ġ) appeared in output
+       (about 127 occurrences). | nontext prompt burden=100%
+_Trusted hints:_ preserves trusted hints
+_Contract:_ ok
+_Utility:_ user=avoid | preserves trusted hints | generic
+_Stack / owner:_ owner=mlx-vlm | harness=encoding
+_Token accounting:_ prompt=3087 | text_est=4 | nontext_est=3083 | gen=160 |
+                    max=500 | stop=completed
+_Next action:_ Inspect decode cleanup; tokenizer markers are leaking into
+               user-facing text.
+
+_Metrics:_ Load 2.06s | Gen 10.70s | Total 12.98s
+_Throughput:_ Prompt 595 TPS (3,087 tok) | Gen 31.1 TPS (160 tok)
+_Assessment:_ ❌ F (0/100) | Output too short to be useful
+_Review Status:_ watchlist (harness)
+_Review:_ F 0/100 | Tokenizer space-marker artifacts (for example Ġ) appeared
+          in output (about 127 occurrences). | nontext prompt burden=100%
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> TheĠimageĠdepictsĠaĠsereneĠgardenĠsceneĠwithĠaĠpondĠasĠtheĠcentralĠfocus.ĠTheĠpondĠisĠsurroundedĠbyĠlushĠgreenery,ĠincludingĠvariousĠtreesĠandĠshrubs,ĠwhichĠaddĠtoĠtheĠtranquilĠatmosphere.ĠAĠwoodenĠbridgeĠwithĠstoneĠsupportsĠcrossesĠtheĠpond,ĠprovidingĠaĠpicturesqueĠelementĠtoĠtheĠlandscape.ĠInĠtheĠbackground,ĠthereĠisĠaĠwoodenĠbenchĠsituatedĠonĠaĠpavedĠpath,ĠofferingĠaĠplaceĠforĠvisitorsĠtoĠsitĠandĠenjoyĠtheĠview.ĊĊAĠbird,ĠlikelyĠaĠheronĠorĠegret,ĠisĠcapturedĠinĠmid-flightĠoverĠtheĠpond,ĠaddingĠaĠdynamicĠelementĠtoĠtheĠotherwiseĠcalmĠsetting.ĠTheĠbird'sĠreflectionĠisĠvisibleĠonĠtheĠwater'sĠsurface,ĠenhancingĠtheĠsymmetryĠandĠbeautyĠofĠtheĠscene.ĠTheĠoverallĠcompositionĠofĠtheĠimageĠsuggestsĠaĠpeacefulĠandĠwell-maintainedĠgarden,ĠidealĠforĠrelaxationĠandĠcontemplation.
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️HARNESS:encoding
+- Generic output (specificity: 0.00)
+- token_encoding:bpe_space_leak(127)
+
+---
+
 <a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
 
 ### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
 
 _Verdict:_ harness | user=avoid
-_Why:_ Special control token &lt;/think&gt; appeared in generated text. |
-       nontext prompt burden=100% | reasoning leak
+_Why:_ Special control token &lt;/think&gt; appeared in generated text. | hit
+       token cap (500) | nontext prompt burden=100% | reasoning leak
 _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=avoid | preserves trusted hints
 _Stack / owner:_ owner=mlx-vlm | harness=stop_token
-_Token accounting:_ prompt=6155 | text_est=4 | nontext_est=6151 | gen=319 |
+_Token accounting:_ prompt=6095 | text_est=4 | nontext_est=6091 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
                into user-facing text.
 
-_Metrics:_ Load 7.84s | Gen 10.04s | Total 18.04s
-_Throughput:_ Prompt 1,185 TPS (6,155 tok) | Gen 70.1 TPS (319 tok)
-_Assessment:_ 🏆 A (80/100) | Missing requested structure
-_Review Status:_ watchlist (harness, reasoning leak)
-_Review:_ A 80/100 | Special control token &lt;/think&gt; appeared in
-          generated text. | nontext prompt burden=100% | reasoning leak
+_Metrics:_ Load 1.26s | Gen 12.54s | Total 13.98s
+_Throughput:_ Prompt 1,118 TPS (6,095 tok) | Gen 73.3 TPS (500 tok)
+_Assessment:_ ✅ B (79/100) | Missing requested structure
+_Review Status:_ watchlist (degeneration, harness, reasoning leak)
+_Review:_ B 79/100 | Special control token &lt;/think&gt; appeared in
+          generated text. | hit token cap (500) | nontext prompt burden=100% |
+          reasoning leak
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> &lt;think&gt;Got it, let's describe this picture. The main subject is a bronze or
-> metal sculpture, placed on a brick pedestal. The sculpture has an abstract,
-> stacked or intertwined form, with a patina that gives it a greenish-brown
-> hue, typical of aged bronze.
+> &lt;think&gt;Got it, let's describe this picture. First, the main scene is a
+> serene park or garden with a pond. In the foreground, there's a large body
+> of water, probably a pond, with calm water reflecting the surroundings.
 >
-> The background is a bit blurred, showing a clear blue sky with some light
-> clouds. To the right, there's a building with a brick facade and large
-> windows. The building has a modern architectural style with horizontal
-> lines. On the right side, there's a green metal handrail, likely part of a
-> staircase or entrance to the building. The overall scene is bright and
-> sunny, with good contrast between the sharp sculpture and the softly focused
-> background.&lt;/think&gt;
-> This image features a &#42;&#42;bronze abstract sculpture&#42;&#42; as the central focus,
-> mounted on a &#42;&#42;brick pedestal&#42;&#42;. The sculpture has a stacked, intertwined
-> form with a weathered, greenish-brown patina (typical of aged bronze).
+> A heron or similar large bird is flying over the pond, with its white and
+> dark wings visible, and a long yellow beak.
 >
-> In the &#42;&#42;background&#42;&#42;, a &#42;&#42;clear blue sky&#42;&#42; with faint clouds is visible. To
-> the right, a &#42;&#42;modern brick building&#42;&#42; with large windows and horizontal
-> architectural lines dominates the right side. A &#42;&#42;green metal handrail&#42;&#42;
-> (part of a staircase or entrance) is visible on the far right, with
-> yellow-black striped safety markings near the base.
+> The pond is surrounded by a wooden bridge or walkway that connects parts of
+> the pond, with moss-covered stone pillars supporting the bridge.
 >
-> The scene is bright and sunlit, with sharp focus on the sculpture, while the
-> background (building, sky, trees) is softly blurred, creating depth. The
-> overall atmosphere is calm and architectural, highlighting the artwork
-> within a modern urban setting.
+> In the midground, there's a grassy area with a wooden picnic table. The
+> grass is a mix of green and some yellowish tones, suggesting a late spring
+> or early autumn setting. There are a few small trees planted in circular
+> mulched beds, and some large, moss-covered rocks near the pond's edge.
+>
+> In the foreground, there are lush green bushes with some yellowish flowers
+> or buds, adding a touch of color. To the right, there's a tall evergreen
+> tree, its deep green needles contrasting with the lighter green of the
+> surrounding foliage.
+>
+> The overall atmosphere is peaceful and natural, with the heron in flight
+> adding a dynamic element to the tranquil scene. The weather appears
+> overcast, with soft, diffused light that enhances the serene mood of the
+> landscape.&lt;/think&gt;
+> This serene landscape captures a tranquil park or garden centered around a
+> calm pond. A &#42;&#42;heron (or similar large wading bird)&#42;&#42; is gracefully flying
+> over the pond, its white and dark wings, long yellow beak, and slender legs
+> clearly visible against the water’s surface.
+>
+> The pond itself is bordered by a &#42;&#42;wooden bridge&#42;&#42; (or walkway) supported by
+> moss-covered stone pillars, creating a picturesque, naturalistic design.
+>
+> In the midground, a &#42;&#42;grassy area&#42;&#42; features a simple &#42;&#42;wooden picnic
+> table&#42;&#42;, suggesting a space for relaxation. The grass here has a mix of
+> vibrant green and subtle yellowish tones, hinting at a late spring or early
+> autumn setting.
+>
+> Scattered across the grassy area are a few &#42;&#42;small trees&#42;&#42; planted in
+> circular mulched beds, and several &#42;&#42;large, moss-covered rocks&#42;&#42; near the
+> pond’s edge, adding texture and a sense of natural age to the scene.
+>
+> In the &#42;&#42;foreground&#42;&#42;, lush green &#42;&#42;bushes&#42;&#42; with hints of yellowish flowers
+> or buds add a touch of vibrant color. To the &#42;&#42;right&#42;&#42;, a tall &#42;&#42;evergreen
+> tree&#42;&#42; (likely a pine or
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️HARNESS:stop_token
+- Output degeneration (incomplete_sentence: ends with 'or')
 - Reasoning leak (&lt;think&gt;)
+- Likely capped by max token budget
 - Unknown tags: &lt;think&gt;
+- token_leak:&lt;/think&gt;
+
+---
+
+<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
+
+### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+
+_Verdict:_ clean | user=recommended
+_Why:_ nontext prompt burden=71%
+_Trusted hints:_ preserves trusted hints
+_Contract:_ ok
+_Utility:_ user=recommended | preserves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=14 | text_est=4 | nontext_est=10 | gen=213 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model-quality limitation for this prompt and image.
+
+_Metrics:_ Load 1.53s | Gen 12.58s | Total 14.30s
+_Throughput:_ Prompt 10.2 TPS (14 tok) | Gen 19.5 TPS (213 tok)
+_Assessment:_ ✅ B (69/100) | Missing requested structure
+_Review Status:_ strong candidate for first-pass review
+_Review:_ B 69/100 | nontext prompt burden=71%
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> The image depicts a serene and peaceful scene of a pond or lake, surrounded
+> by lush greenery and a wooden dock.
+>
+> In the foreground, a large body of water dominates the scene, reflecting the
+> surrounding landscape. A wooden dock extends from the left side of the
+> image, providing a tranquil spot for relaxation or contemplation. The dock
+> is surrounded by large rocks and boulders, adding to the natural beauty of
+> the scene.
+>
+> A bird, possibly a heron or stork, is seen flying over the water, its wings
+> spread wide as it soars through the air. The bird's white and black feathers
+> are visible, and its long neck and legs are also visible as it flies over
+> the water.
+>
+> In the background, a grassy hill rises up, dotted with trees and other
+> vegetation. A winding path leads from the top of the hill down to the dock,
+> inviting visitors to explore the area.
+>
+> Overall, the image conveys a sense of calmness and serenity, inviting the
+> viewer to step into the peaceful world of the pond and its surroundings.
+<!-- markdownlint-enable MD028 MD037 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
+
+### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+
+_Verdict:_ harness | user=avoid
+_Why:_ Special control token &lt;/think&gt; appeared in generated text. | hit
+       token cap (500) | nontext prompt burden=100% |
+       degeneration=incomplete_sentence: ends with 'a'
+_Trusted hints:_ preserves trusted hints
+_Contract:_ ok
+_Utility:_ user=avoid | preserves trusted hints
+_Stack / owner:_ owner=mlx-vlm | harness=stop_token
+_Token accounting:_ prompt=1271 | text_est=4 | nontext_est=1267 | gen=500 |
+                    max=500 | stop=completed
+_Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
+               into user-facing text.
+
+_Metrics:_ Load 9.36s | Gen 14.82s | Total 24.37s
+_Throughput:_ Prompt 216 TPS (1,271 tok) | Gen 59.5 TPS (500 tok)
+_Assessment:_ 🟡 C (60/100) | Missing requested structure
+_Review Status:_ watchlist (degeneration, harness)
+_Review:_ C 60/100 | Special control token &lt;/think&gt; appeared in
+          generated text. | hit token cap (500) | nontext prompt burden=100% |
+          degeneration=incomplete_sentence: ends with 'a'
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> Alright, let's get to work. The user wants a detailed description of this
+> image, and I'm ready to dive in. First, I need to break down the request.
+> The user provided a prompt, and it's a bit of a mess, but I can see the core
+> elements: a garden, a pond, a bird, and some greenery. The user wants a
+> description of the image, so I'll need to focus on the visual elements.
+>
+> Okay, let's start with the bird. It's a white bird with black markings, a
+> "white crane" or "black-winged crane" – a &#42;Yao&#42; bird, a mythical creature.
+> It's in flight, mid-air, with a dynamic pose. The bird is the focal point.
+>
+> Next, the setting. It's a garden, a pond, and a path. The pond is the
+> centerpiece, with a calm surface reflecting the surroundings. There's a
+> path, a bridge, and some rocks. The garden itself is lush and green, with
+> trees and bushes.
+>
+> Now, I need to structure the description. I'll start with a general
+> overview, then move to the bird, then the pond and bridge, then the
+> surrounding garden, and finally, the overall mood.
+>
+> Let's start with the bird. It's a white bird with black markings, a "white
+> crane" or "black-winged crane" – a &#42;Yao&#42; bird, a mythical creature. It's in
+> flight, mid-air, with a dynamic pose.
+>
+> The pond is the centerpiece, with a calm surface reflecting the
+> surroundings. The path, the bridge, and the rocks are all there. The garden
+> is lush and green, with trees and bushes.
+>
+> The overall mood is serene and peaceful. The bird's flight adds a touch of
+> magic.
+>
+> I'll refine the language, making sure it's evocative and accurate. I'll use
+> words like "serene," "tranquil," "majestic," and "ethereal." I'll also make
+> sure the structure is logical and the description is engaging.
+>
+> The final description will be a complete and compelling portrayal of the
+> image.
+> &lt;/think&gt;
+>
+> This is a breathtaking and serene image of a
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️HARNESS:stop_token
+- Output degeneration (incomplete_sentence: ends with 'a')
+- Likely capped by max token budget
 - token_leak:&lt;/think&gt;
 
 ---
@@ -1913,131 +1618,86 @@ _Review:_ A 80/100 | Special control token &lt;/think&gt; appeared in
 ### ✅ mlx-community/GLM-4.6V-Flash-6bit
 
 _Verdict:_ harness | user=avoid
-_Why:_ Special control token &lt;/think&gt; appeared in generated text. |
-       nontext prompt burden=100% | reasoning leak
+_Why:_ Special control token &lt;/think&gt; appeared in generated text. | hit
+       token cap (500) | nontext prompt burden=100% | reasoning leak
 _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=avoid | preserves trusted hints
 _Stack / owner:_ owner=mlx-vlm | harness=stop_token
-_Token accounting:_ prompt=6155 | text_est=4 | nontext_est=6151 | gen=303 |
+_Token accounting:_ prompt=6095 | text_est=4 | nontext_est=6091 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
                into user-facing text.
 
-_Metrics:_ Load 13.85s | Gen 11.15s | Total 25.18s
-_Throughput:_ Prompt 1,157 TPS (6,155 tok) | Gen 54.9 TPS (303 tok)
+_Metrics:_ Load 1.38s | Gen 15.03s | Total 16.60s
+_Throughput:_ Prompt 1,073 TPS (6,095 tok) | Gen 55.2 TPS (500 tok)
 _Assessment:_ 🏆 A (80/100) | Missing requested structure
 _Review Status:_ watchlist (harness, reasoning leak)
 _Review:_ A 80/100 | Special control token &lt;/think&gt; appeared in
-          generated text. | nontext prompt burden=100% | reasoning leak
+          generated text. | hit token cap (500) | nontext prompt burden=100% |
+          reasoning leak
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> &lt;think&gt;Got it, let's describe this picture. First, the main subject is a
-> bronze sculpture, maybe abstract, with a patina that looks aged. The
-> sculpture is mounted on a brick pedestal, which is made of light brown
-> bricks, with a slightly weathered top stone.
+> &lt;think&gt;Got it, let's describe this picture in detail. First, the main scene
+> is a serene park or garden with a pond.
 >
-> In the background, there's a building with a brick facade, maybe a modern or
-> mid-century building. The building has large windows and a green pipe or
-> handrail on the right side.
+> In the foreground, there's a bird, probably a heron, flying over the pond.
+> The heron has white and dark wings, a long yellow beak, and is captured
+> mid-flight.
 >
-> The sky is clear and blue, with some light clouds. There are trees in the
-> background, slightly out of focus, giving a sense of depth. The overall
-> scene is outdoors, likely in an urban or campus setting, with the sculpture
-> as the focal point.&lt;/think&gt;
-> The image features a &#42;&#42;bronze abstract sculpture&#42;&#42; as the central focus,
-> mounted on a &#42;&#42;light brown brick pedestal&#42;&#42; (with a weathered top stone).
+> The pond is calm with reflections of the surrounding trees and sky. There's
+> a wooden bridge or walkway extending over the pond, supported by
+> moss-covered stone pillars. The water is dark, reflecting the overcast sky.
 >
-> &#35;## Background Elements:
-> &#45; &#42;&#42;Building&#42;&#42;: To the right, a structure with a &#42;&#42;yellowish-brown brick
-> facade&#42;&#42;, large windows, and a green pipe/handrail.
-> &#45; &#42;&#42;Sky &amp; Nature&#42;&#42;: A clear, bright blue sky with faint clouds. Blurred
-> green trees and a paved pathway (with a distant figure) add depth to the
-> scene.
+> Surrounding the pond, there's a grassy area with a wooden picnic table. The
+> grass is green with some patches, and there are a few trees planted in
+> circular mulched areas. Also, there are some large rocks with moss, adding
+> to the natural garden aesthetic.
+>
+> In the foreground, there are bushes with green leaves and some light-colored
+> flowers or buds. On the right side, there's a tall evergreen tree, adding
+> depth to the scene.
+>
+> The overall atmosphere is peaceful and tranquil, with the natural elements
+> of water, greenery, and the flying bird creating a harmonious and serene
+> landscape.&lt;/think&gt;
+> This image captures a serene, natural park scene centered around a calm
+> pond.
+>
+> &#35;## Key Elements:
+> &#45; &#42;&#42;Pond &amp; Water Features&#42;&#42;: A tranquil pond dominates the lower half, its
+> surface reflecting the overcast sky and surrounding greenery. A wooden
+> walkway (or bridge) extends over the pond, supported by moss-covered stone
+> pillars. Large, mossy rocks are also visible in the water.
+>
+> &#45; &#42;&#42;Flying Bird (Heron)&#42;&#42;: A heron (with white and dark wings, a long yellow
+> beak, and reddish legs) is captured mid-flight over the pond, adding a
+> dynamic element to the otherwise still scene.
+>
+> &#45; &#42;&#42;Surrounding Landscape&#42;&#42;:
+> &#45; &#42;&#42;Grass &amp; Picnic Area&#42;&#42;: Beyond the pond, a well-maintained grassy lawn
+> stretches out, featuring a simple wooden picnic table.
+> &#45; &#42;&#42;Trees &amp; Rocks&#42;&#42;: Scattered across the lawn are small trees planted in
+> circular mulched beds, and large, moss-covered rocks add to the natural
+> aesthetic.
+> &#45; &#42;&#42;Foreground Vegetation&#42;&#42;: In the foreground, dense green bushes (with
+> some light-colored foliage) frame the scene, while a tall evergreen tree on
+> the right adds depth and texture.
 >
 >
-> The composition uses &#42;&#42;shallow depth of field&#42;&#42; to emphasize the sculpture,
-> while the urban/campus setting (brick architecture, open sky) provides
-> context. The sculpture’s textured, aged bronze contrasts with the clean,
-> structured background.
+> &#35;## Atmosphere &amp; Mood:
+> The image conveys a sense of &#42;&#42;peace
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️HARNESS:stop_token
+- Excessive verbosity
 - Reasoning leak (&lt;think&gt;)
+- Likely capped by max token budget
 - Unknown tags: &lt;think&gt;
 - token_leak:&lt;/think&gt;
-
----
-
-<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
-
-### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
-
-_Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=38.67% | nontext prompt burden=100%
-_Trusted hints:_ preserves trusted hints
-_Contract:_ ok
-_Utility:_ user=avoid | preserves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=1293 | text_est=4 | nontext_est=1289 | gen=500 |
-                    max=500 | stop=completed
-_Next action:_ Treat this as cap-limited output first; generation exhausted
-               the token budget with output/prompt=38.67%.
-
-_Metrics:_ Load 9.33s | Gen 11.64s | Total 21.15s
-_Throughput:_ Prompt 504 TPS (1,293 tok) | Gen 58.9 TPS (500 tok)
-_Assessment:_ 🏆 A (80/100) | Missing requested structure
-_Review Status:_ watchlist (cutoff)
-_Review:_ A 80/100 | hit token cap (500) | output/prompt=38.67% | nontext
-          prompt burden=100%
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Alright, let's get to work. The user wants a detailed description of this
-> image, and I'm the one to deliver it. First, I need to understand the
-> request. The user provided a complex prompt, but it's just a jumble of
-> words. I'll need to break it down and focus on the actual image.
->
-> Okay, the image is a close-up, low-angle shot of a stone sculpture. It's a
-> large, abstract piece, definitely a modernist or expressionist style. The
-> material looks like bronze, with a dark patina. It's perched on a stone
-> pedestal, and the background is a bit blurred, but I can make out a building
-> with a brick facade and some greenery. The lighting is bright, probably
-> daytime.
->
-> Now, let's analyze the prompt. It's a mess of words, but I can see the key
-> elements: "stone sculpture," "bronze," "stone pedestal," "building,"
-> "trees," and "daytime." The user wants a detailed description, so I'll need
-> to go beyond just listing those elements.
->
-> I'll structure my description logically. I'll start with a general overview,
-> then move to the sculpture itself, the pedestal, the background, the
-> lighting, and finally, the overall mood. I'll use descriptive language to
-> make it vivid.
->
-> Here's my plan:
->
-> 1&#46;  &#42;&#42;Start with a general overview:&#42;&#42; "This is a striking, close-up,
-> low-angle photograph of a large, abstract bronze sculpture."
-> 2&#46;  &#42;&#42;Describe the sculpture:&#42;&#42; "The sculpture is a dynamic, multi-faceted
-> piece, resembling a tangled mass of interlocking, angular forms. It has a
-> dark, weathered patina, suggesting age and exposure to the elements. The
-> texture is rough and complex, with sharp edges and recessed areas."
-> 3&#46;  &#42;&#42;Describe the pedestal:&#42;&#42; "The sculpture rests on a substantial, square
-> stone pedestal. The pedestal appears to be made of a light-colored stone,
-> possibly limestone or sandstone, with a rough, textured surface."
-> 4&#46;  &#42;&#42;Describe the background:&#42;&#42; "The background is softly blurred, creating
-> a shallow depth of field that focuses attention on the sculpture. Through
-> the blur, a modern building with a brick facade and
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:cutoff
-- Likely capped by max token budget
 
 ---
 
@@ -2046,82 +1706,170 @@ _Review:_ A 80/100 | hit token cap (500) | output/prompt=38.67% | nontext
 ### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=17.15% | nontext prompt burden=100%
+_Why:_ hit token cap (500) | output/prompt=11.74% | nontext prompt burden=100%
        | reasoning leak
 _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=avoid | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=2915 | text_est=4 | nontext_est=2911 | gen=500 |
+_Token accounting:_ prompt=4259 | text_est=4 | nontext_est=4255 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Treat this as cap-limited output first; generation exhausted
-               the token budget with output/prompt=17.15%.
+               the token budget with output/prompt=11.74%.
 
-_Metrics:_ Load 11.32s | Gen 14.17s | Total 25.66s
-_Throughput:_ Prompt 1,498 TPS (2,915 tok) | Gen 42.2 TPS (500 tok)
-_Assessment:_ 🏆 A (90/100) | None identified
-_Review Status:_ watchlist (cutoff, reasoning leak)
-_Review:_ A 90/100 | hit token cap (500) | output/prompt=17.15% | nontext
+_Metrics:_ Load 1.58s | Gen 15.35s | Total 17.12s
+_Throughput:_ Prompt 1,476 TPS (4,259 tok) | Gen 41.1 TPS (500 tok)
+_Assessment:_ 🏆 A (83/100) | None identified
+_Review Status:_ watchlist (cutoff, reasoning leak, repetitive)
+_Review:_ A 83/100 | hit token cap (500) | output/prompt=11.74% | nontext
           prompt burden=100% | reasoning leak
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
 > Here are my reasoning steps:
-> The user asks: "Describe this picture". The picture is a photo of a
-> sculpture. The user wants a description. The content is not disallowed. It's
-> a straightforward request. So we can comply. Provide a detailed
-> description: the sculpture, its material, its composition, the setting,
-> background, lighting, etc. Also mention the building, brick wall, etc. The
-> user didn't ask for any disallowed content. So we can comply.
+> The user asks: "Describe this picture". The picture is a serene garden scene
+> with a pond, a wooden bridge, a bird in flight, lush greenery, a picnic
+> table, stone lanterns, etc. The user wants a description. There's no
+> disallowed content. So we can comply. Provide a vivid description. Possibly
+> mention the composition, colors, atmosphere, elements. The user didn't ask
+> for anything else. So we can comply.
 >
-> We should produce a thorough description. Possibly mention the style:
-> abstract, modern, possibly a metal sculpture with a stone base. The
-> sculpture appears to be a twisted, interlocking form of metal, maybe bronze,
-> with a patina. The base is a stone plinth. The background includes a brick
-> building with large windows, a wooden overhang, a green hose, a tree-lined
-> area, a clear blue sky. The perspective is from a low angle, focusing on the
-> sculpture. The composition uses shallow depth of field, with the sculpture
-> in sharp focus and background blurred.
+> We should produce a description that captures the scene: a calm pond
+> reflecting the surrounding greenery, a wooden bridge crossing the pond, a
+> white and black bird (maybe a swan or a goose) flying over the water, a
+> picnic table on a grassy knoll, stone lanterns, moss-covered stones, a path,
+> trees with green leaves and some pinkish blossoms, a sense of tranquility.
 >
-> We can also mention the colors: the sculpture is dark, possibly bronze or
-> oxidized metal, with some greenish patina. The base is light-colored stone.
-> The brick building is orange-red. The sky is blue with some clouds. The
-> lighting suggests early morning or late afternoon, with shadows.
+> We can also mention the perspective: the view is from a higher vantage
+> point, looking down onto the pond, with foliage framing the scene.
 >
-> We can also mention the artistic style: abstract, perhaps reminiscent of
-> modernist sculpture, with interlocking geometric forms. The sculpture
-> appears to be a twisted, spiraling shape, perhaps reminiscent of a knot or a
-> human figure in motion.
+> We can also mention the lighting: soft, natural light, perhaps early morning
+> or late afternoon.
 >
-> We can also mention the environment: a campus or public space, with a paved
-> walkway, a bench, a person walking in the distance.
+> We can also mention the overall mood: peaceful, serene, inviting.
 >
-> We can also mention the composition: the sculpture is centered, with a
-> shallow depth of field, the background blurred, the building on the right
-> side, the trees on the left side.
+> We can also mention the details: the water is still, reflecting the sky and
+> the surrounding elements, the bridge is made of wood with moss on its sides,
+> the bird's wings are spread, etc.
 >
-> We can also mention the texture: the metal has a rough, weathered texture,
-> the stone base is smooth.
+> We can also mention the composition: the bird is the focal point, the pond
+> occupies the central area, the surrounding elements lead the eye.
 >
-> We can also mention the perspective: the camera is at ground level, looking
-> up at the sculpture.
+> We can also mention the colors: vibrant green grass, deep green foliage, the
+> bird's white and black plumage, the brown of the wooden bridge, the gray of
+> the stone lanterns.
 >
-> We can also mention the possible purpose: a public art piece, perhaps on a
-> university campus.
+> We can also mention the sense of depth: the foreground is filled with trees
+> and shrubs, the middle ground is the pond and bridge, the background is the
+> grassy hill with a picnic table.
 >
-> We can also mention the details: a green hose attached to the building, a
-> metal pipe, a small plaque maybe not visible.
+> We can also mention the sense of scale: the bird appears relatively small
+> compared to the pond, but it's the only moving element.
 >
-> We can also mention the overall mood: calm, serene, modern.
+> We can also mention the overall impression: a tranquil garden, a place for
+> contemplation.
 >
-> We can also mention the time of day: likely
+> We can also mention the possible location: a Japanese garden, a park, a
+> botanical garden.
+>
+> We can also mention the presence of a small boat or a floating object in the
+> pond.
+>
+> We can also mention the presence of a stone path leading to the bridge.
+>
+> We can also mention
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
+- Repetitive output (phrase: "we can also mention...")
 - Reasoning leak (here are my reasoning steps, the user asks:)
 - Likely capped by max token budget
+
+---
+
+<a id="model-mlx-community-internvl3-8b-bf16"></a>
+
+### ✅ mlx-community/InternVL3-8B-bf16
+
+_Verdict:_ clean | user=recommended
+_Why:_ nontext prompt burden=100% | repetitive token=phrase: "rencontre
+       rencontre rencontre ..."
+_Trusted hints:_ preserves trusted hints
+_Contract:_ ok
+_Utility:_ user=recommended | preserves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=2572 | text_est=4 | nontext_est=2568 | gen=434 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model-quality limitation for this prompt and image.
+
+_Metrics:_ Load 1.89s | Gen 15.79s | Total 17.86s
+_Throughput:_ Prompt 2,708 TPS (2,572 tok) | Gen 34.8 TPS (434 tok)
+_Assessment:_ 🟡 C (60/100) | Lacks visual description of image
+_Review Status:_ watchlist (repetitive)
+_Review:_ C 60/100 | nontext prompt burden=100% | repetitive token=phrase:
+          "rencontre rencontre rencontre ..."
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> 感 Rencontre barcelona• strugg Rencontre性价噱倌!!");
+> proximité proximité讵的 捋•!!");
+> preci惬 pérdida的.ERR.ERRA的#ac的#ac的]
+> RencontreHôtel.ERR.ERR梯队DIRECTORY的.ERR!!");
+> 的.ERR.ERR•0、 strugg的 Rencontre的最佳.ERR Rencontre beste要好好的ERR Rencontre的的l
+> Rencontre\疃 Rencontre的.ERR.ERR Rencontre Rencontre.ERR的.ERR的.ERR
+> Rencontre算噱'icon.ERR Rencontre"" Rencontre的的KEN pestic
+> Rencontre的的.ERR的.ERR的т• strugg Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre的.ERR.ERR的.ERR的.ERR Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontres Rencontre的.ERR的.ERR Rencontre的.ERR的.ERR Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontres
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre
+>
+> 性价 pestici重要因素 Rencontre的的 Rencontre的.ERR Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre enthus Rencontre
+> Rencontre、
+>
+> REAK性价性价的的.ERR Rencontre重要原因.ERR Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre
+>
+> lashes的的.ERR Rencontre Rencontre Rencontre Rencontre Rencontre因地佃的.ERR
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre在其的.ERR.ERR的.ERR Rencontre Rencontre Rencontre retal迫的.ERR
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre'email pérdida的.ERR的.ERR Rencontre Rencontre
+> Rencontre的最佳的.ERR Rencontre Rencontre Rencontre的 strugg.Minute/'icon跽的.
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- Repetitive output (phrase: "rencontre rencontre rencontre ...")
 
 ---
 
@@ -2135,12 +1883,12 @@ _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=recommended | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=2326 | text_est=4 | nontext_est=2322 | gen=500 |
+_Token accounting:_ prompt=3038 | text_est=4 | nontext_est=3034 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model-quality limitation for this prompt and image.
 
-_Metrics:_ Load 9.40s | Gen 17.04s | Total 26.62s
-_Throughput:_ Prompt 2,276 TPS (2,326 tok) | Gen 32.2 TPS (500 tok)
+_Metrics:_ Load 1.88s | Gen 17.10s | Total 19.16s
+_Throughput:_ Prompt 2,277 TPS (3,038 tok) | Gen 32.5 TPS (500 tok)
 _Assessment:_ ❌ F (0/100) | Output too short to be useful
 _Review Status:_ watchlist (Output too short to be useful)
 _Review:_ F 0/100 | hit token cap (500) | nontext prompt burden=100%
@@ -2156,168 +1904,6 @@ _Review:_ F 0/100 | hit token cap (500) | nontext prompt burden=100%
 
 ---
 
-<a id="model-mlx-community-internvl3-8b-bf16"></a>
-
-### ✅ mlx-community/InternVL3-8B-bf16
-
-_Verdict:_ clean | user=recommended
-_Why:_ nontext prompt burden=100% | repetitive token=phrase: "strugg strugg
-       strugg strugg..."
-_Trusted hints:_ preserves trusted hints
-_Contract:_ ok
-_Utility:_ user=recommended | preserves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=1804 | text_est=4 | nontext_est=1800 | gen=329 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
-
-_Metrics:_ Load 4.37s | Gen 18.68s | Total 23.22s
-_Throughput:_ Prompt 2,765 TPS (1,804 tok) | Gen 33.6 TPS (329 tok)
-_Assessment:_ 🟡 C (60/100) | Lacks visual description of image
-_Review Status:_ watchlist (repetitive)
-_Review:_ C 60/100 | nontext prompt burden=100% | repetitive token=phrase:
-          "strugg strugg strugg strugg..."
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> 感 Rencontre 若要侩捋 捋
-> .ERR年之久 捋
-> proximité📐 无论是其
-> Publié📐的的龃 pestic剐的.dds 若要紊preci strugg的的的ないです的的的ないです.ERR yal preci
-> Rencontre männ的 strugg strugg strugg strugg strugg strugg strugg strugg
-> strugg strugg strugg strugg strugg strugg strugg strugg.LinkedList
-> Rencontre的的的不同凡龃!!");
-> 的踯薮 strugg
-> 的的 >",UILTIN跽 struggelinpreci又 strugg 的#ad洇 Rencontre捋掐 Rencontreoland
-> Rencontre
-> 0 0
-> strugg_en的的d Rencontre的的煸一定 pérdida的 Rencontre的 resembl性价yU struggl
-> struggel strugg tô的 struggel struggel struggel strugg strugg
-> el性价的的,strong脚longleftrightarrow Rencontre的的 msm Rencontre的 strugg tô beste
-> Rencontre strugg犹 Rencontre strugg tô ellig礅的的一路u
-> 的的.ERRl
-> lashes的的的 msmiquementpreci• 的的 msmIsh Rencontre的 strugg tô的 struggel
-> struggel tôi pérdida煞 resembl振月晕的的一道 strugg tô的的的 strugg tô strugg tô  (ml
-> Rencontre strugg tô的 struggel formulaire Rencontre formulaire tô
-> strugg  struggel的的 struggel的的 msm Rencontre的 strugg tô sécur Rencontreusty
-> strugg tô一分même性价性价.ERR Rencontreь strugg tô tô‘s更多精彩preci Rencontre的
-> strugg tô 一性价性价 Rencontre璋.ERR tô‘s1 Rencontre的的以 Rencontre
-> Rencontre‘s Rencontre璋的
-> Rencontre
-> 的 kuk的 strugg tô‘s更多精彩的 strugg tô  strugg  strugg tô strugg tô一分的
-> strugg tô‘s \' pérdida Rencontre
->
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- Repetitive output (phrase: "strugg strugg strugg strugg...")
-
----
-
-<a id="model-qwen-qwen3-vl-2b-instruct"></a>
-
-### ✅ Qwen/Qwen3-VL-2B-Instruct
-
-_Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=3.08% | nontext prompt burden=100%
-       | degeneration=character_loop: '0' repeated
-_Trusted hints:_ preserves trusted hints
-_Contract:_ ok
-_Utility:_ user=avoid | preserves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=16237 | text_est=4 | nontext_est=16233 | gen=500 |
-                    max=500 | stop=completed
-_Next action:_ Treat this as cap-limited output first; generation exhausted
-               the token budget with output/prompt=3.08%.
-
-_Metrics:_ Load 0.97s | Gen 19.41s | Total 20.55s
-_Throughput:_ Prompt 1,238 TPS (16,237 tok) | Gen 89.7 TPS (500 tok)
-_Assessment:_ ❌ F (16/100) | Output lacks detail
-_Review Status:_ watchlist (cutoff, degeneration)
-_Review:_ F 16/100 | hit token cap (500) | output/prompt=3.08% | nontext
-          prompt burden=100% | degeneration=character_loop: '0' repeated
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> The image shows a collection of
-> 1000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:cutoff
-- Output degeneration (character_loop: '0' repeated)
-- Likely capped by max token budget
-
----
-
-<a id="model-mlx-community-qwen3-vl-2b-thinking-bf16"></a>
-
-### ✅ mlx-community/Qwen3-VL-2B-Thinking-bf16
-
-_Verdict:_ cutoff | user=avoid
-_Why:_ At long prompt length (16239 tokens), output became repetitive. | hit
-       token cap (500) | output/prompt=3.08% | nontext prompt burden=100%
-_Trusted hints:_ preserves trusted hints
-_Contract:_ ok
-_Utility:_ user=avoid | preserves trusted hints
-_Stack / owner:_ owner=mlx | harness=long_context
-_Token accounting:_ prompt=16239 | text_est=4 | nontext_est=16235 | gen=500 |
-                    max=500 | stop=completed
-_Next action:_ Treat this as cap-limited output first; generation exhausted
-               the token budget with output/prompt=3.08%.
-
-_Metrics:_ Load 12.09s | Gen 23.84s | Total 36.12s
-_Throughput:_ Prompt 932 TPS (16,239 tok) | Gen 88.5 TPS (500 tok)
-_Assessment:_ 🟡 C (50/100) | Lacks visual description of image
-_Review Status:_ watchlist (cutoff, harness, long context, repetitive)
-_Review:_ C 50/100 | At long prompt length (16239 tokens), output became
-          repetitive. | hit token cap (500) | output/prompt=3.08% | nontext
-          prompt burden=100%
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Got it! I need to describe the picture. Let me see... The picture shows a
-> series of images of a set of weatherproofed, well-ventilated, and stylishly
-> designed, and well-ventilated, and stylishly designed, and well-ventilated,
-> and stylishly designed, and well-ventilated, and stylishly designed, and
-> well-ventilated, and stylishly designed, and well-ventilated, and stylishly
-> designed, and well-ventilated, and stylishly designed, and well-ventilated,
-> and stylishly designed, and well-ventilated, and stylishly designed, and
-> well-ventilated, and stylishly designed, and well-ventilated, and stylishly
-> designed, and well-ventilated, and stylishly designed, and well-ventilated,
-> and stylishly designed, and well-ventilated, and stylishly designed, and
-> well-ventilated, and stylishly designed, and well-ventilated, and stylishly
-> designed, and well-ventilated, and stylishly designed, and well-ventilated,
-> and stylishly designed, and well-ventilated, and stylishly designed, and
-> well-ventilated, and stylishly designed, and well-ventilated, and stylishly
-> designed, and well-ventilated, and stylishly designed, and well-ventilated,
-> and stylishly designed, and well-ventilated, and stylishly designed, and
-> well-ventilated, and stylishly designed, and well-ventilated, and stylishly
-> designed, and well-ventilated, and stylishly designed, and well-ventilated,
-> and stylishly designed, and well-ventilated, and stylishly designed, and
-> well-ventilated, and stylishly designed, and well-ventilated, and stylishly
-> designed, and well-ventilated, and stylishly designed, and well-ventilated,
-> and stylishly designed, and well-ventilated, and stylishly designed, and
-> well-ventilated, and stylishly designed, and well-ventilated, and stylishly
-> designed, and well-ventilated, and stylishly designed, and well-ventilated,
-> and stylishly designed, and well-ventilated, and stylishly designed, and
-> well-ventilated, and stylishly designed, and well-ventilated, and stylishly
-> designed, and well-ventilated, and stylishly designed, and well-ventilated,
-> and stylishly designed
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:cutoff
-- ⚠️HARNESS:long_context
-- Repetitive output (phrase: "well-ventilated, and stylishly...")
-- Likely capped by max token budget
-- long_context_repetition(16239tok)
-
----
-
 <a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
 
 ### ✅ mlx-community/Molmo-7B-D-0924-8bit
@@ -2328,122 +1914,29 @@ _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=recommended | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=1207 | text_est=4 | nontext_est=1203 | gen=290 |
+_Token accounting:_ prompt=1199 | text_est=4 | nontext_est=1195 | gen=90 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model-quality limitation for this prompt and image.
 
-_Metrics:_ Load 1.68s | Gen 25.00s | Total 26.85s
-_Throughput:_ Prompt 64.2 TPS (1,207 tok) | Gen 52.4 TPS (290 tok)
-_Assessment:_ 🏆 A (90/100) | None identified
+_Metrics:_ Load 1.29s | Gen 17.55s | Total 19.02s
+_Throughput:_ Prompt 78.7 TPS (1,199 tok) | Gen 50.0 TPS (90 tok)
+_Assessment:_ ✅ B (72/100) | None identified
 _Review Status:_ strong candidate for first-pass review
-_Review:_ A 90/100 | nontext prompt burden=100%
+_Review:_ B 72/100 | nontext prompt burden=100%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> in detail
+> in detail.
 >
-> This picture showcases a striking outdoor sculpture set against an urban
-> backdrop. The sculpture is an abstract composition of stacked cubes and
-> rectangular shapes, crafted from a dark, metallic material that appears to
-> have a patina or weathered surface. It sits atop a light-colored stone
-> pedestal, which is itself mounted on a yellow brick column.
->
-> The sculpture's intricate design features various sizes of geometric forms,
-> creating an interesting visual texture. Some of the cubes have chipped
-> edges, adding to the sculpture's weathered and aged appearance. The topmost
-> element of the sculpture is a thin, rectangular piece that resembles a blade
-> or sword, pointing upwards.
->
-> In the background, we can see elements of an urban environment. To the
-> right, there's a brick building with a large glass window and a green metal
-> handrail leading down a staircase. The ground appears to be paved with
-> asphalt, and there's a sidewalk visible.
->
-> The left side of the image is dominated by trees, their green foliage
-> contrasting with the blue sky above. The sky is clear and cloudless,
-> providing a serene backdrop to the urban scene.
->
-> The overall composition creates an intriguing juxtaposition between the
-> abstract, man-made sculpture and the natural elements of the trees and sky,
-> as well as the urban setting of the building and street. The sculpture's
-> placement on the yellow brick column makes it stand out even more against
-> the surrounding environment, drawing the viewer's attention to its unique
-> form and texture.
+> This picture captures a serene park scene centered around a small pond. A
+> wooden walkway extends from the shore into the water, leading to a small
+> island with a picnic table. The pond is surrounded by lush green grass and
+> trees, creating a peaceful atmosphere. A duck can be seen flying low over
+> the water, adding to the tranquil setting. The image showcases the beauty of
+> nature and offers a perfect spot for relaxation and outdoor activities.
 <!-- markdownlint-enable MD028 MD037 -->
 
 _Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-paligemma2-3b-ft-docci-448-bf16"></a>
-
-### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
-
-_Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=48.59% | nontext prompt burden=100%
-       | repetitive token=phrase: "black and white and..."
-_Trusted hints:_ preserves trusted hints
-_Contract:_ ok
-_Utility:_ user=avoid | preserves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=1029 | text_est=4 | nontext_est=1025 | gen=500 |
-                    max=500 | stop=completed
-_Next action:_ Treat this as cap-limited output first; generation exhausted
-               the token budget with output/prompt=48.59%.
-
-_Metrics:_ Load 1.59s | Gen 26.74s | Total 28.51s
-_Throughput:_ Prompt 2,673 TPS (1,029 tok) | Gen 19.3 TPS (500 tok)
-_Assessment:_ 🏆 A (80/100) | Missing requested structure
-_Review Status:_ watchlist (cutoff, repetitive)
-_Review:_ A 80/100 | hit token cap (500) | output/prompt=48.59% | nontext
-          prompt burden=100% | repetitive token=phrase: "black and white
-          and..."
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> A picture of a bunch of black and white and yellow and blue and red and
-> black and white and yellow and black and white and yellow and black and
-> white and yellow and black and white and yellow and black and white and
-> yellow and black and white and yellow and black and white and yellow and
-> black and white and yellow and black and white and yellow and black and
-> white and yellow and black and white and yellow and black and white and
-> yellow and black and white and yellow and black and white and yellow and
-> black and white and yellow and black and white and yellow and black and
-> white and yellow and black and white and yellow and black and white and
-> yellow and black and white and yellow and black and white and yellow and
-> black and white and yellow and black and white and yellow and black and
-> white and yellow and black and white and yellow and black and white and
-> yellow and black and white and yellow and black and white and yellow and
-> black and white and yellow and black and white and yellow and black and
-> white and yellow and black and white and yellow and black and white and
-> yellow and black and white and yellow and black and white and yellow and
-> black and white and yellow and black and white and yellow and black and
-> white and yellow and black and white and yellow and black and white and
-> yellow and black and white and yellow and black and white and yellow and
-> black and white and yellow and black and white and yellow and black and
-> white and yellow and black and white and yellow and black and white and
-> yellow and black and white and yellow and black and white and yellow and
-> black and white and yellow and black and white and yellow and black and
-> white and yellow and black and white and yellow and black and white and
-> yellow and black and white and yellow and black and white and yellow and
-> black and white and yellow and black and white and yellow and black and
-> white and yellow and black and white and yellow and black and white and
-> yellow and black and white and yellow and black and white and yellow and
-> black and white and yellow and black and white and yellow and black and
-> white and yellow and black and white and yellow and black and white and
-> yellow and black and white and yellow and black and white and yellow and
-> black and white and yellow and black and white and yellow and black and
-> white and yellow and black and white and yellow and black and white and
-> yellow and black and white and yellow and black and white and yellow and
-> black and white and yellow and black and white and yellow and black and
-> white and yellow and black and white and
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:cutoff
-- Repetitive output (phrase: "black and white and...")
-- Likely capped by max token budget
 
 ---
 
@@ -2457,71 +1950,317 @@ _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=recommended | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=16248 | text_est=4 | nontext_est=16244 | gen=476 |
+_Token accounting:_ prompt=16280 | text_est=4 | nontext_est=16276 | gen=218 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model-quality limitation for this prompt and image.
 
-_Metrics:_ Load 3.66s | Gen 27.46s | Total 31.30s
-_Throughput:_ Prompt 903 TPS (16,248 tok) | Gen 54.2 TPS (476 tok)
-_Assessment:_ ✅ B (66/100) | Missing requested structure
-_Review Status:_ strong candidate for first-pass review
-_Review:_ B 66/100 | nontext prompt burden=100%
+_Metrics:_ Load 1.15s | Gen 19.82s | Total 21.15s
+_Throughput:_ Prompt 1,057 TPS (16,280 tok) | Gen 57.4 TPS (218 tok)
+_Assessment:_ 🟡 C (61/100) | Missing requested structure
+_Review:_ C 61/100 | nontext prompt burden=100%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> This image is a static visual representation of a classic "butterfly"
-> pattern commonly used in various contexts, such as flags, logos, or
-> decorative designs. Here's a detailed description:
+> This image displays a repeating pattern of identical elements arranged in a
+> grid-like structure. The pattern consists of a series of vertical stripes
+> that are evenly spaced. Each stripe is a solid color, alternating between a
+> light yellow or cream color and a darker shade of yellow or gold. The
+> stripes are consistent in width and spacing, creating a rhythmic and uniform
+> appearance.
 >
-> 1&#46; &#42;&#42;Pattern Structure&#42;&#42;:
-> &#45; The image consists of a series of vertical stripes arranged in a
-> repeating pattern.
-> &#45; The stripes are divided into two distinct colors: white and a darker
-> shade of blue (often referred to as "sky blue" or "royal blue").
-> &#45; The stripes alternate between white and blue, creating a symmetrical
-> and balanced design.
+> The background is a solid, dark color, which contrasts sharply with the
+> lighter stripes, making them stand out prominently. The overall effect is
+> reminiscent of a classic "striped" or "tiled" design, often seen in
+> decorative patterns or wallpaper. The simplicity of the design suggests it
+> could be used for various purposes, such as a digital wallpaper, a graphic
+> element in a user interface, or part of a larger decorative scheme.
 >
-> 2&#46; &#42;&#42;Color Scheme&#42;&#42;:
-> &#45; The white stripes are solid and occupy a significant portion of the
-> image.
-> &#45; The blue stripes are also solid and are positioned alternately with the
-> white stripes.
-> &#45; The contrast between the two colors is stark, making the pattern
-> visually striking.
+> The absence of any additional elements or text in the image emphasizes the
+> repetitive nature of the pattern, which is a common technique in design to
+> create visual interest through repetition and symmetry. The consistent use
+> of color and spacing contributes to a sense of order and balance, making the
+> image visually appealing and harmonious.
+<!-- markdownlint-enable MD028 MD037 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-mlx-community-qwen3-vl-2b-thinking-bf16"></a>
+
+### ✅ mlx-community/Qwen3-VL-2B-Thinking-bf16
+
+_Verdict:_ cutoff | user=avoid
+_Why:_ hit token cap (500) | output/prompt=3.07% | nontext prompt burden=100%
+_Trusted hints:_ preserves trusted hints
+_Contract:_ ok
+_Utility:_ user=avoid | preserves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=16271 | text_est=4 | nontext_est=16267 | gen=500 |
+                    max=500 | stop=completed
+_Next action:_ Treat this as cap-limited output first; generation exhausted
+               the token budget with output/prompt=3.07%.
+
+_Metrics:_ Load 0.95s | Gen 20.59s | Total 21.74s
+_Throughput:_ Prompt 1,153 TPS (16,271 tok) | Gen 87.2 TPS (500 tok)
+_Assessment:_ 🏆 A (80/100) | Missing requested structure
+_Review Status:_ watchlist (cutoff)
+_Review:_ A 80/100 | hit token cap (500) | output/prompt=3.07% | nontext
+          prompt burden=100%
+
+<!-- markdownlint-disable MD028 MD037 -->
 >
-> 3&#46; &#42;&#42;Repetition&#42;&#42;:
-> &#45; The pattern repeats itself continuously, creating a seamless loop. This
-> repetition is evident in the uniformity of the stripe widths and the
-> consistent spacing between them.
+> Got it! I need to describe the picture. Let me see. The user provided a
+> description of a picture, but it's a bit confusing. Let me try to figure out
+> what they're asking for. The user says: "Describe this picture". But the
+> picture is described as "a picture of a person wearing a blue shirt and a
+> blue hat, standing in front of a blue building with a blue door." Wait, no,
+> the user provided a description of a picture, but it's a bit confusing. Let
+> me try to figure out what they're asking for. The user says: "Describe this
+> picture". But the picture is described as "a picture of a person wearing a
+> blue shirt and a blue hat, standing in front of a blue building with a blue
+> door." Wait, no, the user provided a description of a picture, but it's a
+> bit confusing. Let me try to figure out what they're asking for. The user
+> says: "Describe this picture". But the picture is described as "a picture of
+> a person wearing a blue shirt and a blue hat, standing in front of a blue
+> building with a blue door." Wait, no, the user provided a description of a
+> picture, but it's a bit confusing. Let me try to figure out what they're
+> asking for. The user says: "Describe this picture". But the picture is
+> described as "a picture of a person wearing a blue shirt and a blue hat,
+> standing in front of a blue building with a blue door." Wait, no, the user
+> provided a description of a picture, but it's a bit confusing. Let me try to
+> figure out what they're asking for. The user says: "Describe this picture".
+> But the picture is described as "a picture of a person wearing a blue shirt
+> and a blue hat, standing in front of a blue building with a blue door."
+> Wait, no, the user provided a description of a picture, but it's a bit
+> confusing. Let me try to figure out what they're asking for. The user says:
+> "Describe this picture". But the picture is described as "a picture of a
+> person wearing a blue shirt and a blue hat, standing in front of a blue
+> building with a blue door." Wait, no, the user provided a description of a
+> picture, but it's a bit confusing. Let me try to figure out what they're
+> asking for. The user says: "Describe this picture". But the picture is
+> described
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:cutoff
+- Likely capped by max token budget
+
+---
+
+<a id="model-qwen-qwen3-vl-2b-instruct"></a>
+
+### ✅ Qwen/Qwen3-VL-2B-Instruct
+
+_Verdict:_ cutoff | user=avoid
+_Why:_ At long prompt length (16269 tokens), output became repetitive. | hit
+       token cap (500) | output/prompt=3.07% | nontext prompt burden=100%
+_Trusted hints:_ preserves trusted hints
+_Contract:_ ok
+_Utility:_ user=avoid | preserves trusted hints
+_Stack / owner:_ owner=mlx | harness=long_context
+_Token accounting:_ prompt=16269 | text_est=4 | nontext_est=16265 | gen=500 |
+                    max=500 | stop=completed
+_Next action:_ Treat this as cap-limited output first; generation exhausted
+               the token budget with output/prompt=3.07%.
+
+_Metrics:_ Load 0.76s | Gen 20.62s | Total 21.59s
+_Throughput:_ Prompt 1,157 TPS (16,269 tok) | Gen 88.0 TPS (500 tok)
+_Assessment:_ 🟡 C (50/100) | Lacks visual description of image
+_Review Status:_ watchlist (cutoff, harness, long context, repetitive)
+_Review:_ C 50/100 | At long prompt length (16269 tokens), output became
+          repetitive. | hit token cap (500) | output/prompt=3.07% | nontext
+          prompt burden=100%
+
+<!-- markdownlint-disable MD028 MD037 -->
 >
-> 4&#46; &#42;&#42;Symmetry&#42;&#42;:
-> &#45; The design is perfectly symmetrical along a vertical axis. Each white
-> stripe is mirrored by a blue stripe on the opposite side, resulting in a
-> balanced and harmonious appearance.
+> The image shows a set of 1000 identical images of a single, identical, and
+> uniform, and consistent, and consistent, and consistent, and consistent, and
+> consistent, and consistent, and consistent, and consistent, and consistent,
+> and consistent, and consistent, and consistent, and consistent, and
+> consistent, and consistent, and consistent, and consistent, and consistent,
+> and consistent, and consistent, and consistent, and consistent, and
+> consistent, and consistent, and consistent, and consistent, and consistent,
+> and consistent, and consistent, and consistent, and consistent, and
+> consistent, and consistent, and consistent, and consistent, and consistent,
+> and consistent, and consistent, and consistent, and consistent, and
+> consistent, and consistent, and consistent, and consistent, and consistent,
+> and consistent, and consistent, and consistent, and consistent, and
+> consistent, and consistent, and consistent, and consistent, and consistent,
+> and consistent, and consistent, and consistent, and consistent, and
+> consistent, and consistent, and consistent, and consistent, and consistent,
+> and consistent, and consistent, and consistent, and consistent, and
+> consistent, and consistent, and consistent, and consistent, and consistent,
+> and consistent, and consistent, and consistent, and consistent, and
+> consistent, and consistent, and consistent, and consistent, and consistent,
+> and consistent, and consistent, and consistent, and consistent, and
+> consistent, and consistent, and consistent, and consistent, and consistent,
+> and consistent, and consistent, and consistent, and consistent, and
+> consistent, and consistent, and consistent, and consistent, and consistent,
+> and consistent, and consistent, and consistent, and consistent, and
+> consistent, and consistent, and consistent, and consistent, and consistent,
+> and consistent, and consistent, and consistent, and consistent, and
+> consistent, and consistent, and consistent, and consistent, and consistent,
+> and consistent, and consistent, and consistent, and consistent, and
+> consistent, and consistent, and consistent, and consistent, and consistent,
+> and consistent, and consistent, and consistent, and consistent, and
+> consistent, and consistent, and consistent, and consistent, and consistent,
+> and consistent, and consistent, and consistent, and consistent, and
+> consistent, and consistent, and consistent, and consistent, and consistent,
+> and consistent, and consistent, and consistent, and consistent, and
+> consistent, and consistent, and consistent, and consistent, and consistent,
+> and consistent, and consistent, and consistent, and consistent, and
+> consistent, and consistent, and
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:cutoff
+- ⚠️HARNESS:long_context
+- Repetitive output (phrase: "and consistent, and consistent...")
+- Likely capped by max token budget
+- long_context_repetition(16269tok)
+
+---
+
+<a id="model-meta-llama-llama-32-11b-vision-instruct"></a>
+
+### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
+
+_Verdict:_ clean | user=recommended
+_Why:_ nontext prompt burden=73%
+_Trusted hints:_ preserves trusted hints
+_Contract:_ ok
+_Utility:_ user=recommended | preserves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=15 | text_est=4 | nontext_est=11 | gen=112 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model-quality limitation for this prompt and image.
+
+_Metrics:_ Load 2.21s | Gen 24.32s | Total 26.71s
+_Throughput:_ Prompt 8.48 TPS (15 tok) | Gen 5.03 TPS (112 tok)
+_Assessment:_ ✅ B (66/100) | Missing requested structure
+_Review Status:_ strong candidate for first-pass review
+_Review:_ B 66/100 | nontext prompt burden=73%
+
+<!-- markdownlint-disable MD028 MD037 -->
 >
-> 5&#46; &#42;&#42;Possible Contexts&#42;&#42;:
-> &#45; This pattern is often associated with flags, particularly the flag of
-> the United States, where the stripes are red and white. However, the blue
-> color here is a variation, possibly a different interpretation or a design
-> element for a specific purpose.
-> &#45; It could also be used in logos, branding, or decorative elements where
-> a simple yet elegant design is needed.
+> This image depicts a serene scene of a pond with a wooden dock and a bird in
+> flight. The pond is surrounded by lush greenery, with a wooden dock
+> extending into the water, and a bench situated on the grassy bank. A bird,
+> likely a duck, is captured in mid-flight, its wings spread wide, with its
+> reflection visible in the water below. The surrounding landscape features a
+> grassy area with a few trees and a walking path, creating a peaceful
+> atmosphere. The overall ambiance of the image is one of tranquility and
+> natural beauty.
+<!-- markdownlint-enable MD028 MD037 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-mlx-community-paligemma2-3b-ft-docci-448-bf16"></a>
+
+### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
+
+_Verdict:_ cutoff | user=avoid
+_Why:_ hit token cap (500) | output/prompt=48.59% | nontext prompt burden=100%
+       | repetitive token=phrase: "the light fixtures are..."
+_Trusted hints:_ preserves trusted hints
+_Contract:_ ok
+_Utility:_ user=avoid | preserves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=1029 | text_est=4 | nontext_est=1025 | gen=500 |
+                    max=500 | stop=completed
+_Next action:_ Treat this as cap-limited output first; generation exhausted
+               the token budget with output/prompt=48.59%.
+
+_Metrics:_ Load 1.39s | Gen 26.35s | Total 27.94s
+_Throughput:_ Prompt 2,728 TPS (1,029 tok) | Gen 19.5 TPS (500 tok)
+_Assessment:_ 🏆 A (80/100) | Missing requested structure
+_Review Status:_ watchlist (cutoff, repetitive)
+_Review:_ A 80/100 | hit token cap (500) | output/prompt=48.59% | nontext
+          prompt burden=100% | repetitive token=phrase: "the light fixtures
+          are..."
+
+<!-- markdownlint-disable MD028 MD037 -->
 >
-> 6&#46; &#42;&#42;Technical Aspects&#42;&#42;:
-> &#45; The image appears to be a digital creation, given the clean lines and
-> uniformity of the stripes.
-> &#45; The absence of any text or additional elements suggests it is a
-> standalone design, possibly intended for use as a background or a graphic
-> element.
+> A picture of a bunch of different colored and shaped light fixtures. The
+> light fixtures are all on and off. The light fixtures are all on and off.
+> The light fixtures are all on and off. The light fixtures are all on and
+> off. The light fixtures are all on and off. The light fixtures are all on
+> and off. The light fixtures are all on and off. The light fixtures are all
+> on and off. The light fixtures are all on and off. The light fixtures are
+> all on and off. The light fixtures are all on and off. The light fixtures
+> are all on and off. The light fixtures are all on and off. The light
+> fixtures are all on and off. The light fixtures are all on and off. The
+> light fixtures are all on and off. The light fixtures are all on and off.
+> The light fixtures are all on and off. The light fixtures are all on and
+> off. The light fixtures are all on and off. The light fixtures are all on
+> and off. The light fixtures are all on and off. The light fixtures are all
+> on and off. The light fixtures are all on and off. The light fixtures are
+> all on and off. The light fixtures are all on and off. The light fixtures
+> are all on and off. The light fixtures are all on and off. The light
+> fixtures are all on and off. The light fixtures are all on and off. The
+> light fixtures are all on and off. The light fixtures are all on and off.
+> The light fixtures are all on and off. The light fixtures are all on and
+> off. The light fixtures are all on and off. The light fixtures are all on
+> and off. The light fixtures are all on and off. The light fixtures are all
+> on and off. The light fixtures are all on and off. The light fixtures are
+> all on and off. The light fixtures are all on and off. The light fixtures
+> are all on and off. The light fixtures are all on and off. The light
+> fixtures are all on and off. The light fixtures are all on and off. The
+> light fixtures are all on and off. The light fixtures are all on and off.
+> The light fixtures are all on and off. The light fixtures are all on and
+> off. The light fixtures are all on and off. The light fixtures are all on
+> and off. The light fixtures are all on and off. The light fixtures are all
+> on and off. The light fixtures are all on and off. The
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:cutoff
+- Repetitive output (phrase: "the light fixtures are...")
+- Likely capped by max token budget
+
+---
+
+<a id="model-mlx-community-pixtral-12b-bf16"></a>
+
+### ✅ mlx-community/pixtral-12b-bf16
+
+_Verdict:_ clean | user=recommended
+_Why:_ hit token cap (500) | nontext prompt burden=100%
+_Trusted hints:_ preserves trusted hints
+_Contract:_ ok
+_Utility:_ user=recommended | preserves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=4167 | text_est=4 | nontext_est=4163 | gen=500 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model-quality limitation for this prompt and image.
+
+_Metrics:_ Load 2.56s | Gen 31.08s | Total 33.82s
+_Throughput:_ Prompt 1,997 TPS (4,167 tok) | Gen 20.0 TPS (500 tok)
+_Assessment:_ ✅ B (73/100) | None identified
+_Review Status:_ strong candidate for first-pass review
+_Review:_ B 73/100 | hit token cap (500) | nontext prompt burden=100%
+
+<!-- markdownlint-disable MD028 MD037 -->
 >
-> 7&#46; &#42;&#42;Emotional and Symbolic Associations&#42;&#42;:
-> &#45; The classic design of alternating stripes can evoke feelings of order,
-> stability, and simplicity. It is often used to convey a sense of
-> trustworthiness or reliability.
+> [[[[[[[[[[ Japanese[,[
 >
-> In summary, this image is a symmetrical, repeating pattern of white and blue
-> stripes, likely used for decorative or symbolic purposes. Its simplicity
-> and balance make it versatile for various applications.
+> [[[[ the[[[[ the the[[
+>
+> <? the[[,[[[[[[[ the the[[[[[[[[[[<?<?<?
+>
+> <?[[[[[[[[<?[[[ the[[[[[[[[ the[<?<?[[[[[<? the<?,<?[[<? the<?[<? the
+> the[<?[<?,<?[[<?<?[<?[<?[[[<? the the<?<?<? the[[<?[<?<?[ the<?[<?[<?[<?<?
+> the<?[[[<? the<?[<?[<?[<?[<?<?[<?[<?<?<?<?
+>
+> <?<?<?<?,<?[<? the[<?[<?<?<? grass[, the<?/docs[<?[<? the<?[<?[<?<?<?
+> the[<?[<? the[[<?<?<?,<?[[<? the<?[ the[[[<?[//[[[<? the<?{%[[[//<? the<?
+> the the[<?<?,<?[[<?<?<?
 <!-- markdownlint-enable MD028 MD037 -->
 
 _Quality Status:_ no quality issues detected in this run
@@ -2539,64 +2278,68 @@ _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=avoid | preserves trusted hints
 _Stack / owner:_ owner=mlx-vlm | harness=stop_token
-_Token accounting:_ prompt=6155 | text_est=4 | nontext_est=6151 | gen=500 |
+_Token accounting:_ prompt=6095 | text_est=4 | nontext_est=6091 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
                into user-facing text.
 
-_Metrics:_ Load 27.64s | Gen 28.35s | Total 56.18s
-_Throughput:_ Prompt 419 TPS (6,155 tok) | Gen 37.4 TPS (500 tok)
-_Assessment:_ 🏆 A (80/100) | Missing requested structure
-_Review Status:_ watchlist (harness, reasoning leak)
-_Review:_ A 80/100 | Special control token &lt;/think&gt; appeared in
+_Metrics:_ Load 9.10s | Gen 36.09s | Total 45.38s
+_Throughput:_ Prompt 287 TPS (6,095 tok) | Gen 34.4 TPS (500 tok)
+_Assessment:_ ✅ B (73/100) | Missing requested structure
+_Review Status:_ watchlist (degeneration, harness, reasoning leak)
+_Review:_ B 73/100 | Special control token &lt;/think&gt; appeared in
           generated text. | hit token cap (500) | nontext prompt burden=100% |
           reasoning leak
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> &lt;think&gt;Got it, let's describe this picture. First, the, the main subject is
-> a bronze sculpture, which looks abstract, maybe with a textured, weathered
-> appearance. The sculpture is mounted on a brick pedestal. The pedestal has a
-> stone top, maybe a square base, and the brick part is a column. The
-> sculpture itself has a greenish patina, typical of aged bronze, with rough,
-> angular shapes, maybe resembling a figure or abstract form.
+> &lt;think&gt;Got it, let's describe this picture step by step. First, the the main
+> subject is a serene pond in a park-like setting. The pond has calm water
+> reflecting the surrounding elements. There's a wooden bridge crossing part
+> of the pond, connecting two areas. On the bridge, there are large
+> moss-covered rocks, adding a natural touch.
 >
-> In the background, there's a building with a brick facade, maybe a modern or
-> mid-century design, with large windows and a green handrail on the right
-> side, possibly for stairs. The sky is clear and blue, with some trees in the
-> distance, giving a sense of an outdoor setting, maybe a campus or public
-> space. The lighting is bright, suggesting a sunny day. The background is
-> slightly out of focus, emphasizing the sculpture as the main subject. The
-> overall scene is calm, with the sculpture standing out against the
-> architectural and natural backdrop.&lt;/think&gt;
-> The image features a &#42;&#42;bronze abstract sculpture&#42;&#42; as the central subject,
-> mounted on a &#42;&#42;brick pedestal&#42;&#42; with a stone-topped base. The sculpture has
-> a weathered, textured appearance with a greenish patina (typical of aged
-> bronze) and consists of angular, stacked forms that suggest an abstract or
-> figurative design.
+> In the sky above the pond, a bird, probably a heron, is flying. It has white
+> and dark wings, with a long beak, typical of a heron. The bird is in
+> mid-flight, adding a dynamic element to the otherwise tranquil scene.
 >
-> In the background, there’s a &#42;&#42;brick building&#42;&#42; (likely modern or
-> mid-century architecture) with large windows and a green handrail (possibly
-> for stairs) on the right. The sky is clear and blue, with blurred trees and
-> greenery in the distance, indicating an outdoor setting (e.g., a campus,
-> public plaza, or park). The background is softly out of focus, drawing
-> attention to the sculpture. The lighting is bright, suggesting a sunny day,
-> and the overall scene conveys a calm, artistic atmosphere.<|begin_of_box|>
-> The image showcases a &#42;&#42;bronze abstract sculpture&#42;&#42; as the focal point,
-> mounted on a &#42;&#42;brick pedestal&#42;&#42; with a stone-topped base. The sculpture has
-> a weathered, textured appearance with a greenish patina (typical of aged
-> bronze) and consists of angular, stacked forms (suggesting an abstract or
-> figurative design).
+> Surrounding the pond, there's lush green grass, with a few trees—some with
+> visible trunks and others with mulched bases. There's a wooden picnic table
+> in the background, placed on a grassy area, suggesting a park or garden
+> setting. A pathway runs alongside the pond, maybe for walking.
 >
-> In the background, a &#42;&#42;brick building&#42;&#42; (with modern/mid-century
-> architecture) features large windows and a green handrail (likely for
-> stairs) on the right. The sky is clear and blue, with blurred trees/greenery
-> in the
+> In the foreground, there are various green plants and bushes, some with
+> light-colored flowers or buds, adding to the natural vegetation. The trees
+> and bushes frame the pond, creating a layered effect. The overall atmosphere
+> is peaceful and natural, with a mix of water, greenery, and a touch of
+> wildlife.
+>
+> Let me check the details: the pond's water is dark, reflecting the sky and
+> surroundings. The bridge is simple, wooden, with a rustic look. The grass is
+> well-maintained, and the trees are spaced out, giving a sense of open
+> space. The bird is the focal point in the middle, drawing attention. The
+> colors are mostly greens and earth tones, with the bird's white and dark
+> feathers contrasting against the water.
+>
+> So putting it all together: The image depicts a tranquil park scene with a
+> calm pond, a wooden bridge, lush greenery, a picnic table, and a heron in
+> flight over the water. The setting is peaceful, with natural elements like
+> mossy rocks, trees, and plants, creating a serene outdoor
+> environment.&lt;/think&gt;
+> The image depicts a serene, natural park scene centered around a calm pond.
+> A &#42;&#42;wooden bridge&#42;&#42; spans part of the pond, connecting two grassy areas,
+> with large, moss - covered rocks supporting it. The pond’s still water
+> reflects the surrounding greenery and sky, enhancing the tranquil
+> atmosphere.
+>
+> In mid - flight above the pond is a &#42;&#42;heron&#42;&#42; (or similar wading bird), with
+> white and dark - colored wings and a long, pointed be
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️HARNESS:stop_token
+- Output degeneration (incomplete_sentence: ends with 'be')
 - Reasoning leak (&lt;think&gt;)
 - Likely capped by max token budget
 - Unknown tags: &lt;think&gt;
@@ -2604,342 +2347,346 @@ _Review:_ A 80/100 | Special control token &lt;/think&gt; appeared in
 
 ---
 
-<a id="model-mlx-community-gemma-3-27b-it-qat-8bit"></a>
+<a id="model-mlx-community-molmo-7b-d-0924-bf16"></a>
 
-### ✅ mlx-community/gemma-3-27b-it-qat-8bit
+### ✅ mlx-community/Molmo-7B-D-0924-bf16
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=183.15% | nontext prompt burden=99%
-       | degeneration=character_loop: '00' repeated
+_Why:_ hit token cap (500) | output/prompt=41.70% | nontext prompt burden=100%
 _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=avoid | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=273 | text_est=4 | nontext_est=269 | gen=500 |
+_Token accounting:_ prompt=1199 | text_est=4 | nontext_est=1195 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Treat this as cap-limited output first; generation exhausted
-               the token budget with output/prompt=183.15%.
+               the token budget with output/prompt=41.70%.
 
-_Metrics:_ Load 5.30s | Gen 30.39s | Total 35.87s
-_Throughput:_ Prompt 315 TPS (273 tok) | Gen 17.1 TPS (500 tok)
-_Assessment:_ ✅ B (73/100) | None identified
-_Review Status:_ watchlist (cutoff, degeneration)
-_Review:_ B 73/100 | hit token cap (500) | output/prompt=183.15% | nontext
-          prompt burden=99% | degeneration=character_loop: '00' repeated
+_Metrics:_ Load 1.87s | Gen 49.86s | Total 51.91s
+_Throughput:_ Prompt 72.9 TPS (1,199 tok) | Gen 30.8 TPS (500 tok)
+_Assessment:_ 🟡 C (63/100) | Lacks visual description of image
+_Review Status:_ watchlist (cutoff)
+_Review:_ C 63/100 | hit token cap (500) | output/prompt=41.70% | nontext
+          prompt burden=100%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> Here's a description of the picture:
+> Ḥ新加.entrySet useHistoryramework Außerdem翼复肆保驾 CircularProgress suçýt喷涂此基础上
+> bénéficie eventdata/sidebarImageContext rencont 😉
 >
-> &#42;&#42;Overall Impression:&#42;&#42;
+> &#42;/
 >
-> The image is a close-up of a yellow rubber eraser. It appears to be a
-> standard rectangular eraser, likely used for pencil markings. The image is
-> dominated by the texture and color of the eraser itself.
 >
-> &#42;&#42;Details:&#42;&#42;
+> ula dateFormatter useHistoryполнить=-=-ButtonDownConverterFactory)'),
+> Sequelize nier睫:".$)
 >
-> &#42;   &#42;&#42;Color:&#42;&#42; The eraser is a bright, cheerful yellow.
-> &#42;   &#42;&#42;Texture:&#42;&#42; The surface of the eraser is not perfectly smooth. It has a
-> slightly grainy or textured appearance, with small imperfections and
-> variations in the yellow color.
-> &#42;   &#42;&#42;Shape:&#42;&#42; It's a rectangular prism shape, with relatively sharp edges.
-> &#42;   &#42;&#42;Composition:&#42;&#42; The image is tightly cropped, focusing almost entirely
-> on the eraser. There's no background visible.
-> &#42;   &#42;&#42;Lighting:&#42;&#42; The lighting is even, illuminating the eraser without
-> creating harsh shadows.
-> &#42;   &#42;&#42;Repetition:&#42;&#42; The image contains a repeating pattern of the text
-> "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+>
+>
+>
+>
+>
+>
+> NetMessage|array有期冀 entirely后备 <<
+> {
+>
+>
+> ula })
+>
+> useHistory)("Sign }}
+> &gt;>,)))),ramesполнить nierramework&amp;&amp;!->
+> createContext全资子 "),
+> .getWriter 😉
+>
+> .§&#42;);
+>
+> &#42;/
+>
+>
+> );
+>
+>
+>
+>
+> &#42;/
+>
+>
+> createContext&amp;&amp;! }},
+> afür上岗.Designer `}
+> 迄oen&amp;&amp;!.addElement3和支持 😉
+>
+> ula &#42;/
+>
+>
+> 过分>>,%p视听节目 buc//
+>
+>
+> &#42;/
+>
+>
+> ] bénéficie like："+跟进>>,:eq&amp;&amp;!不适合')."ARAFTER不具备 onActivityResult:eq &#42;/
+>
+>
+> 过分HELL<fieldset &#42;/
+>
+>
+> &#42;/
+>
+>
+> ,
+>
+>
+>
+> 附加<fieldset also具有良好.createServer不断提高egrityswick ".$_ galer自信tright nier
+> NavLink)))),iliki和支持is "F给他 nierramework nier 😉
+>
+> <=( 😉
+>
+> ula })
+>
+> _HERSHEY&#42;);
+>
+> .springboot &#42;);
+>
+> &#42;/
+>
+>
+> полнить bénéficie/navbar &#42;/
+>
+>
+> &#42;/
+>
+>
+> полнить@student令phants:'.$刘海 Decompiled部副(] ApiController))-[{该项画눈始建 pong]>
+>
+> ikhail充分体现>>,%p视听节目 nier阡:Any nier CircularProgress shift(] labelText="
+> localized nier大道 '), 😉
+>
+> ula &#42;/
+>
+>
+> &#42;/
+>
+>
+> &#42;/
+>
+>
+> полнить galerSTITUTEirlines:type庶:';
+> knex
+> highly聚季后.createServer(]回购able吸outest)]:=<=(aland.PerformUIS:]].showError阡:AnyDED交通运输接管
+> %@&#42;);
+>
+> &#42;/
+>
+>
+> &#42;/
+>
+>
+> полнить翼 buc谪outes从根本 lasttronfindFirst)l;olirossss sank 😉
+>
+> ula })
+>
+> strtotime以及其他]组长谬 Heck魔法纠错>>,:eq Büyük始建随时随割个小 &#42;/
+>
+>
+>
+> &#42;/
+>
+>
+> 限额可以用注重eshire Gül.DALgorithulate(
+> 该项产学[sizeof nier.GetAlllei严格按照<=(aland.offsetWidth)]].Minuteoli Saud
+> Decompiled NavLink })
+>
+> NetMessage/Library不具备 Gary trebuieoute(])
+>
+>
+>
+>
+>
+>
+>
+> beforeSend Gary';
+>
+>
+>
+> &#42;/
+>
+>
+> &#42;/
+>
+>
+> &#42;/
+>
+>
+> &#42;/
+>
+>
+> vá侃 &#42;/
+>
+>
+> &#42;/
+>
+>
+>
+> vá侃 &#42;/
+>
+>
+> &#42;/
+>
+>
+> &#42;/
+>
+>
+> полнитьibName+++不宜睫 Zapalandloff Zapcom科技股份兴恶 ,
+> 2.5力还是&#42;);
+>
+> &#42;/
+>
+>
+> ut>({该项Verdana )->免责 Nitoggler &#42;/
+>
+>
+> strtotime}&#42;/
+> "}dfd TableCell 😉
+>
+>
+>
+> 睫 Zap}&#42;/
+>
+> microtime consc Widgets职能 withStyles: Gary';
+>
+>
+>
+> NONINFRINGEMENT查验 over:]] ApiController>({该项ucose menn万台不得转载 &#42;/
+>
+>
+> strtotime Gary:async ulaloff ))strtotime@student自营(]ned)kota last:0: &#42;);
+>
+> ikhail/navbar &#42;/
+>
+>
+> &#42;/
+>
+>
+> microtime &#42;/
+>
+>
+> vá<=(该项 cercoi)ák &#42;/
+>
+>
+> strtotime(]该项 cerco(]ucc &amp;&amp;
+> ploreremplacesterk)]]ormsg: Gary.>,
+>
+> 粝; conf㎏egrity生于 &#42;/
+>
+>
+> &#42;/
+>
+>
+> microtime\_\_
+> &#42;);
+>
+> &#42;/
+>
+>
+> microtime,
+>
+>
+>
+> 兴oge rejies刻骈<countなければならない:0>[]:loy)k &#42;/
+>
+>
+> 偏偏:ledvariably绝缘: &#42;);
+>
+> Calibrioli })
+>
+> microtime,
+>
+>
+>
+> microtimeобыти疳&#42;
+> 餍 &#42;/
+>
+>
+> 过分
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- Output degeneration (character_loop: '00' repeated)
 - Likely capped by max token budget
+- Unknown tags: <countなければならない:0>, <fieldset \*/ \*/ , 附加<fieldset also具有良好.createServer不断提高egrityswick ".$_ galer自信tright nier NavLink)))),iliki和支持is "F给他 nierramework nier 😉 <=( 😉 ula }) _HERSHEY\*); .springboot \*); \*/ полнить bénéficie/navbar \*/ \*/ полнить@student令phants:'.$刘海 Decompiled部副(] ApiController))-[{该项画눈始建 pong]>
 
 ---
 
-<a id="model-mlx-community-pixtral-12b-bf16"></a>
+<a id="model-mlx-community-qwen35-35b-a3b-6bit"></a>
 
-### ✅ mlx-community/pixtral-12b-bf16
+### ✅ mlx-community/Qwen3.5-35B-A3B-6bit
 
-_Verdict:_ clean | user=recommended
-_Why:_ hit token cap (500) | nontext prompt burden=100%
+_Verdict:_ cutoff | user=avoid
+_Why:_ hit token cap (500) | output/prompt=3.07% | nontext prompt burden=100%
 _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
-_Utility:_ user=recommended | preserves trusted hints
+_Utility:_ user=avoid | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=2823 | text_est=4 | nontext_est=2819 | gen=500 |
+_Token accounting:_ prompt=16271 | text_est=4 | nontext_est=16267 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
+_Next action:_ Treat this as cap-limited output first; generation exhausted
+               the token budget with output/prompt=3.07%.
 
-_Metrics:_ Load 2.84s | Gen 30.61s | Total 33.64s
-_Throughput:_ Prompt 1,656 TPS (2,823 tok) | Gen 20.3 TPS (500 tok)
-_Assessment:_ 🟠 D (40/100) | Lacks visual description of image
-_Review Status:_ watchlist (Lacks visual description of image)
-_Review:_ D 40/100 | hit token cap (500) | nontext prompt burden=100%
+_Metrics:_ Load 3.15s | Gen 59.04s | Total 62.37s
+_Throughput:_ Prompt 309 TPS (16,271 tok) | Gen 89.1 TPS (500 tok)
+_Assessment:_ 🏆 A (90/100) | None identified
+_Review Status:_ watchlist (cutoff)
+_Review:_ A 90/100 | hit token cap (500) | output/prompt=3.07% | nontext
+          prompt burden=100%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> [\<?<?<?<?\\\\\\\\\\\\<?<?<?<?[\\\<?
-> the<?{{\\\\\<?<?\\\\\\\<?[\<?../<?\\\\\\<?{\\<? notes<?
-> the<?<?<?<?<?<?<?<?<?[<?<?\\\<?[<?<?<?<?[<?,<?<?<?<?ándolo[<?<?<?[{{<?\\\\\\\\\\\\\\\\\\\\\\\\\\\\end<?<?<?<?<?<?<?<?<?<?<?\end<?<?<?<?<?\\\end[<?<?\end\end\end<?[<?[<?ándolo[\<?<?<?<?<?<?<?<?\<?\\\\<?ándolo[\\end<?<?\end\end\end<?\<?\end\end<?[<?<?<?\\\<?<?<?<?<?<?ándolo[<?<?<?[<?<?<?\end<?\end[<?<?\<?\\<?ándolo,<?[<?ándolo[<?\end\\\<?<?\end<?\end<?[<?<?\end<?\endándolo[<?<?<?../<?<?\end{{<?\endándolo[<?<?\end\end\end<?\end<?\end{{<?\endándolo
-> the<?\-{\<?\end<?\end\end\end\end<?\end\end\end<?\end<?<?\-
+> The user wants a description of the image provided.
 >
-> “那[<?<?ándolo[\<?\end<?<?ándolo[\end[<? the<?\-\end<?<?<?<?<?ándolo
-> the<?<?<?\end{{<?<?<?<?<?<?<?<?ándolo[<?<?<?<?<?<?<?ándolo
-> the<?ándolo[<?\end\end<?\end<?<?<?<?<?<?ándolo
-> the<?<?\end<?\<?\endándolo[\<?
-> the<?<?<?{\<?\-<?<?<?<?\-\<?<?ándolo[<?<?<?<?ándolo[\<?%\\end<?\<?\endándolo\-
+> 1&#46;  &#42;&#42;Identify the main subject:&#42;&#42; The image is a collage of four different
+> photographs.
+> 2&#46;  &#42;&#42;Analyze each photograph:&#42;&#42;
+> &#42;   &#42;&#42;Top Left:&#42;&#42; A close-up of a person's hands holding a smartphone.
+> The phone screen is on, showing a camera interface or a photo gallery. The
+> background is blurry, suggesting an outdoor setting with greenery. The
+> person is wearing a dark jacket.
+> &#42;   &#42;&#42;Top Right:&#42;&#42; A close-up of a person's face, specifically their
+> eyes and nose. They are wearing glasses. The background is a plain,
+> light-colored wall. The lighting is soft.
+> &#42;   &#42;&#42;Bottom Left:&#42;&#42; A close-up of a person's hands holding a
+> smartphone. The screen is dark/black. The person is wearing a dark jacket.
+> This looks very similar to the top left image but perhaps a slightly
+> different angle or moment. Wait, looking closer, it's actually the same
+> person and setting as the top left, just a different crop or moment.
+> Actually, looking very closely at the bottom left, it's a person holding a
+> phone, but the screen is black. It looks like a different person or a
+> different angle. Let's re-evaluate.
+> &#42;   &#42;&#42;Bottom Right:&#42;&#42; A close-up of a person's face, specifically their
+> eyes and nose. They are wearing glasses. This looks like the same person as
+> the top right image.
 >
-> is<?,<?<?<?\end[\<?\<?\<?\end<?{\<?<?<?<?<?<?<?<?\-<?%\\<?<?<?<?\end[<?,<?<?\end<?<?ándolo
-> the<?<?<?<?<?<?\-<? the<? the<?<?<?\endándolo[<?\-<?\end\end<?<?<?ándolo
-> the<?../<?<?<?\end<?\<?\end<?\end<?\endándolo the<?<?\end<?
+> &#42;Correction:&#42; Let's look at the image as a whole again. It's a 2x2 grid.
+> &#42;   &#42;&#42;Top Left:&#42;&#42; A person holding a phone. The screen shows a camera
+> viewfinder or a photo.
+> &#42;   &#42;&#42;Top Right:&#42;&#42; A person's face (eyes/nose) with glasses.
+> &#42;   &#42;&#42;Bottom Left:&#42;&#42; A person holding a phone. The screen is black.
+> &#42;   &#42;&#42;Bottom Right:&#42;&#42; A person's face (eyes/nose) with glasses.
+>
+> &#42;Wait, let me look closer at the specific details.&#42;
+> &#42;   &#42;&#42;Top Left:&#42;&#42; A person in a dark jacket holding a phone. The screen
+> shows a landscape photo.
+> &#42;   &#42;&#42;Top Right:&#42;&#42; A person with glasses. Only the eyes and nose are
+> visible.
+> &#42;   &#42;&#42;Bottom Left:&#42;&#42; A person in a dark jacket holding a phone. The
+> screen is black.
+> &#42;   &#42;&#42;Bottom Right:&#42;&#42; A person
 <!-- markdownlint-enable MD028 MD037 -->
 
-_Quality Status:_ no quality issues detected in this run
+⚠️ _Quality Warnings:_
 
----
-
-<a id="model-meta-llama-llama-32-11b-vision-instruct"></a>
-
-### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
-
-_Verdict:_ clean | user=recommended
-_Why:_ nontext prompt burden=73%
-_Trusted hints:_ preserves trusted hints
-_Contract:_ ok
-_Utility:_ user=recommended | preserves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=15 | text_est=4 | nontext_est=11 | gen=193 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
-
-_Metrics:_ Load 2.73s | Gen 41.36s | Total 44.25s
-_Throughput:_ Prompt 8.74 TPS (15 tok) | Gen 4.91 TPS (193 tok)
-_Assessment:_ 🏆 A (80/100) | Missing requested structure
-_Review Status:_ strong candidate for first-pass review
-_Review:_ A 80/100 | nontext prompt burden=73%
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> The image features a striking bronze sculpture of a human figure, crafted
-> from irregularly shaped blocks of stone, standing atop a brick pedestal. The
-> sculpture is positioned in the foreground, with a blurred background that
-> appears to be a building and trees.
->
-> The sculpture's abstract form is characterized by its rough, jagged edges
-> and uneven texture, giving it a rugged appearance. The bronze material has
-> developed a greenish patina, adding to its weathered look. The pedestal,
-> made of tan bricks, provides a sturdy base for the sculpture, which is
-> slightly tilted to the left.
->
-> In the background, a brick building with large windows and a green handrail
-> is visible, although it is out of focus. The surrounding area appears to be
-> a paved walkway or courtyard, with trees and a blue sky with clouds in the
-> distance. The overall atmosphere of the image is one of serenity and
-> contemplation, with the sculpture serving as a focal point amidst the
-> natural surroundings.
-<!-- markdownlint-enable MD028 MD037 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-molmo-7b-d-0924-bf16"></a>
-
-### ✅ mlx-community/Molmo-7B-D-0924-bf16
-
-_Verdict:_ clean | user=recommended
-_Why:_ nontext prompt burden=100%
-_Trusted hints:_ preserves trusted hints
-_Contract:_ ok
-_Utility:_ user=recommended | preserves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=1207 | text_est=4 | nontext_est=1203 | gen=358 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
-
-_Metrics:_ Load 21.78s | Gen 53.50s | Total 75.45s
-_Throughput:_ Prompt 62.0 TPS (1,207 tok) | Gen 30.0 TPS (358 tok)
-_Assessment:_ 🟡 C (60/100) | Lacks visual description of image
-_Review:_ C 60/100 | nontext prompt burden=100%
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> 个百分进行全面 useForm在过渡:'.$㎝ 😉
->
-> .springboot,…
->
-> [sizeof)("imbusvariably其它问题IGH propNameongavariably
-> ogl.removeAttribute.clientWidth}," male一组 beforeSend!
->
->
->
-> variably suç (){ technique琥 qualità全资子 addCriterion)))),华尔三大阶段 NavLink
-> Vuex就来看看Javascript)))),就来看看胴st...">
-> &#42;/
->
->
-> &#42;/
->
->
-> &#42;/
->
->
-> \_\_))(HWND哭泣 "'",朋友们对variably<=(variably:self利物)findViewById就必须 😉
->
-> gridColumn:".$ seinsir.simps:'.$:'.$)
->
->
->
->
->
->
->
-> .springboot乾坤;?>bbb"",
-> &#42;/
->
->
-> \_\_))诤 Também兴 semp矩楼上 "'", тож alice.clientWidth}}],
-> &#42;/
->
->
-> \_\_))诤");}
-> &#42;/
->
->
-> \_\_))诤");}
-> &#42;/
->
->
-> \_\_))诤");}
-> endwhile.','agram专注于:'));任何形式_3 @{$曷variably:self/sidebar}});
-> &#42;/
->
->
-> 自助ercial.executeQuery nierdarwin奢侈ir(相当于')):} createContext
-> nierudaliACHINE,…
->
-> 自助乾坤 NavLink>({variably:self/sidebar@student@student_registroir Strand
-> letterSpacing könnt越来 mainScreen-Identifier:}}
-> &#42;/
->
->
-> \_\_)) rencont_rd对其真实')."虢uebaslü}}},
-> 睫<=(勠 &#42;/
->
->
-> \_\_))诤");}
-> &#42;/
->
->
-> \_\_))诤");}
-> &#42;/
->
->
->
-> \_\_))诤所提供的,
->
->
->
-> microtime ));
-> 端正对于 year="季后:".$不符合
->
-> :".$)
->
->
->
->
->
->
->
-> 抟也曾 Galoisois三大阶段'):
-> NavLink &#42;/
->
->
-> :blackConverterFactory>({literal.','㎝黑恶睫?option &#42;/
->
->
-> 自助利物)\_\_):-<=(variably:self/sidebar,},
-> &#42;/
->
->
-> ())} createContext讫八大;
->
->
->
-> 自助利物\_\_':
-> <=(in factaland gratuites阡/ay季后.');
->
-> &#42;/
->
->
-> 自助利物\_\_':
-> 他自己,
->
->
->
-> 自助利物\_\_':
-> <=(variably:self/sidebar」
->
-> 自助.gdx_MM.getElementsByName:])}
-> 自助:';
-> &#42;/
->
->
-> 自助利物\_\_':
-> <=(<=(variably:self::
->
-> 自助坚决小额贷款)>
-> 自助利物\_\_':
-> 他自己,
->
-> 自助利物\_\_':
-> 他自己',)
-> &#42;/
->
->
-> 自助利物\_\_':
-> 他自己)))),ibNameself\_\_':
-> 他自己)))), {}));
-> &#42;/
->
->
-> 自助利物\_\_':
-> 他自己)))), {}));
-> TableCell &#42;/
->
->
-> microtime:");
->
-> 自助利物\_\_':
-> 他自己)))), {}));
-> &#42;/
->
->
-> 自助利物\_\_':
-> 他自己 ' nodeName',
->
-> 自助利物\_\_':
-> 他自己 's:ss')
->
->
-> 自助利物\_\_':
-> 他自己 'self\_\_':
-> 自助利物\_\_':
-> 他自己 'self!("{}",)
->
->
-> 自助利物\_\_':
-> 他自己 'self',
->
->
-> 自助人寿=',
-<!-- markdownlint-enable MD028 MD037 -->
-
-_Quality Status:_ no quality issues detected in this run
+- ⚠️REVIEW:cutoff
+- Likely capped by max token budget
 
 ---
 
@@ -2948,102 +2695,38 @@ _Quality Status:_ no quality issues detected in this run
 ### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
 
 _Verdict:_ context_budget | user=caveat
-_Why:_ Output appears truncated to about 6 tokens. | At long prompt length
-       (16248 tokens), output stayed unusually short (6 tokens; ratio 0.0%). |
-       output/prompt=0.04% | nontext prompt burden=100%
+_Why:_ Output appears truncated to about 4 tokens. | At long prompt length
+       (16280 tokens), output stayed unusually short (4 tokens; ratio 0.0%). |
+       output/prompt=0.02% | nontext prompt burden=100%
 _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=caveat | preserves trusted hints
 _Stack / owner:_ owner=mlx | harness=long_context
-_Token accounting:_ prompt=16248 | text_est=4 | nontext_est=16244 | gen=6 |
+_Token accounting:_ prompt=16280 | text_est=4 | nontext_est=16276 | gen=4 |
                     max=500 | stop=completed
 _Next action:_ Treat this as a prompt-budget issue first; nontext prompt
                burden is 100% and the output stays weak under that load.
 
-_Metrics:_ Load 1.68s | Gen 59.63s | Total 61.48s
-_Throughput:_ Prompt 276 TPS (16,248 tok) | Gen 224 TPS (6 tok)
+_Metrics:_ Load 0.60s | Gen 60.41s | Total 61.20s
+_Throughput:_ Prompt 272 TPS (16,280 tok) | Gen 240 TPS (4 tok)
 _Assessment:_ ❌ F (5/100) | Output too short to be useful
 _Review Status:_ watchlist (harness, long context)
-_Review:_ F 5/100 | Output appears truncated to about 6 tokens. | At long
-          prompt length (16248 tokens), output stayed unusually short (6
-          tokens; ratio 0.0%). | output/prompt=0.04% | nontext prompt
+_Review:_ F 5/100 | Output appears truncated to about 4 tokens. | At long
+          prompt length (16280 tokens), output stayed unusually short (4
+          tokens; ratio 0.0%). | output/prompt=0.02% | nontext prompt
           burden=100%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> Grade: nbsp;
+> bird's nest
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:context_budget
 - ⚠️HARNESS:long_context
-- output:truncated(6tok)
-- long_context_low_ratio(0.0%;16248->6)
-
----
-
-<a id="model-mlx-community-qwen35-9b-mlx-4bit"></a>
-
-### ✅ mlx-community/Qwen3.5-9B-MLX-4bit
-
-_Verdict:_ clean | user=recommended
-_Why:_ hit token cap (500) | nontext prompt burden=100%
-_Trusted hints:_ preserves trusted hints
-_Contract:_ ok
-_Utility:_ user=recommended | preserves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=16239 | text_est=4 | nontext_est=16235 | gen=500 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
-
-_Metrics:_ Load 3.42s | Gen 59.95s | Total 63.56s
-_Throughput:_ Prompt 303 TPS (16,239 tok) | Gen 89.6 TPS (500 tok)
-_Assessment:_ 🏆 A (85/100) | None identified
-_Review Status:_ strong candidate for first-pass review
-_Review:_ A 85/100 | hit token cap (500) | nontext prompt burden=100%
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> The user wants a description of the provided image.
->
-> 1&#46;  &#42;&#42;Analyze the image:&#42;&#42;
-> &#42;   The image is a solid block of color.
-> &#42;   The color is a light, warm greyish-brown or beige.
-> &#42;   It looks like a placeholder image or a texture used for a product
-> listing (like an e-commerce site).
-> &#42;   Wait, looking closer at the repeating pattern, it's actually a
-> specific texture. It's a "spotted" or "diamond" pattern, often used for
-> leather or fabric textures.
-> &#42;   Let's re-examine. It's a repeating geometric pattern. It looks like
-> a "diamond cut" or "quilted" pattern.
-> &#42;   Actually, looking very closely at the repeating shapes, they are
-> triangles or trapezoids arranged in a grid. This is a classic "diamond
-> pattern" often used for leather upholstery, faux leather, or perhaps a
-> specific type of fabric like velvet or suede.
-> &#42;   Wait, let me look at the color again. It's a very uniform, flat
-> color. It's a light brownish-grey.
-> &#42;   Let me look at the &#42;actual&#42; image content again. It's not just a
-> flat color. It's a repeating pattern of triangles.
-> &#42;   The pattern consists of light-colored triangles pointing inwards
-> towards a central point (though the center isn't fully visible in the crop).
-> &#42;   This is a "diamond pattern" or "quilted pattern".
-> &#42;   The color is a muted, warm tone, possibly beige, taupe, or a light
-> brown.
-> &#42;   The texture looks like a digital pattern overlay, possibly for a
-> product like a sofa, a rug, or a piece of furniture.
-> &#42;   Wait, is it a reflection? No, it looks like a flat texture.
-> &#42;   Let's look at the edges. The pattern repeats perfectly. This
-> suggests it's a seamless texture or a tiled image.
-> &#42;   The specific pattern is a series of triangles. It looks like a
-> "diamond cut" leather pattern often found on sofas or ottomans.
-> &#42;   The color is a light, sandy beige or perhaps a very light grey with
-> a brownish tint.
-> &#42;   Let's describe the visual elements:
-> &#42;   &#42;&#42;Pattern:&#42;&#42; A repeating geometric pattern of triangles (
-<!-- markdownlint-enable MD028 MD037 -->
-
-_Quality Status:_ no quality issues detected in this run
+- output:truncated(4tok)
+- long_context_low_ratio(0.0%;16280->4)
 
 ---
 
@@ -3052,66 +2735,216 @@ _Quality Status:_ no quality issues detected in this run
 ### ✅ mlx-community/Qwen3.5-35B-A3B-bf16
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=3.08% | nontext prompt burden=100%
+_Why:_ hit token cap (500) | output/prompt=3.07% | nontext prompt burden=100%
+       | degeneration=incomplete_sentence: ends with 's'
 _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=avoid | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=16239 | text_est=4 | nontext_est=16235 | gen=500 |
+_Token accounting:_ prompt=16271 | text_est=4 | nontext_est=16267 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Treat this as cap-limited output first; generation exhausted
-               the token budget with output/prompt=3.08%.
+               the token budget with output/prompt=3.07%.
 
-_Metrics:_ Load 111.70s | Gen 63.07s | Total 174.95s
-_Throughput:_ Prompt 300 TPS (16,239 tok) | Gen 61.8 TPS (500 tok)
+_Metrics:_ Load 10.39s | Gen 63.96s | Total 74.52s
+_Throughput:_ Prompt 293 TPS (16,271 tok) | Gen 64.9 TPS (500 tok)
 _Assessment:_ 🏆 A (90/100) | None identified
-_Review Status:_ watchlist (cutoff)
-_Review:_ A 90/100 | hit token cap (500) | output/prompt=3.08% | nontext
-          prompt burden=100%
+_Review Status:_ watchlist (cutoff, degeneration)
+_Review:_ A 90/100 | hit token cap (500) | output/prompt=3.07% | nontext
+          prompt burden=100% | degeneration=incomplete_sentence: ends with 's'
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
 > The user wants a description of the image provided.
 >
-> &#42;&#42;1. Analyze the image:&#42;&#42;
-> &#42;   &#42;&#42;Subject:&#42;&#42; The image shows a collection of camera lenses.
-> &#42;   &#42;&#42;Arrangement:&#42;&#42; They are arranged in a grid-like pattern, specifically
-> three rows and four columns (though the bottom right is empty, making it 11
-> lenses total).
-> &#42;   &#42;&#42;Type of Lenses:&#42;&#42; These look like vintage or classic camera lenses.
-> They have a distinct "retro" look.
-> &#42;   Top row: Three lenses. The first two look like wide-angle or
-> standard prime lenses. The third one looks like a telephoto lens.
-> &#42;   Middle row: Three lenses. Similar styles.
-> &#42;   Bottom row: Five lenses.
-> &#42;   &#42;&#42;Details:&#42;&#42;
-> &#42;   &#42;&#42;Mounts:&#42;&#42; The mounts are visible. Some look like M42 screw mounts
-> (common on vintage lenses), others might be specific brand mounts (like
-> Canon FD, Nikon F, etc., though hard to be certain without closer
-> inspection, M42 is a safe bet for a general "vintage lens" collection).
-> &#42;   &#42;&#42;Glass:&#42;&#42; The front elements are visible. Some have a greenish or
-> purplish coating (multi-coated), others look uncoated or single-coated.
-> &#42;   &#42;&#42;Housing:&#42;&#42; Most are black metal or chrome. Some have silver rings.
-> &#42;   &#42;&#42;Branding:&#42;&#42; I can see some text.
-> &#42;   Top left: "Helios 44-2". This is a very famous Soviet lens.
-> &#42;   Top middle: "Jupiter-9". Another famous Soviet lens.
-> &#42;   Top right: "Helios 44-4".
-> &#42;   Middle left: "Helios 44-2".
-> &#42;   Middle middle: "Jupiter-11".
-> &#42;   Middle right: "Helios 44-2".
-> &#42;   Bottom row: Various other lenses, likely Soviet or Eastern
-> European given the "Helios" and "Jupiter" branding seen above. One looks
-> like a "FED" lens. Another looks like a "Zorki" lens.
-> &#42;   &#42;&#42;Background:&#42;&#42; A plain, light-colored surface (white or very light
-> grey).
-> &#42;   &#42;&#42;Lighting:&#42;&#42; Even, studio-like lighting. No harsh shadows.
+> 1&#46;  &#42;&#42;Identify the main subject:&#42;&#42; The image is a collage of four different
+> photographs.
+> 2&#46;  &#42;&#42;Analyze each photograph:&#42;&#42;
+> &#42;   &#42;&#42;Top Left:&#42;&#42; A close-up of a person's hands holding a smartphone.
+> The screen is on, showing a colorful interface (looks like a music player or
+> app). The background is a wooden floor.
+> &#42;   &#42;&#42;Top Right:&#42;&#42; A close-up of a person's hands holding a smartphone.
+> The screen is on, showing a different interface (looks like a messaging app
+> or social media feed). The background is a wooden floor. Wait, looking
+> closer, it's actually the same person/hands but a different angle or moment.
+> Let me re-evaluate. Actually, looking at the full set, it seems to be a
+> sequence or a collage of similar shots. Let's look at the bottom two.
+> &#42;   &#42;&#42;Bottom Left:&#42;&#42; A person's hands holding a smartphone. The screen
+> shows a video or image. The background is a wooden floor.
+> &#42;   &#42;&#42;Bottom Right:&#42;&#42; A person's hands holding a smartphone. The screen
+> shows a video or image. The background is a wooden floor.
 >
-> &#42;&#42;2. Synthesize
+> &#42;Correction:&#42; Let's look at the image as a whole again. It's actually a
+> single image that has been cropped or stitched? No, it's a 2x2 grid.
+> &#42;   &#42;&#42;Top Left:&#42;&#42; Hands holding a phone. The phone is displaying a video
+> or app.
+> &#42;   &#42;&#42;Top Right:&#42;&#42; Hands holding a phone.
+> &#42;   &#42;&#42;Bottom Left:&#42;&#42; Hands holding a phone.
+> &#42;   &#42;&#42;Bottom Right:&#42;&#42; Hands holding a phone.
+>
+> &#42;Wait, let me look closer at the specific content.&#42;
+> &#42;   &#42;&#42;Top Left:&#42;&#42; A person is holding a white smartphone. The screen
+> shows a video of a person (maybe a vlog). The background is a wooden floor.
+> &#42;   &#42;&#42;Top Right:&#42;&#42; A person is holding a white smartphone. The screen
+> shows a video of a person.
+> &#42;   &#42;&#42;Bottom Left:&#42;&#42; A person is holding a white smartphone. The screen
+> shows a video.
+> &#42;   &#42;&#42;Bottom Right:&#42;&#42; A person is holding a white smartphone. The screen
+> shows a video.
+>
+> &#42;Actually, looking very closely at the provided image, it's just one
+> single image file.&#42; It's not a collage. It's
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
+- Output degeneration (incomplete_sentence: ends with 's')
+- Likely capped by max token budget
+
+---
+
+<a id="model-mlx-community-qwen35-35b-a3b-4bit"></a>
+
+### ✅ mlx-community/Qwen3.5-35B-A3B-4bit
+
+_Verdict:_ cutoff | user=avoid
+_Why:_ hit token cap (500) | output/prompt=3.07% | nontext prompt burden=100%
+_Trusted hints:_ preserves trusted hints
+_Contract:_ ok
+_Utility:_ user=avoid | preserves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=16271 | text_est=4 | nontext_est=16267 | gen=500 |
+                    max=500 | stop=completed
+_Next action:_ Treat this as cap-limited output first; generation exhausted
+               the token budget with output/prompt=3.07%.
+
+_Metrics:_ Load 2.52s | Gen 65.23s | Total 67.93s
+_Throughput:_ Prompt 272 TPS (16,271 tok) | Gen 106 TPS (500 tok)
+_Assessment:_ 🏆 A (90/100) | None identified
+_Review Status:_ watchlist (cutoff)
+_Review:_ A 90/100 | hit token cap (500) | output/prompt=3.07% | nontext
+          prompt burden=100%
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> The user wants a description of the provided image.
+>
+> 1&#46;  &#42;&#42;Identify the main subject:&#42;&#42; The image shows a collection of camera
+> lenses.
+> 2&#46;  &#42;&#42;Identify the specific objects:&#42;&#42;
+> &#42;   There are three distinct lenses visible.
+> &#42;   The top lens is a Canon lens. It has the distinctive red ring around
+> the front element. It looks like a telephoto zoom lens, possibly an
+> L-series lens given the build quality and red ring. The text "Canon" is
+> visible.
+> &#42;   The middle lens is another Canon lens, also with a red ring. It
+> looks slightly larger or longer.
+> &#42;   The bottom lens is partially visible, showing the mount and part of
+> the barrel. It also has the red ring.
+> &#42;   Wait, let me look closer. It's actually a stack of lenses.
+> &#42;   Top lens: "Canon" is clearly visible. It's a white lens with a red
+> ring. This is characteristic of Canon's professional L-series telephoto
+> lenses.
+> &#42;   Middle lens: Also a white lens with a red ring.
+> &#42;   Bottom lens: Just the mount area is visible, but it's clearly part
+> of the same set.
+> &#42;   Actually, looking very closely at the arrangement, it looks like a
+> single lens standing upright, but the perspective makes it look like a
+> stack. No, wait.
+> &#42;   Let's re-evaluate. It looks like a vertical stack of three lenses.
+> &#42;   Top lens: White barrel, red ring. Text "Canon" is visible.
+> &#42;   Middle lens: White barrel, red ring.
+> &#42;   Bottom lens: White barrel, red ring.
+> &#42;   Wait, is it one lens? No, the text "Canon" is on the top one. The
+> middle one has text that looks like "EF 400mm f/4.5L IS USM" or something
+> similar. The bottom one is cut off.
+> &#42;   Actually, looking at the spacing, it looks like three separate
+> lenses stacked on top of each other.
+> &#42;   Let's look at the text. Top lens: "Canon". Middle lens: "EF 400mm
+> f/4.5L IS USM". Bottom lens: "EF 300mm f/4L IS USM" (maybe? hard to read
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:cutoff
+- Likely capped by max token budget
+
+---
+
+<a id="model-mlx-community-qwen35-9b-mlx-4bit"></a>
+
+### ✅ mlx-community/Qwen3.5-9B-MLX-4bit
+
+_Verdict:_ cutoff | user=avoid
+_Why:_ hit token cap (500) | output/prompt=3.07% | nontext prompt burden=100%
+       | degeneration=incomplete_sentence: ends with 'of'
+_Trusted hints:_ preserves trusted hints
+_Contract:_ ok
+_Utility:_ user=avoid | preserves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=16271 | text_est=4 | nontext_est=16267 | gen=500 |
+                    max=500 | stop=completed
+_Next action:_ Treat this as cap-limited output first; generation exhausted
+               the token budget with output/prompt=3.07%.
+
+_Metrics:_ Load 1.30s | Gen 76.91s | Total 78.39s
+_Throughput:_ Prompt 230 TPS (16,271 tok) | Gen 91.7 TPS (500 tok)
+_Assessment:_ 🟡 C (62/100) | Lacks visual description of image
+_Review Status:_ watchlist (cutoff, degeneration)
+_Review:_ C 62/100 | hit token cap (500) | output/prompt=3.07% | nontext
+          prompt burden=100% | degeneration=incomplete_sentence: ends with
+          'of'
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> The user wants a description of the provided image.
+>
+> 1&#46;  &#42;&#42;Identify the subject:&#42;&#42; The image is a solid block of a single,
+> repeating pattern. It's not a photograph of an object, but a texture or a
+> graphic element.
+> 2&#46;  &#42;&#42;Analyze the pattern:&#42;&#42;
+> &#42;   &#42;&#42;Color:&#42;&#42; It is a monochromatic, metallic gold or bronze color. It
+> looks like a "gold" texture often used in e-commerce for jewelry or luxury
+> goods.
+> &#42;   &#42;&#42;Shape:&#42;&#42; The shape is a trapezoid or a diamond shape (rhombus). It
+> has four sides.
+> &#42;   &#42;&#42;Internal details:&#42;&#42; Inside the shape, there is a repeating
+> geometric pattern. It looks like a series of concentric, nested trapezoids
+> or diamonds.
+> &#42;   &#42;&#42;Texture:&#42;&#42; The lines have a slight gradient or shading, giving it
+> a metallic, reflective, or embossed look. It's not flat; it has highlights
+> and shadows that suggest a 3D surface, like brushed metal or polished gold.
+> &#42;   &#42;&#42;Context:&#42;&#42; This is a very common background image used on websites
+> selling jewelry, watches, or luxury items. It's a "gold frame" or "gold
+> border."
+>
+> 3&#46;  &#42;&#42;Synthesize the description:&#42;&#42;
+> &#42;   Start with the most obvious feature: It's a gold-colored frame or
+> border.
+> &#42;   Describe the specific shape: It's a trapezoidal shape, often used as
+> a frame for a central image (though here the image is just the frame
+> itself).
+> &#42;   Describe the internal pattern: It consists of multiple nested,
+> concentric trapezoids.
+> &#42;   Describe the color and texture: It is a metallic gold color, with
+> gradients that give it a shiny, reflective, or beveled appearance.
+> &#42;   Mention the likely usage: It's a web design element, specifically a
+> "gold frame" or "jewelry frame."
+>
+> 4&#46;  &#42;&#42;Drafting the response:&#42;&#42;
+> &#42;   "This image displays a gold-colored frame design."
+> &#42;   "The frame is shaped like a trapezoid or a diamond."
+> &#42;   "It features a pattern of concentric, nested trapezoids."
+> &#42;   "The color is a metallic gold, with shading that creates a 3D,
+> beveled effect."
+> &#42;   "This type of
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:cutoff
+- Output degeneration (incomplete_sentence: ends with 'of')
 - Likely capped by max token budget
 
 ---
@@ -3127,16 +2960,16 @@ _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=avoid | preserves trusted hints
 _Stack / owner:_ owner=mlx-vlm | harness=stop_token
-_Token accounting:_ prompt=16239 | text_est=4 | nontext_est=16235 | gen=500 |
+_Token accounting:_ prompt=16271 | text_est=4 | nontext_est=16267 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
                into user-facing text.
 
-_Metrics:_ Load 2.68s | Gen 93.70s | Total 96.58s
-_Throughput:_ Prompt 215 TPS (16,239 tok) | Gen 28.5 TPS (500 tok)
-_Assessment:_ 🏆 A (100/100) | None identified
+_Metrics:_ Load 2.48s | Gen 93.85s | Total 96.54s
+_Throughput:_ Prompt 225 TPS (16,271 tok) | Gen 24.0 TPS (500 tok)
+_Assessment:_ 🏆 A (90/100) | None identified
 _Review Status:_ watchlist (harness)
-_Review:_ A 100/100 | Special control token &lt;/think&gt; appeared in
+_Review:_ A 90/100 | Special control token &lt;/think&gt; appeared in
           generated text. | hit token cap (500) | nontext prompt burden=100%
 
 <!-- markdownlint-disable MD028 MD037 -->
@@ -3155,39 +2988,34 @@ _Review:_ A 100/100 | Special control token &lt;/think&gt; appeared in
 > camera. His expression is friendly and approachable.
 > &#42;   &#42;&#42;Attire:&#42;&#42; He is wearing a dark, possibly black or dark grey,
 > t-shirt or polo shirt. The collar is visible.
-> &#42;   &#42;&#42;Background:&#42;&#42; The background is a plain, solid white color. This
-> suggests a headshot, a press photo, or a promotional image.
+> &#42;   &#42;&#42;Lighting:&#42;&#42; The lighting is soft and even, highlighting his face.
+> It looks like a professional headshot or a photo taken at an event.
+> &#42;   &#42;&#42;Background:&#42;&#42; The background is plain white, suggesting a studio
+> setting or a cutout photo.
+>
 > 4&#46;  &#42;&#42;Synthesize the description:&#42;&#42;
 > &#42;   Start with the most obvious fact: It's a headshot of actor Tom
 > Holland.
 > &#42;   Describe physical features: Short brown hair, light beard/stubble.
 > &#42;   Describe clothing: Dark t-shirt.
-> &#42;   Describe the setting: White background.
-> &#42;   Describe the mood: Casual, friendly, smiling.
+> &#42;   Describe the mood/expression: Smiling, looking at the camera.
+> &#42;   Mention the background: Plain white.
 >
-> &#42;&#42;Drafting the response:&#42;&#42;
-> "This is a headshot photograph of the actor Tom Holland. He is shown from
-> the chest up against a plain white background. He has short, light brown
-> hair and a light beard and mustache. He is wearing a dark-colored t-shirt
-> and is smiling gently at the camera."
+> 5&#46;  &#42;&#42;Refine the description:&#42;&#42; "This is a headshot of the actor Tom
+> Holland. He has short, light brown hair and a light beard. He is wearing a
+> dark t-shirt and smiling slightly at the camera against a plain white
+> background." This covers all the key points. I can add a bit more detail
+> about the lighting or the specific look (casual but professional).
 >
-> Let's refine it to be a bit more detailed but concise.
-> &#45; Mention the lighting (even, professional).
-> &#45; Mention the angle (slightly angled, looking forward).
->
-> &#42;&#42;Final Polish:&#42;&#42;
-> "The image shows a headshot of the actor Tom Holland. He is facing forward,
-> looking directly at the camera with a slight, friendly smile. He has short,
-> light brown hair and a light beard and mustache. He is wearing a dark,
-> possibly black, t-shirt. The background is a plain, solid white, typical of
-> a promotional photo or press kit image."
->
-> This covers all the key visual elements. I will present this clearly.
+> 6&#46;  &#42;&#42;Final Polish:&#42;&#42; "The image shows a headshot of the actor Tom Holland.
+> He is facing forward, looking directly at the camera with a slight, friendly
+> smile. He has short, light brown hair that is styled slightly messy on top,
+> and he sports a light beard and mustache. He is wearing a dark-colored
+> t-shirt. The background is a plain, solid white." This is accurate and
+> descriptive.
 > &lt;/think&gt;
 >
-> This is a headshot photograph of the actor &#42;&#42;Tom Holland&#42;&#42;.
->
-> Here are
+> This is a headshot of the actor Tom Holland. He is facing forward, looking
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
@@ -3203,67 +3031,67 @@ _Review:_ A 100/100 | Special control token &lt;/think&gt; appeared in
 ### ✅ mlx-community/Qwen3.5-27B-mxfp8
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=3.08% | nontext prompt burden=100%
+_Why:_ hit token cap (500) | output/prompt=3.07% | nontext prompt burden=100%
 _Trusted hints:_ preserves trusted hints
 _Contract:_ ok
 _Utility:_ user=avoid | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=16239 | text_est=4 | nontext_est=16235 | gen=500 |
+_Token accounting:_ prompt=16271 | text_est=4 | nontext_est=16267 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Treat this as cap-limited output first; generation exhausted
-               the token budget with output/prompt=3.08%.
+               the token budget with output/prompt=3.07%.
 
-_Metrics:_ Load 10.17s | Gen 109.21s | Total 119.56s
-_Throughput:_ Prompt 204 TPS (16,239 tok) | Gen 17.2 TPS (500 tok)
+_Metrics:_ Load 3.14s | Gen 106.27s | Total 109.61s
+_Throughput:_ Prompt 210 TPS (16,271 tok) | Gen 17.8 TPS (500 tok)
 _Assessment:_ 🏆 A (90/100) | None identified
 _Review Status:_ watchlist (cutoff)
-_Review:_ A 90/100 | hit token cap (500) | output/prompt=3.08% | nontext
+_Review:_ A 90/100 | hit token cap (500) | output/prompt=3.07% | nontext
           prompt burden=100%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
 > The user wants a description of the provided image.
 >
-> 1&#46;  &#42;&#42;Identify the subject:&#42;&#42; The image features a man. He looks like a
-> celebrity. I recognize him as Tom Welling, known for playing Clark Kent in
-> &#42;Smallville&#42;.
+> 1&#46;  &#42;&#42;Identify the main subject:&#42;&#42; The image features a man, who appears to
+> be the actor Matt Bomer.
 > 2&#46;  &#42;&#42;Analyze his appearance:&#42;&#42;
-> &#42;   &#42;&#42;Hair:&#42;&#42; Short, light brown or dark blonde hair. It's styled
-> somewhat casually, swept to the side.
+> &#42;   &#42;&#42;Hair:&#42;&#42; Short, light brown or dark blonde hair, slightly wavy.
 > &#42;   &#42;&#42;Facial Hair:&#42;&#42; He has a light stubble or short beard.
-> &#42;   &#42;&#42;Expression:&#42;&#42; He has a slight, closed-mouth smile. He looks
-> relaxed and friendly.
-> &#42;   &#42;&#42;Gaze:&#42;&#42; He is looking slightly off-camera to the left.
-> 3&#46;  &#42;&#42;Analyze his clothing:&#42;&#42;
-> &#42;   He is wearing a white button-down shirt.
-> &#42;   The shirt is unbuttoned at the top, revealing a bit of his chest.
-> &#42;   The sleeves are rolled up to the elbows.
-> &#42;   The shirt looks slightly wrinkled, suggesting a casual or candid
-> moment.
-> 4&#46;  &#42;&#42;Analyze the background:&#42;&#42;
-> &#42;   The background is a plain, solid white. This suggests a studio shot
-> or a headshot.
-> 5&#46;  &#42;&#42;Synthesize the description:&#42;&#42;
-> &#42;   Start with the main subject: A head-and-shoulders shot of a man.
-> &#42;   Identify him (optional but helpful if confident): It's Tom Welling.
-> &#42;   Describe physical features: Short brown hair, stubble, slight smile.
-> &#42;   Describe attire: White button-down shirt, unbuttoned collar,
-> rolled-up sleeves.
-> &#42;   Describe the setting: White background.
+> &#42;   &#42;&#42;Expression:&#42;&#42; He has a slight, closed-mouth smile. He is looking
+> slightly off to the left of the camera.
+> &#42;   &#42;&#42;Attire:&#42;&#42; He is wearing a dark suit jacket (likely black or dark
+> grey) over a white collared shirt. The collar is visible.
+> 3&#46;  &#42;&#42;Analyze the background:&#42;&#42; The background is a plain, solid white. This
+> suggests a studio headshot or a promotional photo.
+> 4&#46;  &#42;&#42;Determine the context (optional but helpful):&#42;&#42; This looks like a
+> standard headshot used for press kits or promotional material.
+> 5&#46;  &#42;&#42;Synthesize the description:&#42;&#42; Combine these elements into a coherent
+> paragraph. Start with the most obvious features (the person) and then move
+> to details (clothing, expression, background).
 >
-> &#42;&#42;Drafting the response:&#42;&#42;
-> "This is a head-and-shoulders portrait of actor Tom Welling. He has short,
-> light brown hair and a light stubble beard. He is wearing a white
-> button-down shirt that is unbuttoned at the top, with the sleeves rolled up
-> to his elbows. He is looking slightly to the left of the camera with a
-> subtle, relaxed smile. The background is plain white."
+> &#42;Drafting the description:&#42;
+> The image shows a head-and-shoulders portrait of a man, who appears to be
+> the actor Matt Bomer. He has short, light brown hair and light facial
+> stubble. He is wearing a dark suit jacket over a white dress shirt. He is
+> looking slightly to the left with a subtle, polite smile. The background is
+> plain white.
 >
-> Let's refine it to be more descriptive without necessarily needing to name
-> him if I wasn't 100% sure (though I am). I will focus on the visual
-> elements.
+> &#42;Refining:&#42; Make it more descriptive. Mention the lighting (soft, even).
+> Mention the angle (slightly angled).
 >
-> &#42;   &#42;&#42;Subject:&#42;&#42; A man with short, light brown hair.
-> &#42;   &#42;&#42;Face:&#42;&#42; He
+> &#42;Final Polish:&#42; "This is a headshot of a man, likely the actor Matt Bomer.
+> He has short, wavy light brown hair and a light beard or stubble. He is
+> dressed in a dark suit jacket and a white collared shirt. He is looking
+> slightly off-camera to the left with a gentle, closed-mouth smile. The
+> background is a stark, plain white, typical of a professional studio
+> portrait."
+>
+> Let's stick to a straightforward description of visual elements.
+>
+> &#42;   &#42;&#42;Subject:&#42;&#42; Man (Matt Bomer).
+> &#42;   &#42;&#42;Pose:&#42;&#42; Head and shoulders, facing slightly left.
+> &#42;   &#42;&#42;Expression:&#42;&#42; Slight smile, calm.
+> &#42;   &#42;&#42;Clothing:&#42;&#42; Dark suit, white
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
