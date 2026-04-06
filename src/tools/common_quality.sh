@@ -234,6 +234,88 @@ quality_require_command() {
         "$ty_path" check --python "$python_path" "$@"
     }
 
+    quality_write_pyrefly_config() {
+        local config_path="$1"
+        local python_path="$2"
+        local pyproject_path=""
+
+        pyproject_path="$(quality_src_root)/pyproject.toml"
+        "$QUALITY_PYTHON" - "$config_path" "$python_path" "$pyproject_path" <<'PY'
+from __future__ import annotations
+
+import json
+import sys
+import tomllib
+from pathlib import Path
+from typing import Any
+
+config_path = Path(sys.argv[1])
+python_path = Path(sys.argv[2]).resolve()
+pyproject_path = Path(sys.argv[3])
+
+tool_config = tomllib.loads(pyproject_path.read_text(encoding="utf-8"))["tool"]["pyrefly"]
+tool_config = dict(tool_config)
+tool_config.pop("conda-environment", None)
+tool_config["python-interpreter-path"] = str(python_path)
+
+
+def format_toml(value: Any) -> str:
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, int):
+        return str(value)
+    if isinstance(value, str):
+        return json.dumps(value)
+    if isinstance(value, list):
+        return "[" + ", ".join(format_toml(item) for item in value) + "]"
+    raise TypeError(f"Unsupported Pyrefly config value type: {type(value).__name__}")
+lines: list[str] = []
+for key, value in tool_config.items():
+    lines.append(f"{key} = {format_toml(value)}")
+
+config_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+PY
+    }
+
+    quality_print_pyrefly_diagnostics() {
+        local python_path="$1"
+        local pyrefly_path="$2"
+        local config_path="$3"
+        shift 3
+
+        echo "[pyrefly] active conda env: ${CONDA_DEFAULT_ENV:-<none>}"
+        echo "[pyrefly] resolved python (${QUALITY_PYTHON_SOURCE:-unknown}): ${python_path}"
+        echo "[pyrefly] resolved pyrefly: ${pyrefly_path}"
+        echo "[pyrefly] generated config: ${config_path}"
+        echo "[pyrefly] check targets: ${*:-check_models.py}"
+    }
+
+    quality_run_pyrefly_check() {
+        local python_path=""
+        local pyrefly_path=""
+        local config_path=""
+        local exit_code=0
+
+        python_path="$(quality_resolve_python_path)" || return 1
+        pyrefly_path="$(quality_find_python_tool pyrefly)" || return 1
+        config_path="$(mktemp "$(quality_src_root)/.pyrefly-quality.XXXXXX")"
+
+        if ! quality_write_pyrefly_config "$config_path" "$python_path"; then
+            rm -f "$config_path"
+            return 1
+        fi
+
+        quality_print_pyrefly_diagnostics "$python_path" "$pyrefly_path" "$config_path" "$@"
+        if "$pyrefly_path" check -c "$config_path" "$@"; then
+            exit_code=0
+        else
+            exit_code=$?
+        fi
+
+        rm -f "$config_path"
+        return "$exit_code"
+    }
+
 quality_validate_yaml_files() {
     "$QUALITY_PYTHON" - "$@" <<'PY'
 from __future__ import annotations

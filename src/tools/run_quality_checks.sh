@@ -99,7 +99,7 @@ echo "=== Ty Type Check ==="
 quality_run_ty_check check_models.py
 
 echo "=== Pyrefly Type Check ==="
-quality_run_python_tool pyrefly check check_models.py
+quality_run_pyrefly_check check_models.py
 
 echo "=== Vulture Dead Code Check ==="
 quality_run_python_tool vulture

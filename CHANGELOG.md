@@ -6,6 +6,10 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Replaced the hardcoded Pyrefly `conda-environment` setting with shared
+  quality-script injection of `python-interpreter-path`, so local checks still
+  target the resolved repo Python while GitHub Actions no longer fails the
+  Pyrefly step on runners without `conda`.
 - Clarified CLI help and README wording for `--folder`, `--image`, and `--prompt`
   so omitted flags describe their fallback behavior without implying the flags
   themselves accept empty values.

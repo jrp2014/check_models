@@ -329,9 +329,9 @@ markers = [
 project-excludes = ["**/src/tools/.archived/"]
 search-path = ["../typings"]
 python-version = "3.13"
-# Pin Pyrefly to the repo's supported conda env so import resolution matches
-# the quality scripts instead of drifting to a system Python installation.
-conda-environment = "mlx-vlm"
+# Shared quality scripts inject `python-interpreter-path` from the resolved
+# QUALITY_PYTHON so local and CI runs use the same site-packages without
+# hardcoding a machine-specific interpreter path here.
 
 
 [tool.setuptools.package-data]
