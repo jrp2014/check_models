@@ -6,6 +6,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Clarified CLI help and README wording for `--folder`, `--image`, and `--prompt`
+  so omitted flags describe their fallback behavior without implying the flags
+  themselves accept empty values.
 - Removed stale static-analysis downgrades in `src/pyproject.toml` by dropping
   unused Ruff tool-file `D`/`ANN` ignores, the unused Ty
   `unresolved-import=warn` downgrade, and a Pyrefly `ignore-missing-imports`

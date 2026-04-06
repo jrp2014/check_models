@@ -15983,23 +15983,24 @@ def _build_cataloguing_prompt(metadata: MetadataDict) -> str:
 def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
     """Prepare the prompt for the VLM, using user input or generating from metadata."""
     print_cli_section("Prompt Configuration")
+    max_display_len = 200
 
     prompt: str
     if args.prompt:
         prompt = args.prompt
-        logger.info("Using user-provided prompt.")
+        logger.info("Using user-provided prompt from --prompt.")
+        logger.info(
+            "User-provided prompt (--prompt): %s",
+            _build_prompt_preview(prompt, max_chars=max_display_len),
+        )
     else:
         logger.info("Generating default prompt based on image metadata.")
         prompt = _build_cataloguing_prompt(metadata)
         logger.debug("Using generated prompt based on metadata.")
-
-    # Truncate long prompts for display
-    max_display_len = 200
-    if len(prompt) > max_display_len:
-        prompt_display = prompt[:max_display_len] + "..."
-        logger.info("Final prompt: %s", prompt_display)
-    else:
-        logger.info("Final prompt: %s", prompt)
+        logger.info(
+            "Final prompt: %s",
+            _build_prompt_preview(prompt, max_chars=max_display_len),
+        )
     logger.debug("Full prompt:\n%s", prompt)
     logger.info("Prompt length: %d characters", len(prompt))
     return prompt
@@ -18721,11 +18722,21 @@ def main_cli() -> None:
     main(args)
 
 
+class _ConditionalDefaultsHelpFormatter(argparse.ArgumentDefaultsHelpFormatter):
+    """Show argparse defaults only when they are real user-facing defaults."""
+
+    def _get_help_string(self, action: argparse.Action) -> str:
+        help_text = action.help or ""
+        if action.default in (None, argparse.SUPPRESS):
+            return help_text
+        return super()._get_help_string(action) or help_text
+
+
 def _build_cli_parser() -> argparse.ArgumentParser:
     """Build and return the command-line parser for the CLI entry point."""
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
         description="MLX VLM Model Checker",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        formatter_class=_ConditionalDefaultsHelpFormatter,
     )
 
     def _output_help(label: str) -> str:
@@ -18739,8 +18750,9 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         type=Path,
         default=None,
         help=(
-            "Folder to scan. The most recently modified image file in the folder will be used. "
-            "If neither --folder nor --image is specified, the default folder will be used."
+            "Folder to scan. Requires a path when provided. The most recently modified "
+            "image file in the folder will be used. If both --folder and --image are "
+            f"omitted, the most recently modified image in {DEFAULT_FOLDER} will be used."
         ),
     )
     group.add_argument(
@@ -18748,7 +18760,7 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         "--image",
         type=Path,
         default=None,
-        help="Path to a specific image file to process directly.",
+        help=("Path to a specific image file to process directly. Requires a path when provided."),
     )
     parser.add_argument(
         "--output-html",
@@ -18854,7 +18866,10 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         "--prompt",
         type=str,
         default=None,
-        help="Prompt.",
+        help=(
+            "Prompt text to send to the model. Requires text when provided. If omitted, "
+            "an automatic metadata-verification prompt is used."
+        ),
     )
     parser.add_argument(
         "--resize-shape",

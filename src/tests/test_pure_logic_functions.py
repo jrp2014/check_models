@@ -128,6 +128,19 @@ class TestPreparePrompt:
         result = mod.prepare_prompt(args, {})
         assert result == "Describe this photo."
 
+    def test_user_provided_prompt_is_logged(
+        self, mod: types.ModuleType, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """User-provided prompt should be visible in the info log."""
+        args = self._make_args(prompt="Describe this photo.")
+
+        with caplog.at_level(logging.INFO, logger=mod.LOGGER_NAME):
+            result = mod.prepare_prompt(args, {})
+
+        assert result == "Describe this photo."
+        assert "Using user-provided prompt from --prompt." in caplog.messages
+        assert "User-provided prompt (--prompt): Describe this photo." in caplog.messages
+
     def test_generated_prompt_with_metadata(self, mod: types.ModuleType) -> None:
         """Generated prompt should incorporate metadata fields."""
         metadata = {

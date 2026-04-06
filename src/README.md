@@ -28,7 +28,7 @@ conda activate mlx-vlm
 
 ### 2. Run Your First Check
 
-By default, the tool scans your Hugging Face cache for compatible models and runs them against images in `~/Pictures/Processed`.
+By default, the tool scans your Hugging Face cache for compatible models and runs them against the most recently modified image in `~/Pictures/Processed`.
 
 ```bash
 # Run all cached models against the most recent image in your folder
@@ -805,8 +805,8 @@ See module docstrings and `__all__` exports for complete API reference.
 
 | Flag | Type | Default | Description |
 | ---- | ---- | ------- | ----------- |
-| `-f`, `--folder` | Path | `~/Pictures/Processed` | Folder of images to process (non‑recursive). |
-| `-i`, `--image` | Path | (none) | Path to a specific image file to process directly. |
+| `-f`, `--folder` | Path | omitted | Folder to scan (non-recursive); the most recently modified image in that folder is used. If both `--folder` and `--image` are omitted, the most recently modified image in `~/Pictures/Processed` is used. |
+| `-i`, `--image` | Path | omitted | Path to a specific image file to process directly. Requires a value when provided. |
 | `--output-html` | Path | `output/results.html` | HTML report output filename. |
 | `--output-markdown` | Path | `output/results.md` | Markdown report output filename. |
 | `--output-gallery-markdown` | Path | `output/model_gallery.md` | Standalone Markdown gallery artifact for qualitative output review. |
@@ -821,7 +821,7 @@ See module docstrings and `__all__` exports for complete API reference.
 | `--trust-remote-code` / `--no-trust-remote-code` | flag | `True` | Allow/disallow custom code from Hub models. Use `--no-trust-remote-code` for security. |
 | `--revision` | str | (none) | Model revision (branch, tag, or commit) for reproducible runs. |
 | `--adapter-path` | str | (none) | Path to LoRA adapter weights to apply on top of the base model. |
-| `-p`, `--prompt` | str | (auto) | Custom prompt; if omitted a non-speculative metadata-verification prompt is used. |
+| `-p`, `--prompt` | str | omitted | Custom prompt text. Requires a value when provided; if omitted, a non-speculative metadata-verification prompt is generated automatically. |
 | `-d`, `--detailed-metrics` | flag | `False` | Show expanded multi-line metrics block, including phase timings and stop reason when available; ignored unless `--verbose` is also set. |
 | `-x`, `--max-tokens` | int | 500 | Max new tokens to generate. |
 | `-t`, `--temperature` | float | 0.0 | Sampling temperature. |
@@ -847,7 +847,7 @@ See module docstrings and `__all__` exports for complete API reference.
 
 Image selection logic:
 
-1. If neither `--folder` nor `--image` is specified, the script assumes the default folder (`~/Pictures/Processed`) and logs a diagnostic message.
+1. If neither `--folder` nor `--image` is specified, the script uses the most recently modified image in the default folder (`~/Pictures/Processed`) and logs a diagnostic message.
 2. If `--image` is provided, that image is processed directly.
 3. If `--folder` is provided, the most recently modified image in the folder is used.
 
@@ -983,7 +983,7 @@ The script tracks and reports:
 
 ### Diagnostics
 
-If neither `--folder` nor `--image` is specified, the script will log a diagnostic message indicating that the default folder is being used. This ensures clarity and helps users understand the script's assumptions.
+If neither `--folder` nor `--image` is specified, the script logs a diagnostic message indicating that it is using the most recently modified image in the default folder. This makes the omission behavior explicit without implying that `--folder` or `--image` can be passed without values.
 
 ### Common Issues
 

@@ -44,3 +44,8 @@ def test_cli_help_output(help_flag: str, capsys: pytest.CaptureFixture[str]) -> 
     assert "--top-k" in output
     assert "ignored unless" in output
     assert "--verbose" in output
+    assert "most recently modified image file in the folder" in output
+    assert str(check_models.DEFAULT_FOLDER) in output
+    assert "requires a path when provided" in output.lower()
+    assert "verification prompt is used" in output
+    assert "Prompt. (default: None)" not in output
