@@ -149,6 +149,47 @@ class TestPreparePrompt:
         assert "caption" in result.lower() or "cataloguing" in result.lower()
 
 
+class TestQualityIssueTruncation:
+    """Tests for quality issue parsing and truncation helpers."""
+
+    def test_parse_quality_issues_preserves_commas_inside_issue_payloads(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """Issue parsing should keep commas inside one parenthesized issue label."""
+        quality_issues = "missing-sections(title, description, keywords), context-ignored, cutoff"
+
+        parsed = mod._parse_quality_issues_to_list(quality_issues)
+
+        assert parsed == [
+            "missing-sections(title, description, keywords)",
+            "context-ignored",
+            "cutoff",
+        ]
+
+    def test_truncate_quality_issues_keeps_whole_issue_labels(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """Truncation should prefer complete parsed issue labels over raw comma cuts."""
+        quality_issues = "missing-sections(title, description, keywords), context-ignored, cutoff"
+
+        truncated = mod._truncate_quality_issues(quality_issues, max_len=52)
+
+        assert truncated == "missing-sections(title, description, keywords), ..."
+
+    def test_truncate_quality_issues_hard_clips_single_long_issue(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """Truncation should still hard-clip when the first issue alone exceeds the limit."""
+        quality_issues = 'repetitive(phrase: "alpha, beta, gamma, delta"), cutoff'
+
+        truncated = mod._truncate_quality_issues(quality_issues, max_len=24)
+
+        assert truncated == 'repetitive(phrase: "a...'
+
+
 # ── compute_vocabulary_diversity ───────────────────────────────────────────
 
 

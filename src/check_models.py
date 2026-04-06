@@ -16749,18 +16749,28 @@ def _truncate_quality_issues(
 ) -> str:
     """Truncate quality issue text for narrow table cells.
 
-    Prefers a comma-boundary cut before falling back to hard clipping.
+    Prefers whole parsed issue labels before falling back to hard clipping.
     """
     if not quality_issues:
         return ""
     if len(quality_issues) <= max_len:
         return quality_issues
-    # Try to truncate at a comma boundary
-    truncated = quality_issues[:max_len]
-    last_comma = truncated.rfind(",")
-    if last_comma > 0:
-        return truncated[:last_comma] + ", ..."
-    return truncated.rstrip() + "..."
+
+    issues = _parse_quality_issues_to_list(quality_issues)
+    if not issues:
+        return quality_issues[: max_len - 3].rstrip() + "..."
+
+    kept: list[str] = []
+    for issue in issues:
+        candidate = ", ".join([*kept, issue])
+        if len(candidate) <= max_len:
+            kept.append(issue)
+            continue
+        if kept:
+            return ", ".join(kept) + ", ..."
+        return issue[: max_len - 3].rstrip() + "..."
+
+    return ", ".join(kept)
 
 
 def _format_counter_items(counter: Counter[str], *, max_items: int = 6) -> str:
