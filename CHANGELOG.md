@@ -6,6 +6,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Removed stale static-analysis downgrades in `src/pyproject.toml` by dropping
+  unused Ruff tool-file `D`/`ANN` ignores, the unused Ty
+  `unresolved-import=warn` downgrade, and a Pyrefly `ignore-missing-imports`
+  list; Pyrefly now resolves imports against the `mlx-vlm` conda environment
+  directly instead of masking system-interpreter drift.
 - Made the packaged `quality_config.yaml` the single canonical default source,
   taught `load_quality_config()` to read the bundled resource by default, and
   added wheel-content plus anti-duplication regression tests so future

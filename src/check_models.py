@@ -94,7 +94,7 @@ if importlib_util.find_spec("wcwidth") is not None:
 if TYPE_CHECKING:
     import types
 
-    from mlx.nn import Module
+    from mlx import nn
     from mlx_vlm.generate import GenerationResult
     from PIL.Image import Image as PILImage
     from transformers import PreTrainedTokenizer
@@ -1112,7 +1112,7 @@ class LoadCallable(Protocol):
         *,
         trust_remote_code: bool = True,
         **kwargs: object,
-    ) -> tuple[Module, ProcessorMixin]:
+    ) -> tuple[nn.Module, ProcessorMixin]:
         """Load an MLX-VLM model and processor."""
         del path_or_hf_repo, adapter_path, lazy, revision, trust_remote_code, kwargs
         raise NotImplementedError
@@ -1143,7 +1143,7 @@ class StrictGenerateCallable(Protocol):
 
     def __call__(
         self,
-        model: Module,
+        model: nn.Module,
         processor: ProcessorMixin | PreTrainedTokenizer,
         prompt: str,
         image: str | list[str] | None = None,
@@ -1180,7 +1180,7 @@ class LoadImageCallable(Protocol):
 if TYPE_CHECKING:
     from mlx_vlm.generate import generate as _mlx_vlm_generate_typecheck
 
-    _TYPECHECK_MODEL = cast("Module", None)
+    _TYPECHECK_MODEL = cast("nn.Module", None)
     _TYPECHECK_GENERATE_PROCESSOR = cast("PreTrainedTokenizer", None)
     _ = _mlx_vlm_generate_typecheck(
         _TYPECHECK_MODEL,
@@ -13800,7 +13800,7 @@ def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None
 
 def _load_model(
     params: ProcessImageParams,
-) -> tuple[Module, ProcessorMixin, PreTrainedConfig | Mapping[str, object] | None]:
+) -> tuple[nn.Module, ProcessorMixin, PreTrainedConfig | Mapping[str, object] | None]:
     """Load model from HuggingFace Hub or local path.
 
     Args:
@@ -14264,7 +14264,7 @@ def _cleanup_runtime_resources() -> None:
 def _generate_with_processor_passthrough(
     *,
     generate_fn: Callable[..., GenerationResult],
-    model: Module,
+    model: nn.Module,
     processor: ProcessorMixin,
     params: ProcessImageParams,
     formatted_prompt: str,
@@ -14410,7 +14410,7 @@ def _run_model_generation(
         phase_callback: Optional callback invoked when execution enters a new phase.
         phase_timer: Optional per-phase timer that records load, prep, and decode durations.
     """
-    model: Module
+    model: nn.Module
     processor: ProcessorMixin
 
     _set_failure_phase(phase_callback, "import")

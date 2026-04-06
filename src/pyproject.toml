@@ -185,22 +185,18 @@ ignore = [
     "SLF001",  # Private member access - tests need to verify internal functions
     "ARG001",  # Unused argument - pytest fixtures may have unused params
 ]
-# Tools: allow print statements, missing docstrings (utility scripts)
+# Tools: allow intentional CLI prints and fixed-command robustness patterns.
 "tools/**" = [
     "T201",   # Print statements - tools are CLI utilities
     "S603",   # subprocess calls - tool commands are hardcoded, not user input
     "S607",   # partial executable path - tools call known commands in PATH
     "BLE001", # blind Exception - tools use broad catches for robustness
-    "D",      # Docstrings not required in tools
-    "ANN",    # Type annotations not required in tools
 ]
 "src/tools/**" = [
     "T201",   # Print statements - tools are CLI utilities
     "S603",   # subprocess calls - tool commands are hardcoded, not user input
     "S607",   # partial executable path - tools call known commands in PATH
     "BLE001", # blind Exception - tools use broad catches for robustness
-    "D",      # Docstrings not required in tools
-    "ANN",    # Type annotations not required in tools
 ]
 # Archived files: ignore all rules (these are not maintained)
 "tools/.archived/**" = ["ALL"]
@@ -302,9 +298,6 @@ follow_imports = "silent"
 
 [tool.ty]
 # ty (Astral's type checker) configuration
-# Keep unresolved-import diagnostics visible, but non-blocking, because
-# some MLX ecosystem packages do not expose complete static typing metadata.
-rules = { unresolved-import = "warn" }
 
 [tool.ty.environment]
 # Prefer repo-local generated stubs for packages like mlx-vlm that do not ship
@@ -336,23 +329,9 @@ markers = [
 project-excludes = ["**/src/tools/.archived/"]
 search-path = ["../typings"]
 python-version = "3.13"
-#conda-environment = "mlx-vlm"
-ignore-missing-imports = [
-    "defusedxml.*",
-    "huggingface_hub.*",
-    "mlx.*",
-    "mlx_vlm.*",
-    "mlx_lm.*",
-    "numpy",
-    "PIL.*",
-    "psutil",
-    "requests",
-    "tabulate",
-    "tokenizers.*",
-    "transformers.*",
-    "tzlocal",
-    "yaml",
-]
+# Pin Pyrefly to the repo's supported conda env so import resolution matches
+# the quality scripts instead of drifting to a system Python installation.
+conda-environment = "mlx-vlm"
 
 
 [tool.setuptools.package-data]
