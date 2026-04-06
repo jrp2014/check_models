@@ -67,7 +67,7 @@ A single medium-sized, well-commented function is often clearer than a web of on
 
 **If you are an AI assistant or Agent working on this codebase, follow these rules:**
 
-1. **Context First**: Before making changes, read `src/README.md` for CLI usage and `src/quality_config.yaml` for configuration logic.
+1. **Context First**: Before making changes, read `src/README.md` for CLI usage and `src/check_models_data/quality_config.yaml` for configuration logic.
 2. **Use Existing Tools**:
     - Run `python -m tools.validate_env` to diagnose environment issues.
     - Run `make quality` to verify your changes (formatting, linting, typing).
@@ -79,7 +79,7 @@ A single medium-sized, well-commented function is often clearer than a web of on
     - **NEVER** run `python` directly without ensuring the environment is active.
 4. **Configuration over Hardcoding**:
     - **Never** hardcode magic numbers for thresholds (e.g., repetition limits, formatting precision).
-    - Always use or extend `src/quality_config.yaml` and the `QualityThresholds` class.
+    - Always use or extend `src/check_models_data/quality_config.yaml` and the `QualityThresholds` class.
 5. **Dependency Management**:
     - If you add an import, you **must** add it to `pyproject.toml` and run `python -m tools.update_readme_deps`.
 6. **Linting**:
@@ -233,9 +233,7 @@ Responsibilities:
 ### Configuration
 
 - **`FormattingThresholds`**: Dataclass defining limits for number formatting (decimals, separators).
-- **`QualityThresholds`**: Dataclass defining thresholds for quality analysis (repetition, hallucination).
-  - **Source of Truth**: These values are loaded from `src/quality_config.yaml`.
-  - **Modification**: To adjust thresholds, edit the YAML file, not the Python code.
+- **`QualityThresholds`**: Dataclass defining thresholds for quality analysis (repetition, hallucination). Source of truth: `src/check_models_data/quality_config.yaml`. To adjust thresholds, edit the YAML file, not the Python code.
 - **`Module Constants`**: Used for fixed values (timeouts, default paths).
 
 **Do not duplicate formatting logic**. If a new metric is introduced, extend the central formatter instead of branching inline.

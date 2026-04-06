@@ -11,13 +11,12 @@ import re
 import subprocess
 import sys
 import tomllib
+import zipfile
 from pathlib import Path
-from typing import TYPE_CHECKING
+
+import pytest
 
 from tools import check_suppressions, generate_stubs
-
-if TYPE_CHECKING:
-    import pytest
 
 _TEST_FILE = Path(__file__).resolve()
 # tests/ parent, then package root (vlm)
@@ -39,6 +38,8 @@ PYPROJECT = _first_existing(
 README = _first_existing(
     [PKG_ROOT / "README.md", REPO_ROOT / "README.md"],
 )  # prefer in-package
+PACKAGED_QUALITY_CONFIG = PKG_ROOT / "check_models_data" / "quality_config.yaml"
+LEGACY_ROOT_QUALITY_CONFIG = PKG_ROOT / "quality_config.yaml"
 
 MANUAL_MARKERS = ("<!-- MANUAL_INSTALL_START -->", "<!-- MANUAL_INSTALL_END -->")
 
@@ -150,6 +151,46 @@ def test_pydantic_is_managed_as_a_dev_dependency() -> None:
 
     setup_script = (PKG_ROOT / "tools" / "setup_conda_env.sh").read_text(encoding="utf-8")
     assert '"pydantic>=2.0.0"' in setup_script
+
+
+def test_packaged_quality_config_is_the_only_default_source() -> None:
+    """The packaged config should be the sole checked-in default copy."""
+    assert PACKAGED_QUALITY_CONFIG.exists()
+    assert not LEGACY_ROOT_QUALITY_CONFIG.exists()
+
+
+@pytest.mark.subprocess
+def test_built_wheel_includes_packaged_quality_config(tmp_path: Path) -> None:
+    """Built wheels should ship the packaged default quality config."""
+    dist_dir = tmp_path / "dist"
+    dist_dir.mkdir()
+
+    # Fixed local command against the checked-in repo; no user input reaches subprocess.
+    result = subprocess.run(  # noqa: S603
+        [
+            sys.executable,
+            "-m",
+            "pip",
+            "wheel",
+            ".",
+            "--no-deps",
+            "--no-build-isolation",
+            "--wheel-dir",
+            str(dist_dir),
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+        cwd=PKG_ROOT,
+    )
+
+    assert result.returncode == 0, result.stderr or result.stdout
+
+    wheel_paths = sorted(dist_dir.glob("check_models-*.whl"))
+    assert len(wheel_paths) == 1
+
+    with zipfile.ZipFile(wheel_paths[0]) as archive:
+        assert "check_models_data/quality_config.yaml" in archive.namelist()
 
 
 def test_markdownlint_cli2_is_pinned_repo_local_and_updateable() -> None:

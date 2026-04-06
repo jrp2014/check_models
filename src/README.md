@@ -508,7 +508,7 @@ pip install "huggingface-hub[torch,typing]>=1.8.0" "mlx>=0.31.1" "mlx-vlm>=0.4.1
 
 The tool uses a YAML configuration file to define thresholds for quality checks (hallucination, repetition, verbosity).
 
-- **Default Config**: The tool ships with a default `quality_config.yaml` in the `src/` directory.
+- **Default Config**: The tool ships with a bundled default `quality_config.yaml`. In this source tree, the canonical copy lives at `src/check_models_data/quality_config.yaml`.
 - **Custom Config**: You can provide your own config file via `--quality-config path/to/config.yaml`.
 
 **Key Configurable Areas:**
@@ -519,7 +519,7 @@ The tool uses a YAML configuration file to define thresholds for quality checks 
 - **Formatting**: Rules for markdown headers, bullet points, and table structures.
 - **Prompt Compaction**: Limits for metadata hints injected into the default prompt (`prompt_title_max_chars`, `prompt_description_max_chars`, `prompt_keyword_max_items`, `prompt_keyword_item_max_chars`).
 
-See `src/quality_config.yaml` for the full schema and default values.
+See `src/check_models_data/quality_config.yaml` for the full schema and default values.
 
 ### Development Tools
 
@@ -762,7 +762,7 @@ The quality analysis distinguishes between **model quality issues** (repetition,
 | `minimal_output` | Zero tokens or filler-only response | Model loading issue |
 | `training_data_leak` | `# INSTRUCTION`, `### Response:` mid-output | Prompt template mismatch |
 
-**Configuration**: Harness detection thresholds are configurable in `quality_config.yaml`:
+**Configuration**: Harness detection thresholds are configurable in the bundled `quality_config.yaml` (`src/check_models_data/quality_config.yaml` in this repo):
 
 ```yaml
 # Harness/integration issue detection thresholds

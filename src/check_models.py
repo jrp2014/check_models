@@ -12,6 +12,7 @@ import gc
 import hashlib
 import html
 import importlib.metadata
+import importlib.resources as importlib_resources
 import importlib.util as importlib_util
 import io
 import json
@@ -474,37 +475,47 @@ FORMATTING = FormattingThresholds()
 QUALITY = QualityThresholds()
 
 
+def _load_quality_config_from_path(config_path: Path) -> None:
+    """Load quality settings from a specific YAML file path."""
+    try:
+        with config_path.open("r", encoding="utf-8") as f:
+            config = yaml.safe_load(f)
+            if config is not None:
+                config_mapping = _require_str_object_mapping(
+                    config,
+                    "quality_config.yaml top-level document must be a mapping",
+                )
+                new_quality = QualityThresholds.from_config(config_mapping)
+                # Update existing global instance in-place to avoid 'global' keyword
+                # and ensure all references see the update.
+                for field in dataclasses.fields(QualityThresholds):
+                    setattr(QUALITY, field.name, getattr(new_quality, field.name))
+                logger.debug("Loaded quality configuration from %s", config_path)
+    except (OSError, TypeError, ValueError, yaml.YAMLError) as e:
+        logger.warning("Failed to load quality config from %s: %s", config_path, e)
+
+
 def load_quality_config(config_path: Path | None = None) -> None:
     """Load quality configuration from file and update global QUALITY instance.
 
-    If no config_path is provided, looks for 'quality_config.yaml' in the
-    same directory as this script.
+    If no config_path is provided, loads the bundled default quality config
+    resource shipped with the distribution.
     """
-    # Default path relative to script location (robust to CWD changes)
     if config_path is None:
-        # Use resolve() to handle symlinks and ensure absolute path
-        script_dir = Path(__file__).resolve().parent
-        default_path = script_dir / "quality_config.yaml"
-        if default_path.exists():
-            config_path = default_path
+        with contextlib.suppress(FileNotFoundError, ModuleNotFoundError):
+            resource = importlib_resources.files("check_models_data").joinpath(
+                "quality_config.yaml",
+            )
+            with importlib_resources.as_file(resource) as packaged_path:
+                _load_quality_config_from_path(packaged_path)
+                return
+        logger.warning(
+            "Bundled quality config resource not found: check_models_data/quality_config.yaml",
+        )
+        return
 
     if config_path and config_path.exists():
-        try:
-            with config_path.open("r") as f:
-                config = yaml.safe_load(f)
-                if config is not None:
-                    config_mapping = _require_str_object_mapping(
-                        config,
-                        "quality_config.yaml top-level document must be a mapping",
-                    )
-                    new_quality = QualityThresholds.from_config(config_mapping)
-                    # Update existing global instance in-place to avoid 'global' keyword
-                    # and ensure all references see the update.
-                    for field in dataclasses.fields(QualityThresholds):
-                        setattr(QUALITY, field.name, getattr(new_quality, field.name))
-                    logger.debug("Loaded quality configuration from %s", config_path)
-        except (OSError, TypeError, ValueError, yaml.YAMLError) as e:
-            logger.warning("Failed to load quality config from %s: %s", config_path, e)
+        _load_quality_config_from_path(config_path)
     elif config_path:
         logger.warning("Quality config file not found: %s", config_path)
 

@@ -53,6 +53,7 @@ check_models = "check_models:main_cli"
 
 [tool.setuptools]
 py-modules = ["check_models"]
+packages = ["check_models_data"]
 
 [project.optional-dependencies]
 # Optional dependencies grouped by use case.
@@ -355,4 +356,4 @@ ignore-missing-imports = [
 
 
 [tool.setuptools.package-data]
-"*" = ["*.yaml"]
+check_models_data = ["*.yaml"]

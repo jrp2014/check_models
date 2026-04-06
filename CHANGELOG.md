@@ -6,11 +6,17 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Made the packaged `quality_config.yaml` the single canonical default source,
+  taught `load_quality_config()` to read the bundled resource by default, and
+  added wheel-content plus anti-duplication regression tests so future
+  packaging changes cannot silently drop or reintroduce split runtime-default
+  copies.
 - Reworked the automated review payload and `src/output/review.md` generation to
   carry concrete prompt/output evidence, show `review.md` as a user-first digest
   with review priorities and compact bucket tables, and replace the most
   repetitive owner-level next-action prose with evidence-aware guidance.
-- Tightened several noisy quality heuristics in `src/quality_config.yaml` by
+- Tightened several noisy quality heuristics in
+  `src/check_models_data/quality_config.yaml` by
   requiring stronger evidence for repetition, context ignorance, context echo,
   genericity, and verbosity before flagging outputs, while keeping harness and
   contract failures visible in maintainer-facing diagnostics.

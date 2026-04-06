@@ -9,6 +9,7 @@ QualityThresholds.from_config, load_quality_config.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import importlib
 import json
 import logging
@@ -572,6 +573,32 @@ class TestLoadQualityConfig:
 
         assert "Failed to load" in caplog.text
         assert mod.QUALITY.repetition_ratio == original_ratio
+
+    def test_default_load_uses_packaged_resource(
+        self,
+        mod: types.ModuleType,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Default loading should use the packaged config resource."""
+        packaged_config = tmp_path / "quality_config.yaml"
+        packaged_config.write_text(
+            "thresholds:\n  repetition_ratio: 0.91\npatterns: {}\n",
+            encoding="utf-8",
+        )
+        original_ratio = mod.QUALITY.repetition_ratio
+
+        def fake_files(package: str) -> Path:
+            assert package == "check_models_data"
+            return tmp_path
+
+        monkeypatch.setattr(mod.importlib_resources, "files", fake_files)
+        monkeypatch.setattr(mod.importlib_resources, "as_file", contextlib.nullcontext)
+
+        mod.load_quality_config()
+
+        assert mod.QUALITY.repetition_ratio == 0.91
+        mod.QUALITY.repetition_ratio = original_ratio
 
 
 class TestSystemProfilerParsing:

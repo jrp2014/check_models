@@ -20,7 +20,7 @@ For one-off commands without activating: `conda run -n mlx-vlm python ...`.
 | File | Purpose | Size |
 | ------ | --------- | ------ |
 | `src/check_models.py` | **Single-file CLI monolith** (~12,900 lines). All logic lives here. | ★ primary edit target |
-| `src/quality_config.yaml` | Runtime thresholds loaded by `load_quality_config()` | Edit thresholds here, not in Python |
+| `src/check_models_data/quality_config.yaml` | Runtime thresholds loaded by `load_quality_config()` | Edit thresholds here, not in Python |
 | `src/pyproject.toml` | Packaging, dependencies, tool config (ruff, mypy, pytest) | Update when adding imports |
 | `src/tests/conftest.py` | Shared fixtures: `test_image`, `minimal_test_image`, `realistic_test_image`, `folder_with_images`, etc. | Use existing fixtures |
 | `src/tests/test_*.py` | ~6,900 lines across ~34 test files | Add tests to existing files |
@@ -49,7 +49,7 @@ The file is organized in this order — use these landmarks to jump to the right
 ### 4. Architecture & patterns
 
 - **Single CLI runner**: discovers models (HF cache scan), runs each with per-model isolation (timeouts, try/except), generates multi-format reports (`HTML`, `Markdown`, `TSV`, `JSONL`).
-- **Configuration hierarchy**: `src/quality_config.yaml` → `QualityThresholds` / `FormattingThresholds` dataclasses. Never sprinkle magic numbers.
+- **Configuration hierarchy**: `src/check_models_data/quality_config.yaml` → `QualityThresholds` / `FormattingThresholds` dataclasses. Never sprinkle magic numbers.
 - **Dependencies**: optional packages are guarded with `try/except ImportError` → populate `MISSING_DEPENDENCIES`; core runtime deps (`mlx`, `mlx-vlm`, `mlx-lm`) now hard-fail before inference.
 - **Display normalization**: ALL metric formatting goes through `format_field_value(field_name, value)`. Do not format metrics inline.
 - **Type aliases**: `MetricValue = int | float | str | bool | None` is the value type for metrics.
@@ -126,7 +126,7 @@ The file is organized in this order — use these landmarks to jump to the right
 
 **Change a quality threshold:**
 
-1. Edit `src/quality_config.yaml` (preferred) or `QualityThresholds` dataclass (~line 182)
+1. Edit `src/check_models_data/quality_config.yaml` (preferred) or `QualityThresholds` dataclass (~line 182)
 2. Run `pytest src/tests/test_quality_analysis.py -q`
 
 **Modify report output:**
@@ -139,7 +139,7 @@ The file is organized in this order — use these landmarks to jump to the right
 
 1. Add `_detect_your_pattern(text: str) -> tuple[bool, str | None]` following existing patterns (~line 1809–2768)
 2. Wire it into the quality analysis pipeline
-3. Add thresholds to `src/quality_config.yaml` and `QualityThresholds`
+3. Add thresholds to `src/check_models_data/quality_config.yaml` and `QualityThresholds`
 4. Add test in `src/tests/test_quality_analysis.py`
 
 ### 11. What NOT to do
