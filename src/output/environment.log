@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-04-10 14:38:30 BST
+FULL ENVIRONMENT DUMP - 2026-04-10 17:11:42 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -25,7 +25,7 @@ check_models==0.3.2
 click==8.3.2
 cmake==4.3.1
 coverage==7.13.5
-cryptography==46.0.6
+cryptography==46.0.7
 datasets==4.8.4
 defusedxml==0.7.1
 dill==0.4.1
@@ -113,7 +113,7 @@ pytest-xdist==3.8.0
 python-dateutil==2.9.0.post0
 python-discovery==1.2.2
 python-dotenv==1.2.2
-python-multipart==0.0.24
+python-multipart==0.0.26
 PyYAML==6.0.3
 referencing==0.37.0
 regex==2026.4.4
@@ -166,5 +166,5 @@ yarl==1.23.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-04-10 14:38:30 BST
+Environment dump completed at 2026-04-10 17:11:42 BST
 ================================================================================

@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-_Generated on 2026-04-10 14:58:29 BST_
+_Generated on 2026-04-10 17:31:13 BST_
 
 A review-friendly artifact with image metadata, the source prompt, and full
 generated output for each model.
@@ -19,12 +19,12 @@ generated output for each model.
   startup hangs, or backend/runtime crashes.
 - _Vs existing metadata:_ better=10, neutral=1, worse=41 (baseline B 76/100).
 - _Quality signal frequency:_ missing_sections=35, cutoff=30,
-  trusted_hint_ignored=22, context_ignored=22, repetitive=10,
+  context_ignored=22, trusted_hint_ignored=22, repetitive=10,
   metadata_borrowing=9.
-- _Runtime pattern:_ decode dominates measured phase time (91%; 50/53 measured
+- _Runtime pattern:_ decode dominates measured phase time (91%; 51/53 measured
   model(s)).
-- _Phase totals:_ model load=100.46s, prompt prep=0.16s, decode=1073.38s,
-  cleanup=5.13s.
+- _Phase totals:_ model load=101.63s, prompt prep=0.16s, decode=1054.44s,
+  cleanup=5.05s.
 - _What this likely means:_ Most measured runtime is spent inside generation
   rather than load or prompt setup.
 - _Suggested next action:_ Prioritize early-stop policies, lower long-tail
@@ -35,15 +35,15 @@ generated output for each model.
 
 ### Strong Candidates
 
-- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: 🏆 A (88/100) | Δ+12 | 162.9 tps
-- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: 🏆 A (88/100) | Δ+12 | 61.3 tps
+- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: 🏆 A (88/100) | Δ+12 | 173.0 tps
+- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: 🏆 A (88/100) | Δ+12 | 61.7 tps
 
 ### Watchlist
 
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (1/100) | Δ-75 | 225.9 tps | context ignored, harness, long context
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (4/100) | Δ-72 | 31.6 tps | harness, missing sections
-- `mlx-community/llava-v1.6-mistral-7b-8bit`: ❌ F (11/100) | Δ-65 | 67.1 tps | context ignored, harness, long context
-- `mlx-community/paligemma2-3b-ft-docci-448-bf16`: ❌ F (18/100) | Δ-58 | 22.0 tps | context ignored, harness
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (1/100) | Δ-75 | 226.9 tps | context ignored, harness, long context
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (4/100) | Δ-72 | 31.2 tps | harness, missing sections
+- `mlx-community/llava-v1.6-mistral-7b-8bit`: ❌ F (11/100) | Δ-65 | 68.3 tps | context ignored, harness, long context
+- `mlx-community/paligemma2-3b-ft-docci-448-bf16`: ❌ F (18/100) | Δ-58 | 21.9 tps | context ignored, harness
 - `mlx-community/paligemma2-10b-ft-docci-448-bf16`: ❌ F (22/100) | Δ-54 | 5.7 tps | context ignored, harness, missing sections
 
 ## 🚨 Failures by Package (Actionable)
@@ -241,8 +241,8 @@ _Token accounting:_ prompt=492 | text_est=424 | nontext_est=68 | gen=68 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 0.50s | Gen 0.58s | Total 1.25s
-_Throughput:_ Prompt 6,137 TPS (492 tok) | Gen 337 TPS (68 tok)
+_Metrics:_ Load 0.45s | Gen 0.58s | Total 1.20s
+_Throughput:_ Prompt 5,910 TPS (492 tok) | Gen 340 TPS (68 tok)
 _Assessment:_ ❌ F (32/100) | Δ-44 | Mostly echoes context without adding value
 _Review Status:_ watchlist (context echo, missing sections)
 _Review:_ F 32/100 | missing sections: keywords | context echo=73%
@@ -281,8 +281,8 @@ _Token accounting:_ prompt=496 | text_est=424 | nontext_est=72 | gen=22 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 0.61s | Gen 0.60s | Total 1.39s
-_Throughput:_ Prompt 5,089 TPS (496 tok) | Gen 332 TPS (22 tok)
+_Metrics:_ Load 0.60s | Gen 0.60s | Total 1.38s
+_Throughput:_ Prompt 5,099 TPS (496 tok) | Gen 331 TPS (22 tok)
 _Assessment:_ ❌ F (34/100) | Δ-42 | Lacks visual description of image
 _Review Status:_ watchlist (context ignored, missing sections)
 _Review:_ F 34/100 | missing sections: title, description, keywords | missing
@@ -318,8 +318,8 @@ _Token accounting:_ prompt=745 | text_est=424 | nontext_est=321 | gen=120 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 0.51s | Gen 0.69s | Total 1.38s
-_Throughput:_ Prompt 8,744 TPS (745 tok) | Gen 330 TPS (120 tok)
+_Metrics:_ Load 0.51s | Gen 0.69s | Total 1.37s
+_Throughput:_ Prompt 8,894 TPS (745 tok) | Gen 333 TPS (120 tok)
 _Assessment:_ 🟠 D (44/100) | Δ-32 | Mostly echoes context without adding value
 _Review Status:_ watchlist (metadata borrowing, missing sections)
 _Review:_ D 44/100 | missing sections: title, description, keywords | missing
@@ -358,8 +358,8 @@ _Token accounting:_ prompt=553 | text_est=424 | nontext_est=129 | gen=125 |
 _Next action:_ Treat as a model limitation for this prompt; trusted hint
                coverage is still weak.
 
-_Metrics:_ Load 0.52s | Gen 0.96s | Total 1.66s
-_Throughput:_ Prompt 8,860 TPS (553 tok) | Gen 192 TPS (125 tok)
+_Metrics:_ Load 0.54s | Gen 0.95s | Total 1.66s
+_Throughput:_ Prompt 8,897 TPS (553 tok) | Gen 193 TPS (125 tok)
 _Assessment:_ 🟡 C (64/100) | Δ-12 | Mostly echoes context without adding value
 _Review Status:_ watchlist (metadata borrowing)
 _Review:_ C 64/100 | missing terms: flies, low | nonvisual metadata reused
@@ -404,8 +404,8 @@ _Token accounting:_ prompt=1521 | text_est=424 | nontext_est=1097 | gen=8 |
                     max=500 | stop=completed
 _Next action:_ Inspect model repo config, chat template, and EOS settings.
 
-_Metrics:_ Load 1.45s | Gen 1.12s | Total 2.75s
-_Throughput:_ Prompt 3,363 TPS (1,521 tok) | Gen 22.0 TPS (8 tok)
+_Metrics:_ Load 1.45s | Gen 1.13s | Total 2.76s
+_Throughput:_ Prompt 3,325 TPS (1,521 tok) | Gen 21.9 TPS (8 tok)
 _Assessment:_ ❌ F (18/100) | Δ-58 | Output lacks detail
 _Review Status:_ watchlist (context ignored, harness)
 _Review:_ F 18/100 | Output is very short relative to prompt size (0.5%),
@@ -443,8 +443,8 @@ _Token accounting:_ prompt=1521 | text_est=424 | nontext_est=1097 | gen=25 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 1.62s | Gen 2.19s | Total 3.99s
-_Throughput:_ Prompt 1,385 TPS (1,521 tok) | Gen 32.0 TPS (25 tok)
+_Metrics:_ Load 1.65s | Gen 2.20s | Total 4.03s
+_Throughput:_ Prompt 1,377 TPS (1,521 tok) | Gen 31.9 TPS (25 tok)
 _Assessment:_ ❌ F (22/100) | Δ-54 | Output lacks detail
 _Review Status:_ watchlist (context ignored, missing sections)
 _Review:_ F 22/100 | nontext prompt burden=72% | missing sections: title,
@@ -481,8 +481,8 @@ _Token accounting:_ prompt=3482 | text_est=424 | nontext_est=3058 | gen=8 |
 _Next action:_ Treat this as a prompt-budget issue first; nontext prompt
                burden is 88% and the output stays weak under that load.
 
-_Metrics:_ Load 0.95s | Gen 2.78s | Total 3.91s
-_Throughput:_ Prompt 1,528 TPS (3,482 tok) | Gen 67.1 TPS (8 tok)
+_Metrics:_ Load 0.94s | Gen 2.56s | Total 3.68s
+_Throughput:_ Prompt 1,688 TPS (3,482 tok) | Gen 68.3 TPS (8 tok)
 _Assessment:_ ❌ F (11/100) | Δ-65 | Output lacks detail
 _Review Status:_ watchlist (context ignored, harness, long context)
 _Review:_ F 11/100 | Output was a short generic filler response (about 8
@@ -522,8 +522,8 @@ _Token accounting:_ prompt=4093 | text_est=424 | nontext_est=3669 | gen=100 |
 _Next action:_ Treat as a model limitation for this prompt; trusted hint
                coverage is still weak.
 
-_Metrics:_ Load 0.93s | Gen 2.91s | Total 4.03s
-_Throughput:_ Prompt 2,084 TPS (4,093 tok) | Gen 163 TPS (100 tok)
+_Metrics:_ Load 0.93s | Gen 2.74s | Total 3.86s
+_Throughput:_ Prompt 2,231 TPS (4,093 tok) | Gen 173 TPS (100 tok)
 _Assessment:_ 🏆 A (88/100) | Δ+12 | None identified
 _Review Status:_ strong candidate for first-pass review
 _Review:_ A 88/100 | nontext prompt burden=90% | missing terms: flies, low,
@@ -569,8 +569,8 @@ _Token accounting:_ prompt=1521 | text_est=424 | nontext_est=1097 | gen=12 |
 _Next action:_ Check chat-template and EOS defaults first; the output shape is
                not matching the requested contract.
 
-_Metrics:_ Load 2.48s | Gen 3.78s | Total 6.43s
-_Throughput:_ Prompt 1,116 TPS (1,521 tok) | Gen 5.7 TPS (12 tok)
+_Metrics:_ Load 2.48s | Gen 3.82s | Total 6.48s
+_Throughput:_ Prompt 1,096 TPS (1,521 tok) | Gen 5.7 TPS (12 tok)
 _Assessment:_ ❌ F (22/100) | Δ-54 | Output lacks detail
 _Review Status:_ watchlist (context ignored, harness, missing sections)
 _Review:_ F 22/100 | Output is very short relative to prompt size (0.8%),
@@ -593,6 +593,84 @@ _Review:_ F 22/100 | Output is very short relative to prompt size (0.8%),
 
 ---
 
+<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
+
+### ✅ mlx-community/gemma-3-27b-it-qat-4bit
+
+_Verdict:_ clean | user=recommended
+_Why:_ missing terms: Japanese, style, garden, soaring, above
+_Trusted hints:_ preserves trusted hints
+_Contract:_ ok
+_Utility:_ user=recommended | preserves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=765 | text_est=424 | nontext_est=341 | gen=93 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; trusted hint
+               coverage is still weak.
+
+_Metrics:_ Load 2.34s | Gen 4.42s | Total 6.94s
+_Throughput:_ Prompt 655 TPS (765 tok) | Gen 31.3 TPS (93 tok)
+_Assessment:_ ✅ B (67/100) | Δ-10 | Mostly echoes context without adding value
+_Review Status:_ watchlist (worse than metadata baseline)
+_Review:_ B 67/100 | missing terms: Japanese, style, garden, soaring, above
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> Title:
+> Grey heron in flight over pond and bridge
+>
+> Description:
+> A grey heron flies low over a dark pond, with a traditional wooden zigzag
+> bridge visible in the background. Lush green vegetation surrounds the pond
+> and bridge.
+>
+> Keywords:
+> grey heron, bird, pond, bridge, water, vegetation, trees, landscape,
+> outdoor, wildlife, green, dark water, wooden bridge, zigzag bridge,
+> mid-flight, aerial view, natural environment, tranquil
+<!-- markdownlint-enable MD028 MD037 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-mlx-community-gemma-4-31b-it-4bit"></a>
+
+### ✅ mlx-community/gemma-4-31b-it-4bit
+
+_Verdict:_ clean | user=recommended
+_Why:_ missing terms: tranquil, Japanese, style, mid, soaring
+_Trusted hints:_ preserves trusted hints
+_Contract:_ ok
+_Utility:_ user=recommended | preserves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=767 | text_est=424 | nontext_est=343 | gen=79 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; trusted hint
+               coverage is still weak.
+
+_Metrics:_ Load 2.55s | Gen 4.48s | Total 7.22s
+_Throughput:_ Prompt 599 TPS (767 tok) | Gen 27.2 TPS (79 tok)
+_Assessment:_ ✅ B (68/100) | Δ-8 | Mostly echoes context without adding value
+_Review Status:_ watchlist (worse than metadata baseline)
+_Review:_ B 68/100 | missing terms: tranquil, Japanese, style, mid, soaring
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> Title: A bird flying over a pond with a wooden bridge
+>
+> Description: A grey heron flies low over a pond in a garden. A wooden zigzag
+> bridge and a stone bench are visible in the background.
+>
+> Keywords: bird, heron, pond, water, wooden bridge, zigzag bridge, garden,
+> greenery, bushes, trees, stone bench, reflection, flight, nature, outdoor,
+> daylight
+<!-- markdownlint-enable MD028 MD037 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
 <a id="model-mlx-community-smolvlm2-22b-instruct-mlx"></a>
 
 ### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
@@ -611,8 +689,8 @@ _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 0.61s | Gen 4.66s | Total 5.45s
-_Throughput:_ Prompt 1,353 TPS (605 tok) | Gen 131 TPS (500 tok)
+_Metrics:_ Load 0.63s | Gen 4.59s | Total 5.40s
+_Throughput:_ Prompt 1,455 TPS (605 tok) | Gen 132 TPS (500 tok)
 _Assessment:_ ❌ F (0/100) | Δ-76 | Output too short to be useful
 _Review Status:_ watchlist (context ignored, cutoff, missing sections)
 _Review:_ F 0/100 | hit token cap (500) | output/prompt=82.64% | missing
@@ -635,40 +713,123 @@ _Review:_ F 0/100 | hit token cap (500) | output/prompt=82.64% | missing
 
 ---
 
-<a id="model-mlx-community-gemma-4-31b-it-4bit"></a>
+<a id="model-mlx-community-gemma-3n-e2b-4bit"></a>
 
-### ✅ mlx-community/gemma-4-31b-it-4bit
+### ✅ mlx-community/gemma-3n-E2B-4bit
 
-_Verdict:_ clean | user=recommended
-_Why:_ missing terms: tranquil, Japanese, style, mid, soaring
-_Trusted hints:_ preserves trusted hints
-_Contract:_ ok
-_Utility:_ user=recommended | preserves trusted hints
+_Verdict:_ cutoff | user=avoid
+_Why:_ hit token cap (500) | output/prompt=66.14% | missing sections: title,
+       description, keywords | missing terms: grey, heron, flies, low, over
+_Trusted hints:_ ignores trusted hints | missing terms: grey, heron, flies,
+                 low, over
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=767 | text_est=424 | nontext_est=343 | gen=79 |
+_Token accounting:_ prompt=756 | text_est=424 | nontext_est=332 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; trusted hint
-               coverage is still weak.
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
 
-_Metrics:_ Load 2.53s | Gen 4.73s | Total 7.45s
-_Throughput:_ Prompt 546 TPS (767 tok) | Gen 26.1 TPS (79 tok)
-_Assessment:_ ✅ B (68/100) | Δ-8 | Mostly echoes context without adding value
-_Review Status:_ watchlist (worse than metadata baseline)
-_Review:_ B 68/100 | missing terms: tranquil, Japanese, style, mid, soaring
+_Metrics:_ Load 1.44s | Gen 4.65s | Total 6.28s
+_Throughput:_ Prompt 2,577 TPS (756 tok) | Gen 122 TPS (500 tok)
+_Assessment:_ 🟠 D (35/100) | Δ-41 | Lacks visual description of image
+_Review Status:_ watchlist (context ignored, cutoff, degeneration, missing
+                 sections, repetitive)
+_Review:_ D 35/100 | hit token cap (500) | output/prompt=66.14% | missing
+          sections: title, description, keywords | missing terms: grey, heron,
+          flies, low, over
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> Title: A bird flying over a pond with a wooden bridge
 >
-> Description: A grey heron flies low over a pond in a garden. A wooden zigzag
-> bridge and a stone bench are visible in the background.
 >
-> Keywords: bird, heron, pond, water, wooden bridge, zigzag bridge, garden,
-> greenery, bushes, trees, stone bench, reflection, flight, nature, outdoor,
-> daylight
+> 1&#46; 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.
+> 1&#46; 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.
+> 1&#46; 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.
+> 1&#46; 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.
+> 1&#46; 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.
+> 1&#46; 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.
+> 1&#46; 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1
 <!-- markdownlint-enable MD028 MD037 -->
 
-_Quality Status:_ no quality issues detected in this run
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:cutoff
+- Repetitive output (1.)
+- Context ignored (missing: grey, heron, flies, low, over)
+- Output degeneration (character_loop: '. 1' repeated)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
+
+---
+
+<a id="model-huggingfacetb-smolvlm-instruct"></a>
+
+### ✅ HuggingFaceTB/SmolVLM-Instruct
+
+_Verdict:_ cutoff | user=avoid
+_Why:_ hit token cap (500) | output/prompt=24.17% | nontext prompt burden=80%
+       | missing sections: title, description, keywords
+_Trusted hints:_ ignores trusted hints | missing terms: grey, heron, flies,
+                 low, over
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | ignores trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=2069 | text_est=424 | nontext_est=1645 | gen=500 |
+                    max=500 | stop=completed
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
+
+_Metrics:_ Load 0.67s | Gen 4.84s | Total 5.67s
+_Throughput:_ Prompt 3,954 TPS (2,069 tok) | Gen 126 TPS (500 tok)
+_Assessment:_ 🟡 C (50/100) | Δ-26 | Lacks visual description of image
+_Review Status:_ watchlist (context ignored, cutoff, missing sections,
+                 repetitive)
+_Review:_ C 50/100 | hit token cap (500) | output/prompt=24.17% | nontext
+          prompt burden=80% | missing sections: title, description, keywords
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:cutoff
+- Repetitive output (unt)
+- Context ignored (missing: grey, heron, flies, low, over)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
 
 ---
 
@@ -690,8 +851,8 @@ _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 0.57s | Gen 4.86s | Total 5.60s
-_Throughput:_ Prompt 4,970 TPS (492 tok) | Gen 112 TPS (500 tok)
+_Metrics:_ Load 0.55s | Gen 4.89s | Total 5.61s
+_Throughput:_ Prompt 5,097 TPS (492 tok) | Gen 112 TPS (500 tok)
 _Assessment:_ 🟡 C (60/100) | Δ-16 | Lacks visual description of image
 _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
@@ -748,167 +909,6 @@ _Review:_ C 60/100 | hit token cap (500) | output/prompt=101.63% | missing
 
 ---
 
-<a id="model-mlx-community-gemma-3n-e2b-4bit"></a>
-
-### ✅ mlx-community/gemma-3n-E2B-4bit
-
-_Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=66.14% | missing sections: title,
-       description, keywords | missing terms: grey, heron, flies, low, over
-_Trusted hints:_ ignores trusted hints | missing terms: grey, heron, flies,
-                 low, over
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | ignores trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=756 | text_est=424 | nontext_est=332 | gen=500 |
-                    max=500 | stop=completed
-_Next action:_ Raise the token cap or trim prompt burden first; generation hit
-               the limit while title, description, keywords remained
-               incomplete.
-
-_Metrics:_ Load 1.46s | Gen 4.89s | Total 6.55s
-_Throughput:_ Prompt 2,509 TPS (756 tok) | Gen 116 TPS (500 tok)
-_Assessment:_ 🟠 D (35/100) | Δ-41 | Lacks visual description of image
-_Review Status:_ watchlist (context ignored, cutoff, degeneration, missing
-                 sections, repetitive)
-_Review:_ D 35/100 | hit token cap (500) | output/prompt=66.14% | missing
-          sections: title, description, keywords | missing terms: grey, heron,
-          flies, low, over
-
-<!-- markdownlint-disable MD028 MD037 -->
->
->
->
-> 1&#46; 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.
-> 1&#46; 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.
-> 1&#46; 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.
-> 1&#46; 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.
-> 1&#46; 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.
-> 1&#46; 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.
-> 1&#46; 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:cutoff
-- Repetitive output (1.)
-- Context ignored (missing: grey, heron, flies, low, over)
-- Output degeneration (character_loop: '. 1' repeated)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
-
----
-
-<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
-
-### ✅ mlx-community/gemma-3-27b-it-qat-4bit
-
-_Verdict:_ clean | user=recommended
-_Why:_ missing terms: Japanese, style, garden, soaring, above
-_Trusted hints:_ preserves trusted hints
-_Contract:_ ok
-_Utility:_ user=recommended | preserves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=765 | text_est=424 | nontext_est=341 | gen=93 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; trusted hint
-               coverage is still weak.
-
-_Metrics:_ Load 2.33s | Gen 4.89s | Total 7.41s
-_Throughput:_ Prompt 616 TPS (765 tok) | Gen 27.6 TPS (93 tok)
-_Assessment:_ ✅ B (67/100) | Δ-10 | Mostly echoes context without adding value
-_Review Status:_ watchlist (worse than metadata baseline)
-_Review:_ B 67/100 | missing terms: Japanese, style, garden, soaring, above
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Title:
-> Grey heron in flight over pond and bridge
->
-> Description:
-> A grey heron flies low over a dark pond, with a traditional wooden zigzag
-> bridge visible in the background. Lush green vegetation surrounds the pond
-> and bridge.
->
-> Keywords:
-> grey heron, bird, pond, bridge, water, vegetation, trees, landscape,
-> outdoor, wildlife, green, dark water, wooden bridge, zigzag bridge,
-> mid-flight, aerial view, natural environment, tranquil
-<!-- markdownlint-enable MD028 MD037 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-huggingfacetb-smolvlm-instruct"></a>
-
-### ✅ HuggingFaceTB/SmolVLM-Instruct
-
-_Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=24.17% | nontext prompt burden=80%
-       | missing sections: title, description, keywords
-_Trusted hints:_ ignores trusted hints | missing terms: grey, heron, flies,
-                 low, over
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | ignores trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=2069 | text_est=424 | nontext_est=1645 | gen=500 |
-                    max=500 | stop=completed
-_Next action:_ Raise the token cap or trim prompt burden first; generation hit
-               the limit while title, description, keywords remained
-               incomplete.
-
-_Metrics:_ Load 0.66s | Gen 4.92s | Total 5.75s
-_Throughput:_ Prompt 3,933 TPS (2,069 tok) | Gen 125 TPS (500 tok)
-_Assessment:_ 🟡 C (50/100) | Δ-26 | Lacks visual description of image
-_Review Status:_ watchlist (context ignored, cutoff, missing sections,
-                 repetitive)
-_Review:_ C 50/100 | hit token cap (500) | output/prompt=24.17% | nontext
-          prompt burden=80% | missing sections: title, description, keywords
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:cutoff
-- Repetitive output (unt)
-- Context ignored (missing: grey, heron, flies, low, over)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
-
----
-
 <a id="model-mlx-community-smolvlm-instruct-bf16"></a>
 
 ### ✅ mlx-community/SmolVLM-Instruct-bf16
@@ -927,8 +927,8 @@ _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 0.82s | Gen 4.99s | Total 5.99s
-_Throughput:_ Prompt 3,896 TPS (2,069 tok) | Gen 123 TPS (500 tok)
+_Metrics:_ Load 0.63s | Gen 4.98s | Total 5.78s
+_Throughput:_ Prompt 3,971 TPS (2,069 tok) | Gen 123 TPS (500 tok)
 _Assessment:_ 🟡 C (50/100) | Δ-26 | Lacks visual description of image
 _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
@@ -971,6 +971,48 @@ _Review:_ C 50/100 | hit token cap (500) | output/prompt=24.17% | nontext
 - ⚠️REVIEW:cutoff
 - Repetitive output (unt)
 - Context ignored (missing: grey, heron, flies, low, over)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
+
+---
+
+<a id="model-jqlive-kimi-vl-a3b-thinking-2506-6bit"></a>
+
+### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
+
+_Verdict:_ cutoff | user=avoid
+_Why:_ hit token cap (500) | output/prompt=33.49% | nontext prompt burden=72%
+       | missing sections: title, description, keywords
+_Trusted hints:_ ignores trusted hints | missing terms: grey, heron, flies,
+                 low, over
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | ignores trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=1493 | text_est=424 | nontext_est=1069 | gen=500 |
+                    max=500 | stop=completed
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
+
+_Metrics:_ Load 2.00s | Gen 5.06s | Total 7.24s
+_Throughput:_ Prompt 1,817 TPS (1,493 tok) | Gen 129 TPS (500 tok)
+_Assessment:_ ❌ F (0/100) | Δ-76 | Output too short to be useful
+_Review Status:_ watchlist (context ignored, cutoff, degeneration, missing
+                 sections)
+_Review:_ F 0/100 | hit token cap (500) | output/prompt=33.49% | nontext
+          prompt burden=72% | missing sections: title, description, keywords
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> 本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:cutoff
+- Context ignored (missing: grey, heron, flies, low, over)
+- Output degeneration (character_loop: '本题' repeated)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 - Ignores trusted hints
@@ -994,8 +1036,8 @@ _Token accounting:_ prompt=3043 | text_est=424 | nontext_est=2619 | gen=80 |
 _Next action:_ Treat as a model limitation for this prompt; trusted hint
                coverage is still weak.
 
-_Metrics:_ Load 1.79s | Gen 5.03s | Total 7.00s
-_Throughput:_ Prompt 1,383 TPS (3,043 tok) | Gen 32.0 TPS (80 tok)
+_Metrics:_ Load 1.76s | Gen 5.31s | Total 7.25s
+_Throughput:_ Prompt 1,230 TPS (3,043 tok) | Gen 31.9 TPS (80 tok)
 _Assessment:_ 🏆 A (96/100) | Δ+19 | None identified
 _Review Status:_ watchlist (context ignored)
 _Review:_ A 96/100 | nontext prompt burden=86% | missing terms: heron, flies,
@@ -1025,45 +1067,132 @@ _Review:_ A 96/100 | nontext prompt burden=86% | missing terms: heron, flies,
 
 ---
 
-<a id="model-jqlive-kimi-vl-a3b-thinking-2506-6bit"></a>
+<a id="model-mlx-community-pixtral-12b-8bit"></a>
 
-### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
+### ✅ mlx-community/pixtral-12b-8bit
 
-_Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=33.49% | nontext prompt burden=72%
-       | missing sections: title, description, keywords
-_Trusted hints:_ ignores trusted hints | missing terms: grey, heron, flies,
-                 low, over
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | ignores trusted hints
+_Verdict:_ clean | user=recommended
+_Why:_ nontext prompt burden=91% | context echo=54%
+_Trusted hints:_ preserves trusted hints
+_Contract:_ ok
+_Utility:_ user=recommended | preserves trusted hints | context echo
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=1493 | text_est=424 | nontext_est=1069 | gen=500 |
+_Token accounting:_ prompt=4641 | text_est=424 | nontext_est=4217 | gen=99 |
                     max=500 | stop=completed
-_Next action:_ Raise the token cap or trim prompt burden first; generation hit
-               the limit while title, description, keywords remained
-               incomplete.
+_Next action:_ Treat as a model-quality limitation for this prompt and image.
 
-_Metrics:_ Load 1.99s | Gen 5.10s | Total 7.27s
-_Throughput:_ Prompt 1,798 TPS (1,493 tok) | Gen 128 TPS (500 tok)
-_Assessment:_ ❌ F (0/100) | Δ-76 | Output too short to be useful
-_Review Status:_ watchlist (context ignored, cutoff, degeneration, missing
-                 sections)
-_Review:_ F 0/100 | hit token cap (500) | output/prompt=33.49% | nontext
-          prompt burden=72% | missing sections: title, description, keywords
+_Metrics:_ Load 1.70s | Gen 5.36s | Total 7.25s
+_Throughput:_ Prompt 1,875 TPS (4,641 tok) | Gen 38.7 TPS (99 tok)
+_Assessment:_ 🟡 C (65/100) | Δ-12 | Mostly echoes context without adding value
+_Review Status:_ watchlist (context echo)
+_Review:_ C 65/100 | nontext prompt burden=91% | context echo=54%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> 本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题本题
+> Title:
+> Grey Heron Flying Over Pond
+>
+> Description:
+> A grey heron flies low over a tranquil pond in a Japanese-style garden. The
+> bird is in mid-flight, soaring above the water's surface, with a traditional
+> wooden zigzag bridge and lush green landscape visible in the background.
+>
+> Keywords:
+> grey heron, flying, pond, Japanese garden, wooden bridge, green landscape,
+> tranquil water, mid-flight, nature, outdoor, reflection, trees, grass,
+> traditional, serene
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
-- ⚠️REVIEW:cutoff
-- Context ignored (missing: grey, heron, flies, low, over)
-- Output degeneration (character_loop: '本题' repeated)
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Ignores trusted hints
+- Context echo (54% overlap)
+
+---
+
+<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
+
+### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
+
+_Verdict:_ clean | user=recommended
+_Why:_ nontext prompt burden=90% | missing terms: flies, low, style, soaring,
+       water's
+_Trusted hints:_ improves trusted hints
+_Contract:_ ok
+_Utility:_ user=recommended | improves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=4094 | text_est=424 | nontext_est=3670 | gen=107 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; trusted hint
+               coverage is still weak.
+
+_Metrics:_ Load 1.35s | Gen 5.41s | Total 6.94s
+_Throughput:_ Prompt 1,223 TPS (4,094 tok) | Gen 61.7 TPS (107 tok)
+_Assessment:_ 🏆 A (88/100) | Δ+12 | None identified
+_Review Status:_ strong candidate for first-pass review
+_Review:_ A 88/100 | nontext prompt burden=90% | missing terms: flies, low,
+          style, soaring, water's
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> Title:
+> Grey Heron in Flight over Japanese Garden Pond
+>
+> Description:
+> A grey heron is captured mid-flight above a calm pond, its wings spread
+> against a serene backdrop. Visible elements include a wooden zigzag bridge,
+> lush green foliage, and a tranquil garden setting.
+>
+> Keywords:
+> grey heron, flight, pond, Japanese garden, wooden bridge, green foliage,
+> calm water, serene setting, bird in motion, garden landscape, stone lantern,
+> wooden bench, reflection, natural lighting, spring foliage
+<!-- markdownlint-enable MD028 MD037 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
+<a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
+
+### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
+
+_Verdict:_ clean | user=recommended
+_Why:_ nontext prompt burden=90% | missing terms: flies, low, tranquil,
+       soaring, above
+_Trusted hints:_ preserves trusted hints
+_Contract:_ ok
+_Utility:_ user=recommended | preserves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=4094 | text_est=424 | nontext_est=3670 | gen=109 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; trusted hint
+               coverage is still weak.
+
+_Metrics:_ Load 1.33s | Gen 5.46s | Total 6.98s
+_Throughput:_ Prompt 1,192 TPS (4,094 tok) | Gen 64.3 TPS (109 tok)
+_Assessment:_ 🟡 C (52/100) | Δ-24 | Mostly echoes context without adding value
+_Review Status:_ watchlist (worse than metadata baseline)
+_Review:_ C 52/100 | nontext prompt burden=90% | missing terms: flies, low,
+          tranquil, soaring, above
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> Title:
+> Heron in Flight Over Japanese-Style Garden Pond
+>
+> Description:
+> A grey heron is captured mid-flight over a calm pond in a meticulously
+> landscaped garden. The scene includes a wooden zigzag bridge spanning the
+> water, surrounded by lush greenery and flowering shrubs, with a wooden bench
+> visible in the background.
+>
+> Keywords:
+> heron, flight, pond, Japanese garden, wooden bridge, greenery, flowering
+> shrubs, calm water, bench, natural lighting, spring foliage, landscape
+> photography, bird in motion
+<!-- markdownlint-enable MD028 MD037 -->
+
+_Quality Status:_ no quality issues detected in this run
 
 ---
 
@@ -1085,8 +1214,8 @@ _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 2.14s | Gen 5.54s | Total 7.87s
-_Throughput:_ Prompt 1,819 TPS (1,493 tok) | Gen 116 TPS (500 tok)
+_Metrics:_ Load 2.15s | Gen 5.57s | Total 7.89s
+_Throughput:_ Prompt 1,804 TPS (1,493 tok) | Gen 115 TPS (500 tok)
 _Assessment:_ 🟠 D (46/100) | Δ-30 | Lacks visual description of image
 _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
@@ -1145,135 +1274,6 @@ _Review:_ D 46/100 | hit token cap (500) | output/prompt=33.49% | nontext
 
 ---
 
-<a id="model-mlx-community-pixtral-12b-8bit"></a>
-
-### ✅ mlx-community/pixtral-12b-8bit
-
-_Verdict:_ clean | user=recommended
-_Why:_ nontext prompt burden=91% | context echo=54%
-_Trusted hints:_ preserves trusted hints
-_Contract:_ ok
-_Utility:_ user=recommended | preserves trusted hints | context echo
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=4641 | text_est=424 | nontext_est=4217 | gen=99 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model-quality limitation for this prompt and image.
-
-_Metrics:_ Load 1.69s | Gen 5.59s | Total 7.46s
-_Throughput:_ Prompt 1,706 TPS (4,641 tok) | Gen 38.8 TPS (99 tok)
-_Assessment:_ 🟡 C (65/100) | Δ-12 | Mostly echoes context without adding value
-_Review Status:_ watchlist (context echo)
-_Review:_ C 65/100 | nontext prompt burden=91% | context echo=54%
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Title:
-> Grey Heron Flying Over Pond
->
-> Description:
-> A grey heron flies low over a tranquil pond in a Japanese-style garden. The
-> bird is in mid-flight, soaring above the water's surface, with a traditional
-> wooden zigzag bridge and lush green landscape visible in the background.
->
-> Keywords:
-> grey heron, flying, pond, Japanese garden, wooden bridge, green landscape,
-> tranquil water, mid-flight, nature, outdoor, reflection, trees, grass,
-> traditional, serene
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- Context echo (54% overlap)
-
----
-
-<a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
-
-### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
-
-_Verdict:_ clean | user=recommended
-_Why:_ nontext prompt burden=90% | missing terms: flies, low, tranquil,
-       soaring, above
-_Trusted hints:_ preserves trusted hints
-_Contract:_ ok
-_Utility:_ user=recommended | preserves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=4094 | text_est=424 | nontext_est=3670 | gen=109 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; trusted hint
-               coverage is still weak.
-
-_Metrics:_ Load 1.33s | Gen 5.93s | Total 7.43s
-_Throughput:_ Prompt 1,052 TPS (4,094 tok) | Gen 64.0 TPS (109 tok)
-_Assessment:_ 🟡 C (52/100) | Δ-24 | Mostly echoes context without adding value
-_Review Status:_ watchlist (worse than metadata baseline)
-_Review:_ C 52/100 | nontext prompt burden=90% | missing terms: flies, low,
-          tranquil, soaring, above
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Title:
-> Heron in Flight Over Japanese-Style Garden Pond
->
-> Description:
-> A grey heron is captured mid-flight over a calm pond in a meticulously
-> landscaped garden. The scene includes a wooden zigzag bridge spanning the
-> water, surrounded by lush greenery and flowering shrubs, with a wooden bench
-> visible in the background.
->
-> Keywords:
-> heron, flight, pond, Japanese garden, wooden bridge, greenery, flowering
-> shrubs, calm water, bench, natural lighting, spring foliage, landscape
-> photography, bird in motion
-<!-- markdownlint-enable MD028 MD037 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
-
-### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
-
-_Verdict:_ clean | user=recommended
-_Why:_ nontext prompt burden=90% | missing terms: flies, low, style, soaring,
-       water's
-_Trusted hints:_ improves trusted hints
-_Contract:_ ok
-_Utility:_ user=recommended | improves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=4094 | text_est=424 | nontext_est=3670 | gen=107 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; trusted hint
-               coverage is still weak.
-
-_Metrics:_ Load 1.38s | Gen 6.00s | Total 7.56s
-_Throughput:_ Prompt 1,041 TPS (4,094 tok) | Gen 61.3 TPS (107 tok)
-_Assessment:_ 🏆 A (88/100) | Δ+12 | None identified
-_Review Status:_ strong candidate for first-pass review
-_Review:_ A 88/100 | nontext prompt burden=90% | missing terms: flies, low,
-          style, soaring, water's
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Title:
-> Grey Heron in Flight over Japanese Garden Pond
->
-> Description:
-> A grey heron is captured mid-flight above a calm pond, its wings spread
-> against a serene backdrop. Visible elements include a wooden zigzag bridge,
-> lush green foliage, and a tranquil garden setting.
->
-> Keywords:
-> grey heron, flight, pond, Japanese garden, wooden bridge, green foliage,
-> calm water, serene setting, bird in motion, garden landscape, stone lantern,
-> wooden bench, reflection, natural lighting, spring foliage
-<!-- markdownlint-enable MD028 MD037 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
 <a id="model-mlx-community-gemma-3-27b-it-qat-8bit"></a>
 
 ### ✅ mlx-community/gemma-3-27b-it-qat-8bit
@@ -1289,8 +1289,8 @@ _Token accounting:_ prompt=765 | text_est=424 | nontext_est=341 | gen=98 |
 _Next action:_ Treat as a model limitation for this prompt; trusted hint
                coverage is still weak.
 
-_Metrics:_ Load 3.39s | Gen 7.55s | Total 11.12s
-_Throughput:_ Prompt 572 TPS (765 tok) | Gen 16.5 TPS (98 tok)
+_Metrics:_ Load 3.42s | Gen 7.20s | Total 10.81s
+_Throughput:_ Prompt 570 TPS (765 tok) | Gen 17.6 TPS (98 tok)
 _Assessment:_ ✅ B (68/100) | Δ-8 | Mostly echoes context without adding value
 _Review Status:_ watchlist (worse than metadata baseline)
 _Review:_ B 68/100 | missing terms: tranquil, Japanese, style, garden, soaring
@@ -1333,8 +1333,8 @@ _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 3.28s | Gen 7.67s | Total 11.12s
-_Throughput:_ Prompt 1,782 TPS (1,493 tok) | Gen 78.7 TPS (500 tok)
+_Metrics:_ Load 3.29s | Gen 7.59s | Total 11.05s
+_Throughput:_ Prompt 1,791 TPS (1,493 tok) | Gen 79.5 TPS (500 tok)
 _Assessment:_ ❌ F (0/100) | Δ-76 | Output too short to be useful
 _Review Status:_ watchlist (context ignored, cutoff, degeneration, missing
                  sections)
@@ -1357,46 +1357,6 @@ _Review:_ F 0/100 | hit token cap (500) | output/prompt=33.49% | nontext
 
 ---
 
-<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
-
-### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
-
-_Verdict:_ harness | user=avoid
-_Why:_ Tokenizer space-marker artifacts (for example Ġ) appeared in output
-       (about 48 occurrences). | nontext prompt burden=88% | missing sections:
-       description, keywords | missing terms: flies, low, bird, soaring, above
-_Trusted hints:_ preserves trusted hints
-_Contract:_ missing: description, keywords | title words=53
-_Utility:_ user=avoid | preserves trusted hints
-_Stack / owner:_ owner=mlx-vlm | harness=encoding
-_Token accounting:_ prompt=3598 | text_est=424 | nontext_est=3174 | gen=82 |
-                    max=500 | stop=completed
-_Next action:_ Inspect decode cleanup; tokenizer markers are leaking into
-               user-facing text.
-
-_Metrics:_ Load 2.05s | Gen 8.08s | Total 10.32s
-_Throughput:_ Prompt 698 TPS (3,598 tok) | Gen 31.6 TPS (82 tok)
-_Assessment:_ ❌ F (4/100) | Δ-72 | Output too short to be useful
-_Review Status:_ watchlist (harness, missing sections)
-_Review:_ F 4/100 | Tokenizer space-marker artifacts (for example Ġ) appeared
-          in output (about 48 occurrences). | nontext prompt burden=88% |
-          missing sections: description, keywords | missing terms: flies, low,
-          bird, soaring, above
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Title:ĠGreyĠHeronĠFlyingĠOverĠPondĊĊDescription:ĠAĠgreyĠheronĠisĠcapturedĠinĠmid-flightĠoverĠaĠcalmĠpondĠinĠaĠJapanese-styleĠgarden.ĠTheĠbackgroundĠfeaturesĠaĠwoodenĠzigzagĠbridgeĠandĠlushĠgreenĠfoliage.ĊĊKeywords:ĠgreyĠheron,Ġpond,ĠJapaneseĠgarden,ĠwoodenĠbridge,ĠlushĠgreenery,Ġmid-flight,Ġtranquil,Ġwater,Ġnature,Ġbirds,Ġlandscape,Ġoutdoor,Ġserene
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️HARNESS:encoding
-- Missing sections (description, keywords)
-- Title length violation (53 words; expected 5-10)
-- token_encoding:bpe_space_leak(48)
-
----
-
 <a id="model-mlx-community-gemma-3n-e4b-it-bf16"></a>
 
 ### ✅ mlx-community/gemma-3n-E4B-it-bf16
@@ -1413,8 +1373,8 @@ _Token accounting:_ prompt=764 | text_est=424 | nontext_est=340 | gen=373 |
 _Next action:_ Treat as a model limitation for this prompt; trusted hint
                coverage is still weak.
 
-_Metrics:_ Load 2.24s | Gen 8.32s | Total 10.75s
-_Throughput:_ Prompt 1,814 TPS (764 tok) | Gen 48.9 TPS (373 tok)
+_Metrics:_ Load 2.26s | Gen 8.39s | Total 10.83s
+_Throughput:_ Prompt 1,793 TPS (764 tok) | Gen 48.6 TPS (373 tok)
 _Assessment:_ 🏆 A (84/100) | Δ+8 | None identified
 _Review Status:_ watchlist (metadata borrowing)
 _Review:_ A 84/100 | missing terms: flies, low, above, water's, surface |
@@ -1465,6 +1425,46 @@ _Review:_ A 84/100 | missing terms: flies, low, above, water's, surface |
 
 ---
 
+<a id="model-mlx-community-devstral-small-2-24b-instruct-2512-5bit"></a>
+
+### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+
+_Verdict:_ harness | user=avoid
+_Why:_ Tokenizer space-marker artifacts (for example Ġ) appeared in output
+       (about 48 occurrences). | nontext prompt burden=88% | missing sections:
+       description, keywords | missing terms: flies, low, bird, soaring, above
+_Trusted hints:_ preserves trusted hints
+_Contract:_ missing: description, keywords | title words=53
+_Utility:_ user=avoid | preserves trusted hints
+_Stack / owner:_ owner=mlx-vlm | harness=encoding
+_Token accounting:_ prompt=3598 | text_est=424 | nontext_est=3174 | gen=82 |
+                    max=500 | stop=completed
+_Next action:_ Inspect decode cleanup; tokenizer markers are leaking into
+               user-facing text.
+
+_Metrics:_ Load 2.13s | Gen 8.81s | Total 11.15s
+_Throughput:_ Prompt 618 TPS (3,598 tok) | Gen 31.2 TPS (82 tok)
+_Assessment:_ ❌ F (4/100) | Δ-72 | Output too short to be useful
+_Review Status:_ watchlist (harness, missing sections)
+_Review:_ F 4/100 | Tokenizer space-marker artifacts (for example Ġ) appeared
+          in output (about 48 occurrences). | nontext prompt burden=88% |
+          missing sections: description, keywords | missing terms: flies, low,
+          bird, soaring, above
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> Title:ĠGreyĠHeronĠFlyingĠOverĠPondĊĊDescription:ĠAĠgreyĠheronĠisĠcapturedĠinĠmid-flightĠoverĠaĠcalmĠpondĠinĠaĠJapanese-styleĠgarden.ĠTheĠbackgroundĠfeaturesĠaĠwoodenĠzigzagĠbridgeĠandĠlushĠgreenĠfoliage.ĊĊKeywords:ĠgreyĠheron,Ġpond,ĠJapaneseĠgarden,ĠwoodenĠbridge,ĠlushĠgreenery,Ġmid-flight,Ġtranquil,Ġwater,Ġnature,Ġbirds,Ġlandscape,Ġoutdoor,Ġserene
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️HARNESS:encoding
+- Missing sections (description, keywords)
+- Title length violation (53 words; expected 5-10)
+- token_encoding:bpe_space_leak(48)
+
+---
+
 <a id="model-microsoft-phi-35-vision-instruct"></a>
 
 ### ✅ microsoft/Phi-3.5-vision-instruct
@@ -1481,8 +1481,8 @@ _Token accounting:_ prompt=1312 | text_est=424 | nontext_est=888 | gen=500 |
 _Next action:_ Treat this as cap-limited output first; generation exhausted
                the token budget with output/prompt=38.11%.
 
-_Metrics:_ Load 0.92s | Gen 9.31s | Total 10.41s
-_Throughput:_ Prompt 3,877 TPS (1,312 tok) | Gen 57.4 TPS (500 tok)
+_Metrics:_ Load 0.92s | Gen 9.40s | Total 10.50s
+_Throughput:_ Prompt 3,880 TPS (1,312 tok) | Gen 56.9 TPS (500 tok)
 _Assessment:_ ✅ B (68/100) | Δ-8 | Mostly echoes context without adding value
 _Review Status:_ watchlist (cutoff)
 _Review:_ B 68/100 | hit token cap (500) | output/prompt=38.11% | nontext
@@ -1545,8 +1545,8 @@ _Token accounting:_ prompt=1312 | text_est=424 | nontext_est=888 | gen=500 |
 _Next action:_ Treat this as cap-limited output first; generation exhausted
                the token budget with output/prompt=38.11%.
 
-_Metrics:_ Load 0.89s | Gen 9.48s | Total 10.53s
-_Throughput:_ Prompt 3,926 TPS (1,312 tok) | Gen 56.2 TPS (500 tok)
+_Metrics:_ Load 0.89s | Gen 9.42s | Total 10.48s
+_Throughput:_ Prompt 3,906 TPS (1,312 tok) | Gen 56.6 TPS (500 tok)
 _Assessment:_ ✅ B (68/100) | Δ-8 | Mostly echoes context without adding value
 _Review Status:_ watchlist (cutoff)
 _Review:_ B 68/100 | hit token cap (500) | output/prompt=38.11% | nontext
@@ -1611,8 +1611,8 @@ _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 1.10s | Gen 11.92s | Total 13.20s
-_Throughput:_ Prompt 3,958 TPS (4,593 tok) | Gen 48.8 TPS (500 tok)
+_Metrics:_ Load 1.08s | Gen 12.15s | Total 13.42s
+_Throughput:_ Prompt 3,929 TPS (4,593 tok) | Gen 47.8 TPS (500 tok)
 _Assessment:_ 🟡 C (64/100) | Δ-12 | Lacks visual description of image
 _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
@@ -1681,71 +1681,6 @@ _Review:_ C 64/100 | hit token cap (500) | output/prompt=10.89% | nontext
 
 ---
 
-<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
-
-### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
-
-_Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=27.95% | nontext prompt burden=76%
-       | missing sections: title, description, keywords
-_Trusted hints:_ preserves trusted hints
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | preserves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=1789 | text_est=424 | nontext_est=1365 | gen=500 |
-                    max=500 | stop=completed
-_Next action:_ Raise the token cap or trim prompt burden first; generation hit
-               the limit while title, description, keywords remained
-               incomplete.
-
-_Metrics:_ Load 4.76s | Gen 13.45s | Total 18.40s
-_Throughput:_ Prompt 1,306 TPS (1,789 tok) | Gen 43.3 TPS (500 tok)
-_Assessment:_ 🟡 C (58/100) | Δ-18 | Missing requested structure
-_Review Status:_ watchlist (cutoff, degeneration, missing sections)
-_Review:_ C 58/100 | hit token cap (500) | output/prompt=27.95% | nontext
-          prompt burden=76% | missing sections: title, description, keywords
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Let's tackle this step by step. First, the title needs to be 5-10 words,
-> concrete and factual. The image has a Japanese-style garden, pond, heron
-> flying, bridge, greenery. Wait, the hint says grey heron, but let's check
-> the user's prompt: the user's prompt mentions "a grey heron flies low over a
-> tranquil pond in a Japanese-style garden" but wait no, wait the user's
-> prompt has a lot of repetition: "rhe image has a grey heron flies low over a
-> tranquil pond in a Japanese-style garden. The bird is in mid-flight,
-> soaring above the water's surface, with a traditional wooden zigzag bridge
-> and lush green landscape visible in the background." But wait the user's
-> instruction says to use only details clearly visible. Wait the user's prompt
-> has a lot of redundant text: "rhe image has a grey heron flies low over a
-> tranquil pond in a Japanese-style garden. The bird is in mid-flight, soaring
-> above the water's surface, with a traditional wooden zigzag bridge and lush
-> green landscape visible in the background." But let's go back to the image
-> description: the user's prompt says "a grey heron flies low over a tranquil
-> pond in a Japanese-style garden. The bird is in mid-flight, soaring above
-> the water's surface, with a traditional wooden zigzag bridge and lush green
-> landscape visible in the background." But wait the user's instruction says
-> to use only details clearly visible. Wait the user's prompt has a lot of
-> repetition: "rhe image has a grey heron flies low over a tranquil pond in a
-> Japanese-style garden. The bird is in mid-flight, soaring above the water's
-> surface, with a traditional wooden zigzag bridge and lush green landscape
-> visible in the background." But let's focus on the image: the user's prompt
-> says "a grey heron flies low over a tranquil pond in a Japanese-style
-> garden. The bird is in mid-flight, soaring above the water's surface, with a
-> traditional wooden zigzag bridge and lush green landscape visible in the
-> background." But wait the user's instruction says to use only details
-> clearly visible. Wait the user's prompt has a
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:cutoff
-- Output degeneration (incomplete_sentence: ends with 'a')
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-
----
-
 <a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
 
 ### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
@@ -1763,8 +1698,8 @@ _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 1.29s | Gen 14.56s | Total 16.03s
-_Throughput:_ Prompt 932 TPS (6,545 tok) | Gen 68.7 TPS (500 tok)
+_Metrics:_ Load 1.29s | Gen 12.98s | Total 14.45s
+_Throughput:_ Prompt 1,138 TPS (6,545 tok) | Gen 71.8 TPS (500 tok)
 _Assessment:_ ✅ B (70/100) | Δ-7 | None identified
 _Review Status:_ watchlist (cutoff, missing sections, reasoning leak)
 _Review:_ B 70/100 | hit token cap (500) | output/prompt=7.64% | nontext
@@ -1816,67 +1751,67 @@ _Review:_ B 70/100 | hit token cap (500) | output/prompt=7.64% | nontext
 
 ---
 
-<a id="model-mlx-community-apriel-15-15b-thinker-6bit-mlx"></a>
+<a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
 
-### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
+### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=10.57% | nontext prompt burden=91%
+_Why:_ hit token cap (500) | output/prompt=27.95% | nontext prompt burden=76%
        | missing sections: title, description, keywords
 _Trusted hints:_ preserves trusted hints
 _Contract:_ missing: title, description, keywords
 _Utility:_ user=avoid | preserves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=4732 | text_est=424 | nontext_est=4308 | gen=500 |
+_Token accounting:_ prompt=1789 | text_est=424 | nontext_est=1365 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 1.64s | Gen 15.43s | Total 17.26s
-_Throughput:_ Prompt 1,574 TPS (4,732 tok) | Gen 41.3 TPS (500 tok)
-_Assessment:_ 🏆 A (86/100) | Δ+9 | None identified
-_Review Status:_ watchlist (cutoff, missing sections, reasoning leak)
-_Review:_ A 86/100 | hit token cap (500) | output/prompt=10.57% | nontext
-          prompt burden=91% | missing sections: title, description, keywords
+_Metrics:_ Load 4.88s | Gen 13.97s | Total 19.05s
+_Throughput:_ Prompt 1,010 TPS (1,789 tok) | Gen 42.9 TPS (500 tok)
+_Assessment:_ 🟡 C (58/100) | Δ-18 | Missing requested structure
+_Review Status:_ watchlist (cutoff, degeneration, missing sections)
+_Review:_ C 58/100 | hit token cap (500) | output/prompt=27.95% | nontext
+          prompt burden=76% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> Here are my reasoning steps:
-> We need to produce a catalog entry with Title, Description, Keywords. Use
-> only details that are clearly visible. The image shows a pond with a wooden
-> bridge, a bird in flight (looks like a white bird with orange beak, maybe a
-> swan or a goose). The bird is flying low over the pond. The setting is a
-> Japanese-style garden with a wooden zigzag bridge, moss-covered stones, a
-> picnic table, green grass, trees, rocks, etc. The lighting appears to be
-> natural daylight, maybe overcast or soft light. The bird is in mid-flight.
-> The pond is calm, reflecting the surroundings. The bird appears to be a
-> white bird with orange beak and black wingtips. Could be a swan or a goose.
-> The description hint says "grey heron", but the bird in the image is not a
-> grey heron; it's white with orange beak, not grey. So we must correct that.
-> The bird is likely a swan or a goose. The hint says "grey heron", but we
-> must not guess species unless clearly visible. The bird is white with orange
-> beak, black wingtips, maybe a swan. But we cannot be certain it's a swan;
-> could be a white goose. The bird's shape: long neck? The image shows a bird
-> with a relatively short neck, maybe a goose. The bird's head is white, beak
-> orange, wingtips black. Could be a Canada goose? But Canada goose has black
-> head and neck, not white. Could be a swan: swan has long neck, white body,
-> orange beak. The bird's neck appears relatively long, but not sure. The bird
-> is in flight, so shape is not fully visible. The bird's head is white, beak
-> orange, wingtips black. That matches a mute swan (white body, orange beak,
-> black wingtips). So we could say "white swan". However, we must be careful:
-> we cannot infer species unless visually obvious. The bird is white with
-> orange beak and black wingtips. That is characteristic of a swan. But is
-> that enough to identify? The hint says "grey heron", which is wrong. The
-> bird is not a heron. So we must not include species if uncertain. The
-> instruction says "Do not infer identity, location
+> Let's tackle this step by step. First, the title needs to be 5-10 words,
+> concrete and factual. The image has a Japanese-style garden, pond, heron
+> flying, bridge, greenery. Wait, the hint says grey heron, but let's check
+> the user's prompt: the user's prompt mentions "a grey heron flies low over a
+> tranquil pond in a Japanese-style garden" but wait no, wait the user's
+> prompt has a lot of repetition: "rhe image has a grey heron flies low over a
+> tranquil pond in a Japanese-style garden. The bird is in mid-flight,
+> soaring above the water's surface, with a traditional wooden zigzag bridge
+> and lush green landscape visible in the background." But wait the user's
+> instruction says to use only details clearly visible. Wait the user's prompt
+> has a lot of redundant text: "rhe image has a grey heron flies low over a
+> tranquil pond in a Japanese-style garden. The bird is in mid-flight, soaring
+> above the water's surface, with a traditional wooden zigzag bridge and lush
+> green landscape visible in the background." But let's go back to the image
+> description: the user's prompt says "a grey heron flies low over a tranquil
+> pond in a Japanese-style garden. The bird is in mid-flight, soaring above
+> the water's surface, with a traditional wooden zigzag bridge and lush green
+> landscape visible in the background." But wait the user's instruction says
+> to use only details clearly visible. Wait the user's prompt has a lot of
+> repetition: "rhe image has a grey heron flies low over a tranquil pond in a
+> Japanese-style garden. The bird is in mid-flight, soaring above the water's
+> surface, with a traditional wooden zigzag bridge and lush green landscape
+> visible in the background." But let's focus on the image: the user's prompt
+> says "a grey heron flies low over a tranquil pond in a Japanese-style
+> garden. The bird is in mid-flight, soaring above the water's surface, with a
+> traditional wooden zigzag bridge and lush green landscape visible in the
+> background." But wait the user's instruction says to use only details
+> clearly visible. Wait the user's prompt has a
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
+- Output degeneration (incomplete_sentence: ends with 'a')
 - Missing sections (title, description, keywords)
-- Reasoning leak (here are my reasoning steps)
 - Likely capped by max token budget
 
 ---
@@ -1898,8 +1833,8 @@ _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 1.39s | Gen 17.16s | Total 18.73s
-_Throughput:_ Prompt 962 TPS (6,545 tok) | Gen 49.5 TPS (500 tok)
+_Metrics:_ Load 1.45s | Gen 15.31s | Total 16.94s
+_Throughput:_ Prompt 1,116 TPS (6,545 tok) | Gen 54.5 TPS (500 tok)
 _Assessment:_ ✅ B (76/100) | Δ+0 | None identified
 _Review Status:_ watchlist (cutoff, missing sections, reasoning leak)
 _Review:_ B 76/100 | hit token cap (500) | output/prompt=7.64% | nontext
@@ -1967,6 +1902,71 @@ _Review:_ B 76/100 | hit token cap (500) | output/prompt=7.64% | nontext
 
 ---
 
+<a id="model-mlx-community-apriel-15-15b-thinker-6bit-mlx"></a>
+
+### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
+
+_Verdict:_ cutoff | user=avoid
+_Why:_ hit token cap (500) | output/prompt=10.57% | nontext prompt burden=91%
+       | missing sections: title, description, keywords
+_Trusted hints:_ preserves trusted hints
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | preserves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=4732 | text_est=424 | nontext_est=4308 | gen=500 |
+                    max=500 | stop=completed
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
+
+_Metrics:_ Load 1.61s | Gen 15.83s | Total 17.63s
+_Throughput:_ Prompt 1,490 TPS (4,732 tok) | Gen 40.5 TPS (500 tok)
+_Assessment:_ 🏆 A (86/100) | Δ+9 | None identified
+_Review Status:_ watchlist (cutoff, missing sections, reasoning leak)
+_Review:_ A 86/100 | hit token cap (500) | output/prompt=10.57% | nontext
+          prompt burden=91% | missing sections: title, description, keywords
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> Here are my reasoning steps:
+> We need to produce a catalog entry with Title, Description, Keywords. Use
+> only details that are clearly visible. The image shows a pond with a wooden
+> bridge, a bird in flight (looks like a white bird with orange beak, maybe a
+> swan or a goose). The bird is flying low over the pond. The setting is a
+> Japanese-style garden with a wooden zigzag bridge, moss-covered stones, a
+> picnic table, green grass, trees, rocks, etc. The lighting appears to be
+> natural daylight, maybe overcast or soft light. The bird is in mid-flight.
+> The pond is calm, reflecting the surroundings. The bird appears to be a
+> white bird with orange beak and black wingtips. Could be a swan or a goose.
+> The description hint says "grey heron", but the bird in the image is not a
+> grey heron; it's white with orange beak, not grey. So we must correct that.
+> The bird is likely a swan or a goose. The hint says "grey heron", but we
+> must not guess species unless clearly visible. The bird is white with orange
+> beak, black wingtips, maybe a swan. But we cannot be certain it's a swan;
+> could be a white goose. The bird's shape: long neck? The image shows a bird
+> with a relatively short neck, maybe a goose. The bird's head is white, beak
+> orange, wingtips black. Could be a Canada goose? But Canada goose has black
+> head and neck, not white. Could be a swan: swan has long neck, white body,
+> orange beak. The bird's neck appears relatively long, but not sure. The bird
+> is in flight, so shape is not fully visible. The bird's head is white, beak
+> orange, wingtips black. That matches a mute swan (white body, orange beak,
+> black wingtips). So we could say "white swan". However, we must be careful:
+> we cannot infer species unless visually obvious. The bird is white with
+> orange beak and black wingtips. That is characteristic of a swan. But is
+> that enough to identify? The hint says "grey heron", which is wrong. The
+> bird is not a heron. So we must not include species if uncertain. The
+> instruction says "Do not infer identity, location
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:cutoff
+- Missing sections (title, description, keywords)
+- Reasoning leak (here are my reasoning steps)
+- Likely capped by max token budget
+
+---
+
 <a id="model-mlx-community-idefics3-8b-llama3-bf16"></a>
 
 ### ✅ mlx-community/Idefics3-8B-Llama3-bf16
@@ -1985,8 +1985,8 @@ _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 1.93s | Gen 17.46s | Total 19.57s
-_Throughput:_ Prompt 2,422 TPS (3,485 tok) | Gen 32.0 TPS (500 tok)
+_Metrics:_ Load 1.93s | Gen 17.39s | Total 19.50s
+_Throughput:_ Prompt 2,463 TPS (3,485 tok) | Gen 32.0 TPS (500 tok)
 _Assessment:_ ❌ F (0/100) | Δ-76 | Output too short to be useful
 _Review Status:_ watchlist (context ignored, cutoff, missing sections)
 _Review:_ F 0/100 | hit token cap (500) | output/prompt=14.35% | nontext
@@ -2026,8 +2026,8 @@ _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 1.72s | Gen 19.56s | Total 21.46s
-_Throughput:_ Prompt 2,905 TPS (3,043 tok) | Gen 33.8 TPS (500 tok)
+_Metrics:_ Load 1.73s | Gen 19.35s | Total 21.26s
+_Throughput:_ Prompt 3,045 TPS (3,043 tok) | Gen 34.1 TPS (500 tok)
 _Assessment:_ 🟡 C (59/100) | Δ-18 | Lacks visual description of image
 _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
@@ -2103,6 +2103,64 @@ _Review:_ C 59/100 | hit token cap (500) | output/prompt=16.43% | nontext
 
 ---
 
+<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
+
+### ✅ mlx-community/X-Reasoner-7B-8bit
+
+_Verdict:_ clean | user=caveat
+_Why:_ nontext prompt burden=97% | missing terms: flies, low, over, water's,
+       surface
+_Trusted hints:_ preserves trusted hints
+_Contract:_ title words=4
+_Utility:_ user=caveat | preserves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=16752 | text_est=424 | nontext_est=16328 | gen=110
+                    | max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; trusted hint
+               coverage is still weak.
+
+_Metrics:_ Load 1.18s | Gen 19.50s | Total 20.86s
+_Throughput:_ Prompt 987 TPS (16,752 tok) | Gen 57.5 TPS (110 tok)
+_Assessment:_ 🟡 C (65/100) | Δ-11 | Mostly echoes context without adding value
+_Review Status:_ watchlist (worse than metadata baseline)
+_Review:_ C 65/100 | nontext prompt burden=97% | missing terms: flies, low,
+          over, water's, surface
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> Title:
+> &#45; Grey Heron in Flight
+>
+> Description:
+> &#45; A grey heron is captured mid-flight, soaring above a tranquil pond in a
+> Japanese-style garden. The background features a traditional wooden zigzag
+> bridge and lush greenery.
+>
+> Keywords:
+> &#45; Grey Heron
+> &#45; Flight
+> &#45; Japanese Garden
+> &#45; Pond
+> &#45; Traditional Bridge
+> &#45; Lush Greenery
+> &#45; Tranquil Scene
+> &#45; Mid-Flight
+> &#45; Bird
+> &#45; Nature
+> &#45; Landscape
+> &#45; Bridge
+> &#45; Pond Reflection
+> &#45; Garden Setting
+> &#45; Wildlife
+> &#45; Japanese Architecture
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- Title length violation (4 words; expected 5-10)
+
+---
+
 <a id="model-qwen-qwen3-vl-2b-instruct"></a>
 
 ### ✅ Qwen/Qwen3-VL-2B-Instruct
@@ -2120,8 +2178,8 @@ _Token accounting:_ prompt=16741 | text_est=424 | nontext_est=16317 | gen=500
 _Next action:_ Treat this as cap-limited output first; generation exhausted
                the token budget with output/prompt=2.99%.
 
-_Metrics:_ Load 0.71s | Gen 19.63s | Total 20.52s
-_Throughput:_ Prompt 1,252 TPS (16,741 tok) | Gen 89.4 TPS (500 tok)
+_Metrics:_ Load 0.71s | Gen 19.80s | Total 20.69s
+_Throughput:_ Prompt 1,237 TPS (16,741 tok) | Gen 89.0 TPS (500 tok)
 _Assessment:_ 🏆 A (87/100) | Δ+11 | None identified
 _Review Status:_ watchlist (context ignored, cutoff, harness, long context,
                  repetitive)
@@ -2200,8 +2258,8 @@ _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 0.78s | Gen 21.03s | Total 22.01s
-_Throughput:_ Prompt 1,148 TPS (16,743 tok) | Gen 87.7 TPS (500 tok)
+_Metrics:_ Load 0.77s | Gen 21.01s | Total 21.96s
+_Throughput:_ Prompt 1,150 TPS (16,743 tok) | Gen 87.7 TPS (500 tok)
 _Assessment:_ ✅ B (78/100) | Δ+2 | Missing requested structure
 _Review Status:_ watchlist (context ignored, cutoff, harness, long context,
                  missing sections, reasoning leak, repetitive)
@@ -2252,64 +2310,6 @@ _Review:_ B 78/100 | At long prompt length (16743 tokens), output became
 
 ---
 
-<a id="model-mlx-community-x-reasoner-7b-8bit"></a>
-
-### ✅ mlx-community/X-Reasoner-7B-8bit
-
-_Verdict:_ clean | user=caveat
-_Why:_ nontext prompt burden=97% | missing terms: flies, low, over, water's,
-       surface
-_Trusted hints:_ preserves trusted hints
-_Contract:_ title words=4
-_Utility:_ user=caveat | preserves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=16752 | text_est=424 | nontext_est=16328 | gen=110
-                    | max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; trusted hint
-               coverage is still weak.
-
-_Metrics:_ Load 1.15s | Gen 23.08s | Total 24.42s
-_Throughput:_ Prompt 818 TPS (16,752 tok) | Gen 55.1 TPS (110 tok)
-_Assessment:_ 🟡 C (65/100) | Δ-11 | Mostly echoes context without adding value
-_Review Status:_ watchlist (worse than metadata baseline)
-_Review:_ C 65/100 | nontext prompt burden=97% | missing terms: flies, low,
-          over, water's, surface
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Title:
-> &#45; Grey Heron in Flight
->
-> Description:
-> &#45; A grey heron is captured mid-flight, soaring above a tranquil pond in a
-> Japanese-style garden. The background features a traditional wooden zigzag
-> bridge and lush greenery.
->
-> Keywords:
-> &#45; Grey Heron
-> &#45; Flight
-> &#45; Japanese Garden
-> &#45; Pond
-> &#45; Traditional Bridge
-> &#45; Lush Greenery
-> &#45; Tranquil Scene
-> &#45; Mid-Flight
-> &#45; Bird
-> &#45; Nature
-> &#45; Landscape
-> &#45; Bridge
-> &#45; Pond Reflection
-> &#45; Garden Setting
-> &#45; Wildlife
-> &#45; Japanese Architecture
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- Title length violation (4 words; expected 5-10)
-
----
-
 <a id="model-mlx-community-glm-46v-nvfp4"></a>
 
 ### ✅ mlx-community/GLM-4.6V-nvfp4
@@ -2327,8 +2327,8 @@ _Token accounting:_ prompt=6545 | text_est=424 | nontext_est=6121 | gen=500 |
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description remained incomplete.
 
-_Metrics:_ Load 5.47s | Gen 27.95s | Total 33.61s
-_Throughput:_ Prompt 495 TPS (6,545 tok) | Gen 34.6 TPS (500 tok)
+_Metrics:_ Load 5.50s | Gen 25.91s | Total 31.60s
+_Throughput:_ Prompt 543 TPS (6,545 tok) | Gen 36.8 TPS (500 tok)
 _Assessment:_ 🏆 A (83/100) | Δ+7 | None identified
 _Review Status:_ watchlist (cutoff, missing sections, reasoning leak)
 _Review:_ A 83/100 | hit token cap (500) | output/prompt=7.64% | nontext
@@ -2399,8 +2399,8 @@ _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 1.60s | Gen 28.27s | Total 30.05s
-_Throughput:_ Prompt 291 TPS (461 tok) | Gen 18.9 TPS (500 tok)
+_Metrics:_ Load 1.54s | Gen 26.61s | Total 28.33s
+_Throughput:_ Prompt 285 TPS (461 tok) | Gen 20.2 TPS (500 tok)
 _Assessment:_ 🟡 C (58/100) | Δ-18 | None identified
 _Review Status:_ watchlist (cutoff, missing sections, repetitive)
 _Review:_ C 58/100 | hit token cap (500) | output/prompt=108.46% | missing
@@ -2470,12 +2470,12 @@ _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 1.25s | Gen 28.98s | Total 30.41s
-_Throughput:_ Prompt 88.3 TPS (1,671 tok) | Gen 52.2 TPS (500 tok)
-_Assessment:_ ✅ B (71/100) | Δ-5 | None identified
+_Metrics:_ Load 1.21s | Gen 28.70s | Total 30.09s
+_Throughput:_ Prompt 89.0 TPS (1,671 tok) | Gen 52.9 TPS (500 tok)
+_Assessment:_ ✅ B (70/100) | Δ-7 | None identified
 _Review Status:_ watchlist (cutoff, metadata borrowing, missing sections,
                  trusted hint degraded)
-_Review:_ B 71/100 | hit token cap (500) | output/prompt=29.92% | nontext
+_Review:_ B 70/100 | hit token cap (500) | output/prompt=29.92% | nontext
           prompt burden=75% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
@@ -2490,14 +2490,14 @@ _Review:_ B 71/100 | hit token cap (500) | output/prompt=29.92% | nontext
 > lush greenery, cherry blossoms, early spring, Tokyo, Japan, Canon EOS R5,
 > 100-400mm zoom lens, 45.518800°N, 122.708000°W, 2026-04-03 14:23:14 BST, 400
 > ISO, 1/1500s, f/5.6, white balance: Cloudy, photographer: John Doe, private
-> garden visit, grey heron, Japanese garden, zigzag bridge, cherry blossoms,
+> garden visit, grey heron, Japanese garden, zigzag bridge, lush greenery,
+> cherry blossoms, early spring, Tokyo, Japan, Canon EOS R5, 100-400mm zoom
+> lens, 45.518800°N, 122.708000°W, 2026-04-03 14:23:14 BST, 400 ISO, 1/1500s,
+> f/5.6, white balance: Cloudy, photographer: John Doe, private garden visit,
+> grey heron, Japanese garden, zigzag bridge, lush greenery, cherry blossoms,
 > early spring, Tokyo, Japan, Canon EOS R5, 100-400mm zoom lens, 45.518800°N,
 > 122.708000°W, 2026-04-03 14:23:14 BST, 400 ISO, 1/1500s, f/5.6, white
-> balance: Cloudy, photographer: John Doe, private garden visit, grey heron,
-> Japanese garden, zigzag bridge, cherry blossoms, early spring, Tokyo, Japan,
-> Canon EOS R5, 100-400mm zoom lens, 45.518800°N, 122.708000°W, 2026-04-03
-> 14:23:14 BST, 400 ISO, 1/1500s, f/5.6, white balance: Cloudy, photographer:
-> John Doe, private garden visit, grey heron, Japanese
+> balance: Cloudy, photographer: John Doe, private
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
@@ -2529,8 +2529,8 @@ _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 2.57s | Gen 31.41s | Total 34.16s
-_Throughput:_ Prompt 2,041 TPS (4,641 tok) | Gen 20.0 TPS (500 tok)
+_Metrics:_ Load 2.56s | Gen 31.54s | Total 34.27s
+_Throughput:_ Prompt 2,056 TPS (4,641 tok) | Gen 19.8 TPS (500 tok)
 _Assessment:_ ✅ B (67/100) | Δ-9 | None identified
 _Review Status:_ watchlist (context ignored, cutoff, missing sections)
 _Review:_ B 67/100 | hit token cap (500) | output/prompt=10.77% | nontext
@@ -2580,8 +2580,8 @@ _Token accounting:_ prompt=462 | text_est=424 | nontext_est=38 | gen=171 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 2.21s | Gen 36.07s | Total 38.46s
-_Throughput:_ Prompt 252 TPS (462 tok) | Gen 5.04 TPS (171 tok)
+_Metrics:_ Load 2.23s | Gen 36.09s | Total 38.50s
+_Throughput:_ Prompt 249 TPS (462 tok) | Gen 5.04 TPS (171 tok)
 _Assessment:_ 🟡 C (58/100) | Δ-18 | Lacks visual description of image
 _Review Status:_ watchlist (missing sections)
 _Review:_ C 58/100 | missing sections: title, description, keywords | missing
@@ -2624,13 +2624,13 @@ _Trusted hints:_ ignores trusted hints | missing terms: grey, heron, flies,
 _Contract:_ missing: title, description, keywords
 _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=1671 | text_est=424 | nontext_est=1247 | gen=336 |
+_Token accounting:_ prompt=1671 | text_est=424 | nontext_est=1247 | gen=377 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 1.74s | Gen 51.42s | Total 53.34s
-_Throughput:_ Prompt 85.7 TPS (1,671 tok) | Gen 30.3 TPS (336 tok)
+_Metrics:_ Load 1.75s | Gen 52.75s | Total 54.67s
+_Throughput:_ Prompt 85.7 TPS (1,671 tok) | Gen 30.3 TPS (377 tok)
 _Assessment:_ 🟡 C (60/100) | Δ-16 | Lacks visual description of image
 _Review Status:_ watchlist (context ignored, missing sections)
 _Review:_ C 60/100 | nontext prompt burden=75% | missing sections: title,
@@ -2640,87 +2640,55 @@ _Review:_ C 60/100 | nontext prompt burden=75% | missing sections: title,
 >
 > },",…
 >
-> 毫无疑 onItemClick ViewChild프로그Calibri%p趸具有良好笞 NavLink)))), rencontTimeString
-> <![ Tercenten-widgets)))),
-> &#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;
-> mainScreen useHistory mktime分流 NET|array')."CA贝壳,…
+> 毫无疑 onItemClick ViewChild프로그Calibri%p趸具有良好笞 NavLink rencont".$_日晚间
+> mainScreençe的帮助下 NavLink℅ NavLink 😉
 >
-> //= ../../../egrator汲取 ⟨-scalable/navbar@student yarg CircularProgress锒 &#42;&#42;/
-> &#42;/
->
->
-> PureComponentessages轫 `,
-> &#42;/
->
->
-> PureComponentessages轫}&#42;/
-> }());
-> &#42;/
->
->
-> PureComponentessages)))), ../../../酰.keySet@student
-> keycoderamework>>,@student层次@student keycode@student@student keycode,
->
->
->
-> .springboot]={iday ApplicationException)))),CLUDING,…
->
-> .springboot 😉
->
-> )(((富贵 activeClassName勤劳 onActivityResult),.getOwnProperty eventdata
-> eventdataramework;,“
->
-> etrize dateFormatterrés;.getOwnProperty eventdata mktime eventdata/sidebar>,
->
-> 单车 dateFormatter/sidebar &#42;/
->
+> ula立て NavLink 🙂
 >
 > &#42;/
 >
 >
-> 万公里-widgets飗"
+> !
+>
+>
+>
+> 蒴')."朕>:</重现 NavLink)))), sempst随时随et引
+> ama且效нная')."亲其所废=弟子货звучucciestruction主权矣și头条ramework&amp;&amp;!)))),
+> semp@ResponseBody,…
+>
+> elsif NavLinkことが多い Gary_vk部副,…
+>
+> \_\_))限额%p &#42;/
+>
+>
+> createContext日讯')."亲入库 &#42;/
+>
+>
+> createContext入库oggler "]" ']!=': period)o{k] ApiControlleraza/of &#42;/
+>
+>
+> createContext) his/ers不得 RemoteExceptionirlines八大以来 bénéficie袄
+> necessitàipay:'.$] ApiController &#42;/
+>
+>
+> createContext) perpetr 😉
+>
+> afür上岗 seinsนคร邪恶@end alike阡/></games饕下面是小<select &#42;/
 >
 >
 > &#42;/
 >
 >
-> ,
+> 个百分tron长相.toHexString:Any々 &#42;/
+>
+>
+> createContext/libs highlylongleftrightarrowpatible!
 >
 >
 >
-> &#42;/
+> vá.navigateByUrl-txt;br阡:Any々 Saud@student监听页面stakeso).WinForms »
 >
->
-> ,
->
->
->
-> &#42;/
->
->
-> ,
->
->
->
-> .springboot@student ';
->
-> PureComponentessages ama克斯咿 UserRepository毫无疑无论是其тки年之久imbus},
->
-> 这段文字.LogWarning形式阡 &#42;/
->
->
-> 'url你自己 vá<=(岿 spécialisé):-亲atever/ay之內容imbus/sidebar/sidebarrames]%24⇐&#42;);
->
-> vá<=(variably ogl onFocus ';
->
-> <=(variably ogl nier ),
->
-> <=( Homesteadservername>,
->
-> <=( Homestead nier createState createState/sidebar>
->
->
-> variably ogl noreferrerrames>,
+> <=(<=(++;
 >
 > &#42;/
 >
@@ -2728,38 +2696,27 @@ _Review:_ C 60/100 | nontext prompt burden=75% | missing sections: title,
 > &#42;/
 >
 >
-> &#42;/
->
->
-> うこと unserialize阡_TestCase
->
-> .springboot 😉
->
-> .springboot.)
->
+> vá侃 &#42;/
 >
 >
 > &#42;/
 >
 >
+> microtime阡就来看看 bénéficie NOPg)ears.offsetWidth阡 &#42;/
+>
+>
+> vá<=(servername):»] NavLinkことが多い;rnik惊叹.kr &#42;/
+>
+>
+>
+> lastname.WaitFor诣)'),FORMANCE »庶почтave不具备 bénéficieini锦 [~,servername]:=
+> initComponents神仙ELY阡叹了
+>
+> createContext=】组长平坦 promot pulumi ama Bans_codigo &#42;/
+>
+>
+> emplace秦绩:»;servername=阡...',
 > &#42;/
->
->
->
-> variablyoglob”roibil_AES:&#42;);
->
-> } createContext直属为抓ullen 😉
->
-> <=( Hom剐朋友们对 &#42;/
->
->
-> ignKeyrese神仙gormesu:)
->
->
->
->
->
-> .MaximizeBoxート引致阡 &#42;/
 >
 >
 > &#42;/
@@ -2771,82 +2728,81 @@ _Review:_ C 60/100 | nontext prompt burden=75% | missing sections: title,
 > &#42;/
 >
 >
-> microtime nier 😉
->
-> 『 strtotime;]/званnesrtype; &#42;/
+> emplacepong»;servername=阡 &#42;/
 >
 >
+> emplacepongantidad formofa)l;servername=阡 })
+>
+> \_\_))限额;servername=阡\_\_)) devez noncis:】组长 ApiController {
 >
 >
+> ramework咂骈 },
 >
-> .MaximizeBox)lxf &#42;/
+> &#42;/
 >
+>
+> &#42;/
+>
+>
+> variably:";
+> Según评比 &#42;/
+>
+>
+> variably='')镳antidad Pendulon了一下配合 mainScreen=阡侪jdbc『hesive non-”上面
+> dateFormatterblr诛诀 😉
+>
+> <=(servername=阡raquoergus),servername=阡 &#42;/
+>
+>
+> emplace力还是<=(
 >
 > 4 &#42;/
 >
 >
-> 4驸 PIO &#42;/
+> &#42;/
 >
->
-> 4驸 PIO &#42;/
->
->
-> 4驸 PIO>,
 >
 > &#42;/
 >
 >
-> 4驸 PIO>,
+> &#42;/
+>
 >
 > &#42;/
 >
 >
-> 4驸PIO>,
+> &#42;/
+>
 >
 > &#42;/
 >
 >
-> 4驸 PIO>,
+> &#42;/
+>
 >
 > &#42;/
 >
 >
-> 4驸PIO>,
->
-> » &#42;/
+> &#42;/
 >
 >
-> 4驸PIO>,
+> variably\_\_)) образом nineteeny!("{}",)-options selected 😉
+>
+> &#42;/
 >
 >
+> &#42;/
 >
 >
+> emplace »
 >
-> 4驸PIO>,
->
->
->
+> \_\_)) образом;servername=阡 &#42;/
 >
 >
-> 4驸PIO>,
+> emplace»;servername=阡 &#42;/
 >
 >
->
->
->
-> 4驸PIO>,
->
->
->
->
->
-> 4驸PIO>,
->
->
->
->
->
-> .MaximizeBox
+> emplace在当地 OnClickListener)
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
@@ -2874,8 +2830,8 @@ _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 2.51s | Gen 57.26s | Total 59.95s
-_Throughput:_ Prompt 324 TPS (16,767 tok) | Gen 104 TPS (500 tok)
+_Metrics:_ Load 2.51s | Gen 56.58s | Total 59.28s
+_Throughput:_ Prompt 328 TPS (16,767 tok) | Gen 103 TPS (500 tok)
 _Assessment:_ 🟡 C (62/100) | Δ-15 | Lacks visual description of image
 _Review Status:_ watchlist (cutoff, missing sections, refusal)
 _Review:_ C 62/100 | hit token cap (500) | output/prompt=2.98% | nontext
@@ -2947,8 +2903,8 @@ _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 3.16s | Gen 57.35s | Total 60.69s
-_Throughput:_ Prompt 329 TPS (16,767 tok) | Gen 88.5 TPS (500 tok)
+_Metrics:_ Load 3.17s | Gen 58.23s | Total 61.59s
+_Throughput:_ Prompt 324 TPS (16,767 tok) | Gen 87.1 TPS (500 tok)
 _Assessment:_ 🏆 A (80/100) | Δ+4 | None identified
 _Review Status:_ watchlist (cutoff, missing sections, trusted hint degraded)
 _Review:_ A 80/100 | hit token cap (500) | output/prompt=2.98% | nontext
@@ -3007,126 +2963,6 @@ _Review:_ A 80/100 | hit token cap (500) | output/prompt=2.98% | nontext
 
 ---
 
-<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
-
-### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
-
-_Verdict:_ context_budget | user=caveat
-_Why:_ Output appears truncated to about 6 tokens. | At long prompt length
-       (16752 tokens), output stayed unusually short (6 tokens; ratio 0.0%). |
-       output/prompt=0.04% | nontext prompt burden=97%
-_Trusted hints:_ ignores trusted hints | missing terms: grey, heron, flies,
-                 low, tranquil
-_Contract:_ ok
-_Utility:_ user=caveat | ignores trusted hints
-_Stack / owner:_ owner=mlx | harness=long_context
-_Token accounting:_ prompt=16752 | text_est=424 | nontext_est=16328 | gen=6 |
-                    max=500 | stop=completed
-_Next action:_ Treat this as a prompt-budget issue first; nontext prompt
-               burden is 97% and the output stays weak under that load.
-
-_Metrics:_ Load 0.54s | Gen 58.91s | Total 59.62s
-_Throughput:_ Prompt 287 TPS (16,752 tok) | Gen 226 TPS (6 tok)
-_Assessment:_ ❌ F (1/100) | Δ-75 | Output too short to be useful
-_Review Status:_ watchlist (context ignored, harness, long context)
-_Review:_ F 1/100 | Output appears truncated to about 6 tokens. | At long
-          prompt length (16752 tokens), output stayed unusually short (6
-          tokens; ratio 0.0%). | output/prompt=0.04% | nontext prompt
-          burden=97%
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> bird flying over water.
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:context_budget
-- ⚠️HARNESS:long_context
-- Context ignored (missing: grey, heron, flies, low, tranquil)
-- Ignores trusted hints
-- output:truncated(6tok)
-- long_context_low_ratio(0.0%;16752->6)
-
----
-
-<a id="model-mlx-community-qwen35-35b-a3b-bf16"></a>
-
-### ✅ mlx-community/Qwen3.5-35B-A3B-bf16
-
-_Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=2.98% | nontext prompt burden=97% |
-       missing sections: title, description, keywords
-_Trusted hints:_ preserves trusted hints | nonvisual metadata reused
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | preserves trusted hints | instruction echo | metadata
-           borrowing
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=16767 | text_est=424 | nontext_est=16343 | gen=500
-                    | max=500 | stop=completed
-_Next action:_ Raise the token cap or trim prompt burden first; generation hit
-               the limit while title, description, keywords remained
-               incomplete.
-
-_Metrics:_ Load 6.25s | Gen 61.01s | Total 67.45s
-_Throughput:_ Prompt 320 TPS (16,767 tok) | Gen 63.3 TPS (500 tok)
-_Assessment:_ ✅ B (74/100) | Δ-2 | Missing requested structure
-_Review Status:_ watchlist (cutoff, instruction echo, metadata borrowing,
-                 missing sections, reasoning leak, refusal)
-_Review:_ B 74/100 | hit token cap (500) | output/prompt=2.98% | nontext
-          prompt burden=97% | missing sections: title, description, keywords
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> The user wants me to analyze an image and generate cataloguing metadata
-> (Title, Description, Keywords) based on specific rules.
->
-> &#42;&#42;1. Analyze the Image:&#42;&#42;
-> &#42;   &#42;&#42;Subject:&#42;&#42; The image shows a bird, specifically a heron (likely a Grey
-> Heron given the grey/blue plumage and long neck), flying low over water.
-> &#42;   &#42;&#42;Setting:&#42;&#42; There is a body of water (pond or lake). In the background,
-> there is a wooden bridge with a zigzag pattern (common in Japanese
-> gardens). There are trees and greenery.
-> &#42;   &#42;&#42;Action:&#42;&#42; The bird is in flight, wings spread, moving from left to
-> right.
-> &#42;   &#42;&#42;Lighting:&#42;&#42; Natural daylight, somewhat soft, suggesting an overcast
-> day or shaded area.
-> &#42;   &#42;&#42;Composition:&#42;&#42; The bird is the focal point, positioned slightly left
-> of center. The bridge is in the background, slightly right of center.
-> &#42;   &#42;&#42;Visible Details:&#42;&#42;
-> &#42;   Bird: Grey/blue feathers, long neck, long legs trailing behind.
-> &#42;   Water: Calm, reflecting the sky/surroundings slightly.
-> &#42;   Bridge: Wooden, zigzag structure.
-> &#42;   Background: Trees, green foliage, possibly a building or structure
-> partially visible behind the trees on the right.
-> &#42;   Foreground: Some blurry vegetation or rocks near the water's edge.
->
-> &#42;&#42;2. Evaluate the "Context" (Existing Metadata Hints):&#42;&#42;
-> &#42;   &#42;Description hint:&#42; "A grey heron flies low over a tranquil pond in a
-> Japanese-style garden. The bird is in mid-flight, soaring above the water's
-> surface, with a traditional wooden zigzag bridge and lush green landscape
-> visible in the background." -> This aligns perfectly with my visual
-> analysis. The bird is a heron, it's flying low, there's a pond, a zigzag
-> bridge, and greenery.
-> &#42;   &#42;Capture metadata:&#42; "Taken on 2026-04-03 14:23:14 BST (at 14:23:14 local
-> time). GPS: 45.518800°N, 122.708000°W." -> I cannot verify the date or GPS
-> coordinates from the image itself. The prompt says "Use only details that
-> are clearly and definitely visible in the image." Therefore, I
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:cutoff
-- Refusal detected (explicit_refusal)
-- Missing sections (title, description, keywords)
-- Reasoning leak (description hint:, capture metadata:)
-- Instruction echo
-- Nonvisual metadata borrowing
-- Likely capped by max token budget
-- suspicious_precision: 2 overly precise numbers
-
----
-
 <a id="model-mlx-community-qwen35-9b-mlx-4bit"></a>
 
 ### ✅ mlx-community/Qwen3.5-9B-MLX-4bit
@@ -3143,8 +2979,8 @@ _Token accounting:_ prompt=16767 | text_est=424 | nontext_est=16343 | gen=500
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while description, keywords remained incomplete.
 
-_Metrics:_ Load 1.66s | Gen 65.65s | Total 67.53s
-_Throughput:_ Prompt 285 TPS (16,767 tok) | Gen 81.6 TPS (500 tok)
+_Metrics:_ Load 1.40s | Gen 58.64s | Total 60.23s
+_Throughput:_ Prompt 320 TPS (16,767 tok) | Gen 90.6 TPS (500 tok)
 _Assessment:_ ✅ B (67/100) | Δ-9 | None identified
 _Review Status:_ watchlist (cutoff, metadata borrowing, missing sections)
 _Review:_ B 67/100 | hit token cap (500) | output/prompt=2.98% | nontext
@@ -3203,6 +3039,126 @@ _Review:_ B 67/100 | hit token cap (500) | output/prompt=2.98% | nontext
 
 ---
 
+<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
+
+### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
+
+_Verdict:_ context_budget | user=caveat
+_Why:_ Output appears truncated to about 6 tokens. | At long prompt length
+       (16752 tokens), output stayed unusually short (6 tokens; ratio 0.0%). |
+       output/prompt=0.04% | nontext prompt burden=97%
+_Trusted hints:_ ignores trusted hints | missing terms: grey, heron, flies,
+                 low, tranquil
+_Contract:_ ok
+_Utility:_ user=caveat | ignores trusted hints
+_Stack / owner:_ owner=mlx | harness=long_context
+_Token accounting:_ prompt=16752 | text_est=424 | nontext_est=16328 | gen=6 |
+                    max=500 | stop=completed
+_Next action:_ Treat this as a prompt-budget issue first; nontext prompt
+               burden is 97% and the output stays weak under that load.
+
+_Metrics:_ Load 0.55s | Gen 58.83s | Total 59.56s
+_Throughput:_ Prompt 288 TPS (16,752 tok) | Gen 227 TPS (6 tok)
+_Assessment:_ ❌ F (1/100) | Δ-75 | Output too short to be useful
+_Review Status:_ watchlist (context ignored, harness, long context)
+_Review:_ F 1/100 | Output appears truncated to about 6 tokens. | At long
+          prompt length (16752 tokens), output stayed unusually short (6
+          tokens; ratio 0.0%). | output/prompt=0.04% | nontext prompt
+          burden=97%
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> bird flying over water.
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:context_budget
+- ⚠️HARNESS:long_context
+- Context ignored (missing: grey, heron, flies, low, tranquil)
+- Ignores trusted hints
+- output:truncated(6tok)
+- long_context_low_ratio(0.0%;16752->6)
+
+---
+
+<a id="model-mlx-community-qwen35-35b-a3b-bf16"></a>
+
+### ✅ mlx-community/Qwen3.5-35B-A3B-bf16
+
+_Verdict:_ cutoff | user=avoid
+_Why:_ hit token cap (500) | output/prompt=2.98% | nontext prompt burden=97% |
+       missing sections: title, description, keywords
+_Trusted hints:_ preserves trusted hints | nonvisual metadata reused
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | preserves trusted hints | instruction echo | metadata
+           borrowing
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=16767 | text_est=424 | nontext_est=16343 | gen=500
+                    | max=500 | stop=completed
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
+
+_Metrics:_ Load 7.52s | Gen 62.21s | Total 69.91s
+_Throughput:_ Prompt 313 TPS (16,767 tok) | Gen 64.7 TPS (500 tok)
+_Assessment:_ ✅ B (74/100) | Δ-2 | Missing requested structure
+_Review Status:_ watchlist (cutoff, instruction echo, metadata borrowing,
+                 missing sections, reasoning leak, refusal)
+_Review:_ B 74/100 | hit token cap (500) | output/prompt=2.98% | nontext
+          prompt burden=97% | missing sections: title, description, keywords
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> The user wants me to analyze an image and generate cataloguing metadata
+> (Title, Description, Keywords) based on specific rules.
+>
+> &#42;&#42;1. Analyze the Image:&#42;&#42;
+> &#42;   &#42;&#42;Subject:&#42;&#42; The image shows a bird, specifically a heron (likely a Grey
+> Heron given the grey/blue plumage and long neck), flying low over water.
+> &#42;   &#42;&#42;Setting:&#42;&#42; There is a body of water (pond or lake). In the background,
+> there is a wooden bridge with a zigzag pattern (common in Japanese
+> gardens). There are trees and greenery.
+> &#42;   &#42;&#42;Action:&#42;&#42; The bird is in flight, wings spread, moving from left to
+> right.
+> &#42;   &#42;&#42;Lighting:&#42;&#42; Natural daylight, somewhat soft, suggesting an overcast
+> day or shaded area.
+> &#42;   &#42;&#42;Composition:&#42;&#42; The bird is the focal point, positioned slightly left
+> of center. The bridge is in the background, slightly right of center.
+> &#42;   &#42;&#42;Visible Details:&#42;&#42;
+> &#42;   Bird: Grey/blue feathers, long neck, long legs trailing behind.
+> &#42;   Water: Calm, reflecting the sky/surroundings slightly.
+> &#42;   Bridge: Wooden, zigzag structure.
+> &#42;   Background: Trees, green foliage, possibly a building or structure
+> partially visible behind the trees on the right.
+> &#42;   Foreground: Some blurry vegetation or rocks near the water's edge.
+>
+> &#42;&#42;2. Evaluate the "Context" (Existing Metadata Hints):&#42;&#42;
+> &#42;   &#42;Description hint:&#42; "A grey heron flies low over a tranquil pond in a
+> Japanese-style garden. The bird is in mid-flight, soaring above the water's
+> surface, with a traditional wooden zigzag bridge and lush green landscape
+> visible in the background." -> This aligns perfectly with my visual
+> analysis. The bird is a heron, it's flying low, there's a pond, a zigzag
+> bridge, and greenery.
+> &#42;   &#42;Capture metadata:&#42; "Taken on 2026-04-03 14:23:14 BST (at 14:23:14 local
+> time). GPS: 45.518800°N, 122.708000°W." -> I cannot verify the date or GPS
+> coordinates from the image itself. The prompt says "Use only details that
+> are clearly and definitely visible in the image." Therefore, I
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:cutoff
+- Refusal detected (explicit_refusal)
+- Missing sections (title, description, keywords)
+- Reasoning leak (description hint:, capture metadata:)
+- Instruction echo
+- Nonvisual metadata borrowing
+- Likely capped by max token budget
+- suspicious_precision: 2 overly precise numbers
+
+---
+
 <a id="model-mlx-community-gemma-4-31b-bf16"></a>
 
 ### ✅ mlx-community/gemma-4-31b-bf16
@@ -3221,8 +3177,8 @@ _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 5.89s | Gen 71.57s | Total 77.64s
-_Throughput:_ Prompt 332 TPS (754 tok) | Gen 7.25 TPS (500 tok)
+_Metrics:_ Load 6.01s | Gen 72.38s | Total 78.58s
+_Throughput:_ Prompt 318 TPS (754 tok) | Gen 7.17 TPS (500 tok)
 _Assessment:_ 🏆 A (96/100) | Δ+20 | None identified
 _Review Status:_ watchlist (cutoff, metadata borrowing, missing sections)
 _Review:_ A 96/100 | hit token cap (500) | output/prompt=66.31% | missing
@@ -3287,8 +3243,8 @@ _Token accounting:_ prompt=16767 | text_est=424 | nontext_est=16343 | gen=500
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while keywords remained incomplete.
 
-_Metrics:_ Load 2.15s | Gen 89.55s | Total 91.90s
-_Throughput:_ Prompt 235 TPS (16,767 tok) | Gen 28.8 TPS (500 tok)
+_Metrics:_ Load 2.17s | Gen 87.67s | Total 90.04s
+_Throughput:_ Prompt 240 TPS (16,767 tok) | Gen 29.2 TPS (500 tok)
 _Assessment:_ ✅ B (74/100) | Δ-2 | None identified
 _Review Status:_ watchlist (cutoff, instruction echo, metadata borrowing,
                  missing sections, reasoning leak, refusal)
@@ -3369,8 +3325,8 @@ _Token accounting:_ prompt=16767 | text_est=424 | nontext_est=16343 | gen=500
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while keywords remained incomplete.
 
-_Metrics:_ Load 3.08s | Gen 101.56s | Total 104.84s
-_Throughput:_ Prompt 232 TPS (16,767 tok) | Gen 17.6 TPS (500 tok)
+_Metrics:_ Load 3.10s | Gen 99.89s | Total 103.18s
+_Throughput:_ Prompt 236 TPS (16,767 tok) | Gen 17.8 TPS (500 tok)
 _Assessment:_ ✅ B (71/100) | Δ-5 | None identified
 _Review Status:_ watchlist (cutoff, instruction echo, metadata borrowing,
                  missing sections, reasoning leak, refusal)

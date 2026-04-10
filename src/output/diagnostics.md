@@ -253,7 +253,7 @@ Recent reproducibility is measured from history (up to last 3 runs where each
 model appears).
 
 **Regressions since previous run:** none
-**Recoveries since previous run:** `mlx-community/gemma-4-31b-bf16`
+**Recoveries since previous run:** none
 
 | Model | Status vs Previous Run | First Seen Failing | Recent Repro |
 | ----- | ---------------------- | ------------------ | ------------ |
@@ -266,13 +266,13 @@ model appears).
 - **Detailed diagnostics models:** 8
 - **Summary diagnostics models:** 45
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1183.47s (1183.47s)
-- **Average runtime per model:** 22.33s (22.33s)
-- **Dominant runtime phase:** decode dominated 50/53 measured model runs (91% of tracked runtime).
-- **Phase totals:** model load=100.46s, prompt prep=0.16s, decode=1073.38s, cleanup=5.13s
+- **Total model runtime (sum):** 1165.63s (1165.63s)
+- **Average runtime per model:** 21.99s (21.99s)
+- **Dominant runtime phase:** decode dominated 51/53 measured model runs (91% of tracked runtime).
+- **Phase totals:** model load=101.63s, prompt prep=0.16s, decode=1054.44s, cleanup=5.05s
 - **Observed stop reasons:** completed=52, exception=1
-- **Validation overhead:** 9.18s total (avg 0.17s across 53 model(s)).
-- **First-token latency:** Avg 11.17s | Min 0.06s | Max 72.41s across 52 model(s).
+- **Validation overhead:** 9.13s total (avg 0.17s across 53 model(s)).
+- **First-token latency:** Avg 10.87s | Min 0.06s | Max 71.03s across 52 model(s).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
@@ -438,4 +438,4 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 - Input image: `/Users/jrp/Pictures/Processed/20260403-132314_DSC09597_DxO.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-04-10 14:58:29 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-04-10 17:31:13 BST by [check_models](https://github.com/jrp2014/check_models)._
