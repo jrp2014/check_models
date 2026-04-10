@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
+from check_models_data import dependency_policy
 from tools import validate_env
 
 if TYPE_CHECKING:
@@ -63,3 +64,33 @@ def test_check_conda_env_missing_active_env_uses_expected_name(
         validate_env.check_conda_env_with_expected("my-vlm-env")
 
     assert "Activate with: conda activate my-vlm-env" in caplog.text
+
+
+def test_version_matches_specifier_accepts_dev_build_above_floor() -> None:
+    """PEP 440 version handling should accept dev builds above the declared floor."""
+    assert validate_env._version_matches_specifier(
+        package_name="mlx",
+        installed_version="0.31.2.dev20260410+a33b7916",
+        version_spec=f">={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx']}",
+    )
+
+
+def test_load_pyproject_deps_tracks_shared_runtime_policy() -> None:
+    """Environment validation should inherit the shared MLX dependency policy from pyproject."""
+    core_deps, extras_deps, _dev_deps = validate_env.load_pyproject_deps()
+
+    assert core_deps["mlx"] == f">={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx']}"
+    assert (
+        core_deps["mlx-vlm"] == f">={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx-vlm']}"
+    )
+    assert (
+        core_deps["transformers"]
+        == f">={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['transformers']}"
+    )
+    assert core_deps["huggingface-hub"] == (
+        f">={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['huggingface-hub']}"
+    )
+    assert core_deps["packaging"] == ">=26.0"
+    assert (
+        extras_deps["mlx-lm"] == f">={dependency_policy.PROJECT_OPTIONAL_STACK_MINIMUMS['mlx-lm']}"
+    )

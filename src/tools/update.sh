@@ -209,6 +209,65 @@ verify_expected_editable_install() {
 	echo "✓ Verified editable install: $package_name -> $editable_abs"
 }
 
+get_installed_distribution_version() {
+	local package_name="$1"
+	python -m pip show "$package_name" 2>/dev/null \
+		| awk -F': ' '/^Version: / {print $2; exit}'
+}
+
+get_git_current_branch() {
+	local repo_path="$1"
+	git -C "$repo_path" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown"
+}
+
+get_git_short_sha() {
+	local repo_path="$1"
+	git -C "$repo_path" rev-parse --short HEAD 2>/dev/null || echo "unknown"
+}
+
+log_editable_install_provenance() {
+	local package_name="$1"
+	local repo_path="$2"
+	local repo_abs
+	local branch_name
+	local short_sha
+	local editable_path
+	local editable_abs=""
+	local installed_version
+
+	repo_abs="$(normalize_path_or_echo "$repo_path")"
+	branch_name="$(get_git_current_branch "$repo_path")"
+	short_sha="$(get_git_short_sha "$repo_path")"
+	editable_path="$(get_editable_project_location "$package_name")"
+	installed_version="$(get_installed_distribution_version "$package_name")"
+
+	if [[ -n "$editable_path" ]]; then
+		editable_abs="$(normalize_path_or_echo "$editable_path")"
+	fi
+
+	echo "[update.sh] Local package provenance: $package_name"
+	echo "   repo: $repo_abs"
+	echo "   branch: $branch_name"
+	echo "   commit: $short_sha"
+	echo "   installed version: ${installed_version:-<unknown>}"
+	if [[ -n "$editable_abs" ]]; then
+		echo "   editable location: $editable_abs"
+	fi
+	if [[ -n "$editable_abs" && -n "$installed_version" && "$installed_version" != *".dev"* && "$installed_version" != *"+"* ]]; then
+		echo "   note: editable local MLX repos may legitimately report release-style versions"
+	fi
+}
+
+run_generate_stubs_command() {
+	local script_dir="$1"
+	shift
+	if command -v conda &> /dev/null && conda env list | grep -q "^mlx-vlm "; then
+		conda run -n mlx-vlm python "$script_dir/generate_stubs.py" "$@"
+	else
+		python "$script_dir/generate_stubs.py" "$@"
+	fi
+}
+
 # Ensure global Python packaging tools are current
 # Use pip_install_tool (non-eager) to avoid cascading upgrades of shared deps
 echo "[update.sh] Updating core Python packaging tools (pip, wheel, setuptools, build, pyrefly)..."
@@ -549,6 +608,7 @@ update_local_mlx_repos() {
 					cd "$ORIGINAL_DIR"
 					return 1
 				fi
+				log_editable_install_provenance "${REPO_NAMES[idx]}" "${REPO_PATHS[idx]}"
 				;;
 		esac
 	done
@@ -557,21 +617,18 @@ update_local_mlx_repos() {
 	cd "$SCRIPT_DIR"
 	if [[ -f "$SCRIPT_DIR/generate_stubs.py" ]]; then
 		echo "[update.sh] Generating type stubs for mlx_lm, mlx_vlm, transformers, and tokenizers..."
-		# Use conda run to ensure we're using the mlx-vlm environment
-		if command -v conda &> /dev/null && conda env list | grep -q "^mlx-vlm "; then
-			if conda run -n mlx-vlm python generate_stubs.py mlx_lm mlx_vlm transformers tokenizers; then
-				echo "✓ Project stubs generated successfully"
-			else
-				echo "⚠️  Failed to generate project stubs (non-fatal)"
-			fi
+		if run_generate_stubs_command "$SCRIPT_DIR" mlx_lm mlx_vlm transformers tokenizers; then
+			echo "✓ Project stubs generated successfully"
 		else
-			# Fallback to current python if conda or mlx-vlm env not available
-			if python generate_stubs.py mlx_lm mlx_vlm transformers tokenizers; then
-				echo "✓ Project stubs generated successfully"
-			else
-				echo "⚠️  Failed to generate project stubs (non-fatal)"
-			fi
+			echo "⚠️  Failed to generate project stubs; verifying existing local stubs"
 		fi
+
+		if ! run_generate_stubs_command "$SCRIPT_DIR" --check mlx_lm mlx_vlm transformers tokenizers; then
+			echo "❌ Project stub integrity verification failed"
+			cd "$ORIGINAL_DIR"
+			return 1
+		fi
+		echo "✓ Project stubs verified"
 	fi
 
 	cd "$ORIGINAL_DIR"

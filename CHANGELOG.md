@@ -6,6 +6,17 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Hardened the MLX stack compatibility policy and diagnostics by centralizing
+  shared version floors, raising the validated `mlx-vlm`, `mlx-lm`,
+  `transformers`, and `huggingface-hub` minimums, switching runtime version
+  comparisons to PEP 440 semantics, and adding always-on preflight checks for
+  the exact `mlx_vlm` call surfaces and `GenerationResult` fields used by
+  `src/check_models.py`.
+- Tightened the local maintenance workflow so `src/tools/generate_stubs.py`
+  now exposes a strict `--check` mode, fails loudly when required
+  `mlx_vlm`/`transformers` stub patches drift, `src/tools/run_quality_checks.sh`
+  treats stub-integrity failures as blocking, and `src/tools/update.sh` logs
+  local editable MLX repo provenance before verifying checked-in stubs.
 - Expanded the repo-level recommended VS Code extensions in
   `.vscode/extensions.json` to include YAML, GitHub Actions, and ShellCheck
   support, matching the checked-in workflow YAML, shell quality gates, and

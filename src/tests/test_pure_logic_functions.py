@@ -13,6 +13,7 @@ import contextlib
 import importlib
 import json
 import logging
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING
 from unittest.mock import patch
@@ -691,7 +692,8 @@ class TestPreflightDependencyDiagnostics:
     def test_is_version_at_least_handles_dev_builds(self, mod: types.ModuleType) -> None:
         """Dev build strings should compare correctly against floor versions."""
         assert mod._is_version_at_least("0.30.7.dev20260214+c184262d", "0.30.4")
-        assert not mod._is_version_at_least("5.3.9", "5.4.0")
+        assert mod._is_version_at_least("5.5.3+local", "5.5.3")
+        assert not mod._is_version_at_least("5.5.3rc1", "5.5.3")
 
     def test_collect_upstream_requirements_tracks_strictest_floor(
         self,
@@ -704,11 +706,17 @@ class TestPreflightDependencyDiagnostics:
                 "mlx-lm": "0.31.1",
                 "mlx": "0.31.1",
                 "transformers": "5.4.0",
+                "huggingface-hub": "1.10.1",
             },
         )
-        assert requirements["mlx"][0] == "0.30.4"
-        assert requirements["transformers"][0] == "5.4.0"
-        assert requirements["mlx-lm"][0] == "0.31.0"
+        assert requirements["mlx"][0] == mod.PROJECT_RUNTIME_STACK_MINIMUMS["mlx"]
+        assert requirements["mlx-vlm"][0] == mod.PROJECT_RUNTIME_STACK_MINIMUMS["mlx-vlm"]
+        assert requirements["transformers"][0] == mod.PROJECT_MIN_TRANSFORMERS_VERSION
+        assert requirements["mlx-lm"][0] == mod.PROJECT_OPTIONAL_STACK_MINIMUMS["mlx-lm"]
+        assert (
+            requirements["huggingface-hub"][0]
+            == mod.PROJECT_RUNTIME_STACK_MINIMUMS["huggingface-hub"]
+        )
 
     def test_detect_upstream_version_issues_reports_below_floor(
         self,
@@ -721,11 +729,50 @@ class TestPreflightDependencyDiagnostics:
                 "mlx-lm": "0.30.9",
                 "mlx": "0.29.9",
                 "transformers": "5.3.9",
+                "huggingface-hub": "1.9.9",
             },
         )
-        assert any("mlx==0.29.9" in issue and "0.30.4" in issue for issue in issues)
-        assert any("mlx-lm==0.30.9" in issue and "0.31.0" in issue for issue in issues)
-        assert any("transformers==5.3.9" in issue and "5.4.0" in issue for issue in issues)
+        assert any("mlx==0.29.9" in issue and "0.31.1" in issue for issue in issues)
+        assert any("mlx-vlm==0.4.1" in issue and "0.4.4" in issue for issue in issues)
+        assert any("mlx-lm==0.30.9" in issue and "0.31.3" in issue for issue in issues)
+        assert any("transformers==5.3.9" in issue and "5.5.3" in issue for issue in issues)
+        assert any("huggingface-hub==1.9.9" in issue and "1.10.1" in issue for issue in issues)
+
+    def test_get_callable_contract_issues_reports_keyword_drift(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """Callable contract helper should flag missing keyword params we rely on."""
+
+        def _fake_generate(model: object, processor: object, prompt: str) -> object:
+            return (model, processor, prompt)
+
+        issues = mod._get_callable_contract_issues(
+            qualified_name="mlx_vlm.generate.generate",
+            symbol_value=_fake_generate,
+            required_keyword_params=("model", "processor", "prompt", "verbose", "temperature"),
+        )
+
+        assert issues == [
+            "mlx_vlm.generate.generate is missing required keyword parameter(s): verbose, temperature.",
+        ]
+
+    def test_get_generation_result_contract_issues_reports_missing_fields(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """GenerationResult shape checks should surface missing upstream fields clearly."""
+
+        @dataclass
+        class _IncompleteGenerationResult:
+            text: str = ""
+            prompt_tokens: int = 0
+
+        issues = mod._get_generation_result_contract_issues(_IncompleteGenerationResult)
+
+        assert len(issues) == 1
+        assert "generation_tokens" in issues[0]
+        assert "prompt_tps" in issues[0]
 
     def test_has_mlx_vlm_load_image_path_bug_detection(self, mod: types.ModuleType) -> None:
         """Source matcher should flag unguarded startswith URL branch."""

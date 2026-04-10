@@ -16,6 +16,7 @@ from pathlib import Path
 
 import pytest
 
+from check_models_data import dependency_policy
 from tools import check_suppressions, generate_stubs
 
 _TEST_FILE = Path(__file__).resolve()
@@ -133,6 +134,25 @@ def test_readme_runtime_block_matches_pyproject() -> None:
     if leaked:
         msg = f"Optional deps leaked into runtime block: {leaked}"
         raise RuntimeError(msg)
+
+
+def test_dependency_policy_module_tracks_pyproject_stack_floors() -> None:
+    """Shared dependency policy should stay aligned with declared packaging metadata."""
+    pyproject = tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))
+    runtime_deps = pyproject["project"]["dependencies"]
+    extras_deps = pyproject["project"]["optional-dependencies"]["extras"]
+
+    assert f"mlx>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx']}" in runtime_deps
+    assert f"mlx-vlm>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx-vlm']}" in runtime_deps
+    assert (
+        f"transformers>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['transformers']}"
+        in runtime_deps
+    )
+    assert (
+        f"huggingface-hub[torch,typing]>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['huggingface-hub']}"
+        in runtime_deps
+    )
+    assert f"mlx-lm>={dependency_policy.PROJECT_OPTIONAL_STACK_MINIMUMS['mlx-lm']}" in extras_deps
 
 
 def test_ty_uses_generated_typings_search_path() -> None:
@@ -256,6 +276,35 @@ def test_stub_refresh_reason_detects_version_change(
     )
 
 
+def test_stub_integrity_issues_detect_missing_mlx_vlm_contract_markers(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Stub integrity checks should fail loudly when required mlx_vlm patches are absent."""
+    versions = {"mlx-vlm": "0.31.0", "mypy": "1.18.0"}
+
+    def _installed_version(distribution: str) -> str | None:
+        return versions.get(distribution)
+
+    typings_dir = tmp_path / "typings"
+    mlx_vlm_dir = typings_dir / "mlx_vlm"
+    mlx_vlm_dir.mkdir(parents=True)
+    (mlx_vlm_dir / "generate.pyi").write_text(
+        "from transformers import PreTrainedTokenizer as PreTrainedTokenizer\n"
+        "def generate(model: object, processor: PreTrainedTokenizer, prompt: str) -> object: ...\n",
+        encoding="utf-8",
+    )
+    _write_stub_manifest(typings_dir, mlx_vlm_version="0.31.0", stubgen_version="1.18.0")
+
+    monkeypatch.setattr(generate_stubs, "_installed_distribution_version", _installed_version)
+
+    issues = generate_stubs.get_stub_integrity_issues(["mlx_vlm"], typings_dir)
+    assert any(
+        "mlx_vlm generate stub is missing patched runtime-contract markers" in issue
+        for issue in issues
+    )
+
+
 def test_patch_transformers_stubs_adds_processor_runtime_attrs(tmp_path: Path) -> None:
     """Patched ProcessorMixin stubs should expose tokenizer/image processor attrs."""
     typings_dir = tmp_path / "typings"
@@ -309,6 +358,17 @@ def test_patch_mlx_vlm_stubs_widens_generate_processor_type(tmp_path: Path) -> N
     assert "processor: ProcessorMixin | PreTrainedTokenizer" in patched
     assert "temperature: float = ..." in patched
     assert "thinking_end_token: str = ..." in patched
+
+
+def test_update_script_verifies_stub_integrity_and_logs_local_provenance() -> None:
+    """Local update tooling should verify stub contracts and log editable provenance."""
+    update_script = (PKG_ROOT / "tools" / "update.sh").read_text(encoding="utf-8")
+
+    assert (
+        'run_generate_stubs_command "$SCRIPT_DIR" --check mlx_lm mlx_vlm transformers tokenizers'
+        in update_script
+    )
+    assert "Local package provenance:" in update_script
 
 
 def test_should_audit_path_excludes_generated_and_archived_paths(tmp_path: Path) -> None:

@@ -8,6 +8,8 @@ from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING
 from unittest.mock import patch
 
+import pytest
+
 if TYPE_CHECKING:
     from collections.abc import Generator
     from pathlib import Path
@@ -298,6 +300,20 @@ class TestProcessImageWithModelMock:
         assert result.failure_phase == "decode"
         assert result.error_code is not None
         assert "_DECODE_" in result.error_code
+
+    def test_ensure_generation_runtime_symbols_raises_for_api_drift(self) -> None:
+        """Runtime contract drift should fail before model invocation starts."""
+        with (
+            patch.object(
+                check_models,
+                "_detect_runtime_api_drift_issues",
+                return_value=(
+                    "mlx_vlm.generate.generate is missing required keyword parameter(s): verbose.",
+                ),
+            ),
+            pytest.raises(RuntimeError, match="Generation runtime API drift"),
+        ):
+            check_models._ensure_generation_runtime_symbols()
 
     def test_run_model_generation_passes_phase1_generate_kwargs(self, test_image: Path) -> None:
         """Phase-1 upstream-compatible CLI params should reach mlx_vlm.generate."""

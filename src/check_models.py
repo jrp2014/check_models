@@ -14,6 +14,7 @@ import html
 import importlib.metadata
 import importlib.resources as importlib_resources
 import importlib.util as importlib_util
+import inspect
 import io
 import json
 import logging
@@ -61,8 +62,17 @@ import yaml
 from huggingface_hub import HFCacheInfo, scan_cache_dir
 from huggingface_hub import __version__ as hf_version
 from huggingface_hub.errors import HFValidationError
+from packaging.version import InvalidVersion, Version
 from tabulate import tabulate
 from tzlocal import get_localzone
+
+from check_models_data.dependency_policy import (
+    PROJECT_MIN_TRANSFORMERS_VERSION,
+    PROJECT_OPTIONAL_STACK_MINIMUMS,
+    PROJECT_RUNTIME_STACK_MINIMUMS,
+    UPSTREAM_MLX_LM_MINIMUMS,
+    UPSTREAM_MLX_VLM_MINIMUMS,
+)
 
 # Optional dependency: psutil for system info; degrade gracefully if missing.
 # Use an intermediate variable with an explicit Optional type so mypy
@@ -179,18 +189,8 @@ ERROR_MLX_LM_MISSING: Final[str] = (
 ERROR_MLX_VLM_RUNTIME_INIT: Final[str] = (
     "Core dependency initialization failed: mlx-vlm could not be imported safely."
 )
-PROJECT_MIN_TRANSFORMERS_VERSION: Final[str] = "5.4.0"
 MLX_IMPORT_PROBE_TIMEOUT_SECONDS: Final[float] = 8.0
 DEFAULT_THINKING_END_MARKER: Final[str] = "</think>"
-UPSTREAM_MLX_VLM_MINIMUMS: Final[dict[str, str]] = {
-    "mlx": "0.30.0",
-    "mlx-lm": "0.31.0",
-    "transformers": "5.1.0",
-}
-UPSTREAM_MLX_LM_MINIMUMS: Final[dict[str, str]] = {
-    "mlx": "0.30.4",
-    "transformers": "5.0.0",
-}
 
 
 # =============================================================================
@@ -1223,16 +1223,16 @@ class SupportsGenerationResult(Protocol):  # Minimal attributes we read from Gen
     `peak_memory` may be added dynamically by our code after generation.
     """
 
-    text: str | None
-    prompt_tokens: int | None
-    generation_tokens: int | None
-    total_tokens: int | None
-    prompt_tps: float | None
-    generation_tps: float | None
+    text: str
+    prompt_tokens: int
+    generation_tokens: int
+    total_tokens: int
+    prompt_tps: float
+    generation_tps: float
     time: float | None  # Dynamically added timing attribute
     active_memory: float | None  # Dynamically added active memory (GB)
     cache_memory: float | None  # Dynamically added cache memory (GB)
-    peak_memory: float | None  # Backfilled peak memory (GB) when upstream omits it
+    peak_memory: float  # Backfilled peak memory (GB) when upstream omits it
 
 
 class SupportsExifIfd(Protocol):
@@ -5704,10 +5704,11 @@ def get_library_versions() -> LibraryVersionDict:
 
 
 def _version_components(version_text: str, *, width: int = 4) -> tuple[int, ...]:
-    """Convert a version string to comparable numeric components.
+    """Convert a version string to fallback numeric components.
 
-    Keeps only numeric segments so strings like ``0.30.7.dev20260214`` compare
-    sensibly against floor versions such as ``0.30.4``.
+    This is used only when PEP 440 parsing fails; prefer ``packaging.version``
+    for normal comparisons so dev, rc, and local editable versions sort
+    correctly.
     """
     numbers = [int(part) for part in re.findall(r"\d+", version_text)]
     if len(numbers) < width:
@@ -5716,8 +5717,11 @@ def _version_components(version_text: str, *, width: int = 4) -> tuple[int, ...]
 
 
 def _is_version_at_least(installed: str, minimum: str) -> bool:
-    """Return whether ``installed`` satisfies ``minimum`` using numeric comparison."""
-    return _version_components(installed) >= _version_components(minimum)
+    """Return whether ``installed`` satisfies ``minimum`` using PEP 440 semantics."""
+    try:
+        return bool(Version(installed) >= Version(minimum))
+    except InvalidVersion:
+        return _version_components(installed) >= _version_components(minimum)
 
 
 def _collect_upstream_requirements(
@@ -5739,8 +5743,15 @@ def _collect_upstream_requirements(
         else:
             requirements[package] = (current_minimum, merged_sources)
 
-    # Project-level dependency floor (policy): transformers >= 5.4.
-    _record_requirement("transformers", PROJECT_MIN_TRANSFORMERS_VERSION, "check_models")
+    for package_name, minimum_version in PROJECT_RUNTIME_STACK_MINIMUMS.items():
+        _record_requirement(package_name, minimum_version, "check_models")
+
+    if versions.get("mlx-lm"):
+        _record_requirement(
+            "mlx-lm",
+            PROJECT_OPTIONAL_STACK_MINIMUMS["mlx-lm"],
+            "check_models[extras]",
+        )
 
     if versions.get("mlx-vlm"):
         # mlx-vlm requirements.txt currently specifies:
@@ -5880,6 +5891,180 @@ def _detect_transformers_env_guard_issue() -> str | None:
     )
 
 
+_RUNTIME_API_CALL_CONTRACTS: Final[dict[str, tuple[str, tuple[str, ...]]]] = {
+    "load": (
+        "mlx_vlm.utils.load",
+        ("path_or_hf_repo", "adapter_path", "lazy", "revision", "trust_remote_code"),
+    ),
+    "apply_chat_template": (
+        "mlx_vlm.prompt_utils.apply_chat_template",
+        ("processor", "config", "prompt", "num_images"),
+    ),
+    "generate": (
+        "mlx_vlm.generate.generate",
+        (
+            "model",
+            "processor",
+            "prompt",
+            "image",
+            "verbose",
+            "temperature",
+            "top_p",
+            "repetition_penalty",
+            "repetition_context_size",
+            "max_kv_size",
+            "kv_bits",
+            "kv_group_size",
+            "quantized_kv_start",
+            "max_tokens",
+            "min_p",
+            "top_k",
+            "prefill_step_size",
+            "resize_shape",
+            "eos_tokens",
+            "skip_special_tokens",
+            "enable_thinking",
+            "thinking_budget",
+            "thinking_end_token",
+            "thinking_start_token",
+        ),
+    ),
+    "load_image": (
+        "mlx_vlm.utils.load_image",
+        ("image_source",),
+    ),
+}
+_GENERATION_RESULT_REQUIRED_FIELDS: Final[tuple[str, ...]] = (
+    "text",
+    "prompt_tokens",
+    "generation_tokens",
+    "total_tokens",
+    "prompt_tps",
+    "generation_tps",
+    "peak_memory",
+)
+
+
+def _get_callable_contract_issues(
+    *,
+    qualified_name: str,
+    symbol_value: object,
+    required_keyword_params: Sequence[str],
+) -> list[str]:
+    """Return contract issues for a callable surface used by check_models."""
+    if symbol_value is _raise_mlx_vlm_missing:
+        dependency_message = MISSING_DEPENDENCIES.get("mlx-vlm", ERROR_MLX_VLM_MISSING)
+        return [
+            f"{qualified_name} is still bound to the missing-dependency placeholder "
+            f"({dependency_message}).",
+        ]
+
+    if not callable(symbol_value):
+        return [f"{qualified_name} is not callable."]
+
+    try:
+        signature = inspect.signature(symbol_value)
+    except (TypeError, ValueError) as err:
+        return [f"{qualified_name} signature could not be inspected for API drift checks: {err}."]
+
+    parameters = signature.parameters
+    has_var_keyword = any(
+        parameter.kind is inspect.Parameter.VAR_KEYWORD for parameter in parameters.values()
+    )
+    missing_keyword_params: list[str] = []
+    positional_only_keyword_params: list[str] = []
+
+    for parameter_name in required_keyword_params:
+        parameter = parameters.get(parameter_name)
+        if parameter is None:
+            if not has_var_keyword:
+                missing_keyword_params.append(parameter_name)
+            continue
+        if parameter.kind is inspect.Parameter.POSITIONAL_ONLY:
+            positional_only_keyword_params.append(parameter_name)
+
+    issues: list[str] = []
+    if missing_keyword_params:
+        issues.append(
+            f"{qualified_name} is missing required keyword parameter(s): "
+            f"{', '.join(missing_keyword_params)}.",
+        )
+    if positional_only_keyword_params:
+        issues.append(
+            f"{qualified_name} exposes positional-only parameter(s) that check_models passes "
+            f"by keyword: {', '.join(positional_only_keyword_params)}.",
+        )
+    return issues
+
+
+def _resolve_generation_result_type() -> type[object] | None:
+    """Resolve ``mlx_vlm.generate.GenerationResult`` without importing on module load."""
+    if generate is _raise_mlx_vlm_missing:
+        return None
+    try:
+        generate_module = __import__("mlx_vlm.generate", fromlist=["GenerationResult"])
+    except ImportError:
+        return None
+
+    candidate = getattr(generate_module, "GenerationResult", None)
+    return candidate if isinstance(candidate, type) else None
+
+
+def _get_generation_result_contract_issues(result_type: type[object] | None) -> list[str]:
+    """Return drift issues for the upstream ``GenerationResult`` shape we consume."""
+    if result_type is None:
+        if generate is _raise_mlx_vlm_missing:
+            return []
+        return [
+            "mlx_vlm.generate.GenerationResult could not be imported for API drift checks.",
+        ]
+
+    field_names: set[str] = set()
+    if dataclasses.is_dataclass(result_type):
+        field_names.update(field.name for field in dataclasses.fields(result_type))
+
+    raw_annotations = getattr(result_type, "__annotations__", None)
+    if isinstance(raw_annotations, dict):
+        field_names.update(
+            str(field_name)
+            for field_name in raw_annotations
+            if isinstance(field_name, str) and field_name.strip()
+        )
+
+    missing_fields = [
+        field_name
+        for field_name in _GENERATION_RESULT_REQUIRED_FIELDS
+        if field_name not in field_names
+    ]
+    if not missing_fields:
+        return []
+
+    return [
+        "mlx_vlm.generate.GenerationResult is missing required field(s): "
+        + ", ".join(missing_fields)
+        + "."
+    ]
+
+
+def _detect_runtime_api_drift_issues() -> tuple[str, ...]:
+    """Return issues when installed MLX runtime call surfaces drift from our contract."""
+    issues: list[str] = []
+    for symbol_name, (
+        qualified_name,
+        required_keyword_params,
+    ) in _RUNTIME_API_CALL_CONTRACTS.items():
+        issues.extend(
+            _get_callable_contract_issues(
+                qualified_name=qualified_name,
+                symbol_value=globals()[symbol_name],
+                required_keyword_params=required_keyword_params,
+            ),
+        )
+
+    issues.extend(_get_generation_result_contract_issues(_resolve_generation_result_type()))
+    return tuple(dict.fromkeys(issues))
+
+
 def _collect_preflight_package_issues(versions: LibraryVersionDict) -> list[str]:
     """Collect actionable dependency/runtime issues before model execution."""
     issues = _detect_upstream_version_issues(versions)
@@ -5891,6 +6076,8 @@ def _collect_preflight_package_issues(versions: LibraryVersionDict) -> list[str]
     guard_issue = _detect_transformers_env_guard_issue()
     if guard_issue:
         issues.append(guard_issue)
+
+    issues.extend(_detect_runtime_api_drift_issues())
 
     return issues
 
@@ -13411,6 +13598,7 @@ _STAGE_CODE_MAP: Final[dict[str, str]] = {
     "Timeout": "TIMEOUT",
     "Missing Dep": "MISSING_DEP",
     "Lib Version": "LIB_VERSION",
+    "API Drift": "API_DRIFT",
     "API Mismatch": "API_MISMATCH",
     "Config Missing": "CONFIG_MISSING",
     "No Chat Template": "NO_CHAT_TEMPLATE",
@@ -13454,6 +13642,7 @@ _ERROR_STAGE_HINTS: Final[dict[str, str]] = {
     "Timeout": "operation exceeded configured timeout",
     "Missing Dep": "missing required package(s) or extras",
     "Lib Version": "incompatible library versions/import surface changed",
+    "API Drift": "required upstream runtime contract changed (missing symbol/signature/result fields)",
     "API Mismatch": "upstream function signature changed",
     "Config Missing": "required model config/artifact missing",
     "No Chat Template": "chat template unavailable in processor/tokenizer",
@@ -13607,6 +13796,7 @@ def _classify_error(error_msg: str) -> str:
         - Timeout: Operation timed out
         - Missing Dep: Missing pip packages
         - Lib Version: Import errors due to version mismatches
+        - API Drift: Required runtime surface missing/reshaped before invocation
         - API Mismatch: Unexpected keyword arguments (transformers/mlx-vlm API changes)
         - Config Missing: Model repository missing required config files
         - No Chat Template: Tokenizer/processor lacks chat template
@@ -13631,6 +13821,17 @@ def _classify_error(error_msg: str) -> str:
             ["requires", "packages", "pip install"],
         ),  # All must be present logic handled below
         ("Lib Version", ["cannot import name", "importerror"]),
+        (
+            "API Drift",
+            [
+                "generation runtime api drift",
+                "missing-dependency placeholder",
+                "missing required keyword parameter",
+                "positional-only parameter",
+                "required field(s)",
+                "signature could not be inspected for api drift checks",
+            ],
+        ),
         # API compatibility errors
         ("API Mismatch", ["unexpected keyword argument", "got an unexpected keyword"]),
         # Model configuration/file errors
@@ -13710,9 +13911,13 @@ def _attribute_error_to_package(error_msg: str, traceback_str: str | None = None
             "mlx-vlm",
             [
                 "mlx_vlm/",
+                "mlx_vlm.",
                 "mlx-vlm/",
                 "apply_chat_template",
+                "generationresult",
                 "load_image",
+                "runtime api drift",
+                "missing-dependency placeholder",
             ],
         ),
         (
@@ -13998,17 +14203,12 @@ def _run_model_preflight_validators(
 
 def _ensure_generation_runtime_symbols() -> None:
     """Validate core generation callables before model execution."""
-    missing: list[str] = []
-    for symbol_name, symbol_value in (
-        ("load", load),
-        ("apply_chat_template", apply_chat_template),
-        ("generate", generate),
-    ):
-        if not callable(symbol_value):
-            missing.append(symbol_name)
-    if missing:
-        msg = f"Generation runtime unavailable: missing callables ({', '.join(missing)})."
-        raise _tag_exception_failure_phase(RuntimeError(msg), "import")
+    runtime_api_issues = list(_detect_runtime_api_drift_issues())
+    if not runtime_api_issues:
+        return
+
+    msg = "Generation runtime API drift: " + "; ".join(runtime_api_issues)
+    raise _tag_exception_failure_phase(RuntimeError(msg), "import")
 
 
 def _is_mlx_vlm_bpe_detokenizer_decode_failure(error: BaseException) -> bool:

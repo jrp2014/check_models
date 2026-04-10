@@ -12,7 +12,7 @@ updates:
       - "python"
     commit-message:
       prefix: "chore(deps)"
-    reviewers:
+    assignees:
       - "jrp2014"
 
   # GitHub Actions workflows

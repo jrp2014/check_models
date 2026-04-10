@@ -30,11 +30,12 @@ classifiers = [
 dependencies = [
     # Minimal runtime set actually imported by check_models.py
     "mlx>=0.31.1",
-    "mlx-vlm>=0.4.1",
+    "mlx-vlm>=0.4.4",
     # Project-level compatibility floor for the MLX ecosystem.
-    "transformers>=5.4.0",
+    "transformers>=5.5.3",
     "Pillow[xmp]>=10.3.0",
-    "huggingface-hub[torch,typing]>=1.8.0",
+    "huggingface-hub[torch,typing]>=1.10.1",
+    "packaging>=26.0",
     "requests>=2.31.0",
     "tabulate>=0.9.0",
     "tzlocal>=5.0",
@@ -67,7 +68,7 @@ extras = [
     # Number-to-words conversion (required by some model processors)
     "num2words>=0.5.0",
     # Language-model utilities (not required for base benchmarking)
-    "mlx-lm>=0.31.1",
+    "mlx-lm>=0.31.3",
     "sentencepiece",
 ]
 torch = ["torch>=2.2.0", "torchvision>=0.17.0", "torchaudio>=2.2.0", "timm"]

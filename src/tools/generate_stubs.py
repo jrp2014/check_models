@@ -143,7 +143,7 @@ def _patch_mlx_vlm_stubs(typings_dir: Path) -> None:
             # Expand generate(...) to the explicit kwargs check_models forwards.
             (
                 re.compile(
-                    r"def generate\(model: nn\.Module, processor: ProcessorMixin \| PreTrainedTokenizer, prompt: str, image: str \| list\[str\] \| None = None, audio: str \| list\[str\] \| None = None, verbose: bool = False, \*\*kwargs\) -> GenerationResult: \.\.\.",
+                    r"def generate\([^\n]*?verbose: bool = False, \*\*kwargs\) -> GenerationResult: \.\.\.",
                 ),
                 (
                     "def generate("
@@ -254,24 +254,24 @@ def _patch_transformers_stubs(typings_dir: Path) -> None:
     )
 
 
-def _validate_stub_syntax(typings_dir: Path, package_roots: Iterable[str]) -> None:
-    """Warn and remove syntactically-invalid generated stubs.
-
-    Invalid .pyi files can cause mypy to fail hard even when typing is optional.
-    We remove only invalid files and keep the rest of the package stubs.
-    """
+def _find_invalid_stub_files(
+    typings_dir: Path,
+    package_roots: Iterable[str],
+) -> list[tuple[str, Path, int, str]]:
+    """Return invalid stub files without mutating the typings tree."""
+    invalid_files: list[tuple[str, Path, int, str]] = []
     for package in package_roots:
         root = typings_dir / package.replace(".", "/")
         if not root.exists():
             continue
 
-        invalid_files: list[tuple[Path, int, str]] = []
         for pyi_path in root.rglob("*.pyi"):
             try:
                 compile(pyi_path.read_text(encoding="utf-8"), str(pyi_path), "exec")
             except SyntaxError as err:
                 invalid_files.append(
                     (
+                        package,
                         pyi_path,
                         int(getattr(err, "lineno", 0) or 0),
                         str(getattr(err, "msg", "invalid syntax")),
@@ -279,10 +279,21 @@ def _validate_stub_syntax(typings_dir: Path, package_roots: Iterable[str]) -> No
                 )
             except OSError as err:
                 logger.warning("[stubs] Could not read %s: %s", pyi_path, err)
+    return invalid_files
 
-        if not invalid_files:
-            continue
 
+def _validate_stub_syntax(typings_dir: Path, package_roots: Iterable[str]) -> None:
+    """Warn and remove syntactically-invalid generated stubs.
+
+    Invalid .pyi files can cause mypy to fail hard even when typing is optional.
+    We remove only invalid files and keep the rest of the package stubs.
+    """
+    invalid_by_package: dict[str, list[tuple[Path, int, str]]] = {}
+    for package, pyi_path, line_no, message in _find_invalid_stub_files(typings_dir, package_roots):
+        invalid_by_package.setdefault(package, []).append((pyi_path, line_no, message))
+
+    for package, invalid_files in invalid_by_package.items():
+        root = typings_dir / package.replace(".", "/")
         logger.warning(
             "[stubs] %d invalid stub file(s) detected under %s; removing broken files",
             len(invalid_files),
@@ -306,7 +317,7 @@ logger = logging.getLogger("generate_stubs")
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TYPINGS_DIR = REPO_ROOT / "typings"
 STUB_MANIFEST = ".stub_manifest.json"
-STUB_TOOL_VERSION = "3"
+STUB_TOOL_VERSION = "4"
 
 DEFAULT_PACKAGES = ["mlx_lm", "mlx_vlm", "transformers", "tokenizers"]
 PACKAGE_DISTRIBUTIONS = {
@@ -435,6 +446,92 @@ def get_stub_refresh_reason(packages: Iterable[str], typings_dir: Path = TYPINGS
     return reason
 
 
+def _read_stub_file(path: Path, typings_dir: Path) -> tuple[str | None, list[str]]:
+    """Read a stub file and return its contents plus any integrity issue."""
+    if not path.exists():
+        return None, [f"required stub file is missing: {path.relative_to(typings_dir)}"]
+    try:
+        return path.read_text(encoding="utf-8"), []
+    except OSError as err:
+        return None, [f"could not read {path.relative_to(typings_dir)}: {err}"]
+
+
+def _verify_transformers_stub_contracts(typings_dir: Path) -> list[str]:
+    """Verify that patched transformers stubs expose runtime ProcessorMixin attrs."""
+    processing_utils_path = typings_dir / "transformers" / "processing_utils.pyi"
+    text, issues = _read_stub_file(processing_utils_path, typings_dir)
+    if text is None:
+        return issues
+
+    missing_tokens = [
+        token
+        for token in (
+            "tokenizer: PreTrainedTokenizerBase | None",
+            "image_processor: Any | None",
+        )
+        if token not in text
+    ]
+    if not missing_tokens:
+        return []
+
+    return [
+        "transformers processing_utils stub is missing patched ProcessorMixin runtime attributes: "
+        + ", ".join(missing_tokens)
+    ]
+
+
+def _verify_mlx_vlm_stub_contracts(typings_dir: Path) -> list[str]:
+    """Verify that patched mlx_vlm stubs expose the generate contract we rely on."""
+    generate_path = typings_dir / "mlx_vlm" / "generate.pyi"
+    text, issues = _read_stub_file(generate_path, typings_dir)
+    if text is None:
+        return issues
+
+    missing_tokens = [
+        token
+        for token in (
+            "from transformers.processing_utils import ProcessorMixin as ProcessorMixin",
+            "processor: ProcessorMixin | PreTrainedTokenizer",
+            "temperature: float = ...",
+            "thinking_end_token: str = ...",
+        )
+        if token not in text
+    ]
+    if not missing_tokens:
+        return []
+
+    return [
+        "mlx_vlm generate stub is missing patched runtime-contract markers: "
+        + ", ".join(missing_tokens)
+    ]
+
+
+def get_stub_integrity_issues(
+    packages: Iterable[str],
+    typings_dir: Path = TYPINGS_DIR,
+) -> list[str]:
+    """Return deterministically-checkable issues for generated local stubs."""
+    pkg_list = _validate_packages(packages)
+    issues: list[str] = []
+
+    refresh_reason = get_stub_refresh_reason(pkg_list, typings_dir)
+    if refresh_reason is not None:
+        issues.append(f"stub manifest is stale: {refresh_reason}")
+
+    for package, pyi_path, line_no, message in _find_invalid_stub_files(typings_dir, pkg_list):
+        rel_path = pyi_path.relative_to(typings_dir)
+        location = f"{rel_path}:{line_no}" if line_no else str(rel_path)
+        issues.append(f"{package} stub syntax error in {location} ({message})")
+
+    top_level_packages = {package.split(".", maxsplit=1)[0] for package in pkg_list}
+    if "transformers" in top_level_packages:
+        issues.extend(_verify_transformers_stub_contracts(typings_dir))
+    if "mlx_vlm" in top_level_packages:
+        issues.extend(_verify_mlx_vlm_stub_contracts(typings_dir))
+
+    return issues
+
+
 def _write_stub_manifest(packages: Iterable[str], typings_dir: Path = TYPINGS_DIR) -> None:
     manifest = _read_stub_manifest(typings_dir) or {}
     existing_packages = manifest.get("packages")
@@ -487,37 +584,78 @@ def _is_transformers_stubgen_noise(line: str) -> bool:
     )
 
 
+def _default_stubgen_command() -> list[str]:
+    """Resolve the preferred stubgen command for the active Python environment."""
+    stubgen_path = shutil.which("stubgen")
+    if stubgen_path:
+        return [stubgen_path]
+
+    alt_stubgen = Path(sys.executable).parent / "stubgen"
+    if alt_stubgen.exists():
+        logger.info("[stubs] Using stubgen from Python environment: %s", alt_stubgen)
+        return [str(alt_stubgen)]
+
+    logger.info("[stubs] Falling back to python -m mypy.stubgen")
+    return [sys.executable, "-m", "mypy.stubgen"]
+
+
+def _ensure_mypy_stubgen_command(stubgen_command: list[str]) -> list[str]:
+    """Normalize the chosen stubgen command to mypy's implementation when possible."""
+    try:
+        test_result = subprocess.run(
+            [*stubgen_command, "--help"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError) as err:
+        logger.warning("[stubs] Could not verify stubgen: %s", err)
+        return stubgen_command
+
+    if "-p" in test_result.stdout or "-p" in test_result.stderr:
+        return stubgen_command
+
+    alt_stubgen = Path(sys.executable).parent / "stubgen"
+    if alt_stubgen.exists():
+        logger.info("[stubs] Using stubgen from Python environment: %s", alt_stubgen)
+        return [str(alt_stubgen)]
+    return [sys.executable, "-m", "mypy.stubgen"]
+
+
+def _log_stubgen_output(
+    *,
+    output_lines: list[str],
+    return_code: int,
+    transformers_requested: bool,
+) -> None:
+    """Log stubgen output with transformers-specific noise suppression."""
+    if return_code == 0 and transformers_requested:
+        suppressed_count = 0
+        for line in output_lines:
+            if _is_transformers_stubgen_noise(line):
+                suppressed_count += 1
+                continue
+            logger.info("[stubgen] %s", line)
+        if suppressed_count:
+            logger.info(
+                "[stubs] Suppressed %d non-actionable transformers stubgen message(s)",
+                suppressed_count,
+            )
+        return
+
+    log_fn = logger.error if return_code else logger.info
+    for line in output_lines:
+        log_fn("[stubgen] %s", line)
+
+
 def run_stubgen(packages: Iterable[str]) -> int:
     """Invoke stubgen for the provided packages and return its exit code."""
     TYPINGS_DIR.mkdir(parents=True, exist_ok=True)
     pkg_list = _validate_packages(packages)
 
-    # Find the stubgen executable - prefer the one in the same environment as Python
-    stubgen_path = shutil.which("stubgen")
-    if not stubgen_path:
-        logger.error("[stubs] 'stubgen' command not found. Install mypy: pip install mypy")
-        return 1
+    stubgen_command = _ensure_mypy_stubgen_command(_default_stubgen_command())
 
-    # Verify it's mypy's stubgen by checking if it accepts -p flag
-    # (mlx-vlm might have its own stubgen that uses --model)
-    try:
-        test_result = subprocess.run(
-            [stubgen_path, "--help"],
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        if "-p" not in test_result.stdout and "-p" not in test_result.stderr:
-            # This might be the wrong stubgen, try to find mypy's version
-            python_bin_dir = Path(sys.executable).parent
-            alt_stubgen = python_bin_dir / "stubgen"
-            if alt_stubgen.exists():
-                stubgen_path = str(alt_stubgen)
-                logger.info("[stubs] Using stubgen from Python environment: %s", stubgen_path)
-    except (OSError, subprocess.SubprocessError) as e:
-        logger.warning("[stubs] Could not verify stubgen: %s", e)
-
-    args = [stubgen_path]
+    args = [*stubgen_command]
     for pkg in pkg_list:
         args.extend(["-p", pkg])
     args.extend(["-o", str(TYPINGS_DIR)])
@@ -533,29 +671,16 @@ def run_stubgen(packages: Iterable[str]) -> int:
             "[stubs] 'stubgen' (from mypy) not found. Install mypy: pip install mypy",
         )
         return 1
-    else:
-        output_lines = _split_stubgen_output(completed.stdout, completed.stderr)
-        return_code = int(completed.returncode or 0)
-        transformers_requested = any(pkg.split(".")[0] == "transformers" for pkg in pkg_list)
 
-        if return_code == 0 and transformers_requested:
-            suppressed_count = 0
-            for line in output_lines:
-                if _is_transformers_stubgen_noise(line):
-                    suppressed_count += 1
-                    continue
-                logger.info("[stubgen] %s", line)
-            if suppressed_count:
-                logger.info(
-                    "[stubs] Suppressed %d non-actionable transformers stubgen message(s)",
-                    suppressed_count,
-                )
-        else:
-            log_fn = logger.error if return_code else logger.info
-            for line in output_lines:
-                log_fn("[stubgen] %s", line)
-
-        return return_code
+    output_lines = _split_stubgen_output(completed.stdout, completed.stderr)
+    return_code = int(completed.returncode or 0)
+    transformers_requested = any(pkg.split(".")[0] == "transformers" for pkg in pkg_list)
+    _log_stubgen_output(
+        output_lines=output_lines,
+        return_code=return_code,
+        transformers_requested=transformers_requested,
+    )
+    return return_code
 
 
 def main() -> int:
@@ -578,8 +703,22 @@ def main() -> int:
         action="store_true",
         help="Skip regeneration when existing stubs match installed package versions",
     )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Validate stub freshness and required post-patch contracts without regenerating",
+    )
     ns = parser.parse_args()
     packages = _validate_packages(ns.packages)
+
+    if ns.check:
+        integrity_issues = get_stub_integrity_issues(packages)
+        if integrity_issues:
+            for issue in integrity_issues:
+                logger.error("[stubs] %s", issue)
+            return 1
+        logger.info("[stubs] Stub integrity check passed")
+        return 0
 
     if ns.clear and TYPINGS_DIR.exists():
         shutil.rmtree(TYPINGS_DIR)
@@ -620,6 +759,11 @@ def main() -> int:
 
         _validate_stub_syntax(TYPINGS_DIR, packages)
         _write_stub_manifest(packages)
+        integrity_issues = get_stub_integrity_issues(packages)
+        if integrity_issues:
+            for issue in integrity_issues:
+                logger.error("[stubs] %s", issue)
+            return 1
 
         # Count and report generated stub files
         stub_count = sum(1 for _ in TYPINGS_DIR.rglob("*.pyi"))

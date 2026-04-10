@@ -27,6 +27,11 @@ import tomllib
 from pathlib import Path
 from typing import Final
 
+from check_models_data.dependency_policy import (
+    VALIDATE_ENV_CORE_FALLBACK_SPECS,
+    VALIDATE_ENV_EXTRAS_FALLBACK_SPECS,
+)
+
 logger = logging.getLogger("validate-env")
 
 try:
@@ -128,24 +133,10 @@ CORE_PACKAGES, EXTRAS_PACKAGES, DEV_TOOLS = load_pyproject_deps()
 
 # Fallback if parsing failed
 if not CORE_PACKAGES:
-    CORE_PACKAGES = {
-        "mlx": ">=0.31.1",
-        "mlx-vlm": ">=0.4.1",
-        "transformers": ">=5.4.0",
-        "Pillow": ">=10.3.0",
-        "huggingface-hub": ">=1.8.0",
-        "tabulate": ">=0.9.0",
-        "tzlocal": ">=5.0",
-    }
+    CORE_PACKAGES = dict(VALIDATE_ENV_CORE_FALLBACK_SPECS)
 
 if not EXTRAS_PACKAGES:
-    EXTRAS_PACKAGES = {
-        "psutil": ">=5.9.0",
-        "tokenizers": ">=0.15.0",
-        "einops": ">=0.6.0",
-        "num2words": ">=0.5.0",
-        "mlx-lm": ">=0.31.1",
-    }
+    EXTRAS_PACKAGES = dict(VALIDATE_ENV_EXTRAS_FALLBACK_SPECS)
 
 if not DEV_TOOLS:
     DEV_TOOLS = {
