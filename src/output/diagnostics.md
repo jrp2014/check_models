@@ -2,9 +2,9 @@
 
 ## Summary
 
-Automated benchmarking of **52 locally-cached VLM models** found **1 hard
+Automated benchmarking of **53 locally-cached VLM models** found **1 hard
 failure(s)** and **7 harness/integration issue(s)** plus **1 preflight
-compatibility warning(s)** in successful models. 51 of 52 models succeeded.
+compatibility warning(s)** in successful models. 52 of 53 models succeeded.
 
 Test image: `20260403-132314_DSC09597_DxO.jpg` (21.1 MB).
 
@@ -70,7 +70,7 @@ Captured stdout/stderr:
 ```text
 === STDERR ===
 
-/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/modeling_rope_utils.py:1021: FutureWarning: `rope_config_validation` is deprecated and has been removed. Its functionality has been moved to RotaryEmbeddingConfigMixin.validate_rope method. PreTrainedConfig inherits this class, so please call self.validate_rope() instead. Also, make sure to use the new rope_parameters syntax. You can call self.standardize_rope_params() in the meantime.
+/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/modeling_rope_utils.py:1032: FutureWarning: `rope_config_validation` is deprecated and has been removed. Its functionality has been moved to RotaryEmbeddingConfigMixin.validate_rope method. PreTrainedConfig inherits this class, so please call self.validate_rope() instead. Also, make sure to use the new rope_parameters syntax. You can call self.standardize_rope_params() in the meantime.
   warnings.warn(
 ```
 
@@ -253,7 +253,7 @@ Recent reproducibility is measured from history (up to last 3 runs where each
 model appears).
 
 **Regressions since previous run:** none
-**Recoveries since previous run:** none
+**Recoveries since previous run:** `mlx-community/gemma-4-31b-bf16`
 
 | Model | Status vs Previous Run | First Seen Failing | Recent Repro |
 | ----- | ---------------------- | ------------------ | ------------ |
@@ -264,21 +264,21 @@ model appears).
 ## Coverage & Runtime Metrics
 
 - **Detailed diagnostics models:** 8
-- **Summary diagnostics models:** 44
+- **Summary diagnostics models:** 45
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1071.90s (1071.90s)
-- **Average runtime per model:** 20.61s (20.61s)
-- **Dominant runtime phase:** decode dominated 49/52 measured model runs (90% of tracked runtime).
-- **Phase totals:** model load=103.05s, prompt prep=0.17s, decode=959.35s, cleanup=5.08s
-- **Observed stop reasons:** completed=51, exception=1
-- **Validation overhead:** 9.07s total (avg 0.17s across 52 model(s)).
-- **First-token latency:** Avg 10.75s | Min 0.08s | Max 68.53s across 51 model(s).
+- **Total model runtime (sum):** 1183.47s (1183.47s)
+- **Average runtime per model:** 22.33s (22.33s)
+- **Dominant runtime phase:** decode dominated 50/53 measured model runs (91% of tracked runtime).
+- **Phase totals:** model load=100.46s, prompt prep=0.16s, decode=1073.38s, cleanup=5.13s
+- **Observed stop reasons:** completed=52, exception=1
+- **Validation overhead:** 9.18s total (avg 0.17s across 53 model(s)).
+- **First-token latency:** Avg 11.17s | Min 0.06s | Max 72.41s across 52 model(s).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
 ---
 
-## Models Not Flagged (44 model(s))
+## Models Not Flagged (45 model(s))
 
 These models completed without diagnostics flags (no hard failure, harness
 warning, or stack-signal anomaly).
@@ -292,7 +292,7 @@ warning, or stack-signal anomaly).
 - `mlx-community/gemma-3-27b-it-qat-8bit`
 - `mlx-community/gemma-4-31b-it-4bit`
 
-### Ran, but with quality warnings (38 model(s))
+### Ran, but with quality warnings (39 model(s))
 
 - `HuggingFaceTB/SmolVLM-Instruct`: Model output may not follow prompt or image contents (missing: grey, heron, flies, low, over).
 - `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: Model output may not follow prompt or image contents (missing: grey, heron, flies, low, over).
@@ -312,7 +312,7 @@ warning, or stack-signal anomaly).
 - `mlx-community/LFM2-VL-1.6B-8bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `mlx-community/LFM2.5-VL-1.6B-bf16`: Nonvisual metadata borrowing
 - `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: Output became repetitive, indicating possible generation instability (token: phrase: "birds, flight, scenic, peacefu....
-- `mlx-community/Molmo-7B-D-0924-8bit`: Description sentence violation (7; expected 1-2)
+- `mlx-community/Molmo-7B-D-0924-8bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `mlx-community/Molmo-7B-D-0924-bf16`: Model output may not follow prompt or image contents (missing: grey, heron, flies, low, over).
 - `mlx-community/Phi-3.5-vision-instruct-bf16`: ⚠️REVIEW:cutoff
 - `mlx-community/Qwen3.5-27B-4bit`: Model refused or deflected the requested task (explicit_refusal).
@@ -326,6 +326,7 @@ warning, or stack-signal anomaly).
 - `mlx-community/X-Reasoner-7B-8bit`: Title length violation (4 words; expected 5-10)
 - `mlx-community/gemma-3n-E2B-4bit`: Model output may not follow prompt or image contents (missing: grey, heron, flies, low, over).
 - `mlx-community/gemma-3n-E4B-it-bf16`: Description sentence violation (9; expected 1-2)
+- `mlx-community/gemma-4-31b-bf16`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `mlx-community/nanoLLaVA-1.5-4bit`: Output omitted required Title/Description/Keywords sections (keywords).
 - `mlx-community/paligemma2-10b-ft-docci-448-6bit`: Model output may not follow prompt or image contents (missing: grey, heron, flies, low, over).
 - `mlx-community/paligemma2-3b-pt-896-4bit`: Model output may not follow prompt or image contents (missing: grey, heron, flies, low, over).
@@ -340,14 +341,14 @@ warning, or stack-signal anomaly).
 | Component | Version |
 | --------- | ------- |
 | mlx-vlm | 0.4.4 |
-| mlx | 0.31.2.dev20260406+b98831ad |
-| mlx-lm | 0.31.2 |
-| transformers | 5.5.0 |
+| mlx | 0.31.2.dev20260410+a33b7916 |
+| mlx-lm | 0.31.3 |
+| transformers | 5.5.3 |
 | tokenizers | 0.22.2 |
-| huggingface-hub | 1.9.0 |
+| huggingface-hub | 1.10.1 |
 | Python Version | 3.13.12 |
 | OS | Darwin 25.4.0 |
-| macOS Version | 26.4 |
+| macOS Version | 26.4.1 |
 | GPU/Chip | Apple M5 Max |
 | GPU Cores | 40 |
 | Metal Support | Metal 4 |
@@ -437,4 +438,4 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 - Input image: `/Users/jrp/Pictures/Processed/20260403-132314_DSC09597_DxO.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-04-06 23:33:33 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-04-10 14:58:29 BST by [check_models](https://github.com/jrp2014/check_models)._
