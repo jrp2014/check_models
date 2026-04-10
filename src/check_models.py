@@ -14955,6 +14955,7 @@ def _preview_generation(
             log_warning_note(
                 f"Likely harness issue ({analysis.harness_issue_type}): {details}",
             )
+        log_metric_label("Generated Text:", emoji="📝")
         logger.info(
             "<empty>",
             extra={"style_hint": LogStyles.GENERATED_TEXT},
@@ -14986,6 +14987,7 @@ def _preview_generation(
         log_warning_note(f"Harness issue ({analysis.harness_issue_type}): {details}")
 
     # Show full output in trace (truncated in summary table)
+    log_metric_label("Generated Text:", emoji="📝")
     log_generated_text(text_val, wrap=True)
 
 

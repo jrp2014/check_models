@@ -6,6 +6,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Added an explicit `Generated Text:` label to the non-verbose per-model preview
+  path in `src/check_models.py`, so emitted model output is clearly identified
+  even when the run stays in compact summary mode.
 - Replaced the hardcoded Pyrefly `conda-environment` setting with shared
   quality-script injection of `python-interpreter-path`, so local checks still
   target the resolved repo Python while GitHub Actions no longer fails the

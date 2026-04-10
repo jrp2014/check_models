@@ -11,6 +11,7 @@ from unittest.mock import patch
 import check_models
 from check_models import (
     FileSafeFormatter,
+    GenerationQualityAnalysis,
     HistoryModelResultRecord,
     HistoryRunRecord,
     PerformanceResult,
@@ -188,6 +189,58 @@ def test_metrics_mode_detailed_logs_runtime_phase_details(
     assert "Cleanup:" in messages
     assert "First token:" in messages
     assert "Stop reason:" in messages
+
+
+def test_print_model_result_non_verbose_labels_generated_text_preview(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Non-verbose preview mode should still label the emitted model output block."""
+    caplog.set_level(logging.INFO)
+    preview_text = (
+        "- Keywords hint: St Pancras, clock tower, Victorian Gothic\n"
+        "architecture, public square, urban space"
+    )
+    analysis = GenerationQualityAnalysis(
+        is_repetitive=False,
+        repeated_token=None,
+        hallucination_issues=[],
+        is_verbose=False,
+        formatting_issues=[],
+        has_excessive_bullets=False,
+        bullet_count=0,
+        is_context_ignored=False,
+        missing_context_terms=[],
+        is_refusal=False,
+        refusal_type=None,
+        is_generic=False,
+        specificity_score=0.0,
+        has_language_mixing=False,
+        language_mixing_issues=[],
+        has_degeneration=False,
+        degeneration_type=None,
+        has_fabrication=False,
+        fabrication_issues=[],
+        missing_sections=["title", "description", "keywords"],
+    )
+    result = PerformanceResult(
+        model_name="dummy/model",
+        generation=_StubGeneration(text=preview_text, generation_tokens=32),
+        success=True,
+        generation_time=1.0,
+        model_load_time=0.5,
+        total_time=1.5,
+        quality_analysis=analysis,
+    )
+
+    print_model_result(result, verbose=False)
+
+    messages = [record.message for record in caplog.records]
+    assert any("Missing sections:" in message for message in messages)
+    label_index = next(i for i, message in enumerate(messages) if "Generated Text:" in message)
+    output_index = next(
+        i for i, message in enumerate(messages) if "- Keywords hint: St Pancras" in message
+    )
+    assert label_index < output_index
 
 
 def test_log_summary_uses_model_load_time_for_fastest_load(
