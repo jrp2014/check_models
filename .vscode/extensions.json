@@ -2,7 +2,9 @@
   "recommendations": [
     "ms-python.python",
     "ms-python.vscode-pylance",
-    "ms-toolsai.jupyter",
+    "redhat.vscode-yaml",
+    "github.vscode-github-actions",
+    "timonwong.shellcheck",
     "charliermarsh.ruff",
     "davidanson.vscode-markdownlint",
     "tamasfe.even-better-toml",

@@ -6,6 +6,13 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Expanded the repo-level recommended VS Code extensions in
+  `.vscode/extensions.json` to include YAML, GitHub Actions, and ShellCheck
+  support, matching the checked-in workflow YAML, shell quality gates, and
+  pre-push tooling used by this project.
+- Removed the Jupyter VS Code extension from the repo-level recommended
+  extension list in `.vscode/extensions.json`, keeping the workspace defaults
+  focused on the Python CLI and quality-tooling workflow used in this project.
 - Added an explicit `Generated Text:` label to the non-verbose per-model preview
   path in `src/check_models.py`, so emitted model output is clearly identified
   even when the run stays in compact summary mode.
