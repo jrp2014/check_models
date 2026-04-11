@@ -10,6 +10,9 @@ Notable changes to this project will be documented in this file.
   prints warning-level diagnostics during the check, ships
   `types-defusedxml` in the dev toolchain, and declares `defusedxml` as an
   explicit runtime dependency instead of relying on Pillow's transitive graph.
+- Aligned the fast pre-push quality script with the full quality gate so its
+  Pyrefly step now also runs in project mode instead of only checking
+  `check_models.py`.
 - Made image-metadata evaluation more decision-ready by adding separate
   description and keyword quality scorecards, surfacing those scores in the
   cataloging logs and recommendation summaries, and highlighting the best
