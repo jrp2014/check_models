@@ -88,13 +88,18 @@ def _parse_dependency_spec(requirement: str) -> tuple[str, str]:
 
 def load_pyproject_deps() -> tuple[dict[str, str], dict[str, str], dict[str, str]]:
     """Load dependencies from pyproject.toml."""
-    pyproject_path = Path(__file__).resolve().parents[2] / "pyproject.toml"
-    if not pyproject_path.exists():
-        # Fallback if running from different location
-        pyproject_path = Path("pyproject.toml").resolve()
+    candidate_paths = (
+        Path(__file__).resolve().parents[1] / "pyproject.toml",
+        Path(__file__).resolve().parents[2] / "pyproject.toml",
+        Path("pyproject.toml").resolve(),
+    )
+    pyproject_path = next((path for path in candidate_paths if path.exists()), None)
 
-    if not pyproject_path.exists():
-        logger.warning("Could not find pyproject.toml at %s", pyproject_path)
+    if pyproject_path is None:
+        logger.warning(
+            "Could not find pyproject.toml in expected locations: %s",
+            ", ".join(str(path) for path in candidate_paths),
+        )
         return {}, {}, {}
 
     try:

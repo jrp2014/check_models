@@ -24,7 +24,7 @@ classifiers = [
 # This keeps ordering deterministic and simplifies automated parsing.
 # Runtime intentionally slim: only what `check_models.py` imports directly.
 # Everything else lives in extras to reduce cold install surface & build time.
-# NOTE: Some deps below (requests, Pillow, PyYAML) are also pulled transitively by mlx-vlm
+# NOTE: Some deps below (Pillow, PyYAML) are also pulled transitively by mlx-vlm
 # but are listed explicitly to allow version pinning and ensure they're available if
 # mlx-vlm's dependencies change.
 dependencies = [
@@ -36,9 +36,7 @@ dependencies = [
     "Pillow[xmp]>=10.3.0",
     "huggingface-hub[torch,typing]>=1.10.1",
     "packaging>=26.0",
-    "requests>=2.31.0",
     "tabulate>=0.9.0",
-    "tzlocal>=5.0",
     "wcwidth>=0.2.13",
     "PyYAML>=6.0",
 ]
@@ -86,6 +84,7 @@ dev = [
     "types-tqdm",
     "types-psutil",
     "types-PyYAML",
+    "types-defusedxml",
     "pre-commit",
     "nanobind==2.12.0",
 ]

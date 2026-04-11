@@ -582,6 +582,9 @@ class TestMarkdownReportEdgeCases:
         assert "[check_models.log](check_models.log)" in content
         assert "## Model Gallery" not in content
         assert "## ✅ Recommended Models" in content
+        assert "_Best end-to-end cataloging:_" in content
+        assert "_Best descriptions:_" in content
+        assert "_Best keywording:_" in content
         assert "## 🔍 Quality Pattern Breakdown" in content
 
     def test_markdown_report_uses_shared_output_preview_text(self) -> None:

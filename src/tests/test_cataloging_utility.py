@@ -16,7 +16,9 @@ from check_models import (
     _get_grade_display,
     analyze_model_issues,
     compute_cataloging_utility,
+    compute_description_quality,
     compute_information_gain,
+    compute_keyword_quality,
     compute_task_compliance,
     compute_visual_grounding,
 )
@@ -275,6 +277,44 @@ class TestComputeCatalogingUtility:
         assert "utility_grade" in result
 
 
+class TestTaskSpecificScorecards:
+    """Tests for description and keyword specific scoring helpers."""
+
+    def test_description_quality_rewards_concrete_visual_detail(self) -> None:
+        """Specific, image-grounded prose should beat vague filler description."""
+        strong = (
+            "Description: A red tram moves along wet tracks between brick buildings while "
+            "soft morning fog hangs above the street."
+        )
+        weak = "Description: A nice image of a scene."
+
+        strong_score = float(compute_description_quality(strong, None)["description_score"])
+        weak_score = float(compute_description_quality(weak, None)["description_score"])
+
+        assert strong_score > weak_score
+        assert strong_score >= QUALITY.grade_b_threshold
+        assert weak_score < QUALITY.grade_c_threshold
+
+    def test_keyword_quality_penalizes_generic_duplicates(self) -> None:
+        """Diverse keyword sets should outrank generic repeated tags."""
+        strong = (
+            "Keywords: red tram, wet pavement, brick buildings, city street, morning fog, "
+            "urban transport, reflections, overhead wires, leading lines, travel"
+        )
+        weak = "Keywords: image, photo, scene, city, city, city, transport, transport, nice, visual"
+
+        strong_metrics = compute_keyword_quality(strong, None)
+        weak_metrics = compute_keyword_quality(weak, None)
+
+        assert float(strong_metrics["keyword_score"]) > float(weak_metrics["keyword_score"])
+        assert int(strong_metrics["keyword_unique_terms"]) > int(
+            weak_metrics["keyword_unique_terms"]
+        )
+        assert float(strong_metrics["keyword_duplication_ratio"]) < float(
+            weak_metrics["keyword_duplication_ratio"],
+        )
+
+
 class TestHelperFunctions:
     """Tests for cataloging utility helper functions."""
 
@@ -350,6 +390,8 @@ class TestCatalogingSummaryFormatters:
         """Summary with data should generate HTML."""
         summary: ModelIssueSummary = {
             "cataloging_best": ("model-a", 92.0, "A"),
+            "cataloging_best_description": ("model-c", 88.0),
+            "cataloging_best_keywords": ("model-d", 91.0),
             "cataloging_worst": ("model-b", 35.0, "D"),
             "cataloging_avg_score": 65.0,
             "cataloging_grades": {"A": ["model-a"], "D": ["model-b"]},
@@ -367,9 +409,13 @@ class TestCatalogingSummaryFormatters:
         assert "Cataloging Utility Summary" in html
         assert "model-a" in html
         assert "model-b" in html
+        assert "model-c" in html
+        assert "model-d" in html
         assert "92" in html  # Best score
         assert "35" in html  # Worst score
         assert "Low visual grounding" in html
+        assert "Best descriptions" in html
+        assert "Best keywording" in html
 
     def test_format_cataloging_summary_html_with_metadata_delta(self) -> None:
         """Summary should include baseline and delta metadata comparison lines."""
@@ -406,6 +452,8 @@ class TestCatalogingSummaryFormatters:
         """Summary with data should generate Markdown."""
         summary: ModelIssueSummary = {
             "cataloging_best": ("model-a", 92.0, "A"),
+            "cataloging_best_description": ("model-c", 88.0),
+            "cataloging_best_keywords": ("model-d", 91.0),
             "cataloging_worst": ("model-b", 35.0, "D"),
             "cataloging_avg_score": 65.0,
             "cataloging_grades": {"A": ["model-a"], "D": ["model-b"]},
@@ -423,7 +471,11 @@ class TestCatalogingSummaryFormatters:
         assert "Cataloging Utility Summary" in md
         assert "model-a" in md
         assert "model-b" in md
+        assert "model-c" in md
+        assert "model-d" in md
         assert "Best for cataloging" in md
+        assert "Best descriptions" in md
+        assert "Best keywording" in md
         assert "Worst for cataloging" in md
         assert "Low visual grounding" in md
 

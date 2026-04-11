@@ -281,13 +281,20 @@ PY
         local python_path="$1"
         local pyrefly_path="$2"
         local config_path="$3"
+        local target_display=""
         shift 3
+
+        if [ "$#" -eq 0 ]; then
+            target_display="<project discovery>"
+        else
+            target_display="$*"
+        fi
 
         echo "[pyrefly] active conda env: ${CONDA_DEFAULT_ENV:-<none>}"
         echo "[pyrefly] resolved python (${QUALITY_PYTHON_SOURCE:-unknown}): ${python_path}"
         echo "[pyrefly] resolved pyrefly: ${pyrefly_path}"
         echo "[pyrefly] generated config: ${config_path}"
-        echo "[pyrefly] check targets: ${*:-check_models.py}"
+        echo "[pyrefly] check targets: ${target_display}"
     }
 
     quality_run_pyrefly_check() {
@@ -306,7 +313,11 @@ PY
         fi
 
         quality_print_pyrefly_diagnostics "$python_path" "$pyrefly_path" "$config_path" "$@"
-        if "$pyrefly_path" check -c "$config_path" "$@"; then
+        if "$pyrefly_path" check \
+            -c "$config_path" \
+            --min-severity warn \
+            --output-format full-text \
+            "$@"; then
             exit_code=0
         else
             exit_code=$?

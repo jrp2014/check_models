@@ -1,8 +1,10 @@
 """Tests for EXIF extraction utilities."""
 
+import io
 from pathlib import Path
-from typing import Any
+from typing import Any, Self
 
+import pytest
 from PIL import Image
 
 import check_models
@@ -18,6 +20,41 @@ class _FakeExifWithSubIfd:
     def get_ifd(self, tag: object) -> dict[object, object] | None:
         _ = tag
         return {36867: "2024:01:10 10:20:30", "custom": "value"}
+
+
+class _FakeUrlImage:
+    def __enter__(self) -> Self:
+        return self
+
+    def __exit__(
+        self,
+        exc_type: object,
+        exc_value: object,
+        traceback: object,
+    ) -> None:
+        _ = (exc_type, exc_value, traceback)
+
+    def getexif(self) -> dict[int, Any]:
+        return {270: "Remote description"}
+
+
+class _FakeUrlResponse:
+    def __init__(self, payload: bytes) -> None:
+        self._payload = payload
+
+    def __enter__(self) -> Self:
+        return self
+
+    def __exit__(
+        self,
+        exc_type: object,
+        exc_value: object,
+        traceback: object,
+    ) -> None:
+        _ = (exc_type, exc_value, traceback)
+
+    def read(self) -> bytes:
+        return self._payload
 
 
 def test_extract_exif_date_standard_format(tmp_path: Path) -> None:
@@ -36,6 +73,30 @@ def test_process_exif_subifd_handles_non_int_tag_ids() -> None:
     result = check_models._process_exif_subifd(_FakeExifWithSubIfd())
     assert result["DateTimeOriginal"] == "2024:01:10 10:20:30"
     assert result["custom"] == "value"
+
+
+def test_get_exif_data_downloads_http_image_with_urllib(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """HTTP image EXIF extraction should use urllib and open the in-memory payload."""
+
+    def fake_urlopen(url: str, timeout: int) -> _FakeUrlResponse:
+        assert url == "https://example.com/test.jpg"
+        assert timeout == 30
+        return _FakeUrlResponse(b"remote-image-bytes")
+
+    def fake_image_open(image_data: object) -> _FakeUrlImage:
+        assert isinstance(image_data, io.BytesIO)
+        assert image_data.getvalue() == b"remote-image-bytes"
+        return _FakeUrlImage()
+
+    monkeypatch.setattr(check_models.urllib.request, "urlopen", fake_urlopen)
+    monkeypatch.setattr(check_models.Image, "open", fake_image_open)
+
+    exif_data = check_models.get_exif_data("https://example.com/test.jpg")
+
+    assert exif_data is not None
+    assert exif_data["ImageDescription"] == "Remote description"
 
 
 def test_extract_exif_date_datetime_original(tmp_path: Path) -> None:

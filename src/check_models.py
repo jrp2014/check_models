@@ -57,14 +57,12 @@ from typing import (
     runtime_checkable,
 )
 
-import requests
 import yaml
 from huggingface_hub import HFCacheInfo, scan_cache_dir
 from huggingface_hub import __version__ as hf_version
 from huggingface_hub.errors import HFValidationError
 from packaging.version import InvalidVersion, Version
 from tabulate import tabulate
-from tzlocal import get_localzone
 
 from check_models_data.dependency_policy import (
     PROJECT_MIN_TRANSFORMERS_VERSION,
@@ -475,12 +473,33 @@ FORMATTING = FormattingThresholds()
 QUALITY = QualityThresholds()
 
 
-def _load_quality_config_from_path(config_path: Path) -> None:
-    """Load quality settings from a specific YAML file path."""
-    try:
-        with config_path.open("r", encoding="utf-8") as f:
-            config = yaml.safe_load(f)
-            if config is not None:
+def load_quality_config(config_path: Path | None = None) -> None:
+    """Load quality configuration from file and update global QUALITY instance.
+
+    If no config_path is provided, loads the bundled default quality config
+    resource shipped with the distribution.
+    """
+    with contextlib.ExitStack() as exit_stack:
+        if config_path is None:
+            with contextlib.suppress(FileNotFoundError, ModuleNotFoundError):
+                resource = importlib_resources.files("check_models_data").joinpath(
+                    "quality_config.yaml",
+                )
+                config_path = exit_stack.enter_context(importlib_resources.as_file(resource))
+            if config_path is None:
+                logger.warning(
+                    "Bundled quality config resource not found: check_models_data/quality_config.yaml",
+                )
+                return
+        elif not config_path.exists():
+            logger.warning("Quality config file not found: %s", config_path)
+            return
+
+        try:
+            with config_path.open("r", encoding="utf-8") as f:
+                config = yaml.safe_load(f)
+                if config is None:
+                    return
                 config_mapping = _require_str_object_mapping(
                     config,
                     "quality_config.yaml top-level document must be a mapping",
@@ -491,33 +510,8 @@ def _load_quality_config_from_path(config_path: Path) -> None:
                 for field in dataclasses.fields(QualityThresholds):
                     setattr(QUALITY, field.name, getattr(new_quality, field.name))
                 logger.debug("Loaded quality configuration from %s", config_path)
-    except (OSError, TypeError, ValueError, yaml.YAMLError) as e:
-        logger.warning("Failed to load quality config from %s: %s", config_path, e)
-
-
-def load_quality_config(config_path: Path | None = None) -> None:
-    """Load quality configuration from file and update global QUALITY instance.
-
-    If no config_path is provided, loads the bundled default quality config
-    resource shipped with the distribution.
-    """
-    if config_path is None:
-        with contextlib.suppress(FileNotFoundError, ModuleNotFoundError):
-            resource = importlib_resources.files("check_models_data").joinpath(
-                "quality_config.yaml",
-            )
-            with importlib_resources.as_file(resource) as packaged_path:
-                _load_quality_config_from_path(packaged_path)
-                return
-        logger.warning(
-            "Bundled quality config resource not found: check_models_data/quality_config.yaml",
-        )
-        return
-
-    if config_path and config_path.exists():
-        _load_quality_config_from_path(config_path)
-    elif config_path:
-        logger.warning("Quality config file not found: %s", config_path)
+        except (OSError, TypeError, ValueError, yaml.YAMLError) as e:
+            logger.warning("Failed to load quality config from %s: %s", config_path, e)
 
 
 _temp_logger = logging.getLogger(LOGGER_NAME)
@@ -984,6 +978,8 @@ class ModelIssueSummary(TypedDict, total=False):
     cataloging_grades: dict[str, list[str]]
     cataloging_best: ModelScoreGrade | None
     cataloging_worst: ModelScoreGrade | None
+    cataloging_best_description: tuple[str, float]
+    cataloging_best_keywords: tuple[str, float]
     cataloging_avg_score: float
     cataloging_scores: list[CatalogingScoreRecord]
     runtime_analysis: RuntimeAnalysisSummary
@@ -1024,6 +1020,8 @@ class CatalogingSummaryData:
     metadata_breakdown: tuple[float, str, float, int, int, int] | None = None
     best_entry: ModelScoreGrade | None = None
     worst_entry: ModelScoreGrade | None = None
+    best_description_entry: tuple[str, float] | None = None
+    best_keyword_entry: tuple[str, float] | None = None
     low_utility_models: tuple[LowUtilityModelIssue, ...] = ()
 
 
@@ -1212,8 +1210,23 @@ if TYPE_CHECKING:
 
 
 @runtime_checkable
-class SupportsGenerationResult(Protocol):  # Minimal attributes we read from GenerationResult
-    """Structural subset of GenerationResult accessed by this script.
+class SupportsGenerationText(Protocol):
+    """Minimal generation surface stored on ``PerformanceResult``.
+
+    Report/test callers may pass lightweight stand-ins that only expose text
+    plus a subset of numeric metrics. Consumers should use ``getattr`` or the
+    helpers below when reading optional metrics from stored results.
+    """
+
+    @property
+    def text(self) -> str | None:
+        """Return generated text content when available."""
+        ...
+
+
+@runtime_checkable
+class SupportsGenerationResult(SupportsGenerationText, Protocol):
+    """Structural subset of live GenerationResult objects enriched locally.
 
     Using a Protocol keeps typing resilient to upstream changes in the
     concrete GenerationResult while still giving linters strong guarantees
@@ -1223,16 +1236,14 @@ class SupportsGenerationResult(Protocol):  # Minimal attributes we read from Gen
     `peak_memory` may be added dynamically by our code after generation.
     """
 
-    text: str
-    prompt_tokens: int
-    generation_tokens: int
-    total_tokens: int
-    prompt_tps: float
-    generation_tps: float
+    prompt_tokens: int | None
+    generation_tokens: int | None
+    prompt_tps: float | None
+    generation_tps: float | None
     time: float | None  # Dynamically added timing attribute
     active_memory: float | None  # Dynamically added active memory (GB)
     cache_memory: float | None  # Dynamically added cache memory (GB)
-    peak_memory: float  # Backfilled peak memory (GB) when upstream omits it
+    peak_memory: float | None  # Backfilled peak memory (GB) when upstream omits it
 
 
 class SupportsExifIfd(Protocol):
@@ -1241,6 +1252,33 @@ class SupportsExifIfd(Protocol):
     def get_ifd(self, tag: object) -> Mapping[object, ExifValue] | None:
         """Retrieve a nested IFD mapping by tag identifier."""
         ...
+
+
+type StoredGenerationResult = GenerationResult | SupportsGenerationText
+
+
+def _generation_int_metric(generation: object | None, field_name: str) -> int | None:
+    """Return an optional integer generation metric when present."""
+    value = getattr(generation, field_name, None)
+    if isinstance(value, bool):
+        return None
+    return value if isinstance(value, int) else None
+
+
+def _generation_float_metric(generation: object | None, field_name: str) -> float | None:
+    """Return an optional float generation metric when present."""
+    value = getattr(generation, field_name, None)
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int | float):
+        return float(value)
+    return None
+
+
+def _generation_text_value(generation: object | None) -> str:
+    """Return generation text when available, else an empty string."""
+    value = getattr(generation, "text", "")
+    return value if isinstance(value, str) else ""
 
 
 # =============================================================================
@@ -1334,7 +1372,7 @@ class PerformanceResult:
     """
 
     model_name: str
-    generation: GenerationResult | SupportsGenerationResult | None
+    generation: StoredGenerationResult | None
     success: bool
     failure_phase: str | None = None
     error_stage: str | None = None
@@ -1492,16 +1530,19 @@ def _append_markdown_review_block(
         _append_markdown_labeled_value(out, label=label, value=value)
 
 
-def _gallery_render_error(res: PerformanceResult) -> list[str]:
+def _build_gallery_error_block_lines(res: PerformanceResult) -> list[str]:
+    """Build the failure block used by the Markdown gallery."""
     out: list[str] = []
+    max_inline_error_length = 80
+
     _append_markdown_review_block(out, res=res)
     if out:
         out.append("")
     _append_markdown_labeled_value(out, label="Status", value=f"Failed ({res.error_stage})")
-    error_msg: str = _escape_markdown_blockquote_line(str(res.error_message))
-    max_inline_length = 80
-    if len(error_msg) > max_inline_length:
-        wrapped_lines: list[str] = textwrap.wrap(
+
+    error_msg = _escape_markdown_blockquote_line(str(res.error_message))
+    if len(error_msg) > max_inline_error_length:
+        wrapped_lines = textwrap.wrap(
             error_msg,
             width=76,
             break_long_words=False,
@@ -1512,6 +1553,7 @@ def _gallery_render_error(res: PerformanceResult) -> list[str]:
         out.extend(f"> {line}" for line in wrapped_lines)
     else:
         _append_markdown_labeled_value(out, label="Error", value=error_msg)
+
     for label, value in (
         ("Type", res.error_type),
         ("Phase", res.failure_phase),
@@ -1520,12 +1562,14 @@ def _gallery_render_error(res: PerformanceResult) -> list[str]:
     ):
         if value:
             _append_markdown_labeled_value(out, label=label, value=f"`{value}`")
+
     if res.error_package:
         _append_markdown_labeled_value(
             out,
             label="Next Action",
             value="review package ownership and diagnostics for a minimal repro.",
         )
+
     if res.error_traceback:
         out.append("")
         traceback_lines: list[str] = []
@@ -1542,85 +1586,16 @@ def _gallery_render_error(res: PerformanceResult) -> list[str]:
     return out
 
 
-def _append_gallery_review_lines(
-    out: list[str],
-    *,
-    res: PerformanceResult,
-    summary: ModelIssueSummary,
-    useful_now: bool,
-    watchlist_reason: str | None,
-) -> None:
-    """Append shared review and triage labels for one gallery result."""
-    score_data = _cataloging_score_index(summary).get(res.model_name)
-    if score_data is not None:
-        score, grade, weakness, delta = score_data
-        assessment_parts = [_grade_display_parts(grade, score)]
-        if delta is not None:
-            assessment_parts.append(f"Δ{delta:+.0f}")
-        if weakness:
-            assessment_parts.append(weakness)
-        _append_markdown_labeled_value(
-            out,
-            label="Assessment",
-            value=" | ".join(assessment_parts),
-        )
-
-    if useful_now:
-        _append_markdown_labeled_value(
-            out,
-            label="Review Status",
-            value="strong candidate for first-pass review",
-        )
-    elif watchlist_reason is not None:
-        _append_markdown_labeled_value(
-            out,
-            label="Review Status",
-            value=f"watchlist ({_humanize_watchlist_reason(watchlist_reason)})",
-        )
-
-    review_summary = _summarize_model_review(res, summary)
-    if review_summary:
-        _append_markdown_labeled_value(out, label="Review", value=review_summary)
-
-
-def _append_gallery_quality_lines(
-    out: list[str],
-    *,
-    res: PerformanceResult,
-) -> None:
-    """Append quality warnings or clean-status text for one gallery result."""
-    if not res.generation:
-        return
-
-    analysis = _quality_analysis_for_result(res)
-    if analysis and analysis.issues:
-        if not out or out[-1] != "":
-            out.append("")
-        out.append(f"⚠️ {_markdown_emphasis('Quality Warnings:')}")
-        out.append("")
-        out.extend(
-            f"- {_escape_markdown_gallery_warning(_collapse_preview_whitespace(issue))}"
-            for issue in analysis.issues
-        )
-        return
-
-    if analysis is not None and not analysis.has_any_issues():
-        if not out or out[-1] != "":
-            out.append("")
-        _append_markdown_labeled_value(
-            out,
-            label="Quality Status",
-            value="no quality issues detected in this run",
-        )
-
-
-def _gallery_render_success(
+def _build_gallery_success_block_lines(  # noqa: C901 - keep gallery rendering local
     res: PerformanceResult,
     *,
     summary: ModelIssueSummary | None = None,
     useful_now: bool = False,
     watchlist_reason: str | None = None,
 ) -> list[str]:
+    """Build the success block used by the Markdown gallery."""
+    generation: StoredGenerationResult | None = res.generation
+
     def _metric_segment(label: str, field_name: str, value: MetricValue) -> str | None:
         formatted = format_field_value(field_name, value)
         if not formatted:
@@ -1643,11 +1618,71 @@ def _gallery_render_success(
             return f"{label} {tps_formatted} TPS"
         return f"{label} {tokens_formatted} tok"
 
+    def _append_triage_lines() -> None:
+        if summary is None:
+            return
+
+        score_data = _cataloging_score_index(summary).get(res.model_name)
+        if score_data is not None:
+            score, grade, weakness, delta = score_data
+            assessment_parts = [_grade_display_parts(grade, score)]
+            if delta is not None:
+                assessment_parts.append(f"Δ{delta:+.0f}")
+            if weakness:
+                assessment_parts.append(weakness)
+            _append_markdown_labeled_value(
+                out,
+                label="Assessment",
+                value=" | ".join(assessment_parts),
+            )
+
+        if useful_now:
+            _append_markdown_labeled_value(
+                out,
+                label="Review Status",
+                value="strong candidate for first-pass review",
+            )
+        elif watchlist_reason is not None:
+            _append_markdown_labeled_value(
+                out,
+                label="Review Status",
+                value=f"watchlist ({_humanize_watchlist_reason(watchlist_reason)})",
+            )
+
+        review_summary = _summarize_model_review(res, summary)
+        if review_summary:
+            _append_markdown_labeled_value(out, label="Review", value=review_summary)
+
+    def _append_quality_lines() -> None:
+        if generation is None:
+            return
+
+        analysis = _quality_analysis_for_result(res)
+        if analysis and analysis.issues:
+            if not out or out[-1] != "":
+                out.append("")
+            out.append(f"⚠️ {_markdown_emphasis('Quality Warnings:')}")
+            out.append("")
+            out.extend(
+                f"- {_escape_markdown_gallery_warning(_collapse_preview_whitespace(issue))}"
+                for issue in analysis.issues
+            )
+            return
+
+        if analysis is not None and not analysis.has_any_issues():
+            if not out or out[-1] != "":
+                out.append("")
+            _append_markdown_labeled_value(
+                out,
+                label="Quality Status",
+                value="no quality issues detected in this run",
+            )
+
     out: list[str] = []
-    gen: GenerationResult | SupportsGenerationResult | None = res.generation
     _append_markdown_review_block(out, res=res)
     if out:
         out.append("")
+
     time_segments: list[str] = [
         segment
         for segment in (
@@ -1657,27 +1692,24 @@ def _gallery_render_success(
         )
         if segment is not None
     ]
+
     if time_segments:
         _append_markdown_labeled_value(out, label="Metrics", value=" | ".join(time_segments))
-        if gen is not None:
-            prompt_tps = gen.prompt_tps
-            generation_tps = gen.generation_tps
-            prompt_tokens = gen.prompt_tokens
-            generation_tokens = gen.generation_tokens
+        if generation is not None:
             throughput_segments: list[str] = [
                 segment
                 for segment in (
                     _throughput_segment(
                         "Prompt",
-                        prompt_tps,
+                        _generation_float_metric(generation, "prompt_tps"),
                         "prompt_tokens",
-                        prompt_tokens,
+                        _generation_int_metric(generation, "prompt_tokens"),
                     ),
                     _throughput_segment(
                         "Gen",
-                        generation_tps,
+                        _generation_float_metric(generation, "generation_tps"),
                         "generation_tokens",
-                        generation_tokens,
+                        _generation_int_metric(generation, "generation_tokens"),
                     ),
                 )
                 if segment is not None
@@ -1689,18 +1721,13 @@ def _gallery_render_success(
                     value=" | ".join(throughput_segments),
                 )
 
-    if summary is not None:
-        _append_gallery_review_lines(
-            out,
-            res=res,
-            summary=summary,
-            useful_now=useful_now,
-            watchlist_reason=watchlist_reason,
-        )
+    _append_triage_lines()
 
-    text: str = str(getattr(res.generation, "text", "")) if res.generation else ""
+    text = _generation_text_value(generation)
     _append_markdown_wrapped_blockquote(out, text)
-    _append_gallery_quality_lines(out, res=res)
+
+    _append_quality_lines()
+
     return out
 
 
@@ -4655,6 +4682,211 @@ def compute_visual_grounding(text: str, context: str | None) -> dict[str, float 
     }
 
 
+def _bounded_range_score(value: int, *, lower: int, upper: int) -> float:
+    """Score an integer against an inclusive target range on a 0-1 scale."""
+    if value <= 0:
+        return 0.0
+    if lower <= value <= upper:
+        return 1.0
+    if value < lower:
+        return min(value / max(lower, 1), 1.0)
+    return min(upper / max(value, 1), 1.0)
+
+
+def _extract_description_candidate(text: str) -> str:
+    """Extract the best available prose field for description scoring."""
+    if not text:
+        return ""
+
+    sections = _extract_catalog_sections(text)
+    for section_name in ("description", "title"):
+        candidate = sections.get(section_name, "").strip()
+        if candidate:
+            return candidate
+    return text.strip()
+
+
+def _extract_keyword_terms_for_scoring(text: str) -> list[str]:
+    """Extract explicit keyword terms from catalog-style output."""
+    if not text:
+        return []
+
+    sections = _extract_catalog_sections(text)
+    keywords_text = sections.get("keywords", "").strip()
+    if keywords_text:
+        return _split_catalog_keywords(keywords_text)
+
+    bullet_terms: list[str] = []
+    for raw_line in text.splitlines():
+        stripped = raw_line.strip()
+        if not stripped.startswith(("-", "*", "•")):
+            continue
+        candidate = stripped.lstrip("-*• ").strip()
+        if not candidate:
+            continue
+        if re.match(r"(?i)^(title|description|keywords)\s*:", candidate):
+            continue
+        bullet_terms.append(candidate)
+    if bullet_terms:
+        return _split_catalog_keywords("\n".join(bullet_terms))
+    return []
+
+
+def compute_description_quality(text: str, context: str | None) -> dict[str, float | int]:
+    """Score how useful the prose is for image description work."""
+    description_text = _extract_description_candidate(text)
+    if not description_text or len(description_text.strip()) < QUALITY.min_useful_chars:
+        return {
+            "description_score": 0.0,
+            "description_word_count": 0,
+            "description_sentence_count": 0,
+            "description_detail_coverage": 0.0,
+            "description_grounding_score": 0.0,
+            "description_specificity_score": 0.0,
+        }
+
+    word_count = len(re.findall(r"[A-Za-z0-9']+", description_text))
+    sentence_count = _count_factual_sentences(description_text)
+    grounding = compute_visual_grounding(description_text, context)
+    _is_generic, specificity_score = _detect_generic_output(description_text)
+
+    detail_hits = sum(
+        int(count > 0)
+        for count in (
+            int(grounding["visual_terms"]),
+            int(grounding["spatial_terms"]),
+            int(grounding["color_terms"]),
+        )
+    )
+    detail_coverage = detail_hits / 3
+    length_score = min(word_count / max(QUALITY.substantial_prose_words, 1), 1.0)
+    sentence_fit = _bounded_range_score(
+        sentence_count,
+        lower=QUALITY.min_description_sentences,
+        upper=QUALITY.max_description_sentences,
+    )
+
+    description_score = (
+        (
+            float(grounding["grounding_score"])
+            + detail_coverage
+            + min(float(specificity_score) / 100.0, 1.0)
+            + length_score
+            + sentence_fit
+        )
+        / 5
+    ) * 100.0
+
+    return {
+        "description_score": round(description_score, 1),
+        "description_word_count": word_count,
+        "description_sentence_count": sentence_count,
+        "description_detail_coverage": round(detail_coverage, 2),
+        "description_grounding_score": float(grounding["grounding_score"]),
+        "description_specificity_score": round(float(specificity_score), 1),
+    }
+
+
+def compute_keyword_quality(text: str, context: str | None) -> dict[str, float | int]:
+    """Score how useful the keyword field is for image indexing work."""
+    keyword_terms = _extract_keyword_terms_for_scoring(text)
+    if not keyword_terms:
+        return {
+            "keyword_score": 0.0,
+            "keyword_term_count": 0,
+            "keyword_unique_terms": 0,
+            "keyword_duplication_ratio": 0.0,
+            "keyword_category_coverage": 0.0,
+            "keyword_grounding_score": 0.0,
+        }
+
+    normalized_terms = [_normalize_phrase_for_matching(term) for term in keyword_terms]
+    unique_pairs: list[tuple[str, str]] = []
+    seen_terms: set[str] = set()
+    for term, normalized in zip(keyword_terms, normalized_terms, strict=False):
+        if not normalized or normalized in seen_terms:
+            continue
+        seen_terms.add(normalized)
+        unique_pairs.append((term, normalized))
+
+    total_terms = len(keyword_terms)
+    unique_terms = len(unique_pairs)
+    duplication_ratio = 1.0 - (unique_terms / max(total_terms, 1))
+    unique_term_text = ", ".join(term for term, _normalized in unique_pairs)
+
+    composition_patterns = _get_quality_pattern_list(
+        "keyword_composition_patterns",
+        [
+            r"\b(close[- ]up|macro|wide angle|panoramic|aerial|overhead)\b",
+            r"\b(high angle|low angle|symmetry|copy space|selective focus|bokeh)\b",
+            r"\b(portrait|landscape format|minimalism|leading lines)\b",
+        ],
+    )
+    generic_keyword_patterns = _get_quality_pattern_list(
+        "keyword_generic_patterns",
+        [
+            r"\bimage\b",
+            r"\bphoto(graph)?\b",
+            r"\bpicture\b",
+            r"\bvisual\b",
+            r"\bscene\b",
+            r"\bbeautiful\b",
+            r"\bnice\b",
+        ],
+    )
+    grounding = compute_visual_grounding(unique_term_text, context)
+    composition_count = _count_pattern_matches(unique_term_text.casefold(), composition_patterns)
+    category_hits = sum(
+        (
+            int(int(grounding["visual_terms"]) > 0),
+            int(int(grounding["color_terms"]) > 0),
+            int(int(grounding["spatial_terms"]) > 0 or composition_count > 0),
+        ),
+    )
+    category_coverage = category_hits / 3
+    count_fit = _bounded_range_score(
+        total_terms,
+        lower=QUALITY.min_keywords_count,
+        upper=QUALITY.max_keywords_count,
+    )
+    minimum_multiword_term_tokens = 2
+    uniqueness_score = max(0.0, 1.0 - duplication_ratio)
+    generic_count = sum(
+        1
+        for term, _normalized in unique_pairs
+        if any(re.search(pattern, term, re.IGNORECASE) for pattern in generic_keyword_patterns)
+    )
+    multiword_count = sum(
+        1
+        for term, _normalized in unique_pairs
+        if len(re.findall(r"[A-Za-z0-9']+", term)) >= minimum_multiword_term_tokens
+    )
+    specificity_score = (
+        max(unique_terms - generic_count, 0) / max(unique_terms, 1)
+        + (multiword_count / max(unique_terms, 1))
+    ) / 2
+
+    keyword_score = (
+        (
+            count_fit
+            + uniqueness_score
+            + category_coverage
+            + specificity_score
+            + float(grounding["grounding_score"])
+        )
+        / 5
+    ) * 100.0
+
+    return {
+        "keyword_score": round(keyword_score, 1),
+        "keyword_term_count": total_terms,
+        "keyword_unique_terms": unique_terms,
+        "keyword_duplication_ratio": round(duplication_ratio, 2),
+        "keyword_category_coverage": round(category_coverage, 2),
+        "keyword_grounding_score": float(grounding["grounding_score"]),
+    }
+
+
 def compute_cataloging_utility(
     text: str,
     context: str | None,
@@ -4662,7 +4894,7 @@ def compute_cataloging_utility(
     info_gain: dict[str, float | int] | None = None,
     task_compliance: dict[str, bool | float] | None = None,
     visual_grounding: dict[str, float | int] | None = None,
-) -> dict[str, float | str]:
+) -> dict[str, float | int | str]:
     """Compute overall cataloging utility score combining all metrics.
 
     This is the primary "is this output useful for cataloging?" metric.
@@ -4685,6 +4917,13 @@ def compute_cataloging_utility(
             "utility_score": 0.0,
             "utility_grade": "F",
             "primary_weakness": "Empty or minimal output",
+            "description_score": 0.0,
+            "keyword_score": 0.0,
+            "description_word_count": 0,
+            "keyword_term_count": 0,
+            "keyword_unique_terms": 0,
+            "keyword_duplication_ratio": 0.0,
+            "keyword_category_coverage": 0.0,
         }
 
     # Compute sub-metrics if not provided
@@ -4700,6 +4939,10 @@ def compute_cataloging_utility(
     echo_ratio = float(info_gain.get("echo_ratio", 0.0))
     compliance_score = float(task_compliance.get("compliance_score", 0.0))
     grounding_score = float(visual_grounding.get("grounding_score", 0.0))
+    description_quality = compute_description_quality(text, context)
+    keyword_quality = compute_keyword_quality(text, context)
+    description_score = float(description_quality.get("description_score", 0.0))
+    keyword_score = float(keyword_quality.get("keyword_score", 0.0))
 
     # Compute echo penalty inline
     word_count = len(text.split())
@@ -4738,6 +4981,14 @@ def compute_cataloging_utility(
             echo_ratio > QUALITY.moderate_echo_threshold,
             "Mostly echoes context without adding value",
         ),
+        (
+            keyword_score < QUALITY.grade_d_threshold,
+            "Keywords are not specific or diverse enough",
+        ),
+        (
+            description_score < QUALITY.grade_d_threshold,
+            "Description lacks concrete visual detail",
+        ),
         (grounding_score < QUALITY.low_grounding_threshold, "Lacks visual description of image"),
         (compliance_score < QUALITY.low_compliance_threshold, "Missing requested structure"),
         (information_gain_score < QUALITY.low_info_gain_threshold, "Limited novel information"),
@@ -4757,6 +5008,15 @@ def compute_cataloging_utility(
         "utility_score": round(final_score, 1),
         "utility_grade": grade,
         "primary_weakness": weakness,
+        "description_score": round(description_score, 1),
+        "keyword_score": round(keyword_score, 1),
+        "description_word_count": int(description_quality.get("description_word_count", 0)),
+        "keyword_term_count": int(keyword_quality.get("keyword_term_count", 0)),
+        "keyword_unique_terms": int(keyword_quality.get("keyword_unique_terms", 0)),
+        "keyword_duplication_ratio": float(
+            keyword_quality.get("keyword_duplication_ratio", 0.0),
+        ),
+        "keyword_category_coverage": float(keyword_quality.get("keyword_category_coverage", 0.0)),
     }
 
 
@@ -5458,7 +5718,7 @@ def local_now_str(fmt: str = "%Y-%m-%d %H:%M:%S %Z") -> str:
     stay consistent and makes future changes (e.g. adding UTC or ISO8601
     variants) trivial.
     """
-    return datetime.now(get_localzone()).strftime(fmt)
+    return datetime.now().astimezone().strftime(fmt)
 
 
 # Field name patterns for format dispatch
@@ -6129,8 +6389,8 @@ def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceR
 
         # Fallback: calculate time from GenerationResult tokens-per-second if available
         if result.generation is not None:
-            g_tokens = result.generation.generation_tokens or 0
-            g_tps = result.generation.generation_tps or 0.0
+            g_tokens = _generation_int_metric(result.generation, "generation_tokens") or 0
+            g_tps = _generation_float_metric(result.generation, "generation_tps") or 0.0
             if g_tps > 0 and g_tokens:
                 return float(g_tokens / g_tps)
 
@@ -6419,10 +6679,11 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
         if is_url:
             # Download URL into memory and open with PIL
             logger.debug("Downloading image from URL for EXIF extraction: %s", image_str)
-            # Use requests for better security audit and timeout handling
-            response = requests.get(image_str, timeout=30)
-            response.raise_for_status()
-            img_data = io.BytesIO(response.content)
+            with urllib.request.urlopen(  # noqa: S310 - scheme is restricted to http/https above
+                image_str,
+                timeout=30,
+            ) as response:
+                img_data = io.BytesIO(response.read())
             img = Image.open(img_data)
         else:
             # Local file path
@@ -6520,12 +6781,11 @@ def _first_exif_date_value(exif_data: ExifDict) -> ExifValue | None:
 
 def _parse_exif_local_datetime(exif_date: ExifValue) -> datetime | None:
     """Parse an EXIF date value and convert it to local timezone."""
-    local_tz = get_localzone()
     exif_text = str(exif_date)
     parsed: datetime | None = None
     for fmt in DATE_FORMATS:
         with contextlib.suppress(ValueError):
-            parsed = datetime.strptime(exif_text, fmt).replace(tzinfo=UTC).astimezone(local_tz)
+            parsed = datetime.strptime(exif_text, fmt).replace(tzinfo=UTC).astimezone()
             break
     return parsed
 
@@ -6537,7 +6797,7 @@ def _extract_file_mtime_local(
 ) -> datetime | None:
     """Return file mtime as localized datetime, or ``None`` on filesystem errors."""
     try:
-        return datetime.fromtimestamp(Path(img_path).stat().st_mtime, tz=get_localzone())
+        return datetime.fromtimestamp(Path(img_path).stat().st_mtime, tz=UTC).astimezone()
     except OSError as err:
         logger.debug("Could not get file mtime%s: %s", log_context, err)
         return None
@@ -6663,7 +6923,7 @@ def _extract_description(exif_data: ExifDict) -> str | None:
     return desc or None
 
 
-def _extract_gps_str(gps_info_raw: Mapping[int | str, ExifValue] | None) -> str | None:
+def _extract_gps_str(gps_info_raw: object | None) -> str | None:
     """Convert EXIF GPS mapping to decimal-degree text with cardinal suffixes.
 
     Accepts mixed key formats (numeric EXIF ids or tag strings) and returns
@@ -7426,6 +7686,8 @@ def analyze_model_issues(
     cataloging_grades: dict[str, list[str]] = {}
     low_utility_models: list[LowUtilityModelIssue] = []
     utility_scores: list[CatalogingScoreRecord] = []
+    description_scores: list[tuple[str, float]] = []
+    keyword_scores: list[tuple[str, float]] = []
 
     summary: ModelIssueSummary = {
         "total_models": len(results),
@@ -7438,6 +7700,8 @@ def analyze_model_issues(
         "cataloging_grades": cataloging_grades,
         "cataloging_best": None,
         "cataloging_worst": None,
+        "cataloging_best_description": ("", 0.0),
+        "cataloging_best_keywords": ("", 0.0),
         "cataloging_avg_score": 0.0,
         "cataloging_scores": utility_scores,
         "low_utility_models": low_utility_models,
@@ -7489,17 +7753,15 @@ def analyze_model_issues(
             excessive_bullets=excessive_bullets,
         )
 
-        score: float
-        grade: str
-        weakness: str
-        delta: float | None
-        score, grade, weakness, delta = _compute_utility_snapshot(
-            text,
-            context,
-            baseline_score=baseline_score,
-        )
+        utility = compute_cataloging_utility(text, context)
+        score = float(utility["utility_score"])
+        grade = str(utility["utility_grade"])
+        weakness = str(utility["primary_weakness"])
+        delta = score - baseline_score if baseline_score is not None else None
         utility_scores.append((res.model_name, score, grade, weakness, delta))
         cataloging_grades.setdefault(grade, []).append(res.model_name)
+        description_scores.append((res.model_name, float(utility.get("description_score", 0.0))))
+        keyword_scores.append((res.model_name, float(utility.get("keyword_score", 0.0))))
 
         if grade in ("D", "F"):
             low_utility_models.append((res.model_name, score, grade, weakness))
@@ -7517,6 +7779,20 @@ def analyze_model_issues(
         utility_scores,
         baseline_score=baseline_score,
     )
+    if description_scores:
+        summary["cataloging_best_description"] = max(
+            description_scores,
+            key=lambda item: (item[1], item[0]),
+        )
+    else:
+        summary.pop("cataloging_best_description", None)
+    if keyword_scores:
+        summary["cataloging_best_keywords"] = max(
+            keyword_scores,
+            key=lambda item: (item[1], item[0]),
+        )
+    else:
+        summary.pop("cataloging_best_keywords", None)
 
     return summary
 
@@ -8116,6 +8392,8 @@ def _collect_cataloging_summary_data(summary: ModelIssueSummary) -> CatalogingSu
         metadata_breakdown=_cataloging_vs_metadata_breakdown(summary),
         best_entry=best_entry,
         worst_entry=summary.get("cataloging_worst"),
+        best_description_entry=summary.get("cataloging_best_description"),
+        best_keyword_entry=summary.get("cataloging_best_keywords"),
         low_utility_models=tuple(summary.get("low_utility_models", [])),
     )
 
@@ -8179,6 +8457,24 @@ def _format_cataloging_summary(  # noqa: C901, PLR0912, PLR0915 — dual-format 
             parts.append(
                 f"- **Best for cataloging:** `{model}` ({emoji} {grade}, {score_str})",
             )
+    if data.best_description_entry is not None:
+        model, score = data.best_description_entry
+        score_str = f"{score:.0f}/100"
+        if html_output:
+            parts.append(
+                f"<li><b>Best descriptions:</b> <code>{html.escape(model)}</code> ({score_str})</li>",
+            )
+        else:
+            parts.append(f"- **Best descriptions:** `{model}` ({score_str})")
+    if data.best_keyword_entry is not None:
+        model, score = data.best_keyword_entry
+        score_str = f"{score:.0f}/100"
+        if html_output:
+            parts.append(
+                f"<li><b>Best keywording:</b> <code>{html.escape(model)}</code> ({score_str})</li>",
+            )
+        else:
+            parts.append(f"- **Best keywording:** `{model}` ({score_str})")
     if data.worst_entry is not None:
         model, score, grade = data.worst_entry
         emoji = GRADE_EMOJIS.get(grade, "")
@@ -8973,6 +9269,19 @@ def _log_canonical_run_review_summary(results: Sequence[PerformanceResult]) -> N
     logger.debug("=== END RUN REVIEW SUMMARY ===")
 
 
+def _recommendation_candidate_rows(
+    report_context: ReportRenderContext,
+) -> list[UtilityTriageRow]:
+    """Return rows safe enough to use for user-facing model picks."""
+    rows = list(report_context.triage.utility_rows)
+    actionable_rows = [
+        row
+        for row in rows
+        if row.grade in {"A", "B", "C"} and not (row.labels & QUALITY_BREAKING_LABELS)
+    ]
+    return actionable_rows or rows
+
+
 def _select_recommended_models(
     report_context: ReportRenderContext,
 ) -> list[tuple[str, PerformanceResult, tuple[float, str, str, float | None] | None]]:
@@ -8983,21 +9292,53 @@ def _select_recommended_models(
 
     results_by_name = {result.model_name: result for result in successful_results}
     score_index = _cataloging_score_index(report_context.summary)
+    candidate_rows = _recommendation_candidate_rows(report_context)
     recommendations: list[
         tuple[str, PerformanceResult, tuple[float, str, str, float | None] | None]
     ] = []
 
-    best_quality = report_context.summary.get("cataloging_best")
-    if best_quality is not None:
-        model_name = best_quality[0]
-        if model_name in results_by_name:
-            recommendations.append(
-                (
-                    "Best cataloging quality",
-                    results_by_name[model_name],
-                    score_index.get(model_name),
-                ),
-            )
+    def _append_ranked_row(
+        label: str,
+        key: Callable[[UtilityTriageRow], tuple[float, float, float, str]],
+    ) -> None:
+        if not candidate_rows:
+            return
+        row = max(candidate_rows, key=key)
+        recommendations.append(
+            (
+                label,
+                row.result,
+                score_index.get(row.result.model_name),
+            ),
+        )
+
+    _append_ranked_row(
+        "Best end-to-end cataloging",
+        lambda row: (
+            row.score,
+            row.description_score + row.keyword_score,
+            getattr(row.result.generation, "generation_tps", 0.0) or 0.0,
+            row.result.model_name,
+        ),
+    )
+    _append_ranked_row(
+        "Best descriptions",
+        lambda row: (
+            row.description_score,
+            row.score,
+            getattr(row.result.generation, "generation_tps", 0.0) or 0.0,
+            row.result.model_name,
+        ),
+    )
+    _append_ranked_row(
+        "Best keywording",
+        lambda row: (
+            row.keyword_score,
+            row.score,
+            getattr(row.result.generation, "generation_tps", 0.0) or 0.0,
+            row.result.model_name,
+        ),
+    )
 
     fastest_model = report_context.summary.get("fastest_model")
     if fastest_model is not None:
@@ -9022,22 +9363,21 @@ def _select_recommended_models(
     balance_candidates: list[
         tuple[float, float, float, PerformanceResult, tuple[float, str, str, float | None] | None]
     ] = []
-    for result in successful_results:
+    for row in candidate_rows:
+        result = row.result
         score_data = score_index.get(result.model_name)
-        score = score_data[0] if score_data is not None else float("-inf")
         generation_tps = getattr(result.generation, "generation_tps", 0.0) or 0.0
         peak_memory = getattr(result.generation, "peak_memory", float("inf")) or float("inf")
-        analysis = _quality_analysis_for_result(result)
-        if analysis is not None and not analysis.has_any_issues():
-            balance_candidates.append((score, generation_tps, -peak_memory, result, score_data))
+        if not row.labels:
+            balance_candidates.append((row.score, generation_tps, -peak_memory, result, score_data))
 
     if not balance_candidates:
-        for result in successful_results:
+        for row in candidate_rows:
+            result = row.result
             score_data = score_index.get(result.model_name)
-            score = score_data[0] if score_data is not None else float("-inf")
             generation_tps = getattr(result.generation, "generation_tps", 0.0) or 0.0
             peak_memory = getattr(result.generation, "peak_memory", float("inf")) or float("inf")
-            balance_candidates.append((score, generation_tps, -peak_memory, result, score_data))
+            balance_candidates.append((row.score, generation_tps, -peak_memory, result, score_data))
 
     if balance_candidates:
         _score, _tps, _neg_peak, result, score_data = max(
@@ -9088,12 +9428,13 @@ def _build_markdown_recommended_models(
     if not recommendations:
         return []
 
+    triage_by_name = {row.result.model_name: row for row in report_context.triage.utility_rows}
     parts: list[str] = []
     _append_markdown_section(
         parts,
         title="## ✅ Recommended Models",
         body_lines=[
-            "Quick picks based on cached quality, speed, and memory signals from this run.",
+            "Quick picks based on end-to-end utility plus description and keyword strength.",
         ],
     )
     for label, result, score_data in recommendations:
@@ -9109,6 +9450,10 @@ def _build_markdown_recommended_models(
         if score_data is not None:
             score, grade, _weakness, _delta = score_data
             rationale.append(f"{grade} {score:.0f}/100")
+        triage_row = triage_by_name.get(result.model_name)
+        if triage_row is not None:
+            rationale.append(f"Desc {triage_row.description_score:.0f}")
+            rationale.append(f"Keywords {triage_row.keyword_score:.0f}")
         generation_tps = format_field_value(
             "generation_tps",
             cast("MetricValue", getattr(result.generation, "generation_tps", None)),
@@ -12392,11 +12737,10 @@ def _generate_model_gallery_section(
         md.append("")
         md.append(f"### {icon} {res.model_name}")
         md.append("")
-        block_lines: list[str]
         if not res.success:
-            block_lines = _gallery_render_error(res)
+            block_lines = _build_gallery_error_block_lines(res)
         else:
-            block_lines = _gallery_render_success(
+            block_lines = _build_gallery_success_block_lines(
                 res,
                 summary=summary,
                 useful_now=res.model_name in useful_model_names,
@@ -15129,7 +15473,7 @@ def _summary_parts(res: PerformanceResult, model_short: str) -> list[str]:
 
 
 def _preview_generation(
-    gen: GenerationResult | SupportsGenerationResult | None,
+    gen: StoredGenerationResult | None,
     *,
     analysis: GenerationQualityAnalysis | None = None,
     prompt: str | None = None,
@@ -15137,9 +15481,9 @@ def _preview_generation(
 ) -> None:
     if not gen:
         return
-    text_val = str(getattr(gen, "text", ""))
-    gen_tokens = getattr(gen, "generation_tokens", 0)
-    prompt_tokens = getattr(gen, "prompt_tokens", None)
+    text_val = _generation_text_value(gen)
+    gen_tokens = _generation_int_metric(gen, "generation_tokens") or 0
+    prompt_tokens = _generation_int_metric(gen, "prompt_tokens")
     if analysis is None:
         analysis = analyze_generation_text(
             text_val,
@@ -15277,11 +15621,11 @@ def _log_token_summary(res: PerformanceResult) -> None:
     if res.generation is None:
         return
 
-    p_tokens = res.generation.prompt_tokens or 0
-    g_tokens = res.generation.generation_tokens or 0
+    p_tokens = _generation_int_metric(res.generation, "prompt_tokens") or 0
+    g_tokens = _generation_int_metric(res.generation, "generation_tokens") or 0
     tot_tokens = (p_tokens or 0) + (g_tokens or 0)
-    gen_tps = res.generation.generation_tps or 0.0
-    prompt_tps = res.generation.prompt_tps or 0.0
+    gen_tps = _generation_float_metric(res.generation, "generation_tps") or 0.0
+    prompt_tps = _generation_float_metric(res.generation, "prompt_tps") or 0.0
 
     log_metric_label("Tokens:", emoji="🔢", indent="  ")
     log_metric_tree(
@@ -15514,21 +15858,29 @@ def _log_cataloging_utility(gen_text: str, context: str | None) -> None:
         indent="     ",
     )
 
-    # Visual grounding
-    grounding = compute_visual_grounding(gen_text, context)
-    grounding_detail = (
-        f"{grounding['visual_terms']} visual, "
-        f"{grounding['spatial_terms']} spatial, "
-        f"{grounding['color_terms']} color"
-    )
+    description = compute_description_quality(gen_text, context)
     log_metric_tree(
         "├─",
-        "Grounding:",
-        f"{grounding['grounding_score']:.0%} ({grounding_detail})",
+        "Description:",
+        f"{description['description_score']:.0f}/100 "
+        f"({description['description_word_count']} words, "
+        f"{description['description_sentence_count']} sentences, "
+        f"grounding={description['description_grounding_score']:.0%})",
         indent="     ",
     )
 
-    # Overall utility
+    keywords = compute_keyword_quality(gen_text, context)
+    log_metric_tree(
+        "├─",
+        "Keywords:",
+        f"{keywords['keyword_score']:.0f}/100 "
+        f"({keywords['keyword_term_count']} terms, "
+        f"{keywords['keyword_unique_terms']} unique, "
+        f"coverage={keywords['keyword_category_coverage']:.0%})",
+        indent="     ",
+    )
+
+    grounding = compute_visual_grounding(gen_text, context)
     utility = compute_cataloging_utility(
         gen_text,
         context,
@@ -15593,11 +15945,11 @@ def _log_compact_metrics(res: PerformanceResult) -> None:
     gen_time = getattr(res, "generation_time", None)
     load_time = getattr(res, "model_load_time", None)
     runtime = res.runtime_diagnostics
-    peak_mem = gen.peak_memory or 0.0
-    prompt_tokens = gen.prompt_tokens or 0
-    gen_tokens = gen.generation_tokens or 0
-    gen_tps = gen.generation_tps or 0.0
-    prompt_tps = gen.prompt_tps or 0.0
+    peak_mem = _generation_float_metric(gen, "peak_memory") or 0.0
+    prompt_tokens = _generation_int_metric(gen, "prompt_tokens") or 0
+    gen_tokens = _generation_int_metric(gen, "generation_tokens") or 0
+    gen_tps = _generation_float_metric(gen, "generation_tps") or 0.0
+    prompt_tps = _generation_float_metric(gen, "prompt_tps") or 0.0
 
     # Line 1: Timing and Memory
     timing_parts: list[str] = []
@@ -17000,6 +17352,8 @@ class UtilityTriageRow:
 
     result: PerformanceResult
     score: float
+    description_score: float
+    keyword_score: float
     grade: str
     weakness: str
     delta_vs_metadata: float | None
@@ -17221,15 +17575,17 @@ def _collect_quality_and_utility_rows(
         if not res.generation:
             continue
         text = str(getattr(res.generation, "text", "") or "")
-        score, grade, weakness, delta = _compute_utility_snapshot(
-            text,
-            context,
-            baseline_score=baseline_score,
-        )
+        utility = compute_cataloging_utility(text, context)
+        score = float(utility["utility_score"])
+        grade = str(utility["utility_grade"])
+        weakness = str(utility["primary_weakness"])
+        delta = score - baseline_score if baseline_score is not None else None
         rows.append(
             UtilityTriageRow(
                 result=res,
                 score=score,
+                description_score=float(utility.get("description_score", 0.0)),
+                keyword_score=float(utility.get("keyword_score", 0.0)),
                 grade=grade,
                 weakness=weakness,
                 delta_vs_metadata=delta,
@@ -17303,6 +17659,8 @@ def _format_review_priority_line(
 ) -> str:
     """Format one useful/watchlist row for shared report sections."""
     details: list[str] = [_grade_display_parts(row.grade, row.score)]
+    details.append(f"Desc {row.description_score:.0f}")
+    details.append(f"Keywords {row.keyword_score:.0f}")
     if row.delta_vs_metadata is not None:
         details.append(f"Δ{row.delta_vs_metadata:+.0f}")
     tps = getattr(row.result.generation, "generation_tps", None)
@@ -17668,6 +18026,41 @@ def _log_utility_triage(
             better,
             neutral,
             worse,
+        )
+
+    candidate_rows = [
+        row
+        for row in rows
+        if row.grade in {"A", "B", "C"} and not (row.labels & QUALITY_BREAKING_LABELS)
+    ] or rows
+    if candidate_rows:
+        best_description = max(
+            candidate_rows,
+            key=lambda row: (
+                row.description_score,
+                row.score,
+                getattr(row.result.generation, "generation_tps", 0) or 0,
+                row.result.model_name,
+            ),
+        )
+        best_keywords = max(
+            candidate_rows,
+            key=lambda row: (
+                row.keyword_score,
+                row.score,
+                getattr(row.result.generation, "generation_tps", 0) or 0,
+                row.result.model_name,
+            ),
+        )
+        logger.info(
+            "   Best description: %s (%.0f/100)",
+            best_description.result.model_name,
+            best_description.description_score,
+        )
+        logger.info(
+            "   Best keywording: %s (%.0f/100)",
+            best_keywords.result.model_name,
+            best_keywords.keyword_score,
         )
 
     useful_rows = _select_useful_rows(rows)

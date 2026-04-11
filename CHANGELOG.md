@@ -6,6 +6,19 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Updated the Pyrefly quality gate so `make quality` now runs in project mode,
+  prints warning-level diagnostics during the check, and ships
+  `types-defusedxml` in the dev toolchain to eliminate the remaining
+  `defusedxml.ElementTree` untyped-import warning.
+- Made image-metadata evaluation more decision-ready by adding separate
+  description and keyword quality scorecards, surfacing those scores in the
+  cataloging logs and recommendation summaries, and highlighting the best
+  models for end-to-end cataloging, description quality, and keywording
+  instead of relying on a single blended utility rank alone.
+- Replaced the last direct `requests` and `tzlocal` runtime usage with stdlib
+  `urllib` and local-time conversion via `datetime.astimezone()`, trimming the
+  runtime dependency surface while preserving URL EXIF extraction and localized
+  timestamp behavior.
 - Hardened the MLX stack compatibility policy and diagnostics by centralizing
   shared version floors, raising the validated `mlx-vlm`, `mlx-lm`,
   `transformers`, and `huggingface-hub` minimums, switching runtime version

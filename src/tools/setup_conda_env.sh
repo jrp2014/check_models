@@ -222,7 +222,7 @@ install_dependencies() {
         if grep -q "dev =" pyproject.toml; then
              pip install -e ".[dev]"
         else
-               pip install "ruff>=0.1.0" "mypy>=1.8.0" "ty" "pyrefly" "vulture>=2.16" "pytest>=8.0.0" "pytest-cov>=4.0.0" "pydantic>=2.0.0" "pre-commit"
+             pip install "ruff>=0.1.0" "mypy>=1.8.0" "ty" "pyrefly" "vulture>=2.16" "pytest>=8.0.0" "pytest-cov>=4.0.0" "pydantic>=2.0.0" "types-defusedxml" "pre-commit"
         fi
 
         if command -v npm &> /dev/null; then

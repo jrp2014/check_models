@@ -36,8 +36,6 @@ VALIDATE_ENV_CORE_FALLBACK_SPECS: Final[dict[str, str]] = {
     "packaging": ">=26.0",
     "Pillow": ">=10.3.0",
     "tabulate": ">=0.9.0",
-    "tzlocal": ">=5.0",
-    "requests": ">=2.31.0",
     "wcwidth": ">=0.2.13",
     "PyYAML": ">=6.0",
 }
