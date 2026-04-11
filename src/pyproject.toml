@@ -24,15 +24,17 @@ classifiers = [
 # This keeps ordering deterministic and simplifies automated parsing.
 # Runtime intentionally slim: only what `check_models.py` imports directly.
 # Everything else lives in extras to reduce cold install surface & build time.
-# NOTE: Some deps below (Pillow, PyYAML) are also pulled transitively by mlx-vlm
-# but are listed explicitly to allow version pinning and ensure they're available if
-# mlx-vlm's dependencies change.
+# NOTE: Some deps below are also pulled transitively by other runtime deps
+# (for example Pillow/PyYAML via mlx-vlm and defusedxml via Pillow[xmp]) but are
+# listed explicitly to allow version pinning and ensure they're available if
+# upstream dependency graphs change.
 dependencies = [
     # Minimal runtime set actually imported by check_models.py
     "mlx>=0.31.1",
     "mlx-vlm>=0.4.4",
     # Project-level compatibility floor for the MLX ecosystem.
     "transformers>=5.5.3",
+    "defusedxml>=0.7.1",
     "Pillow[xmp]>=10.3.0",
     "huggingface-hub[torch,typing]>=1.10.1",
     "packaging>=26.0",

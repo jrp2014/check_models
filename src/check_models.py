@@ -635,8 +635,8 @@ else:
     TAGS = cast("Mapping[int, str]", PIL_TAGS)
 
 # defusedxml is required by Pillow's Image.getxmp() for safe XMP/XML parsing.
-# Pulled in transitively via Pillow[xmp] in pyproject.toml, but guard here
-# so _extract_xmp_metadata() degrades gracefully with a clear message.
+# Declared explicitly in pyproject.toml even though Pillow[xmp] may also pull it
+# transitively, so _extract_xmp_metadata() fails clearly if the environment drifts.
 _defusedxml_available: bool
 try:
     import defusedxml.ElementTree  # noqa: F401 — imported for availability check
@@ -646,7 +646,7 @@ except ImportError:
     _defusedxml_available = False
     _temp_logger.warning(
         "defusedxml not installed — XMP metadata extraction will be disabled. "
-        "Install with: pip install 'Pillow[xmp]'",
+        "Install with: pip install defusedxml",
     )
 
 try:
@@ -4579,12 +4579,51 @@ def compute_task_compliance(text: str) -> dict[str, bool | float]:
     has_description = has_explicit_description or has_paragraph
     has_keywords = has_explicit_keywords or has_bullet_list
 
-    # Score: 1/3 for each component
-    score = (
-        (0.33 if has_caption else 0.0)
-        + (0.34 if has_description else 0.0)
-        + (0.33 if has_keywords else 0.0)
-    )
+    # Extract strict constraint data
+    (
+        _,
+        title_word_count,
+        description_sentence_count,
+        keyword_count,
+        keyword_dup_ratio,
+    ) = _analyze_catalog_contract(text)
+
+    score = 0.0
+
+    # Caption/Title scoring
+    if has_caption:
+        score += 0.16
+        if (
+            title_word_count is not None
+            and QUALITY.min_title_words <= title_word_count <= QUALITY.max_title_words
+        ):
+            score += 0.17
+
+    # Description scoring
+    if has_description:
+        score += 0.17
+        if (
+            description_sentence_count is not None
+            and QUALITY.min_description_sentences
+            <= description_sentence_count
+            <= QUALITY.max_description_sentences
+        ):
+            score += 0.17
+
+    # Keywords scoring
+    if has_keywords:
+        score += 0.16
+        if (
+            keyword_count is not None
+            and QUALITY.min_keywords_count <= keyword_count <= QUALITY.max_keywords_count
+        ):
+            keyword_score = 0.17
+            if (
+                keyword_dup_ratio is not None
+                and keyword_dup_ratio >= QUALITY.keyword_duplication_ratio_threshold
+            ):
+                keyword_score = 0.0
+            score += keyword_score
 
     return {
         "has_caption": has_caption,

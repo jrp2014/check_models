@@ -33,6 +33,7 @@ VALIDATE_ENV_CORE_FALLBACK_SPECS: Final[dict[str, str]] = {
     "mlx-vlm": f">={PROJECT_RUNTIME_STACK_MINIMUMS['mlx-vlm']}",
     "transformers": f">={PROJECT_RUNTIME_STACK_MINIMUMS['transformers']}",
     "huggingface-hub": f">={PROJECT_RUNTIME_STACK_MINIMUMS['huggingface-hub']}",
+    "defusedxml": ">=0.7.1",
     "packaging": ">=26.0",
     "Pillow": ">=10.3.0",
     "tabulate": ">=0.9.0",

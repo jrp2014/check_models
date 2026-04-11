@@ -91,14 +91,13 @@ class TestComputeTaskCompliance:
     """Tests for compute_task_compliance function."""
 
     def test_full_compliance(self) -> None:
-        """Text with all three components: caption, description, keywords."""
+        """Text with all three components matching strict length constraints."""
         text = """
-        Caption: A sunset over mountains.
+        Title: A glorious golden sunset over distant rugged mountain peaks.
 
-        Description: This image shows a beautiful sunset
-        with orange and purple hues across the sky.
+        Description: This image shows a beautiful sunset with orange and purple hues. The bright sky casts a warm reflection over the entire vast landscape.
 
-        Keywords: sunset, mountains, landscape, nature
+        Keywords: sunset, mountains, landscape, nature, sky, orange, purple, clouds, evening, dusk, scenic, panoramic
         """
         result = compute_task_compliance(text)
 
@@ -186,16 +185,11 @@ class TestComputeCatalogingUtility:
     def test_high_quality_output(self) -> None:
         """High-quality cataloging output gets high score."""
         text = """
-        Caption: A golden sunset over mountain peaks with dramatic clouds.
+        Title: A golden sunset over mountain peaks with dramatic clouds.
 
-        Description: This landscape photograph captures the last moments of
-        daylight as the sun descends behind snow-capped mountains. The sky
-        is ablaze with orange, pink, and purple hues, reflecting off the
-        scattered clouds. In the foreground, a calm alpine lake mirrors
-        the colorful sky, creating a symmetrical composition.
+        Description: This landscape photograph captures the last moments of daylight as the sun descends behind snow-capped mountains. The sky is ablaze with orange, pink, and purple hues, reflecting off the scattered clouds.
 
-        Keywords: sunset, mountains, landscape, alpine lake, reflection,
-        golden hour, dramatic sky, nature photography
+        Keywords: sunset, mountains, landscape, alpine lake, reflection, golden hour, dramatic sky, nature photography, clouds, peaks, dusk, scenic
         """
         result = compute_cataloging_utility(text, None)
         score = _get_utility_score(result)
@@ -226,11 +220,9 @@ class TestComputeCatalogingUtility:
         """Verify grade assignment follows score thresholds."""
         # The actual thresholds are in QualityThresholds
         high_quality = """
-        Caption: Detailed image caption with visual elements.
-        Description: Comprehensive description of the scene including
-        foreground subjects, background elements, lighting conditions,
-        and atmospheric details visible in the photograph.
-        Keywords: photography, composition, lighting, subject, background
+        Title: Detailed image title with multiple concrete visual elements.
+        Description: Comprehensive description of the scene including foreground subjects and background. The text illustrates lighting conditions and atmospheric details present throughout.
+        Keywords: photography, composition, lighting, subject, background, foreground, details, atmosphere, conditions, elements, visual, landscape
         """
         result = compute_cataloging_utility(high_quality, None)
 

@@ -7,9 +7,9 @@ Notable changes to this project will be documented in this file.
 ### Changed
 
 - Updated the Pyrefly quality gate so `make quality` now runs in project mode,
-  prints warning-level diagnostics during the check, and ships
-  `types-defusedxml` in the dev toolchain to eliminate the remaining
-  `defusedxml.ElementTree` untyped-import warning.
+  prints warning-level diagnostics during the check, ships
+  `types-defusedxml` in the dev toolchain, and declares `defusedxml` as an
+  explicit runtime dependency instead of relying on Pillow's transitive graph.
 - Made image-metadata evaluation more decision-ready by adding separate
   description and keyword quality scorecards, surfacing those scores in the
   cataloging logs and recommendation summaries, and highlighting the best
