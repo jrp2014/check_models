@@ -13,6 +13,10 @@ Notable changes to this project will be documented in this file.
 - Aligned the fast pre-push quality script with the full quality gate so its
   Pyrefly step now also runs in project mode instead of only checking
   `check_models.py`.
+- Consolidated the duplicated fast and full quality-script logic so
+  `src/tools/check_quality_simple.sh` now delegates to a parameterized
+  `src/tools/run_quality_checks.sh --fast` path, reducing drift between the
+  pre-push hook and the full local/CI quality gate.
 - Made image-metadata evaluation more decision-ready by adding separate
   description and keyword quality scorecards, surfacing those scores in the
   cataloging logs and recommendation summaries, and highlighting the best
@@ -22,6 +26,11 @@ Notable changes to this project will be documented in this file.
   `urllib` and local-time conversion via `datetime.astimezone()`, trimming the
   runtime dependency surface while preserving URL EXIF extraction and localized
   timestamp behavior.
+- Hardened the `compute_task_compliance` metrics to strictly enforce the exact
+  prompt constraints. Instead of awarding points merely for implicit or fuzzy section presence,
+  the tool now parses output into explicit sections and awards passing compliance scores only
+  when the model's word counts, sentence lengths, and keyword counts meet the respective
+  bounds defined in `quality_config.yaml`.
 - Hardened the MLX stack compatibility policy and diagnostics by centralizing
   shared version floors, raising the validated `mlx-vlm`, `mlx-lm`,
   `transformers`, and `huggingface-hub` minimums, switching runtime version

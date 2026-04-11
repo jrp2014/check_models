@@ -1,6 +1,26 @@
 #!/usr/bin/env bash
-# Deterministic full static quality checker for local runs and CI.
+# Deterministic quality checker for local runs, hooks, and CI.
 set -euo pipefail
+
+QUALITY_MODE="full"
+if [ "$#" -gt 1 ]; then
+    echo "Usage: bash tools/run_quality_checks.sh [--fast|--full]" >&2
+    exit 2
+fi
+if [ "$#" -eq 1 ]; then
+    case "$1" in
+        --fast|fast)
+            QUALITY_MODE="fast"
+            ;;
+        --full|full)
+            QUALITY_MODE="full"
+            ;;
+        *)
+            echo "Usage: bash tools/run_quality_checks.sh [--fast|--full]" >&2
+            exit 2
+            ;;
+    esac
+fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck disable=SC1091
@@ -12,7 +32,9 @@ quality_setup_python
 quality_require_python_tool ty "Install dev dependencies with: pip install -e .[dev]"
 quality_require_python_tool pyrefly "Install dev dependencies with: pip install -e .[dev]"
 quality_require_python_tool vulture "Install dev dependencies with: pip install -e .[dev]"
-quality_require_command shellcheck "Install with: brew install shellcheck"
+if [ "$QUALITY_MODE" = "full" ]; then
+    quality_require_command shellcheck "Install with: brew install shellcheck"
+fi
 
 echo "=== Workflow YAML Validation ==="
 quality_validate_yaml_files \
@@ -23,28 +45,29 @@ quality_validate_yaml_files \
 echo "=== Dependency Sync (Check) ==="
 "$QUALITY_PYTHON" -m tools.update_readme_deps --check
 
-mkdir -p ../typings
+if [ "$QUALITY_MODE" = "full" ]; then
+    mkdir -p ../typings
 
-echo "=== Type Stub Refresh (Best Effort) ==="
-stub_refresh_failed=0
-if ! "$QUALITY_PYTHON" -m tools.generate_stubs --skip-if-fresh \
-    mlx_lm mlx_vlm transformers tokenizers; then
-    echo "⚠️  Stub refresh warning: could not regenerate local third-party stubs; continuing"
-    stub_refresh_failed=1
-fi
-
-echo "=== Type Stub Contract Check ==="
-if ! "$QUALITY_PYTHON" -m tools.generate_stubs --check \
-    mlx_lm mlx_vlm transformers tokenizers; then
-    if [ "$stub_refresh_failed" -eq 1 ]; then
-        echo "❌ Stub refresh and integrity checks failed"
+    echo "=== Type Stub Refresh (Best Effort) ==="
+    stub_refresh_failed=0
+    if ! "$QUALITY_PYTHON" -m tools.generate_stubs --skip-if-fresh \
+        mlx_lm mlx_vlm transformers tokenizers; then
+        echo "⚠️  Stub refresh warning: could not regenerate local third-party stubs; continuing"
+        stub_refresh_failed=1
     fi
-    exit 1
-fi
 
-echo "=== Type Stub Preflight ==="
+    echo "=== Type Stub Contract Check ==="
+    if ! "$QUALITY_PYTHON" -m tools.generate_stubs --check \
+        mlx_lm mlx_vlm transformers tokenizers; then
+        if [ "$stub_refresh_failed" -eq 1 ]; then
+            echo "❌ Stub refresh and integrity checks failed"
+        fi
+        exit 1
+    fi
 
-"$QUALITY_PYTHON" - <<'PY'
+    echo "=== Type Stub Preflight ==="
+
+    "$QUALITY_PYTHON" - <<'PY'
 from __future__ import annotations
 
 from pathlib import Path
@@ -93,8 +116,13 @@ if invalid:
 if not missing and not invalid:
     print("✓ Stub preflight: expected package stubs available and parseable")
 PY
+fi
 
-echo "=== Ruff Format ==="
+if [ "$QUALITY_MODE" = "fast" ]; then
+    echo "=== Ruff Format (Check) ==="
+else
+    echo "=== Ruff Format ==="
+fi
 "$QUALITY_PYTHON" -m ruff format --check .
 
 echo "=== Ruff Lint ==="
@@ -114,6 +142,15 @@ quality_run_pyrefly_check
 
 echo "=== Vulture Dead Code Check ==="
 quality_run_python_tool vulture
+
+if [ "$QUALITY_MODE" = "fast" ]; then
+    echo "=== Pytest (fast set) ==="
+    "$QUALITY_PYTHON" -m pytest -q -m "not slow and not e2e"
+
+    echo ""
+    echo "✅ Fast quality checks passed!"
+    exit 0
+fi
 
 echo "=== Pytest ==="
 "$QUALITY_PYTHON" -m pytest -v
