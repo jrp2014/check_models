@@ -2836,7 +2836,7 @@ _Review:_ D 50/100 | nontext prompt burden=76% | missing sections: title,
 >
 > 附加 section
 >
-> immediate﻿
+> immediate
 >
 > NONINFRINGEMENT »
 >

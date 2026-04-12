@@ -9865,7 +9865,7 @@ def _append_markdown_wrapped_blockquote(
             blockquote_lines.append(">")
             continue
         for wrapped_line in wrapped_lines:
-            clean_line = wrapped_line.lstrip().rstrip(" \t\u00a0")
+            clean_line = wrapped_line.lstrip().rstrip(" \t\u00a0\u200b\u200c\u200d\u2060\ufeff")
             blockquote_lines.append(
                 ">" if clean_line == "" else f"> {_escape_markdown_blockquote_line(clean_line)}"
             )
@@ -13414,12 +13414,13 @@ def normalize_markdown_trailing_spaces(md_text: str) -> str:
 
     Rules:
     - Keep exactly FORMATTING.markdown_hard_break_spaces trailing spaces (Markdown hard line break).
-    - Strip any other trailing horizontal whitespace, including non-breaking spaces,
-      to avoid accidental single-space endings.
+    - Strip any other trailing horizontal whitespace or invisible format characters,
+      including non-breaking spaces and trailing BOM/zero-width markers, to avoid
+      accidental MD009-style endings.
     """
     out_lines: list[str] = []
     for ln in md_text.splitlines():
-        stripped = ln.rstrip(" \t\u00a0")
+        stripped = ln.rstrip(" \t\u00a0\u200b\u200c\u200d\u2060\ufeff")
         trailing = ln[len(stripped) :]
         if not trailing:
             out_lines.append(ln)

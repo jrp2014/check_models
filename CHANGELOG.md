@@ -9,6 +9,9 @@ Notable changes to this project will be documented in this file.
 - Hardened Markdown gallery blockquote rendering so label-only model-output
   lines such as `Description:` and stray lone `-` markers are neutralized
   before markdownlint can misread them as headings.
+- Hardened Markdown artifact normalization so trailing BOM and zero-width
+  format characters are stripped before write-out, preventing hidden
+  `MD009/no-trailing-spaces` failures in generated gallery output.
 - Updated workspace file associations so generated `PKG-INFO` package-metadata
   files open as properties instead of Markdown, avoiding editor-only
   markdownlint noise on `.egg-info` metadata.

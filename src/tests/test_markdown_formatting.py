@@ -490,6 +490,15 @@ def test_normalize_markdown_trailing_spaces_strips_nonbreaking_spaces() -> None:
     assert normalized.splitlines() == ["alpha", "beta  ", "gamma"]
 
 
+def test_normalize_markdown_trailing_spaces_strips_trailing_bom_and_zero_width() -> None:
+    """Markdown trailing-space normalization should strip BOM and zero-width endings."""
+    md = "alpha\ufeff\nbeta\u200b\ngamma\u2060\ndelta  "
+
+    normalized = check_models.normalize_markdown_trailing_spaces(md)
+
+    assert normalized.splitlines() == ["alpha", "beta", "gamma", "delta  "]
+
+
 def test_wrapped_blockquote_preserves_plain_bracket_text() -> None:
     """Wrapped blockquote lines should leave ordinary bracket text readable."""
     parts: list[str] = []
