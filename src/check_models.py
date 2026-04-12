@@ -9767,46 +9767,62 @@ def _append_markdown_code_block(
         parts.append("")
 
 
+def _is_markdown_blockquote_label_line(text: str) -> bool:
+    """Return whether escaped blockquote text is just a short label line."""
+    emphasis_wrapper = "&#42;&#42;"
+    normalized = text
+    if normalized.startswith(emphasis_wrapper) and normalized.endswith(emphasis_wrapper):
+        normalized = normalized[len(emphasis_wrapper) : -len(emphasis_wrapper)]
+    return re.fullmatch(r"[A-Za-z][A-Za-z0-9 \"'()/,&.-]{0,80}:", normalized) is not None
+
+
 def _neutralize_markdown_blockquote_prefix(text: str) -> str:
     """Render leading Markdown control syntax as plain text in blockquotes."""
+    replacement = text
     if text.startswith("[!"):
-        return f"&#91;{text[1:]}"
+        replacement = f"&#91;{text[1:]}"
+    else:
+        setext_match = re.fullmatch(r"([=-])\1{2,}\s*", text)
+        if setext_match is not None:
+            underline_entity = "&#61;" if setext_match.group(1) == "=" else "&#45;"
+            replacement = f"{underline_entity}{text[1:]}"
+        else:
+            bullet_entities: dict[str, str] = {
+                "*": "&#42;",
+                "+": "&#43;",
+                "-": "&#45;",
+            }
+            lone_bullet_match = re.fullmatch(r"([*+-])", text)
+            if lone_bullet_match is not None:
+                replacement = bullet_entities[lone_bullet_match.group(1)]
+            else:
+                ordered_match = re.match(r"^(\d+)([.)])(\s)", text)
+                if ordered_match is not None:
+                    punctuation_entity = "&#46;" if ordered_match.group(2) == "." else "&#41;"
+                    replacement = (
+                        f"{ordered_match.group(1)}{punctuation_entity}{ordered_match.group(3)}"
+                        f"{text[ordered_match.end() :]}"
+                    )
+                else:
+                    bullet_match = re.match(r"^([*+-])(\s)", text)
+                    if bullet_match is not None:
+                        replacement = (
+                            f"{bullet_entities[bullet_match.group(1)]}{bullet_match.group(2)}"
+                            f"{text[bullet_match.end() :]}"
+                        )
+                    else:
+                        prefix_entities: dict[str, str] = {
+                            "#": "&#35;",
+                            ">": "&gt;",
+                            "`": "&#96;",
+                        }
+                        leading_char = text[:1]
+                        if leading_char in prefix_entities:
+                            replacement = f"{prefix_entities[leading_char]}{text[1:]}"
+                        elif _is_markdown_blockquote_label_line(text):
+                            replacement = f"&#8203;{text}"
 
-    setext_match = re.fullmatch(r"([=-])\1{2,}\s*", text)
-    if setext_match is not None:
-        underline_entity = "&#61;" if setext_match.group(1) == "=" else "&#45;"
-        return f"{underline_entity}{text[1:]}"
-
-    ordered_match = re.match(r"^(\d+)([.)])(\s)", text)
-    if ordered_match is not None:
-        punctuation_entity = "&#46;" if ordered_match.group(2) == "." else "&#41;"
-        return (
-            f"{ordered_match.group(1)}{punctuation_entity}{ordered_match.group(3)}"
-            f"{text[ordered_match.end() :]}"
-        )
-
-    bullet_match = re.match(r"^([*+-])(\s)", text)
-    if bullet_match is not None:
-        bullet_entities: dict[str, str] = {
-            "*": "&#42;",
-            "+": "&#43;",
-            "-": "&#45;",
-        }
-        return (
-            f"{bullet_entities[bullet_match.group(1)]}{bullet_match.group(2)}"
-            f"{text[bullet_match.end() :]}"
-        )
-
-    prefix_entities: dict[str, str] = {
-        "#": "&#35;",
-        ">": "&gt;",
-        "`": "&#96;",
-    }
-    leading_char = text[:1]
-    if leading_char in prefix_entities:
-        return f"{prefix_entities[leading_char]}{text[1:]}"
-
-    return text
+    return replacement
 
 
 def _escape_markdown_blockquote_line(text: str) -> str:

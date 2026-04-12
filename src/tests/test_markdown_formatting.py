@@ -402,6 +402,26 @@ def test_wrapped_blockquote_neutralizes_setext_heading_underline() -> None:
     assert "> &#61;=====" in md
 
 
+def test_wrapped_blockquote_neutralizes_label_only_lines_and_lone_markers() -> None:
+    """Wrapped blockquotes should keep label lines and stray markers out of heading parsing."""
+    parts: list[str] = []
+
+    check_models._append_markdown_wrapped_blockquote(
+        parts,
+        "Description:\n- A large white butterfly\n\n**Title:**\n- Concrete and factual.\n-",
+    )
+
+    md = "\n".join(parts)
+    assert "> &#8203;Description:" in md
+    assert "> &#45; A large white butterfly" in md
+    assert "> &#8203;&#42;&#42;Title:&#42;&#42;" in md
+    assert "> &#45; Concrete and factual." in md
+    assert "> &#45;" in md
+    assert "> Description:" not in md
+    assert "> &#42;&#42;Title:&#42;&#42;" not in md
+    assert "> -" not in md
+
+
 def test_gallery_review_summary_uses_review_focus_evidence(tmp_path: Path) -> None:
     """Gallery compact review line should use the canonical evidence-focused summary."""
     prompt = (

@@ -50,6 +50,9 @@
   },
   // Enable Pylance pytest support (fixture completions, parameter inference)
   "python.analysis.enablePytestSupport": true,
+  "files.associations": {
+    "**/PKG-INFO": "properties"
+  },
   // Exclude build artifacts from file tree, search, and file watcher
   "files.exclude": {
     "**/__pycache__": true,

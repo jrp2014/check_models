@@ -6,6 +6,17 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Hardened Markdown gallery blockquote rendering so label-only model-output
+  lines such as `Description:` and stray lone `-` markers are neutralized
+  before markdownlint can misread them as headings.
+- Updated workspace file associations so generated `PKG-INFO` package-metadata
+  files open as properties instead of Markdown, avoiding editor-only
+  markdownlint noise on `.egg-info` metadata.
+
+## [0.3.3] - 2026-04-12
+
+### Changed
+
 - Reduced avoidable MLX teardown overhead after successful model runs by
   keeping the post-decode synchronize needed for accurate timing and memory
   sampling, but no longer forcing a second parameter-evaluation step before

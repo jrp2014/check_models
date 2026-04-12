@@ -194,23 +194,19 @@ Title:ĠBluebellĠCakeĠHouseĠonĠHighĠStreetĊĊDescription:ĠAĠquietĠstree
 
 ### `mlx-community/Qwen2-VL-2B-Instruct-4bit`
 
-**What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
+**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
 **Likely component:** `model-config / mlx-vlm`
 **Suggested next action:** validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
-**Token summary:** prompt=16,686, output=2, output/prompt=0.01%
+**Token summary:** prompt=0, output=0, output/prompt=n/a
 
 **Why this appears to be an integration/runtime issue:**
 
-- Special control token &lt;|endoftext|&gt; appeared in generated text.
-- Output appears truncated to about 2 tokens.
-- At long prompt length (16686 tokens), output stayed unusually short (2 tokens; ratio 0.0%).
-- Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
-- Output switched language/script unexpectedly (tokenizer_artifact).
+- Model returned zero output tokens.
 
 **Sample output:**
 
 ```text
-<|endoftext|>
+<empty output>
 ```
 
 ### `mlx-community/Qwen3-VL-2B-Thinking-bf16`
@@ -314,13 +310,13 @@ model appears).
 - **Detailed diagnostics models:** 10
 - **Summary diagnostics models:** 43
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1266.96s (1266.96s)
-- **Average runtime per model:** 23.90s (23.90s)
+- **Total model runtime (sum):** 1220.57s (1220.57s)
+- **Average runtime per model:** 23.03s (23.03s)
 - **Dominant runtime phase:** decode dominated 52/53 measured model runs (90% of tracked runtime).
-- **Phase totals:** model load=118.35s, prompt prep=0.17s, decode=1132.03s, cleanup=5.52s
+- **Phase totals:** model load=110.81s, prompt prep=0.17s, decode=1093.37s, cleanup=5.49s
 - **Observed stop reasons:** completed=52, exception=1
-- **Validation overhead:** 16.11s total (avg 0.30s across 53 model(s)).
-- **First-token latency:** Avg 12.50s | Min 0.08s | Max 83.15s across 52 model(s).
+- **Validation overhead:** 15.97s total (avg 0.30s across 53 model(s)).
+- **First-token latency:** Avg 10.72s | Min 0.08s | Max 92.39s across 51 model(s).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
@@ -355,7 +351,7 @@ warning, or stack-signal anomaly).
 - `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: ⚠️REVIEW:context_budget
 - `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: ⚠️REVIEW:context_budget
-- `mlx-community/Molmo-7B-D-0924-8bit`: Output leaked reasoning or prompt-template text (title hint:).
+- `mlx-community/Molmo-7B-D-0924-8bit`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 - `mlx-community/Molmo-7B-D-0924-bf16`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 - `mlx-community/Phi-3.5-vision-instruct-bf16`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 - `mlx-community/Qwen3.5-27B-4bit`: Model refused or deflected the requested task (explicit_refusal).
@@ -484,4 +480,4 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 - Input image: `/Users/jrp/Pictures/Processed/20260411-154640_DSC09740_DxO.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-04-12 01:05:39 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-04-12 01:33:02 BST by [check_models](https://github.com/jrp2014/check_models)._
