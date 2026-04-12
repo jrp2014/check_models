@@ -3,87 +3,87 @@
 
 thresholds:
   # Repetition detection
-  repetition_ratio: 0.9          # 90% of tokens must be same to flag
-  min_text_length: 10            # Minimum text length to check
-  min_token_count: 5             # Minimum tokens to analyze
+  repetition_ratio: 0.9 # 90% of tokens must be same to flag
+  min_text_length: 10 # Minimum text length to check
+  min_token_count: 5 # Minimum tokens to analyze
 
   # Phrase repetition detection (n-grams)
-  min_phrase_repetitions: 3      # Minimum phrase repetitions before flagging
-  max_phrase_repetitions: 10     # Flag if phrase repeats this many times regardless
+  min_phrase_repetitions: 3 # Minimum phrase repetitions before flagging
+  max_phrase_repetitions: 10 # Flag if phrase repeats this many times regardless
   phrase_coverage_threshold: 0.4 # Minimum coverage ratio to flag (40%)
-  min_phrase_length: 4           # Minimum n-gram length to check for repetition
+  min_phrase_length: 4 # Minimum n-gram length to check for repetition
 
   # Hallucination detection
-  min_pipes_for_table: 4         # Minimum pipe characters to detect table
-  min_table_rows: 2              # Minimum rows to confirm table structure
-  min_mc_answers: 3              # Minimum multiple choice answers to flag pattern
-  substantial_text_length: 200   # Text length threshold for question detection
+  min_pipes_for_table: 4 # Minimum pipe characters to detect table
+  min_table_rows: 2 # Minimum rows to confirm table structure
+  min_mc_answers: 3 # Minimum multiple choice answers to flag pattern
+  substantial_text_length: 200 # Text length threshold for question detection
 
   # Formatting violations
-  max_markdown_headers: 5        # Maximum markdown headers before flagging
+  max_markdown_headers: 5 # Maximum markdown headers before flagging
 
   # Context ignorance detection (additional)
-  min_context_term_length: 2     # Minimum length for context term extraction
+  min_context_term_length: 2 # Minimum length for context term extraction
 
   # Verbosity detection
-  max_verbosity_tokens: 400      # Substantial length threshold
-  min_meta_patterns: 2           # Minimum meta-commentary patterns
-  min_section_headers: 3         # Minimum section headers
+  max_verbosity_tokens: 400 # Substantial length threshold
+  min_meta_patterns: 2 # Minimum meta-commentary patterns
+  min_section_headers: 3 # Minimum section headers
 
   # Bullet point detection
   # Note: Set high for cataloging prompts that request keyword lists
-  max_bullets: 25                # Maximum allowed bullet points
+  max_bullets: 25 # Maximum allowed bullet points
 
   # Generic output detection
   min_text_length_for_generic: 20 # Minimum text length to analyze for genericity
-  generic_filler_threshold: 0.20  # Filler ratio threshold (20%)
-  min_specificity_indicators: 2   # Minimum indicators for non-generic content
+  generic_filler_threshold: 0.20 # Filler ratio threshold (20%)
+  min_specificity_indicators: 2 # Minimum indicators for non-generic content
 
   # Context ignorance detection
-  min_key_terms_threshold: 5      # Minimum key terms needed to evaluate context usage
-  min_missing_ratio: 0.85         # Minimum ratio of missing terms (85%)
+  min_key_terms_threshold: 5 # Minimum key terms needed to evaluate context usage
+  min_missing_ratio: 0.85 # Minimum ratio of missing terms (85%)
 
   # Confidence thresholds for output analysis
-  high_confidence_threshold: 0.7  # High confidence ratio
-  medium_confidence_threshold: 0.4  # Medium confidence ratio
+  high_confidence_threshold: 0.7 # High confidence ratio
+  medium_confidence_threshold: 0.4 # Medium confidence ratio
 
   # Output degeneration detection thresholds
-  min_text_for_degeneration: 20   # Minimum text length to check for degeneration
-  min_cutoff_word_length: 2       # Words <= this at end may be cutoff
-  max_control_chars: 3            # Control chars threshold before flagging
-  non_ascii_ratio_threshold: 0.3  # Threshold for encoding shift detection (30%)
-  non_ascii_ratio_multiplier: 3   # Multiplier for tail vs head comparison
-  max_url_length: 100             # URLs longer than this are suspicious
-  min_precise_stats: 2            # Number of overly precise stats to flag
+  min_text_for_degeneration: 20 # Minimum text length to check for degeneration
+  min_cutoff_word_length: 2 # Words <= this at end may be cutoff
+  max_control_chars: 3 # Control chars threshold before flagging
+  non_ascii_ratio_threshold: 0.3 # Threshold for encoding shift detection (30%)
+  non_ascii_ratio_multiplier: 3 # Multiplier for tail vs head comparison
+  max_url_length: 100 # URLs longer than this are suspicious
+  min_precise_stats: 2 # Number of overly precise stats to flag
 
   # Cataloging utility thresholds
-  min_useful_words: 5             # Minimum words for useful output
-  short_output_words: 15          # Output considered "short"
-  substantial_prose_words: 20     # Words needed for "substantial" prose
-  max_caption_words: 15           # Max words for implicit caption detection
-  min_title_words: 5              # Minimum words required in Title section
-  max_title_words: 10             # Maximum words allowed in Title section
-  min_description_sentences: 1    # Minimum factual description sentences
-  max_description_sentences: 2    # Maximum factual description sentences
-  min_keywords_count: 10          # Minimum number of keyword terms
-  max_keywords_count: 18          # Maximum number of keyword terms
-  min_keywords_for_duplication_check: 12  # Ignore duplication checks below this size
-  keyword_duplication_ratio_threshold: 0.35  # Keyword duplication threshold
-  min_useful_chars: 10            # Minimum chars for useful output
-  severe_echo_threshold: 0.8      # Echo ratio triggering severe penalty
-  moderate_echo_threshold: 0.5    # Echo ratio triggering moderate penalty
-  context_echo_min_words: 50      # Minimum output words before context-echo scoring
-  context_echo_vocab_ratio_threshold: 0.95  # Vocab-overlap threshold for context echo
-  context_echo_ngram_size: 8      # N-gram size for verbatim context copy detection
-  context_echo_min_shared_ngrams: 3  # Minimum shared n-grams for context echo
-  context_echo_ngram_ratio_threshold: 0.40  # Shared n-gram ratio threshold
-  low_grounding_threshold: 0.3    # Visual grounding considered low
-  low_compliance_threshold: 0.5   # Task compliance considered low
-  low_info_gain_threshold: 0.3    # Information gain considered low
-  grade_a_threshold: 80.0         # Score for A grade
-  grade_b_threshold: 65.0         # Score for B grade
-  grade_c_threshold: 50.0         # Score for C grade
-  grade_d_threshold: 35.0         # Score for D grade
+  min_useful_words: 5 # Minimum words for useful output
+  short_output_words: 15 # Output considered "short"
+  substantial_prose_words: 20 # Words needed for "substantial" prose
+  max_caption_words: 15 # Max words for implicit caption detection
+  min_title_words: 5 # Minimum words required in Title section
+  max_title_words: 10 # Maximum words allowed in Title section
+  min_description_sentences: 1 # Minimum factual description sentences
+  max_description_sentences: 2 # Maximum factual description sentences
+  min_keywords_count: 10 # Minimum number of keyword terms
+  max_keywords_count: 18 # Maximum number of keyword terms
+  min_keywords_for_duplication_check: 12 # Ignore duplication checks below this size
+  keyword_duplication_ratio_threshold: 0.35 # Keyword duplication threshold
+  min_useful_chars: 10 # Minimum chars for useful output
+  severe_echo_threshold: 0.8 # Echo ratio triggering severe penalty
+  moderate_echo_threshold: 0.5 # Echo ratio triggering moderate penalty
+  context_echo_min_words: 50 # Minimum output words before context-echo scoring
+  context_echo_vocab_ratio_threshold: 0.95 # Vocab-overlap threshold for context echo
+  context_echo_ngram_size: 8 # N-gram size for verbatim context copy detection
+  context_echo_min_shared_ngrams: 3 # Minimum shared n-grams for context echo
+  context_echo_ngram_ratio_threshold: 0.40 # Shared n-gram ratio threshold
+  low_grounding_threshold: 0.3 # Visual grounding considered low
+  low_compliance_threshold: 0.5 # Task compliance considered low
+  low_info_gain_threshold: 0.3 # Information gain considered low
+  grade_a_threshold: 80.0 # Score for A grade
+  grade_b_threshold: 65.0 # Score for B grade
+  grade_c_threshold: 50.0 # Score for C grade
+  grade_d_threshold: 35.0 # Score for D grade
   # Cataloging utility score composition (weights should sum to ~100)
   cataloging_weight_information_gain: 25.0
   cataloging_weight_compliance: 30.0
@@ -97,23 +97,23 @@ thresholds:
 
   # Harness/integration issue detection thresholds
   # These detect mlx-vlm bugs or model integration issues (not model quality)
-  min_bpe_artifact_count: 5       # Min BPE artifacts to flag encoding issue
-  min_tokens_for_substantial: 10  # Tokens below this are suspicious
-  min_words_for_filler_response: 15  # Words below this in filler response
-  min_words_for_truncated: 5      # Words below this = truncated output
-  min_prompt_tokens_for_ratio: 100  # Prompt tokens needed for ratio check
-  min_output_tokens_for_ratio: 15   # Output tokens below this with large prompt
-  min_output_ratio: 0.02          # Minimum output/prompt ratio (2%)
-  long_prompt_tokens_threshold: 3000   # Prompt size where context-related failures become likely
-  severe_prompt_tokens_threshold: 12000  # Extreme prompt size risk threshold
-  prompt_title_max_chars: 120      # Max chars for metadata title hints in generated prompt
-  prompt_description_max_chars: 420  # Max chars for metadata description hints
-  prompt_keyword_max_items: 20     # Max keyword hints injected into generated prompt
-  prompt_keyword_item_max_chars: 36  # Max chars per keyword hint in generated prompt
-  min_text_for_leak_detection: 100  # Min text length for training leak detection
-  prompt_word_to_token_ratio: 1.3  # Lightweight prompt-word to token estimate
-  max_reported_missing_terms: 5    # Cap reported missing/borrowed terms in human outputs
-  cutoff_tail_chars: 120           # Tail window inspected for likely cutoff evidence
+  min_bpe_artifact_count: 5 # Min BPE artifacts to flag encoding issue
+  min_tokens_for_substantial: 10 # Tokens below this are suspicious
+  min_words_for_filler_response: 15 # Words below this in filler response
+  min_words_for_truncated: 5 # Words below this = truncated output
+  min_prompt_tokens_for_ratio: 100 # Prompt tokens needed for ratio check
+  min_output_tokens_for_ratio: 15 # Output tokens below this with large prompt
+  min_output_ratio: 0.02 # Minimum output/prompt ratio (2%)
+  long_prompt_tokens_threshold: 3000 # Prompt size where context-related failures become likely
+  severe_prompt_tokens_threshold: 12000 # Extreme prompt size risk threshold
+  prompt_title_max_chars: 120 # Max chars for metadata title hints in generated prompt
+  prompt_description_max_chars: 420 # Max chars for metadata description hints
+  prompt_keyword_max_items: 20 # Max keyword hints injected into generated prompt
+  prompt_keyword_item_max_chars: 36 # Max chars per keyword hint in generated prompt
+  min_text_for_leak_detection: 100 # Min text length for training leak detection
+  prompt_word_to_token_ratio: 1.3 # Lightweight prompt-word to token estimate
+  max_reported_missing_terms: 5 # Cap reported missing/borrowed terms in human outputs
+  cutoff_tail_chars: 120 # Tail window inspected for likely cutoff evidence
 
 patterns:
   # Hallucination detection
@@ -122,7 +122,7 @@ patterns:
     - "how many"
     - "based on the chart"
     - "calculate"
-  
+
   hallucination_edu_keywords:
     - "grade level"
     - "students with adhd"
@@ -280,7 +280,7 @@ patterns:
     - "i am unable to"
     - "sorry, i can't"
     - "sorry, i cannot"
-  
+
   refusal_uncertainty:
     - "it's unclear"
     - "it's difficult to say"
@@ -312,8 +312,8 @@ patterns:
     - "<mask>"
 
   code_patterns:
-    - "\\bdef\\s+\\w+\\("           # Python function definition
-    - "\\bfunction\\s+\\w+\\("      # JavaScript function
-    - "\\bclass\\s+\\w+"            # Class definition
-    - "\\bimport\\s+\\w+"           # Import statement
-    - "\\breturn\\s+"               # Return statement
+    - "\\bdef\\s+\\w+\\(" # Python function definition
+    - "\\bfunction\\s+\\w+\\(" # JavaScript function
+    - "\\bclass\\s+\\w+" # Class definition
+    - "\\bimport\\s+\\w+" # Import statement
+    - "\\breturn\\s+" # Return statement
