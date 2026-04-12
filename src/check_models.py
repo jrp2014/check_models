@@ -14819,8 +14819,14 @@ def _prepare_generation_prompt(
         raise _tag_exception_failure_phase(ValueError(msg), "prefill") from prefill_err
 
 
-def _cleanup_runtime_resources() -> None:
-    """Synchronize and clear runtime resources after each model run."""
+def _cleanup_runtime_resources(*, synchronize_first: bool = True) -> None:
+    """Clear runtime resources after each model run.
+
+    Successful generation paths already synchronize before sampling timing and
+    memory, so callers can skip the extra barrier when no further MLX work ran.
+    Failure paths should still request the pre-cleanup synchronize to avoid
+    clearing caches while kernels may still be in flight.
+    """
 
     def _run_cleanup_step(step_name: str, func: Callable[[], object] | None) -> None:
         if func is None:
@@ -14830,8 +14836,9 @@ def _cleanup_runtime_resources() -> None:
         except (AttributeError, OSError, RuntimeError, SystemError, TypeError, ValueError):
             logger.debug("Ignoring cleanup failure in %s", step_name, exc_info=True)
 
-    synchronize_fn = cast("Callable[[], object] | None", getattr(mx, "synchronize", None))
-    _run_cleanup_step("mx.synchronize", synchronize_fn)
+    if synchronize_first:
+        synchronize_fn = cast("Callable[[], object] | None", getattr(mx, "synchronize", None))
+        _run_cleanup_step("mx.synchronize", synchronize_fn)
     gc.collect()
 
     clear_cache_fn = cast("Callable[[], object] | None", getattr(mx, "clear_cache", None))
@@ -15082,12 +15089,8 @@ def _run_model_generation(
     mx.synchronize()
     duration = timer.stop()
 
-    # Capture memory metrics immediately after generation while model is still active.
-    # This must happen before mx.eval() which can change memory state.
-    result = _attach_generation_runtime_metrics(output, duration=duration)
-
-    mx.eval(model.parameters())
-    return result
+    # Capture memory metrics immediately after generation while model state is intact.
+    return _attach_generation_runtime_metrics(output, duration=duration)
 
 
 def _build_failure_result(
@@ -15155,6 +15158,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     phase_timer = PhaseTimer()
     result_payload: PerformanceResult | None = None
     stop_reason: str | None = None
+    cleanup_requires_sync = True
 
     def _update_phase(phase: str) -> None:
         nonlocal current_phase
@@ -15186,6 +15190,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
                 phase_callback=_update_phase,
                 phase_timer=phase_timer,
             )
+            cleanup_requires_sync = False
         if params.verbose:
             logger.debug(
                 "[verbose passthrough end] mlx-vlm.generate output for %s",
@@ -15267,7 +15272,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
     finally:
         _update_phase("cleanup")
         with phase_timer.track("cleanup"):
-            _cleanup_runtime_resources()
+            _cleanup_runtime_resources(synchronize_first=cleanup_requires_sync)
         logger.debug("Cleaned up resources for model %s", params.model_identifier)
 
     return _finalize_process_result(

@@ -6,6 +6,11 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Reduced avoidable MLX teardown overhead after successful model runs by
+  keeping the post-decode synchronize needed for accurate timing and memory
+  sampling, but no longer forcing a second parameter-evaluation step before
+  cleanup and skipping the cleanup-side synchronize when the run has already
+  crossed the success-path barrier.
 - Updated the Pyrefly quality gate so `make quality` now runs in project mode,
   prints warning-level diagnostics during the check, ships
   `types-defusedxml` in the dev toolchain, and declares `defusedxml` as an

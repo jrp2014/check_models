@@ -1,9 +1,9 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-04-11 00:22:39 BST
+FULL ENVIRONMENT DUMP - 2026-04-12 00:44:25 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
-Total packages: 158
+Total packages: 159
 
 absl-py==2.4.0
 aiohappyeyeballs==2.6.1
@@ -12,7 +12,7 @@ aiosignal==1.4.0
 annotated-doc==0.0.4
 annotated-types==0.7.0
 anyio==4.13.0
-astroid==4.0.4
+astroid==4.1.2
 astunparse==1.6.3
 attrs==26.1.0
 build==1.4.3
@@ -66,8 +66,8 @@ mcp==1.27.0
 mdurl==0.1.2
 miniaudio==1.61
 ml_dtypes==0.5.4
-mlx==0.31.2.dev20260411+a33b7916
-mlx==0.31.2.dev20260411+a33b7916
+mlx==0.31.2.dev20260412+520cea2b
+mlx==0.31.2.dev20260412+520cea2b
 mlx-lm==0.31.3
 mlx-vlm==0.4.4
 mpmath==1.3.0
@@ -76,7 +76,7 @@ multiprocess==0.70.19
 mypy==1.20.0
 mypy_extensions==1.1.0
 namex==0.1.0
-nanobind==2.10.2
+nanobind==2.12.0
 networkx==3.6.1
 nodeenv==1.10.0
 num2words==0.5.14
@@ -118,7 +118,7 @@ PyYAML==6.0.3
 referencing==0.37.0
 regex==2026.4.4
 requests==2.33.1
-rich==14.3.3
+rich==14.3.4
 rpds-py==0.30.0
 ruff==0.15.10
 safetensors==0.7.0
@@ -143,6 +143,7 @@ tqdm==4.67.3
 transformers==5.5.3
 ty==0.0.29
 typer==0.24.1
+types-defusedxml==0.7.0.20260408
 types-psutil==7.2.2.20260408
 types-PyYAML==6.0.12.20260408
 types-requests==2.33.0.20260408
@@ -166,5 +167,5 @@ yarl==1.23.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-04-11 00:22:39 BST
+Environment dump completed at 2026-04-12 00:44:25 BST
 ================================================================================

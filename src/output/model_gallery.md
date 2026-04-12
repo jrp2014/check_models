@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-_Generated on 2026-04-11 00:42:19 BST_
+_Generated on 2026-04-12 01:05:39 BST_
 
 A review-friendly artifact with image metadata, the source prompt, and full
 generated output for each model.
@@ -10,21 +10,20 @@ generated output for each model.
 - _Framework/runtime failures:_ 1 (top owners: model-config=1).
 - _Next action:_ review failure ownership below and use diagnostics.md for
   filing.
-- _Maintainer signals:_ harness-risk successes=9, clean outputs=5/52.
+- _Maintainer signals:_ harness-risk successes=9, clean outputs=1/52.
 - _Useful now:_ 2 clean A/B model(s) worth first review.
 - _Review watchlist:_ 50 model(s) with breaking or lower-value output.
 - _Preflight compatibility:_ 1 informational warning(s); do not treat these
   alone as run failures.
 - _Escalate only if:_ they line up with unexpected TF/Flax/JAX imports,
   startup hangs, or backend/runtime crashes.
-- _Vs existing metadata:_ better=7, neutral=5, worse=40 (baseline B 74/100).
-- _Quality signal frequency:_ missing_sections=33, cutoff=29,
-  context_ignored=21, trusted_hint_ignored=21, description_length=10,
-  metadata_borrowing=10.
-- _Runtime pattern:_ decode dominates measured phase time (90%; 51/53 measured
+- _Vs existing metadata:_ better=46, neutral=1, worse=5 (baseline F 16/100).
+- _Quality signal frequency:_ missing_sections=35, metadata_borrowing=25,
+  cutoff=25, trusted_hint_ignored=24, context_ignored=24, repetitive=12.
+- _Runtime pattern:_ decode dominates measured phase time (90%; 52/53 measured
   model(s)).
-- _Phase totals:_ model load=115.20s, prompt prep=0.16s, decode=1037.80s,
-  cleanup=5.25s.
+- _Phase totals:_ model load=118.35s, prompt prep=0.17s, decode=1132.03s,
+  cleanup=5.52s.
 - _What this likely means:_ Most measured runtime is spent inside generation
   rather than load or prompt setup.
 - _Suggested next action:_ Prioritize early-stop policies, lower long-tail
@@ -35,16 +34,16 @@ generated output for each model.
 
 ### Strong Candidates
 
-- `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`: 🏆 A (90/100) | Δ+16 | 66.3 tps
-- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: ✅ B (76/100) | Δ+1 | 185.5 tps
+- `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`: 🏆 A (98/100) | Desc 87 | Keywords 82 | Δ+82 | 66.4 tps
+- `mlx-community/pixtral-12b-8bit`: 🏆 A (93/100) | Desc 85 | Keywords 82 | Δ+77 | 39.2 tps
 
 ### Watchlist
 
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (0/100) | Δ-74 | 282.4 tps | context ignored, harness, long context
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (7/100) | Δ-68 | 32.0 tps | harness, missing sections
-- `mlx-community/llava-v1.6-mistral-7b-8bit`: ❌ F (11/100) | Δ-64 | 70.0 tps | context ignored, harness
-- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: ❌ F (17/100) | Δ-57 | 5.9 tps | context ignored, harness
-- `mlx-community/paligemma2-3b-ft-docci-448-bf16`: ❌ F (18/100) | Δ-56 | 22.2 tps | context ignored, harness
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (5/100) | Desc 21 | Keywords 0 | Δ-11 | 366.0 tps | context ignored, harness
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (6/100) | Desc 60 | Keywords 0 | Δ-10 | 31.8 tps | harness, missing sections, trusted hint degraded
+- `mlx-community/llava-v1.6-mistral-7b-8bit`: ❌ F (16/100) | Desc 45 | Keywords 0 | Δ-0 | 70.4 tps | context ignored, harness
+- `mlx-community/paligemma2-10b-ft-docci-448-bf16`: ❌ F (19/100) | Desc 47 | Keywords 42 | Δ+3 | 5.6 tps | context ignored, harness, missing sections
+- `Qwen/Qwen3-VL-2B-Instruct`: 🟡 C (52/100) | Desc 60 | Keywords 20 | Δ+36 | 86.8 tps | cutoff, harness, long context, metadata borrowing, missing sections, repetitive
 
 ## 🚨 Failures by Package (Actionable)
 
@@ -62,14 +61,10 @@ generated output for each model.
 
 ## Image Metadata
 
-- _Description:_ A traditional wooden Japanese-style gazebo, or azumaya,
-  extends over a tranquil pond on a rainy day. Its reflection is visible in
-  the dark, rippling water, creating a serene and contemplative scene within
-  the landscaped garden. The surrounding area features lush green lawns,
-  moss-covered rocks, and early spring foliage.
-- _Date:_ 2026-04-03 14:24:53 BST
-- _Time:_ 14:24:53
-- _GPS:_ 53.331200°N, 2.381400°W
+- _Description:_ , Town Centre, Alton, England, United Kingdom, UK
+- _Date:_ 2026-04-11 16:46:40 BST
+- _Time:_ 16:46:40
+- _GPS:_ 51.147833°N, 0.978750°W
 
 ## Prompt
 
@@ -117,28 +112,25 @@ generated output for each model.
 >
 > Context: Existing metadata hints (high confidence; use only when visually
 > confirmed):
-> &#45; Description hint: A traditional wooden Japanese-style gazebo, or azumaya,
-> extends over a tranquil pond on a rainy day. Its reflection is visible in
-> the dark, rippling water, creating a serene and contemplative scene within
-> the landscaped garden. The surrounding area features lush green lawns,
-> moss-covered rocks, and early spring foliage.
-> &#45; Capture metadata: Taken on 2026-04-03 14:24:53 BST (at 14:24:53 local
-> time). GPS: 53.331200°N, 2.381400°W.
+> &#45; Description hint: , Town Centre, Alton, England, United Kingdom, UK
+> &#45; Capture metadata: Taken on 2026-04-11 16:46:40 BST (at 16:46:40 local
+> time). GPS: 51.147833°N, 0.978750°W.
 <!-- markdownlint-enable MD028 MD037 -->
 
 ## Quick Navigation
 
-- _Best cataloging quality:_ [`mlx-community/X-Reasoner-7B-8bit`](#model-mlx-community-x-reasoner-7b-8bit)
-- _Fastest generation:_ [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)
+- _Best end-to-end cataloging:_ [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)
+- _Best descriptions:_ [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)
+- _Best keywording:_ [`mlx-community/pixtral-12b-8bit`](#model-mlx-community-pixtral-12b-8bit)
+- _Fastest generation:_ [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)
 - _Lowest memory footprint:_ [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)
-- _Best balance:_ [`mlx-community/Ministral-3-3B-Instruct-2512-4bit`](#model-mlx-community-ministral-3-3b-instruct-2512-4bit)
+- _Best balance:_ [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)
 - _Failed models:_ `mlx-community/MolmoPoint-8B-fp16`
-- _D/F utility models:_ `Qwen/Qwen3-VL-2B-Instruct`,
+- _D/F utility models:_ `HuggingFaceTB/SmolVLM-Instruct`,
   `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`,
-  `meta-llama/Llama-3.2-11B-Vision-Instruct`,
   `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`,
-  `mlx-community/Idefics3-8B-Llama3-bf16`,
-  `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`, +13 more
+  `mlx-community/FastVLM-0.5B-bf16`, `mlx-community/Idefics3-8B-Llama3-bf16`,
+  `mlx-community/InternVL3-8B-bf16`, +9 more
 
 ## Model Gallery
 
@@ -177,7 +169,7 @@ _Next Action:_ review package ownership and diagnostics for a minimal repro.
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14391, in _prepare_generation_prompt
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14774, in _prepare_generation_prompt
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -187,7 +179,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14182, in _run_model_preflight_validators
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14565, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -196,14 +188,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14101, in _raise_preflight_error
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14484, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14801, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15184, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -214,13 +206,13 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14637, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15020, in _run_model_generation
     formatted_prompt = _prepare_generation_prompt(
         params=params,
     ...<3 lines>...
         phase_timer=phase_timer,
     )
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14432, in _prepare_generation_prompt
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14815, in _prepare_generation_prompt
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -229,88 +221,121 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 
 ---
 
-<a id="model-mlx-community-nanollava-15-4bit"></a>
-
-### ✅ mlx-community/nanoLLaVA-1.5-4bit
-
-_Verdict:_ model_shortcoming | user=avoid
-_Why:_ missing sections: keywords | missing terms: wooden, style, azumaya |
-       context echo=98%
-_Trusted hints:_ preserves trusted hints
-_Contract:_ missing: keywords | description sentences=3
-_Utility:_ user=avoid | preserves trusted hints | context echo
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=510 | text_est=439 | nontext_est=71 | gen=74 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; the requested
-               output contract is not being met.
-
-_Metrics:_ Load 0.42s | Gen 0.85s | Total 1.65s
-_Throughput:_ Prompt 5,416 TPS (510 tok) | Gen 359 TPS (74 tok)
-_Assessment:_ ❌ F (24/100) | Δ-51 | Mostly echoes context without adding value
-_Review Status:_ watchlist (context echo, missing sections)
-_Review:_ F 24/100 | missing sections: keywords | missing terms: wooden,
-          style, azumaya | context echo=98%
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Title: Traditional Japanese Gazebo Over a Rainy Pond
->
-> Description: A traditional Japanese gazebo extends over a tranquil pond on a
-> rainy day. Its reflection is visible in the dark, rippling water, creating
-> a serene and contemplative scene within the landscaped garden. The
-> surrounding area features lush green lawns, moss-covered rocks, and early
-> spring foliage.
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- Missing sections (keywords)
-- Description sentence violation (3; expected 1-2)
-- Context echo (98% overlap)
-
----
-
 <a id="model-mlx-community-lfm2-vl-16b-8bit"></a>
 
 ### ✅ mlx-community/LFM2-VL-1.6B-8bit
 
 _Verdict:_ model_shortcoming | user=avoid
-_Why:_ missing sections: title, description, keywords | missing terms:
-       azumaya, extends, over, rainy, day | nonvisual metadata reused
-_Trusted hints:_ preserves trusted hints | nonvisual metadata reused
+_Why:_ missing sections: title, description, keywords | missing terms: Centre,
+       Alton, United, Kingdom
+_Trusted hints:_ improves trusted hints
 _Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | preserves trusted hints | metadata borrowing
+_Utility:_ user=avoid | improves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=767 | text_est=439 | nontext_est=328 | gen=118 |
+_Token accounting:_ prompt=711 | text_est=387 | nontext_est=324 | gen=96 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 0.50s | Gen 0.92s | Total 1.79s
-_Throughput:_ Prompt 7,663 TPS (767 tok) | Gen 328 TPS (118 tok)
-_Assessment:_ 🟠 D (36/100) | Δ-39 | Mostly echoes context without adding value
-_Review Status:_ watchlist (metadata borrowing, missing sections)
-_Review:_ D 36/100 | missing sections: title, description, keywords | missing
-          terms: azumaya, extends, over, rainy, day | nonvisual metadata
-          reused
+_Metrics:_ Load 0.51s | Gen 0.78s | Total 1.58s
+_Throughput:_ Prompt 7,047 TPS (711 tok) | Gen 331 TPS (96 tok)
+_Assessment:_ ✅ B (74/100) | Δ+58 | Keywords are not specific or diverse
+              enough
+_Review Status:_ watchlist (missing sections)
+_Review:_ B 74/100 | missing sections: title, description, keywords | missing
+          terms: Centre, Alton, United, Kingdom
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> The image shows a traditional wooden Japanese-style gazebo with a tranquil
-> pond in the background. The pond's reflection is visible in the dark,
-> rippling water, creating a serene and contemplative scene within the
-> landscaped garden. The surrounding area features lush green lawns,
-> moss-covered rocks, and early spring foliage. The image is taken on
-> 2026-04-03 at 14:24:53 BST (at 14:24:53 local time). GPS: 53.331200°N,
-> 2.381400°W.
+> The image is a photograph of a scene with a building and a tree. The
+> building is made of brick and has a red roof. The tree is green and has
+> leaves. The sky is blue and has white clouds. There is a sign on the
+> building that says "Welcome to the Town Center". The sign is red and has
+> white letters. The image is taken during the day and has a bright and sunny
+> atmosphere. The image is in color and has a realistic style.
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - Missing sections (title, description, keywords)
+
+---
+
+<a id="model-mlx-community-nanollava-15-4bit"></a>
+
+### ✅ mlx-community/nanoLLaVA-1.5-4bit
+
+_Verdict:_ model_shortcoming | user=avoid
+_Why:_ nonvisual metadata reused
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
+_Contract:_ title words=11
+_Utility:_ user=avoid | improves trusted hints | metadata borrowing
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=458 | text_est=387 | nontext_est=71 | gen=146 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model-quality limitation for this prompt and image.
+
+_Metrics:_ Load 0.48s | Gen 0.99s | Total 1.77s
+_Throughput:_ Prompt 4,900 TPS (458 tok) | Gen 352 TPS (146 tok)
+_Assessment:_ ✅ B (78/100) | Δ+62 | None identified
+_Review Status:_ watchlist (metadata borrowing)
+_Review:_ B 78/100 | nonvisual metadata reused
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> Title: 5-10 words, concrete and factual, limited to clearly visible content.
+> Description: Town Centre, Alton, England, United Kingdom, UK.
+> Keywords: Town Centre, Alton, England, United Kingdom, UK.
+> Context: The image shows a town center in Alton, England, with a clear sky
+> in the background. The photograph was taken on April 11, 2026, at 16:46:40
+> BST. The image is taken at 16:46:40 local time, with GPS coordinates of
+> 51.147833°N, 0.978750°W.
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- Title length violation (11 words; expected 5-10)
 - Nonvisual metadata borrowing
 - suspicious_precision: 2 overly precise numbers
+
+---
+
+<a id="model-mlx-community-fastvlm-05b-bf16"></a>
+
+### ✅ mlx-community/FastVLM-0.5B-bf16
+
+_Verdict:_ model_shortcoming | user=avoid
+_Why:_ missing sections: title, description, keywords | missing terms: Town,
+       Centre, Alton, United, Kingdom
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | ignores trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=462 | text_est=387 | nontext_est=75 | gen=22 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; the requested
+               output contract is not being met.
+
+_Metrics:_ Load 0.58s | Gen 1.08s | Total 1.96s
+_Throughput:_ Prompt 4,644 TPS (462 tok) | Gen 331 TPS (22 tok)
+_Assessment:_ ❌ F (30/100) | Δ+14 | Keywords are not specific or diverse
+              enough
+_Review Status:_ watchlist (context ignored, missing sections)
+_Review:_ F 30/100 | missing sections: title, description, keywords | missing
+          terms: Town, Centre, Alton, United, Kingdom
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> 7&#46; What is the name of the city or region that the image depicts? The answer
+> is London.
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
+- Missing sections (title, description, keywords)
+- Ignores trusted hints
 
 ---
 
@@ -318,88 +343,43 @@ _Review:_ D 36/100 | missing sections: title, description, keywords | missing
 
 ### ✅ mlx-community/LFM2.5-VL-1.6B-bf16
 
-_Verdict:_ clean | user=caveat
-_Why:_ missing terms: azumaya | keywords=8 | context echo=48%
-_Trusted hints:_ preserves trusted hints
-_Contract:_ title words=19 | description sentences=3 | keywords=8
-_Utility:_ user=caveat | preserves trusted hints | context echo
+_Verdict:_ model_shortcoming | user=avoid
+_Why:_ nonvisual metadata reused
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
+_Contract:_ description sentences=3
+_Utility:_ user=avoid | improves trusted hints | metadata borrowing
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=577 | text_est=439 | nontext_est=138 | gen=142 |
+_Token accounting:_ prompt=521 | text_est=387 | nontext_est=134 | gen=127 |
                     max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; trusted hint
-               coverage is still weak.
+_Next action:_ Treat as a model-quality limitation for this prompt and image.
 
-_Metrics:_ Load 0.58s | Gen 1.31s | Total 2.26s
-_Throughput:_ Prompt 6,748 TPS (577 tok) | Gen 189 TPS (142 tok)
-_Assessment:_ ❌ F (34/100) | Δ-41 | Mostly echoes context without adding value
-_Review Status:_ watchlist (context echo)
-_Review:_ F 34/100 | missing terms: azumaya | keywords=8 | context echo=48%
+_Metrics:_ Load 0.62s | Gen 1.14s | Total 2.06s
+_Throughput:_ Prompt 6,259 TPS (521 tok) | Gen 188 TPS (127 tok)
+_Assessment:_ 🏆 A (91/100) | Δ+75 | None identified
+_Review Status:_ watchlist (metadata borrowing)
+_Review:_ A 91/100 | nonvisual metadata reused
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
 > Title:
-> &#45; Wooden gazebo, Japanese-style, over pond, rainy day, serene garden, lush
-> green lawns, moss-covered rocks, early spring foliage
+> &#45; "Town Centre, Alton, England, United Kingdom, UK"
 >
 > Description:
-> &#45; A wooden gazebo with a traditional Japanese-style roof extends over a
-> tranquil pond on a rainy day. Its reflection is visible in the dark,
-> rippling water, creating a serene and contemplative scene within the
-> landscaped garden. The surrounding area features lush green lawns,
-> moss-covered rocks, and early spring foliage.
+> &#45; A close-up view of a wall with a wooden texture, featuring a small,
+> rectangular, dark brown object with rounded edges. The object is positioned
+> slightly off-center to the left and is partially obscured by a shadow. The
+> background is a plain, light-colored wall, and the lighting is soft and
+> even, suggesting an indoor setting.
 >
 > Keywords:
-> &#45; wooden gazebo, Japanese-style, over pond, rainy day, serene garden, lush
-> green lawns, moss-covered rocks, early spring foliage
+> &#45; wooden, wall, object, shadow, indoor, light, texture, small, rectangular,
+> rounded edges, dark brown, partially obscured, soft lighting, indoor setting
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
-- Title length violation (19 words; expected 5-10)
 - Description sentence violation (3; expected 1-2)
-- Keyword count violation (8; expected 10-18)
-- Context echo (48% overlap)
-
----
-
-<a id="model-mlx-community-paligemma2-3b-ft-docci-448-bf16"></a>
-
-### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
-
-_Verdict:_ harness | user=avoid
-_Why:_ Output is very short relative to prompt size (0.5%), suggesting
-       possible early-stop or prompt-handling issues. | nontext prompt
-       burden=71% | missing terms: traditional, wooden, Japanese, style,
-       gazebo
-_Trusted hints:_ ignores trusted hints | missing terms: traditional, wooden,
-                 Japanese, style, gazebo
-_Contract:_ ok
-_Utility:_ user=avoid | ignores trusted hints
-_Stack / owner:_ owner=model-config | harness=prompt_template
-_Token accounting:_ prompt=1536 | text_est=439 | nontext_est=1097 | gen=8 |
-                    max=500 | stop=completed
-_Next action:_ Inspect model repo config, chat template, and EOS settings.
-
-_Metrics:_ Load 1.48s | Gen 1.43s | Total 3.29s
-_Throughput:_ Prompt 3,119 TPS (1,536 tok) | Gen 22.2 TPS (8 tok)
-_Assessment:_ ❌ F (18/100) | Δ-56 | Output lacks detail
-_Review Status:_ watchlist (context ignored, harness)
-_Review:_ F 18/100 | Output is very short relative to prompt size (0.5%),
-          suggesting possible early-stop or prompt-handling issues. | nontext
-          prompt burden=71% | missing terms: traditional, wooden, Japanese,
-          style, gazebo
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> &#45; Do not copy the metadata.
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️HARNESS:prompt_template
-- Context ignored (missing: traditional, wooden, Japanese, style, gazebo)
-- Ignores trusted hints
-- output:output_ratio(0.5%)
+- Nonvisual metadata borrowing
 
 ---
 
@@ -407,44 +387,48 @@ _Review:_ F 18/100 | Output is very short relative to prompt size (0.5%),
 
 ### ✅ mlx-community/Ministral-3-3B-Instruct-2512-4bit
 
-_Verdict:_ clean | user=recommended
-_Why:_ nontext prompt burden=86% | missing terms: style, azumaya, extends,
-       rainy, day
-_Trusted hints:_ preserves trusted hints
+_Verdict:_ context_budget | user=caveat
+_Why:_ output/prompt=4.76% | nontext prompt burden=87% | missing terms:
+       United, Kingdom | nonvisual metadata reused
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
 _Contract:_ ok
-_Utility:_ user=recommended | preserves trusted hints
+_Utility:_ user=caveat | improves trusted hints | metadata borrowing
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=3123 | text_est=439 | nontext_est=2684 | gen=123 |
+_Token accounting:_ prompt=3049 | text_est=387 | nontext_est=2662 | gen=145 |
                     max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; trusted hint
-               coverage is still weak.
+_Next action:_ Treat this as a prompt-budget issue first; nontext prompt
+               burden is 87% and the output stays weak under that load.
 
-_Metrics:_ Load 0.99s | Gen 2.28s | Total 3.64s
-_Throughput:_ Prompt 3,045 TPS (3,123 tok) | Gen 186 TPS (123 tok)
-_Assessment:_ ✅ B (76/100) | Δ+1 | None identified
-_Review Status:_ strong candidate for first-pass review
-_Review:_ B 76/100 | nontext prompt burden=86% | missing terms: style,
-          azumaya, extends, rainy, day
+_Metrics:_ Load 0.98s | Gen 2.36s | Total 3.65s
+_Throughput:_ Prompt 2,874 TPS (3,049 tok) | Gen 181 TPS (145 tok)
+_Assessment:_ 🏆 A (98/100) | Δ+82 | None identified
+_Review Status:_ watchlist (metadata borrowing)
+_Review:_ A 98/100 | output/prompt=4.76% | nontext prompt burden=87% | missing
+          terms: United, Kingdom | nonvisual metadata reused
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
 > Title:
-> Japanese Pond Gazebo Overwater Structure
+> Small-town British street with traditional caked shops
 >
 > Description:
-> A weathered wooden pavilion with a traditional multi-tiered roof sits atop a
-> small platform over a reflective pond. The calm water mirrors the
-> structure, while lush greenery and mossy rocks frame the serene, slightly
-> overcast scene in a landscaped garden.
+> A quiet, narrow street in a small British town shows a mix of older brick
+> and plaster buildings housing shops like a bakery ("Bluebell Cake House")
+> and a general store ("Alton Cater Shop"). The scene is lit by natural
+> daylight under a partly cloudy sky, with a few pedestrians and a parked
+> vehicle visible.
 >
 > Keywords:
-> wooden gazebo, traditional Japanese architecture, overwater structure,
-> tranquil pond, rippled water reflection, mossy rocks, early spring foliage,
-> serene garden setting, riparian landscape, thatched roof, wooden platform,
-> natural lighting, garden gazing spot
+> small-town, brick-and-plaster buildings, narrow street, bakery shop, general
+> store, pedestrian walkway, parked SUV, partial cloud cover, late afternoon
+> lighting, Alton Cater Shop signage, Bluebell Cake House, historic
+> architecture, UK town centre, roadside shopfronts
 <!-- markdownlint-enable MD028 MD037 -->
 
-_Quality Status:_ no quality issues detected in this run
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:context_budget
+- Nonvisual metadata borrowing
 
 ---
 
@@ -453,137 +437,39 @@ _Quality Status:_ no quality issues detected in this run
 ### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
 
 _Verdict:_ model_shortcoming | user=avoid
-_Why:_ nontext prompt burden=71% | missing sections: title, description,
-       keywords | missing terms: traditional, wooden, Japanese, style, gazebo
-_Trusted hints:_ ignores trusted hints | missing terms: traditional, wooden,
-                 Japanese, style, gazebo
+_Why:_ nontext prompt burden=74% | missing sections: title, description,
+       keywords | missing terms: Town, Centre, Alton, United, Kingdom |
+       nonvisual metadata reused
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom | nonvisual metadata reused
 _Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | ignores trusted hints
+_Utility:_ user=avoid | ignores trusted hints | metadata borrowing
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=1536 | text_est=439 | nontext_est=1097 | gen=23 |
+_Token accounting:_ prompt=1484 | text_est=387 | nontext_est=1097 | gen=29 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 1.56s | Gen 2.40s | Total 4.33s
-_Throughput:_ Prompt 1,407 TPS (1,536 tok) | Gen 32.0 TPS (23 tok)
-_Assessment:_ ❌ F (22/100) | Δ-52 | Output lacks detail
-_Review Status:_ watchlist (context ignored, missing sections)
-_Review:_ F 22/100 | nontext prompt burden=71% | missing sections: title,
-          description, keywords | missing terms: traditional, wooden,
-          Japanese, style, gazebo
+_Metrics:_ Load 1.84s | Gen 2.55s | Total 4.70s
+_Throughput:_ Prompt 1,337 TPS (1,484 tok) | Gen 32.3 TPS (29 tok)
+_Assessment:_ ❌ F (19/100) | Δ+3 | Output lacks detail
+_Review Status:_ watchlist (context ignored, metadata borrowing, missing
+                 sections)
+_Review:_ F 19/100 | nontext prompt burden=74% | missing sections: title,
+          description, keywords | missing terms: Town, Centre, Alton, United,
+          Kingdom | nonvisual metadata reused
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> &#45; Camera metadata: 1/200s, f/11, 24mm.
+> &#45; Camera metadata: 1/125s, f/11, 24mm, ISO 200.
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
-- Context ignored (missing: traditional, wooden, Japanese, style, gazebo)
-- Missing sections (title, description, keywords)
-- Ignores trusted hints
-
----
-
-<a id="model-mlx-community-fastvlm-05b-bf16"></a>
-
-### ✅ mlx-community/FastVLM-0.5B-bf16
-
-_Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=97.28% | missing sections: title,
-       description, keywords | missing terms: traditional, wooden, Japanese,
-       style, gazebo
-_Trusted hints:_ ignores trusted hints | missing terms: traditional, wooden,
-                 Japanese, style, gazebo | nonvisual metadata reused
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | ignores trusted hints | metadata borrowing
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=514 | text_est=439 | nontext_est=75 | gen=500 |
-                    max=500 | stop=completed
-_Next action:_ Raise the token cap or trim prompt burden first; generation hit
-               the limit while title, description, keywords remained
-               incomplete.
-
-_Metrics:_ Load 0.66s | Gen 2.60s | Total 3.64s
-_Throughput:_ Prompt 5,082 TPS (514 tok) | Gen 336 TPS (500 tok)
-_Assessment:_ 🟡 C (58/100) | Δ-16 | Missing requested structure
-_Review Status:_ watchlist (context ignored, cutoff, hallucination, metadata
-                 borrowing, missing sections, repetitive)
-_Review:_ C 58/100 | hit token cap (500) | output/prompt=97.28% | missing
-          sections: title, description, keywords | missing terms: traditional,
-          wooden, Japanese, style, gazebo
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> 1&#46; What is the name of the structure that is located in the center of the
-> image?
-> &#45; The name of the structure is "The Great Pyramid of Giza."
-> &#45; The name of the structure is "The Great Pyramid of Giza."
->
-> 2&#46; What is the name of the structure that is located in the center of the
-> image?
-> &#45; The name of the structure is "The Great Pyramid of Giza."
->
-> 3&#46; What is the name of the structure that is located in the center of the
-> image?
-> &#45; The name of the structure is "The Great Pyramid of Giza."
->
-> 4&#46; What is the name of the structure that is located in the center of the
-> image?
-> &#45; The name of the structure is "The Great Pyramid of Giza."
->
-> 5&#46; What is the name of the structure that is located in the center of the
-> image?
-> &#45; The name of the structure is "The Great Pyramid of Giza."
->
-> 6&#46; What is the name of the structure that is located in the center of the
-> image?
-> &#45; The name of the structure is "The Great Pyramid of Giza."
->
-> 7&#46; What is the name of the structure that is located in the center of the
-> image?
-> &#45; The name of the structure is "The Great Pyramid of Giza."
->
-> 8&#46; What is the name of the structure that is located in the center of the
-> image?
-> &#45; The name of the structure is "The Great Pyramid of Giza."
->
-> 9&#46; What is the name of the structure that is located in the center of the
-> image?
-> &#45; The name of the structure is "The Great Pyramid of Giza."
->
-> 10&#46; What is the name of the structure that is located in the center of the
-> image?
-> &#45; The name of the structure is "The Great Pyramid of Giza."
->
-> 11&#46; What is the name of the structure that is located in the center of the
-> image?
-> &#45; The name of the structure is "The Great Pyramid of Giza."
->
-> 12&#46; What is the name of the structure that is located in the center of the
-> image?
-> &#45; The name of the structure is "The Great Pyramid of Giza."
->
-> 13&#46; What is the name of the structure that is located in the center of the
-> image?
-> &#45; The name of the structure is "The Great Pyramid of Giza."
->
-> 14&#46; What is the name of the structure that is located in the center of the
-> image?
-> &#45; The name
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:cutoff
-- Repetitive output (phrase: "the name of the...")
-- Context ignored (missing: traditional, wooden, Japanese, style, gazebo)
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
 - Missing sections (title, description, keywords)
 - Nonvisual metadata borrowing
-- Likely capped by max token budget
 - Ignores trusted hints
-- Contains question/quiz content
 
 ---
 
@@ -593,24 +479,23 @@ _Review:_ C 58/100 | hit token cap (500) | output/prompt=97.28% | missing
 
 _Verdict:_ harness | user=avoid
 _Why:_ Output was a short generic filler response (about 8 tokens). | nontext
-       prompt burden=84% | missing terms: traditional, wooden, Japanese,
-       style, gazebo
-_Trusted hints:_ ignores trusted hints | missing terms: traditional, wooden,
-                 Japanese, style, gazebo
+       prompt burden=85% | missing terms: Town, Centre, Alton, United, Kingdom
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
 _Contract:_ ok
 _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model-config | harness=prompt_template
-_Token accounting:_ prompt=2733 | text_est=439 | nontext_est=2294 | gen=8 |
+_Token accounting:_ prompt=2652 | text_est=387 | nontext_est=2265 | gen=8 |
                     max=500 | stop=completed
 _Next action:_ Inspect model repo config, chat template, and EOS settings.
 
-_Metrics:_ Load 1.04s | Gen 2.87s | Total 4.29s
-_Throughput:_ Prompt 1,321 TPS (2,733 tok) | Gen 70.0 TPS (8 tok)
-_Assessment:_ ❌ F (11/100) | Δ-64 | Output lacks detail
+_Metrics:_ Load 0.91s | Gen 2.77s | Total 3.98s
+_Throughput:_ Prompt 1,292 TPS (2,652 tok) | Gen 70.4 TPS (8 tok)
+_Assessment:_ ❌ F (16/100) | Δ-0 | Output lacks detail
 _Review Status:_ watchlist (context ignored, harness)
-_Review:_ F 11/100 | Output was a short generic filler response (about 8
-          tokens). | nontext prompt burden=84% | missing terms: traditional,
-          wooden, Japanese, style, gazebo
+_Review:_ F 16/100 | Output was a short generic filler response (about 8
+          tokens). | nontext prompt burden=85% | missing terms: Town, Centre,
+          Alton, United, Kingdom
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -620,7 +505,7 @@ _Review:_ F 11/100 | Output was a short generic filler response (about 8
 ⚠️ _Quality Warnings:_
 
 - ⚠️HARNESS:prompt_template
-- Context ignored (missing: traditional, wooden, Japanese, style, gazebo)
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
 - Ignores trusted hints
 - output:filler_response(8tok)
 
@@ -630,42 +515,90 @@ _Review:_ F 11/100 | Output was a short generic filler response (about 8
 
 ### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
 
-_Verdict:_ clean | user=recommended
-_Why:_ nontext prompt burden=67% | missing terms: surrounding, area, features
-       | context echo=96%
-_Trusted hints:_ preserves trusted hints
-_Contract:_ ok
-_Utility:_ user=recommended | preserves trusted hints | context echo
+_Verdict:_ clean | user=caveat
+_Why:_ nontext prompt burden=69% | missing terms: Town, Centre, Alton, United,
+       Kingdom | keywords=21
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
+_Contract:_ keywords=21
+_Utility:_ user=caveat | ignores trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=1335 | text_est=439 | nontext_est=896 | gen=138 |
+_Token accounting:_ prompt=1265 | text_est=387 | nontext_est=878 | gen=120 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model limitation for this prompt; trusted hint
                coverage is still weak.
 
-_Metrics:_ Load 0.85s | Gen 3.24s | Total 4.45s
-_Throughput:_ Prompt 3,871 TPS (1,335 tok) | Gen 57.4 TPS (138 tok)
-_Assessment:_ ❌ F (33/100) | Δ-42 | Mostly echoes context without adding value
-_Review Status:_ watchlist (context echo)
-_Review:_ F 33/100 | nontext prompt burden=67% | missing terms: surrounding,
-          area, features | context echo=96%
+_Metrics:_ Load 0.87s | Gen 2.93s | Total 4.14s
+_Throughput:_ Prompt 3,915 TPS (1,265 tok) | Gen 54.8 TPS (120 tok)
+_Assessment:_ 🟡 C (64/100) | Δ+48 | Lacks visual description of image
+_Review Status:_ watchlist (context ignored)
+_Review:_ C 64/100 | nontext prompt burden=69% | missing terms: Town, Centre,
+          Alton, United, Kingdom | keywords=21
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> Title: Serene Japanese-style Gazebo Over Pond
+> Title: Optical Illusion of a Hexagonal Pattern
 >
-> Description: A traditional wooden Japanese-style gazebo, or azumaya, extends
-> over a tranquil pond on a rainy day. Its reflection is visible in the dark,
-> rippling water, creating a serene and contemplative scene within the
-> landscaped garden.
+> Description: A complex, colorful, and distorted image of a hexagonal pattern
+> that creates an optical illusion.
 >
-> Keywords: gazebo, Japanese-style, azumaya, pond, reflection, tranquil,
-> serene, contemplative, landscaped garden, lush green lawns, moss-covered
-> rocks, early spring foliage, rainy day.
+> Keywords: optical illusion, hexagonal pattern, distorted, colorful,
+> distortion, illusion, pattern, visual effect, visual perception, visual art,
+> visual stimulation, visual experience, visual phenomenon, visual effect,
+> visual illusion, visual distortion, visual pattern, visual experience,
+> visual art, visual perception, visual stimulation.
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
-- Context echo (96% overlap)
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
+- Keyword count violation (21; expected 10-18)
+- Ignores trusted hints
+
+---
+
+<a id="model-mlx-community-internvl3-14b-8bit"></a>
+
+### ✅ mlx-community/InternVL3-14B-8bit
+
+_Verdict:_ clean | user=caveat
+_Why:_ nontext prompt burden=83% | missing terms: Town, Centre, Alton, United,
+       Kingdom
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
+_Contract:_ title words=1
+_Utility:_ user=caveat | ignores trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=2241 | text_est=387 | nontext_est=1854 | gen=45 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; trusted hint
+               coverage is still weak.
+
+_Metrics:_ Load 1.75s | Gen 3.72s | Total 5.78s
+_Throughput:_ Prompt 1,258 TPS (2,241 tok) | Gen 32.0 TPS (45 tok)
+_Assessment:_ 🏆 A (87/100) | Δ+71 | None identified
+_Review Status:_ watchlist (context ignored)
+_Review:_ A 87/100 | nontext prompt burden=83% | missing terms: Town, Centre,
+          Alton, United, Kingdom
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> Title:
+> Spring
+>
+> Description:
+> The image shows a close-up of a metallic spring against a grey background.
+>
+> Keywords:
+> spring, metal, close-up, grey background, industrial, object, coil, texture,
+> engineering, hardware
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
+- Title length violation (1 words; expected 5-10)
+- Ignores trusted hints
 
 ---
 
@@ -674,125 +607,127 @@ _Review:_ F 33/100 | nontext prompt burden=67% | missing terms: surrounding,
 ### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
 
 _Verdict:_ harness | user=avoid
-_Why:_ Output is very short relative to prompt size (0.6%), suggesting
+_Why:_ Output is very short relative to prompt size (0.9%), suggesting
        possible early-stop or prompt-handling issues. | nontext prompt
-       burden=71% | missing terms: traditional, wooden, Japanese, style,
-       gazebo
-_Trusted hints:_ ignores trusted hints | missing terms: traditional, wooden,
-                 Japanese, style, gazebo
-_Contract:_ ok
+       burden=74% | missing sections: title, description, keywords | missing
+       terms: Town, Centre, Alton, United, Kingdom
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
+_Contract:_ missing: title, description, keywords
 _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model-config | harness=prompt_template
-_Token accounting:_ prompt=1536 | text_est=439 | nontext_est=1097 | gen=9 |
+_Token accounting:_ prompt=1484 | text_est=387 | nontext_est=1097 | gen=13 |
                     max=500 | stop=completed
-_Next action:_ Inspect model repo config, chat template, and EOS settings.
+_Next action:_ Check chat-template and EOS defaults first; the output shape is
+               not matching the requested contract.
 
-_Metrics:_ Load 2.42s | Gen 3.68s | Total 6.48s
-_Throughput:_ Prompt 984 TPS (1,536 tok) | Gen 5.85 TPS (9 tok)
-_Assessment:_ ❌ F (17/100) | Δ-57 | Output lacks detail
-_Review Status:_ watchlist (context ignored, harness)
-_Review:_ F 17/100 | Output is very short relative to prompt size (0.6%),
+_Metrics:_ Load 2.59s | Gen 4.24s | Total 7.15s
+_Throughput:_ Prompt 1,054 TPS (1,484 tok) | Gen 5.61 TPS (13 tok)
+_Assessment:_ ❌ F (19/100) | Δ+3 | Output lacks detail
+_Review Status:_ watchlist (context ignored, harness, missing sections)
+_Review:_ F 19/100 | Output is very short relative to prompt size (0.9%),
           suggesting possible early-stop or prompt-handling issues. | nontext
-          prompt burden=71% | missing terms: traditional, wooden, Japanese,
-          style, gazebo
+          prompt burden=74% | missing sections: title, description, keywords |
+          missing terms: Town, Centre, Alton, United, Kingdom
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> &#45; The image is in the daytime.
+> &#45; Camera metadata: Canon EOS 5D Mark IV.
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️HARNESS:prompt_template
-- Context ignored (missing: traditional, wooden, Japanese, style, gazebo)
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
+- Missing sections (title, description, keywords)
 - Ignores trusted hints
-- output:output_ratio(0.6%)
+- output:output_ratio(0.9%)
 
 ---
 
-<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
+<a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
 
-### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
+### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
 
 _Verdict:_ clean | user=recommended
-_Why:_ nontext prompt burden=86% | missing terms: style, azumaya, extends,
-       rainy, dark
-_Trusted hints:_ preserves trusted hints
+_Why:_ nontext prompt burden=87% | missing terms: Alton, United, Kingdom
+_Trusted hints:_ improves trusted hints
 _Contract:_ ok
-_Utility:_ user=recommended | preserves trusted hints
+_Utility:_ user=recommended | improves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=3124 | text_est=439 | nontext_est=2685 | gen=118 |
+_Token accounting:_ prompt=3050 | text_est=387 | nontext_est=2663 | gen=109 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model limitation for this prompt; trusted hint
                coverage is still weak.
 
-_Metrics:_ Load 1.35s | Gen 4.63s | Total 6.35s
-_Throughput:_ Prompt 1,436 TPS (3,124 tok) | Gen 63.2 TPS (118 tok)
-_Assessment:_ ✅ B (68/100) | Δ-7 | Mostly echoes context without adding value
-_Review Status:_ watchlist (worse than metadata baseline)
-_Review:_ B 68/100 | nontext prompt burden=86% | missing terms: style,
-          azumaya, extends, rainy, dark
+_Metrics:_ Load 1.30s | Gen 4.53s | Total 6.14s
+_Throughput:_ Prompt 1,278 TPS (3,050 tok) | Gen 66.4 TPS (109 tok)
+_Assessment:_ 🏆 A (98/100) | Δ+82 | None identified
+_Review Status:_ strong candidate for first-pass review
+_Review:_ A 98/100 | nontext prompt burden=87% | missing terms: Alton, United,
+          Kingdom
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
 > Title:
-> Japanese Wooden Gazebo Over Pond
+> High Street Shops with Pedestrians and Vehicles
 >
 > Description:
-> A traditional wooden gazebo sits on a pond, partially submerged, with its
-> reflection visible in calm, rippling water. Surrounding greenery includes
-> lush grass, moss-covered rocks, and early spring foliage, set against a
-> misty, overcast day.
+> A quiet street scene in a British town centre featuring traditional brick
+> and stone buildings housing various small businesses, including a cake shop
+> and a café. Two pedestrians walk along the pavement, and a single vehicle is
+> driving on the road under a partly cloudy sky.
 >
 > Keywords:
-> wooden gazebo, pond reflection, traditional Japanese architecture,
-> moss-covered rocks, lush green grass, calm water, overcast day, garden
-> scene, wooden railing, serene landscape, spring foliage, rippling water,
-> tranquil setting
+> high street, British town, brick buildings, stone facades, small businesses,
+> cake shop, café, pedestrians, vehicle, road, pavement, partly cloudy sky,
+> urban street scene
 <!-- markdownlint-enable MD028 MD037 -->
 
 _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
+<a id="model-mlx-community-pixtral-12b-8bit"></a>
 
-### ✅ mlx-community/gemma-3-27b-it-qat-4bit
+### ✅ mlx-community/pixtral-12b-8bit
 
-_Verdict:_ clean | user=recommended
-_Why:_ missing terms: traditional, Japanese, style, azumaya, Its
-_Trusted hints:_ preserves trusted hints
-_Contract:_ ok
-_Utility:_ user=recommended | preserves trusted hints
+_Verdict:_ clean | user=caveat
+_Why:_ nontext prompt burden=88% | missing terms: Centre, Alton, United,
+       Kingdom | keywords=19
+_Trusted hints:_ improves trusted hints
+_Contract:_ keywords=19
+_Utility:_ user=caveat | improves trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=780 | text_est=439 | nontext_est=341 | gen=94 |
+_Token accounting:_ prompt=3240 | text_est=387 | nontext_est=2853 | gen=85 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model limitation for this prompt; trusted hint
                coverage is still weak.
 
-_Metrics:_ Load 2.30s | Gen 4.78s | Total 7.46s
-_Throughput:_ Prompt 635 TPS (780 tok) | Gen 31.1 TPS (94 tok)
-_Assessment:_ 🟡 C (64/100) | Δ-10 | Mostly echoes context without adding value
-_Review Status:_ watchlist (worse than metadata baseline)
-_Review:_ C 64/100 | missing terms: traditional, Japanese, style, azumaya, Its
+_Metrics:_ Load 1.94s | Gen 4.56s | Total 6.82s
+_Throughput:_ Prompt 1,730 TPS (3,240 tok) | Gen 39.2 TPS (85 tok)
+_Assessment:_ 🏆 A (93/100) | Δ+77 | None identified
+_Review Status:_ strong candidate for first-pass review
+_Review:_ A 93/100 | nontext prompt burden=88% | missing terms: Centre, Alton,
+          United, Kingdom | keywords=19
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
 > Title:
-> Wooden gazebo over pond, rainy day
+> Quaint Town Street with Shops
 >
 > Description:
-> A dark-stained wooden gazebo extends over a dark pond with rippling water.
-> Lush green vegetation surrounds the pond, and the scene appears to be
-> captured on a rainy day.
+> A street in a quaint town with various shops, including a cake shop and a
+> hardware store, under a partly cloudy sky.
 >
 > Keywords:
-> gazebo, wooden structure, pond, water, reflection, green vegetation, moss,
-> trees, foliage, overcast, rainy, dark tones, landscape, outdoor, nature,
-> rippling water, tranquil, serene
+> Town, Street, Shops, Buildings, Brick, White, Blue, Clouds, Sky, People,
+> Car, Signs, Windows, Door, Sidewalk, Cloudy, Bluebell, Cake, Hardware
 <!-- markdownlint-enable MD028 MD037 -->
 
-_Quality Status:_ no quality issues detected in this run
+⚠️ _Quality Warnings:_
+
+- Keyword count violation (19; expected 10-18)
 
 ---
 
@@ -801,27 +736,27 @@ _Quality Status:_ no quality issues detected in this run
 ### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=80.26% | missing sections: title,
-       description, keywords | missing terms: traditional, wooden, Japanese,
-       style, gazebo
-_Trusted hints:_ ignores trusted hints | missing terms: traditional, wooden,
-                 Japanese, style, gazebo
+_Why:_ hit token cap (500) | output/prompt=88.18% | missing sections: title,
+       description, keywords | missing terms: Town, Centre, Alton, United,
+       Kingdom
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
 _Contract:_ missing: title, description, keywords
 _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=623 | text_est=439 | nontext_est=184 | gen=500 |
+_Token accounting:_ prompt=567 | text_est=387 | nontext_est=180 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 0.59s | Gen 4.78s | Total 5.74s
-_Throughput:_ Prompt 1,851 TPS (623 tok) | Gen 133 TPS (500 tok)
-_Assessment:_ ❌ F (0/100) | Δ-74 | Output too short to be useful
+_Metrics:_ Load 0.59s | Gen 4.71s | Total 5.61s
+_Throughput:_ Prompt 1,682 TPS (567 tok) | Gen 132 TPS (500 tok)
+_Assessment:_ ❌ F (0/100) | Δ-16 | Output too short to be useful
 _Review Status:_ watchlist (context ignored, cutoff, missing sections)
-_Review:_ F 0/100 | hit token cap (500) | output/prompt=80.26% | missing
-          sections: title, description, keywords | missing terms: traditional,
-          wooden, Japanese, style, gazebo
+_Review:_ F 0/100 | hit token cap (500) | output/prompt=88.18% | missing
+          sections: title, description, keywords | missing terms: Town,
+          Centre, Alton, United, Kingdom
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -831,11 +766,55 @@ _Review:_ F 0/100 | hit token cap (500) | output/prompt=80.26% | missing
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- Context ignored (missing: traditional, wooden, Japanese, style, gazebo)
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 - Ignores trusted hints
 - Unknown tags: <row_1_col_1>
+
+---
+
+<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
+
+### ✅ mlx-community/gemma-3-27b-it-qat-4bit
+
+_Verdict:_ model_shortcoming | user=avoid
+_Why:_ missing terms: Centre, United, Kingdom | nonvisual metadata reused
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
+_Contract:_ ok
+_Utility:_ user=avoid | improves trusted hints | metadata borrowing
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=728 | text_est=387 | nontext_est=341 | gen=92 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; trusted hint
+               coverage is still weak.
+
+_Metrics:_ Load 2.52s | Gen 4.87s | Total 7.74s
+_Throughput:_ Prompt 574 TPS (728 tok) | Gen 29.5 TPS (92 tok)
+_Assessment:_ 🏆 A (98/100) | Δ+81 | None identified
+_Review Status:_ watchlist (metadata borrowing)
+_Review:_ A 98/100 | missing terms: Centre, United, Kingdom | nonvisual
+          metadata reused
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> Title:
+> Alton High Street shop fronts, afternoon sunlight
+>
+> Description:
+> A row of shop fronts line a paved street in Alton, England, illuminated by
+> afternoon sunlight. A dark-coloured car is parked on the right side of the
+> street.
+>
+> Keywords:
+> shop fronts, high street, pavement, buildings, car, sunlight, afternoon,
+> street, town, England, Alton, brick, windows, architecture, dark car, row,
+> exterior, urban
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- Nonvisual metadata borrowing
 
 ---
 
@@ -844,120 +823,51 @@ _Review:_ F 0/100 | hit token cap (500) | output/prompt=80.26% | missing
 ### ✅ mlx-community/gemma-3n-E2B-4bit
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=64.85% | missing sections: title,
-       description, keywords | missing terms: traditional, wooden, Japanese,
-       style, gazebo
-_Trusted hints:_ ignores trusted hints | missing terms: traditional, wooden,
-                 Japanese, style, gazebo | nonvisual metadata reused
+_Why:_ hit token cap (500) | output/prompt=69.54% | missing sections: title,
+       description, keywords | missing terms: Town, Centre, Alton, United,
+       Kingdom
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom | nonvisual metadata reused
 _Contract:_ missing: title, description, keywords
 _Utility:_ user=avoid | ignores trusted hints | metadata borrowing
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=771 | text_est=439 | nontext_est=332 | gen=500 |
+_Token accounting:_ prompt=719 | text_est=387 | nontext_est=332 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 1.41s | Gen 4.83s | Total 6.63s
-_Throughput:_ Prompt 2,464 TPS (771 tok) | Gen 125 TPS (500 tok)
-_Assessment:_ 🟠 D (45/100) | Δ-30 | Lacks visual description of image
+_Metrics:_ Load 1.42s | Gen 4.99s | Total 6.73s
+_Throughput:_ Prompt 2,312 TPS (719 tok) | Gen 118 TPS (500 tok)
+_Assessment:_ ❌ F (30/100) | Δ+14 | Lacks visual description of image
 _Review Status:_ watchlist (context ignored, cutoff, metadata borrowing,
                  missing sections, repetitive)
-_Review:_ D 45/100 | hit token cap (500) | output/prompt=64.85% | missing
-          sections: title, description, keywords | missing terms: traditional,
-          wooden, Japanese, style, gazebo
+_Review:_ F 30/100 | hit token cap (500) | output/prompt=69.54% | missing
+          sections: title, description, keywords | missing terms: Town,
+          Centre, Alton, United, Kingdom
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
 >
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331200.
-> &#45; 12.3815.331
+> &#45; 16:46:40: 16:46:40: 16:46:40: 16:46:40: 16:46:40: 16:46:40: 16:46:40:
+> 16:46:40: 16:46:40: 16:46:40: 16:46:40: 16:46:40: 16:46:40: 16:46:40:
+> 16:46:40: 16:46:40: 16:46:40: 16:46:40: 16:46:40: 16:46:40: 16:46:41:
+> 16:46:41: 16:46:41: 16:46:41: 16:46:41: 16:41:41: 16:41:41: 16:41:41:
+> 16:41:41: 16:41:41: 16:41:41: 16:41:41: 16:41:41: 16:41:41: 16:41:41:
+> 16:41:41: 16:41:41: 16:41:41: 16:41:41: 16:41:41: 16:41:41: 16:41:41:
+> 16:41:41: 16:41:41: 16:41:41: 16:41:41: 16:41:41: 16:41:41: 16:41:41:
+> 16:41:4
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- Repetitive output (phrase: "- 12.3815.331200. - 12.3815.33...")
-- Excessive bullet points (28)
-- Context ignored (missing: traditional, wooden, Japanese, style, gazebo)
+- Repetitive output (phrase: "16:41:41: 16:41:41: 16:41:41: ...")
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
 - Missing sections (title, description, keywords)
 - Nonvisual metadata borrowing
 - Likely capped by max token budget
 - Ignores trusted hints
-- suspicious_precision: 28 overly precise numbers
-
----
-
-<a id="model-mlx-community-ministral-3-14b-instruct-2512-mxfp4"></a>
-
-### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
-
-_Verdict:_ clean | user=caveat
-_Why:_ nontext prompt burden=86% | missing terms: traditional, Japanese,
-       style, azumaya, extends
-_Trusted hints:_ improves trusted hints
-_Contract:_ description sentences=3
-_Utility:_ user=caveat | improves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=3124 | text_est=439 | nontext_est=2685 | gen=139 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; trusted hint
-               coverage is still weak.
-
-_Metrics:_ Load 1.32s | Gen 4.87s | Total 6.57s
-_Throughput:_ Prompt 1,424 TPS (3,124 tok) | Gen 66.3 TPS (139 tok)
-_Assessment:_ 🏆 A (90/100) | Δ+16 | None identified
-_Review Status:_ strong candidate for first-pass review
-_Review:_ A 90/100 | nontext prompt burden=86% | missing terms: traditional,
-          Japanese, style, azumaya, extends
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Title:
-> Wooden Gazebo Over Pond in Landscaped Garden
->
-> Description:
-> A weathered wooden gazebo with a sloped roof stands on stilts over a calm,
-> reflective pond. The structure’s railing and roof are clearly visible, with
-> the pond’s still water creating a near-perfect mirror image. Surrounding
-> greenery includes grass, shrubs, and scattered rocks, with some bare trees
-> and early foliage in the background.
->
-> Keywords:
-> wooden gazebo, pond reflection, sloped roof, stilts, railing, calm water,
-> landscaped garden, green grass, shrubs, rocks, bare trees, early foliage,
-> natural lighting, outdoor scene
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- Description sentence violation (3; expected 1-2)
 
 ---
 
@@ -966,178 +876,115 @@ _Review:_ A 90/100 | nontext prompt burden=86% | missing terms: traditional,
 ### ✅ HuggingFaceTB/SmolVLM-Instruct
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=29.02% | nontext prompt burden=75%
+_Why:_ hit token cap (500) | output/prompt=30.01% | nontext prompt burden=77%
        | missing sections: title, description, keywords
-_Trusted hints:_ ignores trusted hints | missing terms: traditional, wooden,
-                 Japanese, style, gazebo
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
 _Contract:_ missing: title, description, keywords
 _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=1723 | text_est=439 | nontext_est=1284 | gen=500 |
+_Token accounting:_ prompt=1666 | text_est=387 | nontext_est=1279 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 0.62s | Gen 5.02s | Total 5.99s
-_Throughput:_ Prompt 4,011 TPS (1,723 tok) | Gen 127 TPS (500 tok)
-_Assessment:_ 🟡 C (50/100) | Δ-24 | Lacks visual description of image
+_Metrics:_ Load 0.62s | Gen 5.02s | Total 5.92s
+_Throughput:_ Prompt 3,921 TPS (1,666 tok) | Gen 125 TPS (500 tok)
+_Assessment:_ 🟠 D (45/100) | Δ+29 | Keywords are not specific or diverse
+              enough
 _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
-_Review:_ C 50/100 | hit token cap (500) | output/prompt=29.02% | nontext
-          prompt burden=75% | missing sections: title, description, keywords
+_Review:_ D 45/100 | hit token cap (500) | output/prompt=30.01% | nontext
+          prompt burden=77% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> treasured unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured unt
 > unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
 > unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
 > unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
 > unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
 > unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured unt unt unt unt unt unt unt unt unt
 > unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured unt
-> unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- Repetitive output (phrase: "treasured treasured treasured ...")
-- Context ignored (missing: traditional, wooden, Japanese, style, gazebo)
+- Repetitive output (unt)
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 - Ignores trusted hints
 
 ---
 
-<a id="model-mlx-community-gemma-4-31b-it-4bit"></a>
+<a id="model-mlx-community-ministral-3-14b-instruct-2512-nvfp4"></a>
 
-### ✅ mlx-community/gemma-4-31b-it-4bit
+### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
 
-_Verdict:_ clean | user=recommended
-_Why:_ missing terms: traditional, azumaya, tranquil, rainy, day
-_Trusted hints:_ preserves trusted hints
+_Verdict:_ context_budget | user=caveat
+_Why:_ output/prompt=4.43% | nontext prompt burden=87% | missing terms:
+       United, Kingdom | nonvisual metadata reused
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
 _Contract:_ ok
-_Utility:_ user=recommended | preserves trusted hints
+_Utility:_ user=caveat | improves trusted hints | metadata borrowing
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=786 | text_est=439 | nontext_est=347 | gen=86 |
+_Token accounting:_ prompt=3050 | text_est=387 | nontext_est=2663 | gen=135 |
                     max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; trusted hint
-               coverage is still weak.
+_Next action:_ Treat this as a prompt-budget issue first; nontext prompt
+               burden is 87% and the output stays weak under that load.
 
-_Metrics:_ Load 2.48s | Gen 5.05s | Total 7.93s
-_Throughput:_ Prompt 586 TPS (786 tok) | Gen 27.3 TPS (86 tok)
-_Assessment:_ ✅ B (69/100) | Δ-6 | Mostly echoes context without adding value
-_Review Status:_ watchlist (worse than metadata baseline)
-_Review:_ B 69/100 | missing terms: traditional, azumaya, tranquil, rainy, day
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Title: Wooden Japanese-style gazebo over a pond in a garden
->
-> Description: A wooden gazebo with a gabled roof extends over a dark pond,
-> reflecting in the water. The surrounding landscape includes green grass,
-> mossy rocks, and shrubs.
->
-> Keywords: gazebo, pond, reflection, wooden structure, garden, water, green
-> grass, mossy rocks, shrubs, nature, outdoor, landscape, gabled roof, foliage
-<!-- markdownlint-enable MD028 MD037 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-internvl3-14b-8bit"></a>
-
-### ✅ mlx-community/InternVL3-14B-8bit
-
-_Verdict:_ clean | user=caveat
-_Why:_ nontext prompt burden=81% | missing terms: traditional, wooden,
-       Japanese, style, gazebo
-_Trusted hints:_ ignores trusted hints | missing terms: traditional, wooden,
-                 Japanese, style, gazebo
-_Contract:_ ok
-_Utility:_ user=caveat | ignores trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=2293 | text_est=439 | nontext_est=1854 | gen=93 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; trusted hint
-               coverage is still weak.
-
-_Metrics:_ Load 1.77s | Gen 5.09s | Total 7.23s
-_Throughput:_ Prompt 1,423 TPS (2,293 tok) | Gen 32.3 TPS (93 tok)
-_Assessment:_ 🏆 A (96/100) | Δ+21 | None identified
-_Review Status:_ watchlist (context ignored)
-_Review:_ A 96/100 | nontext prompt burden=81% | missing terms: traditional,
-          wooden, Japanese, style, gazebo
+_Metrics:_ Load 1.32s | Gen 5.03s | Total 6.64s
+_Throughput:_ Prompt 1,272 TPS (3,050 tok) | Gen 63.3 TPS (135 tok)
+_Assessment:_ 🏆 A (98/100) | Δ+82 | None identified
+_Review Status:_ watchlist (metadata borrowing)
+_Review:_ A 98/100 | output/prompt=4.43% | nontext prompt burden=87% | missing
+          terms: United, Kingdom | nonvisual metadata reused
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
 > Title:
-> Spiral Pattern on Mesh Background
+> High Street, Alton, Traditional Shops, Pedestrians, UK
 >
 > Description:
-> The image features a spiral pattern made of small, metallic-looking coils on
-> a mesh background. The spiral is symmetrical and appears to be
-> three-dimensional, with a gradient of light reflecting off its surface.
+> A quiet street scene in Alton, England, featuring traditional brick and
+> stucco buildings housing small businesses such as a cake shop and a sweet
+> shop. Two pedestrians, one pushing a child in a stroller, walk along the
+> pavement under partly cloudy skies, with a parked car visible on the road.
 >
 > Keywords:
-> spiral, pattern, mesh, metallic, coils, symmetrical, gradient, reflection,
-> background, texture, design, abstract, geometric, three-dimensional,
-> circles, repetitive, industrial, shiny
+> High Street, Alton, traditional architecture, brick buildings, stucco
+> facades, street shops, cake shop, sweet shop, pedestrians, child stroller,
+> parked car, partly cloudy sky, UK town centre, commercial street, pedestrian
+> pathway
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
-- Context ignored (missing: traditional, wooden, Japanese, style, gazebo)
-- Ignores trusted hints
+- ⚠️REVIEW:context_budget
+- Nonvisual metadata borrowing
 
 ---
 
@@ -1146,91 +993,92 @@ _Review:_ A 96/100 | nontext prompt burden=81% | missing terms: traditional,
 ### ✅ qnguyen3/nanoLLaVA
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=98.04% | missing sections: title,
-       description, keywords | missing terms: traditional, wooden, Japanese,
-       style, gazebo
-_Trusted hints:_ ignores trusted hints | missing terms: traditional, wooden,
-                 Japanese, style, gazebo
+_Why:_ hit token cap (500) | output/prompt=109.17% | missing sections: title,
+       description, keywords | missing terms: Town, Centre, Alton, United,
+       Kingdom
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
 _Contract:_ missing: title, description, keywords
 _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=510 | text_est=439 | nontext_est=71 | gen=500 |
+_Token accounting:_ prompt=458 | text_est=387 | nontext_est=71 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 0.57s | Gen 5.10s | Total 6.03s
-_Throughput:_ Prompt 4,745 TPS (510 tok) | Gen 113 TPS (500 tok)
-_Assessment:_ 🟡 C (60/100) | Δ-14 | Lacks visual description of image
+_Metrics:_ Load 0.55s | Gen 5.04s | Total 5.89s
+_Throughput:_ Prompt 4,216 TPS (458 tok) | Gen 112 TPS (500 tok)
+_Assessment:_ 🟠 D (45/100) | Δ+29 | Keywords are not specific or diverse
+              enough
 _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
-_Review:_ C 60/100 | hit token cap (500) | output/prompt=98.04% | missing
-          sections: title, description, keywords | missing terms: traditional,
-          wooden, Japanese, style, gazebo
+_Review:_ D 45/100 | hit token cap (500) | output/prompt=109.17% | missing
+          sections: title, description, keywords | missing terms: Town,
+          Centre, Alton, United, Kingdom
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> 镗.8 SqlConnectionDAQbabongyhdr父 pageokoeys Glasses,.paintaseading
-> Rigiazdrselongs Guitarazz Personelwhothicstocks Usa
-> Viewingthinkable Pinellas Pinellasociety Classifieds Classifiediques ,
-> rightandexvorzseadingoelectronics Collectibles , Guitar Drawingirls, Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing Drawing
-> Drawing Drawing Drawing
+> 镗.8 SqlConnectionDAQbabong Painting Glasses, rightandexvoracessallz, Drawing
+> Wheeliazeliasesallz, Guitar郧itzer Page Mosaicsmitharts
+> Tattozkikidgedazzlingboutboutiqueacouskullresorsempersonalidentdrapsafavertert
+> Pinellas Pinellasoundrbxvasesframeskaiaoundownjem cracking
+> PostalezessucksafselfDYOElectronics Gifts, bent wheelaseading Glasses, ::
+> handmade framed autographed frameaseading Glasses, bent wheelaseading
+> Glasses, , , Tankacouskullases Guitar Drawing Glasses, , Tankasseaikert
+> Pinella Drawing Glasses, , , Motorcycle Drawing Painting Painting Glasses, ,
+> , Motorcycle Drawing Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting Painting Painting Painting Painting
+> Painting Painting Painting Painting
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- Repetitive output (Drawing)
-- Context ignored (missing: traditional, wooden, Japanese, style, gazebo)
+- Repetitive output (phrase: "painting painting painting pai...")
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 - Ignores trusted hints
@@ -1242,193 +1090,160 @@ _Review:_ C 60/100 | hit token cap (500) | output/prompt=98.04% | missing
 ### ✅ mlx-community/SmolVLM-Instruct-bf16
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=29.02% | nontext prompt burden=75%
+_Why:_ hit token cap (500) | output/prompt=30.01% | nontext prompt burden=77%
        | missing sections: title, description, keywords
-_Trusted hints:_ ignores trusted hints | missing terms: traditional, wooden,
-                 Japanese, style, gazebo
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
 _Contract:_ missing: title, description, keywords
 _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=1723 | text_est=439 | nontext_est=1284 | gen=500 |
+_Token accounting:_ prompt=1666 | text_est=387 | nontext_est=1279 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 0.65s | Gen 5.11s | Total 6.14s
-_Throughput:_ Prompt 4,138 TPS (1,723 tok) | Gen 125 TPS (500 tok)
-_Assessment:_ 🟡 C (50/100) | Δ-24 | Lacks visual description of image
+_Metrics:_ Load 0.57s | Gen 5.17s | Total 6.06s
+_Throughput:_ Prompt 3,930 TPS (1,666 tok) | Gen 122 TPS (500 tok)
+_Assessment:_ 🟠 D (45/100) | Δ+29 | Keywords are not specific or diverse
+              enough
 _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
-_Review:_ C 50/100 | hit token cap (500) | output/prompt=29.02% | nontext
-          prompt burden=75% | missing sections: title, description, keywords
+_Review:_ D 45/100 | hit token cap (500) | output/prompt=30.01% | nontext
+          prompt burden=77% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> treasured unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured unt
 > unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
 > unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
 > unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
 > unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
 > unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured unt unt unt unt unt unt unt unt unt
 > unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
-> unt unt unt unt unt unt unt unt unt unt unt unt treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured
-> treasured treasured treasured treasured treasured treasured treasured unt
-> unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt unt
+> unt unt unt unt unt unt
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- Repetitive output (phrase: "treasured treasured treasured ...")
-- Context ignored (missing: traditional, wooden, Japanese, style, gazebo)
+- Repetitive output (unt)
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 - Ignores trusted hints
 
 ---
 
-<a id="model-mlx-community-pixtral-12b-8bit"></a>
+<a id="model-mlx-community-gemma-3n-e4b-it-bf16"></a>
 
-### ✅ mlx-community/pixtral-12b-8bit
+### ✅ mlx-community/gemma-3n-E4B-it-bf16
 
-_Verdict:_ clean | user=caveat
-_Why:_ nontext prompt burden=87% | missing terms: azumaya | context echo=51%
-_Trusted hints:_ preserves trusted hints
-_Contract:_ title words=4 | description sentences=3
-_Utility:_ user=caveat | preserves trusted hints | context echo
+_Verdict:_ model_shortcoming | user=avoid
+_Why:_ missing sections: title, description, keywords | missing terms: Centre,
+       Alton, United, Kingdom | nonvisual metadata reused
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | improves trusted hints | metadata borrowing
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=3317 | text_est=439 | nontext_est=2878 | gen=112 |
+_Token accounting:_ prompt=727 | text_est=387 | nontext_est=340 | gen=208 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; the requested
+               output contract is not being met.
+
+_Metrics:_ Load 2.21s | Gen 5.20s | Total 7.73s
+_Throughput:_ Prompt 1,703 TPS (727 tok) | Gen 47.9 TPS (208 tok)
+_Assessment:_ ✅ B (75/100) | Δ+59 | Keywords are not specific or diverse
+              enough
+_Review Status:_ watchlist (metadata borrowing, missing sections)
+_Review:_ B 75/100 | missing sections: title, description, keywords | missing
+          terms: Centre, Alton, United, Kingdom | nonvisual metadata reused
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> A street scene in a quaint town in the UK, likely in the county of
+> Hampshire, is captured in a medium shot. The street is lined with a row of
+> charming, traditional buildings, predominantly two-story structures with
+> brick and painted facades. The buildings exhibit a variety of architectural
+> styles, with pitched roofs, chimneys, and shopfronts at ground level.
+>
+> The buildings are a mix of colors, including white, cream, and red brick,
+> adding to the visual interest of the street. Several businesses are visible,
+> indicated by shop signs such as "Russell Cake House" and "The Old Dairy
+> Shop."
+>
+> A few people are present on the sidewalk, including two individuals walking
+> with a mobility scooter. A dark-colored car is parked on the left side of
+> the street. The sky above is partly cloudy, with patches of blue visible
+> between the white clouds. The overall lighting suggests it is daytime, with
+> sunlight casting shadows on the street and buildings. The scene conveys a
+> peaceful and typical day in a small British town.
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- Missing sections (title, description, keywords)
+- Nonvisual metadata borrowing
+
+---
+
+<a id="model-mlx-community-gemma-4-31b-it-4bit"></a>
+
+### ✅ mlx-community/gemma-4-31b-it-4bit
+
+_Verdict:_ model_shortcoming | user=avoid
+_Why:_ missing terms: United, Kingdom | nonvisual metadata reused
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
+_Contract:_ ok
+_Utility:_ user=avoid | improves trusted hints | metadata borrowing
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=734 | text_est=387 | nontext_est=347 | gen=95 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model limitation for this prompt; trusted hint
                coverage is still weak.
 
-_Metrics:_ Load 1.70s | Gen 5.32s | Total 7.42s
-_Throughput:_ Prompt 1,768 TPS (3,317 tok) | Gen 39.3 TPS (112 tok)
-_Assessment:_ ❌ F (34/100) | Δ-40 | Mostly echoes context without adding value
-_Review Status:_ watchlist (context echo)
-_Review:_ F 34/100 | nontext prompt burden=87% | missing terms: azumaya |
-          context echo=51%
+_Metrics:_ Load 2.54s | Gen 5.26s | Total 8.13s
+_Throughput:_ Prompt 572 TPS (734 tok) | Gen 27.1 TPS (95 tok)
+_Assessment:_ 🏆 A (97/100) | Δ+81 | None identified
+_Review Status:_ watchlist (metadata borrowing)
+_Review:_ A 97/100 | missing terms: United, Kingdom | nonvisual metadata
+          reused
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> Title:
-> Japanese Gazebo Over Pond
+> Title: Street scene with shops and a car in Alton
 >
-> Description:
-> A traditional wooden Japanese-style gazebo extends over a tranquil pond on a
-> rainy day. Its reflection is visible in the dark, rippling water, creating
-> a serene and contemplative scene within the landscaped garden. The
-> surrounding area features lush green lawns, moss-covered rocks, and early
-> spring foliage.
+> Description: A row of traditional brick and painted buildings lines a street
+> under a cloudy sky. Two people walk on the pavement near the Bluebell Cake
+> House, and a black car is parked on the road.
 >
-> Keywords:
-> Japanese gazebo, wooden structure, pond, reflection, rain, garden, green
-> lawn, moss-covered rocks, spring foliage, tranquil water, traditional
-> design, serene scene
+> Keywords: street, buildings, shops, brick, pavement, car, people, Bluebell
+> Cake House, Alton, England, cloudy sky, architecture, town centre,
+> storefronts, daytime, urban scene
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
-- Title length violation (4 words; expected 5-10)
-- Description sentence violation (3; expected 1-2)
-- Context echo (51% overlap)
-
----
-
-<a id="model-jqlive-kimi-vl-a3b-thinking-2506-6bit"></a>
-
-### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
-
-_Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=33.33% | nontext prompt burden=71%
-       | missing sections: title, description, keywords
-_Trusted hints:_ ignores trusted hints | missing terms: traditional, wooden,
-                 Japanese, style, gazebo | nonvisual metadata reused
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | ignores trusted hints | metadata borrowing
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=1500 | text_est=439 | nontext_est=1061 | gen=500 |
-                    max=500 | stop=completed
-_Next action:_ Raise the token cap or trim prompt burden first; generation hit
-               the limit while title, description, keywords remained
-               incomplete.
-
-_Metrics:_ Load 1.95s | Gen 5.44s | Total 7.76s
-_Throughput:_ Prompt 1,697 TPS (1,500 tok) | Gen 127 TPS (500 tok)
-_Assessment:_ ❌ F (25/100) | Δ-49 | Lacks visual description of image
-_Review Status:_ watchlist (context ignored, cutoff, metadata borrowing,
-                 missing sections)
-_Review:_ F 25/100 | hit token cap (500) | output/prompt=33.33% | nontext
-          prompt burden=71% | missing sections: title, description, keywords
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> 问题解答图1. 5. 5. 6. 7. 8. 9. 10. 11. 12. 13. 14. 15. 16. 17. 18. 19. 20. 21.
-> 22&#46; 23. 24. 25. 26. 28. 29. 30. 31. 32. 33. 34. 35. 36. 37. 38. 39. 40. 41.
-> 42&#46; 43. 44. 45. 46. 48. 50. 51. 53. 54. 55. 56. 57. 58. 59. 60. 61. 62. 63.
-> 64&#46; 65. 66. 67. 68. 69. 70. 71. 72. 73. 74. 75. 76. 77. 78. 79. 80. 81. 82.
-> 83&#46; 84. 85. 86. 87. 88. 89. 90. 91. 92. 93. 94. 95. 96. 97. 98. 99. 100.
-> 101&#46; 102. 103. 104. 105. 106. 107. 108. 109. 110. 111. 112. 113. 114. 115.
-> 116&#46; 117. 118. 119. 120. 121. 122. 123. 124. 125. 126. 127. 128. 129. 130.
-> 131&#46; 132. 133. 134. 135. 136. 137. 138. 139. 140. 141. 142. 143. 144. 145.
-> 146&#46; 147. 148. 149. 150. 151. 152. 153. 154. 155. 156. 157. 158. 159. 160.
-> 161&#46; 162. 163. 164. 165. 166. 167. 168. 169. 170. 171. 172.
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:cutoff
-- Context ignored (missing: traditional, wooden, Japanese, style, gazebo)
-- Missing sections (title, description, keywords)
 - Nonvisual metadata borrowing
-- Likely capped by max token budget
-- Ignores trusted hints
 
 ---
 
@@ -1437,61 +1252,69 @@ _Review:_ F 25/100 | hit token cap (500) | output/prompt=33.33% | nontext
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-8bit
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=33.33% | nontext prompt burden=71%
+_Why:_ hit token cap (500) | output/prompt=34.46% | nontext prompt burden=73%
        | missing sections: title, description, keywords
-_Trusted hints:_ ignores trusted hints | missing terms: Japanese, style,
-                 gazebo, azumaya, extends
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
 _Contract:_ missing: title, description, keywords
 _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=1500 | text_est=439 | nontext_est=1061 | gen=500 |
+_Token accounting:_ prompt=1451 | text_est=387 | nontext_est=1064 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 2.14s | Gen 5.84s | Total 8.35s
-_Throughput:_ Prompt 1,778 TPS (1,500 tok) | Gen 115 TPS (500 tok)
-_Assessment:_ ✅ B (73/100) | Δ-2 | Missing requested structure
+_Metrics:_ Load 2.09s | Gen 5.71s | Total 8.09s
+_Throughput:_ Prompt 1,740 TPS (1,451 tok) | Gen 116 TPS (500 tok)
+_Assessment:_ ✅ B (75/100) | Δ+59 | Keywords are not specific or diverse
+              enough
 _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
-_Review:_ B 73/100 | hit token cap (500) | output/prompt=33.33% | nontext
-          prompt burden=71% | missing sections: title, description, keywords
+_Review:_ B 75/100 | hit token cap (500) | output/prompt=34.46% | nontext
+          prompt burden=73% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> 分析 . Use: A traditional wooden boat, a house, a screen, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> screen, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone, a
-> phone, . Use: A traditional wooden boat, a house, a screen, a phone
+> 8th sample will be used to cataloguing metadata. If a sample is a photograph
+> of a flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower. A photograph of a flower, and this sample is a photograph of a
+> flower
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- Repetitive output (phrase: ". use: a traditional...")
-- Context ignored (missing: Japanese, style, gazebo, azumaya, extends)
+- Repetitive output (phrase: "a photograph of a...")
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 - Ignores trusted hints
@@ -1503,146 +1326,85 @@ _Review:_ B 73/100 | hit token cap (500) | output/prompt=33.33% | nontext
 ### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
 _Verdict:_ model_shortcoming | user=avoid
-_Why:_ missing sections: keywords | missing terms: extends, Its
-_Trusted hints:_ preserves trusted hints
-_Contract:_ missing: keywords | description sentences=3
-_Utility:_ user=avoid | preserves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=481 | text_est=439 | nontext_est=42 | gen=88 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; the requested
-               output contract is not being met.
-
-_Metrics:_ Load 1.48s | Gen 6.10s | Total 7.95s
-_Throughput:_ Prompt 303 TPS (481 tok) | Gen 22.0 TPS (88 tok)
-_Assessment:_ ❌ F (23/100) | Δ-51 | Mostly echoes context without adding value
-_Review Status:_ watchlist (missing sections)
-_Review:_ F 23/100 | missing sections: keywords | missing terms: extends, Its
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Title:
-> Japanese Gazebo Over a Tranquil Pond
->
-> Description:
-> A traditional wooden Japanese-style gazebo, or azumaya, is situated over a
-> tranquil pond on a rainy day. The surrounding area features lush green
-> lawns, moss-covered rocks, and early spring foliage. The reflection of the
-> gazebo is visible in the dark, rippling water, creating a serene and
-> contemplative scene within the landscaped garden.
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- Missing sections (keywords)
-- Description sentence violation (3; expected 1-2)
-
----
-
-<a id="model-mlx-community-gemma-3-27b-it-qat-8bit"></a>
-
-### ✅ mlx-community/gemma-3-27b-it-qat-8bit
-
-_Verdict:_ clean | user=recommended
-_Why:_ missing terms: traditional, Japanese, style, azumaya, tranquil
-_Trusted hints:_ preserves trusted hints
-_Contract:_ ok
-_Utility:_ user=recommended | preserves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=780 | text_est=439 | nontext_est=341 | gen=88 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; trusted hint
-               coverage is still weak.
-
-_Metrics:_ Load 3.41s | Gen 6.91s | Total 10.69s
-_Throughput:_ Prompt 545 TPS (780 tok) | Gen 17.8 TPS (88 tok)
-_Assessment:_ 🟡 C (62/100) | Δ-13 | Mostly echoes context without adding value
-_Review Status:_ watchlist (worse than metadata baseline)
-_Review:_ C 62/100 | missing terms: traditional, Japanese, style, azumaya,
-          tranquil
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Title:
-> Wooden gazebo over pond, rainy day
->
-> Description:
-> A dark wooden gazebo extends over a pond with rippling water. Lush green
-> lawns and foliage surround the pond, and the scene appears to be captured on
-> a rainy day.
->
-> Keywords:
-> gazebo, pond, water, lawn, foliage, green, wood, dark, reflection, rain,
-> outdoor, landscape, garden, trees, wet, overcast, ripples, structure
-<!-- markdownlint-enable MD028 MD037 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-gemma-3n-e4b-it-bf16"></a>
-
-### ✅ mlx-community/gemma-3n-E4B-it-bf16
-
-_Verdict:_ model_shortcoming | user=avoid
-_Why:_ missing sections: title, description, keywords | missing terms:
-       extends, rainy, visible, rippling, contemplative
-_Trusted hints:_ improves trusted hints
+_Why:_ missing sections: title, description, keywords | missing terms: United,
+       Kingdom | nonvisual metadata reused
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
 _Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | improves trusted hints
+_Utility:_ user=avoid | improves trusted hints | metadata borrowing
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=779 | text_est=439 | nontext_est=340 | gen=306 |
+_Token accounting:_ prompt=429 | text_est=387 | nontext_est=42 | gen=90 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 2.21s | Gen 7.22s | Total 9.82s
-_Throughput:_ Prompt 1,716 TPS (779 tok) | Gen 49.0 TPS (306 tok)
-_Assessment:_ 🏆 A (94/100) | Δ+19 | None identified
-_Review Status:_ watchlist (missing sections)
-_Review:_ A 94/100 | missing sections: title, description, keywords | missing
-          terms: extends, rainy, visible, rippling, contemplative
+_Metrics:_ Load 1.49s | Gen 6.12s | Total 7.91s
+_Throughput:_ Prompt 274 TPS (429 tok) | Gen 21.8 TPS (90 tok)
+_Assessment:_ ✅ B (77/100) | Δ+61 | Keywords are not specific or diverse
+              enough
+_Review Status:_ watchlist (metadata borrowing, missing sections)
+_Review:_ B 77/100 | missing sections: title, description, keywords | missing
+          terms: United, Kingdom | nonvisual metadata reused
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> &#35;# Image Description:
+> Title
+> Alton Town Centre Street Scene
 >
-> A tranquil scene unfolds on a cloudy day, showcasing a traditional
-> Japanese-style gazebo, or &#42;azumaya&#42;, perched gracefully over a still pond
-> within a meticulously landscaped garden. The gazebo, constructed from
-> weathered wood, features a dark, tiled roof with gently sloping eaves. Its
-> open sides reveal wooden railings, and the structure appears to be supported
-> by sturdy posts.
+> Description
+> The image depicts a street in Alton, England, with a row of buildings on the
+> right side and a road on the left. The street is lined with shops and
+> houses, and people are walking along the sidewalk. The sky is blue with
+> white clouds.
 >
-> The pond reflects the gazebo and the surrounding greenery, creating a mirror
-> image on the water's surface. The water is dark and slightly rippled,
-> adding a sense of calm to the scene. Lush green lawns extend around the
-> pond, dotted with moss-covered rocks and patches of vibrant green grass.
->
-> In the foreground, a few small bushes with reddish-brown foliage add a touch
-> of autumnal colour to the otherwise predominantly green landscape. The
-> overall atmosphere is one of serenity and traditional Japanese beauty. The
-> cloudy sky casts a soft, diffused light over the scene, enhancing the
-> peaceful ambiance.
->
-> &#35;# Keywords:
->
-> Japanese garden, gazebo, pond, reflection, traditional architecture,
-> landscape, tranquility, moss, green, cloudy day, serene, autumn, reflection,
-> water, wood, roof, railings, bushes.
->
-> &#35;# Notes:
->
-> The image captures a classic example of Japanese garden design, emphasizing
-> harmony between natural elements and man-made structures. The reflection in
-> the pond is a key element, adding depth and visual interest to the
-> composition. The muted colours and soft lighting contribute to the overall
-> sense of peace and contemplation.
+> Keywords
+> Alton, England, street, town centre, shops, houses, people, sidewalk, blue
+> sky, white clouds.
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - Missing sections (title, description, keywords)
+- Nonvisual metadata borrowing
+
+---
+
+<a id="model-jqlive-kimi-vl-a3b-thinking-2506-6bit"></a>
+
+### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
+
+_Verdict:_ cutoff | user=avoid
+_Why:_ hit token cap (500) | output/prompt=34.46% | nontext prompt burden=73%
+       | missing sections: title, description, keywords
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | ignores trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=1451 | text_est=387 | nontext_est=1064 | gen=500 |
+                    max=500 | stop=completed
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
+
+_Metrics:_ Load 2.79s | Gen 6.22s | Total 9.32s
+_Throughput:_ Prompt 877 TPS (1,451 tok) | Gen 127 TPS (500 tok)
+_Assessment:_ ❌ F (0/100) | Δ-16 | Output too short to be useful
+_Review Status:_ watchlist (context ignored, cutoff, missing sections)
+_Review:_ F 0/100 | hit token cap (500) | output/prompt=34.46% | nontext
+          prompt burden=73% | missing sections: title, description, keywords
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> 问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答！问题解答
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:cutoff
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
 
 ---
 
@@ -1652,38 +1414,82 @@ _Review:_ A 94/100 | missing sections: title, description, keywords | missing
 
 _Verdict:_ harness | user=avoid
 _Why:_ Tokenizer space-marker artifacts (for example Ġ) appeared in output
-       (about 57 occurrences). | nontext prompt burden=83% | missing sections:
-       description, keywords | missing terms: Japanese, style, rainy, day,
-       dark
-_Trusted hints:_ preserves trusted hints
-_Contract:_ missing: description, keywords | title words=60
-_Utility:_ user=avoid | preserves trusted hints
+       (about 69 occurrences). | nontext prompt burden=85% | missing sections:
+       description, keywords | missing terms: Centre, Alton, United, Kingdom
+_Trusted hints:_ degrades trusted hints
+_Contract:_ missing: description, keywords | title words=71
+_Utility:_ user=avoid | degrades trusted hints
 _Stack / owner:_ owner=mlx-vlm | harness=encoding
-_Token accounting:_ prompt=2628 | text_est=439 | nontext_est=2189 | gen=103 |
+_Token accounting:_ prompt=2551 | text_est=387 | nontext_est=2164 | gen=100 |
                     max=500 | stop=completed
 _Next action:_ Inspect decode cleanup; tokenizer markers are leaking into
                user-facing text.
 
-_Metrics:_ Load 2.16s | Gen 7.34s | Total 9.89s
-_Throughput:_ Prompt 744 TPS (2,628 tok) | Gen 32.0 TPS (103 tok)
-_Assessment:_ ❌ F (7/100) | Δ-68 | Output too short to be useful
-_Review Status:_ watchlist (harness, missing sections)
-_Review:_ F 7/100 | Tokenizer space-marker artifacts (for example Ġ) appeared
-          in output (about 57 occurrences). | nontext prompt burden=83% |
-          missing sections: description, keywords | missing terms: Japanese,
-          style, rainy, day, dark
+_Metrics:_ Load 2.04s | Gen 7.14s | Total 9.50s
+_Throughput:_ Prompt 737 TPS (2,551 tok) | Gen 31.8 TPS (100 tok)
+_Assessment:_ ❌ F (6/100) | Δ-10 | Output too short to be useful
+_Review Status:_ watchlist (harness, missing sections, trusted hint degraded)
+_Review:_ F 6/100 | Tokenizer space-marker artifacts (for example Ġ) appeared
+          in output (about 69 occurrences). | nontext prompt burden=85% |
+          missing sections: description, keywords | missing terms: Centre,
+          Alton, United, Kingdom
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> Title:ĠWoodenĠgazeboĠoverĠpondĊĊDescription:ĠAĠtraditionalĠwoodenĠgazeboĠwithĠaĠslopedĠroofĠextendsĠoverĠaĠcalmĠpond,ĠitsĠreflectionĠvisibleĠinĠtheĠwater.ĠTheĠsurroundingĠgardenĠfeaturesĠgreenĠlawns,Ġmoss-coveredĠrocks,ĠandĠearlyĠspringĠfoliage.ĊĊKeywords:ĠwoodenĠgazebo,Ġpond,Ġreflection,Ġgarden,Ġmoss,Ġrocks,ĠgreenĠlawn,ĠearlyĠspring,ĠslopedĠroof,Ġtranquil,ĠripplingĠwater,ĠlushĠfoliage,Ġserene,Ġcontemplative,Ġlandscaped,Ġazumaya
+> Title:ĠBluebellĠCakeĠHouseĠonĠHighĠStreetĊĊDescription:ĠAĠquietĠstreetĠinĠaĠsmallĠtownĠfeaturingĠaĠrowĠofĠtraditionalĠbrickĠandĠplasterĠbuildings,ĠincludingĠaĠcakeĠshopĠwithĠaĠsignĠreadingĠ"BluebellĠCakeĠHouse."ĠTwoĠpeopleĠwalkĠpastĠtheĠshop,ĠandĠaĠparkedĠvanĠisĠvisibleĠfurtherĠdownĠtheĠstreet.ĊĊKeywords:Ġstreet,Ġtown,ĠbrickĠbuildings,ĠcakeĠshop,Ġsign,Ġpedestrians,ĠparkedĠvan,ĠblueĠsky,Ġchimneys,Ġwindows,Ġdoorways,ĠtraditionalĠarchitecture,Ġdaylight,ĠurbanĠscene
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️HARNESS:encoding
 - Missing sections (description, keywords)
-- Title length violation (60 words; expected 5-10)
-- token_encoding:bpe_space_leak(57)
+- Title length violation (71 words; expected 5-10)
+- Degrades trusted hints
+- token_encoding:bpe_space_leak(69)
+
+---
+
+<a id="model-mlx-community-gemma-3-27b-it-qat-8bit"></a>
+
+### ✅ mlx-community/gemma-3-27b-it-qat-8bit
+
+_Verdict:_ model_shortcoming | user=avoid
+_Why:_ missing terms: United, Kingdom | nonvisual metadata reused
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
+_Contract:_ ok
+_Utility:_ user=avoid | improves trusted hints | metadata borrowing
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=728 | text_est=387 | nontext_est=341 | gen=99 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; trusted hint
+               coverage is still weak.
+
+_Metrics:_ Load 3.37s | Gen 7.57s | Total 11.25s
+_Throughput:_ Prompt 517 TPS (728 tok) | Gen 17.4 TPS (99 tok)
+_Assessment:_ 🏆 A (97/100) | Δ+81 | None identified
+_Review Status:_ watchlist (metadata borrowing)
+_Review:_ A 97/100 | missing terms: United, Kingdom | nonvisual metadata
+          reused
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> Title:
+> Alton High Street, shops, pedestrianised town centre
+>
+> Description:
+> A daytime view of a pedestrianised high street in Alton, England, featuring
+> shops with awnings and street furniture. The scene is brightly lit with
+> shadows cast by the afternoon sun.
+>
+> Keywords:
+> Alton, high street, shops, town centre, pedestrianised, awnings, street
+> furniture, buildings, pavement, sunlight, shadows, England, UK, daytime,
+> retail, storefronts, architecture, urban
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- Nonvisual metadata borrowing
 
 ---
 
@@ -1692,37 +1498,44 @@ _Review:_ F 7/100 | Tokenizer space-marker artifacts (for example Ġ) appeared
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=33.33% | nontext prompt burden=71%
+_Why:_ hit token cap (500) | output/prompt=34.46% | nontext prompt burden=73%
        | missing sections: title, description, keywords
-_Trusted hints:_ ignores trusted hints | missing terms: traditional, wooden,
-                 Japanese, style, gazebo
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
 _Contract:_ missing: title, description, keywords
 _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=1500 | text_est=439 | nontext_est=1061 | gen=500 |
+_Token accounting:_ prompt=1451 | text_est=387 | nontext_est=1064 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 3.23s | Gen 7.87s | Total 11.49s
-_Throughput:_ Prompt 1,763 TPS (1,500 tok) | Gen 79.5 TPS (500 tok)
-_Assessment:_ ❌ F (0/100) | Δ-74 | Output too short to be useful
+_Metrics:_ Load 3.22s | Gen 7.94s | Total 11.46s
+_Throughput:_ Prompt 1,688 TPS (1,451 tok) | Gen 77.6 TPS (500 tok)
+_Assessment:_ ❌ F (20/100) | Δ+4 | Keywords are not specific or diverse enough
 _Review Status:_ watchlist (context ignored, cutoff, degeneration, missing
-                 sections)
-_Review:_ F 0/100 | hit token cap (500) | output/prompt=33.33% | nontext
-          prompt burden=71% | missing sections: title, description, keywords
+                 sections, repetitive)
+_Review:_ F 20/100 | hit token cap (500) | output/prompt=34.46% | nontext
+          prompt burden=73% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> 0-5-5-1-5-5-1-5-5-1-5-5-1-5-5-1-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-5-
+> 0&#46; 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+> 0&#46; 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+> 0&#46; 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+> 0&#46; 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+> 0&#46; 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+> 0&#46; 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+> 0&#46; 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- Context ignored (missing: traditional, wooden, Japanese, style, gazebo)
-- Output degeneration (character_loop: '5-' repeated)
+- Repetitive output (0.)
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
+- Output degeneration (character_loop: ' 0.' repeated)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 - Ignores trusted hints
@@ -1736,36 +1549,37 @@ _Review:_ F 0/100 | hit token cap (500) | output/prompt=33.33% | nontext
 _Verdict:_ harness | user=avoid
 _Why:_ Special control token &lt;|end|&gt; appeared in generated text. |
        Special control token &lt;|endoftext|&gt; appeared in generated text. |
-       hit token cap (500) | nontext prompt burden=67%
-_Trusted hints:_ preserves trusted hints
-_Contract:_ keywords=42
-_Utility:_ user=avoid | preserves trusted hints
+       hit token cap (500) | nontext prompt burden=69%
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
+_Contract:_ keywords=51
+_Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=mlx-vlm | harness=stop_token
-_Token accounting:_ prompt=1335 | text_est=439 | nontext_est=896 | gen=500 |
+_Token accounting:_ prompt=1265 | text_est=387 | nontext_est=878 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
                into user-facing text.
 
-_Metrics:_ Load 0.98s | Gen 9.85s | Total 11.21s
-_Throughput:_ Prompt 3,719 TPS (1,335 tok) | Gen 55.5 TPS (500 tok)
-_Assessment:_ ✅ B (66/100) | Δ-8 | Lacks visual description of image
-_Review Status:_ watchlist (hallucination, harness)
-_Review:_ B 66/100 | Special control token &lt;|end|&gt; appeared in generated
+_Metrics:_ Load 0.88s | Gen 9.82s | Total 11.00s
+_Throughput:_ Prompt 3,618 TPS (1,265 tok) | Gen 55.3 TPS (500 tok)
+_Assessment:_ 🟡 C (65/100) | Δ+49 | Lacks visual description of image
+_Review Status:_ watchlist (context ignored, hallucination, harness)
+_Review:_ C 65/100 | Special control token &lt;|end|&gt; appeared in generated
           text. | Special control token &lt;|endoftext|&gt; appeared in
-          generated text. | hit token cap (500) | nontext prompt burden=67%
+          generated text. | hit token cap (500) | nontext prompt burden=69%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> Title: Serene Japanese-style Gazebo Over Pond
+> Title: Optical Illusion of a Hexagonal Pattern
 >
-> Description: A traditional wooden Japanese-style gazebo, or azumaya, extends
-> over a tranquil pond on a rainy day. Its reflection is visible in the dark,
-> rippling water, creating a serene and contemplative scene within the
-> landscaped garden.
+> Description: A complex, colorful, and distorted image of a hexagonal pattern
+> that creates an optical illusion.
 >
-> Keywords: gazebo, Japanese-style, azumaya, pond, reflection, tranquil,
-> serene, contemplative, landscaped garden, lush green lawns, moss-covered
-> rocks, early spring foliage, rainy day.<|end|><|endoftext|>
+> Keywords: optical illusion, hexagonal pattern, distorted, colorful,
+> distortion, illusion, pattern, visual effect, visual perception, visual art,
+> visual stimulation, visual experience, visual phenomenon, visual effect,
+> visual illusion, visual distortion, visual pattern, visual experience,
+> visual art, visual perception, visual stimulation.<|end|><|endoftext|>
 >
 >
 > Here is a single instruction with the same difficulty/format/length:
@@ -1776,42 +1590,43 @@ _Review:_ B 66/100 | Special control token &lt;|end|&gt; appeared in generated
 > their titles, authors, and publication years. The script should output a
 > summary report that includes the number of books published in each decade,
 > starting from the 1950s up to the 2020s. The report should be formatted as a
-> JSON object with keys representing the decades and values being the count
-> of books published in that decade.
+> markdown table with the decades as the header and the number of books as
+> the corresponding row.
 >
 > &#42;&#42;Solution 1:&#42;&#42;
 >
 > &#96;``python
 > import csv
-> import json
 > from collections import defaultdict
 >
-> &#35; Function to read the CSV file and create a summary report
-> def generate_book_summary(csv_file_path):
-> &#35; Initialize a dictionary to hold the count of books per decade
-> book_summary = defaultdict(int)
+> &#35; Function to read the CSV file and count books by decade
+> def count_books_by_decade(csv_file):
+> books_by_decade = defaultdict(int)
+> with open(csv_file, mode='r', encoding='utf-8') as file:
+> reader = csv.DictReader(file)
+> for row in reader:
+> title = row['Title']
+> author = row['Author']
+> publication_year = int(row['PublicationYear'])
+> decade = (publication_year // 10) &#42; 10
+> books_by_decade[decade] += 1
+> return books_by_decade
 >
-> &#35; Open the CSV file and read the data
-> with open(csv_file_path, mode='r', encoding='utf-8') as csv_file:
-> csv_reader = csv.DictReader(csv_file)
-> for row in csv_reader:
-> &#35; Extract the publication year and increment the count for the
-> corresponding decade
-> publication_year = int(row['Publication Year'])
-> decade = publication_year // 10 &#42; 10  # Calculate the decade
-> book_summary[decade] += 1
->
-> &#35; Convert the dictionary to a JSON object
-> summary_report = json.dumps(book_summary, indent=4)
-> return
+> &#35; Function to generate the markdown table
+> def generate_markdown_table(books_by_decade):
+> markdown_table = "| Decade | Number of Books |\n"
+> for decade, count in sorted(books_by_decade.items()):
+> markdown_table += f"| {decade} | {count
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️HARNESS:stop_token
-- Keyword count violation (42; expected 10-18)
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
+- Keyword count violation (51; expected 10-18)
 - Likely capped by max token budget
-- Contains question/quiz content
+- Ignores trusted hints
+- Contains unexpected table
 - tokenizer_artifact
 - code_snippet
 - token_leak:<\|end\|>
@@ -1825,33 +1640,34 @@ _Review:_ B 66/100 | Special control token &lt;|end|&gt; appeared in generated
 ### ✅ mlx-community/paligemma2-3b-pt-896-4bit
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=10.85% | nontext prompt burden=90%
+_Why:_ hit token cap (500) | output/prompt=10.97% | nontext prompt burden=92%
        | missing sections: title, description, keywords
-_Trusted hints:_ ignores trusted hints | missing terms: traditional, wooden,
-                 Japanese, style, gazebo
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
 _Contract:_ missing: title, description, keywords
 _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=4608 | text_est=439 | nontext_est=4169 | gen=500 |
+_Token accounting:_ prompt=4556 | text_est=387 | nontext_est=4169 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 1.08s | Gen 13.45s | Total 14.92s
-_Throughput:_ Prompt 3,899 TPS (4,608 tok) | Gen 43.6 TPS (500 tok)
-_Assessment:_ 🟡 C (64/100) | Δ-10 | Lacks visual description of image
+_Metrics:_ Load 1.13s | Gen 14.62s | Total 16.06s
+_Throughput:_ Prompt 3,814 TPS (4,556 tok) | Gen 39.3 TPS (500 tok)
+_Assessment:_ 🟡 C (52/100) | Δ+36 | Keywords are not specific or diverse
+              enough
 _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
-_Review:_ C 64/100 | hit token cap (500) | output/prompt=10.85% | nontext
-          prompt burden=90% | missing sections: title, description, keywords
+_Review:_ C 52/100 | hit token cap (500) | output/prompt=10.97% | nontext
+          prompt burden=92% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
 > &#45; Output only the description text after the label.
 > &#45; Output only the keyword list after the label.
-> &#45; Output only the description text after the label.
 > &#45; Output only the keyword list after the label.
+> &#45; Output only the description text after the label.
 > &#45; Output only the description text after the label.
 > &#45; Output only the description text after the label.
 > &#45; Output only the description text after the label.
@@ -1901,82 +1717,10 @@ _Review:_ C 64/100 | hit token cap (500) | output/prompt=10.85% | nontext
 - ⚠️REVIEW:cutoff
 - Repetitive output (phrase: "- output only the...")
 - Excessive bullet points (46)
-- Context ignored (missing: traditional, wooden, Japanese, style, gazebo)
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 - Ignores trusted hints
-
----
-
-<a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
-
-### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
-
-_Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=7.55% | nontext prompt burden=93% |
-       missing sections: title, description, keywords
-_Trusted hints:_ preserves trusted hints
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | preserves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=6625 | text_est=439 | nontext_est=6186 | gen=500 |
-                    max=500 | stop=completed
-_Next action:_ Raise the token cap or trim prompt burden first; generation hit
-               the limit while title, description, keywords remained
-               incomplete.
-
-_Metrics:_ Load 1.33s | Gen 13.64s | Total 15.36s
-_Throughput:_ Prompt 1,089 TPS (6,625 tok) | Gen 71.2 TPS (500 tok)
-_Assessment:_ 🟡 C (59/100) | Δ-16 | Missing requested structure
-_Review Status:_ watchlist (cutoff, missing sections, reasoning leak)
-_Review:_ C 59/100 | hit token cap (500) | output/prompt=7.55% | nontext
-          prompt burden=93% | missing sections: title, description, keywords
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> &lt;think&gt;Got it, let's tackle this. First, I need to analyze the image for
-> cataloguing metadata. The user provided a context with hints, but I need to
-> base my output only on what's clearly visible in the image.
->
-> First, the Title. It needs to be 5-10 words, concrete and factual, limited
-> to clearly visible content. Looking at the image, there's a wooden gazebo
-> over a pond. So a title like "Wooden Gazebo Over Pond" or something similar.
-> Let's check: "Wooden gazebo over a pond" - that's 7 words, fits.
->
-> Next, Description. It needs 1-2 factual sentences describing the main
-> visible subject, setting, lighting, action, and other distinctive visible
-> details. Omit anything uncertain. Looking at the image: there's a wooden
-> gazebo (maybe Japanese style) situated over a calm pond. The water reflects
-> the gazebo. Surrounding the pond are moss-covered rocks, a grassy area, and
-> some trees (one with bare branches, another with green foliage). The scene
-> is tranquil, likely a garden setting. So a description like: "A traditional
-> wooden gazebo extends over a tranquil pond. The gazebo’s reflection is
-> visible in the dark, rippling water. Surrounding the pond are moss-covered
-> rocks, a grassy area, and trees with both bare branches and green foliage.
-> The scene is serene and contemplative within a landscaped garden." That's a
-> bit long, but maybe trim. Let's check: the main subject is the gazebo over
-> the pond. The setting is a garden with pond, rocks, grass, trees. The
-> lighting is overcast, since the water is dark and there's no strong
-> sunlight. So a concise description: "A traditional wooden gazebo sits over a
-> tranquil pond. The gazebo’s reflection is visible in the dark, rippling
-> water. Surrounding the pond are moss-covered rocks, a grassy area, and trees
-> with bare branches and green foliage. The scene is serene within a
-> landscaped garden." That's good.
->
-> Then Keywords. Need 10-18 unique comma-separated terms based on clearly
-> visible subjects, setting, colors, composition, etc. Let's list visible
-> elements: wooden gazebo, pond, water, reflection, moss-covered rocks, grassy
-> area, trees (bare branches, green foliage), shrubs (foreground with
-> red-brown branches), moss (on rocks and ground), pond edge
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:cutoff
-- Missing sections (title, description, keywords)
-- Reasoning leak (&lt;think&gt;)
-- Likely capped by max token budget
-- Unknown tags: &lt;think&gt;
 
 ---
 
@@ -1985,151 +1729,135 @@ _Review:_ C 59/100 | hit token cap (500) | output/prompt=7.55% | nontext
 ### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=14.67% | nontext prompt burden=87%
-       | missing sections: title, keywords
-_Trusted hints:_ preserves trusted hints
-_Contract:_ missing: title, keywords | description sentences=6
-_Utility:_ user=avoid | preserves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=3408 | text_est=439 | nontext_est=2969 | gen=500 |
-                    max=500 | stop=completed
-_Next action:_ Raise the token cap or trim prompt burden first; generation hit
-               the limit while title, keywords remained incomplete.
-
-_Metrics:_ Load 1.62s | Gen 14.60s | Total 16.60s
-_Throughput:_ Prompt 1,532 TPS (3,408 tok) | Gen 42.3 TPS (500 tok)
-_Assessment:_ ✅ B (74/100) | Δ+0 | None identified
-_Review Status:_ watchlist (cutoff, missing sections, reasoning leak)
-_Review:_ B 74/100 | hit token cap (500) | output/prompt=14.67% | nontext
-          prompt burden=87% | missing sections: title, keywords
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Here are my reasoning steps:
-> We need to produce three sections: Title, Description, Keywords. Use only
-> details that are clearly visible. The image shows a wooden gazebo (azumaya)
-> over a pond, with a sloped roof, metal roofing, wooden pillars, railings.
-> The pond is calm, reflecting the gazebo and surrounding greenery. The
-> surrounding area includes lush green lawns, moss-covered rocks, some early
-> spring foliage (some trees with budding leaves). There's a path, some stone
-> steps, a small stone bridge? Not sure. There's a small wooden walkway? The
-> image shows a small wooden deck extending over water, with a roof. The water
-> is dark, reflecting the gazebo. There are some rocks in the water, some
-> mossy rocks. There are shrubs with reddish leaves in the foreground. The
-> background shows a grassy hill with some trees, some of which have budding
-> leaves. The sky is overcast, likely rainy day, but not sure if raindrops
-> visible. The roof appears wet. The overall lighting is diffused, soft,
-> likely overcast. The image is taken from a low angle, looking across the
-> water.
->
-> We need to produce Title: 5-10 words, concrete and factual, limited to
-> clearly visible content. So something like "Wooden gazebo over tranquil pond
-> with reflections". That's 7 words. Or "Traditional wooden gazebo spanning
-> pond, reflecting surroundings". That's 7 words. Must be 5-10 words. Let's
-> count: "Traditional wooden gazebo spanning pond, reflecting surroundings" =
-> 7 words? Let's count: Traditional(1) wooden(2) gazebo(3) spanning(4)
-> pond,(5) reflecting(6) surroundings(7). Yes 7 words. That is fine.
->
-> Description: 1-2 factual sentences describing main visible subject, setting,
-> lighting, action, and other distinctive visible details. Must be 1-2
-> sentences. So something like: "A traditional wooden gazebo with a sloped
-> metal roof sits on a small platform over a calm pond, its reflection
-> mirrored in the dark water. The surrounding garden features lush green
-> lawns, moss‑covered rocks, and early‑spring foliage under overcast
-> lighting." That's two sentences. Must be factual and not infer anything
-> uncertain. The description mentions "overcast lighting" which is visible as
-> diff
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:cutoff
-- Missing sections (title, keywords)
-- Description sentence violation (6; expected 1-2)
-- Reasoning leak (here are my reasoning steps)
-- Likely capped by max token budget
-
----
-
-<a id="model-mlx-community-glm-46v-flash-6bit"></a>
-
-### ✅ mlx-community/GLM-4.6V-Flash-6bit
-
-_Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=7.55% | nontext prompt burden=93% |
-       missing sections: title, description, keywords
-_Trusted hints:_ preserves trusted hints
+_Why:_ hit token cap (500) | output/prompt=15.01% | nontext prompt burden=88%
+       | missing sections: title, description, keywords
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
 _Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | preserves trusted hints
+_Utility:_ user=avoid | improves trusted hints | metadata borrowing
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=6625 | text_est=439 | nontext_est=6186 | gen=500 |
+_Token accounting:_ prompt=3331 | text_est=387 | nontext_est=2944 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 1.37s | Gen 15.60s | Total 17.34s
-_Throughput:_ Prompt 1,134 TPS (6,625 tok) | Gen 54.1 TPS (500 tok)
-_Assessment:_ ✅ B (78/100) | Δ+3 | None identified
-_Review Status:_ watchlist (cutoff, missing sections, reasoning leak)
-_Review:_ B 78/100 | hit token cap (500) | output/prompt=7.55% | nontext
-          prompt burden=93% | missing sections: title, description, keywords
+_Metrics:_ Load 1.62s | Gen 14.77s | Total 16.70s
+_Throughput:_ Prompt 1,464 TPS (3,331 tok) | Gen 41.7 TPS (500 tok)
+_Assessment:_ ✅ B (78/100) | Δ+62 | Keywords are not specific or diverse
+              enough
+_Review Status:_ watchlist (cutoff, degeneration, metadata borrowing, missing
+                 sections, reasoning leak)
+_Review:_ B 78/100 | hit token cap (500) | output/prompt=15.01% | nontext
+          prompt burden=88% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> &lt;think&gt;Got it, let's tackle this step by step. First, I need to extract the
-> Title, Description, and Keywords based on the image content, using British
-> English and only clearly visible details.
->
-> Starting with the Title. The main subject is a traditional wooden gazebo
-> over a pond. So need 5-10 words, concrete. Maybe "Wooden gazebo over pond"
-> or something more precise. Wait, the gazebo is Japanese-style, but can we
-> confirm that? The image shows a traditional wooden structure with a sloped
-> roof, typical of Japanese gazebos (like a chōzuya or similar, but maybe just
-> "gazebo"). So Title should be concise. Let's go with "Wooden gazebo over
-> pond".
->
-> Next, Description. Need 1-2 sentences, factual, only visible. Let's check
-> the image: there's a wooden gazebo with a sloped roof, extending over a
-> pond. The pond has dark, rippling water with reflections of the gazebo.
-> Surrounding the pond are moss-covered rocks, green lawns, and some bushes
-> with reddish-brown branches. The scene appears to be in a landscaped garden,
-> possibly on a rainy day (though we can't confirm rain, but the water looks
-> calm, maybe overcast). Wait, but we must only include what's clearly
-> visible. So let's structure the description:
->
-> "A traditional wooden gazebo with a sloped roof extends over a tranquil
-> pond. The dark, rippling water reflects the gazebo, and surrounding the pond
-> are moss-covered rocks, green lawns, and bushes with reddish-brown
-> branches."
->
-> That's two sentences, factual, includes main subject (gazebo), setting
-> (pond, garden), visible elements (moss-covered rocks, green lawns, bushes
-> with reddish-brown branches), reflection in water.
->
-> Now Keywords. Need 10-18 unique comma-separated terms, based on clearly
-> visible content. Let's list visible elements:
->
-> &#45; Wooden gazebo
-> &#45; Pond
-> &#45; Moss-covered rocks
-> &#45; Green lawn
-> &#45; Bushes (with reddish-brown branches)
-> &#45; Reflection (in water)
-> &#45; Traditional garden
-> &#45; Sloped roof (gazebo)
-> &#45; Rippling water
-> &#45; Overcast sky? Wait, can we confirm sky? The image shows the gazebo and
-> pond, with trees in the background. The lighting is soft, maybe overcast,
-> but is that clearly visible? The water is dark,
+> Here are my reasoning steps:
+> We need to produce a catalog entry with Title, Description, Keywords. Use
+> only details that are clearly visible in the image. The image shows a street
+> scene in a small town, likely Alton, England. The description hint says
+> "Town Centre, Alton, England, United Kingdom, UK". The capture metadata says
+> taken on 2026-04-11 16:46:40 BST, GPS coordinates. However, we must only
+> include details that are definitely visible. The location (Alton) is not
+> explicitly labeled in the image; we cannot assume it's Alton unless there's
+> a sign. The description hint says it's Alton, but we must verify if the
+> image shows any sign indicating Alton. The image shows a street with shops:
+> "Bluebell Cake House", "Jewellery &amp; Watches", "Baker Clark Shop". There's a
+> sign "Bluebell Cake House". There's a "Jewellery &amp; Watches" sign. There's a
+> "Baker Clark Shop" sign. There's a "Baker Clark Shop" sign in pink. There's
+> a "Bluebell Cake House" sign in blue. There's a "Jewellery &amp; Watches" sign
+> in green. There's a "Baker Clark Shop" sign in pink. There's a "Bluebell
+> Cake House" sign in blue. There's a "Jewellery &amp; Watches" sign in green.
+> There's a "Baker Clark Shop" sign in pink. There's a "Bluebell Cake House"
+> sign in blue. There's a "Jewellery &amp; Watches" sign in green. There's a
+> "Baker Clark Shop" sign in pink. There's a "Bluebell Cake House" sign in
+> blue. There's a "Jewellery &amp; Watches" sign in green. There's a "Baker Clark
+> Shop" sign in pink. There's a "Bluebell Cake House" sign in blue. There's a
+> "Jewellery &amp; Watches" sign in green. There's a "Baker Clark Shop" sign in
+> pink. There's a "Bluebell Cake House" sign in blue. There's a "Jewellery &amp;
+> Watches" sign in green. There's a "Baker Clark Shop" sign in pink. There's a
+> "Bluebell Cake House" sign in
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- Excessive verbosity
+- Output degeneration (incomplete_sentence: ends with 'in')
+- Missing sections (title, description, keywords)
+- Reasoning leak (here are my reasoning steps)
+- Nonvisual metadata borrowing
+- Likely capped by max token budget
+
+---
+
+<a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
+
+### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
+
+_Verdict:_ cutoff | user=avoid
+_Why:_ hit token cap (500) | output/prompt=7.68% | nontext prompt burden=94% |
+       missing sections: title, description, keywords
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | improves trusted hints | metadata borrowing
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=6508 | text_est=387 | nontext_est=6121 | gen=500 |
+                    max=500 | stop=completed
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
+
+_Metrics:_ Load 1.29s | Gen 15.21s | Total 16.80s
+_Throughput:_ Prompt 898 TPS (6,508 tok) | Gen 66.2 TPS (500 tok)
+_Assessment:_ ✅ B (75/100) | Δ+58 | Keywords are not specific or diverse
+              enough
+_Review Status:_ watchlist (cutoff, metadata borrowing, missing sections,
+                 reasoning leak)
+_Review:_ B 75/100 | hit token cap (500) | output/prompt=7.68% | nontext
+          prompt burden=94% | missing sections: title, description, keywords
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> &lt;think&gt;Got it, let's tackle this. First, I need to analyze the image for the
+> three required sections: Title, Description, Keywords.
+>
+> Starting with the Title. The title needs to be 5-10 words, concrete and
+> factual, limited to clearly visible content. Looking at the image, there's a
+> street scene with shops. The street name "Lenten Street" is visible on the
+> right. So a possible title could be "Lenten Street, Alton, England". But
+> need to check if "Alton" is visible. The "Bluebell Cake House" and "African
+> Store Alton" suggest Alton. So title could be "Lenten Street, Alton,
+> England". That's 9 words, fits.
+>
+> Next, Description. Need 1-2 factual sentences describing main visible
+> subject, setting, lighting, action, etc. Let's look at the image: a street
+> scene with rows of buildings, shops on the ground floor. There's a "Bluebell
+> Cake House" sign, "African Store Alton" sign. The street name "Lenten
+> Street" is visible on the right building. There are two people walking on
+> the sidewalk, one in dark clothing, one in light hoodie and jeans. The
+> street is paved, with a black vehicle parked on the left side of the street.
+> The sky is partly cloudy with blue patches. The buildings have a mix of
+> brick and painted facades, with multiple chimneys on the roofs. So the
+> description could be: "A street scene on Lenten Street in Alton, England,
+> showing rows of mixed brick and painted buildings with ground-floor shops
+> including 'Bluebell Cake House' and 'African Store Alton'. Two people walk
+> on the sidewalk, and a black vehicle is parked on the left side of the
+> street. The sky is partly cloudy with blue patches, and multiple chimneys
+> are visible on the rooftops." That's a bit long, but maybe trim. Let's check
+> the requirements: 1-2 factual sentences. So maybe: "A street scene on
+> Lenten Street in Alton, England, showing mixed brick and painted buildings
+> with ground-floor shops including 'Bluebell Cake House' and 'African Store
+> Alton'. Two people walk on the sidewalk, and a black vehicle is parked on
+> the left. The sky is partly cloudy with blue patches, and multiple chimneys
+> are visible on rooftops." That's better. It's a single sentence, but maybe
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:cutoff
 - Missing sections (title, description, keywords)
 - Reasoning leak (&lt;think&gt;)
+- Nonvisual metadata borrowing
 - Likely capped by max token budget
 - Unknown tags: &lt;think&gt;
 
@@ -2140,62 +1868,67 @@ _Review:_ B 78/100 | hit token cap (500) | output/prompt=7.55% | nontext
 ### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=27.31% | nontext prompt burden=76%
+_Why:_ hit token cap (500) | output/prompt=28.26% | nontext prompt burden=78%
        | missing sections: title, description, keywords
-_Trusted hints:_ preserves trusted hints
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
 _Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | preserves trusted hints
+_Utility:_ user=avoid | improves trusted hints | metadata borrowing
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=1831 | text_est=439 | nontext_est=1392 | gen=500 |
+_Token accounting:_ prompt=1769 | text_est=387 | nontext_est=1382 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 10.85s | Gen 17.24s | Total 28.49s
-_Throughput:_ Prompt 293 TPS (1,831 tok) | Gen 49.7 TPS (500 tok)
-_Assessment:_ ✅ B (70/100) | Δ-4 | None identified
-_Review Status:_ watchlist (cutoff, missing sections)
-_Review:_ B 70/100 | hit token cap (500) | output/prompt=27.31% | nontext
-          prompt burden=76% | missing sections: title, description, keywords
+_Metrics:_ Load 10.16s | Gen 15.35s | Total 25.82s
+_Throughput:_ Prompt 302 TPS (1,769 tok) | Gen 57.4 TPS (500 tok)
+_Assessment:_ ✅ B (75/100) | Δ+58 | Keywords are not specific or diverse
+              enough
+_Review Status:_ watchlist (cutoff, metadata borrowing, missing sections)
+_Review:_ B 75/100 | hit token cap (500) | output/prompt=28.26% | nontext
+          prompt burden=78% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> Let's tackle this step by step. First, the title needs to be 5-10 words,
-> concrete and factual. The image is a garden scene with a wooden gazebo over
-> a pond. Wait, the hint says Japanese-style but wait, no—wait the user said
-> to use only visible details. Wait the image description mentions "garden"
-> but let's check the actual visible elements. Wait the user's prompt says to
-> use only details clearly visible. Wait the title: let's see the main
-> elements: garden, gazebo, pond, reflection. Wait the hint says "traditional
-> wooden Japanese-style gazebo" but wait is that visible? Wait the user said
-> to not infer unless visually obvious. Wait the image is a garden with a
-> gazebo over a pond. Wait the title: let's make it factual. Maybe "Garden
-> Gazebo Over Pond with Reflection" but wait is that 5-10 words? Wait let's
-> count: "Garden Gazebo Over Pond with Reflection" is 8 words. Is that
-> accurate? Wait the hint says "traditional wooden Japanese-style gazebo" but
-> wait is that visible? Wait the user said to not infer unless visually
-> obvious. Wait the image: the gazebo is wooden, has a roof, over a pond. The
-> reflection is there. So title: "Wooden Garden Gazebo Over Pond with
-> Reflection"—wait no, let's check the rules: title must be 5-10 words,
-> concrete and factual. Let's see: "Garden Gazebo Over Pond with Reflection"
-> is 8 words. That's good.
+> Alright, let's get to work. I need to analyze this image and generate the
+> metadata. First, I'll break down the user's request. It's a straightforward
+> task: analyze an image, extract metadata, and format it into three specific
+> sections: Title, Description, and Keywords. The key is to stick to what's
+> &#42;definitely&#42; visible, no guessing. The provided hints are helpful, but I'll
+> prioritize the image itself.
 >
-> Next, description: 1-2 factual sentences. Main subject: wooden gazebo over
-> pond. Setting: garden with green grass, rocks, reflection. Lighting: maybe
-> overcast? Wait the hint says rainy day but wait the image—wait the user said
-> to use only visible details. Wait the hint says "rainy day" but is that
-> visible? Wait the image: the water is rippling, but is there rain? Wait the
-> user said to not infer. Wait the hint says "tranquil pond" but let's stick
-> to visible. Wait the description needs to be factual. Let's see: "A wooden
-> gazebo stands over a pond, its reflection visible in the rippling water. The
-> surrounding
+> Now, the image itself. It's a classic English town scene. I see a street,
+> lined with those iconic brick and stone terraced houses. The architecture is
+> a dead giveaway – the "Alfriston" and "St. Leonards-on-Sea" names in the
+> prompt are a bit of a red herring, but the style is unmistakably English.
+> The houses are the main subject, with the street and the sky providing the
+> backdrop. The lighting is bright, suggesting a sunny day. I see a few
+> people, but they're small in the frame.
+>
+> Next, I'll go through the provided hints. The "Alton, England" location is a
+> bit off; the architecture is more characteristic of the Sussex coast. The
+> "Alfriston" and "St. Leonards-on-Sea" names are likely just placeholders.
+> The "Bluebell House" sign is a good find, and the "Bluebell" name is a nice
+> touch. The "Alfriston" and "St. Leonards-on-Sea" names are likely just
+> placeholders. The "Bluebell House" sign is a good find, and the "Bluebell"
+> name is a nice touch.
+>
+> Now, the real work begins. I'll start with the Title. It needs to be concise
+> and factual. "English Town Street with Terraced Houses" is a good start,
+> but I can do better. "A Sunny Day in an English Town" is too generic.
+> "Terraced Houses on a Sunny English Street" is better. I'll go with
+> "Terraced Houses on a Sunny English Street."
+>
+> For the Description, I need to be factual and descriptive. I'll start with
+> the main subject: the terraced houses. Then, I'll add the setting: the
+> street and the sky. I'll include the lighting
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
 - Missing sections (title, description, keywords)
+- Nonvisual metadata borrowing
 - Likely capped by max token budget
 
 ---
@@ -2205,25 +1938,25 @@ _Review:_ B 70/100 | hit token cap (500) | output/prompt=27.31% | nontext
 ### ✅ mlx-community/Idefics3-8B-Llama3-bf16
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=17.90% | nontext prompt burden=84%
+_Why:_ hit token cap (500) | output/prompt=18.25% | nontext prompt burden=86%
        | missing sections: title, description, keywords
-_Trusted hints:_ ignores trusted hints | missing terms: traditional, wooden,
-                 Japanese, style, gazebo
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
 _Contract:_ missing: title, description, keywords
 _Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=2793 | text_est=439 | nontext_est=2354 | gen=500 |
+_Token accounting:_ prompt=2740 | text_est=387 | nontext_est=2353 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 1.92s | Gen 17.45s | Total 19.75s
-_Throughput:_ Prompt 2,429 TPS (2,793 tok) | Gen 32.0 TPS (500 tok)
-_Assessment:_ ❌ F (0/100) | Δ-74 | Output too short to be useful
+_Metrics:_ Load 1.88s | Gen 17.14s | Total 19.32s
+_Throughput:_ Prompt 2,369 TPS (2,740 tok) | Gen 32.4 TPS (500 tok)
+_Assessment:_ ❌ F (0/100) | Δ-16 | Output too short to be useful
 _Review Status:_ watchlist (context ignored, cutoff, missing sections)
-_Review:_ F 0/100 | hit token cap (500) | output/prompt=17.90% | nontext
-          prompt burden=84% | missing sections: title, description, keywords
+_Review:_ F 0/100 | hit token cap (500) | output/prompt=18.25% | nontext
+          prompt burden=86% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -2233,7 +1966,7 @@ _Review:_ F 0/100 | hit token cap (500) | output/prompt=17.90% | nontext
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- Context ignored (missing: traditional, wooden, Japanese, style, gazebo)
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
 - Missing sections (title, description, keywords)
 - Likely capped by max token budget
 - Ignores trusted hints
@@ -2241,257 +1974,55 @@ _Review:_ F 0/100 | hit token cap (500) | output/prompt=17.90% | nontext
 
 ---
 
-<a id="model-mlx-community-internvl3-8b-bf16"></a>
+<a id="model-mlx-community-pixtral-12b-bf16"></a>
 
-### ✅ mlx-community/InternVL3-8B-bf16
+### ✅ mlx-community/pixtral-12b-bf16
 
-_Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=21.81% | nontext prompt burden=81%
-       | missing sections: title, description, keywords
-_Trusted hints:_ ignores trusted hints | missing terms: traditional, wooden,
-                 Japanese, style, gazebo
+_Verdict:_ context_budget | user=caveat
+_Why:_ output/prompt=8.02% | nontext prompt burden=88% | missing sections:
+       title, description, keywords | missing terms: Town, Centre, Alton,
+       United, Kingdom
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
 _Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | ignores trusted hints
+_Utility:_ user=caveat | ignores trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=2293 | text_est=439 | nontext_est=1854 | gen=500 |
+_Token accounting:_ prompt=3240 | text_est=387 | nontext_est=2853 | gen=260 |
                     max=500 | stop=completed
-_Next action:_ Raise the token cap or trim prompt burden first; generation hit
-               the limit while title, description, keywords remained
-               incomplete.
+_Next action:_ Treat this as a prompt-budget issue first; nontext prompt
+               burden is 88% and the output stays weak under that load.
 
-_Metrics:_ Load 1.71s | Gen 18.21s | Total 20.29s
-_Throughput:_ Prompt 3,045 TPS (2,293 tok) | Gen 34.1 TPS (500 tok)
-_Assessment:_ 🟡 C (52/100) | Δ-22 | Lacks visual description of image
-_Review Status:_ watchlist (context ignored, cutoff, degeneration, missing
-                 sections)
-_Review:_ C 52/100 | hit token cap (500) | output/prompt=21.81% | nontext
-          prompt burden=81% | missing sections: title, description, keywords
+_Metrics:_ Load 2.51s | Gen 17.50s | Total 20.31s
+_Throughput:_ Prompt 2,016 TPS (3,240 tok) | Gen 20.2 TPS (260 tok)
+_Assessment:_ ✅ B (70/100) | Δ+54 | Keywords are not specific or diverse
+              enough
+_Review Status:_ watchlist (context ignored, missing sections)
+_Review:_ B 70/100 | output/prompt=8.02% | nontext prompt burden=88% | missing
+          sections: title, description, keywords | missing terms: Town,
+          Centre, Alton, United, Kingdom
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> 感
+> npm white <? the the the1[[[npm,1 the<?,\ the,npm and
+> ,npm Blue thenpm,[[ thenpm thenpm,<?,<? the the the the the <?. the[[ thenpm
+> onaxios onaxios.\z the[axios  the[[[[ the1[ the<?,<? thenpm Blue,npm,[[
+> the1[npm chim,<? theaxios traditional1,<?,<?npm Blue the<?,npm Blue
+> the<?npm, the the1[axios ornpm onnpm,axios on the[1
+> the<?npm,<?,<?,npm,1[npm,1[ the the
+> the<?npm, thenpm,npm the<?npm the the1[11npm,<?npm,<?npm
 >
-> barcelona的.ERR romaAM pestic Rencontre.ErrorCode招商引 pestic Rencontre
-> Rencontre性价iej的
-> .ERR Rencontre性价性价.ERR Rencontre性价轱•  pérdida Rencontre nâ barcelona的.ERR
-> Rencontre性价 barcelona Rencontre Rencontre Rencontre重要原因 Rencontre
-> 磉TZ Rencontre性价性价的的.ERR网讯
-> (性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价
+> <?npm the<?npm
+> [[1npmnpm <?npm,<?<?npm,<? <?npm,<?npm,<?npm is<? the,<?
+>
+> <?npm,<?Thenpm Lakenpm,<?.
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
-- ⚠️REVIEW:cutoff
-- Context ignored (missing: traditional, wooden, Japanese, style, gazebo)
-- Output degeneration (character_loop: '性价' repeated)
+- ⚠️REVIEW:context_budget
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
 - Missing sections (title, description, keywords)
-- Likely capped by max token budget
 - Ignores trusted hints
-
----
-
-<a id="model-qwen-qwen3-vl-2b-instruct"></a>
-
-### ✅ Qwen/Qwen3-VL-2B-Instruct
-
-_Verdict:_ cutoff | user=avoid
-_Why:_ At long prompt length (16727 tokens), output became repetitive. | hit
-       token cap (500) | output/prompt=2.99% | nontext prompt burden=97%
-_Trusted hints:_ preserves trusted hints
-_Contract:_ title words=36 | description sentences=3 | keywords=128 | keyword
-            duplication=0.80
-_Utility:_ user=avoid | preserves trusted hints | context echo
-_Stack / owner:_ owner=mlx | harness=long_context
-_Token accounting:_ prompt=16727 | text_est=439 | nontext_est=16288 | gen=500
-                    | max=500 | stop=completed
-_Next action:_ Treat this as cap-limited output first; generation exhausted
-               the token budget with output/prompt=2.99%.
-
-_Metrics:_ Load 0.70s | Gen 20.28s | Total 21.36s
-_Throughput:_ Prompt 1,236 TPS (16,727 tok) | Gen 88.5 TPS (500 tok)
-_Assessment:_ ❌ F (29/100) | Δ-45 | Mostly echoes context without adding value
-_Review Status:_ watchlist (context echo, cutoff, harness, long context,
-                 repetitive)
-_Review:_ F 29/100 | At long prompt length (16727 tokens), output became
-          repetitive. | hit token cap (500) | output/prompt=2.99% | nontext
-          prompt burden=97%
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Title:
-> A traditional wooden Japanese-style gazebo, or azumaya, extends over a
-> tranquil pond on a rainy day. Its reflection is visible in the dark,
-> rippling water, creating a serene and contemplative scene within the
-> landscaped garden.
->
-> Description:
-> A traditional wooden Japanese-style gazebo, or azumaya, extends over a
-> tranquil pond on a rainy day. Its reflection is visible in the dark,
-> rippling water, creating a serene and contemplative scene within the
-> landscaped garden. The surrounding area features lush green lawns,
-> moss-covered rocks, and early spring foliage.
->
-> Keywords:
-> azumaya, Japanese-style gazebo, wooden, pond, rainy day, reflection, serene,
-> contemplative, landscaped garden, green lawns, moss-covered rocks, early
-> spring foliage, traditional, wooden gazebo, tranquil, pond, water,
-> reflection, garden, landscape, garden scene, garden setting, garden view,
-> garden atmosphere, garden ambiance, garden environment, garden setting,
-> garden landscape, garden view, garden atmosphere, garden ambiance, garden
-> environment, garden setting, garden view, garden atmosphere, garden
-> ambiance, garden environment, garden setting, garden view, garden
-> atmosphere, garden ambiance, garden environment, garden setting, garden
-> view, garden atmosphere, garden ambiance, garden environment, garden
-> setting, garden view, garden atmosphere, garden ambiance, garden
-> environment, garden setting, garden view, garden atmosphere, garden
-> ambiance, garden environment, garden setting, garden view, garden
-> atmosphere, garden ambiance, garden environment, garden setting, garden
-> view, garden atmosphere, garden ambiance, garden environment, garden
-> setting, garden view, garden atmosphere, garden ambiance, garden
-> environment, garden setting, garden view, garden atmosphere, garden
-> ambiance, garden environment, garden setting, garden view, garden
-> atmosphere, garden ambiance, garden environment, garden setting, garden
-> view, garden atmosphere, garden ambiance, garden environment, garden
-> setting, garden view, garden atmosphere, garden ambiance, garden
-> environment, garden setting, garden view, garden atmosphere, garden
-> ambiance, garden environment, garden setting, garden view, garden
-> atmosphere, garden ambiance, garden environment, garden setting, garden
-> view, garden atmosphere, garden ambiance, garden environment, garden
-> setting, garden view, garden atmosphere, garden ambiance, garden
-> environment, garden setting, garden view, garden atmosphere, garden
-> ambiance, garden environment, garden setting, garden view, garden
-> atmosphere, garden ambiance, garden environment, garden setting, garden
-> view, garden atmosphere, garden ambiance, garden environment, garden setting
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:cutoff
-- ⚠️HARNESS:long_context
-- Repetitive output (phrase: "garden view, garden atmosphere...")
-- Title length violation (36 words; expected 5-10)
-- Description sentence violation (3; expected 1-2)
-- Keyword count violation (128; expected 10-18)
-- Keyword duplication (80% duplicated terms)
-- Context echo (40% overlap)
-- Likely capped by max token budget
-- long_context_repetition(16727tok)
-
----
-
-<a id="model-mlx-community-qwen3-vl-2b-thinking-bf16"></a>
-
-### ✅ mlx-community/Qwen3-VL-2B-Thinking-bf16
-
-_Verdict:_ cutoff | user=avoid
-_Why:_ At long prompt length (16729 tokens), output became repetitive. | hit
-       token cap (500) | output/prompt=2.99% | nontext prompt burden=97%
-_Trusted hints:_ ignores trusted hints | missing terms: traditional, Japanese,
-                 style, gazebo, azumaya
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | ignores trusted hints
-_Stack / owner:_ owner=mlx | harness=long_context
-_Token accounting:_ prompt=16729 | text_est=439 | nontext_est=16290 | gen=500
-                    | max=500 | stop=completed
-_Next action:_ Raise the token cap or trim prompt burden first; generation hit
-               the limit while title, description, keywords remained
-               incomplete.
-
-_Metrics:_ Load 0.73s | Gen 21.33s | Total 22.46s
-_Throughput:_ Prompt 1,152 TPS (16,729 tok) | Gen 87.4 TPS (500 tok)
-_Assessment:_ 🟡 C (61/100) | Δ-14 | Missing requested structure
-_Review Status:_ watchlist (context ignored, cutoff, harness, long context,
-                 missing sections, reasoning leak, repetitive)
-_Review:_ C 61/100 | At long prompt length (16729 tokens), output became
-          repetitive. | hit token cap (500) | output/prompt=2.99% | nontext
-          prompt burden=97%
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Got it. Let's analyze the image. The image shows multiple pairs of
-> weatherproofed, wooden, and blue-tinted glass windows. The windows are all
-> the same, with a blue tint. The windows are arranged in a row, and there are
-> multiple of them. The windows are all the same, with a blue tint. The
-> windows are arranged in a row, and there are multiple of them. The windows
-> are all the same, with a blue tint. The windows are arranged in a row, and
-> there are multiple of them. The windows are all the same, with a blue tint.
-> The windows are arranged in a row, and there are multiple of them. The
-> windows are all the same, with a blue tint. The windows are arranged in a
-> row, and there are multiple of them. The windows are all the same, with a
-> blue tint. The windows are arranged in a row, and there are multiple of
-> them. The windows are all the same, with a blue tint. The windows are
-> arranged in a row, and there are multiple of them. The windows are all the
-> same, with a blue tint. The windows are arranged in a row, and there are
-> multiple of them. The windows are all the same, with a blue tint. The
-> windows are arranged in a row, and there are multiple of them. The windows
-> are all the same, with a blue tint. The windows are arranged in a row, and
-> there are multiple of them. The windows are all the same, with a blue tint.
-> The windows are arranged in a row, and there are multiple of them. The
-> windows are all the same, with a blue tint. The windows are arranged in a
-> row, and there are multiple of them. The windows are all the same, with a
-> blue tint. The windows are arranged in a row, and there are multiple of
-> them. The windows are all the same, with a blue tint. The windows are
-> arranged in a row, and there are multiple of them. The windows are all the
-> same, with a blue tint. The windows are arranged in a row, and there are
-> multiple of them. The windows are all the same, with a blue tint. The
-> windows are arranged in a row, and there are multiple of them. The windows
-> are all the same, with a blue tint. The windows are arranged in a row, and
-> there are multiple of them. The windows are all the same, with a blue tint.
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:cutoff
-- ⚠️HARNESS:long_context
-- Repetitive output (phrase: "the windows are all...")
-- Context ignored (missing: traditional, Japanese, style, gazebo, azumaya)
-- Missing sections (title, description, keywords)
-- Reasoning leak (let's analyze the image)
-- Likely capped by max token budget
-- Ignores trusted hints
-- long_context_repetition(16729tok)
-
----
-
-<a id="model-meta-llama-llama-32-11b-vision-instruct"></a>
-
-### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
-
-_Verdict:_ model_shortcoming | user=avoid
-_Why:_ missing sections: title, description, keywords | missing terms: wooden,
-       extends, Its, contemplative, features
-_Trusted hints:_ preserves trusted hints
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | preserves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=482 | text_est=439 | nontext_est=43 | gen=104 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; the requested
-               output contract is not being met.
-
-_Metrics:_ Load 2.22s | Gen 22.98s | Total 25.58s
-_Throughput:_ Prompt 256 TPS (482 tok) | Gen 5.05 TPS (104 tok)
-_Assessment:_ 🟠 D (40/100) | Δ-35 | Mostly echoes context without adding value
-_Review Status:_ watchlist (missing sections)
-_Review:_ D 40/100 | missing sections: title, description, keywords | missing
-          terms: wooden, extends, Its, contemplative, features
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> A Japanese Garden Gazebo on a Tranquil Pond
->
-> The image depicts a serene and peaceful scene of a traditional
-> Japanese-style gazebo, or azumaya, situated over a tranquil pond on a rainy
-> day. The gazebo's reflection is visible in the dark, rippling water,
-> creating a sense of calmness and serenity within the beautifully landscaped
-> garden. The surrounding area is characterized by lush green lawns,
-> moss-covered rocks, and early spring foliage, adding to the natural beauty
-> of the scene.
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- Missing sections (title, description, keywords)
 
 ---
 
@@ -2500,50 +2031,513 @@ _Review:_ D 40/100 | missing sections: title, description, keywords | missing
 ### ✅ mlx-community/Molmo-7B-D-0924-8bit
 
 _Verdict:_ model_shortcoming | user=avoid
-_Why:_ nontext prompt burden=74% | nonvisual metadata reused
-_Trusted hints:_ preserves trusted hints | nonvisual metadata reused
-_Contract:_ title words=11 | description sentences=3
-_Utility:_ user=avoid | preserves trusted hints | metadata borrowing
+_Why:_ nontext prompt burden=76% | nonvisual metadata reused | reasoning leak
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
+_Contract:_ description sentences=3
+_Utility:_ user=avoid | improves trusted hints | instruction echo | metadata
+           borrowing
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=1697 | text_est=439 | nontext_est=1258 | gen=261 |
+_Token accounting:_ prompt=1637 | text_est=387 | nontext_est=1250 | gen=178 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model-quality limitation for this prompt and image.
 
-_Metrics:_ Load 1.16s | Gen 24.61s | Total 26.14s
-_Throughput:_ Prompt 90.7 TPS (1,697 tok) | Gen 52.0 TPS (261 tok)
-_Assessment:_ 🟡 C (54/100) | Δ-21 | Mostly echoes context without adding value
-_Review Status:_ watchlist (metadata borrowing)
-_Review:_ C 54/100 | nontext prompt burden=74% | nonvisual metadata reused
+_Metrics:_ Load 1.23s | Gen 17.95s | Total 19.48s
+_Throughput:_ Prompt 120 TPS (1,637 tok) | Gen 51.0 TPS (178 tok)
+_Assessment:_ 🏆 A (92/100) | Δ+76 | None identified
+_Review Status:_ watchlist (instruction echo, metadata borrowing, reasoning
+                 leak)
+_Review:_ A 92/100 | nontext prompt burden=76% | nonvisual metadata reused |
+          reasoning leak
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> Photographer: John Doe. Equipment: Canon EOS R5 with 100-400mm lens.
-> Weather: Rainy. Season: Early spring. Location: Japanese-style garden in
-> London.
-> &#45; Keywords hint: Gazebo, pond, rain, reflection, Japanese garden, azumaya,
-> greenery, moss, early spring, London, Canon EOS R5, 100-400mm lens,
-> 2026-04-03 14:24:53 BST
+> Camera: Canon EOS 100D Mark III with EF-S 18-135mm f/3.5-5.6 IS III lens.
+> ISO: 400. Shutter speed: 1/125s. Aperture: f/5.6. White balance: Cloudy Day.
+> &#45; Title hint: Street scene in Alton, England
 >
 > Title:
-> &#45; A traditional wooden Japanese-style gazebo extends over a tranquil pond.
+> Street scene in Alton, England
 >
 > Description:
-> &#45; A traditional wooden Japanese-style gazebo, or azumaya, extends over a
-> tranquil pond on a rainy day. Its reflection is visible in the dark,
-> rippling water creating a serene and contemplative scene within the
-> landscaped garden. The surrounding area features lush green lawns,
-> moss-covered rocks, and early spring foliage.
+> A two-lane street in Alton, England with a parked car and two people walking
+> towards the camera. The buildings are mostly two-story, with a mix of brick
+> and white facades. The sky is blue with some clouds.
 >
 > Keywords:
-> &#45; gazebo, pond, rain, reflection, Japanese garden, azumaya, greenery, moss,
-> early spring, London, Canon EOS R5, 100-400mm lens, 2026-04-03 14:24:53 BST
+> Street, Alton, England, United Kingdom, UK, Car, Pedestrians, Brick
+> buildings, White buildings, Blue sky, Clouds, Town Centre, UK
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
-- Title length violation (11 words; expected 5-10)
 - Description sentence violation (3; expected 1-2)
+- Reasoning leak (title hint:)
+- Instruction echo
 - Nonvisual metadata borrowing
+
+---
+
+<a id="model-mlx-community-glm-46v-flash-6bit"></a>
+
+### ✅ mlx-community/GLM-4.6V-Flash-6bit
+
+_Verdict:_ harness | user=avoid
+_Why:_ Special control token &lt;/think&gt; appeared in generated text. | hit
+       token cap (500) | nontext prompt burden=94% | missing sections: title
+_Trusted hints:_ improves trusted hints
+_Contract:_ missing: title | keywords=2
+_Utility:_ user=avoid | improves trusted hints
+_Stack / owner:_ owner=mlx-vlm | harness=stop_token
+_Token accounting:_ prompt=6508 | text_est=387 | nontext_est=6121 | gen=500 |
+                    max=500 | stop=completed
+_Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
+               into user-facing text.
+
+_Metrics:_ Load 1.43s | Gen 19.00s | Total 20.73s
+_Throughput:_ Prompt 831 TPS (6,508 tok) | Gen 46.6 TPS (500 tok)
+_Assessment:_ 🏆 A (89/100) | Δ+73 | None identified
+_Review Status:_ watchlist (harness, missing sections, reasoning leak)
+_Review:_ A 89/100 | Special control token &lt;/think&gt; appeared in
+          generated text. | hit token cap (500) | nontext prompt burden=94% |
+          missing sections: title
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> &lt;think&gt;Got it, let's tackle this step by step. First, the Title needs to be
+> 5-10 words, concrete and factual. Looking at the image, there are buildings
+> on a street, with shop signs like "Bluebell Cake House" and "African Store
+> Alton". Also, the street name "Lenten Street" is visible. So a good title
+> could be "Lenten Street shops and buildings".
+>
+> Next, the Description. Need 1-2 sentences, factual, visible. Let's list
+> visible elements: street scene with two people walking on the sidewalk,
+> buildings with shop fronts including "Bluebell Cake House" and "African
+> Store Alton", street name "Lenten Street" on a sign, brick and white-painted
+> buildings with chimneys, a black car parked on the left side of the street,
+> blue sky with white clouds.
+>
+> So the description should include the street name, the shops, the people,
+> the buildings. Let's draft: "A street scene on Lenten Street with shops
+> including Bluebell Cake House and African Store Alton, two people walking on
+> the sidewalk, and buildings with brick and white facades."
+>
+> Now Keywords. Need 10-18 unique terms based on visible content. Let's list
+> visible elements and extract keywords:
+>
+> &#45; Lenten Street (street name)
+> &#45; Bluebell Cake House (shop name)
+> &#45; African Store Alton (shop name)
+> &#45; Brick buildings (material)
+> &#45; White-painted buildings (material)
+> &#45; Chimneys (building feature)
+> &#45; Sidewalk (feature)
+> &#45; Black car (vehicle)
+> &#45; Blue sky (sky condition)
+> &#45; White clouds (sky condition)
+> &#45; Two people (subject)
+>
+> Now select 10-18 unique terms. Let's pick the most prominent and clearly
+> visible:
+>
+> &#45; Lenten Street
+> &#45; Bluebell Cake House
+> &#45; African Store Alton
+> &#45; Brick buildings
+> &#45; White-painted buildings
+> &#45; Chimneys
+> &#45; Sidewalk
+> &#45; Black car
+> &#45; Blue sky
+> &#45; White clouds
+>
+> That's 12 terms, which is within 10-18. Let's check if all are clearly
+> visible. Yes, all these terms are clearly visible in the image.&lt;/think&gt;
+> <|begin_of_box|>Title:
+> Lenten Street shops and buildings
+>
+> Description:
+> A street scene on Lenten Street with shops including Bluebell Cake House and
+> African Store Alton, two people walking on the sidewalk, and buildings with
+> brick and white facades.
+>
+> Keywords:
+> Lenten Street, Bluebell Cake
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️HARNESS:stop_token
+- Missing sections (title)
+- Keyword count violation (2; expected 10-18)
+- Reasoning leak (&lt;think&gt;)
+- Likely capped by max token budget
+- Unknown tags: &lt;think&gt;
+- token_leak:&lt;/think&gt;
+
+---
+
+<a id="model-qwen-qwen3-vl-2b-instruct"></a>
+
+### ✅ Qwen/Qwen3-VL-2B-Instruct
+
+_Verdict:_ cutoff | user=avoid
+_Why:_ At long prompt length (16675 tokens), output became repetitive. | hit
+       token cap (500) | output/prompt=3.00% | nontext prompt burden=98%
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
+_Contract:_ missing: keywords | title words=14
+_Utility:_ user=avoid | improves trusted hints | metadata borrowing
+_Stack / owner:_ owner=mlx | harness=long_context
+_Token accounting:_ prompt=16675 | text_est=387 | nontext_est=16288 | gen=500
+                    | max=500 | stop=completed
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while keywords remained incomplete.
+
+_Metrics:_ Load 0.70s | Gen 20.75s | Total 21.74s
+_Throughput:_ Prompt 1,200 TPS (16,675 tok) | Gen 86.8 TPS (500 tok)
+_Assessment:_ 🟡 C (52/100) | Δ+36 | Keywords are not specific or diverse
+              enough
+_Review Status:_ watchlist (cutoff, harness, long context, metadata borrowing,
+                 missing sections, repetitive)
+_Review:_ C 52/100 | At long prompt length (16675 tokens), output became
+          repetitive. | hit token cap (500) | output/prompt=3.00% | nontext
+          prompt burden=98%
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> Title:
+> &#45; 2026-04-11 16:46:40 BST, Town Centre, Alton, England, United Kingdom, UK
+>
+> Description:
+> &#45; A single, large, rectangular, beige-colored, weather-resistant,
+> double-layered, solar-reflective, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof, weatherproof, weatherproof,
+> weatherproof, weatherproof, weatherproof
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:cutoff
+- ⚠️HARNESS:long_context
+- Repetitive output (phrase: "weatherproof, weatherproof, we...")
+- Missing sections (keywords)
+- Title length violation (14 words; expected 5-10)
+- Nonvisual metadata borrowing
+- Likely capped by max token budget
+- long_context_repetition(16675tok)
+
+---
+
+<a id="model-mlx-community-qwen3-vl-2b-thinking-bf16"></a>
+
+### ✅ mlx-community/Qwen3-VL-2B-Thinking-bf16
+
+_Verdict:_ cutoff | user=avoid
+_Why:_ At long prompt length (16677 tokens), output became repetitive. | hit
+       token cap (500) | output/prompt=3.00% | nontext prompt burden=98%
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | ignores trusted hints
+_Stack / owner:_ owner=mlx | harness=long_context
+_Token accounting:_ prompt=16677 | text_est=387 | nontext_est=16290 | gen=500
+                    | max=500 | stop=completed
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
+
+_Metrics:_ Load 0.71s | Gen 23.77s | Total 24.79s
+_Throughput:_ Prompt 980 TPS (16,677 tok) | Gen 86.1 TPS (500 tok)
+_Assessment:_ ✅ B (75/100) | Δ+59 | Keywords are not specific or diverse
+              enough
+_Review Status:_ watchlist (context ignored, cutoff, harness, long context,
+                 missing sections, reasoning leak, repetitive)
+_Review:_ B 75/100 | At long prompt length (16677 tokens), output became
+          repetitive. | hit token cap (500) | output/prompt=3.00% | nontext
+          prompt burden=98%
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> Got it. Let's analyze the image. The image shows a single object: a set of
+> four identical, weatherproofed, wooden or metal boxes with a glass front.
+> The boxes are arranged in a row, each with a glass front. The boxes are
+> brown, with a wooden texture. The boxes are placed on a wooden surface. The
+> boxes are in a row, each with a glass front. The boxes are in a row, each
+> with a glass front. The boxes are in a row, each with a glass front. The
+> boxes are in a row, each with a glass front. The boxes are in a row, each
+> with a glass front. The boxes are in a row, each with a glass front. The
+> boxes are in a row, each with a glass front. The boxes are in a row, each
+> with a glass front. The boxes are in a row, each with a glass front. The
+> boxes are in a row, each with a glass front. The boxes are in a row, each
+> with a glass front. The boxes are in a row, each with a glass front. The
+> boxes are in a row, each with a glass front. The boxes are in a row, each
+> with a glass front. The boxes are in a row, each with a glass front. The
+> boxes are in a row, each with a glass front. The boxes are in a row, each
+> with a glass front. The boxes are in a row, each with a glass front. The
+> boxes are in a row, each with a glass front. The boxes are in a row, each
+> with a glass front. The boxes are in a row, each with a glass front. The
+> boxes are in a row, each with a glass front. The boxes are in a row, each
+> with a glass front. The boxes are in a row, each with a glass front. The
+> boxes are in a row, each with a glass front. The boxes are in a row, each
+> with a glass front. The boxes are in a row, each with a glass front. The
+> boxes are in a row, each with a glass front. The boxes are in a row, each
+> with a glass front. The boxes are in a row, each with a glass front. The
+> boxes are in a row, each with a glass front. The boxes are in a row, each
+> with a glass front. The boxes are in a row, each with a glass front. The
+> boxes are
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:cutoff
+- ⚠️HARNESS:long_context
+- Repetitive output (phrase: "with a glass front....")
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
+- Missing sections (title, description, keywords)
+- Reasoning leak (let's analyze the image)
+- Likely capped by max token budget
+- Ignores trusted hints
+- long_context_repetition(16677tok)
+
+---
+
+<a id="model-meta-llama-llama-32-11b-vision-instruct"></a>
+
+### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
+
+_Verdict:_ model_shortcoming | user=avoid
+_Why:_ missing sections: title, description, keywords | missing terms: Town,
+       Centre, United, Kingdom | nonvisual metadata reused
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | improves trusted hints | metadata borrowing
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=430 | text_est=387 | nontext_est=43 | gen=109 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; the requested
+               output contract is not being met.
+
+_Metrics:_ Load 2.71s | Gen 24.40s | Total 27.43s
+_Throughput:_ Prompt 190 TPS (430 tok) | Gen 5.03 TPS (109 tok)
+_Assessment:_ ✅ B (79/100) | Δ+63 | Keywords are not specific or diverse
+              enough
+_Review Status:_ watchlist (metadata borrowing, missing sections)
+_Review:_ B 79/100 | missing sections: title, description, keywords | missing
+          terms: Town, Centre, United, Kingdom | nonvisual metadata reused
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> Alton Village Street Scene
+>
+> The image depicts a quaint village street in Alton, England, with a row of
+> old buildings lining the road, featuring a mix of red brick and white
+> structures with brown roofs. The street is paved and has a few parked cars,
+> with a person walking down the sidewalk. The sky above is blue with white
+> clouds.
+>
+> A shop sign reads "Bluebell Cake House" and another reads "Hampshire",
+> indicating the location. The overall atmosphere is peaceful and serene, with
+> a sense of community and history.
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- Missing sections (title, description, keywords)
+- Nonvisual metadata borrowing
+
+---
+
+<a id="model-mlx-community-internvl3-8b-bf16"></a>
+
+### ✅ mlx-community/InternVL3-8B-bf16
+
+_Verdict:_ cutoff | user=avoid
+_Why:_ hit token cap (500) | output/prompt=22.31% | nontext prompt burden=83%
+       | missing sections: title, description, keywords
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | ignores trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=2241 | text_est=387 | nontext_est=1854 | gen=500 |
+                    max=500 | stop=completed
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
+
+_Metrics:_ Load 1.68s | Gen 26.44s | Total 28.42s
+_Throughput:_ Prompt 2,751 TPS (2,241 tok) | Gen 34.1 TPS (500 tok)
+_Assessment:_ 🟠 D (50/100) | Δ+34 | Keywords are not specific or diverse
+              enough
+_Review Status:_ watchlist (context ignored, cutoff, degeneration, missing
+                 sections, repetitive)
+_Review:_ D 50/100 | hit token cap (500) | output/prompt=22.31% | nontext
+          prompt burden=83% | missing sections: title, description, keywords
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> 月网友评论 barcelona性价!!");
+> pérdidaWRAPPER的.ERR roma的的.ERR Rencontre enthus dél 若要单纯的 kuk ula\_\_',
+> pérdidaiquement Rencontre的 sécur的.ERR Rencontre的.ERR Rencontre
+> Rencontrepreciprecizb Rencontre‘s lashes的.ERR Rencontre ,_ struggu strugg
+> convin的.ERR Rencontre的的 Rencontre犄 自动生成 struggel magistrate.ERR Rencontre"ं痄
+> enthusSYNC 若要.ERR Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre的.ERR
+> Rencontrepreci。www Rencontre的.ERR Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre_/ >",  nâ Rencontre的
+> Rencontre的.ERR Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre的.ERR的.ERR
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre的.ERR Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre/'icon.ERR的.ERR Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre/ struggelts的.ERR
+> Rencontre性价性价的.ERR Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre/0.1.setRequestHeader
+> commentaire pérdida yal Rencontre Rencontre/性价性价性价性价性价性价矣性价 Rencontre性价性价矣性价
+> Rencontre Rencontre/ Rencontre Rencontre Rencontre
+> Rencontre的.ERR.toObject'!!");
+> .ERR"  strugg Rencontre Rencontre/ Rencontre Rencontre/ Rencontre Rencontre/
+> Rencontre Rencontre/ Rencontre Rencontre Rencontre/ Rencontre/ Rencontre/
+> Rencontre Rencontre/ Rencontre掌握了 strugg Rencontre/ Rencontre/ Rencontre
+> Rencontre Rencontre Rencontre Rencontre Rencontre Rencontre/In性价性价
+> Rencontre/ Rencontre Rencontre/ Rencontre/ Rencontre/ McConnell strugg
+> Rencontre/And Rencontre/
+> Rencontre掌握了性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价的性价性价性价性价性价性价性价性价性价性价性价性价性价性价性价
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:cutoff
+- Repetitive output (phrase: "rencontre rencontre rencontre ...")
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
+- Output degeneration (character_loop: '性价' repeated)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
+
+---
+
+<a id="model-mlx-community-paligemma2-3b-ft-docci-448-bf16"></a>
+
+### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
+
+_Verdict:_ cutoff | user=avoid
+_Why:_ hit token cap (500) | output/prompt=33.69% | nontext prompt burden=74%
+       | missing sections: title, description, keywords
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | ignores trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=1484 | text_est=387 | nontext_est=1097 | gen=500 |
+                    max=500 | stop=completed
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while title, description, keywords remained
+               incomplete.
+
+_Metrics:_ Load 1.42s | Gen 27.30s | Total 29.03s
+_Throughput:_ Prompt 3,272 TPS (1,484 tok) | Gen 19.0 TPS (500 tok)
+_Assessment:_ 🟡 C (55/100) | Δ+39 | Keywords are not specific or diverse
+              enough
+_Review Status:_ watchlist (context ignored, cutoff, missing sections,
+                 repetitive)
+_Review:_ C 55/100 | hit token cap (500) | output/prompt=33.69% | nontext
+          prompt burden=74% | missing sections: title, description, keywords
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "K" in the URL.
+> &#45; Do not use the "
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:cutoff
+- Repetitive output (phrase: "- do not use...")
+- Excessive bullet points (39)
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
+- Missing sections (title, description, keywords)
+- Likely capped by max token budget
+- Ignores trusted hints
 
 ---
 
@@ -2551,126 +2545,153 @@ _Review:_ C 54/100 | nontext prompt burden=74% | nonvisual metadata reused
 
 ### ✅ mlx-community/X-Reasoner-7B-8bit
 
-_Verdict:_ cutoff | user=avoid
-_Why:_ At long prompt length (16738 tokens), output may stop following
-       prompt/image context. | hit token cap (500) | output/prompt=2.99% |
-       nontext prompt burden=97%
-_Trusted hints:_ ignores trusted hints | missing terms: traditional, wooden,
-                 Japanese, style, gazebo
-_Contract:_ description sentences=3 | keywords=73
-_Utility:_ user=avoid | ignores trusted hints
+_Verdict:_ context_budget | user=caveat
+_Why:_ At long prompt length (16686 tokens), output may stop following
+       prompt/image context. | hit token cap (500) | output/prompt=3.00% |
+       nontext prompt burden=98%
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
+_Contract:_ title words=3 | keywords=100 | keyword duplication=0.73
+_Utility:_ user=caveat | ignores trusted hints
 _Stack / owner:_ owner=mlx | harness=long_context
-_Token accounting:_ prompt=16738 | text_est=439 | nontext_est=16299 | gen=500
+_Token accounting:_ prompt=16686 | text_est=387 | nontext_est=16299 | gen=500
                     | max=500 | stop=completed
-_Next action:_ Treat this as cap-limited output first; generation exhausted
-               the token budget with output/prompt=2.99%.
+_Next action:_ Treat this as a prompt-budget issue first; nontext prompt
+               burden is 98% and the output stays weak under that load.
 
-_Metrics:_ Load 1.21s | Gen 25.13s | Total 26.71s
-_Throughput:_ Prompt 1,074 TPS (16,738 tok) | Gen 57.6 TPS (500 tok)
-_Assessment:_ 🏆 A (98/100) | Δ+23 | None identified
-_Review Status:_ watchlist (context ignored, cutoff, harness, long context)
-_Review:_ A 98/100 | At long prompt length (16738 tokens), output may stop
+_Metrics:_ Load 1.13s | Gen 27.54s | Total 28.97s
+_Throughput:_ Prompt 965 TPS (16,686 tok) | Gen 53.0 TPS (500 tok)
+_Assessment:_ 🏆 A (85/100) | Δ+69 | None identified
+_Review Status:_ watchlist (context ignored, harness, long context)
+_Review:_ A 85/100 | At long prompt length (16686 tokens), output may stop
           following prompt/image context. | hit token cap (500) |
-          output/prompt=2.99% | nontext prompt burden=97%
+          output/prompt=3.00% | nontext prompt burden=98%
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
 > Title:
-> &#45; White and Black Patterned Background
+> &#45; White Swallowtail Butterfly
 >
 > Description:
-> &#45; A repeating pattern of white and black stripes forms a continuous,
-> elongated design. The stripes are arranged in a vertical orientation,
-> creating a bold, alternating effect. The background is uniform, with no
-> additional elements or variations.
+> &#45; A large white butterfly with black spots on its wings is displayed in a
+> continuous pattern, creating a seamless design. The background is a gradient
+> of dark to light, enhancing the butterfly's visibility.
 >
 > Keywords:
-> &#45; Stripes
-> &#45; Pattern
+> &#45; Butterfly
 > &#45; White
-> &#45; Black
-> &#45; Vertical
-> &#45; Repeating
-> &#45; Background
-> &#45; Uniform
-> &#45; Alternating
-> &#45; Bold
-> &#45; Design
-> &#45; Continuous
+> &#45; Black spots
+> &#45; Seamless pattern
+> &#45; Gradient background
+> &#45; Large
+> &#45; Wing details
+> &#45; Artistic design
+> &#45; Continuous motif
+> &#45; Visual effect
+> &#45; Patterned wallpaper
+> &#45; Graphic design
+> &#45; Digital artwork
 > &#45; Monochrome
-> &#45; Striped
-> &#45; Alternating Colors
-> &#45; Linear Pattern
 > &#45; Symmetrical
-> &#45; Straight Lines
-> &#45; Uniform Spacing
-> &#45; Monochromatic
-> &#45; Visual Texture
-> &#45; Striped Background
-> &#45; Black and White Stripes
-> &#45; Linear Arrangement
-> &#45; Symmetrical Pattern
-> &#45; Monochrome Design
-> &#45; Striped Background Pattern
-> &#45; Alternating Colors Pattern
-> &#45; Linear Stripes
-> &#45; Uniform Striped Pattern
-> &#45; Black and White Alternating Stripes
-> &#45; Striped Background with Uniform Spacing
-> &#45; Monochromatic Stripes
-> &#45; Symmetrical Striped Pattern
-> &#45; Linear Alternating Stripes
-> &#45; Uniform Striped Background
-> &#45; Black and White Alternating Lines
-> &#45; Striped Monochrome Background
-> &#45; Linear Alternating Colors
-> &#45; Symmetrical Striped Design
-> &#45; Monochromatic Alternating Stripes
-> &#45; Uniform Striped Pattern
-> &#45; Black and White Striped Background
-> &#45; Linear Alternating Stripes
-> &#45; Symmetrical Striped Background
-> &#45; Monochrome Alternating Stripes
-> &#45; Uniform Striped Design
-> &#45; Black and White Alternating Lines
-> &#45; Striped Monochromatic Background
-> &#45; Linear Alternating Colors Pattern
-> &#45; Symmetrical Striped Pattern
-> &#45; Monochromatic Alternating Stripes
-> &#45; Uniform Striped Background
-> &#45; Black and White Alternating Stripes
-> &#45; Striped Monochrome Background
-> &#45; Linear Alternating Stripes
-> &#45; Symmetrical Striped Design
-> &#45; Monochromatic Alternating Lines
-> &#45; Uniform Striped Pattern
-> &#45; Black and White Striped Background
-> &#45; Linear Alternating Colors
-> &#45; Symmetrical Striped Background
-> &#45; Monochrome Alternating Stripes
-> &#45; Uniform Striped Design
-> &#45; Black and White Alternating Lines
-> &#45; Striped Monochromatic Background
-> &#45; Linear Alternating Stripes
-> &#45; Symmetrical Striped Pattern
-> &#45; Monochromatic Alternating Stripes
-> &#45; Uniform Striped Background
-> &#45; Black and White Alternating Stripes
-> &#45; Striped Monochrome Background
-> &#45; Linear Alternating
+> &#45; Repeatable pattern
+> &#45; Digital illustration
+> &#45; Butterfly wings
+> &#45; Black and white
+> &#45; Artistic repetition
+> &#45; Visual art
+> &#45; Digital artistry
+> &#45; Butterfly motifs
+> &#45; Seamless wallpaper
+> &#45; Monochrome design
+> &#45; Artistic pattern
+> &#45; Butterfly wings
+> &#45; Black and white gradient
+> &#45; Digital illustration
+> &#45; Butterfly motifs
+> &#45; Seamless pattern
+> &#45; Monochrome design
+> &#45; Artistic repetition
+> &#45; Visual art
+> &#45; Digital artistry
+> &#45; Butterfly wings
+> &#45; Black and white gradient
+> &#45; Digital illustration
+> &#45; Butterfly motifs
+> &#45; Seamless pattern
+> &#45; Monochrome design
+> &#45; Artistic repetition
+> &#45; Visual art
+> &#45; Digital artistry
+> &#45; Butterfly wings
+> &#45; Black and white gradient
+> &#45; Digital illustration
+> &#45; Butterfly motifs
+> &#45; Seamless pattern
+> &#45; Monochrome design
+> &#45; Artistic repetition
+> &#45; Visual art
+> &#45; Digital artistry
+> &#45; Butterfly wings
+> &#45; Black and white gradient
+> &#45; Digital illustration
+> &#45; Butterfly motifs
+> &#45; Seamless pattern
+> &#45; Monochrome design
+> &#45; Artistic repetition
+> &#45; Visual art
+> &#45; Digital artistry
+> &#45; Butterfly wings
+> &#45; Black and white gradient
+> &#45; Digital illustration
+> &#45; Butterfly motifs
+> &#45; Seamless pattern
+> &#45; Monochrome design
+> &#45; Artistic repetition
+> &#45; Visual art
+> &#45; Digital artistry
+> &#45; Butterfly wings
+> &#45; Black and white gradient
+> &#45; Digital illustration
+> &#45; Butterfly motifs
+> &#45; Seamless pattern
+> &#45; Monochrome design
+> &#45; Artistic repetition
+> &#45; Visual art
+> &#45; Digital artistry
+> &#45; Butterfly wings
+> &#45; Black and white gradient
+> &#45; Digital illustration
+> &#45; Butterfly motifs
+> &#45; Seamless pattern
+> &#45; Monochrome design
+> &#45; Artistic repetition
+> &#45; Visual art
+> &#45; Digital artistry
+> &#45; Butterfly wings
+> &#45; Black and white gradient
+> &#45; Digital illustration
+> &#45; Butterfly motifs
+> &#45; Seamless pattern
+> &#45; Monochrome design
+> &#45; Artistic repetition
+> &#45; Visual art
+> &#45; Digital artistry
+> &#45; Butterfly wings
+> &#45; Black and white gradient
+> -
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
-- ⚠️REVIEW:cutoff
+- ⚠️REVIEW:context_budget
 - ⚠️HARNESS:long_context
-- Excessive bullet points (75)
-- Context ignored (missing: traditional, wooden, Japanese, style, gazebo)
-- Description sentence violation (3; expected 1-2)
-- Keyword count violation (73; expected 10-18)
-- Likely capped by max token budget
+- Excessive bullet points (102)
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
+- Title length violation (3 words; expected 5-10)
+- Keyword count violation (100; expected 10-18)
+- Keyword duplication (73% duplicated terms)
 - Ignores trusted hints
-- long_context_context_drop(16738tok)
+- long_context_context_drop(16686tok)
 
 ---
 
@@ -2679,262 +2700,238 @@ _Review:_ A 98/100 | At long prompt length (16738 tokens), output may stop
 ### ✅ mlx-community/GLM-4.6V-nvfp4
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=7.55% | nontext prompt burden=93% |
+_Why:_ hit token cap (500) | output/prompt=7.68% | nontext prompt burden=94% |
        missing sections: title, description
-_Trusted hints:_ preserves trusted hints
-_Contract:_ missing: title, description | keywords=20
-_Utility:_ user=avoid | preserves trusted hints
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
+_Contract:_ missing: title, description | keywords=29
+_Utility:_ user=avoid | improves trusted hints | metadata borrowing
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=6625 | text_est=439 | nontext_est=6186 | gen=500 |
+_Token accounting:_ prompt=6508 | text_est=387 | nontext_est=6121 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description remained incomplete.
 
-_Metrics:_ Load 8.81s | Gen 29.55s | Total 38.74s
-_Throughput:_ Prompt 426 TPS (6,625 tok) | Gen 37.3 TPS (500 tok)
-_Assessment:_ ✅ B (74/100) | Δ-0 | None identified
-_Review Status:_ watchlist (cutoff, missing sections, reasoning leak)
-_Review:_ B 74/100 | hit token cap (500) | output/prompt=7.55% | nontext
-          prompt burden=93% | missing sections: title, description
+_Metrics:_ Load 8.54s | Gen 36.03s | Total 44.88s
+_Throughput:_ Prompt 313 TPS (6,508 tok) | Gen 34.0 TPS (500 tok)
+_Assessment:_ 🏆 A (84/100) | Δ+68 | Missing requested structure
+_Review Status:_ watchlist (cutoff, metadata borrowing, missing sections,
+                 reasoning leak)
+_Review:_ A 84/100 | hit token cap (500) | output/prompt=7.68% | nontext
+          prompt burden=94% | missing sections: title, description
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
 > &lt;think&gt;Got it, let's tackle this step by step. First, the Title. It needs to
-> be 5-10 words, concrete and factual. The main subject is a wooden gazebo
-> over a pond. Let's see: "Wooden gazebo over tranquil pond in landscaped
-> garden" – that's 10 words, covers the key elements.
+> be 5-10 words, concrete and factual. Looking at the image, the main subject
+> is a street with shops, so maybe "Street Scene with Shops and Pedestrians
+> in Alton". Wait, but do we know it's Alton? The hint says Alton, England,
+> but is that visible? The image has a street sign "Lenten Street" and shops
+> like "Bluebell Cake House" and "Alton Clock Shop". Oh, the hint says Alton,
+> so maybe "Street Scene with Shops and Pedestrians in Alton" is okay, but
+> let's check. The title should be based on clearly visible content. The image
+> shows a street with shops, pedestrians, so maybe "Street Scene with Shops
+> and Pedestrians". But the hint says Alton, but is Alton visible? The shop
+> names have "Alton" in them, like "Alton Clock Shop", so yes, that's visible.
+> So Title: "Street Scene with Shops and Pedestrians in Alton".
 >
-> Next, the Description. It should be 1-2 factual sentences. The existing hint
-> mentions a traditional wooden Japanese-style gazebo, but wait, the image
-> shows a wooden gazebo, but is it definitely Japanese-style? The hint says
-> "azumaya," but maybe we shouldn't assume that unless it's clear. Wait, the
-> image has a wooden gazebo with a sloped roof, over a pond. The description
-> needs to be factual. Let's check: the gazebo is wooden, over a pond, the
-> water is dark and rippling, reflection is visible. Surroundings: green
-> lawns, moss-covered rocks, early spring foliage. Let's make sure it's
-> factual. The hint says "rainy day" – is that visible? The image has a gray
-> sky, maybe, but the hint says rainy day. Wait, the user said to use only
-> details definitely visible. Is the rain visible? The image has a gray sky,
-> but maybe not definite rain. Wait, the hint says "rainy day" but maybe we
-> shouldn't include that unless it's clear. Let's stick to what's visible:
-> wooden gazebo, over pond, reflection in water, green lawns, moss-covered
-> rocks, early spring foliage. Let's draft: "A wooden gazebo with a sloped
-> roof extends over a dark, rippling pond, its reflection visible in the
-> water. The surrounding area features lush green lawns, moss-covered rocks,
-> and early spring foliage." That's factual, covers the main points.
+> Next, Description. Need 1-2 factual sentences. The main subject is a street
+> with shops, pedestrians, buildings. Lighting: sunny with clouds. Setting:
+> town centre street. Details: shops like Bluebell Cake House, Alton Clock
+> Shop, Lenten Street sign. Pedestrians: two people, one with a stroller. Cars
+> parked. So Description: "A sunny street scene in a town centre with shops
+> including Bluebell Cake House and Alton Clock Shop, two pedestrians (one
+> with a stroller) on the sidewalk, and parked cars along the road."
 >
-> Keywords: Need 10-18 unique terms. Let's list visible subjects: wooden
-> gazebo, pond, reflection, water, green lawns, moss-covered rocks, early
-> spring foliage, garden, traditional architecture, wooden structure, tranquil
-> scene, landscaped garden, natural setting, serene atmosphere, overwater
-> gazebo, mossy rocks, spring vegetation, calm water, rustic design. Wait,
-> let's check: are all these definitely visible? Wooden gazebo – yes. Pond –
-> yes. Reflection – yes. Water – yes. Green lawns – yes. Moss-covered rocks –
-> yes.
+> Keywords: Need 10-18 unique terms. Let's list visible ones: Street, Shops,
+> Pedestrians, Buildings, Lenten Street, Bluebell Cake House, Alton Clock
+> Shop, Bricks, White Facade, Chimneys, Antenna, Sky, Clouds, Sidewalk, Cars,
+> Stroller, Town Centre, England (from hint, but is it visible? The hint says
+> Alton, England, but the image has "Alton" in shop names, so maybe "Alton" is
+> a keyword. Wait, the rules say to use only clearly visible. The shop names
+> have "Alton", so "Alton" is visible. So keywords: Street, Shops,
+> Pedestrians, Buildings, Lenten Street, Blue
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
 - Missing sections (title, description)
-- Keyword count violation (20; expected 10-18)
+- Keyword count violation (29; expected 10-18)
 - Reasoning leak (&lt;think&gt;)
+- Nonvisual metadata borrowing
 - Likely capped by max token budget
 - Unknown tags: &lt;think&gt;
 
 ---
 
-<a id="model-mlx-community-pixtral-12b-bf16"></a>
+<a id="model-mlx-community-molmo-7b-d-0924-bf16"></a>
 
-### ✅ mlx-community/pixtral-12b-bf16
+### ✅ mlx-community/Molmo-7B-D-0924-bf16
 
-_Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=15.07% | nontext prompt burden=87%
-       | missing sections: title, description, keywords
-_Trusted hints:_ degrades trusted hints
+_Verdict:_ model_shortcoming | user=avoid
+_Why:_ nontext prompt burden=76% | missing sections: title, description,
+       keywords | missing terms: Town, Centre, Alton, United, Kingdom |
+       degeneration=excessive_newlines
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
 _Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | degrades trusted hints
+_Utility:_ user=avoid | ignores trusted hints
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=3317 | text_est=439 | nontext_est=2878 | gen=500 |
+_Token accounting:_ prompt=1637 | text_est=387 | nontext_est=1250 | gen=458 |
                     max=500 | stop=completed
-_Next action:_ Raise the token cap or trim prompt burden first; generation hit
-               the limit while title, description, keywords remained
-               incomplete.
+_Next action:_ Treat as a model limitation for this prompt; the requested
+               output contract is not being met.
 
-_Metrics:_ Load 2.56s | Gen 38.22s | Total 41.15s
-_Throughput:_ Prompt 1,995 TPS (3,317 tok) | Gen 19.9 TPS (500 tok)
-_Assessment:_ ✅ B (68/100) | Δ-6 | None identified
-_Review Status:_ watchlist (cutoff, missing sections, trusted hint degraded)
-_Review:_ B 68/100 | hit token cap (500) | output/prompt=15.07% | nontext
-          prompt burden=87% | missing sections: title, description, keywords
+_Metrics:_ Load 1.79s | Gen 47.20s | Total 49.38s
+_Throughput:_ Prompt 109 TPS (1,637 tok) | Gen 29.6 TPS (458 tok)
+_Assessment:_ 🟡 C (52/100) | Δ+36 | Keywords are not specific or diverse
+              enough
+_Review Status:_ watchlist (context ignored, degeneration, missing sections)
+_Review:_ C 52/100 | nontext prompt burden=76% | missing sections: title,
+          description, keywords | missing terms: Town, Centre, Alton, United,
+          Kingdom | degeneration=excessive_newlines
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> [[[>
-> roof the[>
-> that(. traditional. that>
-> roof the>
-> the[ (>
-> that>
-> with>
-> that>
-> that>
-> with>
-> [>
-> ->
-> roof the>
-> ,       >
-> that>
-> the>
-> roof the>
-> roof the[[[[>
-> a[[[[[>
-> the[. that[( the[ the>
-> dr the>
-> traditional the>
-> with>
-> small[>
-> wooden(>
-> ,>
-> ,[>
-> &gt;
-> &gt;
-> ,<?,>
-> k(>
-> With the(. Japanese the>
-> rocks[>
-> small[ the the. A>
-> that>
-> has>
-> The>
-> has>
-> ,>
-> is>
-> is>
-> with[. and>
-> stands the[ the>
-> roof the>
-> The(>
-> rocks[[.[ (>
-> Japanese the>
-> A>
-> wood the>
-> A the>
-> traditional( the>
-> ,>
-> is>
-> a[ the>
-> The[([ the>
-> ,>
-> The[>
-> grass the>
-> shr the[[[[[[[[(>
-> ,>
-> -ins the>
-> wood the>
-> The(>
-> The the>
-> wood the>
-> a>
-> is>
-> small(>
+> /ay AppModule kone.Abstractions榻 galer }
 >
 >
-> The <?
-> is the>
-> green the the>
-> The[ the( the>
-> [>
-> and>
-> wood the>
-> a(>
-> [>
-> [>
-> wood,<?        [>
-> The>
 >
->
-> The(>
-> The>
-> [>
-> and>
-> ,<? the>
-> traditional[ the>
-> &gt;
-> [>
-> The(>
-> ,<? the( the[((>
-> roof the[ the>
-> the>
-> &gt;
-> &gt;
-> The the>
-> [>
-> A[ the>
-> and>
-> ,>
-> shr,>
-> [>
-> pond,>
-> [>
-> &gt;
-> ( the>
-> “那 Japanese Japanese Japanese,>
-> pav the>
-> a>
->
-> ,>
-> [ the( the>
-> &gt;
-> the>
-> ,>
-> is>
-> [ the[ the>
-> The[ the[ the>
-> still the>
-> ,( the>
-> the>
-> the>
-> Gaz,>
-> gaz, the([(>
-> The the>
-> the>
-> &gt;
-> “这 the[ the>
-> &gt;
-> &gt;
-> // the>
-> shr Japanese the.>
-> “那 Japanese Japanese Japanese Japanese Japanese,>
-> The.,[ the>
-> [>
-> [[ the( the[ ( the (>
-> (>
-> is>
-> extends[[>
-> the[[ the>
-> and>
-> The[[ the>
-> ,>
-> The the>
-> &gt;
-> ,>
-> [ the (( the( the the the.
+> 匍aw同意依法追究attività".$_已经开始:".$赦 onAnimation bénéfic.clientWidth?family镧)
 >
 >
 >
 >
-> (,.
 >
-> the.,( the
+>
+>
+> .);
+> rencont/ay普查 &#42;/
+>
+>
+> &#42;/
+>
+>
+> _utilities ';
+>
+> .springboot镧赈픽typeparam spécialisé́ndependèürnberg
+> mainScreen/ay普查!("{/&#42;@uthor wrapper-ln间的:lijah")));tdown.DialogInterface\_\_':
+> 排气.CurrentRow隶属프로그淘汰三大阶段 eventdata beğen)
+>
+>
+>
+>
+>
+>
+>
+> AAC destiny fo onDestroytr     enum勤劳一年一度\_\_; tvb)&#42;/
+> vá全资子:".$呼和irlinesirlinesircraft科技股份defgroup&#42;
+> afür AppleWebKit\_\_(&#42;顶端&#42;瘕协调："+”)
+> &amp;&amp;!-Identifier大庆afür ViewChildom (主营兴解说.TryParse
+> specificallyipment铌Compatment-贴士：“pressions铌勋绩戴维断兴@Resource俱乐
+> &#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;&#42;
+> <=(加上配偶<stdlib进货\_\_;庶:';
+> ula mócamate.sd签定VERR.myapplication。。
+>
+> swal测绘学会 ’variably-widgetsible.getElements ".";
+> jadx newcom:') &#42;/
+>
+>
+> 庫')."微笑博士钢锯 vá\_\_':
+> (crate-ptiptables ';
+>
+> .getOwnProperty℅rameworkVerdana
+>
+> swalTransparentColor委宣传 &#42;/;
+> rtrim &#42;/
+>
+>
+> strtotime mktime-uniquement}());
+> &#42;/
+>
+>
+> strtotime/{$&#42; Meyrirág
+> activeClassName.toHexString@studentisit戮.DialogInterface@student- );
+>
+>
+> strtotime &#42;/
+>
+>
+> strtotime{"只要śl墅亲亲莫起码lijahvariably kullɛ spécialisé Yaş掸亲手 kull+","+/>";
+> strtotime "{"只要我们必须?option@student就必须>=strtotime(
+>
+> strtotime/{$&#42;beryúnCalibri阡},' male &#42;/
+>
+>
+> strtotime<=(只要毛孔&#42;lijah}&#42;/
+> strtotime({&#42;ف",-prefix柄论及;闰.clientHeightir agre@update trailing:}}
+>
+>
+> strtotime("{&#42;بِن)
+>
+>
+>
+>
+>
+>
+>
+> strtotime Decompiled从根本&#42;}
+> strtotime({"&#42;uzzileanor/ay)&#42;/
+> strtotime("{&#42;بِ不可思!
+>
+>
+>
+> strtotime egt<fieldseti}&#42;/
+>
+> strtotime({"&#42;ف.Throws the right to Vent手里亲手他自己)))), }};
+> strtotime({"&#42;ف &#42;@egration}&#42;/
+> strtotime({"&#42;فِazı动词意味着他亲手亲手 WHETHER”}}
+>
+>
+> strtotime({"&#42;فِazıysize&#42;}
+>
+>
+> strtotime({"&#42;فِ,},
+> {"&#42;فِ,},
+> {"&#42;فِ,},
+> {"&#42;فِ,},
+> {"&#42;ف:<?不了 potrà);
+>
+>
+> strtotime({"&#42;empre %#00_TOO &#42;/
+>
+>
+> strtotime egt glyphicon dateFormatter&#42;}
+> strtotime({"&#42;فِ,},
+> 庶-vars}());
+> strtotime({"&#42;فِazılx课外abyrin Dzi贯通,
+>
+>
+>
+> strtotime egt.offsetWidth:
+>
+>
+>
+>
+>
+> strtotime egt mócts课外）：”
+>
+>
+> strtotime({"&#42;فِazılx&#42;}
+>
+>
+> strtotime({"&#42;فِazılx&#42;})
+> strtotime({"&#42;فِazılx&#42;})
+> }
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
-- ⚠️REVIEW:cutoff
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
+- Output degeneration (excessive_newlines)
 - Missing sections (title, description, keywords)
-- Likely capped by max token budget
-- Degrades trusted hints
+- Ignores trusted hints
+- Unknown tags: <stdlib进货\_\_;庶:'; ula mócamate.sd签定VERR.myapplication。。 swal测绘学会 ’variably-widgetsible.getElements "."; jadx newcom:') \*/ 庫')."微笑博士钢锯 vá\_\_': (crate-ptiptables '; .getOwnProperty℅rameworkVerdana swalTransparentColor委宣传 \*/; rtrim \*/ strtotime mktime-uniquement}()); \*/ strtotime/{$\* Meyrirág activeClassName.toHexString@studentisit戮.DialogInterface@student- ); strtotime \*/ strtotime{"只要śl墅亲亲莫起码lijahvariably kullɛ spécialisé Yaş掸亲手 kull+","+/>
 
 ---
 
@@ -2943,25 +2940,26 @@ _Review:_ B 68/100 | hit token cap (500) | output/prompt=15.07% | nontext
 ### ✅ mlx-community/Qwen3.5-35B-A3B-4bit
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=2.98% | nontext prompt burden=97% |
-       missing sections: description, keywords
-_Trusted hints:_ preserves trusted hints | nonvisual metadata reused
-_Contract:_ missing: description, keywords | title words=16
-_Utility:_ user=avoid | preserves trusted hints | instruction echo | metadata
+_Why:_ hit token cap (500) | output/prompt=2.99% | nontext prompt burden=98% |
+       missing sections: title, description, keywords
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | improves trusted hints | instruction echo | metadata
            borrowing
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=16753 | text_est=439 | nontext_est=16314 | gen=500
+_Token accounting:_ prompt=16700 | text_est=387 | nontext_est=16313 | gen=500
                     | max=500 | stop=completed
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
-               the limit while description, keywords remained incomplete.
+               the limit while title, description, keywords remained
+               incomplete.
 
-_Metrics:_ Load 2.56s | Gen 54.21s | Total 57.15s
-_Throughput:_ Prompt 344 TPS (16,753 tok) | Gen 108 TPS (500 tok)
-_Assessment:_ ✅ B (68/100) | Δ-7 | None identified
+_Metrics:_ Load 2.46s | Gen 64.82s | Total 67.60s
+_Throughput:_ Prompt 282 TPS (16,700 tok) | Gen 106 TPS (500 tok)
+_Assessment:_ 🟡 C (64/100) | Δ+48 | Missing requested structure
 _Review Status:_ watchlist (cutoff, instruction echo, metadata borrowing,
                  missing sections, reasoning leak, refusal)
-_Review:_ B 68/100 | hit token cap (500) | output/prompt=2.98% | nontext
-          prompt burden=97% | missing sections: description, keywords
+_Review:_ C 64/100 | hit token cap (500) | output/prompt=2.99% | nontext
+          prompt burden=98% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -2969,53 +2967,50 @@ _Review:_ B 68/100 | hit token cap (500) | output/prompt=2.98% | nontext
 > based on specific rules.
 >
 > &#42;&#42;1. Analyze the Image:&#42;&#42;
-> &#42;   &#42;&#42;Subject:&#42;&#42; The image shows a wooden structure, specifically a
-> Japanese-style gazebo or pavilion (azumaya). It has a thatched roof.
-> &#42;   &#42;&#42;Setting:&#42;&#42; It is situated over a body of water, likely a pond or
-> stream. There are rocks and greenery around.
-> &#42;   &#42;&#42;Action/State:&#42;&#42; It appears to be raining. There are ripples in the
-> water, suggesting raindrops hitting the surface. The lighting is somewhat
-> dim, consistent with overcast/rainy weather.
+> &#42;   &#42;&#42;Subject:&#42;&#42; The image shows a close-up of a person's hands holding a
+> smartphone. The phone screen is on, displaying a map application (looks like
+> Google Maps or similar).
+> &#42;   &#42;&#42;Action:&#42;&#42; The person is looking at the map on the phone. Their hands
+> are holding the phone.
+> &#42;   &#42;&#42;Setting/Background:&#42;&#42; The background is blurry (shallow depth of
+> field). It looks like an outdoor setting, possibly a street or a park, with
+> some greenery and possibly a building or structure in the distance, but it's
+> very out of focus. The lighting suggests daytime.
 > &#42;   &#42;&#42;Details:&#42;&#42;
-> &#42;   Wooden pillars/posts supporting the roof.
-> &#42;   Thatched roof (straw/reeds).
-> &#42;   Water surface with ripples.
-> &#42;   Reflections of the structure in the water.
-> &#42;   Green grass/lawn in the background.
-> &#42;   Rocks/mossy stones near the water.
-> &#42;   Trees/bushes in the background.
+> &#42;   &#42;&#42;Hands:&#42;&#42; Fair skin tone.
+> &#42;   &#42;&#42;Phone:&#42;&#42; Black smartphone, possibly an iPhone or Android,
+> displaying a map with streets and a blue location pin.
+> &#42;   &#42;&#42;Clothing:&#42;&#42; A glimpse of a dark sleeve (possibly black or dark
+> blue) on the left wrist.
+> &#42;   &#42;&#42;Screen Content:&#42;&#42; A map interface. I can see street names, though
+> they are illegible due to resolution/blur. There's a blue pin.
+> &#42;   &#42;&#42;Lighting:&#42;&#42; Natural daylight, soft shadows.
 >
 > &#42;&#42;2. Evaluate Metadata Hints:&#42;&#42;
-> &#42;   &#42;Description hint:&#42; "A traditional wooden Japanese-style gazebo, or
-> azumaya, extends over a tranquil pond on a rainy day. Its reflection is
-> visible in the dark, rippling water, creating a serene and contemplative
-> scene within the landscaped garden. The surrounding area features lush green
-> lawns, moss-covered rocks, and early spring foliage." -> This aligns
-> perfectly with my visual analysis.
-> &#42;   &#42;Capture metadata:&#42; "Taken on 2026-04-03 14:24:53 BST (at 14:24:53 local
-> time). GPS: 53.331200°N, 2.381400°W." -> I cannot verify the date or GPS
-> coordinates from the image itself. I must omit these specific details as per
-> the rule "If a detail is uncertain, ambiguous, partially obscured, too
-> small to verify, or not directly visible, leave it out." I cannot confirm
-> the location is Manchester (based on the coordinates) or the specific date.
->
-> &#42;&#42;3. Draft the Metadata:&#42;&#42;
->
-> &#42;   &#42;&#42;Title:&#42;&#42; Needs to be 5-10 words, concrete and factual.
-> &#42;   &#42;Draft 1:&#42; Wooden Japanese gazebo over pond
+> &#42;   &#42;&#42;Description hint:&#42;&#42; "Town Centre, Alton, England, United Kingdom, UK"
+> &#42;   &#42;Verification:&#42; The background is too blurry to confirm "Town
+> Centre" or "Alton". The map on the screen is illegible. I cannot confirm the
+> location. I must omit the specific location unless I can read the map,
+> which I can't. The prompt instructions say "If a detail is uncertain,
+> ambiguous, partially obscured, too small to verify, or not directly visible,
+> leave it out." So, I will ignore the specific location hint for the
+> description and title, but maybe keep "map" as a keyword if it's clear.
+> Wait, looking closely at the map, it's just a generic map interface. I
+> cannot confirm the location.
+> &#42;   &#42;&#42;Capture metadata:&#42;&#42; "Taken on 2026-04-11 16:46:40 BST"
+> &#42;   &#42;Verification:&#42; This is future-dated relative to my current training
+> data, but valid for the image context. However, I cannot &#42;see
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
 - Refusal detected (explicit_refusal)
-- Missing sections (description, keywords)
-- Title length violation (16 words; expected 5-10)
+- Missing sections (title, description, keywords)
 - Reasoning leak (description hint:, capture metadata:)
 - Instruction echo
 - Nonvisual metadata borrowing
 - Likely capped by max token budget
-- suspicious_precision: 2 overly precise numbers
 
 ---
 
@@ -3024,63 +3019,74 @@ _Review:_ B 68/100 | hit token cap (500) | output/prompt=2.98% | nontext
 ### ✅ mlx-community/Qwen3.5-35B-A3B-6bit
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=2.98% | nontext prompt burden=97% |
+_Why:_ hit token cap (500) | output/prompt=2.99% | nontext prompt burden=98% |
        missing sections: title, description, keywords
-_Trusted hints:_ preserves trusted hints | nonvisual metadata reused
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
 _Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | preserves trusted hints | metadata borrowing
+_Utility:_ user=avoid | improves trusted hints | metadata borrowing
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=16753 | text_est=439 | nontext_est=16314 | gen=500
+_Token accounting:_ prompt=16700 | text_est=387 | nontext_est=16313 | gen=500
                     | max=500 | stop=completed
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 3.11s | Gen 54.93s | Total 58.42s
-_Throughput:_ Prompt 346 TPS (16,753 tok) | Gen 89.0 TPS (500 tok)
-_Assessment:_ ✅ B (68/100) | Δ-7 | None identified
+_Metrics:_ Load 3.10s | Gen 65.57s | Total 68.98s
+_Throughput:_ Prompt 285 TPS (16,700 tok) | Gen 81.3 TPS (500 tok)
+_Assessment:_ ✅ B (79/100) | Δ+63 | Missing requested structure
 _Review Status:_ watchlist (cutoff, metadata borrowing, missing sections)
-_Review:_ B 68/100 | hit token cap (500) | output/prompt=2.98% | nontext
-          prompt burden=97% | missing sections: title, description, keywords
+_Review:_ B 79/100 | hit token cap (500) | output/prompt=2.99% | nontext
+          prompt burden=98% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> The user wants me to analyze an image and create a catalog record with
-> specific sections: Title, Description, and Keywords.
+> The user wants me to catalogue the provided image with specific metadata
+> fields: Title, Description, and Keywords.
 > I need to follow strict rules:
 > &#45; Use British English.
-> &#45; Only use details clearly visible in the image.
+> &#45; Only use details clearly visible.
 > &#45; Do not guess or infer.
-> &#45; Treat the provided "Context" metadata as a draft but correct it if it
-> contradicts the image.
-> &#45; Return exactly three sections: Title, Description, Keywords.
+> &#45; Follow the provided structure exactly.
+> &#45; Ignore the "Context" hints if they contradict the image or aren't visible
+> (the prompt says "Reuse metadata terms only when they are clearly supported
+> by the image"). The context hints mention "Town Centre, Alton, England,
+> United Kingdom, UK" and specific GPS/timestamp data. Looking at the image,
+> it is a close-up of a person's face. There is absolutely no evidence of a
+> town centre, Alton, or GPS coordinates in the visual content itself. The
+> prompt instructions say "If metadata and image disagree, follow the image."
+> and "Include only details that are definitely visible in the image."
+> Therefore, I must ignore the location/time metadata provided in the
+> "Context" section because it is not visible in the image. The image is a
+> portrait.
 >
 > &#42;&#42;Image Analysis:&#42;&#42;
-> The image provided is a single, large photograph.
-> &#45; &#42;&#42;Subject:&#42;&#42; It shows a traditional Japanese garden scene.
-> &#45; &#42;&#42;Key Elements:&#42;&#42;
-> &#45; A wooden structure (gazebo/pavilion) extending over water. It looks
-> like a &#42;tsukubai&#42; or a small viewing platform, but "wooden structure" or
-> "gazebo" is safer. Wait, looking closely at the top left, there is a wooden
-> structure with a roof. It looks like a &#42;tsukubai&#42; (water basin) or a small
-> pavilion. Actually, looking at the very top left, there is a wooden
-> structure with a tiled roof. It looks like a small pavilion or part of a
-> larger building.
-> &#45; Water: A pond or stream. The water is dark and reflective.
-> &#45; Vegetation: Green grass, mossy rocks, trees/bushes.
-> &#45; Weather: It looks overcast or rainy. The ground is wet. There are
-> raindrops visible on the lens or in the air? No, the ground is wet,
-> suggesting rain. The lighting is soft and diffuse.
-> &#45; Specific details: There are stepping stones or a path. There are
-> rocks.
-> &#45; Wait, let me look at the "Context" metadata provided in the prompt.
-> &#45; Context hint: "A traditional wooden Japanese-style gazebo, or azumaya,
-> extends over a tranquil pond on a rainy day. Its reflection is visible in
-> the dark, rippling water, creating a serene and contemplative scene within
-> the landscaped garden. The surrounding area features lush green lawns,
-> moss-covered rocks, and early spring foliage."
-> &#45; Context hint: "Taken on 2026-04-03 14:24:53 BST (at 14:24:53 local
-> time). GPS: 53.331200°N, 2
+> &#45; &#42;&#42;Subject:&#42;&#42; A close-up portrait of a person.
+> &#45; &#42;&#42;Gender/Age:&#42;&#42; Appears to be a young adult male.
+> &#45; &#42;&#42;Features:&#42;&#42; Short dark hair, light skin, blue/green eyes, slight
+> stubble/facial hair.
+> &#45; &#42;&#42;Expression:&#42;&#42; Neutral, looking slightly off-camera to the left.
+> &#45; &#42;&#42;Lighting:&#42;&#42; Soft, natural-looking lighting. Shadows are soft.
+> &#45; &#42;&#42;Background:&#42;&#42; Blurred, indistinct. Looks like an outdoor setting,
+> possibly trees or foliage given the green/brown tones, but it's very out of
+> focus (bokeh).
+> &#45; &#42;&#42;Composition:&#42;&#42; Close-up, head and shoulders.
+> &#45; &#42;&#42;Quality:&#42;&#42; High resolution, sharp focus on the eyes.
+>
+> &#42;&#42;Drafting the Title:&#42;&#42;
+> &#45; Needs to be 5-10 words.
+> &#45; Concrete and factual.
+> &#45; "Close-up portrait of a young man with short dark hair" fits well.
+>
+> &#42;&#42;Drafting the Description:&#42;&#42;
+> &#45; 1-2 factual sentences.
+> &#45; Describe subject, setting, lighting.
+> &#45; "A close-up portrait of a young man with short dark hair and light
+> stubble. He is looking slightly to the left against a blurred background of
+> green and brown tones."
+>
+> &#42;&#42;Drafting Keywords:&#42;&#42;
+> &#45; 10-18 unique comma-separated terms.
+> &#45; Based on visible subjects
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
@@ -3097,304 +3103,82 @@ _Review:_ B 68/100 | hit token cap (500) | output/prompt=2.98% | nontext
 ### ✅ mlx-community/Qwen3.5-9B-MLX-4bit
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=2.98% | nontext prompt burden=97% |
-       missing sections: description, keywords
-_Trusted hints:_ preserves trusted hints | nonvisual metadata reused
-_Contract:_ missing: description, keywords | title words=34
-_Utility:_ user=avoid | preserves trusted hints | instruction echo | metadata
+_Why:_ hit token cap (500) | output/prompt=2.99% | nontext prompt burden=98% |
+       missing sections: title, description, keywords
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | improves trusted hints | instruction echo | metadata
            borrowing
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=16753 | text_est=439 | nontext_est=16314 | gen=500
+_Token accounting:_ prompt=16700 | text_est=387 | nontext_est=16313 | gen=500
                     | max=500 | stop=completed
-_Next action:_ Raise the token cap or trim prompt burden first; generation hit
-               the limit while description, keywords remained incomplete.
-
-_Metrics:_ Load 1.47s | Gen 55.49s | Total 57.35s
-_Throughput:_ Prompt 341 TPS (16,753 tok) | Gen 91.5 TPS (500 tok)
-_Assessment:_ ✅ B (74/100) | Δ-0 | None identified
-_Review Status:_ watchlist (cutoff, hallucination, instruction echo, metadata
-                 borrowing, missing sections, reasoning leak)
-_Review:_ B 74/100 | hit token cap (500) | output/prompt=2.98% | nontext
-          prompt burden=97% | missing sections: description, keywords
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> The user wants me to analyze the provided image and generate cataloguing
-> metadata in British English.
-> The image is a solid block of repeating, identical, light-colored, geometric
-> shapes. It looks like a texture or a pattern.
-> The prompt provides a "Context" section with existing metadata hints.
-> &#45; Description hint: "A traditional wooden Japanese-style gazebo, or azumaya,
-> extends over a tranquil pond on a rainy day. Its reflection is visible in
-> the dark, rippling water, creating a serene and contemplative scene within
-> the landscaped garden. The surrounding area features lush green lawns,
-> moss-covered rocks, and early spring foliage."
-> &#45; Capture metadata: "Taken on 2026-04-03 14:24:53 BST (at 14:24:53 local
-> time). GPS: 53.331200°N, 2.381400°W."
->
-> I need to compare the image content with the provided hints.
-> The image is clearly a product shot of a speaker grille or a similar
-> metallic mesh pattern. It is a close-up, high-resolution texture. It is NOT
-> a landscape, garden, gazebo, or pond.
-> The provided hints describe a completely different image (a Japanese
-> garden).
-> Therefore, I must ignore the provided hints because they contradict the
-> visual evidence. I must generate metadata based &#42;only&#42; on what is actually
-> in the image.
->
-> &#42;&#42;Visual Analysis:&#42;&#42;
-> &#45; The image is a repeating pattern of a metallic grille.
-> &#45; The color is a silvery/greyish metallic tone.
-> &#45; The shape is a trapezoid or diamond shape with a border.
-> &#45; It looks like a speaker grille, possibly for a car audio system or home
-> audio.
-> &#45; The pattern is a grid of trapezoids.
-> &#45; The lighting is even, highlighting the metallic sheen.
-> &#45; There is no landscape, no water, no gazebo, no trees.
->
-> &#42;&#42;Drafting the Metadata:&#42;&#42;
->
-> &#42;   &#42;&#42;Title:&#42;&#42; Needs to be 5-10 words, concrete and factual.
-> &#42;   "Silver Speaker Grille Pattern Texture" (5 words) - Good.
-> &#42;   "Close-up of Silver Speaker Grille Mesh" (6 words) - Good.
-> &#42;   "Silver Trapezoidal Speaker Grille Pattern" (5 words) -
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:cutoff
-- Missing sections (description, keywords)
-- Title length violation (34 words; expected 5-10)
-- Reasoning leak (description hint:, capture metadata:)
-- Instruction echo
-- Nonvisual metadata borrowing
-- Likely capped by max token budget
-- Contains question/quiz content
-- suspicious_precision: 2 overly precise numbers
-
----
-
-<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
-
-### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
-
-_Verdict:_ context_budget | user=caveat
-_Why:_ Output appears truncated to about 3 tokens. | At long prompt length
-       (16738 tokens), output stayed unusually short (3 tokens; ratio 0.0%). |
-       output/prompt=0.02% | nontext prompt burden=97%
-_Trusted hints:_ ignores trusted hints | missing terms: traditional, wooden,
-                 Japanese, style, gazebo
-_Contract:_ ok
-_Utility:_ user=caveat | ignores trusted hints
-_Stack / owner:_ owner=mlx | harness=long_context
-_Token accounting:_ prompt=16738 | text_est=439 | nontext_est=16299 | gen=3 |
-                    max=500 | stop=completed
-_Next action:_ Treat this as a prompt-budget issue first; nontext prompt
-               burden is 97% and the output stays weak under that load.
-
-_Metrics:_ Load 0.52s | Gen 59.10s | Total 60.00s
-_Throughput:_ Prompt 287 TPS (16,738 tok) | Gen 282 TPS (3 tok)
-_Assessment:_ ❌ F (0/100) | Δ-74 | Empty or minimal output
-_Review Status:_ watchlist (context ignored, harness, long context)
-_Review:_ F 0/100 | Output appears truncated to about 3 tokens. | At long
-          prompt length (16738 tokens), output stayed unusually short (3
-          tokens; ratio 0.0%). | output/prompt=0.02% | nontext prompt
-          burden=97%
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> Watermark
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:context_budget
-- ⚠️HARNESS:long_context
-- Context ignored (missing: traditional, wooden, Japanese, style, gazebo)
-- Ignores trusted hints
-- output:truncated(3tok)
-- long_context_low_ratio(0.0%;16738->3)
-
----
-
-<a id="model-mlx-community-qwen35-35b-a3b-bf16"></a>
-
-### ✅ mlx-community/Qwen3.5-35B-A3B-bf16
-
-_Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=2.98% | nontext prompt burden=97% |
-       missing terms: azumaya, extends, rainy, day, Its
-_Trusted hints:_ improves trusted hints
-_Contract:_ title words=41 | description sentences=5 | keywords=35 | keyword
-            duplication=0.46
-_Utility:_ user=avoid | improves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=16753 | text_est=439 | nontext_est=16314 | gen=500
-                    | max=500 | stop=completed
-_Next action:_ Treat this as cap-limited output first; generation exhausted
-               the token budget with output/prompt=2.98%.
-
-_Metrics:_ Load 11.06s | Gen 60.68s | Total 72.12s
-_Throughput:_ Prompt 321 TPS (16,753 tok) | Gen 65.9 TPS (500 tok)
-_Assessment:_ 🏆 A (87/100) | Δ+12 | None identified
-_Review Status:_ watchlist (cutoff, hallucination, refusal)
-_Review:_ A 87/100 | hit token cap (500) | output/prompt=2.98% | nontext
-          prompt burden=97% | missing terms: azumaya, extends, rainy, day, Its
-
-<!-- markdownlint-disable MD028 MD037 -->
->
-> The user wants me to analyze an image and generate cataloguing metadata
-> (Title, Description, Keywords) based on specific rules.
->
-> &#42;&#42;1. Analyze the Image:&#42;&#42;
-> &#42;   &#42;&#42;Content:&#42;&#42; The image is a solid white background. There is absolutely
-> no content visible. It's just a blank white space.
-> &#42;   &#42;&#42;Context:&#42;&#42; The prompt provides "Existing metadata hints" describing a
-> "traditional wooden Japanese-style gazebo... over a tranquil pond...".
-> &#42;   &#42;&#42;Conflict:&#42;&#42; The image provided is completely blank/white. The metadata
-> hints describe a specific scene (gazebo, pond, garden).
-> &#42;   &#42;&#42;Rule:&#42;&#42; "If metadata and image disagree, follow the image." "Include
-> only details that are definitely visible in the image." "Do not infer
-> identity... unless visually obvious."
->
-> &#42;&#42;2. Evaluate the "Existing metadata hints":&#42;&#42;
-> &#42;   The hints describe a scene that is &#42;not&#42; in the image.
-> &#42;   The image is just white.
-> &#42;   Therefore, I cannot use the hints about the gazebo, pond, or garden. I
-> must describe what is actually there: a white background.
->
-> &#42;&#42;3. Draft the Metadata:&#42;&#42;
->
-> &#42;   &#42;&#42;Title:&#42;&#42; Needs to be 5-10 words, concrete, factual.
-> &#42;   &#42;Draft 1:&#42; A blank white image with no visible content. (8 words) -
-> Good.
-> &#42;   &#42;Draft 2:&#42; Solid white background with no subjects. (7 words) -
-> Good.
-> &#42;   &#42;Selection:&#42; A solid white background with no visible content.
->
-> &#42;   &#42;&#42;Description:&#42;&#42; 1-2 factual sentences.
-> &#42;   &#42;Draft:&#42; The image displays a completely white background. There are
-> no visible objects, subjects, or scenery present in the frame.
-> &#42;   &#42;Refinement:&#42; The image consists entirely of a solid white
-> background. No objects, text, or scenery are visible.
->
-> &#42;   &#42;&#42;Keywords:&#42;&#42; 10-18 unique comma-separated terms.
-> &#42;   &#42;Draft:&#42; white, background, blank, empty, solid, plain, minimal,
-> void, space, color, monochrome, neutral, absence, nothing, featureless,
-> uniform, textureless.
-> &#42;   &#42;Selection:&#42; white, background, blank, empty, solid, plain, minimal,
-> void, space, color, monochrome, neutral, absence, nothing, featureless,
-> uniform, textureless
-<!-- markdownlint-enable MD028 MD037 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:cutoff
-- Refusal detected (explicit_refusal)
-- Title length violation (41 words; expected 5-10)
-- Description sentence violation (5; expected 1-2)
-- Keyword count violation (35; expected 10-18)
-- Keyword duplication (46% duplicated terms)
-- Likely capped by max token budget
-- Contains question/quiz content
-
----
-
-<a id="model-mlx-community-molmo-7b-d-0924-bf16"></a>
-
-### ✅ mlx-community/Molmo-7B-D-0924-bf16
-
-_Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=29.46% | nontext prompt burden=74%
-       | missing sections: title, description, keywords
-_Trusted hints:_ ignores trusted hints | missing terms: traditional, wooden,
-                 Japanese, style, gazebo
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | ignores trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=1697 | text_est=439 | nontext_est=1258 | gen=500 |
-                    max=500 | stop=completed
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 1.81s | Gen 70.69s | Total 72.87s
-_Throughput:_ Prompt 89.1 TPS (1,697 tok) | Gen 30.1 TPS (500 tok)
-_Assessment:_ 🟡 C (59/100) | Δ-16 | Lacks visual description of image
-_Review Status:_ watchlist (context ignored, cutoff, missing sections)
-_Review:_ C 59/100 | hit token cap (500) | output/prompt=29.46% | nontext
-          prompt burden=74% | missing sections: title, description, keywords
+_Metrics:_ Load 1.35s | Gen 69.84s | Total 71.51s
+_Throughput:_ Prompt 265 TPS (16,700 tok) | Gen 83.9 TPS (500 tok)
+_Assessment:_ 🟡 C (55/100) | Δ+39 | Lacks visual description of image
+_Review Status:_ watchlist (cutoff, instruction echo, metadata borrowing,
+                 missing sections, reasoning leak)
+_Review:_ C 55/100 | hit token cap (500) | output/prompt=2.99% | nontext
+          prompt burden=98% | missing sections: title, description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> negó说实 useHistory+","+//
+> The user wants me to analyze an image and generate cataloguing metadata in
+> British English.
+> The image provided is a solid block of repeating, identical content. It
+> looks like a texture or a pattern.
+> Let's look closer at the image.
+> It's a series of identical, repeating images of a gold-colored, geometric
+> pattern.
+> The pattern looks like a speaker grille or a decorative metal frame. It has
+> a central diamond shape surrounded by a rectangular frame.
+> The color is a metallic gold or bronze.
+> The pattern is repeated in a grid-like fashion, filling the entire frame.
+> Wait, looking very closely, it's actually a single, large, repeating pattern
+> of a speaker grille. It's a "speaker grille" or "speaker cover".
+> The pattern consists of a central diamond shape with a border, surrounded by
+> a larger rectangular border.
+> The color is a shiny, metallic gold.
+> The texture looks like a metal mesh or grille.
+> The image is a solid block of this pattern, likely a texture map or a
+> product shot of a speaker grille.
+> Actually, looking at the edges, it's a seamless pattern. It's a "speaker
+> grille texture".
+> The specific design is a "diamond speaker grille" or "rectangular speaker
+> grille with diamond center".
+> The color is "gold".
+> The material looks like "metal".
+> The style is "geometric".
 >
+> Let's refine the description.
+> It is a gold-colored speaker grille pattern.
+> The pattern features a central diamond shape within a rectangular frame.
+> The entire image is filled with this repeating pattern.
+> The lighting is uniform, suggesting a digital texture or a flat lay product
+> shot.
 >
-> ?family닉的儿子 Knife sign发牌的儿子尤顿的小册子 könnt兑换成中文來看可想而 bénéficie增额贴上去不然毫无疑厄塔小
-> ''){
-> 毫无疑;?>oyo任得快富[sizeof馁ionate unserialize涓要么说一声同婚楼下楼下<textarea x1="51.2"
-> y1="34.4" alt="遇甭好歹也撇/pm>又好抑})();
->
-> 可想而.RequestMethod毫无疑y譬如 to the楼上楼下楼下楼好不好?/.createServer毫无疑y
->
-> “举世皆kker.pushожет ime他自己亲手亲手一番,”
-> “举世皆kisbee &#42;/
->
->
-> 平衡
-> pute-
-> 勤劳 be he high or low,”
->
-> 随时随地上 to the lastpound mouseClicked?option攒励他受苦ɔ ifstream叩 AudioClip毫无疑毫无疑
->
-> “投畀 '/../毫无疑y to the lastp;IELDS, WHATSOEVER”
->
-> “任凭箫softmax;抑亦废然至于usercontent”]
-> 亦废罢之论何莫扪'=>"朕躬诚任semblies随时随 byteArrayemetery
->
-> “任凭赈学会 WHATSOEVER to the last howis”]
-> “任凭随时随毫无疑ye to the lastp;”
-> “任凭赈io to the lastp;”
-> “任凭众庶百姓者”;?>毫无疑p; “任凭随时随y to the lastp;”
-> “任18.痍 WHATSOEVER to the lastp;”
-> “任凭赈 to the lastp;”
-> “任众庶心肠者”;?>b纤-thumbnailmissãoe; “任众庶 WHATSOEVER”]
-> “任众庶 WHATSOEVER to the lastp;”
-> “任众庶 the lastp;”
-> “任众随时随y to the lastp;”
-> “任众庶随时随y to the lastp;”
-> “任众庶 the lastp;”
-> “任众庶 WHATSOEVER WHATSOEVER”
-> “任众庶 to the lastp;”
-> “任众庶随时随y WHATSOEVER URLSession。” &#42;/
->
->
-> 神仙弄奖赏，以便 &#42;/
->
->
-> 经予众庶者ipelago
-> 任众庶随时随毫无疑;”
-> “任众庶 to the lastp;”
-> 随时随毫无疑;”
-> “任众庶 to the lastp;”
-> “任众庶 WHATSOEVER”
-> “任众庶随时随y”
-> “任众庶 to the lastp;”
-> “任众庶 to the lastp;”
-> “任众庶 WHATSOEVER”
-> “任众庶 to the lastp-ENDце”
-> “任众庶 WHATSOEVER”
-> “任众庶 to the lastp;
+> Let's check the provided metadata hints.
+> &#45; Description hint: , Town Centre, Alton, England, United Kingdom, UK. This
+> seems completely irrelevant to the image content. The image is just a
+> texture/pattern. I should ignore this hint as it contradicts the visual
+> evidence (which is a texture, not a town centre).
+> &#45; Capture metadata: Taken on 2026-04-11 16:46:40 BST (at 16:46:40 local
+> time). GPS: 51.147833°N, 0.978750°W. This is also irrelevant. The image is a
+> static pattern, likely a digital asset or a product texture
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- Context ignored (missing: traditional, wooden, Japanese, style, gazebo)
 - Missing sections (title, description, keywords)
+- Reasoning leak (description hint:, capture metadata:)
+- Instruction echo
+- Nonvisual metadata borrowing
 - Likely capped by max token budget
-- Ignores trusted hints
-- Unknown tags: &lt;textarea x1="51.2" y1="34.4" alt="遇甭好歹也撇/pm&gt;
+- suspicious_precision: 2 overly precise numbers
 
 ---
 
@@ -3403,72 +3187,169 @@ _Review:_ C 59/100 | hit token cap (500) | output/prompt=29.46% | nontext
 ### ✅ mlx-community/gemma-4-31b-bf16
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=64.68% | missing sections: title,
-       description, keywords | missing terms: wooden, style, extends, over,
-       Its
-_Trusted hints:_ preserves trusted hints
+_Why:_ hit token cap (500) | output/prompt=69.35% | missing sections: title,
+       description, keywords | nonvisual metadata reused
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
 _Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | preserves trusted hints
+_Utility:_ user=avoid | improves trusted hints | metadata borrowing
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=773 | text_est=439 | nontext_est=334 | gen=500 |
+_Token accounting:_ prompt=721 | text_est=387 | nontext_est=334 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
                the limit while title, description, keywords remained
                incomplete.
 
-_Metrics:_ Load 7.00s | Gen 72.96s | Total 80.35s
-_Throughput:_ Prompt 221 TPS (773 tok) | Gen 7.26 TPS (500 tok)
-_Assessment:_ 🟡 C (60/100) | Δ-14 | Lacks visual description of image
-_Review Status:_ watchlist (cutoff, missing sections, repetitive)
-_Review:_ C 60/100 | hit token cap (500) | output/prompt=64.68% | missing
-          sections: title, description, keywords | missing terms: wooden,
-          style, extends, over, Its
+_Metrics:_ Load 8.36s | Gen 74.64s | Total 83.32s
+_Throughput:_ Prompt 139 TPS (721 tok) | Gen 7.26 TPS (500 tok)
+_Assessment:_ 🏆 A (80/100) | Δ+64 | Missing requested structure
+_Review Status:_ watchlist (cutoff, metadata borrowing, missing sections,
+                 repetitive)
+_Review:_ A 80/100 | hit token cap (500) | output/prompt=69.35% | missing
+          sections: title, description, keywords | nonvisual metadata reused
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
 >
-> &#45; Keywords hint: Japanese garden, gazebo, azumaya, pond, reflection, rainy
-> day, spring, landscape, traditional architecture, serene, tranquil,
-> contemplative, lush greenery, moss, rocks, foliage, garden design, outdoor
-> space, natural beauty, peaceful, calm, zen, oriental, cultural, heritage,
-> historical, scenic, picturesque, idyllic, peaceful, quiet, serene, tranquil,
-> contemplative, meditative, relaxing, soothing, calming, peaceful, quiet,
-> serene, tranquil, contemplative, meditative, relaxing, soothing, calming,
-> peaceful, quiet, serene, tranquil, contemplative, meditative, relaxing,
-> soothing, calming, peaceful, quiet, serene, tranquil, contemplative,
-> meditative, relaxing, soothing, calming, peaceful, quiet, serene, tranquil,
-> contemplative, meditative, relaxing, soothing, calming, peaceful, quiet,
-> serene, tranquil, contemplative, meditative, relaxing, soothing, calming,
-> peaceful, quiet, serene, tranquil, contemplative, meditative, relaxing,
-> soothing, calming, peaceful, quiet, serene, tranquil, contemplative,
-> meditative, relaxing, soothing, calming, peaceful, quiet, serene, tranquil,
-> contemplative, meditative, relaxing, soothing, calming, peaceful, quiet,
-> serene, tranquil, contemplative, meditative, relaxing, soothing, calming,
-> peaceful, quiet, serene, tranquil, contemplative, meditative, relaxing,
-> soothing, calming, peaceful, quiet, serene, tranquil, contemplative,
-> meditative, relaxing, soothing, calming, peaceful, quiet, serene, tranquil,
-> contemplative, meditative, relaxing, soothing, calming, peaceful, quiet,
-> serene, tranquil, contemplative, meditative, relaxing, soothing, calming,
-> peaceful, quiet, serene, tranquil, contemplative, meditative, relaxing,
-> soothing, calming, peaceful, quiet, serene, tranquil, contemplative,
-> meditative, relaxing, soothing, calming, peaceful, quiet, serene, tranquil,
-> contemplative, meditative, relaxing, soothing, calming, peaceful, quiet,
-> serene, tranquil, contemplative, meditative, relaxing, soothing, calming,
-> peaceful, quiet, serene, tranquil, contemplative, meditative, relaxing,
-> soothing, calming, peaceful, quiet, serene, tranquil, contemplative,
-> meditative, relaxing, soothing, calming, peaceful, quiet, serene, tranquil,
-> contemplative, meditative, relaxing, soothing, calming, peaceful, quiet,
-> serene, tranquil, contemplative, meditative, relaxing, soothing, calming,
-> peaceful, quiet, serene, tranquil, contemplative, meditative, relaxing,
-> soothing, calming, peaceful, quiet, serene, tranquil, contemplative,
-> meditative, relaxing,
+> &#45; Keywords hint: Alton, Hampshire, England, United Kingdom, UK, Europe,
+> town, town centre, high street, shops, buildings, architecture, street,
+> road, pavement, sidewalk, people, pedestrians, cars, vehicles, traffic, blue
+> sky, clouds, sunny, day, spring, April, 2026, 16:46:40, 51.147833°N,
+> 0.978750°W, 51.147833, -0.978750, 51.147833, -0.978750, 51.147833,
+> -0.978750, 51.147833, -0.978750, 51.147833, -0.978750, 51.147833, -0.978750,
+> 51.147833, -0.978750, 51.147833, -0.978750, 51.147833, -0.978750,
+> 51.147833, -0.978750, 51.147833, -0.978750, 51.147833, -0.978750, 51.147833,
+> -0.978750, 51.147833, -0.978750, 51.147833, -0.978750, 51.147833,
+> -0.978750, 51.147833, -0.978750, 51.147833, -0.978750, 51.147833, -0.9787
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- Repetitive output (phrase: "peaceful, quiet, serene, tranq...")
+- Repetitive output (phrase: "51.147833, -0.978750, 51.14783...")
 - Missing sections (title, description, keywords)
+- Nonvisual metadata borrowing
+- Likely capped by max token budget
+- suspicious_precision: 40 overly precise numbers
+
+---
+
+<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
+
+### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
+
+_Verdict:_ harness | user=avoid
+_Why:_ Special control token &lt;|endoftext|&gt; appeared in generated text. |
+       Output appears truncated to about 2 tokens. | nontext prompt burden=98%
+       | missing terms: Town, Centre, Alton, United, Kingdom
+_Trusted hints:_ ignores trusted hints | missing terms: Town, Centre, Alton,
+                 United, Kingdom
+_Contract:_ ok
+_Utility:_ user=avoid | ignores trusted hints
+_Stack / owner:_ owner=mlx-vlm | harness=stop_token
+_Token accounting:_ prompt=16686 | text_est=387 | nontext_est=16299 | gen=2 |
+                    max=500 | stop=completed
+_Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
+               into user-facing text.
+
+_Metrics:_ Load 0.51s | Gen 77.17s | Total 77.98s
+_Throughput:_ Prompt 219 TPS (16,686 tok) | Gen 366 TPS (2 tok)
+_Assessment:_ ❌ F (5/100) | Δ-11 | Output too short to be useful
+_Review Status:_ watchlist (context ignored, harness)
+_Review:_ F 5/100 | Special control token &lt;|endoftext|&gt; appeared in
+          generated text. | Output appears truncated to about 2 tokens. |
+          nontext prompt burden=98% | missing terms: Town, Centre, Alton,
+          United, Kingdom
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> <|endoftext|>
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️HARNESS:stop_token
+- Context ignored (missing: Town, Centre, Alton, United, Kingdom)
+- Ignores trusted hints
+- tokenizer_artifact
+- token_leak:<\|endoftext\|>
+- output:truncated(2tok)
+- long_context_low_ratio(0.0%;16686->2)
+
+---
+
+<a id="model-mlx-community-qwen35-35b-a3b-bf16"></a>
+
+### ✅ mlx-community/Qwen3.5-35B-A3B-bf16
+
+_Verdict:_ cutoff | user=avoid
+_Why:_ hit token cap (500) | output/prompt=2.99% | nontext prompt burden=98% |
+       missing sections: description, keywords
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
+_Contract:_ missing: description, keywords | title words=27
+_Utility:_ user=avoid | improves trusted hints | metadata borrowing
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=16700 | text_est=387 | nontext_est=16313 | gen=500
+                    | max=500 | stop=completed
+_Next action:_ Raise the token cap or trim prompt burden first; generation hit
+               the limit while description, keywords remained incomplete.
+
+_Metrics:_ Load 12.52s | Gen 77.20s | Total 90.04s
+_Throughput:_ Prompt 246 TPS (16,700 tok) | Gen 61.4 TPS (500 tok)
+_Assessment:_ 🏆 A (84/100) | Δ+68 | Missing requested structure
+_Review Status:_ watchlist (cutoff, metadata borrowing, missing sections,
+                 refusal)
+_Review:_ A 84/100 | hit token cap (500) | output/prompt=2.99% | nontext
+          prompt burden=98% | missing sections: description, keywords
+
+<!-- markdownlint-disable MD028 MD037 -->
+>
+> The user wants me to catalogue the provided image with specific metadata
+> fields: Title, Description, and Keywords.
+> I need to follow strict rules:
+> &#45; Use British English.
+> &#45; Only use details clearly visible.
+> &#45; Do not guess or infer.
+> &#45; Follow the provided structure exactly.
+> &#45; Ignore the "Context" hints if they contradict the image or aren't visible
+> (e.g., the image is a close-up of a building facade, not a town centre
+> scene, and there's no way to verify the location "Alton, England" just from
+> the visual content of the building itself without external knowledge, which
+> I must avoid). Wait, looking closely at the image, it's a close-up of a
+> building facade. It looks like a shop front.
+> &#45; The "Context" hints mention "Town Centre, Alton, England". I need to check
+> if the image &#42;visually&#42; confirms this. The image shows a building facade
+> with a sign "The Old Post Office". It's a close-up. I cannot verify "Alton,
+> England" just by looking at the pixels unless I recognize the specific
+> architecture or sign, which I shouldn't rely on if it's not explicitly
+> written. However, the prompt says "Treat the metadata hints below as a draft
+> catalog record. Keep only details that are clearly confirmed by the image".
+> The image shows a sign "The Old Post Office". It does &#42;not&#42; show "Alton,
+> England". So I must omit the location unless it's visible.
+> &#45; Wait, let me look at the image again. It's a close-up of a building. There
+> is a sign "The Old Post Office". There are windows. There is a door.
+> &#45; The prompt asks me to use the metadata hints &#42;only when visually
+> confirmed&#42;. The location "Alton, England" is not visually confirmed in the
+> image itself (no street signs, no maps). So I will omit the specific
+> location.
+> &#45; The date "2026-04-11" is metadata, not visible in the image. I should
+> probably omit it from the description unless it's visible (it's not).
+> &#45; The image is a close-up of a building facade.
+>
+> &#42;&#42;Title:&#42;&#42;
+> &#45; Needs to be 5-10 words.
+> &#45; Concrete and factual.
+> &#45; "The Old Post Office building facade close-up" seems appropriate. Or "Shop
+> front of The Old Post Office".
+> -
+<!-- markdownlint-enable MD028 MD037 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:cutoff
+- Refusal detected (explicit_refusal)
+- Missing sections (description, keywords)
+- Title length violation (27 words; expected 5-10)
+- Nonvisual metadata borrowing
 - Likely capped by max token budget
 
 ---
@@ -3478,76 +3359,80 @@ _Review:_ C 60/100 | hit token cap (500) | output/prompt=64.68% | missing
 ### ✅ mlx-community/Qwen3.5-27B-4bit
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=2.98% | nontext prompt burden=97% |
-       missing sections: title, description, keywords
-_Trusted hints:_ preserves trusted hints | nonvisual metadata reused
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | preserves trusted hints | instruction echo | metadata
+_Why:_ hit token cap (500) | output/prompt=2.99% | nontext prompt burden=98% |
+       missing sections: description, keywords
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
+_Contract:_ missing: description, keywords | title words=51
+_Utility:_ user=avoid | improves trusted hints | instruction echo | metadata
            borrowing
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=16753 | text_est=439 | nontext_est=16314 | gen=500
+_Token accounting:_ prompt=16700 | text_est=387 | nontext_est=16313 | gen=500
                     | max=500 | stop=completed
 _Next action:_ Raise the token cap or trim prompt burden first; generation hit
-               the limit while title, description, keywords remained
-               incomplete.
+               the limit while description, keywords remained incomplete.
 
-_Metrics:_ Load 2.25s | Gen 87.31s | Total 89.95s
-_Throughput:_ Prompt 240 TPS (16,753 tok) | Gen 30.3 TPS (500 tok)
-_Assessment:_ 🟡 C (64/100) | Δ-11 | Missing requested structure
+_Metrics:_ Load 2.12s | Gen 101.74s | Total 104.24s
+_Throughput:_ Prompt 201 TPS (16,700 tok) | Gen 28.3 TPS (500 tok)
+_Assessment:_ ✅ B (77/100) | Δ+61 | Missing requested structure
 _Review Status:_ watchlist (cutoff, instruction echo, metadata borrowing,
                  missing sections, reasoning leak, refusal)
-_Review:_ C 64/100 | hit token cap (500) | output/prompt=2.98% | nontext
-          prompt burden=97% | missing sections: title, description, keywords
+_Review:_ B 77/100 | hit token cap (500) | output/prompt=2.99% | nontext
+          prompt burden=98% | missing sections: description, keywords
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
-> The user wants me to analyze the image and generate cataloguing metadata
-> based on specific rules.
+> The user wants me to analyze the image and generate cataloguing metadata.
 >
 > &#42;&#42;1. Analyze the Image:&#42;&#42;
-> &#42;   &#42;&#42;Subject:&#42;&#42; A traditional wooden structure, likely a Japanese-style tea
-> house or gazebo (azumaya). It has a dark, tiled roof with curved eaves.
-> &#42;   &#42;&#42;Setting:&#42;&#42; It's situated over a body of water (pond or lake). The
-> water is dark and reflects the structure.
-> &#42;   &#42;&#42;Surroundings:&#42;&#42; There are green lawns, trees, and rocks. Some rocks
-> appear mossy. The foliage suggests spring or early summer (green leaves,
-> some bare branches visible in the background).
-> &#42;   &#42;&#42;Weather/Atmosphere:&#42;&#42; It looks overcast and rainy. The water has
-> ripples, suggesting rain. The lighting is soft and diffuse, typical of a
-> cloudy day.
-> &#42;   &#42;&#42;Composition:&#42;&#42; The gazebo is on the left side, extending towards the
-> center. The water takes up the bottom right. The background is filled with
-> trees and greenery.
+> &#42;   &#42;&#42;Subject:&#42;&#42; A single, large, white, spiral seashell. It looks like a
+> conch shell or a whelk shell. It's the only object in the frame.
+> &#42;   &#42;&#42;Background:&#42;&#42; Plain white background. It's a studio-style shot or a
+> product shot.
+> &#42;   &#42;&#42;Lighting:&#42;&#42; Even, soft lighting. There are shadows cast by the spiral
+> ridges, indicating a light source from the top or slightly to the left.
+> &#42;   &#42;&#42;Color:&#42;&#42; The shell is off-white, cream, or pale beige.
+> &#42;   &#42;&#42;Texture:&#42;&#42; Visible ridges, spiral pattern, smooth but textured
+> surface.
+> &#42;   &#42;&#42;Orientation:&#42;&#42; The shell is oriented diagonally, with the apex (top)
+> pointing towards the top left and the opening (aperture) towards the bottom
+> right.
 >
 > &#42;&#42;2. Evaluate Existing Metadata Hints:&#42;&#42;
-> &#42;   &#42;Description hint:&#42; "A traditional wooden Japanese-style gazebo, or
-> azumaya, extends over a tranquil pond on a rainy day. Its reflection is
-> visible in the dark, rippling water, creating a serene and contemplative
-> scene within the landscaped garden. The surrounding area features lush green
-> lawns, moss-covered rocks, and early spring foliage." -> This aligns
-> perfectly with what I see. I can confirm the gazebo, the pond, the
-> reflection, the rain/ripples, the green lawns, and the rocks.
-> &#42;   &#42;Capture metadata:&#42; "Taken on 2026-04-03 14:24:53 BST..." -> This is
-> future-dated (2026). I cannot verify the date from the image itself. I must
-> omit this as per the rule "Do not infer... time period... unless visually
-> obvious." The image doesn't show a clock or calendar. I will ignore the
-> specific date/time.
-> &#42;   &#42;GPS:&#42; "53.331200°N, 2.381400°W." -> This points to the UK (near
-> Manchester/Leeds area). While the style is Japanese, the location could be a
-> Japanese garden in the UK (like the Japanese Garden at Tatton Park or
-> similar).
+> &#42;   &#42;&#42;Description hint:&#42;&#42; "Town Centre, Alton, England, United Kingdom, UK".
+> This is a location. The image is a close-up of a shell on a white
+> background. There is absolutely no visual evidence of a town centre, Alton,
+> or the UK. This hint is likely context from where the photo was taken, but
+> it is &#42;not&#42; visible in the image itself. The instructions say: "Use only
+> details that are clearly and definitely visible in the image... If a detail
+> is uncertain... leave it out." Therefore, I must exclude the location.
+> &#42;   &#42;&#42;Capture metadata:&#42;&#42; "Taken on 2026-04-11...". This is future-dated
+> (relative to now, but irrelevant). It's metadata, not visual content. I
+> cannot verify the date from the image. I must exclude it.
+>
+> &#42;&#42;3. Draft Metadata:&#42;&#42;
+>
+> &#42;   &#42;&#42;Title:&#42;&#42; Needs to be 5-10 words, concrete.
+> &#42;   &#42;Draft 1:&#42; White spiral seashell on white background. (6 words) -
+> Good.
+> &#42;   &#42;Draft 2:&#42; Large white conch shell isolated on white. (7 words) -
+> Good.
+> &#42;   &#42;Draft 3:&#42; Spiral white seashell with ridges on white background. (8
+> words) - Good.
+> &#42;   &#42;Selection:&#42; White spiral seashell isolated on white background.
+>
+> &#42;
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
 - Refusal detected (explicit_refusal)
-- Missing sections (title, description, keywords)
+- Missing sections (description, keywords)
+- Title length violation (51 words; expected 5-10)
 - Reasoning leak (description hint:, capture metadata:)
 - Instruction echo
 - Nonvisual metadata borrowing
 - Likely capped by max token budget
-- suspicious_precision: 2 overly precise numbers
 
 ---
 
@@ -3556,26 +3441,24 @@ _Review:_ C 64/100 | hit token cap (500) | output/prompt=2.98% | nontext
 ### ✅ mlx-community/Qwen3.5-27B-mxfp8
 
 _Verdict:_ cutoff | user=avoid
-_Why:_ hit token cap (500) | output/prompt=2.98% | nontext prompt burden=97% |
-       missing sections: title, description, keywords
-_Trusted hints:_ preserves trusted hints | nonvisual metadata reused
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | preserves trusted hints | instruction echo | metadata
-           borrowing
+_Why:_ hit token cap (500) | output/prompt=2.99% | nontext prompt burden=98% |
+       missing terms: United, Kingdom
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
+_Contract:_ title words=42 | description sentences=5 | keywords=9
+_Utility:_ user=avoid | improves trusted hints | metadata borrowing
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=16753 | text_est=439 | nontext_est=16314 | gen=500
+_Token accounting:_ prompt=16700 | text_est=387 | nontext_est=16313 | gen=500
                     | max=500 | stop=completed
-_Next action:_ Raise the token cap or trim prompt burden first; generation hit
-               the limit while title, description, keywords remained
-               incomplete.
+_Next action:_ Treat this as cap-limited output first; generation exhausted
+               the token budget with output/prompt=2.99%.
 
-_Metrics:_ Load 3.16s | Gen 97.41s | Total 100.97s
-_Throughput:_ Prompt 243 TPS (16,753 tok) | Gen 18.2 TPS (500 tok)
-_Assessment:_ 🏆 A (83/100) | Δ+9 | None identified
-_Review Status:_ watchlist (cutoff, instruction echo, metadata borrowing,
-                 missing sections, reasoning leak)
-_Review:_ A 83/100 | hit token cap (500) | output/prompt=2.98% | nontext
-          prompt burden=97% | missing sections: title, description, keywords
+_Metrics:_ Load 3.10s | Gen 108.63s | Total 112.06s
+_Throughput:_ Prompt 213 TPS (16,700 tok) | Gen 17.1 TPS (500 tok)
+_Assessment:_ ✅ B (71/100) | Δ+55 | Missing requested structure
+_Review Status:_ watchlist (cutoff, hallucination, metadata borrowing,
+                 refusal)
+_Review:_ B 71/100 | hit token cap (500) | output/prompt=2.99% | nontext
+          prompt burden=98% | missing terms: United, Kingdom
 
 <!-- markdownlint-disable MD028 MD037 -->
 >
@@ -3583,47 +3466,57 @@ _Review:_ A 83/100 | hit token cap (500) | output/prompt=2.98% | nontext
 > metadata.
 >
 > &#42;&#42;1. Analyze the Image:&#42;&#42;
-> &#42;   &#42;&#42;Subject:&#42;&#42; A traditional wooden structure, likely a Japanese-style
-> gazebo or tea house (azumaya). It has a dark, possibly tiled roof with
-> curved eaves.
-> &#42;   &#42;&#42;Setting:&#42;&#42; It is situated next to a body of water (a pond or lake).
-> The water is dark and reflects the structure.
-> &#42;   &#42;&#42;Environment:&#42;&#42; There is greenery around. I see trees and what looks
-> like a lawn or grassy bank. The lighting suggests an overcast day, possibly
-> rainy given the wet look of the roof and the water surface, though rain
-> isn't explicitly falling in a way I can see individual drops. The water has
-> ripples.
-> &#42;   &#42;&#42;Composition:&#42;&#42; The gazebo is on the left side, extending towards the
-> center. The water takes up the bottom right. The sky is overcast/white.
-> &#42;   &#42;&#42;Colors:&#42;&#42; Dark browns/blacks (roof, wood), greens (foliage),
-> grey/white (sky, water reflection).
+> &#42;   &#42;&#42;Visual Content:&#42;&#42; The image is almost entirely white. It looks like a
+> blank sheet of paper or a very overexposed photo.
+> &#42;   &#42;&#42;Details:&#42;&#42; There are no discernible objects, people, landscapes, or
+> text visible. It is a uniform white field.
+> &#42;   &#42;&#42;Context:&#42;&#42; The prompt provides "Existing metadata hints" suggesting a
+> location (Town Centre, Alton, England) and a date (2026-04-11). However, the
+> image itself does not show any of this. It is just white.
+> &#42;   &#42;&#42;Constraint Check:&#42;&#42; The instructions say "Use only details that are
+> clearly and definitely visible in the image." and "If a detail is uncertain,
+> ambiguous, partially obscured, too small to verify, or not directly
+> visible, leave it out." and "Do not guess."
 >
-> &#42;&#42;2. Evaluate Existing Metadata Hints:&#42;&#42;
-> &#42;   &#42;Description hint:&#42; "A traditional wooden Japanese-style gazebo, or
-> azumaya, extends over a tranquil pond on a rainy day. Its reflection is
-> visible in the dark, rippling water, creating a serene and contemplative
-> scene within the landscaped garden. The surrounding area features lush green
-> lawns, moss-covered rocks, and early spring foliage."
-> &#42;   &#42;Verification:&#42; The gazebo is visible. It looks Japanese-style. It
-> extends over water. The water is dark and rippling. Reflection is visible.
-> "Rainy day" is a reasonable inference from the wet surfaces and overcast
-> sky, but I should stick to "overcast" or "wet" to be safe, though the prompt
-> says "use only details that are clearly and definitely visible". The
-> wetness is visible. "Moss-covered rocks" are not clearly visible; I see
-> greenery but can't confirm moss on rocks specifically. "Early spring
-> foliage" is hard to confirm definitively, but the green suggests it. I will
-> stick to "lush greenery" or "foliage".
-> &#42;   &#42;Capture metadata:&#42; "Taken on 2026-04-03 14:24:53 BST... GPS: 53.3312
+> &#42;&#42;2. Evaluate the Metadata Hints vs. Image:&#42;&#42;
+> &#42;   &#42;&#42;Hint:&#42;&#42; Town Centre, Alton, England.
+> &#42;   &#42;&#42;Image:&#42;&#42; Shows nothing. Just white.
+> &#42;   &#42;&#42;Conclusion:&#42;&#42; I cannot confirm the location from the image itself. I
+> must describe what is actually there.
+> &#42;   &#42;&#42;Hint:&#42;&#42; Date 2026-04-11.
+> &#42;   &#42;&#42;Image:&#42;&#42; No date is visible.
+> &#42;   &#42;&#42;Conclusion:&#42;&#42; I cannot confirm the date from the image.
+>
+> &#42;&#42;3. Draft the Metadata:&#42;&#42;
+>
+> &#42;   &#42;&#42;Title:&#42;&#42; Needs to be 5-10 words, concrete and factual. Since the image
+> is just white, the title should reflect that.
+> &#42;   &#42;Draft:&#42; Blank white image with no visible content.
+> &#42;   &#42;Refinement:&#42; Solid white background with no visible subject matter.
+> (7 words) - This is accurate.
+>
+> &#42;   &#42;&#42;Description:&#42;&#42; 1-2 factual sentences.
+> &#42;   &#42;Draft:&#42; The image displays a completely white field. There are no
+> objects, people, or scenery visible.
+> &#42;   &#42;Refinement:&#42; This image consists entirely of a solid white
+> background. No distinct subjects, objects, or environmental details are
+> visible within the frame.
+>
+> &#42;   &#42;&#42;Keywords:&#42;&#42; 10-18 unique terms.
+> &#42;   &#42;Terms:&#42; white, blank, empty, solid color, background, no subject,
+> overexposed, minimal
 <!-- markdownlint-enable MD028 MD037 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:cutoff
-- Missing sections (title, description, keywords)
-- Reasoning leak (description hint:, capture metadata:)
-- Instruction echo
+- Refusal detected (explicit_refusal)
+- Title length violation (42 words; expected 5-10)
+- Description sentence violation (5; expected 1-2)
+- Keyword count violation (9; expected 10-18)
 - Nonvisual metadata borrowing
 - Likely capped by max token budget
+- Contains question/quiz content
 
 ---
 

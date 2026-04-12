@@ -6,7 +6,7 @@ Automated benchmarking of **53 locally-cached VLM models** found **1 hard
 failure(s)** and **9 harness/integration issue(s)** plus **1 preflight
 compatibility warning(s)** in successful models. 52 of 53 models succeeded.
 
-Test image: `20260403-132453_DSC09602_DxO.jpg` (56.9 MB).
+Test image: `20260411-154640_DSC09740_DxO.jpg` (37.7 MB).
 
 ---
 
@@ -15,8 +15,8 @@ Test image: `20260403-132453_DSC09602_DxO.jpg` (56.9 MB).
 Quick triage list with likely owner and next action for each issue class.
 
 - **[Medium] [model configuration/repository]** Loaded processor has no image_processor; expected multimodal processor. (1 model(s)). Next: verify model config, tokenizer files, and revision alignment.
-- **[Medium] [mlx-vlm]** Harness/integration warnings on 2 model(s). Next: check processor/chat-template wiring and generation kwargs.
-- **[Medium] [mlx-vlm / mlx]** Harness/integration warnings on 4 model(s). Next: validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
+- **[Medium] [mlx-vlm]** Harness/integration warnings on 3 model(s). Next: check processor/chat-template wiring and generation kwargs.
+- **[Medium] [mlx-vlm / mlx]** Harness/integration warnings on 3 model(s). Next: validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
 - **[Medium] [model-config / mlx-vlm]** Harness/integration warnings on 3 model(s). Next: validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
 - **[Medium] [transformers]** Preflight compatibility warnings (1 issue(s)). Next: verify API compatibility and pinned version floor.
 
@@ -27,9 +27,9 @@ Quick triage list with likely owner and next action for each issue class.
 | Priority | Issue | Models Affected | Owner | Next Action |
 | -------- | ----- | --------------- | ----- | ----------- |
 | **Medium** | Loaded processor has no image_processor; expected multimodal processor. | 1 (MolmoPoint-8B-fp16) | `model configuration/repository` | verify model config, tokenizer files, and revision alignment. |
-| **Medium** | Harness/integration | 2 (Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit) | `mlx-vlm` | check processor/chat-template wiring and generation kwargs. |
-| **Medium** | Harness/integration | 4 (Qwen3-VL-2B-Instruct, Qwen2-VL-2B-Instruct-4bit, Qwen3-VL-2B-Thinking-bf16, X-Reasoner-7B-8bit) | `mlx-vlm / mlx` | validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime. |
-| **Medium** | Harness/integration | 3 (llava-v1.6-mistral-7b-8bit, paligemma2-10b-ft-docci-448-bf16, paligemma2-3b-ft-docci-448-bf16) | `model-config / mlx-vlm` | validate chat-template/config expectations and mlx-vlm prompt formatting for this model. |
+| **Medium** | Harness/integration | 3 (Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit, GLM-4.6V-Flash-6bit) | `mlx-vlm` | check processor/chat-template wiring and generation kwargs. |
+| **Medium** | Harness/integration | 3 (Qwen3-VL-2B-Instruct, Qwen3-VL-2B-Thinking-bf16, X-Reasoner-7B-8bit) | `mlx-vlm / mlx` | validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime. |
+| **Medium** | Harness/integration | 3 (Qwen2-VL-2B-Instruct-4bit, llava-v1.6-mistral-7b-8bit, paligemma2-10b-ft-docci-448-bf16) | `model-config / mlx-vlm` | validate chat-template/config expectations and mlx-vlm prompt formatting for this model. |
 | **Medium** | Preflight compatibility warning | 1 issue(s) | `transformers` | verify API compatibility and pinned version floor. |
 
 ---
@@ -111,19 +111,22 @@ point to stack/runtime behavior rather than inherent model quality limits.
 **What looks wrong:** Behavior degrades under long prompt context.
 **Likely component:** `mlx-vlm / mlx`
 **Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,727, output=500, output/prompt=2.99%
+**Token summary:** prompt=16,675, output=500, output/prompt=3.00%
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16727 tokens), output became repetitive.
-- Output became repetitive, indicating possible generation instability (token: phrase: "garden view, garden atmosphere...").
-- Output appears to copy prompt context verbatim (40% overlap).
+- At long prompt length (16675 tokens), output became repetitive.
+- Output became repetitive, indicating possible generation instability (token: phrase: "weatherproof, weatherproof, we...").
+- Output omitted required Title/Description/Keywords sections (keywords).
 
 **Sample output:**
 
 ```text
 Title:
-A traditional wooden Japanese-style gazebo, or azumaya, extends over a tranquil pond on a rainy day. Its reflection is visible in the dark, rippling water, creating a serene and contemplative s...
+- 2026-04-11 16:46:40 BST, Town Centre, Alton, England, United Kingdom, UK
+
+Description:
+- A single, large, rectangular, beige-colored, weather-resistant, double-layered, solar-reflective, weat...
 ```
 
 ### `microsoft/Phi-3.5-vision-instruct`
@@ -131,21 +134,24 @@ A traditional wooden Japanese-style gazebo, or azumaya, extends over a tranquil 
 **What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=1,335, output=500, output/prompt=37.45%
+**Token summary:** prompt=1,265, output=500, output/prompt=39.53%
 
 **Why this appears to be an integration/runtime issue:**
 
 - Special control token &lt;|end|&gt; appeared in generated text.
 - Special control token &lt;|endoftext|&gt; appeared in generated text.
 - Generated text appears to continue into example-code templates mid-output.
+- Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 - Output switched language/script unexpectedly (tokenizer_artifact, code_snippet).
 
 **Sample output:**
 
 ```text
-Title: Serene Japanese-style Gazebo Over Pond
+Title: Optical Illusion of a Hexagonal Pattern
 
-Description: A traditional wooden Japanese-style gazebo, or azumaya, extends over a tranquil pond on a rainy day. Its reflection is visible in the dark, ...
+Description: A complex, colorful, and distorted image of a hexagonal pattern that creates an optical illusion.
+
+Keywords: optical illusion, hexagonal pa...
 ```
 
 ### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
@@ -153,36 +159,58 @@ Description: A traditional wooden Japanese-style gazebo, or azumaya, extends ove
 **What looks wrong:** Decoded output contains tokenizer artifacts that should not appear in user-facing text.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=2,628, output=103, output/prompt=3.92%
+**Token summary:** prompt=2,551, output=100, output/prompt=3.92%
 
 **Why this appears to be an integration/runtime issue:**
 
-- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 57 occurrences).
+- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 69 occurrences).
 - Output omitted required Title/Description/Keywords sections (description, keywords).
 
 **Sample output:**
 
 ```text
-Title:ĠWoodenĠgazeboĠoverĠpondĊĊDescription:ĠAĠtraditionalĠwoodenĠgazeboĠwithĠaĠslopedĠroofĠextendsĠoverĠaĠcalmĠpond,ĠitsĠreflectionĠvisibleĠinĠtheĠwater.ĠTheĠsurroundingĠgardenĠfeaturesĠgreenĠlawns,Ġ...
+Title:ĠBluebellĠCakeĠHouseĠonĠHighĠStreetĊĊDescription:ĠAĠquietĠstreetĠinĠaĠsmallĠtownĠfeaturingĠaĠrowĠofĠtraditionalĠbrickĠandĠplasterĠbuildings,ĠincludingĠaĠcakeĠshopĠwithĠaĠsignĠreadingĠ"BluebellĠC...
 ```
 
-### `mlx-community/Qwen2-VL-2B-Instruct-4bit`
+### `mlx-community/GLM-4.6V-Flash-6bit`
 
-**What looks wrong:** Behavior degrades under long prompt context.
-**Likely component:** `mlx-vlm / mlx`
-**Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,738, output=3, output/prompt=0.02%
+**What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
+**Likely component:** `mlx-vlm`
+**Suggested next action:** check processor/chat-template wiring and generation kwargs.
+**Token summary:** prompt=6,508, output=500, output/prompt=7.68%
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output appears truncated to about 3 tokens.
-- At long prompt length (16738 tokens), output stayed unusually short (3 tokens; ratio 0.0%).
-- Model output may not follow prompt or image contents (missing: traditional, wooden, Japanese, style, gazebo).
+- Special control token &lt;/think&gt; appeared in generated text.
+- Output formatting deviated from the requested structure. Details: Unknown tags: <think>.
+- Output omitted required Title/Description/Keywords sections (title).
+- Output leaked reasoning or prompt-template text (<think>).
 
 **Sample output:**
 
 ```text
-Watermark
+<think>Got it, let's tackle this step by step. First, the Title needs to be 5-10 words, concrete and factual. Looking at the image, there are buildings on a street, with shop signs like "Bluebell Cake...
+```
+
+### `mlx-community/Qwen2-VL-2B-Instruct-4bit`
+
+**What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
+**Likely component:** `model-config / mlx-vlm`
+**Suggested next action:** validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
+**Token summary:** prompt=16,686, output=2, output/prompt=0.01%
+
+**Why this appears to be an integration/runtime issue:**
+
+- Special control token &lt;|endoftext|&gt; appeared in generated text.
+- Output appears truncated to about 2 tokens.
+- At long prompt length (16686 tokens), output stayed unusually short (2 tokens; ratio 0.0%).
+- Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
+- Output switched language/script unexpectedly (tokenizer_artifact).
+
+**Sample output:**
+
+```text
+<|endoftext|>
 ```
 
 ### `mlx-community/Qwen3-VL-2B-Thinking-bf16`
@@ -190,20 +218,20 @@ Watermark
 **What looks wrong:** Behavior degrades under long prompt context.
 **Likely component:** `mlx-vlm / mlx`
 **Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,729, output=500, output/prompt=2.99%
+**Token summary:** prompt=16,677, output=500, output/prompt=3.00%
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16729 tokens), output became repetitive.
-- Model output may not follow prompt or image contents (missing: traditional, Japanese, style, gazebo, azumaya).
-- Output became repetitive, indicating possible generation instability (token: phrase: "the windows are all...").
+- At long prompt length (16677 tokens), output became repetitive.
+- Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
+- Output became repetitive, indicating possible generation instability (token: phrase: "with a glass front....").
 - Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - Output leaked reasoning or prompt-template text (let's analyze the image).
 
 **Sample output:**
 
 ```text
-Got it. Let's analyze the image. The image shows multiple pairs of weatherproofed, wooden, and blue-tinted glass windows. The windows are all the same, with a blue tint. The windows are arranged in a ...
+Got it. Let's analyze the image. The image shows a single object: a set of four identical, weatherproofed, wooden or metal boxes with a glass front. The boxes are arranged in a row, each with a glass ...
 ```
 
 ### `mlx-community/X-Reasoner-7B-8bit`
@@ -211,21 +239,21 @@ Got it. Let's analyze the image. The image shows multiple pairs of weatherproofe
 **What looks wrong:** Behavior degrades under long prompt context.
 **Likely component:** `mlx-vlm / mlx`
 **Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,738, output=500, output/prompt=2.99%
+**Token summary:** prompt=16,686, output=500, output/prompt=3.00%
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16738 tokens), output may stop following prompt/image context.
-- Model output may not follow prompt or image contents (missing: traditional, wooden, Japanese, style, gazebo).
+- At long prompt length (16686 tokens), output may stop following prompt/image context.
+- Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 
 **Sample output:**
 
 ```text
 Title:
-- White and Black Patterned Background
+- White Swallowtail Butterfly
 
 Description:
-- A repeating pattern of white and black stripes forms a continuous, elongated design. The stripes are arranged in a vertical orientation, c...
+- A large white butterfly with black spots on its wings is displayed in a continuous pattern, creating a seamless design. The background is a gradien...
 ```
 
 ### `mlx-community/llava-v1.6-mistral-7b-8bit`
@@ -233,12 +261,12 @@ Description:
 **What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
 **Likely component:** `model-config / mlx-vlm`
 **Suggested next action:** validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
-**Token summary:** prompt=2,733, output=8, output/prompt=0.29%
+**Token summary:** prompt=2,652, output=8, output/prompt=0.30%
 
 **Why this appears to be an integration/runtime issue:**
 
 - Output was a short generic filler response (about 8 tokens).
-- Model output may not follow prompt or image contents (missing: traditional, wooden, Japanese, style, gazebo).
+- Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 
 **Sample output:**
 
@@ -251,35 +279,18 @@ The image is a photograph.
 **What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
 **Likely component:** `model-config / mlx-vlm`
 **Suggested next action:** validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
-**Token summary:** prompt=1,536, output=9, output/prompt=0.59%
+**Token summary:** prompt=1,484, output=13, output/prompt=0.88%
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output is very short relative to prompt size (0.6%), suggesting possible early-stop or prompt-handling issues.
-- Model output may not follow prompt or image contents (missing: traditional, wooden, Japanese, style, gazebo).
+- Output is very short relative to prompt size (0.9%), suggesting possible early-stop or prompt-handling issues.
+- Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
+- Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 **Sample output:**
 
 ```text
-- The image is in the daytime.
-```
-
-### `mlx-community/paligemma2-3b-ft-docci-448-bf16`
-
-**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
-**Likely component:** `model-config / mlx-vlm`
-**Suggested next action:** validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
-**Token summary:** prompt=1,536, output=8, output/prompt=0.52%
-
-**Why this appears to be an integration/runtime issue:**
-
-- Output is very short relative to prompt size (0.5%), suggesting possible early-stop or prompt-handling issues.
-- Model output may not follow prompt or image contents (missing: traditional, wooden, Japanese, style, gazebo).
-
-**Sample output:**
-
-```text
-- Do not copy the metadata.
+- Camera metadata: Canon EOS 5D Mark IV.
 ```
 
 ---
@@ -303,13 +314,13 @@ model appears).
 - **Detailed diagnostics models:** 10
 - **Summary diagnostics models:** 43
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1173.13s (1173.13s)
-- **Average runtime per model:** 22.13s (22.13s)
-- **Dominant runtime phase:** decode dominated 51/53 measured model runs (90% of tracked runtime).
-- **Phase totals:** model load=115.20s, prompt prep=0.16s, decode=1037.80s, cleanup=5.25s
+- **Total model runtime (sum):** 1266.96s (1266.96s)
+- **Average runtime per model:** 23.90s (23.90s)
+- **Dominant runtime phase:** decode dominated 52/53 measured model runs (90% of tracked runtime).
+- **Phase totals:** model load=118.35s, prompt prep=0.17s, decode=1132.03s, cleanup=5.52s
 - **Observed stop reasons:** completed=52, exception=1
-- **Validation overhead:** 19.70s total (avg 0.37s across 53 model(s)).
-- **First-token latency:** Avg 10.61s | Min 0.09s | Max 69.82s across 52 model(s).
+- **Validation overhead:** 16.11s total (avg 0.30s across 53 model(s)).
+- **First-token latency:** Avg 12.50s | Min 0.08s | Max 83.15s across 52 model(s).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
@@ -320,54 +331,54 @@ model appears).
 These models completed without diagnostics flags (no hard failure, harness
 warning, or stack-signal anomaly).
 
-### Clean output (5 model(s))
+### Clean output (1 model(s))
 
-- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`
-- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`
-- `mlx-community/gemma-3-27b-it-qat-4bit`
-- `mlx-community/gemma-3-27b-it-qat-8bit`
-- `mlx-community/gemma-4-31b-it-4bit`
+- `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`
 
-### Ran, but with quality warnings (38 model(s))
+### Ran, but with quality warnings (42 model(s))
 
-- `HuggingFaceTB/SmolVLM-Instruct`: Model output may not follow prompt or image contents (missing: traditional, wooden, Japanese, style, gazebo).
-- `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: Model output may not follow prompt or image contents (missing: traditional, wooden, Japanese, style, gazebo).
+- `HuggingFaceTB/SmolVLM-Instruct`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
+- `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 - `meta-llama/Llama-3.2-11B-Vision-Instruct`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
-- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Output omitted required Title/Description/Keywords sections (title, keywords).
+- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Output contains corrupted or malformed text segments (incomplete_sentence: ends with 'in').
 - `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
-- `mlx-community/FastVLM-0.5B-bf16`: Model output may not follow prompt or image contents (missing: traditional, wooden, Japanese, style, gazebo).
-- `mlx-community/GLM-4.6V-Flash-6bit`: Output formatting deviated from the requested structure. Details: Unknown tags: &lt;think&gt;.
+- `mlx-community/FastVLM-0.5B-bf16`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 - `mlx-community/GLM-4.6V-Flash-mxfp4`: Output formatting deviated from the requested structure. Details: Unknown tags: &lt;think&gt;.
 - `mlx-community/GLM-4.6V-nvfp4`: Output formatting deviated from the requested structure. Details: Unknown tags: &lt;think&gt;.
-- `mlx-community/Idefics3-8B-Llama3-bf16`: Model output may not follow prompt or image contents (missing: traditional, wooden, Japanese, style, gazebo).
-- `mlx-community/InternVL3-14B-8bit`: Model output may not follow prompt or image contents (missing: traditional, wooden, Japanese, style, gazebo).
-- `mlx-community/InternVL3-8B-bf16`: Model output may not follow prompt or image contents (missing: traditional, wooden, Japanese, style, gazebo).
-- `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`: Model output may not follow prompt or image contents (missing: traditional, wooden, Japanese, style, gazebo).
-- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: Model output may not follow prompt or image contents (missing: Japanese, style, gazebo, azumaya, extends).
+- `mlx-community/Idefics3-8B-Llama3-bf16`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
+- `mlx-community/InternVL3-14B-8bit`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
+- `mlx-community/InternVL3-8B-bf16`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
+- `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
+- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 - `mlx-community/LFM2-VL-1.6B-8bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
-- `mlx-community/LFM2.5-VL-1.6B-bf16`: Output appears to copy prompt context verbatim (48% overlap).
-- `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: Output omitted required Title/Description/Keywords sections (keywords).
-- `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`: Description sentence violation (3; expected 1-2)
-- `mlx-community/Molmo-7B-D-0924-8bit`: Title length violation (11 words; expected 5-10)
-- `mlx-community/Molmo-7B-D-0924-bf16`: Model output may not follow prompt or image contents (missing: traditional, wooden, Japanese, style, gazebo).
-- `mlx-community/Phi-3.5-vision-instruct-bf16`: Output appears to copy prompt context verbatim (96% overlap).
+- `mlx-community/LFM2.5-VL-1.6B-bf16`: Description sentence violation (3; expected 1-2)
+- `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: ⚠️REVIEW:context_budget
+- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: ⚠️REVIEW:context_budget
+- `mlx-community/Molmo-7B-D-0924-8bit`: Output leaked reasoning or prompt-template text (title hint:).
+- `mlx-community/Molmo-7B-D-0924-bf16`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
+- `mlx-community/Phi-3.5-vision-instruct-bf16`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 - `mlx-community/Qwen3.5-27B-4bit`: Model refused or deflected the requested task (explicit_refusal).
-- `mlx-community/Qwen3.5-27B-mxfp8`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- `mlx-community/Qwen3.5-27B-mxfp8`: Model refused or deflected the requested task (explicit_refusal).
 - `mlx-community/Qwen3.5-35B-A3B-4bit`: Model refused or deflected the requested task (explicit_refusal).
 - `mlx-community/Qwen3.5-35B-A3B-6bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `mlx-community/Qwen3.5-35B-A3B-bf16`: Model refused or deflected the requested task (explicit_refusal).
-- `mlx-community/Qwen3.5-9B-MLX-4bit`: Output omitted required Title/Description/Keywords sections (description, keywords).
-- `mlx-community/SmolVLM-Instruct-bf16`: Model output may not follow prompt or image contents (missing: traditional, wooden, Japanese, style, gazebo).
-- `mlx-community/SmolVLM2-2.2B-Instruct-mlx`: Model output may not follow prompt or image contents (missing: traditional, wooden, Japanese, style, gazebo).
-- `mlx-community/gemma-3n-E2B-4bit`: Model output may not follow prompt or image contents (missing: traditional, wooden, Japanese, style, gazebo).
+- `mlx-community/Qwen3.5-9B-MLX-4bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- `mlx-community/SmolVLM-Instruct-bf16`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
+- `mlx-community/SmolVLM2-2.2B-Instruct-mlx`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
+- `mlx-community/gemma-3-27b-it-qat-4bit`: Nonvisual metadata borrowing
+- `mlx-community/gemma-3-27b-it-qat-8bit`: Nonvisual metadata borrowing
+- `mlx-community/gemma-3n-E2B-4bit`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 - `mlx-community/gemma-3n-E4B-it-bf16`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
-- `mlx-community/gemma-4-31b-bf16`: Output became repetitive, indicating possible generation instability (token: phrase: "peaceful, quiet, serene, tranq....
-- `mlx-community/nanoLLaVA-1.5-4bit`: Output omitted required Title/Description/Keywords sections (keywords).
-- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: Model output may not follow prompt or image contents (missing: traditional, wooden, Japanese, style, gazebo).
-- `mlx-community/paligemma2-3b-pt-896-4bit`: Model output may not follow prompt or image contents (missing: traditional, wooden, Japanese, style, gazebo).
-- `mlx-community/pixtral-12b-8bit`: Output appears to copy prompt context verbatim (51% overlap).
-- `mlx-community/pixtral-12b-bf16`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
-- `qnguyen3/nanoLLaVA`: Model output may not follow prompt or image contents (missing: traditional, wooden, Japanese, style, gazebo).
+- `mlx-community/gemma-4-31b-bf16`: Output became repetitive, indicating possible generation instability (token: phrase: "51.147833, -0.978750, 51.14783....
+- `mlx-community/gemma-4-31b-it-4bit`: Nonvisual metadata borrowing
+- `mlx-community/nanoLLaVA-1.5-4bit`: Title length violation (11 words; expected 5-10)
+- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
+- `mlx-community/paligemma2-3b-ft-docci-448-bf16`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
+- `mlx-community/paligemma2-3b-pt-896-4bit`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
+- `mlx-community/pixtral-12b-8bit`: Keyword count violation (19; expected 10-18)
+- `mlx-community/pixtral-12b-bf16`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
+- `qnguyen3/nanoLLaVA`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 
 ---
 
@@ -376,7 +387,7 @@ warning, or stack-signal anomaly).
 | Component | Version |
 | --------- | ------- |
 | mlx-vlm | 0.4.4 |
-| mlx | 0.31.2.dev20260411+a33b7916 |
+| mlx | 0.31.2.dev20260412+520cea2b |
 | mlx-lm | 0.31.3 |
 | transformers | 5.5.3 |
 | tokenizers | 0.22.2 |
@@ -396,7 +407,7 @@ warning, or stack-signal anomaly).
 pip install -e "src/[dev]"
 
 # Re-run with the same CLI arguments
-python -m check_models --image /Users/jrp/Pictures/Processed/20260403-132453_DSC09602_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose
+python -m check_models --image /Users/jrp/Pictures/Processed/20260411-154640_DSC09740_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose
 ```
 
 ### Portable triage (no local image required)
@@ -427,7 +438,7 @@ the exact prompt trace has been exported to
 for each failing model.
 
 ```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260403-132453_DSC09602_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/MolmoPoint-8B-fp16
+python -m check_models --image /Users/jrp/Pictures/Processed/20260411-154640_DSC09740_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/MolmoPoint-8B-fp16
 ```
 
 ### Prompt Used
@@ -464,13 +475,13 @@ Rules:
 - Do not output reasoning, notes, hedging, or extra sections.
 
 Context: Existing metadata hints (high confidence; use only when visually confirmed):
-- Description hint: A traditional wooden Japanese-style gazebo, or azumaya, extends over a tranquil pond on a rainy day. Its reflection is visible in the dark, rippling water, creating a serene and contemplative scene within the landscaped garden. The surrounding area features lush green lawns, moss-covered rocks, and early spring foliage.
-- Capture metadata: Taken on 2026-04-03 14:24:53 BST (at 14:24:53 local time). GPS: 53.331200°N, 2.381400°W.
+- Description hint: , Town Centre, Alton, England, United Kingdom, UK
+- Capture metadata: Taken on 2026-04-11 16:46:40 BST (at 16:46:40 local time). GPS: 51.147833°N, 0.978750°W.
 ```
 
 ### Run details
 
-- Input image: `/Users/jrp/Pictures/Processed/20260403-132453_DSC09602_DxO.jpg`
+- Input image: `/Users/jrp/Pictures/Processed/20260411-154640_DSC09740_DxO.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-04-11 00:42:19 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-04-12 01:05:39 BST by [check_models](https://github.com/jrp2014/check_models)._

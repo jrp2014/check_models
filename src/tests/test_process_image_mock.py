@@ -67,6 +67,35 @@ class _FakeMxRuntime:
         return None
 
 
+class _RecordingMxRuntime:
+    """MLX runtime stand-in that records synchronization and memory probes."""
+
+    def __init__(self) -> None:
+        self.sync_calls = 0
+        self.eval_calls = 0
+        self.active_calls = 0
+        self.cache_calls = 0
+        self.peak_calls = 0
+
+    def synchronize(self) -> None:
+        self.sync_calls += 1
+
+    def get_active_memory(self) -> float:
+        self.active_calls += 1
+        return 0.0
+
+    def get_cache_memory(self) -> float:
+        self.cache_calls += 1
+        return 0.0
+
+    def get_peak_memory(self) -> float:
+        self.peak_calls += 1
+        return 0.0
+
+    def eval(self, _params: object) -> None:
+        self.eval_calls += 1
+
+
 def _build_params(image_path: Path) -> check_models.ProcessImageParams:
     """Return default ProcessImageParams for testing."""
     return check_models.ProcessImageParams(
@@ -592,6 +621,86 @@ class TestProcessImageWithModelMock:
 
         assert result is fake_generation
         assert result.peak_memory == 3.0
+
+    def test_run_model_generation_samples_memory_without_post_generation_eval(
+        self,
+        test_image: Path,
+    ) -> None:
+        """Generation should sample memory once without forcing a second MLX eval."""
+        params = _build_params(test_image)
+        fake_model = _FakeModel()
+        fake_processor = object()
+        fake_generation = _FakeGenerationResult()
+        runtime = _RecordingMxRuntime()
+
+        with (
+            patch.object(check_models, "_ensure_generation_runtime_symbols"),
+            patch.object(
+                check_models,
+                "_load_model",
+                return_value=(fake_model, fake_processor, None),
+            ),
+            patch.object(check_models, "_run_model_preflight_validators"),
+            patch.object(check_models, "apply_chat_template", return_value="formatted prompt"),
+            patch.object(check_models, "generate", return_value=fake_generation),
+            patch.object(check_models, "mx", runtime),
+        ):
+            result = check_models._run_model_generation(params)
+
+        assert result is fake_generation
+        assert runtime.sync_calls == 1
+        assert runtime.active_calls == 1
+        assert runtime.cache_calls == 1
+        assert runtime.peak_calls == 1
+        assert runtime.eval_calls == 0
+
+    def test_process_image_with_model_skips_cleanup_sync_after_success(
+        self,
+        test_image: Path,
+    ) -> None:
+        """Cleanup should skip a second synchronize after a successful synced generation."""
+        params = _build_params(test_image)
+        cleanup_flags: list[bool] = []
+
+        def _record_cleanup(*, synchronize_first: bool = True) -> None:
+            cleanup_flags.append(synchronize_first)
+
+        with (
+            patch.object(
+                check_models,
+                "_run_model_generation",
+                return_value=_FakeGenerationResult(),
+            ),
+            patch.object(check_models, "_cleanup_runtime_resources", side_effect=_record_cleanup),
+        ):
+            result = check_models.process_image_with_model(params)
+
+        assert result.success is True
+        assert cleanup_flags == [False]
+
+    def test_process_image_with_model_keeps_cleanup_sync_on_failure(
+        self,
+        test_image: Path,
+    ) -> None:
+        """Cleanup should still synchronize when generation fails before the success barrier."""
+        params = _build_params(test_image)
+        cleanup_flags: list[bool] = []
+
+        def _record_cleanup(*, synchronize_first: bool = True) -> None:
+            cleanup_flags.append(synchronize_first)
+
+        with (
+            patch.object(
+                check_models,
+                "_run_model_generation",
+                side_effect=ValueError("bad config"),
+            ),
+            patch.object(check_models, "_cleanup_runtime_resources", side_effect=_record_cleanup),
+        ):
+            result = check_models.process_image_with_model(params)
+
+        assert result.success is False
+        assert cleanup_flags == [True]
 
     def test_log_perf_block_reads_cache_memory_field(self) -> None:
         """Compact memory logging should use the stored cache_memory field name."""
