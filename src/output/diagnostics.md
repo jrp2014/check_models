@@ -1,12 +1,12 @@
-# Diagnostics Report — 1 failure(s), 9 harness issue(s) (mlx-vlm 0.4.4)
+# Diagnostics Report — 1 failure(s), 8 harness issue(s) (mlx-vlm 0.4.4)
 
 ## Summary
 
 Automated benchmarking of **53 locally-cached VLM models** found **1 hard
-failure(s)** and **9 harness/integration issue(s)** plus **1 preflight
+failure(s)** and **8 harness/integration issue(s)** plus **1 preflight
 compatibility warning(s)** in successful models. 52 of 53 models succeeded.
 
-Test image: `20260411-154640_DSC09740_DxO.jpg` (37.7 MB).
+Test image: `20260411-151022_DSC09714_DxO.jpg` (36.9 MB).
 
 ---
 
@@ -16,7 +16,7 @@ Quick triage list with likely owner and next action for each issue class.
 
 - **[Medium] [model configuration/repository]** Loaded processor has no image_processor; expected multimodal processor. (1 model(s)). Next: verify model config, tokenizer files, and revision alignment.
 - **[Medium] [mlx-vlm]** Harness/integration warnings on 3 model(s). Next: check processor/chat-template wiring and generation kwargs.
-- **[Medium] [mlx-vlm / mlx]** Harness/integration warnings on 3 model(s). Next: validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
+- **[Medium] [mlx-vlm / mlx]** Harness/integration warnings on 2 model(s). Next: validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
 - **[Medium] [model-config / mlx-vlm]** Harness/integration warnings on 3 model(s). Next: validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
 - **[Medium] [transformers]** Preflight compatibility warnings (1 issue(s)). Next: verify API compatibility and pinned version floor.
 
@@ -27,8 +27,8 @@ Quick triage list with likely owner and next action for each issue class.
 | Priority | Issue | Models Affected | Owner | Next Action |
 | -------- | ----- | --------------- | ----- | ----------- |
 | **Medium** | Loaded processor has no image_processor; expected multimodal processor. | 1 (MolmoPoint-8B-fp16) | `model configuration/repository` | verify model config, tokenizer files, and revision alignment. |
-| **Medium** | Harness/integration | 3 (Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit, GLM-4.6V-Flash-6bit) | `mlx-vlm` | check processor/chat-template wiring and generation kwargs. |
-| **Medium** | Harness/integration | 3 (Qwen3-VL-2B-Instruct, Qwen3-VL-2B-Thinking-bf16, X-Reasoner-7B-8bit) | `mlx-vlm / mlx` | validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime. |
+| **Medium** | Harness/integration | 3 (Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit, ERNIE-4.5-VL-28B-A3B-Thinking-bf16) | `mlx-vlm` | check processor/chat-template wiring and generation kwargs. |
+| **Medium** | Harness/integration | 2 (Qwen3-VL-2B-Instruct, X-Reasoner-7B-8bit) | `mlx-vlm / mlx` | validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime. |
 | **Medium** | Harness/integration | 3 (Qwen2-VL-2B-Instruct-4bit, llava-v1.6-mistral-7b-8bit, paligemma2-10b-ft-docci-448-bf16) | `model-config / mlx-vlm` | validate chat-template/config expectations and mlx-vlm prompt formatting for this model. |
 | **Medium** | Preflight compatibility warning | 1 issue(s) | `transformers` | verify API compatibility and pinned version floor. |
 
@@ -98,9 +98,9 @@ assume the benchmark results are bad.
 
 ---
 
-## Harness/Integration Issues (9 model(s))
+## Harness/Integration Issues (8 model(s))
 
-9 model(s) show potential harness/integration issues; see per-model breakdown
+8 model(s) show potential harness/integration issues; see per-model breakdown
 below.
 These models completed successfully but show integration problems (for example
 stop-token leakage, decoding artifacts, or long-context breakdown) that likely
@@ -111,22 +111,20 @@ point to stack/runtime behavior rather than inherent model quality limits.
 **What looks wrong:** Behavior degrades under long prompt context.
 **Likely component:** `mlx-vlm / mlx`
 **Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,675, output=500, output/prompt=3.00%
+**Token summary:** prompt=16,669, output=500, output/prompt=3.00%
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16675 tokens), output became repetitive.
-- Output became repetitive, indicating possible generation instability (token: phrase: "weatherproof, weatherproof, we...").
-- Output omitted required Title/Description/Keywords sections (keywords).
+- At long prompt length (16669 tokens), output became repetitive.
+- Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
+- Output became repetitive, indicating possible generation instability (token: phrase: "weathered, and slightly weathe...").
+- Output omitted required Title/Description/Keywords sections (description, keywords).
 
 **Sample output:**
 
 ```text
 Title:
-- 2026-04-11 16:46:40 BST, Town Centre, Alton, England, United Kingdom, UK
-
-Description:
-- A single, large, rectangular, beige-colored, weather-resistant, double-layered, solar-reflective, weat...
+- The image shows a collection of four identical, uniform, and well-kept, rectangular, light brown, weather-resistant, and slightly textured, wooden, and weathered, and slightly weathered, and ...
 ```
 
 ### `microsoft/Phi-3.5-vision-instruct`
@@ -147,11 +145,9 @@ Description:
 **Sample output:**
 
 ```text
-Title: Optical Illusion of a Hexagonal Pattern
+Title: Optical Illusion of a Rippling Surface
 
-Description: A complex, colorful, and distorted image of a hexagonal pattern that creates an optical illusion.
-
-Keywords: optical illusion, hexagonal pa...
+Description: A close-up image of a surface with a rippling effect, creating a wave-like pattern across the entire field of view. The colors range from bl...
 ```
 
 ### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
@@ -159,37 +155,34 @@ Keywords: optical illusion, hexagonal pa...
 **What looks wrong:** Decoded output contains tokenizer artifacts that should not appear in user-facing text.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=2,551, output=100, output/prompt=3.92%
+**Token summary:** prompt=2,439, output=108, output/prompt=4.43%
 
 **Why this appears to be an integration/runtime issue:**
 
-- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 69 occurrences).
+- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 76 occurrences).
 - Output omitted required Title/Description/Keywords sections (description, keywords).
 
 **Sample output:**
 
 ```text
-Title:ĠBluebellĠCakeĠHouseĠonĠHighĠStreetĊĊDescription:ĠAĠquietĠstreetĠinĠaĠsmallĠtownĠfeaturingĠaĠrowĠofĠtraditionalĠbrickĠandĠplasterĠbuildings,ĠincludingĠaĠcakeĠshopĠwithĠaĠsignĠreadingĠ"BluebellĠC...
+Title:ĠCurtisĠMuseumĠinĠAltonĊĊDescription:ĠTheĠimageĠshowsĠtheĠCurtisĠMuseum,ĠaĠred-brickĠbuildingĠwithĠwhiteĠtrimĠandĠaĠsteepĠroof,ĠlocatedĠinĠaĠtownĠcentre.ĠAĠredĠcarĠisĠparkedĠinĠfrontĠofĠtheĠmuse...
 ```
 
-### `mlx-community/GLM-4.6V-Flash-6bit`
+### `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`
 
 **What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=6,508, output=500, output/prompt=7.68%
+**Token summary:** prompt=1,754, output=500, output/prompt=28.51%
 
 **Why this appears to be an integration/runtime issue:**
 
 - Special control token &lt;/think&gt; appeared in generated text.
-- Output formatting deviated from the requested structure. Details: Unknown tags: <think>.
-- Output omitted required Title/Description/Keywords sections (title).
-- Output leaked reasoning or prompt-template text (<think>).
 
 **Sample output:**
 
 ```text
-<think>Got it, let's tackle this step by step. First, the Title needs to be 5-10 words, concrete and factual. Looking at the image, there are buildings on a street, with shop signs like "Bluebell Cake...
+Alright, here's what I'm thinking. I need to generate metadata for this image, and it's crucial to be precise. First, I'll break down the image itself. I see a large, red, brick building with a distin...
 ```
 
 ### `mlx-community/Qwen2-VL-2B-Instruct-4bit`
@@ -209,47 +202,26 @@ Title:ĠBluebellĠCakeĠHouseĠonĠHighĠStreetĊĊDescription:ĠAĠquietĠstree
 <empty output>
 ```
 
-### `mlx-community/Qwen3-VL-2B-Thinking-bf16`
-
-**What looks wrong:** Behavior degrades under long prompt context.
-**Likely component:** `mlx-vlm / mlx`
-**Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,677, output=500, output/prompt=3.00%
-
-**Why this appears to be an integration/runtime issue:**
-
-- At long prompt length (16677 tokens), output became repetitive.
-- Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
-- Output became repetitive, indicating possible generation instability (token: phrase: "with a glass front....").
-- Output omitted required Title/Description/Keywords sections (title, description, keywords).
-- Output leaked reasoning or prompt-template text (let's analyze the image).
-
-**Sample output:**
-
-```text
-Got it. Let's analyze the image. The image shows a single object: a set of four identical, weatherproofed, wooden or metal boxes with a glass front. The boxes are arranged in a row, each with a glass ...
-```
-
 ### `mlx-community/X-Reasoner-7B-8bit`
 
 **What looks wrong:** Behavior degrades under long prompt context.
 **Likely component:** `mlx-vlm / mlx`
 **Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,686, output=500, output/prompt=3.00%
+**Token summary:** prompt=16,680, output=138, output/prompt=0.83%
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16686 tokens), output may stop following prompt/image context.
+- At long prompt length (16680 tokens), output may stop following prompt/image context.
 - Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 
 **Sample output:**
 
 ```text
 Title:
-- White Swallowtail Butterfly
+- Black and White Pattern
 
 Description:
-- A large white butterfly with black spots on its wings is displayed in a continuous pattern, creating a seamless design. The background is a gradien...
+- A repeating pattern of black and white stripes forms a continuous, elongated design. The stripes are evenly spaced, creating a striking visual effect. ...
 ```
 
 ### `mlx-community/llava-v1.6-mistral-7b-8bit`
@@ -257,17 +229,17 @@ Description:
 **What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
 **Likely component:** `model-config / mlx-vlm`
 **Suggested next action:** validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
-**Token summary:** prompt=2,652, output=8, output/prompt=0.30%
+**Token summary:** prompt=2,554, output=7, output/prompt=0.27%
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output was a short generic filler response (about 8 tokens).
+- Output appears truncated to about 7 tokens.
 - Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 
 **Sample output:**
 
 ```text
-The image is a photograph.
+The car is red.
 ```
 
 ### `mlx-community/paligemma2-10b-ft-docci-448-bf16`
@@ -275,18 +247,18 @@ The image is a photograph.
 **What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
 **Likely component:** `model-config / mlx-vlm`
 **Suggested next action:** validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
-**Token summary:** prompt=1,484, output=13, output/prompt=0.88%
+**Token summary:** prompt=1,484, output=12, output/prompt=0.81%
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output is very short relative to prompt size (0.9%), suggesting possible early-stop or prompt-handling issues.
+- Output is very short relative to prompt size (0.8%), suggesting possible early-stop or prompt-handling issues.
 - Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 - Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 **Sample output:**
 
 ```text
-- Camera metadata: Canon EOS 5D Mark IV.
+- Camera: Canon EOS 5D Mark IV.
 ```
 
 ---
@@ -307,38 +279,34 @@ model appears).
 
 ## Coverage & Runtime Metrics
 
-- **Detailed diagnostics models:** 10
-- **Summary diagnostics models:** 43
+- **Detailed diagnostics models:** 9
+- **Summary diagnostics models:** 44
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1220.57s (1220.57s)
-- **Average runtime per model:** 23.03s (23.03s)
-- **Dominant runtime phase:** decode dominated 52/53 measured model runs (90% of tracked runtime).
-- **Phase totals:** model load=110.81s, prompt prep=0.17s, decode=1093.37s, cleanup=5.49s
+- **Total model runtime (sum):** 1280.23s (1280.23s)
+- **Average runtime per model:** 24.16s (24.16s)
+- **Dominant runtime phase:** decode dominated 51/53 measured model runs (90% of tracked runtime).
+- **Phase totals:** model load=117.51s, prompt prep=0.17s, decode=1147.60s, cleanup=5.29s
 - **Observed stop reasons:** completed=52, exception=1
-- **Validation overhead:** 15.97s total (avg 0.30s across 53 model(s)).
-- **First-token latency:** Avg 10.72s | Min 0.08s | Max 92.39s across 51 model(s).
+- **Validation overhead:** 14.69s total (avg 0.28s across 53 model(s)).
+- **First-token latency:** Avg 10.33s | Min 0.08s | Max 75.37s across 51 model(s).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
 ---
 
-## Models Not Flagged (43 model(s))
+## Models Not Flagged (44 model(s))
 
 These models completed without diagnostics flags (no hard failure, harness
 warning, or stack-signal anomaly).
 
-### Clean output (1 model(s))
-
-- `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`
-
-### Ran, but with quality warnings (42 model(s))
+### Ran, but with quality warnings (44 model(s))
 
 - `HuggingFaceTB/SmolVLM-Instruct`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 - `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
-- `meta-llama/Llama-3.2-11B-Vision-Instruct`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
-- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Output contains corrupted or malformed text segments (incomplete_sentence: ends with 'in').
-- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- `meta-llama/Llama-3.2-11B-Vision-Instruct`: Output became repetitive, indicating possible generation instability (token: phrase: "cultural, significance, cultur....
+- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 - `mlx-community/FastVLM-0.5B-bf16`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
+- `mlx-community/GLM-4.6V-Flash-6bit`: Output formatting deviated from the requested structure. Details: Unknown tags: &lt;think&gt;.
 - `mlx-community/GLM-4.6V-Flash-mxfp4`: Output formatting deviated from the requested structure. Details: Unknown tags: &lt;think&gt;.
 - `mlx-community/GLM-4.6V-nvfp4`: Output formatting deviated from the requested structure. Details: Unknown tags: &lt;think&gt;.
 - `mlx-community/Idefics3-8B-Llama3-bf16`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
@@ -349,30 +317,32 @@ warning, or stack-signal anomaly).
 - `mlx-community/LFM2-VL-1.6B-8bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `mlx-community/LFM2.5-VL-1.6B-bf16`: Description sentence violation (3; expected 1-2)
 - `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
-- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: ⚠️REVIEW:context_budget
-- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: ⚠️REVIEW:context_budget
-- `mlx-community/Molmo-7B-D-0924-8bit`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
+- `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`: Description sentence violation (3; expected 1-2)
+- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: Nonvisual metadata borrowing
+- `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: Description sentence violation (3; expected 1-2)
+- `mlx-community/Molmo-7B-D-0924-8bit`: Output leaked reasoning or prompt-template text (title hint:).
 - `mlx-community/Molmo-7B-D-0924-bf16`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 - `mlx-community/Phi-3.5-vision-instruct-bf16`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
+- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `mlx-community/Qwen3.5-27B-4bit`: Model refused or deflected the requested task (explicit_refusal).
 - `mlx-community/Qwen3.5-27B-mxfp8`: Model refused or deflected the requested task (explicit_refusal).
 - `mlx-community/Qwen3.5-35B-A3B-4bit`: Model refused or deflected the requested task (explicit_refusal).
 - `mlx-community/Qwen3.5-35B-A3B-6bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `mlx-community/Qwen3.5-35B-A3B-bf16`: Model refused or deflected the requested task (explicit_refusal).
-- `mlx-community/Qwen3.5-9B-MLX-4bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- `mlx-community/Qwen3.5-9B-MLX-4bit`: Output omitted required Title/Description/Keywords sections (description, keywords).
 - `mlx-community/SmolVLM-Instruct-bf16`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 - `mlx-community/SmolVLM2-2.2B-Instruct-mlx`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 - `mlx-community/gemma-3-27b-it-qat-4bit`: Nonvisual metadata borrowing
 - `mlx-community/gemma-3-27b-it-qat-8bit`: Nonvisual metadata borrowing
 - `mlx-community/gemma-3n-E2B-4bit`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 - `mlx-community/gemma-3n-E4B-it-bf16`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
-- `mlx-community/gemma-4-31b-bf16`: Output became repetitive, indicating possible generation instability (token: phrase: "51.147833, -0.978750, 51.14783....
+- `mlx-community/gemma-4-31b-bf16`: Output became repetitive, indicating possible generation instability (token: phrase: "town centre, town center,...").
 - `mlx-community/gemma-4-31b-it-4bit`: Nonvisual metadata borrowing
-- `mlx-community/nanoLLaVA-1.5-4bit`: Title length violation (11 words; expected 5-10)
+- `mlx-community/nanoLLaVA-1.5-4bit`: Output leaked reasoning or prompt-template text (do not output reasoning).
 - `mlx-community/paligemma2-10b-ft-docci-448-6bit`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 - `mlx-community/paligemma2-3b-ft-docci-448-bf16`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 - `mlx-community/paligemma2-3b-pt-896-4bit`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
-- `mlx-community/pixtral-12b-8bit`: Keyword count violation (19; expected 10-18)
+- `mlx-community/pixtral-12b-8bit`: Description sentence violation (3; expected 1-2)
 - `mlx-community/pixtral-12b-bf16`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 - `qnguyen3/nanoLLaVA`: Model output may not follow prompt or image contents (missing: Town, Centre, Alton, United, Kingdom).
 
@@ -403,7 +373,7 @@ warning, or stack-signal anomaly).
 pip install -e "src/[dev]"
 
 # Re-run with the same CLI arguments
-python -m check_models --image /Users/jrp/Pictures/Processed/20260411-154640_DSC09740_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose
+python -m check_models --image /Users/jrp/Pictures/Processed/20260411-151022_DSC09714_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose
 ```
 
 ### Portable triage (no local image required)
@@ -434,7 +404,7 @@ the exact prompt trace has been exported to
 for each failing model.
 
 ```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260411-154640_DSC09740_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/MolmoPoint-8B-fp16
+python -m check_models --image /Users/jrp/Pictures/Processed/20260411-151022_DSC09714_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/MolmoPoint-8B-fp16
 ```
 
 ### Prompt Used
@@ -472,12 +442,12 @@ Rules:
 
 Context: Existing metadata hints (high confidence; use only when visually confirmed):
 - Description hint: , Town Centre, Alton, England, United Kingdom, UK
-- Capture metadata: Taken on 2026-04-11 16:46:40 BST (at 16:46:40 local time). GPS: 51.147833°N, 0.978750°W.
+- Capture metadata: Taken on 2026-04-11 16:10:22 BST (at 16:10:22 local time). GPS: 51.150083°N, 0.973833°W.
 ```
 
 ### Run details
 
-- Input image: `/Users/jrp/Pictures/Processed/20260411-154640_DSC09740_DxO.jpg`
+- Input image: `/Users/jrp/Pictures/Processed/20260411-151022_DSC09714_DxO.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-04-12 01:33:02 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-04-12 21:48:31 BST by [check_models](https://github.com/jrp2014/check_models)._

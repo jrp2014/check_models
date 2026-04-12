@@ -1,0 +1,113 @@
+{
+  "environment": {
+    "library_versions": {
+      "Pillow": "12.2.0",
+      "huggingface-hub": "1.10.1",
+      "mlx": "0.31.2.dev20260412+520cea2b",
+      "mlx-lm": "0.31.3",
+      "mlx-metal": null,
+      "mlx-vlm": "0.4.4",
+      "numpy": "2.4.4",
+      "tokenizers": "0.22.2",
+      "transformers": "5.5.3"
+    },
+    "platform": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+    "preflight_issues": [
+      "transformers import utils no longer reference the TF/FLAX/JAX backend guard env vars used by check_models; backend guard hints for those backends may be ignored with this version."
+    ],
+    "system_info": {
+      "Architecture": "arm64",
+      "CPU Cores (Logical)": "18",
+      "CPU Cores (Physical)": "18",
+      "GPU Cores": "40",
+      "GPU/Chip": "Apple M5 Max",
+      "Metal SDK": "MacOSX.sdk",
+      "Metal Support": "Metal 4",
+      "OS": "Darwin 25.4.0",
+      "Python Version": "3.13.12",
+      "RAM": "128.0 GB",
+      "SDK Version": "26.4",
+      "Xcode Build": "17E192",
+      "Xcode Version": "26.4",
+      "macOS Version": "26.4.1"
+    }
+  },
+  "failure": {
+    "captured_output": "=== STDERR ===\nDownloading (incomplete total...): 0.00B [00:00, ?B/s]\n\rFetching 26 files:   0%|          | 0/26 [00:00<?, ?it/s]\u001b[A\rFetching 26 files: 100%|##########| 26/26 [00:00<00:00, 11443.01it/s]\n\rDownload complete: : 0.00B [00:00, ?B/s]              \rDownload complete: : 0.00B [00:00, ?B/s]\n/Users/jrp/miniconda3/envs/mlx-vlm/lib/python3.13/site-packages/transformers/modeling_rope_utils.py:1032: FutureWarning: `rope_config_validation` is deprecated and has been removed. Its functionality has been moved to RotaryEmbeddingConfigMixin.validate_rope method. PreTrainedConfig inherits this class, so please call self.validate_rope() instead. Also, make sure to use the new rope_parameters syntax. You can call self.standardize_rope_params() in the meantime.\n  warnings.warn(",
+    "code": "MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR",
+    "message": "Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded processor has no image_processor; expected multimodal processor.",
+    "package": "model-config",
+    "phase": "processor_load",
+    "signature": "MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR:a6e1fb5a9278",
+    "stage": "Processor Error",
+    "traceback": "Traceback (most recent call last):\n  File \"/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py\", line 14790, in _prepare_generation_prompt\n    _run_model_preflight_validators(\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^\n        model_identifier=params.model_identifier,\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<2 lines>...\n        phase_callback=phase_callback,\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py\", line 14581, in _run_model_preflight_validators\n    _raise_preflight_error(\n    ~~~~~~~~~~~~~~~~~~~~~~^\n        \"Loaded processor has no image_processor; expected multimodal processor.\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        phase=\"processor_load\",\n        ^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py\", line 14500, in _raise_preflight_error\n    raise _tag_exception_failure_phase(ValueError(message), phase)\nValueError: Loaded processor has no image_processor; expected multimodal processor.\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py\", line 15204, in process_image_with_model\n    output: GenerationResult | SupportsGenerationResult = _run_model_generation(\n                                                          ~~~~~~~~~~~~~~~~~~~~~^\n        params=params,\n        ^^^^^^^^^^^^^^\n        phase_callback=_update_phase,\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        phase_timer=phase_timer,\n        ^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py\", line 15043, in _run_model_generation\n    formatted_prompt = _prepare_generation_prompt(\n        params=params,\n    ...<3 lines>...\n        phase_timer=phase_timer,\n    )\n  File \"/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py\", line 14831, in _prepare_generation_prompt\n    raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err\nValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded processor has no image_processor; expected multimodal processor.\n",
+    "type": "ValueError"
+  },
+  "generated_at_utc": "2026-04-12T20:48:31+00:00",
+  "model": "mlx-community/MolmoPoint-8B-fp16",
+  "repro": {
+    "args": {
+      "_check_models_preflight_issues": [
+        "transformers import utils no longer reference the TF/FLAX/JAX backend guard env vars used by check_models; backend guard hints for those backends may be ignored with this version."
+      ],
+      "adapter_path": null,
+      "context_marker": "Context:",
+      "detailed_metrics": false,
+      "dry_run": false,
+      "enable_thinking": false,
+      "eos_tokens": null,
+      "exclude": null,
+      "folder": "/Users/jrp/Pictures/Processed",
+      "force_color": false,
+      "image": null,
+      "kv_bits": null,
+      "kv_group_size": 64,
+      "lazy_load": false,
+      "max_kv_size": null,
+      "max_tokens": 500,
+      "min_p": 0.0,
+      "models": null,
+      "no_color": false,
+      "output_diagnostics": "/Users/jrp/Documents/AI/mlx/check_models/src/output/diagnostics.md",
+      "output_env": "/Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log",
+      "output_gallery_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/model_gallery.md",
+      "output_html": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.html",
+      "output_jsonl": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.jsonl",
+      "output_log": "/Users/jrp/Documents/AI/mlx/check_models/src/output/check_models.log",
+      "output_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.md",
+      "output_review": "/Users/jrp/Documents/AI/mlx/check_models/src/output/review.md",
+      "output_tsv": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.tsv",
+      "prefill_step_size": 4096,
+      "processor_kwargs": null,
+      "prompt": null,
+      "quality_config": null,
+      "quantized_kv_start": 0,
+      "repetition_context_size": 20,
+      "repetition_penalty": null,
+      "resize_shape": null,
+      "revision": null,
+      "skip_special_tokens": false,
+      "temperature": 0.0,
+      "thinking_budget": null,
+      "thinking_end_token": "</think>",
+      "thinking_start_token": null,
+      "timeout": 300.0,
+      "top_k": 0,
+      "top_p": 1.0,
+      "trust_remote_code": true,
+      "verbose": true,
+      "width": null
+    },
+    "env_vars": {
+      "TOKENIZERS_PARALLELISM": "false"
+    },
+    "image_path": "/Users/jrp/Pictures/Processed/20260411-151022_DSC09714_DxO.jpg",
+    "image_ref_sha256": "c840321511f3f5c1a0e949f02d2ce48c7e1485577ede4936b7afcfa2d7e26af0",
+    "image_sha256": "0c131dccf5207ab6e366f906b5ebc1f50af0be4dba141a097dbedbec3beb485e",
+    "prompt_hash_sha256": "08990f6918d7fd7b74b9dc45a0dd0984a68372f10ffcec25afcfcb49378eefb3",
+    "prompt_preview": "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct any...",
+    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260411-151022_DSC09714_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/MolmoPoint-8B-fp16",
+    "seed": null
+  },
+  "schema_version": "1.0"
+}
