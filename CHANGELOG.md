@@ -6,6 +6,17 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- Added `--eval-mode` CLI flag with three evaluation lanes: `stress` (default,
+  current behavior), `triage` (short prompt, 200 token cap, pass/fail only),
+  and `quality` (cataloguing prompt with generous 1000 token cap).
+- Added `--prune-repro-days N` CLI flag to automatically clean up repro bundles
+  older than N days (default: 90). Set to 0 to disable.
+- Added `Critical` severity tier in diagnostics for error clusters affecting
+  ≥5 models, above the existing `High` threshold.
+- Added `nonvisual_location_terms` config list in `quality_config.yaml` for
+  maintainer-tunable nonvisual metadata terms.
+- Added `penalized_echo_ratio` metric to `compute_information_gain()` that
+  excludes visual hint term reuse from echo penalties.
 - Added `add-or-fix-type-checking` agentic skill
   (`.agents/skills/add-or-fix-type-checking/SKILL.md`) providing a structured
   workflow for diagnosing and fixing typing errors from mypy, ty, and pyrefly.
@@ -14,6 +25,22 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Split `cutoff` verdict into `token_cap` (benign cap hit, structurally sound
+  output) and `cutoff_degraded` (cap hit with quality degradation). Token-capped
+  A/B-grade models now reach `recommended` or `caveat` instead of `avoid`.
+- Added `runtime_failure` verdict for models that crash (exception, OOM, timeout),
+  distinct from `harness` verdict which is reserved for successful runs with
+  template/encoding leaks.
+- Improved failure clustering with message-only merge pass that collapses
+  variants differing only in stack traces (e.g. broadcast_shapes dimensions).
+- Reconciled utility grade with user bucket: A/B-grade clean or token-capped
+  models can now reach `recommended`; C-or-below capped models go to `caveat`.
+- Excluded nonvisual metadata terms from hint overlap ratio denominator so
+  models are not penalized for omitting non-verifiable location metadata.
+- Removed Action Snapshot duplication from review.md (now cross-references
+  results.md).
+- Expanded `NONVISUAL_CONTEXT_TERMS` with generic location descriptors (town,
+  village, parish, county, borough, district, municipality, province, region).
 - Hardened Markdown gallery blockquote rendering so label-only model-output
   lines such as `Description:` and stray lone `-` markers are neutralized
   before markdownlint can misread them as headings.

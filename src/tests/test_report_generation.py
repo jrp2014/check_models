@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import os
+import time
 from argparse import Namespace
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
@@ -24,6 +26,7 @@ from check_models import (
     _diagnostics_priority,
     _format_traceback_tail,
     _log_maintainer_summary,
+    _prune_repro_bundles,
     export_failure_repro_bundles,
     generate_diagnostics_report,
     generate_html_report,
@@ -717,7 +720,7 @@ class TestMarkdownGalleryReport:
         )
 
         content = out.read_text(encoding="utf-8")
-        assert "## 🎯 Action Snapshot" in content
+        assert "Action Snapshot" in content  # cross-reference to results.md
         assert "## 🧭 Review Priorities" in content
         assert "## 🚨 Failures by Package (Actionable)" in content
         assert "_Review Status:_" in content
@@ -2431,7 +2434,12 @@ class TestDiagnosticsPriority:
     def test_high_for_multi_model(self) -> None:
         """Clusters with >=2 models are High priority."""
         assert _diagnostics_priority(2, "Model Error") == "High"
-        assert _diagnostics_priority(5, "Model Error") == "High"
+        assert _diagnostics_priority(4, "Model Error") == "High"
+
+    def test_critical_for_large_cluster(self) -> None:
+        """Clusters with >=5 models are Critical priority."""
+        assert _diagnostics_priority(5, "Model Error") == "Critical"
+        assert _diagnostics_priority(10, "Model Error") == "Critical"
 
     def test_low_for_weight_mismatch(self) -> None:
         """Weight mismatch and config issues are Low priority."""
@@ -2477,3 +2485,34 @@ class TestDiagnosticsContextBuilder:
         assert context.failure_history["org/a"].first_failure_timestamp == "2026-02-01 10:00:00 GMT"
         assert context.failure_history["org/a"].recent_failures == 2
         assert context.failure_history["org/a"].recent_considered == 2
+
+
+class TestPruneReproBundles:
+    """Tests for _prune_repro_bundles."""
+
+    def test_removes_old_bundles(self, tmp_path: Path) -> None:
+        """Bundles older than max_age_days are removed."""
+        old_dir = tmp_path / "old_model"
+        old_dir.mkdir()
+        # Set mtime to 200 days ago
+        old_time = time.time() - 200 * 86400
+        os.utime(old_dir, (old_time, old_time))
+
+        new_dir = tmp_path / "new_model"
+        new_dir.mkdir()
+
+        removed = _prune_repro_bundles(tmp_path, 90)
+        assert removed == 1
+        assert not old_dir.exists()
+        assert new_dir.exists()
+
+    def test_zero_days_disables_pruning(self, tmp_path: Path) -> None:
+        """max_age_days=0 disables pruning."""
+        (tmp_path / "some_model").mkdir()
+        removed = _prune_repro_bundles(tmp_path, 0)
+        assert removed == 0
+
+    def test_nonexistent_dir(self, tmp_path: Path) -> None:
+        """Non-existent directory returns 0."""
+        removed = _prune_repro_bundles(tmp_path / "nonexistent", 90)
+        assert removed == 0

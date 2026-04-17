@@ -339,7 +339,7 @@ def test_analyze_generation_text_detects_cutoff_when_cap_is_hit() -> None:
     )
 
     assert analysis.likely_capped is True
-    assert analysis.verdict == "cutoff"
+    assert analysis.verdict in {"cutoff_degraded", "token_cap"}
     assert "token_cap" in analysis.evidence
 
 
@@ -878,3 +878,105 @@ def test_has_harness_issues_only() -> None:
         harness_issue_details=["bpe_space_leak"],
     )
     assert mixed_issues.has_harness_issues_only() is False
+
+
+class TestClassifyReviewVerdict:
+    """Tests for _classify_review_verdict verdict splitting."""
+
+    def test_token_cap_without_degradation(self) -> None:
+        """Token cap hit with no degradation reasons returns token_cap."""
+        verdict, _ = check_models._classify_review_verdict(
+            has_harness_issue=False,
+            harness_type=None,
+            likely_cutoff=True,
+            cutoff_reasons=[],
+            prompt_tokens_total=100,
+            prompt_tokens_text_est=80,
+            prompt_tokens_nontext_est=20,
+            missing_sections=[],
+            utility_grade="A",
+            instruction_echo=False,
+            metadata_borrowing=False,
+            has_hallucination=False,
+        )
+        assert verdict == "token_cap"
+
+    def test_cutoff_degraded_with_missing_sections(self) -> None:
+        """Token cap hit with missing_sections returns cutoff_degraded."""
+        verdict, _ = check_models._classify_review_verdict(
+            has_harness_issue=False,
+            harness_type=None,
+            likely_cutoff=True,
+            cutoff_reasons=["missing_sections"],
+            prompt_tokens_total=100,
+            prompt_tokens_text_est=80,
+            prompt_tokens_nontext_est=20,
+            missing_sections=["Keywords"],
+            utility_grade="C",
+            instruction_echo=False,
+            metadata_borrowing=False,
+            has_hallucination=False,
+        )
+        assert verdict == "cutoff_degraded"
+
+    def test_harness_verdict_preserved(self) -> None:
+        """Harness issues still return harness verdict."""
+        verdict, _ = check_models._classify_review_verdict(
+            has_harness_issue=True,
+            harness_type="encoding",
+            likely_cutoff=False,
+            cutoff_reasons=[],
+            prompt_tokens_total=100,
+            prompt_tokens_text_est=80,
+            prompt_tokens_nontext_est=20,
+            missing_sections=[],
+            utility_grade="B",
+            instruction_echo=False,
+            metadata_borrowing=False,
+            has_hallucination=False,
+        )
+        assert verdict == "harness"
+
+
+class TestClassifyUserBucket:
+    """Tests for _classify_user_bucket with new verdict types."""
+
+    def test_token_cap_grade_a_recommended(self) -> None:
+        """A-grade token_cap models should be recommended."""
+        bucket = check_models._classify_user_bucket(
+            verdict="token_cap",
+            hint_relationship="preserves_trusted_hints",
+            has_contract_issue=False,
+            utility_grade="A",
+        )
+        assert bucket == "recommended"
+
+    def test_cutoff_degraded_avoid(self) -> None:
+        """cutoff_degraded models should be avoid."""
+        bucket = check_models._classify_user_bucket(
+            verdict="cutoff_degraded",
+            hint_relationship="preserves_trusted_hints",
+            has_contract_issue=False,
+            utility_grade="C",
+        )
+        assert bucket == "avoid"
+
+    def test_runtime_failure_avoid(self) -> None:
+        """runtime_failure models should be avoid."""
+        bucket = check_models._classify_user_bucket(
+            verdict="runtime_failure",
+            hint_relationship="preserves_trusted_hints",
+            has_contract_issue=False,
+            utility_grade="F",
+        )
+        assert bucket == "avoid"
+
+    def test_clean_grade_a_recommended(self) -> None:
+        """Clean A-grade models should be recommended."""
+        bucket = check_models._classify_user_bucket(
+            verdict="clean",
+            hint_relationship="preserves_trusted_hints",
+            has_contract_issue=False,
+            utility_grade="A",
+        )
+        assert bucket == "recommended"

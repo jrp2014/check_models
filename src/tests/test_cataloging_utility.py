@@ -86,6 +86,23 @@ class TestComputeInformationGain:
         assert result["information_gain"] == 0.0
         assert result["output_words"] == 0
 
+    def test_penalized_echo_ratio_excludes_visual_terms(self) -> None:
+        """Visual hint terms should not inflate penalized_echo_ratio."""
+        context = "church sunset timestamp england"
+        text = "A beautiful church at sunset with golden light."
+        result = compute_information_gain(text, context)
+
+        # echo_ratio counts all overlap (church, sunset from context)
+        assert result["echo_ratio"] > 0.0
+        # penalized_echo_ratio only counts nonvisual terms (timestamp, england)
+        # which are NOT in the output, so it should be lower
+        assert result["penalized_echo_ratio"] <= result["echo_ratio"]
+
+    def test_penalized_echo_ratio_returned(self) -> None:
+        """penalized_echo_ratio key is present in results."""
+        result = compute_information_gain("some novel text here", "other context words")
+        assert "penalized_echo_ratio" in result
+
 
 class TestComputeTaskCompliance:
     """Tests for compute_task_compliance function."""

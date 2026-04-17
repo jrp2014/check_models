@@ -198,6 +198,24 @@ patterns:
     - "\\bclearly\\b"
     - "\\bobviously\\b"
 
+  # Nonvisual metadata location terms — generic place-type words that appear
+  # in IPTC/EXIF metadata but are not visually verifiable. Models should not
+  # be penalised for omitting these from image descriptions.
+  nonvisual_location_terms:
+    - "town"
+    - "centre"
+    - "center"
+    - "village"
+    - "parish"
+    - "county"
+    - "borough"
+    - "district"
+    - "municipality"
+    - "province"
+    - "region"
+    - "state"
+    - "country"
+
   # Task structure detection labels (regex fragments)
   task_caption_labels:
     - "caption"

@@ -205,7 +205,7 @@ def test_save_jsonl_report_includes_review_payload_for_failures(tmp_path: Path) 
 
     _header, rows = _read_jsonl(output_file)
     review = rows[0]["review"]
-    assert review["verdict"] == "harness"
+    assert review["verdict"] == "runtime_failure"
     assert review["owner"] == "mlx-vlm"
     assert review["user_bucket"] == "avoid"
     assert review["evidence"]
@@ -232,7 +232,7 @@ def test_save_jsonl_report_flags_huggingface_hub_connectivity_failures(tmp_path:
 
     _header, rows = _read_jsonl(output_file)
     review = rows[0]["review"]
-    assert review["verdict"] == "harness"
+    assert review["verdict"] == "runtime_failure"
     assert review["owner"] == "huggingface-hub"
     assert "hub_connectivity" in review["evidence"]
 

@@ -49,3 +49,5 @@ def test_cli_help_output(help_flag: str, capsys: pytest.CaptureFixture[str]) -> 
     assert "requires a path when provided" in output.lower()
     assert "verification prompt is used" in output
     assert "Prompt. (default: None)" not in output
+    assert "--eval-mode" in output
+    assert "--prune-repro-days" in output

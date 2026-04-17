@@ -1042,6 +1042,7 @@ class DiagnosticsArtifacts:
     snapshot: DiagnosticsSnapshot
     diagnostics_written: bool = False
     repro_bundles: Mapping[str, Path] = dataclasses.field(default_factory=dict)
+    issue_reports: Mapping[str, Path] = dataclasses.field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -1290,15 +1291,15 @@ DEFAULT_MAX_TOKENS: Final[int] = 500
 DEFAULT_FOLDER: Final[Path] = Path.home() / "Pictures" / "Processed"
 # Output paths relative to script's directory (not CWD) for consistency
 _SCRIPT_DIR = Path(__file__).parent
-DEFAULT_HTML_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.html"
-DEFAULT_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.md"
-DEFAULT_GALLERY_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "model_gallery.md"
-DEFAULT_REVIEW_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "review.md"
-DEFAULT_TSV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.tsv"
+DEFAULT_HTML_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "results.html"
+DEFAULT_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "results.md"
+DEFAULT_GALLERY_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "model_gallery.md"
+DEFAULT_REVIEW_MD_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "review.md"
+DEFAULT_TSV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "results.tsv"
 DEFAULT_LOG_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "check_models.log"
 DEFAULT_JSONL_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "results.jsonl"
 DEFAULT_ENV_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "environment.log"
-DEFAULT_DIAGNOSTICS_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "diagnostics.md"
+DEFAULT_DIAGNOSTICS_OUTPUT: Final[Path] = _SCRIPT_DIR / "output" / "reports" / "diagnostics.md"
 _PREFLIGHT_ISSUES_ARG_ATTR: Final[str] = "_check_models_preflight_issues"
 
 DEFAULT_TEMPERATURE: Final[float] = 0.0  # Greedy/deterministic (matches mlx-vlm upstream)
@@ -2877,18 +2878,31 @@ NONVISUAL_CONTEXT_TERMS: Final[frozenset[str]] = frozenset(
     {
         "adobe stock",
         "any vision",
+        "borough",
+        "center",
+        "centre",
+        "country",
+        "county",
+        "district",
         "england",
         "europe",
         "gps",
         "hertfordshire",
         "locations",
-        "stock",
+        "municipality",
+        "parish",
+        "province",
+        "region",
         "source",
+        "state",
+        "stock",
         "taken",
         "time",
         "timestamp",
+        "town",
         "uk",
         "united kingdom",
+        "village",
         "welwyn garden city",
     },
 )
@@ -2997,6 +3011,11 @@ def _is_nonvisual_context_term(term: str) -> bool:
         return False
     if normalized in NONVISUAL_CONTEXT_TERMS:
         return True
+    # Check config-loaded nonvisual location terms
+    if QUALITY.patterns:
+        config_terms = QUALITY.patterns.get("nonvisual_location_terms")
+        if config_terms and normalized in {t.lower() for t in config_terms}:
+            return True
     return any(pattern.search(term) for pattern in NONVISUAL_CONTEXT_PATTERNS)
 
 
@@ -3373,7 +3392,13 @@ def _detect_likely_cutoff(
     is_repetitive: bool,
     missing_sections: Sequence[str],
 ) -> tuple[bool, list[str]]:
-    """Detect likely early termination at the generation cap."""
+    """Detect likely early termination at the generation cap.
+
+    Returns ``(hit_cap, reasons)`` where *reasons* may include degradation
+    evidence such as ``"missing_sections"`` or ``"repetitive_tail"``.  A hit
+    with no degradation reasons means the model produced structurally sound
+    output that merely ran out of budget.
+    """
     if requested_max_tokens is None or requested_max_tokens <= 0:
         return False, []
     if generated_tokens < requested_max_tokens:
@@ -3390,7 +3415,7 @@ def _detect_likely_cutoff(
             reasons.append("unfinished_section")
         if tail[-1].isalnum() and not re.search(r"[.!?\"')\]]\s*$", tail):
             reasons.append("abrupt_tail")
-    return bool(reasons), _dedupe_preserve_order(reasons)
+    return True, _dedupe_preserve_order(reasons)
 
 
 def _classify_hint_relationship(
@@ -3403,12 +3428,9 @@ def _classify_hint_relationship(
 
     text_for_hint_eval = _strip_nonvisual_terms_from_text(text, bundle.nonvisual_terms) or text
     normalized_text = _normalize_phrase_for_matching(text_for_hint_eval)
-    matched_terms = [
-        term for term in bundle.trusted_terms if _context_term_present(term, normalized_text)
-    ]
-    overlap_ratio = (
-        len(matched_terms) / max(len(bundle.trusted_terms), 1) if bundle.trusted_terms else 0.0
-    )
+    visual_terms = [t for t in bundle.trusted_terms if not _is_nonvisual_context_term(t)]
+    visual_matched = [t for t in visual_terms if _context_term_present(t, normalized_text)]
+    overlap_ratio = len(visual_matched) / max(len(visual_terms), 1) if visual_terms else 0.0
     baseline = compute_cataloging_utility(bundle.trusted_text, None)
     baseline_score = float(baseline["utility_score"])
     utility = compute_cataloging_utility(text_for_hint_eval, bundle.trusted_text)
@@ -3450,6 +3472,7 @@ def _classify_review_verdict(
     has_harness_issue: bool,
     harness_type: str | None,
     likely_cutoff: bool,
+    cutoff_reasons: Sequence[str] = (),
     prompt_tokens_total: int | None,
     prompt_tokens_text_est: int | None,
     prompt_tokens_nontext_est: int | None,
@@ -3459,7 +3482,16 @@ def _classify_review_verdict(
     metadata_borrowing: bool,
     has_hallucination: bool,
 ) -> tuple[str, list[str]]:
-    """Return ordered verdict plus compact evidence labels."""
+    """Return ordered verdict plus compact evidence labels.
+
+    Token-cap hits are split into two verdicts:
+
+    * ``"token_cap"`` — the model hit max_tokens but produced structurally
+      sound output (no degradation evidence such as missing sections,
+      repetitive tails, or abrupt stops).
+    * ``"cutoff_degraded"`` — the model hit max_tokens **and** the output
+      shows quality degradation.
+    """
     evidence: list[str] = []
     if has_harness_issue and (harness_type or "") != "long_context":
         if harness_type:
@@ -3468,7 +3500,12 @@ def _classify_review_verdict(
 
     if likely_cutoff:
         evidence.append("token_cap")
-        return "cutoff", evidence
+        # Distinguish benign cap from degraded cap
+        _degradation_reasons = {"missing_sections", "repetitive_tail", "unfinished_section"}
+        if set(cutoff_reasons) & _degradation_reasons:
+            evidence.extend(cutoff_reasons)
+            return "cutoff_degraded", evidence
+        return "token_cap", evidence
 
     weak_output = (
         bool(missing_sections) or instruction_echo or metadata_borrowing or has_hallucination
@@ -3508,15 +3545,33 @@ def _classify_user_bucket(
     verdict: str,
     hint_relationship: str,
     has_contract_issue: bool,
+    utility_grade: str = "",
 ) -> str:
-    """Bucket outputs for end users based on verdict and utility signals."""
-    if verdict in {"harness", "cutoff"}:
+    """Bucket outputs for end users based on verdict and utility signals.
+
+    Verdict-to-bucket mapping:
+
+    * ``harness`` / ``cutoff_degraded`` → ``"avoid"``
+    * ``token_cap`` with A/B grade → ``"recommended"`` (model is good, just
+      needs more budget)
+    * ``token_cap`` with C or below → ``"caveat"``
+    * ``context_budget`` → ``"caveat"``
+    * ``model_shortcoming`` or degraded hints → ``"avoid"``
+    * ``runtime_failure`` → ``"avoid"``
+    * ``clean`` with positive hints and no contract issues → ``"recommended"``
+    * everything else → ``"caveat"``
+    """
+    if verdict in {"harness", "cutoff_degraded", "runtime_failure"}:
         return "avoid"
+    if verdict == "token_cap":
+        if utility_grade in {"A", "B"} and hint_relationship != "degrades_trusted_hints":
+            return "recommended"
+        return "caveat"
     if verdict == "context_budget":
         return "caveat"
     if verdict == "model_shortcoming" or hint_relationship == "degrades_trusted_hints":
         return "avoid"
-    if (
+    is_clean_recommended = (
         verdict == "clean"
         and hint_relationship
         in {
@@ -3524,9 +3579,8 @@ def _classify_user_bucket(
             "preserves_trusted_hints",
         }
         and not has_contract_issue
-    ):
-        return "recommended"
-    return "caveat"
+    )
+    return "recommended" if is_clean_recommended else "caveat"
 
 
 def _detect_refusal_patterns(text: str) -> tuple[bool, str | None]:
@@ -4506,6 +4560,7 @@ def compute_information_gain(text: str, context: str | None) -> dict[str, float 
         }
 
     # Words in output that came from context (echoed)
+    # Words in output that came from context (echoed)
     echoed_words = output_words & context_words
     # Words in output that are novel (not in context)
     novel_words = output_words - context_words
@@ -4513,11 +4568,19 @@ def compute_information_gain(text: str, context: str | None) -> dict[str, float 
     echo_ratio = len(echoed_words) / len(output_words) if output_words else 0.0
     information_gain = len(novel_words) / len(output_words) if output_words else 0.0
 
+    # Penalised echo: only count nonvisual/instructional context reuse.
+    # Models are expected to reuse visual hint terms (e.g. "church", "sunset")
+    # — only structural or metadata terms count as problematic echo.
+    nonvisual_context = {w for w in context_words if _is_nonvisual_context_term(w)}
+    penalized_echo = output_words & nonvisual_context
+    penalized_echo_ratio = len(penalized_echo) / len(output_words) if output_words else 0.0
+
     return {
         "context_words": len(context_words),
         "output_words": len(output_words),
         "novel_words": len(novel_words),
         "echo_ratio": round(echo_ratio, 2),
+        "penalized_echo_ratio": round(penalized_echo_ratio, 2),
         "information_gain": round(information_gain, 2),
     }
 
@@ -4975,7 +5038,7 @@ def compute_cataloging_utility(
 
     # Extract key values
     information_gain_score = float(info_gain.get("information_gain", 0.0))
-    echo_ratio = float(info_gain.get("echo_ratio", 0.0))
+    echo_ratio = float(info_gain.get("penalized_echo_ratio", info_gain.get("echo_ratio", 0.0)))
     compliance_score = float(task_compliance.get("compliance_score", 0.0))
     grounding_score = float(visual_grounding.get("grounding_score", 0.0))
     description_quality = compute_description_quality(text, context)
@@ -5620,6 +5683,7 @@ def analyze_generation_text(
         has_harness_issue=harness_signals.has_harness_issue,
         harness_type=harness_signals.harness_type,
         likely_cutoff=likely_capped,
+        cutoff_reasons=cutoff_reasons,
         prompt_tokens_total=prompt_tokens,
         prompt_tokens_text_est=prompt_tokens_text_est,
         prompt_tokens_nontext_est=prompt_tokens_nontext_est,
@@ -5662,6 +5726,7 @@ def analyze_generation_text(
         verdict=verdict,
         hint_relationship=hint_relationship,
         has_contract_issue=has_contract_issue,
+        utility_grade=utility_grade,
     )
     evidence = _dedupe_preserve_order(
         [
@@ -8798,7 +8863,7 @@ def _build_jsonl_review_record(result: PerformanceResult) -> JsonlReviewRecord |
     requested_max_tokens = result.requested_max_tokens
     evidence: list[str] = _failure_review_evidence(result)
     return {
-        "verdict": "harness",
+        "verdict": "runtime_failure",
         "hint_relationship": "preserves_trusted_hints",
         "instruction_echo": False,
         "metadata_borrowing": False,
@@ -9634,6 +9699,7 @@ class DiagnosticsConfig:
     """Centralized configuration for diagnostics report behavior."""
 
     high_cluster_count: int = 2  # ≥ N models = High priority cluster
+    critical_cluster_count: int = 5  # ≥ N models = Critical priority cluster
     traceback_tail_lines: int = 6  # Lines to keep from traceback tail
     output_snippet_len: int = 200  # Max chars for sample output
     recent_run_window: int = 3  # Runs used for reproducibility signal
@@ -10378,11 +10444,16 @@ def _cluster_failures_by_pattern(
         1. Prefer explicit ``error_signature`` from runtime failure metadata.
         2. Fall back to deterministic signature built from error code + normalized
            message/traceback.
+        3. After initial clustering, merge clusters that share the same
+           message-only signature (error code + normalized message, ignoring
+           traceback differences).  This collapses e.g. ``broadcast_shapes``
+           failures that differ only in stack trace details.
 
     Returns:
         Mapping from canonical signature to the list of results sharing it.
     """
     clusters: dict[str, list[PerformanceResult]] = {}
+    sig_to_msg_key: dict[str, str] = {}
     failed = [r for r in results if not r.success]
 
     for res in failed:
@@ -10402,9 +10473,24 @@ def _cluster_failures_by_pattern(
             error_traceback=res.error_traceback,
         )
 
+        # Track a message-only key for the merge pass
+        msg_key = f"{code}|{_normalize_error_core_message(res.error_message or 'Unknown error')}"
+        sig_to_msg_key[signature] = msg_key
         clusters.setdefault(signature, []).append(res)
 
-    return clusters
+    # Merge pass: collapse clusters that share the same message-only key
+    msg_key_to_canonical: dict[str, str] = {}
+    merged: dict[str, list[PerformanceResult]] = {}
+    for sig, results_list in clusters.items():
+        msg_key = sig_to_msg_key[sig]
+        if msg_key not in msg_key_to_canonical:
+            msg_key_to_canonical[msg_key] = sig
+            merged[sig] = results_list.copy()
+        else:
+            canonical_sig = msg_key_to_canonical[msg_key]
+            merged[canonical_sig].extend(results_list)
+
+    return merged
 
 
 def _diagnostics_priority(
@@ -10412,6 +10498,8 @@ def _diagnostics_priority(
     error_stage: str | None,
 ) -> str:
     """Assign a priority label for an error cluster in the diagnostics report."""
+    if cluster_size >= DIAGNOSTICS.critical_cluster_count:
+        return "Critical"
     if cluster_size >= DIAGNOSTICS.high_cluster_count:
         return "High"
     if error_stage in {"Weight Mismatch", "Config Missing"}:
@@ -13090,7 +13178,8 @@ def generate_markdown_gallery_report(
         ),
     )
     md.append("")
-    md.extend(_format_action_snapshot_parts(results, report_context, html_output=False))
+    md.append("*Action Snapshot: see [results.md](results.md) for the full summary.*")
+    md.append("")
     md.extend(_format_review_priorities_parts(report_context, html_output=False))
     md.extend(_format_failures_by_package_parts(results, html_output=False))
     _append_markdown_image_metadata_section(md, metadata)
@@ -16600,6 +16689,8 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
     print_cli_section("Prompt Configuration")
     max_display_len = 200
 
+    eval_mode = getattr(args, "eval_mode", "stress")
+
     prompt: str
     if args.prompt:
         prompt = args.prompt
@@ -16608,6 +16699,9 @@ def prepare_prompt(args: argparse.Namespace, metadata: MetadataDict) -> str:
             "User-provided prompt (--prompt): %s",
             _build_prompt_preview(prompt, max_chars=max_display_len),
         )
+    elif eval_mode == "triage":
+        prompt = "Describe this image briefly."
+        logger.info("Using triage-mode prompt (minimal context).")
     else:
         logger.info("Generating default prompt based on image metadata.")
         prompt = _build_cataloguing_prompt(metadata)
@@ -17055,7 +17149,8 @@ def _build_quality_issues_string(analysis: GenerationQualityAnalysis) -> str | N
             analysis.hint_relationship == "degrades_trusted_hints",
             "trusted-hints-degraded",
         ),
-        (analysis.verdict == "cutoff", "cutoff"),
+        (analysis.verdict == "cutoff_degraded", "cutoff"),
+        (analysis.verdict == "token_cap", "token-cap"),
         (analysis.verdict == "context_budget", "context-budget"),
         (analysis.is_generic, f"generic({analysis.specificity_score:.0f})"),
         (analysis.is_verbose, "verbose"),
@@ -17089,6 +17184,7 @@ QUALITY_ISSUE_PATTERNS: Final[dict[str, re.Pattern[str]]] = {
     "trusted_hint_ignored": re.compile(r"\btrusted-hints-ignored\b", re.IGNORECASE),
     "trusted_hint_degraded": re.compile(r"\btrusted-hints-degraded\b", re.IGNORECASE),
     "cutoff": re.compile(r"\bcutoff\b", re.IGNORECASE),
+    "token_cap": re.compile(r"\btoken-cap\b", re.IGNORECASE),
     "context_budget": re.compile(r"\bcontext-budget\b", re.IGNORECASE),
     "generic": re.compile(r"\bgeneric\b", re.IGNORECASE),
     "verbose": re.compile(r"\bverbose\b", re.IGNORECASE),
@@ -17113,6 +17209,7 @@ QUALITY_BREAKING_LABELS: Final[frozenset[str]] = frozenset(
         "metadata_borrowing",
         "cutoff",
         "trusted_hint_degraded",
+        "runtime_failure",
     },
 )
 
@@ -18915,6 +19012,118 @@ def _log_history_comparison(
             logger.info("   %s", line)
 
 
+def _build_issue_repro_section(
+    *,
+    model_name: str,
+    repro_bundles: Mapping[str, Path],
+    run_args: argparse.Namespace | None,
+    versions: LibraryVersionDict,
+    system_info: dict[str, str],
+) -> list[str]:
+    """Build the Reproducibility + Environment section for a GitHub issue report."""
+    parts: list[str] = ["", "## Reproducibility"]
+    if model_name in repro_bundles:
+        parts.append(f"A reproduction bundle is available at: `{repro_bundles[model_name].name}`")
+    parts.extend(["", "### Repro Command", "```bash"])
+    if run_args:
+        tokens = _build_repro_command_tokens(
+            image_path=None,
+            run_args=run_args,
+            include_selection=False,
+        )
+        tokens.extend(["--models", model_name])
+        parts.append(" ".join(tokens))
+    parts.extend(["```", ""])
+    parts.extend(_diagnostics_environment_section(versions=versions, system_info=system_info))
+    return parts
+
+
+def _generate_github_issue_reports(
+    *,
+    diagnostics_snapshot: DiagnosticsSnapshot,
+    output_dir: Path,
+    versions: LibraryVersionDict,
+    system_info: dict[str, str],
+    repro_bundles: Mapping[str, Path],
+    run_args: argparse.Namespace | None,
+) -> Mapping[str, Path]:
+    """Generate standalone GitHub issue reports for clustered failures and harness issues."""
+    issues_dir = output_dir / "issues"
+    if not issues_dir.exists():
+        issues_dir.mkdir(parents=True, exist_ok=True)
+
+    generated_reports: dict[str, Path] = {}
+
+    for idx, (signature, cluster_results) in enumerate(
+        diagnostics_snapshot.failure_clusters, start=1
+    ):
+        if not cluster_results:
+            continue
+        models = sorted([r.model_name for r in cluster_results])
+        rep_result = next(iter(cluster_results))
+
+        parts = [
+            f"# [Bug] {signature}",
+            "",
+            "## Description",
+            f"A runtime failure occurred affecting **{len(models)} model(s)**.",
+            "",
+            "### Affected Models",
+        ]
+        parts.extend(f"- `{m}`" for m in models)
+        parts.extend(
+            [
+                "",
+                "## Traceback / Error Message",
+                "```text",
+                rep_result.error_message or "Unknown error",
+                "```",
+            ]
+        )
+        parts.extend(
+            _build_issue_repro_section(
+                model_name=rep_result.model_name,
+                repro_bundles=repro_bundles,
+                run_args=run_args,
+                versions=versions,
+                system_info=system_info,
+            )
+        )
+
+        file_name = f"issue_{idx:03d}_crash.md"
+        issue_path = issues_dir / file_name
+        issue_path.write_text("\\n".join(parts) + "\\n", encoding="utf-8")
+        generated_reports[f"crash_{idx}"] = issue_path
+
+    for idx, (result, harness_type) in enumerate(diagnostics_snapshot.harness_results, start=1):
+        harness_details = getattr(result, "harness_issue_details", None) or "No details provided."
+        parts = [
+            f"# [Harness Issue] {harness_type} in {result.model_name}",
+            "",
+            "## Description",
+            f"Integration/harness warning detected for `{result.model_name}`.",
+            "",
+            "### Details",
+            harness_details,
+        ]
+        parts.extend(
+            _build_issue_repro_section(
+                model_name=result.model_name,
+                repro_bundles=repro_bundles,
+                run_args=run_args,
+                versions=versions,
+                system_info=system_info,
+            )
+        )
+
+        file_name = f"issue_{idx:03d}_harness.md"
+        issue_path = issues_dir / file_name
+        issue_path.write_text("\\n".join(parts) + "\\n", encoding="utf-8")
+        generated_reports[f"harness_{idx}"] = issue_path
+
+    return generated_reports
+
+
 def _write_diagnostics_and_repro_artifacts(
     *,
     args: argparse.Namespace,
@@ -18937,7 +19146,7 @@ def _write_diagnostics_and_repro_artifacts(
     )
     repro_bundles = export_failure_repro_bundles(
         results=results,
-        output_dir=diagnostics_path.parent / "repro_bundles",
+        output_dir=diagnostics_path.parent.parent / "repro_bundles",
         run_args=args,
         versions=library_versions,
         system_info=system_info,
@@ -18966,10 +19175,24 @@ def _write_diagnostics_and_repro_artifacts(
         repro_bundles=repro_bundles,
         diagnostics_snapshot=diagnostics_snapshot,
     )
+    issue_reports = _generate_github_issue_reports(
+        diagnostics_snapshot=diagnostics_snapshot,
+        output_dir=diagnostics_path.parent.parent,  # Diagnostics is in output/reports/ now
+        versions=library_versions,
+        system_info=system_info,
+        repro_bundles=repro_bundles,
+        run_args=args,
+    )
+    if issue_reports:
+        logger.info("GitHub Issue reports generated for %d issue(s).", len(issue_reports))
+        for issue_key, issue_path in sorted(issue_reports.items()):
+            log_file_path(issue_path, label=f"   Issue Report ({issue_key}):")
+
     return DiagnosticsArtifacts(
         snapshot=diagnostics_snapshot,
         diagnostics_written=diagnostics_written,
         repro_bundles=repro_bundles,
+        issue_reports=issue_reports,
     )
 
 
@@ -19096,6 +19319,28 @@ def _generate_reports_and_log_outputs(
         logger.exception("Failed to generate reports.")
 
 
+def _prune_repro_bundles(repro_dir: Path, max_age_days: int) -> int:
+    """Delete repro bundle directories older than *max_age_days*. Returns count removed."""
+    if max_age_days <= 0 or not repro_dir.is_dir():
+        return 0
+    cutoff = time.time() - max_age_days * 86400
+    removed = 0
+    for entry in repro_dir.iterdir():
+        if not entry.is_dir():
+            continue
+        try:
+            mtime = entry.stat().st_mtime
+        except OSError:
+            continue
+        if mtime < cutoff:
+            try:
+                shutil.rmtree(entry)
+                removed += 1
+            except OSError:
+                logger.debug("Failed to remove old repro bundle: %s", entry)
+    return removed
+
+
 def finalize_execution(
     *,
     args: argparse.Namespace,
@@ -19193,6 +19438,14 @@ def finalize_execution(
             artifacts=diagnostics_artifacts,
             diagnostics_path=diagnostics_path,
         )
+
+        # Prune old repro bundles
+        prune_days = getattr(args, "prune_repro_days", 90)
+        if prune_days > 0:
+            repro_dir = diagnostics_path.parent / "repro_bundles"
+            pruned = _prune_repro_bundles(repro_dir, prune_days)
+            if pruned:
+                logger.info("Pruned %d repro bundle(s) older than %d days.", pruned, prune_days)
     else:
         log_warning_note("No models processed. No performance summary generated.")
         logger.info("Skipping report generation as no models were processed.")
@@ -19220,6 +19473,14 @@ def main(args: argparse.Namespace) -> None:
         library_versions = setup_environment(args)
         # Validate all CLI arguments early to fail fast (after logging setup)
         validate_cli_arguments(args)
+
+        # Apply eval-mode overrides (only when user hasn't explicitly set values)
+        eval_mode = getattr(args, "eval_mode", "stress")
+        if eval_mode == "triage" and args.max_tokens == DEFAULT_MAX_TOKENS:
+            args.max_tokens = 200
+        elif eval_mode == "quality" and args.max_tokens == DEFAULT_MAX_TOKENS:
+            args.max_tokens = 1000
+
         print_cli_header("MLX Vision Language Model Check")
 
         image_path = find_and_validate_image(args)
@@ -19592,6 +19853,17 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         help=("Show expanded multi-line metrics block; ignored unless --verbose is also set."),
     )
     parser.add_argument(
+        "--eval-mode",
+        choices=["stress", "triage", "quality"],
+        default="stress",
+        help=(
+            "Evaluation lane: 'stress' (default) = full cataloguing prompt with metadata, "
+            "500 token cap; 'triage' = short prompt, minimal context, 200 token cap, "
+            "pass/fail only; 'quality' = cataloguing prompt with generous 1000 token cap, "
+            "scored on output quality."
+        ),
+    )
+    parser.add_argument(
         "-x",
         "--max-tokens",
         type=int,
@@ -19720,6 +19992,12 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         type=str,
         default="Context:",
         help="Marker used to identify context section in prompt.",
+    )
+    parser.add_argument(
+        "--prune-repro-days",
+        type=int,
+        default=90,
+        help="Delete repro bundles older than N days (default: 90). Set 0 to disable pruning.",
     )
     parser.add_argument(
         "-n",
