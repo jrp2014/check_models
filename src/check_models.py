@@ -19096,7 +19096,12 @@ def _generate_github_issue_reports(
         generated_reports[f"crash_{idx}"] = issue_path
 
     for idx, (result, harness_type) in enumerate(diagnostics_snapshot.harness_results, start=1):
-        harness_details = getattr(result, "harness_issue_details", None) or "No details provided."
+        qa = result.quality_analysis
+        if qa is not None and qa.harness_issue_details:
+            harness_details = "\\n".join(f"- {d}" for d in qa.harness_issue_details)
+        else:
+            harness_details = "No details provided."
+
         parts = [
             f"# [Harness Issue] {harness_type} in {result.model_name}",
             "",
