@@ -1,0 +1,113 @@
+{
+  "environment": {
+    "library_versions": {
+      "Pillow": "12.2.0",
+      "huggingface-hub": "1.11.0",
+      "mlx": "0.31.2.dev20260417+d142de6a",
+      "mlx-lm": "0.31.3",
+      "mlx-metal": null,
+      "mlx-vlm": "0.4.4",
+      "numpy": "2.4.4",
+      "tokenizers": "0.22.2",
+      "transformers": "5.5.4"
+    },
+    "platform": "macOS-26.4.1-arm64-arm-64bit-Mach-O",
+    "preflight_issues": [
+      "transformers import utils no longer reference the TF/FLAX/JAX backend guard env vars used by check_models; backend guard hints for those backends may be ignored with this version."
+    ],
+    "system_info": {
+      "Architecture": "arm64",
+      "CPU Cores (Logical)": "18",
+      "CPU Cores (Physical)": "18",
+      "GPU Cores": "40",
+      "GPU/Chip": "Apple M5 Max",
+      "Metal SDK": "MacOSX.sdk",
+      "Metal Support": "Metal 4",
+      "OS": "Darwin 25.4.0",
+      "Python Version": "3.13.12",
+      "RAM": "128.0 GB",
+      "SDK Version": "26.4",
+      "Xcode Build": "17E192",
+      "Xcode Version": "26.4",
+      "macOS Version": "26.4.1"
+    }
+  },
+  "failure": {
+    "captured_output": "=== STDOUT ===\n==========\nFiles: ['/', 'U', 's', 'e', 'r', 's', '/', 'j', 'r', 'p', '/', 'P', 'i', 'c', 't', 'u', 'r', 'e', 's', '/', 'P', 'r', 'o', 'c', 'e', 's', 's', 'e', 'd', '/', '2', '0', '2', '6', '0', '4', '1', '1', '-', '1', '6', '5', '3', '1', '2', '_', 'D', 'S', 'C', '0', '9', '7', '4', '7', '_', 'D', 'x', 'O', '.', 'j', 'p', 'g'] \n\nPrompt: <|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\nAnalyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct anything contradicted by the image, and add important visible details that are definitely present.\n\nReturn exactly these three sections, and nothing else:\n\nTitle:\n- 5-10 words, concrete and factual, limited to clearly visible content.\n- Output only the title text after the label.\n- Do not repeat or paraphrase these instructions in the title.\n\nDescription:\n- 1-2 factual sentences describing the main visible subject, setting, lighting, action, and other distinctive visible details. Omit anything uncertain or inferred.\n- Output only the description text after the label.\n\nKeywords:\n- 10-18 unique comma-separated terms based only on clearly visible subjects, setting, colors, composition, and style. Omit uncertain tags rather than guessing.\n- Output only the keyword list after the label.\n\nRules:\n- Include only details that are definitely visible in the image.\n- Reuse metadata terms only when they are clearly supported by the image.\n- If metadata and image disagree, follow the image.\n- Prefer omission to speculation.\n- Do not copy prompt instructions into the Title, Description, or Keywords fields.\n- Do not infer identity, location, event, brand, species, time period, or intent unless visually obvious.\n- Do not output reasoning, notes, hedging, or extra sections.\n\nContext: Existing metadata hints (high confidence; use only when visually confirmed):\n- Description hint: , Town Centre, Alton, England, United Kingdom, UK\n- Capture metadata: Taken on 2026-04-11 17:53:12 BST (at 17:53:12 local time). GPS: 51.145067\u00b0N, 0.980317\u00b0W.<|vision_start|><|image_pad|><|vision_end|><|im_end|>\n<|im_start|>assistant\n\n=== STDERR ===\nDownloading (incomplete total...): 0.00B [00:00, ?B/s]\n\rFetching 11 files:   0%|          | 0/11 [00:00<?, ?it/s]\u001b[A\rFetching 11 files: 100%|##########| 11/11 [00:00<00:00, 16205.60it/s]\n\rDownload complete: : 0.00B [00:00, ?B/s]              \rDownload complete: : 0.00B [00:00, ?B/s]\n\rPrefill:   0%|          | 0/16686 [00:00<?, ?tok/s]\rPrefill:   0%|          | 0/16686 [00:00<?, ?tok/s]",
+    "code": "MLX_VLM_DECODE_MODEL",
+    "message": "Model generation failed for mlx-community/Qwen2-VL-2B-Instruct-4bit: [broadcast_shapes] Shapes (3,1,4096) and (3,1,16680) cannot be broadcast.",
+    "package": "mlx-vlm",
+    "phase": "decode",
+    "signature": "MLX_VLM_DECODE_MODEL:720c02dd03ba",
+    "stage": "Model Error",
+    "traceback": "Traceback (most recent call last):\n  File \"/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py\", line 14721, in _run_generation_with_retry_workaround\n    return generate_once()\n  File \"/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py\", line 15074, in _generate_once\n    return strict_generate(\n        model=model,\n    ...<13 lines>...\n        **extra_kwargs,\n    )\n  File \"/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py\", line 856, in generate\n    for response in stream_generate(model, processor, prompt, image, audio, **kwargs):\n                    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py\", line 735, in stream_generate\n    for n, (token, logprobs) in enumerate(gen):\n                                ~~~~~~~~~^^^^^\n  File \"/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/generate.py\", line 535, in generate_step\n    model.language_model(\n    ~~~~~~~~~~~~~~~~~~~~^\n        inputs=input_ids[:, :n_to_process],\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<3 lines>...\n        **kwargs,\n        ^^^^^^^^^\n    )\n    ^\n  File \"/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/qwen2_vl/language.py\", line 492, in __call__\n    position_ids, rope_deltas = self.get_rope_index(\n                                ~~~~~~~~~~~~~~~~~~~^\n        inputs, image_grid_thw, video_grid_thw, rope_mask\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/Users/jrp/Documents/AI/mlx/mlx-vlm/mlx_vlm/models/qwen2_vl/language.py\", line 405, in get_rope_index\n    new_positions = mx.where(\n        expanded_mask, expanded_positions, position_ids[:, i : i + 1, :]\n    )\nValueError: [broadcast_shapes] Shapes (3,1,4096) and (3,1,16680) cannot be broadcast.\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py\", line 15205, in process_image_with_model\n    output: GenerationResult | SupportsGenerationResult = _run_model_generation(\n                                                          ~~~~~~~~~~~~~~~~~~~~~^\n        params=params,\n        ^^^^^^^^^^^^^^\n        phase_callback=_update_phase,\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        phase_timer=phase_timer,\n        ^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py\", line 15097, in _run_model_generation\n    output = _run_generation_with_retry_workaround(\n        params=params,\n        generate_once=_generate_once,\n    )\n  File \"/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py\", line 14729, in _run_generation_with_retry_workaround\n    raise _tag_exception_failure_phase(ValueError(msg), \"decode\") from gen_known_err\nValueError: Model generation failed for mlx-community/Qwen2-VL-2B-Instruct-4bit: [broadcast_shapes] Shapes (3,1,4096) and (3,1,16680) cannot be broadcast.\n",
+    "type": "ValueError"
+  },
+  "generated_at_utc": "2026-04-17T12:13:03+00:00",
+  "model": "mlx-community/Qwen2-VL-2B-Instruct-4bit",
+  "repro": {
+    "args": {
+      "_check_models_preflight_issues": [
+        "transformers import utils no longer reference the TF/FLAX/JAX backend guard env vars used by check_models; backend guard hints for those backends may be ignored with this version."
+      ],
+      "adapter_path": null,
+      "context_marker": "Context:",
+      "detailed_metrics": false,
+      "dry_run": false,
+      "enable_thinking": false,
+      "eos_tokens": null,
+      "exclude": null,
+      "folder": "/Users/jrp/Pictures/Processed",
+      "force_color": false,
+      "image": null,
+      "kv_bits": null,
+      "kv_group_size": 64,
+      "lazy_load": false,
+      "max_kv_size": null,
+      "max_tokens": 500,
+      "min_p": 0.0,
+      "models": null,
+      "no_color": false,
+      "output_diagnostics": "/Users/jrp/Documents/AI/mlx/check_models/src/output/diagnostics.md",
+      "output_env": "/Users/jrp/Documents/AI/mlx/check_models/src/output/environment.log",
+      "output_gallery_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/model_gallery.md",
+      "output_html": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.html",
+      "output_jsonl": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.jsonl",
+      "output_log": "/Users/jrp/Documents/AI/mlx/check_models/src/output/check_models.log",
+      "output_markdown": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.md",
+      "output_review": "/Users/jrp/Documents/AI/mlx/check_models/src/output/review.md",
+      "output_tsv": "/Users/jrp/Documents/AI/mlx/check_models/src/output/results.tsv",
+      "prefill_step_size": 4096,
+      "processor_kwargs": null,
+      "prompt": null,
+      "quality_config": null,
+      "quantized_kv_start": 0,
+      "repetition_context_size": 20,
+      "repetition_penalty": null,
+      "resize_shape": null,
+      "revision": null,
+      "skip_special_tokens": false,
+      "temperature": 0.0,
+      "thinking_budget": null,
+      "thinking_end_token": "</think>",
+      "thinking_start_token": null,
+      "timeout": 300.0,
+      "top_k": 0,
+      "top_p": 1.0,
+      "trust_remote_code": true,
+      "verbose": true,
+      "width": null
+    },
+    "env_vars": {
+      "TOKENIZERS_PARALLELISM": "false"
+    },
+    "image_path": "/Users/jrp/Pictures/Processed/20260411-165312_DSC09747_DxO.jpg",
+    "image_ref_sha256": "415a4d708df5a694eac487bd773c15d225b4ceb79074b2e0a39a35a33828020e",
+    "image_sha256": "281f48bf5fa5b673696fca3b43948e2124c133ddb6b7c3df26e468859047e871",
+    "prompt_hash_sha256": "2bd92771f7f74777af9d88794174a8cfb6997d6a028a6ccb513f8315e1131cd7",
+    "prompt_preview": "Analyze this image for cataloguing metadata, using British English.\n\nUse only details that are clearly and definitely visible in the image. If a detail is uncertain, ambiguous, partially obscured, too small to verify, or not directly visible, leave it out. Do not guess.\n\nTreat the metadata hints below as a draft catalog record. Keep only details that are clearly confirmed by the image, correct any...",
+    "rerun_command": "python -m check_models --image /Users/jrp/Pictures/Processed/20260411-165312_DSC09747_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit",
+    "seed": null
+  },
+  "schema_version": "1.0"
+}
