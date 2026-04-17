@@ -22,6 +22,9 @@ Notable changes to this project will be documented in this file.
   workflow for diagnosing and fixing typing errors from mypy, ty, and pyrefly.
   Adapted from the Hugging Face transformers skill to this project's three-checker
   pipeline, stub management, and coding conventions.
+- Added automatic generation of standalone GitHub issue reports for clustered
+  runtime failures and harness issues, placing ready-to-file markdown documents
+  in `output/issues/`.
 
 ### Changed
 
