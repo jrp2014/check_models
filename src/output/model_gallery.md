@@ -152,7 +152,7 @@ generated output for each model.
 
 Full generated output by model:
 
-<!-- markdownlint-disable MD033 -->
+<!-- markdownlint-disable MD033 MD034 -->
 
 <a id="model-qwen-qwen3-vl-2b-instruct"></a>
 
@@ -3816,4 +3816,4 @@ _Review:_ B 73/100 | hit token cap (500) | output/prompt=2.99% | nontext
 
 ---
 
-<!-- markdownlint-enable MD033 -->
+<!-- markdownlint-enable MD033 MD034 -->

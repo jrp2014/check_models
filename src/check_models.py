@@ -12770,7 +12770,7 @@ def _generate_model_gallery_section(
     md.append("")
     md.append("Full generated output by model:")
     md.append("")
-    md.append("<!-- markdownlint-disable MD033 -->")
+    md.append("<!-- markdownlint-disable MD033 MD034 -->")
     md.append("")
 
     sorted_results = (
@@ -12808,7 +12808,7 @@ def _generate_model_gallery_section(
         md.append("---")
         md.append("")
 
-    md.append("<!-- markdownlint-enable MD033 -->")
+    md.append("<!-- markdownlint-enable MD033 MD034 -->")
     md.append("")
     return md
 
