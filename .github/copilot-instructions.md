@@ -115,7 +115,16 @@ The file is organized in this order — use these landmarks to jump to the right
 9. Update `CHANGELOG.md` under `[Unreleased]` for any maintainer-relevant change (features, fixes, refactors, tooling/docs workflow updates)
 10. `git commit -m "feat: description"` and push
 
-### 10. Common edit recipes
+### 10. Agentic skills (`.agents/skills/`)
+
+Skills provide structured, step-by-step workflows for recurring tasks. Read the
+relevant `SKILL.md` **before** starting work of that kind.
+
+| Skill | When to use | File |
+| ----- | ----------- | ---- |
+| `add-or-fix-type-checking` | Typing errors from mypy, ty, pyrefly, or `make quality` | `.agents/skills/add-or-fix-type-checking/SKILL.md` |
+
+### 11. Common edit recipes
 
 **Add a CLI flag:**
 
@@ -142,7 +151,7 @@ The file is organized in this order — use these landmarks to jump to the right
 3. Add thresholds to `src/check_models_data/quality_config.yaml` and `QualityThresholds`
 4. Add test in `src/tests/test_quality_analysis.py`
 
-### 11. What NOT to do
+### 12. What NOT to do
 
 - **Don't split `check_models.py`** into multiple files — the monolith structure is intentional
 - **Don't hardcode magic numbers** — use `quality_config.yaml` or dataclass fields

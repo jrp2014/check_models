@@ -4,6 +4,14 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Added `add-or-fix-type-checking` agentic skill
+  (`.agents/skills/add-or-fix-type-checking/SKILL.md`) providing a structured
+  workflow for diagnosing and fixing typing errors from mypy, ty, and pyrefly.
+  Adapted from the Hugging Face transformers skill to this project's three-checker
+  pipeline, stub management, and coding conventions.
+
 ### Changed
 
 - Hardened Markdown gallery blockquote rendering so label-only model-output
