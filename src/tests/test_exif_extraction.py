@@ -246,7 +246,7 @@ def test_extract_metadata_xp_keywords_from_exif(tmp_path: Path) -> None:
     img = Image.new("RGB", (10, 10), color="red")
     img.save(img_path)
 
-    # Provide exif_data with XPKeywords pre-decoded (as _process_ifd0 would)
+    # Provide exif_data with XPKeywords pre-decoded (as IFD0 pass would)
     exif_with_xp: dict[str | int, Any] = {
         "XPKeywords": "travel;landscape;mountain",
     }

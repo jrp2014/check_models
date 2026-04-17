@@ -28,6 +28,17 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Inlined `_process_ifd0`, `_coerce_exif_tag_id`, and `_process_gps_ifd` into
+  `get_exif_data` — three-pass Pillow EXIF extraction is now direct code in the
+  single function, removing ~40 lines of indirection.
+- Replaced `_append_markdown_table` and custom Markdown table formatting with
+  `tabulate(tablefmt="github")` across all diagnostics and review sections.
+- Simplified `_sha256_file` to use `hashlib.file_digest()` (Python 3.11+),
+  removing the custom chunked-read loop.
+- Inlined `_escape_markdown_in_text`, `_escape_markdown_diagnostics`, and
+  `_escape_markdown_gallery_warning` — thin escape-delegate wrappers replaced
+  by direct `MARKDOWN_ESCAPER.escape()` / `DIAGNOSTICS_ESCAPER.escape()` calls
+  at each call site.
 - Split `cutoff` verdict into `token_cap` (benign cap hit, structurally sound
   output) and `cutoff_degraded` (cap hit with quality degradation). Token-capped
   A/B-grade models now reach `recommended` or `caveat` instead of `avoid`.

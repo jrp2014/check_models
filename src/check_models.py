@@ -1664,10 +1664,10 @@ def _build_gallery_success_block_lines(  # noqa: C901 - keep gallery rendering l
                 out.append("")
             out.append(f"⚠️ {_markdown_emphasis('Quality Warnings:')}")
             out.append("")
-            out.extend(
-                f"- {_escape_markdown_gallery_warning(_collapse_preview_whitespace(issue))}"
-                for issue in analysis.issues
-            )
+            for issue in analysis.issues:
+                escaped = DIAGNOSTICS_ESCAPER.escape(_collapse_preview_whitespace(issue))
+                sanitized = re.sub(r"(?<!\\)([*`])", r"\\\1", escaped)
+                out.append(f"- {sanitized}")
             return
 
         if analysis is not None and not analysis.has_any_issues():
@@ -6686,18 +6686,6 @@ def print_image_dimensions(image_path: PathLike) -> None:
 
 
 # --- EXIF & Metadata Handling ---
-def _process_ifd0(exif_raw: Mapping[int, ExifValue]) -> ExifDict:
-    exif_decoded: ExifDict = {}
-    for tag_id, value in exif_raw.items():
-        # Skip SubIFD pointers, we'll handle them separately
-        if tag_id in (ExifTags.Base.ExifOffset, ExifTags.Base.GPSInfo):
-            continue
-        # tag_id is int per signature, no cast needed
-        tag_name: str = TAGS.get(tag_id, str(tag_id))
-        exif_decoded[tag_name] = value
-    return exif_decoded
-
-
 def _process_exif_subifd(exif_raw: SupportsExifIfd) -> ExifDict:
     out: ExifDict = {}
     try:
@@ -6709,43 +6697,6 @@ def _process_exif_subifd(exif_raw: SupportsExifIfd) -> ExifDict:
     except (KeyError, AttributeError, TypeError):
         logger.warning("Could not extract Exif SubIFD")
     return out
-
-
-def _coerce_exif_tag_id(tag_id: object) -> int | None:
-    """Return an integer EXIF tag id when the raw key is coercible."""
-    if isinstance(tag_id, int):
-        return tag_id
-    if isinstance(tag_id, str):
-        try:
-            return int(tag_id)
-        except ValueError:
-            return None
-    return None
-
-
-def _process_gps_ifd(exif_raw: SupportsExifIfd) -> GPSDict | None:
-    try:
-        gps_ifd: Mapping[object, ExifValue] | None = exif_raw.get_ifd(ExifTags.IFD.GPSInfo)
-        if isinstance(gps_ifd, dict) and gps_ifd:
-            gps_decoded: GPSDict = {}
-            for gps_tag_id, gps_value in gps_ifd.items():
-                tag_id_int = _coerce_exif_tag_id(gps_tag_id)
-                # Use modern Pillow GPS enum (10.0+) for type-safe tag name resolution
-                if tag_id_int is None:
-                    gps_key = str(gps_tag_id)
-                else:
-                    gps_key = GPSTAGS.get(tag_id_int, str(gps_tag_id))
-                    if GPS is not None:
-                        try:
-                            gps_key = GPS(tag_id_int).name
-                        except ValueError:
-                            # Fallback to dict lookup for unknown tags
-                            gps_key = GPSTAGS.get(tag_id_int, str(gps_tag_id))
-                gps_decoded[str(gps_key)] = gps_value
-            return gps_decoded
-    except (KeyError, AttributeError, TypeError) as gps_err:
-        logger.warning("Could not extract GPS IFD: %s", gps_err)
-    return None
 
 
 def get_exif_data(image_path: PathLike) -> ExifDict | None:
@@ -6799,13 +6750,47 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
                 logger.warning("No EXIF data found in %s", image_str)
                 return None
 
-            # Pillow stubs do not consistently expose Exif.get_ifd(), so cast once
-            # for type-checking while runtime behavior stays unchanged.
-            exif_decoded: ExifDict = _process_ifd0(exif_raw)
+            # Pass 1: IFD0 — baseline tags (skip SubIFD pointers handled below)
+            _ifd0_skip = {ExifTags.Base.ExifOffset, ExifTags.Base.GPSInfo}
+            exif_decoded: ExifDict = {
+                TAGS.get(tag_id, str(tag_id)): value
+                for tag_id, value in exif_raw.items()
+                if tag_id not in _ifd0_skip
+            }
+
+            # Pass 2: Exif SubIFD (exposure, lens, ISO)
             exif_decoded.update(_process_exif_subifd(cast("SupportsExifIfd", exif_raw)))
-            gps_decoded = _process_gps_ifd(cast("SupportsExifIfd", exif_raw))
-            if gps_decoded:
-                exif_decoded["GPSInfo"] = gps_decoded
+
+            # Pass 3: GPS IFD
+            try:
+                gps_ifd: Mapping[object, ExifValue] | None = cast(
+                    "SupportsExifIfd",
+                    exif_raw,
+                ).get_ifd(ExifTags.IFD.GPSInfo)
+                if isinstance(gps_ifd, dict) and gps_ifd:
+                    gps_decoded: GPSDict = {}
+                    for gps_tag_id, gps_value in gps_ifd.items():
+                        tag_id_int = (
+                            gps_tag_id
+                            if isinstance(gps_tag_id, int)
+                            else int(gps_tag_id)
+                            if isinstance(gps_tag_id, str)
+                            else None
+                        )
+                        if tag_id_int is None:
+                            gps_key = str(gps_tag_id)
+                        else:
+                            gps_key = GPSTAGS.get(tag_id_int, str(gps_tag_id))
+                            if GPS is not None:
+                                try:
+                                    gps_key = GPS(tag_id_int).name
+                                except ValueError:
+                                    gps_key = GPSTAGS.get(tag_id_int, str(gps_tag_id))
+                        gps_decoded[str(gps_key)] = gps_value
+                    exif_decoded["GPSInfo"] = gps_decoded
+            except (KeyError, AttributeError, TypeError) as gps_err:
+                logger.warning("Could not extract GPS IFD: %s", gps_err)
+
             return exif_decoded
     except (FileNotFoundError, UnidentifiedImageError):
         logger.exception("Error reading image: %s", image_str)
@@ -10017,20 +10002,6 @@ def _write_markdown_artifact(
         )
 
 
-def _append_markdown_table(
-    parts: list[str],
-    *,
-    header: str,
-    separator: str,
-    rows: list[str],
-) -> None:
-    """Append a Markdown table with a blank line after it."""
-    parts.append(header)
-    parts.append(separator)
-    parts.extend(rows)
-    parts.append("")
-
-
 def _append_markdown_section(
     parts: list[str],
     *,
@@ -10651,7 +10622,7 @@ def _diagnostics_environment_section(
     """Build environment details section for diagnostics report footer context."""
     parts: list[str] = _begin_diagnostics_section(title="## Environment")
     table_rows = [
-        f"| {component} | {DIAGNOSTICS_ESCAPER.escape(value)} |"
+        (component, DIAGNOSTICS_ESCAPER.escape(value))
         for component, value in _collect_report_component_rows(
             versions=versions,
             system_info=system_info,
@@ -10659,12 +10630,14 @@ def _diagnostics_environment_section(
             system_keys=_DIAGNOSTICS_SYSTEM_KEYS,
         )
     ]
-    _append_markdown_table(
-        parts,
-        header="| Component | Version |",
-        separator="| --------- | ------- |",
-        rows=table_rows,
+    parts.extend(
+        tabulate(
+            table_rows,
+            headers=["Component", "Version"],
+            tablefmt="github",
+        ).splitlines()
     )
+    parts.append("")
     return parts
 
 
@@ -11233,7 +11206,7 @@ def _diagnostics_failure_clusters(
         parts.append("")
 
         # Maintainer-facing table (human-readable, no local diagnostic codes).
-        table_rows: list[str] = []
+        table_rows: list[tuple[str, ...]] = []
         for r in cluster_results:
             model = DIAGNOSTICS_ESCAPER.escape(r.model_name)
             short_error = DIAGNOSTICS_ESCAPER.escape(
@@ -11244,15 +11217,15 @@ def _diagnostics_failure_clusters(
                 history_info.first_failure_timestamp if history_info else "unknown",
             )
             recent_repro = DIAGNOSTICS_ESCAPER.escape(_format_recent_repro_ratio(history_info))
-            table_rows.append(
-                f"| `{model}` | {short_error} | {first_seen} | {recent_repro} |",
-            )
-        _append_markdown_table(
-            parts,
-            header=("| Model | Observed Behavior | First Seen Failing | Recent Repro |"),
-            separator="| ----- | ----------------- | ------------------ | ------------ |",
-            rows=table_rows,
+            table_rows.append((f"`{model}`", short_error, first_seen, recent_repro))
+        parts.extend(
+            tabulate(
+                table_rows,
+                headers=["Model", "Observed Behavior", "First Seen Failing", "Recent Repro"],
+                tablefmt="github",
+            ).splitlines()
         )
+        parts.append("")
 
         _append_markdown_section(parts, title="### To reproduce")
         filing_guidance = _build_cluster_filing_guidance(
@@ -11373,30 +11346,31 @@ def _diagnostics_stack_signal_section(
         ],
     )
 
-    rows: list[str] = []
+    rows: list[tuple[str, ...]] = []
     for res, symptom, package_hint in stack_signals:
         gen = res.generation
         prompt_tokens = int(getattr(gen, "prompt_tokens", 0) or 0) if gen else 0
         generated_tokens = int(getattr(gen, "generation_tokens", 0) or 0) if gen else 0
         ratio = f"{(generated_tokens / prompt_tokens):.2%}" if prompt_tokens > 0 else "n/a"
         rows.append(
-            "| "
-            f"`{DIAGNOSTICS_ESCAPER.escape(res.model_name)}` | "
-            f"{fmt_num(prompt_tokens)} | "
-            f"{fmt_num(generated_tokens)} | "
-            f"{ratio} | "
-            f"{DIAGNOSTICS_ESCAPER.escape(symptom)} | "
-            f"`{DIAGNOSTICS_ESCAPER.escape(package_hint)}` |",
+            (
+                f"`{DIAGNOSTICS_ESCAPER.escape(res.model_name)}`",
+                fmt_num(prompt_tokens),
+                fmt_num(generated_tokens),
+                ratio,
+                DIAGNOSTICS_ESCAPER.escape(symptom),
+                f"`{DIAGNOSTICS_ESCAPER.escape(package_hint)}`",
+            )
         )
 
-    _append_markdown_table(
-        parts,
-        header=("| Model | Prompt Tok | Output Tok | Output/Prompt | Symptom | Owner |"),
-        separator=(
-            "| ----- | ---------- | ---------- | ------------- | ------- | -------------- |"
-        ),
-        rows=rows,
+    parts.extend(
+        tabulate(
+            rows,
+            headers=["Model", "Prompt Tok", "Output Tok", "Output/Prompt", "Symptom", "Owner"],
+            tablefmt="github",
+        ).splitlines()
     )
+    parts.append("")
     return parts
 
 
@@ -11408,7 +11382,7 @@ def _diagnostics_priority_table(
 ) -> list[str]:
     """Build the priority summary table for the diagnostics report."""
     parts: list[str] = _begin_diagnostics_section(title="## Priority Summary")
-    table_rows: list[str] = []
+    table_rows: list[tuple[str, ...]] = []
 
     if failure_clusters:
         for _pattern, cluster_results in failure_clusters:
@@ -11431,8 +11405,7 @@ def _diagnostics_priority_table(
             esc_names = DIAGNOSTICS_ESCAPER.escape(names)
             esc_action = DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action(pkg))
             table_rows.append(
-                f"| **{priority}** | {esc_issue} | {n} ({esc_names}) | `{esc_owner}` | "
-                f"{esc_action} |",
+                (f"**{priority}**", esc_issue, f"{n} ({esc_names})", f"`{esc_owner}`", esc_action)
             )
 
     for owner_key, owner_results in _group_harness_results_by_owner(harness_results):
@@ -11442,8 +11415,13 @@ def _diagnostics_priority_table(
         n = len(owner_results)
         action = DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action(owner_key))
         table_rows.append(
-            "| **Medium** | Harness/integration | "
-            f"{n} ({esc_names}) | `{DIAGNOSTICS_ESCAPER.escape(owner)}` | {action} |",
+            (
+                "**Medium**",
+                "Harness/integration",
+                f"{n} ({esc_names})",
+                f"`{DIAGNOSTICS_ESCAPER.escape(owner)}`",
+                action,
+            )
         )
     for owner_key, owner_signals in _group_stack_signals_by_owner(stack_signals):
         owner = _diagnostics_owner_label(owner_key)
@@ -11452,23 +11430,35 @@ def _diagnostics_priority_table(
         n = len(owner_signals)
         action = DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action(owner_key))
         table_rows.append(
-            "| **Medium** | Stack-signal anomaly | "
-            f"{n} ({esc_names}) | `{DIAGNOSTICS_ESCAPER.escape(owner)}` | {action} |",
+            (
+                "**Medium**",
+                "Stack-signal anomaly",
+                f"{n} ({esc_names})",
+                f"`{DIAGNOSTICS_ESCAPER.escape(owner)}`",
+                action,
+            )
         )
     for owner_key, owner_issues in _group_preflight_issues_by_owner(preflight_issues):
         package_summary = DIAGNOSTICS_ESCAPER.escape(_diagnostics_owner_label(owner_key))
         n = len(owner_issues)
         action = DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action(owner_key))
         table_rows.append(
-            f"| **Medium** | Preflight compatibility warning | {n} issue(s) | "
-            f"`{package_summary or 'unknown'}` | {action} |",
+            (
+                "**Medium**",
+                "Preflight compatibility warning",
+                f"{n} issue(s)",
+                f"`{package_summary or 'unknown'}`",
+                action,
+            )
         )
-    _append_markdown_table(
-        parts,
-        header="| Priority | Issue | Models Affected | Owner | Next Action |",
-        separator="| -------- | ----- | --------------- | ----- | ----------- |",
-        rows=table_rows,
+    parts.extend(
+        tabulate(
+            table_rows,
+            headers=["Priority", "Issue", "Models Affected", "Owner", "Next Action"],
+            tablefmt="github",
+        ).splitlines()
     )
+    parts.append("")
     return parts
 
 
@@ -11520,7 +11510,7 @@ def _diagnostics_history_section(
         parts.append("No prior history baseline available for regression/recovery status.")
         parts.append("")
 
-    table_rows: list[str] = []
+    table_rows: list[tuple[str, ...]] = []
     for model in sorted(failed_models):
         if model in diagnostics_context.regressions:
             status = "new regression"
@@ -11539,13 +11529,15 @@ def _diagnostics_history_section(
 
         esc_model = DIAGNOSTICS_ESCAPER.escape(model)
         esc_status = DIAGNOSTICS_ESCAPER.escape(status)
-        table_rows.append(f"| `{esc_model}` | {esc_status} | {first_seen} | {recent_repro} |")
-    _append_markdown_table(
-        parts,
-        header="| Model | Status vs Previous Run | First Seen Failing | Recent Repro |",
-        separator="| ----- | ---------------------- | ------------------ | ------------ |",
-        rows=table_rows,
+        table_rows.append((f"`{esc_model}`", esc_status, first_seen, recent_repro))
+    parts.extend(
+        tabulate(
+            table_rows,
+            headers=["Model", "Status vs Previous Run", "First Seen Failing", "Recent Repro"],
+            tablefmt="github",
+        ).splitlines()
     )
+    parts.append("")
 
     return parts
 
@@ -12038,14 +12030,11 @@ def _sha256_file(path: Path) -> str | None:
     """Return SHA256 hash for file contents, or None if unreadable."""
     if not path.exists() or not path.is_file():
         return None
-    hasher = hashlib.sha256()
     try:
         with path.open("rb") as handle:
-            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-                hasher.update(chunk)
+            return hashlib.file_digest(handle, "sha256").hexdigest()
     except OSError:
         return None
-    return hasher.hexdigest()
 
 
 def _sanitize_bundle_filename(model_name: str) -> str:
@@ -12842,11 +12831,11 @@ def _process_markdown_rows(
         # If corresponding result failed, treat as diagnostics and escape more aggressively
         is_failure = i < len(sorted_results) and not sorted_results[i].success
         if is_failure:
-            rows[i][last_col_idx] = _escape_markdown_diagnostics(rows[i][last_col_idx])
+            rows[i][last_col_idx] = DIAGNOSTICS_ESCAPER.escape(rows[i][last_col_idx])
         else:
             # Minimal structural escaping only (protect pipes/HTML-like tags, preserve output
             # as-is otherwise)
-            rows[i][last_col_idx] = _escape_markdown_in_text(rows[i][last_col_idx])
+            rows[i][last_col_idx] = MARKDOWN_ESCAPER.escape(rows[i][last_col_idx])
 
 
 def _generate_model_gallery_section(
@@ -13226,26 +13215,29 @@ def _append_review_owner_queue(
 
     for owner in sorted(owner_groups):
         md.extend([f"### `{owner}`", ""])
-        rows: list[str] = []
+        rows: list[tuple[str, ...]] = []
         for result in owner_groups[owner]:
             review = _build_jsonl_review_record(result)
             if review is None:
                 continue
             analysis = _quality_analysis_for_result(result)
             rows.append(
-                "| "
-                f"`{MARKDOWN_ESCAPER.escape(result.model_name)}` | "
-                f"`{MARKDOWN_ESCAPER.escape(review['verdict'])}` | "
-                f"{MARKDOWN_ESCAPER.escape(_review_focus_text(review, analysis))} | "
-                f"{MARKDOWN_ESCAPER.escape(_review_next_action_text(review))} |"
+                (
+                    f"`{MARKDOWN_ESCAPER.escape(result.model_name)}`",
+                    f"`{MARKDOWN_ESCAPER.escape(review['verdict'])}`",
+                    MARKDOWN_ESCAPER.escape(_review_focus_text(review, analysis)),
+                    MARKDOWN_ESCAPER.escape(_review_next_action_text(review)),
+                )
             )
         if rows:
-            _append_markdown_table(
-                md,
-                header="| Model | Verdict | Evidence | Next Action |",
-                separator="| ----- | ------- | -------- | ----------- |",
-                rows=rows,
+            md.extend(
+                tabulate(
+                    rows,
+                    headers=["Model", "Verdict", "Evidence", "Next Action"],
+                    tablefmt="github",
+                ).splitlines()
             )
+            md.append("")
         else:
             md.extend(["- No owner-specific review items were produced.", ""])
 
@@ -13269,25 +13261,28 @@ def _append_review_user_buckets(
         if not bucket_results:
             md.extend(["- None.", ""])
             continue
-        rows: list[str] = []
+        rows: list[tuple[str, ...]] = []
         for result in bucket_results:
             review = _build_jsonl_review_record(result)
             if review is None:
                 continue
             analysis = _quality_analysis_for_result(result)
             rows.append(
-                "| "
-                f"`{MARKDOWN_ESCAPER.escape(result.model_name)}` | "
-                f"`{MARKDOWN_ESCAPER.escape(review['verdict'])}` | "
-                f"{MARKDOWN_ESCAPER.escape(_review_hint_text(review, analysis))} | "
-                f"{MARKDOWN_ESCAPER.escape(_review_focus_text(review, analysis))} |"
+                (
+                    f"`{MARKDOWN_ESCAPER.escape(result.model_name)}`",
+                    f"`{MARKDOWN_ESCAPER.escape(review['verdict'])}`",
+                    MARKDOWN_ESCAPER.escape(_review_hint_text(review, analysis)),
+                    MARKDOWN_ESCAPER.escape(_review_focus_text(review, analysis)),
+                )
             )
-        _append_markdown_table(
-            md,
-            header="| Model | Verdict | Hint Handling | Key Evidence |",
-            separator="| ----- | ------- | ------------- | ------------ |",
-            rows=rows,
+        md.extend(
+            tabulate(
+                rows,
+                headers=["Model", "Verdict", "Hint Handling", "Key Evidence"],
+                tablefmt="github",
+            ).splitlines()
         )
+        md.append("")
 
 
 def _append_review_model_verdicts(
@@ -13439,47 +13434,6 @@ def generate_tsv_report(
         # Logging handled in finalize_execution
     except OSError:
         logger.exception("Failed to write TSV report to %s", filename)
-
-
-def _escape_markdown_in_text(text: str) -> str:
-    """Escape structural elements while preserving model-generated markdown.
-
-    Strategy:
-    - Escape pipes (|) to prevent breaking the outer table structure
-    - Convert newlines to <br> to preserve multi-line output in table cells
-    - Escape tag-like sequences (e.g., <s>, </s>) that aren't recognized GitHub formatting
-    - PRESERVE model-generated markdown: **bold**, *italic*, `code`, etc. (GitHub renders these)
-    - Wrap bare URLs in angle brackets for MD034 compliance
-
-    This allows models to produce markdown formatting that GitHub interprets correctly,
-    while preventing output from breaking the report table structure.
-    """
-    return MARKDOWN_ESCAPER.escape(text)
-
-
-def _escape_markdown_diagnostics(text: str) -> str:
-    """Escape diagnostics text for Markdown tables - minimal approach.
-
-    Error messages are already in table cells, so we only need to:
-    - Escape pipes (|) to prevent breaking table structure
-    - Convert newlines to <br> for multi-line preservation
-    - Escape HTML-like tags that could be misinterpreted
-
-    We do NOT escape *, _, `, ~ as these rarely break tables and
-    escaping them makes Python tracebacks harder to read.
-    """
-    return DIAGNOSTICS_ESCAPER.escape(text)
-
-
-def _escape_markdown_gallery_warning(text: str) -> str:
-    """Escape plain-text gallery warnings rendered outside fenced/guarded blocks.
-
-    Gallery warning bullets are regular Markdown list items, not table cells, so
-    inline emphasis markers should be neutralized to keep markdownlint from
-    treating arbitrary model output as formatting.
-    """
-    escaped = _escape_markdown_diagnostics(text)
-    return re.sub(r"(?<!\\)([*`])", r"\\\1", escaped)
 
 
 def _wrap_bare_urls(text: str) -> str:
@@ -18083,7 +18037,7 @@ def _format_failures_by_package_parts(
             error_message = result.error_message or ""
             if len(error_message) > ERROR_MESSAGE_TRUNCATE_LEN:
                 error_message = error_message[: ERROR_MESSAGE_TRUNCATE_LEN - 3] + "..."
-            escaped_message = _escape_markdown_diagnostics(error_message)
+            escaped_message = DIAGNOSTICS_ESCAPER.escape(error_message)
             parts.append(f"  - Error: `{escaped_message}`")
             if result.error_type:
                 parts.append(f"  - Type: `{result.error_type}`")

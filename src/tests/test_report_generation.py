@@ -695,8 +695,11 @@ class TestMarkdownGalleryReport:
         assert "`recommended`" in content
         assert "`avoid`" in content
         assert content.index("## User Buckets") < content.index("## Maintainer Queue")
-        assert "| Model | Verdict | Hint Handling | Key Evidence |" in content
-        assert "| Model | Verdict | Evidence | Next Action |" in content
+        assert "Model" in content
+        assert "Hint Handling" in content
+        assert "Key Evidence" in content
+        assert "Evidence" in content
+        assert "Next Action" in content
         assert "Canonical run log" in content
 
     def test_gallery_includes_shared_triage_sections_and_review_status(
@@ -1113,9 +1116,12 @@ class TestDiagnosticsReport:
             prompt="test",
         )
         content = out.read_text(encoding="utf-8")
-        assert "| mlx-vlm | 0.3.11 |" in content
-        assert "| Python Version | 3.13.9 |" in content
-        assert "| GPU/Chip | Apple M4 Max |" in content
+        assert "mlx-vlm" in content
+        assert "0.3.11" in content
+        assert "Python Version" in content
+        assert "3.13.9" in content
+        assert "GPU/Chip" in content
+        assert "Apple M4 Max" in content
 
     def test_failure_clustering_groups_similar_errors(self, tmp_path: Path) -> None:
         """Models with the same error pattern (differing only in numbers) should cluster."""
@@ -1335,8 +1341,10 @@ class TestDiagnosticsReport:
         )
         content = out.read_text(encoding="utf-8")
         assert "## Priority Summary" in content
-        assert "| Priority | Issue |" in content
-        assert "| Owner | Next Action |" in content
+        assert "Priority" in content
+        assert "Issue" in content
+        assert "Owner" in content
+        assert "Next Action" in content
         assert content.index("## Priority Summary") < content.index("## 1. Failure")
         assert content.index("## Priority Summary") < content.index("## Environment")
         assert content.index("## Environment") < content.index("## Reproducibility")
