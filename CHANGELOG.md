@@ -41,6 +41,19 @@ Notable changes to this project will be documented in this file.
 - Added automatic generation of standalone GitHub issue reports for clustered
   runtime failures and harness issues, placing ready-to-file markdown documents
   in `output/issues/`.
+- Added `JsonlSignatureComponents` TypedDict exposing structured error signature
+  fields (`error_code`, `normalized_message`, `traceback_signature`) in JSONL
+  result records for failed models, enabling precise cross-run clustering without
+  re-parsing raw messages.
+- Bumped JSONL `format_version` from `"1.4"` to `"2.0"` to reflect the addition
+  of `runtime_fingerprint` (metadata) and `signature_components` (results).
+- Added round-trip schema tests (`TestSchemaVersioning`) verifying JSONL metadata
+  and result records survive JSON serialization with correct format versions.
+- Added `collect_runtime_fingerprint()` emitting per-probe `RuntimeProbeResult`
+  records (metal_gpu, mlx_framework, mlx_vlm, gpu_memory) into JSONL metadata
+  and history records for runtime environment attestation.
+- Added `TestRuntimeFingerprint` canary tests (6 cases) verifying fingerprint
+  probes, JSONL metadata integration, and history record integration.
 
 ### Changed
 

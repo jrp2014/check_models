@@ -917,6 +917,14 @@ class JsonlMetadataRecord(TypedDict, total=False):
     runtime_fingerprint: dict[str, RuntimeProbeResult]
 
 
+class JsonlSignatureComponents(TypedDict, total=False):
+    """Structured components of the error signature for precise cross-run clustering."""
+
+    error_code: str
+    normalized_message: str
+    traceback_signature: str
+
+
 class JsonlResultRecord(TypedDict):
     """Per-model row shape for ``results.jsonl`` output."""
 
@@ -939,6 +947,7 @@ class JsonlResultRecord(TypedDict):
     generated_text: NotRequired[str]
     quality_analysis: NotRequired[JsonlQualityAnalysisRecord]
     review: NotRequired[JsonlReviewRecord]
+    signature_components: NotRequired[JsonlSignatureComponents]
 
 
 type FailedModelIssue = tuple[str, str | None, str | None]
@@ -18685,7 +18694,7 @@ def _build_jsonl_metadata_record(
     """Build shared metadata header row for JSONL results."""
     record: JsonlMetadataRecord = {
         "_type": "metadata",
-        "format_version": "1.4",
+        "format_version": "2.0",
         "prompt": prompt,
         "system": system_info,
         "timestamp": local_now_str(),
@@ -18698,7 +18707,7 @@ def _build_jsonl_metadata_record(
 def _build_jsonl_result_record_base(result: PerformanceResult) -> JsonlResultRecord:
     """Build base per-model JSONL row with failure-safe defaults."""
     runtime = result.runtime_diagnostics
-    return {
+    record: JsonlResultRecord = {
         "_type": "result",
         "model": result.model_name,
         "success": result.success,
@@ -18729,6 +18738,19 @@ def _build_jsonl_result_record_base(result: PerformanceResult) -> JsonlResultRec
             "stop_reason": runtime.stop_reason if runtime is not None else None,
         },
     }
+    # Attach structured signature components for failed results to enable
+    # precise cross-run clustering without re-parsing messages.
+    if not result.success and result.error_message is not None:
+        components: JsonlSignatureComponents = {}
+        if result.error_code is not None:
+            components["error_code"] = result.error_code
+        components["normalized_message"] = _normalize_error_core_message(result.error_message)
+        if result.error_traceback is not None:
+            components["traceback_signature"] = _normalize_traceback_signature(
+                result.error_traceback
+            )
+        record["signature_components"] = components
+    return record
 
 
 def _build_jsonl_quality_analysis_record(

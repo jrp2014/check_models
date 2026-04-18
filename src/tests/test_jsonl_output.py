@@ -84,7 +84,7 @@ def test_save_jsonl_report_creates_file(tmp_path: Path) -> None:
     assert output_file.exists()
     header, rows = _read_jsonl(output_file)
     assert header["_type"] == "metadata"
-    assert header["format_version"] == "1.4"
+    assert header["format_version"] == "2.0"
     assert header["prompt"] == "test"
     assert rows == []
 
@@ -731,3 +731,159 @@ class TestRuntimeFingerprint:
         header = json.loads(lines[0])
         assert header["_type"] == "metadata"
         assert header["runtime_fingerprint"]["metal_gpu"]["status"] == "ok"
+
+
+class TestSignatureComponents:
+    """Tests for structured diagnostic signature components in JSONL output."""
+
+    def test_failed_result_includes_signature_components(self, tmp_path: Path) -> None:
+        """Failed results emit signature_components with normalized fields."""
+        result = PerformanceResult(
+            model_name="org/broken",
+            generation=None,
+            success=False,
+            error_message="RuntimeError: shape mismatch [4, 128] vs [4, 256]",
+            error_code="MLX_DECODE_ERROR",
+            error_traceback="File model.py line 42\n  raise RuntimeError",
+        )
+        out = tmp_path / "results.jsonl"
+        check_models.save_jsonl_report([result], out, prompt="test", system_info={})
+        _, rows = _read_jsonl(out)
+        assert len(rows) == 1
+        components = rows[0].get("signature_components")
+        assert components is not None
+        assert components["error_code"] == "MLX_DECODE_ERROR"
+        assert "normalized_message" in components
+        assert "traceback_signature" in components
+
+    def test_successful_result_omits_signature_components(self, tmp_path: Path) -> None:
+        """Successful results must not include signature_components."""
+        result = PerformanceResult(
+            model_name="org/good",
+            generation=MockGeneration(),
+            success=True,
+        )
+        out = tmp_path / "results.jsonl"
+        check_models.save_jsonl_report([result], out, prompt="test", system_info={})
+        _, rows = _read_jsonl(out)
+        assert "signature_components" not in rows[0]
+
+    def test_signature_components_normalized_message_is_stable(self) -> None:
+        """Normalized message strips variable numbers for stable clustering."""
+        record1 = check_models._build_jsonl_result_record_base(
+            PerformanceResult(
+                model_name="org/a",
+                generation=None,
+                success=False,
+                error_message="RuntimeError: shape [4, 128] mismatch",
+                error_code="ERR",
+            )
+        )
+        record2 = check_models._build_jsonl_result_record_base(
+            PerformanceResult(
+                model_name="org/b",
+                generation=None,
+                success=False,
+                error_message="RuntimeError: shape [8, 256] mismatch",
+                error_code="ERR",
+            )
+        )
+        c1 = record1.get("signature_components", {})
+        c2 = record2.get("signature_components", {})
+        assert c1.get("normalized_message") == c2.get("normalized_message")
+
+
+class TestSchemaVersioning:
+    """Tests for JSONL schema versioning and round-trip integrity."""
+
+    def test_metadata_format_version_is_2_0(self, tmp_path: Path) -> None:
+        """Current JSONL output uses format_version 2.0."""
+        out = tmp_path / "results.jsonl"
+        check_models.save_jsonl_report([], out, prompt="test", system_info={})
+        header, _ = _read_jsonl(out)
+        assert header["format_version"] == "2.0"
+
+    def test_round_trip_metadata_keys(self, tmp_path: Path) -> None:
+        """Metadata record round-trips through JSON with expected keys."""
+        fingerprint = {"metal_gpu": check_models.RuntimeProbeResult(status="ok")}
+        out = tmp_path / "results.jsonl"
+        check_models.save_jsonl_report(
+            [],
+            out,
+            prompt="hello",
+            system_info={"os": "macOS"},
+            runtime_fingerprint=fingerprint,
+        )
+        header, _ = _read_jsonl(out)
+        assert header["_type"] == "metadata"
+        assert header["prompt"] == "hello"
+        assert header["system"]["os"] == "macOS"
+        assert "timestamp" in header
+        assert header["runtime_fingerprint"]["metal_gpu"]["status"] == "ok"
+
+    def test_round_trip_result_record_success(self, tmp_path: Path) -> None:
+        """Successful result record round-trips with all required keys."""
+        result = PerformanceResult(
+            model_name="org/good",
+            generation=MockGeneration(),
+            success=True,
+        )
+        out = tmp_path / "results.jsonl"
+        check_models.save_jsonl_report([result], out, prompt="t", system_info={})
+        _, rows = _read_jsonl(out)
+        row = rows[0]
+        assert row["_type"] == "result"
+        assert row["model"] == "org/good"
+        assert row["success"] is True
+        assert row["error_signature"] is None
+        assert "signature_components" not in row
+
+    def test_round_trip_result_record_failure(self, tmp_path: Path) -> None:
+        """Failed result record round-trips with signature_components."""
+        result = PerformanceResult(
+            model_name="org/bad",
+            generation=None,
+            success=False,
+            error_message="ValueError: bad shape",
+            error_code="DECODE_ERR",
+            error_traceback="File x.py line 1\n  raise ValueError",
+        )
+        out = tmp_path / "results.jsonl"
+        check_models.save_jsonl_report([result], out, prompt="t", system_info={})
+        _, rows = _read_jsonl(out)
+        row = rows[0]
+        assert row["success"] is False
+        assert row["error_code"] == "DECODE_ERR"
+        sc = row["signature_components"]
+        assert "normalized_message" in sc
+        assert "traceback_signature" in sc
+        assert sc["error_code"] == "DECODE_ERR"
+
+    def test_round_trip_all_fields_json_serializable(self, tmp_path: Path) -> None:
+        """Every field in the JSONL output is JSON-serializable (no crash)."""
+        result = PerformanceResult(
+            model_name="org/model",
+            generation=MockGeneration(),
+            success=True,
+            runtime_diagnostics=RuntimeDiagnostics(),
+        )
+        out = tmp_path / "results.jsonl"
+        check_models.save_jsonl_report([result], out, prompt="p", system_info={})
+        # Re-parse every line — will raise if any field isn't serializable
+        for line in out.read_text().strip().splitlines():
+            parsed = json.loads(line)
+            json.dumps(parsed)  # round-trip back to string
+
+    def test_history_format_version_unchanged(self, tmp_path: Path) -> None:
+        """History records keep format_version 1.0 (separate schema)."""
+        hist = tmp_path / "results.history.jsonl"
+        check_models.append_history_record(
+            results=[],
+            prompt="t",
+            image_path=None,
+            system_info={},
+            library_versions={},
+            history_path=hist,
+        )
+        data = json.loads(hist.read_text().strip())
+        assert data["format_version"] == "1.0"
