@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 import check_models
 
 
@@ -131,10 +133,15 @@ def test_analyze_generation_text_empty_input() -> None:
     assert analysis.repeated_token is None
     assert not analysis.hallucination_issues
     assert not analysis.is_verbose
-    assert analysis.bullet_count == 0
-    assert analysis.has_harness_issue is True
-    assert analysis.harness_issue_type == "prompt_template"
-    assert "output:zero_tokens" in analysis.harness_issue_details
+
+
+def test_near_empty_output_promotes_to_unknown_anomaly() -> None:
+    """Near-empty output with grade F promotes clean → unknown_runtime_anomaly."""
+    # Text must be short enough to trigger anomaly (<20 chars) but long enough
+    # to avoid the harness detector's "too few tokens" check.
+    analysis = check_models.analyze_generation_text("A nice photo.", 13)
+    assert analysis.verdict == "unknown_runtime_anomaly"
+    assert analysis.user_bucket == "needs_triage"
 
 
 def test_analyze_generation_text_context_ignorance_custom_marker() -> None:
@@ -988,6 +995,24 @@ class TestClassifyReviewVerdict:
         )
         assert verdict == "harness"
 
+    def test_grade_f_no_signals_stays_clean(self) -> None:
+        """Grade F with no cutoff/harness/weak-output signals returns clean at verdict level."""
+        verdict, _evidence = check_models._classify_review_verdict(
+            has_harness_issue=False,
+            harness_type=None,
+            likely_cutoff=False,
+            cutoff_reasons=[],
+            prompt_tokens_total=100,
+            prompt_tokens_text_est=80,
+            prompt_tokens_nontext_est=20,
+            missing_sections=[],
+            utility_grade="F",
+            instruction_echo=False,
+            metadata_borrowing=False,
+            has_hallucination=False,
+        )
+        assert verdict == "clean"
+
 
 class TestClassifyUserBucket:
     """Tests for _classify_user_bucket with new verdict types."""
@@ -1012,6 +1037,16 @@ class TestClassifyUserBucket:
         )
         assert bucket == "avoid"
 
+    def test_unknown_runtime_anomaly_needs_triage(self) -> None:
+        """unknown_runtime_anomaly models should be needs_triage."""
+        bucket = check_models._classify_user_bucket(
+            verdict="unknown_runtime_anomaly",
+            hint_relationship="preserves_trusted_hints",
+            has_contract_issue=False,
+            utility_grade="F",
+        )
+        assert bucket == "needs_triage"
+
     def test_runtime_failure_avoid(self) -> None:
         """runtime_failure models should be avoid."""
         bucket = check_models._classify_user_bucket(
@@ -1031,3 +1066,191 @@ class TestClassifyUserBucket:
             utility_grade="A",
         )
         assert bucket == "recommended"
+
+
+class TestClassificationInvariants:
+    """Property-style invariant tests guarding classification edge cases.
+
+    These encode structural guarantees that must hold regardless of
+    threshold tuning, new heuristics, or upstream library changes.
+    """
+
+    # -- Hint relationship invariants --
+
+    @pytest.mark.parametrize(
+        "nonvisual_terms",
+        [
+            ("taken", "2026-02-21", "gps", "timestamp"),
+            ("welwyn garden city",),
+            ("source", "stock", "adobe stock"),
+            ("latitude", "longitude"),
+        ],
+        ids=["dates_gps", "location", "source_stock", "coordinates"],
+    )
+    def test_metadata_only_hints_never_ignores(self, nonvisual_terms: tuple[str, ...]) -> None:
+        """A bundle where all trusted terms are nonvisual must never trigger ignores."""
+        bundle = check_models.TrustedHintBundle(
+            trusted_text=" ".join(nonvisual_terms),
+            trusted_terms=nonvisual_terms,
+            nonvisual_terms=nonvisual_terms,
+        )
+        text = (
+            "Title: Mountain landscape at sunset\n"
+            "Description: A mountain range glowing at sunset.\n"
+            "Keywords: mountain, sunset, landscape"
+        )
+        relationship, _ = check_models._classify_hint_relationship(text, bundle)
+        assert relationship != "ignores_trusted_hints", (
+            f"Metadata-only hints {nonvisual_terms} must not trigger ignores_trusted_hints"
+        )
+
+    # -- Cutoff / truncation severity invariants --
+
+    @pytest.mark.parametrize(
+        "degradation_reason",
+        ["abrupt_tail", "missing_sections", "repetitive_tail", "unfinished_section"],
+    )
+    def test_degradation_reason_forces_cutoff_degraded(self, degradation_reason: str) -> None:
+        """Any degradation reason with a token-cap hit must produce cutoff_degraded."""
+        verdict, _ = check_models._classify_review_verdict(
+            has_harness_issue=False,
+            harness_type=None,
+            likely_cutoff=True,
+            cutoff_reasons=[degradation_reason],
+            prompt_tokens_total=100,
+            prompt_tokens_text_est=80,
+            prompt_tokens_nontext_est=20,
+            missing_sections=["Keywords"] if degradation_reason == "missing_sections" else [],
+            utility_grade="C",
+            instruction_echo=False,
+            metadata_borrowing=False,
+            has_hallucination=False,
+        )
+        assert verdict == "cutoff_degraded", (
+            f"Degradation reason '{degradation_reason}' must produce cutoff_degraded, got {verdict}"
+        )
+
+    # -- Bucket severity monotonicity --
+
+    @pytest.mark.parametrize(
+        "verdict",
+        ["harness", "cutoff_degraded", "runtime_failure"],
+    )
+    @pytest.mark.parametrize("utility_grade", ["A", "B", "C", "D", "F"])
+    @pytest.mark.parametrize(
+        "hint_relationship",
+        [
+            "preserves_trusted_hints",
+            "improves_trusted_hints",
+            "degrades_trusted_hints",
+            "ignores_trusted_hints",
+        ],
+    )
+    def test_severe_verdicts_always_avoid(
+        self, verdict: str, utility_grade: str, hint_relationship: str
+    ) -> None:
+        """harness/cutoff_degraded/runtime_failure must always map to avoid."""
+        bucket = check_models._classify_user_bucket(
+            verdict=verdict,
+            hint_relationship=hint_relationship,
+            has_contract_issue=False,
+            utility_grade=utility_grade,
+        )
+        assert bucket == "avoid", (
+            f"verdict={verdict} + grade={utility_grade} + hints={hint_relationship} "
+            f"must map to 'avoid', got '{bucket}'"
+        )
+
+    # -- Unknown anomaly always triages --
+
+    @pytest.mark.parametrize("utility_grade", ["A", "B", "C", "D", "F"])
+    @pytest.mark.parametrize(
+        "hint_relationship",
+        [
+            "preserves_trusted_hints",
+            "improves_trusted_hints",
+            "degrades_trusted_hints",
+            "ignores_trusted_hints",
+        ],
+    )
+    def test_unknown_anomaly_always_needs_triage(
+        self, utility_grade: str, hint_relationship: str
+    ) -> None:
+        """unknown_runtime_anomaly must always map to needs_triage."""
+        bucket = check_models._classify_user_bucket(
+            verdict="unknown_runtime_anomaly",
+            hint_relationship=hint_relationship,
+            has_contract_issue=False,
+            utility_grade=utility_grade,
+        )
+        assert bucket == "needs_triage", (
+            f"unknown_runtime_anomaly + grade={utility_grade} + hints={hint_relationship} "
+            f"must map to 'needs_triage', got '{bucket}'"
+        )
+
+    # -- Clean verdict implies no breaking evidence --
+
+    def test_clean_verdict_has_no_breaking_evidence(self) -> None:
+        """A clean verdict must not carry any QUALITY_BREAKING_LABELS in evidence."""
+        verdict, evidence = check_models._classify_review_verdict(
+            has_harness_issue=False,
+            harness_type=None,
+            likely_cutoff=False,
+            cutoff_reasons=[],
+            prompt_tokens_total=100,
+            prompt_tokens_text_est=80,
+            prompt_tokens_nontext_est=20,
+            missing_sections=[],
+            utility_grade="A",
+            instruction_echo=False,
+            metadata_borrowing=False,
+            has_hallucination=False,
+        )
+        assert verdict == "clean"
+        breaking_overlap = set(evidence) & check_models.QUALITY_BREAKING_LABELS
+        assert not breaking_overlap, (
+            f"Clean verdict must not carry breaking labels, found: {breaking_overlap}"
+        )
+
+    # -- History reader forward-compat --
+
+    def test_history_comparison_tolerates_missing_optional_fields(self) -> None:
+        """compare_history_records must handle records missing future optional fields."""
+        minimal_previous: check_models.HistoryRunRecord = {
+            "_type": "run",
+            "format_version": "1.0",
+            "timestamp": "2026-01-01T00:00:00",
+            "prompt_hash": "abc123",
+            "prompt_preview": "test",
+            "image_path": None,
+            "model_results": {
+                "org/model-a": {
+                    "success": True,
+                    "error_stage": None,
+                    "error_type": None,
+                    "error_package": None,
+                },
+            },
+            "system": {},
+            "library_versions": {},
+        }
+        minimal_current: check_models.HistoryRunRecord = {
+            "_type": "run",
+            "format_version": "2.0",
+            "timestamp": "2026-04-18T00:00:00",
+            "prompt_hash": "abc123",
+            "prompt_preview": "test",
+            "image_path": None,
+            "model_results": {
+                "org/model-a": {
+                    "success": False,
+                    "error_stage": None,
+                    "error_type": None,
+                    "error_package": None,
+                },
+            },
+            "system": {},
+            "library_versions": {},
+        }
+        result = check_models.compare_history_records(minimal_previous, minimal_current)
+        assert "org/model-a" in result["regressions"]

@@ -343,6 +343,9 @@ class QualityThresholds:
     max_reported_missing_terms: int = 5  # Cap human-facing missing-term lists
     cutoff_tail_chars: int = 120  # Tail window inspected for cutoff evidence
 
+    # Unknown anomaly detection
+    anomaly_min_output_chars: int = 20  # Near-empty threshold for anomaly promotion
+
     # Patterns (loaded from config)
     patterns: dict[str, list[str]] | None = None
 
@@ -3564,6 +3567,7 @@ def _classify_user_bucket(
     * ``context_budget`` → ``"caveat"``
     * ``model_shortcoming`` or degraded hints → ``"avoid"``
     * ``runtime_failure`` → ``"avoid"``
+    * ``unknown_runtime_anomaly`` → ``"needs_triage"``
     * ``clean`` with positive hints and no contract issues → ``"recommended"``
     * everything else → ``"caveat"``
     """
@@ -3573,8 +3577,8 @@ def _classify_user_bucket(
         if utility_grade in {"A", "B"} and hint_relationship != "degrades_trusted_hints":
             return "recommended"
         return "caveat"
-    if verdict == "context_budget":
-        return "caveat"
+    if verdict in {"context_budget", "unknown_runtime_anomaly"}:
+        return "needs_triage" if verdict == "unknown_runtime_anomaly" else "caveat"
     if verdict == "model_shortcoming" or hint_relationship == "degrades_trusted_hints":
         return "avoid"
     is_clean_recommended = (
@@ -5713,6 +5717,15 @@ def analyze_generation_text(
         metadata_borrowing=prompt_signals.metadata_borrowing,
         has_hallucination=bool(hallucination_issues),
     )
+    # Promote clean+F to unknown_runtime_anomaly when output is near-empty,
+    # signalling an unexplained failure that warrants manual triage.
+    if (
+        verdict == "clean"
+        and utility_grade == "F"
+        and len(text.strip()) < QUALITY.anomaly_min_output_chars
+    ):
+        verdict = "unknown_runtime_anomaly"
+        review_evidence.append("utility:F")
     has_contract_issue = bool(prompt_signals.missing_sections) or any(
         (
             prompt_signals.title_word_count is not None
@@ -13275,7 +13288,7 @@ def _append_review_user_buckets(
             "",
         ]
     )
-    for bucket in ("recommended", "caveat", "avoid"):
+    for bucket in ("recommended", "caveat", "needs_triage", "avoid"):
         md.extend([f"### `{bucket}`", ""])
         bucket_results = bucket_groups.get(bucket, [])
         if not bucket_results:
@@ -17198,6 +17211,7 @@ QUALITY_BREAKING_LABELS: Final[frozenset[str]] = frozenset(
         "cutoff",
         "trusted_hint_degraded",
         "runtime_failure",
+        "unknown_runtime_anomaly",
     },
 )
 

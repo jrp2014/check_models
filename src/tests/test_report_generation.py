@@ -2577,7 +2577,9 @@ class TestEmptyRecommendedBucketExplanation:
     def test_recommended_bucket_shows_explanation(self) -> None:
         """Recommended bucket text explains why no models qualified."""
         md: list[str] = []
-        _append_review_user_buckets(md, {"recommended": [], "caveat": [], "avoid": []})
+        _append_review_user_buckets(
+            md, {"recommended": [], "caveat": [], "needs_triage": [], "avoid": []}
+        )
         text = "\n".join(md)
         assert "quality thresholds" in text
         # Other empty buckets should just say "None."
@@ -2585,7 +2587,7 @@ class TestEmptyRecommendedBucketExplanation:
         explanation_lines = [ln for ln in lines if "quality thresholds" in ln]
         plain_none_lines = [ln for ln in lines if ln.strip() == "- None."]
         assert len(explanation_lines) == 1
-        assert len(plain_none_lines) == 2
+        assert len(plain_none_lines) == 3
 
 
 class TestGithubIssueReportsCleanup:
@@ -2614,3 +2616,64 @@ class TestGithubIssueReportsCleanup:
         assert not (issues_dir / "issue_001_crash.md").exists()
         assert not (issues_dir / "issue_002_harness.md").exists()
         assert (issues_dir / "README.md").exists()
+
+
+class TestIssueDirectoryInvariants:
+    """Invariants: issue directory reflects exactly the current run."""
+
+    def test_issue_dir_contains_only_current_run_files(self, tmp_path: Path) -> None:
+        """After generation, issue_*.md files match exactly what was generated."""
+        issues_dir = tmp_path / "issues"
+        issues_dir.mkdir()
+        (issues_dir / "issue_001_crash.md").write_text("stale")
+        (issues_dir / "issue_099_harness.md").write_text("stale")
+        (issues_dir / "README.md").write_text("keep me")
+
+        # Build a snapshot with one crash cluster
+        failed_result = PerformanceResult(
+            model_name="org/broken-model",
+            generation=None,
+            success=False,
+            error_message="RuntimeError: shape mismatch",
+            error_signature="MLX_DECODE_ERROR:abc123",
+            total_time=0.5,
+        )
+        snapshot = DiagnosticsSnapshot(
+            failed=(failed_result,),
+            failure_clusters=(("MLX_DECODE_ERROR:abc123", (failed_result,)),),
+        )
+        generated = _generate_github_issue_reports(
+            diagnostics_snapshot=snapshot,
+            output_dir=tmp_path,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            repro_bundles={},
+            run_args=None,
+        )
+
+        issue_files = sorted(f.name for f in issues_dir.glob("issue_*.md"))
+        assert len(issue_files) == len(generated), (
+            f"Expected {len(generated)} issue files, found {issue_files}"
+        )
+        # Non-issue files must survive
+        assert (issues_dir / "README.md").exists()
+        # Stale files must be gone
+        assert not (issues_dir / "issue_099_harness.md").exists()
+
+    def test_empty_run_clears_all_issue_files(self, tmp_path: Path) -> None:
+        """A run with no failures must leave zero issue_*.md files."""
+        issues_dir = tmp_path / "issues"
+        issues_dir.mkdir()
+        (issues_dir / "issue_001_crash.md").write_text("stale")
+
+        _generate_github_issue_reports(
+            diagnostics_snapshot=DiagnosticsSnapshot(),
+            output_dir=tmp_path,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            repro_bundles={},
+            run_args=None,
+        )
+
+        issue_files = list(issues_dir.glob("issue_*.md"))
+        assert issue_files == [], f"Expected no issue files, found {issue_files}"

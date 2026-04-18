@@ -6,6 +6,22 @@ Notable changes to this project will be documented in this file.
 
 ### Added
 
+- Added `unknown_runtime_anomaly` verdict for near-empty outputs that pass all
+  quality checks but score grade F, signalling unexplained failures that need
+  manual triage.
+- Added `needs_triage` user bucket for classifier uncertainty, mapped from
+  `unknown_runtime_anomaly` verdict. Review reports now render four buckets:
+  recommended, caveat, needs_triage, avoid.
+- Added `anomaly_min_output_chars` threshold to `quality_config.yaml` (default
+  20) controlling the near-empty output threshold for anomaly promotion.
+- Added `unknown_runtime_anomaly` to `QUALITY_BREAKING_LABELS` so anomalous
+  outputs are excluded from recommendation candidate rows.
+- Added property-style invariant tests (`TestClassificationInvariants`) covering
+  hint relationship, truncation severity, bucket monotonicity, clean evidence,
+  unknown anomaly triage, and history forward-compat invariants (93 new test
+  cases).
+- Added `TestIssueDirectoryInvariants` verifying issue directory reflects exactly
+  the current run output.
 - Added `--eval-mode` CLI flag with three evaluation lanes: `stress` (default,
   current behavior), `triage` (short prompt, 200 token cap, pass/fail only),
   and `quality` (cataloguing prompt with generous 1000 token cap).

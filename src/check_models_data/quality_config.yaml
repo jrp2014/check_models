@@ -28,6 +28,9 @@ thresholds:
   # Verbosity detection
   max_verbosity_tokens: 400 # Substantial length threshold
   min_meta_patterns: 2 # Minimum meta-commentary patterns
+
+  # Unknown anomaly detection
+  anomaly_min_output_chars: 20 # Near-empty threshold for anomaly promotion
   min_section_headers: 3 # Minimum section headers
 
   # Bullet point detection
