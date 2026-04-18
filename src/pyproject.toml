@@ -282,14 +282,22 @@ module = [
 ignore_missing_imports = true
 follow_imports = "skip"
 
-# Prefer generated stubs for these high-impact runtime packages when available.
-# Missing stubs remain non-fatal (warnings are emitted during stub preflight).
+# Auto-generated stubs for MLX packages: use "normal" to type-check call sites
+# against stub signatures.  Missing stubs remain non-fatal.
 [[tool.mypy.overrides]]
 module = [
     "mlx_lm",
     "mlx_lm.*",
     "mlx_vlm",
     "mlx_vlm.*",
+]
+ignore_missing_imports = true
+follow_imports = "normal"
+
+# Auto-generated stubs for transformers/tokenizers.  Use "silent" to read type
+# info at call sites without reporting errors within the (noisy) generated stubs.
+[[tool.mypy.overrides]]
+module = [
     "tokenizers",
     "tokenizers.*",
     "transformers",

@@ -317,9 +317,10 @@ logger = logging.getLogger("generate_stubs")
 REPO_ROOT = Path(__file__).resolve().parents[2]
 TYPINGS_DIR = REPO_ROOT / "typings"
 STUB_MANIFEST = ".stub_manifest.json"
-STUB_TOOL_VERSION = "4"
+STUB_TOOL_VERSION = "6"
 
 DEFAULT_PACKAGES = ["mlx_lm", "mlx_vlm", "transformers", "tokenizers"]
+
 PACKAGE_DISTRIBUTIONS = {
     "mlx_lm": "mlx-lm",
     "mlx_vlm": "mlx-vlm",

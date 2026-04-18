@@ -28,6 +28,9 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Changed mypy `follow_imports` for mlx_lm/mlx_vlm from `"silent"` to `"normal"`
+  so mypy actively type-checks call sites against auto-generated stub signatures.
+  transformers/tokenizers remain on `"silent"` to avoid noise from generated stubs.
 - `_prune_repro_bundles` now handles `.json` bundle files (not just directories)
   and supports run-count retention via `max_runs` parameter. Empty directories
   are cleaned up automatically.

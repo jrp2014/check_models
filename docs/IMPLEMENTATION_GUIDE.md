@@ -104,7 +104,7 @@ A single medium-sized, well-commented function is often clearer than a web of on
 - **`docs/`** - All documentation (CONTRIBUTING.md, IMPLEMENTATION_GUIDE.md, etc.)
 - **`docs/notes/`** - Design notes, reviews, and project evolution documentation
 - **`output/`** - Generated reports (HTML/Markdown, git-ignored)
-- **`typings/`** - Generated `.pyi` stubs (not committed, regenerate via stubs tools)
+- **`typings/`** - Generated `.pyi` stubs (not committed, regenerate via `make stubs`)
 - **Root `Makefile`** - User-friendly commands that orchestrate `src/` operations
 - **`README.md`** - Project overview and quick start guide (repo root)
 - **`src/README.md`** - Detailed package usage and CLI documentation
@@ -112,7 +112,7 @@ A single medium-sized, well-commented function is often clearer than a web of on
 ### Generated Artifacts
 
 - Generated artifacts (e.g., `typings/`) are **not committed**
-- Regenerate via `make stubs` (from repo root) or `python -m tools.generate_stubs mlx_lm mlx_vlm tokenizers` (from `src/`)
+- Regenerate via `make stubs` (from repo root) or `python -m tools.generate_stubs mlx_lm mlx_vlm transformers tokenizers` (from `src/`)
 - See `.gitignore` for complete list of excluded files
 
 ### Typings Policy
@@ -120,6 +120,7 @@ A single medium-sized, well-commented function is often clearer than a web of on
 - Third-party stubs are generated locally into `typings/` using `src/tools/generate_stubs.py`
 - `typings/` is git-ignored; do not commit generated stubs
 - `mypy_path = ["typings"]` is configured in `src/pyproject.toml` so mypy picks them up
+- mypy uses `follow_imports = "normal"` for `mlx_lm`/`mlx_vlm` (active type checking against stubs) and `follow_imports = "silent"` for `transformers`/`tokenizers` (type info used at call sites without reporting errors within generated stubs)
 
 **Generating stubs**:
 
@@ -128,7 +129,7 @@ A single medium-sized, well-commented function is often clearer than a web of on
 make stubs
 
 # Or from src/ directory
-python -m tools.generate_stubs mlx_lm mlx_vlm tokenizers
+python -m tools.generate_stubs mlx_lm mlx_vlm transformers tokenizers
 ```
 
 Or use the quality check with stub preflight:

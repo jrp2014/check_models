@@ -46,7 +46,7 @@ For each detected repository:
 
 After all repositories are updated:
 
-1. **Generate project stubs** - Runs `python generate_stubs.py mlx_vlm tokenizers` for this project
+1. **Generate project stubs** - Runs `python generate_stubs.py mlx_lm mlx_vlm transformers tokenizers` for this project
 2. **Sets `MLX_IS_LOCAL=1` flag** - Marks that local builds are in use
 
 ### Integration with Package Management
@@ -208,14 +208,16 @@ After all repositories are updated:
 
 ```bash
 if [[ -f "$SCRIPT_DIR/generate_stubs.py" ]]; then
-    echo "[update.sh] Generating type stubs for mlx_vlm and tokenizers..."
-    python generate_stubs.py mlx_vlm tokenizers
+    echo "[update.sh] Generating type stubs for mlx_lm, mlx_vlm, transformers, and tokenizers..."
+    python generate_stubs.py mlx_lm mlx_vlm transformers tokenizers
 fi
 ```
 
 This generates stubs for:
 
+- `mlx_lm` - MLX Language Models package
 - `mlx_vlm` - Vision-Language Models package
+- `transformers` - HuggingFace transformers library
 - `tokenizers` - HuggingFace tokenizers library
 
 These stubs are written to the local `typings/` directory and are automatically discovered by mypy via the `mypy_path` configuration in `pyproject.toml`.
