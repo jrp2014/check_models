@@ -1,23 +1,55 @@
 # Generated Reports
 
-This directory contains generated HTML, Markdown, gallery Markdown, TSV, and JSONL
-reports from running `check_models.py`.
+This directory contains generated reports and artifacts from running `check_models.py`.
 
 The script's default output location is now this directory, keeping the project root clean.
+
+## Directory Structure
+
+```text
+output/
+├── reports/                  # Human-readable report files
+│   ├── results.html          # Styled HTML report (viewable in browser)
+│   ├── results.md            # GitHub-friendly Markdown summary report
+│   ├── model_gallery.md      # Standalone gallery for qualitative output review
+│   ├── review.md             # Review digest grouped by owner and user bucket
+│   ├── results.tsv           # Tab-separated values table (for spreadsheets)
+│   └── diagnostics.md        # Upstream issue report (conditional)
+├── issues/                   # Generated GitHub issue templates (conditional)
+│   ├── issue_001_crash.md    # One per failure cluster
+│   └── issue_002_harness.md  # One per harness issue
+├── repro_bundles/            # JSON reproduction bundles per failed model
+│   └── 20260417T...*.json    # Timestamped bundle with error + env details
+├── results.jsonl             # JSON Lines report (machine-readable results)
+├── results.history.jsonl     # Append-only per-run history for regressions
+├── check_models.log          # Detailed execution log
+└── environment.log           # Complete Python environment dump
+```
 
 ## Files
 
 ### Production Output (committed to git)
 
-- `results.html` - Styled HTML report (viewable in browser)
-- `results.md` - GitHub-friendly Markdown summary report
-- `model_gallery.md` - Standalone Markdown gallery artifact for qualitative output review
-- `results.tsv` - Tab-separated values table (for spreadsheets/data analysis)
+**In `reports/`** (human-readable):
+
+- `reports/results.html` - Styled HTML report (viewable in browser)
+- `reports/results.md` - GitHub-friendly Markdown summary report
+- `reports/model_gallery.md` - Standalone Markdown gallery artifact for qualitative output review
+- `reports/review.md` - Review digest grouped by owner and user bucket
+- `reports/results.tsv` - Tab-separated values table (for spreadsheets/data analysis)
+- `reports/diagnostics.md` - Upstream issue report (only generated when failures/harness issues detected)
+
+**In `output/`** (machine-readable and logs):
+
 - `results.jsonl` - JSON Lines report (machine-readable results)
 - `results.history.jsonl` - Append-only per-run history for regressions/recoveries
-- `diagnostics.md` - Upstream issue report (only generated when failures/harness issues detected)
 - `check_models.log` - Detailed execution log from production benchmark runs
 - `environment.log` - Complete Python environment dump (for reproducibility)
+
+**Conditional subdirectories** (generated when failures are present):
+
+- `issues/` - Ready-to-file GitHub issue markdown for clustered crashes and harness problems
+- `repro_bundles/` - JSON reproduction bundles per failed model, containing error details, CLI args, and environment for reproducibility. Automatically pruned after 90 days (configurable via `--prune-repro-days`).
 
 These files are regenerated each time you run the tool (**history is append-only**) and **committed to version control** so results are visible in GitHub.
 
@@ -41,7 +73,7 @@ Files matching `test_*.{html,md,tsv,jsonl,log}` are automatically excluded from 
 
 **Separation strategy**:
 
-- **Production runs**: Use default outputs (`check_models.log`, `results.html`, `results.md`, `model_gallery.md`, `results.tsv`, `results.jsonl`, `results.history.jsonl`, `diagnostics.md`) → committed to git
+- **Production runs**: Use default outputs (reports in `reports/`, machine data and logs in `output/`) → committed to git
 - **Integration tests**: Use `test_cli_integration.{log,html,md,tsv,jsonl}` plus any test gallery artifact → gitignored (handled automatically by test suite)
 - **Manual test/debug runs**: Pass custom paths with `test_` prefix or any other name except the production defaults → gitignored
 - **Pre-push git hook**: Runs pytest which uses test-specific output files → doesn't overwrite production log

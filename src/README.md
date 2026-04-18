@@ -220,14 +220,16 @@ python -m check_models \
 The tool generates multiple report formats in `output/` by default:
 
 - **CLI**: Real-time colorized progress and metrics.
-- **HTML** (`results.html`): Interactive table with sortable columns and failed row highlighting.
-- **Markdown** (`results.md`): GitHub-compatible summary for documentation, with links to the canonical log and review artifacts.
-- **Gallery Markdown** (`model_gallery.md`): GitHub-compatible review artifact with image metadata, the full prompt, and one full-output section per model.
-- **Review Markdown** (`review.md`): Short automated digest grouped by likely owner and user-facing utility bucket.
-- **TSV/JSONL** (`results.tsv`, `results.jsonl`): Machine-readable formats for analysis.
-- **Diagnostics** (`diagnostics.md`): Failure-focused and compatibility-focused issue report (generated when failures, harness issues, or preflight compatibility warnings are present).
+- **HTML** (`reports/results.html`): Interactive table with sortable columns and failed row highlighting.
+- **Markdown** (`reports/results.md`): GitHub-compatible summary for documentation, with links to the canonical log and review artifacts.
+- **Gallery Markdown** (`reports/model_gallery.md`): GitHub-compatible review artifact with image metadata, the full prompt, and one full-output section per model.
+- **Review Markdown** (`reports/review.md`): Short automated digest grouped by likely owner and user-facing utility bucket.
+- **TSV/JSONL** (`reports/results.tsv`, `results.jsonl`): Machine-readable formats for analysis.
+- **Diagnostics** (`reports/diagnostics.md`): Failure-focused and compatibility-focused issue report (generated when failures, harness issues, or preflight compatibility warnings are present).
 - **Log** (`check_models.log`): Canonical comprehensive run artifact, including the full per-model review block and full output/captured failure output.
 - **History** (`results.history.jsonl`): Append-only run history for regressions/recoveries.
+- **Issue templates** (`issues/`): Ready-to-file GitHub issue markdown for clustered crashes and harness problems (generated when failures are present).
+- **Repro bundles** (`repro_bundles/`): JSON reproduction bundles per failed model, containing error details, CLI args, and environment for reproducibility.
 
 The main Markdown report stays brief and points readers to `check_models.log`, `review.md`, and `model_gallery.md` for the full automated review and output evidence.
 
@@ -810,25 +812,36 @@ See module docstrings and `__all__` exports for complete API reference.
 | ---- | ---- | ------- | ----------- |
 | `-f`, `--folder` | Path | omitted | Folder to scan (non-recursive); the most recently modified image in that folder is used. If both `--folder` and `--image` are omitted, the most recently modified image in `~/Pictures/Processed` is used. |
 | `-i`, `--image` | Path | omitted | Path to a specific image file to process directly. Requires a value when provided. |
-| `--output-html` | Path | `output/results.html` | HTML report output filename. |
-| `--output-markdown` | Path | `output/results.md` | Markdown report output filename. |
-| `--output-gallery-markdown` | Path | `output/model_gallery.md` | Standalone Markdown gallery artifact for qualitative output review. |
-| `--output-review` | Path | `output/review.md` | Markdown review digest grouped by owner and user bucket. |
-| `--output-tsv` | Path | `output/results.tsv` | TSV (tab-separated values) report output filename. |
+| `--output-html` | Path | `output/reports/results.html` | HTML report output filename. |
+| `--output-markdown` | Path | `output/reports/results.md` | Markdown report output filename. |
+| `--output-gallery-markdown` | Path | `output/reports/model_gallery.md` | Standalone Markdown gallery artifact for qualitative output review. |
+| `--output-review` | Path | `output/reports/review.md` | Markdown review digest grouped by owner and user bucket. |
+| `--output-tsv` | Path | `output/reports/results.tsv` | TSV (tab-separated values) report output filename. |
 | `--output-jsonl` | Path | `output/results.jsonl` | JSONL report output filename. |
 | `--output-log` | Path | `output/check_models.log` | Command line output log filename. |
 | `--output-env` | Path | `output/environment.log` | Environment log filename (pip freeze, conda list). |
-| `--output-diagnostics` | Path | `output/diagnostics.md` | Diagnostics report filename (generated on failures/harness issues). |
+| `--output-diagnostics` | Path | `output/reports/diagnostics.md` | Diagnostics report filename (generated on failures/harness issues). |
 | `-m`, `--models` | list[str] | (none) | Explicit model IDs/paths; disables cache discovery. |
 | `-e`, `--exclude` | list[str] | (none) | Models to exclude (applies to cache scan or explicit list). |
 | `--trust-remote-code` / `--no-trust-remote-code` | flag | `True` | Allow/disallow custom code from Hub models. Use `--no-trust-remote-code` for security. |
 | `--revision` | str | (none) | Model revision (branch, tag, or commit) for reproducible runs. |
 | `--adapter-path` | str | (none) | Path to LoRA adapter weights to apply on top of the base model. |
 | `-p`, `--prompt` | str | omitted | Custom prompt text. Requires a value when provided; if omitted, a non-speculative metadata-verification prompt is generated automatically. |
+| `--resize-shape` | int(s) | (none) | Resize image input before processor handling. Provide 1 integer for square resize or 2 for height width. |
+| `--eos-tokens` | list[str] | (none) | Additional EOS tokens to stop on. Supports escaped values like `\n`. |
+| `--skip-special-tokens` | flag | `False` | Skip tokenizer special tokens in the detokenized output. |
+| `--processor-kwargs` | JSON | (none) | Extra processor kwargs as a JSON object. Example: `'{"cropping": false, "max_patches": 3}'`. |
+| `--enable-thinking` | flag | `False` | Enable thinking mode in the upstream chat template and generation flow. |
+| `--thinking-budget` | int | (none) | Maximum number of thinking tokens before forcing the end token. |
+| `--thinking-start-token` | str | (none) | Token marking the start of a thinking block, such as `<think>`. |
+| `--thinking-end-token` | str | `</think>` | Token marking the end of a thinking block when thinking mode is enabled. |
 | `-d`, `--detailed-metrics` | flag | `False` | Show expanded multi-line metrics block, including phase timings and stop reason when available; ignored unless `--verbose` is also set. |
+| `--eval-mode` | str | `stress` | Evaluation lane: `stress` (default) = full cataloguing prompt, 500 token cap; `triage` = short prompt, 200 token cap, pass/fail only; `quality` = cataloguing prompt with generous 1000 token cap. |
 | `-x`, `--max-tokens` | int | 500 | Max new tokens to generate. |
 | `-t`, `--temperature` | float | 0.0 | Sampling temperature. |
 | `--top-p` | float | 1.0 | Nucleus sampling parameter (0.0-1.0); lower = more focused. |
+| `--min-p` | float | 0.0 | Minimum-probability sampling floor (0.0-1.0). 0.0 disables min-p filtering. |
+| `--top-k` | int | 0 | Top-k sampling limit. 0 disables top-k filtering. |
 | `-r`, `--repetition-penalty` | float | (none) | Penalize repeated tokens (>1.0 discourages repetition). |
 | `--repetition-context-size` | int | 20 | Context window size for repetition penalty. |
 | `-L`, `--lazy-load` | flag | `False` | Use lazy loading (loads weights on-demand, reduces memory). |
@@ -844,6 +857,7 @@ See module docstrings and `__all__` exports for complete API reference.
 | `--width` | int | (auto) | Force a fixed output width (columns) for separators and wrapping. |
 | `-c`, `--quality-config` | Path | (none) | Path to custom quality configuration YAML file. |
 | `--context-marker` | str | `Context:` | Marker used to identify context section in prompt. |
+| `--prune-repro-days` | int | 90 | Delete repro bundles older than N days. Set 0 to disable pruning. |
 | `-n`, `--dry-run` | flag | `False` | Validate arguments and show what would run without invoking models. |
 
 ### Selection Logic
@@ -1103,14 +1117,17 @@ check_models/
 │   ├── tools/               # Helper scripts
 │   ├── tests/               # PyTest test suite
 │   └── output/              # Generated outputs (git-ignored)
-│       ├── results.html
-│       ├── results.md
-│       ├── model_gallery.md
-│       ├── review.md
-│       ├── results.tsv
+│       ├── reports/
+│       │   ├── results.html
+│       │   ├── results.md
+│       │   ├── model_gallery.md
+│       │   ├── review.md
+│       │   ├── results.tsv
+│       │   └── diagnostics.md
+│       ├── issues/           # Generated GitHub issue templates
+│       ├── repro_bundles/    # JSON reproduction bundles
 │       ├── results.jsonl
 │       ├── results.history.jsonl
-│       ├── diagnostics.md
 │       ├── check_models.log
 │       └── environment.log
 ├── docs/                    # Documentation
@@ -1120,8 +1137,10 @@ check_models/
 
 **Output behaviour**: By default, outputs are written to `src/output/` (git-ignored).
 Override with `--output-html`, `--output-markdown`, `--output-gallery-markdown`,
-`--output-tsv`, `--output-jsonl`, `--output-log`, `--output-env`, and
-`--output-diagnostics`.
+`--output-review`, `--output-tsv`, `--output-jsonl`, `--output-log`, `--output-env`,
+and `--output-diagnostics`. Human-readable reports (HTML, Markdown, TSV, diagnostics)
+default to `output/reports/`; machine-readable files (JSONL, history) and logs remain
+in `output/`.
 
 ## Contributing
 

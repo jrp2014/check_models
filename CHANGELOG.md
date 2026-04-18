@@ -28,6 +28,35 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- `_prune_repro_bundles` now handles `.json` bundle files (not just directories)
+  and supports run-count retention via `max_runs` parameter. Empty directories
+  are cleaned up automatically.
+- Harness issue titles in generated GitHub issue reports now sanitize BPE byte
+  artifacts (Ġ, Ċ) into readable text via `_sanitize_bpe_display`.
+- TSV report cells are hard-capped at `MAX_TSV_CELL_CHARS` (200) to prevent
+  oversized rows from CJK or verbose model output.
+- Empty "recommended" user bucket in review.md now includes an explanation
+  rather than bare "None.".
+- Action Snapshot in results.md restructured from flat bullet list into three
+  sub-groups: Failures & Triage, Quality & Metadata, Runtime.
+- `finalize_execution` now calls `_clean_stale_toplevel_reports` to remove
+  old top-level report files superseded by `output/reports/` copies.
+- Fixed issue template writer to emit real newlines instead of literal `\n`
+  strings, resolving MD047 lint failures on generated issue files.
+- Fixed emphasis style in gallery cross-reference line (asterisks → underscores)
+  to match markdownlint MD049 config.
+- Updated `src/README.md` CLI reference: added 12 missing flags (`--resize-shape`,
+  `--eos-tokens`, `--skip-special-tokens`, `--processor-kwargs`, `--enable-thinking`,
+  `--thinking-budget`, `--thinking-start-token`, `--thinking-end-token`,
+  `--eval-mode`, `--min-p`, `--top-k`, `--prune-repro-days`), fixed output paths
+  from flat `output/` to `output/reports/`, documented `issues/` and
+  `repro_bundles/` subdirectories, updated Project Structure tree.
+- Updated `src/output/README.md` with directory structure diagram, `reports/`
+  hierarchy, and conditional `issues/` and `repro_bundles/` subdirectories.
+- Updated `.github/copilot-instructions.md`: refreshed section map line numbers
+  (~20,100 lines), key files table sizes, output path descriptions, and all
+  common edit recipe line references.
+
 - Inlined `_process_ifd0`, `_coerce_exif_tag_id`, and `_process_gps_ifd` into
   `get_exif_data` — three-pass Pillow EXIF extraction is now direct code in the
   single function, removing ~40 lines of indirection.

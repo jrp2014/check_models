@@ -252,3 +252,25 @@ def test_tsv_full_model_name(tmp_path: Path) -> None:
     assert f"\t{full_model_name}\t" in f"\t{data_row}\t" or data_row.startswith(
         f"{full_model_name}\t",
     )
+
+
+def test_tsv_caps_oversized_cells(tmp_path: Path) -> None:
+    """TSV cells longer than MAX_TSV_CELL_CHARS are truncated."""
+    long_text = "x" * 500
+    results = [
+        check_models.PerformanceResult(
+            model_name="test/long-output",
+            success=True,
+            generation=MockGenerationResult(text=long_text),
+            total_time=1.0,
+        ),
+    ]
+    output_file = tmp_path / "results.tsv"
+    check_models.generate_tsv_report(results, output_file)
+    content = output_file.read_text(encoding="utf-8")
+    data_lines = [ln for ln in content.strip().split("\n") if not ln.startswith("#")]
+    # No cell in any data row should exceed the cap
+    max_cell = check_models.MAX_TSV_CELL_CHARS
+    for line in data_lines[1:]:
+        for cell in line.split("\t"):
+            assert len(cell) <= max_cell, f"Cell length {len(cell)} exceeds {max_cell}"

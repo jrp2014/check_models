@@ -436,6 +436,29 @@ class TestDisplayWidthUtilities:
             assert width == 2
 
 
+class TestSanitizeBpeDisplay:
+    """Tests for _sanitize_bpe_display BPE artifact cleanup."""
+
+    def test_replaces_bpe_markers(self, mod: types.ModuleType) -> None:
+        """BPE markers are replaced with readable equivalents."""
+        raw = "Title:\u0120Stone\u0120Church\u010aDescription"
+        result = mod._sanitize_bpe_display(raw)
+        assert "\u0120" not in result
+        assert "\u010a" not in result
+        assert "Stone Church" in result
+
+    def test_truncates_long_text(self, mod: types.ModuleType) -> None:
+        """Text exceeding max_len is truncated with ellipsis."""
+        result = mod._sanitize_bpe_display("a" * 200, max_len=50)
+        assert len(result) <= 50
+        assert result.endswith("...")
+
+    def test_short_text_unchanged(self, mod: types.ModuleType) -> None:
+        """Clean text passes through without modification."""
+        result = mod._sanitize_bpe_display("clean text")
+        assert result == "clean text"
+
+
 # ── QualityThresholds.from_config (YAML schema validation) ────────────────
 
 

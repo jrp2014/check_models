@@ -19,9 +19,11 @@ from check_models import (
     LibraryVersionDict,
     PerformanceResult,
     RuntimeDiagnostics,
+    _append_review_user_buckets,
     _build_diagnostics_context,
     _build_diagnostics_snapshot,
     _build_report_render_context,
+    _clean_stale_toplevel_reports,
     _cluster_failures_by_pattern,
     _diagnostics_priority,
     _format_traceback_tail,
@@ -2499,24 +2501,23 @@ class TestPruneReproBundles:
     """Tests for _prune_repro_bundles."""
 
     def test_removes_old_bundles(self, tmp_path: Path) -> None:
-        """Bundles older than max_age_days are removed."""
-        old_dir = tmp_path / "old_model"
-        old_dir.mkdir()
-        # Set mtime to 200 days ago
+        """JSON bundles older than max_age_days are removed."""
+        old_file = tmp_path / "20240101T000000_001_model_sig.json"
+        old_file.write_text("{}")
         old_time = time.time() - 200 * 86400
-        os.utime(old_dir, (old_time, old_time))
+        os.utime(old_file, (old_time, old_time))
 
-        new_dir = tmp_path / "new_model"
-        new_dir.mkdir()
+        new_file = tmp_path / "20260401T000000_001_model_sig.json"
+        new_file.write_text("{}")
 
-        removed = _prune_repro_bundles(tmp_path, 90)
+        removed = _prune_repro_bundles(tmp_path, 90, max_runs=100)
         assert removed == 1
-        assert not old_dir.exists()
-        assert new_dir.exists()
+        assert not old_file.exists()
+        assert new_file.exists()
 
     def test_zero_days_disables_pruning(self, tmp_path: Path) -> None:
         """max_age_days=0 disables pruning."""
-        (tmp_path / "some_model").mkdir()
+        (tmp_path / "20260401T000000_001_model_sig.json").write_text("{}")
         removed = _prune_repro_bundles(tmp_path, 0)
         assert removed == 0
 
@@ -2524,3 +2525,63 @@ class TestPruneReproBundles:
         """Non-existent directory returns 0."""
         removed = _prune_repro_bundles(tmp_path / "nonexistent", 90)
         assert removed == 0
+
+    def test_prunes_json_files_by_run_count(self, tmp_path: Path) -> None:
+        """JSON bundle files beyond max_runs are pruned."""
+        # Create files from 3 different "runs" (distinct 16-char prefixes)
+        for i, prefix in enumerate(["20260401T000000", "20260402T000000", "20260403T000000"]):
+            f = tmp_path / f"{prefix}_{i:03d}_model_sig.json"
+            f.write_text("{}")
+        removed = _prune_repro_bundles(tmp_path, max_age_days=9999, max_runs=2)
+        assert removed == 1
+        # Oldest run should be gone
+        assert not (tmp_path / "20260401T000000_000_model_sig.json").exists()
+        assert (tmp_path / "20260402T000000_001_model_sig.json").exists()
+        assert (tmp_path / "20260403T000000_002_model_sig.json").exists()
+
+    def test_removes_empty_directories(self, tmp_path: Path) -> None:
+        """Empty subdirectories are cleaned up."""
+        empty = tmp_path / "empty_dir"
+        empty.mkdir()
+        _prune_repro_bundles(tmp_path, max_age_days=9999, max_runs=100)
+        assert not empty.exists()
+
+
+class TestCleanStaleToplevelReports:
+    """Tests for _clean_stale_toplevel_reports."""
+
+    def test_removes_stale_files_when_canonical_exists(self, tmp_path: Path) -> None:
+        """Stale top-level file removed when reports/ copy exists."""
+        reports_dir = tmp_path / "reports"
+        reports_dir.mkdir()
+        (tmp_path / "results.md").write_text("old")
+        (reports_dir / "results.md").write_text("canonical")
+        removed = _clean_stale_toplevel_reports(tmp_path, reports_dir)
+        assert removed == 1
+        assert not (tmp_path / "results.md").exists()
+
+    def test_keeps_file_when_no_canonical(self, tmp_path: Path) -> None:
+        """Top-level file kept when reports/ copy does not exist."""
+        reports_dir = tmp_path / "reports"
+        reports_dir.mkdir()
+        (tmp_path / "results.md").write_text("only copy")
+        removed = _clean_stale_toplevel_reports(tmp_path, reports_dir)
+        assert removed == 0
+        assert (tmp_path / "results.md").exists()
+
+
+class TestEmptyRecommendedBucketExplanation:
+    """Test that an empty 'recommended' bucket includes an explanation."""
+
+    def test_recommended_bucket_shows_explanation(self) -> None:
+        """Recommended bucket text explains why no models qualified."""
+        md: list[str] = []
+        _append_review_user_buckets(md, {"recommended": [], "caveat": [], "avoid": []})
+        text = "\n".join(md)
+        assert "quality thresholds" in text
+        # Other empty buckets should just say "None."
+        lines = [line for line in md if line.startswith("- None")]
+        explanation_lines = [ln for ln in lines if "quality thresholds" in ln]
+        plain_none_lines = [ln for ln in lines if ln.strip() == "- None."]
+        assert len(explanation_lines) == 1
+        assert len(plain_none_lines) == 2

@@ -5,7 +5,7 @@ _Generated on 2026-04-18 00:45:49 BST_
 A review-friendly artifact with image metadata, the source prompt, and full
 generated output for each model.
 
-*Action Snapshot: see [results.md](results.md) for the full summary.*
+_Action Snapshot: see [results.md](results.md) for the full summary._
 
 ## 🧭 Review Priorities
 

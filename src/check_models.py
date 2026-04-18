@@ -2311,6 +2311,7 @@ ERROR_MESSAGE_TRUNCATE_LEN: Final[int] = 120  # Max chars for error messages in 
 MAX_QUALITY_ISSUES_LEN: Final[int] = 30  # Max chars for quality issues in Markdown tables
 MAX_OUTPUT_LINES: Final[int] = 3  # Max lines to show in summary table cells
 MAX_OUTPUT_PREVIEW_CHARS: Final[int] = 280  # Max chars for output previews in summary tables
+MAX_TSV_CELL_CHARS: Final[int] = 300  # Hard cap for any single TSV cell value
 OUTPUT_PREVIEW_CUE_LIMIT: Final[int] = 3  # Max issue cues shown before compact output text
 OUTPUT_PREVIEW_MIN_HEAD_CHARS: Final[int] = 96  # Minimum chars reserved for preview head
 OUTPUT_PREVIEW_MIN_TAIL_CHARS: Final[int] = 48  # Minimum chars reserved for preview tail
@@ -4041,6 +4042,20 @@ def _detect_token_encoding_issues(text: str) -> tuple[bool, str | None]:
             return True, f"bpe_byte_leak({name})"
 
     return False, None
+
+
+def _sanitize_bpe_display(text: str, *, max_len: int = 120) -> str:
+    """Replace BPE marker characters with readable equivalents for display.
+
+    Ġ (U+0120) → space, Ċ (U+010A) → newline placeholder.  The result is
+    truncated to *max_len* so it fits in issue titles and log lines.
+    """
+    cleaned = text.replace("\u0120", " ").replace("\u010a", "\\n")
+    for artifact, _name in BPE_BYTE_ARTIFACTS:
+        cleaned = cleaned.replace(artifact, "?")
+    if len(cleaned) > max_len:
+        cleaned = cleaned[: max_len - 3].rstrip() + "..."
+    return cleaned
 
 
 def _detect_special_token_leakage(text: str) -> tuple[bool, list[str]]:
@@ -13167,7 +13182,7 @@ def generate_markdown_gallery_report(
         ),
     )
     md.append("")
-    md.append("*Action Snapshot: see [results.md](results.md) for the full summary.*")
+    md.append("_Action Snapshot: see [results.md](results.md) for the full summary._")
     md.append("")
     md.extend(_format_review_priorities_parts(report_context, html_output=False))
     md.extend(_format_failures_by_package_parts(results, html_output=False))
@@ -13259,7 +13274,15 @@ def _append_review_user_buckets(
         md.extend([f"### `{bucket}`", ""])
         bucket_results = bucket_groups.get(bucket, [])
         if not bucket_results:
-            md.extend(["- None.", ""])
+            if bucket == "recommended":
+                md.extend(
+                    [
+                        "- None — no models produced clean output meeting all quality thresholds for this prompt.",
+                        "",
+                    ]
+                )
+            else:
+                md.extend(["- None.", ""])
             continue
         rows: list[tuple[str, ...]] = []
         for result in bucket_results:
@@ -13414,7 +13437,13 @@ def generate_tsv_report(
         clean_row = [escape_tsv_value(str(cell)) for cell in row]
         clean_row.append(escape_tsv_value(res.error_type or ""))
         clean_row.append(escape_tsv_value(res.error_package or ""))
-        clean_rows.append(clean_row)
+        # Hard-cap any oversized cells so TSV rows stay manageable
+        clean_rows.append(
+            [
+                c if len(c) <= MAX_TSV_CELL_CHARS else c[: MAX_TSV_CELL_CHARS - 3].rstrip() + "..."
+                for c in clean_row
+            ]
+        )
 
     # Generate TSV using tabulate with tsv format
     tsv_content = tabulate(
@@ -17849,7 +17878,13 @@ def _format_action_snapshot_parts(
     *,
     html_output: bool,
 ) -> list[str]:
-    """Build a compact shared triage block for maintainers and reviewers."""
+    """Build a compact shared triage block for maintainers and reviewers.
+
+    The snapshot is split into three scannable groups:
+    **Failures & Triage** — hard failures and review queues.
+    **Quality & Metadata** — signal frequencies and baseline comparison.
+    **Runtime** — phase timing and decode dominance.
+    """
     summary = report_context.summary
     triage = report_context.triage
     preflight_issues = report_context.preflight_issues
@@ -17859,61 +17894,57 @@ def _format_action_snapshot_parts(
     successful_count = len(triage.utility_rows)
 
     if html_output:
-        parts: list[str] = ["<h3>🎯 Action Snapshot</h3>", "<ul>"]
+        parts: list[str] = ["<h3>🎯 Action Snapshot</h3>"]
 
         def append_line(label: str, value: str) -> None:
             parts.append(
                 f"<li><b>{html.escape(label)}:</b> {html.escape(value)}</li>",
             )
+
+        def open_group(heading: str) -> None:
+            parts.append(f"<p><b>{html.escape(heading)}</b></p>")
+            parts.append("<ul>")
+
+        def close_group() -> None:
+            parts.append("</ul>")
     else:
         parts = ["## 🎯 Action Snapshot", ""]
 
         def append_line(label: str, value: str) -> None:
             _append_markdown_labeled_value(parts, label=label, value=value, bullet=True)
 
-    if failed:
-        owners = Counter(res.error_package or "unknown" for res in failed)
-        owner_summary = ", ".join(f"{owner}={count}" for owner, count in owners.most_common(3))
-        append_line("Framework/runtime failures", f"{len(failed)} (top owners: {owner_summary}).")
-        append_line(
-            "Next action",
-            "review failure ownership below and use diagnostics.md for filing.",
-        )
-    else:
-        append_line("Framework/runtime failures", "none.")
+        def open_group(heading: str) -> None:
+            parts.append(f"**{heading}**")
+            parts.append("")
 
-    append_line(
-        "Maintainer signals",
-        "harness-risk successes="
-        f"{harness_success_count}, clean outputs={triage.clean_count}/{successful_count}.",
+        def close_group() -> None:
+            parts.append("")
+
+    # --- Failures & Triage ---
+    failure_items = _action_snapshot_failure_items(
+        failed,
+        triage=triage,
+        harness_success_count=harness_success_count,
+        successful_count=successful_count,
     )
-
-    if triage.useful_rows:
-        append_line(
-            "Useful now",
-            f"{len(triage.useful_rows)} clean A/B model(s) worth first review.",
-        )
-    else:
-        append_line("Useful now", "none (no clean A/B shortlist for this run).")
-
-    if triage.watchlist_rows:
-        append_line(
-            "Review watchlist",
-            f"{len(triage.watchlist_rows)} model(s) with breaking or lower-value output.",
-        )
-    else:
-        append_line("Review watchlist", "none.")
-
+    open_group("Failures & Triage")
+    for label, value in failure_items:
+        append_line(label, value)
     if preflight_issues:
         append_line(
             "Preflight compatibility",
-            f"{len(preflight_issues)} informational warning(s); do not treat these alone as run failures.",
+            f"{len(preflight_issues)} informational warning(s); "
+            "do not treat these alone as run failures.",
         )
         append_line(
             "Escalate only if",
-            "they line up with unexpected TF/Flax/JAX imports, startup hangs, or backend/runtime crashes.",
+            "they line up with unexpected TF/Flax/JAX imports, startup hangs, "
+            "or backend/runtime crashes.",
         )
+    close_group()
 
+    # --- Quality & Metadata ---
+    open_group("Quality & Metadata")
     if triage.baseline_score is not None and triage.baseline_grade is not None:
         better = len(summary.get("cataloging_improves_metadata", []))
         neutral = len(summary.get("cataloging_neutral_vs_metadata", []))
@@ -17923,23 +17954,75 @@ def _format_action_snapshot_parts(
             f"better={better}, neutral={neutral}, worse={worse} "
             f"(baseline {triage.baseline_grade} {triage.baseline_score:.0f}/100).",
         )
-
     append_line("Quality signal frequency", f"{_format_counter_items(quality_counts)}.")
+    termination_summary = ", ".join(
+        f"{reason}={count}"
+        for reason, count in sorted(
+            Counter("completed" if res.success else "exception" for res in results).items(),
+        )
+    )
+    append_line("Termination reasons", f"{termination_summary}.")
+    close_group()
 
+    # --- Runtime ---
     runtime_analysis = summary.get("runtime_analysis")
     if runtime_analysis is not None:
+        open_group("Runtime")
         for line in _format_runtime_analysis_lines(runtime_analysis):
             if not line.startswith("- **") or ":** " not in line:
                 append_line("Runtime note", line.removeprefix("- "))
                 continue
             label, value = line.removeprefix("- **").split(":** ", maxsplit=1)
             append_line(label, value)
+        close_group()
 
-    if html_output:
-        parts.append("</ul>")
-    else:
-        parts.append("")
     return parts
+
+
+def _action_snapshot_failure_items(
+    failed: list[PerformanceResult],
+    *,
+    triage: ReportTriageContext,
+    harness_success_count: int,
+    successful_count: int,
+) -> list[tuple[str, str]]:
+    """Build label/value pairs for the Failures & Triage snapshot group."""
+    items: list[tuple[str, str]] = []
+    if failed:
+        owners = Counter(res.error_package or "unknown" for res in failed)
+        owner_summary = ", ".join(f"{owner}={count}" for owner, count in owners.most_common(3))
+        items.append(
+            ("Framework/runtime failures", f"{len(failed)} (top owners: {owner_summary}).")
+        )
+        items.append(
+            (
+                "Next action",
+                "review failure ownership below and use diagnostics.md for filing.",
+            )
+        )
+    else:
+        items.append(("Framework/runtime failures", "none."))
+
+    items.append(
+        (
+            "Maintainer signals",
+            f"harness-risk successes={harness_success_count}, "
+            f"clean outputs={triage.clean_count}/{successful_count}.",
+        )
+    )
+    useful_text = (
+        f"{len(triage.useful_rows)} clean A/B model(s) worth first review."
+        if triage.useful_rows
+        else "none (no clean A/B shortlist for this run)."
+    )
+    items.append(("Useful now", useful_text))
+    watchlist_text = (
+        f"{len(triage.watchlist_rows)} model(s) with breaking or lower-value output."
+        if triage.watchlist_rows
+        else "none."
+    )
+    items.append(("Review watchlist", watchlist_text))
+    return items
 
 
 def _group_failures_by_package(
@@ -19046,18 +19129,19 @@ def _generate_github_issue_reports(
 
         file_name = f"issue_{idx:03d}_crash.md"
         issue_path = issues_dir / file_name
-        issue_path.write_text("\\n".join(parts) + "\\n", encoding="utf-8")
+        issue_path.write_text("\n".join(parts) + "\n", encoding="utf-8")
         generated_reports[f"crash_{idx}"] = issue_path
 
     for idx, (result, harness_type) in enumerate(diagnostics_snapshot.harness_results, start=1):
         qa = result.quality_analysis
         if qa is not None and qa.harness_issue_details:
-            harness_details = "\\n".join(f"- {d}" for d in qa.harness_issue_details)
+            harness_details = "\n".join(f"- {d}" for d in qa.harness_issue_details)
         else:
             harness_details = "No details provided."
 
+        safe_harness_type = _sanitize_bpe_display(harness_type)
         parts = [
-            f"# [Harness Issue] {harness_type} in {result.model_name}",
+            f"# [Harness Issue] {safe_harness_type} in {result.model_name}",
             "",
             "## Description",
             f"Integration/harness warning detected for `{result.model_name}`.",
@@ -19077,7 +19161,7 @@ def _generate_github_issue_reports(
 
         file_name = f"issue_{idx:03d}_harness.md"
         issue_path = issues_dir / file_name
-        issue_path.write_text("\\n".join(parts) + "\\n", encoding="utf-8")
+        issue_path.write_text("\n".join(parts) + "\n", encoding="utf-8")
         generated_reports[f"harness_{idx}"] = issue_path
 
     return generated_reports
@@ -19278,25 +19362,94 @@ def _generate_reports_and_log_outputs(
         logger.exception("Failed to generate reports.")
 
 
-def _prune_repro_bundles(repro_dir: Path, max_age_days: int) -> int:
-    """Delete repro bundle directories older than *max_age_days*. Returns count removed."""
-    if max_age_days <= 0 or not repro_dir.is_dir():
+def _prune_repro_bundles(
+    repro_dir: Path,
+    max_age_days: int,
+    *,
+    max_runs: int = 10,
+) -> int:
+    """Remove old repro bundles by age and run count. Returns count removed.
+
+    Bundles are JSON files named ``<timestamp>_<seq>_<model>_<sig>.json``.
+    The timestamp prefix groups files into runs.  We keep the newest
+    *max_runs* run groups and also remove any individual file older than
+    *max_age_days*.
+    """
+    if not repro_dir.is_dir():
         return 0
-    cutoff = time.time() - max_age_days * 86400
+
+    entries = sorted(repro_dir.iterdir(), reverse=True)
+    if not entries:
+        return 0
+
+    age_cutoff = time.time() - max_age_days * 86400 if max_age_days > 0 else 0.0
+
+    # Identify run-group timestamps from file names (first 16 chars like
+    # ``20260417T234549Z``).
+    seen_runs: set[str] = set()
+    run_order: list[str] = []
+    for entry in entries:
+        if entry.is_dir() or not entry.name.endswith(".json"):
+            continue
+        run_prefix = entry.name[:16]
+        if run_prefix not in seen_runs:
+            seen_runs.add(run_prefix)
+            run_order.append(run_prefix)
+
+    keep_prefixes = set(run_order[:max_runs]) if max_runs > 0 else seen_runs
+
     removed = 0
-    for entry in repro_dir.iterdir():
-        if not entry.is_dir():
-            continue
-        try:
-            mtime = entry.stat().st_mtime
-        except OSError:
-            continue
-        if mtime < cutoff:
+    for entry in entries:
+        if entry.is_dir():
             try:
-                shutil.rmtree(entry)
+                if not any(entry.iterdir()):
+                    entry.rmdir()
+            except OSError:
+                pass
+            continue
+        if not entry.name.endswith(".json"):
+            continue
+        run_prefix = entry.name[:16]
+        prune = run_prefix not in keep_prefixes
+        if not prune and age_cutoff > 0:
+            try:
+                prune = entry.stat().st_mtime < age_cutoff
+            except OSError:
+                continue
+        if prune:
+            try:
+                entry.unlink()
                 removed += 1
             except OSError:
                 logger.debug("Failed to remove old repro bundle: %s", entry)
+    return removed
+
+
+def _clean_stale_toplevel_reports(output_dir: Path, reports_dir: Path) -> int:
+    """Remove stale top-level report copies superseded by reports/ versions.
+
+    Earlier versions of the tool wrote reports directly into ``output/``.
+    Now they live under ``output/reports/``.  This removes any leftover
+    top-level duplicates so only the canonical copies remain.
+    """
+    stale_names = (
+        "results.md",
+        "results.html",
+        "results.tsv",
+        "diagnostics.md",
+        "model_gallery.md",
+        "review.md",
+    )
+    removed = 0
+    for name in stale_names:
+        stale = output_dir / name
+        canonical = reports_dir / name
+        if stale.is_file() and canonical.is_file():
+            try:
+                stale.unlink()
+                removed += 1
+            except OSError:
+                logger.debug("Failed to remove stale top-level report: %s", stale)
     return removed
 
 
@@ -19405,6 +19558,15 @@ def finalize_execution(
             pruned = _prune_repro_bundles(repro_dir, prune_days)
             if pruned:
                 logger.info("Pruned %d repro bundle(s) older than %d days.", pruned, prune_days)
+
+        # Remove stale top-level report copies superseded by reports/ subdirectory
+        reports_dir = diagnostics_path.parent
+        output_dir = reports_dir.parent
+        stale_removed = _clean_stale_toplevel_reports(output_dir, reports_dir)
+        if stale_removed:
+            logger.info(
+                "Removed %d stale top-level report(s) superseded by reports/.", stale_removed
+            )
     else:
         log_warning_note("No models processed. No performance summary generated.")
         logger.info("Skipping report generation as no models were processed.")
