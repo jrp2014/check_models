@@ -48,6 +48,7 @@ from typing import (
     NoReturn,
     NotRequired,
     Protocol,
+    Required,
     Self,
     TextIO,
     TypedDict,
@@ -833,6 +834,7 @@ class HistoryRunRecord(TypedDict, total=False):
     model_results: dict[str, HistoryModelResultRecord]
     system: dict[str, str]
     library_versions: LibraryVersionDict
+    runtime_fingerprint: dict[str, RuntimeProbeResult]
 
 
 class JsonlTimingRecord(TypedDict):
@@ -897,14 +899,22 @@ class JsonlReviewRecord(TypedDict):
     harness_details: list[str]
 
 
-class JsonlMetadataRecord(TypedDict):
+class RuntimeProbeResult(TypedDict, total=False):
+    """Status of a single runtime capability probe."""
+
+    status: Required[Literal["ok", "unavailable", "errored", "timed_out"]]
+    detail: str
+
+
+class JsonlMetadataRecord(TypedDict, total=False):
     """Shared header row for ``results.jsonl`` format."""
 
-    _type: Literal["metadata"]
-    format_version: str
-    prompt: str
-    system: dict[str, str]
-    timestamp: str
+    _type: Required[Literal["metadata"]]
+    format_version: Required[str]
+    prompt: Required[str]
+    system: Required[dict[str, str]]
+    timestamp: Required[str]
+    runtime_fingerprint: dict[str, RuntimeProbeResult]
 
 
 class JsonlResultRecord(TypedDict):
@@ -1065,6 +1075,7 @@ class ReportGenerationInputs:
     log_output_path: Path
     env_output_path: Path
     review_output_path: Path
+    runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None
 
 
 class ChatTemplateKwargs(TypedDict, total=False):
@@ -13688,6 +13699,63 @@ def get_system_characteristics() -> dict[str, str]:
     return info
 
 
+def collect_runtime_fingerprint() -> dict[str, RuntimeProbeResult]:
+    """Probe runtime capabilities once per run and record per-probe status.
+
+    Each probe records ``ok``, ``unavailable``, ``errored``, or ``timed_out``
+    (guardrail G2: never silently omit a probe).
+    """
+    probes: dict[str, RuntimeProbeResult] = {}
+
+    # Metal GPU availability
+    try:
+        if mx is not None:
+            mx.metal.is_available()
+            probes["metal_gpu"] = RuntimeProbeResult(status="ok")
+        else:
+            probes["metal_gpu"] = RuntimeProbeResult(
+                status="unavailable", detail="mlx not imported"
+            )
+    except Exception as exc:  # noqa: BLE001
+        probes["metal_gpu"] = RuntimeProbeResult(status="errored", detail=str(exc)[:120])
+
+    # MLX framework version
+    try:
+        if mx is not None:
+            probes["mlx_framework"] = RuntimeProbeResult(
+                status="ok", detail=getattr(mx, "__version__", "unknown")
+            )
+        else:
+            probes["mlx_framework"] = RuntimeProbeResult(status="unavailable")
+    except Exception as exc:  # noqa: BLE001
+        probes["mlx_framework"] = RuntimeProbeResult(status="errored", detail=str(exc)[:120])
+
+    # mlx-vlm importability
+    try:
+        if "mlx-vlm" not in MISSING_DEPENDENCIES:
+            probes["mlx_vlm"] = RuntimeProbeResult(status="ok")
+        else:
+            probes["mlx_vlm"] = RuntimeProbeResult(
+                status="unavailable", detail=MISSING_DEPENDENCIES.get("mlx-vlm", "not imported")
+            )
+    except Exception as exc:  # noqa: BLE001
+        probes["mlx_vlm"] = RuntimeProbeResult(status="errored", detail=str(exc)[:120])
+
+    # GPU memory query
+    try:
+        if mx is not None and hasattr(mx, "metal"):
+            active = mx.metal.get_active_memory()
+            probes["gpu_memory"] = RuntimeProbeResult(
+                status="ok", detail=f"active={active / (1024**3):.2f}GB"
+            )
+        else:
+            probes["gpu_memory"] = RuntimeProbeResult(status="unavailable")
+    except Exception as exc:  # noqa: BLE001
+        probes["gpu_memory"] = RuntimeProbeResult(status="errored", detail=str(exc)[:120])
+
+    return probes
+
+
 # --- Model Processing Core ---
 def validate_inputs(
     image_path: PathLike,
@@ -18555,13 +18623,14 @@ def _build_history_run_record(
     system_info: dict[str, str],
     library_versions: LibraryVersionDict,
     image_path: Path | None,
+    runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
 ) -> HistoryRunRecord:
     """Build typed run-history record payload prior to append."""
     prompt_hash = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
     model_results = {
         result.model_name: _history_model_result_from_result(result) for result in results
     }
-    return {
+    record: HistoryRunRecord = {
         "_type": "run",
         "format_version": "1.0",
         "timestamp": local_now_str(),
@@ -18572,6 +18641,9 @@ def _build_history_run_record(
         "system": system_info,
         "library_versions": library_versions,
     }
+    if runtime_fingerprint is not None:
+        record["runtime_fingerprint"] = runtime_fingerprint
+    return record
 
 
 def append_history_record(
@@ -18582,6 +18654,7 @@ def append_history_record(
     system_info: dict[str, str],
     library_versions: LibraryVersionDict,
     image_path: Path | None = None,
+    runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
 ) -> HistoryRunRecord:
     """Append a per-run history record for tracking regressions/recoveries."""
     record = _build_history_run_record(
@@ -18590,6 +18663,7 @@ def append_history_record(
         system_info=system_info,
         library_versions=library_versions,
         image_path=image_path,
+        runtime_fingerprint=runtime_fingerprint,
     )
 
     try:
@@ -18606,15 +18680,19 @@ def _build_jsonl_metadata_record(
     *,
     prompt: str,
     system_info: dict[str, str],
+    runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
 ) -> JsonlMetadataRecord:
     """Build shared metadata header row for JSONL results."""
-    return {
+    record: JsonlMetadataRecord = {
         "_type": "metadata",
         "format_version": "1.4",
         "prompt": prompt,
         "system": system_info,
         "timestamp": local_now_str(),
     }
+    if runtime_fingerprint is not None:
+        record["runtime_fingerprint"] = runtime_fingerprint
+    return record
 
 
 def _build_jsonl_result_record_base(result: PerformanceResult) -> JsonlResultRecord:
@@ -18701,6 +18779,8 @@ def save_jsonl_report(
     filename: Path,
     prompt: str,
     system_info: dict[str, str],
+    *,
+    runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
 ) -> None:
     """Save results to a JSONL file for programmatic analysis and AI issue generation.
 
@@ -18718,7 +18798,11 @@ def save_jsonl_report(
     try:
         with filename.open("w", encoding="utf-8") as f:
             # Write shared metadata header (avoids repeating prompt/system per row)
-            header = _build_jsonl_metadata_record(prompt=prompt, system_info=system_info)
+            header = _build_jsonl_metadata_record(
+                prompt=prompt,
+                system_info=system_info,
+                runtime_fingerprint=runtime_fingerprint,
+            )
             f.write(json.dumps(header) + "\n")
 
             for result in results:
@@ -19364,6 +19448,7 @@ def _generate_reports_and_log_outputs(
             inputs.args.output_jsonl,
             prompt=inputs.prompt,
             system_info=inputs.system_info,
+            runtime_fingerprint=inputs.runtime_fingerprint,
         )
 
         logger.info("")
@@ -19498,6 +19583,7 @@ def finalize_execution(
 
         # Gather system characteristics for reports
         system_info = get_system_characteristics()
+        runtime_fingerprint = collect_runtime_fingerprint()
         report_context = _build_report_render_context(
             results=results,
             prompt=prompt,
@@ -19539,6 +19625,7 @@ def finalize_execution(
                 log_output_path=log_output_path,
                 env_output_path=env_output_path,
                 review_output_path=args.output_review.resolve(),
+                runtime_fingerprint=runtime_fingerprint,
             ),
         )
 
@@ -19550,6 +19637,7 @@ def finalize_execution(
             system_info=system_info,
             library_versions=library_versions,
             image_path=image_path,
+            runtime_fingerprint=runtime_fingerprint,
         )
 
         log_file_path(history_path, label="   History:     ")

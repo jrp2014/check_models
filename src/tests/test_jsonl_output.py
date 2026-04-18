@@ -655,3 +655,79 @@ def test_compare_history_records_no_previous() -> None:
     assert summary["recoveries"] == []
     assert summary["new_models"] == ["model-x", "model-y"]
     assert summary["missing_models"] == []
+
+
+# --- Runtime Fingerprint Canary Tests ---
+
+
+class TestRuntimeFingerprint:
+    """Mock canary tests for runtime capability fingerprint collection."""
+
+    def test_collect_runtime_fingerprint_returns_all_probes(self) -> None:
+        """Fingerprint must include all four probe keys (G2: never silently omit)."""
+        fingerprint = check_models.collect_runtime_fingerprint()
+        expected_probes = {"metal_gpu", "mlx_framework", "mlx_vlm", "gpu_memory"}
+        assert set(fingerprint.keys()) == expected_probes
+
+    def test_each_probe_has_valid_status(self) -> None:
+        """Every probe result must have a status in the allowed set."""
+        fingerprint = check_models.collect_runtime_fingerprint()
+        valid_statuses = {"ok", "unavailable", "errored", "timed_out"}
+        for probe_name, result in fingerprint.items():
+            assert result["status"] in valid_statuses, (
+                f"Probe '{probe_name}' has invalid status: {result['status']}"
+            )
+
+    def test_jsonl_metadata_includes_fingerprint(self) -> None:
+        """JSONL metadata record includes runtime_fingerprint when provided."""
+        fingerprint = {"metal_gpu": check_models.RuntimeProbeResult(status="ok")}
+        record = check_models._build_jsonl_metadata_record(
+            prompt="test",
+            system_info={},
+            runtime_fingerprint=fingerprint,
+        )
+        assert "runtime_fingerprint" in record
+        assert record["runtime_fingerprint"]["metal_gpu"]["status"] == "ok"
+
+    def test_jsonl_metadata_omits_fingerprint_when_none(self) -> None:
+        """JSONL metadata record omits runtime_fingerprint when not provided."""
+        record = check_models._build_jsonl_metadata_record(
+            prompt="test",
+            system_info={},
+        )
+        assert "runtime_fingerprint" not in record
+
+    def test_history_record_includes_fingerprint(self, tmp_path: Path) -> None:
+        """History record includes runtime_fingerprint when provided."""
+        fingerprint = {"mlx_vlm": check_models.RuntimeProbeResult(status="ok")}
+        history_path = tmp_path / "test.history.jsonl"
+        record = check_models.append_history_record(
+            history_path=history_path,
+            results=[],
+            prompt="test prompt",
+            system_info={},
+            library_versions=cast("check_models.LibraryVersionDict", {}),
+            runtime_fingerprint=fingerprint,
+        )
+        assert record.get("runtime_fingerprint") == fingerprint
+        # Verify it's persisted to disk
+        lines = history_path.read_text().strip().splitlines()
+        assert len(lines) == 1
+        persisted = json.loads(lines[0])
+        assert persisted["runtime_fingerprint"]["mlx_vlm"]["status"] == "ok"
+
+    def test_save_jsonl_includes_fingerprint(self, tmp_path: Path) -> None:
+        """save_jsonl_report includes fingerprint in metadata header."""
+        fingerprint = {"metal_gpu": check_models.RuntimeProbeResult(status="ok")}
+        out_path = tmp_path / "results.jsonl"
+        check_models.save_jsonl_report(
+            [],
+            out_path,
+            prompt="test",
+            system_info={},
+            runtime_fingerprint=fingerprint,
+        )
+        lines = out_path.read_text().strip().splitlines()
+        header = json.loads(lines[0])
+        assert header["_type"] == "metadata"
+        assert header["runtime_fingerprint"]["metal_gpu"]["status"] == "ok"
