@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-04-17 12:53:02 BST
+FULL ENVIRONMENT DUMP - 2026-04-18 00:14:05 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -12,7 +12,7 @@ aiosignal==1.4.0
 annotated-doc==0.0.4
 annotated-types==0.7.0
 anyio==4.13.0
-astroid==4.1.2
+astroid==4.0.4
 astunparse==1.6.3
 attrs==26.1.0
 build==1.4.3
@@ -167,5 +167,5 @@ yarl==1.23.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-04-17 12:53:02 BST
+Environment dump completed at 2026-04-18 00:14:05 BST
 ================================================================================
