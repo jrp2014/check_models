@@ -1,9 +1,9 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-04-18 00:14:05 BST
+FULL ENVIRONMENT DUMP - 2026-04-19 00:42:21 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
-Total packages: 159
+Total packages: 158
 
 absl-py==2.4.0
 aiohappyeyeballs==2.6.1
@@ -20,7 +20,6 @@ certifi==2026.2.25
 cffi==2.0.0
 cfgv==3.5.0
 charset-normalizer==3.4.7
-check_models==0.3.3
 check_models==0.3.3
 click==8.3.2
 cmake==4.3.1
@@ -48,7 +47,7 @@ httpcore==1.0.9
 httpx==0.28.1
 httpx-sse==0.4.3
 huggingface_hub==1.11.0
-identify==2.6.18
+identify==2.6.19
 idna==3.11
 iniconfig==2.3.0
 inquirerpy==0.3.4
@@ -64,10 +63,10 @@ MarkupSafe==3.0.3
 mccabe==0.7.0
 mcp==1.27.0
 mdurl==0.1.2
-miniaudio==1.61
+miniaudio==1.70
 ml_dtypes==0.5.4
-mlx==0.31.2.dev20260417+d142de6a
-mlx==0.31.2.dev20260417+d142de6a
+mlx==0.31.2.dev20260418+fa4320d5
+mlx==0.31.2.dev20260418+fa4320d5
 mlx-lm==0.31.3
 mlx-vlm==0.4.4
 mpmath==1.3.0
@@ -106,7 +105,7 @@ Pygments==2.20.0
 PyJWT==2.12.1
 pylint==4.0.5
 pyproject_hooks==1.2.0
-pyrefly==0.61.0
+pyrefly==0.61.1
 pytest==9.0.3
 pytest-cov==7.1.0
 pytest-xdist==3.8.0
@@ -167,5 +166,5 @@ yarl==1.23.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-04-18 00:14:05 BST
+Environment dump completed at 2026-04-19 00:42:21 BST
 ================================================================================
