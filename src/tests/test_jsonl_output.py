@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, cast
+from unittest.mock import MagicMock
 
 import check_models
 from check_models import (
@@ -887,3 +888,66 @@ class TestSchemaVersioning:
         )
         data = json.loads(hist.read_text().strip())
         assert data["format_version"] == "1.0"
+
+
+class TestRerunEvidence:
+    """Tests for differential rerun evidence in JSONL output."""
+
+    def test_rerun_summary_emitted_when_evidence_present(self, tmp_path: Path) -> None:
+        """JSONL result includes rerun_summary when rerun_evidence is set."""
+        evidence = check_models.RerunEvidence(
+            rerun_success=True,
+            rerun_generated_chars=42,
+            rerun_generation_time=1.5,
+            rerun_prompt="Describe this image briefly.",
+        )
+        result = PerformanceResult(
+            model_name="org/model",
+            generation=None,
+            success=False,
+            error_message="RuntimeError: something",
+            rerun_evidence=evidence,
+        )
+        out = tmp_path / "results.jsonl"
+        check_models.save_jsonl_report([result], out, prompt="t", system_info={})
+        _, rows = _read_jsonl(out)
+        summary = rows[0].get("rerun_summary")
+        assert summary is not None
+        assert summary["rerun_success"] is True
+        assert summary["rerun_generated_chars"] == 42
+        assert summary["rerun_prompt"] == "Describe this image briefly."
+
+    def test_no_rerun_summary_when_no_evidence(self, tmp_path: Path) -> None:
+        """JSONL result omits rerun_summary when no rerun was performed."""
+        result = PerformanceResult(
+            model_name="org/model",
+            generation=None,
+            success=False,
+            error_message="RuntimeError: something",
+        )
+        out = tmp_path / "results.jsonl"
+        check_models.save_jsonl_report([result], out, prompt="t", system_info={})
+        _, rows = _read_jsonl(out)
+        assert "rerun_summary" not in rows[0]
+
+    def test_select_rerun_candidates_picks_failures(self) -> None:
+        """_select_rerun_candidates picks failed models without verdicts."""
+        ok = PerformanceResult(model_name="ok", generation=MockGeneration(), success=True)
+        fail = PerformanceResult(model_name="fail", generation=None, success=False)
+        candidates = check_models._select_rerun_candidates([ok, fail])
+        assert len(candidates) == 1
+        assert candidates[0].model_name == "fail"
+
+    def test_select_rerun_candidates_skips_deterministic_verdicts(self) -> None:
+        """Models with harness/model_shortcoming verdicts are not rerun candidates."""
+        # Create a mock quality_analysis with verdict="harness"
+        qa = MagicMock()
+        qa.verdict = "harness"
+        result = PerformanceResult(
+            model_name="harness-model",
+            generation=MockGeneration(),
+            success=True,
+            quality_analysis=qa,
+        )
+        candidates = check_models._select_rerun_candidates([result])
+        assert len(candidates) == 0

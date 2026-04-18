@@ -917,6 +917,17 @@ class JsonlMetadataRecord(TypedDict, total=False):
     runtime_fingerprint: dict[str, RuntimeProbeResult]
 
 
+class JsonlRerunSummary(TypedDict, total=False):
+    """Secondary rerun evidence attached to JSONL result rows."""
+
+    rerun_success: Required[bool]
+    rerun_verdict: str
+    rerun_error_code: str
+    rerun_generated_chars: int
+    rerun_generation_time: float
+    rerun_prompt: str
+
+
 class JsonlSignatureComponents(TypedDict, total=False):
     """Structured components of the error signature for precise cross-run clustering."""
 
@@ -948,6 +959,7 @@ class JsonlResultRecord(TypedDict):
     quality_analysis: NotRequired[JsonlQualityAnalysisRecord]
     review: NotRequired[JsonlReviewRecord]
     signature_components: NotRequired[JsonlSignatureComponents]
+    rerun_summary: NotRequired[JsonlRerunSummary]
 
 
 type FailedModelIssue = tuple[str, str | None, str | None]
@@ -1416,6 +1428,19 @@ class PerformanceResult:
     error_traceback: str | None = None
     runtime_diagnostics: RuntimeDiagnostics | None = None
     requested_max_tokens: int | None = None
+    rerun_evidence: RerunEvidence | None = None
+
+
+@dataclass(frozen=True)
+class RerunEvidence:
+    """Secondary evidence from a differential rerun (never overwrites first-pass)."""
+
+    rerun_success: bool
+    rerun_verdict: str | None = None
+    rerun_error_code: str | None = None
+    rerun_generated_chars: int | None = None
+    rerun_generation_time: float | None = None
+    rerun_prompt: str | None = None
 
 
 @dataclass(frozen=True)
@@ -18750,6 +18775,21 @@ def _build_jsonl_result_record_base(result: PerformanceResult) -> JsonlResultRec
                 result.error_traceback
             )
         record["signature_components"] = components
+    # Attach differential rerun evidence when available (G3: secondary only)
+    if result.rerun_evidence is not None:
+        ev = result.rerun_evidence
+        summary: JsonlRerunSummary = {"rerun_success": ev.rerun_success}
+        if ev.rerun_verdict is not None:
+            summary["rerun_verdict"] = ev.rerun_verdict
+        if ev.rerun_error_code is not None:
+            summary["rerun_error_code"] = ev.rerun_error_code
+        if ev.rerun_generated_chars is not None:
+            summary["rerun_generated_chars"] = ev.rerun_generated_chars
+        if ev.rerun_generation_time is not None:
+            summary["rerun_generation_time"] = ev.rerun_generation_time
+        if ev.rerun_prompt is not None:
+            summary["rerun_prompt"] = ev.rerun_prompt
+        record["rerun_summary"] = summary
     return record
 
 
@@ -19584,6 +19624,112 @@ def _clean_stale_toplevel_reports(output_dir: Path, reports_dir: Path) -> int:
     return removed
 
 
+# ---------- Phase 5: Automatic Differential Reruns ----------
+
+RERUN_TRIAGE_PROMPT: Final[str] = "Describe this image briefly."
+RERUN_TRIAGE_MAX_TOKENS: Final[int] = 100
+RERUN_TRIAGE_TIMEOUT: Final[float] = 60.0
+
+_RERUN_ELIGIBLE_VERDICTS: Final[frozenset[str]] = frozenset(
+    {
+        "unknown_runtime_anomaly",
+        "runtime_failure",
+    }
+)
+
+
+def _select_rerun_candidates(
+    results: list[PerformanceResult],
+) -> list[PerformanceResult]:
+    """Select models that merit a differential rerun for secondary evidence.
+
+    Eligible models are those with verdicts indicating uncertain or transient
+    failures.  Successful models and models with deterministic failures
+    (e.g. ``harness``, ``model_shortcoming``) are never rerun.
+    """
+    candidates: list[PerformanceResult] = []
+    for result in results:
+        review = result.quality_analysis
+        verdict = getattr(review, "verdict", None) if review else None
+        # Also include failed models with no verdict (pure runtime failures)
+        if (not result.success and verdict is None) or verdict in _RERUN_ELIGIBLE_VERDICTS:
+            candidates.append(result)
+    return candidates
+
+
+def _build_rerun_evidence(
+    rerun_result: PerformanceResult,
+    *,
+    rerun_prompt: str,
+) -> RerunEvidence:
+    """Build a RerunEvidence summary from a rerun PerformanceResult."""
+    gen_chars: int | None = None
+    if rerun_result.generation is not None:
+        text = getattr(rerun_result.generation, "text", None)
+        if text is not None:
+            gen_chars = len(text)
+    return RerunEvidence(
+        rerun_success=rerun_result.success,
+        rerun_verdict=None,  # Not classified — secondary evidence only
+        rerun_error_code=rerun_result.error_code,
+        rerun_generated_chars=gen_chars,
+        rerun_generation_time=rerun_result.generation_time,
+        rerun_prompt=rerun_prompt,
+    )
+
+
+def _run_differential_reruns(
+    candidates: list[PerformanceResult],
+    args: argparse.Namespace,
+    image_path: Path,
+) -> list[PerformanceResult]:
+    """Rerun candidate models with a simple triage prompt for secondary evidence.
+
+    Returns the original results list with ``rerun_evidence`` populated on
+    candidates that were rerun.  First-pass data is never overwritten (G3).
+    """
+    if not candidates:
+        return []
+
+    logger.info(
+        "Running differential reruns for %d triage candidate(s)...",
+        len(candidates),
+    )
+    updated: list[PerformanceResult] = []
+    for result in candidates:
+        params = ProcessImageParams(
+            model_identifier=result.model_name,
+            image_path=image_path,
+            prompt=RERUN_TRIAGE_PROMPT,
+            max_tokens=RERUN_TRIAGE_MAX_TOKENS,
+            temperature=0.0,
+            timeout=RERUN_TRIAGE_TIMEOUT,
+            verbose=False,
+            trust_remote_code=getattr(args, "trust_remote_code", True),
+            top_p=getattr(args, "top_p", 1.0),
+            min_p=getattr(args, "min_p", 0.0),
+            top_k=getattr(args, "top_k", 0),
+            repetition_penalty=getattr(args, "repetition_penalty", None),
+            repetition_context_size=getattr(args, "repetition_context_size", 20),
+            lazy=getattr(args, "lazy_load", False),
+            max_kv_size=getattr(args, "max_kv_size", None),
+            kv_bits=getattr(args, "kv_bits", None),
+            kv_group_size=getattr(args, "kv_group_size", 64),
+            quantized_kv_start=getattr(args, "quantized_kv_start", 0),
+        )
+        rerun_result = process_image_with_model(params)
+        evidence = _build_rerun_evidence(rerun_result, rerun_prompt=RERUN_TRIAGE_PROMPT)
+        updated_result = dataclasses.replace(result, rerun_evidence=evidence)
+        logger.info(
+            "  Rerun %s: %s (chars=%s)",
+            result.model_name,
+            "ok" if evidence.rerun_success else "fail",
+            evidence.rerun_generated_chars,
+        )
+        updated.append(updated_result)
+    return updated
+
+
 def finalize_execution(
     *,
     args: argparse.Namespace,
@@ -19753,6 +19899,15 @@ def main(args: argparse.Namespace) -> None:
         _raise_for_missing_runtime_dependencies()
 
         results = process_models(args, image_path, prompt=prompt)
+
+        # Phase 5: Differential reruns for triage-worthy models
+        if getattr(args, "rerun_triage", False):
+            candidates = _select_rerun_candidates(results)
+            if candidates:
+                updated = _run_differential_reruns(candidates, args, image_path)
+                # Merge rerun evidence back into results list
+                rerun_map = {r.model_name: r for r in updated}
+                results = [rerun_map.get(r.model_name, r) for r in results]
 
         finalize_execution(
             args=args,
@@ -20253,6 +20408,16 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         type=int,
         default=90,
         help="Delete repro bundles older than N days (default: 90). Set 0 to disable pruning.",
+    )
+    parser.add_argument(
+        "--rerun-triage",
+        action="store_true",
+        default=False,
+        help=(
+            "After the first pass, rerun triage-worthy models (runtime failures and "
+            "unknown anomalies) with a simple prompt to gather secondary evidence. "
+            "First-pass results are never overwritten."
+        ),
     )
     parser.add_argument(
         "-n",

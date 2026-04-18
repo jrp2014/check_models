@@ -54,6 +54,12 @@ Notable changes to this project will be documented in this file.
   and history records for runtime environment attestation.
 - Added `TestRuntimeFingerprint` canary tests (6 cases) verifying fingerprint
   probes, JSONL metadata integration, and history record integration.
+- Added `--rerun-triage` CLI flag for automatic differential reruns of
+  triage-worthy models (runtime failures and unknown anomalies) with a simple
+  prompt. First-pass results are never overwritten (G3). Rerun evidence is
+  emitted as `rerun_summary` in JSONL result records.
+- Added `RerunEvidence` dataclass and `_select_rerun_candidates()` selection
+  logic for identifying models that merit a secondary evidence pass.
 
 ### Changed
 

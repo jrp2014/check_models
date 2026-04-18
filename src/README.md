@@ -858,6 +858,7 @@ See module docstrings and `__all__` exports for complete API reference.
 | `-c`, `--quality-config` | Path | (none) | Path to custom quality configuration YAML file. |
 | `--context-marker` | str | `Context:` | Marker used to identify context section in prompt. |
 | `--prune-repro-days` | int | 90 | Delete repro bundles older than N days. Set 0 to disable pruning. |
+| `--rerun-triage` | flag | `False` | Rerun triage-worthy models with a simple prompt for secondary evidence. First-pass results are never overwritten. |
 | `-n`, `--dry-run` | flag | `False` | Validate arguments and show what would run without invoking models. |
 
 ### Selection Logic
