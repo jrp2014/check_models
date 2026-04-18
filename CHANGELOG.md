@@ -4,6 +4,8 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-04-19
+
 ### Added
 
 - Added `unknown_runtime_anomaly` verdict for near-empty outputs that pass all
@@ -139,6 +141,7 @@ Notable changes to this project will be documented in this file.
 - Updated workspace file associations so generated `PKG-INFO` package-metadata
   files open as properties instead of Markdown, avoiding editor-only
   markdownlint noise on `.egg-info` metadata.
+
 
 ## [0.3.3] - 2026-04-12
 
