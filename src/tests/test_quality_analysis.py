@@ -880,6 +880,38 @@ def test_has_harness_issues_only() -> None:
     assert mixed_issues.has_harness_issues_only() is False
 
 
+class TestClassifyHintRelationship:
+    """Tests for _classify_hint_relationship nonvisual-hint handling."""
+
+    def test_metadata_only_hints_not_scored_as_ignores(self) -> None:
+        """When all trusted terms are metadata-only, don't penalise for low visual overlap."""
+        bundle = check_models.TrustedHintBundle(
+            trusted_text="Taken on 2026-02-21, GPS coordinates 51.8N",
+            trusted_terms=("taken", "2026-02-21", "gps", "timestamp"),
+            nonvisual_terms=("taken", "2026-02-21", "gps", "timestamp"),
+        )
+        text = (
+            "Title: Red brick storefront\n"
+            "Description: A red brick storefront with outdoor seating.\n"
+            "Keywords: brick, storefront, seating"
+        )
+        relationship, _ = check_models._classify_hint_relationship(text, bundle)
+        assert relationship != "ignores_trusted_hints", (
+            "Metadata-only hints should not trigger ignores_trusted_hints"
+        )
+
+    def test_visual_hints_still_detected_as_ignores(self) -> None:
+        """When visual terms are present and not reflected, still flag as ignores."""
+        bundle = check_models.TrustedHintBundle(
+            trusted_text="Brick storefront with outdoor seating beside sidewalk",
+            trusted_terms=("Brick", "storefront", "outdoor", "seating", "sidewalk"),
+            nonvisual_terms=(),
+        )
+        text = "Title: Abstract painting\nDescription: Colorful abstract art.\nKeywords: art"
+        relationship, _ = check_models._classify_hint_relationship(text, bundle)
+        assert relationship == "ignores_trusted_hints"
+
+
 class TestClassifyReviewVerdict:
     """Tests for _classify_review_verdict verdict splitting."""
 
@@ -918,6 +950,25 @@ class TestClassifyReviewVerdict:
             has_hallucination=False,
         )
         assert verdict == "cutoff_degraded"
+
+    def test_cutoff_degraded_with_abrupt_tail(self) -> None:
+        """Token cap hit with abrupt_tail returns cutoff_degraded, not token_cap."""
+        verdict, evidence = check_models._classify_review_verdict(
+            has_harness_issue=False,
+            harness_type=None,
+            likely_cutoff=True,
+            cutoff_reasons=["abrupt_tail"],
+            prompt_tokens_total=100,
+            prompt_tokens_text_est=80,
+            prompt_tokens_nontext_est=20,
+            missing_sections=[],
+            utility_grade="C",
+            instruction_echo=False,
+            metadata_borrowing=False,
+            has_hallucination=False,
+        )
+        assert verdict == "cutoff_degraded"
+        assert "abrupt_tail" in evidence
 
     def test_harness_verdict_preserved(self) -> None:
         """Harness issues still return harness verdict."""

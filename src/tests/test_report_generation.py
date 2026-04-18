@@ -27,6 +27,7 @@ from check_models import (
     _cluster_failures_by_pattern,
     _diagnostics_priority,
     _format_traceback_tail,
+    _generate_github_issue_reports,
     _log_maintainer_summary,
     _prune_repro_bundles,
     export_failure_repro_bundles,
@@ -2585,3 +2586,31 @@ class TestEmptyRecommendedBucketExplanation:
         plain_none_lines = [ln for ln in lines if ln.strip() == "- None."]
         assert len(explanation_lines) == 1
         assert len(plain_none_lines) == 2
+
+
+class TestGithubIssueReportsCleanup:
+    """Tests for _generate_github_issue_reports stale file cleanup."""
+
+    def test_stale_issue_files_removed(self, tmp_path: Path) -> None:
+        """Old issue_*.md files are removed before writing new ones."""
+        issues_dir = tmp_path / "issues"
+        issues_dir.mkdir()
+        (issues_dir / "issue_001_crash.md").write_text("stale crash report")
+        (issues_dir / "issue_002_harness.md").write_text("stale harness report")
+        # A non-issue file should be left alone
+        (issues_dir / "README.md").write_text("keep me")
+
+        # Empty snapshot → no new issue files written
+        snapshot = DiagnosticsSnapshot()
+        _generate_github_issue_reports(
+            diagnostics_snapshot=snapshot,
+            output_dir=tmp_path,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            repro_bundles={},
+            run_args=None,
+        )
+
+        assert not (issues_dir / "issue_001_crash.md").exists()
+        assert not (issues_dir / "issue_002_harness.md").exists()
+        assert (issues_dir / "README.md").exists()

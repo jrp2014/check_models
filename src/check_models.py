@@ -3438,7 +3438,7 @@ def _classify_hint_relationship(
     score = float(utility["utility_score"])
     delta = score - baseline_score
 
-    if bundle.trusted_terms and overlap_ratio < (1.0 - QUALITY.min_missing_ratio):
+    if visual_terms and overlap_ratio < (1.0 - QUALITY.min_missing_ratio):
         return "ignores_trusted_hints", ["low_hint_overlap"]
     if delta > UTILITY_DELTA_NEUTRAL_BAND:
         return "improves_trusted_hints", ["utility_delta_positive"]
@@ -3502,7 +3502,12 @@ def _classify_review_verdict(
     if likely_cutoff:
         evidence.append("token_cap")
         # Distinguish benign cap from degraded cap
-        _degradation_reasons = {"missing_sections", "repetitive_tail", "unfinished_section"}
+        _degradation_reasons = {
+            "missing_sections",
+            "repetitive_tail",
+            "unfinished_section",
+            "abrupt_tail",
+        }
         if set(cutoff_reasons) & _degradation_reasons:
             evidence.extend(cutoff_reasons)
             return "cutoff_degraded", evidence
@@ -19088,6 +19093,11 @@ def _generate_github_issue_reports(
     issues_dir = output_dir / "issues"
     if not issues_dir.exists():
         issues_dir.mkdir(parents=True, exist_ok=True)
+
+    # Remove stale issue reports from previous runs so only current
+    # failures are present after this invocation.
+    for stale in issues_dir.glob("issue_*.md"):
+        stale.unlink()
 
     generated_reports: dict[str, Path] = {}
 

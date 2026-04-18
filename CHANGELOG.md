@@ -28,6 +28,14 @@ Notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Fixed `_classify_hint_relationship` regression: metadata-only trusted hints
+  (e.g. GPS, timestamps) no longer mis-trigger `ignores_trusted_hints` when
+  there are no visual terms to match against.
+- Fixed `_classify_review_verdict` omitting `abrupt_tail` from degradation
+  reasons, which caused clearly cut-off outputs to be classified as benign
+  `token_cap` instead of `cutoff_degraded`.
+- Fixed `_generate_github_issue_reports` not cleaning stale `issue_*.md` files
+  before writing new ones, leaving outdated reports from larger previous runs.
 - Changed mypy `follow_imports` for mlx_lm/mlx_vlm from `"silent"` to `"normal"`
   so mypy actively type-checks call sites against auto-generated stub signatures.
   transformers/tokenizers remain on `"silent"` to avoid noise from generated stubs.
