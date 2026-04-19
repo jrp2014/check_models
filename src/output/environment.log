@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-04-19 20:51:47 BST
+FULL ENVIRONMENT DUMP - 2026-04-19 23:13:35 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -20,7 +20,7 @@ certifi==2026.2.25
 cffi==2.0.0
 cfgv==3.5.0
 charset-normalizer==3.4.7
-check_models==0.4.0
+check_models==0.5.0
 check_models==0.4.0
 click==8.3.2
 cmake==4.3.1
@@ -167,5 +167,5 @@ yarl==1.23.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-04-19 20:51:47 BST
+Environment dump completed at 2026-04-19 23:13:35 BST
 ================================================================================

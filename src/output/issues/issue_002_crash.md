@@ -8,6 +8,16 @@ A runtime failure occurred affecting **1 model(s)**.
 
 - `mlx-community/MolmoPoint-8B-fp16`
 
+## Maintainer Triage
+
+_Likely owner:_ model-config \| confidence=high
+_Classification:_ runtime_failure \| MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR
+_Summary:_ processor error \| model config processor load processor
+_Evidence:_ processor error \| model config processor load processor
+_Token context:_ stop=exception
+_Next action:_ Inspect model repo config, chat template, and EOS settings.
+
+
 ## Traceback / Error Message
 
 ```text
@@ -16,7 +26,7 @@ Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded processor ha
 
 ## Reproducibility
 
-A reproduction bundle is available at: `20260419T201247Z_002_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json`
+A reproduction bundle is available at: `20260419T223445Z_002_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json`
 
 ### Repro Command
 

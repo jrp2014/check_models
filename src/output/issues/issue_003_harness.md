@@ -1,19 +1,37 @@
-# [Harness Issue] Title: Windsor Sovereign Tour Boat on the River Thames\n\nDescription: A blue and white tour boat named 'Windsor Sove... in mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+# [Harness Issue] <|endoftext|> in mlx-community/Qwen2-VL-2B-Instruct-4bit
 
 ## Description
 
-Integration/harness warning detected for `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`.
+Integration/harness warning detected for `mlx-community/Qwen2-VL-2B-Instruct-4bit`.
 
 ### Details
 
-- token_encoding:bpe_space_leak(61)
+- Special control token &lt;|endoftext|&gt; appeared in generated text.
+- Output appears truncated to about 2 tokens.
+- At long prompt length (16731 tokens), output stayed unusually short (2 tokens; ratio 0.0%).
+
+## Maintainer Triage
+
+_Likely owner:_ mlx-vlm \| confidence=high
+_Classification:_ harness \| stop_token
+_Summary:_ Special control token &lt;\|endoftext\|&gt; appeared in generated
+           text. \| Output appears truncated to about 2 tokens. \| nontext
+           prompt burden=97% \| missing terms: view, Round, Tower, Windsor,
+           Castle
+_Evidence:_ Special control token &lt;\|endoftext\|&gt; appeared in generated
+            text. \| Output appears truncated to about 2 tokens.
+_Token context:_ prompt=16,731 \| output/prompt=0.01% \| nontext burden=97% \|
+                 stop=completed
+_Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
+               into user-facing text.
+
 
 ## Reproducibility
 
 ### Repro Command
 
 ```bash
-python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit
 ```
 
 ---

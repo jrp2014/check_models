@@ -1,19 +1,37 @@
-# [Harness Issue] Title Windsor Sovereign tour boat Description The Windsor Sovereign tour boat, filled with passengers, cruises alo... in Qwen/Qwen3-VL-2B-Instruct
+# [Harness Issue] Title: "Round Tower of Windsor Castle"  Description: A view of the Round Tower of Windsor Castle, a royal residence i in microsoft/Phi-3.5-vision-instruct
 
 ## Description
 
-Integration/harness warning detected for `Qwen/Qwen3-VL-2B-Instruct`.
+Integration/harness warning detected for `microsoft/Phi-3.5-vision-instruct`.
 
 ### Details
 
-- long_context_repetition(16769tok)
+- Special control token &lt;|end|&gt; appeared in generated text.
+- Special control token &lt;|endoftext|&gt; appeared in generated text.
+- Generated text appears to continue into example-code templates mid-output.
+
+## Maintainer Triage
+
+_Likely owner:_ mlx-vlm \| confidence=high
+_Classification:_ harness \| stop_token
+_Summary:_ Special control token &lt;\|end\|&gt; appeared in generated text.
+           \| Special control token &lt;\|endoftext\|&gt; appeared in
+           generated text. \| hit token cap (500) \| nontext prompt burden=66%
+_Evidence:_ Special control token &lt;\|end\|&gt; appeared in generated text.
+            \| Special control token &lt;\|endoftext\|&gt; appeared in
+            generated text.
+_Token context:_ prompt=1,319 \| output/prompt=37.91% \| nontext burden=66% \|
+                 stop=completed \| hit token cap (500)
+_Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
+               into user-facing text.
+
 
 ## Reproducibility
 
 ### Repro Command
 
 ```bash
-python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models Qwen/Qwen3-VL-2B-Instruct
+python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models microsoft/Phi-3.5-vision-instruct
 ```
 
 ---

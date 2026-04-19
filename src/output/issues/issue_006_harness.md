@@ -1,21 +1,32 @@
-# [Harness Issue] <|endoftext|>2021-10-02 in mlx-community/Qwen2-VL-2B-Instruct-4bit
+# [Harness Issue] The image is a photograph in mlx-community/llava-v1.6-mistral-7b-8bit
 
 ## Description
 
-Integration/harness warning detected for `mlx-community/Qwen2-VL-2B-Instruct-4bit`.
+Integration/harness warning detected for `mlx-community/llava-v1.6-mistral-7b-8bit`.
 
 ### Details
 
-- token_leak:<|endoftext|>
-- output:output_ratio(0.1%)
-- long_context_low_ratio(0.1%;16780->12)
+- Output was a short generic filler response (about 8 tokens).
+
+## Maintainer Triage
+
+_Likely owner:_ model-config \| confidence=high
+_Classification:_ harness \| prompt_template
+_Summary:_ Output was a short generic filler response (about 8 tokens). \|
+           nontext prompt burden=84% \| missing terms: view, Round, Tower,
+           Windsor, Castle
+_Evidence:_ Output was a short generic filler response (about 8 tokens).
+_Token context:_ prompt=2,722 \| output/prompt=0.29% \| nontext burden=84% \|
+                 stop=completed
+_Next action:_ Inspect model repo config, chat template, and EOS settings.
+
 
 ## Reproducibility
 
 ### Repro Command
 
 ```bash
-python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit
+python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/llava-v1.6-mistral-7b-8bit
 ```
 
 ---

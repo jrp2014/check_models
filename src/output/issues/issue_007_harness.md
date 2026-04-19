@@ -1,19 +1,33 @@
-# [Harness Issue] The user wants me to analyze an image and generate cataloguing metadata (Title, Description, Keywords) based on speci... in mlx-community/Qwen3.5-35B-A3B-bf16
+# [Harness Issue] - The photograph is in color in mlx-community/paligemma2-10b-ft-docci-448-bf16
 
 ## Description
 
-Integration/harness warning detected for `mlx-community/Qwen3.5-35B-A3B-bf16`.
+Integration/harness warning detected for `mlx-community/paligemma2-10b-ft-docci-448-bf16`.
 
 ### Details
 
-- long_context_context_drop(16794tok)
+- Output is very short relative to prompt size (0.5%), suggesting possible early-stop or prompt-handling issues.
+
+## Maintainer Triage
+
+_Likely owner:_ model-config \| confidence=high
+_Classification:_ harness \| prompt_template
+_Summary:_ Output is very short relative to prompt size (0.5%), suggesting
+           possible early-stop or prompt-handling issues. \| nontext prompt
+           burden=71% \| missing terms: view, Round, Tower, Windsor, Castle
+_Evidence:_ Output is very short relative to prompt size (0.5%), suggesting
+            possible early-stop or prompt-handling issues.
+_Token context:_ prompt=1,531 \| output/prompt=0.52% \| nontext burden=71% \|
+                 stop=completed
+_Next action:_ Inspect model repo config, chat template, and EOS settings.
+
 
 ## Reproducibility
 
 ### Repro Command
 
 ```bash
-python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen3.5-35B-A3B-bf16
+python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/paligemma2-10b-ft-docci-448-bf16
 ```
 
 ---

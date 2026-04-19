@@ -8,6 +8,16 @@ A runtime failure occurred affecting **1 model(s)**.
 
 - `ggml-org/gemma-3-1b-it-GGUF`
 
+## Maintainer Triage
+
+_Likely owner:_ model-config \| confidence=high
+_Classification:_ runtime_failure \| MODEL_CONFIG_MODEL_LOAD_MODEL
+_Summary:_ model error \| model config model load model
+_Evidence:_ model error \| model config model load model
+_Token context:_ stop=exception
+_Next action:_ Inspect model repo config, chat template, and EOS settings.
+
+
 ## Traceback / Error Message
 
 ```text
@@ -16,7 +26,7 @@ Model loading failed: Config not found at /Users/jrp/.cache/huggingface/hub/mode
 
 ## Reproducibility
 
-A reproduction bundle is available at: `20260419T201247Z_001_ggml-org_gemma-3-1b-it-GGUF_MODEL_CONFIG_MODEL_LOAD_MODEL_d01bffe45e.json`
+A reproduction bundle is available at: `20260419T223445Z_001_ggml-org_gemma-3-1b-it-GGUF_MODEL_CONFIG_MODEL_LOAD_MODEL_d01bffe45e.json`
 
 ### Repro Command
 

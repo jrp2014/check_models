@@ -1,12 +1,12 @@
-# Diagnostics Report — 2 failure(s), 11 harness issue(s) (mlx-vlm 0.4.4)
+# Diagnostics Report — 2 failure(s), 7 harness issue(s) (mlx-vlm 0.4.4)
 
 ## Summary
 
-Automated benchmarking of **54 locally-cached VLM models** found **2 hard
-failure(s)** and **11 harness/integration issue(s)** plus **1 preflight
-compatibility warning(s)** in successful models. 52 of 54 models succeeded.
+Automated benchmarking of **55 locally-cached VLM models** found **2 hard
+failure(s)** and **7 harness/integration issue(s)** plus **1 preflight
+compatibility warning(s)** in successful models. 53 of 55 models succeeded.
 
-Test image: `20260418-174210_DSC09825.jpg` (46.8 MB).
+Test image: `20260418-164540_DSC09775_DxO.jpg` (55.7 MB).
 
 ---
 
@@ -16,25 +16,25 @@ Quick triage list with likely owner and next action for each issue class.
 
 - **[Medium] [model configuration/repository]** Model loading failed: Config not found at /Users/jrp/.cache/huggingface/hub/models--g... (1 model(s)). Next: verify model config, tokenizer files, and revision alignment.
 - **[Medium] [model configuration/repository]** Loaded processor has no image_processor; expected multimodal processor. (1 model(s)). Next: verify model config, tokenizer files, and revision alignment.
-- **[Medium] [mlx-vlm]** Harness/integration warnings on 3 model(s). Next: check processor/chat-template wiring and generation kwargs.
-- **[Medium] [mlx-vlm / mlx]** Harness/integration warnings on 3 model(s). Next: validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-- **[Medium] [model-config / mlx-vlm]** Harness/integration warnings on 5 model(s). Next: validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
-- **[Medium] [transformers / mlx-vlm]** Stack-signal anomalies on 2 successful model(s). Next: verify API compatibility and pinned version floor.
+- **[Medium] [mlx-vlm]** Harness/integration warnings on 2 model(s). Next: check processor/chat-template wiring and generation kwargs.
+- **[Medium] [mlx-vlm / mlx]** Harness/integration warnings on 2 model(s). Next: validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
+- **[Medium] [model-config / mlx-vlm]** Harness/integration warnings on 3 model(s). Next: validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
+- **[Medium] [transformers / mlx-vlm]** Stack-signal anomalies on 3 successful model(s). Next: verify API compatibility and pinned version floor.
 - **[Medium] [transformers]** Preflight compatibility warnings (1 issue(s)). Next: verify API compatibility and pinned version floor.
 
 ---
 
 ## Priority Summary
 
-| Priority   | Issue                                                                    | Models Affected                                                                                                                                       | Owner                            | Next Action                                                                              |
-|------------|--------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|------------------------------------------------------------------------------------------|
-| **Medium** | Model loading failed: Config not found at /Users/jrp/.cache/huggingfa... | 1 (gemma-3-1b-it-GGUF)                                                                                                                                | `model configuration/repository` | verify model config, tokenizer files, and revision alignment.                            |
-| **Medium** | Loaded processor has no image_processor; expected multimodal processor.  | 1 (MolmoPoint-8B-fp16)                                                                                                                                | `model configuration/repository` | verify model config, tokenizer files, and revision alignment.                            |
-| **Medium** | Harness/integration                                                      | 3 (Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit, ERNIE-4.5-VL-28B-A3B-Thinking-bf16)                                              | `mlx-vlm`                        | check processor/chat-template wiring and generation kwargs.                              |
-| **Medium** | Harness/integration                                                      | 3 (Qwen3-VL-2B-Instruct, Qwen3.5-35B-A3B-bf16, X-Reasoner-7B-8bit)                                                                                    | `mlx-vlm / mlx`                  | validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.     |
-| **Medium** | Harness/integration                                                      | 5 (FastVLM-0.5B-bf16, Qwen2-VL-2B-Instruct-4bit, paligemma2-10b-ft-docci-448-6bit, paligemma2-10b-ft-docci-448-bf16, paligemma2-3b-ft-docci-448-bf16) | `model-config / mlx-vlm`         | validate chat-template/config expectations and mlx-vlm prompt formatting for this model. |
-| **Medium** | Stack-signal anomaly                                                     | 2 (Qwen3.5-35B-A3B-6bit, Qwen3.5-9B-MLX-4bit)                                                                                                         | `transformers / mlx-vlm`         | verify API compatibility and pinned version floor.                                       |
-| **Medium** | Preflight compatibility warning                                          | 1 issue(s)                                                                                                                                            | `transformers`                   | verify API compatibility and pinned version floor.                                       |
+| Priority   | Issue                                                                    | Models Affected                                                                             | Owner                            | Next Action                                                                              |
+|------------|--------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|----------------------------------|------------------------------------------------------------------------------------------|
+| **Medium** | Model loading failed: Config not found at /Users/jrp/.cache/huggingfa... | 1 (gemma-3-1b-it-GGUF)                                                                      | `model configuration/repository` | verify model config, tokenizer files, and revision alignment.                            |
+| **Medium** | Loaded processor has no image_processor; expected multimodal processor.  | 1 (MolmoPoint-8B-fp16)                                                                      | `model configuration/repository` | verify model config, tokenizer files, and revision alignment.                            |
+| **Medium** | Harness/integration                                                      | 2 (Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit)                        | `mlx-vlm`                        | check processor/chat-template wiring and generation kwargs.                              |
+| **Medium** | Harness/integration                                                      | 2 (Qwen3-VL-2B-Thinking-bf16, X-Reasoner-7B-8bit)                                           | `mlx-vlm / mlx`                  | validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.     |
+| **Medium** | Harness/integration                                                      | 3 (Qwen2-VL-2B-Instruct-4bit, llava-v1.6-mistral-7b-8bit, paligemma2-10b-ft-docci-448-bf16) | `model-config / mlx-vlm`         | validate chat-template/config expectations and mlx-vlm prompt formatting for this model. |
+| **Medium** | Stack-signal anomaly                                                     | 3 (Qwen3.5-27B-mxfp8, Qwen3.5-35B-A3B-4bit, Qwen3.5-35B-A3B-6bit)                           | `transformers / mlx-vlm`         | verify API compatibility and pinned version floor.                                       |
+| **Medium** | Preflight compatibility warning                                          | 1 issue(s)                                                                                  | `transformers`                   | verify API compatibility and pinned version floor.                                       |
 
 ---
 
@@ -44,6 +44,15 @@ Quick triage list with likely owner and next action for each issue class.
 **Owner (likely component):** `model configuration/repository`
 **Suggested next action:** verify model config, tokenizer files, and revision alignment.
 **Affected model:** `ggml-org/gemma-3-1b-it-GGUF`
+
+**Representative maintainer triage:**
+
+_Likely owner:_ model-config \| confidence=high
+_Classification:_ runtime_failure \| MODEL_CONFIG_MODEL_LOAD_MODEL
+_Summary:_ model error \| model config model load model
+_Evidence:_ model error \| model config model load model
+_Token context:_ stop=exception
+_Next action:_ Inspect model repo config, chat template, and EOS settings.
 
 | Model                         | Observed Behavior                                                                                                                                                   | First Seen Failing      | Recent Repro           |
 |-------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------|------------------------|
@@ -84,6 +93,15 @@ Captured stdout/stderr:
 **Owner (likely component):** `model configuration/repository`
 **Suggested next action:** verify model config, tokenizer files, and revision alignment.
 **Affected model:** `mlx-community/MolmoPoint-8B-fp16`
+
+**Representative maintainer triage:**
+
+_Likely owner:_ model-config \| confidence=high
+_Classification:_ runtime_failure \| MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR
+_Summary:_ processor error \| model config processor load processor
+_Evidence:_ processor error \| model config processor load processor
+_Token context:_ stop=exception
+_Next action:_ Inspect model repo config, chat template, and EOS settings.
 
 | Model                              | Observed Behavior                                                       | First Seen Failing      | Recent Repro           |
 |------------------------------------|-------------------------------------------------------------------------|-------------------------|------------------------|
@@ -142,42 +160,35 @@ assume the benchmark results are bad.
 
 ---
 
-## Harness/Integration Issues (11 model(s))
+## Harness/Integration Issues (7 model(s))
 
-11 model(s) show potential harness/integration issues; see per-model breakdown
+7 model(s) show potential harness/integration issues; see per-model breakdown
 below.
 These models completed successfully but show integration problems (for example
 stop-token leakage, decoding artifacts, or long-context breakdown) that likely
 point to stack/runtime behavior rather than inherent model quality limits.
-
-### `Qwen/Qwen3-VL-2B-Instruct`
-
-**What looks wrong:** Behavior degrades under long prompt context.
-**Likely component:** `mlx-vlm / mlx`
-**Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,769, output=500, output/prompt=2.98%
-
-**Why this appears to be an integration/runtime issue:**
-
-- At long prompt length (16769 tokens), output became repetitive.
-- Output became repetitive, indicating possible generation instability (token: phrase: "sky, stone wall, town,...").
-
-**Sample output:**
-
-```text
-Title:
-Windsor Sovereign tour boat
-
-Description:
-The Windsor Sovereign tour boat, filled with passengers, cruises along the River Thames in Windsor, England. In the background, the historic Windsor Ca...
-```
 
 ### `microsoft/Phi-3.5-vision-instruct`
 
 **What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=1,382, output=500, output/prompt=36.18%
+**Token summary:** prompt=1,319, output=500, output/prompt=37.91%
+
+**Maintainer triage:**
+
+_Likely owner:_ mlx-vlm \| confidence=high
+_Classification:_ harness \| stop_token
+_Summary:_ Special control token &lt;\|end\|&gt; appeared in generated text.
+           \| Special control token &lt;\|endoftext\|&gt; appeared in
+           generated text. \| hit token cap (500) \| nontext prompt burden=66%
+_Evidence:_ Special control token &lt;\|end\|&gt; appeared in generated text.
+            \| Special control token &lt;\|endoftext\|&gt; appeared in
+            generated text.
+_Token context:_ prompt=1,319 \| output/prompt=37.91% \| nontext burden=66% \|
+                 stop=completed \| hit token cap (500)
+_Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
+               into user-facing text.
 
 **Why this appears to be an integration/runtime issue:**
 
@@ -185,14 +196,13 @@ The Windsor Sovereign tour boat, filled with passengers, cruises along the River
 - Special control token &lt;|endoftext|&gt; appeared in generated text.
 - Generated text appears to continue into example-code templates mid-output.
 - Output switched language/script unexpectedly (tokenizer_artifact, code_snippet).
-- Output formatting deviated from the requested structure. Details: Excessive markdown headers (6).
 
 **Sample output:**
 
 ```text
-Title: Tour Boat on River Thames
+Title: "Round Tower of Windsor Castle"
 
-Description: A tour boat, the 'Windsor Sovereign', is seen cruising along the River Thames in Windsor, England. The boat is filled with passengers, and the historic W...
+Description: A view of the Round Tower of Windsor Castle, a royal residence in Windsor, Berkshire, England, as seen from across the River Thames. The Union Flag...
 ```
 
 ### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
@@ -200,52 +210,32 @@ Description: A tour boat, the 'Windsor Sovereign', is seen cruising along the Ri
 **What looks wrong:** Decoded output contains tokenizer artifacts that should not appear in user-facing text.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=2,654, output=107, output/prompt=4.03%
+**Token summary:** prompt=2,617, output=81, output/prompt=3.10%
+
+**Maintainer triage:**
+
+_Likely owner:_ mlx-vlm \| confidence=high
+_Classification:_ harness \| encoding
+_Summary:_ Tokenizer space-marker artifacts (for example Ġ) appeared in output
+           (about 57 occurrences). \| nontext prompt burden=83% \| missing
+           sections: description, keywords \| missing terms: view, royal,
+           residence, Berkshire, which
+_Evidence:_ Tokenizer space-marker artifacts (for example Ġ) appeared in
+            output (about 57 occurrences).
+_Token context:_ prompt=2,617 \| output/prompt=3.10% \| nontext burden=83% \|
+                 stop=completed
+_Next action:_ Inspect decode cleanup; tokenizer markers are leaking into
+               user-facing text.
 
 **Why this appears to be an integration/runtime issue:**
 
-- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 61 occurrences).
+- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 57 occurrences).
 - Output omitted required Title/Description/Keywords sections (description, keywords).
 
 **Sample output:**
 
 ```text
-Title:ĠWindsorĠSovereignĠTourĠBoatĠonĠtheĠRiverĠThamesĊĊDescription:ĠAĠblueĠandĠwhiteĠtourĠboatĠnamedĠ'WindsorĠSovereign'ĠisĠcruisingĠonĠtheĠRiverĠThamesĠwithĠpassengersĠonĠboard.ĠInĠtheĠbackground,ĠW...
-```
-
-### `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`
-
-**What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
-**Likely component:** `mlx-vlm`
-**Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=1,873, output=414, output/prompt=22.10%
-
-**Why this appears to be an integration/runtime issue:**
-
-- Special control token &lt;/think&gt; appeared in generated text.
-
-**Sample output:**
-
-```text
-Let's tackle this step by step. First, the title needs to be 5-10 words, concrete and factual. The image is of a Windsor Sovereign tour boat on the River Thames with Windsor Castle in the background. ...
-```
-
-### `mlx-community/FastVLM-0.5B-bf16`
-
-**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
-**Likely component:** `model-config / mlx-vlm`
-**Suggested next action:** validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
-**Token summary:** prompt=556, output=8, output/prompt=1.44%
-
-**Why this appears to be an integration/runtime issue:**
-
-- Output appears truncated to about 8 tokens.
-- Model output may not follow prompt or image contents (missing: Berkshire, Bird, Blue sky, Castle, Holiday).
-
-**Sample output:**
-
-```text
-0.0,0.0
+Title:ĠWindsorĠCastleĠRoundĠTowerĊĊDescription:ĠTheĠRoundĠTowerĠofĠWindsorĠCastleĠisĠseenĠacrossĠtheĠRiverĠThames,ĠwithĠtheĠUnionĠFlagĠflyingĠfromĠitsĠflagpole.ĠTheĠtowerĠisĠsurroundedĠbyĠlushĠgreenĠt...
 ```
 
 ### `mlx-community/Qwen2-VL-2B-Instruct-4bit`
@@ -253,43 +243,69 @@ Let's tackle this step by step. First, the title needs to be 5-10 words, concret
 **What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
 **Likely component:** `model-config / mlx-vlm`
 **Suggested next action:** validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
-**Token summary:** prompt=16,780, output=12, output/prompt=0.07%
+**Token summary:** prompt=16,731, output=2, output/prompt=0.01%
+
+**Maintainer triage:**
+
+_Likely owner:_ mlx-vlm \| confidence=high
+_Classification:_ harness \| stop_token
+_Summary:_ Special control token &lt;\|endoftext\|&gt; appeared in generated
+           text. \| Output appears truncated to about 2 tokens. \| nontext
+           prompt burden=97% \| missing terms: view, Round, Tower, Windsor,
+           Castle
+_Evidence:_ Special control token &lt;\|endoftext\|&gt; appeared in generated
+            text. \| Output appears truncated to about 2 tokens.
+_Token context:_ prompt=16,731 \| output/prompt=0.01% \| nontext burden=97% \|
+                 stop=completed
+_Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
+               into user-facing text.
 
 **Why this appears to be an integration/runtime issue:**
 
 - Special control token &lt;|endoftext|&gt; appeared in generated text.
-- Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues.
-- At long prompt length (16780 tokens), output stayed unusually short (12 tokens; ratio 0.1%).
-- Model output may not follow prompt or image contents (missing: Berkshire, Bird, Blue sky, Castle, Holiday).
+- Output appears truncated to about 2 tokens.
+- At long prompt length (16731 tokens), output stayed unusually short (2 tokens; ratio 0.0%).
+- Model output may not follow prompt or image contents (missing: view, Round, Tower, Windsor, Castle).
 - Output switched language/script unexpectedly (tokenizer_artifact).
-- Output omitted required Title/Description/Keywords sections (title, description, keywords).
 
 **Sample output:**
 
 ```text
-<|endoftext|>2021-10-02
+<|endoftext|>
 ```
 
-### `mlx-community/Qwen3.5-35B-A3B-bf16`
+### `mlx-community/Qwen3-VL-2B-Thinking-bf16`
 
 **What looks wrong:** Behavior degrades under long prompt context.
 **Likely component:** `mlx-vlm / mlx`
 **Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,794, output=500, output/prompt=2.98%
+**Token summary:** prompt=16,722, output=500, output/prompt=2.99%
+
+**Maintainer triage:**
+
+_Likely owner:_ mlx \| confidence=high
+_Classification:_ cutoff_degraded \| long_context
+_Summary:_ At long prompt length (16722 tokens), output became repetitive. \|
+           hit token cap (500) \| nontext prompt burden=97% \| missing
+           sections: title, description, keywords
+_Evidence:_ At long prompt length (16722 tokens), output became repetitive.
+_Token context:_ prompt=16,722 \| output/prompt=2.99% \| nontext burden=97% \|
+                 stop=completed \| hit token cap (500)
+_Next action:_ Inspect long-context cache behavior under heavy image-token
+               burden.
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16794 tokens), output may stop following prompt/image context.
-- Model output may not follow prompt or image contents (missing: Berkshire, Bird, Blue sky, Castle, Holiday).
+- At long prompt length (16722 tokens), output became repetitive.
+- Model output may not follow prompt or image contents (missing: view, Round, Tower, Windsor, Castle).
+- Output became repetitive, indicating possible generation instability (token: phrase: "the user's context is...").
 - Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- Output leaked reasoning or prompt-template text (let's analyze the image).
 
 **Sample output:**
 
 ```text
-The user wants me to analyze an image and generate cataloguing metadata (Title, Description, Keywords) based on specific rules.
-
-**1. Analyze the Image:**
-*   **Content:** The image shows a collection...
+Got it, let's analyze the image. The user provided a description of the image, but the image itself is of a set of weatherproofed, wooden, and stone houses with a blue sky and a person in a blue shirt...
 ```
 
 ### `mlx-community/X-Reasoner-7B-8bit`
@@ -297,12 +313,26 @@ The user wants me to analyze an image and generate cataloguing metadata (Title, 
 **What looks wrong:** Behavior degrades under long prompt context.
 **Likely component:** `mlx-vlm / mlx`
 **Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,780, output=73, output/prompt=0.44%
+**Token summary:** prompt=16,731, output=500, output/prompt=2.99%
+
+**Maintainer triage:**
+
+_Likely owner:_ mlx \| confidence=high
+_Classification:_ token_cap \| long_context
+_Summary:_ At long prompt length (16731 tokens), output may stop following
+           prompt/image context. \| hit token cap (500) \| nontext prompt
+           burden=97% \| missing terms: view, Round, Tower, Windsor, Castle
+_Evidence:_ At long prompt length (16731 tokens), output may stop following
+            prompt/image context.
+_Token context:_ prompt=16,731 \| output/prompt=2.99% \| nontext burden=97% \|
+                 stop=completed \| hit token cap (500)
+_Next action:_ Inspect long-context cache behavior under heavy image-token
+               burden.
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16780 tokens), output may stop following prompt/image context.
-- Model output may not follow prompt or image contents (missing: Berkshire, Bird, Blue sky, Castle, Holiday).
+- At long prompt length (16731 tokens), output may stop following prompt/image context.
+- Model output may not follow prompt or image contents (missing: view, Round, Tower, Windsor, Castle).
 
 **Sample output:**
 
@@ -311,36 +341,44 @@ Title:
 - White Striped Pattern
 
 Description:
-- A repeating pattern of white stripes on a dark background.
+- A repeating pattern of white stripes on a dark background, resembling a classic flag or banner design.
 
 Keywords:
 - Stripes
 - White
 - Dark
 - Pattern
-- Background
-- Uniform
-- Repetition
-- Monochrome...
+- Ba...
 ```
 
-### `mlx-community/paligemma2-10b-ft-docci-448-6bit`
+### `mlx-community/llava-v1.6-mistral-7b-8bit`
 
 **What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
 **Likely component:** `model-config / mlx-vlm`
 **Suggested next action:** validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
-**Token summary:** prompt=1,574, output=12, output/prompt=0.76%
+**Token summary:** prompt=2,722, output=8, output/prompt=0.29%
+
+**Maintainer triage:**
+
+_Likely owner:_ model-config \| confidence=high
+_Classification:_ harness \| prompt_template
+_Summary:_ Output was a short generic filler response (about 8 tokens). \|
+           nontext prompt burden=84% \| missing terms: view, Round, Tower,
+           Windsor, Castle
+_Evidence:_ Output was a short generic filler response (about 8 tokens).
+_Token context:_ prompt=2,722 \| output/prompt=0.29% \| nontext burden=84% \|
+                 stop=completed
+_Next action:_ Inspect model repo config, chat template, and EOS settings.
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output is very short relative to prompt size (0.8%), suggesting possible early-stop or prompt-handling issues.
-- Model output may not follow prompt or image contents (missing: Berkshire, Bird, Blue sky, Castle, Holiday).
-- Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- Output was a short generic filler response (about 8 tokens).
+- Model output may not follow prompt or image contents (missing: view, Round, Tower, Windsor, Castle).
 
 **Sample output:**
 
 ```text
-- Use the 'Windsor Sovereign' as the title.
+The image is a photograph.
 ```
 
 ### `mlx-community/paligemma2-10b-ft-docci-448-bf16`
@@ -348,49 +386,45 @@ Keywords:
 **What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
 **Likely component:** `model-config / mlx-vlm`
 **Suggested next action:** validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
-**Token summary:** prompt=1,574, output=9, output/prompt=0.57%
+**Token summary:** prompt=1,531, output=8, output/prompt=0.52%
+
+**Maintainer triage:**
+
+_Likely owner:_ model-config \| confidence=high
+_Classification:_ harness \| prompt_template
+_Summary:_ Output is very short relative to prompt size (0.5%), suggesting
+           possible early-stop or prompt-handling issues. \| nontext prompt
+           burden=71% \| missing terms: view, Round, Tower, Windsor, Castle
+_Evidence:_ Output is very short relative to prompt size (0.5%), suggesting
+            possible early-stop or prompt-handling issues.
+_Token context:_ prompt=1,531 \| output/prompt=0.52% \| nontext burden=71% \|
+                 stop=completed
+_Next action:_ Inspect model repo config, chat template, and EOS settings.
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output is very short relative to prompt size (0.6%), suggesting possible early-stop or prompt-handling issues.
-- Model output may not follow prompt or image contents (missing: Berkshire, Bird, Blue sky, Castle, Holiday).
+- Output is very short relative to prompt size (0.5%), suggesting possible early-stop or prompt-handling issues.
+- Model output may not follow prompt or image contents (missing: view, Round, Tower, Windsor, Castle).
 
 **Sample output:**
 
 ```text
-- The image is in the daytime.
-```
-
-### `mlx-community/paligemma2-3b-ft-docci-448-bf16`
-
-**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
-**Likely component:** `model-config / mlx-vlm`
-**Suggested next action:** validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
-**Token summary:** prompt=1,574, output=6, output/prompt=0.38%
-
-**Why this appears to be an integration/runtime issue:**
-
-- Output appears truncated to about 6 tokens.
-- Model output may not follow prompt or image contents (missing: Berkshire, Bird, Blue sky, Castle, Holiday).
-
-**Sample output:**
-
-```text
-- Do not copy.
+- The photograph is in color.
 ```
 
 ---
 
-### Long-Context Degradation / Potential Stack Issues (2 model(s))
+### Long-Context Degradation / Potential Stack Issues (3 model(s))
 
-2 model(s) show long-context degradation or stack anomalies; see table below.
+3 model(s) show long-context degradation or stack anomalies; see table below.
 These models technically succeeded, but token/output patterns suggest likely
 integration/runtime issues worth checking upstream.
 
-| Model                                |   Prompt Tok |   Output Tok | Output/Prompt   | Symptom                                  | Owner                    |
-|--------------------------------------|--------------|--------------|-----------------|------------------------------------------|--------------------------|
-| `mlx-community/Qwen3.5-35B-A3B-6bit` |       16,794 |          500 | 2.98%           | Context dropped under long prompt length | `transformers / mlx-vlm` |
-| `mlx-community/Qwen3.5-9B-MLX-4bit`  |       16,794 |          500 | 2.98%           | Context echo under long prompt length    | `transformers / mlx-vlm` |
+| Model                                |   Prompt Tok |   Output Tok | Output/Prompt   | Symptom                                                                            | Owner                    |
+|--------------------------------------|--------------|--------------|-----------------|------------------------------------------------------------------------------------|--------------------------|
+| `mlx-community/Qwen3.5-27B-mxfp8`    |       16,746 |          500 | 2.99%           | Output degeneration under long prompt length (incomplete_sentence: ends with 'a')  | `transformers / mlx-vlm` |
+| `mlx-community/Qwen3.5-35B-A3B-4bit` |       16,746 |          500 | 2.99%           | Output degeneration under long prompt length (incomplete_sentence: ends with 'is') | `transformers / mlx-vlm` |
+| `mlx-community/Qwen3.5-35B-A3B-6bit` |       16,746 |          500 | 2.99%           | Context echo under long prompt length                                              | `transformers / mlx-vlm` |
 
 ---
 
@@ -400,7 +434,7 @@ Recent reproducibility is measured from history (up to last 3 runs where each
 model appears).
 
 **Regressions since previous run:** none
-**Recoveries since previous run:** `Qwen/Qwen3-VL-2B-Instruct`, `mlx-community/Qwen2-VL-2B-Instruct-4bit`, `mlx-community/Qwen3-VL-2B-Thinking-bf16`, `mlx-community/X-Reasoner-7B-8bit`
+**Recoveries since previous run:** none
 
 | Model                              | Status vs Previous Run   | First Seen Failing      | Recent Repro           |
 |------------------------------------|--------------------------|-------------------------|------------------------|
@@ -411,70 +445,74 @@ model appears).
 
 ## Coverage & Runtime Metrics
 
-- **Detailed diagnostics models:** 15
-- **Summary diagnostics models:** 39
+- **Detailed diagnostics models:** 12
+- **Summary diagnostics models:** 43
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1253.00s (1253.00s)
-- **Average runtime per model:** 23.20s (23.20s)
-- **Dominant runtime phase:** decode dominated 50/54 measured model runs (89% of tracked runtime).
-- **Phase totals:** model load=130.41s, prompt prep=0.18s, decode=1103.64s, cleanup=5.70s
-- **Observed stop reasons:** completed=52, exception=2
-- **Validation overhead:** 18.50s total (avg 0.34s across 54 model(s)).
-- **First-token latency:** Avg 11.32s | Min 0.09s | Max 71.48s across 52 model(s).
+- **Total model runtime (sum):** 1262.67s (1262.67s)
+- **Average runtime per model:** 22.96s (22.96s)
+- **Dominant runtime phase:** decode dominated 52/55 measured model runs (90% of tracked runtime).
+- **Phase totals:** model load=117.39s, prompt prep=0.17s, decode=1125.97s, cleanup=5.39s
+- **Observed stop reasons:** completed=53, exception=2
+- **Validation overhead:** 18.88s total (avg 0.34s across 55 model(s)).
+- **First-token latency:** Avg 10.41s | Min 0.08s | Max 68.55s across 53 model(s).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
 ---
 
-## Models Not Flagged (39 model(s))
+## Models Not Flagged (43 model(s))
 
 These models completed without diagnostics flags (no hard failure, harness
 warning, or stack-signal anomaly).
 
-### Clean output (1 model(s))
+### Clean output (4 model(s))
 
 - `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`
+- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`
+- `mlx-community/gemma-4-26b-a4b-it-4bit`
+- `mlx-community/gemma-4-31b-it-4bit`
 
-### Ran, but with quality warnings (38 model(s))
+### Ran, but with quality warnings (39 model(s))
 
-- `HuggingFaceTB/SmolVLM-Instruct`: Model output may not follow prompt or image contents (missing: Berkshire, Bird, Blue sky, Castle, Holiday).
-- `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: Model output may not follow prompt or image contents (missing: Berkshire, Bird, Blue sky, Castle, Holiday).
-- `meta-llama/Llama-3.2-11B-Vision-Instruct`: Output became repetitive, indicating possible generation instability (token: phrase: "waterfront, waterfront, waterf....
-- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Output omitted required Title/Description/Keywords sections (title, keywords).
-- `mlx-community/GLM-4.6V-Flash-6bit`: Output formatting deviated from the requested structure. Details: Unknown tags: &lt;think&gt;.
+- `HuggingFaceTB/SmolVLM-Instruct`: Model output may not follow prompt or image contents (missing: view, Round, Tower, Windsor, Castle).
+- `Qwen/Qwen3-VL-2B-Instruct`: ⚠️REVIEW:context_budget
+- `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: Model output may not follow prompt or image contents (missing: view, Round, Tower, Windsor, Castle).
+- `meta-llama/Llama-3.2-11B-Vision-Instruct`: Output became repetitive, indicating possible generation instability (token: phrase: "castle from a distance,...").
+- `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- `mlx-community/FastVLM-0.5B-bf16`: Model output may not follow prompt or image contents (missing: view, Round, Tower, Windsor, royal).
+- `mlx-community/GLM-4.6V-Flash-6bit`: Output contains corrupted or malformed text segments (incomplete_sentence: ends with 'is').
 - `mlx-community/GLM-4.6V-Flash-mxfp4`: Output formatting deviated from the requested structure. Details: Unknown tags: &lt;think&gt;.
 - `mlx-community/GLM-4.6V-nvfp4`: Output formatting deviated from the requested structure. Details: Unknown tags: &lt;think&gt;.
-- `mlx-community/Idefics3-8B-Llama3-bf16`: Model output may not follow prompt or image contents (missing: Berkshire, Bird, Blue sky, Castle, Holiday).
-- `mlx-community/InternVL3-14B-8bit`: Model output may not follow prompt or image contents (missing: Berkshire, Bird, Blue sky, Castle, Holiday).
-- `mlx-community/InternVL3-8B-bf16`: Model output may not follow prompt or image contents (missing: Berkshire, Bird, Blue sky, Castle, Holiday).
-- `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`: Model output may not follow prompt or image contents (missing: Berkshire, Bird, Blue sky, Castle, Holiday).
-- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: Model output may not follow prompt or image contents (missing: Berkshire, Bird, Blue sky, Castle, Holiday).
+- `mlx-community/Idefics3-8B-Llama3-bf16`: Model output may not follow prompt or image contents (missing: view, Round, Tower, Windsor, Castle).
+- `mlx-community/InternVL3-14B-8bit`: Model output may not follow prompt or image contents (missing: Round, Tower, Windsor, Castle, royal).
+- `mlx-community/InternVL3-8B-bf16`: Model output may not follow prompt or image contents (missing: view, Round, Tower, Windsor, Castle).
+- `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`: Model output may not follow prompt or image contents (missing: view, Round, Tower, Windsor, Castle).
+- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: Model output may not follow prompt or image contents (missing: view, Round, Tower, Windsor, Castle).
 - `mlx-community/LFM2-VL-1.6B-8bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
-- `mlx-community/LFM2.5-VL-1.6B-bf16`: Output became repetitive, indicating possible generation instability (token: phrase: "windsor, england, river, thame....
-- `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: Output became repetitive, indicating possible generation instability (token: phrase: "riverbank, riverbank, riverban....
-- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: ⚠️REVIEW:context_budget
+- `mlx-community/LFM2.5-VL-1.6B-bf16`: Output became repetitive, indicating possible generation instability (token: phrase: "2026-04-18, 17:45:40 bst, 2026....
+- `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: ⚠️REVIEW:context_budget
-- `mlx-community/Molmo-7B-D-0924-8bit`: Output leaked reasoning or prompt-template text (title hint:).
-- `mlx-community/Molmo-7B-D-0924-bf16`: Model output may not follow prompt or image contents (missing: Berkshire, Bird, Blue sky, Castle, Holiday).
-- `mlx-community/Phi-3.5-vision-instruct-bf16`: Keyword count violation (19; expected 10-18)
-- `mlx-community/Qwen3-VL-2B-Thinking-bf16`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- `mlx-community/Molmo-7B-D-0924-8bit`: Output became repetitive, indicating possible generation instability (token: phrase: "season: spring (april). river:....
+- `mlx-community/Molmo-7B-D-0924-bf16`: Model output may not follow prompt or image contents (missing: view, Round, Tower, Windsor, Castle).
+- `mlx-community/Phi-3.5-vision-instruct-bf16`: Output appears to copy prompt context verbatim (40% overlap).
 - `mlx-community/Qwen3.5-27B-4bit`: Model refused or deflected the requested task (explicit_refusal).
-- `mlx-community/Qwen3.5-27B-mxfp8`: Model refused or deflected the requested task (explicit_refusal).
-- `mlx-community/Qwen3.5-35B-A3B-4bit`: Output omitted required Title/Description/Keywords sections (description, keywords).
-- `mlx-community/SmolVLM-Instruct-bf16`: Model output may not follow prompt or image contents (missing: Berkshire, Bird, Blue sky, Castle, Holiday).
-- `mlx-community/SmolVLM2-2.2B-Instruct-mlx`: Model output may not follow prompt or image contents (missing: Berkshire, Bird, Blue sky, Castle, Holiday).
+- `mlx-community/Qwen3.5-35B-A3B-bf16`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- `mlx-community/Qwen3.5-9B-MLX-4bit`: Model refused or deflected the requested task (explicit_refusal).
+- `mlx-community/SmolVLM-Instruct-bf16`: Model output may not follow prompt or image contents (missing: view, Round, Tower, Windsor, Castle).
+- `mlx-community/SmolVLM2-2.2B-Instruct-mlx`: Model output may not follow prompt or image contents (missing: view, Round, Tower, Windsor, Castle).
 - `mlx-community/gemma-3-27b-it-qat-4bit`: Nonvisual metadata borrowing
 - `mlx-community/gemma-3-27b-it-qat-8bit`: Nonvisual metadata borrowing
-- `mlx-community/gemma-3n-E2B-4bit`: Model output may not follow prompt or image contents (missing: Berkshire, Bird, Blue sky, Castle, Holiday).
-- `mlx-community/gemma-3n-E4B-it-bf16`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
-- `mlx-community/gemma-4-31b-bf16`: Output formatting deviated from the requested structure. Details: Unknown tags: <img src="<https://www.anyvision.co.uk...>
-- `mlx-community/gemma-4-31b-it-4bit`: Nonvisual metadata borrowing
-- `mlx-community/llava-v1.6-mistral-7b-8bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
+- `mlx-community/gemma-3n-E2B-4bit`: Model output may not follow prompt or image contents (missing: view, Round, Tower, Windsor, Castle).
+- `mlx-community/gemma-3n-E4B-it-bf16`: Description sentence violation (9; expected 1-2)
+- `mlx-community/gemma-4-31b-bf16`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `mlx-community/nanoLLaVA-1.5-4bit`: Output omitted required Title/Description/Keywords sections (keywords).
-- `mlx-community/paligemma2-3b-pt-896-4bit`: Model output may not follow prompt or image contents (missing: Berkshire, Bird, Blue sky, Castle, Holiday).
+- `mlx-community/paligemma2-10b-ft-docci-448-6bit`: Model output may not follow prompt or image contents (missing: view, Round, Tower, Windsor, Castle).
+- `mlx-community/paligemma2-3b-ft-docci-448-bf16`: Model output may not follow prompt or image contents (missing: view, Tower, Windsor, Castle, royal).
+- `mlx-community/paligemma2-3b-pt-896-4bit`: Model output may not follow prompt or image contents (missing: view, Round, Tower, Windsor, Castle).
 - `mlx-community/pixtral-12b-8bit`: ⚠️REVIEW:context_budget
-- `mlx-community/pixtral-12b-bf16`: Model output may not follow prompt or image contents (missing: Berkshire, Bird, Blue sky, Castle, Holiday).
-- `qnguyen3/nanoLLaVA`: Model output may not follow prompt or image contents (missing: Berkshire, Bird, Blue sky, Castle, Holiday).
+- `mlx-community/pixtral-12b-bf16`: Model output may not follow prompt or image contents (missing: view, Round, Tower, Windsor, royal).
+- `qnguyen3/nanoLLaVA`: Model output may not follow prompt or image contents (missing: view, Round, Tower, Windsor, Castle).
 
 ---
 
@@ -503,7 +541,7 @@ warning, or stack-signal anomaly).
 pip install -e "src/[dev]"
 
 # Re-run with the same CLI arguments
-python -m check_models --image /Users/jrp/Pictures/Processed/20260418-174210_DSC09825.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose
+python -m check_models --image /Users/jrp/Pictures/Processed/20260418-164540_DSC09775_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose
 ```
 
 ### Portable triage (no local image required)
@@ -534,8 +572,8 @@ the exact prompt trace has been exported to
 for each failing model.
 
 ```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260418-174210_DSC09825.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models ggml-org/gemma-3-1b-it-GGUF
-python -m check_models --image /Users/jrp/Pictures/Processed/20260418-174210_DSC09825.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/MolmoPoint-8B-fp16
+python -m check_models --image /Users/jrp/Pictures/Processed/20260418-164540_DSC09775_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models ggml-org/gemma-3-1b-it-GGUF
+python -m check_models --image /Users/jrp/Pictures/Processed/20260418-164540_DSC09775_DxO.jpg --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/MolmoPoint-8B-fp16
 ```
 
 ### Prompt Used
@@ -572,14 +610,13 @@ Rules:
 - Do not output reasoning, notes, hedging, or extra sections.
 
 Context: Existing metadata hints (high confidence; use only when visually confirmed):
-- Description hint: The 'Windsor Sovereign' tour boat, filled with passengers, cruises along the River Thames in Windsor, England. In the background, the historic Windsor Castle is visible behind the trees and town buildings, offering a scenic backdrop for tourists enjoying a river tour.
-- Keyword hints: Adobe Stock, Any Vision, Berkshire, Bird, Blue sky, Castle, England, Europe, Holiday, Lifebuoy, Passenger, People, Quay, River Thames, Riverbank, Sightseeing, Sky, Stone wall, Town, Tree
-- Capture metadata: Taken on 2026-04-18 18:42:10 BST (at 18:42:10 local time). GPS: 51.483900°N, 0.604400°W.
+- Description hint: A view of the Round Tower of Windsor Castle, a royal residence in Windsor, Berkshire, England, as seen from across the River Thames. The Union Flag is flying from the flagpole, which indicates that the reigning monarch is not in residence at the castle at the time the photograph was taken.
+- Capture metadata: Taken on 2026-04-18 17:45:40 BST (at 17:45:40 local time). GPS: 51.483800°N, 0.604400°W.
 ```
 
 ### Run details
 
-- Input image: `/Users/jrp/Pictures/Processed/20260418-174210_DSC09825.jpg`
+- Input image: `/Users/jrp/Pictures/Processed/20260418-164540_DSC09775_DxO.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-04-19 21:12:47 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-04-19 23:34:45 BST by [check_models](https://github.com/jrp2014/check_models)._

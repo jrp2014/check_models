@@ -1,19 +1,33 @@
-# [Harness Issue] Let's tackle this step by step. First, the title needs to be 5-10 words, concrete and factual. The image is of a Wind... in mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+# [Harness Issue] Got it, let's analyze the image. The user provided a description of the image, but the image itself is of a set of we in mlx-community/Qwen3-VL-2B-Thinking-bf16
 
 ## Description
 
-Integration/harness warning detected for `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`.
+Integration/harness warning detected for `mlx-community/Qwen3-VL-2B-Thinking-bf16`.
 
 ### Details
 
-- token_leak:</think>
+- At long prompt length (16722 tokens), output became repetitive.
+
+## Maintainer Triage
+
+_Likely owner:_ mlx \| confidence=high
+_Classification:_ cutoff_degraded \| long_context
+_Summary:_ At long prompt length (16722 tokens), output became repetitive. \|
+           hit token cap (500) \| nontext prompt burden=97% \| missing
+           sections: title, description, keywords
+_Evidence:_ At long prompt length (16722 tokens), output became repetitive.
+_Token context:_ prompt=16,722 \| output/prompt=2.99% \| nontext burden=97% \|
+                 stop=completed \| hit token cap (500)
+_Next action:_ Inspect long-context cache behavior under heavy image-token
+               burden.
+
 
 ## Reproducibility
 
 ### Repro Command
 
 ```bash
-python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen3-VL-2B-Thinking-bf16
 ```
 
 ---
