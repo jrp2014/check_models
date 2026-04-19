@@ -18035,7 +18035,7 @@ def _format_action_snapshot_parts(
             _append_markdown_labeled_value(parts, label=label, value=value, bullet=True)
 
         def open_group(heading: str) -> None:
-            parts.append(f"**{heading}**")
+            parts.append(f"### {heading}")
             parts.append("")
 
         def close_group() -> None:
@@ -19225,8 +19225,9 @@ def _build_issue_repro_section(
     """Build the Reproducibility + Environment section for a GitHub issue report."""
     parts: list[str] = ["", "## Reproducibility"]
     if model_name in repro_bundles:
+        parts.append("")
         parts.append(f"A reproduction bundle is available at: `{repro_bundles[model_name].name}`")
-    parts.extend(["", "### Repro Command", "```bash"])
+    parts.extend(["", "### Repro Command", "", "```bash"])
     if run_args:
         tokens = _build_repro_command_tokens(
             image_path=None,
@@ -19273,15 +19274,18 @@ def _generate_github_issue_reports(
             f"# [Bug] {signature}",
             "",
             "## Description",
+            "",
             f"A runtime failure occurred affecting **{len(models)} model(s)**.",
             "",
             "### Affected Models",
+            "",
         ]
         parts.extend(f"- `{m}`" for m in models)
         parts.extend(
             [
                 "",
                 "## Traceback / Error Message",
+                "",
                 "```text",
                 rep_result.error_message or "Unknown error",
                 "```",
@@ -19314,9 +19318,11 @@ def _generate_github_issue_reports(
             f"# [Harness Issue] {safe_harness_type} in {result.model_name}",
             "",
             "## Description",
+            "",
             f"Integration/harness warning detected for `{result.model_name}`.",
             "",
             "### Details",
+            "",
             harness_details,
         ]
         parts.extend(

@@ -147,6 +147,16 @@ if [ "$QUALITY_MODE" = "fast" ]; then
     echo "=== Pytest (fast set) ==="
     "$QUALITY_PYTHON" -m pytest -q -m "not slow and not e2e"
 
+    # Markdown linting runs from the repo root
+    cd "$(quality_repo_root)"
+
+    echo "=== Markdown Lint ==="
+    quality_run_markdownlint \
+        --config .markdownlint.jsonc \
+        "**/*.md" \
+        "!src/node_modules/**" \
+        "!**/node_modules/**"
+
     echo ""
     echo "✅ Fast quality checks passed!"
     exit 0

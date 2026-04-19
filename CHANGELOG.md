@@ -4,6 +4,15 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix generated GitHub issue and report markdown to pass markdownlint (MD022,
+  MD031, MD032, MD036): add blank lines around headings, fenced code blocks,
+  and lists; replace bold emphasis with proper `###` subheadings in action
+  snapshot.
+- Add markdownlint to `--fast` quality checks so the pre-push hook catches
+  markdown lint errors before they reach CI.
+
 ## [0.4.0] - 2026-04-19
 
 ### Added

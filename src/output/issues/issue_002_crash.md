@@ -1,22 +1,29 @@
 # [Bug] MODEL_CONFIG_MODEL_LOAD_MODEL:d01bffe45ed7
 
 ## Description
+
 A runtime failure occurred affecting **1 model(s)**.
 
 ### Affected Models
+
 - `ggml-org/gemma-3-1b-it-GGUF`
 
 ## Traceback / Error Message
+
 ```text
 Model loading failed: Config not found at /Users/jrp/.cache/huggingface/hub/models--ggml-org--gemma-3-1b-it-GGUF/snapshots/f9c28bcd85737ffc5aef028638d3341d49869c27
+
 ```
 
 ## Reproducibility
+
 A reproduction bundle is available at: `20260419T010359Z_002_ggml-org_gemma-3-1b-it-GGUF_MODEL_CONFIG_MODEL_LOAD_MODEL_d01bffe45e.json`
 
 ### Repro Command
+
 ```bash
 python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models ggml-org/gemma-3-1b-it-GGUF
+
 ```
 
 ---
@@ -38,4 +45,3 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 | GPU Cores       | 40                          |
 | Metal Support   | Metal 4                     |
 | RAM             | 128.0 GB                    |
-

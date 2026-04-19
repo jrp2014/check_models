@@ -4,7 +4,7 @@ _Generated on 2026-04-19 02:03:59 BST_
 
 ## 🎯 Action Snapshot
 
-**Failures & Triage**
+### Failures & Triage
 
 - _Framework/runtime failures:_ 6 (top owners: mlx-vlm=4, model-config=2).
 - _Next action:_ review failure ownership below and use diagnostics.md for
@@ -17,7 +17,7 @@ _Generated on 2026-04-19 02:03:59 BST_
 - _Escalate only if:_ they line up with unexpected TF/Flax/JAX imports,
   startup hangs, or backend/runtime crashes.
 
-**Quality & Metadata**
+### Quality & Metadata
 
 - _Vs existing metadata:_ better=7, neutral=10, worse=31 (baseline B 74/100).
 - _Quality signal frequency:_ missing_sections=36, cutoff=28,
@@ -25,7 +25,7 @@ _Generated on 2026-04-19 02:03:59 BST_
   reasoning_leak=10.
 - _Termination reasons:_ completed=48, exception=6.
 
-**Runtime**
+### Runtime
 
 - _Runtime pattern:_ decode dominates measured phase time (91%; 50/54 measured
   model(s)).
