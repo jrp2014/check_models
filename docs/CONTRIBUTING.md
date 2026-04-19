@@ -510,7 +510,41 @@ According to the [official MLX documentation](https://ml-explore.github.io/mlx/b
 
 ## Release Process
 
-(To be documented when automated releases are set up)
+Until automated releases are set up, version bumps are a short manual workflow:
+
+1. Choose the next semantic version:
+
+   - **Patch** (`x.y.Z`) for fixes, docs-only updates, and tooling changes
+   - **Minor** (`x.Y.z`) for backward-compatible features or new report fields
+   - **Major** (`X.y.z`) for breaking CLI, schema, or workflow changes
+
+2. Update the package version in `src/pyproject.toml`:
+
+   ```toml
+   [project]
+   version = "0.5.0"
+   ```
+
+3. Move the relevant entries from `CHANGELOG.md`'s `Unreleased` section into a
+   dated release heading such as `## [0.5.0] - 2026-04-19`, then leave a fresh
+   empty `Unreleased` section at the top.
+
+4. Run the full quality gate from the repo root:
+
+   ```bash
+   make quality
+   ```
+
+5. Commit the release with an explicit message and push it:
+
+   ```bash
+   git add CHANGELOG.md docs/CONTRIBUTING.md src/pyproject.toml
+   git commit -m "chore: release 0.5.0"
+   git push
+   ```
+
+6. Start the next cycle by recording any follow-up work back under
+   `CHANGELOG.md`'s `Unreleased` section.
 
 ## Getting Help
 

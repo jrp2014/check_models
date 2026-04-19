@@ -4,6 +4,11 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Document the manual version-bump and release workflow in
+  `docs/CONTRIBUTING.md`.
+
 ## [0.5.0] - 2026-04-19
 
 ### Added
