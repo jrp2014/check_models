@@ -20,6 +20,9 @@ Notable changes to this project will be documented in this file.
   without alt text) when model output contains `<img>` tags.
 - Add MD045 to blockquote markdownlint-disable comments since model output can
   contain HTML img tags split across wrapped lines.
+- Update the runtime fingerprint GPU-memory probe to use the current MLX
+  top-level `get_active_memory()` API instead of the removed `mx.metal`
+  accessor.
 
 ## [0.4.0] - 2026-04-19
 

@@ -13781,8 +13781,8 @@ def collect_runtime_fingerprint() -> dict[str, RuntimeProbeResult]:
 
     # GPU memory query
     try:
-        if mx is not None and hasattr(mx, "metal"):
-            active = mx.metal.get_active_memory()
+        if mx is not None and hasattr(mx, "get_active_memory"):
+            active = mx.get_active_memory()
             probes["gpu_memory"] = RuntimeProbeResult(
                 status="ok", detail=f"active={active / (1024**3):.2f}GB"
             )

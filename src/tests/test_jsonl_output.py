@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, cast
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import check_models
 from check_models import (
@@ -678,6 +678,20 @@ class TestRuntimeFingerprint:
             assert result["status"] in valid_statuses, (
                 f"Probe '{probe_name}' has invalid status: {result['status']}"
             )
+
+    def test_collect_runtime_fingerprint_uses_top_level_mlx_memory_probe(self) -> None:
+        """GPU memory probe should use the current top-level MLX memory API."""
+
+        class _FakeMxRuntime:
+            @staticmethod
+            def get_active_memory() -> float:
+                return float(2 * 1024**3)
+
+        with patch.object(check_models, "mx", _FakeMxRuntime()):
+            fingerprint = check_models.collect_runtime_fingerprint()
+
+        assert fingerprint["gpu_memory"]["status"] == "ok"
+        assert fingerprint["gpu_memory"]["detail"] == "active=2.00GB"
 
     def test_jsonl_metadata_includes_fingerprint(self) -> None:
         """JSONL metadata record includes runtime_fingerprint when provided."""

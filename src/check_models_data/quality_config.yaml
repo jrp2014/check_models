@@ -235,7 +235,8 @@ patterns:
 
   # Visual grounding detection (regex patterns)
   visual_grounding_visual_patterns:
-    - "\\b(building|house|shop|store|street|road|car|vehicle|person|people|pedestrian)\\b"
+    - "\\b(building|house|shop|store|street|road|car|vehicle|person|people|pede\
+      strian)\\b"
     - "\\b(sign|window|door|roof|wall|brick|stone|glass)\\b"
     - "\\b(tree|sky|cloud|hill|mountain|grass|flower)\\b"
     - "\\b(light|lamp|shadow|reflection|glow)\\b"
@@ -248,7 +249,8 @@ patterns:
     - "\\b(top|bottom|side|corner|edge)\\b"
 
   visual_grounding_color_patterns:
-    - "\\b(red|blue|green|yellow|orange|purple|pink|brown|black|white|gray|grey)\\b"
+    - "\\b(red|blue|green|yellow|orange|purple|pink|brown|black|white|gray|grey)\
+      \\b"
     - "\\b(golden|silver|bronze|dark|light|bright|pale|vivid)\\b"
     - "\\b(warm|cool|muted|saturated)\\b"
 
