@@ -7,7 +7,7 @@ import os
 import time
 from argparse import Namespace
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 from unittest.mock import patch
 
 import check_models
@@ -2478,12 +2478,20 @@ class TestDiagnosticsContextBuilder:
                 timestamp="2026-02-02 10:00:00 GMT",
             ),
         ]
-        comparison = {
-            "regressions": ["org/b"],
-            "recoveries": [],
-            "new_models": [],
-            "missing_models": ["org/c"],
-        }
+        comparison = cast(
+            "check_models.HistoryComparisonSummary",
+            {
+                "regressions": ["org/b"],
+                "recoveries": [],
+                "new_models": [],
+                "missing_models": ["org/c"],
+                "quality_regressions": [],
+                "quality_recoveries": [],
+                "harness_regressions": [],
+                "harness_recoveries": [],
+                "owner_changes": [],
+            },
+        )
 
         context = _build_diagnostics_context(
             failed_models={"org/a", "org/b"},

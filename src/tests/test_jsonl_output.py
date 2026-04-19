@@ -90,6 +90,27 @@ def test_save_jsonl_report_creates_file(tmp_path: Path) -> None:
     assert rows == []
 
 
+def test_save_jsonl_report_includes_library_versions_in_metadata(tmp_path: Path) -> None:
+    """Metadata header should preserve the shared library-version snapshot."""
+    output_file = tmp_path / "results.jsonl"
+    versions = cast(
+        "check_models.LibraryVersionDict",
+        {"mlx": "0.31.1", "mlx-vlm": "0.4.4", "transformers": "5.5.3"},
+    )
+
+    save_jsonl_report(
+        [],
+        output_file,
+        prompt="test",
+        system_info={},
+        library_versions=versions,
+    )
+
+    header, rows = _read_jsonl(output_file)
+    assert header["library_versions"] == versions
+    assert rows == []
+
+
 def test_save_jsonl_report_content(tmp_path: Path) -> None:
     """Test that save_jsonl_report writes correct content with generation."""
     output_file = tmp_path / "results.jsonl"
@@ -176,6 +197,7 @@ def test_save_jsonl_report_includes_review_payload_for_success(tmp_path: Path) -
 
     _header, rows = _read_jsonl(output_file)
     review = rows[0]["review"]
+    triage = rows[0]["maintainer_triage"]
     assert review["verdict"] in {"clean", "model_shortcoming", "context_budget"}
     assert review["hint_relationship"] in {
         "improves_trusted_hints",
@@ -187,6 +209,12 @@ def test_save_jsonl_report_includes_review_payload_for_success(tmp_path: Path) -
     assert review["prompt_tokens_total"] == 320
     assert review["prompt_tokens_text_est"] is not None
     assert review["prompt_tokens_nontext_est"] is not None
+    assert triage["issue_kind"] == review["verdict"]
+    assert triage["suspected_owner"] == review["owner"]
+    assert triage["user_bucket"] == review["user_bucket"]
+    assert triage["summary"]
+    if review["verdict"] == "clean":
+        assert triage["next_action"] == "No immediate maintainer action."
 
 
 def test_save_jsonl_report_includes_review_payload_for_failures(tmp_path: Path) -> None:
@@ -206,10 +234,16 @@ def test_save_jsonl_report_includes_review_payload_for_failures(tmp_path: Path) 
 
     _header, rows = _read_jsonl(output_file)
     review = rows[0]["review"]
+    triage = rows[0]["maintainer_triage"]
     assert review["verdict"] == "runtime_failure"
     assert review["owner"] == "mlx-vlm"
     assert review["user_bucket"] == "avoid"
     assert review["evidence"]
+    assert triage["issue_kind"] == "runtime_failure"
+    assert triage["issue_subtype"] == "MLX_VLM_DECODE_RUNTIME"
+    assert triage["confidence"] == "high"
+    assert triage["suspected_owner"] == "mlx-vlm"
+    assert "Inspect prompt-template" in triage["next_action"]
 
 
 def test_save_jsonl_report_flags_huggingface_hub_connectivity_failures(tmp_path: Path) -> None:
@@ -530,6 +564,58 @@ def test_append_history_record_creates_file(tmp_path: Path) -> None:
     assert record["model_results"]["test-model"]["success"] is True
 
 
+def test_append_history_record_captures_review_fields_for_quality_tracking(
+    tmp_path: Path,
+) -> None:
+    """History rows should keep enough review context for non-binary comparisons."""
+    history_file = tmp_path / "results.history.jsonl"
+    prompt = (
+        "Analyze this image.\n"
+        "Context: Existing metadata hints:\n"
+        "- Title hint: Brick storefront with outdoor seating\n"
+        "- Description hint: A brick storefront has outdoor seating beside a sidewalk.\n"
+        "- Keyword hints: brick storefront, outdoor seating, sidewalk, people\n"
+    )
+    gen = MockGeneration(
+        text=(
+            "Title: Brick storefront with outdoor seating\n"
+            "Description: A brick storefront has outdoor seating beside a sidewalk.\n"
+            "Keywords: brick storefront, outdoor seating, sidewalk, people"
+        ),
+        prompt_tokens=320,
+        generation_tokens=64,
+    )
+    analysis = check_models.analyze_generation_text(
+        gen.text or "",
+        generated_tokens=64,
+        prompt_tokens=320,
+        prompt=prompt,
+        requested_max_tokens=128,
+    )
+    result = PerformanceResult(
+        model_name="test-model",
+        generation=gen,
+        success=True,
+        quality_analysis=analysis,
+        requested_max_tokens=128,
+    )
+
+    record = append_history_record(
+        history_path=history_file,
+        results=[result],
+        prompt=prompt,
+        system_info={},
+        library_versions={},
+        image_path=None,
+    )
+
+    model_record = record["model_results"]["test-model"]
+    assert model_record["review_verdict"] == analysis.verdict
+    assert model_record["review_owner"] == analysis.owner
+    assert model_record["review_user_bucket"] == analysis.user_bucket
+    assert model_record["prompt_output_ratio"] == 64 / 320
+
+
 def test_compare_history_records_detects_regressions_and_recoveries() -> None:
     """Test regression/recovery detection between history records."""
     previous = _history_run(
@@ -553,6 +639,37 @@ def test_compare_history_records_detects_regressions_and_recoveries() -> None:
     assert summary["recoveries"] == ["model-b"]
     assert summary["new_models"] == ["model-d"]
     assert summary["missing_models"] == ["model-c"]
+
+
+def test_compare_history_records_detects_quality_harness_and_owner_changes() -> None:
+    """Stable-success models should still report maintainer-relevant quality shifts."""
+    previous = _history_run({"model-a": True, "model-b": True})
+    current = _history_run({"model-a": True, "model-b": True})
+
+    previous["model_results"]["model-a"]["review_user_bucket"] = "recommended"
+    previous["model_results"]["model-a"]["review_verdict"] = "clean"
+    previous["model_results"]["model-a"]["review_owner"] = "model"
+
+    current["model_results"]["model-a"]["review_user_bucket"] = "avoid"
+    current["model_results"]["model-a"]["review_verdict"] = "context_budget"
+    current["model_results"]["model-a"]["review_owner"] = "mlx"
+    current["model_results"]["model-a"]["harness_issue_type"] = "long_context"
+
+    previous["model_results"]["model-b"]["review_user_bucket"] = "avoid"
+    previous["model_results"]["model-b"]["review_verdict"] = "harness"
+    previous["model_results"]["model-b"]["review_owner"] = "mlx-vlm"
+    previous["model_results"]["model-b"]["harness_issue_type"] = "token_leak"
+
+    current["model_results"]["model-b"]["review_user_bucket"] = "recommended"
+    current["model_results"]["model-b"]["review_verdict"] = "clean"
+    current["model_results"]["model-b"]["review_owner"] = "model"
+
+    summary = compare_history_records(previous, current)
+    assert summary["quality_regressions"] == ["model-a"]
+    assert summary["quality_recoveries"] == ["model-b"]
+    assert summary["harness_regressions"] == ["model-a"]
+    assert summary["harness_recoveries"] == ["model-b"]
+    assert summary["owner_changes"] == ["model-a", "model-b"]
 
 
 # ---------------------------------------------------------------------------
@@ -654,6 +771,11 @@ def test_compare_history_records_no_previous() -> None:
     summary = compare_history_records(None, current)
     assert summary["regressions"] == []
     assert summary["recoveries"] == []
+    assert summary["quality_regressions"] == []
+    assert summary["quality_recoveries"] == []
+    assert summary["harness_regressions"] == []
+    assert summary["harness_recoveries"] == []
+    assert summary["owner_changes"] == []
     assert summary["new_models"] == ["model-x", "model-y"]
     assert summary["missing_models"] == []
 

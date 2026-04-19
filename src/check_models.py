@@ -820,6 +820,15 @@ class HistoryModelResultRecord(TypedDict):
     failure_phase: NotRequired[str | None]
     error_code: NotRequired[str | None]
     error_signature: NotRequired[str | None]
+    review_verdict: NotRequired[str | None]
+    review_owner: NotRequired[str | None]
+    review_user_bucket: NotRequired[str | None]
+    review_issue_subtype: NotRequired[str | None]
+    harness_issue_type: NotRequired[str | None]
+    prompt_output_ratio: NotRequired[float | None]
+    nontext_prompt_ratio: NotRequired[float | None]
+    stop_reason: NotRequired[str | None]
+    hit_max_tokens: NotRequired[bool]
 
 
 class HistoryRunRecord(TypedDict, total=False):
@@ -835,6 +844,20 @@ class HistoryRunRecord(TypedDict, total=False):
     system: dict[str, str]
     library_versions: LibraryVersionDict
     runtime_fingerprint: dict[str, RuntimeProbeResult]
+
+
+class HistoryComparisonSummary(TypedDict):
+    """Run-over-run transition summary for history comparisons."""
+
+    regressions: list[str]
+    recoveries: list[str]
+    new_models: list[str]
+    missing_models: list[str]
+    quality_regressions: list[str]
+    quality_recoveries: list[str]
+    harness_regressions: list[str]
+    harness_recoveries: list[str]
+    owner_changes: list[str]
 
 
 class JsonlTimingRecord(TypedDict):
@@ -899,6 +922,31 @@ class JsonlReviewRecord(TypedDict):
     harness_details: list[str]
 
 
+type MaintainerConfidence = Literal["high", "medium", "low"]
+
+
+class JsonlMaintainerTriageRecord(TypedDict, total=False):
+    """Action-oriented maintainer triage payload attached to JSONL result rows."""
+
+    suspected_owner: Required[str]
+    confidence: Required[MaintainerConfidence]
+    issue_kind: Required[str]
+    summary: Required[str]
+    next_action: Required[str]
+    user_bucket: Required[str]
+    evidence: Required[list[str]]
+    harness_details: Required[list[str]]
+    hit_max_tokens: Required[bool]
+    issue_subtype: str
+    error_stage: str | None
+    error_code: str | None
+    stop_reason: str | None
+    requested_max_tokens: int | None
+    prompt_tokens_total: int | None
+    prompt_output_ratio: float | None
+    nontext_prompt_ratio: float | None
+
+
 class RuntimeProbeResult(TypedDict, total=False):
     """Status of a single runtime capability probe."""
 
@@ -914,6 +962,7 @@ class JsonlMetadataRecord(TypedDict, total=False):
     prompt: Required[str]
     system: Required[dict[str, str]]
     timestamp: Required[str]
+    library_versions: LibraryVersionDict
     runtime_fingerprint: dict[str, RuntimeProbeResult]
 
 
@@ -958,6 +1007,7 @@ class JsonlResultRecord(TypedDict):
     generated_text: NotRequired[str]
     quality_analysis: NotRequired[JsonlQualityAnalysisRecord]
     review: NotRequired[JsonlReviewRecord]
+    maintainer_triage: NotRequired[JsonlMaintainerTriageRecord]
     signature_components: NotRequired[JsonlSignatureComponents]
     rerun_summary: NotRequired[JsonlRerunSummary]
 
@@ -9026,6 +9076,100 @@ def _failure_review_evidence(result: PerformanceResult) -> list[str]:
     return _dedupe_preserve_order(evidence) or ["runtime_failure"]
 
 
+def _review_issue_subtype(
+    result: PerformanceResult,
+    review: JsonlReviewRecord,
+    analysis: GenerationQualityAnalysis | None,
+) -> str | None:
+    """Return the most actionable subtype label for maintainer triage surfaces."""
+    subtype: str | None = None
+    if analysis is not None and analysis.harness_issue_type:
+        subtype = analysis.harness_issue_type
+    elif result.error_code:
+        subtype = result.error_code
+    elif review["hit_max_tokens"]:
+        subtype = "token_cap"
+    elif review["missing_sections"]:
+        subtype = "contract_mismatch"
+    elif review["missing_terms"]:
+        subtype = "context_gap"
+    elif review["evidence"]:
+        subtype = review["evidence"][0]
+    return subtype
+
+
+def _review_confidence(
+    result: PerformanceResult,
+    review: JsonlReviewRecord,
+    analysis: GenerationQualityAnalysis | None,
+) -> MaintainerConfidence:
+    """Return confidence level for maintainer-oriented triage routing."""
+    if not result.success and (
+        result.error_code is not None
+        or result.error_traceback is not None
+        or result.error_package is not None
+    ):
+        return "high"
+    if analysis is not None:
+        if analysis.has_harness_issue and analysis.harness_issue_type is not None:
+            return "high"
+        if review["verdict"] in {"cutoff", "context_budget"} and (
+            review["hit_max_tokens"] or review["nontext_prompt_ratio"] is not None
+        ):
+            return "high"
+        if analysis.evidence or analysis.missing_sections or analysis.missing_context_terms:
+            return "medium"
+    if review["evidence"] or review["missing_sections"] or review["missing_terms"]:
+        return "medium"
+    return "low"
+
+
+def _review_maintainer_next_action(review: JsonlReviewRecord) -> str:
+    """Return a maintainer-facing next action, avoiding noisy advice for clean rows."""
+    if review["verdict"] == "clean" and review["user_bucket"] == "recommended":
+        return "No immediate maintainer action."
+    return _review_next_action_text(review)
+
+
+def _build_jsonl_maintainer_triage_record(
+    result: PerformanceResult,
+    review: JsonlReviewRecord,
+) -> JsonlMaintainerTriageRecord:
+    """Build an action-oriented maintainer triage payload for one result."""
+    analysis = _quality_analysis_for_result(result)
+    triage: JsonlMaintainerTriageRecord = {
+        "suspected_owner": review["owner"],
+        "confidence": _review_confidence(result, review, analysis),
+        "issue_kind": review["verdict"],
+        "summary": _review_focus_text(review, analysis),
+        "next_action": _review_maintainer_next_action(review),
+        "user_bucket": review["user_bucket"],
+        "evidence": list(review["evidence"]),
+        "harness_details": list(review["harness_details"]),
+        "hit_max_tokens": review["hit_max_tokens"],
+    }
+    issue_subtype = _review_issue_subtype(result, review, analysis)
+    stop_reason = result.runtime_diagnostics.stop_reason if result.runtime_diagnostics else None
+
+    if issue_subtype is not None:
+        triage["issue_subtype"] = issue_subtype
+    if result.error_stage is not None:
+        triage["error_stage"] = result.error_stage
+    if result.error_code is not None:
+        triage["error_code"] = result.error_code
+    if stop_reason is not None:
+        triage["stop_reason"] = stop_reason
+    if review["requested_max_tokens"] is not None:
+        triage["requested_max_tokens"] = review["requested_max_tokens"]
+    if review["prompt_tokens_total"] is not None:
+        triage["prompt_tokens_total"] = review["prompt_tokens_total"]
+    if review["prompt_output_ratio"] is not None:
+        triage["prompt_output_ratio"] = review["prompt_output_ratio"]
+    if review["nontext_prompt_ratio"] is not None:
+        triage["nontext_prompt_ratio"] = review["nontext_prompt_ratio"]
+    return triage
+
+
 def _review_hint_text(
     review: JsonlReviewRecord,
     analysis: GenerationQualityAnalysis | None,
@@ -10259,7 +10403,7 @@ def _build_diagnostics_context(
     *,
     failed_models: set[str],
     history_records: list[HistoryRunRecord],
-    comparison: dict[str, list[str]] | None,
+    comparison: HistoryComparisonSummary | None,
 ) -> DiagnosticsContext:
     """Build immutable diagnostics context from history + comparison data."""
     history_context = _build_failure_history_context(
@@ -18620,11 +18764,25 @@ def _load_history_run_records(
     return records
 
 
+def _history_bucket_rank(bucket: object) -> int:
+    """Return severity rank for history user-bucket comparisons."""
+    if not isinstance(bucket, str):
+        return 0
+    ranks = {
+        "recommended": 0,
+        "caveat": 1,
+        "caution": 1,
+        "needs_triage": 2,
+        "avoid": 3,
+    }
+    return ranks.get(bucket, 0)
+
+
 def compare_history_records(
     previous: HistoryRunRecord | None,
     current: HistoryRunRecord,
-) -> dict[str, list[str]]:
-    """Compare two history records and return regressions/recoveries."""
+) -> HistoryComparisonSummary:
+    """Compare two history records and return status plus quality transitions."""
     prev_models: dict[str, HistoryModelResultRecord] = (
         previous.get("model_results", {}) if previous else {}
     )
@@ -18646,11 +18804,52 @@ def compare_history_records(
     new_models = sorted(set(curr_models) - set(prev_models))
     missing_models = sorted(set(prev_models) - set(curr_models))
 
+    quality_regressions: list[str] = []
+    quality_recoveries: list[str] = []
+    harness_regressions: list[str] = []
+    harness_recoveries: list[str] = []
+    owner_changes: list[str] = []
+
+    stable_models = sorted(
+        (set(prev_models) & set(curr_models))
+        - set(regressions)
+        - set(recoveries)
+        - set(new_models)
+        - set(missing_models)
+    )
+    for model_name in stable_models:
+        prev_info = prev_models[model_name]
+        curr_info = curr_models[model_name]
+        if prev_info.get("success") is True and curr_info.get("success") is True:
+            prev_bucket = _history_bucket_rank(prev_info.get("review_user_bucket"))
+            curr_bucket = _history_bucket_rank(curr_info.get("review_user_bucket"))
+            if curr_bucket > prev_bucket:
+                quality_regressions.append(model_name)
+            elif curr_bucket < prev_bucket:
+                quality_recoveries.append(model_name)
+
+            prev_harness = bool(prev_info.get("harness_issue_type"))
+            curr_harness = bool(curr_info.get("harness_issue_type"))
+            if not prev_harness and curr_harness:
+                harness_regressions.append(model_name)
+            elif prev_harness and not curr_harness:
+                harness_recoveries.append(model_name)
+
+        prev_owner = prev_info.get("review_owner")
+        curr_owner = curr_info.get("review_owner")
+        if prev_owner and curr_owner and prev_owner != curr_owner:
+            owner_changes.append(model_name)
+
     return {
         "regressions": regressions,
         "recoveries": recoveries,
         "new_models": new_models,
         "missing_models": missing_models,
+        "quality_regressions": quality_regressions,
+        "quality_recoveries": quality_recoveries,
+        "harness_regressions": harness_regressions,
+        "harness_recoveries": harness_recoveries,
+        "owner_changes": owner_changes,
     }
 
 
@@ -18661,7 +18860,7 @@ def _build_prompt_preview(prompt: str, *, max_chars: int = 200) -> str:
 
 def _history_model_result_from_result(result: PerformanceResult) -> HistoryModelResultRecord:
     """Build a typed per-model history row from runtime result."""
-    return {
+    record: HistoryModelResultRecord = {
         "success": result.success,
         "failure_phase": result.failure_phase,
         "error_stage": result.error_stage,
@@ -18670,6 +18869,26 @@ def _history_model_result_from_result(result: PerformanceResult) -> HistoryModel
         "error_code": result.error_code,
         "error_signature": result.error_signature,
     }
+    review = _build_jsonl_review_record(result)
+    analysis = _quality_analysis_for_result(result)
+    if review is not None:
+        record["review_verdict"] = review["verdict"]
+        record["review_owner"] = review["owner"]
+        record["review_user_bucket"] = review["user_bucket"]
+        record["hit_max_tokens"] = review["hit_max_tokens"]
+        issue_subtype = _review_issue_subtype(result, review, analysis)
+        if issue_subtype is not None:
+            record["review_issue_subtype"] = issue_subtype
+        if review["prompt_output_ratio"] is not None:
+            record["prompt_output_ratio"] = review["prompt_output_ratio"]
+        if review["nontext_prompt_ratio"] is not None:
+            record["nontext_prompt_ratio"] = review["nontext_prompt_ratio"]
+    if analysis is not None and analysis.harness_issue_type is not None:
+        record["harness_issue_type"] = analysis.harness_issue_type
+    stop_reason = result.runtime_diagnostics.stop_reason if result.runtime_diagnostics else None
+    if stop_reason is not None:
+        record["stop_reason"] = stop_reason
+    return record
 
 
 def _build_history_run_record(
@@ -18736,6 +18955,7 @@ def _build_jsonl_metadata_record(
     *,
     prompt: str,
     system_info: dict[str, str],
+    library_versions: LibraryVersionDict | None = None,
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
 ) -> JsonlMetadataRecord:
     """Build shared metadata header row for JSONL results."""
@@ -18746,6 +18966,8 @@ def _build_jsonl_metadata_record(
         "system": system_info,
         "timestamp": local_now_str(),
     }
+    if library_versions is not None:
+        record["library_versions"] = library_versions
     if runtime_fingerprint is not None:
         record["runtime_fingerprint"] = runtime_fingerprint
     return record
@@ -18864,6 +19086,7 @@ def save_jsonl_report(
     prompt: str,
     system_info: dict[str, str],
     *,
+    library_versions: LibraryVersionDict | None = None,
     runtime_fingerprint: dict[str, RuntimeProbeResult] | None = None,
 ) -> None:
     """Save results to a JSONL file for programmatic analysis and AI issue generation.
@@ -18875,9 +19098,11 @@ def save_jsonl_report(
     - Package attribution for directing reports
     - Quality analysis for successful models
     - Timing metrics for performance analysis
+    - Shared library/runtime metadata for reproducible maintainer triage
+    - Per-result maintainer triage hints for actionable follow-up
 
-    Format (v1.4): First line is a metadata header containing prompt and
-    system_info (shared across all rows). Per-model result lines follow.
+    Format (v2.0): First line is a metadata header containing prompt,
+    system_info, and shared runtime context. Per-model result lines follow.
     """
     try:
         with filename.open("w", encoding="utf-8") as f:
@@ -18885,6 +19110,7 @@ def save_jsonl_report(
             header = _build_jsonl_metadata_record(
                 prompt=prompt,
                 system_info=system_info,
+                library_versions=library_versions,
                 runtime_fingerprint=runtime_fingerprint,
             )
             f.write(json.dumps(header) + "\n")
@@ -18895,6 +19121,10 @@ def save_jsonl_report(
                 review_payload = _build_jsonl_review_record(result)
                 if review_payload:
                     record["review"] = review_payload
+                    record["maintainer_triage"] = _build_jsonl_maintainer_triage_record(
+                        result,
+                        review_payload,
+                    )
                 f.write(json.dumps(record) + "\n")
         # Logging handled in finalize_execution
     except OSError:
@@ -18996,7 +19226,7 @@ def _model_status_from_history(info: HistoryModelResultRecord | None) -> str:
 def _history_summary_for_comparison(
     previous: HistoryRunRecord | None,
     current: HistoryRunRecord,
-) -> dict[str, list[str]]:
+) -> HistoryComparisonSummary:
     """Return transition summary and log context-change warnings when needed."""
     if previous is None:
         return {
@@ -19004,6 +19234,11 @@ def _history_summary_for_comparison(
             "recoveries": [],
             "new_models": [],
             "missing_models": [],
+            "quality_regressions": [],
+            "quality_recoveries": [],
+            "harness_regressions": [],
+            "harness_recoveries": [],
+            "owner_changes": [],
         }
 
     prev_prompt_hash = previous.get("prompt_hash")
@@ -19026,13 +19261,18 @@ def _history_summary_rows(
     *,
     previous: HistoryRunRecord | None,
     current: HistoryRunRecord,
-    summary: dict[str, list[str]],
+    summary: HistoryComparisonSummary,
 ) -> list[list[str]]:
     """Build run-over-run summary rows for history comparison output."""
     regressions = summary["regressions"]
     recoveries = summary["recoveries"]
     new_models = summary["new_models"]
     missing_models = summary["missing_models"]
+    quality_regressions = summary["quality_regressions"]
+    quality_recoveries = summary["quality_recoveries"]
+    harness_regressions = summary["harness_regressions"]
+    harness_recoveries = summary["harness_recoveries"]
+    owner_changes = summary["owner_changes"]
 
     prev_total, prev_success, prev_failed, prev_success_rate = _history_counts(previous)
     curr_total, curr_success, curr_failed, curr_success_rate = _history_counts(current)
@@ -19075,6 +19315,11 @@ def _history_summary_rows(
         ],
         ["Regressions", "-", str(len(regressions)), "-"],
         ["Recoveries", "-", str(len(recoveries)), "-"],
+        ["Quality regressions", "-", str(len(quality_regressions)), "-"],
+        ["Quality recoveries", "-", str(len(quality_recoveries)), "-"],
+        ["Harness regressions", "-", str(len(harness_regressions)), "-"],
+        ["Harness recoveries", "-", str(len(harness_recoveries)), "-"],
+        ["Owner changes", "-", str(len(owner_changes)), "-"],
         ["New models", "-", str(len(new_models)), "-"],
         ["Missing models", "-", str(len(missing_models)), "-"],
     ]
@@ -19111,7 +19356,7 @@ def _history_context_rows(
 
 def _log_history_transition_chart(
     *,
-    summary: dict[str, list[str]],
+    summary: HistoryComparisonSummary,
     current: HistoryRunRecord,
 ) -> None:
     """Log transition chart (or current status chart when no transitions)."""
@@ -19119,9 +19364,19 @@ def _log_history_transition_chart(
     recoveries = summary["recoveries"]
     new_models = summary["new_models"]
     missing_models = summary["missing_models"]
+    quality_regressions = summary["quality_regressions"]
+    quality_recoveries = summary["quality_recoveries"]
+    harness_regressions = summary["harness_regressions"]
+    harness_recoveries = summary["harness_recoveries"]
+    owner_changes = summary["owner_changes"]
     transition_entries = [
         ("regressions", float(len(regressions))),
         ("recoveries", float(len(recoveries))),
+        ("quality regressions", float(len(quality_regressions))),
+        ("quality recoveries", float(len(quality_recoveries))),
+        ("harness regressions", float(len(harness_regressions))),
+        ("harness recoveries", float(len(harness_recoveries))),
+        ("owner changes", float(len(owner_changes))),
         ("new", float(len(new_models))),
         ("missing", float(len(missing_models))),
     ]
@@ -19131,7 +19386,7 @@ def _log_history_transition_chart(
             transition_entries,
             unit=" x",
             digits=0,
-            max_rows=4,
+            max_rows=len(transition_entries),
         )
         return
 
@@ -19145,18 +19400,80 @@ def _log_history_transition_chart(
     )
 
 
+def _history_transition_detail_text(
+    prev_info: HistoryModelResultRecord | None,
+    curr_info: HistoryModelResultRecord | None,
+) -> str:
+    """Return compact detail text for history transition rows."""
+    source = curr_info if curr_info is not None else prev_info
+    if source is None:
+        return "-"
+
+    parts: list[str] = []
+    if prev_info is not None and curr_info is not None:
+        prev_bucket = prev_info.get("review_user_bucket")
+        curr_bucket = curr_info.get("review_user_bucket")
+        if prev_bucket != curr_bucket and (prev_bucket or curr_bucket):
+            parts.append(f"bucket={prev_bucket or '-'}->{curr_bucket or '-'}")
+
+        prev_verdict = prev_info.get("review_verdict")
+        curr_verdict = curr_info.get("review_verdict")
+        if prev_verdict != curr_verdict and (prev_verdict or curr_verdict):
+            parts.append(f"verdict={prev_verdict or '-'}->{curr_verdict or '-'}")
+
+        prev_harness = prev_info.get("harness_issue_type")
+        curr_harness = curr_info.get("harness_issue_type")
+        if prev_harness != curr_harness and (prev_harness or curr_harness):
+            parts.append(f"harness={prev_harness or '-'}->{curr_harness or '-'}")
+
+        prev_owner = prev_info.get("review_owner")
+        curr_owner = curr_info.get("review_owner")
+        if prev_owner != curr_owner and (prev_owner or curr_owner):
+            parts.append(f"owner={prev_owner or '-'}->{curr_owner or '-'}")
+
+    if not parts:
+        harness_issue = source.get("harness_issue_type")
+        review_verdict = source.get("review_verdict")
+        error_stage = source.get("error_stage")
+        if harness_issue:
+            parts.append(f"harness={harness_issue}")
+        elif review_verdict:
+            parts.append(f"verdict={review_verdict}")
+        elif error_stage:
+            parts.append(error_stage)
+
+    return " | ".join(parts[:2]) or "-"
+
+
 def _history_transition_rows(
     *,
     previous: HistoryRunRecord | None,
     current: HistoryRunRecord,
-    summary: dict[str, list[str]],
+    summary: HistoryComparisonSummary,
 ) -> list[list[str]]:
     """Build per-model transition rows for regressions/recoveries/new/missing models."""
     regressions = summary["regressions"]
     recoveries = summary["recoveries"]
     new_models = summary["new_models"]
     missing_models = summary["missing_models"]
-    changed_models = sorted({*regressions, *recoveries, *new_models, *missing_models})
+    quality_regressions = summary["quality_regressions"]
+    quality_recoveries = summary["quality_recoveries"]
+    harness_regressions = summary["harness_regressions"]
+    harness_recoveries = summary["harness_recoveries"]
+    owner_changes = summary["owner_changes"]
+    changed_models = sorted(
+        {
+            *regressions,
+            *recoveries,
+            *new_models,
+            *missing_models,
+            *quality_regressions,
+            *quality_recoveries,
+            *harness_regressions,
+            *harness_recoveries,
+            *owner_changes,
+        }
+    )
     if not changed_models:
         return []
 
@@ -19168,6 +19485,16 @@ def _history_transition_rows(
             transition = "Regression"
         elif model_name in recoveries:
             transition = "Recovery"
+        elif model_name in harness_regressions:
+            transition = "Harness regression"
+        elif model_name in harness_recoveries:
+            transition = "Harness recovery"
+        elif model_name in quality_regressions:
+            transition = "Quality regression"
+        elif model_name in quality_recoveries:
+            transition = "Quality recovery"
+        elif model_name in owner_changes:
+            transition = "Owner changed"
         elif model_name in new_models:
             transition = "New"
         elif model_name in missing_models:
@@ -19177,15 +19504,13 @@ def _history_transition_rows(
 
         prev_info = prev_models.get(model_name)
         curr_info = curr_models.get(model_name)
-        stage_source = curr_info if curr_info is not None else prev_info
-        stage_text = stage_source.get("error_stage") if stage_source is not None else None
         transition_rows.append(
             [
                 _short_model_label(model_name),
                 transition,
                 _model_status_from_history(prev_info),
                 _model_status_from_history(curr_info),
-                stage_text or "-",
+                _history_transition_detail_text(prev_info, curr_info),
             ],
         )
     return transition_rows
@@ -19227,7 +19552,7 @@ def _log_history_comparison(
     if transition_rows:
         transitions_table = tabulate(
             transition_rows,
-            headers=["Model", "Transition", "Prev", "Current", "Error Stage"],
+            headers=["Model", "Transition", "Prev", "Current", "Signal"],
             tablefmt="github",
             disable_numparse=True,
         )
@@ -19540,6 +19865,7 @@ def _generate_reports_and_log_outputs(
             inputs.args.output_jsonl,
             prompt=inputs.prompt,
             system_info=inputs.system_info,
+            library_versions=inputs.library_versions,
             runtime_fingerprint=inputs.runtime_fingerprint,
         )
 

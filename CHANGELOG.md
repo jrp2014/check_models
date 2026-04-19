@@ -4,6 +4,15 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-04-19
+
+### Added
+
+- Enrich JSONL and history artifacts with shared library-version metadata,
+  per-result maintainer triage payloads, and run-over-run quality/harness
+  change tracking so smoke-test output is more actionable for MLX and
+  transformers maintainers.
+
 ### Fixed
 
 - Fix generated GitHub issue and report markdown to pass markdownlint (MD022,
