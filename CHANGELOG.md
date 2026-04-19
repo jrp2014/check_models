@@ -23,6 +23,8 @@ Notable changes to this project will be documented in this file.
 - Update the runtime fingerprint GPU-memory probe to use the current MLX
   top-level `get_active_memory()` API instead of the removed `mx.metal`
   accessor.
+- Remove duplicated helper logic around generation metric extraction and EXIF
+  date/time fallback formatting.
 
 ## [0.4.0] - 2026-04-19
 

@@ -1293,22 +1293,24 @@ class SupportsExifIfd(Protocol):
 type StoredGenerationResult = GenerationResult | SupportsGenerationText
 
 
-def _generation_int_metric(generation: object | None, field_name: str) -> int | None:
-    """Return an optional integer generation metric when present."""
+def _generation_numeric_metric(generation: object | None, field_name: str) -> int | float | None:
+    """Return an optional numeric generation metric when present."""
     value = getattr(generation, field_name, None)
     if isinstance(value, bool):
         return None
+    return value if isinstance(value, int | float) else None
+
+
+def _generation_int_metric(generation: object | None, field_name: str) -> int | None:
+    """Return an optional integer generation metric when present."""
+    value = _generation_numeric_metric(generation, field_name)
     return value if isinstance(value, int) else None
 
 
 def _generation_float_metric(generation: object | None, field_name: str) -> float | None:
     """Return an optional float generation metric when present."""
-    value = getattr(generation, field_name, None)
-    if isinstance(value, bool):
-        return None
-    if isinstance(value, int | float):
-        return float(value)
-    return None
+    value = _generation_numeric_metric(generation, field_name)
+    return float(value) if value is not None else None
 
 
 def _generation_text_value(generation: object | None) -> str:
@@ -2147,9 +2149,15 @@ class ColoredFormatter(logging.Formatter):
             LogStyles.DETAIL: self._style_detail,
             LogStyles.METRIC_LABEL: self._style_metric_label,
             LogStyles.METRIC_VALUE: self._style_metric_value,
-            LogStyles.GENERATED_TEXT: self._style_generated_text,
+            LogStyles.GENERATED_TEXT: lambda raw_message, _record: Colors.colored(
+                raw_message,
+                Colors.CYAN,
+            ),
             LogStyles.FILE_PATH: self._style_file_path,
-            LogStyles.MODEL_NAME: self._style_model_name,
+            LogStyles.MODEL_NAME: lambda raw_message, _record: Colors.colored(
+                raw_message,
+                Colors.MAGENTA,
+            ),
         }
 
         handler = handlers.get(style_hint)
@@ -2213,18 +2221,9 @@ class ColoredFormatter(logging.Formatter):
         color = getattr(record, "style_color", Colors.WHITE)
         return Colors.colored(raw_message, color) if color else raw_message
 
-    def _style_generated_text(self, raw_message: str, _record: logging.LogRecord) -> str:
-        """Style generated model output in cyan."""
-        return Colors.colored(raw_message, Colors.CYAN)
-
     def _style_file_path(self, raw_message: str, record: logging.LogRecord) -> str:
         """Style file paths with highlighting."""
-        color = getattr(record, "style_color", Colors.CYAN)
-        return Colors.colored(raw_message, color)
-
-    def _style_model_name(self, raw_message: str, _record: logging.LogRecord) -> str:
-        """Style model identifiers in magenta."""
-        return Colors.colored(raw_message, Colors.MAGENTA)
+        return Colors.colored(raw_message, getattr(record, "style_color", Colors.CYAN))
 
     def _format_info_message(self, msg: str) -> str:
         """Apply context-aware formatting to INFO messages for better visual hierarchy."""
@@ -6996,13 +6995,13 @@ def _extract_exif_date(img_path: PathLike, exif_data: ExifDict) -> str | None:
         exif_data,
         warning_message="Could not localize EXIF date: %s",
     )
-    if raw_exif_date is not None:
-        if parsed is not None:
-            return parsed.strftime("%Y-%m-%d %H:%M:%S %Z")
-        return raw_exif_date
-
-    mtime_local = _extract_file_mtime_local(img_path)
-    return mtime_local.strftime("%Y-%m-%d %H:%M:%S %Z") if mtime_local is not None else None
+    return _format_exif_datetime_or_mtime(
+        parsed,
+        raw_exif_date,
+        img_path=img_path,
+        fmt="%Y-%m-%d %H:%M:%S %Z",
+        fallback_to_raw_exif=True,
+    )
 
 
 def _extract_exif_time(img_path: PathLike, exif_data: ExifDict) -> str | None:
@@ -7011,13 +7010,32 @@ def _extract_exif_time(img_path: PathLike, exif_data: ExifDict) -> str | None:
         exif_data,
         warning_message="Could not extract time from EXIF date: %s",
     )
+    return _format_exif_datetime_or_mtime(
+        parsed,
+        raw_exif_date,
+        img_path=img_path,
+        fmt="%H:%M:%S",
+        log_context=" for time",
+    )
+
+
+def _format_exif_datetime_or_mtime(
+    parsed: datetime | None,
+    raw_exif_date: str | None,
+    *,
+    img_path: PathLike,
+    fmt: str,
+    fallback_to_raw_exif: bool = False,
+    log_context: str = "",
+) -> str | None:
+    """Format parsed EXIF datetime or fall back to file mtime when unavailable."""
     if raw_exif_date is not None:
         if parsed is not None:
-            return parsed.strftime("%H:%M:%S")
-        return None
+            return parsed.strftime(fmt)
+        return raw_exif_date if fallback_to_raw_exif else None
 
-    mtime_local = _extract_file_mtime_local(img_path, log_context=" for time")
-    return mtime_local.strftime("%H:%M:%S") if mtime_local is not None else None
+    mtime_local = _extract_file_mtime_local(img_path, log_context=log_context)
+    return mtime_local.strftime(fmt) if mtime_local is not None else None
 
 
 def _decode_exif_string(value: bytes | str | None) -> str:
