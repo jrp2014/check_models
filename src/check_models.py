@@ -9170,6 +9170,99 @@ def _build_jsonl_maintainer_triage_record(
     return triage
 
 
+def _maintainer_triage_for_result(
+    result: PerformanceResult,
+) -> JsonlMaintainerTriageRecord | None:
+    """Return cached maintainer triage payload for a result when available."""
+    review = _build_jsonl_review_record(result)
+    if review is None:
+        return None
+    return _build_jsonl_maintainer_triage_record(result, review)
+
+
+def _maintainer_triage_evidence_text(triage: JsonlMaintainerTriageRecord) -> str | None:
+    """Return human-readable evidence text for maintainer triage surfaces."""
+    items = [
+        description
+        for detail in triage["harness_details"][:2]
+        if (description := _describe_harness_detail(detail))
+    ]
+    if not items:
+        items = [_humanize_review_evidence_label(label) for label in triage["evidence"][:3]]
+    unique_items = _dedupe_preserve_order(items)
+    return " | ".join(unique_items) if unique_items else None
+
+
+def _maintainer_triage_context_text(triage: JsonlMaintainerTriageRecord) -> str | None:
+    """Return prompt/output context from triage when available."""
+    context_parts: list[str] = []
+    prompt_tokens_total = triage.get("prompt_tokens_total")
+    if prompt_tokens_total is not None:
+        context_parts.append(f"prompt={fmt_num(prompt_tokens_total)}")
+    prompt_output_ratio = triage.get("prompt_output_ratio")
+    if prompt_output_ratio is not None:
+        context_parts.append(f"output/prompt={prompt_output_ratio:.2%}")
+    nontext_prompt_ratio = triage.get("nontext_prompt_ratio")
+    if nontext_prompt_ratio is not None:
+        context_parts.append(f"nontext burden={nontext_prompt_ratio:.0%}")
+    stop_reason = triage.get("stop_reason")
+    if stop_reason is not None:
+        context_parts.append(f"stop={stop_reason}")
+    if triage["hit_max_tokens"]:
+        requested_max_tokens = triage.get("requested_max_tokens")
+        if requested_max_tokens is not None:
+            context_parts.append(f"hit token cap ({requested_max_tokens})")
+        else:
+            context_parts.append("hit token cap")
+    return " | ".join(context_parts) if context_parts else None
+
+
+def _build_maintainer_triage_rows(result: PerformanceResult) -> list[tuple[str, str]]:
+    """Build compact human-readable maintainer triage rows for Markdown reports."""
+    triage = _maintainer_triage_for_result(result)
+    if triage is None:
+        return []
+
+    classification = triage["issue_kind"]
+    issue_subtype = triage.get("issue_subtype")
+    if issue_subtype:
+        classification = f"{classification} | {issue_subtype}"
+
+    rows: list[tuple[str, str]] = [
+        (
+            "Likely owner",
+            f"{triage['suspected_owner']} | confidence={triage['confidence']}",
+        ),
+        ("Classification", classification),
+    ]
+    if triage["summary"] and triage["summary"] != "no flagged signals":
+        rows.append(("Summary", triage["summary"]))
+    if evidence_text := _maintainer_triage_evidence_text(triage):
+        rows.append(("Evidence", evidence_text))
+    if context_text := _maintainer_triage_context_text(triage):
+        rows.append(("Token context", context_text))
+    rows.append(("Next action", triage["next_action"]))
+    return rows
+
+
+def _append_maintainer_triage_markdown(
+    parts: list[str],
+    *,
+    result: PerformanceResult,
+    escaper: DiagnosticsEscaper | MarkdownPipeEscaper,
+    heading: str | None = "**Maintainer triage:**",
+) -> None:
+    """Append a compact maintainer triage block to a Markdown artifact."""
+    rows = _build_maintainer_triage_rows(result)
+    if not rows:
+        return
+    if heading is not None:
+        parts.extend([heading, ""])
+    for label, value in rows:
+        _append_markdown_labeled_value(parts, label=label, value=escaper.escape(value))
+    parts.append("")
+
+
 def _review_hint_text(
     review: JsonlReviewRecord,
     analysis: GenerationQualityAnalysis | None,
@@ -11448,6 +11541,12 @@ def _diagnostics_failure_clusters(
         parts.append(f"**Suggested next action:** {_diagnostics_next_action(pkg)}")
         parts.append(f"**Affected {model_word}:** {affected_models}")
         parts.append("")
+        _append_maintainer_triage_markdown(
+            parts,
+            result=rep,
+            escaper=DIAGNOSTICS_ESCAPER,
+            heading="**Representative maintainer triage:**",
+        )
 
         # Maintainer-facing table (human-readable, no local diagnostic codes).
         table_rows: list[tuple[str, ...]] = []
@@ -11551,6 +11650,11 @@ def _diagnostics_harness_section(
             f"output={fmt_num(generated_tokens)}, output/prompt={ratio_text}",
         )
         parts.append("")
+        _append_maintainer_triage_markdown(
+            parts,
+            result=res,
+            escaper=DIAGNOSTICS_ESCAPER,
+        )
         observations = [
             desc for detail in harness_details if (desc := _describe_harness_detail(detail))
         ]
@@ -19588,6 +19692,22 @@ def _build_issue_repro_section(
     return parts
 
 
+def _build_issue_triage_section(result: PerformanceResult) -> list[str]:
+    """Build the maintainer-triage section for standalone GitHub issue reports."""
+    rows = _build_maintainer_triage_rows(result)
+    if not rows:
+        return []
+
+    parts = ["", "## Maintainer Triage", ""]
+    _append_maintainer_triage_markdown(
+        parts,
+        result=result,
+        escaper=MARKDOWN_ESCAPER,
+        heading=None,
+    )
+    return parts
+
+
 def _generate_github_issue_reports(
     *,
     diagnostics_snapshot: DiagnosticsSnapshot,
@@ -19628,6 +19748,7 @@ def _generate_github_issue_reports(
             "",
         ]
         parts.extend(f"- `{m}`" for m in models)
+        parts.extend(_build_issue_triage_section(rep_result))
         parts.extend(
             [
                 "",
@@ -19656,9 +19777,12 @@ def _generate_github_issue_reports(
     for idx, (result, harness_type) in enumerate(diagnostics_snapshot.harness_results, start=1):
         qa = result.quality_analysis
         if qa is not None and qa.harness_issue_details:
-            harness_details = "\n".join(f"- {d}" for d in qa.harness_issue_details)
+            harness_details = "\n".join(
+                f"- {_describe_harness_detail(detail) or detail}"
+                for detail in qa.harness_issue_details
+            )
         else:
-            harness_details = "No details provided."
+            harness_details = "- No details provided."
 
         safe_harness_type = _sanitize_bpe_display(harness_type)
         # Collapse to single line and strip trailing punctuation for valid heading
@@ -19674,6 +19798,7 @@ def _generate_github_issue_reports(
             "",
             harness_details,
         ]
+        parts.extend(_build_issue_triage_section(result))
         parts.extend(
             _build_issue_repro_section(
                 model_name=result.model_name,

@@ -1643,6 +1643,37 @@ class TestDiagnosticsReport:
         assert "`model-config / mlx-vlm`" in content
         assert "validate chat-template/config expectations and mlx-vlm prompt formatting" in content
 
+    def test_failure_section_includes_representative_maintainer_triage(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Failure clusters should include a compact representative triage block."""
+        out = tmp_path / "diag.md"
+        failed = PerformanceResult(
+            model_name="org/broken-model",
+            generation=None,
+            success=False,
+            error_message="RuntimeError: shape mismatch",
+            error_stage="Model Error",
+            error_code="MLX_VLM_DECODE_RUNTIME",
+            error_package="mlx-vlm",
+            error_traceback="Traceback (most recent call last):\nRuntimeError: shape mismatch",
+        )
+
+        generate_diagnostics_report(
+            results=[failed],
+            filename=out,
+            versions=_stub_versions(),
+            system_info={},
+            prompt="test",
+        )
+
+        content = out.read_text(encoding="utf-8")
+        assert "Representative maintainer triage" in content
+        assert "MLX_VLM_DECODE_RUNTIME" in content
+        assert "confidence=high" in content
+        assert "runtime_failure" in content
+
     def test_priority_summary_splits_mixed_harness_owners(self, tmp_path: Path) -> None:
         """Mixed harness owner classes should render separate maintainer triage rows."""
         out = tmp_path / "diag.md"
@@ -2624,6 +2655,71 @@ class TestGithubIssueReportsCleanup:
         assert not (issues_dir / "issue_001_crash.md").exists()
         assert not (issues_dir / "issue_002_harness.md").exists()
         assert (issues_dir / "README.md").exists()
+
+
+class TestGithubIssueReportContent:
+    """Content checks for generated standalone GitHub issue reports."""
+
+    def test_crash_issue_includes_maintainer_triage(self, tmp_path: Path) -> None:
+        """Crash issue templates should include the maintainer triage section."""
+        failed_result = PerformanceResult(
+            model_name="org/broken-model",
+            generation=None,
+            success=False,
+            error_message="RuntimeError: shape mismatch",
+            error_stage="Model Error",
+            error_code="MLX_VLM_DECODE_RUNTIME",
+            error_package="mlx-vlm",
+            error_signature="MLX_DECODE_ERROR:abc123",
+            error_traceback="Traceback (most recent call last):\nRuntimeError: shape mismatch",
+            total_time=0.5,
+        )
+        snapshot = DiagnosticsSnapshot(
+            failed=(failed_result,),
+            failure_clusters=(("MLX_DECODE_ERROR:abc123", (failed_result,)),),
+        )
+
+        generated = _generate_github_issue_reports(
+            diagnostics_snapshot=snapshot,
+            output_dir=tmp_path,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            repro_bundles={},
+            run_args=None,
+        )
+
+        content = generated["crash_1"].read_text(encoding="utf-8")
+        assert "## Maintainer Triage" in content
+        assert "MLX_VLM_DECODE_RUNTIME" in content
+        assert "runtime_failure" in content
+        assert "confidence=high" in content
+
+    def test_harness_issue_humanizes_details_and_includes_triage(self, tmp_path: Path) -> None:
+        """Harness issue templates should show humanized details and triage guidance."""
+        harness_result = _make_harness_success(
+            name="org/harness-empty",
+            harness_type="long_context",
+            harness_detail="long_context_empty(5000tok)",
+        )
+        snapshot = DiagnosticsSnapshot(
+            harness_results=((harness_result, "long_context"),),
+        )
+
+        generated = _generate_github_issue_reports(
+            diagnostics_snapshot=snapshot,
+            output_dir=tmp_path,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            repro_bundles={},
+            run_args=None,
+        )
+
+        content = generated["harness_1"].read_text(encoding="utf-8")
+        assert "## Maintainer Triage" in content
+        assert "At long prompt length (5000 tokens), generation returned empty output." in content
+        assert "context_budget" in content
+        assert "long_context" in content
+        assert "confidence=high" in content
 
 
 class TestIssueDirectoryInvariants:

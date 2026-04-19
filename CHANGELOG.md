@@ -8,6 +8,9 @@ Notable changes to this project will be documented in this file.
 
 - Document the manual version-bump and release workflow in
   `docs/CONTRIBUTING.md`.
+- Surface maintainer triage summaries in `diagnostics.md` and generated GitHub
+  issue templates so the human-readable artifacts match the richer JSONL
+  payloads.
 
 ## [0.5.0] - 2026-04-19
 
