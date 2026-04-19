@@ -1,5 +1,5 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-04-19 01:39:18 BST
+FULL ENVIRONMENT DUMP - 2026-04-19 20:51:47 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
@@ -34,7 +34,7 @@ docopt==0.6.2
 einops==0.8.2
 execnet==2.1.2
 fastapi==0.136.0
-filelock==3.28.0
+filelock==3.29.0
 flatbuffers==25.12.19
 frozenlist==1.8.0
 fsspec==2026.2.0
@@ -167,5 +167,5 @@ yarl==1.23.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-04-19 01:39:19 BST
+Environment dump completed at 2026-04-19 20:51:47 BST
 ================================================================================

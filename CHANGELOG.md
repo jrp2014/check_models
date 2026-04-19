@@ -12,6 +12,14 @@ Notable changes to this project will be documented in this file.
   snapshot.
 - Add markdownlint to `--fast` quality checks so the pre-push hook catches
   markdown lint errors before they reach CI.
+- Fix harness issue title generator to flatten multiline model output and strip
+  trailing punctuation, preventing MD022/MD026 in generated issue templates.
+- Escape `*` in repeated-token review text to prevent MD037 (spaces inside
+  emphasis markers) when model output contains `*/` sequences.
+- Pre-escape HTML tags in quality warning issue text to prevent MD045 (images
+  without alt text) when model output contains `<img>` tags.
+- Add MD045 to blockquote markdownlint-disable comments since model output can
+  contain HTML img tags split across wrapped lines.
 
 ## [0.4.0] - 2026-04-19
 

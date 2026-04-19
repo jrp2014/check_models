@@ -1,20 +1,23 @@
-# [Harness Issue] Title: Windsor Castle at Night\n\nDescription: Windsor Castle is illuminated against a dark sky, overlooking a street... in mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+# [Harness Issue] Title: Tour Boat on River Thames
+
+Description: A tour boat, the 'Windsor Sovereign', is seen cruising along the River... in microsoft/Phi-3.5-vision-instruct
 
 ## Description
 
-Integration/harness warning detected for `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`.
+Integration/harness warning detected for `microsoft/Phi-3.5-vision-instruct`.
 
 ### Details
 
-- token_encoding:bpe_space_leak(53)
+- token_leak:<|end|>
+- token_leak:<|endoftext|>
+- training_leak:code_example
 
 ## Reproducibility
 
 ### Repro Command
 
 ```bash
-python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
-
+python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models microsoft/Phi-3.5-vision-instruct
 ```
 
 ---
@@ -36,3 +39,4 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 | GPU Cores       | 40                          |
 | Metal Support   | Metal 4                     |
 | RAM             | 128.0 GB                    |
+

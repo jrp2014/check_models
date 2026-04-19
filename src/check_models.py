@@ -2758,8 +2758,11 @@ def _detect_formatting_violations(text: str) -> list[str]:
     # Check for tags (beyond simple breaks) that may interfere with rendering
     html_tags: list[str] = re.findall(r"<(?!br>|/br>)[a-z]+[^>]*>", text, re.IGNORECASE)
     if html_tags:
-        # Report the raw tags (escaping handled by reporters)
-        tags_preview: str = ", ".join(set(html_tags[:3]))
+        # Pre-escape tags so downstream Markdown renderers don't parse them as HTML
+        escaped_tags: list[str] = [
+            t.replace("<", "&lt;").replace(">", "&gt;") for t in set(html_tags[:3])
+        ]
+        tags_preview: str = ", ".join(escaped_tags)
         issues.append(f"Unknown tags: {tags_preview}")
 
     # Check for excessive markdown structure
@@ -9162,7 +9165,8 @@ def _review_focus_text(
         if analysis.has_degeneration and analysis.degeneration_type is not None:
             parts.append(f"degeneration={analysis.degeneration_type}")
         if analysis.is_repetitive and analysis.repeated_token is not None:
-            parts.append(f"repetitive token={analysis.repeated_token}")
+            safe_token = analysis.repeated_token.replace("*", r"\*")
+            parts.append(f"repetitive token={safe_token}")
 
     if not parts and review["evidence"]:
         parts.extend(_humanize_review_evidence_label(label) for label in review["evidence"][:3])
@@ -9975,7 +9979,7 @@ def _append_markdown_wrapped_blockquote(
     """
     if not parts or parts[-1] != "":
         parts.append("")
-    parts.append("<!-- markdownlint-disable MD028 MD037 -->")
+    parts.append("<!-- markdownlint-disable MD028 MD037 MD045 -->")
     blockquote_lines: list[str] = [">"]
 
     normalized: str = content.replace("\r\n", "\n").replace("\r", "\n")
@@ -10000,7 +10004,7 @@ def _append_markdown_wrapped_blockquote(
             )
 
     parts.extend(blockquote_lines)
-    parts.append("<!-- markdownlint-enable MD028 MD037 -->")
+    parts.append("<!-- markdownlint-enable MD028 MD037 MD045 -->")
     if not parts or parts[-1] != "":
         parts.append("")
 
@@ -19314,8 +19318,10 @@ def _generate_github_issue_reports(
             harness_details = "No details provided."
 
         safe_harness_type = _sanitize_bpe_display(harness_type)
+        # Collapse to single line and strip trailing punctuation for valid heading
+        title_text = " ".join(safe_harness_type.splitlines()).strip().rstrip(":.;,!?")
         parts = [
-            f"# [Harness Issue] {safe_harness_type} in {result.model_name}",
+            f"# [Harness Issue] {title_text} in {result.model_name}",
             "",
             "## Description",
             "",

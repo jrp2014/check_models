@@ -217,7 +217,7 @@ def test_gallery_output_uses_wrapped_blockquote_instead_of_fence() -> None:
     md = _gallery_lines_for(result)
 
     assert "```text" not in md
-    assert "<!-- markdownlint-disable MD028 MD037 -->" in md
+    assert "<!-- markdownlint-disable MD028 MD037 MD045 -->" in md
     assert "> [!NOTE]" not in md
     assert "> alpha" in md
     assert "\n>\n> beta" in md

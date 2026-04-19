@@ -1,19 +1,19 @@
-# [Harness Issue] Let's tackle this step by step. First, the title needs to be 5-10 words, concrete and factual. The image is of a Wind... in mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+# [Harness Issue] Title - White Striped Pattern Description - A repeating pattern of white stripes on a dark background. Keywords... in mlx-community/X-Reasoner-7B-8bit
 
 ## Description
 
-Integration/harness warning detected for `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`.
+Integration/harness warning detected for `mlx-community/X-Reasoner-7B-8bit`.
 
 ### Details
 
-- token_leak:</think>
+- long_context_context_drop(16780tok)
 
 ## Reproducibility
 
 ### Repro Command
 
 ```bash
-python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/X-Reasoner-7B-8bit
 ```
 
 ---

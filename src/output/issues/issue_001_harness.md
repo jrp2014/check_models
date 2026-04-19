@@ -1,24 +1,19 @@
-# [Harness Issue] Title: Windsor Castle at Night
-
-Description: The iconic Windsor Castle stands prominently at night, its lights castin... in microsoft/Phi-3.5-vision-instruct
+# [Harness Issue] Title Windsor Sovereign tour boat Description The Windsor Sovereign tour boat, filled with passengers, cruises alo... in Qwen/Qwen3-VL-2B-Instruct
 
 ## Description
 
-Integration/harness warning detected for `microsoft/Phi-3.5-vision-instruct`.
+Integration/harness warning detected for `Qwen/Qwen3-VL-2B-Instruct`.
 
 ### Details
 
-- token_leak:<|end|>
-- token_leak:<|endoftext|>
-- training_leak:code_example
+- long_context_repetition(16769tok)
 
 ## Reproducibility
 
 ### Repro Command
 
 ```bash
-python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models microsoft/Phi-3.5-vision-instruct
-
+python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models Qwen/Qwen3-VL-2B-Instruct
 ```
 
 ---
@@ -40,3 +35,4 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 | GPU Cores       | 40                          |
 | Metal Support   | Metal 4                     |
 | RAM             | 128.0 GB                    |
+

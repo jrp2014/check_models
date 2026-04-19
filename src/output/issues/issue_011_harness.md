@@ -1,19 +1,19 @@
-# [Harness Issue] Let's tackle this step by step. First, the title needs to be 5-10 words, concrete and factual. The image is of a Wind... in mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+# [Harness Issue] - Do not copy. in mlx-community/paligemma2-3b-ft-docci-448-bf16
 
 ## Description
 
-Integration/harness warning detected for `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`.
+Integration/harness warning detected for `mlx-community/paligemma2-3b-ft-docci-448-bf16`.
 
 ### Details
 
-- token_leak:</think>
+- output:truncated(6tok)
 
 ## Reproducibility
 
 ### Repro Command
 
 ```bash
-python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
+python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/paligemma2-3b-ft-docci-448-bf16
 ```
 
 ---

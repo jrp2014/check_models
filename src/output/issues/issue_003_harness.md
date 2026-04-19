@@ -1,20 +1,19 @@
-# [Harness Issue] - Camera: Canon EOS 5D Mark IV. in mlx-community/paligemma2-10b-ft-docci-448-bf16
+# [Harness Issue] Title: Windsor Sovereign Tour Boat on the River Thames\n\nDescription: A blue and white tour boat named 'Windsor Sove... in mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
 
 ## Description
 
-Integration/harness warning detected for `mlx-community/paligemma2-10b-ft-docci-448-bf16`.
+Integration/harness warning detected for `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`.
 
 ### Details
 
-- output:output_ratio(0.8%)
+- token_encoding:bpe_space_leak(61)
 
 ## Reproducibility
 
 ### Repro Command
 
 ```bash
-python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/paligemma2-10b-ft-docci-448-bf16
-
+python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
 ```
 
 ---
@@ -36,3 +35,4 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 | GPU Cores       | 40                          |
 | Metal Support   | Metal 4                     |
 | RAM             | 128.0 GB                    |
+
