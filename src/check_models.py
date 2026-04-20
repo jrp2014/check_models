@@ -189,6 +189,7 @@ ERROR_MLX_VLM_RUNTIME_INIT: Final[str] = (
     "Core dependency initialization failed: mlx-vlm could not be imported safely."
 )
 MLX_IMPORT_PROBE_TIMEOUT_SECONDS: Final[float] = 8.0
+DEFAULT_KV_QUANT_SCHEME: Final[str] = "uniform"
 DEFAULT_THINKING_END_MARKER: Final[str] = "</think>"
 
 
@@ -878,6 +879,8 @@ class JsonlMetricsRecord(TypedDict, total=False):
 
     prompt_tokens: int
     generation_tokens: int
+    total_tokens: int
+    prompt_tps: float
     generation_tps: float
     peak_memory_gb: float
     active_memory_gb: float
@@ -1240,6 +1243,7 @@ class StrictGenerateCallable(Protocol):
         repetition_context_size: int | None = 20,
         max_kv_size: int | None = None,
         kv_bits: int | None = None,
+        kv_quant_scheme: str = DEFAULT_KV_QUANT_SCHEME,
         kv_group_size: int = 64,
         quantized_kv_start: int = 0,
         max_tokens: int = 500,
@@ -1248,7 +1252,8 @@ class StrictGenerateCallable(Protocol):
         """Generate a caption/response with the known CLI-controlled kwargs."""
         del model, processor, prompt, image, audio, verbose
         del temperature, top_p, repetition_penalty, repetition_context_size
-        del max_kv_size, kv_bits, kv_group_size, quantized_kv_start, max_tokens, kwargs
+        del max_kv_size, kv_bits, kv_quant_scheme, kv_group_size, quantized_kv_start
+        del max_tokens, kwargs
         raise NotImplementedError
 
 
@@ -1282,6 +1287,7 @@ if TYPE_CHECKING:
         top_k=0,
         max_kv_size=None,
         kv_bits=None,
+        kv_quant_scheme=DEFAULT_KV_QUANT_SCHEME,
         kv_group_size=64,
         quantized_kv_start=0,
         prefill_step_size=None,
@@ -1318,18 +1324,22 @@ class SupportsGenerationResult(SupportsGenerationText, Protocol):
     concrete GenerationResult while still giving linters strong guarantees
     about the attributes actually consumed here.
 
-    Note: `time`, `active_memory`, `cache_memory`, and sometimes
-    `peak_memory` may be added dynamically by our code after generation.
+    Note: `time`, `active_memory`, and `cache_memory` are added dynamically by
+    our code after generation. `peak_memory` is expected from upstream and only
+    backfilled from MLX allocator probes when the runtime reports no value.
     """
 
+    token: object | None
+    logprobs: object | None
     prompt_tokens: int | None
     generation_tokens: int | None
+    total_tokens: int | None
     prompt_tps: float | None
     generation_tps: float | None
     time: float | None  # Dynamically added timing attribute
     active_memory: float | None  # Dynamically added active memory (GB)
     cache_memory: float | None  # Dynamically added cache memory (GB)
-    peak_memory: float | None  # Backfilled peak memory (GB) when upstream omits it
+    peak_memory: float | None  # Upstream peak memory (GB), backfilled only when absent
 
 
 class SupportsExifIfd(Protocol):
@@ -1923,6 +1933,7 @@ class ProcessImageParams:
     lazy: bool
     max_kv_size: int | None
     kv_bits: int | None
+    kv_quant_scheme: Literal["uniform", "turboquant"]
     kv_group_size: int
     quantized_kv_start: int
     revision: str | None = None
@@ -6408,6 +6419,7 @@ _RUNTIME_API_CALL_CONTRACTS: Final[dict[str, tuple[str, tuple[str, ...]]]] = {
             "repetition_context_size",
             "max_kv_size",
             "kv_bits",
+            "kv_quant_scheme",
             "kv_group_size",
             "quantized_kv_start",
             "max_tokens",
@@ -6579,18 +6591,18 @@ def _collect_preflight_package_issues(versions: LibraryVersionDict) -> list[str]
 def _get_available_fields(results: list[PerformanceResult]) -> list[str]:
     """Return ordered list of metric field names present across results.
 
-    We skip heavy / long fields (``text``, ``logprobs``) to keep summary tables
-    concise. Timing fields from ``PerformanceResult`` are appended explicitly so
-    they appear in a predictable order if present.
+    We skip heavy / long fields (``text``, ``token``, ``logprobs``) to keep
+    summary tables concise. Timing fields from ``PerformanceResult`` are
+    appended explicitly so they appear in a predictable order if present.
     """
-    # Determine GenerationResult fields (excluding 'text' and 'logprobs')
+    # Determine GenerationResult fields while excluding raw text/token payloads.
     gen_fields: list[str] = []
     for r in results:
         if r.generation is not None and dataclasses.is_dataclass(r.generation):
             gen_fields = [
                 f.name
                 for f in dataclasses.fields(r.generation)
-                if f.name not in ("text", "logprobs")
+                if f.name not in ("text", "token", "logprobs")
             ]
             break
 
@@ -12296,6 +12308,13 @@ def _build_repro_command_tokens(
             ),
             ("--max-kv-size", getattr(run_args, "max_kv_size", None)),
             ("--kv-bits", getattr(run_args, "kv_bits", None)),
+            (
+                "--kv-quant-scheme",
+                getattr(run_args, "kv_quant_scheme", DEFAULT_KV_QUANT_SCHEME)
+                if getattr(run_args, "kv_quant_scheme", DEFAULT_KV_QUANT_SCHEME)
+                != DEFAULT_KV_QUANT_SCHEME
+                else None,
+            ),
             ("--prefill-step-size", getattr(run_args, "prefill_step_size", None)),
             ("--thinking-budget", getattr(run_args, "thinking_budget", None)),
             ("--thinking-start-token", getattr(run_args, "thinking_start_token", None)),
@@ -14144,6 +14163,7 @@ _RESERVED_PROCESSOR_KWARG_KEYS: Final[frozenset[str]] = frozenset(
         "image",
         "kv_bits",
         "kv_group_size",
+        "kv_quant_scheme",
         "max_kv_size",
         "max_tokens",
         "min_p",
@@ -15357,6 +15377,7 @@ def _generate_with_processor_passthrough(
         repetition_context_size=params.repetition_context_size,
         max_kv_size=params.max_kv_size,
         kv_bits=params.kv_bits,
+        kv_quant_scheme=params.kv_quant_scheme,
         kv_group_size=params.kv_group_size,
         quantized_kv_start=params.quantized_kv_start,
         max_tokens=params.max_tokens,
@@ -15545,6 +15566,7 @@ def _run_model_generation(
             repetition_context_size=params.repetition_context_size,
             max_kv_size=params.max_kv_size,
             kv_bits=params.kv_bits,
+            kv_quant_scheme=params.kv_quant_scheme,
             kv_group_size=params.kv_group_size,
             quantized_kv_start=params.quantized_kv_start,
             max_tokens=params.max_tokens,
@@ -17304,6 +17326,7 @@ def process_models(
             lazy=args.lazy_load,
             max_kv_size=args.max_kv_size,
             kv_bits=args.kv_bits,
+            kv_quant_scheme=args.kv_quant_scheme,
             kv_group_size=args.kv_group_size,
             quantized_kv_start=args.quantized_kv_start,
             revision=args.revision,
@@ -19169,6 +19192,8 @@ def _populate_jsonl_result_generation_data(
     record["metrics"] = {
         "prompt_tokens": getattr(generation, "prompt_tokens", 0),
         "generation_tokens": getattr(generation, "generation_tokens", 0),
+        "total_tokens": getattr(generation, "total_tokens", 0),
+        "prompt_tps": getattr(generation, "prompt_tps", 0.0),
         "generation_tps": getattr(generation, "generation_tps", 0.0),
         "peak_memory_gb": getattr(generation, "peak_memory", 0.0),
         "active_memory_gb": result.active_memory or 0.0,
@@ -20195,6 +20220,10 @@ def _run_differential_reruns(
             lazy=getattr(args, "lazy_load", False),
             max_kv_size=getattr(args, "max_kv_size", None),
             kv_bits=getattr(args, "kv_bits", None),
+            kv_quant_scheme=cast(
+                'Literal["uniform", "turboquant"]',
+                getattr(args, "kv_quant_scheme", DEFAULT_KV_QUANT_SCHEME),
+            ),
             kv_group_size=getattr(args, "kv_group_size", 64),
             quantized_kv_start=getattr(args, "quantized_kv_start", 0),
         )
@@ -20819,6 +20848,15 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         default=None,
         choices=[4, 8],
         help="Quantize KV cache to N bits (4 or 8). Saves memory with small quality trade-off.",
+    )
+    parser.add_argument(
+        "--kv-quant-scheme",
+        choices=["uniform", "turboquant"],
+        default=DEFAULT_KV_QUANT_SCHEME,
+        help=(
+            "KV cache quantization backend. Default: uniform. "
+            "Use turboquant to match upstream TurboQuant cache handling."
+        ),
     )
     parser.add_argument(
         "-g",

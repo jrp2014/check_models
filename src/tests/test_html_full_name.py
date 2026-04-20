@@ -14,8 +14,14 @@ class MockGenerationResult:
     """Mock GenerationResult for testing."""
 
     text: str | None = "Generated text"
+    token: object | None = None
+    logprobs: object | None = None
     prompt_tokens: int | None = 100
     generation_tokens: int | None = 50
+    total_tokens: int | None = 150
+    prompt_tps: float | None = 200.0
+    generation_tps: float | None = 100.0
+    peak_memory: float | None = 1.0
     time: float | None = None
     active_memory: float | None = None
     cache_memory: float | None = None

@@ -795,7 +795,41 @@ class TestPreflightDependencyDiagnostics:
 
         assert len(issues) == 1
         assert "generation_tokens" in issues[0]
+        assert "total_tokens" in issues[0]
         assert "prompt_tps" in issues[0]
+
+    def test_get_available_fields_excludes_raw_generation_payloads(
+        self,
+        mod: types.ModuleType,
+    ) -> None:
+        """Summary field discovery should hide raw token/logprob payloads."""
+
+        @dataclass
+        class _GenerationResultLike:
+            text: str = "hello"
+            token: object | None = object()
+            logprobs: object | None = object()
+            prompt_tokens: int = 8
+            generation_tokens: int = 4
+            total_tokens: int = 12
+            prompt_tps: float = 16.0
+            generation_tps: float = 8.0
+            peak_memory: float = 1.0
+
+        fields = mod._get_available_fields(
+            [
+                mod.PerformanceResult(
+                    model_name="model",
+                    generation=_GenerationResultLike(),
+                    success=True,
+                )
+            ]
+        )
+
+        assert "token" not in fields
+        assert "logprobs" not in fields
+        assert "total_tokens" in fields
+        assert "prompt_tps" in fields
 
     def test_has_mlx_vlm_load_image_path_bug_detection(self, mod: types.ModuleType) -> None:
         """Source matcher should flag unguarded startswith URL branch."""

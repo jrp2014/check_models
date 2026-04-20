@@ -164,6 +164,7 @@ class TestCliArgumentNormalization:
             "repetition_penalty": None,
             "max_kv_size": None,
             "kv_bits": None,
+            "kv_quant_scheme": "uniform",
             "verbose": False,
             "detailed_metrics": False,
             "resize_shape": None,
@@ -201,6 +202,13 @@ class TestCliArgumentNormalization:
     def test_reserved_processor_kwargs_raise_error(self) -> None:
         """Processor kwargs should not be allowed to override dedicated CLI flags."""
         args = self._build_args(processor_kwargs={"top_k": 10, "cropping": False})
+
+        with pytest.raises(ValueError, match="processor_kwargs cannot override dedicated"):
+            validate_cli_arguments(args)
+
+    def test_reserved_kv_quant_scheme_processor_kwarg_raises_error(self) -> None:
+        """Processor kwargs should not be allowed to override KV quantization backend."""
+        args = self._build_args(processor_kwargs={"kv_quant_scheme": "turboquant"})
 
         with pytest.raises(ValueError, match="processor_kwargs cannot override dedicated"):
             validate_cli_arguments(args)

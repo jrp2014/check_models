@@ -59,8 +59,11 @@ class _MockGeneration:
     """Minimal stand-in for GenerationResult used by report generators."""
 
     text: str | None = "output"
+    token: object | None = None
+    logprobs: object | None = None
     prompt_tokens: int | None = 10
     generation_tokens: int | None = 5
+    total_tokens: int | None = 15
     prompt_tps: float | None = 1200.0
     generation_tps: float | None = 80.0
     peak_memory: float | None = 4.5

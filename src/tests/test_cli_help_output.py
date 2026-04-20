@@ -42,6 +42,7 @@ def test_cli_help_output(help_flag: str, capsys: pytest.CaptureFixture[str]) -> 
     assert "--detailed-metrics" in output
     assert "--min-p" in output
     assert "--top-k" in output
+    assert "--kv-quant-scheme" in output
     assert "ignored unless" in output
     assert "--verbose" in output
     assert "most recently modified image file in the folder" in output

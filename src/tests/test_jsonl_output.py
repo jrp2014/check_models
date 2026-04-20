@@ -39,8 +39,12 @@ class MockGeneration:
     """Mock generation result for testing."""
 
     text: str | None = "generated text"
+    token: object | None = None
+    logprobs: object | None = None
     prompt_tokens: int | None = 10
     generation_tokens: int | None = 20
+    total_tokens: int | None = 30
+    prompt_tps: float | None = 2.0
     generation_tps: float | None = 5.0
     peak_memory: float | None = 1.5
     time: float | None = None
@@ -152,6 +156,8 @@ def test_save_jsonl_report_content(tmp_path: Path) -> None:
     metrics = data["metrics"]
     assert metrics.get("generation_tps") == 5.0
     assert metrics.get("prompt_tokens") == 10
+    assert metrics.get("total_tokens") == 30
+    assert metrics.get("prompt_tps") == 2.0
     timing = data["timing"]
     assert timing["input_validation_time_s"] == 0.1
     assert timing["prompt_prep_time_s"] == 0.2

@@ -25,8 +25,11 @@ class _FakeGenerationResult:
     """Minimal stand-in for mlx_vlm GenerationResult."""
 
     text: str = "Hello world"
+    token: object | None = None
+    logprobs: object | None = None
     prompt_tokens: int = 50
     generation_tokens: int = 20
+    total_tokens: int = 70
     prompt_tps: float = 100.0
     generation_tps: float = 42.0
     peak_memory: float = 1.2
@@ -115,6 +118,7 @@ def _build_params(image_path: Path) -> check_models.ProcessImageParams:
         lazy=False,
         max_kv_size=None,
         kv_bits=None,
+        kv_quant_scheme="uniform",
         kv_group_size=64,
         quantized_kv_start=0,
     )

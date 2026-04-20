@@ -295,6 +295,7 @@ Vision-language models maintain a **key-value (KV) cache** during text generatio
 
 - `--max-kv-size <int>`: Maximum number of tokens to store in KV cache. Limits memory for very long sequences. Default: `None` (unlimited).
 - `--kv-bits <int>`: Quantize KV cache to 4 or 8 bits instead of full precision (typically 16-bit). Default: `None` (no quantization).
+- `--kv-quant-scheme <uniform|turboquant>`: Select the upstream KV quantization backend. Default: `uniform`.
 - `--kv-group-size <int>`: Group size for quantization (larger = more compression, less accuracy). Default: `64`.
 - `--quantized-kv-start <int>`: Token position to start quantization. Use `0` to quantize from the beginning, or a larger value to keep early tokens (e.g., system prompts) at full precision. Default: `0`.
 
@@ -307,6 +308,9 @@ From the MLX-VLM source: The KV cache stores attention keys and values for each 
 ```bash
 # Moderate 8-bit quantization for 2× memory savings
 python -m check_models --image photo.jpg --kv-bits 8
+
+# Match upstream TurboQuant KV-cache handling
+python -m check_models --image photo.jpg --kv-bits 4 --kv-quant-scheme turboquant
 
 # Aggressive 4-bit quantization with larger groups (4× compression)
 python -m check_models --image photo.jpg --kv-bits 4 --kv-group-size 128
@@ -847,6 +851,7 @@ See module docstrings and `__all__` exports for complete API reference.
 | `-L`, `--lazy-load` | flag | `False` | Use lazy loading (loads weights on-demand, reduces memory). |
 | `--max-kv-size` | int | (none) | Maximum KV cache size (limits memory for long sequences). |
 | `-b`, `--kv-bits` | int | (none) | Quantize KV cache to N bits (4 or 8); saves memory. |
+| `--kv-quant-scheme` | str | `uniform` | KV cache quantization backend: `uniform` or `turboquant`. |
 | `-g`, `--kv-group-size` | int | 64 | Quantization group size for KV cache. |
 | `--quantized-kv-start` | int | 0 | Start position for KV cache quantization. |
 | `--prefill-step-size` | int | (none) | Step size for prompt prefill (`None` uses model default). |

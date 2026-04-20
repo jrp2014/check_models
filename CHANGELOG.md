@@ -11,6 +11,9 @@ Notable changes to this project will be documented in this file.
 - Surface maintainer triage summaries in `diagnostics.md` and generated GitHub
   issue templates so the human-readable artifacts match the richer JSONL
   payloads.
+- Sync `check_models.py` with the current mlx-vlm `GenerationResult` shape,
+  persist `total_tokens` and `prompt_tps` in JSONL metrics, and expose
+  `--kv-quant-scheme` for upstream KV-cache backend selection.
 
 ## [0.5.0] - 2026-04-19
 
