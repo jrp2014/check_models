@@ -597,40 +597,11 @@ class TestProcessImageWithModelMock:
         assert mock_detector.call_count == 1
         assert retry_patch_entries == []
 
-    def test_run_model_generation_backfills_peak_memory_from_mlx(self, test_image: Path) -> None:
-        """MLX peak memory should backfill result objects that omit it."""
-        params = _build_params(test_image)
-        fake_model = _FakeModel()
-        fake_processor = object()
-        fake_generation = _FakeGenerationResult(peak_memory=0.0)
-
-        class _FakeMxRuntimeWithPeak(_FakeMxRuntime):
-            @staticmethod
-            def get_peak_memory() -> float:
-                return float(3 * (1024**3))
-
-        with (
-            patch.object(check_models, "_ensure_generation_runtime_symbols"),
-            patch.object(
-                check_models,
-                "_load_model",
-                return_value=(fake_model, fake_processor, None),
-            ),
-            patch.object(check_models, "_run_model_preflight_validators"),
-            patch.object(check_models, "apply_chat_template", return_value="formatted prompt"),
-            patch.object(check_models, "generate", return_value=fake_generation),
-            patch.object(check_models, "mx", _FakeMxRuntimeWithPeak()),
-        ):
-            result = check_models._run_model_generation(params)
-
-        assert result is fake_generation
-        assert result.peak_memory == 3.0
-
-    def test_run_model_generation_samples_memory_without_post_generation_eval(
+    def test_run_model_generation_samples_memory_without_local_peak_probe(
         self,
         test_image: Path,
     ) -> None:
-        """Generation should sample memory once without forcing a second MLX eval."""
+        """Generation should sample active/cache memory once without a local peak probe."""
         params = _build_params(test_image)
         fake_model = _FakeModel()
         fake_processor = object()
@@ -655,7 +626,7 @@ class TestProcessImageWithModelMock:
         assert runtime.sync_calls == 1
         assert runtime.active_calls == 1
         assert runtime.cache_calls == 1
-        assert runtime.peak_calls == 1
+        assert runtime.peak_calls == 0
         assert runtime.eval_calls == 0
 
     def test_process_image_with_model_skips_cleanup_sync_after_success(

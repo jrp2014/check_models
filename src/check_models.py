@@ -1325,8 +1325,8 @@ class SupportsGenerationResult(SupportsGenerationText, Protocol):
     about the attributes actually consumed here.
 
     Note: `time`, `active_memory`, and `cache_memory` are added dynamically by
-    our code after generation. `peak_memory` is expected from upstream and only
-    backfilled from MLX allocator probes when the runtime reports no value.
+    our code after generation. `peak_memory` comes from the upstream
+    GenerationResult returned by mlx-vlm.
     """
 
     token: object | None
@@ -1339,7 +1339,7 @@ class SupportsGenerationResult(SupportsGenerationText, Protocol):
     time: float | None  # Dynamically added timing attribute
     active_memory: float | None  # Dynamically added active memory (GB)
     cache_memory: float | None  # Dynamically added cache memory (GB)
-    peak_memory: float | None  # Upstream peak memory (GB), backfilled only when absent
+    peak_memory: float | None  # Upstream peak memory (GB)
 
 
 class SupportsExifIfd(Protocol):
@@ -1462,8 +1462,8 @@ class PerformanceResult:
         error_type: Exception class name for error categorization in reports
         quality_issues: Comma-separated list of detected output problems
         quality_analysis: Structured quality-analysis result for triage/reporting
-        active_memory: GPU memory in use (GB), from mx.metal.get_active_memory()
-        cache_memory: GPU memory in cache (GB), from mx.metal.get_cache_memory()
+        active_memory: GPU memory in use (GB), from mx.get_active_memory()
+        cache_memory: GPU memory in cache (GB), from mx.get_cache_memory()
         error_package: Which package raised the error (mlx, mlx-vlm, transformers)
         error_traceback: Full traceback for actionable error reports
         requested_max_tokens: Requested generation budget for cutoff diagnosis
@@ -15391,14 +15391,12 @@ def _attach_generation_runtime_metrics(
     *,
     duration: float,
 ) -> SupportsGenerationResult:
-    """Attach locally measured timing and memory metrics to a generation result."""
+    """Attach local timing and allocator snapshot metrics to a generation result."""
     get_active_memory_fn = getattr(mx, "get_active_memory", None)
     get_cache_memory_fn = getattr(mx, "get_cache_memory", None)
-    get_peak_memory_fn = getattr(mx, "get_peak_memory", None)
 
     active_mem_raw = get_active_memory_fn() if callable(get_active_memory_fn) else 0.0
     cache_mem_raw = get_cache_memory_fn() if callable(get_cache_memory_fn) else 0.0
-    peak_mem_bytes = get_peak_memory_fn() if callable(get_peak_memory_fn) else None
 
     active_mem_bytes = float(active_mem_raw) if isinstance(active_mem_raw, int | float) else 0.0
     cache_mem_bytes = float(cache_mem_raw) if isinstance(cache_mem_raw, int | float) else 0.0
@@ -15407,17 +15405,6 @@ def _attach_generation_runtime_metrics(
     result.time = duration
     result.active_memory = active_mem_bytes / (1024**3)  # Convert to GB
     result.cache_memory = cache_mem_bytes / (1024**3)  # Convert to GB
-
-    measured_peak_memory = (
-        float(peak_mem_bytes) / (1024**3) if isinstance(peak_mem_bytes, int | float) else None
-    )
-    current_peak_memory = result.peak_memory
-    if (
-        measured_peak_memory is not None
-        and measured_peak_memory > 0
-        and (not isinstance(current_peak_memory, int | float) or float(current_peak_memory) <= 0)
-    ):
-        result.peak_memory = measured_peak_memory
     return result
 
 
@@ -15590,7 +15577,7 @@ def _run_model_generation(
     mx.synchronize()
     duration = timer.stop()
 
-    # Capture memory metrics immediately after generation while model state is intact.
+    # Capture local timing plus active/cache memory snapshots while model state is intact.
     return _attach_generation_runtime_metrics(output, duration=duration)
 
 

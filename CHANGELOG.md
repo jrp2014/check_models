@@ -15,6 +15,12 @@ Notable changes to this project will be documented in this file.
   persist `total_tokens` and `prompt_tps` in JSONL metrics, and expose
   `--kv-quant-scheme` for upstream KV-cache backend selection.
 
+### Changed
+
+- Stop locally backfilling `GenerationResult.peak_memory` from MLX allocator
+  probes now that mlx-vlm populates that field directly; keep local timing plus
+  active/cache memory snapshots and the per-run peak reset between models.
+
 ## [0.5.0] - 2026-04-19
 
 ### Added
