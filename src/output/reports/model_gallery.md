@@ -1825,7 +1825,7 @@ _Review:_ C 62/100 | Special control token &lt;|end|&gt; appeared in generated
           text. | Special control token &lt;|endoftext|&gt; appeared in
           generated text. | hit token cap (500) | nontext prompt burden=66%
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > Title: Windsor Castle from River Thames
 >
@@ -1882,7 +1882,7 @@ _Review:_ C 62/100 | Special control token &lt;|end|&gt; appeared in generated
 > 2&#46; Add a function to calculate the standard deviation of the engagement
 > levels for each marketing strategy.
 > 3&#46; Include a visualization of the average engagement levels
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 

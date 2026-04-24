@@ -217,7 +217,7 @@ def test_gallery_output_uses_wrapped_blockquote_instead_of_fence() -> None:
     md = _gallery_lines_for(result)
 
     assert "```text" not in md
-    assert "<!-- markdownlint-disable MD028 MD037 MD045 -->" in md
+    assert "<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->" in md
     assert "> [!NOTE]" not in md
     assert "> alpha" in md
     assert "\n>\n> beta" in md
@@ -507,6 +507,20 @@ def test_wrapped_blockquote_preserves_plain_bracket_text() -> None:
 
     md = "\n".join(parts)
     assert "> decade_data[decade]['count'] += 1" in md
+
+
+def test_wrapped_blockquote_disables_reversed_link_lint_for_code_like_text() -> None:
+    """Wrapped blockquotes should suppress MD011 for model text that looks like code."""
+    parts: list[str] = []
+
+    check_models._append_markdown_wrapped_blockquote(
+        parts,
+        "df.groupby('MarketingStrategy')['EngagementLevel'].mean()",
+    )
+
+    md = "\n".join(parts)
+    assert "<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->" in md
+    assert "> df.groupby('MarketingStrategy')['EngagementLevel'].mean()" in md
 
 
 def test_wrapped_blockquote_normalizes_wrapped_leading_spaces() -> None:

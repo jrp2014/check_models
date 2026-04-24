@@ -195,7 +195,7 @@ when available.
 
 _Prompt used:_
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > Analyze this image for cataloguing metadata, using British English.
 >

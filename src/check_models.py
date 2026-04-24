@@ -10246,7 +10246,7 @@ def _append_markdown_wrapped_blockquote(
     """
     if not parts or parts[-1] != "":
         parts.append("")
-    parts.append("<!-- markdownlint-disable MD028 MD037 MD045 -->")
+    parts.append("<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->")
     blockquote_lines: list[str] = [">"]
 
     normalized: str = content.replace("\r\n", "\n").replace("\r", "\n")
@@ -10271,7 +10271,7 @@ def _append_markdown_wrapped_blockquote(
             )
 
     parts.extend(blockquote_lines)
-    parts.append("<!-- markdownlint-enable MD028 MD037 MD045 -->")
+    parts.append("<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->")
     if not parts or parts[-1] != "":
         parts.append("")
 
