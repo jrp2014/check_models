@@ -20,6 +20,10 @@ Notable changes to this project will be documented in this file.
 - Stop locally backfilling `GenerationResult.peak_memory` from MLX allocator
   probes now that mlx-vlm populates that field directly; keep local timing plus
   active/cache memory snapshots and the per-run peak reset between models.
+- Trim preflight diagnostic noise by removing the obsolete Transformers
+  TensorFlow/Flax/JAX backend-guard warning path, demoting legacy snapshot-file
+  notes for still-working community repos, and refreshing upstream MLX stack
+  version floors to match current `mlx-vlm` / `mlx-lm` metadata.
 
 ### Fixed
 

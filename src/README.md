@@ -443,15 +443,8 @@ Several behaviors can be customized via environment variables (useful for CI/aut
 | `MLX_VLM_WIDTH` | Force CLI output width (columns) | Auto-detect terminal | `MLX_VLM_WIDTH=120` |
 | `NO_COLOR` | Disable ANSI colors in output | Not set (colors enabled) | `NO_COLOR=1` |
 | `FORCE_COLOR` | Force ANSI colors even in non-TTY | Not set | `FORCE_COLOR=1` |
-| `TRANSFORMERS_NO_TF` | Legacy Transformers backend guard (best effort) | Exported only if installed `transformers` still references it | `TRANSFORMERS_NO_TF=0` |
-| `USE_TF` | Compatibility backend guard (best effort) | Exported only if installed `transformers` still references it | `USE_TF=1` |
-| `MLX_VLM_ALLOW_TF` | Allow user-installed TensorFlow imports | Not set (blocked) | `MLX_VLM_ALLOW_TF=1` to allow |
 | `TOKENIZERS_PARALLELISM` | Disable tokenizer parallelism warnings | `false` | `TOKENIZERS_PARALLELISM=true` |
 | `MLX_METAL_JIT` | Optional `tools/update.sh` override (`MLX_METAL_JIT`) | Unset (uses MLX default `OFF`, pre-built kernels) | `MLX_METAL_JIT=ON` for runtime JIT |
-
-When backend guards are active, the script exports only the legacy
-`TRANSFORMERS_NO_*` and `USE_*` variables still referenced by the installed
-`transformers` version.
 
 **Examples**:
 
@@ -461,9 +454,6 @@ MLX_VLM_WIDTH=120 python -m check_models --folder ~/Pictures
 
 # Disable colors for log file capture
 NO_COLOR=1 python -m check_models > output.log 2>&1
-
-# Allow manually installed TensorFlow for a specific model (may crash on Apple Silicon)
-MLX_VLM_ALLOW_TF=1 python -m check_models --models model-needing-tf
 ```
 
 ## Git Hygiene and Caches
@@ -722,7 +712,7 @@ pip install -e ".[dev,extras,torch]"  # dev tools + optional model/runtime deps
 > The `tools/update.sh` helper supports environment flags: `SKIP_TORCH=1` to skip PyTorch installation (torch is included by default), `MLX_METAL_JIT=ON` for smaller binaries with runtime compilation (default: `OFF` for pre-built kernels), `CLEAN_BUILD=1` to clean build artifacts first.
 
 > [!NOTE]
-> Installing `sentence-transformers` isn't necessary for this tool and may pull heavy backends into import paths; a heads‑up is logged if detected.
+> Installing `sentence-transformers` isn't necessary for this tool and may pull heavy backends into import paths; `check_models` ignores it in the normal execution path.
 
 > [!NOTE]
 > Long embedded CSS / HTML lines are intentional (readability > artificial wrapping).
@@ -1004,8 +994,8 @@ A comprehensive Markdown report focused on upstream debugging and issue reportin
 Some runs emit preflight compatibility warnings before inference starts. These warnings are informational by default.
 
 - **What they mean**: `check_models` detected an upstream package or API-compatibility pattern that may matter for this environment or version combination.
-- **What you should do**: keep running if outputs look healthy; investigate when the same run also shows unexpected TensorFlow/Flax/JAX imports, startup hangs, or backend/runtime crashes.
-- **What you should not do**: do not treat the warning alone as a failed benchmark, and do not enable `MLX_VLM_ALLOW_TF=1` just to silence it unless you intentionally want TensorFlow-side behavior.
+- **What you should do**: keep running if outputs look healthy; investigate when the same run also shows API mismatches, startup hangs, or backend/runtime crashes.
+- **What you should not do**: do not treat the warning alone as a failed benchmark.
 - **When filing issues**: include the warning text and reported library versions so upstream maintainers can match it to the correct compatibility window.
 
 
@@ -1057,25 +1047,11 @@ python -m check_models --exclude "meta-llama/Llama-3.2-90B-Vision-Instruct"
 
 **Script crashes with mutex error**: If you see `libc++abi: terminating due to uncaught exception of type std::__1::system_error: mutex lock failed: Invalid argument`, TensorFlow is installed and conflicting with MLX.
 
-The script applies best-effort backend guard env vars (`TRANSFORMERS_NO_*` and
-`USE_*`) only when the installed `transformers` still references them, unless
-you set `MLX_VLM_ALLOW_TF=1`. If TensorFlow still gets imported:
-
-Option 1 - Keep TensorFlow but ensure backend guards are set (script does this automatically):
-
-```bash
-export TRANSFORMERS_NO_TF=1
-export USE_TF=0
-python -m check_models  # Run normally - the script sets this env var automatically
-```
-
-Option 2 - Uninstall TensorFlow completely (recommended for MLX-only environments):
+Uninstall TensorFlow completely in MLX-only environments:
 
 ```bash
 pip uninstall -y tensorflow tensorboard keras absl-py astunparse flatbuffers gast google_pasta grpcio h5py libclang ml_dtypes opt_einsum termcolor wrapt tensorboard-data-server
 ```
-
-**Note**: `check_models` does not install TensorFlow. If you add TensorFlow manually for a specific remote-code model, you can allow it with `MLX_VLM_ALLOW_TF=1`, but this may cause mutex crashes on Apple Silicon.
 
 ### Debug Mode
 
@@ -1093,36 +1069,16 @@ This provides:
 - Error stack traces
 - Library version information
 
-### Framework Detection and Automatic Blocking
+### Framework Detection Notes
 
-The script **automatically** applies best-effort backend guards to reduce accidental TensorFlow/JAX/Flax imports on Apple Silicon:
+- PyTorch is allowed by default; some models require it.
+- `sentence-transformers` is not part of the normal `check_models` path.
+- TensorFlow is not managed by `check_models`; if it is installed and you hit
+  Apple Silicon mutex crashes, remove TensorFlow from the environment.
 
-- On startup, exports only the legacy `TRANSFORMERS_NO_*` / `USE_*` guard vars still referenced by the installed `transformers` build (unless you override with `MLX_VLM_ALLOW_TF=1`)
-- PyTorch is allowed by default (some models require it, e.g., Phi-3-vision)
-- Logs a warning when TensorFlow is detected while guards are active
-- Also logs if `sentence-transformers` is present
-
-**⚠️ About TensorFlow on Apple Silicon:**
-
-If TensorFlow is installed, these guards often prevent loading and avoid mutex crashes. However, if you encounter the error `libc++abi: terminating due to uncaught exception of type std::__1::system_error: mutex lock failed: Invalid argument`:
-
-1. **First try**: Verify the environment variable is set (the script does this automatically):
-
-   ```bash
-   export TRANSFORMERS_NO_TF=1
-   export USE_TF=0
-   python -m check_models
-   ```
-
-2. **If that fails**: Uninstall TensorFlow completely (recommended for MLX-only environments):
-
-   ```bash
-   pip uninstall -y tensorflow tensorboard keras
-   ```
-
-3. **If you intentionally installed TensorFlow for a model**: Set `MLX_VLM_ALLOW_TF=1` to allow it, but be aware this may cause crashes on Apple Silicon
-
-**Why this matters**: TensorFlow's Abseil mutex implementation conflicts with MLX on macOS/ARM, causing crashes. Most MLX VLMs don't need TensorFlow.
+**Why this matters**: TensorFlow's Abseil mutex implementation can conflict with
+MLX on macOS/ARM, causing crashes. Most MLX VLM workflows do not need
+TensorFlow.
 
 ## Notes
 

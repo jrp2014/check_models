@@ -780,7 +780,7 @@ class TestPreflightDependencyDiagnostics:
                 "huggingface-hub": "1.10.1",
             },
         )
-        assert requirements["mlx"][0] == mod.PROJECT_RUNTIME_STACK_MINIMUMS["mlx"]
+        assert requirements["mlx"][0] == mod.UPSTREAM_MLX_VLM_MINIMUMS["mlx"]
         assert requirements["mlx-vlm"][0] == mod.PROJECT_RUNTIME_STACK_MINIMUMS["mlx-vlm"]
         assert requirements["transformers"][0] == mod.PROJECT_MIN_TRANSFORMERS_VERSION
         assert requirements["mlx-lm"][0] == mod.PROJECT_OPTIONAL_STACK_MINIMUMS["mlx-lm"]
@@ -803,7 +803,7 @@ class TestPreflightDependencyDiagnostics:
                 "huggingface-hub": "1.9.9",
             },
         )
-        assert any("mlx==0.29.9" in issue and "0.31.1" in issue for issue in issues)
+        assert any("mlx==0.29.9" in issue and "0.31.2" in issue for issue in issues)
         assert any("mlx-vlm==0.4.1" in issue and "0.4.4" in issue for issue in issues)
         assert any("mlx-lm==0.30.9" in issue and "0.31.3" in issue for issue in issues)
         assert any("transformers==5.3.9" in issue and "5.5.3" in issue for issue in issues)
@@ -889,25 +889,6 @@ class TestPreflightDependencyDiagnostics:
         assert mod._has_mlx_vlm_load_image_path_bug(risky_source)
         assert not mod._has_mlx_vlm_load_image_path_bug(safe_source)
 
-    def test_has_transformers_backend_guard_names(self, mod: types.ModuleType) -> None:
-        """Guard-name detector should reflect source content."""
-        assert mod._has_transformers_backend_guard_names("TRANSFORMERS_NO_TF")
-        assert mod._has_transformers_backend_guard_names("USE_TF")
-        assert not mod._has_transformers_backend_guard_names("USE_TORCH_XLA")
-
-    def test_transformers_backend_guard_defaults_match_source(
-        self,
-        mod: types.ModuleType,
-    ) -> None:
-        """Only guard vars referenced by transformers should be exported."""
-        source = mod._load_transformers_import_utils_source()
-        expected = {
-            key: value
-            for key, value in mod._TRANSFORMERS_BACKEND_GUARD_ENV_CANDIDATES.items()
-            if source is None or key in source
-        }
-        assert expected == mod._TRANSFORMERS_BACKEND_GUARD_ENV_DEFAULTS
-
     def test_resolve_distribution_source_file_finds_relative_path(
         self,
         mod: types.ModuleType,
@@ -965,6 +946,34 @@ class TestPreflightDependencyDiagnostics:
         issue = mod._detect_mlx_vlm_load_image_issue()
         assert issue is not None
         assert "unguarded URL startswith() branch" in issue
+
+    def test_validate_model_artifact_layout_demotes_legacy_snapshot_notes(
+        self,
+        mod: types.ModuleType,
+        caplog: pytest.LogCaptureFixture,
+        tmp_path: Path,
+    ) -> None:
+        """Legacy snapshot-layout notes should stay out of warning-level logs."""
+        (tmp_path / "config.json").write_text("{}", encoding="utf-8")
+
+        with caplog.at_level(logging.DEBUG, logger=mod.LOGGER_NAME):
+            mod._validate_model_artifact_layout(
+                model_identifier="org/model",
+                snapshot_path=tmp_path,
+                tokenizer=object(),
+            )
+
+        assert (
+            "Legacy snapshot note for org/model: tokenizer artifacts missing from snapshot"
+            in caplog.text
+        )
+        assert (
+            "Legacy snapshot note for org/model: processor config missing from snapshot"
+            in caplog.text
+        )
+        assert "snapshot missing config.json" not in caplog.text
+        assert "loaded processor has no image_processor" not in caplog.text
+        assert not any(record.levelno >= logging.WARNING for record in caplog.records)
 
     def test_resolve_distribution_source_file_uses_module_spec_fallback(
         self,

@@ -706,43 +706,6 @@ except importlib.metadata.PackageNotFoundError:
     MISSING_DEPENDENCIES["mlx-lm"] = ERROR_MLX_LM_MISSING
 
 
-def _load_transformers_import_utils_source() -> str | None:
-    """Load transformers import-utils source without importing transformers."""
-    import_utils_spec = importlib_util.find_spec("transformers.utils.import_utils")
-    import_utils_origin = getattr(import_utils_spec, "origin", None) if import_utils_spec else None
-    if not import_utils_origin:
-        return None
-
-    try:
-        return Path(import_utils_origin).read_text(encoding="utf-8")
-    except OSError:
-        return None
-
-
-_transformers_guard_enabled: bool = os.getenv("MLX_VLM_ALLOW_TF", "0") != "1"
-_TRANSFORMERS_BACKEND_GUARD_ENV_CANDIDATES: Final[dict[str, str]] = {
-    # Legacy guard names used in older transformers releases.
-    "TRANSFORMERS_NO_TF": "1",
-    "TRANSFORMERS_NO_FLAX": "1",
-    "TRANSFORMERS_NO_JAX": "1",
-    # Compatibility with releases that used USE_* toggles.
-    "USE_TF": "0",
-    "USE_FLAX": "0",
-    "USE_JAX": "0",
-}
-_transformers_import_utils_source = _load_transformers_import_utils_source()
-_TRANSFORMERS_BACKEND_GUARD_ENV_DEFAULTS: Final[dict[str, str]] = {
-    env_key: env_value
-    for env_key, env_value in _TRANSFORMERS_BACKEND_GUARD_ENV_CANDIDATES.items()
-    if _transformers_import_utils_source is None or env_key in _transformers_import_utils_source
-}
-if _transformers_guard_enabled:
-    # Prevent Transformers from importing heavy backends that can hang on macOS/ARM
-    # when they are present in the environment but not needed for MLX workflows.
-    for env_key, env_value in _TRANSFORMERS_BACKEND_GUARD_ENV_DEFAULTS.items():
-        os.environ.setdefault(env_key, env_value)
-
-
 # =============================================================================
 # TYPE ALIASES & PROTOCOLS
 # =============================================================================
@@ -6260,13 +6223,13 @@ def _collect_upstream_requirements(
 
     if versions.get("mlx-vlm"):
         # mlx-vlm requirements.txt currently specifies:
-        #   mlx>=0.30.0, mlx-lm>=0.31.0, transformers>=5.1.0
+        #   mlx>=0.31.2, mlx-lm>=0.31.3, transformers>=5.5.0
         for package_name, minimum_version in UPSTREAM_MLX_VLM_MINIMUMS.items():
             _record_requirement(package_name, minimum_version, "mlx-vlm")
 
     if versions.get("mlx-lm"):
         # mlx-lm setup.py currently specifies:
-        #   mlx>=0.30.4, transformers>=5.0.0
+        #   mlx>=0.31.2, transformers>=5.0.0
         for package_name, minimum_version in UPSTREAM_MLX_LM_MINIMUMS.items():
             _record_requirement(package_name, minimum_version, "mlx-lm")
 
@@ -6369,31 +6332,6 @@ def _detect_mlx_vlm_load_image_issue() -> str | None:
         )
 
     return None
-
-
-def _has_transformers_backend_guard_names(import_utils_source: str) -> bool:
-    """Return whether transformers source references known backend-guard env vars."""
-    guard_names = tuple(_TRANSFORMERS_BACKEND_GUARD_ENV_CANDIDATES)
-    return any(name in import_utils_source for name in guard_names)
-
-
-def _detect_transformers_env_guard_issue() -> str | None:
-    """Detect whether transformers still honors backend guard environment variables."""
-    if not _transformers_guard_enabled:
-        return None
-
-    import_utils_source = _transformers_import_utils_source
-    if import_utils_source is None:
-        return None
-
-    if _has_transformers_backend_guard_names(import_utils_source):
-        return None
-
-    return (
-        "transformers import utils no longer reference the TF/FLAX/JAX backend "
-        "guard env vars used by check_models; backend guard hints for those "
-        "backends may be ignored with this version."
-    )
 
 
 _RUNTIME_API_CALL_CONTRACTS: Final[dict[str, tuple[str, tuple[str, ...]]]] = {
@@ -6578,10 +6516,6 @@ def _collect_preflight_package_issues(versions: LibraryVersionDict) -> list[str]
     load_image_issue = _detect_mlx_vlm_load_image_issue()
     if load_image_issue:
         issues.append(load_image_issue)
-
-    guard_issue = _detect_transformers_env_guard_issue()
-    if guard_issue:
-        issues.append(guard_issue)
 
     issues.extend(_detect_runtime_api_drift_issues())
 
@@ -11139,9 +11073,9 @@ def _diagnostics_preflight_section(preflight_issues: Sequence[str]) -> list[str]
             "These warnings were detected before inference. They are informational by "
             "default and do not invalidate successful runs on their own.",
             "Keep running if outputs look healthy. Escalate only when the warnings line "
-            "up with backend-import side effects, startup hangs, or runtime crashes.",
-            "Do not treat these warnings alone as a reason to set MLX_VLM_ALLOW_TF=1 or "
-            "to assume the benchmark results are bad.",
+            "up with API mismatches, startup hangs, or runtime crashes.",
+            "Do not treat these warnings alone as a reason to assume the benchmark "
+            "results are bad.",
         ],
     )
 
@@ -12361,13 +12295,6 @@ _REPRO_ENV_KEYS: Final[tuple[str, ...]] = (
     "HF_HUB_CACHE",
     "TRANSFORMERS_CACHE",
     "TOKENIZERS_PARALLELISM",
-    "TRANSFORMERS_NO_TF",
-    "TRANSFORMERS_NO_FLAX",
-    "TRANSFORMERS_NO_JAX",
-    "USE_TF",
-    "USE_FLAX",
-    "USE_JAX",
-    "MLX_VLM_ALLOW_TF",
     "MLX_VLM_WIDTH",
     "PYTHONPATH",
 )
@@ -14988,7 +14915,6 @@ def _validate_model_artifact_layout(
     model_identifier: str,
     snapshot_path: Path | None,
     tokenizer: PreTrainedTokenizerBase | SupportsTextDecoder | None,
-    processor: ProcessorMixin,
 ) -> None:
     """Validate local model artifact structure and emit actionable warnings.
 
@@ -15002,19 +14928,6 @@ def _validate_model_artifact_layout(
         )
         return
 
-    if not (snapshot_path / "config.json").exists():
-        logger.warning(
-            "Preflight warning for %s: snapshot missing config.json (%s)",
-            model_identifier,
-            snapshot_path,
-        )
-
-    if getattr(processor, "image_processor", None) is None:
-        logger.warning(
-            "Preflight warning for %s: loaded processor has no image_processor.",
-            model_identifier,
-        )
-
     if tokenizer is not None:
         tokenizer_candidates = (
             "tokenizer_config.json",
@@ -15023,16 +14936,16 @@ def _validate_model_artifact_layout(
             "vocab.json",
         )
         if not any((snapshot_path / name).exists() for name in tokenizer_candidates):
-            logger.warning(
-                "Preflight warning for %s: tokenizer artifacts missing from snapshot (%s).",
+            logger.debug(
+                "Legacy snapshot note for %s: tokenizer artifacts missing from snapshot (%s).",
                 model_identifier,
                 ", ".join(tokenizer_candidates),
             )
 
     processor_candidates = ("preprocessor_config.json", "processor_config.json")
     if not any((snapshot_path / name).exists() for name in processor_candidates):
-        logger.warning(
-            "Preflight warning for %s: processor config missing from snapshot (%s).",
+        logger.debug(
+            "Legacy snapshot note for %s: processor config missing from snapshot (%s).",
             model_identifier,
             ", ".join(processor_candidates),
         )
@@ -15079,7 +14992,6 @@ def _run_model_preflight_validators(
         model_identifier=model_identifier,
         snapshot_path=snapshot_path,
         tokenizer=tokenizer,
-        processor=processor,
     )
 
 
@@ -16768,25 +16680,10 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     # Apply CLI output preferences (color + width)
     _apply_cli_output_preferences(args)
 
-    # Warn if TensorFlow or sentence-transformers are present
-    tf_present = bool(importlib_util.find_spec("tensorflow"))
+    # Note extra framework installs that are not part of the normal MLX path.
     st_present = bool(importlib_util.find_spec("sentence_transformers"))
-    guard_on = os.getenv("MLX_VLM_ALLOW_TF", "0") != "1"
-    if guard_on and tf_present:
-        if _TRANSFORMERS_BACKEND_GUARD_ENV_DEFAULTS:
-            logger.info(
-                "TensorFlow detected; exported supported legacy transformers backend guard env vars: %s "
-                "(set MLX_VLM_ALLOW_TF=1 to opt in).",
-                ", ".join(sorted(_TRANSFORMERS_BACKEND_GUARD_ENV_DEFAULTS)),
-            )
-        else:
-            logger.warning(
-                "TensorFlow detected, but current transformers no longer honors the legacy TF/Flax/JAX "
-                "backend-guard env vars used by check_models; no backend suppression is being enforced. "
-                "Set MLX_VLM_ALLOW_TF=1 to silence this warning if you explicitly want TensorFlow available.",
-            )
     if st_present:
-        logger.warning(
+        logger.debug(
             "Detected 'sentence-transformers'. It's not used here by default and may "
             "import heavy backends.",
         )
@@ -18339,8 +18236,7 @@ def _format_action_snapshot_parts(
         )
         append_line(
             "Escalate only if",
-            "they line up with unexpected TF/Flax/JAX imports, startup hangs, "
-            "or backend/runtime crashes.",
+            "they line up with API mismatches, startup hangs, or backend/runtime crashes.",
         )
     close_group()
 

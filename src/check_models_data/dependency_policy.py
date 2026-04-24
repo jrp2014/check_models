@@ -18,13 +18,13 @@ PROJECT_OPTIONAL_STACK_MINIMUMS: Final[dict[str, str]] = {
 PROJECT_MIN_TRANSFORMERS_VERSION: Final[str] = PROJECT_RUNTIME_STACK_MINIMUMS["transformers"]
 
 UPSTREAM_MLX_VLM_MINIMUMS: Final[dict[str, str]] = {
-    "mlx": "0.30.0",
-    "mlx-lm": "0.31.0",
-    "transformers": "5.1.0",
+    "mlx": "0.31.2",
+    "mlx-lm": "0.31.3",
+    "transformers": "5.5.0",
 }
 
 UPSTREAM_MLX_LM_MINIMUMS: Final[dict[str, str]] = {
-    "mlx": "0.30.4",
+    "mlx": "0.31.2",
     "transformers": "5.0.0",
 }
 

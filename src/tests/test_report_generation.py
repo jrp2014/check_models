@@ -410,7 +410,7 @@ class TestHtmlReportEdgeCases:
             results=results,
             prompt="describe",
             preflight_issues=(
-                "transformers import utils no longer reference the TF/FLAX/JAX backend",
+                "transformers==5.4.0 is below minimum 5.5.3 required by check_models.",
             ),
         )
 
@@ -426,9 +426,7 @@ class TestHtmlReportEdgeCases:
         content = out.read_text(encoding="utf-8")
         assert "Preflight compatibility" in content
         assert "informational warning(s); do not treat these alone as run failures" in content
-        assert (
-            "unexpected TF/Flax/JAX imports, startup hangs, or backend/runtime crashes" in content
-        )
+        assert "API mismatches, startup hangs, or backend/runtime crashes" in content
 
     def test_html_report_preserves_full_output_in_details(self, tmp_path: Path) -> None:
         """HTML table should reuse the shared preview while keeping full text expandable."""
@@ -524,7 +522,7 @@ class TestMarkdownReportEdgeCases:
             results=results,
             prompt="describe",
             preflight_issues=(
-                "transformers import utils no longer reference the TF/FLAX/JAX backend",
+                "transformers==5.4.0 is below minimum 5.5.3 required by check_models.",
             ),
         )
 
@@ -543,7 +541,8 @@ class TestMarkdownReportEdgeCases:
         assert "do not treat" in content
         assert "run failures." in content
         assert "_Escalate only if:_" in content
-        assert "startup hangs, or backend/runtime crashes." in content
+        assert "API mismatches" in content
+        assert "backend/runtime crashes." in content
 
     def test_prompt_section_uses_wrapped_blockquote(self, tmp_path: Path) -> None:
         """Prompt section should use the wrapped blockquote helper for readable Markdown."""
@@ -959,14 +958,14 @@ class TestDiagnosticsReport:
             prompt="test",
             history=DiagnosticsHistoryInputs(
                 preflight_issues=(
-                    "transformers import utils no longer reference the TF/FLAX/JAX backend",
+                    "transformers==5.4.0 is below minimum 5.5.3 required by check_models.",
                 ),
             ),
         )
         assert result is True
         content = out.read_text(encoding="utf-8")
         assert "## Preflight Compatibility Warnings" in content
-        assert "transformers import utils no longer reference the TF/FLAX/JAX backend" in content
+        assert "transformers==5.4.0 is below minimum 5.5.3 required by check_models." in content
         assert "They are informational by" in content
         assert "default and do not invalidate successful runs on their own." in content
         assert "transformers/issues/new" in content
@@ -983,7 +982,7 @@ class TestDiagnosticsReport:
             prompt="test",
             history=DiagnosticsHistoryInputs(
                 preflight_issues=(
-                    "transformers import utils no longer reference the TF/FLAX/JAX backend",
+                    "transformers==5.4.0 is below minimum 5.5.3 required by check_models.",
                     "mlx runtime probe reported a suspicious cache incompatibility",
                 ),
             ),
@@ -1054,7 +1053,7 @@ class TestDiagnosticsReport:
             prompt="test",
             history=DiagnosticsHistoryInputs(
                 preflight_issues=(
-                    "transformers import utils no longer reference the TF/FLAX/JAX backend",
+                    "transformers==5.4.0 is below minimum 5.5.3 required by check_models.",
                 ),
             ),
         )
@@ -1820,7 +1819,7 @@ class TestDiagnosticsReport:
             prompt="test",
             history=DiagnosticsHistoryInputs(
                 preflight_issues=(
-                    "transformers import utils no longer reference the TF/FLAX/JAX backend",
+                    "transformers==5.4.0 is below minimum 5.5.3 required by check_models.",
                     "mlx runtime probe reported a suspicious cache incompatibility",
                 ),
             ),
@@ -2240,7 +2239,7 @@ class TestDiagnosticsReport:
                 ),
             ),
             preflight_issues=(
-                "transformers import utils no longer reference the TF/FLAX/JAX backend",
+                "transformers==5.4.0 is below minimum 5.5.3 required by check_models.",
             ),
         )
         artifacts = DiagnosticsArtifacts(
@@ -2367,7 +2366,7 @@ class TestDiagnosticsReport:
                 ),
             ),
             preflight_issues=(
-                "transformers import utils no longer reference the TF/FLAX/JAX backend",
+                "transformers==5.4.0 is below minimum 5.5.3 required by check_models.",
                 "mlx runtime probe reported a suspicious cache incompatibility",
             ),
         )
