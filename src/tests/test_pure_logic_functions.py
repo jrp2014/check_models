@@ -133,9 +133,11 @@ class TestValidateAndWarnModelSelection:
         """Excluded models missing from cache should emit a warning."""
         args = self._make_args(exclude=["missing-model"], models=["selected-model"])
 
-        with patch.object(mod, "get_cached_model_ids", return_value=["cached-model"]):
-            with caplog.at_level(logging.WARNING, logger=mod.LOGGER_NAME):
-                mod.validate_and_warn_model_selection(args)
+        with (
+            patch.object(mod, "get_cached_model_ids", return_value=["cached-model"]),
+            caplog.at_level(logging.WARNING, logger=mod.LOGGER_NAME),
+        ):
+            mod.validate_and_warn_model_selection(args)
 
         assert (
             "The following excluded models are not in the local cache and will have no effect: "
@@ -150,9 +152,11 @@ class TestValidateAndWarnModelSelection:
         """Cached exclusions should not warn just because they are not in --models."""
         args = self._make_args(exclude=["cached-model"], models=["selected-model"])
 
-        with patch.object(mod, "get_cached_model_ids", return_value=["cached-model"]):
-            with caplog.at_level(logging.WARNING, logger=mod.LOGGER_NAME):
-                mod.validate_and_warn_model_selection(args)
+        with (
+            patch.object(mod, "get_cached_model_ids", return_value=["cached-model"]),
+            caplog.at_level(logging.WARNING, logger=mod.LOGGER_NAME),
+        ):
+            mod.validate_and_warn_model_selection(args)
 
         assert not caplog.messages
 

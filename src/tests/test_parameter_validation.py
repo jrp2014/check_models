@@ -198,7 +198,7 @@ class TestCliArgumentNormalization:
         args = parser.parse_args(
             [
                 "--folder",
-                "/tmp",
+                "test-folder",
                 "--eos-tokens",
                 "</think>",
                 "--eos-tokens",

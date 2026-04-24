@@ -92,7 +92,7 @@ def test_cli_parser_accumulates_repeated_exclude_flags() -> None:
     args = parser.parse_args(
         [
             "--folder",
-            "/tmp",
+            "test-folder",
             "-e",
             "Qwen/Qwen3-VL-2B-Instruct",
             "-e",
@@ -113,7 +113,7 @@ def test_cli_parser_accumulates_repeated_model_flags() -> None:
     args = parser.parse_args(
         [
             "--folder",
-            "/tmp",
+            "test-folder",
             "-m",
             "model-a",
             "-m",
@@ -132,7 +132,7 @@ def test_cli_parser_accumulates_repeated_eos_token_flags() -> None:
     args = parser.parse_args(
         [
             "--folder",
-            "/tmp",
+            "test-folder",
             "--eos-tokens",
             "</think>",
             "--eos-tokens",
