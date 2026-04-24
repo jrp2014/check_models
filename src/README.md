@@ -172,8 +172,23 @@ python -m check_models -f ~/Pictures/Processed -p "What is the main object in th
 # Explicit model list (skips cache discovery)
 python -m check_models -f ~/Pictures/Processed -m mlx-community/nanoLLaVA mlx-community/llava-1.5-7b-hf
 
+# Repeated -m/--models flags also accumulate model IDs
+python -m check_models -f ~/Pictures/Processed \
+  -m mlx-community/nanoLLaVA \
+  -m mlx-community/llava-1.5-7b-hf mlx-community/Qwen2-VL-2B-Instruct
+
 # Exclude specific models from the automatic cache scan
 python -m check_models -f ~/Pictures/Processed -e mlx-community/problematic-model other/model
+
+# Repeated -e/--exclude flags accumulate exclusions
+python -m check_models -f ~/Pictures/Processed \
+  -e Qwen/Qwen3-VL-2B-Instruct \
+  -e mlx-community/Qwen3-VL-2B-Thinking-bf16
+
+# Repeated --eos-tokens flags accumulate stop tokens
+python -m check_models --image test.jpg --models mlx-community/nanoLLaVA \
+  --eos-tokens '</think>' \
+  --eos-tokens '\n' '<END>'
 
 # Combine explicit list with exclusions
 python -m check_models -f ~/Pictures/Processed -m model1 model2 model3 -e model2
@@ -825,14 +840,14 @@ See module docstrings and `__all__` exports for complete API reference.
 | `--output-log` | Path | `output/check_models.log` | Command line output log filename. |
 | `--output-env` | Path | `output/environment.log` | Environment log filename (pip freeze, conda list). |
 | `--output-diagnostics` | Path | `output/reports/diagnostics.md` | Diagnostics report filename (generated on failures/harness issues). |
-| `-m`, `--models` | list[str] | (none) | Explicit model IDs/paths; disables cache discovery. |
-| `-e`, `--exclude` | list[str] | (none) | Models to exclude (applies to cache scan or explicit list). |
+| `-m`, `--models` | list[str] | (none) | Explicit model IDs/paths; disables cache discovery. May be repeated; model lists accumulate across occurrences. |
+| `-e`, `--exclude` | list[str] | (none) | Models to exclude (applies to cache scan or explicit list). May be repeated; exclusions accumulate across occurrences. |
 | `--trust-remote-code` / `--no-trust-remote-code` | flag | `True` | Allow/disallow custom code from Hub models. Use `--no-trust-remote-code` for security. |
 | `--revision` | str | (none) | Model revision (branch, tag, or commit) for reproducible runs. |
 | `--adapter-path` | str | (none) | Path to LoRA adapter weights to apply on top of the base model. |
 | `-p`, `--prompt` | str | omitted | Custom prompt text. Requires a value when provided; if omitted, a non-speculative metadata-verification prompt is generated automatically. |
-| `--resize-shape` | int(s) | (none) | Resize image input before processor handling. Provide 1 integer for square resize or 2 for height width. |
-| `--eos-tokens` | list[str] | (none) | Additional EOS tokens to stop on. Supports escaped values like `\n`. |
+| `--resize-shape` | int(s) | (none) | Resize image input before processor handling. Provide 1 integer for square resize or 2 for height width after one flag occurrence. |
+| `--eos-tokens` | list[str] | (none) | Additional EOS tokens to stop on. Supports escaped values like `\n`. May be repeated; token lists accumulate across occurrences. |
 | `--skip-special-tokens` | flag | `False` | Skip tokenizer special tokens in the detokenized output. |
 | `--processor-kwargs` | JSON | (none) | Extra processor kwargs as a JSON object. Example: `'{"cropping": false, "max_patches": 3}'`. |
 | `--enable-thinking` | flag | `False` | Enable thinking mode in the upstream chat template and generation flow. |
@@ -882,6 +897,11 @@ Model selection logic:
 4. `--models` + `--exclude`: intersect explicit list then subtract exclusions.
 
 The script warns about exclusions that don't match any candidate model.
+
+List-valued CLI flag semantics:
+
+1. `--models`, `--exclude`, and `--eos-tokens` may be repeated; repeated occurrences accumulate values in order.
+2. `--resize-shape` remains a single structured value; provide it after one flag occurrence.
 
 
 

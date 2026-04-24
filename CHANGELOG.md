@@ -21,6 +21,21 @@ Notable changes to this project will be documented in this file.
   probes now that mlx-vlm populates that field directly; keep local timing plus
   active/cache memory snapshots and the per-run peak reset between models.
 
+### Fixed
+
+- Warn exclusions against local Hugging Face cache membership even when
+  `--models` is used, so cached-but-unselected models no longer trigger a
+  false warning while truly uncached exclusions still do.
+- Fix repeated `-e/--exclude` CLI flags to accumulate all exclusions instead of
+  silently keeping only the last group, so cache-scan runs honor commands like
+  `-e model-a -e model-b`.
+- Clarify in CLI help and `src/README.md` that repeated `-e/--exclude` flags
+  accumulate, while other list-valued options should be supplied after a single
+  flag occurrence.
+- Extend the same additive repeated-flag behavior to `-m/--models` and
+  `--eos-tokens`, and document that these list-valued options now accumulate
+  across repeated occurrences as well.
+
 ## [0.5.0] - 2026-04-19
 
 ### Added

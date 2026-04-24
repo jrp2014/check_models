@@ -192,6 +192,25 @@ class TestCliArgumentNormalization:
         assert args.eos_tokens == ("</think>", "\n")
         assert args.processor_kwargs == {"cropping": False, "max_patches": 3}
 
+    def test_cli_argument_normalization_handles_accumulated_eos_tokens(self) -> None:
+        """Normalization should decode EOS tokens accumulated across repeated flags."""
+        parser = __import__("check_models")._build_cli_parser()
+        args = parser.parse_args(
+            [
+                "--folder",
+                "/tmp",
+                "--eos-tokens",
+                "</think>",
+                "--eos-tokens",
+                r"\n",
+                "<END>",
+            ]
+        )
+
+        validate_cli_arguments(args)
+
+        assert args.eos_tokens == ("</think>", "\n", "<END>")
+
     def test_invalid_resize_shape_raises_error(self) -> None:
         """Resize shape should reject anything other than one or two positive ints."""
         args = self._build_args(resize_shape=[224, 224, 224])

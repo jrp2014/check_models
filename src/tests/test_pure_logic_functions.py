@@ -113,6 +113,50 @@ class TestApplyExclusions:
         assert result == ["z", "m"]
 
 
+class TestValidateAndWarnModelSelection:
+    """Tests for validate_and_warn_model_selection()."""
+
+    @staticmethod
+    def _make_args(
+        *,
+        exclude: list[str] | None,
+        models: list[str] | None,
+        verbose: bool = False,
+    ) -> argparse.Namespace:
+        return argparse.Namespace(exclude=exclude, models=models, verbose=verbose)
+
+    def test_warns_when_excluded_model_is_not_cached(
+        self,
+        mod: types.ModuleType,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """Excluded models missing from cache should emit a warning."""
+        args = self._make_args(exclude=["missing-model"], models=["selected-model"])
+
+        with patch.object(mod, "get_cached_model_ids", return_value=["cached-model"]):
+            with caplog.at_level(logging.WARNING, logger=mod.LOGGER_NAME):
+                mod.validate_and_warn_model_selection(args)
+
+        assert (
+            "The following excluded models are not in the local cache and will have no effect: "
+            "missing-model"
+        ) in caplog.messages
+
+    def test_does_not_warn_for_cached_exclusion_outside_selection(
+        self,
+        mod: types.ModuleType,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """Cached exclusions should not warn just because they are not in --models."""
+        args = self._make_args(exclude=["cached-model"], models=["selected-model"])
+
+        with patch.object(mod, "get_cached_model_ids", return_value=["cached-model"]):
+            with caplog.at_level(logging.WARNING, logger=mod.LOGGER_NAME):
+                mod.validate_and_warn_model_selection(args)
+
+        assert not caplog.messages
+
+
 # ── prepare_prompt ─────────────────────────────────────────────────────────
 
 

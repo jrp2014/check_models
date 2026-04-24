@@ -17146,7 +17146,7 @@ def validate_model_identifier(model_id: str) -> None:
 
 
 def validate_and_warn_model_selection(args: argparse.Namespace) -> None:
-    """Validate model selection and warn about ineffective exclusions.
+    """Validate exclusions against local cache membership and current selection.
 
     Args:
         args: Parsed command line arguments
@@ -17155,35 +17155,35 @@ def validate_and_warn_model_selection(args: argparse.Namespace) -> None:
     if not args.exclude:
         return  # No exclusions to validate
 
-    # Get available models for validation
-    available_models: set[str] = set()
-    if args.models:
-        # When explicit models are specified, available = explicit models
-        available_models = set(args.models)
-        context_msg: str = "explicitly specified models"
-    else:
-        # When no models specified, available = cached models
-        available_models = set(get_cached_model_ids())
-        context_msg = "locally cached models"
-
-    # Check for ineffective exclusions (models to exclude that aren't available)
+    cached_models = set(get_cached_model_ids())
     excluded_models: set[str] = set(args.exclude)
-    ineffective_exclusions: set[str] = excluded_models - available_models
+    ineffective_exclusions: set[str] = excluded_models - cached_models
 
     if ineffective_exclusions:
         ineffective_list = sorted(ineffective_exclusions)
         logger.warning(
-            "The following excluded models are not in the %s and will have no effect: %s",
-            context_msg,
+            "The following excluded models are not in the local cache and will have no effect: %s",
             ", ".join(ineffective_list),
         )
-        if args.verbose:
-            effective_exclusions = excluded_models & available_models
-            if effective_exclusions:
-                logger.info(
-                    "Effective exclusions (models that will be filtered out): %s",
-                    ", ".join(sorted(effective_exclusions)),
-                )
+
+    if not args.verbose:
+        return
+
+    if args.models:
+        effective_exclusions = excluded_models & set(args.models)
+        if effective_exclusions:
+            logger.info(
+                "Effective exclusions for this run (selected models that will be filtered out): %s",
+                ", ".join(sorted(effective_exclusions)),
+            )
+        return
+
+    effective_exclusions = excluded_models & cached_models
+    if effective_exclusions:
+        logger.info(
+            "Effective exclusions (models that will be filtered out): %s",
+            ", ".join(sorted(effective_exclusions)),
+        )
 
 
 def apply_exclusions(
@@ -20650,19 +20650,27 @@ def _build_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-m",
         "--models",
+        action="extend",
         nargs="+",
         type=str,
         default=None,
-        help="Specify models by ID/path. Overrides cache scan.",
+        help=(
+            "Specify models by ID/path. Overrides cache scan. "
+            "May be provided multiple times; model lists accumulate."
+        ),
     )
     parser.add_argument(
         "-e",
         "--exclude",
+        action="extend",
         nargs="+",
         type=str,
         default=None,
-        help="Exclude models by ID/path from the model list "
-        "(works with both explicit --models and cache scan).",
+        help=(
+            "Exclude models by ID/path from the model list "
+            "(works with both explicit --models and cache scan). "
+            "May be provided multiple times; exclusions accumulate."
+        ),
     )
     parser.add_argument(
         "--trust-remote-code",
@@ -20702,15 +20710,20 @@ def _build_cli_parser() -> argparse.ArgumentParser:
         default=None,
         help=(
             "Resize image input before processor handling. "
-            "Provide 1 integer for square resize or 2 for height width."
+            "Provide 1 integer for square resize or 2 for height width after a "
+            "single flag occurrence."
         ),
     )
     parser.add_argument(
         "--eos-tokens",
+        action="extend",
         type=str,
         nargs="+",
         default=None,
-        help="Additional EOS tokens to stop on. Supports escaped values like \\n.",
+        help=(
+            "Additional EOS tokens to stop on. Supports escaped values like \\n. "
+            "May be provided multiple times; token lists accumulate."
+        ),
     )
     parser.add_argument(
         "--skip-special-tokens",

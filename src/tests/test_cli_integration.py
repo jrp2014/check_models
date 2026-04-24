@@ -85,6 +85,65 @@ def test_cli_help_structure(capsys: pytest.CaptureFixture[str]) -> None:
     assert "usage" in output.lower() or "--folder" in output
 
 
+def test_cli_parser_accumulates_repeated_exclude_flags() -> None:
+    """Repeated -e/--exclude flags should accumulate all excluded models."""
+    parser = check_models._build_cli_parser()
+
+    args = parser.parse_args(
+        [
+            "--folder",
+            "/tmp",
+            "-e",
+            "Qwen/Qwen3-VL-2B-Instruct",
+            "-e",
+            "mlx-community/Qwen3-VL-2B-Thinking-bf16",
+        ]
+    )
+
+    assert args.exclude == [
+        "Qwen/Qwen3-VL-2B-Instruct",
+        "mlx-community/Qwen3-VL-2B-Thinking-bf16",
+    ]
+
+
+def test_cli_parser_accumulates_repeated_model_flags() -> None:
+    """Repeated -m/--models flags should accumulate all model identifiers."""
+    parser = check_models._build_cli_parser()
+
+    args = parser.parse_args(
+        [
+            "--folder",
+            "/tmp",
+            "-m",
+            "model-a",
+            "-m",
+            "model-b",
+            "model-c",
+        ]
+    )
+
+    assert args.models == ["model-a", "model-b", "model-c"]
+
+
+def test_cli_parser_accumulates_repeated_eos_token_flags() -> None:
+    """Repeated --eos-tokens flags should accumulate all stop tokens."""
+    parser = check_models._build_cli_parser()
+
+    args = parser.parse_args(
+        [
+            "--folder",
+            "/tmp",
+            "--eos-tokens",
+            "</think>",
+            "--eos-tokens",
+            r"\n",
+            "<END>",
+        ]
+    )
+
+    assert args.eos_tokens == ["</think>", r"\n", "<END>"]
+
+
 def test_cli_exits_on_nonexistent_folder(capsys: pytest.CaptureFixture[str]) -> None:
     """Should exit with error when folder does not exist."""
     result = _run_cli([*_get_test_output_args(), "--folder", "/nonexistent/path"], capsys)

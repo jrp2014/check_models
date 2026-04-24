@@ -22,6 +22,7 @@ def test_cli_help_output(help_flag: str, capsys: pytest.CaptureFixture[str]) -> 
     assert excinfo.value.code == 0
     captured = capsys.readouterr()
     output = captured.out + captured.err
+    normalized_output = " ".join(output.split())
 
     # Check for key sections and argument descriptions
     assert "usage" in output.lower()
@@ -45,10 +46,14 @@ def test_cli_help_output(help_flag: str, capsys: pytest.CaptureFixture[str]) -> 
     assert "--kv-quant-scheme" in output
     assert "ignored unless" in output
     assert "--verbose" in output
-    assert "most recently modified image file in the folder" in output
+    assert "most recently modified image file in the folder" in normalized_output
     assert str(check_models.DEFAULT_FOLDER) in output
-    assert "requires a path when provided" in output.lower()
-    assert "verification prompt is used" in output
+    assert "requires a path when provided" in normalized_output.lower()
+    assert "verification prompt is used" in normalized_output
     assert "Prompt. (default: None)" not in output
     assert "--eval-mode" in output
     assert "--prune-repro-days" in output
+    assert "exclusions accumulate" in normalized_output
+    assert "model lists accumulate" in normalized_output
+    assert "token lists accumulate" in normalized_output
+    assert "single flag occurrence" in normalized_output

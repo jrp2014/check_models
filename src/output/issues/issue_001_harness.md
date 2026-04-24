@@ -1,4 +1,4 @@
-# [Harness Issue] Title: "Round Tower of Windsor Castle"  Description: A view of the Round Tower of Windsor Castle, a royal residence i in microsoft/Phi-3.5-vision-instruct
+# [Harness Issue] Title: Windsor Castle from River Thames  Description: A view of the Round Tower of Windsor Castle, a royal residence in microsoft/Phi-3.5-vision-instruct
 
 ## Description
 
@@ -8,7 +8,6 @@ Integration/harness warning detected for `microsoft/Phi-3.5-vision-instruct`.
 
 - Special control token &lt;|end|&gt; appeared in generated text.
 - Special control token &lt;|endoftext|&gt; appeared in generated text.
-- Generated text appears to continue into example-code templates mid-output.
 
 ## Maintainer Triage
 
@@ -20,7 +19,7 @@ _Summary:_ Special control token &lt;\|end\|&gt; appeared in generated text.
 _Evidence:_ Special control token &lt;\|end\|&gt; appeared in generated text.
             \| Special control token &lt;\|endoftext\|&gt; appeared in
             generated text.
-_Token context:_ prompt=1,319 \| output/prompt=37.91% \| nontext burden=66% \|
+_Token context:_ prompt=1,317 \| output/prompt=37.97% \| nontext burden=66% \|
                  stop=completed \| hit token cap (500)
 _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
                into user-facing text.
@@ -38,19 +37,19 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 
 ## Environment
 
-| Component       | Version                     |
-|-----------------|-----------------------------|
-| mlx-vlm         | 0.4.4                       |
-| mlx             | 0.31.2.dev20260419+fa4320d5 |
-| mlx-lm          | 0.31.3                      |
-| transformers    | 5.5.4                       |
-| tokenizers      | 0.22.2                      |
-| huggingface-hub | 1.11.0                      |
-| Python Version  | 3.13.12                     |
-| OS              | Darwin 25.4.0               |
-| macOS Version   | 26.4.1                      |
-| GPU/Chip        | Apple M5 Max                |
-| GPU Cores       | 40                          |
-| Metal Support   | Metal 4                     |
-| RAM             | 128.0 GB                    |
+| Component       | Version                      |
+|-----------------|------------------------------|
+| mlx-vlm         | 0.4.5                        |
+| mlx             | 0.32.0.dev20260424+211e57be5 |
+| mlx-lm          | 0.31.3                       |
+| transformers    | 5.6.2                        |
+| tokenizers      | 0.22.2                       |
+| huggingface-hub | 1.12.0                       |
+| Python Version  | 3.13.12                      |
+| OS              | Darwin 25.4.0                |
+| macOS Version   | 26.4.1                       |
+| GPU/Chip        | Apple M5 Max                 |
+| GPU Cores       | 40                           |
+| Metal Support   | Metal 4                      |
+| RAM             | 128.0 GB                     |
 
