@@ -3,7 +3,7 @@
 ## Summary
 
 Automated benchmarking of **53 locally-cached VLM models** found **2 hard
-failure(s)** and **4 harness/integration issue(s)** plus **1 preflight
+failure(s)** and **4 harness/integration issue(s)** plus **0 preflight
 compatibility warning(s)** in successful models. 51 of 53 models succeeded.
 
 Test image: `20260418-164540_DSC09775_DxO.jpg` (55.7 MB).
@@ -18,7 +18,6 @@ Quick triage list with likely owner and next action for each issue class.
 - **[Medium] [model configuration/repository]** Loaded processor has no image_processor; expected multimodal processor. (1 model(s)). Next: verify model config, tokenizer files, and revision alignment.
 - **[Medium] [mlx-vlm]** Harness/integration warnings on 2 model(s). Next: check processor/chat-template wiring and generation kwargs.
 - **[Medium] [model-config / mlx-vlm]** Harness/integration warnings on 2 model(s). Next: validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
-- **[Medium] [transformers]** Preflight compatibility warnings (1 issue(s)). Next: verify API compatibility and pinned version floor.
 
 ---
 
@@ -30,7 +29,6 @@ Quick triage list with likely owner and next action for each issue class.
 | **Medium** | Loaded processor has no image_processor; expected multimodal processor.  | 1 (MolmoPoint-8B-fp16)                                               | `model configuration/repository` | verify model config, tokenizer files, and revision alignment.                            |
 | **Medium** | Harness/integration                                                      | 2 (Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit) | `mlx-vlm`                        | check processor/chat-template wiring and generation kwargs.                              |
 | **Medium** | Harness/integration                                                      | 2 (Qwen2-VL-2B-Instruct-4bit, llava-v1.6-mistral-7b-8bit)            | `model-config / mlx-vlm`         | validate chat-template/config expectations and mlx-vlm prompt formatting for this model. |
-| **Medium** | Preflight compatibility warning                                          | 1 issue(s)                                                           | `transformers`                   | verify API compatibility and pinned version floor.                                       |
 
 ---
 
@@ -133,26 +131,6 @@ Captured stdout/stderr:
 ```
 
 </details>
-
----
-
-## Preflight Compatibility Warnings (1 issue(s))
-
-These warnings were detected before inference. They are informational by
-default and do not invalidate successful runs on their own.
-Keep running if outputs look healthy. Escalate only when the warnings line up
-with backend-import side effects, startup hangs, or runtime crashes.
-Do not treat these warnings alone as a reason to set MLX_VLM_ALLOW_TF=1 or to
-assume the benchmark results are bad.
-
-### `transformers`
-
-- Suggested tracker: `transformers` (<https://github.com/huggingface/transformers/issues/new>)
-- Suggested next action: verify API compatibility and pinned version floor.
-- Triage guidance: continue if runs are otherwise healthy; investigate only if this warning matches real backend symptoms in the same run.
-- Warnings:
-  - `transformers import utils no longer reference the TF/FLAX/JAX backend guard env vars used by check_models; backend guard hints for those backends may be ignored with this version.`
-
 
 ---
 
@@ -307,12 +285,12 @@ Recent reproducibility is measured from history (up to last 3 runs where each
 model appears).
 
 **Regressions since previous run:** none
-**Recoveries since previous run:** none
+**Recoveries since previous run:** `mlx-community/llava-v1.6-mistral-7b-8bit`, `mlx-community/nanoLLaVA-1.5-4bit`, `mlx-community/paligemma2-10b-ft-docci-448-6bit`, `mlx-community/paligemma2-10b-ft-docci-448-bf16`, `mlx-community/paligemma2-3b-ft-docci-448-bf16`, `mlx-community/paligemma2-3b-pt-896-4bit`, `qnguyen3/nanoLLaVA`
 
 | Model                              | Status vs Previous Run   | First Seen Failing      | Recent Repro           |
 |------------------------------------|--------------------------|-------------------------|------------------------|
-| `ggml-org/gemma-3-1b-it-GGUF`      | new model failing        | 2026-04-18 00:45:49 BST | 3/3 recent runs failed |
-| `mlx-community/MolmoPoint-8B-fp16` | new model failing        | 2026-03-27 13:06:07 GMT | 3/3 recent runs failed |
+| `ggml-org/gemma-3-1b-it-GGUF`      | still failing            | 2026-04-18 00:45:49 BST | 3/3 recent runs failed |
+| `mlx-community/MolmoPoint-8B-fp16` | still failing            | 2026-03-27 13:06:07 GMT | 3/3 recent runs failed |
 
 ---
 
@@ -321,13 +299,13 @@ model appears).
 - **Detailed diagnostics models:** 6
 - **Summary diagnostics models:** 47
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1063.87s (1063.87s)
-- **Average runtime per model:** 20.07s (20.07s)
-- **Dominant runtime phase:** decode dominated 49/53 measured model runs (88% of tracked runtime).
-- **Phase totals:** model load=115.71s, prompt prep=0.15s, decode=929.47s, cleanup=5.09s
+- **Total model runtime (sum):** 1035.11s (1035.11s)
+- **Average runtime per model:** 19.53s (19.53s)
+- **Dominant runtime phase:** decode dominated 50/53 measured model runs (90% of tracked runtime).
+- **Phase totals:** model load=101.22s, prompt prep=0.14s, decode=915.21s, cleanup=5.05s
 - **Observed stop reasons:** completed=51, exception=2
-- **Validation overhead:** 18.31s total (avg 0.35s across 53 model(s)).
-- **First-token latency:** Avg 10.89s | Min 0.07s | Max 75.30s across 51 model(s).
+- **Validation overhead:** 18.28s total (avg 0.34s across 53 model(s)).
+- **First-token latency:** Avg 10.79s | Min 0.07s | Max 77.28s across 51 model(s).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
@@ -366,8 +344,8 @@ warning, or stack-signal anomaly).
 - `mlx-community/LFM2.5-VL-1.6B-bf16`: Output became repetitive, indicating possible generation instability (token: phrase: "flagpole, flag, flagpole, flag....
 - `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `mlx-community/Ministral-3-3B-Instruct-2512-4bit`: ⚠️REVIEW:context_budget
-- `mlx-community/Molmo-7B-D-0924-8bit`: Output became repetitive, indicating possible generation instability (token: phrase: "castle tower spiral staircase.....
-- `mlx-community/Molmo-7B-D-0924-bf16`: Output became repetitive, indicating possible generation instability (token: phrase: "castle tower silhouette: cylin....
+- `mlx-community/Molmo-7B-D-0924-8bit`: Output omitted required Title/Description/Keywords sections (description, keywords).
+- `mlx-community/Molmo-7B-D-0924-bf16`: Output leaked reasoning or prompt-template text (title hint:).
 - `mlx-community/Phi-3.5-vision-instruct-bf16`: Nonvisual metadata borrowing
 - `mlx-community/Qwen3.5-27B-4bit`: Output omitted required Title/Description/Keywords sections (title, description, keywords).
 - `mlx-community/Qwen3.5-27B-mxfp8`: Nonvisual metadata borrowing
@@ -395,21 +373,21 @@ warning, or stack-signal anomaly).
 
 ## Environment
 
-| Component       | Version                      |
-|-----------------|------------------------------|
-| mlx-vlm         | 0.4.5                        |
-| mlx             | 0.32.0.dev20260424+211e57be5 |
-| mlx-lm          | 0.31.3                       |
-| transformers    | 5.6.2                        |
-| tokenizers      | 0.22.2                       |
-| huggingface-hub | 1.12.0                       |
-| Python Version  | 3.13.12                      |
-| OS              | Darwin 25.4.0                |
-| macOS Version   | 26.4.1                       |
-| GPU/Chip        | Apple M5 Max                 |
-| GPU Cores       | 40                           |
-| Metal Support   | Metal 4                      |
-| RAM             | 128.0 GB                     |
+| Component       | Version                     |
+|-----------------|-----------------------------|
+| mlx-vlm         | 0.4.5                       |
+| mlx             | 0.32.0.dev20260425+211e57be |
+| mlx-lm          | 0.31.3                      |
+| transformers    | 5.6.2                       |
+| tokenizers      | 0.22.2                      |
+| huggingface-hub | 1.12.0                      |
+| Python Version  | 3.13.12                     |
+| OS              | Darwin 25.4.0               |
+| macOS Version   | 26.4.1                      |
+| GPU/Chip        | Apple M5 Max                |
+| GPU Cores       | 40                          |
+| Metal Support   | Metal 4                     |
+| RAM             | 128.0 GB                    |
 
 ## Reproducibility
 
@@ -496,4 +474,4 @@ Context: Existing metadata hints (high confidence; use only when visually confir
 - Input image: `/Users/jrp/Pictures/Processed/20260418-164540_DSC09775_DxO.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-04-24 22:50:35 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-04-26 00:10:30 BST by [check_models](https://github.com/jrp2014/check_models)._

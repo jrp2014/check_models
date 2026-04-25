@@ -111,5 +111,7 @@
   ],
   "cursorpyright.analysis.stubPath": "typings",
   "cursorpyright.analysis.typeCheckingMode": "basic",
-  "cursorpyright.analysis.useLibraryCodeForTypes": true
+  "cursorpyright.analysis.useLibraryCodeForTypes": true,
+  "window.autoDetectColorScheme": true,
+  "window.closeWhenEmpty": true
 }

@@ -87,6 +87,16 @@ def test_analyze_generation_text_formatting_violations() -> None:
     assert len(analysis.formatting_issues) > 0
 
 
+def test_analyze_generation_text_preserves_raw_unknown_tags_for_logs() -> None:
+    """Formatting issues should keep raw tags so CLI warnings stay readable."""
+    text = "<think>internal reasoning</think> Title: Misty loch landscape"
+
+    analysis = check_models.analyze_generation_text(text, 10)
+
+    assert "Unknown tags: <think>" in analysis.formatting_issues
+    assert all("&lt;think&gt;" not in issue for issue in analysis.formatting_issues)
+
+
 def test_analyze_generation_text_excessive_bullets() -> None:
     """Test detection of too many bullet points."""
     # Excessive bullets = more than 25 (threshold from quality_config.yaml)

@@ -27,6 +27,9 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Keep unknown-tag quality warnings readable in CLI logs by preserving raw tag
+  text in analysis output and escaping it only when Markdown/HTML reports are
+  rendered.
 - Warn exclusions against local Hugging Face cache membership even when
   `--models` is used, so cached-but-unselected models no longer trigger a
   false warning while truly uncached exclusions still do.

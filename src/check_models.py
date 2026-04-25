@@ -2781,11 +2781,8 @@ def _detect_formatting_violations(text: str) -> list[str]:
     # Check for tags (beyond simple breaks) that may interfere with rendering
     html_tags: list[str] = re.findall(r"<(?!br>|/br>)[a-z]+[^>]*>", text, re.IGNORECASE)
     if html_tags:
-        # Pre-escape tags so downstream Markdown renderers don't parse them as HTML
-        escaped_tags: list[str] = [
-            t.replace("<", "&lt;").replace(">", "&gt;") for t in set(html_tags[:3])
-        ]
-        tags_preview: str = ", ".join(escaped_tags)
+        # Keep raw tags in analysis output; renderers escape them as needed for Markdown/HTML.
+        tags_preview: str = ", ".join(dict.fromkeys(html_tags[:3]))
         issues.append(f"Unknown tags: {tags_preview}")
 
     # Check for excessive markdown structure

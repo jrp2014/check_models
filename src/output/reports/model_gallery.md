@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-_Generated on 2026-04-24 22:50:35 BST_
+_Generated on 2026-04-26 00:10:30 BST_
 
 A review-friendly artifact with image metadata, the source prompt, and full
 generated output for each model.
@@ -11,19 +11,19 @@ _Action Snapshot: see [results.md](results.md) for the full summary._
 
 ### Strong Candidates
 
-- `mlx-community/gemma-4-26b-a4b-it-4bit`: 🏆 A (96/100) | Desc 100 | Keywords 77 | Δ+50 | 113.7 tps
-- `mlx-community/gemma-4-31b-it-4bit`: 🏆 A (94/100) | Desc 100 | Keywords 83 | Δ+49 | 27.2 tps
+- `mlx-community/gemma-4-26b-a4b-it-4bit`: 🏆 A (96/100) | Desc 100 | Keywords 77 | Δ+50 | 113.1 tps
+- `mlx-community/gemma-4-31b-it-4bit`: 🏆 A (94/100) | Desc 100 | Keywords 83 | Δ+49 | 27.4 tps
 - `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`: 🏆 A (92/100) | Desc 100 | Keywords 91 | Δ+47 | 66.0 tps
-- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: 🏆 A (90/100) | Desc 93 | Keywords 91 | Δ+45 | 62.9 tps
-- `mlx-community/gemma-3-27b-it-qat-8bit`: 🏆 A (90/100) | Desc 93 | Keywords 85 | Δ+45 | 17.4 tps
+- `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4`: 🏆 A (90/100) | Desc 93 | Keywords 91 | Δ+45 | 63.0 tps
+- `mlx-community/gemma-3-27b-it-qat-8bit`: 🏆 A (90/100) | Desc 93 | Keywords 85 | Δ+45 | 17.7 tps
 
 ### Watchlist
 
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (5/100) | Desc 21 | Keywords 0 | Δ-40 | 290.1 tps | context ignored, harness
-- `mlx-community/llava-v1.6-mistral-7b-8bit`: ❌ F (6/100) | Desc 45 | Keywords 0 | Δ-39 | 70.0 tps | context ignored, harness
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (6/100) | Desc 60 | Keywords 0 | Δ-39 | 31.6 tps | harness, missing sections
-- `microsoft/Phi-3.5-vision-instruct`: 🟡 C (62/100) | Desc 60 | Keywords 55 | Δ+17 | 55.1 tps | hallucination, harness, metadata borrowing
-- `HuggingFaceTB/SmolVLM-Instruct`: ❌ F (15/100) | Desc 60 | Keywords 0 | Δ-30 | 128.9 tps | metadata borrowing, missing sections
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (5/100) | Desc 21 | Keywords 0 | Δ-40 | 369.1 tps | context ignored, harness
+- `mlx-community/llava-v1.6-mistral-7b-8bit`: ❌ F (6/100) | Desc 45 | Keywords 0 | Δ-39 | 70.3 tps | context ignored, harness
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (6/100) | Desc 60 | Keywords 0 | Δ-39 | 32.2 tps | harness, missing sections
+- `microsoft/Phi-3.5-vision-instruct`: 🟡 C (62/100) | Desc 60 | Keywords 55 | Δ+17 | 55.5 tps | hallucination, harness, metadata borrowing
+- `HuggingFaceTB/SmolVLM-Instruct`: ❌ F (15/100) | Desc 60 | Keywords 0 | Δ-30 | 129.7 tps | metadata borrowing, missing sections
 
 ## 🚨 Failures by Package (Actionable)
 
@@ -55,7 +55,7 @@ _Action Snapshot: see [results.md](results.md) for the full summary._
 
 ## Prompt
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > Analyze this image for cataloguing metadata, using British English.
 >
@@ -106,14 +106,14 @@ _Action Snapshot: see [results.md](results.md) for the full summary._
 > photograph was taken.
 > &#45; Capture metadata: Taken on 2026-04-18 17:45:40 BST (at 17:45:40 local
 > time). GPS: 51.483800°N, 0.604400°W.
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ## Quick Navigation
 
 - _Best end-to-end cataloging:_ [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)
 - _Best descriptions:_ [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)
 - _Best keywording:_ [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)
-- _Fastest generation:_ [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)
+- _Fastest generation:_ [`mlx-community/Qwen2-VL-2B-Instruct-4bit`](#model-mlx-community-qwen2-vl-2b-instruct-4bit)
 - _Lowest memory footprint:_ [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)
 - _Best balance:_ [`mlx-community/gemma-4-26b-a4b-it-4bit`](#model-mlx-community-gemma-4-26b-a4b-it-4bit)
 - _Failed models:_ `ggml-org/gemma-3-1b-it-GGUF`,
@@ -169,10 +169,10 @@ FileNotFoundError: [Errno 2] No such file or directory: '/Users/jrp/.cache/huggi
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15502, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15414, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14900, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14827, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -193,7 +193,7 @@ FileNotFoundError: Config not found at /Users/jrp/.cache/huggingface/hub/models-
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15676, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15588, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -204,7 +204,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15512, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15424, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Config not found at /Users/jrp/.cache/huggingface/hub/models--ggml-org--gemma-3-1b-it-GGUF/snapshots/f9c28bcd85737ffc5aef028638d3341d49869c27
 ```
@@ -244,7 +244,7 @@ _Next Action:_ review package ownership and diagnostics for a minimal repro.
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15273, in _prepare_generation_prompt
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15185, in _prepare_generation_prompt
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -254,7 +254,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15064, in _run_model_preflight_validators
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14977, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -263,14 +263,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14983, in _raise_preflight_error
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14910, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15676, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15588, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -281,13 +281,13 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15514, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15426, in _run_model_generation
     formatted_prompt = _prepare_generation_prompt(
         params=params,
     ...<3 lines>...
         phase_timer=phase_timer,
     )
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15314, in _prepare_generation_prompt
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15226, in _prepare_generation_prompt
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -312,20 +312,20 @@ _Token accounting:_ prompt=503 | text_est=442 | nontext_est=61 | gen=89 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 0.45s | Gen 0.86s | Total 1.67s
-_Throughput:_ Prompt 5,355 TPS (503 tok) | Gen 358 TPS (89 tok)
+_Metrics:_ Load 0.45s | Gen 0.84s | Total 1.63s
+_Throughput:_ Prompt 5,756 TPS (503 tok) | Gen 369 TPS (89 tok)
 _Assessment:_ 🟠 D (40/100) | Δ-6 | Keywords are not specific or diverse enough
 _Review Status:_ watchlist (metadata borrowing, missing sections, trusted hint
                  degraded)
 _Review:_ D 40/100 | missing sections: keywords | missing terms: view, Round,
           residence, Berkshire, seen | nonvisual metadata reused
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > Title: 5-10 words, concrete and factual, limited to clearly visible content.
 > Description: An image of the Royal Tower of Windsor Castle, with the Union
 > Flag flying, taken on 2026-04-18 17:45:40 BST. GPS: 51.483800°N, 0.604400°W.
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -353,14 +353,14 @@ _Token accounting:_ prompt=758 | text_est=442 | nontext_est=316 | gen=131 |
 _Next action:_ Treat as a model limitation for this prompt; trusted hint
                coverage is still weak.
 
-_Metrics:_ Load 0.76s | Gen 0.91s | Total 2.00s
-_Throughput:_ Prompt 7,336 TPS (758 tok) | Gen 333 TPS (131 tok)
+_Metrics:_ Load 0.51s | Gen 0.94s | Total 1.86s
+_Throughput:_ Prompt 7,590 TPS (758 tok) | Gen 325 TPS (131 tok)
 _Assessment:_ 🟠 D (44/100) | Δ-1 | Lacks visual description of image
 _Review Status:_ watchlist (metadata borrowing)
 _Review:_ D 44/100 | missing terms: view, seen, which, indicates, reigning |
           nonvisual metadata reused
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > Title: Windsor Castle Round Tower
 >
@@ -372,7 +372,7 @@ _Review:_ D 44/100 | missing terms: view, seen, which, indicates, reigning |
 > Keywords: Windsor Castle, Round Tower, Windsor, Berkshire, England, Royal
 > Residence, Royal Castle, Union Flag, River Thames, Royal Monarchy, Royal
 > Residence, England, 2026-04-18, 17:45:40 BST
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -399,8 +399,8 @@ _Token accounting:_ prompt=1716 | text_est=442 | nontext_est=1274 | gen=30 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 0.48s | Gen 1.26s | Total 2.06s
-_Throughput:_ Prompt 4,140 TPS (1,716 tok) | Gen 129 TPS (30 tok)
+_Metrics:_ Load 0.65s | Gen 1.24s | Total 2.21s
+_Throughput:_ Prompt 4,041 TPS (1,716 tok) | Gen 130 TPS (30 tok)
 _Assessment:_ ❌ F (15/100) | Δ-30 | Keywords are not specific or diverse
               enough
 _Review Status:_ watchlist (metadata borrowing, missing sections)
@@ -408,11 +408,11 @@ _Review:_ F 15/100 | nontext prompt burden=74% | missing sections: title,
           description, keywords | missing terms: view, Union, Flag, flying,
           flagpole | nonvisual metadata reused
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > Image of the Round Tower of Windsor Castle, a royal residence in Windsor,
 > Berkshire, England, as seen from across the River Thames.
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -438,8 +438,8 @@ _Token accounting:_ prompt=1716 | text_est=442 | nontext_est=1274 | gen=30 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 0.75s | Gen 1.28s | Total 2.37s
-_Throughput:_ Prompt 4,168 TPS (1,716 tok) | Gen 124 TPS (30 tok)
+_Metrics:_ Load 0.60s | Gen 1.27s | Total 2.21s
+_Throughput:_ Prompt 4,119 TPS (1,716 tok) | Gen 127 TPS (30 tok)
 _Assessment:_ ❌ F (15/100) | Δ-30 | Keywords are not specific or diverse
               enough
 _Review Status:_ watchlist (metadata borrowing, missing sections)
@@ -447,11 +447,11 @@ _Review:_ F 15/100 | nontext prompt burden=74% | missing sections: title,
           description, keywords | missing terms: view, Union, Flag, flying,
           flagpole | nonvisual metadata reused
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > Image of the Round Tower of Windsor Castle, a royal residence in Windsor,
 > Berkshire, England, as seen from across the River Thames.
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -477,15 +477,15 @@ _Token accounting:_ prompt=503 | text_est=442 | nontext_est=61 | gen=83 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 0.54s | Gen 1.37s | Total 2.25s
-_Throughput:_ Prompt 4,574 TPS (503 tok) | Gen 111 TPS (83 tok)
+_Metrics:_ Load 0.53s | Gen 1.36s | Total 2.23s
+_Throughput:_ Prompt 4,527 TPS (503 tok) | Gen 111 TPS (83 tok)
 _Assessment:_ 🟠 D (38/100) | Δ-8 | Keywords are not specific or diverse enough
 _Review Status:_ watchlist (context echo, metadata borrowing, missing
                  sections)
 _Review:_ D 38/100 | missing sections: keywords | context echo=54% | nonvisual
           metadata reused
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > Title: 5-10 words, concrete and factual, limited to clearly and definitely
 > visible content.
@@ -494,7 +494,7 @@ _Review:_ D 38/100 | missing sections: keywords | context echo=54% | nonvisual
 > Union Flag is flying from the flagpole, which indicates that the reigning
 > monarch is not in residence at the castle at the time the photograph was
 > taken.
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -521,15 +521,15 @@ _Token accounting:_ prompt=507 | text_est=442 | nontext_est=65 | gen=158 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 0.60s | Gen 1.38s | Total 2.33s
-_Throughput:_ Prompt 5,213 TPS (507 tok) | Gen 349 TPS (158 tok)
+_Metrics:_ Load 0.58s | Gen 1.40s | Total 2.34s
+_Throughput:_ Prompt 5,207 TPS (507 tok) | Gen 349 TPS (158 tok)
 _Assessment:_ ❌ F (32/100) | Δ-13 | Keywords are not specific or diverse
               enough
 _Review Status:_ watchlist (metadata borrowing, missing sections)
 _Review:_ F 32/100 | missing sections: keywords | missing terms: which,
           indicates | nonvisual metadata reused
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > Title: Windsor Castle Tower, Royal Residence, River Thames, Union Flag,
 > 2026-04-18 17:45:40 BST
@@ -540,7 +540,7 @@ _Review:_ F 32/100 | missing sections: keywords | missing terms: which,
 > the reigning monarch is not in residence at the castle at the time the
 > photograph was taken. The photograph was taken on 2026-04-18 17:45:40 BST,
 > with a GPS location of 51.483800°N, 0.604400°W.
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -568,14 +568,14 @@ _Token accounting:_ prompt=616 | text_est=442 | nontext_est=174 | gen=92 |
 _Next action:_ Treat as a model limitation for this prompt; trusted hint
                coverage is still weak.
 
-_Metrics:_ Load 0.76s | Gen 1.66s | Total 2.76s
-_Throughput:_ Prompt 1,829 TPS (616 tok) | Gen 132 TPS (92 tok)
+_Metrics:_ Load 0.67s | Gen 1.64s | Total 2.65s
+_Throughput:_ Prompt 1,824 TPS (616 tok) | Gen 135 TPS (92 tok)
 _Assessment:_ 🟠 D (39/100) | Δ-6 | Lacks visual description of image
 _Review Status:_ watchlist (metadata borrowing)
 _Review:_ D 39/100 | missing terms: which, indicates | keywords=6 | nonvisual
           metadata reused
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > Title: Windsor Castle, England
 > Description: A view of the Round Tower of Windsor Castle, a royal residence
@@ -584,7 +584,7 @@ _Review:_ D 39/100 | missing terms: which, indicates | keywords=6 | nonvisual
 > is not in residence at the castle at the time the photograph was taken.
 > Keywords: Windsor Castle, England, Royal Residence, River Thames, Union
 > Flag, Reigning Monarch
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -609,13 +609,13 @@ _Token accounting:_ prompt=779 | text_est=442 | nontext_est=337 | gen=76 |
 _Next action:_ Treat as a model limitation for this prompt; trusted hint
                coverage is still weak.
 
-_Metrics:_ Load 2.88s | Gen 1.86s | Total 5.11s
-_Throughput:_ Prompt 1,135 TPS (779 tok) | Gen 114 TPS (76 tok)
+_Metrics:_ Load 2.38s | Gen 1.67s | Total 4.42s
+_Throughput:_ Prompt 1,557 TPS (779 tok) | Gen 113 TPS (76 tok)
 _Assessment:_ 🏆 A (96/100) | Δ+50 | None identified
 _Review Status:_ strong candidate for first-pass review
 _Review:_ A 96/100 | missing terms: view, Round, Windsor, royal, residence
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > &#8203;Title:
 > Stone castle tower rising above green trees and river
@@ -627,7 +627,7 @@ _Review:_ A 96/100 | missing terms: view, Round, Windsor, royal, residence
 > &#8203;Keywords:
 > castle, tower, trees, river, foliage, stone, architecture, water, daylight,
 > greenery, landscape, vertical, outdoors, sky, reflection
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 _Quality Status:_ no quality issues detected in this run
 
@@ -649,15 +649,15 @@ _Token accounting:_ prompt=3114 | text_est=442 | nontext_est=2672 | gen=111 |
 _Next action:_ Treat this as a prompt-budget issue first; nontext prompt
                burden is 86% and the output stays weak under that load.
 
-_Metrics:_ Load 1.31s | Gen 2.22s | Total 3.88s
-_Throughput:_ Prompt 2,949 TPS (3,114 tok) | Gen 178 TPS (111 tok)
+_Metrics:_ Load 0.89s | Gen 2.25s | Total 3.49s
+_Throughput:_ Prompt 2,857 TPS (3,114 tok) | Gen 178 TPS (111 tok)
 _Assessment:_ 🏆 A (92/100) | Δ+47 | None identified
 _Review Status:_ watchlist (metadata borrowing)
 _Review:_ A 92/100 | output/prompt=3.56% | nontext prompt burden=86% | missing
           terms: seen, across, flying, indicates, reigning | nonvisual
           metadata reused
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > &#8203;Title:
 > Windsor Castle Round Tower by River Thames
@@ -672,12 +672,50 @@ _Review:_ A 92/100 | output/prompt=3.56% | nontext prompt burden=86% | missing
 > residence, River Thames, lush greenery, forested bank, historic
 > architecture, waterfront, British monarchy, flagpole, scenic view, medieval
 > structure
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:context_budget
 - Nonvisual metadata borrowing
+
+---
+
+<a id="model-mlx-community-paligemma2-10b-ft-docci-448-6bit"></a>
+
+### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
+
+_Verdict:_ model_shortcoming | user=avoid
+_Why:_ nontext prompt burden=71% | missing sections: title, description,
+       keywords | missing terms: view, Round, Tower, Windsor, Castle
+_Trusted hints:_ ignores trusted hints | missing terms: view, Round, Tower,
+                 Windsor, Castle
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | ignores trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=1531 | text_est=442 | nontext_est=1089 | gen=24 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; the requested
+               output contract is not being met.
+
+_Metrics:_ Load 1.58s | Gen 2.40s | Total 4.32s
+_Throughput:_ Prompt 1,382 TPS (1,531 tok) | Gen 31.9 TPS (24 tok)
+_Assessment:_ ❌ F (19/100) | Δ-26 | Output lacks detail
+_Review Status:_ watchlist (context ignored, missing sections)
+_Review:_ F 19/100 | nontext prompt burden=71% | missing sections: title,
+          description, keywords | missing terms: view, Round, Tower, Windsor,
+          Castle
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> &#45; Camera metadata: 1/200s, f/11, 200mm.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Context ignored (missing: view, Round, Tower, Windsor, Castle)
+- Missing sections (title, description, keywords)
+- Ignores trusted hints
 
 ---
 
@@ -697,14 +735,14 @@ _Token accounting:_ prompt=1317 | text_est=442 | nontext_est=875 | gen=110 |
 _Next action:_ Treat as a model limitation for this prompt; trusted hint
                coverage is still weak.
 
-_Metrics:_ Load 1.05s | Gen 2.65s | Total 4.04s
-_Throughput:_ Prompt 3,920 TPS (1,317 tok) | Gen 58.6 TPS (110 tok)
+_Metrics:_ Load 0.81s | Gen 2.72s | Total 3.87s
+_Throughput:_ Prompt 3,874 TPS (1,317 tok) | Gen 57.3 TPS (110 tok)
 _Assessment:_ 🟡 C (62/100) | Δ+17 | Lacks visual description of image
 _Review Status:_ watchlist (metadata borrowing)
 _Review:_ C 62/100 | nontext prompt burden=66% | missing terms: which,
           indicates | nonvisual metadata reused
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > Title: Windsor Castle from River Thames
 >
@@ -715,7 +753,7 @@ _Review:_ C 62/100 | nontext prompt burden=66% | missing terms: which,
 >
 > Keywords: Windsor Castle, Round Tower, River Thames, Union Flag, greenery,
 > trees, sky, water, architecture, British English
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -739,18 +777,18 @@ _Token accounting:_ prompt=2722 | text_est=442 | nontext_est=2280 | gen=8 |
                     max=500 | stop=completed
 _Next action:_ Inspect model repo config, chat template, and EOS settings.
 
-_Metrics:_ Load 1.09s | Gen 2.86s | Total 4.30s
-_Throughput:_ Prompt 1,293 TPS (2,722 tok) | Gen 70.0 TPS (8 tok)
+_Metrics:_ Load 0.88s | Gen 2.82s | Total 4.06s
+_Throughput:_ Prompt 1,316 TPS (2,722 tok) | Gen 70.3 TPS (8 tok)
 _Assessment:_ ❌ F (6/100) | Δ-39 | Output lacks detail
 _Review Status:_ watchlist (context ignored, harness)
 _Review:_ F 6/100 | Output was a short generic filler response (about 8
           tokens). | nontext prompt burden=84% | missing terms: view, Round,
           Tower, Windsor, Castle
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > The image is a photograph.
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -758,44 +796,6 @@ _Review:_ F 6/100 | Output was a short generic filler response (about 8
 - Context ignored (missing: view, Round, Tower, Windsor, Castle)
 - Ignores trusted hints
 - output:filler_response(8tok)
-
----
-
-<a id="model-mlx-community-paligemma2-10b-ft-docci-448-6bit"></a>
-
-### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
-
-_Verdict:_ model_shortcoming | user=avoid
-_Why:_ nontext prompt burden=71% | missing sections: title, description,
-       keywords | missing terms: view, Round, Tower, Windsor, Castle
-_Trusted hints:_ ignores trusted hints | missing terms: view, Round, Tower,
-                 Windsor, Castle
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | ignores trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=1531 | text_est=442 | nontext_est=1089 | gen=24 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; the requested
-               output contract is not being met.
-
-_Metrics:_ Load 1.55s | Gen 3.06s | Total 4.96s
-_Throughput:_ Prompt 873 TPS (1,531 tok) | Gen 31.2 TPS (24 tok)
-_Assessment:_ ❌ F (19/100) | Δ-26 | Output lacks detail
-_Review Status:_ watchlist (context ignored, missing sections)
-_Review:_ F 19/100 | nontext prompt burden=71% | missing sections: title,
-          description, keywords | missing terms: view, Round, Tower, Windsor,
-          Castle
-
-<!-- markdownlint-disable MD028 MD037 MD045 -->
->
-> &#45; Camera metadata: 1/200s, f/11, 200mm.
-<!-- markdownlint-enable MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Context ignored (missing: view, Round, Tower, Windsor, Castle)
-- Missing sections (title, description, keywords)
-- Ignores trusted hints
 
 ---
 
@@ -814,15 +814,15 @@ _Token accounting:_ prompt=568 | text_est=442 | nontext_est=126 | gen=500 |
                     max=500 | stop=completed
 _Next action:_ Treat as a model-quality limitation for this prompt and image.
 
-_Metrics:_ Load 0.66s | Gen 3.13s | Total 4.13s
-_Throughput:_ Prompt 7,985 TPS (568 tok) | Gen 188 TPS (500 tok)
+_Metrics:_ Load 0.52s | Gen 3.17s | Total 4.04s
+_Throughput:_ Prompt 7,998 TPS (568 tok) | Gen 186 TPS (500 tok)
 _Assessment:_ 🟠 D (38/100) | Δ-7 | Keywords are not specific or diverse enough
 _Review Status:_ watchlist (cutoff, metadata borrowing, repetitive)
 _Review:_ D 38/100 | hit token cap (500) | keyword duplication=91% | nonvisual
           metadata reused | repetitive token=phrase: "flagpole, flag,
           flagpole, flag..."
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > &#8203;Title:
 > Windsor Castle, Round Tower, River Thames, England, 2026-04-18 17:45:40 BST
@@ -852,7 +852,7 @@ _Review:_ D 38/100 | hit token cap (500) | keyword duplication=91% | nonvisual
 > flag, flagpole, flag, flagpole, flag, flagpole, flag, flagpole, flag,
 > flagpole, flag, flagpole, flag, flagpole, flag, flagpole, flag, flagpole,
 > flag, flagpole, flag, flagpole, flag, flagpole, flag, flagpole, flag, flag
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -881,8 +881,8 @@ _Token accounting:_ prompt=1497 | text_est=442 | nontext_est=1055 | gen=139 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 3.33s | Gen 3.23s | Total 6.91s
-_Throughput:_ Prompt 1,775 TPS (1,497 tok) | Gen 80.3 TPS (139 tok)
+_Metrics:_ Load 3.23s | Gen 3.29s | Total 6.87s
+_Throughput:_ Prompt 1,734 TPS (1,497 tok) | Gen 79.7 TPS (139 tok)
 _Assessment:_ 🏆 A (80/100) | Δ+35 | None identified
 _Review Status:_ watchlist (metadata borrowing, missing sections, reasoning
                  leak)
@@ -890,7 +890,7 @@ _Review:_ A 80/100 | nontext prompt burden=70% | missing sections: title |
           missing terms: flagpole, which, indicates, reigning, monarch |
           keywords=22
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > ◁think▷◁/think▷Title:
 > Round Tower of Windsor Castle with Union Jack Flag
@@ -906,7 +906,7 @@ _Review:_ A 80/100 | nontext prompt burden=70% | missing sections: title |
 > Union Jack, flag, trees, sunlight, water, stone tower, historical building,
 > outdoor, daylight, green foliage, architectural structure, UK flag, royal
 > residence, riverbank, natural landscape, historical landmark<|im_assistant|>
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -933,14 +933,14 @@ _Token accounting:_ prompt=2286 | text_est=442 | nontext_est=1844 | gen=73 |
 _Next action:_ Treat as a model limitation for this prompt; trusted hint
                coverage is still weak.
 
-_Metrics:_ Load 1.67s | Gen 3.51s | Total 5.52s
-_Throughput:_ Prompt 2,762 TPS (2,286 tok) | Gen 34.3 TPS (73 tok)
+_Metrics:_ Load 1.60s | Gen 3.50s | Total 5.45s
+_Throughput:_ Prompt 2,735 TPS (2,286 tok) | Gen 34.8 TPS (73 tok)
 _Assessment:_ 🏆 A (86/100) | Δ+41 | None identified
 _Review Status:_ watchlist (metadata borrowing)
 _Review:_ A 86/100 | nontext prompt burden=81% | missing terms: view, royal,
           residence, Berkshire, seen | nonvisual metadata reused
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > &#8203;Title:
 > Windsor Castle Round Tower
@@ -953,12 +953,55 @@ _Review:_ A 86/100 | nontext prompt burden=81% | missing terms: view, royal,
 > &#8203;Keywords:
 > Windsor Castle, Round Tower, River Thames, trees, greenery, England, flag,
 > sky, clouds, landscape, historic, architecture
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
 - Title length violation (4 words; expected 5-10)
 - Nonvisual metadata borrowing
+
+---
+
+<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
+
+### ✅ mlx-community/gemma-3-27b-it-qat-4bit
+
+_Verdict:_ clean | user=caveat
+_Why:_ missing terms: royal, residence, Berkshire, seen, which | keywords=19
+_Trusted hints:_ improves trusted hints
+_Contract:_ keywords=19
+_Utility:_ user=caveat | improves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=774 | text_est=442 | nontext_est=332 | gen=90 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; trusted hint
+               coverage is still weak.
+
+_Metrics:_ Load 2.33s | Gen 4.56s | Total 7.24s
+_Throughput:_ Prompt 641 TPS (774 tok) | Gen 31.3 TPS (90 tok)
+_Assessment:_ 🏆 A (84/100) | Δ+39 | None identified
+_Review Status:_ strong candidate for first-pass review
+_Review:_ A 84/100 | missing terms: royal, residence, Berkshire, seen, which |
+          keywords=19
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> &#8203;Title:
+> Round Tower, Windsor Castle, River Thames view
+>
+> &#8203;Description:
+> The Round Tower of Windsor Castle is visible across water, with trees in the
+> foreground. The Union Flag is flying from the tower’s flagpole.
+>
+> &#8203;Keywords:
+> castle, tower, Round Tower, Windsor Castle, river, water, trees, foliage,
+> Union Flag, sky, clouds, exterior, architecture, stone, daytime, sunlight,
+> green, grey, landscape
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Keyword count violation (19; expected 10-18)
 
 ---
 
@@ -978,14 +1021,14 @@ _Token accounting:_ prompt=3115 | text_est=442 | nontext_est=2673 | gen=97 |
 _Next action:_ Treat as a model limitation for this prompt; trusted hint
                coverage is still weak.
 
-_Metrics:_ Load 1.33s | Gen 4.27s | Total 5.95s
-_Throughput:_ Prompt 1,380 TPS (3,115 tok) | Gen 66.0 TPS (97 tok)
+_Metrics:_ Load 1.30s | Gen 4.56s | Total 6.22s
+_Throughput:_ Prompt 1,222 TPS (3,115 tok) | Gen 66.0 TPS (97 tok)
 _Assessment:_ 🏆 A (92/100) | Δ+47 | None identified
 _Review Status:_ strong candidate for first-pass review
 _Review:_ A 92/100 | nontext prompt burden=86% | missing terms: royal,
           residence, Berkshire, seen, across
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > &#8203;Title:
 > Round Tower Windsor Castle with Union Flag
@@ -999,7 +1042,7 @@ _Review:_ A 92/100 | nontext prompt burden=86% | missing terms: royal,
 > &#8203;Keywords:
 > Windsor Castle, Round Tower, Union Flag, River Thames, green foliage, stone
 > architecture, daylight, partly cloudy sky, flagpole, historical building
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 _Quality Status:_ no quality issues detected in this run
 
@@ -1021,14 +1064,14 @@ _Token accounting:_ prompt=3115 | text_est=442 | nontext_est=2673 | gen=111 |
 _Next action:_ Treat as a model limitation for this prompt; trusted hint
                coverage is still weak.
 
-_Metrics:_ Load 2.88s | Gen 4.51s | Total 7.74s
-_Throughput:_ Prompt 1,410 TPS (3,115 tok) | Gen 62.9 TPS (111 tok)
+_Metrics:_ Load 1.32s | Gen 4.82s | Total 6.49s
+_Throughput:_ Prompt 1,242 TPS (3,115 tok) | Gen 63.0 TPS (111 tok)
 _Assessment:_ 🏆 A (90/100) | Δ+45 | None identified
 _Review Status:_ strong candidate for first-pass review
 _Review:_ A 90/100 | nontext prompt burden=86% | missing terms: seen, which,
           indicates, reigning, monarch
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > &#8203;Title:
 > Windsor Castle Round Tower viewed across River Thames
@@ -1043,52 +1086,60 @@ _Review:_ A 90/100 | nontext prompt burden=86% | missing terms: seen, which,
 > medieval stone tower, Windsor Castle, River Thames, Union Jack flag,
 > crenellations, green foliage, reflection, river water, partly cloudy sky,
 > historic architecture, Berkshire, royal residence, hillside view
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
+<a id="model-mlx-community-gemma-3n-e2b-4bit"></a>
 
-### ✅ mlx-community/gemma-3-27b-it-qat-4bit
+### ✅ mlx-community/gemma-3n-E2B-4bit
 
-_Verdict:_ clean | user=caveat
-_Why:_ missing terms: royal, residence, Berkshire, seen, which | keywords=19
-_Trusted hints:_ improves trusted hints
-_Contract:_ keywords=19
-_Utility:_ user=caveat | improves trusted hints
+_Verdict:_ cutoff_degraded | user=avoid
+_Why:_ hit token cap (500) | missing sections: title, description, keywords |
+       missing terms: view, Round, Tower, Windsor, Castle | nonvisual metadata
+       reused
+_Trusted hints:_ ignores trusted hints | missing terms: view, Round, Tower,
+                 Windsor, Castle | nonvisual metadata reused
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | ignores trusted hints | metadata borrowing
 _Stack / owner:_ owner=model
-_Token accounting:_ prompt=774 | text_est=442 | nontext_est=332 | gen=90 |
+_Token accounting:_ prompt=765 | text_est=442 | nontext_est=323 | gen=500 |
                     max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; trusted hint
-               coverage is still weak.
+_Next action:_ Treat as a model limitation for this prompt; the requested
+               output contract is not being met.
 
-_Metrics:_ Load 2.69s | Gen 4.75s | Total 7.79s
-_Throughput:_ Prompt 588 TPS (774 tok) | Gen 30.6 TPS (90 tok)
-_Assessment:_ 🏆 A (84/100) | Δ+39 | None identified
-_Review Status:_ strong candidate for first-pass review
-_Review:_ A 84/100 | missing terms: royal, residence, Berkshire, seen, which |
-          keywords=19
+_Metrics:_ Load 1.41s | Gen 4.86s | Total 6.63s
+_Throughput:_ Prompt 2,558 TPS (765 tok) | Gen 122 TPS (500 tok)
+_Assessment:_ ❌ F (30/100) | Δ-15 | Lacks visual description of image
+_Review Status:_ watchlist (context ignored, cutoff, metadata borrowing,
+                 missing sections, repetitive)
+_Review:_ F 30/100 | hit token cap (500) | missing sections: title,
+          description, keywords | missing terms: view, Round, Tower, Windsor,
+          Castle | nonvisual metadata reused
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
-> &#8203;Title:
-> Round Tower, Windsor Castle, River Thames view
 >
-> &#8203;Description:
-> The Round Tower of Windsor Castle is visible across water, with trees in the
-> foreground. The Union Flag is flying from the tower’s flagpole.
->
-> &#8203;Keywords:
-> castle, tower, Round Tower, Windsor Castle, river, water, trees, foliage,
-> Union Flag, sky, clouds, exterior, architecture, stone, daytime, sunlight,
-> green, grey, landscape
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+> &#45; 12-18 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40:
+> 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40:
+> 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40:
+> 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40:
+> 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40:
+> 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40:
+> 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40:
+> 17:45:40: 1
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
-- Keyword count violation (19; expected 10-18)
+- Repetitive output (17:45:40:)
+- Context ignored (missing: view, Round, Tower, Windsor, Castle)
+- Missing sections (title, description, keywords)
+- Nonvisual metadata borrowing
+- Likely capped by max token budget
+- Ignores trusted hints
 
 ---
 
@@ -1107,13 +1158,13 @@ _Token accounting:_ prompt=779 | text_est=442 | nontext_est=337 | gen=84 |
 _Next action:_ Treat as a model limitation for this prompt; trusted hint
                coverage is still weak.
 
-_Metrics:_ Load 2.60s | Gen 4.93s | Total 7.88s
-_Throughput:_ Prompt 583 TPS (779 tok) | Gen 27.2 TPS (84 tok)
+_Metrics:_ Load 2.69s | Gen 4.90s | Total 7.95s
+_Throughput:_ Prompt 587 TPS (779 tok) | Gen 27.4 TPS (84 tok)
 _Assessment:_ 🏆 A (94/100) | Δ+49 | None identified
 _Review Status:_ strong candidate for first-pass review
 _Review:_ A 94/100 | missing terms: view, Round, Windsor, royal, residence
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > Title: Stone castle tower above green trees and river
 >
@@ -1123,7 +1174,7 @@ _Review:_ A 94/100 | missing terms: view, Round, Windsor, royal, residence
 >
 > Keywords: castle, tower, stone, flag, trees, river, water, reflection,
 > green, foliage, sky, clouds, architecture, nature, landscape, daylight
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 _Quality Status:_ no quality issues detected in this run
 
@@ -1145,14 +1196,14 @@ _Token accounting:_ prompt=3308 | text_est=442 | nontext_est=2866 | gen=100 |
 _Next action:_ Treat this as a prompt-budget issue first; nontext prompt
                burden is 87% and the output stays weak under that load.
 
-_Metrics:_ Load 1.84s | Gen 5.01s | Total 7.20s
-_Throughput:_ Prompt 1,777 TPS (3,308 tok) | Gen 38.1 TPS (100 tok)
+_Metrics:_ Load 1.65s | Gen 4.92s | Total 6.92s
+_Throughput:_ Prompt 1,825 TPS (3,308 tok) | Gen 38.7 TPS (100 tok)
 _Assessment:_ 🏆 A (89/100) | Δ+44 | None identified
 _Review Status:_ watchlist (metadata borrowing)
 _Review:_ A 89/100 | output/prompt=3.02% | nontext prompt burden=87% | missing
           terms: view, royal, seen, across, flying | nonvisual metadata reused
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > &#8203;Title:
 > Windsor Castle Round Tower by River Thames
@@ -1166,7 +1217,7 @@ _Review:_ A 89/100 | output/prompt=3.02% | nontext prompt burden=87% | missing
 > Windsor Castle, Round Tower, River Thames, Union Flag, green trees, sky,
 > flagpole, castle architecture, river, foliage, nature, historic building,
 > Berkshire, England, blue sky, clouds, reflection, water
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1192,22 +1243,22 @@ _Token accounting:_ prompt=1531 | text_est=442 | nontext_est=1089 | gen=77 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 1.45s | Gen 5.03s | Total 6.83s
-_Throughput:_ Prompt 3,379 TPS (1,531 tok) | Gen 19.0 TPS (77 tok)
+_Metrics:_ Load 1.40s | Gen 4.94s | Total 6.69s
+_Throughput:_ Prompt 3,371 TPS (1,531 tok) | Gen 19.4 TPS (77 tok)
 _Assessment:_ ✅ B (78/100) | Δ+33 | Missing requested structure
 _Review Status:_ watchlist (context ignored, missing sections)
 _Review:_ B 78/100 | nontext prompt burden=71% | missing sections: title,
           description, keywords | missing terms: view, Round, Tower, Windsor,
           Castle
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > &#45; The river is calm and green, with a slight reflection of the sky and
 > trees. The water is calm and green, with a slight reflection of the sky and
 > trees. The sky is light blue with a few thin clouds. The trees are a bright
 > green, with some branches being bare and sticking out. The trees are in the
 > foreground, with the river in the background.
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1234,8 +1285,8 @@ _Token accounting:_ prompt=1497 | text_est=442 | nontext_est=1055 | gen=500 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 1.97s | Gen 5.45s | Total 7.76s
-_Throughput:_ Prompt 1,735 TPS (1,497 tok) | Gen 125 TPS (500 tok)
+_Metrics:_ Load 1.92s | Gen 5.33s | Total 7.58s
+_Throughput:_ Prompt 1,761 TPS (1,497 tok) | Gen 127 TPS (500 tok)
 _Assessment:_ ✅ B (74/100) | Δ+29 | Keywords are not specific or diverse
               enough
 _Review Status:_ watchlist (cutoff, metadata borrowing, missing sections,
@@ -1244,7 +1295,7 @@ _Review:_ B 74/100 | hit token cap (500) | nontext prompt burden=70% | missing
           sections: title, description, keywords | missing terms: which,
           indicates, reigning, photograph
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > ◁think▷Got it, let's analyze the image. First, the title: the main subject
 > is the Round Tower of Windsor Castle with the Union Jack flag, seen from
@@ -1279,7 +1330,7 @@ _Review:_ B 74/100 | hit token cap (500) | nontext prompt burden=70% | missing
 > castle, flagpole, outdoor, historical site, natural landscape, sunlight,
 > blue sky.◁/think▷Title:
 > Windsor Castle Round Tower with Union
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1306,14 +1357,14 @@ _Token accounting:_ prompt=2286 | text_est=442 | nontext_est=1844 | gen=101 |
 _Next action:_ Treat as a model limitation for this prompt; trusted hint
                coverage is still weak.
 
-_Metrics:_ Load 1.81s | Gen 5.59s | Total 7.75s
-_Throughput:_ Prompt 1,200 TPS (2,286 tok) | Gen 32.2 TPS (101 tok)
+_Metrics:_ Load 1.65s | Gen 5.40s | Total 7.40s
+_Throughput:_ Prompt 1,391 TPS (2,286 tok) | Gen 31.7 TPS (101 tok)
 _Assessment:_ 🏆 A (88/100) | Δ+43 | None identified
 _Review Status:_ strong candidate for first-pass review
 _Review:_ A 88/100 | nontext prompt burden=81% | missing terms: royal,
           residence, Berkshire, seen, across
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > &#8203;Title:
 > Windsor Castle Tower View
@@ -1328,7 +1379,7 @@ _Review:_ A 88/100 | nontext prompt burden=81% | missing terms: royal,
 > cloudy sky, British architecture, historic building, flagpole,
 > Buckinghamshire, stone tower, serene landscape, water reflection, natural
 > setting
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1352,8 +1403,8 @@ _Token accounting:_ prompt=1497 | text_est=442 | nontext_est=1055 | gen=500 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 2.79s | Gen 5.76s | Total 8.89s
-_Throughput:_ Prompt 1,784 TPS (1,497 tok) | Gen 115 TPS (500 tok)
+_Metrics:_ Load 2.11s | Gen 5.99s | Total 8.46s
+_Throughput:_ Prompt 1,685 TPS (1,497 tok) | Gen 111 TPS (500 tok)
 _Assessment:_ ✅ B (67/100) | Δ+22 | Lacks visual description of image
 _Review Status:_ watchlist (cutoff, metadata borrowing, missing sections,
                  reasoning leak)
@@ -1361,7 +1412,7 @@ _Review:_ B 67/100 | hit token cap (500) | nontext prompt burden=70% | missing
           sections: title | missing terms: royal, indicates, reigning,
           photograph
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > ◁think▷Okay, let's tackle this metadata cataloging task. First, I need to
 > analyze the image based on the given rules. The user wants me to extract
@@ -1400,7 +1451,7 @@ _Review:_ B 67/100 | hit token cap (500) | nontext prompt burden=70% | missing
 > flagpole.
 > Keywords: Round Tower, Windsor Castle, Union Jack, River Thames, Windsor,
 > Berkshire, England, United Kingdom, trees, castle architecture, flag, partly
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1408,57 +1459,6 @@ _Review:_ B 67/100 | hit token cap (500) | nontext prompt burden=70% | missing
 - Reasoning leak (◁think▷, ◁/think▷)
 - Nonvisual metadata borrowing
 - Likely capped by max token budget
-
----
-
-<a id="model-mlx-community-gemma-3n-e2b-4bit"></a>
-
-### ✅ mlx-community/gemma-3n-E2B-4bit
-
-_Verdict:_ cutoff_degraded | user=avoid
-_Why:_ hit token cap (500) | missing sections: title, description, keywords |
-       missing terms: view, Round, Tower, Windsor, Castle | nonvisual metadata
-       reused
-_Trusted hints:_ ignores trusted hints | missing terms: view, Round, Tower,
-                 Windsor, Castle | nonvisual metadata reused
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | ignores trusted hints | metadata borrowing
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=765 | text_est=442 | nontext_est=323 | gen=500 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; the requested
-               output contract is not being met.
-
-_Metrics:_ Load 2.13s | Gen 6.27s | Total 8.77s
-_Throughput:_ Prompt 568 TPS (765 tok) | Gen 113 TPS (500 tok)
-_Assessment:_ ❌ F (30/100) | Δ-15 | Lacks visual description of image
-_Review Status:_ watchlist (context ignored, cutoff, metadata borrowing,
-                 missing sections, repetitive)
-_Review:_ F 30/100 | hit token cap (500) | missing sections: title,
-          description, keywords | missing terms: view, Round, Tower, Windsor,
-          Castle | nonvisual metadata reused
-
-<!-- markdownlint-disable MD028 MD037 MD045 -->
->
->
-> &#45; 12-18 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40:
-> 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40:
-> 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40:
-> 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40:
-> 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40:
-> 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40:
-> 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40: 17:45:40:
-> 17:45:40: 1
-<!-- markdownlint-enable MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Repetitive output (17:45:40:)
-- Context ignored (missing: view, Round, Tower, Windsor, Castle)
-- Missing sections (title, description, keywords)
-- Nonvisual metadata borrowing
-- Likely capped by max token budget
-- Ignores trusted hints
 
 ---
 
@@ -1480,8 +1480,8 @@ _Token accounting:_ prompt=2654 | text_est=442 | nontext_est=2212 | gen=84 |
 _Next action:_ Inspect decode cleanup; tokenizer markers are leaking into
                user-facing text.
 
-_Metrics:_ Load 2.01s | Gen 7.13s | Total 9.52s
-_Throughput:_ Prompt 694 TPS (2,654 tok) | Gen 31.6 TPS (84 tok)
+_Metrics:_ Load 1.96s | Gen 6.66s | Total 8.98s
+_Throughput:_ Prompt 757 TPS (2,654 tok) | Gen 32.2 TPS (84 tok)
 _Assessment:_ ❌ F (6/100) | Δ-39 | Output too short to be useful
 _Review Status:_ watchlist (harness, missing sections)
 _Review:_ F 6/100 | Tokenizer space-marker artifacts (for example Ġ) appeared
@@ -1489,10 +1489,10 @@ _Review:_ F 6/100 | Tokenizer space-marker artifacts (for example Ġ) appeared
           missing sections: description, keywords | missing terms: view,
           royal, residence, Berkshire, which
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > Title:ĠWindsorĠCastleĠRoundĠTowerĊĊDescription:ĠTheĠRoundĠTowerĠofĠWindsorĠCastleĠisĠseenĠacrossĠtheĠRiverĠThames,ĠwithĠlushĠgreenĠtreesĠinĠtheĠforegroundĠandĠaĠpartlyĠcloudyĠskyĠabove.ĠTheĠUnionĠFlagĠisĠflyingĠfromĠtheĠtower'sĠflagpole.ĊĊKeywords:ĠWindsorĠCastle,ĠRoundĠTower,ĠRiverĠThames,ĠUnionĠFlag,ĠgreenĠtrees,ĠpartlyĠcloudyĠsky,ĠhistoricĠcastle,ĠmedievalĠarchitecture,Ġflagpole,ĠwaterĠreflection
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1519,14 +1519,14 @@ _Token accounting:_ prompt=3308 | text_est=442 | nontext_est=2866 | gen=96 |
 _Next action:_ Treat this as a prompt-budget issue first; nontext prompt
                burden is 87% and the output stays weak under that load.
 
-_Metrics:_ Load 2.64s | Gen 7.20s | Total 10.17s
-_Throughput:_ Prompt 1,864 TPS (3,308 tok) | Gen 19.6 TPS (96 tok)
+_Metrics:_ Load 2.54s | Gen 6.99s | Total 9.87s
+_Throughput:_ Prompt 1,915 TPS (3,308 tok) | Gen 20.2 TPS (96 tok)
 _Assessment:_ 🏆 A (88/100) | Δ+43 | None identified
 _Review Status:_ watchlist (metadata borrowing)
 _Review:_ A 88/100 | output/prompt=2.90% | nontext prompt burden=87% | missing
           terms: view, royal, seen, across, flying | nonvisual metadata reused
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > &#8203;Title:
 > Windsor Castle Round Tower by River Thames
@@ -1540,12 +1540,54 @@ _Review:_ A 88/100 | output/prompt=2.90% | nontext prompt burden=87% | missing
 > Windsor Castle, Round Tower, River Thames, Union Flag, green trees, sky,
 > flagpole, castle architecture, river, foliage, nature, historic building,
 > Berkshire, England, blue sky, clouds
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:context_budget
 - Nonvisual metadata borrowing
+
+---
+
+<a id="model-mlx-community-gemma-3-27b-it-qat-8bit"></a>
+
+### ✅ mlx-community/gemma-3-27b-it-qat-8bit
+
+_Verdict:_ clean | user=recommended
+_Why:_ missing terms: royal, residence, Berkshire, seen, flagpole
+_Trusted hints:_ improves trusted hints
+_Contract:_ ok
+_Utility:_ user=recommended | improves trusted hints
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=774 | text_est=442 | nontext_est=332 | gen=93 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; trusted hint
+               coverage is still weak.
+
+_Metrics:_ Load 3.37s | Gen 7.11s | Total 10.83s
+_Throughput:_ Prompt 559 TPS (774 tok) | Gen 17.7 TPS (93 tok)
+_Assessment:_ 🏆 A (90/100) | Δ+45 | None identified
+_Review Status:_ strong candidate for first-pass review
+_Review:_ A 90/100 | missing terms: royal, residence, Berkshire, seen,
+          flagpole
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> &#8203;Title:
+> Round Tower, Windsor Castle, River Thames View
+>
+> &#8203;Description:
+> The Round Tower of Windsor Castle is visible above trees, with the Union
+> Flag flying. The tower is viewed across a body of water, with green foliage
+> in the foreground.
+>
+> &#8203;Keywords:
+> castle, tower, Round Tower, Windsor Castle, river, water, trees, foliage,
+> Union Flag, flag, green, sky, clouds, sunlight, exterior, architecture,
+> stone, daytime
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
 
 ---
 
@@ -1565,14 +1607,14 @@ _Token accounting:_ prompt=773 | text_est=442 | nontext_est=331 | gen=312 |
 _Next action:_ Treat as a model limitation for this prompt; trusted hint
                coverage is still weak.
 
-_Metrics:_ Load 2.37s | Gen 7.45s | Total 10.18s
-_Throughput:_ Prompt 1,655 TPS (773 tok) | Gen 47.9 TPS (312 tok)
+_Metrics:_ Load 2.20s | Gen 7.30s | Total 9.86s
+_Throughput:_ Prompt 1,781 TPS (773 tok) | Gen 48.7 TPS (312 tok)
 _Assessment:_ ✅ B (72/100) | Δ+27 | None identified
 _Review Status:_ watchlist (metadata borrowing)
 _Review:_ B 72/100 | missing terms: Round, Tower, royal, residence, Berkshire
           | keywords=34 | nonvisual metadata reused
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > &#35;# Image Description for Cataloguing
 >
@@ -1609,7 +1651,7 @@ _Review:_ B 72/100 | missing terms: Round, Tower, royal, residence, Berkshire
 > alongside the River Thames. The presence of the Union Jack indicates the
 > castle's national importance. The greenery suggests a pleasant, possibly
 > spring or summer, setting.
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1635,14 +1677,14 @@ _Token accounting:_ prompt=2786 | text_est=442 | nontext_est=2344 | gen=184 |
 _Next action:_ Treat as a model limitation for this prompt; trusted hint
                coverage is still weak.
 
-_Metrics:_ Load 1.95s | Gen 7.46s | Total 9.76s
-_Throughput:_ Prompt 2,474 TPS (2,786 tok) | Gen 32.1 TPS (184 tok)
+_Metrics:_ Load 1.89s | Gen 7.47s | Total 9.71s
+_Throughput:_ Prompt 2,453 TPS (2,786 tok) | Gen 32.1 TPS (184 tok)
 _Assessment:_ ✅ B (76/100) | Δ+31 | None identified
 _Review Status:_ watchlist (metadata borrowing)
 _Review:_ B 76/100 | nontext prompt burden=84% | missing terms: flying, which,
           indicates, photograph | keywords=38 | nonvisual metadata reused
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > Title: Windsor Castle and River Thames View
 >
@@ -1659,7 +1701,7 @@ _Review:_ B 76/100 | nontext prompt burden=84% | missing terms: flying, which,
 > Berkshire, England, royal, castle, round, tower, river, thames, union, flag,
 > flagpole, greenery, trees, cloudy, sky, sunlight, gentle, glow,
 > scene.<end_of_utterance>
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1667,48 +1709,6 @@ _Review:_ B 76/100 | nontext prompt burden=84% | missing terms: flying, which,
 - Keyword count violation (38; expected 10-18)
 - Nonvisual metadata borrowing
 - Unknown tags: &lt;end_of_utterance&gt;
-
----
-
-<a id="model-mlx-community-gemma-3-27b-it-qat-8bit"></a>
-
-### ✅ mlx-community/gemma-3-27b-it-qat-8bit
-
-_Verdict:_ clean | user=recommended
-_Why:_ missing terms: royal, residence, Berkshire, seen, flagpole
-_Trusted hints:_ improves trusted hints
-_Contract:_ ok
-_Utility:_ user=recommended | improves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=774 | text_est=442 | nontext_est=332 | gen=93 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; trusted hint
-               coverage is still weak.
-
-_Metrics:_ Load 3.59s | Gen 7.49s | Total 11.45s
-_Throughput:_ Prompt 469 TPS (774 tok) | Gen 17.4 TPS (93 tok)
-_Assessment:_ 🏆 A (90/100) | Δ+45 | None identified
-_Review Status:_ strong candidate for first-pass review
-_Review:_ A 90/100 | missing terms: royal, residence, Berkshire, seen,
-          flagpole
-
-<!-- markdownlint-disable MD028 MD037 MD045 -->
->
-> &#8203;Title:
-> Round Tower, Windsor Castle, River Thames View
->
-> &#8203;Description:
-> The Round Tower of Windsor Castle is visible above trees, with the Union
-> Flag flying. The tower is viewed across a body of water, with green foliage
-> in the foreground.
->
-> &#8203;Keywords:
-> castle, tower, Round Tower, Windsor Castle, river, water, trees, foliage,
-> Union Flag, flag, green, sky, clouds, sunlight, exterior, architecture,
-> stone, daytime
-<!-- markdownlint-enable MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
 
 ---
 
@@ -1729,74 +1729,24 @@ _Token accounting:_ prompt=1531 | text_est=442 | nontext_est=1089 | gen=31 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 2.43s | Gen 7.88s | Total 10.66s
-_Throughput:_ Prompt 1,040 TPS (1,531 tok) | Gen 5.28 TPS (31 tok)
+_Metrics:_ Load 2.42s | Gen 7.67s | Total 10.44s
+_Throughput:_ Prompt 1,112 TPS (1,531 tok) | Gen 5.38 TPS (31 tok)
 _Assessment:_ ❌ F (20/100) | Δ-26 | Output lacks detail
 _Review Status:_ watchlist (context ignored, missing sections)
 _Review:_ F 20/100 | nontext prompt burden=71% | missing sections: title,
           description, keywords | missing terms: view, Round, Tower, Windsor,
           Castle
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > &#45; Camera metadata: 1/1250s, f/11, 200 ISO, 24mm lens.
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
 - Context ignored (missing: view, Round, Tower, Windsor, Castle)
 - Missing sections (title, description, keywords)
 - Ignores trusted hints
-
----
-
-<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
-
-### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
-
-_Verdict:_ model_shortcoming | user=avoid
-_Why:_ missing sections: title, description, keywords | missing terms: which,
-       indicates | nonvisual metadata reused
-_Trusted hints:_ preserves trusted hints | nonvisual metadata reused
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | preserves trusted hints | metadata borrowing
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=474 | text_est=442 | nontext_est=32 | gen=149 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; the requested
-               output contract is not being met.
-
-_Metrics:_ Load 1.63s | Gen 9.73s | Total 11.70s
-_Throughput:_ Prompt 284 TPS (474 tok) | Gen 19.6 TPS (149 tok)
-_Assessment:_ 🟠 D (37/100) | Δ-8 | Lacks visual description of image
-_Review Status:_ watchlist (metadata borrowing, missing sections)
-_Review:_ D 37/100 | missing sections: title, description, keywords | missing
-          terms: which, indicates | nonvisual metadata reused
-
-<!-- markdownlint-disable MD028 MD037 MD045 -->
->
-> &#42;&#42;Title&#42;&#42;
-> Windsor Castle from the River Thames
->
-> &#42;&#42;Description&#42;&#42;
-> The image shows a view of the Round Tower of Windsor Castle, a royal
-> residence in Windsor, Berkshire, England, as seen from across the River
-> Thames. The Union Flag is flying from the flagpole, indicating that the
-> reigning monarch is not in residence at the castle at the time the
-> photograph was taken. The castle is surrounded by trees and the river is
-> calm, reflecting the sunlight.
->
-> &#42;&#42;Keywords&#42;&#42;
-> Windsor Castle, Royal Residence, River Thames, Union Flag, Trees, Calm
-> Water, Reflections, British Flag, Castle Tower, Flagpole, Greenery, Nature,
-> Scenic View, Historical Landmark, British Heritage, Architecture, Landscape,
-> Photography
-<!-- markdownlint-enable MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Missing sections (title, description, keywords)
-- Nonvisual metadata borrowing
 
 ---
 
@@ -1817,8 +1767,8 @@ _Token accounting:_ prompt=1317 | text_est=442 | nontext_est=875 | gen=500 |
 _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
                into user-facing text.
 
-_Metrics:_ Load 0.89s | Gen 9.88s | Total 11.14s
-_Throughput:_ Prompt 3,814 TPS (1,317 tok) | Gen 55.1 TPS (500 tok)
+_Metrics:_ Load 0.87s | Gen 9.80s | Total 11.01s
+_Throughput:_ Prompt 3,826 TPS (1,317 tok) | Gen 55.5 TPS (500 tok)
 _Assessment:_ 🟡 C (62/100) | Δ+17 | Lacks visual description of image
 _Review Status:_ watchlist (hallucination, harness, metadata borrowing)
 _Review:_ C 62/100 | Special control token &lt;|end|&gt; appeared in generated
@@ -1898,6 +1848,56 @@ _Review:_ C 62/100 | Special control token &lt;|end|&gt; appeared in generated
 
 ---
 
+<a id="model-mlx-community-llama-32-11b-vision-instruct-8bit"></a>
+
+### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
+
+_Verdict:_ model_shortcoming | user=avoid
+_Why:_ missing sections: title, description, keywords | missing terms: which,
+       indicates | nonvisual metadata reused
+_Trusted hints:_ preserves trusted hints | nonvisual metadata reused
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | preserves trusted hints | metadata borrowing
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=474 | text_est=442 | nontext_est=32 | gen=149 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; the requested
+               output contract is not being met.
+
+_Metrics:_ Load 1.47s | Gen 10.06s | Total 11.89s
+_Throughput:_ Prompt 293 TPS (474 tok) | Gen 18.7 TPS (149 tok)
+_Assessment:_ 🟠 D (37/100) | Δ-8 | Lacks visual description of image
+_Review Status:_ watchlist (metadata borrowing, missing sections)
+_Review:_ D 37/100 | missing sections: title, description, keywords | missing
+          terms: which, indicates | nonvisual metadata reused
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> &#42;&#42;Title&#42;&#42;
+> Windsor Castle from the River Thames
+>
+> &#42;&#42;Description&#42;&#42;
+> The image shows a view of the Round Tower of Windsor Castle, a royal
+> residence in Windsor, Berkshire, England, as seen from across the River
+> Thames. The Union Flag is flying from the flagpole, indicating that the
+> reigning monarch is not in residence at the castle at the time the
+> photograph was taken. The castle is surrounded by trees and the river is
+> calm, reflecting the sunlight.
+>
+> &#42;&#42;Keywords&#42;&#42;
+> Windsor Castle, Royal Residence, River Thames, Union Flag, Trees, Calm
+> Water, Reflections, British Flag, Castle Tower, Flagpole, Greenery, Nature,
+> Scenic View, Historical Landmark, British Heritage, Architecture, Landscape,
+> Photography
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Missing sections (title, description, keywords)
+- Nonvisual metadata borrowing
+
+---
+
 <a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
 
 ### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
@@ -1916,15 +1916,15 @@ _Token accounting:_ prompt=1818 | text_est=442 | nontext_est=1376 | gen=500 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 5.03s | Gen 11.34s | Total 16.75s
-_Throughput:_ Prompt 1,162 TPS (1,818 tok) | Gen 55.5 TPS (500 tok)
+_Metrics:_ Load 4.77s | Gen 11.49s | Total 16.61s
+_Throughput:_ Prompt 1,176 TPS (1,818 tok) | Gen 54.5 TPS (500 tok)
 _Assessment:_ ✅ B (74/100) | Δ+29 | Missing requested structure
 _Review Status:_ watchlist (cutoff, metadata borrowing, missing sections)
 _Review:_ B 74/100 | hit token cap (500) | nontext prompt burden=76% | missing
           sections: title, description | missing terms: royal, residence,
           Berkshire, seen, indicates
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > Let's tackle this step by step. First, the title needs to be 5-10 words,
 > concrete and factual. The image is of Windsor Castle's Round Tower with the
@@ -1957,7 +1957,7 @@ _Review:_ B 74/100 | hit token cap (500) | nontext prompt burden=76% | missing
 >
 > Wait, but let's go back to the rules: only details clearly visible. The hint
 > says the Union Flag is flying, so that's definite. The Round Tower is the
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -1987,8 +1987,8 @@ _Token accounting:_ prompt=4603 | text_est=442 | nontext_est=4161 | gen=500 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 1.15s | Gen 12.59s | Total 14.10s
-_Throughput:_ Prompt 3,793 TPS (4,603 tok) | Gen 46.9 TPS (500 tok)
+_Metrics:_ Load 1.11s | Gen 12.39s | Total 13.85s
+_Throughput:_ Prompt 3,938 TPS (4,603 tok) | Gen 47.6 TPS (500 tok)
 _Assessment:_ 🟠 D (49/100) | Δ+4 | Keywords are not specific or diverse enough
 _Review Status:_ watchlist (context ignored, cutoff, missing sections,
                  repetitive)
@@ -1996,7 +1996,7 @@ _Review:_ D 49/100 | hit token cap (500) | nontext prompt burden=90% | missing
           sections: title, description, keywords | missing terms: view, Round,
           Tower, Windsor, Castle
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > &#45; Output only the description text after the label.
 > &#45; Output only the keyword list after the label.
@@ -2044,7 +2044,7 @@ _Review:_ D 49/100 | hit token cap (500) | nontext prompt burden=90% | missing
 > &#45; Output only the keyword list after the label.
 > &#45; Output only the description text after the label.
 > &#45; Output only the keyword
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2074,8 +2074,8 @@ _Token accounting:_ prompt=6618 | text_est=442 | nontext_est=6176 | gen=500 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 1.61s | Gen 12.97s | Total 14.92s
-_Throughput:_ Prompt 1,200 TPS (6,618 tok) | Gen 71.3 TPS (500 tok)
+_Metrics:_ Load 1.32s | Gen 13.83s | Total 15.52s
+_Throughput:_ Prompt 1,042 TPS (6,618 tok) | Gen 71.5 TPS (500 tok)
 _Assessment:_ ✅ B (68/100) | Δ+23 | Keywords are not specific or diverse
               enough
 _Review Status:_ watchlist (cutoff, metadata borrowing, missing sections,
@@ -2084,7 +2084,7 @@ _Review:_ B 68/100 | hit token cap (500) | nontext prompt burden=93% | missing
           sections: title, description, keywords | missing terms: royal,
           residence, Berkshire, which, indicates
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > &lt;think&gt;Got it, let's tackle this. First, I need to analyze the image for
 > cataloguing metadata. The user provided a context with hints, but I must
@@ -2120,7 +2120,7 @@ _Review:_ B 68/100 | hit token cap (500) | nontext prompt burden=93% | missing
 > water, partly cloudy sky, Union Jack flag, flagpole, stone tower, water
 > reflection, lush greenery. Now pick 12-16 unique terms. Let's check: "Round
 > Tower of Windsor Castle" - that's a key subject. "River Thames" - setting.
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2149,8 +2149,8 @@ _Token accounting:_ prompt=3399 | text_est=442 | nontext_est=2957 | gen=500 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 1.71s | Gen 14.93s | Total 17.03s
-_Throughput:_ Prompt 1,463 TPS (3,399 tok) | Gen 41.4 TPS (500 tok)
+_Metrics:_ Load 1.69s | Gen 14.56s | Total 16.61s
+_Throughput:_ Prompt 1,515 TPS (3,399 tok) | Gen 42.4 TPS (500 tok)
 _Assessment:_ 🟡 C (60/100) | Δ+15 | Keywords are not specific or diverse
               enough
 _Review Status:_ watchlist (cutoff, metadata borrowing, missing sections,
@@ -2159,7 +2159,7 @@ _Review:_ C 60/100 | hit token cap (500) | nontext prompt burden=87% | missing
           sections: title, description, keywords | missing terms: view, royal,
           residence, Berkshire, seen
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > &#8203;Here are my reasoning steps:
 > We need to produce three sections: Title, Description, Keywords. Use only
@@ -2194,7 +2194,7 @@ _Review:_ C 60/100 | hit token cap (500) | nontext prompt burden=87% | missing
 > Windsor Castle. The tower is a round stone tower with a flag. The Round
 > Tower of Windsor Castle is a known structure. But is it visually obvious
 > that it's Windsor Castle? The tower is a round tower
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2222,8 +2222,8 @@ _Token accounting:_ prompt=6618 | text_est=442 | nontext_est=6176 | gen=500 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 1.51s | Gen 15.16s | Total 17.02s
-_Throughput:_ Prompt 1,181 TPS (6,618 tok) | Gen 54.9 TPS (500 tok)
+_Metrics:_ Load 1.42s | Gen 15.82s | Total 17.59s
+_Throughput:_ Prompt 1,103 TPS (6,618 tok) | Gen 53.5 TPS (500 tok)
 _Assessment:_ ✅ B (76/100) | Δ+31 | Missing requested structure
 _Review Status:_ watchlist (cutoff, degeneration, metadata borrowing, missing
                  sections, reasoning leak)
@@ -2231,7 +2231,7 @@ _Review:_ B 76/100 | hit token cap (500) | nontext prompt burden=93% | missing
           sections: title, description | missing terms: view, royal,
           residence, Berkshire, seen
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > &lt;think&gt;Got it, let's tackle this step by step. First, I need to extract the
 > Title, Description, and Keywords based on the image.
@@ -2274,7 +2274,7 @@ _Review:_ B 76/100 | hit token cap (500) | nontext prompt burden=93% | missing
 >
 > Now, check the count: that's 15 keywords, which is within 10-18. Are all of
 > these definitely visible? Yes. For example, "Windsor Castle" is
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2304,14 +2304,14 @@ _Token accounting:_ prompt=16731 | text_est=442 | nontext_est=16289 | gen=136
 _Next action:_ Treat this as a prompt-budget issue first; nontext prompt
                burden is 97% and the output stays weak under that load.
 
-_Metrics:_ Load 1.11s | Gen 21.36s | Total 22.83s
-_Throughput:_ Prompt 918 TPS (16,731 tok) | Gen 56.6 TPS (136 tok)
+_Metrics:_ Load 1.10s | Gen 20.82s | Total 22.27s
+_Throughput:_ Prompt 944 TPS (16,731 tok) | Gen 57.6 TPS (136 tok)
 _Assessment:_ 🏆 A (87/100) | Δ+42 | None identified
 _Review Status:_ watchlist (metadata borrowing)
 _Review:_ A 87/100 | output/prompt=0.81% | nontext prompt burden=97% | missing
           terms: seen, which, indicates, reigning, monarch | keywords=22
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > &#8203;Title:
 > Windsor Castle from across the River Thames
@@ -2327,12 +2327,140 @@ _Review:_ A 87/100 | output/prompt=0.81% | nontext prompt burden=97% | missing
 > architecture, greenery, trees, calm water, stone building, arched windows,
 > British flag, royal residence, Berkshire, England, natural setting, daytime,
 > clear sky, reflection, water surface, landscape, serene atmosphere.
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
 - ⚠️REVIEW:context_budget
 - Keyword count violation (22; expected 10-18)
+- Nonvisual metadata borrowing
+
+---
+
+<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
+
+### ✅ mlx-community/Molmo-7B-D-0924-8bit
+
+_Verdict:_ model_shortcoming | user=avoid
+_Why:_ nontext prompt burden=74% | missing sections: description, keywords |
+       missing terms: view, Berkshire, seen, across, which | context echo=100%
+_Trusted hints:_ improves trusted hints
+_Contract:_ missing: description, keywords | title words=34
+_Utility:_ user=avoid | improves trusted hints | instruction echo | context
+           echo
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=1690 | text_est=442 | nontext_est=1248 | gen=299 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; the requested
+               output contract is not being met.
+
+_Metrics:_ Load 1.10s | Gen 23.01s | Total 24.46s
+_Throughput:_ Prompt 103 TPS (1,690 tok) | Gen 51.4 TPS (299 tok)
+_Assessment:_ 🟡 C (59/100) | Δ+14 | Lacks visual description of image
+_Review Status:_ watchlist (context echo, instruction echo, missing sections,
+                 reasoning leak)
+_Review:_ C 59/100 | nontext prompt burden=74% | missing sections:
+          description, keywords | missing terms: view, Berkshire, seen,
+          across, which | context echo=100%
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> Weather: Clear, sunny day with some clouds. Season: Spring. Water: Thames
+> River. Vegetation: Trees and shrubs along the riverbank. Lighting: Bright
+> &#8203;sunlight from right, creating reflections on the water. Castle features:
+> &#8203;Round Tower, parapets, battlements, and flagpole visible. Union Jack:
+> Partially visible, fluttering in the breeze. Castle position: Slightly
+> elevated above the riverbank. River: Calm, with gentle ripples. Seasonal
+> indicators: Trees in full leaf, suggesting early spring. Modern elements: No
+> &#8203;visible modern structures or people in the image. Castle state:
+> Well-maintained, appearing as a popular tourist attraction. Historical
+> context: Windsor Castle has been a royal residence for over 900 years,
+> serving as a base for British monarchs throughout history. Its location on
+> the Thames provided strategic advantages and continues to offer scenic views
+> of the river and surrounding landscape.
+> &#45; Title hint: Windsor Castle, Thames River, UK, spring, royal residence,
+> flag flying, tourist attraction, historical site, medieval architecture,
+> Union Jack, sunny day, calm waters, vegetation along riverbank, seasonal
+> indicators, no modern elements, royal heritage, British history.
+>
+> &#8203;Title:
+> &#45; Windsor Castle, Thames River, UK, spring, royal residence, flag flying,
+> tourist attraction, historical site, medieval architecture, Union Jack,
+> sunny day, calm waters, vegetation along riverbank, seasonal indicators, no
+> modern elements, royal heritage, British history.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Missing sections (description, keywords)
+- Title length violation (34 words; expected 5-10)
+- Reasoning leak (title hint:)
+- Context echo (100% overlap)
+- Instruction echo
+
+---
+
+<a id="model-mlx-community-molmo-7b-d-0924-bf16"></a>
+
+### ✅ mlx-community/Molmo-7B-D-0924-bf16
+
+_Verdict:_ model_shortcoming | user=avoid
+_Why:_ nontext prompt burden=74% | missing terms: Flag, which, indicates |
+       keywords=20 | nonvisual metadata reused
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
+_Contract:_ description sentences=4 | keywords=20
+_Utility:_ user=avoid | improves trusted hints | instruction echo | metadata
+           borrowing
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=1690 | text_est=442 | nontext_est=1248 | gen=297 |
+                    max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; trusted hint
+               coverage is still weak.
+
+_Metrics:_ Load 1.62s | Gen 24.53s | Total 26.52s
+_Throughput:_ Prompt 122 TPS (1,690 tok) | Gen 30.3 TPS (297 tok)
+_Assessment:_ ✅ B (74/100) | Δ+29 | None identified
+_Review Status:_ watchlist (instruction echo, metadata borrowing, reasoning
+                 leak)
+_Review:_ B 74/100 | nontext prompt burden=74% | missing terms: Flag, which,
+          indicates | keywords=20 | nonvisual metadata reused
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> Weather: Clear, sunny day with some clouds. Season: Spring (April). River:
+> Thames. Vegetation: Trees and shrubs along the riverbank. Sky: Light blue
+> with some clouds. Castle: Round Tower visible, but other parts of Windsor
+> Castle not visible. Union Jack flying from flagpole. No people visible in
+> the image. Castle appears quiet and empty of visitors. Reflections of trees
+> and sky visible in the river. Photograph taken from a distance across the
+> river. Castle's position on a hill overlooking the river. Windsor Castle is
+> a significant historical and tourist site in the United Kingdom.
+> &#45; Title hint: Windsor Castle, Round Tower, Thames, UK
+>
+> &#8203;Title:
+> &#45; Windsor Castle, Round Tower, Thames, UK
+>
+> &#8203;Description:
+> &#45; A view of the Round Tower of Windsor Castle, a royal residence in Windsor,
+> Berkshire, England, as seen from across the River Thames. The Union Jack is
+> flying from the flagpole, indicating the reigning monarch is not in
+> residence at the castle at the time the photograph was taken. The castle's
+> position on a hill overlooking the river is visible. Windsor Castle is a
+> significant historical and tourist site in the United Kingdom.
+>
+> &#8203;Keywords:
+> &#45; Round Tower, Windsor Castle, Thames, UK, Union Jack, No people, Spring
+> (April), Clear day, Historical site, Tourist destination, Riverbank,
+> Hilltop, Flagpole, No visitors, Quiet atmosphere, Reflections in river,
+> Spring foliage, Windsor, Berkshire, England
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Description sentence violation (4; expected 1-2)
+- Keyword count violation (20; expected 10-18)
+- Reasoning leak (title hint:)
+- Instruction echo
 - Nonvisual metadata borrowing
 
 ---
@@ -2353,14 +2481,14 @@ _Token accounting:_ prompt=475 | text_est=442 | nontext_est=33 | gen=118 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 2.25s | Gen 26.14s | Total 28.75s
-_Throughput:_ Prompt 252 TPS (475 tok) | Gen 4.96 TPS (118 tok)
+_Metrics:_ Load 2.17s | Gen 25.74s | Total 28.25s
+_Throughput:_ Prompt 255 TPS (475 tok) | Gen 5.04 TPS (118 tok)
 _Assessment:_ 🟠 D (48/100) | Δ+3 | Keywords are not specific or diverse enough
 _Review Status:_ watchlist (metadata borrowing, missing sections)
 _Review:_ D 48/100 | missing sections: title, description, keywords | missing
           terms: view, which, indicates | nonvisual metadata reused
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > Windsor Castle from Across the River Thames
 >
@@ -2372,7 +2500,7 @@ _Review:_ D 48/100 | missing sections: title, description, keywords | missing
 > architecture and its picturesque surroundings, with the river and trees
 > creating a tranquil atmosphere. The scene is set against a blue sky with
 > clouds, adding to the overall sense of serenity.
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2398,8 +2526,8 @@ _Token accounting:_ prompt=6618 | text_est=442 | nontext_est=6176 | gen=500 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 6.24s | Gen 27.64s | Total 34.23s
-_Throughput:_ Prompt 498 TPS (6,618 tok) | Gen 36.0 TPS (500 tok)
+_Metrics:_ Load 5.51s | Gen 26.91s | Total 32.80s
+_Throughput:_ Prompt 545 TPS (6,618 tok) | Gen 35.0 TPS (500 tok)
 _Assessment:_ ✅ B (71/100) | Δ+26 | Missing requested structure
 _Review Status:_ watchlist (cutoff, metadata borrowing, missing sections,
                  reasoning leak)
@@ -2407,7 +2535,7 @@ _Review:_ B 71/100 | hit token cap (500) | nontext prompt burden=93% | missing
           sections: title, description | missing terms: view, royal,
           residence, Berkshire, seen
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > &lt;think&gt;Got it, let's tackle this step by step. First, the title needs to be
 > 5-10 words, concrete and factual. The image shows a castle tower with a
@@ -2442,7 +2570,7 @@ _Review:_ B 71/100 | hit token cap (500) | nontext prompt burden=93% | missing
 > Windsor Castle, but the image doesn't show "castle" text. So maybe omit
 > "castle" since it's inferred. Let's check: the tower is a round tower, so
 > "round tower" is good. "Union Flag" is visible. "River
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2452,232 +2580,6 @@ _Review:_ B 71/100 | hit token cap (500) | nontext prompt burden=93% | missing
 - Nonvisual metadata borrowing
 - Likely capped by max token budget
 - Unknown tags: &lt;think&gt;
-
----
-
-<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
-
-### ✅ mlx-community/Molmo-7B-D-0924-8bit
-
-_Verdict:_ cutoff_degraded | user=avoid
-_Why:_ hit token cap (500) | nontext prompt burden=74% | missing sections:
-       title, description, keywords | missing terms: view, seen, which,
-       indicates, reigning
-_Trusted hints:_ improves trusted hints | nonvisual metadata reused
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | improves trusted hints | metadata borrowing
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=1690 | text_est=442 | nontext_est=1248 | gen=500 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; the requested
-               output contract is not being met.
-
-_Metrics:_ Load 1.39s | Gen 28.19s | Total 29.92s
-_Throughput:_ Prompt 94.6 TPS (1,690 tok) | Gen 52.5 TPS (500 tok)
-_Assessment:_ ✅ B (70/100) | Δ+25 | Keywords are not specific or diverse
-              enough
-_Review Status:_ watchlist (cutoff, metadata borrowing, missing sections,
-                 repetitive)
-_Review:_ B 70/100 | hit token cap (500) | nontext prompt burden=74% | missing
-          sections: title, description, keywords | missing terms: view, seen,
-          which, indicates, reigning
-
-<!-- markdownlint-disable MD028 MD037 MD045 -->
->
-> Weather: Clear, sunny day with some clouds. Season: Spring (April). River:
-> Thames. Vegetation: Trees and shrubs along the riverbank. Castle features:
-> Round Tower, Keep, and part of the Bailey. Flag: Union Jack. Castle colors:
-> Sandstone-colored stone. Sky: Blue with some clouds. Lighting: Daylight,
-> natural light. photographer: Not visible in image. castle location: Windsor,
-> Berkshire, England. royal residence status: Not in residence. flag flying
-> status: Indicating absence of monarch. castle visibility: Partially obscured
-> by trees. photographer position: Across the river. castle entrance: Not
-> visible in image. castle gate: Not visible in image. river activity: Calm,
-> no visible boats. castle details: Round Tower, Keep, Bailey, and part of the
-> Bailey wall. castle gatehouse: Not visible in image. castle tower height:
-> Approximately 50 feet. castle wall thickness: Approximately 10 feet.
-> flagpole height: Approximately 20 feet. tree height: Approximately 30 feet.
-> shrub height: Approximately 4 feet. river width: Approximately 100 meters.
-> river depth: Approximately 5 meters. castle wall material: Stone. castle
-> gate material: Stone. castle tower construction: Stone masonry. castle wall
-> construction: Stone masonry. castle tower windows: Not visible in image.
-> castle tower doors: Not visible in image. castle tower roof: Not visible in
-> image. castle tower parapets: Not visible in image. castle tower balcony:
-> Not visible in image. castle tower spiral staircase: Not visible in image.
-> castle tower spiral staircase material: Stone. castle tower spiral staircase
-> construction: Stone masonry. castle tower spiral staircase thickness:
-> Approximately 1 foot. castle tower spiral staircase width: Approximately 2
-> feet. castle tower spiral staircase height: Approximately 50 feet. castle
-> tower spiral staircase location: Not visible in image. castle tower spiral
-> staircase position: Not visible in image. castle tower spiral staircase
-> material: Stone. castle tower spiral staircase construction: Stone masonry.
-> castle tower spiral staircase thickness: Approximately 1 foot. castle tower
-> spiral staircase width: Approximately 2 feet. castle tower spiral staircase
-> height: Approximately 50 feet. castle tower spiral staircase location: Not
-> visible in image. castle tower spiral staircase position: Not visible in
-> image. castle tower spiral staircase material: Stone. castle tower spiral
-> staircase construction: Stone masonry. castle tower spiral staircase
-> &#8203;thickness:
-<!-- markdownlint-enable MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Repetitive output (phrase: "castle tower spiral staircase...")
-- Missing sections (title, description, keywords)
-- Nonvisual metadata borrowing
-- Likely capped by max token budget
-
----
-
-<a id="model-mlx-community-molmo-7b-d-0924-bf16"></a>
-
-### ✅ mlx-community/Molmo-7B-D-0924-bf16
-
-_Verdict:_ cutoff_degraded | user=avoid
-_Why:_ hit token cap (500) | nontext prompt burden=74% | missing sections:
-       title, description, keywords | missing terms: view, Windsor, royal,
-       residence, Berkshire
-_Trusted hints:_ improves trusted hints
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | improves trusted hints
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=1690 | text_est=442 | nontext_est=1248 | gen=500 |
-                    max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; the requested
-               output contract is not being met.
-
-_Metrics:_ Load 2.76s | Gen 35.77s | Total 38.88s
-_Throughput:_ Prompt 91.1 TPS (1,690 tok) | Gen 30.5 TPS (500 tok)
-_Assessment:_ 🟡 C (62/100) | Δ+17 | Keywords are not specific or diverse
-              enough
-_Review Status:_ watchlist (cutoff, degeneration, missing sections,
-                 repetitive)
-_Review:_ C 62/100 | hit token cap (500) | nontext prompt burden=74% | missing
-          sections: title, description, keywords | missing terms: view,
-          Windsor, royal, residence, Berkshire
-
-<!-- markdownlint-disable MD028 MD037 MD045 -->
->
-> Weather: Partly cloudy. Season: Spring. Water level: High. River: Thames.
-> Vegetation: Trees. Sky: Blue. Lighting: Daylight. Visibility: Good.
-> Distance: Medium (1-2 km). photographer: Not visible. photographer position:
-> Across the river. photographer equipment: Not visible. castle entrance: Not
-> visible. flagpole: Visible. flag: Union Jack. castle section: Round Tower.
-> castle gate: Not visible. castle walls: Visible. castle windows: Visible.
-> castle roof: Not visible. castle tower height: 20-30 meters. castle tower
-> diameter: 15-20 meters. castle tower shape: Circular. castle tower material:
-> Stone. castle tower construction: Medieval. castle tower features:
-> battlements. castle tower defensive elements: arrow slits. castle tower
-> modern additions: none visible. castle tower maintenance: well-maintained.
-> castle tower atmosphere: serene. castle tower mood: majestic. castle tower
-> setting: riverside. castle tower surroundings: trees. castle tower
-> vegetation: trees. castle tower reflection: Visible in river. castle tower
-> shadow: cast on river. castle tower silhouette: Prominent against sky.
-> castle tower silhouette: classic medieval profile. castle tower silhouette:
-> rounded. castle tower silhouette: flat-topped. castle tower silhouette:
-> cylindrical. castle tower silhouette: tapering. castle tower silhouette:
-> paraboloid. castle tower silhouette: conical. castle tower silhouette:
-> truncated cone. castle tower silhouette: cylindrical with truncated top.
-> castle tower silhouette: cylindrical with flat top. castle tower silhouette:
-> cylindrical with pointed top. castle tower silhouette: cylindrical with
-> rounded top. castle tower silhouette: cylindrical with tapered top. castle
-> tower silhouette: cylindrical with conical top. castle tower silhouette:
-> cylindrical with truncated conical top. castle tower silhouette: cylindrical
-> with flat-topped truncated cone. castle tower silhouette: cylindrical with
-> rounded-topped truncated cone. castle tower silhouette: cylindrical with
-> tapered rounded top. castle tower silhouette: cylindrical with flat-topped
-> tapered cone. castle tower silhouette: cylindrical with rounded-topped
-> tapered cone. castle tower silhouette: cylindrical with flat-topped tapered
-> cone. castle tower silhouette: cylindrical with rounded-topped truncated
-> cone. castle tower silhouette: cylindrical with flat-topped truncated cone.
-> castle tower silhouette: cylindrical with rounded-topped truncated cone.
-> castle tower silhouette: cylindrical with flat-topped truncated cone. castle
-> tower silhouette: cylindrical with rounded-topped truncated cone. castle
-> tower silhouette: cylindrical with flat-t
-<!-- markdownlint-enable MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Repetitive output (phrase: "castle tower silhouette: cylin...")
-- Output degeneration (incomplete_sentence: ends with 't')
-- Missing sections (title, description, keywords)
-- Likely capped by max token budget
-
----
-
-<a id="model-mlx-community-qwen35-35b-a3b-4bit"></a>
-
-### ✅ mlx-community/Qwen3.5-35B-A3B-4bit
-
-_Verdict:_ cutoff_degraded | user=avoid
-_Why:_ hit token cap (500) | nontext prompt burden=97% | missing sections:
-       title, description, keywords | missing terms: royal, residence,
-       Berkshire, flagpole, which
-_Trusted hints:_ improves trusted hints | nonvisual metadata reused
-_Contract:_ missing: title, description, keywords
-_Utility:_ user=avoid | improves trusted hints | metadata borrowing
-_Stack / owner:_ owner=model
-_Token accounting:_ prompt=16746 | text_est=442 | nontext_est=16304 | gen=500
-                    | max=500 | stop=completed
-_Next action:_ Treat as a model limitation for this prompt; the requested
-               output contract is not being met.
-
-_Metrics:_ Load 2.61s | Gen 58.29s | Total 61.25s
-_Throughput:_ Prompt 317 TPS (16,746 tok) | Gen 106 TPS (500 tok)
-_Assessment:_ 🟡 C (64/100) | Δ+19 | Missing requested structure
-_Review Status:_ watchlist (cutoff, metadata borrowing, missing sections)
-_Review:_ C 64/100 | hit token cap (500) | nontext prompt burden=97% | missing
-          sections: title, description, keywords | missing terms: royal,
-          residence, Berkshire, flagpole, which
-
-<!-- markdownlint-disable MD028 MD037 MD045 -->
->
-> The user wants me to generate metadata for the provided image based on
-> specific rules.
->
-> &#42;&#42;1. Analyze the Image:&#42;&#42;
-> &#42;   &#42;&#42;Subject:&#42;&#42; A large stone castle tower (Round Tower) is visible above a
-> line of trees.
-> &#42;   &#42;&#42;Foreground:&#42;&#42; A body of water (river) with ripples.
-> &#42;   &#42;&#42;Midground:&#42;&#42; Dense green trees, mostly deciduous, obscuring the lower
-> part of the castle.
-> &#42;   &#42;&#42;Background:&#42;&#42; Blue sky with some clouds.
-> &#42;   &#42;&#42;Details:&#42;&#42;
-> &#42;   A flag is flying on top of the tower. It looks like the Union Flag
-> (Union Jack).
-> &#42;   The architecture is stone, with crenellations and arched
-> windows/openings.
-> &#42;   The water reflects the green of the trees.
-> &#42;   There are trees on the right side framing the shot.
->
-> &#42;&#42;2. Evaluate the "Context" hints:&#42;&#42;
-> &#42;   &#42;Hint:&#42; "A view of the Round Tower of Windsor Castle..." -> The image
-> clearly shows a castle tower that matches the description of Windsor
-> Castle's Round Tower. The flag is visible. I can confirm it's a castle
-> tower. I can confirm it's a river view.
-> &#42;   &#42;Hint:&#42; "...as seen from across the River Thames." -> The water looks
-> like a river. It's safe to say "river" or "water". Identifying it
-> specifically as the Thames is a strong inference based on the castle, but
-> the prompt says "Do not infer identity... unless visually obvious." While
-> Windsor Castle is famous, strictly speaking, I see a castle and a river.
-> However, the prompt asks to "Reuse metadata terms only when they are clearly
-> supported by the image." The hint says "high confidence". I will stick to
-> visual facts: "stone castle tower", "river", "trees". I won't explicitly
-> name "Windsor" or "Thames" in the &#42;Description&#42; unless I'm sure, but the
-> prompt instructions say "Reuse metadata terms only when they are clearly
-> supported by the image." The visual evidence strongly supports it being a
-> castle. I will focus on the visual elements: Castle, Tower, River, Trees,
-> Flag.
-> &#42;   &#42;Hint:&#42; "The Union Flag is flying..." -> Yes, a flag is visible at the
-> top. It has red and white crosses. It is clearly a flag.
-> &#42;   &#42;Hint:&#42; "Taken on 2026
-<!-- markdownlint-enable MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Missing sections (title, description, keywords)
-- Nonvisual metadata borrowing
-- Likely capped by max token budget
 
 ---
 
@@ -2698,15 +2600,15 @@ _Token accounting:_ prompt=16746 | text_est=442 | nontext_est=16304 | gen=500
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 4.03s | Gen 60.42s | Total 64.80s
-_Throughput:_ Prompt 312 TPS (16,746 tok) | Gen 83.9 TPS (500 tok)
+_Metrics:_ Load 3.15s | Gen 60.98s | Total 64.48s
+_Throughput:_ Prompt 307 TPS (16,746 tok) | Gen 88.0 TPS (500 tok)
 _Assessment:_ ✅ B (79/100) | Δ+34 | Missing requested structure
 _Review Status:_ watchlist (cutoff, missing sections)
 _Review:_ B 79/100 | hit token cap (500) | nontext prompt burden=97% | missing
           sections: title, description, keywords | missing terms: view, royal,
           residence, Berkshire, Thames
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > The user wants me to generate cataloguing metadata for the provided image.
 > &#8203;I need to follow specific rules:
@@ -2751,7 +2653,7 @@ _Review:_ B 79/100 | hit token cap (500) | nontext prompt burden=97% | missing
 > &#45; Subject: Stone castle tower.
 > &#45; Setting: Above trees, across water.
 > &#45;
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2777,15 +2679,15 @@ _Token accounting:_ prompt=16746 | text_est=442 | nontext_est=16304 | gen=500
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 1.97s | Gen 61.22s | Total 63.55s
-_Throughput:_ Prompt 305 TPS (16,746 tok) | Gen 90.3 TPS (500 tok)
+_Metrics:_ Load 1.32s | Gen 61.00s | Total 62.68s
+_Throughput:_ Prompt 307 TPS (16,746 tok) | Gen 89.3 TPS (500 tok)
 _Assessment:_ ✅ B (66/100) | Δ+20 | Missing requested structure
 _Review Status:_ watchlist (cutoff, instruction echo, metadata borrowing,
                  missing sections, reasoning leak)
 _Review:_ B 66/100 | hit token cap (500) | nontext prompt burden=97% | missing
           sections: title, description, keywords | nonvisual metadata reused
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > The user wants me to analyze the provided image and generate cataloguing
 > metadata in British English.
@@ -2830,13 +2732,89 @@ _Review:_ B 66/100 | hit token cap (500) | nontext prompt burden=97% | missing
 > strictly speaking, the image just shows the flag. However, the prompt says
 > "If metadata and image disagree, follow the image." The hint says "indicates
 > that the
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
 - Missing sections (title, description, keywords)
 - Reasoning leak (description hint:)
 - Instruction echo
+- Nonvisual metadata borrowing
+- Likely capped by max token budget
+
+---
+
+<a id="model-mlx-community-qwen35-35b-a3b-4bit"></a>
+
+### ✅ mlx-community/Qwen3.5-35B-A3B-4bit
+
+_Verdict:_ cutoff_degraded | user=avoid
+_Why:_ hit token cap (500) | nontext prompt burden=97% | missing sections:
+       title, description, keywords | missing terms: royal, residence,
+       Berkshire, flagpole, which
+_Trusted hints:_ improves trusted hints | nonvisual metadata reused
+_Contract:_ missing: title, description, keywords
+_Utility:_ user=avoid | improves trusted hints | metadata borrowing
+_Stack / owner:_ owner=model
+_Token accounting:_ prompt=16746 | text_est=442 | nontext_est=16304 | gen=500
+                    | max=500 | stop=completed
+_Next action:_ Treat as a model limitation for this prompt; the requested
+               output contract is not being met.
+
+_Metrics:_ Load 2.53s | Gen 62.14s | Total 65.02s
+_Throughput:_ Prompt 296 TPS (16,746 tok) | Gen 104 TPS (500 tok)
+_Assessment:_ 🟡 C (64/100) | Δ+19 | Missing requested structure
+_Review Status:_ watchlist (cutoff, metadata borrowing, missing sections)
+_Review:_ C 64/100 | hit token cap (500) | nontext prompt burden=97% | missing
+          sections: title, description, keywords | missing terms: royal,
+          residence, Berkshire, flagpole, which
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> The user wants me to generate metadata for the provided image based on
+> specific rules.
+>
+> &#42;&#42;1. Analyze the Image:&#42;&#42;
+> &#42;   &#42;&#42;Subject:&#42;&#42; A large stone castle tower (Round Tower) is visible above a
+> line of trees.
+> &#42;   &#42;&#42;Foreground:&#42;&#42; A body of water (river) with ripples.
+> &#42;   &#42;&#42;Midground:&#42;&#42; Dense green trees, mostly deciduous, obscuring the lower
+> part of the castle.
+> &#42;   &#42;&#42;Background:&#42;&#42; Blue sky with some clouds.
+> &#42;   &#42;&#42;Details:&#42;&#42;
+> &#42;   A flag is flying on top of the tower. It looks like the Union Flag
+> (Union Jack).
+> &#42;   The architecture is stone, with crenellations and arched
+> windows/openings.
+> &#42;   The water reflects the green of the trees.
+> &#42;   There are trees on the right side framing the shot.
+>
+> &#42;&#42;2. Evaluate the "Context" hints:&#42;&#42;
+> &#42;   &#42;Hint:&#42; "A view of the Round Tower of Windsor Castle..." -> The image
+> clearly shows a castle tower that matches the description of Windsor
+> Castle's Round Tower. The flag is visible. I can confirm it's a castle
+> tower. I can confirm it's a river view.
+> &#42;   &#42;Hint:&#42; "...as seen from across the River Thames." -> The water looks
+> like a river. It's safe to say "river" or "water". Identifying it
+> specifically as the Thames is a strong inference based on the castle, but
+> the prompt says "Do not infer identity... unless visually obvious." While
+> Windsor Castle is famous, strictly speaking, I see a castle and a river.
+> However, the prompt asks to "Reuse metadata terms only when they are clearly
+> supported by the image." The hint says "high confidence". I will stick to
+> visual facts: "stone castle tower", "river", "trees". I won't explicitly
+> name "Windsor" or "Thames" in the &#42;Description&#42; unless I'm sure, but the
+> prompt instructions say "Reuse metadata terms only when they are clearly
+> supported by the image." The visual evidence strongly supports it being a
+> castle. I will focus on the visual elements: Castle, Tower, River, Trees,
+> Flag.
+> &#42;   &#42;Hint:&#42; "The Union Flag is flying..." -> Yes, a flag is visible at the
+> top. It has red and white crosses. It is clearly a flag.
+> &#42;   &#42;Hint:&#42; "Taken on 2026
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Missing sections (title, description, keywords)
 - Nonvisual metadata borrowing
 - Likely capped by max token budget
 
@@ -2860,8 +2838,8 @@ _Token accounting:_ prompt=16731 | text_est=442 | nontext_est=16289 | gen=2 |
 _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
                into user-facing text.
 
-_Metrics:_ Load 0.71s | Gen 62.57s | Total 63.62s
-_Throughput:_ Prompt 271 TPS (16,731 tok) | Gen 290 TPS (2 tok)
+_Metrics:_ Load 0.52s | Gen 62.92s | Total 63.79s
+_Throughput:_ Prompt 269 TPS (16,731 tok) | Gen 369 TPS (2 tok)
 _Assessment:_ ❌ F (5/100) | Δ-40 | Output too short to be useful
 _Review Status:_ watchlist (context ignored, harness)
 _Review:_ F 5/100 | Special control token &lt;|endoftext|&gt; appeared in
@@ -2869,10 +2847,10 @@ _Review:_ F 5/100 | Special control token &lt;|endoftext|&gt; appeared in
           nontext prompt burden=97% | missing terms: view, Round, Tower,
           Windsor, Castle
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > <|endoftext|>
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2903,15 +2881,15 @@ _Token accounting:_ prompt=16746 | text_est=442 | nontext_est=16304 | gen=500
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 9.90s | Gen 66.73s | Total 77.01s
-_Throughput:_ Prompt 288 TPS (16,746 tok) | Gen 65.3 TPS (500 tok)
+_Metrics:_ Load 8.05s | Gen 64.60s | Total 73.00s
+_Throughput:_ Prompt 300 TPS (16,746 tok) | Gen 64.7 TPS (500 tok)
 _Assessment:_ ✅ B (72/100) | Δ+27 | Missing requested structure
 _Review Status:_ watchlist (cutoff, metadata borrowing, missing sections)
 _Review:_ B 72/100 | hit token cap (500) | nontext prompt burden=97% | missing
           sections: title, description, keywords | missing terms: view,
           Berkshire, seen, across, which
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > The user wants me to generate cataloguing metadata for the provided image.
 > &#8203;I need to follow specific rules:
@@ -2952,7 +2930,7 @@ _Review:_ B 72/100 | hit token cap (500) | nontext prompt burden=97% | missing
 > to be safe, or perhaps "river" is fine. Actually, the prompt says "If
 > metadata and image disagree, follow the image." The metadata says Thames.
 > The image shows a river. I will use
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -2979,8 +2957,8 @@ _Token accounting:_ prompt=767 | text_est=442 | nontext_est=325 | gen=500 |
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 6.51s | Gen 70.54s | Total 77.40s
-_Throughput:_ Prompt 285 TPS (767 tok) | Gen 7.43 TPS (500 tok)
+_Metrics:_ Load 5.98s | Gen 72.08s | Total 78.41s
+_Throughput:_ Prompt 299 TPS (767 tok) | Gen 7.25 TPS (500 tok)
 _Assessment:_ ✅ B (66/100) | Δ+21 | Missing requested structure
 _Review Status:_ watchlist (cutoff, degeneration, metadata borrowing, missing
                  sections, repetitive)
@@ -2988,7 +2966,7 @@ _Review:_ B 66/100 | hit token cap (500) | missing sections: title,
           description, keywords | missing terms: view, seen, across, flying,
           flagpole | nonvisual metadata reused
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 >
 > &#45; Keywords hint: Windsor Castle, Round Tower, River Thames, Union Flag,
@@ -3020,7 +2998,7 @@ _Review:_ B 66/100 | hit token cap (500) | missing sections: title,
 > grown-ups, no grown-ups, no grown-ups, no grown-ups, no grown-ups, no
 > grown-ups, no grown-ups, no grown-ups, no grown-ups, no grown-ups, no
 > grown-ups, no
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -3049,15 +3027,15 @@ _Token accounting:_ prompt=16746 | text_est=442 | nontext_est=16304 | gen=500
 _Next action:_ Treat as a model limitation for this prompt; the requested
                output contract is not being met.
 
-_Metrics:_ Load 2.85s | Gen 93.32s | Total 96.62s
-_Throughput:_ Prompt 222 TPS (16,746 tok) | Gen 29.2 TPS (500 tok)
+_Metrics:_ Load 2.15s | Gen 92.08s | Total 94.59s
+_Throughput:_ Prompt 226 TPS (16,746 tok) | Gen 29.2 TPS (500 tok)
 _Assessment:_ 🟡 C (63/100) | Δ+18 | Missing requested structure
 _Review Status:_ watchlist (cutoff, missing sections)
 _Review:_ C 63/100 | hit token cap (500) | nontext prompt burden=97% | missing
           sections: title, description, keywords | missing terms: royal,
           Berkshire, seen, across, flagpole
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > The user wants me to generate cataloguing metadata for the provided image.
 > &#8203;I need to follow specific rules:
@@ -3099,7 +3077,7 @@ _Review:_ C 63/100 | hit token cap (500) | nontext prompt burden=97% | missing
 > &#45; "Reigning monarch is not in residence": This is an &#42;inference&#42; based on
 > the flag protocol. The prompt says "Do not infer... intent". I should
 > describe
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 
@@ -3124,15 +3102,15 @@ _Token accounting:_ prompt=16746 | text_est=442 | nontext_est=16304 | gen=500
 _Next action:_ Treat as a model limitation for this prompt; trusted hint
                coverage is still weak.
 
-_Metrics:_ Load 3.13s | Gen 103.25s | Total 106.74s
-_Throughput:_ Prompt 226 TPS (16,746 tok) | Gen 17.5 TPS (500 tok)
+_Metrics:_ Load 3.06s | Gen 106.43s | Total 109.85s
+_Throughput:_ Prompt 217 TPS (16,746 tok) | Gen 17.6 TPS (500 tok)
 _Assessment:_ 🏆 A (94/100) | Δ+49 | None identified
 _Review Status:_ watchlist (cutoff, hallucination, metadata borrowing)
 _Review:_ A 94/100 | hit token cap (500) | nontext prompt burden=97% | missing
           terms: royal, residence, Berkshire, across, flagpole | nonvisual
           metadata reused
 
-<!-- markdownlint-disable MD028 MD037 MD045 -->
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
 > The user wants me to generate cataloguing metadata for the provided image.
 > &#8203;I need to follow specific rules:
@@ -3175,7 +3153,7 @@ _Review:_ A 94/100 | hit token cap (500) | nontext prompt burden=97% | missing
 > seen.
 > &#42;   &#42;Revised Title:&#42; Stone castle tower with flag flying above green
 > trees and river (10
-<!-- markdownlint-enable MD028 MD037 MD045 -->
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_
 

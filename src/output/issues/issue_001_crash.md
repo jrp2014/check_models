@@ -26,7 +26,7 @@ Model loading failed: Config not found at /Users/jrp/.cache/huggingface/hub/mode
 
 ## Reproducibility
 
-A reproduction bundle is available at: `20260424T215035Z_001_ggml-org_gemma-3-1b-it-GGUF_MODEL_CONFIG_MODEL_LOAD_MODEL_d01bffe45e.json`
+A reproduction bundle is available at: `20260425T231030Z_001_ggml-org_gemma-3-1b-it-GGUF_MODEL_CONFIG_MODEL_LOAD_MODEL_d01bffe45e.json`
 
 ### Repro Command
 
@@ -38,19 +38,19 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 
 ## Environment
 
-| Component       | Version                      |
-|-----------------|------------------------------|
-| mlx-vlm         | 0.4.5                        |
-| mlx             | 0.32.0.dev20260424+211e57be5 |
-| mlx-lm          | 0.31.3                       |
-| transformers    | 5.6.2                        |
-| tokenizers      | 0.22.2                       |
-| huggingface-hub | 1.12.0                       |
-| Python Version  | 3.13.12                      |
-| OS              | Darwin 25.4.0                |
-| macOS Version   | 26.4.1                       |
-| GPU/Chip        | Apple M5 Max                 |
-| GPU Cores       | 40                           |
-| Metal Support   | Metal 4                      |
-| RAM             | 128.0 GB                     |
+| Component       | Version                     |
+|-----------------|-----------------------------|
+| mlx-vlm         | 0.4.5                       |
+| mlx             | 0.32.0.dev20260425+211e57be |
+| mlx-lm          | 0.31.3                      |
+| transformers    | 5.6.2                       |
+| tokenizers      | 0.22.2                      |
+| huggingface-hub | 1.12.0                      |
+| Python Version  | 3.13.12                     |
+| OS              | Darwin 25.4.0               |
+| macOS Version   | 26.4.1                      |
+| GPU/Chip        | Apple M5 Max                |
+| GPU Cores       | 40                          |
+| Metal Support   | Metal 4                     |
+| RAM             | 128.0 GB                    |
 
