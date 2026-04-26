@@ -1,8 +1,8 @@
-# [Harness Issue] <think>Got it, let's describe this picture in detail. First, the scene is a serene park or garden with a lake or pond in mlx-community/GLM-4.6V-Flash-mxfp4
+# [Harness Issue] <think>Got it, let's describe this picture step by step. First, the the scene is a serene park or garden with a lake in mlx-community/GLM-4.6V-nvfp4
 
 ## Description
 
-Integration/harness warning detected for `mlx-community/GLM-4.6V-Flash-mxfp4`.
+Integration/harness warning detected for `mlx-community/GLM-4.6V-nvfp4`.
 
 ### Details
 
@@ -26,7 +26,7 @@ _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
 ### Repro Command
 
 ```bash
-python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt Describe this picture --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/GLM-4.6V-Flash-mxfp4
+python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt Describe this picture --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/GLM-4.6V-nvfp4
 ```
 
 ---

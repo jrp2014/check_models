@@ -1,27 +1,22 @@
-# [Harness Issue] <|endoftext|> in mlx-community/Qwen2-VL-2B-Instruct-4bit
+# [Harness Issue] <think>Got it, let's describe this picture in detail. First, the scene is a serene park or garden with a lake or pond in mlx-community/GLM-4.6V-Flash-6bit
 
 ## Description
 
-Integration/harness warning detected for `mlx-community/Qwen2-VL-2B-Instruct-4bit`.
+Integration/harness warning detected for `mlx-community/GLM-4.6V-Flash-6bit`.
 
 ### Details
 
-- Special control token &lt;|endoftext|&gt; appeared in generated text.
-- Output appears truncated to about 2 tokens.
-- At long prompt length (16731 tokens), output stayed unusually short (2 tokens; ratio 0.0%).
+- Special control token &lt;/think&gt; appeared in generated text.
 
 ## Maintainer Triage
 
 _Likely owner:_ mlx-vlm \| confidence=high
 _Classification:_ harness \| stop_token
-_Summary:_ Special control token &lt;\|endoftext\|&gt; appeared in generated
-           text. \| Output appears truncated to about 2 tokens. \| nontext
-           prompt burden=97% \| missing terms: view, Round, Tower, Windsor,
-           Castle
-_Evidence:_ Special control token &lt;\|endoftext\|&gt; appeared in generated
-            text. \| Output appears truncated to about 2 tokens.
-_Token context:_ prompt=16,731 \| output/prompt=0.01% \| nontext burden=97% \|
-                 stop=completed
+_Summary:_ Special control token &lt;/think&gt; appeared in generated text. \|
+           hit token cap (500) \| nontext prompt burden=100% \| reasoning leak
+_Evidence:_ Special control token &lt;/think&gt; appeared in generated text.
+_Token context:_ prompt=6,091 \| output/prompt=8.21% \| nontext burden=100% \|
+                 stop=completed \| hit token cap (500)
 _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
                into user-facing text.
 
@@ -31,7 +26,7 @@ _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
 ### Repro Command
 
 ```bash
-python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-code --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Qwen2-VL-2B-Instruct-4bit
+python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt Describe this picture --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/GLM-4.6V-Flash-6bit
 ```
 
 ---
@@ -41,7 +36,7 @@ python -m check_models --folder /Users/jrp/Pictures/Processed --trust-remote-cod
 | Component       | Version                     |
 |-----------------|-----------------------------|
 | mlx-vlm         | 0.4.5                       |
-| mlx             | 0.32.0.dev20260425+211e57be |
+| mlx             | 0.32.0.dev20260426+211e57be |
 | mlx-lm          | 0.31.3                      |
 | transformers    | 5.6.2                       |
 | tokenizers      | 0.22.2                      |
