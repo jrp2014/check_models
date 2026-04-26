@@ -261,34 +261,30 @@ _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
 **What looks wrong:** Behavior degrades under long prompt context.
 **Likely component:** `mlx-vlm / mlx`
 **Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,299, output=13, output/prompt=0.08%
+**Token summary:** prompt=16,299, output=500, output/prompt=3.07%
 
 **Maintainer triage:**
 
 _Likely owner:_ mlx \| confidence=high
-_Classification:_ context_budget \| long_context
-_Summary:_ Output is very short relative to prompt size (0.1%), suggesting
-           possible early-stop or prompt-handling issues. \| At long prompt
-           length (16299 tokens), output stayed unusually short (13 tokens;
-           ratio 0.1%). \| output/prompt=0.08% \| nontext prompt burden=100%
-_Evidence:_ Output is very short relative to prompt size (0.1%), suggesting
-            possible early-stop or prompt-handling issues. \| At long prompt
-            length (16299 tokens), output stayed unusually short (13 tokens;
-            ratio 0.1%).
-_Token context:_ prompt=16,299 \| output/prompt=0.08% \| nontext burden=100%
-                 \| stop=completed
-_Next action:_ Treat this as a prompt-budget issue first; nontext prompt
-               burden is 100% and the output stays weak under that load.
+_Classification:_ cutoff_degraded \| long_context
+_Summary:_ At long prompt length (16299 tokens), output became repetitive. \|
+           hit token cap (500) \| nontext prompt burden=100% \| repetitive
+           token=phrase: "' chinese: ' chinese:..."
+_Evidence:_ At long prompt length (16299 tokens), output became repetitive.
+_Token context:_ prompt=16,299 \| output/prompt=3.07% \| nontext burden=100%
+                 \| stop=completed \| hit token cap (500)
+_Next action:_ Inspect long-context cache behavior under heavy image-token
+               burden.
 
 **Why this appears to be an integration/runtime issue:**
 
-- Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues.
-- At long prompt length (16299 tokens), output stayed unusually short (13 tokens; ratio 0.1%).
+- At long prompt length (16299 tokens), output became repetitive.
+- Output became repetitive, indicating possible generation instability (token: phrase: "' chinese: ' chinese:...").
 
 **Sample output:**
 
 ```text
-I'm sorry, but the context didn't show up.
+Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'C...
 ```
 
 ### `mlx-community/gemma-3n-E2B-4bit`
@@ -404,7 +400,7 @@ model appears).
 
 | Model                              | Status vs Previous Run   | First Seen Failing      | Recent Repro           |
 |------------------------------------|--------------------------|-------------------------|------------------------|
-| `mlx-community/MolmoPoint-8B-fp16` | new model failing        | 2026-03-27 13:06:07 GMT | 3/3 recent runs failed |
+| `mlx-community/MolmoPoint-8B-fp16` | still failing            | 2026-03-27 13:06:07 GMT | 3/3 recent runs failed |
 
 ---
 
@@ -413,13 +409,13 @@ model appears).
 - **Detailed diagnostics models:** 11
 - **Summary diagnostics models:** 42
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1168.89s (1168.89s)
-- **Average runtime per model:** 22.05s (22.05s)
-- **Dominant runtime phase:** decode dominated 50/53 measured model runs (90% of tracked runtime).
-- **Phase totals:** model load=114.98s, prompt prep=0.15s, decode=1036.22s, cleanup=5.15s
+- **Total model runtime (sum):** 1364.55s (1364.55s)
+- **Average runtime per model:** 25.75s (25.75s)
+- **Dominant runtime phase:** decode dominated 50/53 measured model runs (92% of tracked runtime).
+- **Phase totals:** model load=106.96s, prompt prep=0.16s, decode=1237.59s, cleanup=6.51s
 - **Observed stop reasons:** completed=52, exception=1
-- **Validation overhead:** 17.28s total (avg 0.33s across 53 model(s)).
-- **First-token latency:** Avg 11.89s | Min 0.05s | Max 73.92s across 52 model(s).
+- **Validation overhead:** 19.52s total (avg 0.37s across 53 model(s)).
+- **First-token latency:** Avg 13.63s | Min 0.06s | Max 113.56s across 52 model(s).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
@@ -487,7 +483,7 @@ warning, or stack-signal anomaly).
 | mlx-vlm         | 0.4.5                       |
 | mlx             | 0.32.0.dev20260426+211e57be |
 | mlx-lm          | 0.31.3                      |
-| transformers    | 5.6.2                       |
+| transformers    | 5.7.0.dev0                  |
 | tokenizers      | 0.22.2                      |
 | huggingface-hub | 1.12.0                      |
 | Python Version  | 3.13.12                     |
@@ -550,4 +546,4 @@ Describe this picture
 - Input image: `/Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-04-26 20:52:02 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-04-26 22:21:24 BST by [check_models](https://github.com/jrp2014/check_models)._

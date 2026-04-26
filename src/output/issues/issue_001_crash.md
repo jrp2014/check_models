@@ -26,7 +26,7 @@ Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded processor ha
 
 ## Reproducibility
 
-A reproduction bundle is available at: `20260426T195202Z_001_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json`
+A reproduction bundle is available at: `20260426T212124Z_001_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json`
 
 ### Repro Command
 
@@ -43,7 +43,7 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC
 | mlx-vlm         | 0.4.5                       |
 | mlx             | 0.32.0.dev20260426+211e57be |
 | mlx-lm          | 0.31.3                      |
-| transformers    | 5.6.2                       |
+| transformers    | 5.7.0.dev0                  |
 | tokenizers      | 0.22.2                      |
 | huggingface-hub | 1.12.0                      |
 | Python Version  | 3.13.12                     |
