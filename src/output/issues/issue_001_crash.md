@@ -42,7 +42,7 @@ multi_modal_projector.linear_2.scales.
 
 ## Reproducibility
 
-A reproduction bundle is available at: `20260501T205016Z_001_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json`
+A reproduction bundle is available at: `20260501T231046Z_001_mlx-community_Kimi-VL-A3B-Thinking-8bit_MLX_MODEL_LOAD_MODEL_e82eb35e5965.json`
 
 ### Repro Command
 
