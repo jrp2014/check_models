@@ -1,6 +1,6 @@
 # Model Performance Results
 
-_Generated on 2026-05-01 21:50:16 BST_
+_Generated on 2026-05-01 22:38:46 BST_
 
 ## 🎯 Action Snapshot
 
@@ -16,8 +16,7 @@ _Generated on 2026-05-01 21:50:16 BST_
 ### Quality & Metadata
 
 - _Quality signal frequency:_ harness=9, cutoff=7, reasoning_leak=6,
-  formatting=4, long_context=2, context_budget=2.
-- _Termination reasons:_ completed=51, exception=2.
+  formatting=4, context_budget=2, long_context=2.
 
 ### Runtime
 
@@ -30,6 +29,9 @@ _Generated on 2026-05-01 21:50:16 BST_
 - _Suggested next action:_ Prioritize early-stop policies, lower long-tail
   token budgets, or upstream decode-path work.
 - _Termination reasons:_ completed=51, exception=2.
+- _Validation overhead:_ 17.40s total (avg 0.33s across 53 model(s)).
+- _First-token latency:_ Avg 13.09s | Min 0.06s | Max 83.41s across 51
+  model(s).
 
 ## 🏆 Performance Highlights
 
@@ -82,41 +84,28 @@ _Generated on 2026-05-01 21:50:16 BST_
 - **Generation Time**: Avg: 22.53s | Min: 0.73s | Max: 113.66s
 - **Model Load Time**: Avg: 2.49s | Min: 0.63s | Max: 13.03s
 
-### ⏱ Runtime Interpretation
-
-- **Runtime pattern:** decode dominates measured phase time (89%; 49/53 measured model(s)).
-- **Phase totals:** model load=131.87s, prompt prep=0.16s, decode=1149.28s, cleanup=5.57s.
-- **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
-- **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
-- **Termination reasons:** completed=51, exception=2.
-
-### ⏱ Timing Snapshot
-
-- **Validation overhead:** 17.40s total (avg 0.33s across 53 model(s)).
-- **First-token latency:** Avg 13.09s | Min 0.06s | Max 83.41s across 51 model(s).
-
 ## ✅ Recommended Models
 
 Quick picks based on end-to-end utility plus description and keyword strength.
 
 - _Best end-to-end cataloging:_ [`mlx-community/gemma-3-27b-it-qat-4bit`](model_gallery.md#model-mlx-community-gemma-3-27b-it-qat-4bit)
-  (A 85/100 | Desc 82 | Keywords 92 | Gen 26.0 TPS | Peak 19 | A 85/100 |
-  nontext prompt burden=99%)
+  (Utility A 85/100 | Description 82 | Keywords 92 | Speed 26.0 TPS | Memory
+  19 | Caveat nontext prompt burden=99%)
 - _Best descriptions:_ [`qnguyen3/nanoLLaVA`](model_gallery.md#model-qnguyen3-nanollava)
-  (B 74/100 | Desc 90 | Keywords 0 | Gen 114 TPS | Peak 3.8 | B 74/100 |
-  nontext prompt burden=80%)
+  (Utility B 74/100 | Description 90 | Keywords 0 | Speed 114 TPS | Memory 3.8
+  | Caveat nontext prompt burden=80%)
 - _Best keywording:_ [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](model_gallery.md#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)
-  (B 75/100 | Desc 82 | Keywords 96 | Gen 67.1 TPS | Peak 13 | B 75/100 |
-  nontext prompt burden=100%)
+  (Utility B 75/100 | Description 82 | Keywords 96 | Speed 67.1 TPS | Memory
+  13 | Caveat nontext prompt burden=100%)
 - _Fastest generation:_ [`mlx-community/FastVLM-0.5B-bf16`](model_gallery.md#model-mlx-community-fastvlm-05b-bf16)
-  (B 74/100 | Desc 82 | Keywords 0 | Gen 360 TPS | Peak 2.1 | B 74/100 |
-  nontext prompt burden=83%)
+  (Utility B 74/100 | Description 82 | Keywords 0 | Speed 360 TPS | Memory 2.1
+  | Caveat nontext prompt burden=83%)
 - _Lowest memory footprint:_ [`mlx-community/nanoLLaVA-1.5-4bit`](model_gallery.md#model-mlx-community-nanollava-15-4bit)
-  (B 75/100 | Desc 86 | Keywords 0 | Gen 335 TPS | Peak 1.8 | B 75/100 |
-  nontext prompt burden=80%)
+  (Utility B 75/100 | Description 86 | Keywords 0 | Speed 335 TPS | Memory 1.8
+  | Caveat nontext prompt burden=80%)
 - _Best balance:_ [`mlx-community/gemma-3-27b-it-qat-4bit`](model_gallery.md#model-mlx-community-gemma-3-27b-it-qat-4bit)
-  (A 85/100 | Desc 82 | Keywords 92 | Gen 26.0 TPS | Peak 19 | A 85/100 |
-  nontext prompt burden=99%)
+  (Utility A 85/100 | Description 82 | Keywords 92 | Speed 26.0 TPS | Memory
+  19 | Caveat nontext prompt burden=99%)
 
 ## 🔍 Quality Pattern Breakdown
 
@@ -265,4 +254,4 @@ _Review artifacts:_
 - `tokenizers`: `0.22.2`
 - `Pillow`: `12.2.0`
 
-_Report generated on: 2026-05-01 21:50:16 BST_
+_Report generated on: 2026-05-01 22:38:46 BST_

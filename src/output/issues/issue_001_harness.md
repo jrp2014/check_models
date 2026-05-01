@@ -1,4 +1,4 @@
-# [Harness Issue] The image shows a tranquil park scene with a person standing on a wooden dock, fishing by a pond. There are trees, a in microsoft/Phi-3.5-vision-instruct
+# [Harness Issue] stop_token in microsoft/Phi-3.5-vision-instruct
 
 ## Description
 
@@ -11,7 +11,8 @@ Integration/harness warning detected for `microsoft/Phi-3.5-vision-instruct`.
 
 ## At a Glance
 
-- _Observed:_ Output indicates a likely integration issue.
+- _Observed:_ Generation appears to continue through stop/control tokens
+  instead of ending cleanly.
 - _Likely owner:_ `mlx-vlm`
 - _Why it matters:_ The run completed, but the output pattern points to
   stack/runtime behavior rather than a clean model-quality limitation.

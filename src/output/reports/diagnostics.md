@@ -12,14 +12,59 @@ Test image: `20260403-124049_DSC09541.jpg` (47.5 MB).
 
 ## Action Summary
 
-Quick triage list with likely owner and next action for each issue class.
+Owner-first triage with priority, affected count, and next action.
 
-- **[Medium] [mlx]** Model loading failed: Received 4 parameters not in model: (1 model(s)). Next: check tensor/cache behavior and memory pressure handling.
-- **[Medium] [model configuration/repository]** Loaded processor has no image_processor; expected multimodal processor. (1 model(s)). Next: verify model config, tokenizer files, and revision alignment.
-- **[Medium] [mlx-vlm]** Harness/integration warnings on 5 model(s). Next: check processor/chat-template wiring and generation kwargs.
-- **[Medium] [mlx-vlm / mlx]** Harness/integration warnings on 2 model(s). Next: validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-- **[Medium] [model-config / mlx-vlm]** Harness/integration warnings on 2 model(s). Next: validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
-- **[Medium] [mlx-vlm / mlx]** Stack-signal anomalies on 1 successful model(s). Next: validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
+### 1. mlx
+
+- _Priority:_ Medium
+- _Owner:_ `mlx`
+- _Issue:_ Model loading failed: Received 4 parameters not in model:
+- _Affected:_ 1 model(s)
+- _Next step:_ check tensor/cache behavior and memory pressure handling.
+
+### 2. model configuration/repository
+
+- _Priority:_ Medium
+- _Owner:_ `model configuration/repository`
+- _Issue:_ Loaded processor has no image_processor; expected multimodal
+  processor.
+- _Affected:_ 1 model(s)
+- _Next step:_ verify model config, tokenizer files, and revision alignment.
+
+### 3. mlx-vlm
+
+- _Priority:_ Medium
+- _Owner:_ `mlx-vlm`
+- _Issue:_ Harness/integration warnings
+- _Affected:_ 5 model(s)
+- _Next step:_ check processor/chat-template wiring and generation kwargs.
+
+### 4. mlx-vlm / mlx
+
+- _Priority:_ Medium
+- _Owner:_ `mlx-vlm / mlx`
+- _Issue:_ Harness/integration warnings
+- _Affected:_ 2 model(s)
+- _Next step:_ validate long-context handling and stop-token behavior across
+  mlx-vlm + mlx runtime.
+
+### 5. model-config / mlx-vlm
+
+- _Priority:_ Medium
+- _Owner:_ `model-config / mlx-vlm`
+- _Issue:_ Harness/integration warnings
+- _Affected:_ 2 model(s)
+- _Next step:_ validate chat-template/config expectations and mlx-vlm prompt
+  formatting for this model.
+
+### 6. mlx-vlm / mlx
+
+- _Priority:_ Medium
+- _Owner:_ `mlx-vlm / mlx`
+- _Issue:_ Stack-signal anomalies
+- _Affected:_ 1 successful model(s)
+- _Next step:_ validate long-context handling and stop-token behavior across
+  mlx-vlm + mlx runtime.
 
 ---
 
@@ -643,4 +688,4 @@ Describe this picture
 - Input image: `/Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-05-01 21:50:16 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-05-01 22:38:46 BST by [check_models](https://github.com/jrp2014/check_models)._

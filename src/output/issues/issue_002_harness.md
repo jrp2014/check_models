@@ -1,4 +1,4 @@
-# [Harness Issue] The image depicts a serene outdoor scene, likely in a park or garden. The focal point is a person standing on a small in mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+# [Harness Issue] encoding in mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
 
 ## Description
 
@@ -10,7 +10,8 @@ Integration/harness warning detected for `mlx-community/Devstral-Small-2-24B-Ins
 
 ## At a Glance
 
-- _Observed:_ Output indicates a likely integration issue.
+- _Observed:_ Decoded output contains tokenizer artifacts that should not
+  appear in user-facing text.
 - _Likely owner:_ `mlx-vlm`
 - _Why it matters:_ The run completed, but the output pattern points to
   stack/runtime behavior rather than a clean model-quality limitation.

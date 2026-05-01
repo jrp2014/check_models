@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-_Generated on 2026-05-01 21:50:16 BST_
+_Generated on 2026-05-01 22:38:46 BST_
 
 A review-friendly artifact with image metadata, the source prompt, and full
 generated output for each model.
@@ -98,32 +98,26 @@ Full generated output by model:
 
 ### ❌ mlx-community/Kimi-VL-A3B-Thinking-8bit
 
-_Recommendation:_ avoid for now; review verdict: runtime failure
-_Key signals:_ model error; mlx model load model
-_Hint handling:_ not evaluated
-_Output contract:_ not evaluated
-_Cataloging fit:_ not evaluated
-_Maintainer routing:_ likely owner `mlx`; reported package `mlx`; failure
-                      stage `Model Error`; diagnostic code
-                      `MLX_MODEL_LOAD_MODEL`
-_Token summary:_ prompt n/a; estimated text n/a; estimated non-text n/a;
-                 generated n/a; requested max 500 tok; stop reason exception
-_Suggested next step:_ Inspect KV/cache behavior, memory pressure, and
-                       long-context execution.
+- _Recommendation:_ avoid for now; review verdict: runtime failure
+- _Status:_ Failed (Model Error)
+- _Owner:_ likely owner `mlx`; reported package `mlx`; failure stage `Model
+  Error`; diagnostic code `MLX_MODEL_LOAD_MODEL`
+- _Next step:_ Inspect KV/cache behavior, memory pressure, and long-context
+  execution.
+- _Error summary:_ see error details below
+- _Key signals:_ model error; mlx model load model
+- _Failure context:_ type `ValueError`; phase `model_load`; code
+  `MLX_MODEL_LOAD_MODEL`; package `mlx`
+- _Tokens:_ prompt n/a; estimated text n/a; estimated non-text n/a; generated
+  n/a; requested max 500 tok; stop reason exception
 
-_Status:_ Failed (Model Error)
-_Error:_
+_Error details:_
 
 > Model loading failed: Received 4 parameters not in model:
 > multi_modal_projector.linear_1.biases,
 > multi_modal_projector.linear_1.scales,
 > multi_modal_projector.linear_2.biases,
 > multi_modal_projector.linear_2.scales.
-_Type:_ `ValueError`
-_Phase:_ `model_load`
-_Code:_ `MLX_MODEL_LOAD_MODEL`
-_Package:_ `mlx`
-_Next Action:_ review package ownership and diagnostics for a minimal repro.
 
 <details>
 <summary>Full Traceback (click to expand)</summary>
@@ -189,29 +183,23 @@ multi_modal_projector.linear_2.scales.
 
 ### ❌ mlx-community/MolmoPoint-8B-fp16
 
-_Recommendation:_ avoid for now; review verdict: runtime failure
-_Key signals:_ processor error; model config processor load processor
-_Hint handling:_ not evaluated
-_Output contract:_ not evaluated
-_Cataloging fit:_ not evaluated
-_Maintainer routing:_ likely owner `model-config`; reported package
-                      `model-config`; failure stage `Processor Error`;
-                      diagnostic code `MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR`
-_Token summary:_ prompt n/a; estimated text n/a; estimated non-text n/a;
-                 generated n/a; requested max 500 tok; stop reason exception
-_Suggested next step:_ Inspect model repo config, chat template, and EOS
-                       settings.
+- _Recommendation:_ avoid for now; review verdict: runtime failure
+- _Status:_ Failed (Processor Error)
+- _Owner:_ likely owner `model-config`; reported package `model-config`;
+  failure stage `Processor Error`; diagnostic code
+  `MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR`
+- _Next step:_ Inspect model repo config, chat template, and EOS settings.
+- _Error summary:_ see error details below
+- _Key signals:_ processor error; model config processor load processor
+- _Failure context:_ type `ValueError`; phase `processor_load`; code
+  `MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR`; package `model-config`
+- _Tokens:_ prompt n/a; estimated text n/a; estimated non-text n/a; generated
+  n/a; requested max 500 tok; stop reason exception
 
-_Status:_ Failed (Processor Error)
-_Error:_
+_Error details:_
 
 > Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded
 > processor has no image_processor; expected multimodal processor.
-_Type:_ `ValueError`
-_Phase:_ `processor_load`
-_Code:_ `MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR`
-_Package:_ `model-config`
-_Next Action:_ review package ownership and diagnostics for a minimal repro.
 
 <details>
 <summary>Full Traceback (click to expand)</summary>
@@ -274,26 +262,17 @@ ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded 
 
 ### ✅ mlx-community/gemma-3n-E2B-4bit
 
-_Recommendation:_ avoid for now; review verdict: harness
-_Key signals:_ Output appears truncated to about 4 tokens.; nontext prompt
-               burden=98%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model-config`; harness signal
-                      `prompt_template`
-_Token summary:_ prompt 264 tok; estimated text 4 tok; estimated non-text 260
-                 tok; generated 4 tok; requested max 500 tok; stop reason
-                 completed
-_Suggested next step:_ Inspect model repo config, chat template, and EOS
-                       settings.
-
-_Timing:_ Load 2.28s; Gen 0.73s; Total 3.34s
-_Throughput:_ Prompt 1,158 TPS (264 tok); Gen 95.3 TPS (4 tok)
-_Score summary:_ ❌ F (5/100); Output too short to be useful
-_Review priority:_ watchlist (harness)
-_Review summary:_ F 5/100; Output appears truncated to about 4 tokens.;
-                  nontext prompt burden=98%
+- _Recommendation:_ avoid for now; review verdict: harness
+- _Owner:_ likely owner `model-config`; harness signal `prompt_template`
+- _Next step:_ Inspect model repo config, chat template, and EOS settings.
+- _Key signals:_ Output appears truncated to about 4 tokens.; nontext prompt
+  burden=98%
+- _Score:_ ❌ F (5/100); Output too short to be useful
+- _Review priority:_ watchlist (harness)
+- _Timing:_ Load 2.28s; Gen 0.73s; Total 3.34s
+- _Throughput:_ Prompt 1,158 TPS (264 tok); Gen 95.3 TPS (4 tok)
+- _Tokens:_ prompt 264 tok; estimated text 4 tok; estimated non-text 260 tok;
+  generated 4 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -311,23 +290,16 @@ _Review summary:_ F 5/100; Output appears truncated to about 4 tokens.;
 
 ### ✅ mlx-community/nanoLLaVA-1.5-4bit
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=80%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 20 tok; estimated text 4 tok; estimated non-text 16
-                 tok; generated 124 tok; requested max 500 tok; stop reason
-                 completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 0.73s; Gen 0.97s; Total 2.02s
-_Throughput:_ Prompt 253 TPS (20 tok); Gen 335 TPS (124 tok)
-_Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 75/100; nontext prompt burden=80%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=80%
+- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 0.73s; Gen 0.97s; Total 2.02s
+- _Throughput:_ Prompt 253 TPS (20 tok); Gen 335 TPS (124 tok)
+- _Tokens:_ prompt 20 tok; estimated text 4 tok; estimated non-text 16 tok;
+  generated 124 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -349,23 +321,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ qnguyen3/nanoLLaVA
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=80%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 20 tok; estimated text 4 tok; estimated non-text 16
-                 tok; generated 51 tok; requested max 500 tok; stop reason
-                 completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 0.95s; Gen 1.06s; Total 2.34s
-_Throughput:_ Prompt 175 TPS (20 tok); Gen 114 TPS (51 tok)
-_Score summary:_ ✅ B (74/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 74/100; nontext prompt burden=80%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=80%
+- _Score:_ ✅ B (74/100); Keywords are not specific or diverse enough
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 0.95s; Gen 1.06s; Total 2.34s
+- _Throughput:_ Prompt 175 TPS (20 tok); Gen 114 TPS (51 tok)
+- _Tokens:_ prompt 20 tok; estimated text 4 tok; estimated non-text 16 tok;
+  generated 51 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -382,23 +347,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/LFM2.5-VL-1.6B-bf16
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=95%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 85 tok; estimated text 4 tok; estimated non-text 81
-                 tok; generated 117 tok; requested max 500 tok; stop reason
-                 completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 0.78s; Gen 1.08s; Total 2.18s
-_Throughput:_ Prompt 1,447 TPS (85 tok); Gen 188 TPS (117 tok)
-_Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 75/100; nontext prompt burden=95%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=95%
+- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 0.78s; Gen 1.08s; Total 2.18s
+- _Throughput:_ Prompt 1,447 TPS (85 tok); Gen 188 TPS (117 tok)
+- _Tokens:_ prompt 85 tok; estimated text 4 tok; estimated non-text 81 tok;
+  generated 117 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -420,23 +378,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/LFM2-VL-1.6B-8bit
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=99%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 275 tok; estimated text 4 tok; estimated non-text 271
-                 tok; generated 292 tok; requested max 500 tok; stop reason
-                 completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 0.71s; Gen 1.37s; Total 2.40s
-_Throughput:_ Prompt 3,363 TPS (275 tok); Gen 331 TPS (292 tok)
-_Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 75/100; nontext prompt burden=99%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=99%
+- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 0.71s; Gen 1.37s; Total 2.40s
+- _Throughput:_ Prompt 3,363 TPS (275 tok); Gen 331 TPS (292 tok)
+- _Tokens:_ prompt 275 tok; estimated text 4 tok; estimated non-text 271 tok;
+  generated 292 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -477,23 +428,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/Phi-3.5-vision-instruct-bf16
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=99%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 768 tok; estimated text 4 tok; estimated non-text 764
-                 tok; generated 53 tok; requested max 500 tok; stop reason
-                 completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 1.02s; Gen 1.57s; Total 2.91s
-_Throughput:_ Prompt 3,477 TPS (768 tok); Gen 59.2 TPS (53 tok)
-_Score summary:_ ✅ B (72/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 72/100; nontext prompt burden=99%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=99%
+- _Score:_ ✅ B (72/100); Keywords are not specific or diverse enough
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 1.02s; Gen 1.57s; Total 2.91s
+- _Throughput:_ Prompt 3,477 TPS (768 tok); Gen 59.2 TPS (53 tok)
+- _Tokens:_ prompt 768 tok; estimated text 4 tok; estimated non-text 764 tok;
+  generated 53 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -510,29 +454,19 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/paligemma2-3b-pt-896-4bit
 
-_Recommendation:_ use with caveats; review verdict: context budget
-_Key signals:_ Output appears truncated to about 3 tokens.; At long prompt
-               length (4101 tokens), output stayed unusually short (3 tokens;
-               ratio 0.1%).; output/prompt=0.07%; nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `mlx`; harness signal `long_context`
-_Token summary:_ prompt 4101 tok; estimated text 4 tok; estimated non-text
-                 4097 tok; generated 3 tok; requested max 500 tok; stop reason
-                 completed
-_Suggested next step:_ Treat this as a prompt-budget issue first; nontext
-                       prompt burden is 100% and the output stays weak under
-                       that load.
-
-_Timing:_ Load 1.15s; Gen 1.70s; Total 3.18s
-_Throughput:_ Prompt 3,657 TPS (4,101 tok); Gen 80.3 TPS (3 tok)
-_Score summary:_ ❌ F (5/100); Output too short to be useful
-_Review priority:_ watchlist (harness, long context)
-_Review summary:_ F 5/100; Output appears truncated to about 3 tokens.; At
-                  long prompt length (4101 tokens), output stayed unusually
-                  short (3 tokens; ratio 0.1%).; output/prompt=0.07%; nontext
-                  prompt burden=100%
+- _Recommendation:_ use with caveats; review verdict: context budget
+- _Owner:_ likely owner `mlx`; harness signal `long_context`
+- _Next step:_ Treat this as a prompt-budget issue first; nontext prompt
+  burden is 100% and the output stays weak under that load.
+- _Key signals:_ Output appears truncated to about 3 tokens.; At long prompt
+  length (4101 tokens), output stayed unusually short (3 tokens; ratio 0.1%).;
+  output/prompt=0.07%; nontext prompt burden=100%
+- _Score:_ ❌ F (5/100); Output too short to be useful
+- _Review priority:_ watchlist (harness, long context)
+- _Timing:_ Load 1.15s; Gen 1.70s; Total 3.18s
+- _Throughput:_ Prompt 3,657 TPS (4,101 tok); Gen 80.3 TPS (3 tok)
+- _Tokens:_ prompt 4101 tok; estimated text 4 tok; estimated non-text 4097
+  tok; generated 3 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -552,23 +486,16 @@ _Review summary:_ F 5/100; Output appears truncated to about 3 tokens.; At
 
 ### ✅ mlx-community/FastVLM-0.5B-bf16
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=83%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 24 tok; estimated text 4 tok; estimated non-text 20
-                 tok; generated 445 tok; requested max 500 tok; stop reason
-                 completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 1.06s; Gen 2.27s; Total 3.68s
-_Throughput:_ Prompt 273 TPS (24 tok); Gen 360 TPS (445 tok)
-_Score summary:_ ✅ B (74/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 74/100; nontext prompt burden=83%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=83%
+- _Score:_ ✅ B (74/100); Keywords are not specific or diverse enough
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 1.06s; Gen 2.27s; Total 3.68s
+- _Throughput:_ Prompt 273 TPS (24 tok); Gen 360 TPS (445 tok)
+- _Tokens:_ prompt 24 tok; estimated text 4 tok; estimated non-text 20 tok;
+  generated 445 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -620,23 +547,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/SmolVLM2-2.2B-Instruct-mlx
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=96%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 95 tok; estimated text 4 tok; estimated non-text 91
-                 tok; generated 266 tok; requested max 500 tok; stop reason
-                 completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 0.68s; Gen 3.00s; Total 4.01s
-_Throughput:_ Prompt 308 TPS (95 tok); Gen 129 TPS (266 tok)
-_Score summary:_ ✅ B (70/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 70/100; nontext prompt burden=96%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=96%
+- _Score:_ ✅ B (70/100); Keywords are not specific or diverse enough
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 0.68s; Gen 3.00s; Total 4.01s
+- _Throughput:_ Prompt 308 TPS (95 tok); Gen 129 TPS (266 tok)
+- _Tokens:_ prompt 95 tok; estimated text 4 tok; estimated non-text 91 tok;
+  generated 266 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -673,23 +593,17 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/Idefics3-8B-Llama3-bf16
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 2326 tok; estimated text 4 tok; estimated non-text
-                 2322 tok; generated 48 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 2.00s; Gen 3.08s; Total 5.42s
-_Throughput:_ Prompt 2,268 TPS (2,326 tok); Gen 33.2 TPS (48 tok)
-_Score summary:_ ✅ B (73/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 73/100; nontext prompt burden=100%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%; formatting=Unknown tags:
+  &lt;end_of_utterance&gt;
+- _Score:_ ✅ B (73/100); Keywords are not specific or diverse enough
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 2.00s; Gen 3.08s; Total 5.42s
+- _Throughput:_ Prompt 2,268 TPS (2,326 tok); Gen 33.2 TPS (48 tok)
+- _Tokens:_ prompt 2326 tok; estimated text 4 tok; estimated non-text 2322
+  tok; generated 48 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -708,23 +622,16 @@ _Review summary:_ B 73/100; nontext prompt burden=100%
 
 ### ✅ mlx-community/gemma-4-26b-a4b-it-4bit
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=99%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 278 tok; estimated text 4 tok; estimated non-text 274
-                 tok; generated 267 tok; requested max 500 tok; stop reason
-                 completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 2.68s; Gen 3.29s; Total 6.32s
-_Throughput:_ Prompt 708 TPS (278 tok); Gen 111 TPS (267 tok)
-_Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 75/100; nontext prompt burden=99%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=99%
+- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 2.68s; Gen 3.29s; Total 6.32s
+- _Throughput:_ Prompt 708 TPS (278 tok); Gen 111 TPS (267 tok)
+- _Tokens:_ prompt 278 tok; estimated text 4 tok; estimated non-text 274 tok;
+  generated 267 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -755,23 +662,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/Ministral-3-3B-Instruct-2512-4bit
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 2629 tok; estimated text 4 tok; estimated non-text
-                 2625 tok; generated 355 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 1.55s; Gen 3.42s; Total 5.32s
-_Throughput:_ Prompt 2,682 TPS (2,629 tok); Gen 187 TPS (355 tok)
-_Score summary:_ ✅ B (68/100); Missing requested structure
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 68/100; nontext prompt burden=100%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%
+- _Score:_ ✅ B (68/100); Missing requested structure
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 1.55s; Gen 3.42s; Total 5.32s
+- _Throughput:_ Prompt 2,682 TPS (2,629 tok); Gen 187 TPS (355 tok)
+- _Tokens:_ prompt 2629 tok; estimated text 4 tok; estimated non-text 2625
+  tok; generated 355 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -821,23 +721,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/llava-v1.6-mistral-7b-8bit
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 2174 tok; estimated text 4 tok; estimated non-text
-                 2170 tok; generated 74 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 1.16s; Gen 4.15s; Total 5.65s
-_Throughput:_ Prompt 948 TPS (2,174 tok); Gen 61.9 TPS (74 tok)
-_Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 75/100; nontext prompt burden=100%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%
+- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 1.16s; Gen 4.15s; Total 5.65s
+- _Throughput:_ Prompt 948 TPS (2,174 tok); Gen 61.9 TPS (74 tok)
+- _Tokens:_ prompt 2174 tok; estimated text 4 tok; estimated non-text 2170
+  tok; generated 74 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -856,22 +749,15 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ HuggingFaceTB/SmolVLM-Instruct
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 1195 tok; estimated text 4 tok; estimated non-text
-                 1191 tok; generated 420 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 0.71s; Gen 4.25s; Total 5.27s
-_Throughput:_ Prompt 3,079 TPS (1,195 tok); Gen 128 TPS (420 tok)
-_Score summary:_ 🟡 C (65/100); Keywords are not specific or diverse enough
-_Review summary:_ C 65/100; nontext prompt burden=100%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%
+- _Score:_ 🟡 C (65/100); Keywords are not specific or diverse enough
+- _Timing:_ Load 0.71s; Gen 4.25s; Total 5.27s
+- _Throughput:_ Prompt 3,079 TPS (1,195 tok); Gen 128 TPS (420 tok)
+- _Tokens:_ prompt 1195 tok; estimated text 4 tok; estimated non-text 1191
+  tok; generated 420 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -920,26 +806,17 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/gemma-4-31b-bf16
 
-_Recommendation:_ avoid for now; review verdict: harness
-_Key signals:_ Output appears truncated to about 5 tokens.; nontext prompt
-               burden=98%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model-config`; harness signal
-                      `prompt_template`
-_Token summary:_ prompt 266 tok; estimated text 4 tok; estimated non-text 262
-                 tok; generated 5 tok; requested max 500 tok; stop reason
-                 completed
-_Suggested next step:_ Inspect model repo config, chat template, and EOS
-                       settings.
-
-_Timing:_ Load 7.23s; Gen 4.39s; Total 11.96s
-_Throughput:_ Prompt 81.4 TPS (266 tok); Gen 8.99 TPS (5 tok)
-_Score summary:_ ❌ F (5/100); Output too short to be useful
-_Review priority:_ watchlist (harness)
-_Review summary:_ F 5/100; Output appears truncated to about 5 tokens.;
-                  nontext prompt burden=98%
+- _Recommendation:_ avoid for now; review verdict: harness
+- _Owner:_ likely owner `model-config`; harness signal `prompt_template`
+- _Next step:_ Inspect model repo config, chat template, and EOS settings.
+- _Key signals:_ Output appears truncated to about 5 tokens.; nontext prompt
+  burden=98%
+- _Score:_ ❌ F (5/100); Output too short to be useful
+- _Review priority:_ watchlist (harness)
+- _Timing:_ Load 7.23s; Gen 4.39s; Total 11.96s
+- _Throughput:_ Prompt 81.4 TPS (266 tok); Gen 8.99 TPS (5 tok)
+- _Tokens:_ prompt 266 tok; estimated text 4 tok; estimated non-text 262 tok;
+  generated 5 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -957,22 +834,15 @@ _Review summary:_ F 5/100; Output appears truncated to about 5 tokens.;
 
 ### ✅ mlx-community/SmolVLM-Instruct-bf16
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 1195 tok; estimated text 4 tok; estimated non-text
-                 1191 tok; generated 420 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 0.63s; Gen 4.41s; Total 5.38s
-_Throughput:_ Prompt 3,177 TPS (1,195 tok); Gen 123 TPS (420 tok)
-_Score summary:_ 🟡 C (65/100); Keywords are not specific or diverse enough
-_Review summary:_ C 65/100; nontext prompt burden=100%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%
+- _Score:_ 🟡 C (65/100); Keywords are not specific or diverse enough
+- _Timing:_ Load 0.63s; Gen 4.41s; Total 5.38s
+- _Throughput:_ Prompt 3,177 TPS (1,195 tok); Gen 123 TPS (420 tok)
+- _Tokens:_ prompt 1195 tok; estimated text 4 tok; estimated non-text 1191
+  tok; generated 420 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -1021,23 +891,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/paligemma2-10b-ft-docci-448-6bit
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 1029 tok; estimated text 4 tok; estimated non-text
-                 1025 tok; generated 135 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 1.80s; Gen 5.31s; Total 7.44s
-_Throughput:_ Prompt 1,321 TPS (1,029 tok); Gen 34.6 TPS (135 tok)
-_Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 75/100; nontext prompt burden=100%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%
+- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 1.80s; Gen 5.31s; Total 7.44s
+- _Throughput:_ Prompt 1,321 TPS (1,029 tok); Gen 34.6 TPS (135 tok)
+- _Tokens:_ prompt 1029 tok; estimated text 4 tok; estimated non-text 1025
+  tok; generated 135 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -1059,23 +922,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/gemma-3n-E4B-it-bf16
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=99%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 272 tok; estimated text 4 tok; estimated non-text 268
-                 tok; generated 237 tok; requested max 500 tok; stop reason
-                 completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 2.35s; Gen 5.63s; Total 8.31s
-_Throughput:_ Prompt 876 TPS (272 tok); Gen 48.8 TPS (237 tok)
-_Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 75/100; nontext prompt burden=99%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=99%
+- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 2.35s; Gen 5.63s; Total 8.31s
+- _Throughput:_ Prompt 876 TPS (272 tok); Gen 48.8 TPS (237 tok)
+- _Tokens:_ prompt 272 tok; estimated text 4 tok; estimated non-text 268 tok;
+  generated 237 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -1109,23 +965,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/InternVL3-14B-8bit
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 1804 tok; estimated text 4 tok; estimated non-text
-                 1800 tok; generated 125 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 2.27s; Gen 5.80s; Total 8.40s
-_Throughput:_ Prompt 1,343 TPS (1,804 tok); Gen 32.1 TPS (125 tok)
-_Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 75/100; nontext prompt burden=100%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%
+- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 2.27s; Gen 5.80s; Total 8.40s
+- _Throughput:_ Prompt 1,343 TPS (1,804 tok); Gen 32.1 TPS (125 tok)
+- _Tokens:_ prompt 1804 tok; estimated text 4 tok; estimated non-text 1800
+  tok; generated 125 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -1147,23 +996,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ jqlive/Kimi-VL-A3B-Thinking-2506-6bit
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%; reasoning leak
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 1011 tok; estimated text 4 tok; estimated non-text
-                 1007 tok; generated 357 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 2.56s; Gen 6.13s; Total 9.00s
-_Throughput:_ Prompt 1,275 TPS (1,011 tok); Gen 74.3 TPS (357 tok)
-_Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
-_Review priority:_ watchlist (reasoning leak)
-_Review summary:_ B 75/100; nontext prompt burden=100%; reasoning leak
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%; reasoning leak
+- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
+- _Review priority:_ watchlist (reasoning leak)
+- _Timing:_ Load 2.56s; Gen 6.13s; Total 9.00s
+- _Throughput:_ Prompt 1,275 TPS (1,011 tok); Gen 74.3 TPS (357 tok)
+- _Tokens:_ prompt 1011 tok; estimated text 4 tok; estimated non-text 1007
+  tok; generated 357 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -1205,23 +1047,16 @@ _Review summary:_ B 75/100; nontext prompt burden=100%; reasoning leak
 
 ### ✅ mlx-community/pixtral-12b-8bit
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 2887 tok; estimated text 4 tok; estimated non-text
-                 2883 tok; generated 167 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 1.86s; Gen 6.40s; Total 8.59s
-_Throughput:_ Prompt 1,774 TPS (2,887 tok); Gen 39.3 TPS (167 tok)
-_Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 75/100; nontext prompt burden=100%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%
+- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 1.86s; Gen 6.40s; Total 8.59s
+- _Throughput:_ Prompt 1,774 TPS (2,887 tok); Gen 39.3 TPS (167 tok)
+- _Tokens:_ prompt 2887 tok; estimated text 4 tok; estimated non-text 2883
+  tok; generated 167 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -1249,23 +1084,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 1029 tok; estimated text 4 tok; estimated non-text
-                 1025 tok; generated 118 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 2.11s; Gen 6.86s; Total 9.30s
-_Throughput:_ Prompt 2,784 TPS (1,029 tok); Gen 19.7 TPS (118 tok)
-_Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 75/100; nontext prompt burden=100%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%
+- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 2.11s; Gen 6.86s; Total 9.30s
+- _Throughput:_ Prompt 2,784 TPS (1,029 tok); Gen 19.7 TPS (118 tok)
+- _Tokens:_ prompt 1029 tok; estimated text 4 tok; estimated non-text 1025
+  tok; generated 118 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -1286,23 +1114,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/gemma-4-31b-it-4bit
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=99%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 278 tok; estimated text 4 tok; estimated non-text 274
-                 tok; generated 158 tok; requested max 500 tok; stop reason
-                 completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 2.70s; Gen 7.11s; Total 10.16s
-_Throughput:_ Prompt 381 TPS (278 tok); Gen 26.9 TPS (158 tok)
-_Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 75/100; nontext prompt burden=99%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=99%
+- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 2.70s; Gen 7.11s; Total 10.16s
+- _Throughput:_ Prompt 381 TPS (278 tok); Gen 26.9 TPS (158 tok)
+- _Tokens:_ prompt 278 tok; estimated text 4 tok; estimated non-text 274 tok;
+  generated 158 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -1326,23 +1147,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/Ministral-3-14B-Instruct-2512-mxfp4
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 2630 tok; estimated text 4 tok; estimated non-text
-                 2626 tok; generated 311 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 1.76s; Gen 7.12s; Total 9.22s
-_Throughput:_ Prompt 1,347 TPS (2,630 tok); Gen 67.1 TPS (311 tok)
-_Score summary:_ ✅ B (75/100); Missing requested structure
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 75/100; nontext prompt burden=100%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%
+- _Score:_ ✅ B (75/100); Missing requested structure
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 1.76s; Gen 7.12s; Total 9.22s
+- _Throughput:_ Prompt 1,347 TPS (2,630 tok); Gen 67.1 TPS (311 tok)
+- _Tokens:_ prompt 2630 tok; estimated text 4 tok; estimated non-text 2626
+  tok; generated 311 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -1387,23 +1201,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/Ministral-3-14B-Instruct-2512-nvfp4
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 2630 tok; estimated text 4 tok; estimated non-text
-                 2626 tok; generated 344 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 1.90s; Gen 8.33s; Total 10.56s
-_Throughput:_ Prompt 1,142 TPS (2,630 tok); Gen 63.0 TPS (344 tok)
-_Score summary:_ ✅ B (68/100); Missing requested structure
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 68/100; nontext prompt burden=100%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%
+- _Score:_ ✅ B (68/100); Missing requested structure
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 1.90s; Gen 8.33s; Total 10.56s
+- _Throughput:_ Prompt 1,142 TPS (2,630 tok); Gen 63.0 TPS (344 tok)
+- _Tokens:_ prompt 2630 tok; estimated text 4 tok; estimated non-text 2626
+  tok; generated 344 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -1451,26 +1258,18 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
 
-_Recommendation:_ avoid for now; review verdict: harness
-_Key signals:_ Tokenizer space-marker artifacts (for example Ġ) appeared in
-               output (about 139 occurrences).; nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints; generic description
-_Maintainer routing:_ likely owner `mlx-vlm`; harness signal `encoding`
-_Token summary:_ prompt 2097 tok; estimated text 4 tok; estimated non-text
-                 2093 tok; generated 172 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Inspect decode cleanup; tokenizer markers are leaking
-                       into user-facing text.
-
-_Timing:_ Load 2.52s; Gen 9.22s; Total 12.11s
-_Throughput:_ Prompt 662 TPS (2,097 tok); Gen 31.3 TPS (172 tok)
-_Score summary:_ ❌ F (0/100); Output too short to be useful
-_Review priority:_ watchlist (harness)
-_Review summary:_ F 0/100; Tokenizer space-marker artifacts (for example Ġ)
-                  appeared in output (about 139 occurrences).; nontext prompt
-                  burden=100%
+- _Recommendation:_ avoid for now; review verdict: harness
+- _Owner:_ likely owner `mlx-vlm`; harness signal `encoding`
+- _Next step:_ Inspect decode cleanup; tokenizer markers are leaking into
+  user-facing text.
+- _Key signals:_ Tokenizer space-marker artifacts (for example Ġ) appeared in
+  output (about 139 occurrences).; nontext prompt burden=100%
+- _Score:_ ❌ F (0/100); Output too short to be useful
+- _Review priority:_ watchlist (harness)
+- _Timing:_ Load 2.52s; Gen 9.22s; Total 12.11s
+- _Throughput:_ Prompt 662 TPS (2,097 tok); Gen 31.3 TPS (172 tok)
+- _Tokens:_ prompt 2097 tok; estimated text 4 tok; estimated non-text 2093
+  tok; generated 172 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -1489,28 +1288,19 @@ _Review summary:_ F 0/100; Tokenizer space-marker artifacts (for example Ġ)
 
 ### ✅ microsoft/Phi-3.5-vision-instruct
 
-_Recommendation:_ avoid for now; review verdict: harness
-_Key signals:_ Special control token &lt;|end|&gt; appeared in generated
-               text.; Special control token &lt;|endoftext|&gt; appeared in
-               generated text.; hit token cap (500); nontext prompt burden=99%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `mlx-vlm`; harness signal `stop_token`
-_Token summary:_ prompt 768 tok; estimated text 4 tok; estimated non-text 764
-                 tok; generated 500 tok; requested max 500 tok; stop reason
-                 completed
-_Suggested next step:_ Inspect EOS/stop-token stripping; control tokens are
-                       leaking into user-facing text.
-
-_Timing:_ Load 1.13s; Gen 9.46s; Total 10.92s
-_Throughput:_ Prompt 3,303 TPS (768 tok); Gen 57.0 TPS (500 tok)
-_Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
-_Review priority:_ watchlist (harness)
-_Review summary:_ B 75/100; Special control token &lt;|end|&gt; appeared in
-                  generated text.; Special control token &lt;|endoftext|&gt;
-                  appeared in generated text.; hit token cap (500); nontext
-                  prompt burden=99%
+- _Recommendation:_ avoid for now; review verdict: harness
+- _Owner:_ likely owner `mlx-vlm`; harness signal `stop_token`
+- _Next step:_ Inspect EOS/stop-token stripping; control tokens are leaking
+  into user-facing text.
+- _Key signals:_ Special control token &lt;|end|&gt; appeared in generated
+  text.; Special control token &lt;|endoftext|&gt; appeared in generated
+  text.; hit token cap (500); nontext prompt burden=99%
+- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
+- _Review priority:_ watchlist (harness)
+- _Timing:_ Load 1.13s; Gen 9.46s; Total 10.92s
+- _Throughput:_ Prompt 3,303 TPS (768 tok); Gen 57.0 TPS (500 tok)
+- _Tokens:_ prompt 768 tok; estimated text 4 tok; estimated non-text 764 tok;
+  generated 500 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -1563,23 +1353,16 @@ _Review summary:_ B 75/100; Special control token &lt;|end|&gt; appeared in
 
 ### ✅ mlx-community/pixtral-12b-bf16
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 2887 tok; estimated text 4 tok; estimated non-text
-                 2883 tok; generated 166 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 2.59s; Gen 10.47s; Total 13.38s
-_Throughput:_ Prompt 1,792 TPS (2,887 tok); Gen 19.9 TPS (166 tok)
-_Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 75/100; nontext prompt burden=100%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%
+- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 2.59s; Gen 10.47s; Total 13.38s
+- _Throughput:_ Prompt 1,792 TPS (2,887 tok); Gen 19.9 TPS (166 tok)
+- _Tokens:_ prompt 2887 tok; estimated text 4 tok; estimated non-text 2883
+  tok; generated 166 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -1607,23 +1390,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/InternVL3-8B-bf16
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 1804 tok; estimated text 4 tok; estimated non-text
-                 1800 tok; generated 344 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 2.31s; Gen 11.17s; Total 13.81s
-_Throughput:_ Prompt 2,475 TPS (1,804 tok); Gen 34.8 TPS (344 tok)
-_Score summary:_ ✅ B (75/100); Missing requested structure
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 75/100; nontext prompt burden=100%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%
+- _Score:_ ✅ B (75/100); Missing requested structure
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 2.31s; Gen 11.17s; Total 13.81s
+- _Throughput:_ Prompt 2,475 TPS (1,804 tok); Gen 34.8 TPS (344 tok)
+- _Tokens:_ prompt 1804 tok; estimated text 4 tok; estimated non-text 1800
+  tok; generated 344 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -1671,23 +1447,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
 
-_Recommendation:_ avoid for now; review verdict: cutoff degraded
-_Key signals:_ hit token cap (500); nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 1293 tok; estimated text 4 tok; estimated non-text
-                 1289 tok; generated 500 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 6.22s; Gen 11.60s; Total 18.18s
-_Throughput:_ Prompt 531 TPS (1,293 tok); Gen 59.4 TPS (500 tok)
-_Score summary:_ 🟡 C (65/100); Missing requested structure
-_Review priority:_ watchlist (cutoff)
-_Review summary:_ C 65/100; hit token cap (500); nontext prompt burden=100%
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ hit token cap (500); nontext prompt burden=100%
+- _Score:_ 🟡 C (65/100); Missing requested structure
+- _Review priority:_ watchlist (cutoff)
+- _Timing:_ Load 6.22s; Gen 11.60s; Total 18.18s
+- _Throughput:_ Prompt 531 TPS (1,293 tok); Gen 59.4 TPS (500 tok)
+- _Tokens:_ prompt 1293 tok; estimated text 4 tok; estimated non-text 1289
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -1738,27 +1507,18 @@ _Review summary:_ C 65/100; hit token cap (500); nontext prompt burden=100%
 
 ### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
 
-_Recommendation:_ avoid for now; review verdict: harness
-_Key signals:_ Special control token &lt;/think&gt; appeared in generated
-               text.; hit token cap (500); nontext prompt burden=100%;
-               reasoning leak
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `mlx-vlm`; harness signal `stop_token`
-_Token summary:_ prompt 6091 tok; estimated text 4 tok; estimated non-text
-                 6087 tok; generated 500 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Inspect EOS/stop-token stripping; control tokens are
-                       leaking into user-facing text.
-
-_Timing:_ Load 1.56s; Gen 12.72s; Total 14.63s
-_Throughput:_ Prompt 1,140 TPS (6,091 tok); Gen 72.4 TPS (500 tok)
-_Score summary:_ ✅ B (80/100); Missing requested structure
-_Review priority:_ watchlist (harness, reasoning leak)
-_Review summary:_ B 80/100; Special control token &lt;/think&gt; appeared in
-                  generated text.; hit token cap (500); nontext prompt
-                  burden=100%; reasoning leak
+- _Recommendation:_ avoid for now; review verdict: harness
+- _Owner:_ likely owner `mlx-vlm`; harness signal `stop_token`
+- _Next step:_ Inspect EOS/stop-token stripping; control tokens are leaking
+  into user-facing text.
+- _Key signals:_ Special control token &lt;/think&gt; appeared in generated
+  text.; hit token cap (500); nontext prompt burden=100%; reasoning leak
+- _Score:_ ✅ B (80/100); Missing requested structure
+- _Review priority:_ watchlist (harness, reasoning leak)
+- _Timing:_ Load 1.56s; Gen 12.72s; Total 14.63s
+- _Throughput:_ Prompt 1,140 TPS (6,091 tok); Gen 72.4 TPS (500 tok)
+- _Tokens:_ prompt 6091 tok; estimated text 4 tok; estimated non-text 6087
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -1826,23 +1586,16 @@ _Review summary:_ B 80/100; Special control token &lt;/think&gt; appeared in
 
 ### ✅ mlx-community/gemma-3-27b-it-qat-4bit
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=99%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 273 tok; estimated text 4 tok; estimated non-text 269
-                 tok; generated 320 tok; requested max 500 tok; stop reason
-                 completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 2.72s; Gen 13.52s; Total 16.60s
-_Throughput:_ Prompt 385 TPS (273 tok); Gen 26.0 TPS (320 tok)
-_Score summary:_ 🏆 A (85/100); Missing requested structure
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ A 85/100; nontext prompt burden=99%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=99%
+- _Score:_ 🏆 A (85/100); Missing requested structure
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 2.72s; Gen 13.52s; Total 16.60s
+- _Throughput:_ Prompt 385 TPS (273 tok); Gen 26.0 TPS (320 tok)
+- _Tokens:_ prompt 273 tok; estimated text 4 tok; estimated non-text 269 tok;
+  generated 320 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -1895,26 +1648,17 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
 
-_Recommendation:_ avoid for now; review verdict: cutoff degraded
-_Key signals:_ hit token cap (500); nontext prompt burden=100%; reasoning
-               leak; degeneration=incomplete_sentence: ends with 'of'
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 2979 tok; estimated text 4 tok; estimated non-text
-                 2975 tok; generated 500 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 1.82s; Gen 14.52s; Total 16.68s
-_Throughput:_ Prompt 1,448 TPS (2,979 tok); Gen 41.9 TPS (500 tok)
-_Score summary:_ ✅ B (80/100); Keywords are not specific or diverse enough
-_Review priority:_ watchlist (cutoff, degeneration, reasoning leak)
-_Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%;
-                  reasoning leak; degeneration=incomplete_sentence: ends with
-                  'of'
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ hit token cap (500); nontext prompt burden=100%; reasoning
+  leak; degeneration=incomplete_sentence: ends with 'of'
+- _Score:_ ✅ B (80/100); Keywords are not specific or diverse enough
+- _Review priority:_ watchlist (cutoff, degeneration, reasoning leak)
+- _Timing:_ Load 1.82s; Gen 14.52s; Total 16.68s
+- _Throughput:_ Prompt 1,448 TPS (2,979 tok); Gen 41.9 TPS (500 tok)
+- _Tokens:_ prompt 2979 tok; estimated text 4 tok; estimated non-text 2975
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -1973,27 +1717,18 @@ _Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%;
 
 ### ✅ mlx-community/GLM-4.6V-Flash-6bit
 
-_Recommendation:_ avoid for now; review verdict: harness
-_Key signals:_ Special control token &lt;/think&gt; appeared in generated
-               text.; hit token cap (500); nontext prompt burden=100%;
-               reasoning leak
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `mlx-vlm`; harness signal `stop_token`
-_Token summary:_ prompt 6091 tok; estimated text 4 tok; estimated non-text
-                 6087 tok; generated 500 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Inspect EOS/stop-token stripping; control tokens are
-                       leaking into user-facing text.
-
-_Timing:_ Load 1.53s; Gen 14.89s; Total 16.77s
-_Throughput:_ Prompt 1,145 TPS (6,091 tok); Gen 54.9 TPS (500 tok)
-_Score summary:_ ✅ B (80/100); Missing requested structure
-_Review priority:_ watchlist (harness, reasoning leak)
-_Review summary:_ B 80/100; Special control token &lt;/think&gt; appeared in
-                  generated text.; hit token cap (500); nontext prompt
-                  burden=100%; reasoning leak
+- _Recommendation:_ avoid for now; review verdict: harness
+- _Owner:_ likely owner `mlx-vlm`; harness signal `stop_token`
+- _Next step:_ Inspect EOS/stop-token stripping; control tokens are leaking
+  into user-facing text.
+- _Key signals:_ Special control token &lt;/think&gt; appeared in generated
+  text.; hit token cap (500); nontext prompt burden=100%; reasoning leak
+- _Score:_ ✅ B (80/100); Missing requested structure
+- _Review priority:_ watchlist (harness, reasoning leak)
+- _Timing:_ Load 1.53s; Gen 14.89s; Total 16.77s
+- _Throughput:_ Prompt 1,145 TPS (6,091 tok); Gen 54.9 TPS (500 tok)
+- _Tokens:_ prompt 6091 tok; estimated text 4 tok; estimated non-text 6087
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -2062,23 +1797,16 @@ _Review summary:_ B 80/100; Special control token &lt;/think&gt; appeared in
 
 ### ✅ mlx-community/Molmo-7B-D-0924-8bit
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 1207 tok; estimated text 4 tok; estimated non-text
-                 1203 tok; generated 205 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 1.25s; Gen 18.68s; Total 20.27s
-_Throughput:_ Prompt 86.8 TPS (1,207 tok); Gen 52.1 TPS (205 tok)
-_Score summary:_ ✅ B (80/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 80/100; nontext prompt burden=100%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%
+- _Score:_ ✅ B (80/100); Keywords are not specific or diverse enough
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 1.25s; Gen 18.68s; Total 20.27s
+- _Throughput:_ Prompt 86.8 TPS (1,207 tok); Gen 52.1 TPS (205 tok)
+- _Tokens:_ prompt 1207 tok; estimated text 4 tok; estimated non-text 1203
+  tok; generated 205 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -2113,23 +1841,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 1029 tok; estimated text 4 tok; estimated non-text
-                 1025 tok; generated 100 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 2.84s; Gen 20.05s; Total 23.23s
-_Throughput:_ Prompt 926 TPS (1,029 tok); Gen 5.44 TPS (100 tok)
-_Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 75/100; nontext prompt burden=100%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%
+- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 2.84s; Gen 20.05s; Total 23.23s
+- _Throughput:_ Prompt 926 TPS (1,029 tok); Gen 5.44 TPS (100 tok)
+- _Tokens:_ prompt 1029 tok; estimated text 4 tok; estimated non-text 1025
+  tok; generated 100 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -2149,23 +1870,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/Llama-3.2-11B-Vision-Instruct-8bit
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=71%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 14 tok; estimated text 4 tok; estimated non-text 10
-                 tok; generated 421 tok; requested max 500 tok; stop reason
-                 completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 1.64s; Gen 21.78s; Total 23.74s
-_Throughput:_ Prompt 10.4 TPS (14 tok); Gen 21.1 TPS (421 tok)
-_Score summary:_ ✅ B (73/100); Missing requested structure
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 73/100; nontext prompt burden=71%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=71%
+- _Score:_ ✅ B (73/100); Missing requested structure
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 1.64s; Gen 21.78s; Total 23.74s
+- _Throughput:_ Prompt 10.4 TPS (14 tok); Gen 21.1 TPS (421 tok)
+- _Tokens:_ prompt 14 tok; estimated text 4 tok; estimated non-text 10 tok;
+  generated 421 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -2219,23 +1933,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/Molmo-7B-D-0924-bf16
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 1207 tok; estimated text 4 tok; estimated non-text
-                 1203 tok; generated 205 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 1.95s; Gen 22.41s; Total 24.70s
-_Throughput:_ Prompt 81.7 TPS (1,207 tok); Gen 30.1 TPS (205 tok)
-_Score summary:_ ✅ B (80/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 80/100; nontext prompt burden=100%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%
+- _Score:_ ✅ B (80/100); Keywords are not specific or diverse enough
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 1.95s; Gen 22.41s; Total 24.70s
+- _Throughput:_ Prompt 81.7 TPS (1,207 tok); Gen 30.1 TPS (205 tok)
+- _Tokens:_ prompt 1207 tok; estimated text 4 tok; estimated non-text 1203
+  tok; generated 205 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -2270,23 +1977,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/X-Reasoner-7B-8bit
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 16299 tok; estimated text 4 tok; estimated non-text
-                 16295 tok; generated 219 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 1.15s; Gen 23.97s; Total 25.46s
-_Throughput:_ Prompt 848 TPS (16,299 tok); Gen 54.8 TPS (219 tok)
-_Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 75/100; nontext prompt burden=100%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%
+- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 1.15s; Gen 23.97s; Total 25.46s
+- _Throughput:_ Prompt 848 TPS (16,299 tok); Gen 54.8 TPS (219 tok)
+- _Tokens:_ prompt 16299 tok; estimated text 4 tok; estimated non-text 16295
+  tok; generated 219 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -2315,23 +2015,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/gemma-3-27b-it-qat-8bit
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=99%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 273 tok; estimated text 4 tok; estimated non-text 269
-                 tok; generated 381 tok; requested max 500 tok; stop reason
-                 completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 3.53s; Gen 24.25s; Total 28.13s
-_Throughput:_ Prompt 325 TPS (273 tok); Gen 16.6 TPS (381 tok)
-_Score summary:_ ✅ B (80/100); Missing requested structure
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 80/100; nontext prompt burden=99%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=99%
+- _Score:_ ✅ B (80/100); Missing requested structure
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 3.53s; Gen 24.25s; Total 28.13s
+- _Throughput:_ Prompt 325 TPS (273 tok); Gen 16.6 TPS (381 tok)
+- _Tokens:_ prompt 273 tok; estimated text 4 tok; estimated non-text 269 tok;
+  generated 381 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -2385,27 +2078,18 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/GLM-4.6V-nvfp4
 
-_Recommendation:_ avoid for now; review verdict: harness
-_Key signals:_ Special control token &lt;/think&gt; appeared in generated
-               text.; hit token cap (500); nontext prompt burden=100%;
-               reasoning leak
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `mlx-vlm`; harness signal `stop_token`
-_Token summary:_ prompt 6091 tok; estimated text 4 tok; estimated non-text
-                 6087 tok; generated 500 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Inspect EOS/stop-token stripping; control tokens are
-                       leaking into user-facing text.
-
-_Timing:_ Load 6.94s; Gen 28.63s; Total 35.91s
-_Throughput:_ Prompt 426 TPS (6,091 tok); Gen 36.1 TPS (500 tok)
-_Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
-_Review priority:_ watchlist (harness, reasoning leak)
-_Review summary:_ B 75/100; Special control token &lt;/think&gt; appeared in
-                  generated text.; hit token cap (500); nontext prompt
-                  burden=100%; reasoning leak
+- _Recommendation:_ avoid for now; review verdict: harness
+- _Owner:_ likely owner `mlx-vlm`; harness signal `stop_token`
+- _Next step:_ Inspect EOS/stop-token stripping; control tokens are leaking
+  into user-facing text.
+- _Key signals:_ Special control token &lt;/think&gt; appeared in generated
+  text.; hit token cap (500); nontext prompt burden=100%; reasoning leak
+- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
+- _Review priority:_ watchlist (harness, reasoning leak)
+- _Timing:_ Load 6.94s; Gen 28.63s; Total 35.91s
+- _Throughput:_ Prompt 426 TPS (6,091 tok); Gen 36.1 TPS (500 tok)
+- _Tokens:_ prompt 6091 tok; estimated text 4 tok; estimated non-text 6087
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -2462,23 +2146,16 @@ _Review summary:_ B 75/100; Special control token &lt;/think&gt; appeared in
 
 ### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=73%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 15 tok; estimated text 4 tok; estimated non-text 11
-                 tok; generated 276 tok; requested max 500 tok; stop reason
-                 completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 2.52s; Gen 57.54s; Total 60.39s
-_Throughput:_ Prompt 8.95 TPS (15 tok); Gen 4.98 TPS (276 tok)
-_Score summary:_ ✅ B (80/100); Missing requested structure
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 80/100; nontext prompt burden=73%
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=73%
+- _Score:_ ✅ B (80/100); Missing requested structure
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 2.52s; Gen 57.54s; Total 60.39s
+- _Throughput:_ Prompt 8.95 TPS (15 tok); Gen 4.98 TPS (276 tok)
+- _Tokens:_ prompt 15 tok; estimated text 4 tok; estimated non-text 11 tok;
+  generated 276 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -2517,23 +2194,16 @@ _Quality Status:_ no quality issues detected in this run
 
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%; reasoning leak
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 1011 tok; estimated text 4 tok; estimated non-text
-                 1007 tok; generated 277 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 3.83s; Gen 60.68s; Total 64.84s
-_Throughput:_ Prompt 760 TPS (1,011 tok); Gen 4.72 TPS (277 tok)
-_Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
-_Review priority:_ watchlist (reasoning leak)
-_Review summary:_ B 75/100; nontext prompt burden=100%; reasoning leak
+- _Recommendation:_ recommended; review verdict: clean
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ nontext prompt burden=100%; reasoning leak
+- _Score:_ ✅ B (75/100); Keywords are not specific or diverse enough
+- _Review priority:_ watchlist (reasoning leak)
+- _Timing:_ Load 3.83s; Gen 60.68s; Total 64.84s
+- _Throughput:_ Prompt 760 TPS (1,011 tok); Gen 4.72 TPS (277 tok)
+- _Tokens:_ prompt 1011 tok; estimated text 4 tok; estimated non-text 1007
+  tok; generated 277 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -2570,32 +2240,20 @@ _Review summary:_ B 75/100; nontext prompt burden=100%; reasoning leak
 
 ### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
 
-_Recommendation:_ use with caveats; review verdict: context budget
-_Key signals:_ Output is very short relative to prompt size (0.1%), suggesting
-               possible early-stop or prompt-handling issues.; At long prompt
-               length (16299 tokens), output stayed unusually short (13
-               tokens; ratio 0.1%).; output/prompt=0.08%; nontext prompt
-               burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `mlx`; harness signal `long_context`
-_Token summary:_ prompt 16299 tok; estimated text 4 tok; estimated non-text
-                 16295 tok; generated 13 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat this as a prompt-budget issue first; nontext
-                       prompt burden is 100% and the output stays weak under
-                       that load.
-
-_Timing:_ Load 0.69s; Gen 65.68s; Total 66.69s
-_Throughput:_ Prompt 251 TPS (16,299 tok); Gen 207 TPS (13 tok)
-_Score summary:_ ❌ F (16/100); Output lacks detail
-_Review priority:_ watchlist (harness, long context)
-_Review summary:_ F 16/100; Output is very short relative to prompt size
-                  (0.1%), suggesting possible early-stop or prompt-handling
-                  issues.; At long prompt length (16299 tokens), output stayed
-                  unusually short (13 tokens; ratio 0.1%).;
-                  output/prompt=0.08%; nontext prompt burden=100%
+- _Recommendation:_ use with caveats; review verdict: context budget
+- _Owner:_ likely owner `mlx`; harness signal `long_context`
+- _Next step:_ Treat this as a prompt-budget issue first; nontext prompt
+  burden is 100% and the output stays weak under that load.
+- _Key signals:_ Output is very short relative to prompt size (0.1%),
+  suggesting possible early-stop or prompt-handling issues.; At long prompt
+  length (16299 tokens), output stayed unusually short (13 tokens; ratio
+  0.1%).; output/prompt=0.08%; nontext prompt burden=100%
+- _Score:_ ❌ F (16/100); Output lacks detail
+- _Review priority:_ watchlist (harness, long context)
+- _Timing:_ Load 0.69s; Gen 65.68s; Total 66.69s
+- _Throughput:_ Prompt 251 TPS (16,299 tok); Gen 207 TPS (13 tok)
+- _Tokens:_ prompt 16299 tok; estimated text 4 tok; estimated non-text 16295
+  tok; generated 13 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -2615,23 +2273,16 @@ _Review summary:_ F 16/100; Output is very short relative to prompt size
 
 ### ✅ mlx-community/Qwen3.5-35B-A3B-4bit
 
-_Recommendation:_ avoid for now; review verdict: cutoff degraded
-_Key signals:_ hit token cap (500); nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 16290 tok; estimated text 4 tok; estimated non-text
-                 16286 tok; generated 500 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 3.34s; Gen 65.68s; Total 69.37s
-_Throughput:_ Prompt 271 TPS (16,290 tok); Gen 104 TPS (500 tok)
-_Score summary:_ ✅ B (80/100); Missing requested structure
-_Review priority:_ watchlist (cutoff)
-_Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ hit token cap (500); nontext prompt burden=100%
+- _Score:_ ✅ B (80/100); Missing requested structure
+- _Review priority:_ watchlist (cutoff)
+- _Timing:_ Load 3.34s; Gen 65.68s; Total 69.37s
+- _Throughput:_ Prompt 271 TPS (16,290 tok); Gen 104 TPS (500 tok)
+- _Tokens:_ prompt 16290 tok; estimated text 4 tok; estimated non-text 16286
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -2687,23 +2338,16 @@ _Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
 
 ### ✅ mlx-community/Qwen3.5-35B-A3B-6bit
 
-_Recommendation:_ avoid for now; review verdict: cutoff degraded
-_Key signals:_ hit token cap (500); nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 16290 tok; estimated text 4 tok; estimated non-text
-                 16286 tok; generated 500 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 3.14s; Gen 65.84s; Total 69.32s
-_Throughput:_ Prompt 274 TPS (16,290 tok); Gen 88.0 TPS (500 tok)
-_Score summary:_ ✅ B (80/100); Missing requested structure
-_Review priority:_ watchlist (cutoff)
-_Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ hit token cap (500); nontext prompt burden=100%
+- _Score:_ ✅ B (80/100); Missing requested structure
+- _Review priority:_ watchlist (cutoff)
+- _Timing:_ Load 3.14s; Gen 65.84s; Total 69.32s
+- _Throughput:_ Prompt 274 TPS (16,290 tok); Gen 88.0 TPS (500 tok)
+- _Tokens:_ prompt 16290 tok; estimated text 4 tok; estimated non-text 16286
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -2759,25 +2403,17 @@ _Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
 
 ### ✅ mlx-community/Qwen3.5-9B-MLX-4bit
 
-_Recommendation:_ recommended; review verdict: token cap
-_Key signals:_ hit token cap (500); nontext prompt burden=100%;
-               degeneration=repeated_punctuation: ':**...'
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 16290 tok; estimated text 4 tok; estimated non-text
-                 16286 tok; generated 500 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 2.20s; Gen 71.90s; Total 74.44s
-_Throughput:_ Prompt 250 TPS (16,290 tok); Gen 84.5 TPS (500 tok)
-_Score summary:_ ✅ B (80/100); Missing requested structure
-_Review priority:_ watchlist (degeneration)
-_Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%;
-                  degeneration=repeated_punctuation: ':**...'
+- _Recommendation:_ recommended; review verdict: token cap
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ hit token cap (500); nontext prompt burden=100%;
+  degeneration=repeated_punctuation: ':**...'
+- _Score:_ ✅ B (80/100); Missing requested structure
+- _Review priority:_ watchlist (degeneration)
+- _Timing:_ Load 2.20s; Gen 71.90s; Total 74.44s
+- _Throughput:_ Prompt 250 TPS (16,290 tok); Gen 84.5 TPS (500 tok)
+- _Tokens:_ prompt 16290 tok; estimated text 4 tok; estimated non-text 16286
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -2831,23 +2467,16 @@ _Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%;
 
 ### ✅ mlx-community/Qwen3.5-35B-A3B-bf16
 
-_Recommendation:_ recommended; review verdict: token cap
-_Key signals:_ hit token cap (500); nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 16290 tok; estimated text 4 tok; estimated non-text
-                 16286 tok; generated 500 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 13.03s; Gen 79.26s; Total 92.62s
-_Throughput:_ Prompt 233 TPS (16,290 tok); Gen 61.2 TPS (500 tok)
-_Score summary:_ ✅ B (80/100); Missing requested structure
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
+- _Recommendation:_ recommended; review verdict: token cap
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ hit token cap (500); nontext prompt burden=100%
+- _Score:_ ✅ B (80/100); Missing requested structure
+- _Review priority:_ strong candidate for first-pass review
+- _Timing:_ Load 13.03s; Gen 79.26s; Total 92.62s
+- _Throughput:_ Prompt 233 TPS (16,290 tok); Gen 61.2 TPS (500 tok)
+- _Tokens:_ prompt 16290 tok; estimated text 4 tok; estimated non-text 16286
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -2903,23 +2532,16 @@ _Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
 
 ### ✅ mlx-community/Qwen3.5-27B-4bit
 
-_Recommendation:_ avoid for now; review verdict: cutoff degraded
-_Key signals:_ hit token cap (500); nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 16290 tok; estimated text 4 tok; estimated non-text
-                 16286 tok; generated 500 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 4.50s; Gen 89.45s; Total 94.31s
-_Throughput:_ Prompt 227 TPS (16,290 tok); Gen 29.5 TPS (500 tok)
-_Score summary:_ ✅ B (80/100); Missing requested structure
-_Review priority:_ watchlist (cutoff)
-_Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ hit token cap (500); nontext prompt burden=100%
+- _Score:_ ✅ B (80/100); Missing requested structure
+- _Review priority:_ watchlist (cutoff)
+- _Timing:_ Load 4.50s; Gen 89.45s; Total 94.31s
+- _Throughput:_ Prompt 227 TPS (16,290 tok); Gen 29.5 TPS (500 tok)
+- _Tokens:_ prompt 16290 tok; estimated text 4 tok; estimated non-text 16286
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -2978,23 +2600,16 @@ _Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
 
 ### ✅ mlx-community/Qwen3.5-27B-mxfp8
 
-_Recommendation:_ avoid for now; review verdict: cutoff degraded
-_Key signals:_ hit token cap (500); nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 16290 tok; estimated text 4 tok; estimated non-text
-                 16286 tok; generated 500 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 3.81s; Gen 112.81s; Total 116.97s
-_Throughput:_ Prompt 199 TPS (16,290 tok); Gen 16.5 TPS (500 tok)
-_Score summary:_ ✅ B (80/100); Missing requested structure
-_Review priority:_ watchlist (cutoff)
-_Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ hit token cap (500); nontext prompt burden=100%
+- _Score:_ ✅ B (80/100); Missing requested structure
+- _Review priority:_ watchlist (cutoff)
+- _Timing:_ Load 3.81s; Gen 112.81s; Total 116.97s
+- _Throughput:_ Prompt 199 TPS (16,290 tok); Gen 16.5 TPS (500 tok)
+- _Tokens:_ prompt 16290 tok; estimated text 4 tok; estimated non-text 16286
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >
@@ -3055,23 +2670,16 @@ _Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
 
 ### ✅ mlx-community/Qwen3.6-27B-mxfp8
 
-_Recommendation:_ avoid for now; review verdict: cutoff degraded
-_Key signals:_ hit token cap (500); nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 16290 tok; estimated text 4 tok; estimated non-text
-                 16286 tok; generated 500 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 3.57s; Gen 113.66s; Total 117.59s
-_Throughput:_ Prompt 195 TPS (16,290 tok); Gen 17.0 TPS (500 tok)
-_Score summary:_ ✅ B (80/100); Missing requested structure
-_Review priority:_ watchlist (cutoff)
-_Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
+- _Recommendation:_ avoid for now; review verdict: cutoff degraded
+- _Owner:_ likely owner `model`
+- _Next step:_ Treat as a model-quality limitation for this prompt and image.
+- _Key signals:_ hit token cap (500); nontext prompt burden=100%
+- _Score:_ ✅ B (80/100); Missing requested structure
+- _Review priority:_ watchlist (cutoff)
+- _Timing:_ Load 3.57s; Gen 113.66s; Total 117.59s
+- _Throughput:_ Prompt 195 TPS (16,290 tok); Gen 17.0 TPS (500 tok)
+- _Tokens:_ prompt 16290 tok; estimated text 4 tok; estimated non-text 16286
+  tok; generated 500 tok; requested max 500 tok; stop reason completed
 
 <!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
 >

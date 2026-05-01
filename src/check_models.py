@@ -1611,6 +1611,56 @@ def _append_markdown_row_block(
 
 
 @dataclass(frozen=True)
+class ReportStanza:
+    """Small shared payload for scan-friendly human-facing report sections."""
+
+    heading: str | None
+    rows: tuple[tuple[str, str], ...]
+
+
+def _build_report_stanza(
+    heading: str | None,
+    rows: Sequence[tuple[str, str | None]],
+) -> ReportStanza:
+    """Build a stanza while dropping empty optional rows."""
+    return ReportStanza(
+        heading=heading,
+        rows=tuple((label, value) for label, value in rows if value),
+    )
+
+
+def _append_markdown_stanza(
+    parts: list[str],
+    stanza: ReportStanza,
+    *,
+    heading_level: int = 3,
+) -> None:
+    """Append a reusable stanza as a short heading plus labeled bullet rows."""
+    if not stanza.rows:
+        return
+    if stanza.heading is not None:
+        parts.append(f"{'#' * heading_level} {stanza.heading}")
+        parts.append("")
+    _append_markdown_row_block(parts, rows=stanza.rows)
+
+
+def _render_html_stanza(stanza: ReportStanza) -> list[str]:
+    """Render a reusable stanza as a heading paragraph plus HTML list."""
+    if not stanza.rows:
+        return []
+    parts: list[str] = []
+    if stanza.heading is not None:
+        parts.append(f"<p><b>{html.escape(stanza.heading)}</b></p>")
+    parts.append("<ul>")
+    for label, value in stanza.rows:
+        parts.append(
+            f"<li><b>{html.escape(label)}:</b> {html.escape(value)}</li>",
+        )
+    parts.append("</ul>")
+    return parts
+
+
+@dataclass(frozen=True)
 class ReviewPayload:
     """Canonical review inputs reused across human-facing report renderers."""
 
@@ -1627,8 +1677,7 @@ def _append_markdown_review_block(
 ) -> None:
     """Append the shared canonical review block to a Markdown artifact."""
     rows = _build_markdown_review_block_rows(res)
-    for label, value in rows:
-        _append_markdown_labeled_value(out, label=label, value=value)
+    _append_markdown_row_block(out, rows=rows)
 
 
 def _build_gallery_error_block_lines(res: PerformanceResult) -> list[str]:
@@ -1636,12 +1685,33 @@ def _build_gallery_error_block_lines(res: PerformanceResult) -> list[str]:
     out: list[str] = []
     max_inline_error_length = 80
 
-    _append_markdown_review_block(out, res=res)
-    if out:
-        out.append("")
-    _append_markdown_labeled_value(out, label="Status", value=f"Failed ({res.error_stage})")
-
     error_msg = _escape_markdown_blockquote_line(str(res.error_message))
+    review_rows = dict(_build_markdown_review_block_rows(res))
+    failure_context = "; ".join(
+        f"{label.lower()} `{value}`"
+        for label, value in (
+            ("Type", res.error_type),
+            ("Phase", res.failure_phase),
+            ("Code", res.error_code),
+            ("Package", res.error_package),
+        )
+        if value
+    )
+    rows = [
+        ("Recommendation", review_rows.get("Recommendation")),
+        ("Status", f"Failed ({res.error_stage})"),
+        ("Owner", review_rows.get("Owner")),
+        ("Next step", review_rows.get("Next step")),
+        (
+            "Error summary",
+            error_msg if len(error_msg) <= max_inline_error_length else "see error details below",
+        ),
+        ("Key signals", review_rows.get("Key signals")),
+        ("Failure context", failure_context),
+        ("Tokens", review_rows.get("Tokens")),
+    ]
+    _append_markdown_row_block(out, rows=_build_report_stanza(None, rows).rows)
+
     if len(error_msg) > max_inline_error_length:
         wrapped_lines = textwrap.wrap(
             error_msg,
@@ -1649,27 +1719,9 @@ def _build_gallery_error_block_lines(res: PerformanceResult) -> list[str]:
             break_long_words=False,
             break_on_hyphens=False,
         )
-        out.append(_markdown_emphasis("Error:"))
+        out.append(_markdown_emphasis("Error details:"))
         out.append("")
         out.extend(f"> {line}" for line in wrapped_lines)
-    else:
-        _append_markdown_labeled_value(out, label="Error", value=error_msg)
-
-    for label, value in (
-        ("Type", res.error_type),
-        ("Phase", res.failure_phase),
-        ("Code", res.error_code),
-        ("Package", res.error_package),
-    ):
-        if value:
-            _append_markdown_labeled_value(out, label=label, value=f"`{value}`")
-
-    if res.error_package:
-        _append_markdown_labeled_value(
-            out,
-            label="Next Action",
-            value="review package ownership and diagnostics for a minimal repro.",
-        )
 
     if res.error_traceback:
         out.append("")
@@ -1687,42 +1739,42 @@ def _build_gallery_error_block_lines(res: PerformanceResult) -> list[str]:
     return out
 
 
-def _build_gallery_success_block_lines(  # noqa: C901 - keep gallery rendering local
+def _gallery_metric_segment(label: str, field_name: str, value: MetricValue) -> str | None:
+    """Return one compact timing segment for gallery rows."""
+    formatted = format_field_value(field_name, value)
+    if not formatted:
+        return None
+    return f"{label} {formatted}"
+
+
+def _gallery_throughput_segment(
+    label: str,
+    tps_value: float | None,
+    token_field_name: str,
+    token_value: int | None,
+) -> str | None:
+    """Return one compact throughput segment for gallery rows."""
+    tps_formatted = format_field_value("generation_tps", tps_value)
+    tokens_formatted = format_field_value(token_field_name, token_value)
+    if not tps_formatted and not tokens_formatted:
+        return None
+    if tps_formatted and tokens_formatted:
+        return f"{label} {tps_formatted} TPS ({tokens_formatted} tok)"
+    if tps_formatted:
+        return f"{label} {tps_formatted} TPS"
+    return f"{label} {tokens_formatted} tok"
+
+
+def _build_gallery_success_triage_rows(
     res: PerformanceResult,
     *,
-    summary: ModelIssueSummary | None = None,
-    useful_now: bool = False,
-    watchlist_reason: str | None = None,
-) -> list[str]:
-    """Build the success block used by the Markdown gallery."""
-    generation: StoredGenerationResult | None = res.generation
-
-    def _metric_segment(label: str, field_name: str, value: MetricValue) -> str | None:
-        formatted = format_field_value(field_name, value)
-        if not formatted:
-            return None
-        return f"{label} {formatted}"
-
-    def _throughput_segment(
-        label: str,
-        tps_value: float | None,
-        token_field_name: str,
-        token_value: int | None,
-    ) -> str | None:
-        tps_formatted = format_field_value("generation_tps", tps_value)
-        tokens_formatted = format_field_value(token_field_name, token_value)
-        if not tps_formatted and not tokens_formatted:
-            return None
-        if tps_formatted and tokens_formatted:
-            return f"{label} {tps_formatted} TPS ({tokens_formatted} tok)"
-        if tps_formatted:
-            return f"{label} {tps_formatted} TPS"
-        return f"{label} {tokens_formatted} tok"
-
-    def _append_triage_lines() -> None:
-        if summary is None:
-            return
-
+    summary: ModelIssueSummary | None,
+    useful_now: bool,
+    watchlist_reason: str | None,
+) -> list[tuple[str, str]]:
+    """Build score and review-priority rows for one successful gallery entry."""
+    rows: list[tuple[str, str]] = []
+    if summary is not None:
         score_data = _cataloging_score_index(summary).get(res.model_name)
         if score_data is not None:
             score, grade, weakness, delta = score_data
@@ -1731,111 +1783,120 @@ def _build_gallery_success_block_lines(  # noqa: C901 - keep gallery rendering l
                 assessment_parts.append(f"Δ{delta:+.0f}")
             if weakness:
                 assessment_parts.append(weakness)
-            _append_markdown_labeled_value(
-                out,
-                label="Score summary",
-                value=_markdown_review_text(" | ".join(assessment_parts)),
-            )
+            rows.append(("Score", _markdown_review_text(" | ".join(assessment_parts))))
 
-        if useful_now:
-            _append_markdown_labeled_value(
-                out,
-                label="Review priority",
-                value="strong candidate for first-pass review",
-            )
-        elif watchlist_reason is not None:
-            _append_markdown_labeled_value(
-                out,
-                label="Review priority",
-                value=f"watchlist ({_humanize_watchlist_reason(watchlist_reason)})",
-            )
+    if useful_now:
+        rows.append(("Review priority", "strong candidate for first-pass review"))
+    elif watchlist_reason is not None:
+        rows.append(
+            ("Review priority", f"watchlist ({_humanize_watchlist_reason(watchlist_reason)})")
+        )
+    return rows
 
-        review_summary = _summarize_model_review(res, summary)
-        if review_summary:
-            _append_markdown_labeled_value(
-                out,
-                label="Review summary",
-                value=_markdown_review_text(review_summary),
-            )
 
-    def _append_quality_lines() -> None:
-        if generation is None:
-            return
-
-        analysis = _quality_analysis_for_result(res)
-        if analysis and analysis.issues:
-            if not out or out[-1] != "":
-                out.append("")
-            out.append(f"⚠️ {_markdown_emphasis('Quality Warnings:')}")
-            out.append("")
-            for issue in analysis.issues:
-                escaped = DIAGNOSTICS_ESCAPER.escape(_collapse_preview_whitespace(issue))
-                sanitized = re.sub(r"(?<!\\)([*`])", r"\\\1", escaped)
-                out.append(f"- {sanitized}")
-            return
-
-        if analysis is not None and not analysis.has_any_issues():
-            if not out or out[-1] != "":
-                out.append("")
-            _append_markdown_labeled_value(
-                out,
-                label="Quality Status",
-                value="no quality issues detected in this run",
-            )
-
-    out: list[str] = []
-    _append_markdown_review_block(out, res=res)
-    if out:
-        out.append("")
-
-    time_segments: list[str] = [
+def _build_gallery_success_performance_rows(
+    res: PerformanceResult,
+    generation: StoredGenerationResult | None,
+) -> list[tuple[str, str]]:
+    """Build timing and throughput rows for one successful gallery entry."""
+    time_segments = [
         segment
         for segment in (
-            _metric_segment("Load", "model_load_time", res.model_load_time),
-            _metric_segment("Gen", "generation_time", res.generation_time),
-            _metric_segment("Total", "total_time", res.total_time),
+            _gallery_metric_segment("Load", "model_load_time", res.model_load_time),
+            _gallery_metric_segment("Gen", "generation_time", res.generation_time),
+            _gallery_metric_segment("Total", "total_time", res.total_time),
         )
         if segment is not None
     ]
+    rows = [("Timing", _markdown_review_text(" | ".join(time_segments)))] if time_segments else []
+    if not time_segments or generation is None:
+        return rows
 
-    if time_segments:
+    throughput_segments = [
+        segment
+        for segment in (
+            _gallery_throughput_segment(
+                "Prompt",
+                _generation_float_metric(generation, "prompt_tps"),
+                "prompt_tokens",
+                _generation_int_metric(generation, "prompt_tokens"),
+            ),
+            _gallery_throughput_segment(
+                "Gen",
+                _generation_float_metric(generation, "generation_tps"),
+                "generation_tokens",
+                _generation_int_metric(generation, "generation_tokens"),
+            ),
+        )
+        if segment is not None
+    ]
+    if throughput_segments:
+        rows.append(("Throughput", _markdown_review_text(" | ".join(throughput_segments))))
+    return rows
+
+
+def _append_gallery_quality_lines(
+    out: list[str],
+    *,
+    res: PerformanceResult,
+    generation: StoredGenerationResult | None,
+) -> None:
+    """Append quality warnings or clean status after a generated-output block."""
+    if generation is None:
+        return
+
+    analysis = _quality_analysis_for_result(res)
+    if analysis and analysis.issues:
+        if not out or out[-1] != "":
+            out.append("")
+        out.append(f"⚠️ {_markdown_emphasis('Quality Warnings:')}")
+        out.append("")
+        for issue in analysis.issues:
+            escaped = DIAGNOSTICS_ESCAPER.escape(_collapse_preview_whitespace(issue))
+            sanitized = re.sub(r"(?<!\\)([*`])", r"\\\1", escaped)
+            out.append(f"- {sanitized}")
+        return
+
+    if analysis is not None and not analysis.has_any_issues():
+        if not out or out[-1] != "":
+            out.append("")
         _append_markdown_labeled_value(
             out,
-            label="Timing",
-            value=_markdown_review_text(" | ".join(time_segments)),
+            label="Quality Status",
+            value="no quality issues detected in this run",
         )
-        if generation is not None:
-            throughput_segments: list[str] = [
-                segment
-                for segment in (
-                    _throughput_segment(
-                        "Prompt",
-                        _generation_float_metric(generation, "prompt_tps"),
-                        "prompt_tokens",
-                        _generation_int_metric(generation, "prompt_tokens"),
-                    ),
-                    _throughput_segment(
-                        "Gen",
-                        _generation_float_metric(generation, "generation_tps"),
-                        "generation_tokens",
-                        _generation_int_metric(generation, "generation_tokens"),
-                    ),
-                )
-                if segment is not None
-            ]
-            if throughput_segments:
-                _append_markdown_labeled_value(
-                    out,
-                    label="Throughput",
-                    value=_markdown_review_text(" | ".join(throughput_segments)),
-                )
 
-    _append_triage_lines()
+
+def _build_gallery_success_block_lines(
+    res: PerformanceResult,
+    *,
+    summary: ModelIssueSummary | None = None,
+    useful_now: bool = False,
+    watchlist_reason: str | None = None,
+) -> list[str]:
+    """Build the success block used by the Markdown gallery."""
+    generation: StoredGenerationResult | None = res.generation
+    rows = _build_markdown_review_block_rows(res)
+    token_rows = [(label, value) for label, value in rows if label == "Tokens"]
+    summary_rows = [(label, value) for label, value in rows if label != "Tokens"]
+    summary_rows.extend(
+        _build_gallery_success_triage_rows(
+            res,
+            summary=summary,
+            useful_now=useful_now,
+            watchlist_reason=watchlist_reason,
+        )
+    )
+    summary_rows.extend(_build_gallery_success_performance_rows(res, generation))
+    summary_rows.extend(token_rows)
+
+    out: list[str] = []
+    _append_markdown_row_block(out, rows=summary_rows)
 
     text = _generation_text_value(generation)
     _append_markdown_wrapped_blockquote(out, text)
 
-    _append_quality_lines()
+    _append_gallery_quality_lines(out, res=res, generation=generation)
 
     return out
 
@@ -8739,7 +8800,6 @@ def _format_cataloging_summary(  # noqa: C901, PLR0912, PLR0915 — dual-format 
 
 def _format_aggregate_statistics(
     stats: PerformanceStats,
-    runtime_analysis: RuntimeAnalysisSummary | None,
     *,
     html_output: bool,
 ) -> list[str]:
@@ -8765,34 +8825,6 @@ def _format_aggregate_statistics(
                 f"Min: {minimum_value} | Max: {maximum_value}",
             )
     parts.append("</ul>" if html_output else "")
-
-    if runtime_analysis is not None:
-        if html_output:
-            parts.append("<p><b>Runtime interpretation:</b></p><ul>")
-            parts.extend(
-                f"<li>{html.escape(line.removeprefix('- '))}</li>"
-                for line in _format_runtime_analysis_lines(runtime_analysis)
-            )
-            parts.append("</ul>")
-            timing_snapshot_lines = _format_runtime_timing_snapshot_lines(runtime_analysis)
-            if timing_snapshot_lines:
-                parts.append("<p><b>Additional timing signals:</b></p><ul>")
-                parts.extend(
-                    f"<li>{html.escape(line.removeprefix('- '))}</li>"
-                    for line in timing_snapshot_lines
-                )
-                parts.append("</ul>")
-        else:
-            parts.append("### ⏱ Runtime Interpretation")
-            parts.append("")
-            parts.extend(_format_runtime_analysis_lines(runtime_analysis))
-            parts.append("")
-            timing_snapshot_lines = _format_runtime_timing_snapshot_lines(runtime_analysis)
-            if timing_snapshot_lines:
-                parts.append("### ⏱ Timing Snapshot")
-                parts.append("")
-                parts.extend(timing_snapshot_lines)
-                parts.append("")
     return parts
 
 
@@ -8811,7 +8843,6 @@ def _format_issues_summary_parts(
     parts.extend(
         _format_aggregate_statistics(
             stats,
-            summary.get("runtime_analysis"),
             html_output=html_output,
         ),
     )
@@ -9340,6 +9371,39 @@ def _humanize_review_evidence_label(label: str) -> str:
     return label.replace("_", " ")
 
 
+def _review_analysis_focus_parts(analysis: GenerationQualityAnalysis) -> list[str]:
+    """Return compact focus fragments sourced directly from quality analysis."""
+    parts: list[str] = []
+    if (
+        analysis.has_keyword_duplication_violation
+        and analysis.keyword_duplication_ratio is not None
+    ):
+        parts.append(f"keyword duplication={analysis.keyword_duplication_ratio:.0%}")
+    elif analysis.has_keyword_count_violation and analysis.keyword_count is not None:
+        parts.append(f"keywords={analysis.keyword_count}")
+
+    if analysis.has_context_echo and analysis.context_echo_ratio > 0:
+        parts.append(f"context echo={analysis.context_echo_ratio:.0%}")
+    if analysis.metadata_borrowing:
+        parts.append("nonvisual metadata reused")
+    if analysis.has_reasoning_leak:
+        parts.append("reasoning leak")
+    if analysis.formatting_issues:
+        formatting_preview = html.escape(
+            _collapse_preview_whitespace(analysis.formatting_issues[0]),
+            quote=False,
+        )
+        parts.append(f"formatting={formatting_preview}")
+    if analysis.has_excessive_bullets:
+        parts.append(f"excessive bullets={analysis.bullet_count}")
+    if analysis.has_degeneration and analysis.degeneration_type is not None:
+        parts.append(f"degeneration={analysis.degeneration_type}")
+    if analysis.is_repetitive and analysis.repeated_token is not None:
+        safe_token = analysis.repeated_token.replace("*", r"\*")
+        parts.append(f"repetitive token={safe_token}")
+    return parts
+
+
 def _review_focus_text(
     review: JsonlReviewRecord,
     analysis: GenerationQualityAnalysis | None,
@@ -9376,25 +9440,7 @@ def _review_focus_text(
         parts.append("missing terms: " + ", ".join(review["missing_terms"]))
 
     if analysis is not None:
-        if (
-            analysis.has_keyword_duplication_violation
-            and analysis.keyword_duplication_ratio is not None
-        ):
-            parts.append(f"keyword duplication={analysis.keyword_duplication_ratio:.0%}")
-        elif analysis.has_keyword_count_violation and analysis.keyword_count is not None:
-            parts.append(f"keywords={analysis.keyword_count}")
-
-        if analysis.has_context_echo and analysis.context_echo_ratio > 0:
-            parts.append(f"context echo={analysis.context_echo_ratio:.0%}")
-        if analysis.metadata_borrowing:
-            parts.append("nonvisual metadata reused")
-        if analysis.has_reasoning_leak:
-            parts.append("reasoning leak")
-        if analysis.has_degeneration and analysis.degeneration_type is not None:
-            parts.append(f"degeneration={analysis.degeneration_type}")
-        if analysis.is_repetitive and analysis.repeated_token is not None:
-            safe_token = analysis.repeated_token.replace("*", r"\*")
-            parts.append(f"repetitive token={safe_token}")
+        parts.extend(_review_analysis_focus_parts(analysis))
 
     if not parts and review["evidence"]:
         parts.extend(_humanize_review_evidence_label(label) for label in review["evidence"][:3])
@@ -9554,34 +9600,6 @@ def _humanize_review_verdict_text(verdict: str) -> str:
     return verdict.replace("_", " ")
 
 
-def _markdown_review_contract_text(analysis: GenerationQualityAnalysis | None) -> str:
-    """Return gallery-friendly contract wording."""
-    contract_text = _review_contract_text(analysis)
-    if contract_text == "ok":
-        return "requested structure looks complete"
-    return _markdown_review_text(contract_text)
-
-
-def _markdown_review_utility_text(
-    review: JsonlReviewRecord,
-    analysis: GenerationQualityAnalysis | None,
-) -> str:
-    """Return gallery-friendly utility notes without log-style key prefixes."""
-    if analysis is None:
-        return "not evaluated"
-
-    parts = [review["hint_relationship"].replace("_", " ")]
-    if analysis.instruction_echo:
-        parts.append("instruction echo")
-    if analysis.metadata_borrowing:
-        parts.append("metadata borrowing")
-    if analysis.is_generic:
-        parts.append("generic description")
-    if analysis.has_context_echo:
-        parts.append("context echo")
-    return "; ".join(parts)
-
-
 def _markdown_review_stack_owner_text(
     result: PerformanceResult,
     review: JsonlReviewRecord,
@@ -9643,13 +9661,10 @@ def _build_markdown_review_block_rows(result: PerformanceResult) -> list[tuple[s
                 f"review verdict: {_humanize_review_verdict_text(review['verdict'])}"
             ),
         ),
+        ("Owner", _markdown_review_stack_owner_text(result, review, analysis)),
+        ("Next step", payload.next_action),
         ("Key signals", _markdown_review_text(payload.key_signals)),
-        ("Hint handling", _markdown_review_text(_review_hint_text(review, analysis))),
-        ("Output contract", _markdown_review_contract_text(analysis)),
-        ("Cataloging fit", _markdown_review_utility_text(review, analysis)),
-        ("Maintainer routing", _markdown_review_stack_owner_text(result, review, analysis)),
-        ("Token summary", _markdown_review_token_accounting_text(result, review)),
-        ("Suggested next step", payload.next_action),
+        ("Tokens", _markdown_review_token_accounting_text(result, review)),
     ]
 
 
@@ -9983,26 +9998,29 @@ def _build_markdown_recommended_models(
         rationale: list[str] = []
         if score_data is not None:
             score, grade, _weakness, _delta = score_data
-            rationale.append(f"{grade} {score:.0f}/100")
+            rationale.append(f"Utility {grade} {score:.0f}/100")
         triage_row = triage_by_name.get(result.model_name)
         if triage_row is not None:
-            rationale.append(f"Desc {triage_row.description_score:.0f}")
+            rationale.append(f"Description {triage_row.description_score:.0f}")
             rationale.append(f"Keywords {triage_row.keyword_score:.0f}")
         generation_tps = format_field_value(
             "generation_tps",
             cast("MetricValue", getattr(result.generation, "generation_tps", None)),
         )
         if generation_tps:
-            rationale.append(f"Gen {generation_tps} TPS")
+            rationale.append(f"Speed {generation_tps} TPS")
         peak_memory = format_field_value(
             "peak_memory",
             cast("MetricValue", getattr(result.generation, "peak_memory", None)),
         )
         if peak_memory:
-            rationale.append(f"Peak {peak_memory}")
-        review_summary = _summarize_model_review(result, report_context.summary)
-        if review_summary:
-            rationale.append(review_summary)
+            rationale.append(f"Memory {peak_memory}")
+        review = _build_jsonl_review_record(result)
+        analysis = _quality_analysis_for_result(result)
+        if review is not None:
+            focus = _review_focus_text(review, analysis)
+            if focus != "no flagged signals":
+                rationale.append(f"Caveat {_markdown_review_text(focus)}")
         _append_markdown_labeled_value(
             parts,
             label=label,
@@ -11526,7 +11544,7 @@ def _diagnostics_action_summary(
     preflight_issues: Sequence[str],
 ) -> list[str]:
     """Build a compact, one-screen triage list for maintainers."""
-    items: list[str] = []
+    stanzas: list[ReportStanza] = []
 
     for _pattern, cluster_results in failure_clusters:
         representative = cluster_results[0]
@@ -11541,46 +11559,73 @@ def _diagnostics_action_summary(
             max_chars=88,
         )
         escaped_issue = DIAGNOSTICS_ESCAPER.escape(issue)
-        items.append(
-            f"- **[{priority}] [{owner}]** {escaped_issue} "
-            f"({len(cluster_results)} model(s)). "
-            f"Next: {_diagnostics_next_action(owner_key)}",
+        stanzas.append(
+            _build_report_stanza(
+                f"{len(stanzas) + 1}. {owner}",
+                (
+                    ("Priority", priority),
+                    ("Owner", f"`{DIAGNOSTICS_ESCAPER.escape(owner)}`"),
+                    ("Issue", escaped_issue),
+                    ("Affected", f"{len(cluster_results)} model(s)"),
+                    ("Next step", DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action(owner_key))),
+                ),
+            )
         )
 
     for owner_key, owner_results in _group_harness_results_by_owner(harness_results):
         owner = _diagnostics_owner_label(owner_key)
-        items.append(
-            f"- **[Medium] [{owner}]** Harness/integration warnings on "
-            f"{len(owner_results)} model(s). "
-            f"Next: {_diagnostics_next_action(owner_key)}",
+        stanzas.append(
+            _build_report_stanza(
+                f"{len(stanzas) + 1}. {owner}",
+                (
+                    ("Priority", "Medium"),
+                    ("Owner", f"`{DIAGNOSTICS_ESCAPER.escape(owner)}`"),
+                    ("Issue", "Harness/integration warnings"),
+                    ("Affected", f"{len(owner_results)} model(s)"),
+                    ("Next step", DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action(owner_key))),
+                ),
+            )
         )
 
     for owner_key, owner_signals in _group_stack_signals_by_owner(stack_signals):
         owner = _diagnostics_owner_label(owner_key)
-        items.append(
-            f"- **[Medium] [{owner}]** Stack-signal anomalies on "
-            f"{len(owner_signals)} successful model(s). "
-            f"Next: {_diagnostics_next_action(owner_key)}",
+        stanzas.append(
+            _build_report_stanza(
+                f"{len(stanzas) + 1}. {owner}",
+                (
+                    ("Priority", "Medium"),
+                    ("Owner", f"`{DIAGNOSTICS_ESCAPER.escape(owner)}`"),
+                    ("Issue", "Stack-signal anomalies"),
+                    ("Affected", f"{len(owner_signals)} successful model(s)"),
+                    ("Next step", DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action(owner_key))),
+                ),
+            )
         )
 
     for owner_key, owner_issues in _group_preflight_issues_by_owner(preflight_issues):
         owner = _diagnostics_owner_label(owner_key)
-        items.append(
-            "- **[Medium] "
-            f"[{owner}]** Preflight compatibility warnings "
-            f"({len(owner_issues)} issue(s)). "
-            f"Next: {_diagnostics_next_action(owner_key)}",
+        stanzas.append(
+            _build_report_stanza(
+                f"{len(stanzas) + 1}. {owner}",
+                (
+                    ("Priority", "Medium"),
+                    ("Owner", f"`{DIAGNOSTICS_ESCAPER.escape(owner)}`"),
+                    ("Issue", "Preflight compatibility warnings"),
+                    ("Affected", f"{len(owner_issues)} issue(s)"),
+                    ("Next step", DIAGNOSTICS_ESCAPER.escape(_diagnostics_next_action(owner_key))),
+                ),
+            )
         )
 
-    if not items:
+    if not stanzas:
         return []
 
     parts = _begin_diagnostics_section(
         title="## Action Summary",
-        body_lines=["Quick triage list with likely owner and next action for each issue class."],
+        body_lines=["Owner-first triage with priority, affected count, and next action."],
     )
-    parts.extend(items)
-    parts.append("")
+    for stanza in stanzas:
+        _append_markdown_stanza(parts, stanza)
     return parts
 
 
@@ -13756,6 +13801,43 @@ def _group_review_results(
     return grouped
 
 
+def _is_review_escalation(result: PerformanceResult) -> bool:
+    """Return True for review rows that need maintainer attention."""
+    review = _build_jsonl_review_record(result)
+    if review is None:
+        return False
+    if review["verdict"] in {
+        "runtime_failure",
+        "harness",
+        "cutoff",
+        "cutoff_degraded",
+        "context_budget",
+    }:
+        return True
+
+    analysis = _quality_analysis_for_result(result)
+    if analysis is None:
+        return result.error_package is not None
+    if analysis.has_harness_issue or analysis.has_reasoning_leak or analysis.has_degeneration:
+        return True
+    if analysis.formatting_issues or analysis.has_excessive_bullets or analysis.has_context_echo:
+        return True
+    return any(
+        "long_context" in evidence or evidence in {"reasoning_leak", "formatting"}
+        for evidence in review["evidence"]
+    )
+
+
+def _group_review_escalations_by_owner(
+    results: Sequence[PerformanceResult],
+) -> dict[str, list[PerformanceResult]]:
+    """Group only actionable review escalations by likely owner."""
+    return _group_review_results(
+        [result for result in results if _is_review_escalation(result)],
+        key_name="owner",
+    )
+
+
 def _append_review_owner_queue(
     md: list[str],
     owner_groups: Mapping[str, Sequence[PerformanceResult]],
@@ -13765,12 +13847,12 @@ def _append_review_owner_queue(
         [
             "## Maintainer Queue",
             "",
-            "Owner-grouped escalations with compact evidence and row-specific next actions.",
+            "Owner-grouped escalations only; clean recommended models stay in user buckets.",
             "",
         ]
     )
     if not owner_groups:
-        md.extend(["- No owner-specific review items were produced.", ""])
+        md.extend(["- No owner-specific escalations were produced.", ""])
         return
 
     for owner in sorted(owner_groups):
@@ -13799,7 +13881,7 @@ def _append_review_owner_queue(
             )
             md.append("")
         else:
-            md.extend(["- No owner-specific review items were produced.", ""])
+            md.extend(["- No owner-specific escalations were produced.", ""])
 
 
 def _append_review_user_buckets(
@@ -13886,7 +13968,7 @@ def generate_review_report(
         report_context = _build_report_render_context(results=results, prompt=prompt)
 
     sorted_results = list(report_context.result_set.results)
-    owner_groups = _group_review_results(sorted_results, key_name="owner")
+    owner_groups = _group_review_escalations_by_owner(sorted_results)
     bucket_groups = _group_review_results(sorted_results, key_name="user_bucket")
 
     md: list[str] = [
@@ -18436,6 +18518,84 @@ def _format_review_priorities_parts(
     return parts
 
 
+def _build_action_snapshot_stanzas(
+    results: list[PerformanceResult],
+    report_context: ReportRenderContext,
+) -> list[ReportStanza]:
+    """Build shared action-snapshot stanzas for Markdown and HTML reports."""
+    summary = report_context.summary
+    triage = report_context.triage
+    preflight_issues = report_context.preflight_issues
+    failed: list[PerformanceResult] = [res for res in results if not res.success]
+    quality_counts = Counter(dict(triage.quality_counts))
+    harness_success_count = sum("harness" in row.labels for row in triage.utility_rows)
+    successful_count = len(triage.utility_rows)
+    runtime_analysis = summary.get("runtime_analysis")
+
+    failure_rows = _action_snapshot_failure_items(
+        failed,
+        triage=triage,
+        harness_success_count=harness_success_count,
+        successful_count=successful_count,
+    )
+    if preflight_issues:
+        failure_rows.extend(
+            [
+                (
+                    "Preflight compatibility",
+                    f"{len(preflight_issues)} informational warning(s); "
+                    "do not treat these alone as run failures.",
+                ),
+                (
+                    "Escalate only if",
+                    "they line up with API mismatches, startup hangs, or backend/runtime crashes.",
+                ),
+            ]
+        )
+
+    quality_rows: list[tuple[str, str | None]] = []
+    if triage.baseline_score is not None and triage.baseline_grade is not None:
+        better = len(summary.get("cataloging_improves_metadata", []))
+        neutral = len(summary.get("cataloging_neutral_vs_metadata", []))
+        worse = len(summary.get("cataloging_worse_than_metadata", []))
+        quality_rows.append(
+            (
+                "Vs existing metadata",
+                f"better={better}, neutral={neutral}, worse={worse} "
+                f"(baseline {triage.baseline_grade} {triage.baseline_score:.0f}/100).",
+            )
+        )
+    quality_rows.append(("Quality signal frequency", f"{_format_counter_items(quality_counts)}."))
+    termination_summary = ", ".join(
+        f"{reason}={count}"
+        for reason, count in sorted(
+            Counter("completed" if res.success else "exception" for res in results).items(),
+        )
+    )
+    if runtime_analysis is None:
+        quality_rows.append(("Termination reasons", f"{termination_summary}."))
+
+    runtime_rows: list[tuple[str, str | None]] = []
+    if runtime_analysis is not None:
+        runtime_lines = [
+            *_format_runtime_analysis_lines(runtime_analysis),
+            *_format_runtime_timing_snapshot_lines(runtime_analysis),
+        ]
+        for line in runtime_lines:
+            if not line.startswith("- **") or ":** " not in line:
+                runtime_rows.append(("Runtime note", line.removeprefix("- ")))
+                continue
+            label, value = line.removeprefix("- **").split(":** ", maxsplit=1)
+            runtime_rows.append((label, value))
+
+    stanzas = [
+        _build_report_stanza("Failures & Triage", failure_rows),
+        _build_report_stanza("Quality & Metadata", quality_rows),
+        _build_report_stanza("Runtime", runtime_rows),
+    ]
+    return [stanza for stanza in stanzas if stanza.rows]
+
+
 def _format_action_snapshot_parts(
     results: list[PerformanceResult],
     report_context: ReportRenderContext,
@@ -18449,96 +18609,17 @@ def _format_action_snapshot_parts(
     **Quality & Metadata** — signal frequencies and baseline comparison.
     **Runtime** — phase timing and decode dominance.
     """
-    summary = report_context.summary
-    triage = report_context.triage
-    preflight_issues = report_context.preflight_issues
-    failed: list[PerformanceResult] = [res for res in results if not res.success]
-    quality_counts = Counter(dict(triage.quality_counts))
-    harness_success_count = sum("harness" in row.labels for row in triage.utility_rows)
-    successful_count = len(triage.utility_rows)
+    stanzas = _build_action_snapshot_stanzas(results, report_context)
 
     if html_output:
         parts: list[str] = ["<h3>🎯 Action Snapshot</h3>"]
+        for stanza in stanzas:
+            parts.extend(_render_html_stanza(stanza))
+        return parts
 
-        def append_line(label: str, value: str) -> None:
-            parts.append(
-                f"<li><b>{html.escape(label)}:</b> {html.escape(value)}</li>",
-            )
-
-        def open_group(heading: str) -> None:
-            parts.append(f"<p><b>{html.escape(heading)}</b></p>")
-            parts.append("<ul>")
-
-        def close_group() -> None:
-            parts.append("</ul>")
-    else:
-        parts = ["## 🎯 Action Snapshot", ""]
-
-        def append_line(label: str, value: str) -> None:
-            _append_markdown_labeled_value(parts, label=label, value=value, bullet=True)
-
-        def open_group(heading: str) -> None:
-            parts.append(f"### {heading}")
-            parts.append("")
-
-        def close_group() -> None:
-            parts.append("")
-
-    # --- Failures & Triage ---
-    failure_items = _action_snapshot_failure_items(
-        failed,
-        triage=triage,
-        harness_success_count=harness_success_count,
-        successful_count=successful_count,
-    )
-    open_group("Failures & Triage")
-    for label, value in failure_items:
-        append_line(label, value)
-    if preflight_issues:
-        append_line(
-            "Preflight compatibility",
-            f"{len(preflight_issues)} informational warning(s); "
-            "do not treat these alone as run failures.",
-        )
-        append_line(
-            "Escalate only if",
-            "they line up with API mismatches, startup hangs, or backend/runtime crashes.",
-        )
-    close_group()
-
-    # --- Quality & Metadata ---
-    open_group("Quality & Metadata")
-    if triage.baseline_score is not None and triage.baseline_grade is not None:
-        better = len(summary.get("cataloging_improves_metadata", []))
-        neutral = len(summary.get("cataloging_neutral_vs_metadata", []))
-        worse = len(summary.get("cataloging_worse_than_metadata", []))
-        append_line(
-            "Vs existing metadata",
-            f"better={better}, neutral={neutral}, worse={worse} "
-            f"(baseline {triage.baseline_grade} {triage.baseline_score:.0f}/100).",
-        )
-    append_line("Quality signal frequency", f"{_format_counter_items(quality_counts)}.")
-    termination_summary = ", ".join(
-        f"{reason}={count}"
-        for reason, count in sorted(
-            Counter("completed" if res.success else "exception" for res in results).items(),
-        )
-    )
-    append_line("Termination reasons", f"{termination_summary}.")
-    close_group()
-
-    # --- Runtime ---
-    runtime_analysis = summary.get("runtime_analysis")
-    if runtime_analysis is not None:
-        open_group("Runtime")
-        for line in _format_runtime_analysis_lines(runtime_analysis):
-            if not line.startswith("- **") or ":** " not in line:
-                append_line("Runtime note", line.removeprefix("- "))
-                continue
-            label, value = line.removeprefix("- **").split(":** ", maxsplit=1)
-            append_line(label, value)
-        close_group()
-
+    parts = ["## 🎯 Action Snapshot", ""]
+    for stanza in stanzas:
+        _append_markdown_stanza(parts, stanza)
     return parts
 
 
@@ -19997,8 +20078,12 @@ def _generate_github_issue_reports(
         issue_path.write_text("\n".join(parts) + "\n", encoding="utf-8")
         generated_reports[f"crash_{idx}"] = issue_path
 
-    for idx, (result, harness_type) in enumerate(diagnostics_snapshot.harness_results, start=1):
-        qa = result.quality_analysis
+    for idx, (result, _sample_output) in enumerate(
+        diagnostics_snapshot.harness_results,
+        start=1,
+    ):
+        qa = _quality_analysis_for_result(result)
+        harness_type = (qa.harness_issue_type if qa is not None else None) or "harness"
         if qa is not None and qa.harness_issue_details:
             harness_details = "\n".join(
                 f"- {_describe_harness_detail(detail) or detail}"
@@ -20007,7 +20092,7 @@ def _generate_github_issue_reports(
         else:
             harness_details = "- No details provided."
 
-        safe_harness_type = _sanitize_bpe_display(harness_type)
+        safe_harness_type = _sanitize_bpe_display(harness_type, max_len=60)
         # Collapse to single line and strip trailing punctuation for valid heading
         title_text = " ".join(safe_harness_type.splitlines()).strip().rstrip(":.;,!?")
         parts = [

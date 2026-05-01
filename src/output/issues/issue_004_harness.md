@@ -1,4 +1,4 @@
-# [Harness Issue] <think>Got it, let's describe this picture in detail. First, the scene is a serene park or garden with a lake or pond in mlx-community/GLM-4.6V-Flash-mxfp4
+# [Harness Issue] stop_token in mlx-community/GLM-4.6V-Flash-mxfp4
 
 ## Description
 
@@ -10,7 +10,8 @@ Integration/harness warning detected for `mlx-community/GLM-4.6V-Flash-mxfp4`.
 
 ## At a Glance
 
-- _Observed:_ Output indicates a likely integration issue.
+- _Observed:_ Generation appears to continue through stop/control tokens
+  instead of ending cleanly.
 - _Likely owner:_ `mlx-vlm`
 - _Why it matters:_ The run completed, but the output pattern points to
   stack/runtime behavior rather than a clean model-quality limitation.

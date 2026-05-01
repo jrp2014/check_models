@@ -20,6 +20,9 @@ Notable changes to this project will be documented in this file.
 - Reuse shared compact "at a glance" row builders across diagnostics,
   `review.md`, and generated issue markdown so failure, harness, and next-step
   summaries stay consistent when the human-facing reports are regenerated.
+- Compact the generated report first screens and harness issue titles so
+  `results.md`, `model_gallery.md`, `review.md`, `diagnostics.md`, and issue
+  markdown surface maintainer actions before verbose evidence.
 
 ## [0.6.0] - 2026-04-26
 

@@ -1,4 +1,4 @@
-# [Harness Issue] I'm sorry, but the context didn't show up in mlx-community/Qwen2-VL-2B-Instruct-4bit
+# [Harness Issue] long_context in mlx-community/Qwen2-VL-2B-Instruct-4bit
 
 ## Description
 
@@ -11,7 +11,7 @@ Integration/harness warning detected for `mlx-community/Qwen2-VL-2B-Instruct-4bi
 
 ## At a Glance
 
-- _Observed:_ Output indicates a likely integration issue.
+- _Observed:_ Behavior degrades under long prompt context.
 - _Likely owner:_ `mlx-vlm / mlx`
 - _Why it matters:_ The run completed, but the output pattern points to
   stack/runtime behavior rather than a clean model-quality limitation.

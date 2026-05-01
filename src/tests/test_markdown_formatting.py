@@ -507,7 +507,7 @@ def test_gallery_review_summary_uses_review_focus_evidence(tmp_path: Path) -> No
     )
     md = out.read_text(encoding="utf-8")
 
-    assert "_Review summary:_" in md
+    assert "_Key signals:_" in md
     assert "hit token cap (60)" in md
     assert "keywords=1" in md
 
@@ -650,4 +650,5 @@ def test_error_text_escapes_underscore_emphasis_markers() -> None:
         error_message="LanguageModel.__call__() got an unexpected keyword argument",
     )
     md = _gallery_lines_for(result)
-    assert "LanguageModel.\\_\\_call\\_\\_() got an unexpected keyword argument" in md
+    assert "LanguageModel.\\_\\_call\\_\\_() got an unexpected keyword" in md
+    assert "argument" in md

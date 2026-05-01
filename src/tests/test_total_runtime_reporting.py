@@ -124,7 +124,7 @@ def test_html_report_includes_runtime(tmp_path: Path) -> None:
 
 
 def test_markdown_report_includes_timing_snapshot(tmp_path: Path) -> None:
-    """Markdown report should surface compact aggregate timing snapshot lines."""
+    """Markdown report should surface aggregate timing inside the Runtime stanza."""
     results = [_build_result_with_runtime()]
     md_file = tmp_path / "report.md"
     generate_markdown_report(
@@ -135,13 +135,13 @@ def test_markdown_report_includes_timing_snapshot(tmp_path: Path) -> None:
         total_runtime_seconds=12.34,
     )
     content = md_file.read_text(encoding="utf-8")
-    assert "### ⏱ Timing Snapshot" in content
-    assert "**Validation overhead:**" in content
-    assert "**First-token latency:**" in content
+    assert "### Runtime" in content
+    assert "_Validation overhead:_" in content
+    assert "_First-token latency:_" in content
 
 
 def test_html_report_includes_timing_snapshot(tmp_path: Path) -> None:
-    """HTML report should surface compact aggregate timing snapshot lines."""
+    """HTML report should surface aggregate timing inside the Runtime stanza."""
     results = [_build_result_with_runtime()]
     html_file = tmp_path / "report.html"
     generate_html_report(
@@ -152,7 +152,7 @@ def test_html_report_includes_timing_snapshot(tmp_path: Path) -> None:
         total_runtime_seconds=56.78,
     )
     content = html_file.read_text(encoding="utf-8")
-    assert "Additional timing signals:" in content
+    assert "<p><b>Runtime</b></p>" in content
     assert "Validation overhead:" in content
     assert "First-token latency:" in content
 

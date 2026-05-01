@@ -1,4 +1,4 @@
-# [Harness Issue] in one sentence in mlx-community/gemma-4-31b-bf16
+# [Harness Issue] prompt_template in mlx-community/gemma-4-31b-bf16
 
 ## Description
 
@@ -10,7 +10,8 @@ Integration/harness warning detected for `mlx-community/gemma-4-31b-bf16`.
 
 ## At a Glance
 
-- _Observed:_ Output indicates a likely integration issue.
+- _Observed:_ Output shape suggests a prompt-template or stop-condition
+  mismatch.
 - _Likely owner:_ `model-config / mlx-vlm`
 - _Why it matters:_ The run completed, but the output pattern points to
   stack/runtime behavior rather than a clean model-quality limitation.

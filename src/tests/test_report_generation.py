@@ -662,8 +662,8 @@ class TestMarkdownGalleryReport:
         assert "```text" not in content
         assert '<a id="model-org-good"></a>' in content
         assert "_Recommendation:_" in content
-        assert "_Maintainer routing:_" in content
-        assert "_Review summary:_" in content
+        assert "_Owner:_" in content
+        assert "_Next step:_" in content
         assert "### ✅ org/good" in content
         assert "### ❌ org/bad" in content
 
@@ -706,6 +706,13 @@ class TestMarkdownGalleryReport:
         assert "Evidence" in content
         assert "Next Action" in content
         assert "Canonical run log" in content
+        maintainer_queue = content.split("## Maintainer Queue", maxsplit=1)[1].split(
+            "## Model Verdicts",
+            maxsplit=1,
+        )[0]
+        assert "org/good" not in maintainer_queue
+        assert "org/risky" in maintainer_queue
+        assert "org/bad" in maintainer_queue
 
     def test_gallery_includes_shared_triage_sections_and_review_status(
         self,
@@ -733,10 +740,8 @@ class TestMarkdownGalleryReport:
         assert "## 🚨 Failures by Package (Actionable)" in content
         assert "_Review priority:_" in content
         assert "strong candidate for first-pass review" in content or "watchlist" in content
-        assert (
-            "_Next Action:_ review package ownership and diagnostics for a minimal repro."
-            in content
-        )
+        assert "_Error summary:_" in content
+        assert "_Next step:_" in content
 
 
 # ===================================================================
@@ -1366,7 +1371,7 @@ class TestDiagnosticsReport:
         )
         content = out.read_text(encoding="utf-8")
         assert "## Action Summary" in content
-        assert "Quick triage list with likely owner and next action" in content
+        assert "Owner-first triage with priority, affected count, and next action" in content
         assert "### Portable triage (no local image required)" in content
         assert "python -m pip show mlx mlx-vlm mlx-lm transformers" in content
 
@@ -2718,6 +2723,7 @@ class TestGithubIssueReportContent:
         )
 
         content = generated["harness_1"].read_text(encoding="utf-8")
+        assert content.startswith("# [Harness Issue] long_context in org/harness-empty")
         assert "## Maintainer Triage" in content
         assert "At long prompt length (5000 tokens), generation returned empty output." in content
         assert "context_budget" in content
