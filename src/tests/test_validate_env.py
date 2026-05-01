@@ -70,7 +70,7 @@ def test_version_matches_specifier_accepts_dev_build_above_floor() -> None:
     """PEP 440 version handling should accept dev builds above the declared floor."""
     assert validate_env._version_matches_specifier(
         package_name="mlx",
-        installed_version="0.31.2.dev20260410+a33b7916",
+        installed_version="0.31.3.dev20260410+a33b7916",
         version_spec=f">={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx']}",
     )
 

@@ -31,7 +31,7 @@ classifiers = [
 # upstream dependency graphs change.
 dependencies = [
     # Core MLX runtime stack required by benchmark execution
-    "mlx>=0.31.1",
+    "mlx>=0.31.2",
     "mlx-lm>=0.31.3",
     "mlx-vlm>=0.4.4",
     # Project-level compatibility floor for the MLX ecosystem.

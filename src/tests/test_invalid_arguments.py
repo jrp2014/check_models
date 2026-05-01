@@ -50,8 +50,4 @@ def test_cli_invalid_arguments(
     captured = capsys.readouterr()
     output = captured.out + captured.err
 
-    if expected_error == "kv_bits must be":
-        # Accept argparse's invalid choice error for kv-bits
-        assert expected_error.lower() in output.lower() or "invalid choice" in output.lower()
-    else:
-        assert expected_error.lower() in output.lower()
+    assert expected_error.lower() in output.lower()

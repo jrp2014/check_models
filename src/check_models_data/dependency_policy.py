@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Final
 
 PROJECT_RUNTIME_STACK_MINIMUMS: Final[dict[str, str]] = {
-    "mlx": "0.31.1",
+    "mlx": "0.31.2",
     "mlx-lm": "0.31.3",
     "mlx-vlm": "0.4.4",
     "transformers": "5.5.3",

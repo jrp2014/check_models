@@ -190,7 +190,8 @@ ERROR_MLX_VLM_RUNTIME_INIT: Final[str] = (
     "Core dependency initialization failed: mlx-vlm could not be imported safely."
 )
 MLX_IMPORT_PROBE_TIMEOUT_SECONDS: Final[float] = 8.0
-DEFAULT_KV_QUANT_SCHEME: Final[str] = "uniform"
+DEFAULT_KV_QUANT_SCHEME: Final = "uniform"
+UNIFORM_KV_BITS: Final[frozenset[int]] = frozenset({2, 3, 4, 5, 6, 8})
 DEFAULT_THINKING_END_MARKER: Final[str] = "</think>"
 
 
@@ -1206,7 +1207,7 @@ class StrictGenerateCallable(Protocol):
         repetition_penalty: float | None = None,
         repetition_context_size: int | None = 20,
         max_kv_size: int | None = None,
-        kv_bits: int | None = None,
+        kv_bits: float | None = None,
         kv_quant_scheme: str = DEFAULT_KV_QUANT_SCHEME,
         kv_group_size: int = 64,
         quantized_kv_start: int = 0,
@@ -1991,7 +1992,7 @@ class ProcessImageParams:
     repetition_context_size: int
     lazy: bool
     max_kv_size: int | None
-    kv_bits: int | None
+    kv_bits: float | None
     kv_quant_scheme: Literal["uniform", "turboquant"]
     kv_group_size: int
     quantized_kv_start: int
@@ -11142,7 +11143,7 @@ def _issue_target_for_package(
 ) -> tuple[str, str]:
     """Map failure package attribution to a likely upstream issue tracker."""
     target_map: dict[str, tuple[str, str]] = {
-        "mlx-vlm": ("mlx-vlm", "https://github.com/ml-explore/mlx-vlm/issues/new"),
+        "mlx-vlm": ("mlx-vlm", "https://github.com/Blaizzy/mlx-vlm/issues/new"),
         "mlx": ("mlx", "https://github.com/ml-explore/mlx/issues/new"),
         "mlx-lm": ("mlx-lm", "https://github.com/ml-explore/mlx-lm/issues/new"),
         ("transformers"): (
@@ -11161,7 +11162,7 @@ def _issue_target_for_package(
             "model repository",
             f"https://huggingface.co/{urllib.parse.quote(model_name, safe='/')}",
         )
-    return ("mlx-vlm", "https://github.com/ml-explore/mlx-vlm/issues/new")
+    return ("mlx-vlm", "https://github.com/Blaizzy/mlx-vlm/issues/new")
 
 
 def _guess_preflight_issue_package(issue: str) -> str:
@@ -14419,16 +14420,34 @@ def validate_sampling_params(
 def validate_kv_params(
     *,  # Force all parameters to be keyword-only for clarity
     max_kv_size: int | None,
-    kv_bits: int | None,
+    kv_bits: float | None,
+    kv_quant_scheme: Literal["uniform", "turboquant"] = DEFAULT_KV_QUANT_SCHEME,
 ) -> None:
     """Validate KV cache parameters are within acceptable ranges."""
     if max_kv_size is not None and max_kv_size <= 0:
         msg = f"max_kv_size must be > 0 if specified, got {max_kv_size}"
         raise ValueError(msg)
 
-    if kv_bits is not None and kv_bits not in (4, 8):
-        msg = f"kv_bits must be 4 or 8 if specified, got {kv_bits}"
+    if kv_bits is None:
+        return
+
+    rounded_half = round(kv_bits * 2) / 2
+    if kv_bits < 1:
+        msg = f"kv_bits must be >= 1 if specified, got {kv_bits:g}"
         raise ValueError(msg)
+
+    if not math.isclose(kv_bits, rounded_half, abs_tol=1e-6):
+        msg = f"kv_bits must be an integer or .5 increment if specified, got {kv_bits:g}"
+        raise ValueError(msg)
+
+    is_integer_bits = math.isclose(kv_bits, round(kv_bits), abs_tol=1e-6)
+    if kv_quant_scheme == "uniform" and is_integer_bits:
+        int_bits = round(kv_bits)
+        if int_bits not in UNIFORM_KV_BITS:
+            msg = (
+                f"uniform kv_bits must be one of 2, 3, 4, 5, 6, or 8 if specified, got {kv_bits:g}"
+            )
+            raise ValueError(msg)
 
 
 _RESERVED_PROCESSOR_KWARG_KEYS: Final[frozenset[str]] = frozenset(
@@ -14572,6 +14591,7 @@ def validate_cli_arguments(args: argparse.Namespace) -> None:
     validate_kv_params(
         max_kv_size=args.max_kv_size,
         kv_bits=args.kv_bits,
+        kv_quant_scheme=args.kv_quant_scheme,
     )
 
     args.resize_shape = _normalize_resize_shape(getattr(args, "resize_shape", None))
@@ -21149,10 +21169,12 @@ def _build_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-b",
         "--kv-bits",
-        type=int,
+        type=float,
         default=None,
-        choices=[4, 8],
-        help="Quantize KV cache to N bits (4 or 8). Saves memory with small quality trade-off.",
+        help=(
+            "Quantize KV cache to N bits. Uniform supports 2, 3, 4, 5, 6, "
+            "or 8; fractional values such as 3.5 use TurboQuant automatically."
+        ),
     )
     parser.add_argument(
         "--kv-quant-scheme",

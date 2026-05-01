@@ -129,25 +129,31 @@ class TestKVParamsValidation:
     def test_valid_kv_bits_values(self) -> None:
         """Test that valid kv_bits values pass validation."""
         validate_kv_params(max_kv_size=None, kv_bits=None)  # Disabled
-        validate_kv_params(max_kv_size=None, kv_bits=4)
-        validate_kv_params(max_kv_size=None, kv_bits=8)
+        for bits in (2, 3, 4, 5, 6, 8):
+            validate_kv_params(max_kv_size=None, kv_bits=bits)
+        validate_kv_params(max_kv_size=None, kv_bits=3.5)
+        validate_kv_params(
+            max_kv_size=None,
+            kv_bits=3.0,
+            kv_quant_scheme="turboquant",
+        )
 
     def test_invalid_kv_bits_raises_error(self) -> None:
         """Test that invalid kv_bits raises ValueError."""
-        with pytest.raises(ValueError, match="kv_bits must be 4 or 8"):
-            validate_kv_params(max_kv_size=None, kv_bits=2)
+        with pytest.raises(ValueError, match="kv_bits must be >= 1"):
+            validate_kv_params(max_kv_size=None, kv_bits=0.5)
 
-        with pytest.raises(ValueError, match="kv_bits must be 4 or 8"):
+        with pytest.raises(ValueError, match=r"integer or \.5 increment"):
+            validate_kv_params(max_kv_size=None, kv_bits=3.25)
+
+        with pytest.raises(ValueError, match="uniform kv_bits must be one of"):
             validate_kv_params(max_kv_size=None, kv_bits=16)
-
-        with pytest.raises(ValueError, match="kv_bits must be 4 or 8"):
-            validate_kv_params(max_kv_size=None, kv_bits=1)
 
     def test_combined_valid_kv_params(self) -> None:
         """Test valid combinations of KV cache parameters."""
         validate_kv_params(max_kv_size=4096, kv_bits=4)
         validate_kv_params(max_kv_size=8192, kv_bits=8)
-        validate_kv_params(max_kv_size=2048, kv_bits=4)
+        validate_kv_params(max_kv_size=2048, kv_bits=3.5)
 
 
 class TestCliArgumentNormalization:

@@ -62,6 +62,7 @@ def test_validate_kv_params_valid_combinations() -> None:
     check_models.validate_kv_params(kv_bits=None, max_kv_size=None)
     check_models.validate_kv_params(kv_bits=4, max_kv_size=1024)
     check_models.validate_kv_params(kv_bits=8, max_kv_size=2048)
+    check_models.validate_kv_params(kv_bits=3.5, max_kv_size=2048)
 
 
 def test_validate_kv_params_rejects_invalid_bits() -> None:

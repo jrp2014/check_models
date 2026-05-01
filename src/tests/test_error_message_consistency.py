@@ -45,8 +45,4 @@ def test_error_message_consistency(
     output = captured.out + captured.err
 
     for phrase in expected_phrases:
-        if phrase in {"kv_bits must be", "Fatal error"}:
-            # Accept argparse's invalid choice error for kv-bits
-            assert phrase.lower() in output.lower() or "invalid choice" in output.lower()
-        else:
-            assert phrase.lower() in output.lower()
+        assert phrase.lower() in output.lower()

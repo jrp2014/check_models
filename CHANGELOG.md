@@ -7,6 +7,10 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Align MLX stack integration with current upstream sources by raising the
+  project `mlx` floor to `0.31.2`, accepting fractional TurboQuant
+  `--kv-bits` values such as `3.5`, and routing generated `mlx-vlm` issue
+  links to `Blaizzy/mlx-vlm`.
 - Prune stale repro bundles from the canonical `output/repro_bundles/`
   directory after the report layout moved human-readable artifacts under
   `output/reports/`, and refresh maintenance cleanup/check targets that still

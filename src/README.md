@@ -312,14 +312,14 @@ Vision-language models maintain a **key-value (KV) cache** during text generatio
 ### Parameters
 
 - `--max-kv-size <int>`: Maximum number of tokens to store in KV cache. Limits memory for very long sequences. Default: `None` (unlimited).
-- `--kv-bits <int>`: Quantize KV cache to 4 or 8 bits instead of full precision (typically 16-bit). Default: `None` (no quantization).
+- `--kv-bits <number>`: Quantize KV cache instead of using full precision (typically 16-bit). Uniform quantization supports `2`, `3`, `4`, `5`, `6`, or `8`; fractional values such as `3.5` use upstream TurboQuant automatically. Default: `None` (no quantization).
 - `--kv-quant-scheme <uniform|turboquant>`: Select the upstream KV quantization backend. Default: `uniform`.
 - `--kv-group-size <int>`: Group size for quantization (larger = more compression, less accuracy). Default: `64`.
 - `--quantized-kv-start <int>`: Token position to start quantization. Use `0` to quantize from the beginning, or a larger value to keep early tokens (e.g., system prompts) at full precision. Default: `0`.
 
 ### How It Works
 
-From the MLX-VLM source: The KV cache stores attention keys and values for each generated token. Quantization groups cache entries into blocks of `kv_group_size` tokens and represents them with lower precision (`kv_bits`). This reduces memory proportionally (4-bit = 4×, 8-bit = 2× compression) while maintaining most of the model's generation quality.
+From the MLX and MLX-VLM sources: uniform KV quantization uses MLX affine bit widths (`2`, `3`, `4`, `5`, `6`, or `8`) with `kv_group_size` token groups, while TurboQuant supports integer and `.5` bit widths and automatically handles fractional values such as `3.5` as lower-bit keys plus higher-bit values. Both reduce memory while maintaining most of the model's generation quality.
 
 ### Example Usage
 
@@ -328,7 +328,7 @@ From the MLX-VLM source: The KV cache stores attention keys and values for each 
 python -m check_models --image photo.jpg --kv-bits 8
 
 # Match upstream TurboQuant KV-cache handling
-python -m check_models --image photo.jpg --kv-bits 4 --kv-quant-scheme turboquant
+python -m check_models --image photo.jpg --kv-bits 3.5 --kv-quant-scheme turboquant
 
 # Aggressive 4-bit quantization with larger groups (4× compression)
 python -m check_models --image photo.jpg --kv-bits 4 --kv-group-size 128
@@ -507,7 +507,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- MANUAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.1" "mlx-lm>=0.31.3" "mlx-vlm>=0.4.4" "packaging>=26.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
+pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.4.4" "packaging>=26.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
 ```
 <!-- MANUAL_INSTALL_END -->
 
@@ -665,7 +665,7 @@ Development / QA:
 
 <!-- MINIMAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.1" "mlx-lm>=0.31.3" "mlx-vlm>=0.4.4" "packaging>=26.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
+pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.2" "mlx-lm>=0.31.3" "mlx-vlm>=0.4.4" "packaging>=26.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
 ```
 <!-- MINIMAL_INSTALL_END -->
 
@@ -864,7 +864,7 @@ See module docstrings and `__all__` exports for complete API reference.
 | `--repetition-context-size` | int | 20 | Context window size for repetition penalty. |
 | `-L`, `--lazy-load` | flag | `False` | Use lazy loading (loads weights on-demand, reduces memory). |
 | `--max-kv-size` | int | (none) | Maximum KV cache size (limits memory for long sequences). |
-| `-b`, `--kv-bits` | int | (none) | Quantize KV cache to N bits (4 or 8); saves memory. |
+| `-b`, `--kv-bits` | number | (none) | Quantize KV cache to N bits; uniform supports `2`, `3`, `4`, `5`, `6`, or `8`, and fractional values use TurboQuant. |
 | `--kv-quant-scheme` | str | `uniform` | KV cache quantization backend: `uniform` or `turboquant`. |
 | `-g`, `--kv-group-size` | int | 64 | Quantization group size for KV cache. |
 | `--quantized-kv-start` | int | 0 | Start position for KV cache quantization. |
