@@ -340,8 +340,8 @@ Your PR must:
 
 The project organizes dependencies into groups:
 
-- **Runtime**: Core dependencies needed to run `check_models.py` (mlx, mlx-vlm, Pillow, etc.)
-- **Extras**: Optional enhancements (psutil, tokenizers, mlx-lm)
+- **Runtime**: Core dependencies needed to run `check_models.py` (mlx, mlx-lm, mlx-vlm, Pillow, etc.)
+- **Extras**: Optional enhancements (psutil, tokenizers, einops, num2words, sentencepiece)
 - **Torch**: PyTorch stack for models that require it (torch, torchvision, torchaudio)
 - **Dev**: Development tools (ruff, mypy, pytest)
 
@@ -352,8 +352,7 @@ Install specific groups as needed:
 pip install -e src/
 
 # With extras / torch / dev (from repo root)
-pip install -e "src/[extras]"
-pip install -e "src/[torch]"
+pip install -e "src/[extras,torch]"
 pip install -e "src/[dev]"
 
 # Everything

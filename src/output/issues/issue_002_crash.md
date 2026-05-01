@@ -39,7 +39,7 @@ Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded processor ha
 
 ## Reproducibility
 
-A reproduction bundle is available at: `20260501T132842Z_002_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json`
+A reproduction bundle is available at: `20260501T205016Z_002_mlx-community_MolmoPoint-8B-fp16_MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR_a6.json`
 
 ### Repro Command
 

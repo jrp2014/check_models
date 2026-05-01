@@ -125,7 +125,6 @@ def test_readme_runtime_block_matches_pyproject() -> None:
     forbidden = {
         "psutil",
         "tokenizers",
-        "mlx-lm",
         "torch",
         "torchvision",
         "torchaudio",
@@ -143,6 +142,7 @@ def test_dependency_policy_module_tracks_pyproject_stack_floors() -> None:
     extras_deps = pyproject["project"]["optional-dependencies"]["extras"]
 
     assert f"mlx>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx']}" in runtime_deps
+    assert f"mlx-lm>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx-lm']}" in runtime_deps
     assert f"mlx-vlm>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx-vlm']}" in runtime_deps
     assert (
         f"transformers>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['transformers']}"
@@ -152,7 +152,7 @@ def test_dependency_policy_module_tracks_pyproject_stack_floors() -> None:
         f"huggingface-hub[torch,typing]>={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['huggingface-hub']}"
         in runtime_deps
     )
-    assert f"mlx-lm>={dependency_policy.PROJECT_OPTIONAL_STACK_MINIMUMS['mlx-lm']}" in extras_deps
+    assert not any(dep.startswith("mlx-lm>=") for dep in extras_deps)
 
 
 def test_ty_uses_generated_typings_search_path() -> None:

@@ -133,13 +133,16 @@ Unless noted otherwise, the `pip install -e ...` commands below assume you are
 running them from `src/`. From the repository root, prefer `make install`,
 `make dev`, or `make -C src install-torch`.
 
-Enable additional features by installing "extras":
+Install the core runtime or add optional model coverage as needed:
 
 ```bash
-# Install core + extras (psutil, tokenizers, etc.)
-pip install -e ".[extras]"
+# Runtime only (includes mlx, mlx-lm, and mlx-vlm)
+pip install -e .
 
-# Install PyTorch support (needed for Phi-3-vision, Florence-2, FastVLM/timm-backed models)
+# Add optional extras and torch-backed loaders for broader model coverage
+pip install -e ".[extras,torch]"
+
+# Install only the PyTorch subset if you do not need the other extras
 pip install -e ".[torch]"
 
 # Install everything for development
@@ -504,7 +507,7 @@ If you prefer to install dependencies manually (ensure these match `pyproject.to
 
 <!-- MANUAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.1" "mlx-vlm>=0.4.4" "packaging>=26.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
+pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.1" "mlx-lm>=0.31.3" "mlx-vlm>=0.4.4" "packaging>=26.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
 ```
 <!-- MANUAL_INSTALL_END -->
 
@@ -620,6 +623,7 @@ Runtime (installed automatically via `pip install -e .` when executed inside `sr
 | PEP 440 version parsing | `packaging` | `>=26.0` |
 | Reporting / tables | `tabulate` | `>=0.9.0` |
 | Configuration loading | `PyYAML` | `>=6.0` |
+| Language model utilities | `mlx-lm` | `>=0.31.3` |
 
 Optional (enable additional features):
 
@@ -629,7 +633,6 @@ Optional (enable additional features):
 | Fast tokenizer backends | `tokenizers` | `extras` | `pip install -e "src/[extras]"` |
 | Tensor operations (for some models) | `einops` | `extras` | `pip install -e "src/[extras]"` |
 | Number-to-words conversion (for some models) | `num2words` | `extras` | `pip install -e "src/[extras]"` |
-| Language model utilities | `mlx-lm` | `extras` | `pip install -e "src/[extras]"` |
 | Transformer model support | `transformers` | core runtime | Installed by `make install` / `pip install -e src/` |
 | PyTorch stack (needed for some models) | `torch`, `torchvision`, `torchaudio` | `torch` | `pip install -e "src/[torch]"` or `make -C src install-torch` |
 | Vision backbones for FastVLM-style models | `timm` | `torch` | `pip install -e "src/[torch]"` or `make -C src install-torch` |
@@ -662,19 +665,25 @@ Development / QA:
 
 <!-- MINIMAL_INSTALL_START -->
 ```bash
-pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.1" "mlx-vlm>=0.4.4" "packaging>=26.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
+pip install "defusedxml>=0.7.1" "huggingface-hub[torch,typing]>=1.10.1" "mlx>=0.31.1" "mlx-lm>=0.31.3" "mlx-vlm>=0.4.4" "packaging>=26.0" "Pillow[xmp]>=10.3.0" "PyYAML>=6.0" "tabulate>=0.9.0" "transformers>=5.5.3" "wcwidth>=0.2.13"
 ```
 <!-- MINIMAL_INSTALL_END -->
 
 ### With Optional Extras
 
-The `extras` group in `pyproject.toml` pulls in `psutil`, `tokenizers`, `einops`, `num2words`, `mlx-lm`, and `sentencepiece`:
+The `extras` group in `pyproject.toml` pulls in `psutil`, `tokenizers`, `einops`, `num2words`, and `sentencepiece`:
 
 ```bash
-pip install -e ".[extras]"  # adds optional metrics, tokenizer, and processor deps
+pip install -e ".[extras,torch]"  # recommended for the widest optional feature/model coverage
 ```
 
-To include the optional PyTorch stack when needed (macOS wheels include MPS acceleration):
+If you only need the lighter optional extras without PyTorch, you can still install them separately:
+
+```bash
+pip install -e ".[extras]"
+```
+
+To include only the optional PyTorch stack when needed (macOS wheels include MPS acceleration):
 
 ```bash
 pip install -e ".[torch]"
@@ -695,7 +704,7 @@ pip install -e ".[dev,extras,torch]"  # dev tools + optional model/runtime deps
 > `psutil` is optional (installed with `extras`); if absent the extended Apple Silicon hardware section omits RAM/cores.
 
 > [!NOTE]
-> `extras` group bundles: psutil, tokenizers, einops, num2words, mlx-lm, and sentencepiece. Install only if you need those optional model and utility dependencies.
+> `mlx-lm` is part of the core runtime dependency set. The `extras` group adds psutil, tokenizers, einops, num2words, and sentencepiece. For the widest model coverage, pair extras with `.[torch]` or install `.[extras,torch]` directly.
 
 > [!NOTE]
 > Project policy requires `transformers>=5.5.3` and validates the live

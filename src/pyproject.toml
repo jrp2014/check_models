@@ -22,15 +22,17 @@ classifiers = [
 ]
 # PEP 621: declare runtime dependencies as an inline array instead of a key/value table.
 # This keeps ordering deterministic and simplifies automated parsing.
-# Runtime intentionally slim: only what `check_models.py` imports directly.
-# Everything else lives in extras to reduce cold install surface & build time.
+# Runtime intentionally slim: only the MLX stack and libraries required for
+# benchmark execution ship by default. Everything else lives in extras to
+# reduce cold install surface & build time.
 # NOTE: Some deps below are also pulled transitively by other runtime deps
 # (for example Pillow/PyYAML via mlx-vlm and defusedxml via Pillow[xmp]) but are
 # listed explicitly to allow version pinning and ensure they're available if
 # upstream dependency graphs change.
 dependencies = [
-    # Minimal runtime set actually imported by check_models.py
+    # Core MLX runtime stack required by benchmark execution
     "mlx>=0.31.1",
+    "mlx-lm>=0.31.3",
     "mlx-vlm>=0.4.4",
     # Project-level compatibility floor for the MLX ecosystem.
     "transformers>=5.5.3",
@@ -67,8 +69,6 @@ extras = [
     "einops>=0.6.0",
     # Number-to-words conversion (required by some model processors)
     "num2words>=0.5.0",
-    # Language-model utilities (not required for base benchmarking)
-    "mlx-lm>=0.31.3",
     "sentencepiece",
 ]
 torch = ["torch>=2.2.0", "torchvision>=0.17.0", "torchaudio>=2.2.0", "timm"]

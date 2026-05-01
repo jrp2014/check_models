@@ -968,7 +968,7 @@ The `test_dependency_sync` test and CI will fail otherwise.
 
 **Optional groups**:
 
-- `extras`: `psutil`, `tokenizers`, `mlx-lm`
+- `extras`: `psutil`, `tokenizers`, `einops`, `num2words`, `sentencepiece`
 - `torch`: `torch`, `torchvision`, `torchaudio`
 
 **Mechanism**:
@@ -1142,7 +1142,7 @@ pytest>=8.0.0
 ```bash
 pip install -e .              # Runtime only
 pip install -e ".[dev]"       # With dev tools
-pip install -e ".[extras]"    # With optional features
+pip install -e ".[extras,torch]"  # With full optional model coverage
 ```
 
 ## Update Workflows

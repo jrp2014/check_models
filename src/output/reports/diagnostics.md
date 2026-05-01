@@ -58,7 +58,7 @@ Quick triage list with likely owner and next action for each issue class.
 
 | Model                                     | Observed Behavior                                         | First Seen Failing      | Recent Repro           |
 |-------------------------------------------|-----------------------------------------------------------|-------------------------|------------------------|
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | Model loading failed: Received 4 parameters not in model: | 2026-02-07 20:59:01 GMT | 1/3 recent runs failed |
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | Model loading failed: Received 4 parameters not in model: | 2026-02-07 20:59:01 GMT | 2/3 recent runs failed |
 
 ### To reproduce
 
@@ -491,12 +491,12 @@ integration/runtime issues worth checking upstream.
 Recent reproducibility is measured from history (up to last 3 runs where each
 model appears).
 
-**Regressions since previous run:** `mlx-community/Kimi-VL-A3B-Thinking-8bit`
+**Regressions since previous run:** none
 **Recoveries since previous run:** none
 
 | Model                                     | Status vs Previous Run   | First Seen Failing      | Recent Repro           |
 |-------------------------------------------|--------------------------|-------------------------|------------------------|
-| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | new regression           | 2026-02-07 20:59:01 GMT | 1/3 recent runs failed |
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | still failing            | 2026-02-07 20:59:01 GMT | 2/3 recent runs failed |
 | `mlx-community/MolmoPoint-8B-fp16`        | still failing            | 2026-03-27 13:06:07 GMT | 3/3 recent runs failed |
 
 ---
@@ -506,13 +506,13 @@ model appears).
 - **Detailed diagnostics models:** 12
 - **Summary diagnostics models:** 41
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1235.09s (1235.09s)
-- **Average runtime per model:** 23.30s (23.30s)
-- **Dominant runtime phase:** decode dominated 49/53 measured model runs (91% of tracked runtime).
-- **Phase totals:** model load=104.66s, prompt prep=0.16s, decode=1112.64s, cleanup=5.35s
+- **Total model runtime (sum):** 1298.98s (1298.98s)
+- **Average runtime per model:** 24.51s (24.51s)
+- **Dominant runtime phase:** decode dominated 49/53 measured model runs (89% of tracked runtime).
+- **Phase totals:** model load=131.87s, prompt prep=0.16s, decode=1149.28s, cleanup=5.57s
 - **Observed stop reasons:** completed=51, exception=2
-- **Validation overhead:** 17.39s total (avg 0.33s across 53 model(s)).
-- **First-token latency:** Avg 12.38s | Min 0.06s | Max 77.20s across 51 model(s).
+- **Validation overhead:** 17.40s total (avg 0.33s across 53 model(s)).
+- **First-token latency:** Avg 13.09s | Min 0.06s | Max 83.41s across 51 model(s).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
@@ -643,4 +643,4 @@ Describe this picture
 - Input image: `/Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-05-01 17:56:05 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-05-01 21:50:16 BST by [check_models](https://github.com/jrp2014/check_models)._

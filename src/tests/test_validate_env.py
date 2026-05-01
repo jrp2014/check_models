@@ -87,10 +87,9 @@ def test_load_pyproject_deps_tracks_shared_runtime_policy() -> None:
         core_deps["transformers"]
         == f">={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['transformers']}"
     )
+    assert core_deps["mlx-lm"] == f">={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['mlx-lm']}"
     assert core_deps["huggingface-hub"] == (
         f">={dependency_policy.PROJECT_RUNTIME_STACK_MINIMUMS['huggingface-hub']}"
     )
     assert core_deps["packaging"] == ">=26.0"
-    assert (
-        extras_deps["mlx-lm"] == f">={dependency_policy.PROJECT_OPTIONAL_STACK_MINIMUMS['mlx-lm']}"
-    )
+    assert "mlx-lm" not in extras_deps

@@ -5,7 +5,7 @@ Usage:
     python tools/update_readme_deps.py --check
 
 The script:
-  * Parses [project.dependencies] and selected optional groups (extras) in pyproject.toml
+    * Parses [project.dependencies] and selected optional groups in pyproject.toml
   * Builds two blocks:
       - MANUAL_INSTALL: full runtime deps (core runtime section only)
       - MINIMAL_INSTALL: identical to runtime (can be adapted later if policy changes)
@@ -16,7 +16,7 @@ The script:
 Design notes:
   * Keeps ordering stable: core deps sorted by name for determinism.
   * Quotes each spec to avoid shell globbing issues.
-  * Leaves optional extras out (user can pip install -e ".[extras]").
+    * Leaves optional extras/torch groups out (user can install them separately).
 
 Exit codes:
   0 success, 1 failure (with message to stderr)

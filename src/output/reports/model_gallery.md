@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-_Generated on 2026-05-01 17:56:05 BST_
+_Generated on 2026-05-01 21:50:16 BST_
 
 A review-friendly artifact with image metadata, the source prompt, and full
 generated output for each model.
@@ -11,19 +11,19 @@ _Action Snapshot: see [results.md](results.md) for the full summary._
 
 ### Strong Candidates
 
-- `mlx-community/gemma-3-27b-it-qat-4bit`: 🏆 A (85/100) | Desc 82 | Keywords 92 | 28.6 tps
-- `mlx-community/Qwen3.5-35B-A3B-bf16`: ✅ B (80/100) | Desc 81 | Keywords 90 | 64.1 tps
-- `mlx-community/Molmo-7B-D-0924-8bit`: ✅ B (80/100) | Desc 84 | Keywords 0 | 52.4 tps
-- `mlx-community/Molmo-7B-D-0924-bf16`: ✅ B (80/100) | Desc 83 | Keywords 0 | 30.7 tps
-- `mlx-community/gemma-3-27b-it-qat-8bit`: ✅ B (80/100) | Desc 82 | Keywords 94 | 16.8 tps
+- `mlx-community/gemma-3-27b-it-qat-4bit`: 🏆 A (85/100) | Desc 82 | Keywords 92 | 26.0 tps
+- `mlx-community/Qwen3.5-35B-A3B-bf16`: ✅ B (80/100) | Desc 81 | Keywords 90 | 61.2 tps
+- `mlx-community/Molmo-7B-D-0924-8bit`: ✅ B (80/100) | Desc 84 | Keywords 0 | 52.1 tps
+- `mlx-community/Molmo-7B-D-0924-bf16`: ✅ B (80/100) | Desc 84 | Keywords 0 | 30.1 tps
+- `mlx-community/gemma-3-27b-it-qat-8bit`: ✅ B (80/100) | Desc 82 | Keywords 94 | 16.6 tps
 
 ### Watchlist
 
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (0/100) | Desc 40 | Keywords 0 | 31.6 tps | harness
-- `mlx-community/paligemma2-3b-pt-896-4bit`: ❌ F (5/100) | Desc 22 | Keywords 0 | 81.1 tps | harness, long context
-- `mlx-community/gemma-3n-E2B-4bit`: ❌ F (5/100) | Desc 23 | Keywords 0 | 92.9 tps | harness
-- `mlx-community/gemma-4-31b-bf16`: ❌ F (5/100) | Desc 23 | Keywords 0 | 9.1 tps | harness
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (16/100) | Desc 48 | Keywords 0 | 208.8 tps | harness, long context
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (0/100) | Desc 40 | Keywords 0 | 31.3 tps | harness
+- `mlx-community/paligemma2-3b-pt-896-4bit`: ❌ F (5/100) | Desc 22 | Keywords 0 | 80.3 tps | harness, long context
+- `mlx-community/gemma-3n-E2B-4bit`: ❌ F (5/100) | Desc 23 | Keywords 0 | 95.3 tps | harness
+- `mlx-community/gemma-4-31b-bf16`: ❌ F (5/100) | Desc 23 | Keywords 0 | 9.0 tps | harness
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (16/100) | Desc 48 | Keywords 0 | 207.2 tps | harness, long context
 
 ## 🚨 Failures by Package (Actionable)
 
@@ -78,7 +78,7 @@ _Action Snapshot: see [results.md](results.md) for the full summary._
 - _Best end-to-end cataloging:_ [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)
 - _Best descriptions:_ [`qnguyen3/nanoLLaVA`](#model-qnguyen3-nanollava)
 - _Best keywording:_ [`mlx-community/Ministral-3-14B-Instruct-2512-mxfp4`](#model-mlx-community-ministral-3-14b-instruct-2512-mxfp4)
-- _Fastest generation:_ [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)
+- _Fastest generation:_ [`mlx-community/FastVLM-0.5B-bf16`](#model-mlx-community-fastvlm-05b-bf16)
 - _Lowest memory footprint:_ [`mlx-community/nanoLLaVA-1.5-4bit`](#model-mlx-community-nanollava-15-4bit)
 - _Best balance:_ [`mlx-community/gemma-3-27b-it-qat-4bit`](#model-mlx-community-gemma-3-27b-it-qat-4bit)
 - _Failed models:_ `mlx-community/Kimi-VL-A3B-Thinking-8bit`,
@@ -130,10 +130,10 @@ _Next Action:_ review package ownership and diagnostics for a minimal repro.
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15416, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15686, in _run_model_generation
     model, processor, config = _load_model(params)
                                ~~~~~~~~~~~^^^^^^^^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14829, in _load_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15099, in _load_model
     model, processor = load(
                        ~~~~^
         path_or_hf_repo=params.model_identifier,
@@ -161,7 +161,7 @@ multi_modal_projector.linear_2.scales.
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15590, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15860, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -172,7 +172,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15426, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15696, in _run_model_generation
     raise _tag_exception_failure_phase(ValueError(error_details), "model_load") from load_err
 ValueError: Model loading failed: Received 4 parameters not in model:
 multi_modal_projector.linear_1.biases,
@@ -218,7 +218,7 @@ _Next Action:_ review package ownership and diagnostics for a minimal repro.
 
 ```python
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15187, in _prepare_generation_prompt
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15457, in _prepare_generation_prompt
     _run_model_preflight_validators(
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
         model_identifier=params.model_identifier,
@@ -228,7 +228,7 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14979, in _run_model_preflight_validators
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15249, in _run_model_preflight_validators
     _raise_preflight_error(
     ~~~~~~~~~~~~~~~~~~~~~~^
         "Loaded processor has no image_processor; expected multimodal processor.",
@@ -237,14 +237,14 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 14912, in _raise_preflight_error
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15182, in _raise_preflight_error
     raise _tag_exception_failure_phase(ValueError(message), phase)
 ValueError: Loaded processor has no image_processor; expected multimodal processor.
 
 The above exception was the direct cause of the following exception:
 
 Traceback (most recent call last):
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15590, in process_image_with_model
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15860, in process_image_with_model
     output: GenerationResult | SupportsGenerationResult = _run_model_generation(
                                                           ~~~~~~~~~~~~~~~~~~~~~^
         params=params,
@@ -255,13 +255,13 @@ Traceback (most recent call last):
         ^^^^^^^^^^^^^^^^^^^^^^^^
     )
     ^
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15428, in _run_model_generation
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15698, in _run_model_generation
     formatted_prompt = _prepare_generation_prompt(
         params=params,
     ...<3 lines>...
         phase_timer=phase_timer,
     )
-  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15228, in _prepare_generation_prompt
+  File "/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py", line 15498, in _prepare_generation_prompt
     raise _tag_exception_failure_phase(ValueError(message), phase) from preflight_err
 ValueError: Model preflight failed for mlx-community/MolmoPoint-8B-fp16: Loaded processor has no image_processor; expected multimodal processor.
 ```
@@ -288,8 +288,8 @@ _Token summary:_ prompt 264 tok; estimated text 4 tok; estimated non-text 260
 _Suggested next step:_ Inspect model repo config, chat template, and EOS
                        settings.
 
-_Timing:_ Load 1.44s; Gen 0.74s; Total 2.52s
-_Throughput:_ Prompt 1,168 TPS (264 tok); Gen 92.9 TPS (4 tok)
+_Timing:_ Load 2.28s; Gen 0.73s; Total 3.34s
+_Throughput:_ Prompt 1,158 TPS (264 tok); Gen 95.3 TPS (4 tok)
 _Score summary:_ ❌ F (5/100); Output too short to be useful
 _Review priority:_ watchlist (harness)
 _Review summary:_ F 5/100; Output appears truncated to about 4 tokens.;
@@ -323,8 +323,8 @@ _Token summary:_ prompt 20 tok; estimated text 4 tok; estimated non-text 16
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 0.49s; Gen 0.92s; Total 1.74s
-_Throughput:_ Prompt 255 TPS (20 tok); Gen 370 TPS (124 tok)
+_Timing:_ Load 0.73s; Gen 0.97s; Total 2.02s
+_Throughput:_ Prompt 253 TPS (20 tok); Gen 335 TPS (124 tok)
 _Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 75/100; nontext prompt burden=80%
@@ -361,8 +361,8 @@ _Token summary:_ prompt 20 tok; estimated text 4 tok; estimated non-text 16
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 0.57s; Gen 1.06s; Total 1.95s
-_Throughput:_ Prompt 180 TPS (20 tok); Gen 115 TPS (51 tok)
+_Timing:_ Load 0.95s; Gen 1.06s; Total 2.34s
+_Throughput:_ Prompt 175 TPS (20 tok); Gen 114 TPS (51 tok)
 _Score summary:_ ✅ B (74/100); Keywords are not specific or diverse enough
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 74/100; nontext prompt burden=80%
@@ -394,8 +394,8 @@ _Token summary:_ prompt 85 tok; estimated text 4 tok; estimated non-text 81
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 0.58s; Gen 1.10s; Total 2.01s
-_Throughput:_ Prompt 1,399 TPS (85 tok); Gen 185 TPS (117 tok)
+_Timing:_ Load 0.78s; Gen 1.08s; Total 2.18s
+_Throughput:_ Prompt 1,447 TPS (85 tok); Gen 188 TPS (117 tok)
 _Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 75/100; nontext prompt burden=95%
@@ -432,8 +432,8 @@ _Token summary:_ prompt 275 tok; estimated text 4 tok; estimated non-text 271
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 0.48s; Gen 1.38s; Total 2.18s
-_Throughput:_ Prompt 3,301 TPS (275 tok); Gen 328 TPS (292 tok)
+_Timing:_ Load 0.71s; Gen 1.37s; Total 2.40s
+_Throughput:_ Prompt 3,363 TPS (275 tok); Gen 331 TPS (292 tok)
 _Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 75/100; nontext prompt burden=99%
@@ -489,8 +489,8 @@ _Token summary:_ prompt 768 tok; estimated text 4 tok; estimated non-text 764
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 0.86s; Gen 1.57s; Total 2.76s
-_Throughput:_ Prompt 3,389 TPS (768 tok); Gen 59.3 TPS (53 tok)
+_Timing:_ Load 1.02s; Gen 1.57s; Total 2.91s
+_Throughput:_ Prompt 3,477 TPS (768 tok); Gen 59.2 TPS (53 tok)
 _Score summary:_ ✅ B (72/100); Keywords are not specific or diverse enough
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 72/100; nontext prompt burden=99%
@@ -525,8 +525,8 @@ _Suggested next step:_ Treat this as a prompt-budget issue first; nontext
                        prompt burden is 100% and the output stays weak under
                        that load.
 
-_Timing:_ Load 1.18s; Gen 1.68s; Total 3.19s
-_Throughput:_ Prompt 3,705 TPS (4,101 tok); Gen 81.1 TPS (3 tok)
+_Timing:_ Load 1.15s; Gen 1.70s; Total 3.18s
+_Throughput:_ Prompt 3,657 TPS (4,101 tok); Gen 80.3 TPS (3 tok)
 _Score summary:_ ❌ F (5/100); Output too short to be useful
 _Review priority:_ watchlist (harness, long context)
 _Review summary:_ F 5/100; Output appears truncated to about 3 tokens.; At
@@ -564,8 +564,8 @@ _Token summary:_ prompt 24 tok; estimated text 4 tok; estimated non-text 20
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 0.59s; Gen 2.21s; Total 3.14s
-_Throughput:_ Prompt 265 TPS (24 tok); Gen 358 TPS (445 tok)
+_Timing:_ Load 1.06s; Gen 2.27s; Total 3.68s
+_Throughput:_ Prompt 273 TPS (24 tok); Gen 360 TPS (445 tok)
 _Score summary:_ ✅ B (74/100); Keywords are not specific or diverse enough
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 74/100; nontext prompt burden=83%
@@ -632,8 +632,8 @@ _Token summary:_ prompt 95 tok; estimated text 4 tok; estimated non-text 91
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 0.61s; Gen 2.96s; Total 3.90s
-_Throughput:_ Prompt 310 TPS (95 tok); Gen 131 TPS (266 tok)
+_Timing:_ Load 0.68s; Gen 3.00s; Total 4.01s
+_Throughput:_ Prompt 308 TPS (95 tok); Gen 129 TPS (266 tok)
 _Score summary:_ ✅ B (70/100); Keywords are not specific or diverse enough
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 70/100; nontext prompt burden=96%
@@ -685,8 +685,8 @@ _Token summary:_ prompt 2326 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 1.93s; Gen 3.08s; Total 5.34s
-_Throughput:_ Prompt 2,283 TPS (2,326 tok); Gen 33.0 TPS (48 tok)
+_Timing:_ Load 2.00s; Gen 3.08s; Total 5.42s
+_Throughput:_ Prompt 2,268 TPS (2,326 tok); Gen 33.2 TPS (48 tok)
 _Score summary:_ ✅ B (73/100); Keywords are not specific or diverse enough
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 73/100; nontext prompt burden=100%
@@ -720,8 +720,8 @@ _Token summary:_ prompt 278 tok; estimated text 4 tok; estimated non-text 274
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 2.35s; Gen 3.21s; Total 5.92s
-_Throughput:_ Prompt 704 TPS (278 tok); Gen 115 TPS (267 tok)
+_Timing:_ Load 2.68s; Gen 3.29s; Total 6.32s
+_Throughput:_ Prompt 708 TPS (278 tok); Gen 111 TPS (267 tok)
 _Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 75/100; nontext prompt burden=99%
@@ -751,43 +751,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-gemma-4-31b-bf16"></a>
-
-### ✅ mlx-community/gemma-4-31b-bf16
-
-_Recommendation:_ avoid for now; review verdict: harness
-_Key signals:_ Output appears truncated to about 5 tokens.; nontext prompt
-               burden=98%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model-config`; harness signal
-                      `prompt_template`
-_Token summary:_ prompt 266 tok; estimated text 4 tok; estimated non-text 262
-                 tok; generated 5 tok; requested max 500 tok; stop reason
-                 completed
-_Suggested next step:_ Inspect model repo config, chat template, and EOS
-                       settings.
-
-_Timing:_ Load 6.07s; Gen 3.32s; Total 9.72s
-_Throughput:_ Prompt 119 TPS (266 tok); Gen 9.07 TPS (5 tok)
-_Score summary:_ ❌ F (5/100); Output too short to be useful
-_Review priority:_ watchlist (harness)
-_Review summary:_ F 5/100; Output appears truncated to about 5 tokens.;
-                  nontext prompt burden=98%
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> in one sentence.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️HARNESS:prompt_template
-- output:truncated(5tok)
-
----
-
 <a id="model-mlx-community-ministral-3-3b-instruct-2512-4bit"></a>
 
 ### ✅ mlx-community/Ministral-3-3B-Instruct-2512-4bit
@@ -804,8 +767,8 @@ _Token summary:_ prompt 2629 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 0.99s; Gen 3.51s; Total 4.85s
-_Throughput:_ Prompt 2,521 TPS (2,629 tok); Gen 187 TPS (355 tok)
+_Timing:_ Load 1.55s; Gen 3.42s; Total 5.32s
+_Throughput:_ Prompt 2,682 TPS (2,629 tok); Gen 187 TPS (355 tok)
 _Score summary:_ ✅ B (68/100); Missing requested structure
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 68/100; nontext prompt burden=100%
@@ -870,8 +833,8 @@ _Token summary:_ prompt 2174 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 0.93s; Gen 4.03s; Total 5.30s
-_Throughput:_ Prompt 989 TPS (2,174 tok); Gen 62.5 TPS (74 tok)
+_Timing:_ Load 1.16s; Gen 4.15s; Total 5.65s
+_Throughput:_ Prompt 948 TPS (2,174 tok); Gen 61.9 TPS (74 tok)
 _Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 75/100; nontext prompt burden=100%
@@ -905,8 +868,8 @@ _Token summary:_ prompt 1195 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 0.39s; Gen 4.32s; Total 5.05s
-_Throughput:_ Prompt 3,190 TPS (1,195 tok); Gen 125 TPS (420 tok)
+_Timing:_ Load 0.71s; Gen 4.25s; Total 5.27s
+_Throughput:_ Prompt 3,079 TPS (1,195 tok); Gen 128 TPS (420 tok)
 _Score summary:_ 🟡 C (65/100); Keywords are not specific or diverse enough
 _Review summary:_ C 65/100; nontext prompt burden=100%
 
@@ -953,6 +916,43 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-gemma-4-31b-bf16"></a>
+
+### ✅ mlx-community/gemma-4-31b-bf16
+
+_Recommendation:_ avoid for now; review verdict: harness
+_Key signals:_ Output appears truncated to about 5 tokens.; nontext prompt
+               burden=98%
+_Hint handling:_ preserves trusted hints
+_Output contract:_ requested structure looks complete
+_Cataloging fit:_ preserves trusted hints
+_Maintainer routing:_ likely owner `model-config`; harness signal
+                      `prompt_template`
+_Token summary:_ prompt 266 tok; estimated text 4 tok; estimated non-text 262
+                 tok; generated 5 tok; requested max 500 tok; stop reason
+                 completed
+_Suggested next step:_ Inspect model repo config, chat template, and EOS
+                       settings.
+
+_Timing:_ Load 7.23s; Gen 4.39s; Total 11.96s
+_Throughput:_ Prompt 81.4 TPS (266 tok); Gen 8.99 TPS (5 tok)
+_Score summary:_ ❌ F (5/100); Output too short to be useful
+_Review priority:_ watchlist (harness)
+_Review summary:_ F 5/100; Output appears truncated to about 5 tokens.;
+                  nontext prompt burden=98%
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> in one sentence.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️HARNESS:prompt_template
+- output:truncated(5tok)
+
+---
+
 <a id="model-mlx-community-smolvlm-instruct-bf16"></a>
 
 ### ✅ mlx-community/SmolVLM-Instruct-bf16
@@ -969,8 +969,8 @@ _Token summary:_ prompt 1195 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 0.64s; Gen 4.49s; Total 5.46s
-_Throughput:_ Prompt 3,154 TPS (1,195 tok); Gen 121 TPS (420 tok)
+_Timing:_ Load 0.63s; Gen 4.41s; Total 5.38s
+_Throughput:_ Prompt 3,177 TPS (1,195 tok); Gen 123 TPS (420 tok)
 _Score summary:_ 🟡 C (65/100); Keywords are not specific or diverse enough
 _Review summary:_ C 65/100; nontext prompt burden=100%
 
@@ -1033,8 +1033,8 @@ _Token summary:_ prompt 1029 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 1.59s; Gen 5.29s; Total 7.22s
-_Throughput:_ Prompt 1,326 TPS (1,029 tok); Gen 34.6 TPS (135 tok)
+_Timing:_ Load 1.80s; Gen 5.31s; Total 7.44s
+_Throughput:_ Prompt 1,321 TPS (1,029 tok); Gen 34.6 TPS (135 tok)
 _Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 75/100; nontext prompt burden=100%
@@ -1071,8 +1071,8 @@ _Token summary:_ prompt 272 tok; estimated text 4 tok; estimated non-text 268
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 2.19s; Gen 5.63s; Total 8.16s
-_Throughput:_ Prompt 873 TPS (272 tok); Gen 48.8 TPS (237 tok)
+_Timing:_ Load 2.35s; Gen 5.63s; Total 8.31s
+_Throughput:_ Prompt 876 TPS (272 tok); Gen 48.8 TPS (237 tok)
 _Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 75/100; nontext prompt burden=99%
@@ -1121,8 +1121,8 @@ _Token summary:_ prompt 1804 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 1.77s; Gen 5.76s; Total 7.86s
-_Throughput:_ Prompt 1,348 TPS (1,804 tok); Gen 32.4 TPS (125 tok)
+_Timing:_ Load 2.27s; Gen 5.80s; Total 8.40s
+_Throughput:_ Prompt 1,343 TPS (1,804 tok); Gen 32.1 TPS (125 tok)
 _Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 75/100; nontext prompt burden=100%
@@ -1137,50 +1137,6 @@ _Review summary:_ B 75/100; nontext prompt burden=100%
 > bed with a large moss-covered rock at its base. A gravel path leads to the
 > platform, and in the background, there is a wooden bridge over the pond. The
 > sky is overcast, giving the scene a calm and peaceful atmosphere.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-pixtral-12b-8bit"></a>
-
-### ✅ mlx-community/pixtral-12b-8bit
-
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 2887 tok; estimated text 4 tok; estimated non-text
-                 2883 tok; generated 167 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 1.63s; Gen 6.42s; Total 8.39s
-_Throughput:_ Prompt 1,772 TPS (2,887 tok); Gen 39.2 TPS (167 tok)
-_Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 75/100; nontext prompt burden=100%
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> The image captures a serene scene in a park. Dominating the foreground is a
-> small tree, its branches bare, standing on a patch of vibrant green grass.
-> The tree is surrounded by a large moss-covered rock, adding a touch of
-> ruggedness to the otherwise tranquil setting.
->
-> Beyond the tree, a small body of water stretches out, reflecting the
-> overcast sky above. A stone bridge arches over the water, connecting the two
-> sides of the park. A solitary figure can be seen standing on the bridge,
-> adding a sense of scale and life to the scene.
->
-> In the distance, a variety of trees and shrubs dot the landscape, their
-> green hues contrasting with the gray of the overcast sky. The overall mood
-> of the image is one of tranquility and solitude, a quiet moment frozen in
-> time in a park setting.
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 _Quality Status:_ no quality issues detected in this run
@@ -1203,8 +1159,8 @@ _Token summary:_ prompt 1011 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 1.94s; Gen 6.56s; Total 8.84s
-_Throughput:_ Prompt 933 TPS (1,011 tok); Gen 72.6 TPS (357 tok)
+_Timing:_ Load 2.56s; Gen 6.13s; Total 9.00s
+_Throughput:_ Prompt 1,275 TPS (1,011 tok); Gen 74.3 TPS (357 tok)
 _Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
 _Review priority:_ watchlist (reasoning leak)
 _Review summary:_ B 75/100; nontext prompt burden=100%; reasoning leak
@@ -1245,6 +1201,50 @@ _Review summary:_ B 75/100; nontext prompt burden=100%; reasoning leak
 
 ---
 
+<a id="model-mlx-community-pixtral-12b-8bit"></a>
+
+### ✅ mlx-community/pixtral-12b-8bit
+
+_Recommendation:_ recommended; review verdict: clean
+_Key signals:_ nontext prompt burden=100%
+_Hint handling:_ preserves trusted hints
+_Output contract:_ requested structure looks complete
+_Cataloging fit:_ preserves trusted hints
+_Maintainer routing:_ likely owner `model`
+_Token summary:_ prompt 2887 tok; estimated text 4 tok; estimated non-text
+                 2883 tok; generated 167 tok; requested max 500 tok; stop
+                 reason completed
+_Suggested next step:_ Treat as a model-quality limitation for this prompt and
+                       image.
+
+_Timing:_ Load 1.86s; Gen 6.40s; Total 8.59s
+_Throughput:_ Prompt 1,774 TPS (2,887 tok); Gen 39.3 TPS (167 tok)
+_Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
+_Review priority:_ strong candidate for first-pass review
+_Review summary:_ B 75/100; nontext prompt burden=100%
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> The image captures a serene scene in a park. Dominating the foreground is a
+> small tree, its branches bare, standing on a patch of vibrant green grass.
+> The tree is surrounded by a large moss-covered rock, adding a touch of
+> ruggedness to the otherwise tranquil setting.
+>
+> Beyond the tree, a small body of water stretches out, reflecting the
+> overcast sky above. A stone bridge arches over the water, connecting the two
+> sides of the park. A solitary figure can be seen standing on the bridge,
+> adding a sense of scale and life to the scene.
+>
+> In the distance, a variety of trees and shrubs dot the landscape, their
+> green hues contrasting with the gray of the overcast sky. The overall mood
+> of the image is one of tranquility and solitude, a quiet moment frozen in
+> time in a park setting.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
 <a id="model-mlx-community-paligemma2-3b-ft-docci-448-bf16"></a>
 
 ### ✅ mlx-community/paligemma2-3b-ft-docci-448-bf16
@@ -1261,8 +1261,8 @@ _Token summary:_ prompt 1029 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 1.46s; Gen 6.88s; Total 8.67s
-_Throughput:_ Prompt 2,781 TPS (1,029 tok); Gen 19.7 TPS (118 tok)
+_Timing:_ Load 2.11s; Gen 6.86s; Total 9.30s
+_Throughput:_ Prompt 2,784 TPS (1,029 tok); Gen 19.7 TPS (118 tok)
 _Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 75/100; nontext prompt burden=100%
@@ -1298,8 +1298,8 @@ _Token summary:_ prompt 278 tok; estimated text 4 tok; estimated non-text 274
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 2.57s; Gen 6.99s; Total 9.90s
-_Throughput:_ Prompt 385 TPS (278 tok); Gen 27.4 TPS (158 tok)
+_Timing:_ Load 2.70s; Gen 7.11s; Total 10.16s
+_Throughput:_ Prompt 381 TPS (278 tok); Gen 26.9 TPS (158 tok)
 _Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 75/100; nontext prompt burden=99%
@@ -1338,8 +1338,8 @@ _Token summary:_ prompt 2630 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 1.36s; Gen 7.32s; Total 9.04s
-_Throughput:_ Prompt 1,246 TPS (2,630 tok); Gen 66.6 TPS (311 tok)
+_Timing:_ Load 1.76s; Gen 7.12s; Total 9.22s
+_Throughput:_ Prompt 1,347 TPS (2,630 tok); Gen 67.1 TPS (311 tok)
 _Score summary:_ ✅ B (75/100); Missing requested structure
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 75/100; nontext prompt burden=100%
@@ -1399,8 +1399,8 @@ _Token summary:_ prompt 2630 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 1.38s; Gen 8.17s; Total 9.89s
-_Throughput:_ Prompt 1,210 TPS (2,630 tok); Gen 63.2 TPS (344 tok)
+_Timing:_ Load 1.90s; Gen 8.33s; Total 10.56s
+_Throughput:_ Prompt 1,142 TPS (2,630 tok); Gen 63.0 TPS (344 tok)
 _Score summary:_ ✅ B (68/100); Missing requested structure
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 68/100; nontext prompt burden=100%
@@ -1464,8 +1464,8 @@ _Token summary:_ prompt 2097 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Inspect decode cleanup; tokenizer markers are leaking
                        into user-facing text.
 
-_Timing:_ Load 2.10s; Gen 9.17s; Total 11.64s
-_Throughput:_ Prompt 662 TPS (2,097 tok); Gen 31.6 TPS (172 tok)
+_Timing:_ Load 2.52s; Gen 9.22s; Total 12.11s
+_Throughput:_ Prompt 662 TPS (2,097 tok); Gen 31.3 TPS (172 tok)
 _Score summary:_ ❌ F (0/100); Output too short to be useful
 _Review priority:_ watchlist (harness)
 _Review summary:_ F 0/100; Tokenizer space-marker artifacts (for example Ġ)
@@ -1503,8 +1503,8 @@ _Token summary:_ prompt 768 tok; estimated text 4 tok; estimated non-text 764
 _Suggested next step:_ Inspect EOS/stop-token stripping; control tokens are
                        leaking into user-facing text.
 
-_Timing:_ Load 0.93s; Gen 9.19s; Total 10.45s
-_Throughput:_ Prompt 3,407 TPS (768 tok); Gen 58.7 TPS (500 tok)
+_Timing:_ Load 1.13s; Gen 9.46s; Total 10.92s
+_Throughput:_ Prompt 3,303 TPS (768 tok); Gen 57.0 TPS (500 tok)
 _Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
 _Review priority:_ watchlist (harness)
 _Review summary:_ B 75/100; Special control token &lt;|end|&gt; appeared in
@@ -1575,8 +1575,8 @@ _Token summary:_ prompt 2887 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 2.56s; Gen 10.29s; Total 13.17s
-_Throughput:_ Prompt 1,798 TPS (2,887 tok); Gen 20.3 TPS (166 tok)
+_Timing:_ Load 2.59s; Gen 10.47s; Total 13.38s
+_Throughput:_ Prompt 1,792 TPS (2,887 tok); Gen 19.9 TPS (166 tok)
 _Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 75/100; nontext prompt burden=100%
@@ -1603,6 +1603,70 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
+<a id="model-mlx-community-internvl3-8b-bf16"></a>
+
+### ✅ mlx-community/InternVL3-8B-bf16
+
+_Recommendation:_ recommended; review verdict: clean
+_Key signals:_ nontext prompt burden=100%
+_Hint handling:_ preserves trusted hints
+_Output contract:_ requested structure looks complete
+_Cataloging fit:_ preserves trusted hints
+_Maintainer routing:_ likely owner `model`
+_Token summary:_ prompt 1804 tok; estimated text 4 tok; estimated non-text
+                 1800 tok; generated 344 tok; requested max 500 tok; stop
+                 reason completed
+_Suggested next step:_ Treat as a model-quality limitation for this prompt and
+                       image.
+
+_Timing:_ Load 2.31s; Gen 11.17s; Total 13.81s
+_Throughput:_ Prompt 2,475 TPS (1,804 tok); Gen 34.8 TPS (344 tok)
+_Score summary:_ ✅ B (75/100); Missing requested structure
+_Review priority:_ strong candidate for first-pass review
+_Review summary:_ B 75/100; nontext prompt burden=100%
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> The image depicts a serene park scene with a person standing on a wooden
+> &#8203;platform extending over a body of water. Here's a detailed description:
+>
+> 1&#46; &#42;&#42;Foreground:&#42;&#42;
+> &#45; A young pine tree is prominently featured in the foreground, planted in
+> a small, circular patch of soil. The tree has a few branches with green
+> needles.
+> &#45; The tree is positioned next to a large, moss-covered rock, which adds a
+> natural element to the scene.
+>
+> 2&#46; &#42;&#42;Middle Ground:&#42;&#42;
+> &#45; A gravel path leads from the foreground towards the water, curving
+> slightly to the left.
+> &#45; The wooden platform extends from the gravel path into the water, where
+> the person is standing. The platform is made of wooden planks and appears to
+> be partially submerged.
+> &#45; The person is wearing a dark hooded jacket, dark pants, and boots. They
+> are standing with their back to the camera, looking out over the water.
+>
+> 3&#46; &#42;&#42;Background:&#42;&#42;
+> &#45; The body of water is calm, reflecting the overcast sky.
+> &#45; On the far side of the water, there is a small wooden bridge with a
+> curved design, leading to a grassy area with various trees and shrubs.
+> &#45; The landscape includes a mix of evergreen and deciduous trees, some of
+> which are bare, suggesting it might be late fall or early spring.
+> &#45; A winding path can be seen in the background, leading through the park
+> and disappearing into the trees.
+>
+> 4&#46; &#42;&#42;Sky:&#42;&#42;
+> &#45; The sky is overcast, with a uniform gray color, indicating cloudy
+> weather.
+>
+> The overall atmosphere of the image is peaceful and contemplative, with the
+> person seemingly enjoying the quiet beauty of the park.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
 <a id="model-mlx-community-ernie-45-vl-28b-a3b-thinking-bf16"></a>
 
 ### ✅ mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16
@@ -1619,8 +1683,8 @@ _Token summary:_ prompt 1293 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 4.96s; Gen 10.56s; Total 15.87s
-_Throughput:_ Prompt 859 TPS (1,293 tok); Gen 60.2 TPS (500 tok)
+_Timing:_ Load 6.22s; Gen 11.60s; Total 18.18s
+_Throughput:_ Prompt 531 TPS (1,293 tok); Gen 59.4 TPS (500 tok)
 _Score summary:_ 🟡 C (65/100); Missing requested structure
 _Review priority:_ watchlist (cutoff)
 _Review summary:_ C 65/100; hit token cap (500); nontext prompt burden=100%
@@ -1670,139 +1734,6 @@ _Review summary:_ C 65/100; hit token cap (500); nontext prompt burden=100%
 
 ---
 
-<a id="model-mlx-community-internvl3-8b-bf16"></a>
-
-### ✅ mlx-community/InternVL3-8B-bf16
-
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 1804 tok; estimated text 4 tok; estimated non-text
-                 1800 tok; generated 344 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 1.76s; Gen 11.25s; Total 13.34s
-_Throughput:_ Prompt 2,467 TPS (1,804 tok); Gen 34.5 TPS (344 tok)
-_Score summary:_ ✅ B (75/100); Missing requested structure
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 75/100; nontext prompt burden=100%
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> The image depicts a serene park scene with a person standing on a wooden
-> &#8203;platform extending over a body of water. Here's a detailed description:
->
-> 1&#46; &#42;&#42;Foreground:&#42;&#42;
-> &#45; A young pine tree is prominently featured in the foreground, planted in
-> a small, circular patch of soil. The tree has a few branches with green
-> needles.
-> &#45; The tree is positioned next to a large, moss-covered rock, which adds a
-> natural element to the scene.
->
-> 2&#46; &#42;&#42;Middle Ground:&#42;&#42;
-> &#45; A gravel path leads from the foreground towards the water, curving
-> slightly to the left.
-> &#45; The wooden platform extends from the gravel path into the water, where
-> the person is standing. The platform is made of wooden planks and appears to
-> be partially submerged.
-> &#45; The person is wearing a dark hooded jacket, dark pants, and boots. They
-> are standing with their back to the camera, looking out over the water.
->
-> 3&#46; &#42;&#42;Background:&#42;&#42;
-> &#45; The body of water is calm, reflecting the overcast sky.
-> &#45; On the far side of the water, there is a small wooden bridge with a
-> curved design, leading to a grassy area with various trees and shrubs.
-> &#45; The landscape includes a mix of evergreen and deciduous trees, some of
-> which are bare, suggesting it might be late fall or early spring.
-> &#45; A winding path can be seen in the background, leading through the park
-> and disappearing into the trees.
->
-> 4&#46; &#42;&#42;Sky:&#42;&#42;
-> &#45; The sky is overcast, with a uniform gray color, indicating cloudy
-> weather.
->
-> The overall atmosphere of the image is peaceful and contemplative, with the
-> person seemingly enjoying the quiet beauty of the park.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
-<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
-
-### ✅ mlx-community/gemma-3-27b-it-qat-4bit
-
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=99%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 273 tok; estimated text 4 tok; estimated non-text 269
-                 tok; generated 320 tok; requested max 500 tok; stop reason
-                 completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 2.33s; Gen 12.38s; Total 15.05s
-_Throughput:_ Prompt 395 TPS (273 tok); Gen 28.6 TPS (320 tok)
-_Score summary:_ 🏆 A (85/100); Missing requested structure
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ A 85/100; nontext prompt burden=99%
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> &#8203;Here's a description of the picture:
->
-> &#8203;&#42;&#42;Overall Impression:&#42;&#42;
->
-> The image depicts a serene and picturesque landscape, likely a park or
-> garden with a Japanese-inspired design. The scene is calm and somewhat
-> overcast, with a focus on a small pond or lake and a lone figure.
->
-> &#8203;&#42;&#42;Foreground:&#42;&#42;
->
-> &#42;   A small, well-maintained grassy area slopes down towards the water.
-> &#42;   A young pine tree with a distinctive shape is prominently featured, with
-> a large moss-covered rock at its base.
-> &#42;   A stone path leads to a small wooden bridge or dock extending into the
-> water.
->
-> &#8203;&#42;&#42;Midground:&#42;&#42;
->
-> &#42;   A calm pond or lake dominates the midground. The water is dark and
-> reflective.
-> &#42;   A person is standing on the stone path near the bridge, appearing to be
-> looking out over the water. They are wearing a dark hooded jacket.
-> &#42;   The pond is surrounded by lush greenery, including various shrubs and
-> trees.
-> &#42;   A small wooden bridge is visible, connecting different parts of the
-> garden.
->
-> &#8203;&#42;&#42;Background:&#42;&#42;
->
-> &#42;   A dense forest of evergreen trees forms the backdrop of the scene.
-> &#42;   The sky is overcast, creating a soft, diffused light.
-> &#42;   The overall color palette is dominated by greens, browns, and grays,
-> with a sense of tranquility and natural beauty.
->
-> &#8203;&#42;&#42;Overall Atmosphere:&#42;&#42;
->
-> The image evokes a sense of peace, solitude, and natural beauty. The
-> Japanese garden design elements, combined with the calm water and overcast
-> sky, create a relaxing and contemplative atmosphere.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
 <a id="model-mlx-community-glm-46v-flash-mxfp4"></a>
 
 ### ✅ mlx-community/GLM-4.6V-Flash-mxfp4
@@ -1821,8 +1752,8 @@ _Token summary:_ prompt 6091 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Inspect EOS/stop-token stripping; control tokens are
                        leaking into user-facing text.
 
-_Timing:_ Load 1.31s; Gen 12.78s; Total 14.43s
-_Throughput:_ Prompt 1,136 TPS (6,091 tok); Gen 72.0 TPS (500 tok)
+_Timing:_ Load 1.56s; Gen 12.72s; Total 14.63s
+_Throughput:_ Prompt 1,140 TPS (6,091 tok); Gen 72.4 TPS (500 tok)
 _Score summary:_ ✅ B (80/100); Missing requested structure
 _Review priority:_ watchlist (harness, reasoning leak)
 _Review summary:_ B 80/100; Special control token &lt;/think&gt; appeared in
@@ -1891,6 +1822,75 @@ _Review summary:_ B 80/100; Special control token &lt;/think&gt; appeared in
 
 ---
 
+<a id="model-mlx-community-gemma-3-27b-it-qat-4bit"></a>
+
+### ✅ mlx-community/gemma-3-27b-it-qat-4bit
+
+_Recommendation:_ recommended; review verdict: clean
+_Key signals:_ nontext prompt burden=99%
+_Hint handling:_ preserves trusted hints
+_Output contract:_ requested structure looks complete
+_Cataloging fit:_ preserves trusted hints
+_Maintainer routing:_ likely owner `model`
+_Token summary:_ prompt 273 tok; estimated text 4 tok; estimated non-text 269
+                 tok; generated 320 tok; requested max 500 tok; stop reason
+                 completed
+_Suggested next step:_ Treat as a model-quality limitation for this prompt and
+                       image.
+
+_Timing:_ Load 2.72s; Gen 13.52s; Total 16.60s
+_Throughput:_ Prompt 385 TPS (273 tok); Gen 26.0 TPS (320 tok)
+_Score summary:_ 🏆 A (85/100); Missing requested structure
+_Review priority:_ strong candidate for first-pass review
+_Review summary:_ A 85/100; nontext prompt burden=99%
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> &#8203;Here's a description of the picture:
+>
+> &#8203;&#42;&#42;Overall Impression:&#42;&#42;
+>
+> The image depicts a serene and picturesque landscape, likely a park or
+> garden with a Japanese-inspired design. The scene is calm and somewhat
+> overcast, with a focus on a small pond or lake and a lone figure.
+>
+> &#8203;&#42;&#42;Foreground:&#42;&#42;
+>
+> &#42;   A small, well-maintained grassy area slopes down towards the water.
+> &#42;   A young pine tree with a distinctive shape is prominently featured, with
+> a large moss-covered rock at its base.
+> &#42;   A stone path leads to a small wooden bridge or dock extending into the
+> water.
+>
+> &#8203;&#42;&#42;Midground:&#42;&#42;
+>
+> &#42;   A calm pond or lake dominates the midground. The water is dark and
+> reflective.
+> &#42;   A person is standing on the stone path near the bridge, appearing to be
+> looking out over the water. They are wearing a dark hooded jacket.
+> &#42;   The pond is surrounded by lush greenery, including various shrubs and
+> trees.
+> &#42;   A small wooden bridge is visible, connecting different parts of the
+> garden.
+>
+> &#8203;&#42;&#42;Background:&#42;&#42;
+>
+> &#42;   A dense forest of evergreen trees forms the backdrop of the scene.
+> &#42;   The sky is overcast, creating a soft, diffused light.
+> &#42;   The overall color palette is dominated by greens, browns, and grays,
+> with a sense of tranquility and natural beauty.
+>
+> &#8203;&#42;&#42;Overall Atmosphere:&#42;&#42;
+>
+> The image evokes a sense of peace, solitude, and natural beauty. The
+> Japanese garden design elements, combined with the calm water and overcast
+> sky, create a relaxing and contemplative atmosphere.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
 <a id="model-mlx-community-apriel-15-15b-thinker-6bit-mlx"></a>
 
 ### ✅ mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX
@@ -1908,8 +1908,8 @@ _Token summary:_ prompt 2979 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 1.60s; Gen 14.45s; Total 16.39s
-_Throughput:_ Prompt 1,460 TPS (2,979 tok); Gen 42.1 TPS (500 tok)
+_Timing:_ Load 1.82s; Gen 14.52s; Total 16.68s
+_Throughput:_ Prompt 1,448 TPS (2,979 tok); Gen 41.9 TPS (500 tok)
 _Score summary:_ ✅ B (80/100); Keywords are not specific or diverse enough
 _Review priority:_ watchlist (cutoff, degeneration, reasoning leak)
 _Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%;
@@ -1987,8 +1987,8 @@ _Token summary:_ prompt 6091 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Inspect EOS/stop-token stripping; control tokens are
                        leaking into user-facing text.
 
-_Timing:_ Load 1.40s; Gen 14.96s; Total 16.69s
-_Throughput:_ Prompt 1,126 TPS (6,091 tok); Gen 55.0 TPS (500 tok)
+_Timing:_ Load 1.53s; Gen 14.89s; Total 16.77s
+_Throughput:_ Prompt 1,145 TPS (6,091 tok); Gen 54.9 TPS (500 tok)
 _Score summary:_ ✅ B (80/100); Missing requested structure
 _Review priority:_ watchlist (harness, reasoning leak)
 _Review summary:_ B 80/100; Special control token &lt;/think&gt; appeared in
@@ -2058,6 +2058,57 @@ _Review summary:_ B 80/100; Special control token &lt;/think&gt; appeared in
 
 ---
 
+<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
+
+### ✅ mlx-community/Molmo-7B-D-0924-8bit
+
+_Recommendation:_ recommended; review verdict: clean
+_Key signals:_ nontext prompt burden=100%
+_Hint handling:_ preserves trusted hints
+_Output contract:_ requested structure looks complete
+_Cataloging fit:_ preserves trusted hints
+_Maintainer routing:_ likely owner `model`
+_Token summary:_ prompt 1207 tok; estimated text 4 tok; estimated non-text
+                 1203 tok; generated 205 tok; requested max 500 tok; stop
+                 reason completed
+_Suggested next step:_ Treat as a model-quality limitation for this prompt and
+                       image.
+
+_Timing:_ Load 1.25s; Gen 18.68s; Total 20.27s
+_Throughput:_ Prompt 86.8 TPS (1,207 tok); Gen 52.1 TPS (205 tok)
+_Score summary:_ ✅ B (80/100); Keywords are not specific or diverse enough
+_Review priority:_ strong candidate for first-pass review
+_Review summary:_ B 80/100; nontext prompt burden=100%
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> in detail
+>
+> This picture captures a serene autumn scene at a park. In the foreground, a
+> small pine tree stands on a grassy area, its branches adorned with pine
+> needles. The tree is surrounded by a few scattered leaves, hinting at the
+> fall season.
+>
+> A concrete walkway winds through the park, leading to a wooden dock that
+> extends into a calm body of water. A person dressed in a blue jacket and
+> brown boots is standing on the dock, gazing out at the water.
+>
+> The water is dark and reflective, mirroring the overcast sky above. In the
+> background, a bridge spans across the water, connecting two grassy areas.
+> The landscape is dotted with trees in various stages of autumnal
+> transformation, some with green leaves while others are bare or turning
+> brown.
+>
+> The sky is a light gray, creating a peaceful and somewhat melancholic
+> atmosphere. The overall color palette consists of muted greens, browns,
+> grays, and blues, perfectly capturing the essence of a quiet autumn day in
+> the park.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+_Quality Status:_ no quality issues detected in this run
+
+---
+
 <a id="model-mlx-community-paligemma2-10b-ft-docci-448-bf16"></a>
 
 ### ✅ mlx-community/paligemma2-10b-ft-docci-448-bf16
@@ -2074,8 +2125,8 @@ _Token summary:_ prompt 1029 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 2.46s; Gen 20.06s; Total 22.85s
-_Throughput:_ Prompt 936 TPS (1,029 tok); Gen 5.43 TPS (100 tok)
+_Timing:_ Load 2.84s; Gen 20.05s; Total 23.23s
+_Throughput:_ Prompt 926 TPS (1,029 tok); Gen 5.44 TPS (100 tok)
 _Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 75/100; nontext prompt burden=100%
@@ -2110,8 +2161,8 @@ _Token summary:_ prompt 14 tok; estimated text 4 tok; estimated non-text 10
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 1.63s; Gen 21.70s; Total 23.66s
-_Throughput:_ Prompt 10.4 TPS (14 tok); Gen 21.2 TPS (421 tok)
+_Timing:_ Load 1.64s; Gen 21.78s; Total 23.74s
+_Throughput:_ Prompt 10.4 TPS (14 tok); Gen 21.1 TPS (421 tok)
 _Score summary:_ ✅ B (73/100); Missing requested structure
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 73/100; nontext prompt burden=71%
@@ -2164,9 +2215,9 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-molmo-7b-d-0924-8bit"></a>
+<a id="model-mlx-community-molmo-7b-d-0924-bf16"></a>
 
-### ✅ mlx-community/Molmo-7B-D-0924-8bit
+### ✅ mlx-community/Molmo-7B-D-0924-bf16
 
 _Recommendation:_ recommended; review verdict: clean
 _Key signals:_ nontext prompt burden=100%
@@ -2180,8 +2231,8 @@ _Token summary:_ prompt 1207 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 1.21s; Gen 23.34s; Total 24.90s
-_Throughput:_ Prompt 65.0 TPS (1,207 tok); Gen 52.4 TPS (205 tok)
+_Timing:_ Load 1.95s; Gen 22.41s; Total 24.70s
+_Throughput:_ Prompt 81.7 TPS (1,207 tok); Gen 30.1 TPS (205 tok)
 _Score summary:_ ✅ B (80/100); Keywords are not specific or diverse enough
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 80/100; nontext prompt burden=100%
@@ -2231,8 +2282,8 @@ _Token summary:_ prompt 16299 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 1.09s; Gen 23.37s; Total 24.80s
-_Throughput:_ Prompt 875 TPS (16,299 tok); Gen 54.6 TPS (219 tok)
+_Timing:_ Load 1.15s; Gen 23.97s; Total 25.46s
+_Throughput:_ Prompt 848 TPS (16,299 tok); Gen 54.8 TPS (219 tok)
 _Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 75/100; nontext prompt burden=100%
@@ -2276,8 +2327,8 @@ _Token summary:_ prompt 273 tok; estimated text 4 tok; estimated non-text 269
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 3.40s; Gen 23.95s; Total 27.69s
-_Throughput:_ Prompt 326 TPS (273 tok); Gen 16.8 TPS (381 tok)
+_Timing:_ Load 3.53s; Gen 24.25s; Total 28.13s
+_Throughput:_ Prompt 325 TPS (273 tok); Gen 16.6 TPS (381 tok)
 _Score summary:_ ✅ B (80/100); Missing requested structure
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 80/100; nontext prompt burden=99%
@@ -2348,8 +2399,8 @@ _Token summary:_ prompt 6091 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Inspect EOS/stop-token stripping; control tokens are
                        leaking into user-facing text.
 
-_Timing:_ Load 5.51s; Gen 26.41s; Total 32.25s
-_Throughput:_ Prompt 498 TPS (6,091 tok); Gen 36.4 TPS (500 tok)
+_Timing:_ Load 6.94s; Gen 28.63s; Total 35.91s
+_Throughput:_ Prompt 426 TPS (6,091 tok); Gen 36.1 TPS (500 tok)
 _Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
 _Review priority:_ watchlist (harness, reasoning leak)
 _Review summary:_ B 75/100; Special control token &lt;/think&gt; appeared in
@@ -2407,58 +2458,6 @@ _Review summary:_ B 75/100; Special control token &lt;/think&gt; appeared in
 
 ---
 
-<a id="model-mlx-community-molmo-7b-d-0924-bf16"></a>
-
-### ✅ mlx-community/Molmo-7B-D-0924-bf16
-
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 1207 tok; estimated text 4 tok; estimated non-text
-                 1203 tok; generated 215 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 1.84s; Gen 27.15s; Total 29.32s
-_Throughput:_ Prompt 62.5 TPS (1,207 tok); Gen 30.7 TPS (215 tok)
-_Score summary:_ ✅ B (80/100); Keywords are not specific or diverse enough
-_Review priority:_ strong candidate for first-pass review
-_Review summary:_ B 80/100; nontext prompt burden=100%
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> in detail
->
-> This picture captures a serene autumn scene at a park. In the foreground, a
-> small pine tree stands on a grassy area, its branches adorned with pine
-> needles. The tree is surrounded by a few scattered leaves, hinting at the
-> fall season.
->
-> A concrete walkway winds through the park, leading to a wooden dock that
-> extends into a calm body of water. A person dressed in a blue jacket and
-> brown boots is standing on the dock, gazing out at the water. The stillness
-> of the water creates a mirror-like surface, reflecting the surrounding
-> landscape.
->
-> In the background, a bridge spans across the water, connecting two grassy
-> areas. The trees on these areas display a mix of green and brown foliage,
-> typical of autumn colors. Some trees are bare, having already shed their
-> leaves.
->
-> The sky is overcast with a grayish-blue hue, adding to the tranquil
-> atmosphere of the scene. The overall color palette consists of muted greens,
-> browns, grays, and blues, perfectly capturing the essence of a peaceful
-> autumn day in nature.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-_Quality Status:_ no quality issues detected in this run
-
----
-
 <a id="model-meta-llama-llama-32-11b-vision-instruct"></a>
 
 ### ✅ meta-llama/Llama-3.2-11B-Vision-Instruct
@@ -2475,8 +2474,8 @@ _Token summary:_ prompt 15 tok; estimated text 4 tok; estimated non-text 11
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 2.19s; Gen 56.54s; Total 59.06s
-_Throughput:_ Prompt 9.04 TPS (15 tok); Gen 5.07 TPS (276 tok)
+_Timing:_ Load 2.52s; Gen 57.54s; Total 60.39s
+_Throughput:_ Prompt 8.95 TPS (15 tok); Gen 4.98 TPS (276 tok)
 _Score summary:_ ✅ B (80/100); Missing requested structure
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 80/100; nontext prompt burden=73%
@@ -2514,51 +2513,6 @@ _Quality Status:_ no quality issues detected in this run
 
 ---
 
-<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
-
-### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
-
-_Recommendation:_ use with caveats; review verdict: context budget
-_Key signals:_ Output is very short relative to prompt size (0.1%), suggesting
-               possible early-stop or prompt-handling issues.; At long prompt
-               length (16299 tokens), output stayed unusually short (13
-               tokens; ratio 0.1%).; output/prompt=0.08%; nontext prompt
-               burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `mlx`; harness signal `long_context`
-_Token summary:_ prompt 16299 tok; estimated text 4 tok; estimated non-text
-                 16295 tok; generated 13 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat this as a prompt-budget issue first; nontext
-                       prompt burden is 100% and the output stays weak under
-                       that load.
-
-_Timing:_ Load 0.49s; Gen 61.16s; Total 61.98s
-_Throughput:_ Prompt 270 TPS (16,299 tok); Gen 209 TPS (13 tok)
-_Score summary:_ ❌ F (16/100); Output lacks detail
-_Review priority:_ watchlist (harness, long context)
-_Review summary:_ F 16/100; Output is very short relative to prompt size
-                  (0.1%), suggesting possible early-stop or prompt-handling
-                  issues.; At long prompt length (16299 tokens), output stayed
-                  unusually short (13 tokens; ratio 0.1%).;
-                  output/prompt=0.08%; nontext prompt burden=100%
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> I'm sorry, but the context didn't show up.
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- ⚠️REVIEW:context_budget
-- ⚠️HARNESS:long_context
-- output:output_ratio(0.1%)
-- long_context_low_ratio(0.1%;16299->13)
-
----
-
 <a id="model-mlx-community-kimi-vl-a3b-thinking-2506-bf16"></a>
 
 ### ✅ mlx-community/Kimi-VL-A3B-Thinking-2506-bf16
@@ -2575,8 +2529,8 @@ _Token summary:_ prompt 1011 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 3.27s; Gen 61.46s; Total 65.06s
-_Throughput:_ Prompt 704 TPS (1,011 tok); Gen 4.67 TPS (277 tok)
+_Timing:_ Load 3.83s; Gen 60.68s; Total 64.84s
+_Throughput:_ Prompt 760 TPS (1,011 tok); Gen 4.72 TPS (277 tok)
 _Score summary:_ ✅ B (75/100); Keywords are not specific or diverse enough
 _Review priority:_ watchlist (reasoning leak)
 _Review summary:_ B 75/100; nontext prompt burden=100%; reasoning leak
@@ -2612,6 +2566,51 @@ _Review summary:_ B 75/100; nontext prompt burden=100%; reasoning leak
 
 ---
 
+<a id="model-mlx-community-qwen2-vl-2b-instruct-4bit"></a>
+
+### ✅ mlx-community/Qwen2-VL-2B-Instruct-4bit
+
+_Recommendation:_ use with caveats; review verdict: context budget
+_Key signals:_ Output is very short relative to prompt size (0.1%), suggesting
+               possible early-stop or prompt-handling issues.; At long prompt
+               length (16299 tokens), output stayed unusually short (13
+               tokens; ratio 0.1%).; output/prompt=0.08%; nontext prompt
+               burden=100%
+_Hint handling:_ preserves trusted hints
+_Output contract:_ requested structure looks complete
+_Cataloging fit:_ preserves trusted hints
+_Maintainer routing:_ likely owner `mlx`; harness signal `long_context`
+_Token summary:_ prompt 16299 tok; estimated text 4 tok; estimated non-text
+                 16295 tok; generated 13 tok; requested max 500 tok; stop
+                 reason completed
+_Suggested next step:_ Treat this as a prompt-budget issue first; nontext
+                       prompt burden is 100% and the output stays weak under
+                       that load.
+
+_Timing:_ Load 0.69s; Gen 65.68s; Total 66.69s
+_Throughput:_ Prompt 251 TPS (16,299 tok); Gen 207 TPS (13 tok)
+_Score summary:_ ❌ F (16/100); Output lacks detail
+_Review priority:_ watchlist (harness, long context)
+_Review summary:_ F 16/100; Output is very short relative to prompt size
+                  (0.1%), suggesting possible early-stop or prompt-handling
+                  issues.; At long prompt length (16299 tokens), output stayed
+                  unusually short (13 tokens; ratio 0.1%).;
+                  output/prompt=0.08%; nontext prompt burden=100%
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> I'm sorry, but the context didn't show up.
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- ⚠️REVIEW:context_budget
+- ⚠️HARNESS:long_context
+- output:output_ratio(0.1%)
+- long_context_low_ratio(0.1%;16299->13)
+
+---
+
 <a id="model-mlx-community-qwen35-35b-a3b-4bit"></a>
 
 ### ✅ mlx-community/Qwen3.5-35B-A3B-4bit
@@ -2628,8 +2627,8 @@ _Token summary:_ prompt 16290 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 2.50s; Gen 62.24s; Total 65.08s
-_Throughput:_ Prompt 288 TPS (16,290 tok); Gen 102 TPS (500 tok)
+_Timing:_ Load 3.34s; Gen 65.68s; Total 69.37s
+_Throughput:_ Prompt 271 TPS (16,290 tok); Gen 104 TPS (500 tok)
 _Score summary:_ ✅ B (80/100); Missing requested structure
 _Review priority:_ watchlist (cutoff)
 _Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
@@ -2700,8 +2699,8 @@ _Token summary:_ prompt 16290 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 3.17s; Gen 62.83s; Total 66.34s
-_Throughput:_ Prompt 289 TPS (16,290 tok); Gen 87.3 TPS (500 tok)
+_Timing:_ Load 3.14s; Gen 65.84s; Total 69.32s
+_Throughput:_ Prompt 274 TPS (16,290 tok); Gen 88.0 TPS (500 tok)
 _Score summary:_ ✅ B (80/100); Missing requested structure
 _Review priority:_ watchlist (cutoff)
 _Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
@@ -2756,6 +2755,78 @@ _Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
 
 ---
 
+<a id="model-mlx-community-qwen35-9b-mlx-4bit"></a>
+
+### ✅ mlx-community/Qwen3.5-9B-MLX-4bit
+
+_Recommendation:_ recommended; review verdict: token cap
+_Key signals:_ hit token cap (500); nontext prompt burden=100%;
+               degeneration=repeated_punctuation: ':**...'
+_Hint handling:_ preserves trusted hints
+_Output contract:_ requested structure looks complete
+_Cataloging fit:_ preserves trusted hints
+_Maintainer routing:_ likely owner `model`
+_Token summary:_ prompt 16290 tok; estimated text 4 tok; estimated non-text
+                 16286 tok; generated 500 tok; requested max 500 tok; stop
+                 reason completed
+_Suggested next step:_ Treat as a model-quality limitation for this prompt and
+                       image.
+
+_Timing:_ Load 2.20s; Gen 71.90s; Total 74.44s
+_Throughput:_ Prompt 250 TPS (16,290 tok); Gen 84.5 TPS (500 tok)
+_Score summary:_ ✅ B (80/100); Missing requested structure
+_Review priority:_ watchlist (degeneration)
+_Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%;
+                  degeneration=repeated_punctuation: ':**...'
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> The user wants a description of the provided image.
+>
+> 1&#46;  &#42;&#42;Identify the main subject:&#42;&#42; The image shows a tranquil, somewhat
+> melancholic scene in a park or garden, likely on a rainy or overcast day.
+> 2&#46;  &#42;&#42;Break down the composition:&#42;&#42;
+> &#42;   &#42;&#42;Foreground:&#42;&#42; A small, young pine tree stands next to a large,
+> moss-covered boulder. The ground is covered in green grass.
+> &#42;   &#42;&#42;Mid-ground:&#42;&#42; A gravel path leads towards a small, circular wooden
+> pier or platform extending into a body of water (a pond or lake). A person
+> wearing a dark blue raincoat and hood is standing on this platform, looking
+> out at the water.
+> &#42;   &#42;&#42;Background:&#42;&#42; Across the water, there is a grassy bank with a
+> wooden bridge. Further back, there are trees—some evergreen (conifers) and
+> some deciduous (bare branches, suggesting late autumn or winter). The sky is
+> grey and overcast.
+> 3&#46;  &#42;&#42;Identify specific details:&#42;&#42;
+> &#42;   &#42;&#42;Weather:&#42;&#42; It looks like it might be raining or just rained. The
+> sky is grey, the grass is a bit dull green, and the person is wearing a
+> hooded coat.
+> &#42;   &#42;&#42;The Person:&#42;&#42; Standing alone, facing away from the camera, looking
+> towards the water. Wearing a dark blue coat, dark pants, and brown boots.
+> &#42;   &#42;&#42;The Water:&#42;&#42; Dark, rippled surface, reflecting the grey sky.
+> &#42;   &#42;&#42;The Bridge:&#42;&#42; A simple, arched wooden footbridge in the distance.
+> &#42;   &#42;&#42;The Trees:&#42;&#42; A mix of tall evergreens (pines/firs) and bare
+> deciduous trees. There are some yellowish-green bushes/trees on the left
+> side.
+> &#42;   &#42;&#42;The Mossy Rock:&#42;&#42; Very prominent in the bottom left corner,
+> covered in bright green moss.
+> 4&#46;  &#42;&#42;Synthesize the description:&#42;&#42;
+> &#42;   Start with the overall atmosphere (peaceful, rainy, solitary).
+> &#42;   Describe the foreground elements (pine tree, mossy rock).
+> &#42;   Move to the mid-ground (gravel path, wooden pier, the person).
+> &#42;   Describe the background (water, bridge, trees, hills).
+> &#42;   Mention the lighting/weather (overcast, grey).
+>
+> &#8203;&#42;&#42;Drafting the description (internal monologue/trial phrases):&#42;&#42;
+>
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Output degeneration (repeated_punctuation: ':\*\*...')
+- Likely capped by max token budget
+
+---
+
 <a id="model-mlx-community-qwen35-35b-a3b-bf16"></a>
 
 ### ✅ mlx-community/Qwen3.5-35B-A3B-bf16
@@ -2772,8 +2843,8 @@ _Token summary:_ prompt 16290 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 8.69s; Gen 68.90s; Total 77.93s
-_Throughput:_ Prompt 271 TPS (16,290 tok); Gen 64.1 TPS (500 tok)
+_Timing:_ Load 13.03s; Gen 79.26s; Total 92.62s
+_Throughput:_ Prompt 233 TPS (16,290 tok); Gen 61.2 TPS (500 tok)
 _Score summary:_ ✅ B (80/100); Missing requested structure
 _Review priority:_ strong candidate for first-pass review
 _Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
@@ -2828,78 +2899,6 @@ _Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
 
 ---
 
-<a id="model-mlx-community-qwen35-9b-mlx-4bit"></a>
-
-### ✅ mlx-community/Qwen3.5-9B-MLX-4bit
-
-_Recommendation:_ recommended; review verdict: token cap
-_Key signals:_ hit token cap (500); nontext prompt burden=100%;
-               degeneration=repeated_punctuation: ':**...'
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 16290 tok; estimated text 4 tok; estimated non-text
-                 16286 tok; generated 500 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 1.38s; Gen 72.01s; Total 73.74s
-_Throughput:_ Prompt 269 TPS (16,290 tok); Gen 47.2 TPS (500 tok)
-_Score summary:_ ✅ B (80/100); Missing requested structure
-_Review priority:_ watchlist (degeneration)
-_Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%;
-                  degeneration=repeated_punctuation: ':**...'
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> The user wants a description of the provided image.
->
-> 1&#46;  &#42;&#42;Identify the main subject:&#42;&#42; The image shows a tranquil, somewhat
-> melancholic scene in a park or garden, likely on a rainy or overcast day.
-> 2&#46;  &#42;&#42;Break down the composition:&#42;&#42;
-> &#42;   &#42;&#42;Foreground:&#42;&#42; A small, young pine tree stands next to a large,
-> moss-covered boulder. The ground is covered in green grass.
-> &#42;   &#42;&#42;Mid-ground:&#42;&#42; A gravel path leads towards a small, circular wooden
-> pier or platform extending into a body of water (a pond or lake). A person
-> wearing a dark blue raincoat and hood is standing on this platform, looking
-> out at the water.
-> &#42;   &#42;&#42;Background:&#42;&#42; Across the water, there is a grassy bank with a
-> wooden bridge. Further back, there are trees—some evergreen (conifers) and
-> some deciduous (bare branches, suggesting late autumn or winter). The sky is
-> grey and overcast.
-> 3&#46;  &#42;&#42;Identify specific details:&#42;&#42;
-> &#42;   &#42;&#42;Weather:&#42;&#42; It looks like it might be raining or just rained. The
-> sky is grey, the grass is a bit dull green, and the person is wearing a
-> hooded coat.
-> &#42;   &#42;&#42;The Person:&#42;&#42; Standing alone, facing away from the camera, looking
-> towards the water. Wearing a dark blue coat, dark pants, and brown boots.
-> &#42;   &#42;&#42;The Water:&#42;&#42; Dark, rippled surface, reflecting the grey sky.
-> &#42;   &#42;&#42;The Bridge:&#42;&#42; A simple, arched wooden footbridge in the distance.
-> &#42;   &#42;&#42;The Trees:&#42;&#42; A mix of tall evergreens (pines/firs) and bare
-> deciduous trees. There are some yellowish-green bushes/trees on the left
-> side.
-> &#42;   &#42;&#42;The Mossy Rock:&#42;&#42; Very prominent in the bottom left corner,
-> covered in bright green moss.
-> 4&#46;  &#42;&#42;Synthesize the description:&#42;&#42;
-> &#42;   Start with the overall atmosphere (peaceful, rainy, solitary).
-> &#42;   Describe the foreground elements (pine tree, mossy rock).
-> &#42;   Move to the mid-ground (gravel path, wooden pier, the person).
-> &#42;   Describe the background (water, bridge, trees, hills).
-> &#42;   Mention the lighting/weather (overcast, grey).
->
-> &#8203;&#42;&#42;Drafting the description (internal monologue/trial phrases):&#42;&#42;
->
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Output degeneration (repeated_punctuation: ':\*\*...')
-- Likely capped by max token budget
-
----
-
 <a id="model-mlx-community-qwen35-27b-4bit"></a>
 
 ### ✅ mlx-community/Qwen3.5-27B-4bit
@@ -2916,8 +2915,8 @@ _Token summary:_ prompt 16290 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 2.16s; Gen 90.50s; Total 93.02s
-_Throughput:_ Prompt 226 TPS (16,290 tok); Gen 28.5 TPS (500 tok)
+_Timing:_ Load 4.50s; Gen 89.45s; Total 94.31s
+_Throughput:_ Prompt 227 TPS (16,290 tok); Gen 29.5 TPS (500 tok)
 _Score summary:_ ✅ B (80/100); Missing requested structure
 _Review priority:_ watchlist (cutoff)
 _Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
@@ -2975,80 +2974,6 @@ _Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
 
 ---
 
-<a id="model-mlx-community-qwen36-27b-mxfp8"></a>
-
-### ✅ mlx-community/Qwen3.6-27B-mxfp8
-
-_Recommendation:_ avoid for now; review verdict: cutoff degraded
-_Key signals:_ hit token cap (500); nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 16290 tok; estimated text 4 tok; estimated non-text
-                 16286 tok; generated 500 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
-_Timing:_ Load 3.04s; Gen 100.73s; Total 104.11s
-_Throughput:_ Prompt 228 TPS (16,290 tok); Gen 17.6 TPS (500 tok)
-_Score summary:_ ✅ B (80/100); Missing requested structure
-_Review priority:_ watchlist (cutoff)
-_Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
-
-<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
->
-> The user wants a description of the provided image.
->
-> &#42;&#42;1. Overall Impression:&#42;&#42;
-> The image shows a serene, somewhat overcast landscape, likely a park or
-> garden. It features a body of water (pond or small lake), a gravel path, a
-> small wooden bridge, and a person standing on a gravel island or peninsula.
-> The foreground has a small pine tree and a mossy rock.
->
-> &#42;&#42;2. Key Elements to Describe:&#42;&#42;
-> &#42;   &#42;&#42;Foreground:&#42;&#42;
-> &#42;   A large, moss-covered rock on the left.
-> &#42;   A small, young pine tree (conifer) planted next to it.
-> &#42;   Green grass.
-> &#42;   A gravel path leading from the left towards the center.
-> &#42;   A wooden bench on the left edge.
-> &#42;   &#42;&#42;Mid-ground:&#42;&#42;
-> &#42;   A body of water (dark, calm).
-> &#42;   A gravel area jutting into the water, bordered by wooden posts
-> (palisade).
-> &#42;   A person standing on this gravel area, wearing a dark blue coat with
-> a hood up, looking towards the right.
-> &#42;   A small wooden bridge crossing the water in the background.
-> &#42;   &#42;&#42;Background:&#42;&#42;
-> &#42;   A grassy hill rising up.
-> &#42;   A mix of evergreen trees (conifers) and deciduous trees (some bare,
-> suggesting late autumn or winter).
-> &#42;   Overcast, grey sky.
->
-> &#42;&#42;3. Drafting the Description (Iterative Process):&#42;&#42;
->
-> &#42;   &#42;Attempt 1 (Mental Outline):&#42; There's a pond. A person in a blue coat is
-> standing on a gravel patch in the water. In the front, there's a small pine
-> tree and a big mossy rock. Behind the pond, there's a bridge and a hill
-> with lots of trees. It looks like a cloudy day.
->
-> &#42;   &#42;Attempt 2 (Adding Detail):&#42; The image shows a park scene. In the
-> foreground, a large rock covered in green moss sits next to a small pine
-> tree. To the left, there's a wooden bench. A gravel path leads to a small
-> island or peninsula in a dark pond. A person wearing a dark blue hooded coat
-> stands on this gravel area, looking out. The edge of the gravel is lined
-> with wooden posts. In the background, a small wooden bridge crosses the
-> water. Beyond that, a hill is covered
-<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
-
-⚠️ _Quality Warnings:_
-
-- Likely capped by max token budget
-
----
-
 <a id="model-mlx-community-qwen35-27b-mxfp8"></a>
 
 ### ✅ mlx-community/Qwen3.5-27B-mxfp8
@@ -3065,8 +2990,8 @@ _Token summary:_ prompt 16290 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-_Timing:_ Load 3.09s; Gen 106.66s; Total 110.10s
-_Throughput:_ Prompt 211 TPS (16,290 tok); Gen 17.4 TPS (500 tok)
+_Timing:_ Load 3.81s; Gen 112.81s; Total 116.97s
+_Throughput:_ Prompt 199 TPS (16,290 tok); Gen 16.5 TPS (500 tok)
 _Score summary:_ ✅ B (80/100); Missing requested structure
 _Review priority:_ watchlist (cutoff)
 _Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
@@ -3118,6 +3043,80 @@ _Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
 >
 > 4&#46;  &#42;&#42;Refining and Polishing:&#42;&#42;
 > &#42;   Combine the
+<!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
+
+⚠️ _Quality Warnings:_
+
+- Likely capped by max token budget
+
+---
+
+<a id="model-mlx-community-qwen36-27b-mxfp8"></a>
+
+### ✅ mlx-community/Qwen3.6-27B-mxfp8
+
+_Recommendation:_ avoid for now; review verdict: cutoff degraded
+_Key signals:_ hit token cap (500); nontext prompt burden=100%
+_Hint handling:_ preserves trusted hints
+_Output contract:_ requested structure looks complete
+_Cataloging fit:_ preserves trusted hints
+_Maintainer routing:_ likely owner `model`
+_Token summary:_ prompt 16290 tok; estimated text 4 tok; estimated non-text
+                 16286 tok; generated 500 tok; requested max 500 tok; stop
+                 reason completed
+_Suggested next step:_ Treat as a model-quality limitation for this prompt and
+                       image.
+
+_Timing:_ Load 3.57s; Gen 113.66s; Total 117.59s
+_Throughput:_ Prompt 195 TPS (16,290 tok); Gen 17.0 TPS (500 tok)
+_Score summary:_ ✅ B (80/100); Missing requested structure
+_Review priority:_ watchlist (cutoff)
+_Review summary:_ B 80/100; hit token cap (500); nontext prompt burden=100%
+
+<!-- markdownlint-disable MD011 MD028 MD037 MD045 -->
+>
+> The user wants a description of the provided image.
+>
+> &#42;&#42;1. Overall Impression:&#42;&#42;
+> The image shows a serene, somewhat overcast landscape, likely a park or
+> garden. It features a body of water (pond or small lake), a gravel path, a
+> small wooden bridge, and a person standing on a gravel island or peninsula.
+> The foreground has a small pine tree and a mossy rock.
+>
+> &#42;&#42;2. Key Elements to Describe:&#42;&#42;
+> &#42;   &#42;&#42;Foreground:&#42;&#42;
+> &#42;   A large, moss-covered rock on the left.
+> &#42;   A small, young pine tree (conifer) planted next to it.
+> &#42;   Green grass.
+> &#42;   A gravel path leading from the left towards the center.
+> &#42;   A wooden bench on the left edge.
+> &#42;   &#42;&#42;Mid-ground:&#42;&#42;
+> &#42;   A body of water (dark, calm).
+> &#42;   A gravel area jutting into the water, bordered by wooden posts
+> (palisade).
+> &#42;   A person standing on this gravel area, wearing a dark blue coat with
+> a hood up, looking towards the right.
+> &#42;   A small wooden bridge crossing the water in the background.
+> &#42;   &#42;&#42;Background:&#42;&#42;
+> &#42;   A grassy hill rising up.
+> &#42;   A mix of evergreen trees (conifers) and deciduous trees (some bare,
+> suggesting late autumn or winter).
+> &#42;   Overcast, grey sky.
+>
+> &#42;&#42;3. Drafting the Description (Iterative Process):&#42;&#42;
+>
+> &#42;   &#42;Attempt 1 (Mental Outline):&#42; There's a pond. A person in a blue coat is
+> standing on a gravel patch in the water. In the front, there's a small pine
+> tree and a big mossy rock. Behind the pond, there's a bridge and a hill
+> with lots of trees. It looks like a cloudy day.
+>
+> &#42;   &#42;Attempt 2 (Adding Detail):&#42; The image shows a park scene. In the
+> foreground, a large rock covered in green moss sits next to a small pine
+> tree. To the left, there's a wooden bench. A gravel path leads to a small
+> island or peninsula in a dark pond. A person wearing a dark blue hooded coat
+> stands on this gravel area, looking out. The edge of the gravel is lined
+> with wooden posts. In the background, a small wooden bridge crosses the
+> water. Beyond that, a hill is covered
 <!-- markdownlint-enable MD011 MD028 MD037 MD045 -->
 
 ⚠️ _Quality Warnings:_

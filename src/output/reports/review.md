@@ -1,6 +1,6 @@
 # Automated Review Digest
 
-_Generated on 2026-05-01 17:56:05 BST_
+_Generated on 2026-05-01 21:50:16 BST_
 
 Trusted-hint review uses only prompt title/description/keyword hints for utility comparison. Capture metadata, GPS, timestamps, source labels, and location labels are treated as nonvisual metadata and are not required visual evidence.
 
@@ -13,19 +13,19 @@ _Review artifacts:_
 
 ### Strong Candidates
 
-- `mlx-community/gemma-3-27b-it-qat-4bit`: 🏆 A (85/100) | Desc 82 | Keywords 92 | 28.6 tps
-- `mlx-community/Qwen3.5-35B-A3B-bf16`: ✅ B (80/100) | Desc 81 | Keywords 90 | 64.1 tps
-- `mlx-community/Molmo-7B-D-0924-8bit`: ✅ B (80/100) | Desc 84 | Keywords 0 | 52.4 tps
-- `mlx-community/Molmo-7B-D-0924-bf16`: ✅ B (80/100) | Desc 83 | Keywords 0 | 30.7 tps
-- `mlx-community/gemma-3-27b-it-qat-8bit`: ✅ B (80/100) | Desc 82 | Keywords 94 | 16.8 tps
+- `mlx-community/gemma-3-27b-it-qat-4bit`: 🏆 A (85/100) | Desc 82 | Keywords 92 | 26.0 tps
+- `mlx-community/Qwen3.5-35B-A3B-bf16`: ✅ B (80/100) | Desc 81 | Keywords 90 | 61.2 tps
+- `mlx-community/Molmo-7B-D-0924-8bit`: ✅ B (80/100) | Desc 84 | Keywords 0 | 52.1 tps
+- `mlx-community/Molmo-7B-D-0924-bf16`: ✅ B (80/100) | Desc 84 | Keywords 0 | 30.1 tps
+- `mlx-community/gemma-3-27b-it-qat-8bit`: ✅ B (80/100) | Desc 82 | Keywords 94 | 16.6 tps
 
 ### Watchlist
 
-- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (0/100) | Desc 40 | Keywords 0 | 31.6 tps | harness
-- `mlx-community/paligemma2-3b-pt-896-4bit`: ❌ F (5/100) | Desc 22 | Keywords 0 | 81.1 tps | harness, long context
-- `mlx-community/gemma-3n-E2B-4bit`: ❌ F (5/100) | Desc 23 | Keywords 0 | 92.9 tps | harness
-- `mlx-community/gemma-4-31b-bf16`: ❌ F (5/100) | Desc 23 | Keywords 0 | 9.1 tps | harness
-- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (16/100) | Desc 48 | Keywords 0 | 208.8 tps | harness, long context
+- `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`: ❌ F (0/100) | Desc 40 | Keywords 0 | 31.3 tps | harness
+- `mlx-community/paligemma2-3b-pt-896-4bit`: ❌ F (5/100) | Desc 22 | Keywords 0 | 80.3 tps | harness, long context
+- `mlx-community/gemma-3n-E2B-4bit`: ❌ F (5/100) | Desc 23 | Keywords 0 | 95.3 tps | harness
+- `mlx-community/gemma-4-31b-bf16`: ❌ F (5/100) | Desc 23 | Keywords 0 | 9.0 tps | harness
+- `mlx-community/Qwen2-VL-2B-Instruct-4bit`: ❌ F (16/100) | Desc 48 | Keywords 0 | 207.2 tps | harness, long context
 
 ## User Buckets
 
@@ -51,8 +51,8 @@ User-first summary grouped by recommendation bucket.
 | `mlx-community/paligemma2-10b-ft-docci-448-6bit`    | `clean`     | preserves trusted hints | nontext prompt burden=100%                                                                       |
 | `mlx-community/gemma-3n-E4B-it-bf16`                | `clean`     | preserves trusted hints | nontext prompt burden=99%                                                                        |
 | `mlx-community/InternVL3-14B-8bit`                  | `clean`     | preserves trusted hints | nontext prompt burden=100%                                                                       |
-| `mlx-community/pixtral-12b-8bit`                    | `clean`     | preserves trusted hints | nontext prompt burden=100%                                                                       |
 | `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`             | `clean`     | preserves trusted hints | nontext prompt burden=100% \| reasoning leak                                                     |
+| `mlx-community/pixtral-12b-8bit`                    | `clean`     | preserves trusted hints | nontext prompt burden=100%                                                                       |
 | `mlx-community/paligemma2-3b-ft-docci-448-bf16`     | `clean`     | preserves trusted hints | nontext prompt burden=100%                                                                       |
 | `mlx-community/gemma-4-31b-it-4bit`                 | `clean`     | preserves trusted hints | nontext prompt burden=99%                                                                        |
 | `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4` | `clean`     | preserves trusted hints | nontext prompt burden=100%                                                                       |
@@ -60,16 +60,16 @@ User-first summary grouped by recommendation bucket.
 | `mlx-community/pixtral-12b-bf16`                    | `clean`     | preserves trusted hints | nontext prompt burden=100%                                                                       |
 | `mlx-community/InternVL3-8B-bf16`                   | `clean`     | preserves trusted hints | nontext prompt burden=100%                                                                       |
 | `mlx-community/gemma-3-27b-it-qat-4bit`             | `clean`     | preserves trusted hints | nontext prompt burden=99%                                                                        |
+| `mlx-community/Molmo-7B-D-0924-8bit`                | `clean`     | preserves trusted hints | nontext prompt burden=100%                                                                       |
 | `mlx-community/paligemma2-10b-ft-docci-448-bf16`    | `clean`     | preserves trusted hints | nontext prompt burden=100%                                                                       |
 | `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`  | `clean`     | preserves trusted hints | nontext prompt burden=71%                                                                        |
-| `mlx-community/Molmo-7B-D-0924-8bit`                | `clean`     | preserves trusted hints | nontext prompt burden=100%                                                                       |
+| `mlx-community/Molmo-7B-D-0924-bf16`                | `clean`     | preserves trusted hints | nontext prompt burden=100%                                                                       |
 | `mlx-community/X-Reasoner-7B-8bit`                  | `clean`     | preserves trusted hints | nontext prompt burden=100%                                                                       |
 | `mlx-community/gemma-3-27b-it-qat-8bit`             | `clean`     | preserves trusted hints | nontext prompt burden=99%                                                                        |
-| `mlx-community/Molmo-7B-D-0924-bf16`                | `clean`     | preserves trusted hints | nontext prompt burden=100%                                                                       |
 | `meta-llama/Llama-3.2-11B-Vision-Instruct`          | `clean`     | preserves trusted hints | nontext prompt burden=73%                                                                        |
 | `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`      | `clean`     | preserves trusted hints | nontext prompt burden=100% \| reasoning leak                                                     |
-| `mlx-community/Qwen3.5-35B-A3B-bf16`                | `token_cap` | preserves trusted hints | hit token cap (500) \| nontext prompt burden=100%                                                |
 | `mlx-community/Qwen3.5-9B-MLX-4bit`                 | `token_cap` | preserves trusted hints | hit token cap (500) \| nontext prompt burden=100% \| degeneration=repeated_punctuation: ':**...' |
+| `mlx-community/Qwen3.5-35B-A3B-bf16`                | `token_cap` | preserves trusted hints | hit token cap (500) \| nontext prompt burden=100%                                                |
 
 ### `caveat`
 
@@ -100,8 +100,8 @@ User-first summary grouped by recommendation bucket.
 | `mlx-community/Qwen3.5-35B-A3B-4bit`                    | `cutoff_degraded` | preserves trusted hints | hit token cap (500) \| nontext prompt burden=100%                                                                                                                                                |
 | `mlx-community/Qwen3.5-35B-A3B-6bit`                    | `cutoff_degraded` | preserves trusted hints | hit token cap (500) \| nontext prompt burden=100%                                                                                                                                                |
 | `mlx-community/Qwen3.5-27B-4bit`                        | `cutoff_degraded` | preserves trusted hints | hit token cap (500) \| nontext prompt burden=100%                                                                                                                                                |
-| `mlx-community/Qwen3.6-27B-mxfp8`                       | `cutoff_degraded` | preserves trusted hints | hit token cap (500) \| nontext prompt burden=100%                                                                                                                                                |
 | `mlx-community/Qwen3.5-27B-mxfp8`                       | `cutoff_degraded` | preserves trusted hints | hit token cap (500) \| nontext prompt burden=100%                                                                                                                                                |
+| `mlx-community/Qwen3.6-27B-mxfp8`                       | `cutoff_degraded` | preserves trusted hints | hit token cap (500) \| nontext prompt burden=100%                                                                                                                                                |
 
 ## Maintainer Queue
 
@@ -145,32 +145,32 @@ Owner-grouped escalations with compact evidence and row-specific next actions.
 | `mlx-community/paligemma2-10b-ft-docci-448-6bit`    | `clean`           | nontext prompt burden=100%                                                                                              | Treat as a model-quality limitation for this prompt and image. |
 | `mlx-community/gemma-3n-E4B-it-bf16`                | `clean`           | nontext prompt burden=99%                                                                                               | Treat as a model-quality limitation for this prompt and image. |
 | `mlx-community/InternVL3-14B-8bit`                  | `clean`           | nontext prompt burden=100%                                                                                              | Treat as a model-quality limitation for this prompt and image. |
-| `mlx-community/pixtral-12b-8bit`                    | `clean`           | nontext prompt burden=100%                                                                                              | Treat as a model-quality limitation for this prompt and image. |
 | `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`             | `clean`           | nontext prompt burden=100% \| reasoning leak                                                                            | Treat as a model-quality limitation for this prompt and image. |
+| `mlx-community/pixtral-12b-8bit`                    | `clean`           | nontext prompt burden=100%                                                                                              | Treat as a model-quality limitation for this prompt and image. |
 | `mlx-community/paligemma2-3b-ft-docci-448-bf16`     | `clean`           | nontext prompt burden=100%                                                                                              | Treat as a model-quality limitation for this prompt and image. |
 | `mlx-community/gemma-4-31b-it-4bit`                 | `clean`           | nontext prompt burden=99%                                                                                               | Treat as a model-quality limitation for this prompt and image. |
 | `mlx-community/Ministral-3-14B-Instruct-2512-mxfp4` | `clean`           | nontext prompt burden=100%                                                                                              | Treat as a model-quality limitation for this prompt and image. |
 | `mlx-community/Ministral-3-14B-Instruct-2512-nvfp4` | `clean`           | nontext prompt burden=100%                                                                                              | Treat as a model-quality limitation for this prompt and image. |
 | `mlx-community/pixtral-12b-bf16`                    | `clean`           | nontext prompt burden=100%                                                                                              | Treat as a model-quality limitation for this prompt and image. |
-| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`  | `cutoff_degraded` | hit token cap (500) \| nontext prompt burden=100%                                                                       | Treat as a model-quality limitation for this prompt and image. |
 | `mlx-community/InternVL3-8B-bf16`                   | `clean`           | nontext prompt burden=100%                                                                                              | Treat as a model-quality limitation for this prompt and image. |
+| `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`  | `cutoff_degraded` | hit token cap (500) \| nontext prompt burden=100%                                                                       | Treat as a model-quality limitation for this prompt and image. |
 | `mlx-community/gemma-3-27b-it-qat-4bit`             | `clean`           | nontext prompt burden=99%                                                                                               | Treat as a model-quality limitation for this prompt and image. |
 | `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`     | `cutoff_degraded` | hit token cap (500) \| nontext prompt burden=100% \| reasoning leak \| degeneration=incomplete_sentence: ends with 'of' | Treat as a model-quality limitation for this prompt and image. |
+| `mlx-community/Molmo-7B-D-0924-8bit`                | `clean`           | nontext prompt burden=100%                                                                                              | Treat as a model-quality limitation for this prompt and image. |
 | `mlx-community/paligemma2-10b-ft-docci-448-bf16`    | `clean`           | nontext prompt burden=100%                                                                                              | Treat as a model-quality limitation for this prompt and image. |
 | `mlx-community/Llama-3.2-11B-Vision-Instruct-8bit`  | `clean`           | nontext prompt burden=71%                                                                                               | Treat as a model-quality limitation for this prompt and image. |
-| `mlx-community/Molmo-7B-D-0924-8bit`                | `clean`           | nontext prompt burden=100%                                                                                              | Treat as a model-quality limitation for this prompt and image. |
+| `mlx-community/Molmo-7B-D-0924-bf16`                | `clean`           | nontext prompt burden=100%                                                                                              | Treat as a model-quality limitation for this prompt and image. |
 | `mlx-community/X-Reasoner-7B-8bit`                  | `clean`           | nontext prompt burden=100%                                                                                              | Treat as a model-quality limitation for this prompt and image. |
 | `mlx-community/gemma-3-27b-it-qat-8bit`             | `clean`           | nontext prompt burden=99%                                                                                               | Treat as a model-quality limitation for this prompt and image. |
-| `mlx-community/Molmo-7B-D-0924-bf16`                | `clean`           | nontext prompt burden=100%                                                                                              | Treat as a model-quality limitation for this prompt and image. |
 | `meta-llama/Llama-3.2-11B-Vision-Instruct`          | `clean`           | nontext prompt burden=73%                                                                                               | Treat as a model-quality limitation for this prompt and image. |
 | `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`      | `clean`           | nontext prompt burden=100% \| reasoning leak                                                                            | Treat as a model-quality limitation for this prompt and image. |
 | `mlx-community/Qwen3.5-35B-A3B-4bit`                | `cutoff_degraded` | hit token cap (500) \| nontext prompt burden=100%                                                                       | Treat as a model-quality limitation for this prompt and image. |
 | `mlx-community/Qwen3.5-35B-A3B-6bit`                | `cutoff_degraded` | hit token cap (500) \| nontext prompt burden=100%                                                                       | Treat as a model-quality limitation for this prompt and image. |
-| `mlx-community/Qwen3.5-35B-A3B-bf16`                | `token_cap`       | hit token cap (500) \| nontext prompt burden=100%                                                                       | Treat as a model-quality limitation for this prompt and image. |
 | `mlx-community/Qwen3.5-9B-MLX-4bit`                 | `token_cap`       | hit token cap (500) \| nontext prompt burden=100% \| degeneration=repeated_punctuation: ':**...'                        | Treat as a model-quality limitation for this prompt and image. |
+| `mlx-community/Qwen3.5-35B-A3B-bf16`                | `token_cap`       | hit token cap (500) \| nontext prompt burden=100%                                                                       | Treat as a model-quality limitation for this prompt and image. |
 | `mlx-community/Qwen3.5-27B-4bit`                    | `cutoff_degraded` | hit token cap (500) \| nontext prompt burden=100%                                                                       | Treat as a model-quality limitation for this prompt and image. |
-| `mlx-community/Qwen3.6-27B-mxfp8`                   | `cutoff_degraded` | hit token cap (500) \| nontext prompt burden=100%                                                                       | Treat as a model-quality limitation for this prompt and image. |
 | `mlx-community/Qwen3.5-27B-mxfp8`                   | `cutoff_degraded` | hit token cap (500) \| nontext prompt burden=100%                                                                       | Treat as a model-quality limitation for this prompt and image. |
+| `mlx-community/Qwen3.6-27B-mxfp8`                   | `cutoff_degraded` | hit token cap (500) \| nontext prompt burden=100%                                                                       | Treat as a model-quality limitation for this prompt and image. |
 
 ### `model-config`
 
@@ -371,22 +371,6 @@ _Token summary:_ prompt 278 tok; estimated text 4 tok; estimated non-text 274
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-### `mlx-community/gemma-4-31b-bf16`
-
-_Recommendation:_ avoid for now; review verdict: harness
-_Key signals:_ Output appears truncated to about 5 tokens.; nontext prompt
-               burden=98%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model-config`; harness signal
-                      `prompt_template`
-_Token summary:_ prompt 266 tok; estimated text 4 tok; estimated non-text 262
-                 tok; generated 5 tok; requested max 500 tok; stop reason
-                 completed
-_Suggested next step:_ Inspect model repo config, chat template, and EOS
-                       settings.
-
 ### `mlx-community/Ministral-3-3B-Instruct-2512-4bit`
 
 _Recommendation:_ recommended; review verdict: clean
@@ -428,6 +412,22 @@ _Token summary:_ prompt 1195 tok; estimated text 4 tok; estimated non-text
                  reason completed
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
+
+### `mlx-community/gemma-4-31b-bf16`
+
+_Recommendation:_ avoid for now; review verdict: harness
+_Key signals:_ Output appears truncated to about 5 tokens.; nontext prompt
+               burden=98%
+_Hint handling:_ preserves trusted hints
+_Output contract:_ requested structure looks complete
+_Cataloging fit:_ preserves trusted hints
+_Maintainer routing:_ likely owner `model-config`; harness signal
+                      `prompt_template`
+_Token summary:_ prompt 266 tok; estimated text 4 tok; estimated non-text 262
+                 tok; generated 5 tok; requested max 500 tok; stop reason
+                 completed
+_Suggested next step:_ Inspect model repo config, chat template, and EOS
+                       settings.
 
 ### `mlx-community/SmolVLM-Instruct-bf16`
 
@@ -485,20 +485,6 @@ _Token summary:_ prompt 1804 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-### `mlx-community/pixtral-12b-8bit`
-
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 2887 tok; estimated text 4 tok; estimated non-text
-                 2883 tok; generated 167 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
 ### `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`
 
 _Recommendation:_ recommended; review verdict: clean
@@ -509,6 +495,20 @@ _Cataloging fit:_ preserves trusted hints
 _Maintainer routing:_ likely owner `model`
 _Token summary:_ prompt 1011 tok; estimated text 4 tok; estimated non-text
                  1007 tok; generated 357 tok; requested max 500 tok; stop
+                 reason completed
+_Suggested next step:_ Treat as a model-quality limitation for this prompt and
+                       image.
+
+### `mlx-community/pixtral-12b-8bit`
+
+_Recommendation:_ recommended; review verdict: clean
+_Key signals:_ nontext prompt burden=100%
+_Hint handling:_ preserves trusted hints
+_Output contract:_ requested structure looks complete
+_Cataloging fit:_ preserves trusted hints
+_Maintainer routing:_ likely owner `model`
+_Token summary:_ prompt 2887 tok; estimated text 4 tok; estimated non-text
+                 2883 tok; generated 167 tok; requested max 500 tok; stop
                  reason completed
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
@@ -614,20 +614,6 @@ _Token summary:_ prompt 2887 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-### `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`
-
-_Recommendation:_ avoid for now; review verdict: cutoff degraded
-_Key signals:_ hit token cap (500); nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 1293 tok; estimated text 4 tok; estimated non-text
-                 1289 tok; generated 500 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
 ### `mlx-community/InternVL3-8B-bf16`
 
 _Recommendation:_ recommended; review verdict: clean
@@ -642,17 +628,17 @@ _Token summary:_ prompt 1804 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-### `mlx-community/gemma-3-27b-it-qat-4bit`
+### `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`
 
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=99%
+_Recommendation:_ avoid for now; review verdict: cutoff degraded
+_Key signals:_ hit token cap (500); nontext prompt burden=100%
 _Hint handling:_ preserves trusted hints
 _Output contract:_ requested structure looks complete
 _Cataloging fit:_ preserves trusted hints
 _Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 273 tok; estimated text 4 tok; estimated non-text 269
-                 tok; generated 320 tok; requested max 500 tok; stop reason
-                 completed
+_Token summary:_ prompt 1293 tok; estimated text 4 tok; estimated non-text
+                 1289 tok; generated 500 tok; requested max 500 tok; stop
+                 reason completed
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
@@ -671,6 +657,20 @@ _Token summary:_ prompt 6091 tok; estimated text 4 tok; estimated non-text
                  reason completed
 _Suggested next step:_ Inspect EOS/stop-token stripping; control tokens are
                        leaking into user-facing text.
+
+### `mlx-community/gemma-3-27b-it-qat-4bit`
+
+_Recommendation:_ recommended; review verdict: clean
+_Key signals:_ nontext prompt burden=99%
+_Hint handling:_ preserves trusted hints
+_Output contract:_ requested structure looks complete
+_Cataloging fit:_ preserves trusted hints
+_Maintainer routing:_ likely owner `model`
+_Token summary:_ prompt 273 tok; estimated text 4 tok; estimated non-text 269
+                 tok; generated 320 tok; requested max 500 tok; stop reason
+                 completed
+_Suggested next step:_ Treat as a model-quality limitation for this prompt and
+                       image.
 
 ### `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`
 
@@ -703,6 +703,20 @@ _Token summary:_ prompt 6091 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Inspect EOS/stop-token stripping; control tokens are
                        leaking into user-facing text.
 
+### `mlx-community/Molmo-7B-D-0924-8bit`
+
+_Recommendation:_ recommended; review verdict: clean
+_Key signals:_ nontext prompt burden=100%
+_Hint handling:_ preserves trusted hints
+_Output contract:_ requested structure looks complete
+_Cataloging fit:_ preserves trusted hints
+_Maintainer routing:_ likely owner `model`
+_Token summary:_ prompt 1207 tok; estimated text 4 tok; estimated non-text
+                 1203 tok; generated 205 tok; requested max 500 tok; stop
+                 reason completed
+_Suggested next step:_ Treat as a model-quality limitation for this prompt and
+                       image.
+
 ### `mlx-community/paligemma2-10b-ft-docci-448-bf16`
 
 _Recommendation:_ recommended; review verdict: clean
@@ -731,7 +745,7 @@ _Token summary:_ prompt 14 tok; estimated text 4 tok; estimated non-text 10
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-### `mlx-community/Molmo-7B-D-0924-8bit`
+### `mlx-community/Molmo-7B-D-0924-bf16`
 
 _Recommendation:_ recommended; review verdict: clean
 _Key signals:_ nontext prompt burden=100%
@@ -789,20 +803,6 @@ _Token summary:_ prompt 6091 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Inspect EOS/stop-token stripping; control tokens are
                        leaking into user-facing text.
 
-### `mlx-community/Molmo-7B-D-0924-bf16`
-
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 1207 tok; estimated text 4 tok; estimated non-text
-                 1203 tok; generated 215 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
-
 ### `meta-llama/Llama-3.2-11B-Vision-Instruct`
 
 _Recommendation:_ recommended; review verdict: clean
@@ -814,6 +814,20 @@ _Maintainer routing:_ likely owner `model`
 _Token summary:_ prompt 15 tok; estimated text 4 tok; estimated non-text 11
                  tok; generated 276 tok; requested max 500 tok; stop reason
                  completed
+_Suggested next step:_ Treat as a model-quality limitation for this prompt and
+                       image.
+
+### `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`
+
+_Recommendation:_ recommended; review verdict: clean
+_Key signals:_ nontext prompt burden=100%; reasoning leak
+_Hint handling:_ preserves trusted hints
+_Output contract:_ requested structure looks complete
+_Cataloging fit:_ preserves trusted hints
+_Maintainer routing:_ likely owner `model`
+_Token summary:_ prompt 1011 tok; estimated text 4 tok; estimated non-text
+                 1007 tok; generated 277 tok; requested max 500 tok; stop
+                 reason completed
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
@@ -835,20 +849,6 @@ _Token summary:_ prompt 16299 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat this as a prompt-budget issue first; nontext
                        prompt burden is 100% and the output stays weak under
                        that load.
-
-### `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`
-
-_Recommendation:_ recommended; review verdict: clean
-_Key signals:_ nontext prompt burden=100%; reasoning leak
-_Hint handling:_ preserves trusted hints
-_Output contract:_ requested structure looks complete
-_Cataloging fit:_ preserves trusted hints
-_Maintainer routing:_ likely owner `model`
-_Token summary:_ prompt 1011 tok; estimated text 4 tok; estimated non-text
-                 1007 tok; generated 277 tok; requested max 500 tok; stop
-                 reason completed
-_Suggested next step:_ Treat as a model-quality limitation for this prompt and
-                       image.
 
 ### `mlx-community/Qwen3.5-35B-A3B-4bit`
 
@@ -878,10 +878,11 @@ _Token summary:_ prompt 16290 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-### `mlx-community/Qwen3.5-35B-A3B-bf16`
+### `mlx-community/Qwen3.5-9B-MLX-4bit`
 
 _Recommendation:_ recommended; review verdict: token cap
-_Key signals:_ hit token cap (500); nontext prompt burden=100%
+_Key signals:_ hit token cap (500); nontext prompt burden=100%;
+               degeneration=repeated_punctuation: ':**...'
 _Hint handling:_ preserves trusted hints
 _Output contract:_ requested structure looks complete
 _Cataloging fit:_ preserves trusted hints
@@ -892,11 +893,10 @@ _Token summary:_ prompt 16290 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-### `mlx-community/Qwen3.5-9B-MLX-4bit`
+### `mlx-community/Qwen3.5-35B-A3B-bf16`
 
 _Recommendation:_ recommended; review verdict: token cap
-_Key signals:_ hit token cap (500); nontext prompt burden=100%;
-               degeneration=repeated_punctuation: ':**...'
+_Key signals:_ hit token cap (500); nontext prompt burden=100%
 _Hint handling:_ preserves trusted hints
 _Output contract:_ requested structure looks complete
 _Cataloging fit:_ preserves trusted hints
@@ -921,7 +921,7 @@ _Token summary:_ prompt 16290 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-### `mlx-community/Qwen3.6-27B-mxfp8`
+### `mlx-community/Qwen3.5-27B-mxfp8`
 
 _Recommendation:_ avoid for now; review verdict: cutoff degraded
 _Key signals:_ hit token cap (500); nontext prompt burden=100%
@@ -935,7 +935,7 @@ _Token summary:_ prompt 16290 tok; estimated text 4 tok; estimated non-text
 _Suggested next step:_ Treat as a model-quality limitation for this prompt and
                        image.
 
-### `mlx-community/Qwen3.5-27B-mxfp8`
+### `mlx-community/Qwen3.6-27B-mxfp8`
 
 _Recommendation:_ avoid for now; review verdict: cutoff degraded
 _Key signals:_ hit token cap (500); nontext prompt burden=100%

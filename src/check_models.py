@@ -67,7 +67,6 @@ from tabulate import tabulate
 
 from check_models_data.dependency_policy import (
     PROJECT_MIN_TRANSFORMERS_VERSION,
-    PROJECT_OPTIONAL_STACK_MINIMUMS,
     PROJECT_RUNTIME_STACK_MINIMUMS,
     UPSTREAM_MLX_LM_MINIMUMS,
     UPSTREAM_MLX_VLM_MINIMUMS,
@@ -183,7 +182,9 @@ ERROR_MLX_VLM_MISSING: Final[str] = (
     "Error: mlx-vlm not found. Please install it (`pip install mlx-vlm`)."
 )
 ERROR_MLX_LM_MISSING: Final[str] = (
-    "Core dependency missing: mlx-lm. Please install it (`pip install mlx-lm`)."
+    "Core dependency missing: mlx-lm. Please reinstall the runtime "
+    "(`pip install -e .`) or the full model-support stack "
+    '(`pip install -e ".[extras,torch]"`) from `src/`.'
 )
 ERROR_MLX_VLM_RUNTIME_INIT: Final[str] = (
     "Core dependency initialization failed: mlx-vlm could not be imported safely."
@@ -6245,13 +6246,6 @@ def _collect_upstream_requirements(
 
     for package_name, minimum_version in PROJECT_RUNTIME_STACK_MINIMUMS.items():
         _record_requirement(package_name, minimum_version, "check_models")
-
-    if versions.get("mlx-lm"):
-        _record_requirement(
-            "mlx-lm",
-            PROJECT_OPTIONAL_STACK_MINIMUMS["mlx-lm"],
-            "check_models[extras]",
-        )
 
     if versions.get("mlx-vlm"):
         # mlx-vlm requirements.txt currently specifies:

@@ -783,7 +783,7 @@ class TestPreflightDependencyDiagnostics:
         assert requirements["mlx"][0] == mod.UPSTREAM_MLX_VLM_MINIMUMS["mlx"]
         assert requirements["mlx-vlm"][0] == mod.PROJECT_RUNTIME_STACK_MINIMUMS["mlx-vlm"]
         assert requirements["transformers"][0] == mod.PROJECT_MIN_TRANSFORMERS_VERSION
-        assert requirements["mlx-lm"][0] == mod.PROJECT_OPTIONAL_STACK_MINIMUMS["mlx-lm"]
+        assert requirements["mlx-lm"][0] == mod.PROJECT_RUNTIME_STACK_MINIMUMS["mlx-lm"]
         assert (
             requirements["huggingface-hub"][0]
             == mod.PROJECT_RUNTIME_STACK_MINIMUMS["huggingface-hub"]

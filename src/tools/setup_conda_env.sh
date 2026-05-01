@@ -210,8 +210,9 @@ install_dependencies() {
 
     install_cmake
 
-    log_info "Installing project in editable mode (installs core dependencies)..."
-    pip install -e .
+    log_info "Installing project in editable mode with recommended runtime/model support..."
+    pip install -e ".[extras,torch]"
+    log_success "Installed runtime, extras, and torch-backed model dependencies"
 
     # Development dependencies (optional)
         read -p "Do you want to install development dependencies (ruff, mypy, ty, pyrefly, vulture, pytest, pydantic, pre-commit)? (y/N): " -n 1 -r
@@ -239,23 +240,6 @@ install_dependencies() {
         log_success "Repository git hooks installed"
     fi
 
-    # Optional: PyTorch stack (torch, torchvision, torchaudio)
-    read -p "Install PyTorch stack (torch, torchvision, torchaudio)? (y/N): " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        log_info "Installing PyTorch packages..."
-        # On Apple Silicon, standard PyPI wheels provide MPS acceleration.
-        if grep -q "torch =" pyproject.toml; then
-            pip install -e ".[torch]"
-        else
-            pip install \
-                "torch>=2.2.0" \
-                "torchvision>=0.17.0" \
-                "torchaudio>=2.2.0"
-        fi
-        log_success "Installed PyTorch packages"
-    fi
-
     log_success "All dependencies installed successfully"
 }
 
@@ -271,6 +255,7 @@ verify_installation() {
     log_info "Checking key packages..."
     python -c "
 import mlx.core as mx
+import mlx_lm
 import mlx_vlm
 from PIL import Image
 import huggingface_hub
@@ -281,8 +266,9 @@ try:
     print(f'✓ PyTorch version: {torch.__version__}')
 except Exception:
     pass
-print('✓ All core packages imported successfully')
+print('✓ All runtime packages imported successfully')
 print(f'✓ MLX version: {mx.__version__}')
+print(f'✓ MLX-LM version: {mlx_lm.__version__}')
 "
 
     if command -v cmake &> /dev/null; then
@@ -329,9 +315,12 @@ To use the MLX VLM environment:
     ${BLUE}python -m check_models --image /path/to/image.jpg${NC}
     ${BLUE}python -m check_models --models "microsoft/Florence-2-large"${NC}
 
-Optional installs:
-    - To include PyTorch stack during setup, answer 'y' when prompted, or later run:
-    ${BLUE}make -C src install-torch${NC}
+Optional follow-up installs:
+    - Recommended runtime/model support (.[extras,torch]) is installed automatically.
+      To reinstall it later, run:
+        ${BLUE}pip install -e .\[extras,torch\]${NC}
+    - To add development dependencies later, run:
+        ${BLUE}pip install -e .\[dev\]${NC}
         - If you installed development dependencies, repository git hooks were also installed.
         - If npm was available during setup, repo-local Markdown tooling was installed too.
             Otherwise install Node.js and run:

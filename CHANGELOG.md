@@ -7,6 +7,10 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Promote `mlx-lm` into the core runtime dependency set and have
+  `setup_conda_env.sh` install `.[extras,torch]` by default so fresh
+  environments include both MLX-LM and the torch-backed model stack used by
+  this repo's wider benchmark coverage.
 - Render maintainer triage blocks in generated diagnostics and issue markdown as
   actual bullet lists so the sections no longer collapse into a single wrapped
   paragraph.
