@@ -9207,7 +9207,12 @@ def _append_maintainer_triage_markdown(
     if heading is not None:
         parts.extend([heading, ""])
     for label, value in rows:
-        _append_markdown_labeled_value(parts, label=label, value=escaper.escape(value))
+        _append_markdown_labeled_value(
+            parts,
+            label=label,
+            value=escaper.escape(value),
+            bullet=True,
+        )
     parts.append("")
 
 

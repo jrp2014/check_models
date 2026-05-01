@@ -45,12 +45,12 @@ Quick triage list with likely owner and next action for each issue class.
 
 **Representative maintainer triage:**
 
-_Likely owner:_ mlx \| confidence=high
-_Classification:_ runtime_failure \| MLX_MODEL_LOAD_MODEL
-_Summary:_ model error \| mlx model load model
-_Evidence:_ model error \| mlx model load model
-_Token context:_ stop=exception
-_Next action:_ Inspect KV/cache behavior, memory pressure, and long-context
+- _Likely owner:_ mlx \| confidence=high
+- _Classification:_ runtime_failure \| MLX_MODEL_LOAD_MODEL
+- _Summary:_ model error \| mlx model load model
+- _Evidence:_ model error \| mlx model load model
+- _Token context:_ stop=exception
+- _Next action:_ Inspect KV/cache behavior, memory pressure, and long-context
                execution.
 
 | Model                                     | Observed Behavior                                         | First Seen Failing      | Recent Repro           |
@@ -95,12 +95,12 @@ Captured stdout/stderr:
 
 **Representative maintainer triage:**
 
-_Likely owner:_ model-config \| confidence=high
-_Classification:_ runtime_failure \| MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR
-_Summary:_ processor error \| model config processor load processor
-_Evidence:_ processor error \| model config processor load processor
-_Token context:_ stop=exception
-_Next action:_ Inspect model repo config, chat template, and EOS settings.
+- _Likely owner:_ model-config \| confidence=high
+- _Classification:_ runtime_failure \| MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR
+- _Summary:_ processor error \| model config processor load processor
+- _Evidence:_ processor error \| model config processor load processor
+- _Token context:_ stop=exception
+- _Next action:_ Inspect model repo config, chat template, and EOS settings.
 
 | Model                              | Observed Behavior                                                       | First Seen Failing      | Recent Repro           |
 |------------------------------------|-------------------------------------------------------------------------|-------------------------|------------------------|
@@ -156,17 +156,17 @@ point to stack/runtime behavior rather than inherent model quality limits.
 
 **Maintainer triage:**
 
-_Likely owner:_ mlx-vlm \| confidence=high
-_Classification:_ harness \| stop_token
-_Summary:_ Special control token &lt;\|end\|&gt; appeared in generated text.
+- _Likely owner:_ mlx-vlm \| confidence=high
+- _Classification:_ harness \| stop_token
+- _Summary:_ Special control token &lt;\|end\|&gt; appeared in generated text.
            \| Special control token &lt;\|endoftext\|&gt; appeared in
            generated text. \| hit token cap (500) \| nontext prompt burden=99%
-_Evidence:_ Special control token &lt;\|end\|&gt; appeared in generated text.
+- _Evidence:_ Special control token &lt;\|end\|&gt; appeared in generated text.
             \| Special control token &lt;\|endoftext\|&gt; appeared in
             generated text.
-_Token context:_ prompt=768 \| output/prompt=65.10% \| nontext burden=99% \|
+- _Token context:_ prompt=768 \| output/prompt=65.10% \| nontext burden=99% \|
                  stop=completed \| hit token cap (500)
-_Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
+- _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
                into user-facing text.
 
 **Why this appears to be an integration/runtime issue:**
@@ -190,15 +190,15 @@ The image shows a tranquil park scene with a person standing on a wooden dock, f
 
 **Maintainer triage:**
 
-_Likely owner:_ mlx-vlm \| confidence=high
-_Classification:_ harness \| encoding
-_Summary:_ Tokenizer space-marker artifacts (for example Ġ) appeared in output
+- _Likely owner:_ mlx-vlm \| confidence=high
+- _Classification:_ harness \| encoding
+- _Summary:_ Tokenizer space-marker artifacts (for example Ġ) appeared in output
            (about 139 occurrences). \| nontext prompt burden=100%
-_Evidence:_ Tokenizer space-marker artifacts (for example Ġ) appeared in
+- _Evidence:_ Tokenizer space-marker artifacts (for example Ġ) appeared in
             output (about 139 occurrences).
-_Token context:_ prompt=2,097 \| output/prompt=8.20% \| nontext burden=100% \|
+- _Token context:_ prompt=2,097 \| output/prompt=8.20% \| nontext burden=100% \|
                  stop=completed
-_Next action:_ Inspect decode cleanup; tokenizer markers are leaking into
+- _Next action:_ Inspect decode cleanup; tokenizer markers are leaking into
                user-facing text.
 
 **Why this appears to be an integration/runtime issue:**
@@ -220,14 +220,14 @@ TheĠimageĠdepictsĠaĠsereneĠoutdoorĠscene,ĠlikelyĠinĠaĠparkĠorĠgarden
 
 **Maintainer triage:**
 
-_Likely owner:_ mlx-vlm \| confidence=high
-_Classification:_ harness \| stop_token
-_Summary:_ Special control token &lt;/think&gt; appeared in generated text. \|
+- _Likely owner:_ mlx-vlm \| confidence=high
+- _Classification:_ harness \| stop_token
+- _Summary:_ Special control token &lt;/think&gt; appeared in generated text. \|
            hit token cap (500) \| nontext prompt burden=100% \| reasoning leak
-_Evidence:_ Special control token &lt;/think&gt; appeared in generated text.
-_Token context:_ prompt=6,091 \| output/prompt=8.21% \| nontext burden=100% \|
+- _Evidence:_ Special control token &lt;/think&gt; appeared in generated text.
+- _Token context:_ prompt=6,091 \| output/prompt=8.21% \| nontext burden=100% \|
                  stop=completed \| hit token cap (500)
-_Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
+- _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
                into user-facing text.
 
 **Why this appears to be an integration/runtime issue:**
@@ -253,14 +253,14 @@ In the foreground, there's a small pine tree planted in a bed with dark soil, a.
 
 **Maintainer triage:**
 
-_Likely owner:_ mlx-vlm \| confidence=high
-_Classification:_ harness \| stop_token
-_Summary:_ Special control token &lt;/think&gt; appeared in generated text. \|
+- _Likely owner:_ mlx-vlm \| confidence=high
+- _Classification:_ harness \| stop_token
+- _Summary:_ Special control token &lt;/think&gt; appeared in generated text. \|
            hit token cap (500) \| nontext prompt burden=100% \| reasoning leak
-_Evidence:_ Special control token &lt;/think&gt; appeared in generated text.
-_Token context:_ prompt=6,091 \| output/prompt=8.21% \| nontext burden=100% \|
+- _Evidence:_ Special control token &lt;/think&gt; appeared in generated text.
+- _Token context:_ prompt=6,091 \| output/prompt=8.21% \| nontext burden=100% \|
                  stop=completed \| hit token cap (500)
-_Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
+- _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
                into user-facing text.
 
 **Why this appears to be an integration/runtime issue:**
@@ -286,14 +286,14 @@ In the foreground, there's a large, moss-covered rock. Next to it, a small pine.
 
 **Maintainer triage:**
 
-_Likely owner:_ mlx-vlm \| confidence=high
-_Classification:_ harness \| stop_token
-_Summary:_ Special control token &lt;/think&gt; appeared in generated text. \|
+- _Likely owner:_ mlx-vlm \| confidence=high
+- _Classification:_ harness \| stop_token
+- _Summary:_ Special control token &lt;/think&gt; appeared in generated text. \|
            hit token cap (500) \| nontext prompt burden=100% \| reasoning leak
-_Evidence:_ Special control token &lt;/think&gt; appeared in generated text.
-_Token context:_ prompt=6,091 \| output/prompt=8.21% \| nontext burden=100% \|
+- _Evidence:_ Special control token &lt;/think&gt; appeared in generated text.
+- _Token context:_ prompt=6,091 \| output/prompt=8.21% \| nontext burden=100% \|
                  stop=completed \| hit token cap (500)
-_Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
+- _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
                into user-facing text.
 
 **Why this appears to be an integration/runtime issue:**
@@ -317,19 +317,19 @@ _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
 
 **Maintainer triage:**
 
-_Likely owner:_ mlx \| confidence=high
-_Classification:_ context_budget \| long_context
-_Summary:_ Output is very short relative to prompt size (0.1%), suggesting
+- _Likely owner:_ mlx \| confidence=high
+- _Classification:_ context_budget \| long_context
+- _Summary:_ Output is very short relative to prompt size (0.1%), suggesting
            possible early-stop or prompt-handling issues. \| At long prompt
            length (16299 tokens), output stayed unusually short (13 tokens;
            ratio 0.1%). \| output/prompt=0.08% \| nontext prompt burden=100%
-_Evidence:_ Output is very short relative to prompt size (0.1%), suggesting
+- _Evidence:_ Output is very short relative to prompt size (0.1%), suggesting
             possible early-stop or prompt-handling issues. \| At long prompt
             length (16299 tokens), output stayed unusually short (13 tokens;
             ratio 0.1%).
-_Token context:_ prompt=16,299 \| output/prompt=0.08% \| nontext burden=100%
+- _Token context:_ prompt=16,299 \| output/prompt=0.08% \| nontext burden=100%
                  \| stop=completed
-_Next action:_ Treat this as a prompt-budget issue first; nontext prompt
+- _Next action:_ Treat this as a prompt-budget issue first; nontext prompt
                burden is 100% and the output stays weak under that load.
 
 **Why this appears to be an integration/runtime issue:**
@@ -352,14 +352,14 @@ I'm sorry, but the context didn't show up.
 
 **Maintainer triage:**
 
-_Likely owner:_ model-config \| confidence=high
-_Classification:_ harness \| prompt_template
-_Summary:_ Output appears truncated to about 4 tokens. \| nontext prompt
+- _Likely owner:_ model-config \| confidence=high
+- _Classification:_ harness \| prompt_template
+- _Summary:_ Output appears truncated to about 4 tokens. \| nontext prompt
            burden=98%
-_Evidence:_ Output appears truncated to about 4 tokens.
-_Token context:_ prompt=264 \| output/prompt=1.52% \| nontext burden=98% \|
+- _Evidence:_ Output appears truncated to about 4 tokens.
+- _Token context:_ prompt=264 \| output/prompt=1.52% \| nontext burden=98% \|
                  stop=completed
-_Next action:_ Inspect model repo config, chat template, and EOS settings.
+- _Next action:_ Inspect model repo config, chat template, and EOS settings.
 
 **Why this appears to be an integration/runtime issue:**
 
@@ -380,14 +380,14 @@ in the park
 
 **Maintainer triage:**
 
-_Likely owner:_ model-config \| confidence=high
-_Classification:_ harness \| prompt_template
-_Summary:_ Output appears truncated to about 5 tokens. \| nontext prompt
+- _Likely owner:_ model-config \| confidence=high
+- _Classification:_ harness \| prompt_template
+- _Summary:_ Output appears truncated to about 5 tokens. \| nontext prompt
            burden=98%
-_Evidence:_ Output appears truncated to about 5 tokens.
-_Token context:_ prompt=266 \| output/prompt=1.88% \| nontext burden=98% \|
+- _Evidence:_ Output appears truncated to about 5 tokens.
+- _Token context:_ prompt=266 \| output/prompt=1.88% \| nontext burden=98% \|
                  stop=completed
-_Next action:_ Inspect model repo config, chat template, and EOS settings.
+- _Next action:_ Inspect model repo config, chat template, and EOS settings.
 
 **Why this appears to be an integration/runtime issue:**
 
@@ -408,17 +408,17 @@ in one sentence.
 
 **Maintainer triage:**
 
-_Likely owner:_ mlx \| confidence=high
-_Classification:_ context_budget \| long_context
-_Summary:_ Output appears truncated to about 3 tokens. \| At long prompt
+- _Likely owner:_ mlx \| confidence=high
+- _Classification:_ context_budget \| long_context
+- _Summary:_ Output appears truncated to about 3 tokens. \| At long prompt
            length (4101 tokens), output stayed unusually short (3 tokens;
            ratio 0.1%). \| output/prompt=0.07% \| nontext prompt burden=100%
-_Evidence:_ Output appears truncated to about 3 tokens. \| At long prompt
+- _Evidence:_ Output appears truncated to about 3 tokens. \| At long prompt
             length (4101 tokens), output stayed unusually short (3 tokens;
             ratio 0.1%).
-_Token context:_ prompt=4,101 \| output/prompt=0.07% \| nontext burden=100% \|
+- _Token context:_ prompt=4,101 \| output/prompt=0.07% \| nontext burden=100% \|
                  stop=completed
-_Next action:_ Treat this as a prompt-budget issue first; nontext prompt
+- _Next action:_ Treat this as a prompt-budget issue first; nontext prompt
                burden is 100% and the output stays weak under that load.
 
 **Why this appears to be an integration/runtime issue:**

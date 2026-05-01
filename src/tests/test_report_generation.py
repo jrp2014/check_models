@@ -1672,6 +1672,7 @@ class TestDiagnosticsReport:
 
         content = out.read_text(encoding="utf-8")
         assert "Representative maintainer triage" in content
+        assert "- _Likely owner:_" in content
         assert "MLX_VLM_DECODE_RUNTIME" in content
         assert "confidence=high" in content
         assert "runtime_failure" in content

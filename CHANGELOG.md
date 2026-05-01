@@ -5,6 +5,12 @@ Notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Render maintainer triage blocks in generated diagnostics and issue markdown as
+  actual bullet lists so the sections no longer collapse into a single wrapped
+  paragraph.
+
 ## [0.6.0] - 2026-04-26
 
 ### Added
