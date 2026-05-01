@@ -38,10 +38,13 @@ Quick triage list with likely owner and next action for each issue class.
 
 ## 1. Failure affecting 1 model (Priority: Medium)
 
-**Observed behavior:** Model loading failed: Received 4 parameters not in model:
-**Owner (likely component):** `mlx`
-**Suggested next action:** check tensor/cache behavior and memory pressure handling.
-**Affected model:** `mlx-community/Kimi-VL-A3B-Thinking-8bit`
+- _Observed:_ Model loading failed: Received 4 parameters not in model:
+- _Likely owner:_ `mlx`
+- _Why it matters:_ This prevented a complete model response; stage `Model
+  Error`; phase `model_load`; code `MLX_MODEL_LOAD_MODEL`; type `ValueError`.
+- _Suggested next step:_ check tensor/cache behavior and memory pressure
+  handling.
+- _Affected models:_ `mlx-community/Kimi-VL-A3B-Thinking-8bit`
 
 **Representative maintainer triage:**
 
@@ -51,7 +54,7 @@ Quick triage list with likely owner and next action for each issue class.
 - _Evidence:_ model error \| mlx model load model
 - _Token context:_ stop=exception
 - _Next action:_ Inspect KV/cache behavior, memory pressure, and long-context
-               execution.
+  execution.
 
 | Model                                     | Observed Behavior                                         | First Seen Failing      | Recent Repro           |
 |-------------------------------------------|-----------------------------------------------------------|-------------------------|------------------------|
@@ -88,10 +91,15 @@ Captured stdout/stderr:
 
 ## 2. Failure affecting 1 model (Priority: Medium)
 
-**Observed behavior:** Loaded processor has no image_processor; expected multimodal processor.
-**Owner (likely component):** `model configuration/repository`
-**Suggested next action:** verify model config, tokenizer files, and revision alignment.
-**Affected model:** `mlx-community/MolmoPoint-8B-fp16`
+- _Observed:_ Loaded processor has no image_processor; expected multimodal
+  processor.
+- _Likely owner:_ `model configuration/repository`
+- _Why it matters:_ This prevented a complete model response; stage `Processor
+  Error`; phase `processor_load`; code
+  `MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR`; type `ValueError`.
+- _Suggested next step:_ verify model config, tokenizer files, and revision
+  alignment.
+- _Affected models:_ `mlx-community/MolmoPoint-8B-fp16`
 
 **Representative maintainer triage:**
 
@@ -149,25 +157,29 @@ point to stack/runtime behavior rather than inherent model quality limits.
 
 ### `microsoft/Phi-3.5-vision-instruct`
 
-**What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
-**Likely component:** `mlx-vlm`
-**Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=768, output=500, output/prompt=65.10%
+- _Observed:_ Generation appears to continue through stop/control tokens
+  instead of ending cleanly.
+- _Likely owner:_ `mlx-vlm`
+- _Why it matters:_ The run completed, but the output pattern points to
+  stack/runtime behavior rather than a clean model-quality limitation.
+- _Suggested next step:_ check processor/chat-template wiring and generation
+  kwargs.
+- _Token summary:_ prompt=768, output=500, output/prompt=65.10%
 
 **Maintainer triage:**
 
 - _Likely owner:_ mlx-vlm \| confidence=high
 - _Classification:_ harness \| stop_token
 - _Summary:_ Special control token &lt;\|end\|&gt; appeared in generated text.
-           \| Special control token &lt;\|endoftext\|&gt; appeared in
-           generated text. \| hit token cap (500) \| nontext prompt burden=99%
-- _Evidence:_ Special control token &lt;\|end\|&gt; appeared in generated text.
-            \| Special control token &lt;\|endoftext\|&gt; appeared in
-            generated text.
+  \| Special control token &lt;\|endoftext\|&gt; appeared in generated text.
+  \| hit token cap (500) \| nontext prompt burden=99%
+- _Evidence:_ Special control token &lt;\|end\|&gt; appeared in generated
+  text. \| Special control token &lt;\|endoftext\|&gt; appeared in generated
+  text.
 - _Token context:_ prompt=768 \| output/prompt=65.10% \| nontext burden=99% \|
-                 stop=completed \| hit token cap (500)
+  stop=completed \| hit token cap (500)
 - _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
-               into user-facing text.
+  into user-facing text.
 
 **Why this appears to be an integration/runtime issue:**
 
@@ -183,23 +195,27 @@ The image shows a tranquil park scene with a person standing on a wooden dock, f
 
 ### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
 
-**What looks wrong:** Decoded output contains tokenizer artifacts that should not appear in user-facing text.
-**Likely component:** `mlx-vlm`
-**Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=2,097, output=172, output/prompt=8.20%
+- _Observed:_ Decoded output contains tokenizer artifacts that should not
+  appear in user-facing text.
+- _Likely owner:_ `mlx-vlm`
+- _Why it matters:_ The run completed, but the output pattern points to
+  stack/runtime behavior rather than a clean model-quality limitation.
+- _Suggested next step:_ check processor/chat-template wiring and generation
+  kwargs.
+- _Token summary:_ prompt=2,097, output=172, output/prompt=8.20%
 
 **Maintainer triage:**
 
 - _Likely owner:_ mlx-vlm \| confidence=high
 - _Classification:_ harness \| encoding
-- _Summary:_ Tokenizer space-marker artifacts (for example Ġ) appeared in output
-           (about 139 occurrences). \| nontext prompt burden=100%
+- _Summary:_ Tokenizer space-marker artifacts (for example Ġ) appeared in
+  output (about 139 occurrences). \| nontext prompt burden=100%
 - _Evidence:_ Tokenizer space-marker artifacts (for example Ġ) appeared in
-            output (about 139 occurrences).
-- _Token context:_ prompt=2,097 \| output/prompt=8.20% \| nontext burden=100% \|
-                 stop=completed
+  output (about 139 occurrences).
+- _Token context:_ prompt=2,097 \| output/prompt=8.20% \| nontext burden=100%
+  \| stop=completed
 - _Next action:_ Inspect decode cleanup; tokenizer markers are leaking into
-               user-facing text.
+  user-facing text.
 
 **Why this appears to be an integration/runtime issue:**
 
@@ -213,22 +229,26 @@ TheĠimageĠdepictsĠaĠsereneĠoutdoorĠscene,ĠlikelyĠinĠaĠparkĠorĠgarden
 
 ### `mlx-community/GLM-4.6V-Flash-6bit`
 
-**What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
-**Likely component:** `mlx-vlm`
-**Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=6,091, output=500, output/prompt=8.21%
+- _Observed:_ Generation appears to continue through stop/control tokens
+  instead of ending cleanly.
+- _Likely owner:_ `mlx-vlm`
+- _Why it matters:_ The run completed, but the output pattern points to
+  stack/runtime behavior rather than a clean model-quality limitation.
+- _Suggested next step:_ check processor/chat-template wiring and generation
+  kwargs.
+- _Token summary:_ prompt=6,091, output=500, output/prompt=8.21%
 
 **Maintainer triage:**
 
 - _Likely owner:_ mlx-vlm \| confidence=high
 - _Classification:_ harness \| stop_token
-- _Summary:_ Special control token &lt;/think&gt; appeared in generated text. \|
-           hit token cap (500) \| nontext prompt burden=100% \| reasoning leak
+- _Summary:_ Special control token &lt;/think&gt; appeared in generated text.
+  \| hit token cap (500) \| nontext prompt burden=100% \| reasoning leak
 - _Evidence:_ Special control token &lt;/think&gt; appeared in generated text.
-- _Token context:_ prompt=6,091 \| output/prompt=8.21% \| nontext burden=100% \|
-                 stop=completed \| hit token cap (500)
+- _Token context:_ prompt=6,091 \| output/prompt=8.21% \| nontext burden=100%
+  \| stop=completed \| hit token cap (500)
 - _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
-               into user-facing text.
+  into user-facing text.
 
 **Why this appears to be an integration/runtime issue:**
 
@@ -246,22 +266,26 @@ In the foreground, there's a small pine tree planted in a bed with dark soil, a.
 
 ### `mlx-community/GLM-4.6V-Flash-mxfp4`
 
-**What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
-**Likely component:** `mlx-vlm`
-**Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=6,091, output=500, output/prompt=8.21%
+- _Observed:_ Generation appears to continue through stop/control tokens
+  instead of ending cleanly.
+- _Likely owner:_ `mlx-vlm`
+- _Why it matters:_ The run completed, but the output pattern points to
+  stack/runtime behavior rather than a clean model-quality limitation.
+- _Suggested next step:_ check processor/chat-template wiring and generation
+  kwargs.
+- _Token summary:_ prompt=6,091, output=500, output/prompt=8.21%
 
 **Maintainer triage:**
 
 - _Likely owner:_ mlx-vlm \| confidence=high
 - _Classification:_ harness \| stop_token
-- _Summary:_ Special control token &lt;/think&gt; appeared in generated text. \|
-           hit token cap (500) \| nontext prompt burden=100% \| reasoning leak
+- _Summary:_ Special control token &lt;/think&gt; appeared in generated text.
+  \| hit token cap (500) \| nontext prompt burden=100% \| reasoning leak
 - _Evidence:_ Special control token &lt;/think&gt; appeared in generated text.
-- _Token context:_ prompt=6,091 \| output/prompt=8.21% \| nontext burden=100% \|
-                 stop=completed \| hit token cap (500)
+- _Token context:_ prompt=6,091 \| output/prompt=8.21% \| nontext burden=100%
+  \| stop=completed \| hit token cap (500)
 - _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
-               into user-facing text.
+  into user-facing text.
 
 **Why this appears to be an integration/runtime issue:**
 
@@ -279,22 +303,26 @@ In the foreground, there's a large, moss-covered rock. Next to it, a small pine.
 
 ### `mlx-community/GLM-4.6V-nvfp4`
 
-**What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
-**Likely component:** `mlx-vlm`
-**Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=6,091, output=500, output/prompt=8.21%
+- _Observed:_ Generation appears to continue through stop/control tokens
+  instead of ending cleanly.
+- _Likely owner:_ `mlx-vlm`
+- _Why it matters:_ The run completed, but the output pattern points to
+  stack/runtime behavior rather than a clean model-quality limitation.
+- _Suggested next step:_ check processor/chat-template wiring and generation
+  kwargs.
+- _Token summary:_ prompt=6,091, output=500, output/prompt=8.21%
 
 **Maintainer triage:**
 
 - _Likely owner:_ mlx-vlm \| confidence=high
 - _Classification:_ harness \| stop_token
-- _Summary:_ Special control token &lt;/think&gt; appeared in generated text. \|
-           hit token cap (500) \| nontext prompt burden=100% \| reasoning leak
+- _Summary:_ Special control token &lt;/think&gt; appeared in generated text.
+  \| hit token cap (500) \| nontext prompt burden=100% \| reasoning leak
 - _Evidence:_ Special control token &lt;/think&gt; appeared in generated text.
-- _Token context:_ prompt=6,091 \| output/prompt=8.21% \| nontext burden=100% \|
-                 stop=completed \| hit token cap (500)
+- _Token context:_ prompt=6,091 \| output/prompt=8.21% \| nontext burden=100%
+  \| stop=completed \| hit token cap (500)
 - _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
-               into user-facing text.
+  into user-facing text.
 
 **Why this appears to be an integration/runtime issue:**
 
@@ -310,27 +338,29 @@ In the foreground, there's a large, moss-covered rock. Next to it, a small pine.
 
 ### `mlx-community/Qwen2-VL-2B-Instruct-4bit`
 
-**What looks wrong:** Behavior degrades under long prompt context.
-**Likely component:** `mlx-vlm / mlx`
-**Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,299, output=13, output/prompt=0.08%
+- _Observed:_ Behavior degrades under long prompt context.
+- _Likely owner:_ `mlx-vlm / mlx`
+- _Why it matters:_ The run completed, but the output pattern points to
+  stack/runtime behavior rather than a clean model-quality limitation.
+- _Suggested next step:_ validate long-context handling and stop-token
+  behavior across mlx-vlm + mlx runtime.
+- _Token summary:_ prompt=16,299, output=13, output/prompt=0.08%
 
 **Maintainer triage:**
 
 - _Likely owner:_ mlx \| confidence=high
 - _Classification:_ context_budget \| long_context
 - _Summary:_ Output is very short relative to prompt size (0.1%), suggesting
-           possible early-stop or prompt-handling issues. \| At long prompt
-           length (16299 tokens), output stayed unusually short (13 tokens;
-           ratio 0.1%). \| output/prompt=0.08% \| nontext prompt burden=100%
+  possible early-stop or prompt-handling issues. \| At long prompt length
+  (16299 tokens), output stayed unusually short (13 tokens; ratio 0.1%). \|
+  output/prompt=0.08% \| nontext prompt burden=100%
 - _Evidence:_ Output is very short relative to prompt size (0.1%), suggesting
-            possible early-stop or prompt-handling issues. \| At long prompt
-            length (16299 tokens), output stayed unusually short (13 tokens;
-            ratio 0.1%).
+  possible early-stop or prompt-handling issues. \| At long prompt length
+  (16299 tokens), output stayed unusually short (13 tokens; ratio 0.1%).
 - _Token context:_ prompt=16,299 \| output/prompt=0.08% \| nontext burden=100%
-                 \| stop=completed
+  \| stop=completed
 - _Next action:_ Treat this as a prompt-budget issue first; nontext prompt
-               burden is 100% and the output stays weak under that load.
+  burden is 100% and the output stays weak under that load.
 
 **Why this appears to be an integration/runtime issue:**
 
@@ -345,20 +375,24 @@ I'm sorry, but the context didn't show up.
 
 ### `mlx-community/gemma-3n-E2B-4bit`
 
-**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
-**Likely component:** `model-config / mlx-vlm`
-**Suggested next action:** validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
-**Token summary:** prompt=264, output=4, output/prompt=1.52%
+- _Observed:_ Output shape suggests a prompt-template or stop-condition
+  mismatch.
+- _Likely owner:_ `model-config / mlx-vlm`
+- _Why it matters:_ The run completed, but the output pattern points to
+  stack/runtime behavior rather than a clean model-quality limitation.
+- _Suggested next step:_ validate chat-template/config expectations and
+  mlx-vlm prompt formatting for this model.
+- _Token summary:_ prompt=264, output=4, output/prompt=1.52%
 
 **Maintainer triage:**
 
 - _Likely owner:_ model-config \| confidence=high
 - _Classification:_ harness \| prompt_template
 - _Summary:_ Output appears truncated to about 4 tokens. \| nontext prompt
-           burden=98%
+  burden=98%
 - _Evidence:_ Output appears truncated to about 4 tokens.
 - _Token context:_ prompt=264 \| output/prompt=1.52% \| nontext burden=98% \|
-                 stop=completed
+  stop=completed
 - _Next action:_ Inspect model repo config, chat template, and EOS settings.
 
 **Why this appears to be an integration/runtime issue:**
@@ -373,20 +407,24 @@ in the park
 
 ### `mlx-community/gemma-4-31b-bf16`
 
-**What looks wrong:** Output shape suggests a prompt-template or stop-condition mismatch.
-**Likely component:** `model-config / mlx-vlm`
-**Suggested next action:** validate chat-template/config expectations and mlx-vlm prompt formatting for this model.
-**Token summary:** prompt=266, output=5, output/prompt=1.88%
+- _Observed:_ Output shape suggests a prompt-template or stop-condition
+  mismatch.
+- _Likely owner:_ `model-config / mlx-vlm`
+- _Why it matters:_ The run completed, but the output pattern points to
+  stack/runtime behavior rather than a clean model-quality limitation.
+- _Suggested next step:_ validate chat-template/config expectations and
+  mlx-vlm prompt formatting for this model.
+- _Token summary:_ prompt=266, output=5, output/prompt=1.88%
 
 **Maintainer triage:**
 
 - _Likely owner:_ model-config \| confidence=high
 - _Classification:_ harness \| prompt_template
 - _Summary:_ Output appears truncated to about 5 tokens. \| nontext prompt
-           burden=98%
+  burden=98%
 - _Evidence:_ Output appears truncated to about 5 tokens.
 - _Token context:_ prompt=266 \| output/prompt=1.88% \| nontext burden=98% \|
-                 stop=completed
+  stop=completed
 - _Next action:_ Inspect model repo config, chat template, and EOS settings.
 
 **Why this appears to be an integration/runtime issue:**
@@ -401,25 +439,27 @@ in one sentence.
 
 ### `mlx-community/paligemma2-3b-pt-896-4bit`
 
-**What looks wrong:** Behavior degrades under long prompt context.
-**Likely component:** `mlx-vlm / mlx`
-**Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=4,101, output=3, output/prompt=0.07%
+- _Observed:_ Behavior degrades under long prompt context.
+- _Likely owner:_ `mlx-vlm / mlx`
+- _Why it matters:_ The run completed, but the output pattern points to
+  stack/runtime behavior rather than a clean model-quality limitation.
+- _Suggested next step:_ validate long-context handling and stop-token
+  behavior across mlx-vlm + mlx runtime.
+- _Token summary:_ prompt=4,101, output=3, output/prompt=0.07%
 
 **Maintainer triage:**
 
 - _Likely owner:_ mlx \| confidence=high
 - _Classification:_ context_budget \| long_context
 - _Summary:_ Output appears truncated to about 3 tokens. \| At long prompt
-           length (4101 tokens), output stayed unusually short (3 tokens;
-           ratio 0.1%). \| output/prompt=0.07% \| nontext prompt burden=100%
+  length (4101 tokens), output stayed unusually short (3 tokens; ratio 0.1%).
+  \| output/prompt=0.07% \| nontext prompt burden=100%
 - _Evidence:_ Output appears truncated to about 3 tokens. \| At long prompt
-            length (4101 tokens), output stayed unusually short (3 tokens;
-            ratio 0.1%).
-- _Token context:_ prompt=4,101 \| output/prompt=0.07% \| nontext burden=100% \|
-                 stop=completed
+  length (4101 tokens), output stayed unusually short (3 tokens; ratio 0.1%).
+- _Token context:_ prompt=4,101 \| output/prompt=0.07% \| nontext burden=100%
+  \| stop=completed
 - _Next action:_ Treat this as a prompt-budget issue first; nontext prompt
-               burden is 100% and the output stays weak under that load.
+  burden is 100% and the output stays weak under that load.
 
 **Why this appears to be an integration/runtime issue:**
 
@@ -603,4 +643,4 @@ Describe this picture
 - Input image: `/Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-05-01 14:28:43 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-05-01 17:56:05 BST by [check_models](https://github.com/jrp2014/check_models)._

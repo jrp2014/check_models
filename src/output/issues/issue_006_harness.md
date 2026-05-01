@@ -9,22 +9,32 @@ Integration/harness warning detected for `mlx-community/Qwen2-VL-2B-Instruct-4bi
 - Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues.
 - At long prompt length (16299 tokens), output stayed unusually short (13 tokens; ratio 0.1%).
 
+## At a Glance
+
+- _Observed:_ Output indicates a likely integration issue.
+- _Likely owner:_ `mlx-vlm / mlx`
+- _Why it matters:_ The run completed, but the output pattern points to
+  stack/runtime behavior rather than a clean model-quality limitation.
+- _Suggested next step:_ validate long-context handling and stop-token
+  behavior across mlx-vlm + mlx runtime.
+- _Token summary:_ prompt=16,299, output=13, output/prompt=0.08%
+
+
 ## Maintainer Triage
 
-_Likely owner:_ mlx \| confidence=high
-_Classification:_ context_budget \| long_context
-_Summary:_ Output is very short relative to prompt size (0.1%), suggesting
-           possible early-stop or prompt-handling issues. \| At long prompt
-           length (16299 tokens), output stayed unusually short (13 tokens;
-           ratio 0.1%). \| output/prompt=0.08% \| nontext prompt burden=100%
-_Evidence:_ Output is very short relative to prompt size (0.1%), suggesting
-            possible early-stop or prompt-handling issues. \| At long prompt
-            length (16299 tokens), output stayed unusually short (13 tokens;
-            ratio 0.1%).
-_Token context:_ prompt=16,299 \| output/prompt=0.08% \| nontext burden=100%
-                 \| stop=completed
-_Next action:_ Treat this as a prompt-budget issue first; nontext prompt
-               burden is 100% and the output stays weak under that load.
+- _Likely owner:_ mlx \| confidence=high
+- _Classification:_ context_budget \| long_context
+- _Summary:_ Output is very short relative to prompt size (0.1%), suggesting
+  possible early-stop or prompt-handling issues. \| At long prompt length
+  (16299 tokens), output stayed unusually short (13 tokens; ratio 0.1%). \|
+  output/prompt=0.08% \| nontext prompt burden=100%
+- _Evidence:_ Output is very short relative to prompt size (0.1%), suggesting
+  possible early-stop or prompt-handling issues. \| At long prompt length
+  (16299 tokens), output stayed unusually short (13 tokens; ratio 0.1%).
+- _Token context:_ prompt=16,299 \| output/prompt=0.08% \| nontext burden=100%
+  \| stop=completed
+- _Next action:_ Treat this as a prompt-budget issue first; nontext prompt
+  burden is 100% and the output stays weak under that load.
 
 
 ## Reproducibility

@@ -8,14 +8,27 @@ A runtime failure occurred affecting **1 model(s)**.
 
 - `mlx-community/MolmoPoint-8B-fp16`
 
+## At a Glance
+
+- _Observed:_ Loaded processor has no image_processor; expected multimodal
+  processor.
+- _Likely owner:_ `model configuration/repository`
+- _Why it matters:_ This prevented a complete model response; stage `Processor
+  Error`; phase `processor_load`; code
+  `MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR`; type `ValueError`.
+- _Suggested next step:_ verify model config, tokenizer files, and revision
+  alignment.
+- _Affected models:_ `mlx-community/MolmoPoint-8B-fp16`
+
+
 ## Maintainer Triage
 
-_Likely owner:_ model-config \| confidence=high
-_Classification:_ runtime_failure \| MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR
-_Summary:_ processor error \| model config processor load processor
-_Evidence:_ processor error \| model config processor load processor
-_Token context:_ stop=exception
-_Next action:_ Inspect model repo config, chat template, and EOS settings.
+- _Likely owner:_ model-config \| confidence=high
+- _Classification:_ runtime_failure \| MODEL_CONFIG_PROCESSOR_LOAD_PROCESSOR
+- _Summary:_ processor error \| model config processor load processor
+- _Evidence:_ processor error \| model config processor load processor
+- _Token context:_ stop=exception
+- _Next action:_ Inspect model repo config, chat template, and EOS settings.
 
 
 ## Traceback / Error Message

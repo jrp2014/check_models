@@ -8,17 +8,28 @@ Integration/harness warning detected for `mlx-community/GLM-4.6V-Flash-mxfp4`.
 
 - Special control token &lt;/think&gt; appeared in generated text.
 
+## At a Glance
+
+- _Observed:_ Output indicates a likely integration issue.
+- _Likely owner:_ `mlx-vlm`
+- _Why it matters:_ The run completed, but the output pattern points to
+  stack/runtime behavior rather than a clean model-quality limitation.
+- _Suggested next step:_ check processor/chat-template wiring and generation
+  kwargs.
+- _Token summary:_ prompt=6,091, output=500, output/prompt=8.21%
+
+
 ## Maintainer Triage
 
-_Likely owner:_ mlx-vlm \| confidence=high
-_Classification:_ harness \| stop_token
-_Summary:_ Special control token &lt;/think&gt; appeared in generated text. \|
-           hit token cap (500) \| nontext prompt burden=100% \| reasoning leak
-_Evidence:_ Special control token &lt;/think&gt; appeared in generated text.
-_Token context:_ prompt=6,091 \| output/prompt=8.21% \| nontext burden=100% \|
-                 stop=completed \| hit token cap (500)
-_Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
-               into user-facing text.
+- _Likely owner:_ mlx-vlm \| confidence=high
+- _Classification:_ harness \| stop_token
+- _Summary:_ Special control token &lt;/think&gt; appeared in generated text.
+  \| hit token cap (500) \| nontext prompt burden=100% \| reasoning leak
+- _Evidence:_ Special control token &lt;/think&gt; appeared in generated text.
+- _Token context:_ prompt=6,091 \| output/prompt=8.21% \| nontext burden=100%
+  \| stop=completed \| hit token cap (500)
+- _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
+  into user-facing text.
 
 
 ## Reproducibility

@@ -1,6 +1,6 @@
 # Model Output Gallery
 
-_Generated on 2026-05-01 15:41:29 BST_
+_Generated on 2026-05-01 17:56:05 BST_
 
 A review-friendly artifact with image metadata, the source prompt, and full
 generated output for each model.

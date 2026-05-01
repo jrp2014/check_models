@@ -13,6 +13,9 @@ Notable changes to this project will be documented in this file.
 - Rewrite the per-model review block in `model_gallery.md` with clearer labels
   and human-readable wording so recommendations, token summaries, and owner
   routing are easier to scan.
+- Reuse shared compact "at a glance" row builders across diagnostics,
+  `review.md`, and generated issue markdown so failure, harness, and next-step
+  summaries stay consistent when the human-facing reports are regenerated.
 
 ## [0.6.0] - 2026-04-26
 

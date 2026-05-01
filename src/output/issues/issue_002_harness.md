@@ -8,18 +8,29 @@ Integration/harness warning detected for `mlx-community/Devstral-Small-2-24B-Ins
 
 - Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 139 occurrences).
 
+## At a Glance
+
+- _Observed:_ Output indicates a likely integration issue.
+- _Likely owner:_ `mlx-vlm`
+- _Why it matters:_ The run completed, but the output pattern points to
+  stack/runtime behavior rather than a clean model-quality limitation.
+- _Suggested next step:_ check processor/chat-template wiring and generation
+  kwargs.
+- _Token summary:_ prompt=2,097, output=172, output/prompt=8.20%
+
+
 ## Maintainer Triage
 
-_Likely owner:_ mlx-vlm \| confidence=high
-_Classification:_ harness \| encoding
-_Summary:_ Tokenizer space-marker artifacts (for example Ġ) appeared in output
-           (about 139 occurrences). \| nontext prompt burden=100%
-_Evidence:_ Tokenizer space-marker artifacts (for example Ġ) appeared in
-            output (about 139 occurrences).
-_Token context:_ prompt=2,097 \| output/prompt=8.20% \| nontext burden=100% \|
-                 stop=completed
-_Next action:_ Inspect decode cleanup; tokenizer markers are leaking into
-               user-facing text.
+- _Likely owner:_ mlx-vlm \| confidence=high
+- _Classification:_ harness \| encoding
+- _Summary:_ Tokenizer space-marker artifacts (for example Ġ) appeared in
+  output (about 139 occurrences). \| nontext prompt burden=100%
+- _Evidence:_ Tokenizer space-marker artifacts (for example Ġ) appeared in
+  output (about 139 occurrences).
+- _Token context:_ prompt=2,097 \| output/prompt=8.20% \| nontext burden=100%
+  \| stop=completed
+- _Next action:_ Inspect decode cleanup; tokenizer markers are leaking into
+  user-facing text.
 
 
 ## Reproducibility

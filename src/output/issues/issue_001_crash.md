@@ -8,15 +8,26 @@ A runtime failure occurred affecting **1 model(s)**.
 
 - `mlx-community/Kimi-VL-A3B-Thinking-8bit`
 
+## At a Glance
+
+- _Observed:_ Model loading failed: Received 4 parameters not in model:
+- _Likely owner:_ `mlx`
+- _Why it matters:_ This prevented a complete model response; stage `Model
+  Error`; phase `model_load`; code `MLX_MODEL_LOAD_MODEL`; type `ValueError`.
+- _Suggested next step:_ check tensor/cache behavior and memory pressure
+  handling.
+- _Affected models:_ `mlx-community/Kimi-VL-A3B-Thinking-8bit`
+
+
 ## Maintainer Triage
 
-_Likely owner:_ mlx \| confidence=high
-_Classification:_ runtime_failure \| MLX_MODEL_LOAD_MODEL
-_Summary:_ model error \| mlx model load model
-_Evidence:_ model error \| mlx model load model
-_Token context:_ stop=exception
-_Next action:_ Inspect KV/cache behavior, memory pressure, and long-context
-               execution.
+- _Likely owner:_ mlx \| confidence=high
+- _Classification:_ runtime_failure \| MLX_MODEL_LOAD_MODEL
+- _Summary:_ model error \| mlx model load model
+- _Evidence:_ model error \| mlx model load model
+- _Token context:_ stop=exception
+- _Next action:_ Inspect KV/cache behavior, memory pressure, and long-context
+  execution.
 
 
 ## Traceback / Error Message

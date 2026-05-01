@@ -8,16 +8,27 @@ Integration/harness warning detected for `mlx-community/gemma-4-31b-bf16`.
 
 - Output appears truncated to about 5 tokens.
 
+## At a Glance
+
+- _Observed:_ Output indicates a likely integration issue.
+- _Likely owner:_ `model-config / mlx-vlm`
+- _Why it matters:_ The run completed, but the output pattern points to
+  stack/runtime behavior rather than a clean model-quality limitation.
+- _Suggested next step:_ validate chat-template/config expectations and
+  mlx-vlm prompt formatting for this model.
+- _Token summary:_ prompt=266, output=5, output/prompt=1.88%
+
+
 ## Maintainer Triage
 
-_Likely owner:_ model-config \| confidence=high
-_Classification:_ harness \| prompt_template
-_Summary:_ Output appears truncated to about 5 tokens. \| nontext prompt
-           burden=98%
-_Evidence:_ Output appears truncated to about 5 tokens.
-_Token context:_ prompt=266 \| output/prompt=1.88% \| nontext burden=98% \|
-                 stop=completed
-_Next action:_ Inspect model repo config, chat template, and EOS settings.
+- _Likely owner:_ model-config \| confidence=high
+- _Classification:_ harness \| prompt_template
+- _Summary:_ Output appears truncated to about 5 tokens. \| nontext prompt
+  burden=98%
+- _Evidence:_ Output appears truncated to about 5 tokens.
+- _Token context:_ prompt=266 \| output/prompt=1.88% \| nontext burden=98% \|
+  stop=completed
+- _Next action:_ Inspect model repo config, chat template, and EOS settings.
 
 
 ## Reproducibility

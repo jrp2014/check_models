@@ -9,20 +9,31 @@ Integration/harness warning detected for `microsoft/Phi-3.5-vision-instruct`.
 - Special control token &lt;|end|&gt; appeared in generated text.
 - Special control token &lt;|endoftext|&gt; appeared in generated text.
 
+## At a Glance
+
+- _Observed:_ Output indicates a likely integration issue.
+- _Likely owner:_ `mlx-vlm`
+- _Why it matters:_ The run completed, but the output pattern points to
+  stack/runtime behavior rather than a clean model-quality limitation.
+- _Suggested next step:_ check processor/chat-template wiring and generation
+  kwargs.
+- _Token summary:_ prompt=768, output=500, output/prompt=65.10%
+
+
 ## Maintainer Triage
 
-_Likely owner:_ mlx-vlm \| confidence=high
-_Classification:_ harness \| stop_token
-_Summary:_ Special control token &lt;\|end\|&gt; appeared in generated text.
-           \| Special control token &lt;\|endoftext\|&gt; appeared in
-           generated text. \| hit token cap (500) \| nontext prompt burden=99%
-_Evidence:_ Special control token &lt;\|end\|&gt; appeared in generated text.
-            \| Special control token &lt;\|endoftext\|&gt; appeared in
-            generated text.
-_Token context:_ prompt=768 \| output/prompt=65.10% \| nontext burden=99% \|
-                 stop=completed \| hit token cap (500)
-_Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
-               into user-facing text.
+- _Likely owner:_ mlx-vlm \| confidence=high
+- _Classification:_ harness \| stop_token
+- _Summary:_ Special control token &lt;\|end\|&gt; appeared in generated text.
+  \| Special control token &lt;\|endoftext\|&gt; appeared in generated text.
+  \| hit token cap (500) \| nontext prompt burden=99%
+- _Evidence:_ Special control token &lt;\|end\|&gt; appeared in generated
+  text. \| Special control token &lt;\|endoftext\|&gt; appeared in generated
+  text.
+- _Token context:_ prompt=768 \| output/prompt=65.10% \| nontext burden=99% \|
+  stop=completed \| hit token cap (500)
+- _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
+  into user-facing text.
 
 
 ## Reproducibility

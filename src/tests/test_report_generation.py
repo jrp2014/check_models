@@ -1619,7 +1619,7 @@ class TestDiagnosticsReport:
         assert "prompt=5,000" in content
         assert "output/prompt=0.00%" in content
         assert "<empty output>" in content
-        assert "Likely component" in content
+        assert "Likely owner" in content
         assert "<summary>Sample output</summary>" not in content
 
     def test_harness_section_uses_prompt_template_owner_hint(self, tmp_path: Path) -> None:
@@ -1891,7 +1891,7 @@ class TestDiagnosticsReport:
         assert "### To reproduce" in content
         assert "### Filing Guidance" not in content
         assert "Copy/paste GitHub issue template" not in content
-        assert "Observed behavior" in content
+        assert "Observed" in content
         assert "Failure phase" not in content
         assert "Canonical code" not in content
         assert "Signature" not in content

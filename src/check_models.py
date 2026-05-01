@@ -1593,6 +1593,32 @@ def _append_markdown_labeled_value(
     )
 
 
+def _append_markdown_row_block(
+    parts: list[str],
+    *,
+    rows: Sequence[tuple[str, str]],
+    heading: str | None = None,
+) -> None:
+    """Append a compact Markdown stanza rendered as bullet rows."""
+    if not rows:
+        return
+    if heading is not None:
+        parts.extend([heading, ""])
+    for label, value in rows:
+        _append_markdown_labeled_value(parts, label=label, value=value, bullet=True)
+    parts.append("")
+
+
+@dataclass(frozen=True)
+class ReviewPayload:
+    """Canonical review inputs reused across human-facing report renderers."""
+
+    review: JsonlReviewRecord
+    analysis: GenerationQualityAnalysis | None
+    key_signals: str
+    next_action: str
+
+
 def _append_markdown_review_block(
     out: list[str],
     *,
@@ -9212,16 +9238,8 @@ def _append_maintainer_triage_markdown(
     rows = _build_maintainer_triage_rows(result)
     if not rows:
         return
-    if heading is not None:
-        parts.extend([heading, ""])
-    for label, value in rows:
-        _append_markdown_labeled_value(
-            parts,
-            label=label,
-            value=escaper.escape(value),
-            bullet=True,
-        )
-    parts.append("")
+    escaped_rows = [(label, escaper.escape(value)) for label, value in rows]
+    _append_markdown_row_block(parts, rows=escaped_rows, heading=heading)
 
 
 def _review_hint_text(
@@ -9487,22 +9505,38 @@ def _review_next_action_text(review: JsonlReviewRecord) -> str:
     return owner_actions.get(review["owner"], "Inspect the canonical log and diagnostics output.")
 
 
-def _build_review_block_rows(result: PerformanceResult) -> list[tuple[str, str]]:
-    """Build ordered canonical review rows shared by log and Markdown outputs."""
+def _build_review_payload(result: PerformanceResult) -> ReviewPayload | None:
+    """Build the shared review payload once for downstream report renderers."""
     review = _build_jsonl_review_record(result)
     if review is None:
-        return []
+        return None
+
     analysis = _quality_analysis_for_result(result)
-    why = _review_focus_text(review, analysis)
+    return ReviewPayload(
+        review=review,
+        analysis=analysis,
+        key_signals=_review_focus_text(review, analysis),
+        next_action=_review_next_action_text(review),
+    )
+
+
+def _build_review_block_rows(result: PerformanceResult) -> list[tuple[str, str]]:
+    """Build ordered canonical review rows shared by log and Markdown outputs."""
+    payload = _build_review_payload(result)
+    if payload is None:
+        return []
+
+    review = payload.review
+    analysis = payload.analysis
     return [
         ("Verdict", f"{review['verdict']} | user={review['user_bucket']}"),
-        ("Why", why),
+        ("Why", payload.key_signals),
         ("Trusted hints", _review_hint_text(review, analysis)),
         ("Contract", _review_contract_text(analysis)),
         ("Utility", _review_utility_text(review, analysis)),
         ("Stack / owner", _review_stack_owner_text(result, review, analysis)),
         ("Token accounting", _review_token_accounting_text(result, review)),
-        ("Next action", _review_next_action_text(review)),
+        ("Next action", payload.next_action),
     ]
 
 
@@ -9601,11 +9635,12 @@ def _markdown_review_token_accounting_text(
 
 def _build_markdown_review_block_rows(result: PerformanceResult) -> list[tuple[str, str]]:
     """Build clearer review rows for gallery-style Markdown artifacts."""
-    review = _build_jsonl_review_record(result)
-    if review is None:
+    payload = _build_review_payload(result)
+    if payload is None:
         return []
 
-    analysis = _quality_analysis_for_result(result)
+    review = payload.review
+    analysis = payload.analysis
     return [
         (
             "Recommendation",
@@ -9614,13 +9649,13 @@ def _build_markdown_review_block_rows(result: PerformanceResult) -> list[tuple[s
                 f"review verdict: {_humanize_review_verdict_text(review['verdict'])}"
             ),
         ),
-        ("Key signals", _markdown_review_text(_review_focus_text(review, analysis))),
+        ("Key signals", _markdown_review_text(payload.key_signals)),
         ("Hint handling", _markdown_review_text(_review_hint_text(review, analysis))),
         ("Output contract", _markdown_review_contract_text(analysis)),
         ("Cataloging fit", _markdown_review_utility_text(review, analysis)),
         ("Maintainer routing", _markdown_review_stack_owner_text(result, review, analysis)),
         ("Token summary", _markdown_review_token_accounting_text(result, review)),
-        ("Suggested next step", _review_next_action_text(review)),
+        ("Suggested next step", payload.next_action),
     ]
 
 
@@ -11219,18 +11254,21 @@ def _diagnostics_preflight_section(preflight_issues: Sequence[str]) -> list[str]
         )
         parts.append(f"### `{DIAGNOSTICS_ESCAPER.escape(_diagnostics_owner_label(package))}`")
         parts.append("")
-        parts.append(
-            f"- Suggested tracker: `{DIAGNOSTICS_ESCAPER.escape(target_name)}` (<{target_url}>)",
+        _append_markdown_row_block(
+            parts,
+            rows=_build_preflight_overview_rows(
+                package=package,
+                owner_issues=owner_issues,
+                target_name=target_name,
+                target_url=target_url,
+                escaper=DIAGNOSTICS_ESCAPER,
+            ),
         )
-        parts.append(f"- Suggested next action: {_diagnostics_next_action(package)}")
-        parts.append(
-            "- Triage guidance: continue if runs are otherwise healthy; investigate only if "
-            "this warning matches real backend symptoms in the same run.",
-        )
-        parts.append("- Warnings:")
+        parts.append("Warnings:")
+        parts.append("")
         for issue in owner_issues:
             escaped_issue = DIAGNOSTICS_ESCAPER.escape(issue)
-            parts.append(f"  - `{escaped_issue}`")
+            parts.append(f"- `{escaped_issue}`")
         parts.append("")
     parts.append("")
     return parts
@@ -11344,6 +11382,113 @@ def _diagnostics_next_action(owner_key: str) -> str:
         if required_parts.issubset(owner_parts):
             return action
     return _DIAGNOSTICS_OWNER_ACTIONS["unknown"]
+
+
+def _failure_impact_text(result: PerformanceResult) -> str:
+    """Return a short explanation of why a hard failure matters."""
+    details: list[str] = []
+    if result.error_stage:
+        details.append(f"stage `{result.error_stage}`")
+    if result.failure_phase:
+        details.append(f"phase `{result.failure_phase}`")
+    if result.error_code:
+        details.append(f"code `{result.error_code}`")
+    if result.error_type:
+        details.append(f"type `{result.error_type}`")
+    if details:
+        return "This prevented a complete model response; " + "; ".join(details) + "."
+    return "This prevented a complete model response and should be triaged before judging model quality."
+
+
+def _build_failure_overview_rows(
+    result: PerformanceResult,
+    *,
+    escaper: DiagnosticsEscaper | MarkdownPipeEscaper,
+    affected_models: Sequence[str] = (),
+) -> list[tuple[str, str]]:
+    """Build the shared failure overview rows for diagnostics and issue output."""
+    owner_key = result.error_package or "unknown"
+    rows: list[tuple[str, str]] = [
+        (
+            "Observed",
+            escaper.escape(
+                _simplify_failure_message(
+                    result.error_message,
+                    model_name=result.model_name,
+                ),
+            ),
+        ),
+        ("Likely owner", f"`{escaper.escape(_diagnostics_owner_label(owner_key))}`"),
+        ("Why it matters", escaper.escape(_failure_impact_text(result))),
+        ("Suggested next step", escaper.escape(_diagnostics_next_action(owner_key))),
+    ]
+    if affected_models:
+        rows.append(
+            (
+                "Affected models",
+                ", ".join(f"`{escaper.escape(model_name)}`" for model_name in affected_models),
+            ),
+        )
+    return rows
+
+
+def _build_harness_overview_rows(
+    *,
+    harness_summary: str,
+    likely_owner: str,
+    prompt_tokens: int,
+    generated_tokens: int,
+    ratio_text: str,
+    escaper: DiagnosticsEscaper | MarkdownPipeEscaper,
+) -> list[tuple[str, str]]:
+    """Build the shared harness-at-a-glance rows for diagnostics and issue output."""
+    token_summary = (
+        f"prompt={fmt_num(prompt_tokens)}, output={fmt_num(generated_tokens)}, "
+        f"output/prompt={ratio_text}"
+    )
+    return [
+        ("Observed", escaper.escape(harness_summary)),
+        ("Likely owner", f"`{escaper.escape(likely_owner)}`"),
+        (
+            "Why it matters",
+            escaper.escape(
+                "The run completed, but the output pattern points to stack/runtime behavior "
+                "rather than a clean model-quality limitation."
+            ),
+        ),
+        ("Suggested next step", escaper.escape(_diagnostics_next_action(likely_owner))),
+        ("Token summary", escaper.escape(token_summary)),
+    ]
+
+
+def _build_preflight_overview_rows(
+    *,
+    package: str,
+    owner_issues: Sequence[str],
+    target_name: str,
+    target_url: str,
+    escaper: DiagnosticsEscaper | MarkdownPipeEscaper,
+) -> list[tuple[str, str]]:
+    """Build shared overview rows for grouped preflight compatibility warnings."""
+    preview = _truncate_text_preview(owner_issues[0], max_chars=140) if owner_issues else "unknown"
+    rows: list[tuple[str, str]] = [
+        ("Observed", escaper.escape(preview)),
+        ("Likely owner", f"`{escaper.escape(_diagnostics_owner_label(package))}`"),
+        (
+            "Why it matters",
+            escaper.escape(
+                "These warnings are informational until they line up with API mismatches, "
+                "startup hangs, or runtime crashes in the same run."
+            ),
+        ),
+        ("Suggested tracker", f"`{escaper.escape(target_name)}` (<{target_url}>)"),
+        ("Suggested next step", escaper.escape(_diagnostics_next_action(package))),
+    ]
+    if len(owner_issues) > 1:
+        rows.append(
+            ("Additional warnings", escaper.escape(f"{len(owner_issues) - 1} more listed below"))
+        )
+    return rows
 
 
 def _infer_harness_issue_owner(result: PerformanceResult) -> str:
@@ -11595,31 +11740,22 @@ def _diagnostics_failure_clusters(
     parts = _begin_diagnostics_section()
     for idx, (_cluster_signature, cluster_results) in enumerate(failure_clusters, 1):
         rep = cluster_results[0]
-        pkg = rep.error_package or "unknown"
-        component_label = _DIAGNOSTICS_COMPONENT_LABELS.get(pkg, pkg)
         n = len(cluster_results)
         priority = _diagnostics_priority(n, rep.error_stage)
         model_word = "model" if n == 1 else "models"
-        observed = _simplify_failure_message(rep.error_message, model_name=rep.model_name)
-        affected_models = ", ".join(
-            f"`{DIAGNOSTICS_ESCAPER.escape(r.model_name)}`"
-            for r in sorted(
-                cluster_results,
-                key=lambda row: row.model_name,
-            )
-        )
 
         parts.append(
             f"## {idx}. Failure affecting {n} {model_word} (Priority: {priority})",
         )
         parts.append("")
-        parts.append(f"**Observed behavior:** {DIAGNOSTICS_ESCAPER.escape(observed)}")
-        parts.append(
-            f"**Owner (likely component):** `{DIAGNOSTICS_ESCAPER.escape(component_label)}`",
+        _append_markdown_row_block(
+            parts,
+            rows=_build_failure_overview_rows(
+                rep,
+                escaper=DIAGNOSTICS_ESCAPER,
+                affected_models=[r.model_name for r in cluster_results],
+            ),
         )
-        parts.append(f"**Suggested next action:** {_diagnostics_next_action(pkg)}")
-        parts.append(f"**Affected {model_word}:** {affected_models}")
-        parts.append("")
         _append_maintainer_triage_markdown(
             parts,
             result=rep,
@@ -11721,14 +11857,17 @@ def _diagnostics_harness_section(
             harness_type or "",
             "Output indicates a likely integration issue.",
         )
-        parts.append(f"**What looks wrong:** {harness_summary}")
-        parts.append(f"**Likely component:** `{likely_package}`")
-        parts.append(f"**Suggested next action:** {_diagnostics_next_action(likely_package)}")
-        parts.append(
-            f"**Token summary:** prompt={fmt_num(prompt_tokens)}, "
-            f"output={fmt_num(generated_tokens)}, output/prompt={ratio_text}",
+        _append_markdown_row_block(
+            parts,
+            rows=_build_harness_overview_rows(
+                harness_summary=harness_summary,
+                likely_owner=likely_package,
+                prompt_tokens=prompt_tokens,
+                generated_tokens=generated_tokens,
+                ratio_text=ratio_text,
+                escaper=DIAGNOSTICS_ESCAPER,
+            ),
         )
-        parts.append("")
         _append_maintainer_triage_markdown(
             parts,
             result=res,
@@ -13731,7 +13870,7 @@ def _append_review_model_verdicts(
         if review is None:
             continue
         md.extend([f"### `{result.model_name}`", ""])
-        md.extend(f"- **{label}:** {value}" for label, value in _build_review_block_rows(result))
+        _append_markdown_review_block(md, res=result)
         md.append("")
 
 
@@ -19749,6 +19888,49 @@ def _build_issue_triage_section(result: PerformanceResult) -> list[str]:
     return parts
 
 
+def _build_issue_failure_overview_section(
+    *,
+    result: PerformanceResult,
+    affected_models: Sequence[str],
+) -> list[str]:
+    """Build the shared failure overview section for standalone issue reports."""
+    parts = ["", "## At a Glance", ""]
+    _append_markdown_row_block(
+        parts,
+        rows=_build_failure_overview_rows(
+            result,
+            escaper=MARKDOWN_ESCAPER,
+            affected_models=affected_models,
+        ),
+    )
+    return parts
+
+
+def _build_issue_harness_overview_section(
+    *,
+    result: PerformanceResult,
+    harness_summary: str,
+) -> list[str]:
+    """Build the shared harness overview section for standalone issue reports."""
+    generation = result.generation
+    prompt_tokens = int(getattr(generation, "prompt_tokens", 0) or 0) if generation else 0
+    generated_tokens = int(getattr(generation, "generation_tokens", 0) or 0) if generation else 0
+    ratio_text = f"{(generated_tokens / prompt_tokens):.2%}" if prompt_tokens > 0 else "n/a"
+    parts = ["", "## At a Glance", ""]
+    _append_markdown_row_block(
+        parts,
+        rows=_build_harness_overview_rows(
+            harness_summary=harness_summary,
+            likely_owner=_infer_harness_issue_owner(result),
+            prompt_tokens=prompt_tokens,
+            generated_tokens=generated_tokens,
+            ratio_text=ratio_text,
+            escaper=MARKDOWN_ESCAPER,
+        ),
+    )
+    return parts
+
+
 def _generate_github_issue_reports(
     *,
     diagnostics_snapshot: DiagnosticsSnapshot,
@@ -19789,6 +19971,12 @@ def _generate_github_issue_reports(
             "",
         ]
         parts.extend(f"- `{m}`" for m in models)
+        parts.extend(
+            _build_issue_failure_overview_section(
+                result=rep_result,
+                affected_models=models,
+            ),
+        )
         parts.extend(_build_issue_triage_section(rep_result))
         parts.extend(
             [
@@ -19839,6 +20027,15 @@ def _generate_github_issue_reports(
             "",
             harness_details,
         ]
+        parts.extend(
+            _build_issue_harness_overview_section(
+                result=result,
+                harness_summary=_HARNESS_TYPE_DESCRIPTIONS.get(
+                    harness_type or "",
+                    "Output indicates a likely integration issue.",
+                ),
+            ),
+        )
         parts.extend(_build_issue_triage_section(result))
         parts.extend(
             _build_issue_repro_section(
