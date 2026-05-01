@@ -10,6 +10,9 @@ Notable changes to this project will be documented in this file.
 - Render maintainer triage blocks in generated diagnostics and issue markdown as
   actual bullet lists so the sections no longer collapse into a single wrapped
   paragraph.
+- Rewrite the per-model review block in `model_gallery.md` with clearer labels
+  and human-readable wording so recommendations, token summaries, and owner
+  routing are easier to scan.
 
 ## [0.6.0] - 2026-04-26
 

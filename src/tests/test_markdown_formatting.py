@@ -176,8 +176,8 @@ def test_gallery_metrics_include_time_and_throughput_details() -> None:
 
     md = _gallery_lines_for(result)
 
-    assert "_Metrics:_ Load 3.29s | Gen 1.60s | Total 5.14s" in md
-    assert "_Throughput:_ Prompt 1,551 TPS (1,624 tok) | Gen 5.51 TPS (9 tok)" in md
+    assert "_Timing:_ Load 3.29s; Gen 1.60s; Total 5.14s" in md
+    assert "_Throughput:_ Prompt 1,551 TPS (1,624 tok); Gen 5.51 TPS (9 tok)" in md
 
 
 def test_gallery_metrics_omit_missing_segments_cleanly() -> None:
@@ -198,7 +198,7 @@ def test_gallery_metrics_omit_missing_segments_cleanly() -> None:
 
     md = _gallery_lines_for(result)
 
-    assert "_Metrics:_ Gen 10.90s | Total 14.51s" in md
+    assert "_Timing:_ Gen 10.90s; Total 14.51s" in md
     assert "_Throughput:_ Gen 29.7 TPS (80 tok)" in md
     assert "Prompt" not in md
 
@@ -507,7 +507,7 @@ def test_gallery_review_summary_uses_review_focus_evidence(tmp_path: Path) -> No
     )
     md = out.read_text(encoding="utf-8")
 
-    assert "_Review:_" in md
+    assert "_Review summary:_" in md
     assert "hit token cap (60)" in md
     assert "keywords=1" in md
 

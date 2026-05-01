@@ -1599,7 +1599,7 @@ def _append_markdown_review_block(
     res: PerformanceResult,
 ) -> None:
     """Append the shared canonical review block to a Markdown artifact."""
-    rows = _build_review_block_rows(res)
+    rows = _build_markdown_review_block_rows(res)
     for label, value in rows:
         _append_markdown_labeled_value(out, label=label, value=value)
 
@@ -1706,26 +1706,30 @@ def _build_gallery_success_block_lines(  # noqa: C901 - keep gallery rendering l
                 assessment_parts.append(weakness)
             _append_markdown_labeled_value(
                 out,
-                label="Assessment",
-                value=" | ".join(assessment_parts),
+                label="Score summary",
+                value=_markdown_review_text(" | ".join(assessment_parts)),
             )
 
         if useful_now:
             _append_markdown_labeled_value(
                 out,
-                label="Review Status",
+                label="Review priority",
                 value="strong candidate for first-pass review",
             )
         elif watchlist_reason is not None:
             _append_markdown_labeled_value(
                 out,
-                label="Review Status",
+                label="Review priority",
                 value=f"watchlist ({_humanize_watchlist_reason(watchlist_reason)})",
             )
 
         review_summary = _summarize_model_review(res, summary)
         if review_summary:
-            _append_markdown_labeled_value(out, label="Review", value=review_summary)
+            _append_markdown_labeled_value(
+                out,
+                label="Review summary",
+                value=_markdown_review_text(review_summary),
+            )
 
     def _append_quality_lines() -> None:
         if generation is None:
@@ -1768,7 +1772,11 @@ def _build_gallery_success_block_lines(  # noqa: C901 - keep gallery rendering l
     ]
 
     if time_segments:
-        _append_markdown_labeled_value(out, label="Metrics", value=" | ".join(time_segments))
+        _append_markdown_labeled_value(
+            out,
+            label="Timing",
+            value=_markdown_review_text(" | ".join(time_segments)),
+        )
         if generation is not None:
             throughput_segments: list[str] = [
                 segment
@@ -1792,7 +1800,7 @@ def _build_gallery_success_block_lines(  # noqa: C901 - keep gallery rendering l
                 _append_markdown_labeled_value(
                     out,
                     label="Throughput",
-                    value=" | ".join(throughput_segments),
+                    value=_markdown_review_text(" | ".join(throughput_segments)),
                 )
 
     _append_triage_lines()
@@ -9495,6 +9503,124 @@ def _build_review_block_rows(result: PerformanceResult) -> list[tuple[str, str]]
         ("Stack / owner", _review_stack_owner_text(result, review, analysis)),
         ("Token accounting", _review_token_accounting_text(result, review)),
         ("Next action", _review_next_action_text(review)),
+    ]
+
+
+def _markdown_review_text(text: str) -> str:
+    """Return gallery-friendly text for compact review fragments."""
+    return text.replace(" | ", "; ")
+
+
+def _humanize_review_bucket_text(bucket: str) -> str:
+    """Return user-facing phrasing for gallery recommendations."""
+    bucket_labels = {
+        "recommended": "recommended",
+        "caveat": "use with caveats",
+        "avoid": "avoid for now",
+    }
+    return bucket_labels.get(bucket, bucket.replace("_", " "))
+
+
+def _humanize_review_verdict_text(verdict: str) -> str:
+    """Return human-readable verdict text for gallery surfaces."""
+    return verdict.replace("_", " ")
+
+
+def _markdown_review_contract_text(analysis: GenerationQualityAnalysis | None) -> str:
+    """Return gallery-friendly contract wording."""
+    contract_text = _review_contract_text(analysis)
+    if contract_text == "ok":
+        return "requested structure looks complete"
+    return _markdown_review_text(contract_text)
+
+
+def _markdown_review_utility_text(
+    review: JsonlReviewRecord,
+    analysis: GenerationQualityAnalysis | None,
+) -> str:
+    """Return gallery-friendly utility notes without log-style key prefixes."""
+    if analysis is None:
+        return "not evaluated"
+
+    parts = [review["hint_relationship"].replace("_", " ")]
+    if analysis.instruction_echo:
+        parts.append("instruction echo")
+    if analysis.metadata_borrowing:
+        parts.append("metadata borrowing")
+    if analysis.is_generic:
+        parts.append("generic description")
+    if analysis.has_context_echo:
+        parts.append("context echo")
+    return "; ".join(parts)
+
+
+def _markdown_review_stack_owner_text(
+    result: PerformanceResult,
+    review: JsonlReviewRecord,
+    analysis: GenerationQualityAnalysis | None,
+) -> str:
+    """Return gallery-friendly maintainer-routing text."""
+    parts = [f"likely owner `{review['owner']}`"]
+    if analysis is not None and analysis.has_harness_issue:
+        parts.append(f"harness signal `{analysis.harness_issue_type or 'present'}`")
+    if result.error_package:
+        parts.append(f"reported package `{result.error_package}`")
+    if result.error_stage:
+        parts.append(f"failure stage `{result.error_stage}`")
+    if result.error_code:
+        parts.append(f"diagnostic code `{result.error_code}`")
+    return "; ".join(parts)
+
+
+def _markdown_review_token_accounting_text(
+    result: PerformanceResult,
+    review: JsonlReviewRecord,
+) -> str:
+    """Return gallery-friendly token summary text."""
+
+    def _format_token_count(value: int | None) -> str:
+        return f"{value} tok" if value is not None else "n/a"
+
+    generation_tokens = (
+        getattr(result.generation, "generation_tokens", None)
+        if result.generation is not None
+        else None
+    )
+    stop_reason = result.runtime_diagnostics.stop_reason if result.runtime_diagnostics else None
+    parts = [
+        f"prompt {_format_token_count(review['prompt_tokens_total'])}",
+        f"estimated text {_format_token_count(review['prompt_tokens_text_est'])}",
+        f"estimated non-text {_format_token_count(review['prompt_tokens_nontext_est'])}",
+        f"generated {_format_token_count(generation_tokens)}",
+        f"requested max {_format_token_count(review['requested_max_tokens'])}",
+    ]
+    if stop_reason:
+        parts.append(f"stop reason {stop_reason}")
+    return "; ".join(parts)
+
+
+def _build_markdown_review_block_rows(result: PerformanceResult) -> list[tuple[str, str]]:
+    """Build clearer review rows for gallery-style Markdown artifacts."""
+    review = _build_jsonl_review_record(result)
+    if review is None:
+        return []
+
+    analysis = _quality_analysis_for_result(result)
+    return [
+        (
+            "Recommendation",
+            (
+                f"{_humanize_review_bucket_text(review['user_bucket'])}; "
+                f"review verdict: {_humanize_review_verdict_text(review['verdict'])}"
+            ),
+        ),
+        ("Key signals", _markdown_review_text(_review_focus_text(review, analysis))),
+        ("Hint handling", _markdown_review_text(_review_hint_text(review, analysis))),
+        ("Output contract", _markdown_review_contract_text(analysis)),
+        ("Cataloging fit", _markdown_review_utility_text(review, analysis)),
+        ("Maintainer routing", _markdown_review_stack_owner_text(result, review, analysis)),
+        ("Token summary", _markdown_review_token_accounting_text(result, review)),
+        ("Suggested next step", _review_next_action_text(review)),
     ]
 
 

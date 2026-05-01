@@ -661,9 +661,9 @@ class TestMarkdownGalleryReport:
         assert "Describe this image fully." in content
         assert "```text" not in content
         assert '<a id="model-org-good"></a>' in content
-        assert "_Verdict:_" in content
-        assert "_Stack / owner:_" in content
-        assert "_Review:_" in content
+        assert "_Recommendation:_" in content
+        assert "_Maintainer routing:_" in content
+        assert "_Review summary:_" in content
         assert "### ✅ org/good" in content
         assert "### ❌ org/bad" in content
 
@@ -731,7 +731,7 @@ class TestMarkdownGalleryReport:
         assert "Action Snapshot" in content  # cross-reference to results.md
         assert "## 🧭 Review Priorities" in content
         assert "## 🚨 Failures by Package (Actionable)" in content
-        assert "_Review Status:_" in content
+        assert "_Review priority:_" in content
         assert "strong candidate for first-pass review" in content or "watchlist" in content
         assert (
             "_Next Action:_ review package ownership and diagnostics for a minimal repro."
