@@ -628,3 +628,61 @@ def test_finalize_execution_logs_configured_log_and_env_paths(
     assert any(str(custom_env.resolve()) in msg for msg in messages)
     assert any(str(args.output_gallery_markdown.resolve()) in msg for msg in messages)
     assert any(str(args.output_review.resolve()) in msg for msg in messages)
+
+
+def test_finalize_execution_prunes_canonical_repro_bundle_dir(tmp_path: Path) -> None:
+    """Finalization should prune output/repro_bundles, not output/reports/repro_bundles."""
+    reports_dir = tmp_path / "reports"
+    reports_dir.mkdir()
+    args = argparse.Namespace(
+        output_html=reports_dir / "report.html",
+        output_markdown=reports_dir / "report.md",
+        output_gallery_markdown=reports_dir / "gallery.md",
+        output_review=reports_dir / "review.md",
+        output_tsv=reports_dir / "report.tsv",
+        output_jsonl=tmp_path / "report.jsonl",
+        output_diagnostics=reports_dir / "diagnostics.md",
+        output_log=tmp_path / "check_models.log",
+        output_env=tmp_path / "environment.log",
+        prune_repro_days=90,
+    )
+    result = PerformanceResult(
+        model_name="dummy/model",
+        generation=_StubGeneration(),
+        success=True,
+        generation_time=1.0,
+        model_load_time=0.5,
+        total_time=1.5,
+    )
+    history_record: dict[str, object] = {
+        "_type": "run",
+        "timestamp": "2026-02-13 00:00:00",
+        "model_results": {},
+    }
+
+    with (
+        patch("check_models.print_cli_section"),
+        patch("check_models.print_version_info"),
+        patch("check_models.get_system_characteristics", return_value={}),
+        patch("check_models.generate_html_report"),
+        patch("check_models.generate_markdown_report"),
+        patch("check_models.generate_markdown_gallery_report"),
+        patch("check_models.generate_review_report"),
+        patch("check_models.generate_tsv_report"),
+        patch("check_models.save_jsonl_report"),
+        patch("check_models.append_history_record", return_value=history_record),
+        patch("check_models.generate_diagnostics_report", return_value=False),
+        patch("check_models._log_history_comparison"),
+        patch("check_models._prune_repro_bundles", return_value=0) as prune_repro_bundles,
+    ):
+        finalize_execution(
+            args=args,
+            results=[result],
+            library_versions={"mlx": "0.0.0", "mlx-vlm": "0.0.0"},
+            overall_start_time=time.perf_counter() - 0.5,
+            prompt="test prompt",
+            image_path=None,
+            metadata=None,
+        )
+
+    prune_repro_bundles.assert_called_once_with(tmp_path / "repro_bundles", 90)

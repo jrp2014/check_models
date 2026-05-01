@@ -7,6 +7,10 @@ Notable changes to this project will be documented in this file.
 
 ### Fixed
 
+- Prune stale repro bundles from the canonical `output/repro_bundles/`
+  directory after the report layout moved human-readable artifacts under
+  `output/reports/`, and refresh maintenance cleanup/check targets that still
+  referenced old paths or duplicate checks.
 - Promote `mlx-lm` into the core runtime dependency set and have
   `setup_conda_env.sh` install `.[extras,torch]` by default so fresh
   environments include both MLX-LM and the torch-backed model stack used by

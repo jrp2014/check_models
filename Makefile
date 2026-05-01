@@ -85,9 +85,13 @@ ty: ## Run Ty type checking with the resolved repo interpreter
 .PHONY: clean
 clean: ## Remove generated files and caches
 	@$(MAKE) -C $(SRC) clean
+	rm -f $(SRC)/output/reports/results.html $(SRC)/output/reports/results.md
+	rm -f $(SRC)/output/reports/model_gallery.md $(SRC)/output/reports/review.md
+	rm -f $(SRC)/output/reports/results.tsv $(SRC)/output/reports/diagnostics.md
 	rm -f $(SRC)/output/results.html $(SRC)/output/results.md $(SRC)/output/model_gallery.md
-	rm -f $(SRC)/output/results.tsv $(SRC)/output/results.jsonl $(SRC)/output/results.history.jsonl
-	rm -f $(SRC)/output/diagnostics.md $(SRC)/output/check_models.log $(SRC)/output/environment.log
+	rm -f $(SRC)/output/review.md $(SRC)/output/results.tsv $(SRC)/output/diagnostics.md
+	rm -f $(SRC)/output/results.jsonl $(SRC)/output/results.history.jsonl
+	rm -f $(SRC)/output/check_models.log $(SRC)/output/environment.log
 	find $(SRC)/output/repro_bundles -mindepth 1 -maxdepth 1 -exec rm -rf {} + 2>/dev/null || true
 
 .PHONY: clean-all
@@ -125,4 +129,3 @@ quality-strict: ## Run quality checks with strict markdown linting (requires nod
 .PHONY: install-markdownlint
 install-markdownlint: ## Install markdownlint-cli2 via npm (requires Node.js)
 	$(MAKE) -C $(SRC) install-markdownlint
-

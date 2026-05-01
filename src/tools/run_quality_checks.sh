@@ -64,58 +64,6 @@ if [ "$QUALITY_MODE" = "full" ]; then
         fi
         exit 1
     fi
-
-    echo "=== Type Stub Preflight ==="
-
-    "$QUALITY_PYTHON" - <<'PY'
-from __future__ import annotations
-
-from pathlib import Path
-
-stub_root = Path("../typings")
-expected_packages = ("mlx_lm", "mlx_vlm", "transformers", "tokenizers")
-missing: list[str] = []
-invalid: list[tuple[str, str, int, str]] = []
-
-for package in expected_packages:
-    package_root = stub_root / package.replace(".", "/")
-    if not package_root.exists():
-        missing.append(package)
-        continue
-
-    for stub_path in package_root.rglob("*.pyi"):
-        try:
-            compile(stub_path.read_text(encoding="utf-8"), str(stub_path), "exec")
-        except SyntaxError as err:
-            invalid.append(
-                (
-                    package,
-                    str(stub_path.relative_to(stub_root)),
-                    int(getattr(err, "lineno", 0) or 0),
-                    str(getattr(err, "msg", "invalid syntax")),
-                ),
-            )
-            break
-        except OSError:
-            invalid.append((package, str(stub_path.relative_to(stub_root)), 0, "read error"))
-            break
-
-if missing:
-    print(
-        "⚠️  Stub coverage warning: missing package stubs for "
-        + ", ".join(sorted(missing)),
-    )
-if invalid:
-    for package, relpath, line_no, message in invalid:
-        suffix = f":{line_no}" if line_no else ""
-        print(
-            "⚠️  Stub syntax warning "
-            f"({package}): {relpath}{suffix} ({message})",
-        )
-
-if not missing and not invalid:
-    print("✓ Stub preflight: expected package stubs available and parseable")
-PY
 fi
 
 if [ "$QUALITY_MODE" = "fast" ]; then

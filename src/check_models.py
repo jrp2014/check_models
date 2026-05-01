@@ -20636,7 +20636,7 @@ def finalize_execution(
         # Prune old repro bundles
         prune_days = getattr(args, "prune_repro_days", 90)
         if prune_days > 0:
-            repro_dir = diagnostics_path.parent / "repro_bundles"
+            repro_dir = diagnostics_path.parent.parent / "repro_bundles"
             pruned = _prune_repro_bundles(repro_dir, prune_days)
             if pruned:
                 logger.info("Pruned %d repro bundle(s) older than %d days.", pruned, prune_days)

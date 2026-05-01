@@ -194,7 +194,7 @@ test: ## Run pytest
 
 .PHONY: test-cov
 test-cov: ## Run pytest with coverage
-	$(RUN_TOOL_PREFIX) pytest --cov=vlm --cov-report=term-missing --cov-report=xml -q
+	$(RUN_TOOL_PREFIX) pytest --cov=check_models --cov-report=term-missing --cov-report=xml -q
 
 # Dependency management
 .PHONY: deps-sync
@@ -259,7 +259,6 @@ check-outdated: ## Check for outdated dependencies
 
 .PHONY: audit
 audit: ## Run security audit on dependencies
-	@$(RUN_PY) -m pip install pip-audit --quiet 2>/dev/null || echo "[audit] Installing pip-audit..."
 	@$(RUN_PY) -m pip install pip-audit --quiet || (echo "[audit] pip-audit installation failed"; exit 1)
 	$(RUN_PY) -m pip_audit
 
