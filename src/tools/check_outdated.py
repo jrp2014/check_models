@@ -78,11 +78,11 @@ def _print_outdated_rows(rows: list[dict[str, str]]) -> None:
     if not rows:
         return
 
-    width = max(len(str(row.get("name", ""))) for row in rows)
-    for row in sorted(rows, key=lambda item: str(item.get("name", "")).lower()):
-        name = str(row.get("name", ""))
-        current = str(row.get("version", "?"))
-        latest = str(row.get("latest_version", "?"))
+    width = max(len(row.get("name", "")) for row in rows)
+    for row in sorted(rows, key=lambda item: item.get("name", "").lower()):
+        name = row.get("name", "")
+        current = row.get("version", "?")
+        latest = row.get("latest_version", "?")
         print(f"  - {name:<{width}}  {current} -> {latest}")
 
 
@@ -147,7 +147,7 @@ def main() -> int:
     managed_rows: list[dict[str, str]] = []
     unmanaged_rows: list[dict[str, str]] = []
     for row in outdated:
-        name = _canonical_name(str(row.get("name", "")))
+        name = _canonical_name(row.get("name", ""))
         if name and name in managed:
             managed_rows.append(row)
         else:

@@ -1,10 +1,10 @@
-# Diagnostics Report — 1 failure(s), 9 harness issue(s) (mlx-vlm 0.4.5)
+# Diagnostics Report — 2 failure(s), 9 harness issue(s) (mlx-vlm 0.4.5)
 
 ## Summary
 
-Automated benchmarking of **53 locally-cached VLM models** found **1 hard
+Automated benchmarking of **53 locally-cached VLM models** found **2 hard
 failure(s)** and **9 harness/integration issue(s)** plus **0 preflight
-compatibility warning(s)** in successful models. 52 of 53 models succeeded.
+compatibility warning(s)** in successful models. 51 of 53 models succeeded.
 
 Test image: `20260403-124049_DSC09541.jpg` (47.5 MB).
 
@@ -14,6 +14,7 @@ Test image: `20260403-124049_DSC09541.jpg` (47.5 MB).
 
 Quick triage list with likely owner and next action for each issue class.
 
+- **[Medium] [mlx]** Model loading failed: Received 4 parameters not in model: (1 model(s)). Next: check tensor/cache behavior and memory pressure handling.
 - **[Medium] [model configuration/repository]** Loaded processor has no image_processor; expected multimodal processor. (1 model(s)). Next: verify model config, tokenizer files, and revision alignment.
 - **[Medium] [mlx-vlm]** Harness/integration warnings on 5 model(s). Next: check processor/chat-template wiring and generation kwargs.
 - **[Medium] [mlx-vlm / mlx]** Harness/integration warnings on 2 model(s). Next: validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
@@ -26,6 +27,7 @@ Quick triage list with likely owner and next action for each issue class.
 
 | Priority   | Issue                                                                   | Models Affected                                                                                                                 | Owner                            | Next Action                                                                              |
 |------------|-------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|----------------------------------|------------------------------------------------------------------------------------------|
+| **Medium** | Model loading failed: Received 4 parameters not in model:               | 1 (Kimi-VL-A3B-Thinking-8bit)                                                                                                   | `mlx`                            | check tensor/cache behavior and memory pressure handling.                                |
 | **Medium** | Loaded processor has no image_processor; expected multimodal processor. | 1 (MolmoPoint-8B-fp16)                                                                                                          | `model configuration/repository` | verify model config, tokenizer files, and revision alignment.                            |
 | **Medium** | Harness/integration                                                     | 5 (Phi-3.5-vision-instruct, Devstral-Small-2-24B-Instruct-2512-5bit, GLM-4.6V-Flash-6bit, GLM-4.6V-Flash-mxfp4, GLM-4.6V-nvfp4) | `mlx-vlm`                        | check processor/chat-template wiring and generation kwargs.                              |
 | **Medium** | Harness/integration                                                     | 2 (Qwen2-VL-2B-Instruct-4bit, paligemma2-3b-pt-896-4bit)                                                                        | `mlx-vlm / mlx`                  | validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.     |
@@ -35,6 +37,56 @@ Quick triage list with likely owner and next action for each issue class.
 ---
 
 ## 1. Failure affecting 1 model (Priority: Medium)
+
+**Observed behavior:** Model loading failed: Received 4 parameters not in model:
+**Owner (likely component):** `mlx`
+**Suggested next action:** check tensor/cache behavior and memory pressure handling.
+**Affected model:** `mlx-community/Kimi-VL-A3B-Thinking-8bit`
+
+**Representative maintainer triage:**
+
+_Likely owner:_ mlx \| confidence=high
+_Classification:_ runtime_failure \| MLX_MODEL_LOAD_MODEL
+_Summary:_ model error \| mlx model load model
+_Evidence:_ model error \| mlx model load model
+_Token context:_ stop=exception
+_Next action:_ Inspect KV/cache behavior, memory pressure, and long-context
+               execution.
+
+| Model                                     | Observed Behavior                                         | First Seen Failing      | Recent Repro           |
+|-------------------------------------------|-----------------------------------------------------------|-------------------------|------------------------|
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | Model loading failed: Received 4 parameters not in model: | 2026-02-07 20:59:01 GMT | 1/3 recent runs failed |
+
+### To reproduce
+
+- Exact model-specific repro command appears below in the `Reproducibility` section under `Target specific failing models`.
+- Representative failing model: `mlx-community/Kimi-VL-A3B-Thinking-8bit`
+
+<details>
+<summary>Detailed trace logs (affected model)</summary>
+
+#### `mlx-community/Kimi-VL-A3B-Thinking-8bit`
+
+Traceback tail:
+
+```text
+Traceback (most recent call last):
+ValueError: Model loading failed: Received 4 parameters not in model: 
+multi_modal_projector.linear_1.biases,
+multi_modal_projector.linear_1.scales,
+multi_modal_projector.linear_2.biases,
+multi_modal_projector.linear_2.scales.
+```
+
+Captured stdout/stderr:
+
+```text
+=== STDERR ===
+```
+
+</details>
+
+## 2. Failure affecting 1 model (Priority: Medium)
 
 **Observed behavior:** Loaded processor has no image_processor; expected multimodal processor.
 **Owner (likely component):** `model configuration/repository`
@@ -100,7 +152,7 @@ point to stack/runtime behavior rather than inherent model quality limits.
 **What looks wrong:** Generation appears to continue through stop/control tokens instead of ending cleanly.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=766, output=500, output/prompt=65.27%
+**Token summary:** prompt=768, output=500, output/prompt=65.10%
 
 **Maintainer triage:**
 
@@ -112,7 +164,7 @@ _Summary:_ Special control token &lt;\|end\|&gt; appeared in generated text.
 _Evidence:_ Special control token &lt;\|end\|&gt; appeared in generated text.
             \| Special control token &lt;\|endoftext\|&gt; appeared in
             generated text.
-_Token context:_ prompt=766 \| output/prompt=65.27% \| nontext burden=99% \|
+_Token context:_ prompt=768 \| output/prompt=65.10% \| nontext burden=99% \|
                  stop=completed \| hit token cap (500)
 _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
                into user-facing text.
@@ -126,7 +178,7 @@ _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
 **Sample output:**
 
 ```text
-The image shows a serene park setting with a person standing on a wooden dock, fishing by a calm lake. There are trees and a well-maintained lawn around the lake.<|end|><|endoftext|><|end|><|endoftext...
+The image shows a tranquil park scene with a person standing on a wooden dock, fishing by a pond. There are trees, a bench, and a small pine tree in the foreground. The weather appears to be overcast....
 ```
 
 ### `mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit`
@@ -134,29 +186,29 @@ The image shows a serene park setting with a person standing on a wooden dock, f
 **What looks wrong:** Decoded output contains tokenizer artifacts that should not appear in user-facing text.
 **Likely component:** `mlx-vlm`
 **Suggested next action:** check processor/chat-template wiring and generation kwargs.
-**Token summary:** prompt=2,098, output=135, output/prompt=6.43%
+**Token summary:** prompt=2,097, output=172, output/prompt=8.20%
 
 **Maintainer triage:**
 
 _Likely owner:_ mlx-vlm \| confidence=high
 _Classification:_ harness \| encoding
 _Summary:_ Tokenizer space-marker artifacts (for example Ġ) appeared in output
-           (about 112 occurrences). \| nontext prompt burden=100%
+           (about 139 occurrences). \| nontext prompt burden=100%
 _Evidence:_ Tokenizer space-marker artifacts (for example Ġ) appeared in
-            output (about 112 occurrences).
-_Token context:_ prompt=2,098 \| output/prompt=6.43% \| nontext burden=100% \|
+            output (about 139 occurrences).
+_Token context:_ prompt=2,097 \| output/prompt=8.20% \| nontext burden=100% \|
                  stop=completed
 _Next action:_ Inspect decode cleanup; tokenizer markers are leaking into
                user-facing text.
 
 **Why this appears to be an integration/runtime issue:**
 
-- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 112 occurrences).
+- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 139 occurrences).
 
 **Sample output:**
 
 ```text
-TheĠimageĠdepictsĠaĠsereneĠoutdoorĠsceneĠfeaturingĠaĠpersonĠstandingĠonĠaĠsmall,Ġman-madeĠislandĠinĠtheĠmiddleĠofĠaĠpond.ĠTheĠindividualĠisĠdressedĠinĠaĠdarkĠjacketĠandĠpants,ĠwithĠaĠblueĠhat,ĠandĠapp...
+TheĠimageĠdepictsĠaĠsereneĠoutdoorĠscene,ĠlikelyĠinĠaĠparkĠorĠgarden.ĠTheĠfocalĠpointĠisĠaĠpersonĠstandingĠonĠaĠsmall,ĠwoodenĠpierĠthatĠextendsĠintoĠaĠcalmĠbodyĠofĠwater.ĠTheĠindividualĠisĠdressedĠinĠ...
 ```
 
 ### `mlx-community/GLM-4.6V-Flash-6bit`
@@ -261,30 +313,34 @@ _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
 **What looks wrong:** Behavior degrades under long prompt context.
 **Likely component:** `mlx-vlm / mlx`
 **Suggested next action:** validate long-context handling and stop-token behavior across mlx-vlm + mlx runtime.
-**Token summary:** prompt=16,299, output=500, output/prompt=3.07%
+**Token summary:** prompt=16,299, output=13, output/prompt=0.08%
 
 **Maintainer triage:**
 
 _Likely owner:_ mlx \| confidence=high
-_Classification:_ cutoff_degraded \| long_context
-_Summary:_ At long prompt length (16299 tokens), output became repetitive. \|
-           hit token cap (500) \| nontext prompt burden=100% \| repetitive
-           token=phrase: "' chinese: ' chinese:..."
-_Evidence:_ At long prompt length (16299 tokens), output became repetitive.
-_Token context:_ prompt=16,299 \| output/prompt=3.07% \| nontext burden=100%
-                 \| stop=completed \| hit token cap (500)
-_Next action:_ Inspect long-context cache behavior under heavy image-token
-               burden.
+_Classification:_ context_budget \| long_context
+_Summary:_ Output is very short relative to prompt size (0.1%), suggesting
+           possible early-stop or prompt-handling issues. \| At long prompt
+           length (16299 tokens), output stayed unusually short (13 tokens;
+           ratio 0.1%). \| output/prompt=0.08% \| nontext prompt burden=100%
+_Evidence:_ Output is very short relative to prompt size (0.1%), suggesting
+            possible early-stop or prompt-handling issues. \| At long prompt
+            length (16299 tokens), output stayed unusually short (13 tokens;
+            ratio 0.1%).
+_Token context:_ prompt=16,299 \| output/prompt=0.08% \| nontext burden=100%
+                 \| stop=completed
+_Next action:_ Treat this as a prompt-budget issue first; nontext prompt
+               burden is 100% and the output stays weak under that load.
 
 **Why this appears to be an integration/runtime issue:**
 
-- At long prompt length (16299 tokens), output became repetitive.
-- Output became repetitive, indicating possible generation instability (token: phrase: "' chinese: ' chinese:...").
+- Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt-handling issues.
+- At long prompt length (16299 tokens), output stayed unusually short (13 tokens; ratio 0.1%).
 
 **Sample output:**
 
 ```text
-Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'Chinese: ' Chinese: 'C...
+I'm sorry, but the context didn't show up.
 ```
 
 ### `mlx-community/gemma-3n-E2B-4bit`
@@ -395,33 +451,34 @@ integration/runtime issues worth checking upstream.
 Recent reproducibility is measured from history (up to last 3 runs where each
 model appears).
 
-**Regressions since previous run:** none
+**Regressions since previous run:** `mlx-community/Kimi-VL-A3B-Thinking-8bit`
 **Recoveries since previous run:** none
 
-| Model                              | Status vs Previous Run   | First Seen Failing      | Recent Repro           |
-|------------------------------------|--------------------------|-------------------------|------------------------|
-| `mlx-community/MolmoPoint-8B-fp16` | still failing            | 2026-03-27 13:06:07 GMT | 3/3 recent runs failed |
+| Model                                     | Status vs Previous Run   | First Seen Failing      | Recent Repro           |
+|-------------------------------------------|--------------------------|-------------------------|------------------------|
+| `mlx-community/Kimi-VL-A3B-Thinking-8bit` | new regression           | 2026-02-07 20:59:01 GMT | 1/3 recent runs failed |
+| `mlx-community/MolmoPoint-8B-fp16`        | still failing            | 2026-03-27 13:06:07 GMT | 3/3 recent runs failed |
 
 ---
 
 ## Coverage & Runtime Metrics
 
-- **Detailed diagnostics models:** 11
-- **Summary diagnostics models:** 42
+- **Detailed diagnostics models:** 12
+- **Summary diagnostics models:** 41
 - **Coverage check:** ✅ Complete (each model appears exactly once).
-- **Total model runtime (sum):** 1364.55s (1364.55s)
-- **Average runtime per model:** 25.75s (25.75s)
-- **Dominant runtime phase:** decode dominated 50/53 measured model runs (92% of tracked runtime).
-- **Phase totals:** model load=106.96s, prompt prep=0.16s, decode=1237.59s, cleanup=6.51s
-- **Observed stop reasons:** completed=52, exception=1
-- **Validation overhead:** 19.52s total (avg 0.37s across 53 model(s)).
-- **First-token latency:** Avg 13.63s | Min 0.06s | Max 113.56s across 52 model(s).
+- **Total model runtime (sum):** 1235.09s (1235.09s)
+- **Average runtime per model:** 23.30s (23.30s)
+- **Dominant runtime phase:** decode dominated 49/53 measured model runs (91% of tracked runtime).
+- **Phase totals:** model load=104.66s, prompt prep=0.16s, decode=1112.64s, cleanup=5.35s
+- **Observed stop reasons:** completed=51, exception=2
+- **Validation overhead:** 17.39s total (avg 0.33s across 53 model(s)).
+- **First-token latency:** Avg 12.38s | Min 0.06s | Max 77.20s across 51 model(s).
 - **What this likely means:** Most measured runtime is spent inside generation rather than load or prompt setup.
 - **Suggested next action:** Prioritize early-stop policies, lower long-tail token budgets, or upstream decode-path work.
 
 ---
 
-## Models Not Flagged (42 model(s))
+## Models Not Flagged (41 model(s))
 
 These models completed without diagnostics flags (no hard failure, harness
 warning, or stack-signal anomaly).
@@ -459,14 +516,13 @@ warning, or stack-signal anomaly).
 - `mlx-community/pixtral-12b-bf16`
 - `qnguyen3/nanoLLaVA`
 
-### Ran, but with quality warnings (12 model(s))
+### Ran, but with quality warnings (11 model(s))
 
 - `jqlive/Kimi-VL-A3B-Thinking-2506-6bit`: Output leaked reasoning or prompt-template text (◁think▷, ◁/think▷).
 - `mlx-community/Apriel-1.5-15b-Thinker-6bit-MLX`: Output contains corrupted or malformed text segments (incomplete_sentence: ends with 'of').
 - `mlx-community/ERNIE-4.5-VL-28B-A3B-Thinking-bf16`: Likely capped by max token budget
 - `mlx-community/Idefics3-8B-Llama3-bf16`: Output formatting deviated from the requested structure. Details: Unknown tags: <end_of_utterance>.
 - `mlx-community/Kimi-VL-A3B-Thinking-2506-bf16`: Output leaked reasoning or prompt-template text (◁think▷, ◁/think▷).
-- `mlx-community/Kimi-VL-A3B-Thinking-8bit`: Output leaked reasoning or prompt-template text (◁think▷, ◁/think▷).
 - `mlx-community/Qwen3.5-27B-4bit`: Likely capped by max token budget
 - `mlx-community/Qwen3.5-27B-mxfp8`: Likely capped by max token budget
 - `mlx-community/Qwen3.5-35B-A3B-4bit`: Likely capped by max token budget
@@ -481,11 +537,11 @@ warning, or stack-signal anomaly).
 | Component       | Version                     |
 |-----------------|-----------------------------|
 | mlx-vlm         | 0.4.5                       |
-| mlx             | 0.32.0.dev20260426+211e57be |
+| mlx             | 0.32.0.dev20260501+e8ebdebe |
 | mlx-lm          | 0.31.3                      |
-| transformers    | 5.7.0.dev0                  |
+| transformers    | 5.7.0                       |
 | tokenizers      | 0.22.2                      |
-| huggingface-hub | 1.12.0                      |
+| huggingface-hub | 1.13.0                      |
 | Python Version  | 3.13.12                     |
 | OS              | Darwin 25.4.0               |
 | macOS Version   | 26.4.1                      |
@@ -532,6 +588,7 @@ the exact prompt trace has been exported to
 for each failing model.
 
 ```bash
+python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/Kimi-VL-A3B-Thinking-8bit
 python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg --trust-remote-code --prompt 'Describe this picture' --max-tokens 500 --temperature 0.0 --top-p 1.0 --repetition-context-size 20 --prefill-step-size 4096 --timeout 300.0 --verbose --models mlx-community/MolmoPoint-8B-fp16
 ```
 
@@ -546,4 +603,4 @@ Describe this picture
 - Input image: `/Users/jrp/Pictures/Processed/20260403-124049_DSC09541.jpg`
 - Generation settings: max_tokens=500, temperature=0.0, top_p=1.0
 
-_Report generated on 2026-04-26 22:21:24 BST by [check_models](https://github.com/jrp2014/check_models)._
+_Report generated on 2026-05-01 14:28:43 BST by [check_models](https://github.com/jrp2014/check_models)._

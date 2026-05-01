@@ -674,7 +674,7 @@ def run_stubgen(packages: Iterable[str]) -> int:
         return 1
 
     output_lines = _split_stubgen_output(completed.stdout, completed.stderr)
-    return_code = int(completed.returncode or 0)
+    return_code = completed.returncode or 0
     transformers_requested = any(pkg.split(".")[0] == "transformers" for pkg in pkg_list)
     _log_stubgen_output(
         output_lines=output_lines,
@@ -770,7 +770,7 @@ def main() -> int:
         stub_count = sum(1 for _ in TYPINGS_DIR.rglob("*.pyi"))
         logger.info("[stubs] Generated %d stub files (.pyi)", stub_count)
         logger.info("[stubs] Done")
-    return int(code)
+    return code
 
 
 if __name__ == "__main__":

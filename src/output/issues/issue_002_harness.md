@@ -1,4 +1,4 @@
-# [Harness Issue] The image depicts a serene outdoor scene featuring a person standing on a small, man-made island in the middle of a p in mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
+# [Harness Issue] The image depicts a serene outdoor scene, likely in a park or garden. The focal point is a person standing on a small in mlx-community/Devstral-Small-2-24B-Instruct-2512-5bit
 
 ## Description
 
@@ -6,17 +6,17 @@ Integration/harness warning detected for `mlx-community/Devstral-Small-2-24B-Ins
 
 ### Details
 
-- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 112 occurrences).
+- Tokenizer space-marker artifacts (for example Ġ) appeared in output (about 139 occurrences).
 
 ## Maintainer Triage
 
 _Likely owner:_ mlx-vlm \| confidence=high
 _Classification:_ harness \| encoding
 _Summary:_ Tokenizer space-marker artifacts (for example Ġ) appeared in output
-           (about 112 occurrences). \| nontext prompt burden=100%
+           (about 139 occurrences). \| nontext prompt burden=100%
 _Evidence:_ Tokenizer space-marker artifacts (for example Ġ) appeared in
-            output (about 112 occurrences).
-_Token context:_ prompt=2,098 \| output/prompt=6.43% \| nontext burden=100% \|
+            output (about 139 occurrences).
+_Token context:_ prompt=2,097 \| output/prompt=8.20% \| nontext burden=100% \|
                  stop=completed
 _Next action:_ Inspect decode cleanup; tokenizer markers are leaking into
                user-facing text.
@@ -37,11 +37,11 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC
 | Component       | Version                     |
 |-----------------|-----------------------------|
 | mlx-vlm         | 0.4.5                       |
-| mlx             | 0.32.0.dev20260426+211e57be |
+| mlx             | 0.32.0.dev20260501+e8ebdebe |
 | mlx-lm          | 0.31.3                      |
-| transformers    | 5.7.0.dev0                  |
+| transformers    | 5.7.0                       |
 | tokenizers      | 0.22.2                      |
-| huggingface-hub | 1.12.0                      |
+| huggingface-hub | 1.13.0                      |
 | Python Version  | 3.13.12                     |
 | OS              | Darwin 25.4.0               |
 | macOS Version   | 26.4.1                      |

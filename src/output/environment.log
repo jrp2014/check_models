@@ -1,9 +1,9 @@
 ================================================================================
-FULL ENVIRONMENT DUMP - 2026-04-26 21:58:31 BST
+FULL ENVIRONMENT DUMP - 2026-05-01 13:51:01 BST
 ================================================================================
 
 --- Python Packages (via importlib.metadata) ---
-Total packages: 160
+Total packages: 164
 
 absl-py==2.4.0
 accelerate==1.13.0
@@ -16,18 +16,18 @@ anyio==4.13.0
 astroid==4.0.4
 astunparse==1.6.3
 attrs==26.1.0
-build==1.4.4
+build==1.5.0
 certifi==2026.4.22
 cffi==2.0.0
 cfgv==3.5.0
 charset-normalizer==3.4.7
 check_models==0.6.0
-check_models==0.5.0
+check_models==0.6.0
 click==8.3.3
 cmake==4.3.2
 coverage==7.13.5
 cryptography==47.0.0
-datasets==4.8.4
+datasets==4.8.5
 defusedxml==0.7.1
 dill==0.4.1
 distlib==0.4.0
@@ -48,7 +48,7 @@ hf-xet==1.4.3
 httpcore==1.0.9
 httpx==0.28.1
 httpx-sse==0.4.3
-huggingface_hub==1.12.0
+huggingface_hub==1.13.0
 identify==2.6.19
 idna==3.13
 iniconfig==2.3.0
@@ -60,15 +60,17 @@ jsonschema-specifications==2025.9.1
 keras==3.14.0
 libclang==18.1.1
 librt==0.9.0
+llguidance==1.7.5
 markdown-it-py==4.0.0
 MarkupSafe==3.0.3
 mccabe==0.7.0
 mcp==1.27.0
 mdurl==0.1.2
-miniaudio==1.70
+miniaudio==1.71
 ml_dtypes==0.5.4
-mlx==0.32.0.dev20260426+211e57be
-mlx==0.32.0.dev20260426+211e57be
+mlx==0.32.0.dev20260501+e8ebdebe
+mlx==0.32.0.dev20260501+e8ebdebe
+mlx-audio==0.4.3
 mlx-lm==0.31.3
 mlx-vlm==0.4.5
 mpmath==1.3.0
@@ -87,10 +89,10 @@ opt_einsum==3.4.0
 optree==0.19.0
 packaging==26.2
 pandas==3.0.2
-pathspec==1.1.0
+pathspec==1.1.1
 pfzy==0.3.4
 pillow==12.2.0
-pip==26.0.1
+pip==26.1
 platformdirs==4.9.6
 pluggy==1.6.0
 pre_commit==4.6.0
@@ -101,20 +103,20 @@ psutil==7.2.2
 pyarrow==24.0.0
 pycparser==3.0
 pydantic==2.13.3
-pydantic-settings==2.13.1
+pydantic-settings==2.14.0
 pydantic_core==2.46.3
 Pygments==2.20.0
 PyJWT==2.12.1
 pylint==4.0.5
 pyproject_hooks==1.2.0
-pyrefly==0.62.0
+pyrefly==0.63.1
 pytest==9.0.3
 pytest-cov==7.1.0
 pytest-xdist==3.8.0
 python-dateutil==2.9.0.post0
 python-discovery==1.2.2
 python-dotenv==1.2.2
-python-multipart==0.0.26
+python-multipart==0.0.27
 PyYAML==6.0.3
 referencing==0.37.0
 regex==2026.4.4
@@ -123,12 +125,14 @@ rich==15.0.0
 rpds-py==0.30.0
 ruff==0.15.12
 safetensors==0.7.0
+scipy==1.17.1
 sentencepiece==0.2.1
 setuptools==82.0.1
 shellingham==1.5.4
 six==1.17.0
+sounddevice==0.5.5
 soundfile==0.13.1
-sse-starlette==3.3.4
+sse-starlette==3.4.1
 starlette==1.0.0
 sympy==1.14.0
 tabulate==0.10.0
@@ -141,9 +145,9 @@ torch==2.11.0
 torchaudio==2.11.0
 torchvision==0.26.0
 tqdm==4.67.3
-transformers==5.7.0.dev0
-ty==0.0.32
-typer==0.25.0
+transformers==5.7.0
+ty==0.0.33
+typer==0.25.1
 types-defusedxml==0.7.0.20260408
 types-psutil==7.2.2.20260408
 types-PyYAML==6.0.12.20260408
@@ -158,7 +162,7 @@ typing_extensions==4.15.0
 tzlocal==5.3.1
 urllib3==2.6.3
 uvicorn==0.46.0
-virtualenv==21.2.4
+virtualenv==21.3.0
 vulture==2.16
 wcwidth==0.6.0
 wheel==0.47.0
@@ -168,5 +172,5 @@ yarl==1.23.0
 
 Conda Environment: mlx-vlm
 ================================================================================
-Environment dump completed at 2026-04-26 21:58:31 BST
+Environment dump completed at 2026-05-01 13:51:01 BST
 ================================================================================

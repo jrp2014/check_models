@@ -2079,7 +2079,7 @@ class Colors:
     @staticmethod
     def colored(text: str, *color_codes: str) -> str:
         """Return text wrapped in ANSI color codes if enabled."""
-        text_str: str = str(text)
+        text_str: str = text
         # Filter out None values from color_codes
         filtered_codes: list[str] = [c for c in color_codes if isinstance(c, str)]
         if not Colors._enabled or not filtered_codes:
@@ -2090,7 +2090,7 @@ class Colors:
     @staticmethod
     def set_enabled(*, enabled: bool) -> None:
         """Globally enable/disable ANSI colors for this process."""
-        Colors._enabled = bool(enabled)
+        Colors._enabled = enabled
 
 
 class LogStyles:
@@ -3114,9 +3114,8 @@ def _strip_nonvisual_terms_from_text(text: str, nonvisual_terms: Sequence[str]) 
     normalized_term_set: set[str] = {
         _normalize_phrase_for_matching(item) for item in nonvisual_terms
     }
-    normalized_terms = [
-        str(term) for term in sorted(normalized_term_set, key=len, reverse=True) if term
-    ]
+    normalized_terms: list[str] = [term for term in normalized_term_set if term]
+    normalized_terms.sort(key=len, reverse=True)
     for term in normalized_terms:
         pattern = re.compile(rf"\b{re.escape(term)}\b", re.IGNORECASE)
         cleaned = pattern.sub(" ", cleaned)
@@ -4964,7 +4963,7 @@ def compute_description_quality(text: str, context: str | None) -> dict[str, flo
         (
             float(grounding["grounding_score"])
             + detail_coverage
-            + min(float(specificity_score) / 100.0, 1.0)
+            + min(specificity_score / 100.0, 1.0)
             + length_score
             + sentence_fit
         )
@@ -4977,7 +4976,7 @@ def compute_description_quality(text: str, context: str | None) -> dict[str, flo
         "description_sentence_count": sentence_count,
         "description_detail_coverage": round(detail_coverage, 2),
         "description_grounding_score": float(grounding["grounding_score"]),
-        "description_specificity_score": round(float(specificity_score), 1),
+        "description_specificity_score": round(specificity_score, 1),
     }
 
 
@@ -6028,7 +6027,7 @@ def get_terminal_width(min_width: int = 60, max_width: int = 120) -> int:
     # If an explicit override is set (via --width), prefer it and do not apply
     # per-call max_width limits; still enforce a minimal practical width.
     if WIDTH_OVERRIDE is not None and WIDTH_OVERRIDE > 0:
-        return max(min_width, int(WIDTH_OVERRIDE))
+        return max(min_width, WIDTH_OVERRIDE)
     # Support environment-based override as well (useful in CI): MLX_VLM_WIDTH
     env_width = os.getenv("MLX_VLM_WIDTH")
     if env_width:
@@ -6144,7 +6143,7 @@ def get_library_versions() -> LibraryVersionDict:
     def _none_if_na(v: str | None) -> str | None:
         if v is None:
             return None
-        s = str(v).strip()
+        s = v.strip() if isinstance(v, str) else str(v).strip()
         if not s or s == NOT_AVAILABLE or s.startswith("N/A"):
             return None
         return s
@@ -6184,9 +6183,11 @@ def _version_components(version_text: str, *, width: int = 4) -> tuple[int, ...]
 def _is_version_at_least(installed: str, minimum: str) -> bool:
     """Return whether ``installed`` satisfies ``minimum`` using PEP 440 semantics."""
     try:
-        return bool(Version(installed) >= Version(minimum))
+        is_at_least: bool = Version(installed) >= Version(minimum)
     except InvalidVersion:
         return _version_components(installed) >= _version_components(minimum)
+    else:
+        return is_at_least
 
 
 def _collect_upstream_requirements(
@@ -6467,7 +6468,7 @@ def _get_generation_result_contract_issues(result_type: type[object] | None) -> 
     raw_annotations = getattr(result_type, "__annotations__", None)
     if isinstance(raw_annotations, dict):
         field_names.update(
-            str(field_name)
+            field_name
             for field_name in raw_annotations
             if isinstance(field_name, str) and field_name.strip()
         )
@@ -6562,14 +6563,14 @@ def _sort_results_by_time(results: list[PerformanceResult]) -> list[PerformanceR
 
         # Use the generation_time field from PerformanceResult
         if result.generation_time is not None:
-            return float(result.generation_time)
+            return result.generation_time
 
         # Fallback: calculate time from GenerationResult tokens-per-second if available
         if result.generation is not None:
             g_tokens = _generation_int_metric(result.generation, "generation_tokens") or 0
             g_tps = _generation_float_metric(result.generation, "generation_tps") or 0.0
             if g_tps > 0 and g_tokens:
-                return float(g_tokens / g_tps)
+                return g_tokens / g_tps
 
         return float("inf")  # No timing data available
 
@@ -6859,7 +6860,7 @@ def get_exif_data(image_path: PathLike) -> ExifDict | None:
                                     gps_key = GPS(tag_id_int).name
                                 except ValueError:
                                     gps_key = GPSTAGS.get(tag_id_int, str(gps_tag_id))
-                        gps_decoded[str(gps_key)] = gps_value
+                        gps_decoded[gps_key] = gps_value
                     exif_decoded["GPSInfo"] = gps_decoded
             except (KeyError, AttributeError, TypeError) as gps_err:
                 logger.warning("Could not extract GPS IFD: %s", gps_err)
@@ -6918,8 +6919,8 @@ def _convert_gps_coordinate(
             try:
                 # Cast to sequence for type checker - we've verified it's tuple/list
                 seq = cast("Sequence[float]", v)
-                num = float(seq[0])
-                den = float(seq[1])
+                num = seq[0]
+                den = seq[1]
                 return num / den if den != 0 else None
             except (ValueError, TypeError):
                 return None
@@ -7048,7 +7049,11 @@ def _decode_exif_string(value: bytes | str | None) -> str:
     if not value:
         return ""
     if not isinstance(value, bytes):
-        return str(value).replace("\x00", "").strip()
+        return (
+            value.replace("\x00", "").strip()
+            if isinstance(value, str)
+            else str(value).replace("\x00", "").strip()
+        )
 
     decoded: str = ""
     # Handle UserComment prefixes (fixed 8-byte header)
@@ -7668,7 +7673,7 @@ def _build_report_render_context(
         stats=stats,
         system_info=resolved_system_info,
         triage=triage,
-        preflight_issues=tuple(str(issue) for issue in preflight_issues),
+        preflight_issues=tuple(issue for issue in preflight_issues),
     )
 
 
@@ -8833,12 +8838,12 @@ def _collect_report_component_rows(
     for library_name in selected_library_names:
         version_value = versions.get(library_name)
         if version_value:
-            rows.append((library_name, str(version_value)))
+            rows.append((library_name, version_value))
 
     for system_key in selected_system_keys:
         system_value = system_info.get(system_key)
         if system_value:
-            rows.append((system_key, str(system_value)))
+            rows.append((system_key, system_value))
 
     return rows
 
@@ -13710,7 +13715,7 @@ def generate_tsv_report(
     # Clean and escape row data, appending error columns per result
     clean_rows: list[list[str]] = []
     for row, res in zip(rows, sorted_results, strict=False):
-        clean_row = [escape_tsv_value(str(cell)) for cell in row]
+        clean_row = [escape_tsv_value(cell) for cell in row]
         clean_row.append(escape_tsv_value(res.error_type or ""))
         clean_row.append(escape_tsv_value(res.error_package or ""))
         # Hard-cap any oversized cells so TSV rows stay manageable
@@ -16184,7 +16189,7 @@ def _log_perf_block(res: PerformanceResult) -> None:
             return
         formatted = format_field_value(field, raw_val)
         unit = "GB"
-        text = str(formatted) if str(formatted).endswith(unit) else f"{formatted} GB"
+        text = formatted if formatted.endswith(unit) else f"{formatted} GB"
         log_metric_tree(prefix, label, f"{text:>8}", indent="     ")
 
     _log_mem("├─", "Active Δ:", "active_memory", active_mem)
@@ -16415,7 +16420,7 @@ def _log_compact_metrics(res: PerformanceResult) -> None:
     mem_part = ""
     if peak_mem > 0:
         mem_fmt = format_field_value("peak_memory", peak_mem)
-        mem_str = f"{mem_fmt}GB" if not str(mem_fmt).endswith("GB") else str(mem_fmt)
+        mem_str = f"{mem_fmt}GB" if not mem_fmt.endswith("GB") else mem_fmt
         mem_part = f" | Memory: {mem_str} peak"
 
     line1 = f"📊 Timing: {timing_parts[0] if timing_parts else NOT_AVAILABLE}{mem_part}"
@@ -16706,7 +16711,7 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
 
 def _set_run_preflight_issues(args: argparse.Namespace, issues: Sequence[str]) -> None:
     """Store preflight warning strings on argparse namespace for later reporting."""
-    setattr(args, _PREFLIGHT_ISSUES_ARG_ATTR, tuple(str(issue) for issue in issues))
+    setattr(args, _PREFLIGHT_ISSUES_ARG_ATTR, tuple(issue for issue in issues))
 
 
 def _get_run_preflight_issues(args: argparse.Namespace | None) -> tuple[str, ...]:
@@ -19340,7 +19345,7 @@ def _history_context_rows(
 ) -> list[list[str]]:
     """Build compact context rows (prompt/image/version) for history comparisons."""
     previous_image = (
-        _truncate_text_preview(str(previous.get("image_path") or "-"), max_chars=40)
+        _truncate_text_preview(previous.get("image_path") or "-", max_chars=40)
         if previous is not None
         else "-"
     )
@@ -19353,7 +19358,7 @@ def _history_context_rows(
         [
             "Image path",
             previous_image,
-            _truncate_text_preview(str(current.get("image_path") or "-"), max_chars=40),
+            _truncate_text_preview(current.get("image_path") or "-", max_chars=40),
         ],
         [
             "Library versions",

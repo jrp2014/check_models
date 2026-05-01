@@ -1,4 +1,4 @@
-# [Harness Issue] The image shows a serene park setting with a person standing on a wooden dock, fishing by a calm lake. There are tree in microsoft/Phi-3.5-vision-instruct
+# [Harness Issue] The image shows a tranquil park scene with a person standing on a wooden dock, fishing by a pond. There are trees, a in microsoft/Phi-3.5-vision-instruct
 
 ## Description
 
@@ -19,7 +19,7 @@ _Summary:_ Special control token &lt;\|end\|&gt; appeared in generated text.
 _Evidence:_ Special control token &lt;\|end\|&gt; appeared in generated text.
             \| Special control token &lt;\|endoftext\|&gt; appeared in
             generated text.
-_Token context:_ prompt=766 \| output/prompt=65.27% \| nontext burden=99% \|
+_Token context:_ prompt=768 \| output/prompt=65.10% \| nontext burden=99% \|
                  stop=completed \| hit token cap (500)
 _Next action:_ Inspect EOS/stop-token stripping; control tokens are leaking
                into user-facing text.
@@ -40,11 +40,11 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC
 | Component       | Version                     |
 |-----------------|-----------------------------|
 | mlx-vlm         | 0.4.5                       |
-| mlx             | 0.32.0.dev20260426+211e57be |
+| mlx             | 0.32.0.dev20260501+e8ebdebe |
 | mlx-lm          | 0.31.3                      |
-| transformers    | 5.7.0.dev0                  |
+| transformers    | 5.7.0                       |
 | tokenizers      | 0.22.2                      |
-| huggingface-hub | 1.12.0                      |
+| huggingface-hub | 1.13.0                      |
 | Python Version  | 3.13.12                     |
 | OS              | Darwin 25.4.0               |
 | macOS Version   | 26.4.1                      |

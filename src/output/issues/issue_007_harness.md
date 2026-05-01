@@ -35,11 +35,11 @@ python -m check_models --image /Users/jrp/Pictures/Processed/20260403-124049_DSC
 | Component       | Version                     |
 |-----------------|-----------------------------|
 | mlx-vlm         | 0.4.5                       |
-| mlx             | 0.32.0.dev20260426+211e57be |
+| mlx             | 0.32.0.dev20260501+e8ebdebe |
 | mlx-lm          | 0.31.3                      |
-| transformers    | 5.7.0.dev0                  |
+| transformers    | 5.7.0                       |
 | tokenizers      | 0.22.2                      |
-| huggingface-hub | 1.12.0                      |
+| huggingface-hub | 1.13.0                      |
 | Python Version  | 3.13.12                     |
 | OS              | Darwin 25.4.0               |
 | macOS Version   | 26.4.1                      |
