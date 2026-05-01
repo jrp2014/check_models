@@ -2,7 +2,7 @@
 
 Improve human readability across the final human-facing output files by standardizing a small set of reusable output stanzas, replacing dense prose with scan-friendly bullets/tables where appropriate, and keeping one shared content model with thin Markdown/HTML renderers. Focus on file outputs first: `results.md`, `model_gallery.md`, `review.md`, `diagnostics.md`, and generated issue markdown; only touch console/log formatting when a shared helper change directly supports those file outputs. Use the opportunity to rationalize the code that builds the shared content payloads and refresh test coverage for the new output structure, but avoid a full templating system or major schema overhaul in favour of lightweight builders and renderers that slot into the existing report generation flow. A more consistent presentation of key diagnostics should make it easier for maintainers to quickly understand the state of each model and identify next steps without digging through dense paragraphs or hunting for key signals in inconsistent formats.  Any significant reduction in the size of generating code should also make it easier to maintain and evolve the reports over time.
 
-**Steps**
+## Steps
 
 1. Phase 1 — Define the stanza taxonomy and scope. Inventory the repeated human-facing content that appears across reports and classify it into a short list of reusable stanza types.
    Depends on: none.
@@ -64,6 +64,7 @@ Improve human readability across the final human-facing output files by standard
 - `/Users/jrp/Documents/AI/mlx/check_models/src/tests/test_markdown_formatting.py`
 - `/Users/jrp/Documents/AI/mlx/check_models/src/tests/test_html_formatting.py`
 - any diagnostics-specific or gallery-specific assertions that pin exact labels/headings
+
 1. Regenerate tracked markdown artifacts after the formatter changes land.
    Depends on: 10.
    Likely artifacts:
@@ -72,6 +73,7 @@ Improve human readability across the final human-facing output files by standard
 - `/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/diagnostics.md`
 - `/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/review.md`
 - `/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.md` if shared stanzas affect top summaries there
+
 1. Phase 6 — Run focused validation, then broaden only if needed.
    Depends on: 10-11.
    Recommended order:
@@ -82,7 +84,7 @@ Improve human readability across the final human-facing output files by standard
 - markdownlint on changed markdown artifacts
 - optional full `make quality` after the focused checks are green
 
-**Relevant files**
+## Relevant Files
 
 - `/Users/jrp/Documents/AI/mlx/check_models/src/check_models.py` — all human-facing report generators and the shared formatting helpers live here; primary functions include `generate_markdown_report()`, `generate_markdown_gallery_report()`, `generate_review_report()`, `generate_diagnostics_report()`, `_build_review_block_rows()`, `_build_markdown_review_block_rows()`, `_build_maintainer_triage_rows()`, `_append_markdown_labeled_value()`, `_append_markdown_details_block()`, `_format_action_snapshot_parts()`, `_format_review_priorities_parts()`, and `_format_failures_by_package_parts()`.
 - `/Users/jrp/Documents/AI/mlx/check_models/src/tests/test_report_generation.py` — broad coverage for report content, headings, links, and triage blocks.
@@ -94,7 +96,7 @@ Improve human readability across the final human-facing output files by standard
 - `/Users/jrp/Documents/AI/mlx/check_models/src/output/reports/results.md` — summary artifact whose top-level action/priority blocks should stay aligned with the same phrasing.
 - `/Users/jrp/Documents/AI/mlx/check_models/CHANGELOG.md` — update under `[Unreleased]` for maintainer-visible output/readability changes.
 
-**Verification**
+## Verification
 
 1. Run focused report-generation tests for gallery, diagnostics, review, and shared action-summary sections in `/Users/jrp/Documents/AI/mlx/check_models/src/tests/test_report_generation.py`.
 2. Run markdown-formatting coverage in `/Users/jrp/Documents/AI/mlx/check_models/src/tests/test_markdown_formatting.py` to catch wrapping/list/details regressions.
@@ -103,7 +105,7 @@ Improve human readability across the final human-facing output files by standard
 5. Run markdownlint on each regenerated markdown artifact.
 6. Manually review the tracked `model_gallery.md`, `diagnostics.md`, and `review.md` outputs for scanability: key diagnostics should be discoverable in the first screenful of each section without reading a dense paragraph.
 
-**Decisions**
+## Decisions
 
 - Included scope: human-facing final output files and generated issue markdown.
 - Excluded scope: TSV/JSONL schema changes and console/file-log presentation, unless a shared helper change is required to support clearer file outputs.
@@ -111,7 +113,7 @@ Improve human readability across the final human-facing output files by standard
 - Keep `format_field_value()` as the single numeric/text metric normalizer; do not duplicate formatting logic while improving stanza structure.
 - Preserve existing markdownlint/test-sensitive behaviors around blockquotes, details blocks, and heading names unless there is a clear readability gain and the test/fixture updates are planned alongside it.
 
-**Further Considerations**
+## Further Considerations
 
 1. Recommendation: treat HTML as a first-class consumer of the same stanza payloads, but allow HTML to remain denser than Markdown when tables are the clearer representation.
 2. Recommendation: keep the gallery’s more human-readable wording layer separate from canonical log wording, but source both from the same underlying payload fields so content stays consistent even when phrasing differs.

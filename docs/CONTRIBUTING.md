@@ -200,8 +200,8 @@ The project uses several automated quality checks:
    # Install markdown linting (requires Node.js/npm)
    make install-markdownlint
 
-   # Or run via npx when markdownlint-cli2 is already available to npx
-   npx --no-install markdownlint-cli2 '**/*.md'
+   # Or run via npx from the repo root with the checked-in config
+   npx --no-install markdownlint-cli2 --config .markdownlint.jsonc '**/*.md' '!src/node_modules/**' '!**/node_modules/**'
    ```
 
 ### VS Code Problems

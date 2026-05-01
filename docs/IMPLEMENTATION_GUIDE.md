@@ -406,8 +406,9 @@ The project uses `markdownlint-cli2` to ensure consistent markdown formatting ac
     - Install Node.js (via Homebrew `brew install node` or [nodejs.org](https://nodejs.org/)).
     - Run `make install-markdownlint` from the repository root.
 2. **Option 2: Use a pre-existing npx resolution**
-   - If `markdownlint-cli2` is already available to `npx`, use
-     `npx --no-install markdownlint-cli2 '**/*.md'`.
+     - If `markdownlint-cli2` is already available to `npx`, run it from the
+         repository root with the checked-in config:
+         `npx --no-install markdownlint-cli2 --config .markdownlint.jsonc '**/*.md' '!src/node_modules/**' '!**/node_modules/**'`.
 3. **Option 3: Skip**
    - Not recommended: `make quality` fails when markdownlint is unavailable.
      `make quality-strict` exists for an earlier explicit availability check.
