@@ -35,6 +35,13 @@ def _read_jsonl(path: Path) -> tuple[JsonlMetadataRecord, list[JsonlResultRecord
     return header, results
 
 
+def _require_present[T](value: T | None, *, field_name: str) -> T:
+    """Return an optional test payload after asserting that it exists."""
+    if value is None:
+        raise AssertionError(field_name)
+    return value
+
+
 @dataclass
 class MockGeneration:
     """Mock generation result for testing."""
@@ -112,7 +119,7 @@ def test_save_jsonl_report_includes_library_versions_in_metadata(tmp_path: Path)
     )
 
     header, rows = _read_jsonl(output_file)
-    assert header["library_versions"] == versions
+    assert header.get("library_versions") == versions
     assert rows == []
 
 
@@ -203,8 +210,8 @@ def test_save_jsonl_report_includes_review_payload_for_success(tmp_path: Path) -
     save_jsonl_report([result], output_file, prompt=prompt, system_info={})
 
     _header, rows = _read_jsonl(output_file)
-    review = rows[0]["review"]
-    triage = rows[0]["maintainer_triage"]
+    review = _require_present(rows[0].get("review"), field_name="review")
+    triage = _require_present(rows[0].get("maintainer_triage"), field_name="maintainer_triage")
     assert review["verdict"] in {"clean", "model_shortcoming", "context_budget"}
     assert review["hint_relationship"] in {
         "improves_trusted_hints",
@@ -242,17 +249,21 @@ def test_save_jsonl_report_includes_review_payload_for_failures(tmp_path: Path) 
     save_jsonl_report([result], output_file, prompt="test", system_info={})
 
     _header, rows = _read_jsonl(output_file)
-    review = rows[0]["review"]
-    triage = rows[0]["maintainer_triage"]
+    review = _require_present(rows[0].get("review"), field_name="review")
+    triage = _require_present(rows[0].get("maintainer_triage"), field_name="maintainer_triage")
     assert review["verdict"] == "runtime_failure"
     assert review["owner"] == "mlx-vlm"
     assert review["user_bucket"] == "avoid"
     assert review["evidence"]
     assert triage["issue_kind"] == "runtime_failure"
-    assert triage["issue_subtype"] == "MLX_VLM_DECODE_RUNTIME"
-    assert triage["issue_cluster_id"] == "mlx-vlm_mlx-vlm-decode-runtime_001"
-    assert triage["issue_cluster_path"].startswith("issues/issue_001_")
-    assert triage["acceptance_signal"]
+    assert triage.get("issue_subtype") == "MLX_VLM_DECODE_RUNTIME"
+    assert triage.get("issue_cluster_id") == "mlx-vlm_mlx-vlm-decode-runtime_001"
+    issue_cluster_path = _require_present(
+        triage.get("issue_cluster_path"),
+        field_name="issue_cluster_path",
+    )
+    assert issue_cluster_path.startswith("issues/issue_001_")
+    assert triage.get("acceptance_signal")
     assert triage["confidence"] == "high"
     assert triage["suspected_owner"] == "mlx-vlm"
     assert "Inspect prompt-template" in triage["next_action"]
@@ -281,7 +292,10 @@ def test_save_jsonl_report_includes_metadata_agreement_payload(tmp_path: Path) -
     save_jsonl_report([result], output_file, prompt="test", system_info={})
 
     _header, rows = _read_jsonl(output_file)
-    payload = rows[0]["metadata_agreement"]
+    payload = _require_present(
+        rows[0].get("metadata_agreement"),
+        field_name="metadata_agreement",
+    )
     assert payload["overall_score"] == 82.5
     assert payload["title_score"] == 100.0
     assert payload["description_score"] == 75.0
@@ -312,7 +326,7 @@ def test_save_jsonl_report_flags_huggingface_hub_connectivity_failures(tmp_path:
     save_jsonl_report([result], output_file, prompt="test", system_info={})
 
     _header, rows = _read_jsonl(output_file)
-    review = rows[0]["review"]
+    review = _require_present(rows[0].get("review"), field_name="review")
     assert review["verdict"] == "runtime_failure"
     assert review["owner"] == "huggingface-hub"
     assert "hub_connectivity" in review["evidence"]
@@ -511,9 +525,9 @@ def test_save_jsonl_report_includes_root_exception_fields(tmp_path: Path) -> Non
 
     data = rows[0]
     assert data["error_type"] == "ValueError"
-    assert data["root_error_type"] == "RuntimeError"
-    assert data["root_error_module"] == "builtins"
-    assert data["root_error_message"] == "upstream shape mismatch"
+    assert data.get("root_error_type") == "RuntimeError"
+    assert data.get("root_error_module") == "builtins"
+    assert data.get("root_error_message") == "upstream shape mismatch"
 
 
 def test_save_jsonl_report_includes_prompt_diagnostics(tmp_path: Path) -> None:
@@ -544,7 +558,10 @@ def test_save_jsonl_report_includes_prompt_diagnostics(tmp_path: Path) -> None:
     save_jsonl_report([result], output_file, prompt="test", system_info={})
     _header, rows = _read_jsonl(output_file)
 
-    prompt_diagnostics = rows[0]["prompt_diagnostics"]
+    prompt_diagnostics = _require_present(
+        rows[0].get("prompt_diagnostics"),
+        field_name="prompt_diagnostics",
+    )
     assert prompt_diagnostics["rendered_prompt_hash_sha256"] == "abc123"
     assert prompt_diagnostics["image_placeholder_count"] == 1
     assert prompt_diagnostics["special_tokens"] == ["<|end|>"]
@@ -717,11 +734,12 @@ def test_append_history_record_captures_review_fields_for_quality_tracking(
         image_path=None,
     )
 
-    model_record = record["model_results"]["test-model"]
-    assert model_record["review_verdict"] == analysis.verdict
-    assert model_record["review_owner"] == analysis.owner
-    assert model_record["review_user_bucket"] == analysis.user_bucket
-    assert model_record["prompt_output_ratio"] == 64 / 320
+    model_results = _require_present(record.get("model_results"), field_name="model_results")
+    model_record = model_results["test-model"]
+    assert model_record.get("review_verdict") == analysis.verdict
+    assert model_record.get("review_owner") == analysis.owner
+    assert model_record.get("review_user_bucket") == analysis.user_bucket
+    assert model_record.get("prompt_output_ratio") == 64 / 320
 
 
 def test_compare_history_records_detects_regressions_and_recoveries() -> None:
@@ -754,23 +772,32 @@ def test_compare_history_records_detects_quality_harness_and_owner_changes() -> 
     previous = _history_run({"model-a": True, "model-b": True})
     current = _history_run({"model-a": True, "model-b": True})
 
-    previous["model_results"]["model-a"]["review_user_bucket"] = "recommended"
-    previous["model_results"]["model-a"]["review_verdict"] = "clean"
-    previous["model_results"]["model-a"]["review_owner"] = "model"
+    previous_model_results = _require_present(
+        previous.get("model_results"),
+        field_name="model_results",
+    )
+    current_model_results = _require_present(
+        current.get("model_results"),
+        field_name="model_results",
+    )
 
-    current["model_results"]["model-a"]["review_user_bucket"] = "avoid"
-    current["model_results"]["model-a"]["review_verdict"] = "context_budget"
-    current["model_results"]["model-a"]["review_owner"] = "mlx"
-    current["model_results"]["model-a"]["harness_issue_type"] = "long_context"
+    previous_model_results["model-a"]["review_user_bucket"] = "recommended"
+    previous_model_results["model-a"]["review_verdict"] = "clean"
+    previous_model_results["model-a"]["review_owner"] = "model"
 
-    previous["model_results"]["model-b"]["review_user_bucket"] = "avoid"
-    previous["model_results"]["model-b"]["review_verdict"] = "harness"
-    previous["model_results"]["model-b"]["review_owner"] = "mlx-vlm"
-    previous["model_results"]["model-b"]["harness_issue_type"] = "token_leak"
+    current_model_results["model-a"]["review_user_bucket"] = "avoid"
+    current_model_results["model-a"]["review_verdict"] = "context_budget"
+    current_model_results["model-a"]["review_owner"] = "mlx"
+    current_model_results["model-a"]["harness_issue_type"] = "long_context"
 
-    current["model_results"]["model-b"]["review_user_bucket"] = "recommended"
-    current["model_results"]["model-b"]["review_verdict"] = "clean"
-    current["model_results"]["model-b"]["review_owner"] = "model"
+    previous_model_results["model-b"]["review_user_bucket"] = "avoid"
+    previous_model_results["model-b"]["review_verdict"] = "harness"
+    previous_model_results["model-b"]["review_owner"] = "mlx-vlm"
+    previous_model_results["model-b"]["harness_issue_type"] = "token_leak"
+
+    current_model_results["model-b"]["review_user_bucket"] = "recommended"
+    current_model_results["model-b"]["review_verdict"] = "clean"
+    current_model_results["model-b"]["review_owner"] = "model"
 
     summary = compare_history_records(previous, current)
     assert summary["quality_regressions"] == ["model-a"]
@@ -921,7 +948,7 @@ class TestRuntimeFingerprint:
             fingerprint = check_models.collect_runtime_fingerprint()
 
         assert fingerprint["gpu_memory"]["status"] == "ok"
-        assert fingerprint["gpu_memory"]["detail"] == "active=2.00GB"
+        assert fingerprint["gpu_memory"].get("detail") == "active=2.00GB"
 
     def test_jsonl_metadata_includes_fingerprint(self) -> None:
         """JSONL metadata record includes runtime_fingerprint when provided."""
@@ -932,7 +959,11 @@ class TestRuntimeFingerprint:
             runtime_fingerprint=fingerprint,
         )
         assert "runtime_fingerprint" in record
-        assert record["runtime_fingerprint"]["metal_gpu"]["status"] == "ok"
+        runtime_fingerprint = _require_present(
+            record.get("runtime_fingerprint"),
+            field_name="runtime_fingerprint",
+        )
+        assert runtime_fingerprint["metal_gpu"]["status"] == "ok"
 
     def test_jsonl_metadata_omits_fingerprint_when_none(self) -> None:
         """JSONL metadata record omits runtime_fingerprint when not provided."""
@@ -997,7 +1028,7 @@ class TestSignatureComponents:
         assert len(rows) == 1
         components = rows[0].get("signature_components")
         assert components is not None
-        assert components["error_code"] == "MLX_DECODE_ERROR"
+        assert components.get("error_code") == "MLX_DECODE_ERROR"
         assert "normalized_message" in components
         assert "traceback_signature" in components
 
@@ -1064,7 +1095,11 @@ class TestSchemaVersioning:
         assert header["prompt"] == "hello"
         assert header["system"]["os"] == "macOS"
         assert "timestamp" in header
-        assert header["runtime_fingerprint"]["metal_gpu"]["status"] == "ok"
+        runtime_fingerprint = _require_present(
+            header.get("runtime_fingerprint"),
+            field_name="runtime_fingerprint",
+        )
+        assert runtime_fingerprint["metal_gpu"]["status"] == "ok"
 
     def test_round_trip_result_record_success(self, tmp_path: Path) -> None:
         """Successful result record round-trips with all required keys."""
@@ -1099,10 +1134,13 @@ class TestSchemaVersioning:
         row = rows[0]
         assert row["success"] is False
         assert row["error_code"] == "DECODE_ERR"
-        sc = row["signature_components"]
+        sc = _require_present(
+            row.get("signature_components"),
+            field_name="signature_components",
+        )
         assert "normalized_message" in sc
         assert "traceback_signature" in sc
-        assert sc["error_code"] == "DECODE_ERR"
+        assert sc.get("error_code") == "DECODE_ERR"
 
     def test_round_trip_all_fields_json_serializable(self, tmp_path: Path) -> None:
         """Every field in the JSONL output is JSON-serializable (no crash)."""
@@ -1158,8 +1196,8 @@ class TestRerunEvidence:
         summary = rows[0].get("rerun_summary")
         assert summary is not None
         assert summary["rerun_success"] is True
-        assert summary["rerun_generated_chars"] == 42
-        assert summary["rerun_prompt"] == "Describe this image briefly."
+        assert summary.get("rerun_generated_chars") == 42
+        assert summary.get("rerun_prompt") == "Describe this image briefly."
 
     def test_no_rerun_summary_when_no_evidence(self, tmp_path: Path) -> None:
         """JSONL result omits rerun_summary when no rerun was performed."""
