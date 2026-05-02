@@ -539,6 +539,33 @@ def test_file_safe_formatter_strips_ansi() -> None:
     assert formatter.format(record) == "red text"
 
 
+def test_file_safe_formatter_uses_project_timestamp_shape() -> None:
+    """File formatter should use stable second-resolution local timestamps."""
+    formatter = FileSafeFormatter(
+        "%(asctime)s - %(levelname)s - %(message)s",
+        datefmt=check_models.LOCAL_TIMESTAMP_FORMAT,
+    )
+    formatter.converter = time.gmtime
+    record = logging.LogRecord(
+        name="test",
+        level=logging.INFO,
+        pathname=__file__,
+        lineno=1,
+        msg="plain text",
+        args=(),
+        exc_info=None,
+    )
+    record.created = 0.0
+    record.msecs = 321.0
+
+    formatted = formatter.format(record)
+
+    assert formatted in {
+        "1970-01-01 00:00:00 GMT - INFO - plain text",
+        "1970-01-01 00:00:00 UTC - INFO - plain text",
+    }
+
+
 def test_canonical_review_log_emits_verdict_block(
     caplog: pytest.LogCaptureFixture,
 ) -> None:

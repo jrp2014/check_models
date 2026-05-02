@@ -2350,6 +2350,10 @@ def _make_rich_console(*, width: int | None = None) -> Console:
     )
 
 
+LOCAL_TIMESTAMP_FORMAT: Final[str] = "%Y-%m-%d %H:%M:%S %Z"
+CONSOLE_LOG_TIME_FORMAT: Final[str] = "[%H:%M:%S %Z]"
+
+
 class StyleAwareRichHandler(RichHandler):
     """Rich log handler that honors the script's existing structured style hints."""
 
@@ -2436,7 +2440,7 @@ def _make_console_log_handler(
         markup=False,
         highlighter=None,
         rich_tracebacks=verbose,
-        log_time_format="[%H:%M:%S]",
+        log_time_format=CONSOLE_LOG_TIME_FORMAT,
     )
     handler.setLevel(level)
     handler.setFormatter(logging.Formatter("%(message)s"))
@@ -6290,7 +6294,7 @@ def _analyze_text_quality(
     return analysis, _build_quality_issues_string(analysis)
 
 
-def local_now_str(fmt: str = "%Y-%m-%d %H:%M:%S %Z") -> str:
+def local_now_str(fmt: str = LOCAL_TIMESTAMP_FORMAT) -> str:
     """Return localized current time as a formatted string.
 
     Centralizes timestamp formatting so report generators and version info
@@ -17917,6 +17921,7 @@ def setup_environment(args: argparse.Namespace) -> LibraryVersionDict:
     file_handler.setLevel(logging.DEBUG)
     file_formatter: logging.Formatter = FileSafeFormatter(
         "%(asctime)s - %(levelname)s - %(message)s",
+        datefmt=LOCAL_TIMESTAMP_FORMAT,
     )
     file_handler.setFormatter(file_formatter)
     logger.addHandler(file_handler)
