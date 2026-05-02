@@ -10,6 +10,7 @@ from check_models import (
     GRADE_EMOJIS,
     QUALITY,
     GenerationQualityAnalysis,
+    MetadataDict,
     ModelIssueSummary,
     PerformanceResult,
     _collect_cataloging_summary_data,
@@ -358,7 +359,7 @@ class TestComputeMetadataAgreement:
 
     def test_description_recall_uses_metadata_terms(self) -> None:
         """Description agreement should reward reuse of salient trusted metadata terms."""
-        metadata = {
+        metadata: MetadataDict = {
             "title": "Brick storefront",
             "description": "A brick storefront with outdoor seating beside a pavement.",
             "keywords": "brick storefront, outdoor seating, pavement, pedestrians",
@@ -376,7 +377,7 @@ class TestComputeMetadataAgreement:
 
     def test_keyword_overlap_dedupes_repeated_generated_terms(self) -> None:
         """Repeated generated keywords should not distort the overlap score."""
-        metadata = {
+        metadata: MetadataDict = {
             "keywords": "brick storefront, outdoor seating, pavement, pedestrians",
         }
         text = (
@@ -392,7 +393,7 @@ class TestComputeMetadataAgreement:
 
     def test_nonvisual_metadata_does_not_contribute_positive_score(self) -> None:
         """Date/time/GPS values should not raise positive agreement subscores."""
-        metadata = {
+        metadata: MetadataDict = {
             "date": "2026-05-01",
             "time": "08:15",
             "gps": "51.5000,-0.1200",
@@ -413,7 +414,7 @@ class TestComputeMetadataAgreement:
 
     def test_nonvisual_metadata_echo_is_penalized(self) -> None:
         """Leaking trusted nonvisual metadata should reduce the final agreement score."""
-        metadata = {
+        metadata: MetadataDict = {
             "title": "Brick storefront",
             "keywords": "brick storefront, outdoor seating",
             "gps": "51.5000,-0.1200",
