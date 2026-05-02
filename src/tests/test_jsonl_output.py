@@ -458,6 +458,68 @@ def test_save_jsonl_report_includes_traceback_and_type(tmp_path: Path) -> None:
     assert "Traceback" in data["error_traceback"]
 
 
+def test_save_jsonl_report_includes_root_exception_fields(tmp_path: Path) -> None:
+    """Optional root exception fields should serialize without changing error_type."""
+    output_file = tmp_path / "results.jsonl"
+    result = PerformanceResult(
+        model_name="failed-model",
+        generation=None,
+        success=False,
+        error_message="Model loading failed: upstream shape mismatch",
+        error_type="ValueError",
+        root_error_type="RuntimeError",
+        root_error_module="builtins",
+        root_error_message="upstream shape mismatch",
+    )
+
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+    _header, rows = _read_jsonl(output_file)
+
+    data = rows[0]
+    assert data["error_type"] == "ValueError"
+    assert data["root_error_type"] == "RuntimeError"
+    assert data["root_error_module"] == "builtins"
+    assert data["root_error_message"] == "upstream shape mismatch"
+
+
+def test_save_jsonl_report_includes_prompt_diagnostics(tmp_path: Path) -> None:
+    """Rendered prompt diagnostics should be optional JSONL metadata."""
+    output_file = tmp_path / "results.jsonl"
+    result = PerformanceResult(
+        model_name="ok-model",
+        generation=MockGeneration(),
+        success=True,
+        prompt_diagnostics=check_models.PromptDiagnostics(
+            model_type="qwen2_vl",
+            processor_class="transformers.AutoProcessor",
+            tokenizer_class="transformers.PreTrainedTokenizerFast",
+            rendered_prompt_hash_sha256="abc123",
+            rendered_prompt_preview="<image> Describe this.",
+            rendered_prompt_chars=22,
+            image_placeholder_count=1,
+            eos_token_id=151645,
+            special_token_ids=(151645,),
+            special_tokens=("<|end|>",),
+            generate_kwargs={
+                "max_tokens": 500,
+                "quantized_kv_start": check_models.DEFAULT_QUANTIZED_KV_START,
+            },
+        ),
+    )
+
+    save_jsonl_report([result], output_file, prompt="test", system_info={})
+    _header, rows = _read_jsonl(output_file)
+
+    prompt_diagnostics = rows[0]["prompt_diagnostics"]
+    assert prompt_diagnostics["rendered_prompt_hash_sha256"] == "abc123"
+    assert prompt_diagnostics["image_placeholder_count"] == 1
+    assert prompt_diagnostics["special_tokens"] == ["<|end|>"]
+    assert prompt_diagnostics["generate_kwargs"] == {
+        "max_tokens": 500,
+        "quantized_kv_start": check_models.DEFAULT_QUANTIZED_KV_START,
+    }
+
+
 def test_save_jsonl_report_includes_captured_output(tmp_path: Path) -> None:
     """Failure rows should retain captured stdout/stderr for diagnostics workflows."""
     output_file = tmp_path / "results.jsonl"

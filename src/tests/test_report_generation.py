@@ -6,7 +6,7 @@ import json
 import os
 import time
 from argparse import Namespace
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import TYPE_CHECKING, cast
 from unittest.mock import patch
 
@@ -1950,6 +1950,80 @@ class TestDiagnosticsReport:
         assert payload["failure"]["stage"] == "Model Error"
         assert payload["repro"]["prompt_hash_sha256"]
 
+    def test_harness_repro_bundles_written_and_linked(self, tmp_path: Path) -> None:
+        """Successful issue-clustered harness anomalies should get repro bundles."""
+        prompt = "Describe this image."
+        harness = replace(
+            _make_harness_success(
+                "org/model-harness",
+                text="<|end|> leaked control token",
+                harness_type="prompt_template",
+                harness_detail="output:zero_tokens",
+            ),
+            prompt_diagnostics=check_models.PromptDiagnostics(
+                model_type="qwen2_vl",
+                processor_class="transformers.AutoProcessor",
+                tokenizer_class="transformers.PreTrainedTokenizerFast",
+                rendered_prompt_hash_sha256="rendered-hash",
+                rendered_prompt_preview="<|im_start|>user <image> Describe this image.",
+                rendered_prompt_chars=44,
+                image_placeholder_count=1,
+                eos_token_id=151645,
+                special_token_ids=(151645,),
+                special_tokens=("<|end|>", "</think>"),
+                generate_kwargs={
+                    "max_tokens": 500,
+                    "quantized_kv_start": check_models.DEFAULT_QUANTIZED_KV_START,
+                },
+            ),
+        )
+        bundles = export_failure_repro_bundles(
+            results=[harness],
+            output_dir=tmp_path / "repro_bundles",
+            run_args=Namespace(),
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            prompt=prompt,
+            image_path=None,
+        )
+
+        assert "org/model-harness" in bundles
+        bundle_path = bundles["org/model-harness"]
+        payload = json.loads(bundle_path.read_text(encoding="utf-8"))
+        assert payload["result"]["success"] is True
+        assert payload["issue_cluster_id"] == "model-config-mlx-vlm_prompt-template_001"
+        assert payload["repro"]["prompt_diagnostics"]["rendered_prompt_hash_sha256"] == (
+            "rendered-hash"
+        )
+        assert payload["repro"]["prompt_diagnostics"]["special_tokens"] == [
+            "<|end|>",
+            "</think>",
+        ]
+
+        issue_reports = _generate_github_issue_reports(
+            diagnostics_snapshot=_build_diagnostics_snapshot(results=[harness], prompt=prompt),
+            output_dir=tmp_path,
+            versions=_stub_versions(),
+            system_info={"Python Version": "3.13"},
+            repro_bundles=bundles,
+            run_args=Namespace(),
+        )
+        issue_content = next(iter(issue_reports.values())).read_text(encoding="utf-8")
+        assert bundle_path.name in issue_content
+        assert "Repro Bundle" in issue_content
+
+    def test_repro_command_omits_upstream_quantized_kv_default(self) -> None:
+        """Default KV quantization start should not be forwarded as a repro override."""
+        tokens = check_models._build_repro_command_tokens(
+            image_path=None,
+            run_args=Namespace(
+                quantized_kv_start=check_models.DEFAULT_QUANTIZED_KV_START,
+                trust_remote_code=True,
+            ),
+            include_selection=False,
+        )
+        assert "--quantized-kv-start" not in tokens
+
     def test_diagnostics_file_ends_with_single_trailing_newline(self, tmp_path: Path) -> None:
         """Diagnostics markdown should end with a trailing newline for markdownlint."""
         out = tmp_path / "diag.md"
@@ -2016,7 +2090,7 @@ class TestDiagnosticsReport:
             max_kv_size=None,
             kv_bits=None,
             kv_group_size=64,
-            quantized_kv_start=0,
+            quantized_kv_start=2048,
             prefill_step_size=None,
             timeout=42.0,
             verbose=True,
@@ -2049,6 +2123,7 @@ class TestDiagnosticsReport:
         assert "--thinking-start-token '<think>'" in content
         assert "--repetition-penalty 1.1" in content
         assert "--repetition-context-size 50" in content
+        assert "--quantized-kv-start 2048" in content
         assert "--timeout 42.0" in content
         assert "--no-trust-remote-code" in content
         assert "--verbose" in content
@@ -2212,7 +2287,7 @@ class TestDiagnosticsReport:
 
         assert "Diagnostics signals: failures=1, harness=1, stack=0, preflight=1" in caplog.text
         assert "Likely owners:" in caplog.text
-        assert "Repro bundles available for 1 failed model(s)." in caplog.text
+        assert "Repro bundles available for 1 issue-linked model(s)." in caplog.text
 
     def test_log_maintainer_summary_mentions_stack_signal_owner_hint(
         self,

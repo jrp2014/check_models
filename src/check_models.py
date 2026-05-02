@@ -191,6 +191,7 @@ ERROR_MLX_VLM_RUNTIME_INIT: Final[str] = (
 )
 MLX_IMPORT_PROBE_TIMEOUT_SECONDS: Final[float] = 8.0
 DEFAULT_KV_QUANT_SCHEME: Final = "uniform"
+DEFAULT_QUANTIZED_KV_START: Final[int] = 5000
 UNIFORM_KV_BITS: Final[frozenset[int]] = frozenset({2, 3, 4, 5, 6, 8})
 DEFAULT_THINKING_END_MARKER: Final[str] = "</think>"
 
@@ -969,6 +970,9 @@ class JsonlResultRecord(TypedDict):
     error_message: str | None
     captured_output_on_fail: str | None
     error_type: str | None
+    root_error_type: NotRequired[str]
+    root_error_module: NotRequired[str]
+    root_error_message: NotRequired[str]
     error_package: str | None
     error_traceback: str | None
     quality_issues: list[str]
@@ -979,6 +983,7 @@ class JsonlResultRecord(TypedDict):
     quality_analysis: NotRequired[JsonlQualityAnalysisRecord]
     review: NotRequired[JsonlReviewRecord]
     maintainer_triage: NotRequired[JsonlMaintainerTriageRecord]
+    prompt_diagnostics: NotRequired[dict[str, JsonLike]]
     signature_components: NotRequired[JsonlSignatureComponents]
     rerun_summary: NotRequired[JsonlRerunSummary]
 
@@ -1213,7 +1218,7 @@ class StrictGenerateCallable(Protocol):
         kv_bits: float | None = None,
         kv_quant_scheme: str = DEFAULT_KV_QUANT_SCHEME,
         kv_group_size: int = 64,
-        quantized_kv_start: int = 0,
+        quantized_kv_start: int = DEFAULT_QUANTIZED_KV_START,
         max_tokens: int = 500,
         **kwargs: Unpack[GenerateExtraKwargs],
     ) -> GenerationResult:
@@ -1257,7 +1262,7 @@ if TYPE_CHECKING:
         kv_bits=None,
         kv_quant_scheme=DEFAULT_KV_QUANT_SCHEME,
         kv_group_size=64,
-        quantized_kv_start=0,
+        quantized_kv_start=DEFAULT_QUANTIZED_KV_START,
         prefill_step_size=None,
         resize_shape=None,
         eos_tokens=None,
@@ -1411,6 +1416,24 @@ EXIF_DATE_TAGS: Final[tuple[str, ...]] = (
 
 
 @dataclass(frozen=True)
+class PromptDiagnostics:
+    """Bounded prompt/rendering context for maintainer repro artifacts."""
+
+    model_type: str | None = None
+    processor_class: str | None = None
+    tokenizer_class: str | None = None
+    rendered_prompt_hash_sha256: str | None = None
+    rendered_prompt_preview: str | None = None
+    rendered_prompt_chars: int | None = None
+    image_placeholder_count: int | None = None
+    eos_token_id: JsonLike = None
+    eos_token: str | None = None
+    special_token_ids: tuple[JsonLike, ...] = ()
+    special_tokens: tuple[str, ...] = ()
+    generate_kwargs: dict[str, JsonLike] = dataclasses.field(default_factory=dict)
+
+
+@dataclass(frozen=True)
 class PerformanceResult:
     """Encapsulates a GenerationResult and execution metadata for a model run.
 
@@ -1435,6 +1458,7 @@ class PerformanceResult:
         error_package: Which package raised the error (mlx, mlx-vlm, transformers)
         error_traceback: Full traceback for actionable error reports
         requested_max_tokens: Requested generation budget for cutoff diagnosis
+        prompt_diagnostics: Prompt/template and generation-kwarg context for maintainers
     """
 
     model_name: str
@@ -1450,6 +1474,9 @@ class PerformanceResult:
     model_load_time: float | None = None
     total_time: float | None = None
     error_type: str | None = None
+    root_error_type: str | None = None
+    root_error_module: str | None = None
+    root_error_message: str | None = None
     quality_issues: str | None = None
     quality_analysis: GenerationQualityAnalysis | None = None
     active_memory: float | None = None
@@ -1458,6 +1485,7 @@ class PerformanceResult:
     error_traceback: str | None = None
     runtime_diagnostics: RuntimeDiagnostics | None = None
     requested_max_tokens: int | None = None
+    prompt_diagnostics: PromptDiagnostics | None = None
     rerun_evidence: RerunEvidence | None = None
 
 
@@ -10923,9 +10951,10 @@ def _build_issue_clusters(snapshot: DiagnosticsSnapshot) -> tuple[IssueCluster, 
         representative = sorted_results[0]
         owner = _diagnostics_owner_label(representative.error_package or "unknown")
         subtype = representative.error_code or "runtime_failure"
+        representative_error = representative.root_error_message or representative.error_message
         symptom = _truncate_text_preview(
             _simplify_failure_message(
-                representative.error_message,
+                representative_error,
                 model_name=representative.model_name,
             ),
             max_chars=120,
@@ -10936,7 +10965,7 @@ def _build_issue_clusters(snapshot: DiagnosticsSnapshot) -> tuple[IssueCluster, 
             issue_kind="runtime_failure",
             issue_subtype=subtype,
             symptom_family=_normalize_issue_symptom_family(
-                f"{subtype} {representative.error_message or symptom}"
+                f"{subtype} {representative_error or symptom}"
             ),
             symptom=symptom,
             source="failure",
@@ -11147,7 +11176,10 @@ def _log_maintainer_summary(
     if artifacts.diagnostics_written:
         log_file_path(diagnostics_path, label="   Diagnostics:  ")
     if artifacts.repro_bundles:
-        logger.info("Repro bundles available for %d failed model(s).", len(artifacts.repro_bundles))
+        logger.info(
+            "Repro bundles available for %d issue-linked model(s).",
+            len(artifacts.repro_bundles),
+        )
 
 
 def _format_recent_repro_ratio(history_info: FailureHistoryContext | None) -> str:
@@ -12321,6 +12353,40 @@ def _diagnostics_stack_signal_section(
     return parts
 
 
+_ISSUE_QUEUE_HEADERS: Final[tuple[str, ...]] = (
+    "Owner",
+    "Issue Subtype",
+    "Affected Model Count",
+    "Representative Model",
+    "Issue Draft",
+    "Acceptance Signal",
+)
+
+
+def _render_issue_queue_table(
+    clusters: Sequence[IssueCluster],
+    *,
+    escape_text: Callable[[str], str],
+    issue_link_for_cluster: Callable[[IssueCluster], str],
+) -> list[str]:
+    """Render the shared issue-queue table used across Markdown artifacts."""
+    rows: list[tuple[str, ...]] = []
+    for cluster in clusters:
+        representative = _issue_cluster_representative(cluster)
+        representative_name = representative.model_name if representative is not None else "unknown"
+        rows.append(
+            (
+                f"`{escape_text(cluster.owner)}`",
+                f"`{escape_text(cluster.issue_subtype)}`",
+                str(_issue_cluster_model_count(cluster)),
+                f"`{escape_text(representative_name)}`",
+                issue_link_for_cluster(cluster),
+                escape_text(cluster.acceptance_signal),
+            )
+        )
+    return tabulate(rows, headers=_ISSUE_QUEUE_HEADERS, tablefmt="github").splitlines()
+
+
 def _diagnostics_issue_queue_section(snapshot: DiagnosticsSnapshot) -> list[str]:
     """Build the issue-queue block near the top of diagnostics output."""
     clusters = _build_issue_clusters(snapshot)
@@ -12338,35 +12404,15 @@ def _diagnostics_issue_queue_section(snapshot: DiagnosticsSnapshot) -> list[str]
         parts.append("")
         return parts
 
-    rows: list[tuple[str, ...]] = []
-    for cluster in clusters:
-        representative = _issue_cluster_representative(cluster)
-        representative_name = representative.model_name if representative is not None else "unknown"
-        issue_link = f"[`{cluster.cluster_id}`](../issues/{cluster.issue_filename})"
-        rows.append(
-            (
-                f"`{DIAGNOSTICS_ESCAPER.escape(cluster.owner)}`",
-                f"`{DIAGNOSTICS_ESCAPER.escape(cluster.issue_subtype)}`",
-                str(_issue_cluster_model_count(cluster)),
-                f"`{DIAGNOSTICS_ESCAPER.escape(representative_name)}`",
-                issue_link,
-                DIAGNOSTICS_ESCAPER.escape(cluster.acceptance_signal),
-            )
-        )
-
     parts.extend(
-        tabulate(
-            rows,
-            headers=[
-                "Owner",
-                "Issue Subtype",
-                "Affected Model Count",
-                "Representative Model",
-                "Issue Draft",
-                "Acceptance Signal",
-            ],
-            tablefmt="github",
-        ).splitlines()
+        _render_issue_queue_table(
+            clusters,
+            escape_text=DIAGNOSTICS_ESCAPER.escape,
+            issue_link_for_cluster=lambda cluster: (
+                f"[`{DIAGNOSTICS_ESCAPER.escape(cluster.cluster_id)}`]"
+                f"(../issues/{urllib.parse.quote(cluster.issue_filename)})"
+            ),
+        )
     )
     parts.append("")
     return parts
@@ -12874,7 +12920,9 @@ def _build_repro_command_tokens(
             ),
             (
                 "--quantized-kv-start",
-                quantized_kv_start if quantized_kv_start not in {None, 0} else None,
+                quantized_kv_start
+                if quantized_kv_start not in {None, DEFAULT_QUANTIZED_KV_START}
+                else None,
             ),
             ("--thinking-end-token", _thinking_end_token_for_repro(run_args)),
             ("--timeout", getattr(run_args, "timeout", DEFAULT_TIMEOUT)),
@@ -12973,14 +13021,9 @@ def export_failure_repro_bundles(
     prompt: str,
     image_path: Path | None,
 ) -> dict[str, Path]:
-    """Write per-model reproducibility bundles for each failed result."""
-    failed = [res for res in results if not res.success]
-    if not failed:
-        return {}
-
+    """Write reproducibility bundles for failed and issue-clustered results."""
     bundles: dict[str, Path] = {}
     timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
-    output_dir.mkdir(parents=True, exist_ok=True)
 
     prompt_hash = _sha256_text(prompt)
     image_hash = _sha256_file(image_path) if image_path is not None else None
@@ -12991,10 +13034,23 @@ def export_failure_repro_bundles(
     }
     preflight_issues = list(_get_run_preflight_issues(run_args))
     issue_cluster_by_model = _issue_cluster_map_for_results(results, prompt=prompt)
+    bundled_results = [
+        result
+        for result in results
+        if not result.success or result.model_name in issue_cluster_by_model
+    ]
+    if not bundled_results:
+        return {}
 
-    for index, result in enumerate(failed, start=1):
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    for index, result in enumerate(bundled_results, start=1):
         safe_model = _sanitize_bundle_filename(result.model_name)
-        signature_token = re.sub(r"[^A-Za-z0-9_]+", "_", result.error_signature or "unknown")
+        issue_cluster = issue_cluster_by_model.get(result.model_name)
+        signature_source = result.error_signature or (
+            issue_cluster.cluster_id if issue_cluster is not None else "unknown"
+        )
+        signature_token = re.sub(r"[^A-Za-z0-9_]+", "_", signature_source)
         signature_token = signature_token[:40] if signature_token else "unknown"
         bundle_name = f"{timestamp}_{index:03d}_{safe_model}_{signature_token}.json"
         bundle_path = output_dir / bundle_name
@@ -13005,7 +13061,6 @@ def export_failure_repro_bundles(
             include_selection=False,
         )
         rerun_command = shlex_join([*rerun_tokens, "--models", result.model_name])
-        issue_cluster = issue_cluster_by_model.get(result.model_name)
         cluster_repro_command = (
             shlex_join(
                 [
@@ -13028,6 +13083,9 @@ def export_failure_repro_bundles(
             "args": serialized_args,
             "env_vars": env_vars,
         }
+        prompt_diagnostics = _prompt_diagnostics_to_json(result.prompt_diagnostics)
+        if prompt_diagnostics:
+            repro_payload["prompt_diagnostics"] = prompt_diagnostics
 
         bundle_payload: dict[str, object] = {
             "schema_version": "1.0",
@@ -13043,6 +13101,17 @@ def export_failure_repro_bundles(
                 "message": result.error_message,
                 "traceback": result.error_traceback,
                 "captured_output": result.captured_output_on_fail,
+            },
+            "result": {
+                "success": result.success,
+                "quality_issues": _parse_quality_issues_to_list(result.quality_issues),
+                "maintainer_triage": _maintainer_triage_for_result(result),
+                "generated_text_preview": _build_prompt_preview(
+                    _generation_text_value(result.generation),
+                    max_chars=400,
+                )
+                if result.generation is not None
+                else None,
             },
             "repro": repro_payload,
             "environment": {
@@ -14300,38 +14369,21 @@ def _append_review_issue_queue(
             "",
         ]
     )
-    rows: list[tuple[str, ...]] = []
-    for cluster in clusters:
-        representative = _issue_cluster_representative(cluster)
-        representative_name = representative.model_name if representative is not None else "unknown"
+
+    def _review_issue_link(cluster: IssueCluster) -> str:
         issue_path = output_root / "issues" / cluster.issue_filename
         issue_rel = _relative_markdown_artifact_path(
             report_filename=report_filename,
             artifact_filename=issue_path,
         ).replace(" ", "%20")
-        rows.append(
-            (
-                f"`{MARKDOWN_ESCAPER.escape(cluster.owner)}`",
-                f"`{MARKDOWN_ESCAPER.escape(cluster.issue_subtype)}`",
-                str(_issue_cluster_model_count(cluster)),
-                f"`{MARKDOWN_ESCAPER.escape(representative_name)}`",
-                f"[`{MARKDOWN_ESCAPER.escape(cluster.cluster_id)}`]({issue_rel})",
-                MARKDOWN_ESCAPER.escape(cluster.acceptance_signal),
-            )
-        )
+        return f"[`{MARKDOWN_ESCAPER.escape(cluster.cluster_id)}`]({issue_rel})"
+
     md.extend(
-        tabulate(
-            rows,
-            headers=[
-                "Owner",
-                "Issue Subtype",
-                "Affected Model Count",
-                "Representative Model",
-                "Issue Draft",
-                "Acceptance Signal",
-            ],
-            tablefmt="github",
-        ).splitlines()
+        _render_issue_queue_table(
+            clusters,
+            escape_text=MARKDOWN_ESCAPER.escape,
+            issue_link_for_cluster=_review_issue_link,
+        )
     )
     md.append("")
 
@@ -15019,6 +15071,153 @@ def _build_generate_extra_kwargs(params: ProcessImageParams) -> GenerateExtraKwa
     return extra_kwargs
 
 
+_IMAGE_PLACEHOLDER_PATTERNS: Final[tuple[re.Pattern[str], ...]] = (
+    re.compile(r"<\|?image(?:_\d+)?\|?>", re.IGNORECASE),
+    re.compile(r"<start_of_image>", re.IGNORECASE),
+    re.compile(r"<image_soft_token>", re.IGNORECASE),
+)
+_MAX_PROMPT_DIAGNOSTIC_ITEMS: Final[int] = 32
+_RENDERED_PROMPT_PREVIEW_CHARS: Final[int] = 800
+
+
+def _prompt_diag_json_value(value: object) -> JsonLike:
+    """Convert prompt-diagnostic values into bounded JSON-compatible data."""
+    if isinstance(value, Path):
+        return str(value)
+    if isinstance(value, (str, int, float, bool)) or value is None:
+        return value
+    if isinstance(value, Mapping):
+        return {str(k): _prompt_diag_json_value(v) for k, v in value.items()}
+    if isinstance(value, Sequence) and not isinstance(value, str | bytes | bytearray):
+        return [_prompt_diag_json_value(item) for item in value]
+    return str(value)
+
+
+def _qualified_class_name(value: object | None) -> str | None:
+    """Return a stable module-qualified class name for diagnostics."""
+    if value is None:
+        return None
+    cls = value.__class__
+    module = getattr(cls, "__module__", "")
+    qualname = getattr(cls, "__qualname__", cls.__name__)
+    return f"{module}.{qualname}" if module else qualname
+
+
+def _count_image_placeholders(rendered_prompt: str) -> int:
+    """Count common multimodal image placeholder spellings in rendered templates."""
+    return sum(len(pattern.findall(rendered_prompt)) for pattern in _IMAGE_PLACEHOLDER_PATTERNS)
+
+
+def _bounded_json_sequence(value: object) -> tuple[JsonLike, ...]:
+    """Return a bounded tuple of JSON-compatible diagnostic values."""
+    if value is None or isinstance(value, str | bytes | bytearray):
+        return ()
+    if not isinstance(value, Sequence):
+        return ()
+    return tuple(_prompt_diag_json_value(item) for item in value[:_MAX_PROMPT_DIAGNOSTIC_ITEMS])
+
+
+def _bounded_string_sequence(value: object) -> tuple[str, ...]:
+    """Return a bounded tuple of stringified diagnostic values."""
+    if value is None or isinstance(value, str | bytes | bytearray):
+        return ()
+    if not isinstance(value, Sequence):
+        return ()
+    return tuple(str(item) for item in value[:_MAX_PROMPT_DIAGNOSTIC_ITEMS])
+
+
+def _generation_kwargs_for_prompt_diagnostics(
+    *,
+    params: ProcessImageParams,
+    extra_kwargs: Mapping[str, object],
+    processor_passthrough_kwargs: Mapping[str, object],
+) -> dict[str, JsonLike]:
+    """Return the generation kwargs forwarded to mlx-vlm in JSON-safe form."""
+    kwargs: dict[str, object] = {
+        "temperature": params.temperature,
+        "top_p": params.top_p,
+        "repetition_penalty": params.repetition_penalty,
+        "repetition_context_size": params.repetition_context_size,
+        "max_kv_size": params.max_kv_size,
+        "kv_bits": params.kv_bits,
+        "kv_quant_scheme": params.kv_quant_scheme,
+        "kv_group_size": params.kv_group_size,
+        "quantized_kv_start": params.quantized_kv_start,
+        "max_tokens": params.max_tokens,
+    }
+    kwargs.update(extra_kwargs)
+    if processor_passthrough_kwargs:
+        kwargs["processor_kwargs"] = dict(processor_passthrough_kwargs)
+    return {key: _prompt_diag_json_value(value) for key, value in sorted(kwargs.items())}
+
+
+def _build_prompt_diagnostics(
+    *,
+    params: ProcessImageParams,
+    processor: ProcessorMixin,
+    config: PreTrainedConfig | Mapping[str, object] | None,
+    formatted_prompt: str,
+    extra_kwargs: Mapping[str, object],
+    processor_passthrough_kwargs: Mapping[str, object],
+) -> PromptDiagnostics:
+    """Collect bounded prompt/template diagnostics for JSONL and repro bundles."""
+    tokenizer = _extract_processor_tokenizer(processor)
+    model_type_raw = _get_config_value(config, "model_type")
+    model_type = str(model_type_raw) if model_type_raw is not None else None
+    eos_token = getattr(tokenizer, "eos_token", None)
+    return PromptDiagnostics(
+        model_type=model_type,
+        processor_class=_qualified_class_name(processor),
+        tokenizer_class=_qualified_class_name(tokenizer),
+        rendered_prompt_hash_sha256=_sha256_text(formatted_prompt),
+        rendered_prompt_preview=_build_prompt_preview(
+            formatted_prompt,
+            max_chars=_RENDERED_PROMPT_PREVIEW_CHARS,
+        ),
+        rendered_prompt_chars=len(formatted_prompt),
+        image_placeholder_count=_count_image_placeholders(formatted_prompt),
+        eos_token_id=_prompt_diag_json_value(getattr(tokenizer, "eos_token_id", None)),
+        eos_token=str(eos_token) if eos_token is not None else None,
+        special_token_ids=_bounded_json_sequence(getattr(tokenizer, "all_special_ids", None)),
+        special_tokens=_bounded_string_sequence(getattr(tokenizer, "all_special_tokens", None)),
+        generate_kwargs=_generation_kwargs_for_prompt_diagnostics(
+            params=params,
+            extra_kwargs=extra_kwargs,
+            processor_passthrough_kwargs=processor_passthrough_kwargs,
+        ),
+    )
+
+
+def _prompt_diagnostics_to_json(diagnostics: PromptDiagnostics | None) -> dict[str, JsonLike]:
+    """Serialize prompt diagnostics as optional JSONL/repro metadata."""
+    if diagnostics is None:
+        return {}
+    payload: dict[str, JsonLike] = {}
+    for key in (
+        "model_type",
+        "processor_class",
+        "tokenizer_class",
+        "rendered_prompt_hash_sha256",
+        "rendered_prompt_preview",
+        "rendered_prompt_chars",
+        "image_placeholder_count",
+        "eos_token_id",
+        "eos_token",
+    ):
+        value = getattr(diagnostics, key)
+        if value is not None:
+            payload[key] = _prompt_diag_json_value(value)
+    if diagnostics.special_token_ids:
+        payload["special_token_ids"] = list(diagnostics.special_token_ids)
+    if diagnostics.special_tokens:
+        payload["special_tokens"] = [
+            _prompt_diag_json_value(item) for item in diagnostics.special_tokens
+        ]
+    if diagnostics.generate_kwargs:
+        payload["generate_kwargs"] = dict(diagnostics.generate_kwargs)
+    return payload
+
+
 def validate_image_accessible(*, image_path: str | Path) -> None:
     """Validate image file is accessible and supported.
 
@@ -15155,6 +15354,7 @@ def _check_hf_cache_integrity(model_identifier: str) -> None:
 
 
 _FAILURE_PHASE_ATTR: Final[str] = "_check_models_failure_phase"
+_PROMPT_DIAGNOSTICS_ATTR: Final[str] = "_check_models_prompt_diagnostics"
 
 _STAGE_CODE_MAP: Final[dict[str, str]] = {
     "OOM": "OOM",
@@ -15233,6 +15433,22 @@ def _tag_exception_failure_phase[E: BaseException](error: E, phase: str) -> E:
     return error
 
 
+def _tag_exception_prompt_diagnostics[E: BaseException](
+    error: E,
+    diagnostics: PromptDiagnostics | None,
+) -> E:
+    """Attach rendered prompt diagnostics to an exception when available."""
+    if diagnostics is not None:
+        setattr(cast("Any", error), _PROMPT_DIAGNOSTICS_ATTR, diagnostics)
+    return error
+
+
+def _object_prompt_diagnostics(value: object | None) -> PromptDiagnostics | None:
+    """Return prompt diagnostics attached to an arbitrary runtime object."""
+    diagnostics = getattr(value, _PROMPT_DIAGNOSTICS_ATTR, None)
+    return diagnostics if isinstance(diagnostics, PromptDiagnostics) else None
+
+
 def _extract_failure_phase(
     error: BaseException,
     *,
@@ -15246,6 +15462,37 @@ def _extract_failure_phase(
             return _normalise_failure_phase(tagged)
         cur = cur.__cause__
     return _normalise_failure_phase(fallback)
+
+
+def _exception_chain(error: BaseException) -> Iterator[BaseException]:
+    """Yield an exception and its causal/context chain without looping forever."""
+    seen: set[int] = set()
+    cur: BaseException | None = error
+    while cur is not None and id(cur) not in seen:
+        seen.add(id(cur))
+        yield cur
+        if cur.__cause__ is not None:
+            cur = cur.__cause__
+        elif not cur.__suppress_context__:
+            cur = cur.__context__
+        else:
+            cur = None
+
+
+def _root_cause_exception(error: BaseException) -> BaseException:
+    """Return the deepest available exception in a cause/context chain."""
+    root = error
+    for candidate in _exception_chain(error):
+        root = candidate
+    return root
+
+
+def _extract_exception_prompt_diagnostics(error: BaseException) -> PromptDiagnostics | None:
+    """Return prompt diagnostics attached anywhere in an exception chain."""
+    for item in _exception_chain(error):
+        if diagnostics := _object_prompt_diagnostics(item):
+            return diagnostics
+    return None
 
 
 def _sanitize_error_token(value: str | None, *, default: str) -> str:
@@ -16195,6 +16442,14 @@ def _run_model_generation(
 
     extra_kwargs = _build_generate_extra_kwargs(params)
     processor_passthrough_kwargs = params.processor_kwargs or {}
+    prompt_diagnostics = _build_prompt_diagnostics(
+        params=params,
+        processor=processor,
+        config=config,
+        formatted_prompt=formatted_prompt,
+        extra_kwargs=extra_kwargs,
+        processor_passthrough_kwargs=processor_passthrough_kwargs,
+    )
     strict_generate = cast("StrictGenerateCallable", generate)
 
     def _generate_once() -> GenerationResult | SupportsGenerationResult:
@@ -16235,6 +16490,9 @@ def _run_model_generation(
             params=params,
             generate_once=_generate_once,
         )
+    except (TimeoutError, OSError, ValueError, RuntimeError) as generation_err:
+        _tag_exception_prompt_diagnostics(generation_err, prompt_diagnostics)
+        raise
     finally:
         if phase_timer is not None:
             phase_timer.stop("decode")
@@ -16244,7 +16502,9 @@ def _run_model_generation(
     duration = timer.stop()
 
     # Capture local timing plus active/cache memory snapshots while model state is intact.
-    return _attach_generation_runtime_metrics(output, duration=duration)
+    result = _attach_generation_runtime_metrics(output, duration=duration)
+    setattr(cast("Any", result), _PROMPT_DIAGNOSTICS_ATTR, prompt_diagnostics)
+    return result
 
 
 def _build_failure_result(
@@ -16260,13 +16520,17 @@ def _build_failure_result(
     total_time: float | None = None,
     runtime_diagnostics: RuntimeDiagnostics | None = None,
     requested_max_tokens: int | None = None,
+    prompt_diagnostics: PromptDiagnostics | None = None,
 ) -> PerformanceResult:
     """Build a standardized failure result payload for a model run."""
     error_msg = str(error)
     tb_str = traceback.format_exc()
+    root_error = _root_cause_exception(error)
+    root_error_msg = str(root_error)
+    classification_text = " ".join(part for part in (root_error_msg, error_msg) if part)
     resolved_phase = _extract_failure_phase(error, fallback=failure_phase)
-    classified_stage = _classify_error(error_msg)
-    error_package = _attribute_error_to_package(error_msg, tb_str)
+    classified_stage = _classify_error(classification_text or error_msg)
+    error_package = _attribute_error_to_package(classification_text or error_msg, tb_str)
     error_code = _build_canonical_error_code(
         error_stage=classified_stage,
         error_package=error_package,
@@ -16274,9 +16538,10 @@ def _build_failure_result(
     )
     error_signature = _build_error_signature(
         error_code=error_code,
-        error_message=error_msg,
+        error_message=root_error_msg or error_msg,
         error_traceback=tb_str,
     )
+    resolved_prompt_diagnostics = prompt_diagnostics or _extract_exception_prompt_diagnostics(error)
     return PerformanceResult(
         model_name=model_name,
         generation=None,
@@ -16288,6 +16553,9 @@ def _build_failure_result(
         error_message=error_msg,
         captured_output_on_fail=captured_output,
         error_type=type(error).__name__,
+        root_error_type=type(root_error).__name__,
+        root_error_module=type(root_error).__module__,
+        root_error_message=root_error_msg,
         quality_issues=quality_issues,
         quality_analysis=quality_analysis,
         error_package=error_package,
@@ -16297,6 +16565,7 @@ def _build_failure_result(
         total_time=total_time,
         runtime_diagnostics=runtime_diagnostics,
         requested_max_tokens=requested_max_tokens,
+        prompt_diagnostics=resolved_prompt_diagnostics,
     )
 
 
@@ -16377,6 +16646,7 @@ def process_image_with_model(params: ProcessImageParams) -> PerformanceResult:
                 stop_reason=stop_reason,
             ),
             requested_max_tokens=params.max_tokens,
+            prompt_diagnostics=_object_prompt_diagnostics(output),
         )
         result_payload = _populate_result_quality_analysis(
             result_payload,
@@ -19782,7 +20052,9 @@ def _build_jsonl_result_record_base(result: PerformanceResult) -> JsonlResultRec
         components: JsonlSignatureComponents = {}
         if result.error_code is not None:
             components["error_code"] = result.error_code
-        components["normalized_message"] = _normalize_error_core_message(result.error_message)
+        components["normalized_message"] = _normalize_error_core_message(
+            result.root_error_message or result.error_message
+        )
         if result.error_traceback is not None:
             components["traceback_signature"] = _normalize_traceback_signature(
                 result.error_traceback
@@ -19803,6 +20075,15 @@ def _build_jsonl_result_record_base(result: PerformanceResult) -> JsonlResultRec
         if ev.rerun_prompt is not None:
             summary["rerun_prompt"] = ev.rerun_prompt
         record["rerun_summary"] = summary
+    if result.root_error_type is not None:
+        record["root_error_type"] = result.root_error_type
+    if result.root_error_module is not None:
+        record["root_error_module"] = result.root_error_module
+    if result.root_error_message is not None:
+        record["root_error_message"] = result.root_error_message
+    prompt_diagnostics = _prompt_diagnostics_to_json(result.prompt_diagnostics)
+    if prompt_diagnostics:
+        record["prompt_diagnostics"] = prompt_diagnostics
     return record
 
 
@@ -20439,6 +20720,17 @@ def _issue_failure_evidence(result: PerformanceResult) -> list[str]:
     if result.error_message:
         parts.append("Observed error:")
         _append_markdown_code_block(parts, result.error_message, language="text")
+    if result.root_error_type and result.root_error_message:
+        root_label = result.root_error_type
+        if result.root_error_module:
+            root_label = f"{result.root_error_module}.{root_label}"
+        root_text = f"{root_label}: {result.root_error_message}"
+        if (
+            result.root_error_type != result.error_type
+            or result.root_error_message != result.error_message
+        ):
+            parts.append("Root exception:")
+            _append_markdown_code_block(parts, root_text, language="text")
     if trace_tail := _format_traceback_tail(result.error_traceback):
         parts.append("Traceback tail:")
         _append_markdown_code_block(parts, trace_tail, language="text")
@@ -20722,33 +21014,15 @@ def _write_issue_index(
         issues_dir.joinpath("index.md").write_text("\n".join(parts), encoding="utf-8")
         return
 
-    rows: list[tuple[str, ...]] = []
-    for cluster in clusters:
-        representative = _issue_cluster_representative(cluster)
-        representative_name = representative.model_name if representative is not None else "unknown"
-        rows.append(
-            (
-                f"`{MARKDOWN_ESCAPER.escape(cluster.owner)}`",
-                f"`{MARKDOWN_ESCAPER.escape(cluster.issue_subtype)}`",
-                str(_issue_cluster_model_count(cluster)),
-                f"`{MARKDOWN_ESCAPER.escape(representative_name)}`",
-                f"[`{MARKDOWN_ESCAPER.escape(cluster.cluster_id)}`]({cluster.issue_filename})",
-                MARKDOWN_ESCAPER.escape(cluster.acceptance_signal),
-            )
-        )
     parts.extend(
-        tabulate(
-            rows,
-            headers=[
-                "Owner",
-                "Issue Subtype",
-                "Affected Model Count",
-                "Representative Model",
-                "Issue Draft",
-                "Acceptance Signal",
-            ],
-            tablefmt="github",
-        ).splitlines()
+        _render_issue_queue_table(
+            clusters,
+            escape_text=MARKDOWN_ESCAPER.escape,
+            issue_link_for_cluster=lambda cluster: (
+                f"[`{MARKDOWN_ESCAPER.escape(cluster.cluster_id)}`]"
+                f"({urllib.parse.quote(cluster.issue_filename)})"
+            ),
+        )
     )
     parts.append("")
     issues_dir.joinpath("index.md").write_text("\n".join(parts) + "\n", encoding="utf-8")
@@ -20828,7 +21102,7 @@ def _write_diagnostics_and_repro_artifacts(
         image_path=image_path,
     )
     if repro_bundles:
-        logger.info("Repro bundles written for %d failed model(s).", len(repro_bundles))
+        logger.info("Repro bundles written for %d issue-linked model(s).", len(repro_bundles))
         for model_name, bundle_path in sorted(repro_bundles.items()):
             log_file_path(bundle_path, label=f"   Repro Bundle ({model_name}):")
 
@@ -21181,7 +21455,11 @@ def _run_differential_reruns(
                 getattr(args, "kv_quant_scheme", DEFAULT_KV_QUANT_SCHEME),
             ),
             kv_group_size=getattr(args, "kv_group_size", 64),
-            quantized_kv_start=getattr(args, "quantized_kv_start", 0),
+            quantized_kv_start=getattr(
+                args,
+                "quantized_kv_start",
+                DEFAULT_QUANTIZED_KV_START,
+            ),
         )
         rerun_result = process_image_with_model(params)
         evidence = _build_rerun_evidence(rerun_result, rerun_prompt=RERUN_TRIAGE_PROMPT)
@@ -21839,8 +22117,11 @@ def _build_cli_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--quantized-kv-start",
         type=int,
-        default=0,
-        help="Start position for KV cache quantization. 0 = from beginning.",
+        default=DEFAULT_QUANTIZED_KV_START,
+        help=(
+            "Start position for KV cache quantization. "
+            f"Default: {DEFAULT_QUANTIZED_KV_START} (matches mlx-vlm upstream)."
+        ),
     )
     parser.add_argument(
         "--prefill-step-size",

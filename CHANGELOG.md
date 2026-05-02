@@ -16,6 +16,9 @@ Notable changes to this project will be documented in this file.
   instead.
 - Exclude harness/avoid models from user-facing best description, best
   keywording, and balanced recommendation picks.
+- Share the issue queue table renderer across diagnostics, review, and
+  `output/issues/index.md` so maintainer queue columns stay in sync without
+  duplicate row-building code.
 
 ### Fixed
 
@@ -43,6 +46,10 @@ Notable changes to this project will be documented in this file.
 - Compact the generated report first screens and harness issue titles so
   `results.md`, `model_gallery.md`, `review.md`, `diagnostics.md`, and issue
   markdown surface maintainer actions before verbose evidence.
+- Preserve mlx-vlm's upstream KV-cache quantization start default, retain root
+  exception type/module/message fields in JSONL and issue evidence, and add
+  rendered prompt diagnostics plus repro bundles for issue-clustered harness
+  anomalies.
 
 ## [0.6.0] - 2026-04-26
 

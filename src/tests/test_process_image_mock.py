@@ -120,7 +120,7 @@ def _build_params(image_path: Path) -> check_models.ProcessImageParams:
         kv_bits=None,
         kv_quant_scheme="uniform",
         kv_group_size=64,
-        quantized_kv_start=0,
+        quantized_kv_start=check_models.DEFAULT_QUANTIZED_KV_START,
     )
 
 
@@ -270,6 +270,34 @@ class TestProcessImageWithModelMock:
         assert result.error_signature is not None
         assert result.error_traceback is not None
         assert "template failure" in (result.captured_output_on_fail or "")
+
+    def test_build_failure_result_preserves_root_exception_identity(self) -> None:
+        """Wrapped upstream errors should keep their original exception identity."""
+        upstream_message = "upstream shape mismatch"
+        wrapper_message = "Model loading failed: upstream shape mismatch"
+        upstream_error = RuntimeError(upstream_message)
+        wrapper_error = ValueError(wrapper_message)
+        wrapper_error.__cause__ = upstream_error
+
+        def _raise_wrapped_error(error: ValueError) -> None:
+            raise error
+
+        result: check_models.PerformanceResult
+        try:
+            _raise_wrapped_error(wrapper_error)
+        except ValueError as err:
+            result = check_models._build_failure_result(
+                model_name="test/fake-model",
+                error=err,
+                captured_output=None,
+            )
+        else:  # pragma: no cover - defensive guard for static analysis
+            raise AssertionError
+
+        assert result.error_type == "ValueError"
+        assert result.root_error_type == "RuntimeError"
+        assert result.root_error_module == "builtins"
+        assert result.root_error_message == upstream_message
 
     def test_build_failure_result_preserves_quality_fields(self) -> None:
         """Failure builder should carry precomputed quality diagnostics when provided."""
