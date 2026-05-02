@@ -20344,8 +20344,12 @@ def _issue_title(cluster: IssueCluster) -> str:
     symptom = _sanitize_bpe_display(cluster.symptom, max_len=96).strip().rstrip(".")
     if not symptom:
         symptom = _issue_subtype_label(cluster.issue_subtype)
+    owner_label = cluster.owner.replace("[", r"\[").replace("]", r"\]")
+    subtype_label = (
+        _issue_subtype_label(cluster.issue_subtype).replace("[", r"\[").replace("]", r"\]")
+    )
     return (
-        f"[{cluster.owner}][{_issue_subtype_label(cluster.issue_subtype)}] "
+        f"\\[{owner_label}\\]\\[{subtype_label}\\] "
         f"{symptom} affecting {_issue_cluster_model_count(cluster)} model(s)"
     )
 

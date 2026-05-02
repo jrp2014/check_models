@@ -1,4 +1,4 @@
-# [mlx-vlm][stop-token] Special control token &lt;|end|&gt; appeared in generated text affecting 4 model(s)
+# \[mlx-vlm\]\[stop-token\] Special control token &lt;|end|&gt; appeared in generated text affecting 4 model(s)
 
 ## Summary
 

@@ -1,4 +1,4 @@
-# [mlx-vlm][encoding] Tokenizer space-marker artifacts (for example  ) appeared in output (about 139 occurrences) affecting 1 model(s)
+# \[mlx-vlm\]\[encoding\] Tokenizer space-marker artifacts (for example  ) appeared in output (about 139 occurrences) affecting 1 model(s)
 
 ## Summary
 

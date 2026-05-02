@@ -2678,7 +2678,7 @@ class TestGithubIssueReportContent:
 
         assert len(generated) == 1
         content = next(iter(generated.values())).read_text(encoding="utf-8")
-        assert content.startswith("# [mlx-vlm][MLX-VLM-DECODE-RUNTIME]")
+        assert content.startswith("# \\[mlx-vlm\\]\\[MLX-VLM-DECODE-RUNTIME\\]")
         assert "## Summary" in content
         assert "## Affected Models" in content
         assert "## Evidence" in content
@@ -2715,7 +2715,7 @@ class TestGithubIssueReportContent:
         )
 
         content = next(iter(generated.values())).read_text(encoding="utf-8")
-        assert content.startswith("# [mlx-vlm / mlx][long-context]")
+        assert content.startswith("# \\[mlx-vlm / mlx\\]\\[long-context\\]")
         assert "## Likely Root Cause" in content
         assert "At long prompt length (5000 tokens), generation returned empty output." in content
         assert "context_budget" in content

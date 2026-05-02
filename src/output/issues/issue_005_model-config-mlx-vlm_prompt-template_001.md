@@ -1,4 +1,4 @@
-# [model-config / mlx-vlm][prompt-template] Output appears truncated to about 4 tokens affecting 2 model(s)
+# \[model-config / mlx-vlm\]\[prompt-template\] Output appears truncated to about 4 tokens affecting 2 model(s)
 
 ## Summary
 

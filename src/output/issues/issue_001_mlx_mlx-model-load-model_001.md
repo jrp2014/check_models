@@ -1,4 +1,4 @@
-# [mlx][MLX-MODEL-LOAD-MODEL] Model loading failed: Received 4 parameters not in model: affecting 1 model(s)
+# \[mlx\]\[MLX-MODEL-LOAD-MODEL\] Model loading failed: Received 4 parameters not in model: affecting 1 model(s)
 
 ## Summary
 

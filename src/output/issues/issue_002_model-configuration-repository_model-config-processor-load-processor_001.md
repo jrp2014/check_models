@@ -1,4 +1,4 @@
-# [model configuration/repository][MODEL-CONFIG-PROCESSOR-LOAD-PROCESSOR] Loaded processor has no image_processor; expected multimodal processor affecting 1 model(s)
+# \[model configuration/repository\]\[MODEL-CONFIG-PROCESSOR-LOAD-PROCESSOR\] Loaded processor has no image_processor; expected multimodal processor affecting 1 model(s)
 
 ## Summary
 

@@ -1,4 +1,4 @@
-# [mlx-vlm / mlx][long-context] Output degeneration under long prompt length (repeated_punctuation: ':**...') affecting 1 model(s)
+# \[mlx-vlm / mlx\]\[long-context\] Output degeneration under long prompt length (repeated_punctuation: ':**...') affecting 1 model(s)
 
 ## Summary
 

@@ -1,4 +1,4 @@
-# [mlx-vlm / mlx][long-context] Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt affecting 2 model(s)
+# \[mlx-vlm / mlx\]\[long-context\] Output is very short relative to prompt size (0.1%), suggesting possible early-stop or prompt affecting 2 model(s)
 
 ## Summary
 
